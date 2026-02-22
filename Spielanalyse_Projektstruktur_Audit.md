@@ -530,3 +530,39 @@ Das Projekt ist technisch ambitioniert und fuer ein Arcade-3D-Spiel bereits weit
 
 Wenn diese 3-4 kritischen Punkte gefixt und die Struktur in kleinen Phasen verbessert wird, steigt die Entwicklungsgeschwindigkeit deutlich und Regressionsrisiko sinkt spuerbar.
 
+## Umsetzungsstatus (Session 2026-02-22, append)
+
+Revalidierung vor Fortsetzung wurde durchgefuehrt (Git-Status/Diffs/Log + gezielte `rg`-Checks auf `Renderer`, `Player`, `main.js`, `three-disposal.js` sowie Bot/Trail/Input/Powerup/EntityManager).
+
+### Revalidiert als erledigt / vorhanden
+
+- Bot `_senseEnvironment`-Crashfix vorhanden (deklarierte Probe-/Openness-Variablen in `js/modules/Bot.js`)
+- `SLOW_TIME` TimeScale-Reset vorhanden (Default `1.0` pro Tick + Absenkung nur bei aktivem Effekt)
+- Trail-Alt-API `Trail.checkCollision()` offenbar entfernt (kein Treffer mehr in `js/modules/Trail.js`)
+- `requiredWins` Runtime an UI-Range angepasst (1-15 statt harter Mindestwert 5)
+- `InputManager.preventDefault()` nur fuer relevante Tasten / Bindings
+- `EntityManager.dispose()` + `PowerupManager.dispose()` im Match-Lifecycle genutzt
+- `PowerupManager.dispose()` entsorgt Shared-Geometrien
+- `Renderer` Scene-Roots (`persistentRoot`, `matchRoot`, `debugRoot`) + `clearMatchScene()` vorhanden
+- `main.js` nutzt `clearMatchScene()`
+- `Player.dispose()` Deep-Disposal + `js/modules/three-disposal.js` vorhanden
+- Shared-Player-Geometrien gegen Doppel-Dispose markiert
+- Projektil-Asset-Disposal in `EntityManager.dispose()` vorhanden
+
+### Zusaetzlich in dieser Session behoben
+
+- Resource-Lifecycle-Restpunkt in `Arena.build()`:
+  - `CanvasTexture`-Template wurde erzeugt und geklont, aber Original nicht genutzt/entsorgt
+  - Fix: Basis-Textur direkt fuer Boden verwenden, nur Wand-Textur klonen (`js/modules/Arena.js`)
+- `ParticleSystem.dispose()` ergaenzt (`js/modules/Particles.js`) und im Match-Lifecycle explizit aufgerufen (`js/main.js`)
+  - vor `clearMatchScene()` bei `startMatch()` und `_returnToMenu()`
+
+### Verifikation
+
+- Gezielter Node-Smoke fuer `ParticleSystem.dispose()` erfolgreich (inkl. doppeltem `dispose()` ohne Crash)
+- `npm run build` erfolgreich (Vite Chunk-Warnung bleibt, kein Build-Fehler)
+
+### Offene Risiken / naechste Schritte
+
+- Kein echter Browser-Restart-Stresstest (mehrfach Start Match / Return to Menu mit DevTools-Memory-Profiling) in dieser Session
+- Naechster sinnvoller Schritt (Phase 1): kleine `SettingsStore`-Extraktion aus `main.js` (nur Load/Save/Profile-Persistenz + Profilname-Lookup, ohne UI-Logik und ohne `_applySettingsToRuntime()`-Umbau)
