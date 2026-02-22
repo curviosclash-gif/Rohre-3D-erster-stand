@@ -52,3 +52,25 @@ export function setJsonEditorText(editor, value) {
         editor.dom.jsonOutput.value = String(value ?? '');
     }
 }
+
+const PROPERTY_FIELD_MAP = Object.freeze({
+    y: 'propY',
+    size: 'propSize',
+    width: 'propWidth',
+    depth: 'propDepth',
+    height: 'propHeight',
+    scale: 'propScale'
+});
+
+export function readPropertyFieldNumber(editor, field, fallback = 0) {
+    const domKey = PROPERTY_FIELD_MAP[field];
+    if (!domKey) return fallback;
+    return parseFloat(editor?.dom?.[domKey]?.value) || fallback;
+}
+
+export function writePropertyFieldValue(editor, field, value) {
+    const domKey = PROPERTY_FIELD_MAP[field];
+    if (!domKey) return;
+    const input = editor?.dom?.[domKey];
+    if (input) input.value = String(value ?? '');
+}

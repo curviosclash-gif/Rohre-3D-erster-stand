@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { writePropertyFieldValue } from './EditorFormState.js';
 
 export function updateUndoRedoButtonsView(editor, state = null) {
     const historyState = state || editor.commandHistory?.getState?.();
@@ -40,12 +41,7 @@ export function showPropertyPanelView(editor, obj) {
         propDepthRow,
         propHeightRow,
         propScaleRow,
-        propSize,
-        propWidth,
-        propDepth,
-        propHeight,
-        propY,
-        propScale
+        propY
     } = editor.dom;
 
     if (!propPanel || !propY) {
@@ -54,7 +50,7 @@ export function showPropertyPanelView(editor, obj) {
     }
 
     propPanel.style.display = "block";
-    propY.value = Math.round(obj.position.y);
+    writePropertyFieldValue(editor, 'y', Math.round(obj.position.y));
 
     const u = obj.userData;
 
@@ -68,15 +64,15 @@ export function showPropertyPanelView(editor, obj) {
         if (propWidthRow) propWidthRow.style.display = "flex";
         if (propDepthRow) propDepthRow.style.display = "flex";
         if (propHeightRow) propHeightRow.style.display = "flex";
-        if (propWidth) propWidth.value = u.sizeX || u.sizeInfo * 2;
-        if (propDepth) propDepth.value = u.sizeZ || u.sizeInfo * 2;
-        if (propHeight) propHeight.value = u.sizeY || u.sizeInfo * 2;
+        writePropertyFieldValue(editor, 'width', u.sizeX || u.sizeInfo * 2);
+        writePropertyFieldValue(editor, 'depth', u.sizeZ || u.sizeInfo * 2);
+        writePropertyFieldValue(editor, 'height', u.sizeY || u.sizeInfo * 2);
     } else if (u.type === 'tunnel' || u.type === 'portal') {
         if (propSizeRow) propSizeRow.style.display = "flex";
-        if (propSize) propSize.value = u.radius || u.sizeInfo;
+        writePropertyFieldValue(editor, 'size', u.radius || u.sizeInfo);
     } else if (u.type === 'aircraft') {
         if (propScaleRow) propScaleRow.style.display = "flex";
-        if (propScale) propScale.value = u.modelScale || 50;
+        writePropertyFieldValue(editor, 'scale', u.modelScale || 50);
     }
 }
 

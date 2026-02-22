@@ -1,11 +1,13 @@
+import { readPropertyFieldNumber } from './EditorFormState.js';
+
 export function bindEditorPropertyControls(editor) {
     if (!editor) return;
     const dom = editor.dom;
 
-    dom.propY?.addEventListener('change', (e) => {
+    dom.propY?.addEventListener('change', () => {
         editor.executeHistoryMutation('Edit object Y', () => {
             if (!editor.selectedObject || !editor.isManagedObjectAlive(editor.selectedObject)) return;
-            editor.selectedObject.position.y = parseFloat(e.target.value);
+            editor.selectedObject.position.y = readPropertyFieldNumber(editor, 'y', editor.selectedObject.position.y);
             if (editor.selectedObject.userData.type === 'tunnel') {
                 editor.mapManager?.notifyObjectMutated?.(editor.selectedObject);
             }
@@ -13,10 +15,10 @@ export function bindEditorPropertyControls(editor) {
         });
     });
 
-    dom.propSize?.addEventListener('change', (e) => {
+    dom.propSize?.addEventListener('change', () => {
         editor.executeHistoryMutation('Edit object size', () => {
             if (editor.selectedObject && editor.isManagedObjectAlive(editor.selectedObject)) {
-                const val = parseFloat(e.target.value);
+                const val = readPropertyFieldNumber(editor, 'size', editor.selectedObject.userData.sizeInfo || 0);
                 const userData = editor.selectedObject.userData;
                 userData.sizeInfo = val;
 
@@ -40,9 +42,9 @@ export function bindEditorPropertyControls(editor) {
             if (!selected || !editor.isManagedObjectAlive(selected)) return;
             if (selected.userData.type !== 'hard' && selected.userData.type !== 'foam') return;
 
-            const w = parseFloat(dom.propWidth?.value);
-            const d = parseFloat(dom.propDepth?.value);
-            const h = parseFloat(dom.propHeight?.value);
+            const w = readPropertyFieldNumber(editor, 'width', selected.userData.sizeX || 0);
+            const d = readPropertyFieldNumber(editor, 'depth', selected.userData.sizeZ || 0);
+            const h = readPropertyFieldNumber(editor, 'height', selected.userData.sizeY || 0);
 
             selected.userData.sizeX = w;
             selected.userData.sizeZ = d;
@@ -56,13 +58,13 @@ export function bindEditorPropertyControls(editor) {
     dom.propDepth?.addEventListener('change', updateBoxScale);
     dom.propHeight?.addEventListener('change', updateBoxScale);
 
-    dom.propScale?.addEventListener('change', (e) => {
+    dom.propScale?.addEventListener('change', () => {
         editor.executeHistoryMutation('Scale aircraft', () => {
             const selected = editor.selectedObject;
             if (!selected || !editor.isManagedObjectAlive(selected)) return;
             if (selected.userData.type !== 'aircraft') return;
 
-            const s = parseFloat(e.target.value);
+            const s = readPropertyFieldNumber(editor, 'scale', selected.userData.modelScale || 0);
             if (s > 0) {
                 selected.userData.modelScale = s;
                 selected.scale.set(s, s, s);
