@@ -5,6 +5,10 @@ import { TransformControls } from 'three/addons/controls/TransformControls.js';
 export class EditorCore {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
+        this.runtimeStateAccessors = {
+            isFlyModeEnabled: () => false,
+            getArenaHeight: () => 950
+        };
 
         this.keys = { w: false, a: false, s: false, d: false, q: false, e: false, x: false, y: false, shift: false };
         document.addEventListener('keydown', (e) => {
@@ -19,6 +23,15 @@ export class EditorCore {
         });
 
         this.setupScene();
+    }
+
+    setRuntimeStateAccessors(accessors = {}) {
+        if (typeof accessors.isFlyModeEnabled === 'function') {
+            this.runtimeStateAccessors.isFlyModeEnabled = accessors.isFlyModeEnabled;
+        }
+        if (typeof accessors.getArenaHeight === 'function') {
+            this.runtimeStateAccessors.getArenaHeight = accessors.getArenaHeight;
+        }
     }
 
     setupScene() {
@@ -51,7 +64,7 @@ export class EditorCore {
 
         this.transformControl = new TransformControls(this.camera, this.renderer.domElement);
         this.transformControl.addEventListener('dragging-changed', (event) => {
-            const flyMode = document.getElementById("chkFly")?.checked;
+            const flyMode = !!this.runtimeStateAccessors.isFlyModeEnabled?.();
             if (!flyMode) this.orbit.enabled = !event.value;
         });
 
@@ -115,11 +128,11 @@ export class EditorCore {
         const dt = (time - this.lastTime) / 1000 || 0.016;
         this.lastTime = time;
 
-        const flyMode = document.getElementById("chkFly")?.checked;
+        const flyMode = !!this.runtimeStateAccessors.isFlyModeEnabled?.();
         if (flyMode) {
             const speed = (this.keys.shift ? 600 : 250) * dt;
             const orbitSpeed = (this.keys.shift ? 1.4 : 0.8) * dt;
-            const arenaHeight = parseFloat(document.getElementById("numArenaH")?.value) || 950;
+            const arenaHeight = Number(this.runtimeStateAccessors.getArenaHeight?.()) || 950;
             const mapCenter = new THREE.Vector3(0, arenaHeight * 0.5, 0);
 
             // W/S = vertical orbit (pitch), Q/E = horizontal orbit (yaw) around map center.

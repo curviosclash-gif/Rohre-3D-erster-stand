@@ -16,10 +16,15 @@ function isFiniteNumber(value) {
 }
 
 export class EditorMapManager {
-    constructor(core, UI, assetLoader) {
+    constructor(core, assetLoader, options = {}) {
         this.core = core;
-        this.UI = UI;
         this.assetLoader = assetLoader;
+        this.callbacks = {
+            onTunnelVisualsChanged: null,
+            onHudCountChanged: null,
+            onBeforeManagedObjectRemoved: null,
+            onBeforeManagedObjectsCleared: null
+        };
 
         this.mapData = {
             tunnels: [], hardBlocks: [], foamBlocks: [],
@@ -34,7 +39,25 @@ export class EditorMapManager {
         this._pendingHudRefresh = false;
         this._pendingTunnelVisualRefresh = false;
 
+        this.setCallbacks(options?.callbacks || options);
         this.setupPrimitives();
+    }
+
+    setCallbacks(callbacks = {}) {
+        if (!callbacks || typeof callbacks !== 'object') return;
+
+        if (typeof callbacks.onTunnelVisualsChanged === 'function') {
+            this.callbacks.onTunnelVisualsChanged = callbacks.onTunnelVisualsChanged;
+        }
+        if (typeof callbacks.onHudCountChanged === 'function') {
+            this.callbacks.onHudCountChanged = callbacks.onHudCountChanged;
+        }
+        if (typeof callbacks.onBeforeManagedObjectRemoved === 'function') {
+            this.callbacks.onBeforeManagedObjectRemoved = callbacks.onBeforeManagedObjectRemoved;
+        }
+        if (typeof callbacks.onBeforeManagedObjectsCleared === 'function') {
+            this.callbacks.onBeforeManagedObjectsCleared = callbacks.onBeforeManagedObjectsCleared;
+        }
     }
 
     setupPrimitives() {
@@ -87,17 +110,11 @@ export class EditorMapManager {
     }
 
     flushSceneUiRefresh() {
-        if (!this.UI) {
-            this._pendingHudRefresh = false;
-            this._pendingTunnelVisualRefresh = false;
-            return;
-        }
-
         if (this._pendingTunnelVisualRefresh) {
-            this.UI.updateTunnelVisuals();
+            this.callbacks.onTunnelVisualsChanged?.();
         }
         if (this._pendingHudRefresh) {
-            this.UI.updateHudCount();
+            this.callbacks.onHudCountChanged?.();
         }
 
         this._pendingHudRefresh = false;
@@ -278,7 +295,7 @@ export class EditorMapManager {
         const objectId = rootObject.userData?.id;
         const isTunnel = rootObject.userData?.type === 'tunnel';
 
-        this.UI?.onBeforeManagedObjectRemoved?.(rootObject);
+        this.callbacks.onBeforeManagedObjectRemoved?.(rootObject);
 
         if (this.core.transformControl.object === rootObject) {
             this.core.transformControl.detach();
@@ -303,7 +320,7 @@ export class EditorMapManager {
 
     clearAllObjects() {
         this.withSceneMutation(() => {
-            this.UI?.beforeManagedObjectsCleared?.();
+            this.callbacks.onBeforeManagedObjectsCleared?.();
 
             const objects = [...this.core.objectsContainer.children];
             for (const object of objects) {
@@ -520,19 +537,20 @@ export class EditorMapManager {
         return JSON.stringify(payload, null, 2);
     }
 
-    importFromJSON(jsonString, syncArenaValuesCallback) {
+    importFromJSON(jsonString, options = {}) {
         try {
             const parsed = parseMapJSON(jsonString);
             const data = parsed.map;
+            const onArenaSize = typeof options === 'function'
+                ? options
+                : (typeof options?.onArenaSize === 'function' ? options.onArenaSize : null);
+
             if (parsed.warnings.length > 0) {
                 console.warn('[EditorMapManager] Import migration warnings:', parsed.warnings);
             }
 
-            if (data.arenaSize) {
-                document.getElementById("numArenaW").value = data.arenaSize.width;
-                document.getElementById("numArenaD").value = data.arenaSize.depth;
-                document.getElementById("numArenaH").value = data.arenaSize.height;
-                syncArenaValuesCallback();
+            if (data.arenaSize && onArenaSize) {
+                onArenaSize(data.arenaSize);
             }
 
             this.clearAllObjects();

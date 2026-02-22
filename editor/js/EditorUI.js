@@ -1,6 +1,12 @@
 import * as THREE from 'three';
-import { CUSTOM_MAP_STORAGE_KEY } from '../../js/modules/MapSchema.js';
 import { EditorCommandHistory, SnapshotCommand } from './EditorCommandHistory.js';
+import { bindEditorToolPaletteControls } from './ui/EditorToolPaletteControls.js';
+import { bindEditorCanvasInteractionControls } from './ui/EditorCanvasInteractionControls.js';
+import { bindEditorPropertyControls } from './ui/EditorPropertyControls.js';
+import { bindEditorShortcutControls } from './ui/EditorShortcutControls.js';
+import { bindEditorViewportControls } from './ui/EditorViewportControls.js';
+import { bindEditorSessionControls } from './ui/EditorSessionControls.js';
+import { createEditorDomRefs } from './ui/EditorDomRefs.js';
 
 export class EditorUI {
     constructor(core) {
@@ -14,6 +20,7 @@ export class EditorUI {
 
         this.useSnap = false;
         this.snapSize = 50;
+        this.flyModeEnabled = false;
         this.ARENA_W = 2800;
         this.ARENA_D = 2400;
         this.ARENA_H = 950;
@@ -31,6 +38,12 @@ export class EditorUI {
         });
         this.historySuspendDepth = 0;
         this.pendingHistoryGestures = new Map();
+        this.dom = createEditorDomRefs(document);
+
+        this.core.setRuntimeStateAccessors?.({
+            isFlyModeEnabled: () => this.flyModeEnabled,
+            getArenaHeight: () => this.ARENA_H
+        });
 
         this.setupVisuals();
         this.setupEventListeners();
@@ -66,6 +79,20 @@ export class EditorUI {
             height: this.ARENA_H,
             depth: this.ARENA_D
         };
+    }
+
+    setArenaSizeInputs(arenaSize) {
+        if (!arenaSize) return;
+        const { numArenaW, numArenaD, numArenaH } = this.dom;
+        if (Number.isFinite(Number(arenaSize.width))) {
+            if (numArenaW) numArenaW.value = arenaSize.width;
+        }
+        if (Number.isFinite(Number(arenaSize.depth))) {
+            if (numArenaD) numArenaD.value = arenaSize.depth;
+        }
+        if (Number.isFinite(Number(arenaSize.height))) {
+            if (numArenaH) numArenaH.value = arenaSize.height;
+        }
     }
 
     isHistoryRecordingSuspended() {
@@ -111,7 +138,12 @@ export class EditorUI {
         const syncArenaValues = this.syncArenaValues || (() => { });
 
         this.withHistorySuspended(() => {
-            this.mapManager.importFromJSON(snapshot.json, syncArenaValues);
+            this.mapManager.importFromJSON(snapshot.json, {
+                onArenaSize: (arenaSize) => {
+                    this.setArenaSizeInputs(arenaSize);
+                    syncArenaValues();
+                }
+            });
             if (snapshot.hasPlayerSpawnObject === false) {
                 const playerSpawns = [...this.core.objectsContainer.children].filter((obj) => (
                     obj?.userData?.type === 'spawn' && obj?.userData?.subType === 'player'
@@ -208,8 +240,7 @@ export class EditorUI {
         const historyState = state || this.commandHistory?.getState?.();
         if (!historyState) return;
 
-        const btnUndo = document.getElementById("btnUndo");
-        const btnRedo = document.getElementById("btnRedo");
+        const { btnUndo, btnRedo } = this.dom;
 
         if (btnUndo) {
             btnUndo.disabled = !historyState.canUndo;
@@ -251,7 +282,7 @@ export class EditorUI {
 
     syncTransformControlAttachment() {
         const selected = this.isManagedObjectAlive(this.selectedObject) ? this.selectedObject : null;
-        const flyMode = !!document.getElementById("chkFly")?.checked;
+        const flyMode = !!this.flyModeEnabled;
 
         if (!selected || flyMode) {
             this.detachTransformControl();
@@ -309,7 +340,9 @@ export class EditorUI {
 
     updateHudCount() {
         const count = this.mapManager?.getObjectCount?.() ?? this.core.objectsContainer.children.length;
-        document.getElementById("hudObjCount").textContent = `Objekte: ${count}`;
+        if (this.dom.hudObjCount) {
+            this.dom.hudObjCount.textContent = `Objekte: ${count}`;
+        }
     }
 
     getSelectionOutlines(object) {
@@ -423,16 +456,25 @@ export class EditorUI {
             this.hidePropPanel();
             return;
         }
-        const propPanel = document.getElementById("propPanel");
-        const propSizeRow = document.getElementById("propSizeRow");
-        const propWidthRow = document.getElementById("propWidthRow");
-        const propDepthRow = document.getElementById("propDepthRow");
-        const propHeightRow = document.getElementById("propHeightRow");
-        const propSize = document.getElementById("propSize");
-        const propWidth = document.getElementById("propWidth");
-        const propDepth = document.getElementById("propDepth");
-        const propHeight = document.getElementById("propHeight");
-        const propY = document.getElementById("propY");
+        const {
+            propPanel,
+            propSizeRow,
+            propWidthRow,
+            propDepthRow,
+            propHeightRow,
+            propScaleRow,
+            propSize,
+            propWidth,
+            propDepth,
+            propHeight,
+            propY,
+            propScale
+        } = this.dom;
+
+        if (!propPanel || !propY) {
+            this.hidePropPanel();
+            return;
+        }
 
         propPanel.style.display = "block";
         propY.value = Math.round(obj.position.y);
@@ -443,7 +485,6 @@ export class EditorUI {
         propWidthRow.style.display = "none";
         propDepthRow.style.display = "none";
         propHeightRow.style.display = "none";
-        const propScaleRow = document.getElementById("propScaleRow");
         if (propScaleRow) propScaleRow.style.display = "none";
 
         if (u.type === 'hard' || u.type === 'foam') {
@@ -457,487 +498,37 @@ export class EditorUI {
             propSizeRow.style.display = "flex";
             propSize.value = u.radius || u.sizeInfo;
         } else if (u.type === 'aircraft') {
-            const propScaleRow = document.getElementById("propScaleRow");
-            const propScale = document.getElementById("propScale");
-            propScaleRow.style.display = "flex";
-            propScale.value = u.modelScale || 50;
+            if (propScaleRow) propScaleRow.style.display = "flex";
+            if (propScale) propScale.value = u.modelScale || 50;
         }
     }
 
     hidePropPanel() {
-        document.getElementById("propPanel").style.display = "none";
+        if (this.dom.propPanel) this.dom.propPanel.style.display = "none";
     }
 
     setupEventListeners() {
-        // UI Tools
-        document.querySelectorAll('.tool').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.tool').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                this.currentTool = btn.dataset.tool;
+        this.flyModeEnabled = !!this.dom.chkFly?.checked;
 
-                document.querySelectorAll('.sub-menu').forEach(m => m.style.display = 'none');
-                if (this.currentTool === 'spawn') document.getElementById("subSpawn").style.display = "flex";
-                if (this.currentTool === 'item') document.getElementById("subItem").style.display = "flex";
-                if (this.currentTool === 'aircraft') document.getElementById("subAircraft").style.display = "flex";
+        bindEditorToolPaletteControls(this);
 
-                if (this.currentTool !== 'select') this.selectObject(null);
-            });
-        });
+        bindEditorCanvasInteractionControls(this);
 
-        // Click & Draw on 3D Canvas
-        let isDraggingTransform = false;
-        this.core.transformControl.addEventListener('dragging-changed', (e) => {
-            isDraggingTransform = e.value;
-            if (e.value) {
-                const activeObject = this.core.transformControl.object;
-                const managed = this.mapManager?.resolveManagedObject?.(activeObject) || activeObject;
-                if (managed && this.isManagedObjectAlive(managed)) {
-                    this.beginHistoryGesture('transform', `Transform ${managed.userData?.type || 'object'}`);
-                }
-            } else {
-                this.commitHistoryGesture('transform');
-            }
-        });
-        this.core.transformControl.addEventListener('objectChange', () => {
-            const activeObject = this.core.transformControl.object;
-            if (!activeObject) return;
+        bindEditorShortcutControls(this);
 
-            const managedObject = this.mapManager?.notifyObjectMutated?.(activeObject) || activeObject;
-            if (!this.isManagedObjectAlive(managedObject)) {
-                this.detachTransformControl();
-                if (this.selectedObject && !this.isManagedObjectAlive(this.selectedObject)) {
-                    this.selectObject(null);
-                }
-                return;
-            }
-
-            if (managedObject === this.selectedObject) {
-                this.showPropPanel(managedObject);
-            }
-        });
-
-        const getGroundPos = (e) => {
-            const rect = this.core.container.getBoundingClientRect();
-            this.mouse.x = ((e.clientX - rect.left) / this.core.container.clientWidth) * 2 - 1;
-            this.mouse.y = -((e.clientY - rect.top) / this.core.container.clientHeight) * 2 + 1;
-            this.raycaster.setFromCamera(this.mouse, this.core.camera);
-
-            const useYLayer = document.getElementById("chkYLayer").checked;
-            const targetMesh = useYLayer ? this.core.yGroundMesh : this.core.groundMesh;
-
-            const intersectsGround = this.raycaster.intersectObject(targetMesh);
-            if (intersectsGround.length > 0) {
-                let p = intersectsGround[0].point;
-                if (this.useSnap) {
-                    p.x = Math.round(p.x / this.snapSize) * this.snapSize;
-                    p.z = Math.round(p.z / this.snapSize) * this.snapSize;
-                }
-                return p;
-            }
-            return null;
-        };
-
-        this.core.container.addEventListener('pointerdown', (e) => {
-            if (isDraggingTransform) return;
-            if (e.button !== 0) return;
-
-            const rect = this.core.container.getBoundingClientRect();
-            this.mouse.x = ((e.clientX - rect.left) / this.core.container.clientWidth) * 2 - 1;
-            this.mouse.y = -((e.clientY - rect.top) / this.core.container.clientHeight) * 2 + 1;
-            this.raycaster.setFromCamera(this.mouse, this.core.camera);
-
-            if (this.currentTool === "select") {
-                const intersects = this.raycaster.intersectObjects(this.core.objectsContainer.children, true);
-                if (intersects.length > 0) {
-                    this.selectObject(this.resolveSelectableObject(intersects[0].object));
-                } else {
-                    this.selectObject(null);
-                }
-            } else {
-                // START DRAWING
-                const p = getGroundPos(e);
-                if (p) {
-                    this.selectObject(null);
-                    this.beginHistoryGesture('draw', `Create ${this.currentTool}`);
-                    this.isDrawing = true;
-
-                    const useYLayer = document.getElementById("chkYLayer").checked;
-                    let y = useYLayer ? parseFloat(document.getElementById("numYLayer").value) : (this.currentTool === 'hard' || this.currentTool === 'foam' ? this.ARENA_H * 0.35 : this.ARENA_H * 0.55);
-
-                    if (useYLayer && (this.currentTool === 'hard' || this.currentTool === 'foam')) {
-                        y += (this.ARENA_H * 0.7) / 2; // Offset um Hälfte der Standardhöhe
-                    }
-
-                    this.drawStartPos = { x: p.x, y: y, z: p.z };
-
-                    let subType = null;
-                    if (this.currentTool === 'spawn') subType = document.getElementById("selSpawnType").value;
-                    if (this.currentTool === 'item') subType = document.getElementById("selItemType").value;
-                    if (this.currentTool === 'aircraft') subType = document.getElementById("selAircraftType").value;
-
-                    // Erschaffe temporäres Mesh mit Init-Werten
-                    this.previewMesh = this.mapManager.createMesh(this.currentTool, subType, p.x, y, p.z, 0, {
-                        sizeX: this.snapSize, sizeZ: this.snapSize, sizeY: this.ARENA_H * 0.7,
-                        pointA: new THREE.Vector3(p.x, y, p.z), pointB: new THREE.Vector3(p.x, y, p.z)
-                    });
-
-                    if (this.previewMesh) {
-                        this.setSelectionOutline(this.previewMesh, 0xffff00, 0.65);
-                    } else {
-                        this.cancelHistoryGesture('draw');
-                    }
-                }
-            }
-        });
-
-        this.core.container.addEventListener('pointermove', (e) => {
-            if (!this.isDrawing || !this.previewMesh) return;
-            if (!this.isManagedObjectAlive(this.previewMesh)) {
-                this.cancelHistoryGesture('draw');
-                this.clearDrawingState();
-                return;
-            }
-
-            const curr = getGroundPos(e);
-            if (curr) {
-                const start = this.drawStartPos;
-                const tool = this.previewMesh.userData.type;
-
-                if (tool === 'hard' || tool === 'foam') {
-                    // Rechteck: berechne Center und Größe
-                    const minSize = this.useSnap ? this.snapSize : 10;
-                    const w = Math.max(minSize, Math.abs(curr.x - start.x));
-                    const d = Math.max(minSize, Math.abs(curr.z - start.z));
-                    const cx = (start.x + curr.x) / 2;
-                    const cz = (start.z + curr.z) / 2;
-
-                    this.previewMesh.position.set(cx, start.y, cz);
-                    this.previewMesh.scale.set(w, this.ARENA_H * 0.7, d); // Standardwandhöhe
-                    this.previewMesh.userData.sizeX = w;
-                    this.previewMesh.userData.sizeZ = d;
-                    this.previewMesh.userData.sizeY = this.ARENA_H * 0.7;
-                    this.previewMesh.userData.sizeInfo = Math.max(w, d, this.ARENA_H * 0.7) * 0.5;
-                } else if (tool === 'tunnel') {
-                    const pA = new THREE.Vector3(start.x, start.y, start.z);
-                    const pB = new THREE.Vector3(curr.x, start.y, curr.z);
-                    if (pA.distanceTo(pB) > 0.1) {
-                        this.mapManager.alignTunnelSegment(this.previewMesh, pA, pB, 160);
-                    }
-                } else {
-                    // Items/Portal/Spawn folgen einfach der Maus (Drag-to-place)
-                    this.previewMesh.position.set(curr.x, start.y, curr.z);
-                }
-            }
-        });
-
-        this.core.container.addEventListener('pointerup', () => {
-            if (this.isDrawing && this.previewMesh) {
-                this.isDrawing = false;
-                if (this.isManagedObjectAlive(this.previewMesh)) {
-                    this.setSelectionOutline(this.previewMesh, 0x000000, 0.2);
-                    this.selectObject(this.previewMesh);
-                }
-                this.previewMesh = null;
-                this.drawStartPos = null;
-                this.commitHistoryGesture('draw');
-            }
-        });
-
-        this.core.container.addEventListener('keyup', (e) => {
-            if (e.ctrlKey) return; // handled below
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                document.getElementById("btnDelSelected").click();
-            }
-        });
-
-        // Keyboard Actions
-        const shouldIgnoreGlobalShortcut = (target) => {
-            if (!(target instanceof Element)) return false;
-            const tagName = target.tagName.toLowerCase();
-            return tagName === 'input'
-                || tagName === 'textarea'
-                || tagName === 'select'
-                || target.isContentEditable;
-        };
-
-        document.addEventListener('keydown', (e) => {
-            if (shouldIgnoreGlobalShortcut(e.target)) return;
-
-            const lowerKey = e.key.toLowerCase();
-
-            if (e.ctrlKey && lowerKey === 'z') {
-                e.preventDefault();
-                if (e.shiftKey) {
-                    this.redo();
-                } else {
-                    this.undo();
-                }
-                return;
-            }
-            if (e.ctrlKey && lowerKey === 'y') {
-                e.preventDefault();
-                this.redo();
-                return;
-            }
-
-            // Delete
-            if (e.key === 'Delete' || e.key === 'Backspace') {
-                this.deleteSelectedObject();
-            }
-
-            // Transform Modes
-            if (lowerKey === 'r') {
-                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && this.core.transformControl.object) {
-                    this.core.transformControl.setMode('rotate');
-                    this.core.transformControl.showX = false;
-                    this.core.transformControl.showY = true;
-                    this.core.transformControl.showZ = false;
-                }
-            }
-            if (lowerKey === 't') {
-                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && this.core.transformControl.object) {
-                    this.core.transformControl.setMode('translate');
-                    this.core.transformControl.showX = true;
-                    this.core.transformControl.showY = true;
-                    this.core.transformControl.showZ = true;
-                }
-            }
-
-            // Copy
-            if (e.ctrlKey && lowerKey === 'c') {
-                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject)) {
-                    this.clipboardData = this.createClipboardPayload(this.selectedObject);
-                }
-            }
-            // Paste
-            if (e.ctrlKey && lowerKey === 'v') {
-                if (this.clipboardData) {
-                    this.executeHistoryMutation('Paste object', () => {
-                        this.raycaster.setFromCamera(this.mouse, this.core.camera);
-
-                        const useYLayer = document.getElementById("chkYLayer").checked;
-                        const targetMesh = useYLayer ? this.core.yGroundMesh : this.core.groundMesh;
-                        const intersectsGround = this.raycaster.intersectObject(targetMesh);
-
-                        let targetPos = new THREE.Vector3(0, this.clipboardData.sourcePos?.y ?? this.ARENA_H * 0.55, 0);
-
-                        if (intersectsGround.length > 0) {
-                            targetPos.x = intersectsGround[0].point.x;
-                            targetPos.z = intersectsGround[0].point.z;
-                            if (this.useSnap) {
-                                targetPos.x = Math.round(targetPos.x / this.snapSize) * this.snapSize;
-                                targetPos.z = Math.round(targetPos.z / this.snapSize) * this.snapSize;
-                            }
-                        }
-
-                        if (useYLayer) {
-                            const base_y = parseFloat(document.getElementById("numYLayer").value);
-                            targetPos.y = base_y;
-                            if (this.clipboardData.type === 'hard' || this.clipboardData.type === 'foam') {
-                                const sy = this.clipboardData.sizeY || (this.clipboardData.sizeInfo * 2);
-                                targetPos.y = base_y + sy / 2;
-                            }
-                        } else if (this.clipboardData.type === 'hard' || this.clipboardData.type === 'foam') {
-                            targetPos.y = this.ARENA_H * 0.35;
-                        }
-
-                        let extraProps = { ...this.clipboardData };
-                        delete extraProps.sourcePos;
-                        if (extraProps.pointA?.isVector3) extraProps.pointA = extraProps.pointA.clone();
-                        if (extraProps.pointB?.isVector3) extraProps.pointB = extraProps.pointB.clone();
-
-                        if (this.clipboardData.type === 'tunnel' && this.clipboardData.pointA && this.clipboardData.pointB) {
-                            // Offset the tunnel segment safely so we don't paste directly on top
-                            const sourcePos = this.clipboardData.sourcePos?.isVector3
-                                ? this.clipboardData.sourcePos
-                                : this.clipboardData.pointA.clone().lerp(this.clipboardData.pointB, 0.5);
-                            const diff = targetPos.clone().sub(sourcePos);
-                            extraProps.pointA = this.clipboardData.pointA.clone().add(diff);
-                            extraProps.pointB = this.clipboardData.pointB.clone().add(diff);
-                        }
-
-                        const mesh = this.mapManager.createMesh(
-                            this.clipboardData.type,
-                            this.clipboardData.subType,
-                            targetPos.x, targetPos.y, targetPos.z,
-                            this.clipboardData.sizeInfo,
-                            extraProps
-                        );
-                        if (mesh) this.selectObject(mesh);
-                    });
-                }
-            }
-        });
-
-        // Prop changes
-        document.getElementById("propY").addEventListener('change', (e) => {
-            this.executeHistoryMutation('Edit object Y', () => {
-                if (!this.selectedObject || !this.isManagedObjectAlive(this.selectedObject)) return;
-                this.selectedObject.position.y = parseFloat(e.target.value);
-                if (this.selectedObject.userData.type === 'tunnel') {
-                    this.mapManager?.notifyObjectMutated?.(this.selectedObject);
-                }
-                this.showPropPanel(this.selectedObject);
-            });
-        });
-
-        document.getElementById("propSize").addEventListener('change', (e) => {
-            this.executeHistoryMutation('Edit object size', () => {
-                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject)) {
-                    const val = parseFloat(e.target.value);
-                    const u = this.selectedObject.userData;
-                    u.sizeInfo = val;
-
-                    if (u.type === 'tunnel') {
-                        u.radius = val;
-                        if (u.pointA && u.pointB) {
-                            this.mapManager.alignTunnelSegment(this.selectedObject, u.pointA, u.pointB, val);
-                            this.mapManager?.notifyObjectMutated?.(this.selectedObject);
-                        }
-                    } else if (u.type === 'portal') {
-                        this.selectedObject.scale.set(val, val, val);
-                        u.radius = val;
-                    }
-                }
-            });
-        });
-
-        // Box Scale Inputs
-        const updateBoxScale = () => {
-            this.executeHistoryMutation('Resize block', () => {
-                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && (this.selectedObject.userData.type === 'hard' || this.selectedObject.userData.type === 'foam')) {
-                    const w = parseFloat(document.getElementById("propWidth").value);
-                    const d = parseFloat(document.getElementById("propDepth").value);
-                    const h = parseFloat(document.getElementById("propHeight").value);
-
-                    this.selectedObject.userData.sizeX = w;
-                    this.selectedObject.userData.sizeZ = d;
-                    this.selectedObject.userData.sizeY = h;
-                    this.selectedObject.userData.sizeInfo = Math.max(w, d, h) * 0.5;
-                    this.selectedObject.scale.set(w, h, d);
-                }
-            });
-        };
-
-        document.getElementById("propWidth").addEventListener('change', updateBoxScale);
-        document.getElementById("propDepth").addEventListener('change', updateBoxScale);
-        document.getElementById("propHeight").addEventListener('change', updateBoxScale);
-
-        // Aircraft Scale Input
-        document.getElementById("propScale").addEventListener('change', (e) => {
-            this.executeHistoryMutation('Scale aircraft', () => {
-                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && this.selectedObject.userData.type === 'aircraft') {
-                    const s = parseFloat(e.target.value);
-                    if (s > 0) {
-                        this.selectedObject.userData.modelScale = s;
-                        this.selectedObject.scale.set(s, s, s);
-                    }
-                }
-            });
-        });
+        bindEditorPropertyControls(this);
 
         // Arena resize
         const syncArenaValues = () => {
-            this.ARENA_W = parseFloat(document.getElementById("numArenaW").value) || 2800;
-            this.ARENA_D = parseFloat(document.getElementById("numArenaD").value) || 2400;
-            this.ARENA_H = parseFloat(document.getElementById("numArenaH").value) || 950;
+            this.ARENA_W = parseFloat(this.dom.numArenaW?.value) || 2800;
+            this.ARENA_D = parseFloat(this.dom.numArenaD?.value) || 2400;
+            this.ARENA_H = parseFloat(this.dom.numArenaH?.value) || 950;
             this.updateArenaVisual();
         };
         this.syncArenaValues = syncArenaValues;
 
-        document.getElementById("numArenaW").addEventListener('change', () => this.executeHistoryMutation('Resize arena', syncArenaValues));
-        document.getElementById("numArenaD").addEventListener('change', () => this.executeHistoryMutation('Resize arena', syncArenaValues));
-        document.getElementById("numArenaH").addEventListener('change', () => this.executeHistoryMutation('Resize arena', syncArenaValues));
-
-        // Y-Layer Setup
-        document.getElementById("chkYLayer").addEventListener('change', (e) => {
-            this.core.yGridHelper.visible = e.target.checked;
-        });
-        document.getElementById("numYLayer").addEventListener('change', (e) => {
-            const y = parseFloat(e.target.value);
-            this.core.yGridHelper.position.y = y;
-            this.core.yGroundMesh.position.y = y;
-        });
-
-        // Fly Mode Setup
-        document.getElementById("chkFly").addEventListener('change', (e) => {
-            const isFly = e.target.checked;
-            const rightClickRotate = {
-                LEFT: THREE.MOUSE.NONE,
-                MIDDLE: THREE.MOUSE.DOLLY,
-                RIGHT: THREE.MOUSE.ROTATE
-            };
-
-            // Wenn FlyMode an ist, erlauben wir das Drehen nur noch über Rechtsklick (MOUSE.RIGHT),
-            // damit Links-Klick (MOUSE.LEFT) komplett fürs Bauen von Blöcken frei ist.
-            if (isFly) {
-                this.core.orbit.mouseButtons = rightClickRotate;
-                if (this.selectedObject) this.detachTransformControl();
-            } else {
-                this.core.orbit.mouseButtons = rightClickRotate;
-                if (this.selectedObject) this.syncTransformControlAttachment();
-            }
-        });
-
-        // Snap Setup
-        document.getElementById("chkSnap").addEventListener('change', (e) => {
-            this.useSnap = e.target.checked;
-            this.core.transformControl.setTranslationSnap(this.useSnap ? this.snapSize : null);
-        });
-        document.getElementById("numGrid").addEventListener('change', (e) => {
-            this.snapSize = parseFloat(e.target.value);
-            if (this.useSnap) this.core.transformControl.setTranslationSnap(this.snapSize);
-        });
-
-        // Export/Import
-        document.getElementById("btnExport").addEventListener("click", () => {
-            document.getElementById("jsonOutput").value = this.mapManager.generateJSONExport(this.getArenaSizeForExport());
-        });
-
-        document.getElementById("btnPlaytest").addEventListener("click", () => {
-            const jsonText = this.mapManager.generateJSONExport(this.getArenaSizeForExport());
-
-            try {
-                // Gleicher Origin (Vite-Server) -> localStorage funktioniert direkt
-                localStorage.setItem(CUSTOM_MAP_STORAGE_KEY, jsonText);
-            } catch (error) {
-                alert(`Playtest konnte nicht gespeichert werden: ${error.message}`);
-                return;
-            }
-
-            const playtestWindow = window.open("../index.html?playtest=1", "_blank", "noopener");
-            if (!playtestWindow) {
-                alert("Popup blockiert. Bitte Popups erlauben und erneut versuchen.");
-            }
-        });
-
-        document.getElementById("btnImport").addEventListener("click", () => {
-            const txt = document.getElementById("jsonOutput").value.trim();
-            if (!txt) return;
-            this.executeHistoryMutation('Import map', () => {
-                this.mapManager.importFromJSON(txt, syncArenaValues);
-            });
-        });
-
-        document.getElementById("btnNew").addEventListener("click", () => {
-            this.executeHistoryMutation('Clear map', () => {
-                this.clearAllObjects();
-                document.getElementById("jsonOutput").value = "";
-            });
-        });
-
-        document.getElementById("btnDelSelected").addEventListener("click", () => {
-            this.deleteSelectedObject();
-        });
-
-        document.getElementById("btnUndo")?.addEventListener("click", () => {
-            this.undo();
-        });
-
-        document.getElementById("btnRedo")?.addEventListener("click", () => {
-            this.redo();
-        });
+        bindEditorViewportControls(this, { syncArenaValues });
+        bindEditorSessionControls(this, { syncArenaValues });
 
         this.updateUndoRedoUi();
     }
