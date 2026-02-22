@@ -26,12 +26,6 @@ export class EditorMapManager {
             onBeforeManagedObjectsCleared: null
         };
 
-        this.mapData = {
-            tunnels: [], hardBlocks: [], foamBlocks: [],
-            portals: [], items: [], botSpawns: [], aircraft: [],
-            playerSpawn: { x: -800, y: 950 * 0.55, z: 0 }
-        };
-
         this.objectsById = new Map();
         this.nextObjectIdCounter = 1;
 
