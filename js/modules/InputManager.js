@@ -27,6 +27,7 @@ export class InputManager {
         this.keys = {};
         this.justPressed = {};
         this.bindings = deepClone(CONFIG.KEYS);
+        this._preventDefaultCodes = new Set();
 
         // GC Optimization: Reusable object
         this._reuseInput = {
@@ -43,17 +44,23 @@ export class InputManager {
             nextItem: false,
         };
 
+        this._rebuildPreventDefaultCodes();
+
         window.addEventListener('keydown', (e) => {
             if (!this.keys[e.code]) {
                 this.justPressed[e.code] = true;
             }
             this.keys[e.code] = true;
-            e.preventDefault();
+            if (this._shouldPreventDefault(e.code)) {
+                e.preventDefault();
+            }
         });
 
         window.addEventListener('keyup', (e) => {
             this.keys[e.code] = false;
-            e.preventDefault();
+            if (this._shouldPreventDefault(e.code)) {
+                e.preventDefault();
+            }
         });
     }
 
@@ -62,6 +69,7 @@ export class InputManager {
             PLAYER_1: this._normalizePlayerBindings(bindingsByPlayer?.PLAYER_1, CONFIG.KEYS.PLAYER_1),
             PLAYER_2: this._normalizePlayerBindings(bindingsByPlayer?.PLAYER_2, CONFIG.KEYS.PLAYER_2),
         };
+        this._rebuildPreventDefaultCodes();
     }
 
     getBindings() {
@@ -77,6 +85,28 @@ export class InputManager {
         }
 
         return normalized;
+    }
+
+    _rebuildPreventDefaultCodes() {
+        const codes = new Set(['Escape', 'Enter']);
+
+        const addBindingCodes = (bindingSet) => {
+            if (!bindingSet) return;
+            for (const action of ACTION_KEYS) {
+                const code = bindingSet[action];
+                if (typeof code === 'string' && code.length > 0) {
+                    codes.add(code);
+                }
+            }
+        };
+
+        addBindingCodes(this.bindings?.PLAYER_1);
+        addBindingCodes(this.bindings?.PLAYER_2);
+        this._preventDefaultCodes = codes;
+    }
+
+    _shouldPreventDefault(code) {
+        return this._preventDefaultCodes.has(code);
     }
 
     isDown(code) {

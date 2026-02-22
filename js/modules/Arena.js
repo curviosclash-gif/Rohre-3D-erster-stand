@@ -46,20 +46,21 @@ export class Arena {
         };
 
         // Material
-        const checkerTemplate = this._createCheckerTexture(
+        const checkerTexture = this._createCheckerTexture(
             CONFIG.ARENA.CHECKER_LIGHT_COLOR,
             CONFIG.ARENA.CHECKER_DARK_COLOR
         );
         const checkerWorldSize = Math.max(1, CONFIG.ARENA.CHECKER_WORLD_SIZE || 18);
 
-        const floorTexture = checkerTemplate.clone();
+        // Reuse the base texture for one material so we don't leave an unused clone/template behind.
+        const floorTexture = checkerTexture;
         floorTexture.needsUpdate = true;
         floorTexture.repeat.set(
             Math.max(1, sx / checkerWorldSize),
             Math.max(1, sz / checkerWorldSize)
         );
 
-        const wallTexture = checkerTemplate.clone();
+        const wallTexture = checkerTexture.clone();
         wallTexture.needsUpdate = true;
         wallTexture.repeat.set(
             Math.max(1, sx / checkerWorldSize),

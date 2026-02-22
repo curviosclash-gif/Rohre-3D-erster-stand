@@ -803,11 +803,11 @@ export class EntityManager {
                     const dzp = position.z - closestZ;
 
                     if (dxp * dxp + dyp * dyp + dzp * dzp <= totalRadius * totalRadius) {
-                        // Wenn OBB-Check möglich, dann final prüfen
-                        if (playerRef && playerRef.isPointInOBB) {
-                            // Wir nutzen _tmpVec für den Punkt-Check
+                        // If OBB check is possible, then final check
+                        if (playerRef && playerRef.isSphereInOBB) {
+                            // We use _tmpVec for the point check
                             this._tmpVec.set(closestX, closestY, closestZ);
-                            if (playerRef.isPointInOBB(this._tmpVec)) {
+                            if (playerRef.isSphereInOBB(this._tmpVec, seg.radius)) {
                                 return { hit: true, playerIndex: seg.playerIndex };
                             }
                         } else {

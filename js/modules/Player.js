@@ -5,10 +5,16 @@
 import * as THREE from 'three';
 import { CONFIG } from './Config.js';
 import { Trail } from './Trail.js';
+import { disposeObject3DResources } from './three-disposal.js';
 import { createVehicleMesh, isValidVehicleId, VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
 
 // Shared Geometries (einmalig erstellt, von allen Spielern geteilt)
 const SHARED_GEO = {};
+function _markSharedGeometry(geometry) {
+    if (!geometry) return;
+    geometry.userData = geometry.userData || {};
+    geometry.userData.__sharedNoDispose = true;
+}
 function _ensureSharedGeo() {
     if (SHARED_GEO.body) return;
     SHARED_GEO.body = new THREE.ConeGeometry(0.35, 3.2, 8);
@@ -34,6 +40,10 @@ function _ensureSharedGeo() {
     const finShape = new THREE.Shape();
     finShape.moveTo(0, 0); finShape.lineTo(0, 0.8); finShape.lineTo(0.4, 0.1); finShape.lineTo(0, 0);
     SHARED_GEO.fin = new THREE.ExtrudeGeometry(finShape, { depth: 0.04, bevelEnabled: false });
+
+    for (const geo of Object.values(SHARED_GEO)) {
+        _markSharedGeometry(geo);
+    }
 }
 
 export class Player {
@@ -90,10 +100,11 @@ export class Player {
         // Lokale Bounding-Box für präzise OBB-Kollision
         this.hitboxBox = new THREE.Box3();
         const r = this.hitboxRadius;
-        this.hitboxBox.set(new THREE.Vector3(-r, -r * 0.5, -r), new THREE.Vector3(r, r * 0.5, r));
+        this.hitboxBox.set(new THREE.Vector3(-r, -r * 0.7, -r), new THREE.Vector3(r, r * 0.7, r));
 
         this._tmpWorldToLocal = new THREE.Matrix4();
         this._tmpLocalPoint = new THREE.Vector3();
+        this._tmpLocalSphere = new THREE.Sphere();
 
         this.vehicleMesh = null;
         this._vehicleBounds = { minZ: -1.95, maxZ: 1.9, sizeY: 1.0 };
@@ -336,6 +347,9 @@ export class Player {
 
         // Modell updaten
         this._updateModel();
+
+        // Matrix für Kollisionsprüfung (OBB) aktualisieren
+        this.group.updateMatrixWorld(true);
     }
 
     _updateModel() {
@@ -388,7 +402,6 @@ export class Player {
                 }
             }
         }
-
     }
 
     _updateEffects(dt) {
@@ -580,23 +593,32 @@ export class Player {
 
     dispose() {
         this.trail.dispose();
-        this.renderer.removeFromScene(this.group);
+        if (this.group) {
+            this.renderer.removeFromScene(this.group);
+            disposeObject3DResources(this.group);
+        }
+        this.vehicleMesh = null;
+        this.shieldMesh = null;
+        this.firstPersonAnchor = null;
+        this.flames = [];
+        this.group = null;
     }
 
     /**
-     * Prüft, ob ein Welt-Punkt innerhalb der rotierenden OBB des Spielers liegt.
-     * @param {THREE.Vector3} worldPoint 
+     * Prüft, ob eine Welt-Kugel innerhalb der rotierenden OBB des Spielers liegt.
+     * @param {THREE.Vector3} worldCenter 
+     * @param {number} radius
      * @returns {boolean}
      */
-    isPointInOBB(worldPoint) {
+    isSphereInOBB(worldCenter, radius) {
         if (!this.alive) return false;
 
         // Welt-Punkt in lokale Koordinaten des Schiffes umrechnen
-        // Wir nutzen die MatrixWorld des Groups
         this._tmpWorldToLocal.copy(this.group.matrixWorld).invert();
-        this._tmpLocalPoint.copy(worldPoint).applyMatrix4(this._tmpWorldToLocal);
+        this._tmpLocalSphere.center.copy(worldCenter).applyMatrix4(this._tmpWorldToLocal);
+        this._tmpLocalSphere.radius = radius;
 
         // In lokalen Koordinaten gegen die Box3 prüfen
-        return this.hitboxBox.containsPoint(this._tmpLocalPoint);
+        return this.hitboxBox.intersectsSphere(this._tmpLocalSphere);
     }
 }

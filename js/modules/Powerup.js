@@ -145,4 +145,16 @@ export class PowerupManager {
         this.items = [];
         this.spawnTimer = 0;
     }
+
+    dispose() {
+        this.clear();
+        if (this._sharedGeo) {
+            this._sharedGeo.dispose();
+            this._sharedGeo = null;
+        }
+        if (this._sharedWireGeo) {
+            this._sharedWireGeo.dispose();
+            this._sharedWireGeo = null;
+        }
+    }
 }

@@ -1195,12 +1195,16 @@ export class Game {
         this._syncP2HudVisibility();
 
         if (this.entityManager) {
-            this.entityManager.clear();
+            this.entityManager.dispose();
         }
         if (this.powerupManager) {
-            this.powerupManager.clear();
+            this.powerupManager.dispose();
         }
-        this.renderer.clearScene();
+        if (this.particles?.dispose) {
+            this.particles.dispose();
+            this.particles = null;
+        }
+        this.renderer.clearMatchScene();
         this.particles = new ParticleSystem(this.renderer);
         this.arena = new Arena(this.renderer);
         this.arena.portalsEnabled = this.settings.portalsEnabled;
@@ -1333,7 +1337,7 @@ export class Game {
         // Match-Sieg nur wenn nicht Singleplayer-Solo (also entweder MP oder mit Bots)
         const totalBots = parseInt(this.numBots) || 0;
         const canWinMatch = this.entityManager.getHumanPlayers().length > 1 || totalBots > 0;
-        const requiredWins = Math.max(5, this.winsNeeded); // SICHERHEIT: Mindestens 5 Siege
+        const requiredWins = Math.max(1, parseInt(this.winsNeeded, 10) || 1);
         const matchWinner = canWinMatch ? this.entityManager.players.find((p) => p.score >= requiredWins) : null;
 
         if (matchWinner) {
@@ -1666,12 +1670,16 @@ export class Game {
     _returnToMenu() {
         this.state = 'MENU';
         if (this.entityManager) {
-            this.entityManager.clear();
+            this.entityManager.dispose();
         }
         if (this.powerupManager) {
-            this.powerupManager.clear();
+            this.powerupManager.dispose();
         }
-        this.renderer.clearScene();
+        if (this.particles?.dispose) {
+            this.particles.dispose();
+            this.particles = null;
+        }
+        this.renderer.clearMatchScene();
         this.arena = null;
         this.entityManager = null;
         this.powerupManager = null;

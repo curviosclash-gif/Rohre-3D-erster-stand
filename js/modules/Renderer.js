@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import { CONFIG } from './Config.js';
+import { disposeObject3DResources } from './three-disposal.js';
 
 export class Renderer {
     constructor(canvas) {
@@ -31,6 +32,7 @@ export class Renderer {
 
         // Beleuchtung
         this._setupLights();
+        this._setupSceneRoots();
 
         // Kameras (eine pro Spieler)
         this.cameras = [];
@@ -74,6 +76,20 @@ export class Renderer {
         this.scene.add(fillLight);
 
         // PointLight entfernt fuer Performance
+    }
+
+    _setupSceneRoots() {
+        this.persistentRoot = new THREE.Group();
+        this.persistentRoot.name = 'persistentRoot';
+        this.scene.add(this.persistentRoot);
+
+        this.matchRoot = new THREE.Group();
+        this.matchRoot.name = 'matchRoot';
+        this.scene.add(this.matchRoot);
+
+        this.debugRoot = new THREE.Group();
+        this.debugRoot.name = 'debugRoot';
+        this.scene.add(this.debugRoot);
     }
 
     createCamera(index) {
@@ -298,38 +314,48 @@ export class Renderer {
     }
 
     addToScene(obj) {
-        this.scene.add(obj);
+        this.matchRoot.add(obj);
+    }
+
+    addToPersistentScene(obj) {
+        this.persistentRoot.add(obj);
+    }
+
+    addToDebugScene(obj) {
+        this.debugRoot.add(obj);
     }
 
     removeFromScene(obj) {
-        this.scene.remove(obj);
+        if (obj?.parent) {
+            obj.parent.remove(obj);
+        }
     }
 
-    clearScene() {
-        // Entferne alles außer Lichter
-        const toRemove = [];
-        this.scene.traverse((child) => {
-            if (!child.isLight && child !== this.scene) {
-                toRemove.push(child);
-            }
-        });
-        for (const obj of toRemove) {
-            if (obj.parent === this.scene) {
-                this.scene.remove(obj);
-            }
-            if (obj.geometry) obj.geometry.dispose();
-            if (obj.material) {
-                if (Array.isArray(obj.material)) {
-                    obj.material.forEach(m => m.dispose());
-                } else {
-                    obj.material.dispose();
-                }
-            }
+    _clearRoot(root) {
+        if (!root) return;
+        disposeObject3DResources(root);
+        while (root.children.length > 0) {
+            root.remove(root.children[root.children.length - 1]);
         }
+    }
+
+    _resetCameras() {
         this.cameras = [];
         this.cameraTargets = [];
         this.cameraModes = [];
         this.cameraBoostBlend = [];
+    }
+
+    clearMatchScene() {
+        this._clearRoot(this.matchRoot);
+        this._resetCameras();
+    }
+
+    clearScene() {
+        // Legacy alias: gezieltes Cleanup statt globalem Scene-Traverse.
+        this._clearRoot(this.matchRoot);
+        this._clearRoot(this.debugRoot);
+        this._resetCameras();
     }
 
     setQuality(quality) {

@@ -3,6 +3,7 @@
 // ============================================
 
 import * as THREE from 'three';
+import { disposeObject3DResources } from './three-disposal.js';
 
 const MAX_PARTICLES = 1000;
 const DUMMY = new THREE.Object3D();
@@ -40,6 +41,7 @@ export class ParticleSystem {
     }
 
     spawn(position, count, color, speed = 1.0, size = 0.5, life = 1.0) {
+        if (!this.mesh) return;
         this._tmpColor.setHex(color);
 
         for (let i = 0; i < count; i++) {
@@ -96,6 +98,7 @@ export class ParticleSystem {
     }
 
     update(dt) {
+        if (!this.mesh) return;
         if (this.count === 0) {
             this.mesh.count = 0;
             return;
@@ -174,6 +177,26 @@ export class ParticleSystem {
 
     clear() {
         this.count = 0;
-        this.mesh.count = 0;
+        if (this.mesh) {
+            this.mesh.count = 0;
+        }
+    }
+
+    dispose() {
+        this.clear();
+        if (this.mesh) {
+            this.renderer?.removeFromScene(this.mesh);
+            disposeObject3DResources(this.mesh);
+            this.mesh = null;
+        }
+        this.renderer = null;
+        this.positions = null;
+        this.velocities = null;
+        this.lifetimes = null;
+        this.maxLifetimes = null;
+        this.gravities = null;
+        this.scales = null;
+        this.colors = null;
+        this._tmpColor = null;
     }
 }
