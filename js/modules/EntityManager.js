@@ -47,6 +47,23 @@ function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
+function isTruthyFlag(value) {
+    const raw = String(value || '').trim().toLowerCase();
+    return raw === '1' || raw === 'true' || raw === 'yes' || raw === 'on';
+}
+
+function readTrailCollisionDebugFlagFromUrl() {
+    if (typeof window === 'undefined' || !window.location) {
+        return false;
+    }
+    try {
+        const params = new URLSearchParams(window.location.search);
+        return isTruthyFlag(params.get('traildebug')) || isTruthyFlag(params.get('collisiondebug'));
+    } catch {
+        return false;
+    }
+}
+
 // Avoid immediate self-collisions against the freshly written trail head,
 // but keep the blind window small enough so tight loops are still detected.
 export function deriveSelfTrailSkipRecentSegments(player) {
@@ -106,6 +123,15 @@ export class EntityManager {
         // Global Spatial Grid for trails and objects
         this.gridSize = 10;
         this.spatialGrid = new Map(); // Key: hash(cx, cz), Value: Set of segment data
+
+        // Optional runtime diagnostics for self-trail/grid edge cases
+        this._trailCollisionDebugEnabled = readTrailCollisionDebugFlagFromUrl();
+        this._trailCollisionDebugLogCount = 0;
+        this._trailCollisionDebugMaxLogs = 80;
+        this._trailCollisionDebugSkipRecentSeen = 0;
+        if (this._trailCollisionDebugEnabled) {
+            console.info('[TrailCollisionDebug] enabled via ?traildebug=1');
+        }
     }
 
     setup(numHumans, numBots, options = {}) {
@@ -789,9 +815,45 @@ export class EntityManager {
         return keys;
     }
 
+    _debugTrailCollision(tag, payload) {
+        if (!this._trailCollisionDebugEnabled) return;
+        if (this._trailCollisionDebugLogCount >= this._trailCollisionDebugMaxLogs) return;
+        this._trailCollisionDebugLogCount++;
+        console.debug(`[TrailCollisionDebug:${tag}]`, payload);
+        if (this._trailCollisionDebugLogCount === this._trailCollisionDebugMaxLogs) {
+            console.warn('[TrailCollisionDebug] log cap reached; suppressing further logs');
+        }
+    }
+
+    _shouldLogSkipRecentCandidate(dist, skipRecent) {
+        if (!this._trailCollisionDebugEnabled) return false;
+        this._trailCollisionDebugSkipRecentSeen++;
+        if (this._trailCollisionDebugSkipRecentSeen <= 8) return true; // early visibility
+        if (dist <= 1) return true; // freshly written head-near segments are interesting
+        if (dist >= Math.max(0, skipRecent - 2)) return true; // edge of blind window
+        return (this._trailCollisionDebugSkipRecentSeen % 20) === 0; // sampled stream
+    }
+
     registerTrailSegment(playerIndex, segmentIdx, data) {
         const entry = { playerIndex, segmentIdx, fromX: data.fromX, fromY: data.fromY, fromZ: data.fromZ, toX: data.toX, toY: data.toY, toZ: data.toZ, radius: data.radius };
         const keys = this._getSegmentGridKeys(data);
+
+        const dx = (Number(data.toX) || 0) - (Number(data.fromX) || 0);
+        const dy = (Number(data.toY) || 0) - (Number(data.fromY) || 0);
+        const dz = (Number(data.toZ) || 0) - (Number(data.fromZ) || 0);
+        const segmentLength = Math.sqrt(dx * dx + dy * dy + dz * dz);
+        if (keys.length > 1 || segmentLength > this.gridSize * 1.25) {
+            this._debugTrailCollision('register-segment', {
+                playerIndex,
+                segmentIdx,
+                segmentLength: Number(segmentLength.toFixed(3)),
+                keyCount: keys.length,
+                gridSize: this.gridSize,
+                from: [Number(data.fromX) || 0, Number(data.fromY) || 0, Number(data.fromZ) || 0],
+                to: [Number(data.toX) || 0, Number(data.toY) || 0, Number(data.toZ) || 0],
+                radius: Number(data.radius) || 0,
+            });
+        }
 
         for (const key of keys) {
             if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, new Set());
@@ -827,7 +889,22 @@ export class EntityManager {
                         const player = this.players[seg.playerIndex];
                         if (player && player.trail) {
                             let dist = (player.trail.writeIndex - 1 - seg.segmentIdx + player.trail.maxSegments) % player.trail.maxSegments;
-                            if (dist < skipRecent) continue;
+                            if (dist < skipRecent) {
+                                if (this._shouldLogSkipRecentCandidate(dist, skipRecent)) {
+                                    this._debugTrailCollision('skip-recent', {
+                                        playerIndex: seg.playerIndex,
+                                        segmentIdx: seg.segmentIdx,
+                                        dist,
+                                        skipRecent,
+                                        writeIndex: player.trail.writeIndex,
+                                        maxSegments: player.trail.maxSegments,
+                                        queryRadius: radius,
+                                        cellX,
+                                        cellZ,
+                                    });
+                                }
+                                continue;
+                            }
                         }
                     }
 
@@ -873,9 +950,31 @@ export class EntityManager {
                             // We use _tmpVec for the point check
                             this._tmpVec.set(closestX, closestY, closestZ);
                             if (playerRef.isSphereInOBB(this._tmpVec, seg.radius)) {
+                                if (seg.playerIndex === excludePlayerIndex) {
+                                    this._debugTrailCollision('self-hit', {
+                                        playerIndex: seg.playerIndex,
+                                        segmentIdx: seg.segmentIdx,
+                                        skipRecent,
+                                        queryRadius: radius,
+                                        segmentRadius: seg.radius,
+                                        cellX,
+                                        cellZ,
+                                    });
+                                }
                                 return { hit: true, playerIndex: seg.playerIndex };
                             }
                         } else {
+                            if (seg.playerIndex === excludePlayerIndex) {
+                                this._debugTrailCollision('self-hit', {
+                                    playerIndex: seg.playerIndex,
+                                    segmentIdx: seg.segmentIdx,
+                                    skipRecent,
+                                    queryRadius: radius,
+                                    segmentRadius: seg.radius,
+                                    cellX,
+                                    cellZ,
+                                });
+                            }
                             return { hit: true, playerIndex: seg.playerIndex };
                         }
                     }

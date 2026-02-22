@@ -593,3 +593,38 @@ Revalidierung vor Fortsetzung wurde durchgefuehrt (Git-Status/Diffs/Log + geziel
 - Verifikation:
   - 2 Node-basierte Headless-Smokes fuer `RoundStateOps` erfolgreich (Match-End, Round-End, Unentschieden inkl. Singleplayer-No-Match-Fall)
 - Ergebnis: keine beabsichtigte Verhaltensaenderung sichtbar; Phase-1-Refactor-Schritt weitergefuehrt ohne grossen Umbau
+
+### Zusatz-Append (Session 2026-02-22, Self-Trail Grid-Robustheit + Debug-Instrumentierung)
+
+- Revalidierung vor Fortsetzung erneut durchgefuehrt (Audit-Abschnitte + Git/Worktree-Status + gezielte `rg`-Checks auf `main.js`, `RoundStateOps`, `EntityManager`, `Renderer`, `SettingsStore`)
+- Beobachtung / Rest-Risiko bestaetigt:
+  - Trail-Spatial-Grid-Registrierung nutzte zuvor nur `midX/midZ` (eine Zelle pro Segment)
+  - Dadurch konnten lange Trail-Segmente (z. B. bei Frame-Drops) trotz geometrischer Naehe vom 3x3-Grid-Check verfehlt werden
+- Minimaler Robustheits-Fix in `js/modules/EntityManager.js` umgesetzt (verhaltensneutral ausser Bugfix):
+  - neue `_getSegmentGridKeys(data)`-Ableitung fuer alle betroffenen X/Z-Grid-Zellen eines Segment-AABB (inkl. Radius)
+  - `registerTrailSegment(...)` registriert Segmente in alle relevanten Zellen (statt nur Mittelpunkt-Zelle)
+  - `unregisterTrailSegment(...)` bleibt kompatibel und akzeptiert jetzt Single-Key oder Key-Array
+- Bereits vorhandener Self-Trail-Blindfenster-Fix bleibt aktiv:
+  - dynamisches `deriveSelfTrailSkipRecentSegments(player)` statt festem `skipRecent=25`
+- Headless-Verifikation (Node):
+  - reproduzierbarer Long-Segment-Fall (`fromX=0` bis `toX=40`) wurde vor dem Fix verfehlt (`hit=null`)
+  - nach Fix wird Treffer erkannt (`hit=true`) und Multi-Cell-Unregister entfernt sauber alle Registrierungen
+  - `deriveSelfTrailSkipRecentSegments(...)` liefert im Default-nahen Test weiterhin typischerweise `5`
+- Browser-/Runtime-Verifikation (ohne Build):
+  - `npm run dev` + headless Chromium (Playwright) gegen `?playtest=1`
+  - synthetischer Long-Segment-Test im laufenden Runtime-Kontext erkennt Treffer korrekt
+  - keine `pageerror`/Console-Errors im Testlauf
+- Zusaetzliche Debug-Instrumentierung (nur optional aktiv):
+  - URL-Flag `?traildebug=1` (alternativ `?collisiondebug=1`) aktiviert gezielte Konsolenlogs in `EntityManager`
+  - Log-Typen:
+    - `register-segment` (lange/mehrzellige Segmente, inkl. `segmentLength`, `keyCount`)
+    - `skip-recent` (gesampelte Kandidaten, die wegen `skipRecent` uebersprungen werden)
+    - `self-hit` (erkannte Self-Trail-Treffer inkl. `skipRecent`)
+  - Log-Cap vorhanden (80 Eintraege), um Konsole nicht zu fluten
+- Waehrend der Session wurden zusaetzliche Commits im Repo sichtbar:
+  - `38997b7` (RoundOutcome-Auslagerung + Self-Trail-Tuning)
+  - `63d368a` (`.gitignore` fuer lokale Editor-Logs)
+  - `bf8df5c` (Editor-Refactor, unverwandt zur Runtime)
+- Ergebnis:
+  - gezielter Kollisions-Bugfix fuer Long-Segment/Grid-Randfaelle umgesetzt und technisch verifiziert
+  - manueller Ingame-Smoke mit echten engen Loopings / FPS-Schwankungen weiterhin als naechster sinnvoller Schritt offen
