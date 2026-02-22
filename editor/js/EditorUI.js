@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { EditorCommandHistory, SnapshotCommand } from './EditorCommandHistory.js';
+import { EditorCommandHistory } from './EditorCommandHistory.js';
 import { bindEditorToolPaletteControls } from './ui/EditorToolPaletteControls.js';
 import { bindEditorCanvasInteractionControls } from './ui/EditorCanvasInteractionControls.js';
 import { bindEditorPropertyControls } from './ui/EditorPropertyControls.js';
@@ -8,6 +8,19 @@ import { bindEditorViewportControls } from './ui/EditorViewportControls.js';
 import { bindEditorSessionControls } from './ui/EditorSessionControls.js';
 import { createEditorDomRefs } from './ui/EditorDomRefs.js';
 import { isFlyModeChecked, readArenaSizeInputs, writeArenaSizeInputs } from './ui/EditorFormState.js';
+import {
+    applyHistorySnapshot,
+    beginHistoryGesture,
+    cancelHistoryGesture,
+    captureHistorySnapshot,
+    commitHistoryGesture,
+    executeHistoryMutation,
+    isHistoryRecordingSuspended,
+    pushSnapshotHistoryCommand,
+    redoHistory,
+    undoHistory,
+    withHistorySuspended
+} from './ui/EditorHistoryOps.js';
 import {
     beforeManagedObjectsClearedSelectionState,
     clearAllManagedObjects,
@@ -106,144 +119,47 @@ export class EditorUI {
     }
 
     isHistoryRecordingSuspended() {
-        return this.historySuspendDepth > 0 || this.commandHistory?.isApplying?.();
+        return isHistoryRecordingSuspended(this);
     }
 
     withHistorySuspended(fn) {
-        this.historySuspendDepth += 1;
-        try {
-            return fn();
-        } finally {
-            this.historySuspendDepth = Math.max(0, this.historySuspendDepth - 1);
-        }
+        return withHistorySuspended(this, fn);
     }
 
     captureHistorySnapshot() {
-        if (!this.mapManager) return null;
-
-        let json = '';
-        try {
-            json = this.mapManager.generateJSONExport(this.getArenaSizeForExport());
-        } catch (error) {
-            console.warn('[EditorUI] Failed to capture history snapshot:', error);
-            return null;
-        }
-
-        const selectedObjectId = (this.selectedObject && this.isManagedObjectAlive(this.selectedObject))
-            ? (this.selectedObject.userData?.id || null)
-            : null;
-        const hasPlayerSpawnObject = this.core.objectsContainer.children.some((obj) => (
-            obj?.userData?.type === 'spawn' && obj?.userData?.subType === 'player'
-        ));
-
-        return {
-            json,
-            selectedObjectId,
-            hasPlayerSpawnObject
-        };
+        return captureHistorySnapshot(this);
     }
 
     applyHistorySnapshot(snapshot) {
-        if (!snapshot || !this.mapManager) return;
-        const syncArenaValues = this.syncArenaValues || (() => { });
-
-        this.withHistorySuspended(() => {
-            this.mapManager.importFromJSON(snapshot.json, {
-                onArenaSize: (arenaSize) => {
-                    this.setArenaSizeInputs(arenaSize);
-                    syncArenaValues();
-                }
-            });
-            if (snapshot.hasPlayerSpawnObject === false) {
-                const playerSpawns = [...this.core.objectsContainer.children].filter((obj) => (
-                    obj?.userData?.type === 'spawn' && obj?.userData?.subType === 'player'
-                ));
-                playerSpawns.forEach((obj) => this.mapManager.removeObject(obj));
-            }
-            const selected = snapshot.selectedObjectId ? this.mapManager.getObjectById(snapshot.selectedObjectId) : null;
-            this.selectObject(selected || null);
-        });
+        applyHistorySnapshot(this, snapshot);
     }
 
     pushSnapshotHistoryCommand(label, beforeSnapshot, afterSnapshot) {
-        if (!beforeSnapshot || !afterSnapshot) return false;
-        if (
-            beforeSnapshot.json === afterSnapshot.json &&
-            beforeSnapshot.hasPlayerSpawnObject === afterSnapshot.hasPlayerSpawnObject
-        ) {
-            return false;
-        }
-
-        return this.commandHistory.push(new SnapshotCommand({
-            label,
-            before: beforeSnapshot,
-            after: afterSnapshot,
-            applySnapshot: (snapshot) => this.applyHistorySnapshot(snapshot)
-        }));
+        return pushSnapshotHistoryCommand(this, label, beforeSnapshot, afterSnapshot);
     }
 
     executeHistoryMutation(label, mutateFn) {
-        if (typeof mutateFn !== 'function') return undefined;
-        if (!this.mapManager || this.isHistoryRecordingSuspended()) {
-            return mutateFn();
-        }
-
-        const beforeSnapshot = this.captureHistorySnapshot();
-        const result = mutateFn();
-        const afterSnapshot = this.captureHistorySnapshot();
-        this.pushSnapshotHistoryCommand(label, beforeSnapshot, afterSnapshot);
-        return result;
+        return executeHistoryMutation(this, label, mutateFn);
     }
 
     beginHistoryGesture(key, label) {
-        if (!key || !this.mapManager || this.isHistoryRecordingSuspended()) return;
-        if (this.pendingHistoryGestures.has(key)) return;
-
-        const snapshot = this.captureHistorySnapshot();
-        if (!snapshot) return;
-
-        this.pendingHistoryGestures.set(key, {
-            label: String(label || 'Change'),
-            before: snapshot
-        });
+        beginHistoryGesture(this, key, label);
     }
 
     commitHistoryGesture(key, labelOverride = null) {
-        if (!key) return false;
-
-        const pending = this.pendingHistoryGestures.get(key);
-        if (!pending) return false;
-        this.pendingHistoryGestures.delete(key);
-
-        if (!this.mapManager || this.isHistoryRecordingSuspended()) return false;
-
-        const afterSnapshot = this.captureHistorySnapshot();
-        return this.pushSnapshotHistoryCommand(labelOverride || pending.label, pending.before, afterSnapshot);
+        return commitHistoryGesture(this, key, labelOverride);
     }
 
     cancelHistoryGesture(key) {
-        if (!key) return;
-        this.pendingHistoryGestures.delete(key);
+        cancelHistoryGesture(this, key);
     }
 
     undo() {
-        if (!this.commandHistory) return false;
-        try {
-            return this.commandHistory.undo();
-        } catch (error) {
-            alert(`Undo fehlgeschlagen: ${error.message}`);
-            return false;
-        }
+        return undoHistory(this);
     }
 
     redo() {
-        if (!this.commandHistory) return false;
-        try {
-            return this.commandHistory.redo();
-        } catch (error) {
-            alert(`Redo fehlgeschlagen: ${error.message}`);
-            return false;
-        }
+        return redoHistory(this);
     }
 
     updateUndoRedoUi(state = null) {
