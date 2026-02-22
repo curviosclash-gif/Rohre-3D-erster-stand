@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { getYLayerValue, isYLayerEnabled } from './EditorFormState.js';
 
 export function bindEditorShortcutControls(editor) {
     if (!editor) return;
@@ -73,7 +74,7 @@ export function bindEditorShortcutControls(editor) {
             editor.executeHistoryMutation('Paste object', () => {
                 editor.raycaster.setFromCamera(editor.mouse, editor.core.camera);
 
-                const useYLayer = !!dom.chkYLayer?.checked;
+                const useYLayer = isYLayerEnabled(editor);
                 const targetMesh = useYLayer ? editor.core.yGroundMesh : editor.core.groundMesh;
                 const intersectsGround = editor.raycaster.intersectObject(targetMesh);
 
@@ -89,7 +90,7 @@ export function bindEditorShortcutControls(editor) {
                 }
 
                 if (useYLayer) {
-                    const baseY = parseFloat(dom.numYLayer?.value);
+                    const baseY = getYLayerValue(editor);
                     targetPos.y = baseY;
                     if (editor.clipboardData.type === 'hard' || editor.clipboardData.type === 'foam') {
                         const sy = editor.clipboardData.sizeY || (editor.clipboardData.sizeInfo * 2);

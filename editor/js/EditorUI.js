@@ -7,6 +7,7 @@ import { bindEditorShortcutControls } from './ui/EditorShortcutControls.js';
 import { bindEditorViewportControls } from './ui/EditorViewportControls.js';
 import { bindEditorSessionControls } from './ui/EditorSessionControls.js';
 import { createEditorDomRefs } from './ui/EditorDomRefs.js';
+import { isFlyModeChecked, readArenaSizeInputs, writeArenaSizeInputs } from './ui/EditorFormState.js';
 import {
     hidePropertyPanelView,
     showPropertyPanelView,
@@ -89,17 +90,7 @@ export class EditorUI {
     }
 
     setArenaSizeInputs(arenaSize) {
-        if (!arenaSize) return;
-        const { numArenaW, numArenaD, numArenaH } = this.dom;
-        if (Number.isFinite(Number(arenaSize.width))) {
-            if (numArenaW) numArenaW.value = arenaSize.width;
-        }
-        if (Number.isFinite(Number(arenaSize.depth))) {
-            if (numArenaD) numArenaD.value = arenaSize.depth;
-        }
-        if (Number.isFinite(Number(arenaSize.height))) {
-            if (numArenaH) numArenaH.value = arenaSize.height;
-        }
+        writeArenaSizeInputs(this, arenaSize);
     }
 
     isHistoryRecordingSuspended() {
@@ -436,7 +427,7 @@ export class EditorUI {
     }
 
     setupEventListeners() {
-        this.flyModeEnabled = !!this.dom.chkFly?.checked;
+        this.flyModeEnabled = isFlyModeChecked(this);
 
         bindEditorToolPaletteControls(this);
 
@@ -448,9 +439,14 @@ export class EditorUI {
 
         // Arena resize
         const syncArenaValues = () => {
-            this.ARENA_W = parseFloat(this.dom.numArenaW?.value) || 2800;
-            this.ARENA_D = parseFloat(this.dom.numArenaD?.value) || 2400;
-            this.ARENA_H = parseFloat(this.dom.numArenaH?.value) || 950;
+            const arenaSize = readArenaSizeInputs(this, {
+                width: 2800,
+                depth: 2400,
+                height: 950
+            });
+            this.ARENA_W = arenaSize.width;
+            this.ARENA_D = arenaSize.depth;
+            this.ARENA_H = arenaSize.height;
             this.updateArenaVisual();
         };
         this.syncArenaValues = syncArenaValues;

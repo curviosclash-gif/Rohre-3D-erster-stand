@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { isFlyModeChecked } from './EditorFormState.js';
 
 export function bindEditorViewportControls(editor, { syncArenaValues } = {}) {
     if (!editor || typeof syncArenaValues !== 'function') return;
@@ -24,7 +25,7 @@ export function bindEditorViewportControls(editor, { syncArenaValues } = {}) {
     });
 
     const flyCheckbox = dom.chkFly;
-    editor.flyModeEnabled = !!flyCheckbox?.checked;
+    editor.flyModeEnabled = isFlyModeChecked(editor);
     flyCheckbox?.addEventListener('change', (e) => {
         const isFly = e.target.checked;
         editor.flyModeEnabled = isFly;

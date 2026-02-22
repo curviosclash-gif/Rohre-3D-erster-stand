@@ -1,13 +1,12 @@
 import { CUSTOM_MAP_STORAGE_KEY } from '../../../js/modules/MapSchema.js';
+import { getJsonEditorText, setJsonEditorText } from './EditorFormState.js';
 
 export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     if (!editor) return;
     const dom = editor.dom;
 
     dom.btnExport?.addEventListener("click", () => {
-        if (dom.jsonOutput) {
-            dom.jsonOutput.value = editor.mapManager.generateJSONExport(editor.getArenaSizeForExport());
-        }
+        setJsonEditorText(editor, editor.mapManager.generateJSONExport(editor.getArenaSizeForExport()));
     });
 
     dom.btnPlaytest?.addEventListener("click", () => {
@@ -27,7 +26,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     });
 
     dom.btnImport?.addEventListener("click", () => {
-        const txt = dom.jsonOutput?.value.trim() || '';
+        const txt = getJsonEditorText(editor).trim();
         if (!txt) return;
         editor.executeHistoryMutation('Import map', () => {
             editor.mapManager.importFromJSON(txt, {
@@ -46,7 +45,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     dom.btnNew?.addEventListener("click", () => {
         editor.executeHistoryMutation('Clear map', () => {
             editor.clearAllObjects();
-            if (dom.jsonOutput) dom.jsonOutput.value = "";
+            setJsonEditorText(editor, "");
         });
     });
 

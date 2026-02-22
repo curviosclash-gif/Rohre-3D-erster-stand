@@ -1,8 +1,8 @@
 import * as THREE from 'three';
+import { getCurrentToolSubtype, getYLayerValue, isYLayerEnabled } from './EditorFormState.js';
 
 export function bindEditorCanvasInteractionControls(editor) {
     if (!editor) return;
-    const dom = editor.dom;
 
     let isDraggingTransform = false;
 
@@ -43,7 +43,7 @@ export function bindEditorCanvasInteractionControls(editor) {
         editor.mouse.y = -((e.clientY - rect.top) / editor.core.container.clientHeight) * 2 + 1;
         editor.raycaster.setFromCamera(editor.mouse, editor.core.camera);
 
-        const useYLayer = !!dom.chkYLayer?.checked;
+        const useYLayer = isYLayerEnabled(editor);
         const targetMesh = useYLayer ? editor.core.yGroundMesh : editor.core.groundMesh;
 
         const intersectsGround = editor.raycaster.intersectObject(targetMesh);
@@ -84,9 +84,9 @@ export function bindEditorCanvasInteractionControls(editor) {
         editor.beginHistoryGesture('draw', `Create ${editor.currentTool}`);
         editor.isDrawing = true;
 
-        const useYLayer = !!dom.chkYLayer?.checked;
+        const useYLayer = isYLayerEnabled(editor);
         let y = useYLayer
-            ? parseFloat(dom.numYLayer?.value)
+            ? getYLayerValue(editor)
             : ((editor.currentTool === 'hard' || editor.currentTool === 'foam') ? editor.ARENA_H * 0.35 : editor.ARENA_H * 0.55);
 
         if (useYLayer && (editor.currentTool === 'hard' || editor.currentTool === 'foam')) {
@@ -95,10 +95,7 @@ export function bindEditorCanvasInteractionControls(editor) {
 
         editor.drawStartPos = { x: p.x, y, z: p.z };
 
-        let subType = null;
-        if (editor.currentTool === 'spawn') subType = dom.selSpawnType?.value;
-        if (editor.currentTool === 'item') subType = dom.selItemType?.value;
-        if (editor.currentTool === 'aircraft') subType = dom.selAircraftType?.value;
+        const subType = getCurrentToolSubtype(editor);
 
         editor.previewMesh = editor.mapManager.createMesh(editor.currentTool, subType, p.x, y, p.z, 0, {
             sizeX: editor.snapSize,
