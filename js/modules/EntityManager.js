@@ -43,6 +43,35 @@ function getEmptyInput() {
     return SHARED_EMPTY_INPUT;
 }
 
+function clampInt(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+}
+
+// Avoid immediate self-collisions against the freshly written trail head,
+// but keep the blind window small enough so tight loops are still detected.
+export function deriveSelfTrailSkipRecentSegments(player) {
+    const updateInterval = Math.max(0.01, Number(CONFIG.TRAIL?.UPDATE_INTERVAL) || 0.07);
+    const speed = Math.max(1, Number(player?.speed) || Number(player?.baseSpeed) || Number(CONFIG.PLAYER?.SPEED) || 18);
+    const hitboxRadius = Math.max(0.4, Number(player?.hitboxRadius) || Number(CONFIG.PLAYER?.HITBOX_RADIUS) || 0.8);
+    const trailRadius = Math.max(0.05, (Number(player?.trail?.width) || Number(CONFIG.TRAIL?.WIDTH) || 0.6) * 0.5);
+
+    let bodyLengthEstimate = hitboxRadius * 2.5;
+    const box = player?.hitboxBox;
+    if (box && box.min && box.max) {
+        const lenX = Math.abs(Number(box.max.x) - Number(box.min.x)) || 0;
+        const lenZ = Math.abs(Number(box.max.z) - Number(box.min.z)) || 0;
+        bodyLengthEstimate = Math.max(bodyLengthEstimate, lenX, lenZ);
+    }
+
+    const graceDistance = Math.max(
+        hitboxRadius * 3.5,
+        bodyLengthEstimate + hitboxRadius * 0.5 + trailRadius
+    );
+    const estimatedSegmentSpacing = Math.max(0.2, speed * updateInterval);
+
+    return clampInt(Math.ceil(graceDistance / estimatedSegmentSpacing) + 1, 5, 12);
+}
+
 export class EntityManager {
     constructor(renderer, arena, powerupManager, particles, audio, recorder) {
         this.renderer = renderer;
@@ -360,7 +389,8 @@ export class EntityManager {
                 }
 
                 // Global Trail Collision (Nutzt OBB für Präzision)
-                const collision = this.checkGlobalCollision(player.position, hRadius * 2.0, player.index, 25, player);
+                const selfTrailSkipRecent = deriveSelfTrailSkipRecentSegments(player);
+                const collision = this.checkGlobalCollision(player.position, hRadius * 2.0, player.index, selfTrailSkipRecent, player);
                 if (collision && collision.hit) {
                     if (player.hasShield) {
                         player.hasShield = false;
@@ -734,15 +764,50 @@ export class EntityManager {
         return (cx + 1000) * 2000 + (cz + 1000);
     }
 
+    _getSegmentGridKeys(data) {
+        const fromX = Number(data?.fromX);
+        const toX = Number(data?.toX);
+        const fromZ = Number(data?.fromZ);
+        const toZ = Number(data?.toZ);
+
+        if (!Number.isFinite(fromX) || !Number.isFinite(toX) || !Number.isFinite(fromZ) || !Number.isFinite(toZ)) {
+            return [this._getGridKey(data.midX, data.midZ)];
+        }
+
+        const radius = Math.max(0, Number(data?.radius) || 0);
+        const minCellX = Math.floor((Math.min(fromX, toX) - radius) / this.gridSize);
+        const maxCellX = Math.floor((Math.max(fromX, toX) + radius) / this.gridSize);
+        const minCellZ = Math.floor((Math.min(fromZ, toZ) - radius) / this.gridSize);
+        const maxCellZ = Math.floor((Math.max(fromZ, toZ) + radius) / this.gridSize);
+        const keys = [];
+
+        for (let cx = minCellX; cx <= maxCellX; cx++) {
+            for (let cz = minCellZ; cz <= maxCellZ; cz++) {
+                keys.push((cx + 1000) * 2000 + (cz + 1000));
+            }
+        }
+        return keys;
+    }
+
     registerTrailSegment(playerIndex, segmentIdx, data) {
-        const key = this._getGridKey(data.midX, data.midZ);
-        if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, new Set());
         const entry = { playerIndex, segmentIdx, fromX: data.fromX, fromY: data.fromY, fromZ: data.fromZ, toX: data.toX, toY: data.toY, toZ: data.toZ, radius: data.radius };
-        this.spatialGrid.get(key).add(entry);
-        return { key, entry };
+        const keys = this._getSegmentGridKeys(data);
+
+        for (const key of keys) {
+            if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, new Set());
+            this.spatialGrid.get(key).add(entry);
+        }
+
+        return { key: keys.length === 1 ? keys[0] : keys, entry };
     }
 
     unregisterTrailSegment(key, entry) {
+        if (Array.isArray(key)) {
+            for (const singleKey of key) {
+                this.unregisterTrailSegment(singleKey, entry);
+            }
+            return;
+        }
         const cell = this.spatialGrid.get(key);
         if (cell) { cell.delete(entry); if (cell.size === 0) this.spatialGrid.delete(key); }
     }

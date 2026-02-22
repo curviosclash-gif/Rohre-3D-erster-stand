@@ -579,3 +579,17 @@ Revalidierung vor Fortsetzung wurde durchgefuehrt (Git-Status/Diffs/Log + geziel
 - Zusaetzlich browserseitig verifiziert:
   - Profil-Update-Fallback funktioniert, wenn `activeProfileName` leer/inkonsistent ist, aber `profile-select` auf existierendes Profil zeigt (`_syncProfileActionState()` / `_saveProfile()` mit `resolveActiveProfileName(...)`-Fallback)
 - Ergebnis: keine beabsichtigte Verhaltensaenderung durch Phase 1e sichtbar; kein weiterer Fix in dieser Session notwendig
+
+### Zusatz-Append (Session 2026-02-22, RoundStateOps / Phase 1f kleiner Refactor)
+
+- Revalidierung vor Fortsetzung erneut erfolgt (Audit-Abschnitte + Git/Worktree-Status + gezielte `rg`-Checks auf `main.js`, `Renderer`, `SettingsStore`, Profil-Helper)
+- Kleiner verhaltensneutraler Refactor in `js/main.js`:
+  - Round-/Match-End-Entscheidungslogik aus `_onRoundEnd()` in neues Pure-Helper-Modul `js/modules/RoundStateOps.js` ausgelagert (`deriveRoundEndOutcome(...)`)
+  - `main.js` behält weiterhin State-Mutationen, HUD-/DOM-Schreiben, Recorder-Logik und Lifecycle
+- Beibehalten / explizit verifiziert:
+  - `requiredWins`-Ableitung bleibt `Math.max(1, parseInt(..., 10) || 1)` (UI-Range 1..15 unveraendert)
+  - Match-End nur bei Multiplayer oder Bots (`humanPlayerCount > 1 || totalBots > 0`)
+  - UI-Texte fuer Match-End / Round-End / Unentschieden unveraendert
+- Verifikation:
+  - 2 Node-basierte Headless-Smokes fuer `RoundStateOps` erfolgreich (Match-End, Round-End, Unentschieden inkl. Singleplayer-No-Match-Fall)
+- Ergebnis: keine beabsichtigte Verhaltensaenderung sichtbar; Phase-1-Refactor-Schritt weitergefuehrt ohne grossen Umbau

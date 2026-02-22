@@ -22,6 +22,7 @@ import { SettingsStore } from './modules/SettingsStore.js';
 import { removeProfileByName, resolveActiveProfileName, upsertProfileEntry } from './modules/ProfileDataOps.js';
 import { deriveProfileControlSelectState } from './modules/ProfileControlStateOps.js';
 import { deriveProfileActionUiState } from './modules/ProfileUiStateOps.js';
+import { deriveRoundEndOutcome } from './modules/RoundStateOps.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -1308,27 +1309,17 @@ export class Game {
         this._updateHUD();
 
         // Match-Sieg nur wenn nicht Singleplayer-Solo (also entweder MP oder mit Bots)
-        const totalBots = parseInt(this.numBots) || 0;
-        const canWinMatch = this.entityManager.getHumanPlayers().length > 1 || totalBots > 0;
-        const requiredWins = Math.max(1, parseInt(this.winsNeeded, 10) || 1);
-        const matchWinner = canWinMatch ? this.entityManager.players.find((p) => p.score >= requiredWins) : null;
+        const roundEndOutcome = deriveRoundEndOutcome(this.entityManager.players, {
+            winner,
+            humanPlayerCount: this.entityManager.getHumanPlayers().length,
+            totalBots: this.numBots,
+            winsNeeded: this.winsNeeded,
+        });
 
-        if (matchWinner) {
-            this.state = 'MATCH_END';
-            const name = matchWinner.isBot ? `Bot ${matchWinner.index + 1}` : `Spieler ${matchWinner.index + 1}`;
-            this.ui.messageText.textContent = `Sieg: ${name} (Score: ${matchWinner.score})`;
-            this.ui.messageSub.textContent = 'ENTER fuer neues Match oder ESC fuer Menue';
-            this.ui.messageOverlay.classList.remove('hidden');
-        } else if (winner) {
-            const name = winner.isBot ? `Bot ${winner.index + 1}` : `Spieler ${winner.index + 1}`;
-            this.ui.messageText.textContent = `${name} gewinnt die Runde`;
-            this.ui.messageSub.textContent = 'Naechste Runde in 3...';
-            this.ui.messageOverlay.classList.remove('hidden');
-        } else {
-            this.ui.messageText.textContent = 'Unentschieden';
-            this.ui.messageSub.textContent = 'Naechste Runde in 3...';
-            this.ui.messageOverlay.classList.remove('hidden');
-        }
+        this.state = roundEndOutcome.state;
+        this.ui.messageText.textContent = roundEndOutcome.messageText;
+        this.ui.messageSub.textContent = roundEndOutcome.messageSub;
+        this.ui.messageOverlay.classList.remove('hidden');
     }
 
     _updateHUD() {
