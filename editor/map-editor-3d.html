@@ -254,6 +254,10 @@
                 <p class="sub">
                     Wähle ein Werkzeug und klicke in die Szene. Nutze die Transform-Gizmos, um Objekte zu bewegen.
                 </p>
+                <div class="row" style="padding-top:0;">
+                    <label>Asset-Status</label>
+                    <span id="assetStatusText" style="font-size:11px; color: var(--muted);">Nicht geladen</span>
+                </div>
             </div>
 
             <div>
@@ -414,6 +418,10 @@
                     style="margin:4px 0; background-color: #3b82f6; color:white; border:none; padding:8px; border-radius:4px; cursor:pointer;">▶
                     Map im Browser Spielen</button>
                 <div style="display:flex;gap:6px;margin:4px 0;">
+                    <button id="btnUndo" class="small" title="Undo (Strg+Z)" disabled>Undo</button>
+                    <button id="btnRedo" class="small" title="Redo (Strg+Y / Strg+Shift+Z)" disabled>Redo</button>
+                </div>
+                <div style="display:flex;gap:6px;margin:4px 0;">
                     <button id="btnExport" class="small">Export to JSON</button>
                     <button id="btnImport" class="small">Import JSON</button>
                     <button id="btnNew" class="small">Neu (Leeren)</button>
@@ -430,6 +438,7 @@
                 <span class="kbd">Maus Rad</span> = Zoom<br>
                 <span class="kbd">T</span> = Bewegen (Translate) | <span class="kbd">R</span> = Rotieren<br>
                 <span class="kbd">Strg+C / Strg+V</span> = Duplizieren<br>
+                <span class="kbd">Strg+Z / Strg+Y</span> = Undo / Redo<br>
                 <span class="kbd">Entf</span> = Löschen<br><br>
                 <em>Bei Tunneln: Jeder Punkt wird eigenständig platziert und im Export pärchenweise (Start+End)
                     verdrahtet.</em>
@@ -448,9 +457,33 @@
 
         async function initEditor() {
             try {
+                const assetStatusText = document.getElementById("assetStatusText");
+                const setAssetStatus = ({ level = 'info', message = '' } = {}) => {
+                    if (!assetStatusText) return;
+                    assetStatusText.textContent = message || 'Unbekannt';
+                    assetStatusText.style.color = (
+                        level === 'error' ? 'var(--danger)' :
+                            level === 'warn' ? '#fbbf24' :
+                                'var(--muted)'
+                    );
+                };
+
                 // Instanziere Assets Loader und warte auf Models
-                const assetLoader = new EditorAssetLoader();
-                await assetLoader.loadAll();
+                setAssetStatus({ level: 'info', message: 'Lade Assets...' });
+                const assetLoader = new EditorAssetLoader({ timeoutMs: 8000, onStatus: setAssetStatus });
+                const assetSummary = await assetLoader.loadAll();
+
+                if ((assetSummary.failed + assetSummary.timedOut) > 0) {
+                    setAssetStatus({
+                        level: 'warn',
+                        message: `${assetSummary.loaded}/${assetSummary.total} geladen, ${assetSummary.failed + assetSummary.timedOut} Placeholder`
+                    });
+                } else {
+                    setAssetStatus({
+                        level: 'info',
+                        message: `${assetSummary.loaded}/${assetSummary.total} geladen`
+                    });
+                }
 
                 // Instanziere Core Components
                 const core = new EditorCore("threeCanvas");
@@ -466,6 +499,11 @@
 
             } catch (err) {
                 console.error("Editor initialization failed:", err);
+                const assetStatusText = document.getElementById("assetStatusText");
+                if (assetStatusText) {
+                    assetStatusText.textContent = "Init fehlgeschlagen";
+                    assetStatusText.style.color = "var(--danger)";
+                }
                 alert("Fehler beim Starten des 3D Map Editors. Details in der Konsole.");
             }
         }

@@ -31,8 +31,9 @@ export class HUD {
 
         this.visible = false;
 
-        // Temp vectors
+        // Temp vectors/objects
         this._vec = new THREE.Vector3();
+        this._euler = new THREE.Euler();
     }
 
     _createPitchLadder() {
@@ -132,10 +133,10 @@ export class HUD {
         // 1. Attitude (Pitch + Heading)
         // Horizon stays stabilized instead of rolling with camera.
         // Three.js Euler Order YXZ means: Y=Yaw, X=Pitch, Z=Roll
-        const euler = new THREE.Euler().setFromQuaternion(player.quaternion, 'YXZ');
-        const pitchDeg = THREE.MathUtils.radToDeg(euler.x);
-        const yawDeg = THREE.MathUtils.radToDeg(euler.y); // Heading
-        const rollDeg = THREE.MathUtils.radToDeg(euler.z);
+        this._euler.setFromQuaternion(player.quaternion, 'YXZ');
+        const pitchDeg = THREE.MathUtils.radToDeg(this._euler.x);
+        const yawDeg = THREE.MathUtils.radToDeg(this._euler.y); // Heading
+        const rollDeg = THREE.MathUtils.radToDeg(this._euler.z);
         const planarMode = !!CONFIG.GAMEPLAY.PLANAR_MODE;
 
         // Stabilized horizon: no roll rotation

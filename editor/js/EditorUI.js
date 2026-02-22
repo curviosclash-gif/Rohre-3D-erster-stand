@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { CUSTOM_MAP_STORAGE_KEY } from '../../js/modules/MapSchema.js';
+import { EditorCommandHistory, SnapshotCommand } from './EditorCommandHistory.js';
 
 export class EditorUI {
     constructor(core) {
@@ -8,6 +10,7 @@ export class EditorUI {
         this.currentTool = "select";
         this.selectedObject = null;
         this.clipboardData = null;
+        this.syncArenaValues = null;
 
         this.useSnap = false;
         this.snapSize = 50;
@@ -22,12 +25,242 @@ export class EditorUI {
         this.drawStartPos = null;
         this.previewMesh = null;
 
+        this.commandHistory = new EditorCommandHistory({
+            limit: 100,
+            onChange: (state) => this.updateUndoRedoUi(state)
+        });
+        this.historySuspendDepth = 0;
+        this.pendingHistoryGestures = new Map();
+
         this.setupVisuals();
         this.setupEventListeners();
     }
 
     setMapManager(mana) {
         this.mapManager = mana;
+        this.updateUndoRedoUi();
+    }
+
+    detachTransformControl() {
+        if (this.core.transformControl.object) {
+            this.core.transformControl.detach();
+        }
+    }
+
+    isManagedObjectAlive(object) {
+        if (!object) return false;
+        if (!this.mapManager) return object.parent === this.core.objectsContainer;
+        return this.mapManager.isRegisteredObject(object);
+    }
+
+    clearDrawingState() {
+        this.cancelHistoryGesture('draw');
+        this.isDrawing = false;
+        this.drawStartPos = null;
+        this.previewMesh = null;
+    }
+
+    getArenaSizeForExport() {
+        return {
+            width: this.ARENA_W,
+            height: this.ARENA_H,
+            depth: this.ARENA_D
+        };
+    }
+
+    isHistoryRecordingSuspended() {
+        return this.historySuspendDepth > 0 || this.commandHistory?.isApplying?.();
+    }
+
+    withHistorySuspended(fn) {
+        this.historySuspendDepth += 1;
+        try {
+            return fn();
+        } finally {
+            this.historySuspendDepth = Math.max(0, this.historySuspendDepth - 1);
+        }
+    }
+
+    captureHistorySnapshot() {
+        if (!this.mapManager) return null;
+
+        let json = '';
+        try {
+            json = this.mapManager.generateJSONExport(this.getArenaSizeForExport());
+        } catch (error) {
+            console.warn('[EditorUI] Failed to capture history snapshot:', error);
+            return null;
+        }
+
+        const selectedObjectId = (this.selectedObject && this.isManagedObjectAlive(this.selectedObject))
+            ? (this.selectedObject.userData?.id || null)
+            : null;
+        const hasPlayerSpawnObject = this.core.objectsContainer.children.some((obj) => (
+            obj?.userData?.type === 'spawn' && obj?.userData?.subType === 'player'
+        ));
+
+        return {
+            json,
+            selectedObjectId,
+            hasPlayerSpawnObject
+        };
+    }
+
+    applyHistorySnapshot(snapshot) {
+        if (!snapshot || !this.mapManager) return;
+        const syncArenaValues = this.syncArenaValues || (() => { });
+
+        this.withHistorySuspended(() => {
+            this.mapManager.importFromJSON(snapshot.json, syncArenaValues);
+            if (snapshot.hasPlayerSpawnObject === false) {
+                const playerSpawns = [...this.core.objectsContainer.children].filter((obj) => (
+                    obj?.userData?.type === 'spawn' && obj?.userData?.subType === 'player'
+                ));
+                playerSpawns.forEach((obj) => this.mapManager.removeObject(obj));
+            }
+            const selected = snapshot.selectedObjectId ? this.mapManager.getObjectById(snapshot.selectedObjectId) : null;
+            this.selectObject(selected || null);
+        });
+    }
+
+    pushSnapshotHistoryCommand(label, beforeSnapshot, afterSnapshot) {
+        if (!beforeSnapshot || !afterSnapshot) return false;
+        if (
+            beforeSnapshot.json === afterSnapshot.json &&
+            beforeSnapshot.hasPlayerSpawnObject === afterSnapshot.hasPlayerSpawnObject
+        ) {
+            return false;
+        }
+
+        return this.commandHistory.push(new SnapshotCommand({
+            label,
+            before: beforeSnapshot,
+            after: afterSnapshot,
+            applySnapshot: (snapshot) => this.applyHistorySnapshot(snapshot)
+        }));
+    }
+
+    executeHistoryMutation(label, mutateFn) {
+        if (typeof mutateFn !== 'function') return undefined;
+        if (!this.mapManager || this.isHistoryRecordingSuspended()) {
+            return mutateFn();
+        }
+
+        const beforeSnapshot = this.captureHistorySnapshot();
+        const result = mutateFn();
+        const afterSnapshot = this.captureHistorySnapshot();
+        this.pushSnapshotHistoryCommand(label, beforeSnapshot, afterSnapshot);
+        return result;
+    }
+
+    beginHistoryGesture(key, label) {
+        if (!key || !this.mapManager || this.isHistoryRecordingSuspended()) return;
+        if (this.pendingHistoryGestures.has(key)) return;
+
+        const snapshot = this.captureHistorySnapshot();
+        if (!snapshot) return;
+
+        this.pendingHistoryGestures.set(key, {
+            label: String(label || 'Change'),
+            before: snapshot
+        });
+    }
+
+    commitHistoryGesture(key, labelOverride = null) {
+        if (!key) return false;
+
+        const pending = this.pendingHistoryGestures.get(key);
+        if (!pending) return false;
+        this.pendingHistoryGestures.delete(key);
+
+        if (!this.mapManager || this.isHistoryRecordingSuspended()) return false;
+
+        const afterSnapshot = this.captureHistorySnapshot();
+        return this.pushSnapshotHistoryCommand(labelOverride || pending.label, pending.before, afterSnapshot);
+    }
+
+    cancelHistoryGesture(key) {
+        if (!key) return;
+        this.pendingHistoryGestures.delete(key);
+    }
+
+    undo() {
+        if (!this.commandHistory) return false;
+        try {
+            return this.commandHistory.undo();
+        } catch (error) {
+            alert(`Undo fehlgeschlagen: ${error.message}`);
+            return false;
+        }
+    }
+
+    redo() {
+        if (!this.commandHistory) return false;
+        try {
+            return this.commandHistory.redo();
+        } catch (error) {
+            alert(`Redo fehlgeschlagen: ${error.message}`);
+            return false;
+        }
+    }
+
+    updateUndoRedoUi(state = null) {
+        const historyState = state || this.commandHistory?.getState?.();
+        if (!historyState) return;
+
+        const btnUndo = document.getElementById("btnUndo");
+        const btnRedo = document.getElementById("btnRedo");
+
+        if (btnUndo) {
+            btnUndo.disabled = !historyState.canUndo;
+            btnUndo.title = historyState.undoLabel
+                ? `Undo: ${historyState.undoLabel} (Strg+Z)`
+                : 'Undo (Strg+Z)';
+        }
+        if (btnRedo) {
+            btnRedo.disabled = !historyState.canRedo;
+            btnRedo.title = historyState.redoLabel
+                ? `Redo: ${historyState.redoLabel} (Strg+Y / Strg+Shift+Z)`
+                : 'Redo (Strg+Y / Strg+Shift+Z)';
+        }
+    }
+
+    beforeManagedObjectsCleared() {
+        this.cancelHistoryGesture('transform');
+        this.clearDrawingState();
+        this.selectObject(null);
+        this.detachTransformControl();
+    }
+
+    onBeforeManagedObjectRemoved(object) {
+        if (!object) return;
+
+        if (this.previewMesh === object) {
+            this.clearDrawingState();
+        }
+
+        if (this.selectedObject === object) {
+            this.selectObject(null);
+            return;
+        }
+
+        if (this.core.transformControl.object === object) {
+            this.detachTransformControl();
+        }
+    }
+
+    syncTransformControlAttachment() {
+        const selected = this.isManagedObjectAlive(this.selectedObject) ? this.selectedObject : null;
+        const flyMode = !!document.getElementById("chkFly")?.checked;
+
+        if (!selected || flyMode) {
+            this.detachTransformControl();
+            return;
+        }
+
+        if (this.core.transformControl.object !== selected) {
+            this.core.transformControl.attach(selected);
+        }
     }
 
     setupVisuals() {
@@ -75,7 +308,8 @@ export class EditorUI {
     }
 
     updateHudCount() {
-        document.getElementById("hudObjCount").textContent = `Objekte: ${this.core.objectsContainer.children.length}`;
+        const count = this.mapManager?.getObjectCount?.() ?? this.core.objectsContainer.children.length;
+        document.getElementById("hudObjCount").textContent = `Objekte: ${count}`;
     }
 
     getSelectionOutlines(object) {
@@ -98,6 +332,11 @@ export class EditorUI {
     }
 
     resolveSelectableObject(hitObject) {
+        if (!hitObject) return null;
+        if (this.mapManager) {
+            return this.mapManager.resolveManagedObject(hitObject);
+        }
+
         let node = hitObject;
         while (node && node.parent && node.parent !== this.core.objectsContainer) {
             node = node.parent;
@@ -112,6 +351,9 @@ export class EditorUI {
             sourcePos: object.position.clone(),
             rotateY: object.rotation.y || 0
         };
+        delete payload.id;
+        delete payload.editorObjectId;
+        delete payload.editorManagedRoot;
         if (payload.pointA?.isVector3) payload.pointA = payload.pointA.clone();
         if (payload.pointB?.isVector3) payload.pointB = payload.pointB.clone();
         return payload;
@@ -119,10 +361,20 @@ export class EditorUI {
 
     deleteSelectedObject() {
         if (!this.selectedObject) return;
+        if (!this.isManagedObjectAlive(this.selectedObject)) {
+            this.selectObject(null);
+            return;
+        }
+        if (this.mapManager) {
+            this.executeHistoryMutation('Delete object', () => {
+                this.mapManager.removeObject(this.selectedObject);
+            });
+            return;
+        }
 
         const removed = this.selectedObject;
         this.core.objectsContainer.remove(removed);
-        this.core.transformControl.detach();
+        this.detachTransformControl();
         if (removed.userData.type === 'tunnel') this.updateTunnelVisuals();
         this.selectedObject = null;
         this.hidePropPanel();
@@ -130,21 +382,34 @@ export class EditorUI {
     }
 
     selectObject(obj) {
+        const nextObject = this.mapManager ? this.mapManager.resolveManagedObject(obj) : obj;
+
+        if (this.selectedObject && !this.isManagedObjectAlive(this.selectedObject)) {
+            this.selectedObject = null;
+        }
+
         if (this.selectedObject) {
             this.setSelectionOutline(this.selectedObject, 0x000000, 0.2);
         }
-        this.selectedObject = obj;
+
+        this.selectedObject = nextObject && this.isManagedObjectAlive(nextObject) ? nextObject : null;
+
         if (this.selectedObject) {
             this.setSelectionOutline(this.selectedObject, 0xffffff, 0.8);
-            this.core.transformControl.attach(this.selectedObject);
+            this.syncTransformControlAttachment();
             this.showPropPanel(this.selectedObject);
         } else {
-            this.core.transformControl.detach();
+            this.detachTransformControl();
             this.hidePropPanel();
         }
     }
 
     clearAllObjects() {
+        if (this.mapManager) {
+            this.mapManager.clearAllObjects();
+            return;
+        }
+
         while (this.core.objectsContainer.children.length > 0) {
             this.core.objectsContainer.remove(this.core.objectsContainer.children[0]);
         }
@@ -154,6 +419,10 @@ export class EditorUI {
     }
 
     showPropPanel(obj) {
+        if (!obj || !obj.userData) {
+            this.hidePropPanel();
+            return;
+        }
         const propPanel = document.getElementById("propPanel");
         const propSizeRow = document.getElementById("propSizeRow");
         const propWidthRow = document.getElementById("propWidthRow");
@@ -220,18 +489,31 @@ export class EditorUI {
         let isDraggingTransform = false;
         this.core.transformControl.addEventListener('dragging-changed', (e) => {
             isDraggingTransform = e.value;
+            if (e.value) {
+                const activeObject = this.core.transformControl.object;
+                const managed = this.mapManager?.resolveManagedObject?.(activeObject) || activeObject;
+                if (managed && this.isManagedObjectAlive(managed)) {
+                    this.beginHistoryGesture('transform', `Transform ${managed.userData?.type || 'object'}`);
+                }
+            } else {
+                this.commitHistoryGesture('transform');
+            }
         });
         this.core.transformControl.addEventListener('objectChange', () => {
             const activeObject = this.core.transformControl.object;
             if (!activeObject) return;
 
-            if (activeObject.userData.type === 'tunnel' && this.mapManager) {
-                this.mapManager.syncTunnelEndpointsFromMesh(activeObject);
-                this.updateTunnelVisuals();
+            const managedObject = this.mapManager?.notifyObjectMutated?.(activeObject) || activeObject;
+            if (!this.isManagedObjectAlive(managedObject)) {
+                this.detachTransformControl();
+                if (this.selectedObject && !this.isManagedObjectAlive(this.selectedObject)) {
+                    this.selectObject(null);
+                }
+                return;
             }
 
-            if (activeObject === this.selectedObject) {
-                this.showPropPanel(activeObject);
+            if (managedObject === this.selectedObject) {
+                this.showPropPanel(managedObject);
             }
         });
 
@@ -277,6 +559,7 @@ export class EditorUI {
                 const p = getGroundPos(e);
                 if (p) {
                     this.selectObject(null);
+                    this.beginHistoryGesture('draw', `Create ${this.currentTool}`);
                     this.isDrawing = true;
 
                     const useYLayer = document.getElementById("chkYLayer").checked;
@@ -301,6 +584,8 @@ export class EditorUI {
 
                     if (this.previewMesh) {
                         this.setSelectionOutline(this.previewMesh, 0xffff00, 0.65);
+                    } else {
+                        this.cancelHistoryGesture('draw');
                     }
                 }
             }
@@ -308,6 +593,11 @@ export class EditorUI {
 
         this.core.container.addEventListener('pointermove', (e) => {
             if (!this.isDrawing || !this.previewMesh) return;
+            if (!this.isManagedObjectAlive(this.previewMesh)) {
+                this.cancelHistoryGesture('draw');
+                this.clearDrawingState();
+                return;
+            }
 
             const curr = getGroundPos(e);
             if (curr) {
@@ -327,6 +617,7 @@ export class EditorUI {
                     this.previewMesh.userData.sizeX = w;
                     this.previewMesh.userData.sizeZ = d;
                     this.previewMesh.userData.sizeY = this.ARENA_H * 0.7;
+                    this.previewMesh.userData.sizeInfo = Math.max(w, d, this.ARENA_H * 0.7) * 0.5;
                 } else if (tool === 'tunnel') {
                     const pA = new THREE.Vector3(start.x, start.y, start.z);
                     const pB = new THREE.Vector3(curr.x, start.y, curr.z);
@@ -343,9 +634,13 @@ export class EditorUI {
         this.core.container.addEventListener('pointerup', () => {
             if (this.isDrawing && this.previewMesh) {
                 this.isDrawing = false;
-                this.setSelectionOutline(this.previewMesh, 0x000000, 0.2);
-                this.selectObject(this.previewMesh);
+                if (this.isManagedObjectAlive(this.previewMesh)) {
+                    this.setSelectionOutline(this.previewMesh, 0x000000, 0.2);
+                    this.selectObject(this.previewMesh);
+                }
                 this.previewMesh = null;
+                this.drawStartPos = null;
+                this.commitHistoryGesture('draw');
             }
         });
 
@@ -357,8 +652,34 @@ export class EditorUI {
         });
 
         // Keyboard Actions
+        const shouldIgnoreGlobalShortcut = (target) => {
+            if (!(target instanceof Element)) return false;
+            const tagName = target.tagName.toLowerCase();
+            return tagName === 'input'
+                || tagName === 'textarea'
+                || tagName === 'select'
+                || target.isContentEditable;
+        };
+
         document.addEventListener('keydown', (e) => {
-            if (e.target.tagName.toLowerCase() === 'input' || e.target.tagName.toLowerCase() === 'textarea') return;
+            if (shouldIgnoreGlobalShortcut(e.target)) return;
+
+            const lowerKey = e.key.toLowerCase();
+
+            if (e.ctrlKey && lowerKey === 'z') {
+                e.preventDefault();
+                if (e.shiftKey) {
+                    this.redo();
+                } else {
+                    this.undo();
+                }
+                return;
+            }
+            if (e.ctrlKey && lowerKey === 'y') {
+                e.preventDefault();
+                this.redo();
+                return;
+            }
 
             // Delete
             if (e.key === 'Delete' || e.key === 'Backspace') {
@@ -366,16 +687,16 @@ export class EditorUI {
             }
 
             // Transform Modes
-            if (e.key.toLowerCase() === 'r') {
-                if (this.selectedObject && this.core.transformControl.object) {
+            if (lowerKey === 'r') {
+                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && this.core.transformControl.object) {
                     this.core.transformControl.setMode('rotate');
                     this.core.transformControl.showX = false;
                     this.core.transformControl.showY = true;
                     this.core.transformControl.showZ = false;
                 }
             }
-            if (e.key.toLowerCase() === 't') {
-                if (this.selectedObject && this.core.transformControl.object) {
+            if (lowerKey === 't') {
+                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && this.core.transformControl.object) {
                     this.core.transformControl.setMode('translate');
                     this.core.transformControl.showX = true;
                     this.core.transformControl.showY = true;
@@ -384,110 +705,119 @@ export class EditorUI {
             }
 
             // Copy
-            if (e.ctrlKey && e.key.toLowerCase() === 'c') {
-                if (this.selectedObject) {
+            if (e.ctrlKey && lowerKey === 'c') {
+                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject)) {
                     this.clipboardData = this.createClipboardPayload(this.selectedObject);
                 }
             }
             // Paste
-            if (e.ctrlKey && e.key.toLowerCase() === 'v') {
+            if (e.ctrlKey && lowerKey === 'v') {
                 if (this.clipboardData) {
-                    this.raycaster.setFromCamera(this.mouse, this.core.camera);
+                    this.executeHistoryMutation('Paste object', () => {
+                        this.raycaster.setFromCamera(this.mouse, this.core.camera);
 
-                    const useYLayer = document.getElementById("chkYLayer").checked;
-                    const targetMesh = useYLayer ? this.core.yGroundMesh : this.core.groundMesh;
-                    const intersectsGround = this.raycaster.intersectObject(targetMesh);
+                        const useYLayer = document.getElementById("chkYLayer").checked;
+                        const targetMesh = useYLayer ? this.core.yGroundMesh : this.core.groundMesh;
+                        const intersectsGround = this.raycaster.intersectObject(targetMesh);
 
-                    let targetPos = new THREE.Vector3(0, this.clipboardData.sourcePos?.y ?? this.ARENA_H * 0.55, 0);
+                        let targetPos = new THREE.Vector3(0, this.clipboardData.sourcePos?.y ?? this.ARENA_H * 0.55, 0);
 
-                    if (intersectsGround.length > 0) {
-                        targetPos.x = intersectsGround[0].point.x;
-                        targetPos.z = intersectsGround[0].point.z;
-                        if (this.useSnap) {
-                            targetPos.x = Math.round(targetPos.x / this.snapSize) * this.snapSize;
-                            targetPos.z = Math.round(targetPos.z / this.snapSize) * this.snapSize;
+                        if (intersectsGround.length > 0) {
+                            targetPos.x = intersectsGround[0].point.x;
+                            targetPos.z = intersectsGround[0].point.z;
+                            if (this.useSnap) {
+                                targetPos.x = Math.round(targetPos.x / this.snapSize) * this.snapSize;
+                                targetPos.z = Math.round(targetPos.z / this.snapSize) * this.snapSize;
+                            }
                         }
-                    }
 
-                    if (useYLayer) {
-                        const base_y = parseFloat(document.getElementById("numYLayer").value);
-                        targetPos.y = base_y;
-                        if (this.clipboardData.type === 'hard' || this.clipboardData.type === 'foam') {
-                            const sy = this.clipboardData.sizeY || (this.clipboardData.sizeInfo * 2);
-                            targetPos.y = base_y + sy / 2;
+                        if (useYLayer) {
+                            const base_y = parseFloat(document.getElementById("numYLayer").value);
+                            targetPos.y = base_y;
+                            if (this.clipboardData.type === 'hard' || this.clipboardData.type === 'foam') {
+                                const sy = this.clipboardData.sizeY || (this.clipboardData.sizeInfo * 2);
+                                targetPos.y = base_y + sy / 2;
+                            }
+                        } else if (this.clipboardData.type === 'hard' || this.clipboardData.type === 'foam') {
+                            targetPos.y = this.ARENA_H * 0.35;
                         }
-                    } else if (this.clipboardData.type === 'hard' || this.clipboardData.type === 'foam') {
-                        targetPos.y = this.ARENA_H * 0.35;
-                    }
 
-                    let extraProps = { ...this.clipboardData };
-                    delete extraProps.sourcePos;
-                    if (extraProps.pointA?.isVector3) extraProps.pointA = extraProps.pointA.clone();
-                    if (extraProps.pointB?.isVector3) extraProps.pointB = extraProps.pointB.clone();
+                        let extraProps = { ...this.clipboardData };
+                        delete extraProps.sourcePos;
+                        if (extraProps.pointA?.isVector3) extraProps.pointA = extraProps.pointA.clone();
+                        if (extraProps.pointB?.isVector3) extraProps.pointB = extraProps.pointB.clone();
 
-                    if (this.clipboardData.type === 'tunnel' && this.clipboardData.pointA && this.clipboardData.pointB) {
-                        // Offset the tunnel segment safely so we don't paste directly on top
-                        const sourcePos = this.clipboardData.sourcePos?.isVector3
-                            ? this.clipboardData.sourcePos
-                            : this.clipboardData.pointA.clone().lerp(this.clipboardData.pointB, 0.5);
-                        const diff = targetPos.clone().sub(sourcePos);
-                        extraProps.pointA = this.clipboardData.pointA.clone().add(diff);
-                        extraProps.pointB = this.clipboardData.pointB.clone().add(diff);
-                    }
+                        if (this.clipboardData.type === 'tunnel' && this.clipboardData.pointA && this.clipboardData.pointB) {
+                            // Offset the tunnel segment safely so we don't paste directly on top
+                            const sourcePos = this.clipboardData.sourcePos?.isVector3
+                                ? this.clipboardData.sourcePos
+                                : this.clipboardData.pointA.clone().lerp(this.clipboardData.pointB, 0.5);
+                            const diff = targetPos.clone().sub(sourcePos);
+                            extraProps.pointA = this.clipboardData.pointA.clone().add(diff);
+                            extraProps.pointB = this.clipboardData.pointB.clone().add(diff);
+                        }
 
-                    const mesh = this.mapManager.createMesh(
-                        this.clipboardData.type,
-                        this.clipboardData.subType,
-                        targetPos.x, targetPos.y, targetPos.z,
-                        this.clipboardData.sizeInfo,
-                        extraProps
-                    );
-                    if (mesh) this.selectObject(mesh);
+                        const mesh = this.mapManager.createMesh(
+                            this.clipboardData.type,
+                            this.clipboardData.subType,
+                            targetPos.x, targetPos.y, targetPos.z,
+                            this.clipboardData.sizeInfo,
+                            extraProps
+                        );
+                        if (mesh) this.selectObject(mesh);
+                    });
                 }
             }
         });
 
         // Prop changes
         document.getElementById("propY").addEventListener('change', (e) => {
-            if (!this.selectedObject) return;
-            this.selectedObject.position.y = parseFloat(e.target.value);
-            if (this.selectedObject.userData.type === 'tunnel') {
-                this.mapManager.syncTunnelEndpointsFromMesh(this.selectedObject);
-                this.updateTunnelVisuals();
-            }
-            this.showPropPanel(this.selectedObject);
+            this.executeHistoryMutation('Edit object Y', () => {
+                if (!this.selectedObject || !this.isManagedObjectAlive(this.selectedObject)) return;
+                this.selectedObject.position.y = parseFloat(e.target.value);
+                if (this.selectedObject.userData.type === 'tunnel') {
+                    this.mapManager?.notifyObjectMutated?.(this.selectedObject);
+                }
+                this.showPropPanel(this.selectedObject);
+            });
         });
 
         document.getElementById("propSize").addEventListener('change', (e) => {
-            if (this.selectedObject) {
-                const val = parseFloat(e.target.value);
-                const u = this.selectedObject.userData;
-                u.sizeInfo = val;
+            this.executeHistoryMutation('Edit object size', () => {
+                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject)) {
+                    const val = parseFloat(e.target.value);
+                    const u = this.selectedObject.userData;
+                    u.sizeInfo = val;
 
-                if (u.type === 'tunnel') {
-                    u.radius = val;
-                    if (u.pointA && u.pointB) {
-                        this.mapManager.alignTunnelSegment(this.selectedObject, u.pointA, u.pointB, val);
-                        this.updateTunnelVisuals();
+                    if (u.type === 'tunnel') {
+                        u.radius = val;
+                        if (u.pointA && u.pointB) {
+                            this.mapManager.alignTunnelSegment(this.selectedObject, u.pointA, u.pointB, val);
+                            this.mapManager?.notifyObjectMutated?.(this.selectedObject);
+                        }
+                    } else if (u.type === 'portal') {
+                        this.selectedObject.scale.set(val, val, val);
+                        u.radius = val;
                     }
-                } else if (u.type === 'portal') {
-                    this.selectedObject.scale.set(val, val, val);
                 }
-            }
+            });
         });
 
         // Box Scale Inputs
         const updateBoxScale = () => {
-            if (this.selectedObject && (this.selectedObject.userData.type === 'hard' || this.selectedObject.userData.type === 'foam')) {
-                const w = parseFloat(document.getElementById("propWidth").value);
-                const d = parseFloat(document.getElementById("propDepth").value);
-                const h = parseFloat(document.getElementById("propHeight").value);
+            this.executeHistoryMutation('Resize block', () => {
+                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && (this.selectedObject.userData.type === 'hard' || this.selectedObject.userData.type === 'foam')) {
+                    const w = parseFloat(document.getElementById("propWidth").value);
+                    const d = parseFloat(document.getElementById("propDepth").value);
+                    const h = parseFloat(document.getElementById("propHeight").value);
 
-                this.selectedObject.userData.sizeX = w;
-                this.selectedObject.userData.sizeZ = d;
-                this.selectedObject.userData.sizeY = h;
-                this.selectedObject.scale.set(w, h, d);
-            }
+                    this.selectedObject.userData.sizeX = w;
+                    this.selectedObject.userData.sizeZ = d;
+                    this.selectedObject.userData.sizeY = h;
+                    this.selectedObject.userData.sizeInfo = Math.max(w, d, h) * 0.5;
+                    this.selectedObject.scale.set(w, h, d);
+                }
+            });
         };
 
         document.getElementById("propWidth").addEventListener('change', updateBoxScale);
@@ -496,13 +826,15 @@ export class EditorUI {
 
         // Aircraft Scale Input
         document.getElementById("propScale").addEventListener('change', (e) => {
-            if (this.selectedObject && this.selectedObject.userData.type === 'aircraft') {
-                const s = parseFloat(e.target.value);
-                if (s > 0) {
-                    this.selectedObject.userData.modelScale = s;
-                    this.selectedObject.scale.set(s, s, s);
+            this.executeHistoryMutation('Scale aircraft', () => {
+                if (this.selectedObject && this.isManagedObjectAlive(this.selectedObject) && this.selectedObject.userData.type === 'aircraft') {
+                    const s = parseFloat(e.target.value);
+                    if (s > 0) {
+                        this.selectedObject.userData.modelScale = s;
+                        this.selectedObject.scale.set(s, s, s);
+                    }
                 }
-            }
+            });
         });
 
         // Arena resize
@@ -512,10 +844,11 @@ export class EditorUI {
             this.ARENA_H = parseFloat(document.getElementById("numArenaH").value) || 950;
             this.updateArenaVisual();
         };
+        this.syncArenaValues = syncArenaValues;
 
-        document.getElementById("numArenaW").addEventListener('change', syncArenaValues);
-        document.getElementById("numArenaD").addEventListener('change', syncArenaValues);
-        document.getElementById("numArenaH").addEventListener('change', syncArenaValues);
+        document.getElementById("numArenaW").addEventListener('change', () => this.executeHistoryMutation('Resize arena', syncArenaValues));
+        document.getElementById("numArenaD").addEventListener('change', () => this.executeHistoryMutation('Resize arena', syncArenaValues));
+        document.getElementById("numArenaH").addEventListener('change', () => this.executeHistoryMutation('Resize arena', syncArenaValues));
 
         // Y-Layer Setup
         document.getElementById("chkYLayer").addEventListener('change', (e) => {
@@ -540,10 +873,10 @@ export class EditorUI {
             // damit Links-Klick (MOUSE.LEFT) komplett fürs Bauen von Blöcken frei ist.
             if (isFly) {
                 this.core.orbit.mouseButtons = rightClickRotate;
-                if (this.selectedObject) this.core.transformControl.detach();
+                if (this.selectedObject) this.detachTransformControl();
             } else {
                 this.core.orbit.mouseButtons = rightClickRotate;
-                if (this.selectedObject) this.core.transformControl.attach(this.selectedObject);
+                if (this.selectedObject) this.syncTransformControlAttachment();
             }
         });
 
@@ -559,32 +892,54 @@ export class EditorUI {
 
         // Export/Import
         document.getElementById("btnExport").addEventListener("click", () => {
-            document.getElementById("jsonOutput").value = this.mapManager.generateJSONExport({
-                width: this.ARENA_W, height: this.ARENA_H, depth: this.ARENA_D
-            });
+            document.getElementById("jsonOutput").value = this.mapManager.generateJSONExport(this.getArenaSizeForExport());
         });
 
         document.getElementById("btnPlaytest").addEventListener("click", () => {
-            const jsonText = this.mapManager.generateJSONExport({
-                width: this.ARENA_W, height: this.ARENA_H, depth: this.ARENA_D
-            });
-            // Gleicher Origin (Vite-Server) → localStorage funktioniert direkt
-            localStorage.setItem("custom_map_test", jsonText);
-            window.open("../index.html", "_blank");
+            const jsonText = this.mapManager.generateJSONExport(this.getArenaSizeForExport());
+
+            try {
+                // Gleicher Origin (Vite-Server) -> localStorage funktioniert direkt
+                localStorage.setItem(CUSTOM_MAP_STORAGE_KEY, jsonText);
+            } catch (error) {
+                alert(`Playtest konnte nicht gespeichert werden: ${error.message}`);
+                return;
+            }
+
+            const playtestWindow = window.open("../index.html?playtest=1", "_blank", "noopener");
+            if (!playtestWindow) {
+                alert("Popup blockiert. Bitte Popups erlauben und erneut versuchen.");
+            }
         });
 
         document.getElementById("btnImport").addEventListener("click", () => {
             const txt = document.getElementById("jsonOutput").value.trim();
-            if (txt) this.mapManager.importFromJSON(txt, syncArenaValues);
+            if (!txt) return;
+            this.executeHistoryMutation('Import map', () => {
+                this.mapManager.importFromJSON(txt, syncArenaValues);
+            });
         });
 
         document.getElementById("btnNew").addEventListener("click", () => {
-            this.clearAllObjects();
-            document.getElementById("jsonOutput").value = "";
+            this.executeHistoryMutation('Clear map', () => {
+                this.clearAllObjects();
+                document.getElementById("jsonOutput").value = "";
+            });
         });
 
         document.getElementById("btnDelSelected").addEventListener("click", () => {
             this.deleteSelectedObject();
         });
+
+        document.getElementById("btnUndo")?.addEventListener("click", () => {
+            this.undo();
+        });
+
+        document.getElementById("btnRedo")?.addEventListener("click", () => {
+            this.redo();
+        });
+
+        this.updateUndoRedoUi();
     }
 }
+

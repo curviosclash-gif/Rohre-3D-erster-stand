@@ -17,10 +17,21 @@ export class Arena {
 
     /** Baut die Arena für die gewählte Map */
     build(mapKey) {
-        const map = CONFIG.MAPS[mapKey] || CONFIG.MAPS.standard;
-        this.currentMapKey = mapKey;
+        const fallbackMap = CONFIG.MAPS.standard || Object.values(CONFIG.MAPS || {})[0] || {
+            name: 'Fallback Map',
+            size: [80, 30, 80],
+            obstacles: [],
+            portals: [],
+        };
+        const hasRequestedMap = typeof mapKey === 'string' && !!CONFIG.MAPS[mapKey];
+        const map = hasRequestedMap ? CONFIG.MAPS[mapKey] : fallbackMap;
+        this.currentMapKey = hasRequestedMap ? mapKey : 'standard';
         const scale = CONFIG.ARENA.MAP_SCALE || 1;
-        const [baseSx, baseSy, baseSz] = map.size;
+        const fallbackSize = Array.isArray(fallbackMap.size) ? fallbackMap.size : [80, 30, 80];
+        const mapSize = Array.isArray(map.size) ? map.size : fallbackSize;
+        const baseSx = Number.isFinite(mapSize[0]) && mapSize[0] > 0 ? mapSize[0] : fallbackSize[0];
+        const baseSy = Number.isFinite(mapSize[1]) && mapSize[1] > 0 ? mapSize[1] : fallbackSize[1];
+        const baseSz = Number.isFinite(mapSize[2]) && mapSize[2] > 0 ? mapSize[2] : fallbackSize[2];
         const sx = baseSx * scale;
         const sy = baseSy * scale;
         const sz = baseSz * scale;
@@ -106,9 +117,17 @@ export class Arena {
         this._addWall(0, sy, 0, sx, t, sz, wallMat);
 
         // ---- Hindernisse ----
-        for (const obs of map.obstacles) {
-            const [px, py, pz] = obs.pos;
-            const [ox, oy, oz] = obs.size;
+        const obstacleDefs = Array.isArray(map.obstacles) ? map.obstacles : [];
+        for (const obs of obstacleDefs) {
+            if (!obs || !Array.isArray(obs.pos) || !Array.isArray(obs.size)) continue;
+            const px = Number(obs.pos[0]);
+            const py = Number(obs.pos[1]);
+            const pz = Number(obs.pos[2]);
+            const ox = Number(obs.size[0]);
+            const oy = Number(obs.size[1]);
+            const oz = Number(obs.size[2]);
+            if (![px, py, pz, ox, oy, oz].every(Number.isFinite)) continue;
+            if (ox <= 0 || oy <= 0 || oz <= 0) continue;
             this._addObstacle(
                 px * scale,
                 py * scale,
@@ -148,15 +167,24 @@ export class Arena {
     }
 
     _createPortalFromDef(def, scale) {
+        if (!def || !Array.isArray(def.a) || !Array.isArray(def.b)) return;
+        const ax = Number(def.a[0]);
+        const ay = Number(def.a[1]);
+        const az = Number(def.a[2]);
+        const bx = Number(def.b[0]);
+        const by = Number(def.b[1]);
+        const bz = Number(def.b[2]);
+        if (![ax, ay, az, bx, by, bz].every(Number.isFinite)) return;
+
         const posA = this._resolvePortalPosition(
-            new THREE.Vector3(def.a[0] * scale, def.a[1] * scale, def.a[2] * scale),
+            new THREE.Vector3(ax * scale, ay * scale, az * scale),
             11
         );
         const posB = this._resolvePortalPosition(
-            new THREE.Vector3(def.b[0] * scale, def.b[1] * scale, def.b[2] * scale),
+            new THREE.Vector3(bx * scale, by * scale, bz * scale),
             29
         );
-        const color = def.color || 0x00ffcc;
+        const color = Number.isFinite(def.color) ? def.color : 0x00ffcc;
         this._addPortalInstance(posA, posB, color, 'NEUTRAL', 'NEUTRAL');
     }
 

@@ -15,6 +15,14 @@ const MAP_BEHAVIOR = {
     pyramid: { caution: 0.08, portalBias: 0.12, aggressionBias: 0.03 },
 };
 
+// Statische Richtungen für Portalsensorik (Vermeidet Array-Allokation pro Aufruf)
+const PORTAL_EXIT_CHECK_DIRS = [
+    { x: 1, y: 0, z: 0 },
+    { x: -1, y: 0, z: 0 },
+    { x: 0, y: 0, z: 1 },
+    { x: 0, y: 0, z: -1 },
+];
+
 // Phase 3: Kontextsensitive Item-Regeln (emergencyScale + combatSelf)
 const ITEM_RULES = {
     SPEED_UP: { self: 0.8, offense: 0.2, defensiveScale: 0.5, emergencyScale: 0.1, combatSelf: 0.2 },
@@ -161,6 +169,9 @@ export class BotAI {
             // Backward-Probe für Rückwärtserkennung
             createProbe('backward', 3.14, 0, 0.25),
         ];
+
+        this._collisionCache = new Map();
+        this._lastSensePos = new THREE.Vector3();
 
         this._setDifficulty(options.difficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL');
         this._checkStuckTimer = this.profile.stuckCheckInterval;
@@ -348,7 +359,7 @@ export class BotAI {
                 const distance = sampleDistances[j];
                 this._tmpVec2.copy(player.position).addScaledVector(this._tmpVec, distance);
 
-                const wallHit = arena.checkCollision(this._tmpVec2, 1.35);
+                const wallHit = arena.checkCollision(this._tmpVec2, player.hitboxRadius * 1.6);
                 const trailHit = this._checkTrailHit(this._tmpVec2, player, allPlayers);
                 if (wallHit || trailHit) {
                     score += 3.2 + j * 0.8 + (trailHit ? 0.9 : 0.5);
@@ -421,7 +432,7 @@ export class BotAI {
         const checks = [3, 5, 7];
         for (let i = 0; i < checks.length; i++) {
             this._tmpVec2.copy(player.position).addScaledVector(this._tmpVec, checks[i]);
-            if (arena.checkCollision(this._tmpVec2, 1.35) || this._checkTrailHit(this._tmpVec2, player, allPlayers)) {
+            if (arena.checkCollision(this._tmpVec2, player.hitboxRadius * 1.6) || this._checkTrailHit(this._tmpVec2, player, allPlayers)) {
                 return false;
             }
         }
@@ -473,24 +484,9 @@ export class BotAI {
     }
 
     _checkTrailHit(position, player, allPlayers) {
-        const selfSkipRecent = this.state.recoveryActive
-            ? 6
-            : (this._recentBouncePressure > 1.4 ? 8 : 12);
-        for (let i = 0; i < allPlayers.length; i++) {
-            const other = allPlayers[i];
-            if (!other || !other.alive) continue;
-            const skipRecent = other === player ? selfSkipRecent : 0;
-
-            if (other.trail.checkCollisionFast) {
-                if (other.trail.checkCollisionFast(position, 1.35, skipRecent)) {
-                    return true;
-                }
-            } else {
-                const hit = other.trail.checkCollision(position, 1.35, skipRecent);
-                if (hit && hit.hit) return true;
-            }
-        }
-        return false;
+        // Use global collision system
+        const hit = player.trail.entityManager.checkGlobalCollision(position, player.hitboxRadius * 1.6, player.index, 20);
+        return !!(hit && hit.hit);
     }
 
     _scoreProbe(player, arena, allPlayers, probe, lookAhead) {
@@ -512,7 +508,7 @@ export class BotAI {
         for (let d = step; d <= probeLookAhead; d += step) {
             this._tmpVec.copy(player.position).addScaledVector(probe.dir, d);
 
-            if (arena.checkCollision(this._tmpVec, 1.35)) {
+            if (arena.checkCollision(this._tmpVec, player.hitboxRadius * 1.6)) {
                 wallDist = d;
                 if (d <= step * 1.5) immediateDanger = true;
                 break;
@@ -604,7 +600,7 @@ export class BotAI {
     }
 
     _estimatePointRisk(point, player, arena, allPlayers) {
-        const wallHit = arena.checkCollision(point, 1.6) ? 1 : 0;
+        const wallHit = arena.checkCollision(point, player.hitboxRadius * 2.0) ? 1 : 0;
         const trailHit = this._checkTrailHit(point, player, allPlayers) ? 1 : 0;
         const enemyPressure = this._estimateEnemyPressure(point, player, allPlayers);
         return wallHit * 1.2 + trailHit * 1.5 + enemyPressure * 0.6;
@@ -615,25 +611,20 @@ export class BotAI {
     // ================================================================
     _estimateExitSafety(exit, arena, player, allPlayers) {
         const probeDistance = 5;
-        const dirs = [
-            { x: 1, y: 0, z: 0 },
-            { x: -1, y: 0, z: 0 },
-            { x: 0, y: 0, z: 1 },
-            { x: 0, y: 0, z: -1 },
-        ];
         let blockedCount = 0;
-        for (let i = 0; i < dirs.length; i++) {
+        for (let i = 0; i < PORTAL_EXIT_CHECK_DIRS.length; i++) {
+            const dir = PORTAL_EXIT_CHECK_DIRS[i];
             this._tmpVec3.set(
-                exit.x + dirs[i].x * probeDistance,
-                exit.y + dirs[i].y * probeDistance,
-                exit.z + dirs[i].z * probeDistance
+                exit.x + dir.x * probeDistance,
+                exit.y + dir.y * probeDistance,
+                exit.z + dir.z * probeDistance
             );
-            if (arena.checkCollision(this._tmpVec3, 1.6)
+            if (arena.checkCollision(this._tmpVec3, player.hitboxRadius * 2.0)
                 || this._checkTrailHit(this._tmpVec3, player, allPlayers)) {
                 blockedCount++;
             }
         }
-        return blockedCount / dirs.length;
+        return blockedCount / PORTAL_EXIT_CHECK_DIRS.length;
     }
 
     // ================================================================
@@ -894,18 +885,19 @@ export class BotAI {
         player.getDirection(this._tmpForward).normalize();
         this._buildBasis(this._tmpForward);
 
-        // Phase 1: Probe-Anzahl basierend auf Schwierigkeit filtern
-        const maxProbes = this.profile.probeCount || this._probes.length;
+        // Adaptive Sensing: Reduce probes in open space
+        const maxProbes = this._probes.length;
+        const useFewProbes = !this.sense.immediateDanger && (this.sense.forwardRisk || 0) < 0.25 && (this.sense.localOpenness || 0) > this.sense.lookAhead * 0.7;
+        const probesToProcess = useFewProbes ? Math.min(6, maxProbes) : maxProbes;
 
-        let bestProbe = null;
-        let bestRisk = Infinity;
-        let forwardProbe = null;
         let opennessSum = 0;
         let opennessCount = 0;
+        let bestRisk = Infinity;
+        let bestProbe = null;
+        let forwardProbe = null;
 
-        for (let i = 0; i < this._probes.length; i++) {
-            // Probes nach Index begrenzen (EASY nutzt weniger)
-            if (i >= maxProbes) break;
+        for (let i = 0; i < maxProbes; i++) {
+            if (i >= probesToProcess) break;
 
             const probe = this._probes[i];
             const isVertical = Math.abs(probe.pitch) > 0.001;

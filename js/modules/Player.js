@@ -5,6 +5,7 @@
 import * as THREE from 'three';
 import { CONFIG } from './Config.js';
 import { Trail } from './Trail.js';
+import { createVehicleMesh, isValidVehicleId, VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
 
 // Shared Geometries (einmalig erstellt, von allen Spielern geteilt)
 const SHARED_GEO = {};
@@ -22,6 +23,7 @@ function _ensureSharedGeo() {
     SHARED_GEO.flameOuter = new THREE.ConeGeometry(0.28, 1.8, 8);
     SHARED_GEO.flameOuter.rotateX(-Math.PI / 2);
     SHARED_GEO.shield = new THREE.SphereGeometry(1.5, 8, 8);
+    SHARED_GEO.shieldBox = new THREE.BoxGeometry(1, 1, 1);
     // Flügel-Geometrien
     const wingShape = new THREE.Shape();
     wingShape.moveTo(0, 0); wingShape.lineTo(-1.8, 0.6); wingShape.lineTo(-0.3, 0.8); wingShape.lineTo(0, 0);
@@ -35,7 +37,7 @@ function _ensureSharedGeo() {
 }
 
 export class Player {
-    constructor(renderer, index, color, isBot = false) {
+    constructor(renderer, index, color, isBot = false, options = {}) {
         this.renderer = renderer;
         this.index = index;
         this.color = color;
@@ -77,139 +79,118 @@ export class Player {
         this.spawnProtectionTimer = 0;
         this.planarAimOffset = 0;
 
+        const requestedVehicleId = String(options?.vehicleId || '').trim();
+        this.vehicleId = isValidVehicleId(requestedVehicleId)
+            ? requestedVehicleId
+            : String(CONFIG.PLAYER.DEFAULT_VEHICLE_ID || 'ship5');
+
+        const vehicleDef = VEHICLE_DEFINITIONS.find(v => v.id === this.vehicleId) || VEHICLE_DEFINITIONS[0];
+        this.hitboxRadius = (vehicleDef.hitbox?.radius || CONFIG.PLAYER.HITBOX_RADIUS || 0.8) * this.modelScale;
+
+        // Lokale Bounding-Box für präzise OBB-Kollision
+        this.hitboxBox = new THREE.Box3();
+        const r = this.hitboxRadius;
+        this.hitboxBox.set(new THREE.Vector3(-r, -r * 0.5, -r), new THREE.Vector3(r, r * 0.5, r));
+
+        this._tmpWorldToLocal = new THREE.Matrix4();
+        this._tmpLocalPoint = new THREE.Vector3();
+
+        this.vehicleMesh = null;
+        this._vehicleBounds = { minZ: -1.95, maxZ: 1.9, sizeY: 1.0 };
+
         // Kamera-Modus
         this.cameraMode = 0;
 
-        // 3D-Modell (Kampfjet)
+        // 3D-Modell (Dynamisch über Registry)
         this._createModel();
 
         // Trail
-        this.trail = new Trail(renderer, color);
+        this.trail = new Trail(renderer, color, this.index, options.entityManager);
     }
 
     _createModel() {
-        _ensureSharedGeo();
         this.group = new THREE.Group();
 
-        const jetMat = new THREE.MeshStandardMaterial({
-            color: this.color,
-            emissive: this.color,
-            emissiveIntensity: 0.2,
-            roughness: 0.3,
-            metalness: 0.7,
-        });
-        const jetMatDark = new THREE.MeshStandardMaterial({
-            color: this.color,
-            emissive: this.color,
-            emissiveIntensity: 0.1,
-            roughness: 0.4,
-            metalness: 0.8,
-        });
+        // Create vehicle mesh from registry
+        this.vehicleMesh = createVehicleMesh(this.vehicleId, this.color);
+        this.group.add(this.vehicleMesh);
 
-        // --- Rumpf (shared Geometry) ---
-        const body = new THREE.Mesh(SHARED_GEO.body, jetMat);
-        body.castShadow = false;
-        this.group.add(body);
+        const updateBox = () => {
+            if (this.vehicleMesh.localBox) {
+                this.hitboxBox.copy(this.vehicleMesh.localBox);
+            } else {
+                this.vehicleMesh.updateMatrixWorld(true);
+                const invMatrix = new THREE.Matrix4().copy(this.vehicleMesh.matrixWorld).invert();
+                this.hitboxBox.setFromObject(this.vehicleMesh).applyMatrix4(invMatrix);
+            }
 
-        // --- Cockpit (shared Geometry) ---
-        const cockpitMat = new THREE.MeshStandardMaterial({
-            color: 0x88ccff,
-            emissive: 0x2266aa,
-            emissiveIntensity: 0.3,
-            transparent: true,
-            opacity: 0.7,
-            roughness: 0.1,
-            metalness: 0.9,
-        });
-        const cockpit = new THREE.Mesh(SHARED_GEO.cockpit, cockpitMat);
-        cockpit.rotation.x = -Math.PI / 2;
-        cockpit.position.set(0, 0.2, -0.7);
-        this.group.add(cockpit);
+            // Kraftfeld-Box an OBB anpassen
+            if (this.shieldMesh) {
+                const size = new THREE.Vector3();
+                const center = new THREE.Vector3();
+                this.hitboxBox.getSize(size);
+                this.hitboxBox.getCenter(center);
 
-        // Anchor fuer First-Person-Kamera (an der Flugzeugspitze)
+                // Etwas Puffer (15% größer)
+                this.shieldMesh.scale.set(size.x * 1.15, size.y * 1.15, size.z * 1.15);
+                this.shieldMesh.position.copy(center);
+            }
+        };
+
+        if (this.vehicleMesh.addEventListener) {
+            this.vehicleMesh.addEventListener('loaded', updateBox);
+        }
+        updateBox();
+
+        // First Person Anchor (fallback if not provided by mesh)
         this.firstPersonAnchor = new THREE.Object3D();
-        this.firstPersonAnchor.position.set(
-            CONFIG.PLAYER.NOSE_CAMERA_LOCAL_X || 0,
-            CONFIG.PLAYER.NOSE_CAMERA_LOCAL_Y || 0,
-            CONFIG.PLAYER.NOSE_CAMERA_LOCAL_Z || -1.95
-        );
-        this.group.add(this.firstPersonAnchor);
+        if (this.vehicleMesh.firstPersonAnchor) {
+            this.firstPersonAnchor = this.vehicleMesh.firstPersonAnchor;
+        } else {
+            this.firstPersonAnchor.position.set(
+                CONFIG.PLAYER.NOSE_CAMERA_LOCAL_X || 0,
+                CONFIG.PLAYER.NOSE_CAMERA_LOCAL_Y || 0,
+                CONFIG.PLAYER.NOSE_CAMERA_LOCAL_Z || -2
+            );
+            this.group.add(this.firstPersonAnchor);
+        }
 
-        // --- Delta-Flügel (shared Geometries) ---
-        const wingL = new THREE.Mesh(SHARED_GEO.wingL, jetMatDark);
-        wingL.position.set(0, -0.02, 0.1);
-        wingL.castShadow = false;
-        this.group.add(wingL);
-
-        const wingR = new THREE.Mesh(SHARED_GEO.wingR, jetMatDark);
-        wingR.position.set(0, -0.02, 0.1);
-        wingR.castShadow = false;
-        this.group.add(wingR);
-
-        // --- Heckleitwerk (shared Geometry) ---
-        const fin = new THREE.Mesh(SHARED_GEO.fin, jetMat);
-        fin.position.set(-0.02, 0.15, 1.0);
-        fin.castShadow = false;
-        this.group.add(fin);
-
-        // --- Düse (shared Geometry) ---
-        const nozzleMat = new THREE.MeshStandardMaterial({
-            color: 0x333333,
-            roughness: 0.6,
-            metalness: 0.9,
-        });
-        const nozzle = new THREE.Mesh(SHARED_GEO.nozzle, nozzleMat);
-        nozzle.position.z = 1.5;
-        this.group.add(nozzle);
-
-        // --- Flammen-Triebwerkseffekt (shared Geometries) ---
-        this.flameGroup = new THREE.Group();
-        this.flameGroup.position.z = 1.9;
-        this.flames = [];
-
-        const flameInnerMat = new THREE.MeshBasicMaterial({
-            color: 0xffffaa,
-            transparent: true,
-            opacity: 0.9,
-        });
-        const flameInner = new THREE.Mesh(SHARED_GEO.flameInner, flameInnerMat);
-        this.flameGroup.add(flameInner);
-        this.flames.push(flameInner);
-
-        const flameMidMat = new THREE.MeshBasicMaterial({
-            color: 0xff8800,
-            transparent: true,
-            opacity: 0.6,
-        });
-        const flameMid = new THREE.Mesh(SHARED_GEO.flameMid, flameMidMat);
-        this.flameGroup.add(flameMid);
-        this.flames.push(flameMid);
-
-        const flameOuterMat = new THREE.MeshBasicMaterial({
-            color: 0xff3300,
-            transparent: true,
-            opacity: 0.35,
-        });
-        const flameOuter = new THREE.Mesh(SHARED_GEO.flameOuter, flameOuterMat);
-        this.flameGroup.add(flameOuter);
-        this.flames.push(flameOuter);
-
-        // BoostLight entfernt fuer Performance
-
-        this.group.add(this.flameGroup);
-
-        // --- Schild-Kugel (shared Geometry, 8 Segmente) ---
+        // --- Kraftfeld-Box (shared Geometry) ---
+        _ensureSharedGeo();
         const shieldMat = new THREE.MeshBasicMaterial({
             color: 0x4488ff,
             transparent: true,
             opacity: 0,
             wireframe: true,
+            side: THREE.BackSide, // Auch von innen sichtbar
+            depthWrite: false,
         });
-        this.shieldMesh = new THREE.Mesh(SHARED_GEO.shield, shieldMat);
+        this.shieldMesh = new THREE.Mesh(SHARED_GEO.shieldBox, shieldMat);
+
+        // Zweite Ebene für "Glow"-Effekt
+        const innerShield = new THREE.Mesh(SHARED_GEO.shieldBox, new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            transparent: true,
+            opacity: 0,
+            wireframe: false,
+            depthWrite: false,
+        }));
+        innerShield.name = "innerShield";
+        this.shieldMesh.add(innerShield);
+        innerShield.scale.set(0.98, 0.98, 0.98);
+
         this.group.add(this.shieldMesh);
 
         this.renderer.addToScene(this.group);
         this._applyModelScale();
+
+        // Compatibility: extract flames if they exist in the vehicle mesh
+        this.flames = [];
+        this.vehicleMesh.traverse((child) => {
+            if (child.name === 'flame' || (child.material && child.material.name === 'flame')) {
+                this.flames.push(child);
+            }
+        });
     }
 
     spawn(position, startDirection = null) {
@@ -348,6 +329,11 @@ export class Player {
         // Trail aktualisieren
         this.trail.update(dt, this.position, this._tmpVec);
 
+        // Modell-Animationen (z.B. rotierende Ringe, blinkende Lichter)
+        if (this.vehicleMesh && typeof this.vehicleMesh.tick === 'function') {
+            this.vehicleMesh.tick(dt);
+        }
+
         // Modell updaten
         this._updateModel();
     }
@@ -363,38 +349,44 @@ export class Player {
             const boostFactor = this.isBoosting ? 3.0 : 1.0;
             const flicker = Math.sin(time * 25) * 0.15 + Math.sin(time * 37) * 0.1;
 
-            // Innere Flamme
-            const innerScale = (0.4 + flicker * 0.3) * boostFactor;
-            this.flames[0].scale.set(1, 1, innerScale);
-            this.flames[0].material.opacity = this.isBoosting ? 1.0 : 0.7;
+            for (let i = 0; i < this.flames.length; i++) {
+                const flame = this.flames[i];
+                if (!flame) continue;
 
-            // Mittlere Flamme
-            const midScale = (0.35 + flicker * 0.2) * boostFactor;
-            this.flames[1].scale.set(1, 1, midScale);
-            this.flames[1].material.opacity = this.isBoosting ? 0.8 : 0.45;
+                // Dynamische Skalierung basierend auf Index (für Tiefe, falls mehrere Schichten existieren)
+                // Bei nur 2 Triebwerken verhalten sich beide gleich.
+                const depthOffset = i * 0.05;
+                const scaleZ = (0.4 - depthOffset + flicker * (0.3 - depthOffset)) * boostFactor;
+                flame.scale.set(1, 1, Math.max(0.1, scaleZ));
 
-            // Äußere Flamme
-            const outerScale = (0.3 + flicker * 0.15) * boostFactor;
-            this.flames[2].scale.set(1, 1, outerScale);
-            this.flames[2].material.opacity = this.isBoosting ? 0.6 : 0.2;
+                if (flame.material) {
+                    flame.material.opacity = this.isBoosting ? 1.0 : 0.7;
 
-            // Boost-Farbwechsel
-            if (this.isBoosting) {
-                this.flames[0].material.color.setHex(0xffffff);
-                this.flames[1].material.color.setHex(0xffaa33);
-                this.flames[2].material.color.setHex(0xff4400);
-            } else {
-                this.flames[0].material.color.setHex(0xffffaa);
-                this.flames[1].material.color.setHex(0xff8800);
-                this.flames[2].material.color.setHex(0xff3300);
+                    if (this.isBoosting) {
+                        // Weiß/Orange Mix für Boost
+                        flame.material.color.setHex(i % 2 === 0 ? 0xffffff : 0xffaa33);
+                    } else {
+                        // Standard Orange-Töne
+                        flame.material.color.setHex(i % 2 === 0 ? 0xffffaa : 0xff8800);
+                    }
+                }
             }
         }
 
         // BoostLight entfernt
 
-        // Schild-Visualisierung
+        // Kraftfeld-Visualisierung (Box)
         if (this.shieldMesh) {
-            this.shieldMesh.material.opacity = this.hasShield ? 0.25 + Math.sin(time * 5) * 0.1 : 0;
+            this.shieldMesh.visible = this.hasShield;
+            if (this.hasShield) {
+                const shieldOpacity = 0.3 + Math.sin(time * 6) * 0.15;
+                this.shieldMesh.material.opacity = shieldOpacity;
+
+                const inner = this.shieldMesh.getObjectByName("innerShield");
+                if (inner) {
+                    inner.material.opacity = 0.1 + Math.sin(time * 6 + 1) * 0.05;
+                }
+            }
         }
 
     }
@@ -589,5 +581,22 @@ export class Player {
     dispose() {
         this.trail.dispose();
         this.renderer.removeFromScene(this.group);
+    }
+
+    /**
+     * Prüft, ob ein Welt-Punkt innerhalb der rotierenden OBB des Spielers liegt.
+     * @param {THREE.Vector3} worldPoint 
+     * @returns {boolean}
+     */
+    isPointInOBB(worldPoint) {
+        if (!this.alive) return false;
+
+        // Welt-Punkt in lokale Koordinaten des Schiffes umrechnen
+        // Wir nutzen die MatrixWorld des Groups
+        this._tmpWorldToLocal.copy(this.group.matrixWorld).invert();
+        this._tmpLocalPoint.copy(worldPoint).applyMatrix4(this._tmpWorldToLocal);
+
+        // In lokalen Koordinaten gegen die Box3 prüfen
+        return this.hitboxBox.containsPoint(this._tmpLocalPoint);
     }
 }

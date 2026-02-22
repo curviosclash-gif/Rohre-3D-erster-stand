@@ -14,10 +14,14 @@ import { ParticleSystem } from './modules/Particles.js';
 import { AudioManager } from './modules/Audio.js';
 import { HUD } from './modules/HUD.js';
 import { RoundRecorder } from './modules/RoundRecorder.js';
+import { VEHICLE_DEFINITIONS } from './entities/vehicle-registry.js';
+import { CUSTOM_MAP_KEY } from './modules/MapSchema.js';
+import { resolveArenaMapSelection } from './modules/CustomMapLoader.js';
+import { UIManager } from './modules/UIManager.js';
 
-const SETTINGS_STORAGE_KEY = 'mini-curve-fever-3d.settings.v4';
-const SETTINGS_STORAGE_LEGACY_KEYS = ['mini-curve-fever-3d.settings.v3'];
-const SETTINGS_PROFILES_STORAGE_KEY = 'mini-curve-fever-3d.settings-profiles.v1';
+const SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
+const SETTINGS_STORAGE_LEGACY_KEYS = ['mini-curve-fever-3d.settings.v4', 'mini-curve-fever-3d.settings.v3'];
+const SETTINGS_PROFILES_STORAGE_KEY = 'aero-arena-3d.settings-profiles.v1';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -153,17 +157,24 @@ export class Game {
             profileSaveButton: document.getElementById('btn-profile-save'),
             profileLoadButton: document.getElementById('btn-profile-load'),
             profileDeleteButton: document.getElementById('btn-profile-delete'),
+
+            vehicleSelectP1: document.getElementById('vehicle-select-p1'),
+            vehicleSelectP2: document.getElementById('vehicle-select-p2'),
+            vehicleP2Container: document.getElementById('vehicle-p2-container'),
+
             startButton: document.getElementById('btn-start'),
         };
 
         this._navButtons = [];
         this._menuButtonByPanel = new Map();
+        this._activeSubmenu = null;
         this._lastMenuTrigger = null;
         this._buildInfoClipboardText = '';
 
+        this.uiManager = new UIManager(this);
+        this.uiManager.init();
+
         this._setupMenuListeners();
-        this._setupMenuNavigation();
-        this._syncMenuControls();
         this._markSettingsDirty(false);
         this._renderBuildInfo();
 
@@ -201,27 +212,60 @@ export class Game {
                 }
             }
         });
+
+        this._autoStartPlaytestIfRequested();
     }
 
     // update() ist weiter unten definiert (einzelne Methode für alles)
+
+    _isPlaytestLaunchRequested() {
+        try {
+            const params = new URLSearchParams(window.location.search);
+            const raw = String(params.get('playtest') || '').toLowerCase();
+            return raw === '1' || raw === 'true' || raw === 'yes';
+        } catch {
+            return false;
+        }
+    }
+
+    _autoStartPlaytestIfRequested() {
+        if (!this._isPlaytestLaunchRequested()) {
+            return;
+        }
+
+        this.settings.mapKey = CUSTOM_MAP_KEY;
+        this._onSettingsChanged();
+
+        window.setTimeout(() => {
+            if (this.state !== 'MENU') return;
+            this.startMatch();
+        }, 0);
+    }
 
     _formatBuildTime() {
         if (BUILD_TIME === 'dev') {
             return {
                 short: 'dev',
                 iso: 'dev',
-                local: 'dev',
+                local: 'Development Build',
             };
         }
+        try {
+            const date = new Date(BUILD_TIME);
+            return {
+                short: date.toLocaleDateString(),
+                iso: date.toISOString(),
+                local: date.toLocaleString(),
+            };
+        } catch {
+            return { short: 'dev', iso: 'dev', local: 'Build-ID: ' + BUILD_ID };
+        }
+    }
 
-        const parsed = new Date(BUILD_TIME);
-        const iso = Number.isNaN(parsed.getTime()) ? BUILD_TIME : parsed.toISOString();
-        const local = Number.isNaN(parsed.getTime())
-            ? BUILD_TIME
-            : parsed.toLocaleString('de-DE', { hour12: false });
-        const short = iso.slice(0, 16).replace('T', ' ');
-
-        return { short, iso, local };
+    _showMainNav() {
+        if (this.uiManager) {
+            this.uiManager.showMainNav();
+        }
     }
 
     _renderBuildInfo() {
@@ -305,6 +349,10 @@ export class Game {
                 PLAYER_1: false,
                 PLAYER_2: false,
             },
+            vehicles: {
+                PLAYER_1: 'ship5',
+                PLAYER_2: 'ship5',
+            },
             portalsEnabled: true,
             gameplay: {
                 speed: 18,
@@ -358,7 +406,10 @@ export class Game {
         const merged = deepClone(defaults);
 
         merged.mode = src.mode === '2p' ? '2p' : '1p';
-        merged.mapKey = CONFIG.MAPS[src.mapKey] ? src.mapKey : defaults.mapKey;
+        const requestedMapKey = String(src.mapKey || '');
+        merged.mapKey = (requestedMapKey === CUSTOM_MAP_KEY || CONFIG.MAPS[requestedMapKey])
+            ? requestedMapKey
+            : defaults.mapKey;
         merged.numBots = clamp(parseInt(src.numBots ?? defaults.numBots, 10), 0, 8);
         merged.botDifficulty = ['EASY', 'NORMAL', 'HARD'].includes(src.botDifficulty)
             ? src.botDifficulty
@@ -370,6 +421,11 @@ export class Game {
         merged.invertPitch.PLAYER_2 = !!src?.invertPitch?.PLAYER_2;
         merged.cockpitCamera.PLAYER_1 = !!src?.cockpitCamera?.PLAYER_1;
         merged.cockpitCamera.PLAYER_2 = !!src?.cockpitCamera?.PLAYER_2;
+
+        if (!merged.vehicles) merged.vehicles = { PLAYER_1: 'ship5', PLAYER_2: 'ship5' };
+        merged.vehicles.PLAYER_1 = src?.vehicles?.PLAYER_1 || 'ship5';
+        merged.vehicles.PLAYER_2 = src?.vehicles?.PLAYER_2 || 'ship5';
+
         merged.portalsEnabled = src?.portalsEnabled !== undefined ? !!src.portalsEnabled : defaults.portalsEnabled;
 
         merged.gameplay.speed = clamp(parseFloat(src?.gameplay?.speed ?? defaults.gameplay.speed), 8, 40);
@@ -484,7 +540,6 @@ export class Game {
         CONFIG.PLAYER.SPEED = this.settings.gameplay.speed;
         CONFIG.PLAYER.TURN_SPEED = this.settings.gameplay.turnSensitivity;
         CONFIG.PLAYER.MODEL_SCALE = this.settings.gameplay.planeScale;
-        CONFIG.PLAYER.HITBOX_RADIUS = 0.8 * this.settings.gameplay.planeScale;
         CONFIG.PLAYER.AUTO_ROLL = this.settings.autoRoll;
 
         if (this.settings.gameplay) {
@@ -516,6 +571,12 @@ export class Game {
 
         this.input.setBindings(this.settings.controls);
 
+        // Fahrzeuge
+        CONFIG.PLAYER.VEHICLES = {
+            PLAYER_1: this.settings.vehicles?.PLAYER_1 || 'ship5',
+            PLAYER_2: this.settings.vehicles?.PLAYER_2 || 'ship5',
+        };
+
         CONFIG.HOMING.LOCK_ON_ANGLE = this.settings.gameplay.lockOnAngle;
     }
 
@@ -527,8 +588,38 @@ export class Game {
             });
         });
 
+        // Fahrzeuge Liste füllen
+        const populateVehicles = (select) => {
+            if (!select) return;
+            select.innerHTML = '';
+            VEHICLE_DEFINITIONS.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                opt.textContent = v.label;
+                select.appendChild(opt);
+            });
+        };
+        populateVehicles(this.ui.vehicleSelectP1);
+        populateVehicles(this.ui.vehicleSelectP2);
+
+        if (this.ui.vehicleSelectP1) {
+            this.ui.vehicleSelectP1.addEventListener('change', (e) => {
+                this.settings.vehicles.PLAYER_1 = e.target.value;
+                this._onSettingsChanged();
+            });
+        }
+        if (this.ui.vehicleSelectP2) {
+            this.ui.vehicleSelectP2.addEventListener('change', (e) => {
+                this.settings.vehicles.PLAYER_2 = e.target.value;
+                this._onSettingsChanged();
+            });
+        }
+
         this.ui.mapSelect.addEventListener('change', (e) => {
-            this.settings.mapKey = CONFIG.MAPS[e.target.value] ? e.target.value : 'standard';
+            const selectedMapKey = String(e.target.value || '');
+            this.settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || CONFIG.MAPS[selectedMapKey])
+                ? selectedMapKey
+                : 'standard';
             this._onSettingsChanged();
         });
 
@@ -746,220 +837,13 @@ export class Game {
         }
     }
 
-    _setupMenuNavigation() {
-        this._menuNav = document.getElementById('menu-nav');
-        this._submenuPanels = Array.from(document.querySelectorAll('.submenu-panel'));
-        this._activeSubmenu = null;
-        this._navButtons = Array.from(document.querySelectorAll('.nav-btn[data-submenu]'));
-        this._menuButtonByPanel.clear();
-
-        for (const panel of this._submenuPanels) {
-            panel.setAttribute('aria-hidden', panel.classList.contains('hidden') ? 'true' : 'false');
-        }
-
-        // Nav-Buttons → Untermenü öffnen
-        for (const btn of this._navButtons) {
-            const panelId = btn.dataset.submenu;
-            if (panelId) {
-                this._menuButtonByPanel.set(panelId, btn);
-            }
-            btn.setAttribute('aria-expanded', 'false');
-            btn.addEventListener('click', () => {
-                this._lastMenuTrigger = btn;
-                this._showSubmenu(panelId);
-            });
-        }
-
-        if (this._menuNav) {
-            this._menuNav.addEventListener('keydown', (e) => {
-                const navKeys = ['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'];
-                if (!navKeys.includes(e.key)) return;
-
-                const currentIndex = this._navButtons.indexOf(document.activeElement);
-                if (currentIndex < 0) return;
-
-                e.preventDefault();
-                if (e.key === 'Home') {
-                    this._navButtons[0]?.focus();
-                    return;
-                }
-                if (e.key === 'End') {
-                    this._navButtons[this._navButtons.length - 1]?.focus();
-                    return;
-                }
-
-                const step = (e.key === 'ArrowLeft' || e.key === 'ArrowUp') ? -1 : 1;
-                this._focusNextNavButton(currentIndex, step);
-            });
-        }
-
-        // Zurück-Buttons → Hauptnavigation
-        const backBtns = document.querySelectorAll('.back-btn[data-back]');
-        for (const btn of backBtns) {
-            btn.addEventListener('click', () => {
-                this._showMainNav();
-            });
-        }
-
-        // ESC im Menü → Zurück zur Hauptnavigation
-        window.addEventListener('keydown', (e) => {
-            if (e.code === 'Escape' && this.state === 'MENU' && this._activeSubmenu) {
-                e.preventDefault();
-                this._showMainNav();
-            }
-        });
-
-        this._updateMenuNavState();
-        this._updateMenuContext();
-    }
-
-    _focusNextNavButton(currentIndex, step) {
-        if (!this._navButtons.length) return;
-        const length = this._navButtons.length;
-        const nextIndex = (currentIndex + step + length) % length;
-        this._navButtons[nextIndex]?.focus();
-    }
-
-    _updateMenuNavState() {
-        for (const btn of this._navButtons) {
-            const panelId = btn.dataset.submenu;
-            const isActive = !!this._activeSubmenu && panelId === this._activeSubmenu;
-            btn.classList.toggle('active', isActive);
-            btn.setAttribute('aria-expanded', isActive ? 'true' : 'false');
-        }
-    }
-
-    _focusFirstInSubmenu(panel) {
-        if (!panel) return;
-        const focusTarget = panel.querySelector(
-            'button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        );
-        if (focusTarget) {
-            focusTarget.focus();
-        }
-    }
-
-    _showSubmenu(panelId) {
-        if (!panelId) return;
-
-        if (this._menuNav) {
-            this._menuNav.classList.add('hidden');
-            this._menuNav.setAttribute('aria-hidden', 'true');
-        }
-        for (const panel of this._submenuPanels) {
-            panel.classList.add('hidden');
-            panel.setAttribute('aria-hidden', 'true');
-        }
-        const target = document.getElementById(panelId);
-        if (target) {
-            target.classList.remove('hidden');
-            target.setAttribute('aria-hidden', 'false');
-            this._activeSubmenu = panelId;
-            this._updateMenuNavState();
-            this._focusFirstInSubmenu(target);
-            this._updateMenuContext();
-        }
-    }
-
-    _showMainNav() {
-        for (const panel of this._submenuPanels) {
-            panel.classList.add('hidden');
-            panel.setAttribute('aria-hidden', 'true');
-        }
-        if (this._menuNav) {
-            this._menuNav.classList.remove('hidden');
-            this._menuNav.setAttribute('aria-hidden', 'false');
-        }
-        this._activeSubmenu = null;
-        this._updateMenuNavState();
-        this._updateMenuContext();
-
-        const focusTarget = this._lastMenuTrigger || this._navButtons[0];
-        if (focusTarget && this.state === 'MENU') {
-            focusTarget.focus();
-        }
-    }
-
     _onSettingsChanged() {
-        this._applySettingsToRuntime();
         this._markSettingsDirty(true);
-        this._syncMenuControls();
-    }
-
-    _syncMenuControls() {
-        this.ui.modeButtons.forEach((btn) => {
-            btn.classList.toggle('active', btn.dataset.mode === this.settings.mode);
-        });
-
-        this.ui.mapSelect.value = this.settings.mapKey;
-
-        this.ui.botSlider.value = String(this.settings.numBots);
-        this.ui.botLabel.textContent = String(this.settings.numBots);
-        if (this.ui.botDifficultySelect) {
-            this.ui.botDifficultySelect.value = this.settings.botDifficulty || 'NORMAL';
+        if (this.uiManager) {
+            this.uiManager.syncAll();
+            this.uiManager.updateContext();
         }
-
-        this.ui.winSlider.value = String(this.settings.winsNeeded);
-        this.ui.winLabel.textContent = String(this.settings.winsNeeded);
-
-        this.ui.autoRollToggle.checked = this.settings.autoRoll;
-        this.ui.invertP1.checked = this.settings.invertPitch.PLAYER_1;
-        this.ui.invertP2.checked = this.settings.invertPitch.PLAYER_2;
-        this.ui.cockpitCamP1.checked = this.settings.cockpitCamera.PLAYER_1;
-        this.ui.cockpitCamP2.checked = this.settings.cockpitCamera.PLAYER_2;
-
-        const planarModeToggle = document.getElementById('planar-mode-toggle');
-        if (planarModeToggle) {
-            planarModeToggle.checked = this.settings.gameplay?.planarMode || false;
-        }
-
-        this.ui.portalsToggle.checked = this.settings.portalsEnabled;
-
-        const portalCountSlider = document.getElementById('portal-count-slider');
-        const portalCountLabel = document.getElementById('portal-count-label');
-        if (portalCountSlider && portalCountLabel) {
-            const val = this.settings.gameplay?.portalCount || 0;
-            portalCountSlider.value = val;
-            portalCountLabel.textContent = val;
-        }
-
-        const planarLevelCountSlider = document.getElementById('planar-level-count-slider');
-        const planarLevelCountLabel = document.getElementById('planar-level-count-label');
-        if (planarLevelCountSlider && planarLevelCountLabel) {
-            const val = clamp(parseInt(this.settings.gameplay?.planarLevelCount ?? 5, 10), 2, 10);
-            planarLevelCountSlider.value = val;
-            planarLevelCountLabel.textContent = val;
-        }
-
-        this.ui.speedSlider.value = String(this.settings.gameplay.speed);
-        this.ui.speedLabel.textContent = this.settings.gameplay.speed.toFixed(1);
-
-        this.ui.turnSlider.value = String(this.settings.gameplay.turnSensitivity);
-        this.ui.turnLabel.textContent = this.settings.gameplay.turnSensitivity.toFixed(1);
-
-        this.ui.planeSizeSlider.value = String(this.settings.gameplay.planeScale);
-        this.ui.planeSizeLabel.textContent = this.settings.gameplay.planeScale.toFixed(1);
-
-        this.ui.trailWidthSlider.value = String(this.settings.gameplay.trailWidth);
-        this.ui.trailWidthLabel.textContent = this.settings.gameplay.trailWidth.toFixed(2);
-
-        this.ui.gapSizeSlider.value = String(this.settings.gameplay.gapSize);
-        this.ui.gapSizeLabel.textContent = this.settings.gameplay.gapSize.toFixed(2);
-
-        this.ui.gapFrequencySlider.value = String(this.settings.gameplay.gapFrequency);
-        this.ui.gapFrequencyLabel.textContent = this.settings.gameplay.gapFrequency.toFixed(3);
-
-        this.ui.itemAmountSlider.value = String(this.settings.gameplay.itemAmount);
-        this.ui.itemAmountLabel.textContent = String(this.settings.gameplay.itemAmount);
-
-        this.ui.fireRateSlider.value = String(this.settings.gameplay.fireRate);
-        this.ui.fireRateLabel.textContent = this.settings.gameplay.fireRate.toFixed(2);
-
-        this.ui.lockOnSlider.value = String(this.settings.gameplay.lockOnAngle);
-        this.ui.lockOnLabel.textContent = String(this.settings.gameplay.lockOnAngle);
-
         this._renderKeybindEditor();
-        this._syncP2HudVisibility();
         this._syncProfileControls();
         this._updateSaveButtonState();
     }
@@ -1282,6 +1166,18 @@ export class Game {
         this._showStatusToast(`${prefix}: ${message}`);
     }
 
+    _getDeathMessage(cause) {
+        const messages = {
+            'WALL': 'Kollision mit der Wand!',
+            'TRAIL_SELF': 'Eigener Schweif getroffen!',
+            'TRAIL_OTHER': 'Gegnerischer Schweif getroffen!',
+            'PROJECTILE': 'Abgeschossen!',
+            'OUT_OF_BOUNDS': 'Arena verlassen!',
+            'UNKNOWN': 'Unbekannte Todesursache'
+        };
+        return messages[cause] || messages['UNKNOWN'];
+    }
+
     _syncP2HudVisibility() {
         this.ui.p2Hud.classList.toggle('hidden', this.numHumans !== 2);
     }
@@ -1304,28 +1200,50 @@ export class Game {
         if (this.powerupManager) {
             this.powerupManager.clear();
         }
-        this.particles.clear();
         this.renderer.clearScene();
+        this.particles = new ParticleSystem(this.renderer);
         this.arena = new Arena(this.renderer);
         this.arena.portalsEnabled = this.settings.portalsEnabled;
+
+        const mapResolution = resolveArenaMapSelection(this.mapKey);
+        if (mapResolution.isCustom && mapResolution.mapDefinition) {
+            CONFIG.MAPS[CUSTOM_MAP_KEY] = mapResolution.mapDefinition;
+        }
+        this.mapKey = mapResolution.effectiveMapKey;
         this.arena.build(this.mapKey);
 
+        if (mapResolution.error) {
+            console.warn('[Game] Map loading fallback:', mapResolution.error);
+        }
+        if (Array.isArray(mapResolution.warnings) && mapResolution.warnings.length > 0) {
+            console.warn('[Game] Map loading warnings:', mapResolution.warnings);
+        }
+        if (mapResolution.isFallback && mapResolution.requestedMapKey === CUSTOM_MAP_KEY) {
+            this._showStatusToast('Custom-Map ungueltig, Standard-Map geladen', 2600, 'error');
+        } else if (mapResolution.isFallback) {
+            this._showStatusToast(`Map-Fallback aktiv: ${mapResolution.effectiveMapKey}`, 2200, 'error');
+        }
+
         this.powerupManager = new PowerupManager(this.renderer, this.arena);
-
-
-
         this.entityManager = new EntityManager(this.renderer, this.arena, this.powerupManager, this.particles, this.audio, this.recorder);
         this.numHumans = this.settings.mode === '2p' ? 2 : 1;
         this.numBots = this.settings.numBots;
-        this.mapKey = this.settings.mapKey;
         this.winsNeeded = this.settings.winsNeeded || 5;
 
         this.entityManager.setup(this.numHumans, this.numBots, {
             modelScale: this.settings.gameplay.planeScale,
             botDifficulty: this.settings.botDifficulty || 'NORMAL',
             humanConfigs: [
-                { invertPitch: this.settings.invertPitch.PLAYER_1, cockpitCamera: this.settings.cockpitCamera.PLAYER_1 },
-                { invertPitch: this.settings.invertPitch.PLAYER_2, cockpitCamera: this.settings.cockpitCamera.PLAYER_2 },
+                {
+                    invertPitch: this.settings.invertPitch.PLAYER_1,
+                    cockpitCamera: this.settings.cockpitCamera.PLAYER_1,
+                    vehicleId: this.settings.vehicles.PLAYER_1
+                },
+                {
+                    invertPitch: this.settings.invertPitch.PLAYER_2,
+                    cockpitCamera: this.settings.cockpitCamera.PLAYER_2,
+                    vehicleId: this.settings.vehicles.PLAYER_2
+                },
             ],
         });
         this.entityManager.onPlayerFeedback = (player, message) => {
@@ -1340,8 +1258,11 @@ export class Game {
             player.score = 0;
         }
 
-        this.entityManager.onPlayerDied = () => {
-            // Optional impact effects can be added here.
+        this.entityManager.onPlayerDied = (player, cause) => {
+            if (!player.isBot) {
+                const msg = this._getDeathMessage(cause);
+                this._showStatusToast(msg, 2500, 'error');
+            }
         };
 
         this.entityManager.onRoundEnd = (winner) => {
@@ -1697,6 +1618,7 @@ export class Game {
                 this.hudP2.setVisibility(false);
             }
 
+            this.gameLoop.setTimeScale(1.0);
             for (const p of this.entityManager.players) {
                 for (const effect of p.activeEffects) {
                     if (effect.type === 'SLOW_TIME') {
@@ -1771,7 +1693,7 @@ export class Game {
             this.ui.crosshairP2.style.top = '50%';
             this.ui.crosshairP2.style.transform = 'translate(-50%, -50%) rotate(0deg)';
         }
-        this._syncMenuControls();
+        this.uiManager.syncAll();
     }
     _showDebugLog(recorderDump) {
         // Disabled

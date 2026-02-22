@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Curve Fever 3D</title>
+    <title>Aero Arena 3D</title>
 
     <script type="importmap">
     {
@@ -14,7 +14,7 @@
         }
     }
     </script>
-  <script type="module" crossorigin src="/assets/index-C4Pbf6nA.js"></script>
+  <script type="module" crossorigin src="/assets/index-CHRq-MPn.js"></script>
   <link rel="stylesheet" crossorigin href="/assets/index-CpKtZ-lK.css">
 </head>
 
@@ -36,7 +36,7 @@
     <div id="ui-layer">
         <div id="main-menu" role="dialog" aria-modal="true" aria-labelledby="main-menu-title">
             <div class="menu-content" role="document">
-                <h1 id="main-menu-title">Mini Curve Fever 3D</h1>
+                <h1 id="main-menu-title">Aero Arena 3D</h1>
                 <p class="subtitle">Multiplayer Luftkampf Arena</p>
                 <div id="build-info" class="build-info"></div>
                 <p id="menu-context" class="menu-context" role="status" aria-live="polite" aria-atomic="true">
@@ -91,6 +91,7 @@
                             <label for="map-select">Map</label>
                             <select id="map-select">
                                 <option value="standard">Standard Arena</option>
+                                <option value="custom">Editor Playtest</option>
                                 <option value="empty">Leer</option>
                                 <option value="maze">Labyrinth</option>
                                 <option value="complex">Komplex</option>
@@ -115,6 +116,16 @@
                         <div class="menu-section">
                             <label for="win-count">Siege zum Gewinn: <span id="win-count-label">5</span></label>
                             <input type="range" id="win-count" min="1" max="15" value="5">
+                        </div>
+
+                        <div class="menu-section">
+                            <label for="vehicle-select-p1">Fahrzeug Spieler 1</label>
+                            <select id="vehicle-select-p1"></select>
+                        </div>
+
+                        <div id="vehicle-p2-container" class="menu-section hidden">
+                            <label for="vehicle-select-p2">Fahrzeug Spieler 2</label>
+                            <select id="vehicle-select-p2"></select>
                         </div>
 
                         <button type="button" id="btn-start" class="start-btn">Spiel starten</button>
@@ -436,7 +447,7 @@
             <div id="status-toast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
         </div>
     </div>
-
+
 </body>
 
 </html>

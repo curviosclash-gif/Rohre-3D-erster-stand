@@ -113,8 +113,16 @@ export class PowerupManager {
             if (this.items[i].box.intersectsSphere(this._pickupSphere)) {
                 const item = this.items.splice(i, 1)[0];
                 this.renderer.removeFromScene(item.mesh);
-                // Nur Material disposen, Geometry ist shared
-                item.mesh.material.dispose();
+                // Alle Materialien disposen (Parent + Children wie Wireframe)
+                item.mesh.traverse((node) => {
+                    if (node.material) {
+                        if (Array.isArray(node.material)) {
+                            node.material.forEach(m => m.dispose());
+                        } else {
+                            node.material.dispose();
+                        }
+                    }
+                });
                 return item.type;
             }
         }
@@ -124,8 +132,15 @@ export class PowerupManager {
     clear() {
         for (const item of this.items) {
             this.renderer.removeFromScene(item.mesh);
-            // Material disposen (Geometry ist shared)
-            item.mesh.material.dispose();
+            item.mesh.traverse((node) => {
+                if (node.material) {
+                    if (Array.isArray(node.material)) {
+                        node.material.forEach(m => m.dispose());
+                    } else {
+                        node.material.dispose();
+                    }
+                }
+            });
         }
         this.items = [];
         this.spawnTimer = 0;

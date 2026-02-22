@@ -39,6 +39,7 @@ export const CONFIG = {
         START_Y: 10,
         AUTO_ROLL: true,
         AUTO_ROLL_SPEED: 1.5,
+        DEFAULT_VEHICLE_ID: 'ship5',
     },
 
     // ---- Gameplay Options ----
@@ -272,6 +273,12 @@ export const CONFIG = {
             portals: [
                 { a: [-30, 12, 0], b: [30, 12, 0], color: 0x00ffcc },
             ]
+        },
+        custom: {
+            name: 'Editor Playtest',
+            size: [80, 30, 80],
+            obstacles: [],
+            portals: [],
         },
         empty: {
             name: 'Leer',

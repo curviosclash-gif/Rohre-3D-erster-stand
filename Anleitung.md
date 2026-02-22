@@ -1,6 +1,6 @@
-# Mini Curve Fever 3D - Spielanleitung
+# Aero Arena 3D - Spielanleitung
 
-Willkommen bei **Mini Curve Fever 3D**! Dies ist ein schnelles Arcade-Spiel für 1 oder 2 Spieler, inspiriert vom Klassiker "Achtung, die Kurve!", aber in einer vollen 3D-Umgebung mit Flugzeug-Steuerung.
+Willkommen bei **Aero Arena 3D**! Dies ist ein schnelles Arcade-Spiel für 1 oder 2 Spieler, inspiriert von klassischen Arena-Spielen, aber in einer vollen 3D-Umgebung mit Flugzeug-Steuerung.
 
 ## Spielziel
 

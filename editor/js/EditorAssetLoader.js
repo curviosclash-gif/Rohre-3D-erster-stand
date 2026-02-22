@@ -2,9 +2,13 @@ import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
 
 export class EditorAssetLoader {
-    constructor() {
+    constructor(options = {}) {
         this.loader = new OBJLoader();
         this.cache = new Map();
+        this.loadStatus = new Map();
+        this.warnedMissingAssets = new Set();
+        this.timeoutMs = Number.isFinite(options.timeoutMs) && options.timeoutMs > 0 ? options.timeoutMs : 8000;
+        this.onStatus = typeof options.onStatus === 'function' ? options.onStatus : null;
 
         // Items & Categories that have an OBJ model
         this.modelsToLoad = [
@@ -69,55 +73,220 @@ export class EditorAssetLoader {
         };
     }
 
-    async loadAll() {
-        console.log("Loading 3D Assets...");
-
-        // Load item models
-        const itemPromises = this.modelsToLoad.map(modelName => {
-            return this._loadModel(modelName, `../assets/items/${modelName}.obj`);
-        });
-
-        // Load jet models
-        const jetPromises = this.jetsToLoad.map(jet => {
-            return this._loadModel(jet.id, jet.file);
-        });
-
-        await Promise.all([...itemPromises, ...jetPromises]);
-        console.log("All Assets loaded.");
+    setStatusHandler(handler) {
+        this.onStatus = typeof handler === 'function' ? handler : null;
     }
 
-    _loadModel(id, url) {
+    _emitStatus(level, message, extra = {}) {
+        const payload = { level, message, ...extra };
+
+        if (level === 'error') {
+            console.error(`[EditorAssetLoader] ${message}`, extra);
+        } else if (level === 'warn') {
+            console.warn(`[EditorAssetLoader] ${message}`, extra);
+        } else {
+            console.info(`[EditorAssetLoader] ${message}`, extra);
+        }
+
+        if (this.onStatus) {
+            try {
+                this.onStatus(payload);
+            } catch (callbackError) {
+                console.warn('[EditorAssetLoader] Status handler failed:', callbackError);
+            }
+        }
+    }
+
+    _markOwnedResource(resource) {
+        if (!resource || typeof resource !== 'object') return resource;
+        resource.userData = {
+            ...(resource.userData || {}),
+            editorOwnedResource: true
+        };
+        return resource;
+    }
+
+    _createPlaceholderModel(id, reason = 'missing') {
+        const color = this.colors[id] || 0x64748b;
+        const group = new THREE.Group();
+        group.name = `placeholder_${id}`;
+        group.userData = {
+            editorAssetId: id,
+            isEditorPlaceholder: true,
+            placeholderReason: reason
+        };
+
+        const boxGeo = this._markOwnedResource(new THREE.BoxGeometry(1, 1, 1));
+        const boxMat = this._markOwnedResource(new THREE.MeshLambertMaterial({
+            color,
+            transparent: true,
+            opacity: 0.55
+        }));
+        const box = new THREE.Mesh(boxGeo, boxMat);
+        box.castShadow = true;
+        box.receiveShadow = true;
+        group.add(box);
+
+        const edgeGeo = this._markOwnedResource(new THREE.EdgesGeometry(boxGeo));
+        const edgeMat = this._markOwnedResource(new THREE.LineBasicMaterial({ color: 0xffffff }));
+        const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+        group.add(edges);
+
+        return group;
+    }
+
+    _prepareLoadedObject(id, object) {
+        const color = this.colors[id] || 0xdddddd;
+
+        object.traverse((child) => {
+            if (!child?.isMesh) return;
+            child.material = new THREE.MeshLambertMaterial({ color });
+            child.castShadow = true;
+            child.receiveShadow = true;
+            child.userData = {
+                ...(child.userData || {}),
+                editorAssetId: id
+            };
+        });
+
+        object.userData = {
+            ...(object.userData || {}),
+            editorAssetId: id,
+            isEditorPlaceholder: false
+        };
+    }
+
+    _cloneAssetObject(object, id) {
+        const clone = object.clone(true);
+
+        clone.traverse((child) => {
+            if (child.geometry?.isBufferGeometry) {
+                child.geometry = this._markOwnedResource(child.geometry.clone());
+            }
+
+            if (Array.isArray(child.material)) {
+                child.material = child.material.map((mat) => this._markOwnedResource(mat.clone()));
+            } else if (child.material) {
+                child.material = this._markOwnedResource(child.material.clone());
+            }
+
+            child.userData = {
+                ...(child.userData || {}),
+                editorAssetId: id,
+                editorCloneNode: true
+            };
+
+            if (child.isMesh) {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            }
+        });
+
+        clone.userData = {
+            ...(clone.userData || {}),
+            editorAssetId: id,
+            editorCloneRoot: true,
+            isEditorPlaceholder: !!object.userData?.isEditorPlaceholder
+        };
+
+        return clone;
+    }
+
+    _createAndCachePlaceholder(id, reason) {
+        const placeholder = this._createPlaceholderModel(id, reason);
+        this.cache.set(id, placeholder);
+        this.loadStatus.set(id, {
+            state: 'placeholder',
+            reason
+        });
+        return placeholder;
+    }
+
+    _loadModelWithTimeout(id, url) {
         return new Promise((resolve) => {
+            let settled = false;
+            const finalize = (status, object = null, error = null) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timeoutHandle);
+
+                if (status === 'loaded' && object) {
+                    this._prepareLoadedObject(id, object);
+                    this.cache.set(id, object);
+                    this.loadStatus.set(id, {
+                        state: 'loaded',
+                        url
+                    });
+                    resolve({ id, status: 'loaded' });
+                    return;
+                }
+
+                const failureReason = status === 'timeout' ? 'timeout' : 'error';
+                this._createAndCachePlaceholder(id, failureReason);
+                this.loadStatus.set(id, {
+                    state: status,
+                    url,
+                    error: error?.message || String(error || '')
+                });
+
+                const msg = status === 'timeout'
+                    ? `Timeout while loading "${id}" (${this.timeoutMs}ms). Placeholder is used.`
+                    : `Failed to load "${id}" from "${url}". Placeholder is used.`;
+                this._emitStatus('warn', msg, { id, url, error: error?.message || String(error || '') });
+                resolve({ id, status, error });
+            };
+
+            const timeoutHandle = setTimeout(() => {
+                finalize('timeout', null, new Error(`Asset load timeout after ${this.timeoutMs}ms`));
+            }, this.timeoutMs);
+
             this.loader.load(
                 url,
-                (object) => {
-                    const color = this.colors[id] || 0xdddddd;
-                    const defaultMaterial = new THREE.MeshLambertMaterial({ color: color });
-
-                    object.traverse((child) => {
-                        if (child.isMesh) {
-                            child.material = defaultMaterial;
-                            child.castShadow = true;
-                            child.receiveShadow = true;
-                        }
-                    });
-
-                    this.cache.set(id, object);
-                    resolve();
-                },
+                (object) => finalize('loaded', object),
                 undefined,
-                (error) => {
-                    console.error(`Failed to load ${id}:`, error);
-                    resolve();
-                }
+                (error) => finalize('error', null, error)
             );
         });
     }
 
+    async loadAll() {
+        const allEntries = [
+            ...this.modelsToLoad.map((modelName) => ({ id: modelName, url: `../assets/items/${modelName}.obj` })),
+            ...this.jetsToLoad.map((jet) => ({ id: jet.id, url: jet.file }))
+        ];
+
+        this._emitStatus('info', `Loading ${allEntries.length} 3D assets...`);
+        const results = await Promise.all(allEntries.map((entry) => this._loadModelWithTimeout(entry.id, entry.url)));
+
+        const loaded = results.filter((entry) => entry.status === 'loaded').length;
+        const timedOut = results.filter((entry) => entry.status === 'timeout').length;
+        const failed = results.filter((entry) => entry.status === 'error').length;
+        const placeholders = timedOut + failed;
+
+        if (placeholders > 0) {
+            this._emitStatus('warn', `${placeholders} asset(s) use placeholders (${failed} failed, ${timedOut} timeout).`, {
+                loaded,
+                failed,
+                timedOut
+            });
+        } else {
+            this._emitStatus('info', 'All 3D assets loaded successfully.', { loaded });
+        }
+
+        return { loaded, failed, timedOut, total: allEntries.length };
+    }
+
     getClone(modelName) {
-        if (!this.cache.has(modelName)) return null;
+        if (!this.cache.has(modelName)) {
+            if (!this.warnedMissingAssets.has(modelName)) {
+                this.warnedMissingAssets.add(modelName);
+                this._emitStatus('warn', `Asset "${modelName}" is not in cache. Using placeholder.`, { id: modelName });
+            }
+            this._createAndCachePlaceholder(modelName, 'missing');
+        }
 
         const original = this.cache.get(modelName);
-        return original.clone();
+        if (!original) return null;
+        return this._cloneAssetObject(original, modelName);
     }
 }
