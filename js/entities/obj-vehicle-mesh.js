@@ -78,7 +78,12 @@ export class OBJVehicleMesh extends THREE.Group {
                 this.model = object;
 
                 // Triebwerke hinzufügen
-                this.createWingEngines(size.x * scale * 0.45, size.z * scale);
+                this.createWingEngines(
+                    size.x * scale * 0.45,
+                    size.z * scale,
+                    size.x * scale * 0.5,
+                    size.z * scale * 0.4
+                );
 
                 // Muzzle position anpassen (vor dem Schiff)
                 this.muzzle.position.set(0, 0, -size.z * scale * 0.6);
@@ -93,7 +98,7 @@ export class OBJVehicleMesh extends THREE.Group {
 
 
 
-    createWingEngines(wingSpan, depth) {
+    createWingEngines(wingSpan, depth, forceFieldWidth, forceFieldDepth) {
         const shroudGeo = new THREE.CylinderGeometry(0.4, 0.35, 1.5, 12);
         shroudGeo.rotateX(Math.PI / 2);
 
@@ -133,8 +138,8 @@ export class OBJVehicleMesh extends THREE.Group {
         const rEng = createEngineAssembly(1);
 
         // Force Fields
-        this.createForceField(size.x * scale * 0.5, size.z * scale * 0.4, 1.5, -1);
-        this.createForceField(size.x * scale * 0.5, size.z * scale * 0.4, 1.5, 1);
+        this.createForceField(forceFieldWidth, forceFieldDepth, 1.5, -1);
+        this.createForceField(forceFieldWidth, forceFieldDepth, 1.5, 1);
 
         // Glow / Flame
         const glowGeo = new THREE.CylinderGeometry(0.3, 0.01, 1.5, 8);
