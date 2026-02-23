@@ -1,5 +1,6 @@
 // ============================================
 import * as THREE from 'three';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CONFIG } from './Config.js';
 
 // Statische Normalen-Vektoren fuer Arena-Wandkollisionen (readonly, einmalig alloziert)
@@ -35,6 +36,12 @@ export class Arena {
         this._tmpVecGate2 = new THREE.Vector3();
         // Hilfsvektor fuer lookAt in _buildSpecialGates
         this._tmpVec = new THREE.Vector3();
+        // Phase 2: Geometry-Merging – temporaere Sammel-Arrays
+        this._pendingWallGeos = [];
+        this._pendingObstacleGeos = [];
+        this._pendingFoamGeos = [];
+        this._pendingObstacleEdgeGeos = [];
+        this._pendingFoamEdgeGeos = [];
     }
 
     /** Baut die Arena fuer die gewaehlte Map */
@@ -119,6 +126,12 @@ export class Arena {
             transparent: true,
             opacity: 0.42,
         });
+        // Materialreferenzen fuer _flushMergedGeometries() speichern
+        this._wallMat = wallMat;
+        this._obstacleMat = obstacleMat;
+        this._foamMat = foamObstacleMat;
+        this._obstacleEdgeMat = new THREE.LineBasicMaterial({ color: 0x4466aa, transparent: true, opacity: 0.5 });
+        this._foamEdgeMat = new THREE.LineBasicMaterial({ color: 0x3ddc97, transparent: true, opacity: 0.42 });
 
         // ---- Boden ----
         const floor = new THREE.Mesh(
@@ -169,6 +182,9 @@ export class Arena {
                 }
             );
         }
+
+        // ---- Geometrien mergen und zur Szene hinzufuegen ----
+        this._flushMergedGeometries();
 
         // ---- Portale ----
         this._buildPortals(map, scale);
@@ -717,47 +733,53 @@ export class Arena {
 
     _addWall(x, y, z, w, h, d, material) {
         const geo = new THREE.BoxGeometry(w, h, d);
-        const mesh = new THREE.Mesh(geo, material);
-        mesh.position.set(x, y, z);
-        mesh.matrixAutoUpdate = false;
-        mesh.updateMatrix();
-        this.renderer.addToScene(mesh);
+        // Kollisions-Box aus Hilfsmesh berechnen (wird nicht zur Szene hinzugefuegt)
+        const tmpMesh = new THREE.Mesh(geo);
+        tmpMesh.position.set(x, y, z);
+        tmpMesh.matrixAutoUpdate = false;
+        tmpMesh.updateMatrix();
+        const box = new THREE.Box3().setFromObject(tmpMesh);
+        this.obstacles.push({ box, isWall: true, kind: 'wall' });
 
-        const box = new THREE.Box3().setFromObject(mesh);
-        this.obstacles.push({ mesh, box, isWall: true, kind: 'wall' });
+        // Geometrie in Weltkoordinaten transformieren und fuer Merging sammeln
+        const worldGeo = geo.clone();
+        worldGeo.applyMatrix4(tmpMesh.matrix);
+        this._pendingWallGeos.push(worldGeo);
     }
 
     _addObstacle(x, y, z, w, h, d, material, options = {}) {
+        const kind = typeof options.kind === 'string' ? options.kind : 'hard';
+        const isFoam = kind === 'foam';
+
         const geo = new THREE.BoxGeometry(w, h, d);
 
-        const edges = new THREE.EdgesGeometry(geo);
-        const lineMat = new THREE.LineBasicMaterial({
-            color: Number.isFinite(options.edgeColor) ? options.edgeColor : 0x4466aa,
-            transparent: true,
-            opacity: Number.isFinite(options.edgeOpacity) ? options.edgeOpacity : 0.5,
-        });
+        // Kollisions-Box aus Hilfsmesh berechnen (wird nicht zur Szene hinzugefuegt)
+        const tmpMesh = new THREE.Mesh(geo);
+        tmpMesh.position.set(x, y, z);
+        tmpMesh.matrixAutoUpdate = false;
+        tmpMesh.updateMatrix();
+        const box = new THREE.Box3().setFromObject(tmpMesh);
+        this.obstacles.push({ box, isWall: false, kind });
 
-        const mesh = new THREE.Mesh(geo, material.clone());
-        mesh.position.set(x, y, z);
-        mesh.castShadow = false;
-        mesh.receiveShadow = false;
-        mesh.matrixAutoUpdate = false;
-        mesh.updateMatrix();
-        this.renderer.addToScene(mesh);
+        // Mesh-Geometrie in Weltkoordinaten und fuer Merging sammeln
+        const worldGeo = geo.clone();
+        worldGeo.applyMatrix4(tmpMesh.matrix);
+        if (isFoam) {
+            this._pendingFoamGeos.push(worldGeo);
+        } else {
+            this._pendingObstacleGeos.push(worldGeo);
+        }
 
-        const line = new THREE.LineSegments(edges, lineMat);
-        line.position.copy(mesh.position);
-        line.matrixAutoUpdate = false;
-        line.updateMatrix();
-        this.renderer.addToScene(line);
-
-        const box = new THREE.Box3().setFromObject(mesh);
-        this.obstacles.push({
-            mesh,
-            box,
-            isWall: false,
-            kind: typeof options.kind === 'string' ? options.kind : 'hard'
-        });
+        // Kanten-Geometrie ebenfalls sammeln
+        const edgeGeo = new THREE.EdgesGeometry(geo);
+        const worldEdgeGeo = edgeGeo.clone();
+        worldEdgeGeo.applyMatrix4(tmpMesh.matrix);
+        edgeGeo.dispose();
+        if (isFoam) {
+            this._pendingFoamEdgeGeos.push(worldEdgeGeo);
+        } else {
+            this._pendingObstacleEdgeGeos.push(worldEdgeGeo);
+        }
     }
 
     _addParticles(sx, sy, sz) {
@@ -783,6 +805,56 @@ export class Arena {
 
         this.particles = new THREE.Points(geo, mat);
         this.renderer.addToScene(this.particles);
+    }
+
+    /** Merged alle gesammelten Geometrien zu je einem Mesh pro Material-Gruppe.
+     *  Wird am Ende von build() aufgerufen. Reduziert Draw-Calls fuer statische Geometrie. */
+    _flushMergedGeometries() {
+        const addMergedMesh = (geos, material, isShadowCaster = false) => {
+            if (geos.length === 0) return null;
+            const merged = mergeGeometries(geos, false);
+            if (!merged) return null;
+            const mesh = new THREE.Mesh(merged, material);
+            mesh.castShadow = isShadowCaster;
+            mesh.receiveShadow = false;
+            mesh.matrixAutoUpdate = false;
+            this.renderer.addToScene(mesh);
+            geos.forEach(g => g.dispose());
+            return mesh;
+        };
+
+        const addMergedLines = (geos, material) => {
+            if (geos.length === 0) return null;
+            const merged = mergeGeometries(geos, false);
+            if (!merged) return null;
+            const lines = new THREE.LineSegments(merged, material);
+            lines.matrixAutoUpdate = false;
+            this.renderer.addToScene(lines);
+            geos.forEach(g => g.dispose());
+            return lines;
+        };
+
+        // Waende → 1 Draw-Call
+        this._mergedWallMesh = addMergedMesh(this._pendingWallGeos, this._wallMat);
+
+        // Harte Hindernisse → 1 Draw-Call
+        this._mergedObstacleMesh = addMergedMesh(this._pendingObstacleGeos, this._obstacleMat);
+
+        // Foam-Hindernisse → 1 Draw-Call
+        this._mergedFoamMesh = addMergedMesh(this._pendingFoamGeos, this._foamMat);
+
+        // Kanten harte Hindernisse → 1 Draw-Call
+        this._mergedObstacleEdges = addMergedLines(this._pendingObstacleEdgeGeos, this._obstacleEdgeMat);
+
+        // Kanten Foam-Hindernisse → 1 Draw-Call
+        this._mergedFoamEdges = addMergedLines(this._pendingFoamEdgeGeos, this._foamEdgeMat);
+
+        // Pending-Arrays leeren
+        this._pendingWallGeos = [];
+        this._pendingObstacleGeos = [];
+        this._pendingFoamGeos = [];
+        this._pendingObstacleEdgeGeos = [];
+        this._pendingFoamEdgeGeos = [];
     }
 
     /** Prueft Kollision eines Punktes mit Arena-Grenzen und Hindernissen */
