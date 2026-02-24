@@ -3,7 +3,7 @@
 // ============================================
 
 import * as THREE from 'three';
-import { disposeObject3DResources } from './three-disposal.js';
+import { disposeObject3DResources } from '../core/three-disposal.js';
 
 const MAX_PARTICLES = 1000;
 const DUMMY = new THREE.Object3D();

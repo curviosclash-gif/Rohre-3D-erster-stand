@@ -1,10 +1,10 @@
-import { CONFIG } from './Config.js';
-import { Arena } from './Arena.js';
-import { EntityManager } from './EntityManager.js';
-import { PowerupManager } from './Powerup.js';
-import { ParticleSystem } from './Particles.js';
-import { CUSTOM_MAP_KEY } from './MapSchema.js';
-import { resolveArenaMapSelection } from './CustomMapLoader.js';
+import { CONFIG } from '../core/Config.js';
+import { Arena } from '../entities/Arena.js';
+import { EntityManager } from '../entities/EntityManager.js';
+import { PowerupManager } from '../entities/Powerup.js';
+import { ParticleSystem } from '../entities/Particles.js';
+import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
+import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
 
 export function disposeMatchSessionSystems(renderer, currentSession) {
     if (currentSession?.entityManager) {

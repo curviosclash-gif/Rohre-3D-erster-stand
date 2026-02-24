@@ -2,9 +2,9 @@
 // UIManager.js - Handles DOM interactions, settings syncing and UI state
 // ============================================
 
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 import { VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
-import { CUSTOM_MAP_KEY } from './MapSchema.js';
+import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);

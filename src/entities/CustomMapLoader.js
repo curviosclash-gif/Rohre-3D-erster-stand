@@ -1,4 +1,4 @@
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 import {
     CUSTOM_MAP_KEY,
     CUSTOM_MAP_STORAGE_KEY,

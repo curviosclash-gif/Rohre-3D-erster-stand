@@ -15,7 +15,7 @@ graph TD;
     classDef entity fill:#bfb,stroke:#333,stroke-width:2px;
     classDef ui fill:#fbb,stroke:#333,stroke-width:2px;
 
-    subgraph CoreSystem [Core System & Bootstrapping]
+    subgraph CoreSystem [Core System (`src/core`)]
         main[main.js<br/>Einstiegspunkt]:::core
         Config[Config.js<br/>Zentrale Einstellungen]:::core
         GameLoop[GameLoop.js<br/>RAF & Timing]:::core
@@ -24,7 +24,7 @@ graph TD;
         Audio[Audio.js<br/>Sound Engine]:::core
     end
 
-    subgraph GameState [Game State & Match Management]
+    subgraph GameState [Game State & Match Management (`src/state`)]
         MatchSessionFactory[MatchSessionFactory.js<br/>Startet Match]:::state
         RoundStateController[RoundStateController.js<br/>Zustandsautomat]:::state
         RoundStateOps[RoundStateOps.js<br/>Logik-Operationen]:::state
@@ -32,7 +32,7 @@ graph TD;
         RoundRecorder[RoundRecorder.js<br/>Statistiken]:::state
     end
 
-    subgraph WorldEntities [World & Entities]
+    subgraph WorldEntities [World & Entities (`src/entities`)]
         Arena[Arena.js<br/>3D Level & Kollision]:::entity
         EntityManager[EntityManager.js<br/>Bot/Player/Projektile]:::entity
         Player[Player.js<br/>Benutzergesteuert]:::entity
@@ -46,7 +46,7 @@ graph TD;
         MapSchema[MapSchema.js]:::entity
     end
 
-    subgraph UserInterface [User Interface & Profiles]
+    subgraph UserInterface [User Interface & Profiles (`src/ui`)]
         HUD[HUD.js<br/>In-Game Overlay]:::ui
         UIManager[UIManager.js<br/>Menüs]:::ui
         SettingsStore[SettingsStore.js<br/>LocalStorage]:::ui

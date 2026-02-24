@@ -2,7 +2,7 @@
 // Config.js - Zentrale Spielkonfiguration
 // ============================================
 
-import { GENERATED_LOCAL_MAPS } from './GeneratedLocalMaps.js';
+import { GENERATED_LOCAL_MAPS } from '../entities/GeneratedLocalMaps.js';
 
 export const CONFIG = {
     // ---- Allgemein ----

@@ -3,10 +3,10 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 import { Trail } from './Trail.js';
-import { disposeObject3DResources } from './three-disposal.js';
-import { createVehicleMesh, isValidVehicleId, VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
+import { disposeObject3DResources } from '../core/three-disposal.js';
+import { createVehicleMesh, isValidVehicleId, VEHICLE_DEFINITIONS } from './vehicle-registry.js';
 
 // Shared Geometries (einmalig erstellt, von allen Spielern geteilt)
 const SHARED_GEO = {};

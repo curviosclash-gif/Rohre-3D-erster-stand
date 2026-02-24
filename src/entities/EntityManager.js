@@ -3,10 +3,10 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 import { Player } from './Player.js';
 import { BotAI } from './Bot.js';
-import { getVehicleIds, isValidVehicleId } from '../entities/vehicle-registry.js';
+import { getVehicleIds, isValidVehicleId } from './vehicle-registry.js';
 
 // Reused input object to reduce GC
 const SHARED_EMPTY_INPUT = {

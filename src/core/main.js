@@ -3,30 +3,30 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from './modules/Config.js';
-import { Renderer } from './modules/Renderer.js';
-import { GameLoop } from './modules/GameLoop.js';
-import { InputManager } from './modules/InputManager.js';
-import { ParticleSystem } from './modules/Particles.js';
-import { AudioManager } from './modules/Audio.js';
-import { HUD } from './modules/HUD.js';
-import { RoundRecorder } from './modules/RoundRecorder.js';
-import { VEHICLE_DEFINITIONS } from './entities/vehicle-registry.js';
-import { CUSTOM_MAP_KEY } from './modules/MapSchema.js';
-import { UIManager } from './modules/UIManager.js';
-import { SettingsStore } from './modules/SettingsStore.js';
-import { removeProfileByName, resolveActiveProfileName, upsertProfileEntry } from './modules/ProfileDataOps.js';
-import { deriveProfileControlSelectState } from './modules/ProfileControlStateOps.js';
-import { deriveProfileActionUiState } from './modules/ProfileUiStateOps.js';
-import { createRoundStateController } from './modules/RoundStateController.js';
-import { coordinateRoundEnd } from './modules/RoundEndCoordinator.js';
-import { disposeMatchSessionSystems, initializeMatchSession } from './modules/MatchSessionFactory.js';
+import { CONFIG } from './Config.js';
+import { Renderer } from './Renderer.js';
+import { GameLoop } from './GameLoop.js';
+import { InputManager } from './InputManager.js';
+import { ParticleSystem } from '../entities/Particles.js';
+import { AudioManager } from './Audio.js';
+import { HUD } from '../ui/HUD.js';
+import { RoundRecorder } from '../state/RoundRecorder.js';
+import { VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
+import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
+import { UIManager } from '../ui/UIManager.js';
+import { SettingsStore } from '../ui/SettingsStore.js';
+import { removeProfileByName, resolveActiveProfileName, upsertProfileEntry } from '../ui/ProfileDataOps.js';
+import { deriveProfileControlSelectState } from '../ui/ProfileControlStateOps.js';
+import { deriveProfileActionUiState } from '../ui/ProfileUiStateOps.js';
+import { createRoundStateController } from '../state/RoundStateController.js';
+import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
+import { disposeMatchSessionSystems, initializeMatchSession } from '../state/MatchSessionFactory.js';
 import {
     deriveMatchStartUiState,
     deriveReturnToMenuUiState,
     deriveRoundStartUiState,
     deriveRoundEndCountdownUiState,
-} from './modules/MatchUiStateOps.js';
+} from '../ui/MatchUiStateOps.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';

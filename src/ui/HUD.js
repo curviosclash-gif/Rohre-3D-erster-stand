@@ -2,7 +2,7 @@
    HUD.js - Fighter Jet Head-Up Display
    ============================================ */
 import * as THREE from 'three';
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 
 export class HUD {
     constructor(elementId, playerIndex) {

@@ -3,7 +3,7 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 

@@ -8,7 +8,7 @@
 * **Engine:** Three.js (WebGL), Vanilla JavaScript (ES6 Modules). No big frameworks (React/Vue/Svelte).
 * **Architecture Pattern:** State-Machine + Functional Core / Imperative Shell.
 * **State Management:** State is passed explicitly. Heavy use of pure functions (`...Ops.js`) for logic, and Managers/Controllers for state holding.
-* **Module System:** ES6 `import`/`export` across the `js/` directory.
+* **Module System:** ES6 `import`/`export` across the `src/` directory (subfolders: `core`, `entities`, `state`, `ui`).
 
 ## 2. Core Modules & Responsibilities (Dictionary)
 

@@ -3,7 +3,7 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 
 const UNIT_CYLINDER_GEOMETRY = new THREE.CylinderGeometry(1, 1, 1, 4);
 const UP_AXIS = new THREE.Vector3(0, 1, 0);

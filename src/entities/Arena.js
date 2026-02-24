@@ -1,7 +1,7 @@
 // ============================================
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { CONFIG } from './Config.js';
+import { CONFIG } from '../core/Config.js';
 
 // Statische Normalen-Vektoren fuer Arena-Wandkollisionen (readonly, einmalig alloziert)
 const NORMAL_PX = Object.freeze(new THREE.Vector3(1, 0, 0));   // +X (rechte Wand)

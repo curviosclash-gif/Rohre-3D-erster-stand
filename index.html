@@ -447,12 +447,207 @@
             <div id="message-overlay" class="hidden" role="alert" aria-live="assertive" aria-atomic="true">
                 <div id="message-text"></div>
                 <div id="message-sub"></div>
+                                <label class="toggle-row">
+                                    <input type="checkbox" id="cockpit-cam-p1">
+                                    <span>Spieler 1</span>
+                                </label>
+                                <label class="toggle-row">
+                                    <input type="checkbox" id="cockpit-cam-p2">
+                                    <span>Spieler 2</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="menu-section">
+                            <button type="button" id="btn-reset-keys" class="secondary-btn">Standard-Tasten
+                                wiederherstellen</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======= SUBMENU: PROFILE ======= -->
+                <div id="submenu-profiles" class="submenu-panel hidden" role="region"
+                    aria-labelledby="submenu-profiles-title" aria-hidden="true">
+                    <div class="submenu-header">
+                        <button type="button" class="back-btn" data-back aria-label="Zur Hauptnavigation">←
+                            Zurück</button>
+                        <h2 id="submenu-profiles-title" class="submenu-title">👤 Profile</h2>
+                    </div>
+
+                    <div class="submenu-body">
+                        <div class="menu-section">
+                            <h2 class="section-title">Preset-Profile</h2>
+                            <label for="profile-name">Profilname</label>
+                            <input type="text" id="profile-name" maxlength="32" placeholder="z. B. Turnier">
+                            <button type="button" id="btn-profile-save" class="secondary-btn secondary-btn-spaced">
+                                Profil unter Namen speichern</button>
+                        </div>
+
+                        <div class="menu-section">
+                            <label for="profile-select">Gespeicherte Profile</label>
+                            <select id="profile-select">
+                                <option value="">Kein Profil gewaehlt</option>
+                            </select>
+                            <button type="button" id="btn-profile-load" class="secondary-btn secondary-btn-spaced">
+                                Profil laden</button>
+                            <button type="button" id="btn-profile-delete" class="secondary-btn secondary-btn-spaced">
+                                Profil loeschen</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======= SUBMENU: PORTALE / MAP ======= -->
+                <div id="submenu-portals" class="submenu-panel hidden" role="region"
+                    aria-labelledby="submenu-portals-title" aria-hidden="true">
+                    <div class="submenu-header">
+                        <button type="button" class="back-btn" data-back aria-label="Zur Hauptnavigation">←
+                            Zurück</button>
+                        <h2 id="submenu-portals-title" class="submenu-title">🌀 Portale / Map</h2>
+                    </div>
+
+                    <div class="submenu-body">
+                        <div class="menu-section">
+                            <label class="toggle-row">
+                                <input type="checkbox" id="portals-toggle" checked>
+                                <span>Portale aktiviert</span>
+                            </label>
+                        </div>
+
+                        <div class="menu-section">
+                            <label for="portal-count-slider">Anzahl Portale: <span
+                                    id="portal-count-label">0</span></label>
+                            <input type="range" id="portal-count-slider" min="0" max="20" step="2" value="0">
+                        </div>
+
+                        <div class="menu-section">
+                            <label for="planar-level-count-slider">Anzahl Ebenen: <span
+                                    id="planar-level-count-label">5</span></label>
+                            <input type="range" id="planar-level-count-slider" min="2" max="10" step="1" value="5">
+                        </div>
+
+                        <div class="menu-section">
+                            <label for="planar-mode-toggle">Ebene erzwingen</label>
+                            <label class="toggle-row">
+                                <input type="checkbox" id="planar-mode-toggle">
+                                <span>Planar Modus (Kein Pitch)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ======= SUBMENU: DEBUG / INFO ======= -->
+                <div id="submenu-debug" class="submenu-panel hidden" role="region" aria-labelledby="submenu-debug-title"
+                    aria-hidden="true">
+                    <div class="submenu-header">
+                        <button type="button" class="back-btn" data-back aria-label="Zur Hauptnavigation">←
+                            Zurück</button>
+                        <h2 id="submenu-debug-title" class="submenu-title">ℹ️ Debug / Info</h2>
+                    </div>
+
+                    <div class="submenu-body">
+                        <div class="menu-section">
+                            <h2 class="section-title">Build-Information</h2>
+                            <div id="build-info-detail" class="build-info-detail"></div>
+                            <button type="button" id="btn-copy-build" class="secondary-btn secondary-btn-spaced">
+                                Build-Info kopieren
+                            </button>
+                        </div>
+                        <div class="menu-section">
+                            <p class="debug-hint">Drücke <kbd>F</kbd> im Spiel für FPS-Overlay</p>
+                            <p class="debug-hint">Drücke <kbd>P</kbd> im Spiel für Grafik-Toggle</p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div id="hud" class="hidden">
+            <!-- P1 Fighter HUD -->
+            <div id="p1-fighter-hud" class="fighter-hud hidden">
+                <div class="hud-center-crosshair">+</div>
+                <div class="hud-bank-line"></div>
+                <div class="hud-bank-angle">0°</div>
+                <div class="hud-horizon">
+                    <div class="horizon-line"></div>
+                </div>
+                <div class="hud-pitch-ladder">
+                    <!-- Lines generated by JS -->
+                </div>
+                <div class="hud-tape left">
+                    <div class="tape-label">SPD</div>
+                    <div class="tape-value" id="p1-hud-speed">0</div>
+                    <div class="tape-scale" id="p1-hud-speed-scale"></div>
+                    <div class="tape-marker">►</div>
+                </div>
+                <div class="hud-tape right">
+                    <div class="tape-label">ALT</div>
+                    <div class="tape-value" id="p1-hud-alt">0</div>
+                    <div class="tape-scale" id="p1-hud-alt-scale"></div>
+                    <div class="tape-marker">◄</div>
+                </div>
+                <div class="hud-tape top">
+                    <div class="tape-value" id="p1-hud-heading">N</div>
+                    <div class="tape-scale horizontal" id="p1-hud-heading-scale"></div>
+                    <div class="tape-marker">▼</div>
+                </div>
+                <div id="p1-lock-reticle" class="hud-lock-reticle hidden">
+                    <div class="lock-box"></div>
+                    <div class="lock-dist"></div>
+                </div>
+            </div>
+
+            <!-- P2 Fighter HUD -->
+            <div id="p2-fighter-hud" class="fighter-hud p2 hidden">
+                <div class="hud-center-crosshair">+</div>
+                <div class="hud-bank-line"></div>
+                <div class="hud-bank-angle">0°</div>
+                <div class="hud-horizon">
+                    <div class="horizon-line"></div>
+                </div>
+                <div class="hud-pitch-ladder"></div>
+                <div class="hud-tape left">
+                    <div class="tape-label">SPD</div>
+                    <div class="tape-value" id="p2-hud-speed">0</div>
+                    <div class="tape-scale" id="p2-hud-speed-scale"></div>
+                    <div class="tape-marker">►</div>
+                </div>
+                <div class="hud-tape right">
+                    <div class="tape-label">ALT</div>
+                    <div class="tape-value" id="p2-hud-alt">0</div>
+                    <div class="tape-scale" id="p2-hud-alt-scale"></div>
+                    <div class="tape-marker">◄</div>
+                </div>
+                <div class="hud-tape top">
+                    <div class="tape-value" id="p2-hud-heading">N</div>
+                    <div class="tape-scale horizontal" id="p2-hud-heading-scale"></div>
+                    <div class="tape-marker">▼</div>
+                </div>
+                <div id="p2-lock-reticle" class="hud-lock-reticle hidden">
+                    <div class="lock-box"></div>
+                    <div class="lock-dist"></div>
+                </div>
+            </div>
+
+            <div id="p1-hud" class="player-hud left">
+                <div class="player-name">Spieler 1</div>
+                <div class="player-score">0</div>
+                <div id="p1-items" class="item-bar"></div>
+            </div>
+            <div id="p2-hud" class="player-hud right hidden">
+                <div class="player-name">Spieler 2</div>
+                <div class="player-score">0</div>
+                <div id="p2-items" class="item-bar"></div>
+            </div>
+            <div id="message-overlay" class="hidden" role="alert" aria-live="assertive" aria-atomic="true">
+                <div id="message-text"></div>
+                <div id="message-sub"></div>
             </div>
             <div id="status-toast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
         </div>
     </div>
 
-    <script type="module" src="js/main.js"></script>
+    <script type="module" src="src/core/main.js"></script>
 </body>
 
 </html>

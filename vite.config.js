@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parseMapJSON, toArenaMapDefinition } from './js/modules/MapSchema.js';
+import { parseMapJSON, toArenaMapDefinition } from './src/entities/MapSchema.js';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 const buildTime = new Date().toISOString();
