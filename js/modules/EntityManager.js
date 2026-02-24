@@ -136,6 +136,9 @@ export class EntityManager {
         this.spatialGrid = new Map(); // Key: hash(cx, cz), Value: Set of segment data
         this._keysBuffer = []; // Wiederverwendbarer Buffer fuer _getSegmentGridKeys
 
+        // Cached Global Collision Result
+        this._trailCollisionResult = { hit: false, playerIndex: -1 };
+
         // Optional runtime diagnostics for self-trail/grid edge cases
         const trailDebugConfig = readTrailCollisionDebugConfigFromUrl();
         this._trailCollisionDebugEnabled = trailDebugConfig.enabled;
@@ -1097,7 +1100,9 @@ export class EntityManager {
                                         cellZ,
                                     });
                                 }
-                                return { hit: true, playerIndex: seg.playerIndex };
+                                this._trailCollisionResult.hit = true;
+                                this._trailCollisionResult.playerIndex = seg.playerIndex;
+                                return this._trailCollisionResult;
                             }
                         } else {
                             if (seg.playerIndex === excludePlayerIndex) {
@@ -1111,7 +1116,9 @@ export class EntityManager {
                                     cellZ,
                                 });
                             }
-                            return { hit: true, playerIndex: seg.playerIndex };
+                            this._trailCollisionResult.hit = true;
+                            this._trailCollisionResult.playerIndex = seg.playerIndex;
+                            return this._trailCollisionResult;
                         }
                     }
                 }

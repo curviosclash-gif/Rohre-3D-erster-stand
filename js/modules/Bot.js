@@ -363,7 +363,7 @@ export class BotAI {
                 const distance = sampleDistances[j];
                 this._tmpVec2.copy(player.position).addScaledVector(this._tmpVec, distance);
 
-                const wallHit = arena.checkCollision(this._tmpVec2, player.hitboxRadius * 1.6);
+                const wallHit = arena.checkCollisionFast(this._tmpVec2, player.hitboxRadius * 1.6);
                 const trailHit = this._checkTrailHit(this._tmpVec2, player, allPlayers);
                 if (wallHit || trailHit) {
                     score += 3.2 + j * 0.8 + (trailHit ? 0.9 : 0.5);
@@ -436,7 +436,7 @@ export class BotAI {
         const checks = [3, 5, 7];
         for (let i = 0; i < checks.length; i++) {
             this._tmpVec2.copy(player.position).addScaledVector(this._tmpVec, checks[i]);
-            if (arena.checkCollision(this._tmpVec2, player.hitboxRadius * 1.6) || this._checkTrailHit(this._tmpVec2, player, allPlayers)) {
+            if (arena.checkCollisionFast(this._tmpVec2, player.hitboxRadius * 1.6) || this._checkTrailHit(this._tmpVec2, player, allPlayers)) {
                 return false;
             }
         }
@@ -512,7 +512,7 @@ export class BotAI {
         for (let d = step; d <= probeLookAhead; d += step) {
             this._tmpVec.copy(player.position).addScaledVector(probe.dir, d);
 
-            if (arena.checkCollision(this._tmpVec, player.hitboxRadius * 1.6)) {
+            if (arena.checkCollisionFast(this._tmpVec, player.hitboxRadius * 1.6)) {
                 wallDist = d;
                 if (d <= step * 1.5) immediateDanger = true;
                 break;
@@ -604,7 +604,7 @@ export class BotAI {
     }
 
     _estimatePointRisk(point, player, arena, allPlayers) {
-        const wallHit = arena.checkCollision(point, player.hitboxRadius * 2.0) ? 1 : 0;
+        const wallHit = arena.checkCollisionFast(point, player.hitboxRadius * 2.0) ? 1 : 0;
         const trailHit = this._checkTrailHit(point, player, allPlayers) ? 1 : 0;
         const enemyPressure = this._estimateEnemyPressure(point, player, allPlayers);
         return wallHit * 1.2 + trailHit * 1.5 + enemyPressure * 0.6;
@@ -623,7 +623,7 @@ export class BotAI {
                 exit.y + dir.y * probeDistance,
                 exit.z + dir.z * probeDistance
             );
-            if (arena.checkCollision(this._tmpVec3, player.hitboxRadius * 2.0)
+            if (arena.checkCollisionFast(this._tmpVec3, player.hitboxRadius * 2.0)
                 || this._checkTrailHit(this._tmpVec3, player, allPlayers)) {
                 blockedCount++;
             }
@@ -889,10 +889,14 @@ export class BotAI {
         player.getDirection(this._tmpForward).normalize();
         this._buildBasis(this._tmpForward);
 
-        // Adaptive Sensing: Reduce probes in open space
+        // Time-Slicing der Probes: Vollstaendiger Scan nur im zugewiesenen Frame
         const maxProbes = this._probes.length;
-        const useFewProbes = !this.sense.immediateDanger && (this.sense.forwardRisk || 0) < 0.25 && (this.sense.localOpenness || 0) > this.sense.lookAhead * 0.7;
-        const probesToProcess = useFewProbes ? Math.min(6, maxProbes) : maxProbes;
+        const isFullScanFrame = (this._sensePhaseCounter === this._sensePhase);
+
+        // Adaptive Sensing: Reduce probes in open space or non-assigned frames
+        const useFewProbes = !isFullScanFrame || (!this.sense.immediateDanger && (this.sense.forwardRisk || 0) < 0.25 && (this.sense.localOpenness || 0) > this.sense.lookAhead * 0.7);
+        // In non-scan frames, only evaluate the most critical probes (forward, up, down, backwards)
+        const probesToProcess = useFewProbes ? Math.min(5, maxProbes) : maxProbes;
 
         let opennessSum = 0;
         let opennessCount = 0;
@@ -1149,16 +1153,14 @@ export class BotAI {
 
         this._resetDecision();
 
-        // Time-Slicing: Vollstaendiger Scan nur in zugeordnetem Frame-Slot
-        this._sensePhaseCounter = (this._sensePhaseCounter + 1) % 3;
-        const shouldFullSense = this._sensePhaseCounter === this._sensePhase;
-        if (shouldFullSense) {
-            this._senseEnvironment(player, arena, allPlayers, projectiles);
-        } else {
-            // Nur kritische Checks in anderen Frames (Projektile + Hoehe)
-            this._senseProjectiles(player, projectiles);
-            this._senseHeight(player, arena);
-        }
+        // Time-Slicing auf Frame-Ebene
+        // Wir setzen die Zuweisung in _senseEnvironment durch, nicht indem wir den Aufruf skippen.
+        // Das garantiert, dass grundlegende Risiken aktualisiert werden.
+        this._sensePhaseCounter = (this._sensePhaseCounter + 1) % 4; // Erweitert auf 4 Ticks
+
+        this._senseEnvironment(player, arena, allPlayers, projectiles);
+        this._senseProjectiles(player, projectiles);
+        this._senseHeight(player, arena);
 
         if (this.sense.immediateDanger && this.state.recoveryCooldown <= 0 && this._recentBouncePressure > 2.3) {
             this._enterRecovery(player, arena, allPlayers, 'collision-pressure');

@@ -36,8 +36,9 @@ export class Arena {
         this._tmpVecGate2 = new THREE.Vector3();
         // Hilfsvektor fuer lookAt in _buildSpecialGates
         this._tmpVec = new THREE.Vector3();
-        // Hilfsvektor fuer Normalenberechnung (Pooling)
         this._tmpNormal = new THREE.Vector3();
+        // Cached Collision Result (Zero-Allocation Performance)
+        this._collisionResult = { hit: false, kind: '', isWall: false, normal: new THREE.Vector3() };
         // Phase 2: Geometry-Merging – temporaere Sammel-Arrays
         this._pendingWallGeos = [];
         this._pendingObstacleGeos = [];
@@ -912,26 +913,66 @@ export class Arena {
         if (!position) return null;
 
         // Optimierung: Statische Normalen-Vektoren statt new THREE.Vector3() pro Aufruf
-        if (position.x - radius < b.minX) return { hit: true, kind: 'wall', isWall: true, normal: NORMAL_PX };
-        if (position.x + radius > b.maxX) return { hit: true, kind: 'wall', isWall: true, normal: NORMAL_NX };
-        if (position.y - radius < b.minY) return { hit: true, kind: 'wall', isWall: true, normal: NORMAL_PY };
-        if (position.y + radius > b.maxY) return { hit: true, kind: 'wall', isWall: true, normal: NORMAL_NY };
-        if (position.z - radius < b.minZ) return { hit: true, kind: 'wall', isWall: true, normal: NORMAL_PZ };
-        if (position.z + radius > b.maxZ) return { hit: true, kind: 'wall', isWall: true, normal: NORMAL_NZ };
+        // Nutze das gecachte Result-Objekt
+        if (position.x - radius < b.minX) {
+            this._collisionResult.hit = true; this._collisionResult.kind = 'wall'; this._collisionResult.isWall = true; this._collisionResult.normal.copy(NORMAL_PX);
+            return this._collisionResult;
+        }
+        if (position.x + radius > b.maxX) {
+            this._collisionResult.hit = true; this._collisionResult.kind = 'wall'; this._collisionResult.isWall = true; this._collisionResult.normal.copy(NORMAL_NX);
+            return this._collisionResult;
+        }
+        if (position.y - radius < b.minY) {
+            this._collisionResult.hit = true; this._collisionResult.kind = 'wall'; this._collisionResult.isWall = true; this._collisionResult.normal.copy(NORMAL_PY);
+            return this._collisionResult;
+        }
+        if (position.y + radius > b.maxY) {
+            this._collisionResult.hit = true; this._collisionResult.kind = 'wall'; this._collisionResult.isWall = true; this._collisionResult.normal.copy(NORMAL_NY);
+            return this._collisionResult;
+        }
+        if (position.z - radius < b.minZ) {
+            this._collisionResult.hit = true; this._collisionResult.kind = 'wall'; this._collisionResult.isWall = true; this._collisionResult.normal.copy(NORMAL_PZ);
+            return this._collisionResult;
+        }
+        if (position.z + radius > b.maxZ) {
+            this._collisionResult.hit = true; this._collisionResult.kind = 'wall'; this._collisionResult.isWall = true; this._collisionResult.normal.copy(NORMAL_PZ);
+            return this._collisionResult;
+        }
 
         this._tmpSphere.center.copy(position);
         this._tmpSphere.radius = radius;
         for (const obs of this.obstacles) {
             if (!obs.box.intersectsSphere(this._tmpSphere)) continue;
-            return {
-                hit: true,
-                kind: obs.kind || (obs.isWall ? 'wall' : 'hard'),
-                isWall: !!obs.isWall,
-                normal: this._computeBoxCollisionNormal(obs.box, position)
-            };
+            this._collisionResult.hit = true;
+            this._collisionResult.kind = obs.kind || (obs.isWall ? 'wall' : 'hard');
+            this._collisionResult.isWall = !!obs.isWall;
+            this._collisionResult.normal.copy(this._computeBoxCollisionNormal(obs.box, position));
+            return this._collisionResult;
         }
 
         return null;
+    }
+
+    /**
+     * Sehr schneller Bool-Check fuer Bot-Raycasts.
+     * Generiert KEINE Normalen, mutiert keine Arrays.
+     */
+    checkCollisionFast(position, radius = 0) {
+        const b = this.bounds;
+        if (!position) return false;
+
+        if (position.x - radius < b.minX || position.x + radius > b.maxX ||
+            position.y - radius < b.minY || position.y + radius > b.maxY ||
+            position.z - radius < b.minZ || position.z + radius > b.maxZ) {
+            return true;
+        }
+
+        this._tmpSphere.center.copy(position);
+        this._tmpSphere.radius = radius;
+        for (const obs of this.obstacles) {
+            if (obs.box.intersectsSphere(this._tmpSphere)) return true;
+        }
+        return false;
     }
 
     /** Prueft ob Spezial-Gates durchflogen wurden */
@@ -965,7 +1006,8 @@ export class Arena {
     }
 
     checkCollision(position, radius) {
-        return !!this.getCollisionInfo(position, radius);
+        // Nutze den super-schnellen check statt getCollisionInfo
+        return this.checkCollisionFast(position, radius);
     }
 
     /** Gibt eine zufaellige freie Position in der Arena zurueck */
