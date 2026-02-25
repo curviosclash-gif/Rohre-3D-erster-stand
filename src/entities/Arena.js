@@ -520,9 +520,11 @@ export class Arena {
         return this._resolvePortalPosition(pos, seed);
     }
 
-    _resolvePlanarElevatorPair(b, lowY, highY, margin, seed = 0) {
-        const baseX = Math.max(b.minX + margin, Math.min(b.maxX - margin, seed % b.maxX));
-        const baseZ = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, (seed * 73) % b.maxZ));
+    _resolvePlanarElevatorPair(nx, nz, lowY, highY, seed = 0) {
+        const b = this.bounds;
+        const margin = CONFIG.PORTAL.RING_SIZE + 2.5;
+        const baseX = b.minX + margin + (nx + 1) * 0.5 * (b.maxX - b.minX - 2 * margin);
+        const baseZ = b.minZ + margin + (nz + 1) * 0.5 * (b.maxZ - b.minZ - 2 * margin);
 
         const lowProbe = new THREE.Vector3();
         const highProbe = new THREE.Vector3();
