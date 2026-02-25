@@ -794,27 +794,27 @@ export class Game {
                 this._deleteProfile(selected);
             });
         }
-        if (this.ui.profileSelect) {
-            this.ui.profileSelect.addEventListener('change', () => {
-                const selected = this._normalizeProfileName(this.ui.profileSelect.value || '');
-                const selectedProfile = this._findProfileByName(selected);
-                this.activeProfileName = selectedProfile ? selectedProfile.name : '';
-                if (this.ui.profileNameInput) {
-                    this.ui.profileNameInput.value = this.activeProfileName;
-                }
-                this._syncProfileActionState();
-            });
-        }
+
         if (this.ui.profileNameInput) {
             this.ui.profileNameInput.addEventListener('input', () => {
                 this._syncProfileActionState();
             });
-            this.ui.profileNameInput.addEventListener('keydown', (event) => {
-                if (event.key !== 'Enter') return;
-                event.preventDefault();
-                this._saveProfile(this.ui.profileNameInput.value || '');
+        }
+
+        if (this.ui.profileSelect) {
+            this.ui.profileSelect.addEventListener('change', () => {
+                const selected = this._normalizeProfileName(this.ui.profileSelect.value || '');
+                const selectedProfile = this._findProfileByName(selected);
+
+                if (selectedProfile && this.ui.profileNameInput) {
+                    this.ui.profileNameInput.value = selectedProfile.name;
+                }
+
+                this._syncProfileActionState();
             });
         }
+
+
 
         const portalCountSlider = document.getElementById('portal-count-slider');
         const portalCountLabel = document.getElementById('portal-count-label');
@@ -941,8 +941,8 @@ export class Game {
 
     _saveProfile(profileName) {
         const name = this._normalizeProfileName(profileName);
-        if (!name) {
-            this._showStatusToast('Profilname fehlt', 1400, 'error');
+        if (!name || name.length < 2) {
+            this._showStatusToast('Name zu kurz oder ungueltig (min. 2 Zeichen)', 2000, 'error');
             return false;
         }
 
@@ -954,6 +954,7 @@ export class Game {
         );
         const activeIdx = this._findProfileIndexByName(effectiveActiveProfileName);
         const canOverwrite = idx >= 0 && idx === activeIdx;
+
         if (idx >= 0 && !canOverwrite) {
             this._showStatusToast('Name existiert bereits', 1500, 'error');
             return false;
@@ -969,10 +970,15 @@ export class Game {
         this.settingsProfiles = upsertProfileEntry(this.settingsProfiles, entry, this.profileDataOps).profiles;
 
         this.activeProfileName = name;
+        if (this.ui.profileNameInput) {
+            this.ui.profileNameInput.value = name;
+        }
+
         const persisted = this._saveProfiles();
         this._syncProfileControls();
+
         if (!persisted) {
-            this._showStatusToast('Profil konnte nicht gespeichert werden', 1700, 'error');
+            this._showStatusToast('Profil konnte nicht gespeichert werden (Speicher voll?)', 1700, 'error');
             return false;
         }
 
