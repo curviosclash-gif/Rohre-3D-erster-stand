@@ -520,52 +520,31 @@ export class Arena {
         return this._resolvePortalPosition(pos, seed);
     }
 
-    _resolvePlanarElevatorPair(nx, nz, yLow, yHigh, seed = 0) {
-        const lowY = Math.min(yLow, yHigh);
-        const highY = Math.max(yLow, yHigh);
-        const b = this.bounds;
-        const margin = CONFIG.PORTAL.RING_SIZE + 2.5;
-        const testRadius = CONFIG.PORTAL.RADIUS * 0.75;
-
-        const baseX = b.minX + margin + (nx + 1) * 0.5 * (b.maxX - b.minX - 2 * margin);
-        const baseZ = b.minZ + margin + (nz + 1) * 0.5 * (b.maxZ - b.minZ - 2 * margin);
+    _resolvePlanarElevatorPair(b, lowY, highY, margin, seed = 0) {
+        const baseX = Math.max(b.minX + margin, Math.min(b.maxX - margin, seed % b.maxX));
+        const baseZ = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, (seed * 73) % b.maxZ));
 
         const lowProbe = new THREE.Vector3();
         const highProbe = new THREE.Vector3();
         for (let i = 0; i < 28; i++) {
-            const angle = (((seed + i * 41) % 360) * Math.PI) / 180;
-            const dist = i === 0 ? 0 : 2.2 + (i - 1) * 1.2;
-            const x = Math.max(b.minX + margin, Math.min(b.maxX - margin, baseX + Math.cos(angle) * dist));
-            const z = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, baseZ + Math.sin(angle) * dist));
+            const angle1 = (((seed + i * 41) % 360) * Math.PI) / 180;
+            const dist1 = i === 0 ? 0 : 2.2 + (i - 1) * 1.2;
+            const x1 = Math.max(b.minX + margin, Math.min(b.maxX - margin, baseX + Math.cos(angle1) * dist1));
+            const z1 = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, baseZ + Math.sin(angle1) * dist1));
 
-            lowProbe.set(x, lowY, z);
-            highProbe.set(x, highY, z);
-            if (!this.checkCollision(lowProbe, testRadius) && !this.checkCollision(highProbe, testRadius)) {
-                return {
-                    low: lowProbe.clone(),
-                    high: highProbe.clone(),
-                };
+            // Verschiebe das zweite Portal etwas, damit sie nicht exakt uebereinander liegen
+            const angle2 = (((seed + 180 + i * 41) % 360) * Math.PI) / 180;
+            const dist2 = i === 0 ? 3.0 : 2.2 + i * 1.2;
+            const x2 = Math.max(b.minX + margin, Math.min(b.maxX - margin, baseX + Math.cos(angle2) * dist2));
+            const z2 = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, baseZ + Math.sin(angle2) * dist2));
+
+            lowProbe.set(x1, lowY, z1);
+            highProbe.set(x2, highY, z2);
+
+            if (!this.checkCollision(lowProbe, 2.0) && !this.checkCollision(highProbe, 2.0)) {
+                return { low: lowProbe.clone(), high: highProbe.clone() };
             }
         }
-
-        const lowFallback = this._resolvePortalPosition(new THREE.Vector3(baseX, lowY, baseZ), seed);
-        const highAtLowXZ = new THREE.Vector3(lowFallback.x, highY, lowFallback.z);
-        if (!this.checkCollision(highAtLowXZ, testRadius)) {
-            return {
-                low: lowFallback,
-                high: highAtLowXZ,
-            };
-        }
-
-        const highFallback = this._resolvePortalPosition(new THREE.Vector3(baseX, highY, baseZ), seed + 17);
-        const lowAtHighXZ = new THREE.Vector3(highFallback.x, lowY, highFallback.z);
-        if (!this.checkCollision(lowAtHighXZ, testRadius)) {
-            return {
-                low: lowAtHighXZ,
-                high: highFallback,
-            };
-        }
-
         return null;
     }
 
@@ -1050,14 +1029,13 @@ export class Arena {
         if (height <= 0) return [b.minY + 3];
 
         const levels = [];
-        const step = Math.max(4, height / 4);
-        for (let y = b.minY + step * 0.5; y < b.maxY - 1; y += step) {
-            levels.push(Math.round(y * 10) / 10);
+        const levelCount = CONFIG.GAMEPLAY.PLANAR_LEVEL_COUNT || 5;
+        const step = height / levelCount;
+
+        for (let i = 0; i < levelCount; i++) {
+            levels.push(b.minY + step * i + step * 0.5);
         }
-        if (levels.length < 2) {
-            levels.push(b.minY + 3);
-            levels.push(b.maxY - 3);
-        }
+
         return levels;
     }
 

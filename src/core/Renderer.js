@@ -143,7 +143,8 @@ export class Renderer {
         const target = this.cameraTargets[playerIndex];
         const mode = this.getCameraMode(playerIndex);
         const smooth = CONFIG.CAMERA.SMOOTHING;
-        const lockToNose = mode === 'FIRST_PERSON' && !!CONFIG.CAMERA.FIRST_PERSON_LOCK_TO_NOSE && !!firstPersonAnchor;
+        const isCockpitFirstPerson = cockpitCamera && mode === 'FIRST_PERSON';
+        const lockToNose = (mode === 'FIRST_PERSON' && !!CONFIG.CAMERA.FIRST_PERSON_LOCK_TO_NOSE && !!firstPersonAnchor) || isCockpitFirstPerson;
         const noseClearance = CONFIG.CAMERA.FIRST_PERSON_NOSE_CLEARANCE || 0;
         const firstPersonHardLock = lockToNose && mode === 'FIRST_PERSON';
         const boostTarget = mode === 'FIRST_PERSON' && isBoosting ? 1 : 0;
