@@ -70,11 +70,10 @@ Wie wird getestet, dass es funktioniert?
 
 Falls das Feature groß genug ist:
 
-- Füge eine neue Phase in `docs/Umsetzungsplan.md` hinzu
+- Füge eine oder mehrere neue Phasen in `docs/Umsetzungsplan.md` hinzu
+- **WICHTIG:** Halte Phasen extrem klein und fokussiert (Atomic Commits Prinzip). Mische niemals z.B. UI-Arbeiten mit Core-Engine-Arbeiten in der gleichen Phase. Teile große Features in Phase X.1, Phase X.2 usw. auf.
 - Format: `## Phase X: [ ] Feature-Name`
 - Mit Unterpunkten für jeden Umsetzungsschritt
-
----
 
 ## 5. User-Bestätigung
 

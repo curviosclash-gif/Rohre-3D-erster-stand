@@ -56,20 +56,20 @@ Aktualisiere die Versionsnummer in `package.json`.
 
 ---
 
-## 5. Release-Commit & Tag
+## 5. Build erstellen (Gate – schlägt fehl → Abbruch)
+
+```bash
+npm run build
+```
+
+---
+
+## 6. Release-Commit & Tag
 
 ```bash
 git add -A && git commit -m "release: v[X.Y.Z]" -m "[Zusammenfassung der wichtigsten Änderungen]"
 git tag -a v[X.Y.Z] -m "Release v[X.Y.Z] – [Kurzbeschreibung]"
 git push && git push --tags
-```
-
----
-
-## 6. Build erstellen
-
-```bash
-npm run build
 ```
 
 ---

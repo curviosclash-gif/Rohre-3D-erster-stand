@@ -37,13 +37,19 @@ Zeige dem User die **Details der Phase**:
 
 ---
 
-## 2. Detail-Planung
+## 2. Detail-Planung (und Phasen-Splitting!)
 
-Erstelle einen `implementation_plan.md` für die aktuelle Phase. Berücksichtige dabei:
+Prüfe die aktuelle Phase auf ihren Umfang und die betroffenen Dateien.
+**WICHTIG:** Eine Phase darf nicht zu groß sein! Wenn eine Phase mehrere unabhängige Systeme berührt (z.B. UI und Core-Gameplay), **muss** sie in kleinere Etappen (z.B. 2a, 2b) aufgeteilt werden.
 
+Erstelle einen `implementation_plan.md` für die aktuelle (ggf. verkleinerte) Phase. Berücksichtige dabei:
+
+- **Scope-Begrenzung**: Maximal 2-3 zusammenhängende Ziele pro Etappe.
 - Alle betroffenen Dateien.
 - Die notwendigen Code-Änderungen.
 - Die Risiko-Bewertung (Gering, Mittel, Hoch).
+
+Falls du die Phase aufteilst, passe `docs/Umsetzungsplan.md` an und erkläre dem User die Aufteilung.
 
 ---
 

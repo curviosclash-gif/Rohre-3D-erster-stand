@@ -97,54 +97,58 @@ Lies auch den letzten `docs/Analysebericht.md` (falls vorhanden), um zu wissen w
      75. Main Thread Blocking (16ms Limit)
      76. CSS Reflows in UI Updates
      77. DOM Node Count Leak Detection (5 Minuten Dauer-Loop)
-     78. WebWorker Message Cloning Latency
-     79. IndexedDB Bulk Write Time
-     80. LocalStorage Quota Exceed Exception
-     81. SharedArrayBuffer Fallbacks
-     82. Audio Context Background Suspend
-     83. Positional Audio Panning Curve
-     84. Audio Buffer Concurrent Decodes
-     85. Multiple Sound Overlaps (Voice Limit)
-     86. Output Device Switching Hot-Plug
-     87. Input Device Polling Rate Jitter
-     88. Gamepad Axis Deadzone Drift
-     89. Gamepad Button Mapping Edge Cases
-     90. Keyboard Ghosting Kombinationen
-     91. Mouse Delta Smoothing Jump
-     92. Touch Screen Multi-Touch Pinch
-     93. Browser Tab Visibility Change Event
-     94. Background Throttling Timer Rescue
-     95. Power Saving Mode FPS Detect
-     96. Device Pixel Ratio Hot-Swap
-     97. Savegame Checksum Tampering
-     98. Savegame Version Schema Validate
-     99. Corrupt Savegame Recovery
-     100. JSON Parsing Exception Trapping
-     101. Binary Serialization Endianness
-     102. Entity ID Generation Collisions
-     103. Event Bus Infinite Loop Guard
-     104. Event Listener Unmount Leaks
-     105. Promise Rejection Global Handler
-     106. XSS Vulnerability in Chat/Input
-     107. Rate Limiting Command Spam
-     108. Analytics/Telemetrie Opt-Out
-     109. Error Reporting Payload Size
-     110. Dependency Version Resolving
-     111. Minification Variable Mangling
-     112. Source Map Resolving in Prod
-     113. Hot Module Replacement Status
-     114. Localization Missing Keys Check
-     115. Font Load Timeout Fallback
-     116. Texture Fallback Images (Missing/404)
-     117. CSS Variable Scope Bleeding
-     118. CSS Animation GPU Acceleration
-     119. Game Logic Determinism Check
-     120. Final Memory Heap Snapshot Compare
-     121. Arithmetic Robustness (NaN/Infinity Guards in Kern-Berechnungen)
-     122. State Transition Validation (Prüfung illegaler Zustandsübergänge)
-     123. Component Lifecycle Consistency (Initialisierungs- & Zerstörungslogik)
-     124. Data Transform Integrity (Validierung von Input-zu-Output Mappings)
-     125. Global Registry/Store Sync (Verhinderung von "Stale States" in Stores)
+     100. WebWorker Message Cloning Latency
+     101. IndexedDB Bulk Write Time
+     102. LocalStorage Quota Exceed Exception
+     103. SharedArrayBuffer Fallbacks
+     104. Audio Context Background Suspend
+     105. Positional Audio Panning Curve
+     106. Audio Buffer Concurrent Decodes
+     107. Multiple Sound Overlaps (Voice Limit)
+     108. Audio Device Switching Hot-Plug
+     109. Input Device Polling Rate Jitter
+     110. Gamepad Axis Deadzone Drift
+     111. Gamepad Button Mapping Edge Cases
+     112. Keyboard Ghosting Kombinationen
+     113. Mouse Delta Smoothing Jump
+     114. Touch Screen Multi-Touch Pinch
+     115. Browser Tab Visibility Change Event
+     116. Background Throttling Timer Rescue
+     117. Power Saving Mode FPS Detect
+     118. Device Pixel Ratio Hot-Swap
+     119. Savegame Checksum Tampering
+     120. Savegame Version Schema Validate
+     121. Corrupt Savegame Recovery
+     122. JSON Parsing Exception Trapping
+     123. Binary Serialization Endianness
+     124. Entity ID Generation Collisions
+     125. Event Bus Infinite Loop Guard
+     126. Event Listener Unmount Leaks
+     127. Promise Rejection Global Handler
+     128. XSS Vulnerability in Chat/Input
+     129. Rate Limiting Command Spam
+     130. Analytics/Telemetrie Opt-Out
+     131. Error Reporting Payload Size
+     132. Dependency Version Resolving
+     133. Minification Variable Mangling
+     134. Source Map Resolving in Prod
+     135. Hot Module Replacement Status
+     136. Localization Missing Keys Check
+     137. Font Load Timeout Fallback
+     138. Texture Fallback Images (Missing/404)
+     139. CSS Variable Scope Bleeding
+     140. CSS Animation GPU Acceleration
+     141. Game Logic Determinism Check
+     142. Final Memory Heap Snapshot Compare
+     143. Arithmetic Robustness (NaN/Infinity Guards in Kern-Berechnungen)
+     144. State Transition Validation (Prüfung illegaler Zustandsübergänge)
+     145. Component Lifecycle Consistency (Initialisierungs- & Zerstörungslogik)
+     146. Data Transform Integrity (Validierung von Input-zu-Output Mappings)
+     147. Global Registry/Store Sync (Verhinderung von "Stale States" in Stores)
+
+   - **`npm run smoke:roundstate`** *(Smoke: RoundStateController - reine Node.js-Logik, kein Server nötig)*
+   - **`npm run smoke:selftrail`** *(Smoke: Trail-Kollision im Browser - baut und startet Dev-Server automatisch)*
+
 2. **Testergebnisse persistieren**: Speichere die Roh-Ergebnisse in `docs/Testergebnisse_YYYY-MM-DD.md` mit Datum im Dateinamen. Format pro Test: `✅ PASS` / `❌ FAIL` / `⚠️ WARN` + Kurzbeschreibung.
 
 3. **Analysebericht (Nur NEUE Funde)**: Analysiere die Ausgaben aller 125 Tests. Falls ein vorheriger `docs/Analysebericht.md` existiert, **vergleiche** die neuen Ergebnisse mit dem letzten Bericht und markiere was **neu**, **behoben** oder **verschlechtert** ist. Dokumentiere in `docs/Analysebericht.md` ausschließlich **neue** Probleme, Regressionsfehler oder bisher unentdeckte Engpässe.
