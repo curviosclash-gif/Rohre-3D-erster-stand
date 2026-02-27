@@ -1,55 +1,34 @@
 ---
-description: Vor jeder Aenderungssession den aktuellen Stand sichern
+description: Create a quick safety checkpoint before edits.
 ---
 
-## Vor einer Session: Stand sichern
-
-1. Git-Commit erstellen (sichert alles im Repo):
+## 1. Preferred backup
 
 ```bash
-git add -A && git commit -m "WIP: [Thema/Kontext]" -m "Bisherige Änderungen: [kurze Auflistung was geändert wurde und warum]"
+git add [scoped-files]
+git commit -m "WIP: [context]"
 ```
 
-1. Backup wichtiger JS-Dateien erstellen:
+- Confirm scope with `git diff --name-only` before creating WIP commit.
+
+## 2. Optional extra backup
 
 ```bash
 powershell -File backup.ps1
 ```
 
-1. Optional – Push auf GitHub (empfohlen für zusätzliche Sicherheit):
+- Push only after confirming there are no unrelated changes in the commit.
+
+## 3. Temporary alternative
 
 ```bash
-git push
-```
-
-## Schnelle Alternative: Git Stash
-
-Falls du nur kurz etwas testen willst ohne einen Commit zu machen:
-
-```bash
-# Änderungen zwischenspeichern (ohne Commit)
-git stash push -m "WIP: [Beschreibung]"
-
-# Später wiederherstellen
+git stash push -m "WIP: [context]"
 git stash pop
 ```
 
-## Nach einer Session: Aenderungen pruefen
-
-1. Aenderungen ansehen:
+## 4. Restore single file safely
 
 ```bash
-git diff --stat HEAD~1
+git restore --source=HEAD -- src/PATH/FILE.js
 ```
 
-1. Wenn etwas schiefgelaufen ist, eine Datei wiederherstellen:
-
-```bash
-git checkout -- js/modules/DATEINAME.js
-```
-
-## Regeln fuer PowerShell-Befehle
-
-- **Kein** Here-String (`@"..."@`) direkt als run_command-Argument — haengt sich auf
-- Stattdessen: Skript als `.ps1`-Datei schreiben, dann `powershell -File skript.ps1` aufrufen
-- Befehle mit `;` verketten vermeiden — lieber einzeln ausfuehren

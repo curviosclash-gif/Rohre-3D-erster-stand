@@ -1,74 +1,50 @@
 ---
-description: Toten Code finden, unbenutzte Dateien entfernen, Dokumentation aufräumen, Abhängigkeiten prüfen.
+description: Detect and remove dead code/files with safe dry-run first.
 ---
 
-## 1. Ungenutzten Code finden
+## 0. Detect
 
-Scanne das Projekt nach:
+- Unused exports:
+  - if `tsconfig.json` exists: `npx -y ts-unused-exports tsconfig.json`
+  - else: manual `rg` checks
+- Gather TODO/FIXME/HACK markers and large commented blocks.
+
+## 1. Inventory
+
+- Candidate file set:
+  - `git ls-files "src/**/*.js" "editor/js/**/*.js" "tests/**/*.js"`
+- Cross-check with actual imports/references.
+
+## 2. Security and deps
+
+- `npm outdated`
+- `npm audit`
+- Apply fixes selectively after impact check.
+
+## 3. Dry-run report (mandatory)
+
+- List candidate deletions/archives.
+- Add per-item risk rating.
+- No file deletion in dry-run.
+
+## 4. Execute after confirmation
+
+- Remove/archive approved items only.
+- Re-run relevant tests.
+
+## 5. Commit
 
 ```bash
-# Unbenutzte Exporte finden
-npx -y ts-unused-exports tsconfig.json 2>$null || echo "Manuell prüfen"
+git add [approved-files]
+git commit -m "chore: cleanup - remove dead code/files"
 ```
 
-Zusätzlich manuell prüfen:
+- Verify scope first: `git diff --name-only`.
+- Push only after confirming no unrelated files are included.
 
-- Funktionen die nirgends importiert/aufgerufen werden
-- Auskommentierter Code (> 5 Zeilen)
-- TODO/FIXME/HACK Kommentare sammeln
+## Report
 
----
+Use standard output format from `.agents/rules/reporting_format.md`.
 
-## 2. Unbenutzte Dateien finden
 
-```bash
-# Dateien die nirgends importiert werden
-git ls-files "js/**/*.js" | Sort-Object
-```
 
-Vergleiche mit den tatsächlichen Imports im Projekt. Zeige:
-
-```text
-🧹 CLEANUP-BERICHT
-═══════════════════
-Unbenutzte Dateien: [Liste oder "keine"]
-Toter Code: [X Stellen in Y Dateien]
-TODO/FIXME: [X offene Kommentare]
-Auskommentierter Code: [X Blöcke]
-```
-
----
-
-## 3. Dokumentation aufräumen
-
-Prüfe `docs/`:
-
-- Veraltete Pläne die archiviert werden können → `docs/archive/`
-- Widersprüche zwischen Dokumenten
-- Fehlende Aktualisierungen im Umsetzungsplan
-
----
-
-## 4. Abhängigkeiten & Sicherheit prüfen
-
-```bash
-npm outdated
-npm audit
-```
-
-Zeige veraltete Pakete und **behebe Sicherheitslücken** falls möglich (`npm audit fix`).
-
----
-
-## 5. Aufräumen durchführen
-
-Frage den User was gelöscht/archiviert werden soll. Dann:
-
-- Toten Code entfernen
-- Unbenutzte Dateien löschen
-- Veraltete Docs archivieren
-
-```bash
-git add -A && git commit -m "chore: Cleanup – toter Code und veraltete Dateien entfernt" -m "- [Was entfernt wurde und warum]"
-git push
-```

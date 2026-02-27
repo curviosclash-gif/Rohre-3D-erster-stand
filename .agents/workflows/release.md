@@ -1,83 +1,41 @@
 ---
-description: Build erstellen, Version hochzählen, Changelog generieren und Release auf GitHub pushen.
+description: Prepare and publish a safe release.
 ---
 
-## 1. Pre-Release Check
+## 0. Pre-check
 
-- Führe `npm run test:core` aus – alle Tests müssen bestehen.
-- Führe `npm audit` aus – keine kritischen Sicherheitslücken erlaubt.
-- Prüfe `git status` – keine uncommitteten Änderungen erlaubt.
-- Lies `docs/Umsetzungsplan.md` und zeige dem User welche Phasen seit dem letzten Release erledigt wurden.
+- `npm run test:core`
+- `npm audit` (no critical issues)
+- `git status` clean
 
----
+## 1. Versioning
 
-## 2. Version bestimmen
+- Read current version from `package.json`.
+- Choose patch/minor/major.
 
-Lies die aktuelle Version aus `package.json`. Frage den User:
+## 2. Changelog
 
-```text
-📦 RELEASE VORBEREITUNG
-═══════════════════════
-Aktuelle Version: X.Y.Z
-Erledigte Phasen seit letztem Release: [Liste]
+- Update `CHANGELOG.md` from `git log`.
+- Include new/changed/fixed sections.
 
-Welche neue Version?
-  1. Patch (X.Y.Z+1) – nur Bugfixes
-  2. Minor (X.Y+1.0) – neue Features, abwärtskompatibel
-  3. Major (X+1.0.0) – Breaking Changes
-```
+## 3. Build gate
 
----
+- `npm run build` must pass.
 
-## 3. Changelog generieren
-
-Erstelle/aktualisiere `CHANGELOG.md`:
-
-```markdown
-## [X.Y.Z] – DD.MM.YYYY
-
-### Neu
-- [Features aus erledigten Phasen]
-
-### Behoben
-- [Fixes aus erledigten Phasen]
-
-### Geändert
-- [Refactorings, Performance-Verbesserungen]
-```
-
-Nutze `git log --oneline [letzter-tag]..HEAD` als Quelle.
-
----
-
-## 4. Version hochzählen
-
-Aktualisiere die Versionsnummer in `package.json`.
-
----
-
-## 5. Build erstellen (Gate – schlägt fehl → Abbruch)
+## 4. Tag and push
 
 ```bash
-npm run build
+git add [release-files]
+git commit -m "release: v[X.Y.Z]"
+git tag -a v[X.Y.Z] -m "Release v[X.Y.Z]"
 ```
 
----
+- Verify scope first: `git diff --name-only`.
+- Push and tag push only after confirming release scope.
 
-## 6. Release-Commit & Tag
+## Report
 
-```bash
-git add -A && git commit -m "release: v[X.Y.Z]" -m "[Zusammenfassung der wichtigsten Änderungen]"
-git tag -a v[X.Y.Z] -m "Release v[X.Y.Z] – [Kurzbeschreibung]"
-git push && git push --tags
-```
+Use standard output format from `.agents/rules/reporting_format.md`.
 
----
 
-## 7. Abschluss
 
-Zeige dem User:
-
-- Release-Version
-- Changelog-Zusammenfassung
-- GitHub-Link zum Tag

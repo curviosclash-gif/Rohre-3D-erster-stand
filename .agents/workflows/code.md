@@ -1,89 +1,52 @@
 ---
-description: Setzt ein geplantes Feature oder Code-Erweiterung um – von der Implementierung bis zum Commit.
+description: Implement a planned change from coding to verification and commit.
 ---
 
-## 0. Kontext-Aufbau
+## 0. Context
 
-- Lies `docs/Umsetzungsplan.md` für den aktuellen Stand.
-- Prüfe ob ein Feature-Plan existiert (`docs/Feature_*.md`). Falls ja, nutze ihn als Grundlage.
-- Falls kein Plan existiert: Schlage vor, zuerst `/plan` auszuführen.
-- Lies `git log -n 3 --oneline` für den letzten Kontext.
+- Read `docs/Umsetzungsplan.md`.
+- Read latest context: `git log -n 3 --oneline`.
+- If available, use `docs/Feature_*.md` for scope.
 
----
+## 1. Scope
 
-## 1. Sicherung
+- Define target files and expected behavior.
+- If scope is clear, proceed directly.
+- Ask only for critical missing constraints.
 
-- Führe `/session-backup` aus oder erstelle einen WIP-Commit.
+## 2. Implement
 
----
+- Follow existing project patterns.
+- Avoid hardcoded config values.
+- Include cleanup/dispose for new runtime objects.
 
-## 2. Scope & Branching bestätigen
+## 3. Self-check
 
-Zeige dem User eine kompakte Übersicht:
+- `rg -n "console\\.log" src tests`
+- No open TODOs in changed code.
+- Run relevant tests for touched area.
 
-```text
-🔨 CODE-SESSION
-═══════════════
-Feature: [Name]
-Branch-Vorschlag: feature/[name-kleingeschrieben]
-Dateien: [Liste der zu ändernden/neuen Dateien]
-Geschätzte Komplexität: [Gering/Mittel/Hoch]
-```
+## 4. Definition of Done
 
-Warte auf Bestätigung. Falls gewünscht, Branch erstellen:
-`git checkout -b feature/[name]`
+- `npm run build` succeeds.
+- Relevant tests pass (minimum `npm run test:core` when applicable).
+- `git diff --name-only` matches planned scope.
+- Add one-line risk rating: low/medium/high.
 
----
-
-## 3. Implementierung
-
-Setze den Code um. Beachte dabei:
-
-- **Bestehende Patterns** im Projekt einhalten (prüfe ähnliche Module als Referenz)
-- **Config-Werte** in `Config.js` auslagern, nicht hart-coden
-- **Events/Callbacks** über bestehende Systeme dispatchen
-- **Cleanup/Dispose** immer mitdenken (Memory-Leaks vermeiden)
-
----
-
-## 4. Selbst-Review & Qualitaet
-
-Vor dem Commit prüfe:
-
-- [ ] Keine `console.log` Debug-Ausgaben vergessen? (`grep -r "console.log" js/`)
-- [ ] Keine offenen `TODO`s im neuen Code?
-- [ ] Dispose/Cleanup für neue Objekte vorhanden?
-- [ ] Config-Werte statt Magic Numbers?
-- [ ] Bestehende Tests noch lauffähig?
-
-Führe `npm run test:core` aus.
-
----
-
-## 5. Git-Commit & Push
+## 5. Commit
 
 ```bash
-git add -A && git commit -m "feat: [Feature-Name] – [Kurzbeschreibung]" -m "- Datei1.js: Was hinzugefügt (Warum)" -m "- Datei2.js: Was geändert (Warum)"
+git add [scoped-files]
+git commit -m "[type]: [name] - [short reason]"
 ```
 
-```bash
-git push
-```
+- `type` must match workflow intent (`feat`, `fix`, `refactor`, `perf`, `chore`, `release`).
+- Before push, show impacted files (`git diff --name-only`) and confirm scope if unrelated changes exist.
+- Push only after scope confirmation.
 
----
+## Report
 
-## 6. Dokumentation aktualisieren
+Use standard output format from `.agents/rules/reporting_format.md`.
 
-- Falls eine Phase in `docs/Umsetzungsplan.md` betroffen ist → auf `[x]` setzen + `Erledigt: DD.MM.YYYY`
-- Falls ein `docs/Feature_[Name].md` existiert → als erledigt markieren oder löschen
-- Aktualisiere `Stand:`-Datum im Umsetzungsplan
 
----
 
-## 7. Abschluss
-
-Zeige dem User:
-
-- Was wurde umgesetzt (Zusammenfassung)
-- Welche Dateien geändert/erstellt
-- Nächste Schritte / Vorschläge
