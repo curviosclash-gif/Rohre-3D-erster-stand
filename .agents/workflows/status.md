@@ -1,38 +1,27 @@
 ---
-description: Schnellübersicht über Projekt-Status, Umsetzungsplan und letzte Commits
+description: Quick project status snapshot.
 ---
 
-1. **Umsetzungsplan lesen**: Lies `docs/Umsetzungsplan.md` und zeige die Statusübersicht:
+## 1. Plan status
 
-```text
-📋 STATUSÜBERSICHT UMSETZUNGSPLAN
-═══════════════════════════════════
-✅ Phase 1: [Name] – erledigt (DD.MM.YYYY)
-✅ Phase 2: [Name] – erledigt (DD.MM.YYYY)
-🔧 Phase 3: [Name] – NÄCHSTE PHASE ← aktuell
-⬚  Phase 4: [Name] – offen
-...
-```
+- Read `docs/Umsetzungsplan.md`.
+- Identify next open phase.
 
-1. **Letzte Git-Commits anzeigen**:
+## 2. Git state
 
-```bash
-git log -n 5 --oneline --decorate
-```
+- `git log -n 5 --oneline --decorate`
+- `git status --short`
+- `git branch -a`
 
-1. **Offene Änderungen prüfen**:
+## 3. Output
 
-```bash
-git status --short
-```
+- Next phase
+- Uncommitted changes
+- Active branches
 
-1. **Branches anzeigen**:
+## Report
 
-```bash
-git branch -a
-```
+Use standard output format from `.agents/rules/reporting_format.md`.
 
-1. **Zusammenfassung ausgeben**: Fasse den aktuellen Stand in 2-3 Sätzen zusammen:
-   - Welche Phase ist als nächstes dran?
-   - Gibt es uncommittete Änderungen?
-   - Gibt es offene Branches?
+
+

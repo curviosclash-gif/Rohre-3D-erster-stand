@@ -1,101 +1,33 @@
 ---
-description: Spieler meldet ein Problem aus dem Spiel – Log-Analyse, Rückfragen bei Unklarheiten, dann gezielter Fix.
+description: Diagnose a reported issue and apply a targeted fix.
 ---
 
-## 0. Problembeschreibung aufnehmen
+## 0. Capture issue
 
-Fordere den Spieler auf, das Problem **so genau wie möglich** zu beschreiben:
+- Get exact symptom, timing, reproducibility, and error text.
+- Ask follow-up only if missing data blocks diagnosis.
 
-- Was genau ist passiert?
-- Wann ist es passiert? (Menü, Runde, nach Power-Up, etc.)
-- Ist es reproduzierbar?
-- Gab es eine Fehlermeldung oder einen Freeze?
+## 1. Analyze evidence
 
-Falls die Beschreibung unklar oder unvollständig ist: **Sofort nachfragen**, bevor du weiterarbeitest. Stelle gezielte Ja/Nein- oder Auswahlfragen.
+- Check latest logs and error traces.
+- Correlate timestamps with user scenario.
+- Extract likely failure path.
 
----
+## 2. Find root cause
 
-## 1. Session-Logs auswerten
+- Locate error pattern in code (`rg`).
+- Validate cause with minimal reproduction.
+- Note impacted files and side effects.
 
-Lies die aktuellsten Spiel-Logs:
+## 3. Fix
 
-```
-analysis/logs/session_1.log   ← aktuelle Session
-analysis/logs/session_2.log   ← vorherige Session (falls relevant)
-```
+- Apply smallest safe change for root cause.
+- Keep scope limited to affected files.
+- Re-run relevant checks (`build` + focused tests).
 
-Filtere gezielt nach:
+## Report
 
-- `[ERROR]` und `[WARN]` Einträgen
-- Zeitstempel, die zum beschriebenen Zeitpunkt passen
-- Auffälligkeiten: Crashes, Context Lost, fehlende Initialisierungen, wiederholte Neustarts
+Use standard output format from `.agents/rules/reporting_format.md`.
 
-Zeige dem User eine **Zusammenfassung** der relevanten Log-Einträge:
 
-```text
-🔍 LOG-ANALYSE
-═══════════════
-📅 Session: [Datum/Uhrzeit]
-⚠️  3x Context Lost zwischen 21:28 - 21:30
-❌ TypeError in EntityManager.js (Zeile ~420)
-ℹ️  Letzte erfolgreiche Runde: 21:25
-```
 
----
-
-## 2. Rückfragen bei Unklarheiten
-
-Falls die Logs das Problem **nicht eindeutig erklären** oder die Spielerbeschreibung nicht zu den Logs passt:
-
-- Frage gezielt nach: "Hast du zu dem Zeitpunkt X gemacht?"
-- Frage nach Browser/Gerät falls performance-relevant
-- Frage ob das Problem nach einem Reload weiterhin auftritt
-
-**Erst weiterarbeiten wenn die Ursache klar eingegrenzt ist.**
-
----
-
-## 3. Ursache lokalisieren
-
-Untersuche die betroffenen Dateien im Code:
-
-- Suche nach dem Fehler-Pattern aus den Logs (grep)
-- Prüfe die relevante(n) Datei(en) auf den Fehler
-- Dokumentiere kurz die Root-Cause
-
-Zeige dem User:
-
-```text
-🎯 URSACHE
-═══════════
-Datei:    src/EntityManager.js
-Problem:  [Beschreibung]
-Auswirkung: [Was der Spieler sieht]
-```
-
----
-
-## 4. Fix umsetzen
-
-Erstelle den Fix mit `/code` Workflow-Logik:
-
-- Commit-Prefix: `fix:`
-- Scope: nur die betroffene(n) Datei(en)
-- Teste ob das Problem behoben ist (Build-Check)
-
----
-
-## 5. Bestätigung
-
-Gib dem User eine kurze Zusammenfassung:
-
-```text
-✅ BUGFIX ABGESCHLOSSEN
-═══════════════════════
-Problem:  [Kurzbeschreibung]
-Ursache:  [Root-Cause]
-Fix:      [Was geändert wurde]
-Commit:   [Hash + Message]
-```
-
-Frage: **"Kannst du das Spiel nochmal testen und prüfen ob das Problem weg ist?"**

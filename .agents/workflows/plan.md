@@ -1,80 +1,42 @@
 ---
-description: Plant ein neues Feature oder eine Code-Erweiterung – von der Idee bis zum fertigen Umsetzungsplan.
+description: Create a compact implementation plan for a new feature or extension.
 ---
 
-## 0. Kontext-Aufbau
+## 0. Context
 
-- Lies `docs/Umsetzungsplan.md` für den aktuellen Projekt-Stand.
-- Lies `git log -n 5 --oneline` für den letzten Kontext.
-- Scanne die Projektstruktur (`js/modules/`) um die bestehende Architektur zu verstehen.
+- Read `docs/Umsetzungsplan.md`.
+- Read `git log -n 5 --oneline`.
+- Scan impacted modules in `src/`, `tests/`, `editor/js/`.
 
----
+## 1. Clarify (only if critical)
 
-## 1. Anforderung klären
+- What should be built?
+- Why does it matter?
+- Which area/module is affected?
 
-Frage den User (falls nicht klar):
+## 2. Architecture check
 
-- **Was** soll gebaut werden? (Feature-Beschreibung)
-- **Warum**? (Motivation/Problem das gelöst wird)
-- **Wo** im Spiel? (Welche bestehenden Module sind betroffen?)
+- Existing modules/interfaces/events
+- Reuse vs new file decision
+- Risk rating (low/medium/high)
 
----
+## 3. Write plan
 
-## 2. Architektur-Analyse
+Create `docs/Feature_[Name].md` with:
 
-Untersuche die betroffenen Dateien:
+- Goal
+- Affected files
+- Steps
+- Verification
 
-- Welche Module existieren bereits?
-- Welche Schnittstellen/Events gibt es?
-- Wo muss neuer Code ansetzen vs. bestehenden erweitern?
+## 4. Update master plan
 
-Zeige dem User eine kurze **Übersicht**:
+- Add focused phase(s) in `docs/Umsetzungsplan.md` only if needed.
+- Keep phases small and single-purpose.
 
-```text
-🏗️ ARCHITEKTUR-ANALYSE
-═══════════════════════
-Betroffene Module: [Liste]
-Neue Dateien: [Liste oder "keine"]
-Abhängigkeiten: [Liste]
-Risiko: [Gering/Mittel/Hoch]
-```
+## Report
 
----
+Use standard output format from `.agents/rules/reporting_format.md`.
 
-## 3. Plan erstellen
 
-Erstelle `docs/Feature_[Name].md` mit:
 
-```markdown
-# Feature: [Name]
-
-## Beschreibung
-Was und warum.
-
-## Betroffene Dateien
-- `js/modules/Datei.js` – Was wird geändert
-- `js/modules/NeueDatei.js` – [NEU] Was wird erstellt
-
-## Umsetzungsschritte
-1. Schritt 1
-2. Schritt 2
-...
-
-## Verifikation
-Wie wird getestet, dass es funktioniert?
-```
-
----
-
-## 4. Umsetzungsplan aktualisieren
-
-Falls das Feature groß genug ist:
-
-- Füge eine oder mehrere neue Phasen in `docs/Umsetzungsplan.md` hinzu
-- **WICHTIG:** Halte Phasen extrem klein und fokussiert (Atomic Commits Prinzip). Mische niemals z.B. UI-Arbeiten mit Core-Engine-Arbeiten in der gleichen Phase. Teile große Features in Phase X.1, Phase X.2 usw. auf.
-- Format: `## Phase X: [ ] Feature-Name`
-- Mit Unterpunkten für jeden Umsetzungsschritt
-
-## 5. User-Bestätigung
-
-Zeige den Plan und frage: **Soll ich mit `/code` die Umsetzung starten?**

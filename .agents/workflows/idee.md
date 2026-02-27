@@ -1,70 +1,31 @@
 ---
-description: Strukturiert eine grobe Spielidee zu einem durchdachten Feature-Konzept mit Bewertung und nächsten Schritten.
+description: Turn a rough idea into a scoped, evaluable concept.
 ---
 
-## 1. Idee aufnehmen
+## 0. Capture
 
-Frage den User nach der groben Idee. Falls nötig, stelle Rückfragen:
+- What is the idea?
+- What player value should it create?
+- Any reference examples?
 
-- **Was** schwebt dir vor? (Kurzbeschreibung)
-- **Für wen?** (Spieler-Erlebnis: Spaß, Taktik, Optik, Performance?)
-- **Inspiration?** (Gibt es Vorbilder aus anderen Spielen?)
+## 1. Create concept doc
 
----
+Create `docs/Ideen/[Name].md` with:
 
-## 2. Idee ausarbeiten
+- Description
+- Gameplay impact
+- Scope and affected modules
+- Variants (minimal, standard, full)
+- Open questions
+- Score (fun, feasibility, fit)
 
-Erstelle `docs/Ideen/[Name].md` mit folgender Struktur:
+## 2. Decision
 
-```markdown
-# Idee: [Name]
+- Discard
+- Backlog
+- Plan for implementation
 
-Erstellt: DD.MM.YYYY
-Status: 💡 Konzept
+## 3. Next action
 
-## Beschreibung
-Was ist das Feature? Wie erlebt es der Spieler?
+- If approved: start `/plan`.
 
-## Gameplay-Wirkung
-- Wie verändert es das Spielgefühl?
-- Interaktion mit bestehenden Mechaniken (Power-Ups, Bots, Arenen)?
-
-## Umfang
-- Geschätzte Komplexität: [Klein / Mittel / Groß]
-- Betroffene Module: [grobe Liste]
-- Neue Assets nötig? [Ja/Nein – welche?]
-
-## Varianten
-- **Variante A**: [Einfachste Umsetzung]
-- **Variante B**: [Erweiterte Version]
-- **Variante C**: [Volle Vision]
-
-## Offene Fragen
-- [Was ist noch unklar?]
-
-## Bewertung
-| Kriterium | Wertung (1-5) |
-|-----------|:---:|
-| Spielspaß | ? |
-| Umsetzbarkeit | ? |
-| Passt zum Spiel | ? |
-| **Gesamt** | **?** |
-```
-
----
-
-## 3. Gemeinsam bewerten
-
-Gehe die **Bewertungstabelle** mit dem User durch und fülle sie aus. Diskutiere Varianten – welche ist realistisch, welche ist die "Traumversion"?
-
----
-
-## 4. Entscheidung & nächste Schritte
-
-Frage den User:
-
-- **🗑️ Verwerfen** → Datei bleibt als Archiv, Status auf `❌ Verworfen`
-- **💤 Backlog** → Status auf `📋 Backlog`, wird später aufgegriffen
-- **🚀 Umsetzen** → Status auf `🚀 Geplant`, schlage vor:
-  - `/plan` zum technischen Plan erstellen
-  - Oder direkt neue Phase im Umsetzungsplan anlegen
