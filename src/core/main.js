@@ -78,6 +78,7 @@ export class Game {
         this.settingsProfiles = this._loadProfiles();
         this.activeProfileName = '';
         this.settingsDirty = false;
+        this.config = CONFIG;
 
         this.state = 'MENU';
         this.roundPause = 0;

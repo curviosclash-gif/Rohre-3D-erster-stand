@@ -1,15 +1,15 @@
 /** Seite laden und auf Hauptmenü warten */
 export async function loadGame(page) {
-    await page.goto('/');
+    await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 45000 });
     await page.waitForSelector('#main-menu', { state: 'visible', timeout: 10000 });
 }
 
 /** Spiel starten (Standardkonfiguration) */
 export async function startGame(page) {
     await loadGame(page);
-    await page.click('[data-submenu="submenu-game"]');
+    await page.click('#menu-nav [data-submenu="submenu-game"]');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 3000 });
-    await page.click('#btn-start');
+    await page.click('#submenu-game:not(.hidden) #btn-start');
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
         return hud && !hud.classList.contains('hidden');
@@ -23,14 +23,14 @@ export async function startGame(page) {
 /** Spiel mit N Bots starten */
 export async function startGameWithBots(page, botCount = 1) {
     await loadGame(page);
-    await page.click('[data-submenu="submenu-game"]');
+    await page.click('#menu-nav [data-submenu="submenu-game"]');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 3000 });
     await page.evaluate((count) => {
         const slider = document.getElementById('bot-count');
         slider.value = String(count);
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     }, botCount);
-    await page.click('#btn-start');
+    await page.click('#submenu-game:not(.hidden) #btn-start');
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
         return hud && !hud.classList.contains('hidden');

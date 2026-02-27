@@ -120,6 +120,8 @@ export class Player {
 
         this.vehicleMesh = null;
         this._vehicleBounds = { minZ: -1.95, maxZ: 1.9, sizeY: 1.0 };
+        this._onVehicleLoaded = null;
+        this._vehicleLoadedTarget = null;
 
         // Kamera-Modus
         this.cameraMode = 0;
@@ -137,14 +139,18 @@ export class Player {
         // Create vehicle mesh from registry
         this.vehicleMesh = createVehicleMesh(this.vehicleId, this.color);
         this.group.add(this.vehicleMesh);
+        const mesh = this.vehicleMesh;
 
         const updateBox = () => {
-            if (this.vehicleMesh.localBox) {
-                this.hitboxBox.copy(this.vehicleMesh.localBox);
+            const currentMesh = this.vehicleMesh;
+            if (!currentMesh || currentMesh !== mesh || !this.group) return;
+
+            if (currentMesh.localBox) {
+                this.hitboxBox.copy(currentMesh.localBox);
             } else {
-                this.vehicleMesh.updateMatrixWorld(true);
-                const invMatrix = this._tmpMat.copy(this.vehicleMesh.matrixWorld).invert();
-                this.hitboxBox.setFromObject(this.vehicleMesh).applyMatrix4(invMatrix);
+                currentMesh.updateMatrixWorld(true);
+                const invMatrix = this._tmpMat.copy(currentMesh.matrixWorld).invert();
+                this.hitboxBox.setFromObject(currentMesh).applyMatrix4(invMatrix);
             }
 
             // Kraftfeld-Box an OBB anpassen
@@ -160,8 +166,10 @@ export class Player {
             }
         };
 
-        if (this.vehicleMesh.addEventListener) {
-            this.vehicleMesh.addEventListener('loaded', updateBox);
+        if (mesh?.addEventListener) {
+            this._onVehicleLoaded = updateBox;
+            this._vehicleLoadedTarget = mesh;
+            mesh.addEventListener('loaded', updateBox);
         }
         updateBox();
 
@@ -639,6 +647,11 @@ export class Player {
     }
 
     dispose() {
+        if (this._vehicleLoadedTarget?.removeEventListener && this._onVehicleLoaded) {
+            this._vehicleLoadedTarget.removeEventListener('loaded', this._onVehicleLoaded);
+        }
+        this._onVehicleLoaded = null;
+        this._vehicleLoadedTarget = null;
         this.trail.dispose();
         if (this.group) {
             this.renderer.removeFromScene(this.group);

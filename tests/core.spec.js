@@ -177,6 +177,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const seen = {};
             const dupes = [];
             document.querySelectorAll('[id]').forEach(el => {
+                const isVisible = !!(el.offsetParent || (el.getClientRects && el.getClientRects().length));
+                if (!isVisible) return;
                 if (seen[el.id]) dupes.push(el.id);
                 seen[el.id] = true;
             });

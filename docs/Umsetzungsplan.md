@@ -102,11 +102,13 @@ Erledigt: 27.02.2026
   - Durchschnittliche Bot-Ueberlebenszeit: 53.04s
   - Detailreport: `docs/Testergebnisse_Phase4b_2026-02-27.md` und `data/bot_validation_report.json`
 
-## Phase 5: [ ] Test-Runtime & Headless Fehler (P1)
+## Phase 5: [x] Test-Runtime & Headless Fehler (P1)
+
+Erledigt: 27.02.2026
 
 - **Ziele:**
-  1. Fehlende Helper-Werte (`derivedSkipRecent`) für Fahrzeuge im `smoke:selftrail` Script analysieren und korrigieren.
-  2. Fehlende HUD-Anzeige (T7) im Headless-Mode/Playwright fixen.
-  3. Arena-Generierung (T10) im Headless-Mode/Playwright fixen.
-- **Dateien:** `scripts/self-trail-debug-smoke.mjs`, `src/entities/Player.js` (Fahrzeug-Setup), `tests/core.spec.js`, `src/core/main.js`
-- **Verifikation:** `npm run test:core` und `npm run smoke:selftrail` laufen beide komplett ohne Fehler durch.
+  1. [x] Fehlende Helper-Werte (`derivedSkipRecent`) für Fahrzeuge im `smoke:selftrail` Script analysieren und korrigieren.
+  2. [x] Fehlende HUD-Anzeige (T7) im Headless-Mode/Playwright fixen.
+  3. [x] Arena-Generierung (T10) im Headless-Mode/Playwright fixen.
+- **Dateien:** `scripts/self-trail-debug-smoke.mjs`, `src/entities/Player.js`, `tests/helpers.js`, `tests/core.spec.js`, `src/core/main.js`, `playwright.config.js`
+- **Verifikation:** `npm run smoke:selftrail`, `npm run test:core`, `npm run test:physics`, `npm run build` (alle grün am 27.02.2026).

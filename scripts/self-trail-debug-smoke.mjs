@@ -330,7 +330,7 @@ async function main() {
 
                 let derivedSkipRecent = null;
                 try {
-                    const entityManagerModule = await import('/js/modules/EntityManager.js');
+                    const entityManagerModule = await import('/src/entities/EntityManager.js');
                     if (typeof entityManagerModule?.deriveSelfTrailSkipRecentSegments === 'function') {
                         const value = entityManagerModule.deriveSelfTrailSkipRecentSegments(player);
                         derivedSkipRecent = Number.isFinite(value) ? value : null;
