@@ -26,8 +26,8 @@ Create `implementation_plan.md`:
 ## 3. Execute
 
 - Run `/code` workflow with `fix:` commit prefix.
-- Apply DoD gate: build + relevant tests + `git diff --name-only` scope check.
-- Use commit message type `fix`.
+- Keep this workflow focused on phase management only.
+- Use `/code` as the single source of truth for implementation DoD and verification checks.
 
 ## 4. Close phase
 

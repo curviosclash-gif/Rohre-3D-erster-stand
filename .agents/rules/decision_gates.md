@@ -7,3 +7,4 @@ description: Rule for when to ask and when to proceed
 - If multiple options are valid, provide a short recommendation and proceed with the safest default unless the user asks to choose first.
 - Use explicit confirmation for destructive operations, data deletion, schema changes, or irreversible migrations.
 - Keep clarification questions concrete and answerable (yes/no or short option list).
+- For non-destructive design decisions (e.g., helper naming, local refactor shape), prioritize proactive execution with a brief rationale over blocking questions.

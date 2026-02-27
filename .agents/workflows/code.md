@@ -24,12 +24,13 @@ description: Implement a planned change from coding to verification and commit.
 
 - `rg -n "console\\.log" src tests`
 - No open TODOs in changed code.
-- Run relevant tests for touched area.
+- Select tests via `.agents/test_mapping.md` based on changed paths.
+- If no mapping matches, run `npm run test:core` as default safety check.
 
 ## 4. Definition of Done
 
 - `npm run build` succeeds.
-- Relevant tests pass (minimum `npm run test:core` when applicable).
+- Mapped tests (from `.agents/test_mapping.md`) pass.
 - `git diff --name-only` matches planned scope.
 - Add one-line risk rating: low/medium/high.
 
