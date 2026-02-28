@@ -20,7 +20,7 @@ export class HUD {
         this.headingValue = this.container.querySelector('#' + (playerIndex === 0 ? 'p1' : 'p2') + '-hud-heading');
         this.lockReticle = this.container.querySelector('.hud-lock-reticle');
         this.lockDist = this.lockReticle.querySelector('.lock-dist');
-        this.boostFill = this.container.querySelector('#' + (playerIndex === 0 ? 'p1' : 'p2') + '-hud-boost-fill');
+        this.boostFill = document.getElementById((playerIndex === 0 ? 'p1' : 'p2') + '-hud-boost-fill');
 
         // Tapes (Scales)
         this.speedScale = this.container.querySelector('#' + (playerIndex === 0 ? 'p1' : 'p2') + '-hud-speed-scale');

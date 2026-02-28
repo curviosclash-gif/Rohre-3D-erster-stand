@@ -1117,6 +1117,7 @@ input[type="range"]::-webkit-slider-thumb {
     overflow: hidden;
     display: flex;
     align-items: center;
+    z-index: 100;
 }
 
 .hud-boost-bar .boost-label {
