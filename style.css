@@ -1091,6 +1091,7 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
     *,
     *::before,
     *::after {
@@ -1099,4 +1100,44 @@ input[type="range"]::-webkit-slider-thumb {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* ============================================
+   BOOST HUD
+   ============================================ */
+.hud-boost-bar {
+    position: relative;
+    margin-top: 10px;
+    width: 150px;
+    /* etwas kuerzer passend fuer das info div */
+    height: 12px;
+    background: rgba(8, 22, 14, 0.4);
+    border: 1px solid rgba(141, 255, 159, 0.55);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.hud-boost-bar .boost-label {
+    position: absolute;
+    left: auto;
+    right: 105%;
+    font-size: 10px;
+    color: #8dff9f;
+    letter-spacing: 1px;
+}
+
+.hud-boost-bar .boost-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #0088ff, #00ffff);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.6);
+    transition: width 0.1s linear, background 0.3s ease;
+}
+
+/* Wenn Boost Cooldown hat, aendere die Farbe */
+.hud-boost-bar .boost-fill.cooldown {
+    background: linear-gradient(90deg, #883333, #ff4444);
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
 }

@@ -121,8 +121,23 @@ export class HUD {
             return;
         }
 
-        // Only show in specific camera modes (e.g. FIRST_PERSON)
-        // Check game logic or pass camera mode
+        // --- Boost Bar Update (immer sichtbar) ---
+        if (this.boostFill) {
+            if (player.isBoosting) {
+                const pct = (player.boostTimer / CONFIG.PLAYER.BOOST_DURATION) * 100;
+                this.boostFill.style.width = `${Math.max(0, pct)}%`;
+                this.boostFill.classList.remove('cooldown');
+            } else if (player.boostCooldown > 0) {
+                const pct = (1 - player.boostCooldown / CONFIG.PLAYER.BOOST_COOLDOWN) * 100;
+                this.boostFill.style.width = `${Math.min(100, pct)}%`;
+                this.boostFill.classList.add('cooldown');
+            } else {
+                this.boostFill.style.width = '100%';
+                this.boostFill.classList.remove('cooldown');
+            }
+        }
+
+        // Only show fighter flight instruments in FIRST_PERSON
         const camMode = CONFIG.CAMERA.MODES[player.cameraMode];
         if (camMode !== 'FIRST_PERSON') {
             this.setVisibility(false);
@@ -130,6 +145,7 @@ export class HUD {
         }
 
         this.setVisibility(true);
+
 
         // 1. Attitude (Pitch + Heading)
         // Horizon stays stabilized instead of rolling with camera.
@@ -229,20 +245,5 @@ export class HUD {
             this.lockReticle.classList.add('hidden');
         }
 
-        // 5. Boost Bar
-        if (this.boostFill) {
-            if (player.isBoosting) {
-                const pct = (player.boostTimer / CONFIG.PLAYER.BOOST_DURATION) * 100;
-                this.boostFill.style.width = `${Math.max(0, pct)}%`;
-                this.boostFill.classList.remove('cooldown');
-            } else if (player.boostCooldown > 0) {
-                const pct = (1 - player.boostCooldown / CONFIG.PLAYER.BOOST_COOLDOWN) * 100;
-                this.boostFill.style.width = `${Math.min(100, pct)}%`;
-                this.boostFill.classList.add('cooldown');
-            } else {
-                this.boostFill.style.width = '100%';
-                this.boostFill.classList.remove('cooldown');
-            }
-        }
     }
 }
