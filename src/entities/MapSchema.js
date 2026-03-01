@@ -73,7 +73,7 @@ function sanitizeBlock(raw) {
     const width = asPositiveNumber(source.width, legacySize * 2, 1);
     const depth = asPositiveNumber(source.depth, legacySize * 2, 1);
     const height = asPositiveNumber(source.height, legacySize * 2, 1);
-    return withOptionalId({
+    const result = withOptionalId({
         x: asFiniteNumber(source.x, 0),
         y: asFiniteNumber(source.y, 0),
         z: asFiniteNumber(source.z, 0),
@@ -83,6 +83,17 @@ function sanitizeBlock(raw) {
         size: asPositiveNumber(source.size, Math.max(width, depth, height) * 0.5, 1),
         rotateY: asFiniteNumber(source.rotateY, 0),
     }, source.id);
+
+    if (source.tunnel && typeof source.tunnel === 'object') {
+        result.tunnel = {
+            radius: asPositiveNumber(source.tunnel.radius, Math.min(width, height, depth) * 0.3, 0.1),
+            axis: source.tunnel.axis === 'x' || source.tunnel.axis === 'y' || source.tunnel.axis === 'z'
+                ? source.tunnel.axis
+                : 'z',
+        };
+    }
+
+    return result;
 }
 
 function sanitizeTunnel(raw) {
@@ -271,7 +282,7 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
 
     const obstacles = [];
     const pushBlockAsObstacle = (block, kind = 'hard') => {
-        obstacles.push({
+        const obstacle = {
             pos: [
                 block.x * invScale,
                 block.y * invScale,
@@ -283,14 +294,23 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
                 block.depth * invScale,
             ],
             kind,
-        });
+        };
+        if (block.tunnel && typeof block.tunnel === 'object') {
+            obstacle.tunnel = {
+                radius: asPositiveNumber(block.tunnel.radius, Math.min(block.width, block.height, block.depth) * 0.3, 0.1) * invScale,
+                axis: block.tunnel.axis === 'x' || block.tunnel.axis === 'y' || block.tunnel.axis === 'z'
+                    ? block.tunnel.axis
+                    : 'z',
+            };
+        }
+        obstacles.push(obstacle);
     };
 
     normalized.hardBlocks.forEach((block) => pushBlockAsObstacle(block, 'hard'));
     normalized.foamBlocks.forEach((block) => pushBlockAsObstacle(block, 'foam'));
 
     if (normalized.tunnels.length > 0) {
-        warnings.push('Tunnels are currently ignored by the game runtime.');
+        warnings.push('Standalone tunnels[] entries are currently ignored by the game runtime.');
     }
     if (normalized.items.length > 0) {
         warnings.push('Items are currently ignored by the game runtime.');

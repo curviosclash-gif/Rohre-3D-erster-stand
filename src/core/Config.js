@@ -1,4 +1,4 @@
-// ============================================
+﻿// ============================================
 // Config.js - Zentrale Spielkonfiguration
 // ============================================
 
@@ -543,33 +543,33 @@ export const CONFIG = {
                 // --- Horizontale Wände (E-W laufend, dünn in Z) ---
 
                 // Z=-30 (Reihe 1→2)
-                { pos: [-40, 12, -30], size: [20, 24, 3] },     // ↑ Boden: A1↔A2 blockiert
-                { pos: [0, 23, -30], size: [20, 24, 3] },       // ↓ Decke: C1↔C2 blockiert
+                { pos: [-40, 12, -30], size: [20, 24, 3], tunnel: { radius: 4.0, axis: 'z' } },     // ↑ Boden: A1↔A2 blockiert
+                { pos: [0, 23, -30], size: [20, 24, 3], tunnel: { radius: 3.8, axis: 'z' } },       // ↓ Decke: C1↔C2 blockiert
                 { pos: [40, 12, -30], size: [20, 24, 3] },      // ↑ Boden: E1↔E2 blockiert
 
                 // Z=-10 (Reihe 2→3)
                 { pos: [-20, 23, -10], size: [20, 24, 3] },     // ↓ Decke: B2↔B3 blockiert
-                { pos: [20, 12, -10], size: [20, 24, 3] },      // ↑ Boden: D2↔D3 blockiert
+                { pos: [20, 12, -10], size: [20, 24, 3], tunnel: { radius: 4.2, axis: 'z' } },      // ↑ Boden: D2↔D3 blockiert
 
                 // Z=10 (Reihe 3→4)
                 { pos: [-40, 12, 10], size: [20, 24, 3] },      // ↑ Boden: A3↔A4 blockiert
-                { pos: [0, 23, 10], size: [20, 24, 3] },        // ↓ Decke: C3↔C4 blockiert
+                { pos: [0, 23, 10], size: [20, 24, 3], tunnel: { radius: 3.6, axis: 'z' } },        // ↓ Decke: C3↔C4 blockiert
                 { pos: [20, 12, 10], size: [20, 24, 3] },       // ↑ Boden: D3↔D4 blockiert
 
                 // Z=30 (Reihe 4→5)
-                { pos: [-20, 23, 30], size: [20, 24, 3] },      // ↓ Decke: B4↔B5 blockiert
+                { pos: [-20, 23, 30], size: [20, 24, 3], tunnel: { radius: 4.0, axis: 'z' } },      // ↓ Decke: B4↔B5 blockiert
                 { pos: [0, 12, 30], size: [20, 24, 3] },        // ↑ Boden: C4↔C5 blockiert
 
                 // --- Vertikale Wände (N-S laufend, dünn in X) ---
 
                 // X=-30 (Spalte A↔B)
                 { pos: [-30, 23, -40], size: [3, 24, 20] },     // ↓ Decke: A1↔B1 blockiert
-                { pos: [-30, 12, 0], size: [3, 24, 20] },       // ↑ Boden: A3↔B3 blockiert
+                { pos: [-30, 12, 0], size: [3, 24, 20], tunnel: { radius: 4.2, axis: 'x' } },       // ↑ Boden: A3↔B3 blockiert
                 { pos: [-30, 23, 20], size: [3, 24, 20] },      // ↓ Decke: A4↔B4 blockiert
 
                 // X=-10 (Spalte B↔C)
                 { pos: [-10, 12, -20], size: [3, 24, 20] },     // ↑ Boden: B2↔C2 blockiert
-                { pos: [-10, 23, 20], size: [3, 24, 20] },      // ↓ Decke: B4↔C4 blockiert
+                { pos: [-10, 23, 20], size: [3, 24, 20], tunnel: { radius: 3.8, axis: 'x' } },      // ↓ Decke: B4↔C4 blockiert
                 { pos: [-10, 12, 40], size: [3, 24, 20] },      // ↑ Boden: B5↔C5 blockiert
 
                 // X=10 (Spalte C↔D)
@@ -578,7 +578,7 @@ export const CONFIG = {
 
                 // X=30 (Spalte D↔E)
                 { pos: [30, 12, -20], size: [3, 24, 20] },      // ↑ Boden: D2↔E2 blockiert
-                { pos: [30, 23, 0], size: [3, 24, 20] },        // ↓ Decke: D3↔E3 blockiert
+                { pos: [30, 23, 0], size: [3, 24, 20], tunnel: { radius: 4.0, axis: 'x' } },        // ↓ Decke: D3↔E3 blockiert
                 { pos: [30, 12, 30], size: [3, 24, 20] },       // ↑ Boden: D5↔E5 blockiert (Sackgasse)
 
                 // --- Orientierungs-Pfeiler (Boden→Decke durchgehend) ---
@@ -592,6 +592,105 @@ export const CONFIG = {
                 { a: [40, 5, -40], b: [-40, 30, 40], color: 0xff66ff },    // NO unten → SW oben
                 { a: [-40, 30, 0], b: [40, 5, 0], color: 0xffaa00 },      // W oben → O unten
                 { a: [0, 5, -40], b: [0, 30, 40], color: 0x44ff88 },      // N unten → S oben
+            ]
+        },
+        mega_maze_xl: {
+            name: 'Mega-Labyrinth XL',
+            size: [200, 45, 200],
+            obstacles: [
+                // 10x10 Grid, 20er Zellen, Boden(↑Y=11,H=22)/Decke(↓Y=34,H=22)
+                // Zellzentren: -90,-70,-50,-30,-10,10,30,50,70,90
+                // Wandlinien: -80,-60,-40,-20,0,20,40,60,80
+
+                // ===== Horizontale Wände (E-W, dünn in Z) =====
+                // Z=-80
+                { pos: [-60, 11, -80], size: [60, 22, 3], tunnel: { radius: 4.5, axis: 'z' } },     // ↑ Boden
+                { pos: [20, 34, -80], size: [60, 22, 3], tunnel: { radius: 4.2, axis: 'z' } },      // ↓ Decke
+                { pos: [80, 11, -80], size: [20, 22, 3] },      // ↑ Boden
+                // Z=-60
+                { pos: [-60, 34, -60], size: [20, 22, 3] },     // ↓ Decke
+                { pos: [0, 11, -60], size: [20, 22, 3], tunnel: { radius: 3.8, axis: 'z' } },       // ↑ Boden
+                { pos: [70, 34, -60], size: [40, 22, 3] },      // ↓ Decke
+                // Z=-40
+                { pos: [-80, 11, -40], size: [20, 22, 3] },     // ↑ Boden
+                { pos: [-10, 34, -40], size: [40, 22, 3], tunnel: { radius: 4.4, axis: 'z' } },     // ↓ Decke
+                { pos: [50, 11, -40], size: [40, 22, 3] },      // ↑ Boden
+                // Z=-20
+                { pos: [-30, 34, -20], size: [40, 22, 3] },     // ↓ Decke
+                { pos: [20, 11, -20], size: [20, 22, 3] },      // ↑ Boden
+                { pos: [80, 34, -20], size: [20, 22, 3] },      // ↓ Decke
+                // Z=0
+                { pos: [-80, 11, 0], size: [20, 22, 3] },       // ↑ Boden
+                { pos: [-20, 34, 0], size: [20, 22, 3] },       // ↓ Decke
+                { pos: [50, 11, 0], size: [40, 22, 3], tunnel: { radius: 4.6, axis: 'z' } },        // ↑ Boden
+                // Z=20
+                { pos: [-50, 34, 20], size: [40, 22, 3] },      // ↓ Decke
+                { pos: [30, 11, 20], size: [40, 22, 3], tunnel: { radius: 4.2, axis: 'z' } },       // ↑ Boden
+                { pos: [80, 34, 20], size: [20, 22, 3] },       // ↓ Decke
+                // Z=40
+                { pos: [-70, 11, 40], size: [40, 22, 3] },      // ↑ Boden
+                { pos: [10, 34, 40], size: [40, 22, 3], tunnel: { radius: 4.0, axis: 'z' } },       // ↓ Decke
+                { pos: [60, 11, 40], size: [20, 22, 3] },       // ↑ Boden
+                // Z=60
+                { pos: [-40, 34, 60], size: [20, 22, 3] },      // ↓ Decke
+                { pos: [0, 11, 60], size: [20, 22, 3] },        // ↑ Boden
+                { pos: [70, 34, 60], size: [40, 22, 3], tunnel: { radius: 4.8, axis: 'z' } },       // ↓ Decke
+                // Z=80
+                { pos: [-70, 11, 80], size: [40, 22, 3] },      // ↑ Boden
+                { pos: [-10, 34, 80], size: [40, 22, 3], tunnel: { radius: 4.1, axis: 'z' } },      // ↓ Decke
+                { pos: [60, 11, 80], size: [20, 22, 3] },       // ↑ Boden
+
+                // ===== Vertikale Wände (N-S, dünn in X) =====
+                // X=-80
+                { pos: [-80, 34, -70], size: [3, 22, 40] },     // ↓ Decke
+                { pos: [-80, 11, 10], size: [3, 22, 40], tunnel: { radius: 4.4, axis: 'x' } },      // ↑ Boden
+                { pos: [-80, 34, 70], size: [3, 22, 40] },      // ↓ Decke
+                // X=-60
+                { pos: [-60, 11, -50], size: [3, 22, 40] },     // ↑ Boden
+                { pos: [-60, 34, 30], size: [3, 22, 40] },      // ↓ Decke
+                { pos: [-60, 11, 80], size: [3, 22, 20] },      // ↑ Boden
+                // X=-40
+                { pos: [-40, 34, -80], size: [3, 22, 20] },     // ↓ Decke
+                { pos: [-40, 11, -10], size: [3, 22, 40], tunnel: { radius: 4.0, axis: 'x' } },     // ↑ Boden
+                { pos: [-40, 34, 50], size: [3, 22, 40] },      // ↓ Decke
+                // X=-20
+                { pos: [-20, 11, -30], size: [3, 22, 40] },     // ↑ Boden
+                { pos: [-20, 34, 40], size: [3, 22, 20] },      // ↓ Decke
+                { pos: [-20, 11, 80], size: [3, 22, 20] },      // ↑ Boden
+                // X=0
+                { pos: [0, 34, -70], size: [3, 22, 40] },       // ↓ Decke
+                { pos: [0, 11, 0], size: [3, 22, 20] },         // ↑ Boden
+                { pos: [0, 34, 70], size: [3, 22, 40] },        // ↓ Decke
+                // X=20
+                { pos: [20, 11, -60], size: [3, 22, 20] },      // ↑ Boden
+                { pos: [20, 34, 10], size: [3, 22, 40], tunnel: { radius: 4.6, axis: 'x' } },       // ↓ Decke
+                { pos: [20, 11, 60], size: [3, 22, 20] },       // ↑ Boden
+                // X=40
+                { pos: [40, 34, -60], size: [3, 22, 60] },      // ↓ Decke
+                { pos: [40, 11, 30], size: [3, 22, 40] },       // ↑ Boden
+                { pos: [40, 34, 80], size: [3, 22, 20] },       // ↓ Decke
+                // X=60
+                { pos: [60, 11, -30], size: [3, 22, 40], tunnel: { radius: 4.3, axis: 'x' } },      // ↑ Boden
+                { pos: [60, 34, 50], size: [3, 22, 40] },       // ↓ Decke
+                // X=80
+                { pos: [80, 11, -70], size: [3, 22, 40] },      // ↑ Boden
+                { pos: [80, 34, -10], size: [3, 22, 40], tunnel: { radius: 4.1, axis: 'x' } },      // ↓ Decke
+                { pos: [80, 11, 70], size: [3, 22, 40] },       // ↑ Boden
+
+                // ===== Orientierungs-Pfeiler (durchgehend) =====
+                { pos: [-90, 22.5, -90], size: [4, 45, 4] },
+                { pos: [90, 22.5, -90], size: [4, 45, 4] },
+                { pos: [-90, 22.5, 90], size: [4, 45, 4] },
+                { pos: [90, 22.5, 90], size: [4, 45, 4] },
+                { pos: [0, 22.5, 0], size: [6, 45, 6], tunnel: { radius: 2.4, axis: 'y' } },        // Zentraler Pfeiler
+            ],
+            portals: [
+                { a: [-85, 5, -85], b: [85, 40, 85], color: 0x00ffcc },     // NW↔SO diagonal
+                { a: [85, 5, -85], b: [-85, 40, 85], color: 0xff66ff },     // NO↔SW diagonal
+                { a: [-85, 40, 0], b: [85, 5, 0], color: 0xffaa00 },       // W oben↔O unten
+                { a: [0, 5, -85], b: [0, 40, 85], color: 0x44ff88 },       // N unten↔S oben
+                { a: [-45, 5, -45], b: [45, 40, 45], color: 0xff4444 },    // Inner NW↔SO
+                { a: [45, 5, -45], b: [-45, 40, 45], color: 0x4488ff },    // Inner NO↔SW
             ]
         },
         ...GENERATED_LOCAL_MAPS,

@@ -2,6 +2,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { CONFIG } from '../core/Config.js';
+import { createBoxWithTunnel } from './TunnelGeometry.js';
 
 // Statische Normalen-Vektoren fuer Arena-Wandkollisionen (readonly, einmalig alloziert)
 const NORMAL_PX = Object.freeze(new THREE.Vector3(1, 0, 0));   // +X (rechte Wand)
@@ -20,6 +21,52 @@ function asFiniteNumber(value, defaultValue = 0) {
 function asPositiveNumber(value, defaultValue = 1) {
     const num = Number(value);
     return Number.isFinite(num) && num > 0 ? num : defaultValue;
+}
+
+function normalizeTunnelAxis(axis) {
+    if (axis === 'x' || axis === 'y' || axis === 'z') return axis;
+    return 'z';
+}
+
+function resolveTunnelRadius(tunnelRadius, width, height, depth, axis) {
+    const tunnelAxis = normalizeTunnelAxis(axis);
+    const crossA = tunnelAxis === 'x' ? height : width;
+    const crossB = tunnelAxis === 'z' ? height : depth;
+    const maxRadius = Math.max(0.001, Math.min(crossA, crossB) * 0.5 - 1e-4);
+    const fallback = Math.max(0.35, Math.min(crossA, crossB) * 0.3);
+    const radius = asPositiveNumber(tunnelRadius, fallback);
+    return Math.min(radius, maxRadius);
+}
+
+function isInsideTunnel(point, tunnel, radius = 0) {
+    if (!point || !tunnel || typeof tunnel !== 'object') return false;
+
+    const tunnelRadius = Number(tunnel.radius);
+    if (!Number.isFinite(tunnelRadius) || tunnelRadius <= 0) return false;
+
+    const probeRadius = Number.isFinite(radius) && radius > 0 ? radius : 0;
+    const effectiveRadius = tunnelRadius - probeRadius;
+    if (effectiveRadius <= 0) return false;
+
+    const cx = Number.isFinite(tunnel.cx) ? tunnel.cx : 0;
+    const cy = Number.isFinite(tunnel.cy) ? tunnel.cy : 0;
+    const cz = Number.isFinite(tunnel.cz) ? tunnel.cz : 0;
+    const axis = normalizeTunnelAxis(tunnel.axis);
+
+    let d1 = 0;
+    let d2 = 0;
+    if (axis === 'x') {
+        d1 = point.y - cy;
+        d2 = point.z - cz;
+    } else if (axis === 'y') {
+        d1 = point.x - cx;
+        d2 = point.z - cz;
+    } else {
+        d1 = point.x - cx;
+        d2 = point.y - cy;
+    }
+
+    return (d1 * d1 + d2 * d2) < (effectiveRadius * effectiveRadius);
 }
 
 export class Arena {
@@ -178,20 +225,40 @@ export class Arena {
             if (ox <= 0 || oy <= 0 || oz <= 0) continue;
             const obstacleKind = String(obs.kind || 'hard').toLowerCase();
             const isFoamObstacle = obstacleKind === 'foam';
-            this._addObstacle(
-                px * scale,
-                py * scale,
-                pz * scale,
-                ox * scale,
-                oy * scale,
-                oz * scale,
-                isFoamObstacle ? foamObstacleMat : obstacleMat,
-                {
-                    kind: isFoamObstacle ? 'foam' : 'hard',
-                    edgeColor: isFoamObstacle ? 0x3ddc97 : 0x4466aa,
-                    edgeOpacity: isFoamObstacle ? 0.42 : 0.5,
-                }
-            );
+            const obstacleOptions = {
+                kind: isFoamObstacle ? 'foam' : 'hard',
+                edgeColor: isFoamObstacle ? 0x3ddc97 : 0x4466aa,
+                edgeOpacity: isFoamObstacle ? 0.42 : 0.5,
+            };
+
+            const hasTunnel = obs.tunnel && typeof obs.tunnel === 'object';
+            if (hasTunnel) {
+                const tunnelRadius = Number(obs.tunnel.radius);
+                const tunnelAxis = normalizeTunnelAxis(String(obs.tunnel.axis || 'z').toLowerCase());
+                this._addObstacleWithTunnel(
+                    px * scale,
+                    py * scale,
+                    pz * scale,
+                    ox * scale,
+                    oy * scale,
+                    oz * scale,
+                    isFoamObstacle ? foamObstacleMat : obstacleMat,
+                    tunnelRadius * scale,
+                    tunnelAxis,
+                    obstacleOptions,
+                );
+            } else {
+                this._addObstacle(
+                    px * scale,
+                    py * scale,
+                    pz * scale,
+                    ox * scale,
+                    oy * scale,
+                    oz * scale,
+                    isFoamObstacle ? foamObstacleMat : obstacleMat,
+                    obstacleOptions,
+                );
+            }
         }
 
         // ---- Geometrien mergen und zur Szene hinzufuegen ----
@@ -790,6 +857,48 @@ export class Arena {
         geo.dispose();
     }
 
+    _addObstacleWithTunnel(x, y, z, w, h, d, material, tunnelRadius, tunnelAxis, options = {}) {
+        const kind = typeof options.kind === 'string' ? options.kind : 'hard';
+        const isFoam = kind === 'foam';
+        const axis = normalizeTunnelAxis(tunnelAxis);
+        const radius = resolveTunnelRadius(tunnelRadius, w, h, d, axis);
+
+        const geo = createBoxWithTunnel(w, h, d, radius, axis);
+        const translationMatrix = new THREE.Matrix4().makeTranslation(x, y, z);
+
+        const box = new THREE.Box3(
+            new THREE.Vector3(x - w / 2, y - h / 2, z - d / 2),
+            new THREE.Vector3(x + w / 2, y + h / 2, z + d / 2)
+        );
+
+        this.obstacles.push({
+            box,
+            isWall: false,
+            kind,
+            tunnel: { cx: x, cy: y, cz: z, radius, axis },
+        });
+
+        const worldGeo = geo.clone();
+        worldGeo.applyMatrix4(translationMatrix);
+        if (isFoam) {
+            this._pendingFoamGeos.push(worldGeo);
+        } else {
+            this._pendingObstacleGeos.push(worldGeo);
+        }
+
+        const edgeGeo = new THREE.EdgesGeometry(geo);
+        const worldEdgeGeo = edgeGeo.clone();
+        worldEdgeGeo.applyMatrix4(translationMatrix);
+        if (isFoam) {
+            this._pendingFoamEdgeGeos.push(worldEdgeGeo);
+        } else {
+            this._pendingObstacleEdgeGeos.push(worldEdgeGeo);
+        }
+
+        edgeGeo.dispose();
+        geo.dispose();
+    }
+
     _addParticles(sx, sy, sz) {
         const count = 200;
         const geo = new THREE.BufferGeometry();
@@ -924,6 +1033,7 @@ export class Arena {
         this._tmpSphere.radius = radius;
         for (const obs of this.obstacles) {
             if (!obs.box.intersectsSphere(this._tmpSphere)) continue;
+            if (obs.tunnel && isInsideTunnel(position, obs.tunnel, radius)) continue;
             this._collisionResult.hit = true;
             this._collisionResult.kind = obs.kind || (obs.isWall ? 'wall' : 'hard');
             this._collisionResult.isWall = !!obs.isWall;
@@ -951,7 +1061,9 @@ export class Arena {
         this._tmpSphere.center.copy(position);
         this._tmpSphere.radius = radius;
         for (const obs of this.obstacles) {
-            if (obs.box.intersectsSphere(this._tmpSphere)) return true;
+            if (!obs.box.intersectsSphere(this._tmpSphere)) continue;
+            if (obs.tunnel && isInsideTunnel(position, obs.tunnel, radius)) continue;
+            return true;
         }
         return false;
     }
