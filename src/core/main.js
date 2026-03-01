@@ -14,7 +14,7 @@ import { RoundRecorder } from '../state/RoundRecorder.js';
 import { VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { UIManager } from '../ui/UIManager.js';
-import { SettingsStore } from '../ui/SettingsStore.js';
+import { SettingsManager, KEY_BIND_ACTIONS } from './SettingsManager.js';
 import { removeProfileByName, resolveActiveProfileName, upsertProfileEntry } from '../ui/ProfileDataOps.js';
 import { deriveProfileControlSelectState } from '../ui/ProfileControlStateOps.js';
 import { deriveProfileActionUiState } from '../ui/ProfileUiStateOps.js';
@@ -42,36 +42,19 @@ function deepClone(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
 
-const KEY_BIND_ACTIONS = [
-    { label: 'Pitch Hoch', key: 'UP' },
-    { label: 'Pitch Runter', key: 'DOWN' },
-    { label: 'Links (Gier)', key: 'LEFT' },
-    { label: 'Rechts (Gier)', key: 'RIGHT' },
-    { label: 'Rollen Links', key: 'ROLL_LEFT' },
-    { label: 'Rollen Rechts', key: 'ROLL_RIGHT' },
-    { label: 'Boost', key: 'BOOST' },
-    { label: 'Schiessen', key: 'SHOOT' },
-    { label: 'Item Abwerfen', key: 'DROP' },
-    { label: 'Item Wechseln', key: 'NEXT_ITEM' },
-    { label: 'Kamera', key: 'CAMERA' },
-];
-
 export class Game {
     constructor() {
-        this.settingsStore = new SettingsStore({
-            sanitizeSettings: (settings) => this._sanitizeSettings(settings),
-            createDefaultSettings: () => this._createDefaultSettings(),
-        });
+        this.settingsManager = new SettingsManager();
         this.profileDataOps = {
-            findProfileIndexByName: (profiles, profileName) => this.settingsStore.findProfileIndexByName(profiles, profileName),
-            findProfileByName: (profiles, profileName) => this.settingsStore.findProfileByName(profiles, profileName),
+            findProfileIndexByName: (profiles, profileName) => this.settingsManager.store.findProfileIndexByName(profiles, profileName),
+            findProfileByName: (profiles, profileName) => this.settingsManager.store.findProfileByName(profiles, profileName),
         };
         this.profileUiStateOps = {
-            normalizeProfileName: (rawName) => this.settingsStore.normalizeProfileName(rawName),
+            normalizeProfileName: (rawName) => this.settingsManager.store.normalizeProfileName(rawName),
             ...this.profileDataOps,
         };
         this.profileControlStateOps = {
-            normalizeProfileName: (rawName) => this.settingsStore.normalizeProfileName(rawName),
+            normalizeProfileName: (rawName) => this.settingsManager.store.normalizeProfileName(rawName),
             resolveActiveProfileName: (profiles, profileName) => resolveActiveProfileName(profiles, profileName, this.profileDataOps),
         };
         this.settings = this._loadSettings();
@@ -383,150 +366,37 @@ export class Game {
         this.ui.menuContext.textContent = `${section} · Profil: ${activeProfile} · ${dirtyState}`;
     }
 
-    _createDefaultSettings() {
-        return {
-            mode: '1p',
-            mapKey: 'standard',
-            numBots: 1,
-            botDifficulty: 'NORMAL',
-            winsNeeded: 5,
-            autoRoll: true,
-            invertPitch: {
-                PLAYER_1: false,
-                PLAYER_2: false,
-            },
-            cockpitCamera: {
-                PLAYER_1: false,
-                PLAYER_2: false,
-            },
-            vehicles: {
-                PLAYER_1: 'ship5',
-                PLAYER_2: 'ship5',
-            },
-            portalsEnabled: true,
-            gameplay: {
-                speed: 18,
-                turnSensitivity: 2.2,
-                planeScale: 1.0,
-                trailWidth: 0.6,
-                gapSize: 0.3,
-                gapFrequency: 0.02,
-                itemAmount: 8,
-                fireRate: 0.45,
-                lockOnAngle: 15,
-                planarMode: false,
-                portalCount: 0,
-                planarLevelCount: 5,
-                portalBeams: false,
-            },
-            controls: this._cloneDefaultControls(),
-        };
-    }
-
-    _cloneDefaultControls() {
-        const base = deepClone(CONFIG.KEYS);
-        return {
-            PLAYER_1: { ...base.PLAYER_1 },
-            PLAYER_2: { ...base.PLAYER_2 },
-        };
-    }
-
-    _normalizePlayerControls(source, fallback) {
-        const src = source || {};
-        const out = {
-            UP: src.UP || fallback.UP,
-            DOWN: src.DOWN || fallback.DOWN,
-            LEFT: src.LEFT || fallback.LEFT,
-            RIGHT: src.RIGHT || fallback.RIGHT,
-            ROLL_LEFT: src.ROLL_LEFT || fallback.ROLL_LEFT,
-            ROLL_RIGHT: src.ROLL_RIGHT || fallback.ROLL_RIGHT,
-            BOOST: src.BOOST || fallback.BOOST,
-            SHOOT: src.SHOOT || fallback.SHOOT,
-            NEXT_ITEM: src.NEXT_ITEM || fallback.NEXT_ITEM,
-            DROP: src.DROP || fallback.DROP,
-            CAMERA: src.CAMERA || fallback.CAMERA,
-        };
-
-        return out;
-    }
-
-    _sanitizeSettings(saved) {
-        const defaults = this._createDefaultSettings();
-        const src = saved && typeof saved === 'object' ? saved : {};
-        const merged = deepClone(defaults);
-
-        merged.mode = src.mode === '2p' ? '2p' : '1p';
-        const requestedMapKey = String(src.mapKey || '');
-        merged.mapKey = (requestedMapKey === CUSTOM_MAP_KEY || CONFIG.MAPS[requestedMapKey])
-            ? requestedMapKey
-            : defaults.mapKey;
-        merged.numBots = clamp(parseInt(src.numBots ?? defaults.numBots, 10), 0, 8);
-        merged.botDifficulty = ['EASY', 'NORMAL', 'HARD'].includes(src.botDifficulty)
-            ? src.botDifficulty
-            : defaults.botDifficulty;
-        merged.winsNeeded = clamp(parseInt(src.winsNeeded ?? defaults.winsNeeded, 10), 1, 15);
-        merged.autoRoll = typeof src.autoRoll === 'boolean' ? src.autoRoll : defaults.autoRoll;
-
-        merged.invertPitch.PLAYER_1 = !!src?.invertPitch?.PLAYER_1;
-        merged.invertPitch.PLAYER_2 = !!src?.invertPitch?.PLAYER_2;
-        merged.cockpitCamera.PLAYER_1 = !!src?.cockpitCamera?.PLAYER_1;
-        merged.cockpitCamera.PLAYER_2 = !!src?.cockpitCamera?.PLAYER_2;
-
-        if (!merged.vehicles) merged.vehicles = { PLAYER_1: 'ship5', PLAYER_2: 'ship5' };
-        merged.vehicles.PLAYER_1 = src?.vehicles?.PLAYER_1 || 'ship5';
-        merged.vehicles.PLAYER_2 = src?.vehicles?.PLAYER_2 || 'ship5';
-
-        merged.portalsEnabled = src?.portalsEnabled !== undefined ? !!src.portalsEnabled : defaults.portalsEnabled;
-
-        merged.gameplay.speed = clamp(parseFloat(src?.gameplay?.speed ?? defaults.gameplay.speed), 8, 40);
-        merged.gameplay.turnSensitivity = clamp(parseFloat(src?.gameplay?.turnSensitivity ?? defaults.gameplay.turnSensitivity), 0.8, 5);
-        merged.gameplay.planeScale = clamp(parseFloat(src?.gameplay?.planeScale ?? defaults.gameplay.planeScale), 0.6, 2.0);
-        merged.gameplay.trailWidth = clamp(parseFloat(src?.gameplay?.trailWidth ?? defaults.gameplay.trailWidth), 0.2, 2.5);
-        merged.gameplay.gapSize = clamp(parseFloat(src?.gameplay?.gapSize ?? defaults.gameplay.gapSize), 0.05, 1.5);
-        merged.gameplay.gapFrequency = clamp(parseFloat(src?.gameplay?.gapFrequency ?? defaults.gameplay.gapFrequency), 0, 0.25);
-        merged.gameplay.itemAmount = clamp(parseInt(src?.gameplay?.itemAmount ?? defaults.gameplay.itemAmount, 10), 1, 20);
-        merged.gameplay.fireRate = clamp(parseFloat(src?.gameplay?.fireRate ?? defaults.gameplay.fireRate), 0.1, 2.0);
-        merged.gameplay.lockOnAngle = clamp(parseInt(src?.gameplay?.lockOnAngle ?? defaults.gameplay.lockOnAngle, 10), 5, 45);
-        merged.gameplay.planarMode = !!(src?.gameplay?.planarMode ?? defaults.gameplay.planarMode);
-        merged.gameplay.portalCount = clamp(parseInt(src?.gameplay?.portalCount ?? defaults.gameplay.portalCount, 10), 0, 20);
-        merged.gameplay.planarLevelCount = clamp(parseInt(src?.gameplay?.planarLevelCount ?? defaults.gameplay.planarLevelCount, 10), 2, 10);
-        merged.gameplay.portalBeams = false;
-
-        merged.controls.PLAYER_1 = this._normalizePlayerControls(src?.controls?.PLAYER_1, defaults.controls.PLAYER_1);
-        merged.controls.PLAYER_2 = this._normalizePlayerControls(src?.controls?.PLAYER_2, defaults.controls.PLAYER_2);
-
-        return merged;
-    }
+    
 
     _loadSettings() {
-        return this.settingsStore.loadSettings();
+        return this.settingsManager.loadSettings();
     }
 
     _saveSettings() {
-        const persisted = this.settingsStore.saveSettings(this.settings);
+        const persisted = this.settingsManager.saveSettings(this.settings);
         if (persisted) {
             this._markSettingsDirty(false);
         }
     }
 
     _loadProfiles() {
-        return this.settingsStore.loadProfiles();
+        return this.settingsManager.store.loadProfiles();
     }
 
     _saveProfiles() {
-        return this.settingsStore.saveProfiles(this.settingsProfiles);
+        return this.settingsManager.store.saveProfiles(this.settingsProfiles);
     }
 
     _normalizeProfileName(rawName) {
-        return this.settingsStore.normalizeProfileName(rawName);
+        return this.settingsManager.store.normalizeProfileName(rawName);
     }
 
     _findProfileIndexByName(profileName) {
-        return this.settingsStore.findProfileIndexByName(this.settingsProfiles, profileName);
+        return this.settingsManager.store.findProfileIndexByName(this.settingsProfiles, profileName);
     }
 
     _findProfileByName(profileName) {
-        return this.settingsStore.findProfileByName(this.settingsProfiles, profileName);
+        return this.settingsManager.store.findProfileByName(this.settingsProfiles, profileName);
     }
 
     _applySettingsToRuntime() {

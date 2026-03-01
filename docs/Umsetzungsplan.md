@@ -134,3 +134,41 @@ Erledigt: 28.02.2026
 - Dateien: `index.html`, `style.css`, `src/ui/HUD.js`
 - Verifikation: `npm run smoke:selftrail` (erfolgreich am 2026-02-28) und manuelle Sichtpruefung im Spiel.
 
+## Phase 8: [x] Modulare Architektur fuer Performance und KI-Erweiterbarkeit
+
+Geplant: 2026-03-01
+Letztes Update: 2026-03-01
+Erledigt: 2026-03-01
+
+- Ziele:
+  1. Kernmodule schrittweise modularisieren (`main.js`, `EntityManager`, `Bot`), ohne Verhalten zu brechen.
+  2. KI ueber klare Policy-Schnittstellen erweiterbar machen.
+  3. Hotpath-Allocations reduzieren und messbar validieren.
+- Referenzplan: `docs/Feature_Modulare_Architektur_KI_Performance.md`
+- Teilphasen:
+  - 8.1 [x] Playing-State aus `main.js` extrahieren (Erledigt: 2026-03-01)
+  - 8.2 [x] Entity-Update-Pipeline in Subsysteme schneiden (Erledigt: 2026-03-01)
+  - 8.3 [x] Bot-Policy-Schnittstelle einfuehren (Erledigt: 2026-03-01)
+  - 8.4 [x] Bot-Logik in Sensing/Decision/Action Module splitten (Erledigt: 2026-03-01)
+  - 8.5 [x] Hotpath-Allocations und Kollisionspfad optimieren (Erledigt: 2026-03-01)
+  - 8.6 [x] Messung/Baseline fuer Performance und KI-Stabilitaet (Erledigt: 2026-03-01)
+  - 8.7 [x] Abschluss, Cleanup, Architektur-Doku finalisieren (Erledigt: 2026-03-01)
+- Verifikation pro Teilphase:
+  - Gemappte Tests gemaess `.agents/test_mapping.md`
+  - Pflicht-Gates: `npm run docs:sync` und `npm run docs:check`
+
+## Phase 9: [ ] Modularisierung UI & Settings (main.js Split)
+
+Geplant: 2026-03-01
+
+- Ziele:
+  1. `main.js` massiv verkleinern durch Auslagerung von persistenten Profilen und Einstellungen.
+  2. Trennung von Rendering/Game-Loop und DOM-Menue-Steuerung.
+- Referenzplan: `docs/Feature_Modularisierung_UI_Settings.md`
+- Teilphasen:
+  - [x] 9.1 SettingsManager extrahieren
+  - [ ] 9.2 ProfileManager extrahieren
+  - [ ] 9.3 MenuController extrahieren
+- Verifikation pro Teilphase:
+  - Manuelle Funktionalitaetstests (Laden/Speichern, UI-Buttons).
+  - Pflicht-Gates: `npm run docs:sync` und `npm run docs:check`
