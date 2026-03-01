@@ -16,6 +16,7 @@ import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { UIManager } from '../ui/UIManager.js';
 import { SettingsManager, KEY_BIND_ACTIONS } from './SettingsManager.js';
 import { ProfileManager } from './ProfileManager.js';
+import { MenuController } from '../ui/MenuController.js';
 import { deriveProfileControlSelectState } from '../ui/ProfileControlStateOps.js';
 import { deriveProfileActionUiState } from '../ui/ProfileUiStateOps.js';
 import { createRoundStateController } from '../state/RoundStateController.js';
@@ -435,273 +436,28 @@ export class Game {
     }
 
     _setupMenuListeners() {
-        this.ui.modeButtons.forEach((btn) => {
-            btn.addEventListener('click', () => {
-                this.settings.mode = btn.dataset.mode === '2p' ? '2p' : '1p';
+        this.menuController = new MenuController({
+            ui: this.ui,
+            settings: this.settings,
+            onSettingsChanged: () => this._onSettingsChanged(),
+            onStartMatch: () => this.startMatch(),
+            onStartKeyCapture: (player, action) => this._startKeyCapture(player, action),
+            onSaveProfile: (name) => this._saveProfile(name),
+            onLoadProfile: (name) => this._loadProfile(name),
+            onDeleteProfile: (name) => this._deleteProfile(name),
+            onResetKeys: () => {
+                this.settings.controls = this._cloneDefaultControls();
                 this._onSettingsChanged();
-            });
+                this._showStatusToast('✅ Standard-Tasten wiederhergestellt');
+            },
+            onSaveKeys: () => {
+                this._saveSettings();
+                this._showStatusToast('Einstellungen gespeichert');
+            },
+            onStatusToast: (msg, duration, type) => this._showStatusToast(msg, duration, type)
         });
 
-        // Fahrzeuge Liste füllen
-        const populateVehicles = (select) => {
-            if (!select) return;
-            select.innerHTML = '';
-            VEHICLE_DEFINITIONS.forEach(v => {
-                const opt = document.createElement('option');
-                opt.value = v.id;
-                opt.textContent = v.label;
-                select.appendChild(opt);
-            });
-        };
-        populateVehicles(this.ui.vehicleSelectP1);
-        populateVehicles(this.ui.vehicleSelectP2);
-
-        if (this.ui.vehicleSelectP1) {
-            this.ui.vehicleSelectP1.addEventListener('change', (e) => {
-                this.settings.vehicles.PLAYER_1 = e.target.value;
-                this._onSettingsChanged();
-            });
-        }
-        if (this.ui.vehicleSelectP2) {
-            this.ui.vehicleSelectP2.addEventListener('change', (e) => {
-                this.settings.vehicles.PLAYER_2 = e.target.value;
-                this._onSettingsChanged();
-            });
-        }
-
-        this.ui.mapSelect.addEventListener('change', (e) => {
-            const selectedMapKey = String(e.target.value || '');
-            this.settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || CONFIG.MAPS[selectedMapKey])
-                ? selectedMapKey
-                : 'standard';
-            this._onSettingsChanged();
-        });
-
-        this.ui.botSlider.addEventListener('input', () => {
-            this.settings.numBots = clamp(parseInt(this.ui.botSlider.value, 10), 0, 8);
-            this._onSettingsChanged();
-        });
-
-        if (this.ui.botDifficultySelect) {
-            this.ui.botDifficultySelect.addEventListener('change', () => {
-                const value = String(this.ui.botDifficultySelect.value || '').toUpperCase();
-                this.settings.botDifficulty = ['EASY', 'NORMAL', 'HARD'].includes(value) ? value : 'NORMAL';
-                this._onSettingsChanged();
-            });
-        }
-
-        this.ui.winSlider.addEventListener('input', () => {
-            this.settings.winsNeeded = clamp(parseInt(this.ui.winSlider.value, 10), 1, 15);
-            this._onSettingsChanged();
-        });
-
-        this.ui.autoRollToggle.addEventListener('change', () => {
-            this.settings.autoRoll = !!this.ui.autoRollToggle.checked;
-            this._onSettingsChanged();
-        });
-
-        this.ui.invertP1.addEventListener('change', () => {
-            this.settings.invertPitch.PLAYER_1 = !!this.ui.invertP1.checked;
-            this._onSettingsChanged();
-        });
-
-        this.ui.invertP2.addEventListener('change', () => {
-            this.settings.invertPitch.PLAYER_2 = !!this.ui.invertP2.checked;
-            this._onSettingsChanged();
-        });
-
-        this.ui.cockpitCamP1.addEventListener('change', () => {
-            this.settings.cockpitCamera.PLAYER_1 = !!this.ui.cockpitCamP1.checked;
-            this._onSettingsChanged();
-        });
-
-        this.ui.cockpitCamP2.addEventListener('change', () => {
-            this.settings.cockpitCamera.PLAYER_2 = !!this.ui.cockpitCamP2.checked;
-            this._onSettingsChanged();
-        });
-
-        const planarModeToggle = document.getElementById('planar-mode-toggle');
-        if (planarModeToggle) {
-            planarModeToggle.addEventListener('change', (e) => {
-                if (!this.settings.gameplay) this.settings.gameplay = {};
-                this.settings.gameplay.planarMode = e.target.checked;
-
-                // Usability: Auto-active portals if they are off, because Planar Mode needs them
-                if (this.settings.gameplay.planarMode && (this.settings.gameplay.portalCount || 0) === 0) {
-                    this.settings.gameplay.portalCount = 4;
-                    this._showStatusToast('Ebenen-Modus: 4 Portale aktiviert');
-                }
-
-                this._onSettingsChanged();
-            });
-        }
-
-        this.ui.portalsToggle.addEventListener('change', () => {
-            this.settings.portalsEnabled = !!this.ui.portalsToggle.checked;
-            this._onSettingsChanged();
-        });
-
-        this.ui.speedSlider.addEventListener('input', () => {
-            this.settings.gameplay.speed = clamp(parseFloat(this.ui.speedSlider.value), 8, 40);
-            this._onSettingsChanged();
-        });
-
-        this.ui.turnSlider.addEventListener('input', () => {
-            this.settings.gameplay.turnSensitivity = clamp(parseFloat(this.ui.turnSlider.value), 0.8, 5);
-            this._onSettingsChanged();
-        });
-
-        this.ui.planeSizeSlider.addEventListener('input', () => {
-            this.settings.gameplay.planeScale = clamp(parseFloat(this.ui.planeSizeSlider.value), 0.6, 2.0);
-            this._onSettingsChanged();
-        });
-
-        this.ui.trailWidthSlider.addEventListener('input', () => {
-            this.settings.gameplay.trailWidth = clamp(parseFloat(this.ui.trailWidthSlider.value), 0.2, 2.5);
-            this._onSettingsChanged();
-        });
-
-        this.ui.gapSizeSlider.addEventListener('input', () => {
-            this.settings.gameplay.gapSize = clamp(parseFloat(this.ui.gapSizeSlider.value), 0.05, 1.5);
-            this._onSettingsChanged();
-        });
-
-        this.ui.gapFrequencySlider.addEventListener('input', () => {
-            this.settings.gameplay.gapFrequency = clamp(parseFloat(this.ui.gapFrequencySlider.value), 0, 0.25);
-            this._onSettingsChanged();
-        });
-
-        this.ui.itemAmountSlider.addEventListener('input', () => {
-            this.settings.gameplay.itemAmount = clamp(parseInt(this.ui.itemAmountSlider.value, 10), 1, 20);
-            this._onSettingsChanged();
-        });
-
-        this.ui.fireRateSlider.addEventListener('input', () => {
-            this.settings.gameplay.fireRate = clamp(parseFloat(this.ui.fireRateSlider.value), 0.1, 2.0);
-            this._onSettingsChanged();
-        });
-
-        this.ui.lockOnSlider.addEventListener('input', () => {
-            this.settings.gameplay.lockOnAngle = clamp(parseInt(this.ui.lockOnSlider.value, 10), 5, 45);
-            this._onSettingsChanged();
-        });
-
-        this.ui.keybindP1.addEventListener('click', (e) => {
-            const btn = e.target.closest('button.keybind-btn');
-            if (!btn) return;
-            this._startKeyCapture('PLAYER_1', btn.dataset.action);
-        });
-
-        this.ui.keybindP2.addEventListener('click', (e) => {
-            const btn = e.target.closest('button.keybind-btn');
-            if (!btn) return;
-            this._startKeyCapture('PLAYER_2', btn.dataset.action);
-        });
-
-        this.ui.resetKeysButton.addEventListener('click', () => {
-            this.settings.controls = this._cloneDefaultControls();
-            this._onSettingsChanged();
-            this._showStatusToast('✅ Standard-Tasten wiederhergestellt');
-        });
-
-        this.ui.saveKeysButton.addEventListener('click', () => {
-            this._saveSettings();
-            this._showStatusToast('Einstellungen gespeichert');
-        });
-
-        this.ui.startButton.addEventListener('click', () => {
-            this.startMatch();
-        });
-
-        if (this.ui.openEditorButton) {
-            this.ui.openEditorButton.addEventListener('click', () => {
-                window.open('editor/map-editor-3d.html', '_blank');
-            });
-        }
-
-        if (this.ui.openVehicleEditorButton) {
-            this.ui.openVehicleEditorButton.addEventListener('click', () => {
-                window.open('prototypes/vehicle-lab/index.html', '_blank');
-            });
-        }
-
-
-        if (this.ui.profileSaveButton) {
-            this.ui.profileSaveButton.addEventListener('click', () => {
-                this._saveProfile(this.ui.profileNameInput?.value || '');
-            });
-        }
-        if (this.ui.profileLoadButton) {
-            this.ui.profileLoadButton.addEventListener('click', () => {
-                const selected = this._normalizeProfileName(this.ui.profileSelect?.value || '');
-                if (!selected) {
-                    this._showStatusToast('Profil auswaehlen', 1400, 'error');
-                    return;
-                }
-                this._loadProfile(selected);
-            });
-        }
-        if (this.ui.profileDeleteButton) {
-            this.ui.profileDeleteButton.addEventListener('click', () => {
-                const selected = this._normalizeProfileName(this.ui.profileSelect?.value || '');
-                if (!selected) {
-                    this._showStatusToast('Profil auswaehlen', 1400, 'error');
-                    return;
-                }
-                this._deleteProfile(selected);
-            });
-        }
-
-        if (this.ui.profileNameInput) {
-            this.ui.profileNameInput.addEventListener('input', () => {
-                this._syncProfileActionState();
-            });
-        }
-
-        if (this.ui.profileSelect) {
-            this.ui.profileSelect.addEventListener('change', () => {
-                const selected = this._normalizeProfileName(this.ui.profileSelect.value || '');
-                const selectedProfile = this._findProfileByName(selected);
-
-                if (selectedProfile && this.ui.profileNameInput) {
-                    this.ui.profileNameInput.value = selectedProfile.name;
-                }
-
-                this._syncProfileActionState();
-            });
-        }
-
-
-
-        const portalCountSlider = document.getElementById('portal-count-slider');
-        const portalCountLabel = document.getElementById('portal-count-label');
-        if (portalCountSlider && portalCountLabel) {
-            portalCountSlider.addEventListener('input', (e) => {
-                const val = parseInt(e.target.value, 10);
-                portalCountLabel.textContent = val;
-                if (!this.settings.gameplay) this.settings.gameplay = {};
-                this.settings.gameplay.portalCount = val;
-                this._onSettingsChanged();
-            });
-        }
-
-        const planarLevelCountSlider = document.getElementById('planar-level-count-slider');
-        const planarLevelCountLabel = document.getElementById('planar-level-count-label');
-        if (planarLevelCountSlider && planarLevelCountLabel) {
-            planarLevelCountSlider.addEventListener('input', (e) => {
-                const val = clamp(parseInt(e.target.value, 10), 2, 10);
-                planarLevelCountLabel.textContent = val;
-                if (!this.settings.gameplay) this.settings.gameplay = {};
-                this.settings.gameplay.planarLevelCount = val;
-                this._onSettingsChanged();
-            });
-        }
-
-        if (this.ui.copyBuildButton) {
-            this.ui.copyBuildButton.addEventListener('click', () => {
-                this._copyBuildInfoToClipboard();
-            });
-        }
+        this.menuController.setupListeners();
     }
 
     _onSettingsChanged() {

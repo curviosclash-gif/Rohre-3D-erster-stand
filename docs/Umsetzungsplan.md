@@ -157,7 +157,7 @@ Erledigt: 2026-03-01
   - Gemappte Tests gemaess `.agents/test_mapping.md`
   - Pflicht-Gates: `npm run docs:sync` und `npm run docs:check`
 
-## Phase 9: [ ] Modularisierung UI & Settings (main.js Split)
+- Phase 9: [x] Modularisierung UI & Settings (main.js Split)
 
 Geplant: 2026-03-01
 
@@ -167,8 +167,8 @@ Geplant: 2026-03-01
 - Referenzplan: `docs/Feature_Modularisierung_UI_Settings.md`
 - Teilphasen:
   - [x] 9.1 SettingsManager extrahieren
-  - [ ] 9.2 ProfileManager extrahieren
-  - [ ] 9.3 MenuController extrahieren
+  - [x] 9.2 ProfileManager extrahieren
+  - [x] 9.3 MenuController extrahieren
 - Verifikation pro Teilphase:
   - Manuelle Funktionalitaetstests (Laden/Speichern, UI-Buttons).
   - Pflicht-Gates: `npm run docs:sync` und `npm run docs:check`

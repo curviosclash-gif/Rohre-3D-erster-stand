@@ -23,7 +23,7 @@
 - **Umbau:** Verbindung zwischen `main.js` und dem neuen `ProfileManager` herstellen.
 - **Verifikation:** Neues Profil anlegen, aktivieren, neuladen -> Neues Profil muss aktiv bleiben.
 
-### [ ] Phase 9.3: MenuController extrahieren
+### [x] Phase 9.3: MenuController extrahieren
 
 - **Aufgabe:** Auslagern des kompletten kritischen DOM-Bindings (Event-Listener fuer Buttons, Slider, Checkboxen, Panels aus-/einblenden) in `MenuController.js`.
 - **Umbau:** `MenuController` sendet Events oder ruft Callbacks in `main.js` (StartMatch, ReturnToMenu) auf. Die Settings-Slider sprechen direkt mit dem `SettingsManager`.
