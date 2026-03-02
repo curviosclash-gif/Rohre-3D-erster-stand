@@ -173,7 +173,7 @@ Letztes Update: 2026-03-02
   - [x] 14.3A HUD-Tick-Entzerrung (getrennte Frequenzen Score/Feed/Indikator)
   - [x] 14.3B Overheat-Snapshot als mutable Ref + dirty-Flag
   - [x] 14.4 Integration I: PlayingState nur dirty Overheat in `huntState` spiegeln
-  - [ ] 14.5 Integration II: Recorder im Runtime-Pfad sauber toggelbar machen
+  - [x] 14.5 Integration II: Recorder im Runtime-Pfad sauber toggelbar machen
   - [ ] 14.6 Wave-Regression (S+M) und Merge-Hygiene
   - [ ] 14.7 Abschluss-Benchmark und KPI-Vergleich gegen Baseline
   - [ ] 14.8 Doku-Abschluss, Restrisiken, Masterplan-Status auf abgeschlossen

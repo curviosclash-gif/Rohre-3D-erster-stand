@@ -73,6 +73,7 @@ export class RoundRecorder {
         this._snapshotInterval = 10;
         this.roundStartTime = 0;
         this._enabled = true;
+        this._frameCaptureEnabled = false;
 
         this._aggregate = createAggregateSummary();
         this._baselines = new Map();
@@ -348,8 +349,16 @@ export class RoundRecorder {
         ];
     }
 
+    setFrameCaptureEnabled(enabled) {
+        this._frameCaptureEnabled = !!enabled;
+    }
+
+    isFrameCaptureEnabled() {
+        return this._frameCaptureEnabled;
+    }
+
     recordFrame(players) {
-        if (!this._enabled) return;
+        if (!this._enabled || !this._frameCaptureEnabled || !Array.isArray(players)) return;
         this._frameCounter++;
         if (this._frameCounter % this._snapshotInterval !== 0) return;
 

@@ -93,6 +93,8 @@ export class Game {
 
         // Debug Recorder
         this.recorder = new RoundRecorder();
+        this._recorderFrameCaptureEnabled = this._resolveRecorderFrameCaptureEnabledDefault();
+        this.recorder.setFrameCaptureEnabled(this._recorderFrameCaptureEnabled);
 
         this._applySettingsToRuntime();
         this.input.setBindings(this.settings.controls);
@@ -818,11 +820,30 @@ export class Game {
         this.roundStateTickSystem.updateMatchEnd(dt);
     }
 
+    _resolveRecorderFrameCaptureEnabledDefault() {
+        try {
+            const params = new URLSearchParams(window.location.search || '');
+            const raw = params.get('recordframes') || params.get('recorderFrames');
+            if (!raw) return false;
+            const normalized = String(raw).trim().toLowerCase();
+            return normalized === '1' || normalized === 'true' || normalized === 'on';
+        } catch {
+            return false;
+        }
+    }
+
+    setRecorderFrameCaptureEnabled(enabled) {
+        this._recorderFrameCaptureEnabled = !!enabled;
+        if (this.recorder?.setFrameCaptureEnabled) {
+            this.recorder.setFrameCaptureEnabled(this._recorderFrameCaptureEnabled);
+        }
+    }
+
     update(dt) {
         this.runtimeDiagnosticsSystem.update(dt);
 
         // Debug Recording
-        if (this.state === 'PLAYING' && this.entityManager) {
+        if (this._recorderFrameCaptureEnabled && this.state === 'PLAYING' && this.entityManager) {
             this.recorder.recordFrame(this.entityManager.players);
         }
 
