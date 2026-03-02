@@ -968,6 +968,106 @@ input[type="range"]::-webkit-slider-thumb {
     box-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
 }
 
+.hunt-hud {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: end;
+    gap: 12px;
+    padding: 0 16px 14px;
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 19;
+}
+
+.hunt-player-panel {
+    max-width: 240px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    background: rgba(5, 10, 20, 0.75);
+    backdrop-filter: blur(2px);
+}
+
+#hunt-p2-panel {
+    justify-self: end;
+}
+
+.hunt-label {
+    font-size: 0.72rem;
+    color: #a8b8cc;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.hunt-bar {
+    width: 100%;
+    height: 9px;
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 4px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.hunt-fill {
+    width: 0;
+    height: 100%;
+    transition: width 0.12s linear;
+}
+
+.hunt-bar-hp .hunt-fill {
+    background: linear-gradient(90deg, #ff4f4f, #59ff8e);
+}
+
+.hunt-bar-overheat .hunt-fill {
+    background: linear-gradient(90deg, #5ac8ff, #ffb347, #ff4f4f);
+}
+
+.hunt-value {
+    font-size: 0.72rem;
+    color: #dce8f7;
+    margin-top: 2px;
+}
+
+.hunt-kill-feed {
+    min-width: 260px;
+    max-width: 360px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    background: rgba(8, 16, 28, 0.75);
+}
+
+.hunt-kill-feed ul {
+    margin: 6px 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.hunt-kill-feed li {
+    font-size: 0.78rem;
+    color: #e7eef9;
+    line-height: 1.35;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.hunt-damage-indicator {
+    position: absolute;
+    left: 50%;
+    top: 42%;
+    color: #ff5b5b;
+    font-size: 2rem;
+    text-shadow: 0 0 14px rgba(255, 42, 42, 0.75);
+    transform: translate(-50%, -50%);
+    transition: opacity 0.12s linear;
+}
+
 /* ============================================
    MESSAGE OVERLAY
    ============================================ */
@@ -1080,6 +1180,21 @@ input[type="range"]::-webkit-slider-thumb {
     .nav-help-content {
         justify-content: flex-start;
     }
+
+    .hunt-hud {
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 0 10px 8px;
+    }
+
+    #hunt-p2-panel {
+        justify-self: start;
+    }
+
+    .hunt-kill-feed {
+        min-width: 0;
+        max-width: none;
+    }
 }
 
 @media (max-width: 560px) {
@@ -1094,6 +1209,15 @@ input[type="range"]::-webkit-slider-thumb {
     .nav-btn {
         font-size: 0.98em;
         padding: 15px 12px;
+    }
+
+    .hunt-player-panel,
+    .hunt-kill-feed {
+        padding: 8px;
+    }
+
+    .hunt-damage-indicator {
+        font-size: 1.6rem;
     }
 }
 

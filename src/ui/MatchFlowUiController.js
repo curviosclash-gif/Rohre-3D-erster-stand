@@ -103,6 +103,11 @@ export class MatchFlowUiController {
         const game = this.game;
         game.state = 'PLAYING';
         game._hudTimer = 0;
+        if (game.huntState) {
+            game.huntState.killFeed = [];
+            game.huntState.damageIndicator = null;
+            game.huntState.overheatByPlayer = {};
+        }
 
         if (game.ui.crosshairP1) {
             game.ui.crosshairP1.style.display = 'none';
@@ -179,6 +184,11 @@ export class MatchFlowUiController {
     returnToMenu() {
         const game = this.game;
         game.state = 'MENU';
+        if (game.huntState) {
+            game.huntState.killFeed = [];
+            game.huntState.damageIndicator = null;
+            game.huntState.overheatByPlayer = {};
+        }
         disposeMatchSessionSystems(game.renderer, game._getCurrentMatchSessionRefs());
         game._clearMatchSessionRefs();
         this.applyMatchUiState(deriveReturnToMenuUiState());

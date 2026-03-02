@@ -677,6 +677,39 @@
             </div>
             <div id="p2-items" class="item-bar"></div>
         </div>
+
+        <div id="hunt-hud" class="hunt-hud hidden" aria-hidden="true">
+            <div id="hunt-p1-panel" class="hunt-player-panel">
+                <div class="hunt-label">P1 HP</div>
+                <div class="hunt-bar hunt-bar-hp">
+                    <div id="hunt-p1-hp-fill" class="hunt-fill"></div>
+                </div>
+                <div id="hunt-p1-hp-text" class="hunt-value">0 / 0</div>
+                <div class="hunt-label">Overheat</div>
+                <div class="hunt-bar hunt-bar-overheat">
+                    <div id="hunt-p1-overheat-fill" class="hunt-fill"></div>
+                </div>
+                <div id="hunt-p1-overheat-text" class="hunt-value">0%</div>
+            </div>
+            <div id="hunt-p2-panel" class="hunt-player-panel hidden">
+                <div class="hunt-label">P2 HP</div>
+                <div class="hunt-bar hunt-bar-hp">
+                    <div id="hunt-p2-hp-fill" class="hunt-fill"></div>
+                </div>
+                <div id="hunt-p2-hp-text" class="hunt-value">0 / 0</div>
+                <div class="hunt-label">Overheat</div>
+                <div class="hunt-bar hunt-bar-overheat">
+                    <div id="hunt-p2-overheat-fill" class="hunt-fill"></div>
+                </div>
+                <div id="hunt-p2-overheat-text" class="hunt-value">0%</div>
+            </div>
+            <div class="hunt-kill-feed">
+                <div class="hunt-label">Kill Feed</div>
+                <ul id="hunt-kill-feed-list"></ul>
+            </div>
+            <div id="hunt-damage-indicator" class="hunt-damage-indicator hidden">▲</div>
+        </div>
+
         <div id="message-overlay" class="hidden" role="alert" aria-live="assertive" aria-atomic="true">
             <div id="message-text"></div>
             <div id="message-sub"></div>

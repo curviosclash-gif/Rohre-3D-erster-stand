@@ -28,6 +28,7 @@ import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { MatchFlowUiController } from '../ui/MatchFlowUiController.js';
 import { RuntimeDiagnosticsSystem } from './RuntimeDiagnosticsSystem.js';
 import { KeybindEditorController } from '../ui/KeybindEditorController.js';
+import { HuntHUD } from '../hunt/HuntHUD.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -59,6 +60,11 @@ export class Game {
         this.config = CONFIG;
         this.runtimeConfig = null;
         this.activeGameMode = GAME_MODE_TYPES.CLASSIC;
+        this.huntState = {
+            overheatByPlayer: {},
+            killFeed: [],
+            damageIndicator: null,
+        };
 
         this.state = 'MENU';
         this.roundPause = 0;
@@ -76,6 +82,7 @@ export class Game {
         // HUD Systems
         this.hudP1 = new HUD('p1-fighter-hud', 0);
         this.hudP2 = new HUD('p2-fighter-hud', 1);
+        this.huntHud = new HuntHUD(this);
         this.hudRuntimeSystem = new HudRuntimeSystem(this);
         this.crosshairSystem = new CrosshairSystem(this);
         this.matchFlowUiController = new MatchFlowUiController(this);
@@ -823,6 +830,10 @@ export class Game {
             this._updateRoundEndState(dt);
         } else if (this.state === 'MATCH_END') {
             this._updateMatchEndState(dt);
+        }
+
+        if (this.huntHud) {
+            this.huntHud.update(dt);
         }
     }
 
