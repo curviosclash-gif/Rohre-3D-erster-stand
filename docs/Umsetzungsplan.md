@@ -55,7 +55,7 @@ Geplant: 2026-03-02
 - Referenzplan: `docs/Feature_JagdModus.md`
 - Teilphasen:
   - [x] 11.1 Game-Mode-Infrastruktur (HuntMode, HuntConfig, Menue-Toggle, Feature-Flag)
-  - [ ] 11.2a HP-System (Player-Erweiterung, HealthSystem)
+  - [x] 11.2a HP-System (Player-Erweiterung, HealthSystem)
   - [ ] 11.2b Collision-Umstellung (HP statt Kill)
   - [ ] 11.3 HUD: HP-Bar, Overheat-Bar, Kill-Feed, Schadens-Indikator
   - [ ] 11.4 MG mit Ueberhitzung (OverheatGunSystem, Tracer, Falloff)

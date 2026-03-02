@@ -7,6 +7,13 @@ import { CONFIG } from '../core/Config.js';
 import { Trail } from './Trail.js';
 import { disposeObject3DResources } from '../core/three-disposal.js';
 import { createVehicleMesh, isValidVehicleId, VEHICLE_DEFINITIONS } from './vehicle-registry.js';
+import {
+    applyDamage,
+    applyHealing,
+    grantShield,
+    resetPlayerHealth,
+    updatePlayerHealthRegen,
+} from '../hunt/HealthSystem.js';
 
 // Shared Geometries (einmalig erstellt, von allen Spielern geteilt)
 const SHARED_GEO = {};
@@ -82,8 +89,12 @@ export class Player {
         this.inventory = [];
         this.selectedItemIndex = 0;
         this.hasShield = false;
+        this.shieldHP = 0;
         this.isGhost = false;
         this.invertControls = false;
+        this.maxHp = 1;
+        this.hp = 1;
+        this.lastDamageTimestamp = -Infinity;
         this.invertPitchBase = false;
         this.modelScale = CONFIG.PLAYER.MODEL_SCALE || 1;
         this.cockpitCamera = false;
@@ -131,6 +142,7 @@ export class Player {
 
         // Trail
         this.trail = new Trail(renderer, color, this.index, options.entityManager);
+        resetPlayerHealth(this);
     }
 
     _createModel() {
@@ -238,6 +250,7 @@ export class Player {
         this.spawnProtectionTimer = CONFIG.PLAYER.SPAWN_PROTECTION || 0;
         this.planarAimOffset = 0;
         this.steeringLockTimer = 0;
+        resetPlayerHealth(this);
         // Planar Mode State: keep the spawn level chosen by the spawner.
         const fallbackY = CONFIG.PLAYER.START_Y || 5;
         const spawnY = Number.isFinite(position?.y) ? position.y : fallbackY;
@@ -269,6 +282,7 @@ export class Player {
         this.spawnProtectionTimer = Math.max(0, this.spawnProtectionTimer - dt);
         this.steeringLockTimer = Math.max(0, (this.steeringLockTimer || 0) - dt);
         const steeringLocked = this.steeringLockTimer > 0;
+        updatePlayerHealthRegen(this, dt);
 
         // Effekte aktualisieren
         this._updateEffects(dt);
@@ -526,7 +540,7 @@ export class Player {
                 this.trail.setWidth(config.trailWidth);
                 break;
             case 'SHIELD':
-                this.hasShield = true;
+                grantShield(this);
                 break;
             case 'GHOST':
                 this.isGhost = true;
@@ -550,6 +564,7 @@ export class Player {
                 break;
             case 'SHIELD':
                 this.hasShield = false;
+                this.shieldHP = 0;
                 break;
             case 'GHOST':
                 this.isGhost = false;
@@ -597,7 +612,24 @@ export class Player {
 
     kill() {
         this.alive = false;
+        this.hp = 0;
         this.group.visible = false;
+    }
+
+    takeDamage(amount, options = {}) {
+        const result = applyDamage(this, amount, options);
+        if (result.isDead && this.alive) {
+            this.kill();
+        }
+        return result;
+    }
+
+    heal(amount) {
+        return applyHealing(this, amount);
+    }
+
+    isDead() {
+        return !this.alive || this.hp <= 0;
     }
 
     getDirection(out = null) {
