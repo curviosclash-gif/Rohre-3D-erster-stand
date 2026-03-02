@@ -7,6 +7,10 @@ node_modules/
 # Build-Output
 dist/
 
+# Test-Output
+playwright-report/
+test-results/
+
 # Temporäre Patch-Skripte
 p1_*.ps1
 patch_phase1.py
