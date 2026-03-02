@@ -153,7 +153,7 @@ Letztes Update: 2026-03-02
 
 ---
 
-## Phase 14: [/] Hotpath-Performance und modulare Laufzeit-Optimierung
+## Phase 14: [x] Hotpath-Performance und modulare Laufzeit-Optimierung
 
 Geplant: 2026-03-02
 Letztes Update: 2026-03-02
@@ -176,7 +176,7 @@ Letztes Update: 2026-03-02
   - [x] 14.5 Integration II: Recorder im Runtime-Pfad sauber toggelbar machen
   - [x] 14.6 Wave-Regression (S+M) und Merge-Hygiene
   - [x] 14.7 Abschluss-Benchmark und KPI-Vergleich gegen Baseline
-  - [ ] 14.8 Doku-Abschluss, Restrisiken, Masterplan-Status auf abgeschlossen
+  - [x] 14.8 Doku-Abschluss, Restrisiken, Masterplan-Status auf abgeschlossen
 - KPI-Gates (Baseline 2026-03-02):
   - FPS-Mittel Overall: Baseline `59.54`, Gate `>= 56.56` (max. -5%).
   - Draw Calls Overall: Baseline `28.49`, Gate `<= 31.34` (max. +10%).
