@@ -5,6 +5,8 @@
 import { CONFIG } from '../core/Config.js';
 import { VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
+import { isSettingsChangeKey, normalizeSettingsChangeKeys } from './SettingsChangeKeys.js';
+import { resolveSyncMethodNamesForChangeKeys } from './UISettingsSyncMap.js';
 
 export class UIManager {
     constructor(game) {
@@ -95,10 +97,53 @@ export class UIManager {
 
     syncAll() {
         const settings = this.game.settings;
-        const ui = this.ui;
+        this.syncModes(settings);
+        this.syncMap(settings);
+        this.syncBots(settings);
+        this.syncRules(settings);
+        this.syncGameplay(settings);
+        this.syncVehicles(settings);
+    }
 
-        // Mode
-        ui.modeButtons.forEach(btn => {
+    syncByChangeKeys(changedKeys) {
+        if (!Array.isArray(changedKeys) || changedKeys.length === 0) {
+            this.syncAll();
+            return;
+        }
+
+        for (const rawKey of changedKeys) {
+            const key = typeof rawKey === 'string' ? rawKey.trim() : '';
+            if (!key || !isSettingsChangeKey(key)) {
+                this.syncAll();
+                return;
+            }
+        }
+
+        const normalizedKeys = normalizeSettingsChangeKeys(changedKeys);
+        if (normalizedKeys.length === 0) {
+            this.syncAll();
+            return;
+        }
+
+        const syncMethodNames = resolveSyncMethodNamesForChangeKeys(normalizedKeys);
+        if (syncMethodNames.length === 0) {
+            this.syncAll();
+            return;
+        }
+
+        for (const methodName of syncMethodNames) {
+            const syncMethod = this[methodName];
+            if (typeof syncMethod !== 'function') {
+                this.syncAll();
+                return;
+            }
+            syncMethod.call(this);
+        }
+    }
+
+    syncModes(settings = this.game.settings) {
+        const ui = this.ui;
+        ui.modeButtons.forEach((btn) => {
             btn.classList.toggle('active', btn.dataset.mode === settings.mode);
         });
         if (ui.vehicleP2Container) {
@@ -134,16 +179,21 @@ export class UIManager {
             ui.huntRespawnToggle.checked = !!settings?.hunt?.respawnEnabled;
             ui.huntRespawnToggle.disabled = resolvedGameMode !== GAME_MODE_TYPES.HUNT;
         }
+    }
 
-        // Map
-        ui.mapSelect.value = settings.mapKey;
+    syncMap(settings = this.game.settings) {
+        this.ui.mapSelect.value = settings.mapKey;
+    }
 
-        // Bots
+    syncBots(settings = this.game.settings) {
+        const ui = this.ui;
         ui.botSlider.value = settings.numBots;
         ui.botLabel.textContent = settings.numBots;
         if (ui.botDifficultySelect) ui.botDifficultySelect.value = settings.botDifficulty;
+    }
 
-        // Rules
+    syncRules(settings = this.game.settings) {
+        const ui = this.ui;
         ui.winSlider.value = settings.winsNeeded;
         ui.winLabel.textContent = settings.winsNeeded;
         ui.autoRollToggle.checked = !!settings.autoRoll;
@@ -152,7 +202,10 @@ export class UIManager {
         ui.cockpitCamP1.checked = !!settings.cockpitCamera.PLAYER_1;
         ui.cockpitCamP2.checked = !!settings.cockpitCamera.PLAYER_2;
         ui.portalsToggle.checked = !!settings.portalsEnabled;
+    }
 
+    syncGameplay(settings = this.game.settings) {
+        const ui = this.ui;
         const gp = settings.gameplay;
         ui.speedSlider.value = gp.speed;
         ui.speedLabel.textContent = `${gp.speed} m/s`;
@@ -175,8 +228,10 @@ export class UIManager {
 
         const planarToggle = document.getElementById('planar-mode-toggle');
         if (planarToggle) planarToggle.checked = !!gp.planarMode;
+    }
 
-        // Vehicles
+    syncVehicles(settings = this.game.settings) {
+        const ui = this.ui;
         if (ui.vehicleSelectP1) ui.vehicleSelectP1.value = settings.vehicles.PLAYER_1;
         if (ui.vehicleSelectP2) ui.vehicleSelectP2.value = settings.vehicles.PLAYER_2;
     }
@@ -184,23 +239,45 @@ export class UIManager {
     updateContext() {
         if (!this.ui.menuContext) return;
         const section = this._getMenuSectionLabel(this.game._activeSubmenu);
-        const activeProfile = this.game.activeProfileName || 'Ungespeichert';
-        this.ui.menuContext.textContent = `${section} · Profil: ${activeProfile}`;
+        const activeProfile = this._resolveActiveProfileName();
+        const dirtyState = this.game.settingsDirty ? 'ungespeicherte Aenderungen' : 'alles gespeichert';
+        this.ui.menuContext.textContent = `${section} · Profil: ${activeProfile} · ${dirtyState}`;
+    }
+
+    _resolveActiveProfileName() {
+        const game = this.game;
+        const typedProfile = game.ui?.profileNameInput?.value || '';
+        const normalizedTypedProfile = game.profileManager?.normalizeProfileName
+            ? game.profileManager.normalizeProfileName(typedProfile)
+            : typedProfile.trim();
+        return game.activeProfileName || normalizedTypedProfile || 'kein Profil';
     }
 
     _getMenuSectionLabel(panelId) {
         if (!panelId) return 'Hauptmenue';
         const linkedButton = this._menuButtonByPanel.get(panelId);
-        if (linkedButton) return (linkedButton.textContent || '').trim();
-        return 'Untermenue';
+        if (linkedButton) {
+            return (linkedButton.textContent || '').replace(/\s+/g, ' ').trim();
+        }
+        const panelTitle = document.querySelector(`#${panelId} .submenu-title`);
+        return (panelTitle?.textContent || 'Untermenue').replace(/\s+/g, ' ').trim();
     }
 
-    showToast(message, tone = 'info') {
+    showToast(message, durationMsOrTone = 1200, tone = 'info') {
         const toast = this.ui.statusToast;
         if (!toast) return;
+        const durationMs = typeof durationMsOrTone === 'number' ? durationMsOrTone : 1200;
+        const requestedTone = typeof durationMsOrTone === 'string' ? durationMsOrTone : tone;
+        const normalizedTone = requestedTone === 'success' || requestedTone === 'error' ? requestedTone : 'info';
         toast.textContent = message;
-        toast.className = `status-toast toast-${tone} show`;
+        toast.classList.remove('hidden', 'show', 'toast-info', 'toast-success', 'toast-error');
+        toast.classList.add(`toast-${normalizedTone}`);
+        void toast.offsetWidth;
+        toast.classList.add('show');
         if (this._toastTimer) clearTimeout(this._toastTimer);
-        this._toastTimer = setTimeout(() => toast.classList.remove('show'), 1500);
+        this._toastTimer = setTimeout(() => {
+            toast.classList.remove('show');
+            toast.classList.add('hidden');
+        }, durationMs);
     }
 }

@@ -44,9 +44,12 @@ Stand: 2026-03-02
 
 ### 2.4 UI (`src/ui`)
 
-- `UIManager.js`: Menues und Bedienfluss
+- `UIManager.js`: Menues, selektive Settings-Sync (`syncByChangeKeys`), Menu-Context und Status-Toast
 - `HUD.js`: Ingame-Overlay
 - `MatchFlowUiController.js`, `KeybindEditorController.js`: UI-Flow/Settings-Controller-Splits aus `main.js`
+- `UISettingsSyncMap.js`: Zuordnung `changedKey -> UI-Sync-Teilfunktion`
+- `SettingsChangeKeys.js`, `SettingsChangeSetOps.js`: stabiler Key-Vertrag und Set-Operationen fuer Event-Coalescing
+- `MenuController.js`: emittiert typisierte `SETTINGS_CHANGED`-Payloads und coalesct `input`-Storms pro Frame
 - `SettingsStore.js`, `Profile*Ops.js`, `MatchUiStateOps.js`
 
 ### 2.5 Hunt (`src/hunt`)

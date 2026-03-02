@@ -326,29 +326,6 @@ export class Game {
         fallbackCopy();
     }
 
-    _getMenuSectionLabel(panelId) {
-        if (!panelId) return 'Hauptmenue';
-
-        const linkedButton = this._menuButtonByPanel.get(panelId);
-        if (linkedButton) {
-            return (linkedButton.textContent || '').replace(/\s+/g, ' ').trim();
-        }
-
-        const panelTitle = document.querySelector(`#${panelId} .submenu-title`);
-        return (panelTitle?.textContent || 'Untermenue').replace(/\s+/g, ' ').trim();
-    }
-
-    _updateMenuContext() {
-        if (!this.ui.menuContext) return;
-
-        const section = this._getMenuSectionLabel(this._activeSubmenu);
-        const activeProfile = this.activeProfileName || this._normalizeProfileName(this.ui.profileNameInput?.value || '') || 'kein Profil';
-        const dirtyState = this.settingsDirty ? 'ungespeicherte Aenderungen' : 'alles gespeichert';
-        this.ui.menuContext.textContent = `${section} · Profil: ${activeProfile} · ${dirtyState}`;
-    }
-
-
-
     _loadSettings() {
         return this.settingsManager.loadSettings();
     }
@@ -409,7 +386,7 @@ export class Game {
 
         switch (event.type) {
             case MENU_CONTROLLER_EVENT_TYPES.SETTINGS_CHANGED:
-                this._onSettingsChanged();
+                this._onSettingsChanged(event);
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.START_MATCH:
                 this.startMatch();
@@ -443,10 +420,15 @@ export class Game {
         }
     }
 
-    _onSettingsChanged() {
+    _onSettingsChanged(event = null) {
         this._markSettingsDirty(true);
         if (this.uiManager) {
-            this.uiManager.syncAll();
+            const changedKeys = Array.isArray(event?.changedKeys) ? event.changedKeys : null;
+            if (Array.isArray(changedKeys) && changedKeys.length > 0 && typeof this.uiManager.syncByChangeKeys === 'function') {
+                this.uiManager.syncByChangeKeys(changedKeys);
+            } else {
+                this.uiManager.syncAll();
+            }
             this.uiManager.updateContext();
         }
         this._renderKeybindEditor();
@@ -465,7 +447,7 @@ export class Game {
         this.ui.saveKeysButton.textContent = this.settingsDirty
             ? '💾 Einstellungen explizit speichern *'
             : '💾 Einstellungen explizit speichern';
-        this._updateMenuContext();
+        this.uiManager?.updateContext();
     }
 
     _syncProfileControls() {
@@ -530,7 +512,7 @@ export class Game {
             this.ui.profileSaveButton.disabled = !actionState.canSaveProfile;
             this.ui.profileSaveButton.textContent = actionState.saveButtonLabel;
         }
-        this._updateMenuContext();
+        this.uiManager?.updateContext();
     }
 
     _saveProfile(profileName) {
@@ -624,23 +606,8 @@ export class Game {
     }
 
     _showStatusToast(message, durationMs = 1200, tone = 'info') {
-        if (!this.ui.statusToast) return;
-
-        const normalizedTone = tone === 'success' || tone === 'error' ? tone : 'info';
-        this.ui.statusToast.textContent = message;
-        this.ui.statusToast.classList.remove('hidden', 'show', 'toast-info', 'toast-success', 'toast-error');
-        this.ui.statusToast.classList.add(`toast-${normalizedTone}`);
-        // Restart animation on repeated calls.
-        void this.ui.statusToast.offsetWidth;
-        this.ui.statusToast.classList.add('show');
-
-        if (this.toastTimeout) {
-            clearTimeout(this.toastTimeout);
-        }
-        this.toastTimeout = setTimeout(() => {
-            this.ui.statusToast.classList.remove('show');
-            this.ui.statusToast.classList.add('hidden');
-        }, durationMs);
+        if (!this.uiManager || typeof this.uiManager.showToast !== 'function') return;
+        this.uiManager.showToast(message, durationMs, tone);
     }
 
     _showPlayerFeedback(player, message) {

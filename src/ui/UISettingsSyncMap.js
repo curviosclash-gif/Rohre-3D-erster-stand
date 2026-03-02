@@ -1,0 +1,61 @@
+import { SETTINGS_CHANGE_KEYS } from './SettingsChangeKeys.js';
+
+export const UI_SETTINGS_SYNC_MAP = Object.freeze({
+    [SETTINGS_CHANGE_KEYS.MODE]: ['syncModes'],
+    [SETTINGS_CHANGE_KEYS.GAME_MODE]: ['syncModes'],
+    [SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED]: ['syncModes'],
+    [SETTINGS_CHANGE_KEYS.MAP_KEY]: ['syncMap'],
+    [SETTINGS_CHANGE_KEYS.BOTS_COUNT]: ['syncBots'],
+    [SETTINGS_CHANGE_KEYS.BOTS_DIFFICULTY]: ['syncBots'],
+    [SETTINGS_CHANGE_KEYS.RULES_WINS_NEEDED]: ['syncRules'],
+    [SETTINGS_CHANGE_KEYS.RULES_AUTO_ROLL]: ['syncRules'],
+    [SETTINGS_CHANGE_KEYS.RULES_INVERT_P1]: ['syncRules'],
+    [SETTINGS_CHANGE_KEYS.RULES_INVERT_P2]: ['syncRules'],
+    [SETTINGS_CHANGE_KEYS.RULES_COCKPIT_P1]: ['syncRules'],
+    [SETTINGS_CHANGE_KEYS.RULES_COCKPIT_P2]: ['syncRules'],
+    [SETTINGS_CHANGE_KEYS.RULES_PORTALS_ENABLED]: ['syncRules'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_TURN_SENSITIVITY]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANE_SCALE]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_TRAIL_WIDTH]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_GAP_SIZE]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_GAP_FREQUENCY]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_ITEM_AMOUNT]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_FIRE_RATE]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_LOCK_ON_ANGLE]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_MODE]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_PORTAL_COUNT]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_LEVEL_COUNT]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_1]: ['syncVehicles'],
+    [SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_2]: ['syncVehicles'],
+});
+
+const SYNC_METHOD_EXECUTION_ORDER = Object.freeze([
+    'syncModes',
+    'syncMap',
+    'syncBots',
+    'syncRules',
+    'syncGameplay',
+    'syncVehicles',
+]);
+
+export function resolveSyncMethodNamesForChangeKeys(changedKeys) {
+    if (!Array.isArray(changedKeys) || changedKeys.length === 0) {
+        return [];
+    }
+
+    const seenMethods = new Set();
+
+    for (const key of changedKeys) {
+        const mappedMethods = UI_SETTINGS_SYNC_MAP[key];
+        if (!Array.isArray(mappedMethods) || mappedMethods.length === 0) {
+            return [];
+        }
+        for (const methodName of mappedMethods) {
+            if (seenMethods.has(methodName)) continue;
+            seenMethods.add(methodName);
+        }
+    }
+
+    return SYNC_METHOD_EXECUTION_ORDER.filter((methodName) => seenMethods.has(methodName));
+}

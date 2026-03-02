@@ -1,6 +1,8 @@
 import { CONFIG } from '../core/Config.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
+import { SETTINGS_CHANGE_KEYS, normalizeSettingsChangeKeys } from './SettingsChangeKeys.js';
+import { addChangedKeys, changedKeySetToArray } from './SettingsChangeSetOps.js';
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -29,15 +31,88 @@ export class MenuController {
         this.ui = options.ui;
         this.settings = options.settings;
         this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : null;
+        this._queuedInputChangeKeys = new Set();
+        this._queuedInputFlushHandle = null;
+        this._queuedInputFlushUsesAnimationFrame = false;
     }
 
     _emit(type, payload = {}) {
+        if (type !== MENU_CONTROLLER_EVENT_TYPES.SETTINGS_CHANGED) {
+            this._flushQueuedInputSettingsChangedNow();
+        }
         if (!this.onEvent) return;
         this.onEvent({ type, ...payload });
     }
 
-    _emitSettingsChanged() {
+    _emitSettingsChanged(changedKeys) {
+        const normalizedChangedKeys = normalizeSettingsChangeKeys(changedKeys);
+        if (normalizedChangedKeys.length > 0) {
+            this._emit(MENU_CONTROLLER_EVENT_TYPES.SETTINGS_CHANGED, { changedKeys: normalizedChangedKeys });
+            return;
+        }
         this._emit(MENU_CONTROLLER_EVENT_TYPES.SETTINGS_CHANGED);
+    }
+
+    _emitSettingsChangedImmediate(changedKeys) {
+        this._flushQueuedInputSettingsChangedNow();
+        this._emitSettingsChanged(changedKeys);
+    }
+
+    _queueInputSettingsChanged(changedKeys) {
+        const normalizedChangedKeys = normalizeSettingsChangeKeys(changedKeys);
+        if (normalizedChangedKeys.length === 0) return;
+
+        // Keep first input response immediate; merge only follow-up input bursts in the same frame.
+        if (this._queuedInputFlushHandle === null) {
+            this._emitSettingsChanged(normalizedChangedKeys);
+            this._scheduleQueuedInputSettingsChangedFlush();
+            return;
+        }
+
+        addChangedKeys(this._queuedInputChangeKeys, normalizedChangedKeys);
+    }
+
+    _scheduleQueuedInputSettingsChangedFlush() {
+        if (this._queuedInputFlushHandle !== null) return;
+
+        const flush = () => {
+            this._queuedInputFlushHandle = null;
+            this._queuedInputFlushUsesAnimationFrame = false;
+            this._flushQueuedInputSettingsChanged();
+        };
+
+        if (typeof window !== 'undefined' && typeof window.requestAnimationFrame === 'function') {
+            this._queuedInputFlushUsesAnimationFrame = true;
+            this._queuedInputFlushHandle = window.requestAnimationFrame(flush);
+            return;
+        }
+
+        this._queuedInputFlushHandle = setTimeout(flush, 0);
+    }
+
+    _flushQueuedInputSettingsChangedNow() {
+        if (this._queuedInputFlushHandle !== null) {
+            this._cancelQueuedInputSettingsChangedFlush();
+            this._queuedInputFlushHandle = null;
+            this._queuedInputFlushUsesAnimationFrame = false;
+        }
+        this._flushQueuedInputSettingsChanged();
+    }
+
+    _flushQueuedInputSettingsChanged() {
+        const changedKeys = changedKeySetToArray(this._queuedInputChangeKeys);
+        if (changedKeys.length === 0) return;
+        this._queuedInputChangeKeys.clear();
+        this._emitSettingsChanged(changedKeys);
+    }
+
+    _cancelQueuedInputSettingsChangedFlush() {
+        if (this._queuedInputFlushHandle === null) return;
+        if (this._queuedInputFlushUsesAnimationFrame && typeof window !== 'undefined' && typeof window.cancelAnimationFrame === 'function') {
+            window.cancelAnimationFrame(this._queuedInputFlushHandle);
+            return;
+        }
+        clearTimeout(this._queuedInputFlushHandle);
     }
 
     setupListeners() {
@@ -48,7 +123,7 @@ export class MenuController {
         ui.modeButtons.forEach((btn) => {
             btn.addEventListener('click', () => {
                 settings.mode = btn.dataset.mode === '2p' ? '2p' : '1p';
-                this._emitSettingsChanged();
+                this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.MODE]);
             });
         });
 
@@ -56,12 +131,14 @@ export class MenuController {
             ui.gameModeButtons.forEach((btn) => {
                 btn.addEventListener('click', () => {
                     const requested = String(btn.dataset.gameMode || GAME_MODE_TYPES.CLASSIC);
+                    const changedKeys = [SETTINGS_CHANGE_KEYS.GAME_MODE];
                     settings.gameMode = resolveActiveGameMode(requested, huntFeatureEnabled);
                     if (settings.gameMode !== GAME_MODE_TYPES.HUNT) {
                         if (!settings.hunt) settings.hunt = {};
                         settings.hunt.respawnEnabled = false;
+                        changedKeys.push(SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED);
                     }
-                    this._emitSettingsChanged();
+                    this._emitSettingsChangedImmediate(changedKeys);
                 });
             });
         }
@@ -70,20 +147,20 @@ export class MenuController {
             ui.huntRespawnToggle.addEventListener('change', () => {
                 if (!settings.hunt) settings.hunt = {};
                 settings.hunt.respawnEnabled = !!ui.huntRespawnToggle.checked;
-                this._emitSettingsChanged();
+                this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED]);
             });
         }
 
         if (ui.vehicleSelectP1) {
             ui.vehicleSelectP1.addEventListener('change', (e) => {
                 settings.vehicles.PLAYER_1 = e.target.value;
-                this._emitSettingsChanged();
+                this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_1]);
             });
         }
         if (ui.vehicleSelectP2) {
             ui.vehicleSelectP2.addEventListener('change', (e) => {
                 settings.vehicles.PLAYER_2 = e.target.value;
-                this._emitSettingsChanged();
+                this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_2]);
             });
         }
 
@@ -92,50 +169,50 @@ export class MenuController {
             settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || CONFIG.MAPS[selectedMapKey])
                 ? selectedMapKey
                 : 'standard';
-            this._emitSettingsChanged();
+            this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.MAP_KEY]);
         });
 
         ui.botSlider.addEventListener('input', () => {
             settings.numBots = clamp(parseInt(ui.botSlider.value, 10), 0, 8);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.BOTS_COUNT]);
         });
 
         if (ui.botDifficultySelect) {
             ui.botDifficultySelect.addEventListener('change', () => {
                 const value = String(ui.botDifficultySelect.value || '').toUpperCase();
                 settings.botDifficulty = ['EASY', 'NORMAL', 'HARD'].includes(value) ? value : 'NORMAL';
-                this._emitSettingsChanged();
+                this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.BOTS_DIFFICULTY]);
             });
         }
 
         ui.winSlider.addEventListener('input', () => {
             settings.winsNeeded = clamp(parseInt(ui.winSlider.value, 10), 1, 15);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.RULES_WINS_NEEDED]);
         });
 
         ui.autoRollToggle.addEventListener('change', () => {
             settings.autoRoll = !!ui.autoRollToggle.checked;
-            this._emitSettingsChanged();
+            this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.RULES_AUTO_ROLL]);
         });
 
         ui.invertP1.addEventListener('change', () => {
             settings.invertPitch.PLAYER_1 = !!ui.invertP1.checked;
-            this._emitSettingsChanged();
+            this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.RULES_INVERT_P1]);
         });
 
         ui.invertP2.addEventListener('change', () => {
             settings.invertPitch.PLAYER_2 = !!ui.invertP2.checked;
-            this._emitSettingsChanged();
+            this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.RULES_INVERT_P2]);
         });
 
         ui.cockpitCamP1.addEventListener('change', () => {
             settings.cockpitCamera.PLAYER_1 = !!ui.cockpitCamP1.checked;
-            this._emitSettingsChanged();
+            this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.RULES_COCKPIT_P1]);
         });
 
         ui.cockpitCamP2.addEventListener('change', () => {
             settings.cockpitCamera.PLAYER_2 = !!ui.cockpitCamP2.checked;
-            this._emitSettingsChanged();
+            this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.RULES_COCKPIT_P2]);
         });
 
         const planarModeToggle = document.getElementById('planar-mode-toggle');
@@ -143,67 +220,69 @@ export class MenuController {
             planarModeToggle.addEventListener('change', (e) => {
                 if (!settings.gameplay) settings.gameplay = {};
                 settings.gameplay.planarMode = e.target.checked;
+                const changedKeys = [SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_MODE];
 
                 // Usability: Auto-active portals if they are off, because Planar Mode needs them
                 if (settings.gameplay.planarMode && (settings.gameplay.portalCount || 0) === 0) {
                     settings.gameplay.portalCount = 4;
+                    changedKeys.push(SETTINGS_CHANGE_KEYS.GAMEPLAY_PORTAL_COUNT);
                     this._emit(MENU_CONTROLLER_EVENT_TYPES.SHOW_STATUS_TOAST, {
                         message: 'Ebenen-Modus: 4 Portale aktiviert',
                     });
                 }
 
-                this._emitSettingsChanged();
+                this._emitSettingsChangedImmediate(changedKeys);
             });
         }
 
         ui.portalsToggle.addEventListener('change', () => {
             settings.portalsEnabled = !!ui.portalsToggle.checked;
-            this._emitSettingsChanged();
+            this._emitSettingsChangedImmediate([SETTINGS_CHANGE_KEYS.RULES_PORTALS_ENABLED]);
         });
 
         ui.speedSlider.addEventListener('input', () => {
             settings.gameplay.speed = clamp(parseFloat(ui.speedSlider.value), 8, 40);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED]);
         });
 
         ui.turnSlider.addEventListener('input', () => {
             settings.gameplay.turnSensitivity = clamp(parseFloat(ui.turnSlider.value), 0.8, 5);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_TURN_SENSITIVITY]);
         });
 
         ui.planeSizeSlider.addEventListener('input', () => {
             settings.gameplay.planeScale = clamp(parseFloat(ui.planeSizeSlider.value), 0.6, 2.0);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANE_SCALE]);
         });
 
         ui.trailWidthSlider.addEventListener('input', () => {
             settings.gameplay.trailWidth = clamp(parseFloat(ui.trailWidthSlider.value), 0.2, 2.5);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_TRAIL_WIDTH]);
         });
 
         ui.gapSizeSlider.addEventListener('input', () => {
             settings.gameplay.gapSize = clamp(parseFloat(ui.gapSizeSlider.value), 0.05, 1.5);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_GAP_SIZE]);
         });
 
         ui.gapFrequencySlider.addEventListener('input', () => {
             settings.gameplay.gapFrequency = clamp(parseFloat(ui.gapFrequencySlider.value), 0, 0.25);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_GAP_FREQUENCY]);
         });
 
         ui.itemAmountSlider.addEventListener('input', () => {
             settings.gameplay.itemAmount = clamp(parseInt(ui.itemAmountSlider.value, 10), 1, 20);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_ITEM_AMOUNT]);
         });
 
         ui.fireRateSlider.addEventListener('input', () => {
             settings.gameplay.fireRate = clamp(parseFloat(ui.fireRateSlider.value), 0.1, 2.0);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_FIRE_RATE]);
         });
 
         ui.lockOnSlider.addEventListener('input', () => {
             settings.gameplay.lockOnAngle = clamp(parseInt(ui.lockOnSlider.value, 10), 5, 45);
-            this._emitSettingsChanged();
+            this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_LOCK_ON_ANGLE]);
         });
 
         ui.keybindP1.addEventListener('click', (e) => {
@@ -278,7 +357,7 @@ export class MenuController {
                 portalCountLabel.textContent = val;
                 if (!settings.gameplay) settings.gameplay = {};
                 settings.gameplay.portalCount = val;
-                this._emitSettingsChanged();
+                this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_PORTAL_COUNT]);
             });
         }
 
@@ -290,7 +369,7 @@ export class MenuController {
                 planarLevelCountLabel.textContent = val;
                 if (!settings.gameplay) settings.gameplay = {};
                 settings.gameplay.planarLevelCount = val;
-                this._emitSettingsChanged();
+                this._queueInputSettingsChanged([SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_LEVEL_COUNT]);
             });
         }
     }
