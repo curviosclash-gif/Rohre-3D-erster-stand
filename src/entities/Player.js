@@ -10,10 +10,20 @@ import { createVehicleMesh, isValidVehicleId, VEHICLE_DEFINITIONS } from './vehi
 import {
     applyDamage,
     applyHealing,
-    grantShield,
     resetPlayerHealth,
     updatePlayerHealthRegen,
 } from '../hunt/HealthSystem.js';
+import {
+    applyPlayerPowerup,
+    removePlayerEffect,
+    updatePlayerEffects,
+} from './player/PlayerEffectOps.js';
+import {
+    addPlayerInventoryItem,
+    cyclePlayerInventoryItem,
+    dropPlayerInventoryItem,
+    usePlayerInventoryItem,
+} from './player/PlayerInventoryOps.js';
 
 // Shared Geometries (einmalig erstellt, von allen Spielern geteilt)
 const SHARED_GEO = {};
@@ -469,25 +479,7 @@ export class Player {
     }
 
     _updateEffects(dt) {
-        for (let i = this.activeEffects.length - 1; i >= 0; i--) {
-            const effect = this.activeEffects[i];
-            effect.remaining -= dt;
-
-            if (effect.remaining <= 0) {
-                this._removeEffect(effect);
-                this.activeEffects.splice(i, 1);
-            }
-        }
-
-        // Spezial-Gate Timer
-        if (this.boostPortalTimer > 0) {
-            this.boostPortalTimer -= dt;
-            if (this.boostPortalTimer <= 0) this.boostPortalParams = null;
-        }
-        if (this.slingshotTimer > 0) {
-            this.slingshotTimer -= dt;
-            if (this.slingshotTimer <= 0) this.slingshotParams = null;
-        }
+        updatePlayerEffects(this, dt);
     }
 
     _applyModelScale() {
@@ -510,104 +502,27 @@ export class Player {
     }
 
     applyPowerup(type) {
-        const config = CONFIG.POWERUP.TYPES[type];
-        if (!config) return;
-
-        this.activeEffects = this.activeEffects.filter(e => {
-            if (e.type === type) {
-                this._removeEffect(e);
-                return false;
-            }
-            return true;
-        });
-
-        const effect = { type, remaining: config.duration };
-        this.activeEffects.push(effect);
-
-        switch (type) {
-            case 'SPEED_UP':
-                this.baseSpeed = CONFIG.PLAYER.SPEED * config.multiplier;
-                this.speed = this.baseSpeed;
-                break;
-            case 'SLOW_DOWN':
-                this.baseSpeed = CONFIG.PLAYER.SPEED * config.multiplier;
-                this.speed = this.baseSpeed;
-                break;
-            case 'THICK':
-                this.trail.setWidth(config.trailWidth);
-                break;
-            case 'THIN':
-                this.trail.setWidth(config.trailWidth);
-                break;
-            case 'SHIELD':
-                grantShield(this);
-                break;
-            case 'GHOST':
-                this.isGhost = true;
-                break;
-            case 'INVERT':
-                this.invertControls = true;
-                break;
-        }
+        applyPlayerPowerup(this, type);
     }
 
     _removeEffect(effect) {
-        switch (effect.type) {
-            case 'SPEED_UP':
-            case 'SLOW_DOWN':
-                this.baseSpeed = CONFIG.PLAYER.SPEED;
-                this.speed = this.baseSpeed;
-                break;
-            case 'THICK':
-            case 'THIN':
-                this.trail.resetWidth();
-                break;
-            case 'SHIELD':
-                this.hasShield = false;
-                this.shieldHP = 0;
-                break;
-            case 'GHOST':
-                this.isGhost = false;
-                break;
-            case 'INVERT':
-                this.invertControls = false;
-                break;
-        }
+        removePlayerEffect(this, effect);
     }
 
     addToInventory(type) {
-        if (this.inventory.length < CONFIG.POWERUP.MAX_INVENTORY) {
-            this.inventory.push(type);
-            return true;
-        }
-        return false;
+        return addPlayerInventoryItem(this, type);
     }
 
     cycleItem() {
-        if (this.inventory.length > 0) {
-            this.selectedItemIndex = (this.selectedItemIndex + 1) % this.inventory.length;
-        } else {
-            this.selectedItemIndex = 0;
-        }
+        cyclePlayerInventoryItem(this);
     }
 
     useItem() {
-        if (this.inventory.length > 0 && this.selectedItemIndex < this.inventory.length) {
-            const type = this.inventory.splice(this.selectedItemIndex, 1)[0];
-            if (this.selectedItemIndex >= this.inventory.length && this.inventory.length > 0) {
-                this.selectedItemIndex = 0;
-            }
-            this.applyPowerup(type);
-            return type;
-        }
-        return null;
+        return usePlayerInventoryItem(this);
     }
 
     dropItem() {
-        if (this.inventory.length > 0) {
-            return this.inventory.pop();
-        }
-        return null;
+        return dropPlayerInventoryItem(this);
     }
 
     kill() {
