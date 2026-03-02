@@ -1,6 +1,24 @@
 import { test, expect } from '@playwright/test';
 import { loadGame, startGame, startGameWithBots, returnToMenu } from './helpers.js';
 
+async function startHuntGame(page) {
+    await loadGame(page);
+    await page.click('#menu-nav [data-submenu="submenu-game"]');
+    await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 3000 });
+    await page.click('#btn-mode-hunt');
+    await page.click('#submenu-game:not(.hidden) #btn-start');
+    await page.waitForFunction(() => {
+        const hud = document.getElementById('hud');
+        const huntHud = document.getElementById('hunt-hud');
+        const game = window.GAME_INSTANCE;
+        return !!(
+            hud && !hud.classList.contains('hidden')
+            && huntHud && !huntHud.classList.contains('hidden')
+            && game?.entityManager?.players?.length > 0
+        );
+    }, { timeout: 15000 });
+}
+
 test.describe('T41-60: Physik & AI', () => {
 
     test('T41: Arena-Kollision erkennt Wand (außerhalb)', async ({ page }) => {
@@ -269,5 +287,72 @@ test.describe('T41-60: Physik & AI', () => {
             return botAI.sense.targetInFront;
         });
         expect(targetInFront).toBeTruthy();
+    });
+
+    test('T61: Hunt-MG entfernt getroffenes Spursegment sofort', async ({ page }) => {
+        await startHuntGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            if (!entityManager || !player) {
+                return { error: 'missing-entity-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            player.shootCooldown = 0;
+            if (entityManager._overheatGunSystem?._overheatByPlayer) {
+                entityManager._overheatGunSystem._overheatByPlayer[player.index] = 0;
+            }
+            if (entityManager._overheatGunSystem?._lockoutByPlayer) {
+                entityManager._overheatGunSystem._lockoutByPlayer[player.index] = 0;
+            }
+
+            const aim = player.position.clone().set(0, 0, 0);
+            player.getAimDirection(aim).normalize();
+            const from = player.position.clone().addScaledVector(aim, 14);
+            const to = player.position.clone().addScaledVector(aim, 16);
+            const writeIndex = Math.max(0, Number(player?.trail?.writeIndex) || 0);
+            const maxSegments = Math.max(1, Number(player?.trail?.maxSegments) || 5000);
+            const segmentIdx = (writeIndex + Math.floor(maxSegments * 0.5)) % maxSegments;
+            const radius = Math.max(0.15, (Number(player?.trail?.width) || 0.6) * 0.5);
+
+            const trailRef = entityManager.registerTrailSegment(player.index, segmentIdx, {
+                fromX: from.x,
+                fromY: from.y,
+                fromZ: from.z,
+                toX: to.x,
+                toY: to.y,
+                toZ: to.z,
+                midX: (from.x + to.x) * 0.5,
+                midZ: (from.z + to.z) * 0.5,
+                radius,
+                hp: 3,
+                maxHp: 3,
+                ownerTrail: null,
+            });
+
+            const fireResult = entityManager._shootHuntGun(player);
+            const entry = trailRef?.entry || null;
+            const destroyed = !!entry?.destroyed;
+
+            if (!destroyed && trailRef?.key && entry) {
+                entityManager.unregisterTrailSegment(trailRef.key, entry);
+            }
+
+            return {
+                error: null,
+                fireOk: !!fireResult?.ok,
+                trailHit: !!fireResult?.trailHit,
+                destroyed,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.fireOk).toBeTruthy();
+        expect(result.trailHit).toBeTruthy();
+        expect(result.destroyed).toBeTruthy();
     });
 });

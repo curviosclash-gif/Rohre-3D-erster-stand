@@ -6,6 +6,15 @@ function getMgConfig() {
     return CONFIG?.HUNT?.MG || {};
 }
 
+const MG_TRAIL_SELF_SKIP_RECENT = 8;
+const MG_TRAIL_SAMPLE_STEP = 0.7;
+const MG_TRAIL_HIT_RADIUS = 0.45;
+const MG_TRACER_UP_AXIS = new THREE.Vector3(0, 1, 0);
+const MG_TRACER_UNIT_CYLINDER = new THREE.CylinderGeometry(1, 1, 1, 8);
+const MG_TRACER_UNIT_SPHERE = new THREE.SphereGeometry(1, 10, 10);
+const MG_TRACER_DEFAULT_BEAM_RADIUS = 0.16;
+const MG_TRACER_DEFAULT_BULLET_RADIUS = 0.42;
+
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
 }
@@ -40,6 +49,9 @@ export class OverheatGunSystem {
         this._tmpHit = new THREE.Vector3();
         this._tmpMuzzle = new THREE.Vector3();
         this._tmpTracerEnd = new THREE.Vector3();
+        this._tmpTrailProbe = new THREE.Vector3();
+        this._tmpTracerDir = new THREE.Vector3();
+        this._tmpTracerMid = new THREE.Vector3();
     }
 
     reset() {
@@ -110,12 +122,14 @@ export class OverheatGunSystem {
         player.getAimDirection(this._tmpAim).normalize();
         this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
         this._tmpTracerEnd.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, Math.max(10, Number(mg.RANGE || 95)));
-        if (hitResult.target) {
-            this._tmpTracerEnd.copy(hitResult.target.position);
+        if (hitResult.point) {
+            this._tmpTracerEnd.set(hitResult.point.x, hitResult.point.y, hitResult.point.z);
         }
-        this._spawnTracer(this._tmpMuzzle, this._tmpTracerEnd, !!hitResult.target);
+        this._spawnTracer(this._tmpMuzzle, this._tmpTracerEnd, !!(hitResult.target || hitResult.trail), mg);
         if (hitResult.target) {
             this._applyHit(player, hitResult.target, hitResult.distance, mg);
+        } else if (hitResult.trail) {
+            this._applyTrailHit(player, hitResult.trail, mg);
         }
 
         if (this.entityManager?.audio) {
@@ -126,6 +140,7 @@ export class OverheatGunSystem {
             ok: true,
             type: 'MG_BULLET',
             hit: !!hitResult.target,
+            trailHit: !!hitResult.trail,
             overheat: this.getOverheatValue(idx),
         };
     }
@@ -185,7 +200,98 @@ export class OverheatGunSystem {
             }
         }
 
-        return { target: bestTarget, distance: bestDistance };
+        const trailHit = this._resolveTrailHit(player, mg, Math.min(maxRange, bestDistance));
+        if (trailHit && trailHit.distance < bestDistance) {
+            return {
+                target: null,
+                distance: trailHit.distance,
+                trail: trailHit,
+                point: trailHit.point,
+            };
+        }
+
+        if (bestTarget) {
+            return {
+                target: bestTarget,
+                distance: bestDistance,
+                trail: null,
+                point: {
+                    x: bestTarget.position.x,
+                    y: bestTarget.position.y,
+                    z: bestTarget.position.z,
+                },
+            };
+        }
+
+        if (trailHit) {
+            return {
+                target: null,
+                distance: trailHit.distance,
+                trail: trailHit,
+                point: trailHit.point,
+            };
+        }
+
+        return { target: null, distance: Infinity, trail: null, point: null };
+    }
+
+    _resolveTrailHit(player, mg, maxRange) {
+        const trailSpatialIndex = this.entityManager?.getTrailSpatialIndex?.() || this.entityManager?._trailSpatialIndex;
+        if (!trailSpatialIndex?.checkProjectileTrailCollision) return null;
+
+        const selfSkipRecent = Math.max(0, Math.floor(Number(mg.TRAIL_SELF_SKIP_RECENT) || MG_TRAIL_SELF_SKIP_RECENT));
+        const sampleStep = Math.max(0.2, Number(mg.TRAIL_SAMPLE_STEP) || MG_TRAIL_SAMPLE_STEP);
+        const probeRadius = Math.max(0.12, Number(mg.TRAIL_HIT_RADIUS) || MG_TRAIL_HIT_RADIUS);
+
+        player.getAimDirection(this._tmpAim).normalize();
+        this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
+        for (let distance = 0; distance <= maxRange; distance += sampleStep) {
+            this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
+            const hit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
+                excludePlayerIndex: player.index,
+                skipRecent: selfSkipRecent,
+            });
+            if (!hit?.entry) continue;
+
+            if (hit.closestPoint) {
+                this._tmpHit.set(hit.closestPoint.closestX, hit.closestPoint.closestY, hit.closestPoint.closestZ);
+            } else {
+                this._tmpHit.copy(this._tmpTrailProbe);
+            }
+
+            return {
+                entry: hit.entry,
+                distance: this._tmpMuzzle.distanceTo(this._tmpHit),
+                point: {
+                    x: this._tmpHit.x,
+                    y: this._tmpHit.y,
+                    z: this._tmpHit.z,
+                },
+            };
+        }
+
+        return null;
+    }
+
+    _applyTrailHit(attacker, trailHit, mg) {
+        const trailSpatialIndex = this.entityManager?.getTrailSpatialIndex?.() || this.entityManager?._trailSpatialIndex;
+        if (!trailSpatialIndex?.damageTrailSegment || !trailHit?.entry) return;
+
+        const entry = trailHit.entry;
+        const fallbackDamage = Math.max(1, Number(entry.maxHp) || Number(entry.hp) || 1);
+        const configuredDamage = Number(mg.TRAIL_DAMAGE);
+        const damage = Number.isFinite(configuredDamage) && configuredDamage > 0 ? configuredDamage : fallbackDamage;
+        const damageResult = trailSpatialIndex.damageTrailSegment(entry, damage);
+        if (!damageResult?.hit) return;
+
+        if (this.entityManager?.particles && trailHit.point) {
+            this._tmpHit.set(trailHit.point.x, trailHit.point.y, trailHit.point.z);
+            const color = damageResult.destroyed ? 0x66ddff : 0x3388ff;
+            this.entityManager.particles.spawnHit(this._tmpHit, color);
+        }
+        if (this.entityManager?.audio && !attacker?.isBot) {
+            this.entityManager.audio.play('HIT');
+        }
     }
 
     _applyHit(attacker, target, distance, mg) {
@@ -231,26 +337,55 @@ export class OverheatGunSystem {
         feed(`${attackerLabel} -> ${targetLabel}: ${suffix}`);
     }
 
-    _spawnTracer(start, end, hit = false) {
+    _spawnTracer(start, end, hit = false, mg = null) {
         const renderer = this.entityManager?.renderer;
         if (!renderer?.addToScene) return;
 
-        const geometry = new THREE.BufferGeometry().setFromPoints([start.clone(), end.clone()]);
-        const material = new THREE.LineBasicMaterial({
-            color: hit ? 0xffe38a : 0x8ad5ff,
+        this._tmpTracerDir.subVectors(end, start);
+        const length = this._tmpTracerDir.length();
+        if (!Number.isFinite(length) || length <= 0.001) return;
+        this._tmpTracerDir.divideScalar(length);
+
+        const beamRadius = Math.max(0.02, Number(mg?.TRACER_BEAM_RADIUS) || MG_TRACER_DEFAULT_BEAM_RADIUS);
+        const bulletRadius = Math.max(0.04, Number(mg?.TRACER_BULLET_RADIUS) || MG_TRACER_DEFAULT_BULLET_RADIUS);
+        const tracerColor = hit ? 0xffe38a : 0x8ad5ff;
+
+        const beamMaterial = new THREE.MeshBasicMaterial({
+            color: tracerColor,
             transparent: true,
             opacity: 0.92,
             depthWrite: false,
         });
-        const line = new THREE.Line(geometry, material);
-        line.renderOrder = 210;
-        renderer.addToScene(line);
+        const bulletMaterial = new THREE.MeshBasicMaterial({
+            color: tracerColor,
+            transparent: true,
+            opacity: 0.96,
+            depthWrite: false,
+        });
+
+        const tracerRoot = new THREE.Group();
+        tracerRoot.renderOrder = 210;
+        tracerRoot.quaternion.setFromUnitVectors(MG_TRACER_UP_AXIS, this._tmpTracerDir);
+        this._tmpTracerMid.addVectors(start, end).multiplyScalar(0.5);
+        tracerRoot.position.copy(this._tmpTracerMid);
+
+        const beam = new THREE.Mesh(MG_TRACER_UNIT_CYLINDER, beamMaterial);
+        beam.scale.set(beamRadius, length, beamRadius);
+        tracerRoot.add(beam);
+
+        const bullet = new THREE.Mesh(MG_TRACER_UNIT_SPHERE, bulletMaterial);
+        bullet.position.y = length * 0.5;
+        bullet.scale.setScalar(bulletRadius);
+        tracerRoot.add(bullet);
+
+        renderer.addToScene(tracerRoot);
 
         const maxTtl = hit ? 0.11 : 0.08;
         this._tracers.push({
-            mesh: line,
+            mesh: tracerRoot,
             ttl: maxTtl,
             maxTtl,
+            materials: [beamMaterial, bulletMaterial],
         });
     }
 
@@ -265,7 +400,12 @@ export class OverheatGunSystem {
             }
             tracer.ttl -= Math.max(0, dt);
             const fade = clamp(tracer.ttl / Math.max(0.001, tracer.maxTtl), 0, 1);
-            if (tracer.mesh.material) {
+            if (Array.isArray(tracer.materials)) {
+                const opacity = fade * 0.92;
+                for (const material of tracer.materials) {
+                    if (material) material.opacity = opacity;
+                }
+            } else if (tracer.mesh.material) {
                 tracer.mesh.material.opacity = fade * 0.92;
             }
             if (tracer.ttl > 0) continue;
@@ -275,8 +415,13 @@ export class OverheatGunSystem {
             } else if (tracer.mesh.parent) {
                 tracer.mesh.parent.remove(tracer.mesh);
             }
-            tracer.mesh.geometry?.dispose?.();
-            tracer.mesh.material?.dispose?.();
+            if (Array.isArray(tracer.materials)) {
+                for (const material of tracer.materials) {
+                    material?.dispose?.();
+                }
+            } else {
+                tracer.mesh.material?.dispose?.();
+            }
             this._tracers.splice(i, 1);
         }
     }
@@ -292,8 +437,13 @@ export class OverheatGunSystem {
             } else if (mesh.parent) {
                 mesh.parent.remove(mesh);
             }
-            mesh.geometry?.dispose?.();
-            mesh.material?.dispose?.();
+            if (Array.isArray(tracer.materials)) {
+                for (const material of tracer.materials) {
+                    material?.dispose?.();
+                }
+            } else {
+                mesh.material?.dispose?.();
+            }
         }
         this._tracers.length = 0;
     }
