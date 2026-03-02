@@ -1,4 +1,4 @@
-# Umsetzungsplan - Archiv (Phase 1-10)
+﻿# Umsetzungsplan - Archiv (Phase 1-10)
 
 Archiviert am: 2026-03-02
 Alle Phasen hier sind abgeschlossen oder durch Phase 11/12 abgeloest.
@@ -122,7 +122,7 @@ Erledigt: 2026-03-01
   1. Kernmodule schrittweise modularisieren (`main.js`, `EntityManager`, `Bot`), ohne Verhalten zu brechen.
   2. KI ueber klare Policy-Schnittstellen erweiterbar machen.
   3. Hotpath-Allocations reduzieren und messbar validieren.
-- Referenzplan: `docs/Feature_Modulare_Architektur_KI_Performance.md`
+- Referenzplan: `docs/archive/Feature_Modulare_Architektur_KI_Performance.md`
 - Teilphasen:
   - 8.1 [x] Playing-State aus `main.js` extrahieren (Erledigt: 2026-03-01)
   - 8.2 [x] Entity-Update-Pipeline in Subsysteme schneiden (Erledigt: 2026-03-01)
@@ -142,7 +142,7 @@ Geplant: 2026-03-01
 - Ziele:
   1. `main.js` massiv verkleinern durch Auslagerung von persistenten Profilen und Einstellungen.
   2. Trennung von Rendering/Game-Loop und DOM-Menue-Steuerung.
-- Referenzplan: `docs/Feature_Modularisierung_UI_Settings.md`
+- Referenzplan: `docs/archive/Feature_Modularisierung_UI_Settings.md`
 - Teilphasen:
   - [x] 9.1 SettingsManager extrahieren
   - [x] 9.2 ProfileManager extrahieren
@@ -160,7 +160,7 @@ Letztes Update: 2026-03-02
   1. Laufzeit- und UI-Orchestrierung weiter entkoppeln (`main.js` als duenne Shell).
   2. `EntityManager`, `Arena` und `Bot` in klar testbare Subsysteme schneiden.
   3. Performance-Hotpaths (Projectile, Trail, Collision) isolieren und reproduzierbar messen.
-- Referenzplan: `docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md`
+- Referenzplan: `docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md`
 - Teilphasen:
   - [x] 10.1 Core Runtime Loop final entkoppeln (Erledigt: 2026-03-01)
   - [x] 10.2 UI-Verantwortung konsolidieren (UIManager vs MenuController) (Erledigt: 2026-03-01)

@@ -1,4 +1,4 @@
-# Feature: Phase 14 - Hotpath-Performance und modulare Laufzeit-Optimierung (2-Agenten-Plan)
+﻿# Feature: Phase 14 - Hotpath-Performance und modulare Laufzeit-Optimierung (2-Agenten-Plan)
 
 Stand: 2026-03-02
 
@@ -89,7 +89,7 @@ Ziel:
 
 Dateien (2-5):
 
-- `docs/Feature_Modularisierung_Phase14_Hotpath_Performance.md`
+- `docs/archive/Feature_Modularisierung_Phase14_Hotpath_Performance.md`
 - `docs/Testergebnisse_2026-03-02.md` (oder neues Tagesdokument)
 
 Arbeitsschritte:
@@ -291,7 +291,7 @@ Arbeitsschritte:
 
 Definition of Done:
 
-- Weniger unn�tige UI-Arbeit pro Frame.
+- Weniger unnï¿½tige UI-Arbeit pro Frame.
 - Keine visuelle Stotter-Regressions.
 
 Verifikation (Intervall S):
@@ -482,11 +482,11 @@ Commit:
 
 Start erster Schritt:
 
-`Starte Phase 14.0 aus docs/Feature_Modularisierung_Phase14_Hotpath_Performance.md und fuehre danach direkt 14.1A und 14.1B parallel aus.`
+`Starte Phase 14.0 aus docs/archive/Feature_Modularisierung_Phase14_Hotpath_Performance.md und fuehre danach direkt 14.1A und 14.1B parallel aus.`
 
 Weiter nach jedem Schritt:
 
-`Markiere Phase 14.X als erledigt und starte unmittelbar die naechste Phase aus docs/Feature_Modularisierung_Phase14_Hotpath_Performance.md inklusive der dort definierten Verifikation.`
+`Markiere Phase 14.X als erledigt und starte unmittelbar die naechste Phase aus docs/archive/Feature_Modularisierung_Phase14_Hotpath_Performance.md inklusive der dort definierten Verifikation.`
 
 
 

@@ -1,4 +1,4 @@
-# Umsetzungsplan (Master)
+﻿# Umsetzungsplan (Master)
 
 Dies ist der konsolidierte Plan fuer anstehende und laufende Implementierungen.
 Neue Findings aus dem Analysebericht fliessen hier ein.
@@ -100,8 +100,8 @@ Letztes Update: 2026-03-02
   - [x] 12.8 `main.js` Split B - Keybind-Editor Controller entkoppeln
   - [x] 12.11 `Player.js` Split B - Motion/Update Ops auslagern
   - **Block C - Dependency-Gates, warten auf Phase 11:**
-  - [x] 12.9 `main.js` Split C - Match/UI-Flow Controller entkoppeln — **GATE: wartet auf 11.1 [x]**
-  - [x] 12.10 `Player.js` Split A - Effects/Inventory Ops auslagern — **GATE: wartet auf 11.2a [x]**
+  - [x] 12.9 `main.js` Split C - Match/UI-Flow Controller entkoppeln â€” **GATE: wartet auf 11.1 [x]**
+  - [x] 12.10 `Player.js` Split A - Effects/Inventory Ops auslagern â€” **GATE: wartet auf 11.2a [x]**
   - **Abschluss:**
   - [x] 12.12 Abschluss, Verifikation, Cleanup
 - Verifikation pro Teilphase:
@@ -163,7 +163,7 @@ Letztes Update: 2026-03-02
   1. Per-frame DOM- und GC-Last im Runtime-Pfad reduzieren.
   2. Hotpath-Aenderungen in kleine, rollback-freundliche Teilphasen schneiden.
   3. Wirksamkeit ueber feste Testintervalle und Benchmark-Gates nachweisen.
-- Referenzplan: `docs/Feature_Modularisierung_Phase14_Hotpath_Performance.md`
+- Referenzplan: `docs/archive/Feature_Modularisierung_Phase14_Hotpath_Performance.md`
 - Teilphasen:
   - [x] 14.0 Baseline, Metrik-Gates und Ownership finalisieren
   - [x] 14.1A HuntHUD Kill-Feed inkrementell statt Full-Rebuild
@@ -183,7 +183,7 @@ Letztes Update: 2026-03-02
   - Stuck-Events: Baseline `0`, Gate `<= 0`.
   - Funktionale Gates: alle Intervall-S/M/L-Testkommandos ohne neue Fehler.
 - Verifikation:
-  - Intervall S je Mikro-Phase: lane-spezifische Tests gemaess `docs/Feature_Modularisierung_Phase14_Hotpath_Performance.md`
+  - Intervall S je Mikro-Phase: lane-spezifische Tests gemaess `docs/archive/Feature_Modularisierung_Phase14_Hotpath_Performance.md`
   - Intervall M je Wave: `npm run smoke:roundstate`, `npm run smoke:selftrail`
   - Intervall L zum Abschluss: `npm run benchmark:baseline`, `npm run docs:sync`, `npm run docs:check`
 - Prompt-Regel:

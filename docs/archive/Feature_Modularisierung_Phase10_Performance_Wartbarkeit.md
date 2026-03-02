@@ -1,4 +1,4 @@
-# Feature: Phase 10 - Vertiefte Modularisierung fuer Performance und Wartbarkeit
+﻿# Feature: Phase 10 - Vertiefte Modularisierung fuer Performance und Wartbarkeit
 
 Stand: 2026-03-02
 
@@ -71,7 +71,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.1 als erledigt und starte Phase 10.2 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.1 als erledigt und starte Phase 10.2 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -113,7 +113,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.2 als erledigt und starte Phase 10.3 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.2 als erledigt und starte Phase 10.3 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -154,7 +154,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.3 als erledigt und starte Phase 10.4 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.3 als erledigt und starte Phase 10.4 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -194,7 +194,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.4 als erledigt und starte Phase 10.5 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.4 als erledigt und starte Phase 10.5 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -234,7 +234,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.5 als erledigt und starte Phase 10.6 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.5 als erledigt und starte Phase 10.6 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -278,7 +278,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.6 als erledigt und starte Phase 10.7 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.6 als erledigt und starte Phase 10.7 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -320,7 +320,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.7 als erledigt und starte Phase 10.8 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.7 als erledigt und starte Phase 10.8 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -361,7 +361,7 @@ Verifikation:
 
 Naechster-Chat-Prompt:
 
-`Markiere Phase 10.8 als erledigt und starte Phase 10.9 aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
+`Markiere Phase 10.8 als erledigt und starte Phase 10.9 aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md.`
 
 ---
 
@@ -410,4 +410,4 @@ Naechster-Chat-Prompt:
 
 Wenn eine Phase beendet ist, immer diesen Stil nutzen:
 
-`Markiere Phase 10.X als erledigt und starte Phase 10.Y aus docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md. Fuehre danach die Verifikation gemaess Phase 10.Y aus und gib den naechsten Prompt aus.`
+`Markiere Phase 10.X als erledigt und starte Phase 10.Y aus docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md. Fuehre danach die Verifikation gemaess Phase 10.Y aus und gib den naechsten Prompt aus.`

@@ -1,4 +1,4 @@
-# Feature: Phase 12 - KI-freundliche Modularisierung (kleine, sichere Splits)
+﻿# Feature: Phase 12 - KI-freundliche Modularisierung (kleine, sichere Splits)
 
 Stand: 2026-03-02
 
@@ -12,7 +12,7 @@ Die naechste Modularisierungsrunde wird so geschnitten, dass ein KI-Agent pro Ta
 
 ## Voraussetzungen
 
-1. Start erst nach Abschluss von Phase 10.9 (`docs/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md`).
+1. Start erst nach Abschluss von Phase 10.9 (`docs/archive/Feature_Modularisierung_Phase10_Performance_Wartbarkeit.md`).
 2. Architekturregeln aus `docs/ai_architecture_context.md` bleiben unveraendert gueltig.
 
 ## Leitregeln pro Teilphase
