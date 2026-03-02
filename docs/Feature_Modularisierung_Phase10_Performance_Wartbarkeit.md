@@ -1,6 +1,6 @@
 # Feature: Phase 10 - Vertiefte Modularisierung fuer Performance und Wartbarkeit
 
-Stand: 2026-03-01
+Stand: 2026-03-02
 
 ## Ziel
 
@@ -27,10 +27,10 @@ Das Spiel wird in kleinen, sicheren Schritten weiter modularisiert, damit:
 - [x] 10.2 UI-Verantwortung konsolidieren (UIManager vs MenuController) (Erledigt: 2026-03-01)
 - [x] 10.3 HUD- und Crosshair-Logik als eigene Systeme (Erledigt: 2026-03-01)
 - [x] 10.4 EntityManager Split I - ProjectileSystem (Erledigt: 2026-03-01)
-- [ ] 10.5 EntityManager Split II - TrailSpatialIndex
-- [ ] 10.6 Arena Split - Builder / Collision / PortalGate
-- [ ] 10.7 Bot Split II - Recovery/Targeting/Scoring Ops
-- [ ] 10.8 RuntimeConfig Snapshot statt globaler Streuung
+- [x] 10.5 EntityManager Split II - TrailSpatialIndex (Erledigt: 2026-03-02)
+- [x] 10.6 Arena Split - Builder / Collision / PortalGate (Erledigt: 2026-03-02)
+- [x] 10.7 Bot Split II - Recovery/Targeting/Scoring Ops (Erledigt: 2026-03-02)
+- [x] 10.8 RuntimeConfig Snapshot statt globaler Streuung (Erledigt: 2026-03-02)
 - [ ] 10.9 Abschluss, Baseline-Vergleich, Cleanup
 
 ---
@@ -200,6 +200,8 @@ Naechster-Chat-Prompt:
 
 ## Phase 10.5 - EntityManager Split II - TrailSpatialIndex
 
+Erledigt: 2026-03-02
+
 Ziel:
 
 1. Spatial-Grid- und Trail-Kollisionslogik aus `EntityManager` auslagern.
@@ -237,6 +239,8 @@ Naechster-Chat-Prompt:
 ---
 
 ## Phase 10.6 - Arena Split - Builder / Collision / PortalGate
+
+Erledigt: 2026-03-02
 
 Ziel:
 
@@ -280,6 +284,8 @@ Naechster-Chat-Prompt:
 
 ## Phase 10.7 - Bot Split II - Recovery/Targeting/Scoring Ops
 
+Erledigt: 2026-03-02
+
 Ziel:
 
 1. Verbleibende dicke Bot-Methoden aus `Bot.js` in fokussierte Ops verschieben.
@@ -319,6 +325,8 @@ Naechster-Chat-Prompt:
 ---
 
 ## Phase 10.8 - RuntimeConfig Snapshot statt globaler Streuung
+
+Erledigt: 2026-03-02
 
 Ziel:
 

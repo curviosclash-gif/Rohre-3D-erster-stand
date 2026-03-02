@@ -18,6 +18,9 @@ export class Trail {
         this.color = color;
         this.playerIndex = playerIndex;
         this.entityManager = entityManager;
+        this.trailSpatialIndex = entityManager
+            ? (typeof entityManager.getTrailSpatialIndex === 'function' ? entityManager.getTrailSpatialIndex() : entityManager)
+            : null;
 
         // Ring Buffer Logic
         this.maxSegments = CONFIG.TRAIL.MAX_SEGMENTS || 1400;
@@ -134,8 +137,8 @@ export class Trail {
         if (this.segmentCount >= this.maxSegments) {
             const oldRef = this.segmentRefs[this.writeIndex];
             reusableRef = oldRef;
-            if (oldRef && this.entityManager) {
-                this.entityManager.unregisterTrailSegment(oldRef.key, oldRef.entry);
+            if (oldRef && this.trailSpatialIndex) {
+                this.trailSpatialIndex.unregisterTrailSegment(oldRef.key, oldRef.entry);
             }
         }
 
@@ -154,8 +157,8 @@ export class Trail {
         this._dirty = true;
 
         // Register in global grid
-        if (this.entityManager) {
-            this.segmentRefs[this.writeIndex] = this.entityManager.registerTrailSegment(this.playerIndex, this.writeIndex, {
+        if (this.trailSpatialIndex) {
+            this.segmentRefs[this.writeIndex] = this.trailSpatialIndex.registerTrailSegment(this.playerIndex, this.writeIndex, {
                 midX, midZ, fromX, fromY, fromZ, toX, toY, toZ, radius
             }, reusableRef);
         }
@@ -170,8 +173,8 @@ export class Trail {
         DUMMY.scale.set(0, 0, 0);
         DUMMY.updateMatrix();
         for (let i = 0; i < this.maxSegments; i++) {
-            if (this.segmentRefs[i] && this.entityManager) {
-                this.entityManager.unregisterTrailSegment(this.segmentRefs[i].key, this.segmentRefs[i].entry);
+            if (this.segmentRefs[i] && this.trailSpatialIndex) {
+                this.trailSpatialIndex.unregisterTrailSegment(this.segmentRefs[i].key, this.segmentRefs[i].entry);
             }
             this.mesh.setMatrixAt(i, DUMMY.matrix);
             this.segmentRefs[i] = null;

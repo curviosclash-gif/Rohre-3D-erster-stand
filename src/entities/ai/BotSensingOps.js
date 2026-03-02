@@ -3,6 +3,7 @@
 // ============================================
 
 import { CONFIG } from '../../core/Config.js';
+import { estimateEnemyPressure, selectTarget } from './BotTargetingOps.js';
 
 export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
     const mapBehavior = bot._mapBehavior(arena);
@@ -61,12 +62,12 @@ export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
     bot.sense.immediateDanger = !!(forwardProbe && forwardProbe.immediateDanger);
     bot.sense.localOpenness = opennessCount > 0 ? opennessSum / opennessCount : bot.sense.lookAhead * 0.4;
 
-    const nearestEnemyPressure = bot._estimateEnemyPressure(player.position, player, allPlayers);
+    const nearestEnemyPressure = estimateEnemyPressure(bot, player.position, player, allPlayers);
     const tightSpacePressure = 1 - Math.min(1, bot.sense.localOpenness / bot.sense.lookAhead);
     bot.sense.pressure = Math.min(1.6, nearestEnemyPressure * 0.8 + tightSpacePressure * 0.9 + bot._recentBouncePressure * 0.2);
 
     if (bot.state.targetRefreshTimer <= 0 || !bot.state.targetPlayer || !bot.state.targetPlayer.alive) {
-        bot._selectTarget(player, allPlayers);
+        selectTarget(bot, player, allPlayers);
         bot.state.targetRefreshTimer = bot.profile.targetRefreshInterval;
     }
 }

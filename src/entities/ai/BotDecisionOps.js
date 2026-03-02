@@ -3,6 +3,7 @@
 // ============================================
 
 import { CONFIG } from '../../core/Config.js';
+import { enterRecovery, updateRecovery } from './BotRecoveryOps.js';
 
 export function applyPortalSteering(bot, player) {
     if (!bot.state.portalIntentActive || !bot._portalTarget) return false;
@@ -156,8 +157,8 @@ export function decideItemUsage(bot, player, itemRules) {
 
 export function runDecision(bot, dt, player, arena, allPlayers, itemRules) {
     if (bot.sense.immediateDanger && bot.state.recoveryCooldown <= 0 && bot._recentBouncePressure > 2.3) {
-        bot._enterRecovery(player, arena, allPlayers, 'collision-pressure');
-        if (bot._updateRecovery(dt, player, arena, allPlayers)) {
+        enterRecovery(bot, player, arena, allPlayers, 'collision-pressure');
+        if (updateRecovery(bot, dt, player, arena, allPlayers)) {
             return true;
         }
     }

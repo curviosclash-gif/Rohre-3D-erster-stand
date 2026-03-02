@@ -6,6 +6,14 @@ import { ParticleSystem } from '../entities/Particles.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
 
+function toSafeInt(value, fallback) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
+        return fallback;
+    }
+    return Math.round(parsed);
+}
+
 export function disposeMatchSessionSystems(renderer, currentSession) {
     if (currentSession?.entityManager) {
         currentSession.entityManager.dispose();
@@ -19,26 +27,27 @@ export function disposeMatchSessionSystems(renderer, currentSession) {
     renderer.clearMatchScene();
 }
 
-function buildHumanConfigs(settings) {
+function buildHumanConfigs(settings, runtimeConfig = null) {
+    const runtimeVehicles = runtimeConfig?.player?.vehicles || null;
     return [
         {
             invertPitch: !!settings?.invertPitch?.PLAYER_1,
             cockpitCamera: !!settings?.cockpitCamera?.PLAYER_1,
-            vehicleId: settings?.vehicles?.PLAYER_1,
+            vehicleId: runtimeVehicles?.PLAYER_1 || settings?.vehicles?.PLAYER_1,
         },
         {
             invertPitch: !!settings?.invertPitch?.PLAYER_2,
             cockpitCamera: !!settings?.cockpitCamera?.PLAYER_2,
-            vehicleId: settings?.vehicles?.PLAYER_2,
+            vehicleId: runtimeVehicles?.PLAYER_2 || settings?.vehicles?.PLAYER_2,
         },
     ];
 }
 
-function buildEntityManagerSetupOptions(settings) {
+function buildEntityManagerSetupOptions(settings, runtimeConfig = null) {
     return {
-        modelScale: settings?.gameplay?.planeScale,
-        botDifficulty: settings?.botDifficulty || 'NORMAL',
-        humanConfigs: buildHumanConfigs(settings),
+        modelScale: runtimeConfig?.player?.modelScale ?? settings?.gameplay?.planeScale,
+        botDifficulty: runtimeConfig?.bot?.activeDifficulty || settings?.botDifficulty || 'NORMAL',
+        humanConfigs: buildHumanConfigs(settings, runtimeConfig),
     };
 }
 
@@ -47,6 +56,7 @@ export function createMatchSession({
     audio,
     recorder,
     settings,
+    runtimeConfig = null,
     requestedMapKey,
     currentSession = null,
 }) {
@@ -54,9 +64,11 @@ export function createMatchSession({
 
     const particles = new ParticleSystem(renderer);
     const arena = new Arena(renderer);
-    arena.portalsEnabled = !!settings?.portalsEnabled;
+    const portalsEnabled = runtimeConfig?.session?.portalsEnabled ?? !!settings?.portalsEnabled;
+    arena.portalsEnabled = !!portalsEnabled;
 
-    const mapResolution = resolveArenaMapSelection(requestedMapKey);
+    const resolvedRequestedMapKey = runtimeConfig?.session?.mapKey || requestedMapKey;
+    const mapResolution = resolveArenaMapSelection(resolvedRequestedMapKey);
     if (mapResolution.isCustom && mapResolution.mapDefinition) {
         CONFIG.MAPS[CUSTOM_MAP_KEY] = mapResolution.mapDefinition;
     }
@@ -66,11 +78,15 @@ export function createMatchSession({
     const powerupManager = new PowerupManager(renderer, arena);
     const entityManager = new EntityManager(renderer, arena, powerupManager, particles, audio, recorder);
 
-    const numHumans = settings?.mode === '2p' ? 2 : 1;
-    const numBots = Number(settings?.numBots) || 0;
-    const winsNeeded = Number(settings?.winsNeeded) || 5;
+    const fallbackHumans = settings?.mode === '2p' ? 2 : 1;
+    const fallbackBots = Number(settings?.numBots) || 0;
+    const fallbackWinsNeeded = Number(settings?.winsNeeded) || 5;
 
-    entityManager.setup(numHumans, numBots, buildEntityManagerSetupOptions(settings));
+    const numHumans = Math.max(1, toSafeInt(runtimeConfig?.session?.numHumans, fallbackHumans));
+    const numBots = Math.max(0, toSafeInt(runtimeConfig?.session?.numBots, fallbackBots));
+    const winsNeeded = Math.max(1, toSafeInt(runtimeConfig?.session?.winsNeeded, fallbackWinsNeeded));
+
+    entityManager.setup(numHumans, numBots, buildEntityManagerSetupOptions(settings, runtimeConfig));
 
     return {
         particles,
@@ -200,6 +216,7 @@ export function initializeMatchSession({
     audio,
     recorder,
     settings,
+    runtimeConfig = null,
     requestedMapKey,
     currentSession = null,
     onPlayerFeedback = null,
@@ -212,6 +229,7 @@ export function initializeMatchSession({
         audio,
         recorder,
         settings,
+        runtimeConfig,
         requestedMapKey,
         currentSession,
     });
@@ -228,7 +246,7 @@ export function initializeMatchSession({
 
     const feedbackPlan = deriveMapResolutionFeedbackPlan({
         mapResolution: session.mapResolution,
-        portalsEnabled: !!settings?.portalsEnabled,
+        portalsEnabled: runtimeConfig?.session?.portalsEnabled ?? !!settings?.portalsEnabled,
     });
 
     return {

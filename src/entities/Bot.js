@@ -7,6 +7,8 @@ import { CONFIG } from '../core/Config.js';
 import { runPerception } from './ai/BotSensingOps.js';
 import { runDecision } from './ai/BotDecisionOps.js';
 import { runAction } from './ai/BotActionOps.js';
+import { estimateEnemyPressure, estimatePointRisk, selectTarget } from './ai/BotTargetingOps.js';
+import { enterRecovery, updateRecovery, updateStuckState } from './ai/BotRecoveryOps.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
@@ -310,222 +312,28 @@ export class BotAI {
         }
     }
 
-    _updateStuckState(player, arena, allPlayers) {
-        if (!this._hasPositionSample) {
-            this._lastPos.copy(player.position);
-            this._hasPositionSample = true;
-            return;
-        }
-
-        if (this._checkStuckTimer > 0) return;
-        this._checkStuckTimer = this.profile.stuckCheckInterval;
-
-        player.getDirection(this._tmpForward).normalize();
-        this._tmpVec.subVectors(player.position, this._lastPos);
-        const movement = this._tmpVec.length();
-        const forwardProgress = this._tmpVec.dot(this._tmpForward);
-
-        const weakMovement = movement < this.profile.minProgressDistance;
-        const weakProgress = forwardProgress < this.profile.minForwardProgress;
-
-        if (weakMovement || weakProgress) {
-            this._stuckScore += this.profile.stuckCheckInterval;
-        } else {
-            this._stuckScore = Math.max(0, this._stuckScore - this.profile.stuckCheckInterval * 0.8);
-        }
-
-        this._stuckScore += this._recentBouncePressure * 0.06;
-        if (this._bounceStreak >= 3) {
-            this._stuckScore += Math.min(0.35, 0.08 * (this._bounceStreak - 2));
-        }
-        this._lastPos.copy(player.position);
-
-        if (!this.state.recoveryActive && this.state.recoveryCooldown <= 0 && this._stuckScore >= this.profile.stuckTriggerTime) {
-            this._enterRecovery(player, arena, allPlayers, 'low-progress');
-        }
+    _selectTarget(player, allPlayers) {
+        selectTarget(this, player, allPlayers);
     }
 
-    _selectRecoveryManeuver(player, arena, allPlayers) {
-        player.getDirection(this._tmpForward).normalize();
-        this._buildBasis(this._tmpForward);
+    _estimateEnemyPressure(position, owner, allPlayers) {
+        return estimateEnemyPressure(this, position, owner, allPlayers);
+    }
 
-        const candidates = CONFIG.GAMEPLAY.PLANAR_MODE
-            ? [
-                { yaw: -1, pitch: 0, weight: 0.02 },
-                { yaw: 1, pitch: 0, weight: 0.02 },
-                { yaw: -1, pitch: 0, weight: 0.12, biasAwayFromNormal: true },
-                { yaw: 1, pitch: 0, weight: 0.12, biasAwayFromNormal: true },
-            ]
-            : [
-                { yaw: -1, pitch: 0, weight: 0.02 },
-                { yaw: 1, pitch: 0, weight: 0.02 },
-                { yaw: -1, pitch: 1, weight: 0.1 },
-                { yaw: 1, pitch: 1, weight: 0.1 },
-                { yaw: -1, pitch: -1, weight: 0.1 },
-                { yaw: 1, pitch: -1, weight: 0.1 },
-                { yaw: -1, pitch: 0, weight: 0.14, biasAwayFromNormal: true },
-                { yaw: 1, pitch: 0, weight: 0.14, biasAwayFromNormal: true },
-            ];
+    _estimatePointRisk(point, player, arena, allPlayers) {
+        return estimatePointRisk(this, point, player, arena, allPlayers);
+    }
 
-        const sampleDistances = [3, 5.5, 8.5, 12];
-        let best = null;
-        let bestScore = Infinity;
-
-        for (let i = 0; i < candidates.length; i++) {
-            const candidate = candidates[i];
-            this._tmpVec.copy(this._tmpForward).addScaledVector(this._tmpRight, candidate.yaw * 0.95);
-            if (!CONFIG.GAMEPLAY.PLANAR_MODE && candidate.pitch !== 0) {
-                this._tmpVec.addScaledVector(this._tmpUp, candidate.pitch * 0.75);
-            }
-            this._tmpVec.normalize();
-
-            let score = candidate.weight;
-
-            if (candidate.biasAwayFromNormal && this._hasCollisionNormal) {
-                const side = this._tmpRight.dot(this._lastCollisionNormal);
-                if ((candidate.yaw > 0 && side > 0) || (candidate.yaw < 0 && side < 0)) {
-                    score += 0.65;
-                }
-            }
-
-            for (let j = 0; j < sampleDistances.length; j++) {
-                const distance = sampleDistances[j];
-                this._tmpVec2.copy(player.position).addScaledVector(this._tmpVec, distance);
-
-                const wallHit = arena.checkCollisionFast(this._tmpVec2, player.hitboxRadius * 1.6);
-                const trailHit = this._checkTrailHit(this._tmpVec2, player, allPlayers);
-                if (wallHit || trailHit) {
-                    score += 3.2 + j * 0.8 + (trailHit ? 0.9 : 0.5);
-                    break;
-                }
-
-                score += this._estimateEnemyPressure(this._tmpVec2, player, allPlayers) * 0.35;
-            }
-
-            if (this._hasCollisionNormal) {
-                const awayDot = this._tmpVec.dot(this._lastCollisionNormal);
-                score -= awayDot * 0.65;
-            }
-
-            if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
-                const margin = 7;
-                const projectedY = player.position.y + this._tmpVec.y * 9;
-                if (projectedY < arena.bounds.minY + margin || projectedY > arena.bounds.maxY - margin) {
-                    score += 0.85;
-                }
-            }
-
-            if (score < bestScore) {
-                bestScore = score;
-                best = candidate;
-            }
-        }
-
-        return best;
+    _updateStuckState(player, arena, allPlayers) {
+        updateStuckState(this, player, arena, allPlayers);
     }
 
     _enterRecovery(player, arena, allPlayers, reason) {
-        this.state.recoveryActive = true;
-        this.state.recoveryTimer = this.profile.recoveryDuration;
-        this.state.recoveryCooldown = this.profile.recoveryCooldown;
-        this.state.recoverySwitchUsed = false;
-        this._stuckScore = 0;
-
-        const maneuver = this._selectRecoveryManeuver(player, arena, allPlayers);
-        let selectedYaw = maneuver?.yaw || (Math.random() > 0.5 ? 1 : -1);
-        this.state.recoveryPitch = CONFIG.GAMEPLAY.PLANAR_MODE ? 0 : (maneuver?.pitch || 0);
-
-        if (this._recoveryChainTimer > 0 && this._lastRecoveryReason === reason) {
-            this._recoveryChainCount = Math.min(6, this._recoveryChainCount + 1);
-        } else {
-            this._recoveryChainCount = 1;
-        }
-        this._recoveryChainTimer = 2.2;
-        this._lastRecoveryReason = reason;
-
-        if (this._recoveryChainCount >= 2 && this._lastRecoveryYaw !== 0 && selectedYaw === this._lastRecoveryYaw) {
-            selectedYaw *= -1;
-        }
-        this._lastRecoveryYaw = selectedYaw;
-        this.state.recoveryYaw = selectedYaw;
-
-        if (this._recoveryChainCount >= 3) {
-            this.state.recoveryTimer *= 1.25;
-            this.state.recoveryCooldown *= 0.8;
-        }
-
-        if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
-            const margin = 8;
-            if (player.position.y < arena.bounds.minY + margin) this.state.recoveryPitch = 1;
-            else if (player.position.y > arena.bounds.maxY - margin) this.state.recoveryPitch = -1;
-        }
-
-        if (this.recorder) {
-            this.recorder.logEvent(
-                'STUCK',
-                player.index,
-                `reason=${reason} yaw=${this.state.recoveryYaw} pitch=${this.state.recoveryPitch} chain=${this._recoveryChainCount}`
-            );
-        }
-    }
-
-    _shouldBoostRecovery(player, arena, allPlayers) {
-        if (this._recentBouncePressure > 1.2) return false;
-        if (this._bounceStreak >= 3) return false;
-        if (this.sense.forwardRisk > 0.62) return false;
-
-        player.getDirection(this._tmpForward).normalize();
-        this._buildBasis(this._tmpForward);
-        this._tmpVec.copy(this._tmpForward);
-        this._tmpVec.addScaledVector(this._tmpRight, this.state.recoveryYaw * 0.22);
-        if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
-            this._tmpVec.addScaledVector(this._tmpUp, this.state.recoveryPitch * 0.2);
-        }
-        this._tmpVec.normalize();
-
-        const checks = [3, 5, 7];
-        for (let i = 0; i < checks.length; i++) {
-            this._tmpVec2.copy(player.position).addScaledVector(this._tmpVec, checks[i]);
-            if (arena.checkCollisionFast(this._tmpVec2, player.hitboxRadius * 1.6) || this._checkTrailHit(this._tmpVec2, player, allPlayers)) {
-                return false;
-            }
-        }
-        return true;
+        enterRecovery(this, player, arena, allPlayers, reason);
     }
 
     _updateRecovery(dt, player, arena, allPlayers) {
-        this.state.recoveryTimer -= dt;
-        if (this.state.recoveryTimer <= 0) {
-            this.state.recoveryActive = false;
-            this.state.recoveryYaw = 0;
-            this.state.recoveryPitch = 0;
-            this.state.recoverySwitchUsed = false;
-            return false;
-        }
-
-        const stuckInsideRecovery =
-            !this.state.recoverySwitchUsed &&
-            this.state.recoveryTimer <= this.profile.recoveryDuration * 0.55 &&
-            (this.sense.forwardRisk > 0.78 || this._recentBouncePressure > 2.1 || this._bounceStreak >= 3);
-        if (stuckInsideRecovery) {
-            this.state.recoveryYaw = this.state.recoveryYaw !== 0 ? -this.state.recoveryYaw : (Math.random() > 0.5 ? 1 : -1);
-            this.state.recoveryPitch = CONFIG.GAMEPLAY.PLANAR_MODE ? 0 : -this.state.recoveryPitch;
-            this.state.recoverySwitchUsed = true;
-            if (this.recorder) {
-                this.recorder.logEvent('RECOVERY_SWITCH', player.index, `yaw=${this.state.recoveryYaw} pitch=${this.state.recoveryPitch}`);
-            }
-        }
-
-        this._resetInput(this.currentInput);
-        this.currentInput.boost = this._shouldBoostRecovery(player, arena, allPlayers);
-        if (this.state.recoveryYaw > 0) this.currentInput.yawRight = true;
-        else if (this.state.recoveryYaw < 0) this.currentInput.yawLeft = true;
-
-        if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
-            if (this.state.recoveryPitch > 0) this.currentInput.pitchUp = true;
-            else if (this.state.recoveryPitch < 0) this.currentInput.pitchDown = true;
-        }
-        return true;
+        return updateRecovery(this, dt, player, arena, allPlayers);
     }
 
     _computeDynamicLookAhead(player) {
@@ -690,67 +498,6 @@ export class BotAI {
         probe.clearance = Math.min(wallDist, trailDist);
         probe.immediateDanger = immediateDanger;
         probe.risk = risk;
-    }
-
-    _selectTarget(player, allPlayers) {
-        let bestTarget = null;
-        let bestScore = -Infinity;
-        let bestDistSq = Infinity;
-
-        player.getDirection(this._tmpForward).normalize();
-
-        for (let i = 0; i < allPlayers.length; i++) {
-            const other = allPlayers[i];
-            if (!other || other === player || !other.alive) continue;
-
-            this._tmpVec.subVectors(other.position, player.position);
-            const distSq = this._tmpVec.lengthSq();
-            if (distSq < 0.0001) continue;
-
-            const invDist = 1 / Math.max(4, Math.sqrt(distSq));
-            const toward = this._tmpVec.normalize().dot(this._tmpForward);
-
-            other.getDirection(this._tmpVec2).normalize();
-            this._tmpVec3.subVectors(player.position, other.position).normalize();
-            const threatAlignment = this._tmpVec2.dot(this._tmpVec3);
-
-            const score = invDist * 0.9 + toward * 0.55 + threatAlignment * 0.35;
-            if (score > bestScore) {
-                bestScore = score;
-                bestTarget = other;
-                bestDistSq = distSq;
-            }
-        }
-
-        this.state.targetPlayer = bestTarget;
-        this.sense.targetDistanceSq = bestTarget ? bestDistSq : Infinity;
-
-        if (bestTarget) {
-            this._tmpVec.subVectors(bestTarget.position, player.position).normalize();
-            this.sense.targetInFront = this._tmpVec.dot(this._tmpForward) > 0.52;
-        } else {
-            this.sense.targetInFront = false;
-        }
-    }
-
-    _estimateEnemyPressure(position, owner, allPlayers) {
-        let nearestDistSq = Infinity;
-        for (let i = 0; i < allPlayers.length; i++) {
-            const other = allPlayers[i];
-            if (!other || other === owner || !other.alive) continue;
-            const d = other.position.distanceToSquared(position);
-            if (d < nearestDistSq) nearestDistSq = d;
-        }
-        if (!isFinite(nearestDistSq)) return 0;
-        const dist = Math.sqrt(nearestDistSq);
-        return dist >= 40 ? 0 : 1 - dist / 40;
-    }
-
-    _estimatePointRisk(point, player, arena, allPlayers) {
-        const wallHit = arena.checkCollisionFast(point, player.hitboxRadius * 2.0) ? 1 : 0;
-        const trailHit = this._checkTrailHit(point, player, allPlayers) ? 1 : 0;
-        const enemyPressure = this._estimateEnemyPressure(point, player, allPlayers);
-        return wallHit * 1.2 + trailHit * 1.5 + enemyPressure * 0.6;
     }
 
     // ================================================================
@@ -977,7 +724,7 @@ export class BotAI {
                 const forwardDot = this._tmpVec.dot(this._tmpForward);
                 if (forwardDot < this.profile.portalEntryDotMin) continue;
 
-                const entryRisk = this._estimatePointRisk(entry, player, arena, allPlayers);
+                const entryRisk = estimatePointRisk(this, entry, player, arena, allPlayers);
                 // Phase 7: Exit-Safety statt einfacher Punkt-Risiko
                 const exitSafety = this._estimateExitSafety(exit, arena, player, allPlayers);
                 const exitRisk = exitSafety;
@@ -1024,10 +771,10 @@ export class BotAI {
         }
 
         this._updateTimers(dt);
-        this._updateStuckState(player, arena, allPlayers);
+        updateStuckState(this, player, arena, allPlayers);
 
         if (this.state.recoveryActive) {
-            if (this._updateRecovery(dt, player, arena, allPlayers)) {
+            if (updateRecovery(this, dt, player, arena, allPlayers)) {
                 return this.currentInput;
             }
         }

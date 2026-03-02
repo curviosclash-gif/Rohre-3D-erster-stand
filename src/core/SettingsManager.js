@@ -5,6 +5,7 @@
 import { CONFIG } from './Config.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { SettingsStore } from '../ui/SettingsStore.js';
+import { createRuntimeConfigSnapshot } from './RuntimeConfig.js';
 
 function clamp(val, min, max) {
     return Math.min(Math.max(val, min), max);
@@ -155,5 +156,9 @@ export class SettingsManager {
 
     saveSettings(settings) {
         return this.store.saveSettings(settings);
+    }
+
+    createRuntimeConfig(settings) {
+        return createRuntimeConfigSnapshot(settings, { baseConfig: CONFIG });
     }
 }

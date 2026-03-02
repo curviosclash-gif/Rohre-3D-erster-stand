@@ -30,6 +30,7 @@ import {
 } from '../ui/MatchUiStateOps.js';
 import { HudRuntimeSystem } from '../ui/HudRuntimeSystem.js';
 import { CrosshairSystem } from '../ui/CrosshairSystem.js';
+import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -59,6 +60,7 @@ export class Game {
         this.activeProfileName = this.profileManager.getActiveProfileName();
         this.settingsDirty = false;
         this.config = CONFIG;
+        this.runtimeConfig = null;
 
         this.state = 'MENU';
         this.roundPause = 0;
@@ -389,52 +391,24 @@ export class Game {
     }
 
     _applySettingsToRuntime() {
-        this.numHumans = this.settings.mode === '2p' ? 2 : 1;
-        this.numBots = this.settings.numBots;
-        this.mapKey = this.settings.mapKey;
-        this.winsNeeded = this.settings.winsNeeded;
+        this.runtimeConfig = this.settingsManager.createRuntimeConfig(this.settings);
 
-        CONFIG.PLAYER.SPEED = this.settings.gameplay.speed;
-        CONFIG.PLAYER.TURN_SPEED = this.settings.gameplay.turnSensitivity;
-        CONFIG.PLAYER.MODEL_SCALE = this.settings.gameplay.planeScale;
-        CONFIG.PLAYER.AUTO_ROLL = this.settings.autoRoll;
+        this.numHumans = this.runtimeConfig.session.numHumans;
+        this.numBots = this.runtimeConfig.session.numBots;
+        this.mapKey = this.runtimeConfig.session.mapKey;
+        this.winsNeeded = this.runtimeConfig.session.winsNeeded;
 
-        if (this.settings.gameplay) {
-            CONFIG.GAMEPLAY.PLANAR_MODE = !!this.settings.gameplay.planarMode;
-            CONFIG.GAMEPLAY.PORTAL_COUNT = this.settings.gameplay.portalCount || 0;
-            CONFIG.GAMEPLAY.PLANAR_LEVEL_COUNT = clamp(parseInt(this.settings.gameplay.planarLevelCount ?? 5, 10), 2, 10);
-        }
+        applyRuntimeConfigCompatibility(this.runtimeConfig, CONFIG);
 
-        CONFIG.TRAIL.WIDTH = this.settings.gameplay.trailWidth;
-        CONFIG.TRAIL.GAP_DURATION = this.settings.gameplay.gapSize;
-        CONFIG.TRAIL.GAP_CHANCE = this.settings.gameplay.gapFrequency;
-
-        CONFIG.POWERUP.MAX_ON_FIELD = Math.round(this.settings.gameplay.itemAmount);
-        CONFIG.PROJECTILE.COOLDOWN = this.settings.gameplay.fireRate;
-
-        if (this.settings.gameplay) {
-            CONFIG.GAMEPLAY.PORTAL_BEAMS = false;
-        }
-
-        CONFIG.BOT.ACTIVE_DIFFICULTY = this.settings.botDifficulty || CONFIG.BOT.DEFAULT_DIFFICULTY;
-
-        // Apply immediately if arena exists
+        // Apply immediately if arena/entity manager are already alive.
         if (this.arena && this.arena.toggleBeams) {
-            this.arena.toggleBeams(CONFIG.GAMEPLAY.PORTAL_BEAMS);
+            this.arena.toggleBeams(this.runtimeConfig.gameplay.portalBeams);
         }
         if (this.entityManager && this.entityManager.setBotDifficulty) {
-            this.entityManager.setBotDifficulty(CONFIG.BOT.ACTIVE_DIFFICULTY);
+            this.entityManager.setBotDifficulty(this.runtimeConfig.bot.activeDifficulty);
         }
 
-        this.input.setBindings(this.settings.controls);
-
-        // Fahrzeuge
-        CONFIG.PLAYER.VEHICLES = {
-            PLAYER_1: this.settings.vehicles?.PLAYER_1 || 'ship5',
-            PLAYER_2: this.settings.vehicles?.PLAYER_2 || 'ship5',
-        };
-
-        CONFIG.HOMING.LOCK_ON_ANGLE = this.settings.gameplay.lockOnAngle;
+        this.input.setBindings(this.runtimeConfig.controls);
     }
 
     _setupMenuListeners() {
@@ -918,6 +892,7 @@ export class Game {
             audio: this.audio,
             recorder: this.recorder,
             settings: this.settings,
+            runtimeConfig: this.runtimeConfig,
             requestedMapKey: this.mapKey,
             currentSession: this._getCurrentMatchSessionRefs(),
             onPlayerFeedback: (player, message) => {
@@ -983,9 +958,9 @@ export class Game {
         return {
             recorder: this.recorder,
             winner,
-            players: this.entityManager.players,
+            players: this.entityManager ? this.entityManager.players : [],
             roundStateController: this.roundStateController,
-            humanPlayerCount: this.entityManager.getHumanPlayers().length,
+            humanPlayerCount: this.entityManager ? this.entityManager.getHumanPlayers().length : 0,
             totalBots: this.numBots,
             winsNeeded: this.winsNeeded,
             logger: console,
@@ -1036,9 +1011,10 @@ export class Game {
     _updatePlanarAimAssist(dt) {
         if (!this.entityManager) return;
 
-        const inputSpeed = CONFIG.GAMEPLAY.PLANAR_AIM_INPUT_SPEED || 1.5;
-        const returnSpeed = CONFIG.GAMEPLAY.PLANAR_AIM_RETURN_SPEED || 0.6;
-        const isPlanar = !!CONFIG.GAMEPLAY.PLANAR_MODE;
+        const gameplayConfig = this.runtimeConfig?.gameplay;
+        const inputSpeed = gameplayConfig?.planarAimInputSpeed || CONFIG.GAMEPLAY.PLANAR_AIM_INPUT_SPEED || 1.5;
+        const returnSpeed = gameplayConfig?.planarAimReturnSpeed || CONFIG.GAMEPLAY.PLANAR_AIM_RETURN_SPEED || 0.6;
+        const isPlanar = gameplayConfig?.planarMode ?? !!CONFIG.GAMEPLAY.PLANAR_MODE;
 
         for (const player of this.entityManager.getHumanPlayers()) {
             const axis = isPlanar ? this._getPlanarAimAxis(player.index) : 0;
