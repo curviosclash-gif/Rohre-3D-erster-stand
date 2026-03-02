@@ -24,6 +24,7 @@ import {
     dropPlayerInventoryItem,
     usePlayerInventoryItem,
 } from './player/PlayerInventoryOps.js';
+import { updatePlayerMotion } from './player/PlayerMotionOps.js';
 
 // Shared Geometries (einmalig erstellt, von allen Spielern geteilt)
 const SHARED_GEO = {};
@@ -296,140 +297,7 @@ export class Player {
 
         // Effekte aktualisieren
         this._updateEffects(dt);
-
-        // Steuerung
-        const turnSpeed = CONFIG.PLAYER.TURN_SPEED * dt;
-        const rollSpeed = CONFIG.PLAYER.ROLL_SPEED * dt;
-
-        let pitchInput = 0;
-        let yawInput = 0;
-        let rollInput = 0;
-
-        if (input) {
-            pitchInput = (input.pitchUp ? 1 : 0) - (input.pitchDown ? 1 : 0);
-            yawInput = (input.yawLeft ? 1 : 0) - (input.yawRight ? 1 : 0);
-            rollInput = (input.rollLeft ? 1 : 0) - (input.rollRight ? 1 : 0);
-
-            // Invertierte Steuerung?
-            if (this.invertPitchBase) {
-                pitchInput *= -1;
-            }
-
-            // Invertierte Steuerung durch Effekt?
-            if (this.invertControls) {
-                pitchInput *= -1;
-                yawInput *= -1;
-            }
-
-            // Planar Mode: Ignore pitch input
-            if (CONFIG.GAMEPLAY.PLANAR_MODE) {
-                pitchInput = 0;
-            }
-
-            // Boost
-            if (!steeringLocked && input.boost && this.boostCooldown <= 0 && !this.isBoosting) {
-                this.isBoosting = true;
-                this.boostTimer = CONFIG.PLAYER.BOOST_DURATION;
-            }
-        }
-
-        if (steeringLocked) {
-            pitchInput = 0;
-            yawInput = 0;
-            rollInput = 0;
-        }
-
-        // Rotation anwenden (wiederverwendbare Objekte)
-        this._tmpEuler.set(
-            pitchInput * turnSpeed,
-            yawInput * turnSpeed,
-            rollInput * rollSpeed,
-            'YXZ'
-        );
-        this._tmpQuat.setFromEuler(this._tmpEuler);
-        this.quaternion.multiply(this._tmpQuat);
-
-        // Auto-Roll (Stabilisierung)
-        if (CONFIG.PLAYER.AUTO_ROLL && rollInput === 0) {
-            this._tmpEuler2.setFromQuaternion(this.quaternion, 'YXZ');
-            this._tmpEuler2.z *= (1 - CONFIG.PLAYER.AUTO_ROLL_SPEED * dt);
-
-            if (CONFIG.GAMEPLAY.PLANAR_MODE) {
-                this._tmpEuler2.x = 0; // Strict pitch lock 
-            }
-
-            this.quaternion.setFromEuler(this._tmpEuler2);
-        } else if (CONFIG.GAMEPLAY.PLANAR_MODE) {
-            // Strict pitch lock even if rolling
-            this._tmpEuler2.setFromQuaternion(this.quaternion, 'YXZ');
-            this._tmpEuler2.x = 0;
-            this.quaternion.setFromEuler(this._tmpEuler2);
-        }
-
-        // Boost-Logik
-        if (this.isBoosting) {
-            this.boostTimer -= dt;
-            this.speed = this.baseSpeed * CONFIG.PLAYER.BOOST_MULTIPLIER;
-            if (this.boostTimer <= 0) {
-                this.isBoosting = false;
-                this.boostCooldown = CONFIG.PLAYER.BOOST_COOLDOWN;
-                this.speed = this.baseSpeed;
-            }
-        }
-        if (this.boostCooldown > 0) {
-            this.boostCooldown -= dt;
-        }
-
-        // Vorwärtsbewegung
-        this._tmpVec.set(0, 0, -1).applyQuaternion(this.quaternion);
-        this.velocity.copy(this._tmpVec).multiplyScalar(this.speed);
-
-        // ---- Spezial-Gate Effekte anwenden ----
-        if (this.boostPortalTimer > 0) {
-            // Starker Vorwärtsschub in Gate-Richtung
-            const factor = Math.min(1, this.boostPortalTimer / 0.5); // Ease out
-            const strength = (this.boostPortalParams?.forwardImpulse || 40) * factor;
-            this.velocity.addScaledVector(this.boostPortalDir, strength);
-
-            // Speed Surge (temporäre Erhöhung des Limits)
-            this.speed = Math.max(this.speed, (this.boostPortalParams?.bonusSpeed || 50));
-        }
-
-        if (this.slingshotTimer > 0) {
-            // Impuls + Lift
-            const factor = Math.min(1, this.slingshotTimer / 1.0);
-            const fStrength = (this.slingshotParams?.forwardImpulse || 25) * factor;
-            const uStrength = (this.slingshotParams?.liftImpulse || 5) * factor;
-
-            this.velocity.addScaledVector(this.slingshotForward, fStrength);
-            this.velocity.addScaledVector(this.slingshotUp, uStrength);
-        }
-
-        if (CONFIG.GAMEPLAY.PLANAR_MODE) {
-            this.velocity.y = 0;
-            // Use currentPlanarY instead of static constant
-            this.position.y = this.currentPlanarY;
-        }
-
-        this.position.x += this.velocity.x * dt;
-        if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
-            this.position.y += this.velocity.y * dt;
-        }
-        this.position.z += this.velocity.z * dt;
-
-        // Trail aktualisieren
-        this.trail.update(dt, this.position, this._tmpVec);
-
-        // Modell-Animationen
-        if (this.vehicleMesh && typeof this.vehicleMesh.tick === 'function') {
-            this.vehicleMesh.tick(dt);
-        }
-
-        // Modell updaten
-        this._updateModel();
-
-        // Matrix für Kollisionsprüfung (OBB) aktualisieren
-        this.group.updateMatrixWorld(true);
+        updatePlayerMotion(this, dt, input, steeringLocked);
     }
 
     _updateModel() {
