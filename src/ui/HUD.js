@@ -21,6 +21,8 @@ export class HUD {
         this.lockReticle = this.container.querySelector('.hud-lock-reticle');
         this.lockDist = this.lockReticle.querySelector('.lock-dist');
         this.boostFill = document.getElementById((playerIndex === 0 ? 'p1' : 'p2') + '-hud-boost-fill');
+        this.lifeBar = document.getElementById((playerIndex === 0 ? 'p1' : 'p2') + '-hud-life-bar');
+        this.lifeFill = document.getElementById((playerIndex === 0 ? 'p1' : 'p2') + '-hud-life-fill');
 
         // Tapes (Scales)
         this.speedScale = this.container.querySelector('#' + (playerIndex === 0 ? 'p1' : 'p2') + '-hud-speed-scale');
@@ -134,6 +136,19 @@ export class HUD {
             } else {
                 this.boostFill.style.width = '100%';
                 this.boostFill.classList.remove('cooldown');
+            }
+        }
+
+        if (this.lifeBar && this.lifeFill) {
+            const maxHp = Math.max(1, Number(player.maxHp) || 1);
+            const hp = Math.max(0, Number(player.hp) || 0);
+            const showLifeBar = maxHp > 1;
+            this.lifeBar.classList.toggle('hidden', !showLifeBar);
+            if (showLifeBar) {
+                const pct = Math.max(0, Math.min(100, (hp / maxHp) * 100));
+                this.lifeFill.style.width = `${pct.toFixed(1)}%`;
+            } else {
+                this.lifeFill.style.width = '0%';
             }
         }
 

@@ -13,8 +13,6 @@ export class HuntHUD {
     constructor(game) {
         this.game = game;
         this.root = document.getElementById('hunt-hud');
-        this.p1HpFill = document.getElementById('hunt-p1-hp-fill');
-        this.p1HpText = document.getElementById('hunt-p1-hp-text');
         this.p1ShieldFill = document.getElementById('hunt-p1-shield-fill');
         this.p1ShieldText = document.getElementById('hunt-p1-shield-text');
         this.p1BoostFill = document.getElementById('hunt-p1-boost-fill');
@@ -22,8 +20,6 @@ export class HuntHUD {
         this.p1OverheatFill = document.getElementById('hunt-p1-overheat-fill');
         this.p1OverheatText = document.getElementById('hunt-p1-overheat-text');
         this.p2Panel = document.getElementById('hunt-p2-panel');
-        this.p2HpFill = document.getElementById('hunt-p2-hp-fill');
-        this.p2HpText = document.getElementById('hunt-p2-hp-text');
         this.p2ShieldFill = document.getElementById('hunt-p2-shield-fill');
         this.p2ShieldText = document.getElementById('hunt-p2-shield-text');
         this.p2BoostFill = document.getElementById('hunt-p2-boost-fill');
@@ -91,8 +87,6 @@ export class HuntHUD {
         if (this._consumeTick('_playerPanelTickTimer', dt, playerPanelInterval) > 0) {
             const humans = game.entityManager ? game.entityManager.getHumanPlayers() : [];
             this._updatePlayerPanel(humans[0], {
-                hpFill: this.p1HpFill,
-                hpText: this.p1HpText,
                 shieldFill: this.p1ShieldFill,
                 shieldText: this.p1ShieldText,
                 boostFill: this.p1BoostFill,
@@ -105,8 +99,6 @@ export class HuntHUD {
                 this.p2Panel.classList.toggle('hidden', !p2Visible);
                 if (p2Visible) {
                     this._updatePlayerPanel(humans[1], {
-                        hpFill: this.p2HpFill,
-                        hpText: this.p2HpText,
                         shieldFill: this.p2ShieldFill,
                         shieldText: this.p2ShieldText,
                         boostFill: this.p2BoostFill,
@@ -129,12 +121,6 @@ export class HuntHUD {
     }
 
     _updatePlayerPanel(player, refs) {
-        const hp = Math.max(0, Number(player?.hp) || 0);
-        const maxHp = Math.max(1, Number(player?.maxHp) || 1);
-        const hpRatio = hp / maxHp;
-        if (refs.hpFill) refs.hpFill.style.width = toPercent(hpRatio);
-        if (refs.hpText) refs.hpText.textContent = `${Math.round(hp)} / ${Math.round(maxHp)}`;
-
         const shield = Math.max(0, Number(player?.shieldHP) || 0);
         const maxShield = Math.max(1, Number(player?.maxShieldHp) || 1);
         const shieldRatio = shield / maxShield;
