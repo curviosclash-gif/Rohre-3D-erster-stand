@@ -143,6 +143,22 @@ export function updatePlayerHealthRegen(player, dt, config = CONFIG, nowSeconds 
     player.hp = Math.min(maxHp, player.hp + regenPerSecond * Math.max(0, dt));
 }
 
+export function resolveCollisionDamage(cause = 'WALL', config = CONFIG) {
+    if (!isHuntHealthActive(config)) {
+        return 1;
+    }
+
+    const table = config?.HUNT?.COLLISION_DAMAGE || {};
+    const key = String(cause || '').toUpperCase();
+    if (key === 'TRAIL' || key === 'TRAIL_SELF' || key === 'TRAIL_OTHER') {
+        return Math.max(1, toSafeNumber(table.TRAIL, 34));
+    }
+    if (key === 'PLAYER_CRASH') {
+        return Math.max(1, toSafeNumber(table.PLAYER_CRASH, 40));
+    }
+    return Math.max(1, toSafeNumber(table.WALL, 22));
+}
+
 export function grantShield(player, config = CONFIG) {
     if (!player) return 0;
     player.hasShield = true;

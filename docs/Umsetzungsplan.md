@@ -56,7 +56,7 @@ Geplant: 2026-03-02
 - Teilphasen:
   - [x] 11.1 Game-Mode-Infrastruktur (HuntMode, HuntConfig, Menue-Toggle, Feature-Flag)
   - [x] 11.2a HP-System (Player-Erweiterung, HealthSystem)
-  - [ ] 11.2b Collision-Umstellung (HP statt Kill)
+  - [x] 11.2b Collision-Umstellung (HP statt Kill)
   - [ ] 11.3 HUD: HP-Bar, Overheat-Bar, Kill-Feed, Schadens-Indikator
   - [ ] 11.4 MG mit Ueberhitzung (OverheatGunSystem, Tracer, Falloff)
   - [ ] 11.5 3-Stufen-Raketen (schwach/mittel/stark, Arena-Pickups)

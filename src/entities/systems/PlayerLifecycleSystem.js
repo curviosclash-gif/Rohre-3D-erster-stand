@@ -3,6 +3,7 @@
 // ============================================
 
 import { CONFIG } from '../../core/Config.js';
+import { isHuntHealthActive, resolveCollisionDamage } from '../../hunt/HealthSystem.js';
 
 export class PlayerLifecycleSystem {
     constructor(entityManager) {
@@ -26,6 +27,7 @@ export class PlayerLifecycleSystem {
 
     updatePlayer(player, dt, input) {
         const entityManager = this.entityManager;
+        const huntModeActive = isHuntHealthActive();
 
         if (input.nextItem) player.cycleItem();
         if (input.dropItem) player.dropItem();
@@ -106,15 +108,24 @@ export class PlayerLifecycleSystem {
                     if (entityManager.particles) entityManager.particles.spawnHit(player.position, 0x34d399);
                     entityManager._bouncePlayerOnFoam(player, arenaCollision.normal || null);
                     bouncedOnFoam = true;
-                } else if (player.hasShield) {
-                    player.hasShield = false;
-                    player.getDirection(entityManager._tmpDir).multiplyScalar(2.2);
-                    player.position.sub(entityManager._tmpDir);
                 } else {
                     if (entityManager.audio) entityManager.audio.play('HIT');
                     if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
-                    entityManager._killPlayer(player, 'WALL');
-                    return;
+                    if (huntModeActive) {
+                        const wallDamage = resolveCollisionDamage('WALL');
+                        const damageResult = player.takeDamage(wallDamage);
+                        if (damageResult.isDead) {
+                            entityManager._killPlayer(player, 'WALL');
+                            return;
+                        }
+                    } else if (player.hasShield) {
+                        player.hasShield = false;
+                        player.getDirection(entityManager._tmpDir).multiplyScalar(2.2);
+                        player.position.sub(entityManager._tmpDir);
+                    } else {
+                        entityManager._killPlayer(player, 'WALL');
+                        return;
+                    }
                 }
             }
 
@@ -123,12 +134,21 @@ export class PlayerLifecycleSystem {
                 const selfTrailSkipRecent = entityManager.constructor.deriveSelfTrailSkipRecentSegments(player);
                 const collision = entityManager.checkGlobalCollision(player.position, hRadius * 2.0, player.index, selfTrailSkipRecent, player);
                 if (collision && collision.hit) {
-                    if (player.hasShield) {
+                    const trailCause = collision.playerIndex === player.index ? 'TRAIL_SELF' : 'TRAIL_OTHER';
+                    if (huntModeActive) {
+                        if (entityManager.audio) entityManager.audio.play('HIT');
+                        if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
+                        const damageResult = player.takeDamage(resolveCollisionDamage('TRAIL'));
+                        if (damageResult.isDead) {
+                            entityManager._killPlayer(player, trailCause);
+                            return;
+                        }
+                    } else if (player.hasShield) {
                         player.hasShield = false;
                     } else {
                         if (entityManager.audio) entityManager.audio.play('HIT');
                         if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
-                        entityManager._killPlayer(player, collision.playerIndex === player.index ? 'TRAIL_SELF' : 'TRAIL_OTHER');
+                        entityManager._killPlayer(player, trailCause);
                         return;
                     }
                 }
