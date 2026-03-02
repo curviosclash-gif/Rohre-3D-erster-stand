@@ -63,6 +63,13 @@ export class CrosshairSystem {
         }
     }
 
+    _syncCrosshairOverheatState(player, crosshairElement) {
+        if (!crosshairElement || !player) return;
+        const overheat = Number(this.game?.huntState?.overheatByPlayer?.[player.index] || 0);
+        const ratio = clamp(overheat / 100, 0, 1);
+        crosshairElement.style.setProperty('--crosshair-overheat', ratio.toFixed(2));
+    }
+
     updateCrosshairs() {
         const game = this.game;
         if (!game.entityManager) return;
@@ -84,6 +91,7 @@ export class CrosshairSystem {
                 game.ui.crosshairP1.style.display = 'none';
             }
             this._syncCrosshairLockState(0, game.ui.crosshairP1);
+            this._syncCrosshairOverheatState(p1, game.ui.crosshairP1);
         }
 
         if (game.ui.crosshairP2) {
@@ -94,6 +102,7 @@ export class CrosshairSystem {
                     game.ui.crosshairP2.style.display = 'none';
                 }
                 this._syncCrosshairLockState(1, game.ui.crosshairP2);
+                this._syncCrosshairOverheatState(p2, game.ui.crosshairP2);
             } else {
                 game.ui.crosshairP2.style.display = 'none';
             }

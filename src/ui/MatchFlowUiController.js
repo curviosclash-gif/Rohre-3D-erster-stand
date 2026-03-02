@@ -94,6 +94,16 @@ export class MatchFlowUiController {
             },
         });
         game._applyInitializedMatchSession(initializedMatch);
+        if (game.entityManager) {
+            game.entityManager.onHuntFeedEvent = (entry) => {
+                if (!game.huntState) return;
+                if (!Array.isArray(game.huntState.killFeed)) game.huntState.killFeed = [];
+                game.huntState.killFeed.unshift(String(entry));
+                if (game.huntState.killFeed.length > 5) {
+                    game.huntState.killFeed.length = 5;
+                }
+            };
+        }
         game._applyMatchFeedbackPlan(initializedMatch.feedbackPlan);
 
         this.startRound();

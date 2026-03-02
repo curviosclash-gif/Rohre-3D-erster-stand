@@ -17,6 +17,9 @@ export class PlayingStateSystem {
 
         game._updatePlanarAimAssist(dt);
         game.entityManager.update(dt, game.input);
+        if (game.huntState && game.entityManager?.getHuntOverheatSnapshot) {
+            game.huntState.overheatByPlayer = game.entityManager.getHuntOverheatSnapshot();
+        }
         game.powerupManager.update(dt);
         game.particles.update(dt);
         game.arena.update(dt);

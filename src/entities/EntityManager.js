@@ -12,6 +12,7 @@ import { ProjectileSystem } from './systems/ProjectileSystem.js';
 import { PlayerInputSystem } from './systems/PlayerInputSystem.js';
 import { PlayerLifecycleSystem } from './systems/PlayerLifecycleSystem.js';
 import { TrailSpatialIndex } from './systems/TrailSpatialIndex.js';
+import { OverheatGunSystem } from '../hunt/OverheatGunSystem.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -76,6 +77,8 @@ export class EntityManager {
         this.onPlayerFeedback = null;
         this._playerInputSystem = new PlayerInputSystem(this);
         this._playerLifecycleSystem = new PlayerLifecycleSystem(this);
+        this._overheatGunSystem = new OverheatGunSystem(this);
+        this.onHuntFeedEvent = null;
 
         // Wiederverwendbare temp-Vektoren (vermeidet GC-Druck)
         this._tmpVec = new THREE.Vector3();
@@ -340,6 +343,7 @@ export class EntityManager {
     update(dt, inputManager) {
         this._lockOnCache.clear();
         this._projectileSystem.update(dt);
+        this._overheatGunSystem.update(dt);
 
         for (const player of this.players) {
             if (!player.alive) continue;
@@ -399,6 +403,14 @@ export class EntityManager {
 
     _shootItemProjectile(player, preferredIndex = -1) {
         return this._projectileSystem.shootItemProjectile(player, preferredIndex);
+    }
+
+    _shootHuntGun(player) {
+        return this._overheatGunSystem.tryFire(player);
+    }
+
+    getHuntOverheatSnapshot() {
+        return this._overheatGunSystem.getOverheatSnapshot();
     }
 
     _checkLockOn(player) {
@@ -573,6 +585,7 @@ export class EntityManager {
         this.bots.length = 0;
         this.botByPlayer.clear();
         this._projectileSystem.clear();
+        this._overheatGunSystem.reset();
 
         if (this.powerupManager) {
             this.powerupManager.clear();

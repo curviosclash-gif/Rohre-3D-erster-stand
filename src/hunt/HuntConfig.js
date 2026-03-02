@@ -16,6 +16,10 @@ export const HUNT_CONFIG = Object.freeze({
         OVERHEAT_PER_SHOT: 6.5,
         COOLING_PER_SECOND: 22,
         LOCKOUT_THRESHOLD: 100,
+        LOCKOUT_SECONDS: 1.2,
+        RANGE: 95,
+        MIN_FALLOFF: 0.5,
+        AIM_DOT_MIN: 0.965,
     }),
     ROCKET_TIERS: Object.freeze({
         WEAK: Object.freeze({ damage: 15, spawnChance: 0.6 }),

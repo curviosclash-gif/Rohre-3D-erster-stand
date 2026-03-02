@@ -42,7 +42,9 @@ export class PlayerLifecycleSystem {
         }
 
         if (input.shootItem) {
-            const result = entityManager._shootItemProjectile(player, input.shootItemIndex);
+            const result = huntModeActive
+                ? entityManager._shootHuntGun(player)
+                : entityManager._shootItemProjectile(player, input.shootItemIndex);
             if (!result.ok && !player.isBot) {
                 entityManager._notifyPlayerFeedback(player, result.reason);
             } else if (result.ok && entityManager.recorder) {

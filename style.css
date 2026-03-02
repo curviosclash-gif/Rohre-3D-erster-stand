@@ -60,13 +60,14 @@ body {
     transform: translate(-50%, -50%);
     pointer-events: none;
     transition: filter 0.12s ease;
+    --crosshair-overheat: 0;
 }
 
 .crosshair::before,
 .crosshair::after {
     content: '';
     position: absolute;
-    background: rgba(255, 255, 255, 0.8);
+    background: color-mix(in srgb, #ffffff calc((1 - var(--crosshair-overheat)) * 100%), #ff4f4f calc(var(--crosshair-overheat) * 100%));
 }
 
 .crosshair::before {
@@ -91,7 +92,7 @@ body {
     left: 50%;
     width: 28px;
     height: 28px;
-    border: 2px solid rgba(255, 255, 255, 0.6);
+    border: 2px solid color-mix(in srgb, #e6f4ff calc((1 - var(--crosshair-overheat)) * 100%), #ff6a3d calc(var(--crosshair-overheat) * 100%));
     border-radius: 50%;
     transform: translate(-50%, -50%);
 }
@@ -102,7 +103,7 @@ body {
     left: 50%;
     width: 4px;
     height: 4px;
-    background: white;
+    background: color-mix(in srgb, #ffffff calc((1 - var(--crosshair-overheat)) * 100%), #ff5b4d calc(var(--crosshair-overheat) * 100%));
     border-radius: 50%;
     transform: translate(-50%, -50%);
 }
