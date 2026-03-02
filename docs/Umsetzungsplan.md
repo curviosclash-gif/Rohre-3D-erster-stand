@@ -171,7 +171,7 @@ Letztes Update: 2026-03-02
   - [ ] 14.2A HUD/Crosshair nur bei Aenderung in DOM schreiben
   - [x] 14.2B Bot-Portal-Intent ohne Loop-Allokationen
   - [ ] 14.3A HUD-Tick-Entzerrung (getrennte Frequenzen Score/Feed/Indikator)
-  - [ ] 14.3B Overheat-Snapshot als mutable Ref + dirty-Flag
+  - [x] 14.3B Overheat-Snapshot als mutable Ref + dirty-Flag
   - [ ] 14.4 Integration I: PlayingState nur dirty Overheat in `huntState` spiegeln
   - [ ] 14.5 Integration II: Recorder im Runtime-Pfad sauber toggelbar machen
   - [ ] 14.6 Wave-Regression (S+M) und Merge-Hygiene
