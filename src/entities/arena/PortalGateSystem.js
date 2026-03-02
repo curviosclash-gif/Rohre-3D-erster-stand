@@ -5,6 +5,13 @@ import {
     createPortalMesh,
     createSlingshotGateMesh,
 } from './PortalGateMeshFactory.js';
+import {
+    getMapPlanarAnchors,
+    getMapPortalSlots3D,
+    portalPositionFromSlot,
+    resolvePlanarElevatorPair,
+    resolvePortalPosition,
+} from './PortalPlacementOps.js';
 
 function asFiniteNumber(value, defaultValue = 0) {
     const num = Number(value);
@@ -127,8 +134,8 @@ export class PortalGateSystem {
         const bz = Number(def.b[2]);
         if (![ax, ay, az, bx, by, bz].every(Number.isFinite)) return;
 
-        const posA = this._resolvePortalPosition(new THREE.Vector3(ax * scale, ay * scale, az * scale), 11);
-        const posB = this._resolvePortalPosition(new THREE.Vector3(bx * scale, by * scale, bz * scale), 29);
+        const posA = resolvePortalPosition(new THREE.Vector3(ax * scale, ay * scale, az * scale), 11, this.arena, CONFIG.PORTAL);
+        const posB = resolvePortalPosition(new THREE.Vector3(bx * scale, by * scale, bz * scale), 29, this.arena, CONFIG.PORTAL);
         const color = Number.isFinite(def.color) ? def.color : 0x00ffcc;
         this._addPortalInstance(posA, posB, color, 'NEUTRAL', 'NEUTRAL');
     }
@@ -143,7 +150,7 @@ export class PortalGateSystem {
 
     _buildFixed3DPortals(pairCount) {
         const colors = [0x00ffcc, 0xff00cc, 0xffff00, 0x00ccff, 0xff8844, 0x66ff44];
-        const slots = this._getMapPortalSlots3D();
+        const slots = getMapPortalSlots3D(this.arena.currentMapKey);
         if (slots.length < 2) return;
 
         for (let i = 0; i < pairCount; i++) {
@@ -151,10 +158,10 @@ export class PortalGateSystem {
             const slotB = slots[(i * 2 + 5) % slots.length];
             const slotBAlt = slots[(i * 2 + 7) % slots.length];
 
-            const posA = this._portalPositionFromSlot(slotA, i * 13 + 5);
-            let posB = this._portalPositionFromSlot(slotB, i * 17 + 9);
+            const posA = portalPositionFromSlot(slotA, i * 13 + 5, this.arena, CONFIG.PORTAL);
+            let posB = portalPositionFromSlot(slotB, i * 17 + 9, this.arena, CONFIG.PORTAL);
             if (posA.distanceToSquared(posB) < 64) {
-                posB = this._portalPositionFromSlot(slotBAlt, i * 23 + 3);
+                posB = portalPositionFromSlot(slotBAlt, i * 23 + 3, this.arena, CONFIG.PORTAL);
             }
 
             this._addPortalInstance(posA, posB, colors[i % colors.length], 'NEUTRAL', 'NEUTRAL');
@@ -163,7 +170,7 @@ export class PortalGateSystem {
 
     _buildFixedPlanarPortals(pairCount) {
         const colors = [0x00ffcc, 0xff00cc, 0xffff00, 0x00ccff, 0xff8844, 0x66ff44];
-        const anchors = this._getMapPlanarAnchors();
+        const anchors = getMapPlanarAnchors(this.arena.currentMapKey);
         const levels = this.getPortalLevels();
         if (anchors.length === 0 || levels.length < 2) return;
 
@@ -173,136 +180,10 @@ export class PortalGateSystem {
             const levelBand = (i + Math.floor(i / Math.max(1, anchors.length))) % transitionCount;
             const lowY = levels[levelBand];
             const highY = levels[levelBand + 1];
-            const pair = this._resolvePlanarElevatorPair(anchor[0], anchor[1], lowY, highY, i * 29 + 7);
+            const pair = resolvePlanarElevatorPair(anchor[0], anchor[1], lowY, highY, i * 29 + 7, this.arena, CONFIG.PORTAL);
             if (!pair) continue;
             this._addPortalInstance(pair.low, pair.high, colors[i % colors.length], 'UP', 'DOWN');
         }
-    }
-
-    _getMapPortalSlots3D() {
-        const layouts = {
-            standard: [
-                [-0.75, 0.18, -0.75], [0.75, 0.18, 0.75], [0.75, 0.35, -0.75], [-0.75, 0.35, 0.75],
-                [-0.2, 0.52, -0.82], [0.2, 0.52, 0.82], [-0.82, 0.62, 0.2], [0.82, 0.62, -0.2],
-                [0, 0.26, -0.35], [0, 0.58, 0.35], [-0.45, 0.72, 0], [0.45, 0.72, 0],
-            ],
-            empty: [
-                [-0.78, 0.2, -0.78], [0.78, 0.2, 0.78], [0.78, 0.2, -0.78], [-0.78, 0.2, 0.78],
-                [0, 0.45, -0.82], [0, 0.45, 0.82], [-0.82, 0.45, 0], [0.82, 0.45, 0],
-                [-0.35, 0.72, -0.35], [0.35, 0.72, 0.35], [0.35, 0.72, -0.35], [-0.35, 0.72, 0.35],
-            ],
-            maze: [
-                [-0.8, 0.22, -0.6], [0.8, 0.22, 0.6], [-0.8, 0.22, 0.6], [0.8, 0.22, -0.6],
-                [-0.25, 0.5, -0.8], [0.25, 0.5, 0.8], [-0.6, 0.62, 0], [0.6, 0.62, 0],
-                [0, 0.35, -0.2], [0, 0.35, 0.2], [-0.4, 0.75, -0.35], [0.4, 0.75, 0.35],
-            ],
-            complex: [
-                [-0.82, 0.2, -0.82], [0.82, 0.2, 0.82], [0.82, 0.2, -0.82], [-0.82, 0.2, 0.82],
-                [-0.5, 0.42, -0.1], [0.5, 0.42, 0.1], [-0.1, 0.55, 0.5], [0.1, 0.55, -0.5],
-                [0, 0.72, -0.72], [0, 0.72, 0.72], [-0.72, 0.72, 0], [0.72, 0.72, 0],
-            ],
-            pyramid: [
-                [-0.78, 0.18, -0.78], [0.78, 0.18, 0.78], [0.78, 0.18, -0.78], [-0.78, 0.18, 0.78],
-                [-0.45, 0.38, -0.45], [0.45, 0.38, 0.45], [0, 0.58, -0.78], [0, 0.58, 0.78],
-                [-0.78, 0.58, 0], [0.78, 0.58, 0], [-0.2, 0.78, 0], [0.2, 0.78, 0],
-            ],
-        };
-        return layouts[this.arena.currentMapKey] || layouts.standard;
-    }
-
-    _getMapPlanarAnchors() {
-        const anchors = {
-            standard: [[-0.7, -0.7], [0.7, -0.7], [0.7, 0.7], [-0.7, 0.7], [0, -0.45], [0, 0.45], [-0.45, 0], [0.45, 0]],
-            empty: [[-0.75, -0.75], [0.75, -0.75], [0.75, 0.75], [-0.75, 0.75], [0, -0.55], [0, 0.55], [-0.55, 0], [0.55, 0]],
-            maze: [[-0.78, -0.62], [0.78, -0.62], [0.78, 0.62], [-0.78, 0.62], [0, -0.72], [0, 0.72], [-0.52, 0], [0.52, 0]],
-            complex: [[-0.82, -0.82], [0.82, -0.82], [0.82, 0.82], [-0.82, 0.82], [-0.55, 0], [0.55, 0], [0, -0.55], [0, 0.55]],
-            pyramid: [[-0.78, -0.78], [0.78, -0.78], [0.78, 0.78], [-0.78, 0.78], [-0.48, 0], [0.48, 0], [0, -0.48], [0, 0.48]],
-        };
-        return anchors[this.arena.currentMapKey] || anchors.standard;
-    }
-
-    _portalPositionFromSlot(slot, seed) {
-        const b = this.arena.bounds;
-        const margin = CONFIG.PORTAL.RING_SIZE + 2.5;
-        const nx = (slot[0] + 1) * 0.5;
-        const ny = slot[1];
-        const nz = (slot[2] + 1) * 0.5;
-        const pos = new THREE.Vector3(
-            b.minX + margin + nx * (b.maxX - b.minX - 2 * margin),
-            b.minY + margin + ny * (b.maxY - b.minY - 2 * margin),
-            b.minZ + margin + nz * (b.maxZ - b.minZ - 2 * margin)
-        );
-        return this._resolvePortalPosition(pos, seed);
-    }
-
-    _portalPositionFromXZLevel(nx, nz, levelY, seed) {
-        const b = this.arena.bounds;
-        const margin = CONFIG.PORTAL.RING_SIZE + 2.5;
-        const pos = new THREE.Vector3(
-            b.minX + margin + (nx + 1) * 0.5 * (b.maxX - b.minX - 2 * margin),
-            levelY,
-            b.minZ + margin + (nz + 1) * 0.5 * (b.maxZ - b.minZ - 2 * margin)
-        );
-        return this._resolvePortalPosition(pos, seed);
-    }
-
-    _resolvePlanarElevatorPair(nx, nz, lowY, highY, seed = 0) {
-        const b = this.arena.bounds;
-        const margin = CONFIG.PORTAL.RING_SIZE + 2.5;
-        const baseX = b.minX + margin + (nx + 1) * 0.5 * (b.maxX - b.minX - 2 * margin);
-        const baseZ = b.minZ + margin + (nz + 1) * 0.5 * (b.maxZ - b.minZ - 2 * margin);
-
-        const lowProbe = new THREE.Vector3();
-        const highProbe = new THREE.Vector3();
-        for (let i = 0; i < 28; i++) {
-            const angle1 = (((seed + i * 41) % 360) * Math.PI) / 180;
-            const dist1 = i === 0 ? 0 : 2.2 + (i - 1) * 1.2;
-            const x1 = Math.max(b.minX + margin, Math.min(b.maxX - margin, baseX + Math.cos(angle1) * dist1));
-            const z1 = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, baseZ + Math.sin(angle1) * dist1));
-
-            const angle2 = (((seed + 180 + i * 41) % 360) * Math.PI) / 180;
-            const dist2 = i === 0 ? 3.0 : 2.2 + i * 1.2;
-            const x2 = Math.max(b.minX + margin, Math.min(b.maxX - margin, baseX + Math.cos(angle2) * dist2));
-            const z2 = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, baseZ + Math.sin(angle2) * dist2));
-
-            lowProbe.set(x1, lowY, z1);
-            highProbe.set(x2, highY, z2);
-
-            if (!this.arena.checkCollision(lowProbe, 2.0) && !this.arena.checkCollision(highProbe, 2.0)) {
-                return { low: lowProbe.clone(), high: highProbe.clone() };
-            }
-        }
-        return null;
-    }
-
-    _resolvePortalPosition(pos, seed = 0) {
-        const b = this.arena.bounds;
-        const margin = CONFIG.PORTAL.RING_SIZE + 2.5;
-        const testRadius = CONFIG.PORTAL.RADIUS * 0.75;
-        if (!this.arena.checkCollision(pos, testRadius)) {
-            return pos;
-        }
-
-        const probe = new THREE.Vector3();
-        for (let i = 0; i < 20; i++) {
-            const angle = (((seed + i * 37) % 360) * Math.PI) / 180;
-            const dist = 2.5 + i * 1.3;
-            probe.set(
-                pos.x + Math.cos(angle) * dist,
-                pos.y,
-                pos.z + Math.sin(angle) * dist
-            );
-
-            probe.x = Math.max(b.minX + margin, Math.min(b.maxX - margin, probe.x));
-            probe.y = Math.max(b.minY + margin, Math.min(b.maxY - margin, probe.y));
-            probe.z = Math.max(b.minZ + margin, Math.min(b.maxZ - margin, probe.z));
-
-            if (!this.arena.checkCollision(probe, testRadius)) {
-                return probe.clone();
-            }
-        }
-
-        return pos;
     }
 
     _addPortalInstance(posA, posB, color, dirA = 'NEUTRAL', dirB = 'NEUTRAL') {
