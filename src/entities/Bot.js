@@ -74,6 +74,7 @@ export class BotAI {
             cameraSwitch: false,
             dropItem: false,
             shootItem: false,
+            shootMG: false,
             shootItemIndex: -1,
             nextItem: false,
             useItem: -1,
@@ -260,6 +261,7 @@ export class BotAI {
         input.cameraSwitch = false;
         input.dropItem = false;
         input.shootItem = false;
+        input.shootMG = false;
         input.shootItemIndex = -1;
         input.nextItem = false;
         input.useItem = -1;
@@ -709,42 +711,65 @@ export class BotAI {
 
         for (let i = 0; i < arena.portals.length; i++) {
             const portal = arena.portals[i];
-            // PrÃ¼fe beide Seiten des Portals
-            const sides = [
-                { entry: portal.posA, exit: portal.posB },
-                { entry: portal.posB, exit: portal.posA },
-            ];
-
-            for (let s = 0; s < sides.length; s++) {
-                const { entry, exit } = sides[s];
-                const distSq = player.position.distanceToSquared(entry);
-                if (distSq > seekDistSq) continue;
-
-                this._tmpVec.subVectors(entry, player.position).normalize();
-                const forwardDot = this._tmpVec.dot(this._tmpForward);
-                if (forwardDot < this.profile.portalEntryDotMin) continue;
-
-                const entryRisk = estimatePointRisk(this, entry, player, arena, allPlayers);
-                // Phase 7: Exit-Safety statt einfacher Punkt-Risiko
-                const exitSafety = this._estimateExitSafety(exit, arena, player, allPlayers);
-                const exitRisk = exitSafety;
-                // Wenn >= 75% der Exit-Richtungen blockiert sind â†’ Portal meiden
-                if (exitSafety >= 0.75) continue;
-
-                const localRelief = this.sense.forwardRisk - exitRisk;
-                const distancePenalty = distSq / seekDistSq;
-                const score =
-                    localRelief * (0.8 + this.profile.portalInterest) +
-                    this.sense.mapPortalBias * 0.5 -
-                    entryRisk * 0.6 -
-                    distancePenalty * 0.4;
-
-                if (score > bestScore) {
-                    bestScore = score;
-                    bestEntry = entry;
-                    bestExit = exit;
-                    bestEntryDistSq = distSq;
+            const entryA = portal.posA;
+            const exitA = portal.posB;
+            const distSqA = player.position.distanceToSquared(entryA);
+            if (distSqA <= seekDistSq) {
+                this._tmpVec.subVectors(entryA, player.position).normalize();
+                const forwardDotA = this._tmpVec.dot(this._tmpForward);
+                if (forwardDotA >= this.profile.portalEntryDotMin) {
+                    const entryRiskA = estimatePointRisk(this, entryA, player, arena, allPlayers);
+                    // Phase 7: Exit-Safety statt einfacher Punkt-Risiko
+                    const exitSafetyA = this._estimateExitSafety(exitA, arena, player, allPlayers);
+                    const exitRiskA = exitSafetyA;
+                    // Wenn >= 75% der Exit-Richtungen blockiert sind â†’ Portal meiden
+                    if (exitSafetyA < 0.75) {
+                        const localReliefA = this.sense.forwardRisk - exitRiskA;
+                        const distancePenaltyA = distSqA / seekDistSq;
+                        const scoreA =
+                            localReliefA * (0.8 + this.profile.portalInterest) +
+                            this.sense.mapPortalBias * 0.5 -
+                            entryRiskA * 0.6 -
+                            distancePenaltyA * 0.4;
+                        if (scoreA > bestScore) {
+                            bestScore = scoreA;
+                            bestEntry = entryA;
+                            bestExit = exitA;
+                            bestEntryDistSq = distSqA;
+                        }
+                    }
                 }
+            }
+
+            const entryB = portal.posB;
+            const exitB = portal.posA;
+            const distSqB = player.position.distanceToSquared(entryB);
+            if (distSqB > seekDistSq) continue;
+
+            this._tmpVec.subVectors(entryB, player.position).normalize();
+            const forwardDotB = this._tmpVec.dot(this._tmpForward);
+            if (forwardDotB < this.profile.portalEntryDotMin) continue;
+
+            const entryRiskB = estimatePointRisk(this, entryB, player, arena, allPlayers);
+            // Phase 7: Exit-Safety statt einfacher Punkt-Risiko
+            const exitSafetyB = this._estimateExitSafety(exitB, arena, player, allPlayers);
+            const exitRiskB = exitSafetyB;
+            // Wenn >= 75% der Exit-Richtungen blockiert sind â†’ Portal meiden
+            if (exitSafetyB >= 0.75) continue;
+
+            const localReliefB = this.sense.forwardRisk - exitRiskB;
+            const distancePenaltyB = distSqB / seekDistSq;
+            const scoreB =
+                localReliefB * (0.8 + this.profile.portalInterest) +
+                this.sense.mapPortalBias * 0.5 -
+                entryRiskB * 0.6 -
+                distancePenaltyB * 0.4;
+
+            if (scoreB > bestScore) {
+                bestScore = scoreB;
+                bestEntry = entryB;
+                bestExit = exitB;
+                bestEntryDistSq = distSqB;
             }
         }
 

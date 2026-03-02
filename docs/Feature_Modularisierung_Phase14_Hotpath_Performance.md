@@ -69,7 +69,7 @@ Intervall L (vor Abschluss von 14.8):
 - [x] 14.1A HuntHUD Kill-Feed inkrementell statt Full-Rebuild
 - [x] 14.1B RuntimeDiagnostics FPS-Ringbuffer ohne per-frame reduce/shift
 - [ ] 14.2A HUD/Crosshair nur bei Aenderung in DOM schreiben
-- [ ] 14.2B Bot-Portal-Intent ohne Loop-Allokationen
+- [x] 14.2B Bot-Portal-Intent ohne Loop-Allokationen
 - [ ] 14.3A HUD-Tick-Entzerrung (getrennte Frequenzen Score/Feed/Indikator)
 - [ ] 14.3B Overheat-Snapshot als mutable Ref + dirty-Flag
 - [ ] 14.4 Integration I: PlayingState nur dirty Overheat in `huntState` spiegeln
@@ -291,7 +291,7 @@ Arbeitsschritte:
 
 Definition of Done:
 
-- Weniger unnötige UI-Arbeit pro Frame.
+- Weniger unnï¿½tige UI-Arbeit pro Frame.
 - Keine visuelle Stotter-Regressions.
 
 Verifikation (Intervall S):
@@ -487,5 +487,6 @@ Start erster Schritt:
 Weiter nach jedem Schritt:
 
 `Markiere Phase 14.X als erledigt und starte unmittelbar die naechste Phase aus docs/Feature_Modularisierung_Phase14_Hotpath_Performance.md inklusive der dort definierten Verifikation.`
+
 
 
