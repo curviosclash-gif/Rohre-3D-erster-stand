@@ -172,7 +172,7 @@ Letztes Update: 2026-03-02
   - [x] 14.2B Bot-Portal-Intent ohne Loop-Allokationen
   - [x] 14.3A HUD-Tick-Entzerrung (getrennte Frequenzen Score/Feed/Indikator)
   - [x] 14.3B Overheat-Snapshot als mutable Ref + dirty-Flag
-  - [ ] 14.4 Integration I: PlayingState nur dirty Overheat in `huntState` spiegeln
+  - [x] 14.4 Integration I: PlayingState nur dirty Overheat in `huntState` spiegeln
   - [ ] 14.5 Integration II: Recorder im Runtime-Pfad sauber toggelbar machen
   - [ ] 14.6 Wave-Regression (S+M) und Merge-Hygiene
   - [ ] 14.7 Abschluss-Benchmark und KPI-Vergleich gegen Baseline
