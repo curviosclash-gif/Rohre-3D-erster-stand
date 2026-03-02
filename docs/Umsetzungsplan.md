@@ -75,7 +75,7 @@ Geplant: 2026-03-02
 
 ---
 
-## Phase 12: [ ] KI-freundliche Modularisierung (kleine Splits)
+## Phase 12: [x] KI-freundliche Modularisierung (kleine Splits)
 
 Geplant: 2026-03-02
 Letztes Update: 2026-03-02
@@ -102,7 +102,7 @@ Letztes Update: 2026-03-02
   - [x] 12.9 `main.js` Split C - Match/UI-Flow Controller entkoppeln — **GATE: wartet auf 11.1 [x]**
   - [x] 12.10 `Player.js` Split A - Effects/Inventory Ops auslagern — **GATE: wartet auf 11.2a [x]**
   - **Abschluss:**
-  - [ ] 12.12 Abschluss, Verifikation, Cleanup
+  - [x] 12.12 Abschluss, Verifikation, Cleanup
 - Verifikation pro Teilphase:
   - Gemappte Tests gemaess `.agents/test_mapping.md`
   - Pflicht-Gates: `npm run docs:sync` und `npm run docs:check`
@@ -111,3 +111,8 @@ Letztes Update: 2026-03-02
   - Commit-Schema: `refactor(phase12.X): <kurze-beschreibung>`
 - Prompt-Regel:
   - Am Ende jeder Teilphase den im Referenzplan definierten "Naechster-Chat-Prompt" ausgeben und damit direkt die Folgephase starten.
+
+### Restrisiken / Nacharbeiten (Stand: 2026-03-02)
+
+- Hunt-Balancing ist auf Konfigurationsniveau abgestimmt, benoetigt aber weitere Spieltests mit echten Rundenlaengen.
+- Hunt-Powerup-Modelle nutzen aktuell prozedurale 3D-Meshes; externe GLTF-Assets koennen spaeter als optionaler Upgrade-Pfad folgen.

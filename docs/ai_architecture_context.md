@@ -14,6 +14,7 @@ Stand: 2026-03-02
 
 - `main.js`: App-Orchestrierung, Match-Lifecycle, Runtime-State-Anwendung
 - `PlayingStateSystem.js`: kapselt den PLAYING-Updateablauf als eigenes System
+- `RuntimeDiagnosticsSystem.js`: Runtime-Monitoring/FPS/Quality-Delegation aus `main.js`
 - `Config.js`: zentrale Spielkonfiguration
 - `GameLoop.js`: Update-/Render-Takt
 - `Renderer.js`: Scene/Kamera/Render-Layer
@@ -30,10 +31,12 @@ Stand: 2026-03-02
 
 - `Arena.js`: Bounds/Kollisionen, Fast-Collision-Pfade
 - `EntityManager.js`: Pipeline-Orchestrierung fuer Input, Lifecycle, Projectile/Trail-Kollisionen
+- `systems/ProjectileSystem.js`, `systems/TrailSpatialIndex.js`: modulare Projectile-/Trail-Hotpaths
 - `systems/PlayerInputSystem.js`: Human/Bot-Input-Aufloesung
 - `systems/PlayerLifecycleSystem.js`: Spieler-Tick, Arena-/Trail-/Portal-/Powerup-Lifecycle
 - `ai/BotPolicyTypes.js`, `ai/BotPolicyRegistry.js`: Policy-Vertrag und Registry-Fabrik
 - `ai/RuleBasedBotPolicy.js`: Default-Policy-Adapter auf `Bot.js`
+- `hunt/HuntBotPolicy.js`: Hunt-spezifische Bot-Policy (MG/Rocket/HP-Verhalten)
 - `ai/BotSensingOps.js`, `ai/BotDecisionOps.js`, `ai/BotActionOps.js`: modulare KI-Ops
 - `Player.js`, `Bot.js`, `Trail.js`, `Powerup.js`, `Particles.js`
 - `vehicle-registry.js` + Fahrzeug-Mesh-Module
@@ -43,7 +46,15 @@ Stand: 2026-03-02
 
 - `UIManager.js`: Menues und Bedienfluss
 - `HUD.js`: Ingame-Overlay
+- `MatchFlowUiController.js`, `KeybindEditorController.js`: UI-Flow/Settings-Controller-Splits aus `main.js`
 - `SettingsStore.js`, `Profile*Ops.js`, `MatchUiStateOps.js`
+
+### 2.5 Hunt (`src/hunt`)
+
+- `HuntMode.js`, `HuntConfig.js`, `HealthSystem.js`: Game-Mode + HP/Shield-Logik
+- `OverheatGunSystem.js`, `RocketPickupSystem.js`, `DestructibleTrail.js`: Hunt-Kampfpfade
+- `HuntHUD.js`, `ScreenShake.js`: Hunt-UI/Feedback
+- `RespawnSystem.js`, `HuntScoring.js`: Respawn + erweitertes Hunt-Scoring
 
 ## 3. State-Namen (aktuell)
 
