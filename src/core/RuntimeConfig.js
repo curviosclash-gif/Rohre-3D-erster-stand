@@ -65,6 +65,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
     const source = settings && typeof settings === 'object' ? settings : {};
     const gameplaySource = source.gameplay && typeof source.gameplay === 'object' ? source.gameplay : {};
     const huntSource = source.hunt && typeof source.hunt === 'object' ? source.hunt : {};
+    const botBridgeSource = source.botBridge && typeof source.botBridge === 'object' ? source.botBridge : {};
 
     const mode = source.mode === '2p' ? '2p' : '1p';
     const numHumans = mode === '2p' ? 2 : 1;
@@ -124,6 +125,15 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
         },
         bot: {
             activeDifficulty: botDifficulty,
+            trainerBridgeEnabled: !!botBridgeSource.enabled,
+            trainerBridgeUrl: typeof botBridgeSource.url === 'string' && botBridgeSource.url.trim()
+                ? botBridgeSource.url.trim()
+                : 'ws://127.0.0.1:8765',
+            trainerBridgeTimeoutMs: clamp(
+                Math.round(toNumber(botBridgeSource.timeoutMs, 80)),
+                20,
+                5000
+            ),
         },
         homing: {
             lockOnAngle: clamp(Math.round(toNumber(gameplaySource.lockOnAngle, homingDefaults.LOCK_ON_ANGLE)), 5, 45),
@@ -175,6 +185,9 @@ export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CO
     targetConfig.POWERUP.MAX_ON_FIELD = runtimeConfig.powerup.maxOnField;
     targetConfig.PROJECTILE.COOLDOWN = runtimeConfig.projectile.cooldown;
     targetConfig.BOT.ACTIVE_DIFFICULTY = runtimeConfig.bot.activeDifficulty;
+    targetConfig.BOT.TRAINER_BRIDGE_ENABLED = !!runtimeConfig.bot.trainerBridgeEnabled;
+    targetConfig.BOT.TRAINER_BRIDGE_URL = runtimeConfig.bot.trainerBridgeUrl;
+    targetConfig.BOT.TRAINER_BRIDGE_TIMEOUT_MS = runtimeConfig.bot.trainerBridgeTimeoutMs;
     targetConfig.HOMING.LOCK_ON_ANGLE = runtimeConfig.homing.lockOnAngle;
     if (targetConfig.HUNT) {
         targetConfig.HUNT.ACTIVE_MODE = runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC;

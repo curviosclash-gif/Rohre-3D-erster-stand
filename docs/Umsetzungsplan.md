@@ -214,7 +214,7 @@ Letztes Update: 2026-03-03
   - [x] 15.4A Classic-Bridge-Policy integrieren (Agent A)
   - [x] 15.4B Hunt-Bridge-Policy integrieren (Agent B)
   - [ ] 15.5 Integration: RuntimeConfig/Settings/Session-Auswahl
-  - [ ] 15.6 Optional: WebSocket-Bridge fuer externes Training (Feature-Flag)
+  - [x] 15.6 Optional: WebSocket-Bridge fuer externes Training (Feature-Flag)
   - [ ] 15.7 Abschluss: Regression, Doku, Restrisiken
 - GATES:
   - 15.2A startet erst nach 15.1A.

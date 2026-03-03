@@ -4,6 +4,7 @@
 
 import { createNeutralBotAction, sanitizeBotAction } from './actions/BotActionContract.js';
 import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
+import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
 
 function isRuntimeContextPayload(value) {
     return !!(
@@ -24,6 +25,24 @@ function createRuntimeContextFromLegacyArgs(player, arena, allPlayers, projectil
     };
 }
 
+function resolveTrainerBridgeOptions(options = {}) {
+    const runtimeBotConfig = options?.runtimeConfig?.bot || null;
+    const trainerConfig = options?.trainerBridge && typeof options.trainerBridge === 'object'
+        ? options.trainerBridge
+        : null;
+    const enabled = !!(
+        options?.trainerBridgeEnabled
+        ?? trainerConfig?.enabled
+        ?? runtimeBotConfig?.trainerBridgeEnabled
+        ?? false
+    );
+    return {
+        enabled,
+        url: trainerConfig?.url || options?.trainerBridgeUrl || runtimeBotConfig?.trainerBridgeUrl || 'ws://127.0.0.1:8765',
+        timeoutMs: trainerConfig?.timeoutMs || options?.trainerBridgeTimeoutMs || runtimeBotConfig?.trainerBridgeTimeoutMs || 80,
+    };
+}
+
 export class ObservationBridgePolicy {
     constructor(options = {}) {
         this.type = normalizeBotPolicyType(options.type || BOT_POLICY_TYPES.CLASSIC_BRIDGE);
@@ -34,6 +53,12 @@ export class ObservationBridgePolicy {
         this._warningCooldownMs = 2000;
         this._lastWarningAt = 0;
         this._neutralAction = createNeutralBotAction({});
+        this._trainerBridge = null;
+
+        const trainerBridgeOptions = resolveTrainerBridgeOptions(options);
+        if (trainerBridgeOptions.enabled) {
+            this._trainerBridge = new WebSocketTrainerBridge(trainerBridgeOptions);
+        }
     }
 
     _warn(message, error = null) {
@@ -87,6 +112,35 @@ export class ObservationBridgePolicy {
         }, this._neutralAction);
     }
 
+    _buildTrainerPayload(runtimeContext, player) {
+        return {
+            mode: String(runtimeContext?.mode || ''),
+            dt: Number.isFinite(runtimeContext?.dt) ? runtimeContext.dt : 0,
+            observation: runtimeContext?.observation || null,
+            player: player
+                ? {
+                    index: Number.isInteger(player.index) ? player.index : -1,
+                    hp: Number(player.hp) || 0,
+                    maxHp: Number(player.maxHp) || 0,
+                    shieldHp: Number(player.shieldHP) || 0,
+                    maxShieldHp: Number(player.maxShieldHp) || 0,
+                    inventoryLength: Array.isArray(player.inventory) ? player.inventory.length : 0,
+                }
+                : null,
+        };
+    }
+
+    _resolveTrainerBridgeAction(runtimeContext, player) {
+        if (!this._trainerBridge) {
+            return { action: null, failure: null };
+        }
+
+        this._trainerBridge.submitObservation(this._buildTrainerPayload(runtimeContext, player));
+        const action = this._trainerBridge.consumeLatestAction();
+        const failure = this._trainerBridge.consumeFailure();
+        return { action, failure };
+    }
+
     getObservation(player, runtimeContext) {
         if (typeof this._resolveObservation === 'function') {
             try {
@@ -111,6 +165,14 @@ export class ObservationBridgePolicy {
             runtimeContext.observation = this.getObservation(player, runtimeContext);
         }
 
+        const trainerResult = this._resolveTrainerBridgeAction(runtimeContext, player);
+        if (trainerResult.failure) {
+            this._warn(`trainer bridge ${trainerResult.failure}; fallback local policy`);
+        }
+        if (trainerResult.action && typeof trainerResult.action === 'object') {
+            return this._sanitizeAction(trainerResult.action, player);
+        }
+
         if (typeof this._resolveAction === 'function') {
             try {
                 const action = this._resolveAction(runtimeContext, player, dt);
@@ -128,6 +190,9 @@ export class ObservationBridgePolicy {
     }
 
     reset() {
+        if (this._trainerBridge) {
+            this._trainerBridge.close();
+        }
         if (typeof this._fallbackPolicy?.reset === 'function') {
             this._fallbackPolicy.reset();
         }

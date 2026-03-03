@@ -258,6 +258,7 @@ export class EntityManager {
             const ai = this.botPolicyRegistry.create(this.botPolicyType, {
                 difficulty: this.botDifficulty,
                 recorder: this.recorder,
+                runtimeConfig: this.runtimeConfig,
             });
             if (typeof ai?.setSensePhase === 'function') {
                 ai.setSensePhase(i % 4); // Time-Slicing: Bot-Scans auf 4 Frames verteilen

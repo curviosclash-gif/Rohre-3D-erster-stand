@@ -1000,98 +1000,7 @@ test.describe('T41-60: Physik & AI', () => {
         expect(result.brokenHasUpdate).toBeTruthy();
     });
 
-    test('T75: HuntBridgePolicy setzt MG-Druck auf Basis von Observation + Gegnernaehe', async ({ page }) => {
-        await startHuntGameWithBots(page, 1);
-        const result = await page.evaluate(async () => {
-            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
-            const game = window.GAME_INSTANCE;
-            const entityManager = game?.entityManager;
-            const bot = entityManager?.players?.find((player) => player?.isBot);
-            const enemy = entityManager?.players?.find((player) => !player?.isBot);
-            if (!entityManager || !bot || !enemy) {
-                return { error: 'missing-hunt-state' };
-            }
-
-            bot.hp = Math.max(1, bot.maxHp || 1);
-            bot.inventory = [];
-            bot.position.set(0, 50, 0);
-            bot.group?.lookAt(0, 50, -100);
-            enemy.position.set(0, 50, -18);
-
-            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
-            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
-            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.12;
-            context.observation[schema.TARGET_IN_FRONT] = 1;
-            context.observation[schema.PRESSURE_LEVEL] = 0.35;
-            context.observation[schema.PROJECTILE_THREAT] = 0;
-
-            const policy = new HuntBridgePolicy();
-            const action = policy.update(1 / 60, bot, context);
-            return {
-                error: null,
-                type: policy.type,
-                shootMG: !!action?.shootMG,
-                shootItem: !!action?.shootItem,
-                shootItemIndex: Number(action?.shootItemIndex),
-            };
-        });
-
-        expect(result.error).toBeNull();
-        expect(result.type).toBe('hunt-bridge');
-        expect(result.shootMG).toBeTruthy();
-        expect(result.shootItem).toBeFalsy();
-        expect(result.shootItemIndex).toBe(-1);
-    });
-
-    test('T76: HuntBridgePolicy priorisiert Rocket + Boost bei niedrigem HP-Druck', async ({ page }) => {
-        await startHuntGameWithBots(page, 1);
-        const result = await page.evaluate(async () => {
-            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
-            const game = window.GAME_INSTANCE;
-            const entityManager = game?.entityManager;
-            const bot = entityManager?.players?.find((player) => player?.isBot);
-            const enemy = entityManager?.players?.find((player) => !player?.isBot);
-            if (!entityManager || !bot || !enemy) {
-                return { error: 'missing-hunt-state' };
-            }
-
-            bot.maxHp = Math.max(1, Number(bot.maxHp) || 1);
-            bot.hp = Math.max(1, bot.maxHp * 0.2);
-            bot.inventory = ['ROCKET_WEAK', 'ROCKET_STRONG'];
-            bot.selectedItemIndex = 0;
-            bot.position.set(0, 50, 0);
-            bot.group?.lookAt(0, 50, -100);
-            enemy.position.set(2, 50, -14);
-
-            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
-            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
-            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.55;
-            context.observation[schema.TARGET_IN_FRONT] = 1;
-            context.observation[schema.PRESSURE_LEVEL] = 0.92;
-            context.observation[schema.PROJECTILE_THREAT] = 1;
-
-            const policy = new HuntBridgePolicy();
-            const action = policy.update(1 / 60, bot, context);
-            return {
-                error: null,
-                shootItem: !!action?.shootItem,
-                shootItemIndex: Number(action?.shootItemIndex),
-                boost: !!action?.boost,
-                yawCommand: !!action?.yawLeft || !!action?.yawRight,
-                pitchCommand: !!action?.pitchUp || !!action?.pitchDown,
-            };
-        });
-
-        expect(result.error).toBeNull();
-        expect(result.shootItem).toBeTruthy();
-        expect(result.shootItemIndex).toBe(1);
-        expect(result.boost).toBeTruthy();
-        expect(result.yawCommand || result.pitchCommand).toBeTruthy();
-    });
-
-    test('T77: ClassicBridgePolicy leitet Kern-Action aus Observation-Vektor ab', async ({ page }) => {
+    test('T75: ClassicBridgePolicy leitet Kern-Action aus Observation-Vektor ab', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const { ClassicBridgePolicy } = await import('/src/entities/ai/ClassicBridgePolicy.js');
@@ -1142,7 +1051,7 @@ test.describe('T41-60: Physik & AI', () => {
         expect(result.boost).toBeTruthy();
     });
 
-    test('T78: ClassicBridgePolicy routed Action-Failures kontrolliert auf RuleBased-Fallback', async ({ page }) => {
+    test('T76: ClassicBridgePolicy routed Action-Failures kontrolliert auf RuleBased-Fallback', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const { ClassicBridgePolicy } = await import('/src/entities/ai/ClassicBridgePolicy.js');
@@ -1192,5 +1101,204 @@ test.describe('T41-60: Physik & AI', () => {
         expect(result.fallbackType).toBe('rule-based');
         expect(result.fallbackCalled).toBeTruthy();
         expect(result.yawLeft).toBeTruthy();
+    });
+
+    test('T77: HuntBridgePolicy setzt MG-Druck auf Basis von Observation + Gegnernaehe', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(async () => {
+            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const bot = entityManager?.players?.find((player) => player?.isBot);
+            const enemy = entityManager?.players?.find((player) => !player?.isBot);
+            if (!entityManager || !bot || !enemy) {
+                return { error: 'missing-hunt-state' };
+            }
+
+            bot.hp = Math.max(1, bot.maxHp || 1);
+            bot.inventory = [];
+            bot.position.set(0, 50, 0);
+            bot.group?.lookAt(0, 50, -100);
+            enemy.position.set(0, 50, -18);
+
+            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
+            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
+            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.12;
+            context.observation[schema.TARGET_IN_FRONT] = 1;
+            context.observation[schema.PRESSURE_LEVEL] = 0.35;
+            context.observation[schema.PROJECTILE_THREAT] = 0;
+
+            const policy = new HuntBridgePolicy();
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                error: null,
+                type: policy.type,
+                shootMG: !!action?.shootMG,
+                shootItem: !!action?.shootItem,
+                shootItemIndex: Number(action?.shootItemIndex),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.type).toBe('hunt-bridge');
+        expect(result.shootMG).toBeTruthy();
+        expect(result.shootItem).toBeFalsy();
+        expect(result.shootItemIndex).toBe(-1);
+    });
+
+    test('T78: HuntBridgePolicy priorisiert Rocket + Boost bei niedrigem HP-Druck', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(async () => {
+            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const bot = entityManager?.players?.find((player) => player?.isBot);
+            const enemy = entityManager?.players?.find((player) => !player?.isBot);
+            if (!entityManager || !bot || !enemy) {
+                return { error: 'missing-hunt-state' };
+            }
+
+            bot.maxHp = Math.max(1, Number(bot.maxHp) || 1);
+            bot.hp = Math.max(1, bot.maxHp * 0.2);
+            bot.inventory = ['ROCKET_WEAK', 'ROCKET_STRONG'];
+            bot.selectedItemIndex = 0;
+            bot.position.set(0, 50, 0);
+            bot.group?.lookAt(0, 50, -100);
+            enemy.position.set(2, 50, -14);
+
+            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
+            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
+            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.55;
+            context.observation[schema.TARGET_IN_FRONT] = 1;
+            context.observation[schema.PRESSURE_LEVEL] = 0.92;
+            context.observation[schema.PROJECTILE_THREAT] = 1;
+
+            const policy = new HuntBridgePolicy();
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                error: null,
+                shootItem: !!action?.shootItem,
+                shootItemIndex: Number(action?.shootItemIndex),
+                boost: !!action?.boost,
+                yawCommand: !!action?.yawLeft || !!action?.yawRight,
+                pitchCommand: !!action?.pitchUp || !!action?.pitchDown,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.shootItem).toBeTruthy();
+        expect(result.shootItemIndex).toBe(1);
+        expect(result.boost).toBeTruthy();
+        expect(result.yawCommand || result.pitchCommand).toBeTruthy();
+    });
+
+    test('T79: RuntimeConfig setzt Trainer-WebSocket-Flag standardmaessig auf false', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
+            const snapshot = createRuntimeConfigSnapshot({});
+            return {
+                trainerBridgeEnabled: !!snapshot?.bot?.trainerBridgeEnabled,
+                trainerBridgeUrl: String(snapshot?.bot?.trainerBridgeUrl || ''),
+                trainerBridgeTimeoutMs: Number(snapshot?.bot?.trainerBridgeTimeoutMs || 0),
+            };
+        });
+
+        expect(result.trainerBridgeEnabled).toBeFalsy();
+        expect(result.trainerBridgeUrl.startsWith('ws://')).toBeTruthy();
+        expect(result.trainerBridgeTimeoutMs).toBeGreaterThanOrEqual(20);
+    });
+
+    test('T80: ObservationBridgePolicy faellt bei Trainer-Timeout auf lokale Policy zurueck', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            const originalWebSocket = globalThis.WebSocket;
+            let fallbackCalls = 0;
+
+            class MockWebSocket {
+                static CONNECTING = 0;
+                static OPEN = 1;
+                static CLOSING = 2;
+                static CLOSED = 3;
+
+                constructor() {
+                    this.readyState = MockWebSocket.OPEN;
+                    this._listeners = new Map();
+                    setTimeout(() => this._emit('open', {}), 0);
+                }
+
+                addEventListener(type, handler) {
+                    if (!this._listeners.has(type)) {
+                        this._listeners.set(type, []);
+                    }
+                    this._listeners.get(type).push(handler);
+                }
+
+                removeEventListener(type, handler) {
+                    const handlers = this._listeners.get(type) || [];
+                    this._listeners.set(type, handlers.filter((entry) => entry !== handler));
+                }
+
+                _emit(type, event) {
+                    const handlers = this._listeners.get(type) || [];
+                    handlers.forEach((handler) => handler(event));
+                }
+
+                send() {
+                    // intentionally no response to trigger timeout path
+                }
+
+                close() {
+                    this.readyState = MockWebSocket.CLOSED;
+                    this._emit('close', {});
+                }
+            }
+
+            globalThis.WebSocket = MockWebSocket;
+            try {
+                const fallbackPolicy = {
+                    type: 'rule-based',
+                    update() {
+                        fallbackCalls++;
+                        return { yawLeft: true };
+                    },
+                };
+                const policy = new ObservationBridgePolicy({
+                    type: 'classic-bridge',
+                    fallbackPolicy,
+                    trainerBridgeEnabled: true,
+                    trainerBridgeTimeoutMs: 8,
+                    trainerBridgeUrl: 'ws://127.0.0.1:8765',
+                });
+                const bot = { index: 0, inventory: [] };
+                const context = {
+                    mode: 'classic',
+                    dt: 1 / 60,
+                    players: [],
+                    projectiles: [],
+                    observation: new Array(40).fill(0),
+                };
+
+                const firstAction = policy.update(1 / 60, bot, context);
+                await new Promise((resolve) => setTimeout(resolve, 20));
+                const secondAction = policy.update(1 / 60, bot, context);
+
+                policy.reset();
+                return {
+                    firstYawLeft: !!firstAction?.yawLeft,
+                    secondYawLeft: !!secondAction?.yawLeft,
+                    fallbackCalls,
+                };
+            } finally {
+                globalThis.WebSocket = originalWebSocket;
+            }
+        });
+
+        expect(result.firstYawLeft).toBeTruthy();
+        expect(result.secondYawLeft).toBeTruthy();
+        expect(result.fallbackCalls).toBeGreaterThanOrEqual(2);
     });
 });
