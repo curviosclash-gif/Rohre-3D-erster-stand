@@ -69,9 +69,10 @@ Datei-Ownership:
 - [x] 15.3B Registry auf modulare Bridge-Policies erweitern (Agent B)
 - [x] 15.4A Classic-Bridge-Policy integrieren (Agent A)
 - [x] 15.4B Hunt-Bridge-Policy integrieren (Agent B)
-- [ ] 15.5 Integration: RuntimeConfig/Settings/Session-Auswahl
+- [x] 15.5 Integration: RuntimeConfig/Settings/Session-Auswahl
 - [x] 15.6 Optional: WebSocket-Bridge fuer externes Training (Feature-Flag)
-- [ ] 15.7 Abschluss: Regression, Doku, Restrisiken
+- [x] 15.7 Abschluss: Regression, Doku, Restrisiken
+- Abschlussdatum gesamt: 2026-03-03
 
 GATES:
 

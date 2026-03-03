@@ -191,7 +191,7 @@ Letztes Update: 2026-03-02
 
 ---
 
-## Phase 15: [ ] Modulare Bot-Schnittstelle fuer Deep-Learning-Bridge
+## Phase 15: [x] Modulare Bot-Schnittstelle fuer Deep-Learning-Bridge
 
 Geplant: 2026-03-03
 Letztes Update: 2026-03-03
@@ -213,9 +213,9 @@ Letztes Update: 2026-03-03
   - [x] 15.3B Registry auf modulare Bridge-Policies erweitern (Agent B)
   - [x] 15.4A Classic-Bridge-Policy integrieren (Agent A)
   - [x] 15.4B Hunt-Bridge-Policy integrieren (Agent B)
-  - [ ] 15.5 Integration: RuntimeConfig/Settings/Session-Auswahl
+  - [x] 15.5 Integration: RuntimeConfig/Settings/Session-Auswahl
   - [x] 15.6 Optional: WebSocket-Bridge fuer externes Training (Feature-Flag)
-  - [ ] 15.7 Abschluss: Regression, Doku, Restrisiken
+  - [x] 15.7 Abschluss: Regression, Doku, Restrisiken
 - GATES:
   - 15.2A startet erst nach 15.1A.
   - 15.2B startet erst nach 15.1B.
@@ -226,6 +226,11 @@ Letztes Update: 2026-03-03
 - Verifikation pro Teilphase:
   - Gemappte Tests gemaess `.agents/test_mapping.md`
   - Pflicht-Gates: `npm run docs:sync` und `npm run docs:check`
+- Abgeschlossen am: 2026-03-03
+- Restrisiken:
+  - Observation-Schema V2-Migration benoetigt spaeter ein versionssicheres Dual-Read-Fenster.
+  - Externe Trainer-Bridge bleibt latenzsensitiv und sollte mit Telemetrie-Grenzwerten abgesichert werden.
+  - Fuer produktive Training-Loops fehlt noch ein dediziertes Monitoring-Dashboard (siehe Backlog V15).
 - Prompt-Regel:
   - Am Ende jeder Teilphase den im Referenzplan definierten "Naechster-Chat-Prompt" ausgeben und damit direkt die Folgephase starten.
 

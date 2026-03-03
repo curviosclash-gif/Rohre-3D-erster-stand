@@ -44,9 +44,13 @@ function buildHumanConfigs(settings, runtimeConfig = null) {
 }
 
 function buildEntityManagerSetupOptions(settings, runtimeConfig = null) {
+    const runtimeBotConfig = runtimeConfig?.bot || null;
     return {
         modelScale: runtimeConfig?.player?.modelScale ?? settings?.gameplay?.planeScale,
         botDifficulty: runtimeConfig?.bot?.activeDifficulty || settings?.botDifficulty || 'NORMAL',
+        botPolicyType: runtimeBotConfig?.policyType || null,
+        activeGameMode: runtimeConfig?.session?.activeGameMode || settings?.gameMode || null,
+        runtimeConfig,
         humanConfigs: buildHumanConfigs(settings, runtimeConfig),
     };
 }

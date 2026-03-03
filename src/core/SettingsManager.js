@@ -5,7 +5,11 @@
 import { CONFIG } from './Config.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { SettingsStore } from '../ui/SettingsStore.js';
-import { createRuntimeConfigSnapshot } from './RuntimeConfig.js';
+import {
+    BOT_POLICY_STRATEGIES,
+    createRuntimeConfigSnapshot,
+    normalizeBotPolicyStrategy,
+} from './RuntimeConfig.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
 
 function clamp(val, min, max) {
@@ -46,6 +50,7 @@ export class SettingsManager {
             mapKey: 'standard',
             numBots: 1,
             botDifficulty: 'NORMAL',
+            botPolicyStrategy: BOT_POLICY_STRATEGIES.AUTO,
             winsNeeded: 5,
             autoRoll: true,
             invertPitch: {
@@ -143,6 +148,7 @@ export class SettingsManager {
         merged.botDifficulty = ['EASY', 'NORMAL', 'HARD'].includes(src.botDifficulty)
             ? src.botDifficulty
             : defaults.botDifficulty;
+        merged.botPolicyStrategy = normalizeBotPolicyStrategy(src.botPolicyStrategy, defaults.botPolicyStrategy);
         merged.winsNeeded = clamp(parseInt(src.winsNeeded ?? defaults.winsNeeded, 10), 1, 15);
         merged.autoRoll = typeof src.autoRoll === 'boolean' ? src.autoRoll : defaults.autoRoll;
 

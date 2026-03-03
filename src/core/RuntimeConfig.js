@@ -1,5 +1,6 @@
 import { CONFIG } from './Config.js';
 import { GAME_MODE_TYPES, isHuntMode, resolveActiveGameMode } from '../hunt/HuntMode.js';
+import { BOT_POLICY_TYPES } from '../entities/ai/BotPolicyTypes.js';
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -61,6 +62,34 @@ function resolveBotDifficulty(requestedDifficulty, botConfig) {
         : fallback;
 }
 
+export const BOT_POLICY_STRATEGIES = Object.freeze({
+    RULE_BASED: 'rule-based',
+    BRIDGE: 'bridge',
+    AUTO: 'auto',
+});
+const BOT_POLICY_STRATEGY_SET = new Set(Object.values(BOT_POLICY_STRATEGIES));
+
+export function normalizeBotPolicyStrategy(strategy, fallback = BOT_POLICY_STRATEGIES.AUTO) {
+    const normalizedFallback = BOT_POLICY_STRATEGY_SET.has(String(fallback || '').trim().toLowerCase())
+        ? String(fallback).trim().toLowerCase()
+        : BOT_POLICY_STRATEGIES.AUTO;
+    const candidate = typeof strategy === 'string' ? strategy.trim().toLowerCase() : '';
+    return BOT_POLICY_STRATEGY_SET.has(candidate) ? candidate : normalizedFallback;
+}
+
+export function resolveBotPolicyType(strategy, activeGameMode, { huntFeatureEnabled = true } = {}) {
+    const normalizedStrategy = normalizeBotPolicyStrategy(strategy, BOT_POLICY_STRATEGIES.AUTO);
+    const huntModeActive = isHuntMode(activeGameMode, huntFeatureEnabled);
+
+    if (normalizedStrategy === BOT_POLICY_STRATEGIES.BRIDGE) {
+        return huntModeActive ? BOT_POLICY_TYPES.HUNT_BRIDGE : BOT_POLICY_TYPES.CLASSIC_BRIDGE;
+    }
+    if (normalizedStrategy === BOT_POLICY_STRATEGIES.RULE_BASED) {
+        return BOT_POLICY_TYPES.RULE_BASED;
+    }
+    return huntModeActive ? BOT_POLICY_TYPES.HUNT : BOT_POLICY_TYPES.RULE_BASED;
+}
+
 export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = {}) {
     const source = settings && typeof settings === 'object' ? settings : {};
     const gameplaySource = source.gameplay && typeof source.gameplay === 'object' ? source.gameplay : {};
@@ -83,6 +112,8 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
     const controlsDefaults = baseConfig.KEYS || CONFIG.KEYS;
 
     const botDifficulty = resolveBotDifficulty(source.botDifficulty, botDefaults);
+    const botPolicyStrategy = normalizeBotPolicyStrategy(source.botPolicyStrategy, BOT_POLICY_STRATEGIES.AUTO);
+    const botPolicyType = resolveBotPolicyType(botPolicyStrategy, activeGameMode, { huntFeatureEnabled });
 
     const runtimeConfig = {
         session: {
@@ -125,6 +156,8 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
         },
         bot: {
             activeDifficulty: botDifficulty,
+            policyStrategy: botPolicyStrategy,
+            policyType: botPolicyType,
             trainerBridgeEnabled: !!botBridgeSource.enabled,
             trainerBridgeUrl: typeof botBridgeSource.url === 'string' && botBridgeSource.url.trim()
                 ? botBridgeSource.url.trim()
@@ -185,6 +218,8 @@ export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CO
     targetConfig.POWERUP.MAX_ON_FIELD = runtimeConfig.powerup.maxOnField;
     targetConfig.PROJECTILE.COOLDOWN = runtimeConfig.projectile.cooldown;
     targetConfig.BOT.ACTIVE_DIFFICULTY = runtimeConfig.bot.activeDifficulty;
+    targetConfig.BOT.ACTIVE_POLICY_STRATEGY = runtimeConfig?.bot?.policyStrategy || BOT_POLICY_STRATEGIES.AUTO;
+    targetConfig.BOT.ACTIVE_POLICY_TYPE = runtimeConfig?.bot?.policyType || BOT_POLICY_TYPES.RULE_BASED;
     targetConfig.BOT.TRAINER_BRIDGE_ENABLED = !!runtimeConfig.bot.trainerBridgeEnabled;
     targetConfig.BOT.TRAINER_BRIDGE_URL = runtimeConfig.bot.trainerBridgeUrl;
     targetConfig.BOT.TRAINER_BRIDGE_TIMEOUT_MS = runtimeConfig.bot.trainerBridgeTimeoutMs;

@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
 import { Player } from './Player.js';
 import { BotPolicyRegistry } from './ai/BotPolicyRegistry.js';
-import { BOT_POLICY_TYPES, DEFAULT_BOT_POLICY_TYPE } from './ai/BotPolicyTypes.js';
+import { BOT_POLICY_TYPES, DEFAULT_BOT_POLICY_TYPE, normalizeBotPolicyType } from './ai/BotPolicyTypes.js';
 import { createBotRuntimeContext } from './ai/BotRuntimeContextFactory.js';
 import { getVehicleIds, isValidVehicleId } from './vehicle-registry.js';
 import { ProjectileSystem } from './systems/ProjectileSystem.js';
@@ -20,6 +20,22 @@ import { isHuntHealthActive } from '../hunt/HealthSystem.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
+}
+
+function normalizeActiveMode(mode) {
+    return String(mode || '').trim().toLowerCase();
+}
+
+function resolvePolicyFallbackByMode(activeMode) {
+    return normalizeActiveMode(activeMode) === 'hunt'
+        ? BOT_POLICY_TYPES.HUNT
+        : DEFAULT_BOT_POLICY_TYPE;
+}
+
+function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, activeGameMode } = {}) {
+    const runtimePolicyType = runtimeConfig?.bot?.policyType || null;
+    const fallbackPolicyType = resolvePolicyFallbackByMode(activeGameMode);
+    return normalizeBotPolicyType(requestedPolicyType || runtimePolicyType || fallbackPolicyType);
 }
 
 export class EntityManager {
@@ -203,15 +219,16 @@ export class EntityManager {
             || this.activeGameMode
             || 'classic';
         const activeModeLower = String(this.activeGameMode || '').toLowerCase();
-        this.huntEnabled = activeModeLower === 'hunt' || isHuntHealthActive();
+        this.huntEnabled = activeModeLower === 'hunt';
 
         const humanConfigs = Array.isArray(options.humanConfigs) ? options.humanConfigs : [];
         const modelScale = typeof options.modelScale === 'number' ? options.modelScale : (CONFIG.PLAYER.MODEL_SCALE || 1);
         this.botDifficulty = options.botDifficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || this.botDifficulty;
-        const requestedPolicyType = options.botPolicyType || this.botPolicyType;
-        this.botPolicyType = isHuntHealthActive()
-            ? BOT_POLICY_TYPES.HUNT
-            : requestedPolicyType;
+        this.botPolicyType = resolveConfiguredBotPolicyType({
+            requestedPolicyType: options.botPolicyType,
+            runtimeConfig: this.runtimeConfig,
+            activeGameMode: this.activeGameMode,
+        });
         const availableVehicleIds = getVehicleIds();
         const defaultVehicleId = String(CONFIG.PLAYER.DEFAULT_VEHICLE_ID || availableVehicleIds[0] || 'aircraft');
         const normalizeVehicleId = (value) => {

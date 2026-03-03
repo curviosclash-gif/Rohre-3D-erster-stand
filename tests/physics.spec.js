@@ -1200,12 +1200,16 @@ test.describe('T41-60: Physik & AI', () => {
             const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
             const snapshot = createRuntimeConfigSnapshot({});
             return {
+                policyStrategy: String(snapshot?.bot?.policyStrategy || ''),
+                policyType: String(snapshot?.bot?.policyType || ''),
                 trainerBridgeEnabled: !!snapshot?.bot?.trainerBridgeEnabled,
                 trainerBridgeUrl: String(snapshot?.bot?.trainerBridgeUrl || ''),
                 trainerBridgeTimeoutMs: Number(snapshot?.bot?.trainerBridgeTimeoutMs || 0),
             };
         });
 
+        expect(result.policyStrategy).toBe('auto');
+        expect(result.policyType).toBe('rule-based');
         expect(result.trainerBridgeEnabled).toBeFalsy();
         expect(result.trainerBridgeUrl.startsWith('ws://')).toBeTruthy();
         expect(result.trainerBridgeTimeoutMs).toBeGreaterThanOrEqual(20);
@@ -1300,5 +1304,106 @@ test.describe('T41-60: Physik & AI', () => {
         expect(result.firstYawLeft).toBeTruthy();
         expect(result.secondYawLeft).toBeTruthy();
         expect(result.fallbackCalls).toBeGreaterThanOrEqual(2);
+    });
+
+    test('T81: RuntimeConfig loest Bot-Policy-Strategie reproduzierbar nach Modus auf', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
+
+            const classicAuto = createRuntimeConfigSnapshot({
+                gameMode: 'CLASSIC',
+                botPolicyStrategy: 'auto',
+            });
+            const huntAuto = createRuntimeConfigSnapshot({
+                gameMode: 'HUNT',
+                botPolicyStrategy: 'auto',
+            });
+            const classicBridge = createRuntimeConfigSnapshot({
+                gameMode: 'CLASSIC',
+                botPolicyStrategy: 'bridge',
+            });
+            const huntBridge = createRuntimeConfigSnapshot({
+                gameMode: 'HUNT',
+                botPolicyStrategy: 'bridge',
+            });
+            const forcedRuleBased = createRuntimeConfigSnapshot({
+                gameMode: 'HUNT',
+                botPolicyStrategy: 'rule-based',
+            });
+            const invalidStrategy = createRuntimeConfigSnapshot({
+                gameMode: 'CLASSIC',
+                botPolicyStrategy: 'unknown',
+            });
+
+            return {
+                classicAuto: classicAuto?.bot?.policyType,
+                huntAuto: huntAuto?.bot?.policyType,
+                classicBridge: classicBridge?.bot?.policyType,
+                huntBridge: huntBridge?.bot?.policyType,
+                forcedRuleBased: forcedRuleBased?.bot?.policyType,
+                invalidStrategyName: invalidStrategy?.bot?.policyStrategy,
+                invalidStrategyPolicy: invalidStrategy?.bot?.policyType,
+            };
+        });
+
+        expect(result.classicAuto).toBe('rule-based');
+        expect(result.huntAuto).toBe('hunt');
+        expect(result.classicBridge).toBe('classic-bridge');
+        expect(result.huntBridge).toBe('hunt-bridge');
+        expect(result.forcedRuleBased).toBe('rule-based');
+        expect(result.invalidStrategyName).toBe('auto');
+        expect(result.invalidStrategyPolicy).toBe('rule-based');
+    });
+
+    test('T82: Session-Wiring uebergibt aufgeloeste Bot-Policy an EntityManager', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            if (!game?.startMatch || !game?._returnToMenu) {
+                return { error: 'missing-game-hooks' };
+            }
+
+            game.settings.mode = '1p';
+            game.settings.numBots = 1;
+
+            const runScenario = (gameMode, strategy) => {
+                game.settings.gameMode = gameMode;
+                game.settings.botPolicyStrategy = strategy;
+                game._onSettingsChanged();
+                game.startMatch();
+
+                const entityManager = game.entityManager;
+                const botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
+                const botPolicy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+                const snapshot = {
+                    mode: String(game.runtimeConfig?.session?.activeGameMode || ''),
+                    strategy: String(game.runtimeConfig?.bot?.policyStrategy || ''),
+                    runtimePolicyType: String(game.runtimeConfig?.bot?.policyType || ''),
+                    entityPolicyType: String(entityManager?.botPolicyType || ''),
+                    botPolicyType: String(botPolicy?.type || ''),
+                };
+                game._returnToMenu();
+                return snapshot;
+            };
+
+            return {
+                error: null,
+                classicBridge: runScenario('CLASSIC', 'bridge'),
+                huntBridge: runScenario('HUNT', 'bridge'),
+                huntAuto: runScenario('HUNT', 'auto'),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.classicBridge.runtimePolicyType).toBe('classic-bridge');
+        expect(result.classicBridge.entityPolicyType).toBe('classic-bridge');
+        expect(result.classicBridge.botPolicyType).toBe('classic-bridge');
+        expect(result.huntBridge.runtimePolicyType).toBe('hunt-bridge');
+        expect(result.huntBridge.entityPolicyType).toBe('hunt-bridge');
+        expect(result.huntBridge.botPolicyType).toBe('hunt-bridge');
+        expect(result.huntAuto.runtimePolicyType).toBe('hunt');
+        expect(result.huntAuto.entityPolicyType).toBe('hunt');
+        expect(result.huntAuto.botPolicyType).toBe('hunt');
     });
 });

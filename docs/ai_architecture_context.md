@@ -97,3 +97,10 @@ Stand: 2026-03-03
   - Bei Observation-/Action-Contract-Verletzung wird die Ausgabe neutralisiert und auf `rule-based` zurueckgefallen.
 - V1 Nicht-Ziele:
   - keine History-Frames, keine Reward-/Telemetriefelder im Runtime-Vektor, keine verpflichtende Netzwerk-Bridge.
+
+## 7. Runtime-Policy-Auswahl (Stand 2026-03-03)
+
+- `SettingsManager` fuehrt `botPolicyStrategy` mit Default `auto`.
+- `RuntimeConfig` normalisiert Strategie (`rule-based|bridge|auto`) und loest deterministisch `bot.policyType` nach aktivem Modus auf.
+- `MatchSessionFactory` gibt `runtimeConfig` plus aufgeloesten `botPolicyType` an `EntityManager.setup(...)` weiter.
+- `EntityManager` nutzt einen klaren Resolver (`requested > runtime > mode-fallback`) statt Hunt-Health-Hack.
