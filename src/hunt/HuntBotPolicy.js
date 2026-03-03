@@ -6,18 +6,18 @@ import { BOT_POLICY_TYPES } from '../entities/ai/BotPolicyTypes.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
-function clamp(value, min, max) {
+export function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
 }
 
-function resolveHealthRatio(player) {
+export function resolveHealthRatio(player) {
     if (!player) return 1;
     const hp = Math.max(0, Number(player.hp) || 0);
     const maxHp = Math.max(1, Number(player.maxHp) || 1);
     return clamp(hp / maxHp, 0, 1);
 }
 
-function getNearestEnemy(player, allPlayers, outVec) {
+export function getNearestEnemy(player, allPlayers, outVec) {
     let nearest = null;
     let nearestDistSq = Infinity;
     for (const other of allPlayers || []) {
@@ -32,7 +32,7 @@ function getNearestEnemy(player, allPlayers, outVec) {
     return { enemy: nearest, distSq: nearestDistSq };
 }
 
-function findStrongestRocketIndex(inventory = []) {
+export function findStrongestRocketIndex(inventory = []) {
     let strongestIndex = -1;
     let strongestRank = -1;
     for (let i = 0; i < inventory.length; i++) {

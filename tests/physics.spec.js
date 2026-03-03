@@ -999,4 +999,198 @@ test.describe('T41-60: Physik & AI', () => {
         expect(result.unknownHasUpdate).toBeTruthy();
         expect(result.brokenHasUpdate).toBeTruthy();
     });
+
+    test('T75: HuntBridgePolicy setzt MG-Druck auf Basis von Observation + Gegnernaehe', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(async () => {
+            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const bot = entityManager?.players?.find((player) => player?.isBot);
+            const enemy = entityManager?.players?.find((player) => !player?.isBot);
+            if (!entityManager || !bot || !enemy) {
+                return { error: 'missing-hunt-state' };
+            }
+
+            bot.hp = Math.max(1, bot.maxHp || 1);
+            bot.inventory = [];
+            bot.position.set(0, 50, 0);
+            bot.group?.lookAt(0, 50, -100);
+            enemy.position.set(0, 50, -18);
+
+            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
+            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
+            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.12;
+            context.observation[schema.TARGET_IN_FRONT] = 1;
+            context.observation[schema.PRESSURE_LEVEL] = 0.35;
+            context.observation[schema.PROJECTILE_THREAT] = 0;
+
+            const policy = new HuntBridgePolicy();
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                error: null,
+                type: policy.type,
+                shootMG: !!action?.shootMG,
+                shootItem: !!action?.shootItem,
+                shootItemIndex: Number(action?.shootItemIndex),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.type).toBe('hunt-bridge');
+        expect(result.shootMG).toBeTruthy();
+        expect(result.shootItem).toBeFalsy();
+        expect(result.shootItemIndex).toBe(-1);
+    });
+
+    test('T76: HuntBridgePolicy priorisiert Rocket + Boost bei niedrigem HP-Druck', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(async () => {
+            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const bot = entityManager?.players?.find((player) => player?.isBot);
+            const enemy = entityManager?.players?.find((player) => !player?.isBot);
+            if (!entityManager || !bot || !enemy) {
+                return { error: 'missing-hunt-state' };
+            }
+
+            bot.maxHp = Math.max(1, Number(bot.maxHp) || 1);
+            bot.hp = Math.max(1, bot.maxHp * 0.2);
+            bot.inventory = ['ROCKET_WEAK', 'ROCKET_STRONG'];
+            bot.selectedItemIndex = 0;
+            bot.position.set(0, 50, 0);
+            bot.group?.lookAt(0, 50, -100);
+            enemy.position.set(2, 50, -14);
+
+            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
+            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
+            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.55;
+            context.observation[schema.TARGET_IN_FRONT] = 1;
+            context.observation[schema.PRESSURE_LEVEL] = 0.92;
+            context.observation[schema.PROJECTILE_THREAT] = 1;
+
+            const policy = new HuntBridgePolicy();
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                error: null,
+                shootItem: !!action?.shootItem,
+                shootItemIndex: Number(action?.shootItemIndex),
+                boost: !!action?.boost,
+                yawCommand: !!action?.yawLeft || !!action?.yawRight,
+                pitchCommand: !!action?.pitchUp || !!action?.pitchDown,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.shootItem).toBeTruthy();
+        expect(result.shootItemIndex).toBe(1);
+        expect(result.boost).toBeTruthy();
+        expect(result.yawCommand || result.pitchCommand).toBeTruthy();
+    });
+
+    test('T77: ClassicBridgePolicy leitet Kern-Action aus Observation-Vektor ab', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicBridgePolicy } = await import('/src/entities/ai/ClassicBridgePolicy.js');
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const bot = {
+                index: 0,
+                inventory: ['SHIELD'],
+                selectedItemIndex: 0,
+            };
+            const context = {
+                players: [],
+                projectiles: [],
+                observation: null,
+            };
+            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
+            context.observation[schema.WALL_DISTANCE_FRONT] = 0.18;
+            context.observation[schema.WALL_DISTANCE_LEFT] = 0.14;
+            context.observation[schema.WALL_DISTANCE_RIGHT] = 0.9;
+            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.2;
+            context.observation[schema.TARGET_ALIGNMENT] = 0.94;
+            context.observation[schema.TARGET_IN_FRONT] = 1;
+            context.observation[schema.PRESSURE_LEVEL] = 0.84;
+            context.observation[schema.PROJECTILE_THREAT] = 1;
+            context.observation[schema.LOCAL_OPENNESS_RATIO] = 0.7;
+            context.observation[schema.INVENTORY_COUNT_RATIO] = 0.1;
+            context.observation[schema.SELECTED_ITEM_SLOT] = 0;
+
+            const policy = new ClassicBridgePolicy();
+            const action = policy.update(1 / 60, bot, context);
+
+            return {
+                error: null,
+                type: policy.type,
+                yawRight: !!action?.yawRight,
+                shootMG: !!action?.shootMG,
+                shootItem: !!action?.shootItem,
+                shootItemIndex: Number(action?.shootItemIndex),
+                boost: !!action?.boost,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.type).toBe('classic-bridge');
+        expect(result.yawRight).toBeTruthy();
+        expect(result.shootMG).toBeTruthy();
+        expect(result.shootItem).toBeTruthy();
+        expect(result.shootItemIndex).toBe(0);
+        expect(result.boost).toBeTruthy();
+    });
+
+    test('T78: ClassicBridgePolicy routed Action-Failures kontrolliert auf RuleBased-Fallback', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicBridgePolicy } = await import('/src/entities/ai/ClassicBridgePolicy.js');
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const bot = {
+                index: 0,
+                inventory: [],
+                selectedItemIndex: 0,
+            };
+            const context = {
+                players: [],
+                projectiles: [],
+                observation: null,
+            };
+            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
+            context.observation[schema.WALL_DISTANCE_FRONT] = 0.65;
+
+            const policy = new ClassicBridgePolicy({
+                resolveAction: () => {
+                    throw new Error('simulated-classic-bridge-action-failure');
+                },
+            });
+
+            const fallbackType = policy._fallbackPolicy?.type;
+            const originalFallbackUpdate = policy._fallbackPolicy?.update;
+            let fallbackCalled = false;
+            let action = null;
+            try {
+                policy._fallbackPolicy.update = function fallbackUpdate() {
+                    fallbackCalled = true;
+                    return { yawLeft: true };
+                };
+                action = policy.update(1 / 60, bot, context);
+            } finally {
+                policy._fallbackPolicy.update = originalFallbackUpdate;
+            }
+
+            return {
+                error: null,
+                fallbackType,
+                fallbackCalled,
+                yawLeft: !!action?.yawLeft,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.fallbackType).toBe('rule-based');
+        expect(result.fallbackCalled).toBeTruthy();
+        expect(result.yawLeft).toBeTruthy();
+    });
 });

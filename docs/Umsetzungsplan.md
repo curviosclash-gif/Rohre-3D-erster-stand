@@ -211,8 +211,8 @@ Letztes Update: 2026-03-03
   - [x] 15.2B 20-Slot-Item-Encoding + Mode-ID Features (Agent B)
   - [x] 15.3A Runtime-Context-Wiring in Entity/Input-System (Agent A)
   - [x] 15.3B Registry auf modulare Bridge-Policies erweitern (Agent B)
-  - [ ] 15.4A Classic-Bridge-Policy integrieren (Agent A)
-  - [ ] 15.4B Hunt-Bridge-Policy integrieren (Agent B)
+  - [x] 15.4A Classic-Bridge-Policy integrieren (Agent A)
+  - [x] 15.4B Hunt-Bridge-Policy integrieren (Agent B)
   - [ ] 15.5 Integration: RuntimeConfig/Settings/Session-Auswahl
   - [ ] 15.6 Optional: WebSocket-Bridge fuer externes Training (Feature-Flag)
   - [ ] 15.7 Abschluss: Regression, Doku, Restrisiken

@@ -11,6 +11,7 @@ import {
 } from './BotPolicyTypes.js';
 import { RuleBasedBotPolicy } from './RuleBasedBotPolicy.js';
 import { HuntBotPolicy } from '../../hunt/HuntBotPolicy.js';
+import { ClassicBridgePolicy } from './ClassicBridgePolicy.js';
 import { ObservationBridgePolicy } from './ObservationBridgePolicy.js';
 
 export class BotPolicyRegistry {
@@ -21,9 +22,8 @@ export class BotPolicyRegistry {
         this.register(BOT_POLICY_TYPES.HUNT, (options) => new HuntBotPolicy(options));
         this.register(
             BOT_POLICY_TYPES.CLASSIC_BRIDGE,
-            (options) => new ObservationBridgePolicy({
+            (options) => new ClassicBridgePolicy({
                 ...options,
-                type: BOT_POLICY_TYPES.CLASSIC_BRIDGE,
                 fallbackPolicy: new RuleBasedBotPolicy(options),
             })
         );
