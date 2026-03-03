@@ -170,6 +170,13 @@ export class Player {
         const updateBox = () => {
             const currentMesh = this.vehicleMesh;
             if (!currentMesh || currentMesh !== mesh || !this.group) return;
+            const fallbackRadius = Math.max(0.2, Number(this.hitboxRadius) || 0.8);
+            const applyFallbackHitbox = () => {
+                this.hitboxBox.set(
+                    this._tmpVec.set(-fallbackRadius, -fallbackRadius * 0.7, -fallbackRadius),
+                    this._tmpDir.set(fallbackRadius, fallbackRadius * 0.7, fallbackRadius)
+                );
+            };
 
             if (currentMesh.localBox) {
                 this.hitboxBox.copy(currentMesh.localBox);
@@ -177,6 +184,14 @@ export class Player {
                 currentMesh.updateMatrixWorld(true);
                 const invMatrix = this._tmpMat.copy(currentMesh.matrixWorld).invert();
                 this.hitboxBox.setFromObject(currentMesh).applyMatrix4(invMatrix);
+            }
+            const min = this.hitboxBox.min;
+            const max = this.hitboxBox.max;
+            const invalidBox = this.hitboxBox.isEmpty()
+                || !Number.isFinite(min.x) || !Number.isFinite(min.y) || !Number.isFinite(min.z)
+                || !Number.isFinite(max.x) || !Number.isFinite(max.y) || !Number.isFinite(max.z);
+            if (invalidBox) {
+                applyFallbackHitbox();
             }
 
             // Kraftfeld-Box an OBB anpassen

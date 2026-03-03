@@ -14,7 +14,7 @@ Gate: PASS
 - Keine Legacy-Pfade gefunden.
 
 ## Encoding-Warnungen (Mojibake)
-- Keine Mojibake-Muster gefunden.
+- docs/Bot-Training-Schnittstelle.md: Zeilen 3, 7, 8, 11, 12, 17, 18, 20, 26, 28, 32, 34, 35, 43, 53, 66, 68, 70, 73, 75, 79, 87
 
 ## Ergebnis
 - Dokumentation aktuell (geprueft am 2026-03-03).

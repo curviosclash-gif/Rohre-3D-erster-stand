@@ -29,7 +29,7 @@ Create `docs/Feature_[Name].md` with:
 - Affected files
 - Split into as many granular sub-phases as needed (e.g. 1.1, 1.2, 1.3) so the AI never gets confused by too many changes at once.
 - Checkboxes `[ ]` for each phase to track completion.
-- Verification steps for each phase.
+- Verification steps (choose sensible intervals, do not enforce full test runs after every small sub-phase; focus tests on points where functional units are completed).
 
 ## 4. Update master plan
 

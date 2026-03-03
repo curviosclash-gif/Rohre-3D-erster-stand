@@ -257,37 +257,77 @@ export class OverheatGunSystem {
         if (!trailSpatialIndex?.checkProjectileTrailCollision) return null;
 
         const selfSkipRecent = Math.max(0, Math.floor(Number(mg.TRAIL_SELF_SKIP_RECENT) || MG_TRAIL_SELF_SKIP_RECENT));
+        const skipSelfCompletely = Math.max(
+            selfSkipRecent + 1,
+            Math.floor(Number(player?.trail?.maxSegments) || 0)
+        );
         const sampleStep = Math.max(0.2, Number(mg.TRAIL_SAMPLE_STEP) || MG_TRAIL_SAMPLE_STEP);
         const probeRadius = Math.max(0.12, Number(mg.TRAIL_HIT_RADIUS) || MG_TRAIL_HIT_RADIUS);
+        let fallbackSelfHit = null;
 
         player.getAimDirection(this._tmpAim).normalize();
         this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
         for (let distance = 0; distance <= maxRange; distance += sampleStep) {
             this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
+            const enemyHit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
+                excludePlayerIndex: player.index,
+                skipRecent: skipSelfCompletely,
+            });
+            if (enemyHit?.entry) {
+                return this._createTrailHit(enemyHit);
+            }
+
             const hit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
                 excludePlayerIndex: player.index,
                 skipRecent: selfSkipRecent,
             });
             if (!hit?.entry) continue;
 
-            if (hit.closestPoint) {
-                this._tmpHit.set(hit.closestPoint.closestX, hit.closestPoint.closestY, hit.closestPoint.closestZ);
-            } else {
-                this._tmpHit.copy(this._tmpTrailProbe);
+            if (Number(hit.entry.playerIndex) === player.index) {
+                if (!fallbackSelfHit) {
+                    fallbackSelfHit = this._createTrailHit(hit);
+                }
+                continue;
             }
 
-            return {
-                entry: hit.entry,
-                distance: this._tmpMuzzle.distanceTo(this._tmpHit),
-                point: {
-                    x: this._tmpHit.x,
-                    y: this._tmpHit.y,
-                    z: this._tmpHit.z,
-                },
-            };
+            return this._createTrailHit(hit);
         }
 
-        return null;
+        if (fallbackSelfHit) {
+            const denseStep = Math.max(0.12, sampleStep * 0.5);
+            if (denseStep < sampleStep) {
+                for (let distance = 0; distance <= maxRange; distance += denseStep) {
+                    this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
+                    const enemyHit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
+                        excludePlayerIndex: player.index,
+                        skipRecent: skipSelfCompletely,
+                    });
+                    if (enemyHit?.entry) {
+                        return this._createTrailHit(enemyHit);
+                    }
+                }
+            }
+        }
+
+        return fallbackSelfHit;
+    }
+
+    _createTrailHit(hit) {
+        if (!hit?.entry) return null;
+        if (hit.closestPoint) {
+            this._tmpHit.set(hit.closestPoint.closestX, hit.closestPoint.closestY, hit.closestPoint.closestZ);
+        } else {
+            this._tmpHit.copy(this._tmpTrailProbe);
+        }
+        return {
+            entry: hit.entry,
+            distance: this._tmpMuzzle.distanceTo(this._tmpHit),
+            point: {
+                x: this._tmpHit.x,
+                y: this._tmpHit.y,
+                z: this._tmpHit.z,
+            },
+        };
     }
 
     _applyTrailHit(attacker, trailHit, mg) {
@@ -300,10 +340,15 @@ export class OverheatGunSystem {
         const damage = Number.isFinite(configuredDamage) && configuredDamage > 0 ? configuredDamage : fallbackDamage;
         const damageResult = trailSpatialIndex.damageTrailSegment(entry, damage);
         if (!damageResult?.hit) return;
+        const destroyOnHit = mg?.DESTROY_TRAIL_ON_HIT !== false;
+        let destroyed = !!damageResult.destroyed;
+        if (destroyOnHit && !destroyed && typeof trailSpatialIndex.destroySegment === 'function') {
+            destroyed = !!trailSpatialIndex.destroySegment(entry);
+        }
 
         if (this.entityManager?.particles && trailHit.point) {
             this._tmpHit.set(trailHit.point.x, trailHit.point.y, trailHit.point.z);
-            const color = damageResult.destroyed ? 0x66ddff : 0x3388ff;
+            const color = destroyed ? 0x66ddff : 0x3388ff;
             this.entityManager.particles.spawnHit(this._tmpHit, color);
         }
         if (this.entityManager?.audio && !attacker?.isBot) {

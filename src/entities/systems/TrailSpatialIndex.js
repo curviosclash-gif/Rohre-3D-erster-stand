@@ -371,7 +371,9 @@ export class TrailSpatialIndex {
                     if (hitInfo) {
                         if (playerRef && playerRef.isSphereInOBB) {
                             this._tmpClosestPoint.set(hitInfo.closestX, hitInfo.closestY, hitInfo.closestZ);
-                            if (playerRef.isSphereInOBB(this._tmpClosestPoint, seg.radius)) {
+                            const queryRadius = Math.max(0, Number(radius) || 0);
+                            const effectiveRadius = Math.max(0, Number(seg.radius) || 0) + queryRadius;
+                            if (playerRef.isSphereInOBB(this._tmpClosestPoint, effectiveRadius)) {
                                 if (seg.playerIndex === excludePlayerIndex) {
                                     this._debugTrailCollision('self-hit', {
                                         playerIndex: seg.playerIndex,

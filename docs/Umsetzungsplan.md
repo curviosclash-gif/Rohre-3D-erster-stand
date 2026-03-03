@@ -19,7 +19,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 
 **Wichtig:**
 
-- Keine offenen kritischen Findings (Stand: 2026-03-03, inkl. Hunt-MG-Targeting-Hotfix validiert mit `npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83"`, `test:core`, `build`).
+- Keine offenen kritischen Findings (Stand: 2026-03-03, inkl. Hunt-MG-Targeting-/Trail-Collision-Hotfix validiert mit `npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83|T84|T85|T86|T87"`, `test:physics`, `test:core`, `build`).
 
 **Mittel:**
 
@@ -65,3 +65,26 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - [ ] V16 Event-Playlist/Fun-Modes
   - Rotierende Spezialregeln als zeitlich limitierte Modi fuer Abwechslung und Retention.
   - Zielpfade: `src/core/Config.js`, `src/core/main.js`, `src/ui/MenuController.js`.
+- [ ] V17 Kernmodule weiter modularisieren (2-Agenten-Betrieb)
+  - Fokus: `main.js`, `EntityManager.js`, `Bot.js` weiter in kleine, KI-freundliche Module splitten; Hotpath-Performance absichern.
+  - Referenzplan: `docs/Feature_Modularisierung_Kernmodule_2Agenten.md`.
+
+---
+
+## Parallelblock V17 (Stand: 2026-03-03)
+
+- Rollenmodell:
+  - Agent A implementiert Phasen `20.x` und fuehrt **keine** Tests aus.
+  - Agent B kontrolliert, fuehrt Tests aus und gibt Gates `Q0..Q3` frei.
+
+- [ ] 20.0 Vorbereitende Leitplanken (Scope-Hygiene + Contracts + Hotpath-Guardrails)
+- [ ] 20.1 EntityManager Split A (SpawnPlacementSystem, CollisionResponseSystem, HuntCombatSystem)
+- [ ] 20.2 main.js Split B (MatchSessionRuntimeBridge, PlanarAimAssistSystem, BuildInfo-Kapselung)
+- [ ] 20.3 Bot.js Split C (BotProbeOps, BotPortalOps, BotThreatOps)
+- [ ] 20.4 Abschluss + Doku-Freeze (`docs:sync`, `docs:check`)
+
+- QA-Gates (Agent B):
+  - [ ] Q0 Baseline/Import-Gate
+  - [ ] Q1 Entity/Hunt-Regression-Gate
+  - [ ] Q2 Runtime/UI-Regression-Gate
+  - [ ] Q3 Bot-Behavior-Gate + Endabnahme

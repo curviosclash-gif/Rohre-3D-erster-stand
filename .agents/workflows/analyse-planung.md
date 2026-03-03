@@ -19,7 +19,7 @@ description: Run full test analysis, persist results, and update prioritized act
 
 ## 2. Execute and persist
 
-- Run all mapped commands.
+- Run mapped commands sensibly. Always run core tests, but run specialized tests (GPU, physics, stress) only if relevant to recent changes or during a major milestone. Avoid running all commands blindly.
 - Save raw outcome to `docs/Testergebnisse_YYYY-MM-DD.md`.
 - Use per-test status: `PASS` / `FAIL` / `WARN`.
 
@@ -48,7 +48,3 @@ description: Run full test analysis, persist results, and update prioritized act
 ## Report
 
 Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-

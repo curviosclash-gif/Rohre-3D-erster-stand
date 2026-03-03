@@ -25,6 +25,45 @@ export class PlayerLifecycleSystem {
         return null;
     }
 
+    _resolveTrailCollision(entityManager, player, prevPos, radius, selfTrailSkipRecent) {
+        const directHit = entityManager.checkGlobalCollision(
+            player.position,
+            radius,
+            player.index,
+            selfTrailSkipRecent,
+            player
+        );
+        if (directHit?.hit) {
+            return directHit;
+        }
+
+        entityManager._tmpVec.subVectors(player.position, prevPos);
+        const traveledDistance = entityManager._tmpVec.length();
+        const minSweepDistance = Math.max(0.45, radius * 0.35);
+        if (!Number.isFinite(traveledDistance) || traveledDistance <= minSweepDistance) {
+            return null;
+        }
+
+        const stepDistance = Math.max(0.5, radius * 0.75);
+        const steps = Math.min(12, Math.max(2, Math.ceil(traveledDistance / stepDistance)));
+        for (let i = 1; i < steps; i++) {
+            const t = i / steps;
+            entityManager._tmpVec2.lerpVectors(prevPos, player.position, t);
+            const sweptHit = entityManager.checkGlobalCollision(
+                entityManager._tmpVec2,
+                radius,
+                player.index,
+                selfTrailSkipRecent,
+                null
+            );
+            if (sweptHit?.hit) {
+                return sweptHit;
+            }
+        }
+
+        return null;
+    }
+
     updatePlayer(player, dt, input) {
         const entityManager = this.entityManager;
         const huntModeActive = isHuntHealthActive();
@@ -153,7 +192,13 @@ export class PlayerLifecycleSystem {
             // Global Trail Collision (Nutzt OBB fuer Praezision)
             if (!bouncedOnFoam) {
                 const selfTrailSkipRecent = entityManager.constructor.deriveSelfTrailSkipRecentSegments(player);
-                const collision = entityManager.checkGlobalCollision(player.position, hRadius * 2.0, player.index, selfTrailSkipRecent, player);
+                const collision = this._resolveTrailCollision(
+                    entityManager,
+                    player,
+                    prevPos,
+                    hRadius * 2.0,
+                    selfTrailSkipRecent
+                );
                 if (collision && collision.hit) {
                     const trailCause = collision.playerIndex === player.index ? 'TRAIL_SELF' : 'TRAIL_OTHER';
                     if (huntModeActive) {

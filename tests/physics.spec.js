@@ -631,6 +631,420 @@ test.describe('T41-60: Physik & AI', () => {
         expect(result.enemyHpAfter).toBe(result.enemyHpBefore);
     });
 
+    test('T83: Hunt-MG priorisiert gegnerische Spur vor eigener Spur auf Schusslinie', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((player, index) => index !== 0 && player?.alive);
+            if (!game || !entityManager || !shooter || !enemy) {
+                return { error: 'missing-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            shooter.trail?.clear?.();
+            enemy.trail?.clear?.();
+            shooter.position.set(0, 50, 0);
+            shooter.group?.lookAt(0, 50, -120);
+            enemy.position.set(16, 50, -24);
+
+            const aim = shooter.position.clone().set(0, 0, 0);
+            shooter.getAimDirection(aim).normalize();
+
+            const ownFrom = shooter.position.clone().addScaledVector(aim, 12);
+            const ownTo = shooter.position.clone().addScaledVector(aim, 14);
+            const enemyFrom = shooter.position.clone().addScaledVector(aim, 20);
+            const enemyTo = shooter.position.clone().addScaledVector(aim, 22);
+
+            const ownWriteIndex = Math.max(0, Number(shooter?.trail?.writeIndex) || 0);
+            const ownMaxSegments = Math.max(1, Number(shooter?.trail?.maxSegments) || 5000);
+            const ownSegmentIdx = (ownWriteIndex + Math.floor(ownMaxSegments * 0.45)) % ownMaxSegments;
+            const ownRadius = Math.max(0.15, (Number(shooter?.trail?.width) || 0.6) * 0.5);
+
+            const enemyWriteIndex = Math.max(0, Number(enemy?.trail?.writeIndex) || 0);
+            const enemyMaxSegments = Math.max(1, Number(enemy?.trail?.maxSegments) || 5000);
+            const enemySegmentIdx = (enemyWriteIndex + Math.floor(enemyMaxSegments * 0.45)) % enemyMaxSegments;
+            const enemyRadius = Math.max(0.15, (Number(enemy?.trail?.width) || 0.6) * 0.5);
+
+            const ownRef = entityManager.registerTrailSegment(shooter.index, ownSegmentIdx, {
+                fromX: ownFrom.x,
+                fromY: ownFrom.y,
+                fromZ: ownFrom.z,
+                toX: ownTo.x,
+                toY: ownTo.y,
+                toZ: ownTo.z,
+                midX: (ownFrom.x + ownTo.x) * 0.5,
+                midZ: (ownFrom.z + ownTo.z) * 0.5,
+                radius: ownRadius,
+                hp: 3,
+                maxHp: 3,
+                ownerTrail: null,
+            });
+
+            const enemyRef = entityManager.registerTrailSegment(enemy.index, enemySegmentIdx, {
+                fromX: enemyFrom.x,
+                fromY: enemyFrom.y,
+                fromZ: enemyFrom.z,
+                toX: enemyTo.x,
+                toY: enemyTo.y,
+                toZ: enemyTo.z,
+                midX: (enemyFrom.x + enemyTo.x) * 0.5,
+                midZ: (enemyFrom.z + enemyTo.z) * 0.5,
+                radius: enemyRadius,
+                hp: 3,
+                maxHp: 3,
+                ownerTrail: null,
+            });
+
+            shooter.shootCooldown = 0;
+            if (entityManager._overheatGunSystem?._overheatByPlayer) {
+                entityManager._overheatGunSystem._overheatByPlayer[shooter.index] = 0;
+            }
+            if (entityManager._overheatGunSystem?._lockoutByPlayer) {
+                entityManager._overheatGunSystem._lockoutByPlayer[shooter.index] = 0;
+            }
+
+            const fireResult = entityManager._shootHuntGun(shooter);
+            const ownDestroyed = !!ownRef?.entry?.destroyed;
+            const enemyDestroyed = !!enemyRef?.entry?.destroyed;
+
+            if (!ownDestroyed && ownRef?.key && ownRef?.entry) {
+                entityManager.unregisterTrailSegment(ownRef.key, ownRef.entry);
+            }
+            if (!enemyDestroyed && enemyRef?.key && enemyRef?.entry) {
+                entityManager.unregisterTrailSegment(enemyRef.key, enemyRef.entry);
+            }
+
+            return {
+                error: null,
+                fireOk: !!fireResult?.ok,
+                trailHit: !!fireResult?.trailHit,
+                ownDestroyed,
+                enemyDestroyed,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.fireOk).toBeTruthy();
+        expect(result.trailHit).toBeTruthy();
+        expect(result.enemyDestroyed).toBeTruthy();
+        expect(result.ownDestroyed).toBeFalsy();
+    });
+
+    test('T84: Hunt-Trail-Kollision trifft gegnerische Spur auch bei grossem Frame-Schritt', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !player || !enemy) {
+                return { error: 'missing-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            player.trail?.clear?.();
+            enemy.trail?.clear?.();
+
+            player.position.set(0, 50, 6);
+            player.group?.lookAt(0, 50, -120);
+            player.spawnProtectionTimer = 0;
+            player.hp = Math.max(100, Number(player.maxHp) || 100);
+            player.lastDamageTimestamp = -Infinity;
+
+            enemy.position.set(30, 50, -40);
+
+            const writeIndex = Math.max(0, Number(enemy?.trail?.writeIndex) || 0);
+            const maxSegments = Math.max(1, Number(enemy?.trail?.maxSegments) || 5000);
+            const segmentIdx = (writeIndex + Math.floor(maxSegments * 0.6)) % maxSegments;
+            const radius = Math.max(0.25, (Number(enemy?.trail?.width) || 0.6) * 0.5);
+
+            const trailRef = entityManager.registerTrailSegment(enemy.index, segmentIdx, {
+                fromX: -8,
+                fromY: 50,
+                fromZ: 0,
+                toX: 8,
+                toY: 50,
+                toZ: 0,
+                midX: 0,
+                midZ: 0,
+                radius,
+                hp: 3,
+                maxHp: 3,
+                ownerTrail: null,
+            });
+
+            const hpBefore = Number(player.hp || 0);
+            entityManager._playerLifecycleSystem.updatePlayer(player, 0.55, {
+                nextItem: false,
+                dropItem: false,
+                useItem: -1,
+                shootItem: false,
+                shootItemIndex: -1,
+                shootMG: false,
+                pitchUp: false,
+                pitchDown: false,
+                yawLeft: false,
+                yawRight: false,
+                rollLeft: false,
+                rollRight: false,
+                boost: false,
+                cameraSwitch: false,
+            });
+            const hpAfter = Number(player.hp || 0);
+
+            if (trailRef?.key && trailRef?.entry && !trailRef.entry.destroyed) {
+                entityManager.unregisterTrailSegment(trailRef.key, trailRef.entry);
+            }
+
+            return {
+                error: null,
+                hpBefore,
+                hpAfter,
+                damageApplied: hpBefore - hpAfter,
+                alive: !!player.alive,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.damageApplied).toBeGreaterThan(0);
+        expect(result.hpAfter).toBeLessThan(result.hpBefore);
+        expect(result.alive).toBeTruthy();
+    });
+
+    test('T85: Hunt-Trail-Kollision trifft gegnerische Spur auch bei kleinen Frames (Enemy-Offset)', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !player || !enemy) {
+                return { error: 'missing-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            player.trail?.clear?.();
+            enemy.trail?.clear?.();
+            player.trail?.forceGap?.(3.0);
+
+            player.position.set(1.45, 50, 6);
+            player.group?.lookAt(1.45, 50, -120);
+            player.spawnProtectionTimer = 0;
+            player.hp = Math.max(100, Number(player.maxHp) || 100);
+            player.lastDamageTimestamp = -Infinity;
+
+            enemy.position.set(30, 50, -30);
+
+            const writeIndex = Math.max(0, Number(enemy?.trail?.writeIndex) || 0);
+            const maxSegments = Math.max(1, Number(enemy?.trail?.maxSegments) || 5000);
+            const segmentIdx = (writeIndex + Math.floor(maxSegments * 0.52)) % maxSegments;
+            const radius = Math.max(0.25, (Number(enemy?.trail?.width) || 0.6) * 0.5);
+
+            const trailRef = entityManager.registerTrailSegment(enemy.index, segmentIdx, {
+                fromX: 0,
+                fromY: 50,
+                fromZ: -8,
+                toX: 0,
+                toY: 50,
+                toZ: 8,
+                midX: 0,
+                midZ: 0,
+                radius,
+                hp: 3,
+                maxHp: 3,
+                ownerTrail: null,
+            });
+
+            const neutralInput = {
+                nextItem: false,
+                dropItem: false,
+                useItem: -1,
+                shootItem: false,
+                shootItemIndex: -1,
+                shootMG: false,
+                pitchUp: false,
+                pitchDown: false,
+                yawLeft: false,
+                yawRight: false,
+                rollLeft: false,
+                rollRight: false,
+                boost: false,
+                cameraSwitch: false,
+            };
+
+            const hpBefore = Number(player.hp || 0);
+            for (let i = 0; i < 60; i++) {
+                entityManager._playerLifecycleSystem.updatePlayer(player, 1 / 60, neutralInput);
+                if (Number(player.hp || 0) < hpBefore || !player.alive) break;
+            }
+            const hpAfter = Number(player.hp || 0);
+
+            if (trailRef?.key && trailRef?.entry && !trailRef.entry.destroyed) {
+                entityManager.unregisterTrailSegment(trailRef.key, trailRef.entry);
+            }
+
+            return {
+                error: null,
+                hpBefore,
+                hpAfter,
+                damageApplied: hpBefore - hpAfter,
+                alive: !!player.alive,
+                finalX: Number(player.position.x || 0),
+                finalZ: Number(player.position.z || 0),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.damageApplied).toBeGreaterThan(0);
+        expect(result.hpAfter).toBeLessThan(result.hpBefore);
+        expect(result.alive).toBeTruthy();
+    });
+
+    test('T86: Hunt-MG zerstoert gegnerisches echtes Trail-Segment (ownerTrail) sofort', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !shooter || !enemy) {
+                return { error: 'missing-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            shooter.trail?.clear?.();
+            enemy.trail?.clear?.();
+            shooter.position.set(0, 50, 0);
+            shooter.group?.lookAt(0, 50, -120);
+            enemy.position.set(20, 50, -20);
+
+            enemy.trail._addSegment(0, 50, -18, 0, 50, -16);
+            const maxSegments = Math.max(1, Number(enemy?.trail?.maxSegments) || 5000);
+            const segmentIdx = (Math.max(0, Number(enemy.trail.writeIndex) || 0) - 1 + maxSegments) % maxSegments;
+            const refBefore = enemy?.trail?.segmentRefs?.[segmentIdx] || null;
+            if (!refBefore?.entry) {
+                return { error: 'missing-owner-trail-segment' };
+            }
+
+            shooter.shootCooldown = 0;
+            if (entityManager._overheatGunSystem?._overheatByPlayer) {
+                entityManager._overheatGunSystem._overheatByPlayer[shooter.index] = 0;
+            }
+            if (entityManager._overheatGunSystem?._lockoutByPlayer) {
+                entityManager._overheatGunSystem._lockoutByPlayer[shooter.index] = 0;
+            }
+
+            const fireResult = entityManager._shootHuntGun(shooter);
+            const entry = refBefore.entry;
+            const destroyed = !!entry?.destroyed;
+            const refAfter = enemy?.trail?.segmentRefs?.[segmentIdx] || null;
+
+            if (refAfter?.key && refAfter?.entry) {
+                entityManager.unregisterTrailSegment(refAfter.key, refAfter.entry);
+                enemy.trail.segmentRefs[segmentIdx] = null;
+            }
+
+            return {
+                error: null,
+                fireOk: !!fireResult?.ok,
+                trailHit: !!fireResult?.trailHit,
+                destroyed,
+                visualCleared: refAfter === null,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.fireOk).toBeTruthy();
+        expect(result.trailHit).toBeTruthy();
+        expect(result.destroyed).toBeTruthy();
+        expect(result.visualCleared).toBeTruthy();
+    });
+
+    test('T87: Hunt-MG entfernt Trail-Visual auch bei totem Gegner sofort', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !shooter || !enemy) {
+                return { error: 'missing-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            shooter.trail?.clear?.();
+            enemy.trail?.clear?.();
+            shooter.position.set(0, 50, 0);
+            shooter.group?.lookAt(0, 50, -120);
+            enemy.position.set(22, 50, -20);
+
+            enemy.trail._addSegment(0, 50, -18, 0, 50, -16);
+            const maxSegments = Math.max(1, Number(enemy?.trail?.maxSegments) || 5000);
+            const segmentIdx = (Math.max(0, Number(enemy.trail.writeIndex) || 0) - 1 + maxSegments) % maxSegments;
+            const refBefore = enemy?.trail?.segmentRefs?.[segmentIdx] || null;
+            if (!refBefore?.entry) {
+                return { error: 'missing-owner-trail-segment' };
+            }
+
+            enemy.kill();
+            if (enemy.trail?.mesh?.instanceMatrix) {
+                enemy.trail.mesh.instanceMatrix.needsUpdate = false;
+            }
+
+            shooter.shootCooldown = 0;
+            if (entityManager._overheatGunSystem?._overheatByPlayer) {
+                entityManager._overheatGunSystem._overheatByPlayer[shooter.index] = 0;
+            }
+            if (entityManager._overheatGunSystem?._lockoutByPlayer) {
+                entityManager._overheatGunSystem._lockoutByPlayer[shooter.index] = 0;
+            }
+
+            const fireResult = entityManager._shootHuntGun(shooter);
+            const entry = refBefore.entry;
+            const destroyed = !!entry?.destroyed;
+            const refAfter = enemy?.trail?.segmentRefs?.[segmentIdx] || null;
+            const matrixArray = enemy?.trail?.mesh?.instanceMatrix?.array || null;
+            const matrixOffset = segmentIdx * 16;
+            const m0 = Number(matrixArray?.[matrixOffset] || 0);
+            const m5 = Number(matrixArray?.[matrixOffset + 5] || 0);
+            const m10 = Number(matrixArray?.[matrixOffset + 10] || 0);
+            const scaleCollapsed = Math.abs(m0) < 1e-6 && Math.abs(m5) < 1e-6 && Math.abs(m10) < 1e-6;
+
+            if (refAfter?.key && refAfter?.entry) {
+                entityManager.unregisterTrailSegment(refAfter.key, refAfter.entry);
+                enemy.trail.segmentRefs[segmentIdx] = null;
+            }
+
+            return {
+                error: null,
+                fireOk: !!fireResult?.ok,
+                trailHit: !!fireResult?.trailHit,
+                destroyed,
+                visualCleared: refAfter === null,
+                scaleCollapsed,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.fireOk).toBeTruthy();
+        expect(result.trailHit).toBeTruthy();
+        expect(result.destroyed).toBeTruthy();
+        expect(result.visualCleared).toBeTruthy();
+        expect(result.scaleCollapsed).toBeTruthy();
+    });
+
     test('T65: Bot-Action-Contract sanitizt invalide Payloads robust', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

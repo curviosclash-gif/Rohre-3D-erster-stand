@@ -24,7 +24,7 @@ description: Implement a planned change from coding to verification and commit.
 
 - `rg -n "console\\.log" src tests`
 - No open TODOs in changed code.
-- Select tests via `.agents/test_mapping.md` based on changed paths.
+- Select tests via `.agents/test_mapping.md` based on changed paths. Focus only on meaningful tests for the specific change. Avoid running the entire test suite for minor steps.
 - If no mapping matches, run `npm run test:core` as default safety check.
 
 ## 4. Documentation freshness (mandatory)
@@ -55,7 +55,3 @@ git commit -m "[type]: [name] - [short reason]"
 ## Report
 
 Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-

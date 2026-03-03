@@ -1,7 +1,7 @@
-Original prompt: bitte überprüfe den jagdmodus es funktioniert fast nichts
+ï»¿Original prompt: bitte Ã¼berprÃ¼fe den jagdmodus es funktioniert fast nichts
 
 2026-03-02
-- Skill `develop-web-game` aktiv für reproduzierbare Spielmodus-Diagnose.
+- Skill `develop-web-game` aktiv fÃ¼r reproduzierbare Spielmodus-Diagnose.
 - `.agents` Regeln/Workflows geladen (bugfix, test_mapping, reporting).
 - `progress.md` neu erstellt.
 - Hunt-Bug reproduziert im Browser: Human-Schuss in Hunt feuert nicht (shootCooldown bleibt 0 bei KeyF/KeyG).
@@ -60,3 +60,75 @@ Original prompt: bitte überprüfe den jagdmodus es funktioniert fast nichts
 - Neuer Test T62 in tests/physics.spec.js prueft groessere Hunt-Rakete + Zielsuche.
 - Verifikation: npx playwright test tests/physics.spec.js -g T62 PASS; npm run test:physics PASS; npm run test:core PASS; npm run build PASS; docs:sync/check PASS.
 
+
+2026-03-03 (Follow-up: Gegner-Trail vs eigener Trail bei MG)
+- Nutzerfeedback: In Jagd wirkte MG-Trail-Zielsuche bei gegnerischem Trail unzuverlaessig.
+- Ursache im Trefferpfad: _resolveTrailHit konnte bei ueberlappenden Segmenten zuerst eigene Spur als Hit nehmen und damit gegnerische Spur wegpriorisieren.
+- Fix in src/hunt/OverheatGunSystem.js:
+  - Gegnerische Spur wird bei Trail-Overlap priorisiert.
+  - Eigene Spur bleibt als Fallback zerstoerbar, falls keine gegnerische Spur auf der Schusslinie liegt.
+- Regressionstest hinzugefuegt:
+  - tests/physics.spec.js -> T83: Hunt-MG priorisiert gegnerische Spur vor eigener Spur auf Schusslinie.
+- Verifikation:
+  - npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83" PASS
+  - npm run test:core PASS
+  - npm run build PASS
+
+2026-03-03 (Follow-up: gegnerische Trail-Kollision beim Durchflug)
+- Nutzerfeedback: Gegnerische Spur-Kollision fuehlte sich ausfallend an; mehrfaches Durchfliegen ohne Treffer.
+- Reproduktion abgesichert mit neuem Test T84: grosser Frame-Schritt (dt=0.55) konnte Trail zwischen Frames ueberspringen.
+- Fix in src/entities/systems/PlayerLifecycleSystem.js:
+  - neuer Sweep-Fallback fuer Trail-Kollision entlang des Wegs zwischen `prevPos` und aktueller Position.
+  - direkter praeziser OBB-Check bleibt bestehen; Sweep greift nur, wenn der direkte Check nichts findet.
+- Zusaetzliche Stabilisierung in src/hunt/OverheatGunSystem.js:
+  - dichte Feinsuche nach gegnerischer Spur, wenn initial nur eigene Spur gefunden wurde.
+- Regressionstest hinzugefuegt:
+  - tests/physics.spec.js -> T84: Hunt-Trail-Kollision trifft gegnerische Spur auch bei grossem Frame-Schritt.
+- Verifikation:
+  - npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83|T84" PASS
+  - npm run test:physics PASS (44/44)
+  - npm run test:core PASS
+  - npm run build PASS
+
+2026-03-03 (Follow-up: gleiche Enemy-Trail-Logik wie Self-Trail)
+- Nutzerfeedback: Eigene Spur funktioniert, gegnerische Spur nicht stabil.
+- Root Cause verifiziert: `player.hitboxBox` konnte nach Vehicle-Load leer sein (`isEmpty=true`), dadurch schlug `isSphereInOBB` immer fehl und OBB-basierte Trail-Treffer wurden verworfen.
+- Fix in `src/entities/Player.js`:
+  - Fallback-Hitbox fuer invalide/leere Mesh-Boxes in `_createModel()->updateBox` eingebaut.
+- Zusaetzlich verbessert:
+  - `src/entities/systems/TrailSpatialIndex.js`: OBB-Check verwendet jetzt konsistenten effektiven Radius (`segment + queryRadius`).
+  - `src/hunt/OverheatGunSystem.js`: Enemy-Trail wird pro Sample explizit vor eigener Spur gesucht (self nur Fallback).
+- Regressionstest hinzugefuegt:
+  - `tests/physics.spec.js` -> `T85: Hunt-Trail-Kollision trifft gegnerische Spur auch bei kleinen Frames (Enemy-Offset)`.
+- Verifikation:
+  - npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83|T84|T85" PASS
+  - npm run test:physics PASS (45/45)
+  - npm run test:core PASS
+  - npm run build PASS
+
+2026-03-03 (Follow-up: Treffer ja, aber Segment nicht sofort weg)
+- Nutzerfeedback: Gegnerischer Trail wird getroffen, aber Segment bleibt stehen.
+- Fix in `src/hunt/OverheatGunSystem.js`:
+  - MG-Trail-Treffer erzwingt jetzt standardmaessig `destroy-on-hit`.
+  - Optional abschaltbar ueber `HUNT.MG.DESTROY_TRAIL_ON_HIT=false`.
+- Regressionstest hinzugefuegt:
+  - `tests/physics.spec.js` -> `T86: Hunt-MG zerstoert gegnerisches echtes Trail-Segment (ownerTrail) sofort`.
+- Verifikation:
+  - npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83|T84|T85|T86" PASS
+  - npm run test:physics PASS (46/46)
+  - npm run test:core PASS
+  - npm run build PASS
+
+2026-03-03 (Follow-up: Segment bleibt sichtbar, Kollision weg)
+- Analyse bestaetigt: Segment konnte nach MG-Treffer im Grid entfernt sein, aber visuell bei totem Gegner noch stehen bleiben.
+- Ursache: `Trail.destroySegmentByEntry` setzte `_dirty`, aber markierte `instanceMatrix.needsUpdate` nicht sofort.
+- Fix in `src/entities/Trail.js`:
+  - `destroySegmentByEntry` setzt jetzt zusaetzlich `this.mesh.instanceMatrix.needsUpdate = true`.
+- Regressionstest hinzugefuegt:
+  - `tests/physics.spec.js` -> `T87: Hunt-MG entfernt Trail-Visual auch bei totem Gegner sofort`.
+- Verifikation:
+  - npx playwright test tests/physics.spec.js -g "T86|T87" PASS
+  - npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83|T84|T85|T86|T87" PASS
+  - npm run test:physics PASS (46/46)
+  - npm run test:core PASS
+  - npm run build PASS

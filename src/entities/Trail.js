@@ -203,6 +203,7 @@ export class Trail {
         DUMMY.updateMatrix();
         this.mesh.setMatrixAt(segmentIdx, DUMMY.matrix);
         this.segmentRefs[segmentIdx] = null;
+        this.mesh.instanceMatrix.needsUpdate = true;
         this._dirty = true;
         return true;
     }
