@@ -61,7 +61,7 @@ Datei-Ownership:
 ## Fortschrittsboard
 
 - [x] 15.0 Scope, Contract und Semantik einfrieren
-- [ ] 15.1A Observation-Schema V1 + Index-Konstanten (Agent A)
+- [x] 15.1A Observation-Schema V1 + Index-Konstanten (Agent A)
 - [x] 15.1B Action-Contract + Fallback-Regeln (Agent B)
 - [ ] 15.2A Observation-Extraktion aus Runtime entkoppeln (Agent A)
 - [x] 15.2B 20-Slot-Item-Encoding + Mode-ID Features (Agent B)
