@@ -702,4 +702,83 @@ test.describe('T41-60: Physik & AI', () => {
         expect(result.action.shootItemIndex).toBe(-1);
         expect(result.action.useItem).toBe(-1);
     });
+
+    test('T67: Item-Slot-Encoding erzeugt stabiles 20-Slot-One-Hot-Array', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const mod = await import('/src/entities/ai/observation/ItemSlotEncoder.js');
+            const encoded = new Array(mod.ITEM_SLOT_COUNT).fill(-1);
+            mod.encodeItemSlots(['SPEED_UP', 'ROCKET_MEDIUM', 'UNKNOWN_ITEM', 'ROCKET_MEDIUM'], encoded);
+            return {
+                encoded,
+                slotCount: mod.ITEM_SLOT_COUNT,
+                speedUpSlot: mod.ITEM_SLOT_BY_TYPE.SPEED_UP,
+                rocketMediumSlot: mod.ITEM_SLOT_BY_TYPE.ROCKET_MEDIUM,
+                unknownSlot: mod.ITEM_SLOT_UNKNOWN_INDEX,
+            };
+        });
+
+        expect(result.encoded.length).toBe(result.slotCount);
+        expect(result.encoded[result.speedUpSlot]).toBe(1);
+        expect(result.encoded[result.rocketMediumSlot]).toBe(1);
+        expect(result.encoded[result.unknownSlot]).toBe(1);
+        expect(result.encoded.every((value) => value === 0 || value === 1)).toBeTruthy();
+    });
+
+    test('T68: Mode-Feature-Encoding mappt classic/hunt deterministisch', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const mod = await import('/src/entities/ai/observation/ModeFeatureEncoder.js');
+            const classic = mod.writeModeFeatures('classic', [0, 0, 0]);
+            const hunt = mod.writeModeFeatures('HUNT', [0, 0, 0]);
+            const fallback = mod.writeModeFeatures('unknown-mode', [0, 0, 0]);
+            return { classic, hunt, fallback };
+        });
+
+        expect(result.classic).toEqual([0, 1, 0]);
+        expect(result.hunt).toEqual([1, 0, 1]);
+        expect(result.fallback).toEqual([0, 1, 0]);
+    });
+
+    test('T69: Observation-Schema V1 hat feste Laenge und eindeutige Indizes', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const semantics = await import('/src/entities/ai/observation/ObservationSemantics.js');
+            const indexValues = Object.values(schema.OBSERVATION_INDEX)
+                .filter((value) => Number.isInteger(value))
+                .sort((a, b) => a - b);
+            const uniqueIndices = new Set(indexValues);
+            const semanticsIndices = semantics.OBSERVATION_SEMANTICS_V1.map((entry) => entry.index);
+            const uniqueSemanticIndices = new Set(semanticsIndices);
+
+            return {
+                version: schema.OBSERVATION_SCHEMA_VERSION,
+                length: schema.OBSERVATION_LENGTH_V1,
+                indexCount: indexValues.length,
+                uniqueIndexCount: uniqueIndices.size,
+                minIndex: indexValues[0],
+                maxIndex: indexValues[indexValues.length - 1],
+                itemSlot00: schema.ITEM_SLOT_00,
+                itemSlot19: schema.ITEM_SLOT_19,
+                semanticsLength: semantics.OBSERVATION_SEMANTICS_V1.length,
+                uniqueSemanticsIndexCount: uniqueSemanticIndices.size,
+                hasUniqueSemanticsIndices: semantics.hasUniqueObservationSemanticIndices(),
+                hasExpectedSemanticsLength: semantics.hasExpectedObservationSemanticLength(schema.OBSERVATION_LENGTH_V1),
+            };
+        });
+
+        expect(result.version).toBe('v1');
+        expect(result.length).toBe(40);
+        expect(result.indexCount).toBe(40);
+        expect(result.uniqueIndexCount).toBe(40);
+        expect(result.minIndex).toBe(0);
+        expect(result.maxIndex).toBe(39);
+        expect(result.itemSlot00).toBe(20);
+        expect(result.itemSlot19).toBe(39);
+        expect(result.semanticsLength).toBe(40);
+        expect(result.uniqueSemanticsIndexCount).toBe(40);
+        expect(result.hasUniqueSemanticsIndices).toBeTruthy();
+        expect(result.hasExpectedSemanticsLength).toBeTruthy();
+    });
 });

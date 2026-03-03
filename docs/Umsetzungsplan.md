@@ -1,4 +1,4 @@
-﻿# Umsetzungsplan (Master)
+# Umsetzungsplan (Master)
 
 Dies ist der konsolidierte Plan fuer anstehende und laufende Implementierungen.
 Neue Findings aus dem Analysebericht fliessen hier ein.
@@ -208,7 +208,7 @@ Letztes Update: 2026-03-03
   - [ ] 15.1A Observation-Schema V1 + Index-Konstanten (Agent A)
   - [x] 15.1B Action-Contract + Fallback-Regeln (Agent B)
   - [ ] 15.2A Observation-Extraktion aus Runtime entkoppeln (Agent A)
-  - [ ] 15.2B 20-Slot-Item-Encoding + Mode-ID Features (Agent B)
+  - [x] 15.2B 20-Slot-Item-Encoding + Mode-ID Features (Agent B)
   - [ ] 15.3A Runtime-Context-Wiring in Entity/Input-System (Agent A)
   - [ ] 15.3B Registry auf modulare Bridge-Policies erweitern (Agent B)
   - [ ] 15.4A Classic-Bridge-Policy integrieren (Agent A)
