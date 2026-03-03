@@ -18,7 +18,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 
 **Wichtig:**
 
-- Keine offenen kritischen Findings (Stand: 2026-03-02, inkl. Hunt-Input-Hotfix validiert mit `test:core`, `test:physics`, `test:stress`).
+- Keine offenen kritischen Findings (Stand: 2026-03-03, inkl. Hunt-MG-Targeting-Hotfix validiert mit `npx playwright test tests/physics.spec.js -g "T61|T63|T64"`, `test:core`, `build`).
 
 **Mittel:**
 
@@ -188,6 +188,83 @@ Letztes Update: 2026-03-02
   - Intervall L zum Abschluss: `npm run benchmark:baseline`, `npm run docs:sync`, `npm run docs:check`
 - Prompt-Regel:
   - Nach jeder Phase direkt die naechste Phase starten, nur bei rotem Gate stoppen.
+
+---
+
+## Phase 15: [ ] Modulare Bot-Schnittstelle fuer Deep-Learning-Bridge
+
+Geplant: 2026-03-03
+Letztes Update: 2026-03-03
+**Parallelbetrieb:** Ja, in zwei Lanes (A: Observation/Runtime-Context, B: Action/Policy/Bridge) plus Integrations-Agent.
+
+- Ziele:
+  1. Observation/Action als stabile Bridge zwischen Engine und Bot-Gehirn entkoppeln.
+  2. Fixes, semantisch stabiles Observation-Schema mit 20-Slot-Item-Encoding etablieren.
+  3. Classic- und Hunt-Bots ueber ein gemeinsames, modulares Policy-Interface betreiben.
+  4. Optionale Trainer-Bridge vorbereiten, ohne den Produktionspfad zu destabilisieren.
+- Referenzplan: `docs/Feature_BotSchnittstelle_Modulare_Integration.md`
+- Teilphasen:
+  - [ ] 15.0 Scope, Contract und Semantik einfrieren
+  - [ ] 15.1A Observation-Schema V1 + Index-Konstanten (Agent A)
+  - [ ] 15.1B Action-Contract + Fallback-Regeln (Agent B)
+  - [ ] 15.2A Observation-Extraktion aus Runtime entkoppeln (Agent A)
+  - [ ] 15.2B 20-Slot-Item-Encoding + Mode-ID Features (Agent B)
+  - [ ] 15.3A Runtime-Context-Wiring in Entity/Input-System (Agent A)
+  - [ ] 15.3B Registry auf modulare Bridge-Policies erweitern (Agent B)
+  - [ ] 15.4A Classic-Bridge-Policy integrieren (Agent A)
+  - [ ] 15.4B Hunt-Bridge-Policy integrieren (Agent B)
+  - [ ] 15.5 Integration: RuntimeConfig/Settings/Session-Auswahl
+  - [ ] 15.6 Optional: WebSocket-Bridge fuer externes Training (Feature-Flag)
+  - [ ] 15.7 Abschluss: Regression, Doku, Restrisiken
+- GATES:
+  - 15.2A startet erst nach 15.1A.
+  - 15.2B startet erst nach 15.1B.
+  - 15.3A/15.3B starten erst wenn 15.2A und 15.2B abgeschlossen sind.
+  - 15.4A/15.4B starten erst nach 15.3A und 15.3B.
+  - 15.5 startet erst nach 15.4A und 15.4B.
+  - 15.7 startet erst nach gruener Verifikation von 15.6 oder explizitem Skip-Entscheid.
+- Verifikation pro Teilphase:
+  - Gemappte Tests gemaess `.agents/test_mapping.md`
+  - Pflicht-Gates: `npm run docs:sync` und `npm run docs:check`
+- Prompt-Regel:
+  - Am Ende jeder Teilphase den im Referenzplan definierten "Naechster-Chat-Prompt" ausgeben und damit direkt die Folgephase starten.
+
+---
+
+## Produkt- und Gameplay-Verbesserungen (Backlog, Stand: 2026-03-03)
+
+- Entscheidung: Aus der Vorschlagsliste vom 2026-03-03 sind Punkte `4`, `5`, `6`, `7`, `8`, `9`, `11`, `13`, `15`, `16` fuer den Umsetzungsplan freigegeben.
+- Punkt `10` (Challenge-/Achievement-Idee) wurde auf Wunsch archiviert: `docs/archive/Idee_10_Achievements_Challenges.md`.
+- [ ] V4 Treffer-/Schadensfeedback verbessern
+  - Klarere Audio-/VFX-Signale bei MG-, Raketen- und Trail-Treffern sowie bei Schildabsorption.
+  - Zielpfade: `src/hunt/HuntHUD.js`, `src/core/Audio.js`, `src/entities/systems/ProjectileSystem.js`.
+- [ ] V5 Hunt-Mode Feintuning datenbasiert abschliessen
+  - TTK, Overheat-Fenster, Respawn-Timer und Pickup-Spawns auf Telemetrie und Matchdaten abstimmen.
+  - Zielpfade: `src/core/Config.js`, `src/hunt/HuntConfig.js`, `src/hunt/RespawnSystem.js`, `src/hunt/RocketPickupSystem.js`.
+- [ ] V6 Menue-Schnellpresets einfuehren
+  - Presets wie `Arcade`, `Competitive`, `Chaos` mit sauberem Sync in Settings/UI.
+  - Zielpfade: `src/ui/MenuController.js`, `src/ui/UIManager.js`, `src/core/SettingsManager.js`.
+- [ ] V7 Profile-UX ausbauen
+  - Profil duplizieren, Import/Export und Standardprofil-Markierung ergaenzen.
+  - Zielpfade: `src/ui/SettingsStore.js`, `src/ui/Profile*Ops.js`, `src/ui/MenuController.js`.
+- [ ] V8 Post-Match-Statistiken erweitern
+  - Kill/Death, Trefferquote, Ueberlebenszeit und Todesursachen pro Runde/Match sichtbar machen.
+  - Zielpfade: `src/ui/HUD.js`, `src/ui/MatchFlowUiController.js`, `src/state/RoundRecorder.js`.
+- [ ] V9 Replay/Ghost fuer letzte Runde
+  - Leichten Replay-/Ghost-Pfad fuer Lern- und Highlight-Momente aufbauen.
+  - Zielpfade: `src/state/RoundRecorder.js`, `src/core/main.js`, `src/ui/MatchFlowUiController.js`.
+- [ ] V11 Mehr Map-Varianz ueber GLB/GLTF-Maps
+  - Map-Pool um externe GLB-Umgebungen erweitern, inklusive Collider/Fallback-Pfad.
+  - Referenz: `docs/Feature_GLB_Map_Loader.md`.
+- [ ] V13 Performance-Hotspot `maze` gezielt optimieren
+  - Draw-Calls per Batching/Instancing/LOD reduzieren, ohne Gameplay-Regression.
+  - Zielpfade: `src/entities/Arena.js`, `src/core/Renderer.js`, `src/core/Config.js`.
+- [ ] V15 Telemetrie-Dashboard fuer Balancing
+  - Winrate-, Survival-, Stuck- und Schadensmetriken pro Mode/Map/Bot-Level auswertbar machen.
+  - Zielpfade: `scripts/`, `data/`, `docs/Testergebnisse_*.md`.
+- [ ] V16 Event-Playlist/Fun-Modes
+  - Rotierende Spezialregeln als zeitlich limitierte Modi fuer Abwechslung und Retention.
+  - Zielpfade: `src/core/Config.js`, `src/core/main.js`, `src/ui/MenuController.js`.
 
 
 

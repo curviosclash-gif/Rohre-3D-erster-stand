@@ -14,19 +14,19 @@
         "rounds": 10
       },
       "metrics": {
-        "rounds": 4,
-        "botWinRate": 0.25,
+        "rounds": 5,
+        "botWinRate": 0.6,
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 14.634775297541637,
+        "averageBotSurvival": 30.818340845944476,
         "stuckPerMinute": 0,
-        "totalDuration": 84.91319999999553
+        "totalDuration": 208.26800000000372
       },
       "runner": {
-        "forcedRounds": 1,
-        "timeoutRounds": 1,
-        "elapsedMs": 86523
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 181293
       }
     },
     {
@@ -45,14 +45,14 @@
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 25.954067139179944,
+        "averageBotSurvival": 29.630166473514084,
         "stuckPerMinute": 0,
-        "totalDuration": 128.45099999999255
+        "totalDuration": 150.29159999999777
       },
       "runner": {
-        "forcedRounds": 2,
-        "timeoutRounds": 2,
-        "elapsedMs": 130869
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 156433
       }
     },
     {
@@ -71,14 +71,14 @@
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 21.917500211968825,
+        "averageBotSurvival": 31.618958541106622,
         "stuckPerMinute": 0,
-        "totalDuration": 93.46910000000148
+        "totalDuration": 131.95940000000223
       },
       "runner": {
-        "forcedRounds": 1,
-        "timeoutRounds": 1,
-        "elapsedMs": 94844
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 140877
       }
     },
     {
@@ -93,34 +93,34 @@
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 0.25,
+        "botWinRate": 0.75,
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 24.450400420377264,
+        "averageBotSurvival": 45.24550036010805,
         "stuckPerMinute": 0,
-        "totalDuration": 119.64240000000598
+        "totalDuration": 180.98210000000148
       },
       "runner": {
-        "forcedRounds": 1,
-        "timeoutRounds": 1,
-        "elapsedMs": 121176
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 198127
       }
     }
   ],
   "overall": {
-    "rounds": 16,
-    "botWinRate": 0.625,
+    "rounds": 17,
+    "botWinRate": 0.8235294117647058,
     "stuckEvents": 0,
     "wallHits": 0,
     "trailHits": 0,
-    "averageBotSurvival": 21.739185767266918,
+    "averageBotSurvival": 34.1217768075669,
     "stuckPerMinute": 0,
-    "totalDuration": 426.4756999999954
+    "totalDuration": 671.5011000000052
   },
   "runner": {
-    "forcedRounds": 5,
-    "timeoutRounds": 5,
+    "forcedRounds": 12,
+    "timeoutRounds": 12,
     "failOnForcedRound": false,
     "maxForcedRounds": 9007199254740991
   }
