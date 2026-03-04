@@ -22,21 +22,21 @@
 
 ### Kennzahlen (Gesamt)
 
-- FPS-Mittel: 59.47
-- Draw Calls (Mittel): 22.67
+- FPS-Mittel: 59.75
+- Draw Calls (Mittel): 36.52
 - Bot-Winrate: 82.4%
 - Stuck-Events: 0
 - Runden erfasst: 17
-- Performance-Samples: 46
+- Performance-Samples: 48
 
 ### Kennzahlen je Szenario
 
 | Szenario | Runden | FPS-Mittel | Draw Calls (Mittel) | Bot-Winrate | Stuck | Avg Survival |
 |---|---:|---:|---:|---:|---:|---:|
-| V1 (standard) | 5 | 57.54 | 17.80 | 60.0% | 0 | 30.82s |
-| V2 (maze) | 4 | 60.00 | 19.36 | 100.0% | 0 | 29.63s |
-| V3 (complex) | 4 | 60.00 | 26.63 | 100.0% | 0 | 31.62s |
-| V4 (standard) | 4 | 60.00 | 24.33 | 75.0% | 0 | 45.25s |
+| V1 (standard) | 5 | 59.28 | 26.12 | 60.0% | 0 | 30.82s |
+| V2 (maze) | 4 | 60.00 | 34.82 | 100.0% | 0 | 29.63s |
+| V3 (complex) | 4 | 60.00 | 83.00 | 100.0% | 0 | 31.62s |
+| V4 (standard) | 4 | 60.00 | 34.07 | 75.0% | 0 | 45.25s |
 
 ### Kurzbewertung
 
