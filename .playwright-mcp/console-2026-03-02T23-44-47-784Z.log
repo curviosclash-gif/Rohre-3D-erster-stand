@@ -1,0 +1,2 @@
+[     370ms] [ERROR] wasm streaming compile failed: TypeError: WebAssembly compilation aborted: Network error: Response body loading was aborted @ https://cdn.jsdelivr.net/npm/onnxruntime-web@1.16.3/dist/ort.min.js:5
+[     371ms] [ERROR] falling back to ArrayBuffer instantiation @ https://cdn.jsdelivr.net/npm/onnxruntime-web@1.16.3/dist/ort.min.js:5

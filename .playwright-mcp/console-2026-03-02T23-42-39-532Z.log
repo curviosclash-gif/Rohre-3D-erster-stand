@@ -1,0 +1,22 @@
+[    2621ms] [ERROR] [AiBot] Failed to load model: TypeError: Cannot read properties of undefined (reading 'create')
+    at AiBot.load (http://localhost:5173/src/ai/ai_bridge.mjs?t=1772494949430:26:55)
+    at AiManager.loadModel (http://localhost:5173/src/ai/AiManager.mjs:19:19)
+    at new Game (http://localhost:5173/src/core/main.js:213:19)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/ai/ai_bridge.mjs?t=1772494949430:29
+[   57602ms] [ERROR] [AiBot] Failed to load model: TypeError: Cannot read properties of undefined (reading 'InferenceSession')
+    at AiBot.load (http://localhost:5173/src/ai/ai_bridge.mjs?t=1772495008627:28:38)
+    at AiManager.loadModel (http://localhost:5173/src/ai/AiManager.mjs:19:19)
+    at new Game (http://localhost:5173/src/core/main.js:213:19)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/ai/ai_bridge.mjs?t=1772495008627:31
+[  119806ms] [WARNING] [OBJVehicleMesh] Failed to load ship5.obj/.mtl, using fallback mesh. TypeError: Failed to fetch
+    at FileLoader.load (http://localhost:5173/node_modules/.vite/deps/chunk-ZH5BSLKU.js?v=bce35699:24998:5)
+    at OBJLoader.load (http://localhost:5173/node_modules/.vite/deps/three_addons_loaders_OBJLoader__js.js?v=bce35699:272:12)
+    at http://localhost:5173/src/entities/obj-vehicle-mesh.js:73:39
+    at Object.onLoad (http://localhost:5173/node_modules/.vite/deps/three_addons_loaders_MTLLoader__js.js?v=bce35699:42:9)
+    at http://localhost:5173/node_modules/.vite/deps/chunk-ZH5BSLKU.js?v=bce35699:25067:39 @ http://localhost:5173/src/entities/obj-vehicle-mesh.js:91
+[  119815ms] [WARNING] [OBJVehicleMesh] Failed to load ship5.obj/.mtl, using fallback mesh. TypeError: Failed to fetch
+    at FileLoader.load (http://localhost:5173/node_modules/.vite/deps/chunk-ZH5BSLKU.js?v=bce35699:24998:5)
+    at OBJLoader.load (http://localhost:5173/node_modules/.vite/deps/three_addons_loaders_OBJLoader__js.js?v=bce35699:272:12)
+    at http://localhost:5173/src/entities/obj-vehicle-mesh.js:73:39
+    at Object.onLoad (http://localhost:5173/node_modules/.vite/deps/three_addons_loaders_MTLLoader__js.js?v=bce35699:42:9)
+    at http://localhost:5173/node_modules/.vite/deps/chunk-ZH5BSLKU.js?v=bce35699:25067:39 @ http://localhost:5173/src/entities/obj-vehicle-mesh.js:91

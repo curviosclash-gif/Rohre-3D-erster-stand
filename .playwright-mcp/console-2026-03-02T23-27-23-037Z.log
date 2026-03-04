@@ -1,0 +1,17 @@
+[    1861ms] [ERROR] Fatal Game Init Error: TypeError: Cannot assign to read only property 'TRAIL_HIT_RADIUS' of object '#<Object>'
+    at applyRuntimeConfigCompatibility (http://localhost:5173/src/core/RuntimeConfig.js?t=1772493859934:183:51)
+    at Game._applySettingsToRuntime (http://localhost:5173/src/core/main.js:370:9)
+    at new Game (http://localhost:5173/src/core/main.js:101:14)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/core/main.js:934
+[    2044ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:5173/favicon.ico:0
+[   26028ms] [ERROR] Fatal Game Init Error: TypeError: Cannot assign to read only property 'TRAIL_HIT_RADIUS' of object '#<Object>'
+    at applyRuntimeConfigCompatibility (http://localhost:5173/src/core/RuntimeConfig.js?t=1772493859934:183:51)
+    at Game._applySettingsToRuntime (http://localhost:5173/src/core/main.js:370:9)
+    at new Game (http://localhost:5173/src/core/main.js:101:14)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/core/main.js:934
+[   52826ms] [WARNING] [Game] AI loadModel failed: ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from derived constructor
+    at new AiBot (http://localhost:5173/src/ai/ai_bridge.mjs:15:9)
+    at AiManager.loadModel (http://localhost:5173/src/ai/AiManager.mjs:18:21)
+    at new Game (http://localhost:5173/src/core/main.js:213:19)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/core/main.js:213
+[  332984ms] [WARNING] WebGL: CONTEXT_LOST_WEBGL: loseContext: context lost @ http://localhost:5173/:0
