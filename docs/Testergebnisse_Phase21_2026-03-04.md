@@ -95,3 +95,17 @@ Split-Ergebnis:
 - `src/entities/Bot.js` bindet die Fassade und reduziert direkte Sensor-Proxy-Methoden.
 - `src/entities/ai/BotSensingOps.js` und verwandte Ops nutzen `checkTrailHit`/Facade-Zugriffe.
 - Recovery/Pursuit/PortalIntent bleiben laut Physics- und Smoke-Gates regressionsfrei.
+
+## 21.5 Verifikation (MenuController Listener-Split)
+
+- `npm run test:core`
+  - Ergebnis: PASS (`20 passed`)
+- `npm run test:stress`
+  - Ergebnis: PASS (`13 passed`)
+
+Split-Ergebnis:
+
+- `src/ui/menu/MenuGameplayBindings.js` kapselt Gameplay-/Settings-Listener.
+- `src/ui/menu/MenuProfileBindings.js` kapselt Profilaktionen.
+- `src/ui/menu/MenuControlBindings.js` kapselt Keybind/Controls-Listener.
+- `src/ui/MenuController.js` bleibt Queue-/Event-Emitter-Fassade ohne monolithische Listener-Registrierung.

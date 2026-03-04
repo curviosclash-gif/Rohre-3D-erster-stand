@@ -83,5 +83,5 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - [x] 21.2 ProjectileSystem Split (StatePool, SimulationOps, HitResolver)
 - [x] 21.3 main.js Split (Bootstrap, RuntimeFacade, DebugApi)
 - [x] 21.4 Bot-Fassade vereinfachen (Proxy-Abbau + SensorsFacade)
-- [ ] 21.5 MenuController Listener-Split (Gameplay/Profile/Controls)
+- [x] 21.5 MenuController Listener-Split (Gameplay/Profile/Controls)
 - [ ] 21.6 Abschluss, Stabilisierung, Doku-Freeze (`docs:sync`, `docs:check`)

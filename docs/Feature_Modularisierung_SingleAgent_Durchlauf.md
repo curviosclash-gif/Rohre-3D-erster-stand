@@ -140,10 +140,10 @@ Exit-Kriterien:
 
 ## Phase 21.5 - MenuController Listener-Split
 
-- [ ] 21.5.1 Gameplay-Bindings nach `MenuGameplayBindings.js` extrahieren.
-- [ ] 21.5.2 Profil-Bindings nach `MenuProfileBindings.js` extrahieren.
-- [ ] 21.5.3 Keybind/Steuerungs-Bindings nach `MenuControlBindings.js` extrahieren.
-- [ ] 21.5.4 `MenuController.js` als Event-Emitter/Fassade vereinfachen.
+- [x] 21.5.1 Gameplay-Bindings nach `MenuGameplayBindings.js` extrahieren.
+- [x] 21.5.2 Profil-Bindings nach `MenuProfileBindings.js` extrahieren.
+- [x] 21.5.3 Keybind/Steuerungs-Bindings nach `MenuControlBindings.js` extrahieren.
+- [x] 21.5.4 `MenuController.js` als Event-Emitter/Fassade vereinfachen.
 
 Verifikation:
 
