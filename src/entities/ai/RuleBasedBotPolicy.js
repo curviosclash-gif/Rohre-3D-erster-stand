@@ -28,7 +28,22 @@ export class RuleBasedBotPolicy {
     }
 
     setSensePhase(phase) {
-        const normalized = Number.isFinite(phase) ? Math.max(0, Math.floor(phase)) % 4 : 0;
-        this._botAI._sensePhase = normalized;
+        if (typeof this._botAI.setSensePhase === 'function') {
+            this._botAI.setSensePhase(phase);
+        }
+    }
+
+    getSensorSnapshot() {
+        if (typeof this._botAI.getSensorSnapshot === 'function') {
+            return this._botAI.getSensorSnapshot();
+        }
+        return null;
+    }
+
+    getSensorArray() {
+        if (typeof this._botAI.getSensorArray === 'function') {
+            return this._botAI.getSensorArray();
+        }
+        return null;
     }
 }

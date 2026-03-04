@@ -47,6 +47,57 @@ export function findStrongestRocketIndex(inventory = []) {
     return strongestIndex;
 }
 
+function resolveSensorSnapshot(policy) {
+    if (typeof policy?._fallbackPolicy?.getSensorSnapshot === 'function') {
+        return policy._fallbackPolicy.getSensorSnapshot();
+    }
+    return null;
+}
+
+function resolveSensorYawPitch(snapshot) {
+    const yaw = Number.isFinite(snapshot?.targetYaw) ? snapshot.targetYaw : 0;
+    const pitch = Number.isFinite(snapshot?.targetPitch) ? snapshot.targetPitch : 0;
+    return { yaw, pitch };
+}
+
+function applyRetreatSteeringFallback(policy, input, player, enemy) {
+    policy._tmpToEnemy.subVectors(enemy.position, player.position).normalize();
+    player.getDirection(policy._tmpForward).normalize();
+    policy._tmpRight.crossVectors(WORLD_UP, policy._tmpForward);
+    if (policy._tmpRight.lengthSq() <= 0.000001) {
+        policy._tmpRight.set(1, 0, 0);
+    } else {
+        policy._tmpRight.normalize();
+    }
+    policy._tmpUp.crossVectors(policy._tmpForward, policy._tmpRight).normalize();
+
+    const yawTowardEnemy = policy._tmpRight.dot(policy._tmpToEnemy);
+    if (Math.abs(yawTowardEnemy) > 0.03) {
+        input.yawLeft = yawTowardEnemy > 0;
+        input.yawRight = yawTowardEnemy < 0;
+    }
+
+    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+        const pitchTowardEnemy = policy._tmpUp.dot(policy._tmpToEnemy);
+        if (Math.abs(pitchTowardEnemy) > 0.07) {
+            input.pitchUp = pitchTowardEnemy < 0;
+            input.pitchDown = pitchTowardEnemy > 0;
+        }
+    }
+}
+
+function applyRetreatSteeringFromSensors(input, snapshot) {
+    const steering = resolveSensorYawPitch(snapshot);
+    if (Math.abs(steering.yaw) > 0.01) {
+        input.yawLeft = steering.yaw > 0;
+        input.yawRight = steering.yaw < 0;
+    }
+    if (!CONFIG.GAMEPLAY.PLANAR_MODE && Math.abs(steering.pitch) > 0.01) {
+        input.pitchUp = steering.pitch < 0;
+        input.pitchDown = steering.pitch > 0;
+    }
+}
+
 export class HuntBotPolicy {
     constructor(options = {}) {
         this.type = BOT_POLICY_TYPES.HUNT;
@@ -61,7 +112,14 @@ export class HuntBotPolicy {
         const input = this._fallbackPolicy.update(dt, player, arena, allPlayers, projectiles);
         if (!player || !player.alive) return input;
 
-        const { enemy, distSq } = getNearestEnemy(player, allPlayers, this._tmpToEnemy);
+        const snapshot = resolveSensorSnapshot(this);
+        const nearest = getNearestEnemy(player, allPlayers, this._tmpToEnemy);
+        const enemy = snapshot?.targetPlayer && snapshot.targetPlayer.alive ? snapshot.targetPlayer : nearest.enemy;
+        const distSq = Number.isFinite(snapshot?.targetDistanceSq) ? snapshot.targetDistanceSq : nearest.distSq;
+        const targetInFront = snapshot ? !!snapshot.targetInFront : true;
+        const pressure = Number.isFinite(snapshot?.pressure) ? snapshot.pressure : 0;
+        const projectileThreat = !!snapshot?.projectileThreat;
+
         const healthRatio = resolveHealthRatio(player);
         const enemyHealthRatio = resolveHealthRatio(enemy);
         const aggression = clamp(0.55 + (healthRatio - enemyHealthRatio) * 0.8, 0.15, 1.0);
@@ -69,13 +127,18 @@ export class HuntBotPolicy {
         const mgRangeSq = mgRange * mgRange;
         input.shootMG = false;
 
-        if (enemy && distSq <= mgRangeSq && healthRatio > 0.15 && aggression >= 0.45) {
+        if (enemy && distSq <= mgRangeSq && healthRatio > 0.15 && aggression >= 0.45 && targetInFront) {
             input.shootMG = true;
         }
 
         const rocketIndex = findStrongestRocketIndex(player.inventory);
         if (rocketIndex >= 0 && enemy) {
-            const shouldUseRocket = healthRatio < 0.55 || enemyHealthRatio > 0.45 || distSq > 20 * 20;
+            const shouldUseRocket =
+                healthRatio < 0.55
+                || enemyHealthRatio > 0.45
+                || distSq > 20 * 20
+                || pressure > 0.58
+                || projectileThreat;
             if (shouldUseRocket) {
                 input.shootItem = true;
                 input.shootItemIndex = rocketIndex;
@@ -83,30 +146,12 @@ export class HuntBotPolicy {
         }
 
         if (healthRatio <= 0.33 && enemy) {
-            this._tmpToEnemy.subVectors(enemy.position, player.position).normalize();
-            player.getDirection(this._tmpForward).normalize();
-            this._tmpRight.crossVectors(WORLD_UP, this._tmpForward);
-            if (this._tmpRight.lengthSq() <= 0.000001) {
-                this._tmpRight.set(1, 0, 0);
+            const hasSensorSteering = snapshot && (Math.abs(snapshot.targetYaw || 0) > 0.01 || Math.abs(snapshot.targetPitch || 0) > 0.01);
+            if (hasSensorSteering) {
+                applyRetreatSteeringFromSensors(input, snapshot);
             } else {
-                this._tmpRight.normalize();
+                applyRetreatSteeringFallback(this, input, player, enemy);
             }
-            this._tmpUp.crossVectors(this._tmpForward, this._tmpRight).normalize();
-
-            const yawTowardEnemy = this._tmpRight.dot(this._tmpToEnemy);
-            if (Math.abs(yawTowardEnemy) > 0.03) {
-                input.yawLeft = yawTowardEnemy > 0;
-                input.yawRight = yawTowardEnemy < 0;
-            }
-
-            if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
-                const pitchTowardEnemy = this._tmpUp.dot(this._tmpToEnemy);
-                if (Math.abs(pitchTowardEnemy) > 0.07) {
-                    input.pitchUp = pitchTowardEnemy < 0;
-                    input.pitchDown = pitchTowardEnemy > 0;
-                }
-            }
-
             input.boost = true;
             if (rocketIndex < 0) {
                 input.shootItem = false;
@@ -133,5 +178,19 @@ export class HuntBotPolicy {
         if (typeof this._fallbackPolicy.setSensePhase === 'function') {
             this._fallbackPolicy.setSensePhase(phase);
         }
+    }
+
+    getSensorSnapshot() {
+        if (typeof this._fallbackPolicy.getSensorSnapshot === 'function') {
+            return this._fallbackPolicy.getSensorSnapshot();
+        }
+        return null;
+    }
+
+    getSensorArray() {
+        if (typeof this._fallbackPolicy.getSensorArray === 'function') {
+            return this._fallbackPolicy.getSensorArray();
+        }
+        return null;
     }
 }

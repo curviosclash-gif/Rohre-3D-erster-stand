@@ -1,30 +1,16 @@
-﻿// ============================================
+// ============================================
 // Bot.js - AI opponent logic
 // ============================================
 
 import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
-import { runPerception } from './ai/BotSensingOps.js';
 import { runDecision } from './ai/BotDecisionOps.js';
 import { runAction } from './ai/BotActionOps.js';
 import { estimateEnemyPressure, estimatePointRisk, selectTarget } from './ai/BotTargetingOps.js';
 import { enterRecovery, updateRecovery, updateStuckState } from './ai/BotRecoveryOps.js';
-import { composeProbeDirection, scanProbeRay, scoreProbe } from './ai/BotProbeOps.js';
-import { estimateExitSafety, evaluatePortalIntent } from './ai/BotPortalOps.js';
-import { senseProjectiles, senseHeight, senseBotSpacing, evaluatePursuit } from './ai/BotThreatOps.js';
+import { BotSensors } from './ai/BotSensors.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
-
-const MAP_BEHAVIOR = {
-    standard: { caution: 0.0, portalBias: 0.0, aggressionBias: 0.0 },
-    empty: { caution: -0.12, portalBias: -0.08, aggressionBias: 0.16 },
-    maze: { caution: 0.22, portalBias: 0.06, aggressionBias: -0.1 },
-    complex: { caution: 0.16, portalBias: 0.08, aggressionBias: -0.04 },
-    pyramid: { caution: 0.08, portalBias: 0.12, aggressionBias: 0.03 },
-};
-
-const BOT_COLLISION_CACHE_POS_SCALE = 32;
-const BOT_COLLISION_CACHE_RADIUS_SCALE = 64;
 
 // Phase 3: Kontextsensitive Item-Regeln (emergencyScale + combatSelf)
 const ITEM_RULES = {
@@ -37,21 +23,6 @@ const ITEM_RULES = {
     GHOST: { self: 0.95, offense: 0.1, defensiveScale: 1.0, emergencyScale: 2.0, combatSelf: 0.5 },
     INVERT: { self: -0.7, offense: 0.85, defensiveScale: 0.15, emergencyScale: 0.0, combatSelf: -0.4 },
 };
-
-function createProbe(name, yaw, pitch, weight = 0) {
-    return {
-        name,
-        yaw,
-        pitch,
-        weight,
-        dir: new THREE.Vector3(),
-        risk: 999,
-        wallDist: 0,
-        trailDist: 0,
-        clearance: 0,
-        immediateDanger: false,
-    };
-}
 
 export class BotAI {
     constructor(options = {}) {
@@ -110,30 +81,6 @@ export class BotAI {
             portalEntryDistanceSq: Infinity,
         };
 
-        this.sense = {
-            lookAhead: 0,
-            forwardRisk: 1,
-            bestProbe: null,
-            targetDistanceSq: Infinity,
-            targetInFront: false,
-            immediateDanger: false,
-            pressure: 0,
-            localOpenness: 0,
-            mapCaution: 0,
-            mapPortalBias: 0,
-            mapAggressionBias: 0,
-            projectileThreat: false,
-            projectileEvadeYaw: 0,
-            projectileEvadePitch: 0,
-            heightBias: 0,
-            botRepulsionYaw: 0,
-            botRepulsionPitch: 0,
-            pursuitActive: false,
-            pursuitYaw: 0,
-            pursuitPitch: 0,
-            pursuitAimDot: 0,
-        };
-
         this._checkStuckTimer = 0;
         this._stuckScore = 0;
         this._recentBouncePressure = 0;
@@ -159,33 +106,30 @@ export class BotAI {
         this._tmpVec2 = new THREE.Vector3();
         this._tmpVec3 = new THREE.Vector3();
 
-        // Phase 1: Erweiterte Probes (12 statt 7)
-        this._probes = [
-            createProbe('forward', 0, 0, 0),
-            createProbe('left', -1.0, 0, 0.02),
-            createProbe('right', 1.0, 0, 0.02),
-            createProbe('leftWide', -1.8, 0, 0.07),
-            createProbe('rightWide', 1.8, 0, 0.07),
-            createProbe('up', 0, 0.9, 0.08),
-            createProbe('down', 0, -0.9, 0.08),
-            // Neue diagonale Probes
-            createProbe('upLeft', -0.7, 0.7, 0.10),
-            createProbe('upRight', 0.7, 0.7, 0.10),
-            createProbe('downLeft', -0.7, -0.7, 0.10),
-            createProbe('downRight', 0.7, -0.7, 0.10),
-            // Backward-Probe fÃ¼r RÃ¼ckwÃ¤rtserkennung
-            createProbe('backward', 3.14, 0, 0.25),
-        ];
+        this.sensors = new BotSensors();
+        this.sense = this.sensors.sense;
+        this._probes = this.sensors._probes;
+        this._collisionCache = this.sensors._collisionCache;
+        this._probeRayCenter = this.sensors._probeRayCenter;
+        this._probeRayLeft = this.sensors._probeRayLeft;
+        this._probeRayRight = this.sensors._probeRayRight;
 
-        this._collisionCache = new Map();
-        this._lastSensePos = new THREE.Vector3();
-        this._probeRayCenter = { wallDist: 0, trailDist: 0, immediateDanger: false };
-        this._probeRayLeft = { wallDist: 0, trailDist: 0, immediateDanger: false };
-        this._probeRayRight = { wallDist: 0, trailDist: 0, immediateDanger: false };
-
-        // Time-Slicing: Sensor-Scans auf verschiedene Frames verteilen
-        this._sensePhase = 0;         // Frame-Slot dieses Bots (0..3), von EntityManager gesetzt
-        this._sensePhaseCounter = 0;  // Hochzaehlender Frame-Zaehler
+        Object.defineProperty(this, '_sensePhase', {
+            configurable: true,
+            enumerable: true,
+            get: () => this.sensors._sensePhase,
+            set: (phase) => { this.sensors.setSensePhase(phase); },
+        });
+        Object.defineProperty(this, '_sensePhaseCounter', {
+            configurable: true,
+            enumerable: true,
+            get: () => this.sensors._sensePhaseCounter,
+            set: (value) => {
+                this.sensors._sensePhaseCounter = Number.isFinite(value)
+                    ? Math.max(0, Math.floor(value))
+                    : 0;
+            },
+        });
 
         this._setDifficulty(options.difficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL');
         this._checkStuckTimer = this.profile.stuckCheckInterval;
@@ -332,99 +276,88 @@ export class BotAI {
         return updateRecovery(this, dt, player, arena, allPlayers);
     }
 
-    _computeDynamicLookAhead(player) {
-        const base = this.profile.lookAhead;
-        const speedRatio = player.baseSpeed > 0 ? player.speed / player.baseSpeed : 1;
-        let lookAhead = base * (1 + (speedRatio - 1) * 0.75);
-        if (player.isBoosting) lookAhead *= 1.2;
-        return Math.max(8, lookAhead);
+    _mapBehavior(arena) {
+        this.sensors.bindRuntime(this);
+        return this.sensors._mapBehavior(arena);
     }
 
-    _mapBehavior(arena) {
-        const mapKey = arena.currentMapKey || 'standard';
-        return MAP_BEHAVIOR[mapKey] || MAP_BEHAVIOR.standard;
+    _computeDynamicLookAhead(player) {
+        this.sensors.bindRuntime(this);
+        return this.sensors._computeDynamicLookAhead(player);
     }
 
     _composeProbeDirection(forward, right, up, probe) {
-        composeProbeDirection(this, forward, right, up, probe);
+        this.sensors.bindRuntime(this);
+        this.sensors._composeProbeDirection(forward, right, up, probe);
     }
 
     _buildCollisionMemoKey(position, radius, excludePlayerIndex, skipRecent) {
-        const qx = Math.round(position.x * BOT_COLLISION_CACHE_POS_SCALE);
-        const qy = Math.round(position.y * BOT_COLLISION_CACHE_POS_SCALE);
-        const qz = Math.round(position.z * BOT_COLLISION_CACHE_POS_SCALE);
-        const qr = Math.round(radius * BOT_COLLISION_CACHE_RADIUS_SCALE);
-
-        let hash = 2166136261;
-        hash = Math.imul(hash ^ qx, 16777619);
-        hash = Math.imul(hash ^ qy, 16777619);
-        hash = Math.imul(hash ^ qz, 16777619);
-        hash = Math.imul(hash ^ qr, 16777619);
-        hash = Math.imul(hash ^ (excludePlayerIndex + 2048), 16777619);
-        hash = Math.imul(hash ^ skipRecent, 16777619);
-        return hash >>> 0;
+        this.sensors.bindRuntime(this);
+        return this.sensors._buildCollisionMemoKey(position, radius, excludePlayerIndex, skipRecent);
     }
 
     _getCollisionMemoized(entityManager, position, radius, excludePlayerIndex, skipRecent, playerRef) {
-        const key = this._buildCollisionMemoKey(position, radius, excludePlayerIndex, skipRecent);
-        const cached = this._collisionCache.get(key);
-        if (cached !== undefined) {
-            return cached === 1;
-        }
-
-        const hit = entityManager.checkGlobalCollision(position, radius, excludePlayerIndex, skipRecent, playerRef);
-        const hasHit = !!(hit && hit.hit);
-        this._collisionCache.set(key, hasHit ? 1 : 0);
-        return hasHit;
+        this.sensors.bindRuntime(this);
+        return this.sensors._getCollisionMemoized(entityManager, position, radius, excludePlayerIndex, skipRecent, playerRef);
     }
 
     _checkTrailHit(position, player, allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
-        const entityManager = player?.trail?.entityManager;
-        if (!entityManager) return false;
-        return this._getCollisionMemoized(entityManager, position, radius, player.index, skipRecent, player);
+        this.sensors.bindRuntime(this);
+        return this.sensors._checkTrailHit(position, player, allPlayers, radius, skipRecent);
     }
 
     _scanProbeRay(player, arena, allPlayers, direction, lookAhead, step, out) {
-        scanProbeRay(this, player, arena, allPlayers, direction, lookAhead, step, out);
+        this.sensors.bindRuntime(this);
+        this.sensors._scanProbeRay(player, arena, allPlayers, direction, lookAhead, step, out);
     }
 
     _scoreProbe(player, arena, allPlayers, probe, lookAhead) {
-        scoreProbe(this, player, arena, allPlayers, probe, lookAhead);
+        this.sensors.bindRuntime(this);
+        this.sensors._scoreProbe(player, arena, allPlayers, probe, lookAhead);
     }
 
-    // ================================================================
-    // Phase 7: Portal-Exit-Safety â€” prÃ¼fe 4 Richtungen am Exit
-    // ================================================================
     _estimateExitSafety(exit, arena, player, allPlayers) {
-        return estimateExitSafety(this, exit, arena, player, allPlayers);
+        this.sensors.bindRuntime(this);
+        return this.sensors._estimateExitSafety(exit, arena, player, allPlayers);
     }
 
-    // ================================================================
-    // ================================================================
     _senseProjectiles(player, projectiles) {
-        senseProjectiles(this, player, projectiles);
+        this.sensors.bindRuntime(this);
+        this.sensors._senseProjectiles(player, projectiles);
     }
 
-    // ================================================================
-    // ================================================================
     _senseHeight(player, arena) {
-        senseHeight(this, player, arena);
+        this.sensors.bindRuntime(this);
+        this.sensors._senseHeight(player, arena);
     }
 
-    // ================================================================
-    // ================================================================
     _senseBotSpacing(player, allPlayers) {
-        senseBotSpacing(this, player, allPlayers);
+        this.sensors.bindRuntime(this);
+        this.sensors._senseBotSpacing(player, allPlayers);
     }
 
-    // ================================================================
-    // ================================================================
     _evaluatePursuit(player) {
-        evaluatePursuit(this, player);
+        this.sensors.bindRuntime(this);
+        this.sensors._evaluatePursuit(player);
     }
 
     _evaluatePortalIntent(player, arena, allPlayers) {
-        evaluatePortalIntent(this, player, arena, allPlayers);
+        this.sensors.bindRuntime(this);
+        this.sensors._evaluatePortalIntent(player, arena, allPlayers);
+    }
+
+    setSensePhase(phase) {
+        this.sensors.setSensePhase(phase);
+    }
+
+    getSensorSnapshot() {
+        this.sensors.bindRuntime(this);
+        return this.sensors.getSnapshot();
+    }
+
+    getSensorArray() {
+        this.sensors.bindRuntime(this);
+        return this.sensors.getSensorArray();
     }
 
     update(dt, player, arena, allPlayers, projectiles) {
@@ -450,7 +383,7 @@ export class BotAI {
         this.reactionTimer = Math.max(0.02, this.profile.reactionTime * jitter);
 
         this._resetDecision();
-        runPerception(this, player, arena, allPlayers, projectiles);
+        this.sensors.update(this, player, arena, allPlayers, projectiles);
         if (runDecision(this, dt, player, arena, allPlayers, ITEM_RULES)) {
             return this.currentInput;
         }
