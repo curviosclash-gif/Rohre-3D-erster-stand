@@ -33,3 +33,17 @@ Hinweis: Treffer zu alten Runtime-Pfaden bestehen nur in `docs/archive/**` als h
 - Bestehende Temp-Vektoren und Objekt-Reuse beibehalten.
 - Pools weiterverwenden (`Projectile`-State/Mesh, Tracer-Lifecycle etc.).
 - Keine neuen Material-/Geometry-Instanzen pro Frame in Hotpaths erzeugen.
+
+## 21.1 Verifikation (OverheatGunSystem Split)
+
+- `npm run test:core`
+  - Ergebnis: PASS (`20 passed`)
+- `npm run test:physics`
+  - Ergebnis: PASS (`47 passed`)
+
+Split-Ergebnis:
+
+- `src/hunt/mg/MGOverheatState.js` kapselt Overheat-/Lockout-/Snapshot-State.
+- `src/hunt/mg/MGHitResolver.js` kapselt Hitscan- und Trail-Hit-Aufloesung inkl. Damage.
+- `src/hunt/mg/MGTracerFx.js` kapselt Tracer Spawn/Update/Cleanup.
+- `src/hunt/OverheatGunSystem.js` bleibt als orchestrierende Fassade kompatibel.

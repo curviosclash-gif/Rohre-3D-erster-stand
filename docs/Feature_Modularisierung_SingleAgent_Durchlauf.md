@@ -69,10 +69,10 @@ Exit-Kriterien:
 
 ## Phase 21.1 - OverheatGunSystem aufteilen
 
-- [ ] 21.1.1 Overheat- und Lockout-Zustand nach `src/hunt/mg/MGOverheatState.js` extrahieren.
-- [ ] 21.1.2 Trefferberechnung (Hitscan + Trail-Hit) nach `src/hunt/mg/MGHitResolver.js` extrahieren.
-- [ ] 21.1.3 Tracer-Erzeugung/-Update/-Cleanup nach `src/hunt/mg/MGTracerFx.js` extrahieren.
-- [ ] 21.1.4 `OverheatGunSystem.js` als orchestrierende Fassade stabil halten.
+- [x] 21.1.1 Overheat- und Lockout-Zustand nach `src/hunt/mg/MGOverheatState.js` extrahieren.
+- [x] 21.1.2 Trefferberechnung (Hitscan + Trail-Hit) nach `src/hunt/mg/MGHitResolver.js` extrahieren.
+- [x] 21.1.3 Tracer-Erzeugung/-Update/-Cleanup nach `src/hunt/mg/MGTracerFx.js` extrahieren.
+- [x] 21.1.4 `OverheatGunSystem.js` als orchestrierende Fassade stabil halten.
 
 Verifikation:
 
