@@ -2,6 +2,13 @@
 
 Dieses Dokument beschreibt die bestehende Spiel- und Bot-Architektur, um als Grundlage fÃ¼r ein zukÃ¼nftiges Bot-Training (z.B. per Reinforcement Learning oder PPO) zu dienen. Die KI operiert kontinuierlich im `update`-Loop und erzeugt aus **Umgebungsdaten (Observations)** konkrete **Aktionsentscheidungen (Actions)**.
 
+## Modulstatus (Stand 2026-03-03)
+
+- `src/entities/Bot.js` ist die Runtime-Huelle mit zentralem `update()`.
+- Probe-Logik liegt in `src/entities/ai/BotProbeOps.js`.
+- Portal-Intent/Exit-Safety liegt in `src/entities/ai/BotPortalOps.js`.
+- Projektil-/Hoehen-/Spacing-/Pursuit-Sensorik liegt in `src/entities/ai/BotThreatOps.js`.
+
 ## 1. Output / Actions (Aktionsraum)
 
 Die Bot-Klasse (`BotAI`) generiert in jedem Frame eine Entscheidung (`_decision`), die in konkrete Eingabesimulationen (Inputs) fÃ¼r den Spieler-Avatar Ã¼bersetzt wird.

@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-03-03
+Stand: 2026-03-04
 Modus: sync
 Gate: PASS
 
@@ -14,7 +14,8 @@ Gate: PASS
 - Keine Legacy-Pfade gefunden.
 
 ## Encoding-Warnungen (Mojibake)
-- docs/Bot-Training-Schnittstelle.md: Zeilen 3, 7, 8, 11, 12, 17, 18, 20, 26, 28, 32, 34, 35, 43, 53, 66, 68, 70, 73, 75, 79, 87
+- docs/Bot-Training-Schnittstelle.md: Zeilen 3, 14, 15, 18, 19, 24, 25, 27, 33, 35, 39, 41, 42, 50, 60, 73, 75, 77, 80, 82, 86, 94
+- docs/Refactoring_Plan_God_Classes.md: Zeilen 32
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-03-03).
+- Dokumentation aktuell (geprueft am 2026-03-04).

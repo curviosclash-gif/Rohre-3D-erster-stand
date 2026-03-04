@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-02",
+  "generatedAt": "2026-03-04",
   "baseline": {
     "sourceReportPath": "data/bot_validation_report.json",
     "sourceGeneratedAt": "2026-03-02",
@@ -60,28 +60,28 @@
         "rounds": 10
       },
       "metrics": {
-        "rounds": 4,
-        "botWinRate": 0.25,
+        "rounds": 5,
+        "botWinRate": 0.6,
         "stuckEvents": 0,
-        "averageBotSurvival": 14.634775297541637,
-        "fpsAverage": 58.732878331064974,
-        "drawCallsAverage": 14.642857142857142,
-        "performanceSamples": 14
+        "averageBotSurvival": 30.818340845944476,
+        "fpsAverage": 57.54205190716156,
+        "drawCallsAverage": 17.8,
+        "performanceSamples": 10
       },
       "performance": {
-        "sampleCount": 14,
-        "fpsAverage": 58.732878331064974,
-        "drawCallsAverage": 14.642857142857142,
-        "fpsMin": 56.666666666666664,
-        "fpsMax": 60,
-        "drawCallsMin": 6,
-        "drawCallsMax": 19,
-        "observedDurationMs": 8423
+        "sampleCount": 10,
+        "fpsAverage": 57.54205190716156,
+        "drawCallsAverage": 17.8,
+        "fpsMin": 53.864689527340154,
+        "fpsMax": 60.00000001455407,
+        "drawCallsMin": 12,
+        "drawCallsMax": 23,
+        "observedDurationMs": 9998
       },
       "sourceRunner": {
-        "forcedRounds": 1,
-        "timeoutRounds": 1,
-        "elapsedMs": 86523
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 181293
       }
     },
     {
@@ -98,25 +98,25 @@
         "rounds": 4,
         "botWinRate": 1,
         "stuckEvents": 0,
-        "averageBotSurvival": 25.954067139179944,
-        "fpsAverage": 60,
-        "drawCallsAverage": 72,
-        "performanceSamples": 8
+        "averageBotSurvival": 29.630166473514084,
+        "fpsAverage": 60.00000001455407,
+        "drawCallsAverage": 19.363636363636363,
+        "performanceSamples": 11
       },
       "performance": {
-        "sampleCount": 8,
-        "fpsAverage": 60,
-        "drawCallsAverage": 72,
-        "fpsMin": 60,
-        "fpsMax": 60,
-        "drawCallsMin": 55,
-        "drawCallsMax": 83,
-        "observedDurationMs": 8343
+        "sampleCount": 11,
+        "fpsAverage": 60.00000001455407,
+        "drawCallsAverage": 19.363636363636363,
+        "fpsMin": 60.00000001455407,
+        "fpsMax": 60.00000001455407,
+        "drawCallsMin": 10,
+        "drawCallsMax": 21,
+        "observedDurationMs": 8294
       },
       "sourceRunner": {
-        "forcedRounds": 2,
-        "timeoutRounds": 2,
-        "elapsedMs": 130869
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 156433
       }
     },
     {
@@ -133,25 +133,25 @@
         "rounds": 4,
         "botWinRate": 1,
         "stuckEvents": 0,
-        "averageBotSurvival": 21.917500211968825,
-        "fpsAverage": 60,
-        "drawCallsAverage": 27.357142857142858,
-        "performanceSamples": 14
+        "averageBotSurvival": 31.618958541106622,
+        "fpsAverage": 60.002536481552205,
+        "drawCallsAverage": 26.63157894736842,
+        "performanceSamples": 19
       },
       "performance": {
-        "sampleCount": 14,
-        "fpsAverage": 60,
-        "drawCallsAverage": 27.357142857142858,
-        "fpsMin": 60,
-        "fpsMax": 60,
-        "drawCallsMin": 24,
+        "sampleCount": 19,
+        "fpsAverage": 60.002536481552205,
+        "drawCallsAverage": 26.63157894736842,
+        "fpsMin": 60.00000002910822,
+        "fpsMax": 60.00401607881118,
+        "drawCallsMin": 10,
         "drawCallsMax": 31,
-        "observedDurationMs": 8448
+        "observedDurationMs": 8457
       },
       "sourceRunner": {
-        "forcedRounds": 1,
-        "timeoutRounds": 1,
-        "elapsedMs": 94844
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 140877
       }
     },
     {
@@ -166,48 +166,48 @@
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 0.25,
+        "botWinRate": 0.75,
         "stuckEvents": 0,
-        "averageBotSurvival": 24.450400420377264,
-        "fpsAverage": 60.003729203563616,
-        "drawCallsAverage": 26.571428571428573,
-        "performanceSamples": 14
+        "averageBotSurvival": 45.24550036010805,
+        "fpsAverage": 60.00401609336533,
+        "drawCallsAverage": 24.333333333333332,
+        "performanceSamples": 6
       },
       "performance": {
-        "sampleCount": 14,
-        "fpsAverage": 60.003729203563616,
-        "drawCallsAverage": 26.571428571428573,
-        "fpsMin": 60.00000001455371,
-        "fpsMax": 60.004016064256675,
-        "drawCallsMin": 10,
-        "drawCallsMax": 38,
-        "observedDurationMs": 8670
+        "sampleCount": 6,
+        "fpsAverage": 60.00401609336533,
+        "drawCallsAverage": 24.333333333333332,
+        "fpsMin": 60.00401609336533,
+        "fpsMax": 60.00401609336533,
+        "drawCallsMin": 11,
+        "drawCallsMax": 50,
+        "observedDurationMs": 8468
       },
       "sourceRunner": {
-        "forcedRounds": 1,
-        "timeoutRounds": 1,
-        "elapsedMs": 121176
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 198127
       }
     }
   ],
   "overall": {
-    "rounds": 16,
-    "botWinRate": 0.625,
+    "rounds": 17,
+    "botWinRate": 0.8235294117647058,
     "stuckEvents": 0,
-    "averageBotSurvival": 21.739185767266918,
-    "fpsAverage": 59.646250109696005,
-    "drawCallsAverage": 30.72,
-    "performanceSamples": 50
+    "averageBotSurvival": 34.1217768075669,
+    "fpsAverage": 59.46723497698683,
+    "drawCallsAverage": 22.67391304347826,
+    "performanceSamples": 46
   },
   "sourceRunner": {
-    "forcedRounds": 5,
-    "timeoutRounds": 5,
+    "forcedRounds": 12,
+    "timeoutRounds": 12,
     "failOnForcedRound": false,
     "maxForcedRounds": 9007199254740991
   },
   "paths": {
     "json": "data/performance_ki_baseline_report.json",
     "sourceJson": "data/bot_validation_report.json",
-    "doc": "docs/Testergebnisse_2026-03-02.md"
+    "doc": "docs/Testergebnisse_2026-03-04.md"
   }
 }

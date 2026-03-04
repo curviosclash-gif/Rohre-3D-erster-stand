@@ -43,7 +43,7 @@ Bestehend (primaer):
 - `src/entities/EntityManager.js`
 - `src/core/main.js`
 - `src/entities/Bot.js`
-- `src/entities/Arena.js.latest_commit` (Aufraeumen)
+- `src/entities/Arena.js.latest_commit` (Aufraeumen, verschoben nach `docs/archive/Arena.js.latest_commit`)
 
 Neu (zielbild):
 
@@ -60,17 +60,17 @@ Neu (zielbild):
 
 ## Phase 20.0 - Vorbereitende Leitplanken (Agent A)
 
-- [ ] **20.0.1 Scope-Hygiene**
+- [x] **20.0.1 Scope-Hygiene**
   - `src/entities/Arena.js.latest_commit` aus Runtime-Naehe entfernen (nach `docs/archive/` oder `backups/`), damit KI-Search/Edit keine Altdatei als aktiven Code behandelt.
-- [ ] **20.0.2 Schnittstellen-Protokoll**
+- [x] **20.0.2 Schnittstellen-Protokoll**
   - Kurze Modul-Contracts als Header-Kommentare in den neuen Zielmodulen vorbereiten (Inputs/Outputs/Seiteneffekte).
-- [ ] **20.0.3 Guardrails fuer Hotpaths**
+- [x] **20.0.3 Guardrails fuer Hotpaths**
   - Bei neuen `update`-nahen Methoden nur wiederverwendbare Temp-Objekte und Pools nutzen.
 
 ### Gate Q0 (Agent B)
 
-- [ ] Import-Graph laeuft ohne neue Dead Imports.
-- [ ] `Arena.js.latest_commit` wird nicht mehr von Runtime-Pfaden referenziert.
+- [x] Import-Graph laeuft ohne neue Dead Imports.
+- [x] `Arena.js.latest_commit` wird nicht mehr von Runtime-Pfaden referenziert.
 
 Empfohlene Checks:
 
@@ -81,20 +81,20 @@ Empfohlene Checks:
 
 ## Phase 20.1 - EntityManager Split A: Spawn + Bounce + HuntCombat (Agent A)
 
-- [ ] **20.1.1 SpawnPlacementSystem extrahieren**
+- [x] **20.1.1 SpawnPlacementSystem extrahieren**
   - Methoden aus `EntityManager` auslagern: `_findSpawnPosition`, `_findSafeSpawnDirection`, `_traceFreeDistance`, `_findSafeBouncePosition` (nur Spawn-relevanter Teil).
   - `EntityManager` bleibt orchestrierender Call-Site.
-- [ ] **20.1.2 CollisionResponseSystem extrahieren**
+- [x] **20.1.2 CollisionResponseSystem extrahieren**
   - Bounce-/Clamp-Methoden auslagern: `_clampBotPosition`, `_bounceBot`, `_bouncePlayerOnFoam`, `_isBotPositionSafe`.
-- [ ] **20.1.3 HuntCombatSystem extrahieren**
+- [x] **20.1.3 HuntCombatSystem extrahieren**
   - Inventar-/Item-/MG-/LockOn-Pfade auslagern: `_takeInventoryItem`, `_useInventoryItem`, `_shootItemProjectile`, `_shootHuntGun`, `_checkLockOn`.
-- [ ] **20.1.4 Kompatibilitaets-Fassade belassen**
+- [x] **20.1.4 Kompatibilitaets-Fassade belassen**
   - Oeffentliche Aufrufer und bestehende Signaturen stabil halten.
 
 ### Gate Q1 (Agent B)
 
-- [ ] Keine Verhaltensabweichung bei Spawn, Bounce und Hunt-Hit-Pfaden.
-- [ ] Keine neuen per-frame Allokationen in den extrahierten Hotpaths.
+- [x] Keine Verhaltensabweichung bei Spawn, Bounce und Hunt-Hit-Pfaden.
+- [x] Keine neuen per-frame Allokationen in den extrahierten Hotpaths.
 
 Empfohlene Checks:
 
@@ -106,19 +106,19 @@ Empfohlene Checks:
 
 ## Phase 20.2 - main.js Split B: Runtime-Orchestrierung verschaelern (Agent A)
 
-- [ ] **20.2.1 MatchSessionRuntimeBridge einfuehren**
+- [x] **20.2.1 MatchSessionRuntimeBridge einfuehren**
   - Session-Ref-Lifecycle und Apply/Clear-Helfer aus `main.js` herausziehen (`_applyInitializedMatchSession`, `_getCurrentMatchSessionRefs`, `_clearMatchSessionRefs`).
-- [ ] **20.2.2 PlanarAimAssistSystem einfuehren**
+- [x] **20.2.2 PlanarAimAssistSystem einfuehren**
   - `_getPlanarAimAxis` + `_updatePlanarAimAssist` + TimeScale-Abgleich in dediziertes Core-System verschieben.
-- [ ] **20.2.3 BuildInfo/Clipboard-Helfer kapseln**
+- [x] **20.2.3 BuildInfo/Clipboard-Helfer kapseln**
   - Build-Info-Render/Kopierlogik in klar getrennten Utility-/Controller-Pfad auslagern.
-- [ ] **20.2.4 main.js als Facade stabilisieren**
+- [x] **20.2.4 main.js als Facade stabilisieren**
   - `main.js` bleibt Entry-Orchestrator mit Delegation statt Detail-Logik.
 
 ### Gate Q2 (Agent B)
 
-- [ ] Match Start/Stop, Round-End und Menu-Rueckkehr unveraendert.
-- [ ] UI-Status (Crosshair/HUD/Toast) regressionsfrei.
+- [x] Match Start/Stop, Round-End und Menu-Rueckkehr unveraendert.
+- [x] UI-Status (Crosshair/HUD/Toast) regressionsfrei.
 
 Empfohlene Checks:
 
@@ -130,19 +130,19 @@ Empfohlene Checks:
 
 ## Phase 20.3 - Bot.js Split C: Sensing-Hilfen auslagern (Agent A)
 
-- [ ] **20.3.1 BotProbeOps extrahieren**
+- [x] **20.3.1 BotProbeOps extrahieren**
   - Probe-Richtung, Probe-Ray und Probe-Scoring-Helfer aus `Bot.js` in `src/entities/ai/BotProbeOps.js`.
-- [ ] **20.3.2 BotPortalOps extrahieren**
+- [x] **20.3.2 BotPortalOps extrahieren**
   - Portal-Intent und Exit-Safety-Pfade auslagern (`_estimateExitSafety`, `_evaluatePortalIntent`).
-- [ ] **20.3.3 BotThreatOps extrahieren**
+- [x] **20.3.3 BotThreatOps extrahieren**
   - Projektil-, Hoehen- und Bot-Abstands-Sensorik auslagern (`_senseProjectiles`, `_senseHeight`, `_senseBotSpacing`, `_evaluatePursuit`).
-- [ ] **20.3.4 Bot.js als schlanke Runtime-Huelle**
+- [x] **20.3.4 Bot.js als schlanke Runtime-Huelle**
   - `update()` + Statusverwaltung bleibt zentral; Fachlogik lebt in Ops-Modulen.
 
 ### Gate Q3 (Agent B)
 
-- [ ] Bot-Verhalten bleibt stabil (kein Totalausfall von Recovery/Pursuit/Portal-Intent).
-- [ ] Keine Leistungseinbrueche in dichten Bot-Szenen.
+- [x] Bot-Verhalten bleibt stabil (kein Totalausfall von Recovery/Pursuit/Portal-Intent).
+- [x] Keine Leistungseinbrueche in dichten Bot-Szenen.
 
 Empfohlene Checks:
 
@@ -155,13 +155,13 @@ Empfohlene Checks:
 
 ## Phase 20.4 - Abschluss und Doku-Freeze (Agent A + Agent B)
 
-- [ ] **20.4.1 Agent A**
+- [x] **20.4.1 Agent A**
   - Restliche Runtime-Doku/Kommentare in den neuen Modulen auf Endstand bringen.
   - Keine Testausfuehrung.
-- [ ] **20.4.2 Agent B**
+- [x] **20.4.2 Agent B**
   - Endabnahme mit gebuendelter Test-Suite.
   - Ergebnisprotokoll in `docs/Testergebnisse_2026-03-03.md` ergaenzen.
-- [ ] **20.4.3 Dokumentations-Freshness**
+- [x] **20.4.3 Dokumentations-Freshness**
   - `npm run docs:sync`
   - `npm run docs:check`
 

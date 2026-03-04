@@ -19,7 +19,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 
 **Wichtig:**
 
-- Keine offenen kritischen Findings (Stand: 2026-03-03, inkl. Hunt-MG-Targeting-/Trail-Collision-Hotfix validiert mit `npx playwright test tests/physics.spec.js -g "T61|T63|T64|T83|T84|T85|T86|T87"`, `test:physics`, `test:core`, `build`).
+- Offenes kritisches QA-Finding (Stand: 2026-03-04): V17 Gate Q1/Q3 bleiben `NO-GO`, weil `test:physics` im Re-Check 3 innerhalb derselben Abnahme einmal rot war (T86) und damit nicht stabil deterministisch gruen ist. Details: `docs/Testergebnisse_2026-03-03.md`.
 
 **Mittel:**
 
@@ -77,14 +77,14 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
   - Agent A implementiert Phasen `20.x` und fuehrt **keine** Tests aus.
   - Agent B kontrolliert, fuehrt Tests aus und gibt Gates `Q0..Q3` frei.
 
-- [ ] 20.0 Vorbereitende Leitplanken (Scope-Hygiene + Contracts + Hotpath-Guardrails)
-- [ ] 20.1 EntityManager Split A (SpawnPlacementSystem, CollisionResponseSystem, HuntCombatSystem)
-- [ ] 20.2 main.js Split B (MatchSessionRuntimeBridge, PlanarAimAssistSystem, BuildInfo-Kapselung)
-- [ ] 20.3 Bot.js Split C (BotProbeOps, BotPortalOps, BotThreatOps)
-- [ ] 20.4 Abschluss + Doku-Freeze (`docs:sync`, `docs:check`)
+- [x] 20.0 Vorbereitende Leitplanken (Scope-Hygiene + Contracts + Hotpath-Guardrails)
+- [x] 20.1 EntityManager Split A (SpawnPlacementSystem, CollisionResponseSystem, HuntCombatSystem)
+- [x] 20.2 main.js Split B (MatchSessionRuntimeBridge, PlanarAimAssistSystem, BuildInfo-Kapselung)
+- [x] 20.3 Bot.js Split C (BotProbeOps, BotPortalOps, BotThreatOps)
+- [/] 20.4 Abschluss + Doku-Freeze (`docs:sync`, `docs:check`) - Agent-A-Doku abgeschlossen, Agent-B-Endabnahme weiterhin offen (Q1/Q3 NO-GO, Stand 2026-03-04)
 
 - QA-Gates (Agent B):
-  - [ ] Q0 Baseline/Import-Gate
+  - [x] Q0 Baseline/Import-Gate
   - [ ] Q1 Entity/Hunt-Regression-Gate
-  - [ ] Q2 Runtime/UI-Regression-Gate
+  - [x] Q2 Runtime/UI-Regression-Gate
   - [ ] Q3 Bot-Behavior-Gate + Endabnahme
