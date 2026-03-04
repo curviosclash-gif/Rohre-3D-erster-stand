@@ -119,7 +119,7 @@ export class OverheatGunSystem {
         this._increaseOverheat(idx, mg);
 
         const hitResult = this._resolveHit(player, mg);
-        player.getAimDirection(this._tmpAim).normalize();
+        this._resolveAimDirection(player, this._tmpAim);
         this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
         this._tmpTracerEnd.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, Math.max(10, Number(mg.RANGE || 95)));
         if (hitResult.point) {
@@ -178,7 +178,7 @@ export class OverheatGunSystem {
     _resolveHit(player, mg) {
         const players = this.entityManager?.players || [];
         const maxRange = Math.max(10, Number(mg.RANGE || 95));
-        player.getAimDirection(this._tmpAim).normalize();
+        this._resolveAimDirection(player, this._tmpAim);
         this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
 
         let bestTarget = null;
@@ -265,7 +265,7 @@ export class OverheatGunSystem {
         const probeRadius = Math.max(0.12, Number(mg.TRAIL_HIT_RADIUS) || MG_TRAIL_HIT_RADIUS);
         let fallbackSelfHit = null;
 
-        player.getAimDirection(this._tmpAim).normalize();
+        this._resolveAimDirection(player, this._tmpAim);
         this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
         for (let distance = 0; distance <= maxRange; distance += sampleStep) {
             this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
@@ -310,6 +310,10 @@ export class OverheatGunSystem {
         }
 
         return fallbackSelfHit;
+    }
+
+    _resolveAimDirection(player, out) {
+        return player.getAimDirection(out).normalize();
     }
 
     _createTrailHit(hit) {
