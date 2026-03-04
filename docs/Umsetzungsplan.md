@@ -5,6 +5,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 
 > Abgeschlossene Phasen 1-10 siehe [Archiv](archive/Umsetzungsplan_Archiv_Phase1-10.md).
 > Abgeschlossene Phasen 11-15 siehe [Archiv](archive/Umsetzungsplan_Archiv_Phase11-15.md).
+> Abgeschlossene Phase 17 siehe [Archiv](archive/Umsetzungsplan_Archiv_Phase17.md).
 > Abgeschlossene Referenzplaene siehe `docs/archive/`.
 
 ## Status-Uebersicht
@@ -19,7 +20,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 
 **Wichtig:**
 
-- Offenes kritisches QA-Finding (Stand: 2026-03-04): V17 Gate Q1/Q3 bleiben `NO-GO`, weil `test:physics` im Re-Check 3 innerhalb derselben Abnahme einmal rot war (T86) und damit nicht stabil deterministisch gruen ist. Details: `docs/Testergebnisse_2026-03-03.md`.
+- Keine offenen kritischen Punkte.
 
 **Mittel:**
 
@@ -65,26 +66,22 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - [ ] V16 Event-Playlist/Fun-Modes
   - Rotierende Spezialregeln als zeitlich limitierte Modi fuer Abwechslung und Retention.
   - Zielpfade: `src/core/Config.js`, `src/core/main.js`, `src/ui/MenuController.js`.
-- [ ] V17 Kernmodule weiter modularisieren (2-Agenten-Betrieb)
-  - Fokus: `main.js`, `EntityManager.js`, `Bot.js` weiter in kleine, KI-freundliche Module splitten; Hotpath-Performance absichern.
-  - Referenzplan: `docs/Feature_Modularisierung_Kernmodule_2Agenten.md`.
+- [/] V18 Single-Agent-Durchlauf fuer weitere Modularisierung (ohne Stop)
+  - Fokus: `OverheatGunSystem`, `ProjectileSystem`, `main.js`, `Bot.js`, `MenuController` in sequenziellen Phasen fuer einen Agenten.
+  - Referenzplan: `docs/Feature_Modularisierung_SingleAgent_Durchlauf.md`.
 
 ---
 
-## Parallelblock V17 (Stand: 2026-03-03)
+## Single-Agent Block V18 (Stand: 2026-03-04)
 
 - Rollenmodell:
-  - Agent A implementiert Phasen `20.x` und fuehrt **keine** Tests aus.
-  - Agent B kontrolliert, fuehrt Tests aus und gibt Gates `Q0..Q3` frei.
+  - Ein Agent setzt alle Phasen `21.x` strikt sequenziell um.
+  - Keine Zwischenfreigaben durch zweite Instanz; Phase wechselt nur bei erfuellten Exit-Kriterien.
 
-- [x] 20.0 Vorbereitende Leitplanken (Scope-Hygiene + Contracts + Hotpath-Guardrails)
-- [x] 20.1 EntityManager Split A (SpawnPlacementSystem, CollisionResponseSystem, HuntCombatSystem)
-- [x] 20.2 main.js Split B (MatchSessionRuntimeBridge, PlanarAimAssistSystem, BuildInfo-Kapselung)
-- [x] 20.3 Bot.js Split C (BotProbeOps, BotPortalOps, BotThreatOps)
-- [/] 20.4 Abschluss + Doku-Freeze (`docs:sync`, `docs:check`) - Agent-A-Doku abgeschlossen, Agent-B-Endabnahme weiterhin offen (Q1/Q3 NO-GO, Stand 2026-03-04)
-
-- QA-Gates (Agent B):
-  - [x] Q0 Baseline/Import-Gate
-  - [ ] Q1 Entity/Hunt-Regression-Gate
-  - [x] Q2 Runtime/UI-Regression-Gate
-  - [ ] Q3 Bot-Behavior-Gate + Endabnahme
+- [x] 21.0 Baseline, Scope und Guardrails
+- [ ] 21.1 OverheatGunSystem Split (State, HitResolver, TracerFx)
+- [ ] 21.2 ProjectileSystem Split (StatePool, SimulationOps, HitResolver)
+- [ ] 21.3 main.js Split (Bootstrap, RuntimeFacade, DebugApi)
+- [ ] 21.4 Bot-Fassade vereinfachen (Proxy-Abbau + SensorsFacade)
+- [ ] 21.5 MenuController Listener-Split (Gameplay/Profile/Controls)
+- [ ] 21.6 Abschluss, Stabilisierung, Doku-Freeze (`docs:sync`, `docs:check`)
