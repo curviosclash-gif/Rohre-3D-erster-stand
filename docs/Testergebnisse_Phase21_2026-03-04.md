@@ -47,3 +47,19 @@ Split-Ergebnis:
 - `src/hunt/mg/MGHitResolver.js` kapselt Hitscan- und Trail-Hit-Aufloesung inkl. Damage.
 - `src/hunt/mg/MGTracerFx.js` kapselt Tracer Spawn/Update/Cleanup.
 - `src/hunt/OverheatGunSystem.js` bleibt als orchestrierende Fassade kompatibel.
+
+## 21.2 Verifikation (ProjectileSystem Split)
+
+- `npm run test:core`
+  - Ergebnis: PASS (`20 passed`)
+- `npm run test:physics`
+  - Ergebnis: PASS (`47 passed`)
+- `npm run smoke:selftrail`
+  - Ergebnis: PASS (`failures: []`)
+
+Split-Ergebnis:
+
+- `src/entities/systems/projectile/ProjectileStatePool.js` kapselt Projectile-State-Reuse.
+- `src/entities/systems/projectile/ProjectileSimulationOps.js` kapselt Bewegung, Homing und Foam-Bounce-Simulation.
+- `src/entities/systems/projectile/ProjectileHitResolver.js` kapselt Trail-/Arena-/Player-Trefferlogik.
+- `src/entities/systems/ProjectileSystem.js` orchestriert nur noch Spawn, Pools/Facades und Lifecycle.

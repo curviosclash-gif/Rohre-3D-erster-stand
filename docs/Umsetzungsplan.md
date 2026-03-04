@@ -80,7 +80,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 
 - [x] 21.0 Baseline, Scope und Guardrails
 - [x] 21.1 OverheatGunSystem Split (State, HitResolver, TracerFx)
-- [ ] 21.2 ProjectileSystem Split (StatePool, SimulationOps, HitResolver)
+- [x] 21.2 ProjectileSystem Split (StatePool, SimulationOps, HitResolver)
 - [ ] 21.3 main.js Split (Bootstrap, RuntimeFacade, DebugApi)
 - [ ] 21.4 Bot-Fassade vereinfachen (Proxy-Abbau + SensorsFacade)
 - [ ] 21.5 MenuController Listener-Split (Gameplay/Profile/Controls)

@@ -86,10 +86,10 @@ Exit-Kriterien:
 
 ## Phase 21.2 - ProjectileSystem aufteilen
 
-- [ ] 21.2.1 Projectile State/Pools nach `ProjectileStatePool.js` verschieben.
-- [ ] 21.2.2 Bewegungs-/Homing-Update nach `ProjectileSimulationOps.js` verschieben.
-- [ ] 21.2.3 Treffer- und Collision-Logik nach `ProjectileHitResolver.js` verschieben.
-- [ ] 21.2.4 `ProjectileSystem.js` auf API-Fassade reduzieren.
+- [x] 21.2.1 Projectile State/Pools nach `ProjectileStatePool.js` verschieben.
+- [x] 21.2.2 Bewegungs-/Homing-Update nach `ProjectileSimulationOps.js` verschieben.
+- [x] 21.2.3 Treffer- und Collision-Logik nach `ProjectileHitResolver.js` verschieben.
+- [x] 21.2.4 `ProjectileSystem.js` auf API-Fassade reduzieren.
 
 Verifikation:
 

@@ -5,8 +5,10 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
 import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
-import { isRocketTierType, resolveRocketTierDamage } from '../../hunt/RocketPickupSystem.js';
-import { applyTrailDamageFromProjectile } from '../../hunt/DestructibleTrail.js';
+import { isRocketTierType } from '../../hunt/RocketPickupSystem.js';
+import { ProjectileStatePool } from './projectile/ProjectileStatePool.js';
+import { ProjectileSimulationOps } from './projectile/ProjectileSimulationOps.js';
+import { ProjectileHitResolver } from './projectile/ProjectileHitResolver.js';
 
 function getNowMilliseconds() {
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
@@ -54,7 +56,10 @@ export class ProjectileSystem {
         this.projectiles = [];
         this._projectileAssets = new Map();
         this._projectilePools = new Map();
-        this._projectileStatePool = [];
+        this._statePool = new ProjectileStatePool();
+        this._projectileStatePool = this._statePool.pool;
+        this._simulationOps = new ProjectileSimulationOps(this);
+        this._hitResolver = new ProjectileHitResolver(this);
 
         this._tmpVec = new THREE.Vector3();
         this._tmpVec2 = new THREE.Vector3();
@@ -141,58 +146,11 @@ export class ProjectileSystem {
     }
 
     _acquireProjectileState() {
-        const pooled = this._projectileStatePool.pop();
-        if (pooled) {
-            return pooled;
-        }
-
-        return {
-            mesh: null,
-            flame: null,
-            poolKey: '',
-            owner: null,
-            type: null,
-            position: new THREE.Vector3(),
-            velocity: new THREE.Vector3(),
-            radius: 0,
-            ttl: 0,
-            traveled: 0,
-            target: null,
-            huntRocket: false,
-            visualScale: 1,
-            homingTurnRate: 0,
-            homingLockOnAngle: 0,
-            homingRange: 0,
-            homingReacquireInterval: 0,
-            homingReacquireTimer: 0,
-            foamBounces: 0,
-            foamBounceCooldown: 0,
-        };
+        return this._statePool.acquire();
     }
 
     _releaseProjectileState(projectile) {
-        if (!projectile) return;
-        projectile.mesh = null;
-        projectile.flame = null;
-        projectile.poolKey = '';
-        projectile.owner = null;
-        projectile.type = null;
-        projectile.position.set(0, 0, 0);
-        projectile.velocity.set(0, 0, 0);
-        projectile.radius = 0;
-        projectile.ttl = 0;
-        projectile.traveled = 0;
-        projectile.target = null;
-        projectile.huntRocket = false;
-        projectile.visualScale = 1;
-        projectile.homingTurnRate = 0;
-        projectile.homingLockOnAngle = 0;
-        projectile.homingRange = 0;
-        projectile.homingReacquireInterval = 0;
-        projectile.homingReacquireTimer = 0;
-        projectile.foamBounces = 0;
-        projectile.foamBounceCooldown = 0;
-        this._projectileStatePool.push(projectile);
+        this._statePool.release(projectile);
     }
 
     _acquireProjectileMesh(type, color) {
@@ -294,78 +252,11 @@ export class ProjectileSystem {
     }
 
     _bounceProjectileOnFoam(projectile, collisionInfo) {
-        if (!projectile || !collisionInfo?.normal) return false;
-
-        const maxFoamBounces = 3;
-        if ((projectile.foamBounces || 0) >= maxFoamBounces) return false;
-        if ((projectile.foamBounceCooldown || 0) > 0) return false;
-
-        this._tmpVec.copy(projectile.velocity);
-        const speed = this._tmpVec.length();
-        if (speed <= 0.0001) return false;
-
-        this._tmpVec2.copy(collisionInfo.normal).normalize();
-        if (this._tmpVec.dot(this._tmpVec2) >= 0) {
-            this._tmpVec2.multiplyScalar(-1);
-        }
-
-        this._tmpVec.normalize().reflect(this._tmpVec2);
-        this._tmpVec.addScaledVector(this._tmpVec2, 0.08).normalize();
-        projectile.velocity.copy(this._tmpVec.multiplyScalar(speed * 1.02));
-
-        projectile.position.addScaledVector(this._tmpVec2, Math.max(0.2, projectile.radius * 1.25));
-        projectile.mesh.position.copy(projectile.position);
-        this._tmpVec.addVectors(projectile.position, projectile.velocity);
-        projectile.mesh.lookAt(this._tmpVec);
-
-        projectile.foamBounces = (projectile.foamBounces || 0) + 1;
-        projectile.foamBounceCooldown = 0.045;
-        projectile.ttl = Math.max(0, projectile.ttl - 0.02);
-
-        this.onProjectileHit(projectile.position, 0x34d399, projectile.owner, projectile);
-        return true;
+        return this._simulationOps.bounceProjectileOnFoam(projectile, collisionInfo);
     }
 
     _acquireHomingTarget(projectile, players) {
-        if (!projectile || !Array.isArray(players) || players.length === 0) return null;
-
-        const owner = projectile.owner;
-        const maxRange = Math.max(10, Number(projectile.homingRange || CONFIG?.HOMING?.MAX_LOCK_RANGE || 100));
-        const maxRangeSq = maxRange * maxRange;
-        const lockOnAngle = Math.max(5, Number(projectile.homingLockOnAngle || CONFIG?.HOMING?.LOCK_ON_ANGLE || 15));
-        const minDot = Math.cos(THREE.MathUtils.degToRad(lockOnAngle));
-
-        this._tmpVec2.copy(projectile.velocity);
-        const speed = this._tmpVec2.length();
-        if (speed <= 0.0001) return null;
-        this._tmpVec2.divideScalar(speed);
-
-        let bestTarget = null;
-        let bestDistSq = Infinity;
-        let bestFallbackTarget = null;
-        let bestFallbackDistSq = Infinity;
-        for (const target of players) {
-            if (!target || !target.alive || target === owner) continue;
-
-            this._tmpVec.subVectors(target.position, projectile.position);
-            const distSq = this._tmpVec.lengthSq();
-            if (distSq <= 1 || distSq > maxRangeSq) continue;
-            if (distSq < bestFallbackDistSq) {
-                bestFallbackDistSq = distSq;
-                bestFallbackTarget = target;
-            }
-
-            const distance = Math.sqrt(distSq);
-            this._tmpDir.copy(this._tmpVec).multiplyScalar(1 / distance);
-            if (this._tmpVec2.dot(this._tmpDir) < minDot) continue;
-
-            if (distSq < bestDistSq) {
-                bestDistSq = distSq;
-                bestTarget = target;
-            }
-        }
-        if (bestTarget) return bestTarget;
-        return projectile.huntRocket ? bestFallbackTarget : null;
+        return this._simulationOps.acquireHomingTarget(projectile, players);
     }
 
     update(dt) {
@@ -376,126 +267,14 @@ export class ProjectileSystem {
 
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const projectile = this.projectiles[i];
-            projectile.foamBounceCooldown = Math.max(0, (projectile.foamBounceCooldown || 0) - dt);
-
-            const vx = projectile.velocity.x * dt;
-            const vy = projectile.velocity.y * dt;
-            const vz = projectile.velocity.z * dt;
-            projectile.position.x += vx;
-            projectile.position.y += vy;
-            projectile.position.z += vz;
-            projectile.traveled += Math.sqrt(vx * vx + vy * vy + vz * vz);
-            projectile.ttl -= dt;
-
-            projectile.mesh.position.copy(projectile.position);
-            this._tmpVec.addVectors(projectile.position, projectile.velocity);
-            projectile.mesh.lookAt(this._tmpVec);
-
-            const portalResult = arena?.checkPortal
-                ? arena.checkPortal(projectile.position, projectile.radius, 1000 + i)
-                : null;
-            if (portalResult) {
-                projectile.position.copy(portalResult.target);
-                this._tmpVec.copy(projectile.velocity).normalize().multiplyScalar(1.5);
-                projectile.position.add(this._tmpVec);
-                projectile.mesh.position.copy(projectile.position);
-            }
-
-            if (projectile.huntRocket) {
-                projectile.homingReacquireTimer = Math.max(0, (projectile.homingReacquireTimer || 0) - dt);
-                if (!projectile.target || !projectile.target.alive || projectile.homingReacquireTimer <= 0) {
-                    projectile.target = this._acquireHomingTarget(projectile, players);
-                    projectile.homingReacquireTimer = Math.max(0.04, Number(projectile.homingReacquireInterval || 0.12));
-                }
-            }
-
-            if (projectile.target && projectile.target.alive) {
-                this._tmpVec.subVectors(projectile.target.position, projectile.position).normalize();
-                this._tmpVec2.copy(projectile.velocity);
-                const speed = this._tmpVec2.length();
-                const turnRate = Math.max(0.1, Number(projectile.homingTurnRate || CONFIG.HOMING.TURN_RATE));
-                this._tmpVec2.normalize().lerp(this._tmpVec, Math.min(turnRate * dt, 1.0)).normalize();
-                projectile.velocity.copy(this._tmpVec2.multiplyScalar(speed));
-                this._tmpVec.addVectors(projectile.position, projectile.velocity);
-                projectile.mesh.lookAt(this._tmpVec);
-            }
-
-            if (projectile.flame) {
-                const flicker = 0.7 + Math.sin(time * 30 + i * 7) * 0.3;
-                projectile.flame.scale.set(1, 1, flicker);
-            }
-
-            let arenaCollision = null;
-            if (typeof arena?.getCollisionInfo === 'function') {
-                arenaCollision = arena.getCollisionInfo(projectile.position, projectile.radius);
-            } else if (typeof arena?.checkCollision === 'function' && arena.checkCollision(projectile.position, projectile.radius)) {
-                arenaCollision = { hit: true, kind: 'wall', normal: null };
-            }
-
-            const projectileExpired = projectile.ttl <= 0 || projectile.traveled >= CONFIG.PROJECTILE.MAX_DISTANCE;
-            const projectileHitArena = !!arenaCollision?.hit;
-            const arenaKind = String(arenaCollision?.kind || 'wall').toLowerCase();
-            const bouncedOnFoam = projectileHitArena && arenaKind === 'foam'
-                ? this._bounceProjectileOnFoam(projectile, arenaCollision)
-                : false;
-
-            if (projectileExpired || (projectileHitArena && !bouncedOnFoam)) {
-                this.onProjectileHit(projectile.position, 0xffff00, projectile.owner, projectile);
-                this._removeProjectileAt(i);
-                continue;
-            }
-
-            if (bouncedOnFoam) {
-                continue;
-            }
-
-            const trailHit = applyTrailDamageFromProjectile(trailSpatialIndex, projectile);
-            if (trailHit) {
-                if (trailHit.closestPoint) {
-                    this._tmpVec.set(
-                        trailHit.closestPoint.closestX,
-                        trailHit.closestPoint.closestY,
-                        trailHit.closestPoint.closestZ
-                    );
-                } else {
-                    this._tmpVec.copy(projectile.position);
-                }
-                this.onTrailSegmentHit(this._tmpVec, projectile.owner, projectile, trailHit);
-                this._removeProjectileAt(i);
-                continue;
-            }
-
-            let hit = false;
-            for (const target of players) {
-                if (!target.alive || target === projectile.owner) continue;
-
-                if (target.isPointInOBB && target.isPointInOBB(projectile.position)) {
-                    hit = true;
-                } else {
-                    const hitRadius = target.hitboxRadius + projectile.radius;
-                    if (target.position.distanceToSquared(projectile.position) <= hitRadius * hitRadius) {
-                        hit = true;
-                    }
-                }
-
-                if (hit) {
-                    const huntRocketHit = isHuntHealthActive() && isRocketTierType(projectile.type);
-                    if (huntRocketHit) {
-                        const damage = resolveRocketTierDamage(projectile.type);
-                        const damageResult = target.takeDamage(damage);
-                        this.onProjectilePowerup(target, projectile);
-                        this.onProjectileDamage(target, projectile.owner, projectile.type, damageResult);
-                    } else if (target.hasShield) {
-                        target.hasShield = false;
-                    } else {
-                        target.applyPowerup(projectile.type);
-                        this.onProjectilePowerup(target, projectile);
-                    }
-                    break;
-                }
-            }
-
-            if (hit) {
+            const simulationResult = this._simulationOps.stepProjectile(projectile, i, dt, arena, players, time);
+            const shouldRemove = this._hitResolver.resolveProjectileOutcome(
+                projectile,
+                players,
+                trailSpatialIndex,
+                simulationResult
+            );
+            if (shouldRemove) {
                 this._removeProjectileAt(i);
             }
         }
@@ -548,6 +327,6 @@ export class ProjectileSystem {
 
         this._projectileAssets.clear();
         this._projectilePools.clear();
-        this._projectileStatePool.length = 0;
+        this._statePool.clear();
     }
 }
