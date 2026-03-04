@@ -53,7 +53,7 @@ function selectRecoveryManeuver(bot, player, arena, allPlayers) {
             bot._tmpVec2.copy(player.position).addScaledVector(bot._tmpVec, distance);
 
             const wallHit = arena.checkCollisionFast(bot._tmpVec2, player.hitboxRadius * 1.6);
-            const trailHit = bot._checkTrailHit(bot._tmpVec2, player, allPlayers);
+            const trailHit = bot.checkTrailHit(bot._tmpVec2, player, allPlayers);
             if (wallHit || trailHit) {
                 score += 3.2 + j * 0.8 + (trailHit ? 0.9 : 0.5);
                 break;
@@ -101,7 +101,7 @@ function shouldBoostRecovery(bot, player, arena, allPlayers) {
     const checks = [3, 5, 7];
     for (let i = 0; i < checks.length; i++) {
         bot._tmpVec2.copy(player.position).addScaledVector(bot._tmpVec, checks[i]);
-        if (arena.checkCollisionFast(bot._tmpVec2, player.hitboxRadius * 1.6) || bot._checkTrailHit(bot._tmpVec2, player, allPlayers)) {
+        if (arena.checkCollisionFast(bot._tmpVec2, player.hitboxRadius * 1.6) || bot.checkTrailHit(bot._tmpVec2, player, allPlayers)) {
             return false;
         }
     }

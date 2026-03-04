@@ -46,7 +46,7 @@ export function scanProbeRay(bot, player, arena, allPlayers, direction, lookAhea
             break;
         }
 
-        if (bot._checkTrailHit(bot._tmpVec, player, allPlayers, radius, skipRecent)) {
+        if (bot.checkTrailHit(bot._tmpVec, player, allPlayers, radius, skipRecent)) {
             out.trailDist = d;
             if (d <= step * 1.5) out.immediateDanger = true;
             break;

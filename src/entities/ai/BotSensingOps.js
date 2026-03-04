@@ -6,19 +6,19 @@ import { CONFIG } from '../../core/Config.js';
 import { estimateEnemyPressure, selectTarget } from './BotTargetingOps.js';
 
 export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
-    const mapBehavior = bot._mapBehavior(arena);
+    const mapBehavior = bot.mapBehavior(arena);
     bot.sense.mapCaution = mapBehavior.caution;
     bot.sense.mapPortalBias = mapBehavior.portalBias;
     bot.sense.mapAggressionBias = mapBehavior.aggressionBias;
 
-    bot.sense.lookAhead = bot._computeDynamicLookAhead(player);
+    bot.sense.lookAhead = bot.computeDynamicLookAhead(player);
 
     player.getDirection(bot._tmpForward).normalize();
     bot._buildBasis(bot._tmpForward);
 
     // Time-Slicing der Probes: Vollstaendiger Scan nur im zugewiesenen Frame
     const maxProbes = bot._probes.length;
-    const isFullScanFrame = (bot._sensePhaseCounter === bot._sensePhase);
+    const isFullScanFrame = (bot.sensePhaseCounter === bot.sensePhase);
 
     // Adaptive Sensing: Reduce probes in open space or non-assigned frames
     const useFewProbes = !isFullScanFrame || (!bot.sense.immediateDanger && (bot.sense.forwardRisk || 0) < 0.25 && (bot.sense.localOpenness || 0) > bot.sense.lookAhead * 0.7);
@@ -41,8 +41,8 @@ export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
             continue;
         }
 
-        bot._composeProbeDirection(bot._tmpForward, bot._tmpRight, bot._tmpUp, probe);
-        bot._scoreProbe(player, arena, allPlayers, probe, bot.sense.lookAhead);
+        bot.composeProbeDirection(bot._tmpForward, bot._tmpRight, bot._tmpUp, probe);
+        bot.scoreProbe(player, arena, allPlayers, probe, bot.sense.lookAhead);
 
         opennessSum += probe.clearance;
         opennessCount++;
@@ -74,14 +74,14 @@ export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
 
 export function runPerception(bot, player, arena, allPlayers, projectiles) {
     // Time-Slicing auf Frame-Ebene
-    bot._sensePhaseCounter = (bot._sensePhaseCounter + 1) % 4;
+    bot.incrementSensePhaseCounter();
     // Collision memo is valid only for one perception tick.
-    bot._collisionCache.clear();
+    bot.clearCollisionCache();
 
     senseEnvironment(bot, player, arena, allPlayers, projectiles);
-    bot._senseProjectiles(player, projectiles);
-    bot._senseHeight(player, arena);
-    bot._senseBotSpacing(player, allPlayers);
-    bot._evaluatePursuit(player);
-    bot._evaluatePortalIntent(player, arena, allPlayers);
+    bot.senseProjectiles(player, projectiles);
+    bot.senseHeight(player, arena);
+    bot.senseBotSpacing(player, allPlayers);
+    bot.evaluatePursuit(player);
+    bot.evaluatePortalIntent(player, arena, allPlayers);
 }

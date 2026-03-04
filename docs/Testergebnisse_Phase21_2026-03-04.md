@@ -79,3 +79,19 @@ Split-Ergebnis:
 - `src/core/GameRuntimeFacade.js` kapselt Settings-/Menu-Runtime-Orchestrierung.
 - `src/core/GameDebugApi.js` kapselt Recorder-/Validation-Debug-API.
 - `src/core/main.js` delegiert auf die neuen Fassaden bei stabiler `Game`-API.
+
+## 21.4 Verifikation (Bot-Sensor-Fassade)
+
+- `npm run test:core`
+  - Ergebnis: PASS (`20 passed`)
+- `npm run test:physics`
+  - Ergebnis: PASS (`47 passed`)
+- `npm run smoke:roundstate`
+  - Ergebnis: PASS (`ok: true`)
+
+Split-Ergebnis:
+
+- `src/entities/ai/BotSensorsFacade.js` stellt die stabile Adapterflaeche fuer Sensorzugriffe bereit.
+- `src/entities/Bot.js` bindet die Fassade und reduziert direkte Sensor-Proxy-Methoden.
+- `src/entities/ai/BotSensingOps.js` und verwandte Ops nutzen `checkTrailHit`/Facade-Zugriffe.
+- Recovery/Pursuit/PortalIntent bleiben laut Physics- und Smoke-Gates regressionsfrei.

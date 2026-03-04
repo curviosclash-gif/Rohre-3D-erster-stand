@@ -9,6 +9,7 @@ import { runAction } from './ai/BotActionOps.js';
 import { estimateEnemyPressure, estimatePointRisk, selectTarget } from './ai/BotTargetingOps.js';
 import { enterRecovery, updateRecovery, updateStuckState } from './ai/BotRecoveryOps.js';
 import { BotSensors } from './ai/BotSensors.js';
+import { BotSensorsFacade } from './ai/BotSensorsFacade.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
@@ -107,6 +108,9 @@ export class BotAI {
         this._tmpVec3 = new THREE.Vector3();
 
         this.sensors = new BotSensors();
+        this.sensorsFacade = this.sensors.facade instanceof BotSensorsFacade
+            ? this.sensors.facade.bindRuntime(this)
+            : new BotSensorsFacade(this.sensors).bindRuntime(this);
         this.sense = this.sensors.sense;
         this._probes = this.sensors._probes;
         this._collisionCache = this.sensors._collisionCache;
@@ -277,87 +281,36 @@ export class BotAI {
     }
 
     _mapBehavior(arena) {
-        this.sensors.bindRuntime(this);
-        return this.sensors._mapBehavior(arena);
-    }
-
-    _computeDynamicLookAhead(player) {
-        this.sensors.bindRuntime(this);
-        return this.sensors._computeDynamicLookAhead(player);
-    }
-
-    _composeProbeDirection(forward, right, up, probe) {
-        this.sensors.bindRuntime(this);
-        this.sensors._composeProbeDirection(forward, right, up, probe);
-    }
-
-    _buildCollisionMemoKey(position, radius, excludePlayerIndex, skipRecent) {
-        this.sensors.bindRuntime(this);
-        return this.sensors._buildCollisionMemoKey(position, radius, excludePlayerIndex, skipRecent);
-    }
-
-    _getCollisionMemoized(entityManager, position, radius, excludePlayerIndex, skipRecent, playerRef) {
-        this.sensors.bindRuntime(this);
-        return this.sensors._getCollisionMemoized(entityManager, position, radius, excludePlayerIndex, skipRecent, playerRef);
-    }
-
-    _checkTrailHit(position, player, allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
-        this.sensors.bindRuntime(this);
-        return this.sensors._checkTrailHit(position, player, allPlayers, radius, skipRecent);
-    }
-
-    _scanProbeRay(player, arena, allPlayers, direction, lookAhead, step, out) {
-        this.sensors.bindRuntime(this);
-        this.sensors._scanProbeRay(player, arena, allPlayers, direction, lookAhead, step, out);
+        this.sensorsFacade.bindRuntime(this);
+        return this.sensorsFacade.mapBehavior(arena);
     }
 
     _scoreProbe(player, arena, allPlayers, probe, lookAhead) {
-        this.sensors.bindRuntime(this);
-        this.sensors._scoreProbe(player, arena, allPlayers, probe, lookAhead);
+        this.sensorsFacade.bindRuntime(this);
+        this.sensorsFacade.scoreProbe(player, arena, allPlayers, probe, lookAhead);
     }
 
-    _estimateExitSafety(exit, arena, player, allPlayers) {
-        this.sensors.bindRuntime(this);
-        return this.sensors._estimateExitSafety(exit, arena, player, allPlayers);
+    checkTrailHit(position, player, allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
+        this.sensorsFacade.bindRuntime(this);
+        return this.sensorsFacade.checkTrailHit(position, player, allPlayers, radius, skipRecent);
     }
 
-    _senseProjectiles(player, projectiles) {
-        this.sensors.bindRuntime(this);
-        this.sensors._senseProjectiles(player, projectiles);
-    }
-
-    _senseHeight(player, arena) {
-        this.sensors.bindRuntime(this);
-        this.sensors._senseHeight(player, arena);
-    }
-
-    _senseBotSpacing(player, allPlayers) {
-        this.sensors.bindRuntime(this);
-        this.sensors._senseBotSpacing(player, allPlayers);
-    }
-
-    _evaluatePursuit(player) {
-        this.sensors.bindRuntime(this);
-        this.sensors._evaluatePursuit(player);
-    }
-
-    _evaluatePortalIntent(player, arena, allPlayers) {
-        this.sensors.bindRuntime(this);
-        this.sensors._evaluatePortalIntent(player, arena, allPlayers);
+    _checkTrailHit(position, player, allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
+        return this.checkTrailHit(position, player, allPlayers, radius, skipRecent);
     }
 
     setSensePhase(phase) {
-        this.sensors.setSensePhase(phase);
+        this.sensorsFacade.setSensePhase(phase);
     }
 
     getSensorSnapshot() {
-        this.sensors.bindRuntime(this);
-        return this.sensors.getSnapshot();
+        this.sensorsFacade.bindRuntime(this);
+        return this.sensorsFacade.getSensorSnapshot();
     }
 
     getSensorArray() {
-        this.sensors.bindRuntime(this);
-        return this.sensors.getSensorArray();
+        this.sensorsFacade.bindRuntime(this);
+        return this.sensorsFacade.getSensorArray();
     }
 
     update(dt, player, arena, allPlayers, projectiles) {
@@ -383,6 +336,7 @@ export class BotAI {
         this.reactionTimer = Math.max(0.02, this.profile.reactionTime * jitter);
 
         this._resetDecision();
+        this.sensorsFacade.bindRuntime(this);
         this.sensors.update(this, player, arena, allPlayers, projectiles);
         if (runDecision(this, dt, player, arena, allPlayers, ITEM_RULES)) {
             return this.currentInput;

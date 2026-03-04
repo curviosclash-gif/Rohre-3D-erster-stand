@@ -122,10 +122,10 @@ Exit-Kriterien:
 
 ## Phase 21.4 - Bot-Fassade vereinfachen
 
-- [ ] 21.4.1 Redundante Sensor-Proxy-Methoden in `Bot.js` abbauen.
-- [ ] 21.4.2 Stabile Adapterflaeche ueber `BotSensorsFacade.js` bereitstellen.
-- [ ] 21.4.3 `BotSensingOps.js` und verwandte Ops auf die neue Adapterflaeche umstellen.
-- [ ] 21.4.4 Verhalten (Recovery/Pursuit/PortalIntent) per bestehender API stabil halten.
+- [x] 21.4.1 Redundante Sensor-Proxy-Methoden in `Bot.js` abbauen.
+- [x] 21.4.2 Stabile Adapterflaeche ueber `BotSensorsFacade.js` bereitstellen.
+- [x] 21.4.3 `BotSensingOps.js` und verwandte Ops auf die neue Adapterflaeche umstellen.
+- [x] 21.4.4 Verhalten (Recovery/Pursuit/PortalIntent) per bestehender API stabil halten.
 
 Verifikation:
 

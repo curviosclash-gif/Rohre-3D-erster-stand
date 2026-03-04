@@ -7,6 +7,7 @@ import { runPerception } from './BotSensingOps.js';
 import { composeProbeDirection, scanProbeRay, scoreProbe } from './BotProbeOps.js';
 import { estimateExitSafety, evaluatePortalIntent } from './BotPortalOps.js';
 import { senseProjectiles, senseHeight, senseBotSpacing, evaluatePursuit } from './BotThreatOps.js';
+import { BotSensorsFacade } from './BotSensorsFacade.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
@@ -141,6 +142,7 @@ export class BotSensors {
             portalIntentActive: false,
             portalIntentScore: 0,
         };
+        this.facade = new BotSensorsFacade(this);
     }
 
     _bindRuntime(bot) {
@@ -233,6 +235,10 @@ export class BotSensors {
         return this._getCollisionMemoized(entityManager, position, radius, player.index, skipRecent, player);
     }
 
+    checkTrailHit(position, player, allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
+        return this._checkTrailHit(position, player, allPlayers, radius, skipRecent);
+    }
+
     _scanProbeRay(player, arena, allPlayers, direction, lookAhead, step, out) {
         scanProbeRay(this, player, arena, allPlayers, direction, lookAhead, step, out);
     }
@@ -288,7 +294,7 @@ export class BotSensors {
 
     update(bot, player, arena, allPlayers, projectiles) {
         this._bindRuntime(bot);
-        runPerception(this, player, arena, allPlayers, projectiles);
+        runPerception(this.facade.bindRuntime(bot), player, arena, allPlayers, projectiles);
         this._updateTargetSteering(player);
         this._syncRuntimeState();
         return this.sense;
