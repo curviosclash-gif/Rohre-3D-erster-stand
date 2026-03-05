@@ -330,7 +330,7 @@ export class Game {
     }
 
     startMatch() {
-        this.matchFlowUiController.startMatch();
+        this.runtimeFacade.startMatch();
     }
 
     _getPlanarAimAxis(playerIndex) {
@@ -380,7 +380,7 @@ export class Game {
 
     // Legacy compatibility hook retained for runtime/tests.
     _returnToMenu() {
-        this.matchFlowUiController.returnToMenu();
+        this.runtimeFacade.returnToMenu();
     }
 
     render() {

@@ -1,15 +1,21 @@
 import * as THREE from 'three';
 import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
-import { disposeMatchSessionSystems, initializeMatchSession } from '../state/MatchSessionFactory.js';
+import { MatchFeedbackAdapter } from './MatchFeedbackAdapter.js';
+import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
 import {
-    deriveMatchStartUiState,
-    deriveReturnToMenuUiState,
-    deriveRoundStartUiState,
-} from './MatchUiStateOps.js';
+    deriveMatchStartTransition,
+    deriveReturnToMenuTransition,
+    deriveRoundStartTransition,
+} from '../state/MatchLifecycleStateTransitions.js';
 
 export class MatchFlowUiController {
     constructor(game) {
         this.game = game;
+        this.sessionOrchestrator = new MatchLifecycleSessionOrchestrator(game);
+        this.feedbackAdapter = new MatchFeedbackAdapter({
+            showToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone),
+            logger: console,
+        });
         this._damageDir = new THREE.Vector3();
         this._damageForward = new THREE.Vector3();
         this._damageRight = new THREE.Vector3();
@@ -55,6 +61,24 @@ export class MatchFlowUiController {
 
     applyMatchStartUiState(uiState) {
         this.applyMatchUiState(uiState);
+    }
+
+    applyLifecycleTransition(transition) {
+        const game = this.game;
+        if (!transition) return;
+
+        if (typeof transition.state === 'string' && transition.state.length > 0) {
+            game.state = transition.state;
+        }
+        if (typeof transition.roundPause === 'number') {
+            game.roundPause = transition.roundPause;
+        }
+        if (typeof transition.hudTimer === 'number') {
+            game._hudTimer = transition.hudTimer;
+        }
+        if (transition.huntStatePatch && game.huntState) {
+            Object.assign(game.huntState, transition.huntStatePatch);
+        }
     }
 
     resetCrosshairElementUi(element) {
@@ -128,21 +152,26 @@ export class MatchFlowUiController {
         };
     }
 
+    _pushHuntFeedEntry(entry) {
+        const game = this.game;
+        if (!game.huntState) return;
+        if (!Array.isArray(game.huntState.killFeed)) game.huntState.killFeed = [];
+        game.huntState.killFeed.unshift(String(entry));
+        if (game.huntState.killFeed.length > 5) {
+            game.huntState.killFeed.length = 5;
+        }
+    }
+
     startMatch() {
         const game = this.game;
         game.keyCapture = null;
         game._applySettingsToRuntime();
 
-        this.applyMatchStartUiState(deriveMatchStartUiState({ numHumans: game.numHumans }));
+        const matchStartTransition = deriveMatchStartTransition({ numHumans: game.numHumans });
+        this.applyLifecycleTransition(matchStartTransition);
+        this.applyMatchStartUiState(matchStartTransition.uiState);
 
-        const initializedMatch = initializeMatchSession({
-            renderer: game.renderer,
-            audio: game.audio,
-            recorder: game.recorder,
-            settings: game.settings,
-            runtimeConfig: game.runtimeConfig,
-            requestedMapKey: game.mapKey,
-            currentSession: game.matchSessionRuntimeBridge.getCurrentMatchSessionRefs(),
+        const initializedMatch = this.sessionOrchestrator.createMatchSession({
             onPlayerFeedback: (player, message) => {
                 game._showPlayerFeedback(player, message);
             },
@@ -155,34 +184,19 @@ export class MatchFlowUiController {
                 this.onRoundEnd(winner);
             },
         });
-        game.matchSessionRuntimeBridge.applyInitializedMatchSession(initializedMatch);
-        if (game.entityManager) {
-            game.entityManager.onHuntFeedEvent = (entry) => {
-                if (!game.huntState) return;
-                if (!Array.isArray(game.huntState.killFeed)) game.huntState.killFeed = [];
-                game.huntState.killFeed.unshift(String(entry));
-                if (game.huntState.killFeed.length > 5) {
-                    game.huntState.killFeed.length = 5;
-                }
-            };
-            game.entityManager.onHuntDamageEvent = (event) => {
-                this._handleHuntDamageEvent(event);
-            };
-        }
-        this._applyMatchFeedbackPlan(initializedMatch.feedbackPlan);
+        this.sessionOrchestrator.bindHuntEventHandlers({
+            onHuntFeedEvent: (entry) => this._pushHuntFeedEntry(entry),
+            onHuntDamageEvent: (event) => this._handleHuntDamageEvent(event),
+        });
+        this.feedbackAdapter.applyFeedbackPlan(initializedMatch.feedbackPlan);
 
         this.startRound();
     }
 
     startRound() {
         const game = this.game;
-        game.state = 'PLAYING';
-        game._hudTimer = 0;
-        if (game.huntState) {
-            game.huntState.killFeed = [];
-            game.huntState.damageIndicator = null;
-            game.huntState.overheatByPlayer = {};
-        }
+        const roundStartTransition = deriveRoundStartTransition();
+        this.applyLifecycleTransition(roundStartTransition);
 
         if (game.ui.crosshairP1) {
             game.ui.crosshairP1.style.display = 'none';
@@ -191,21 +205,10 @@ export class MatchFlowUiController {
             game.ui.crosshairP2.style.display = 'none';
         }
 
-        game.roundPause = 0;
-
-        for (const player of game.entityManager.players) {
-            player.trail.clear();
-        }
-        game.powerupManager.clear();
-
-        game.recorder.startRound(game.entityManager.players);
-        game.entityManager.spawnAll();
-        for (const player of game.entityManager.getHumanPlayers()) {
-            player.planarAimOffset = 0;
-        }
+        this.sessionOrchestrator.resetRoundRuntime();
 
         game.gameLoop.setTimeScale(1.0);
-        this.applyMatchUiState(deriveRoundStartUiState());
+        this.applyMatchUiState(roundStartTransition.uiState);
         game.hudRuntimeSystem.updateScoreHud();
     }
 
@@ -266,29 +269,12 @@ export class MatchFlowUiController {
 
     returnToMenu() {
         const game = this.game;
-        game.state = 'MENU';
-        if (game.huntState) {
-            game.huntState.killFeed = [];
-            game.huntState.damageIndicator = null;
-            game.huntState.overheatByPlayer = {};
-        }
-        disposeMatchSessionSystems(game.renderer, game.matchSessionRuntimeBridge.getCurrentMatchSessionRefs());
-        game.matchSessionRuntimeBridge.clearMatchSessionRefs();
-        this.applyMatchUiState(deriveReturnToMenuUiState());
+        const returnTransition = deriveReturnToMenuTransition();
+        this.applyLifecycleTransition(returnTransition);
+        this.sessionOrchestrator.teardownMatchSession();
+        this.applyMatchUiState(returnTransition.uiState);
         game._showMainNav();
         this.resetCrosshairUi();
         game.uiManager.syncAll();
-    }
-
-    _applyMatchFeedbackPlan(feedbackPlan) {
-        if (!feedbackPlan) return;
-        for (const entry of feedbackPlan.consoleEntries || []) {
-            const level = entry?.level === 'warn' ? 'warn' : 'log';
-            const args = Array.isArray(entry?.args) ? entry.args : [entry];
-            console[level](...args);
-        }
-        for (const toast of feedbackPlan.toasts || []) {
-            this.game._showStatusToast(toast.message, toast.durationMs, toast.tone);
-        }
     }
 }

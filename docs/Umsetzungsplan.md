@@ -172,8 +172,8 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
   - Wechsel zur naechsten Phase nur nach bestandenem Teil-Gate.
 
 - [x] 25.0 Baseline + Non-Overlap-Freeze (abgeschlossen 2026-03-05)
-- [ ] 25.1 Match-Lifecycle-Orchestrierung entkoppeln
-- [ ] 25.2 EntityManager in Setup/Spawn/Tick-Pipelines schneiden
+- [x] 25.1 Match-Lifecycle-Orchestrierung entkoppeln (abgeschlossen 2026-03-05)
+- [x] 25.2 EntityManager in Setup/Spawn/Tick-Pipelines schneiden (abgeschlossen 2026-03-05)
 - [ ] 25.3 Arena-Build-Pipeline modularisieren (Cache + Compile-Stufen)
 - [ ] 25.4 Map-Datenpfad modularisieren (Presets + Schema + Loader)
 - [ ] 25.5 CameraRigSystem in Strategien zerlegen (Mode/Collision/Shake)
@@ -184,6 +184,12 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - Kurznotiz 2026-03-05 (25.0):
   - Scope-Freeze aktiv: keine Bearbeitung der 24.1-24.6 Module (`PlayerInputSystem`, Observation-/Trail-/MG-/Portal-/HUD-Hotpaths).
   - Lifecycle-Baseline in `tmp/perf_phase25_0_lifecycle_baseline.json`: `domToGameInstanceMs=320`, `startMatchLatencyMs=5179.20`, `returnToMenuLatencyMs=18.20`.
+- Kurznotiz 2026-03-05 (25.1):
+  - Match-Lifecycle entkoppelt in Session-Orchestrator + Transition-Ops + Feedback-Adapter; `MatchFlowUiController` schlanker.
+  - Phasen-Gates bestanden: `test:core`, `smoke:roundstate`, `test:stress`.
+- Kurznotiz 2026-03-05 (25.2):
+  - `EntityManager` Setup-/Spawn-/Tick-Pfade in `EntitySetupOps`, `EntitySpawnOps`, `EntityTickPipeline` ausgelagert; Verdrahtung ueber `EntityRuntimeAssembler`.
+  - Phasen-Gates bestanden: `test:core`, `test:physics`.
 
 ---
 

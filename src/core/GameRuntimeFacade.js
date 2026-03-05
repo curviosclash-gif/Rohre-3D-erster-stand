@@ -51,7 +51,7 @@ export class GameRuntimeFacade {
                 this.onSettingsChanged(event);
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.START_MATCH:
-                game.startMatch();
+                this.startMatch();
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.START_KEY_CAPTURE:
                 game.keybindEditorController.startKeyCapture(event.player, event.action);
@@ -113,6 +113,18 @@ export class GameRuntimeFacade {
             ? '💾 Einstellungen explizit speichern *'
             : '💾 Einstellungen explizit speichern';
         game.uiManager?.updateContext();
+    }
+
+    startMatch() {
+        this.game?.matchFlowUiController?.startMatch?.();
+    }
+
+    restartRound() {
+        this.game?.matchFlowUiController?.startRound?.();
+    }
+
+    returnToMenu() {
+        this.game?.matchFlowUiController?.returnToMenu?.();
     }
 
     syncP2HudVisibility() {

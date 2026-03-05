@@ -3,32 +3,14 @@
 // ============================================
 
 import { CONFIG } from '../core/Config.js';
-import { Player } from './Player.js';
 import { BotPolicyRegistry } from './ai/BotPolicyRegistry.js';
-import { BOT_POLICY_TYPES, DEFAULT_BOT_POLICY_TYPE, normalizeBotPolicyType } from './ai/BotPolicyTypes.js';
+import { DEFAULT_BOT_POLICY_TYPE } from './ai/BotPolicyTypes.js';
 import { createBotRuntimeContext } from './ai/BotRuntimeContextFactory.js';
-import { getVehicleIds, isValidVehicleId } from './vehicle-registry.js';
 import { assembleEntityRuntime } from './runtime/EntityRuntimeAssembler.js';
 import { isHuntHealthActive } from '../hunt/HealthSystem.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
-}
-
-function normalizeActiveMode(mode) {
-    return String(mode || '').trim().toLowerCase();
-}
-
-function resolvePolicyFallbackByMode(activeMode) {
-    return normalizeActiveMode(activeMode) === 'hunt'
-        ? BOT_POLICY_TYPES.HUNT
-        : DEFAULT_BOT_POLICY_TYPE;
-}
-
-function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, activeGameMode } = {}) {
-    const runtimePolicyType = runtimeConfig?.bot?.policyType || null;
-    const fallbackPolicyType = resolvePolicyFallbackByMode(activeGameMode);
-    return normalizeBotPolicyType(requestedPolicyType || runtimePolicyType || fallbackPolicyType);
 }
 
 export class EntityManager {
@@ -84,99 +66,27 @@ export class EntityManager {
     setup(numHumans, numBots, options = {}) {
         console.log(`[EntityManager] Setup: Humans=${numHumans}, Bots=${numBots}`);
         this.clear();
-
-        this._applySetupRuntimeOptions(options);
-        const setupContext = this._resolveSetupPlayerContext(options);
-        this._resetSetupCollections();
-        this._setupHumanPlayers(numHumans, setupContext);
-        this._setupBotPlayers(numHumans, numBots, setupContext);
+        this._setupOps.runSetup(numHumans, numBots, options);
     }
 
     _applySetupRuntimeOptions(options = {}) {
-        this.runtimeConfig = options.runtimeConfig || null;
-        this.activeGameMode = options.activeGameMode
-            || this.runtimeConfig?.session?.activeGameMode
-            || this.activeGameMode
-            || 'classic';
-        const activeModeLower = String(this.activeGameMode || '').toLowerCase();
-        this.huntEnabled = activeModeLower === 'hunt';
-        this.botDifficulty = options.botDifficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || this.botDifficulty;
-        this.botPolicyType = resolveConfiguredBotPolicyType({
-            requestedPolicyType: options.botPolicyType,
-            runtimeConfig: this.runtimeConfig,
-            activeGameMode: this.activeGameMode,
-        });
+        this._setupOps.applySetupRuntimeOptions(options);
     }
 
     _resolveSetupPlayerContext(options = {}) {
-        const availableVehicleIds = getVehicleIds();
-        const defaultVehicleId = String(CONFIG.PLAYER.DEFAULT_VEHICLE_ID || availableVehicleIds[0] || 'aircraft');
-        const normalizeVehicleId = (value) => {
-            const candidate = String(value || '').trim();
-            if (isValidVehicleId(candidate)) {
-                return candidate;
-            }
-            return defaultVehicleId;
-        };
-        const botVehicleSource = Array.isArray(options.botVehicleIds) && options.botVehicleIds.length > 0
-            ? options.botVehicleIds
-            : availableVehicleIds;
-        const botVehicleIds = botVehicleSource.map((id) => normalizeVehicleId(id));
-        return {
-            humanConfigs: Array.isArray(options.humanConfigs) ? options.humanConfigs : [],
-            modelScale: typeof options.modelScale === 'number' ? options.modelScale : (CONFIG.PLAYER.MODEL_SCALE || 1),
-            defaultVehicleId,
-            normalizeVehicleId,
-            botVehicleIds,
-        };
+        return this._setupOps.resolveSetupPlayerContext(options);
     }
 
     _resetSetupCollections() {
-        this.humanPlayers = [];
-        this.botByPlayer.clear();
+        this._setupOps.resetSetupCollections();
     }
 
     _setupHumanPlayers(numHumans, setupContext) {
-        const humanColors = [CONFIG.COLORS.PLAYER_1, CONFIG.COLORS.PLAYER_2];
-        for (let i = 0; i < numHumans; i++) {
-            const playerVehicleId = setupContext.normalizeVehicleId(setupContext.humanConfigs[i]?.vehicleId);
-            const player = new Player(this.renderer, i, humanColors[i], false, {
-                vehicleId: playerVehicleId,
-                entityManager: this,
-            });
-            player.setControlOptions({
-                invertPitch: !!setupContext.humanConfigs[i]?.invertPitch,
-                cockpitCamera: !!setupContext.humanConfigs[i]?.cockpitCamera,
-                modelScale: setupContext.modelScale,
-            });
-            this.players.push(player);
-            this.humanPlayers.push(player);
-        }
+        this._setupOps.setupHumanPlayers(numHumans, setupContext);
     }
 
     _setupBotPlayers(numHumans, numBots, setupContext) {
-        for (let i = 0; i < numBots; i++) {
-            const color = CONFIG.COLORS.BOT_COLORS[i % CONFIG.COLORS.BOT_COLORS.length];
-            const botVehicleId = setupContext.botVehicleIds.length > 0
-                ? setupContext.botVehicleIds[i % setupContext.botVehicleIds.length]
-                : setupContext.defaultVehicleId;
-            const player = new Player(this.renderer, numHumans + i, color, true, {
-                vehicleId: botVehicleId,
-                entityManager: this,
-            });
-            player.setControlOptions({ modelScale: setupContext.modelScale, invertPitch: false });
-            const ai = this.botPolicyRegistry.create(this.botPolicyType, {
-                difficulty: this.botDifficulty,
-                recorder: this.recorder,
-                runtimeConfig: this.runtimeConfig,
-            });
-            if (typeof ai?.setSensePhase === 'function') {
-                ai.setSensePhase(i % 4); // Time-Slicing: Bot-Scans auf 4 Frames verteilen
-            }
-            this.players.push(player);
-            this.bots.push({ player, ai });
-            this.botByPlayer.set(player, ai);
-        }
+        this._setupOps.setupBotPlayers(numHumans, numBots, setupContext);
     }
 
     setBotDifficulty(profileName) {
@@ -194,30 +104,15 @@ export class EntityManager {
     }
 
     spawnAll() {
-        this._roundEnded = false;
-        this._respawnSystem.reset();
-        const spawnContext = this._createSpawnContext();
-        for (const player of this.players) {
-            this._spawnPlayer(player, spawnContext);
-        }
+        this._spawnOps.spawnAll();
     }
 
     _createSpawnContext() {
-        const isPlanar = !!CONFIG.GAMEPLAY.PLANAR_MODE;
-        return {
-            planarSpawnLevel: isPlanar ? this._getPlanarSpawnLevel() : null,
-        };
+        return this._spawnOps.createSpawnContext();
     }
 
     _spawnPlayer(player, spawnContext) {
-        const pos = this._findSpawnPosition(12, 12, spawnContext.planarSpawnLevel);
-        const dir = this._findSafeSpawnDirection(pos, player.hitboxRadius);
-        player.spawn(pos, dir);
-        player.shootCooldown = 0;
-        if (this.recorder) {
-            this.recorder.markPlayerSpawn(player);
-            this.recorder.logEvent('SPAWN', player.index, player.isBot ? 'bot=1' : 'bot=0');
-        }
+        this._spawnOps.spawnPlayer(player, spawnContext);
     }
 
     _getPlanarSpawnLevel() {
@@ -267,25 +162,7 @@ export class EntityManager {
     }
 
     update(dt, inputManager) {
-        this._lockOnCache.clear();
-        this._projectileSystem.update(dt);
-        this._overheatGunSystem.update(dt);
-        this._respawnSystem.update(dt);
-
-        for (const player of this.players) {
-            if (!player.alive) continue;
-            this._playerLifecycleSystem.updateShootCooldown(player, dt);
-            const input = this._playerInputSystem.resolvePlayerInput(player, dt, inputManager);
-            this._playerLifecycleSystem.updatePlayer(player, dt, input);
-        }
-
-        if (this._roundEnded) return;
-
-        const outcome = this._roundOutcomeSystem.resolve();
-        if (outcome.shouldEnd) {
-            this._roundEnded = true;
-            this._eventBus.emitRoundEnd(outcome.winner);
-        }
+        this._tickPipeline.update(dt, inputManager);
     }
 
     _getPendingHumanRespawns(players = this.humanPlayers) {

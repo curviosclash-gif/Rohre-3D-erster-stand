@@ -12,6 +12,9 @@ import { EntityEventBus } from './EntityEventBus.js';
 import { OverheatGunSystem } from '../../hunt/OverheatGunSystem.js';
 import { RespawnSystem } from '../../hunt/RespawnSystem.js';
 import { HuntScoring } from '../../hunt/HuntScoring.js';
+import { EntitySetupOps } from './EntitySetupOps.js';
+import { EntitySpawnOps } from './EntitySpawnOps.js';
+import { EntityTickPipeline } from './EntityTickPipeline.js';
 
 export class EntityRuntimeAssembler {
     constructor(entityManager) {
@@ -159,6 +162,9 @@ export class EntityRuntimeAssembler {
             getBots: () => owner.bots,
             getPendingHumanRespawns: (players) => owner._getPendingHumanRespawns(players),
         });
+        const setupOps = new EntitySetupOps(owner);
+        const spawnOps = new EntitySpawnOps(owner);
+        const tickPipeline = new EntityTickPipeline(owner);
 
         return {
             _projectileSystem: projectileSystem,
@@ -183,6 +189,9 @@ export class EntityRuntimeAssembler {
             _respawnSystem: respawnSystem,
             _huntCombatSystem: huntCombatSystem,
             _roundOutcomeSystem: roundOutcomeSystem,
+            _setupOps: setupOps,
+            _spawnOps: spawnOps,
+            _tickPipeline: tickPipeline,
         };
     }
 }
