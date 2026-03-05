@@ -69,7 +69,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - [ ] V24 Performance-Flaschenhaelse systematisch abbauen
   - Fokus: CPU/GPU/GC-Hotspots in Bot-Sensing, Trail-Kollision, MG-Tracer, Portal-Rendering und HUD-DOM.
   - Referenzplan: `docs/Feature_Performance_Flaschenhaelse_Abarbeitung.md`.
-- [ ] V25 Weitere Modularisierung ausserhalb Phase 24
+- [x] V25 Weitere Modularisierung ausserhalb Phase 24 (abgeschlossen 2026-03-05)
   - Fokus: Match-/Entity-Orchestrierung, Arena-Build-Pipeline, Map-Datenpfad, Kamera-Rig, Settings-Contracts, Test-Suite-Split.
   - Referenzplan: `docs/Feature_Modularisierung_V25_Ausserhalb_Phase24.md`.
 - [x] V18 Single-Agent-Durchlauf fuer weitere Modularisierung (ohne Stop)
@@ -164,7 +164,7 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 
 ---
 
-## Single-Agent Block V25 (geplant, Stand: 2026-03-05)
+## Single-Agent Block V25 (abgeschlossen, Stand: 2026-03-05)
 
 - Rollenmodell:
   - Ein Agent setzt die Phasen `25.x` strikt sequenziell um.
@@ -174,12 +174,12 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - [x] 25.0 Baseline + Non-Overlap-Freeze (abgeschlossen 2026-03-05)
 - [x] 25.1 Match-Lifecycle-Orchestrierung entkoppeln (abgeschlossen 2026-03-05)
 - [x] 25.2 EntityManager in Setup/Spawn/Tick-Pipelines schneiden (abgeschlossen 2026-03-05)
-- [ ] 25.3 Arena-Build-Pipeline modularisieren (Cache + Compile-Stufen)
-- [ ] 25.4 Map-Datenpfad modularisieren (Presets + Schema + Loader)
-- [ ] 25.5 CameraRigSystem in Strategien zerlegen (Mode/Collision/Shake)
-- [ ] 25.6 Settings-/RuntimeConfig-Contracts vereinheitlichen
-- [ ] 25.7 Test-Suite modularisieren (Physics/AI/Hunt getrennt)
-- [ ] 25.8 Abschluss-Gate, Regression und Doku-Freeze (`docs:sync`, `docs:check`)
+- [x] 25.3 Arena-Build-Pipeline modularisieren (Cache + Compile-Stufen) (abgeschlossen 2026-03-05)
+- [x] 25.4 Map-Datenpfad modularisieren (Presets + Schema + Loader) (abgeschlossen 2026-03-05)
+- [x] 25.5 CameraRigSystem in Strategien zerlegen (Mode/Collision/Shake) (abgeschlossen 2026-03-05)
+- [x] 25.6 Settings-/RuntimeConfig-Contracts vereinheitlichen (abgeschlossen 2026-03-05)
+- [x] 25.7 Test-Suite modularisieren (Physics/AI/Hunt getrennt) (abgeschlossen 2026-03-05)
+- [x] 25.8 Abschluss-Gate, Regression und Doku-Freeze (`docs:sync`, `docs:check`) (abgeschlossen 2026-03-05)
 
 - Kurznotiz 2026-03-05 (25.0):
   - Scope-Freeze aktiv: keine Bearbeitung der 24.1-24.6 Module (`PlayerInputSystem`, Observation-/Trail-/MG-/Portal-/HUD-Hotpaths).
@@ -190,6 +190,25 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - Kurznotiz 2026-03-05 (25.2):
   - `EntityManager` Setup-/Spawn-/Tick-Pfade in `EntitySetupOps`, `EntitySpawnOps`, `EntityTickPipeline` ausgelagert; Verdrahtung ueber `EntityRuntimeAssembler`.
   - Phasen-Gates bestanden: `test:core`, `test:physics`.
+- Kurznotiz 2026-03-05 (25.3):
+  - Arena-Build in Cache (`ArenaBuildResourceCache`) + Compile-Stages (`ArenaGeometryCompilePipeline`) gesplittet, inkl. Rebuild-Signatur-Policy.
+  - Phasen-Gates bestanden: `test:core`, `test:physics`, `test:gpu`.
+- Kurznotiz 2026-03-05 (25.4):
+  - Map-Datenpfad getrennt in Preset-Themenmodule + MapSchema-Ops (`Migration/Sanitize/Runtime`) + Loader-Resolver fuer Fallback/Warnungen.
+  - Phasen-Gates bestanden: `test:core`, `test:physics`.
+- Kurznotiz 2026-03-05 (25.5):
+  - Camera-Rig gesplittet in Mode-/Collision-/Shake-Strategien; Collision-Pruefung mit bewegungs- und modebasiertem Recheck-Cache.
+  - Phasen-Gates bestanden: `test:core`, `test:physics`, `test:gpu`.
+- Kurznotiz 2026-03-05 (25.6):
+  - Shared Contract fuer Settings/RuntimeConfig (`SettingsRuntimeContract`) zentralisiert Limits, Clamping und Controls-Normalisierung.
+  - Phasen-Gates bestanden: `test:core`, `test:stress`.
+- Kurznotiz 2026-03-05 (25.7):
+  - Physics-Suite aufgeteilt in `physics-core`, `physics-hunt`, `physics-policy` plus neue Teil-Skripte fuer gezielte Regressionen.
+  - Phasen-Gates bestanden: `test:physics:core`, `test:physics:hunt`, `test:physics:policy`, `test:core`, `test:physics`.
+- Kurznotiz 2026-03-05 (25.8):
+  - Abschluss-Gates bestanden: `test:core`, `test:physics`, `test:gpu`, `test:stress`, `docs:sync`, `docs:check`.
+  - Lifecycle-Deltas ggü. 25.0-Baseline: `domToGameInstance 320.00 -> 70.30ms`, `startMatch 5179.20 -> 1810.00ms`, `returnToMenu 18.20 -> 31.10ms`.
+  - Kamera-Pfad-Probe (inferenzbasiert): `resolveCalls=240`, `collisionChecks=1`, geschaetzte vermiedene Checks `239 (~99.58%)`.
 
 ---
 
