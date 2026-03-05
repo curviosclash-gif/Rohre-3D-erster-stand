@@ -13,6 +13,7 @@ export class TrailCollisionQuery {
         this._trailCollisionResult = { hit: false, playerIndex: -1 };
         this._tmpClosestPoint = new THREE.Vector3();
         this._projectileSeenEntries = new Set();
+        this._globalSeenEntries = new Set();
     }
 
     _debugTrailCollision(tag, payload) {
@@ -120,6 +121,8 @@ export class TrailCollisionQuery {
         const cellX = Math.floor(position.x / registry.gridSize);
         const cellZ = Math.floor(position.z / registry.gridSize);
         const players = this.getPlayers();
+        const seenEntries = this._globalSeenEntries;
+        seenEntries.clear();
 
         for (let dx = -1; dx <= 1; dx++) {
             for (let dz = -1; dz <= 1; dz++) {
@@ -128,6 +131,8 @@ export class TrailCollisionQuery {
                 if (!cell) continue;
 
                 for (const seg of cell) {
+                    if (seenEntries.has(seg)) continue;
+                    seenEntries.add(seg);
                     if (!seg || seg.destroyed) continue;
                     if (seg.playerIndex === excludePlayerIndex) {
                         const player = players[seg.playerIndex];

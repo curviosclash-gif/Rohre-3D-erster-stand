@@ -12,6 +12,15 @@ export const PERCEPTION_THRESHOLDS = Object.freeze({
     projectileApproachDot: 0.25,
 });
 
+export function resolveAdaptiveWallProbeSteps(previousRatio, minSteps = 8, maxSteps = 20) {
+    const safeMin = Math.max(4, Math.trunc(minSteps));
+    const safeMax = Math.max(safeMin, Math.trunc(maxSteps));
+    if (!Number.isFinite(previousRatio)) return safeMax;
+    if (previousRatio >= 0.72) return safeMin;
+    if (previousRatio >= 0.45) return Math.max(safeMin, Math.trunc((safeMin + safeMax) * 0.5));
+    return safeMax;
+}
+
 export function buildPerceptionBasis(forward, rightOut, upOut, worldUp = DEFAULT_WORLD_UP) {
     rightOut.crossVectors(worldUp, forward);
     if (rightOut.lengthSq() <= 0.000001) {

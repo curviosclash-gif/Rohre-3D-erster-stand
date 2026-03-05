@@ -72,11 +72,20 @@ export class PlayerInputSystem {
         console.warn(`[ObservationSystem] Fallback observation for bot index ${playerIndex}: ${reason}${errorMessage}`);
     }
 
-    _resolveRuntimeContext(player, dt, entityManager) {
+    _resolveRuntimeContext(player, dt, entityManager, options = {}) {
         if (typeof entityManager?.createBotRuntimeContext === 'function') {
-            return entityManager.createBotRuntimeContext(player, dt);
+            return entityManager.createBotRuntimeContext(player, dt, options);
         }
-        return createBotRuntimeContext(entityManager, player, dt);
+        return createBotRuntimeContext(entityManager, player, dt, options);
+    }
+
+    _policyNeedsObservation(policy) {
+        if (!policy || policy.requiresObservation === false) return false;
+        if (policy.requiresObservation === true || policy.usesObservation === true) return true;
+        if (policy.usesRuntimeContext === true) return true;
+        if (typeof policy.getObservation === 'function') return true;
+        const policyType = typeof policy.type === 'string' ? policy.type : '';
+        return policyType.includes('bridge');
     }
 
     _buildBotObservation(player, policy, runtimeContext) {
@@ -135,10 +144,18 @@ export class PlayerInputSystem {
         if (player.isBot) {
             const botAI = entityManager.botByPlayer.get(player);
             if (botAI) {
-                const runtimeContext = this._resolveRuntimeContext(player, dt, entityManager);
-                const observation = this._buildBotObservation(player, botAI, runtimeContext);
-                runtimeContext.observation = observation;
-                this._lastBotObservationByIndex.set(player.index, observation);
+                const needsObservation = this._policyNeedsObservation(botAI);
+                const runtimeContext = this._resolveRuntimeContext(player, dt, entityManager, {
+                    includeObservationContext: needsObservation,
+                });
+                if (needsObservation) {
+                    const observation = this._buildBotObservation(player, botAI, runtimeContext);
+                    runtimeContext.observation = observation;
+                    this._lastBotObservationByIndex.set(player.index, observation);
+                } else {
+                    runtimeContext.observation = null;
+                    this._lastBotObservationByIndex.delete(player.index);
+                }
 
                 const sanitizeOptions = {
                     inventoryLength: Array.isArray(player.inventory) ? player.inventory.length : 0,

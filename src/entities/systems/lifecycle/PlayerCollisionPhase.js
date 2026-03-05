@@ -142,8 +142,19 @@ export class PlayerCollisionPhase {
             return null;
         }
 
-        const stepDistance = Math.max(0.5, radius * 0.75);
-        const steps = Math.min(12, Math.max(2, Math.ceil(traveledDistance / stepDistance)));
+        const stepDistance = Math.max(0.6, radius * 0.85);
+        let steps = Math.ceil(traveledDistance / stepDistance);
+        const gridSize = Number(entityManager?.trails?.spatialIndex?.gridSize || 0);
+        if (gridSize > 0) {
+            const prevCellX = Math.floor(prevPos.x / gridSize);
+            const prevCellZ = Math.floor(prevPos.z / gridSize);
+            const nextCellX = Math.floor(player.position.x / gridSize);
+            const nextCellZ = Math.floor(player.position.z / gridSize);
+            if (prevCellX === nextCellX && prevCellZ === nextCellZ) {
+                steps = Math.min(10, steps);
+            }
+        }
+        steps = Math.min(12, Math.max(2, steps));
         for (let i = 1; i < steps; i++) {
             const t = i / steps;
             entityManager._tmpVec2.lerpVectors(prevPos, player.position, t);

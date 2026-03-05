@@ -8,6 +8,7 @@ export class HudRuntimeSystem {
     constructor(game) {
         this.game = game;
         this._hudP2Visible = null;
+        this._fighterHudTimer = 0;
     }
 
     updateScoreHud() {
@@ -85,6 +86,24 @@ export class HudRuntimeSystem {
         return 0.2;
     }
 
+    _resolveFighterHudInterval() {
+        const configuredInterval = Number(this.game?.runtimeConfig?.uiHotpath?.fighterHudInterval);
+        if (Number.isFinite(configuredInterval) && configuredInterval > 0) {
+            return configuredInterval;
+        }
+        return 0.05;
+    }
+
+    _consumeInterval(timerKey, dt, interval) {
+        const elapsed = this[timerKey] + dt;
+        if (elapsed < interval) {
+            this[timerKey] = elapsed;
+            return 0;
+        }
+        this[timerKey] = elapsed % interval;
+        return elapsed;
+    }
+
     updatePlayingHudTick(dt) {
         const game = this.game;
         if (!game.entityManager) return;
@@ -97,16 +116,23 @@ export class HudRuntimeSystem {
             this.updateScoreHud();
         }
 
-        // FIGHTER HUD UPDATE
-        const p1 = game.entityManager.players[0];
-        if (p1) game.hudP1.update(p1, dt, game.entityManager);
+        const fighterHudInterval = this._resolveFighterHudInterval();
+        const fighterElapsed = this._consumeInterval('_fighterHudTimer', dt, fighterHudInterval);
 
+        // FIGHTER HUD UPDATE
         if (game.numHumans === 2) {
             this._setHudP2Visibility(true);
-            const p2 = game.entityManager.players[1];
-            if (p2) game.hudP2.update(p2, dt, game.entityManager);
         } else {
             this._setHudP2Visibility(false);
+        }
+        if (fighterElapsed <= 0) return;
+
+        const p1 = game.entityManager.players[0];
+        if (p1) game.hudP1.update(p1, fighterElapsed, game.entityManager);
+
+        if (game.numHumans === 2) {
+            const p2 = game.entityManager.players[1];
+            if (p2) game.hudP2.update(p2, fighterElapsed, game.entityManager);
         }
     }
 }

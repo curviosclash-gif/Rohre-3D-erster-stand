@@ -64,19 +64,19 @@
         "botWinRate": 0.6,
         "stuckEvents": 0,
         "averageBotSurvival": 30.818340845944476,
-        "fpsAverage": 59.1573932840474,
-        "drawCallsAverage": 26.444444444444443,
-        "performanceSamples": 18
+        "fpsAverage": 60,
+        "drawCallsAverage": 17.58823529411765,
+        "performanceSamples": 17
       },
       "performance": {
-        "sampleCount": 18,
-        "fpsAverage": 59.1573932840474,
-        "drawCallsAverage": 26.444444444444443,
-        "fpsMin": 57.64705882352941,
+        "sampleCount": 17,
+        "fpsAverage": 60,
+        "drawCallsAverage": 17.58823529411765,
+        "fpsMin": 60,
         "fpsMax": 60,
         "drawCallsMin": 8,
-        "drawCallsMax": 37,
-        "observedDurationMs": 9146
+        "drawCallsMax": 19,
+        "observedDurationMs": 8426
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -99,19 +99,19 @@
         "botWinRate": 1,
         "stuckEvents": 0,
         "averageBotSurvival": 29.630166473514084,
-        "fpsAverage": 60.004016064257016,
-        "drawCallsAverage": 70.875,
-        "performanceSamples": 8
+        "fpsAverage": 60.00178492553315,
+        "drawCallsAverage": 21,
+        "performanceSamples": 18
       },
       "performance": {
-        "sampleCount": 8,
-        "fpsAverage": 60.004016064257016,
-        "drawCallsAverage": 70.875,
-        "fpsMin": 60.00401606425701,
+        "sampleCount": 18,
+        "fpsAverage": 60.00178492553315,
+        "drawCallsAverage": 21,
+        "fpsMin": 60.00000001455405,
         "fpsMax": 60.00401606425701,
-        "drawCallsMin": 10,
-        "drawCallsMax": 112,
-        "observedDurationMs": 8568
+        "drawCallsMin": 21,
+        "drawCallsMax": 21,
+        "observedDurationMs": 8370
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -134,19 +134,19 @@
         "botWinRate": 1,
         "stuckEvents": 0,
         "averageBotSurvival": 31.618958541106622,
-        "fpsAverage": 60.000446242298835,
-        "drawCallsAverage": 23.77777777777778,
-        "performanceSamples": 9
+        "fpsAverage": 60.003681408002365,
+        "drawCallsAverage": 87.25,
+        "performanceSamples": 12
       },
       "performance": {
-        "sampleCount": 9,
-        "fpsAverage": 60.000446242298835,
-        "drawCallsAverage": 23.77777777777778,
-        "fpsMin": 60.00000001455405,
-        "fpsMax": 60.00401606425701,
-        "drawCallsMin": 22,
-        "drawCallsMax": 27,
-        "observedDurationMs": 8516
+        "sampleCount": 12,
+        "fpsAverage": 60.003681408002365,
+        "drawCallsAverage": 87.25,
+        "fpsMin": 60.00000002910797,
+        "fpsMax": 60.00401607881094,
+        "drawCallsMin": 31,
+        "drawCallsMax": 108,
+        "observedDurationMs": 9538
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -169,19 +169,19 @@
         "botWinRate": 0.75,
         "stuckEvents": 0,
         "averageBotSurvival": 45.24550036010805,
-        "fpsAverage": 60.00401607881114,
-        "drawCallsAverage": 24.46153846153846,
+        "fpsAverage": 60.00000002910796,
+        "drawCallsAverage": 80.07692307692308,
         "performanceSamples": 13
       },
       "performance": {
         "sampleCount": 13,
-        "fpsAverage": 60.00401607881114,
-        "drawCallsAverage": 24.46153846153846,
-        "fpsMin": 60.004016078811155,
-        "fpsMax": 60.004016078811155,
-        "drawCallsMin": 16,
-        "drawCallsMax": 27,
-        "observedDurationMs": 8391
+        "fpsAverage": 60.00000002910796,
+        "drawCallsAverage": 80.07692307692308,
+        "fpsMin": 60.00000002910797,
+        "fpsMax": 60.00000002910797,
+        "drawCallsMin": 23,
+        "drawCallsMax": 122,
+        "observedDurationMs": 9608
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -195,9 +195,9 @@
     "botWinRate": 0.8235294117647058,
     "stuckEvents": 0,
     "averageBotSurvival": 34.1217768075669,
-    "fpsAverage": 59.685863184003004,
-    "drawCallsAverage": 32.8125,
-    "performanceSamples": 48
+    "fpsAverage": 60.00127176556715,
+    "drawCallsAverage": 46.083333333333336,
+    "performanceSamples": 60
   },
   "sourceRunner": {
     "forcedRounds": 12,

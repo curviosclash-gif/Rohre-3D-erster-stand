@@ -19,7 +19,7 @@ function resolveRuntimeMode(entityManager) {
     return isHuntHealthActive() ? GAME_MODE_TYPES.HUNT : GAME_MODE_TYPES.CLASSIC;
 }
 
-export function createBotRuntimeContext(entityManager, player, dt = 0) {
+export function createBotRuntimeContext(entityManager, player, dt = 0, options = {}) {
     const mode = resolveRuntimeMode(entityManager);
     const players = Array.isArray(entityManager?.players) ? entityManager.players : [];
     const projectiles = Array.isArray(entityManager?.projectiles) ? entityManager.projectiles : [];
@@ -29,13 +29,16 @@ export function createBotRuntimeContext(entityManager, player, dt = 0) {
         huntEnabled: mode === GAME_MODE_TYPES.HUNT || isHuntHealthActive(),
         portalsEnabled: !!entityManager?.arena?.portalsEnabled,
     };
-    const observationContext = createObservationContext({
-        arena: entityManager?.arena,
-        players,
-        projectiles,
-        mode,
-        planarMode: rules.planarMode,
-    });
+    const includeObservationContext = options?.includeObservationContext !== false;
+    const observationContext = includeObservationContext
+        ? createObservationContext({
+            arena: entityManager?.arena,
+            players,
+            projectiles,
+            mode,
+            planarMode: rules.planarMode,
+        })
+        : null;
 
     return {
         dt: Number.isFinite(dt) ? dt : 0,

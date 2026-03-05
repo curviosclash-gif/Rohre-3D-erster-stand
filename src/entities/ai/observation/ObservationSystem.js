@@ -45,6 +45,7 @@ import {
     computeProjectileThreatFlag,
     findNearestEnemySample,
     PERCEPTION_THRESHOLDS,
+    resolveAdaptiveWallProbeSteps,
     sampleWallDistance,
 } from '../perception/EnvironmentSamplingOps.js';
 
@@ -57,6 +58,13 @@ const TMP_DOWN = new THREE.Vector3();
 const TMP_TO_TARGET = new THREE.Vector3();
 const TMP_DIRECTION = new THREE.Vector3();
 const TMP_PROBE = new THREE.Vector3();
+const WALL_SAMPLE_COUNT = 5;
+const WALL_INDEX_FRONT = 0;
+const WALL_INDEX_LEFT = 1;
+const WALL_INDEX_RIGHT = 2;
+const WALL_INDEX_UP = 3;
+const WALL_INDEX_DOWN = 4;
+const WALL_PROBE_STATE_BY_PLAYER = new WeakMap();
 
 const DEFAULT_CONTEXT = Object.freeze({
     arena: null,
@@ -65,6 +73,11 @@ const DEFAULT_CONTEXT = Object.freeze({
     mode: 'classic',
     planarMode: false,
     wallProbeDistance: 45,
+    wallProbeMinSteps: 8,
+    wallProbeMaxSteps: 20,
+    wallProbeCacheWindowMs: 18,
+    wallProbeReusePositionEps: 0.2,
+    wallProbeReuseDirectionDot: 0.999,
     targetDistanceMax: 120,
     projectileThreatRange: 28,
 });
@@ -94,6 +107,129 @@ function sampleWallDistanceRatio(arena, origin, direction, radius, maxDistance, 
     return normalizeDistanceRatio(distance, safeMaxDistance, 0);
 }
 
+function resolveNowMs() {
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        return performance.now();
+    }
+    return Date.now();
+}
+
+function createWallProbeState() {
+    const ratios = new Float32Array(WALL_SAMPLE_COUNT);
+    for (let i = 0; i < WALL_SAMPLE_COUNT; i++) {
+        ratios[i] = -1;
+    }
+    return {
+        position: new THREE.Vector3(),
+        forward: new THREE.Vector3(),
+        ratios,
+        sampledAtMs: 0,
+        valid: false,
+    };
+}
+
+function getWallProbeState(player) {
+    let state = WALL_PROBE_STATE_BY_PLAYER.get(player);
+    if (!state) {
+        state = createWallProbeState();
+        WALL_PROBE_STATE_BY_PLAYER.set(player, state);
+    }
+    return state;
+}
+
+function canReuseWallProbeState(state, player, forward, runtimeContext, nowMs) {
+    if (!state?.valid) return false;
+    const cacheWindowMs = Math.max(0, Number(runtimeContext?.wallProbeCacheWindowMs) || 0);
+    if (cacheWindowMs <= 0 || nowMs - state.sampledAtMs > cacheWindowMs) {
+        return false;
+    }
+
+    const positionEps = Math.max(0, Number(runtimeContext?.wallProbeReusePositionEps) || 0);
+    const positionEpsSq = positionEps * positionEps;
+    if (state.position.distanceToSquared(player.position) > positionEpsSq) {
+        return false;
+    }
+
+    const directionDotThreshold = clamp(
+        Number(runtimeContext?.wallProbeReuseDirectionDot) || 0,
+        -1,
+        1
+    );
+    return state.forward.dot(forward) >= directionDotThreshold;
+}
+
+function resolveWallProbeSteps(runtimeContext, previousRatio) {
+    return resolveAdaptiveWallProbeSteps(
+        previousRatio,
+        runtimeContext?.wallProbeMinSteps,
+        runtimeContext?.wallProbeMaxSteps
+    );
+}
+
+function sampleWallRatios(player, runtimeContext, radius) {
+    const state = getWallProbeState(player);
+    const nowMs = resolveNowMs();
+    if (canReuseWallProbeState(state, player, TMP_FORWARD, runtimeContext, nowMs)) {
+        return state.ratios;
+    }
+
+    const ratios = state.ratios;
+    const wallProbeDistance = runtimeContext.wallProbeDistance;
+    const arena = runtimeContext.arena;
+    const previousFront = ratios[WALL_INDEX_FRONT];
+    const previousLeft = ratios[WALL_INDEX_LEFT];
+    const previousRight = ratios[WALL_INDEX_RIGHT];
+    const previousUp = ratios[WALL_INDEX_UP];
+    const previousDown = ratios[WALL_INDEX_DOWN];
+
+    ratios[WALL_INDEX_FRONT] = sampleWallDistanceRatio(
+        arena,
+        player.position,
+        TMP_FORWARD,
+        radius,
+        wallProbeDistance,
+        resolveWallProbeSteps(runtimeContext, previousFront)
+    );
+    ratios[WALL_INDEX_LEFT] = sampleWallDistanceRatio(
+        arena,
+        player.position,
+        TMP_LEFT.copy(TMP_RIGHT).multiplyScalar(-1),
+        radius,
+        wallProbeDistance,
+        resolveWallProbeSteps(runtimeContext, previousLeft)
+    );
+    ratios[WALL_INDEX_RIGHT] = sampleWallDistanceRatio(
+        arena,
+        player.position,
+        TMP_RIGHT,
+        radius,
+        wallProbeDistance,
+        resolveWallProbeSteps(runtimeContext, previousRight)
+    );
+    ratios[WALL_INDEX_UP] = sampleWallDistanceRatio(
+        arena,
+        player.position,
+        TMP_UP,
+        radius,
+        wallProbeDistance,
+        resolveWallProbeSteps(runtimeContext, previousUp)
+    );
+    ratios[WALL_INDEX_DOWN] = sampleWallDistanceRatio(
+        arena,
+        player.position,
+        TMP_DOWN.copy(TMP_UP).multiplyScalar(-1),
+        radius,
+        wallProbeDistance,
+        resolveWallProbeSteps(runtimeContext, previousDown)
+    );
+
+    state.position.copy(player.position);
+    state.forward.copy(TMP_FORWARD);
+    state.sampledAtMs = nowMs;
+    state.valid = true;
+    return ratios;
+}
+
 function findNearestEnemy(player, players) {
     const sample = findNearestEnemySample(player, players, TMP_FORWARD, TMP_TO_TARGET);
     return {
@@ -112,6 +248,11 @@ function computeProjectileThreat(player, projectiles, threatRange) {
 }
 
 export function createObservationContext(input = {}) {
+    const wallProbeMinSteps = Math.max(4, Math.trunc(Number(input.wallProbeMinSteps) || DEFAULT_CONTEXT.wallProbeMinSteps));
+    const wallProbeMaxSteps = Math.max(
+        wallProbeMinSteps,
+        Math.trunc(Number(input.wallProbeMaxSteps) || DEFAULT_CONTEXT.wallProbeMaxSteps)
+    );
     return {
         arena: input.arena || DEFAULT_CONTEXT.arena,
         players: Array.isArray(input.players) ? input.players : DEFAULT_CONTEXT.players,
@@ -119,6 +260,15 @@ export function createObservationContext(input = {}) {
         mode: input.mode || DEFAULT_CONTEXT.mode,
         planarMode: !!input.planarMode,
         wallProbeDistance: Math.max(1, Number(input.wallProbeDistance) || DEFAULT_CONTEXT.wallProbeDistance),
+        wallProbeMinSteps,
+        wallProbeMaxSteps,
+        wallProbeCacheWindowMs: Math.max(0, Number(input.wallProbeCacheWindowMs) || DEFAULT_CONTEXT.wallProbeCacheWindowMs),
+        wallProbeReusePositionEps: Math.max(0, Number(input.wallProbeReusePositionEps) || DEFAULT_CONTEXT.wallProbeReusePositionEps),
+        wallProbeReuseDirectionDot: clamp(
+            Number(input.wallProbeReuseDirectionDot) || DEFAULT_CONTEXT.wallProbeReuseDirectionDot,
+            -1,
+            1
+        ),
         targetDistanceMax: Math.max(1, Number(input.targetDistanceMax) || DEFAULT_CONTEXT.targetDistanceMax),
         projectileThreatRange: Math.max(1, Number(input.projectileThreatRange) || DEFAULT_CONTEXT.projectileThreatRange),
     };
@@ -139,42 +289,12 @@ export function buildObservation(player, context = {}, target = null) {
     const radius = Math.max(0.1, Number(player.hitboxRadius) || 0.8);
 
     buildBasisFromPlayer(player);
-
-    const wallFront = sampleWallDistanceRatio(
-        runtimeContext.arena,
-        player.position,
-        TMP_FORWARD,
-        radius,
-        runtimeContext.wallProbeDistance
-    );
-    const wallLeft = sampleWallDistanceRatio(
-        runtimeContext.arena,
-        player.position,
-        TMP_LEFT.copy(TMP_RIGHT).multiplyScalar(-1),
-        radius,
-        runtimeContext.wallProbeDistance
-    );
-    const wallRight = sampleWallDistanceRatio(
-        runtimeContext.arena,
-        player.position,
-        TMP_RIGHT,
-        radius,
-        runtimeContext.wallProbeDistance
-    );
-    const wallUp = sampleWallDistanceRatio(
-        runtimeContext.arena,
-        player.position,
-        TMP_UP,
-        radius,
-        runtimeContext.wallProbeDistance
-    );
-    const wallDown = sampleWallDistanceRatio(
-        runtimeContext.arena,
-        player.position,
-        TMP_DOWN.copy(TMP_UP).multiplyScalar(-1),
-        radius,
-        runtimeContext.wallProbeDistance
-    );
+    const wallRatios = sampleWallRatios(player, runtimeContext, radius);
+    const wallFront = wallRatios[WALL_INDEX_FRONT];
+    const wallLeft = wallRatios[WALL_INDEX_LEFT];
+    const wallRight = wallRatios[WALL_INDEX_RIGHT];
+    const wallUp = wallRatios[WALL_INDEX_UP];
+    const wallDown = wallRatios[WALL_INDEX_DOWN];
 
     const nearestEnemy = findNearestEnemy(player, runtimeContext.players);
     const projectileThreat = computeProjectileThreat(player, runtimeContext.projectiles, runtimeContext.projectileThreatRange);

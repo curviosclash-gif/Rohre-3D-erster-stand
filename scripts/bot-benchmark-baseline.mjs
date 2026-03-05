@@ -214,8 +214,14 @@ async function sampleScenarioPerformance(page, scenarioId) {
     await page.evaluate((id) => {
         const g = window.GAME_INSTANCE;
         if (!g) throw new Error('GAME_INSTANCE missing');
-        if (typeof g.applyBotValidationScenario !== 'function') throw new Error('applyBotValidationScenario missing');
-        const applied = g.applyBotValidationScenario(id);
+        const debugApi = g.debugApi || window.GAME_DEBUG || null;
+        const applyScenario = typeof g.applyBotValidationScenario === 'function'
+            ? g.applyBotValidationScenario.bind(g)
+            : (typeof debugApi?.applyBotValidationScenario === 'function'
+                ? debugApi.applyBotValidationScenario.bind(debugApi)
+                : null);
+        if (typeof applyScenario !== 'function') throw new Error('applyBotValidationScenario missing');
+        const applied = applyScenario(id);
         if (!applied) throw new Error(`Scenario not found: ${id}`);
         g.winsNeeded = 1;
         if (g.settings) g.settings.winsNeeded = 1;

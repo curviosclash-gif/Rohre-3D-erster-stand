@@ -102,6 +102,36 @@ export class MGHitResolver {
         return player.getAimDirection(out).normalize();
     }
 
+    _scanTrailLine(
+        trailSpatialIndex,
+        player,
+        probeRadius,
+        maxRange,
+        sampleStep,
+        skipRecent,
+        allowSelfFallback = false
+    ) {
+        let fallbackSelfHit = null;
+        for (let distance = 0; distance <= maxRange; distance += sampleStep) {
+            this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
+            const hit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
+                excludePlayerIndex: player.index,
+                skipRecent,
+            });
+            if (!hit?.entry) continue;
+
+            const hitPlayerIndex = Number(hit.entry.playerIndex);
+            if (hitPlayerIndex === player.index) {
+                if (allowSelfFallback && !fallbackSelfHit) {
+                    fallbackSelfHit = this._createTrailHit(hit);
+                }
+                continue;
+            }
+            return this._createTrailHit(hit);
+        }
+        return fallbackSelfHit;
+    }
+
     _resolveTrailHit(player, mg, maxRange) {
         const trailSpatialIndex = this.runtime?.getTrailSpatialIndex?.() || this.runtime?.trails?.spatialIndex;
         if (!trailSpatialIndex?.checkProjectileTrailCollision) return null;
@@ -117,44 +147,43 @@ export class MGHitResolver {
 
         this.resolveAimDirection(player, this._tmpAim);
         this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
-        for (let distance = 0; distance <= maxRange; distance += sampleStep) {
-            this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
-            const enemyHit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
-                excludePlayerIndex: player.index,
-                skipRecent: skipSelfCompletely,
-            });
-            if (enemyHit?.entry) {
-                return this._createTrailHit(enemyHit);
-            }
-
-            const hit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
-                excludePlayerIndex: player.index,
-                skipRecent: selfSkipRecent,
-            });
-            if (!hit?.entry) continue;
-
-            if (Number(hit.entry.playerIndex) === player.index) {
-                if (!fallbackSelfHit) {
-                    fallbackSelfHit = this._createTrailHit(hit);
-                }
-                continue;
-            }
-
-            return this._createTrailHit(hit);
+        const enemyHit = this._scanTrailLine(
+            trailSpatialIndex,
+            player,
+            probeRadius,
+            maxRange,
+            sampleStep,
+            skipSelfCompletely,
+            false
+        );
+        if (enemyHit) {
+            return enemyHit;
         }
+
+        fallbackSelfHit = this._scanTrailLine(
+            trailSpatialIndex,
+            player,
+            probeRadius,
+            maxRange,
+            sampleStep,
+            selfSkipRecent,
+            true
+        );
 
         if (fallbackSelfHit) {
             const denseStep = Math.max(0.12, sampleStep * 0.5);
             if (denseStep < sampleStep) {
-                for (let distance = 0; distance <= maxRange; distance += denseStep) {
-                    this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
-                    const enemyHit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
-                        excludePlayerIndex: player.index,
-                        skipRecent: skipSelfCompletely,
-                    });
-                    if (enemyHit?.entry) {
-                        return this._createTrailHit(enemyHit);
-                    }
+                const denseEnemyHit = this._scanTrailLine(
+                    trailSpatialIndex,
+                    player,
+                    probeRadius,
+                    maxRange,
+                    denseStep,
+                    skipSelfCompletely,
+                    false
+                );
+                if (denseEnemyHit) {
+                    return denseEnemyHit;
                 }
             }
         }

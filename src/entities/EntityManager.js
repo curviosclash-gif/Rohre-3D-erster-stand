@@ -189,8 +189,8 @@ export class EntityManager {
         }
     }
 
-    createBotRuntimeContext(player, dt) {
-        return createBotRuntimeContext(this, player, dt);
+    createBotRuntimeContext(player, dt, options = {}) {
+        return createBotRuntimeContext(this, player, dt, options);
     }
 
     spawnAll() {

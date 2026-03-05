@@ -90,67 +90,76 @@ export function createSlingshotGateMesh(position, rotation, color, renderer) {
     return group;
 }
 
-export function createPortalMesh(position, color, direction, renderer) {
+export function createPortalMesh(position, color, direction, renderer, options = {}) {
     const group = new THREE.Group();
     const ringSize = CONFIG.PORTAL.RING_SIZE;
+    const compactMode = options?.compact === true;
 
     let displayColor = color;
     if (direction === 'UP') displayColor = 0x00ff00;
     if (direction === 'DOWN') displayColor = 0xff0000;
 
-    const torusGeo = new THREE.TorusGeometry(ringSize, 0.3, 16, 32);
+    const torusGeo = new THREE.TorusGeometry(
+        ringSize,
+        compactMode ? 0.24 : 0.3,
+        compactMode ? 10 : 16,
+        compactMode ? 20 : 32
+    );
     const torusMat = new THREE.MeshStandardMaterial({
         color: displayColor,
         emissive: displayColor,
-        emissiveIntensity: 1.2,
+        emissiveIntensity: compactMode ? 0.95 : 1.2,
         roughness: 0.2,
         metalness: 0.8,
     });
     const torus = new THREE.Mesh(torusGeo, torusMat);
     group.add(torus);
 
-    const discGeo = new THREE.CircleGeometry(ringSize * 0.85, 32);
+    const discGeo = new THREE.CircleGeometry(ringSize * (compactMode ? 0.82 : 0.85), compactMode ? 20 : 32);
     const discMat = new THREE.MeshBasicMaterial({
         color: displayColor,
         transparent: true,
-        opacity: 0.15,
+        opacity: compactMode ? 0.12 : 0.15,
         side: THREE.DoubleSide,
     });
     const disc = new THREE.Mesh(discGeo, discMat);
     group.add(disc);
 
-    const innerTorusGeo = new THREE.TorusGeometry(ringSize * 0.6, 0.15, 12, 24);
-    const innerTorusMat = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        emissive: displayColor,
-        emissiveIntensity: 0.5,
-        transparent: true,
-        opacity: 0.6,
-    });
-    const innerTorus = new THREE.Mesh(innerTorusGeo, innerTorusMat);
-    group.add(innerTorus);
-
-    if (direction !== 'NEUTRAL') {
-        const arrowGeo = new THREE.ConeGeometry(0.8, 2.5, 8);
-        const arrowMat = new THREE.MeshBasicMaterial({
-            color: displayColor,
+    if (!compactMode) {
+        const innerTorusGeo = new THREE.TorusGeometry(ringSize * 0.6, 0.15, 12, 24);
+        const innerTorusMat = new THREE.MeshStandardMaterial({
+            color: 0xffffff,
+            emissive: displayColor,
+            emissiveIntensity: 0.5,
             transparent: true,
-            opacity: 0.8,
+            opacity: 0.6,
         });
-        const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+        const innerTorus = new THREE.Mesh(innerTorusGeo, innerTorusMat);
+        group.add(innerTorus);
 
-        if (direction === 'UP') {
-            arrow.position.y = 0;
-        } else if (direction === 'DOWN') {
-            arrow.rotation.x = Math.PI;
-            arrow.position.y = 0;
+        if (direction !== 'NEUTRAL') {
+            const arrowGeo = new THREE.ConeGeometry(0.8, 2.5, 8);
+            const arrowMat = new THREE.MeshBasicMaterial({
+                color: displayColor,
+                transparent: true,
+                opacity: 0.8,
+            });
+            const arrow = new THREE.Mesh(arrowGeo, arrowMat);
+
+            if (direction === 'UP') {
+                arrow.position.y = 0;
+            } else if (direction === 'DOWN') {
+                arrow.rotation.x = Math.PI;
+                arrow.position.y = 0;
+            }
+
+            group.add(arrow);
+            group.userData.arrow = arrow;
         }
-
-        group.add(arrow);
-        group.userData.arrow = arrow;
-        group.userData.direction = direction;
     }
 
+    group.userData.direction = direction;
+    group.userData.compact = compactMode;
     group.position.copy(position);
     renderer.addToScene(group);
     return group;

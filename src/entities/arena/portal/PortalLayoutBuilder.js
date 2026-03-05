@@ -27,6 +27,7 @@ export class PortalLayoutBuilder {
     constructor(arena) {
         this.arena = arena;
         this._tmpVec = new THREE.Vector3();
+        this._portalMeshCompactMode = false;
     }
 
     build(map, scale) {
@@ -104,15 +105,18 @@ export class PortalLayoutBuilder {
 
     _buildPortals(map, scale) {
         this.arena.portals = [];
+        this._portalMeshCompactMode = false;
         if (!this.arena.portalsEnabled) return;
 
         const pairCount = Math.max(0, Math.floor(CONFIG.GAMEPLAY.PORTAL_COUNT || 0));
         if (pairCount > 0) {
+            this._portalMeshCompactMode = pairCount >= 3;
             this._buildFixedDynamicPortals(pairCount);
             return;
         }
 
         if (Array.isArray(map.portals)) {
+            this._portalMeshCompactMode = map.portals.length >= 3;
             for (const def of map.portals) {
                 this._createPortalFromDef(def, scale);
             }
@@ -184,8 +188,9 @@ export class PortalLayoutBuilder {
     }
 
     _addPortalInstance(posA, posB, color, dirA = 'NEUTRAL', dirB = 'NEUTRAL') {
-        const meshA = createPortalMesh(posA, color, dirA, this.arena.renderer);
-        const meshB = createPortalMesh(posB, color, dirB, this.arena.renderer);
+        const portalMeshOptions = this._portalMeshCompactMode ? { compact: true } : undefined;
+        const meshA = createPortalMesh(posA, color, dirA, this.arena.renderer, portalMeshOptions);
+        const meshB = createPortalMesh(posB, color, dirB, this.arena.renderer, portalMeshOptions);
         this.arena.portals.push({
             posA,
             posB,

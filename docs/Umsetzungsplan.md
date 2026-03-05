@@ -66,6 +66,12 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - [ ] V16 Event-Playlist/Fun-Modes
   - Rotierende Spezialregeln als zeitlich limitierte Modi fuer Abwechslung und Retention.
   - Zielpfade: `src/core/Config.js`, `src/core/main.js`, `src/ui/MenuController.js`.
+- [ ] V24 Performance-Flaschenhaelse systematisch abbauen
+  - Fokus: CPU/GPU/GC-Hotspots in Bot-Sensing, Trail-Kollision, MG-Tracer, Portal-Rendering und HUD-DOM.
+  - Referenzplan: `docs/Feature_Performance_Flaschenhaelse_Abarbeitung.md`.
+- [ ] V25 Weitere Modularisierung ausserhalb Phase 24
+  - Fokus: Match-/Entity-Orchestrierung, Arena-Build-Pipeline, Map-Datenpfad, Kamera-Rig, Settings-Contracts, Test-Suite-Split.
+  - Referenzplan: `docs/Feature_Modularisierung_V25_Ausserhalb_Phase24.md`.
 - [x] V18 Single-Agent-Durchlauf fuer weitere Modularisierung (ohne Stop)
   - Fokus: `OverheatGunSystem`, `ProjectileSystem`, `main.js`, `Bot.js`, `MenuController` in sequenziellen Phasen fuer einen Agenten.
   - Referenzplan: `docs/Feature_Modularisierung_SingleAgent_Durchlauf.md`.
@@ -138,3 +144,98 @@ Neue Findings aus dem Analysebericht fliessen hier ein.
 - [x] 23.8 Portal/Gate Runtime modularisieren (abgeschlossen 2026-03-04)
 - [x] 23.9 TrailSpatialIndex intern splitten (abgeschlossen 2026-03-04)
 - [x] 23.10 Abschluss, Handover und Doku-Freeze (`docs:sync`, `docs:check`) (abgeschlossen 2026-03-04)
+
+---
+
+## Single-Agent Block V24 (Stand: 2026-03-05)
+
+- Rollenmodell:
+  - Ein Agent setzt die Phasen `24.x` strikt sequenziell um.
+  - Wechsel zur naechsten Phase nur nach bestandenem Phasen-Gate.
+
+- [x] 24.0 Baseline-Freeze und Messprotokoll (abgeschlossen 2026-03-05)
+- [x] 24.1 Quick Win: Observation-Build nur bei Bedarf (abgeschlossen 2026-03-05)
+- [x] 24.2 Observation-Wall-Probing budgetieren (abgeschlossen 2026-03-05)
+- [x] 24.3 Trail-Kollision deduplizieren und Sweep-Kosten senken (abgeschlossen 2026-03-05)
+- [x] 24.4 MG-Tracer pooling und Hit-Sampling straffen (abgeschlossen 2026-03-05)
+- [x] 24.5 Portal/Gate Renderkosten reduzieren (abgeschlossen 2026-03-05)
+- [x] 24.6 HUD/DOM Runtime-Updates weiter entkoppeln (abgeschlossen 2026-03-05)
+- [x] 24.7 Abschluss-Gate, Regression und Doku-Freeze (`docs:sync`, `docs:check`) (abgeschlossen 2026-03-05)
+
+---
+
+## Single-Agent Block V25 (geplant, Stand: 2026-03-05)
+
+- Rollenmodell:
+  - Ein Agent setzt die Phasen `25.x` strikt sequenziell um.
+  - Phase `25.x` darf nur Module enthalten, die nicht in `24.1` bis `24.6` liegen.
+  - Wechsel zur naechsten Phase nur nach bestandenem Teil-Gate.
+
+- [x] 25.0 Baseline + Non-Overlap-Freeze (abgeschlossen 2026-03-05)
+- [ ] 25.1 Match-Lifecycle-Orchestrierung entkoppeln
+- [ ] 25.2 EntityManager in Setup/Spawn/Tick-Pipelines schneiden
+- [ ] 25.3 Arena-Build-Pipeline modularisieren (Cache + Compile-Stufen)
+- [ ] 25.4 Map-Datenpfad modularisieren (Presets + Schema + Loader)
+- [ ] 25.5 CameraRigSystem in Strategien zerlegen (Mode/Collision/Shake)
+- [ ] 25.6 Settings-/RuntimeConfig-Contracts vereinheitlichen
+- [ ] 25.7 Test-Suite modularisieren (Physics/AI/Hunt getrennt)
+- [ ] 25.8 Abschluss-Gate, Regression und Doku-Freeze (`docs:sync`, `docs:check`)
+
+- Kurznotiz 2026-03-05 (25.0):
+  - Scope-Freeze aktiv: keine Bearbeitung der 24.1-24.6 Module (`PlayerInputSystem`, Observation-/Trail-/MG-/Portal-/HUD-Hotpaths).
+  - Lifecycle-Baseline in `tmp/perf_phase25_0_lifecycle_baseline.json`: `domToGameInstanceMs=320`, `startMatchLatencyMs=5179.20`, `returnToMenuLatencyMs=18.20`.
+
+---
+
+## Single-Agent Block V26: Gameplay & Features (geplant, Stand: 2026-03-05)
+
+- Rollenmodell:
+  - Umsetzung der aus dem Backlog freigegebenen Gameplay-Punkte.
+  - Iterativer Durchlauf mit Fokus auf Spielgefuehl und Polish.
+
+- [ ] 26.0 Baseline-Freeze und Gameplay-Metriken erfassen
+- [ ] 26.1 V4 Treffer-/Schadensfeedback (Audio & VFX)
+  - [ ] 26.1.1 Audio-Signale fuer MG, Raketen und Schild implementieren
+  - [ ] 26.1.2 VFX-Signale (Partikel/Flashes) bei Treffern ausbauen
+- [ ] 26.2 V5 Hunt-Mode Feintuning
+  - [ ] 26.2.1 TTK und Overheat-Werte basierend auf Testdaten anpassen
+  - [ ] 26.2.2 Respawn- und Pickup-Logik verfeinern
+- [ ] 26.3 V6 Menue-Schnellpresets ("Arcade", "Competitive", "Chaos")
+- [ ] 26.4 V9 Replay/Ghost-System fuer die letzte Runde aufbauen
+- [ ] 26.5 V11 GLB-Map Loader Integration (Erweiterte Map-Varianz)
+- [ ] 26.6 V16 Event-Playlist / Fun-Modes Mechanik testen
+- [ ] 26.7 Abschluss-Gate, Playtest und Doku-Freeze (`docs:sync`, `docs:check`)
+
+---
+
+## Single-Agent Block V27: Profile, Statistiken & UI (geplant, Stand: 2026-03-05)
+
+- Rollenmodell:
+  - Umsetzung der erweiterten Profil-, UI- und Statistik-Features.
+
+- [ ] 27.0 Baseline-Freeze und UI-Markup-Analyse
+- [ ] 27.1 V7 Profile-UX Ausbau
+  - [ ] 27.1.1 Duplizieren und Import/Export-Funktion
+  - [ ] 27.1.2 Standardprofil-Markierung ergaenzen
+- [ ] 27.2 V8 Post-Match-Statistiken
+  - [ ] 27.2.1 Datenaggregator fuer Round/Match-Stats ausbauen
+  - [ ] 27.2.2 UI-Overlay fuer vertiefte Statistiken am Rundenende
+- [ ] 27.3 V15 Telemetrie-Dashboard fuer iteratives Balancing
+- [ ] 27.4 Abschluss-Gate, UI-Verifikation und Doku-Freeze (`docs:sync`, `docs:check`)
+
+---
+
+## Single-Agent Block V28: Architektur & Performance (geplant, Stand: 2026-03-05)
+
+- Rollenmodell:
+  - Fokus auf Aufloesung von "God-Classes" und tiefen Core-Optimierungen.
+
+- [ ] 28.0 Baseline-Freeze und Regression-Setup
+- [ ] 28.1 Player "God Class" Refactoring
+  - [ ] 28.1.1 Three.js Rendering in `PlayerView` auslagern
+  - [ ] 28.1.2 Input-Handling in `PlayerController` isolieren
+- [ ] 28.2 Bot "God Class" Refactoring
+  - [ ] 28.2.1 Rendering in `BotView` kapseln
+  - [ ] 28.2.2 Sensing/Probing-Logik fuer kuenftiges ML-Training abstrahieren
+- [ ] 28.3 V13 Performance-Hotspot 'maze' (Draw-Calls / Batching optimieren)
+- [ ] 28.4 Abschluss-Gate, Performance-Metrics pruefen und Doku-Freeze (`docs:sync`, `docs:check`)

@@ -39,6 +39,28 @@ export class HUD {
         this._euler = new THREE.Euler();
     }
 
+    _setStyle(element, property, value) {
+        if (!element) return;
+        if (element.style[property] !== value) {
+            element.style[property] = value;
+        }
+    }
+
+    _setText(element, value) {
+        if (!element) return;
+        if (element.textContent !== value) {
+            element.textContent = value;
+        }
+    }
+
+    _setClassFlag(element, className, enabled) {
+        if (!element) return;
+        const hasClass = element.classList.contains(className);
+        if (hasClass !== enabled) {
+            element.classList.toggle(className, enabled);
+        }
+    }
+
     _createPitchLadder() {
         // Create lines for -90 to +90 degrees
         for (let i = -18; i <= 18; i++) { // Every 5 degrees
@@ -127,15 +149,15 @@ export class HUD {
         if (this.boostFill) {
             if (player.isBoosting) {
                 const pct = (player.boostTimer / CONFIG.PLAYER.BOOST_DURATION) * 100;
-                this.boostFill.style.width = `${Math.max(0, pct)}%`;
-                this.boostFill.classList.remove('cooldown');
+                this._setStyle(this.boostFill, 'width', `${Math.max(0, pct)}%`);
+                this._setClassFlag(this.boostFill, 'cooldown', false);
             } else if (player.boostCooldown > 0) {
                 const pct = (1 - player.boostCooldown / CONFIG.PLAYER.BOOST_COOLDOWN) * 100;
-                this.boostFill.style.width = `${Math.min(100, pct)}%`;
-                this.boostFill.classList.add('cooldown');
+                this._setStyle(this.boostFill, 'width', `${Math.min(100, pct)}%`);
+                this._setClassFlag(this.boostFill, 'cooldown', true);
             } else {
-                this.boostFill.style.width = '100%';
-                this.boostFill.classList.remove('cooldown');
+                this._setStyle(this.boostFill, 'width', '100%');
+                this._setClassFlag(this.boostFill, 'cooldown', false);
             }
         }
 
@@ -143,12 +165,12 @@ export class HUD {
             const maxHp = Math.max(1, Number(player.maxHp) || 1);
             const hp = Math.max(0, Number(player.hp) || 0);
             const showLifeBar = maxHp > 1;
-            this.lifeBar.classList.toggle('hidden', !showLifeBar);
+            this._setClassFlag(this.lifeBar, 'hidden', !showLifeBar);
             if (showLifeBar) {
                 const pct = Math.max(0, Math.min(100, (hp / maxHp) * 100));
-                this.lifeFill.style.width = `${pct.toFixed(1)}%`;
+                this._setStyle(this.lifeFill, 'width', `${pct.toFixed(1)}%`);
             } else {
-                this.lifeFill.style.width = '0%';
+                this._setStyle(this.lifeFill, 'width', '0%');
             }
         }
 
@@ -172,38 +194,38 @@ export class HUD {
         const planarMode = !!CONFIG.GAMEPLAY.PLANAR_MODE;
 
         // Stabilized horizon: no roll rotation
-        this.horizon.style.transform = 'translate(-50%, -50%)';
+        this._setStyle(this.horizon, 'transform', 'translate(-50%, -50%)');
 
         // Move Pitch Ladder
         // 8px per degree pitch, without roll coupling
-        this.pitchLadder.style.transform = `translate(-50%, -50%) translateY(${pitchDeg * 8}px)`;
+        this._setStyle(this.pitchLadder, 'transform', `translate(-50%, -50%) translateY(${pitchDeg * 8}px)`);
 
         // Bank indicator: rotating line + angle in center
         if (this.bankLine) {
-            this.bankLine.style.transform = `translate(-50%, -50%) rotate(${rollDeg}deg)`;
+            this._setStyle(this.bankLine, 'transform', `translate(-50%, -50%) rotate(${rollDeg}deg)`);
         }
         if (this.bankAngle) {
             const rollInt = Math.round(rollDeg);
             const sign = rollInt > 0 ? '+' : '';
-            this.bankAngle.textContent = `${sign}${rollInt}°`;
+            this._setText(this.bankAngle, `${sign}${rollInt}°`);
         }
 
         // In non-planar mode the HUD crosshair replaces the DOM crosshair.
         if (this.centerCrosshair) {
-            this.centerCrosshair.classList.toggle('hidden', planarMode);
+            this._setClassFlag(this.centerCrosshair, 'hidden', planarMode);
         }
 
         // 2. Speed & Alt
         const speed = Math.round(player.speed * 10); // Scale up a bit
         const alt = Math.round(player.position.y);
 
-        this.speedValue.textContent = speed;
-        this.altValue.textContent = alt;
+        this._setText(this.speedValue, String(speed));
+        this._setText(this.altValue, String(alt));
 
         // Move Scales (center current value)
         // Using pixel steps defined in creation
-        this.speedScale.style.transform = `translateY(0) translateY(${speed * 2}px)`; // 2px per unit (20px per 10 units)
-        this.altScale.style.transform = `translateY(0) translateY(${alt * 2}px)`;
+        this._setStyle(this.speedScale, 'transform', `translateY(0) translateY(${speed * 2}px)`); // 2px per unit (20px per 10 units)
+        this._setStyle(this.altScale, 'transform', `translateY(0) translateY(${alt * 2}px)`);
 
         // 3. Heading
         let heading = -yawDeg;
@@ -211,12 +233,12 @@ export class HUD {
         heading = heading % 360;
         const headingInt = Math.round(heading);
 
-        this.headingValue.textContent = headingInt.toString().padStart(3, '0');
+        this._setText(this.headingValue, headingInt.toString().padStart(3, '0'));
         // 4px per degree, centered at 50% (offset 360/2 * 4 ?)
         // Simply shift: -heading * 4px
         // But we want 0 (North) centered.
         // Let's just shift text track.
-        this.headingScale.style.transform = `translateX(-50%) translateX(${-heading * 4}px)`;
+        this._setStyle(this.headingScale, 'transform', `translateX(-50%) translateX(${-heading * 4}px)`);
 
         // 4. Lock-On Reticle
         const target = entityManager.getLockOnTarget(player.index);
@@ -232,9 +254,9 @@ export class HUD {
             // NOTE: For now assuming centered lock if strict angle, but proper projection is needed.
             // Let's grab camera from renderer properly.
 
-            this.lockReticle.classList.remove('hidden');
+            this._setClassFlag(this.lockReticle, 'hidden', false);
             const dist = Math.round(player.position.distanceTo(target.position));
-            this.lockDist.textContent = dist + 'm';
+            this._setText(this.lockDist, `${dist}m`);
 
             // Getting screen position requires camera matrix
             // This is tricky without reference.
@@ -249,15 +271,15 @@ export class HUD {
 
                 // Check if behind
                 if (this._vec.z < 1) {
-                    this.lockReticle.style.left = `${x}px`;
-                    this.lockReticle.style.top = `${y}px`;
+                    this._setStyle(this.lockReticle, 'left', `${x}px`);
+                    this._setStyle(this.lockReticle, 'top', `${y}px`);
                 } else {
-                    this.lockReticle.classList.add('hidden'); // Behind camera
+                    this._setClassFlag(this.lockReticle, 'hidden', true); // Behind camera
                 }
             }
 
         } else {
-            this.lockReticle.classList.add('hidden');
+            this._setClassFlag(this.lockReticle, 'hidden', true);
         }
 
     }
