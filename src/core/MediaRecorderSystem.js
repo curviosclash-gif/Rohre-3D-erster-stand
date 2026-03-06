@@ -1,4 +1,7 @@
 const DEFAULT_MIME_CANDIDATES = [
+    'video/mp4;codecs=avc1',
+    'video/mp4',
+    'video/webm;codecs=h264',
     'video/webm;codecs=vp9,opus',
     'video/webm;codecs=vp8,opus',
     'video/webm;codecs=vp9',
@@ -214,9 +217,9 @@ export class MediaRecorderSystem {
         let recorder = null;
         try {
             if (support.selectedMimeType) {
-                recorder = new this._mediaRecorderCtor(stream, { mimeType: support.selectedMimeType });
+                recorder = new this._mediaRecorderCtor(stream, { mimeType: support.selectedMimeType, videoBitsPerSecond: 8000000 });
             } else {
-                recorder = new this._mediaRecorderCtor(stream);
+                recorder = new this._mediaRecorderCtor(stream, { videoBitsPerSecond: 8000000 });
             }
         } catch (error) {
             this._stopStreamTracks(stream);
@@ -244,7 +247,7 @@ export class MediaRecorderSystem {
         };
 
         try {
-            recorder.start();
+            recorder.start(1000);
         } catch (error) {
             this._cleanupRuntimeRecorder();
             this.logger?.warn?.('[MediaRecorderSystem] recorder.start failed', error);
@@ -299,7 +302,7 @@ export class MediaRecorderSystem {
         const startedAt = activeRecording?.startedAt || endedAtMs;
         const mode = sanitizeFileToken(activeRecording?.trigger?.context?.activeGameMode, 'classic');
         const matchId = sanitizeFileToken(activeRecording?.trigger?.context?.sessionId, 'session');
-        const ext = mimeType.includes('webm') ? 'webm' : 'video';
+        const ext = mimeType.includes('webm') ? 'webm' : mimeType.includes('mp4') ? 'mp4' : 'video';
         return `${this.filePrefix}-${mode}-${matchId}-${toSafeDatePart(startedAt)}-${toSafeDatePart(endedAtMs)}.${ext}`;
     }
 
@@ -335,14 +338,32 @@ export class MediaRecorderSystem {
         };
 
         if (this.autoDownload && blob.size > 0) {
+            const doFallback = () => {
+                try {
+                    this.downloadHandler({
+                        blob,
+                        fileName: downloadFileName || fileName,
+                        mimeType,
+                    });
+                } catch (error) {
+                    this.logger?.warn?.('[MediaRecorderSystem] auto download fallback failed', error);
+                }
+            };
+
             try {
-                this.downloadHandler({
-                    blob,
-                    fileName: downloadFileName || fileName,
-                    mimeType,
+                fetch('/api/editor/save-video-disk', {
+                    method: 'POST',
+                    headers: { 'x-file-name': downloadFileName || fileName },
+                    body: blob
+                }).then(res => {
+                    if (!res.ok) throw new Error('Network response was not ok');
+                    this.logger?.info?.('[MediaRecorderSystem] Video saved to disk successfully via API.', downloadFileName || fileName);
+                }).catch(error => {
+                    this.logger?.warn?.('[MediaRecorderSystem] API save failed, falling back to browser download', error);
+                    doFallback();
                 });
             } catch (error) {
-                this.logger?.warn?.('[MediaRecorderSystem] auto download failed', error);
+                doFallback();
             }
         }
 

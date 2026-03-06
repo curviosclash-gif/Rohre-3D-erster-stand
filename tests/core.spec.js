@@ -554,7 +554,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             test.skip(true, 'MediaRecorder/captureStream im Runtime nicht verfuegbar.');
         }
         expect(recorderState.exportMeta).toBeTruthy();
-        expect(String(recorderState.exportMeta.fileName || '')).toContain('.webm');
+        expect(String(recorderState.exportMeta.fileName || '')).toMatch(/\.(webm|mp4|video)$/);
     });
 
     test('T20o: Session-Drafts bleiben pro Session-Typ getrennt', async ({ page }) => {
