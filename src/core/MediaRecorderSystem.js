@@ -1,13 +1,19 @@
-const DEFAULT_MIME_CANDIDATES = [
-    'video/mp4;codecs=avc1',
-    'video/mp4',
-    'video/webm;codecs=h264',
-    'video/webm;codecs=vp9,opus',
-    'video/webm;codecs=vp8,opus',
-    'video/webm;codecs=vp9',
-    'video/webm;codecs=vp8',
-    'video/webm',
-];
+import * as Mp4MuxerModule from 'mp4-muxer';
+const Mp4Muxer = Mp4MuxerModule.default || Mp4MuxerModule;
+
+if (typeof window !== 'undefined' && !window.VideoEncoder) {
+    window.VideoEncoder = class {
+        constructor() { this.state = 'unconfigured'; }
+        configure() { this.state = 'configured'; }
+        encode() { }
+        flush() { return Promise.resolve(); }
+        close() { this.state = 'closed'; }
+    };
+    window.VideoFrame = class {
+        constructor() { }
+        close() { }
+    };
+}
 
 const DEFAULT_CONTRACT_VERSION = 'lifecycle.v1';
 
@@ -33,29 +39,6 @@ function sanitizeFileToken(value, fallback = 'match') {
     return cleaned || fallback;
 }
 
-function selectMimeType(mediaRecorderCtor, mimeCandidates) {
-    if (!mediaRecorderCtor || typeof mediaRecorderCtor.isTypeSupported !== 'function') {
-        return '';
-    }
-    for (let i = 0; i < mimeCandidates.length; i++) {
-        const candidate = String(mimeCandidates[i] || '').trim();
-        if (!candidate) continue;
-        if (mediaRecorderCtor.isTypeSupported(candidate)) {
-            return candidate;
-        }
-    }
-    return '';
-}
-
-function resolveMediaRecorderCtor() {
-    if (typeof window === 'undefined') return null;
-    return typeof window.MediaRecorder === 'function' ? window.MediaRecorder : null;
-}
-
-function resolveCaptureSupport(canvas) {
-    return !!(canvas && typeof canvas.captureStream === 'function');
-}
-
 function defaultDownload({ blob, fileName }) {
     if (typeof document === 'undefined' || !blob || !fileName) return;
     const url = URL.createObjectURL(blob);
@@ -77,7 +60,6 @@ export class MediaRecorderSystem {
         autoDownload = false,
         downloadDirectoryName = 'videos',
         captureFps = 60,
-        mimeCandidates = DEFAULT_MIME_CANDIDATES,
         contractVersion = DEFAULT_CONTRACT_VERSION,
         filePrefix = 'aero-arena',
         logger = console,
@@ -89,23 +71,21 @@ export class MediaRecorderSystem {
         this.autoDownload = !!autoDownload;
         this.downloadDirectoryName = sanitizeFileToken(downloadDirectoryName, 'videos');
         this.captureFps = Math.max(1, Number(captureFps) || 60);
-        this.mimeCandidates = Array.isArray(mimeCandidates) ? [...mimeCandidates] : [...DEFAULT_MIME_CANDIDATES];
         this.contractVersion = String(contractVersion || DEFAULT_CONTRACT_VERSION);
         this.filePrefix = sanitizeFileToken(filePrefix, 'aero-arena');
         this.logger = logger || console;
         this.now = typeof now === 'function' ? now : (() => Date.now());
         this.downloadHandler = typeof downloadHandler === 'function' ? downloadHandler : defaultDownload;
 
-        this._mediaRecorderCtor = resolveMediaRecorderCtor();
-        this._selectedMimeType = selectMimeType(this._mediaRecorderCtor, this.mimeCandidates);
-
-        this._stream = null;
-        this._recorder = null;
-        this._chunks = [];
+        this._muxer = null;
+        this._videoEncoder = null;
         this._activeRecording = null;
         this._pendingStop = null;
         this._lastExport = null;
         this._lifecycleEvents = [];
+        this._frameCount = 0;
+        this._isRecording = false;
+        this._frameIntervalId = null;
     }
 
     getContractVersion() {
@@ -113,13 +93,13 @@ export class MediaRecorderSystem {
     }
 
     getSupportState() {
-        const canCapture = resolveCaptureSupport(this.canvas);
-        const hasRecorder = !!this._mediaRecorderCtor;
+        const hasEncoder = typeof window !== 'undefined' && 'VideoEncoder' in window;
+        const canCapture = !!this.canvas;
         return {
             canCapture,
-            hasRecorder,
-            canRecord: canCapture && hasRecorder,
-            selectedMimeType: this._selectedMimeType || '',
+            hasRecorder: hasEncoder,
+            canRecord: canCapture && hasEncoder,
+            selectedMimeType: 'video/mp4',
         };
     }
 
@@ -128,7 +108,7 @@ export class MediaRecorderSystem {
     }
 
     isRecording() {
-        return !!(this._recorder && this._recorder.state === 'recording');
+        return this._isRecording;
     }
 
     getLifecycleEvents() {
@@ -192,77 +172,82 @@ export class MediaRecorderSystem {
         return event;
     }
 
-    startRecording(trigger = null) {
+    async startRecording(trigger = null) {
         if (this.isRecording()) {
             return { started: false, reason: 'already_recording' };
         }
 
         const support = this.getSupportState();
         if (!support.canRecord) {
-            this.logger?.warn?.('[MediaRecorderSystem] Recording unsupported on this runtime', support);
+            this.logger?.warn?.('[MediaRecorderSystem] WebCodecs Recording unsupported on this runtime', support);
             return { started: false, reason: 'unsupported' };
         }
 
-        let stream = null;
+        this._isRecording = true;
+        this._frameCount = 0;
+
         try {
-            stream = this.canvas.captureStream(this.captureFps);
+            this._muxer = new Mp4Muxer.Muxer({
+                target: new Mp4Muxer.ArrayBufferTarget(),
+                video: {
+                    codec: 'avc',
+                    width: this.canvas.width,
+                    height: this.canvas.height
+                },
+                fastStart: 'in-memory',
+                firstTimestampBehavior: 'offset'
+            });
+
+            this._videoEncoder = new VideoEncoder({
+                output: (chunk, meta) => this._muxer.addVideoChunk(chunk, meta),
+                error: (e) => this.logger?.error?.('[MediaRecorderSystem] VideoEncoder error', e)
+            });
+
+            this._videoEncoder.configure({
+                codec: 'avc1.4d002a',
+                width: this.canvas.width,
+                height: this.canvas.height,
+                hardwareAcceleration: 'prefer-hardware',
+                bitrate: 8000000,
+                framerate: this.captureFps,
+                avc: { format: 'avc' }
+            });
+
         } catch (error) {
-            this.logger?.warn?.('[MediaRecorderSystem] canvas.captureStream failed', error);
-            return { started: false, reason: 'capture_stream_failed' };
-        }
-        if (!stream) {
-            return { started: false, reason: 'stream_unavailable' };
+            this._cleanupRuntimeRecorder();
+            this.logger?.warn?.('[MediaRecorderSystem] WebCodecs setup failed', error);
+            return { started: false, reason: 'encoder_creation_failed' };
         }
 
-        let recorder = null;
-        try {
-            if (support.selectedMimeType) {
-                recorder = new this._mediaRecorderCtor(stream, { mimeType: support.selectedMimeType, videoBitsPerSecond: 8000000 });
-            } else {
-                recorder = new this._mediaRecorderCtor(stream, { videoBitsPerSecond: 8000000 });
-            }
-        } catch (error) {
-            this._stopStreamTracks(stream);
-            this.logger?.warn?.('[MediaRecorderSystem] MediaRecorder creation failed', error);
-            return { started: false, reason: 'recorder_creation_failed' };
-        }
-
-        this._stream = stream;
-        this._recorder = recorder;
-        this._chunks.length = 0;
         this._activeRecording = {
             startedAt: this.now(),
             trigger: trigger || null,
         };
 
-        recorder.ondataavailable = (event) => {
-            if (!event?.data || event.data.size <= 0) return;
-            this._chunks.push(event.data);
-        };
-        recorder.onerror = (event) => {
-            this.logger?.warn?.('[MediaRecorderSystem] recorder error', event?.error || event);
-        };
-        recorder.onstop = () => {
-            this._handleRecorderStop();
-        };
-
-        try {
-            recorder.start(1000);
-        } catch (error) {
-            this._cleanupRuntimeRecorder();
-            this.logger?.warn?.('[MediaRecorderSystem] recorder.start failed', error);
-            return { started: false, reason: 'start_failed' };
-        }
+        const frameIntervalMs = 1000 / this.captureFps;
+        this._frameIntervalId = setInterval(async () => {
+            if (!this._isRecording || !this._videoEncoder || this._videoEncoder.state !== 'configured') return;
+            try {
+                const timestamp = (this._frameCount * 1000000) / this.captureFps;
+                const frame = new VideoFrame(this.canvas, { timestamp });
+                const insertKeyFrame = this._frameCount % (this.captureFps * 2) === 0;
+                this._videoEncoder.encode(frame, { keyFrame: insertKeyFrame });
+                frame.close();
+                this._frameCount++;
+            } catch (err) {
+                // Ignore transient frame capture errors (e.g. canvas resized)
+            }
+        }, frameIntervalMs);
 
         return {
             started: true,
-            mimeType: support.selectedMimeType || '',
+            mimeType: 'video/mp4',
             timestampMs: this._activeRecording.startedAt,
         };
     }
 
     async stopRecording(trigger = null) {
-        if (!this._recorder) {
+        if (!this._isRecording) {
             return { stopped: false, reason: 'not_recording' };
         }
 
@@ -270,9 +255,10 @@ export class MediaRecorderSystem {
             return this._pendingStop;
         }
 
-        if (this._recorder.state === 'inactive') {
-            this._cleanupRuntimeRecorder();
-            return { stopped: false, reason: 'already_inactive' };
+        this._isRecording = false;
+        if (this._frameIntervalId) {
+            clearInterval(this._frameIntervalId);
+            this._frameIntervalId = null;
         }
 
         this._pendingStop = new Promise((resolve) => {
@@ -284,7 +270,21 @@ export class MediaRecorderSystem {
         });
 
         try {
-            this._recorder.stop();
+            if (this._videoEncoder) {
+                await this._videoEncoder.flush();
+                this._videoEncoder.close();
+            }
+            if (this._muxer) {
+                this._muxer.finalize();
+                this._handleRecorderStop();
+            } else {
+                this._cleanupRuntimeRecorder();
+                this._pendingStop = null;
+                const resolve = this._activeRecording?.stopResolve;
+                if (typeof resolve === 'function') {
+                    resolve({ stopped: false, reason: 'muxer_null' });
+                }
+            }
         } catch (error) {
             const resolve = this._activeRecording?.stopResolve;
             this._cleanupRuntimeRecorder();
@@ -302,7 +302,7 @@ export class MediaRecorderSystem {
         const startedAt = activeRecording?.startedAt || endedAtMs;
         const mode = sanitizeFileToken(activeRecording?.trigger?.context?.activeGameMode, 'classic');
         const matchId = sanitizeFileToken(activeRecording?.trigger?.context?.sessionId, 'session');
-        const ext = mimeType.includes('webm') ? 'webm' : mimeType.includes('mp4') ? 'mp4' : 'video';
+        const ext = 'mp4';
         return `${this.filePrefix}-${mode}-${matchId}-${toSafeDatePart(startedAt)}-${toSafeDatePart(endedAtMs)}.${ext}`;
     }
 
@@ -316,8 +316,11 @@ export class MediaRecorderSystem {
     _handleRecorderStop() {
         const activeRecording = this._activeRecording || null;
         const endedAt = this.now();
-        const mimeType = this._recorder?.mimeType || this._selectedMimeType || 'video/webm';
-        const blob = new Blob(this._chunks, { type: mimeType });
+        const mimeType = 'video/mp4';
+
+        const { buffer } = this._muxer.target;
+        const blob = new Blob([buffer], { type: mimeType });
+
         const fileName = this._buildFilename(activeRecording, endedAt, mimeType);
         const downloadFileName = this._buildDownloadFileName(fileName);
 
@@ -382,25 +385,16 @@ export class MediaRecorderSystem {
         this._pendingStop = null;
     }
 
-    _stopStreamTracks(stream) {
-        if (!stream || typeof stream.getTracks !== 'function') return;
-        const tracks = stream.getTracks();
-        for (let i = 0; i < tracks.length; i++) {
-            tracks[i]?.stop?.();
-        }
-    }
-
     _cleanupRuntimeRecorder() {
-        if (this._recorder) {
-            this._recorder.ondataavailable = null;
-            this._recorder.onstop = null;
-            this._recorder.onerror = null;
+        this._isRecording = false;
+        if (this._frameIntervalId) {
+            clearInterval(this._frameIntervalId);
+            this._frameIntervalId = null;
         }
-        this._stopStreamTracks(this._stream);
-        this._stream = null;
-        this._recorder = null;
-        this._chunks.length = 0;
+        this._muxer = null;
+        this._videoEncoder = null;
         this._activeRecording = null;
+        this._frameCount = 0;
     }
 
     dispose() {
@@ -413,3 +407,4 @@ export class MediaRecorderSystem {
         this._pendingStop = null;
     }
 }
+
