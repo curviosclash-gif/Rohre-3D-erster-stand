@@ -13,6 +13,10 @@ import {
     startGame,
 } from './helpers.js';
 
+const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
+const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
+const MENU_PRESETS_STORAGE_KEY = 'cuviosclash.menu-presets.v1';
+
 test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T1: Seite lädt ohne JS-Fehler', async ({ page }) => {
@@ -101,7 +105,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await loadGame(page);
         const roundTrip = await page.evaluate(() => {
             try {
-                const key = 'aero-arena-3d.settings.v1';
+                const key = 'cuviosclash.settings.v1';
                 const data = { test: true, ts: Date.now() };
                 localStorage.setItem(key, JSON.stringify(data));
                 const loaded = JSON.parse(localStorage.getItem(key));
@@ -110,6 +114,41 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             } catch { return false; }
         });
         expect(roundTrip).toBeTruthy();
+    });
+
+    test('T12b: Legacy localStorage Settings-Key wird nach CuviosClash migriert', async ({ page }) => {
+        await loadGame(page);
+        await page.evaluate(({ currentKey, legacyKey }) => {
+            localStorage.removeItem(currentKey);
+            localStorage.setItem(legacyKey, JSON.stringify({
+                mapKey: 'maze',
+                winsNeeded: 7,
+            }));
+        }, {
+            currentKey: SETTINGS_STORAGE_KEY,
+            legacyKey: LEGACY_SETTINGS_STORAGE_KEY,
+        });
+
+        await page.reload();
+        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
+
+        const migratedState = await page.evaluate(({ currentKey }) => ({
+            mapKey: window.GAME_INSTANCE?.settings?.mapKey,
+            winsNeeded: window.GAME_INSTANCE?.settings?.winsNeeded,
+            hasNewKey: !!localStorage.getItem(currentKey),
+        }), { currentKey: SETTINGS_STORAGE_KEY });
+
+        expect(migratedState.mapKey).toBe('maze');
+        expect(migratedState.winsNeeded).toBe(7);
+        expect(migratedState.hasNewKey).toBeTruthy();
+
+        await page.evaluate(({ currentKey, legacyKey }) => {
+            localStorage.removeItem(currentKey);
+            localStorage.removeItem(legacyKey);
+        }, {
+            currentKey: SETTINGS_STORAGE_KEY,
+            legacyKey: LEGACY_SETTINGS_STORAGE_KEY,
+        });
     });
 
     test('T13: Keine Fehler 2s nach Laden', async ({ page }) => {
@@ -270,14 +309,14 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T20e: Open-Preset speichert Metadatenvertrag vollstaendig', async ({ page }) => {
         await loadGame(page);
-        await page.evaluate(() => localStorage.removeItem('aero-arena-3d.menu-presets.v1'));
+        await page.evaluate((storageKey) => localStorage.removeItem(storageKey), MENU_PRESETS_STORAGE_KEY);
         await openLevel4Drawer(page);
         await page.fill('#preset-name', 'Open Preset QA');
         await page.click('#btn-preset-save-open');
         await page.waitForTimeout(120);
 
         const contractState = await page.evaluate(() => {
-            const raw = localStorage.getItem('aero-arena-3d.menu-presets.v1');
+            const raw = localStorage.getItem('cuviosclash.menu-presets.v1');
             const parsed = raw ? JSON.parse(raw) : {};
             const presets = Array.isArray(parsed?.presets) ? parsed.presets : [];
             const openPreset = presets.find((preset) => preset?.metadata?.kind === 'open');
@@ -690,5 +729,40 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
         await page.keyboard.press('Escape');
         await expect(page.locator('#menu-nav')).toBeVisible();
+    });
+
+    test('T20v: Ebene 3 schaltet nur Classic 3D/Planar und aendert nicht Fight-Auswahl aus Ebene 2', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path=\"fight\"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+
+        await page.click('#btn-dimension-planar');
+        await page.waitForTimeout(120);
+        let state = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            return {
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                gameMode: String(game?.settings?.gameMode || ''),
+                planarMode: !!game?.settings?.gameplay?.planarMode,
+            };
+        });
+        expect(state.modePath).toBe('fight');
+        expect(state.gameMode).toBe('HUNT');
+        expect(state.planarMode).toBeTruthy();
+
+        await page.click('#btn-dimension-classic-3d');
+        await page.waitForTimeout(120);
+        state = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            return {
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                gameMode: String(game?.settings?.gameMode || ''),
+                planarMode: !!game?.settings?.gameplay?.planarMode,
+            };
+        });
+        expect(state.modePath).toBe('fight');
+        expect(state.gameMode).toBe('HUNT');
+        expect(state.planarMode).toBeFalsy();
     });
 });

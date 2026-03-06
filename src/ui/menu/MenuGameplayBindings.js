@@ -15,6 +15,21 @@ export function setupMenuGameplayBindings(ctx) {
     const eventTypes = ctx.eventTypes;
     const keys = ctx.settingsChangeKeys;
     const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
+    const applyPlanarMode = (enabled) => {
+        if (!settings.gameplay) settings.gameplay = {};
+        settings.gameplay.planarMode = !!enabled;
+        const changedKeys = [keys.GAMEPLAY_PLANAR_MODE];
+
+        if (settings.gameplay.planarMode && (settings.gameplay.portalCount || 0) === 0) {
+            settings.gameplay.portalCount = 4;
+            changedKeys.push(keys.GAMEPLAY_PORTAL_COUNT);
+            emit(eventTypes.SHOW_STATUS_TOAST, {
+                message: 'Ebenen-Modus: 4 Portale aktiviert',
+            });
+        }
+
+        emitSettingsChangedImmediate(changedKeys);
+    };
 
     if (Array.isArray(ui.sessionButtons)) {
         ui.sessionButtons.forEach((button) => {
@@ -74,6 +89,16 @@ export function setupMenuGameplayBindings(ctx) {
                     changedKeys.push(keys.HUNT_RESPAWN_ENABLED);
                 }
                 emitSettingsChangedImmediate(changedKeys);
+            });
+        });
+    }
+
+    if (Array.isArray(ui.dimensionModeButtons)) {
+        ui.dimensionModeButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const planarRaw = String(btn?.dataset?.planarMode || '').trim().toLowerCase();
+                const planarEnabled = planarRaw === 'true' || planarRaw === '1' || planarRaw === 'yes';
+                applyPlanarMode(planarEnabled);
             });
         });
     }
@@ -163,19 +188,7 @@ export function setupMenuGameplayBindings(ctx) {
     const planarModeToggle = document.getElementById('planar-mode-toggle');
     if (planarModeToggle) {
         planarModeToggle.addEventListener('change', (e) => {
-            if (!settings.gameplay) settings.gameplay = {};
-            settings.gameplay.planarMode = e.target.checked;
-            const changedKeys = [keys.GAMEPLAY_PLANAR_MODE];
-
-            if (settings.gameplay.planarMode && (settings.gameplay.portalCount || 0) === 0) {
-                settings.gameplay.portalCount = 4;
-                changedKeys.push(keys.GAMEPLAY_PORTAL_COUNT);
-                emit(eventTypes.SHOW_STATUS_TOAST, {
-                    message: 'Ebenen-Modus: 4 Portale aktiviert',
-                });
-            }
-
-            emitSettingsChangedImmediate(changedKeys);
+            applyPlanarMode(!!e.target.checked);
         });
     }
 

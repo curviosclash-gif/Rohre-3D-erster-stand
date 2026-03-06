@@ -2,10 +2,19 @@
 // SettingsStore.js - localStorage persistence for settings and profiles
 // ============================================
 
-const SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
-const SETTINGS_STORAGE_LEGACY_KEYS = ['mini-curve-fever-3d.settings.v4', 'mini-curve-fever-3d.settings.v3'];
-const SETTINGS_PROFILES_STORAGE_KEY = 'aero-arena-3d.settings-profiles.v1';
-const MENU_PRESETS_STORAGE_KEY = 'aero-arena-3d.menu-presets.v1';
+import {
+    LEGACY_STORAGE_KEYS,
+    STORAGE_KEYS,
+    migrateStorageValue,
+    readFirstAvailableStorageValue,
+} from './StorageKeys.js';
+
+const SETTINGS_STORAGE_KEY = STORAGE_KEYS.settings;
+const SETTINGS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settings;
+const SETTINGS_PROFILES_STORAGE_KEY = STORAGE_KEYS.settingsProfiles;
+const SETTINGS_PROFILES_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settingsProfiles;
+const MENU_PRESETS_STORAGE_KEY = STORAGE_KEYS.menuPresets;
+const MENU_PRESETS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
 
 function getDefaultStorage() {
     try {
@@ -30,7 +39,13 @@ export class SettingsStore {
             ? [...options.settingsStorageLegacyKeys]
             : [...SETTINGS_STORAGE_LEGACY_KEYS];
         this.settingsProfilesStorageKey = options.settingsProfilesStorageKey || SETTINGS_PROFILES_STORAGE_KEY;
+        this.settingsProfilesStorageLegacyKeys = Array.isArray(options.settingsProfilesStorageLegacyKeys)
+            ? [...options.settingsProfilesStorageLegacyKeys]
+            : [...SETTINGS_PROFILES_STORAGE_LEGACY_KEYS];
         this.menuPresetsStorageKey = options.menuPresetsStorageKey || MENU_PRESETS_STORAGE_KEY;
+        this.menuPresetsStorageLegacyKeys = Array.isArray(options.menuPresetsStorageLegacyKeys)
+            ? [...options.menuPresetsStorageLegacyKeys]
+            : [...MENU_PRESETS_STORAGE_LEGACY_KEYS];
     }
 
     loadSettings() {
@@ -39,13 +54,16 @@ export class SettingsStore {
         }
 
         try {
-            const keys = [this.settingsStorageKey, ...this.settingsStorageLegacyKeys];
-            for (const key of keys) {
-                const raw = this.storage.getItem(key);
-                if (!raw) continue;
-                const saved = JSON.parse(raw);
-                return this.sanitizeSettings(saved);
-            }
+            const resolved = readFirstAvailableStorageValue(
+                this.storage,
+                this.settingsStorageKey,
+                this.settingsStorageLegacyKeys
+            );
+            if (!resolved) return this.createDefaultSettings();
+            const saved = JSON.parse(resolved.raw);
+            const sanitized = this.sanitizeSettings(saved);
+            migrateStorageValue(this.storage, this.settingsStorageKey, resolved);
+            return sanitized;
         } catch {
             // Ignore malformed storage and fall back to defaults.
         }
@@ -72,9 +90,13 @@ export class SettingsStore {
         }
 
         try {
-            const raw = this.storage.getItem(this.settingsProfilesStorageKey);
-            if (!raw) return [];
-            const parsed = JSON.parse(raw);
+            const resolved = readFirstAvailableStorageValue(
+                this.storage,
+                this.settingsProfilesStorageKey,
+                this.settingsProfilesStorageLegacyKeys
+            );
+            if (!resolved) return [];
+            const parsed = JSON.parse(resolved.raw);
             if (!Array.isArray(parsed)) return [];
 
             const out = [];
@@ -91,6 +113,7 @@ export class SettingsStore {
                 });
             }
             out.sort((a, b) => b.updatedAt - a.updatedAt);
+            migrateStorageValue(this.storage, this.settingsProfilesStorageKey, resolved);
             return out;
         } catch {
             return [];
@@ -119,9 +142,15 @@ export class SettingsStore {
         }
 
         try {
-            const raw = this.storage.getItem(key);
-            if (!raw) return fallbackValue;
-            return JSON.parse(raw);
+            const resolved = readFirstAvailableStorageValue(
+                this.storage,
+                key,
+                this._resolveLegacyKeysForStorageKey(key)
+            );
+            if (!resolved) return fallbackValue;
+            const parsed = JSON.parse(resolved.raw);
+            migrateStorageValue(this.storage, key, resolved);
+            return parsed;
         } catch {
             return fallbackValue;
         }
@@ -140,6 +169,19 @@ export class SettingsStore {
         } catch {
             return false;
         }
+    }
+
+    _resolveLegacyKeysForStorageKey(storageKey) {
+        if (storageKey === this.settingsStorageKey) {
+            return this.settingsStorageLegacyKeys;
+        }
+        if (storageKey === this.settingsProfilesStorageKey) {
+            return this.settingsProfilesStorageLegacyKeys;
+        }
+        if (storageKey === this.menuPresetsStorageKey) {
+            return this.menuPresetsStorageLegacyKeys;
+        }
+        return [];
     }
 
     normalizeProfileName(rawName) {

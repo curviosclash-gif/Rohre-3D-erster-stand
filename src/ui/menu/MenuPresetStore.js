@@ -1,7 +1,14 @@
 import { findFixedMenuPresetById, getFixedMenuPresetCatalog } from './MenuPresetCatalog.js';
 import { createPresetMetadata } from './MenuPresetApplyOps.js';
+import {
+    LEGACY_STORAGE_KEYS,
+    STORAGE_KEYS,
+    migrateStorageValue,
+    readFirstAvailableStorageValue,
+} from '../StorageKeys.js';
 
-const MENU_PRESET_STORAGE_KEY = 'aero-arena-3d.menu-presets.v1';
+const MENU_PRESET_STORAGE_KEY = STORAGE_KEYS.menuPresets;
+const MENU_PRESET_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
 const MENU_PRESET_STORAGE_SCHEMA_VERSION = 'menu-preset-store.v1';
 
 function getDefaultStorage() {
@@ -68,6 +75,9 @@ export class MenuPresetStore {
     constructor(options = {}) {
         this.storage = options.storage ?? getDefaultStorage();
         this.storageKey = options.storageKey || MENU_PRESET_STORAGE_KEY;
+        this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
+            ? [...options.storageLegacyKeys]
+            : [...MENU_PRESET_STORAGE_LEGACY_KEYS];
         this.fixedCatalog = Array.isArray(options.fixedCatalog) && options.fixedCatalog.length > 0
             ? options.fixedCatalog.map((preset) => ensurePresetMetadataContract(preset))
             : getFixedMenuPresetCatalog().map((preset) => ensurePresetMetadataContract(preset));
@@ -84,10 +94,11 @@ export class MenuPresetStore {
         }
 
         try {
-            const raw = this.storage.getItem(this.storageKey);
-            if (!raw) return [];
-            const parsed = JSON.parse(raw);
+            const resolved = readFirstAvailableStorageValue(this.storage, this.storageKey, this.storageLegacyKeys);
+            if (!resolved) return [];
+            const parsed = JSON.parse(resolved.raw);
             const presets = Array.isArray(parsed?.presets) ? parsed.presets : [];
+            migrateStorageValue(this.storage, this.storageKey, resolved);
             return presets
                 .map((preset) => ensurePresetMetadataContract(preset))
                 .filter(Boolean);

@@ -284,13 +284,14 @@ export class UIManager {
     }
 
     _getStartFieldBinding(fieldKey) {
+        const dimensionModeButton = Array.isArray(this.ui.dimensionModeButtons) ? this.ui.dimensionModeButtons[0] : null;
         const gameModeButton = Array.isArray(this.ui.gameModeButtons) ? this.ui.gameModeButtons[0] : null;
         const bindings = {
             map: { control: this.ui.mapSelect, hint: this.ui.mapFieldHint },
             vehicleP1: { control: this.ui.vehicleSelectP1, hint: this.ui.vehicleP1FieldHint },
             vehicleP2: { control: this.ui.vehicleSelectP2, hint: this.ui.vehicleP2FieldHint },
             theme: { control: this.ui.themeModeSelect, hint: this.ui.themeFieldHint },
-            match: { control: gameModeButton || this.ui.huntRespawnToggle, hint: this.ui.matchFieldHint },
+            match: { control: dimensionModeButton || gameModeButton || this.ui.huntRespawnToggle, hint: this.ui.matchFieldHint },
             multiplayer: { control: this.ui.multiplayerLobbyCodeInput, hint: this.ui.matchFieldHint },
         };
         return bindings[fieldKey] || { control: null, hint: null };
@@ -685,11 +686,6 @@ export class UIManager {
                 btn.title = btn.disabled ? 'Hunt-Modus ist per Feature-Flag deaktiviert' : '';
             });
         }
-        if (ui.huntModeHint) {
-            ui.huntModeHint.textContent = huntFeatureEnabled
-                ? 'Regelset fuer die laufende Session waehlen.'
-                : 'Hunt-Modus ist per Feature-Flag deaktiviert.';
-        }
         if (ui.huntRespawnRow) {
             ui.huntRespawnRow.classList.toggle('hidden', resolvedGameMode !== GAME_MODE_TYPES.HUNT);
         }
@@ -754,6 +750,15 @@ export class UIManager {
 
         const planarToggle = document.getElementById('planar-mode-toggle');
         if (planarToggle) planarToggle.checked = !!gp.planarMode;
+        if (Array.isArray(ui.dimensionModeButtons)) {
+            ui.dimensionModeButtons.forEach((button) => {
+                const planarRaw = String(button?.dataset?.planarMode || '').trim().toLowerCase();
+                const buttonPlanarMode = planarRaw === 'true' || planarRaw === '1' || planarRaw === 'yes';
+                const isActive = buttonPlanarMode === !!gp.planarMode;
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-pressed', String(isActive));
+            });
+        }
     }
 
     syncVehicles(settings = this.game.settings) {

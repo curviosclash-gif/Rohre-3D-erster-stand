@@ -1,6 +1,13 @@
 import { MENU_SESSION_TYPES } from './MenuStateContracts.js';
+import {
+    LEGACY_STORAGE_KEYS,
+    STORAGE_KEYS,
+    migrateStorageValue,
+    readFirstAvailableStorageValue,
+} from '../StorageKeys.js';
 
-const MENU_DRAFT_STORAGE_KEY = 'aero-arena-3d.menu-drafts.v1';
+const MENU_DRAFT_STORAGE_KEY = STORAGE_KEYS.menuDrafts;
+const MENU_DRAFT_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_SCHEMA_VERSION = 'menu-draft-store.v1';
 
 const VALID_SESSION_TYPE_SET = new Set(Object.values(MENU_SESSION_TYPES));
@@ -99,6 +106,9 @@ export class MenuDraftStore {
     constructor(options = {}) {
         this.storage = options.storage ?? getDefaultStorage();
         this.storageKey = options.storageKey || MENU_DRAFT_STORAGE_KEY;
+        this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
+            ? [...options.storageLegacyKeys]
+            : [...MENU_DRAFT_STORAGE_LEGACY_KEYS];
     }
 
     _loadStore() {
@@ -107,9 +117,10 @@ export class MenuDraftStore {
         }
 
         try {
-            const raw = this.storage.getItem(this.storageKey);
-            if (!raw) return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
-            const parsed = JSON.parse(raw);
+            const resolved = readFirstAvailableStorageValue(this.storage, this.storageKey, this.storageLegacyKeys);
+            if (!resolved) return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
+            const parsed = JSON.parse(resolved.raw);
+            migrateStorageValue(this.storage, this.storageKey, resolved);
             return {
                 schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION,
                 drafts: parsed?.drafts && typeof parsed.drafts === 'object' ? parsed.drafts : {},

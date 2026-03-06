@@ -1,4 +1,12 @@
-const MENU_TEXT_OVERRIDE_STORAGE_KEY = 'aero-arena-3d.menu-text-overrides.v1';
+import {
+    LEGACY_STORAGE_KEYS,
+    STORAGE_KEYS,
+    migrateStorageValue,
+    readFirstAvailableStorageValue,
+} from '../StorageKeys.js';
+
+const MENU_TEXT_OVERRIDE_STORAGE_KEY = STORAGE_KEYS.menuTextOverrides;
+const MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTextOverrides;
 
 function getDefaultStorage() {
     try {
@@ -21,14 +29,18 @@ export class MenuTextOverrideStore {
     constructor(options = {}) {
         this.storage = options.storage ?? getDefaultStorage();
         this.storageKey = options.storageKey || MENU_TEXT_OVERRIDE_STORAGE_KEY;
+        this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
+            ? [...options.storageLegacyKeys]
+            : [...MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS];
     }
 
     _loadRaw() {
         if (!this.storage || typeof this.storage.getItem !== 'function') return {};
         try {
-            const raw = this.storage.getItem(this.storageKey);
-            if (!raw) return {};
-            const parsed = JSON.parse(raw);
+            const resolved = readFirstAvailableStorageValue(this.storage, this.storageKey, this.storageLegacyKeys);
+            if (!resolved) return {};
+            const parsed = JSON.parse(resolved.raw);
+            migrateStorageValue(this.storage, this.storageKey, resolved);
             return parsed && typeof parsed === 'object' ? parsed : {};
         } catch {
             return {};
@@ -81,4 +93,3 @@ export class MenuTextOverrideStore {
         return this.setOverride(textId, '');
     }
 }
-

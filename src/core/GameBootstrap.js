@@ -45,6 +45,7 @@ export function createGameUiRefs() {
 
         modeButtons: Array.from(document.querySelectorAll('.mode-btn[data-mode]')),
         gameModeButtons: Array.from(document.querySelectorAll('.game-mode-btn')),
+        dimensionModeButtons: Array.from(document.querySelectorAll('.dimension-mode-btn[data-planar-mode]')),
         huntRespawnToggle: document.getElementById('hunt-respawn-toggle'),
         huntRespawnRow: document.getElementById('hunt-respawn-row'),
         huntModeHint: document.getElementById('hunt-mode-hint'),

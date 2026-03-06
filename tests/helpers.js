@@ -126,8 +126,9 @@ export async function startGameWithBots(page, botCount = 1) {
 // Start hunt mode with default bot count.
 export async function startHuntGame(page) {
     await loadGame(page);
-    await openGameSubmenu(page);
-    await page.click('#submenu-game:not(.hidden) #btn-mode-hunt');
+    await openCustomSubmenu(page);
+    await page.click('#submenu-custom:not(.hidden) [data-mode-path="fight"]');
+    await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await page.click('#submenu-game:not(.hidden) #btn-start');
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
@@ -144,13 +145,14 @@ export async function startHuntGame(page) {
 // Start hunt mode with configurable bot count.
 export async function startHuntGameWithBots(page, botCount = 1) {
     await loadGame(page);
-    await openGameSubmenu(page);
+    await openCustomSubmenu(page);
+    await page.click('#submenu-custom:not(.hidden) [data-mode-path="fight"]');
+    await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
     await page.evaluate((count) => {
         const slider = document.getElementById('bot-count');
         slider.value = String(count);
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     }, botCount);
-    await page.click('#submenu-game:not(.hidden) #btn-mode-hunt');
     await page.click('#submenu-game:not(.hidden) #btn-start');
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');

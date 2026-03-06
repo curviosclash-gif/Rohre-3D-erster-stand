@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aero Arena 3D</title>
+    <title>CuviosClash</title>
     <link rel="stylesheet" href="style.css">
     <script type="importmap">
     {
@@ -34,7 +34,7 @@
     <div id="ui-layer">
         <div id="main-menu" role="dialog" aria-modal="true" aria-labelledby="main-menu-title" style="visibility:hidden">
             <div class="menu-content" role="document">
-                <h1 id="main-menu-title">Aero Arena 3D</h1>
+                <h1 id="main-menu-title">CuviosClash</h1>
                 <p class="subtitle">Multiplayer Luftkampf Arena</p>
 
                 <!-- ======= HAUPTNAVIGATION ======= -->
@@ -180,15 +180,15 @@
                         </div>
 
                         <div class="menu-section">
-                            <h2 class="section-title" data-menu-text-id="menu.level3.matchfields.title">Session-Relevante Matchfelder</h2>
+                            <h2 class="section-title" data-menu-text-id="menu.level3.matchfields.title">Ebenen-Modus</h2>
                             <div class="btn-group">
-                                <button id="btn-mode-classic" class="mode-btn game-mode-btn active"
-                                    data-game-mode="CLASSIC">Classic</button>
-                                <button id="btn-mode-hunt" class="mode-btn game-mode-btn"
-                                    data-game-mode="HUNT">Fight</button>
+                                <button id="btn-dimension-classic-3d" class="mode-btn dimension-mode-btn active"
+                                    data-planar-mode="false">Classic 3D</button>
+                                <button id="btn-dimension-planar" class="mode-btn dimension-mode-btn"
+                                    data-planar-mode="true">Planar</button>
                             </div>
-                            <small id="hunt-mode-hint" class="menu-hint" data-menu-text-id="menu.level3.matchfields.hint">Regelset fuer die laufende Session
-                                waehlen.</small>
+                            <small id="hunt-mode-hint" class="menu-hint" data-menu-text-id="menu.level3.matchfields.hint">Spielweg (Fight/Normal) kommt aus Ebene 2.
+                                Hier nur Classic 3D oder Planar waehlen.</small>
                             <p id="match-field-hint" class="menu-field-hint hidden" role="status" aria-live="polite"></p>
                         </div>
 

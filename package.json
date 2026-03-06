@@ -1,5 +1,5 @@
 {
-  "name": "aero-arena-3d",
+  "name": "cuviosclash",
   "version": "0.9.0",
   "description": "Ein 3D-Arcade-Flugspiel inspiriert von klassischen Arena-Spielen",
   "main": "src/core/main.js",

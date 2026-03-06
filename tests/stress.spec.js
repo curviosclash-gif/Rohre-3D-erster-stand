@@ -11,6 +11,9 @@ import {
     startGame,
 } from './helpers.js';
 
+const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
+const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
+
 test.describe('T61-125: Stress, I/O & Sicherheit', () => {
 
     test('T61: Keine JS-Fehler nach 5s Spielzeit', async ({ page }) => {
@@ -42,13 +45,13 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
         test.setTimeout(60000);
         await loadGame(page);
         await page.evaluate(() => {
-            localStorage.setItem('aero-arena-3d.settings.v1', 'NICHT_JSON{{{');
+            localStorage.setItem('cuviosclash.settings.v1', 'NICHT_JSON{{{');
         });
         const errors = collectErrors(page);
         await page.reload();
         await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
         expect(errors).toHaveLength(0);
-        await page.evaluate(() => localStorage.removeItem('aero-arena-3d.settings.v1'));
+        await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_STORAGE_KEY);
     });
 
     test('T65: XSS in Profilname wird nicht ausgefuehrt', async ({ page }) => {
@@ -63,13 +66,13 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
         }
         await page.waitForTimeout(1000);
         expect(dialogs).toHaveLength(0);
-        await page.evaluate(() => localStorage.removeItem('aero-arena-3d.settings-profiles.v1'));
+        await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_PROFILES_STORAGE_KEY);
     });
 
     test('T66: Ungueltige Settings-Werte -> kein Crash', async ({ page }) => {
         await page.goto('/');
         await page.evaluate(() => {
-            localStorage.setItem('aero-arena-3d.settings.v1', JSON.stringify({
+            localStorage.setItem('cuviosclash.settings.v1', JSON.stringify({
                 speed: -999,
                 turnSpeed: 'abc',
                 botCount: null,
@@ -79,7 +82,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
         await page.reload();
         await page.waitForSelector('#main-menu', { state: 'visible', timeout: 10000 });
         expect(errors).toHaveLength(0);
-        await page.evaluate(() => localStorage.removeItem('aero-arena-3d.settings.v1'));
+        await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_STORAGE_KEY);
     });
 
     test('T67: 3x Spiel starten/stoppen ohne Fehler', async ({ page }) => {
@@ -160,11 +163,11 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
     test('T73: Extreme Settings (100 Bots) stuerzen nicht direkt ab', async ({ page }) => {
         test.setTimeout(60000);
         await loadGame(page);
-        await page.evaluate(() => {
-            const s = JSON.parse(localStorage.getItem('aero-arena-3d.settings.v1') || '{}');
+        await page.evaluate((storageKey) => {
+            const s = JSON.parse(localStorage.getItem(storageKey) || '{}');
             s.botCount = 100;
-            localStorage.setItem('aero-arena-3d.settings.v1', JSON.stringify(s));
-        });
+            localStorage.setItem(storageKey, JSON.stringify(s));
+        }, SETTINGS_STORAGE_KEY);
         const errors = collectErrors(page);
         await page.reload();
         await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
@@ -172,7 +175,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
         await page.click('#btn-start');
         await page.waitForTimeout(3000);
         expect(errors).toHaveLength(0);
-        await page.evaluate(() => localStorage.removeItem('aero-arena-3d.settings.v1'));
+        await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_STORAGE_KEY);
     });
 
     test('T74: Preset-Apply Burst bleibt stabil', async ({ page }) => {
