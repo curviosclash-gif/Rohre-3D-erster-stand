@@ -1,4 +1,4 @@
-# AI Architecture Context: Rohre-3D
+# AI Architecture Context: CuviosClash
 
 > **Format:** Highly structured markdown designed for LLM context injection.
 > **Purpose:** Provides an immediate, absolute understanding of the game's architecture, data-flow, and strict paradigms.

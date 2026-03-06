@@ -1,8 +1,8 @@
-# 🤖 AI Project Onboarding: Rohre-3D
+# 🤖 AI Project Onboarding: CuviosClash
 
-Welcome, AI Developer. This is your definitive starting point for understanding the "Rohre-3D" project. **Always read this document first** when starting a new conversation regarding this repository.
+Welcome, AI Developer. This is your definitive starting point for understanding the "CuviosClash" project. **Always read this document first** when starting a new conversation regarding this repository.
 
-## 🎯 Context: What is "Rohre-3D"?
+## 🎯 Context: What is "CuviosClash"?
 
 It's a fast-paced, 3D browser-based game reminiscent of "Tron" but set on the interior walls of giant tubes/pipes. Pilots (Player and AI Bots) fly forward automatically, leaving deadly light trails behind them. The goal is to survive and force opponents to crash into the trails or the level boundaries.
 

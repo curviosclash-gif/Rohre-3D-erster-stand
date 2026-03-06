@@ -6,7 +6,7 @@ Diese Datei ist der aktuelle Einstieg fuer KI-Assistenz in diesem Repository.
 
 ## 1. Projektkontext
 
-Rohre-3D ist ein schnelles 3D-Browser-Spiel mit Trail-Kollisionen in einer Rohr-/Arena-Umgebung.
+CuviosClash ist ein schnelles 3D-Browser-Spiel mit Trail-Kollisionen in einer Rohr-/Arena-Umgebung.
 Hauptziel im Match: ueberleben, Gegner zu Kollisionen zwingen, Round- und Match-Siege erzielen.
 
 ## 2. Canonical Quellen (zuerst lesen)

@@ -1,7 +1,7 @@
 # Spielanalyse + Projektstruktur-Audit (Deep Dive)
 
 Stand: 2026-02-22  
-Projekt: `Rohre-3D-erster-stand`
+Projekt: `CuviosClash`
 
 ## Schnellstatus (Stand 2026-02-23)
 

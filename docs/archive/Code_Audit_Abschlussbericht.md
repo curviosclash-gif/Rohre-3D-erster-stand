@@ -1,7 +1,7 @@
 # Code-Audit Abschlussbericht
 
 **Stand:** 2026-03-04
-**Zweck:** Architektur- und Qualitätsanalyse der gesamten Codebase von Aero Arena 3D (ohne Modifikationen).
+**Zweck:** Architektur- und Qualitätsanalyse der gesamten Codebase von CuviosClash (ohne Modifikationen).
 
 ## Executive Summary
 

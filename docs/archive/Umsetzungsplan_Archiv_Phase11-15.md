@@ -176,7 +176,7 @@ Letztes Update: 2026-03-03
   2. Fixes, semantisch stabiles Observation-Schema mit 20-Slot-Item-Encoding etablieren.
   3. Classic- und Hunt-Bots ueber ein gemeinsames, modulares Policy-Interface betreiben.
   4. Optionale Trainer-Bridge vorbereiten, ohne den Produktionspfad zu destabilisieren.
-- Referenzplan: `docs/Feature_BotSchnittstelle_Modulare_Integration.md`
+- Referenzplan: `docs/archive/plans/completed/Feature_BotSchnittstelle_Modulare_Integration.md`
 - Teilphasen:
   - [x] 15.0 Scope, Contract und Semantik einfrieren
   - [x] 15.1A Observation-Schema V1 + Index-Konstanten (Agent A)
@@ -207,3 +207,4 @@ Letztes Update: 2026-03-03
   - Fuer produktive Training-Loops fehlt noch ein dediziertes Monitoring-Dashboard (siehe Backlog V15).
 - Prompt-Regel:
   - Am Ende jeder Teilphase den im Referenzplan definierten "Naechster-Chat-Prompt" ausgeben und damit direkt die Folgephase starten.
+

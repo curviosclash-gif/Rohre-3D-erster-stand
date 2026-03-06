@@ -1,6 +1,6 @@
 # Next Chat Prompt (paste into next Codex chat)
 
-Arbeite im Projekt `c:\\Users\\gunda\\Desktop\\Rohre-3D-erster-stand` weiter.
+Arbeite im Projekt `c:\\Users\\gunda\\Desktop\\CuviosClash` weiter.
 
 Wichtig: Bitte zuerst den aktuellen Ist-Stand revalidieren und nicht blind auf diesem Prompt aufbauen.
 

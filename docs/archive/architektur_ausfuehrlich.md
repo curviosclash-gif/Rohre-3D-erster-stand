@@ -1,6 +1,6 @@
-# Rohr-3D: Ausführliche Spiel - Architektur & Abhängigkeitsgraph
+# CuviosClash: Ausführliche Spiel - Architektur & Abhängigkeitsgraph
 
-Dieses Dokument liefert eine tiefe Analyse der Architektur des "Rohre-3D" Spiels. Es erweitert den grundlegenden Import-Graphen um detaillierte Beschreibungen für jeden Knotenpunkt sowie architektonische Design-Entscheidungen.
+Dieses Dokument liefert eine tiefe Analyse der Architektur des "CuviosClash" Spiels. Es erweitert den grundlegenden Import-Graphen um detaillierte Beschreibungen für jeden Knotenpunkt sowie architektonische Design-Entscheidungen.
 
 ## 1. Detaillierter Architektur-Graph (Mermaid)
 

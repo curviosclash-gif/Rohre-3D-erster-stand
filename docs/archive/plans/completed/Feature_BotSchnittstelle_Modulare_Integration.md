@@ -94,7 +94,7 @@ Ziel:
 
 Dateien (2-5):
 
-- `docs/Feature_BotSchnittstelle_Modulare_Integration.md`
+- `docs/archive/plans/completed/Feature_BotSchnittstelle_Modulare_Integration.md`
 - `docs/ai_architecture_context.md`
 
 Arbeitsschritte:
@@ -495,8 +495,9 @@ Verifikation:
 
 Start erster Schritt:
 
-`Starte Phase 15.0 aus docs/Feature_BotSchnittstelle_Modulare_Integration.md und fuehre danach direkt die Parallelphasen 15.1A und 15.1B aus.`
+`Starte Phase 15.0 aus docs/archive/plans/completed/Feature_BotSchnittstelle_Modulare_Integration.md und fuehre danach direkt die Parallelphasen 15.1A und 15.1B aus.`
 
 Weiter nach jeder Teilphase:
 
-`Markiere Phase 15.X als erledigt und starte Phase 15.Y aus docs/Feature_BotSchnittstelle_Modulare_Integration.md. Fuehre danach die dort definierte Verifikation aus und gib den naechsten Prompt aus.`
+`Markiere Phase 15.X als erledigt und starte Phase 15.Y aus docs/archive/plans/completed/Feature_BotSchnittstelle_Modulare_Integration.md. Fuehre danach die dort definierte Verifikation aus und gib den naechsten Prompt aus.`
+

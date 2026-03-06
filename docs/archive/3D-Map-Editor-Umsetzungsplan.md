@@ -1,7 +1,7 @@
 # 3D Map Editor - Umsetzungsplan (kompakt)
 
 Stand: 2026-02-21  
-Projekt: Aero Arena 3D
+Projekt: CuviosClash
 
 ## 1. Zielbild
 

@@ -4,6 +4,12 @@ Stand: 2026-03-06
 Status: Abgeschlossen (26.3b.0-26.3b.8)
 Owner: Single-Agent Umsetzung
 
+## Nachtrag 2026-03-06 (Bugfix Ebene-3 Moduswahl)
+
+- Ebene 2 bleibt alleinige Wahl fuer `Fight` vs `Normal`.
+- Ebene 3 schaltet nur noch den Ebenenmodus (`Classic 3D` vs `Planar`).
+- Ziel: keine Ueberschneidung zwischen Spielweg-Auswahl (Ebene 2) und Bewegungs-/Ebenenmodus (Ebene 3).
+
 ## Ziel
 
 Das Hauptmenue wird auf einen klaren 4-Ebenen-Flow umgestellt:
@@ -117,7 +123,7 @@ Produktziel:
 - `tests/helpers.js`
 - `tests/core.spec.js`
 - `tests/stress.spec.js`
-- `docs/Feature_Menu_Umbau_V26_3.md`
+- `docs/archive/plans/completed/Feature_Menu_Umbau_V26_3.md`
 - `docs/Umsetzungsplan.md`
 
 ## Umsetzungsphasen
@@ -266,7 +272,7 @@ Produktziel:
   - Umgesetzt:
     - Build-Gate bestanden (`npm run build`).
     - Finale Test-Gates bestanden (`npm run test:core`, `npm run test:stress`).
-    - Doku-Freeze abgeschlossen (`npm run docs:sync`, `npm run docs:check`) und Referenzdoku `docs/Feature_Menu_Umbau_V26_3.md` auf den 26.3b-Follow-up verlinkt.
+    - Doku-Freeze abgeschlossen (`npm run docs:sync`, `npm run docs:check`) und Referenzdoku `docs/archive/plans/completed/Feature_Menu_Umbau_V26_3.md` auf den 26.3b-Follow-up verlinkt.
 
 ## Verifikation
 
@@ -291,7 +297,8 @@ Produktziel:
 
 Bei Implementierung muessen danach mindestens geprueft oder aktualisiert werden:
 
-- `docs/Feature_Menu_Umbau_V26_3.md`
+- `docs/archive/plans/completed/Feature_Menu_Umbau_V26_3.md`
 - `docs/Umsetzungsplan.md`
 - `docs/ai_architecture_context.md` nur falls Vertrage/Panel-Zustaende sich strukturell aendern
 - `docs/Dokumentationsstatus.md` indirekt ueber `docs:sync`
+

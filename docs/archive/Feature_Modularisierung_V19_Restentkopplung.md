@@ -30,7 +30,7 @@ Bestehend (primaer):
 - `src/hunt/RespawnSystem.js`
 - `src/hunt/mg/MGHitResolver.js`
 - `src/core/main.js`
-- `docs/Refactoring_Plan_God_Classes.md`
+- `docs/archive/plans/completed/Refactoring_Plan_God_Classes.md`
 - `docs/Umsetzungsplan.md`
 
 Neu (Zielbild, erwartete Splits):
@@ -72,7 +72,7 @@ Risiko-Rating:
 ## Dokumentationsauswirkungen (nach Umsetzung)
 
 - `docs/ai_architecture_context.md` (Module + Runtime-Contracts)
-- `docs/Refactoring_Plan_God_Classes.md` (aktiver Planstand)
+- `docs/archive/plans/completed/Refactoring_Plan_God_Classes.md` (aktiver Planstand)
 - `docs/Umsetzungsplan.md` (Phase-Tracking)
 - `docs/Testergebnisse_YYYY-MM-DD.md` (Verifikationsdelta)
 
@@ -354,3 +354,4 @@ Abgeschlossen am: `2026-03-04`
 - Runtime-Contracts sind explizit, statt private Feldkopplung.
 - Hotpaths bleiben allocationsarm.
 - Dokumentation und Tests sind gruen.
+

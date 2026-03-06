@@ -1,4 +1,4 @@
-﻿# Feature: V20 Single-Agent No-Stop Tiefenmodularisierung
+# Feature: V20 Single-Agent No-Stop Tiefenmodularisierung
 
 Stand: 2026-03-04
 
@@ -39,7 +39,7 @@ Bestehend (primaer):
 - `src/entities/ai/observation/ObservationSystem.js`
 - `src/entities/arena/PortalGateSystem.js`
 - `src/entities/systems/TrailSpatialIndex.js`
-- `docs/Refactoring_Plan_God_Classes.md`
+- `docs/archive/plans/completed/Refactoring_Plan_God_Classes.md`
 - `docs/Umsetzungsplan.md`
 
 Neu (Zielbild, erwartete Splits):
@@ -100,7 +100,7 @@ Risiko-Rating:
 ## Dokumentationsauswirkungen (nach Umsetzung)
 
 - `docs/ai_architecture_context.md`
-- `docs/Refactoring_Plan_God_Classes.md`
+- `docs/archive/plans/completed/Refactoring_Plan_God_Classes.md`
 - `docs/Umsetzungsplan.md`
 - `docs/Testergebnisse_YYYY-MM-DD.md`
 
@@ -166,7 +166,7 @@ Abgeschlossen am: `2026-03-04`
 - `main.js` Pass-Throughs fuer MatchFlow/SessionBridge entfernt; Entry-Point bleibt auf Runtime-Start + Kernzustand fokussiert.
 - Delegationen in bestehende Controller/Fassaden verschoben: `RoundStateTickSystem`, `PlayingStateSystem`, `MatchFlowUiController`.
 - Runtime/Debug-Einstiege konsolidiert: `window.GAME_INSTANCE`, `window.GAME_RUNTIME`, `window.GAME_DEBUG`.
-- V19-Referenz gesetzt: `22.5` bleibt abgeschlossen in `docs/Feature_Modularisierung_V19_Restentkopplung.md`.
+- V19-Referenz gesetzt: `22.5` bleibt abgeschlossen in `docs/archive/Feature_Modularisierung_V19_Restentkopplung.md`.
 
 ### 23.1 Verifikation (Stand 2026-03-04)
 
@@ -490,3 +490,4 @@ Abgeschlossen am: `2026-03-04`
 - AI-Wahrnehmung ist zwischen Rule-Based und Bridge konsistent modularisiert.
 - Hotpaths bleiben allocationsarm.
 - Dokumentation und Verifikation sind gruen.
+

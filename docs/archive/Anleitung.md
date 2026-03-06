@@ -1,6 +1,6 @@
-# Aero Arena 3D - Spielanleitung
+# CuviosClash - Spielanleitung
 
-Willkommen bei **Aero Arena 3D**! Dies ist ein schnelles Arcade-Spiel für 1 oder 2 Spieler, inspiriert von klassischen Arena-Spielen, aber in einer vollen 3D-Umgebung mit Flugzeug-Steuerung.
+Willkommen bei **CuviosClash**! Dies ist ein schnelles Arcade-Spiel für 1 oder 2 Spieler, inspiriert von klassischen Arena-Spielen, aber in einer vollen 3D-Umgebung mit Flugzeug-Steuerung.
 
 ## Spielziel
 
