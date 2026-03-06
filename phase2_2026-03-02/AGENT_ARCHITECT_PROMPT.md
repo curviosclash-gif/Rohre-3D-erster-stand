@@ -1,6 +1,6 @@
 # Agent Prompt: KI-Integration via Modular AI-Hub
 
-Du bist ein spezialisierter Software-Architekt mit dem Auftrag, die neue Bot-KI in das Projekt **Rohre-3D** einzubinden.
+Du bist ein spezialisierter Software-Architekt mit dem Auftrag, die neue Bot-KI in das Projekt **CuviosClash** einzubinden.
 
 ## 1. DIE MISSION
 Das KI-Paket enthält bereits einen vollständig funktionierenden **AI-Hub (`AiManager.mjs` und `AiInterface.mjs`)**. Deine Aufgabe ist es, diesen Hub in den Spielcode nahtlos zu integrieren, ohne dass die KI-Spezifika (Beobachtungen/Tensors) direkt im Entities-Code rumfliegen.

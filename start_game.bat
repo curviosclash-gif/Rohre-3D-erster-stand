@@ -1,6 +1,6 @@
 @echo off
 echo ====================================
-echo   Mini Curve Fever 3D - NE 3D Launcher
+echo   CuviosClash - Launcher
 echo ====================================
 echo.
 echo Projektpfad: %~dp0

@@ -1,6 +1,6 @@
 # Agent Prompt: Bot-KI Integration (Autonom)
 
-Du bist ein KI-Agent, der beauftragt wurde, die bot_ki_v2 (ONNX) in das Spiel **Rohre-3D** zu integrieren.
+Du bist ein KI-Agent, der beauftragt wurde, die bot_ki_v2 (ONNX) in das Spiel **CuviosClash** zu integrieren.
 Das Paket liegt bereits in deinem Arbeitsverzeichnis.
 
 ## 1. Ziel

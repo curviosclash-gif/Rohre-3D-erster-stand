@@ -73,7 +73,7 @@ async function probeExistingServer(url) {
         });
         if (!response.ok) return { reachable: false, reason: `HTTP ${response.status}` };
         const text = await response.text();
-        const looksLikeProject = /Aero Arena 3D/i.test(text) || /btn-start/i.test(text);
+        const looksLikeProject = /CuviosClash/i.test(text) || /btn-start/i.test(text);
         return {
             reachable: true,
             looksLikeProject,

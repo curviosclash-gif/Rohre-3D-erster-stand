@@ -12,7 +12,7 @@ param(
     [switch]$VerboseOutput
 )
 
-$projectPath = "C:\Users\gunda\Desktop\Rohre-3D-erster-stand"
+$projectPath = $PSScriptRoot
 $markerFile = Join-Path $projectPath ".last_auto_backup"
 $optInFile = Join-Path $projectPath ".auto_backup_enabled"
 $gitDir = Join-Path $projectPath ".git"

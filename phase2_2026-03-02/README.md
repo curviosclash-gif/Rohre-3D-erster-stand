@@ -1,6 +1,6 @@
 # Bot-KI Implementierungspaket — phase2 (2026-03-02)
 
-Dieses Paket enthält alle Dateien, um die KI in das Spiel **Rohre-3D** zu integrieren.
+Dieses Paket enthält alle Dateien, um die KI in das Spiel **CuviosClash** zu integrieren.
 Kein Python, kein Training, keine `node_modules` notwendig.
 
 ## Ordnerstruktur

@@ -132,3 +132,35 @@
   - npm run test:physics PASS (46/46)
   - npm run test:core PASS
   - npm run build PASS
+
+2026-03-06 (Branding-Rename auf CuviosClash)
+- Sichtbares Branding aktualisiert:
+  - `index.html` Titel + Menue-Headline auf `CuviosClash`.
+  - `style.css` Kommentar, `package.json`/`package-lock.json` Paketname und `scripts/self-trail-debug-smoke.mjs` Projektprobe angepasst.
+- Persistenz-Namespace migriert:
+  - Neue Storage-Keys laufen unter `cuviosclash.*`.
+  - Legacy-Fallback fuer den vorherigen Storage-Namespace bleibt lesbar und migriert beim Laden automatisch auf die neuen Keys.
+- Tests/Doku:
+  - Neuer Core-Test prueft Legacy-Migration des Settings-Keys.
+  - `npm run test:core` PASS
+  - `npm run test:stress` PASS
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+- Visuelle Verifikation:
+  - Preview-Screenshot `tmp/cuviosclash-preview.png` zeigt den Menue-Header mit `CuviosClash`.
+
+2026-03-06 (Branding-Rename Follow-up: Archiv, Tools, Startskripte)
+- Weitere Rest-Renames umgesetzt:
+  - Archivdoku auf `CuviosClash` gezogen (`docs/archive/*` relevante Projekt-/Titelstellen).
+  - Editor- und Startskripte umbenannt (`editor/*.html`, `start_*.bat`, `server.ps1`, `auto-backup.ps1`).
+  - Temp-Logs mit altem Paketnamen aus `tmp/` entfernt.
+- Verifikation:
+  - `npm run test:core` PASS
+  - `npm run smoke:selftrail` PASS
+  - `npm run build` PASS (im Smoke enthalten)
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+  - Preview-Check bestaetigt erneut `document.title = CuviosClash` und Menue-Header `CuviosClash`.
+- Restrisiko / offener Punkt:
+  - Der physische Ordner-Rename des Workspace auf Desktop wurde versucht, aber durch einen noch am aktiven Projektpfad haengenden Prozess blockiert; inhaltlich sind die Pfadreferenzen bereits auf `CuviosClash` aktualisiert.

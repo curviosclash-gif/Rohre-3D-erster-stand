@@ -65,7 +65,7 @@ try {
     $activePort = $startup.Port
 
     Write-Host ""
-    Write-Host "  === Mini Curve Fever 3D ===" -ForegroundColor Cyan
+    Write-Host "  === CuviosClash ===" -ForegroundColor Cyan
     Write-Host "  Server laeuft auf: http://localhost:$activePort" -ForegroundColor Green
     Write-Host "  Druecke Ctrl+C zum Beenden." -ForegroundColor DarkGray
     Write-Host ""

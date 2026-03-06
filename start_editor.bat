@@ -1,5 +1,5 @@
 @echo off
-echo === Mini Curve Fever 3D - Map Editor ===
+echo === CuviosClash - Map Editor ===
 echo Starte Vite Dev-Server...
 echo.
 
