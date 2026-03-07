@@ -110,16 +110,26 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
   - [ ] 28.2.2 Sensing/Probing-Logik fuer kuenftiges ML-Training abstrahieren
 - [ ] 28.3 V13 Performance-Hotspot `maze` (Draw-Calls / Batching optimieren)
 - [ ] 28.4 Abschluss-Gate, Performance-Metrics pruefen und Doku-Freeze (`docs:sync`, `docs:check`)
-- [ ] 28.5 Performance-Offensive (CPU/GPU/Startup)
-  - [ ] 28.5.0 Baseline-Refresh und Messharness absichern
-  - [ ] 28.5.1 GPU-Hotspot `maze`/Portale weiter reduzieren
-  - [ ] 28.5.2 Renderer-/Kamera-Hotpath budgetieren
-  - [ ] 28.5.3 Bot-/Trail-CPU-Hotpaths nachziehen
-  - [ ] 28.5.4 Allocation-/GC-Budget im Hotpath erzwingen
-  - [ ] 28.5.5 Start-/Transition-Latenz reduzieren
-  - [ ] 28.5.6 Recording-Overhead isolieren
-  - [ ] 28.5.7 HUD/UI-Hotpath nachziehen
-  - [ ] 28.5.8 Abschluss-Gate und Doku-Freeze (`docs:sync`, `docs:check`)
+- [x] 28.5 Performance-Offensive Maximalpfad (CPU/GPU/Startup ohne Feature-Verlust)
+  - [x] 28.5.0 Baseline-Refresh und Feature-Parity-Harness
+  - [x] 28.5.1 Render-Resource-Cache und Portal-/Gate-Instancing
+  - [x] 28.5.2 Non-Recording-Renderer entschlacken
+  - [x] 28.5.3 Match-Session-Reuse und Start-/Transition-Latenz
+  - [x] 28.5.4 Bot-/Trail-/Projectile-CPU-Hotpaths und Allocation-Budget
+  - [x] 28.5.5 Structural Scaling Path (Worker/SoA, nur bei offenem Delta)
+  - [x] 28.5.6 Menu/UI-Bootstrap und DOM-Last reduzieren
+  - [x] 28.5.7 Vollbenchmark und Feature-Parity-Gate
+  - [x] 28.5.8 Abschluss-Gate und Doku-Freeze (`docs:sync`, `docs:check`)
+  - Status 2026-03-07: 28.5.0 abgeschlossen (Baseline + Lifecycle-Harness mit Trend/Vollprofil unter `tmp/perf_phase28_5_lifecycle_*.json`).
+  - Status 2026-03-07: 28.5.1 abgeschlossen (echtes Portal-/Gate-Instancing via shared `InstancedMesh`-Batches + no-dispose Resource-Caches; `benchmark:baseline` danach bei `overall drawCallsAverage=20.99`, `V3 drawCallsAverage=23.73`, `V2 drawCallsMax=24`; Core/GPU gruen).
+  - Status 2026-03-07 (Follow-up): Portalfarben im Instancing-Pfad wiederhergestellt; Portale/Gates nutzen weiter Instancing, aber farbgetrennte Material-Batches fuer leuchtende Portalringe statt weiss-grauer Shared-Materialien (`build` gruen, GPU `T21b` gruen, portalnahe Core-Regressionen gruen; einmalige Playwright-Navigationsfluktuation bei Sammellauf von `T10b|T10c|T10d|T10e`, `T10d` solo gruen).
+  - Status 2026-03-07: 28.5.2 abgeschlossen (Non-Recording-Rendererpfad, Recorder-Defaults auf expliziten Start umgestellt, Core/GPU gruen).
+  - Status 2026-03-07: 28.5.3 abgeschlossen (Menu-Prewarm fuer Match-Arena aktiv; Lifecycle-Vollprofil bei `startMatchLatencyMs=202`, `returnToMenuLatencyMs=23`).
+  - Status 2026-03-07: 28.5.4 abgeschlossen (Bot-Multirate + Trail-Query-Stamp-Reuse + Bot/Observation-Context-Reuse + Projectile swap-pop; `test:core`, `test:physics`, `test:stress` gruen).
+  - Status 2026-03-07: 28.5.5 abgeschlossen (Gate-C bewertet; Worker/SoA bewusst nicht aktiviert, da Delta aktuell GPU-seitig. Volles Verifikationspaket `benchmark:baseline` + `test:core/physics/stress` gruen).
+  - Status 2026-03-07: 28.5.6 abgeschlossen (Lazy-UI-Bootstrap fuer Level4/Developer/Preset-Pfade; Lifecycle-Vollprofil `domToGameInstanceMs=1943`, `startMatchLatencyMs=65`, `returnToMenuLatencyMs=42`; Core/Stress gruen).
+  - Status 2026-03-07: 28.5.7 abgeschlossen (Vollgate mit `benchmark:baseline`, `benchmark:lifecycle -- --profile trend|full` und `test:core/physics/gpu/stress` komplett gruen; Pflichtmetriken erreicht: `overall drawCallsAverage=20.99`, `V3 drawCallsAverage=23.73`, `V2 drawCallsMax=24`, `startMatchLatencyMs=179`, `returnToMenuLatencyMs=26`).
+  - Status 2026-03-07: 28.5.8 abgeschlossen (Doku-Freeze gesetzt; `docs:sync`/`docs:check` nach finalem Performance-End-Gate gruen, keine offenen Pflichtdeltas mehr).
 
 ## Nachlauf / Technik-Backlog
 
@@ -178,6 +188,12 @@ Template:
   - Plan-Datei: `docs/Feature_Cinematic_Camera_Followup_V29b.md`
   - Datei-Scope: `src/core/**`, `src/entities/systems/CinematicCameraSystem.js`, `src/ui/**`, `tests/gpu.spec.js`, `tests/core.spec.js`, `tests/physics-policy.spec.js`, `docs/**`
   - Konfliktregel: beinhaltet Vorschlaege 1/2/3/4/6; Vorschlag 5 bleibt separat als `N3` geparkt
+- [ ] PX Runtime-Stabilisierung & Wartbarkeit V30
+  - Erstellt am: `2026-03-07`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Runtime_Stabilisierung_Wartbarkeit_V30.md`
+  - Datei-Scope: `src/core/**`, `src/entities/**`, `src/ui/**`, `src/state/**`, `tests/**`, `docs/**`
+  - Konfliktregel: Korrektheits- und Lifecycle-Fixes zuerst; groessere UI-/Runtime-Splits erst nach gruenen Zwischen-Gates der frueheren Phasen
 <!-- PLAN-INTAKE-END -->
 
 ## Archivierte Referenzen
@@ -193,3 +209,5 @@ Vor Task-Abschluss immer:
 
 - `npm run docs:sync`
 - `npm run docs:check`
+
+

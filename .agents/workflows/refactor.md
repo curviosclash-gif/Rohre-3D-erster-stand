@@ -21,13 +21,7 @@ description: Restructure code without changing behavior.
 - Re-run baseline tests.
 - Compare with baseline; investigate regressions immediately.
 
-## 4. Documentation freshness
-
-- Run `npm run docs:sync`.
-- Update docs when module structure/naming changed.
-- Run `npm run docs:check` (must pass).
-
-## 5. Commit
+## 4. Commit
 
 ```bash
 git add [scoped-files]
@@ -39,8 +33,4 @@ git commit -m "refactor: [scope] - [reason]"
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-
+Standardformat verwenden.

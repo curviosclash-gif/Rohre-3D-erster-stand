@@ -286,3 +286,38 @@
   - `npm run docs:sync` PASS
   - `npm run docs:check` PASS
   - visueller Gameplay-Screenshot geprueft: `tmp/map-prewarm-fix-after.png`
+
+2026-03-07 (Portal-Visual Follow-up: schwarze Portale nach Instancing)
+- Nutzerfeedback: Portale erscheinen ploetzlich nur noch schwarz.
+- Root Cause verifiziert:
+  - Der Performance-Fix fuer Portal-/Gate-Instancing hatte farbige/emissive Einzelmaterialien auf einen shared weiss/grauen Materialpfad umgestellt.
+  - Ergebnis im Browser: Portal-Batches existieren weiter, aber die Torus-/Disc-Materialien waren materialseitig `ffffff`/`1f1f1f`; farbige Leuchtwirkung war weg.
+- Fix umgesetzt:
+  - `src/entities/arena/PortalGateMeshFactory.js`: farbgetrennte Instancing-Batches fuer Portal- und Gate-Ringe; Materialfarbe/Emissive wieder pro Portalfarbe gesetzt.
+  - `tests/gpu.spec.js` `T21b`: Batch-Counts werden ueber farbgetrennte InstancedMeshes summiert; Test prueft zusaetzlich Rot/Grun in Material- und Emissive-Farben.
+- Verifikation:
+  - Browser-Probe bestaetigt Portal-Batches `portal:torus:...:00ff00` / `...:ff0000` mit passenden Material-/Emissive-Farben.
+  - Visual-Check: `tmp/portal-color-restored-close.png` zeigt wieder leuchtende rot/gruene Portale.
+  - `npm run build` PASS
+  - `npm run test:gpu -- -g "T21b"` PASS
+  - `npm run test:core -- -g "T10b|T10c|T10d|T10e"` -> `T10b/T10c/T10e` PASS, `T10d` einmal mit Playwright-Navigation-Flake; `npm run test:core -- -g "T10d"` danach PASS
+
+2026-03-07 (Map-Disk-Path-Fix fuer Editor-/Generated-Maps)
+- Nutzerauftrag ab `e548108`: separaten Map-bezogenen Fix nach Prewarm-Regressions-Commit uebernehmen.
+- Root Cause end-to-end reproduziert:
+  - Baseline-Snapshot von `e548108` bestaetigt Pfad-Mismatch: `vite.config.js` schrieb Disk-Maps nach `js/modules/GeneratedLocalMaps.js`, die Runtime importiert aber `src/entities/GeneratedLocalMaps.js`.
+  - Ohne `js/modules/` scheitert der Save-POST bereits mit 500 nach dem Schreiben der `data/maps/*.json`.
+  - Mit absichtlich angelegtem `js/modules/` landet die generierte Map zwar dort, taucht im Runtime-Menue aber weiterhin nicht auf, weil `src/entities/GeneratedLocalMaps.js` stub bleibt.
+- Fix umgesetzt:
+  - `vite.config.js`: `GENERATED_LOCAL_MAPS_MODULE_PATH` auf `src/entities/GeneratedLocalMaps.js` umgestellt.
+  - `tests/core.spec.js`: neue Regression `T10f` fuer echten Editor-Disk-Save -> Runtime-Menue -> Match-Load.
+  - `tests/core.spec.js`: `T10f` mit eigenem Timeout/robusterem Cleanup stabilisiert.
+- Echte Runtime-Verifikation:
+  - Dev-Server: Browserflow speichert Map ueber `/api/editor/save-map-disk`, zeigt sie im Menue und laedt sie im Match (`tmp/map-disk-dev.png`).
+  - Preview-Bundle: dieselbe gespeicherte Map erscheint nach `npm run build` im Preview und laedt im Match (`tmp/map-disk-preview.png`).
+  - Statischer Launcher: dieselbe Map erscheint ueber `server.ps1` im Menu und laedt im Match (`tmp/map-disk-static.png`).
+- Test-/Gate-Status:
+  - `npx playwright test tests/core.spec.js -g "T10f"` PASS
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS

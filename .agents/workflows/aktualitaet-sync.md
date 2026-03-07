@@ -25,7 +25,16 @@ description: Check and auto-update docs/workflows/rules to current repository re
 - Run `npm run docs:check`.
 - Ensure the command exits PASS and no blocking issues remain.
 
-## 4. Optional reality checks
+## 4. Commit Docs
+
+- Commit all updated documentation files:
+
+  ```bash
+  git add docs/
+  git commit -m "docs: sync documentation status"
+  ```
+
+## 5. Optional reality checks
 
 - If docs claim smoke stability, run:
   - `npm run smoke:roundstate`
@@ -38,5 +47,4 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
+Standardformat verwenden.

@@ -1,0 +1,127 @@
+{
+  "generatedAt": "2026-03-02",
+  "baseUrl": "http://127.0.0.1:4273",
+  "roundsPerScenario": 4,
+  "scenarios": [
+    {
+      "scenario": {
+        "id": "V1",
+        "mode": "1p",
+        "bots": 1,
+        "mapKey": "standard",
+        "planarMode": false,
+        "portalCount": 0,
+        "rounds": 10
+      },
+      "metrics": {
+        "rounds": 5,
+        "botWinRate": 0.6,
+        "stuckEvents": 0,
+        "wallHits": 0,
+        "trailHits": 0,
+        "averageBotSurvival": 30.818340845944476,
+        "stuckPerMinute": 0,
+        "totalDuration": 208.26800000000372
+      },
+      "runner": {
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 181293
+      }
+    },
+    {
+      "scenario": {
+        "id": "V2",
+        "mode": "1p",
+        "bots": 3,
+        "mapKey": "maze",
+        "planarMode": false,
+        "portalCount": 0,
+        "rounds": 10
+      },
+      "metrics": {
+        "rounds": 4,
+        "botWinRate": 1,
+        "stuckEvents": 0,
+        "wallHits": 0,
+        "trailHits": 0,
+        "averageBotSurvival": 29.630166473514084,
+        "stuckPerMinute": 0,
+        "totalDuration": 150.29159999999777
+      },
+      "runner": {
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 156433
+      }
+    },
+    {
+      "scenario": {
+        "id": "V3",
+        "mode": "1p",
+        "bots": 3,
+        "mapKey": "complex",
+        "planarMode": true,
+        "portalCount": 4,
+        "rounds": 10
+      },
+      "metrics": {
+        "rounds": 4,
+        "botWinRate": 1,
+        "stuckEvents": 0,
+        "wallHits": 0,
+        "trailHits": 0,
+        "averageBotSurvival": 31.618958541106622,
+        "stuckPerMinute": 0,
+        "totalDuration": 131.95940000000223
+      },
+      "runner": {
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 140877
+      }
+    },
+    {
+      "scenario": {
+        "id": "V4",
+        "mode": "2p",
+        "bots": 2,
+        "mapKey": "standard",
+        "planarMode": true,
+        "portalCount": 6,
+        "rounds": 10
+      },
+      "metrics": {
+        "rounds": 4,
+        "botWinRate": 0.75,
+        "stuckEvents": 0,
+        "wallHits": 0,
+        "trailHits": 0,
+        "averageBotSurvival": 45.24550036010805,
+        "stuckPerMinute": 0,
+        "totalDuration": 180.98210000000148
+      },
+      "runner": {
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 198127
+      }
+    }
+  ],
+  "overall": {
+    "rounds": 17,
+    "botWinRate": 0.8235294117647058,
+    "stuckEvents": 0,
+    "wallHits": 0,
+    "trailHits": 0,
+    "averageBotSurvival": 34.1217768075669,
+    "stuckPerMinute": 0,
+    "totalDuration": 671.5011000000052
+  },
+  "runner": {
+    "forcedRounds": 12,
+    "timeoutRounds": 12,
+    "failOnForcedRound": false,
+    "maxForcedRounds": 9007199254740991
+  }
+}

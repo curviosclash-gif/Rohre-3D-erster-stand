@@ -5,6 +5,10 @@
 import { CONFIG } from '../../core/Config.js';
 import { estimateEnemyPressure, selectTarget } from './BotTargetingOps.js';
 
+const BOT_PROJECTILE_SENSE_STRIDE = 2;
+const BOT_SPACING_SENSE_STRIDE = 3;
+const BOT_SPACING_DECAY = 0.82;
+
 export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
     const mapBehavior = bot.mapBehavior(arena);
     bot.sense.mapCaution = mapBehavior.caution;
@@ -79,9 +83,38 @@ export function runPerception(bot, player, arena, allPlayers, projectiles) {
     bot.clearCollisionCache();
 
     senseEnvironment(bot, player, arena, allPlayers, projectiles);
-    bot.senseProjectiles(player, projectiles);
+    const sensePhaseCounter = bot.sensePhaseCounter;
+    const sensePhase = bot.sensePhase;
+    const fullScanFrame = sensePhaseCounter === sensePhase;
+    const hasProjectiles = Array.isArray(projectiles) && projectiles.length > 0;
+    const shouldSenseProjectiles = hasProjectiles && (
+        fullScanFrame
+        || bot.sense.immediateDanger
+        || bot.sense.forwardRisk > 0.42
+        || (sensePhaseCounter % BOT_PROJECTILE_SENSE_STRIDE) === (sensePhase % BOT_PROJECTILE_SENSE_STRIDE)
+    );
+
+    if (shouldSenseProjectiles) {
+        bot.senseProjectiles(player, projectiles);
+    } else {
+        bot.sense.projectileThreat = false;
+        bot.sense.projectileEvadeYaw = 0;
+        bot.sense.projectileEvadePitch = 0;
+    }
+
     bot.senseHeight(player, arena);
-    bot.senseBotSpacing(player, allPlayers);
+    const shouldSenseSpacing = fullScanFrame
+        || bot.sense.immediateDanger
+        || bot.sense.forwardRisk > 0.65
+        || (sensePhaseCounter % BOT_SPACING_SENSE_STRIDE) === (sensePhase % BOT_SPACING_SENSE_STRIDE);
+    if (shouldSenseSpacing) {
+        bot.senseBotSpacing(player, allPlayers);
+    } else {
+        bot.sense.botRepulsionYaw *= BOT_SPACING_DECAY;
+        bot.sense.botRepulsionPitch *= BOT_SPACING_DECAY;
+        if (Math.abs(bot.sense.botRepulsionYaw) < 0.05) bot.sense.botRepulsionYaw = 0;
+        if (Math.abs(bot.sense.botRepulsionPitch) < 0.05) bot.sense.botRepulsionPitch = 0;
+    }
     bot.evaluatePursuit(player);
     bot.evaluatePortalIntent(player, arena, allPlayers);
 }

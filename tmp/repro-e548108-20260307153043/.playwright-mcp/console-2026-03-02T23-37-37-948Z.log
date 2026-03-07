@@ -1,0 +1,15 @@
+[    3630ms] [WARNING] [Game] AI loadModel failed: ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from derived constructor
+    at new AiBot (http://localhost:5173/src/ai/ai_bridge.mjs:15:9)
+    at AiManager.loadModel (http://localhost:5173/src/ai/AiManager.mjs:18:21)
+    at new Game (http://localhost:5173/src/core/main.js:213:19)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/core/main.js:213
+[  275775ms] [WARNING] [Game] AI loadModel failed: ReferenceError: Must call super constructor in derived class before accessing 'this' or returning from derived constructor
+    at new AiBot (http://localhost:5173/src/ai/ai_bridge.mjs:15:9)
+    at AiManager.loadModel (http://localhost:5173/src/ai/AiManager.mjs:18:21)
+    at new Game (http://localhost:5173/src/core/main.js:213:19)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/core/main.js:213
+[  297256ms] [ERROR] [AiBot] Failed to load model: TypeError: Cannot read properties of undefined (reading 'create')
+    at AiBot.load (http://localhost:5173/src/ai/ai_bridge.mjs?t=1772494949430:26:55)
+    at AiManager.loadModel (http://localhost:5173/src/ai/AiManager.mjs:19:19)
+    at new Game (http://localhost:5173/src/core/main.js:213:19)
+    at http://localhost:5173/src/core/main.js:931:22 @ http://localhost:5173/src/ai/ai_bridge.mjs?t=1772494949430:29

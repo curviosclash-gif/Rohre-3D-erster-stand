@@ -1,0 +1,40 @@
+{
+  "name": "cuviosclash",
+  "version": "0.9.0",
+  "description": "Ein 3D-Arcade-Flugspiel inspiriert von klassischen Arena-Spielen",
+  "main": "src/core/main.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "docs:check": "node scripts/docs-freshness.mjs --check",
+    "docs:sync": "node scripts/docs-freshness.mjs --write",
+    "smoke:selftrail": "npm run build && node scripts/self-trail-debug-smoke.mjs",
+    "smoke:roundstate": "node scripts/round-state-controller-smoke.mjs",
+    "bot:validate": "node scripts/bot-validation-runner.mjs",
+    "benchmark:baseline": "node scripts/bot-benchmark-baseline.mjs",
+    "test:core": "playwright test tests/core.spec.js",
+    "test:gpu": "playwright test tests/gpu.spec.js",
+    "test:physics": "playwright test tests/physics-core.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js",
+    "test:physics:core": "playwright test tests/physics-core.spec.js",
+    "test:physics:hunt": "playwright test tests/physics-hunt.spec.js",
+    "test:physics:policy": "playwright test tests/physics-policy.spec.js",
+    "test:stress": "playwright test tests/stress.spec.js"
+  },
+  "keywords": [
+    "game",
+    "3d",
+    "threejs"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mp4-muxer": "^5.2.2",
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "vite": "^5.0.0"
+  }
+}

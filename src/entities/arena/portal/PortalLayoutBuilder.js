@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../../core/Config.js';
 import {
+    createPortalGateVisualRegistry,
     createBoostPortalMesh,
     createPortalMesh,
     createSlingshotGateMesh,
@@ -28,9 +29,11 @@ export class PortalLayoutBuilder {
         this.arena = arena;
         this._tmpVec = new THREE.Vector3();
         this._portalMeshCompactMode = false;
+        this._visualRegistry = null;
     }
 
     build(map, scale) {
+        this._visualRegistry = createPortalGateVisualRegistry(this.arena.renderer);
         this._buildPortals(map, scale);
         this._buildSpecialGates(map, scale);
     }
@@ -73,9 +76,9 @@ export class PortalLayoutBuilder {
 
             let mesh;
             if (type === 'boost') {
-                mesh = createBoostPortalMesh(pos, rotation, color, this.arena.renderer);
+                mesh = createBoostPortalMesh(pos, rotation, color, this._visualRegistry);
             } else if (type === 'slingshot') {
-                mesh = createSlingshotGateMesh(pos, rotation, color, this.arena.renderer);
+                mesh = createSlingshotGateMesh(pos, rotation, color, this._visualRegistry);
             }
             if (!mesh) continue;
 
@@ -110,13 +113,13 @@ export class PortalLayoutBuilder {
 
         const pairCount = Math.max(0, Math.floor(CONFIG.GAMEPLAY.PORTAL_COUNT || 0));
         if (pairCount > 0) {
-            this._portalMeshCompactMode = pairCount >= 3;
+            this._portalMeshCompactMode = pairCount >= 2;
             this._buildFixedDynamicPortals(pairCount);
             return;
         }
 
         if (Array.isArray(map.portals)) {
-            this._portalMeshCompactMode = map.portals.length >= 3;
+            this._portalMeshCompactMode = map.portals.length >= 2;
             for (const def of map.portals) {
                 this._createPortalFromDef(def, scale);
             }
@@ -189,8 +192,8 @@ export class PortalLayoutBuilder {
 
     _addPortalInstance(posA, posB, color, dirA = 'NEUTRAL', dirB = 'NEUTRAL') {
         const portalMeshOptions = this._portalMeshCompactMode ? { compact: true } : undefined;
-        const meshA = createPortalMesh(posA, color, dirA, this.arena.renderer, portalMeshOptions);
-        const meshB = createPortalMesh(posB, color, dirB, this.arena.renderer, portalMeshOptions);
+        const meshA = createPortalMesh(posA, color, dirA, this._visualRegistry, portalMeshOptions);
+        const meshB = createPortalMesh(posB, color, dirB, this._visualRegistry, portalMeshOptions);
         this.arena.portals.push({
             posA,
             posB,

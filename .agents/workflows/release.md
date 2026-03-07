@@ -41,8 +41,4 @@ git tag -a v[X.Y.Z] -m "Release v[X.Y.Z]"
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-
+Standardformat verwenden.

@@ -12,6 +12,21 @@ test.describe('T21-40: Rendering & GPU', () => {
         expect(ok).toBeTruthy();
     });
 
+    test('T21a: Renderer nutzt non-recording Buffer im Standardpfad', async ({ page }) => {
+        await startGame(page);
+        const probe = await page.evaluate(() => {
+            const renderer = window.GAME_INSTANCE?.renderer;
+            const gl = renderer?.renderer?.getContext?.();
+            const attrs = gl?.getContextAttributes?.() || null;
+            return {
+                preserveDrawingBuffer: !!attrs?.preserveDrawingBuffer,
+                recordingActive: !!renderer?.getRecordingActive?.(),
+            };
+        });
+        expect(probe.recordingActive).toBeFalsy();
+        expect(probe.preserveDrawingBuffer).toBeFalsy();
+    });
+
     test('T22: Szene hat Lichter', async ({ page }) => {
         await startGame(page);
         const hasLights = await page.evaluate(() => {
@@ -225,5 +240,59 @@ test.describe('T21-40: Rendering & GPU', () => {
         expect(probe.mode).toBe('THIRD_PERSON');
         expect(probe.cockpit).toBeTruthy();
         expect(probe.blend).toBeGreaterThan(0);
+    });
+
+    test('T21b: Portal-Szenarien nutzen InstancedMesh fuer Portal-Visuals', async ({ page }) => {
+        await loadGame(page);
+        await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            const debugApi = g?.debugApi || window.GAME_DEBUG || null;
+            const applyScenario = typeof g?.applyBotValidationScenario === 'function'
+                ? g.applyBotValidationScenario.bind(g)
+                : (typeof debugApi?.applyBotValidationScenario === 'function'
+                    ? debugApi.applyBotValidationScenario.bind(debugApi)
+                    : null);
+            if (typeof applyScenario !== 'function') {
+                throw new Error('applyBotValidationScenario missing');
+            }
+            applyScenario('V3');
+            g.winsNeeded = 1;
+            if (g.settings) g.settings.winsNeeded = 1;
+            if (typeof g._onSettingsChanged === 'function') g._onSettingsChanged();
+            g.startMatch();
+        });
+        await page.waitForFunction(() => window.GAME_INSTANCE?.state === 'PLAYING', null, { timeout: 10000 });
+        await page.waitForTimeout(500);
+
+        const probe = await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            const instancedPortals = [];
+            g?.renderer?.scene?.traverse((child) => {
+                if (child?.isInstancedMesh && typeof child.name === 'string' && child.name.startsWith('portal:')) {
+                    instancedPortals.push({
+                        name: child.name,
+                        count: child.count,
+                        color: child.material?.color?.getHexString?.() || null,
+                        emissive: child.material?.emissive?.getHexString?.() || null,
+                    });
+                }
+            });
+            const torusBatches = instancedPortals.filter((entry) => entry.name.startsWith('portal:torus:'));
+            const discBatches = instancedPortals.filter((entry) => entry.name.startsWith('portal:disc:'));
+            return {
+                portalPairs: g?.arena?.portals?.length || 0,
+                instancedPortals,
+                torusCount: torusBatches.reduce((sum, entry) => sum + (entry.count || 0), 0),
+                discCount: discBatches.reduce((sum, entry) => sum + (entry.count || 0), 0),
+                torusColors: torusBatches.map((entry) => entry.color).filter(Boolean),
+                torusEmissives: torusBatches.map((entry) => entry.emissive).filter(Boolean),
+            };
+        });
+
+        expect(probe.portalPairs).toBe(4);
+        expect(probe.torusCount).toBe(8);
+        expect(probe.discCount).toBe(8);
+        expect(probe.torusColors).toEqual(expect.arrayContaining(['00ff00', 'ff0000']));
+        expect(probe.torusEmissives).toEqual(expect.arrayContaining(['00ff00', 'ff0000']));
     });
 });

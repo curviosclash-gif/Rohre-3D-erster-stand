@@ -1,0 +1,19 @@
+{
+  "measuredAt": "2026-03-05T03:48:35.870Z",
+  "url": "http://127.0.0.1:4282",
+  "init": {
+    "domContentLoadedEventEndMs": 1361.800000000745,
+    "gameInstanceReadyMs": 1432.1000000014901,
+    "domToGameInstanceMs": 70.30000000074506
+  },
+  "startMatchLatencyMs": 1810,
+  "returnToMenuLatencyMs": 31.09999999962747,
+  "cameraPath": {
+    "error": null,
+    "resolveCalls": 240,
+    "collisionChecks": 1,
+    "expectedNoCacheChecks": 240,
+    "savedChecksEstimate": 239,
+    "savedRatio": 0.9958333333333333
+  }
+}

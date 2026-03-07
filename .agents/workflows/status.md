@@ -22,8 +22,4 @@ description: Quick project status snapshot.
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-
+Standardformat verwenden.

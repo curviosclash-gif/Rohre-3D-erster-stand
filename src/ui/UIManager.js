@@ -53,6 +53,8 @@ export class UIManager {
         this._vehiclePreviewEntries = listVehiclePreviewEntries();
         this._startSetupDisposers = [];
         this._startValidationIssue = null;
+        this._level4SectionControlsSetup = false;
+        this._developerTextCatalogSetup = false;
         this._developerNavButtons = Array.from(document.querySelectorAll(
             '[data-submenu="submenu-developer"], [data-menu-target="submenu-developer"], [data-menu-step-target="submenu-developer"]'
         ));
@@ -74,11 +76,20 @@ export class UIManager {
         this._setupVehicleSelects();
         this._setupMapSelect();
         this._setupStartSetupControls();
-        this._setupLevel4SectionControls();
-        this._setupDeveloperTextCatalog();
         this._setupMenuNavigation();
         this.syncAll();
         this.updateContext();
+    }
+
+    _ensureLevel4SectionControlsSetup() {
+        if (this._level4SectionControlsSetup) return;
+        this._setupLevel4SectionControls();
+    }
+
+    _ensureDeveloperTextCatalogSetup() {
+        if (this._developerTextCatalogSetup) return;
+        this._setupDeveloperTextCatalog();
+        this._developerTextCatalogSetup = true;
     }
 
     _setupVehicleSelects() {
@@ -242,6 +253,7 @@ export class UIManager {
     }
 
     _setupLevel4SectionControls() {
+        if (this._level4SectionControlsSetup) return;
         if (!Array.isArray(this.ui.level4SectionTabs)) return;
         this.ui.level4SectionTabs.forEach((button) => {
             button.addEventListener('click', () => {
@@ -259,6 +271,7 @@ export class UIManager {
                 tabs[nextIndex]?.focus?.();
             });
         });
+        this._level4SectionControlsSetup = true;
     }
 
     setLevel4Section(sectionId, options = {}) {
@@ -269,10 +282,10 @@ export class UIManager {
         if (options.persist !== false) {
             this.settings.localSettings.toolsState.activeSection = resolvedSectionId;
         }
+        if (!this.settings.localSettings.toolsState.level4Open) return;
+        this._ensureLevel4SectionControlsSetup();
         this._syncLevel4SectionState(resolvedSectionId, options);
-        if (this.settings.localSettings.toolsState.level4Open) {
-            this.updateContext();
-        }
+        this.updateContext();
     }
 
     _syncLevel4SectionState(sectionId, options = {}) {
@@ -611,6 +624,9 @@ export class UIManager {
             onPanelChanged: (panelId, _panelConfig, _transition, transitionMetadata) => {
                 const previousPanelId = this.game._activeSubmenu || null;
                 this.game._activeSubmenu = panelId || null;
+                if (panelId === 'submenu-developer') {
+                    this._ensureDeveloperTextCatalogSetup();
+                }
                 if (panelId !== 'submenu-game' && this.settings?.localSettings?.toolsState?.level4Open) {
                     this.settings.localSettings.toolsState.level4Open = false;
                     this.setLevel4Open(false);
@@ -648,6 +664,9 @@ export class UIManager {
         const drawer = this.ui.level4Drawer;
         if (!drawer) return;
         const open = !!isOpen;
+        if (open) {
+            this._ensureLevel4SectionControlsSetup();
+        }
         if (!this.settings?.localSettings?.toolsState || typeof this.settings.localSettings.toolsState !== 'object') {
             this.settings.localSettings.toolsState = {};
         }
@@ -658,7 +677,9 @@ export class UIManager {
             this.settings?.localSettings?.toolsState?.activeSection,
             LEVEL4_SECTION_IDS.CONTROLS
         );
-        this._syncLevel4SectionState(activeSection, { focus: false });
+        if (open || this._level4SectionControlsSetup) {
+            this._syncLevel4SectionState(activeSection, { focus: false });
+        }
         this._syncMenuChromeState(this.game._activeSubmenu || null);
         if (open) {
             const activePanel = Array.isArray(this.ui.level4SectionPanels)

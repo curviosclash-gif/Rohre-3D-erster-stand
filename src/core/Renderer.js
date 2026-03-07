@@ -17,8 +17,9 @@ export class Renderer {
             canvas: this.canvas,
             antialias: window.devicePixelRatio <= 1,
             alpha: false,
-            preserveDrawingBuffer: true,
+            preserveDrawingBuffer: false,
         });
+        this._recordingActive = false;
         this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, CONFIG.RENDER.MAX_PIXEL_RATIO));
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.type = THREE.BasicShadowMap;
@@ -109,6 +110,14 @@ export class Renderer {
 
     getCinematicEnabled() {
         return this.cameraRigSystem.getCinematicEnabled();
+    }
+
+    setRecordingActive(active) {
+        this._recordingActive = !!active;
+    }
+
+    getRecordingActive() {
+        return this._recordingActive;
     }
 
     updateCamera(

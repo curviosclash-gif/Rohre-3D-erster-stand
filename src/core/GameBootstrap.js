@@ -16,8 +16,61 @@ import { CrosshairSystem } from '../ui/CrosshairSystem.js';
 import { BuildInfoController } from './BuildInfoController.js';
 import { MediaRecorderSystem } from './MediaRecorderSystem.js';
 
-export function createGameUiRefs() {
+function readBooleanQueryParam(paramName, fallback = false) {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has(paramName)) return fallback;
+        const value = String(params.get(paramName) || '').trim().toLowerCase();
+        if (value === '1' || value === 'true' || value === 'yes' || value === 'on') return true;
+        if (value === '0' || value === 'false' || value === 'no' || value === 'off') return false;
+    } catch {
+        // no-op
+    }
+    return fallback;
+}
+
+function readNumberQueryParam(paramName, fallback, min, max) {
+    try {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.has(paramName)) return fallback;
+        const value = Number(params.get(paramName));
+        if (!Number.isFinite(value)) return fallback;
+        return Math.max(min, Math.min(max, Math.floor(value)));
+    } catch {
+        // no-op
+    }
+    return fallback;
+}
+
+function resolveRecorderRuntimeConfig() {
     return {
+        autoRecordingEnabled: readBooleanQueryParam('autorecord', false),
+        captureFps: readNumberQueryParam('recordfps', 30, 10, 60),
+    };
+}
+
+function defineLazyUiRef(target, key, resolver) {
+    let resolved = false;
+    let cached = null;
+    Object.defineProperty(target, key, {
+        configurable: true,
+        enumerable: true,
+        get() {
+            if (!resolved) {
+                cached = resolver();
+                resolved = true;
+            }
+            return cached;
+        },
+        set(value) {
+            cached = value;
+            resolved = true;
+        },
+    });
+}
+
+export function createGameUiRefs() {
+    const ui = {
         mainMenu: document.getElementById('main-menu'),
         hud: document.getElementById('hud'),
         p2Hud: document.getElementById('p2-hud'),
@@ -109,7 +162,7 @@ export function createGameUiRefs() {
         presetDeleteButton: document.getElementById('btn-preset-delete'),
         presetNameInput: document.getElementById('preset-name'),
         presetStatus: document.getElementById('preset-status'),
-        quickstartPresetButtons: Array.from(document.querySelectorAll('[data-preset-id]')),
+        quickstartPresetButtons: null,
         multiplayerHostButton: document.getElementById('btn-multiplayer-host'),
         multiplayerJoinButton: document.getElementById('btn-multiplayer-join'),
         multiplayerReadyToggle: document.getElementById('multiplayer-ready-toggle'),
@@ -127,7 +180,7 @@ export function createGameUiRefs() {
         developerTextClearButton: document.getElementById('btn-developer-text-clear'),
         developerTelemetryOutput: document.getElementById('developer-telemetry-output'),
         developerHint: document.getElementById('developer-hint'),
-        debugHints: Array.from(document.querySelectorAll('.debug-hint')),
+        debugHints: null,
 
         vehicleSelectP1: document.getElementById('vehicle-select-p1'),
         vehicleSelectP2: document.getElementById('vehicle-select-p2'),
@@ -153,9 +206,9 @@ export function createGameUiRefs() {
         level3ResetButton: document.getElementById('btn-level3-reset'),
         openLevel4Button: document.getElementById('btn-open-level4'),
         level4Drawer: document.getElementById('submenu-level4'),
-        startAccordions: Array.from(document.querySelectorAll('[data-start-section]')),
-        level4SectionTabs: Array.from(document.querySelectorAll('[data-level4-section-target]')),
-        level4SectionPanels: Array.from(document.querySelectorAll('#submenu-level4 [data-level4-section]')),
+        startAccordions: null,
+        level4SectionTabs: null,
+        level4SectionPanels: null,
         closeLevel4Button: document.getElementById('btn-close-level4'),
         level4ResetButton: document.getElementById('btn-level4-reset'),
         configShareInput: document.getElementById('config-share-input'),
@@ -166,16 +219,27 @@ export function createGameUiRefs() {
         openEditorButton: document.getElementById('btn-open-editor'),
         openVehicleEditorButton: document.getElementById('btn-open-vehicle-editor'),
     };
+
+    defineLazyUiRef(ui, 'quickstartPresetButtons', () => Array.from(document.querySelectorAll('[data-preset-id]')));
+    defineLazyUiRef(ui, 'debugHints', () => Array.from(document.querySelectorAll('.debug-hint')));
+    defineLazyUiRef(ui, 'startAccordions', () => Array.from(document.querySelectorAll('[data-start-section]')));
+    defineLazyUiRef(ui, 'level4SectionTabs', () => Array.from(document.querySelectorAll('[data-level4-section-target]')));
+    defineLazyUiRef(ui, 'level4SectionPanels', () => Array.from(document.querySelectorAll('#submenu-level4 [data-level4-section]')));
+
+    return ui;
 }
 
 export function bootstrapGameRuntime(game, options = {}) {
     const canvas = document.getElementById('game-canvas');
     game.renderer = new Renderer(canvas);
+    const recorderRuntimeConfig = resolveRecorderRuntimeConfig();
     game.mediaRecorderSystem = new MediaRecorderSystem({
         canvas,
-        autoRecordingEnabled: true,
+        autoRecordingEnabled: recorderRuntimeConfig.autoRecordingEnabled,
         autoDownload: true,
+        captureFps: recorderRuntimeConfig.captureFps,
         downloadDirectoryName: 'videos',
+        onRecordingStateChange: (isRecording) => game.renderer?.setRecordingActive?.(isRecording),
         logger: console,
     });
     game.input = new InputManager();

@@ -12,7 +12,9 @@ function _disposeTexture(texture, seenTextures) {
 export function disposeMaterialResources(material, state = {}) {
     const seenMaterials = state.seenMaterials || new Set();
     const seenTextures = state.seenTextures || new Set();
-    const skipMaterial = typeof state.skipMaterial === 'function' ? state.skipMaterial : () => false;
+    const skipMaterial = typeof state.skipMaterial === 'function'
+        ? state.skipMaterial
+        : (entry) => entry?.userData?.__sharedNoDispose === true;
 
     if (!material) return;
     if (Array.isArray(material)) {
@@ -73,7 +75,7 @@ export function disposeObject3DResources(root, options = {}) {
         : (geometry) => geometry?.userData?.__sharedNoDispose === true;
     const skipMaterial = typeof options.skipMaterial === 'function'
         ? options.skipMaterial
-        : () => false;
+        : (material) => material?.userData?.__sharedNoDispose === true;
 
     root.traverse((child) => {
         if (child?.isInstancedMesh && typeof child.dispose === 'function') {

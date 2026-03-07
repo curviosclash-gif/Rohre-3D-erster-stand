@@ -60,6 +60,7 @@ export class MediaRecorderSystem {
         autoDownload = false,
         downloadDirectoryName = 'videos',
         captureFps = 60,
+        onRecordingStateChange = null,
         contractVersion = DEFAULT_CONTRACT_VERSION,
         filePrefix = 'aero-arena',
         logger = console,
@@ -71,6 +72,7 @@ export class MediaRecorderSystem {
         this.autoDownload = !!autoDownload;
         this.downloadDirectoryName = sanitizeFileToken(downloadDirectoryName, 'videos');
         this.captureFps = Math.max(1, Number(captureFps) || 60);
+        this.onRecordingStateChange = typeof onRecordingStateChange === 'function' ? onRecordingStateChange : null;
         this.contractVersion = String(contractVersion || DEFAULT_CONTRACT_VERSION);
         this.filePrefix = sanitizeFileToken(filePrefix, 'aero-arena');
         this.logger = logger || console;
@@ -109,6 +111,49 @@ export class MediaRecorderSystem {
 
     isRecording() {
         return this._isRecording;
+    }
+
+    setCaptureFps(fps) {
+        const nextFps = Math.max(1, Math.floor(Number(fps) || 0));
+        if (!Number.isFinite(nextFps)) {
+            return this.captureFps;
+        }
+        this.captureFps = nextFps;
+        if (this._isRecording) {
+            this._startFrameCaptureLoop();
+        }
+        return this.captureFps;
+    }
+
+    _notifyRecordingStateChange(isRecording) {
+        if (typeof this.onRecordingStateChange !== 'function') return;
+        try {
+            this.onRecordingStateChange(!!isRecording);
+        } catch (error) {
+            this.logger?.warn?.('[MediaRecorderSystem] recording state callback failed', error);
+        }
+    }
+
+    _startFrameCaptureLoop() {
+        if (this._frameIntervalId) {
+            clearInterval(this._frameIntervalId);
+            this._frameIntervalId = null;
+        }
+
+        const frameIntervalMs = 1000 / this.captureFps;
+        this._frameIntervalId = setInterval(async () => {
+            if (!this._isRecording || !this._videoEncoder || this._videoEncoder.state !== 'configured') return;
+            try {
+                const timestamp = (this._frameCount * 1000000) / this.captureFps;
+                const frame = new VideoFrame(this.canvas, { timestamp });
+                const insertKeyFrame = this._frameCount % (this.captureFps * 2) === 0;
+                this._videoEncoder.encode(frame, { keyFrame: insertKeyFrame });
+                frame.close();
+                this._frameCount++;
+            } catch {
+                // Ignore transient frame capture errors (e.g. canvas resized)
+            }
+        }, frameIntervalMs);
     }
 
     getLifecycleEvents() {
@@ -224,20 +269,8 @@ export class MediaRecorderSystem {
             trigger: trigger || null,
         };
 
-        const frameIntervalMs = 1000 / this.captureFps;
-        this._frameIntervalId = setInterval(async () => {
-            if (!this._isRecording || !this._videoEncoder || this._videoEncoder.state !== 'configured') return;
-            try {
-                const timestamp = (this._frameCount * 1000000) / this.captureFps;
-                const frame = new VideoFrame(this.canvas, { timestamp });
-                const insertKeyFrame = this._frameCount % (this.captureFps * 2) === 0;
-                this._videoEncoder.encode(frame, { keyFrame: insertKeyFrame });
-                frame.close();
-                this._frameCount++;
-            } catch (err) {
-                // Ignore transient frame capture errors (e.g. canvas resized)
-            }
-        }, frameIntervalMs);
+        this._startFrameCaptureLoop();
+        this._notifyRecordingStateChange(true);
 
         return {
             started: true,
@@ -395,6 +428,7 @@ export class MediaRecorderSystem {
         this._videoEncoder = null;
         this._activeRecording = null;
         this._frameCount = 0;
+        this._notifyRecordingStateChange(false);
     }
 
     dispose() {

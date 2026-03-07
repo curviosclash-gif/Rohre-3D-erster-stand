@@ -15,6 +15,7 @@ import {
     exportMenuConfigAsJson,
     importMenuConfigFromInput,
 } from '../ui/menu/MenuConfigShareOps.js';
+import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 
 const MATCH_SETTING_CHANGE_KEY_SET = new Set([
     SETTINGS_CHANGE_KEYS.MODE,
@@ -91,6 +92,35 @@ export class GameRuntimeFacade {
     constructor(game) {
         this.game = game || null;
         this.menuMultiplayerBridge = null;
+        this._matchPrewarmTimer = null;
+    }
+
+    _clearMatchPrewarmTimer() {
+        if (!this._matchPrewarmTimer) return;
+        clearTimeout(this._matchPrewarmTimer);
+        this._matchPrewarmTimer = null;
+    }
+
+    scheduleMatchPrewarm() {
+        const game = this.game;
+        if (!game?.renderer || !game?.settingsManager) return;
+        if (game.state !== 'MENU') return;
+        if (game.entityManager) return;
+
+        this._clearMatchPrewarmTimer();
+        this._matchPrewarmTimer = setTimeout(() => {
+            this._matchPrewarmTimer = null;
+            if (game.state !== 'MENU') return;
+            if (game.entityManager) return;
+
+            const runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
+            prewarmMatchArenaSession({
+                renderer: game.renderer,
+                settings: game.settings,
+                runtimeConfig,
+                requestedMapKey: runtimeConfig?.session?.mapKey || game.mapKey,
+            });
+        }, 50);
     }
 
     applySettingsToRuntime() {
@@ -115,6 +145,7 @@ export class GameRuntimeFacade {
         }
 
         game.input?.setBindings?.(game.runtimeConfig.controls);
+        this.scheduleMatchPrewarm();
     }
 
     setupMenuListeners() {
@@ -908,6 +939,7 @@ export class GameRuntimeFacade {
         game.keybindEditorController.renderEditor();
         game._syncProfileControls();
         this.updateSaveButtonState();
+        this.scheduleMatchPrewarm();
     }
 
     markSettingsDirty(isDirty) {
@@ -927,6 +959,7 @@ export class GameRuntimeFacade {
     }
 
     startMatch() {
+        this._clearMatchPrewarmTimer();
         const telemetryPayload = {
             sessionType: this.game?.settings?.localSettings?.sessionType || 'single',
             modePath: this.game?.settings?.localSettings?.modePath || 'normal',
@@ -954,6 +987,7 @@ export class GameRuntimeFacade {
 
     returnToMenu() {
         this.game?.matchFlowUiController?.returnToMenu?.();
+        this.scheduleMatchPrewarm();
     }
 
     syncP2HudVisibility() {

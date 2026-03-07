@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Powerup Lab (Prototype)</title>
+    <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+    <canvas id="lab-canvas" aria-label="Powerup Lab 3D Demo"></canvas>
+
+    <aside class="hud" aria-live="polite">
+        <div class="hud__header">
+            <p class="hud__eyebrow">Prototype (nicht integriert)</p>
+            <h1>Powerup Lab</h1>
+            <p class="hud__sub">Boost-Portal + weitere experimentelle Gates in einem separaten Ordner.</p>
+        </div>
+
+        <section class="hud__panel">
+            <h2>Status</h2>
+            <div class="hud__grid">
+                <span>Speed</span><strong id="speedValue">0</strong>
+                <span>World-Time</span><strong id="timeScaleValue">1.00x</strong>
+                <span>Energy</span><strong id="energyValue">0</strong>
+                <span>Position</span><strong id="posValue">0 / 0 / 0</strong>
+            </div>
+        </section>
+
+        <section class="hud__panel">
+            <h2>Aktive Effekte</h2>
+            <div id="effectsValue" class="hud__effects">Keine</div>
+        </section>
+
+        <section class="hud__panel">
+            <h2>Controls</h2>
+            <ul class="hud__list">
+                <li><kbd>W</kbd>/<kbd>S</kbd> Pitch</li>
+                <li><kbd>A</kbd>/<kbd>D</kbd> Yaw</li>
+                <li><kbd>Q</kbd>/<kbd>E</kbd> Roll</li>
+                <li><kbd>Space</kbd> leichter Eigen-Boost</li>
+                <li><kbd>R</kbd> Reset</li>
+            </ul>
+        </section>
+
+        <section class="hud__panel">
+            <h2>Events</h2>
+            <ul id="eventLog" class="hud__log"></ul>
+        </section>
+    </aside>
+
+    <script type="module" src="./main.js"></script>
+</body>
+</html>

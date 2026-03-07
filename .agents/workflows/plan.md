@@ -41,9 +41,18 @@ Create `docs/Feature_[Name].md` with:
 
 - Add a verification note to run `npm run docs:sync` and `npm run docs:check` during implementation closure.
 
+## 6. Commit
+
+- Commit the new feature plan and the updated master plan:
+
+  ```bash
+  git add docs/Umsetzungsplan.md docs/Feature_[Name].md
+  git commit -m "docs: add implementation plan for [Name]"
+  ```
+
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
+Standardformat verwenden.
 
 **CRITICAL ADDITION FOR THE REPORT:**
 At the end of your report, you MUST provide:

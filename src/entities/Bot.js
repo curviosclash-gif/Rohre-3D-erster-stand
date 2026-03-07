@@ -264,17 +264,17 @@ export class BotAI {
     }
 
     _mapBehavior(arena) {
-        this.sensorsFacade.bindRuntime(this);
+        this._ensureSensorsRuntimeBound();
         return this.sensorsFacade.mapBehavior(arena);
     }
 
     _scoreProbe(player, arena, allPlayers, probe, lookAhead) {
-        this.sensorsFacade.bindRuntime(this);
+        this._ensureSensorsRuntimeBound();
         this.sensorsFacade.scoreProbe(player, arena, allPlayers, probe, lookAhead);
     }
 
     checkTrailHit(position, player, allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
-        this.sensorsFacade.bindRuntime(this);
+        this._ensureSensorsRuntimeBound();
         return this.sensorsFacade.checkTrailHit(position, player, allPlayers, radius, skipRecent);
     }
 
@@ -286,13 +286,25 @@ export class BotAI {
         this.sensorsFacade.setSensePhase(phase);
     }
 
+    _ensureSensorsRuntimeBound() {
+        if (
+            this.sensorsFacade.runtimeBot !== this
+            || this.sensors.profile !== this.profile
+            || this.sensors.state !== this.state
+        ) {
+            this.sensorsFacade.bindRuntime(this);
+            return;
+        }
+        this.sensors._recentBouncePressure = this._recentBouncePressure;
+    }
+
     getSensorSnapshot() {
-        this.sensorsFacade.bindRuntime(this);
+        this._ensureSensorsRuntimeBound();
         return this.sensorsFacade.getSensorSnapshot();
     }
 
     getSensorArray() {
-        this.sensorsFacade.bindRuntime(this);
+        this._ensureSensorsRuntimeBound();
         return this.sensorsFacade.getSensorArray();
     }
 
@@ -319,7 +331,7 @@ export class BotAI {
         this.reactionTimer = Math.max(0.02, this.profile.reactionTime * jitter);
 
         this._resetDecision();
-        this.sensorsFacade.bindRuntime(this);
+        this._ensureSensorsRuntimeBound();
         this.sensors.update(this, player, arena, allPlayers, projectiles);
         if (runDecision(this, dt, player, arena, allPlayers, ITEM_RULES)) {
             return this.currentInput;

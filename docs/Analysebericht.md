@@ -9,6 +9,7 @@ Nachvalidierung: 2026-03-07 (`server.ps1` + Chromium-Smoke auf statischem Launch
 - Keine neuen offenen Warnungen nach dem aktuellen Nachvalidierungs-Lauf.
 - Behoben 2026-03-07: Der statische Launcherpfad startete nicht mehr, weil der Browser den Bare-Specifier `mp4-muxer` ausserhalb von Vite nicht aufloesen konnte.
 - Behoben 2026-03-07: Die Cinematic-Kamera blieb in Third-Person wirkungslos, sobald `cockpitCamera` aktiv war (Blend blieb bei `0`).
+- Behoben 2026-03-07: Portale erschienen nach dem Portal-/Gate-Instancing ploetzlich schwarz, weil der neue Shared-Material-Pfad farbige/emissive Portalmaterialien durch weiss-graue Shared-Materialien ersetzt hatte.
 
 ## Regressionen
 
@@ -41,3 +42,5 @@ Nachvalidierung: 2026-03-07 (`server.ps1` + Chromium-Smoke auf statischem Launch
 - Behoben: `index.html` mappt `mp4-muxer` jetzt auch fuer den statischen Browserpfad; `server.ps1` liefert `.mjs` als JavaScript aus.
 - Behoben: `CameraRigSystem` wendet Cinematic-Offsets jetzt auch im Cockpit-Third-Person-Pfad an.
 - Abgesichert: Neuer GPU-Regressionstest `T33b` in `tests/gpu.spec.js` prueft Cinematic-Blend bei `cockpitCamera=true` + `THIRD_PERSON`.
+- Behoben: Portal-/Gate-Instancing batcht Portalfarben jetzt farbgetrennt pro Material, sodass Portalringe wieder korrekt rot/gruen leuchten statt schwarz zu erscheinen.
+- Abgesichert: `tests/gpu.spec.js` `T21b` summiert jetzt farbgetrennte Portal-Batches und prueft explizit Rot/Grun in Material- und Emissive-Farben.

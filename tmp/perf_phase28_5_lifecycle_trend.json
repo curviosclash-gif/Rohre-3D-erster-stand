@@ -1,0 +1,16 @@
+{
+  "generatedAt": "2026-03-07T09:05:49.118Z",
+  "profile": "trend",
+  "sampleDurationMs": 2500,
+  "appUrl": "http://127.0.0.1:4275",
+  "measurements": {
+    "domToGameInstanceMs": 4283,
+    "startMatchLatencyMs": 68,
+    "returnToMenuLatencyMs": 63
+  },
+  "lifecycleEventTypes": [
+    "match_started",
+    "match_ended",
+    "menu_opened"
+  ]
+}

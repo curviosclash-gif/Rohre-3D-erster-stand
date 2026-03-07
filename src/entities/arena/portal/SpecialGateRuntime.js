@@ -51,13 +51,21 @@ export class SpecialGateRuntime {
             const { spines, outerRing, innerDisk, frontRing, backRing } = gate.mesh.userData;
             if (spines) {
                 for (let i = 0; i < spines.length; i++) {
-                    spines[i].rotation.x = time * 2 + i * 0.5;
+                    if (spines[i]?.setRotation) {
+                        spines[i].setRotation('x', time * 2 + i * 0.5);
+                    } else if (spines[i]) {
+                        spines[i].rotation.x = time * 2 + i * 0.5;
+                    }
                 }
             }
-            if (outerRing) outerRing.rotation.z = time * 0.8;
-            if (innerDisk) innerDisk.rotation.z = -time * 1.2;
-            if (frontRing) frontRing.rotation.z = time * 0.6;
-            if (backRing) backRing.rotation.z = -time * 0.9;
+            if (outerRing?.setRotation) outerRing.setRotation('z', time * 0.8);
+            else if (outerRing) outerRing.rotation.z = time * 0.8;
+            if (innerDisk?.setRotation) innerDisk.setRotation('z', -time * 1.2);
+            else if (innerDisk) innerDisk.rotation.z = -time * 1.2;
+            if (frontRing?.setRotation) frontRing.setRotation('z', time * 0.6);
+            else if (frontRing) frontRing.rotation.z = time * 0.6;
+            if (backRing?.setRotation) backRing.setRotation('z', -time * 0.9);
+            else if (backRing) backRing.rotation.z = -time * 0.9;
         }
     }
 }

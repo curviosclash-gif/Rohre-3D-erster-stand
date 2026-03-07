@@ -29,7 +29,7 @@ Create `implementation_plan.md`:
 
 - Run `/code` workflow with `fix:` commit prefix.
 - Keep this workflow focused on phase management only.
-- Use `/code` as the single source of truth for implementation DoD and verification checks.
+- Use `/code` as the single source of truth for implementation DoD, verification checks, AND documentation freshness.
 - If no-stop block is active: continue directly to the next open phase in the same block after each successful phase close.
 - Stop only on hard blockers (failing gates, unclear contract conflicts, missing assets, or explicit user stop).
 
@@ -37,11 +37,17 @@ Create `implementation_plan.md`:
 
 - Mark phase/task checkboxes done.
 - Add completion date.
-- Run `npm run docs:sync` and `npm run docs:check` before marking phase complete.
 - Remove `implementation_plan.md`.
+- Commit the plan update:
+
+  ```bash
+  git add docs/Umsetzungsplan.md implementation_plan.md
+  git commit -m "chore: close phase [Name] in master plan"
+  ```
+
 - If no-stop block: repeat Step 1-4 until the block has no `[ ]` phases left.
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
+Standardformat verwenden.
 Set `Next Step` to `/fix-planung`.

@@ -33,5 +33,4 @@ description: Verify docs/workflows/rules are current with an automated gate.
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
+Standardformat verwenden.

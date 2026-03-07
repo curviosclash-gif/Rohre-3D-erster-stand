@@ -2,24 +2,19 @@
 description: Run full test analysis, persist results, and update prioritized action plan.
 ---
 
-## 0. Context
+## 0. Context (optional – skip for focused re-runs)
 
 - Read `docs/Umsetzungsplan.md`.
 - Read latest `docs/Analysebericht.md` if present.
 
 ## 1. Test mapping (source of truth)
 
-- `T1-T20`: `npm run test:core` -> `tests/core.spec.js`
-- `T21-T40`: `npm run test:gpu` -> `tests/gpu.spec.js`
-- `T41-T60`: `npm run test:physics` -> `tests/physics.spec.js`
-- `T61-T125`: `npm run test:stress` -> `tests/stress.spec.js`
-- Extra smoke:
-  - `npm run smoke:roundstate`
-  - `npm run smoke:selftrail`
+- Use `.agents/test_mapping.md` to select commands based on changed paths.
+- Extra smoke: `npm run smoke:roundstate`, `npm run smoke:selftrail`.
 
 ## 2. Execute and persist
 
-- Run mapped commands sensibly. Always run core tests, but run specialized tests (GPU, physics, stress) only if relevant to recent changes or during a major milestone. Avoid running all commands blindly.
+- Run mapped commands sensibly. Always run core tests, but run specialized tests (GPU, physics, stress) only if relevant to recent changes or during a major milestone.
 - Save raw outcome to `docs/Testergebnisse_YYYY-MM-DD.md`.
 - Use per-test status: `PASS` / `FAIL` / `WARN`.
 
@@ -34,17 +29,11 @@ description: Run full test analysis, persist results, and update prioritized act
 - Keep completed items for history.
 - Ensure phase headers use checkbox format: `## Phase X: [ ] Title`.
 
-## 5. Documentation freshness check
-
-- Run `npm run docs:sync`.
-- Resolve stale path/state/date references from `docs/Dokumentationsstatus.md`.
-- Run `npm run docs:check` (must pass).
-
-## 6. Final consistency check
+## 5. Final consistency check
 
 - No uncovered findings between test report, analysis, and plan.
 - Keep `/fix-planung` compatibility.
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
+Standardformat verwenden.

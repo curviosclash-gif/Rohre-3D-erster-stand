@@ -23,18 +23,17 @@ description: Diagnose a reported issue and apply a targeted fix.
 
 - Apply smallest safe change for root cause.
 - Keep scope limited to affected files.
-- Re-run relevant checks (`build` + focused tests).
+- Re-run relevant checks (`build` + focused tests via `.agents/test_mapping.md`).
 
-## 4. Documentation sync
+## 4. Commit
 
-- Run `npm run docs:sync`.
-- Update issue status in `docs/Analysebericht.md` and `docs/Umsetzungsplan.md` when bug state changed.
-- Run `npm run docs:check` (must pass).
+```bash
+git add [scoped-files]
+git commit -m "fix: [short reason]"
+```
+
+- Verify scope first: `git diff --name-only`.
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-
+Standardformat verwenden.

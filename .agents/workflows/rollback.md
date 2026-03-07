@@ -27,17 +27,13 @@ git reset --hard <COMMIT>
 ## 4. Sync plan
 
 - Update `docs/Umsetzungsplan.md` phases that are no longer done.
+- Commit the plan update:
 
-## 5. Documentation freshness
-
-- Run `npm run docs:sync`.
-- Ensure analysis/report docs do not claim reverted behavior as active.
-- Run `npm run docs:check` (must pass).
+  ```bash
+  git add docs/Umsetzungsplan.md
+  git commit -m "chore: sync plan after rollback"
+  ```
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-
+Standardformat verwenden.

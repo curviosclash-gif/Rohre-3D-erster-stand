@@ -2,7 +2,7 @@
 description: Measure baseline, optimize bottlenecks, and verify impact.
 ---
 
-## 0. Context
+## 0. Context (optional – skip if target is already clear)
 
 - Read `docs/Umsetzungsplan.md` and recent commits.
 - Confirm slow scenario (FPS/load/latency).
@@ -27,16 +27,15 @@ description: Measure baseline, optimize bottlenecks, and verify impact.
 - Re-run baseline scenario.
 - Report before/after deltas.
 
-## 5. Documentation freshness
+## 5. Commit
 
-- Run `npm run docs:sync`.
-- Sync any changed performance claims in docs with explicit date.
-- Run `npm run docs:check` (must pass).
+```bash
+git add [scoped-files]
+git commit -m "perf: [short reason]"
+```
+
+- Verify scope first: `git diff --name-only`.
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-
+Standardformat verwenden.

@@ -1,0 +1,11 @@
+{
+  "measuredAt": "2026-03-05T02:39:30.487Z",
+  "url": "http://127.0.0.1:4281",
+  "init": {
+    "domContentLoadedEventEndMs": 4288.0999999996275,
+    "gameInstanceReadyMs": 4608.0999999996275,
+    "domToGameInstanceMs": 320
+  },
+  "startMatchLatencyMs": 5179.200000001118,
+  "returnToMenuLatencyMs": 18.199999999254942
+}

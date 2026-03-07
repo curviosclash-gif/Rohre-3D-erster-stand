@@ -32,13 +32,7 @@ description: Detect and remove dead code/files with safe dry-run first.
 - Remove/archive approved items only.
 - Re-run relevant tests.
 
-## 5. Documentation freshness
-
-- Run `npm run docs:sync`.
-- Update docs referencing removed/moved files.
-- Run `npm run docs:check` (must pass).
-
-## 6. Commit
+## 5. Commit
 
 ```bash
 git add [approved-files]
@@ -50,8 +44,4 @@ git commit -m "chore: cleanup - remove dead code/files"
 
 ## Report
 
-Use standard output format from `.agents/rules/reporting_format.md`.
-
-
-
-
+Standardformat verwenden.

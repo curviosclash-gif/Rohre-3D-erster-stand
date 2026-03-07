@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 import { TrailCollisionDebugTelemetry } from './TrailCollisionDebugTelemetry.js';
 
+const GRID_KEY_OFFSET = 1000;
+const GRID_KEY_STRIDE = 2000;
+const CELL_OFFSETS_3X3 = [
+    [-1, -1], [0, -1], [1, -1],
+    [-1, 0], [0, 0], [1, 0],
+    [-1, 1], [0, 1], [1, 1],
+];
+
 export class TrailCollisionQuery {
     constructor(options = {}) {
         this.getPlayers = typeof options.getPlayers === 'function'
@@ -11,9 +19,15 @@ export class TrailCollisionQuery {
             : (() => options.registry || null);
         this.debugTelemetry = new TrailCollisionDebugTelemetry(options.debugConfig);
         this._trailCollisionResult = { hit: false, playerIndex: -1 };
+        this._projectileTrailCollisionResult = {
+            entry: null,
+            closestPoint: { closestX: 0, closestY: 0, closestZ: 0 },
+            cellKey: 0,
+        };
         this._tmpClosestPoint = new THREE.Vector3();
-        this._projectileSeenEntries = new Set();
-        this._globalSeenEntries = new Set();
+        this._tmpClosestPointData = { closestX: 0, closestY: 0, closestZ: 0 };
+        this._projectileQueryStamp = 1;
+        this._globalQueryStamp = 1;
     }
 
     _debugTrailCollision(tag, payload) {
@@ -24,19 +38,19 @@ export class TrailCollisionQuery {
         return this.debugTelemetry.shouldLogSkipRecentCandidate(dist, skipRecent);
     }
 
-    _segmentIntersectsSphere(seg, position, radius) {
+    _segmentIntersectsSphere(seg, position, radius, outClosestPoint = null) {
         const totalRadius = radius + seg.radius;
         const minX = Math.min(seg.fromX, seg.toX) - seg.radius;
         const maxX = Math.max(seg.fromX, seg.toX) + seg.radius;
-        if (position.x < minX - radius || position.x > maxX + radius) return null;
+        if (position.x < minX - radius || position.x > maxX + radius) return false;
 
         const minY = Math.min(seg.fromY, seg.toY) - seg.radius;
         const maxY = Math.max(seg.fromY, seg.toY) + seg.radius;
-        if (position.y < minY - radius || position.y > maxY + radius) return null;
+        if (position.y < minY - radius || position.y > maxY + radius) return false;
 
         const minZ = Math.min(seg.fromZ, seg.toZ) - seg.radius;
         const maxZ = Math.max(seg.fromZ, seg.toZ) + seg.radius;
-        if (position.z < minZ - radius || position.z > maxZ + radius) return null;
+        if (position.z < minZ - radius || position.z > maxZ + radius) return false;
 
         const vx = seg.toX - seg.fromX;
         const vy = seg.toY - seg.fromY;
@@ -60,10 +74,25 @@ export class TrailCollisionQuery {
         const dzp = position.z - closestZ;
         const distSq = dxp * dxp + dyp * dyp + dzp * dzp;
         if (distSq > totalRadius * totalRadius) {
-            return null;
+            return false;
         }
 
-        return { closestX, closestY, closestZ };
+        if (outClosestPoint) {
+            outClosestPoint.closestX = closestX;
+            outClosestPoint.closestY = closestY;
+            outClosestPoint.closestZ = closestZ;
+        }
+        return true;
+    }
+
+    _nextProjectileQueryStamp() {
+        this._projectileQueryStamp += 1;
+        return this._projectileQueryStamp;
+    }
+
+    _nextGlobalQueryStamp() {
+        this._globalQueryStamp += 1;
+        return this._globalQueryStamp;
     }
 
     checkProjectileTrailCollision(position, radius, options = {}) {
@@ -75,19 +104,20 @@ export class TrailCollisionQuery {
         const cellX = Math.floor(position.x / registry.gridSize);
         const cellZ = Math.floor(position.z / registry.gridSize);
         const players = this.getPlayers();
-        const seenEntries = this._projectileSeenEntries;
-        seenEntries.clear();
+        const queryStamp = this._nextProjectileQueryStamp();
+        const result = this._projectileTrailCollisionResult;
+        result.entry = null;
 
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dz = -1; dz <= 1; dz++) {
-                const key = (cellX + dx + 1000) * 2000 + (cellZ + dz + 1000);
+        for (let i = 0; i < CELL_OFFSETS_3X3.length; i++) {
+            const [dx, dz] = CELL_OFFSETS_3X3[i];
+            const key = (cellX + dx + GRID_KEY_OFFSET) * GRID_KEY_STRIDE + (cellZ + dz + GRID_KEY_OFFSET);
                 const cell = registry.spatialGrid.get(key);
                 if (!cell) continue;
 
                 for (const seg of cell) {
-                    if (seenEntries.has(seg)) continue;
-                    seenEntries.add(seg);
                     if (!seg || seg.destroyed) continue;
+                    if (seg._projectileTrailQueryStamp === queryStamp) continue;
+                    seg._projectileTrailQueryStamp = queryStamp;
 
                     if (seg.playerIndex === excludePlayerIndex && skipRecent > 0) {
                         const player = players[seg.playerIndex];
@@ -100,17 +130,16 @@ export class TrailCollisionQuery {
                         }
                     }
 
-                    const hitInfo = this._segmentIntersectsSphere(seg, position, radius);
-                    if (hitInfo) {
-                        return {
-                            entry: seg,
-                            closestPoint: hitInfo,
-                            cellKey: key,
-                        };
-                    }
+                    if (!this._segmentIntersectsSphere(seg, position, radius, this._tmpClosestPointData)) continue;
+
+                    result.entry = seg;
+                    result.closestPoint.closestX = this._tmpClosestPointData.closestX;
+                    result.closestPoint.closestY = this._tmpClosestPointData.closestY;
+                    result.closestPoint.closestZ = this._tmpClosestPointData.closestZ;
+                    result.cellKey = key;
+                    return result;
                 }
             }
-        }
 
         return null;
     }
@@ -121,19 +150,18 @@ export class TrailCollisionQuery {
         const cellX = Math.floor(position.x / registry.gridSize);
         const cellZ = Math.floor(position.z / registry.gridSize);
         const players = this.getPlayers();
-        const seenEntries = this._globalSeenEntries;
-        seenEntries.clear();
+        const queryStamp = this._nextGlobalQueryStamp();
 
-        for (let dx = -1; dx <= 1; dx++) {
-            for (let dz = -1; dz <= 1; dz++) {
-                const key = (cellX + dx + 1000) * 2000 + (cellZ + dz + 1000);
+        for (let i = 0; i < CELL_OFFSETS_3X3.length; i++) {
+            const [dx, dz] = CELL_OFFSETS_3X3[i];
+            const key = (cellX + dx + GRID_KEY_OFFSET) * GRID_KEY_STRIDE + (cellZ + dz + GRID_KEY_OFFSET);
                 const cell = registry.spatialGrid.get(key);
                 if (!cell) continue;
 
                 for (const seg of cell) {
-                    if (seenEntries.has(seg)) continue;
-                    seenEntries.add(seg);
                     if (!seg || seg.destroyed) continue;
+                    if (seg._globalTrailQueryStamp === queryStamp) continue;
+                    seg._globalTrailQueryStamp = queryStamp;
                     if (seg.playerIndex === excludePlayerIndex) {
                         const player = players[seg.playerIndex];
                         const trail = player?.trail;
@@ -158,11 +186,14 @@ export class TrailCollisionQuery {
                         }
                     }
 
-                    const hitInfo = this._segmentIntersectsSphere(seg, position, radius);
-                    if (!hitInfo) continue;
+                    if (!this._segmentIntersectsSphere(seg, position, radius, this._tmpClosestPointData)) continue;
 
                     if (playerRef && playerRef.isSphereInOBB) {
-                        this._tmpClosestPoint.set(hitInfo.closestX, hitInfo.closestY, hitInfo.closestZ);
+                        this._tmpClosestPoint.set(
+                            this._tmpClosestPointData.closestX,
+                            this._tmpClosestPointData.closestY,
+                            this._tmpClosestPointData.closestZ
+                        );
                         const queryRadius = Math.max(0, Number(radius) || 0);
                         const effectiveRadius = Math.max(0, Number(seg.radius) || 0) + queryRadius;
                         if (!playerRef.isSphereInOBB(this._tmpClosestPoint, effectiveRadius)) {
@@ -187,7 +218,6 @@ export class TrailCollisionQuery {
                     return this._trailCollisionResult;
                 }
             }
-        }
         return null;
     }
 }

@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 2,
+  "arenaSize": {
+    "width": 2800,
+    "height": 950,
+    "depth": 2400
+  },
+  "tunnels": [],
+  "hardBlocks": [
+    {
+      "x": 0,
+      "y": 160,
+      "z": 0,
+      "width": 320,
+      "depth": 320,
+      "height": 180,
+      "size": 160,
+      "rotateY": 0,
+      "id": "qa_disk_block"
+    }
+  ],
+  "foamBlocks": [],
+  "portals": [],
+  "items": [],
+  "aircraft": [],
+  "botSpawns": [],
+  "playerSpawn": {
+    "x": -800,
+    "y": 522.5,
+    "z": 0
+  }
+}

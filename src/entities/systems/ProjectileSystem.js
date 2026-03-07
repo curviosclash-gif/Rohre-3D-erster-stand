@@ -285,7 +285,11 @@ export class ProjectileSystem {
         if (!projectile) return;
 
         this._releaseProjectileMesh(projectile);
-        this.projectiles.splice(index, 1);
+        const lastIndex = this.projectiles.length - 1;
+        if (index !== lastIndex) {
+            this.projectiles[index] = this.projectiles[lastIndex];
+        }
+        this.projectiles.pop();
         this._releaseProjectileState(projectile);
     }
 

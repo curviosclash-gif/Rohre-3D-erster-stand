@@ -81,6 +81,7 @@ const DEFAULT_CONTEXT = Object.freeze({
     targetDistanceMax: 120,
     projectileThreatRange: 28,
 });
+const OBSERVATION_CONTEXT_CACHE_FLAG = '__observationContextV1';
 
 function resetObservationTarget(target) {
     for (let i = 0; i < OBSERVATION_LENGTH_V1; i++) {
@@ -247,31 +248,32 @@ function computeProjectileThreat(player, projectiles, threatRange) {
     });
 }
 
-export function createObservationContext(input = {}) {
+export function createObservationContext(input = {}, target = null) {
+    const context = target && typeof target === 'object' ? target : {};
     const wallProbeMinSteps = Math.max(4, Math.trunc(Number(input.wallProbeMinSteps) || DEFAULT_CONTEXT.wallProbeMinSteps));
     const wallProbeMaxSteps = Math.max(
         wallProbeMinSteps,
         Math.trunc(Number(input.wallProbeMaxSteps) || DEFAULT_CONTEXT.wallProbeMaxSteps)
     );
-    return {
-        arena: input.arena || DEFAULT_CONTEXT.arena,
-        players: Array.isArray(input.players) ? input.players : DEFAULT_CONTEXT.players,
-        projectiles: Array.isArray(input.projectiles) ? input.projectiles : DEFAULT_CONTEXT.projectiles,
-        mode: input.mode || DEFAULT_CONTEXT.mode,
-        planarMode: !!input.planarMode,
-        wallProbeDistance: Math.max(1, Number(input.wallProbeDistance) || DEFAULT_CONTEXT.wallProbeDistance),
-        wallProbeMinSteps,
-        wallProbeMaxSteps,
-        wallProbeCacheWindowMs: Math.max(0, Number(input.wallProbeCacheWindowMs) || DEFAULT_CONTEXT.wallProbeCacheWindowMs),
-        wallProbeReusePositionEps: Math.max(0, Number(input.wallProbeReusePositionEps) || DEFAULT_CONTEXT.wallProbeReusePositionEps),
-        wallProbeReuseDirectionDot: clamp(
-            Number(input.wallProbeReuseDirectionDot) || DEFAULT_CONTEXT.wallProbeReuseDirectionDot,
-            -1,
-            1
-        ),
-        targetDistanceMax: Math.max(1, Number(input.targetDistanceMax) || DEFAULT_CONTEXT.targetDistanceMax),
-        projectileThreatRange: Math.max(1, Number(input.projectileThreatRange) || DEFAULT_CONTEXT.projectileThreatRange),
-    };
+    context.arena = input.arena || DEFAULT_CONTEXT.arena;
+    context.players = Array.isArray(input.players) ? input.players : DEFAULT_CONTEXT.players;
+    context.projectiles = Array.isArray(input.projectiles) ? input.projectiles : DEFAULT_CONTEXT.projectiles;
+    context.mode = input.mode || DEFAULT_CONTEXT.mode;
+    context.planarMode = !!input.planarMode;
+    context.wallProbeDistance = Math.max(1, Number(input.wallProbeDistance) || DEFAULT_CONTEXT.wallProbeDistance);
+    context.wallProbeMinSteps = wallProbeMinSteps;
+    context.wallProbeMaxSteps = wallProbeMaxSteps;
+    context.wallProbeCacheWindowMs = Math.max(0, Number(input.wallProbeCacheWindowMs) || DEFAULT_CONTEXT.wallProbeCacheWindowMs);
+    context.wallProbeReusePositionEps = Math.max(0, Number(input.wallProbeReusePositionEps) || DEFAULT_CONTEXT.wallProbeReusePositionEps);
+    context.wallProbeReuseDirectionDot = clamp(
+        Number(input.wallProbeReuseDirectionDot) || DEFAULT_CONTEXT.wallProbeReuseDirectionDot,
+        -1,
+        1
+    );
+    context.targetDistanceMax = Math.max(1, Number(input.targetDistanceMax) || DEFAULT_CONTEXT.targetDistanceMax);
+    context.projectileThreatRange = Math.max(1, Number(input.projectileThreatRange) || DEFAULT_CONTEXT.projectileThreatRange);
+    context[OBSERVATION_CONTEXT_CACHE_FLAG] = true;
+    return context;
 }
 
 export function buildObservation(player, context = {}, target = null) {
@@ -280,7 +282,9 @@ export function buildObservation(player, context = {}, target = null) {
         return observation;
     }
 
-    const runtimeContext = createObservationContext(context);
+    const runtimeContext = context?.[OBSERVATION_CONTEXT_CACHE_FLAG]
+        ? context
+        : createObservationContext(context);
     const playerInventory = Array.isArray(player.inventory) ? player.inventory : [];
     const inventoryLength = playerInventory.length;
     const selectedItemIndex = inventoryLength > 0

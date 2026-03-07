@@ -50,8 +50,16 @@ export class PortalRuntimeSystem {
 
         const time = performance.now() * 0.001;
         for (const portal of this.arena.portals) {
-            if (portal.meshA) portal.meshA.rotation.z = time * 0.5;
-            if (portal.meshB) portal.meshB.rotation.z = -time * 0.5;
+            if (portal.meshA?.setSpinZ) {
+                portal.meshA.setSpinZ(time * 0.5);
+            } else if (portal.meshA) {
+                portal.meshA.rotation.z = time * 0.5;
+            }
+            if (portal.meshB?.setSpinZ) {
+                portal.meshB.setSpinZ(-time * 0.5);
+            } else if (portal.meshB) {
+                portal.meshB.rotation.z = -time * 0.5;
+            }
         }
     }
 }
