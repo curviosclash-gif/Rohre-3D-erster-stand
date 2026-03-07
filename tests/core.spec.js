@@ -1,4 +1,6 @@
 import { test, expect } from '@playwright/test';
+import path from 'node:path';
+import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import {
     collectErrors,
     loadGame,
@@ -12,11 +14,16 @@ import {
     returnToMenu,
     startGame,
 } from './helpers.js';
+import { stringifyMapDocument } from '../src/entities/MapSchema.js';
 
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
 const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
 const MENU_PRESETS_STORAGE_KEY = 'cuviosclash.menu-presets.v1';
 const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
+const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(process.cwd(), 'src/entities/GeneratedLocalMaps.js');
+const EDITOR_MAP_DIR = path.resolve(process.cwd(), 'data/maps');
+const EDITOR_JSON_SUFFIX = '.editor.json';
+const RUNTIME_JSON_SUFFIX = '.runtime.json';
 
 function buildLegacyRuntimeCustomMap(obstacles = []) {
     return JSON.stringify({
@@ -24,6 +31,20 @@ function buildLegacyRuntimeCustomMap(obstacles = []) {
         obstacles,
         portals: [],
     });
+}
+
+async function loadGameWithRetry(page, attempts = 4) {
+    let lastError = null;
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+        try {
+            await loadGame(page);
+            return;
+        } catch (error) {
+            lastError = error;
+            await page.waitForTimeout(400 * (attempt + 1));
+        }
+    }
+    throw lastError;
 }
 
 test.describe('T1-20: Core & Infrastruktur', () => {
@@ -1079,5 +1100,109 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(secondProbe.mapKey).toBe('custom');
         expect(secondProbe.obstacleCount).toBe(3);
         expect(secondProbe.floorParent).toBe('matchRoot');
+    });
+
+    test('T10f: Editor-Disk-Maps erscheinen im Runtime-Menue und laden im Match', async ({ page }) => {
+        test.setTimeout(120000);
+        const moduleBackup = readFileSync(GENERATED_LOCAL_MAPS_MODULE_PATH, 'utf8');
+        const mapName = `QA Disk Map ${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+        const mapJson = stringifyMapDocument({
+            arenaSize: { width: 2800, height: 950, depth: 2400 },
+            hardBlocks: [
+                { id: 'qa_disk_block', x: 0, y: 160, z: 0, width: 320, height: 180, depth: 320 },
+            ],
+        });
+
+        let createdMapKey = '';
+
+        try {
+            await page.goto('/editor/map-editor-3d.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
+            await page.waitForSelector('#btnSaveToGame', { timeout: 15000 });
+
+            const saveResult = await page.evaluate(async ({ mapName, mapJson }) => {
+                const response = await fetch('/api/editor/save-map-disk', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        mapName,
+                        jsonText: mapJson,
+                    }),
+                });
+                const payload = await response.json();
+                return {
+                    status: response.status,
+                    ok: response.ok,
+                    payload,
+                };
+            }, { mapName, mapJson });
+
+            expect(saveResult.ok).toBeTruthy();
+            expect(saveResult.payload?.ok).toBeTruthy();
+            expect(saveResult.payload?.generatedModulePath).toBe('src/entities/GeneratedLocalMaps.js');
+
+            createdMapKey = String(saveResult.payload?.mapKey || '');
+            expect(createdMapKey).toMatch(/^editor_/);
+
+            await page.waitForTimeout(900);
+            await loadGameWithRetry(page);
+            await openGameSubmenu(page);
+
+            const selectionState = await page.evaluate((expectedName) => {
+                const options = Array.from(document.querySelectorAll('#map-select option')).map((option) => ({
+                    value: option.value,
+                    text: String(option.textContent || ''),
+                }));
+                const matching = options.find((entry) => entry.text === expectedName) || null;
+                return {
+                    matching,
+                    optionCount: options.length,
+                };
+            }, mapName);
+
+            expect(selectionState.optionCount).toBeGreaterThan(0);
+            expect(selectionState.matching).toBeTruthy();
+            expect(selectionState.matching?.value).toBe(createdMapKey);
+
+            await page.evaluate((mapKey) => {
+                const game = window.GAME_INSTANCE;
+                if (!game?.settings) return;
+                game.settings.mapKey = mapKey;
+                game.runtimeFacade?.onSettingsChanged?.({ changedKeys: ['mapKey'] });
+            }, createdMapKey);
+            await page.waitForTimeout(200);
+
+            const runtimeSelection = await page.evaluate(() => ({
+                domValue: document.getElementById('map-select')?.value ?? null,
+                settingsMapKey: window.GAME_INSTANCE?.settings?.mapKey ?? null,
+            }));
+
+            expect(runtimeSelection.domValue).toBe(createdMapKey);
+            expect(runtimeSelection.settingsMapKey).toBe(createdMapKey);
+            await page.click('#submenu-game:not(.hidden) #btn-start');
+            await page.waitForFunction(() => {
+                const hud = document.getElementById('hud');
+                const g = window.GAME_INSTANCE;
+                return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
+            }, { timeout: 15000 });
+
+            const matchProbe = await page.evaluate(() => ({
+                mapKey: window.GAME_INSTANCE?.arena?.currentMapKey ?? null,
+                obstacleCount: window.GAME_INSTANCE?.arena?.obstacles?.filter((entry) => !entry?.isWall)?.length ?? 0,
+            }));
+
+            expect(matchProbe.mapKey).toBe(createdMapKey);
+            expect(matchProbe.obstacleCount).toBeGreaterThanOrEqual(1);
+        } finally {
+            if (createdMapKey) {
+                rmSync(path.join(EDITOR_MAP_DIR, `${createdMapKey}${EDITOR_JSON_SUFFIX}`), { force: true });
+                rmSync(path.join(EDITOR_MAP_DIR, `${createdMapKey}${RUNTIME_JSON_SUFFIX}`), { force: true });
+            }
+            writeFileSync(GENERATED_LOCAL_MAPS_MODULE_PATH, moduleBackup, 'utf8');
+            if (!page.isClosed()) {
+                await page.waitForTimeout(200);
+            }
+        }
     });
 });

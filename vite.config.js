@@ -15,7 +15,7 @@ const GENERATED_EDITOR_MAP_KEY_PREFIX = 'editor_';
 const DEFAULT_EDITOR_DISK_MAP_NAME = 'Editor Map';
 const EDITOR_MAP_NAME_MAX_LENGTH = 80;
 const EDITOR_MAP_DIR = path.resolve(__dirname, 'data', 'maps');
-const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(__dirname, 'js', 'modules', 'GeneratedLocalMaps.js');
+const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(__dirname, 'src', 'entities', 'GeneratedLocalMaps.js');
 const EDITOR_JSON_SUFFIX = '.editor.json';
 const RUNTIME_JSON_SUFFIX = '.runtime.json';
 
