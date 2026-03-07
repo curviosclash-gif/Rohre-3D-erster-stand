@@ -5,6 +5,9 @@ import { PowerupManager } from '../entities/Powerup.js';
 import { ParticleSystem } from '../entities/Particles.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
+import { createArenaMapFingerprint } from '../entities/arena/ArenaBuildResourceCache.js';
+
+let PREWARMED_ARENA_SESSION = null;
 
 function toSafeInt(value, fallback) {
     const parsed = Number(value);
@@ -14,7 +17,98 @@ function toSafeInt(value, fallback) {
     return Math.round(parsed);
 }
 
-export function disposeMatchSessionSystems(renderer, currentSession) {
+function resolveArenaSourceMap(mapResolution, effectiveMapKey) {
+    if (mapResolution?.mapDefinition && typeof mapResolution.mapDefinition === 'object') {
+        return mapResolution.mapDefinition;
+    }
+    if (effectiveMapKey && CONFIG?.MAPS?.[effectiveMapKey]) {
+        return CONFIG.MAPS[effectiveMapKey];
+    }
+    return CONFIG?.MAPS?.standard || null;
+}
+
+function buildArenaSessionKey(mapResolution, runtimeConfig, portalsEnabled) {
+    const effectiveMapKey = mapResolution?.effectiveMapKey || 'standard';
+    const gameplay = runtimeConfig?.gameplay || {};
+    const arenaSourceMap = resolveArenaSourceMap(mapResolution, effectiveMapKey);
+    const mapFingerprint = createArenaMapFingerprint(arenaSourceMap);
+    return [
+        String(effectiveMapKey || 'standard'),
+        mapFingerprint,
+        portalsEnabled ? '1' : '0',
+        gameplay.planarMode ? '1' : '0',
+        Math.max(0, Math.round(Number(gameplay.portalCount) || 0)),
+        Math.max(0, Math.round(Number(gameplay.planarLevelCount) || 0)),
+    ].join('|');
+}
+
+function resolveMatchMap(runtimeConfig = null, requestedMapKey = null) {
+    const resolvedRequestedMapKey = runtimeConfig?.session?.mapKey || requestedMapKey;
+    const mapResolution = resolveArenaMapSelection(resolvedRequestedMapKey);
+    if (mapResolution.isCustom && mapResolution.mapDefinition) {
+        CONFIG.MAPS[CUSTOM_MAP_KEY] = mapResolution.mapDefinition;
+    }
+    return mapResolution;
+}
+
+function consumePrewarmedArenaSessionIfMatch(renderer, sessionKey) {
+    if (!PREWARMED_ARENA_SESSION) return null;
+    if (PREWARMED_ARENA_SESSION.renderer !== renderer) return null;
+    if (PREWARMED_ARENA_SESSION.sessionKey !== sessionKey) return null;
+
+    const prepared = PREWARMED_ARENA_SESSION;
+    PREWARMED_ARENA_SESSION = null;
+    return prepared;
+}
+
+export function prewarmMatchArenaSession({
+    renderer,
+    settings,
+    runtimeConfig = null,
+    requestedMapKey,
+} = {}) {
+    if (!renderer) return null;
+
+    const portalsEnabled = runtimeConfig?.session?.portalsEnabled ?? !!settings?.portalsEnabled;
+    const mapResolution = resolveMatchMap(runtimeConfig, requestedMapKey);
+    const effectiveMapKey = mapResolution.effectiveMapKey;
+    const sessionKey = buildArenaSessionKey(mapResolution, runtimeConfig, portalsEnabled);
+
+    if (PREWARMED_ARENA_SESSION
+        && PREWARMED_ARENA_SESSION.renderer === renderer
+        && PREWARMED_ARENA_SESSION.sessionKey === sessionKey) {
+        return {
+            prewarmed: true,
+            reusedExisting: true,
+            effectiveMapKey,
+            sessionKey,
+        };
+    }
+
+    renderer.clearMatchScene();
+
+    const arena = new Arena(renderer);
+    arena.portalsEnabled = !!portalsEnabled;
+    arena.build(effectiveMapKey);
+
+    PREWARMED_ARENA_SESSION = {
+        renderer,
+        sessionKey,
+        mapResolution,
+        effectiveMapKey,
+        portalsEnabled: !!portalsEnabled,
+        arena,
+    };
+
+    return {
+        prewarmed: true,
+        reusedExisting: false,
+        effectiveMapKey,
+        sessionKey,
+    };
+}
+
+export function disposeMatchSessionSystems(renderer, currentSession, options = {}) {
     if (currentSession?.entityManager) {
         currentSession.entityManager.dispose();
     }
@@ -24,7 +118,9 @@ export function disposeMatchSessionSystems(renderer, currentSession) {
     if (currentSession?.particles?.dispose) {
         currentSession.particles.dispose();
     }
-    renderer.clearMatchScene();
+    if (options.clearScene !== false) {
+        renderer.clearMatchScene();
+    }
 }
 
 function buildHumanConfigs(settings, runtimeConfig = null) {
@@ -64,20 +160,27 @@ export function createMatchSession({
     requestedMapKey,
     currentSession = null,
 }) {
-    disposeMatchSessionSystems(renderer, currentSession);
+    const portalsEnabled = runtimeConfig?.session?.portalsEnabled ?? !!settings?.portalsEnabled;
+    const mapResolution = resolveMatchMap(runtimeConfig, requestedMapKey);
+    const effectiveMapKey = mapResolution.effectiveMapKey;
+    const sessionKey = buildArenaSessionKey(mapResolution, runtimeConfig, portalsEnabled);
+    const prewarmedArenaSession = consumePrewarmedArenaSessionIfMatch(renderer, sessionKey);
+    const canPreservePrewarmedScene = !!prewarmedArenaSession
+        && !currentSession?.entityManager
+        && !currentSession?.powerupManager
+        && !currentSession?.particles;
+    const reusablePrewarmedArenaSession = canPreservePrewarmedScene ? prewarmedArenaSession : null;
+
+    disposeMatchSessionSystems(renderer, currentSession, {
+        clearScene: !canPreservePrewarmedScene,
+    });
 
     const particles = new ParticleSystem(renderer);
-    const arena = new Arena(renderer);
-    const portalsEnabled = runtimeConfig?.session?.portalsEnabled ?? !!settings?.portalsEnabled;
+    const arena = reusablePrewarmedArenaSession?.arena || new Arena(renderer);
     arena.portalsEnabled = !!portalsEnabled;
-
-    const resolvedRequestedMapKey = runtimeConfig?.session?.mapKey || requestedMapKey;
-    const mapResolution = resolveArenaMapSelection(resolvedRequestedMapKey);
-    if (mapResolution.isCustom && mapResolution.mapDefinition) {
-        CONFIG.MAPS[CUSTOM_MAP_KEY] = mapResolution.mapDefinition;
+    if (!reusablePrewarmedArenaSession) {
+        arena.build(effectiveMapKey);
     }
-    const effectiveMapKey = mapResolution.effectiveMapKey;
-    arena.build(effectiveMapKey);
 
     const powerupManager = new PowerupManager(renderer, arena);
     const entityManager = new EntityManager(renderer, arena, powerupManager, particles, audio, recorder);

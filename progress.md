@@ -235,3 +235,54 @@
 - Neuer Plan erstellt: `docs/Feature_Cinematic_Camera_Followup_V29b.md` (enthaelt Vorschlaege 1/2/3/4/6 in granularen Phasen).
 - Punkt 5 explizit separat im Masterplan geparkt: `docs/Umsetzungsplan.md` -> `N3 T82 Policy-Wiring isolieren und spaeter separat beheben`.
 - Plan-Eingang im Masterplan um `PX Cinematic Camera Follow-up V29b` erweitert.
+
+2026-03-07 (Performance Offensive V28.5 revalidiert und auf Zielwerte gebracht)
+- Ausgangslage beim Start dieses Blocks:
+  - Doku markierte `28.5.x` bereits als abgeschlossen, aber reale Metriken lagen noch bei `overall drawCallsAverage=37.67`, `V3 drawCallsAverage=62.40`, `V4 drawCallsAverage=37.00`.
+  - Root Cause: `src/entities/arena/PortalGateMeshFactory.js` teilte nur Geometry/Material, baute Portal-/Gate-Visuals aber weiterhin als einzelne Meshes pro Instanz auf.
+- Fix umgesetzt:
+  - `src/entities/arena/PortalGateMeshFactory.js`: echte InstancedMesh-Batches mit shared no-dispose Resource-Caches und `instanceColor` fuer Portal-/Gate-Komponenten.
+  - `src/entities/arena/portal/PortalLayoutBuilder.js`: Match-lokale Visual-Registry fuer Portal-/Gate-Aufbau.
+  - `src/entities/arena/portal/PortalRuntimeSystem.js` und `src/entities/arena/portal/SpecialGateRuntime.js`: Animationspfade auf neue Instancing-Handles erweitert, kompatibel zum bisherigen Mesh-Pfad.
+  - `src/core/three-disposal.js`: shared Materialien/Geometrien werden beim Match-Cleanup nicht versehentlich wegdisponiert.
+  - Regressionen: `tests/core.spec.js` (`T10b` Portal-Runtime) und `tests/gpu.spec.js` (`T21b` Portal-Instancing).
+- Verifikation / Metriken:
+  - `npm run build` PASS
+  - `npm run test:core` PASS (`49 passed`, `1 skipped`)
+  - `npm run test:physics` PASS (`47 passed`)
+  - `npm run test:gpu` PASS (`16 passed`)
+  - `npm run test:stress` PASS (`19 passed`)
+  - `npm run benchmark:baseline` PASS -> `overall fpsAverage=59.977`, `overall drawCallsAverage=20.986`, `V2 drawCallsMax=24`, `V3 drawCallsAverage=23.733`, `stuckEvents=0`
+  - `npm run benchmark:lifecycle -- --profile trend` PASS -> `domToGameInstanceMs=4283`, `startMatchLatencyMs=68`, `returnToMenuLatencyMs=63`
+  - `npm run benchmark:lifecycle -- --profile full` PASS -> `domToGameInstanceMs=3253`, `startMatchLatencyMs=179`, `returnToMenuLatencyMs=26`
+- Visuelle Checks:
+  - Skill `develop-web-game` Client erfolgreich ausgefuehrt; Screenshots unter `tmp/develop-web-game-portal/`.
+  - Gezielter `V3` Portal-Screenshot unter `tmp/perf-phase28-5-v3-instancing.png` geprueft; Portal-Visuals sichtbar und intakt.
+- Abschluss:
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+  - Doku-Freeze fuer `docs/Feature_Performance_Offensive_V28_5.md`, `docs/Umsetzungsplan.md` und `docs/Testergebnisse_2026-03-07.md` auf finale Referenzwerte gezogen.
+
+2026-03-07 (Map-Load Regression nach Prewarm/Portal-Optimierungen behoben)
+- Nutzerfeedback: Maps wirken nach den juengsten Aenderungen nicht korrekt geladen.
+- Root Cause verifiziert per Browser-Repro:
+  - `prewarmMatchArenaSession()` baut die Arena bereits in `renderer.matchRoot`.
+  - `createMatchSession()` rief danach weiterhin `renderer.clearMatchScene()` auf und reused dieselbe Prewarm-Arena ohne Rebuild.
+  - Ergebnis: Kollisions-/Portal-Daten leben weiter, aber `_floorMesh` / `_mergedWallMesh` / `_mergedObstacleMesh` sind aus der Szene geloescht.
+- Zusatzrisiken aus derselben Aenderung behoben:
+  - Prewarm-Session-Key war zu grob (`mapKey|portalsEnabled`) und ignorierte arena-relevante Unterschiede wie Custom-Map-Inhalt, `portalCount`, `planarMode`, `planarLevelCount`.
+  - Arena-Build-Signatur war ebenfalls zu grob und konnte Custom-Maps mit gleichem Key/Size oder veraenderte Portal-Layouts faelschlich auf `reuse` lassen.
+- Fixes:
+  - `src/state/MatchSessionFactory.js`: Prewarm-Szene bleibt beim reuse erhalten; Session-Key jetzt inkl. Map-Fingerprint + arena-relevanter Gameplay-Parameter.
+  - `src/entities/arena/ArenaBuildResourceCache.js`: Map-Fingerprint + erweiterte Build-Signatur.
+  - `src/entities/arena/ArenaBuilder.js`: Reuse nur noch bei wirklich noch angehaengter Geometrie; Signatur deckt Portal-/Planar-Parameter mit ab.
+  - `tests/core.spec.js`: neue Regressionen `T10c` / `T10d` / `T10e` fuer sichtbare Arena-Meshes nach Prewarm, Portal-Layout-Rebuild und Custom-Map-Wechsel mit gleichem Key.
+- Verifikation:
+  - `npm run build` PASS
+  - `npm run test:core -- -g "T10b|T10c|T10d|T10e"` PASS
+  - `npm run test:core` PASS (`52 passed`, `1 skipped`)
+  - `npm run test:physics` PASS (`47 passed`)
+  - `npm run test:gpu -- -g "T21b"` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+  - visueller Gameplay-Screenshot geprueft: `tmp/map-prewarm-fix-after.png`

@@ -16,6 +16,15 @@ import {
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
 const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
 const MENU_PRESETS_STORAGE_KEY = 'cuviosclash.menu-presets.v1';
+const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
+
+function buildLegacyRuntimeCustomMap(obstacles = []) {
+    return JSON.stringify({
+        size: [80, 30, 80],
+        obstacles,
+        portals: [],
+    });
+}
 
 test.describe('T1-20: Core & Infrastruktur', () => {
 
@@ -514,12 +523,16 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         const recorderState = await page.evaluate(() => {
             const recorder = window.GAME_INSTANCE?.mediaRecorderSystem;
             return {
+                autoRecordingEnabled: !!recorder?.autoRecordingEnabled,
                 autoDownload: !!recorder?.autoDownload,
                 directoryName: String(recorder?.downloadDirectoryName || ''),
+                captureFps: Number(recorder?.captureFps || 0),
             };
         });
+        expect(recorderState.autoRecordingEnabled).toBeFalsy();
         expect(recorderState.autoDownload).toBeTruthy();
         expect(recorderState.directoryName).toBe('videos');
+        expect(recorderState.captureFps).toBe(30);
     });
 
     test('T20n: Escape-Return finalisiert Recording-Export trotz doppeltem Lifecycle-Stop', async ({ page }) => {
@@ -529,6 +542,9 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         const recordingState = await page.evaluate(() => {
             const recorder = window.GAME_INSTANCE?.mediaRecorderSystem;
             const support = recorder?.getSupportState?.() || {};
+            if (support.canRecord && !recorder?.isRecording?.()) {
+                recorder?.notifyLifecycleEvent?.('recording_requested', { command: 'start' });
+            }
             return {
                 canRecord: !!support.canRecord,
                 isRecording: !!recorder?.isRecording?.(),
@@ -896,5 +912,172 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(level4State.activeSection).toBe('tools');
         expect(level4State.drawerOverflow).toBeLessThanOrEqual(4);
         expect(level4State.stackOverflow).toBeLessThanOrEqual(4);
+    });
+
+    test('T10b: Portal-Runtime bleibt im Validierungsszenario funktionsfaehig', async ({ page }) => {
+        await loadGame(page);
+        await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            const debugApi = g?.debugApi || window.GAME_DEBUG || null;
+            const applyScenario = typeof g?.applyBotValidationScenario === 'function'
+                ? g.applyBotValidationScenario.bind(g)
+                : (typeof debugApi?.applyBotValidationScenario === 'function'
+                    ? debugApi.applyBotValidationScenario.bind(debugApi)
+                    : null);
+            if (typeof applyScenario !== 'function') {
+                throw new Error('applyBotValidationScenario missing');
+            }
+            applyScenario('V3');
+            g.winsNeeded = 1;
+            if (g.settings) g.settings.winsNeeded = 1;
+            if (typeof g._onSettingsChanged === 'function') g._onSettingsChanged();
+            g.startMatch();
+        });
+        await page.waitForFunction(() => window.GAME_INSTANCE?.state === 'PLAYING', null, { timeout: 10000 });
+
+        const probe = await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            const portal = g?.arena?.portals?.[0];
+            if (!portal) return null;
+
+            const hit = g.arena.checkPortal(portal.posA.clone(), 0.1, 'qa-portal');
+            return {
+                portalPairs: g.arena.portals.length,
+                hit: !!hit,
+                targetDistance: hit ? hit.target.distanceTo(portal.posB) : null,
+                cooldown: portal.cooldowns.get('qa-portal') || 0,
+            };
+        });
+
+        expect(probe).not.toBeNull();
+        expect(probe.portalPairs).toBe(4);
+        expect(probe.hit).toBeTruthy();
+        expect(probe.targetDistance).toBeLessThan(0.001);
+        expect(probe.cooldown).toBeGreaterThan(0);
+    });
+
+    test('T10c: Prewarmed Match behaelt Arena-Visuals beim Start', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await page.waitForTimeout(250);
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const g = window.GAME_INSTANCE;
+            return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
+        }, { timeout: 15000 });
+
+        const probe = await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            return {
+                floorParent: g?.arena?._floorMesh?.parent?.name ?? null,
+                wallParent: g?.arena?._mergedWallMesh?.parent?.name ?? null,
+                obstacleParent: g?.arena?._mergedObstacleMesh?.parent?.name ?? null,
+                nonWallObstacleCount: Array.isArray(g?.arena?.obstacles)
+                    ? g.arena.obstacles.filter((entry) => !entry?.isWall).length
+                    : 0,
+            };
+        });
+
+        expect(probe.floorParent).toBe('matchRoot');
+        expect(probe.wallParent).toBe('matchRoot');
+        expect(probe.obstacleParent).toBe('matchRoot');
+        expect(probe.nonWallObstacleCount).toBeGreaterThan(0);
+    });
+
+    test('T10d: Portal-Layout folgt geaenderter Portal-Anzahl im Prewarm-Pfad', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await page.evaluate(() => {
+            const toggle = document.getElementById('portals-toggle');
+            const slider = document.getElementById('portal-count-slider');
+            if (toggle && !toggle.checked) {
+                toggle.checked = true;
+                toggle.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            if (slider) {
+                slider.value = '4';
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+                slider.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+        await page.waitForTimeout(250);
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const g = window.GAME_INSTANCE;
+            return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
+        }, { timeout: 15000 });
+
+        const portalCount = await page.evaluate(() => window.GAME_INSTANCE?.arena?.portals?.length ?? 0);
+        expect(portalCount).toBe(4);
+    });
+
+    test('T10e: Custom-Map-Aenderungen mit gleichem Key laden neues Layout', async ({ page }) => {
+        const mapA = buildLegacyRuntimeCustomMap([
+            { pos: [0, 5, 0], size: [6, 6, 6] },
+        ]);
+        const mapB = buildLegacyRuntimeCustomMap([
+            { pos: [0, 5, 0], size: [6, 6, 6] },
+            { pos: [12, 5, 0], size: [6, 6, 6] },
+            { pos: [-12, 5, 0], size: [6, 6, 6] },
+        ]);
+
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await page.evaluate(({ storageKey, mapJson }) => {
+            localStorage.setItem(storageKey, mapJson);
+            const g = window.GAME_INSTANCE;
+            if (g?.settings) {
+                g.settings.mapKey = 'custom';
+            }
+            g?.runtimeFacade?.onSettingsChanged?.({ changedKeys: ['mapKey'] });
+        }, { storageKey: CUSTOM_MAP_STORAGE_KEY, mapJson: mapA });
+        await page.waitForTimeout(250);
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const g = window.GAME_INSTANCE;
+            return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
+        }, { timeout: 15000 });
+
+        const firstObstacleCount = await page.evaluate(() =>
+            window.GAME_INSTANCE?.arena?.obstacles?.filter((entry) => !entry?.isWall)?.length ?? 0
+        );
+        expect(firstObstacleCount).toBe(1);
+
+        await returnToMenu(page);
+        await page.evaluate(({ storageKey, mapJson }) => {
+            localStorage.setItem(storageKey, mapJson);
+            const g = window.GAME_INSTANCE;
+            if (g?.settings) {
+                g.settings.mapKey = 'custom';
+            }
+            g?.runtimeFacade?.onSettingsChanged?.({ changedKeys: ['mapKey'] });
+        }, { storageKey: CUSTOM_MAP_STORAGE_KEY, mapJson: mapB });
+
+        await page.waitForTimeout(250);
+        const reopened = await page.evaluate(() => {
+            const runtime = window.GAME_INSTANCE?.uiManager?.menuNavigationRuntime;
+            return !!runtime?.showPanel?.('submenu-game', { trigger: 'test_custom_map_reopen' });
+        });
+        expect(reopened).toBeTruthy();
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const g = window.GAME_INSTANCE;
+            return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
+        }, { timeout: 15000 });
+
+        const secondProbe = await page.evaluate(() => ({
+            mapKey: window.GAME_INSTANCE?.arena?.currentMapKey ?? null,
+            obstacleCount: window.GAME_INSTANCE?.arena?.obstacles?.filter((entry) => !entry?.isWall)?.length ?? 0,
+            floorParent: window.GAME_INSTANCE?.arena?._floorMesh?.parent?.name ?? null,
+        }));
+
+        expect(secondProbe.mapKey).toBe('custom');
+        expect(secondProbe.obstacleCount).toBe(3);
+        expect(secondProbe.floorParent).toBe('matchRoot');
     });
 });

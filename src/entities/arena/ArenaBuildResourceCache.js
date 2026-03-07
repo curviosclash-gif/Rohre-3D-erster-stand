@@ -43,13 +43,51 @@ function round2(value) {
     return Math.round((Number(value) || 0) * 100) / 100;
 }
 
-export function createArenaBuildSignature({ mapKey, scale, sx, sy, sz }) {
+function stableSerialize(value) {
+    try {
+        return JSON.stringify(value) || '';
+    } catch {
+        return '';
+    }
+}
+
+function hashString(input = '') {
+    let hash = 2166136261;
+    const text = String(input || '');
+    for (let i = 0; i < text.length; i++) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+export function createArenaMapFingerprint(map) {
+    return hashString(stableSerialize(map && typeof map === 'object' ? map : null));
+}
+
+export function createArenaBuildSignature({
+    mapKey,
+    mapFingerprint = '',
+    scale,
+    sx,
+    sy,
+    sz,
+    portalsEnabled = true,
+    planarMode = false,
+    portalCount = 0,
+    planarLevelCount = 0,
+}) {
     return [
         String(mapKey || 'standard'),
+        String(mapFingerprint || ''),
         round2(scale),
         round2(sx),
         round2(sy),
         round2(sz),
+        portalsEnabled ? 1 : 0,
+        planarMode ? 1 : 0,
+        Math.max(0, Math.round(Number(portalCount) || 0)),
+        Math.max(0, Math.round(Number(planarLevelCount) || 0)),
     ].join('|');
 }
 
@@ -128,4 +166,3 @@ export function getArenaMaterialBundle({
     MATERIAL_BUNDLE_CACHE.set(bundleKey, bundle);
     return bundle;
 }
-

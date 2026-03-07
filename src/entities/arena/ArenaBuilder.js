@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
 import { ArenaGeometryCompilePipeline } from './ArenaGeometryCompilePipeline.js';
-import { createArenaBuildSignature, getArenaMaterialBundle } from './ArenaBuildResourceCache.js';
+import { createArenaBuildSignature, createArenaMapFingerprint, getArenaMaterialBundle } from './ArenaBuildResourceCache.js';
 
 function asPositiveScale(value, fallback = 1) {
     const scale = Number(value);
@@ -24,10 +24,15 @@ export class ArenaBuilder {
 
         const buildSignature = createArenaBuildSignature({
             mapKey: mapResolution.currentMapKey,
+            mapFingerprint: createArenaMapFingerprint(mapResolution.map),
             scale,
             sx: size.sx,
             sy: size.sy,
             sz: size.sz,
+            portalsEnabled: this.arena.portalsEnabled,
+            planarMode: !!CONFIG.GAMEPLAY.PLANAR_MODE,
+            portalCount: CONFIG.GAMEPLAY.PORTAL_COUNT,
+            planarLevelCount: CONFIG.GAMEPLAY.PLANAR_LEVEL_COUNT,
         });
         const canReuse = previousBuildSignature
             && previousBuildSignature === buildSignature
@@ -156,7 +161,6 @@ export class ArenaBuilder {
     }
 
     _hasCompiledGeometry() {
-        return !!this.arena._floorMesh && !!this.arena._mergedWallMesh;
+        return !!this.arena._floorMesh?.parent && !!this.arena._mergedWallMesh?.parent;
     }
 }
-
