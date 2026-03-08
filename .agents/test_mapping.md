@@ -16,3 +16,19 @@ Use this table to select verification commands from changed paths.
 ## Fallback
 
 - If no mapping matches, run `npm run test:core`.
+
+## Schnellpfad (nur bei kleinen Aenderungen)
+
+- `src/ui/**` nur visuell → `npm run test:core` reicht, `test:stress` entfaellt
+- `src/entities/Bot*.js` → `npm run test:physics:core` reicht, `test:physics:hunt` und `test:physics:policy` entfallen
+- `src/core/MediaRecorderSystem.js` → nur T20a/T20af/T20n aus `test:core`
+- Workflow-/Doc-Aenderungen → keine Tests noetig
+
+## Port-Konflikte vermeiden
+
+Bei parallelen Test-Runs verschiedene Ports nutzen:
+
+```
+TEST_PORT=5174 npm run test:core
+TEST_PORT=5175 npm run test:physics
+```

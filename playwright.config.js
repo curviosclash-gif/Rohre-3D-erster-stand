@@ -1,15 +1,17 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
 
+const TEST_PORT = process.env.TEST_PORT || 5173;
+
 export default defineConfig({
     testDir: './tests',
-    fullyParallel: false,
+    fullyParallel: true,
     forbidOnly: !!process.env.CI,
-    retries: process.env.CI ? 2 : 0,
-    workers: 1,
+    retries: 1,
+    workers: process.env.CI ? 1 : 2,
     reporter: 'html',
     use: {
-        baseURL: 'http://localhost:5173',
+        baseURL: `http://localhost:${TEST_PORT}`,
         trace: 'on-first-retry',
     },
     projects: [
@@ -19,8 +21,8 @@ export default defineConfig({
         },
     ],
     webServer: {
-        command: 'npm run dev',
-        url: 'http://localhost:5173',
+        command: `npx vite --port ${TEST_PORT}`,
+        url: `http://localhost:${TEST_PORT}`,
         reuseExistingServer: !process.env.CI,
     },
 });

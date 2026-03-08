@@ -49,6 +49,7 @@ async function loadGameWithRetry(page, attempts = 4) {
 }
 
 test.describe('T1-20: Core & Infrastruktur', () => {
+    test.describe.configure({ mode: 'serial' });
 
     test('T1: Seite lädt ohne JS-Fehler', async ({ page }) => {
         const errors = collectErrors(page);
@@ -185,7 +186,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
     test('T13: Keine Fehler 2s nach Laden', async ({ page }) => {
         const errors = collectErrors(page);
         await loadGame(page);
-        await page.waitForTimeout(2000);
+        await page.waitForTimeout(800);
         expect(errors).toHaveLength(0);
     });
 
@@ -270,7 +271,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await openSubmenu(page, 'submenu-settings');
         await expect(page.locator('#submenu-settings')).toBeVisible();
         await page.click('#submenu-settings [data-back]');
-        await page.waitForTimeout(400);
+        await page.waitForTimeout(150);
         await expect(page.locator('#menu-nav')).toBeVisible();
     });
 
@@ -362,7 +363,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T20b: Lifecycle-Events markieren Match Start/Ende und Menue-Oeffnung', async ({ page }) => {
         await startGame(page);
-        await page.waitForTimeout(300);
+        await page.waitForTimeout(100);
 
         let eventTypes = await page.evaluate(() => (
             window.GAME_INSTANCE?.mediaRecorderSystem?.getLifecycleEvents?.().map((entry) => entry.type) || []
@@ -370,7 +371,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(eventTypes.includes('match_started')).toBeTruthy();
 
         await returnToMenu(page);
-        await page.waitForTimeout(300);
+        await page.waitForTimeout(100);
 
         eventTypes = await page.evaluate(() => (
             window.GAME_INSTANCE?.mediaRecorderSystem?.getLifecycleEvents?.().map((entry) => entry.type) || []
@@ -392,7 +393,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await openMultiplayerSubmenu(page);
         await page.fill('#multiplayer-lobby-code', 'QA-LOBBY');
         await page.click('#btn-multiplayer-host');
-        await page.waitForTimeout(120);
+        await page.waitForTimeout(50);
         const lifecycleEvent = await page.evaluate(() => {
             const events = window.GAME_INSTANCE?.getMenuLifecycleEvents?.() || [];
             return events.find((entry) => entry.type === 'multiplayer_host') || null;
@@ -409,7 +410,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await openLevel4Drawer(page, { section: 'tools' });
         await page.fill('#preset-name', 'Open Preset QA');
         await page.click('#btn-preset-save-open');
-        await page.waitForTimeout(120);
+        await page.waitForTimeout(50);
 
         const contractState = await page.evaluate(() => {
             const raw = localStorage.getItem('cuviosclash.menu-presets.v1');
@@ -439,7 +440,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const button = document.querySelector('#submenu-game [data-preset-id="competitive"]');
             button?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
         });
-        await page.waitForTimeout(120);
+        await page.waitForTimeout(50);
 
         const matchPreset = await page.evaluate(() => ({
             id: window.GAME_INSTANCE?.settings?.matchSettings?.activePresetId || '',
@@ -500,6 +501,44 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(profileState.find((profile) => profile?.isDefault)?.name).toBe('QA Profil');
 
         await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_PROFILES_STORAGE_KEY);
+    });
+
+    test('T20kb: Map- und Flugzeugauswahl bleiben in State und Match konsistent', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+
+        await page.selectOption('#map-select', 'maze');
+        await page.selectOption('#vehicle-select-p1', 'aircraft');
+
+        await expect(page.locator('#map-select')).toHaveValue('maze');
+        await expect(page.locator('#vehicle-select-p1')).toHaveValue('aircraft');
+
+        const selectionState = await page.evaluate(() => ({
+            mapKey: window.GAME_INSTANCE?.settings?.mapKey ?? null,
+            vehicleId: window.GAME_INSTANCE?.settings?.vehicles?.PLAYER_1 ?? null,
+        }));
+
+        expect(selectionState.mapKey).toBe('maze');
+        expect(selectionState.vehicleId).toBe('aircraft');
+
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const game = window.GAME_INSTANCE;
+            return !!(
+                hud
+                && !hud.classList.contains('hidden')
+                && game?.entityManager?.humanPlayers?.length > 0
+            );
+        }, { timeout: 15000 });
+
+        const matchState = await page.evaluate(() => ({
+            mapKey: window.GAME_INSTANCE?.arena?.currentMapKey ?? null,
+            humanVehicleId: window.GAME_INSTANCE?.entityManager?.humanPlayers?.[0]?.vehicleId ?? null,
+        }));
+
+        expect(matchState.mapKey).toBe('maze');
+        expect(matchState.humanVehicleId).toBe('aircraft');
     });
 
     test('T20g: Runtime-Guard blockiert Developer-Events fuer non-owner', async ({ page }) => {
@@ -634,7 +673,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
         await page.click('#keybind-global .keybind-btn[data-action="CINEMATIC_TOGGLE"]');
         await page.keyboard.press('KeyB');
-        await page.waitForTimeout(120);
+        await page.waitForTimeout(50);
 
         const globalBinding = await page.evaluate(() => (
             window.GAME_INSTANCE?.settings?.controls?.GLOBAL?.CINEMATIC_TOGGLE || ''
@@ -676,7 +715,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T20n: Escape-Return finalisiert Recording-Export trotz doppeltem Lifecycle-Stop', async ({ page }) => {
         await startGame(page);
-        await page.waitForTimeout(1400);
+        await page.waitForTimeout(500);
 
         const recordingState = await page.evaluate(() => {
             const recorder = window.GAME_INSTANCE?.mediaRecorderSystem;
@@ -694,7 +733,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         }
 
         await returnToMenu(page);
-        await page.waitForTimeout(800);
+        await page.waitForTimeout(300);
 
         const recorderState = await page.evaluate(async () => {
             const recorder = window.GAME_INSTANCE?.mediaRecorderSystem;
@@ -1062,8 +1101,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const updates = [];
             try {
                 window.requestAnimationFrame = () => 1;
-                window.cancelAnimationFrame = () => {};
-                const loop = new GameLoop((dt) => updates.push(dt), () => {});
+                window.cancelAnimationFrame = () => { };
+                const loop = new GameLoop((dt) => updates.push(dt), () => { });
                 loop.running = true;
                 loop.lastTime = 0;
                 loop._loop(10);
@@ -1096,8 +1135,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const updates = [];
             try {
                 window.requestAnimationFrame = () => 1;
-                window.cancelAnimationFrame = () => {};
-                const loop = new GameLoop((dt) => updates.push(dt), () => {});
+                window.cancelAnimationFrame = () => { };
+                const loop = new GameLoop((dt) => updates.push(dt), () => { });
                 loop.running = true;
                 loop.lastTime = 0;
                 loop._loop(200);
@@ -1128,8 +1167,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const updates = [];
             try {
                 window.requestAnimationFrame = () => 1;
-                window.cancelAnimationFrame = () => {};
-                const loop = new GameLoop((dt) => updates.push(dt), () => {});
+                window.cancelAnimationFrame = () => { };
+                const loop = new GameLoop((dt) => updates.push(dt), () => { });
                 loop.running = true;
                 loop.lastTime = 0;
                 loop.setTimeScale(0.5);

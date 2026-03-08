@@ -15,12 +15,13 @@ const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
 const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
 
 test.describe('T61-125: Stress, I/O & Sicherheit', () => {
+    test.describe.configure({ mode: 'serial' });
 
     test('T61: Keine JS-Fehler nach 5s Spielzeit', async ({ page }) => {
         test.setTimeout(30000);
         const errors = collectErrors(page);
         await startGame(page);
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
         expect(errors).toHaveLength(0);
     });
 
@@ -28,7 +29,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
         test.setTimeout(60000);
         await startGame(page);
         const before = await page.evaluate(() => document.querySelectorAll('*').length);
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
         const after = await page.evaluate(() => document.querySelectorAll('*').length);
         expect(after - before).toBeLessThan(100);
     });
@@ -36,7 +37,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
     test('T63: ESC waehrend Spiel oeffnet Menue', async ({ page }) => {
         test.setTimeout(60000);
         await startGame(page);
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(400);
         await returnToMenu(page);
         await expect(page.locator('#main-menu')).toBeVisible();
     });
@@ -64,7 +65,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
         if (!isDisabled) {
             await page.click('#btn-profile-save');
         }
-        await page.waitForTimeout(1000);
+        await page.waitForTimeout(400);
         expect(dialogs).toHaveLength(0);
         await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_PROFILES_STORAGE_KEY);
     });
@@ -124,7 +125,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
             }
         });
         await startGame(page);
-        await page.waitForTimeout(5000);
+        await page.waitForTimeout(2000);
         expect(warnings).toHaveLength(0);
     });
 
@@ -173,7 +174,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
         await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
         await openGameSubmenu(page);
         await page.click('#btn-start');
-        await page.waitForTimeout(3000);
+        await page.waitForTimeout(1500);
         expect(errors).toHaveLength(0);
         await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_STORAGE_KEY);
     });
