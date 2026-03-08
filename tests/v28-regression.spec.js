@@ -30,6 +30,7 @@ test.describe('V28 Baseline Regression Setup (28.0)', () => {
                 hasController: typeof player.controller?.resolveControlState === 'function',
                 hasViewUpdate: typeof player.view?.update === 'function',
                 viewIsBoundToPlayer: player.view?.player === player,
+                viewType: player.view?.viewType,
                 noLegacyControlResolver: typeof player.resolveControlState === 'undefined',
             };
         });
@@ -38,6 +39,7 @@ test.describe('V28 Baseline Regression Setup (28.0)', () => {
         expect(result.hasController).toBeTruthy();
         expect(result.hasViewUpdate).toBeTruthy();
         expect(result.viewIsBoundToPlayer).toBeTruthy();
+        expect(result.viewType).toBe('player');
         expect(result.noLegacyControlResolver).toBeTruthy();
     });
 
@@ -81,6 +83,35 @@ test.describe('V28 Baseline Regression Setup (28.0)', () => {
         expect(result.hasSensePhase).toBeTruthy();
         expect(result.snapshotOk).toBeTruthy();
         expect(result.arrayOk).toBeTruthy();
+    });
+
+    test('T28b2: Bot-Rendering bleibt ueber BotView vom AI-Runtimekern getrennt', async ({ page }) => {
+        await startGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const botEntry = window.GAME_INSTANCE?.entityManager?.bots?.[0];
+            const botPlayer = botEntry?.player;
+            const botAI = botEntry?.ai?._botAI;
+            if (!botPlayer || !botAI) {
+                return { error: 'missing-bot-runtime' };
+            }
+
+            const visualKeys = ['group', 'vehicleMesh', 'shieldMesh', 'view'];
+            return {
+                error: null,
+                botViewType: botPlayer.view?.viewType,
+                botGroupViewType: botPlayer.group?.userData?.entityViewType,
+                aiHasRenderer: typeof botAI.renderer !== 'undefined',
+                aiHasVisualRefs: visualKeys.some((key) => typeof botAI[key] !== 'undefined'),
+                sensorsFacadeRuntimeBound: botAI.sensorsFacade?.runtimeBot === botAI,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.botViewType).toBe('bot');
+        expect(result.botGroupViewType).toBe('bot');
+        expect(result.aiHasRenderer).toBeFalsy();
+        expect(result.aiHasVisualRefs).toBeFalsy();
+        expect(result.sensorsFacadeRuntimeBound).toBeTruthy();
     });
 
     test('T28c: Maze Draw-Calls bleiben innerhalb der Baseline-Huelle', async ({ page }) => {

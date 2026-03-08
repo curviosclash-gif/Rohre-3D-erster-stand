@@ -59,6 +59,7 @@ export class PlayerView {
     constructor(player, renderer) {
         this.player = player;
         this.renderer = renderer;
+        this.viewType = 'player';
 
         this.group = null;
         this.vehicleMesh = null;
@@ -120,6 +121,9 @@ export class PlayerView {
         if (this.renderer?.addToScene) {
             this.renderer.addToScene(this.group);
         }
+
+        this.group.userData = this.group.userData || {};
+        this.group.userData.entityViewType = this.viewType;
 
         this.applyModelScale();
         this._syncShieldBaseScaleToHitbox();

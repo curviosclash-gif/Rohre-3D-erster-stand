@@ -108,13 +108,18 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 - Konfliktregel: `maze`-Optimierung und Klassen-Splits bleiben in diesem Block gebuendelt
 
 - [x] 28.0 Baseline-Freeze und Regression-Setup (abgeschlossen 2026-03-08)
-- [ ] 28.1 Player "God Class" Refactoring
-  - [ ] 28.1.1 Three.js Rendering in `PlayerView` auslagern
-  - [ ] 28.1.2 Input-Handling in `PlayerController` isolieren
-- [ ] 28.2 Bot "God Class" Refactoring
-  - [ ] 28.2.1 Rendering in `BotView` kapseln
-  - [ ] 28.2.2 Sensing/Probing-Logik fuer kuenftiges ML-Training abstrahieren
+- [x] 28.1 Player "God Class" Refactoring
+  - [x] 28.1.1 Three.js Rendering in `PlayerView` auslagern
+  - [x] 28.1.2 Input-Handling in `PlayerController` isolieren
+  - Abgeschlossen am: `2026-03-08`
+  - Status 2026-03-08: `Player` instanziiert den Rendering-Pfad ueber `createPlayerView`/`PlayerView`, Eingabeaufloesung bleibt in `PlayerController`; V28-Regression `T28a` bestaetigt getrennte Verantwortungen.
+- [x] 28.2 Bot "God Class" Refactoring
+  - [x] 28.2.1 Rendering in `BotView` kapseln
+  - [x] 28.2.2 Sensing/Probing-Logik fuer kuenftiges ML-Training abstrahieren
+  - Abgeschlossen am: `2026-03-08`
+  - Status 2026-03-08: Bots erhalten eine explizite `BotView`-Seam ueber die gemeinsame View-Fabrik; Sensorik und probe-/ML-nahe Runtime bleiben ueber `BotSensorsFacade`, `BotRuntimeContextFactory` und Observation-Reuse entkoppelt. V28-Regressionen `T28b` und `T28b2` gruen.
 - [ ] 28.3 V13 Performance-Hotspot `maze` (Draw-Calls / Batching optimieren)
+  - Status 2026-03-08: Reproduzierbarer Blocker vor Abschluss von V28: `npm run test:v28:regression -- -g "T28c"` scheitert auf `maze` mit `drawCallsAverage=55.8` bei Budget `<=35`; naechster Lane-Schritt bleibt die Batching-/Draw-Call-Analyse in `28.3`.
 - [ ] 28.4 Abschluss-Gate, Performance-Metrics pruefen und Doku-Freeze (`docs:sync`, `docs:check`)
   - Status 2026-03-08: 28.0 abgeschlossen (`benchmark:baseline` erneuert, neuer Harness `npm run test:v28:regression`; Referenzen `data/performance_ki_baseline_report.json` und `docs/Testergebnisse_2026-03-08.md`).
 - [x] 28.5 Performance-Offensive Maximalpfad (CPU/GPU/Startup ohne Feature-Verlust)

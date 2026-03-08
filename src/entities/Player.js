@@ -30,7 +30,7 @@ import {
     updatePlayerMotion,
 } from './player/PlayerMotionOps.js';
 import { PlayerController } from './player/PlayerController.js';
-import { PlayerView } from './player/PlayerView.js';
+import { createPlayerView } from './player/createPlayerView.js';
 
 export class Player {
     constructor(renderer, index, color, isBot = false, options = {}) {
@@ -123,7 +123,7 @@ export class Player {
         this.cameraMode = 0;
 
         this.controller = new PlayerController();
-        this.view = new PlayerView(this, renderer);
+        this.view = createPlayerView(this, renderer);
         this.view.createModel();
 
         this.trail = new Trail(renderer, color, this.index, options.entityManager);
