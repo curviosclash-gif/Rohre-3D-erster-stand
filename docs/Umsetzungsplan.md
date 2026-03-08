@@ -101,7 +101,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 - Hauptpfade: `src/entities/**`, `src/core/**`
 - Konfliktregel: `maze`-Optimierung und Klassen-Splits bleiben in diesem Block gebuendelt
 
-- [ ] 28.0 Baseline-Freeze und Regression-Setup
+- [x] 28.0 Baseline-Freeze und Regression-Setup (abgeschlossen 2026-03-08)
 - [ ] 28.1 Player "God Class" Refactoring
   - [ ] 28.1.1 Three.js Rendering in `PlayerView` auslagern
   - [ ] 28.1.2 Input-Handling in `PlayerController` isolieren
@@ -110,6 +110,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
   - [ ] 28.2.2 Sensing/Probing-Logik fuer kuenftiges ML-Training abstrahieren
 - [ ] 28.3 V13 Performance-Hotspot `maze` (Draw-Calls / Batching optimieren)
 - [ ] 28.4 Abschluss-Gate, Performance-Metrics pruefen und Doku-Freeze (`docs:sync`, `docs:check`)
+  - Status 2026-03-08: 28.0 abgeschlossen (`benchmark:baseline` erneuert, neuer Harness `npm run test:v28:regression`; Referenzen `data/performance_ki_baseline_report.json` und `docs/Testergebnisse_2026-03-08.md`).
 - [x] 28.5 Performance-Offensive Maximalpfad (CPU/GPU/Startup ohne Feature-Verlust)
   - [x] 28.5.0 Baseline-Refresh und Feature-Parity-Harness
   - [x] 28.5.1 Render-Resource-Cache und Portal-/Gate-Instancing

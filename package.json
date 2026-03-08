@@ -15,6 +15,7 @@
     "bot:validate": "node scripts/bot-validation-runner.mjs",
     "benchmark:baseline": "node scripts/bot-benchmark-baseline.mjs",
     "benchmark:lifecycle": "node scripts/perf-lifecycle-measure.mjs",
+    "test:v28:regression": "playwright test tests/v28-regression.spec.js",
     "test:core": "playwright test tests/core.spec.js",
     "test:gpu": "playwright test tests/gpu.spec.js",
     "test:physics": "playwright test tests/physics-core.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js",

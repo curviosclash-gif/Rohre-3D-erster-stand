@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-07",
+  "generatedAt": "2026-03-08",
   "baseline": {
     "sourceReportPath": "data/bot_validation_report.json",
     "sourceGeneratedAt": "2026-03-02",
@@ -64,19 +64,19 @@
         "botWinRate": 0.6,
         "stuckEvents": 0,
         "averageBotSurvival": 30.818340845944476,
-        "fpsAverage": 59.93806723935321,
-        "drawCallsAverage": 17,
-        "performanceSamples": 27
+        "fpsAverage": 60,
+        "drawCallsAverage": 22.866666666666667,
+        "performanceSamples": 15
       },
       "performance": {
-        "sampleCount": 27,
-        "fpsAverage": 59.93806723935321,
-        "drawCallsAverage": 17,
-        "fpsMin": 58.2713462545835,
-        "fpsMax": 60.01813313861502,
-        "drawCallsMin": 17,
-        "drawCallsMax": 17,
-        "observedDurationMs": 8213
+        "sampleCount": 15,
+        "fpsAverage": 60,
+        "drawCallsAverage": 22.866666666666667,
+        "fpsMin": 60,
+        "fpsMax": 60,
+        "drawCallsMin": 10,
+        "drawCallsMax": 34,
+        "observedDurationMs": 8381
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -99,19 +99,19 @@
         "botWinRate": 1,
         "stuckEvents": 0,
         "averageBotSurvival": 29.630166473514084,
-        "fpsAverage": 60.00225908125314,
-        "drawCallsAverage": 24,
-        "performanceSamples": 16
+        "fpsAverage": 60,
+        "drawCallsAverage": 48.111111111111114,
+        "performanceSamples": 9
       },
       "performance": {
-        "sampleCount": 16,
-        "fpsAverage": 60.00225908125314,
-        "drawCallsAverage": 24,
-        "fpsMin": 60.00000005329521,
-        "fpsMax": 60.00401610299817,
-        "drawCallsMin": 24,
-        "drawCallsMax": 24,
-        "observedDurationMs": 8570
+        "sampleCount": 9,
+        "fpsAverage": 60,
+        "drawCallsAverage": 48.111111111111114,
+        "fpsMin": 60,
+        "fpsMax": 60,
+        "drawCallsMin": 16,
+        "drawCallsMax": 135,
+        "observedDurationMs": 10753
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -134,19 +134,19 @@
         "botWinRate": 1,
         "stuckEvents": 0,
         "averageBotSurvival": 31.618958541106622,
-        "fpsAverage": 60.000000053295224,
-        "drawCallsAverage": 23.733333333333334,
-        "performanceSamples": 15
+        "fpsAverage": 60,
+        "drawCallsAverage": 75,
+        "performanceSamples": 4
       },
       "performance": {
-        "sampleCount": 15,
-        "fpsAverage": 60.000000053295224,
-        "drawCallsAverage": 23.733333333333334,
-        "fpsMin": 60.00000005329521,
-        "fpsMax": 60.00000005329521,
-        "drawCallsMin": 20,
-        "drawCallsMax": 24,
-        "observedDurationMs": 8730
+        "sampleCount": 4,
+        "fpsAverage": 60,
+        "drawCallsAverage": 75,
+        "fpsMin": 60,
+        "fpsMax": 60,
+        "drawCallsMin": 50,
+        "drawCallsMax": 86,
+        "observedDurationMs": 11196
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -169,19 +169,19 @@
         "botWinRate": 0.75,
         "stuckEvents": 0,
         "averageBotSurvival": 45.24550036010805,
-        "fpsAverage": 60.00334677593515,
-        "drawCallsAverage": 22.5,
-        "performanceSamples": 12
+        "fpsAverage": 60,
+        "drawCallsAverage": 65.8,
+        "performanceSamples": 5
       },
       "performance": {
-        "sampleCount": 12,
-        "fpsAverage": 60.00334677593515,
-        "drawCallsAverage": 22.5,
-        "fpsMin": 60.000000067849356,
-        "fpsMax": 60.00401611755232,
-        "drawCallsMin": 20,
-        "drawCallsMax": 23,
-        "observedDurationMs": 8239
+        "sampleCount": 5,
+        "fpsAverage": 60,
+        "drawCallsAverage": 65.8,
+        "fpsMin": 60,
+        "fpsMax": 60,
+        "drawCallsMin": 26,
+        "drawCallsMax": 98,
+        "observedDurationMs": 9913
       },
       "sourceRunner": {
         "forcedRounds": 3,
@@ -195,9 +195,9 @@
     "botWinRate": 0.8235294117647058,
     "stuckEvents": 0,
     "averageBotSurvival": 34.1217768075669,
-    "fpsAverage": 59.977201755331954,
-    "drawCallsAverage": 20.985714285714284,
-    "performanceSamples": 70
+    "fpsAverage": 60,
+    "drawCallsAverage": 42.57575757575758,
+    "performanceSamples": 33
   },
   "sourceRunner": {
     "forcedRounds": 12,
@@ -208,6 +208,6 @@
   "paths": {
     "json": "data/performance_ki_baseline_report.json",
     "sourceJson": "data/bot_validation_report.json",
-    "doc": "docs/Testergebnisse_2026-03-07.md"
+    "doc": "docs/Testergebnisse_2026-03-08.md"
   }
 }
