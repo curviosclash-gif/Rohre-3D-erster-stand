@@ -86,7 +86,12 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 - Hauptpfade: `src/ui/**`, `src/state/**`, `scripts/**`, `data/**`
 - Konfliktregel: Statistik-/Profil-Details nur in diesem Block pflegen
 
-- [ ] 27.0 Baseline-Freeze und UI-Markup-Analyse
+- [x] 27.0 Baseline-Freeze und UI-Markup-Analyse
+  - Abgeschlossen am: `2026-03-08`
+  - Status 2026-03-08:
+    - Baseline-Analyse fuer V27 in `docs/Feature_Profile_Statistiken_UI_V27.md` festgeschrieben.
+    - Contract-Freeze gesetzt fuer bestehende Profil-IDs (`#profile-name`, `#btn-profile-save`, `#profile-select`, `#btn-profile-load`, `#btn-profile-delete`) und Round-End-Overlay (`#message-overlay`, `#message-text`, `#message-sub`).
+    - Iststand bestaetigt: Round/Match-Metriken sind in `RoundRecorder`/`RoundMetricsStore` verfuegbar, aber UI-seitig noch nicht als vertiefte Post-Match-Ansicht verdrahtet.
 - [ ] 27.1 V7 Profile-UX Ausbau
   - [ ] 27.1.1 Duplizieren und Import/Export-Funktion
   - [ ] 27.1.2 Standardprofil-Markierung ergaenzen
