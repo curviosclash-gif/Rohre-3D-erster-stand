@@ -1,8 +1,6 @@
 // ============================================
-// GameLoop.js - Smooth Variable Timestep Game Loop
+// GameLoop.js - fixed-step simulation loop with scaled game time
 // ============================================
-
-import { CONFIG } from './Config.js';
 
 export class GameLoop {
     constructor(updateFn, renderFn) {
@@ -10,18 +8,20 @@ export class GameLoop {
         this.renderFn = renderFn;
         this.running = false;
         this.lastTime = 0;
-        this.timeScale = 1.0; // Für Zeitlupe-Powerup
+        this.timeScale = 1.0; // Fuer Zeitlupe-Powerup
         this._boundLoop = this._loop.bind(this);
         this.frameId = null;
         this._errorShown = false;
         this.accumulator = 0;
-        this.fixedStep = 1 / 60; // Fester Physik-Schritt (1x pro Frame bei 60 FPS)
+        this.fixedStep = 1 / 60;
+        this.maxSubSteps = 3;
     }
 
     start() {
         this.running = true;
         this.lastTime = performance.now();
         this._errorShown = false;
+        this.accumulator = 0;
         this.frameId = requestAnimationFrame(this._boundLoop);
     }
 
@@ -34,7 +34,8 @@ export class GameLoop {
     }
 
     setTimeScale(scale) {
-        this.timeScale = scale;
+        const numericScale = Number(scale);
+        this.timeScale = Number.isFinite(numericScale) ? Math.max(0, numericScale) : 1.0;
     }
 
     _loop(now) {
@@ -43,28 +44,22 @@ export class GameLoop {
         const rawDt = (now - this.lastTime) / 1000;
         this.lastTime = now;
 
-        // Begrenze dt um Spiral-of-Death und Tab-Switch-Sprünge zu vermeiden
         const dt = Math.min(rawDt, 0.05);
-        this.accumulator += dt * this.timeScale;
+        const scaledDt = dt * this.timeScale;
+        this.accumulator += scaledDt;
 
-        // Maximal 3 Schritte pro Frame (Spiral-of-Death-Schutz)
-        const maxAccum = this.fixedStep * 3;
-        if (this.accumulator > maxAccum) this.accumulator = maxAccum;
+        const maxAccum = this.fixedStep * this.maxSubSteps;
+        if (this.accumulator > maxAccum) {
+            this.accumulator = maxAccum;
+        }
 
         try {
-            let stepped = false;
             while (this.accumulator >= this.fixedStep) {
                 this.updateFn(this.fixedStep);
                 this.accumulator -= this.fixedStep;
-                stepped = true;
-            }
-            // Fallback: mindestens ein Update pro Frame wenn dt > 0
-            if (!stepped && dt > 0) {
-                this.updateFn(dt * this.timeScale);
             }
             this.renderFn();
         } catch (err) {
-            // Fehler sichtbar machen per Overlay
             if (!this._errorShown) {
                 this._errorShown = true;
                 console.error('GameLoop error:', err);

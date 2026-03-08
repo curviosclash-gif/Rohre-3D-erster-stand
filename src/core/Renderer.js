@@ -59,7 +59,8 @@ export class Renderer {
 
         this.qualityController = new RenderQualityController(this.renderer, this.scene);
 
-        window.addEventListener('resize', () => this._onResize());
+        this._onWindowResize = () => this._onResize();
+        window.addEventListener('resize', this._onWindowResize);
     }
 
     _setupLights() {
@@ -198,5 +199,14 @@ export class Renderer {
 
     setQuality(quality) {
         this.qualityController.setQuality(quality);
+    }
+
+    dispose() {
+        if (this._onWindowResize) {
+            window.removeEventListener('resize', this._onWindowResize);
+            this._onWindowResize = null;
+        }
+        this.clearScene();
+        this.renderer.dispose();
     }
 }

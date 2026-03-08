@@ -5,6 +5,7 @@
 import { sanitizeBotAction } from '../ai/actions/BotActionContract.js';
 import { createBotRuntimeContext } from '../ai/BotRuntimeContextFactory.js';
 import { buildObservation } from '../ai/observation/ObservationSystem.js';
+import { OBSERVATION_LENGTH_V1 } from '../ai/observation/ObservationSchemaV1.js';
 
 // Reused input object to reduce GC
 const SHARED_EMPTY_INPUT = {
@@ -90,6 +91,7 @@ export class PlayerInputSystem {
 
     _buildBotObservation(player, policy, runtimeContext) {
         const observationContext = runtimeContext?.observationContext || runtimeContext;
+        const observationTarget = this._resolveObservationTarget(runtimeContext);
         if (typeof policy?.getObservation === 'function') {
             try {
                 const customObservation = policy.getObservation(player, runtimeContext);
@@ -105,7 +107,24 @@ export class PlayerInputSystem {
                 this._warnInvalidBotObservation(player, 'policy.getObservation threw', error);
             }
         }
-        return buildObservation(player, observationContext);
+        return buildObservation(player, observationContext, observationTarget);
+    }
+
+    _resolveObservationTarget(runtimeContext) {
+        const reusable = runtimeContext?.observationBuffer;
+        if (
+            reusable
+            && typeof reusable.length === 'number'
+            && reusable.length === OBSERVATION_LENGTH_V1
+            && typeof reusable.fill === 'function'
+        ) {
+            return reusable;
+        }
+        const fallback = new Array(OBSERVATION_LENGTH_V1).fill(0);
+        if (runtimeContext && typeof runtimeContext === 'object') {
+            runtimeContext.observationBuffer = fallback;
+        }
+        return fallback;
     }
 
     _invokeBotPolicyUpdate(policy, dt, player, runtimeContext) {

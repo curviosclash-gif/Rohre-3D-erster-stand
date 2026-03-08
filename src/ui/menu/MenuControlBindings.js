@@ -2,8 +2,9 @@ export function setupMenuControlBindings(ctx) {
     const ui = ctx.ui;
     const emit = ctx.emit;
     const eventTypes = ctx.eventTypes;
+    const bind = ctx.bind;
 
-    ui.keybindP1.addEventListener('click', (e) => {
+    bind(ui.keybindP1, 'click', (e) => {
         const btn = e.target.closest('button.keybind-btn');
         if (!btn) return;
         emit(eventTypes.START_KEY_CAPTURE, {
@@ -12,7 +13,7 @@ export function setupMenuControlBindings(ctx) {
         });
     });
 
-    ui.keybindP2.addEventListener('click', (e) => {
+    bind(ui.keybindP2, 'click', (e) => {
         const btn = e.target.closest('button.keybind-btn');
         if (!btn) return;
         emit(eventTypes.START_KEY_CAPTURE, {
@@ -22,7 +23,7 @@ export function setupMenuControlBindings(ctx) {
     });
 
     if (ui.keybindGlobal) {
-        ui.keybindGlobal.addEventListener('click', (e) => {
+        bind(ui.keybindGlobal, 'click', (e) => {
             const btn = e.target.closest('button.keybind-btn');
             if (!btn) return;
             emit(eventTypes.START_KEY_CAPTURE, {
@@ -32,11 +33,11 @@ export function setupMenuControlBindings(ctx) {
         });
     }
 
-    ui.resetKeysButton.addEventListener('click', () => {
+    bind(ui.resetKeysButton, 'click', () => {
         emit(eventTypes.RESET_KEYS);
     });
 
-    ui.saveKeysButton.addEventListener('click', () => {
+    bind(ui.saveKeysButton, 'click', () => {
         emit(eventTypes.SAVE_KEYS);
     });
 }

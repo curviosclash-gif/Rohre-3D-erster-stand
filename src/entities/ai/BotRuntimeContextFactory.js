@@ -6,6 +6,7 @@ import { CONFIG } from '../../core/Config.js';
 import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
 import { GAME_MODE_TYPES, normalizeGameMode } from '../../hunt/HuntMode.js';
 import { createObservationContext } from './observation/ObservationSystem.js';
+import { OBSERVATION_LENGTH_V1 } from './observation/ObservationSchemaV1.js';
 
 const RUNTIME_CONTEXT_BY_PLAYER = new WeakMap();
 
@@ -35,6 +36,7 @@ function createCachedRuntimeContext() {
             portalsEnabled: false,
         },
         observationContext: null,
+        observationBuffer: new Array(OBSERVATION_LENGTH_V1).fill(0),
         observation: null,
     };
 }
@@ -82,6 +84,9 @@ export function createBotRuntimeContext(entityManager, player, dt = 0, options =
             planarMode: rules.planarMode,
         }, runtimeContext.observationContext)
         : null;
+    if (!runtimeContext.observationBuffer || runtimeContext.observationBuffer.length !== OBSERVATION_LENGTH_V1) {
+        runtimeContext.observationBuffer = new Array(OBSERVATION_LENGTH_V1).fill(0);
+    }
     runtimeContext.observation = null;
     return runtimeContext;
 }

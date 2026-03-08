@@ -20,18 +20,27 @@ export class AudioManager {
         };
 
         // Initialize on first user interaction (browser policy)
-        const initAudio = () => this._init();
-        window.addEventListener('keydown', initAudio, { once: true });
-        window.addEventListener('mousedown', initAudio, { once: true });
-
-        // Emergency Mute Toggle (M)
-        window.addEventListener('keydown', (e) => {
+        this._onInitInteraction = () => {
+            this._init();
+            this._removeInitListeners();
+        };
+        this._onMuteToggle = (e) => {
             if (e.code === 'KeyM') {
                 this.enabled = !this.enabled;
                 console.log(`Audio ${this.enabled ? 'ENABLED' : 'DISABLED'}`);
-                // Optional: Show toast via main.js (not accessible here directly, but console helps debugging)
             }
-        });
+        };
+
+        window.addEventListener('keydown', this._onInitInteraction);
+        window.addEventListener('mousedown', this._onInitInteraction);
+        window.addEventListener('keydown', this._onMuteToggle);
+    }
+
+    _removeInitListeners() {
+        if (this._onInitInteraction) {
+            window.removeEventListener('keydown', this._onInitInteraction);
+            window.removeEventListener('mousedown', this._onInitInteraction);
+        }
     }
 
     _init() {
@@ -169,5 +178,19 @@ export class AudioManager {
 
         osc.start();
         osc.stop(this.ctx.currentTime + 0.3);
+    }
+
+    dispose() {
+        this._removeInitListeners();
+        if (this._onMuteToggle) {
+            window.removeEventListener('keydown', this._onMuteToggle);
+            this._onMuteToggle = null;
+        }
+        this._onInitInteraction = null;
+        if (this.ctx && typeof this.ctx.close === 'function') {
+            this.ctx.close().catch(() => {});
+        }
+        this.ctx = null;
+        this.buffers = {};
     }
 }

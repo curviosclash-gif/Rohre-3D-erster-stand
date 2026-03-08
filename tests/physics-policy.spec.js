@@ -268,6 +268,54 @@ test.describe('Physics Policy (T65-T82)', () => {
         expect(result.actionYawLeft).toBeTruthy();
     });
 
+    test('T71b: Observation-Buffer wird pro Bot-Tick wiederverwendet', async ({ page }) => {
+        await startGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const bot = entityManager?.players?.find((player) => player?.isBot);
+            if (!entityManager || !bot) {
+                return { error: 'missing-bot' };
+            }
+
+            const policy = entityManager.botByPlayer.get(bot);
+            if (!policy) {
+                return { error: 'missing-policy' };
+            }
+
+            const originalUpdate = policy.update;
+            const originalFlag = policy.usesRuntimeContext;
+            const observedRefs = [];
+            const bufferMatches = [];
+            try {
+                policy.usesRuntimeContext = true;
+                policy.update = function observationReuseProbe(dt, player, context) {
+                    observedRefs.push(context?.observation || null);
+                    bufferMatches.push(context?.observationBuffer === context?.observation);
+                    return { yawLeft: false };
+                };
+                entityManager._playerInputSystem.resolvePlayerInput(bot, 1 / 60, null);
+                entityManager._playerInputSystem.resolvePlayerInput(bot, 1 / 60, null);
+                return {
+                    error: null,
+                    tickCount: observedRefs.length,
+                    sameObservationReference: observedRefs[0] === observedRefs[1],
+                    observationLength: Number(observedRefs[0]?.length || 0),
+                    bufferMatches,
+                };
+            } finally {
+                policy.update = originalUpdate;
+                policy.usesRuntimeContext = originalFlag;
+            }
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.tickCount).toBe(2);
+        expect(result.sameObservationReference).toBeTruthy();
+        expect(result.observationLength).toBe(40);
+        expect(result.bufferMatches.every((entry) => entry === true)).toBeTruthy();
+    });
+
     test('T72: Legacy-Policy-Signatur bleibt kompatibel', async ({ page }) => {
         await startGameWithBots(page, 1);
         const result = await page.evaluate(() => {

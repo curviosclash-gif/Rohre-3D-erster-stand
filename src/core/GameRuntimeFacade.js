@@ -10,12 +10,27 @@ import { SETTINGS_CHANGE_KEYS } from '../ui/SettingsChangeKeys.js';
 import { guardMenuRuntimeEvent, resolveMenuAccessContext } from '../ui/menu/MenuAccessPolicy.js';
 import { MenuMultiplayerBridge } from '../ui/menu/MenuMultiplayerBridge.js';
 import { LEVEL4_SECTION_IDS } from '../ui/menu/MenuStateContracts.js';
-import {
-    exportMenuConfigAsCode,
-    exportMenuConfigAsJson,
-    importMenuConfigFromInput,
-} from '../ui/menu/MenuConfigShareOps.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
+import { GAME_STATE_IDS } from './runtime/GameStateIds.js';
+import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
+import {
+    applyMenuPresetAction,
+    deleteMenuPresetAction,
+    handleConfigExportCodeAction,
+    handleConfigExportJsonAction,
+    handleConfigImportAction,
+    saveMenuPresetAction,
+} from './runtime/MenuRuntimePresetConfigService.js';
+import {
+    didHostChangeMatchSettings,
+    handleMultiplayerHostAction,
+    handleMultiplayerJoinAction,
+    handleMultiplayerReadyToggleAction,
+    invalidateMultiplayerReadyIfHostChangedSettings,
+} from './runtime/MenuRuntimeMultiplayerService.js';
+import {
+    orchestrateRuntimeSettingsChanged,
+} from './runtime/RuntimeSettingsChangeOrchestrator.js';
 
 const MATCH_SETTING_CHANGE_KEY_SET = new Set([
     SETTINGS_CHANGE_KEYS.MODE,
@@ -104,13 +119,13 @@ export class GameRuntimeFacade {
     scheduleMatchPrewarm() {
         const game = this.game;
         if (!game?.renderer || !game?.settingsManager) return;
-        if (game.state !== 'MENU') return;
+        if (game.state !== GAME_STATE_IDS.MENU) return;
         if (game.entityManager) return;
 
         this._clearMatchPrewarmTimer();
         this._matchPrewarmTimer = setTimeout(() => {
             this._matchPrewarmTimer = null;
-            if (game.state !== 'MENU') return;
+            if (game.state !== GAME_STATE_IDS.MENU) return;
             if (game.entityManager) return;
 
             const runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
@@ -158,6 +173,7 @@ export class GameRuntimeFacade {
             });
         }
         this.menuMultiplayerBridge = game.menuMultiplayerBridge;
+        game.menuController?.dispose?.();
 
         game.menuController = new MenuController({
             ui: game.ui,
@@ -521,174 +537,101 @@ export class GameRuntimeFacade {
         game._showStatusToast('Ebene 4 zurueckgesetzt', 1200, 'info');
     }
 
-    _setConfigShareStatus(message, tone = 'info') {
-        const ui = this.game?.ui;
-        if (!ui?.configShareStatus) return;
-        ui.configShareStatus.textContent = String(message || '');
-        ui.configShareStatus.setAttribute('data-tone', tone);
-    }
-
     handleConfigExportCode() {
-        const game = this.game;
-        const code = exportMenuConfigAsCode(game.settings);
-        if (game.ui?.configShareInput) {
-            game.ui.configShareInput.value = code;
-        }
-        this._setConfigShareStatus('Config-Code erzeugt');
+        handleConfigExportCodeAction(this.game);
     }
 
     handleConfigExportJson() {
-        const game = this.game;
-        const json = exportMenuConfigAsJson(game.settings);
-        if (game.ui?.configShareInput) {
-            game.ui.configShareInput.value = json;
-        }
-        this._setConfigShareStatus('Config-JSON erzeugt');
+        handleConfigExportJsonAction(this.game);
     }
 
     handleConfigImport(event) {
-        const game = this.game;
-        const inputValue = String(event?.inputValue || game.ui?.configShareInput?.value || '');
-        const result = importMenuConfigFromInput(game.settings, inputValue);
-        if (!result.success) {
-            this._setConfigShareStatus('Import fehlgeschlagen', 'error');
-            game._showStatusToast('Config-Import fehlgeschlagen', 1400, 'error');
-            return;
-        }
-
-        this.onSettingsChanged({ changedKeys: SESSION_SWITCH_CHANGED_KEYS });
-        this._setConfigShareStatus('Import erfolgreich', 'success');
-        game._showStatusToast('Config importiert', 1200, 'success');
+        handleConfigImportAction({
+            game: this.game,
+            inputValue: String(event?.inputValue || this.game?.ui?.configShareInput?.value || ''),
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            sessionSwitchChangedKeys: SESSION_SWITCH_CHANGED_KEYS,
+        });
     }
 
     applyMenuPreset(event) {
-        const game = this.game;
         const presetId = String(event?.presetId || '').trim();
-        if (!presetId) {
-            game._showStatusToast('Preset fehlt.', 1500, 'error');
-            return;
-        }
-
-        const result = game.settingsManager.applyMenuPreset(game.settings, presetId, this._resolveMenuAccessContext());
-        if (!result.success) {
-            game._showStatusToast('Preset konnte nicht angewendet werden.', 1700, 'error');
-            return;
-        }
-
-        const changedKeys = Array.isArray(result.changedKeys) ? result.changedKeys.slice() : [];
-        changedKeys.push(
-            SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_ID,
-            SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_KIND,
-            SETTINGS_CHANGE_KEYS.PRESET_STATUS
-        );
-        this.onSettingsChanged({ changedKeys });
-
-        if (result.blockedPaths?.length > 0) {
-            game._showStatusToast('Preset teilweise angewendet (Host-Felder blieben unveraendert).', 1900, 'info');
-            return;
-        }
-        game._showStatusToast(`Preset geladen: ${presetId}`, 1300, 'success');
+        applyMenuPresetAction({
+            game: this.game,
+            presetId,
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
+        });
     }
 
     saveMenuPreset(event, kind) {
-        const game = this.game;
-        const presetName = String(event?.name || '').trim();
-        const result = game.settingsManager.saveMenuPreset(
-            game.settings,
-            {
-                kind,
-                name: presetName,
-                sourcePresetId: String(event?.sourcePresetId || '').trim(),
-            },
-            this._resolveMenuAccessContext()
-        );
-        if (!result.success) {
-            game._showStatusToast('Preset konnte nicht gespeichert werden.', 1700, 'error');
-            return;
-        }
-        this.onSettingsChanged({
-            changedKeys: [
-                SETTINGS_CHANGE_KEYS.PRESET_LIST,
-                SETTINGS_CHANGE_KEYS.PRESET_STATUS,
-            ],
+        saveMenuPresetAction({
+            game: this.game,
+            kind,
+            presetName: String(event?.name || '').trim(),
+            sourcePresetId: String(event?.sourcePresetId || '').trim(),
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
         });
-        const label = kind === 'fixed' ? 'verbindlich' : 'frei';
-        game._showStatusToast(`Preset gespeichert (${label}): ${result.preset?.name || result.preset?.id}`, 1400, 'success');
     }
 
     deleteMenuPreset(event) {
-        const game = this.game;
-        const presetId = String(event?.presetId || '').trim();
-        if (!presetId) {
-            game._showStatusToast('Kein Preset ausgewaehlt.', 1500, 'error');
-            return;
-        }
-        const result = game.settingsManager.deleteMenuPreset(presetId, game.settings, this._resolveMenuAccessContext());
-        if (!result.success) {
-            game._showStatusToast('Preset konnte nicht geloescht werden.', 1700, 'error');
-            return;
-        }
-        this.onSettingsChanged({
-            changedKeys: [
-                SETTINGS_CHANGE_KEYS.PRESET_LIST,
-                SETTINGS_CHANGE_KEYS.PRESET_STATUS,
-            ],
+        deleteMenuPresetAction({
+            game: this.game,
+            presetId: String(event?.presetId || '').trim(),
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
         });
-        game._showStatusToast(`Preset geloescht: ${presetId}`, 1200, 'success');
     }
 
     _didHostChangeMatchSettings(changedKeys) {
-        if (!Array.isArray(changedKeys) || changedKeys.length === 0) return false;
-        return changedKeys.some((key) => MATCH_SETTING_CHANGE_KEY_SET.has(key));
+        return didHostChangeMatchSettings(changedKeys, MATCH_SETTING_CHANGE_KEY_SET);
     }
 
     _invalidateMultiplayerReadyIfHostChangedSettings(changedKeys) {
-        if (!this._didHostChangeMatchSettings(changedKeys)) return;
-        const accessContext = this._resolveMenuAccessContext();
-        if (!accessContext.isOwner) return;
-
-        const invalidatedEvent = this.menuMultiplayerBridge?.invalidateReadyForAll('host_settings_changed');
-        if (!invalidatedEvent) return;
-
-        this.game.ui?.multiplayerReadyToggle && (this.game.ui.multiplayerReadyToggle.checked = false);
-        this.onSettingsChanged({
-            changedKeys: [SETTINGS_CHANGE_KEYS.MULTIPLAYER_STATUS],
+        invalidateMultiplayerReadyIfHostChangedSettings({
+            changedKeys,
+            matchSettingChangeKeySet: MATCH_SETTING_CHANGE_KEY_SET,
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            menuMultiplayerBridge: this.menuMultiplayerBridge,
+            game: this.game,
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
         });
     }
 
     handleMultiplayerHost(event) {
-        const game = this.game;
-        const accessContext = this._resolveMenuAccessContext();
-        this.menuMultiplayerBridge?.host({
-            actorId: accessContext.actorId,
-            lobbyCode: String(event?.lobbyCode || '').trim(),
+        handleMultiplayerHostAction({
+            game: this.game,
+            event,
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            menuMultiplayerBridge: this.menuMultiplayerBridge,
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
         });
-        this.onSettingsChanged({
-            changedKeys: [SETTINGS_CHANGE_KEYS.MULTIPLAYER_STATUS],
-        });
-        game._showStatusToast('Multiplayer-Host gestartet (Stub).', 1500, 'info');
     }
 
     handleMultiplayerJoin(event) {
-        const game = this.game;
-        const accessContext = this._resolveMenuAccessContext();
-        this.menuMultiplayerBridge?.join({
-            actorId: accessContext.actorId,
-            lobbyCode: String(event?.lobbyCode || '').trim(),
+        handleMultiplayerJoinAction({
+            game: this.game,
+            event,
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            menuMultiplayerBridge: this.menuMultiplayerBridge,
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
         });
-        this.onSettingsChanged({
-            changedKeys: [SETTINGS_CHANGE_KEYS.MULTIPLAYER_STATUS],
-        });
-        game._showStatusToast('Multiplayer-Join angefragt (Stub).', 1500, 'info');
     }
 
     handleMultiplayerReadyToggle(event) {
-        this.menuMultiplayerBridge?.toggleReady({
-            actorId: this._resolveMenuAccessContext().actorId,
-            ready: !!event?.ready,
-        });
-        this.onSettingsChanged({
-            changedKeys: [SETTINGS_CHANGE_KEYS.MULTIPLAYER_STATUS],
+        handleMultiplayerReadyToggleAction({
+            event,
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            menuMultiplayerBridge: this.menuMultiplayerBridge,
+            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
+            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
         });
     }
 
@@ -838,108 +781,25 @@ export class GameRuntimeFacade {
     }
 
     _resolveStartValidationIssue() {
-        const game = this.game;
-        const settings = game?.settings || {};
-        const sessionType = String(settings?.localSettings?.sessionType || 'single').toLowerCase();
-        const mapKey = String(settings?.mapKey || '').trim();
-        const mapExists = mapKey === 'custom' || !!CONFIG?.MAPS?.[mapKey];
-        if (!mapExists) {
-            return {
-                message: 'Start nicht moeglich: Bitte eine gueltige Map waehlen.',
-                fieldKey: 'map',
-                fieldMessage: 'Map-Auswahl fehlt oder ist ungueltig.',
-            };
-        }
-
-        const vehicleP1 = String(settings?.vehicles?.PLAYER_1 || '').trim();
-        if (!vehicleP1) {
-            return {
-                message: 'Start nicht moeglich: Flugzeug P1 fehlt.',
-                fieldKey: 'vehicleP1',
-                fieldMessage: 'Flugzeug P1 auswaehlen.',
-            };
-        }
-
-        if (sessionType === 'splitscreen') {
-            const vehicleP2 = String(settings?.vehicles?.PLAYER_2 || '').trim();
-            if (!vehicleP2) {
-                return {
-                    message: 'Start nicht moeglich: Splitscreen benoetigt Flugzeug P2.',
-                    fieldKey: 'vehicleP2',
-                    fieldMessage: 'Flugzeug P2 auswaehlen.',
-                };
-            }
-        }
-
-        if (sessionType === 'multiplayer') {
-            const lobbyCode = String(game?.ui?.multiplayerLobbyCodeInput?.value || '').trim();
-            const ready = !!game?.ui?.multiplayerReadyToggle?.checked;
-            if (!lobbyCode && !ready) {
-                return {
-                    message: 'Start nicht moeglich: Multiplayer-Stub erfordert Lobby-Code oder Ready.',
-                    fieldKey: 'multiplayer',
-                    fieldMessage: 'Lobby-Code eintragen oder Ready aktivieren.',
-                };
-            }
-        }
-
-        const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
-        const gameMode = String(settings?.gameMode || 'CLASSIC').toUpperCase();
-        if (modePath === 'fight' && gameMode !== GAME_MODE_TYPES.HUNT) {
-            return {
-                message: 'Start nicht moeglich: Fight muss intern auf HUNT laufen.',
-                fieldKey: 'match',
-                fieldMessage: 'Fight-Konflikt: Modus auf HUNT synchronisieren.',
-            };
-        }
-
-        const themeMode = String(settings?.localSettings?.themeMode || 'dunkel').toLowerCase();
-        if (themeMode !== 'hell' && themeMode !== 'dunkel') {
-            return {
-                message: 'Start nicht moeglich: Theme-Modus ungueltig.',
-                fieldKey: 'theme',
-                fieldMessage: 'Theme auf Hell oder Dunkel setzen.',
-            };
-        }
-
-        return null;
+        return resolveMatchStartValidationIssue({
+            settings: this.game?.settings,
+            ui: this.game?.ui,
+            maps: CONFIG?.MAPS,
+            huntModeType: GAME_MODE_TYPES.HUNT,
+        });
     }
 
     onSettingsChanged(event = null) {
-        const game = this.game;
-        const incomingChangedKeys = Array.isArray(event?.changedKeys) ? event.changedKeys : [];
-        if (incomingChangedKeys.some((key) => START_VALIDATION_RELEVANT_KEY_SET.has(key))) {
-            game.uiManager?.clearStartValidationError?.();
-        }
-        const compatibilityResult = game.settingsManager?.applyMenuCompatibilityRules?.(
-            game.settings,
-            { accessContext: this._resolveMenuAccessContext() }
-        );
-        const compatibilityKeys = Array.isArray(compatibilityResult?.changedKeys)
-            ? compatibilityResult.changedKeys
-            : [];
-        const mergedChangedKeys = Array.from(new Set([
-            ...incomingChangedKeys,
-            ...compatibilityKeys,
-        ]));
-        const changedKeys = mergedChangedKeys.length > 0 ? mergedChangedKeys : null;
-
-        this.markSettingsDirty(true);
-        if (game.uiManager) {
-            if (Array.isArray(changedKeys) && changedKeys.length > 0 && typeof game.uiManager.syncByChangeKeys === 'function') {
-                game.uiManager.syncByChangeKeys(changedKeys);
-            } else {
-                game.uiManager.syncAll();
-            }
-            game.uiManager.updateContext();
-        }
-        if (Array.isArray(changedKeys) && changedKeys.length > 0) {
-            this._invalidateMultiplayerReadyIfHostChangedSettings(changedKeys);
-        }
-        game.keybindEditorController.renderEditor();
-        game._syncProfileControls();
-        this.updateSaveButtonState();
-        this.scheduleMatchPrewarm();
+        orchestrateRuntimeSettingsChanged({
+            game: this.game,
+            event,
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            startValidationRelevantKeySet: START_VALIDATION_RELEVANT_KEY_SET,
+            invalidateMultiplayerReadyIfHostChangedSettings: (changedKeys) => this._invalidateMultiplayerReadyIfHostChangedSettings(changedKeys),
+            markSettingsDirty: (isDirty) => this.markSettingsDirty(isDirty),
+            updateSaveButtonState: () => this.updateSaveButtonState(),
+            scheduleMatchPrewarm: () => this.scheduleMatchPrewarm(),
+        });
     }
 
     markSettingsDirty(isDirty) {
@@ -993,5 +853,13 @@ export class GameRuntimeFacade {
     syncP2HudVisibility() {
         const game = this.game;
         game.ui?.p2Hud?.classList?.toggle('hidden', game.numHumans !== 2);
+    }
+
+    dispose() {
+        this._clearMatchPrewarmTimer();
+        this.game?.menuController?.dispose?.();
+        if (this.game) {
+            this.game.menuController = null;
+        }
     }
 }

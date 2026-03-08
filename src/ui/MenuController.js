@@ -59,6 +59,13 @@ export class MenuController {
         this._queuedInputChangeKeys = new Set();
         this._queuedInputFlushHandle = null;
         this._queuedInputFlushUsesAnimationFrame = false;
+        this._disposers = [];
+    }
+
+    _bind(target, type, handler, options) {
+        if (!target?.addEventListener || typeof handler !== 'function') return;
+        target.addEventListener(type, handler, options);
+        this._disposers.push(() => target.removeEventListener(type, handler, options));
     }
 
     _emit(type, payload = {}) {
@@ -141,6 +148,7 @@ export class MenuController {
     }
 
     setupListeners() {
+        this.dispose();
         const bindingContext = {
             ui: this.ui,
             settings: this.settings,
@@ -149,11 +157,27 @@ export class MenuController {
             emit: (type, payload) => this._emit(type, payload),
             emitSettingsChangedImmediate: (changedKeys) => this._emitSettingsChangedImmediate(changedKeys),
             queueInputSettingsChanged: (changedKeys) => this._queueInputSettingsChanged(changedKeys),
+            bind: (target, type, handler, options) => this._bind(target, type, handler, options),
         };
 
         setupMenuGameplayBindings(bindingContext);
         setupMenuProfileBindings(bindingContext);
         setupMenuControlBindings(bindingContext);
         setupMenuDevPanelBindings(bindingContext);
+    }
+
+    dispose() {
+        this._cancelQueuedInputSettingsChangedFlush();
+        this._queuedInputFlushHandle = null;
+        this._queuedInputFlushUsesAnimationFrame = false;
+        this._queuedInputChangeKeys.clear();
+        while (this._disposers.length > 0) {
+            const dispose = this._disposers.pop();
+            try {
+                dispose?.();
+            } catch {
+                // Keep teardown robust even if one UI binding is already detached.
+            }
+        }
     }
 }

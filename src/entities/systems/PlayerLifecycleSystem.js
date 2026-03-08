@@ -25,6 +25,9 @@ export class PlayerLifecycleSystem {
 
         const prevPos = this._interactionPhase.capturePreviousPosition(player);
         player.update(dt, input);
+        if (player.alive && player.trail) {
+            player.trail.update(dt, player.position, player._tmpVec);
+        }
 
         this._interactionPhase.runSpecialGates(player, prevPos);
         const aborted = this._collisionPhase.run(player, prevPos, huntModeActive);

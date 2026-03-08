@@ -1,0 +1,10 @@
+// ============================================
+// GameStateIds.js - canonical runtime state IDs
+// ============================================
+
+export const GAME_STATE_IDS = Object.freeze({
+    MENU: 'MENU',
+    PLAYING: 'PLAYING',
+    ROUND_END: 'ROUND_END',
+    MATCH_END: 'MATCH_END',
+});

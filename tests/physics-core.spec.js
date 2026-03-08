@@ -59,6 +59,73 @@ test.describe('Physics Core (T41-T60)', () => {
         expect(hasTrail).toBeTruthy();
     });
 
+    test('T45b: PlayerLifecycleSystem aktualisiert den Trail ausserhalb von PlayerView.update', async ({ page }) => {
+        await startGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            if (!entityManager || !player?.view || !player?.trail) {
+                return { error: 'missing-player-runtime' };
+            }
+
+            const originalViewUpdate = player.view.update.bind(player.view);
+            const originalTrailUpdate = player.trail.update.bind(player.trail);
+            let trailCalls = 0;
+            let trailCalledFromView = false;
+            let insideViewUpdate = false;
+
+            player.view.update = (dt) => {
+                insideViewUpdate = true;
+                try {
+                    return originalViewUpdate(dt);
+                } finally {
+                    insideViewUpdate = false;
+                }
+            };
+            player.trail.update = (...args) => {
+                trailCalls += 1;
+                if (insideViewUpdate) {
+                    trailCalledFromView = true;
+                }
+                return originalTrailUpdate(...args);
+            };
+
+            const input = {
+                pitchUp: false,
+                pitchDown: false,
+                yawLeft: false,
+                yawRight: false,
+                rollLeft: false,
+                rollRight: false,
+                boost: false,
+                cameraSwitch: false,
+                dropItem: false,
+                shootItem: false,
+                shootMG: false,
+                shootItemIndex: -1,
+                nextItem: false,
+                useItem: -1,
+            };
+
+            try {
+                entityManager._playerLifecycleSystem.updatePlayer(player, 1 / 60, input);
+                return {
+                    error: null,
+                    trailCalls,
+                    trailCalledFromView,
+                };
+            } finally {
+                player.view.update = originalViewUpdate;
+                player.trail.update = originalTrailUpdate;
+            }
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.trailCalls).toBe(1);
+        expect(result.trailCalledFromView).toBeFalsy();
+    });
+
     test('T46: 1 Bot spawnt korrekt', async ({ page }) => {
         test.setTimeout(60000);
         await startGameWithBots(page, 1);

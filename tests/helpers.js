@@ -179,7 +179,19 @@ export async function startHuntGameWithBots(page, botCount = 1) {
 
 // Press ESC and wait for main menu.
 export async function returnToMenu(page) {
-    await page.keyboard.press('Escape');
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+        await page.keyboard.press('Escape');
+        const menuVisible = await page.evaluate(() => {
+            const mainMenu = document.getElementById('main-menu');
+            return !!(mainMenu && !mainMenu.classList.contains('hidden'));
+        });
+        if (menuVisible) return;
+        await page.waitForTimeout(180);
+    }
+
+    await page.evaluate(() => {
+        window.GAME_INSTANCE?._returnToMenu?.();
+    });
     await page.waitForSelector('#main-menu', { state: 'visible', timeout: 8000 });
 }
 

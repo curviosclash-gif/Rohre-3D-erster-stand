@@ -17,6 +17,7 @@ import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { bootstrapGameRuntime } from './GameBootstrap.js';
 import { GameRuntimeFacade } from './GameRuntimeFacade.js';
 import { GameDebugApi } from './GameDebugApi.js';
+import { GAME_STATE_IDS } from './runtime/GameStateIds.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -47,13 +48,16 @@ export class Game {
             damageIndicator: null,
         };
 
-        this.state = 'MENU';
+        this.state = GAME_STATE_IDS.MENU;
         this.roundPause = 0;
         this.roundStateController = createRoundStateController({ defaultRoundPause: 3.0 });
         this.playingStateSystem = new PlayingStateSystem(this);
         this.roundStateTickSystem = new RoundStateTickSystem(this);
         this._hudTimer = 0;
         this.keyCapture = null;
+        this._disposed = false;
+        this._playtestStartTimeoutId = null;
+        this._boundKeyCaptureHandler = (event) => this.keybindEditorController.handleKeyCapture(event);
 
         bootstrapGameRuntime(this, {
             appVersion: APP_VERSION,
@@ -90,7 +94,7 @@ export class Game {
 
         this.gameLoop.start();
 
-        window.addEventListener('keydown', (e) => this.keybindEditorController.handleKeyCapture(e), true);
+        window.addEventListener('keydown', this._boundKeyCaptureHandler, true);
 
         this._autoStartPlaytestIfRequested();
     }
@@ -139,10 +143,17 @@ export class Game {
         }
         this._onSettingsChanged();
 
-        window.setTimeout(() => {
-            if (this.state !== 'MENU') return;
+        this._playtestStartTimeoutId = window.setTimeout(() => {
+            this._playtestStartTimeoutId = null;
+            if (this.state !== GAME_STATE_IDS.MENU) return;
             this.startMatch();
         }, 0);
+    }
+
+    _clearPlaytestStartTimeout() {
+        if (this._playtestStartTimeoutId == null) return;
+        clearTimeout(this._playtestStartTimeoutId);
+        this._playtestStartTimeoutId = null;
     }
 
     _showMainNav() {
@@ -437,15 +448,15 @@ export class Game {
         this._handleGlobalInputHotkeys();
 
         // Debug Recording
-        if (this._recorderFrameCaptureEnabled && this.state === 'PLAYING' && this.entityManager) {
+        if (this._recorderFrameCaptureEnabled && this.state === GAME_STATE_IDS.PLAYING && this.entityManager) {
             this.recorder.recordFrame(this.entityManager.players);
         }
 
-        if (this.state === 'PLAYING') {
+        if (this.state === GAME_STATE_IDS.PLAYING) {
             this._updatePlayingState(dt);
-        } else if (this.state === 'ROUND_END') {
+        } else if (this.state === GAME_STATE_IDS.ROUND_END) {
             this._updateRoundEndState(dt);
-        } else if (this.state === 'MATCH_END') {
+        } else if (this.state === GAME_STATE_IDS.MATCH_END) {
             this._updateMatchEndState(dt);
         }
 
@@ -463,19 +474,85 @@ export class Game {
         this.renderer.render();
     }
 
+    dispose() {
+        if (this._disposed) return;
+        this._disposed = true;
+
+        this._clearPlaytestStartTimeout();
+        if (this._boundKeyCaptureHandler) {
+            window.removeEventListener('keydown', this._boundKeyCaptureHandler, true);
+            this._boundKeyCaptureHandler = null;
+        }
+
+        this.keyCapture = null;
+        this.gameLoop?.stop?.();
+        this.matchFlowUiController?.sessionOrchestrator?.teardownMatchSession?.();
+        this.runtimeFacade?.dispose?.();
+        this.uiManager?.dispose?.();
+        this.runtimeDiagnosticsSystem?.dispose?.();
+        this.mediaRecorderSystem?.dispose?.();
+        this.input?.dispose?.();
+        this.audio?.dispose?.();
+        this.renderer?.dispose?.();
+
+        if (window.GAME_INSTANCE === this) window.GAME_INSTANCE = null;
+        if (window.GAME_RUNTIME === this.runtimeFacade) window.GAME_RUNTIME = null;
+        if (window.GAME_DEBUG === this.debugApi) window.GAME_DEBUG = null;
+    }
+
 }
 
 // Global Error Handling
-window.onerror = function (msg, url, lineNo, columnNo, error) {
+function showRuntimeErrorOverlay({ title, lines = [], stack = null }) {
+    const existing = document.getElementById('runtime-error-overlay');
+    if (existing) {
+        existing.remove();
+    }
+
     const overlay = document.createElement('div');
+    overlay.id = 'runtime-error-overlay';
     overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(50,0,0,0.9);color:#fff;padding:20px;z-index:99999;font-family:monospace;overflow:auto;';
-    overlay.innerHTML = `<h1>CRITICAL ERROR</h1><p>${msg}</p><p>${url}:${lineNo}:${columnNo}</p><pre>${error ? error.stack : 'No stack trace'}</pre>`;
+
+    const heading = document.createElement('h1');
+    heading.textContent = String(title || 'ERROR');
+    overlay.appendChild(heading);
+
+    if (Array.isArray(lines)) {
+        for (let i = 0; i < lines.length; i++) {
+            const text = String(lines[i] ?? '').trim();
+            if (!text) continue;
+            const paragraph = document.createElement('p');
+            paragraph.textContent = text;
+            overlay.appendChild(paragraph);
+        }
+    }
+
+    const stackElement = document.createElement('pre');
+    stackElement.textContent = String(stack || 'No stack trace');
+    overlay.appendChild(stackElement);
+
     document.body.appendChild(overlay);
+}
+
+window.onerror = function (msg, url, lineNo, columnNo, error) {
+    showRuntimeErrorOverlay({
+        title: 'CRITICAL ERROR',
+        lines: [
+            String(msg || ''),
+            `${String(url || '')}:${Number(lineNo) || 0}:${Number(columnNo) || 0}`,
+        ],
+        stack: error?.stack || 'No stack trace',
+    });
     return false;
 };
 
-window.addEventListener('DOMContentLoaded', () => {
+function disposeExistingGameInstance() {
+    window.GAME_INSTANCE?.dispose?.();
+}
+
+function handleDomContentLoaded() {
     try {
+        disposeExistingGameInstance();
         console.log('DOM ready, initializing Game...');
         const game = new Game();
         // Consolidated runtime/debug entrypoints.
@@ -484,9 +561,12 @@ window.addEventListener('DOMContentLoaded', () => {
         window.GAME_DEBUG = game.debugApi;
     } catch (err) {
         console.error('Fatal Game Init Error:', err);
-        const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(50,0,0,0.9);color:#fff;padding:20px;z-index:99999;font-family:monospace;overflow:auto;';
-        overlay.innerHTML = `<h1>INIT ERROR</h1><p>${err.message}</p><pre>${err.stack}</pre>`;
-        document.body.appendChild(overlay);
+        showRuntimeErrorOverlay({
+            title: 'INIT ERROR',
+            lines: [String(err?.message || 'Unknown initialization error')],
+            stack: err?.stack || 'No stack trace',
+        });
     }
-});
+}
+
+window.addEventListener('DOMContentLoaded', handleDomContentLoaded);

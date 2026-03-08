@@ -1,21 +1,13 @@
 import * as Mp4MuxerModule from 'mp4-muxer';
 const Mp4Muxer = Mp4MuxerModule;
 
-if (typeof window !== 'undefined' && !window.VideoEncoder) {
-    window.VideoEncoder = class {
-        constructor() { this.state = 'unconfigured'; }
-        configure() { this.state = 'configured'; }
-        encode() { }
-        flush() { return Promise.resolve(); }
-        close() { this.state = 'closed'; }
-    };
-    window.VideoFrame = class {
-        constructor() { }
-        close() { }
-    };
-}
-
 const DEFAULT_CONTRACT_VERSION = 'lifecycle.v1';
+const DEFAULT_MIME_TYPE = 'video/mp4';
+
+const RECORDER_ENGINE = Object.freeze({
+    NATIVE_WEBCODECS: 'webcodecs-native',
+    NONE: 'none',
+});
 
 export const LIFECYCLE_EVENT_TYPES = Object.freeze({
     MATCH_STARTED: 'match_started',
@@ -53,6 +45,34 @@ function defaultDownload({ blob, fileName }) {
     setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
+function resolveGlobalScope(explicitScope = null) {
+    if (explicitScope && typeof explicitScope === 'object') {
+        return explicitScope;
+    }
+    if (typeof window !== 'undefined') {
+        return window;
+    }
+    if (typeof globalThis !== 'undefined') {
+        return globalThis;
+    }
+    return {};
+}
+
+function detectNativeRecorderSupport(globalScope) {
+    const scope = resolveGlobalScope(globalScope);
+    const encoderCtor = scope?.VideoEncoder;
+    const frameCtor = scope?.VideoFrame;
+    const hasEncoderCtor = typeof encoderCtor === 'function';
+    const hasFrameCtor = typeof frameCtor === 'function';
+    const hasNativeProbe = hasEncoderCtor && typeof encoderCtor.isConfigSupported === 'function';
+    const hasRecorder = hasEncoderCtor && hasFrameCtor && hasNativeProbe;
+    return {
+        hasRecorder,
+        recorderEngine: hasRecorder ? RECORDER_ENGINE.NATIVE_WEBCODECS : RECORDER_ENGINE.NONE,
+        supportReason: hasRecorder ? 'native-webcodecs' : 'missing-native-webcodecs',
+    };
+}
+
 export class MediaRecorderSystem {
     constructor({
         canvas = null,
@@ -66,6 +86,8 @@ export class MediaRecorderSystem {
         logger = console,
         now = () => Date.now(),
         downloadHandler = defaultDownload,
+        capabilityProbe = null,
+        globalScope = null,
     } = {}) {
         this.canvas = canvas || null;
         this.autoRecordingEnabled = autoRecordingEnabled !== false;
@@ -78,6 +100,8 @@ export class MediaRecorderSystem {
         this.logger = logger || console;
         this.now = typeof now === 'function' ? now : (() => Date.now());
         this.downloadHandler = typeof downloadHandler === 'function' ? downloadHandler : defaultDownload;
+        this._capabilityProbe = typeof capabilityProbe === 'function' ? capabilityProbe : null;
+        this._globalScope = resolveGlobalScope(globalScope);
 
         this._muxer = null;
         this._videoEncoder = null;
@@ -94,15 +118,48 @@ export class MediaRecorderSystem {
         return this.contractVersion;
     }
 
-    getSupportState() {
-        const hasEncoder = typeof window !== 'undefined' && 'VideoEncoder' in window;
+    _resolveSupportState() {
         const canCapture = !!this.canvas;
+        let customSupport = null;
+        if (typeof this._capabilityProbe === 'function') {
+            try {
+                customSupport = this._capabilityProbe({
+                    canvas: this.canvas,
+                    globalScope: this._globalScope,
+                    mimeType: DEFAULT_MIME_TYPE,
+                });
+            } catch (error) {
+                this.logger?.warn?.('[MediaRecorderSystem] capability probe failed', error);
+            }
+        }
+
+        if (customSupport && typeof customSupport === 'object') {
+            const hasRecorder = !!customSupport.hasRecorder;
+            const canRecord = !!customSupport.canRecord;
+            return {
+                canCapture,
+                hasRecorder,
+                canRecord,
+                selectedMimeType: String(customSupport.selectedMimeType || DEFAULT_MIME_TYPE),
+                recorderEngine: String(customSupport.recorderEngine || (hasRecorder ? RECORDER_ENGINE.NATIVE_WEBCODECS : RECORDER_ENGINE.NONE)),
+                supportReason: String(customSupport.supportReason || (canRecord ? 'capability-probe' : 'probe-disabled')),
+            };
+        }
+
+        const nativeSupport = detectNativeRecorderSupport(this._globalScope);
+        const hasRecorder = nativeSupport.hasRecorder;
         return {
             canCapture,
-            hasRecorder: hasEncoder,
-            canRecord: canCapture && hasEncoder,
-            selectedMimeType: 'video/mp4',
+            hasRecorder,
+            canRecord: canCapture && hasRecorder,
+            selectedMimeType: DEFAULT_MIME_TYPE,
+            recorderEngine: nativeSupport.recorderEngine,
+            supportReason: canCapture ? nativeSupport.supportReason : 'missing-canvas',
         };
+    }
+
+    getSupportState() {
+        return this._resolveSupportState();
     }
 
     setAutoRecordingEnabled(enabled) {
@@ -140,12 +197,18 @@ export class MediaRecorderSystem {
             this._frameIntervalId = null;
         }
 
+        const VideoFrameCtor = this._globalScope?.VideoFrame;
+        if (typeof VideoFrameCtor !== 'function') {
+            this.logger?.warn?.('[MediaRecorderSystem] frame capture unavailable: missing VideoFrame constructor');
+            return;
+        }
+
         const frameIntervalMs = 1000 / this.captureFps;
         this._frameIntervalId = setInterval(async () => {
             if (!this._isRecording || !this._videoEncoder || this._videoEncoder.state !== 'configured') return;
             try {
                 const timestamp = (this._frameCount * 1000000) / this.captureFps;
-                const frame = new VideoFrame(this.canvas, { timestamp });
+                const frame = new VideoFrameCtor(this.canvas, { timestamp });
                 const insertKeyFrame = this._frameCount % (this.captureFps * 2) === 0;
                 this._videoEncoder.encode(frame, { keyFrame: insertKeyFrame });
                 frame.close();
@@ -217,15 +280,50 @@ export class MediaRecorderSystem {
         return event;
     }
 
+    _buildStartResult(started, reason, extra = null) {
+        const result = {
+            action: 'start',
+            ok: !!started,
+            started: !!started,
+            reason: String(reason || (started ? 'started' : 'unknown')),
+        };
+        if (extra && typeof extra === 'object') {
+            Object.assign(result, extra);
+        }
+        return result;
+    }
+
+    _buildStopResult(stopped, reason, extra = null) {
+        const result = {
+            action: 'stop',
+            ok: !!stopped,
+            stopped: !!stopped,
+            reason: String(reason || (stopped ? 'stopped' : 'unknown')),
+        };
+        if (extra && typeof extra === 'object') {
+            Object.assign(result, extra);
+        }
+        return result;
+    }
+
     async startRecording(trigger = null) {
+        if (this._pendingStop) {
+            return this._buildStartResult(false, 'stop_pending');
+        }
+
         if (this.isRecording()) {
-            return { started: false, reason: 'already_recording' };
+            return this._buildStartResult(false, 'already_recording');
         }
 
         const support = this.getSupportState();
         if (!support.canRecord) {
             this.logger?.warn?.('[MediaRecorderSystem] WebCodecs Recording unsupported on this runtime', support);
-            return { started: false, reason: 'unsupported' };
+            return this._buildStartResult(false, 'unsupported', { support });
+        }
+
+        const VideoEncoderCtor = this._globalScope?.VideoEncoder;
+        if (typeof VideoEncoderCtor !== 'function') {
+            return this._buildStartResult(false, 'missing-video-encoder', { support });
         }
 
         this._isRecording = true;
@@ -243,7 +341,7 @@ export class MediaRecorderSystem {
                 firstTimestampBehavior: 'offset'
             });
 
-            this._videoEncoder = new VideoEncoder({
+            this._videoEncoder = new VideoEncoderCtor({
                 output: (chunk, meta) => this._muxer.addVideoChunk(chunk, meta),
                 error: (e) => this.logger?.error?.('[MediaRecorderSystem] VideoEncoder error', e)
             });
@@ -261,7 +359,7 @@ export class MediaRecorderSystem {
         } catch (error) {
             this._cleanupRuntimeRecorder();
             this.logger?.warn?.('[MediaRecorderSystem] WebCodecs setup failed', error);
-            return { started: false, reason: 'encoder_creation_failed' };
+            return this._buildStartResult(false, 'encoder_creation_failed', { error });
         }
 
         this._activeRecording = {
@@ -272,20 +370,19 @@ export class MediaRecorderSystem {
         this._startFrameCaptureLoop();
         this._notifyRecordingStateChange(true);
 
-        return {
-            started: true,
-            mimeType: 'video/mp4',
+        return this._buildStartResult(true, 'started', {
+            mimeType: DEFAULT_MIME_TYPE,
             timestampMs: this._activeRecording.startedAt,
-        };
+        });
     }
 
     async stopRecording(trigger = null) {
-        if (!this._isRecording) {
-            return { stopped: false, reason: 'not_recording' };
-        }
-
         if (this._pendingStop) {
             return this._pendingStop;
+        }
+
+        if (!this._isRecording) {
+            return this._buildStopResult(false, 'not_recording');
         }
 
         this._isRecording = false;
@@ -311,21 +408,24 @@ export class MediaRecorderSystem {
                 this._muxer.finalize();
                 this._handleRecorderStop();
             } else {
+                const result = this._buildStopResult(false, 'muxer_null');
+                const resolve = this._activeRecording?.stopResolve;
                 this._cleanupRuntimeRecorder();
                 this._pendingStop = null;
-                const resolve = this._activeRecording?.stopResolve;
                 if (typeof resolve === 'function') {
-                    resolve({ stopped: false, reason: 'muxer_null' });
+                    resolve(result);
                 }
+                return result;
             }
         } catch (error) {
             const resolve = this._activeRecording?.stopResolve;
+            const result = this._buildStopResult(false, 'stop_failed', { error });
             this._cleanupRuntimeRecorder();
             this._pendingStop = null;
             if (typeof resolve === 'function') {
-                resolve({ stopped: false, reason: 'stop_failed', error });
+                resolve(result);
             }
-            return { stopped: false, reason: 'stop_failed', error };
+            return result;
         }
 
         return this._pendingStop;
@@ -346,10 +446,57 @@ export class MediaRecorderSystem {
         return `${this.downloadDirectoryName}/${baseName}`;
     }
 
+    _attemptAutoDownload(blob, fileName, mimeType) {
+        if (!this.autoDownload || !blob || blob.size <= 0) {
+            return { requested: false, transport: 'disabled' };
+        }
+
+        const safeFileName = String(fileName || '').trim();
+        const downloadViaBrowser = (reason, error = null) => {
+            if (error) {
+                this.logger?.warn?.(`[MediaRecorderSystem] recording export fallback (${reason})`, error);
+            }
+            try {
+                this.downloadHandler({
+                    blob,
+                    fileName: safeFileName,
+                    mimeType,
+                });
+                return true;
+            } catch (downloadError) {
+                this.logger?.warn?.('[MediaRecorderSystem] recording export browser download failed', downloadError);
+                return false;
+            }
+        };
+
+        if (typeof fetch !== 'function') {
+            downloadViaBrowser('fetch-unavailable');
+            return { requested: true, transport: 'download' };
+        }
+
+        try {
+            fetch('/api/editor/save-video-disk', {
+                method: 'POST',
+                headers: { 'x-file-name': safeFileName },
+                body: blob
+            }).then((response) => {
+                if (!response.ok) throw new Error(`http_${response.status}`);
+                this.logger?.info?.('[MediaRecorderSystem] recording export saved via api', safeFileName);
+            }).catch((error) => {
+                this.logger?.warn?.('[MediaRecorderSystem] recording export api failed, using browser download', error);
+                downloadViaBrowser('api-failed', error);
+            });
+            return { requested: true, transport: 'api-with-download-fallback' };
+        } catch (error) {
+            downloadViaBrowser('api-throw', error);
+            return { requested: true, transport: 'download' };
+        }
+    }
+
     _handleRecorderStop() {
         const activeRecording = this._activeRecording || null;
         const endedAt = this.now();
-        const mimeType = 'video/mp4';
+        const mimeType = DEFAULT_MIME_TYPE;
 
         const { buffer } = this._muxer.target;
         const blob = new Blob([buffer], { type: mimeType });
@@ -373,45 +520,17 @@ export class MediaRecorderSystem {
             trigger: activeRecording?.stopTrigger || activeRecording?.trigger || null,
         };
 
-        if (this.autoDownload && blob.size > 0) {
-            const doFallback = () => {
-                try {
-                    this.downloadHandler({
-                        blob,
-                        fileName: downloadFileName || fileName,
-                        mimeType,
-                    });
-                } catch (error) {
-                    this.logger?.warn?.('[MediaRecorderSystem] auto download fallback failed', error);
-                }
-            };
-
-            try {
-                fetch('/api/editor/save-video-disk', {
-                    method: 'POST',
-                    headers: { 'x-file-name': downloadFileName || fileName },
-                    body: blob
-                }).then(res => {
-                    if (!res.ok) throw new Error('Network response was not ok');
-                    this.logger?.info?.('[MediaRecorderSystem] Video saved to disk successfully via API.', downloadFileName || fileName);
-                }).catch(error => {
-                    this.logger?.warn?.('[MediaRecorderSystem] API save failed, falling back to browser download', error);
-                    doFallback();
-                });
-            } catch (error) {
-                doFallback();
-            }
-        }
+        const exportTransport = this._attemptAutoDownload(blob, downloadFileName || fileName, mimeType);
 
         const resolve = activeRecording?.stopResolve;
         this._cleanupRuntimeRecorder();
-        const result = {
-            stopped: true,
+        const result = this._buildStopResult(true, 'stopped', {
             fileName,
             downloadFileName,
             mimeType,
             sizeBytes: blob.size,
-        };
+            exportTransport: exportTransport.transport,
+        });
         if (typeof resolve === 'function') {
             resolve(result);
         }

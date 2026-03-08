@@ -207,10 +207,6 @@ export class PlayerView {
     update(dt) {
         if (!this.group) return;
 
-        if (this.player.trail) {
-            this.player.trail.update(dt, this.player.position, this.player._tmpVec);
-        }
-
         if (this.vehicleMesh && typeof this.vehicleMesh.tick === 'function') {
             this.vehicleMesh.tick(dt);
         }

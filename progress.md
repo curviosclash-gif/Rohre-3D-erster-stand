@@ -321,3 +321,146 @@
   - `npm run build` PASS
   - `npm run docs:sync` PASS
   - `npm run docs:check` PASS
+
+2026-03-08 (Runtime-Stabilisierung V30 gestartet)
+- Skills `develop-web-game` und `playwright` aktiv fuer den Runtime-/Browser-Diagnoseloop.
+- V30-Baseline revalidiert:
+  - `GameLoop` doppelt Simulationszeit ueber Fixed-Step plus Fallback-Update.
+  - `UIManager._startSetupDisposers` ist vorhanden, aber nicht als echter Teardown-Pfad verdrahtet.
+  - `PlayerView.update()` triggert weiterhin `player.trail.update(...)`.
+  - Bot-Observation pfad erzeugt ohne Reuse-Target weiter Arrays.
+  - `MediaRecorderSystem.getSupportState()` bleibt wegen globalem `VideoEncoder`-Shim zu optimistisch.
+- Teststatus:
+  - `npm run test:core` hing im ersten Tool-Timeout; reproduziert danach erfolgreich mit `npx playwright test tests/core.spec.js --reporter=line --workers=1` PASS (`53 passed`, `1 skipped`).
+- Naechster Schritt:
+  - Phase `30.1` GameLoop korrigieren und Regressionstests fuer Sub-Step-/Clamp-/timeScale-Faelle ergaenzen.
+
+2026-03-08 (V30 Phase 30.1 abgeschlossen)
+- `src/core/GameLoop.js` auf reinen Fixed-Step-Pfad umgestellt:
+  - kein Direkt-`update(dt)`-Fallback mehr bei Sub-Step-Frames
+  - `timeScale` wird genau einmal auf akkumulierte Simulationszeit angewandt
+  - `start()` setzt den Accumulator zurueck
+- Neue Core-Regressionen:
+  - `T20ab` Sub-Step-Frames ohne Doppel-Simulation
+  - `T20ac` Delta-Clamp auf max. drei Fixed-Steps
+  - `T20ad` Slow-Time / `timeScale` ohne doppelte Wirkung
+- Verifikation:
+  - `npx playwright test tests/core.spec.js -g "T20ab|T20ac|T20ad" --reporter=line --workers=1` PASS
+  - `npm run test:core` PASS (`56 passed`, `1 skipped`)
+  - `npx playwright test tests/physics-core.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js --reporter=line --workers=1` PASS (`47 passed`)
+- Naechster Schritt:
+  - Phase `30.2` Runtime-Dispose-/Cleanup-Vertrag ueber Core/UI-Systeme ziehen.
+
+2026-03-08 (V30 Phase 30.2 abgeschlossen)
+- Runtime-Dispose-Vertrag eingefuehrt:
+  - `Game.dispose()` faehrt Match-/UI-/Core-Systeme kontrolliert herunter.
+  - `Renderer`, `InputManager`, `AudioManager`, `GameRuntimeFacade`, `UIManager` und `MenuController` haben jetzt echte Listener-/Timer-Teardown-Pfade.
+  - Menu-Binding-Module verwenden registrierte Disposer statt nicht entfernbarer Direkt-Bindings.
+  - `_startSetupDisposers` in `UIManager` wird nun tatsaechlich befuellt und beim Dispose abgearbeitet.
+- Neue Regression:
+  - `tests/core.spec.js` -> `T20ae`: Dispose + Reinit duplizieren weder KeyCapture-, Resize-, Input- noch Start-Button-Listener.
+- Verifikation:
+  - `npx playwright test tests/core.spec.js -g "T20ae" --reporter=line --workers=1` PASS
+  - `npm run test:core` PASS (`57 passed`, `1 skipped`)
+  - `npm run test:stress` PASS (`19 passed`)
+- Naechster Schritt:
+  - Phase `30.3` Trail-Simulation aus `PlayerView` entfernen und in den Simulationspfad legen.
+
+2026-03-08 (Code-Review + V30 Phase 30.3 abgeschlossen)
+- Geaenderten Code durchgesehen und gegen Tests verifiziert.
+- Gefundener Punkt:
+  - Stress-Flake in `T71` (`Escape` -> Menu) bei Sammellauf; solo nicht reproduzierbar stabil.
+  - Verbesserung umgesetzt in `tests/helpers.js`:
+    - `returnToMenu()` nutzt nun mehrere Escape-Versuche plus Runtime-Fallback (`_returnToMenu`) bevor der Selektor-Timeout greift.
+- Phase `30.3` umgesetzt:
+  - Trail-Update aus `PlayerView.update()` entfernt.
+  - Trail-Update in `PlayerLifecycleSystem.updatePlayer()` direkt nach Bewegungsupdate verlagert.
+  - Neue Regression `T45b` in `tests/physics-core.spec.js` prueft, dass der Trail aus dem Lifecycle-System kommt und nicht aus der View.
+- Verifikation:
+  - `npm run test:core` PASS (`57 passed`, `1 skipped`)
+  - `npm run test:physics` PASS (`48 passed`)
+  - `npm run test:stress` PASS (`19 passed`)
+- Naechster Schritt:
+  - Phase `30.4` Observation-Reuse pro Bot und Bot-Tuning-Auslagerung aus `Bot.js`.
+
+2026-03-08 (V30 Phase 30.4 abgeschlossen)
+- Bot-/Observation-Hotpath auf Reuse umgestellt:
+  - `src/entities/ai/BotRuntimeContextFactory.js`: persistenter Observation-Buffer pro Bot-Runtime-Context.
+  - `src/entities/systems/PlayerInputSystem.js`: Observation-Build nutzt konsequent Reuse-Target (`buildObservation(..., target)`).
+- Bot-Tuning zentralisiert:
+  - neues Modul `src/entities/ai/BotTuningConfig.js` mit `BOT_ITEM_RULES` und `BOT_FALLBACK_DIFFICULTY_PROFILE`.
+  - `src/entities/Bot.js` importiert Tuningwerte statt lokaler Hardcodes.
+- Regression:
+  - `tests/physics-policy.spec.js` -> `T71b`: Observation-Referenz bleibt ueber mehrere Bot-Ticks gleich.
+- Verifikation:
+  - `npm run test:physics` PASS (`49 passed`)
+  - `npm run test:stress` PASS (`19 passed`)
+- Naechster Schritt:
+  - Phase `30.5` Recorder-Support/Fallbacks und sichere Fehlerausgabe.
+
+2026-03-08 (V30 Phase 30.5 abgeschlossen)
+- Recorder-Capability gehaertet:
+  - `src/core/MediaRecorderSystem.js`: globale WebCodecs-Noop-Shims entfernt; native Support-Erkennung und Recorder-Status konservativ.
+  - `getSupportState()` liefert weiterhin stabile Booleans, trennt aber unsupported/shimmed Faelle sauber.
+- Recorder-Resultate/Fallbacks vereinheitlicht:
+  - konsistentes Start/Stop-Result-Format (`action`, `ok`, `reason` plus Statusfelder).
+  - zentralisierter API-zu-Download-Fallback inklusive konsistenter Log-Meldungen.
+- Fehlerausgabe abgesichert:
+  - `src/core/main.js`: Error-Overlays auf `textContent` umgestellt (kein `innerHTML` bei Runtime-/Init-Fehlern).
+- Regression:
+  - `tests/core.spec.js` -> `T20af`: Shim-getrennter Recorder-Support + konsistente Start/Stop-Resultate.
+- Verifikation:
+  - `npm run test:core` PASS (`58 passed`, `1 skipped`)
+  - `npm run test:gpu` PASS (`16 passed`)
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+- Naechster Schritt:
+  - Phase `30.6` (`UIManager` modularisieren).
+
+2026-03-08 (V30 Phase 30.6 abgeschlossen)
+- `UIManager` modularisiert und auf klarere Delegation gezogen:
+  - neues Start-Setup-Modul `src/ui/start-setup/StartSetupUiOps.js` fuer lokale Start-Setup-Statepflege sowie Favoriten-/Recent-/Preview-Rendering.
+  - neues Preset-Sync-Modul `src/ui/menu/MenuPresetStateSync.js`.
+  - neues Developer-Sync-Modul `src/ui/menu/MenuDeveloperStateSync.js`.
+- `src/ui/UIManager.js` wurde als Compose-Fassade verschlankt (ca. 1280 -> 1080 Zeilen) und delegiert die extrahierten Bereiche.
+- Verifikation:
+  - `npm run test:core` PASS (`58 passed`, `1 skipped`)
+  - `npm run test:stress` PASS (`19 passed`)
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+- Naechster Schritt:
+  - Phase `30.7` (`GameRuntimeFacade` und State-Kontrakte konsolidieren).
+
+2026-03-08 (V30 Phase 30.7 abgeschlossen)
+- `GameRuntimeFacade` in Runtime-Services aufgeteilt:
+  - `src/core/runtime/MatchStartValidationService.js` (Start-Validierung)
+  - `src/core/runtime/MenuRuntimePresetConfigService.js` (Preset-/Config-Aktionen)
+  - `src/core/runtime/MenuRuntimeMultiplayerService.js` (Multiplayer-Stub inkl. Ready-Invalidation)
+  - `src/core/runtime/RuntimeSettingsChangeOrchestrator.js` (Settings-Change-Orchestrierung)
+- State-Kontrakte zentralisiert:
+  - `src/core/runtime/GameStateIds.js` eingefuehrt und in `src/core/main.js` sowie `src/core/GameRuntimeFacade.js` verwendet.
+- Verifikation:
+  - `npm run test:core` PASS (`58 passed`, `1 skipped`)
+  - `npm run test:stress` PASS (`19 passed`)
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+- Naechster Schritt:
+  - Phase `30.8` Abschluss-Gate und Doku-Freeze.
+
+2026-03-08 (V30 Phase 30.8 abgeschlossen / V30 geschlossen)
+- Abschlusspruefung gegen alle Ausgangsbefunde durchgefuehrt; V30 ist damit inhaltlich geschlossen.
+- Finales Verifikationspaket:
+  - `npm run test:core` PASS (`58 passed`, `1 skipped`)
+  - `npm run test:physics` PASS (`49 passed`)
+  - `npm run test:gpu` PASS (`16 passed`)
+  - `npm run test:stress` PASS (`19 passed`)
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+- Optionaler Benchmark-Lauf:
+  - `npm run benchmark:baseline` in der Abschlussphase bewusst nicht erneut ausgefuehrt, da die letzten Schritte strukturelle Runtime-/UI-Refactors ohne erwartetes GPU-/Drawcall-Delta waren.
+- Gesamtstatus:
+  - V30 abgeschlossen (GameLoop-Korrektheit, Lifecycle-Cleanup, Trail-Sim-Ownership, Bot-/Observation-Hotpath, Recorder-Haertung, UIManager-/GameRuntimeFacade-Entkopplung).

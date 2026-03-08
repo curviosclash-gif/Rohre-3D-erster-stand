@@ -50,23 +50,28 @@ export class InputManager {
         };
 
         this._rebuildPreventDefaultCodes();
+        this._onKeyDown = (e) => this._handleKeyDown(e);
+        this._onKeyUp = (e) => this._handleKeyUp(e);
 
-        window.addEventListener('keydown', (e) => {
-            if (!this.keys[e.code]) {
-                this.justPressed[e.code] = true;
-            }
-            this.keys[e.code] = true;
-            if (this._shouldPreventDefault(e.code)) {
-                e.preventDefault();
-            }
-        });
+        window.addEventListener('keydown', this._onKeyDown);
+        window.addEventListener('keyup', this._onKeyUp);
+    }
 
-        window.addEventListener('keyup', (e) => {
-            this.keys[e.code] = false;
-            if (this._shouldPreventDefault(e.code)) {
-                e.preventDefault();
-            }
-        });
+    _handleKeyDown(e) {
+        if (!this.keys[e.code]) {
+            this.justPressed[e.code] = true;
+        }
+        this.keys[e.code] = true;
+        if (this._shouldPreventDefault(e.code)) {
+            e.preventDefault();
+        }
+    }
+
+    _handleKeyUp(e) {
+        this.keys[e.code] = false;
+        if (this._shouldPreventDefault(e.code)) {
+            e.preventDefault();
+        }
     }
 
     setBindings(bindingsByPlayer) {
@@ -204,5 +209,18 @@ export class InputManager {
         this._reuseInput.nextItem = this._wasActionPressed(keyMap.NEXT_ITEM, altKeyMap?.NEXT_ITEM || '');
 
         return this._reuseInput;
+    }
+
+    dispose() {
+        if (this._onKeyDown) {
+            window.removeEventListener('keydown', this._onKeyDown);
+            this._onKeyDown = null;
+        }
+        if (this._onKeyUp) {
+            window.removeEventListener('keyup', this._onKeyUp);
+            this._onKeyUp = null;
+        }
+        this.keys = {};
+        this.justPressed = {};
     }
 }

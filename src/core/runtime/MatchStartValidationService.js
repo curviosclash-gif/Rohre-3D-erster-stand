@@ -1,0 +1,74 @@
+// ============================================
+// MatchStartValidationService.js - validates menu state before match start
+// ============================================
+
+export function resolveMatchStartValidationIssue({
+    settings = {},
+    ui = null,
+    maps = {},
+    huntModeType = 'HUNT',
+} = {}) {
+    const sessionType = String(settings?.localSettings?.sessionType || 'single').toLowerCase();
+    const mapKey = String(settings?.mapKey || '').trim();
+    const mapExists = mapKey === 'custom' || !!maps?.[mapKey];
+    if (!mapExists) {
+        return {
+            message: 'Start nicht moeglich: Bitte eine gueltige Map waehlen.',
+            fieldKey: 'map',
+            fieldMessage: 'Map-Auswahl fehlt oder ist ungueltig.',
+        };
+    }
+
+    const vehicleP1 = String(settings?.vehicles?.PLAYER_1 || '').trim();
+    if (!vehicleP1) {
+        return {
+            message: 'Start nicht moeglich: Flugzeug P1 fehlt.',
+            fieldKey: 'vehicleP1',
+            fieldMessage: 'Flugzeug P1 auswaehlen.',
+        };
+    }
+
+    if (sessionType === 'splitscreen') {
+        const vehicleP2 = String(settings?.vehicles?.PLAYER_2 || '').trim();
+        if (!vehicleP2) {
+            return {
+                message: 'Start nicht moeglich: Splitscreen benoetigt Flugzeug P2.',
+                fieldKey: 'vehicleP2',
+                fieldMessage: 'Flugzeug P2 auswaehlen.',
+            };
+        }
+    }
+
+    if (sessionType === 'multiplayer') {
+        const lobbyCode = String(ui?.multiplayerLobbyCodeInput?.value || '').trim();
+        const ready = !!ui?.multiplayerReadyToggle?.checked;
+        if (!lobbyCode && !ready) {
+            return {
+                message: 'Start nicht moeglich: Multiplayer-Stub erfordert Lobby-Code oder Ready.',
+                fieldKey: 'multiplayer',
+                fieldMessage: 'Lobby-Code eintragen oder Ready aktivieren.',
+            };
+        }
+    }
+
+    const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
+    const gameMode = String(settings?.gameMode || 'CLASSIC').toUpperCase();
+    if (modePath === 'fight' && gameMode !== huntModeType) {
+        return {
+            message: 'Start nicht moeglich: Fight muss intern auf HUNT laufen.',
+            fieldKey: 'match',
+            fieldMessage: 'Fight-Konflikt: Modus auf HUNT synchronisieren.',
+        };
+    }
+
+    const themeMode = String(settings?.localSettings?.themeMode || 'dunkel').toLowerCase();
+    if (themeMode !== 'hell' && themeMode !== 'dunkel') {
+        return {
+            message: 'Start nicht moeglich: Theme-Modus ungueltig.',
+            fieldKey: 'theme',
+            fieldMessage: 'Theme auf Hell oder Dunkel setzen.',
+        };
+    }
+
+    return null;
+}

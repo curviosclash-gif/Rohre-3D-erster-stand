@@ -294,6 +294,71 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(probe.canRecordType).toBe('boolean');
     });
 
+    test('T20af: Recorder-Support trennt Shim-Faelle und liefert konsistente Start/Stop-Resultate', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const logger = { warn() { }, info() { }, error() { } };
+
+            const shimRecorder = new MediaRecorderSystem({
+                canvas: { width: 320, height: 180 },
+                logger,
+                capabilityProbe: () => ({
+                    canCapture: true,
+                    hasRecorder: false,
+                    canRecord: false,
+                    selectedMimeType: 'video/mp4',
+                    recorderEngine: 'none',
+                    supportReason: 'shim-or-unsupported',
+                }),
+            });
+            const nativeRecorder = new MediaRecorderSystem({
+                canvas: { width: 320, height: 180 },
+                logger,
+                capabilityProbe: () => ({
+                    canCapture: true,
+                    hasRecorder: true,
+                    canRecord: true,
+                    selectedMimeType: 'video/mp4',
+                    recorderEngine: 'webcodecs-native',
+                    supportReason: 'native-webcodecs',
+                }),
+            });
+
+            const shimSupport = shimRecorder.getSupportState();
+            const nativeSupport = nativeRecorder.getSupportState();
+            const unsupportedStart = await shimRecorder.startRecording({ type: 'manual-test' });
+            const idleStop = await shimRecorder.stopRecording({ type: 'manual-test' });
+
+            shimRecorder.dispose();
+            nativeRecorder.dispose();
+
+            return {
+                shimHasRecorder: !!shimSupport.hasRecorder,
+                shimCanRecord: !!shimSupport.canRecord,
+                nativeHasRecorder: !!nativeSupport.hasRecorder,
+                nativeCanRecord: !!nativeSupport.canRecord,
+                startAction: unsupportedStart?.action || '',
+                startReason: unsupportedStart?.reason || '',
+                startStarted: !!unsupportedStart?.started,
+                stopAction: idleStop?.action || '',
+                stopReason: idleStop?.reason || '',
+                stopStopped: !!idleStop?.stopped,
+            };
+        });
+
+        expect(result.shimHasRecorder).toBeFalsy();
+        expect(result.shimCanRecord).toBeFalsy();
+        expect(result.nativeHasRecorder).toBeTruthy();
+        expect(result.nativeCanRecord).toBeTruthy();
+        expect(result.startAction).toBe('start');
+        expect(result.startReason).toBe('unsupported');
+        expect(result.startStarted).toBeFalsy();
+        expect(result.stopAction).toBe('stop');
+        expect(result.stopReason).toBe('not_recording');
+        expect(result.stopStopped).toBeFalsy();
+    });
+
     test('T20b: Lifecycle-Events markieren Match Start/Ende und Menue-Oeffnung', async ({ page }) => {
         await startGame(page);
         await page.waitForTimeout(300);
@@ -933,6 +998,196 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(level4State.activeSection).toBe('tools');
         expect(level4State.drawerOverflow).toBeLessThanOrEqual(4);
         expect(level4State.stackOverflow).toBeLessThanOrEqual(4);
+    });
+
+    test('T20ab: GameLoop akkumuliert Sub-Step-Frames ohne Doppel-Simulation', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameLoop } = await import('/src/core/GameLoop.js');
+            const originalRaf = window.requestAnimationFrame;
+            const originalCancel = window.cancelAnimationFrame;
+            const updates = [];
+            try {
+                window.requestAnimationFrame = () => 1;
+                window.cancelAnimationFrame = () => {};
+                const loop = new GameLoop((dt) => updates.push(dt), () => {});
+                loop.running = true;
+                loop.lastTime = 0;
+                loop._loop(10);
+                loop._loop(20);
+                loop._loop(30);
+                return {
+                    updateCount: updates.length,
+                    totalDt: updates.reduce((sum, dt) => sum + dt, 0),
+                    accumulator: loop.accumulator,
+                    fixedStep: loop.fixedStep,
+                };
+            } finally {
+                window.requestAnimationFrame = originalRaf;
+                window.cancelAnimationFrame = originalCancel;
+            }
+        });
+
+        expect(result.updateCount).toBe(1);
+        expect(result.totalDt).toBeGreaterThanOrEqual(result.fixedStep - 0.000001);
+        expect(result.totalDt).toBeLessThanOrEqual(result.fixedStep + 0.000001);
+        expect(result.accumulator).toBeLessThan(result.fixedStep);
+    });
+
+    test('T20ac: GameLoop klemmt grosse Delta-Spruenge auf maximal drei Fixed-Steps', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameLoop } = await import('/src/core/GameLoop.js');
+            const originalRaf = window.requestAnimationFrame;
+            const originalCancel = window.cancelAnimationFrame;
+            const updates = [];
+            try {
+                window.requestAnimationFrame = () => 1;
+                window.cancelAnimationFrame = () => {};
+                const loop = new GameLoop((dt) => updates.push(dt), () => {});
+                loop.running = true;
+                loop.lastTime = 0;
+                loop._loop(200);
+                return {
+                    updateCount: updates.length,
+                    totalDt: updates.reduce((sum, dt) => sum + dt, 0),
+                    accumulator: loop.accumulator,
+                    fixedStep: loop.fixedStep,
+                };
+            } finally {
+                window.requestAnimationFrame = originalRaf;
+                window.cancelAnimationFrame = originalCancel;
+            }
+        });
+
+        expect(result.updateCount).toBe(3);
+        expect(result.totalDt).toBeGreaterThanOrEqual(result.fixedStep * 3 - 0.000001);
+        expect(result.totalDt).toBeLessThanOrEqual(result.fixedStep * 3 + 0.000001);
+        expect(result.accumulator).toBeLessThan(0.000001);
+    });
+
+    test('T20ad: GameLoop wendet timeScale nur einmal auf akkumulierte Simulationszeit an', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameLoop } = await import('/src/core/GameLoop.js');
+            const originalRaf = window.requestAnimationFrame;
+            const originalCancel = window.cancelAnimationFrame;
+            const updates = [];
+            try {
+                window.requestAnimationFrame = () => 1;
+                window.cancelAnimationFrame = () => {};
+                const loop = new GameLoop((dt) => updates.push(dt), () => {});
+                loop.running = true;
+                loop.lastTime = 0;
+                loop.setTimeScale(0.5);
+                loop._loop(10);
+                loop._loop(20);
+                loop._loop(30);
+                loop._loop(40);
+                return {
+                    updateCount: updates.length,
+                    totalDt: updates.reduce((sum, dt) => sum + dt, 0),
+                    accumulator: loop.accumulator,
+                    fixedStep: loop.fixedStep,
+                };
+            } finally {
+                window.requestAnimationFrame = originalRaf;
+                window.cancelAnimationFrame = originalCancel;
+            }
+        });
+
+        expect(result.updateCount).toBe(1);
+        expect(result.totalDt).toBeGreaterThanOrEqual(result.fixedStep - 0.000001);
+        expect(result.totalDt).toBeLessThanOrEqual(result.fixedStep + 0.000001);
+        expect(result.totalDt).toBeLessThan(0.02);
+        expect(result.accumulator).toBeLessThan(result.fixedStep);
+    });
+
+    test('T20ae: Runtime-Dispose entfernt globale und Menue-Listener vor Reinit', async ({ page }) => {
+        const errors = collectErrors(page);
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const first = window.GAME_INSTANCE;
+            if (!first?.dispose || typeof first.constructor !== 'function') {
+                return { error: 'missing-game-runtime' };
+            }
+
+            let firstStartCalls = 0;
+            let secondStartCalls = 0;
+            let secondKeyCaptureCalls = 0;
+            let firstResizeCalls = 0;
+            let secondResizeCalls = 0;
+
+            first.runtimeFacade.startMatch = () => {
+                firstStartCalls += 1;
+                return false;
+            };
+            first.dispose();
+
+            const second = new first.constructor();
+            window.GAME_INSTANCE = second;
+            window.GAME_RUNTIME = second.runtimeFacade;
+            window.GAME_DEBUG = second.debugApi;
+            second.runtimeFacade.startMatch = () => {
+                secondStartCalls += 1;
+                return false;
+            };
+
+            second.keyCapture = { playerKey: 'PLAYER_1', actionKey: 'UP' };
+            second.keybindEditorController.handleKeyCapture = () => {
+                if (!second.keyCapture) {
+                    return false;
+                }
+                secondKeyCaptureCalls += 1;
+                return true;
+            };
+            window.dispatchEvent(new KeyboardEvent('keydown', {
+                code: 'KeyZ',
+                bubbles: true,
+                cancelable: true,
+            }));
+
+            second.keyCapture = null;
+            first.renderer._onResize = () => {
+                firstResizeCalls += 1;
+            };
+            second.renderer._onResize = () => {
+                secondResizeCalls += 1;
+            };
+            window.dispatchEvent(new Event('resize'));
+
+            window.dispatchEvent(new KeyboardEvent('keydown', {
+                code: 'KeyQ',
+                bubbles: true,
+                cancelable: true,
+            }));
+            const firstInputUpdated = !!first.input?.keys?.KeyQ;
+            const secondInputUpdated = !!second.input?.keys?.KeyQ;
+
+            document.getElementById('btn-start')?.click();
+            second.dispose();
+
+            return {
+                error: null,
+                firstStartCalls,
+                secondStartCalls,
+                secondKeyCaptureCalls,
+                firstResizeCalls,
+                secondResizeCalls,
+                firstInputUpdated,
+                secondInputUpdated,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.firstStartCalls).toBe(0);
+        expect(result.secondStartCalls).toBe(1);
+        expect(result.secondKeyCaptureCalls).toBe(1);
+        expect(result.firstResizeCalls).toBe(0);
+        expect(result.secondResizeCalls).toBe(1);
+        expect(result.firstInputUpdated).toBeFalsy();
+        expect(result.secondInputUpdated).toBeTruthy();
+        expect(errors).toHaveLength(0);
     });
 
     test('T10b: Portal-Runtime bleibt im Validierungsszenario funktionsfaehig', async ({ page }) => {

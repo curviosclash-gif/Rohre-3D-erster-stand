@@ -2,6 +2,7 @@ export function setupMenuDevPanelBindings(ctx) {
     const ui = ctx.ui;
     const emit = ctx.emit;
     const eventTypes = ctx.eventTypes;
+    const bind = ctx.bind;
 
     const emitPresetAction = (type, extraPayload = null) => {
         const payload = extraPayload && typeof extraPayload === 'object' ? extraPayload : {};
@@ -10,7 +11,7 @@ export function setupMenuDevPanelBindings(ctx) {
 
     if (Array.isArray(ui.quickstartPresetButtons)) {
         ui.quickstartPresetButtons.forEach((button) => {
-            button.addEventListener('click', () => {
+            bind(button, 'click', () => {
                 const presetId = String(button?.dataset?.presetId || '').trim();
                 if (!presetId) return;
                 emitPresetAction(eventTypes.PRESET_APPLY, {
@@ -22,7 +23,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.presetApplyButton) {
-        ui.presetApplyButton.addEventListener('click', () => {
+        bind(ui.presetApplyButton, 'click', () => {
             const presetId = String(ui.presetSelect?.value || '').trim();
             if (!presetId) {
                 emit(eventTypes.SHOW_STATUS_TOAST, {
@@ -37,7 +38,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.presetSaveOpenButton) {
-        ui.presetSaveOpenButton.addEventListener('click', () => {
+        bind(ui.presetSaveOpenButton, 'click', () => {
             const presetName = String(ui.presetNameInput?.value || '').trim();
             emitPresetAction(eventTypes.PRESET_SAVE_OPEN, {
                 name: presetName,
@@ -47,7 +48,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.presetSaveFixedButton) {
-        ui.presetSaveFixedButton.addEventListener('click', () => {
+        bind(ui.presetSaveFixedButton, 'click', () => {
             const presetName = String(ui.presetNameInput?.value || '').trim();
             emitPresetAction(eventTypes.PRESET_SAVE_FIXED, {
                 name: presetName,
@@ -57,7 +58,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.presetDeleteButton) {
-        ui.presetDeleteButton.addEventListener('click', () => {
+        bind(ui.presetDeleteButton, 'click', () => {
             const presetId = String(ui.presetSelect?.value || '').trim();
             if (!presetId) {
                 emit(eventTypes.SHOW_STATUS_TOAST, {
@@ -72,7 +73,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.multiplayerHostButton) {
-        ui.multiplayerHostButton.addEventListener('click', () => {
+        bind(ui.multiplayerHostButton, 'click', () => {
             emit(eventTypes.MULTIPLAYER_HOST, {
                 lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
             });
@@ -80,7 +81,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.multiplayerJoinButton) {
-        ui.multiplayerJoinButton.addEventListener('click', () => {
+        bind(ui.multiplayerJoinButton, 'click', () => {
             emit(eventTypes.MULTIPLAYER_JOIN, {
                 lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
             });
@@ -88,7 +89,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.multiplayerReadyToggle) {
-        ui.multiplayerReadyToggle.addEventListener('change', () => {
+        bind(ui.multiplayerReadyToggle, 'change', () => {
             emit(eventTypes.MULTIPLAYER_READY_TOGGLE, {
                 ready: !!ui.multiplayerReadyToggle.checked,
             });
@@ -96,7 +97,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerModeToggle) {
-        ui.developerModeToggle.addEventListener('change', () => {
+        bind(ui.developerModeToggle, 'change', () => {
             emit(eventTypes.DEVELOPER_MODE_TOGGLE, {
                 enabled: !!ui.developerModeToggle.checked,
             });
@@ -104,7 +105,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerThemeSelect) {
-        ui.developerThemeSelect.addEventListener('change', () => {
+        bind(ui.developerThemeSelect, 'change', () => {
             emit(eventTypes.DEVELOPER_THEME_CHANGE, {
                 themeId: String(ui.developerThemeSelect.value || '').trim(),
             });
@@ -112,7 +113,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerVisibilitySelect) {
-        ui.developerVisibilitySelect.addEventListener('change', () => {
+        bind(ui.developerVisibilitySelect, 'change', () => {
             emit(eventTypes.DEVELOPER_VISIBILITY_CHANGE, {
                 mode: String(ui.developerVisibilitySelect.value || '').trim(),
             });
@@ -120,7 +121,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerFixedPresetLockToggle) {
-        ui.developerFixedPresetLockToggle.addEventListener('change', () => {
+        bind(ui.developerFixedPresetLockToggle, 'change', () => {
             emit(eventTypes.DEVELOPER_FIXED_PRESET_LOCK_TOGGLE, {
                 enabled: !!ui.developerFixedPresetLockToggle.checked,
             });
@@ -128,7 +129,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerActorSelect) {
-        ui.developerActorSelect.addEventListener('change', () => {
+        bind(ui.developerActorSelect, 'change', () => {
             emit(eventTypes.DEVELOPER_ACTOR_CHANGE, {
                 actorId: String(ui.developerActorSelect.value || '').trim(),
             });
@@ -136,7 +137,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerReleasePreviewToggle) {
-        ui.developerReleasePreviewToggle.addEventListener('change', () => {
+        bind(ui.developerReleasePreviewToggle, 'change', () => {
             emit(eventTypes.DEVELOPER_RELEASE_PREVIEW_TOGGLE, {
                 enabled: !!ui.developerReleasePreviewToggle.checked,
             });
@@ -144,7 +145,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerTextApplyButton) {
-        ui.developerTextApplyButton.addEventListener('click', () => {
+        bind(ui.developerTextApplyButton, 'click', () => {
             emit(eventTypes.DEVELOPER_TEXT_OVERRIDE_SET, {
                 textId: String(ui.developerTextIdSelect?.value || '').trim(),
                 textValue: String(ui.developerTextOverrideInput?.value || ''),
@@ -153,7 +154,7 @@ export function setupMenuDevPanelBindings(ctx) {
     }
 
     if (ui.developerTextClearButton) {
-        ui.developerTextClearButton.addEventListener('click', () => {
+        bind(ui.developerTextClearButton, 'click', () => {
             emit(eventTypes.DEVELOPER_TEXT_OVERRIDE_CLEAR, {
                 textId: String(ui.developerTextIdSelect?.value || '').trim(),
             });
