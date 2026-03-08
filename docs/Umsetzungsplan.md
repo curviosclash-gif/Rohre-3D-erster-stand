@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-07
+Stand: 2026-03-08
 
 Dieser Masterplan ist die einzige aktive Planquelle fuer offene Arbeit.
 Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
@@ -61,7 +61,8 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 - Hauptpfade: `src/hunt/**`, `src/entities/**`, `src/core/**`, `src/ui/**`
 - Konfliktregel: keine neuen fremden Plaene mitten in diesen Block einfuegen; neue Arbeit nur im `Plan-Eingang` ankuendigen
 
-- [ ] 26.0 Baseline-Freeze und Gameplay-Metriken erfassen
+- [x] 26.0 Baseline-Freeze und Gameplay-Metriken erfassen
+  - Status 2026-03-08: Baseline ueber `npm run benchmark:baseline` neu eingefroren (`overall fpsAverage=60.00`, `overall drawCallsAverage=25.49`, `botWinRate=82.4%`, `stuckEvents=0`; Artefakte: `data/performance_ki_baseline_report.json`, `docs/Testergebnisse_2026-03-08.md`).
 - [ ] 26.1 V4 Treffer-/Schadensfeedback (Audio & VFX)
   - [ ] 26.1.1 Audio-Signale fuer MG, Raketen und Schild implementieren
   - [ ] 26.1.2 VFX-Signale (Partikel/Flashes) bei Treffern ausbauen
