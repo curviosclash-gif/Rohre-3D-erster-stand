@@ -48,6 +48,36 @@ V27 erweitert drei Bereiche ohne Contract-Bruch:
 - 27.2: Stats-Daten sind vorhanden, aber nicht als UI-Overlay am Round-End aufbereitet.
 - 27.3: Telemetrie-Store ist vorhanden, aber ohne Dashboard-UI und ohne erweiterten Balancing-Fokus.
 
+## Phase 27.1 Umsetzung (2026-03-08)
+
+### V7 Profile-UX Ausbau
+
+- Profil-Controls additiv erweitert:
+  - neue Buttons fuer `Duplizieren`, `Als Standard markieren`, `Profil exportieren`, `Profil importieren`
+  - neues Transfer-Feld `#profile-transfer-input` plus Statusslot `#profile-transfer-status`
+- Persistenz erweitert:
+  - Profil-Eintraege tragen jetzt optional `isDefault`
+  - Import/Export nutzt den JSON-Vertrag `profile-export.v1`
+- UX-Luecke aus dem Masterplan geschlossen:
+  - Profil-Aktionsbuttons reagieren jetzt auf Texteingaben, Select-Wechsel und Import-Textarea sofort
+  - Select-Optionen markieren das Standardprofil sichtbar als `(... Standard)`
+- Sicherheits-/Verhaltensrahmen:
+  - bestehende Profil-IDs blieben unveraendert
+  - Import sanitiziert Settings weiter ueber `SettingsStore`
+  - Speichern darf existierende Profile weiter nur fuer das aktuell geladene/gespeicherte Profil direkt aktualisieren
+
+### Verifikation 27.1
+
+- Playwright-Core-Regression `T20ka` deckt Save-State, Duplicate, Default-Markierung und Profil-Import/Export ab.
+- `npx playwright test tests/core.spec.js --reporter=line --workers=1` PASS (`59 passed`, `1 skipped`)
+- `npx playwright test tests/stress.spec.js --reporter=line --workers=1` PASS (`19 passed`)
+- `npm run build` PASS
+- `npm run docs:sync` PASS
+- `npm run docs:check` PASS
+- Visueller Browser-Check:
+  - Skill `develop-web-game` Client gegen `http://127.0.0.1:4173` ausgefuehrt, Screenshot unter `tmp/develop-web-game-v27/shot-0.png`
+  - zusaetzlicher Playwright-UI-Screenshot der neuen Tools-Controls unter `profile-tools-populated.png`
+
 ### Contract-Freeze fuer V27-Folgeschritte
 
 - Bestehende IDs bleiben erhalten:

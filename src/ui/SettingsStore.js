@@ -16,6 +16,25 @@ const SETTINGS_PROFILES_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settingsProfil
 const MENU_PRESETS_STORAGE_KEY = STORAGE_KEYS.menuPresets;
 const MENU_PRESETS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
 
+function normalizeProfileEntries(profiles) {
+    const sortedProfiles = Array.isArray(profiles)
+        ? [...profiles].sort((a, b) => Number(b?.updatedAt || 0) - Number(a?.updatedAt || 0))
+        : [];
+    let defaultAssigned = false;
+    return sortedProfiles.map((profile) => {
+        const isDefault = Boolean(profile?.isDefault) && !defaultAssigned;
+        if (isDefault) {
+            defaultAssigned = true;
+        }
+        return {
+            name: String(profile?.name || '').trim(),
+            updatedAt: Number(profile?.updatedAt || Date.now()),
+            settings: profile?.settings || {},
+            isDefault,
+        };
+    });
+}
+
 function getDefaultStorage() {
     try {
         return typeof localStorage !== 'undefined' ? localStorage : null;
@@ -110,11 +129,11 @@ export class SettingsStore {
                     name,
                     updatedAt: Number(entry?.updatedAt || Date.now()),
                     settings: this.sanitizeSettings(entry?.settings || {}),
+                    isDefault: Boolean(entry?.isDefault),
                 });
             }
-            out.sort((a, b) => b.updatedAt - a.updatedAt);
             migrateStorageValue(this.storage, this.settingsProfilesStorageKey, resolved);
-            return out;
+            return normalizeProfileEntries(out);
         } catch {
             return [];
         }
@@ -126,7 +145,7 @@ export class SettingsStore {
         }
 
         try {
-            this.storage.setItem(this.settingsProfilesStorageKey, JSON.stringify(profiles));
+            this.storage.setItem(this.settingsProfilesStorageKey, JSON.stringify(normalizeProfileEntries(profiles)));
             return true;
         } catch {
             // Ignore persistence errors.

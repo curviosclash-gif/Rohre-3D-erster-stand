@@ -284,6 +284,16 @@ export class GameRuntimeFacade {
             case MENU_CONTROLLER_EVENT_TYPES.START_KEY_CAPTURE:
                 game.keybindEditorController.startKeyCapture(event.player, event.action);
                 return;
+            case MENU_CONTROLLER_EVENT_TYPES.PROFILE_UI_STATE_SYNC:
+                if (typeof event.selectedName === 'string') {
+                    game.selectedProfileName = event.selectedName;
+                }
+                if (event.fullRefresh) {
+                    game._syncProfileControls();
+                } else {
+                    game._syncProfileActionState();
+                }
+                return;
             case MENU_CONTROLLER_EVENT_TYPES.SAVE_PROFILE:
                 game._saveProfile(event.name);
                 return;
@@ -292,6 +302,18 @@ export class GameRuntimeFacade {
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.DELETE_PROFILE:
                 game._deleteProfile(event.name);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.DUPLICATE_PROFILE:
+                game._duplicateProfile(event.sourceName, event.targetName);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.EXPORT_PROFILE:
+                game._exportProfile(event.name);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.IMPORT_PROFILE:
+                game._importProfile(event.inputValue, event.targetName);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.SET_DEFAULT_PROFILE:
+                game._setDefaultProfile(event.name);
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.RESET_KEYS:
                 game.settings.controls = game.settingsManager.cloneDefaultControls();

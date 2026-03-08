@@ -464,3 +464,30 @@
   - `npm run benchmark:baseline` in der Abschlussphase bewusst nicht erneut ausgefuehrt, da die letzten Schritte strukturelle Runtime-/UI-Refactors ohne erwartetes GPU-/Drawcall-Delta waren.
 - Gesamtstatus:
   - V30 abgeschlossen (GameLoop-Korrektheit, Lifecycle-Cleanup, Trail-Sim-Ownership, Bot-/Observation-Hotpath, Recorder-Haertung, UIManager-/GameRuntimeFacade-Entkopplung).
+
+2026-03-08 (V27 Phase 27.1 gestartet, Agent B)
+- Workflow geladen: `.agents/workflows/fix-planung.md` + `.agents/workflows/code.md`, Lane strikt auf `Block V27`.
+- Baseline fuer V27 bestaetigt ueber `docs/Feature_Profile_Statistiken_UI_V27.md` und `docs/Umsetzungsplan.md`.
+- Erste offene Phase in Lane B: `27.1 V7 Profile-UX Ausbau` mit:
+  - `27.1.1` Duplizieren und Import/Export-Funktion
+  - `27.1.2` Standardprofil-Markierung
+- Relevanter Zusatzbefund aus Masterplan:
+  - `Profil speichern` aktualisiert seinen Disabled-State nach Eingabe aktuell nicht zuverlaessig; wird im selben UX-Schritt mitbehandelt.
+- `implementation_plan.md` fuer Phase `27.1` angelegt.
+
+2026-03-08 (V27 Phase 27.1 abgeschlossen, Agent B)
+- Profil-UX umgesetzt:
+  - neue Tools-Controls fuer Duplicate, Standardprofil, Profil-JSON Export/Import
+  - persistentes `isDefault` an Profilen
+  - neuer Import/Export-Vertrag `profile-export.v1`
+  - Profil-Buttons reagieren jetzt sofort auf Nameingabe, Select-Wechsel und Transfer-Textarea
+- Neue Regression:
+  - `tests/core.spec.js` -> `T20ka` fuer Save-State, Duplicate, Default-Markierung und Import/Export
+- Verifikation:
+  - `npx playwright test tests/core.spec.js --reporter=line --workers=1` PASS (`59 passed`, `1 skipped`)
+  - `npx playwright test tests/stress.spec.js --reporter=line --workers=1` PASS (`19 passed`)
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+  - Skill `develop-web-game` Client gegen `http://127.0.0.1:4173` erfolgreich; Screenshot `tmp/develop-web-game-v27/shot-0.png`
+  - Playwright-Visual-Check fuer Tools-Panel erfolgreich; Screenshot `profile-tools-populated.png`

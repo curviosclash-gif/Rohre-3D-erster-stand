@@ -36,6 +36,8 @@ export class Game {
         this.settings = this._loadSettings();
         this.settingsProfiles = this.profileManager.getProfiles();
         this.activeProfileName = this.profileManager.getActiveProfileName();
+        this.selectedProfileName = this.activeProfileName;
+        this.loadedProfileName = '';
         this.settingsDirty = false;
         this.config = CONFIG;
         this.runtimeConfig = null;
@@ -207,7 +209,7 @@ export class Game {
         const controlState = deriveProfileControlSelectState(
             this.settingsProfiles,
             {
-                activeProfileName: this.activeProfileName,
+                activeProfileName: this.selectedProfileName || this.activeProfileName,
                 selectValue: this.ui.profileSelect.value,
                 isProfileNameInputFocused: this.ui.profileNameInput
                     ? document.activeElement?.isSameNode(this.ui.profileNameInput)
@@ -230,6 +232,7 @@ export class Game {
         }
 
         const validSelected = controlState.resolvedActiveProfileName;
+        this.selectedProfileName = validSelected;
         this.activeProfileName = validSelected;
         this.ui.profileSelect.value = validSelected;
 
@@ -240,15 +243,14 @@ export class Game {
     }
 
     _syncProfileActionState() {
-        const effectiveActiveProfileName = this.profileManager.resolveActiveProfileName(
-            this.activeProfileName || this.ui.profileSelect?.value || ''
-        );
+        const effectiveLoadedProfileName = this.profileManager.findProfileByName(this.loadedProfileName || '')?.name || '';
         const actionState = deriveProfileActionUiState(
             this.settingsProfiles,
             {
                 selectedProfileName: this.ui.profileSelect?.value || this.activeProfileName || '',
                 typedName: this.ui.profileNameInput?.value || '',
-                activeProfileName: effectiveActiveProfileName,
+                activeProfileName: effectiveLoadedProfileName,
+                transferInputValue: this.ui.profileTransferInput?.value || '',
             },
             this.profileUiStateOps
         );
@@ -259,6 +261,19 @@ export class Game {
         if (this.ui.profileDeleteButton) {
             this.ui.profileDeleteButton.disabled = !actionState.canDeleteProfile;
         }
+        if (this.ui.profileDuplicateButton) {
+            this.ui.profileDuplicateButton.disabled = !actionState.canDuplicateProfile;
+        }
+        if (this.ui.profileDefaultButton) {
+            this.ui.profileDefaultButton.disabled = !actionState.canSetDefaultProfile;
+            this.ui.profileDefaultButton.textContent = actionState.defaultButtonLabel;
+        }
+        if (this.ui.profileExportButton) {
+            this.ui.profileExportButton.disabled = !actionState.canExportProfile;
+        }
+        if (this.ui.profileImportButton) {
+            this.ui.profileImportButton.disabled = !actionState.canImportProfile;
+        }
         if (this.ui.profileSaveButton) {
             this.ui.profileSaveButton.disabled = !actionState.canSaveProfile;
             this.ui.profileSaveButton.textContent = actionState.saveButtonLabel;
@@ -266,8 +281,14 @@ export class Game {
         this.uiManager?.updateContext();
     }
 
+    _setProfileTransferStatus(message, tone = 'info') {
+        if (!this.ui.profileTransferStatus) return;
+        this.ui.profileTransferStatus.textContent = String(message || '');
+        this.ui.profileTransferStatus.setAttribute('data-tone', tone);
+    }
+
     _saveProfile(profileName) {
-        const result = this.profileManager.saveProfile(profileName, this.settings, this.activeProfileName);
+        const result = this.profileManager.saveProfile(profileName, this.settings, this.loadedProfileName);
         if (!result.success) {
             this._showStatusToast(result.error, 2000, 'error');
             return false;
@@ -275,6 +296,8 @@ export class Game {
 
         this.settingsProfiles = this.profileManager.getProfiles();
         this.activeProfileName = this.profileManager.getActiveProfileName();
+        this.selectedProfileName = this.activeProfileName;
+        this.loadedProfileName = result.name;
 
         if (this.ui.profileNameInput) {
             this.ui.profileNameInput.value = result.name;
@@ -290,6 +313,26 @@ export class Game {
         return true;
     }
 
+    _duplicateProfile(sourceProfileName, targetProfileName = '') {
+        const result = this.profileManager.duplicateProfile(sourceProfileName, targetProfileName);
+        if (!result.success) {
+            this._showStatusToast(result.error, 1800, 'error');
+            return false;
+        }
+
+        this.settingsProfiles = this.profileManager.getProfiles();
+        this.activeProfileName = this.profileManager.getActiveProfileName();
+        this.selectedProfileName = this.activeProfileName;
+
+        if (this.ui.profileNameInput) {
+            this.ui.profileNameInput.value = result.name;
+        }
+
+        this._syncProfileControls();
+        this._showStatusToast(`Profil dupliziert: ${result.name}`, 1500, 'success');
+        return true;
+    }
+
     _loadProfile(profileName) {
         const result = this.profileManager.loadProfile(profileName);
         if (!result.success) {
@@ -299,9 +342,70 @@ export class Game {
 
         this.settings = result.profile.settings;
         this.activeProfileName = this.profileManager.getActiveProfileName();
+        this.selectedProfileName = this.activeProfileName;
+        this.loadedProfileName = result.profile.name;
         this._onSettingsChanged();
         this._markSettingsDirty(false);
         this._showStatusToast(`Profil geladen: ${result.profile.name}`, 1400, 'success');
+        return true;
+    }
+
+    _exportProfile(profileName) {
+        const result = this.profileManager.exportProfile(profileName);
+        if (!result.success) {
+            this._setProfileTransferStatus(result.error, 'error');
+            this._showStatusToast(result.error, 1700, 'error');
+            return false;
+        }
+
+        if (this.ui.profileTransferInput) {
+            this.ui.profileTransferInput.value = result.serialized;
+        }
+
+        this._setProfileTransferStatus(`Profil exportiert: ${result.name}`, 'success');
+        this._syncProfileActionState();
+        this._showStatusToast(`Profil exportiert: ${result.name}`, 1400, 'success');
+        return true;
+    }
+
+    _importProfile(inputValue, requestedProfileName = '') {
+        const result = this.profileManager.importProfile(inputValue, requestedProfileName);
+        if (!result.success) {
+            this._setProfileTransferStatus(result.error, 'error');
+            this._showStatusToast(result.error, 1800, 'error');
+            return false;
+        }
+
+        this.settingsProfiles = this.profileManager.getProfiles();
+        this.activeProfileName = this.profileManager.getActiveProfileName();
+        this.selectedProfileName = this.activeProfileName;
+
+        if (this.ui.profileNameInput) {
+            this.ui.profileNameInput.value = result.name;
+        }
+        if (this.ui.profileTransferInput) {
+            this.ui.profileTransferInput.value = result.serialized;
+        }
+
+        this._syncProfileControls();
+        this._setProfileTransferStatus(`Profil importiert: ${result.name}`, 'success');
+        this._showStatusToast(`Profil importiert: ${result.name}`, 1500, 'success');
+        return true;
+    }
+
+    _setDefaultProfile(profileName) {
+        const result = this.profileManager.setDefaultProfile(profileName);
+        if (!result.success) {
+            this._showStatusToast(result.error, 1700, 'error');
+            return false;
+        }
+
+        this.settingsProfiles = this.profileManager.getProfiles();
+        this.activeProfileName = this.profileManager.getActiveProfileName();
+        this.selectedProfileName = this.activeProfileName;
+        this._syncProfileControls();
+
+        this._showStatusToast(`Standardprofil gesetzt: ${result.name}`, 1500, 'success');
         return true;
     }
 
@@ -314,6 +418,10 @@ export class Game {
 
         this.settingsProfiles = this.profileManager.getProfiles();
         this.activeProfileName = this.profileManager.getActiveProfileName();
+        this.selectedProfileName = this.activeProfileName;
+        if (this.loadedProfileName && this.profileManager.normalizeProfileName(this.loadedProfileName) === this.profileManager.normalizeProfileName(result.removedName)) {
+            this.loadedProfileName = '';
+        }
         this._syncProfileControls();
 
         this._showStatusToast(`Profil geloescht: ${result.removedName}`, 1400, 'success');

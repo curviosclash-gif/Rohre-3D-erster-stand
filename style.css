@@ -885,11 +885,13 @@ input[type="range"]::-webkit-slider-thumb {
     line-height: 1.4;
 }
 
-#config-share-status[data-tone="error"] {
+#config-share-status[data-tone="error"],
+#profile-transfer-status[data-tone="error"] {
     color: #ffb5b5;
 }
 
-#config-share-status[data-tone="success"] {
+#config-share-status[data-tone="success"],
+#profile-transfer-status[data-tone="success"] {
     color: #9ff2c7;
 }
 

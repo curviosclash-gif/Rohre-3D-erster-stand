@@ -437,6 +437,30 @@
                                 data-menu-action="profile-delete" data-menu-text-id="menu.level4.tools.profile_delete.label">
                                 Profil loeschen
                             </button>
+                            <div class="btn-group secondary-btn-spaced">
+                                <button type="button" id="btn-profile-duplicate" class="secondary-btn"
+                                    data-menu-action="profile-duplicate" data-menu-text-id="menu.level4.tools.profile_duplicate.label">
+                                    Profil duplizieren
+                                </button>
+                                <button type="button" id="btn-profile-set-default" class="secondary-btn"
+                                    data-menu-action="profile-default" data-menu-text-id="menu.level4.tools.profile_default.label">
+                                    Als Standard markieren
+                                </button>
+                            </div>
+                            <label for="profile-transfer-input" class="secondary-btn-spaced"
+                                data-menu-text-id="menu.level4.tools.profile_transfer.label">Profil-Transfer</label>
+                            <textarea id="profile-transfer-input" rows="4" placeholder="Profil-JSON exportieren oder einfuegen"></textarea>
+                            <div class="btn-group secondary-btn-spaced">
+                                <button type="button" id="btn-profile-export" class="secondary-btn"
+                                    data-menu-action="profile-export" data-menu-text-id="menu.level4.tools.profile_export.label">
+                                    Profil exportieren
+                                </button>
+                                <button type="button" id="btn-profile-import" class="secondary-btn"
+                                    data-menu-action="profile-import" data-menu-text-id="menu.level4.tools.profile_import.label">
+                                    Profil importieren
+                                </button>
+                            </div>
+                            <p id="profile-transfer-status" class="menu-hint" role="status" aria-live="polite">Kein Profil-Import/Export ausgefuehrt.</p>
 
                             <label for="preset-select" class="secondary-btn-spaced"
                                 data-menu-text-id="menu.level4.tools.preset_catalog.label">Preset Katalog</label>

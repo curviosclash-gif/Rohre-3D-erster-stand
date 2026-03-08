@@ -35,6 +35,7 @@ export function deriveProfileActionUiState(profiles, inputs = {}, options = {}) 
     const selectedName = normalizeProfileName(inputs.selectedProfileName || inputs.activeProfileName || '');
     const typedName = normalizeProfileName(inputs.typedName || '');
     const activeProfileName = normalizeProfileName(inputs.activeProfileName || '');
+    const transferInputValue = String(inputs.transferInputValue || '').trim();
 
     const selectedProfile = findProfileByName(safeProfiles, selectedName) || null;
     const typedProfileIdx = findProfileIndexByName(safeProfiles, typedName);
@@ -49,7 +50,12 @@ export function deriveProfileActionUiState(profiles, inputs = {}, options = {}) 
         canUpdateActive,
         canLoadProfile: Boolean(selectedProfile),
         canDeleteProfile: Boolean(selectedProfile),
+        canDuplicateProfile: Boolean(selectedProfile),
+        canExportProfile: Boolean(selectedProfile),
+        canImportProfile: Boolean(transferInputValue),
+        canSetDefaultProfile: Boolean(selectedProfile) && !selectedProfile.isDefault,
         canSaveProfile: Boolean(typedName),
+        defaultButtonLabel: selectedProfile?.isDefault ? 'Standardprofil aktiv' : 'Als Standard markieren',
         saveButtonLabel: getSaveButtonLabel({ typedName, canUpdateActive, typedProfileIdx }),
     };
 }

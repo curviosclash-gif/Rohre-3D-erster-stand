@@ -19,7 +19,12 @@ export function deriveProfileControlSelectState(profiles, inputs = {}, options =
 
     const safeProfiles = ensureArray(profiles);
     const requestedProfileName = normalizeProfileName(inputs.activeProfileName || inputs.selectValue || '');
-    const sortedProfiles = [...safeProfiles].sort((a, b) => b.updatedAt - a.updatedAt);
+    const sortedProfiles = [...safeProfiles].sort((a, b) => {
+        if (!!a?.isDefault !== !!b?.isDefault) {
+            return a?.isDefault ? -1 : 1;
+        }
+        return Number(b?.updatedAt || 0) - Number(a?.updatedAt || 0);
+    });
     const resolvedActiveProfileName = resolveActiveProfileName(safeProfiles, requestedProfileName);
 
     return {
@@ -32,7 +37,7 @@ export function deriveProfileControlSelectState(profiles, inputs = {}, options =
         },
         profileOptions: sortedProfiles.map((profile) => ({
             value: profile.name,
-            text: profile.name,
+            text: profile.isDefault ? `${profile.name} (Standard)` : profile.name,
         })),
         shouldMirrorProfileNameInput: !inputs.isProfileNameInputFocused,
     };

@@ -17,6 +17,7 @@ import {
 import { stringifyMapDocument } from '../src/entities/MapSchema.js';
 
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
+const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
 const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
 const MENU_PRESETS_STORAGE_KEY = 'cuviosclash.menu-presets.v1';
 const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
@@ -447,6 +448,58 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
         expect(matchPreset.id).toBe('competitive');
         expect(matchPreset.kind).toBe('fixed');
+    });
+
+    test('T20ka: Profil-UX aktualisiert Action-State und unterstuetzt Duplicate, Import/Export und Standardprofil', async ({ page }) => {
+        await page.goto('/');
+        await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_PROFILES_STORAGE_KEY);
+        await page.reload();
+        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
+        await openLevel4Drawer(page, { section: 'tools' });
+
+        await page.fill('#profile-name', 'QA Profil');
+        await expect(page.locator('#btn-profile-save')).toBeEnabled();
+        await page.click('#btn-profile-save');
+        await expect(page.locator('#profile-select')).toHaveValue('QA Profil');
+
+        await page.click('#btn-profile-set-default');
+        await expect(page.locator('#profile-select option:checked')).toHaveText('QA Profil (Standard)');
+
+        await page.fill('#profile-name', 'QA Profil Kopie');
+        await expect(page.locator('#btn-profile-duplicate')).toBeEnabled();
+        await page.click('#btn-profile-duplicate');
+        await expect(page.locator('#profile-select')).toHaveValue('QA Profil Kopie');
+
+        await page.selectOption('#profile-select', 'QA Profil');
+        await expect(page.locator('#profile-name')).toHaveValue('QA Profil');
+        await expect(page.locator('#btn-profile-set-default')).toBeDisabled();
+        await expect(page.locator('#btn-profile-set-default')).toHaveText('Standardprofil aktiv');
+
+        await page.selectOption('#profile-select', 'QA Profil Kopie');
+        await expect(page.locator('#btn-profile-set-default')).toBeEnabled();
+        await page.click('#btn-profile-export');
+
+        const exportPayload = await page.inputValue('#profile-transfer-input');
+        const exportedProfile = JSON.parse(exportPayload);
+        expect(exportedProfile.contractVersion).toBe('profile-export.v1');
+        expect(exportedProfile.profile.name).toBe('QA Profil Kopie');
+
+        exportedProfile.profile.name = 'QA Import';
+        await page.fill('#profile-transfer-input', JSON.stringify(exportedProfile, null, 2));
+        await expect(page.locator('#btn-profile-import')).toBeEnabled();
+        await page.fill('#profile-name', '');
+        await page.click('#btn-profile-import');
+        await expect(page.locator('#profile-select')).toHaveValue('QA Import');
+        await expect(page.locator('#profile-transfer-status')).toContainText('Profil importiert: QA Import');
+
+        const profileState = await page.evaluate((storageKey) => {
+            return JSON.parse(localStorage.getItem(storageKey) || '[]');
+        }, SETTINGS_PROFILES_STORAGE_KEY);
+        expect(profileState).toHaveLength(3);
+        expect(profileState.filter((profile) => profile?.isDefault)).toHaveLength(1);
+        expect(profileState.find((profile) => profile?.isDefault)?.name).toBe('QA Profil');
+
+        await page.evaluate((storageKey) => localStorage.removeItem(storageKey), SETTINGS_PROFILES_STORAGE_KEY);
     });
 
     test('T20g: Runtime-Guard blockiert Developer-Events fuer non-owner', async ({ page }) => {

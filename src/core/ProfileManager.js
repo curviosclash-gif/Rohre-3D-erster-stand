@@ -2,13 +2,22 @@
 // ProfileManager.js - business logic for settings profiles
 // ============================================
 
-import { removeProfileByName, resolveActiveProfileName, upsertProfileEntry } from '../ui/ProfileDataOps.js';
+import {
+    cloneProfileEntry,
+    removeProfileByName,
+    resolveActiveProfileName,
+    resolveDefaultProfileName,
+    resolveUniqueProfileName,
+    setDefaultProfileByName,
+    upsertProfileEntry,
+} from '../ui/ProfileDataOps.js';
+import { exportProfileAsJson, parseProfileImport } from '../ui/ProfileTransferOps.js';
 
 export class ProfileManager {
     constructor(settingsStore) {
         this.store = settingsStore;
         this.profiles = this.store.loadProfiles();
-        this.activeProfileName = '';
+        this.activeProfileName = resolveDefaultProfileName(this.profiles);
     }
 
     getProfiles() {
@@ -17,6 +26,10 @@ export class ProfileManager {
 
     getActiveProfileName() {
         return this.activeProfileName;
+    }
+
+    getDefaultProfileName() {
+        return resolveDefaultProfileName(this.profiles);
     }
 
     setActiveProfileName(name) {
@@ -76,10 +89,12 @@ export class ProfileManager {
         }
 
         const isUpdate = idx >= 0;
+        const existingProfile = idx >= 0 ? this.profiles[idx] : null;
         const entry = {
             name,
             updatedAt: Date.now(),
             settings: JSON.parse(JSON.stringify(currentSettings)),
+            isDefault: Boolean(existingProfile?.isDefault),
         };
 
         this.profiles = upsertProfileEntry(this.profiles, entry, this.getProfileDataOps()).profiles;
@@ -91,6 +106,48 @@ export class ProfileManager {
         }
 
         return { success: true, isUpdate, name };
+    }
+
+    duplicateProfile(sourceProfileName, targetProfileName = '') {
+        const sourceName = this.normalizeProfileName(sourceProfileName);
+        const sourceProfile = this.findProfileByName(sourceName);
+        if (!sourceProfile) {
+            return { success: false, error: 'Quellprofil nicht gefunden' };
+        }
+
+        const requestedTargetName = this.normalizeProfileName(targetProfileName);
+        if (requestedTargetName && requestedTargetName !== sourceProfile.name && this.findProfileIndexByName(requestedTargetName) >= 0) {
+            return { success: false, error: 'Name existiert bereits' };
+        }
+
+        const duplicateName = requestedTargetName && requestedTargetName !== sourceProfile.name
+            ? requestedTargetName
+            : resolveUniqueProfileName(
+                this.profiles,
+                `${sourceProfile.name} Kopie`,
+                {
+                    normalizeProfileName: (rawName) => this.normalizeProfileName(rawName),
+                    findProfileIndexByName: (profiles, name) => this.store.findProfileIndexByName(profiles, name),
+                    fallbackLabel: 'Profil Kopie',
+                }
+            );
+        if (!duplicateName) {
+            return { success: false, error: 'Duplikatname konnte nicht erzeugt werden' };
+        }
+
+        const entry = cloneProfileEntry(sourceProfile, duplicateName, {
+            updatedAt: Date.now(),
+            isDefault: false,
+        });
+        this.profiles = upsertProfileEntry(this.profiles, entry, this.getProfileDataOps()).profiles;
+        this.activeProfileName = duplicateName;
+
+        const persisted = this.store.saveProfiles(this.profiles);
+        if (!persisted) {
+            return { success: false, error: 'Profil konnte nicht dupliziert werden' };
+        }
+
+        return { success: true, name: duplicateName, sourceName: sourceProfile.name };
     }
 
     loadProfile(profileName) {
@@ -105,6 +162,92 @@ export class ProfileManager {
         const sanitizedSettings = this.store.sanitizeSettings(profile.settings);
 
         return { success: true, profile: { ...profile, settings: sanitizedSettings } };
+    }
+
+    exportProfile(profileName) {
+        const name = this.normalizeProfileName(profileName);
+        const profile = this.findProfileByName(name);
+        if (!profile) {
+            return { success: false, error: 'Profil nicht gefunden' };
+        }
+
+        return {
+            success: true,
+            name: profile.name,
+            serialized: exportProfileAsJson(profile),
+        };
+    }
+
+    importProfile(inputValue, requestedProfileName = '') {
+        const parsed = parseProfileImport(inputValue, {
+            normalizeProfileName: (rawName) => this.normalizeProfileName(rawName),
+        });
+        if (!parsed.success) {
+            return parsed;
+        }
+
+        const explicitName = this.normalizeProfileName(requestedProfileName);
+        let targetName = explicitName || parsed.profile.name;
+        if (explicitName && this.findProfileIndexByName(explicitName) >= 0) {
+            return { success: false, error: 'Name existiert bereits' };
+        }
+        if (!explicitName && this.findProfileIndexByName(targetName) >= 0) {
+            targetName = resolveUniqueProfileName(
+                this.profiles,
+                `${targetName} Import`,
+                {
+                    normalizeProfileName: (rawName) => this.normalizeProfileName(rawName),
+                    findProfileIndexByName: (profiles, name) => this.store.findProfileIndexByName(profiles, name),
+                    fallbackLabel: 'Profil Import',
+                }
+            );
+        }
+        if (!targetName) {
+            return { success: false, error: 'Importname konnte nicht erzeugt werden' };
+        }
+
+        const entry = cloneProfileEntry(parsed.profile, targetName, {
+            updatedAt: Date.now(),
+            settings: this.store.sanitizeSettings(parsed.profile.settings || {}),
+        });
+        this.profiles = upsertProfileEntry(this.profiles, entry, this.getProfileDataOps()).profiles;
+        if (entry.isDefault) {
+            this.profiles = setDefaultProfileByName(this.profiles, entry.name, this.getProfileDataOps()).profiles;
+        }
+        this.activeProfileName = entry.name;
+
+        const persisted = this.store.saveProfiles(this.profiles);
+        if (!persisted) {
+            return { success: false, error: 'Profil konnte nicht importiert werden' };
+        }
+
+        return {
+            success: true,
+            name: entry.name,
+            serialized: exportProfileAsJson(entry),
+            isDefault: entry.isDefault,
+        };
+    }
+
+    setDefaultProfile(profileName) {
+        const name = this.normalizeProfileName(profileName);
+        const result = setDefaultProfileByName(this.profiles, name, this.getProfileDataOps());
+        if (!result.success) {
+            return { success: false, error: 'Profil nicht gefunden' };
+        }
+
+        this.profiles = result.profiles;
+        this.activeProfileName = result.defaultProfile?.name || this.activeProfileName;
+
+        const persisted = this.store.saveProfiles(this.profiles);
+        if (!persisted) {
+            return { success: false, error: 'Standardprofil konnte nicht gespeichert werden' };
+        }
+
+        return {
+            success: true,
+            name: result.defaultProfile?.name || '',
+        };
     }
 
     deleteProfile(profileName) {
