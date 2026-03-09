@@ -63,9 +63,11 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 
 - [x] 26.0 Baseline-Freeze und Gameplay-Metriken erfassen
   - Status 2026-03-08: Baseline ueber `npm run benchmark:baseline` neu eingefroren (`overall fpsAverage=60.00`, `overall drawCallsAverage=25.49`, `botWinRate=82.4%`, `stuckEvents=0`; Artefakte: `data/performance_ki_baseline_report.json`, `docs/Testergebnisse_2026-03-08.md`).
-- [ ] 26.1 V4 Treffer-/Schadensfeedback (Audio & VFX)
-  - [ ] 26.1.1 Audio-Signale fuer MG, Raketen und Schild implementieren
-  - [ ] 26.1.2 VFX-Signale (Partikel/Flashes) bei Treffern ausbauen
+- [x] 26.1 V4 Treffer-/Schadensfeedback (Audio & VFX)
+  - Abgeschlossen am: `2026-03-08`
+  - [x] 26.1.1 Audio-Signale fuer MG, Raketen und Schild implementieren
+  - [x] 26.1.2 VFX-Signale (Partikel/Flashes) bei Treffern ausbauen
+  - Status 2026-03-08: Differenzierte Hunt-Feedback-Cues fuer MG, Raketen und Schild aktiv; neue MG-/Trail-/Rocket-/Shield-Partikelprofile sowie Regressionen `T88`/`T89` verifiziert.
 - [ ] 26.2 V5 Hunt-Mode Feintuning
   - [ ] 26.2.1 TTK und Overheat-Werte basierend auf Testdaten anpassen
   - [ ] 26.2.2 Respawn- und Pickup-Logik verfeinern
@@ -92,9 +94,14 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
     - Baseline-Analyse fuer V27 in `docs/Feature_Profile_Statistiken_UI_V27.md` festgeschrieben.
     - Contract-Freeze gesetzt fuer bestehende Profil-IDs (`#profile-name`, `#btn-profile-save`, `#profile-select`, `#btn-profile-load`, `#btn-profile-delete`) und Round-End-Overlay (`#message-overlay`, `#message-text`, `#message-sub`).
     - Iststand bestaetigt: Round/Match-Metriken sind in `RoundRecorder`/`RoundMetricsStore` verfuegbar, aber UI-seitig noch nicht als vertiefte Post-Match-Ansicht verdrahtet.
-- [ ] 27.1 V7 Profile-UX Ausbau
-  - [ ] 27.1.1 Duplizieren und Import/Export-Funktion
-  - [ ] 27.1.2 Standardprofil-Markierung ergaenzen
+- [x] 27.1 V7 Profile-UX Ausbau
+  - Abgeschlossen am: `2026-03-08`
+  - Status 2026-03-08:
+    - Profil-UX additiv um Duplizieren, JSON-Import/Export (`profile-export.v1`) und Standardprofil-Markierung erweitert.
+    - Profil-Aktionszustand reagiert jetzt korrekt auf Eingabe-/Select-Wechsel; der offene Befund `Profil speichern bleibt deaktiviert` ist damit geschlossen.
+    - Visuelle und technische Verifikation erfolgt ueber `tests/core.spec.js` (`T20ka`), `test:core`, `test:stress`, `build` sowie Browser-Screenshots.
+  - [x] 27.1.1 Duplizieren und Import/Export-Funktion
+  - [x] 27.1.2 Standardprofil-Markierung ergaenzen
 - [ ] 27.2 V8 Post-Match-Statistiken
   - [ ] 27.2.1 Datenaggregator fuer Round/Match-Stats ausbauen
   - [ ] 27.2.2 UI-Overlay fuer vertiefte Statistiken am Rundenende
@@ -176,7 +183,7 @@ Template:
 
 - [ ] PX Kurztitel
   - Erstellt am: `YYYY-MM-DD`
-  - Agent: `A` oder `B`
+  - Agent: `A`, `B` oder `C`
   - Plan-Datei: `docs/Feature_Name.md`
   - Datei-Scope: `src/...`, `tests/...`
   - Konfliktregel: kurzer Hinweis zu Datei-Overlap oder bewusstem Non-Overlap
@@ -206,6 +213,30 @@ Template:
   - Plan-Datei: `docs/Feature_Runtime_Stabilisierung_Wartbarkeit_V30.md`
   - Datei-Scope: `src/core/**`, `src/entities/**`, `src/ui/**`, `src/state/**`, `tests/**`, `docs/**`
   - Konfliktregel: Korrektheits- und Lifecycle-Fixes zuerst; groessere UI-/Runtime-Splits erst nach gruenen Zwischen-Gates der frueheren Phasen
+- [ ] PX Parallelbetrieb 3-Bot Kickoff V26 (Bot A)
+  - Erstellt am: `2026-03-08`
+  - Agent: `A`
+  - Plan-Datei: `docs/Umsetzungsplan.md` (Block `V26`)
+  - Datei-Scope: `src/hunt/**`, `src/entities/**`, `src/core/**`, `src/ui/**`, `tests/**`, `docs/**`
+  - Konfliktregel: nur V26-Phasen (`26.0` bis `26.8`) bearbeiten; keine Aenderungen in V27/V28 ausser zwingende Shared-Fixes mit kurzer Notiz im Bearbeitungsprotokoll
+- [ ] PX Parallelbetrieb 3-Bot Kickoff V27 (Bot B)
+  - Erstellt am: `2026-03-08`
+  - Agent: `B`
+  - Plan-Datei: `docs/Umsetzungsplan.md` (Block `V27`)
+  - Datei-Scope: `src/ui/**`, `src/state/**`, `scripts/**`, `data/**`, `tests/**`, `docs/**`
+  - Konfliktregel: nur V27-Phasen (`27.0` bis `27.4`) bearbeiten; keine Aenderungen in V26/V28 ausser zwingende Shared-Fixes mit kurzer Notiz im Bearbeitungsprotokoll
+- [ ] PX Parallelbetrieb 3-Bot Kickoff V28/Nachlauf (Bot C)
+  - Erstellt am: `2026-03-08`
+  - Agent: `C`
+  - Plan-Datei: `docs/Umsetzungsplan.md` (Block `V28` + `Nachlauf / Technik-Backlog`)
+  - Datei-Scope: `src/core/**`, `src/entities/**`, `src/state/**`, `src/ui/menu/**`, `tests/**`, `docs/**`
+  - Konfliktregel: zuerst V28 (`28.0` bis `28.4`), danach Nachlauf (`N1` bis `T2`); keine Eingriffe in V26/V27 ausser zwingende Shared-Fixes mit kurzer Notiz im Bearbeitungsprotokoll
+- [ ] PX Test Performance Optimization V2
+  - Erstellt am: `2026-03-09`
+  - Agent: `A` (aktuell)
+  - Plan-Datei: `docs/Feature_TestPerformance_V2.md`
+  - Datei-Scope: `tests/**`
+  - Konfliktregel: Nur Test-Code wird umgebaut, Engine-Code bleibt unberuehrt. Parallelisierbar.
 <!-- PLAN-INTAKE-END -->
 
 ## Archivierte Referenzen
@@ -221,5 +252,3 @@ Vor Task-Abschluss immer:
 
 - `npm run docs:sync`
 - `npm run docs:check`
-
-
