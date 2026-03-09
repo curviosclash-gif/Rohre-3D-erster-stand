@@ -292,19 +292,16 @@ export class UIManager {
         if (this.ui.mapSelect) {
             this._listen(this.ui.mapSelect, 'change', () => {
                 pushRecentEntry(startSetup.recentMaps, this.ui.mapSelect.value);
-                this.syncStartSetupState(settings);
             }, undefined, this._startSetupDisposers);
         }
         if (this.ui.vehicleSelectP1) {
             this._listen(this.ui.vehicleSelectP1, 'change', () => {
                 pushRecentEntry(startSetup.recentVehicles, this.ui.vehicleSelectP1.value);
-                this.syncStartSetupState(settings);
             }, undefined, this._startSetupDisposers);
         }
         if (this.ui.vehicleSelectP2) {
             this._listen(this.ui.vehicleSelectP2, 'change', () => {
                 pushRecentEntry(startSetup.recentVehicles, this.ui.vehicleSelectP2.value);
-                this.syncStartSetupState(settings);
             }, undefined, this._startSetupDisposers);
         }
 

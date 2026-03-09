@@ -491,3 +491,40 @@
   - `npm run docs:check` PASS
   - Skill `develop-web-game` Client gegen `http://127.0.0.1:4173` erfolgreich; Screenshot `tmp/develop-web-game-v27/shot-0.png`
   - Playwright-Visual-Check fuer Tools-Panel erfolgreich; Screenshot `profile-tools-populated.png`
+
+2026-03-08 (V26 Phase 26.1 abgeschlossen, Agent A)
+- Hunt-Trefferfeedback differenziert:
+  - neue Audio-Cues `MG_SHOOT`/`MG_HIT`, `ROCKET_SHOOT`/`ROCKET_IMPACT` und `SHIELD_HIT`
+  - neue Partikelprofile fuer MG-, Trail-, Raketen- und Schildtreffer
+  - Hunt-Schadensevents laufen im modularen Runtime-Pfad jetzt konsistent durch das zentrale Feedback-Wiring
+- Neue Regressionen:
+  - `tests/physics-hunt.spec.js` -> `T88`, `T89`
+  - `tests/helpers.js` -> robusterer Session-Type-Selektor fuer Hunt-Startflows
+- Verifikation:
+  - `npx playwright test tests/physics-core.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js --reporter=line --workers=1` PASS (`51 passed`) gegen manuell gestarteten `vite --host localhost --port 5173 --strictPort`
+  - `npx playwright test tests/core.spec.js --reporter=line --workers=1` PASS (`59 passed`, `1 skipped`) gegen denselben manuellen Vite-Server
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+ - `npm run docs:check` PASS
+  - Skill `develop-web-game` Client erfolgreich; Screenshots unter `output/web-game-agent-a/shot-0.png` und `output/web-game-agent-a/shot-1.png`
+- Naechster Schritt:
+  - Phase `26.2` Hunt-Mode Feintuning
+
+2026-03-09 (Bugfix: Karten- und Flugzeugauswahl uebernehmen nicht)
+- Nutzerproblem reproduziert:
+  - Auswahl in `#map-select` und `#vehicle-select-p1` sprang direkt auf alte Werte zurueck.
+  - Match startete trotz Auswahl weiter mit `standard` und `ship5`.
+- Root Cause:
+  - `src/ui/UIManager.js` hing vor `MenuController` eigene `change`-Listener an die Selects.
+  - Diese Listener riefen sofort `syncStartSetupState(settings)` auf und renderten die Selects aus altem `settings`-State neu, bevor die eigentlichen Gameplay-Bindings den neuen Wert uebernehmen konnten.
+- Fix:
+  - `src/ui/UIManager.js`: Select-Change-Listener fuer Map und Vehicles aktualisieren jetzt nur noch die Recent-Listen; das eigentliche UI-Resync laeuft ueber den regulaeren `onSettingsChanged`-Pfad nach dem Settings-Update.
+  - `tests/core.spec.js`: neue Regression `T20kb` prueft Map-/Flugzeug-Auswahl in DOM, `settings` und gestartetem Match.
+- Verifikation:
+  - direkte Browser-Repro gegen `http://localhost:5173`: Auswahl bleibt auf `maze` / `aircraft`, Match startet mit denselben Werten.
+  - `npx playwright test tests/core.spec.js -g "T20kb" --reporter=line --workers=1` PASS
+  - `npm run test:core` PASS (`60 passed`, `1 skipped`)
+  - `npm run test:stress` PASS (`19 passed`)
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
