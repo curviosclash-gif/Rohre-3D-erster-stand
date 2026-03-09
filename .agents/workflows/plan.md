@@ -53,9 +53,3 @@ Create `docs/Feature_[Name].md` with:
 ## Report
 
 Standardformat verwenden.
-
-**CRITICAL ADDITION FOR THE REPORT:**
-At the end of your report, you MUST provide:
-
-1. A copy-paste prompt for the user to start the FIRST sub-phase in the next chat (e.g., "Mache weiter mit Phase X.1 aus dem Dokument Y").
-2. A generic copy-paste prompt for the user to use AFTER a phase is done to start the NEXT phase in the following chat (e.g., "Markiere Phase X.1 als erledigt und starte Phase X.2 aus dem Dokument").
