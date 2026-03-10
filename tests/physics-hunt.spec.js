@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loadGame, startHuntGame, startHuntGameWithBots } from './helpers.js';
 
-test.describe('Physics Hunt (T61-T64, T83-T87)', () => {
+test.describe('Physics Hunt (Tests 61-64, 83-89)', () => {
 
     test('T61: Hunt-MG entfernt getroffenes Spursegment sofort', async ({ page }) => {
         await startHuntGame(page);
@@ -734,6 +734,158 @@ test.describe('Physics Hunt (T61-T64, T83-T87)', () => {
         expect(result.destroyed).toBeTruthy();
         expect(result.visualCleared).toBeTruthy();
         expect(result.scaleCollapsed).toBeTruthy();
+    });
+
+    test('T88: Hunt-MG nutzt differenzierte Audio-/VFX-Signale fuer Treffer und Schildabsorption', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !shooter || !enemy) {
+                return { error: 'missing-state' };
+            }
+            if (
+                typeof game.audio?.clearDebugEvents !== 'function'
+                || typeof game.audio?.getRecentEvents !== 'function'
+                || typeof game.particles?.clearDebugEvents !== 'function'
+                || typeof game.particles?.getRecentEvents !== 'function'
+            ) {
+                return { error: 'missing-feedback-debug-hooks' };
+            }
+
+            const resetShotState = () => {
+                shooter.shootCooldown = 0;
+                if (entityManager._overheatGunSystem?._overheatByPlayer) {
+                    entityManager._overheatGunSystem._overheatByPlayer[shooter.index] = 0;
+                }
+                if (entityManager._overheatGunSystem?._lockoutByPlayer) {
+                    entityManager._overheatGunSystem._lockoutByPlayer[shooter.index] = 0;
+                }
+            };
+
+            const runShot = ({ shielded }) => {
+                enemy.spawnProtectionTimer = 0;
+                enemy.alive = true;
+                enemy.hp = Math.max(100, Number(enemy.maxHp) || 100);
+                enemy.maxHp = Math.max(100, Number(enemy.maxHp) || 100);
+                enemy.position.set(0, 50, -18);
+                enemy.setLookAtWorld?.(0, 50, -120);
+                enemy.hasShield = !!shielded;
+                enemy.maxShieldHp = Math.max(40, Number(enemy.maxShieldHp) || 40);
+                enemy.shieldHP = shielded ? enemy.maxShieldHp : 0;
+                shooter.position.set(0, 50, 0);
+                shooter.setLookAtWorld?.(0, 50, -120);
+
+                resetShotState();
+                game.audio.clearDebugEvents();
+                game.particles.clearDebugEvents();
+
+                const hpBefore = Number(enemy.hp || 0);
+                const shieldBefore = Number(enemy.shieldHP || 0);
+                const fireResult = entityManager._shootHuntGun(shooter);
+
+                return {
+                    ok: !!fireResult?.ok,
+                    hit: !!fireResult?.hit,
+                    hpDamage: hpBefore - Number(enemy.hp || 0),
+                    shieldDamage: shieldBefore - Number(enemy.shieldHP || 0),
+                    audio: game.audio.getRecentEvents(8).map((entry) => entry.type),
+                    particles: game.particles.getRecentEvents(8).map((entry) => entry.type),
+                };
+            };
+
+            const hullHit = runShot({ shielded: false });
+            const shieldHit = runShot({ shielded: true });
+
+            return {
+                error: null,
+                hullHit,
+                shieldHit,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.hullHit.ok).toBeTruthy();
+        expect(result.hullHit.hit).toBeTruthy();
+        expect(result.hullHit.hpDamage).toBeGreaterThan(0);
+        expect(result.hullHit.shieldDamage).toBe(0);
+        expect(result.hullHit.audio).toContain('MG_SHOOT');
+        expect(result.hullHit.audio).toContain('MG_HIT');
+        expect(result.hullHit.particles).toContain('mg-impact');
+
+        expect(result.shieldHit.ok).toBeTruthy();
+        expect(result.shieldHit.hit).toBeTruthy();
+        expect(result.shieldHit.hpDamage).toBe(0);
+        expect(result.shieldHit.shieldDamage).toBeGreaterThan(0);
+        expect(result.shieldHit.audio).toContain('MG_SHOOT');
+        expect(result.shieldHit.audio).toContain('SHIELD_HIT');
+        expect(result.shieldHit.particles).toContain('shield-impact');
+    });
+
+    test('T89: Hunt-Raketen liefern eigenes Start-/Impact-Feedback', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !shooter || !enemy) {
+                return { error: 'missing-state' };
+            }
+            if (
+                typeof game.audio?.clearDebugEvents !== 'function'
+                || typeof game.audio?.getRecentEvents !== 'function'
+                || typeof game.particles?.clearDebugEvents !== 'function'
+                || typeof game.particles?.getRecentEvents !== 'function'
+            ) {
+                return { error: 'missing-feedback-debug-hooks' };
+            }
+
+            entityManager._projectileSystem?.clear?.();
+            shooter.position.set(0, 50, 0);
+            shooter.setLookAtWorld?.(0, 50, -120);
+            shooter.shootCooldown = 0;
+            shooter.inventory = ['ROCKET_MEDIUM'];
+            shooter.selectedItemIndex = 0;
+
+            enemy.alive = true;
+            enemy.hp = Math.max(100, Number(enemy.maxHp) || 100);
+            enemy.maxHp = Math.max(100, Number(enemy.maxHp) || 100);
+            enemy.hasShield = false;
+            enemy.shieldHP = 0;
+            enemy.position.set(0, 50, -30);
+
+            game.audio.clearDebugEvents();
+            game.particles.clearDebugEvents();
+
+            const hpBefore = Number(enemy.hp || 0);
+            const shot = entityManager._shootItemProjectile(shooter, 0);
+            if (!shot?.ok) {
+                return { error: 'shot-failed', reason: shot?.reason || null };
+            }
+
+            for (let i = 0; i < 120; i++) {
+                entityManager._projectileSystem.update(1 / 60);
+                if (Number(enemy.hp || 0) < hpBefore || entityManager.projectiles.length === 0) {
+                    break;
+                }
+            }
+
+            return {
+                error: null,
+                hpDamage: hpBefore - Number(enemy.hp || 0),
+                audio: game.audio.getRecentEvents(10).map((entry) => entry.type),
+                particles: game.particles.getRecentEvents(10).map((entry) => entry.type),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.hpDamage).toBeGreaterThan(0);
+        expect(result.audio).toContain('ROCKET_SHOOT');
+        expect(result.audio).toContain('ROCKET_IMPACT');
+        expect(result.particles).toContain('rocket-impact');
     });
 
 });

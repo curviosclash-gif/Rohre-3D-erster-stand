@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loadGame, startGameWithBots, startHuntGameWithBots, returnToMenu } from './helpers.js';
 
-test.describe('Physics Policy (T65-T82)', () => {
+test.describe('Physics Policy (Tests 65-82)', () => {
 
     test('T65: Bot-Action-Contract sanitizt invalide Payloads robust', async ({ page }) => {
         await loadGame(page);
@@ -361,7 +361,7 @@ test.describe('Physics Policy (T65-T82)', () => {
         expect(result.actionYawRight).toBeTruthy();
     });
 
-    test('T73: BotPolicyRegistry registriert modulare Bridge-Policy-Typen', async ({ page }) => {
+    test('T73: BotPolicyRegistry registriert Legacy- und Match-Bot-Typen', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const { BotPolicyRegistry } = await import('/src/entities/ai/BotPolicyRegistry.js');
@@ -370,23 +370,41 @@ test.describe('Physics Policy (T65-T82)', () => {
             const registry = new BotPolicyRegistry();
             const classicBridge = registry.create(BOT_POLICY_TYPES.CLASSIC_BRIDGE);
             const huntBridge = registry.create(BOT_POLICY_TYPES.HUNT_BRIDGE);
+            const classic3d = registry.create(BOT_POLICY_TYPES.CLASSIC_3D);
+            const classic2d = registry.create(BOT_POLICY_TYPES.CLASSIC_2D);
+            const hunt3d = registry.create(BOT_POLICY_TYPES.HUNT_3D);
+            const hunt2d = registry.create(BOT_POLICY_TYPES.HUNT_2D);
 
             return {
                 classicType: classicBridge?.type,
                 huntType: huntBridge?.type,
+                classic3dType: classic3d?.type,
+                classic2dType: classic2d?.type,
+                hunt3dType: hunt3d?.type,
+                hunt2dType: hunt2d?.type,
                 classicUsesRuntimeContext: classicBridge?.usesRuntimeContext === true,
                 huntUsesRuntimeContext: huntBridge?.usesRuntimeContext === true,
+                matchUsesRuntimeContext: [classic3d, classic2d, hunt3d, hunt2d]
+                    .every((policy) => policy?.usesRuntimeContext === true),
                 classicHasUpdate: typeof classicBridge?.update === 'function',
                 huntHasUpdate: typeof huntBridge?.update === 'function',
+                matchHasUpdate: [classic3d, classic2d, hunt3d, hunt2d]
+                    .every((policy) => typeof policy?.update === 'function'),
             };
         });
 
         expect(result.classicType).toBe('classic-bridge');
         expect(result.huntType).toBe('hunt-bridge');
+        expect(result.classic3dType).toBe('classic-3d');
+        expect(result.classic2dType).toBe('classic-2d');
+        expect(result.hunt3dType).toBe('hunt-3d');
+        expect(result.hunt2dType).toBe('hunt-2d');
         expect(result.classicUsesRuntimeContext).toBeTruthy();
         expect(result.huntUsesRuntimeContext).toBeTruthy();
+        expect(result.matchUsesRuntimeContext).toBeTruthy();
         expect(result.classicHasUpdate).toBeTruthy();
         expect(result.huntHasUpdate).toBeTruthy();
+        expect(result.matchHasUpdate).toBeTruthy();
     });
 
     test('T74: BotPolicyRegistry faellt bei Fehlkonfiguration kontrolliert auf rule-based zurueck', async ({ page }) => {
@@ -403,11 +421,13 @@ test.describe('Physics Policy (T65-T82)', () => {
             const unknown = registry.create('unknown-policy-type');
             const broken = registry.create('broken-bridge');
             const disabledBridge = registry.create(BOT_POLICY_TYPES.CLASSIC_BRIDGE, { bridgeEnabled: false });
+            const disabledMatchBot = registry.create(BOT_POLICY_TYPES.HUNT_2D, { bridgeEnabled: false });
 
             return {
                 unknownType: unknown?.type,
                 brokenType: broken?.type,
                 disabledBridgeType: disabledBridge?.type,
+                disabledMatchBotType: disabledMatchBot?.type,
                 unknownHasUpdate: typeof unknown?.update === 'function',
                 brokenHasUpdate: typeof broken?.update === 'function',
             };
@@ -416,6 +436,7 @@ test.describe('Physics Policy (T65-T82)', () => {
         expect(result.unknownType).toBe('rule-based');
         expect(result.brokenType).toBe('rule-based');
         expect(result.disabledBridgeType).toBe('rule-based');
+        expect(result.disabledMatchBotType).toBe('rule-based');
         expect(result.unknownHasUpdate).toBeTruthy();
         expect(result.brokenHasUpdate).toBeTruthy();
     });
@@ -629,7 +650,7 @@ test.describe('Physics Policy (T65-T82)', () => {
         });
 
         expect(result.policyStrategy).toBe('auto');
-        expect(result.policyType).toBe('rule-based');
+        expect(result.policyType).toBe('classic-3d');
         expect(result.trainerBridgeEnabled).toBeFalsy();
         expect(result.trainerBridgeUrl.startsWith('ws://')).toBeTruthy();
         expect(result.trainerBridgeTimeoutMs).toBeGreaterThanOrEqual(20);
@@ -731,34 +752,52 @@ test.describe('Physics Policy (T65-T82)', () => {
         const result = await page.evaluate(async () => {
             const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
 
-            const classicAuto = createRuntimeConfigSnapshot({
+            const classic3dAuto = createRuntimeConfigSnapshot({
                 gameMode: 'CLASSIC',
+                gameplay: { planarMode: false },
                 botPolicyStrategy: 'auto',
             });
-            const huntAuto = createRuntimeConfigSnapshot({
+            const classic2dAuto = createRuntimeConfigSnapshot({
+                gameMode: 'CLASSIC',
+                gameplay: { planarMode: true },
+                botPolicyStrategy: 'auto',
+            });
+            const hunt3dAuto = createRuntimeConfigSnapshot({
                 gameMode: 'HUNT',
+                gameplay: { planarMode: false },
+                botPolicyStrategy: 'auto',
+            });
+            const hunt2dAuto = createRuntimeConfigSnapshot({
+                gameMode: 'HUNT',
+                gameplay: { planarMode: true },
                 botPolicyStrategy: 'auto',
             });
             const classicBridge = createRuntimeConfigSnapshot({
                 gameMode: 'CLASSIC',
+                gameplay: { planarMode: true },
                 botPolicyStrategy: 'bridge',
             });
             const huntBridge = createRuntimeConfigSnapshot({
                 gameMode: 'HUNT',
+                gameplay: { planarMode: true },
                 botPolicyStrategy: 'bridge',
             });
             const forcedRuleBased = createRuntimeConfigSnapshot({
                 gameMode: 'HUNT',
+                gameplay: { planarMode: true },
                 botPolicyStrategy: 'rule-based',
             });
             const invalidStrategy = createRuntimeConfigSnapshot({
                 gameMode: 'CLASSIC',
+                gameplay: { planarMode: true },
                 botPolicyStrategy: 'unknown',
             });
 
             return {
-                classicAuto: classicAuto?.bot?.policyType,
-                huntAuto: huntAuto?.bot?.policyType,
+                classic3dAuto: classic3dAuto?.bot?.policyType,
+                classic2dAuto: classic2dAuto?.bot?.policyType,
+                hunt3dAuto: hunt3dAuto?.bot?.policyType,
+                hunt2dAuto: hunt2dAuto?.bot?.policyType,
                 classicBridge: classicBridge?.bot?.policyType,
                 huntBridge: huntBridge?.bot?.policyType,
                 forcedRuleBased: forcedRuleBased?.bot?.policyType,
@@ -767,13 +806,15 @@ test.describe('Physics Policy (T65-T82)', () => {
             };
         });
 
-        expect(result.classicAuto).toBe('rule-based');
-        expect(result.huntAuto).toBe('hunt');
+        expect(result.classic3dAuto).toBe('classic-3d');
+        expect(result.classic2dAuto).toBe('classic-2d');
+        expect(result.hunt3dAuto).toBe('hunt-3d');
+        expect(result.hunt2dAuto).toBe('hunt-2d');
         expect(result.classicBridge).toBe('classic-bridge');
         expect(result.huntBridge).toBe('hunt-bridge');
         expect(result.forcedRuleBased).toBe('rule-based');
         expect(result.invalidStrategyName).toBe('auto');
-        expect(result.invalidStrategyPolicy).toBe('rule-based');
+        expect(result.invalidStrategyPolicy).toBe('classic-2d');
     });
 
     test('T82: Session-Wiring uebergibt aufgeloeste Bot-Policy an EntityManager', async ({ page }) => {
@@ -785,23 +826,31 @@ test.describe('Physics Policy (T65-T82)', () => {
             }
 
             game.settings.mode = '1p';
-            game.settings.numBots = 1;
+            game.settings.numBots = 2;
+            if (!game.settings.gameplay || typeof game.settings.gameplay !== 'object') {
+                game.settings.gameplay = {};
+            }
 
-            const runScenario = (gameMode, strategy) => {
+            const runScenario = (gameMode, planarMode, strategy = 'auto') => {
                 game.settings.gameMode = gameMode;
                 game.settings.botPolicyStrategy = strategy;
+                game.settings.gameplay.planarMode = !!planarMode;
                 game._onSettingsChanged();
                 game.startMatch();
 
                 const entityManager = game.entityManager;
-                const botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
-                const botPolicy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+                const botPlayers = entityManager?.players?.filter((player) => player?.isBot) || [];
+                const botPolicyTypes = botPlayers.map((player) => String(entityManager?.botByPlayer?.get(player)?.type || ''));
+                const uniqueBotPolicyTypes = Array.from(new Set(botPolicyTypes.filter((type) => !!type)));
                 const snapshot = {
                     mode: String(game.runtimeConfig?.session?.activeGameMode || ''),
+                    planarMode: !!game.runtimeConfig?.gameplay?.planarMode,
                     strategy: String(game.runtimeConfig?.bot?.policyStrategy || ''),
                     runtimePolicyType: String(game.runtimeConfig?.bot?.policyType || ''),
                     entityPolicyType: String(entityManager?.botPolicyType || ''),
-                    botPolicyType: String(botPolicy?.type || ''),
+                    botPolicyTypes,
+                    uniqueBotPolicyTypes,
+                    botCount: botPlayers.length,
                 };
                 game._returnToMenu();
                 return snapshot;
@@ -809,22 +858,30 @@ test.describe('Physics Policy (T65-T82)', () => {
 
             return {
                 error: null,
-                classicBridge: runScenario('CLASSIC', 'bridge'),
-                huntBridge: runScenario('HUNT', 'bridge'),
-                huntAuto: runScenario('HUNT', 'auto'),
+                classic3d: runScenario('CLASSIC', false),
+                classic2d: runScenario('CLASSIC', true),
+                hunt3d: runScenario('HUNT', false),
+                hunt2d: runScenario('HUNT', true),
             };
         });
 
         expect(result.error).toBeNull();
-        expect(result.classicBridge.runtimePolicyType).toBe('classic-bridge');
-        expect(result.classicBridge.entityPolicyType).toBe('classic-bridge');
-        expect(result.classicBridge.botPolicyType).toBe('classic-bridge');
-        expect(result.huntBridge.runtimePolicyType).toBe('hunt-bridge');
-        expect(result.huntBridge.entityPolicyType).toBe('hunt-bridge');
-        expect(result.huntBridge.botPolicyType).toBe('hunt-bridge');
-        expect(result.huntAuto.runtimePolicyType).toBe('hunt');
-        expect(result.huntAuto.entityPolicyType).toBe('hunt');
-        expect(result.huntAuto.botPolicyType).toBe('hunt');
+        expect(result.classic3d.runtimePolicyType).toBe('classic-3d');
+        expect(result.classic3d.entityPolicyType).toBe('classic-3d');
+        expect(result.classic3d.uniqueBotPolicyTypes).toEqual(['classic-3d']);
+        expect(result.classic3d.botCount).toBe(2);
+        expect(result.classic2d.runtimePolicyType).toBe('classic-2d');
+        expect(result.classic2d.entityPolicyType).toBe('classic-2d');
+        expect(result.classic2d.uniqueBotPolicyTypes).toEqual(['classic-2d']);
+        expect(result.classic2d.botCount).toBe(2);
+        expect(result.hunt3d.runtimePolicyType).toBe('hunt-3d');
+        expect(result.hunt3d.entityPolicyType).toBe('hunt-3d');
+        expect(result.hunt3d.uniqueBotPolicyTypes).toEqual(['hunt-3d']);
+        expect(result.hunt3d.botCount).toBe(2);
+        expect(result.hunt2d.runtimePolicyType).toBe('hunt-2d');
+        expect(result.hunt2d.entityPolicyType).toBe('hunt-2d');
+        expect(result.hunt2d.uniqueBotPolicyTypes).toEqual(['hunt-2d']);
+        expect(result.hunt2d.botCount).toBe(2);
     });
 
 });

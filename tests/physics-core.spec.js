@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loadGame, startGame, startGameWithBots } from './helpers.js';
 
-test.describe('Physics Core (T41-T60)', () => {
+test.describe('Physics Core (Tests 41-60)', () => {
 
     test('T41: Arena-Kollision erkennt Wand (außerhalb)', async ({ page }) => {
         await startGame(page);
