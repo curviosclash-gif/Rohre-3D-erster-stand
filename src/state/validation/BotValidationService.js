@@ -73,9 +73,9 @@ export class BotValidationService {
         const matrix = this.getValidationMatrix();
         return {
             steps: [
-                '1) GAME_INSTANCE.debugApi.applyBotValidationScenario(0) und 10 Runden spielen.',
+                '1) GAME_INSTANCE.debugApi.applyBotValidationScenario(0), Match starten und auf expectedPolicyType pruefen.',
                 '2) GAME_INSTANCE.debugApi.captureBotBaseline("BASELINE") ausfuehren.',
-                '3) Weitere Szenarien aus der Matrix durchspielen.',
+                '3) Weitere Szenarien aus der Matrix durchspielen und Runtime-Policy-Type je Szenario abgleichen.',
                 '4) GAME_INSTANCE.debugApi.printBotValidationReport("BASELINE") fuer KPI-Vergleich ausfuehren.',
             ],
             matrix,
@@ -90,9 +90,11 @@ export class BotValidationService {
         game.settings.mode = scenario.mode === '2p' ? '2p' : '1p';
         game.settings.numBots = scenario.bots;
         game.settings.mapKey = scenario.mapKey;
+        game.settings.gameMode = scenario.gameMode === 'HUNT' ? 'HUNT' : 'CLASSIC';
+        game.settings.botPolicyStrategy = String(scenario.botPolicyStrategy || 'auto');
         game.settings.gameplay.planarMode = !!scenario.planarMode;
         game.settings.gameplay.portalCount = scenario.portalCount;
-        game.settings.portalsEnabled = scenario.portalCount > 0 || game.settings.portalsEnabled;
+        game.settings.portalsEnabled = scenario.portalCount > 0;
         game.settings.winsNeeded = Math.max(1, game.settings.winsNeeded);
         if (typeof game._onSettingsChanged === 'function') {
             game._onSettingsChanged();

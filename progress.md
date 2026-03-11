@@ -528,3 +528,61 @@
   - `npm run build` PASS
   - `npm run docs:sync` PASS
   - `npm run docs:check` PASS
+
+2026-03-10 (Planung: Bot-Modus-Spezialbots V31)
+- Nutzeranforderung praezisiert:
+  - genau vier Bot-Arten
+  - `normal/classic + 3d` -> `classic-3d`
+  - `normal/classic + planar` -> `classic-2d`
+  - `fight/hunt + 3d` -> `hunt-3d`
+  - `fight/hunt + planar` -> `hunt-2d`
+  - pro Match genau eine Bot-Art, kein Mischbetrieb im selben Match
+- Analyse bestaetigt:
+  - aktueller Runtime-Pfad loest primar `classic` vs. `hunt` auf
+  - `planarMode` ist bereits im Runtime-/Observation-Kontext verfuegbar, aber noch nicht Teil der konkreten Match-Bot-Auswahl
+  - `EntitySetupOps` setzt bereits genau einen Bot-Typ pro Match, was fachlich so beibehalten werden soll
+- Revalidierung des echten Menueflusses:
+  - Ebene 2 zeigt im UI `Fight` und `Normal`
+  - `Fight` mappt technisch auf `gameMode=HUNT`
+  - `Normal` mappt technisch auf `gameMode=CLASSIC`
+  - Ebene 3 schaltet nur `planarMode` (`3d`/`planar`) und aendert die Ebene-2-Auswahl nicht
+  - bestaetigt durch `tests/core.spec.js` `T20v`
+- Neue Plan-/Prompt-Doku angelegt:
+  - `docs/Feature_Bot_Modus_Spezialbots_V31.md`
+  - `docs/NEXT_AGENT_PROMPT_Bot_Modus_Spezialbots_V31.md`
+  - `docs/Umsetzungsplan.md` um append-only Intake-Eintrag erweitert
+- Naechster Schritt:
+  - naechster Agent soll den V31-Plan implementieren und dabei Resolver, Registry, Session-Wiring und Tests fuer die vier Modus-Kombinationen sauber nachziehen
+
+2026-03-10 (Planung: Parallelbetrieb V31 + V32)
+- Nutzerwunsch: Bot-Modus-Auswahl und Trainingsumgebung sollen parallel planbar und umsetzbar sein.
+- Planung darauf angepasst:
+  - `V31` besitzt nur Match-Bot-Auswahl, Resolver, Registry, Session-Wiring und mode-bezogene Tests.
+  - `V32` besitzt nur additive Trainingsmodule, Trainingsstate, Trainingsskripte und getrennte Tests.
+- Ueberlappung aktiv vermieden:
+  - V31 fasst `src/entities/ai/training/**`, `src/state/training/**` und Training-Skripte nicht an.
+  - V32 fasst `src/core/RuntimeConfig.js`, `src/entities/ai/BotPolicyTypes.js`, `src/entities/ai/BotPolicyRegistry.js`, `src/entities/runtime/EntitySetupOps.js` und `src/state/MatchSessionFactory.js` nicht an.
+- Neue Plan-/Prompt-Doku angelegt:
+  - `docs/Feature_Bot_Trainingsumgebung_V32.md`
+  - `docs/NEXT_AGENT_PROMPT_Bot_Trainingsumgebung_V32.md`
+  - `docs/Feature_Bot_Modus_Spezialbots_V31.md` und `docs/NEXT_AGENT_PROMPT_Bot_Modus_Spezialbots_V31.md` auf Parallelbetrieb angepasst
+
+2026-03-11 (V31/V32 Abschluss, Tests leicht geaendert beruecksichtigt)
+- V31-Luecke 31.5 geschlossen:
+  - `src/state/validation/BotValidationMatrix.js` auf vier explizite Modus-Bot-Domaenen (`classic-3d`, `classic-2d`, `hunt-3d`, `hunt-2d`) mit `expectedPolicyType` erweitert.
+  - `src/state/validation/BotValidationService.js` setzt in `applyScenario()` jetzt auch `gameMode` und `botPolicyStrategy` deterministisch.
+- Testfilter auf geaenderte Testtitel gehaertet:
+  - V31-Verifikation nutzt jetzt exakte IDs: `npx playwright test tests/physics-policy.spec.js -g "T73:|T74:|T79:|T81:|T82:" --workers=1`.
+  - Hintergrund: breites `-g "T73|T74|T79|T81|T82"` matchte durch `Tests 65-82` ungewollt die ganze Datei.
+- Plan-/Statusdoku synchronisiert:
+  - `docs/Feature_Bot_Modus_Spezialbots_V31.md` auf abgeschlossenen Phasenstand gesetzt.
+  - `docs/Umsetzungsplan.md`: PX-Eintraege fuer `V31` und `V32` auf `[x]`, `N3` als geschlossen markiert.
+- Verifikation:
+  - `npx playwright test tests/physics-policy.spec.js -g "T73:|T74:|T79:|T81:|T82:" --workers=1` PASS.
+  - `npx playwright test tests/training-environment.spec.js --workers=1` PASS.
+  - `node scripts/training-smoke.mjs` PASS.
+  - `node scripts/training-eval-smoke.mjs` PASS.
+  - `npm run smoke:roundstate` PASS.
+  - `npx playwright test tests/core.spec.js -g "T10b:" --workers=1` PASS.
+  - `npx playwright test tests/core.spec.js -g "T20v:" --workers=1` PASS.
+  - `npx playwright test tests/core.spec.js -g "T20n:" --workers=1` FAIL (Timeout, bestehender Recording-Testbefund ausserhalb V31/V32-Scope).

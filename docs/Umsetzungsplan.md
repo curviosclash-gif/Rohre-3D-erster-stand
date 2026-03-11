@@ -1,6 +1,6 @@
-# Umsetzungsplan (Aktiver Master)
+﻿# Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-08
+Stand: 2026-03-11
 
 Dieser Masterplan ist die einzige aktive Planquelle fuer offene Arbeit.
 Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
@@ -26,13 +26,36 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 - Ein zweiter Agent haengt neue Planideen oder neue Referenzplaene nur in `Plan-Eingang (append-only)` an.
 - Die Rueckfuehrung aus dem Eingang in einen Hauptblock passiert spaeter in einem separaten Cleanup-Schritt.
 - Prioritaeten und Index werden bewusst seltener angepasst als die Detailbloecke, um Merge-Konflikte klein zu halten.
+- **Lock-Regeln**: Siehe `AGENTS.md` Abschnitt `Parallel Bots`. Jeder Block hat einen `<!-- LOCK -->` Header. Claim nur via atomarem Commit.
+- **Phasen-Schema**: Jede Phase muss mindestens 2 Unterphasen haben. Einzelschritte als Unterphasen modellieren.
+
+## Datei-Ownership (aktiv bei Parallelbetrieb)
+
+| Pfad-Pattern | Besitzer-Block | Aktueller Bot |
+|---|---|---|
+| `src/hunt/**` | V26 | frei |
+| `src/entities/ai/**` | V26 | frei |
+| `src/ui/menu/**` | V27 | frei |
+| `src/state/**` | V27 | frei |
+| `src/core/**` | V28 | frei |
+| `src/entities/systems/**` | V28 | frei |
+| `scripts/**` | shared | alle |
+| `tests/**` | shared | alle (append-only) |
+| `docs/**` | shared | alle (append-only) |
+| `editor/**` | shared | alle |
+
+## Conflict-Log (append-only)
+
+| Datum | Bot | Fremder Block | Datei | Grund | Risiko |
+|---|---|---|---|---|---|
+| - | - | - | - | (noch keine Eintraege) | - |
 
 ## Schnellindex Offener Arbeit
 
 - `V26 Gameplay & Features`: `V4`, `V5`, `V9`, `V11`, `V16`
 - `V27 Profile, Statistiken & UI`: `V7`, `V8`, `V15`
 - `V28 Architektur & Performance`: `V13`, Player-/Bot-God-Class-Refactoring
-- `Nachlauf / Technik`: `N1` Multiplayer-Runtime, `N2` Recording-UI, `N3` T82-Policy-Fix (geparkt), `T1` Testersatz, `T2` Bundle-Groesse
+- `Nachlauf / Technik`: `N1` Multiplayer-Runtime, `N2` Recording-UI, `T1` Testersatz, `T2` Bundle-Groesse
 
 ## Prioritaeten (stabil, nur bei Bedarf anpassen)
 
@@ -56,6 +79,8 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 ## Aktive Workstreams
 
 ### Block V26: Gameplay & Features
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: keine -->
 
 - Scope: `V4`, `V5`, `V9`, `V11`, `V16`
 - Hauptpfade: `src/hunt/**`, `src/entities/**`, `src/core/**`, `src/ui/**`
@@ -83,6 +108,8 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 - [ ] 26.8 Abschluss-Gate, Playtest und Doku-Freeze (`docs:sync`, `docs:check`)
 
 ### Block V27: Profile, Statistiken & UI
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: keine -->
 
 - Scope: `V7`, `V8`, `V15`
 - Hauptpfade: `src/ui/**`, `src/state/**`, `scripts/**`, `data/**`
@@ -109,6 +136,8 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 - [ ] 27.4 Abschluss-Gate, UI-Verifikation und Doku-Freeze (`docs:sync`, `docs:check`)
 
 ### Block V28: Architektur & Performance
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: keine -->
 
 - Scope: `V13`, Player-/Bot-God-Class-Refactoring
 - Hauptpfade: `src/entities/**`, `src/core/**`
@@ -160,10 +189,10 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
   - Zielpfade: `index.html`, `src/ui/KeybindEditorController.js`, `src/ui/menu/MenuControlBindings.js`, `src/core/MediaRecorderSystem.js`.
   - Status 2026-03-07: statischer Launcherpfad wieder kompatibel; Bare-Import `mp4-muxer` wird im Browserpfad ueber die Importmap aufgeloest und `server.ps1` liefert `.mjs` korrekt aus.
   - Status 2026-03-07: Cinematic-Kamera funktioniert wieder konsistent in `THIRD_PERSON`, auch wenn `cockpitCamera` aktiv ist (GPU-Regressionstest `T33b`).
-- [ ] N3 T82 Policy-Wiring isolieren und spaeter separat beheben (Punkt 5 geparkt)
-  - Ziel: Divergenz in `tests/physics-policy.spec.js` (`T82`: erwartet `hunt-bridge`, erhaelt `classic-bridge`) isolieren und minimal fixen.
-  - Status: bewusst separat vom Cinematic-Follow-up geparkt; nicht Teil von `docs/Feature_Cinematic_Camera_Followup_V29b.md`.
-  - Verifikation (bei Abarbeitung): `npm run test:physics -- -g "T81|T82"` plus `npm run docs:sync` und `npm run docs:check`.
+- [x] N3 T82 Policy-Wiring isolieren und spaeter separat beheben (Punkt 5 geparkt)
+  - Ziel: Divergenz in `tests/physics-policy.spec.js` (`T82`) isolieren und minimal fixen.
+  - Status 2026-03-11: ueber V31-Resolver/Registry/Session-Wiring geschlossen; `T81` und `T82` laufen mit vier Match-Bot-Typen stabil gruen.
+  - Verifikation: `npx playwright test tests/physics-policy.spec.js -g "T81:|T82:" --workers=1`.
 - [ ] T1 Dummy-Tests schrittweise durch echte Integritaetstests ersetzen
   - Ziel: bestehende Platzhaltertests entlang des geaenderten Codes ersetzen.
   - Status 2026-03-07: Playwright-Menuecheck erfolgreich (`npm run test:core` = 48 passed / 1 skipped, `npm run test:stress` = 19 passed).
@@ -237,6 +266,40 @@ Template:
   - Plan-Datei: `docs/Feature_TestPerformance_V2.md`
   - Datei-Scope: `tests/**`
   - Konfliktregel: Nur Test-Code wird umgebaut, Engine-Code bleibt unberuehrt. Parallelisierbar.
+- [x] PX Bot-Modus-Spezialbots V31
+  - Erstellt am: `2026-03-10`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Bot_Modus_Spezialbots_V31.md`
+  - Datei-Scope: `src/core/RuntimeConfig.js`, `src/entities/ai/**`, `src/entities/runtime/EntitySetupOps.js`, `src/state/MatchSessionFactory.js`, `src/state/validation/**`, `tests/physics-policy.spec.js`, `docs/**`
+  - Konfliktregel: Pro Match bleibt genau ein Bot-Typ aktiv; Resolver- und Registry-Aenderungen gebuendelt in diesem Plan halten
+  - Status 2026-03-11: umgesetzt und verifiziert (Resolver + Session-Wiring + Validation-Matrix fuer `classic-3d`, `classic-2d`, `hunt-3d`, `hunt-2d`).
+  - Verifikation: `npx playwright test tests/physics-policy.spec.js -g "T73:|T74:|T79:|T81:|T82:" --workers=1`.
+- [x] PX Bot-Trainingsumgebung V32
+  - Erstellt am: `2026-03-10`
+  - Agent: `B`
+  - Plan-Datei: `docs/Feature_Bot_Trainingsumgebung_V32.md`
+  - Datei-Scope: `src/entities/ai/training/**`, `src/state/training/**`, `scripts/**`, neue trainingsbezogene Tests, `docs/**`
+  - Konfliktregel: Keine Eingriffe in V31-Kerndateien (`RuntimeConfig`, `BotPolicyTypes`, `BotPolicyRegistry`, `EntitySetupOps`, `MatchSessionFactory`); additive Trainingslane
+  - Status 2026-03-11: Trainingsumgebung additiv abgeschlossen; Trainings-Smokes und `T90-T93` gruen.
+  - Verifikation: `npx playwright test tests/training-environment.spec.js --workers=1`, `node scripts/training-smoke.mjs`, `node scripts/training-eval-smoke.mjs`.
+- [ ] PX Bot-Training-Automatisierung V33 (Bot A)
+  - Erstellt am: `2026-03-11`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
+  - Datei-Scope: `src/entities/ai/training/**` (Automation-Core), `scripts/training-run.mjs`, optionale Orchestrierungsanteile fuer `training:e2e`, `tests/**`, `docs/**`
+  - Konfliktregel: Kein Eingriff in UI-Lane (`index.html`, `src/ui/menu/**`) und keine Gate-/Eval-Skripte von Bot B; Cross-Lane-Aenderungen im Conflict-Log dokumentieren
+- [ ] PX Bot-Training-Automatisierung V33 (Bot B)
+  - Erstellt am: `2026-03-11`
+  - Agent: `B`
+  - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
+  - Datei-Scope: Bridge-/Gate-Lane unter `src/entities/ai/training/**`, `src/state/training/**`, `scripts/training-eval.mjs`, `scripts/training-gate.mjs`, `package.json`, `tests/**`, `docs/**`
+  - Konfliktregel: Kein Eingriff in UI- und Dev-Panel-Dateien von Bot C; `package.json` nur in dieser Lane anfassen
+- [ ] PX Bot-Training-Automatisierung V33 (Bot C)
+  - Erstellt am: `2026-03-11`
+  - Agent: `C`
+  - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
+  - Datei-Scope: `index.html`, `src/core/GameBootstrap.js`, `src/ui/menu/**`, `src/core/runtime/MenuRuntimeDeveloperTrainingService.js`, `src/core/GameRuntimeFacade.js`, `src/core/GameDebugApi.js`, `tests/**`, `docs/**`
+  - Konfliktregel: Kein Eingriff in `scripts/training-eval.mjs`/`scripts/training-gate.mjs`/`package.json` (Bot B) und keine Core-Automationmodule von Bot A
 <!-- PLAN-INTAKE-END -->
 
 ## Archivierte Referenzen
@@ -252,3 +315,4 @@ Vor Task-Abschluss immer:
 
 - `npm run docs:sync`
 - `npm run docs:check`
+
