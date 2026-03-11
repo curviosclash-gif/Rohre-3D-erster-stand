@@ -33,6 +33,9 @@ import {
 } from './runtime/RuntimeSettingsChangeOrchestrator.js';
 import {
     handleDeveloperTrainingAutoStepAction,
+    handleDeveloperTrainingRunBatchAction,
+    handleDeveloperTrainingRunEvalAction,
+    handleDeveloperTrainingRunGateAction,
     handleDeveloperTrainingResetAction,
     handleDeveloperTrainingStepAction,
 } from './runtime/MenuRuntimeDeveloperTrainingService.js';
@@ -294,6 +297,15 @@ export class GameRuntimeFacade {
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_AUTO_STEP:
                 this.handleDeveloperTrainingAutoStep(event);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RUN_BATCH:
+                this.handleDeveloperTrainingRunBatch(event);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RUN_EVAL:
+                this.handleDeveloperTrainingRunEval(event);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RUN_GATE:
+                this.handleDeveloperTrainingRunGate(event);
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.START_KEY_CAPTURE:
                 game.keybindEditorController.startKeyCapture(event.player, event.action);
@@ -832,6 +844,27 @@ export class GameRuntimeFacade {
 
     handleDeveloperTrainingAutoStep(event) {
         handleDeveloperTrainingAutoStepAction({
+            game: this.game,
+            event,
+        });
+    }
+
+    handleDeveloperTrainingRunBatch(event) {
+        handleDeveloperTrainingRunBatchAction({
+            game: this.game,
+            event,
+        });
+    }
+
+    handleDeveloperTrainingRunEval(event) {
+        handleDeveloperTrainingRunEvalAction({
+            game: this.game,
+            event,
+        });
+    }
+
+    handleDeveloperTrainingRunGate(event) {
+        handleDeveloperTrainingRunGateAction({
             game: this.game,
             event,
         });

@@ -89,9 +89,22 @@ export function syncMenuDeveloperState({
         ui.developerTrainingDoneToggle,
         ui.developerTrainingTerminalReasonInput,
         ui.developerTrainingAutoStepsInput,
+        ui.developerTrainingBatchEpisodesInput,
+        ui.developerTrainingBatchSeedsInput,
+        ui.developerTrainingBatchModesInput,
+        ui.developerTrainingBridgeModeSelect,
+        ui.developerTrainingTimeoutMsInput,
+        ui.developerTrainingGateMinReturnInput,
+        ui.developerTrainingGateMinTerminalRateInput,
+        ui.developerTrainingGateMaxTruncationRateInput,
+        ui.developerTrainingGateMaxInvalidRateInput,
+        ui.developerTrainingGateMaxRuntimeErrorsInput,
         ui.developerTrainingResetButton,
         ui.developerTrainingStepButton,
         ui.developerTrainingAutoStepButton,
+        ui.developerTrainingRunBatchButton,
+        ui.developerTrainingRunEvalButton,
+        ui.developerTrainingRunGateButton,
     ];
     developerControls.forEach((control) => {
         if (!control) return;
