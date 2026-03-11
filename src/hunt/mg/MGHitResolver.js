@@ -233,14 +233,14 @@ export class MGHitResolver {
         if (this.runtime?.services?.particles && trailHit.point) {
             this._tmpHit.set(trailHit.point.x, trailHit.point.y, trailHit.point.z);
             const color = destroyed ? 0x66ddff : 0x3388ff;
-            this.runtime.services.particles.spawnHit(this._tmpHit, color);
+            this.runtime.services.particles.spawnTrailImpact(this._tmpHit, color, { destroyed });
         }
         if (this.runtime?.services?.audio && !attacker?.isBot) {
-            this.runtime.services.audio.play('HIT');
+            this.runtime.services.audio.play('MG_HIT', { intensity: destroyed ? 1 : 0.75 });
         }
     }
 
-    applyHit(attacker, target, distance, mg) {
+    applyHit(attacker, target, distance, mg, impactPoint = null) {
         const maxRange = Math.max(10, Number(mg.RANGE || 95));
         const minFalloff = clamp(Number(mg.MIN_FALLOFF || 0.5), 0.2, 1);
         const baseDamage = Math.max(1, Number(mg.DAMAGE || 9));
@@ -253,8 +253,8 @@ export class MGHitResolver {
             sourcePlayer: attacker,
             cause: 'MG_BULLET',
             damageResult,
+            impactPoint: impactPoint || target.position,
         });
-        this._emitTracerImpact(target);
         if (damageResult.isDead) {
             this.runtime?.lifecycle?.killPlayer?.(target, 'PROJECTILE', { killer: attacker });
             this._pushKillFeed(attacker, target, 'ELIMINATED');
@@ -262,15 +262,6 @@ export class MGHitResolver {
         }
 
         this._pushKillFeed(attacker, target, `-${Math.round(damage)} HP`);
-    }
-
-    _emitTracerImpact(target) {
-        if (this.runtime?.services?.particles) {
-            this.runtime.services.particles.spawnHit(target.position, 0xffaa33);
-        }
-        if (this.runtime?.services?.audio) {
-            this.runtime.services.audio.play('HIT');
-        }
     }
 
     _pushKillFeed(attacker, target, suffix) {

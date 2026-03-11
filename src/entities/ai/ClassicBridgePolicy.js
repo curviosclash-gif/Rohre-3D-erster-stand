@@ -2,7 +2,7 @@
 // ClassicBridgePolicy.js - classic bridge policy driven by observation vectors
 // ============================================
 
-import { BOT_POLICY_TYPES } from './BotPolicyTypes.js';
+import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
 import { ObservationBridgePolicy } from './ObservationBridgePolicy.js';
 import { RuleBasedBotPolicy } from './RuleBasedBotPolicy.js';
 import {
@@ -101,6 +101,7 @@ export function resolveClassicBridgeAction(runtimeContext) {
 
 export class ClassicBridgePolicy extends ObservationBridgePolicy {
     constructor(options = {}) {
+        const policyType = normalizeBotPolicyType(options.type || BOT_POLICY_TYPES.CLASSIC_BRIDGE);
         const fallbackPolicy = options.fallbackPolicy || new RuleBasedBotPolicy(options);
         const resolveAction = typeof options.resolveAction === 'function'
             ? options.resolveAction
@@ -108,11 +109,11 @@ export class ClassicBridgePolicy extends ObservationBridgePolicy {
 
         super({
             ...options,
-            type: BOT_POLICY_TYPES.CLASSIC_BRIDGE,
+            type: policyType,
             fallbackPolicy,
             resolveAction,
         });
 
-        this.type = BOT_POLICY_TYPES.CLASSIC_BRIDGE;
+        this.type = policyType;
     }
 }

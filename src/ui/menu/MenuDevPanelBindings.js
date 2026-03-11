@@ -1,3 +1,9 @@
+import {
+    buildDeveloperTrainingAutoStepPayload,
+    buildDeveloperTrainingResetPayload,
+    buildDeveloperTrainingStepPayload,
+} from './MenuDeveloperTrainingEventPayload.js';
+
 export function setupMenuDevPanelBindings(ctx) {
     const ui = ctx.ui;
     const emit = ctx.emit;
@@ -158,6 +164,24 @@ export function setupMenuDevPanelBindings(ctx) {
             emit(eventTypes.DEVELOPER_TEXT_OVERRIDE_CLEAR, {
                 textId: String(ui.developerTextIdSelect?.value || '').trim(),
             });
+        });
+    }
+
+    if (ui.developerTrainingResetButton) {
+        bind(ui.developerTrainingResetButton, 'click', () => {
+            emit(eventTypes.DEVELOPER_TRAINING_RESET, buildDeveloperTrainingResetPayload(ui));
+        });
+    }
+
+    if (ui.developerTrainingStepButton) {
+        bind(ui.developerTrainingStepButton, 'click', () => {
+            emit(eventTypes.DEVELOPER_TRAINING_STEP, buildDeveloperTrainingStepPayload(ui));
+        });
+    }
+
+    if (ui.developerTrainingAutoStepButton) {
+        bind(ui.developerTrainingAutoStepButton, 'click', () => {
+            emit(eventTypes.DEVELOPER_TRAINING_AUTO_STEP, buildDeveloperTrainingAutoStepPayload(ui));
         });
     }
 }

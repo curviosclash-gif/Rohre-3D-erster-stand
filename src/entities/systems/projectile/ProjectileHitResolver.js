@@ -63,7 +63,7 @@ export class ProjectileHitResolver {
                 const damage = resolveRocketTierDamage(projectile.type);
                 const damageResult = target.takeDamage(damage);
                 this.system?.onProjectilePowerup?.(target, projectile);
-                this.system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult);
+                this.system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult, projectile);
             } else if (target.hasShield) {
                 target.hasShield = false;
             } else {

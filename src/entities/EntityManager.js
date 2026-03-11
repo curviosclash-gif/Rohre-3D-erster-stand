@@ -8,6 +8,7 @@ import { DEFAULT_BOT_POLICY_TYPE } from './ai/BotPolicyTypes.js';
 import { createBotRuntimeContext } from './ai/BotRuntimeContextFactory.js';
 import { assembleEntityRuntime } from './runtime/EntityRuntimeAssembler.js';
 import { isHuntHealthActive } from '../hunt/HealthSystem.js';
+import { emitHuntDamageFeedback } from '../hunt/HuntDamageFeedback.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -216,6 +217,10 @@ export class EntityManager {
         if (isHuntHealthActive()) {
             this._huntScoring.registerDamage(event?.sourcePlayer, event?.target, event?.damageResult);
         }
+        emitHuntDamageFeedback(event, {
+            particles: this.particles,
+            audio: this.audio,
+        });
         this._eventBus.emitHuntDamageEvent(event || null);
     }
 

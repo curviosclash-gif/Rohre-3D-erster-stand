@@ -12,6 +12,7 @@ import { EntityEventBus } from './EntityEventBus.js';
 import { OverheatGunSystem } from '../../hunt/OverheatGunSystem.js';
 import { RespawnSystem } from '../../hunt/RespawnSystem.js';
 import { HuntScoring } from '../../hunt/HuntScoring.js';
+import { isRocketTierType } from '../../hunt/RocketPickupSystem.js';
 import { EntitySetupOps } from './EntitySetupOps.js';
 import { EntitySpawnOps } from './EntitySpawnOps.js';
 import { EntityTickPipeline } from './EntityTickPipeline.js';
@@ -31,30 +32,50 @@ export class EntityRuntimeAssembler {
             takeInventoryItem: (player, preferredIndex) => owner._takeInventoryItem(player, preferredIndex),
             resolveLockOn: (player) => owner._checkLockOn(player),
             getTrailSpatialIndex: () => owner._trailSpatialIndex,
-            onShoot: () => {
-                if (owner.audio) owner.audio.play('SHOOT');
+            onShoot: (player, type) => {
+                if (!owner.audio || player?.isBot) return;
+                owner.audio.play(isRocketTierType(type) ? 'ROCKET_SHOOT' : 'SHOOT');
             },
-            onProjectileHit: (position, color, projectileOwner) => {
+            onProjectileHit: (position, color, projectileOwner, projectile) => {
+                if (isRocketTierType(projectile?.type)) {
+                    if (owner.particles) owner.particles.spawnRocketImpact(position, projectile?.type, color);
+                    if (owner.audio && !projectileOwner?.isBot) owner.audio.play('ROCKET_IMPACT');
+                    return;
+                }
                 if (owner.particles) owner.particles.spawnHit(position, color);
                 if (owner.audio && !projectileOwner?.isBot) owner.audio.play('HIT');
             },
             onTrailSegmentHit: (position, projectileOwner, projectile, trailHit) => {
                 const isDestroyed = !!trailHit?.destroyed;
                 const color = isDestroyed ? 0x66ddff : 0x3388ff;
-                if (owner.particles) owner.particles.spawnHit(position, color);
-                if (owner.audio && !projectileOwner?.isBot) owner.audio.play('HIT');
+                if (owner.particles) {
+                    if (isRocketTierType(projectile?.type)) {
+                        owner.particles.spawnRocketImpact(position, projectile?.type, color);
+                    } else {
+                        owner.particles.spawnTrailImpact(position, color, { destroyed: isDestroyed });
+                    }
+                }
+                if (owner.audio && !projectileOwner?.isBot) {
+                    owner.audio.play(isRocketTierType(projectile?.type) ? 'ROCKET_IMPACT' : 'HIT');
+                }
             },
-            onProjectilePowerup: (target) => {
+            onProjectilePowerup: (target, projectile) => {
+                if (isRocketTierType(projectile?.type)) {
+                    if (owner.particles) owner.particles.spawnRocketImpact(target.position, projectile?.type);
+                    if (owner.audio && !projectile?.owner?.isBot) owner.audio.play('ROCKET_IMPACT');
+                    return;
+                }
                 if (owner.particles) owner.particles.spawnExplosion(target.position, 0xff0000);
                 if (owner.audio) owner.audio.play('POWERUP');
             },
-            onProjectileDamage: (target, projectileOwner, type, damageResult) => {
+            onProjectileDamage: (target, projectileOwner, type, damageResult, projectile) => {
                 owner._emitHuntDamageEvent({
                     target,
                     sourcePlayer: projectileOwner || null,
                     cause: type || 'PROJECTILE',
                     damageResult,
                     projectileType: type || null,
+                    impactPoint: projectile?.position || target?.position || null,
                 });
                 if (damageResult?.isDead) {
                     owner._killPlayer(target, 'PROJECTILE', { killer: projectileOwner || null });
@@ -90,6 +111,10 @@ export class EntityRuntimeAssembler {
                 if (typeof owner.onRoundEnd === 'function') owner.onRoundEnd(winner);
             },
         });
+        const runtimeEvents = {
+            emitHuntDamageEvent: (event) => owner._emitHuntDamageEvent(event || null),
+            emitHuntFeed: (message) => eventBus?.emitHuntFeed(message),
+        };
 
         const tmpVec = new THREE.Vector3();
         const tmpVec2 = new THREE.Vector3();
@@ -149,7 +174,7 @@ export class EntityRuntimeAssembler {
                     getTrailSpatialIndex: () => trailSpatialIndex,
                 },
             },
-            events: eventBus,
+            events: runtimeEvents,
         });
 
         const playerInputSystem = new PlayerInputSystem(owner);

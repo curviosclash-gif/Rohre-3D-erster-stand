@@ -2,6 +2,9 @@
 // WebSocketTrainerBridge.js - optional async trainer bridge with timeout/error tracking
 // ============================================
 
+import { TRAINING_CONTRACT_VERSION } from './TrainingContractV1.js';
+import { createTrainerTransportEnvelope } from './TrainerPayloadAdapter.js';
+
 function clamp(value, min, max) {
     const numeric = Number(value);
     if (!Number.isFinite(numeric)) return min;
@@ -25,6 +28,7 @@ export class WebSocketTrainerBridge {
         this._nextRequestId = 1;
         this._pendingRequest = null;
         this._latestAction = null;
+        this._latestResponse = null;
         this._latestFailure = null;
         this._boundOpenHandler = null;
         this._boundMessageHandler = null;
@@ -90,13 +94,20 @@ export class WebSocketTrainerBridge {
             return;
         }
 
+        const pending = this._pendingRequest;
+        const expectsAction = pending?.expectsAction !== false;
+        this._latestResponse = parsed;
         this._clearPending();
+        if (!expectsAction) {
+            return;
+        }
+
         const actionPayload = parsed?.action ?? parsed?.payload?.action ?? null;
         if (actionPayload && typeof actionPayload === 'object') {
             this._latestAction = actionPayload;
-        } else {
-            this._recordFailure('missing-action');
+            return;
         }
+        this._recordFailure('missing-action');
     }
 
     _ensureSocket() {
@@ -136,18 +147,19 @@ export class WebSocketTrainerBridge {
         );
     }
 
-    submitObservation(payload) {
+    _submitRequest(type, payload, options = {}) {
         if (!this.enabled) return;
         this._ensureSocket();
         this._handleTimeout();
         if (!this._canSendRequest()) return;
 
         const requestId = this._nextRequestId++;
-        const envelope = {
-            type: 'bot-action-request',
-            id: requestId,
+        const envelope = createTrainerTransportEnvelope(
+            type,
+            requestId,
             payload,
-        };
+            options.envelopeOptions || {}
+        );
 
         let serialized = '';
         try {
@@ -162,16 +174,50 @@ export class WebSocketTrainerBridge {
             this._pendingRequest = {
                 id: requestId,
                 sentAt: Date.now(),
+                expectsAction: options.expectsAction !== false,
             };
         } catch {
             this._recordFailure('send-failed');
         }
     }
 
+    submitObservation(payload) {
+        this._submitRequest('bot-action-request', payload, {
+            expectsAction: true,
+        });
+    }
+
+    submitTrainingPayload(messageType, payload) {
+        const type = typeof messageType === 'string' && messageType.trim()
+            ? messageType.trim()
+            : 'training-step';
+        this._submitRequest(type, payload, {
+            expectsAction: false,
+            envelopeOptions: {
+                contractVersion: TRAINING_CONTRACT_VERSION,
+                sentAtMs: Date.now(),
+            },
+        });
+    }
+
+    submitTrainingReset(payload) {
+        this.submitTrainingPayload('training-reset', payload);
+    }
+
+    submitTrainingStep(payload) {
+        this.submitTrainingPayload('training-step', payload);
+    }
+
     consumeLatestAction() {
         const action = this._latestAction;
         this._latestAction = null;
         return action;
+    }
+
+    consumeLatestResponse() {
+        const response = this._latestResponse;
+        this._latestResponse = null;
+        return response;
     }
 
     consumeFailure() {
@@ -193,5 +239,6 @@ export class WebSocketTrainerBridge {
         this._socket = null;
         this._clearPending();
         this._latestAction = null;
+        this._latestResponse = null;
     }
 }

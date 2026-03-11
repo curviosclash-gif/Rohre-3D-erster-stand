@@ -8,13 +8,20 @@ export class AudioManager {
         this.enabled = true;
         this.volume = 0.15;
         this.buffers = {};
+        this._debugEvents = [];
+        this._maxDebugEvents = 24;
 
         // Throttling Logic
         this.lastPlayTime = {}; // { 'EXPLOSION': 123456789 }
         this.cooldowns = {
             'SHOOT': 100,      // Max 10 shots per second
+            'MG_SHOOT': 50,
+            'ROCKET_SHOOT': 180,
             'EXPLOSION': 200,  // Max 5 explosions per second
             'HIT': 100,
+            'MG_HIT': 70,
+            'ROCKET_IMPACT': 160,
+            'SHIELD_HIT': 70,
             'POWERUP': 500,
             'BOOST': 200
         };
@@ -65,22 +72,61 @@ export class AudioManager {
         this.buffers.explosion = buffer;
     }
 
-    play(type) {
+    _clamp(value, min, max) {
+        return Math.min(Math.max(value, min), max);
+    }
+
+    _resolveTime() {
+        if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+            return performance.now();
+        }
+        return Date.now();
+    }
+
+    _recordDebugEvent(type, options = {}) {
+        this._debugEvents.push({
+            type,
+            intensity: Number.isFinite(Number(options.intensity)) ? Number(options.intensity) : null,
+            depleted: options.depleted === true,
+            at: this._resolveTime(),
+        });
+        if (this._debugEvents.length > this._maxDebugEvents) {
+            this._debugEvents.splice(0, this._debugEvents.length - this._maxDebugEvents);
+        }
+    }
+
+    getRecentEvents(limit = 10) {
+        const size = Math.max(0, Number(limit) || 0);
+        return size > 0 ? this._debugEvents.slice(-size) : [];
+    }
+
+    clearDebugEvents() {
+        this._debugEvents.length = 0;
+        this.lastPlayTime = {};
+    }
+
+    play(type, options = {}) {
         if (!this.enabled || !this.ctx) return;
         if (this.ctx.state === 'suspended') this.ctx.resume();
 
         // Check Cooldown
-        const now = performance.now();
+        const now = this._resolveTime();
         const last = this.lastPlayTime[type] || 0;
         const cooldown = this.cooldowns[type] || 50;
 
         if (now - last < cooldown) return;
         this.lastPlayTime[type] = now;
+        this._recordDebugEvent(type, options);
 
         switch (type) {
             case 'SHOOT': this._playShoot(); break;
+            case 'MG_SHOOT': this._playMgShoot(options); break;
+            case 'ROCKET_SHOOT': this._playRocketShoot(options); break;
             case 'EXPLOSION': this._playExplosion(); break;
             case 'HIT': this._playHit(); break;
+            case 'MG_HIT': this._playMgHit(options); break;
+            case 'ROCKET_IMPACT': this._playRocketImpact(options); break;
+            case 'SHIELD_HIT': this._playShieldHit(options); break;
             case 'POWERUP': this._playPowerup(); break;
             case 'BOOST': this._playBoost(); break;
         }
@@ -102,6 +148,44 @@ export class AudioManager {
 
         osc.start();
         osc.stop(this.ctx.currentTime + 0.1);
+    }
+
+    _playMgShoot(options = {}) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 0.75, 0.2, 1.2);
+
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(1450, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(260, this.ctx.currentTime + 0.06);
+
+        gain.gain.setValueAtTime(this.volume * 0.22 * intensity, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.06);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.06);
+    }
+
+    _playRocketShoot(options = {}) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 0.9, 0.25, 1.3);
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(72, this.ctx.currentTime + 0.22);
+
+        gain.gain.setValueAtTime(this.volume * 0.42 * intensity, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.22);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.22);
     }
 
     _playExplosion() {
@@ -142,6 +226,73 @@ export class AudioManager {
 
         osc.start();
         osc.stop(this.ctx.currentTime + 0.1);
+    }
+
+    _playMgHit(options = {}) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 0.8, 0.2, 1.4);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(920, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(280, this.ctx.currentTime + 0.08);
+
+        gain.gain.setValueAtTime(this.volume * 0.32 * intensity, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.08);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.08);
+    }
+
+    _playRocketImpact(options = {}) {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 1, 0.3, 1.6);
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(42, this.ctx.currentTime + 0.28);
+
+        gain.gain.setValueAtTime(this.volume * 0.52 * intensity, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.28);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.28);
+        this._playExplosion();
+    }
+
+    _playShieldHit(options = {}) {
+        const primary = this.ctx.createOscillator();
+        const secondary = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const intensity = this._clamp(Number(options.intensity) || 0.9, 0.2, 1.3);
+        const endFrequency = options.depleted ? 180 : 260;
+
+        primary.type = 'sine';
+        primary.frequency.setValueAtTime(760, this.ctx.currentTime);
+        primary.frequency.exponentialRampToValueAtTime(endFrequency, this.ctx.currentTime + 0.16);
+
+        secondary.type = 'triangle';
+        secondary.frequency.setValueAtTime(1180, this.ctx.currentTime);
+        secondary.frequency.exponentialRampToValueAtTime(Math.max(endFrequency * 1.8, 320), this.ctx.currentTime + 0.12);
+
+        gain.gain.setValueAtTime(this.volume * 0.26 * intensity, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.18);
+
+        primary.connect(gain);
+        secondary.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        primary.start();
+        secondary.start();
+        primary.stop(this.ctx.currentTime + 0.18);
+        secondary.stop(this.ctx.currentTime + 0.16);
     }
 
     _playPowerup() {
@@ -192,5 +343,6 @@ export class AudioManager {
         }
         this.ctx = null;
         this.buffers = {};
+        this._debugEvents = [];
     }
 }

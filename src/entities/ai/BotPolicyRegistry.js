@@ -12,7 +12,23 @@ import {
 import { RuleBasedBotPolicy } from './RuleBasedBotPolicy.js';
 import { HuntBotPolicy } from '../../hunt/HuntBotPolicy.js';
 import { ClassicBridgePolicy } from './ClassicBridgePolicy.js';
-import { ObservationBridgePolicy } from './ObservationBridgePolicy.js';
+import { HuntBridgePolicy } from './HuntBridgePolicy.js';
+
+function createClassicBridgeFactory(type) {
+    return (options = {}) => new ClassicBridgePolicy({
+        ...options,
+        type,
+        fallbackPolicy: options.fallbackPolicy || new RuleBasedBotPolicy(options),
+    });
+}
+
+function createHuntBridgeFactory(type) {
+    return (options = {}) => new HuntBridgePolicy({
+        ...options,
+        type,
+        fallbackPolicy: options.fallbackPolicy || new HuntBotPolicy(options),
+    });
+}
 
 export class BotPolicyRegistry {
     constructor() {
@@ -20,21 +36,12 @@ export class BotPolicyRegistry {
         this._creationLogCache = new Set();
         this.register(BOT_POLICY_TYPES.RULE_BASED, (options) => new RuleBasedBotPolicy(options));
         this.register(BOT_POLICY_TYPES.HUNT, (options) => new HuntBotPolicy(options));
-        this.register(
-            BOT_POLICY_TYPES.CLASSIC_BRIDGE,
-            (options) => new ClassicBridgePolicy({
-                ...options,
-                fallbackPolicy: new RuleBasedBotPolicy(options),
-            })
-        );
-        this.register(
-            BOT_POLICY_TYPES.HUNT_BRIDGE,
-            (options) => new ObservationBridgePolicy({
-                ...options,
-                type: BOT_POLICY_TYPES.HUNT_BRIDGE,
-                fallbackPolicy: new HuntBotPolicy(options),
-            })
-        );
+        this.register(BOT_POLICY_TYPES.CLASSIC_BRIDGE, createClassicBridgeFactory(BOT_POLICY_TYPES.CLASSIC_BRIDGE));
+        this.register(BOT_POLICY_TYPES.HUNT_BRIDGE, createHuntBridgeFactory(BOT_POLICY_TYPES.HUNT_BRIDGE));
+        this.register(BOT_POLICY_TYPES.CLASSIC_3D, createClassicBridgeFactory(BOT_POLICY_TYPES.CLASSIC_3D));
+        this.register(BOT_POLICY_TYPES.CLASSIC_2D, createClassicBridgeFactory(BOT_POLICY_TYPES.CLASSIC_2D));
+        this.register(BOT_POLICY_TYPES.HUNT_3D, createHuntBridgeFactory(BOT_POLICY_TYPES.HUNT_3D));
+        this.register(BOT_POLICY_TYPES.HUNT_2D, createHuntBridgeFactory(BOT_POLICY_TYPES.HUNT_2D));
     }
 
     register(type, factory) {

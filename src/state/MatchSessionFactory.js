@@ -141,11 +141,13 @@ function buildHumanConfigs(settings, runtimeConfig = null) {
 
 function buildEntityManagerSetupOptions(settings, runtimeConfig = null) {
     const runtimeBotConfig = runtimeConfig?.bot || null;
+    const setupPlanarMode = runtimeConfig?.gameplay?.planarMode ?? settings?.gameplay?.planarMode;
     return {
         modelScale: runtimeConfig?.player?.modelScale ?? settings?.gameplay?.planeScale,
         botDifficulty: runtimeConfig?.bot?.activeDifficulty || settings?.botDifficulty || 'NORMAL',
         botPolicyType: runtimeBotConfig?.policyType || null,
         activeGameMode: runtimeConfig?.session?.activeGameMode || settings?.gameMode || null,
+        planarMode: typeof setupPlanarMode === 'boolean' ? setupPlanarMode : undefined,
         runtimeConfig,
         humanConfigs: buildHumanConfigs(settings, runtimeConfig),
     };

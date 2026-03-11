@@ -16,3 +16,11 @@ p1_*.ps1
 patch_phase1.py
 *.bak
 *.latest_commit
+
+# Lokale Laufzeit-/Screenshot-Artefakte
+output/web-game-agent-a/
+tmp/dev-server.log
+tmp/develop-web-game-v27/
+data/training/*_latest.json
+data/maps/editor_qa-disk-map-*.editor.json
+data/maps/editor_qa-disk-map-*.runtime.json

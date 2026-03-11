@@ -120,13 +120,13 @@ export class OverheatGunSystem {
         }
         this._tracerFx.spawnTracer(this._tmpMuzzle, this._tmpTracerEnd, !!(hitResult.target || hitResult.trail), mg);
         if (hitResult.target) {
-            this._hitResolver.applyHit(player, hitResult.target, hitResult.distance, mg);
+            this._hitResolver.applyHit(player, hitResult.target, hitResult.distance, mg, hitResult.point);
         } else if (hitResult.trail) {
             this._hitResolver.applyTrailHit(player, hitResult.trail, mg);
         }
 
-        if (this.entityManager?.audio) {
-            this.entityManager.audio.play('SHOOT');
+        if (this.entityManager?.audio && !player?.isBot) {
+            this.entityManager.audio.play('MG_SHOOT');
         }
 
         return {

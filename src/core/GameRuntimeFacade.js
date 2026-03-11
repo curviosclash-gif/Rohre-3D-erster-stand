@@ -31,6 +31,11 @@ import {
 import {
     orchestrateRuntimeSettingsChanged,
 } from './runtime/RuntimeSettingsChangeOrchestrator.js';
+import {
+    handleDeveloperTrainingAutoStepAction,
+    handleDeveloperTrainingResetAction,
+    handleDeveloperTrainingStepAction,
+} from './runtime/MenuRuntimeDeveloperTrainingService.js';
 
 const MATCH_SETTING_CHANGE_KEY_SET = new Set([
     SETTINGS_CHANGE_KEYS.MODE,
@@ -280,6 +285,15 @@ export class GameRuntimeFacade {
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TEXT_OVERRIDE_CLEAR:
                 this.handleDeveloperTextOverrideClear(event);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RESET:
+                this.handleDeveloperTrainingReset(event);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_STEP:
+                this.handleDeveloperTrainingStep(event);
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_AUTO_STEP:
+                this.handleDeveloperTrainingAutoStep(event);
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.START_KEY_CAPTURE:
                 game.keybindEditorController.startKeyCapture(event.player, event.action);
@@ -800,6 +814,27 @@ export class GameRuntimeFacade {
             changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES],
         });
         game._showStatusToast('Text-Override geloescht.', 1200, 'success');
+    }
+
+    handleDeveloperTrainingReset(event) {
+        handleDeveloperTrainingResetAction({
+            game: this.game,
+            event,
+        });
+    }
+
+    handleDeveloperTrainingStep(event) {
+        handleDeveloperTrainingStepAction({
+            game: this.game,
+            event,
+        });
+    }
+
+    handleDeveloperTrainingAutoStep(event) {
+        handleDeveloperTrainingAutoStepAction({
+            game: this.game,
+            event,
+        });
     }
 
     _resolveStartValidationIssue() {

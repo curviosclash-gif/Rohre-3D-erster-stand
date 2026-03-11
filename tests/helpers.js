@@ -5,8 +5,26 @@ export async function loadGame(page) {
 }
 
 export async function selectSessionType(page, sessionType = 'single') {
-    const sessionButton = page.locator(`#menu-nav [data-session-type="${sessionType}"]`).first();
-    await sessionButton.click({ force: true });
+    const selector = `#menu-nav [data-session-type="${sessionType}"]`;
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+        const sessionButton = page.locator(selector).first();
+        await sessionButton.waitFor({ state: 'visible', timeout: 4000 });
+        await sessionButton.click({ force: true });
+
+        const panelVisible = await page.evaluate(() => {
+            const panel = document.getElementById('submenu-custom');
+            return !!(panel && !panel.classList.contains('hidden'));
+        });
+        if (panelVisible) return;
+
+        try {
+            await openViaNavigationRuntime(page, 'submenu-custom');
+            return;
+        } catch {
+            await page.waitForTimeout(150 * (attempt + 1));
+        }
+    }
+
     await page.waitForSelector('#submenu-custom:not(.hidden)', { timeout: 4000 });
 }
 

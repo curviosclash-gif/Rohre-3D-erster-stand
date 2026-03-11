@@ -10,7 +10,7 @@ import {
     TARGET_DISTANCE_RATIO,
     TARGET_IN_FRONT,
 } from './observation/ObservationSchemaV1.js';
-import { BOT_POLICY_TYPES } from './BotPolicyTypes.js';
+import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
 import { ObservationBridgePolicy } from './ObservationBridgePolicy.js';
 import {
     clamp,
@@ -136,6 +136,7 @@ function resolveHuntBridgeAction(runtimeContext, player) {
 
 export class HuntBridgePolicy extends ObservationBridgePolicy {
     constructor(options = {}) {
+        const policyType = normalizeBotPolicyType(options.type || BOT_POLICY_TYPES.HUNT_BRIDGE);
         const fallbackPolicy = options.fallbackPolicy || new HuntBotPolicy(options);
         const resolveAction = typeof options.resolveAction === 'function'
             ? options.resolveAction
@@ -143,11 +144,11 @@ export class HuntBridgePolicy extends ObservationBridgePolicy {
 
         super({
             ...options,
-            type: BOT_POLICY_TYPES.HUNT_BRIDGE,
+            type: policyType,
             fallbackPolicy,
             resolveAction,
         });
 
-        this.type = BOT_POLICY_TYPES.HUNT_BRIDGE;
+        this.type = policyType;
     }
 }

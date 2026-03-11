@@ -4,6 +4,7 @@
 
 import { createNeutralBotAction, sanitizeBotAction } from './actions/BotActionContract.js';
 import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
+import { buildTrainerRuntimeObservationPayload } from './training/TrainerPayloadAdapter.js';
 import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
 
 function isRuntimeContextPayload(value) {
@@ -113,21 +114,7 @@ export class ObservationBridgePolicy {
     }
 
     _buildTrainerPayload(runtimeContext, player) {
-        return {
-            mode: String(runtimeContext?.mode || ''),
-            dt: Number.isFinite(runtimeContext?.dt) ? runtimeContext.dt : 0,
-            observation: runtimeContext?.observation || null,
-            player: player
-                ? {
-                    index: Number.isInteger(player.index) ? player.index : -1,
-                    hp: Number(player.hp) || 0,
-                    maxHp: Number(player.maxHp) || 0,
-                    shieldHp: Number(player.shieldHP) || 0,
-                    maxShieldHp: Number(player.maxShieldHp) || 0,
-                    inventoryLength: Array.isArray(player.inventory) ? player.inventory.length : 0,
-                }
-                : null,
-        };
+        return buildTrainerRuntimeObservationPayload(runtimeContext, player);
     }
 
     _resolveTrainerBridgeAction(runtimeContext, player) {

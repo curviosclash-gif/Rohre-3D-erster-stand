@@ -1,6 +1,6 @@
 import { CONFIG } from './Config.js';
 import { GAME_MODE_TYPES, isHuntMode, resolveActiveGameMode } from '../hunt/HuntMode.js';
-import { BOT_POLICY_TYPES } from '../entities/ai/BotPolicyTypes.js';
+import { BOT_POLICY_TYPES, resolveMatchBotPolicyType } from '../entities/ai/BotPolicyTypes.js';
 import {
     clampSettingValue,
     createControlBindingsSnapshot,
@@ -41,7 +41,7 @@ export function normalizeBotPolicyStrategy(strategy, fallback = BOT_POLICY_STRAT
     return BOT_POLICY_STRATEGY_SET.has(candidate) ? candidate : normalizedFallback;
 }
 
-export function resolveBotPolicyType(strategy, activeGameMode, { huntFeatureEnabled = true } = {}) {
+export function resolveBotPolicyType(strategy, activeGameMode, { huntFeatureEnabled = true, planarMode = false } = {}) {
     const normalizedStrategy = normalizeBotPolicyStrategy(strategy, BOT_POLICY_STRATEGIES.AUTO);
     const huntModeActive = isHuntMode(activeGameMode, huntFeatureEnabled);
 
@@ -51,7 +51,10 @@ export function resolveBotPolicyType(strategy, activeGameMode, { huntFeatureEnab
     if (normalizedStrategy === BOT_POLICY_STRATEGIES.RULE_BASED) {
         return BOT_POLICY_TYPES.RULE_BASED;
     }
-    return huntModeActive ? BOT_POLICY_TYPES.HUNT : BOT_POLICY_TYPES.RULE_BASED;
+    return resolveMatchBotPolicyType({
+        huntModeActive,
+        planarMode: !!planarMode,
+    });
 }
 
 export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = {}) {
@@ -75,10 +78,14 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
     const botDefaults = baseConfig.BOT || CONFIG.BOT;
     const homingDefaults = baseConfig.HOMING || CONFIG.HOMING;
     const controlsDefaults = baseConfig.KEYS || CONFIG.KEYS;
+    const planarMode = !!gameplaySource.planarMode;
 
     const botDifficulty = resolveBotDifficulty(source.botDifficulty, botDefaults);
     const botPolicyStrategy = normalizeBotPolicyStrategy(source.botPolicyStrategy, BOT_POLICY_STRATEGIES.AUTO);
-    const botPolicyType = resolveBotPolicyType(botPolicyStrategy, activeGameMode, { huntFeatureEnabled });
+    const botPolicyType = resolveBotPolicyType(botPolicyStrategy, activeGameMode, {
+        huntFeatureEnabled,
+        planarMode,
+    });
 
     const runtimeConfig = {
         session: {
@@ -102,7 +109,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
             },
         },
         gameplay: {
-            planarMode: !!gameplaySource.planarMode,
+            planarMode,
             portalCount: clampSettingValue(gameplaySource.portalCount, SETTINGS_LIMITS.gameplay.portalCount, gameplayDefaults.PORTAL_COUNT || 0),
             planarLevelCount: clampSettingValue(gameplaySource.planarLevelCount, SETTINGS_LIMITS.gameplay.planarLevelCount, gameplayDefaults.PLANAR_LEVEL_COUNT || 5),
             portalBeams: false,

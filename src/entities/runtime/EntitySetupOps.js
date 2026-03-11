@@ -1,21 +1,25 @@
 import { CONFIG } from '../../core/Config.js';
 import { Player } from '../Player.js';
-import { BOT_POLICY_TYPES, DEFAULT_BOT_POLICY_TYPE, normalizeBotPolicyType } from '../ai/BotPolicyTypes.js';
+import { normalizeBotPolicyType, resolveMatchBotPolicyType } from '../ai/BotPolicyTypes.js';
 import { getVehicleIds, isValidVehicleId } from '../vehicle-registry.js';
 
 function normalizeActiveMode(mode) {
     return String(mode || '').trim().toLowerCase();
 }
 
-function resolvePolicyFallbackByMode(activeMode) {
-    return normalizeActiveMode(activeMode) === 'hunt'
-        ? BOT_POLICY_TYPES.HUNT
-        : DEFAULT_BOT_POLICY_TYPE;
+function resolvePolicyFallbackByMode(activeMode, planarMode = false) {
+    return resolveMatchBotPolicyType({
+        huntModeActive: normalizeActiveMode(activeMode) === 'hunt',
+        planarMode: !!planarMode,
+    });
 }
 
-function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, activeGameMode } = {}) {
+function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, activeGameMode, planarMode } = {}) {
     const runtimePolicyType = runtimeConfig?.bot?.policyType || null;
-    const fallbackPolicyType = resolvePolicyFallbackByMode(activeGameMode);
+    const effectivePlanarMode = typeof planarMode === 'boolean'
+        ? planarMode
+        : !!runtimeConfig?.gameplay?.planarMode;
+    const fallbackPolicyType = resolvePolicyFallbackByMode(activeGameMode, effectivePlanarMode);
     return normalizeBotPolicyType(requestedPolicyType || runtimePolicyType || fallbackPolicyType);
 }
 
@@ -43,12 +47,16 @@ export class EntitySetupOps {
             || owner.activeGameMode
             || 'classic';
         const activeModeLower = String(owner.activeGameMode || '').toLowerCase();
+        const setupPlanarMode = typeof options.planarMode === 'boolean'
+            ? options.planarMode
+            : owner.runtimeConfig?.gameplay?.planarMode;
         owner.huntEnabled = activeModeLower === 'hunt';
         owner.botDifficulty = options.botDifficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || owner.botDifficulty;
         owner.botPolicyType = resolveConfiguredBotPolicyType({
             requestedPolicyType: options.botPolicyType,
             runtimeConfig: owner.runtimeConfig,
             activeGameMode: owner.activeGameMode,
+            planarMode: setupPlanarMode,
         });
     }
 
@@ -129,4 +137,3 @@ export class EntitySetupOps {
         }
     }
 }
-

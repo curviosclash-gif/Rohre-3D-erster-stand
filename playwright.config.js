@@ -2,17 +2,18 @@
 import { defineConfig, devices } from '@playwright/test';
 
 const TEST_PORT = process.env.TEST_PORT || 5173;
+const isCI = !!process.env.CI;
 
 export default defineConfig({
     testDir: './tests',
     fullyParallel: true,
-    forbidOnly: !!process.env.CI,
-    retries: 1,
-    workers: process.env.CI ? 1 : 2,
-    reporter: 'html',
+    forbidOnly: isCI,
+    retries: isCI ? 1 : 0,
+    workers: isCI ? 1 : undefined,
+    reporter: [['list'], ['html', { open: 'never' }]],
     use: {
         baseURL: `http://localhost:${TEST_PORT}`,
-        trace: 'on-first-retry',
+        trace: 'retain-on-failure',
     },
     projects: [
         {
@@ -23,6 +24,6 @@ export default defineConfig({
     webServer: {
         command: `npx vite --port ${TEST_PORT}`,
         url: `http://localhost:${TEST_PORT}`,
-        reuseExistingServer: !process.env.CI,
+        reuseExistingServer: !isCI,
     },
 });

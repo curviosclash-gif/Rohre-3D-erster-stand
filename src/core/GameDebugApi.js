@@ -1,4 +1,5 @@
 import { BotValidationService } from '../state/validation/BotValidationService.js';
+import { DeveloperTrainingController } from './DeveloperTrainingController.js';
 
 export class GameDebugApi {
     constructor(game) {
@@ -6,6 +7,7 @@ export class GameDebugApi {
         this.validationService = new BotValidationService({
             getRecorder: () => this.game?.recorder || null,
         });
+        this.trainingController = new DeveloperTrainingController();
     }
 
     resolveRecorderFrameCaptureEnabledDefault() {
@@ -61,5 +63,21 @@ export class GameDebugApi {
         game._showStatusToast(`Szenario ${scenario.id} geladen`);
         console.log('[Validation] scenario loaded:', scenario);
         return scenario;
+    }
+
+    resetTrainingSession(input = {}) {
+        return this.trainingController.reset(input);
+    }
+
+    stepTrainingSession(input = {}) {
+        return this.trainingController.step(input);
+    }
+
+    runTrainingAutoSteps(input = {}) {
+        return this.trainingController.autoStep(input);
+    }
+
+    getTrainingSessionSnapshot() {
+        return this.trainingController.getSnapshot();
     }
 }

@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-03-09
+Stand: 2026-03-11
 
 ## 1. Architekturparadigma
 
@@ -27,6 +27,7 @@ Stand: 2026-03-09
 - `RoundStateOps.js`: Pure Round/Match-End-Ableitung
 - `RoundEndCoordinator.js`, `RoundRecorder.js` (Store-Fassade auf `recorder/RoundEventStore.js`, `RoundMetricsStore.js`, `RoundSnapshotStore.js`)
 - `validation/BotValidationService.js`, `validation/BotValidationMatrix.js`: entkoppelte Baseline-/Validation-Pfade fuer Debug-Workflows
+- `training/TrainingDomain.js`, `training/EpisodeController.js`, `training/RewardCalculator.js`: additive Trainings-Domaene, Episoden-Lifecycle und Reward-Shaping
 
 ### 2.3 Entities (`src/entities`)
 
@@ -41,6 +42,7 @@ Stand: 2026-03-09
 - `ai/RuleBasedBotPolicy.js`: Default-Policy-Adapter auf `Bot.js`
 - `hunt/HuntBotPolicy.js`: Hunt-spezifische Bot-Policy (MG/Rocket/HP-Verhalten)
 - `ai/BotSensingOps.js`, `ai/BotDecisionOps.js`, `ai/BotActionOps.js`: modulare KI-Ops
+- `ai/training/TrainingContractV1.js`, `DeterministicTrainingStepRunner.js`, `TrainerPayloadAdapter.js`, `TrainingTransportFacade.js`, `WebSocketTrainerBridge.js`: additive Trainings-/Transport-Schicht ohne Breaking Change am Bot-Bridge-V1-Vertrag
 - `Player.js`, `Bot.js`, `Trail.js`, `Powerup.js`, `Particles.js`
 - `vehicle-registry.js` + Fahrzeug-Mesh-Module
 - `MapSchema.js`, `CustomMapLoader.js`, `GeneratedLocalMaps.js`
@@ -101,9 +103,17 @@ Stand: 2026-03-09
 - V1 Nicht-Ziele:
   - keine History-Frames, keine Reward-/Telemetriefelder im Runtime-Vektor, keine verpflichtende Netzwerk-Bridge.
 
-## 7. Runtime-Policy-Auswahl (Stand 2026-03-03)
+## 7. Runtime-Policy-Auswahl (Stand 2026-03-10)
 
 - `SettingsManager` fuehrt `botPolicyStrategy` mit Default `auto`.
-- `RuntimeConfig` normalisiert Strategie (`rule-based|bridge|auto`) und loest deterministisch `bot.policyType` nach aktivem Modus auf.
+- `RuntimeConfig` normalisiert Strategie (`rule-based|bridge|auto`) und loest bei `auto` deterministisch `bot.policyType` aus `gameMode + planarMode`.
+- Match-Resolver (V31):
+  - `CLASSIC + 3d` -> `classic-3d`
+  - `CLASSIC + planar` -> `classic-2d`
+  - `HUNT + 3d` -> `hunt-3d`
+  - `HUNT + planar` -> `hunt-2d`
+- Legacy-Kompatibilitaet bleibt erhalten:
+  - `bridge` -> `classic-bridge|hunt-bridge`
+  - `rule-based` -> `rule-based`
 - `MatchSessionFactory` gibt `runtimeConfig` plus aufgeloesten `botPolicyType` an `EntityManager.setup(...)` weiter.
-- `EntityManager` nutzt einen klaren Resolver (`requested > runtime > mode-fallback`) statt Hunt-Health-Hack.
+- `EntityManager` nutzt einen klaren Resolver (`requested > runtime > mode+planar-fallback`) statt Hunt-Health-Hack.

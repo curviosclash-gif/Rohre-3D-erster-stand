@@ -47,8 +47,6 @@ export class PlayerCollisionPhase {
                 entityManager._bouncePlayerOnFoam(player, arenaCollision.normal || null);
                 bouncedOnFoam = true;
             } else {
-                if (entityManager.audio) entityManager.audio.play('HIT');
-                if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
                 if (huntModeActive) {
                     const wallDamage = resolveCollisionDamage('WALL');
                     const damageResult = player.takeDamage(wallDamage);
@@ -58,16 +56,21 @@ export class PlayerCollisionPhase {
                         cause: 'WALL',
                         hitNormal: arenaCollision.normal || null,
                         damageResult,
+                        impactPoint: player.position,
                     });
                     if (damageResult.isDead) {
                         entityManager._killPlayer(player, 'WALL');
                         return true;
                     }
                 } else if (player.hasShield) {
+                    if (entityManager.audio) entityManager.audio.play('HIT');
+                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
                     player.hasShield = false;
                     player.getDirection(entityManager._tmpDir).multiplyScalar(2.2);
                     player.position.sub(entityManager._tmpDir);
                 } else {
+                    if (entityManager.audio) entityManager.audio.play('HIT');
+                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
                     entityManager._killPlayer(player, 'WALL');
                     return true;
                 }
@@ -80,8 +83,6 @@ export class PlayerCollisionPhase {
             if (collision?.hit) {
                 const trailCause = collision.playerIndex === player.index ? 'TRAIL_SELF' : 'TRAIL_OTHER';
                 if (huntModeActive) {
-                    if (entityManager.audio) entityManager.audio.play('HIT');
-                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
                     const damageResult = player.takeDamage(resolveCollisionDamage('TRAIL'));
                     const sourcePlayer = collision.playerIndex >= 0 && collision.playerIndex !== player.index
                         ? entityManager.players[collision.playerIndex]
@@ -91,12 +92,15 @@ export class PlayerCollisionPhase {
                         sourcePlayer,
                         cause: trailCause,
                         damageResult,
+                        impactPoint: player.position,
                     });
                     if (damageResult.isDead) {
                         entityManager._killPlayer(player, trailCause, { killer: sourcePlayer || null });
                         return true;
                     }
                 } else if (player.hasShield) {
+                    if (entityManager.audio) entityManager.audio.play('HIT');
+                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
                     player.hasShield = false;
                 } else {
                     if (entityManager.audio) entityManager.audio.play('HIT');
