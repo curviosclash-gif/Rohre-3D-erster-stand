@@ -1,11 +1,12 @@
-﻿---
+---
 description: Implement a planned change from coding to verification and commit.
 ---
 
 ## 0. Context
 
+// turbo
 - Read `docs/Umsetzungsplan.md`.
-- Read latest context: `git log -n 3 --oneline`.
+- `git log -n 3 --oneline`.
 - If available, use `docs/Feature_*.md` for scope.
 
 ## 1. Scope
@@ -13,8 +14,7 @@ description: Implement a planned change from coding to verification and commit.
 - Define target files and expected behavior.
 - If scope is clear, proceed directly.
 - Ask only for critical missing constraints.
-- If unrelated worktree changes from another agent/user exist, do not absorb them into the current task.
-- After explicit user approval, continue with strictly scoped staging/commit for only the files owned by the current task.
+- If unrelated worktree changes exist, do not absorb them – commit only scoped files.
 
 ## 2. Implement
 
@@ -24,37 +24,23 @@ description: Implement a planned change from coding to verification and commit.
 
 ## 3. Self-check
 
+// turbo
 - `rg -n "(console\.log|TODO:|FIXME:|HACK:)" src tests`
 - No open TODOs in changed code.
-- Select tests via `.agents/test_mapping.md` based on changed paths. Focus only on meaningful tests for the specific change. Avoid running the entire test suite for minor steps.
-- If no mapping matches, run `npm run test:core` as default safety check.
+- Select tests via `.agents/test_mapping.md`. Focus on meaningful tests for the change, not the full suite.
+- Fallback: `npm run test:core`.
 
-## 4. Documentation freshness (mandatory)
+## 4. Doc-freshness + build gate
 
-- Run `npm run docs:sync`.
-- Resolve findings from `docs/Dokumentationsstatus.md`.
-- Run `npm run docs:check` (must pass).
+// turbo
+- `npm run docs:sync && npm run docs:check`
+- `npm run build`
 
-## 5. Definition of Done
+## 5. Commit (see AGENTS.md §Commit Convention)
 
-- `npm run build` succeeds.
-- Mapped tests (from `.agents/test_mapping.md`) pass.
-- `git diff --name-only` matches planned scope.
-- Documentation freshness check completed.
-- Add one-line risk rating: low/medium/high.
-
-## 6. Commit
-
-```bash
-git add [scoped-files]
-git commit -m "[type]: [name] - [short reason]"
-```
-
-- `type` must match workflow intent (`feat`, `fix`, `refactor`, `perf`, `chore`, `release`).
-- Before push, show impacted files (`git diff --name-only`) and confirm scope if unrelated changes exist.
-- Push only after scope confirmation.
-- In parallel-agent scenarios, never stage unrelated modified or untracked files just to get a clean worktree.
-- If foreign changes remain in the worktree, commit only the scoped files for the current task and mention the untouched paths in the report.
+- `git add [scoped-files]` → `git commit -m "[type]: [name] - [short reason]"`
+- Verify scope: `git diff --name-only`. Push only after confirmation.
+- In parallel-agent scenarios, never stage unrelated files.
 
 ## Report
 

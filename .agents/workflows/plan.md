@@ -1,54 +1,59 @@
-﻿---
+---
 description: Create a compact implementation plan for a new feature or extension.
 ---
 
 ## 0. Context
 
+// turbo
 - Read `docs/Umsetzungsplan.md`.
-- Read `git log -n 5 --oneline`.
+- `git log -n 5 --oneline`.
 - Scan impacted modules in `src/`, `tests/`, `editor/js/`.
 
 ## 1. Clarify (only if critical)
 
-- What should be built?
-- Why does it matter?
-- Which area/module is affected?
+- What, why, which module?
 
 ## 2. Architecture check
 
 - Existing modules/interfaces/events
 - Reuse vs new file decision
 - Risk rating (low/medium/high)
-- Documentation impact list (which docs need update after implementation)
+- Documentation impact list
+- Datei-Ownership prüfen: kollidiert der Scope mit einem gelockten Block?
 
 ## 3. Write plan
 
-Create `docs/Feature_[Name].md` with:
+Create `docs/Feature_[Name].md`:
+- Goal, affected files
+- **Phasen mit Pflicht-Unterphasen** (jede Phase mindestens 2 Unterphasen):
 
-- Goal
-- Affected files
-- Split into as many granular sub-phases as needed (e.g. 1.1, 1.2, 1.3) so the AI never gets confused by too many changes at once.
-- Checkboxes `[ ]` for each phase to track completion.
-- Verification steps (choose sensible intervals, do not enforce full test runs after every small sub-phase; focus tests on points where functional units are completed).
+```markdown
+- [ ] X.1 [Phasenname]
+  - [ ] X.1.1 [Unterphasen-Schritt 1]
+  - [ ] X.1.2 [Unterphasen-Schritt 2]
+- [ ] X.2 [Phasenname]
+  - [ ] X.2.1 ...
+  - [ ] X.2.2 ...
+- [ ] X.9 Abschluss-Gate
+  - [ ] X.9.1 Tests und Build verifizieren
+  - [ ] X.9.2 docs:sync, docs:check, Doku-Freeze
+```
+
+- Verification at functional-unit boundaries (not after every sub-phase)
+- Include freshness note: run `npm run docs:sync && npm run docs:check` at closure
 
 ## 4. Update master plan
 
-- Add the new Phase as a focused block in `docs/Umsetzungsplan.md`.
-- Include the sub-phases with checkboxes `[ ]` to mark which phase is done.
-- Keep phases small and single-purpose.
+- Add new block in `docs/Umsetzungsplan.md`:
+  - Lock-Header: `<!-- LOCK: frei -->`
+  - Optional: `<!-- DEPENDS-ON: ... -->`
+  - Scope, Hauptpfade, Konfliktregel
+  - Sub-phase checkboxes
+- Update `Datei-Ownership`-Tabelle with new paths
 
-## 5. Freshness hook
+## 5. Commit
 
-- Add a verification note to run `npm run docs:sync` and `npm run docs:check` during implementation closure.
-
-## 6. Commit
-
-- Commit the new feature plan and the updated master plan:
-
-  ```bash
-  git add docs/Umsetzungsplan.md docs/Feature_[Name].md
-  git commit -m "docs: add implementation plan for [Name]"
-  ```
+- `git add docs/Umsetzungsplan.md docs/Feature_[Name].md` → `docs: add implementation plan for [Name]`
 
 ## Report
 

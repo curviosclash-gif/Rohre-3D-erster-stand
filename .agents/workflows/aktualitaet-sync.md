@@ -1,49 +1,40 @@
-﻿---
+---
 description: Check and auto-update docs/workflows/rules to current repository reality.
 ---
 
 ## 0. Context
 
-- Read `docs/Umsetzungsplan.md`.
-- Read `docs/Analysebericht.md` if present.
-- Read latest `docs/Testergebnisse_*.md`.
-- Read `git log -n 5 --oneline`.
+// turbo
+- Read `docs/Umsetzungsplan.md`, `docs/Analysebericht.md`, latest `docs/Testergebnisse_*.md`.
+- `git log -n 5 --oneline`.
 
-## 1. Auto-sync (mandatory)
+## 1. Auto-sync
 
-- Run `npm run docs:sync`.
-- Open `docs/Dokumentationsstatus.md` and review findings.
+// turbo
+- `npm run docs:sync`. Review findings in `docs/Dokumentationsstatus.md`.
 
 ## 2. Resolve remaining drift
 
-- If `docs:sync` reports legacy-path findings, update affected active files.
-- If required files are missing, restore/create them.
+- Update affected files for legacy-path findings. Restore missing required files.
 - Re-run `npm run docs:sync` after each fix.
 
 ## 3. Validate
 
-- Run `npm run docs:check`.
-- Ensure the command exits PASS and no blocking issues remain.
+// turbo
+- `npm run docs:check` → must exit PASS.
 
-## 4. Commit Docs
+## 4. Commit
 
-- Commit all updated documentation files:
-
-  ```bash
-  git add docs/
-  git commit -m "docs: sync documentation status"
-  ```
+- `git add docs/` → `docs: sync documentation status`
 
 ## 5. Optional reality checks
 
-- If docs claim smoke stability, run:
-  - `npm run smoke:roundstate`
-  - `npm run smoke:selftrail`
+// turbo
+- `npm run smoke:roundstate` and `npm run smoke:selftrail` (if docs claim stability).
 
 ## Gate
 
-- `npm run docs:check` PASS.
-- `docs/Dokumentationsstatus.md` reflects the current date and status.
+- `npm run docs:check` PASS. `docs/Dokumentationsstatus.md` reflects current date.
 
 ## Report
 

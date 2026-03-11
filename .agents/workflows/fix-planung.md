@@ -1,53 +1,70 @@
-﻿---
-description: Execute the next open phase from master plan with tight scope control (supports single-agent no-stop blocks).
+---
+description: Execute the next open phase from master plan with dynamic N-bot parallel support.
 ---
 
 ## 0. Read status
 
+// turbo
+- `git pull --rebase`
 - Read `docs/Umsetzungsplan.md`.
-- Identify first phase marked `[ ]`.
-- Detect whether the phase belongs to a `Single-Agent Block` that is intended for no-stop execution.
-- Read `git log -n 5 --oneline`.
+- `git log -n 5 --oneline`.
 
-## 1. Scope next phase
+## 1. Claim phase (parallel-safe)
 
-- List open tasks in that phase.
-- List affected files.
-- Split phase if it touches unrelated systems.
+- Identify your Bot-ID from the kickoff command (e.g. `/fix-planung Bot-1`).
+- Find the first block with `<!-- LOCK: frei -->` whose `DEPENDS-ON` are all fulfilled (`[x]`).
+- If a `<!-- SUB-LOCK -->` is used, claim a specific top-level phase within a block instead.
+- **Atomarer Claim-Commit:**
 
-## 2. Create execution plan
+```bash
+git pull --rebase
+# Lock setzen im Umsetzungsplan
+git add docs/Umsetzungsplan.md
+git commit -m "chore: Bot-X claims Block VXX"
+git push
+# Bei Push-Fehler: git pull --rebase und retry
+```
+
+- If no free block exists → report `Kein freier Block` and stop.
+- Update `Datei-Ownership`-Tabelle im Umsetzungsplan für den claimed Block.
+
+## 2. Scope next phase
+
+- Identify first `[ ]` phase inside the claimed block.
+- List open sub-phases and affected files.
+- Check `Datei-Ownership`-Tabelle → keine Konflikte mit anderen Bots.
+- If phase has no sub-phases: split into at least 2 before starting.
+
+## 3. Create execution plan
 
 Create `implementation_plan.md`:
+- Bot-ID, target block/phase, 2-3 goals max
+- File-level changes, risk rating, verification commands
+- Ordered list of remaining phases in own block
 
-- 2-3 goals max
-- file-level changes
-- risk rating
-- verification commands
-- If no-stop block: include ordered list of all remaining phases in that block and continue criteria.
-
-## 3. Execute
+## 4. Execute
 
 - Run `/code` workflow with `fix:` commit prefix.
-- Keep this workflow focused on phase management only.
-- Use `/code` as the single source of truth for implementation DoD, verification checks, AND documentation freshness.
-- If no-stop block is active: continue directly to the next open phase in the same block after each successful phase close.
-- Stop only on hard blockers (failing gates, unclear contract conflicts, missing assets, or explicit user stop).
+- `/code` is the single source of truth for DoD, verification, and doc-freshness.
+- Continue to next open phase in own block after each close.
+- **Shared-File-Regel:** If a change touches a file owned by another block:
+  - Keep change minimal
+  - Add entry to `Conflict-Log` in Umsetzungsplan before committing
+- Stop only on hard blockers or explicit user stop.
 
-## 4. Close phase
+## 5. Close phase
 
-- Mark phase/task checkboxes done.
-- Add completion date.
+- Mark sub-phase and phase checkboxes done, add completion date.
 - Remove `implementation_plan.md`.
-- Commit the plan update:
+- Commit: `git add docs/Umsetzungsplan.md` → `chore: close phase [Name]`
+- Repeat 2–5 until own block has no `[ ]` phases left.
 
-  ```bash
-  git add docs/Umsetzungsplan.md implementation_plan.md
-  git commit -m "chore: close phase [Name] in master plan"
-  ```
+## 6. Release block
 
-- If no-stop block: repeat Step 1-4 until the block has no `[ ]` phases left.
+- Remove `<!-- LOCK: Bot-X ... -->`, set back to `<!-- LOCK: frei -->`.
+- Clear own rows from `Datei-Ownership`-Tabelle.
+- Commit: `chore: Bot-X releases Block VXX`
 
 ## Report
 
-Standardformat verwenden.
-Set `Next Step` to `/fix-planung`.
+Standardformat verwenden. Set `Next Step` to `/fix-planung`.

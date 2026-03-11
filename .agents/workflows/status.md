@@ -1,11 +1,11 @@
-﻿---
+---
 description: Quick project status snapshot.
 ---
+// turbo-all
 
 ## 1. Plan status
 
-- Read `docs/Umsetzungsplan.md`.
-- Identify next open phase.
+- Read `docs/Umsetzungsplan.md`. Identify next open phase.
 
 ## 2. Git state
 
@@ -15,10 +15,8 @@ description: Quick project status snapshot.
 
 ## 3. Output
 
-- Next phase
-- Uncommitted changes
-- Active branches
-- If documentation drift is suspected, run `npm run docs:sync` and then `npm run docs:check`.
+- Next phase, uncommitted changes, active branches.
+- If documentation drift suspected: `npm run docs:sync && npm run docs:check`.
 
 ## Report
 

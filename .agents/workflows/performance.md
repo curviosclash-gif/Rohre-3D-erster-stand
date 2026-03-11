@@ -1,40 +1,34 @@
-﻿---
+---
 description: Measure baseline, optimize bottlenecks, and verify impact.
 ---
 
-## 0. Context (optional – skip if target is already clear)
+## 0. Context (skip if target is clear)
 
-- Read `docs/Umsetzungsplan.md` and recent commits.
-- Confirm slow scenario (FPS/load/latency).
+// turbo
+- Read `docs/Umsetzungsplan.md` and recent commits. Confirm slow scenario.
 
 ## 1. Baseline
 
-- Run relevant tests/benchmarks.
-- Capture metrics: FPS, frame time, draw calls, memory.
+// turbo
+- Run relevant tests/benchmarks. Capture: FPS, frame time, draw calls, memory.
 
 ## 2. Bottlenecks
 
-- Identify top 3 issues (CPU/GPU/alloc/GC).
-- Estimate impact per issue.
+- Identify top 3 issues (CPU/GPU/alloc/GC). Estimate impact per issue.
 
 ## 3. Optimize
 
-- Implement smallest high-impact change first.
-- Keep logic behavior unchanged unless requested.
+- Implement smallest high-impact change first. Keep logic behavior unchanged unless requested.
 
 ## 4. Verify
 
-- Re-run baseline scenario.
-- Report before/after deltas.
+// turbo
+- Re-run baseline scenario. Report before/after deltas.
 
-## 5. Commit
+## 5. Commit (see AGENTS.md §Commit Convention)
 
-```bash
-git add [scoped-files]
-git commit -m "perf: [short reason]"
-```
-
-- Verify scope first: `git diff --name-only`.
+- `git add [scoped-files]` → `perf: [short reason]`
+- Verify scope: `git diff --name-only`.
 
 ## Report
 

@@ -1,35 +1,30 @@
-﻿---
+---
 description: Run full test analysis, persist results, and update prioritized action plan.
 ---
 
-## 0. Context (optional – skip for focused re-runs)
+## 0. Context (skip for focused re-runs)
 
-- Read `docs/Umsetzungsplan.md`.
-- Read latest `docs/Analysebericht.md` if present.
+// turbo
+- Read `docs/Umsetzungsplan.md` and latest `docs/Analysebericht.md`.
 
-## 1. Test mapping (source of truth)
+## 1. Execute and persist
 
 - Use `.agents/test_mapping.md` to select commands based on changed paths.
+- Always run core tests; specialized tests (GPU, physics, stress) only if relevant or at milestones.
 - Extra smoke: `npm run smoke:roundstate`, `npm run smoke:selftrail`.
+- Save to `docs/Testergebnisse_YYYY-MM-DD.md` with per-test `PASS`/`FAIL`/`WARN`.
 
-## 2. Execute and persist
-
-- Run mapped commands sensibly. Always run core tests, but run specialized tests (GPU, physics, stress) only if relevant to recent changes or during a major milestone.
-- Save raw outcome to `docs/Testergebnisse_YYYY-MM-DD.md`.
-- Use per-test status: `PASS` / `FAIL` / `WARN`.
-
-## 3. Analyze deltas only
+## 2. Analyze deltas
 
 - Compare against previous `docs/Analysebericht.md`.
 - Document only: new issues, regressions, resolved items.
 
-## 4. Update master plan
+## 3. Update master plan
 
 - Sync findings into `docs/Umsetzungsplan.md`.
-- Keep completed items for history.
-- Ensure phase headers use checkbox format: `## Phase X: [ ] Title`.
+- Keep completed items for history. Use checkbox format: `## Phase X: [ ] Title`.
 
-## 5. Final consistency check
+## 4. Final consistency
 
 - No uncovered findings between test report, analysis, and plan.
 - Keep `/fix-planung` compatibility.

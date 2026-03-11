@@ -1,4 +1,4 @@
-﻿---
+---
 description: Diagnose a reported issue and apply a targeted fix.
 ---
 
@@ -9,30 +9,25 @@ description: Diagnose a reported issue and apply a targeted fix.
 
 ## 1. Analyze evidence
 
-- Check latest logs and error traces.
-- Correlate timestamps with user scenario.
+// turbo
+- Check latest logs and error traces. Correlate timestamps.
 - Extract likely failure path.
 
 ## 2. Find root cause
 
-- Locate error pattern in code (`rg`).
+- Locate error pattern: `rg [pattern] src tests`.
 - Validate cause with minimal reproduction.
 - Note impacted files and side effects.
 
 ## 3. Fix
 
 - Apply smallest safe change for root cause.
-- Keep scope limited to affected files.
-- Re-run relevant checks (`build` + focused tests via `.agents/test_mapping.md`).
+- Re-run relevant checks: `npm run build` + focused tests via `.agents/test_mapping.md`.
 
-## 4. Commit
+## 4. Commit (see AGENTS.md §Commit Convention)
 
-```bash
-git add [scoped-files]
-git commit -m "fix: [short reason]"
-```
-
-- Verify scope first: `git diff --name-only`.
+- `git add [scoped-files]` → `fix: [short reason]`
+- Verify scope: `git diff --name-only`.
 
 ## Report
 

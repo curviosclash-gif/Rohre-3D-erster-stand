@@ -1,35 +1,29 @@
-﻿---
+---
 description: Restructure code without changing behavior.
 ---
 
 ## 0. Scope
 
-- Identify module and refactor objective.
-- Confirm no behavior change target.
+- Identify module and refactor objective. Confirm no behavior change.
 
 ## 1. Baseline
 
+// turbo
 - Run baseline tests and store result.
 
 ## 2. Refactor
 
-- Reduce duplication and long functions.
-- Clarify module boundaries and naming.
+- Reduce duplication and long functions. Clarify module boundaries and naming.
 
 ## 3. Verify
 
-- Re-run baseline tests.
-- Compare with baseline; investigate regressions immediately.
+// turbo
+- Re-run baseline tests. Compare; investigate regressions immediately.
 
-## 4. Commit
+## 4. Commit (see AGENTS.md §Commit Convention)
 
-```bash
-git add [scoped-files]
-git commit -m "refactor: [scope] - [reason]"
-```
-
-- Verify scope first: `git diff --name-only`.
-- Push only after confirming no unrelated files are included.
+- `git add [scoped-files]` → `refactor: [scope] - [reason]`
+- Verify scope: `git diff --name-only`.
 
 ## Report
 

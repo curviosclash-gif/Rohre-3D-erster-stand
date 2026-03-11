@@ -48,3 +48,54 @@ This file defines repository-specific operating rules for Codex.
 
 - Do not generate full walkthrough artifacts unless requested.
 - For UI changes, provide lightweight visual verification evidence when available.
+
+## Commit Convention
+
+All workflows follow this pattern unless stated otherwise:
+
+1. Stage only scoped files: `git add [scoped-files]`
+2. Verify scope: `git diff --name-only`
+3. Commit: `git commit -m "[type]: [short reason]"` — type matches workflow intent (`feat`, `fix`, `refactor`, `perf`, `chore`, `release`, `docs`)
+4. Push only after scope confirmation. In parallel-agent scenarios, never stage unrelated files.
+5. For immediate small corrections in the same task, use `git commit --amend`.
+
+## Turbo Default
+
+- Read-only commands (`git log`, `git status`, `rg`, `npm run docs:check`) are safe to auto-run (`// turbo`).
+- Workflows marked `// turbo-all` auto-run every `run_command` step.
+
+## Parallel Bots
+
+Multiple bots can work on different blocks in `docs/Umsetzungsplan.md` simultaneously.
+
+### Lock-Protokoll
+
+- Each block has a `<!-- LOCK: frei -->` or `<!-- LOCK: Bot-X seit YYYY-MM-DD -->` header.
+- A bot **claims** a free block via atomic commit: `git pull --rebase` → set lock → `git push`. On push failure: retry.
+- A bot **releases** a block after completing all phases: set lock back to `frei`.
+- **Stale-Lock**: If lock is >24h old without commits in that block, another bot may take over after user confirmation.
+- **Sub-Locks**: Optionally, 2 bots can work on the same block if they claim different top-level phases via `<!-- SUB-LOCK: Bot-X -->`.
+
+### Datei-Ownership
+
+- `docs/Umsetzungsplan.md` contains a `Datei-Ownership` table mapping path patterns to blocks/bots.
+- A bot must not modify files owned by another bot's block unless absolutely necessary.
+- `tests/**` and `docs/**` are shared (append-only or own sections).
+
+### Conflict-Log
+
+- Any cross-block file change **must** be logged in the `Conflict-Log` section of `docs/Umsetzungsplan.md` before committing.
+- Format: date, bot, foreign block, file, reason, risk rating.
+
+### Dependencies
+
+- Blocks can declare `<!-- DEPENDS-ON: VXX.Y -->`. A bot must verify dependencies are fulfilled (`[x]`) before claiming.
+
+## Phasen-Schema
+
+All plans in `docs/Umsetzungsplan.md` must follow this structure:
+
+- Every block contains top-level phases (e.g. `26.1`, `26.2`).
+- Every phase must have at least 2 sub-phases (e.g. `26.1.1`, `26.1.2`).
+- Every block ends with an Abschluss-Gate phase.
+- Single-step items are modeled as sub-phases, never as standalone phases.
