@@ -1,5 +1,8 @@
 import {
     buildDeveloperTrainingAutoStepPayload,
+    buildDeveloperTrainingRunBatchPayload,
+    buildDeveloperTrainingRunEvalPayload,
+    buildDeveloperTrainingRunGatePayload,
     buildDeveloperTrainingResetPayload,
     buildDeveloperTrainingStepPayload,
 } from './MenuDeveloperTrainingEventPayload.js';
@@ -182,6 +185,24 @@ export function setupMenuDevPanelBindings(ctx) {
     if (ui.developerTrainingAutoStepButton) {
         bind(ui.developerTrainingAutoStepButton, 'click', () => {
             emit(eventTypes.DEVELOPER_TRAINING_AUTO_STEP, buildDeveloperTrainingAutoStepPayload(ui));
+        });
+    }
+
+    if (ui.developerTrainingRunBatchButton) {
+        bind(ui.developerTrainingRunBatchButton, 'click', () => {
+            emit(eventTypes.DEVELOPER_TRAINING_RUN_BATCH, buildDeveloperTrainingRunBatchPayload(ui));
+        });
+    }
+
+    if (ui.developerTrainingRunEvalButton) {
+        bind(ui.developerTrainingRunEvalButton, 'click', () => {
+            emit(eventTypes.DEVELOPER_TRAINING_RUN_EVAL, buildDeveloperTrainingRunEvalPayload(ui));
+        });
+    }
+
+    if (ui.developerTrainingRunGateButton) {
+        bind(ui.developerTrainingRunGateButton, 'click', () => {
+            emit(eventTypes.DEVELOPER_TRAINING_RUN_GATE, buildDeveloperTrainingRunGatePayload(ui));
         });
     }
 }
