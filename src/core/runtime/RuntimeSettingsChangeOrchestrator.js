@@ -31,6 +31,7 @@ export function orchestrateRuntimeSettingsChanged({
     const changedKeys = mergedChangedKeys.length > 0 ? mergedChangedKeys : null;
 
     markSettingsDirty?.(true);
+    game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
     if (game.uiManager) {
         if (Array.isArray(changedKeys) && changedKeys.length > 0 && typeof game.uiManager.syncByChangeKeys === 'function') {
             game.uiManager.syncByChangeKeys(changedKeys);

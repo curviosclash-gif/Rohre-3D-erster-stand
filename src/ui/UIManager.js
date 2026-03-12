@@ -11,6 +11,7 @@ import { createMenuSchema } from './menu/MenuSchema.js';
 import { MenuPanelRegistry } from './menu/MenuPanelRegistry.js';
 import {
     evaluateMenuAccessPolicy,
+    resolveDebugAccessPolicy,
     resolveDeveloperAccessPolicy,
     resolveMenuAccessContext,
 } from './menu/MenuAccessPolicy.js';
@@ -36,6 +37,7 @@ import {
 } from './start-setup/StartSetupUiOps.js';
 import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
+import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality, resolveShadowQualityLabel } from '../core/renderer/ShadowQuality.js';
 
 export class UIManager {
     constructor(game) {
@@ -59,6 +61,7 @@ export class UIManager {
             ? game.menuStateMachine
             : new MenuStateMachine({ initialState: MENU_STATE_IDS.MAIN });
         this.menuNavigationRuntime = null;
+        this.menuExpertLoginRuntime = game.menuExpertLoginRuntime || null;
         this._mapPreviewEntries = listMapPreviewEntries();
         this._vehiclePreviewEntries = listVehiclePreviewEntries();
         this._startSetupDisposers = [];
@@ -88,6 +91,11 @@ export class UIManager {
         this._setupMapSelect();
         this._setupStartSetupControls();
         this._setupMenuNavigation();
+        this._setupExpertLoginBindings();
+        if (this.menuExpertLoginRuntime) {
+            this.menuExpertLoginRuntime.onStateChanged = () => this._handleExpertStateChanged();
+            this.menuExpertLoginRuntime.bindUi(this.ui);
+        }
         this.syncAll();
         this.updateContext();
     }
@@ -197,6 +205,53 @@ export class UIManager {
         this._level4SectionControlsSetup = true;
     }
 
+    _setupExpertLoginBindings() {
+        if (!this.menuExpertLoginRuntime) return;
+        if (this.ui.expertPasswordInput) {
+            this._listen(this.ui.expertPasswordInput, 'input', () => {
+                this.menuExpertLoginRuntime.clearError();
+            });
+            this._listen(this.ui.expertPasswordInput, 'keydown', (event) => {
+                if (event.key !== 'Enter') return;
+                event.preventDefault();
+                this._attemptExpertUnlock();
+            });
+        }
+        if (this.ui.expertUnlockButton) {
+            this._listen(this.ui.expertUnlockButton, 'click', () => this._attemptExpertUnlock());
+        }
+        if (this.ui.expertLockButton) {
+            this._listen(this.ui.expertLockButton, 'click', () => this.menuExpertLoginRuntime.lock());
+        }
+        if (this.ui.expertQuickLockButton) {
+            this._listen(this.ui.expertQuickLockButton, 'click', () => this.menuExpertLoginRuntime.lock());
+        }
+        if (this.ui.expertCancelButton) {
+            this._listen(this.ui.expertCancelButton, 'click', () => this.showMainNav());
+        }
+    }
+
+    _attemptExpertUnlock() {
+        if (!this.menuExpertLoginRuntime) return;
+        const password = String(this.ui.expertPasswordInput?.value || '');
+        const result = this.menuExpertLoginRuntime.unlock(password);
+        if (!result.success) {
+            this.showToast('Passwort falsch.', 1400, 'error');
+            this.ui.expertPasswordInput?.focus?.();
+            this.ui.expertPasswordInput?.select?.();
+            return;
+        }
+        this.menuExpertLoginRuntime.focusPrimaryControl();
+    }
+
+    _handleExpertStateChanged() {
+        this.updateContext();
+        this.syncDeveloperState(this.settings);
+        if (this.game._activeSubmenu === 'submenu-expert') {
+            this.menuExpertLoginRuntime?.focusPrimaryControl?.();
+        }
+    }
+
     setLevel4Section(sectionId, options = {}) {
         const resolvedSectionId = this._resolveLevel4Section(sectionId);
         if (!this.settings?.localSettings?.toolsState || typeof this.settings.localSettings.toolsState !== 'object') {
@@ -243,6 +298,7 @@ export class UIManager {
         let depth = 1;
         if (normalizedPanelId === 'submenu-custom') depth = 2;
         if (normalizedPanelId === 'submenu-game') depth = level4Open ? 4 : 3;
+        if (normalizedPanelId === 'submenu-expert') depth = 2;
         if (normalizedPanelId === 'submenu-developer' || normalizedPanelId === 'submenu-debug') depth = 5;
         root.setAttribute('data-menu-depth', String(depth));
         root.setAttribute('data-menu-panel', normalizedPanelId || 'main');
@@ -547,6 +603,9 @@ export class UIManager {
                 if (panelId === 'submenu-developer') {
                     this._ensureDeveloperTextCatalogSetup();
                 }
+                if (panelId === 'submenu-expert') {
+                    this.menuExpertLoginRuntime?.focusPrimaryControl?.();
+                }
                 if (panelId !== 'submenu-game' && this.settings?.localSettings?.toolsState?.level4Open) {
                     this.settings.localSettings.toolsState.level4Open = false;
                     this.setLevel4Open(false);
@@ -651,12 +710,15 @@ export class UIManager {
         const developerPolicy = developerPanelConfig?.semanticId === 'developer'
             ? resolveDeveloperAccessPolicy(accessContext)
             : (developerPanelConfig?.accessPolicy || 'open');
+        const debugPolicy = debugPanelConfig?.semanticId === 'debug'
+            ? resolveDebugAccessPolicy(accessContext)
+            : (debugPanelConfig?.accessPolicy || 'open');
         const developerAllowed = !shouldHideDeveloperUi
             && developerPanelConfig?.visibility !== 'hidden'
             && evaluateMenuAccessPolicy(developerPolicy, accessContext).allowed;
         const debugAllowed = !shouldHideDeveloperUi
             && debugPanelConfig?.visibility !== 'hidden'
-            && evaluateMenuAccessPolicy(debugPanelConfig?.accessPolicy || 'open', accessContext).allowed;
+            && evaluateMenuAccessPolicy(debugPolicy, accessContext).allowed;
 
         this._setElementsHidden(this._developerNavButtons, !developerAllowed);
         this._setElementsHidden(this._debugNavButtons, !debugAllowed);
@@ -846,6 +908,9 @@ export class UIManager {
             : Math.max(0.2, Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
         if (ui.mgTrailAimSlider) ui.mgTrailAimSlider.value = mgTrailAimRadius;
         if (ui.mgTrailAimLabel) ui.mgTrailAimLabel.textContent = mgTrailAimRadius.toFixed(2);
+        const shadowQuality = normalizeShadowQuality(settings?.localSettings?.shadowQuality, DEFAULT_SHADOW_QUALITY);
+        if (ui.shadowQualitySlider) ui.shadowQualitySlider.value = String(shadowQuality);
+        if (ui.shadowQualityLabel) ui.shadowQualityLabel.textContent = resolveShadowQualityLabel(shadowQuality);
         ui.lockOnLabel.textContent = gp.lockOnAngle + '\u00B0';
 
         const planarToggle = document.getElementById('planar-mode-toggle');
@@ -1104,8 +1169,8 @@ export class UIManager {
             [LEVEL4_SECTION_IDS.CONTROLS]: 'Steuerung',
             [LEVEL4_SECTION_IDS.GAMEPLAY]: 'Gameplay',
             [LEVEL4_SECTION_IDS.ADVANCED_MAP]: 'Map-Details',
-            [LEVEL4_SECTION_IDS.TOOLS]: 'Tools',
-        }[activeSection] || 'Tools';
+            [LEVEL4_SECTION_IDS.TOOLS]: 'Profile',
+        }[activeSection] || 'Profile';
 
         let contextText = `${section} | Profil: ${activeProfile} | ${dirtyState}`;
         if (this.settings?.localSettings?.toolsState?.level4Open) {
@@ -1114,6 +1179,9 @@ export class UIManager {
             contextText = `${section} | ${sessionLabel} | ${modeLabel} | ${mapLabel}`;
         } else if (this.game._activeSubmenu === 'submenu-custom') {
             contextText = `${section} | ${sessionLabel} | Sofortstart oder Setup | ${dirtyState}`;
+        } else if (this.game._activeSubmenu === 'submenu-expert') {
+            const expertStateLabel = this.menuExpertLoginRuntime?.isUnlocked?.() ? 'freigeschaltet' : 'gesperrt';
+            contextText = `${section} | Expertenstatus: ${expertStateLabel} | ${dirtyState}`;
         }
         this.ui.menuContext.textContent = contextText;
     }
@@ -1160,6 +1228,9 @@ export class UIManager {
     }
 
     dispose() {
+        if (this.menuExpertLoginRuntime) {
+            this.menuExpertLoginRuntime.onStateChanged = null;
+        }
         if (this._toastTimer) {
             clearTimeout(this._toastTimer);
             this._toastTimer = null;

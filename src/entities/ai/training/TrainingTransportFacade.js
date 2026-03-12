@@ -42,6 +42,7 @@ export class TrainingTransportFacade {
         const payload = buildTrainerTransitionPayload(transition, {
             mode: transition?.info?.domain?.mode || input?.mode,
             planarMode: transition?.info?.domain?.planarMode ?? input?.planarMode,
+            controlProfileId: transition?.info?.domain?.controlProfileId ?? input?.controlProfileId,
         });
         const delivered = this._submit(type, payload);
         const packet = {

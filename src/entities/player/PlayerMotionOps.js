@@ -28,6 +28,14 @@ function hasValidHitbox(box) {
         && Number.isFinite(max.z);
 }
 
+function clampAxisInput(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return 0;
+    if (numeric > 1) return 1;
+    if (numeric < -1) return -1;
+    return numeric;
+}
+
 export function initializePlayerHitbox(player, radius) {
     if (!player?.hitboxBox) return;
     const fallbackRadius = Math.max(MIN_HITBOX_RADIUS, Number(radius) || Number(CONFIG.PLAYER.HITBOX_RADIUS) || 0.8);
@@ -68,12 +76,14 @@ export function syncPlayerHitboxFromVehicleMesh(player, mesh = null) {
 }
 
 export function updatePlayerMotion(player, dt, controlState = null) {
-    const turnSpeed = CONFIG.PLAYER.TURN_SPEED * dt;
-    const rollSpeed = CONFIG.PLAYER.ROLL_SPEED * dt;
+    const resolvedTurnSpeed = Number(player?.turnSpeed) || Number(CONFIG.PLAYER.TURN_SPEED) || 0;
+    const resolvedRollSpeed = Number(player?.rollSpeed) || Number(CONFIG.PLAYER.ROLL_SPEED) || 0;
+    const turnSpeed = resolvedTurnSpeed * dt;
+    const rollSpeed = resolvedRollSpeed * dt;
 
-    const pitchInput = Number(controlState?.pitchInput) || 0;
-    const yawInput = Number(controlState?.yawInput) || 0;
-    const rollInput = Number(controlState?.rollInput) || 0;
+    const pitchInput = clampAxisInput(controlState?.pitchInput);
+    const yawInput = clampAxisInput(controlState?.yawInput);
+    const rollInput = clampAxisInput(controlState?.rollInput);
     const wantsBoost = !!controlState?.boost;
 
     if (wantsBoost && player.boostCooldown <= 0 && !player.isBoosting) {
@@ -165,23 +175,46 @@ export function setPlayerLookAtWorld(player, x, y, z) {
 
     player._tmpVec.normalize();
     player.quaternion.setFromUnitVectors(player._tmpDir.set(0, 0, -1), player._tmpVec);
+    if (player) {
+        player._obbCollisionPrepared = false;
+    }
     return true;
 }
 
-export function isSphereInPlayerOBB(player, worldCenter, radius) {
-    if (!player?.alive || !player?.hitboxBox || !worldCenter) return false;
+export function preparePlayerObbCollisionQuery(player) {
+    if (!player?.hitboxBox) return false;
+    if (player._obbCollisionPrepared === true) {
+        return true;
+    }
+
+    const scaleValue = Number(player.modelScale) || 1;
+    if (player.group) {
+        player.group.position?.copy?.(player.position);
+        player.group.quaternion?.copy?.(player.quaternion);
+        if (player.group.scale?.setScalar) {
+            player.group.scale.setScalar(scaleValue);
+        }
+        player.group.updateMatrixWorld?.(true);
+    }
 
     if (player.group?.matrixWorld) {
         player._tmpWorldToLocal.copy(player.group.matrixWorld).invert();
     } else {
         if (!player._tmpHitboxScale) return false;
-        const scaleValue = Number(player.modelScale) || 1;
         player._tmpWorldToLocal.compose(
             player.position,
             player.quaternion,
             player._tmpHitboxScale.set(scaleValue, scaleValue, scaleValue)
         ).invert();
     }
+
+    player._obbCollisionPrepared = true;
+    return true;
+}
+
+export function isSphereInPlayerOBB(player, worldCenter, radius) {
+    if (!player?.alive || !player?.hitboxBox || !worldCenter) return false;
+    if (!player._obbCollisionPrepared && !preparePlayerObbCollisionQuery(player)) return false;
 
     player._tmpLocalSphere.center.copy(worldCenter).applyMatrix4(player._tmpWorldToLocal);
     player._tmpLocalSphere.radius = radius;

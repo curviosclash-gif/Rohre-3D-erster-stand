@@ -1,45 +1,57 @@
 {
-  "generatedAt": "2026-03-08",
+  "generatedAt": "2026-03-12",
   "baseline": {
     "sourceReportPath": "data/bot_validation_report.json",
-    "sourceGeneratedAt": "2026-03-02",
+    "sourceGeneratedAt": "2026-03-11",
     "roundsPerScenario": 4,
     "matrix": [
       {
         "id": "V1",
         "mode": "1p",
-        "bots": 1,
+        "bots": 2,
         "mapKey": "standard",
+        "gameMode": "CLASSIC",
+        "botPolicyStrategy": "auto",
         "planarMode": false,
         "portalCount": 0,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "classic-3d"
       },
       {
         "id": "V2",
         "mode": "1p",
-        "bots": 3,
+        "bots": 2,
         "mapKey": "maze",
-        "planarMode": false,
+        "gameMode": "CLASSIC",
+        "botPolicyStrategy": "auto",
+        "planarMode": true,
         "portalCount": 0,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "classic-2d"
       },
       {
         "id": "V3",
         "mode": "1p",
         "bots": 3,
         "mapKey": "complex",
+        "gameMode": "HUNT",
+        "botPolicyStrategy": "auto",
         "planarMode": true,
         "portalCount": 4,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "hunt-2d"
       },
       {
         "id": "V4",
         "mode": "2p",
         "bots": 2,
         "mapKey": "standard",
-        "planarMode": true,
+        "gameMode": "HUNT",
+        "botPolicyStrategy": "auto",
+        "planarMode": false,
         "portalCount": 6,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "hunt-3d"
       }
     ],
     "sampleDurationMs": 8000,
@@ -53,70 +65,76 @@
       "scenario": {
         "id": "V1",
         "mode": "1p",
-        "bots": 1,
+        "bots": 2,
         "mapKey": "standard",
+        "gameMode": "CLASSIC",
+        "botPolicyStrategy": "auto",
         "planarMode": false,
         "portalCount": 0,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "classic-3d"
       },
       "metrics": {
-        "rounds": 5,
-        "botWinRate": 0.6,
+        "rounds": 4,
+        "botWinRate": 0.75,
         "stuckEvents": 0,
-        "averageBotSurvival": 30.818340845944476,
+        "averageBotSurvival": 24.96402464561652,
         "fpsAverage": 60,
-        "drawCallsAverage": 22.866666666666667,
-        "performanceSamples": 15
+        "drawCallsAverage": 19.214285714285715,
+        "performanceSamples": 14
       },
       "performance": {
-        "sampleCount": 15,
+        "sampleCount": 14,
         "fpsAverage": 60,
-        "drawCallsAverage": 22.866666666666667,
+        "drawCallsAverage": 19.214285714285715,
         "fpsMin": 60,
         "fpsMax": 60,
-        "drawCallsMin": 10,
-        "drawCallsMax": 34,
-        "observedDurationMs": 8381
+        "drawCallsMin": 9,
+        "drawCallsMax": 20,
+        "observedDurationMs": 8607
       },
       "sourceRunner": {
-        "forcedRounds": 3,
-        "timeoutRounds": 3,
-        "elapsedMs": 181293
+        "forcedRounds": 2,
+        "timeoutRounds": 2,
+        "elapsedMs": 116402
       }
     },
     {
       "scenario": {
         "id": "V2",
         "mode": "1p",
-        "bots": 3,
+        "bots": 2,
         "mapKey": "maze",
-        "planarMode": false,
+        "gameMode": "CLASSIC",
+        "botPolicyStrategy": "auto",
+        "planarMode": true,
         "portalCount": 0,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "classic-2d"
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 1,
+        "botWinRate": 0.75,
         "stuckEvents": 0,
-        "averageBotSurvival": 29.630166473514084,
+        "averageBotSurvival": 19.208024952984488,
         "fpsAverage": 60,
-        "drawCallsAverage": 48.111111111111114,
-        "performanceSamples": 9
+        "drawCallsAverage": 15.157894736842104,
+        "performanceSamples": 19
       },
       "performance": {
-        "sampleCount": 9,
+        "sampleCount": 19,
         "fpsAverage": 60,
-        "drawCallsAverage": 48.111111111111114,
+        "drawCallsAverage": 15.157894736842104,
         "fpsMin": 60,
         "fpsMax": 60,
-        "drawCallsMin": 16,
-        "drawCallsMax": 135,
-        "observedDurationMs": 10753
+        "drawCallsMin": 9,
+        "drawCallsMax": 20,
+        "observedDurationMs": 8141
       },
       "sourceRunner": {
-        "forcedRounds": 3,
-        "timeoutRounds": 3,
-        "elapsedMs": 156433
+        "forcedRounds": 1,
+        "timeoutRounds": 1,
+        "elapsedMs": 99523
       }
     },
     {
@@ -125,33 +143,36 @@
         "mode": "1p",
         "bots": 3,
         "mapKey": "complex",
+        "gameMode": "HUNT",
+        "botPolicyStrategy": "auto",
         "planarMode": true,
         "portalCount": 4,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "hunt-2d"
       },
       "metrics": {
         "rounds": 4,
         "botWinRate": 1,
         "stuckEvents": 0,
-        "averageBotSurvival": 31.618958541106622,
+        "averageBotSurvival": 26.765250205993652,
         "fpsAverage": 60,
-        "drawCallsAverage": 75,
-        "performanceSamples": 4
+        "drawCallsAverage": 23.625,
+        "performanceSamples": 8
       },
       "performance": {
-        "sampleCount": 4,
+        "sampleCount": 8,
         "fpsAverage": 60,
-        "drawCallsAverage": 75,
+        "drawCallsAverage": 23.625,
         "fpsMin": 60,
         "fpsMax": 60,
-        "drawCallsMin": 50,
-        "drawCallsMax": 86,
-        "observedDurationMs": 11196
+        "drawCallsMin": 18,
+        "drawCallsMax": 29,
+        "observedDurationMs": 8520
       },
       "sourceRunner": {
-        "forcedRounds": 3,
-        "timeoutRounds": 3,
-        "elapsedMs": 140877
+        "forcedRounds": 2,
+        "timeoutRounds": 2,
+        "elapsedMs": 110713
       }
     },
     {
@@ -160,54 +181,57 @@
         "mode": "2p",
         "bots": 2,
         "mapKey": "standard",
-        "planarMode": true,
+        "gameMode": "HUNT",
+        "botPolicyStrategy": "auto",
+        "planarMode": false,
         "portalCount": 6,
-        "rounds": 10
+        "rounds": 10,
+        "expectedPolicyType": "hunt-3d"
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 0.75,
+        "botWinRate": 1,
         "stuckEvents": 0,
-        "averageBotSurvival": 45.24550036010805,
+        "averageBotSurvival": 27.34517526626587,
         "fpsAverage": 60,
-        "drawCallsAverage": 65.8,
-        "performanceSamples": 5
+        "drawCallsAverage": 50.72727272727273,
+        "performanceSamples": 22
       },
       "performance": {
-        "sampleCount": 5,
+        "sampleCount": 22,
         "fpsAverage": 60,
-        "drawCallsAverage": 65.8,
+        "drawCallsAverage": 50.72727272727273,
         "fpsMin": 60,
         "fpsMax": 60,
-        "drawCallsMin": 26,
-        "drawCallsMax": 98,
-        "observedDurationMs": 9913
+        "drawCallsMin": 38,
+        "drawCallsMax": 116,
+        "observedDurationMs": 8540
       },
       "sourceRunner": {
-        "forcedRounds": 3,
-        "timeoutRounds": 3,
-        "elapsedMs": 198127
+        "forcedRounds": 2,
+        "timeoutRounds": 2,
+        "elapsedMs": 111823
       }
     }
   ],
   "overall": {
-    "rounds": 17,
-    "botWinRate": 0.8235294117647058,
+    "rounds": 16,
+    "botWinRate": 0.875,
     "stuckEvents": 0,
-    "averageBotSurvival": 34.1217768075669,
+    "averageBotSurvival": 24.570618767715132,
     "fpsAverage": 60,
-    "drawCallsAverage": 42.57575757575758,
-    "performanceSamples": 33
+    "drawCallsAverage": 29.555555555555557,
+    "performanceSamples": 63
   },
   "sourceRunner": {
-    "forcedRounds": 12,
-    "timeoutRounds": 12,
+    "forcedRounds": 7,
+    "timeoutRounds": 7,
     "failOnForcedRound": false,
     "maxForcedRounds": 9007199254740991
   },
   "paths": {
     "json": "data/performance_ki_baseline_report.json",
     "sourceJson": "data/bot_validation_report.json",
-    "doc": "docs/Testergebnisse_2026-03-08.md"
+    "doc": "docs/Testergebnisse_2026-03-12.md"
   }
 }

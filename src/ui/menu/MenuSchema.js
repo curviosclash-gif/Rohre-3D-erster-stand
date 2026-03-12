@@ -108,6 +108,18 @@ function createPanelSchema(featureFlags) {
             settingsDomain: 'matchSettings',
         },
         {
+            id: 'submenu-expert',
+            semanticId: 'expert',
+            label: 'Expert',
+            icon: 'LOCK',
+            order: 65,
+            level: 'expert',
+            accessPolicy: MENU_ACCESS_POLICIES.OPEN,
+            visibility: 'visible',
+            legacyIds: [],
+            settingsDomain: 'localSettings',
+        },
+        {
             id: 'submenu-developer',
             semanticId: 'developer',
             label: 'Developer',

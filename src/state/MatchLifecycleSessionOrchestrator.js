@@ -61,6 +61,7 @@ export class MatchLifecycleSessionOrchestrator {
             renderer: game.renderer,
             audio: game.audio,
             recorder: game.recorder,
+            runtimeProfiler: game.runtimePerfProfiler,
             settings: game.settings,
             runtimeConfig: game.runtimeConfig,
             requestedMapKey: game.mapKey,

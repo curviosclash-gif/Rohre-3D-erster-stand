@@ -70,6 +70,26 @@ export async function openGameSubmenu(page, options = {}) {
     await openSubmenu(page, 'submenu-game', options);
 }
 
+export async function openStartSetupSection(page, sectionId) {
+    const normalizedSectionId = String(sectionId || '').trim();
+    if (!normalizedSectionId) {
+        throw new Error('Start-Setup-Sektion fehlt.');
+    }
+    const gamePanelVisible = await page.locator('#submenu-game:not(.hidden)').count();
+    if (!gamePanelVisible) {
+        await openGameSubmenu(page);
+    }
+    const section = page.locator(`#submenu-game details[data-start-section="${normalizedSectionId}"]`).first();
+    await section.waitFor({ state: 'attached', timeout: 4000 });
+    const isOpen = await section.evaluate((element) => element instanceof HTMLDetailsElement && element.open);
+    if (isOpen) return;
+    await section.locator('summary').click({ force: true });
+    await page.waitForFunction((id) => {
+        const element = document.querySelector(`#submenu-game details[data-start-section="${id}"]`);
+        return element instanceof HTMLDetailsElement && element.open === true;
+    }, normalizedSectionId, { timeout: 4000 });
+}
+
 export async function openCustomSubmenu(page) {
     await openSubmenu(page, 'submenu-custom');
 }
@@ -92,14 +112,51 @@ export async function openLevel4Drawer(page, options = {}) {
     }
 }
 
+export async function openExpertSubmenu(page) {
+    const expertPanel = page.locator('#submenu-expert');
+    if (await expertPanel.count()) {
+        const isVisible = await expertPanel.isVisible().catch(() => false);
+        if (isVisible) return;
+    }
+    const level4DrawerVisible = await page.locator('#submenu-level4:not(.hidden)').count();
+    if (level4DrawerVisible) {
+        await page.click('#btn-close-level4');
+        await page.waitForFunction(() => {
+            const drawer = document.getElementById('submenu-level4');
+            return !!drawer && drawer.classList.contains('hidden');
+        }, null, { timeout: 4000 });
+    }
+    await page.click('#btn-open-expert');
+    await page.waitForSelector('#submenu-expert:not(.hidden)', { timeout: 4000 });
+}
+
+export async function unlockExpertMode(page, password = '1307') {
+    const isUnlocked = await page.evaluate(() => !!window.GAME_INSTANCE?.menuExpertLoginRuntime?.isUnlocked?.());
+    if (isUnlocked) return;
+    await openExpertSubmenu(page);
+    await page.fill('#expert-password-input', password);
+    await page.click('#btn-expert-unlock');
+    await page.waitForFunction(() => !!window.GAME_INSTANCE?.menuExpertLoginRuntime?.isUnlocked?.(), null, { timeout: 4000 });
+}
+
+export async function lockExpertMode(page) {
+    await openExpertSubmenu(page);
+    const isUnlocked = await page.evaluate(() => !!window.GAME_INSTANCE?.menuExpertLoginRuntime?.isUnlocked?.());
+    if (!isUnlocked) return;
+    await page.click('#btn-expert-lock');
+    await page.waitForFunction(() => !window.GAME_INSTANCE?.menuExpertLoginRuntime?.isUnlocked?.(), null, { timeout: 4000 });
+}
+
 export async function openDeveloperSubmenu(page) {
-    await openLevel4Drawer(page, { section: 'tools' });
+    await unlockExpertMode(page);
+    await openExpertSubmenu(page);
     await page.click('#btn-open-developer');
     await page.waitForSelector('#submenu-developer:not(.hidden)', { timeout: 4000 });
 }
 
 export async function openDebugSubmenu(page) {
-    await openDeveloperSubmenu(page);
+    await unlockExpertMode(page);
+    await openExpertSubmenu(page);
     await page.click('#btn-open-debug');
     await page.waitForSelector('#submenu-debug:not(.hidden)', { timeout: 4000 });
 }
@@ -117,19 +174,43 @@ function isBenignErrorMessage(message) {
     return BENIGN_ERROR_PATTERNS.some((pattern) => pattern.test(message));
 }
 
+async function triggerMatchStart(page) {
+    const started = await page.evaluate(() => {
+        const game = window.GAME_INSTANCE;
+        if (game?.startMatch && typeof game.startMatch === 'function') {
+            setTimeout(() => {
+                try {
+                    game.startMatch();
+                } catch {
+                    // Keep helper resilient; readiness wait will fail if start did not happen.
+                }
+            }, 0);
+            return true;
+        }
+
+        const startButton = document.querySelector('#submenu-game:not(.hidden) #btn-start');
+        if (!(startButton instanceof HTMLButtonElement)) return false;
+        startButton.click();
+        return true;
+    });
+    if (!started) {
+        throw new Error('Start-Trigger nicht verfuegbar.');
+    }
+}
+
 // Start game with default configuration.
 export async function startGame(page) {
     await loadGame(page);
     await openGameSubmenu(page);
-    await page.click('#submenu-game:not(.hidden) #btn-start');
+    await triggerMatchStart(page);
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
-        return hud && !hud.classList.contains('hidden');
-    }, { timeout: 15000 });
-    await page.waitForFunction(() => {
         const g = window.GAME_INSTANCE;
-        return g && g.entityManager && g.entityManager.players && g.entityManager.players.length > 0;
-    }, { timeout: 8000 });
+        return !!(
+            hud && !hud.classList.contains('hidden')
+            && g?.entityManager?.players?.length > 0
+        );
+    }, null, { timeout: 30000 });
 }
 
 // Start game with N bots.
@@ -141,15 +222,15 @@ export async function startGameWithBots(page, botCount = 1) {
         slider.value = String(count);
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     }, botCount);
-    await page.click('#submenu-game:not(.hidden) #btn-start');
+    await triggerMatchStart(page);
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
-        return hud && !hud.classList.contains('hidden');
-    }, { timeout: 15000 });
-    await page.waitForFunction(() => {
         const g = window.GAME_INSTANCE;
-        return g && g.entityManager && g.entityManager.players && g.entityManager.players.length > 0;
-    }, { timeout: 8000 });
+        return !!(
+            hud && !hud.classList.contains('hidden')
+            && g?.entityManager?.players?.length > 0
+        );
+    }, null, { timeout: 30000 });
 }
 
 // Start hunt mode with default bot count.
@@ -158,7 +239,7 @@ export async function startHuntGame(page) {
     await openCustomSubmenu(page);
     await page.click('#submenu-custom:not(.hidden) [data-mode-path="fight"]');
     await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
-    await page.click('#submenu-game:not(.hidden) #btn-start');
+    await triggerMatchStart(page);
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
         const huntHud = document.getElementById('hunt-hud');
@@ -168,7 +249,7 @@ export async function startHuntGame(page) {
             && huntHud && !huntHud.classList.contains('hidden')
             && game?.entityManager?.players?.length > 0
         );
-    }, { timeout: 15000 });
+    }, null, { timeout: 30000 });
 }
 
 // Start hunt mode with configurable bot count.
@@ -182,7 +263,7 @@ export async function startHuntGameWithBots(page, botCount = 1) {
         slider.value = String(count);
         slider.dispatchEvent(new Event('input', { bubbles: true }));
     }, botCount);
-    await page.click('#submenu-game:not(.hidden) #btn-start');
+    await triggerMatchStart(page);
     await page.waitForFunction(() => {
         const hud = document.getElementById('hud');
         const huntHud = document.getElementById('hunt-hud');
@@ -192,7 +273,7 @@ export async function startHuntGameWithBots(page, botCount = 1) {
             && huntHud && !huntHud.classList.contains('hidden')
             && game?.entityManager?.players?.length > 1
         );
-    }, { timeout: 15000 });
+    }, null, { timeout: 30000 });
 }
 
 // Press ESC and wait for main menu.

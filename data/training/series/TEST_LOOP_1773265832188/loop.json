@@ -1,0 +1,56 @@
+{
+  "ok": false,
+  "contractVersion": "v36-training-loop-v1",
+  "generatedAt": "2026-03-11T21:50:38.386Z",
+  "seriesStamp": "TEST_LOOP_1773265832188",
+  "withTrainerServer": false,
+  "stopOnFail": true,
+  "stageTimeoutMs": 600000,
+  "elapsedMs": 5392,
+  "runs": [
+    {
+      "runIndex": 1,
+      "runStamp": "TEST_LOOP_1773265832188-r01",
+      "status": "failed",
+      "failedStage": "gate",
+      "stages": [
+        {
+          "stage": "run",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 1105
+        },
+        {
+          "stage": "eval",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 2602
+        },
+        {
+          "stage": "gate",
+          "status": "failed",
+          "exitCode": 1,
+          "reason": "scripts/training-gate.mjs exited with code 1",
+          "elapsedMs": 1669
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "runsRequested": 2,
+    "runsExecuted": 1,
+    "runsCompleted": 0,
+    "runsFailed": 1,
+    "stageFailures": [
+      {
+        "runIndex": 1,
+        "runStamp": "TEST_LOOP_1773265832188-r01",
+        "stage": "gate",
+        "reason": "scripts/training-gate.mjs exited with code 1"
+      }
+    ]
+  },
+  "artifactPath": "data/training/series/TEST_LOOP_1773265832188/loop.json"
+}

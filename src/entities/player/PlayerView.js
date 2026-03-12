@@ -70,6 +70,8 @@ export class PlayerView {
 
         this._onVehicleLoaded = null;
         this._vehicleLoadedTarget = null;
+        this._renderPosition = new THREE.Vector3();
+        this._renderQuaternion = new THREE.Quaternion();
     }
 
     createModel() {
@@ -202,10 +204,21 @@ export class PlayerView {
         }
     }
 
+    applyRenderTransform(renderAlpha = 1) {
+        if (!this.group) return;
+        this.player.resolveRenderTransform(renderAlpha, this._renderPosition, this._renderQuaternion);
+        this.group.position.copy(this._renderPosition);
+        this.group.quaternion.copy(this._renderQuaternion);
+        this.group.updateMatrixWorld(true);
+    }
+
     syncFromState() {
         if (!this.group) return;
         this.group.position.copy(this.player.position);
         this.group.quaternion.copy(this.player.quaternion);
+        this._renderPosition.copy(this.player.position);
+        this._renderQuaternion.copy(this.player.quaternion);
+        this.group.updateMatrixWorld(true);
     }
 
     update(dt) {
@@ -214,8 +227,6 @@ export class PlayerView {
         if (this.vehicleMesh && typeof this.vehicleMesh.tick === 'function') {
             this.vehicleMesh.tick(dt);
         }
-
-        this.syncFromState();
 
         const time = performance.now() * 0.001;
         if (this.flames.length > 0) {
@@ -259,8 +270,6 @@ export class PlayerView {
                 }
             }
         }
-
-        this.group.updateMatrixWorld(true);
     }
 
     getFirstPersonCameraAnchor(out = null) {

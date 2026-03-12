@@ -41,6 +41,22 @@ function resolveTrainerBridgeOptions(options = {}) {
         enabled,
         url: trainerConfig?.url || options?.trainerBridgeUrl || runtimeBotConfig?.trainerBridgeUrl || 'ws://127.0.0.1:8765',
         timeoutMs: trainerConfig?.timeoutMs || options?.trainerBridgeTimeoutMs || runtimeBotConfig?.trainerBridgeTimeoutMs || 80,
+        maxRetries: trainerConfig?.maxRetries
+            ?? options?.trainerBridgeMaxRetries
+            ?? runtimeBotConfig?.trainerBridgeMaxRetries
+            ?? 1,
+        retryDelayMs: trainerConfig?.retryDelayMs
+            ?? options?.trainerBridgeRetryDelayMs
+            ?? runtimeBotConfig?.trainerBridgeRetryDelayMs
+            ?? 0,
+        resumeCheckpoint: trainerConfig?.resumeCheckpoint
+            ?? options?.trainerCheckpointResumeToken
+            ?? runtimeBotConfig?.trainerCheckpointResumeToken
+            ?? '',
+        resumeStrict: trainerConfig?.resumeStrict
+            ?? options?.trainerCheckpointResumeStrict
+            ?? runtimeBotConfig?.trainerCheckpointResumeStrict
+            ?? false,
     };
 }
 
@@ -55,10 +71,130 @@ export class ObservationBridgePolicy {
         this._lastWarningAt = 0;
         this._neutralAction = createNeutralBotAction({});
         this._trainerBridge = null;
+        this._trainerBridgeOptions = null;
+        this._trainerBridgeInitPromise = null;
+        this._trainerBridgeInitState = Object.freeze({
+            status: 'disabled',
+            resumeRequested: false,
+            resumeToken: null,
+            loaded: false,
+            error: null,
+            resumeSource: null,
+        });
 
         const trainerBridgeOptions = resolveTrainerBridgeOptions(options);
         if (trainerBridgeOptions.enabled) {
+            this._trainerBridgeOptions = trainerBridgeOptions;
             this._trainerBridge = new WebSocketTrainerBridge(trainerBridgeOptions);
+            this._primeTrainerBridge(trainerBridgeOptions);
+        }
+    }
+
+    _setTrainerBridgeInitState(nextState = {}) {
+        this._trainerBridgeInitState = Object.freeze({
+            status: typeof nextState.status === 'string' ? nextState.status : 'disabled',
+            resumeRequested: nextState.resumeRequested === true,
+            resumeToken: typeof nextState.resumeToken === 'string' ? nextState.resumeToken : null,
+            loaded: nextState.loaded === true,
+            error: typeof nextState.error === 'string' ? nextState.error : null,
+            resumeSource: typeof nextState.resumeSource === 'string' ? nextState.resumeSource : null,
+        });
+    }
+
+    _primeTrainerBridge(trainerBridgeOptions = {}) {
+        const resumeToken = typeof trainerBridgeOptions.resumeCheckpoint === 'string'
+            ? trainerBridgeOptions.resumeCheckpoint.trim()
+            : '';
+        if (!resumeToken) {
+            this._setTrainerBridgeInitState({
+                status: 'ready',
+                resumeRequested: false,
+                loaded: true,
+            });
+            return;
+        }
+        this._setTrainerBridgeInitState({
+            status: 'pending',
+            resumeRequested: true,
+            resumeToken,
+            loaded: false,
+            error: null,
+            resumeSource: null,
+        });
+
+        this._trainerBridgeInitPromise = this._initializeTrainerCheckpointResume(resumeToken, trainerBridgeOptions);
+    }
+
+    async _initializeTrainerCheckpointResume(resumeToken, trainerBridgeOptions) {
+        if (!this._trainerBridge) return;
+        const resumeStrict = trainerBridgeOptions?.resumeStrict === true;
+        const commandTimeoutMs = Math.max(
+            40,
+            Number(trainerBridgeOptions?.timeoutMs || 80) * 4
+        );
+        try {
+            if (typeof this._trainerBridge.waitForReady === 'function') {
+                const ready = await this._trainerBridge.waitForReady(commandTimeoutMs);
+                if (!ready) {
+                    if (resumeStrict) {
+                        this._setTrainerBridgeInitState({
+                            status: 'failed',
+                            resumeRequested: true,
+                            resumeToken,
+                            loaded: false,
+                            error: 'ready-timeout',
+                        });
+                        return;
+                    }
+                    this._setTrainerBridgeInitState({
+                        status: 'ready',
+                        resumeRequested: true,
+                        resumeToken,
+                        loaded: false,
+                        error: 'ready-timeout',
+                    });
+                    return;
+                }
+            }
+
+            const payload = {
+                strict: resumeStrict,
+            };
+            let requestType = 'trainer-checkpoint-load-latest';
+            if (resumeToken.toLowerCase() !== 'latest') {
+                payload.checkpointPath = resumeToken;
+            }
+            const response = await this._trainerBridge.submitCommand(requestType, payload, {
+                timeoutMs: commandTimeoutMs,
+            });
+            const loaded = response?.ok === true && response?.loaded === true;
+            if (!loaded && resumeStrict) {
+                this._setTrainerBridgeInitState({
+                    status: 'failed',
+                    resumeRequested: true,
+                    resumeToken,
+                    loaded: false,
+                    error: response?.error || 'checkpoint-load-failed',
+                    resumeSource: response?.resumeSource || null,
+                });
+                return;
+            }
+            this._setTrainerBridgeInitState({
+                status: 'ready',
+                resumeRequested: true,
+                resumeToken,
+                loaded,
+                error: loaded ? null : (response?.error || 'checkpoint-load-failed'),
+                resumeSource: response?.resumeSource || null,
+            });
+        } catch (error) {
+            this._setTrainerBridgeInitState({
+                status: resumeStrict ? 'failed' : 'ready',
+                resumeRequested: true,
+                resumeToken,
+                loaded: false,
+                error: error?.message || 'checkpoint-load-exception',
+            });
         }
     }
 
@@ -119,13 +255,30 @@ export class ObservationBridgePolicy {
 
     _resolveTrainerBridgeAction(runtimeContext, player) {
         if (!this._trainerBridge) {
-            return { action: null, failure: null };
+            return { action: null, failure: null, usedBridge: false };
+        }
+        const initStatus = this._trainerBridgeInitState?.status;
+        if (initStatus === 'pending') {
+            return { action: null, failure: 'checkpoint-resume-pending', usedBridge: true };
+        }
+        if (initStatus === 'failed') {
+            return {
+                action: null,
+                failure: this._trainerBridgeInitState?.error || 'checkpoint-resume-failed',
+                usedBridge: true,
+            };
         }
 
         this._trainerBridge.submitObservation(this._buildTrainerPayload(runtimeContext, player));
         const action = this._trainerBridge.consumeLatestAction();
         const failure = this._trainerBridge.consumeFailure();
-        return { action, failure };
+        return { action, failure, usedBridge: true };
+    }
+
+    _recordTrainerFallback(reason = 'bridge-fallback') {
+        if (this._trainerBridge && typeof this._trainerBridge.recordFallback === 'function') {
+            this._trainerBridge.recordFallback(reason);
+        }
     }
 
     getObservation(player, runtimeContext) {
@@ -159,6 +312,13 @@ export class ObservationBridgePolicy {
         if (trainerResult.action && typeof trainerResult.action === 'object') {
             return this._sanitizeAction(trainerResult.action, player);
         }
+        if (trainerResult.usedBridge) {
+            this._recordTrainerFallback(
+                trainerResult.failure
+                    ? `bridge-${trainerResult.failure}`
+                    : 'bridge-no-action'
+            );
+        }
 
         if (typeof this._resolveAction === 'function') {
             try {
@@ -176,9 +336,38 @@ export class ObservationBridgePolicy {
         return this._sanitizeAction(fallbackAction, player);
     }
 
+    getTrainerBridgeTelemetry() {
+        if (!this._trainerBridge || typeof this._trainerBridge.getTelemetrySnapshot !== 'function') {
+            return null;
+        }
+        return this._trainerBridge.getTelemetrySnapshot();
+    }
+
+    getTrainerBridgeStatus() {
+        return {
+            enabled: !!this._trainerBridge,
+            resume: {
+                ...this._trainerBridgeInitState,
+            },
+            telemetry: this.getTrainerBridgeTelemetry(),
+        };
+    }
+
     reset() {
         if (this._trainerBridge) {
             this._trainerBridge.close();
+        }
+        this._trainerBridgeInitPromise = null;
+        if (this._trainerBridge && this._trainerBridgeOptions) {
+            this._primeTrainerBridge(this._trainerBridgeOptions);
+        } else {
+            this._setTrainerBridgeInitState({
+                status: this._trainerBridge ? 'ready' : 'disabled',
+                resumeRequested: false,
+                loaded: true,
+                error: null,
+                resumeSource: null,
+            });
         }
         if (typeof this._fallbackPolicy?.reset === 'function') {
             this._fallbackPolicy.reset();

@@ -1,6 +1,7 @@
 import { CONFIG } from '../../core/Config.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
+import { normalizeShadowQuality } from '../../core/renderer/ShadowQuality.js';
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -247,6 +248,16 @@ export function setupMenuGameplayBindings(ctx) {
         bind(ui.mgTrailAimSlider, 'input', () => {
             settings.gameplay.mgTrailAimRadius = clamp(parseFloat(ui.mgTrailAimSlider.value), 0.2, 3.0);
             queueInputSettingsChanged([keys.GAMEPLAY_MG_TRAIL_AIM_RADIUS]);
+        });
+    }
+
+    if (ui.shadowQualitySlider) {
+        bind(ui.shadowQualitySlider, 'input', () => {
+            if (!settings.localSettings || typeof settings.localSettings !== 'object') {
+                settings.localSettings = {};
+            }
+            settings.localSettings.shadowQuality = normalizeShadowQuality(ui.shadowQualitySlider.value);
+            queueInputSettingsChanged([keys.LOCAL_SHADOW_QUALITY]);
         });
     }
 

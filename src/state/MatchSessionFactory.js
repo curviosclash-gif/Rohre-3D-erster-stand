@@ -157,6 +157,7 @@ export function createMatchSession({
     renderer,
     audio,
     recorder,
+    runtimeProfiler = null,
     settings,
     runtimeConfig = null,
     requestedMapKey,
@@ -185,7 +186,15 @@ export function createMatchSession({
     }
 
     const powerupManager = new PowerupManager(renderer, arena);
-    const entityManager = new EntityManager(renderer, arena, powerupManager, particles, audio, recorder);
+    const entityManager = new EntityManager(
+        renderer,
+        arena,
+        powerupManager,
+        particles,
+        audio,
+        recorder,
+        runtimeProfiler
+    );
 
     const fallbackHumans = settings?.mode === '2p' ? 2 : 1;
     const fallbackBots = Number(settings?.numBots) || 0;
@@ -324,6 +333,7 @@ export function initializeMatchSession({
     renderer,
     audio,
     recorder,
+    runtimeProfiler = null,
     settings,
     runtimeConfig = null,
     requestedMapKey,
@@ -337,6 +347,7 @@ export function initializeMatchSession({
         renderer,
         audio,
         recorder,
+        runtimeProfiler,
         settings,
         runtimeConfig,
         requestedMapKey,

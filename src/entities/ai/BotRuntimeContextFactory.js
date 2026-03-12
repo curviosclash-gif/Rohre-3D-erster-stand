@@ -9,6 +9,9 @@ import { createObservationContext } from './observation/ObservationSystem.js';
 import { OBSERVATION_LENGTH_V1 } from './observation/ObservationSchemaV1.js';
 
 const RUNTIME_CONTEXT_BY_PLAYER = new WeakMap();
+const CONTROL_PROFILE_VERSION = 'cp-v35';
+const LEGACY_CONTROL_PROFILE_VERSION = 'legacy-v1';
+const ANY_PROFILE_TOKENS = new Set(['*', 'any', 'multi', 'multi-profile', 'multi-profile-training']);
 
 function resolveRuntimeMode(entityManager) {
     const requestedMode = entityManager?.activeGameMode
@@ -20,6 +23,117 @@ function resolveRuntimeMode(entityManager) {
         return GAME_MODE_TYPES.HUNT;
     }
     return isHuntHealthActive() ? GAME_MODE_TYPES.HUNT : GAME_MODE_TYPES.CLASSIC;
+}
+
+function toPositiveNumber(value, fallback) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) return fallback;
+    return numeric;
+}
+
+function toProfileToken(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return '0';
+    const rounded = Math.round(numeric * 1000) / 1000;
+    return String(rounded);
+}
+
+function normalizeProfileId(value) {
+    if (typeof value !== 'string') return '';
+    const trimmed = value.trim().toLowerCase();
+    return trimmed;
+}
+
+function modeDimensionKey(mode, planarMode) {
+    return `${mode}-${planarMode ? '2d' : '3d'}`;
+}
+
+function buildRampControlProfileId(mode, planarMode, control) {
+    const dimensionKey = modeDimensionKey(mode, planarMode);
+    return `${CONTROL_PROFILE_VERSION}:${dimensionKey}:s${toProfileToken(control.speed)}:t${toProfileToken(control.turnSpeed)}:r${toProfileToken(control.rollSpeed)}:ra${toProfileToken(control.rampAttackRate)}:rr${toProfileToken(control.rampReleaseRate)}`;
+}
+
+function buildLegacyControlProfileId(mode, planarMode, control) {
+    const dimensionKey = modeDimensionKey(mode, planarMode);
+    return `${LEGACY_CONTROL_PROFILE_VERSION}:${dimensionKey}:s${toProfileToken(control.speed)}:t${toProfileToken(control.turnSpeed)}:r${toProfileToken(control.rollSpeed)}`;
+}
+
+function matchesProfileList(value, rampControlProfileId) {
+    if (!Array.isArray(value)) return false;
+    const normalizedTarget = normalizeProfileId(rampControlProfileId);
+    for (let i = 0; i < value.length; i++) {
+        const token = normalizeProfileId(value[i]);
+        if (!token) continue;
+        if (token === normalizedTarget || ANY_PROFILE_TOKENS.has(token)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function hasConfiguredProfileMatch(botConfig, rampControlProfileId) {
+    if (!botConfig || typeof botConfig !== 'object') {
+        return false;
+    }
+
+    if (botConfig.multiProfileTraining === true) {
+        return true;
+    }
+
+    const directProfile = normalizeProfileId(botConfig.controlProfileId);
+    const normalizedTarget = normalizeProfileId(rampControlProfileId);
+    if (directProfile) {
+        if (directProfile === normalizedTarget || ANY_PROFILE_TOKENS.has(directProfile)) {
+            return true;
+        }
+    }
+
+    if (matchesProfileList(botConfig.controlProfileIds, rampControlProfileId)) {
+        return true;
+    }
+    if (matchesProfileList(botConfig.rampControlProfileIds, rampControlProfileId)) {
+        return true;
+    }
+    if (matchesProfileList(botConfig.allowedControlProfileIds, rampControlProfileId)) {
+        return true;
+    }
+    if (matchesProfileList(botConfig.multiControlProfileIds, rampControlProfileId)) {
+        return true;
+    }
+
+    return false;
+}
+
+function resolveControlDynamics(entityManager, player) {
+    const runtimePlayerConfig = entityManager?.runtimeConfig?.player || null;
+    const speed = toPositiveNumber(
+        player?.baseSpeed ?? player?.speed,
+        toPositiveNumber(runtimePlayerConfig?.speed, toPositiveNumber(CONFIG?.PLAYER?.SPEED, 18))
+    );
+    const turnSpeed = toPositiveNumber(
+        player?.turnSpeed,
+        toPositiveNumber(runtimePlayerConfig?.turnSpeed, toPositiveNumber(CONFIG?.PLAYER?.TURN_SPEED, 2.2))
+    );
+    const rollSpeed = toPositiveNumber(
+        player?.rollSpeed,
+        toPositiveNumber(CONFIG?.PLAYER?.ROLL_SPEED, 2.0)
+    );
+    const rampAttackRate = toPositiveNumber(
+        player?.controlRampRates?.attack ?? player?.controller?.rampAttackRate,
+        12
+    );
+    const rampReleaseRate = toPositiveNumber(
+        player?.controlRampRates?.release ?? player?.controller?.rampReleaseRate,
+        8.5
+    );
+
+    return {
+        speed,
+        turnSpeed,
+        rollSpeed,
+        rampAttackRate,
+        rampReleaseRate,
+    };
 }
 
 function createCachedRuntimeContext() {
@@ -34,7 +148,27 @@ function createCachedRuntimeContext() {
             planarMode: false,
             huntEnabled: false,
             portalsEnabled: false,
+            controlProfileId: '',
+            controlProfileMatch: false,
+            botRampEnabled: false,
+            dynamicActionAdapterEnabled: false,
         },
+        controlDynamics: {
+            speed: 0,
+            turnSpeed: 0,
+            rollSpeed: 0,
+            rampAttackRate: 0,
+            rampReleaseRate: 0,
+            rampEnabled: false,
+            dynamicActionAdapterEnabled: false,
+            discreteRateThreshold: 0.18,
+        },
+        controlProfileId: '',
+        rampControlProfileId: '',
+        legacyControlProfileId: '',
+        controlProfileMatch: false,
+        controlProfileAllowsRamps: false,
+        dynamicActionAdapterEnabled: false,
         observationContext: null,
         observationBuffer: new Array(OBSERVATION_LENGTH_V1).fill(0),
         observation: null,
@@ -64,7 +198,45 @@ export function createBotRuntimeContext(entityManager, player, dt = 0, options =
         planarMode: false,
         huntEnabled: false,
         portalsEnabled: false,
+        controlProfileId: '',
+        controlProfileMatch: false,
+        botRampEnabled: false,
+        dynamicActionAdapterEnabled: false,
     });
+    const controlDynamics = runtimeContext.controlDynamics || (runtimeContext.controlDynamics = {
+        speed: 0,
+        turnSpeed: 0,
+        rollSpeed: 0,
+        rampAttackRate: 0,
+        rampReleaseRate: 0,
+        rampEnabled: false,
+        dynamicActionAdapterEnabled: false,
+        discreteRateThreshold: 0.18,
+    });
+
+    const resolvedControl = resolveControlDynamics(entityManager, player);
+    const rampControlProfileId = buildRampControlProfileId(mode, planarMode, resolvedControl);
+    const legacyControlProfileId = buildLegacyControlProfileId(mode, planarMode, resolvedControl);
+
+    const runtimeBotConfig = entityManager?.runtimeConfig?.bot || null;
+    const botRampFeatureEnabled = !!(
+        runtimeBotConfig?.enableBotInputRamps
+        ?? runtimeBotConfig?.inputRampEnabled
+        ?? runtimeBotConfig?.rampEnabled
+        ?? false
+    );
+    const controlProfileMatch = hasConfiguredProfileMatch(runtimeBotConfig, rampControlProfileId);
+    const controlProfileAllowsRamps = player?.isBot
+        ? (botRampFeatureEnabled && controlProfileMatch)
+        : (player?.controlRampEnabled !== false);
+    const dynamicActionAdapterEnabled = !!(
+        runtimeBotConfig?.dynamicActionAdapterEnabled
+        ?? runtimeBotConfig?.actionAdapterEnabled
+        ?? false
+    ) && controlProfileAllowsRamps;
+    const activeControlProfileId = controlProfileAllowsRamps
+        ? rampControlProfileId
+        : legacyControlProfileId;
 
     runtimeContext.dt = Number.isFinite(dt) ? dt : 0;
     runtimeContext.player = player || null;
@@ -72,9 +244,38 @@ export function createBotRuntimeContext(entityManager, player, dt = 0, options =
     runtimeContext.players = players;
     runtimeContext.projectiles = projectiles;
     runtimeContext.mode = mode;
+
     rules.planarMode = planarMode;
     rules.huntEnabled = mode === GAME_MODE_TYPES.HUNT || isHuntHealthActive();
     rules.portalsEnabled = !!entityManager?.arena?.portalsEnabled;
+    rules.controlProfileId = activeControlProfileId;
+    rules.controlProfileMatch = controlProfileMatch;
+    rules.botRampEnabled = controlProfileAllowsRamps;
+    rules.dynamicActionAdapterEnabled = dynamicActionAdapterEnabled;
+
+    controlDynamics.speed = resolvedControl.speed;
+    controlDynamics.turnSpeed = resolvedControl.turnSpeed;
+    controlDynamics.rollSpeed = resolvedControl.rollSpeed;
+    controlDynamics.rampAttackRate = resolvedControl.rampAttackRate;
+    controlDynamics.rampReleaseRate = resolvedControl.rampReleaseRate;
+    controlDynamics.rampEnabled = controlProfileAllowsRamps;
+    controlDynamics.dynamicActionAdapterEnabled = dynamicActionAdapterEnabled;
+
+    runtimeContext.controlProfileId = activeControlProfileId;
+    runtimeContext.rampControlProfileId = rampControlProfileId;
+    runtimeContext.legacyControlProfileId = legacyControlProfileId;
+    runtimeContext.controlProfileMatch = controlProfileMatch;
+    runtimeContext.controlProfileAllowsRamps = controlProfileAllowsRamps;
+    runtimeContext.dynamicActionAdapterEnabled = dynamicActionAdapterEnabled;
+
+    if (player && typeof player === 'object') {
+        if (player.isBot) {
+            player.controlRampEnabled = controlProfileAllowsRamps;
+            player.dynamicActionAdapterEnabled = dynamicActionAdapterEnabled;
+        }
+        player.controlProfileId = activeControlProfileId;
+    }
+
     runtimeContext.observationContext = includeObservationContext
         ? createObservationContext({
             arena: runtimeContext.arena,

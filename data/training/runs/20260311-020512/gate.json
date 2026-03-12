@@ -1,0 +1,139 @@
+{
+  "ok": true,
+  "status": "pass",
+  "runStamp": "20260311-020512",
+  "generatedAt": "2026-03-11T02:05:13.588Z",
+  "thresholdVersion": "v33-botb-1",
+  "source": {
+    "evalPath": "data/training/runs/20260311-020512/eval.json"
+  },
+  "kpis": {
+    "episodeCount": 16,
+    "episodeReturnMean": 1.615,
+    "terminalRate": 0.5,
+    "truncationRate": 0.5,
+    "invalidActionRate": 1,
+    "runtimeErrorCount": 0,
+    "bridgeTimeoutRate": 0.5,
+    "bridgeFallbackRate": 0.5,
+    "bridgeLatencyP95Ms": 17,
+    "bridgeTelemetry": {
+      "requestsSent": 4,
+      "responsesReceived": 2,
+      "retries": 2,
+      "timeouts": 2,
+      "fallbacks": 2,
+      "latencyP95Ms": 17
+    }
+  },
+  "checks": [
+    {
+      "metric": "episodeReturnMean",
+      "comparator": "min",
+      "value": 1.615,
+      "warnThreshold": 1.4535,
+      "hardThreshold": 1.21125,
+      "level": "pass"
+    },
+    {
+      "metric": "terminalRate",
+      "comparator": "min",
+      "value": 0.5,
+      "warnThreshold": 0.45,
+      "hardThreshold": 0.4,
+      "level": "pass"
+    },
+    {
+      "metric": "truncationRate",
+      "comparator": "max",
+      "value": 0.5,
+      "warnThreshold": 0.625,
+      "hardThreshold": 0.725,
+      "level": "pass"
+    },
+    {
+      "metric": "invalidActionRate",
+      "comparator": "max",
+      "value": 1,
+      "warnThreshold": 1.12,
+      "hardThreshold": 1.42,
+      "level": "pass"
+    },
+    {
+      "metric": "runtimeErrorCount",
+      "comparator": "max",
+      "value": 0,
+      "warnThreshold": 0,
+      "hardThreshold": 0,
+      "level": "pass"
+    },
+    {
+      "metric": "bridgeTimeoutRate",
+      "comparator": "max",
+      "value": 0.5,
+      "warnThreshold": 0.57,
+      "hardThreshold": 0.72,
+      "level": "pass"
+    },
+    {
+      "metric": "bridgeFallbackRate",
+      "comparator": "max",
+      "value": 0.5,
+      "warnThreshold": 0.57,
+      "hardThreshold": 0.72,
+      "level": "pass"
+    },
+    {
+      "metric": "bridgeLatencyP95Ms",
+      "comparator": "max",
+      "value": 17,
+      "warnThreshold": 51.2,
+      "hardThreshold": 63.5,
+      "level": "pass"
+    }
+  ],
+  "warnings": [],
+  "hardFailures": [],
+  "thresholds": {
+    "episodeReturnMean": {
+      "comparator": "min",
+      "warn": 1.4535,
+      "hard": 1.21125
+    },
+    "terminalRate": {
+      "comparator": "min",
+      "warn": 0.45,
+      "hard": 0.4
+    },
+    "truncationRate": {
+      "comparator": "max",
+      "warn": 0.625,
+      "hard": 0.725
+    },
+    "invalidActionRate": {
+      "comparator": "max",
+      "warn": 1.12,
+      "hard": 1.42
+    },
+    "runtimeErrorCount": {
+      "comparator": "max",
+      "warn": 0,
+      "hard": 0
+    },
+    "bridgeTimeoutRate": {
+      "comparator": "max",
+      "warn": 0.57,
+      "hard": 0.72
+    },
+    "bridgeFallbackRate": {
+      "comparator": "max",
+      "warn": 0.57,
+      "hard": 0.72
+    },
+    "bridgeLatencyP95Ms": {
+      "comparator": "max",
+      "warn": 51.2,
+      "hard": 63.5
+    }
+  }
+}

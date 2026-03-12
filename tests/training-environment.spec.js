@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { loadGame } from './helpers.js';
+import { loadGame, openDeveloperSubmenu } from './helpers.js';
 
 test.describe('Training Environment V32', () => {
 
@@ -42,6 +42,7 @@ test.describe('Training Environment V32', () => {
                 resetDone: reset.done,
                 resetTruncated: reset.truncated,
                 resetDomainId: reset.info?.domain?.domainId || null,
+                resetControlProfileId: reset.info?.domain?.controlProfileId || null,
                 stepOperation: step.operation,
                 stepActionShootItem: !!step.action?.shootItem,
                 stepActionShootItemIndex: Number(step.action?.shootItemIndex),
@@ -49,6 +50,7 @@ test.describe('Training Environment V32', () => {
                 stepDone: !!step.done,
                 stepTruncated: !!step.truncated,
                 stepSchemaVersion: step.info?.observationSchemaVersion || null,
+                stepControlProfileId: step.info?.domain?.controlProfileId || null,
             };
         });
 
@@ -58,6 +60,8 @@ test.describe('Training Environment V32', () => {
         expect(result.resetDone).toBeFalsy();
         expect(result.resetTruncated).toBeFalsy();
         expect(result.resetDomainId).toBe('hunt-2d');
+        expect(typeof result.resetControlProfileId).toBe('string');
+        expect(result.resetControlProfileId.length).toBeGreaterThan(0);
         expect(result.stepOperation).toBe('step');
         expect(result.stepActionShootItem).toBeTruthy();
         expect(result.stepActionShootItemIndex).toBe(1);
@@ -65,6 +69,8 @@ test.describe('Training Environment V32', () => {
         expect(result.stepDone).toBeFalsy();
         expect(result.stepTruncated).toBeFalsy();
         expect(result.stepSchemaVersion).toBe('v1');
+        expect(typeof result.stepControlProfileId).toBe('string');
+        expect(result.stepControlProfileId.length).toBeGreaterThan(0);
     });
 
     test('T91: EpisodeController leitet done/truncated inkl. max-steps deterministisch ab', async ({ page }) => {
@@ -295,6 +301,8 @@ test.describe('Training Environment V32', () => {
                     sentTypes: sent.map((entry) => entry.type),
                     actionYawLeft: !!action?.yawLeft,
                     trainingAckOk: response?.ok === true,
+                    runtimeControlProfileId: runtimePayload?.controlProfileId || null,
+                    transitionControlProfileId: transitionPayload?.info?.domain?.controlProfileId || null,
                     legacyEnvelopeHasType: legacyEnvelope.type === 'bot-action-request',
                     legacyEnvelopeHasId: Number.isInteger(legacyEnvelope.id),
                     legacyEnvelopeHasPayload: Object.prototype.hasOwnProperty.call(legacyEnvelope, 'payload'),
@@ -308,6 +316,10 @@ test.describe('Training Environment V32', () => {
         expect(result.sentTypes).toEqual(['bot-action-request', 'training-step']);
         expect(result.actionYawLeft).toBeTruthy();
         expect(result.trainingAckOk).toBeTruthy();
+        expect(typeof result.runtimeControlProfileId).toBe('string');
+        expect(result.runtimeControlProfileId.length).toBeGreaterThan(0);
+        expect(typeof result.transitionControlProfileId).toBe('string');
+        expect(result.transitionControlProfileId.length).toBeGreaterThan(0);
         expect(result.legacyEnvelopeHasType).toBeTruthy();
         expect(result.legacyEnvelopeHasId).toBeTruthy();
         expect(result.legacyEnvelopeHasPayload).toBeTruthy();
@@ -316,8 +328,13 @@ test.describe('Training Environment V32', () => {
 
     test('T94: Developer-Training-Events nutzen den modularen reset/step-Pfad inkl. UI-Output', async ({ page }) => {
         await loadGame(page);
+        await openDeveloperSubmenu(page);
         const result = await page.evaluate(() => {
             const game = globalThis.GAME_INSTANCE;
+            game.runtimeFacade.handleMenuControllerEvent({
+                type: 'developer_mode_toggle',
+                enabled: true,
+            });
             game.runtimeFacade.handleMenuControllerEvent({
                 type: 'developer_training_reset',
                 mode: 'hunt',
@@ -378,8 +395,13 @@ test.describe('Training Environment V32', () => {
 
     test('T95: Developer Auto-Step fuehrt N Schritte aus und stoppt deterministisch bei Terminal', async ({ page }) => {
         await loadGame(page);
+        await openDeveloperSubmenu(page);
         const result = await page.evaluate(() => {
             const game = globalThis.GAME_INSTANCE;
+            game.runtimeFacade.handleMenuControllerEvent({
+                type: 'developer_mode_toggle',
+                enabled: true,
+            });
             game.runtimeFacade.handleMenuControllerEvent({
                 type: 'developer_training_auto_step',
                 mode: 'classic',
@@ -422,5 +444,306 @@ test.describe('Training Environment V32', () => {
         expect(result.autoStepExecuted).toBe(2);
         expect(result.autoStepStoppedReason).toBe('terminal');
         expect(result.outputHasTerminalFlag).toBeTruthy();
+    });
+
+    test('T96: Training Batch ist bei gleichen Seeds/Modes reproduzierbar und endet vollstaendig', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const game = globalThis.GAME_INSTANCE;
+            const payload = {
+                episodes: 2,
+                seeds: [5, 9],
+                modes: ['classic-3d', 'hunt-2d'],
+                maxSteps: 8,
+                inventoryLength: 2,
+                timeoutMs: 3000,
+            };
+            const runA = game.debugApi.runTrainingBatch(payload);
+            const runB = game.debugApi.runTrainingBatch(payload);
+            const digest = (run) => run.episodes.map((entry) => ({
+                seed: entry.seed,
+                domainId: entry.domainId,
+                stepsExecuted: entry.stepsExecuted,
+                episodeReturn: entry.episodeReturn,
+                done: entry.done,
+                truncated: entry.truncated,
+                invalidActionCount: entry.invalidActionCount,
+                runtimeError: entry.runtimeError,
+            }));
+
+            return {
+                runAKpis: runA.kpis,
+                runBKpis: runB.kpis,
+                runAEpisodeDigest: digest(runA),
+                runBEpisodeDigest: digest(runB),
+                expectedEpisodes: payload.episodes * payload.seeds.length * payload.modes.length,
+                runAEpisodesTotal: Number(runA.summary?.episodesTotal || 0),
+                runAArtifactPath: runA.artifactPath || '',
+                runBArtifactPath: runB.artifactPath || '',
+            };
+        });
+
+        expect(result.runAKpis).toEqual(result.runBKpis);
+        expect(result.runAEpisodeDigest).toEqual(result.runBEpisodeDigest);
+        expect(result.runAEpisodesTotal).toBe(result.expectedEpisodes);
+        expect(result.runAArtifactPath.endsWith('/run.json')).toBeTruthy();
+        expect(result.runBArtifactPath.endsWith('/run.json')).toBeTruthy();
+    });
+
+    test('T97: Training Gate liefert PASS/FAIL inkl. Exit-Code auf Basis von KPI-Schwellen', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const game = globalThis.GAME_INSTANCE;
+            const evalResult = game.debugApi.runTrainingEval({
+                episodes: 1,
+                seeds: [13],
+                modes: ['classic-3d'],
+                maxSteps: 6,
+                inventoryLength: 2,
+                timeoutMs: 3000,
+            });
+            const passGate = game.debugApi.runTrainingGate({
+                evalResult,
+                gateThresholds: {
+                    minEpisodeReturnMean: Number(evalResult.kpis.episodeReturnMean || 0) - 0.001,
+                    minTerminalRate: 0,
+                    maxTruncationRate: 1,
+                    maxInvalidActionRate: 1,
+                    maxRuntimeErrorCount: 10,
+                },
+            });
+            const failGate = game.debugApi.runTrainingGate({
+                evalResult,
+                gateThresholds: {
+                    minEpisodeReturnMean: Number(evalResult.kpis.episodeReturnMean || 0) + 100,
+                    minTerminalRate: 1,
+                    maxTruncationRate: 0,
+                    maxInvalidActionRate: 0,
+                    maxRuntimeErrorCount: 0,
+                },
+            });
+
+            return {
+                passPass: !!passGate.pass,
+                passExitCode: Number(passGate.exitCode),
+                failPass: !!failGate.pass,
+                failExitCode: Number(failGate.exitCode),
+                failHasFailedCheck: (failGate.checks || []).some((entry) => entry.pass === false),
+                gateArtifactPath: String(failGate.artifactPath || ''),
+                gateChecksCount: Array.isArray(failGate.checks) ? failGate.checks.length : 0,
+            };
+        });
+
+        expect(result.passPass).toBeTruthy();
+        expect(result.passExitCode).toBe(0);
+        expect(result.failPass).toBeFalsy();
+        expect(result.failExitCode).toBe(1);
+        expect(result.failHasFailedCheck).toBeTruthy();
+        expect(result.gateArtifactPath.endsWith('/gate.json')).toBeTruthy();
+        expect(result.gateChecksCount).toBe(5);
+    });
+
+    test('T98: Developer-UI Buttons triggern Run Batch/Eval/Gate und zeigen KPI+Artefaktpfad im Output', async ({ page }) => {
+        await loadGame(page);
+        await openDeveloperSubmenu(page);
+        const result = await page.evaluate(() => {
+            const game = globalThis.GAME_INSTANCE;
+
+            game.runtimeFacade.handleMenuControllerEvent({
+                type: 'developer_mode_toggle',
+                enabled: true,
+            });
+
+            document.getElementById('developer-training-batch-episodes-input').value = '1';
+            document.getElementById('developer-training-batch-seeds-input').value = '21,22';
+            document.getElementById('developer-training-batch-modes-input').value = 'classic-3d,hunt-3d';
+            document.getElementById('developer-training-max-steps-input').value = '6';
+            document.getElementById('developer-training-timeout-ms-input').value = '3000';
+
+            document.getElementById('btn-developer-training-run-batch').click();
+            const batchRaw = document.getElementById('developer-training-output').textContent || '';
+            const batchParsed = JSON.parse(batchRaw);
+
+            document.getElementById('btn-developer-training-run-eval').click();
+            const evalRaw = document.getElementById('developer-training-output').textContent || '';
+            const evalParsed = JSON.parse(evalRaw);
+
+            document.getElementById('developer-training-gate-min-return-input').value = '999';
+            document.getElementById('developer-training-gate-min-terminal-rate-input').value = '1';
+            document.getElementById('developer-training-gate-max-truncation-rate-input').value = '0';
+            document.getElementById('developer-training-gate-max-invalid-rate-input').value = '0';
+            document.getElementById('developer-training-gate-max-runtime-errors-input').value = '0';
+            document.getElementById('btn-developer-training-run-gate').click();
+            const gateRaw = document.getElementById('developer-training-output').textContent || '';
+            const gateParsed = JSON.parse(gateRaw);
+
+            const automationSnapshot = game.debugApi.getTrainingAutomationSnapshot();
+
+            return {
+                batchKind: batchParsed.kind || null,
+                evalKind: evalParsed.kind || null,
+                gatePass: !!gateParsed.pass,
+                gateExitCode: Number(gateParsed.exitCode || 0),
+                batchHasArtifactPath: typeof batchParsed.artifactPath === 'string' && batchParsed.artifactPath.includes('/run.json'),
+                evalHasArtifactPath: typeof evalParsed.artifactPath === 'string' && evalParsed.artifactPath.includes('/eval.json'),
+                gateHasArtifactPath: typeof gateParsed.artifactPath === 'string' && gateParsed.artifactPath.includes('/gate.json'),
+                gateHasKpis: gateRaw.includes('"episodeReturnMean"') && gateRaw.includes('"terminalRate"'),
+                snapshotHasBatch: !!automationSnapshot?.latestBatch,
+                snapshotHasEval: !!automationSnapshot?.latestEval,
+                snapshotHasGate: !!automationSnapshot?.latestGate,
+            };
+        });
+
+        expect(result.batchKind).toBe('run');
+        expect(result.evalKind).toBe('eval');
+        expect(result.gatePass).toBeFalsy();
+        expect(result.gateExitCode).toBe(1);
+        expect(result.batchHasArtifactPath).toBeTruthy();
+        expect(result.evalHasArtifactPath).toBeTruthy();
+        expect(result.gateHasArtifactPath).toBeTruthy();
+        expect(result.gateHasKpis).toBeTruthy();
+        expect(result.snapshotHasBatch).toBeTruthy();
+        expect(result.snapshotHasEval).toBeTruthy();
+        expect(result.snapshotHasGate).toBeTruthy();
+    });
+
+    test('T99: ObservationBridgePolicy laedt Resume-Checkpoint vor Trainer-Actions im Matchpfad', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            const originalWebSocket = globalThis.WebSocket;
+            const sentTypes = [];
+
+            class MockWebSocket {
+                static CONNECTING = 0;
+                static OPEN = 1;
+                static CLOSING = 2;
+                static CLOSED = 3;
+
+                constructor() {
+                    this.readyState = MockWebSocket.OPEN;
+                    this._listeners = new Map();
+                    setTimeout(() => {
+                        this._emit('open', {});
+                        this._emit('message', {
+                            data: JSON.stringify({
+                                type: 'trainer-ready',
+                                ok: true,
+                            }),
+                        });
+                    }, 0);
+                }
+
+                addEventListener(type, handler) {
+                    const list = this._listeners.get(type) || [];
+                    list.push(handler);
+                    this._listeners.set(type, list);
+                }
+
+                removeEventListener(type, handler) {
+                    const list = this._listeners.get(type) || [];
+                    this._listeners.set(type, list.filter((entry) => entry !== handler));
+                }
+
+                _emit(type, payload) {
+                    const handlers = this._listeners.get(type) || [];
+                    for (const handler of handlers) {
+                        handler(payload);
+                    }
+                }
+
+                send(raw) {
+                    const envelope = JSON.parse(raw);
+                    sentTypes.push(envelope.type);
+                    if (envelope.type === 'trainer-checkpoint-load-latest') {
+                        setTimeout(() => {
+                            this._emit('message', {
+                                data: JSON.stringify({
+                                    id: envelope.id,
+                                    ok: true,
+                                    type: 'trainer-checkpoint',
+                                    loaded: true,
+                                    resumeSource: 'latest',
+                                }),
+                            });
+                        }, 0);
+                        return;
+                    }
+                    if (envelope.type === 'bot-action-request') {
+                        setTimeout(() => {
+                            this._emit('message', {
+                                data: JSON.stringify({
+                                    id: envelope.id,
+                                    ok: true,
+                                    type: 'bot-action-response',
+                                    action: { yawLeft: true },
+                                }),
+                            });
+                        }, 0);
+                    }
+                }
+
+                close() {
+                    this.readyState = MockWebSocket.CLOSED;
+                    this._emit('close', {});
+                }
+            }
+
+            globalThis.WebSocket = MockWebSocket;
+            try {
+                let fallbackCalls = 0;
+                const policy = new ObservationBridgePolicy({
+                    type: 'classic-bridge',
+                    trainerBridgeEnabled: true,
+                    trainerBridgeTimeoutMs: 20,
+                    trainerCheckpointResumeToken: 'latest',
+                    trainerCheckpointResumeStrict: true,
+                    fallbackPolicy: {
+                        update() {
+                            fallbackCalls += 1;
+                            return { yawRight: true };
+                        },
+                    },
+                });
+                const bot = { index: 1, inventory: [] };
+                const context = {
+                    mode: 'classic',
+                    planarMode: false,
+                    dt: 1 / 60,
+                    players: [],
+                    projectiles: [],
+                    observation: new Array(40).fill(0.2),
+                };
+
+                const firstAction = policy.update(1 / 60, bot, context);
+                await new Promise((resolve) => setTimeout(resolve, 30));
+                let bridgeActionObserved = false;
+                for (let i = 0; i < 6; i++) {
+                    const action = policy.update(1 / 60, bot, context);
+                    bridgeActionObserved = bridgeActionObserved || !!action?.yawLeft;
+                    await new Promise((resolve) => setTimeout(resolve, 20));
+                }
+                const status = policy.getTrainerBridgeStatus();
+                policy.reset();
+
+                return {
+                    sentTypes,
+                    firstYawRight: !!firstAction?.yawRight,
+                    bridgeActionObserved,
+                    fallbackCalls,
+                    resumeLoaded: !!status?.resume?.loaded,
+                    resumeStatus: status?.resume?.status || null,
+                };
+            } finally {
+                globalThis.WebSocket = originalWebSocket;
+            }
+        });
+
+        expect(result.sentTypes[0]).toBe('trainer-checkpoint-load-latest');
+        expect(result.sentTypes.includes('bot-action-request')).toBeTruthy();
+        expect(result.bridgeActionObserved).toBeTruthy();
+        expect(result.fallbackCalls).toBeGreaterThanOrEqual(0);
+        expect(result.resumeLoaded).toBeTruthy();
+        expect(result.resumeStatus).toBe('ready');
     });
 });

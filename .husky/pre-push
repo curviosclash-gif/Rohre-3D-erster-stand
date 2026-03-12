@@ -1,0 +1,5 @@
+echo "Running docs:check (aus AGENTS.md Regeln)..."
+npm run docs:check
+
+echo "Führe Fast-Tests aus, um Code vor dem Pushen abzusichern..."
+npm run test:fast

@@ -64,6 +64,7 @@ export const KEY_BIND_ACTIONS = [
 
 export const GLOBAL_KEY_BIND_ACTIONS = [
     { label: 'Cinematic Kamera (beide Spieler)', key: 'CINEMATIC_TOGGLE' },
+    { label: 'Videoaufnahme Start/Stopp', key: 'RECORDING_TOGGLE' },
 ];
 
 function normalizeTelemetrySnapshot(snapshot) {
@@ -148,6 +149,15 @@ export class SettingsManager {
                 planarLevelCount: 5,
                 portalBeams: false,
             },
+            botBridge: {
+                enabled: false,
+                url: 'ws://127.0.0.1:8765',
+                timeoutMs: 80,
+                maxRetries: 1,
+                retryDelayMs: 0,
+                resumeCheckpoint: '',
+                resumeStrict: false,
+            },
             controls: this.cloneDefaultControls(),
         };
         return ensureMenuContractState(defaults);
@@ -222,6 +232,34 @@ export class SettingsManager {
         merged.gameplay.portalCount = clampSettingValue(src?.gameplay?.portalCount ?? defaults.gameplay.portalCount, SETTINGS_LIMITS.gameplay.portalCount, defaults.gameplay.portalCount);
         merged.gameplay.planarLevelCount = clampSettingValue(src?.gameplay?.planarLevelCount ?? defaults.gameplay.planarLevelCount, SETTINGS_LIMITS.gameplay.planarLevelCount, defaults.gameplay.planarLevelCount);
         merged.gameplay.portalBeams = false;
+
+        merged.botBridge = {
+            enabled: !!(src?.botBridge?.enabled ?? defaults.botBridge.enabled),
+            url: typeof src?.botBridge?.url === 'string' && src.botBridge.url.trim()
+                ? src.botBridge.url.trim()
+                : defaults.botBridge.url,
+            timeoutMs: clampSettingValue(
+                src?.botBridge?.timeoutMs ?? defaults.botBridge.timeoutMs,
+                SETTINGS_LIMITS.botBridge.timeoutMs,
+                defaults.botBridge.timeoutMs
+            ),
+            maxRetries: clampSettingValue(
+                src?.botBridge?.maxRetries ?? defaults.botBridge.maxRetries,
+                SETTINGS_LIMITS.botBridge.maxRetries,
+                defaults.botBridge.maxRetries
+            ),
+            retryDelayMs: clampSettingValue(
+                src?.botBridge?.retryDelayMs ?? defaults.botBridge.retryDelayMs,
+                SETTINGS_LIMITS.botBridge.retryDelayMs,
+                defaults.botBridge.retryDelayMs
+            ),
+            resumeCheckpoint: typeof src?.botBridge?.resumeCheckpoint === 'string'
+                ? src.botBridge.resumeCheckpoint.trim()
+                : defaults.botBridge.resumeCheckpoint,
+            resumeStrict: typeof src?.botBridge?.resumeStrict === 'boolean'
+                ? src.botBridge.resumeStrict
+                : defaults.botBridge.resumeStrict,
+        };
 
         merged.controls.PLAYER_1 = normalizeControlBindings(src?.controls?.PLAYER_1, defaults.controls.PLAYER_1, { guardCombatConflicts: true });
         merged.controls.PLAYER_2 = normalizeControlBindings(src?.controls?.PLAYER_2, defaults.controls.PLAYER_2, { guardCombatConflicts: true });

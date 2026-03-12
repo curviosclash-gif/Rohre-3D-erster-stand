@@ -69,59 +69,71 @@ Shared-Pfade:
 
 ## Phasen
 
-- [ ] 33.0 Contract- und KPI-Freeze
-  - [ ] 33.0.1 Run-Konfig-Vertrag festlegen (`episodes`, `seeds`, `modes`, `maxSteps`, `bridgeMode`, `timeouts`)
-  - [ ] 33.0.2 KPI- und Gate-Vertrag festlegen (`episodeReturnMean`, `terminalRate`, `truncationRate`, `invalidActionRate`, `runtimeErrorCount`)
-  - [ ] 33.0.3 Artefaktstruktur einfrieren (`data/training/runs/<stamp>/{run,eval,gate}.json`)
-  - [ ] 33.0.4 Parallel-Ownership fuer A/B/C dokumentieren
+- [x] 33.0 Contract- und KPI-Freeze
+  - [x] 33.0.1 Run-Konfig-Vertrag festlegen (`episodes`, `seeds`, `modes`, `maxSteps`, `bridgeMode`, `timeouts`)
+  - [x] 33.0.2 KPI- und Gate-Vertrag festlegen (`episodeReturnMean`, `terminalRate`, `truncationRate`, `invalidActionRate`, `runtimeErrorCount`)
+  - [x] 33.0.3 Artefaktstruktur einfrieren (`data/training/runs/<stamp>/{run,eval,gate}.json`)
+  - [x] 33.0.4 Parallel-Ownership fuer A/B/C dokumentieren
+  - Status 2026-03-11 (Bot A): `TrainingAutomationContractV33` friert Run-Konfig, KPI-Grundvertrag und Artefaktlayout inkl. `latest`-Index ein.
 
-- [ ] 33.1 Automationskern Batch-Runner (Bot A)
-  - [ ] 33.1.1 `TrainingAutomationRunner` fuer Episode-/Seed-Schleifen bauen
-  - [ ] 33.1.2 Reuse von `DeterministicTrainingStepRunner` und `TrainingTransportFacade` erzwingen (keine doppelte Step-Logik)
-  - [ ] 33.1.3 Basismetriken pro Episode/Run aggregieren (Return, Steps, Terminal-Grund)
-  - [ ] 33.1.4 `scripts/training-run.mjs` fuer reproduzierbare Batch-Laeufe liefern
+- [x] 33.1 Automationskern Batch-Runner (Bot A)
+  - [x] 33.1.1 `TrainingAutomationRunner` fuer Episode-/Seed-Schleifen bauen
+  - [x] 33.1.2 Reuse von `DeterministicTrainingStepRunner` und `TrainingTransportFacade` erzwingen (keine doppelte Step-Logik)
+  - [x] 33.1.3 Basismetriken pro Episode/Run aggregieren (Return, Steps, Terminal-Grund)
+  - [x] 33.1.4 `scripts/training-run.mjs` fuer reproduzierbare Batch-Laeufe liefern
+  - Status 2026-03-11 (Bot A): Batch-Runner, Run-Artefakt und KPI-Aggregation laufen deterministisch ueber `episodes x seeds x modes`.
 
-- [ ] 33.2 Eval- und Gate-Lane (Bot B)
-  - [ ] 33.2.1 `scripts/training-eval.mjs` fuer feste Eval-Seeds/Szenarien bauen
-  - [ ] 33.2.2 `scripts/training-gate.mjs` mit harten Schwellen + Exit-Code (`0`/`1`) bauen
-  - [ ] 33.2.3 Gate-Bericht mit klaren PASS/FAIL-Details je KPI ausgeben
-  - [ ] 33.2.4 `package.json` Scripts (`training:run`, `training:eval`, `training:gate`, `training:e2e`) verdrahten
+- [x] 33.2 Eval- und Gate-Lane (Bot B)
+  - [x] 33.2.1 `scripts/training-eval.mjs` fuer feste Eval-Seeds/Szenarien bauen
+  - [x] 33.2.2 `scripts/training-gate.mjs` mit harten Schwellen + Exit-Code (`0`/`1`) bauen
+  - [x] 33.2.3 Gate-Bericht mit klaren PASS/FAIL-Details je KPI ausgeben
+  - [x] 33.2.4 `package.json` Scripts (`training:run`, `training:eval`, `training:gate`, `training:e2e`) verdrahten
+  - Status 2026-03-11 (Bot B): Eval/Gate-Skripte schreiben Artefakte nach `data/training/runs/<stamp>/{eval,gate}.json`, aktualisieren `latest.json` und liefern KPI-Checks mit PASS/FAIL je Metrik sowie Exit-Code `0/1`.
 
-- [ ] 33.3 Bridge-/Trainer-Client-Lane (Bot B)
-  - [ ] 33.3.1 Optionalen `TrainerSessionClient`/Adapter fuer request-action/ack erweitern
-  - [ ] 33.3.2 Timeout-/Retry-/Fallback-Pfad hart absichern
-  - [ ] 33.3.3 Bridge-Telemetrie (`latency`, `timeouts`, `fallbacks`) in Eval/Gate einspeisen
-  - [ ] 33.3.4 Mock-Bridge-Szenarien fuer deterministische Tests vorbereiten
+- [x] 33.3 Bridge-/Trainer-Client-Lane (Bot B)
+  - [x] 33.3.1 Optionalen `TrainerSessionClient`/Adapter fuer request-action/ack erweitern
+  - [x] 33.3.2 Timeout-/Retry-/Fallback-Pfad hart absichern
+  - [x] 33.3.3 Bridge-Telemetrie (`latency`, `timeouts`, `fallbacks`) in Eval/Gate einspeisen
+  - [x] 33.3.4 Mock-Bridge-Szenarien fuer deterministische Tests vorbereiten
+  - Status 2026-03-11 (Bot B): `WebSocketTrainerBridge` besitzt Retry-/Timeout-Telemetrie (`requests`, `responses`, `latency`, `timeouts`, `retries`, `fallbacks`), `ObservationBridgePolicy` meldet Fallbacks aktiv, und Eval nutzt deterministische Mock-Bridge-Szenarien.
 
-- [ ] 33.4 Developer-UI Automationslane (Bot C)
-  - [ ] 33.4.1 Dev-Panel um `Run Batch`, `Run Eval`, `Run Gate` erweitern
-  - [ ] 33.4.2 UI-Input->Payload weiterhin modular halten (`MenuDeveloperTrainingEventPayload`)
-  - [ ] 33.4.3 Runtime-Service fuer Fortschritt/Ergebnisanzeige kapseln (keine Monolith-Logik in `GameRuntimeFacade`)
-  - [ ] 33.4.4 Artefaktpfade/KPI-Ergebnis im Panel klar anzeigen
+- [x] 33.4 Developer-UI Automationslane (Bot C)
+  - [x] 33.4.1 Dev-Panel um `Run Batch`, `Run Eval`, `Run Gate` erweitern
+  - [x] 33.4.2 UI-Input->Payload weiterhin modular halten (`MenuDeveloperTrainingEventPayload`)
+  - [x] 33.4.3 Runtime-Service fuer Fortschritt/Ergebnisanzeige kapseln (keine Monolith-Logik in `GameRuntimeFacade`)
+  - [x] 33.4.4 Artefaktpfade/KPI-Ergebnis im Panel klar anzeigen
+  - Status 2026-03-11 (Bot C): Developer-Panel besitzt jetzt Automation-Inputs (`episodes`, `seeds`, `modes`, `bridgeMode`, `timeoutMs`, Gate-Thresholds) sowie `Run Batch`, `Run Eval`, `Run Gate`; Runtime-Service rendert KPI-, Artefakt- und PASS/FAIL-Ausgabe.
 
-- [ ] 33.5 Test-Lane Training Automation (Bot C, shared mit B)
-  - [ ] 33.5.1 Neue Training-Automation-Tests fuer Seed-Reproduzierbarkeit und Batch-Ende bauen
-  - [ ] 33.5.2 Gate-Tests fuer PASS/FAIL und Exit-Code bauen
-  - [ ] 33.5.3 UI-Flow-Tests fuer neue Automationsbuttons (`Run Batch/Eval/Gate`) bauen
-  - [ ] 33.5.4 Flaky-Risiko markieren und isolierte Re-Run-Regel dokumentieren
+- [x] 33.5 Test-Lane Training Automation (Bot C, shared mit B)
+  - [x] 33.5.1 Neue Training-Automation-Tests fuer Seed-Reproduzierbarkeit und Batch-Ende bauen
+  - [x] 33.5.2 Gate-Tests fuer PASS/FAIL und Exit-Code bauen
+  - [x] 33.5.3 UI-Flow-Tests fuer neue Automationsbuttons (`Run Batch/Eval/Gate`) bauen
+  - [x] 33.5.4 Flaky-Risiko markieren und isolierte Re-Run-Regel dokumentieren
+  - Status 2026-03-11 (Bot C): `tests/training-environment.spec.js` um `T96-T98` erweitert (Reproduzierbarkeit, Gate Exit-Code, UI-Button-Flow). Re-Run-Regel bei Flake: `npx playwright test tests/training-environment.spec.js -g "T96:|T97:|T98:" --workers=1`.
 
-- [ ] 33.6 Baseline- und Threshold-Kalibrierung (Bot B)
-  - [ ] 33.6.1 Baseline-Runs auf fixen Seeds erzeugen und als Referenz ablegen
-  - [ ] 33.6.2 Gate-Schwellen datenbasiert kalibrieren (nicht willkuerlich)
-  - [ ] 33.6.3 Drift-Regeln definieren (`warn` vs `hard fail`)
-  - [ ] 33.6.4 Restrisiken fuer echte externe Trainerlatenz dokumentieren
+- [x] 33.6 Baseline- und Threshold-Kalibrierung (Bot B)
+  - [x] 33.6.1 Baseline-Runs auf fixen Seeds erzeugen und als Referenz ablegen
+  - [x] 33.6.2 Gate-Schwellen datenbasiert kalibrieren (nicht willkuerlich)
+  - [x] 33.6.3 Drift-Regeln definieren (`warn` vs `hard fail`)
+  - [x] 33.6.4 Restrisiken fuer echte externe Trainerlatenz dokumentieren
+  - Status 2026-03-11 (Bot B): Referenz-Baseline aus festen Eval-Seeds (`11/23/37/41` ueber `classic/hunt` in `2d/3d`) liegt in `TRAINING_GATE_BASELINE_REFERENCE`; Schwellen werden daraus faktorisiert (`warn` vs `hard`) abgeleitet.
 
-- [ ] 33.7 End-to-End-Orchestrierung (Bot A + B)
-  - [ ] 33.7.1 `training:e2e` als deterministische Reihenfolge `run -> eval -> gate` absichern
-  - [ ] 33.7.2 Fehlerfortpflanzung und Exit-Codes fuer CI robust machen
-  - [ ] 33.7.3 Artefaktindex (`latest`) erzeugen
-  - [ ] 33.7.4 Laufzeitbudget fuer lokale/CI-Ausfuehrung dokumentieren
+- [x] 33.7 End-to-End-Orchestrierung (Bot A + B)
+  - [x] 33.7.1 (A/B) `training:e2e` als deterministische Reihenfolge `run -> eval -> gate` absichern
+  - [x] 33.7.2 (A/B) Fehlerfortpflanzung und Exit-Codes fuer CI robust machen
+  - [x] 33.7.3 (A/B) Artefaktindex (`latest`) erzeugen
+  - [x] 33.7.4 Laufzeitbudget fuer lokale/CI-Ausfuehrung dokumentieren
+  - Status 2026-03-11 (Bot A): A-Orchestrierung vorbereitet (`training-run`/`training-e2e`) und kompatibel zu Eval/Gate-Lane.
+  - Status 2026-03-11 (Bot B): `package.json` verdrahtet `training:e2e`; Eval/Gate aktualisieren `latest.json` deterministisch, und `training:gate` propagiert `pass/fail` via Exit-Code.
+  - Laufzeitbudget 2026-03-11 (lokal, deterministische Defaults): `training:run` ~1.5s, `training:eval` ~2.7s, `training:gate` ~1.4s, `training:e2e` ~3.2s.
 
 - [ ] 33.9 Abschluss-Gate und Doku-Freeze
   - [ ] 33.9.1 Verifikation: `training:e2e`, relevante Training-Tests, `test:core`
-  - [ ] 33.9.2 Verifikation: `docs:sync`, `docs:check`, `build`
-  - [ ] 33.9.3 Doku-Update (`Bot-Training-Schnittstelle`, Umsetzungsplan-Status, Restpunkte)
+  - [x] 33.9.2 Verifikation: `docs:sync`, `docs:check`, `build`
+  - [x] 33.9.3 Doku-Update (`Bot-Training-Schnittstelle`, Umsetzungsplan-Status, Restpunkte)
   - [ ] 33.9.4 Lock-Release + sauberer Abschlussbericht mit PASS/FAIL
+  - Status 2026-03-11 (Bot C): Training-Automation-Tests (`T96-T98`) PASS; `docs:sync/check` und `build` PASS. `test:core`/`test:stress` laufen im Sammellauf aktuell in fruehe Timeout-Flakes (`T7/T8`, `T61`), isolierte Re-Runs gruen. `training:e2e` bleibt bis zur A/B-Orchestrierung (`training:run/eval/gate/e2e`) offen.
+  - Status 2026-03-11 (Bot B): `training:run`, `training:eval`, `training:gate` und `training:e2e` PASS; neue Bridge-/Gate-Tests PASS; Sammellauf `test:core` zeigt flakigen Setup-Timeout in `T2` (isolierter Re-Run PASS), `test:physics`-Sammellauf lief in Tool-Timeout.
 
 ## Definition of Done
 
@@ -146,3 +158,4 @@ Optional:
 
 1. `npm run test:stress` (bei UI-Eingriffen stark empfohlen)
 2. isolierte Re-Runs fuer bekannte Flake-Kandidaten mit Dokumentation
+

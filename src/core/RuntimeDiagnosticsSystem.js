@@ -1,5 +1,11 @@
 const FPS_TRACKER_WINDOW = 60;
 
+function formatMs(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric < 0) return '0.0';
+    return numeric.toFixed(1);
+}
+
 function createFpsTracker(windowSize = FPS_TRACKER_WINDOW) {
     return {
         samples: new Float32Array(windowSize),
@@ -68,7 +74,8 @@ export class RuntimeDiagnosticsSystem {
 
     update(dt) {
         const game = this.game;
-        game._fpsTracker.update(dt);
+        const renderDt = Number(game?._renderDelta);
+        game._fpsTracker.update(Number.isFinite(renderDt) && renderDt > 0 ? renderDt : dt);
 
         if (game.stats) {
             game._statsTimer = (game._statsTimer || 0) + dt;
@@ -82,6 +89,15 @@ export class RuntimeDiagnosticsSystem {
                 const texs = info.memory.textures || 0;
                 const players = game.entityManager ? game.entityManager.players.filter((player) => player.alive).length : 0;
                 const quality = game.isLowQuality ? 'LOW' : 'HIGH';
+                const perfSnapshot = game.runtimePerfProfiler?.getSnapshot?.({
+                    windowSize: 240,
+                    spikeEventsLimit: 0,
+                }) || null;
+                const frameAvgMs = perfSnapshot?.frameMs?.avg || 0;
+                const frameP95Ms = perfSnapshot?.frameMs?.p95 || 0;
+                const frameP99Ms = perfSnapshot?.frameMs?.p99 || 0;
+                const spikeRecent = perfSnapshot?.spikes?.recent || 0;
+                const spikeThreshold = perfSnapshot?.spikes?.thresholdMs || 0;
                 game.stats.innerHTML =
                     `<b style="color:${fps < 30 ? '#f44' : fps < 50 ? '#fa0' : '#0f0'}">FPS: ${fps}</b>\n` +
                     `Draw Calls: ${draws}\n` +
@@ -89,7 +105,9 @@ export class RuntimeDiagnosticsSystem {
                     `Geometrien: ${geos}\n` +
                     `Texturen: ${texs}\n` +
                     `Spieler: ${players}\n` +
-                    `Qualitaet: ${quality}`;
+                    `Qualitaet: ${quality}\n` +
+                    `Frame ms avg/p95/p99: ${formatMs(frameAvgMs)} / ${formatMs(frameP95Ms)} / ${formatMs(frameP99Ms)}\n` +
+                    `Spikes>${formatMs(spikeThreshold)}ms: ${spikeRecent}`;
             }
         }
 

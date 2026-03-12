@@ -3,16 +3,20 @@ import path from 'node:path';
 import { readFileSync, rmSync, writeFileSync } from 'node:fs';
 import {
     collectErrors,
+    lockExpertMode,
     loadGame,
     openCustomSubmenu,
     openDebugSubmenu,
     openDeveloperSubmenu,
+    openExpertSubmenu,
     openGameSubmenu,
+    openStartSetupSection,
     openLevel4Drawer,
     openMultiplayerSubmenu,
     openSubmenu,
     returnToMenu,
     startGame,
+    unlockExpertMode,
 } from './helpers.js';
 import { stringifyMapDocument } from '../src/entities/MapSchema.js';
 
@@ -202,7 +206,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             await page.waitForFunction(() => {
                 const hud = document.getElementById('hud');
                 return hud && !hud.classList.contains('hidden');
-            }, { timeout: 15000 });
+            }, null, { timeout: 15000 });
             await page.waitForTimeout(500);
             await returnToMenu(page);
         }
@@ -223,7 +227,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T16: Schwierigkeitsstufen auswählbar', async ({ page }) => {
         await loadGame(page);
-        await openGameSubmenu(page);
+        await openStartSetupSection(page, 'match');
         for (const diff of ['EASY', 'NORMAL', 'HARD']) {
             await page.selectOption('#bot-difficulty', diff);
             expect(await page.inputValue('#bot-difficulty')).toBe(diff);
@@ -508,6 +512,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await openGameSubmenu(page);
 
         await page.selectOption('#map-select', 'maze');
+        await openStartSetupSection(page, 'vehicle');
         await page.selectOption('#vehicle-select-p1', 'aircraft');
 
         await expect(page.locator('#map-select')).toHaveValue('maze');
@@ -530,7 +535,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                 && !hud.classList.contains('hidden')
                 && game?.entityManager?.humanPlayers?.length > 0
             );
-        }, { timeout: 15000 });
+        }, null, { timeout: 15000 });
 
         const matchState = await page.evaluate(() => ({
             mapKey: window.GAME_INSTANCE?.arena?.currentMapKey ?? null,
@@ -612,12 +617,50 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(expandedOnLevel3).toBe(0);
     });
 
-    test('T20ia: Developer- und Debug-Pfad sind ueber Ebene 4 erreichbar', async ({ page }) => {
+    test('T20ia: Expertenlogin sperrt Developer/Debug bis Passwort 1307 und entsperrt danach', async ({ page }) => {
         await loadGame(page);
-        await openDeveloperSubmenu(page);
+        await openLevel4Drawer(page, { section: 'tools' });
+        await expect(page.locator('#submenu-level4 #btn-open-developer')).toHaveCount(0);
+
+        await openExpertSubmenu(page);
+        await expect(page.locator('#expert-unlocked-state')).toBeHidden();
+        await page.fill('#expert-password-input', '9999');
+        await page.click('#btn-expert-unlock');
+        await expect(page.locator('#expert-login-status')).toContainText('Passwort falsch');
+        await expect(page.locator('#expert-unlocked-state')).toBeHidden();
+
+        await page.fill('#expert-password-input', '1307');
+        await page.click('#btn-expert-unlock');
+        await expect(page.locator('#expert-unlocked-state')).toBeVisible();
+        await expect(page.locator('#build-info')).toContainText('Build');
+
+        await page.click('#btn-open-developer');
         await expect(page.locator('#submenu-developer')).toBeVisible();
+
         await openDebugSubmenu(page);
         await expect(page.locator('#submenu-debug')).toBeVisible();
+    });
+
+    test('T20ib: Logout sperrt den Expertenbereich erneut und Reload startet wieder gesperrt', async ({ page }) => {
+        await loadGame(page);
+        await unlockExpertMode(page);
+        await expect(page.locator('#expert-unlocked-state')).toBeVisible();
+
+        await lockExpertMode(page);
+        await expect(page.locator('#expert-unlocked-state')).toBeHidden();
+        await expect(page.locator('#expert-locked-state')).toBeVisible();
+
+        const postLockState = await page.evaluate(() => ({
+            unlocked: !!window.GAME_INSTANCE?.menuExpertLoginRuntime?.isUnlocked?.(),
+            developerOpened: !!window.GAME_INSTANCE?.uiManager?.menuNavigationRuntime?.showPanel?.('submenu-developer', { trigger: 'post_lock_test' }),
+        }));
+        expect(postLockState.unlocked).toBeFalsy();
+        expect(postLockState.developerOpened).toBeFalsy();
+
+        await page.reload();
+        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 10000 });
+        const postReloadUnlocked = await page.evaluate(() => !!window.GAME_INSTANCE?.menuExpertLoginRuntime?.isUnlocked?.());
+        expect(postReloadUnlocked).toBeFalsy();
     });
 
     test('T20j: Menu-Compatibility-Rules fixen inkonsistente Fixed-Preset-States deterministisch', async ({ page }) => {
@@ -681,6 +724,20 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(globalBinding).toBe('KeyB');
     });
 
+    test('T20k1: Globale Recording-Taste ist im Menue belegbar', async ({ page }) => {
+        await loadGame(page);
+        await openLevel4Drawer(page, { section: 'controls' });
+
+        await page.click('#keybind-global .keybind-btn[data-action="RECORDING_TOGGLE"]');
+        await page.keyboard.press('KeyN');
+        await page.waitForTimeout(50);
+
+        const globalBinding = await page.evaluate(() => (
+            window.GAME_INSTANCE?.settings?.controls?.GLOBAL?.RECORDING_TOGGLE || ''
+        ));
+        expect(globalBinding).toBe('KeyN');
+    });
+
     test('T20l: Globale Cinematic-Taste toggelt Kamera fuer beide Spieler', async ({ page }) => {
         await startGame(page);
         await page.evaluate(() => {
@@ -694,6 +751,59 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await page.waitForTimeout(100);
         const after = await page.evaluate(() => window.GAME_INSTANCE?.renderer?.getCinematicEnabled?.());
         expect(after).toBe(!before);
+    });
+
+    test('T20l1: Globale Recording-Taste triggert lifecycle.v1 recording_requested toggle', async ({ page }) => {
+        test.setTimeout(60000);
+        await startGame(page);
+        await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.settings.controls.GLOBAL.RECORDING_TOGGLE = 'KeyN';
+            game.input.setBindings(game.settings.controls);
+
+            const originalRecorder = game.mediaRecorderSystem;
+            const probe = {
+                events: [],
+                recording: false,
+                restore() {
+                    game.mediaRecorderSystem = originalRecorder;
+                },
+            };
+
+            game.mediaRecorderSystem = {
+                getSupportState: () => ({ canRecord: true }),
+                isRecording: () => probe.recording,
+                notifyLifecycleEvent: (type, context) => {
+                    probe.events.push({ type, command: String(context?.command || '') });
+                    if (String(context?.command || '').toLowerCase() === 'toggle') {
+                        probe.recording = !probe.recording;
+                    }
+                },
+            };
+
+            window.__recordingHotkeyProbe = probe;
+        });
+
+        await page.keyboard.press('n');
+        await page.waitForTimeout(60);
+        await page.keyboard.press('n');
+        await page.waitForTimeout(60);
+
+        const probeState = await page.evaluate(() => {
+            const probe = window.__recordingHotkeyProbe || { events: [], recording: false };
+            const events = Array.isArray(probe.events) ? probe.events.slice() : [];
+            const recording = !!probe.recording;
+            probe.restore?.();
+            delete window.__recordingHotkeyProbe;
+            return { events, recording };
+        });
+
+        expect(probeState.events).toHaveLength(2);
+        expect(probeState.events[0]?.type).toBe('recording_requested');
+        expect(probeState.events[0]?.command).toBe('toggle');
+        expect(probeState.events[1]?.type).toBe('recording_requested');
+        expect(probeState.events[1]?.command).toBe('toggle');
+        expect(probeState.recording).toBeFalsy();
     });
 
     test('T20m: Recording-AutoDownload ist aktiv und nutzt Videos-Ordnername', async ({ page }) => {
@@ -811,6 +921,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await loadGame(page);
         await openGameSubmenu(page);
         await page.selectOption('#map-select', 'complex');
+        await openStartSetupSection(page, 'match');
         await page.selectOption('#theme-mode-select', 'hell');
         await page.click('#btn-level3-reset');
         expect(await page.inputValue('#map-select')).toBe('standard');
@@ -945,6 +1056,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await openCustomSubmenu(page);
         await page.click('#submenu-custom:not(.hidden) [data-mode-path=\"fight\"]');
         await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await openStartSetupSection(page, 'match');
 
         await page.click('#btn-dimension-planar');
         await page.waitForTimeout(120);
@@ -975,42 +1087,51 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(state.planarMode).toBeFalsy();
     });
 
-    test('T20w: Header wird ausserhalb Ebene 1 kompakt und Context bleibt aktiv', async ({ page }) => {
+    test('T20w: Kopf- und Level-2-Zweitcopy ist visuell entfernt, Context bleibt als SR-Status aktiv', async ({ page }) => {
         await loadGame(page);
 
         const level1State = await page.evaluate(() => {
             const root = document.getElementById('main-menu');
-            const shell = root?.querySelector('.menu-shell');
-            const buildInfo = document.getElementById('build-info');
+            const context = document.getElementById('menu-context');
+            const isVisible = (selector) => Array.from(document.querySelectorAll(selector)).some((element) => {
+                const style = window.getComputedStyle(element);
+                return style.display !== 'none' && style.visibility !== 'hidden' && element.getClientRects().length > 0;
+            });
+            const contextRect = context?.getBoundingClientRect?.() || { width: 0, height: 0 };
             return {
                 depth: root?.getAttribute('data-menu-depth') || '',
-                shellHeight: Math.round(shell?.getBoundingClientRect().height || 0),
-                buildDisplay: buildInfo ? window.getComputedStyle(buildInfo).display : '',
+                secondaryCopyVisible: isVisible('.subtitle') || isVisible('.nav-btn-meta') || isVisible('.nav-help-card'),
+                contextText: String(context?.textContent || '').trim(),
+                contextWidth: Math.round(contextRect.width || 0),
+                contextHeight: Math.round(contextRect.height || 0),
             };
         });
 
-        await openGameSubmenu(page);
+        await openCustomSubmenu(page);
 
         const compactState = await page.evaluate(() => {
             const root = document.getElementById('main-menu');
-            const shell = root?.querySelector('.menu-shell');
-            const buildInfo = document.getElementById('build-info');
-            const context = document.getElementById('menu-context');
+            const isVisible = (selector) => Array.from(document.querySelectorAll(selector)).some((element) => {
+                const style = window.getComputedStyle(element);
+                return style.display !== 'none' && style.visibility !== 'hidden' && element.getClientRects().length > 0;
+            });
             return {
                 depth: root?.getAttribute('data-menu-depth') || '',
                 panel: root?.getAttribute('data-menu-panel') || '',
-                shellHeight: Math.round(shell?.getBoundingClientRect().height || 0),
-                buildDisplay: buildInfo ? window.getComputedStyle(buildInfo).display : '',
-                contextText: String(context?.textContent || '').trim(),
+                level2SecondaryVisible: isVisible('#submenu-custom .menu-choice-eyebrow')
+                    || isVisible('#submenu-custom .menu-choice-copy')
+                    || isVisible('#submenu-custom .menu-copy-secondary'),
             };
         });
 
         expect(level1State.depth).toBe('1');
-        expect(compactState.depth).toBe('3');
-        expect(compactState.panel).toBe('submenu-game');
-        expect(compactState.shellHeight).toBeLessThan(level1State.shellHeight);
-        expect(compactState.buildDisplay).toBe('none');
-        expect(compactState.contextText).toContain('Match vorbereiten');
+        expect(level1State.secondaryCopyVisible).toBeFalsy();
+        expect(level1State.contextText).toContain('Hauptmenue');
+        expect(level1State.contextWidth).toBeLessThanOrEqual(1);
+        expect(level1State.contextHeight).toBeLessThanOrEqual(1);
+        expect(compactState.depth).toBe('2');
+        expect(compactState.panel).toBe('submenu-custom');
+        expect(compactState.level2SecondaryVisible).toBeFalsy();
     });
 
     test('T20x: Moduskarte fuehrt direkt in Ebene 3', async ({ page }) => {
@@ -1195,6 +1316,106 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.accumulator).toBeLessThan(result.fixedStep);
     });
 
+    test('T20af: GameLoop uebergibt Render-Alpha aus accumulator/fixedStep', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameLoop } = await import('/src/core/GameLoop.js');
+            const originalRaf = window.requestAnimationFrame;
+            const originalCancel = window.cancelAnimationFrame;
+            const renderAlphas = [];
+            try {
+                window.requestAnimationFrame = () => 1;
+                window.cancelAnimationFrame = () => { };
+                const loop = new GameLoop(() => { }, (alpha) => {
+                    renderAlphas.push(alpha);
+                });
+                loop.running = true;
+                loop.lastTime = 0;
+                loop._loop(10);
+                loop._loop(20);
+                loop._loop(30);
+                const expectedAlpha = loop.fixedStep > 0 ? (loop.accumulator / loop.fixedStep) : 0;
+                return {
+                    renderCallCount: renderAlphas.length,
+                    latestRenderAlpha: Number(renderAlphas[renderAlphas.length - 1] ?? -1),
+                    cachedRenderAlpha: Number(loop.renderAlpha),
+                    expectedAlpha: Number(expectedAlpha),
+                };
+            } finally {
+                window.requestAnimationFrame = originalRaf;
+                window.cancelAnimationFrame = originalCancel;
+            }
+        });
+
+        expect(result.renderCallCount).toBe(3);
+        expect(result.latestRenderAlpha).toBeGreaterThanOrEqual(0);
+        expect(result.latestRenderAlpha).toBeLessThanOrEqual(1);
+        expect(Math.abs(result.cachedRenderAlpha - result.latestRenderAlpha)).toBeLessThan(0.000001);
+        expect(Math.abs(result.expectedAlpha - result.latestRenderAlpha)).toBeLessThan(0.000001);
+    });
+
+    test('T20ag: GameLoop neutralisiert extreme Delta-Spruenge mit Jump-Guard', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameLoop } = await import('/src/core/GameLoop.js');
+            const originalRaf = window.requestAnimationFrame;
+            const originalCancel = window.cancelAnimationFrame;
+            const updates = [];
+            try {
+                window.requestAnimationFrame = () => 1;
+                window.cancelAnimationFrame = () => { };
+                const loop = new GameLoop((dt) => updates.push(dt), () => { });
+                loop.running = true;
+                loop.lastTime = 0;
+                loop._loop(1200);
+                return {
+                    updateCount: updates.length,
+                    totalDt: updates.reduce((sum, dt) => sum + dt, 0),
+                    accumulator: loop.accumulator,
+                    fixedStep: loop.fixedStep,
+                };
+            } finally {
+                window.requestAnimationFrame = originalRaf;
+                window.cancelAnimationFrame = originalCancel;
+            }
+        });
+
+        expect(result.updateCount).toBe(1);
+        expect(result.totalDt).toBeGreaterThanOrEqual(result.fixedStep - 0.000001);
+        expect(result.totalDt).toBeLessThanOrEqual(result.fixedStep + 0.000001);
+        expect(result.accumulator).toBeLessThan(0.000001);
+    });
+
+    test('T20ah: Debug-API liefert Runtime-Perf-Snapshot inkl. Subsystem-Werten', async ({ page }) => {
+        await loadGame(page);
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const profiler = game?.runtimePerfProfiler;
+            const now = performance.now();
+            profiler?.beginFrame?.(16.7, now);
+            profiler?.recordSubsystemDuration?.('update', 2.4);
+            profiler?.recordSubsystemDuration?.('camera', 1.2);
+            profiler?.endFrame?.(16.7, now + 16.7);
+            const snapshot = game?.debugApi?.getRuntimePerformanceSnapshot?.({
+                windowSize: 1,
+                spikeEventsLimit: 0,
+            }) || null;
+            return {
+                hasSnapshot: !!snapshot,
+                frameP95: Number(snapshot?.performance?.frameMs?.p95 || 0),
+                updateAvg: Number(snapshot?.performance?.subsystems?.update?.avg || 0),
+                cameraAvg: Number(snapshot?.performance?.subsystems?.camera?.avg || 0),
+                hasRecorderDiagnostics: !!snapshot?.recorder,
+            };
+        });
+
+        expect(probe.hasSnapshot).toBeTruthy();
+        expect(probe.frameP95).toBeGreaterThan(0);
+        expect(probe.updateAvg).toBeGreaterThan(0);
+        expect(probe.cameraAvg).toBeGreaterThan(0);
+        expect(probe.hasRecorderDiagnostics).toBeTruthy();
+    });
+
     test('T20ae: Runtime-Dispose entfernt globale und Menue-Listener vor Reinit', async ({ page }) => {
         const errors = collectErrors(page);
         await loadGame(page);
@@ -1333,7 +1554,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const hud = document.getElementById('hud');
             const g = window.GAME_INSTANCE;
             return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
-        }, { timeout: 15000 });
+        }, null, { timeout: 15000 });
 
         const probe = await page.evaluate(() => {
             const g = window.GAME_INSTANCE;
@@ -1375,7 +1596,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const hud = document.getElementById('hud');
             const g = window.GAME_INSTANCE;
             return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
-        }, { timeout: 15000 });
+        }, null, { timeout: 15000 });
 
         const portalCount = await page.evaluate(() => window.GAME_INSTANCE?.arena?.portals?.length ?? 0);
         expect(portalCount).toBe(4);
@@ -1407,7 +1628,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const hud = document.getElementById('hud');
             const g = window.GAME_INSTANCE;
             return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
-        }, { timeout: 15000 });
+        }, null, { timeout: 15000 });
 
         const firstObstacleCount = await page.evaluate(() =>
             window.GAME_INSTANCE?.arena?.obstacles?.filter((entry) => !entry?.isWall)?.length ?? 0
@@ -1436,7 +1657,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             const hud = document.getElementById('hud');
             const g = window.GAME_INSTANCE;
             return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
-        }, { timeout: 15000 });
+        }, null, { timeout: 15000 });
 
         const secondProbe = await page.evaluate(() => ({
             mapKey: window.GAME_INSTANCE?.arena?.currentMapKey ?? null,
@@ -1532,7 +1753,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                 const hud = document.getElementById('hud');
                 const g = window.GAME_INSTANCE;
                 return hud && !hud.classList.contains('hidden') && g?.entityManager?.players?.length > 0;
-            }, { timeout: 15000 });
+            }, null, { timeout: 15000 });
 
             const matchProbe = await page.evaluate(() => ({
                 mapKey: window.GAME_INSTANCE?.arena?.currentMapKey ?? null,

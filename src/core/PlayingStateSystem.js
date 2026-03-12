@@ -48,9 +48,25 @@ export class PlayingStateSystem {
         game.powerupManager.update(dt);
         game.particles.update(dt);
         game.arena.update(dt);
-        game.entityManager.updateCameras(dt);
-        game.crosshairSystem.updateCrosshairs();
         game.hudRuntimeSystem.updatePlayingHudTick(dt);
         game._applyPlayingTimeScaleFromEffects();
+    }
+
+    render(alpha = 1, renderDelta = null) {
+        const game = this.game;
+        if (!game?.entityManager) return;
+
+        const numericAlpha = Number(alpha);
+        const renderAlpha = Number.isFinite(numericAlpha) ? Math.max(0, Math.min(1, numericAlpha)) : 1;
+        const numericRenderDelta = Number(renderDelta);
+        const cameraDt = Number.isFinite(numericRenderDelta)
+            ? Math.max(1 / 240, Math.min(0.05, numericRenderDelta))
+            : (Number(game?.gameLoop?.fixedStep) || (1 / 60));
+
+        game.entityManager.renderInterpolatedTransforms(renderAlpha);
+        const cameraStart = game.runtimePerfProfiler?.startSample?.();
+        game.entityManager.updateCameras(cameraDt, renderAlpha);
+        game.runtimePerfProfiler?.endSample?.('camera', cameraStart);
+        game.crosshairSystem.updateCrosshairs();
     }
 }

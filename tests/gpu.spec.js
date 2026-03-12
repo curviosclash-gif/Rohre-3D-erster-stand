@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loadGame, startGame, startGameWithBots, returnToMenu } from './helpers.js';
+import { loadGame, openLevel4Drawer, startGame, startGameWithBots, returnToMenu } from './helpers.js';
 
 test.describe('T21-40: Rendering & GPU', () => {
 
@@ -150,6 +150,63 @@ test.describe('T21-40: Rendering & GPU', () => {
         expect(highSettings.shadows).toBeTruthy();
         expect(highSettings.toneMapping).not.toBe(0); // THREE.ACESFilmicToneMapping is 4
         expect(highSettings.pixelRatio).toBeGreaterThan(0.8);
+    });
+
+    test('T31a: Schattenqualitaets-Slider steuert Shadow-Maps im Menue', async ({ page }) => {
+        await loadGame(page);
+        await openLevel4Drawer(page, { section: 'gameplay' });
+
+        await expect(page.locator('#shadow-quality-slider')).toHaveValue('2');
+        await expect(page.locator('#shadow-quality-label')).toHaveText('Mittel');
+
+        await page.evaluate(() => {
+            const slider = document.getElementById('shadow-quality-slider');
+            slider.value = '3';
+            slider.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        await page.waitForTimeout(100);
+
+        const highState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const readDirectionalShadowMapSize = () => {
+                let mapSize = 0;
+                game?.renderer?.scene?.traverse((child) => {
+                    if (mapSize > 0) return;
+                    if (child.isDirectionalLight && child.castShadow) {
+                        mapSize = child.shadow?.mapSize?.width || 0;
+                    }
+                });
+                return mapSize;
+            };
+            game.renderer.setQuality('LOW');
+            game.renderer.setQuality('HIGH');
+            return {
+                stored: game?.settings?.localSettings?.shadowQuality,
+                label: document.getElementById('shadow-quality-label')?.textContent || '',
+                shadows: game?.renderer?.renderer?.shadowMap?.enabled ?? false,
+                mapSize: readDirectionalShadowMapSize(),
+            };
+        });
+        expect(highState.stored).toBe(3);
+        expect(highState.label).toBe('Hoch');
+        expect(highState.shadows).toBeTruthy();
+        expect(highState.mapSize).toBeGreaterThanOrEqual(1024);
+
+        await page.evaluate(() => {
+            const slider = document.getElementById('shadow-quality-slider');
+            slider.value = '0';
+            slider.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+        await page.waitForTimeout(100);
+
+        const offState = await page.evaluate(() => ({
+            stored: window.GAME_INSTANCE?.settings?.localSettings?.shadowQuality,
+            label: document.getElementById('shadow-quality-label')?.textContent || '',
+            shadows: window.GAME_INSTANCE?.renderer?.renderer?.shadowMap?.enabled ?? true,
+        }));
+        expect(offState.stored).toBe(0);
+        expect(offState.label).toBe('Aus');
+        expect(offState.shadows).toBeFalsy();
     });
 
     test('T32: Szene nutzt definierte Scene-Roots', async ({ page }) => {

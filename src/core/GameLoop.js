@@ -3,7 +3,7 @@
 // ============================================
 
 export class GameLoop {
-    constructor(updateFn, renderFn) {
+    constructor(updateFn, renderFn, options = {}) {
         this.updateFn = updateFn;
         this.renderFn = renderFn;
         this.running = false;
@@ -15,6 +15,10 @@ export class GameLoop {
         this.accumulator = 0;
         this.fixedStep = 1 / 60;
         this.maxSubSteps = 3;
+        this.renderAlpha = 1;
+        this.renderDelta = this.fixedStep;
+        this.runtimePerfProfiler = options?.runtimePerfProfiler || null;
+        this.largeDeltaResetSeconds = 0.25;
     }
 
     start() {
@@ -22,6 +26,8 @@ export class GameLoop {
         this.lastTime = performance.now();
         this._errorShown = false;
         this.accumulator = 0;
+        this.renderAlpha = 0;
+        this.renderDelta = this.fixedStep;
         this.frameId = requestAnimationFrame(this._boundLoop);
     }
 
@@ -41,10 +47,23 @@ export class GameLoop {
     _loop(now) {
         if (!this.running) return;
 
-        const rawDt = (now - this.lastTime) / 1000;
+        let rawDt = (now - this.lastTime) / 1000;
+        if (!Number.isFinite(rawDt) || rawDt < 0) {
+            rawDt = 0;
+        }
         this.lastTime = now;
 
-        const dt = Math.min(rawDt, 0.05);
+        const deltaJump = rawDt > this.largeDeltaResetSeconds;
+        if (deltaJump) {
+            this.accumulator = 0;
+        }
+
+        const stabilizedRawDt = deltaJump ? this.fixedStep : rawDt;
+        const dt = Math.min(stabilizedRawDt, 0.05);
+        const runtimePerfProfiler = this.runtimePerfProfiler;
+        runtimePerfProfiler?.beginFrame(rawDt * 1000, now);
+
+        this.renderDelta = dt;
         const scaledDt = dt * this.timeScale;
         this.accumulator += scaledDt;
 
@@ -55,10 +74,14 @@ export class GameLoop {
 
         try {
             while (this.accumulator >= this.fixedStep) {
+                const updateStart = runtimePerfProfiler?.startSample?.();
                 this.updateFn(this.fixedStep);
+                runtimePerfProfiler?.endSample?.('update', updateStart);
                 this.accumulator -= this.fixedStep;
             }
-            this.renderFn();
+            const rawAlpha = this.fixedStep > 0 ? (this.accumulator / this.fixedStep) : 0;
+            this.renderAlpha = Number.isFinite(rawAlpha) ? Math.max(0, Math.min(1, rawAlpha)) : 0;
+            this.renderFn(this.renderAlpha, this.renderDelta);
         } catch (err) {
             if (!this._errorShown) {
                 this._errorShown = true;
@@ -69,6 +92,7 @@ export class GameLoop {
                 document.body.appendChild(overlay);
             }
         }
+        runtimePerfProfiler?.endFrame(rawDt * 1000, now);
 
         this.frameId = requestAnimationFrame(this._boundLoop);
     }

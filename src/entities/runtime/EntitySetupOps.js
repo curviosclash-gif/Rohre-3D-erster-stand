@@ -127,6 +127,7 @@ export class EntitySetupOps {
                 difficulty: owner.botDifficulty,
                 recorder: owner.recorder,
                 runtimeConfig: owner.runtimeConfig,
+                runtimeProfiler: owner.runtimeProfiler,
             });
             if (typeof ai?.setSensePhase === 'function') {
                 ai.setSensePhase(i % 4); // Time-slicing for batched bot scans

@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loadGame, startHuntGame, startHuntGameWithBots } from './helpers.js';
 
 test.describe('Physics Hunt (Tests 61-64, 83-89)', () => {
+    test.describe.configure({ timeout: 120000 });
 
     test('T61: Hunt-MG entfernt getroffenes Spursegment sofort', async ({ page }) => {
         await startHuntGame(page);

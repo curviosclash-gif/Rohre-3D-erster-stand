@@ -1,4 +1,5 @@
 import { MENU_DEVELOPER_ACCESS_MODES } from './MenuStateContracts.js';
+import { resolveMenuExpertState } from './MenuExpertLoginRuntime.js';
 
 export const MENU_ACCESS_POLICIES = Object.freeze({
     OPEN: 'open',
@@ -14,6 +15,7 @@ export const MENU_ACCESS_GUARD_REASONS = Object.freeze({
     OWNER_REQUIRED: 'owner_required',
     LOCKED: 'locked',
     HIDDEN_FOR_PLAYER: 'hidden_for_player',
+    EXPERT_LOGIN_REQUIRED: 'expert_login_required',
     INVALID_POLICY: 'invalid_policy',
 });
 
@@ -59,6 +61,7 @@ export function resolveMenuAccessContext(settings) {
         ? requestedMode
         : MENU_DEVELOPER_ACCESS_MODES.OWNER_ONLY;
 
+    const expertState = resolveMenuExpertState(settings);
     return {
         ownerId,
         actorId,
@@ -66,6 +69,7 @@ export function resolveMenuAccessContext(settings) {
         developerModeVisibility,
         developerModeEnabled: settings?.menuFeatureFlags?.developerModeEnabled !== false,
         releasePreviewEnabled: !!localSettings.releasePreviewEnabled,
+        expertModeUnlocked: expertState?.unlocked === true,
     };
 }
 
@@ -74,10 +78,29 @@ export function normalizeAccessPolicy(accessPolicy) {
     return VALID_ACCESS_POLICY_SET.has(normalized) ? normalized : null;
 }
 
+export function resolveExpertAccessState(accessContext) {
+    if (accessContext?.expertModeUnlocked === true) {
+        return { allowed: true, reason: MENU_ACCESS_GUARD_REASONS.ALLOWED };
+    }
+    return { allowed: false, reason: MENU_ACCESS_GUARD_REASONS.EXPERT_LOGIN_REQUIRED };
+}
+
 export function resolveDeveloperAccessPolicy(accessContext) {
+    const expertAccessState = resolveExpertAccessState(accessContext);
+    if (!expertAccessState.allowed) {
+        return MENU_ACCESS_POLICIES.LOCKED;
+    }
     const mode = normalizeString(accessContext?.developerModeVisibility, MENU_DEVELOPER_ACCESS_MODES.OWNER_ONLY);
     if (mode === MENU_DEVELOPER_ACCESS_MODES.OPEN) return MENU_ACCESS_POLICIES.OPEN;
     if (mode === MENU_DEVELOPER_ACCESS_MODES.HIDDEN_FOR_PLAYERS) return MENU_ACCESS_POLICIES.HIDDEN_FOR_PLAYERS;
+    return MENU_ACCESS_POLICIES.OWNER_ONLY;
+}
+
+export function resolveDebugAccessPolicy(accessContext) {
+    const expertAccessState = resolveExpertAccessState(accessContext);
+    if (!expertAccessState.allowed) {
+        return MENU_ACCESS_POLICIES.LOCKED;
+    }
     return MENU_ACCESS_POLICIES.OWNER_ONLY;
 }
 

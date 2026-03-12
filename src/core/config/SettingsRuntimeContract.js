@@ -19,6 +19,8 @@ export const SETTINGS_LIMITS = Object.freeze({
     }),
     botBridge: Object.freeze({
         timeoutMs: Object.freeze({ min: 20, max: 5000, integer: true }),
+        maxRetries: Object.freeze({ min: 0, max: 5, integer: true }),
+        retryDelayMs: Object.freeze({ min: 0, max: 1000, integer: true }),
     }),
 });
 
@@ -81,6 +83,7 @@ export function normalizeGlobalControlBindings(source, fallback) {
     const base = fallback || {};
     return {
         CINEMATIC_TOGGLE: src.CINEMATIC_TOGGLE || base.CINEMATIC_TOGGLE || 'F8',
+        RECORDING_TOGGLE: src.RECORDING_TOGGLE || base.RECORDING_TOGGLE || 'F9',
     };
 }
 

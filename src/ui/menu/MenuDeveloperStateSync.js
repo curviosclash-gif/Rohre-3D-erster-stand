@@ -36,7 +36,7 @@ export function syncMenuDeveloperState({
 
     if (ui.developerModeToggle) {
         ui.developerModeToggle.checked = !!localSettings.developerModeEnabled;
-        ui.developerModeToggle.disabled = !releaseState?.featureEnabled;
+        ui.developerModeToggle.disabled = !releaseState?.featureEnabled || accessContext?.expertModeUnlocked !== true;
     }
     if (ui.developerThemeSelect) {
         ui.developerThemeSelect.value = String(localSettings.developerThemeId || 'classic-console');
@@ -52,10 +52,11 @@ export function syncMenuDeveloperState({
     }
     if (ui.developerReleasePreviewToggle) {
         ui.developerReleasePreviewToggle.checked = !!localSettings.releasePreviewEnabled;
-        ui.developerReleasePreviewToggle.disabled = !releaseState?.featureEnabled;
+        ui.developerReleasePreviewToggle.disabled = !releaseState?.featureEnabled || accessContext?.expertModeUnlocked !== true;
     }
 
     const controlsLocked = !releaseState?.featureEnabled
+        || accessContext?.expertModeUnlocked !== true
         || !localSettings.developerModeEnabled
         || !!releaseState?.releasePreviewEnabled;
     const developerControls = [
@@ -131,9 +132,10 @@ export function syncMenuDeveloperState({
     if (ui.developerHint) {
         const mode = String(localSettings.developerModeVisibility || 'owner_only');
         const ownerState = accessContext?.isOwner ? 'owner' : 'player';
+        const expertState = accessContext?.expertModeUnlocked ? 'unlocked' : 'locked';
         const releaseStateText = releaseState?.releasePreviewEnabled
             ? 'release_preview_active'
             : (releaseState?.featureEnabled ? 'dev_enabled' : 'dev_feature_off');
-        ui.developerHint.textContent = `Developer Scope: ${mode} | Session: ${ownerState} | Release: ${releaseStateText}`;
+        ui.developerHint.textContent = `Developer Scope: ${mode} | Session: ${ownerState} | Expert: ${expertState} | Release: ${releaseStateText}`;
     }
 }

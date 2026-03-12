@@ -1,4 +1,8 @@
-import { evaluateMenuAccessPolicy, resolveDeveloperAccessPolicy } from './MenuAccessPolicy.js';
+import {
+    evaluateMenuAccessPolicy,
+    resolveDebugAccessPolicy,
+    resolveDeveloperAccessPolicy,
+} from './MenuAccessPolicy.js';
 import { MENU_STATE_IDS } from './MenuStateMachine.js';
 
 function normalizeId(value) {
@@ -414,6 +418,9 @@ export class MenuNavigationRuntime {
         if (!panelConfig || typeof panelConfig !== 'object') return 'open';
         if (panelConfig.semanticId === 'developer') {
             return resolveDeveloperAccessPolicy(this.accessContext);
+        }
+        if (panelConfig.semanticId === 'debug') {
+            return resolveDebugAccessPolicy(this.accessContext);
         }
         return panelConfig.accessPolicy || 'open';
     }

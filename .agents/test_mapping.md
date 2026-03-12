@@ -28,11 +28,12 @@ Use this table to select verification commands from changed paths.
 
 ## Parallelisierung
 
-Bei parallelen Test-Runs verschiedene Ports nutzen:
+Bei parallelen Playwright-Runs pro Bot isolieren (Port + Artefakte):
 
 ```
-TEST_PORT=5174 npm run test:core
-TEST_PORT=5175 npm run test:physics
+TEST_PORT=5174 PW_RUN_TAG=bot1 PW_OUTPUT_DIR=test-results/bot1 npm run test:core
+TEST_PORT=5175 PW_RUN_TAG=bot2 PW_OUTPUT_DIR=test-results/bot2 npm run test:physics
 ```
 
-Playwright nutzt lokal automatisch alle CPU-Kerne (workers: undefined). Fuer CI ist workers auf 1 fixiert.
+Wichtig: Keine parallelen Runs mit identischem `TEST_PORT` oder identischem `PW_OUTPUT_DIR`.
+Default-Config laeuft lokal mit `workers=1` fuer geringere Last; optional per `PW_WORKERS` erhoehbar.

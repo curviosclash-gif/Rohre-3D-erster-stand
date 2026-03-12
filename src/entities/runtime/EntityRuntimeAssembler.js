@@ -121,6 +121,8 @@ export class EntityRuntimeAssembler {
         const tmpDir = new THREE.Vector3();
         const tmpDir2 = new THREE.Vector3();
         const tmpCamAnchor = new THREE.Vector3();
+        const tmpCamRenderPos = new THREE.Vector3();
+        const tmpCamRenderQuat = new THREE.Quaternion();
         const tmpCollisionNormal = new THREE.Vector3();
         const tmpPrevPlayerPosition = new THREE.Vector3();
         const fallbackArenaCollision = { hit: true, kind: 'wall', isWall: true, normal: null };
@@ -200,6 +202,8 @@ export class EntityRuntimeAssembler {
             _tmpDir: tmpDir,
             _tmpDir2: tmpDir2,
             _tmpCamAnchor: tmpCamAnchor,
+            _tmpCamRenderPos: tmpCamRenderPos,
+            _tmpCamRenderQuat: tmpCamRenderQuat,
             _tmpCollisionNormal: tmpCollisionNormal,
             _tmpPrevPlayerPosition: tmpPrevPlayerPosition,
             _fallbackArenaCollision: fallbackArenaCollision,

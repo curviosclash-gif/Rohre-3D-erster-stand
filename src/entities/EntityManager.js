@@ -38,13 +38,14 @@ export class EntityManager {
         return clampInt(Math.ceil(graceDistance / estimatedSegmentSpacing) + 1, 5, 12);
     }
 
-    constructor(renderer, arena, powerupManager, particles, audio, recorder) {
+    constructor(renderer, arena, powerupManager, particles, audio, recorder, runtimeProfiler = null) {
         this.renderer = renderer;
         this.arena = arena;
         this.powerupManager = powerupManager;
         this.particles = particles;
         this.audio = audio;
         this.recorder = recorder;
+        this.runtimeProfiler = runtimeProfiler || null;
         this.players = [];
         this.humanPlayers = [];
         this.bots = [];
@@ -257,19 +258,39 @@ export class EntityManager {
 
     _bounceBot(player, normalOverride = null, source = 'WALL', options = {}) {
         this._collisionResponseSystem.bounceBot(player, normalOverride, source, options);
+        player?.markRenderDiscontinuity?.('bounce');
     }
 
     _bouncePlayerOnFoam(player, normalOverride = null) {
         this._collisionResponseSystem.bouncePlayerOnFoam(player, normalOverride);
+        player?.markRenderDiscontinuity?.('bounce-foam');
     }
 
-    updateCameras(dt) {
+    renderInterpolatedTransforms(renderAlpha = 1) {
+        for (const player of this.players) {
+            player?.view?.applyRenderTransform?.(renderAlpha);
+        }
+    }
+
+    updateCameras(dt, renderAlpha = 1) {
         for (const player of this.players) {
             if (!player.isBot && player.index < this.renderer.cameras.length) {
-                const pos = player.position;
-                const dir = player.alive ? player.getDirection(this._tmpDir2) : this._tmpDir2.set(0, 0, -1);
+                player.resolveRenderTransform(renderAlpha, this._tmpCamRenderPos, this._tmpCamRenderQuat);
+                const dir = player.alive
+                    ? this._tmpDir2.set(0, 0, -1).applyQuaternion(this._tmpCamRenderQuat)
+                    : this._tmpDir2.set(0, 0, -1);
                 const firstPersonAnchor = player.getFirstPersonCameraAnchor(this._tmpCamAnchor);
-                this.renderer.updateCamera(player.index, pos, dir, dt, player.quaternion, player.cockpitCamera, player.isBoosting, this.arena, firstPersonAnchor);
+                this.renderer.updateCamera(
+                    player.index,
+                    this._tmpCamRenderPos,
+                    dir,
+                    dt,
+                    this._tmpCamRenderQuat,
+                    player.cockpitCamera,
+                    player.isBoosting,
+                    this.arena,
+                    firstPersonAnchor
+                );
             }
         }
     }

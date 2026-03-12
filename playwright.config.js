@@ -1,19 +1,80 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
 
-const TEST_PORT = process.env.TEST_PORT || 5173;
 const isCI = !!process.env.CI;
+
+function toPositiveInt(rawValue, fallback, min = 1, max = 65_535) {
+    const numeric = Number.parseInt(String(rawValue || ''), 10);
+    if (!Number.isFinite(numeric)) return fallback;
+    return Math.max(min, Math.min(max, numeric));
+}
+
+function hashRunTag(value) {
+    let hash = 0;
+    const source = String(value || '');
+    for (let i = 0; i < source.length; i++) {
+        hash = ((hash << 5) - hash) + source.charCodeAt(i);
+        hash |= 0;
+    }
+    return Math.abs(hash);
+}
+
+function sanitizeRunTag(value) {
+    const normalized = String(value || '')
+        .trim()
+        .replace(/[^a-zA-Z0-9-_]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    return normalized || `pid-${process.pid}`;
+}
+
+function resolveIsolatedPlaywrightEnv() {
+    const runTag = sanitizeRunTag(process.env.PW_RUN_TAG || `pid-${process.pid}-${Date.now().toString(36)}`);
+    const defaultPortBase = toPositiveInt(process.env.PW_BASE_PORT, 5173, 1024, 60_000);
+    const defaultPortSpan = toPositiveInt(process.env.PW_PORT_SPAN, 400, 10, 4000);
+    const defaultPort = defaultPortBase + (hashRunTag(runTag) % defaultPortSpan);
+    const testPort = toPositiveInt(process.env.TEST_PORT, defaultPort, 1024, 65_535);
+    const outputDir = String(process.env.PW_OUTPUT_DIR || `test-results/${runTag}`);
+    const workers = toPositiveInt(process.env.PW_WORKERS, 1, 1, 32);
+
+    process.env.PW_RUN_TAG = runTag;
+    process.env.TEST_PORT = String(testPort);
+    process.env.PW_OUTPUT_DIR = outputDir;
+    process.env.PW_WORKERS = String(workers);
+
+    return {
+        runTag,
+        testPort,
+        outputDir,
+        workers,
+    };
+}
+
+const isolatedEnv = resolveIsolatedPlaywrightEnv();
+const TEST_PORT = isolatedEnv.testPort;
+const runTag = isolatedEnv.runTag;
+const outputDir = isolatedEnv.outputDir;
+const htmlReportDir = String(process.env.PW_HTML_REPORT_DIR || `playwright-report/${runTag}`);
+const workers = isolatedEnv.workers;
+const traceMode = process.env.PW_TRACE === '1'
+    ? 'retain-on-failure'
+    : (isCI ? 'retain-on-failure' : 'off');
+const reporters = process.env.PW_HTML_REPORT === '1' || isCI
+    ? [['list'], ['html', { open: 'never', outputFolder: htmlReportDir }]]
+    : [['list']];
 
 export default defineConfig({
     testDir: './tests',
-    fullyParallel: true,
+    fullyParallel: false,
     forbidOnly: isCI,
     retries: isCI ? 1 : 0,
-    workers: isCI ? 1 : undefined,
-    reporter: [['list'], ['html', { open: 'never' }]],
+    workers,
+    outputDir,
+    globalSetup: './tests/playwright.global-setup.js',
+    globalTeardown: './tests/playwright.global-teardown.js',
+    reporter: reporters,
     use: {
         baseURL: `http://localhost:${TEST_PORT}`,
-        trace: 'retain-on-failure',
+        trace: traceMode,
     },
     projects: [
         {
@@ -24,6 +85,6 @@ export default defineConfig({
     webServer: {
         command: `npx vite --port ${TEST_PORT}`,
         url: `http://localhost:${TEST_PORT}`,
-        reuseExistingServer: !isCI,
+        reuseExistingServer: !isCI && process.env.PW_REUSE_SERVER === '1',
     },
 });

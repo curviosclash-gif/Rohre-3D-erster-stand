@@ -21,6 +21,7 @@ const ACTION_KEYS = [
 
 const GLOBAL_ACTION_KEYS = [
     'CINEMATIC_TOGGLE',
+    'RECORDING_TOGGLE',
 ];
 
 function deepClone(obj) {

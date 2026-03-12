@@ -17,6 +17,7 @@ const WORLD_UP = new THREE.Vector3(0, 1, 0);
 export class BotAI {
     constructor(options = {}) {
         this.recorder = options.recorder || null;
+        this.runtimeProfiler = options.runtimeProfiler || null;
 
         this.currentInput = {
             pitchUp: false,
@@ -301,7 +302,9 @@ export class BotAI {
 
         this._resetDecision();
         this._ensureSensorsRuntimeBound();
+        const botSensingStart = this.runtimeProfiler?.startSample?.();
         this.sensors.update(this, player, arena, allPlayers, projectiles);
+        this.runtimeProfiler?.endSample?.('bot_sensing', botSensingStart);
         if (runDecision(this, dt, player, arena, allPlayers, BOT_ITEM_RULES)) {
             return this.currentInput;
         }

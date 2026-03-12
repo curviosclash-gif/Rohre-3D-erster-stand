@@ -46,6 +46,11 @@ Create `implementation_plan.md`:
 
 - Run `/code` workflow with `fix:` commit prefix.
 - `/code` is the single source of truth for DoD, verification, and doc-freshness.
+- For parallel-bot Playwright runs, enforce per-bot isolation:
+  - unique `TEST_PORT`
+  - unique `PW_RUN_TAG`
+  - unique `PW_OUTPUT_DIR`
+- Never run concurrent Playwright suites with shared defaults in the same workspace.
 - Continue to next open phase in own block after each close.
 - **Shared-File-Regel:** If a change touches a file owned by another block:
   - Keep change minimal

@@ -15,6 +15,7 @@ import { HudRuntimeSystem } from '../ui/HudRuntimeSystem.js';
 import { CrosshairSystem } from '../ui/CrosshairSystem.js';
 import { BuildInfoController } from './BuildInfoController.js';
 import { MediaRecorderSystem } from './MediaRecorderSystem.js';
+import { MenuExpertLoginRuntime } from '../ui/menu/MenuExpertLoginRuntime.js';
 
 function readBooleanQueryParam(paramName, fallback = false) {
     try {
@@ -87,6 +88,15 @@ export function createGameUiRefs() {
         menuNav: document.getElementById('menu-nav'),
         menuPanels: Array.from(document.querySelectorAll('.submenu-panel')),
         menuNavButtons: Array.from(document.querySelectorAll('.nav-btn')),
+        openExpertButton: document.getElementById('btn-open-expert'),
+        expertQuickLockButton: document.getElementById('btn-expert-lock-quick'),
+        expertLockedState: document.getElementById('expert-locked-state'),
+        expertUnlockedState: document.getElementById('expert-unlocked-state'),
+        expertPasswordInput: document.getElementById('expert-password-input'),
+        expertUnlockButton: document.getElementById('btn-expert-unlock'),
+        expertCancelButton: document.getElementById('btn-expert-cancel'),
+        expertLockButton: document.getElementById('btn-expert-lock'),
+        expertStatus: document.getElementById('expert-login-status'),
         sessionButtons: Array.from(document.querySelectorAll('.nav-btn[data-session-type]')),
         modePathButtons: Array.from(document.querySelectorAll('.mode-path-btn[data-mode-path]')),
         quickStartLastButton: document.getElementById('btn-quick-last-settings'),
@@ -95,6 +105,8 @@ export function createGameUiRefs() {
         buildInfo: document.getElementById('build-info'),
         buildInfoDetail: document.getElementById('build-info-detail'),
         copyBuildButton: document.getElementById('btn-copy-build'),
+        openDeveloperButton: document.getElementById('btn-open-developer'),
+        openDebugButton: document.getElementById('btn-open-debug'),
 
         modeButtons: Array.from(document.querySelectorAll('.mode-btn[data-mode]')),
         gameModeButtons: Array.from(document.querySelectorAll('.game-mode-btn')),
@@ -142,6 +154,8 @@ export function createGameUiRefs() {
         lockOnLabel: document.getElementById('lockon-label'),
         mgTrailAimSlider: document.getElementById('mg-trail-aim-slider'),
         mgTrailAimLabel: document.getElementById('mg-trail-aim-label'),
+        shadowQualitySlider: document.getElementById('shadow-quality-slider'),
+        shadowQualityLabel: document.getElementById('shadow-quality-label'),
         crosshairP1: document.getElementById('crosshair-p1'),
         crosshairP2: document.getElementById('crosshair-p2'),
 
@@ -277,6 +291,7 @@ export function createGameUiRefs() {
 export function bootstrapGameRuntime(game, options = {}) {
     const canvas = document.getElementById('game-canvas');
     game.renderer = new Renderer(canvas);
+    game.renderer.setShadowQuality(game.settings?.localSettings?.shadowQuality);
     const recorderRuntimeConfig = resolveRecorderRuntimeConfig();
     game.mediaRecorderSystem = new MediaRecorderSystem({
         canvas,
@@ -285,6 +300,7 @@ export function bootstrapGameRuntime(game, options = {}) {
         captureFps: recorderRuntimeConfig.captureFps,
         downloadDirectoryName: 'videos',
         onRecordingStateChange: (isRecording) => game.renderer?.setRecordingActive?.(isRecording),
+        runtimePerfProfiler: game.runtimePerfProfiler,
         logger: console,
     });
     game.input = new InputManager();
@@ -305,7 +321,10 @@ export function bootstrapGameRuntime(game, options = {}) {
 
     game.gameLoop = new GameLoop(
         (dt) => game.update(dt),
-        () => game.render()
+        (renderAlpha, renderDelta) => game.render(renderAlpha, renderDelta),
+        {
+            runtimePerfProfiler: game.runtimePerfProfiler,
+        }
     );
 
     game.ui = createGameUiRefs();
@@ -325,5 +344,10 @@ export function bootstrapGameRuntime(game, options = {}) {
         appVersion: options.appVersion,
         buildId: options.buildId,
         buildTime: options.buildTime,
+    });
+    game.menuExpertLoginRuntime = new MenuExpertLoginRuntime({
+        settings: game.settings,
+        ui: game.ui,
+        showStatusToast,
     });
 }

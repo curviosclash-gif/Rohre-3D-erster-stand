@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loadGame, startGame, startGameWithBots } from './helpers.js';
 
 test.describe('Physics Core (Tests 41-60)', () => {
+    test.describe.configure({ timeout: 120000 });
 
     test('T41: Arena-Kollision erkennt Wand (außerhalb)', async ({ page }) => {
         await startGame(page);
@@ -177,10 +178,16 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T51: Bot erkennt Hindernis via Raycast (_scanProbeRay)', async ({ page }) => {
         await startGameWithBots(page, 1);
         const wallDetected = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return false;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return false;
             const bot = botData.player;
-            const botAI = botData.ai._botAI;
 
             const arena = window.GAME_INSTANCE.arena;
             const allPlayers = window.GAME_INSTANCE.entityManager.players;
@@ -196,10 +203,16 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T52: Bot Target Selection wählt nächsten Gegner', async ({ page }) => {
         await startGameWithBots(page, 2);
         const targetSelected = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return false;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return false;
             const bot = botData.player;
-            const botAI = botData.ai._botAI;
 
             botAI._selectTarget(bot, window.GAME_INSTANCE.entityManager.players);
             return botAI.state.targetPlayer !== null && botAI.state.targetPlayer !== bot;
@@ -210,10 +223,16 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T53: Bot StuckScore steigt bei Blockade', async ({ page }) => {
         await startGameWithBots(page, 1);
         const stuckDetected = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return false;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return false;
             const bot = botData.player;
-            const botAI = botData.ai._botAI;
 
             const arena = window.GAME_INSTANCE.arena;
             const allPlayers = window.GAME_INSTANCE.entityManager.players;
@@ -231,9 +250,15 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T54: Bot MapBehavior liest korrektes Profil', async ({ page }) => {
         await startGameWithBots(page, 1);
         const hasBehavior = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return false;
-            const botAI = botData.ai._botAI;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return false;
 
             const beh = botAI._mapBehavior(window.GAME_INSTANCE.arena);
             return typeof beh.caution === 'number' && typeof beh.aggressionBias === 'number';
@@ -257,11 +282,57 @@ test.describe('Physics Core (Tests 41-60)', () => {
         expect(moved).toBeTruthy();
     });
 
+    test('T55b: PlayerController nutzt standardmaessig direkten Legacy-Pfad fuer Human und Bot', async ({ page }) => {
+        await startGameWithBots(page, 1);
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const human = game?.entityManager?.players?.find((entry) => !entry?.isBot) || null;
+            const bot = game?.entityManager?.bots?.[0]?.player || null;
+            if (!human || !bot) {
+                return { error: 'missing-players' };
+            }
+
+            const input = {
+                pitchUp: false,
+                pitchDown: false,
+                yawLeft: false,
+                yawRight: true,
+                rollLeft: false,
+                rollRight: false,
+                boost: false,
+            };
+
+            human.controller.resetAxisState();
+            bot.controller.resetAxisState();
+            human.controlRampEnabled = false;
+            bot.controlRampEnabled = false;
+
+            const humanState = human.controller.resolveControlState(human, input, false, 1 / 60);
+            const botState = bot.controller.resolveControlState(bot, input, false, 1 / 60);
+            return {
+                error: null,
+                humanYaw: Number(humanState?.yawInput || 0),
+                botYaw: Number(botState?.yawInput || 0),
+            };
+        });
+
+        expect(probe.error).toBeNull();
+        expect(probe.humanYaw).toBe(-1);
+        expect(probe.botYaw).toBe(-1);
+    });
+
     test('T56: Bot Probes scale correctly (12 probes pro AI)', async ({ page }) => {
         await startGameWithBots(page, 1);
         const probeCount = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            return botData?.ai?._botAI?._probes?.length ?? 0;
+            const botAI = resolveBotAI(botData);
+            return botAI?._probes?.length ?? 0;
         });
         expect(probeCount).toBe(12);
     });
@@ -269,9 +340,15 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T57: Bot _estimateEnemyPressure detects nearby players', async ({ page }) => {
         await startGameWithBots(page, 1);
         const pressure = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return 0;
-            const botAI = botData.ai._botAI;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return 0;
             const bot = botData.player;
             const allPlayers = window.GAME_INSTANCE.entityManager.players;
 
@@ -287,9 +364,15 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T58: Bot FSM Transition to Recovery State', async ({ page }) => {
         await startGameWithBots(page, 1);
         const inRecovery = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return false;
-            const botAI = botData.ai._botAI;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return false;
             const bot = botData.player;
             const arena = window.GAME_INSTANCE.arena;
             const allPlayers = window.GAME_INSTANCE.entityManager.players;
@@ -303,9 +386,15 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T59: Bot Recovery Switch Fallback', async ({ page }) => {
         await startGameWithBots(page, 1);
         const switchUsed = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return false;
-            const botAI = botData.ai._botAI;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return false;
             const bot = botData.player;
             const arena = window.GAME_INSTANCE.arena;
             const allPlayers = window.GAME_INSTANCE.entityManager.players;
@@ -322,9 +411,15 @@ test.describe('Physics Core (Tests 41-60)', () => {
     test('T60: Bot Target InFront Query (LoS)', async ({ page }) => {
         await startGameWithBots(page, 1);
         const targetInFront = await page.evaluate(() => {
+            const resolveBotAI = (entry) => (
+                entry?.ai?._botAI
+                || entry?.ai?._fallbackPolicy?._botAI
+                || entry?.ai?._fallbackPolicy?._fallbackPolicy?._botAI
+                || null
+            );
             const botData = window.GAME_INSTANCE?.entityManager?.bots?.[0];
-            if (!botData || !botData.ai || !botData.ai._botAI) return false;
-            const botAI = botData.ai._botAI;
+            const botAI = resolveBotAI(botData);
+            if (!botData || !botAI) return false;
             const bot = botData.player;
             const human = window.GAME_INSTANCE.entityManager.players[0];
             if (!human) return false;

@@ -201,6 +201,14 @@ export class Renderer {
         this.qualityController.setQuality(quality);
     }
 
+    setShadowQuality(level) {
+        this.qualityController.setShadowQuality(level);
+    }
+
+    getShadowQuality() {
+        return this.qualityController.getShadowQuality();
+    }
+
     dispose() {
         if (this._onWindowResize) {
             window.removeEventListener('resize', this._onWindowResize);

@@ -4,6 +4,7 @@ export const UI_SETTINGS_SYNC_MAP = Object.freeze({
     [SETTINGS_CHANGE_KEYS.SESSION_TYPE]: ['syncSessionState', 'syncModes', 'syncMultiplayerState'],
     [SETTINGS_CHANGE_KEYS.MODE_PATH]: ['syncSessionState'],
     [SETTINGS_CHANGE_KEYS.LOCAL_THEME_MODE]: ['syncSessionState'],
+    [SETTINGS_CHANGE_KEYS.LOCAL_SHADOW_QUALITY]: ['syncGameplay'],
     [SETTINGS_CHANGE_KEYS.MODE]: ['syncModes'],
     [SETTINGS_CHANGE_KEYS.GAME_MODE]: ['syncModes'],
     [SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED]: ['syncModes'],

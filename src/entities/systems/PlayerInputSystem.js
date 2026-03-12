@@ -43,6 +43,13 @@ function getEmptyInput() {
     return SHARED_EMPTY_INPUT;
 }
 
+const DYNAMIC_ACTION_RATE_THRESHOLD = 0.18;
+
+function readFiniteRate(raw, fallback = NaN) {
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) ? numeric : fallback;
+}
+
 export class PlayerInputSystem {
     constructor(entityManager) {
         this.entityManager = entityManager;
@@ -152,6 +159,93 @@ export class PlayerInputSystem {
         );
     }
 
+    _isDynamicActionAdapterEnabled(runtimeContext) {
+        if (!runtimeContext || typeof runtimeContext !== 'object') return false;
+
+        const byRules = runtimeContext?.rules?.dynamicActionAdapterEnabled === true;
+        const byControl = runtimeContext?.controlDynamics?.dynamicActionAdapterEnabled === true;
+        const byRuntime = runtimeContext?.dynamicActionAdapterEnabled === true;
+        if (!byRules && !byControl && !byRuntime) {
+            return false;
+        }
+
+        if (runtimeContext?.controlProfileAllowsRamps === false) {
+            return false;
+        }
+        if (runtimeContext?.rules?.botRampEnabled === false) {
+            return false;
+        }
+        return true;
+    }
+
+    _applyDesiredRateAxis(targetInput, rawAction, options = {}) {
+        const positiveKey = options.positiveKey;
+        const negativeKey = options.negativeKey;
+        if (!positiveKey || !negativeKey || !rawAction || typeof rawAction !== 'object') {
+            return false;
+        }
+
+        const keys = Array.isArray(options.rateKeys) ? options.rateKeys : [];
+        let rateValue = NaN;
+        for (let i = 0; i < keys.length; i++) {
+            const key = keys[i];
+            const candidate = readFiniteRate(rawAction[key], NaN);
+            if (Number.isFinite(candidate)) {
+                rateValue = candidate;
+                break;
+            }
+        }
+        if (!Number.isFinite(rateValue)) {
+            return false;
+        }
+
+        const threshold = Math.max(0.01, readFiniteRate(options.threshold, DYNAMIC_ACTION_RATE_THRESHOLD));
+        if (Math.abs(rateValue) < threshold) {
+            targetInput[positiveKey] = false;
+            targetInput[negativeKey] = false;
+            return true;
+        }
+
+        if (rateValue > 0) {
+            targetInput[positiveKey] = true;
+            targetInput[negativeKey] = false;
+        } else {
+            targetInput[positiveKey] = false;
+            targetInput[negativeKey] = true;
+        }
+        return true;
+    }
+
+    _applyDynamicActionAdapter(targetInput, rawAction, runtimeContext) {
+        if (!this._isDynamicActionAdapterEnabled(runtimeContext)) {
+            return;
+        }
+        if (!rawAction || typeof rawAction !== 'object') {
+            return;
+        }
+
+        const threshold = readFiniteRate(runtimeContext?.controlDynamics?.discreteRateThreshold, DYNAMIC_ACTION_RATE_THRESHOLD);
+
+        this._applyDesiredRateAxis(targetInput, rawAction, {
+            positiveKey: 'yawRight',
+            negativeKey: 'yawLeft',
+            rateKeys: ['desiredYawRate', 'yawRate', 'targetYawRate'],
+            threshold,
+        });
+        this._applyDesiredRateAxis(targetInput, rawAction, {
+            positiveKey: 'pitchUp',
+            negativeKey: 'pitchDown',
+            rateKeys: ['desiredPitchRate', 'pitchRate', 'targetPitchRate'],
+            threshold,
+        });
+        this._applyDesiredRateAxis(targetInput, rawAction, {
+            positiveKey: 'rollRight',
+            negativeKey: 'rollLeft',
+            rateKeys: ['desiredRollRate', 'rollRate', 'targetRollRate'],
+            threshold,
+        });
+    }
+
     getLastBotObservation(playerIndex) {
         return this._lastBotObservationByIndex.get(playerIndex) || null;
     }
@@ -183,6 +277,7 @@ export class PlayerInputSystem {
                 try {
                     const output = this._invokeBotPolicyUpdate(botAI, dt, player, runtimeContext);
                     input = sanitizeBotAction(output, sanitizeOptions, input);
+                    this._applyDynamicActionAdapter(input, output, runtimeContext);
                 } catch (error) {
                     this._warnInvalidBotAction(player, 'policy update threw', error);
                     input = getEmptyInput();

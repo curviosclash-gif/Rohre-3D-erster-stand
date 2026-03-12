@@ -1,0 +1,355 @@
+{
+  "ok": true,
+  "status": "pass",
+  "runStamp": "TEST_LOOP_1773265946119-r02",
+  "generatedAt": "2026-03-11T21:52:34.345Z",
+  "thresholdVersion": "v36-botops-1",
+  "source": {
+    "evalPath": "data/training/runs/TEST_LOOP_1773265946119-r02/eval.json"
+  },
+  "kpis": {
+    "episodeCount": 16,
+    "episodeReturnMean": 1.615,
+    "terminalRate": 0.5,
+    "truncationRate": 0.5,
+    "invalidActionRate": 1,
+    "runtimeErrorCount": 0,
+    "timeoutRate": 0.5,
+    "fallbackRate": 0.25,
+    "actionCoverage": 0.666667,
+    "responseCoverage": 0.75,
+    "bridgeTimeoutRate": 0.5,
+    "bridgeFallbackRate": 0.25,
+    "bridgeLatencyP95Ms": 6,
+    "latencyP95Ms": 6,
+    "opsKpis": {
+      "contractVersion": "v36-ops-kpi-v1",
+      "requestCount": 4,
+      "actionRequestCount": 3,
+      "responseCount": 3,
+      "actionResponseCount": 2,
+      "ackResponseCount": 1,
+      "commandResponseCount": 0,
+      "retryCount": 1,
+      "timeoutCount": 2,
+      "fallbackCount": 1,
+      "failureCount": 0,
+      "timeoutRate": 0.5,
+      "fallbackRate": 0.25,
+      "responseCoverage": 0.75,
+      "actionCoverage": 0.666667,
+      "latencyP95Ms": 6,
+      "bridgeTimeoutRate": 0.5,
+      "bridgeFallbackRate": 0.25,
+      "bridgeLatencyP95Ms": 6
+    },
+    "bridgeTelemetry": {
+      "requestsSent": 4,
+      "actionRequests": 3,
+      "trainingRequests": 1,
+      "commandRequests": 0,
+      "responsesReceived": 3,
+      "actionResponses": 2,
+      "ackResponses": 1,
+      "commandResponses": 0,
+      "retries": 1,
+      "timeouts": 2,
+      "fallbacks": 1,
+      "latencyP95Ms": 6
+    }
+  },
+  "checks": [
+    {
+      "metric": "episodeReturnMean",
+      "comparator": "min",
+      "value": 1.615,
+      "warnThreshold": 1.4535,
+      "hardThreshold": 1.21125,
+      "level": "pass"
+    },
+    {
+      "metric": "terminalRate",
+      "comparator": "min",
+      "value": 0.5,
+      "warnThreshold": 0.45,
+      "hardThreshold": 0.4,
+      "level": "pass"
+    },
+    {
+      "metric": "truncationRate",
+      "comparator": "max",
+      "value": 0.5,
+      "warnThreshold": 0.625,
+      "hardThreshold": 0.725,
+      "level": "pass"
+    },
+    {
+      "metric": "invalidActionRate",
+      "comparator": "max",
+      "value": 1,
+      "warnThreshold": 1.12,
+      "hardThreshold": 1.42,
+      "level": "pass"
+    },
+    {
+      "metric": "runtimeErrorCount",
+      "comparator": "max",
+      "value": 0,
+      "warnThreshold": 0,
+      "hardThreshold": 0,
+      "level": "pass"
+    },
+    {
+      "metric": "timeoutRate",
+      "comparator": "max",
+      "value": 0.5,
+      "warnThreshold": 0.57,
+      "hardThreshold": 0.72,
+      "level": "pass"
+    },
+    {
+      "metric": "fallbackRate",
+      "comparator": "max",
+      "value": 0.25,
+      "warnThreshold": 0.295,
+      "hardThreshold": 0.37,
+      "level": "pass"
+    },
+    {
+      "metric": "actionCoverage",
+      "comparator": "min",
+      "value": 0.666667,
+      "warnThreshold": 0.45,
+      "hardThreshold": 0.375,
+      "level": "pass"
+    },
+    {
+      "metric": "responseCoverage",
+      "comparator": "min",
+      "value": 0.75,
+      "warnThreshold": 0.675,
+      "hardThreshold": 0.5625,
+      "level": "pass"
+    },
+    {
+      "metric": "bridgeTimeoutRate",
+      "comparator": "max",
+      "value": 0.5,
+      "warnThreshold": 0.57,
+      "hardThreshold": 0.72,
+      "level": "pass"
+    },
+    {
+      "metric": "bridgeFallbackRate",
+      "comparator": "max",
+      "value": 0.25,
+      "warnThreshold": 0.295,
+      "hardThreshold": 0.37,
+      "level": "pass"
+    },
+    {
+      "metric": "bridgeLatencyP95Ms",
+      "comparator": "max",
+      "value": 6,
+      "warnThreshold": 9.2,
+      "hardThreshold": 11,
+      "level": "pass"
+    }
+  ],
+  "warnings": [],
+  "hardFailures": [],
+  "thresholds": {
+    "episodeReturnMean": {
+      "comparator": "min",
+      "warn": 1.4535,
+      "hard": 1.21125
+    },
+    "terminalRate": {
+      "comparator": "min",
+      "warn": 0.45,
+      "hard": 0.4
+    },
+    "truncationRate": {
+      "comparator": "max",
+      "warn": 0.625,
+      "hard": 0.725
+    },
+    "invalidActionRate": {
+      "comparator": "max",
+      "warn": 1.12,
+      "hard": 1.42
+    },
+    "runtimeErrorCount": {
+      "comparator": "max",
+      "warn": 0,
+      "hard": 0
+    },
+    "timeoutRate": {
+      "comparator": "max",
+      "warn": 0.57,
+      "hard": 0.72
+    },
+    "fallbackRate": {
+      "comparator": "max",
+      "warn": 0.295,
+      "hard": 0.37
+    },
+    "actionCoverage": {
+      "comparator": "min",
+      "warn": 0.45,
+      "hard": 0.375
+    },
+    "responseCoverage": {
+      "comparator": "min",
+      "warn": 0.675,
+      "hard": 0.5625
+    },
+    "bridgeTimeoutRate": {
+      "comparator": "max",
+      "warn": 0.57,
+      "hard": 0.72
+    },
+    "bridgeFallbackRate": {
+      "comparator": "max",
+      "warn": 0.295,
+      "hard": 0.37
+    },
+    "bridgeLatencyP95Ms": {
+      "comparator": "max",
+      "warn": 9.2,
+      "hard": 11
+    }
+  },
+  "trendGate": {
+    "windowSize": 3,
+    "sampleStamps": [
+      "20260311-184317",
+      "20260311T195519Z",
+      "TEST_LOOP_1773265946119-r02"
+    ],
+    "enabled": true,
+    "ok": true,
+    "status": "pass",
+    "sampleCount": 3,
+    "checks": [
+      {
+        "metric": "episodeReturnMean",
+        "direction": "max",
+        "level": "pass",
+        "delta": 0,
+        "first": 1.615,
+        "last": 1.615,
+        "warnDelta": -0.03,
+        "hardDelta": -0.08,
+        "reason": null
+      },
+      {
+        "metric": "terminalRate",
+        "direction": "max",
+        "level": "pass",
+        "delta": 0,
+        "first": 0.5,
+        "last": 0.5,
+        "warnDelta": -0.05,
+        "hardDelta": -0.12,
+        "reason": null
+      },
+      {
+        "metric": "timeoutRate",
+        "direction": "min",
+        "level": "warn",
+        "delta": null,
+        "first": null,
+        "last": 0.5,
+        "warnDelta": 0.05,
+        "hardDelta": 0.12,
+        "reason": "insufficient-data"
+      },
+      {
+        "metric": "fallbackRate",
+        "direction": "min",
+        "level": "warn",
+        "delta": null,
+        "first": null,
+        "last": 0.25,
+        "warnDelta": 0.05,
+        "hardDelta": 0.12,
+        "reason": "insufficient-data"
+      },
+      {
+        "metric": "actionCoverage",
+        "direction": "max",
+        "level": "warn",
+        "delta": null,
+        "first": null,
+        "last": 0.666667,
+        "warnDelta": -0.08,
+        "hardDelta": -0.2,
+        "reason": "insufficient-data"
+      }
+    ],
+    "warnings": [
+      {
+        "metric": "timeoutRate",
+        "direction": "min",
+        "level": "warn",
+        "delta": null,
+        "first": null,
+        "last": 0.5,
+        "warnDelta": 0.05,
+        "hardDelta": 0.12,
+        "reason": "insufficient-data"
+      },
+      {
+        "metric": "fallbackRate",
+        "direction": "min",
+        "level": "warn",
+        "delta": null,
+        "first": null,
+        "last": 0.25,
+        "warnDelta": 0.05,
+        "hardDelta": 0.12,
+        "reason": "insufficient-data"
+      },
+      {
+        "metric": "actionCoverage",
+        "direction": "max",
+        "level": "warn",
+        "delta": null,
+        "first": null,
+        "last": 0.666667,
+        "warnDelta": -0.08,
+        "hardDelta": -0.2,
+        "reason": "insufficient-data"
+      }
+    ],
+    "hardFailures": []
+  },
+  "playEvalGate": {
+    "enabled": true,
+    "ok": true,
+    "status": "pass",
+    "checks": [
+      {
+        "metric": "scenarioReturnMean",
+        "comparator": "min",
+        "level": "pass",
+        "value": 2.425,
+        "warnThreshold": 1.4535,
+        "hardThreshold": 1.292,
+        "baseline": 1.615
+      },
+      {
+        "metric": "scenarioWinRate",
+        "comparator": "min",
+        "level": "pass",
+        "value": 0.5,
+        "warnThreshold": 0.45,
+        "hardThreshold": 0.4,
+        "baseline": 0.5
+      }
+    ],
+    "warnings": [],
+    "hardFailures": []
+  }
+}

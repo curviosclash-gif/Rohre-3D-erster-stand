@@ -27,6 +27,8 @@ description: Implement a planned change from coding to verification and commit.
 // turbo
 - `rg -n "(console\.log|TODO:|FIXME:|HACK:)" src tests`
 - No open TODOs in changed code.
+- Multi-agent Playwright safety: never run multiple Playwright suites in parallel on the same repo/port/output directory.
+- If parallel bots must test at the same time, each bot must use unique values for `TEST_PORT`, `PW_RUN_TAG`, and `PW_OUTPUT_DIR`.
 - Select tests via `.agents/test_mapping.md`. Focus on meaningful tests for the change, not the full suite.
 - Fallback: `npm run test:core`.
 

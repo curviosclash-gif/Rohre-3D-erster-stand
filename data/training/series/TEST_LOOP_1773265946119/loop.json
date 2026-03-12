@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "contractVersion": "v36-training-loop-v1",
+  "generatedAt": "2026-03-11T21:52:34.420Z",
+  "seriesStamp": "TEST_LOOP_1773265946119",
+  "withTrainerServer": false,
+  "stopOnFail": true,
+  "stageTimeoutMs": 600000,
+  "elapsedMs": 7384,
+  "runs": [
+    {
+      "runIndex": 1,
+      "runStamp": "TEST_LOOP_1773265946119-r01",
+      "status": "completed",
+      "failedStage": null,
+      "stages": [
+        {
+          "stage": "run",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 1046
+        },
+        {
+          "stage": "eval",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 2801
+        },
+        {
+          "stage": "gate",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 1518
+        }
+      ]
+    },
+    {
+      "runIndex": 2,
+      "runStamp": "TEST_LOOP_1773265946119-r02",
+      "status": "completed",
+      "failedStage": null,
+      "stages": [
+        {
+          "stage": "run",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 582
+        },
+        {
+          "stage": "eval",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 830
+        },
+        {
+          "stage": "gate",
+          "status": "completed",
+          "exitCode": 0,
+          "reason": null,
+          "elapsedMs": 572
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "runsRequested": 2,
+    "runsExecuted": 2,
+    "runsCompleted": 2,
+    "runsFailed": 0,
+    "stageFailures": []
+  },
+  "artifactPath": "data/training/series/TEST_LOOP_1773265946119/loop.json"
+}

@@ -1,0 +1,210 @@
+{
+  "contractVersion": "v34-trainer-artifact-v1",
+  "generatedAt": "2026-03-11T22:25:05.891Z",
+  "stamp": "20260311T222457Z-r02",
+  "checkpointPath": "data/training/models/20260311T222457Z-r02/checkpoint.json",
+  "resumeSource": "latest",
+  "trainer": {
+    "id": 318,
+    "ok": true,
+    "type": "trainer-stats",
+    "sessionId": "2-e6bd5676",
+    "connectionId": 2,
+    "state": {
+      "episodeId": "episode-2",
+      "episodeIndex": 2,
+      "stepIndex": 181,
+      "mode": "hunt",
+      "planarMode": true,
+      "domainId": "hunt-2d",
+      "resumeSource": "data/training/models/20260311T222457Z-r01/checkpoint.json"
+    },
+    "stats": {
+      "messagesReceived": 318,
+      "actionRequests": 1,
+      "trainingResets": 2,
+      "trainingSteps": 313,
+      "replayWrites": 313,
+      "modelInferences": 1,
+      "optimizerUpdates": 62,
+      "checkpointExports": 0,
+      "checkpointLoads": 1,
+      "errors": 0
+    },
+    "replay": {
+      "capacity": 20000,
+      "size": 313,
+      "fillRatio": 0.01565,
+      "nextWriteIndex": 313
+    },
+    "model": {
+      "observationLength": 40,
+      "actionCount": 15,
+      "envSteps": 626,
+      "optimizerSteps": 125,
+      "epsilon": 0.88106,
+      "lastLoss": 0.3397852868656184,
+      "lastTargetSyncAt": 0,
+      "hyper": {
+        "hiddenSize": 64,
+        "learningRate": 0.00075,
+        "gamma": 0.99,
+        "batchSize": 32,
+        "replayWarmup": 64,
+        "trainEvery": 4,
+        "targetSyncInterval": 128,
+        "epsilonStart": 1,
+        "epsilonEnd": 0.05,
+        "epsilonDecaySteps": 5000
+      }
+    }
+  },
+  "bridge": {
+    "requestsSent": 317,
+    "actionRequests": 1,
+    "trainingRequests": 315,
+    "commandRequests": 1,
+    "responsesReceived": 304,
+    "actionResponses": 1,
+    "ackResponses": 302,
+    "commandResponses": 1,
+    "retries": 0,
+    "timeouts": 0,
+    "failures": 0,
+    "fallbacks": 0,
+    "readyMessages": 1,
+    "latencySampleCount": 128,
+    "latencyMeanMs": 873.0234375,
+    "latencyP95Ms": 1171,
+    "latencyMinMs": 3,
+    "latencyMaxMs": 1219,
+    "lastLatencyMs": 1218,
+    "learningReports": 300,
+    "learningUpdates": 59,
+    "lossSampleCount": 128,
+    "lossMean": 0.34048032421849544,
+    "lossP95": 0.4603920490316288,
+    "latestLoss": 0.36232659015381985,
+    "epsilonSampleCount": 128,
+    "epsilonMean": 0.8955950000000001,
+    "latestEpsilon": 0.88353,
+    "replayFillSampleCount": 128,
+    "replayFillMean": 0.011825,
+    "latestReplayFill": 0.015,
+    "maxOptimizerSteps": 122,
+    "lastFailure": null,
+    "lastFallbackReason": null
+  },
+  "opsKpis": {
+    "contractVersion": "v36-ops-kpi-v1",
+    "requestCount": 317,
+    "actionRequestCount": 1,
+    "responseCount": 304,
+    "actionResponseCount": 1,
+    "ackResponseCount": 302,
+    "commandResponseCount": 1,
+    "retryCount": 0,
+    "timeoutCount": 0,
+    "fallbackCount": 0,
+    "failureCount": 0,
+    "timeoutRate": 0,
+    "fallbackRate": 0,
+    "responseCoverage": 0.958991,
+    "actionCoverage": 1,
+    "latencyP95Ms": 1171,
+    "bridgeTimeoutRate": 0,
+    "bridgeFallbackRate": 0,
+    "bridgeLatencyP95Ms": 1171
+  },
+  "runSummary": {
+    "contractVersion": "v33-run-v1",
+    "generatedAt": "2026-03-11T22:25:04.230Z",
+    "startedAtMs": 751,
+    "finishedAtMs": 1093,
+    "elapsedMs": 342,
+    "config": {
+      "contractVersion": "v33-run-v1",
+      "kpiContractVersion": "v33-kpi-v1",
+      "artifactLayoutVersion": "v33-artifact-v1",
+      "episodes": 2,
+      "seeds": [
+        11
+      ],
+      "modes": [
+        {
+          "mode": "hunt",
+          "planarMode": true,
+          "domainId": "hunt-2d"
+        }
+      ],
+      "maxSteps": 180,
+      "bridgeMode": "bridge",
+      "timeouts": {
+        "stepMs": 75,
+        "episodeMs": 20000,
+        "runMs": 180000
+      }
+    },
+    "totals": {
+      "episodesTotal": 2,
+      "stepsTotal": 313,
+      "terminalCount": 1,
+      "truncationCount": 1,
+      "invalidActionStepCount": 78,
+      "invalidActionEventCount": 156,
+      "runtimeErrorCount": 0,
+      "deliveredPacketCount": 315,
+      "episodeReturnTotal": 10.725
+    },
+    "kpis": {
+      "contractVersion": "v33-kpi-v1",
+      "episodeReturnMean": 5.3625,
+      "terminalRate": 0.5,
+      "truncationRate": 0.5,
+      "invalidActionRate": 0.249201,
+      "runtimeErrorCount": 0
+    },
+    "episodes": [
+      {
+        "index": 1,
+        "seed": 11,
+        "mode": "hunt",
+        "planarMode": true,
+        "domainId": "hunt-2d",
+        "episodeInSeed": 1,
+        "episodeId": "episode-1",
+        "episodeIndex": 1,
+        "done": true,
+        "truncated": false,
+        "stepCount": 133,
+        "episodeReturn": 3.7,
+        "invalidActionSteps": 33,
+        "invalidActionEvents": 66,
+        "deliveredPacketCount": 134,
+        "terminalReason": "match-loss",
+        "truncatedReason": null,
+        "runtimeError": null
+      },
+      {
+        "index": 2,
+        "seed": 11,
+        "mode": "hunt",
+        "planarMode": true,
+        "domainId": "hunt-2d",
+        "episodeInSeed": 2,
+        "episodeId": "episode-2",
+        "episodeIndex": 2,
+        "done": false,
+        "truncated": true,
+        "stepCount": 180,
+        "episodeReturn": 7.025,
+        "invalidActionSteps": 45,
+        "invalidActionEvents": 90,
+        "deliveredPacketCount": 181,
+        "terminalReason": null,
+        "truncatedReason": "max-steps",
+        "runtimeError": null
+      }
+    ]
+  }
+}

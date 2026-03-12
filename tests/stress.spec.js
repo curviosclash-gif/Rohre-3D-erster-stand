@@ -1,4 +1,4 @@
-﻿import { test, expect } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import {
     collectErrors,
     loadGame,
@@ -96,7 +96,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
             await page.waitForFunction(() => {
                 const hud = document.getElementById('hud');
                 return hud && !hud.classList.contains('hidden');
-            }, { timeout: 15000 });
+            }, null, { timeout: 15000 });
             await page.waitForTimeout(1000);
             await returnToMenu(page);
         }
@@ -130,7 +130,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
     });
 
     test('T71: Schnelles Starten und Beenden verursacht keine Fehler', async ({ page }) => {
-        test.setTimeout(60000);
+        test.setTimeout(120000);
         const errors = collectErrors(page);
         await loadGame(page);
         for (let i = 0; i < 10; i += 1) {
@@ -139,7 +139,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
             await page.waitForFunction(() => {
                 const hud = document.getElementById('hud');
                 return hud && !hud.classList.contains('hidden');
-            }, { timeout: 15000 });
+            }, null, { timeout: 15000 });
             await page.waitForTimeout(200);
             await returnToMenu(page);
             await page.waitForTimeout(200);
@@ -257,7 +257,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
             await page.waitForFunction(() => {
                 const hud = document.getElementById('hud');
                 return hud && !hud.classList.contains('hidden');
-            }, { timeout: 15000 });
+            }, null, { timeout: 15000 });
             await page.waitForTimeout(200);
             await returnToMenu(page);
             await page.click('#menu-nav [data-session-type=\"single\"]');
@@ -319,7 +319,7 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
             await page.waitForFunction(() => {
                 const drawer = document.getElementById('submenu-level4');
                 return !!drawer && drawer.classList.contains('hidden');
-            }, { timeout: 4000 });
+            }, null, { timeout: 4000 });
 
             await page.keyboard.press('Escape');
             await page.waitForSelector('#submenu-custom:not(.hidden)', { timeout: 4000 });

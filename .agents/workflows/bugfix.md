@@ -22,6 +22,8 @@ description: Diagnose a reported issue and apply a targeted fix.
 ## 3. Fix
 
 - Apply smallest safe change for root cause.
+- Multi-agent Playwright safety: do not run multiple Playwright suites concurrently on the same repo/port/output directory.
+- If concurrent bot validation is required, assign unique `TEST_PORT`, `PW_RUN_TAG`, and `PW_OUTPUT_DIR` per bot run.
 - Re-run relevant checks: `npm run build` + focused tests via `.agents/test_mapping.md`.
 
 ## 4. Commit (see AGENTS.md §Commit Convention)

@@ -337,6 +337,7 @@ export const CONFIG_SECTIONS = {
         },
         GLOBAL: {
             CINEMATIC_TOGGLE: 'F8',
+            RECORDING_TOGGLE: 'F9',
         }
     }
 };

@@ -136,6 +136,12 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
                 ? botBridgeSource.url.trim()
                 : 'ws://127.0.0.1:8765',
             trainerBridgeTimeoutMs: clampSettingValue(botBridgeSource.timeoutMs, SETTINGS_LIMITS.botBridge.timeoutMs, 80),
+            trainerBridgeMaxRetries: clampSettingValue(botBridgeSource.maxRetries, SETTINGS_LIMITS.botBridge.maxRetries, 1),
+            trainerBridgeRetryDelayMs: clampSettingValue(botBridgeSource.retryDelayMs, SETTINGS_LIMITS.botBridge.retryDelayMs, 0),
+            trainerCheckpointResumeToken: typeof botBridgeSource.resumeCheckpoint === 'string'
+                ? botBridgeSource.resumeCheckpoint.trim()
+                : '',
+            trainerCheckpointResumeStrict: botBridgeSource.resumeStrict === true,
         },
         homing: {
             lockOnAngle: clampSettingValue(gameplaySource.lockOnAngle, SETTINGS_LIMITS.gameplay.lockOnAngle, homingDefaults.LOCK_ON_ANGLE),
@@ -189,6 +195,10 @@ export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CO
     targetConfig.BOT.TRAINER_BRIDGE_ENABLED = !!runtimeConfig.bot.trainerBridgeEnabled;
     targetConfig.BOT.TRAINER_BRIDGE_URL = runtimeConfig.bot.trainerBridgeUrl;
     targetConfig.BOT.TRAINER_BRIDGE_TIMEOUT_MS = runtimeConfig.bot.trainerBridgeTimeoutMs;
+    targetConfig.BOT.TRAINER_BRIDGE_MAX_RETRIES = runtimeConfig.bot.trainerBridgeMaxRetries;
+    targetConfig.BOT.TRAINER_BRIDGE_RETRY_DELAY_MS = runtimeConfig.bot.trainerBridgeRetryDelayMs;
+    targetConfig.BOT.TRAINER_CHECKPOINT_RESUME_TOKEN = runtimeConfig.bot.trainerCheckpointResumeToken;
+    targetConfig.BOT.TRAINER_CHECKPOINT_RESUME_STRICT = runtimeConfig.bot.trainerCheckpointResumeStrict;
     targetConfig.HOMING.LOCK_ON_ANGLE = runtimeConfig.homing.lockOnAngle;
     if (targetConfig.HUNT) {
         targetConfig.HUNT.ACTIVE_MODE = runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC;

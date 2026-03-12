@@ -1,0 +1,9 @@
+branch="$(git rev-parse --abbrev-ref HEAD)"
+if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
+  echo "❌ Direkte Commits auf main/master sind nicht erlaubt. Bitte erstelle einen Feature-Branch."
+  exit 1
+fi
+
+echo "Prüfe Lock-Protokoll..."
+node scripts/verify-lock.mjs
+

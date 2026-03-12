@@ -11,9 +11,14 @@ export class CameraRigSystem {
         this.cameraTargets = [];
         this.cameraModes = [];
         this.cameraBoostBlend = [];
+        this.cameraDtSmoothing = [];
         this.cameraShakeTimers = [];
         this.cameraShakeDurations = [];
         this.cameraShakeIntensities = [];
+
+        this._cameraDtMin = 1 / 240;
+        this._cameraDtMax = 0.05;
+        this._cameraDtResetThreshold = 0.12;
 
         this._tmpVec = new THREE.Vector3();
         this._tmpVec2 = new THREE.Vector3();
@@ -30,6 +35,32 @@ export class CameraRigSystem {
         this.cinematicCameraSystem = new CinematicCameraSystem({
             enabled: cinematicEnabled,
         });
+    }
+
+    _resolveSmoothedDt(playerIndex, dt) {
+        const rawDt = Number(dt);
+        const fallbackDt = 1 / 60;
+        if (Number.isFinite(rawDt) && rawDt > this._cameraDtResetThreshold) {
+            this.cameraDtSmoothing[playerIndex] = fallbackDt;
+            return fallbackDt;
+        }
+        const clampedDt = THREE.MathUtils.clamp(
+            Number.isFinite(rawDt) ? rawDt : fallbackDt,
+            this._cameraDtMin,
+            this._cameraDtMax
+        );
+        const prevDt = this.cameraDtSmoothing[playerIndex];
+        if (!(prevDt > 0)) {
+            this.cameraDtSmoothing[playerIndex] = clampedDt;
+            return clampedDt;
+        }
+        const smoothedDt = THREE.MathUtils.clamp(
+            prevDt + (clampedDt - prevDt) * 0.2,
+            this._cameraDtMin,
+            this._cameraDtMax
+        );
+        this.cameraDtSmoothing[playerIndex] = smoothedDt;
+        return smoothedDt;
     }
 
     createCamera(aspect) {
@@ -91,6 +122,7 @@ export class CameraRigSystem {
         const cam = this.cameras[playerIndex];
         const target = this.cameraTargets[playerIndex];
         const mode = this.getCameraMode(playerIndex);
+        const stableDt = this._resolveSmoothedDt(playerIndex, dt);
         const smooth = CONFIG.CAMERA.SMOOTHING;
         const isCockpitFirstPerson = cockpitCamera && mode === 'FIRST_PERSON';
         const lockToNose = (mode === 'FIRST_PERSON' && !!CONFIG.CAMERA.FIRST_PERSON_LOCK_TO_NOSE && !!firstPersonAnchor) || isCockpitFirstPerson;
@@ -98,7 +130,7 @@ export class CameraRigSystem {
         const firstPersonHardLock = lockToNose && mode === 'FIRST_PERSON';
         const boostTarget = mode === 'FIRST_PERSON' && isBoosting ? 1 : 0;
         const boostBlendSpeed = Math.max(0.001, CONFIG.CAMERA.FIRST_PERSON_BOOST_BLEND_SPEED || 8.5);
-        const boostAlpha = 1 - Math.exp(-boostBlendSpeed * Math.max(0, dt));
+        const boostAlpha = 1 - Math.exp(-boostBlendSpeed * stableDt);
         const previousBoostBlend = this.cameraBoostBlend[playerIndex] || 0;
         const boostBlend = THREE.MathUtils.clamp(
             THREE.MathUtils.lerp(previousBoostBlend, boostTarget, boostAlpha),
@@ -111,7 +143,7 @@ export class CameraRigSystem {
             CONFIG.CAMERA.FIRST_PERSON_BOOST_OFFSET || CONFIG.CAMERA.FIRST_PERSON_OFFSET,
             boostBlend
         );
-        const shakeOffset = this.shakeSolver.resolveOffset(playerIndex, dt, this._tmpShakeOffset);
+        const shakeOffset = this.shakeSolver.resolveOffset(playerIndex, stableDt, this._tmpShakeOffset);
         const hasShake = shakeOffset.x !== 0 || shakeOffset.y !== 0 || shakeOffset.z !== 0;
 
         if (cockpitCamera && playerQuaternion) {
@@ -142,7 +174,7 @@ export class CameraRigSystem {
                 target,
                 playerDirection,
                 playerPosition,
-                dt,
+                dt: stableDt,
                 isBoosting,
                 cockpitCamera,
             });
@@ -151,7 +183,7 @@ export class CameraRigSystem {
                 target.position.add(shakeOffset);
             }
 
-            const smoothFactor = firstPersonHardLock ? 1 : (1 - Math.pow(1 - smooth, dt * 60));
+            const smoothFactor = firstPersonHardLock ? 1 : (1 - Math.pow(1 - smooth, stableDt * 60));
             cam.position.lerp(target.position, smoothFactor);
             if (firstPersonHardLock) {
                 cam.quaternion.copy(playerQuaternion);
@@ -188,7 +220,7 @@ export class CameraRigSystem {
             target,
             playerDirection,
             playerPosition,
-            dt,
+            dt: stableDt,
             isBoosting,
             cockpitCamera,
         });
@@ -204,7 +236,7 @@ export class CameraRigSystem {
             return;
         }
 
-        const smoothFactor = 1 - Math.pow(1 - smooth, dt * 60);
+        const smoothFactor = 1 - Math.pow(1 - smooth, stableDt * 60);
         cam.position.lerp(target.position, smoothFactor);
 
         cam.getWorldDirection(this._tmpLookAt);
@@ -218,6 +250,7 @@ export class CameraRigSystem {
         this.cameraTargets.length = 0;
         this.cameraModes.length = 0;
         this.cameraBoostBlend.length = 0;
+        this.cameraDtSmoothing.length = 0;
         this.cameraShakeTimers.length = 0;
         this.cameraShakeDurations.length = 0;
         this.cameraShakeIntensities.length = 0;

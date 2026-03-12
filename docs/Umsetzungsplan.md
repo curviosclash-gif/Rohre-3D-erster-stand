@@ -84,7 +84,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 ## Aktive Workstreams
 
 ### Block V26: Gameplay & Features
-<!-- LOCK: A seit 2026-03-12 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: keine -->
 
 - Scope: `V4`, `V5`, `V9`, `V11`, `V16`

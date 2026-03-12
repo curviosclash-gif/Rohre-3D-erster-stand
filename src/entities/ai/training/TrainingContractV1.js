@@ -48,9 +48,16 @@ function normalizeMetadata(metadata) {
 
 function resolveDomain(input = {}) {
     if (input?.episode?.domain && typeof input.episode.domain === 'object') {
-        return { ...input.episode.domain };
+        return deriveTrainingDomain({
+            ...input,
+            ...input.episode.domain,
+            controlProfileId: input.episode.domain.controlProfileId ?? input.controlProfileId,
+        });
     }
-    return deriveTrainingDomain(input);
+    return deriveTrainingDomain({
+        ...input,
+        controlProfileId: input.controlProfileId,
+    });
 }
 
 function buildInfoPayload(input = {}) {
@@ -63,6 +70,7 @@ function buildInfoPayload(input = {}) {
             matchId: typeof input.matchId === 'string' ? input.matchId : null,
             mode: domain.mode,
             planarMode: domain.planarMode,
+            controlProfileId: domain.controlProfileId,
         },
         terminalReason: typeof input.terminalReason === 'string' ? input.terminalReason : null,
         truncatedReason: typeof input.truncatedReason === 'string' ? input.truncatedReason : null,

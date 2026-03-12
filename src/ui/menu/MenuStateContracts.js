@@ -1,3 +1,5 @@
+import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality } from '../../core/renderer/ShadowQuality.js';
+
 export const MENU_STATE_SCHEMA_VERSION = 'menu-state.v1';
 export const MATCH_SETTINGS_SCHEMA_VERSION = 'match-settings.v1';
 export const PLAYER_LOADOUT_SCHEMA_VERSION = 'player-loadout.v1';
@@ -131,6 +133,7 @@ function normalizeLocalSettingsState(localSettings = null) {
         sessionType,
         modePath,
         themeMode: normalizeString(source.themeMode, 'dunkel').toLowerCase() === 'hell' ? 'hell' : 'dunkel',
+        shadowQuality: normalizeShadowQuality(source.shadowQuality, DEFAULT_SHADOW_QUALITY),
         startSetup,
         toolsState,
         draftStateBySessionType,

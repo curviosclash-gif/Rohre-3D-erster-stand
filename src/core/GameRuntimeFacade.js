@@ -151,6 +151,7 @@ export class GameRuntimeFacade {
         if (!game?.settingsManager) return;
 
         game.runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
+        game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
 
         game.numHumans = game.runtimeConfig.session.numHumans;
         game.numBots = game.runtimeConfig.session.numBots;
@@ -546,6 +547,10 @@ export class GameRuntimeFacade {
         const defaults = game.settingsManager.createDefaultSettings();
         game.settings.gameplay = { ...defaults.gameplay };
         game.settings.controls = JSON.parse(JSON.stringify(defaults.controls));
+        if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+            game.settings.localSettings = {};
+        }
+        game.settings.localSettings.shadowQuality = defaults.localSettings.shadowQuality;
         game.settings.portalsEnabled = defaults.portalsEnabled;
         game.settings.autoRoll = defaults.autoRoll;
         game.settings.invertPitch = { ...defaults.invertPitch };
@@ -577,6 +582,7 @@ export class GameRuntimeFacade {
                 SETTINGS_CHANGE_KEYS.GAMEPLAY_FIRE_RATE,
                 SETTINGS_CHANGE_KEYS.GAMEPLAY_LOCK_ON_ANGLE,
                 SETTINGS_CHANGE_KEYS.GAMEPLAY_MG_TRAIL_AIM_RADIUS,
+                SETTINGS_CHANGE_KEYS.LOCAL_SHADOW_QUALITY,
                 SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_MODE,
                 SETTINGS_CHANGE_KEYS.GAMEPLAY_PORTAL_COUNT,
                 SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_LEVEL_COUNT,

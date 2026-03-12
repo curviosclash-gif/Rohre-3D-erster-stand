@@ -1,0 +1,40 @@
+{
+  "contractVersion": "v33-artifact-v1",
+  "stamp": "20260312T100306Z",
+  "generatedAt": "2026-03-12T10:03:16.521Z",
+  "stageOrder": [
+    "run",
+    "eval",
+    "gate"
+  ],
+  "runDir": "data/training/runs/20260312T100306Z",
+  "artifacts": {
+    "run": {
+      "path": "data/training/runs/20260312T100306Z/run.json",
+      "status": "completed",
+      "exists": true
+    },
+    "eval": {
+      "path": "data/training/runs/20260312T100306Z/eval.json",
+      "status": "completed",
+      "exists": true
+    },
+    "gate": {
+      "path": "data/training/runs/20260312T100306Z/gate.json",
+      "status": "completed",
+      "exists": true
+    },
+    "trainer": {
+      "path": "data/training/runs/20260312T100306Z/trainer.json",
+      "status": "completed",
+      "exists": true
+    },
+    "checkpoint": {
+      "path": "data/training/models/20260312T100306Z/checkpoint.json",
+      "status": "completed",
+      "exists": true
+    }
+  },
+  "resumeSource": null,
+  "lastCompletedStage": "gate"
+}

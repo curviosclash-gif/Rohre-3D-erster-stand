@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loadGame, startGameWithBots, startHuntGameWithBots, returnToMenu } from './helpers.js';
 
 test.describe('Physics Policy (Tests 65-82)', () => {
+    test.describe.configure({ timeout: 120000 });
 
     test('T65: Bot-Action-Contract sanitizt invalide Payloads robust', async ({ page }) => {
         await loadGame(page);
@@ -646,6 +647,10 @@ test.describe('Physics Policy (Tests 65-82)', () => {
                 trainerBridgeEnabled: !!snapshot?.bot?.trainerBridgeEnabled,
                 trainerBridgeUrl: String(snapshot?.bot?.trainerBridgeUrl || ''),
                 trainerBridgeTimeoutMs: Number(snapshot?.bot?.trainerBridgeTimeoutMs || 0),
+                trainerBridgeMaxRetries: Number(snapshot?.bot?.trainerBridgeMaxRetries || 0),
+                trainerBridgeRetryDelayMs: Number(snapshot?.bot?.trainerBridgeRetryDelayMs || 0),
+                trainerCheckpointResumeToken: String(snapshot?.bot?.trainerCheckpointResumeToken || ''),
+                trainerCheckpointResumeStrict: !!snapshot?.bot?.trainerCheckpointResumeStrict,
             };
         });
 
@@ -654,6 +659,45 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         expect(result.trainerBridgeEnabled).toBeFalsy();
         expect(result.trainerBridgeUrl.startsWith('ws://')).toBeTruthy();
         expect(result.trainerBridgeTimeoutMs).toBeGreaterThanOrEqual(20);
+        expect(result.trainerBridgeMaxRetries).toBeGreaterThanOrEqual(0);
+        expect(result.trainerBridgeRetryDelayMs).toBeGreaterThanOrEqual(0);
+        expect(result.trainerCheckpointResumeToken).toBe('');
+        expect(result.trainerCheckpointResumeStrict).toBeFalsy();
+    });
+
+    test('T79b: RuntimeConfig uebernimmt botBridge Resume- und Retry-Settings reproduzierbar', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
+            const snapshot = createRuntimeConfigSnapshot({
+                botBridge: {
+                    enabled: true,
+                    url: 'ws://127.0.0.1:9001',
+                    timeoutMs: 180,
+                    maxRetries: 3,
+                    retryDelayMs: 40,
+                    resumeCheckpoint: 'latest',
+                    resumeStrict: true,
+                },
+            });
+            return {
+                enabled: !!snapshot?.bot?.trainerBridgeEnabled,
+                url: String(snapshot?.bot?.trainerBridgeUrl || ''),
+                timeoutMs: Number(snapshot?.bot?.trainerBridgeTimeoutMs || 0),
+                maxRetries: Number(snapshot?.bot?.trainerBridgeMaxRetries || 0),
+                retryDelayMs: Number(snapshot?.bot?.trainerBridgeRetryDelayMs || 0),
+                resumeToken: String(snapshot?.bot?.trainerCheckpointResumeToken || ''),
+                resumeStrict: !!snapshot?.bot?.trainerCheckpointResumeStrict,
+            };
+        });
+
+        expect(result.enabled).toBeTruthy();
+        expect(result.url).toBe('ws://127.0.0.1:9001');
+        expect(result.timeoutMs).toBe(180);
+        expect(result.maxRetries).toBe(3);
+        expect(result.retryDelayMs).toBe(40);
+        expect(result.resumeToken).toBe('latest');
+        expect(result.resumeStrict).toBeTruthy();
     });
 
     test('T80: ObservationBridgePolicy faellt bei Trainer-Timeout auf lokale Policy zurueck', async ({ page }) => {

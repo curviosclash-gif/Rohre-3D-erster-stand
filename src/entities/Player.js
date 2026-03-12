@@ -26,6 +26,7 @@ import {
 import {
     initializePlayerHitbox,
     isSphereInPlayerOBB,
+    preparePlayerObbCollisionQuery,
     setPlayerLookAtWorld,
     updatePlayerMotion,
 } from './player/PlayerMotionOps.js';
@@ -47,6 +48,8 @@ export class Player {
         this.quaternion = new THREE.Quaternion();
         this.speed = CONFIG.PLAYER.SPEED;
         this.baseSpeed = CONFIG.PLAYER.SPEED;
+        this.turnSpeed = CONFIG.PLAYER.TURN_SPEED;
+        this.rollSpeed = CONFIG.PLAYER.ROLL_SPEED;
 
         // Reused temp objects
         this._tmpEuler = new THREE.Euler(0, 0, 0, 'YXZ');
@@ -82,6 +85,18 @@ export class Player {
         this.spawnProtectionTimer = 0;
         this.planarAimOffset = 0;
         this.steeringLockTimer = 0;
+        this.controlRampEnabled = false;
+        this.controlRampRates = {
+            attack: 12.0,
+            release: 8.5,
+        };
+        this.controlProfileId = '';
+        this.dynamicActionAdapterEnabled = false;
+        this._renderPrevPosition = new THREE.Vector3();
+        this._renderPrevQuaternion = new THREE.Quaternion();
+        this._renderInterpolationPosition = new THREE.Vector3();
+        this._renderInterpolationQuaternion = new THREE.Quaternion();
+        this._renderDiscontinuityVersion = 0;
 
         // Special gate effects
         this.boostPortalTimer = 0;
@@ -110,6 +125,7 @@ export class Player {
         this._tmpLocalSphere = new THREE.Sphere();
         this._tmpHitboxScale = new THREE.Vector3(1, 1, 1);
         this._shieldBaseScale = new THREE.Vector3(1, 1, 1);
+        this._obbCollisionPrepared = false;
 
         initializePlayerHitbox(this, this.hitboxRadius);
 
@@ -123,10 +139,15 @@ export class Player {
         this.cameraMode = 0;
 
         this.controller = new PlayerController();
+        this.controller.setRampRates(this.controlRampRates);
         this.view = createPlayerView(this, renderer);
         this.view.createModel();
 
         this.trail = new Trail(renderer, color, this.index, options.entityManager);
+        this._renderPrevPosition.copy(this.position);
+        this._renderPrevQuaternion.copy(this.quaternion);
+        this._renderInterpolationPosition.copy(this.position);
+        this._renderInterpolationQuaternion.copy(this.quaternion);
         resetPlayerHealth(this);
     }
 
@@ -149,6 +170,7 @@ export class Player {
         const fallbackY = CONFIG.PLAYER.START_Y || 5;
         const spawnY = Number.isFinite(position?.y) ? position.y : fallbackY;
         this.currentPlanarY = CONFIG.GAMEPLAY.PLANAR_MODE ? spawnY : fallbackY;
+        this.controller?.resetAxisState?.();
 
         this.trail.clear();
         this.trail.resetWidth();
@@ -163,6 +185,8 @@ export class Player {
             this.quaternion.setFromEuler(this._tmpEuler);
         }
 
+        this.markRenderDiscontinuity('spawn');
+        this._obbCollisionPrepared = false;
         this.view?.syncFromState();
     }
 
@@ -176,12 +200,14 @@ export class Player {
         const success = setPlayerLookAtWorld(this, x, y, z);
         if (success) {
             this.view?.syncRotation();
+            this._obbCollisionPrepared = false;
         }
         return success;
     }
 
     update(dt, input) {
         if (!this.alive) return;
+        this._obbCollisionPrepared = false;
 
         this.spawnProtectionTimer = Math.max(0, this.spawnProtectionTimer - dt);
         this.steeringLockTimer = Math.max(0, (this.steeringLockTimer || 0) - dt);
@@ -191,7 +217,10 @@ export class Player {
         updatePlayerHealthRegen(this, dt);
         updatePlayerEffects(this, dt);
 
-        const controlState = this.controller.resolveControlState(this, input, steeringLocked);
+        this._renderPrevPosition.copy(this.position);
+        this._renderPrevQuaternion.copy(this.quaternion);
+
+        const controlState = this.controller.resolveControlState(this, input, steeringLocked, dt);
         updatePlayerMotion(this, dt, controlState);
 
         this.view?.update(dt);
@@ -208,6 +237,22 @@ export class Player {
         if (typeof options.cockpitCamera === 'boolean') {
             this.cockpitCamera = options.cockpitCamera;
         }
+        if (typeof options.turnSpeed === 'number' && Number.isFinite(options.turnSpeed) && options.turnSpeed > 0) {
+            this.turnSpeed = options.turnSpeed;
+        }
+        if (typeof options.rollSpeed === 'number' && Number.isFinite(options.rollSpeed) && options.rollSpeed > 0) {
+            this.rollSpeed = options.rollSpeed;
+        }
+        if (typeof options.controlRampEnabled === 'boolean') {
+            this.controlRampEnabled = options.controlRampEnabled;
+        }
+        if (typeof options.controlRampAttackRate === 'number' && Number.isFinite(options.controlRampAttackRate) && options.controlRampAttackRate > 0) {
+            this.controlRampRates.attack = options.controlRampAttackRate;
+        }
+        if (typeof options.controlRampReleaseRate === 'number' && Number.isFinite(options.controlRampReleaseRate) && options.controlRampReleaseRate > 0) {
+            this.controlRampRates.release = options.controlRampReleaseRate;
+        }
+        this.controller?.setRampRates?.(this.controlRampRates);
     }
 
     applyPowerup(type) {
@@ -261,6 +306,77 @@ export class Player {
             return out.set(0, 0, -1).applyQuaternion(this.quaternion);
         }
         return new THREE.Vector3(0, 0, -1).applyQuaternion(this.quaternion);
+    }
+
+    markRenderDiscontinuity(_reason = 'external') {
+        this._renderPrevPosition.copy(this.position);
+        this._renderPrevQuaternion.copy(this.quaternion);
+        this._renderInterpolationPosition.copy(this.position);
+        this._renderInterpolationQuaternion.copy(this.quaternion);
+        this._renderDiscontinuityVersion = (this._renderDiscontinuityVersion + 1) >>> 0;
+    }
+
+    _shouldAutoResetRenderInterpolation() {
+        const speed = Math.max(
+            1,
+            Number(this.speed) || Number(this.baseSpeed) || Number(CONFIG.PLAYER.SPEED) || 18
+        );
+        const radius = Math.max(0.2, Number(this.hitboxRadius) || Number(CONFIG.PLAYER.HITBOX_RADIUS) || 0.8);
+        const maxInterpolatedDistance = Math.max(radius * 3.5, speed * 0.35);
+        if (this._renderPrevPosition.distanceToSquared(this.position) > maxInterpolatedDistance * maxInterpolatedDistance) {
+            return true;
+        }
+        const angularDelta = this._renderPrevQuaternion.angleTo(this.quaternion);
+        return angularDelta > 1.15;
+    }
+
+    resolveRenderTransform(alpha = 1, outPosition = null, outQuaternion = null) {
+        if (this._shouldAutoResetRenderInterpolation()) {
+            this.markRenderDiscontinuity('auto');
+        }
+
+        const resolvedAlpha = Number.isFinite(alpha)
+            ? Math.max(0, Math.min(1, alpha))
+            : 1;
+
+        if (outPosition) {
+            if (resolvedAlpha <= 0) {
+                outPosition.copy(this._renderPrevPosition);
+            } else if (resolvedAlpha >= 1) {
+                outPosition.copy(this.position);
+            } else {
+                outPosition.copy(this._renderPrevPosition).lerp(this.position, resolvedAlpha);
+            }
+        }
+
+        if (outQuaternion) {
+            if (resolvedAlpha <= 0) {
+                outQuaternion.copy(this._renderPrevQuaternion);
+            } else if (resolvedAlpha >= 1) {
+                outQuaternion.copy(this.quaternion);
+            } else {
+                outQuaternion.copy(this._renderPrevQuaternion).slerp(this.quaternion, resolvedAlpha);
+            }
+        }
+        return resolvedAlpha;
+    }
+
+    resolveRenderPosition(alpha = 1, out = null) {
+        const target = out || this._renderInterpolationPosition;
+        this.resolveRenderTransform(alpha, target, null);
+        return target;
+    }
+
+    resolveRenderQuaternion(alpha = 1, out = null) {
+        const target = out || this._renderInterpolationQuaternion;
+        this.resolveRenderTransform(alpha, null, target);
+        return target;
+    }
+
+    resolveRenderDirection(alpha = 1, out = null) {
+        const target = out || this._tmpDir;
+        this.resolveRenderQuaternion(alpha, this._renderInterpolationQuaternion);
+        return target.set(0, 0, -1).applyQuaternion(this._renderInterpolationQuaternion);
     }
 
     getFirstPersonCameraAnchor(out = null) {
@@ -317,6 +433,10 @@ export class Player {
 
     isSphereInOBB(worldCenter, radius) {
         return isSphereInPlayerOBB(this, worldCenter, radius);
+    }
+
+    prepareObbCollisionQuery() {
+        return preparePlayerObbCollisionQuery(this);
     }
 
     activateBoostPortal(params, forward) {

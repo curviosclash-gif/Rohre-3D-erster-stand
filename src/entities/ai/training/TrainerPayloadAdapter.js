@@ -31,6 +31,23 @@ function resolvePlanarMode(runtimeContext = {}) {
     return !!runtimeContext.planarMode;
 }
 
+function resolveControlProfileId(runtimeContext = {}, mode = 'classic', planarMode = false) {
+    const directControlProfileId = typeof runtimeContext?.controlProfileId === 'string'
+        ? runtimeContext.controlProfileId.trim()
+        : '';
+    if (directControlProfileId) {
+        return directControlProfileId;
+    }
+    const rulesControlProfileId = typeof runtimeContext?.rules?.controlProfileId === 'string'
+        ? runtimeContext.rules.controlProfileId.trim()
+        : '';
+    if (rulesControlProfileId) {
+        return rulesControlProfileId;
+    }
+    const fallbackDomain = deriveTrainingDomain({ mode, planarMode });
+    return fallbackDomain.controlProfileId;
+}
+
 function buildPlayerPayload(player) {
     if (!player || typeof player !== 'object') return null;
     return {
@@ -50,14 +67,17 @@ export function buildTrainerRuntimeObservationPayload(runtimeContext = {}, playe
         ? runtimeContext.mode
         : '';
     const planarMode = resolvePlanarMode(runtimeContext);
+    const controlProfileId = resolveControlProfileId(runtimeContext, rawMode, planarMode);
     const domain = deriveTrainingDomain({
         mode: rawMode,
         planarMode,
+        controlProfileId,
     });
 
     return {
         mode: rawMode,
         planarMode,
+        controlProfileId: domain.controlProfileId,
         domainId: domain.domainId,
         domainVersion: domain.version,
         dt: toFiniteNumber(runtimeContext?.dt, 0),
@@ -72,9 +92,13 @@ export function buildTrainerTransitionPayload(transition = {}, options = {}) {
     const info = transition?.info && typeof transition.info === 'object'
         ? transition.info
         : {};
-    const domain = info.domain && typeof info.domain === 'object'
-        ? { ...info.domain }
-        : deriveTrainingDomain(options);
+    const domainSource = info.domain && typeof info.domain === 'object'
+        ? info.domain
+        : options;
+    const domain = deriveTrainingDomain({
+        ...domainSource,
+        controlProfileId: domainSource?.controlProfileId ?? options.controlProfileId,
+    });
 
     return {
         contractVersion: TRAINING_CONTRACT_VERSION,

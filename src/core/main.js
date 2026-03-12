@@ -18,6 +18,8 @@ import { bootstrapGameRuntime } from './GameBootstrap.js';
 import { GameRuntimeFacade } from './GameRuntimeFacade.js';
 import { GameDebugApi } from './GameDebugApi.js';
 import { GAME_STATE_IDS } from './runtime/GameStateIds.js';
+import { LIFECYCLE_EVENT_TYPES } from './MediaRecorderSystem.js';
+import { RuntimePerfProfiler } from './perf/RuntimePerfProfiler.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -56,6 +58,11 @@ export class Game {
         this.playingStateSystem = new PlayingStateSystem(this);
         this.roundStateTickSystem = new RoundStateTickSystem(this);
         this._hudTimer = 0;
+        this._renderAlpha = 1;
+        this._renderDelta = 1 / 60;
+        this.runtimePerfProfiler = new RuntimePerfProfiler({
+            spikeThresholdMs: 30,
+        });
         this.keyCapture = null;
         this._disposed = false;
         this._playtestStartTimeoutId = null;
@@ -448,10 +455,43 @@ export class Game {
         );
     }
 
+    _toggleRecordingFromGlobalHotkey() {
+        const recorder = this.mediaRecorderSystem;
+        if (!recorder || typeof recorder.notifyLifecycleEvent !== 'function') {
+            return;
+        }
+
+        const support = recorder.getSupportState?.() || null;
+        if (support && support.canRecord === false) {
+            this._showStatusToast('Videoaufnahme nicht verfuegbar', 1600, 'error');
+            return;
+        }
+
+        const wasRecording = !!recorder.isRecording?.();
+        recorder.notifyLifecycleEvent(LIFECYCLE_EVENT_TYPES.RECORDING_REQUESTED, {
+            command: 'toggle',
+            source: 'global_hotkey',
+        });
+        const isRecording = !!recorder.isRecording?.();
+
+        if (!wasRecording && isRecording) {
+            this._showStatusToast('Videoaufnahme: gestartet', 1200, 'success');
+            return;
+        }
+        if (wasRecording && !isRecording) {
+            this._showStatusToast('Videoaufnahme: gestoppt', 1200, 'info');
+            return;
+        }
+        this._showStatusToast('Videoaufnahme: keine Aenderung', 1200, 'warning');
+    }
+
     _handleGlobalInputHotkeys() {
         if (this.keyCapture) return;
         if (this.input?.wasGlobalActionPressed?.('CINEMATIC_TOGGLE')) {
             this._toggleCinematicCameraFromGlobalHotkey();
+        }
+        if (this.input?.wasGlobalActionPressed?.('RECORDING_TOGGLE')) {
+            this._toggleRecordingFromGlobalHotkey();
         }
     }
 
@@ -527,6 +567,18 @@ export class Game {
         this.runtimeFacade.startMatch();
     }
 
+    getBotValidationMatrix() {
+        return this.debugApi?.getBotValidationMatrix?.() || [];
+    }
+
+    applyBotValidationScenario(idOrIndex = 0) {
+        return this.debugApi?.applyBotValidationScenario?.(idOrIndex) || null;
+    }
+
+    _onRoundEnd(winner = null) {
+        this.matchFlowUiController?.onRoundEnd?.(winner);
+    }
+
     _getPlanarAimAxis(playerIndex) {
         return this.planarAimAssistSystem.getPlanarAimAxis(playerIndex);
     }
@@ -578,8 +630,19 @@ export class Game {
         this.runtimeFacade.returnToMenu();
     }
 
-    render() {
+    render(alpha = this.gameLoop?.renderAlpha ?? 1, renderDelta = this.gameLoop?.renderDelta ?? this.gameLoop?.fixedStep ?? (1 / 60)) {
+        const numericAlpha = Number(alpha);
+        const numericRenderDelta = Number(renderDelta);
+        this._renderAlpha = Number.isFinite(numericAlpha) ? Math.max(0, Math.min(1, numericAlpha)) : 1;
+        this._renderDelta = Number.isFinite(numericRenderDelta) ? Math.max(0, Math.min(0.05, numericRenderDelta)) : (1 / 60);
+
+        if (this.state === GAME_STATE_IDS.PLAYING) {
+            this.playingStateSystem.render(this._renderAlpha, this._renderDelta);
+        }
+        const renderStart = this.runtimePerfProfiler?.startSample?.();
         this.renderer.render();
+        this.runtimePerfProfiler?.endSample?.('render', renderStart);
+        this.mediaRecorderSystem?.captureRenderedFrame?.(this._renderDelta);
     }
 
     dispose() {
