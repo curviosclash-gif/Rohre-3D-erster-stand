@@ -1,4 +1,4 @@
-﻿# Umsetzungsplan (Aktiver Master)
+# Umsetzungsplan (Aktiver Master)
 
 Stand: 2026-03-11
 
@@ -40,6 +40,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 | `src/core/**` | V28 | frei |
 | `src/entities/systems/**` | V28 | frei |
 | `scripts/**` | shared | alle |
+| `trainer/**` | PX V34 | frei |
 | `tests/**` | shared | alle (append-only) |
 | `docs/**` | shared | alle (append-only) |
 | `editor/**` | shared | alle |
@@ -48,7 +49,11 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 
 | Datum | Bot | Fremder Block | Datei | Grund | Risiko |
 |---|---|---|---|---|---|
-| - | - | - | - | (noch keine Eintraege) | - |
+| 2026-03-11 | A | V28 | `src/core/GameBootstrap.js` | Expertenlogin brauchte neue UI-Refs und Bootstrap-Verdrahtung fuer den V27-Menuepfad | niedrig |
+| 2026-03-11 | A | V28 | `src/core/RuntimeConfig.js`, `src/core/SettingsManager.js`, `src/core/config/SettingsRuntimeContract.js`, `src/core/GameDebugApi.js` | V36 Runtime-Bridge-/Resume-Integration fuer produktiven Trainerbetrieb | mittel |
+| 2026-03-11 | A | V27 | `src/state/training/TrainingGateEvaluator.js`, `src/state/training/TrainingGateThresholds.js`, `src/state/training/TrainingOpsKpiContractV36.js` | V36 KPI-/Gate-Vertrag (Ops-Metriken, Trend-Gate, Play-Eval-Drift) | niedrig |
+| 2026-03-11 | A | V26 | `src/entities/ai/ObservationBridgePolicy.js`, `src/entities/ai/training/WebSocketTrainerBridge.js` | V36 Match-Resume-vor-Action und erweiterte Bridge-Telemetrie/Fallback-Messung | mittel |
+| 2026-03-11 | A | PX V34 | `trainer/session/TrainerSession.mjs`, `trainer/server/TrainerServer.mjs`, `trainer/config/TrainerRuntimeContract.mjs`, `trainer/model/CheckpointValidation.mjs` | V36 Checkpoint-Resume-Haertung (`trainer-checkpoint-load-latest`) und Validierung | mittel |
 
 ## Schnellindex Offener Arbeit
 
@@ -79,7 +84,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 ## Aktive Workstreams
 
 ### Block V26: Gameplay & Features
-<!-- LOCK: frei -->
+<!-- LOCK: A seit 2026-03-12 -->
 <!-- DEPENDS-ON: keine -->
 
 - Scope: `V4`, `V5`, `V9`, `V11`, `V16`
@@ -288,18 +293,82 @@ Template:
   - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
   - Datei-Scope: `src/entities/ai/training/**` (Automation-Core), `scripts/training-run.mjs`, optionale Orchestrierungsanteile fuer `training:e2e`, `tests/**`, `docs/**`
   - Konfliktregel: Kein Eingriff in UI-Lane (`index.html`, `src/ui/menu/**`) und keine Gate-/Eval-Skripte von Bot B; Cross-Lane-Aenderungen im Conflict-Log dokumentieren
-- [ ] PX Bot-Training-Automatisierung V33 (Bot B)
+- [x] PX Menu Entschlackung V27b
+  - Erstellt am: `2026-03-11`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Menu_Entschlackung_V27b.md`
+  - Datei-Scope: `index.html`, `style.css`, `src/ui/**`, `src/core/GameBootstrap.js`, `tests/**`, `docs/**`
+  - Konfliktregel: Nur Menue-Informationsarchitektur und UI-Verdichtung anfassen; bestehende Developer-/Training-Vertraege aus V33 ueber stabile IDs/Event-Pfade schuetzen
+  - Status 2026-03-11: Level 1/2 sichtbar entschlackt, Level 3 auf einen offenen Detailblock reduziert, Ebene 4 in `Profile & Presets` plus `Utilities` verdichtet; normaler Menuepfad enthaelt keine Developer-/Debug-Einstiege mehr.
+  - Verifikation 2026-03-11: `npm run test:core` PASS, `npm run test:stress` PASS, `npx playwright test tests/training-environment.spec.js` PASS, Desktop-/Mobil-Screenshots `menu-v27-level1-desktop.png`, `menu-v27-level2-desktop.png`, `menu-v27-level2-mobile.png`.
+- [x] PX Bot-Training-Automatisierung V33 (Bot B)
   - Erstellt am: `2026-03-11`
   - Agent: `B`
   - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
   - Datei-Scope: Bridge-/Gate-Lane unter `src/entities/ai/training/**`, `src/state/training/**`, `scripts/training-eval.mjs`, `scripts/training-gate.mjs`, `package.json`, `tests/**`, `docs/**`
   - Konfliktregel: Kein Eingriff in UI- und Dev-Panel-Dateien von Bot C; `package.json` nur in dieser Lane anfassen
+  - Status 2026-03-11: Eval/Gate-Lane mit KPI-Gate, Exit-Code, Bridge-Retry/Timeout/Fallback-Telemetrie und `training:e2e`-Scriptverdrahtung abgeschlossen.
+  - Verifikation: `npm run training:run`, `npm run training:eval`, `npm run training:gate`, `npm run training:e2e`, `npx playwright test tests/training-automation.spec.js --workers=1`, `npx playwright test tests/physics-policy.spec.js -g "T80:" --workers=1`, `npx playwright test tests/training-environment.spec.js -g "T93:" --workers=1`, `npm run docs:sync`, `npm run docs:check`, `npm run build`.
 - [ ] PX Bot-Training-Automatisierung V33 (Bot C)
   - Erstellt am: `2026-03-11`
   - Agent: `C`
   - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
   - Datei-Scope: `index.html`, `src/core/GameBootstrap.js`, `src/ui/menu/**`, `src/core/runtime/MenuRuntimeDeveloperTrainingService.js`, `src/core/GameRuntimeFacade.js`, `src/core/GameDebugApi.js`, `tests/**`, `docs/**`
   - Konfliktregel: Kein Eingriff in `scripts/training-eval.mjs`/`scripts/training-gate.mjs`/`package.json` (Bot B) und keine Core-Automationmodule von Bot A
+  - Status 2026-03-11: 33.4/33.5 (C-Anteil) umgesetzt (`Run Batch/Eval/Gate` UI + Payload + Runtime-Service + `T96-T98`); offene Abschlussabhaengigkeit fuer 33.9 bleibt `training:e2e` aus A/B-Lane.
+  - Verifikation 2026-03-11: `npx playwright test tests/training-environment.spec.js -g "T96:|T97:|T98:" --workers=1` PASS; `npm run test:core` und `npm run test:stress` im Sammellauf mit fruehen Timeout-Flakes (`T7/T8`, `T61`) rot, isolierte Re-Runs (`T7`, `T61`) PASS; `npm run docs:sync` PASS; `npm run docs:check` PASS; `npm run build` PASS.
+- [ ] PX Bot-Training DeepLearning Server V34
+  - Erstellt am: `2026-03-11`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Bot_Training_DeepLearning_Server_V34.md`
+  - Datei-Scope: `scripts/trainer-server.mjs`, neues `trainer/**`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `scripts/training-run.mjs`, `tests/**`, `docs/**`
+  - Konfliktregel: Kein UI-Umbau (`index.html`, `src/ui/menu/**`), Bridge-/Training-Scope strikt halten und Shared-Pfade append-only pflegen
+- [x] PX Menu Expertenlogin und Textreduktion V27c
+  - Erstellt am: `2026-03-11`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Menu_Expertenlogin_Textreduktion_V27c.md`
+  - Datei-Scope: `index.html`, `style.css`, `src/ui/**`, `src/core/**`, `tests/**`, `docs/**`
+  - Konfliktregel: Developer-/Training-IDs, Events und Owner-Policies aus V33 nicht brechen; Expertenlogin nur als additive Gate-Schicht einfuehren
+  - Status 2026-03-11: Expertenlogin mit festem Passwort `1307` als lokales Session-Gate umgesetzt; Build-Info, Developer und Debug in den Expertenpfad verlagert; Logout und Reload sperren den Bereich erneut.
+  - Verifikation 2026-03-11: `npm run test:core` PASS, `npm run test:stress` PASS, `npx playwright test tests/training-environment.spec.js` PASS, Experten-Screenshots `menu-v27-expert-unlocked-desktop.png`, `menu-v27-expert-mobile.png`.
+- [/] PX Steuerungsfluss Input-Rampen + Render-Interpolation V35 (bot-robust)
+  - Erstellt am: `2026-03-11`
+  - Agent: `A+B` (optional Integrator fuer `35.9`)
+  - Plan-Datei: `docs/Umsetzungsplan.md` (Intake-Block, Parallel-Lanes `35.1` bis `35.4`)
+  - Datei-Scope Lane A: `src/entities/player/PlayerController.js`, `src/entities/player/PlayerMotionOps.js`, `src/entities/Player.js`, `tests/physics-core.spec.js`, `docs/**`
+  - Datei-Scope Lane B: `src/core/GameLoop.js`, `src/core/main.js`, `src/core/PlayingStateSystem.js`, `src/entities/player/PlayerView.js`, `src/entities/EntityManager.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/entities/ai/training/TrainerPayloadAdapter.js`, `src/entities/ai/training/TrainingContractV1.js`, `src/state/training/TrainingDomain.js`, `tests/core.spec.js`, `tests/gpu.spec.js`, `tests/training-environment.spec.js`, `docs/**`
+  - Konfliktregel: Lane A und Lane B bearbeiten keine fremden Lane-Dateien; `docs/**` und `tests/**` nur append-only je eigener Sektion. Plan 1 darf fuer Bots erst aktiv werden, wenn `35.3` und `35.4` abgeschlossen sind.
+  - <!-- LOCK: frei -->
+  - [x] 35.1 Plan 1 - Input-Rampen (Lane A)
+    - <!-- SUB-LOCK: Bot-A -->
+    - [x] 35.1.1 Digitale Achsen (`pitch/yaw/roll`) im `PlayerController` auf geglaettete Zielwerte mit Attack-/Release-Raten umstellen
+    - [x] 35.1.2 Steering-Lock, Invertierung und Planar-Mode mit den geglaetteten Achsen konsistent halten, Hotpath-Allocation vermeiden und Bot-Pfad zunaechst per Guard auf Legacy belassen
+  - [x] 35.2 Plan 2 - Render-Interpolation (Lane B)
+    - <!-- SUB-LOCK: frei -->
+    - [x] 35.2.1 `GameLoop` um Render-Alpha (`accumulator/fixedStep`) erweitern und Renderpfad (`main`/`PlayingStateSystem`) auf Alpha-Weitergabe vorbereiten
+    - [x] 35.2.2 Interpolierte Player-/Kamera-Transforms einbauen (inkl. Reset bei Teleport/Bounce/Spawn), ohne Simulations-Determinismus zu veraendern
+  - [x] 35.3 Bot-Runtime-Kontext normalisieren (Lane B)
+    - <!-- SUB-LOCK: Bot-B -->
+    - [x] 35.3.1 Bot-Runtime-Kontext um normalisierte Dynamikparameter erweitern (`speed`, `turnSpeed`, Rampenparameter) und daraus stabile `controlProfileId` ableiten
+    - [x] 35.3.2 Trainings-/Transport-Contracts (`TrainingContractV1`, `TrainerPayloadAdapter`, `TrainingDomain`) um `controlProfileId` erweitern, sodass Eval/Training profile-aware bleibt
+  - [x] 35.4 Dynamik-invariante Actions und Rollout-Sicherheit (Lane B)
+    - <!-- SUB-LOCK: Bot-B -->
+    - [x] 35.4.1 Optionalen Action-Adapter fuer dynamik-invariante Steuerung einfuehren (z. B. gewuenschte Winkelrate -> diskrete Flags), standardmaessig feature-flag-gesteuert
+    - [x] 35.4.2 Gate-Regel festziehen: Bot-Rampen nur aktiv bei passendem `controlProfileId` (oder Multi-Profile-Training), sonst Legacy-Pfad beibehalten
+  - [/] 35.9 Abschluss-Gate
+    - [/] 35.9.1 Verifikation je Lane: `npm run test:physics` (Lane A) sowie `npm run test:core` + `npx playwright test tests/training-environment.spec.js` + `npm run training:e2e` (Lane B)
+    - [x] 35.9.2 Vergleichbarkeit absichern: Bot-Validation vor/nach Profilwechsel dokumentieren (`npm run bot:validate`) und nur ohne KPI-Regression freigeben
+    - [x] 35.9.3 Dokumentationsabschluss: `npm run docs:sync`, `npm run docs:check`, danach Lock-Rueckgabe auf `<!-- LOCK: frei -->` bestaetigen
+  - Status 2026-03-11: 35.1 bis 35.4 umgesetzt (Input-Rampen inkl. Bot-Legacy-Guard, Render-Interpolation inkl. Spawn/Bounce-Reset und Teleport-Discontinuity-Reset, normalisierter BotRuntimeContext mit `controlProfileId`, dynamik-invarianter Action-Adapter mit Profil-Gate).
+  - Gate-Status 2026-03-11: `npm run test:core` PASS, `npx playwright test tests/training-environment.spec.js` PASS, `npm run training:e2e` PASS, `npm run bot:validate` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS, `npm run test:physics` FAIL (Timeout-/Stabilitaetskaskade im Multi-Worker-Physics-Lauf; siehe Test-Artefakte unter `test-results/**`).
+- [/] PX Bot-Training Produktivbetrieb und Automatisierung V36
+  - Erstellt am: `2026-03-11`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Bot_Training_Produktivbetrieb_Automatisierung_V36.md`
+  - Datei-Scope: `scripts/**`, `trainer/**`, `src/entities/ai/training/**`, `src/core/**`, `src/state/training/**`, `tests/**`, `docs/**`
+  - Konfliktregel: Kein UI-Redesign in normalen Menuepfaden; Bridge/Trainer/Automation zuerst in shared+training-Pfaden halten. Cross-Block-Aenderungen in `src/core/**` oder `src/state/**` vor Commit im Conflict-Log eintragen.
+  - Status 2026-03-11: Phasen `36.0` bis `36.7` abgeschlossen (`[x]`), `36.9` mit offenem Core-Blocker (`T7`) auf `[/]`.
+  - Verifikation 2026-03-11: `training:loop` PASS (`series 20260311T222457Z`), `training:e2e` PASS (`20260311T220754Z`), `node --test tests/trainer-v34-*.test.mjs` PASS, `training-environment` PASS, `docs:sync` PASS, `docs:check` PASS, `build` PASS, `test:core` FAIL (`T7`, isolierte Re-Runs ebenfalls FAIL).
 <!-- PLAN-INTAKE-END -->
 
 ## Archivierte Referenzen
@@ -315,4 +384,97 @@ Vor Task-Abschluss immer:
 
 - `npm run docs:sync`
 - `npm run docs:check`
+
+## Status-Log (append-only)
+
+### 2026-03-11 - PX Bot-Training DeepLearning Server V34 - Iteration 1
+
+- Scope abgeschlossen fuer `34.0`, `34.1`, `34.2`:
+  - Contract-/Failure-Policy-Freeze im neuen `trainer/config/**`
+  - Trainer-Server + Session-Routing in `trainer/server/**` und `trainer/session/**`
+  - Replay-/Transitions-Pipeline in `trainer/replay/**`
+  - Bootstrap von `scripts/trainer-server.mjs` auf den neuen Trainerpfad
+  - V34-Tests additiv unter `tests/trainer-v34-*.mjs`
+- Laufstatus:
+  - `start_training_bridge.bat --episodes 100 --seeds 11 --modes hunt-2d` ausgefuehrt, Exit-Code `0`
+  - Core-Gate bleibt von bestehendem Timeout-Flake (`T7`) betroffen
+
+### 2026-03-11 - PX Bot-Training DeepLearning Server V34 - Iteration 2
+
+- Scope fuer `34.3` umgesetzt:
+  - neues `trainer/model/**` mit deterministischem DQN/MLP (`SeededRng`, `DqnMlpNetwork`, `DqnTrainer`, `ActionVocabulary`)
+  - Session-Inferenz von Heuristik auf Modellpfad gehoben (`bot-action-request`)
+  - Replay->Optimizer-Pfad aktiv (`training-step` triggert TD-Loss/Backprop/Target-Sync)
+- Verifikation:
+  - V34-Node-Tests (Replay/Server/Model) PASS
+  - Bridge-Run `start_training_bridge.bat --episodes 100 --seeds 11 --modes hunt-2d` PASS
+  - `runtimeErrorCount` im Run-Artefakt auf `0` in diesem Lauf
+
+### 2026-03-11 - PX Bot-Training DeepLearning Server V34 - Iteration 3
+
+- Scope fuer `34.4` bis `34.7` + `34.9` umgesetzt:
+  - Bridge-Handshake/Readiness und Lerntelemetrie in `WebSocketTrainerBridge` gehaertet.
+  - Checkpoint-Export/Load + Resume-Quelle im Trainer-Contract/Session verankert.
+  - Artefaktpfad `trainer.json` + `checkpoint.json` inkl. Latest-Index-Erweiterung integriert.
+  - Startskripte mit Strict-Ready-Modus finalisiert.
+  - Gate-Kompatibilitaetsfix fuer `latest.stamp` in `scripts/training-gate.mjs`.
+- Verifikation:
+  - V34-Node-Tests (`tests/trainer-v34-*.mjs`) PASS
+  - `start_training_bridge.bat --episodes 100 --seeds 11 --modes hunt-2d`:
+    - ohne laufenden Trainer FAIL (`bridge-ready-check failed`)
+    - mit laufendem `scripts/trainer-server.mjs` PASS
+  - `npm run training:e2e` PASS
+  - `npm run test:core` FAIL (bestehende Playwright-Timeout-Flakes `T7`/`T10e`)
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+  - `npm run build` PASS
+
+### 2026-03-11 - PX Steuerungsfluss Input-Rampen + Render-Interpolation V35 - Lane B (`35.2`)
+
+- Scope `35.2` abgeschlossen:
+  - `GameLoop` liefert `renderAlpha = accumulator / fixedStep` als Render-Argument.
+  - Renderpfad in `main`/`PlayingStateSystem` auf Alpha-Renderphase verdrahtet.
+  - Interpolierte Player-/Kamera-Transforms laufen im Renderpfad; Fixed-Step bleibt Sim-Source-of-Truth.
+  - Hard-Snap-Reset bei Spawn/Bounce aktiv; Teleport-Spruenge werden per Discontinuity-Guard abgefangen.
+- Verifikation:
+  - `npm run test:core` FAIL (`T7` Timeout-Flake im Startpfad, bekannte Instabilitaet).
+  - `npm run test:gpu` FAIL (mehrere Start-/Setup-Timeouts; isolierte Einzeltests wie `T21`/`T21a` PASS).
+
+### 2026-03-11 - PX Steuerungsfluss Input-Rampen + Render-Interpolation V35 - Abschlussstand (`35.1` bis `35.4`, `35.9`)
+
+- Scope umgesetzt:
+  - Input-Rampen fuer `pitch/yaw/roll` in `PlayerController` mit Attack-/Release-Glattung; Steering-Lock, Invert und Planar-Modus konsistent auf Zielachsen angewendet.
+  - Bot-Legacy-Guard aktiv: Bot-Rampen bleiben standardmaessig aus, bis ein passendes `controlProfileId` explizit freigegeben ist.
+  - Render-Interpolation fuer Player/Kamera aktiv (Fixed-Step Sim bleibt deterministisch); Spawn/Bounce setzen harte Reset-Marken, Teleport-Spruenge werden ueber Discontinuity-Reset abgefangen.
+  - Bot-Runtime-Kontext normalisiert um `speed`/`turnSpeed`/`rollSpeed`/Rampenparameter; stabile `controlProfileId`-Ableitung eingebaut.
+  - Trainings-Contract-Lane um `controlProfileId` erweitert (`TrainingDomain`, `TrainingContractV1`, `TrainerPayloadAdapter`, `TrainingTransportFacade`).
+  - Dynamik-invarianter Action-Adapter (Desired-Rate -> diskrete Flags) als Feature-Flag hinter Runtime-Context-Gate aktiviert.
+- Gate-Ergebnisse:
+  - `npm run test:physics` FAIL (mehrfach reproduzierte Timeout-/Stabilitaetskaskade im Multi-Worker-Lauf, 17-35 PASS je Re-Run; Artefakte unter `test-results/**`).
+  - `npm run test:core` PASS.
+  - `npx playwright test tests/training-environment.spec.js` PASS.
+  - `npm run training:e2e` PASS.
+  - `npm run bot:validate` PASS (Runner-Ende erfolgreich, Bericht geschrieben).
+  - `npm run docs:sync` PASS.
+  - `npm run docs:check` PASS.
+
+### 2026-03-11 - PX Bot-Training Produktivbetrieb und Automatisierung V36 - Abschlussstand (`36.0` bis `36.9`)
+
+- Scope umgesetzt:
+  - V36 Ops-KPI-Vertrag (`timeoutRate`, `fallbackRate`, `actionCoverage`, `responseCoverage`) in Run/Eval/Gate integriert.
+  - Serien-Orchestrierung (`scripts/training-loop.mjs`) mit `resume-checkpoint=latest`, Stop-on-fail und Serienartefakt unter `data/training/series/**`.
+  - Resume-/Checkpoint-Haertung in Trainer-Server/Session inkl. `trainer-checkpoint-load-latest` und Checkpoint-Validierung.
+  - Match-Runtime-Integration: `botBridge`-Settings + Resume-vor-Action in `ObservationBridgePolicy`; Bridge-Status fuer Runtime-Diagnose in `GameDebugApi`.
+  - Eval-/Gate-Erweiterung um Play-Eval-Lane und Rolling-Window-Trend-Gate.
+  - Runbook/Troubleshooting fuer Produktivbetrieb in `docs/Bot-Training-Schnittstelle.md` ergaenzt.
+- Gate-Ergebnisse:
+  - `node scripts/training-loop.mjs --runs 2 --episodes 2 --seeds 11 --modes hunt-2d --bridge-mode bridge --resume-checkpoint latest --resume-strict false --with-trainer-server true --stop-on-fail true` PASS.
+  - `npm run training:e2e` PASS.
+  - `node --test tests/trainer-v34-*.test.mjs` PASS.
+  - `npx playwright test tests/training-environment.spec.js --workers=1` PASS.
+  - `npm run test:core` FAIL (`T7: Spiel startet - HUD sichtbar`, Timeout reproduzierbar).
+  - Isolierte Re-Runs: `npx playwright test tests/core.spec.js -g "T7: Spiel startet" --workers=1` FAIL, inkl. `--retries=1` weiterhin FAIL.
+  - `npm run docs:sync` PASS.
+  - `npm run docs:check` PASS.
+  - `npm run build` PASS.
 
