@@ -158,7 +158,10 @@ export class UIManager {
         Object.entries(CONFIG.MAPS || {}).forEach(([key, mapDef]) => {
             const opt = document.createElement('option');
             opt.value = key;
-            opt.textContent = String(mapDef?.name || key);
+            opt.textContent = this._formatMapLabel({
+                name: String(mapDef?.name || key),
+                hasGlbModel: typeof mapDef?.glbModel === 'string' && mapDef.glbModel.trim().length > 0,
+            });
             select.appendChild(opt);
         });
 
@@ -167,6 +170,11 @@ export class UIManager {
         } else if (CONFIG.MAPS?.standard) {
             select.value = 'standard';
         }
+    }
+
+    _formatMapLabel(entry = {}) {
+        const name = String(entry?.name || entry?.key || 'Map');
+        return entry?.hasGlbModel ? `${name} [GLB]` : name;
     }
 
     _setStartSectionOpen(sectionId, shouldOpen = true) {
@@ -935,6 +943,7 @@ export class UIManager {
 
     syncStartSetupState(settings = this.game.settings) {
         const startSetup = ensureStartSetupLocalState(settings);
+        const multiplayerSessionState = this.game?.menuMultiplayerBridge?.getSessionState?.() || null;
         const mapSearch = String(startSetup.mapSearch || '').trim().toLowerCase();
         const mapFilter = String(startSetup.mapFilter || 'all').toLowerCase();
         const vehicleSearch = String(startSetup.vehicleSearch || '').trim().toLowerCase();
@@ -965,7 +974,7 @@ export class UIManager {
                 .forEach((entry) => {
                     const option = document.createElement('option');
                     option.value = entry.key;
-                    option.textContent = entry.name;
+                    option.textContent = this._formatMapLabel(entry);
                     this.ui.mapSelect.appendChild(option);
                 });
             if (this.ui.mapSelect.options.length === 0) {
@@ -1053,10 +1062,13 @@ export class UIManager {
                 summaryBlocks.push({ label: 'P2', value: vehiclePreviewP2.label });
             }
             if (sessionType === MENU_SESSION_TYPES.MULTIPLAYER) {
-                const hasCode = String(this.ui.multiplayerLobbyCodeInput?.value || '').trim();
+                const hasCode = String(multiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
+                const readySummary = multiplayerSessionState?.joined
+                    ? ` (${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready)`
+                    : '';
                 summaryBlocks.push({
                     label: 'Lobby',
-                    value: hasCode || 'Code offen',
+                    value: hasCode ? `${hasCode}${readySummary}` : 'nicht verbunden',
                     muted: !hasCode,
                 });
             }
@@ -1066,11 +1078,16 @@ export class UIManager {
         if (this.ui.mapPreview) {
             renderPreviewCard(this.ui.mapPreview, {
                 title: mapPreview.name,
-                badges: [humanizePreviewCategory(mapPreview.category), mapPreview.sizeText],
+                badges: [
+                    mapPreview.hasGlbModel ? 'GLB' : 'BOX',
+                    humanizePreviewCategory(mapPreview.category),
+                    mapPreview.sizeText,
+                ],
                 facts: [
                     { label: 'Groesse', value: mapPreview.sizeText },
                     { label: 'Hindernisse', value: String(mapPreview.obstacleCount) },
                     { label: 'Portale', value: String(mapPreview.portalCount) },
+                    { label: 'Render', value: mapPreview.renderMode },
                 ],
             });
         }
@@ -1101,11 +1118,26 @@ export class UIManager {
                 this.ui.multiplayerInlineState.open = sessionType === MENU_SESSION_TYPES.MULTIPLAYER;
             }
         }
+        if (this.ui.multiplayerLobbyCodeInput && multiplayerSessionState?.joined) {
+            this.ui.multiplayerLobbyCodeInput.value = String(multiplayerSessionState.lobbyCode || '');
+        }
+        if (this.ui.multiplayerReadyToggle) {
+            this.ui.multiplayerReadyToggle.disabled = sessionType !== MENU_SESSION_TYPES.MULTIPLAYER || multiplayerSessionState?.joined !== true;
+            this.ui.multiplayerReadyToggle.checked = sessionType === MENU_SESSION_TYPES.MULTIPLAYER
+                ? multiplayerSessionState?.localReady === true
+                : false;
+        }
         if (this.ui.multiplayerLobbyState) {
-            const hasCode = String(this.ui.multiplayerLobbyCodeInput?.value || '').trim().length > 0;
-            const ready = !!this.ui.multiplayerReadyToggle?.checked;
-            const state = hasCode || ready ? 'verbunden' : 'nicht verbunden';
-            this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${state}`;
+            const lobbyCode = String(multiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
+            if (sessionType !== MENU_SESSION_TYPES.MULTIPLAYER) {
+                this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: inaktiv';
+            } else if (multiplayerSessionState?.joined) {
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready`;
+            } else if (lobbyCode) {
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} noch nicht verbunden`;
+            } else {
+                this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: nicht verbunden';
+            }
         }
 
         if (this.ui.themeModeSelect) {
@@ -1128,10 +1160,41 @@ export class UIManager {
 
     syncMultiplayerState(settings = this.game.settings) {
         if (!this.ui.multiplayerStatus) return;
-        const role = this._accessContext?.isOwner ? 'Host' : 'Client';
+        const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
+        const sessionState = this.game?.menuMultiplayerBridge?.getSessionState?.() || null;
         const activePresetId = String(settings?.matchSettings?.activePresetId || '');
         const presetText = activePresetId ? ` | Preset: ${activePresetId}` : '';
-        this.ui.multiplayerStatus.textContent = `Lobby Stub v1 | Rolle: ${role}${presetText}`;
+        if (sessionType !== MENU_SESSION_TYPES.MULTIPLAYER) {
+            this.ui.multiplayerStatus.textContent = `Lobby inaktiv${presetText}`;
+            if (this.ui.startButton) {
+                this.ui.startButton.disabled = false;
+                this.ui.startButton.title = '';
+            }
+            return;
+        }
+
+        if (!sessionState?.joined) {
+            this.ui.multiplayerStatus.textContent = `Lobby offline | Rolle: nicht verbunden${presetText}`;
+            if (this.ui.startButton) {
+                this.ui.startButton.disabled = true;
+                this.ui.startButton.title = 'Lobby hosten oder joinen, bevor gestartet wird.';
+            }
+            return;
+        }
+
+        const role = sessionState.isHost ? 'Host' : 'Client';
+        const startStatus = sessionState.canStart
+            ? 'Start bereit'
+            : (sessionState.isHost ? 'Warte auf Ready' : 'Warte auf Host');
+        this.ui.multiplayerStatus.textContent = `Lobby live | Rolle: ${role} | ${sessionState.readyCount}/${sessionState.memberCount} ready | ${startStatus}${presetText}`;
+        if (this.ui.startButton) {
+            this.ui.startButton.disabled = !sessionState.canStart;
+            this.ui.startButton.title = sessionState.canStart
+                ? ''
+                : (sessionState.isHost
+                    ? 'Alle Teilnehmer muessen Ready sein und mindestens 2 Spieler verbunden sein.'
+                    : 'Nur der Host kann das Match starten.');
+        }
     }
 
     syncDeveloperState(settings = this.game.settings) {

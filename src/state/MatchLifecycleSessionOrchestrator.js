@@ -1,6 +1,10 @@
 import { initializeMatchSession, disposeMatchSessionSystems } from './MatchSessionFactory.js';
 import { LIFECYCLE_EVENT_TYPES } from '../core/MediaRecorderSystem.js';
 
+function isPromiseLike(value) {
+    return !!value && typeof value.then === 'function';
+}
+
 export class MatchLifecycleSessionOrchestrator {
     constructor(game) {
         this.game = game || null;
@@ -48,6 +52,18 @@ export class MatchLifecycleSessionOrchestrator {
         this._emitLifecycleEvent(LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
+    _applyInitializedMatch(initializedMatch) {
+        const game = this.game;
+        game.matchSessionRuntimeBridge.applyInitializedMatchSession(initializedMatch);
+        this._startLifecycleSession({
+            mapKey: initializedMatch?.session?.effectiveMapKey || game.mapKey || null,
+            numHumans: initializedMatch?.session?.numHumans || game.numHumans || 0,
+            numBots: initializedMatch?.session?.numBots || game.numBots || 0,
+            winsNeeded: initializedMatch?.session?.winsNeeded || game.winsNeeded || 0,
+        });
+        return initializedMatch;
+    }
+
     createMatchSession({ onPlayerFeedback, onPlayerDied, onRoundEnd } = {}) {
         const game = this.game;
         if (!game) {
@@ -70,14 +86,10 @@ export class MatchLifecycleSessionOrchestrator {
             onPlayerDied,
             onRoundEnd,
         });
-        game.matchSessionRuntimeBridge.applyInitializedMatchSession(initializedMatch);
-        this._startLifecycleSession({
-            mapKey: initializedMatch?.session?.effectiveMapKey || game.mapKey || null,
-            numHumans: initializedMatch?.session?.numHumans || game.numHumans || 0,
-            numBots: initializedMatch?.session?.numBots || game.numBots || 0,
-            winsNeeded: initializedMatch?.session?.winsNeeded || game.winsNeeded || 0,
-        });
-        return initializedMatch;
+        if (isPromiseLike(initializedMatch)) {
+            return Promise.resolve(initializedMatch).then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch));
+        }
+        return this._applyInitializedMatch(initializedMatch);
     }
 
     bindHuntEventHandlers({ onHuntFeedEvent, onHuntDamageEvent } = {}) {

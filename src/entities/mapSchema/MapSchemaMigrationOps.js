@@ -54,6 +54,7 @@ function sanitizeLegacyRuntimeMapDocument(rawMap, warnings) {
             y: height * 0.55,
             z: 0,
         },
+        glbModel: typeof rawMap?.glbModel === 'string' ? rawMap.glbModel : undefined,
     };
 }
 
@@ -116,4 +117,3 @@ export function createMapDocument(data = {}) {
 export function stringifyMapDocument(data = {}, indent = 2) {
     return JSON.stringify(createMapDocument(data), null, indent);
 }
-

@@ -74,6 +74,10 @@ export class OverheatGunSystem {
         return this._state.getOverheatValue(playerIndex);
     }
 
+    resetPlayer(playerIndex) {
+        this._state.resetPlayer(playerIndex);
+    }
+
     getOverheatSnapshot() {
         return this._state.overheatSnapshot;
     }

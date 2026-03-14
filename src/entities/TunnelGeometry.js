@@ -9,6 +9,36 @@ function asPositiveNumber(value, fallback) {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
 }
 
+function hasFinitePositionAttribute(geometry) {
+    const position = geometry?.getAttribute?.('position');
+    if (!position || position.itemSize < 3 || position.count <= 0) {
+        return false;
+    }
+    for (let i = 0; i < position.count; i++) {
+        if (
+            !Number.isFinite(position.getX(i))
+            || !Number.isFinite(position.getY(i))
+            || !Number.isFinite(position.getZ(i))
+        ) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function hasFiniteBounds(geometry) {
+    const box = geometry?.boundingBox;
+    const sphere = geometry?.boundingSphere;
+    if (!box || !sphere) return false;
+    return Number.isFinite(box.min.x)
+        && Number.isFinite(box.min.y)
+        && Number.isFinite(box.min.z)
+        && Number.isFinite(box.max.x)
+        && Number.isFinite(box.max.y)
+        && Number.isFinite(box.max.z)
+        && Number.isFinite(sphere.radius);
+}
+
 function projectAngleToRectangle(angle, halfWidth, halfHeight) {
     const dirX = Math.cos(angle);
     const dirY = Math.sin(angle);
@@ -123,6 +153,7 @@ export function createBoxWithTunnel(boxW, boxH, boxD, tunnelRadius, tunnelAxis =
     const safeW = asPositiveNumber(boxW, 1);
     const safeH = asPositiveNumber(boxH, 1);
     const safeD = asPositiveNumber(boxD, 1);
+    const buildFallbackGeometry = () => new THREE.BoxGeometry(safeW, safeH, safeD);
 
     const setup = resolveCanonicalSetup(safeW, safeH, safeD, tunnelAxis);
     const maxRadius = Math.max(EPSILON, Math.min(setup.width, setup.height) * 0.5 - EPSILON);
@@ -130,10 +161,10 @@ export function createBoxWithTunnel(boxW, boxH, boxD, tunnelRadius, tunnelAxis =
     const safeRadius = Math.min(asPositiveNumber(tunnelRadius, fallbackRadius), maxRadius);
 
     if (safeRadius <= EPSILON) {
-        return new THREE.BoxGeometry(safeW, safeH, safeD);
+        return buildFallbackGeometry();
     }
 
-    const geometry = createCanonicalBoxWithTunnel(
+    let geometry = createCanonicalBoxWithTunnel(
         setup.width,
         setup.height,
         setup.depth,
@@ -145,8 +176,18 @@ export function createBoxWithTunnel(boxW, boxH, boxD, tunnelRadius, tunnelAxis =
         setup.rotateToAxis(geometry);
     }
 
+    if (!hasFinitePositionAttribute(geometry)) {
+        geometry.dispose();
+        geometry = buildFallbackGeometry();
+    }
+
     geometry.computeBoundingBox();
     geometry.computeBoundingSphere();
+    if (!hasFiniteBounds(geometry)) {
+        geometry.dispose();
+        geometry = buildFallbackGeometry();
+        geometry.computeBoundingBox();
+        geometry.computeBoundingSphere();
+    }
     return geometry;
 }
-

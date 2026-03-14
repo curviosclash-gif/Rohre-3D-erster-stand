@@ -41,7 +41,19 @@ export function normalizeBotPolicyStrategy(strategy, fallback = BOT_POLICY_STRAT
     return BOT_POLICY_STRATEGY_SET.has(candidate) ? candidate : normalizedFallback;
 }
 
-export function resolveBotPolicyType(strategy, activeGameMode, { huntFeatureEnabled = true, planarMode = false } = {}) {
+function resolveLocalBotPolicyType(huntModeActive) {
+    return huntModeActive ? BOT_POLICY_TYPES.HUNT : BOT_POLICY_TYPES.RULE_BASED;
+}
+
+export function resolveBotPolicyType(
+    strategy,
+    activeGameMode,
+    {
+        huntFeatureEnabled = true,
+        planarMode = false,
+        trainerBridgeEnabled = false,
+    } = {}
+) {
     const normalizedStrategy = normalizeBotPolicyStrategy(strategy, BOT_POLICY_STRATEGIES.AUTO);
     const huntModeActive = isHuntMode(activeGameMode, huntFeatureEnabled);
 
@@ -51,10 +63,13 @@ export function resolveBotPolicyType(strategy, activeGameMode, { huntFeatureEnab
     if (normalizedStrategy === BOT_POLICY_STRATEGIES.RULE_BASED) {
         return BOT_POLICY_TYPES.RULE_BASED;
     }
-    return resolveMatchBotPolicyType({
-        huntModeActive,
-        planarMode: !!planarMode,
-    });
+    if (trainerBridgeEnabled === true) {
+        return resolveMatchBotPolicyType({
+            huntModeActive,
+            planarMode: !!planarMode,
+        });
+    }
+    return resolveLocalBotPolicyType(huntModeActive);
 }
 
 export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = {}) {
@@ -82,9 +97,11 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
 
     const botDifficulty = resolveBotDifficulty(source.botDifficulty, botDefaults);
     const botPolicyStrategy = normalizeBotPolicyStrategy(source.botPolicyStrategy, BOT_POLICY_STRATEGIES.AUTO);
+    const trainerBridgeEnabled = !!botBridgeSource.enabled;
     const botPolicyType = resolveBotPolicyType(botPolicyStrategy, activeGameMode, {
         huntFeatureEnabled,
         planarMode,
+        trainerBridgeEnabled,
     });
 
     const runtimeConfig = {
@@ -131,7 +148,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
             activeDifficulty: botDifficulty,
             policyStrategy: botPolicyStrategy,
             policyType: botPolicyType,
-            trainerBridgeEnabled: !!botBridgeSource.enabled,
+            trainerBridgeEnabled,
             trainerBridgeUrl: typeof botBridgeSource.url === 'string' && botBridgeSource.url.trim()
                 ? botBridgeSource.url.trim()
                 : 'ws://127.0.0.1:8765',

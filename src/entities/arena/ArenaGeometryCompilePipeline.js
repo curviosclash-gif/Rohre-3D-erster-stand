@@ -41,6 +41,9 @@ export class ArenaGeometryCompilePipeline {
     beginBuildStage() {
         const arena = this.arena;
         arena.obstacles = [];
+        arena._clearLoadedGlbScene?.();
+        arena._glbLoadError = null;
+        arena._glbLoadWarnings = [];
 
         removeAndDisposeObject(arena, '_floorMesh');
         removeAndDisposeObject(arena, '_mergedWallMesh');
@@ -257,4 +260,3 @@ export class ArenaGeometryCompilePipeline {
         geo.dispose();
     }
 }
-

@@ -59,6 +59,12 @@ export function setupMenuGameplayBindings(ctx) {
         });
     }
 
+    if (ui.quickStartEventPlaylistButton) {
+        bind(ui.quickStartEventPlaylistButton, 'click', () => {
+            emit(eventTypes.QUICKSTART_EVENT_PLAYLIST_START);
+        });
+    }
+
     if (ui.quickStartRandomButton) {
         bind(ui.quickStartRandomButton, 'click', () => {
             emit(eventTypes.QUICKSTART_RANDOM_START);

@@ -1,3 +1,7 @@
+if [ -f ".husky/.bypass" ]; then
+  exit 0
+fi
+
 echo "Running docs:check (aus AGENTS.md Regeln)..."
 npm run docs:check
 

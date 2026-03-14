@@ -16,7 +16,11 @@ export class RenderQualityController {
     }
 
     setQuality(quality) {
-        this.quality = quality === 'LOW' ? 'LOW' : 'HIGH';
+        const nextQuality = quality === 'LOW' ? 'LOW' : 'HIGH';
+        if (this.quality === nextQuality) {
+            return;
+        }
+        this.quality = nextQuality;
         if (this.quality === 'LOW') {
             this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 0.8));
             this.renderer.toneMapping = THREE.NoToneMapping;
@@ -34,7 +38,11 @@ export class RenderQualityController {
     }
 
     setShadowQuality(level) {
-        this.shadowQuality = normalizeShadowQuality(level);
+        const nextShadowQuality = normalizeShadowQuality(level);
+        if (this.shadowQuality === nextShadowQuality) {
+            return;
+        }
+        this.shadowQuality = nextShadowQuality;
         this._applyShadowQuality();
         this._refreshMaterials();
     }

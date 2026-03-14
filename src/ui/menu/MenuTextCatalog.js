@@ -8,6 +8,7 @@ export const MENU_TEXT_CATALOG = Object.freeze({
     'menu.level2.quick.title': 'Sofort spielen',
     'menu.level2.quick.hint': 'Diese Aktionen starten sofort mit vertrauten oder zufaelligen Einstellungen.',
     'menu.level2.quick_last.label': 'Letzte Einstellungen starten',
+    'menu.level2.quick_event.label': 'Event-Playlist starten',
     'menu.level2.quick_random.label': 'Zufalls-Map direkt starten',
     'menu.level2.mode.title': 'Konfigurieren',
     'menu.level2.mode.hint': 'Waehle einen Stil. Ebene 3 oeffnet direkt mit passenden Vorgaben.',

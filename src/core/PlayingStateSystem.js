@@ -58,14 +58,22 @@ export class PlayingStateSystem {
 
         const numericAlpha = Number(alpha);
         const renderAlpha = Number.isFinite(numericAlpha) ? Math.max(0, Math.min(1, numericAlpha)) : 1;
-        const numericRenderDelta = Number(renderDelta);
+        const renderTiming = game?.gameLoop?.getRenderTiming?.() || null;
+        const numericRenderDelta = Number(renderTiming?.stabilizedDt ?? renderDelta);
         const cameraDt = Number.isFinite(numericRenderDelta)
             ? Math.max(1 / 240, Math.min(0.05, numericRenderDelta))
             : (Number(game?.gameLoop?.fixedStep) || (1 / 60));
+        game?.renderer?.cameraRigSystem?.setFrameTiming?.({
+            frameId: Number(renderTiming?.frameId) || 0,
+            rawDt: Number(renderTiming?.rawDt),
+            dt: cameraDt,
+            reset: renderTiming?.reset === true,
+            reason: renderTiming?.resetReason || '',
+        });
 
         game.entityManager.renderInterpolatedTransforms(renderAlpha);
         const cameraStart = game.runtimePerfProfiler?.startSample?.();
-        game.entityManager.updateCameras(cameraDt, renderAlpha);
+        game.entityManager.updateCameras(cameraDt, renderAlpha, true);
         game.runtimePerfProfiler?.endSample?.('camera', cameraStart);
         game.crosshairSystem.updateCrosshairs();
     }

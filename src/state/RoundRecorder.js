@@ -27,6 +27,7 @@ export class RoundRecorder {
         this.roundStartTime = 0;
         this._enabled = true;
         this._frameCaptureEnabled = false;
+        this._replayCaptureEnabled = true;
         this._frameCounter = 0;
         this._snapshotInterval = 10;
 
@@ -171,15 +172,76 @@ export class RoundRecorder {
         this._frameCaptureEnabled = !!enabled;
     }
 
+    setReplayCaptureEnabled(enabled) {
+        this._replayCaptureEnabled = !!enabled;
+    }
+
     isFrameCaptureEnabled() {
-        return this._frameCaptureEnabled;
+        return this._frameCaptureEnabled || this._replayCaptureEnabled;
+    }
+
+    shouldCaptureFrames() {
+        return this._enabled && this.isFrameCaptureEnabled();
     }
 
     recordFrame(players) {
-        if (!this._enabled || !this._frameCaptureEnabled || !Array.isArray(players)) return;
+        if (!this.shouldCaptureFrames() || !Array.isArray(players)) return;
         this._frameCounter++;
         if (this._frameCounter % this._snapshotInterval !== 0) return;
         this._snapshotStore.capture(players);
+    }
+
+    getLastRoundGhostClip(players = [], options = {}) {
+        const orderedSnapshots = this._snapshotStore.getOrderedSnapshots();
+        if (orderedSnapshots.length < 2) return null;
+
+        const maxSourceDuration = Math.max(0.5, Number(options.maxSourceDuration) || 12);
+        const fallbackSnapshotStep = Math.max(1, Number(this._snapshotInterval) || 1) / 60;
+        const finalTime = Number(orderedSnapshots[orderedSnapshots.length - 1]?.time) || 0;
+        const minTime = Math.max(0, finalTime - maxSourceDuration);
+        let startIndex = 0;
+        while (
+            startIndex < orderedSnapshots.length - 2
+            && Number(orderedSnapshots[startIndex + 1]?.time) < minTime
+        ) {
+            startIndex++;
+        }
+
+        const selectedSnapshots = orderedSnapshots.slice(startIndex);
+        const startTime = Number(selectedSnapshots[0]?.time) || 0;
+        const normalizedFrames = [];
+        for (let index = 0; index < selectedSnapshots.length; index++) {
+            const snapshot = selectedSnapshots[index];
+            const rawTime = Math.max(0, (Number(snapshot?.time) || 0) - startTime);
+            const previousTime = index > 0 ? Number(normalizedFrames[index - 1]?.time) || 0 : 0;
+            const normalizedTime = index > 0 && rawTime < (previousTime + fallbackSnapshotStep * 0.5)
+                ? previousTime + fallbackSnapshotStep
+                : rawTime;
+            normalizedFrames.push({
+                time: normalizedTime,
+                players: Array.isArray(snapshot?.players)
+                    ? snapshot.players.map((player) => ({ ...player }))
+                    : [],
+            });
+        }
+        const sourceDuration = Number(normalizedFrames[normalizedFrames.length - 1]?.time) || 0;
+        if (normalizedFrames.length < 2 || sourceDuration <= 0) return null;
+
+        const clipPlayers = Array.isArray(players)
+            ? players.map((player) => ({
+                idx: Number(player?.index) || 0,
+                color: Number(player?.color) || 0xffffff,
+                isBot: !!player?.isBot,
+                modelScale: Math.max(0.6, Number(player?.modelScale) || 1),
+            }))
+            : [];
+
+        return {
+            sourceDuration,
+            displayDuration: Math.max(0.5, Number(options.displayDuration) || 3),
+            frames: normalizedFrames,
+            players: clipPlayers,
+        };
     }
 
     dump() {

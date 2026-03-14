@@ -2,11 +2,39 @@ import * as THREE from 'three';
 import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
 import { MatchFeedbackAdapter } from './MatchFeedbackAdapter.js';
 import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
+import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
+import { deriveMatchLoadingUiState } from './MatchUiStateOps.js';
 import {
     deriveMatchStartTransition,
     deriveReturnToMenuTransition,
     deriveRoundStartTransition,
 } from '../state/MatchLifecycleStateTransitions.js';
+
+function isPromiseLike(value) {
+    return !!value && typeof value.then === 'function';
+}
+
+function hasOwnProperty(source, key) {
+    return !!source && Object.prototype.hasOwnProperty.call(source, key);
+}
+
+function normalizeTelemetryString(value, fallback = 'unknown') {
+    const normalized = typeof value === 'string' ? value.trim() : '';
+    return normalized || fallback;
+}
+
+function resolveRoundTelemetryWinnerLabel(players, roundMetrics) {
+    if (!roundMetrics) return 'Unbekannt';
+    const winnerIndex = Number(roundMetrics.winnerIndex);
+    if (!Number.isFinite(winnerIndex) || winnerIndex < 0) return 'Unentschieden';
+    const winner = Array.isArray(players)
+        ? players.find((player) => Number(player?.index) === winnerIndex)
+        : null;
+    if (!winner) {
+        return roundMetrics.winnerIsBot ? `Bot ${winnerIndex + 1}` : `Spieler ${winnerIndex + 1}`;
+    }
+    return winner.isBot ? `Bot ${winner.index + 1}` : `Spieler ${winner.index + 1}`;
+}
 
 export class MatchFlowUiController {
     constructor(game) {
@@ -20,12 +48,72 @@ export class MatchFlowUiController {
         this._damageForward = new THREE.Vector3();
         this._damageRight = new THREE.Vector3();
         this._damageWorldUp = new THREE.Vector3(0, 1, 0);
+        this._startMatchPromise = null;
+    }
+
+    _resolveMessageStatsContainer() {
+        return document.getElementById('message-stats');
+    }
+
+    _clearMessageStatsUi() {
+        const statsContainer = this._resolveMessageStatsContainer();
+        if (!statsContainer) return;
+        statsContainer.innerHTML = '';
+        statsContainer.classList.add('hidden');
+    }
+
+    _renderMessageStatsUi(overlayStats) {
+        const statsContainer = this._resolveMessageStatsContainer();
+        if (!statsContainer) return;
+
+        const blocks = Array.isArray(overlayStats?.blocks) ? overlayStats.blocks : [];
+        if (overlayStats?.visible === false || blocks.length === 0) {
+            this._clearMessageStatsUi();
+            return;
+        }
+
+        statsContainer.innerHTML = '';
+        blocks.forEach((block) => {
+            const blockElement = document.createElement('section');
+            blockElement.className = 'message-stats-card';
+            blockElement.setAttribute('data-stats-block-id', String(block?.id || 'block'));
+
+            const title = document.createElement('h3');
+            title.className = 'message-stats-title';
+            title.textContent = String(block?.title || 'Stats');
+            blockElement.appendChild(title);
+
+            const list = document.createElement('dl');
+            list.className = 'message-stats-list';
+            const rows = Array.isArray(block?.rows) ? block.rows : [];
+            rows.forEach((row) => {
+                const rowElement = document.createElement('div');
+                rowElement.className = 'message-stats-row';
+                rowElement.setAttribute('data-stats-row-key', String(row?.key || 'row'));
+
+                const label = document.createElement('dt');
+                label.className = 'message-stats-label';
+                label.textContent = String(row?.label || '');
+
+                const value = document.createElement('dd');
+                value.className = 'message-stats-value';
+                value.textContent = String(row?.value || '');
+
+                rowElement.append(label, value);
+                list.appendChild(rowElement);
+            });
+
+            blockElement.appendChild(list);
+            statsContainer.appendChild(blockElement);
+        });
+
+        statsContainer.classList.remove('hidden');
     }
 
     applyMatchUiState(uiState) {
         const game = this.game;
         const visibility = uiState?.visibility || {};
-        const hasOwn = (key) => Object.prototype.hasOwnProperty.call(visibility, key);
+        const hasOwn = (key) => hasOwnProperty(visibility, key);
         if (game.ui.mainMenu && hasOwn('mainMenuHidden')) {
             game.ui.mainMenu.classList.toggle('hidden', visibility.mainMenuHidden !== false);
         }
@@ -42,6 +130,9 @@ export class MatchFlowUiController {
             if (hasOwn('messageOverlayHidden')) {
                 game.ui.messageOverlay.classList.toggle('hidden', visibility.messageOverlayHidden !== false);
             }
+        }
+        if (hasOwnProperty(uiState, 'overlayStats')) {
+            this._renderMessageStatsUi(uiState.overlayStats);
         }
         if (game.ui.statusToast && hasOwn('statusToastHidden')) {
             game.ui.statusToast.classList.toggle('hidden', visibility.statusToastHidden !== false);
@@ -162,14 +253,77 @@ export class MatchFlowUiController {
         }
     }
 
-    startMatch() {
+    _resolveMatchLoadingUiState() {
+        const requestedMapKey = this.game?.runtimeConfig?.session?.mapKey || this.game?.mapKey || 'standard';
+        const mapSelection = resolveArenaMapSelection(requestedMapKey);
+        const mapDefinition = mapSelection?.mapDefinition || null;
+        if (!mapDefinition?.glbModel) return null;
+        return deriveMatchLoadingUiState({
+            messageText: `Lade ${String(mapDefinition?.name || requestedMapKey)}...`,
+            messageSub: 'GLB-Umgebung wird vorbereitet',
+        });
+    }
+
+    _buildRoundEndTelemetryPayload(roundEndPlan) {
+        const game = this.game;
+        const roundMetrics = roundEndPlan?.recording?.roundMetrics
+            || game?.recorder?.getLastRoundMetrics?.()
+            || null;
+        if (!roundMetrics) return null;
+
+        return {
+            mapKey: normalizeTelemetryString(game?.arena?.currentMapKey || game?.mapKey, 'standard'),
+            mode: normalizeTelemetryString(game?.activeGameMode || game?.runtimeConfig?.session?.activeGameMode, 'classic').toLowerCase(),
+            state: normalizeTelemetryString(roundEndPlan?.outcome?.state, 'ROUND_END'),
+            winnerType: roundMetrics.winnerIndex < 0
+                ? 'draw'
+                : (roundMetrics.winnerIsBot ? 'bot' : 'human'),
+            winnerLabel: resolveRoundTelemetryWinnerLabel(game?.entityManager?.players, roundMetrics),
+            duration: Math.max(0, Number(roundMetrics.duration) || 0),
+            selfCollisions: Math.max(0, Number(roundMetrics.selfCollisions) || 0),
+            itemUses: Math.max(0, Number(roundMetrics.itemUseEvents) || 0),
+            stuckEvents: Math.max(0, Number(roundMetrics.stuckEvents) || 0),
+        };
+    }
+
+    _recordRoundEndTelemetry(roundEndPlan) {
+        const telemetryPayload = this._buildRoundEndTelemetryPayload(roundEndPlan);
+        if (!telemetryPayload) return;
+        this.game?.runtimeFacade?.recordRoundEndTelemetry?.(telemetryPayload);
+        if (telemetryPayload.state === 'MATCH_END') {
+            this.game?.runtimeFacade?.recordMatchEndTelemetry?.(telemetryPayload);
+        }
+    }
+
+    _completeStartedMatch(initializedMatch) {
+        this.sessionOrchestrator.bindHuntEventHandlers({
+            onHuntFeedEvent: (entry) => this._pushHuntFeedEntry(entry),
+            onHuntDamageEvent: (event) => this._handleHuntDamageEvent(event),
+        });
+        this.startRound();
+        this.feedbackAdapter.applyFeedbackPlan(initializedMatch?.feedbackPlan);
+        return true;
+    }
+
+    _handleStartMatchFailure(error) {
+        console.error('[MatchFlowUiController] startMatch failed:', error);
+        this.game?._showStatusToast?.('Map-Start fehlgeschlagen. Fallback oder Menue wird geladen.', 2600, 'error');
+        this.returnToMenu();
+        return false;
+    }
+
+    _startMatchInternal() {
         const game = this.game;
         game.keyCapture = null;
-        game._applySettingsToRuntime();
+        game._applySettingsToRuntime({ schedulePrewarm: false });
 
         const matchStartTransition = deriveMatchStartTransition({ numHumans: game.numHumans });
         this.applyLifecycleTransition(matchStartTransition);
         this.applyMatchStartUiState(matchStartTransition.uiState);
+        const loadingUiState = this._resolveMatchLoadingUiState();
+        if (loadingUiState) {
+            this.applyMatchUiState(loadingUiState);
+        }
 
         const initializedMatch = this.sessionOrchestrator.createMatchSession({
             onPlayerFeedback: (player, message) => {
@@ -184,19 +338,35 @@ export class MatchFlowUiController {
                 this.onRoundEnd(winner);
             },
         });
-        this.sessionOrchestrator.bindHuntEventHandlers({
-            onHuntFeedEvent: (entry) => this._pushHuntFeedEntry(entry),
-            onHuntDamageEvent: (event) => this._handleHuntDamageEvent(event),
-        });
-        this.feedbackAdapter.applyFeedbackPlan(initializedMatch.feedbackPlan);
+        if (isPromiseLike(initializedMatch)) {
+            return Promise.resolve(initializedMatch).then((resolvedMatch) => this._completeStartedMatch(resolvedMatch));
+        }
+        return this._completeStartedMatch(initializedMatch);
+    }
 
-        this.startRound();
+    startMatch() {
+        if (this._startMatchPromise) return this._startMatchPromise;
+        try {
+            const startResult = this._startMatchInternal();
+            if (isPromiseLike(startResult)) {
+                this._startMatchPromise = Promise.resolve(startResult)
+                    .catch((error) => this._handleStartMatchFailure(error))
+                    .finally(() => {
+                        this._startMatchPromise = null;
+                    });
+                return this._startMatchPromise;
+            }
+            return startResult;
+        } catch (error) {
+            return this._handleStartMatchFailure(error);
+        }
     }
 
     startRound() {
         const game = this.game;
         const roundStartTransition = deriveRoundStartTransition();
         this.applyLifecycleTransition(roundStartTransition);
+        game.entityManager?.clearLastRoundGhost?.();
 
         if (game.ui.crosshairP1) {
             game.ui.crosshairP1.style.display = 'none';
@@ -218,6 +388,9 @@ export class MatchFlowUiController {
         game.roundPause = 3.0;
 
         const roundEndPlan = coordinateRoundEnd(this.buildRoundEndCoordinatorRequest(winner));
+        const ghostClip = game.recorder?.getLastRoundGhostClip?.(game.entityManager?.players, {
+            displayDuration: game.roundPause,
+        });
         const huntSummary = game.entityManager?.getHuntScoreboardSummary
             ? game.entityManager.getHuntScoreboardSummary(4)
             : '';
@@ -227,6 +400,12 @@ export class MatchFlowUiController {
             roundEndPlan.uiState.messageText = baseText ? `${baseText}\n${huntSummary}` : huntSummary;
         }
         this.applyRoundEndCoordinatorPlan(roundEndPlan);
+        this._recordRoundEndTelemetry(roundEndPlan);
+        if (ghostClip) {
+            game.entityManager?.playLastRoundGhost?.(ghostClip);
+        } else {
+            game.entityManager?.clearLastRoundGhost?.();
+        }
     }
 
     buildRoundEndCoordinatorRequest(winner) {
@@ -271,6 +450,7 @@ export class MatchFlowUiController {
         const game = this.game;
         const returnTransition = deriveReturnToMenuTransition();
         this.applyLifecycleTransition(returnTransition);
+        game.entityManager?.clearLastRoundGhost?.();
         this.sessionOrchestrator.teardownMatchSession();
         this.applyMatchUiState(returnTransition.uiState);
         game._showMainNav();

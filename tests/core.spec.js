@@ -16,6 +16,7 @@ import {
     openSubmenu,
     returnToMenu,
     startGame,
+    startGameWithBots,
     unlockExpertMode,
 } from './helpers.js';
 import { stringifyMapDocument } from '../src/entities/MapSchema.js';
@@ -30,12 +31,16 @@ const EDITOR_MAP_DIR = path.resolve(process.cwd(), 'data/maps');
 const EDITOR_JSON_SUFFIX = '.editor.json';
 const RUNTIME_JSON_SUFFIX = '.runtime.json';
 
-function buildLegacyRuntimeCustomMap(obstacles = []) {
-    return JSON.stringify({
+function buildLegacyRuntimeCustomMap(obstacles = [], options = {}) {
+    const payload = {
         size: [80, 30, 80],
         obstacles,
         portals: [],
-    });
+    };
+    if (typeof options?.glbModel === 'string' && options.glbModel.trim().length > 0) {
+        payload.glbModel = options.glbModel.trim();
+    }
+    return JSON.stringify(payload);
 }
 
 async function loadGameWithRetry(page, attempts = 4) {
@@ -213,6 +218,133 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(errors).toHaveLength(0);
     });
 
+    test('T14b: GLB-Maps markieren UI und starten mit Loader-Overlay und Szene-Collidern', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await page.selectOption('#map-select', 'glb_hangar');
+        await page.waitForFunction(() => window.GAME_INSTANCE?.settings?.mapKey === 'glb_hangar', null, { timeout: 5000 });
+        await page.waitForFunction(() => {
+            const previewText = document.getElementById('map-preview')?.textContent || '';
+            return previewText.includes('GLB');
+        }, null, { timeout: 5000 });
+
+        const selectionState = await page.evaluate(() => ({
+            optionText: document.querySelector('#map-select option[value="glb_hangar"]')?.textContent || '',
+            previewText: document.getElementById('map-preview')?.textContent || '',
+        }));
+
+        expect(selectionState.optionText).toContain('[GLB]');
+        expect(selectionState.previewText).toContain('GLB');
+
+        const probe = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            game.runtimeFacade?._clearMatchPrewarmTimer?.();
+            const startPromise = game.matchFlowUiController.startMatch();
+            const overlay = document.getElementById('message-overlay');
+            const messageText = document.getElementById('message-text');
+            const messageSub = document.getElementById('message-sub');
+            const overlayVisibleDuringStart = !!overlay && !overlay.classList.contains('hidden');
+            const loadingText = messageText?.textContent || '';
+            const loadingSub = messageSub?.textContent || '';
+
+            await startPromise;
+
+            const nonWallObstacles = Array.isArray(game.arena?.obstacles)
+                ? game.arena.obstacles.filter((entry) => !entry?.isWall)
+                : [];
+            return {
+                state: game.state,
+                currentMapKey: game.arena?.currentMapKey || null,
+                overlayVisibleDuringStart,
+                loadingText,
+                loadingSub,
+                glbScenePresent: !!game.arena?._glbScene,
+                glbChildCount: game.arena?._glbScene?.children?.length || 0,
+                glbError: game.arena?._glbLoadError || '',
+                nonWallObstacleCount: nonWallObstacles.length,
+                obstacleKinds: nonWallObstacles.map((entry) => entry.kind || 'hard'),
+                floorParent: game.arena?._floorMesh?.parent?.name || null,
+            };
+        });
+
+        expect(probe.state).toBe('PLAYING');
+        expect(probe.currentMapKey).toBe('glb_hangar');
+        expect(probe.overlayVisibleDuringStart).toBeTruthy();
+        expect(probe.loadingText).toContain('GLB Test Hangar');
+        expect(probe.loadingSub).toContain('GLB-Umgebung');
+        expect(probe.glbScenePresent).toBeTruthy();
+        expect(probe.glbChildCount).toBeGreaterThanOrEqual(4);
+        expect(probe.glbError).toBe('');
+        expect(probe.nonWallObstacleCount).toBe(2);
+        expect(probe.obstacleKinds).toEqual(expect.arrayContaining(['hard', 'foam']));
+        expect(probe.floorParent).toBe('matchRoot');
+    });
+
+    test('T14c: Ungueltige GLB-Maps fallen auf Box-Hindernisse und Warn-Toast zurueck', async ({ page }) => {
+        const brokenRuntimeMap = stringifyMapDocument({
+            arenaSize: { width: 240, height: 90, depth: 240 },
+            hardBlocks: [
+                { id: 'glb_fallback_hard', x: -24, y: 12, z: 0, width: 6, height: 24, depth: 24 },
+            ],
+            foamBlocks: [
+                { id: 'glb_fallback_foam', x: 24, y: 12, z: 0, width: 6, height: 24, depth: 24 },
+            ],
+            glbModel: 'data:model/gltf-binary;base64,broken',
+        });
+
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await page.evaluate(({ storageKey, mapJson }) => {
+            localStorage.setItem(storageKey, mapJson);
+            const game = window.GAME_INSTANCE;
+            if (game?.settings) {
+                game.settings.mapKey = 'custom';
+            }
+            game?.runtimeFacade?.onSettingsChanged?.({ changedKeys: ['mapKey'] });
+        }, {
+            storageKey: CUSTOM_MAP_STORAGE_KEY,
+            mapJson: brokenRuntimeMap,
+        });
+        await page.waitForFunction(() => window.GAME_INSTANCE?.settings?.mapKey === 'custom', null, { timeout: 5000 });
+
+        const probe = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            game.runtimeFacade?._clearMatchPrewarmTimer?.();
+            const startPromise = game.matchFlowUiController.startMatch();
+            const loadingVisibleDuringStart = !document.getElementById('message-overlay')?.classList.contains('hidden');
+
+            await startPromise;
+
+            const nonWallObstacles = Array.isArray(game.arena?.obstacles)
+                ? game.arena.obstacles.filter((entry) => !entry?.isWall)
+                : [];
+            const toast = document.getElementById('status-toast');
+            return {
+                state: game.state,
+                currentMapKey: game.arena?.currentMapKey || null,
+                loadingVisibleDuringStart,
+                glbScenePresent: !!game.arena?._glbScene,
+                glbError: game.arena?._glbLoadError || '',
+                glbWarnings: Array.isArray(game.arena?._glbLoadWarnings) ? game.arena._glbLoadWarnings : [],
+                nonWallObstacleCount: nonWallObstacles.length,
+                obstacleKinds: nonWallObstacles.map((entry) => entry.kind || 'hard'),
+                toastText: toast?.textContent || '',
+                toastVisible: !!toast && !toast.classList.contains('hidden'),
+            };
+        });
+
+        expect(probe.state).toBe('PLAYING');
+        expect(probe.currentMapKey).toBe('custom');
+        expect(probe.loadingVisibleDuringStart).toBeTruthy();
+        expect(probe.glbScenePresent).toBeFalsy();
+        expect(probe.glbError).not.toBe('');
+        expect(probe.glbWarnings.length).toBeGreaterThan(0);
+        expect(probe.nonWallObstacleCount).toBe(2);
+        expect(probe.obstacleKinds).toEqual(expect.arrayContaining(['hard', 'foam']));
+        expect(probe.toastVisible).toBeTruthy();
+        expect(probe.toastText).toContain('Box-Fallback aktiv');
+    });
+
     test('T15: Bot-Count Slider aktualisiert Label', async ({ page }) => {
         await loadGame(page);
         await openGameSubmenu(page);
@@ -384,6 +516,73 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(eventTypes.includes('menu_opened')).toBeTruthy();
     });
 
+    test('T20ba: Round-End Ghost-Replay nutzt Recorder-Snapshots und wird beim Rundenreset entfernt', async ({ page }) => {
+        await startGameWithBots(page, 1);
+
+        const replayState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const players = game?.entityManager?.players || [];
+            if (players.length < 2) {
+                return { error: 'missing-players' };
+            }
+
+            const applyPose = (player, x, y, z, yaw) => {
+                player.position.set(x, y, z);
+                player.quaternion.set(0, Math.sin(yaw * 0.5), 0, Math.cos(yaw * 0.5));
+            };
+
+            const baseY0 = Number(players[0]?.position?.y) || 5;
+            const baseY1 = Number(players[1]?.position?.y) || 5;
+
+            game.recorder._snapshotInterval = 1;
+            game.recorder.startRound(players);
+
+            for (let step = 0; step < 6; step += 1) {
+                applyPose(players[0], -18 + step * 4.2, baseY0, 9 - step * 1.8, step * 0.2);
+                applyPose(players[1], 16 - step * 3.1, baseY1, -7 + step * 2.4, -step * 0.16);
+                game.recorder.recordFrame(players);
+            }
+
+            game.matchFlowUiController.onRoundEnd(players[0]);
+            const initialGhost = game.entityManager.getLastRoundGhostState();
+            game.entityManager.updateLastRoundGhostPlayback(1.5);
+            const advancedGhost = game.entityManager.getLastRoundGhostState();
+
+            return {
+                state: game.state,
+                overlayVisible: !document.getElementById('message-overlay')?.classList?.contains('hidden'),
+                initialGhost,
+                advancedGhost,
+            };
+        });
+
+        expect(replayState.error || '').toBe('');
+        expect(['ROUND_END', 'MATCH_END']).toContain(replayState.state);
+        expect(replayState.overlayVisible).toBeTruthy();
+        expect(replayState.initialGhost.active).toBeTruthy();
+        expect(replayState.initialGhost.frameCount).toBeGreaterThanOrEqual(6);
+        expect(replayState.initialGhost.entryCount).toBeGreaterThanOrEqual(2);
+
+        const movedGhost = replayState.advancedGhost.ghosts.some((ghost, index) => {
+            const before = replayState.initialGhost.ghosts[index];
+            return before && (ghost.x !== before.x || ghost.z !== before.z);
+        });
+        expect(movedGhost).toBeTruthy();
+
+        const resetState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.matchFlowUiController.startRound();
+            return {
+                state: game.state,
+                ghost: game.entityManager.getLastRoundGhostState(),
+            };
+        });
+
+        expect(resetState.state).toBe('PLAYING');
+        expect(resetState.ghost.active).toBeFalsy();
+        expect(resetState.ghost.entryCount).toBe(0);
+    });
+
     test('T20c: Multiplayer ist als Session-Typ in Ebene 1 waehlbar', async ({ page }) => {
         await loadGame(page);
         await expect(page.locator('#menu-nav [data-session-type="multiplayer"]')).toBeVisible();
@@ -406,6 +605,112 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(lifecycleEvent).toBeTruthy();
         expect(lifecycleEvent.contractVersion).toBe('lifecycle.v1');
         expect(lifecycleEvent.payload?.lobbyCode).toBe('QA-LOBBY');
+    });
+
+    test('T20d1: Multiplayer-Lobby synchronisiert Join, Ready und Host-Invalidation ueber zwei Tabs', async ({ page }) => {
+        const secondPage = await page.context().newPage();
+        try {
+            await loadGame(page);
+            await loadGame(secondPage);
+
+            await openMultiplayerSubmenu(page);
+            await page.fill('#multiplayer-lobby-code', 'SYNC-LOBBY');
+            await page.click('#btn-multiplayer-host');
+            await page.waitForFunction(() => window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.()?.joined === true, null, { timeout: 5000 });
+
+            await openMultiplayerSubmenu(secondPage);
+            await secondPage.fill('#multiplayer-lobby-code', 'SYNC-LOBBY');
+            await secondPage.click('#btn-multiplayer-join');
+            await secondPage.waitForFunction(() => window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.()?.joined === true, null, { timeout: 5000 });
+            await secondPage.check('#multiplayer-ready-toggle');
+
+            await page.waitForFunction(() => {
+                const state = window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.();
+                return state?.memberCount === 2 && state?.readyCount === 1;
+            }, null, { timeout: 5000 });
+
+            const syncedState = await page.evaluate(() => ({
+                sessionState: window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.(),
+                lobbyStateText: document.getElementById('multiplayer-lobby-state')?.textContent || '',
+            }));
+            expect(syncedState.sessionState?.isHost).toBeTruthy();
+            expect(syncedState.sessionState?.memberCount).toBe(2);
+            expect(syncedState.sessionState?.readyCount).toBe(1);
+            expect(syncedState.lobbyStateText).toContain('2 Spieler');
+
+            await page.evaluate(() => {
+                const slider = document.getElementById('bot-count');
+                slider.value = '4';
+                slider.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+
+            await secondPage.waitForFunction(() => {
+                const state = window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.();
+                return state?.joined === true && state?.localReady === false && state?.readyCount === 0;
+            }, null, { timeout: 5000 });
+
+            const invalidatedState = await secondPage.evaluate(() => ({
+                sessionState: window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.(),
+                readyChecked: !!document.getElementById('multiplayer-ready-toggle')?.checked,
+            }));
+            expect(invalidatedState.sessionState?.role).toBe('client');
+            expect(invalidatedState.sessionState?.localReady).toBeFalsy();
+            expect(invalidatedState.readyChecked).toBeFalsy();
+        } finally {
+            await secondPage.close();
+        }
+    });
+
+    test('T20d2: Multiplayer-Host startet Match synchron mit autoritativem Snapshot ueber zwei Tabs', async ({ page }) => {
+        test.setTimeout(120000);
+        const secondPage = await page.context().newPage();
+        try {
+            await loadGame(page);
+            await loadGame(secondPage);
+
+            await openMultiplayerSubmenu(page);
+            await page.fill('#multiplayer-lobby-code', 'START-LOBBY');
+            await page.click('#btn-multiplayer-host');
+            await page.waitForFunction(() => window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.()?.joined === true, null, { timeout: 5000 });
+
+            await page.selectOption('#map-select', 'maze');
+            await page.waitForFunction(() => window.GAME_INSTANCE?.settings?.mapKey === 'maze', null, { timeout: 5000 });
+
+            await openMultiplayerSubmenu(secondPage);
+            await secondPage.fill('#multiplayer-lobby-code', 'START-LOBBY');
+            await secondPage.click('#btn-multiplayer-join');
+            await secondPage.waitForFunction(() => window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.()?.joined === true, null, { timeout: 5000 });
+
+            await page.check('#multiplayer-ready-toggle');
+            await secondPage.check('#multiplayer-ready-toggle');
+
+            await page.waitForFunction(() => {
+                const state = window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.();
+                return state?.canStart === true && state?.allReady === true;
+            }, null, { timeout: 5000 });
+
+            await page.click('#btn-start');
+
+            await page.waitForFunction(() => {
+                const game = window.GAME_INSTANCE;
+                return game?.state === 'PLAYING' && game?.settings?.mapKey === 'maze' && !!game?.entityManager;
+            }, null, { timeout: 30000 });
+            await secondPage.waitForFunction(() => {
+                const game = window.GAME_INSTANCE;
+                return game?.state === 'PLAYING' && game?.settings?.mapKey === 'maze' && !!game?.entityManager;
+            }, null, { timeout: 30000 });
+
+            const secondProbe = await secondPage.evaluate(() => ({
+                state: window.GAME_INSTANCE?.state,
+                mapKey: window.GAME_INSTANCE?.settings?.mapKey,
+                hudVisible: !document.getElementById('hud')?.classList.contains('hidden'),
+            }));
+            expect(secondProbe.state).toBe('PLAYING');
+            expect(secondProbe.mapKey).toBe('maze');
+            expect(secondProbe.hudVisible).toBeTruthy();
+        } finally {
+            await secondPage.close();
+        }
     });
 
     test('T20e: Open-Preset speichert Metadatenvertrag vollstaendig', async ({ page }) => {
@@ -453,6 +758,111 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
         expect(matchPreset.id).toBe('competitive');
         expect(matchPreset.kind).toBe('fixed');
+    });
+
+    test('T20bb: Event-Playlist Quickstart ist sichtbar, startet direkt und persistiert den Cursor', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await expect(page.locator('#btn-quick-event-playlist')).toBeVisible();
+
+        await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.__eventPlaylistStartCalls = [];
+            game.runtimeFacade.startMatch = () => {
+                game.__eventPlaylistStartCalls.push({
+                    presetId: game.settings?.matchSettings?.activePresetId || '',
+                    nextIndex: game.settings?.localSettings?.eventPlaylistState?.nextIndex ?? null,
+                });
+                return true;
+            };
+        });
+
+        await page.click('#btn-quick-event-playlist');
+        await page.waitForTimeout(80);
+
+        const firstState = await page.evaluate((settingsStorageKey) => {
+            const game = window.GAME_INSTANCE;
+            const persistedSettings = JSON.parse(localStorage.getItem(settingsStorageKey) || '{}');
+            return {
+                startCalls: Array.isArray(game.__eventPlaylistStartCalls) ? game.__eventPlaylistStartCalls.length : 0,
+                activePresetId: String(game?.settings?.matchSettings?.activePresetId || ''),
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                eventPlaylistState: game?.settings?.localSettings?.eventPlaylistState || null,
+                toastText: document.getElementById('status-toast')?.textContent || '',
+                persistedEventPlaylistState: persistedSettings?.localSettings?.eventPlaylistState || null,
+            };
+        }, SETTINGS_STORAGE_KEY);
+
+        expect(firstState.startCalls).toBe(1);
+        expect(firstState.activePresetId).toBe('arcade');
+        expect(firstState.modePath).toBe('quick_action');
+        expect(firstState.eventPlaylistState?.activePlaylistId).toBe('fun_rotation');
+        expect(firstState.eventPlaylistState?.nextIndex).toBe(1);
+        expect(firstState.toastText).toContain('Event-Playlist');
+        expect(firstState.persistedEventPlaylistState?.nextIndex).toBe(1);
+
+        await page.reload();
+        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
+        await openCustomSubmenu(page);
+        await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.__eventPlaylistStartCalls = [];
+            game.runtimeFacade.startMatch = () => {
+                game.__eventPlaylistStartCalls.push({
+                    presetId: game.settings?.matchSettings?.activePresetId || '',
+                });
+                return true;
+            };
+        });
+
+        await page.click('#btn-quick-event-playlist');
+        await page.waitForTimeout(80);
+
+        const secondPresetId = await page.evaluate(() => window.GAME_INSTANCE?.settings?.matchSettings?.activePresetId || '');
+        expect(secondPresetId).toBe('chaos');
+
+        await page.evaluate((settingsStorageKey) => localStorage.removeItem(settingsStorageKey), SETTINGS_STORAGE_KEY);
+    });
+
+    test('T20bc: Event-Playlist rotiert deterministisch ueber die Fun-Presets und wrappt', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.__eventPlaylistSequence = [];
+            game.runtimeFacade.startMatch = () => {
+                game.__eventPlaylistSequence.push({
+                    presetId: game.settings?.matchSettings?.activePresetId || '',
+                    nextIndex: game.settings?.localSettings?.eventPlaylistState?.nextIndex ?? null,
+                });
+                return true;
+            };
+        });
+
+        for (let index = 0; index < 4; index += 1) {
+            await page.click('#btn-quick-event-playlist');
+            await page.waitForTimeout(60);
+        }
+
+        const rotationState = await page.evaluate((settingsStorageKey) => {
+            const game = window.GAME_INSTANCE;
+            const persistedSettings = JSON.parse(localStorage.getItem(settingsStorageKey) || '{}');
+            return {
+                sequence: Array.isArray(game.__eventPlaylistSequence)
+                    ? game.__eventPlaylistSequence.map((entry) => entry.presetId)
+                    : [],
+                nextIndex: game?.settings?.localSettings?.eventPlaylistState?.nextIndex ?? null,
+                lastPresetId: game?.settings?.localSettings?.eventPlaylistState?.lastPresetId || '',
+                persistedNextIndex: persistedSettings?.localSettings?.eventPlaylistState?.nextIndex ?? null,
+            };
+        }, SETTINGS_STORAGE_KEY);
+
+        expect(rotationState.sequence).toEqual(['arcade', 'chaos', 'competitive', 'arcade']);
+        expect(rotationState.nextIndex).toBe(1);
+        expect(rotationState.lastPresetId).toBe('arcade');
+        expect(rotationState.persistedNextIndex).toBe(1);
+
+        await page.evaluate((settingsStorageKey) => localStorage.removeItem(settingsStorageKey), SETTINGS_STORAGE_KEY);
     });
 
     test('T20ka: Profil-UX aktualisiert Action-State und unterstuetzt Duplicate, Import/Export und Standardprofil', async ({ page }) => {
@@ -544,6 +954,166 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
         expect(matchState.mapKey).toBe('maze');
         expect(matchState.humanVehicleId).toBe('aircraft');
+    });
+
+    test('T20kc: Round-End-Overlay zeigt vertiefte Round- und Match-Stats an', async ({ page }) => {
+        await startGameWithBots(page, 1);
+
+        const overlayState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const players = game?.entityManager?.players || [];
+            if (players.length < 2) return { error: 'missing-players' };
+            const now = performance.now();
+            const simulatedDurationMs = Math.max(100, Math.min(2500, now - 50));
+
+            players[0].score = 0;
+            players[1].score = 0;
+            game.recorder.startRound(players);
+            game.recorder.logEvent('ITEM_USE', players[0].index, 'rocket');
+            game.recorder.logEvent('STUCK', players[1].index, 'wall');
+            game.recorder.markPlayerDeath(players[1], 'TRAIL_SELF');
+            game.recorder.roundStartTime = now - simulatedDurationMs;
+
+            game.matchFlowUiController.onRoundEnd(players[0]);
+            game.roundPause = 2.6;
+            game.roundStateTickSystem.updateRoundEnd(0.3);
+
+            const statsRoot = document.getElementById('message-stats');
+            const readValue = (blockId, rowKey) => statsRoot?.querySelector(
+                `[data-stats-block-id="${blockId}"] [data-stats-row-key="${rowKey}"] .message-stats-value`
+            )?.textContent || '';
+
+            return {
+                state: game.state,
+                overlayVisible: !document.getElementById('message-overlay')?.classList.contains('hidden'),
+                statsVisible: !!statsRoot && !statsRoot.classList.contains('hidden'),
+                blockIds: Array.from(statsRoot?.querySelectorAll('[data-stats-block-id]') || []).map((node) => node.getAttribute('data-stats-block-id')),
+                roundWinner: readValue('round', 'winner'),
+                roundDuration: readValue('round', 'duration'),
+                expectedDurationFloor: (Math.floor((simulatedDurationMs / 1000) * 10) / 10).toFixed(1),
+                matchRounds: readValue('match', 'rounds'),
+                scoreLeader: readValue('scoreboard', 'player-0'),
+                countdownText: document.getElementById('message-sub')?.textContent || '',
+            };
+        });
+
+        expect(overlayState.error || '').toBe('');
+        expect(overlayState.state).toBe('ROUND_END');
+        expect(overlayState.overlayVisible).toBeTruthy();
+        expect(overlayState.statsVisible).toBeTruthy();
+        expect(overlayState.blockIds).toEqual(expect.arrayContaining(['round', 'match', 'scoreboard']));
+        expect(overlayState.roundWinner).toBe('Spieler 1');
+        expect(overlayState.roundDuration).toContain(overlayState.expectedDurationFloor);
+        expect(overlayState.matchRounds).toBe('1');
+        expect(overlayState.scoreLeader).toBe('1/5');
+        expect(overlayState.countdownText).toContain('Naechste Runde in 3');
+    });
+
+    test('T20kd: Match-End-Overlay zeigt Endstand und aggregierte Match-Stats', async ({ page }) => {
+        await startGameWithBots(page, 1);
+
+        const overlayState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const players = game?.entityManager?.players || [];
+            if (players.length < 2) return { error: 'missing-players' };
+            const now = performance.now();
+            const simulatedDurationMs = Math.max(100, Math.min(2100, now - 50));
+
+            game.winsNeeded = 3;
+            players[0].score = 2;
+            players[1].score = 1;
+            game.recorder.startRound(players);
+            game.recorder.logEvent('ITEM_USE', players[0].index, 'shield');
+            game.recorder.roundStartTime = now - simulatedDurationMs;
+
+            game.matchFlowUiController.onRoundEnd(players[0]);
+
+            const statsRoot = document.getElementById('message-stats');
+            const readTitle = (blockId) => statsRoot?.querySelector(
+                `[data-stats-block-id="${blockId}"] .message-stats-title`
+            )?.textContent || '';
+            const readValue = (blockId, rowKey) => statsRoot?.querySelector(
+                `[data-stats-block-id="${blockId}"] [data-stats-row-key="${rowKey}"] .message-stats-value`
+            )?.textContent || '';
+
+            return {
+                state: game.state,
+                messageText: document.getElementById('message-text')?.textContent || '',
+                scoreboardTitle: readTitle('scoreboard'),
+                scoreLeader: readValue('scoreboard', 'player-0'),
+                botWinRate: readValue('match', 'bot-win-rate'),
+                roundTitle: readTitle('round'),
+            };
+        });
+
+        expect(overlayState.error || '').toBe('');
+        expect(overlayState.state).toBe('MATCH_END');
+        expect(overlayState.messageText).toContain('Sieg: Spieler 1');
+        expect(overlayState.roundTitle).toBe('Finalrunde');
+        expect(overlayState.scoreboardTitle).toBe('Endstand');
+        expect(overlayState.scoreLeader).toBe('3/3');
+        expect(overlayState.botWinRate).toBe('0%');
+    });
+
+    test('T20ke: Developer-Telemetrie-Dashboard zeigt Balancing-Summary aus dem Round-End-Pfad', async ({ page }) => {
+        await startGameWithBots(page, 1);
+
+        const telemetryProbe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const players = game?.entityManager?.players || [];
+            if (players.length < 2) return { error: 'missing-players' };
+            const now = performance.now();
+            const simulatedDurationMs = Math.max(100, Math.min(1600, now - 50));
+
+            players[0].score = 0;
+            players[1].score = 0;
+            game.recorder.startRound(players);
+            game.recorder.logEvent('ITEM_USE', players[0].index, 'rocket');
+            game.recorder.logEvent('STUCK', players[1].index, 'wall');
+            game.recorder.markPlayerDeath(players[1], 'TRAIL_SELF');
+            game.recorder.roundStartTime = now - simulatedDurationMs;
+            game.matchFlowUiController.onRoundEnd(players[0]);
+
+            return {
+                error: '',
+                balanceRounds: Number(game.settings?.localSettings?.telemetryState?.balance?.rounds || 0),
+            };
+        });
+
+        expect(telemetryProbe.error || '').toBe('');
+        expect(telemetryProbe.balanceRounds).toBeGreaterThanOrEqual(1);
+
+        await returnToMenu(page);
+        await openDeveloperSubmenu(page);
+
+        const dashboardState = await page.evaluate(() => {
+            const telemetry = JSON.parse(document.getElementById('developer-telemetry-output')?.textContent || '{}');
+            const readValue = (cardId, rowKey) => document.querySelector(
+                `[data-telemetry-card="${cardId}"] [data-telemetry-row-key="${rowKey}"] .developer-telemetry-value`
+            )?.textContent || '';
+            const readLabel = (cardId, rowKey) => document.querySelector(
+                `[data-telemetry-card="${cardId}"] [data-telemetry-row-key="${rowKey}"] .developer-telemetry-label`
+            )?.textContent || '';
+
+            return {
+                telemetry,
+                cardIds: Array.from(document.querySelectorAll('[data-telemetry-card]')).map((node) => node.getAttribute('data-telemetry-card')),
+                overviewRounds: readValue('overview', 'rounds'),
+                balanceDuration: readValue('balance', 'average-round-duration'),
+                topMap: readLabel('maps', 'bucket-0'),
+                recentRows: Array.from(document.querySelectorAll('[data-telemetry-recent-index]')).map((node) => node.textContent || ''),
+            };
+        });
+
+        expect(dashboardState.cardIds).toEqual(expect.arrayContaining(['overview', 'balance', 'maps', 'modes', 'recent']));
+        expect(Number(dashboardState.telemetry?.balance?.rounds || 0)).toBe(1);
+        expect(Number(dashboardState.telemetry?.balance?.humanWins || 0)).toBe(1);
+        expect(dashboardState.telemetry?.topMaps?.[0]?.key).toBe('standard');
+        expect(dashboardState.overviewRounds).toBe('1');
+        expect(dashboardState.balanceDuration).not.toBe('0.00s');
+        expect(dashboardState.topMap).toBe('standard');
+        expect(dashboardState.recentRows[0] || '').toContain('Spieler 1');
+        expect(dashboardState.recentRows[0] || '').toContain('standard / classic');
     });
 
     test('T20g: Runtime-Guard blockiert Developer-Events fuer non-owner', async ({ page }) => {
@@ -1416,6 +1986,370 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(probe.hasRecorderDiagnostics).toBeTruthy();
     });
 
+    test('T20ah1: RuntimePerfProfiler sammelt Spikes ohne Console-Warnstorm per Default', async ({ page }) => {
+        await loadGame(page);
+        const probe = await page.evaluate(async () => {
+            const { RuntimePerfProfiler } = await import('/src/core/perf/RuntimePerfProfiler.js');
+            const warnings = [];
+            const originalWarn = console.warn;
+            console.warn = (...args) => warnings.push(args.map((entry) => String(entry)).join(' '));
+            try {
+                const profiler = new RuntimePerfProfiler({
+                    spikeThresholdMs: 30,
+                    spikeLogLimit: 8,
+                });
+                profiler.beginFrame(42, 1000);
+                profiler.recordSubsystemDuration('render', 3.5);
+                profiler.endFrame(42, 1042);
+                profiler.beginFrame(46, 1060);
+                profiler.recordSubsystemDuration('update', 1.8);
+                profiler.endFrame(46, 1106);
+                const snapshot = profiler.getSnapshot({ windowSize: 2 });
+                return {
+                    warningCount: warnings.length,
+                    spikeTotal: Number(snapshot?.spikes?.total || 0),
+                    recentSpikeCount: Number(snapshot?.spikes?.recent || 0),
+                    frameP99: Number(snapshot?.frameMs?.p99 || snapshot?.performance?.frameMs?.p99 || 0),
+                };
+            } finally {
+                console.warn = originalWarn;
+            }
+        });
+
+        expect(probe.warningCount).toBe(0);
+        expect(probe.spikeTotal).toBe(2);
+        expect(probe.recentSpikeCount).toBe(2);
+        expect(probe.frameP99).toBeGreaterThanOrEqual(42);
+    });
+
+    test('T20ai: GameLoop resettet den gemeinsamen Render-Delta-Pfad bei Fokuswechsel sauber', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameLoop } = await import('/src/core/GameLoop.js');
+            const originalRaf = window.requestAnimationFrame;
+            const originalCancel = window.cancelAnimationFrame;
+            const updates = [];
+            try {
+                window.requestAnimationFrame = () => 1;
+                window.cancelAnimationFrame = () => { };
+                const loop = new GameLoop((dt) => updates.push(dt), () => { });
+                loop.running = true;
+                loop.lastTime = 100;
+                loop.requestDeltaReset('window-focus');
+                loop._loop(110);
+                const firstTiming = { ...loop.getRenderTiming() };
+                const updatesAfterReset = updates.length;
+                loop._loop(120);
+                const secondTiming = { ...loop.getRenderTiming() };
+                return {
+                    fixedStep: loop.fixedStep,
+                    updatesAfterReset,
+                    totalUpdates: updates.length,
+                    firstTiming,
+                    secondTiming,
+                };
+            } finally {
+                window.requestAnimationFrame = originalRaf;
+                window.cancelAnimationFrame = originalCancel;
+            }
+        });
+
+        expect(result.updatesAfterReset).toBe(1);
+        expect(result.totalUpdates).toBe(1);
+        expect(result.firstTiming.reset).toBeTruthy();
+        expect(String(result.firstTiming.resetReason || '')).toContain('window-focus');
+        expect(Math.abs(result.firstTiming.stabilizedDt - result.fixedStep)).toBeLessThan(0.000001);
+        expect(result.secondTiming.reset).toBeFalsy();
+    });
+
+    test('T20ai1: Cinematic-Toggle resettet Kamera-Smoothing und fordert Delta-Reset an', async ({ page }) => {
+        await startGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const rig = game?.renderer?.cameraRigSystem;
+            if (!game || !rig) {
+                return { error: 'missing-runtime' };
+            }
+
+            rig.cameraDtSmoothing[0] = 0.05;
+            rig.cameraBoostBlend[0] = 0.75;
+            rig.cinematicCameraSystem._blendByPlayer[0] = 0.8;
+            rig.cinematicCameraSystem._timeByPlayer[0] = 3.2;
+
+            const beforeEnabled = game.renderer.getCinematicEnabled();
+            game._toggleCinematicCameraFromGlobalHotkey();
+
+            return {
+                error: null,
+                beforeEnabled,
+                afterEnabled: game.renderer.getCinematicEnabled(),
+                pendingDeltaReset: game.gameLoop?._pendingDeltaReset === true,
+                pendingDeltaResetReason: String(game.gameLoop?._pendingDeltaResetReason || ''),
+                smoothedDt: Number(rig.cameraDtSmoothing[0] || 0),
+                boostBlend: Number(rig.cameraBoostBlend[0] || 0),
+                cinematicBlend: Number(rig.cinematicCameraSystem.getPlayerBlend(0) || 0),
+                cinematicTime: Number(rig.cinematicCameraSystem._timeByPlayer[0] || 0),
+                frameTimingReset: rig._frameTiming?.reset === true,
+                frameTimingReason: String(rig._frameTiming?.reason || ''),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.afterEnabled).toBe(!result.beforeEnabled);
+        expect(result.pendingDeltaReset).toBeTruthy();
+        expect(result.pendingDeltaResetReason).toContain('cinematic-toggle');
+        expect(Math.abs(result.smoothedDt - (1 / 60))).toBeLessThan(0.000001);
+        expect(result.boostBlend).toBe(0);
+        expect(result.cinematicBlend).toBe(0);
+        expect(result.cinematicTime).toBe(0);
+        expect(result.frameTimingReset).toBeTruthy();
+        expect(result.frameTimingReason).toBe('cinematic-toggle');
+    });
+
+    test('T20ai2: Kamera-Update nutzt gerenderte Transforms und spart Anchor-Arbeit ausserhalb First-Person', async ({ page }) => {
+        await startGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.humanPlayers?.[0];
+            if (!game || !entityManager || !player) {
+                return { error: 'missing-runtime' };
+            }
+
+            const modes = Array.isArray(game?.config?.CAMERA?.MODES)
+                ? game.config.CAMERA.MODES
+                : ['THIRD_PERSON', 'FIRST_PERSON', 'TOP_DOWN'];
+            const thirdPersonIndex = Math.max(0, modes.indexOf('THIRD_PERSON'));
+            const firstPersonIndex = Math.max(0, modes.indexOf('FIRST_PERSON'));
+
+            const originalResolve = player.resolveRenderTransform.bind(player);
+            const originalAnchor = player.getFirstPersonCameraAnchor.bind(player);
+            let resolveCalls = 0;
+            let anchorCalls = 0;
+
+            player.resolveRenderTransform = (...args) => {
+                resolveCalls += 1;
+                return originalResolve(...args);
+            };
+            player.getFirstPersonCameraAnchor = (...args) => {
+                anchorCalls += 1;
+                return originalAnchor(...args);
+            };
+
+            try {
+                entityManager.renderInterpolatedTransforms(0.35);
+                const resolveAfterRender = resolveCalls;
+
+                game.renderer.cameraModes[player.index] = thirdPersonIndex;
+                entityManager.updateCameras(1 / 60, 0.35, true);
+                const thirdPersonResolveDelta = resolveCalls - resolveAfterRender;
+                const thirdPersonAnchorDelta = anchorCalls;
+
+                entityManager.renderInterpolatedTransforms(0.6);
+                const resolveBeforeFirstPersonCamera = resolveCalls;
+                const anchorBeforeFirstPersonCamera = anchorCalls;
+                game.renderer.cameraModes[player.index] = firstPersonIndex;
+                entityManager.updateCameras(1 / 60, 0.6, true);
+
+                return {
+                    error: null,
+                    resolveAfterRender,
+                    thirdPersonResolveDelta,
+                    thirdPersonAnchorDelta,
+                    firstPersonResolveDelta: resolveCalls - resolveBeforeFirstPersonCamera,
+                    firstPersonAnchorDelta: anchorCalls - anchorBeforeFirstPersonCamera,
+                };
+            } finally {
+                player.resolveRenderTransform = originalResolve;
+                player.getFirstPersonCameraAnchor = originalAnchor;
+            }
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.resolveAfterRender).toBeGreaterThan(0);
+        expect(result.thirdPersonResolveDelta).toBe(0);
+        expect(result.thirdPersonAnchorDelta).toBe(0);
+        expect(result.firstPersonResolveDelta).toBe(0);
+        expect(result.firstPersonAnchorDelta).toBe(1);
+    });
+
+    test('T20aj: Recorder-Backpressure trimmt Capture-Backlog und blockiert den Loop nicht', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            let now = 0;
+            const recorder = new MediaRecorderSystem({
+                canvas: { width: 320, height: 180 },
+                autoDownload: false,
+                globalScope: {},
+            });
+            recorder._perfNow = () => now;
+            recorder._isRecording = true;
+            recorder._activeRecorderEngine = 'mediarecorder-native';
+            recorder._mediaRecorderSupportsRequestFrame = false;
+            recorder._captureLevelIndex = 1;
+
+            const capturedSteps = [];
+            recorder._captureMediaRecorderFrame = (stepIntervalMs) => {
+                recorder._captureTimestampUs += Math.max(1, Math.round(stepIntervalMs * 1000));
+                recorder._frameCount += 1;
+                recorder._captureEncodedFrames += 1;
+                recorder._recordCaptureTimestampUs(recorder._captureTimestampUs);
+                capturedSteps.push(stepIntervalMs);
+            };
+
+            const renderDeltasMs = [34, 34, 34, 90, 34, 34, 90, 34, 34, 90, 34, 34];
+            for (let i = 0; i < renderDeltasMs.length; i++) {
+                now += renderDeltasMs[i];
+                recorder.captureRenderedFrame(renderDeltasMs[i] / 1000);
+            }
+
+            return {
+                capturedCount: capturedSteps.length,
+                diagnostics: recorder.getRecordingDiagnostics(),
+                accumulatorMs: recorder._captureAccumulatorMs,
+            };
+        });
+
+        expect(result.capturedCount).toBeGreaterThan(0);
+        expect(result.capturedCount).toBeLessThan(12);
+        expect(result.diagnostics.backpressureEvents).toBeGreaterThan(0);
+        expect(result.diagnostics.captureLevel).toBeGreaterThan(1);
+        expect(result.diagnostics.droppedFrames).toBeGreaterThan(0);
+        expect(result.accumulatorMs).toBeLessThan(150);
+    });
+
+    test('T20aj1: Recorder berechnet Frame-Interval-Stats lazy und cached sie zwischen Diagnostics-Aufrufen', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            let now = 0;
+            const recorder = new MediaRecorderSystem({
+                canvas: { width: 320, height: 180 },
+                autoDownload: false,
+                globalScope: {},
+            });
+            recorder._perfNow = () => now;
+            recorder._isRecording = true;
+            recorder._activeRecorderEngine = 'mediarecorder-native';
+            recorder._mediaRecorderSupportsRequestFrame = true;
+            recorder._mediaRecorderVideoTrack = { requestFrame() { } };
+
+            let computeCalls = 0;
+            const originalCompute = recorder._computeFrameIntervalStats.bind(recorder);
+            recorder._computeFrameIntervalStats = () => {
+                computeCalls += 1;
+                return originalCompute();
+            };
+            recorder._captureMediaRecorderFrame = (stepIntervalMs) => {
+                recorder._captureTimestampUs += Math.max(1, Math.round(stepIntervalMs * 1000));
+                recorder._frameCount += 1;
+                recorder._captureEncodedFrames += 1;
+                recorder._recordCaptureTimestampUs(recorder._captureTimestampUs);
+            };
+
+            for (let i = 0; i < 5; i++) {
+                now += 20;
+                recorder.captureRenderedFrame(0.02);
+            }
+
+            const callsBeforeDiagnostics = computeCalls;
+            const firstDiagnostics = recorder.getRecordingDiagnostics();
+            const callsAfterFirstDiagnostics = computeCalls;
+            const secondDiagnostics = recorder.getRecordingDiagnostics();
+            const callsAfterSecondDiagnostics = computeCalls;
+
+            return {
+                callsBeforeDiagnostics,
+                callsAfterFirstDiagnostics,
+                callsAfterSecondDiagnostics,
+                firstSampleCount: Number(firstDiagnostics?.frameIntervalStats?.sampleCount || 0),
+                secondSampleCount: Number(secondDiagnostics?.frameIntervalStats?.sampleCount || 0),
+            };
+        });
+
+        expect(result.callsBeforeDiagnostics).toBe(0);
+        expect(result.callsAfterFirstDiagnostics).toBe(1);
+        expect(result.callsAfterSecondDiagnostics).toBe(1);
+        expect(result.firstSampleCount).toBeGreaterThan(0);
+        expect(result.secondSampleCount).toBe(result.firstSampleCount);
+    });
+
+    test('T20aj2: Recorder priorisiert unter harter Last Downscale vor FPS-Kollaps', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            let now = 0;
+            const recorder = new MediaRecorderSystem({
+                canvas: { width: 320, height: 180 },
+                autoDownload: false,
+                captureFps: 30,
+                globalScope: {},
+            });
+            recorder._perfNow = () => now;
+            recorder._isRecording = true;
+            recorder._activeRecorderEngine = 'mediarecorder-native';
+            recorder._mediaRecorderSupportsRequestFrame = false;
+            recorder._captureLevelIndex = 1;
+
+            const renderDeltasMs = [34, 34, 90, 90, 90, 90, 90];
+            for (let i = 0; i < renderDeltasMs.length; i++) {
+                now += renderDeltasMs[i];
+                recorder.captureRenderedFrame(renderDeltasMs[i] / 1000);
+            }
+
+            return recorder.getRecordingDiagnostics();
+        });
+
+        expect(result.captureLevel).toBeGreaterThan(1);
+        expect(result.captureResolutionScale).toBeLessThanOrEqual(0.5);
+        expect(result.effectiveCaptureFps).toBeGreaterThanOrEqual(18);
+    });
+
+    test('T20ak: Recorder normalisiert Export-Zeitstempel bei fehlerhafter Stop-Reihenfolge', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            let now = 4900;
+            const recorder = new MediaRecorderSystem({
+                canvas: { width: 320, height: 180 },
+                autoDownload: false,
+                now: () => now,
+                globalScope: {},
+            });
+            recorder._isRecording = true;
+            recorder._activeMimeType = 'video/webm';
+            recorder._activeRecorderEngine = 'mediarecorder-native';
+            recorder._activeRecording = {
+                startedAt: 5000,
+                trigger: {
+                    context: {
+                        activeGameMode: 'classic',
+                        sessionId: 'phase9',
+                    },
+                },
+                stopResolve: () => { },
+            };
+            recorder._lastFrameIntervalStats = {
+                sampleCount: 3,
+                mean: 40,
+                p95: 45,
+                p99: 48,
+                max: 48,
+            };
+            recorder._finalizeBlobExport(new Blob(['clip'], { type: 'video/webm' }), 'video/webm');
+            const exportMeta = recorder.getLastExportMeta();
+            recorder.dispose();
+            return exportMeta;
+        });
+
+        expect(result).toBeTruthy();
+        expect(result.endedAt).toBeGreaterThanOrEqual(result.startedAt);
+        expect(result.durationMs).toBeGreaterThan(0);
+        expect(result.timestampValidation?.adjusted).toBeTruthy();
+        expect(String(result.fileName || '')).not.toContain('invalid-date');
+    });
+
     test('T20ae: Runtime-Dispose entfernt globale und Menue-Listener vor Reinit', async ({ page }) => {
         const errors = collectErrors(page);
         await loadGame(page);
@@ -1651,7 +2585,16 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             return !!runtime?.showPanel?.('submenu-game', { trigger: 'test_custom_map_reopen' });
         });
         expect(reopened).toBeTruthy();
-        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.waitForFunction(() => {
+            const panel = document.getElementById('submenu-game');
+            const game = window.GAME_INSTANCE;
+            return !!(
+                panel
+                && !panel.classList.contains('hidden')
+                && game?.settings?.mapKey === 'custom'
+            );
+        }, null, { timeout: 5000 });
+        await page.locator('#submenu-game:not(.hidden) #btn-start').waitFor({ state: 'visible', timeout: 5000 });
         await page.click('#submenu-game:not(.hidden) #btn-start');
         await page.waitForFunction(() => {
             const hud = document.getElementById('hud');

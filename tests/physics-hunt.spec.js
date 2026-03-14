@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { loadGame, startHuntGame, startHuntGameWithBots } from './helpers.js';
 
-test.describe('Physics Hunt (Tests 61-64, 83-89)', () => {
+test.describe('Physics Hunt (Tests 61-64, 83-89c)', () => {
     test.describe.configure({ timeout: 120000 });
 
     test('T61: Hunt-MG entfernt getroffenes Spursegment sofort', async ({ page }) => {
@@ -887,6 +887,187 @@ test.describe('Physics Hunt (Tests 61-64, 83-89)', () => {
         expect(result.audio).toContain('ROCKET_SHOOT');
         expect(result.audio).toContain('ROCKET_IMPACT');
         expect(result.particles).toContain('rocket-impact');
+    });
+
+    test('T89a: Hunt-MG braucht jetzt einen Lockout, bevor ein Full-HP-Ziel faellt', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const target = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !shooter || !target) {
+                return { error: 'missing-state' };
+            }
+
+            shooter.position.set(0, 50, 0);
+            shooter.setLookAtWorld?.(0, 50, -120);
+            shooter.spawnProtectionTimer = 0;
+            target.position.set(0, 50, -18);
+            target.setLookAtWorld?.(0, 50, -120);
+            target.spawnProtectionTimer = 0;
+            target.alive = true;
+            target.maxHp = Math.max(100, Number(target.maxHp) || 100);
+            target.hp = target.maxHp;
+            target.hasShield = false;
+            target.shieldHP = 0;
+
+            shooter.shootCooldown = 0;
+            entityManager._overheatGunSystem?._overheatByPlayer && (entityManager._overheatGunSystem._overheatByPlayer[shooter.index] = 0);
+            entityManager._overheatGunSystem?._lockoutByPlayer && (entityManager._overheatGunSystem._lockoutByPlayer[shooter.index] = 0);
+
+            const step = 1 / 120;
+            let elapsed = 0;
+            let shots = 0;
+            let firstLockoutAt = null;
+
+            while (elapsed < 10 && target.alive) {
+                shooter.shootCooldown = Math.max(0, Number(shooter.shootCooldown || 0) - step);
+                entityManager._overheatGunSystem.update(step);
+                const lockout = Math.max(0, Number(entityManager._overheatGunSystem._lockoutByPlayer?.[shooter.index] || 0));
+                if (lockout > 0 && firstLockoutAt === null) {
+                    firstLockoutAt = elapsed;
+                }
+                if (shooter.shootCooldown <= 0 && lockout <= 0) {
+                    const shot = entityManager._shootHuntGun(shooter);
+                    if (shot?.ok) shots += 1;
+                }
+                elapsed += step;
+            }
+
+            return {
+                error: null,
+                ttk: target.alive ? null : elapsed,
+                shots,
+                firstLockoutAt,
+                mgConfig: {
+                    damage: Number(game?.config?.HUNT?.MG?.DAMAGE || 0),
+                    overheatPerShot: Number(game?.config?.HUNT?.MG?.OVERHEAT_PER_SHOT || 0),
+                    coolingPerSecond: Number(game?.config?.HUNT?.MG?.COOLING_PER_SECOND || 0),
+                    lockoutSeconds: Number(game?.config?.HUNT?.MG?.LOCKOUT_SECONDS || 0),
+                },
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.ttk).not.toBeNull();
+        expect(result.firstLockoutAt).not.toBeNull();
+        expect(result.firstLockoutAt).toBeLessThan(result.ttk);
+        expect(result.ttk).toBeGreaterThan(1.6);
+        expect(result.ttk).toBeLessThan(2.4);
+        expect(result.shots).toBeGreaterThanOrEqual(14);
+    });
+
+    test('T89b: Hunt-Pickups limitieren Raketenflut und filtern punitive Debuffs', async ({ page }) => {
+        await startHuntGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const powerupManager = game?.powerupManager;
+            if (!game || !powerupManager) {
+                return { error: 'missing-powerup-manager' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            const counts = {};
+            const originalRandom = Math.random;
+            let seed = 123456789;
+            Math.random = () => {
+                seed = (seed * 1664525 + 1013904223) >>> 0;
+                return seed / 0x100000000;
+            };
+
+            powerupManager.clear();
+            powerupManager.spawnTimer = 0;
+            for (let i = 0; i < 200; i++) {
+                powerupManager._spawnRandom();
+                const item = powerupManager.items.pop();
+                if (!item) continue;
+                counts[item.type] = (counts[item.type] || 0) + 1;
+                game.renderer.removeFromScene(item.mesh);
+                item.mesh.traverse((node) => {
+                    if (node.material) {
+                        if (Array.isArray(node.material)) {
+                            node.material.forEach((material) => material.dispose());
+                        } else {
+                            node.material.dispose();
+                        }
+                    }
+                });
+            }
+            Math.random = originalRandom;
+
+            const rocketTotal = ['ROCKET_WEAK', 'ROCKET_MEDIUM', 'ROCKET_STRONG']
+                .reduce((sum, key) => sum + Number(counts[key] || 0), 0);
+
+            return {
+                error: null,
+                counts,
+                rocketTotal,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.counts.SLOW_DOWN || 0).toBe(0);
+        expect(result.counts.INVERT || 0).toBe(0);
+        expect(result.rocketTotal).toBeLessThan(90);
+        expect(result.counts.ROCKET_STRONG || 0).toBeLessThan(result.counts.ROCKET_MEDIUM || 0);
+        expect(result.counts.ROCKET_MEDIUM || 0).toBeLessThan(result.counts.ROCKET_WEAK || 0);
+        expect(result.counts.SHIELD || 0).toBeGreaterThan(0);
+    });
+
+    test('T89c: Hunt-Respawn resettet Snowball-Zustaende und gibt Recovery-Fenster', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            if (!game || !entityManager || !player) {
+                return { error: 'missing-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            game.settings.hunt.respawnEnabled = true;
+            game._applySettingsToRuntime?.();
+
+            player.inventory = ['ROCKET_STRONG', 'SHIELD'];
+            player.selectedItemIndex = 1;
+            player.shootCooldown = 0.5;
+            entityManager._overheatGunSystem._overheatByPlayer[player.index] = 84;
+            entityManager._overheatGunSystem._lockoutByPlayer[player.index] = 0.9;
+
+            player.kill();
+            entityManager._respawnSystem.onPlayerDied(player);
+            for (let i = 0; i < 600; i++) {
+                entityManager._respawnSystem.update(1 / 60);
+                if (player.alive) break;
+            }
+
+            return {
+                error: null,
+                alive: !!player.alive,
+                inventory: [...player.inventory],
+                selectedItemIndex: Number(player.selectedItemIndex || 0),
+                shieldHP: Number(player.shieldHP || 0),
+                spawnProtectionTimer: Number(player.spawnProtectionTimer || 0),
+                shootCooldown: Number(player.shootCooldown || 0),
+                overheat: Number(entityManager._overheatGunSystem._overheatByPlayer?.[player.index] || 0),
+                lockout: Number(entityManager._overheatGunSystem._lockoutByPlayer?.[player.index] || 0),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.alive).toBeTruthy();
+        expect(result.inventory).toEqual(['ROCKET_WEAK']);
+        expect(result.selectedItemIndex).toBe(0);
+        expect(result.shieldHP).toBeGreaterThanOrEqual(18);
+        expect(result.spawnProtectionTimer).toBeGreaterThanOrEqual(1.2);
+        expect(result.shootCooldown).toBe(0);
+        expect(result.overheat).toBe(0);
+        expect(result.lockout).toBe(0);
     });
 
 });

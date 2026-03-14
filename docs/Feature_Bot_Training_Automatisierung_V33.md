@@ -127,13 +127,13 @@ Shared-Pfade:
   - Status 2026-03-11 (Bot B): `package.json` verdrahtet `training:e2e`; Eval/Gate aktualisieren `latest.json` deterministisch, und `training:gate` propagiert `pass/fail` via Exit-Code.
   - Laufzeitbudget 2026-03-11 (lokal, deterministische Defaults): `training:run` ~1.5s, `training:eval` ~2.7s, `training:gate` ~1.4s, `training:e2e` ~3.2s.
 
-- [ ] 33.9 Abschluss-Gate und Doku-Freeze
-  - [ ] 33.9.1 Verifikation: `training:e2e`, relevante Training-Tests, `test:core`
+- [x] 33.9 Abschluss-Gate und Doku-Freeze
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 33.9.1 Verifikation: `training:e2e`, relevante Training-Tests, `test:core`
   - [x] 33.9.2 Verifikation: `docs:sync`, `docs:check`, `build`
   - [x] 33.9.3 Doku-Update (`Bot-Training-Schnittstelle`, Umsetzungsplan-Status, Restpunkte)
-  - [ ] 33.9.4 Lock-Release + sauberer Abschlussbericht mit PASS/FAIL
-  - Status 2026-03-11 (Bot C): Training-Automation-Tests (`T96-T98`) PASS; `docs:sync/check` und `build` PASS. `test:core`/`test:stress` laufen im Sammellauf aktuell in fruehe Timeout-Flakes (`T7/T8`, `T61`), isolierte Re-Runs gruen. `training:e2e` bleibt bis zur A/B-Orchestrierung (`training:run/eval/gate/e2e`) offen.
-  - Status 2026-03-11 (Bot B): `training:run`, `training:eval`, `training:gate` und `training:e2e` PASS; neue Bridge-/Gate-Tests PASS; Sammellauf `test:core` zeigt flakigen Setup-Timeout in `T2` (isolierter Re-Run PASS), `test:physics`-Sammellauf lief in Tool-Timeout.
+  - [x] 33.9.4 Lock-Release + sauberer Abschlussbericht mit PASS/FAIL
+  - Status 2026-03-13: `npx playwright test tests/training-environment.spec.js --workers=1` PASS (`10 passed`), `npm run training:e2e` PASS (`stamp=20260313T124557Z`), `npm run test:core` PASS (`82 passed`, `1 skipped`), `npm run docs:sync` PASS, `npm run docs:check` PASS und `npm run build` PASS. Die historischen Sammellauf-Flakes (`T7/T8/T61`) sind auf dem aktuellen Stand fuer dieses Gate nicht reproduzierbar.
 
 ## Definition of Done
 

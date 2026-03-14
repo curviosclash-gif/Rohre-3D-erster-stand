@@ -21,14 +21,17 @@ const ENCODE_QUEUE_SOFT_LIMIT = 2;
 const ENCODE_QUEUE_DROP_LIMIT = 10;
 const CAPTURE_LOAD_LEVELS = Object.freeze([
     Object.freeze({ fpsScale: 1.0, resolutionScale: 1.0 }),
-    Object.freeze({ fpsScale: 0.85, resolutionScale: 0.85 }),
-    Object.freeze({ fpsScale: 0.66, resolutionScale: 0.75 }),
-    Object.freeze({ fpsScale: 0.6, resolutionScale: 0.6 }),
+    Object.freeze({ fpsScale: 0.95, resolutionScale: 0.9 }),
+    Object.freeze({ fpsScale: 0.9, resolutionScale: 0.78 }),
+    Object.freeze({ fpsScale: 0.8, resolutionScale: 0.65 }),
+    Object.freeze({ fpsScale: 0.7, resolutionScale: 0.5 }),
+    Object.freeze({ fpsScale: 0.6, resolutionScale: 0.42 }),
 ]);
 const MAX_CAPTURE_TIMESTAMPS = 4096;
 const MAX_CAPTURE_STEPS_PER_RENDER = 1;
-const MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS = 30;
-const MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS = 45;
+const MAX_CAPTURE_BACKLOG_STEPS = 2;
+const MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS = 22;
+const MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS = 38;
 
 export const LIFECYCLE_EVENT_TYPES = Object.freeze({
     MATCH_STARTED: 'match_started',
@@ -252,6 +255,7 @@ export class MediaRecorderSystem {
         this._captureTimestampHistoryCount = 0;
         this._captureTimestampHistoryWriteIndex = 0;
         this._lastFrameIntervalStats = null;
+        this._frameIntervalStatsDirty = false;
     }
 
     getContractVersion() {
@@ -340,11 +344,14 @@ export class MediaRecorderSystem {
         }
     }
 
-    _resetWebCodecsCaptureState() {
+    _resetWebCodecsCaptureState(initialLevelIndex = 1) {
         this._captureAccumulatorMs = 0;
         this._captureLastNowMs = 0;
         this._captureTimestampUs = 0;
-        this._captureLevelIndex = 1;
+        this._captureLevelIndex = Math.max(
+            0,
+            Math.min(CAPTURE_LOAD_LEVELS.length - 1, Math.trunc(toFiniteNumber(initialLevelIndex, 1)))
+        );
         this._captureHighPressureFrames = 0;
         this._captureLowPressureFrames = 0;
         this._captureDroppedFrames = 0;
@@ -354,6 +361,7 @@ export class MediaRecorderSystem {
         this._captureTimestampHistoryCount = 0;
         this._captureTimestampHistoryWriteIndex = 0;
         this._lastFrameIntervalStats = null;
+        this._frameIntervalStatsDirty = false;
     }
 
     _getCaptureLevel() {
@@ -432,6 +440,7 @@ export class MediaRecorderSystem {
         this._captureTimestampHistoryUs[this._captureTimestampHistoryWriteIndex] = timestampUs;
         this._captureTimestampHistoryWriteIndex = (this._captureTimestampHistoryWriteIndex + 1) % MAX_CAPTURE_TIMESTAMPS;
         this._captureTimestampHistoryCount = Math.min(MAX_CAPTURE_TIMESTAMPS, this._captureTimestampHistoryCount + 1);
+        this._frameIntervalStatsDirty = true;
     }
 
     _resolveCaptureTimestampUs(sequenceIndex) {
@@ -476,9 +485,34 @@ export class MediaRecorderSystem {
         };
     }
 
+    _getFrameIntervalStats(forceRecompute = false) {
+        if (!forceRecompute && this._frameIntervalStatsDirty !== true) {
+            return this._lastFrameIntervalStats;
+        }
+        this._lastFrameIntervalStats = this._computeFrameIntervalStats();
+        this._frameIntervalStatsDirty = false;
+        return this._lastFrameIntervalStats;
+    }
+
     _updateCaptureLoadLevel(encodeQueueSize) {
         const safeQueueSize = Math.max(0, Math.trunc(toFiniteNumber(encodeQueueSize, 0)));
         this._captureMaxEncodeQueueSize = Math.max(this._captureMaxEncodeQueueSize, safeQueueSize);
+
+        if (safeQueueSize >= ENCODE_QUEUE_DROP_LIMIT) {
+            const nextLevel = Math.min(CAPTURE_LOAD_LEVELS.length - 1, this._captureLevelIndex + 2);
+            if (nextLevel !== this._captureLevelIndex) {
+                this._captureLevelIndex = nextLevel;
+                this._captureBackpressureEvents += 1;
+                this.logger?.warn?.('[MediaRecorderSystem] capture load level increased', {
+                    level: this._captureLevelIndex,
+                    encodeQueueSize: safeQueueSize,
+                    immediate: true,
+                });
+            }
+            this._captureHighPressureFrames = 0;
+            this._captureLowPressureFrames = 0;
+            return;
+        }
 
         if (safeQueueSize >= ENCODE_QUEUE_SOFT_LIMIT) {
             this._captureHighPressureFrames += 1;
@@ -492,7 +526,7 @@ export class MediaRecorderSystem {
         }
 
         if (
-            this._captureHighPressureFrames >= 3
+            this._captureHighPressureFrames >= 2
             && this._captureLevelIndex < (CAPTURE_LOAD_LEVELS.length - 1)
         ) {
             this._captureLevelIndex += 1;
@@ -502,7 +536,7 @@ export class MediaRecorderSystem {
                 level: this._captureLevelIndex,
                 encodeQueueSize: safeQueueSize,
             });
-        } else if (this._captureLowPressureFrames >= 180 && this._captureLevelIndex > 0) {
+        } else if (this._captureLowPressureFrames >= 240 && this._captureLevelIndex > 0) {
             this._captureLevelIndex -= 1;
             this._captureLowPressureFrames = 0;
             this.logger?.info?.('[MediaRecorderSystem] capture load level recovered', {
@@ -516,10 +550,28 @@ export class MediaRecorderSystem {
         if (safeDeltaMs >= MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS) {
             return ENCODE_QUEUE_DROP_LIMIT;
         }
+        if (safeDeltaMs >= (MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS * 1.5)) {
+            return ENCODE_QUEUE_SOFT_LIMIT + 2;
+        }
         if (safeDeltaMs >= MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS) {
             return ENCODE_QUEUE_SOFT_LIMIT;
         }
         return 0;
+    }
+
+    _dropCaptureBacklog(stepIntervalMs) {
+        const safeStepIntervalMs = Math.max(1, toFiniteNumber(stepIntervalMs, 1000 / Math.max(1, this.captureFps)));
+        const maxBacklogMs = safeStepIntervalMs * MAX_CAPTURE_BACKLOG_STEPS;
+        if (!(this._captureAccumulatorMs > maxBacklogMs)) {
+            return 0;
+        }
+
+        const retainedAccumulatorMs = safeStepIntervalMs;
+        const overflowMs = Math.max(0, this._captureAccumulatorMs - retainedAccumulatorMs);
+        const droppedFrames = Math.max(1, Math.floor(overflowMs / safeStepIntervalMs));
+        this._captureAccumulatorMs = retainedAccumulatorMs;
+        this._captureDroppedFrames += droppedFrames;
+        return droppedFrames;
     }
 
     _captureWebCodecsFrame(stepIntervalMs) {
@@ -547,7 +599,6 @@ export class MediaRecorderSystem {
             this._frameCount += 1;
             this._captureEncodedFrames += 1;
             this._recordCaptureTimestampUs(this._captureTimestampUs);
-            this._lastFrameIntervalStats = this._computeFrameIntervalStats();
         } catch {
             // Ignore transient frame capture errors (e.g. canvas resized)
         } finally {
@@ -572,7 +623,6 @@ export class MediaRecorderSystem {
             this._frameCount += 1;
             this._captureEncodedFrames += 1;
             this._recordCaptureTimestampUs(this._captureTimestampUs);
-            this._lastFrameIntervalStats = this._computeFrameIntervalStats();
         } catch {
             this._captureDroppedFrames += 1;
         } finally {
@@ -609,21 +659,28 @@ export class MediaRecorderSystem {
         }
         deltaMs = Math.min(250, deltaMs);
 
-        if (
-            this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER
-            && !this._mediaRecorderSupportsRequestFrame
-        ) {
-            this._captureMediaRecorderFrame(deltaMs);
-            return;
-        }
-
         this._captureAccumulatorMs += deltaMs;
+        let syntheticQueueSize = 0;
         if (this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER) {
-            this._updateCaptureLoadLevel(this._resolveSyntheticQueueSizeFromRenderDelta(deltaMs));
+            syntheticQueueSize = this._resolveSyntheticQueueSizeFromRenderDelta(
+                Math.max(deltaMs, this._captureAccumulatorMs)
+            );
+            this._updateCaptureLoadLevel(syntheticQueueSize);
         }
 
         const effectiveFps = this._resolveEffectiveCaptureFps();
         const stepIntervalMs = 1000 / effectiveFps;
+        this._dropCaptureBacklog(stepIntervalMs);
+
+        if (
+            this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER
+            && !this._mediaRecorderSupportsRequestFrame
+            && syntheticQueueSize >= ENCODE_QUEUE_DROP_LIMIT
+        ) {
+            this._captureAccumulatorMs = Math.min(this._captureAccumulatorMs, stepIntervalMs);
+            this._captureDroppedFrames += 1;
+            return;
+        }
 
         let captureSteps = 0;
         while (
@@ -639,9 +696,7 @@ export class MediaRecorderSystem {
             captureSteps += 1;
         }
 
-        if (this._captureAccumulatorMs > stepIntervalMs * 8) {
-            this._captureAccumulatorMs = stepIntervalMs * 2;
-        }
+        this._dropCaptureBacklog(stepIntervalMs);
     }
 
     getRecordingDiagnostics() {
@@ -660,7 +715,7 @@ export class MediaRecorderSystem {
             encodedFrames: this._captureEncodedFrames,
             maxEncodeQueueSize: this._captureMaxEncodeQueueSize,
             backpressureEvents: this._captureBackpressureEvents,
-            frameIntervalStats: this._lastFrameIntervalStats
+            frameIntervalStats: this._getFrameIntervalStats()
                 ? { ...this._lastFrameIntervalStats }
                 : null,
         };
@@ -679,12 +734,16 @@ export class MediaRecorderSystem {
             sizeBytes: this._lastExport.sizeBytes,
             startedAt: this._lastExport.startedAt,
             endedAt: this._lastExport.endedAt,
+            durationMs: this._lastExport.durationMs,
             trigger: this._lastExport.trigger,
             frameIntervalStats: this._lastExport.frameIntervalStats
                 ? { ...this._lastExport.frameIntervalStats }
                 : null,
             recorderDiagnostics: this._lastExport.recorderDiagnostics
                 ? { ...this._lastExport.recorderDiagnostics }
+                : null,
+            timestampValidation: this._lastExport.timestampValidation
+                ? { ...this._lastExport.timestampValidation }
                 : null,
         };
     }
@@ -831,7 +890,7 @@ export class MediaRecorderSystem {
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_WEBCODECS;
         this._activeMimeType = DEFAULT_MIME_TYPE;
         this._frameCount = 0;
-        this._resetWebCodecsCaptureState();
+        this._resetWebCodecsCaptureState(1);
         this._activeRecording = {
             startedAt: this.now(),
             trigger: trigger || null,
@@ -875,7 +934,7 @@ export class MediaRecorderSystem {
         };
         try {
             this._mediaRecorderChunks = [];
-            this._captureLevelIndex = CAPTURE_LOAD_LEVELS.length - 1;
+            this._captureLevelIndex = Math.min(2, CAPTURE_LOAD_LEVELS.length - 1);
             const level = this._getCaptureLevel();
             const captureStreamSource = this._ensureMediaRecorderCaptureSurface(level.resolutionScale);
             const streamSourceCanvas = captureStreamSource && typeof captureStreamSource.captureStream === 'function'
@@ -937,8 +996,7 @@ export class MediaRecorderSystem {
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_MEDIARECORDER;
         this._activeMimeType = selectedMimeType || DEFAULT_FALLBACK_MIME_TYPE;
         this._frameCount = 0;
-        this._resetWebCodecsCaptureState();
-        this._captureLevelIndex = CAPTURE_LOAD_LEVELS.length - 1;
+        this._resetWebCodecsCaptureState(Math.min(2, CAPTURE_LOAD_LEVELS.length - 1));
         this._activeRecording = {
             startedAt: this.now(),
             trigger: trigger || null,
@@ -1073,6 +1131,40 @@ export class MediaRecorderSystem {
         return `${this.downloadDirectoryName}/${baseName}`;
     }
 
+    _estimateCapturedDurationMs(frameIntervalStats = null) {
+        const sampleCount = Math.max(0, Math.trunc(toFiniteNumber(frameIntervalStats?.sampleCount, 0)));
+        const meanMs = Math.max(0, toFiniteNumber(frameIntervalStats?.mean, 0));
+        if (sampleCount > 0 && meanMs > 0) {
+            return sampleCount * meanMs;
+        }
+        return Math.max(0, Math.round(this._captureTimestampUs / 1000));
+    }
+
+    _normalizeExportTiming(activeRecording, endedAtMs, frameIntervalStats = null) {
+        const rawEndedAt = toFiniteNumber(endedAtMs, this.now());
+        const estimatedDurationMs = this._estimateCapturedDurationMs(frameIntervalStats);
+        let startedAt = toFiniteNumber(activeRecording?.startedAt, rawEndedAt);
+        let endedAt = rawEndedAt;
+        let adjusted = false;
+
+        if (!(startedAt > 0)) {
+            startedAt = Math.max(0, rawEndedAt - estimatedDurationMs);
+            adjusted = true;
+        }
+        if (!(endedAt >= startedAt)) {
+            endedAt = startedAt + Math.max(1, estimatedDurationMs);
+            adjusted = true;
+        }
+
+        return {
+            startedAt,
+            endedAt,
+            durationMs: Math.max(0, endedAt - startedAt),
+            adjusted,
+            estimatedDurationMs,
+        };
+    }
+
     _attemptAutoDownload(blob, fileName, mimeType) {
         if (!this.autoDownload || !blob || blob.size <= 0) {
             return { requested: false, transport: 'disabled' };
@@ -1123,12 +1215,18 @@ export class MediaRecorderSystem {
 
     _finalizeBlobExport(blob, mimeType = DEFAULT_MIME_TYPE) {
         const activeRecording = this._activeRecording || null;
-        const endedAt = this.now();
         const safeBlob = blob instanceof Blob ? blob : new Blob([], { type: String(mimeType || DEFAULT_MIME_TYPE) });
         const resolvedMimeType = String(mimeType || safeBlob.type || this._activeMimeType || DEFAULT_MIME_TYPE);
-        const fileName = this._buildFilename(activeRecording, endedAt, resolvedMimeType);
+        const frameIntervalStats = this._getFrameIntervalStats(true) || this._lastFrameIntervalStats;
+        const timing = this._normalizeExportTiming(activeRecording, this.now(), frameIntervalStats);
+        const fileName = this._buildFilename(
+            activeRecording
+                ? { ...activeRecording, startedAt: timing.startedAt }
+                : { startedAt: timing.startedAt },
+            timing.endedAt,
+            resolvedMimeType
+        );
         const downloadFileName = this._buildDownloadFileName(fileName);
-        const frameIntervalStats = this._computeFrameIntervalStats() || this._lastFrameIntervalStats;
         const recorderDiagnostics = this.getRecordingDiagnostics();
 
         if (this._lastExport?.objectUrl) {
@@ -1142,8 +1240,9 @@ export class MediaRecorderSystem {
             downloadFileName,
             mimeType: resolvedMimeType,
             sizeBytes: safeBlob.size,
-            startedAt: activeRecording?.startedAt || endedAt,
-            endedAt,
+            startedAt: timing.startedAt,
+            endedAt: timing.endedAt,
+            durationMs: timing.durationMs,
             trigger: activeRecording?.stopTrigger || activeRecording?.trigger || null,
             frameIntervalStats: frameIntervalStats
                 ? { ...frameIntervalStats }
@@ -1151,6 +1250,10 @@ export class MediaRecorderSystem {
             recorderDiagnostics: recorderDiagnostics
                 ? { ...recorderDiagnostics }
                 : null,
+            timestampValidation: {
+                adjusted: timing.adjusted,
+                estimatedDurationMs: timing.estimatedDurationMs,
+            },
         };
 
         const exportTransport = this._attemptAutoDownload(safeBlob, downloadFileName || fileName, resolvedMimeType);
@@ -1163,12 +1266,19 @@ export class MediaRecorderSystem {
             mimeType: resolvedMimeType,
             sizeBytes: safeBlob.size,
             exportTransport: exportTransport.transport,
+            startedAt: timing.startedAt,
+            endedAt: timing.endedAt,
+            durationMs: timing.durationMs,
             frameIntervalStats: frameIntervalStats
                 ? { ...frameIntervalStats }
                 : null,
             recorderDiagnostics: recorderDiagnostics
                 ? { ...recorderDiagnostics }
                 : null,
+            timestampValidation: {
+                adjusted: timing.adjusted,
+                estimatedDurationMs: timing.estimatedDurationMs,
+            },
         });
         if (typeof resolve === 'function') {
             resolve(result);

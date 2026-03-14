@@ -20,6 +20,8 @@ import { GameDebugApi } from './GameDebugApi.js';
 import { GAME_STATE_IDS } from './runtime/GameStateIds.js';
 import { LIFECYCLE_EVENT_TYPES } from './MediaRecorderSystem.js';
 import { RuntimePerfProfiler } from './perf/RuntimePerfProfiler.js';
+import { initializeGameApp } from './AppInitializer.js';
+import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './PlaytestLaunchParams.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -110,36 +112,13 @@ export class Game {
 
     // update() ist weiter unten definiert (einzelne Methode für alles)
 
-    _isPlaytestLaunchRequested() {
-        try {
-            const params = new URLSearchParams(window.location.search);
-            const raw = String(params.get('playtest') || '').toLowerCase();
-            return raw === '1' || raw === 'true' || raw === 'yes';
-        } catch {
-            return false;
-        }
-    }
-
-    _readPlaytestLaunchBoolParam(paramName) {
-        try {
-            const params = new URLSearchParams(window.location.search);
-            if (!params.has(paramName)) return null;
-            const raw = String(params.get(paramName) || '').toLowerCase();
-            if (raw === '1' || raw === 'true' || raw === 'yes' || raw === 'on') return true;
-            if (raw === '0' || raw === 'false' || raw === 'no' || raw === 'off') return false;
-            return null;
-        } catch {
-            return null;
-        }
-    }
-
     _autoStartPlaytestIfRequested() {
-        if (!this._isPlaytestLaunchRequested()) {
+        if (!isPlaytestLaunchRequested()) {
             return;
         }
 
         this.settings.mapKey = CUSTOM_MAP_KEY;
-        const planarRequested = this._readPlaytestLaunchBoolParam('planar');
+        const planarRequested = readPlaytestLaunchBoolParam('planar');
         if (typeof planarRequested === 'boolean') {
             if (!this.settings.gameplay) this.settings.gameplay = {};
             this.settings.gameplay.planarMode = planarRequested;
@@ -186,8 +165,8 @@ export class Game {
         }
     }
 
-    _applySettingsToRuntime() {
-        this.runtimeFacade.applySettingsToRuntime();
+    _applySettingsToRuntime(options = undefined) {
+        this.runtimeFacade.applySettingsToRuntime(options);
     }
 
     _setupMenuListeners() {
@@ -448,6 +427,7 @@ export class Game {
         const currentlyEnabled = !!renderer.getCinematicEnabled();
         const nextEnabled = !currentlyEnabled;
         renderer.setCinematicEnabled(nextEnabled);
+        this.gameLoop?.requestDeltaReset?.('cinematic-toggle');
         this._showStatusToast(
             nextEnabled ? 'Cinematic Kamera: aktiv' : 'Cinematic Kamera: deaktiviert',
             1400,
@@ -523,21 +503,26 @@ export class Game {
 
         if (normalizedEvent.type === 'multiplayer_host') {
             const lobbyCode = String(normalizedEvent.payload?.lobbyCode || 'local-lobby');
-            this._showStatusToast(`Lobby erstellt (Stub): ${lobbyCode}`, 1200, 'info');
+            this._showStatusToast(`Lobby erstellt: ${lobbyCode}`, 1200, 'info');
             return;
         }
         if (normalizedEvent.type === 'multiplayer_join') {
             const lobbyCode = String(normalizedEvent.payload?.lobbyCode || 'local-lobby');
-            this._showStatusToast(`Lobby beitreten (Stub): ${lobbyCode}`, 1200, 'info');
+            this._showStatusToast(`Lobby beigetreten: ${lobbyCode}`, 1200, 'info');
             return;
         }
         if (normalizedEvent.type === 'multiplayer_ready_toggle') {
             const ready = !!normalizedEvent.payload?.ready;
-            this._showStatusToast(ready ? 'Ready gesetzt (Stub)' : 'Ready entfernt (Stub)', 1000, 'info');
+            this._showStatusToast(ready ? 'Ready gesetzt' : 'Ready entfernt', 1000, 'info');
             return;
         }
         if (normalizedEvent.type === 'multiplayer_ready_invalidated') {
             this._showStatusToast('Ready zurueckgesetzt: Host-Settings geaendert', 1500, 'info');
+            return;
+        }
+        if (normalizedEvent.type === 'multiplayer_match_start') {
+            const lobbyCode = String(normalizedEvent.payload?.lobbyCode || 'Lobby');
+            this._showStatusToast(`Lobby startet Match: ${lobbyCode}`, 1400, 'info');
         }
     }
 
@@ -608,7 +593,7 @@ export class Game {
         this._handleGlobalInputHotkeys();
 
         // Debug Recording
-        if (this._recorderFrameCaptureEnabled && this.state === GAME_STATE_IDS.PLAYING && this.entityManager) {
+        if (this.state === GAME_STATE_IDS.PLAYING && this.entityManager && this.recorder?.shouldCaptureFrames?.()) {
             this.recorder.recordFrame(this.entityManager.players);
         }
 
@@ -672,72 +657,4 @@ export class Game {
     }
 
 }
-
-// Global Error Handling
-function showRuntimeErrorOverlay({ title, lines = [], stack = null }) {
-    const existing = document.getElementById('runtime-error-overlay');
-    if (existing) {
-        existing.remove();
-    }
-
-    const overlay = document.createElement('div');
-    overlay.id = 'runtime-error-overlay';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(50,0,0,0.9);color:#fff;padding:20px;z-index:99999;font-family:monospace;overflow:auto;';
-
-    const heading = document.createElement('h1');
-    heading.textContent = String(title || 'ERROR');
-    overlay.appendChild(heading);
-
-    if (Array.isArray(lines)) {
-        for (let i = 0; i < lines.length; i++) {
-            const text = String(lines[i] ?? '').trim();
-            if (!text) continue;
-            const paragraph = document.createElement('p');
-            paragraph.textContent = text;
-            overlay.appendChild(paragraph);
-        }
-    }
-
-    const stackElement = document.createElement('pre');
-    stackElement.textContent = String(stack || 'No stack trace');
-    overlay.appendChild(stackElement);
-
-    document.body.appendChild(overlay);
-}
-
-window.onerror = function (msg, url, lineNo, columnNo, error) {
-    showRuntimeErrorOverlay({
-        title: 'CRITICAL ERROR',
-        lines: [
-            String(msg || ''),
-            `${String(url || '')}:${Number(lineNo) || 0}:${Number(columnNo) || 0}`,
-        ],
-        stack: error?.stack || 'No stack trace',
-    });
-    return false;
-};
-
-function disposeExistingGameInstance() {
-    window.GAME_INSTANCE?.dispose?.();
-}
-
-function handleDomContentLoaded() {
-    try {
-        disposeExistingGameInstance();
-        console.log('DOM ready, initializing Game...');
-        const game = new Game();
-        // Consolidated runtime/debug entrypoints.
-        window.GAME_INSTANCE = game;
-        window.GAME_RUNTIME = game.runtimeFacade;
-        window.GAME_DEBUG = game.debugApi;
-    } catch (err) {
-        console.error('Fatal Game Init Error:', err);
-        showRuntimeErrorOverlay({
-            title: 'INIT ERROR',
-            lines: [String(err?.message || 'Unknown initialization error')],
-            stack: err?.stack || 'No stack trace',
-        });
-    }
-}
-
-window.addEventListener('DOMContentLoaded', handleDomContentLoaded);
+initializeGameApp({ createGame: () => new Game() });

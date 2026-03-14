@@ -9,7 +9,7 @@ const BOT_VALIDATION_MATRIX = Object.freeze([
         planarMode: false,
         portalCount: 0,
         rounds: 10,
-        expectedPolicyType: 'classic-3d',
+        expectedPolicyType: 'rule-based',
     }),
     Object.freeze({
         id: 'V2',
@@ -21,7 +21,7 @@ const BOT_VALIDATION_MATRIX = Object.freeze([
         planarMode: true,
         portalCount: 0,
         rounds: 10,
-        expectedPolicyType: 'classic-2d',
+        expectedPolicyType: 'rule-based',
     }),
     Object.freeze({
         id: 'V3',
@@ -33,7 +33,7 @@ const BOT_VALIDATION_MATRIX = Object.freeze([
         planarMode: true,
         portalCount: 4,
         rounds: 10,
-        expectedPolicyType: 'hunt-2d',
+        expectedPolicyType: 'hunt',
     }),
     Object.freeze({
         id: 'V4',
@@ -45,7 +45,7 @@ const BOT_VALIDATION_MATRIX = Object.freeze([
         planarMode: false,
         portalCount: 6,
         rounds: 10,
-        expectedPolicyType: 'hunt-3d',
+        expectedPolicyType: 'hunt',
     }),
 ]);
 

@@ -104,6 +104,10 @@ export class BotSensorsFacade {
         return this.sensors?._computeDynamicLookAhead(player) || 8;
     }
 
+    _buildBasis(forward) {
+        this.sensors?._buildBasis(forward);
+    }
+
     composeProbeDirection(forward, right, up, probe) {
         this.sensors?._composeProbeDirection(forward, right, up, probe);
     }

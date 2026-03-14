@@ -19,6 +19,24 @@ export class GameLoop {
         this.renderDelta = this.fixedStep;
         this.runtimePerfProfiler = options?.runtimePerfProfiler || null;
         this.largeDeltaResetSeconds = 0.25;
+        this.renderFrameId = 0;
+        this._renderTiming = {
+            frameId: 0,
+            rawDt: this.fixedStep,
+            stabilizedDt: this.fixedStep,
+            reset: false,
+            resetReason: '',
+            timestampMs: 0,
+        };
+        this._pendingDeltaReset = false;
+        this._pendingDeltaResetReason = '';
+        this._focusResetEventsAttached = false;
+        this._boundWindowBlur = () => this.requestDeltaReset('window-blur');
+        this._boundWindowFocus = () => this.requestDeltaReset('window-focus');
+        this._boundVisibilityChange = () => {
+            const hidden = typeof document !== 'undefined' && document.hidden === true;
+            this.requestDeltaReset(hidden ? 'visibility-hidden' : 'visibility-visible');
+        };
     }
 
     start() {
@@ -28,6 +46,9 @@ export class GameLoop {
         this.accumulator = 0;
         this.renderAlpha = 0;
         this.renderDelta = this.fixedStep;
+        this.renderFrameId = 0;
+        this.requestDeltaReset('start');
+        this._attachFocusResetEvents();
         this.frameId = requestAnimationFrame(this._boundLoop);
     }
 
@@ -37,11 +58,64 @@ export class GameLoop {
             cancelAnimationFrame(this.frameId);
             this.frameId = null;
         }
+        this._detachFocusResetEvents();
     }
 
     setTimeScale(scale) {
         const numericScale = Number(scale);
         this.timeScale = Number.isFinite(numericScale) ? Math.max(0, numericScale) : 1.0;
+    }
+
+    requestDeltaReset(reason = 'manual') {
+        this._pendingDeltaReset = true;
+        this._pendingDeltaResetReason = String(reason || 'manual');
+    }
+
+    getRenderTiming() {
+        return this._renderTiming;
+    }
+
+    _attachFocusResetEvents() {
+        if (this._focusResetEventsAttached) return;
+        if (typeof window !== 'undefined' && window?.addEventListener) {
+            window.addEventListener('blur', this._boundWindowBlur);
+            window.addEventListener('focus', this._boundWindowFocus);
+        }
+        if (typeof document !== 'undefined' && document?.addEventListener) {
+            document.addEventListener('visibilitychange', this._boundVisibilityChange);
+        }
+        this._focusResetEventsAttached = true;
+    }
+
+    _detachFocusResetEvents() {
+        if (!this._focusResetEventsAttached) return;
+        if (typeof window !== 'undefined' && window?.removeEventListener) {
+            window.removeEventListener('blur', this._boundWindowBlur);
+            window.removeEventListener('focus', this._boundWindowFocus);
+        }
+        if (typeof document !== 'undefined' && document?.removeEventListener) {
+            document.removeEventListener('visibilitychange', this._boundVisibilityChange);
+        }
+        this._focusResetEventsAttached = false;
+    }
+
+    _consumeDeltaReset() {
+        const reset = this._pendingDeltaReset === true;
+        const reason = reset ? (this._pendingDeltaResetReason || 'manual') : '';
+        this._pendingDeltaReset = false;
+        this._pendingDeltaResetReason = '';
+        return { reset, reason };
+    }
+
+    _updateRenderTiming(now, rawDt, stabilizedDt, reset, resetReason = '') {
+        const timing = this._renderTiming;
+        timing.frameId = this.renderFrameId;
+        timing.rawDt = rawDt;
+        timing.stabilizedDt = stabilizedDt;
+        timing.reset = reset === true;
+        timing.resetReason = String(resetReason || '');
+        timing.timestampMs = now;
+        return timing;
     }
 
     _loop(now) {
@@ -53,14 +127,21 @@ export class GameLoop {
         }
         this.lastTime = now;
 
+        const pendingReset = this._consumeDeltaReset();
         const deltaJump = rawDt > this.largeDeltaResetSeconds;
-        if (deltaJump) {
+        const shouldResetDelta = deltaJump || pendingReset.reset;
+        const resetReason = deltaJump
+            ? (pendingReset.reset ? `${pendingReset.reason}|delta-jump` : 'delta-jump')
+            : pendingReset.reason;
+        if (shouldResetDelta) {
             this.accumulator = 0;
         }
 
-        const stabilizedRawDt = deltaJump ? this.fixedStep : rawDt;
+        const stabilizedRawDt = shouldResetDelta ? this.fixedStep : rawDt;
         const dt = Math.min(stabilizedRawDt, 0.05);
         const runtimePerfProfiler = this.runtimePerfProfiler;
+        this.renderFrameId += 1;
+        this._updateRenderTiming(now, rawDt, dt, shouldResetDelta, resetReason);
         runtimePerfProfiler?.beginFrame(rawDt * 1000, now);
 
         this.renderDelta = dt;

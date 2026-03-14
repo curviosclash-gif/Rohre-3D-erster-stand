@@ -3,6 +3,7 @@
 // ============================================
 
 import { applyDeveloperThemeToDocument } from './MenuDeveloperModeOps.js';
+import { renderMenuTelemetryDashboard } from './MenuTelemetryDashboard.js';
 
 export function syncMenuDeveloperState({
     ui,
@@ -123,6 +124,9 @@ export function syncMenuDeveloperState({
     const telemetrySnapshot = settingsManager?.getMenuTelemetrySnapshot?.(settings)
         || localSettings.telemetryState
         || null;
+    if (ui.developerTelemetryDashboard) {
+        renderMenuTelemetryDashboard(ui.developerTelemetryDashboard, telemetrySnapshot);
+    }
     if (ui.developerTelemetryOutput) {
         ui.developerTelemetryOutput.textContent = telemetrySnapshot
             ? JSON.stringify(telemetrySnapshot, null, 2)

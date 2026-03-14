@@ -44,10 +44,32 @@ function getEmptyInput() {
 }
 
 const DYNAMIC_ACTION_RATE_THRESHOLD = 0.18;
+const OBSERVATION_PHASE_SLOTS = 4;
+const OBSERVATION_MAX_REBUILDS_PER_FRAME = 2;
+const OBSERVATION_MAX_REUSE_FRAMES = 4;
 
 function readFiniteRate(raw, fallback = NaN) {
     const numeric = Number(raw);
     return Number.isFinite(numeric) ? numeric : fallback;
+}
+
+function nowMs() {
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        return performance.now();
+    }
+    return Date.now();
+}
+
+function toPositiveInt(value, fallback, min = 1, max = 1024) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return fallback;
+    return Math.max(min, Math.min(max, Math.trunc(numeric)));
+}
+
+function wrapPhase(value, slots) {
+    if (!(slots > 0)) return 0;
+    const normalized = Math.trunc(Number(value) || 0) % slots;
+    return normalized < 0 ? normalized + slots : normalized;
 }
 
 export class PlayerInputSystem {
@@ -58,6 +80,40 @@ export class PlayerInputSystem {
         this._botObservationWarningCooldownMs = 3000;
         this._botObservationWarnings = new Map();
         this._lastBotObservationByIndex = new Map();
+        this._observationMetaByIndex = new Map();
+        this._observationFrameId = 0;
+        this._observationRebuildsThisFrame = 0;
+        this._observationPhaseSlots = OBSERVATION_PHASE_SLOTS;
+        this._observationMaxRebuildsPerFrame = OBSERVATION_MAX_REBUILDS_PER_FRAME;
+        this._observationMaxReuseFrames = OBSERVATION_MAX_REUSE_FRAMES;
+    }
+
+    beginFrame() {
+        this._observationFrameId += 1;
+        this._observationRebuildsThisFrame = 0;
+        this._syncObservationScheduleConfig();
+    }
+
+    _syncObservationScheduleConfig() {
+        const runtimeBotConfig = this.entityManager?.runtimeConfig?.bot || null;
+        this._observationPhaseSlots = toPositiveInt(
+            runtimeBotConfig?.observationPhaseSlots,
+            OBSERVATION_PHASE_SLOTS,
+            1,
+            8
+        );
+        this._observationMaxRebuildsPerFrame = toPositiveInt(
+            runtimeBotConfig?.observationMaxRebuildsPerFrame,
+            OBSERVATION_MAX_REBUILDS_PER_FRAME,
+            1,
+            8
+        );
+        this._observationMaxReuseFrames = toPositiveInt(
+            runtimeBotConfig?.observationMaxReuseFrames,
+            OBSERVATION_MAX_REUSE_FRAMES,
+            1,
+            16
+        );
     }
 
     _warnInvalidBotAction(player, reason, error = null) {
@@ -94,6 +150,91 @@ export class PlayerInputSystem {
         if (typeof policy.getObservation === 'function') return true;
         const policyType = typeof policy.type === 'string' ? policy.type : '';
         return policyType.includes('bridge');
+    }
+
+    _resolveObservationMeta(playerIndex, defaultPhase = 0) {
+        const key = Number.isInteger(playerIndex) ? playerIndex : -1;
+        let meta = this._observationMetaByIndex.get(key);
+        if (!meta) {
+            meta = {
+                lastRebuildFrame: -1,
+                phase: wrapPhase(defaultPhase, this._observationPhaseSlots),
+            };
+            this._observationMetaByIndex.set(key, meta);
+        }
+        return meta;
+    }
+
+    _resolvePolicySensePhase(player, policy) {
+        const playerIndex = Number.isInteger(player?.index) ? player.index : -1;
+        const fallbackPhase = wrapPhase(playerIndex, this._observationPhaseSlots);
+        const meta = this._resolveObservationMeta(playerIndex, fallbackPhase);
+        const policyPhase = Number(policy?.sensePhase);
+        if (Number.isFinite(policyPhase)) {
+            meta.phase = wrapPhase(policyPhase, this._observationPhaseSlots);
+        } else {
+            meta.phase = Number.isInteger(meta.phase)
+                ? wrapPhase(meta.phase, this._observationPhaseSlots)
+                : fallbackPhase;
+        }
+        return meta.phase;
+    }
+
+    _shouldRebuildObservation(player, policy) {
+        const playerIndex = Number.isInteger(player?.index) ? player.index : -1;
+        const meta = this._resolveObservationMeta(playerIndex, playerIndex);
+        const hasCachedObservation = this._lastBotObservationByIndex.has(playerIndex);
+        if (this._observationRebuildsThisFrame >= this._observationMaxRebuildsPerFrame) {
+            return false;
+        }
+        if (!hasCachedObservation) {
+            return true;
+        }
+
+        const lastRebuildFrame = Number.isFinite(meta.lastRebuildFrame)
+            ? meta.lastRebuildFrame
+            : -1;
+        const sinceRebuild = this._observationFrameId - lastRebuildFrame;
+        if (sinceRebuild >= this._observationMaxReuseFrames) {
+            return true;
+        }
+
+        const phase = this._resolvePolicySensePhase(player, policy);
+        return wrapPhase(this._observationFrameId, this._observationPhaseSlots) === phase;
+    }
+
+    _resolveScheduledObservation(player, policy, runtimeContext) {
+        const playerIndex = Number.isInteger(player?.index) ? player.index : -1;
+        if (this._shouldRebuildObservation(player, policy)) {
+            const observation = this._buildBotObservation(player, policy, runtimeContext);
+            const meta = this._resolveObservationMeta(playerIndex, playerIndex);
+            meta.lastRebuildFrame = this._observationFrameId;
+            this._lastBotObservationByIndex.set(playerIndex, observation);
+            this._observationRebuildsThisFrame += 1;
+            return observation;
+        }
+
+        const cachedObservation = this._lastBotObservationByIndex.get(playerIndex);
+        if (cachedObservation) {
+            return cachedObservation;
+        }
+        return this._resolveObservationTarget(runtimeContext);
+    }
+
+    _recordBotSensingSample(runtimeProfiler, player, policyType, startMs) {
+        if (!runtimeProfiler || !Number.isFinite(startMs)) {
+            return;
+        }
+        const durationMs = nowMs() - startMs;
+        if (!(durationMs > 0)) {
+            return;
+        }
+        runtimeProfiler.recordSubsystemDuration?.('bot_sensing', durationMs);
+        runtimeProfiler.recordBotSensingDetail?.(
+            Number.isInteger(player?.index) ? player.index : -1,
+            typeof policyType === 'string' ? policyType : '',
+            durationMs
+        );
     }
 
     _buildBotObservation(player, policy, runtimeContext) {
@@ -258,13 +399,16 @@ export class PlayerInputSystem {
             const botAI = entityManager.botByPlayer.get(player);
             if (botAI) {
                 const needsObservation = this._policyNeedsObservation(botAI);
+                const runtimeProfiler = entityManager?.runtimeProfiler || null;
+                const botSensingStart = needsObservation ? runtimeProfiler?.startSample?.() : NaN;
                 const runtimeContext = this._resolveRuntimeContext(player, dt, entityManager, {
                     includeObservationContext: needsObservation,
                 });
                 if (needsObservation) {
-                    const observation = this._buildBotObservation(player, botAI, runtimeContext);
+                    const observation = this._resolveScheduledObservation(player, botAI, runtimeContext);
                     runtimeContext.observation = observation;
                     this._lastBotObservationByIndex.set(player.index, observation);
+                    this._recordBotSensingSample(runtimeProfiler, player, botAI?.type, botSensingStart);
                 } else {
                     runtimeContext.observation = null;
                     this._lastBotObservationByIndex.delete(player.index);

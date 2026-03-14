@@ -12,6 +12,7 @@ export const MENU_CONTROLLER_EVENT_TYPES = Object.freeze({
     SESSION_TYPE_CHANGE: 'session_type_change',
     MODE_PATH_CHANGE: 'mode_path_change',
     QUICKSTART_LAST_START: 'quickstart_last_start',
+    QUICKSTART_EVENT_PLAYLIST_START: 'quickstart_event_playlist_start',
     QUICKSTART_RANDOM_START: 'quickstart_random_start',
     LEVEL3_RESET: 'level3_reset',
     LEVEL4_OPEN: 'level4_open',

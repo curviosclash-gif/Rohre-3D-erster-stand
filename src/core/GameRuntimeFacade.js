@@ -8,6 +8,7 @@ import {
 } from '../ui/MenuController.js';
 import { SETTINGS_CHANGE_KEYS } from '../ui/SettingsChangeKeys.js';
 import { guardMenuRuntimeEvent, resolveMenuAccessContext } from '../ui/menu/MenuAccessPolicy.js';
+import { getNextEventPlaylistEntry } from '../ui/menu/EventPlaylistCatalog.js';
 import { MenuMultiplayerBridge } from '../ui/menu/MenuMultiplayerBridge.js';
 import { LEVEL4_SECTION_IDS } from '../ui/menu/MenuStateContracts.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
@@ -22,6 +23,8 @@ import {
     saveMenuPresetAction,
 } from './runtime/MenuRuntimePresetConfigService.js';
 import {
+    applyMultiplayerMatchSettingsSnapshot,
+    createMultiplayerMatchSettingsSnapshot,
     didHostChangeMatchSettings,
     handleMultiplayerHostAction,
     handleMultiplayerJoinAction,
@@ -137,18 +140,21 @@ export class GameRuntimeFacade {
             if (game.entityManager) return;
 
             const runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
-            prewarmMatchArenaSession({
+            Promise.resolve(prewarmMatchArenaSession({
                 renderer: game.renderer,
                 settings: game.settings,
                 runtimeConfig,
                 requestedMapKey: runtimeConfig?.session?.mapKey || game.mapKey,
+            })).catch((error) => {
+                console.warn('[GameRuntimeFacade] Match prewarm skipped:', error);
             });
         }, 50);
     }
 
-    applySettingsToRuntime() {
+    applySettingsToRuntime(options = {}) {
         const game = this.game;
         if (!game?.settingsManager) return;
+        const schedulePrewarm = options?.schedulePrewarm !== false;
 
         game.runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
         game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
@@ -169,7 +175,9 @@ export class GameRuntimeFacade {
         }
 
         game.input?.setBindings?.(game.runtimeConfig.controls);
-        this.scheduleMatchPrewarm();
+        if (schedulePrewarm) {
+            this.scheduleMatchPrewarm();
+        }
     }
 
     setupMenuListeners() {
@@ -178,10 +186,19 @@ export class GameRuntimeFacade {
             game.menuMultiplayerBridge = new MenuMultiplayerBridge({
                 contractVersion: game?.menuLifecycleContractVersion || 'lifecycle.v1',
                 onEvent: (lifecycleEvent) => game._handleMenuLifecycleEvent?.(lifecycleEvent),
-                onStatus: (message) => game._showStatusToast(message, 1300, 'info'),
+                onStatus: null,
+                onStateChanged: (sessionState) => this._handleMultiplayerSessionStateChanged(sessionState),
+                onMatchStart: (command) => this._handleMultiplayerMatchStart(command),
             });
+        } else {
+            game.menuMultiplayerBridge.onEvent = (lifecycleEvent) => game._handleMenuLifecycleEvent?.(lifecycleEvent);
+            game.menuMultiplayerBridge.onStatus = null;
+            game.menuMultiplayerBridge.onStateChanged = (sessionState) => this._handleMultiplayerSessionStateChanged(sessionState);
+            game.menuMultiplayerBridge.onMatchStart = (command) => this._handleMultiplayerMatchStart(command);
         }
         this.menuMultiplayerBridge = game.menuMultiplayerBridge;
+        this.menuMultiplayerBridge?.syncActorIdentity?.(this._resolveMenuAccessContext()?.actorId);
+        this._handleMultiplayerSessionStateChanged(this.menuMultiplayerBridge?.getSessionState?.());
         game.menuController?.dispose?.();
 
         game.menuController = new MenuController({
@@ -190,6 +207,63 @@ export class GameRuntimeFacade {
             onEvent: (event) => this.handleMenuControllerEvent(event),
         });
         game.menuController.setupListeners();
+    }
+
+    _captureMultiplayerMatchSettings() {
+        return createMultiplayerMatchSettingsSnapshot(this.game?.settings);
+    }
+
+    _syncMultiplayerUiState() {
+        const game = this.game;
+        game?.uiManager?.syncStartSetupState?.(game.settings);
+        game?.uiManager?.syncMultiplayerState?.(game.settings);
+        game?.uiManager?.updateContext?.();
+    }
+
+    _handleMultiplayerSessionStateChanged(sessionState = null) {
+        const game = this.game;
+        if (!game?.ui) return;
+        if (sessionState?.joined && game.ui.multiplayerLobbyCodeInput) {
+            game.ui.multiplayerLobbyCodeInput.value = String(sessionState.lobbyCode || '');
+        }
+        this._syncMultiplayerUiState();
+    }
+
+    _applyAuthoritativeMultiplayerMatchSettings(snapshot) {
+        const game = this.game;
+        if (!game?.settings) return;
+        applyMultiplayerMatchSettingsSnapshot(game.settings, snapshot);
+        game.settingsManager?.applyMenuCompatibilityRules?.(
+            game.settings,
+            { accessContext: this._resolveMenuAccessContext() }
+        );
+        this.markSettingsDirty(false);
+        game.uiManager?.syncAll?.();
+        game.uiManager?.updateContext?.();
+    }
+
+    _handleMultiplayerMatchStart(command = null) {
+        const game = this.game;
+        if (!game || game.state !== GAME_STATE_IDS.MENU) return false;
+        if (command?.settingsSnapshot) {
+            this._applyAuthoritativeMultiplayerMatchSettings(command.settingsSnapshot);
+        }
+        game.uiManager?.clearStartValidationError?.();
+        game.matchFlowUiController?.startMatch?.();
+        return true;
+    }
+
+    _syncMultiplayerRuntimeContext(changedKeys = null) {
+        const game = this.game;
+        const sessionType = String(game?.settings?.localSettings?.sessionType || 'single').toLowerCase();
+        if (sessionType !== 'multiplayer') return;
+
+        const accessContext = this._resolveMenuAccessContext();
+        this.menuMultiplayerBridge?.syncActorIdentity?.(accessContext?.actorId);
+        if (Array.isArray(changedKeys) && changedKeys.length > 0 && this._didHostChangeMatchSettings(changedKeys)) {
+            this.menuMultiplayerBridge?.publishHostSettings?.(this._captureMultiplayerMatchSettings());
+        }
+        this._syncMultiplayerUiState();
     }
 
     handleMenuControllerEvent(event) {
@@ -217,6 +291,9 @@ export class GameRuntimeFacade {
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_LAST_START:
                 this.handleQuickStartLastStart();
+                return;
+            case MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_EVENT_PLAYLIST_START:
+                this.handleQuickStartEventPlaylistStart();
                 return;
             case MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_RANDOM_START:
                 this.handleQuickStartRandomStart();
@@ -376,6 +453,14 @@ export class GameRuntimeFacade {
         return telemetrySnapshot;
     }
 
+    recordRoundEndTelemetry(payload = null) {
+        return this._recordMenuTelemetry('round_end', payload);
+    }
+
+    recordMatchEndTelemetry(payload = null) {
+        return this._recordMenuTelemetry('match_end', payload);
+    }
+
     handleMenuPanelChanged(previousPanelId, nextPanelId, transitionMetadata = null) {
         const fromPanelId = String(previousPanelId || '').trim();
         const toPanelId = String(nextPanelId || '').trim();
@@ -468,6 +553,62 @@ export class GameRuntimeFacade {
         });
         game._showStatusToast('Schnellstart: letzte Einstellungen', 1000, 'info');
         this.startMatch();
+    }
+
+    handleQuickStartEventPlaylistStart() {
+        const game = this.game;
+        const playlistStep = getNextEventPlaylistEntry(game?.settings?.localSettings?.eventPlaylistState);
+        const presetId = String(playlistStep?.entry?.presetId || '').trim();
+        if (!presetId) {
+            game._showStatusToast('Event-Playlist ist nicht verfuegbar.', 1500, 'error');
+            return;
+        }
+
+        const presetResult = game.settingsManager.applyMenuPreset(
+            game.settings,
+            presetId,
+            this._resolveMenuAccessContext()
+        );
+        if (!presetResult.success) {
+            game._showStatusToast('Event-Playlist konnte nicht vorbereitet werden.', 1600, 'error');
+            return;
+        }
+
+        game.settings.localSettings.modePath = 'quick_action';
+        game.settings.localSettings.eventPlaylistState = {
+            ...playlistStep.persistedState,
+        };
+
+        const changedKeys = [
+            SETTINGS_CHANGE_KEYS.MODE_PATH,
+        ];
+        if (Array.isArray(presetResult.changedKeys)) {
+            changedKeys.push(...presetResult.changedKeys);
+        }
+        this.onSettingsChanged({ changedKeys: Array.from(new Set(changedKeys)) });
+
+        const presetName = String(playlistStep?.preset?.name || presetId).trim() || presetId;
+        const started = this.startMatch();
+        if (started) {
+            this._recordMenuTelemetry('quickstart', {
+                variant: 'event_playlist',
+                playlistId: playlistStep?.playlist?.id || '',
+                presetId,
+                stepIndex: playlistStep.currentIndex,
+                displayIndex: playlistStep.displayIndex,
+                totalSteps: playlistStep.totalSteps,
+                sessionType: game?.settings?.localSettings?.sessionType || 'single',
+            });
+            const persisted = game.settingsManager.saveSettings(game.settings);
+            if (persisted) {
+                this.markSettingsDirty(false);
+            }
+            game._showStatusToast(
+                `Event-Playlist: ${presetName} (${playlistStep.displayIndex}/${playlistStep.totalSteps})`,
+                1300,
+                'info'
+            );
+        }
     }
 
     handleQuickStartRandomStart() {
@@ -663,8 +804,8 @@ export class GameRuntimeFacade {
             event,
             resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
             menuMultiplayerBridge: this.menuMultiplayerBridge,
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
+            syncUiState: () => this._syncMultiplayerUiState(),
+            captureSettingsSnapshot: () => this._captureMultiplayerMatchSettings(),
         });
     }
 
@@ -674,18 +815,17 @@ export class GameRuntimeFacade {
             event,
             resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
             menuMultiplayerBridge: this.menuMultiplayerBridge,
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
+            syncUiState: () => this._syncMultiplayerUiState(),
         });
     }
 
     handleMultiplayerReadyToggle(event) {
         handleMultiplayerReadyToggleAction({
+            game: this.game,
             event,
             resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
             menuMultiplayerBridge: this.menuMultiplayerBridge,
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
+            syncUiState: () => this._syncMultiplayerUiState(),
         });
     }
 
@@ -880,13 +1020,14 @@ export class GameRuntimeFacade {
         return resolveMatchStartValidationIssue({
             settings: this.game?.settings,
             ui: this.game?.ui,
+            multiplayerSessionState: this.menuMultiplayerBridge?.getSessionState?.(),
             maps: CONFIG?.MAPS,
             huntModeType: GAME_MODE_TYPES.HUNT,
         });
     }
 
     onSettingsChanged(event = null) {
-        orchestrateRuntimeSettingsChanged({
+        const changedKeys = orchestrateRuntimeSettingsChanged({
             game: this.game,
             event,
             resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
@@ -896,6 +1037,8 @@ export class GameRuntimeFacade {
             updateSaveButtonState: () => this.updateSaveButtonState(),
             scheduleMatchPrewarm: () => this.scheduleMatchPrewarm(),
         });
+        this._syncMultiplayerRuntimeContext(changedKeys);
+        return changedKeys;
     }
 
     markSettingsDirty(isDirty) {
@@ -933,6 +1076,25 @@ export class GameRuntimeFacade {
             return false;
         }
         this.game?.uiManager?.clearStartValidationError?.();
+        if (String(this.game?.settings?.localSettings?.sessionType || 'single').toLowerCase() === 'multiplayer') {
+            const startResult = this.menuMultiplayerBridge?.requestMatchStart?.({
+                settingsSnapshot: this._captureMultiplayerMatchSettings(),
+            });
+            if (!startResult?.ok) {
+                this._recordMenuTelemetry('abort', {
+                    ...telemetryPayload,
+                    reason: 'multiplayer_start_failed',
+                    code: startResult?.code || 'unknown',
+                });
+                this.game?._showStatusToast?.(
+                    startResult?.message || 'Lobby-Start konnte nicht ausgeliefert werden.',
+                    1700,
+                    'error'
+                );
+                return false;
+            }
+            return true;
+        }
         this.game?.matchFlowUiController?.startMatch?.();
         return true;
     }
@@ -954,8 +1116,10 @@ export class GameRuntimeFacade {
     dispose() {
         this._clearMatchPrewarmTimer();
         this.game?.menuController?.dispose?.();
+        this.game?.menuMultiplayerBridge?.dispose?.();
         if (this.game) {
             this.game.menuController = null;
+            this.game.menuMultiplayerBridge = null;
         }
     }
 }

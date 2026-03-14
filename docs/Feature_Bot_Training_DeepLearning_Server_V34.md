@@ -1,6 +1,6 @@
 # Feature: Bot-Training DeepLearning Server V34
 
-Stand: 2026-03-11
+Stand: 2026-03-13
 
 ## Ziel
 
@@ -64,50 +64,52 @@ Hauptrisiken:
 
 ## Phasen
 
-- [ ] 34.0 Contract- und Laufzeit-Freeze
-  - [ ] 34.0.1 WS-Vertrag fuer `bot-action-request`, `training-reset`, `training-step` finalisieren
-  - [ ] 34.0.2 Session-/Seed-/Checkpoint-Vertrag (Load/Save/Resume) festlegen
-  - [ ] 34.0.3 Failure-Policy (Timeout, Retry, Backpressure, Fallback) verbindlich definieren
+- [x] 34.0 Contract- und Laufzeit-Freeze
+  - [x] 34.0.1 WS-Vertrag fuer `bot-action-request`, `training-reset`, `training-step` finalisieren
+  - [x] 34.0.2 Session-/Seed-/Checkpoint-Vertrag (Load/Save/Resume) festlegen
+  - [x] 34.0.3 Failure-Policy (Timeout, Retry, Backpressure, Fallback) verbindlich definieren
 
-- [ ] 34.1 Trainer-Server-Fundament
-  - [ ] 34.1.1 `scripts/trainer-server.mjs` als Bootstrap auf `trainer/server` umstellen
-  - [ ] 34.1.2 Session-Manager mit verbindlicher Message-Routing-Logik bauen
-  - [ ] 34.1.3 Health-/Stats-Endpunkte (oder WS-Stats-Message) fuer Betrieb einfuehren
+- [x] 34.1 Trainer-Server-Fundament
+  - [x] 34.1.1 `scripts/trainer-server.mjs` als Bootstrap auf `trainer/server` umstellen
+  - [x] 34.1.2 Session-Manager mit verbindlicher Message-Routing-Logik bauen
+  - [x] 34.1.3 Health-/Stats-Endpunkte (oder WS-Stats-Message) fuer Betrieb einfuehren
 
-- [ ] 34.2 Replay- und Datenpipeline
-  - [ ] 34.2.1 Transition-Schema (`s, a, r, s', done`) inkl. Validierung implementieren
-  - [ ] 34.2.2 Replay-Buffer (Kapazitaet, Sampling, Priorisierung optional) bauen
-  - [ ] 34.2.3 Observation-Normalisierung und Action-Maskierung robust kapseln
+- [x] 34.2 Replay- und Datenpipeline
+  - [x] 34.2.1 Transition-Schema (`s, a, r, s', done`) inkl. Validierung implementieren
+  - [x] 34.2.2 Replay-Buffer (Kapazitaet, Sampling, Priorisierung optional) bauen
+  - [x] 34.2.3 Observation-Normalisierung und Action-Maskierung robust kapseln
 
-- [ ] 34.3 Modell und Optimierung (Deep Learning)
-  - [ ] 34.3.1 Basismodell (DQN/MLP) mit deterministischer Initialisierung implementieren
-  - [ ] 34.3.2 Trainingsschritt (Loss, Backprop, Target-Update) integrieren
-  - [ ] 34.3.3 Inferenzpfad mit Epsilon-Greedy und sicheren Action-Grenzen absichern
+- [x] 34.3 Modell und Optimierung (Deep Learning)
+  - [x] 34.3.1 Basismodell (DQN/MLP) mit deterministischer Initialisierung implementieren
+  - [x] 34.3.2 Trainingsschritt (Loss, Backprop, Target-Update) integrieren
+  - [x] 34.3.3 Inferenzpfad mit Epsilon-Greedy und sicheren Action-Grenzen absichern
 
-- [ ] 34.4 Bridge-Integration in den Lauf
-  - [ ] 34.4.1 `WebSocketTrainerBridge` Handshake/Readiness gegen echten Trainer stabilisieren
-  - [ ] 34.4.2 `training-run` Bridge-Modus fuer echtes ACK-/Action-Handling haerten
-  - [ ] 34.4.3 Telemetrie um Lernmetriken (loss, epsilon, replayFill) erweitern
+- [x] 34.4 Bridge-Integration in den Lauf
+  - [x] 34.4.1 `WebSocketTrainerBridge` Handshake/Readiness gegen echten Trainer stabilisieren
+  - [x] 34.4.2 `training-run` Bridge-Modus fuer echtes ACK-/Action-Handling haerten
+  - [x] 34.4.3 Telemetrie um Lernmetriken (loss, epsilon, replayFill) erweitern
 
-- [ ] 34.5 Checkpoints und Artefakte
-  - [ ] 34.5.1 Modellablage unter `data/training/models/<runStamp>/` einfuehren
-  - [ ] 34.5.2 Metrik-Serien unter `data/training/runs/<stamp>/trainer.json` schreiben
-  - [ ] 34.5.3 `latest`-Index um aktiven Checkpoint und Resume-Quelle erweitern
+- [x] 34.5 Checkpoints und Artefakte
+  - [x] 34.5.1 Modellablage unter `data/training/models/<runStamp>/` einfuehren
+  - [x] 34.5.2 Metrik-Serien unter `data/training/runs/<stamp>/trainer.json` schreiben
+  - [x] 34.5.3 `latest`-Index um aktiven Checkpoint und Resume-Quelle erweitern
 
-- [ ] 34.6 Test- und Stabilitaets-Gates
-  - [ ] 34.6.1 Unit-Tests fuer Replay, Sampler und Action-Sanitizing bauen
-  - [ ] 34.6.2 WS-Integrations-Tests mit realem Trainerprozess bauen
-  - [ ] 34.6.3 deterministische Smoke-Session mit festen Seeds als Regression absichern
+- [x] 34.6 Test- und Stabilitaets-Gates
+  - [x] 34.6.1 Unit-Tests fuer Replay, Sampler und Action-Sanitizing bauen
+  - [x] 34.6.2 WS-Integrations-Tests mit realem Trainerprozess bauen
+  - [x] 34.6.3 deterministische Smoke-Session mit festen Seeds als Regression absichern
 
-- [ ] 34.7 Betriebs- und Startflow
-  - [ ] 34.7.1 Startskripte (`start_trainer_server`, `start_training_bridge`) fuer V34-Lifecycle finalisieren
-  - [ ] 34.7.2 `.env`/CLI-Parameter fuer Hyperparameter + Pfade dokumentieren
-  - [ ] 34.7.3 Schnellstart fuer lokale Nutzung und CI beschreiben
+- [x] 34.7 Betriebs- und Startflow
+  - [x] 34.7.1 Startskripte (`start_trainer_server`, `start_training_bridge`) fuer V34-Lifecycle finalisieren
+  - [x] 34.7.2 `.env`/CLI-Parameter fuer Hyperparameter + Pfade dokumentieren
+  - [x] 34.7.3 Schnellstart fuer lokale Nutzung und CI beschreiben
 
-- [ ] 34.9 Abschluss-Gate und Doku-Freeze
-  - [ ] 34.9.1 Verifikation: zielgerichtete V34-Tests, `npm run test:core`, `npm run build`
-  - [ ] 34.9.2 Verifikation: `npm run docs:sync` und `npm run docs:check`
-  - [ ] 34.9.3 Doku-Freeze + Status-Update in Umsetzungsplan und Schnittstellen-Doku
+- [x] 34.9 Abschluss-Gate und Doku-Freeze
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 34.9.1 Verifikation: zielgerichtete V34-Tests, `npm run test:core`, `npm run build`
+  - [x] 34.9.2 Verifikation: `npm run docs:sync` und `npm run docs:check`
+  - [x] 34.9.3 Doku-Freeze + Status-Update in Umsetzungsplan und Schnittstellen-Doku
+  - Status 2026-03-13: `node --test tests/trainer-v34-*.test.mjs` PASS (13/13), `npm run training:e2e` PASS (`stamp=20260313T124557Z`), `TEST_PORT=5341 PW_RUN_TAG=plan-core PW_OUTPUT_DIR=test-results/plan-core PW_WORKERS=1 npm run test:core` PASS (`82 passed`, `1 skipped`), `npm run docs:sync` PASS, `npm run docs:check` PASS und `npm run build` PASS.
 
 ## Definition of Done
 

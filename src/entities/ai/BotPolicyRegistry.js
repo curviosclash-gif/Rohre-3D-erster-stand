@@ -30,6 +30,25 @@ function createHuntBridgeFactory(type) {
     });
 }
 
+function resolveLocalFallbackType(requestedType, options = {}) {
+    const normalizedRequestedType = normalizeBotPolicyType(requestedType);
+    if (normalizedRequestedType.includes('hunt')) {
+        return BOT_POLICY_TYPES.HUNT;
+    }
+    if (normalizedRequestedType.includes('classic')) {
+        return BOT_POLICY_TYPES.RULE_BASED;
+    }
+
+    const activeGameMode = String(
+        options?.activeGameMode
+        || options?.runtimeConfig?.session?.activeGameMode
+        || ''
+    ).trim().toLowerCase();
+    return activeGameMode === 'hunt'
+        ? BOT_POLICY_TYPES.HUNT
+        : BOT_POLICY_TYPES.RULE_BASED;
+}
+
 export class BotPolicyRegistry {
     constructor() {
         this._factories = new Map();
@@ -60,9 +79,7 @@ export class BotPolicyRegistry {
 
         if (fallbackReason) {
             console.warn(`[BotPolicyRegistry] requested=${requestedType} resolved=${resolvedType} fallback=${fallbackReason}`);
-            return;
         }
-        console.info(`[BotPolicyRegistry] requested=${requestedType} resolved=${resolvedType}`);
     }
 
     _resolveFactory(type, options = {}) {
@@ -72,7 +89,7 @@ export class BotPolicyRegistry {
         let fallbackReason = null;
 
         if (!bridgeEnabled && isBridgeBotPolicyType(requestedType)) {
-            resolvedType = DEFAULT_BOT_POLICY_TYPE;
+            resolvedType = resolveLocalFallbackType(requestedType, options);
             fallbackReason = 'bridge-disabled';
         }
 

@@ -8,6 +8,27 @@ import { isHuntHealthActive } from '../hunt/HealthSystem.js';
 import { isRocketTierType, pickWeightedRocketTierType } from '../hunt/RocketPickupSystem.js';
 import { PowerupModelFactory } from './PowerupModelFactory.js';
 
+function getHuntPickupWeights() {
+    return CONFIG?.HUNT?.PICKUP_WEIGHTS || {};
+}
+
+function pickWeightedType(typeEntries = []) {
+    let totalWeight = 0;
+    for (const entry of typeEntries) {
+        totalWeight += Math.max(0, Number(entry?.weight) || 0);
+    }
+    if (totalWeight <= 0) return null;
+
+    let roll = Math.random() * totalWeight;
+    for (const entry of typeEntries) {
+        roll -= Math.max(0, Number(entry?.weight) || 0);
+        if (roll <= 0) {
+            return entry.type;
+        }
+    }
+    return typeEntries[typeEntries.length - 1]?.type || null;
+}
+
 export class PowerupManager {
     constructor(renderer, arena) {
         this.renderer = renderer;
@@ -62,11 +83,26 @@ export class PowerupManager {
         if (spawnableTypes.length === 0) return;
 
         let type = spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
-        const rocketSpawnChance = Math.max(0, Number(CONFIG?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0));
-        if (huntModeActive && Math.random() < rocketSpawnChance) {
-            const weightedRocketType = pickWeightedRocketTierType();
-            if (spawnableTypes.includes(weightedRocketType) || isRocketTierType(weightedRocketType)) {
-                type = weightedRocketType;
+        if (huntModeActive) {
+            const rocketSpawnChance = Math.max(0, Number(CONFIG?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0));
+            const nonRocketTypes = spawnableTypes.filter((typeKey) => !isRocketTierType(typeKey));
+            const huntWeights = getHuntPickupWeights();
+            const weightedNonRocketTypes = nonRocketTypes
+                .map((typeKey) => ({
+                    type: typeKey,
+                    weight: Number(huntWeights?.[typeKey] ?? 1),
+                }))
+                .filter((entry) => entry.weight > 0);
+
+            if (Math.random() < rocketSpawnChance) {
+                const weightedRocketType = pickWeightedRocketTierType();
+                if (spawnableTypes.includes(weightedRocketType) || isRocketTierType(weightedRocketType)) {
+                    type = weightedRocketType;
+                }
+            } else if (weightedNonRocketTypes.length > 0) {
+                type = pickWeightedType(weightedNonRocketTypes) || weightedNonRocketTypes[0].type;
+            } else if (nonRocketTypes.length > 0) {
+                type = nonRocketTypes[Math.floor(Math.random() * nonRocketTypes.length)];
             }
         }
 

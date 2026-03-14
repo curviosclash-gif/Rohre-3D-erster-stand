@@ -38,17 +38,13 @@ export class ArenaBuilder {
             && previousBuildSignature === buildSignature
             && this._hasCompiledGeometry();
 
+        let materialBundle = null;
         if (!canReuse) {
             this.geometryPipeline.beginBuildStage();
-            const materialBundle = this._resolveMaterialBundle(size);
+            materialBundle = this._resolveMaterialBundle(size);
             this._assignArenaMaterials(materialBundle);
             this._compileFloorStage(size.sx, size.sz, materialBundle.floorMat);
             this.geometryPipeline.compileWallStage({ sx: size.sx, sy: size.sy, sz: size.sz, scale });
-            this.geometryPipeline.compileObstacleStage({
-                obstacleDefs: Array.isArray(mapResolution.map.obstacles) ? mapResolution.map.obstacles : [],
-                scale,
-            });
-            this.geometryPipeline.flushMergeStage(materialBundle);
         }
 
         return {
@@ -57,6 +53,10 @@ export class ArenaBuilder {
             sx: size.sx,
             sy: size.sy,
             sz: size.sz,
+            obstacleDefs: Array.isArray(mapResolution.map.obstacles) ? mapResolution.map.obstacles : [],
+            glbModel: typeof mapResolution.map?.glbModel === 'string' ? mapResolution.map.glbModel : '',
+            glbLoadDelayMs: Number(mapResolution.map?.glbLoadDelayMs) || 0,
+            materialBundle,
             buildSignature,
             rebuildPolicy: canReuse ? 'reuse' : 'rebuild',
         };

@@ -9,6 +9,7 @@ import { createBotRuntimeContext } from './ai/BotRuntimeContextFactory.js';
 import { assembleEntityRuntime } from './runtime/EntityRuntimeAssembler.js';
 import { isHuntHealthActive } from '../hunt/HealthSystem.js';
 import { emitHuntDamageFeedback } from '../hunt/HuntDamageFeedback.js';
+import { LastRoundGhostSystem } from './LastRoundGhostSystem.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -57,16 +58,17 @@ export class EntityManager {
         this.onHuntDamageEvent = null;
         this.botDifficulty = CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL';
         Object.assign(this, assembleEntityRuntime(this));
+        this._lastRoundGhostSystem = new LastRoundGhostSystem(renderer);
         this.projectiles = this._projectileSystem.projectiles;
         this.botPolicyRegistry = new BotPolicyRegistry();
         this.botPolicyType = DEFAULT_BOT_POLICY_TYPE;
+        this.botBridgeEnabled = false;
         this.activeGameMode = CONFIG?.HUNT?.ACTIVE_MODE || 'classic';
         this.huntEnabled = isHuntHealthActive();
         this.runtimeConfig = null;
     }
 
     setup(numHumans, numBots, options = {}) {
-        console.log(`[EntityManager] Setup: Humans=${numHumans}, Bots=${numBots}`);
         this.clear();
         this._setupOps.runSetup(numHumans, numBots, options);
     }
@@ -272,14 +274,21 @@ export class EntityManager {
         }
     }
 
-    updateCameras(dt, renderAlpha = 1) {
+    updateCameras(dt, renderAlpha = 1, useRenderedTransforms = false) {
         for (const player of this.players) {
             if (!player.isBot && player.index < this.renderer.cameras.length) {
-                player.resolveRenderTransform(renderAlpha, this._tmpCamRenderPos, this._tmpCamRenderQuat);
+                const mode = this.renderer.getCameraMode(player.index);
+                const reusedRenderedTransform = useRenderedTransforms
+                    && player.view?.copyRenderTransform?.(this._tmpCamRenderPos, this._tmpCamRenderQuat);
+                if (!reusedRenderedTransform) {
+                    player.resolveRenderTransform(renderAlpha, this._tmpCamRenderPos, this._tmpCamRenderQuat);
+                }
                 const dir = player.alive
                     ? this._tmpDir2.set(0, 0, -1).applyQuaternion(this._tmpCamRenderQuat)
                     : this._tmpDir2.set(0, 0, -1);
-                const firstPersonAnchor = player.getFirstPersonCameraAnchor(this._tmpCamAnchor);
+                const firstPersonAnchor = mode === 'FIRST_PERSON'
+                    ? player.getFirstPersonCameraAnchor(this._tmpCamAnchor)
+                    : null;
                 this.renderer.updateCamera(
                     player.index,
                     this._tmpCamRenderPos,
@@ -293,6 +302,27 @@ export class EntityManager {
                 );
             }
         }
+    }
+
+    playLastRoundGhost(clip) {
+        return this._lastRoundGhostSystem?.playClip?.(clip) || false;
+    }
+
+    clearLastRoundGhost() {
+        this._lastRoundGhostSystem?.clear?.();
+    }
+
+    updateLastRoundGhostPlayback(dt) {
+        this._lastRoundGhostSystem?.update?.(dt);
+    }
+
+    getLastRoundGhostState() {
+        return this._lastRoundGhostSystem?.getState?.() || {
+            active: false,
+            frameCount: 0,
+            entryCount: 0,
+            ghosts: [],
+        };
     }
 
     getHumanPlayers() { return this.humanPlayers; }
@@ -332,6 +362,7 @@ export class EntityManager {
         } else {
             this._projectileSystem.clear();
         }
+        this._lastRoundGhostSystem?.clear?.();
         this._overheatGunSystem.reset();
         this._respawnSystem.reset();
         this._huntScoring.reset();
@@ -344,6 +375,9 @@ export class EntityManager {
         this._lockOnCache.clear();
         this.onHuntDamageEvent = null;
         this.onHuntFeedEvent = null;
+        if (disposeProjectileSystem) {
+            this._lastRoundGhostSystem?.dispose?.();
+        }
     }
 }
 

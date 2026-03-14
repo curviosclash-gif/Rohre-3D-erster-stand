@@ -8,6 +8,7 @@ import { BOT_POLICY_TYPES } from './BotPolicyTypes.js';
 export class RuleBasedBotPolicy {
     constructor(options = {}) {
         this.type = BOT_POLICY_TYPES.RULE_BASED;
+        this.sensePhase = 0;
         this._botAI = new BotAI(options);
     }
 
@@ -28,8 +29,10 @@ export class RuleBasedBotPolicy {
     }
 
     setSensePhase(phase) {
+        const normalizedPhase = Number.isFinite(Number(phase)) ? Math.max(0, Math.trunc(Number(phase))) : 0;
+        this.sensePhase = normalizedPhase;
         if (typeof this._botAI.setSensePhase === 'function') {
-            this._botAI.setSensePhase(phase);
+            this._botAI.setSensePhase(normalizedPhase);
         }
     }
 

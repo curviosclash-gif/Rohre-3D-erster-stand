@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import { ArenaBuilder } from './arena/ArenaBuilder.js';
 import { ArenaCollision } from './arena/ArenaCollision.js';
 import { PortalGateSystem } from './arena/PortalGateSystem.js';
+import { loadGLBMap } from './GLBMapLoader.js';
+import { disposeObject3DResources } from '../core/three-disposal.js';
 
 export class Arena {
     constructor(renderer) {
@@ -20,6 +22,9 @@ export class Arena {
         this._mergedFoamMesh = null;
         this._mergedObstacleEdges = null;
         this._mergedFoamEdges = null;
+        this._glbScene = null;
+        this._glbLoadError = null;
+        this._glbLoadWarnings = [];
         this._lastBuildSignature = null;
 
         this._builder = new ArenaBuilder(this);
@@ -27,16 +32,63 @@ export class Arena {
         this._portalGateSystem = new PortalGateSystem(this);
     }
 
+    _clearLoadedGlbScene() {
+        if (!this._glbScene) return;
+        this.renderer.removeFromScene(this._glbScene);
+        disposeObject3DResources(this._glbScene);
+        this._glbScene = null;
+    }
+
     build(mapKey) {
         const buildContext = this._builder.build(mapKey, {
             previousBuildSignature: this._lastBuildSignature,
         });
 
-        if (buildContext.rebuildPolicy !== 'reuse') {
+        if (buildContext.rebuildPolicy === 'reuse') {
+            return buildContext;
+        }
+
+        let usedGlbModel = false;
+        const finalizeBuild = () => {
+            if (!usedGlbModel) {
+                this._builder.geometryPipeline.compileObstacleStage({
+                    obstacleDefs: buildContext.obstacleDefs,
+                    scale: buildContext.scale,
+                });
+            }
+
+            this._builder.geometryPipeline.flushMergeStage(buildContext.materialBundle);
             this._portalGateSystem.build(buildContext.map, buildContext.scale);
             this._builder.compileParticleStage(buildContext.sx, buildContext.sy, buildContext.sz);
             this._lastBuildSignature = buildContext.buildSignature;
+            return {
+                ...buildContext,
+                usedGlbModel,
+                glbLoadError: this._glbLoadError,
+                glbLoadWarnings: [...this._glbLoadWarnings],
+            };
+        };
+
+        if (!buildContext.glbModel) {
+            return finalizeBuild();
         }
+
+        return loadGLBMap(buildContext.glbModel, {
+            loadDelayMs: buildContext.glbLoadDelayMs,
+            sceneName: `glbMap-${this.currentMapKey}`,
+        }).then((glbResult) => {
+            this._glbScene = glbResult.scene;
+            this.renderer.addToScene(this._glbScene);
+            if (Array.isArray(glbResult.colliders) && glbResult.colliders.length > 0) {
+                this.obstacles.push(...glbResult.colliders);
+            }
+            usedGlbModel = true;
+            return finalizeBuild();
+        }).catch((error) => {
+            this._glbLoadError = error?.message || 'Unknown GLB loading error';
+            this._glbLoadWarnings = [`GLB fallback active: ${this._glbLoadError}`];
+            return finalizeBuild();
+        });
     }
 
     toggleBeams(enabled) {

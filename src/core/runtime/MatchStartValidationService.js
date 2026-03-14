@@ -5,6 +5,7 @@
 export function resolveMatchStartValidationIssue({
     settings = {},
     ui = null,
+    multiplayerSessionState = null,
     maps = {},
     huntModeType = 'HUNT',
 } = {}) {
@@ -40,13 +41,36 @@ export function resolveMatchStartValidationIssue({
     }
 
     if (sessionType === 'multiplayer') {
-        const lobbyCode = String(ui?.multiplayerLobbyCodeInput?.value || '').trim();
-        const ready = !!ui?.multiplayerReadyToggle?.checked;
-        if (!lobbyCode && !ready) {
+        const sessionState = multiplayerSessionState && typeof multiplayerSessionState === 'object'
+            ? multiplayerSessionState
+            : null;
+        const lobbyCode = String(sessionState?.lobbyCode || ui?.multiplayerLobbyCodeInput?.value || '').trim();
+        if (!lobbyCode || sessionState?.joined !== true) {
             return {
-                message: 'Start nicht moeglich: Multiplayer-Stub erfordert Lobby-Code oder Ready.',
+                message: 'Start nicht moeglich: Bitte eine echte Lobby hosten oder ihr beitreten.',
                 fieldKey: 'multiplayer',
-                fieldMessage: 'Lobby-Code eintragen oder Ready aktivieren.',
+                fieldMessage: 'Host oder Join ausfuehren, damit eine Lobby verbunden ist.',
+            };
+        }
+        if (sessionState?.isHost !== true) {
+            return {
+                message: 'Start nicht moeglich: Nur der Host darf das Match starten.',
+                fieldKey: 'multiplayer',
+                fieldMessage: 'Auf den Host warten oder selbst hosten.',
+            };
+        }
+        if ((sessionState?.memberCount || 0) < 2) {
+            return {
+                message: 'Start nicht moeglich: Multiplayer benoetigt mindestens zwei Teilnehmer.',
+                fieldKey: 'multiplayer',
+                fieldMessage: 'Einen zweiten Spieler joinen lassen.',
+            };
+        }
+        if (sessionState?.allReady !== true) {
+            return {
+                message: 'Start nicht moeglich: Alle Lobby-Teilnehmer muessen Ready sein.',
+                fieldKey: 'multiplayer',
+                fieldMessage: 'Ready auf allen verbundenen Clients setzen.',
             };
         }
     }

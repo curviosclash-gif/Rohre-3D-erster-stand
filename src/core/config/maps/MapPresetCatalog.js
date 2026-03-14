@@ -2,6 +2,8 @@
 // MapPresets.js - Ausgelagerte Map-Presets
 // ============================================
 
+import { TEST_HANGAR_GLB_DATA_URI } from './EmbeddedGlbMapAssets.js';
+
 export const MAP_PRESET_CATALOG = {
     standard: {
         name: 'Standard Arena',
@@ -27,6 +29,17 @@ export const MAP_PRESET_CATALOG = {
         name: 'Leer',
         size: [50, 25, 50],
         obstacles: [],
+        portals: []
+    },
+    glb_hangar: {
+        name: 'GLB Test Hangar',
+        size: [60, 25, 60],
+        glbModel: TEST_HANGAR_GLB_DATA_URI,
+        glbLoadDelayMs: 140,
+        obstacles: [
+            { pos: [-6, 4, 0], size: [2, 8, 10] },
+            { pos: [6, 4, 0], size: [2, 8, 10], kind: 'foam' },
+        ],
         portals: []
     },
     maze: {

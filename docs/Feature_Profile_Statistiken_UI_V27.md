@@ -84,3 +84,88 @@ V27 erweitert drei Bereiche ohne Contract-Bruch:
   - `#profile-name`, `#btn-profile-save`, `#profile-select`, `#btn-profile-load`, `#btn-profile-delete`
   - `#message-overlay`, `#message-text`, `#message-sub`
 - Erweiterungen fuer 27.1-27.3 erfolgen additiv (neue Controls/Container statt Breaking Rename).
+
+## Phase 27.2 Umsetzung (2026-03-13)
+
+### V8 Post-Match-Statistiken
+
+- Round-End-Overlay additiv erweitert:
+  - neuer Container `#message-stats` unterhalb von `#message-sub`
+  - drei strukturierte Karten fuer `Diese Runde`, `Match bisher` und `Zwischenstand`
+- Neue Aggregationsschicht:
+  - `src/state/PostMatchStatsAggregator.js` verdichtet `RoundRecorder`-Round-/Aggregate-Metriken in den UI-Vertrag `post-match-stats.v1`
+  - Round-/Match-End-Pfad nutzt dieselbe Datenbasis und wechselt nur Titel/Scoreboard je nach `MATCH_END`
+- Runtime-Wiring:
+  - `src/state/RoundEndCoordinator.js` haengt die Stats-Zusammenfassung an den bestehenden Round-End-Plan
+  - `src/ui/MatchUiStateOps.js` fuehrt `overlayStats` additiv im Match-UI-State ein
+  - `src/ui/MatchFlowUiController.js` rendert die Karten dynamisch und laesst Countdown-Updates die Stats nicht ueberschreiben
+- Stabilisierung im Startpfad:
+  - `src/core/GameRuntimeFacade.js`, `src/core/main.js` und `src/ui/MatchFlowUiController.js` unterdruecken beim laufenden Match-Start ein erneutes Prewarm-Scheduling
+  - damit kippt der GLB-Startpfad nicht mehr in das reproduzierte `matchRoot`-/`_floorMesh`-Race aus `T14b`
+
+### Verifikation 27.2
+
+- Neue Core-Regressionen:
+  - `T20kc` prueft Round-End-Overlay mit Round-/Match-/Scoreboard-Karten
+  - `T20kd` prueft Match-End-Overlay mit Endstand und aggregierten Match-Werten
+- Gezielte Laeufe PASS:
+  - `TEST_PORT=5318 PW_RUN_TAG=v27-2-t20kc-r2 PW_OUTPUT_DIR=test-results/v27-2-t20kc-r2 PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test --grep T20kc`
+  - `TEST_PORT=5319 PW_RUN_TAG=v27-2-t20kd-r2 PW_OUTPUT_DIR=test-results/v27-2-t20kd-r2 PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test --grep T20kd`
+  - `TEST_PORT=5315 PW_RUN_TAG=v27-2-t14b-racefix PW_OUTPUT_DIR=test-results/v27-2-t14b-racefix PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test --grep T14b`
+- Mapping-/Gate-Laeufe PASS:
+  - `npm run smoke:roundstate`
+  - `TEST_PORT=5322 PW_RUN_TAG=v27-2-core-r4 PW_OUTPUT_DIR=test-results/v27-2-core-r4 PW_WORKERS=1 npm run test:core` (`81 passed`, `1 skipped`)
+  - `TEST_PORT=5324 PW_RUN_TAG=v27-2-stress PW_OUTPUT_DIR=test-results/v27-2-stress PW_WORKERS=1 npm run test:stress` (`20 passed`)
+  - `npm run build`
+  - `npm run docs:sync`
+- Browser-Spotcheck:
+  - sichtbares Round-End-Overlay mit drei Stats-Karten unter `tmp/develop-web-game-v27-2/post-match-overlay-element.png`
+  - DOM-/Console-Artefakt unter `tmp/develop-web-game-v27-2/post-match-overlay-state.json`
+
+### Offener Folgepfad
+
+- 27.3 bleibt offen:
+  - Developer-Telemetrie zeigt aktuell weiter nur Roh-JSON in `#developer-telemetry-output`
+  - fuer V15 fehlt noch das eigentliche Dashboard fuer Balancing-Auswertung
+
+## Phase 27.3 Umsetzung (2026-03-13)
+
+### V15 Telemetrie-Dashboard fuer iteratives Balancing
+
+- Persistenz erweitert:
+  - `src/ui/menu/MenuTelemetryStore.js` speichert jetzt zusaetzlich `balanceSummary` und `recentRounds`
+  - Round-End-/Match-End-Ereignisse aggregieren Runden, Match-Enden, Human-/Bot-Siege, Dauer, Self-Crashes, Item-Nutzung und Stuck-Events, gruppiert nach Map und Modus
+- Runtime-Wiring:
+  - `src/ui/MatchFlowUiController.js` erzeugt am Round-End einen normierten Balancing-Telemetrie-Payload (`mapKey`, `mode`, Sieger-Typ, Dauer, KPI-Zaehler)
+  - `src/core/GameRuntimeFacade.js` exponiert dafuer explizite Writer `recordRoundEndTelemetry` und `recordMatchEndTelemetry`
+  - `src/core/SettingsManager.js` liefert aus dem Rohzustand ein lesbares Snapshot-Modell mit `balance`, `topMaps`, `topModes` und `recentRounds`
+- Developer-UI:
+  - neues `#developer-telemetry-dashboard` im Experten-/Developer-Menue
+  - neues `src/ui/menu/MenuTelemetryDashboard.js` rendert Karten fuer `Uebersicht`, `Balancing`, `Top Maps`, `Top Modi` sowie `Letzte Runden`
+  - Roh-JSON in `#developer-telemetry-output` bleibt fuer bestehende Tools/Tests erhalten
+
+### Verifikation 27.3
+
+- Neue Core-Regression:
+  - `T20ke` verfolgt eine synthetische Round-End-Runde bis in JSON-Snapshot und Dashboard-Karten des Developer-Menues
+- Gezielte Laeufe PASS:
+  - `TEST_PORT=5327 PW_RUN_TAG=v27-3-target-t20t PW_OUTPUT_DIR=test-results/v27-3-target-t20t PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test --grep T20t`
+  - `TEST_PORT=5328 PW_RUN_TAG=v27-3-target-ke-r2 PW_OUTPUT_DIR=test-results/v27-3-target-ke-r2 PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test --grep T20ke`
+- Vollgate PASS:
+  - `npm run smoke:roundstate`
+  - `TEST_PORT=5332 PW_RUN_TAG=v27-3-core-r2 PW_OUTPUT_DIR=test-results/v27-3-core-r2 PW_WORKERS=1 npm run test:core` (`82 passed`, `1 skipped`)
+  - `TEST_PORT=5333 PW_RUN_TAG=v27-3-stress PW_OUTPUT_DIR=test-results/v27-3-stress PW_WORKERS=1 npm run test:stress` (`20 passed`)
+- Browser-Spotcheck:
+  - Dashboard-Screenshot unter `tmp/develop-web-game-v27-3/telemetry-dashboard.png`
+  - Zustand unter `tmp/develop-web-game-v27-3/telemetry-dashboard-state.json`
+
+## Abschluss-Gate 27.4 (2026-03-13)
+
+- V27 ist damit fachlich geschlossen:
+  - `27.1` Profile-UX
+  - `27.2` Post-Match-Statistiken
+  - `27.3` Balancing-Telemetrie-Dashboard
+- Abschluss-Gates:
+  - `npm run build` PASS
+  - `npm run docs:sync` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
+  - `npm run docs:check` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)

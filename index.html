@@ -262,10 +262,10 @@
                             data-start-section="multiplayer">
                             <summary class="menu-accordion-summary">
                                 <span class="section-title">Lobby & Bereitschaft</span>
-                                <span class="menu-accordion-copy">Session-Code, Host/Join und Ready-Status</span>
+                                <span class="menu-accordion-copy">Session-Code, echte Lobby-Verbindung und Ready-Status</span>
                             </summary>
                             <div class="menu-accordion-body">
-                                <p id="multiplayer-lobby-state" class="menu-hint">Multiplayer-Stub: nicht in Lobby</p>
+                                <p id="multiplayer-lobby-state" class="menu-hint">Lobbystatus: nicht verbunden</p>
                                 <label for="multiplayer-lobby-code">Lobby Code</label>
                                 <input type="text" id="multiplayer-lobby-code" maxlength="32" placeholder="z. B. TEST-1234">
                                 <div class="btn-group secondary-btn-spaced">
@@ -277,7 +277,7 @@
                                     Ready setzen
                                 </label>
                                 <p id="multiplayer-status" class="menu-hint" role="status" aria-live="polite">
-                                    Lobby Stub v1 | Rolle: Host
+                                    Lobby inaktiv | Rolle: nicht verbunden
                                 </p>
                             </div>
                         </details>
@@ -576,6 +576,12 @@
                                     <span class="menu-choice-title" data-menu-text-id="menu.level2.quick_last.label">Letzte Einstellungen starten</span>
                                     <span class="menu-choice-copy">Nimmt Session, Map und Flugzeug aus deinem letzten Start.</span>
                                 </button>
+                                <button type="button" id="btn-quick-event-playlist" class="secondary-btn menu-choice-card"
+                                    data-menu-action="quickstart-event-playlist">
+                                    <span class="menu-choice-eyebrow">Direkt</span>
+                                    <span class="menu-choice-title" data-menu-text-id="menu.level2.quick_event.label">Event-Playlist starten</span>
+                                    <span class="menu-choice-copy">Rotiert ueber vorbereitete Fun-Presets und startet sofort die naechste Runde.</span>
+                                </button>
                                 <button type="button" id="btn-quick-random-map" class="secondary-btn menu-choice-card"
                                     data-menu-action="quickstart-random">
                                     <span class="menu-choice-eyebrow">Direkt</span>
@@ -627,7 +633,7 @@
                         <div class="menu-section">
                             <h2 class="section-title">Weiterleitung</h2>
                             <p class="menu-hint menu-copy-secondary">
-                                Multiplayer liegt im 4-Ebenen-Flow in Ebene 3 (Start-Setup) als Inline-Stub.
+                                Multiplayer liegt im 4-Ebenen-Flow in Ebene 3 (Start-Setup) als echte Lobby-Steuerung.
                             </p>
                             <p class="menu-hint menu-copy-secondary">Bitte Session-Typ `Multiplayer` waehlen und in Ebene 3 fortfahren.</p>
                         </div>
@@ -955,6 +961,7 @@
                         </div>
                         <div class="menu-section">
                             <h2 class="section-title" data-menu-text-id="menu.developer.telemetry.title">Entwicklungs-Telemetrie</h2>
+                            <div id="developer-telemetry-dashboard" class="developer-telemetry-dashboard" aria-live="polite"></div>
                             <pre id="developer-telemetry-output" class="build-info-detail">Keine Telemetrie vorhanden.</pre>
                         </div>
                         <div class="menu-section">
@@ -1135,6 +1142,7 @@
             <div id="message-overlay" class="hidden" role="alert" aria-live="assertive" aria-atomic="true">
                 <div id="message-text"></div>
                 <div id="message-sub"></div>
+                <div id="message-stats" class="hidden" aria-live="polite"></div>
             </div>
             <div id="status-toast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
         </div>

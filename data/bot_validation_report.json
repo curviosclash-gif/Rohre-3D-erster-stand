@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-11",
+  "generatedAt": "2026-03-13",
   "baseUrl": "http://127.0.0.1:4273",
   "roundsPerScenario": 4,
   "scenarios": [
@@ -14,22 +14,22 @@
         "planarMode": false,
         "portalCount": 0,
         "rounds": 10,
-        "expectedPolicyType": "classic-3d"
+        "expectedPolicyType": "rule-based"
       },
       "metrics": {
-        "rounds": 4,
-        "botWinRate": 0.75,
+        "rounds": 5,
+        "botWinRate": 1,
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 24.96402464561652,
+        "averageBotSurvival": 37.23923944702401,
         "stuckPerMinute": 0,
-        "totalDuration": 114.01159999999403
+        "totalDuration": 196.82910000002383
       },
       "runner": {
-        "forcedRounds": 2,
-        "timeoutRounds": 2,
-        "elapsedMs": 116402
+        "forcedRounds": 4,
+        "timeoutRounds": 4,
+        "elapsedMs": 166361
       }
     },
     {
@@ -43,22 +43,22 @@
         "planarMode": true,
         "portalCount": 0,
         "rounds": 10,
-        "expectedPolicyType": "classic-2d"
+        "expectedPolicyType": "rule-based"
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 0.75,
+        "botWinRate": 1,
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 19.208024952984488,
+        "averageBotSurvival": 22.99222493171692,
         "stuckPerMinute": 0,
-        "totalDuration": 97.02479999999701
+        "totalDuration": 108.10670000004768
       },
       "runner": {
         "forcedRounds": 1,
         "timeoutRounds": 1,
-        "elapsedMs": 99523
+        "elapsedMs": 111404
       }
     },
     {
@@ -72,7 +72,7 @@
         "planarMode": true,
         "portalCount": 4,
         "rounds": 10,
-        "expectedPolicyType": "hunt-2d"
+        "expectedPolicyType": "hunt"
       },
       "metrics": {
         "rounds": 4,
@@ -80,14 +80,14 @@
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 26.765250205993652,
+        "averageBotSurvival": 33.277000222771676,
         "stuckPerMinute": 0,
-        "totalDuration": 107.06099999999999
+        "totalDuration": 133.10809999999407
       },
       "runner": {
-        "forcedRounds": 2,
-        "timeoutRounds": 2,
-        "elapsedMs": 110713
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 138425
       }
     },
     {
@@ -101,38 +101,38 @@
         "planarMode": false,
         "portalCount": 6,
         "rounds": 10,
-        "expectedPolicyType": "hunt-3d"
+        "expectedPolicyType": "hunt"
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 1,
+        "botWinRate": 0.75,
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 27.34517526626587,
+        "averageBotSurvival": 32.1675756317145,
         "stuckPerMinute": 0,
-        "totalDuration": 109.38070000000297
+        "totalDuration": 128.67040000000594
       },
       "runner": {
         "forcedRounds": 2,
         "timeoutRounds": 2,
-        "elapsedMs": 111823
+        "elapsedMs": 137070
       }
     }
   ],
   "overall": {
-    "rounds": 16,
-    "botWinRate": 0.875,
+    "rounds": 17,
+    "botWinRate": 0.9411764705882353,
     "stuckEvents": 0,
     "wallHits": 0,
     "trailHits": 0,
-    "averageBotSurvival": 24.570618767715132,
+    "averageBotSurvival": 31.761376492937202,
     "stuckPerMinute": 0,
-    "totalDuration": 427.4780999999941
+    "totalDuration": 566.7143000000715
   },
   "runner": {
-    "forcedRounds": 7,
-    "timeoutRounds": 7,
+    "forcedRounds": 10,
+    "timeoutRounds": 10,
     "failOnForcedRound": false,
     "maxForcedRounds": 9007199254740991
   }

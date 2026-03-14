@@ -54,6 +54,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 | 2026-03-11 | A | V27 | `src/state/training/TrainingGateEvaluator.js`, `src/state/training/TrainingGateThresholds.js`, `src/state/training/TrainingOpsKpiContractV36.js` | V36 KPI-/Gate-Vertrag (Ops-Metriken, Trend-Gate, Play-Eval-Drift) | niedrig |
 | 2026-03-11 | A | V26 | `src/entities/ai/ObservationBridgePolicy.js`, `src/entities/ai/training/WebSocketTrainerBridge.js` | V36 Match-Resume-vor-Action und erweiterte Bridge-Telemetrie/Fallback-Messung | mittel |
 | 2026-03-11 | A | PX V34 | `trainer/session/TrainerSession.mjs`, `trainer/server/TrainerServer.mjs`, `trainer/config/TrainerRuntimeContract.mjs`, `trainer/model/CheckpointValidation.mjs` | V36 Checkpoint-Resume-Haertung (`trainer-checkpoint-load-latest`) und Validierung | mittel |
+| 2026-03-13 | Codex | V27/V28 | `src/ui/menu/EventPlaylistCatalog.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuTextCatalog.js`, `src/ui/MenuController.js`, `src/core/GameBootstrap.js`, `src/core/GameRuntimeFacade.js` | V26.6 benoetigt einen additiven Event-Playlist-Quickstart ueber bestehende Menue-/Runtime-Pfade hinweg | mittel |
 
 ## Schnellindex Offener Arbeit
 
@@ -84,7 +85,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 ## Aktive Workstreams
 
 ### Block V26: Gameplay & Features
-<!-- LOCK: frei -->
+<!-- LOCK: Codex seit 2026-03-14 -->
 <!-- DEPENDS-ON: keine -->
 
 - Scope: `V4`, `V5`, `V9`, `V11`, `V16`
@@ -98,19 +99,35 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
   - [x] 26.1.1 Audio-Signale fuer MG, Raketen und Schild implementieren
   - [x] 26.1.2 VFX-Signale (Partikel/Flashes) bei Treffern ausbauen
   - Status 2026-03-08: Differenzierte Hunt-Feedback-Cues fuer MG, Raketen und Schild aktiv; neue MG-/Trail-/Rocket-/Shield-Partikelprofile sowie Regressionen `T88`/`T89` verifiziert.
-- [ ] 26.2 V5 Hunt-Mode Feintuning
-  - [ ] 26.2.1 TTK und Overheat-Werte basierend auf Testdaten anpassen
-  - [ ] 26.2.2 Respawn- und Pickup-Logik verfeinern
-- [ ] 26.4 V9 Replay/Ghost-System fuer die letzte Runde aufbauen
-- [ ] 26.5 V11 GLB-Map Loader Integration (konsolidiert aus altem Detailplan)
-  - [ ] 26.5.1 `GLTFLoader`/`GLBMapLoader` einfuehren
-  - [ ] 26.5.2 `glbModel` in Map-Definitionen und Schema aufnehmen
-  - [ ] 26.5.3 `Arena.build()` asynchron machen und Fallback-Pfad absichern
-  - [ ] 26.5.4 Beispiel-GLB oder reproduzierbares Test-Asset bereitstellen
-  - [ ] 26.5.5 UI-Integration fuer Map-Auswahl und Ladezustand nachziehen
-  - [ ] 26.5.6 GLB-Loader-Test, Fallback-Test und manuelle Verifikation abschliessen
-- [ ] 26.6 V16 Event-Playlist / Fun-Modes Mechanik testen
-- [ ] 26.8 Abschluss-Gate, Playtest und Doku-Freeze (`docs:sync`, `docs:check`)
+- [x] 26.2 V5 Hunt-Mode Feintuning
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 26.2.1 TTK und Overheat-Werte basierend auf Testdaten anpassen
+  - [x] 26.2.2 Respawn- und Pickup-Logik verfeinern
+  - Status 2026-03-13: Messlauf vor dem Fix zeigte MG-TTK ~`1.09s` ohne Lockout-vor-Kill, Raketen-Uebersampling (`111/200` Spawns) sowie Respawn mit uebernommenem Inventar. Hunt-Balance jetzt ueber MG-Tuning (`damage=7.75`, `overheat=9`, `lockoutThreshold=96`, `lockoutSeconds=0.75`), bereinigten Weighted Pickup-Pool ohne `SLOW_DOWN`/`INVERT`, reduzierte Rocket-Chance (`0.28`) und Respawn-Recovery (`ROCKET_WEAK`, `shieldHP=18`, Combat-State-Reset) gehaertet; Regressionen `T89a` bis `T89c` sowie `test:physics`, `test:core`, `build`, `docs:sync`, `docs:check` gruen.
+- [x] 26.4 V9 Replay/Ghost-System fuer die letzte Runde aufbauen
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 26.4.1 Recorder-Snapshots fuer letzte Runde als Ghost-Clip aufbereiten
+  - [x] 26.4.2 Ghost-Playback im Round-/Match-End verdrahten und Reset-Pfade absichern
+  - Status 2026-03-13: `RoundSnapshotStore` speichert jetzt Position + Quaternion in chronologischer Clip-Form; `RoundRecorder` erfasst Replay-Snapshots standardmaessig auch ohne Debug-Flag und normalisiert extrem kleine Timestamp-Deltas fuer deterministische Captures. `EntityManager` rendert ein leichtes Ghost-Playback waehrend `ROUND_END`/`MATCH_END`, `MatchFlowUiController` raeumt es bei `startRound()`/`returnToMenu()` wieder auf; Regression `T20ba`, `smoke:roundstate`, `test:core`, `test:physics`, `build`, `docs:sync`, `docs:check` sowie Browser-Artefakte `tmp/develop-web-game-v26-4/last-round-ghost-canvas.png` und `tmp/develop-web-game-v26-4/last-round-ghost-state.json` gruen.
+- [x] 26.5 V11 GLB-Map Loader Integration (konsolidiert aus altem Detailplan)
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 26.5.1 `GLTFLoader`/`GLBMapLoader` einfuehren
+  - [x] 26.5.2 `glbModel` in Map-Definitionen und Schema aufnehmen
+  - [x] 26.5.3 `Arena.build()` asynchron machen und Fallback-Pfad absichern
+  - [x] 26.5.4 Beispiel-GLB oder reproduzierbares Test-Asset bereitstellen
+  - [x] 26.5.5 UI-Integration fuer Map-Auswahl und Ladezustand nachziehen
+  - [x] 26.5.6 GLB-Loader-Test, Fallback-Test und manuelle Verifikation abschliessen
+  - Status 2026-03-13: Neuer `GLBMapLoader` laedt GLB/GLTF-Szenen via `GLTFLoader`, extrahiert Collider aus Mesh-Namen (`_nocol`, `_foam`) und verdrahtet einen reproduzierbaren `glb_hangar`-Preset mit eingebettetem Test-Asset. `Arena.build()` unterstuetzt jetzt einen hybriden Startpfad: GLB-Maps laden asynchron mit Box-Fallback + Warn-Telemetrie, bestehende Non-GLB-Matches bleiben fuer alte Runtime-/Physics-Pfade synchron; der Prewarm-/Match-Start ist gegen gleichzeitige Builds serialisiert. Map-Schema, Runtime-Migration und Preview-UI tragen `glbModel`, die Map-Auswahl zeigt GLB-Badges, `MatchFlowUiController` blendet fuer GLB-Matches ein Ladeoverlay ein und zeigt Fallback-Warnungen nach dem Start als Toast. Regressionen `T14b`, `T14c`, `T20ba`, `test:core`, `test:physics`, `test:stress`, `smoke:roundstate`, `build`, `docs:sync`, `docs:check` sind gruen; visuelle/State-Artefakte liegen unter `tmp/develop-web-game-v26-5/glb-preview-card.png`, `tmp/develop-web-game-v26-5/glb-hangar-state.json`, `tmp/develop-web-game-v26-5/glb-fallback-state.json`, `tmp/develop-web-game-v26-5/console.json`.
+- [x] 26.6 V16 Event-Playlist / Fun-Modes Mechanik testen
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 26.6.1 Playlist-Katalog auf bestehende Fun-/Fixed-Presets aufsetzen und Zustand persistieren
+  - [x] 26.6.2 Quickstart-/Menuepfad fuer Event-Playlist verdrahten und per Core-/Stress-Test absichern
+  - Status 2026-03-13: Neuer `EventPlaylistCatalog` setzt additiv auf den vorhandenen Fixed-Presets `arcade`, `chaos` und `competitive` auf und persistiert den Rotationszustand in `settings.localSettings.eventPlaylistState` (`activePlaylistId`, `nextIndex`, `lastPresetId`). Level 2 erhaelt mit `btn-quick-event-playlist` einen direkten Event-Quickstart; `MenuController`, `MenuGameplayBindings`, `GameBootstrap` und `GameRuntimeFacade` verdrahten den neuen Event-Typ, wenden das naechste Preset deterministisch an, speichern den Cursor nach erfolgreichem Start sofort in `cuviosclash.settings.v1`, emitten Quickstart-Telemetrie (`variant=event_playlist`) und zeigen einen Fortschritts-Toast `Event-Playlist: <Preset> (n/3)`. Regressionen `T20bb`, `T20bc` und `T77b` sowie Vollsuiten `test:core` und `test:stress` sind gruen; visuelle Artefakte liegen unter `tmp/develop-web-game-v26-6/event-playlist-level2.png` und `tmp/develop-web-game-v26-6/event-playlist-state.json`.
+- [x] 26.8 Abschluss-Gate, Playtest und Doku-Freeze (`docs:sync`, `docs:check`)
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 26.8.1 Vollverifikation fuer V26-Restumfang (`test:core`, `test:stress`, `build`) abschliessen
+  - [x] 26.8.2 Browser-Spotcheck, Doku-Sync und Doku-Check einfrieren
+  - Status 2026-03-13: Abschluss-Gate fuer V26 ist geschlossen. `npm run docs:sync` und `npm run docs:check` liefen ohne Aktualisierungsbedarf (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`), `npm run build` ist gruen und der Browser-Spotcheck bestaetigt den neuen Event-Playlist-Button sichtbar in Ebene 2. Vollverifikation: `TEST_PORT=5303 PW_RUN_TAG=v26-6-core-r2 PW_OUTPUT_DIR=test-results/v26-6-core-r2 PW_WORKERS=1 npm run test:core` PASS (`79 passed`, `1 skipped`) und `TEST_PORT=5304 PW_RUN_TAG=v26-6-stress PW_OUTPUT_DIR=test-results/v26-6-stress PW_WORKERS=1 npm run test:stress` PASS (`20 passed`); ein frueher `test:core`-Lauf scheiterte einmalig in `T14b` auf dem bestehenden GLB-Pfad, isolierter Re-Run und Voll-Rerun waren anschliessend gruen.
 
 ### Block V27: Profile, Statistiken & UI
 <!-- LOCK: frei -->
@@ -134,11 +151,29 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
     - Visuelle und technische Verifikation erfolgt ueber `tests/core.spec.js` (`T20ka`), `test:core`, `test:stress`, `build` sowie Browser-Screenshots.
   - [x] 27.1.1 Duplizieren und Import/Export-Funktion
   - [x] 27.1.2 Standardprofil-Markierung ergaenzen
-- [ ] 27.2 V8 Post-Match-Statistiken
-  - [ ] 27.2.1 Datenaggregator fuer Round/Match-Stats ausbauen
-  - [ ] 27.2.2 UI-Overlay fuer vertiefte Statistiken am Rundenende
-- [ ] 27.3 V15 Telemetrie-Dashboard fuer iteratives Balancing
-- [ ] 27.4 Abschluss-Gate, UI-Verifikation und Doku-Freeze (`docs:sync`, `docs:check`)
+- [x] 27.2 V8 Post-Match-Statistiken
+  - Abgeschlossen am: `2026-03-13`
+  - Status 2026-03-13:
+    - `RoundRecorder`-Metriken werden ueber `PostMatchStatsAggregator` in einen additiven UI-Vertrag `post-match-stats.v1` ueberfuehrt und im bestehenden Round-/Match-End-Overlay als drei Karten (`Diese Runde`, `Match bisher`, `Zwischenstand`) unter `#message-stats` gerendert.
+    - `RoundEndCoordinator`, `MatchUiStateOps` und `MatchFlowUiController` verdrahten die Stats ohne Contract-Bruch; Countdown-Ticks behalten die Karten sichtbar und Match-Ende schaltet Titel/Scoreboard deterministisch auf Finalzustand um.
+    - Beim Vollgate gefundene GLB-Start-Race beseitigt: `applySettingsToRuntime({ schedulePrewarm: false })` unterdrueckt waehrend `startMatch()` ein konkurrierendes Prewarm-Reschedule, damit `T14b` den `matchRoot` stabil behaelt.
+    - Regressionen `T20kc` und `T20kd`, `smoke:roundstate`, `test:core`, `test:stress` sowie `build` sind gruen; visueller Spotcheck liegt unter `tmp/develop-web-game-v27-2/post-match-overlay-element.png` und `tmp/develop-web-game-v27-2/post-match-overlay-state.json`.
+  - [x] 27.2.1 Datenaggregator fuer Round/Match-Stats ausbauen
+  - [x] 27.2.2 UI-Overlay fuer vertiefte Statistiken am Rundenende
+- [x] 27.3 V15 Telemetrie-Dashboard fuer iteratives Balancing
+  - Abgeschlossen am: `2026-03-13`
+  - Status 2026-03-13:
+    - `MenuTelemetryStore` persistiert jetzt neben Menue-Events auch Round-/Match-Balancingdaten (`balanceSummary`, `recentRounds`) inklusive Aggregationen je Map und Modus.
+    - `MatchFlowUiController` emitttiert normierte Round-End-/Match-End-Payloads in die bestehende Telemetrie-Pipeline; `SettingsManager` leitet daraus lesbare Snapshot-Bloecke `balance`, `topMaps`, `topModes` und `recentRounds` fuer das Developer-Menue ab.
+    - Das Developer-Menue rendert ueber `#developer-telemetry-dashboard` nun ein echtes Dashboard mit Karten fuer Uebersicht, Balancing, Top Maps, Top Modi und Letzte Runden; das bisherige Roh-JSON in `#developer-telemetry-output` bleibt erhalten.
+    - Neue Core-Regression `T20ke` sowie bestehender Telemetriepfad `T20t` sind gruen; visueller Spotcheck liegt unter `tmp/develop-web-game-v27-3/telemetry-dashboard.png` und `tmp/develop-web-game-v27-3/telemetry-dashboard-state.json`.
+- [x] 27.4 Abschluss-Gate, UI-Verifikation und Doku-Freeze (`docs:sync`, `docs:check`)
+  - Abgeschlossen am: `2026-03-13`
+  - Status 2026-03-13:
+    - V27 ist als Block geschlossen: `27.1`, `27.2` und `27.3` sind voll verifiziert.
+    - Vollverifikation: `npm run smoke:roundstate` PASS, `TEST_PORT=5332 PW_RUN_TAG=v27-3-core-r2 PW_OUTPUT_DIR=test-results/v27-3-core-r2 PW_WORKERS=1 npm run test:core` PASS (`82 passed`, `1 skipped`) und `TEST_PORT=5333 PW_RUN_TAG=v27-3-stress PW_OUTPUT_DIR=test-results/v27-3-stress PW_WORKERS=1 npm run test:stress` PASS (`20 passed`).
+    - UI-Spotchecks bestaetigen sowohl das neue Round-End-Stats-Overlay (`tmp/develop-web-game-v27-2/post-match-overlay-element.png`) als auch das Telemetrie-Dashboard (`tmp/develop-web-game-v27-3/telemetry-dashboard.png`).
+    - Abschluss-Gates gruen: `npm run build` PASS sowie `npm run docs:sync`/`npm run docs:check` jeweils mit `updated=0`, `missing=0`, `legacy=0`, `mojibake=0`.
 
 ### Block V28: Architektur & Performance
 <!-- LOCK: frei -->
@@ -159,10 +194,15 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
   - [x] 28.2.2 Sensing/Probing-Logik fuer kuenftiges ML-Training abstrahieren
   - Abgeschlossen am: `2026-03-08`
   - Status 2026-03-08: Bots erhalten eine explizite `BotView`-Seam ueber die gemeinsame View-Fabrik; Sensorik und probe-/ML-nahe Runtime bleiben ueber `BotSensorsFacade`, `BotRuntimeContextFactory` und Observation-Reuse entkoppelt. V28-Regressionen `T28b` und `T28b2` gruen.
-- [ ] 28.3 V13 Performance-Hotspot `maze` (Draw-Calls / Batching optimieren)
-  - Status 2026-03-08: Reproduzierbarer Blocker vor Abschluss von V28: `npm run test:v28:regression -- -g "T28c"` scheitert auf `maze` mit `drawCallsAverage=55.8` bei Budget `<=35`; naechster Lane-Schritt bleibt die Batching-/Draw-Call-Analyse in `28.3`.
-- [ ] 28.4 Abschluss-Gate, Performance-Metrics pruefen und Doku-Freeze (`docs:sync`, `docs:check`)
-  - Status 2026-03-08: 28.0 abgeschlossen (`benchmark:baseline` erneuert, neuer Harness `npm run test:v28:regression`; Referenzen `data/performance_ki_baseline_report.json` und `docs/Testergebnisse_2026-03-08.md`).
+- [x] 28.3 V13 Performance-Hotspot `maze` (Draw-Calls / Batching optimieren)
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 28.3.1 `T28c` fuer den `maze`-Pfad wieder unter die aktuelle Huelle ziehen
+  - [x] 28.3.2 `maze`-Metriken im aktuellen Regression-/Baseline-Harness bestaetigen
+  - Status 2026-03-13: `TEST_PORT=5340 PW_RUN_TAG=plan-v28 PW_OUTPUT_DIR=test-results/plan-v28 PW_WORKERS=1 npm run test:v28:regression -- --workers=1` bestaetigt den eigentlichen Hotspot `T28c` wieder gruen; im selben Lauf blieb nur `T28a` einmalig am 30s-Testtimeout haengen, ohne den `maze`-Pfad zu beruehren. Der aktualisierte Baseline-Report (`BOT_BASELINE_PORT=4275 npm run benchmark:baseline`) misst fuer `V2 (maze)` `fpsAverage=55.17`, `drawCallsAverage=20.00`, `drawCallsMax=20`.
+- [x] 28.4 Abschluss-Gate, Performance-Metrics pruefen und Doku-Freeze (`docs:sync`, `docs:check`)
+  - [x] 28.4.1 Repo-Gates (`docs:sync`, `docs:check`, `build`) auf aktuellem Stand bestaetigen
+  - [x] 28.4.2 Vollbenchmark wieder auf das historische 28.5-Performance-Niveau ziehen
+  - Status 2026-03-13: Das verbleibende V28-Delta war kein neuer `maze`-Draw-Call-Regressionspfad, sondern ein Jitter-/Render-Stall im Vollbenchmark. `scripts/perf-jitter-matrix.mjs` trennt die interaktive Messung jetzt sauber von Recording-Gap-Probes; zusaetzlich vermeiden idempotente Quality-/Shadow-Setter in `src/core/renderer/RenderQualityController.js` unnoetige Material-Recompiles im Benchmark-Setup. Finales Gate: `PERF_RUCKLER_PORT=5353 npm run benchmark:jitter` PASS (`tmp/perf_jitter_matrix_1773422511548.json`, `worstInteractiveP95=16.10ms`, `interactiveAggregateP99=17.10ms`, `worstRecordingGapMs=55.556ms`, `benchmarkPass=true`), dazu `npm run test:core` PASS (`82 passed`, `1 skipped`), `npm run test:gpu` PASS (`17 passed`), `npm run test:physics` PASS (`57 passed`) und `npm run build` PASS.
 - [x] 28.5 Performance-Offensive Maximalpfad (CPU/GPU/Startup ohne Feature-Verlust)
   - [x] 28.5.0 Baseline-Refresh und Feature-Parity-Harness
   - [x] 28.5.1 Render-Resource-Cache und Portal-/Gate-Instancing
@@ -204,6 +244,21 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
   - Offene Befunde 2026-03-07: `Profil speichern` bleibt nach Eingabe deaktiviert; `Build-Info kopieren` hat kein Runtime-Binding.
 - [ ] T2 Bundle-Groesse weiter optimieren
   - Ziel: Code-Splitting und Ladepfade nur dann vertiefen, wenn der Nutzen messbar bleibt.
+- [ ] N4 Object-Pooling fuer Partikel & Projektile
+  - Ziel: Garbage Collection (GC) Spikes reduzieren durch Ringpuffer-Wiederverwendung von Partikeln und Geschossen (MG, Raketen, Schilde).
+  - Zielpfade: `src/entities/**`, Render-Effekte.
+- [ ] N5 Delta-Kompression fuer Replay-System
+  - Ziel: Speicherbedarf des `RoundSnapshotStore` signifikant senken, Basis fuer laengere Matches.
+  - Zielpfade: `src/core/RoundSnapshotStore.js`, `src/core/RoundRecorder.js`.
+- [ ] N6 Determinismus & Rollback-Vorstufen (State-Snapshots)
+  - Ziel: Trennung von Render/Sim-Alpha nutzen, um voll-reproduzierbare Frame-Snapshots fuer kuenftigen Multiplayer (GGPO-Style) bereitzustellen.
+  - Zielpfade: `src/core/GameLoop.js`, `src/core/PlayingStateSystem.js`.
+- [ ] N7 Persistente Telemetrie-Historie (IndexedDB)
+  - Ziel: Balancing-Daten im Telemetrie-Dashboard ueber Browser-Sessions hinweg vergleichen.
+  - Zielpfade: `src/state/MenuTelemetryStore.js`, lokaler Storage-Adapter.
+- [ ] N8 Bot-Dynamikprofile als UI-Gegnerklassen
+  - Ziel: Die in V35 abstrahierten `controlProfileId`s als waehlbare "Gegner-Typen" (aggressiv, wendig, traeg) ins UI heben.
+  - Zielpfade: `src/ui/menu/**`, `src/state/**`.
 
 ## Plan-Eingang (append-only)
 
@@ -287,12 +342,13 @@ Template:
   - Konfliktregel: Keine Eingriffe in V31-Kerndateien (`RuntimeConfig`, `BotPolicyTypes`, `BotPolicyRegistry`, `EntitySetupOps`, `MatchSessionFactory`); additive Trainingslane
   - Status 2026-03-11: Trainingsumgebung additiv abgeschlossen; Trainings-Smokes und `T90-T93` gruen.
   - Verifikation: `npx playwright test tests/training-environment.spec.js --workers=1`, `node scripts/training-smoke.mjs`, `node scripts/training-eval-smoke.mjs`.
-- [ ] PX Bot-Training-Automatisierung V33 (Bot A)
+- [x] PX Bot-Training-Automatisierung V33 (Bot A)
   - Erstellt am: `2026-03-11`
   - Agent: `A`
   - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
   - Datei-Scope: `src/entities/ai/training/**` (Automation-Core), `scripts/training-run.mjs`, optionale Orchestrierungsanteile fuer `training:e2e`, `tests/**`, `docs/**`
   - Konfliktregel: Kein Eingriff in UI-Lane (`index.html`, `src/ui/menu/**`) und keine Gate-/Eval-Skripte von Bot B; Cross-Lane-Aenderungen im Conflict-Log dokumentieren
+  - Status 2026-03-13: A-Lane inklusive gemeinsamem `33.9`-Gate abgeschlossen; `npm run training:e2e`, `npx playwright test tests/training-environment.spec.js --workers=1`, `npm run test:core`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind gruen.
 - [x] PX Menu Entschlackung V27b
   - Erstellt am: `2026-03-11`
   - Agent: `A`
@@ -309,20 +365,20 @@ Template:
   - Konfliktregel: Kein Eingriff in UI- und Dev-Panel-Dateien von Bot C; `package.json` nur in dieser Lane anfassen
   - Status 2026-03-11: Eval/Gate-Lane mit KPI-Gate, Exit-Code, Bridge-Retry/Timeout/Fallback-Telemetrie und `training:e2e`-Scriptverdrahtung abgeschlossen.
   - Verifikation: `npm run training:run`, `npm run training:eval`, `npm run training:gate`, `npm run training:e2e`, `npx playwright test tests/training-automation.spec.js --workers=1`, `npx playwright test tests/physics-policy.spec.js -g "T80:" --workers=1`, `npx playwright test tests/training-environment.spec.js -g "T93:" --workers=1`, `npm run docs:sync`, `npm run docs:check`, `npm run build`.
-- [ ] PX Bot-Training-Automatisierung V33 (Bot C)
+- [x] PX Bot-Training-Automatisierung V33 (Bot C)
   - Erstellt am: `2026-03-11`
   - Agent: `C`
   - Plan-Datei: `docs/Feature_Bot_Training_Automatisierung_V33.md`
   - Datei-Scope: `index.html`, `src/core/GameBootstrap.js`, `src/ui/menu/**`, `src/core/runtime/MenuRuntimeDeveloperTrainingService.js`, `src/core/GameRuntimeFacade.js`, `src/core/GameDebugApi.js`, `tests/**`, `docs/**`
   - Konfliktregel: Kein Eingriff in `scripts/training-eval.mjs`/`scripts/training-gate.mjs`/`package.json` (Bot B) und keine Core-Automationmodule von Bot A
-  - Status 2026-03-11: 33.4/33.5 (C-Anteil) umgesetzt (`Run Batch/Eval/Gate` UI + Payload + Runtime-Service + `T96-T98`); offene Abschlussabhaengigkeit fuer 33.9 bleibt `training:e2e` aus A/B-Lane.
-  - Verifikation 2026-03-11: `npx playwright test tests/training-environment.spec.js -g "T96:|T97:|T98:" --workers=1` PASS; `npm run test:core` und `npm run test:stress` im Sammellauf mit fruehen Timeout-Flakes (`T7/T8`, `T61`) rot, isolierte Re-Runs (`T7`, `T61`) PASS; `npm run docs:sync` PASS; `npm run docs:check` PASS; `npm run build` PASS.
-- [ ] PX Bot-Training DeepLearning Server V34
+  - Status 2026-03-13: 33.4/33.5 plus gemeinsames `33.9`-Gate sind abgeschlossen; `npx playwright test tests/training-environment.spec.js --workers=1`, `npm run training:e2e`, `npm run test:core`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind gruen.
+- [x] PX Bot-Training DeepLearning Server V34
   - Erstellt am: `2026-03-11`
   - Agent: `A`
   - Plan-Datei: `docs/Feature_Bot_Training_DeepLearning_Server_V34.md`
   - Datei-Scope: `scripts/trainer-server.mjs`, neues `trainer/**`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `scripts/training-run.mjs`, `tests/**`, `docs/**`
   - Konfliktregel: Kein UI-Umbau (`index.html`, `src/ui/menu/**`), Bridge-/Training-Scope strikt halten und Shared-Pfade append-only pflegen
+  - Status 2026-03-13: Detailplan V34 ist geschlossen; `node --test tests/trainer-v34-*.test.mjs`, `npm run training:e2e`, `npm run test:core`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind gruen.
 - [x] PX Menu Expertenlogin und Textreduktion V27c
   - Erstellt am: `2026-03-11`
   - Agent: `A`
@@ -331,7 +387,7 @@ Template:
   - Konfliktregel: Developer-/Training-IDs, Events und Owner-Policies aus V33 nicht brechen; Expertenlogin nur als additive Gate-Schicht einfuehren
   - Status 2026-03-11: Expertenlogin mit festem Passwort `1307` als lokales Session-Gate umgesetzt; Build-Info, Developer und Debug in den Expertenpfad verlagert; Logout und Reload sperren den Bereich erneut.
   - Verifikation 2026-03-11: `npm run test:core` PASS, `npm run test:stress` PASS, `npx playwright test tests/training-environment.spec.js` PASS, Experten-Screenshots `menu-v27-expert-unlocked-desktop.png`, `menu-v27-expert-mobile.png`.
-- [/] PX Steuerungsfluss Input-Rampen + Render-Interpolation V35 (bot-robust)
+- [x] PX Steuerungsfluss Input-Rampen + Render-Interpolation V35 (bot-robust)
   - Erstellt am: `2026-03-11`
   - Agent: `A+B` (optional Integrator fuer `35.9`)
   - Plan-Datei: `docs/Umsetzungsplan.md` (Intake-Block, Parallel-Lanes `35.1` bis `35.4`)
@@ -355,20 +411,46 @@ Template:
     - <!-- SUB-LOCK: Bot-B -->
     - [x] 35.4.1 Optionalen Action-Adapter fuer dynamik-invariante Steuerung einfuehren (z. B. gewuenschte Winkelrate -> diskrete Flags), standardmaessig feature-flag-gesteuert
     - [x] 35.4.2 Gate-Regel festziehen: Bot-Rampen nur aktiv bei passendem `controlProfileId` (oder Multi-Profile-Training), sonst Legacy-Pfad beibehalten
-  - [/] 35.9 Abschluss-Gate
-    - [/] 35.9.1 Verifikation je Lane: `npm run test:physics` (Lane A) sowie `npm run test:core` + `npx playwright test tests/training-environment.spec.js` + `npm run training:e2e` (Lane B)
+  - [x] 35.9 Abschluss-Gate
+    - [x] 35.9.1 Verifikation je Lane: `npm run test:physics` (Lane A) sowie `npm run test:core` + `npx playwright test tests/training-environment.spec.js` + `npm run training:e2e` (Lane B)
     - [x] 35.9.2 Vergleichbarkeit absichern: Bot-Validation vor/nach Profilwechsel dokumentieren (`npm run bot:validate`) und nur ohne KPI-Regression freigeben
     - [x] 35.9.3 Dokumentationsabschluss: `npm run docs:sync`, `npm run docs:check`, danach Lock-Rueckgabe auf `<!-- LOCK: frei -->` bestaetigen
   - Status 2026-03-11: 35.1 bis 35.4 umgesetzt (Input-Rampen inkl. Bot-Legacy-Guard, Render-Interpolation inkl. Spawn/Bounce-Reset und Teleport-Discontinuity-Reset, normalisierter BotRuntimeContext mit `controlProfileId`, dynamik-invarianter Action-Adapter mit Profil-Gate).
-  - Gate-Status 2026-03-11: `npm run test:core` PASS, `npx playwright test tests/training-environment.spec.js` PASS, `npm run training:e2e` PASS, `npm run bot:validate` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS, `npm run test:physics` FAIL (Timeout-/Stabilitaetskaskade im Multi-Worker-Physics-Lauf; siehe Test-Artefakte unter `test-results/**`).
-- [/] PX Bot-Training Produktivbetrieb und Automatisierung V36
+  - Gate-Status 2026-03-13: `TEST_PORT=5342 PW_RUN_TAG=plan-physics PW_OUTPUT_DIR=test-results/plan-physics PW_WORKERS=1 npm run test:physics` PASS (`57 passed`), `TEST_PORT=5341 PW_RUN_TAG=plan-core PW_OUTPUT_DIR=test-results/plan-core PW_WORKERS=1 npm run test:core` PASS (`82 passed`, `1 skipped`), `TEST_PORT=5343 PW_RUN_TAG=plan-training-ui PW_OUTPUT_DIR=test-results/plan-training-ui PW_WORKERS=1 npx playwright test tests/training-environment.spec.js --workers=1` PASS (`10 passed`), `npm run training:e2e` PASS (`stamp=20260313T124557Z`), `npm run bot:validate` PASS (`forcedRounds=10/17`), `npm run docs:sync` PASS und `npm run docs:check` PASS.
+- [x] PX Bot-Training Produktivbetrieb und Automatisierung V36
   - Erstellt am: `2026-03-11`
   - Agent: `A`
   - Plan-Datei: `docs/Feature_Bot_Training_Produktivbetrieb_Automatisierung_V36.md`
   - Datei-Scope: `scripts/**`, `trainer/**`, `src/entities/ai/training/**`, `src/core/**`, `src/state/training/**`, `tests/**`, `docs/**`
   - Konfliktregel: Kein UI-Redesign in normalen Menuepfaden; Bridge/Trainer/Automation zuerst in shared+training-Pfaden halten. Cross-Block-Aenderungen in `src/core/**` oder `src/state/**` vor Commit im Conflict-Log eintragen.
-  - Status 2026-03-11: Phasen `36.0` bis `36.7` abgeschlossen (`[x]`), `36.9` mit offenem Core-Blocker (`T7`) auf `[/]`.
-  - Verifikation 2026-03-11: `training:loop` PASS (`series 20260311T222457Z`), `training:e2e` PASS (`20260311T220754Z`), `node --test tests/trainer-v34-*.test.mjs` PASS, `training-environment` PASS, `docs:sync` PASS, `docs:check` PASS, `build` PASS, `test:core` FAIL (`T7`, isolierte Re-Runs ebenfalls FAIL).
+  - Status 2026-03-13: Phasen `36.0` bis `36.9` abgeschlossen (`[x]`); der historische Core-Blocker `T7` ist auf dem aktuellen Stand nicht mehr reproduzierbar.
+  - Verifikation 2026-03-13: `node scripts/training-loop.mjs --runs 2 --episodes 2 --seeds 11 --modes hunt-2d --bridge-mode bridge --resume-checkpoint latest --resume-strict false --with-trainer-server true --stop-on-fail true` PASS (`series 20260313T124626Z`), `npm run training:e2e` PASS (`20260313T124557Z`), `node --test tests/trainer-v34-*.test.mjs` PASS, `npx playwright test tests/training-environment.spec.js --workers=1` PASS, `npm run test:core` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS und `npm run build` PASS.
+- [x] PX Performance-Restrisiken & Jitter-Stabilisierung V37
+  - Erstellt am: `2026-03-13`
+  - Agent: `A`
+  - Plan-Datei: `docs/Feature_Performance_Restrisiken_V37.md`
+  - Datei-Scope: `src/core/**`, `src/entities/**`, `tests/core.spec.js`, `docs/**`
+  - Konfliktregel: Nur Performance-Hotpaths bearbeiten, keine funktionale Logik aendern. Start-Latenzen (T7) zuerst angehen.
+  - Status 2026-03-13: Phasen `37.1` bis `37.9` abgeschlossen (`[x]`). Der finale Jitter-Matrixlauf `tmp/perf_jitter_matrix_1773422511548.json` ist gruen (`interactiveAggregateP99=17.10ms`, `worstRecordingGapMs=55.556ms`, `benchmarkPass=true`), `npm run test:core` laeuft stabil ohne T7-Timeout durch, und `npm run test:gpu` sowie `npm run test:physics` sind PASS. Browser-Spotchecks bestaetigen Menue -> Setup -> Match-Transition unter `tmp/develop-web-game-v37-menu/shot-0.png`, `tmp/develop-web-game-v37-level2/shot-0.png` und `tmp/develop-web-game-v37-play2/shot-0.png`; ein abgeschnittener Three.js-Bounding-Warnhinweis trat nur im Skill-Client mit synthetischem Quickstart auf und liess sich im aequivalenten direkten Playwright-Selektorpfad nicht reproduzieren.
+- [/] PX Architektur-Verbesserung & Prävention V38
+  - Erstellt am: `2026-03-13`
+  - Agent: `Codex`
+  - Plan-Datei: `docs/Feature_Architektur_Massnahmenplan_V38.md`
+  - Datei-Scope: `src/core/main.js`, `src/ui/UIManager.js`, `package.json`, `.eslint*`, `tsconfig.json`
+  - Konfliktregel: Tooling-Updates (ESLint, TS-Check) separat von funktionalen Anpassungen durchführen. "God Object"-Splits nur nach Absprache/Sicherung der Tests.
+  - [x] 38.1 Tooling-Grails fuer Dateigroesse und JS-Vertraege
+    - [x] 38.1.1 `eslint.config.js` mit `max-lines`-Guard und additiven Legacy-Ceilings fuer bestehende Grossdateien einfuehren
+    - [x] 38.1.2 `tsconfig.json` + `npm run typecheck:architecture` fuer neue Bootstrap-Helfer mit `tsc --checkJs` aufbauen
+  - [x] 38.2 `main.js` entlasten
+    - [x] 38.2.1 Runtime-Error-Overlay und DOM-Bootstrap nach `src/core/RuntimeErrorOverlay.js` und `src/core/AppInitializer.js` auslagern
+    - [x] 38.2.2 Playtest-URL-Parsing nach `src/core/PlaytestLaunchParams.js` verschieben
+  - [ ] 38.3 `UIManager.js` modularisieren
+    - [ ] 38.3.1 Start-/Preview-/Summary-Sync in dedizierte Controller/Ops extrahieren
+    - [ ] 38.3.2 Navigation-/Access-/Dispose-Lifecycle in dedizierte Controller ueberfuehren
+  - [ ] 38.9 Abschluss-Gate
+    - [ ] 38.9.1 `npm run architecture:guard` und `npm run test:core` gruen bestaetigen
+    - [ ] 38.9.2 `npm run build`, `npm run docs:sync` und `npm run docs:check` gruen bestaetigen
+  - Status 2026-03-14: Erste Praeventionsstufe umgesetzt. `main.js` ist um Bootstrap-/Error-/Playtest-Helfer entlastet, `prebuild` fuehrt jetzt einen additiven Architektur-Guard aus ESLint-`max-lines` plus inkrementellem `tsc --checkJs` aus; der verbleibende offene Rest ist die eigentliche Modularisierung von `UIManager.js`.
 <!-- PLAN-INTAKE-END -->
 
 ## Archivierte Referenzen
@@ -477,4 +559,23 @@ Vor Task-Abschluss immer:
   - `npm run docs:sync` PASS.
   - `npm run docs:check` PASS.
   - `npm run build` PASS.
+
+### 2026-03-13 - V35/V36 Performance-Follow-up (`Phase 5`, `Phase 6`, `Phase 8`, `Phase 9`)
+
+- Scope umgesetzt:
+  - gemeinsamer Kamera-Timing-Pfad fuer `GameLoop` -> `PlayingStateSystem` -> `CameraRigSystem` inkl. Fokus-/Visibility-Reset
+  - Recorder-Backpressure mit aggressiveren Load-Levels, Backlog-Trim und normalisierten Export-Zeitstempeln
+  - Playwright-/Benchmark-Wrapper mit lokalem Start-Lock und erzwungener Run-Isolation (`TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR`, `PW_WORKERS=1`)
+  - Jitter-Matrix-Runner mit eindeutig benannten Referenzclips fuer Phase 9
+- Gate-Ergebnisse:
+  - `npm run build` PASS
+  - `npm run test:core` FAIL (`T7: Spiel startet - HUD sichtbar`, isolierter Re-Run ebenfalls FAIL)
+  - `npx playwright test tests/core.spec.js -g "T10e:" --workers=1` PASS
+  - `npm run test:physics` PASS
+  - `npm run test:gpu` PASS
+  - `npm run benchmark:jitter` FAIL auf den Acceptance-Zielen (`worstP95=183.30ms`, `worstP99=366.60ms`, `recordingGapViolations=8`, `periodicSpikeRuns=0`)
+- Artefakte:
+  - Report: `docs/Testergebnisse_2026-03-13_V35V36_Phase5_9.md`
+  - Matrix: `tmp/perf_jitter_matrix_v35v36_phase9_final_20260312.json`
+  - Referenzclips: `videos/aero-arena-*-phase9-*.webm`
 

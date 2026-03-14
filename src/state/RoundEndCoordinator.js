@@ -3,6 +3,7 @@
 // ============================================
 
 import { deriveRoundEndOverlayUiState } from '../ui/MatchUiStateOps.js';
+import { buildPostMatchStatsSummary } from './PostMatchStatsAggregator.js';
 
 function getSafeLogger(logger) {
     return logger && typeof logger.log === 'function' ? logger : console;
@@ -46,10 +47,11 @@ export function deriveOnRoundEndCoordinatorPlan({ roundStateController, players,
     return roundStateController.deriveOnRoundEndPlan(players, buildRoundEndControllerInputs(inputs));
 }
 
-export function deriveRoundEndCoordinatorUiState(plan = {}) {
+export function deriveRoundEndCoordinatorUiState(plan = {}, statsSummary = null) {
     return deriveRoundEndOverlayUiState({
         messageText: plan?.transition?.overlayMessageText || '',
         messageSub: plan?.transition?.overlayMessageSub || '',
+        overlayStats: statsSummary,
     });
 }
 
@@ -77,12 +79,18 @@ export function coordinateRoundEnd({
         players,
         inputs: { winner, humanPlayerCount, totalBots, winsNeeded },
     });
-    const uiState = deriveRoundEndCoordinatorUiState(plan);
+    const statsSummary = buildPostMatchStatsSummary({
+        recorder,
+        players,
+        outcome: plan?.outcome,
+    });
+    const uiState = deriveRoundEndCoordinatorUiState(plan, statsSummary);
     const effectsPlan = deriveRoundEndCoordinatorEffectsPlan();
     return {
         recording,
         score,
         effectsPlan,
+        statsSummary,
         uiState,
         ...plan,
     };

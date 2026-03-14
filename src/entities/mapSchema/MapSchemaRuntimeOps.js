@@ -88,9 +88,9 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
             ],
             obstacles,
             portals,
+            glbModel: typeof normalized.glbModel === 'string' ? normalized.glbModel : undefined,
         },
         warnings,
         mapDocument: normalized,
     };
 }
-

@@ -4,6 +4,7 @@ const BASE_MAP_KEYS = [
     'standard',
     'custom',
     'empty',
+    'glb_hangar',
     'maze',
     'complex',
     'pyramid',
@@ -29,4 +30,3 @@ export const MAP_PRESETS_BASE = Object.freeze(
         return result;
     }, {})
 );
-

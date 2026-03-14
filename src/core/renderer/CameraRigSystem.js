@@ -19,6 +19,13 @@ export class CameraRigSystem {
         this._cameraDtMin = 1 / 240;
         this._cameraDtMax = 0.05;
         this._cameraDtResetThreshold = 0.12;
+        this._frameTiming = {
+            frameId: 0,
+            rawDt: 1 / 60,
+            dt: 1 / 60,
+            reset: false,
+            reason: '',
+        };
 
         this._tmpVec = new THREE.Vector3();
         this._tmpVec2 = new THREE.Vector3();
@@ -37,15 +44,34 @@ export class CameraRigSystem {
         });
     }
 
-    _resolveSmoothedDt(playerIndex, dt) {
-        const rawDt = Number(dt);
+    _resetTimingState(reason = 'timing-reset') {
         const fallbackDt = 1 / 60;
-        if (Number.isFinite(rawDt) && rawDt > this._cameraDtResetThreshold) {
+        for (let i = 0; i < this.cameraDtSmoothing.length; i++) {
+            this.cameraDtSmoothing[i] = fallbackDt;
+        }
+        for (let i = 0; i < this.cameraBoostBlend.length; i++) {
+            this.cameraBoostBlend[i] = 0;
+        }
+        this._frameTiming.frameId = Math.max(0, Number(this._frameTiming.frameId) || 0);
+        this._frameTiming.rawDt = fallbackDt;
+        this._frameTiming.dt = fallbackDt;
+        this._frameTiming.reset = true;
+        this._frameTiming.reason = String(reason || 'timing-reset');
+    }
+
+    _resolveSmoothedDt(playerIndex, dt) {
+        const sharedTiming = this._frameTiming || null;
+        const sharedDt = Number(sharedTiming?.dt);
+        const sharedRawDt = Number(sharedTiming?.rawDt);
+        const rawDt = Number.isFinite(sharedRawDt) ? sharedRawDt : Number(dt);
+        const fallbackDt = 1 / 60;
+        const shouldResetDt = sharedTiming?.reset === true || (Number.isFinite(rawDt) && rawDt > this._cameraDtResetThreshold);
+        if (shouldResetDt) {
             this.cameraDtSmoothing[playerIndex] = fallbackDt;
             return fallbackDt;
         }
         const clampedDt = THREE.MathUtils.clamp(
-            Number.isFinite(rawDt) ? rawDt : fallbackDt,
+            Number.isFinite(sharedDt) ? sharedDt : (Number.isFinite(rawDt) ? rawDt : fallbackDt),
             this._cameraDtMin,
             this._cameraDtMax
         );
@@ -99,11 +125,43 @@ export class CameraRigSystem {
     }
 
     setCinematicEnabled(enabled) {
-        this.cinematicCameraSystem.setEnabled(enabled);
+        const normalizedEnabled = enabled === true;
+        const changed = this.cinematicCameraSystem.isEnabled() !== normalizedEnabled;
+        this.cinematicCameraSystem.setEnabled(normalizedEnabled);
+        if (!changed) {
+            return;
+        }
+        this.cinematicCameraSystem.reset();
+        this._resetTimingState('cinematic-toggle');
     }
 
     getCinematicEnabled() {
         return this.cinematicCameraSystem.isEnabled();
+    }
+
+    setFrameTiming(timing = null) {
+        const nextFrameId = Number(timing?.frameId);
+        const nextRawDt = Number(timing?.rawDt);
+        const nextDt = Number(timing?.dt);
+        this._frameTiming.frameId = Number.isFinite(nextFrameId)
+            ? Math.max(0, Math.trunc(nextFrameId))
+            : (this._frameTiming.frameId + 1);
+        this._frameTiming.rawDt = Math.max(
+            0,
+            Number.isFinite(nextRawDt)
+                ? nextRawDt
+                : (Number.isFinite(nextDt) ? nextDt : (1 / 60))
+        );
+        this._frameTiming.dt = THREE.MathUtils.clamp(
+            Number.isFinite(nextDt)
+                ? nextDt
+                : (Number.isFinite(nextRawDt) ? nextRawDt : (1 / 60)),
+            this._cameraDtMin,
+            this._cameraDtMax
+        );
+        this._frameTiming.reset = timing?.reset === true;
+        this._frameTiming.reason = String(timing?.reason || '');
+        return this._frameTiming;
     }
 
     updateCamera(
@@ -254,6 +312,8 @@ export class CameraRigSystem {
         this.cameraShakeTimers.length = 0;
         this.cameraShakeDurations.length = 0;
         this.cameraShakeIntensities.length = 0;
+        this._frameTiming.frameId = 0;
+        this._resetTimingState('camera-reset');
         this.collisionSolver.reset();
         this.cinematicCameraSystem.reset();
     }

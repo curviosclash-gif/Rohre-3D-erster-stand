@@ -140,7 +140,7 @@ export function normalizeMapSchemaDocument(rawMap) {
     const arenaSize = sanitizeArenaSize(rawMap.arenaSize);
     const playerSpawnDefault = { x: -800, y: arenaSize.height * 0.55, z: 0 };
 
-    return {
+    return withOptionalStringField({
         schemaVersion: MAP_SCHEMA_VERSION,
         arenaSize,
         tunnels: asArray(rawMap.tunnels).map((entry) => sanitizeTunnel(entry)),
@@ -151,6 +151,5 @@ export function normalizeMapSchemaDocument(rawMap) {
         aircraft: asArray(rawMap.aircraft).map((entry) => sanitizeAircraft(entry)),
         botSpawns: asArray(rawMap.botSpawns).map((entry) => sanitizeVector3(entry, { x: 0, y: playerSpawnDefault.y, z: 0 })),
         playerSpawn: sanitizeVector3(rawMap.playerSpawn, playerSpawnDefault),
-    };
+    }, 'glbModel', rawMap.glbModel);
 }
-

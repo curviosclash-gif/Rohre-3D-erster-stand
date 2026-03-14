@@ -69,6 +69,10 @@ export class RoundStateTickSystem {
         this.game.entityManager.updateCameras(dt);
     }
 
+    _updateRoundStateGhostPlayback(dt) {
+        this.game.entityManager?.updateLastRoundGhostPlayback?.(dt);
+    }
+
     _runRoundStateTickStepCore(tickStep, dt, hooks = {}) {
         if (typeof hooks.beforeBase === 'function') {
             const shouldStop = hooks.beforeBase(tickStep);
@@ -78,6 +82,7 @@ export class RoundStateTickSystem {
             return true;
         }
         this._updateRoundStateCamerasIfNeeded(dt, tickStep.shouldUpdateCameras);
+        this._updateRoundStateGhostPlayback(dt);
         if (typeof hooks.afterBase === 'function') {
             const shouldStop = hooks.afterBase(tickStep);
             if (shouldStop) return true;

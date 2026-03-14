@@ -1,9 +1,37 @@
 import { CONFIG } from '../core/Config.js';
-import { isHuntHealthActive } from './HealthSystem.js';
+import { grantShield, isHuntHealthActive } from './HealthSystem.js';
 
 function getLabel(player) {
     if (!player) return 'Spieler';
     return player.isBot ? `Bot ${player.index + 1}` : `P${player.index + 1}`;
+}
+
+function getRespawnConfig() {
+    return CONFIG?.HUNT?.RESPAWN || {};
+}
+
+function resetRespawnInventory(player, respawnConfig) {
+    if (!player || respawnConfig?.RESET_INVENTORY === false) return;
+    player.inventory.length = 0;
+    player.selectedItemIndex = 0;
+
+    const startLoadout = Array.isArray(respawnConfig?.START_LOADOUT)
+        ? respawnConfig.START_LOADOUT
+        : [];
+    for (const type of startLoadout) {
+        if (typeof type !== 'string' || !type.trim()) continue;
+        player.addToInventory(type.trim());
+    }
+}
+
+function applyRespawnRecovery(player, respawnConfig) {
+    if (!player) return;
+
+    const recoveryShieldHp = Math.max(0, Number(respawnConfig?.RECOVERY_SHIELD_HP || 0));
+    if (recoveryShieldHp > 0) {
+        grantShield(player);
+        player.shieldHP = Math.min(player.maxShieldHp || recoveryShieldHp, recoveryShieldHp);
+    }
 }
 
 export class RespawnSystem {
@@ -22,7 +50,7 @@ export class RespawnSystem {
 
     onPlayerDied(player) {
         if (!this.isEnabled() || !player) return false;
-        const delaySeconds = Math.max(0.1, Number(CONFIG?.HUNT?.RESPAWN?.DELAY_SECONDS || 3));
+        const delaySeconds = Math.max(0.1, Number(getRespawnConfig()?.DELAY_SECONDS || 3));
         this.pendingByPlayer.set(player.index, {
             player,
             remaining: delaySeconds,
@@ -61,21 +89,31 @@ export class RespawnSystem {
             pending.remaining -= safeDt;
             if (pending.remaining > 0) continue;
 
+            const respawnConfig = getRespawnConfig();
             const planarSpawnLevel = CONFIG.GAMEPLAY.PLANAR_MODE && this.runtime?.spawn?.getPlanarSpawnLevel
                 ? this.runtime.spawn.getPlanarSpawnLevel()
                 : null;
-            const spawnPos = this.runtime.spawn.findSpawnPosition(12, 12, planarSpawnLevel);
+            const minEnemyDistance = Math.max(12, Number(respawnConfig?.MIN_ENEMY_DISTANCE || 18));
+            const spawnPos = this.runtime.spawn.findSpawnPosition(minEnemyDistance, 12, planarSpawnLevel);
             const spawnDir = this.runtime.spawn.findSafeSpawnDirection(spawnPos, player.hitboxRadius);
             player.spawn(spawnPos, spawnDir);
 
-            const invulnerability = Math.max(0, Number(CONFIG?.HUNT?.RESPAWN?.INVULNERABILITY_SECONDS || 1));
+            resetRespawnInventory(player, respawnConfig);
+            applyRespawnRecovery(player, respawnConfig);
+
+            const invulnerability = Math.max(0, Number(respawnConfig?.INVULNERABILITY_SECONDS || 1));
             player.spawnProtectionTimer = Math.max(player.spawnProtectionTimer || 0, invulnerability);
             player.shootCooldown = 0;
+            this.runtime?.combat?.resetRespawnCombatState?.(player);
 
             const recorder = this.runtime?.services?.recorder;
             if (recorder) {
                 recorder.markPlayerSpawn(player);
-                recorder.logEvent('RESPAWN', player.index, `delay=${Math.max(0, Number(CONFIG?.HUNT?.RESPAWN?.DELAY_SECONDS || 3)).toFixed(2)}`);
+                recorder.logEvent(
+                    'RESPAWN',
+                    player.index,
+                    `delay=${Math.max(0, Number(respawnConfig?.DELAY_SECONDS || 3)).toFixed(2)} shield=${Math.round(player.shieldHP || 0)} items=${player.inventory.length}`
+                );
             }
             this.runtime?.events?.emitHuntFeed(`${getLabel(player)} respawned`);
 

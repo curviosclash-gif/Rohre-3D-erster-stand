@@ -163,6 +163,7 @@ export class EntityRuntimeAssembler {
                 combat: {
                     shootItemProjectile: (player, preferredIndex = -1) => projectileSystem.shootItemProjectile(player, preferredIndex),
                     shootHuntGun: (player) => owner._overheatGunSystem.tryFire(player),
+                    resetRespawnCombatState: (player) => owner._overheatGunSystem.resetPlayer(player?.index),
                 },
                 spawn: {
                     getPlanarSpawnLevel: () => owner._getPlanarSpawnLevel(),

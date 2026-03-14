@@ -40,6 +40,12 @@ export class MGOverheatState {
         this.markOverheatSnapshotDirty();
     }
 
+    resetPlayer(playerIndex) {
+        const key = String(playerIndex);
+        this.lockoutByPlayer[key] = 0;
+        this.setOverheatValue(key, 0);
+    }
+
     update(players, dt, mg = getMgConfig()) {
         const coolPerSecond = Math.max(0, Number(mg.COOLING_PER_SECOND || 22));
         for (const player of players || []) {

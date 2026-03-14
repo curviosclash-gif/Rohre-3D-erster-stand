@@ -188,25 +188,12 @@ export function preparePlayerObbCollisionQuery(player) {
     }
 
     const scaleValue = Number(player.modelScale) || 1;
-    if (player.group) {
-        player.group.position?.copy?.(player.position);
-        player.group.quaternion?.copy?.(player.quaternion);
-        if (player.group.scale?.setScalar) {
-            player.group.scale.setScalar(scaleValue);
-        }
-        player.group.updateMatrixWorld?.(true);
-    }
-
-    if (player.group?.matrixWorld) {
-        player._tmpWorldToLocal.copy(player.group.matrixWorld).invert();
-    } else {
-        if (!player._tmpHitboxScale) return false;
-        player._tmpWorldToLocal.compose(
-            player.position,
-            player.quaternion,
-            player._tmpHitboxScale.set(scaleValue, scaleValue, scaleValue)
-        ).invert();
-    }
+    if (!player._tmpHitboxScale) return false;
+    player._tmpWorldToLocal.compose(
+        player.position,
+        player.quaternion,
+        player._tmpHitboxScale.set(scaleValue, scaleValue, scaleValue)
+    ).invert();
 
     player._obbCollisionPrepared = true;
     return true;

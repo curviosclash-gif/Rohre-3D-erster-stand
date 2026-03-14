@@ -33,6 +33,7 @@ export function listMapPreviewEntries() {
         const size = Array.isArray(mapDefinition?.size) ? mapDefinition.size : [80, 30, 80];
         const obstacles = Array.isArray(mapDefinition?.obstacles) ? mapDefinition.obstacles.length : 0;
         const portals = Array.isArray(mapDefinition?.portals) ? mapDefinition.portals.length : 0;
+        const hasGlbModel = typeof mapDefinition?.glbModel === 'string' && mapDefinition.glbModel.trim().length > 0;
         return {
             key: mapKey,
             name: normalizeString(mapDefinition?.name, mapKey),
@@ -40,6 +41,8 @@ export function listMapPreviewEntries() {
             obstacleCount: obstacles,
             portalCount: portals,
             category: resolveMapCategory(mapDefinition),
+            hasGlbModel,
+            renderMode: hasGlbModel ? 'GLB' : 'BOX',
         };
     });
 }
@@ -55,6 +58,8 @@ export function resolveMapPreview(mapKey) {
         obstacleCount: 0,
         portalCount: 0,
         category: 'medium',
+        hasGlbModel: false,
+        renderMode: 'BOX',
     };
 }
 
@@ -78,4 +83,3 @@ export function resolveVehiclePreview(vehicleId) {
         category: 'medium',
     };
 }
-

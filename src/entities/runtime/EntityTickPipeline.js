@@ -11,6 +11,7 @@ export class EntityTickPipeline {
         owner._projectileSystem.update(dt);
         owner._overheatGunSystem.update(dt);
         owner._respawnSystem.update(dt);
+        owner._playerInputSystem.beginFrame?.();
 
         for (const player of owner.players) {
             if (!player.alive) continue;
@@ -28,4 +29,3 @@ export class EntityTickPipeline {
         }
     }
 }
-

@@ -1,26 +1,51 @@
 import { CONFIG } from '../../core/Config.js';
 import { Player } from '../Player.js';
-import { normalizeBotPolicyType, resolveMatchBotPolicyType } from '../ai/BotPolicyTypes.js';
+import {
+    BOT_POLICY_TYPES,
+    isBridgeBotPolicyType,
+    normalizeBotPolicyType,
+    resolveMatchBotPolicyType,
+} from '../ai/BotPolicyTypes.js';
 import { getVehicleIds, isValidVehicleId } from '../vehicle-registry.js';
 
 function normalizeActiveMode(mode) {
     return String(mode || '').trim().toLowerCase();
 }
 
-function resolvePolicyFallbackByMode(activeMode, planarMode = false) {
+function resolveLocalPolicyFallbackByMode(activeMode) {
+    return normalizeActiveMode(activeMode) === 'hunt'
+        ? BOT_POLICY_TYPES.HUNT
+        : BOT_POLICY_TYPES.RULE_BASED;
+}
+
+function resolvePolicyFallbackByMode(activeMode, planarMode = false, bridgeEnabled = false) {
+    if (!bridgeEnabled) {
+        return resolveLocalPolicyFallbackByMode(activeMode);
+    }
     return resolveMatchBotPolicyType({
         huntModeActive: normalizeActiveMode(activeMode) === 'hunt',
         planarMode: !!planarMode,
     });
 }
 
-function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, activeGameMode, planarMode } = {}) {
+function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, activeGameMode, planarMode, bridgeEnabled } = {}) {
     const runtimePolicyType = runtimeConfig?.bot?.policyType || null;
     const effectivePlanarMode = typeof planarMode === 'boolean'
         ? planarMode
         : !!runtimeConfig?.gameplay?.planarMode;
-    const fallbackPolicyType = resolvePolicyFallbackByMode(activeGameMode, effectivePlanarMode);
-    return normalizeBotPolicyType(requestedPolicyType || runtimePolicyType || fallbackPolicyType);
+    const effectiveBridgeEnabled = typeof bridgeEnabled === 'boolean'
+        ? bridgeEnabled
+        : !!runtimeConfig?.bot?.trainerBridgeEnabled;
+    const fallbackPolicyType = resolvePolicyFallbackByMode(
+        activeGameMode,
+        effectivePlanarMode,
+        effectiveBridgeEnabled
+    );
+    const resolvedPolicyType = normalizeBotPolicyType(requestedPolicyType || runtimePolicyType || fallbackPolicyType);
+    if (!effectiveBridgeEnabled && isBridgeBotPolicyType(resolvedPolicyType)) {
+        return normalizeBotPolicyType(resolveLocalPolicyFallbackByMode(activeGameMode));
+    }
+    return resolvedPolicyType;
 }
 
 export class EntitySetupOps {
@@ -50,13 +75,20 @@ export class EntitySetupOps {
         const setupPlanarMode = typeof options.planarMode === 'boolean'
             ? options.planarMode
             : owner.runtimeConfig?.gameplay?.planarMode;
+        const runtimePolicyStrategy = String(owner.runtimeConfig?.bot?.policyStrategy || '').trim().toLowerCase();
+        const strategyForcesBridge = runtimePolicyStrategy === 'bridge';
+        const setupBridgeEnabled = typeof options.bridgeEnabled === 'boolean'
+            ? options.bridgeEnabled
+            : (strategyForcesBridge || !!owner.runtimeConfig?.bot?.trainerBridgeEnabled);
         owner.huntEnabled = activeModeLower === 'hunt';
         owner.botDifficulty = options.botDifficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || owner.botDifficulty;
+        owner.botBridgeEnabled = setupBridgeEnabled;
         owner.botPolicyType = resolveConfiguredBotPolicyType({
             requestedPolicyType: options.botPolicyType,
             runtimeConfig: owner.runtimeConfig,
             activeGameMode: owner.activeGameMode,
             planarMode: setupPlanarMode,
+            bridgeEnabled: setupBridgeEnabled,
         });
     }
 
@@ -128,10 +160,14 @@ export class EntitySetupOps {
                 recorder: owner.recorder,
                 runtimeConfig: owner.runtimeConfig,
                 runtimeProfiler: owner.runtimeProfiler,
+                bridgeEnabled: owner.botBridgeEnabled !== false,
+                activeGameMode: owner.activeGameMode,
             });
+            const sensePhase = i % 4;
             if (typeof ai?.setSensePhase === 'function') {
-                ai.setSensePhase(i % 4); // Time-slicing for batched bot scans
+                ai.setSensePhase(sensePhase); // Time-slicing for batched bot scans
             }
+            ai.sensePhase = sensePhase;
             owner.players.push(player);
             owner.bots.push({ player, ai });
             owner.botByPlayer.set(player, ai);

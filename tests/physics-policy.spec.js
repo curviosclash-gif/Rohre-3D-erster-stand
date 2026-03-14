@@ -437,7 +437,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         expect(result.unknownType).toBe('rule-based');
         expect(result.brokenType).toBe('rule-based');
         expect(result.disabledBridgeType).toBe('rule-based');
-        expect(result.disabledMatchBotType).toBe('rule-based');
+        expect(result.disabledMatchBotType).toBe('hunt');
         expect(result.unknownHasUpdate).toBeTruthy();
         expect(result.brokenHasUpdate).toBeTruthy();
     });
@@ -655,7 +655,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         });
 
         expect(result.policyStrategy).toBe('auto');
-        expect(result.policyType).toBe('classic-3d');
+        expect(result.policyType).toBe('rule-based');
         expect(result.trainerBridgeEnabled).toBeFalsy();
         expect(result.trainerBridgeUrl.startsWith('ws://')).toBeTruthy();
         expect(result.trainerBridgeTimeoutMs).toBeGreaterThanOrEqual(20);
@@ -850,15 +850,15 @@ test.describe('Physics Policy (Tests 65-82)', () => {
             };
         });
 
-        expect(result.classic3dAuto).toBe('classic-3d');
-        expect(result.classic2dAuto).toBe('classic-2d');
-        expect(result.hunt3dAuto).toBe('hunt-3d');
-        expect(result.hunt2dAuto).toBe('hunt-2d');
+        expect(result.classic3dAuto).toBe('rule-based');
+        expect(result.classic2dAuto).toBe('rule-based');
+        expect(result.hunt3dAuto).toBe('hunt');
+        expect(result.hunt2dAuto).toBe('hunt');
         expect(result.classicBridge).toBe('classic-bridge');
         expect(result.huntBridge).toBe('hunt-bridge');
         expect(result.forcedRuleBased).toBe('rule-based');
         expect(result.invalidStrategyName).toBe('auto');
-        expect(result.invalidStrategyPolicy).toBe('classic-2d');
+        expect(result.invalidStrategyPolicy).toBe('rule-based');
     });
 
     test('T82: Session-Wiring uebergibt aufgeloeste Bot-Policy an EntityManager', async ({ page }) => {
@@ -910,22 +910,78 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         });
 
         expect(result.error).toBeNull();
-        expect(result.classic3d.runtimePolicyType).toBe('classic-3d');
-        expect(result.classic3d.entityPolicyType).toBe('classic-3d');
-        expect(result.classic3d.uniqueBotPolicyTypes).toEqual(['classic-3d']);
+        expect(result.classic3d.runtimePolicyType).toBe('rule-based');
+        expect(result.classic3d.entityPolicyType).toBe('rule-based');
+        expect(result.classic3d.uniqueBotPolicyTypes).toEqual(['rule-based']);
         expect(result.classic3d.botCount).toBe(2);
-        expect(result.classic2d.runtimePolicyType).toBe('classic-2d');
-        expect(result.classic2d.entityPolicyType).toBe('classic-2d');
-        expect(result.classic2d.uniqueBotPolicyTypes).toEqual(['classic-2d']);
+        expect(result.classic2d.runtimePolicyType).toBe('rule-based');
+        expect(result.classic2d.entityPolicyType).toBe('rule-based');
+        expect(result.classic2d.uniqueBotPolicyTypes).toEqual(['rule-based']);
         expect(result.classic2d.botCount).toBe(2);
-        expect(result.hunt3d.runtimePolicyType).toBe('hunt-3d');
-        expect(result.hunt3d.entityPolicyType).toBe('hunt-3d');
-        expect(result.hunt3d.uniqueBotPolicyTypes).toEqual(['hunt-3d']);
+        expect(result.hunt3d.runtimePolicyType).toBe('hunt');
+        expect(result.hunt3d.entityPolicyType).toBe('hunt');
+        expect(result.hunt3d.uniqueBotPolicyTypes).toEqual(['hunt']);
         expect(result.hunt3d.botCount).toBe(2);
-        expect(result.hunt2d.runtimePolicyType).toBe('hunt-2d');
-        expect(result.hunt2d.entityPolicyType).toBe('hunt-2d');
-        expect(result.hunt2d.uniqueBotPolicyTypes).toEqual(['hunt-2d']);
+        expect(result.hunt2d.runtimePolicyType).toBe('hunt');
+        expect(result.hunt2d.entityPolicyType).toBe('hunt');
+        expect(result.hunt2d.uniqueBotPolicyTypes).toEqual(['hunt']);
         expect(result.hunt2d.botCount).toBe(2);
+    });
+
+    test('T82b: Rule-Based-Bot-Perception bleibt ueber Facade lauffaehig', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            if (!game?.startMatch || !game?._returnToMenu) {
+                return { error: 'missing-game-hooks' };
+            }
+
+            game.settings.mode = '1p';
+            game.settings.numBots = 2;
+            game.settings.gameMode = 'CLASSIC';
+            game.settings.botPolicyStrategy = 'rule-based';
+            if (!game.settings.gameplay || typeof game.settings.gameplay !== 'object') {
+                game.settings.gameplay = {};
+            }
+            game.settings.gameplay.planarMode = false;
+            game._onSettingsChanged();
+            game.startMatch();
+
+            const entityManager = game.entityManager;
+            const botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
+            const policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+            if (!botPlayer || !policy) {
+                game._returnToMenu();
+                return { error: 'missing-bot-policy' };
+            }
+
+            try {
+                const action = policy.update(1 / 60, botPlayer, game.arena, entityManager.players, entityManager.projectiles);
+                const sensorSnapshot = typeof policy.getSensorSnapshot === 'function'
+                    ? policy.getSensorSnapshot()
+                    : null;
+                game._returnToMenu();
+                return {
+                    error: null,
+                    policyType: String(policy.type || ''),
+                    hasAction: !!action,
+                    forwardRisk: Number(sensorSnapshot?.forwardRisk),
+                    lookAhead: Number(sensorSnapshot?.lookAhead),
+                };
+            } catch (error) {
+                game._returnToMenu();
+                return {
+                    error: error instanceof Error ? error.message : String(error),
+                    policyType: String(policy.type || ''),
+                };
+            }
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.policyType).toBe('rule-based');
+        expect(result.hasAction).toBeTruthy();
+        expect(Number.isFinite(result.forwardRisk)).toBeTruthy();
+        expect(result.lookAhead).toBeGreaterThan(0);
     });
 
 });

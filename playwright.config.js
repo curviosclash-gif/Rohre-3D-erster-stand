@@ -83,8 +83,9 @@ export default defineConfig({
         },
     ],
     webServer: {
-        command: `npx vite --port ${TEST_PORT}`,
+        command: `npx vite --port ${TEST_PORT} --strictPort`,
         url: `http://localhost:${TEST_PORT}`,
+        timeout: 120_000,
         reuseExistingServer: !isCI && process.env.PW_REUSE_SERVER === '1',
     },
 });

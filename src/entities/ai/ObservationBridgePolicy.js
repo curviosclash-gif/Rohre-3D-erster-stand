@@ -7,6 +7,9 @@ import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
 import { buildTrainerRuntimeObservationPayload } from './training/TrainerPayloadAdapter.js';
 import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
 
+const WARNING_COOLDOWN_BASE_MS = 2000;
+const WARNING_COOLDOWN_MAX_MS = 30000;
+
 function isRuntimeContextPayload(value) {
     return !!(
         value
@@ -63,12 +66,18 @@ function resolveTrainerBridgeOptions(options = {}) {
 export class ObservationBridgePolicy {
     constructor(options = {}) {
         this.type = normalizeBotPolicyType(options.type || BOT_POLICY_TYPES.CLASSIC_BRIDGE);
+        this.sensePhase = 0;
         this.usesRuntimeContext = true;
         this._fallbackPolicy = options.fallbackPolicy || null;
         this._resolveAction = typeof options.resolveAction === 'function' ? options.resolveAction : null;
         this._resolveObservation = typeof options.resolveObservation === 'function' ? options.resolveObservation : null;
-        this._warningCooldownMs = 2000;
-        this._lastWarningAt = 0;
+        this._warningBaseCooldownMs = WARNING_COOLDOWN_BASE_MS;
+        this._warningMaxCooldownMs = WARNING_COOLDOWN_MAX_MS;
+        this._warningStateByKey = new Map();
+        this._bridgeFailureState = {
+            reason: null,
+            updatedAt: 0,
+        };
         this._neutralAction = createNeutralBotAction({});
         this._trainerBridge = null;
         this._trainerBridgeOptions = null;
@@ -198,12 +207,52 @@ export class ObservationBridgePolicy {
         }
     }
 
-    _warn(message, error = null) {
+    _warn(message, error = null, key = null) {
+        const warningKey = typeof key === 'string' && key.trim()
+            ? key.trim()
+            : String(message || 'warning');
+        let warningState = this._warningStateByKey.get(warningKey);
+        if (!warningState) {
+            warningState = {
+                lastWarningAt: 0,
+                cooldownMs: this._warningBaseCooldownMs,
+                suppressed: 0,
+            };
+            this._warningStateByKey.set(warningKey, warningState);
+        }
+
         const now = Date.now();
-        if (now - this._lastWarningAt < this._warningCooldownMs) return;
-        this._lastWarningAt = now;
+        if (now - warningState.lastWarningAt < warningState.cooldownMs) {
+            warningState.suppressed += 1;
+            return;
+        }
+
+        const suppressedCount = warningState.suppressed;
+        warningState.suppressed = 0;
+        warningState.lastWarningAt = now;
+        warningState.cooldownMs = Math.min(
+            this._warningMaxCooldownMs,
+            Math.max(this._warningBaseCooldownMs, warningState.cooldownMs * 2)
+        );
+
+        const suppressedMessage = suppressedCount > 0
+            ? ` (suppressed=${suppressedCount})`
+            : '';
         const errorMessage = error ? ` (${error.message || String(error)})` : '';
-        console.warn(`[ObservationBridgePolicy] ${this.type}: ${message}${errorMessage}`);
+        console.warn(`[ObservationBridgePolicy] ${this.type}: ${message}${suppressedMessage}${errorMessage}`);
+    }
+
+    _recordBridgeFailure(reason) {
+        const normalizedReason = typeof reason === 'string' && reason.trim()
+            ? reason.trim()
+            : 'bridge-failure';
+        this._bridgeFailureState.reason = normalizedReason;
+        this._bridgeFailureState.updatedAt = Date.now();
+        this._warn(
+            `trainer bridge ${normalizedReason}; fallback local policy`,
+            null,
+            `bridge-failure:${normalizedReason}`
+        );
     }
 
     _asRuntimeContext(dt, player, runtimeContextOrArena, allPlayers, projectiles) {
@@ -237,7 +286,7 @@ export class ObservationBridgePolicy {
                 runtimeContext.projectiles
             );
         } catch (error) {
-            this._warn('fallback policy update failed', error);
+            this._warn('fallback policy update failed', error, 'fallback-update-failed');
             return this._neutralAction;
         }
     }
@@ -245,7 +294,11 @@ export class ObservationBridgePolicy {
     _sanitizeAction(action, player) {
         return sanitizeBotAction(action, {
             inventoryLength: Array.isArray(player?.inventory) ? player.inventory.length : 0,
-            onInvalid: (reason) => this._warn(`sanitized invalid action (${reason})`),
+            onInvalid: (reason) => this._warn(
+                `sanitized invalid action (${reason})`,
+                null,
+                `sanitized-action:${reason}`
+            ),
         }, this._neutralAction);
     }
 
@@ -286,14 +339,14 @@ export class ObservationBridgePolicy {
             try {
                 return this._resolveObservation(player, runtimeContext);
             } catch (error) {
-                this._warn('resolveObservation failed', error);
+                this._warn('resolveObservation failed', error, 'resolve-observation-failed');
             }
         }
         if (typeof this._fallbackPolicy?.getObservation === 'function') {
             try {
                 return this._fallbackPolicy.getObservation(player, runtimeContext);
             } catch (error) {
-                this._warn('fallback getObservation failed', error);
+                this._warn('fallback getObservation failed', error, 'fallback-observation-failed');
             }
         }
         return runtimeContext?.observation || null;
@@ -307,7 +360,10 @@ export class ObservationBridgePolicy {
 
         const trainerResult = this._resolveTrainerBridgeAction(runtimeContext, player);
         if (trainerResult.failure) {
-            this._warn(`trainer bridge ${trainerResult.failure}; fallback local policy`);
+            this._recordBridgeFailure(trainerResult.failure);
+        } else {
+            this._bridgeFailureState.reason = null;
+            this._bridgeFailureState.updatedAt = Date.now();
         }
         if (trainerResult.action && typeof trainerResult.action === 'object') {
             return this._sanitizeAction(trainerResult.action, player);
@@ -326,9 +382,9 @@ export class ObservationBridgePolicy {
                 if (action && typeof action === 'object') {
                     return this._sanitizeAction(action, player);
                 }
-                this._warn('resolveAction returned no action payload, using fallback');
+                this._warn('resolveAction returned no action payload, using fallback', null, 'resolve-action-empty');
             } catch (error) {
-                this._warn('resolveAction failed, using fallback', error);
+                this._warn('resolveAction failed, using fallback', error, 'resolve-action-failed');
             }
         }
 
@@ -349,11 +405,18 @@ export class ObservationBridgePolicy {
             resume: {
                 ...this._trainerBridgeInitState,
             },
+            failure: {
+                reason: this._bridgeFailureState.reason,
+                updatedAt: this._bridgeFailureState.updatedAt,
+            },
             telemetry: this.getTrainerBridgeTelemetry(),
         };
     }
 
     reset() {
+        this._warningStateByKey.clear();
+        this._bridgeFailureState.reason = null;
+        this._bridgeFailureState.updatedAt = Date.now();
         if (this._trainerBridge) {
             this._trainerBridge.close();
         }
@@ -387,8 +450,10 @@ export class ObservationBridgePolicy {
     }
 
     setSensePhase(phase) {
+        const normalizedPhase = Number.isFinite(Number(phase)) ? Math.max(0, Math.trunc(Number(phase))) : 0;
+        this.sensePhase = normalizedPhase;
         if (typeof this._fallbackPolicy?.setSensePhase === 'function') {
-            this._fallbackPolicy.setSensePhase(phase);
+            this._fallbackPolicy.setSensePhase(normalizedPhase);
         }
     }
 }

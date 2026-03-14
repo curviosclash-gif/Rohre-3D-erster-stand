@@ -107,6 +107,7 @@ export class BotAI {
         this._probeRayCenter = this.sensors._probeRayCenter;
         this._probeRayLeft = this.sensors._probeRayLeft;
         this._probeRayRight = this.sensors._probeRayRight;
+        this.sensePhase = 0;
 
         this._setDifficulty(options.difficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL');
         this._checkStuckTimer = this.profile.stuckCheckInterval;
@@ -253,7 +254,9 @@ export class BotAI {
     }
 
     setSensePhase(phase) {
-        this.sensorsFacade.setSensePhase(phase);
+        const normalized = Number.isFinite(Number(phase)) ? Math.max(0, Math.trunc(Number(phase))) : 0;
+        this.sensePhase = normalized;
+        this.sensorsFacade.setSensePhase(normalized);
     }
 
     _ensureSensorsRuntimeBound() {

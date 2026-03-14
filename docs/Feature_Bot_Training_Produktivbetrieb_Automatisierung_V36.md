@@ -103,11 +103,12 @@ Hauptrisiken:
   - [x] 36.7.2 Troubleshooting fuer bekannte Fehlerbilder (`ready-timeout`, `checkpoint-import-failed`) dokumentieren
   - Status 2026-03-11: Runbook- und Troubleshooting-Abschnitte in `docs/Bot-Training-Schnittstelle.md` ergaenzt.
 
-- [/] 36.9 Abschluss-Gate und Doku-Freeze
-  - [/] 36.9.1 Verifikation: zielgerichtete V36-Tests, Trainingsserie, `training:e2e`, relevante Core-Checks
+- [x] 36.9 Abschluss-Gate und Doku-Freeze
+  - Abgeschlossen am: `2026-03-13`
+  - [x] 36.9.1 Verifikation: zielgerichtete V36-Tests, Trainingsserie, `training:e2e`, relevante Core-Checks
   - [x] 36.9.2 Verifikation: `npm run docs:sync` und `npm run docs:check`
   - [x] 36.9.3 Abschlussbericht mit PASS/FAIL, Restrisiken und naechsten Schritten
-  - Status 2026-03-11: Alle V36-spezifischen Gates sind gruen (`training:loop`, `training:e2e`, `trainer-v34-*`, `training-environment`, `docs:sync`, `docs:check`, `build`), `npm run test:core` bleibt auf `T7` reproduzierbar rot (isolierte Re-Runs ebenfalls rot).
+  - Status 2026-03-13: Alle V36-spezifischen Gates sind im aktuellen Stand gruen (`training:loop`, `training:e2e`, `trainer-v34-*`, `training-environment`, `test:core`, `docs:sync`, `docs:check`, `build`); der fruehere `T7`-Blocker ist nicht mehr reproduzierbar.
 
 ## Definition of Done
 
@@ -150,7 +151,27 @@ Verifikation:
 8. `npm run docs:check` -> PASS.
 9. `npm run build` -> PASS.
 
+Restrisiken im Zwischenstand 2026-03-11:
+
+1. Core-Gate `T7` war zu diesem Zeitpunkt ein reproduzierbarer Blocker fuer den Vollabschluss.
+2. Erster Run nach `resume-checkpoint=latest` kann ohne vorhandenes Checkpoint erwartbar mit `loaded=false` starten; ab Folgerun wird `latest` geladen.
+
+## Abschlussbericht 2026-03-13
+
+Ergebnis: `PASS`.
+
+Verifikation:
+
+1. `node scripts/training-loop.mjs --runs 2 --episodes 2 --seeds 11 --modes hunt-2d --bridge-mode bridge --resume-checkpoint latest --resume-strict false --with-trainer-server true --stop-on-fail true` -> PASS (`data/training/series/20260313T124626Z/loop.json`).
+2. `npm run training:e2e` -> PASS (`stamp=20260313T124557Z`).
+3. `node --test tests/trainer-v34-*.test.mjs` -> PASS (13/13).
+4. `npx playwright test tests/training-environment.spec.js --workers=1` -> PASS (10/10, inkl. `T99`).
+5. `TEST_PORT=5341 PW_RUN_TAG=plan-core PW_OUTPUT_DIR=test-results/plan-core PW_WORKERS=1 npm run test:core` -> PASS (82 passed, 1 skipped).
+6. `npm run docs:sync` -> PASS.
+7. `npm run docs:check` -> PASS.
+8. `npm run build` -> PASS.
+
 Restrisiken:
 
-1. Core-Gate `T7` ist aktuell ein reproduzierbarer Blocker fuer den Vollabschluss.
-2. Erster Run nach `resume-checkpoint=latest` kann ohne vorhandenes Checkpoint erwartbar mit `loaded=false` starten; ab Folgerun wird `latest` geladen.
+1. Der erste `training-loop`-Run mit `resume-checkpoint=latest` kann erwartbar noch `loaded=false` mit `invalid-transition` melden, wenn im frischen Serienlauf noch kein neues `latest` aus dieser Serie existiert; der Folgerun laedt den aktuellen Checkpoint anschließend korrekt.
+2. `npm run bot:validate` bleibt funktional gruen, zeigt im aktuellen Stand aber weiterhin viele erzwungene Rundenenden (`forcedRounds=10/17`) und sollte fuer kuenftige Gameplay-/Performance-Arbeit beobachtet werden.

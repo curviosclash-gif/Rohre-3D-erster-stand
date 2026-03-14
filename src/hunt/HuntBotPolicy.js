@@ -101,6 +101,7 @@ function applyRetreatSteeringFromSensors(input, snapshot) {
 export class HuntBotPolicy {
     constructor(options = {}) {
         this.type = BOT_POLICY_TYPES.HUNT;
+        this.sensePhase = 0;
         this._fallbackPolicy = new RuleBasedBotPolicy(options);
         this._tmpToEnemy = new THREE.Vector3();
         this._tmpForward = new THREE.Vector3();
@@ -175,8 +176,10 @@ export class HuntBotPolicy {
     }
 
     setSensePhase(phase) {
+        const normalizedPhase = Number.isFinite(Number(phase)) ? Math.max(0, Math.trunc(Number(phase))) : 0;
+        this.sensePhase = normalizedPhase;
         if (typeof this._fallbackPolicy.setSensePhase === 'function') {
-            this._fallbackPolicy.setSensePhase(phase);
+            this._fallbackPolicy.setSensePhase(normalizedPhase);
         }
     }
 

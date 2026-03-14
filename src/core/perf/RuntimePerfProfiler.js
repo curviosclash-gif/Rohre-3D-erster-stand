@@ -2,6 +2,7 @@ const DEFAULT_BUFFER_SIZE = 720;
 const DEFAULT_STATS_WINDOW = 300;
 const DEFAULT_SPIKE_THRESHOLD_MS = 30;
 const DEFAULT_SPIKE_LOG_LIMIT = 64;
+const DEFAULT_SPIKE_LOG_COOLDOWN_MS = 1500;
 
 const SUBSYSTEM_IDS = Object.freeze([
     'update',
@@ -51,6 +52,14 @@ function sanitizeWindowSize(value, fallback, max) {
     return Math.max(1, Math.min(max, Math.trunc(numeric)));
 }
 
+function createBotSensingDetailState() {
+    return {
+        playerIndex: -1,
+        policyType: '',
+        ms: 0,
+    };
+}
+
 export class RuntimePerfProfiler {
     constructor(options = {}) {
         this.bufferSize = toPositiveInt(options.bufferSize, DEFAULT_BUFFER_SIZE, 120, 4096);
@@ -64,6 +73,11 @@ export class RuntimePerfProfiler {
             toFiniteNumber(options.spikeThresholdMs, DEFAULT_SPIKE_THRESHOLD_MS)
         );
         this._spikeLogLimit = toPositiveInt(options.spikeLogLimit, DEFAULT_SPIKE_LOG_LIMIT, 8, 512);
+        this._spikeLoggingEnabled = options.logSpikes === true;
+        this._spikeLogCooldownMs = Math.max(
+            0,
+            toFiniteNumber(options.spikeLogCooldownMs, DEFAULT_SPIKE_LOG_COOLDOWN_MS)
+        );
 
         this._frameTimesMs = new Float32Array(this.bufferSize);
         this._subsystemBuffers = SUBSYSTEM_IDS.map(() => new Float32Array(this.bufferSize));
@@ -78,6 +92,9 @@ export class RuntimePerfProfiler {
         this._spikeCountTotal = 0;
 
         this._spikeEvents = [];
+        this._currentFrameBotSensing = createBotSensingDetailState();
+        this._lastSpikeLogTimestampMs = -Infinity;
+        this._suppressedSpikeLogs = 0;
     }
 
     getSubsystemIds() {
@@ -98,6 +115,34 @@ export class RuntimePerfProfiler {
         this._lastFrameTimestampMs = 0;
         this._spikeCountTotal = 0;
         this._spikeEvents.length = 0;
+        this._currentFrameBotSensing.playerIndex = -1;
+        this._currentFrameBotSensing.policyType = '';
+        this._currentFrameBotSensing.ms = 0;
+        this._lastSpikeLogTimestampMs = -Infinity;
+        this._suppressedSpikeLogs = 0;
+    }
+
+    setSpikeLoggingEnabled(enabled) {
+        this._spikeLoggingEnabled = enabled === true;
+    }
+
+    isSpikeLoggingEnabled() {
+        return this._spikeLoggingEnabled === true;
+    }
+
+    _shouldEmitSpikeLog(timestampMs) {
+        if (this._spikeLoggingEnabled !== true) {
+            this._suppressedSpikeLogs += 1;
+            return false;
+        }
+        if (!(this._spikeLogCooldownMs > 0)) {
+            return true;
+        }
+        if ((timestampMs - this._lastSpikeLogTimestampMs) < this._spikeLogCooldownMs) {
+            this._suppressedSpikeLogs += 1;
+            return false;
+        }
+        return true;
     }
 
     beginFrame(frameTimeMs, timestampMs = nowMs()) {
@@ -105,6 +150,9 @@ export class RuntimePerfProfiler {
         this._pendingFrameTimeMs = Math.max(0, toFiniteNumber(frameTimeMs, 0));
         this._pendingTimestampMs = Math.max(0, toFiniteNumber(timestampMs, nowMs()));
         this._frameActive = true;
+        this._currentFrameBotSensing.playerIndex = -1;
+        this._currentFrameBotSensing.policyType = '';
+        this._currentFrameBotSensing.ms = 0;
     }
 
     startSample() {
@@ -123,6 +171,16 @@ export class RuntimePerfProfiler {
         const safeDuration = toFiniteNumber(durationMs, 0);
         if (!(safeDuration > 0)) return;
         this._currentFrameSubsystemMs[subsystemIndex] += safeDuration;
+    }
+
+    recordBotSensingDetail(playerIndex, policyType, durationMs) {
+        if (!this._frameActive) return;
+        const safeDuration = toFiniteNumber(durationMs, 0);
+        if (!(safeDuration > this._currentFrameBotSensing.ms)) return;
+
+        this._currentFrameBotSensing.playerIndex = Number.isInteger(playerIndex) ? playerIndex : -1;
+        this._currentFrameBotSensing.policyType = typeof policyType === 'string' ? policyType : '';
+        this._currentFrameBotSensing.ms = safeDuration;
     }
 
     endFrame(frameTimeMs = null, timestampMs = null) {
@@ -150,23 +208,43 @@ export class RuntimePerfProfiler {
         if (resolvedFrameTimeMs >= this.spikeThresholdMs) {
             this._spikeCountTotal += 1;
             const topSubsystems = this._resolveTopSubsystems(this._currentFrameSubsystemMs);
+            const botSensingDetail = this._currentFrameBotSensing.ms > 0
+                ? {
+                    playerIndex: this._currentFrameBotSensing.playerIndex,
+                    policyType: this._currentFrameBotSensing.policyType,
+                    ms: this._currentFrameBotSensing.ms,
+                }
+                : null;
             const spikeEvent = {
                 timestampMs: resolvedTimestampMs,
                 frameTimeMs: resolvedFrameTimeMs,
                 topSubsystems,
+                botSensing: botSensingDetail,
             };
             this._spikeEvents.push(spikeEvent);
             if (this._spikeEvents.length > this._spikeLogLimit) {
                 this._spikeEvents.shift();
             }
 
-            if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+            if (
+                this._shouldEmitSpikeLog(resolvedTimestampMs)
+                && typeof console !== 'undefined'
+                && typeof console.warn === 'function'
+            ) {
                 const topSummary = topSubsystems
                     .map((entry) => `${entry.id}=${entry.ms.toFixed(2)}ms`)
                     .join(', ');
+                const botSummary = botSensingDetail
+                    ? ` bot=[index=${botSensingDetail.playerIndex} policy=${botSensingDetail.policyType || 'unknown'} ms=${botSensingDetail.ms.toFixed(2)}]`
+                    : '';
+                const suppressedSummary = this._suppressedSpikeLogs > 0
+                    ? ` suppressed=${this._suppressedSpikeLogs}`
+                    : '';
                 console.warn(
-                    `[PerfSpike] frame=${resolvedFrameTimeMs.toFixed(2)}ms threshold=${this.spikeThresholdMs.toFixed(1)}ms top=[${topSummary}]`
+                    `[PerfSpike] frame=${resolvedFrameTimeMs.toFixed(2)}ms threshold=${this.spikeThresholdMs.toFixed(1)}ms top=[${topSummary}]${botSummary}${suppressedSummary}`
                 );
+                this._lastSpikeLogTimestampMs = resolvedTimestampMs;
+                this._suppressedSpikeLogs = 0;
             }
         }
 
@@ -307,6 +385,13 @@ export class RuntimePerfProfiler {
                     id: subsystem.id,
                     ms: subsystem.ms,
                 })),
+                botSensing: entry.botSensing
+                    ? {
+                        playerIndex: entry.botSensing.playerIndex,
+                        policyType: entry.botSensing.policyType,
+                        ms: entry.botSensing.ms,
+                    }
+                    : null,
             }))
             : [];
 

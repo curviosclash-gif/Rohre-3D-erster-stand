@@ -1,4 +1,5 @@
 import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality } from '../../core/renderer/ShadowQuality.js';
+import { DEFAULT_EVENT_PLAYLIST_ID } from './EventPlaylistCatalog.js';
 
 export const MENU_STATE_SCHEMA_VERSION = 'menu-state.v1';
 export const MATCH_SETTINGS_SCHEMA_VERSION = 'match-settings.v1';
@@ -67,6 +68,17 @@ function cloneObject(value, fallback = {}) {
     return JSON.parse(JSON.stringify(value));
 }
 
+function normalizeEventPlaylistState(eventPlaylistState = null) {
+    const source = eventPlaylistState && typeof eventPlaylistState === 'object' ? eventPlaylistState : {};
+    const activePlaylistId = normalizeString(source.activePlaylistId, DEFAULT_EVENT_PLAYLIST_ID);
+    const nextIndex = Number.isFinite(Number(source.nextIndex)) ? Math.max(0, Math.floor(Number(source.nextIndex))) : 0;
+    return {
+        activePlaylistId,
+        nextIndex,
+        lastPresetId: normalizeString(source.lastPresetId, ''),
+    };
+}
+
 export function createMenuFeatureFlags(flags = null) {
     const source = flags && typeof flags === 'object' ? flags : {};
     return {
@@ -119,6 +131,7 @@ function normalizeLocalSettingsState(localSettings = null) {
         startAttempts: 0,
         lastEvents: [],
     });
+    const eventPlaylistState = normalizeEventPlaylistState(source.eventPlaylistState);
 
     return {
         schemaVersion: LOCAL_SETTINGS_SCHEMA_VERSION,
@@ -138,6 +151,7 @@ function normalizeLocalSettingsState(localSettings = null) {
         toolsState,
         draftStateBySessionType,
         telemetryState,
+        eventPlaylistState,
     };
 }
 

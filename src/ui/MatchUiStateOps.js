@@ -15,6 +15,21 @@ export function deriveMatchStartUiState(inputs = {}) {
             messageOverlayHidden: true,
             statusToastHidden: true,
         },
+        overlayStats: null,
+    };
+}
+
+export function deriveMatchLoadingUiState(inputs = {}) {
+    return {
+        messageText: String(inputs.messageText || 'Lade Arena...'),
+        messageSub: String(inputs.messageSub || 'Map-Assets werden vorbereitet'),
+        visibility: {
+            mainMenuHidden: true,
+            hudHidden: true,
+            messageOverlayHidden: false,
+            statusToastHidden: true,
+        },
+        overlayStats: null,
     };
 }
 
@@ -26,6 +41,7 @@ export function deriveReturnToMenuUiState() {
             messageOverlayHidden: true,
             statusToastHidden: true,
         },
+        overlayStats: null,
     };
 }
 
@@ -35,6 +51,7 @@ export function deriveRoundStartUiState() {
             messageOverlayHidden: true,
             statusToastHidden: true,
         },
+        overlayStats: null,
     };
 }
 
@@ -42,6 +59,7 @@ export function deriveRoundEndOverlayUiState(roundEndOutcome = {}) {
     return {
         messageText: String(roundEndOutcome.messageText || ''),
         messageSub: String(roundEndOutcome.messageSub || ''),
+        overlayStats: roundEndOutcome.overlayStats || null,
         visibility: {
             messageOverlayHidden: false,
         },

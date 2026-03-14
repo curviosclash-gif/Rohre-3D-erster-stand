@@ -187,7 +187,6 @@ export class PlayerView {
     applyModelScale() {
         if (this.group) {
             this.group.scale.setScalar(this.player.modelScale || 1);
-            this.group.updateMatrixWorld(true);
         }
     }
 
@@ -200,7 +199,6 @@ export class PlayerView {
     syncRotation() {
         if (this.group?.quaternion) {
             this.group.quaternion.copy(this.player.quaternion);
-            this.group.updateMatrixWorld(true);
         }
     }
 
@@ -209,7 +207,17 @@ export class PlayerView {
         this.player.resolveRenderTransform(renderAlpha, this._renderPosition, this._renderQuaternion);
         this.group.position.copy(this._renderPosition);
         this.group.quaternion.copy(this._renderQuaternion);
-        this.group.updateMatrixWorld(true);
+    }
+
+    copyRenderTransform(outPosition = null, outQuaternion = null) {
+        if (!this.group) return false;
+        if (outPosition) {
+            outPosition.copy(this._renderPosition);
+        }
+        if (outQuaternion) {
+            outQuaternion.copy(this._renderQuaternion);
+        }
+        return true;
     }
 
     syncFromState() {
@@ -218,7 +226,6 @@ export class PlayerView {
         this.group.quaternion.copy(this.player.quaternion);
         this._renderPosition.copy(this.player.position);
         this._renderQuaternion.copy(this.player.quaternion);
-        this.group.updateMatrixWorld(true);
     }
 
     update(dt) {
@@ -275,6 +282,7 @@ export class PlayerView {
     getFirstPersonCameraAnchor(out = null) {
         const target = out || new THREE.Vector3();
         if (this.firstPersonAnchor) {
+            this.firstPersonAnchor.updateWorldMatrix(true, false);
             this.firstPersonAnchor.getWorldPosition(target);
             return target;
         }
