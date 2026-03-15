@@ -160,7 +160,7 @@ export class EntitySetupOps {
                 recorder: owner.recorder,
                 runtimeConfig: owner.runtimeConfig,
                 runtimeProfiler: owner.runtimeProfiler,
-                bridgeEnabled: owner.botBridgeEnabled !== false,
+                bridgeEnabled: true,
                 activeGameMode: owner.activeGameMode,
             });
             const sensePhase = i % 4;

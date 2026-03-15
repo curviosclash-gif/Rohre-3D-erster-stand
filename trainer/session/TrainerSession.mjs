@@ -12,6 +12,7 @@ import { inferActionFromObservation } from './ActionSanitizer.mjs';
 import { DqnTrainer } from '../model/DqnTrainer.mjs';
 import { validateDqnCheckpointPayload } from '../model/CheckpointValidation.mjs';
 import { resolveLatestCheckpointPayloadSync } from '../artifacts/TrainerArtifactStore.mjs';
+import { MetricsLogger } from '../server/MetricsLogger.mjs';
 
 function toText(raw) {
     if (typeof raw === 'string') return raw;
@@ -76,9 +77,16 @@ export class TrainerSession {
             errors: 0,
         };
 
+        this._metrics = new MetricsLogger({ maxHistory: this.config.metricsHistory || 500 });
+        this._episodeRewardAccum = 0;
+        this._episodeStepAccum = 0;
+        this._episodeLossAccum = 0;
+        this._episodeLossCount = 0;
+
         this._model = new DqnTrainer({
             observationLength: this.config.observationLength,
             maxItemIndex: this.config.maxItemIndex,
+            planarMode: this.config.planarMode,
             seed: this.config.sessionSeed,
             model: this.config.model,
         });
@@ -119,7 +127,12 @@ export class TrainerSession {
             stats: { ...this._stats },
             replay: this.replayBuffer.getStats(),
             model: this._model.getSnapshot(),
+            metrics: this._metrics.getSummary(),
         };
+    }
+
+    getMetricsHistory(count = 50) {
+        return this._metrics.getRecentEpisodes(count);
     }
 
     _buildErrorEnvelope(id, code, details = null) {
@@ -292,6 +305,25 @@ export class TrainerSession {
         this._state.domainId = typeof domain.domainId === 'string' ? domain.domainId : this._state.domainId;
         this._state.lastObservation = frame.observation;
 
+        // Log previous episode metrics on reset (new episode starts)
+        if (this._episodeStepAccum > 0) {
+            const snapshot = this._model.getSnapshot();
+            this._metrics.logEpisode({
+                episodeIndex: this._state.episodeIndex - 1,
+                totalReward: this._episodeRewardAccum,
+                steps: this._episodeStepAccum,
+                epsilon: snapshot.epsilon,
+                avgLoss: this._episodeLossCount > 0 ? this._episodeLossAccum / this._episodeLossCount : 0,
+                optimizerSteps: snapshot.optimizerSteps,
+                replayFill: this.replayBuffer.getStats()?.fillRatio || 0,
+                domainId: this._state.domainId,
+            });
+        }
+        this._episodeRewardAccum = 0;
+        this._episodeStepAccum = 0;
+        this._episodeLossAccum = 0;
+        this._episodeLossCount = 0;
+
         return this._buildAckEnvelope(id, TRAINER_MESSAGE_TYPES.TRAINING_RESET, {
             replay: this.replayBuffer.getStats(),
             state: cloneSessionState(this._state),
@@ -325,6 +357,15 @@ export class TrainerSession {
         );
         if (trainingUpdate.trained) {
             this._stats.optimizerUpdates += 1;
+        }
+
+        // Accumulate episode metrics
+        const reward = Number(transitionResult.transition.reward) || 0;
+        this._episodeRewardAccum += reward;
+        this._episodeStepAccum += 1;
+        if (trainingUpdate.trained && trainingUpdate.loss != null) {
+            this._episodeLossAccum += Number(trainingUpdate.loss) || 0;
+            this._episodeLossCount += 1;
         }
 
         const domain = validated.frame?.info?.domain || {};
@@ -367,10 +408,12 @@ export class TrainerSession {
                 details: validation.details,
             });
         }
-        const imported = this._model.importCheckpoint(validation.checkpoint);
-        if (!imported) {
+        const imported = this._model.importCheckpoint(validation.checkpoint, { strict });
+        if (!imported || (typeof imported === 'object' && imported.ok === false)) {
+            const importError = typeof imported === 'object' ? imported.error : 'checkpoint-import-failed';
             return this._buildErrorEnvelope(id, TRAINER_FAILURE_CODES.INVALID_TRANSITION, {
-                errors: ['checkpoint-import-failed'],
+                errors: [importError || 'checkpoint-import-failed'],
+                details: typeof imported === 'object' ? imported.details : null,
             });
         }
         this._stats.checkpointLoads += 1;

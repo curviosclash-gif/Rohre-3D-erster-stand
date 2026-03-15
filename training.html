@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CuviosClash Training Dashboard</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600&display=swap">
+<style>
+:root {
+    --bg: #050510;
+    --panel-bg: rgba(20, 20, 40, 0.82);
+    --border: rgba(100, 180, 255, 0.15);
+    --accent: #00aaff;
+    --accent-dim: rgba(0, 170, 255, 0.25);
+    --accent-strong: #00ddff;
+    --muted: #93a4c6;
+    --text: #e2e8f0;
+    --success: #34d399;
+    --danger: #f97373;
+    --warning: #fbbf24;
+    --heading-font: 'Orbitron', monospace;
+    --ui-font: 'Inter', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--ui-font);
+    min-height: 100vh;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+header {
+    text-align: center;
+    padding: 28px 16px 12px;
+    border-bottom: 1px solid var(--border);
+}
+header h1 {
+    font-family: var(--heading-font);
+    font-size: 1.6em;
+    letter-spacing: 3px;
+    background: linear-gradient(135deg, var(--accent), #ff8800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+header .stamp {
+    font-size: 0.78em;
+    color: var(--muted);
+    margin-top: 4px;
+    font-family: var(--heading-font);
+}
+main {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+section {
+    background: var(--panel-bg);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    backdrop-filter: blur(12px);
+}
+section h2 {
+    font-family: var(--heading-font);
+    font-size: 0.85em;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent);
+    margin-bottom: 14px;
+}
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+.kpi-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+.kpi-card .value {
+    font-family: var(--heading-font);
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--text);
+}
+.kpi-card .label {
+    font-size: 0.7em;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.domain-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+.domain-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+}
+.domain-card .name {
+    font-family: var(--heading-font);
+    font-size: 0.75em;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+}
+.domain-card .stat { font-size: 0.82em; color: var(--muted); }
+.domain-card .stat b { color: var(--text); }
+
+/* Training Control */
+.mode-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 14px;
+}
+.mode-tab {
+    flex: 1;
+    padding: 8px 6px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--muted);
+    font-family: var(--heading-font);
+    font-size: 0.65em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+.mode-tab.active {
+    background: var(--accent-dim);
+    color: var(--accent-strong);
+    border-color: var(--accent);
+}
+.config-row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+.config-field { display: flex; flex-direction: column; gap: 3px; }
+.config-field label {
+    font-size: 0.68em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+}
+.config-field input[type="number"],
+.config-field input[type="text"] {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    padding: 6px 10px;
+    font-family: var(--ui-font);
+    font-size: 0.85em;
+    width: 110px;
+}
+.config-field input:focus { outline: none; border-color: var(--accent); }
+.mode-checks { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.mode-checks label {
+    font-size: 0.8em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+.mode-checks input[type="checkbox"] { accent-color: var(--accent); }
+.btn-row { display: flex; gap: 10px; margin: 12px 0; }
+.btn-start {
+    padding: 10px 28px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 68%, #0050cc), var(--accent));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--heading-font);
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.btn-start:hover { opacity: 0.88; }
+.btn-start:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-stop {
+    padding: 10px 24px;
+    background: linear-gradient(135deg, #cc3333, #ff4444);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: var(--heading-font);
+    font-size: 0.85em;
+    letter-spacing: 1px;
+    cursor: pointer;
+    display: none;
+}
+.btn-stop.visible { display: inline-block; }
+.btn-secondary {
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: var(--muted);
+    font-size: 0.78em;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.14); }
+.status-label {
+    font-size: 0.8em;
+    color: var(--muted);
+    margin-bottom: 6px;
+}
+.status-label.running { color: var(--accent); }
+.status-label.done { color: var(--success); }
+.status-label.failed { color: var(--danger); }
+#training-output {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.72em;
+    color: var(--muted);
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.4;
+}
+.chart-container {
+    min-height: 180px;
+    overflow-x: auto;
+}
+.chart-container svg { display: block; }
+.empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.82em;
+    padding: 30px;
+    opacity: 0.6;
+}
+
+/* Gate */
+.gate-badge {
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 10px;
+    font-family: var(--heading-font);
+    font-size: 1em;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+.gate-badge.pass { background: rgba(52, 211, 153, 0.2); color: var(--success); border: 1px solid var(--success); }
+.gate-badge.fail { background: rgba(249, 115, 115, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+.gate-badge.unknown { background: rgba(147, 164, 198, 0.15); color: var(--muted); border: 1px solid var(--muted); }
+.gate-checks { margin-top: 12px; }
+.gate-checks table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78em;
+}
+.gate-checks th, .gate-checks td {
+    padding: 6px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+.gate-checks th { color: var(--muted); font-weight: 600; }
+.gate-checks .check-pass { color: var(--success); }
+.gate-checks .check-warn { color: var(--warning); }
+.gate-checks .check-fail { color: var(--danger); }
+
+/* History */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.78em;
+}
+.history-table th, .history-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+.history-table th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 0.85em; }
+.history-table tr { cursor: pointer; transition: background 0.15s; }
+.history-table tr:hover { background: rgba(0, 170, 255, 0.06); }
+.history-table tr.active-row { background: var(--accent-dim); }
+.trend-chart { margin-top: 14px; min-height: 100px; }
+
+/* Curriculum config */
+.curriculum-stages { display: flex; flex-direction: column; gap: 8px; }
+.curriculum-stage-row {
+    display: flex; gap: 8px; align-items: center;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+}
+.curriculum-stage-row .stage-num {
+    font-family: var(--heading-font);
+    font-size: 0.75em;
+    color: var(--accent);
+    min-width: 20px;
+}
+.curriculum-stage-row input {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 4px 8px;
+    font-size: 0.8em;
+    font-family: var(--ui-font);
+}
+.curriculum-stage-row input.stage-name { width: 100px; }
+.curriculum-stage-row input.stage-episodes { width: 60px; }
+.curriculum-stage-row input.stage-modes { flex: 1; min-width: 140px; }
+
+/* Schedule */
+.schedule-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.schedule-toggle {
+    position: relative;
+    width: 44px; height: 24px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.25s;
+}
+.schedule-toggle.active { background: var(--accent); }
+.schedule-toggle .knob {
+    position: absolute; top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.25s;
+}
+.schedule-toggle.active .knob { transform: translateX(20px); }
+.schedule-info { font-size: 0.78em; color: var(--muted); }
+
+/* Config panel visibility */
+.config-panel { display: none; }
+.config-panel.active { display: block; }
+
+@media (max-width: 640px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .domain-grid { grid-template-columns: 1fr; }
+    .mode-tabs { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+<header>
+    <h1>Training Dashboard</h1>
+    <div class="stamp" id="stamp-label">Keine Trainingsdaten</div>
+</header>
+
+<main>
+    <!-- 1. Training Control -->
+    <section id="section-control">
+        <h2>Training Control</h2>
+        <div class="mode-tabs">
+            <div class="mode-tab active" data-mode="single">Single</div>
+            <div class="mode-tab" data-mode="loop">Endlos-Loop</div>
+            <div class="mode-tab" data-mode="curriculum">Curriculum</div>
+            <div class="mode-tab" data-mode="scheduled">Scheduled</div>
+        </div>
+
+        <!-- Single / Loop config -->
+        <div class="config-panel active" id="panel-single">
+            <div class="config-row">
+                <div class="config-field">
+                    <label>Episodes</label>
+                    <input type="number" id="cfg-episodes" value="20" min="1" max="10000">
+                </div>
+                <div class="config-field">
+                    <label>Seed</label>
+                    <input type="text" id="cfg-seed" placeholder="random" style="width:80px">
+                </div>
+                <div class="config-field">
+                    <label>Max Steps</label>
+                    <input type="number" id="cfg-maxsteps" value="" placeholder="auto" style="width:80px">
+                </div>
+            </div>
+            <div class="config-row">
+                <div class="config-field">
+                    <label>Modes</label>
+                    <div class="mode-checks">
+                        <label><input type="checkbox" value="classic-3d" checked> Classic 3D</label>
+                        <label><input type="checkbox" value="classic-2d"> Classic 2D</label>
+                        <label><input type="checkbox" value="hunt-3d"> Hunt 3D</label>
+                        <label><input type="checkbox" value="hunt-2d"> Hunt 2D</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Curriculum config -->
+        <div class="config-panel" id="panel-curriculum">
+            <div class="curriculum-stages" id="curriculum-stages">
+                <div class="curriculum-stage-row">
+                    <span class="stage-num">1</span>
+                    <input class="stage-name" value="Navigate" placeholder="Name">
+                    <input class="stage-episodes" type="number" value="20" placeholder="Ep.">
+                    <input class="stage-modes" value="classic-3d" placeholder="Modes">
+                </div>
+                <div class="curriculum-stage-row">
+                    <span class="stage-num">2</span>
+                    <input class="stage-name" value="Combat" placeholder="Name">
+                    <input class="stage-episodes" type="number" value="20" placeholder="Ep.">
+                    <input class="stage-modes" value="classic-3d,hunt-3d" placeholder="Modes">
+                </div>
+                <div class="curriculum-stage-row">
+                    <span class="stage-num">3</span>
+                    <input class="stage-name" value="Full" placeholder="Name">
+                    <input class="stage-episodes" type="number" value="20" placeholder="Ep.">
+                    <input class="stage-modes" value="classic-3d,classic-2d,hunt-3d,hunt-2d" placeholder="Modes">
+                </div>
+            </div>
+        </div>
+
+        <!-- Schedule config -->
+        <div class="config-panel" id="panel-scheduled">
+            <div class="schedule-row">
+                <div class="schedule-toggle" id="schedule-toggle">
+                    <div class="knob"></div>
+                </div>
+                <div class="config-field">
+                    <label>Intervall (Stunden)</label>
+                    <input type="number" id="cfg-interval" value="6" min="0.01" step="0.5" style="width:80px">
+                </div>
+                <div class="schedule-info" id="schedule-info">Inaktiv</div>
+            </div>
+        </div>
+
+        <div class="btn-row">
+            <button class="btn-start" id="btn-start">Start Training</button>
+            <button class="btn-stop" id="btn-stop">Stop</button>
+            <button class="btn-secondary" id="btn-clear" style="margin-left:auto">Output leeren</button>
+        </div>
+        <div class="status-label" id="training-status">Idle</div>
+        <pre id="training-output"></pre>
+    </section>
+
+    <!-- 2. Run KPIs -->
+    <section id="section-kpis">
+        <h2>Run KPIs</h2>
+        <div class="kpi-grid" id="kpi-grid">
+            <div class="kpi-card"><div class="value" id="kpi-return">—</div><div class="label">Avg Return</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-terminal">—</div><div class="label">Terminal Rate</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-invalid">—</div><div class="label">Invalid Action Rate</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-episodes">—</div><div class="label">Episodes</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-errors">—</div><div class="label">Runtime Errors</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-elapsed">—</div><div class="label">Elapsed</div></div>
+        </div>
+    </section>
+
+    <!-- 3. Episode Chart -->
+    <section id="section-chart">
+        <h2>Episode Returns</h2>
+        <div class="chart-container" id="episode-chart"><div class="empty-state">Keine Episoden-Daten</div></div>
+    </section>
+
+    <!-- 4. Eval Results -->
+    <section id="section-eval">
+        <h2>Eval Results</h2>
+        <div class="domain-grid" id="eval-domains"><div class="empty-state">Keine Eval-Daten</div></div>
+    </section>
+
+    <!-- 5. Gate Status -->
+    <section id="section-gate">
+        <h2>Gate Status</h2>
+        <div id="gate-content"><div class="empty-state">Kein Gate-Ergebnis</div></div>
+    </section>
+
+    <!-- 6. Trainer & Checkpoint -->
+    <section id="section-trainer">
+        <h2>Trainer / Checkpoint</h2>
+        <div class="kpi-grid" id="trainer-grid">
+            <div class="kpi-card"><div class="value" id="kpi-loss">—</div><div class="label">Loss</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-epsilon">—</div><div class="label">Epsilon</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-replay">—</div><div class="label">Replay Fill</div></div>
+            <div class="kpi-card"><div class="value" id="kpi-checkpoint">—</div><div class="label">Checkpoint</div></div>
+        </div>
+    </section>
+
+    <!-- 7. History -->
+    <section id="section-history">
+        <h2>Trainings-Historie</h2>
+        <div class="trend-chart" id="trend-chart"></div>
+        <div id="history-content"><div class="empty-state">Keine Historie</div></div>
+    </section>
+</main>
+
+<script>
+const $ = (s) => document.getElementById(s);
+const POLL_STATUS_MS = 8000;
+const POLL_PROGRESS_MS = 2000;
+let currentMode = 'single';
+let ws = null;
+let statusTimer = null;
+let progressTimer = null;
+let lastLineIdx = 0;
+
+// --- Mode Tabs ---
+document.querySelectorAll('.mode-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentMode = tab.dataset.mode;
+        document.querySelectorAll('.config-panel').forEach(p => p.classList.remove('active'));
+        if (currentMode === 'curriculum') $('panel-curriculum').classList.add('active');
+        else if (currentMode === 'scheduled') $('panel-scheduled').classList.add('active');
+        else $('panel-single').classList.add('active');
+    });
+});
+
+// --- Schedule Toggle ---
+$('schedule-toggle').addEventListener('click', async () => {
+    const toggle = $('schedule-toggle');
+    const active = !toggle.classList.contains('active');
+    toggle.classList.toggle('active', active);
+    const intervalHours = parseFloat($('cfg-interval').value) || 6;
+    const res = await fetch('/api/training/schedule', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: active, intervalHours, config: collectConfig() }),
+    });
+    const data = await res.json();
+    if (data.ok && data.scheduled) {
+        $('schedule-info').textContent = data.scheduled.enabled
+            ? `Aktiv — Naechster Run: ${new Date(data.scheduled.nextRunAt).toLocaleString()}`
+            : 'Inaktiv';
+    }
+});
+
+// --- Collect Config ---
+function collectConfig() {
+    const modes = [];
+    document.querySelectorAll('.mode-checks input:checked').forEach(cb => modes.push(cb.value));
+    return {
+        episodes: parseInt($('cfg-episodes').value) || 20,
+        modes: modes.join(',') || 'classic-3d',
+        seed: $('cfg-seed').value.trim() || '',
+        maxSteps: parseInt($('cfg-maxsteps').value) || '',
+    };
+}
+
+function collectCurriculum() {
+    const stages = [];
+    document.querySelectorAll('.curriculum-stage-row').forEach(row => {
+        stages.push({
+            name: row.querySelector('.stage-name').value,
+            episodes: parseInt(row.querySelector('.stage-episodes').value) || 20,
+            modes: row.querySelector('.stage-modes').value || 'classic-3d',
+        });
+    });
+    return stages;
+}
+
+// --- Start ---
+$('btn-start').addEventListener('click', async () => {
+    $('btn-start').disabled = true;
+    $('training-output').textContent = '';
+    lastLineIdx = 0;
+
+    const body = { mode: currentMode, ...collectConfig() };
+    if (currentMode === 'curriculum') body.curriculum = collectCurriculum();
+
+    const res = await fetch('/api/training/start', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json();
+    if (!data.ok) {
+        $('training-status').textContent = `Fehler: ${data.error}`;
+        $('training-status').className = 'status-label failed';
+        $('btn-start').disabled = false;
+        return;
+    }
+    setRunningUI(true, currentMode);
+    connectWebSocket();
+    startProgressPolling();
+});
+
+// --- Stop ---
+$('btn-stop').addEventListener('click', async () => {
+    await fetch('/api/training/stop', { method: 'POST' });
+});
+
+// --- Clear ---
+$('btn-clear').addEventListener('click', () => {
+    $('training-output').textContent = '';
+});
+
+// --- Running UI ---
+function setRunningUI(running, mode) {
+    $('btn-start').disabled = running;
+    $('btn-stop').classList.toggle('visible', running);
+    const statusEl = $('training-status');
+    if (running) {
+        statusEl.textContent = `Running (${mode})...`;
+        statusEl.className = 'status-label running';
+    }
+}
+
+// --- WebSocket ---
+function connectWebSocket() {
+    if (ws && ws.readyState <= 1) return;
+    const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+    ws = new WebSocket(`${proto}//${location.host}/ws/training`);
+    ws.onmessage = (evt) => {
+        try {
+            const msg = JSON.parse(evt.data);
+            if (msg.type === 'line') {
+                $('training-output').textContent += msg.text + '\n';
+                $('training-output').scrollTop = $('training-output').scrollHeight;
+                lastLineIdx = (msg.i || 0) + 1;
+            } else if (msg.type === 'status') {
+                updateStatusFromMsg(msg);
+            } else if (msg.type === 'done') {
+                const label = msg.exitCode === 0 ? 'Abgeschlossen' : `Fehlgeschlagen (exit ${msg.exitCode})`;
+                $('training-status').textContent = label;
+                $('training-status').className = msg.exitCode === 0 ? 'status-label done' : 'status-label failed';
+                setRunningUI(false);
+                stopProgressPolling();
+                fetchStatus();
+                fetchHistory();
+            } else if (msg.type === 'loop-restart') {
+                $('training-status').textContent = `Loop Iteration ${msg.iteration} | Running...`;
+            } else if (msg.type === 'curriculum-stage') {
+                $('training-status').textContent = `Curriculum Stage ${msg.index + 1}/${msg.total}: ${msg.stage}`;
+            }
+        } catch { /* ignore */ }
+    };
+    ws.onclose = () => { ws = null; };
+    ws.onerror = () => { ws = null; };
+}
+
+function updateStatusFromMsg(msg) {
+    if (msg.running) {
+        const elapsed = msg.elapsedMs ? formatElapsed(msg.elapsedMs) : '';
+        let label = `Running (${msg.mode || 'single'})`;
+        if (msg.loopIteration > 0) label += ` | Iteration ${msg.loopIteration}`;
+        if (elapsed) label += ` | ${elapsed}`;
+        $('training-status').textContent = label;
+        $('training-status').className = 'status-label running';
+        setRunningUI(true, msg.mode);
+    } else if (msg.exitCode != null) {
+        const label = msg.exitCode === 0 ? 'Abgeschlossen' : `Fehlgeschlagen (exit ${msg.exitCode})`;
+        $('training-status').textContent = label;
+        $('training-status').className = msg.exitCode === 0 ? 'status-label done' : 'status-label failed';
+        setRunningUI(false);
+    }
+}
+
+// --- Progress Polling (fallback) ---
+function startProgressPolling() {
+    if (progressTimer) return;
+    progressTimer = setInterval(fetchProgress, POLL_PROGRESS_MS);
+}
+function stopProgressPolling() {
+    if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+}
+async function fetchProgress() {
+    try {
+        const res = await fetch(`/api/training/progress?since=${lastLineIdx}`);
+        const data = await res.json();
+        if (!data.ok) return;
+        if (!ws || ws.readyState > 1) {
+            for (const line of (data.lines || [])) {
+                $('training-output').textContent += line.text + '\n';
+                lastLineIdx = line.i + 1;
+            }
+            $('training-output').scrollTop = $('training-output').scrollHeight;
+        }
+        if (!data.running) {
+            stopProgressPolling();
+            fetchStatus();
+            fetchHistory();
+            const label = data.exitCode === 0 ? 'Abgeschlossen' : `Fehlgeschlagen (exit ${data.exitCode})`;
+            $('training-status').textContent = label;
+            $('training-status').className = data.exitCode === 0 ? 'status-label done' : 'status-label failed';
+            setRunningUI(false);
+        } else {
+            const elapsed = data.elapsedMs ? formatElapsed(data.elapsedMs) : '';
+            let label = `Running (${data.mode || 'single'})`;
+            if (data.loopIteration > 0) label += ` | Iteration ${data.loopIteration}`;
+            if (elapsed) label += ` | ${elapsed}`;
+            $('training-status').textContent = label;
+            $('training-status').className = 'status-label running';
+        }
+    } catch { /* ignore */ }
+}
+
+// --- Fetch Status ---
+async function fetchStatus(stamp) {
+    try {
+        const url = stamp ? `/api/training/status?stamp=${stamp}` : '/api/training/status';
+        const res = await fetch(url);
+        const data = await res.json();
+        if (!data.ok || !data.stamp) {
+            $('stamp-label').textContent = 'Keine Trainingsdaten';
+            return;
+        }
+        $('stamp-label').textContent = `Run: ${data.stamp} | ${data.lastCompletedStage || '—'}`;
+        renderKpis(data.run);
+        renderEpisodeChart(data.run?.episodes);
+        renderEvalDomains(data.eval?.domains);
+        renderGate(data.gate);
+        renderTrainer(data.trainer, data.checkpoint);
+        if (data.training?.running) {
+            setRunningUI(true, data.training.mode);
+            connectWebSocket();
+            startProgressPolling();
+        }
+    } catch { /* ignore */ }
+}
+
+// --- Fetch History ---
+async function fetchHistory() {
+    try {
+        const res = await fetch('/api/training/history');
+        const data = await res.json();
+        if (!data.ok) return;
+        renderHistory(data.runs || []);
+        renderTrendChart(data.runs || []);
+    } catch { /* ignore */ }
+}
+
+// --- Render KPIs ---
+function renderKpis(run) {
+    if (!run?.kpis) {
+        ['kpi-return','kpi-terminal','kpi-invalid','kpi-episodes','kpi-errors','kpi-elapsed'].forEach(id => $(id).textContent = '—');
+        return;
+    }
+    $('kpi-return').textContent = (run.kpis.episodeReturnMean ?? 0).toFixed(2);
+    $('kpi-terminal').textContent = ((run.kpis.terminalRate ?? 0) * 100).toFixed(1) + '%';
+    $('kpi-invalid').textContent = ((run.kpis.invalidActionRate ?? 0) * 100).toFixed(1) + '%';
+    $('kpi-episodes').textContent = run.totals?.episodesTotal ?? '—';
+    $('kpi-errors').textContent = run.kpis.runtimeErrorCount ?? 0;
+    $('kpi-elapsed').textContent = run.totals?.elapsedMs ? formatElapsed(run.totals.elapsedMs) : '—';
+}
+
+// --- Render Episode Chart ---
+function renderEpisodeChart(episodes) {
+    const container = $('episode-chart');
+    if (!episodes || episodes.length === 0) {
+        container.innerHTML = '<div class="empty-state">Keine Episoden-Daten</div>';
+        return;
+    }
+    const maxReturn = Math.max(...episodes.map(e => Math.abs(e.episodeReturn || 0)), 1);
+    const svgH = 170;
+    const barW = Math.max(4, Math.min(20, (900 / episodes.length) - 2));
+    const bars = episodes.map((ep, i) => {
+        const val = ep.episodeReturn || 0;
+        const h = Math.max(2, (Math.abs(val) / maxReturn) * (svgH - 20));
+        const color = ep.runtimeError ? '#f97373' : (ep.truncated || ep.truncatedReason) ? '#fbbf24' : '#00aaff';
+        const x = i * (barW + 2) + 4;
+        const y = svgH - h;
+        return `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="${color}" rx="2" opacity="0.85">` +
+               `<title>Ep ${ep.index ?? i}: return=${val.toFixed(2)}, reason=${ep.terminalReason || ep.runtimeError || '—'}</title></rect>`;
+    }).join('');
+    const svgW = episodes.length * (barW + 2) + 8;
+    container.innerHTML = `<svg width="100%" height="${svgH}" viewBox="0 0 ${svgW} ${svgH}" preserveAspectRatio="xMinYEnd meet">${bars}</svg>`;
+}
+
+// --- Render Eval Domains ---
+function renderEvalDomains(domains) {
+    const container = $('eval-domains');
+    if (!domains || Object.keys(domains).length === 0) {
+        container.innerHTML = '<div class="empty-state">Keine Eval-Daten</div>';
+        return;
+    }
+    container.innerHTML = Object.entries(domains).map(([name, d]) =>
+        `<div class="domain-card">
+            <div class="name">${name}</div>
+            <div class="stat">Episodes: <b>${d.count}</b></div>
+            <div class="stat">Avg Return: <b>${d.avgReturn?.toFixed(2) ?? '—'}</b></div>
+            <div class="stat">Win Rate: <b>${((d.winRate || 0) * 100).toFixed(0)}%</b></div>
+        </div>`
+    ).join('');
+}
+
+// --- Render Gate ---
+function renderGate(gate) {
+    const container = $('gate-content');
+    if (!gate) {
+        container.innerHTML = '<div class="empty-state">Kein Gate-Ergebnis</div>';
+        return;
+    }
+    const badgeClass = gate.status === 'pass' ? 'pass' : gate.status === 'fail' ? 'fail' : 'unknown';
+    let html = `<span class="gate-badge ${badgeClass}">${gate.status?.toUpperCase() || 'UNKNOWN'}</span>`;
+    if (gate.checks && gate.checks.length > 0) {
+        html += `<div class="gate-checks"><table>
+            <tr><th>Metric</th><th>Value</th><th>Threshold</th><th>Status</th></tr>`;
+        for (const c of gate.checks) {
+            const cls = c.passed === true ? 'check-pass' : c.level === 'warn' ? 'check-warn' : 'check-fail';
+            html += `<tr class="${cls}">
+                <td>${c.metric || c.name || '—'}</td>
+                <td>${c.value != null ? (typeof c.value === 'number' ? c.value.toFixed(4) : c.value) : '—'}</td>
+                <td>${c.threshold != null ? c.threshold : '—'}</td>
+                <td>${c.passed ? 'PASS' : (c.level || 'FAIL')}</td>
+            </tr>`;
+        }
+        html += '</table></div>';
+    }
+    container.innerHTML = html;
+}
+
+// --- Render Trainer ---
+function renderTrainer(trainer, checkpoint) {
+    $('kpi-loss').textContent = trainer?.latestLoss != null ? trainer.latestLoss.toFixed(4) : '—';
+    $('kpi-epsilon').textContent = trainer?.latestEpsilon != null ? trainer.latestEpsilon.toFixed(4) : '—';
+    $('kpi-replay').textContent = trainer?.latestReplayFill != null ? (trainer.latestReplayFill * 100).toFixed(1) + '%' : '—';
+    const cpEl = $('kpi-checkpoint');
+    if (checkpoint?.hasData) {
+        cpEl.textContent = 'Verfuegbar';
+        cpEl.style.color = 'var(--success)';
+    } else if (checkpoint?.exists) {
+        cpEl.textContent = 'Leer';
+        cpEl.style.color = 'var(--warning)';
+    } else {
+        cpEl.textContent = 'Fehlt';
+        cpEl.style.color = 'var(--danger)';
+    }
+}
+
+// --- Render History ---
+function renderHistory(runs) {
+    const container = $('history-content');
+    if (!runs || runs.length === 0) {
+        container.innerHTML = '<div class="empty-state">Keine Historie</div>';
+        return;
+    }
+    let html = `<table class="history-table">
+        <tr><th>Datum</th><th>Episodes</th><th>Avg Return</th><th>Gate</th></tr>`;
+    for (const run of runs) {
+        const date = run.stamp ? run.stamp.replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z/, '$1-$2-$3 $4:$5') : '—';
+        const avgReturn = run.avgReturn != null ? run.avgReturn.toFixed(2) : '—';
+        const gateLabel = run.gateStatus === 'pass' ? '<span style="color:var(--success)">PASS</span>'
+            : run.gateStatus === 'fail' ? '<span style="color:var(--danger)">FAIL</span>' : '—';
+        html += `<tr onclick="fetchStatus('${run.stamp}')" title="Details laden">
+            <td>${date}</td><td>${run.episodes || '—'}</td><td>${avgReturn}</td><td>${gateLabel}</td>
+        </tr>`;
+    }
+    html += '</table>';
+    container.innerHTML = html;
+}
+
+// --- Render Trend Chart ---
+function renderTrendChart(runs) {
+    const container = $('trend-chart');
+    const valid = runs.filter(r => r.avgReturn != null).reverse();
+    if (valid.length < 2) { container.innerHTML = ''; return; }
+    const maxR = Math.max(...valid.map(r => Math.abs(r.avgReturn)), 1);
+    const w = 800;
+    const h = 80;
+    const stepX = w / Math.max(valid.length - 1, 1);
+    const points = valid.map((r, i) => `${(i * stepX).toFixed(1)},${(h - ((r.avgReturn / maxR) * (h - 10) + 5)).toFixed(1)}`).join(' ');
+    container.innerHTML = `<svg width="100%" height="${h}" viewBox="0 0 ${w} ${h}" preserveAspectRatio="xMidYMid meet">
+        <polyline points="${points}" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.8"/>
+        ${valid.map((r, i) => `<circle cx="${(i * stepX).toFixed(1)}" cy="${(h - ((r.avgReturn / maxR) * (h - 10) + 5)).toFixed(1)}" r="3" fill="var(--accent)">
+            <title>${r.stamp}: ${r.avgReturn.toFixed(2)}</title></circle>`).join('')}
+    </svg>`;
+}
+
+// --- Helpers ---
+function formatElapsed(ms) {
+    if (ms < 1000) return `${ms}ms`;
+    const s = Math.floor(ms / 1000);
+    if (s < 60) return `${s}s`;
+    const m = Math.floor(s / 60);
+    const rs = s % 60;
+    if (m < 60) return `${m}m ${rs}s`;
+    const h = Math.floor(m / 60);
+    const rm = m % 60;
+    return `${h}h ${rm}m`;
+}
+
+// --- Init ---
+document.addEventListener('DOMContentLoaded', () => {
+    fetchStatus();
+    fetchHistory();
+    statusTimer = setInterval(() => { fetchStatus(); fetchHistory(); }, POLL_STATUS_MS);
+});
+</script>
+</body>
+</html>

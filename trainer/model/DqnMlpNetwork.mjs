@@ -128,6 +128,7 @@ export class DqnMlpNetwork {
             return {
                 meanLoss: null,
                 trained: false,
+                tdErrors: [],
             };
         }
         const gamma = clampFloat(options.gamma, 0.99, 0, 1);
@@ -143,9 +144,13 @@ export class DqnMlpNetwork {
 
         let totalLoss = 0;
         let trainedCount = 0;
+        const tdErrors = [];
 
         for (const sample of samples) {
-            if (!sample || typeof sample !== 'object') continue;
+            if (!sample || typeof sample !== 'object') {
+                tdErrors.push(0);
+                continue;
+            }
             const actionIndex = clampInt(
                 sample.actionIndex,
                 0,
@@ -154,6 +159,7 @@ export class DqnMlpNetwork {
             );
             const reward = toFinite(sample.reward, 0);
             const done = sample.done === true;
+            const isWeight = toFinite(sample._isWeight, 1);
 
             const online = this._forwardWithCache(sample.state);
             const currentQ = online.output[actionIndex];
@@ -161,15 +167,17 @@ export class DqnMlpNetwork {
             const nextBestQ = targetQValues[argMax(targetQValues)];
             const target = reward + (done ? 0 : gamma * nextBestQ);
             const delta = currentQ - target;
-            totalLoss += 0.5 * delta * delta;
+            const weightedDelta = delta * isWeight;
+            totalLoss += 0.5 * delta * delta * isWeight;
             trainedCount += 1;
+            tdErrors.push(delta);
 
-            gradBOutput[actionIndex] += delta;
+            gradBOutput[actionIndex] += weightedDelta;
             for (let hiddenIndex = 0; hiddenIndex < this.hiddenSize; hiddenIndex++) {
                 const outputWeightIndex = hiddenIndex * this.outputSize + actionIndex;
-                gradWHiddenOutput[outputWeightIndex] += online.aHidden[hiddenIndex] * delta;
+                gradWHiddenOutput[outputWeightIndex] += online.aHidden[hiddenIndex] * weightedDelta;
 
-                const gradHiddenPreActivation = this.weightsHiddenOutput[outputWeightIndex] * delta;
+                const gradHiddenPreActivation = this.weightsHiddenOutput[outputWeightIndex] * weightedDelta;
                 if (online.zHidden[hiddenIndex] <= 0) {
                     continue;
                 }
@@ -186,6 +194,7 @@ export class DqnMlpNetwork {
             return {
                 meanLoss: null,
                 trained: false,
+                tdErrors,
             };
         }
 
@@ -206,6 +215,7 @@ export class DqnMlpNetwork {
         return {
             meanLoss: totalLoss / trainedCount,
             trained: true,
+            tdErrors,
         };
     }
 

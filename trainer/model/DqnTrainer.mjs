@@ -50,6 +50,7 @@ export class DqnTrainer {
             epsilonStart: clampFloat(options?.model?.epsilonStart, 1, 0, 1),
             epsilonEnd: clampFloat(options?.model?.epsilonEnd, 0.05, 0, 1),
             epsilonDecaySteps: clampInt(options?.model?.epsilonDecaySteps, 5000, 1, 10_000_000),
+            rewardClamp: clampFloat(options?.model?.rewardClamp, 10, 0.1, 1000),
         };
 
         const epsilonMin = Math.min(this.hyper.epsilonStart, this.hyper.epsilonEnd);
@@ -57,9 +58,11 @@ export class DqnTrainer {
         this.hyper.epsilonStart = epsilonMax;
         this.hyper.epsilonEnd = epsilonMin;
 
+        this.planarMode = options.planarMode === true;
         this.rng = new SeededRng(this.seed);
         this.actionVocabulary = new ActionVocabulary({
             maxItemIndex: this.maxItemIndex,
+            planarMode: this.planarMode,
         });
         this.onlineNetwork = new DqnMlpNetwork({
             inputSize: this.observationLength,
@@ -91,7 +94,13 @@ export class DqnTrainer {
         return normalizeObservationVector(observation, {
             length: this.observationLength,
             clampAbs: 10_000,
+            warnRange: 2,
         });
+    }
+
+    _clampReward(reward) {
+        const value = toFinite(reward, 0);
+        return Math.max(-this.hyper.rewardClamp, Math.min(this.hyper.rewardClamp, value));
     }
 
     _buildTrainingSample(transition) {
@@ -110,7 +119,7 @@ export class DqnTrainer {
         return {
             state: this._normalizeState(transition.state),
             actionIndex,
-            reward: toFinite(transition.reward, 0),
+            reward: this._clampReward(transition.reward),
             nextState: this._normalizeState(transition.nextState),
             done: transition.done === true,
         };
@@ -175,7 +184,11 @@ export class DqnTrainer {
         const samples = [];
         for (const sampled of sampledTransitions) {
             const mapped = this._buildTrainingSample(sampled);
-            if (mapped) samples.push(mapped);
+            if (mapped) {
+                mapped._replayIndex = sampled._replayIndex;
+                mapped._isWeight = sampled._isWeight;
+                samples.push(mapped);
+            }
         }
         if (samples.length === 0) {
             return {
@@ -195,6 +208,16 @@ export class DqnTrainer {
             gamma: this.hyper.gamma,
             learningRate: this.hyper.learningRate,
         });
+
+        // Update priorities for PER
+        if (typeof replayBuffer.updatePriority === 'function' && Array.isArray(trainingResult.tdErrors)) {
+            for (let i = 0; i < trainingResult.tdErrors.length; i++) {
+                const sample = samples[i];
+                if (sample && Number.isInteger(sample._replayIndex)) {
+                    replayBuffer.updatePriority(sample._replayIndex, trainingResult.tdErrors[i]);
+                }
+            }
+        }
         if (!trainingResult.trained) {
             return {
                 trained: false,
@@ -253,28 +276,50 @@ export class DqnTrainer {
             lastTargetSyncAt: this.lastTargetSyncAt,
             observationLength: this.observationLength,
             maxItemIndex: this.maxItemIndex,
+            planarMode: this.planarMode,
+            actionCount: this.actionVocabulary.size,
             hyper: { ...this.hyper },
             online: this.onlineNetwork.exportState(),
             target: this.targetNetwork.exportState(),
         };
     }
 
-    importCheckpoint(checkpoint) {
+    importCheckpoint(checkpoint, options = {}) {
         if (!checkpoint || typeof checkpoint !== 'object') {
-            return false;
+            return { ok: false, error: 'checkpoint-missing' };
         }
         if (checkpoint.contractVersion !== 'v34-dqn-checkpoint-v1') {
-            return false;
+            return { ok: false, error: 'checkpoint-contract-version-mismatch', details: {
+                expected: 'v34-dqn-checkpoint-v1',
+                actual: checkpoint.contractVersion || null,
+            }};
+        }
+        const strict = options.strict !== false;
+        const expectedActionCount = this.actionVocabulary.size;
+        const checkpointObsLength = clampInt(checkpoint.observationLength, 0, 0, 10_000);
+        const checkpointActionCount = clampInt(
+            checkpoint.online?.outputSize ?? checkpoint.target?.outputSize,
+            0, 0, 10_000
+        );
+        if (checkpointObsLength && checkpointObsLength !== this.observationLength) {
+            const msg = `observation-length-mismatch: checkpoint=${checkpointObsLength} runtime=${this.observationLength}`;
+            if (strict) return { ok: false, error: msg };
+            console.warn(`[DqnTrainer] ${msg} (non-strict, continuing)`);
+        }
+        if (checkpointActionCount && checkpointActionCount !== expectedActionCount) {
+            const msg = `action-count-mismatch: checkpoint=${checkpointActionCount} runtime=${expectedActionCount}`;
+            if (strict) return { ok: false, error: msg };
+            console.warn(`[DqnTrainer] ${msg} (non-strict, continuing)`);
         }
         const importedOnline = this.onlineNetwork.importState(checkpoint.online);
         const importedTarget = this.targetNetwork.importState(checkpoint.target);
         if (!importedOnline || !importedTarget) {
-            return false;
+            return { ok: false, error: 'network-state-import-failed' };
         }
         this.envSteps = clampInt(checkpoint.envSteps, 0, 0, 1_000_000_000);
         this.optimizerSteps = clampInt(checkpoint.optimizerSteps, 0, 0, 1_000_000_000);
         this.lastLoss = checkpoint.lastLoss == null ? null : toFinite(checkpoint.lastLoss, 0);
         this.lastTargetSyncAt = clampInt(checkpoint.lastTargetSyncAt, 0, 0, 1_000_000_000);
-        return true;
+        return { ok: true, error: null };
     }
 }
