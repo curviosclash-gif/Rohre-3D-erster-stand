@@ -108,8 +108,8 @@ function normalizeLocalSettingsState(localSettings = null) {
     const developerModeVisibility = VALID_DEVELOPER_ACCESS_MODE_SET.has(requestedAccessMode)
         ? requestedAccessMode
         : MENU_DEVELOPER_ACCESS_MODES.OWNER_ONLY;
-    const sessionType = normalizeSessionType(source.sessionType, MENU_SESSION_TYPES.SINGLE);
-    const modePath = normalizeModePath(source.modePath, MENU_MODE_PATHS.NORMAL);
+    const sessionType = normalizeSessionType(source.sessionType, MENU_SESSION_TYPES.SPLITSCREEN);
+    const modePath = normalizeModePath(source.modePath, MENU_MODE_PATHS.FIGHT);
     const startSetup = cloneObject(source.startSetup, {
         mapSearch: '',
         mapFilter: 'all',
