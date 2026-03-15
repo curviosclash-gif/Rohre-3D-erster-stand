@@ -18,7 +18,7 @@ export class GameLoop {
         this.renderAlpha = 1;
         this.renderDelta = this.fixedStep;
         this.runtimePerfProfiler = options?.runtimePerfProfiler || null;
-        this.largeDeltaResetSeconds = 0.25;
+        this.largeDeltaResetSeconds = 0.2;
         this.renderFrameId = 0;
         this._renderTiming = {
             frameId: 0,
@@ -134,7 +134,9 @@ export class GameLoop {
             ? (pendingReset.reset ? `${pendingReset.reason}|delta-jump` : 'delta-jump')
             : pendingReset.reason;
         if (shouldResetDelta) {
-            this.accumulator = 0;
+            // Halb gefüllter Akkumulator nach Reset → renderAlpha ≈ 0.5 statt 0,
+            // verhindert sichtbaren Positions-Sprung direkt nach dem Reset-Frame.
+            this.accumulator = this.fixedStep * 0.5;
         }
 
         const stabilizedRawDt = shouldResetDelta ? this.fixedStep : rawDt;
