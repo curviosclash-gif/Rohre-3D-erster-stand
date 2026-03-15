@@ -63,13 +63,13 @@ export function resolveBotPolicyType(
     if (normalizedStrategy === BOT_POLICY_STRATEGIES.RULE_BASED) {
         return BOT_POLICY_TYPES.RULE_BASED;
     }
-    if (trainerBridgeEnabled === true) {
-        return resolveMatchBotPolicyType({
-            huntModeActive,
-            planarMode: !!planarMode,
-        });
-    }
-    return resolveLocalBotPolicyType(huntModeActive);
+    // AUTO strategy: always use bridge policy types so that local checkpoint
+    // auto-loading works. The bridge policy gracefully falls back to rule-based
+    // when no checkpoint and no WebSocket bridge are available.
+    return resolveMatchBotPolicyType({
+        huntModeActive,
+        planarMode: !!planarMode,
+    });
 }
 
 export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = {}) {

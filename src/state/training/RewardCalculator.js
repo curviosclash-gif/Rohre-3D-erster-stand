@@ -1,6 +1,24 @@
 // ============================================
 // RewardCalculator.js - deterministic additive reward shaping for training
 // ============================================
+//
+// Expected reward ranges per step (with default weights):
+//   baseStep:     0        (constant)
+//   survival:     0..0.01  (per step)
+//   kill:         0..1     (rare, 0-1 per step)
+//   crash:       -1..0     (rare)
+//   stuck:       -0.35..0  (rare)
+//   itemPickup:   0..0.08  (0-1 per step)
+//   itemUse:      0..0.03  (0-1 per step)
+//   damageDealt:  0..~0.5  (0-25 damage units typical)
+//   damageTaken: -0.5..0   (0-20 damage units typical)
+//   win:          0..1.5   (terminal only)
+//   loss:        -1.5..0   (terminal only)
+//
+// Typical per-step range: ~[-2.5, +3.0]
+// Terminal step range:    ~[-3.5, +4.5]
+// Trainer clamps rewards to [-rewardClamp, +rewardClamp] (default +-10)
+// ============================================
 
 const REWARD_PRECISION = 1_000_000;
 
@@ -98,15 +116,71 @@ export function calculateReward(signals = {}, options = {}) {
     };
 }
 
+// ============================================
+// Curriculum stages: gradually increase reward complexity
+// ============================================
+export const CURRICULUM_STAGES = Object.freeze([
+    {
+        name: 'navigate',
+        minSteps: 0,
+        description: 'Navigation + survival only',
+        weightOverrides: {
+            kill: 0, crash: -0.5, stuck: -0.5, itemPickup: 0, itemUse: 0,
+            damageDealt: 0, damageTaken: 0, win: 0, loss: 0,
+            survival: 0.02, baseStep: 0.001,
+        },
+    },
+    {
+        name: 'combat',
+        minSteps: 5000,
+        description: 'Navigation + shooting',
+        weightOverrides: {
+            itemPickup: 0, itemUse: 0,
+            survival: 0.015, baseStep: 0,
+        },
+    },
+    {
+        name: 'full',
+        minSteps: 15000,
+        description: 'Full complexity with items',
+        weightOverrides: {},
+    },
+]);
+
+export function resolveCurriculumStage(totalSteps, stages = CURRICULUM_STAGES) {
+    let resolved = stages[0];
+    for (const stage of stages) {
+        if (totalSteps >= stage.minSteps) {
+            resolved = stage;
+        }
+    }
+    return resolved;
+}
+
 export class RewardCalculator {
     constructor(options = {}) {
         this.weights = resolveWeightMap(options);
+        this.curriculumEnabled = options.curriculum === true;
+        this.curriculumStages = options.curriculumStages || CURRICULUM_STAGES;
+        this._currentStage = null;
     }
 
     compute(signals = {}, episodeSnapshot = null) {
+        let weights = this.weights;
+        if (this.curriculumEnabled && typeof signals.totalEnvSteps === 'number') {
+            const stage = resolveCurriculumStage(signals.totalEnvSteps, this.curriculumStages);
+            if (stage && stage.weightOverrides) {
+                weights = { ...this.weights, ...stage.weightOverrides };
+                this._currentStage = stage.name;
+            }
+        }
         return calculateReward(signals, {
-            weights: this.weights,
+            weights,
             episodeSnapshot,
         });
+    }
+
+    get currentStage() {
+        return this._currentStage;
     }
 }

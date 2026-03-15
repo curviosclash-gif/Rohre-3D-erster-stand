@@ -61,7 +61,12 @@ export class ActionVocabulary {
         this.maxItemIndex = Number.isInteger(options.maxItemIndex)
             ? Math.max(0, options.maxItemIndex)
             : 2;
-        this._templates = [
+        this.planarMode = options.planarMode === true;
+        this._templates = this._buildTemplates();
+    }
+
+    _buildTemplates() {
+        const templates = [
             createTemplateAction(),
             createTemplateAction({ yawLeft: true }),
             createTemplateAction({ yawRight: true }),
@@ -71,13 +76,22 @@ export class ActionVocabulary {
             createTemplateAction({ shootMG: true }),
             createTemplateAction({ yawLeft: true, shootMG: true }),
             createTemplateAction({ yawRight: true, shootMG: true }),
-            createTemplateAction({ shootItem: true, shootItemIndex: 0 }),
-            createTemplateAction({ shootItem: true, shootItemIndex: 1 }),
-            createTemplateAction({ useItem: 0 }),
-            createTemplateAction({ useItem: 1 }),
-            createTemplateAction({ nextItem: true }),
-            createTemplateAction({ dropItem: true }),
         ];
+        if (!this.planarMode) {
+            templates.push(createTemplateAction({ pitchUp: true }));
+            templates.push(createTemplateAction({ pitchDown: true }));
+            templates.push(createTemplateAction({ pitchUp: true, boost: true }));
+            templates.push(createTemplateAction({ pitchDown: true, boost: true }));
+        }
+        for (let i = 0; i <= this.maxItemIndex; i++) {
+            templates.push(createTemplateAction({ shootItem: true, shootItemIndex: i }));
+        }
+        for (let i = 0; i <= this.maxItemIndex; i++) {
+            templates.push(createTemplateAction({ useItem: i }));
+        }
+        templates.push(createTemplateAction({ nextItem: true }));
+        templates.push(createTemplateAction({ dropItem: true }));
+        return templates;
     }
 
     get size() {

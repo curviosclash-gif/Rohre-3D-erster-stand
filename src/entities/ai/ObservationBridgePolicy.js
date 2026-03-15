@@ -6,6 +6,7 @@ import { createNeutralBotAction, sanitizeBotAction } from './actions/BotActionCo
 import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
 import { buildTrainerRuntimeObservationPayload } from './training/TrainerPayloadAdapter.js';
 import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
+import { LocalDqnInference } from './inference/LocalDqnInference.js';
 
 const WARNING_COOLDOWN_BASE_MS = 2000;
 const WARNING_COOLDOWN_MAX_MS = 30000;
@@ -79,6 +80,8 @@ export class ObservationBridgePolicy {
             updatedAt: 0,
         };
         this._neutralAction = createNeutralBotAction({});
+        this._localInference = null;
+        this._localInferenceVocabulary = null;
         this._trainerBridge = null;
         this._trainerBridgeOptions = null;
         this._trainerBridgeInitPromise = null;
@@ -96,6 +99,11 @@ export class ObservationBridgePolicy {
             this._trainerBridgeOptions = trainerBridgeOptions;
             this._trainerBridge = new WebSocketTrainerBridge(trainerBridgeOptions);
             this._primeTrainerBridge(trainerBridgeOptions);
+        }
+
+        const autoLoad = options.autoLoadCheckpoint !== false;
+        if (autoLoad && !this._localInference && !this._trainerBridge) {
+            this._autoLoadLatestCheckpoint();
         }
     }
 
@@ -306,7 +314,59 @@ export class ObservationBridgePolicy {
         return buildTrainerRuntimeObservationPayload(runtimeContext, player);
     }
 
+    _autoLoadLatestCheckpoint() {
+        const CHECKPOINT_API_URL = '/api/bot/latest-checkpoint';
+        fetch(CHECKPOINT_API_URL)
+            .then((res) => {
+                if (!res.ok) return null;
+                return res.json();
+            })
+            .then((data) => {
+                if (!data?.ok || !data?.checkpoint) return;
+                const result = this.loadLocalCheckpoint(data.checkpoint);
+                if (result.ok) {
+                    console.info('[ObservationBridgePolicy] auto-loaded trained bot checkpoint');
+                }
+            })
+            .catch(() => {
+                // No checkpoint available — silent fallback to rule-based
+            });
+    }
+
+    loadLocalCheckpoint(checkpoint, actionVocabulary = null) {
+        const inference = new LocalDqnInference();
+        const result = inference.loadCheckpoint(checkpoint);
+        if (!result.ok) {
+            this._warn(`local checkpoint load failed: ${result.error}`, null, 'local-checkpoint-load');
+            return result;
+        }
+        this._localInference = inference;
+        this._localInferenceVocabulary = actionVocabulary || null;
+        return result;
+    }
+
+    _resolveLocalInferenceAction(runtimeContext) {
+        if (!this._localInference || !this._localInference.loaded) {
+            return null;
+        }
+        const observation = runtimeContext?.observation;
+        if (!Array.isArray(observation)) return null;
+        const { actionIndex } = this._localInference.selectBestAction(observation);
+        if (this._localInferenceVocabulary && typeof this._localInferenceVocabulary.decode === 'function') {
+            return this._localInferenceVocabulary.decode(actionIndex, {
+                planarMode: runtimeContext?.rules?.planarMode,
+                domainId: runtimeContext?.rules?.domainId,
+            });
+        }
+        return { _actionIndex: actionIndex };
+    }
+
     _resolveTrainerBridgeAction(runtimeContext, player) {
+        // Local inference has priority (no latency)
+        const localAction = this._resolveLocalInferenceAction(runtimeContext);
+        if (localAction) {
+            return { action: localAction, failure: null, usedBridge: false };
+        }
         if (!this._trainerBridge) {
             return { action: null, failure: null, usedBridge: false };
         }
