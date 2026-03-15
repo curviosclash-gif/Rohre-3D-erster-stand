@@ -14,11 +14,11 @@ export class GameLoop {
         this._errorShown = false;
         this.accumulator = 0;
         this.fixedStep = 1 / 60;
-        this.maxSubSteps = 5;
+        this.maxSubSteps = 3;
         this.renderAlpha = 1;
         this.renderDelta = this.fixedStep;
         this.runtimePerfProfiler = options?.runtimePerfProfiler || null;
-        this.largeDeltaResetSeconds = 0.5;
+        this.largeDeltaResetSeconds = 0.2;
         this.renderFrameId = 0;
         // Dt-Ringpuffer: glaettet den Frame-Jitter (60Hz-Resonanz mit fixedStep=1/60)
         // verhindert das Alpha-0<->1-Springen, das das Flugzeug ruckeln laesst.

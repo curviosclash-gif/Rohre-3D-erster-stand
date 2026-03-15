@@ -217,11 +217,11 @@ export class Player {
         updatePlayerHealthRegen(this, dt);
         updatePlayerEffects(this, dt);
 
-        if (this._lastCaptureFrame !== renderFrameId) {
-            this._renderPrevPosition.copy(this.position);
-            this._renderPrevQuaternion.copy(this.quaternion);
-            this._lastCaptureFrame = renderFrameId;
-        }
+        // Capture vor JEDEM Substep, nicht nur einmal pro Frame.
+        // So interpoliert render() immer zwischen den letzten beiden Physics-States
+        // statt über N Substeps hinweg (was bei Framedrops zum Ruckeln fuehrt).
+        this._renderPrevPosition.copy(this.position);
+        this._renderPrevQuaternion.copy(this.quaternion);
 
         const controlState = this.controller.resolveControlState(this, input, steeringLocked, dt);
         updatePlayerMotion(this, dt, controlState);
