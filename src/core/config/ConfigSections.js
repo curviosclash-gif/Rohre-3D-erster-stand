@@ -26,8 +26,8 @@ export const CONFIG_SECTIONS = {
 
     // ---- Spieler ----
     PLAYER: {
-        SPEED: 18,
-        TURN_SPEED: 2.2,
+        SPEED: 35,
+        TURN_SPEED: 3.4,
         ROLL_SPEED: 2.0,
         BOOST_MULTIPLIER: 1.8,
         BOOST_DURATION: 2.0,
@@ -47,7 +47,7 @@ export const CONFIG_SECTIONS = {
     // ---- Gameplay Options ----
     GAMEPLAY: {
         PLANAR_MODE: false,
-        PORTAL_COUNT: 0,
+        PORTAL_COUNT: 8,
         PLANAR_LEVEL_COUNT: 5,
         PORTAL_BEAMS: false,
         PLANAR_AIM_INPUT_SPEED: 1.5,
@@ -80,7 +80,7 @@ export const CONFIG_SECTIONS = {
     // ---- Powerups ----
     POWERUP: {
         SPAWN_INTERVAL: 3.0,
-        MAX_ON_FIELD: 8,
+        MAX_ON_FIELD: 10,
         PICKUP_RADIUS: 2.5,
         SIZE: 1.5,
         ROTATION_SPEED: 2.0,
@@ -106,8 +106,8 @@ export const CONFIG_SECTIONS = {
 
     // ---- Bots ----
     BOT: {
-        DEFAULT_DIFFICULTY: 'NORMAL',
-        ACTIVE_DIFFICULTY: 'NORMAL',
+        DEFAULT_DIFFICULTY: 'HARD',
+        ACTIVE_DIFFICULTY: 'HARD',
         REACTION_TIME: 0.13,
         LOOK_AHEAD: 13,
         AGGRESSION: 0.58,
@@ -252,7 +252,7 @@ export const CONFIG_SECTIONS = {
         RADIUS: 0.7,
         LIFE_TIME: 3.0,
         MAX_DISTANCE: 140,
-        COOLDOWN: 0.45,
+        COOLDOWN: 1.25,
         PLANAR_AIM_MAX_ANGLE_DEG: 18,
     },
 
@@ -268,7 +268,7 @@ export const CONFIG_SECTIONS = {
 
     // ---- Homing (Zielsuchend) ----
     HOMING: {
-        LOCK_ON_ANGLE: 15,       // Grad – Lock-On-Kegel
+        LOCK_ON_ANGLE: 11,       // Grad – Lock-On-Kegel
         TURN_RATE: 3.0,          // Wie schnell Rakete zum Ziel lenkt (Rad/s)
         MAX_LOCK_RANGE: 100,     // Maximale Lock-On-Entfernung
     },
@@ -316,24 +316,24 @@ export const CONFIG_SECTIONS = {
             ROLL_RIGHT: 'KeyE',
             BOOST: 'ShiftLeft',
             SHOOT: 'KeyF',
-            SHOOT_MG: 'KeyG',
+            SHOOT_MG: 'KeyX',
             NEXT_ITEM: 'KeyR',
-            DROP: 'KeyX',
+            DROP: 'KeyG',
             CAMERA: 'KeyC',
         },
         PLAYER_2: {
-            UP: 'ArrowUp',
-            DOWN: 'ArrowDown',
-            LEFT: 'ArrowLeft',
-            RIGHT: 'ArrowRight',
-            ROLL_LEFT: 'KeyN',
-            ROLL_RIGHT: 'KeyM',
-            BOOST: 'ShiftRight',
-            SHOOT: 'KeyJ',
-            SHOOT_MG: 'KeyK',
-            NEXT_ITEM: 'KeyL',
-            DROP: 'KeyH',
-            CAMERA: 'KeyV',
+            UP: 'Numpad8',
+            DOWN: 'Numpad5',
+            LEFT: 'Numpad4',
+            RIGHT: 'Numpad6',
+            ROLL_LEFT: 'Numpad7',
+            ROLL_RIGHT: 'Numpad9',
+            BOOST: 'ArrowRight',
+            SHOOT: 'ArrowUp',
+            SHOOT_MG: 'ArrowDown',
+            NEXT_ITEM: 'ArrowLeft',
+            DROP: 'Quote',
+            CAMERA: 'NumpadDivide',
         },
         GLOBAL: {
             CINEMATIC_TOGGLE: 'F8',

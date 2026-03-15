@@ -222,15 +222,15 @@
 
                                 <div class="match-settings-grid">
                                     <div class="menu-section">
-                                        <label for="bot-count">Bots: <span id="bot-count-label">1</span></label>
-                                        <input type="range" id="bot-count" min="0" max="8" value="1">
+                                        <label for="bot-count">Bots: <span id="bot-count-label">5</span></label>
+                                        <input type="range" id="bot-count" min="0" max="8" value="5">
                                     </div>
                                     <div class="menu-section">
                                         <label for="bot-difficulty">Bot-Schwierigkeit</label>
                                         <select id="bot-difficulty">
                                             <option value="EASY">Easy</option>
-                                            <option value="NORMAL" selected>Normal</option>
-                                            <option value="HARD">Hard</option>
+                                            <option value="NORMAL">Normal</option>
+                                            <option value="HARD" selected>Hard</option>
                                         </select>
                                     </div>
                                     <div class="menu-section">
@@ -341,10 +341,10 @@
                             role="tabpanel" aria-labelledby="level4-tab-gameplay" aria-hidden="true">
                         <div class="menu-section">
                             <h2 class="section-title" data-menu-text-id="menu.level4.gameplay.title">Gameplay-Feineinstellungen</h2>
-                            <label for="speed-slider">Geschwindigkeit: <span id="speed-label">18.0</span></label>
-                            <input type="range" id="speed-slider" min="8" max="40" step="0.5" value="18">
-                            <label for="turn-slider">Lenk-Empfindlichkeit: <span id="turn-label">2.2</span></label>
-                            <input type="range" id="turn-slider" min="0.8" max="5.0" step="0.1" value="2.2">
+                            <label for="speed-slider">Geschwindigkeit: <span id="speed-label">35.0</span></label>
+                            <input type="range" id="speed-slider" min="8" max="40" step="0.5" value="35">
+                            <label for="turn-slider">Lenk-Empfindlichkeit: <span id="turn-label">3.4</span></label>
+                            <input type="range" id="turn-slider" min="0.8" max="5.0" step="0.1" value="3.4">
                             <label for="plane-size-slider">Flugzeug-Groesse: <span id="plane-size-label">1.0</span></label>
                             <input type="range" id="plane-size-slider" min="0.6" max="2.0" step="0.1" value="1.0">
                             <label for="trail-width-slider">Strahldicke: <span id="trail-width-label">0.60</span></label>
@@ -353,16 +353,16 @@
                             <input type="range" id="gap-size-slider" min="0.05" max="1.5" step="0.05" value="0.3">
                             <label for="gap-frequency-slider">Luecken-Haeufigkeit: <span id="gap-frequency-label">0.020</span></label>
                             <input type="range" id="gap-frequency-slider" min="0" max="0.25" step="0.005" value="0.02">
-                            <label for="item-amount-slider">Item-Menge: <span id="item-amount-label">8</span></label>
-                            <input type="range" id="item-amount-slider" min="1" max="20" step="1" value="8">
-                            <label for="fire-rate-slider">Schussgeschwindigkeit: <span id="fire-rate-label">0.45</span>s</label>
-                            <input type="range" id="fire-rate-slider" min="0.1" max="2.0" step="0.05" value="0.45">
-                            <label for="lockon-slider">Lock-On Radius: <span id="lockon-label">15</span>°</label>
-                            <input type="range" id="lockon-slider" min="5" max="45" step="1" value="15">
-                            <label for="mg-trail-aim-slider">MG Trail-Zielsuchradius: <span id="mg-trail-aim-label">0.78</span></label>
-                            <input type="range" id="mg-trail-aim-slider" min="0.2" max="3.0" step="0.05" value="0.78">
-                            <label for="shadow-quality-slider">Schattenqualitaet: <span id="shadow-quality-label">Mittel</span></label>
-                            <input type="range" id="shadow-quality-slider" min="0" max="3" step="1" value="2">
+                            <label for="item-amount-slider">Item-Menge: <span id="item-amount-label">10</span></label>
+                            <input type="range" id="item-amount-slider" min="1" max="20" step="1" value="10">
+                            <label for="fire-rate-slider">Schussgeschwindigkeit: <span id="fire-rate-label">1.25</span>s</label>
+                            <input type="range" id="fire-rate-slider" min="0.1" max="2.0" step="0.05" value="1.25">
+                            <label for="lockon-slider">Lock-On Radius: <span id="lockon-label">11</span>°</label>
+                            <input type="range" id="lockon-slider" min="5" max="45" step="1" value="11">
+                            <label for="mg-trail-aim-slider">MG Trail-Zielsuchradius: <span id="mg-trail-aim-label">3.00</span></label>
+                            <input type="range" id="mg-trail-aim-slider" min="0.2" max="3.0" step="0.05" value="3.0">
+                            <label for="shadow-quality-slider">Schattenqualitaet: <span id="shadow-quality-label">Hoch</span></label>
+                            <input type="range" id="shadow-quality-slider" min="0" max="3" step="1" value="3">
 
                             <label class="toggle-row secondary-btn-spaced">
                                 <input type="checkbox" id="auto-roll-toggle" checked>
@@ -370,11 +370,11 @@
                             </label>
                             <div class="toggle-grid secondary-btn-spaced">
                                 <label class="toggle-row">
-                                    <input type="checkbox" id="invert-p1">
+                                    <input type="checkbox" id="invert-p1" checked>
                                     <span>Invert Pitch P1</span>
                                 </label>
                                 <label class="toggle-row">
-                                    <input type="checkbox" id="invert-p2">
+                                    <input type="checkbox" id="invert-p2" checked>
                                     <span>Invert Pitch P2</span>
                                 </label>
                                 <label class="toggle-row">
@@ -397,8 +397,8 @@
                                 <input type="checkbox" id="portals-toggle" checked>
                                 <span>Portale aktiviert</span>
                             </label>
-                            <label for="portal-count-slider">Anzahl Portale: <span id="portal-count-label">0</span></label>
-                            <input type="range" id="portal-count-slider" min="0" max="20" step="2" value="0">
+                            <label for="portal-count-slider">Anzahl Portale: <span id="portal-count-label">8</span></label>
+                            <input type="range" id="portal-count-slider" min="0" max="20" step="2" value="8">
                             <label for="planar-level-count-slider">Anzahl Ebenen: <span id="planar-level-count-label">5</span></label>
                             <input type="range" id="planar-level-count-slider" min="2" max="10" step="1" value="5">
                             <label class="toggle-row">

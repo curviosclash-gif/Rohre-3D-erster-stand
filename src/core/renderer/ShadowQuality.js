@@ -5,7 +5,7 @@ export const SHADOW_QUALITY_LEVELS = Object.freeze({
     HIGH: 3,
 });
 
-export const DEFAULT_SHADOW_QUALITY = SHADOW_QUALITY_LEVELS.MEDIUM;
+export const DEFAULT_SHADOW_QUALITY = SHADOW_QUALITY_LEVELS.HIGH;
 
 const SHADOW_QUALITY_PRESETS = Object.freeze({
     [SHADOW_QUALITY_LEVELS.OFF]: Object.freeze({
