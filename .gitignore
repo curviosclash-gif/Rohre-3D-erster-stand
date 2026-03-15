@@ -7,7 +7,8 @@ node_modules/
 # Build-Output
 dist/
 
-# Test-Output
+# Tests
+tests/
 playwright-report/
 test-results/
 
@@ -20,10 +21,7 @@ patch_phase1.py
 # Lokale Laufzeit-/Screenshot-Artefakte
 output/web-game-agent-a/
 tmp/
-data/training/*.json
-data/training/models/
-data/training/runs/
-data/training/series/
+data/training/
 data/maps/editor_qa-disk-map-*.editor.json
 data/maps/editor_qa-disk-map-*.runtime.json
 
