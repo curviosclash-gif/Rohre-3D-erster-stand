@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
 import { MatchFeedbackAdapter } from './MatchFeedbackAdapter.js';
 import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
+import { PauseOverlayController } from './PauseOverlayController.js';
 import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
 import { deriveMatchLoadingUiState } from './MatchUiStateOps.js';
 import {
@@ -49,6 +50,7 @@ export class MatchFlowUiController {
         this._damageRight = new THREE.Vector3();
         this._damageWorldUp = new THREE.Vector3(0, 1, 0);
         this._startMatchPromise = null;
+        this.pauseOverlayController = new PauseOverlayController(this);
     }
 
     _resolveMessageStatsContainer() {
@@ -133,6 +135,9 @@ export class MatchFlowUiController {
         }
         if (hasOwnProperty(uiState, 'overlayStats')) {
             this._renderMessageStatsUi(uiState.overlayStats);
+        }
+        if (game.ui.pauseOverlay && hasOwn('pauseOverlayHidden')) {
+            game.ui.pauseOverlay.classList.toggle('hidden', visibility.pauseOverlayHidden !== false);
         }
         if (game.ui.statusToast && hasOwn('statusToastHidden')) {
             game.ui.statusToast.classList.toggle('hidden', visibility.statusToastHidden !== false);
@@ -456,5 +461,21 @@ export class MatchFlowUiController {
         game._showMainNav();
         this.resetCrosshairUi();
         game.uiManager.syncAll();
+    }
+
+    pause() {
+        this.pauseOverlayController.pause();
+    }
+
+    resumeFromPause() {
+        this.pauseOverlayController.resumeFromPause();
+    }
+
+    returnToMenuFromPause() {
+        this.pauseOverlayController.returnToMenuFromPause();
+    }
+
+    _setupPauseOverlayListeners() {
+        this.pauseOverlayController.setupListeners();
     }
 }

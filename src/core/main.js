@@ -588,6 +588,12 @@ export class Game {
         this.roundStateTickSystem.updateMatchEnd(dt);
     }
 
+    _updatePausedState(_dt) {
+        if (this.input.wasPressed('Escape')) {
+            this.matchFlowUiController.resumeFromPause();
+        }
+    }
+
     update(dt) {
         this.runtimeDiagnosticsSystem.update(dt);
         this._handleGlobalInputHotkeys();
@@ -599,6 +605,8 @@ export class Game {
 
         if (this.state === GAME_STATE_IDS.PLAYING) {
             this._updatePlayingState(dt);
+        } else if (this.state === GAME_STATE_IDS.PAUSED) {
+            this._updatePausedState(dt);
         } else if (this.state === GAME_STATE_IDS.ROUND_END) {
             this._updateRoundEndState(dt);
         } else if (this.state === GAME_STATE_IDS.MATCH_END) {
@@ -621,7 +629,7 @@ export class Game {
         this._renderAlpha = Number.isFinite(numericAlpha) ? Math.max(0, Math.min(1, numericAlpha)) : 1;
         this._renderDelta = Number.isFinite(numericRenderDelta) ? Math.max(0, Math.min(0.05, numericRenderDelta)) : (1 / 60);
 
-        if (this.state === GAME_STATE_IDS.PLAYING) {
+        if (this.state === GAME_STATE_IDS.PLAYING || this.state === GAME_STATE_IDS.PAUSED) {
             this.playingStateSystem.render(this._renderAlpha, this._renderDelta);
         }
         const renderStart = this.runtimePerfProfiler?.startSample?.();

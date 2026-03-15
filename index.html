@@ -1144,6 +1144,44 @@
                 <div id="message-sub"></div>
                 <div id="message-stats" class="hidden" aria-live="polite"></div>
             </div>
+            <div id="pause-overlay" class="hidden" role="dialog" aria-modal="true" aria-label="Spiel pausiert">
+                <div id="pause-title">PAUSE</div>
+                <div id="pause-actions">
+                    <button type="button" id="btn-pause-resume" class="start-btn">Fortsetzen</button>
+                    <button type="button" id="btn-pause-settings" class="secondary-btn">Einstellungen</button>
+                    <button type="button" id="btn-pause-menu" class="secondary-btn">Men&uuml;</button>
+                </div>
+                <div id="pause-settings" class="hidden">
+                    <h3 class="pause-settings-title">Einstellungen</h3>
+                    <label class="toggle-row pause-toggle">
+                        <input type="checkbox" id="pause-auto-roll-toggle" checked>
+                        <span>Auto-Roll aktiv</span>
+                    </label>
+                    <label class="toggle-row pause-toggle">
+                        <input type="checkbox" id="pause-invert-p1" checked>
+                        <span>Invert Pitch P1</span>
+                    </label>
+                    <label class="toggle-row pause-toggle">
+                        <input type="checkbox" id="pause-invert-p2" checked>
+                        <span>Invert Pitch P2</span>
+                    </label>
+                    <div class="pause-keybinds-section">
+                        <h4 class="pause-settings-subtitle">Tastenbelegung</h4>
+                        <div class="pause-keybind-columns">
+                            <div class="pause-keybind-column">
+                                <h5 class="pause-keybind-header">Spieler 1</h5>
+                                <div id="pause-keybind-p1" class="keybind-grid"></div>
+                            </div>
+                            <div class="pause-keybind-column">
+                                <h5 class="pause-keybind-header">Spieler 2</h5>
+                                <div id="pause-keybind-p2" class="keybind-grid"></div>
+                            </div>
+                        </div>
+                        <div id="pause-keybind-warning" class="keybind-warning hidden" role="status" aria-live="polite"></div>
+                    </div>
+                    <button type="button" id="btn-pause-settings-back" class="secondary-btn">Zur&uuml;ck</button>
+                </div>
+            </div>
             <div id="status-toast" class="hidden" role="status" aria-live="polite" aria-atomic="true"></div>
         </div>
     </div>

@@ -82,6 +82,18 @@ export function createGameUiRefs() {
         messageOverlay: document.getElementById('message-overlay'),
         messageText: document.getElementById('message-text'),
         messageSub: document.getElementById('message-sub'),
+        pauseOverlay: document.getElementById('pause-overlay'),
+        pauseResumeButton: document.getElementById('btn-pause-resume'),
+        pauseSettingsButton: document.getElementById('btn-pause-settings'),
+        pauseMenuButton: document.getElementById('btn-pause-menu'),
+        pauseSettingsPanel: document.getElementById('pause-settings'),
+        pauseSettingsBackButton: document.getElementById('btn-pause-settings-back'),
+        pauseAutoRollToggle: document.getElementById('pause-auto-roll-toggle'),
+        pauseInvertP1: document.getElementById('pause-invert-p1'),
+        pauseInvertP2: document.getElementById('pause-invert-p2'),
+        pauseKeybindP1: document.getElementById('pause-keybind-p1'),
+        pauseKeybindP2: document.getElementById('pause-keybind-p2'),
+        pauseKeybindWarning: document.getElementById('pause-keybind-warning'),
         statusToast: document.getElementById('status-toast'),
         keybindWarning: document.getElementById('keybind-warning'),
         menuContext: document.getElementById('menu-context'),
@@ -330,6 +342,7 @@ export function bootstrapGameRuntime(game, options = {}) {
     );
 
     game.ui = createGameUiRefs();
+    game.matchFlowUiController._setupPauseOverlayListeners();
     game._navButtons = [];
     game._menuButtonByPanel = new Map();
     game._activeSubmenu = null;

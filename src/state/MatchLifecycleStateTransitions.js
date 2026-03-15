@@ -1,5 +1,7 @@
 import {
     deriveMatchStartUiState,
+    derivePauseUiState,
+    deriveResumeUiState,
     deriveReturnToMenuUiState,
     deriveRoundStartUiState,
 } from '../ui/MatchUiStateOps.js';
@@ -39,6 +41,26 @@ export function deriveReturnToMenuTransition() {
         hudTimer: null,
         uiState: deriveReturnToMenuUiState(),
         huntStatePatch: createHuntStateReset(),
+    };
+}
+
+export function derivePauseTransition() {
+    return {
+        state: 'PAUSED',
+        roundPause: null,
+        hudTimer: null,
+        uiState: derivePauseUiState(),
+        huntStatePatch: null,
+    };
+}
+
+export function deriveResumeTransition() {
+    return {
+        state: 'PLAYING',
+        roundPause: null,
+        hudTimer: null,
+        uiState: deriveResumeUiState(),
+        huntStatePatch: null,
     };
 }
 

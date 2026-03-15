@@ -13,6 +13,7 @@ export function deriveMatchStartUiState(inputs = {}) {
             mainMenuHidden: true,
             hudHidden: false,
             messageOverlayHidden: true,
+            pauseOverlayHidden: true,
             statusToastHidden: true,
         },
         overlayStats: null,
@@ -27,6 +28,7 @@ export function deriveMatchLoadingUiState(inputs = {}) {
             mainMenuHidden: true,
             hudHidden: true,
             messageOverlayHidden: false,
+            pauseOverlayHidden: true,
             statusToastHidden: true,
         },
         overlayStats: null,
@@ -39,6 +41,7 @@ export function deriveReturnToMenuUiState() {
             mainMenuHidden: false,
             hudHidden: true,
             messageOverlayHidden: true,
+            pauseOverlayHidden: true,
             statusToastHidden: true,
         },
         overlayStats: null,
@@ -49,6 +52,7 @@ export function deriveRoundStartUiState() {
     return {
         visibility: {
             messageOverlayHidden: true,
+            pauseOverlayHidden: true,
             statusToastHidden: true,
         },
         overlayStats: null,
@@ -73,5 +77,23 @@ export function deriveRoundEndCountdownUiState(roundPause) {
     }
     return {
         messageSub: `Naechste Runde in ${countdown}...`,
+    };
+}
+
+export function derivePauseUiState() {
+    return {
+        visibility: {
+            pauseOverlayHidden: false,
+            messageOverlayHidden: true,
+            statusToastHidden: true,
+        },
+    };
+}
+
+export function deriveResumeUiState() {
+    return {
+        visibility: {
+            pauseOverlayHidden: true,
+        },
     };
 }

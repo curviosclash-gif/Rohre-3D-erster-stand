@@ -14,6 +14,14 @@ export class KeybindEditorController {
         this.updateKeyConflictWarning(conflicts);
     }
 
+    renderPauseEditor() {
+        const game = this.game;
+        const conflicts = this.collectKeyConflicts();
+        this.renderKeybindRows('PLAYER_1', game.ui.pauseKeybindP1, KEY_BIND_ACTIONS, conflicts);
+        this.renderKeybindRows('PLAYER_2', game.ui.pauseKeybindP2, KEY_BIND_ACTIONS, conflicts);
+        this._updateWarningElement(game.ui.pauseKeybindWarning, conflicts);
+    }
+
     renderKeybindRows(playerKey, container, actions, conflicts) {
         if (!container) return;
 
@@ -54,11 +62,23 @@ export class KeybindEditorController {
     startKeyCapture(playerKey, actionKey) {
         this.game.keyCapture = { playerKey, actionKey };
         this.renderEditor();
+        this.renderPauseEditor();
+    }
+
+    _isKeybindEditorVisible() {
+        const game = this.game;
+        if (game.ui.mainMenu && !game.ui.mainMenu.classList.contains('hidden')) {
+            return true;
+        }
+        if (game.state === 'PAUSED' && game.ui.pauseSettingsPanel && !game.ui.pauseSettingsPanel.classList.contains('hidden')) {
+            return true;
+        }
+        return false;
     }
 
     handleKeyCapture(event) {
         const game = this.game;
-        if (!game.keyCapture || game.ui.mainMenu.classList.contains('hidden')) {
+        if (!game.keyCapture || !this._isKeybindEditorVisible()) {
             return false;
         }
 
@@ -68,13 +88,18 @@ export class KeybindEditorController {
         if (event.code === 'Escape') {
             game.keyCapture = null;
             this.renderEditor();
+            this.renderPauseEditor();
             return true;
         }
 
         this.setControlValue(game.keyCapture.playerKey, game.keyCapture.actionKey, event.code);
         game.keyCapture = null;
         game._onSettingsChanged();
-        game._showStatusToast('✅ Taste gespeichert!');
+        if (game.state === 'PAUSED') {
+            game.input?.setBindings?.(game.settings.controls);
+            this.renderPauseEditor();
+        }
+        game._showStatusToast('Taste gespeichert!');
         return true;
     }
 
@@ -108,22 +133,25 @@ export class KeybindEditorController {
         return counts;
     }
 
-    updateKeyConflictWarning(conflicts) {
-        const warning = this.game.ui.keybindWarning;
-        if (!warning) return;
+    _updateWarningElement(warningElement, conflicts) {
+        if (!warningElement) return;
 
         const conflictCodes = Array.from(conflicts.entries())
             .filter(([, count]) => count > 1)
             .map(([code]) => this.formatKeyCode(code));
 
         if (conflictCodes.length === 0) {
-            warning.classList.add('hidden');
-            warning.textContent = '';
+            warningElement.classList.add('hidden');
+            warningElement.textContent = '';
             return;
         }
 
-        warning.classList.remove('hidden');
-        warning.textContent = `Achtung: Mehrfachbelegte Tasten: ${conflictCodes.join(', ')}`;
+        warningElement.classList.remove('hidden');
+        warningElement.textContent = `Achtung: Mehrfachbelegte Tasten: ${conflictCodes.join(', ')}`;
+    }
+
+    updateKeyConflictWarning(conflicts) {
+        this._updateWarningElement(this.game.ui.keybindWarning, conflicts);
     }
 
     formatKeyCode(code) {

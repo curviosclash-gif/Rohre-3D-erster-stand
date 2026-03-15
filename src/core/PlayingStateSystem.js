@@ -39,7 +39,7 @@ export class PlayingStateSystem {
         const renderFrameId = game.gameLoop?.renderFrameId || 0;
 
         if (game.input.wasPressed('Escape')) {
-            game.matchFlowUiController.returnToMenu();
+            game.matchFlowUiController.pause();
             return;
         }
 

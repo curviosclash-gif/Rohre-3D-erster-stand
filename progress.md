@@ -1221,3 +1221,20 @@ Offene TODOs naechster Schritt:
   - `develop-web-game`-Client ueber Skill-Pfad per lokaler `node_modules`-Junction lauffaehig gemacht.
   - Artefakte: `tmp/develop-web-game-v37-menu/shot-0.png`, `tmp/develop-web-game-v37-level2/shot-0.png`, `tmp/develop-web-game-v37-play2/shot-0.png`.
   - Hinweis: Der Skill-Client meldete beim synthetischen Quickstart einmal einen abgeschnittenen Three.js-Bounding-Warnhinweis; der aequivalente direkte Playwright-Selektorpfad (`single` -> `#btn-quick-random-map`) reproduzierte denselben Fehler nicht. Falls das erneut auftritt, zuerst den vollstaendigen Console-Stack capturen, bevor weitere Geometrie-Patches gemacht werden.
+- 2026-03-16 (Claude-Worktree-Port in Root)
+- Uebernommen in den Hauptordner:
+- `install.bat` aus `claude/wizardly-kepler`.
+- Pause-Overlay aus `claude/modest-lederberg` mit neuem `PAUSED`-State, Resume/Settings/Menu, Toggle-Sync und Pause-Keybind-Editor.
+- Pause-Logik aus `MatchFlowUiController` in neuen `src/ui/PauseOverlayController.js` ausgelagert, damit die Architektur-Lintgrenze (`max-lines`) auf dem Root-Stand eingehalten wird.
+- Hotfix waehrend Verifikation: `Escape` wird beim Eintritt in den Pause-State ueber `input.clearJustPressed()` konsumiert, damit Pause nicht sofort wieder aufgehoben wird.
+- Direkte Browser-Verifikation erfolgreich:
+- Pause nach `Escape` bleibt stabil (`state=PAUSED`, Overlay sichtbar).
+- Pause-Settings oeffnen, zeigen je 12 Keybind-Zeilen fuer P1/P2 und lassen sich wieder mit `Fortsetzen` verlassen.
+- Screenshot-Artefakte: `output/web-game-pause/shot-0.png`, `output/web-game-pause/shot-1.png`, `pause-overlay-check.png`.
+- Verifikation:
+- `npm run smoke:roundstate` PASS
+- `npm run build` PASS
+- `npm run docs:sync` PASS
+- `npm run docs:check` PASS
+- `npm run test:core` FAIL, aber auf vorhandenem Legacy-Migrationsfall `T12b` (`mapKey expected maze, got mega_maze`), nicht auf dem Pause-Port.
+- `npm run test:stress` FAIL, aber auf vorhandenem Multiplayer-Ready-Test `T75` (disabled `#multiplayer-ready-toggle`), nicht auf dem Pause-Port.
