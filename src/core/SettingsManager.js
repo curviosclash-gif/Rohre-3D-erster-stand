@@ -211,6 +211,7 @@ export class SettingsManager {
 
     createDefaultSettings() {
         const defaults = {
+            settingsVersion: 2,
             mode: '2p',
             gameMode: resolveActiveGameMode(CONFIG.HUNT?.DEFAULT_MODE, CONFIG.HUNT?.ENABLED !== false),
             mapKey: 'mega_maze',
@@ -273,6 +274,10 @@ export class SettingsManager {
     sanitizeSettings(saved) {
         const defaults = this.createDefaultSettings();
         const src = saved && typeof saved === 'object' ? saved : {};
+        // Bei Versionswechsel: alte gespeicherte Settings verwerfen, neue Defaults nutzen
+        if ((src.settingsVersion || 0) < (defaults.settingsVersion || 0)) {
+            return deepClone(defaults);
+        }
         const merged = deepClone(defaults);
         const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
         const migratedSessionType = normalizeSessionType(

@@ -1,5 +1,5 @@
 export const HUNT_CONFIG = Object.freeze({
-    DEFAULT_MODE: 'CLASSIC',
+    DEFAULT_MODE: 'HUNT',
     DEFAULT_RESPAWN_ENABLED: true,
     PLAYER_MAX_HP: 100,
     PLAYER_REGEN_PER_SECOND: 2.0,
