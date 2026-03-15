@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // EntityManager.js - manages players, collisions and item projectiles
 // ============================================
 
@@ -165,8 +165,8 @@ export class EntityManager {
         return this._spawnPlacementSystem.traceFreeDistance(origin, direction, maxDistance, stepDistance, radius);
     }
 
-    update(dt, inputManager) {
-        this._tickPipeline.update(dt, inputManager);
+    update(dt, inputManager, renderFrameId = 0) {
+        this._tickPipeline.update(dt, inputManager, renderFrameId);
     }
 
     _getPendingHumanRespawns(players = this.humanPlayers) {

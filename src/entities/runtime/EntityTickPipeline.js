@@ -3,7 +3,7 @@ export class EntityTickPipeline {
         this.entityManager = entityManager || null;
     }
 
-    update(dt, inputManager) {
+    update(dt, inputManager, renderFrameId = 0) {
         const owner = this.entityManager;
         if (!owner) return;
 
@@ -17,7 +17,7 @@ export class EntityTickPipeline {
             if (!player.alive) continue;
             owner._playerLifecycleSystem.updateShootCooldown(player, dt);
             const input = owner._playerInputSystem.resolvePlayerInput(player, dt, inputManager);
-            owner._playerLifecycleSystem.updatePlayer(player, dt, input);
+            owner._playerLifecycleSystem.updatePlayer(player, dt, input, renderFrameId);
         }
 
         if (owner._roundEnded) return;

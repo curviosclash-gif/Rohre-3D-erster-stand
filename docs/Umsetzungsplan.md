@@ -55,6 +55,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 | 2026-03-11 | A | V26 | `src/entities/ai/ObservationBridgePolicy.js`, `src/entities/ai/training/WebSocketTrainerBridge.js` | V36 Match-Resume-vor-Action und erweiterte Bridge-Telemetrie/Fallback-Messung | mittel |
 | 2026-03-11 | A | PX V34 | `trainer/session/TrainerSession.mjs`, `trainer/server/TrainerServer.mjs`, `trainer/config/TrainerRuntimeContract.mjs`, `trainer/model/CheckpointValidation.mjs` | V36 Checkpoint-Resume-Haertung (`trainer-checkpoint-load-latest`) und Validierung | mittel |
 | 2026-03-13 | Codex | V27/V28 | `src/ui/menu/EventPlaylistCatalog.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuTextCatalog.js`, `src/ui/MenuController.js`, `src/core/GameBootstrap.js`, `src/core/GameRuntimeFacade.js` | V26.6 benoetigt einen additiven Event-Playlist-Quickstart ueber bestehende Menue-/Runtime-Pfade hinweg | mittel |
+| 2026-03-15 | Codex | V28 | `src/core/GameLoop.js` | Flugzeug-Stottern durch 60Hz-Resonanz (Alpha-Springen) behoben via Ringpuffer-Smoothing | mittel |
 
 ## Schnellindex Offener Arbeit
 
@@ -447,6 +448,10 @@ Template:
   - [ ] 38.3 `UIManager.js` modularisieren
     - [ ] 38.3.1 Start-/Preview-/Summary-Sync in dedizierte Controller/Ops extrahieren
     - [ ] 38.3.2 Navigation-/Access-/Dispose-Lifecycle in dedizierte Controller ueberfuehren
+  - [x] 38.4 Jitter-Stabilisierung (60Hz-Resonanz)
+    - [x] 38.4.1 Problem-Analyse: fixedStep/rawDt Resonanz identifiziert (Alpha 0<->1 Jitter bei rAF-Schwankungen)
+    - [x] 38.4.2 Dt-Smoothing via 4-Frame-Ringpuffer in `GameLoop.js` implementiert
+    - Status 2026-03-15: Flugzeug-Stottern behoben; Core-Resonanz geglaettet. All 22 `physics-core` tests PASS.
   - [ ] 38.9 Abschluss-Gate
     - [ ] 38.9.1 `npm run architecture:guard` und `npm run test:core` gruen bestaetigen
     - [ ] 38.9.2 `npm run build`, `npm run docs:sync` und `npm run docs:check` gruen bestaetigen

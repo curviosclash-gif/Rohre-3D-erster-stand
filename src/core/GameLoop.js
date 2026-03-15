@@ -14,12 +14,18 @@ export class GameLoop {
         this._errorShown = false;
         this.accumulator = 0;
         this.fixedStep = 1 / 60;
-        this.maxSubSteps = 3;
+        this.maxSubSteps = 5;
         this.renderAlpha = 1;
         this.renderDelta = this.fixedStep;
         this.runtimePerfProfiler = options?.runtimePerfProfiler || null;
-        this.largeDeltaResetSeconds = 0.2;
+        this.largeDeltaResetSeconds = 0.5;
         this.renderFrameId = 0;
+        // Dt-Ringpuffer: glaettet den Frame-Jitter (60Hz-Resonanz mit fixedStep=1/60)
+        // verhindert das Alpha-0<->1-Springen, das das Flugzeug ruckeln laesst.
+        this._dtBuf = new Float64Array(4);
+        this._dtBufIdx = 0;
+        this._dtBufSum = this.fixedStep * 4;
+        for (let i = 0; i < 4; i++) this._dtBuf[i] = this.fixedStep;
         this._renderTiming = {
             frameId: 0,
             rawDt: this.fixedStep,
@@ -47,6 +53,10 @@ export class GameLoop {
         this.renderAlpha = 0;
         this.renderDelta = this.fixedStep;
         this.renderFrameId = 0;
+        // Ringpuffer zuruecksetzen
+        this._dtBufSum = this.fixedStep * 4;
+        for (let i = 0; i < 4; i++) this._dtBuf[i] = this.fixedStep;
+        this._dtBufIdx = 0;
         this.requestDeltaReset('start');
         this._attachFocusResetEvents();
         this.frameId = requestAnimationFrame(this._boundLoop);
@@ -134,12 +144,25 @@ export class GameLoop {
             ? (pendingReset.reset ? `${pendingReset.reason}|delta-jump` : 'delta-jump')
             : pendingReset.reason;
         if (shouldResetDelta) {
-            // Halb gefüllter Akkumulator nach Reset → renderAlpha ≈ 0.5 statt 0,
-            // verhindert sichtbaren Positions-Sprung direkt nach dem Reset-Frame.
+            // Half-Step Seeding: Sorgt dafuer, dass der erste Frame nach einem Reset
+            // (z.B. Rundenstart oder Tab-Wechsel) bei renderAlpha ≈ 0.5 liegt.
+            // Verhindert den optischen Rücksprung auf die Vorposition (Alpha=0).
             this.accumulator = this.fixedStep * 0.5;
+            // Ringpuffer bei Reset zuruecksetzen, damit kein alter Jitter einfliesst
+            this._dtBufSum = this.fixedStep * 4;
+            for (let i = 0; i < 4; i++) this._dtBuf[i] = this.fixedStep;
+            this._dtBufIdx = 0;
         }
 
-        const stabilizedRawDt = shouldResetDelta ? this.fixedStep : rawDt;
+        // Dt-Smoothing via Ringpuffer (4 Frames):
+        // Glaettet Mikro-Jitter (~0.5ms) der Browser-rAF, der sonst Alpha 0<->1 springen laesst.
+        const clampedRaw = shouldResetDelta ? this.fixedStep : Math.min(rawDt, 0.25);
+        this._dtBufSum += clampedRaw - this._dtBuf[this._dtBufIdx];
+        this._dtBuf[this._dtBufIdx] = clampedRaw;
+        this._dtBufIdx = (this._dtBufIdx + 1) & 3; // & 3 == % 4
+        const smoothedDt = this._dtBufSum * 0.25; // / 4
+
+        const stabilizedRawDt = shouldResetDelta ? this.fixedStep : smoothedDt;
         const dt = Math.min(stabilizedRawDt, 0.05);
         const runtimePerfProfiler = this.runtimePerfProfiler;
         this.renderFrameId += 1;

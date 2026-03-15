@@ -294,7 +294,11 @@ export class CameraRigSystem {
             return;
         }
 
-        const smoothFactor = 1 - Math.pow(1 - smooth, stableDt * 60);
+        // Fix: Doppeltes Smoothing erzeugt Schwebung mit Interpolation. 
+        // Deshalb immer Hard-Lock, da das `target` durch `Player.js` _renderInterpolationPosition bereits "butterweich" ist.
+        const effectiveSmooth = 1.0; 
+        const smoothFactor = 1 - Math.pow(1 - effectiveSmooth, stableDt * 60);
+
         cam.position.lerp(target.position, smoothFactor);
 
         cam.getWorldDirection(this._tmpLookAt);

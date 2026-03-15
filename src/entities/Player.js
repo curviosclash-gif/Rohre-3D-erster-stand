@@ -205,7 +205,7 @@ export class Player {
         return success;
     }
 
-    update(dt, input) {
+    update(dt, input, renderFrameId = 0) {
         if (!this.alive) return;
         this._obbCollisionPrepared = false;
 
@@ -217,8 +217,11 @@ export class Player {
         updatePlayerHealthRegen(this, dt);
         updatePlayerEffects(this, dt);
 
-        this._renderPrevPosition.copy(this.position);
-        this._renderPrevQuaternion.copy(this.quaternion);
+        if (this._lastCaptureFrame !== renderFrameId) {
+            this._renderPrevPosition.copy(this.position);
+            this._renderPrevQuaternion.copy(this.quaternion);
+            this._lastCaptureFrame = renderFrameId;
+        }
 
         const controlState = this.controller.resolveControlState(this, input, steeringLocked, dt);
         updatePlayerMotion(this, dt, controlState);
@@ -322,12 +325,12 @@ export class Player {
             Number(this.speed) || Number(this.baseSpeed) || Number(CONFIG.PLAYER.SPEED) || 18
         );
         const radius = Math.max(0.2, Number(this.hitboxRadius) || Number(CONFIG.PLAYER.HITBOX_RADIUS) || 0.8);
-        const maxInterpolatedDistance = Math.max(radius * 3.5, speed * 0.35);
+        const maxInterpolatedDistance = Math.max(radius * 3.5, speed * 0.5);
         if (this._renderPrevPosition.distanceToSquared(this.position) > maxInterpolatedDistance * maxInterpolatedDistance) {
             return true;
         }
         const angularDelta = this._renderPrevQuaternion.angleTo(this.quaternion);
-        return angularDelta > 1.15;
+        return angularDelta > 2.0;
     }
 
     resolveRenderTransform(alpha = 1, outPosition = null, outQuaternion = null) {

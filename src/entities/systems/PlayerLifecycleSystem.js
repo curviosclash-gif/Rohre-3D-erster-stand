@@ -19,13 +19,13 @@ export class PlayerLifecycleSystem {
         player.shootCooldown = Math.max(0, (player.shootCooldown || 0) - dt);
     }
 
-    updatePlayer(player, dt, input) {
+    updatePlayer(player, dt, input, renderFrameId = 0) {
         const huntModeActive = isHuntHealthActive();
         const runtimeProfiler = this.entityManager?.runtimeProfiler || null;
         this._actionPhase.run(player, input, huntModeActive);
 
         const prevPos = this._interactionPhase.capturePreviousPosition(player);
-        player.update(dt, input);
+        player.update(dt, input, renderFrameId);
         if (player.alive && typeof player.prepareObbCollisionQuery === 'function') {
             player.prepareObbCollisionQuery();
         }

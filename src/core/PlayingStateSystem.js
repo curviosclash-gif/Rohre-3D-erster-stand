@@ -36,6 +36,7 @@ export class PlayingStateSystem {
 
     update(dt) {
         const game = this.game;
+        const renderFrameId = game.gameLoop?.renderFrameId || 0;
 
         if (game.input.wasPressed('Escape')) {
             game.matchFlowUiController.returnToMenu();
@@ -43,7 +44,7 @@ export class PlayingStateSystem {
         }
 
         game._updatePlanarAimAssist(dt);
-        game.entityManager.update(dt, game.input);
+        game.entityManager.update(dt, game.input, renderFrameId);
         this._syncHuntOverheatSnapshot();
         game.powerupManager.update(dt);
         game.particles.update(dt);

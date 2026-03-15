@@ -20,10 +20,15 @@ patch_phase1.py
 # Lokale Laufzeit-/Screenshot-Artefakte
 output/web-game-agent-a/
 tmp/
-data/training/*_latest.json
+data/training/*.json
+data/training/models/
+data/training/runs/
 data/training/series/
 data/maps/editor_qa-disk-map-*.editor.json
 data/maps/editor_qa-disk-map-*.runtime.json
+
+# Test-Ergebnisse (erweitert)
+test-results-*/
 
 # Videos
 videos/
