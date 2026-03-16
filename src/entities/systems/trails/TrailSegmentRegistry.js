@@ -13,7 +13,12 @@ export class TrailSegmentRegistry {
     constructor(options = {}) {
         this.gridSize = asPositiveNumber(options.gridSize, 10);
         this.spatialGrid = options.spatialGrid instanceof Map ? options.spatialGrid : new Map();
+        this._entryLookup = new Map();
         this._keysBuffer = [];
+    }
+
+    _getEntryLookupKey(playerIndex, segmentIdx) {
+        return `${playerIndex}:${segmentIdx}`;
     }
 
     _getGridKey(x, z) {
@@ -53,6 +58,10 @@ export class TrailSegmentRegistry {
 
     registerTrailSegment(playerIndex, segmentIdx, data, reusableRef = null) {
         const entry = reusableRef && reusableRef.entry ? reusableRef.entry : {};
+        const nextLookupKey = this._getEntryLookupKey(playerIndex, segmentIdx);
+        if (entry._descriptorKey && entry._descriptorKey !== nextLookupKey && this._entryLookup.get(entry._descriptorKey) === entry) {
+            this._entryLookup.delete(entry._descriptorKey);
+        }
         entry.playerIndex = playerIndex;
         entry.segmentIdx = segmentIdx;
         entry.fromX = data.fromX;
@@ -66,12 +75,14 @@ export class TrailSegmentRegistry {
         entry.maxHp = Math.max(1, Number(data.maxHp) || Number(data.hp) || 1);
         entry.hp = Math.max(0, Number(data.hp) || entry.maxHp);
         entry.destroyed = false;
+        entry._descriptorKey = nextLookupKey;
 
         const keys = this._getSegmentGridKeys(data);
         for (const key of keys) {
             if (!this.spatialGrid.has(key)) this.spatialGrid.set(key, new Set());
             this.spatialGrid.get(key).add(entry);
         }
+        this._entryLookup.set(nextLookupKey, entry);
 
         let keyRef = keys.length === 1 ? keys[0] : null;
         if (keys.length > 1) {
@@ -103,15 +114,35 @@ export class TrailSegmentRegistry {
             for (const singleKey of key) {
                 this.unregisterTrailSegment(singleKey, entry);
             }
+            if (entry && entry._gridKeyRef === key) {
+                if (entry._descriptorKey && this._entryLookup.get(entry._descriptorKey) === entry) {
+                    this._entryLookup.delete(entry._descriptorKey);
+                }
+                entry._gridKeyRef = null;
+            }
             return;
         }
 
         const cell = this.spatialGrid.get(key);
-        if (!cell) return;
-        cell.delete(entry);
-        if (cell.size === 0) {
-            this.spatialGrid.delete(key);
+        if (cell) {
+            cell.delete(entry);
+            if (cell.size === 0) {
+                this.spatialGrid.delete(key);
+            }
         }
+        if (entry && entry._gridKeyRef === key) {
+            if (entry._descriptorKey && this._entryLookup.get(entry._descriptorKey) === entry) {
+                this._entryLookup.delete(entry._descriptorKey);
+            }
+            entry._gridKeyRef = null;
+        }
+    }
+
+    resolveTrailEntry(playerIndex, segmentIdx) {
+        if (!Number.isInteger(playerIndex) || !Number.isInteger(segmentIdx)) return null;
+        const entry = this._entryLookup.get(this._getEntryLookupKey(playerIndex, segmentIdx)) || null;
+        if (!entry || entry.destroyed) return null;
+        return entry;
     }
 
     damageTrailSegment(entry, damage = 1) {
@@ -168,6 +199,9 @@ export class TrailSegmentRegistry {
             entry.ownerTrail.destroySegmentByEntry(entry);
         }
 
+        if (entry._descriptorKey && this._entryLookup.get(entry._descriptorKey) === entry) {
+            this._entryLookup.delete(entry._descriptorKey);
+        }
         entry._gridKeyRef = null;
         entry.hp = 0;
         return true;
@@ -175,5 +209,6 @@ export class TrailSegmentRegistry {
 
     clear() {
         this.spatialGrid.clear();
+        this._entryLookup.clear();
     }
 }

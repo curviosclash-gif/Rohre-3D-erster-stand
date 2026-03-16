@@ -143,6 +143,7 @@ function createCachedRuntimeContext() {
         arena: null,
         players: [],
         projectiles: [],
+        trailSpatialIndex: null,
         mode: GAME_MODE_TYPES.CLASSIC,
         rules: {
             planarMode: false,
@@ -172,6 +173,7 @@ function createCachedRuntimeContext() {
         observationContext: null,
         observationBuffer: new Array(OBSERVATION_LENGTH_V1).fill(0),
         observation: null,
+        huntTarget: null,
     };
 }
 
@@ -243,6 +245,7 @@ export function createBotRuntimeContext(entityManager, player, dt = 0, options =
     runtimeContext.arena = entityManager?.arena || null;
     runtimeContext.players = players;
     runtimeContext.projectiles = projectiles;
+    runtimeContext.trailSpatialIndex = entityManager?.getTrailSpatialIndex?.() || entityManager?._trailSpatialIndex || null;
     runtimeContext.mode = mode;
 
     rules.planarMode = planarMode;
@@ -289,5 +292,8 @@ export function createBotRuntimeContext(entityManager, player, dt = 0, options =
         runtimeContext.observationBuffer = new Array(OBSERVATION_LENGTH_V1).fill(0);
     }
     runtimeContext.observation = null;
+    runtimeContext.huntTarget = rules.huntEnabled && typeof entityManager?._checkLockOn === 'function'
+        ? entityManager._checkLockOn(player)
+        : null;
     return runtimeContext;
 }

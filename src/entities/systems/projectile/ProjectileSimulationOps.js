@@ -1,5 +1,11 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../../core/Config.js';
+import {
+    createHuntTargetingScratch,
+    createPlayerTargetDescriptor,
+    resolveHuntLineTarget,
+    resolveHuntTargetPosition,
+} from '../../../hunt/HuntTargetingOps.js';
 
 export class ProjectileSimulationOps {
     constructor(system) {
@@ -7,6 +13,8 @@ export class ProjectileSimulationOps {
         this._tmpVec = new THREE.Vector3();
         this._tmpVec2 = new THREE.Vector3();
         this._tmpDir = new THREE.Vector3();
+        this._tmpTargetPosition = new THREE.Vector3();
+        this._targetingScratch = createHuntTargetingScratch();
         this._stepResult = {
             projectileExpired: false,
             projectileHitArena: false,
@@ -15,7 +23,7 @@ export class ProjectileSimulationOps {
         };
     }
 
-    acquireHomingTarget(projectile, players) {
+    acquireHomingTarget(projectile, players, trailSpatialIndex = null) {
         if (!projectile || !Array.isArray(players) || players.length === 0) return null;
 
         const owner = projectile.owner;
@@ -28,6 +36,30 @@ export class ProjectileSimulationOps {
         const speed = this._tmpVec2.length();
         if (speed <= 0.0001) return null;
         this._tmpVec2.divideScalar(speed);
+
+        if (projectile.huntRocket) {
+            const trailHitRadius = Math.max(
+                Number(projectile.radius) || 0,
+                Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS || 0.78)
+            );
+            const sharedTarget = resolveHuntLineTarget({
+                sourcePlayer: owner,
+                players,
+                trailSpatialIndex,
+                origin: projectile.position,
+                direction: this._tmpVec2,
+                playerRange: maxRange,
+                trailRange: maxRange,
+                trailSampleStep: Number(CONFIG?.HUNT?.MG?.TRAIL_SAMPLE_STEP),
+                trailHitRadius,
+                trailSelfSkipRecent: Number(CONFIG?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
+                allowSelfTrailFallback: false,
+                scratch: this._targetingScratch,
+            });
+            if (sharedTarget) {
+                return sharedTarget;
+            }
+        }
 
         let bestTarget = null;
         let bestDistSq = Infinity;
@@ -53,8 +85,15 @@ export class ProjectileSimulationOps {
                 bestTarget = target;
             }
         }
-        if (bestTarget) return bestTarget;
-        return projectile.huntRocket ? bestFallbackTarget : null;
+        if (bestTarget) {
+            return projectile.huntRocket
+                ? createPlayerTargetDescriptor(bestTarget, Math.sqrt(bestDistSq))
+                : bestTarget;
+        }
+        if (projectile.huntRocket && bestFallbackTarget) {
+            return createPlayerTargetDescriptor(bestFallbackTarget, Math.sqrt(bestFallbackDistSq));
+        }
+        return null;
     }
 
     bounceProjectileOnFoam(projectile, collisionInfo) {
@@ -90,7 +129,7 @@ export class ProjectileSimulationOps {
         return true;
     }
 
-    stepProjectile(projectile, index, dt, arena, players, time) {
+    stepProjectile(projectile, index, dt, arena, players, trailSpatialIndex, time) {
         projectile.foamBounceCooldown = Math.max(0, (projectile.foamBounceCooldown || 0) - dt);
 
         const vx = projectile.velocity.x * dt;
@@ -118,21 +157,38 @@ export class ProjectileSimulationOps {
 
         if (projectile.huntRocket) {
             projectile.homingReacquireTimer = Math.max(0, (projectile.homingReacquireTimer || 0) - dt);
-            if (!projectile.target || !projectile.target.alive || projectile.homingReacquireTimer <= 0) {
-                projectile.target = this.acquireHomingTarget(projectile, players);
+            const currentTarget = resolveHuntTargetPosition(
+                projectile.target,
+                players,
+                trailSpatialIndex,
+                this._tmpTargetPosition,
+                { scratch: this._targetingScratch }
+            );
+            if (!currentTarget || projectile.homingReacquireTimer <= 0) {
+                projectile.target = this.acquireHomingTarget(projectile, players, trailSpatialIndex);
                 projectile.homingReacquireTimer = Math.max(0.04, Number(projectile.homingReacquireInterval || 0.12));
             }
         }
 
-        if (projectile.target && projectile.target.alive) {
-            this._tmpVec.subVectors(projectile.target.position, projectile.position).normalize();
-            this._tmpVec2.copy(projectile.velocity);
-            const speed = this._tmpVec2.length();
-            const turnRate = Math.max(0.1, Number(projectile.homingTurnRate || CONFIG.HOMING.TURN_RATE));
-            this._tmpVec2.normalize().lerp(this._tmpVec, Math.min(turnRate * dt, 1.0)).normalize();
-            projectile.velocity.copy(this._tmpVec2.multiplyScalar(speed));
-            this._tmpVec.addVectors(projectile.position, projectile.velocity);
-            projectile.mesh.lookAt(this._tmpVec);
+        const targetPosition = resolveHuntTargetPosition(
+            projectile.target,
+            players,
+            trailSpatialIndex,
+            this._tmpTargetPosition,
+            { scratch: this._targetingScratch }
+        );
+        if (targetPosition) {
+            this._tmpVec.subVectors(targetPosition, projectile.position);
+            if (this._tmpVec.lengthSq() > 0.000001) {
+                this._tmpVec.normalize();
+                this._tmpVec2.copy(projectile.velocity);
+                const speed = this._tmpVec2.length();
+                const turnRate = Math.max(0.1, Number(projectile.homingTurnRate || CONFIG.HOMING.TURN_RATE));
+                this._tmpVec2.normalize().lerp(this._tmpVec, Math.min(turnRate * dt, 1.0)).normalize();
+                projectile.velocity.copy(this._tmpVec2.multiplyScalar(speed));
+                this._tmpVec.addVectors(projectile.position, projectile.velocity);
+                projectile.mesh.lookAt(this._tmpVec);
+            }
         }
 
         if (projectile.flame) {

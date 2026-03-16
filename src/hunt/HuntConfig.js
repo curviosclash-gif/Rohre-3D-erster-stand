@@ -26,6 +26,10 @@ export const HUNT_CONFIG = Object.freeze({
         TRACER_BEAM_RADIUS: 0.16,
         TRACER_BULLET_RADIUS: 0.42,
     }),
+    TARGETING: Object.freeze({
+        MUZZLE_OFFSET: 2.1,
+        TRAIL_DESCRIPTOR_MAX_DRIFT: 1.25,
+    }),
     ROCKET: Object.freeze({
         VISUAL_SCALE_WEAK: 1.7,
         VISUAL_SCALE_MEDIUM: 1.95,
@@ -75,9 +79,9 @@ export const HUNT_CONFIG = Object.freeze({
         }),
     }),
     ROCKET_TIERS: Object.freeze({
-        WEAK: Object.freeze({ damage: 15, spawnChance: 0.68 }),
-        MEDIUM: Object.freeze({ damage: 35, spawnChance: 0.24 }),
-        STRONG: Object.freeze({ damage: 60, spawnChance: 0.08 }),
+        WEAK: Object.freeze({ damage: 15, spawnChance: 0.68, trailBlastRadiusSegments: 0 }),
+        MEDIUM: Object.freeze({ damage: 35, spawnChance: 0.24, trailBlastRadiusSegments: 1 }),
+        STRONG: Object.freeze({ damage: 60, spawnChance: 0.08, trailBlastRadiusSegments: 2 }),
     }),
     ROCKET_PICKUP_SPAWN_CHANCE: 0.28,
     PICKUP_WEIGHTS: Object.freeze({

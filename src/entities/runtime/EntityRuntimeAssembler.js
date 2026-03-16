@@ -50,7 +50,7 @@ export class EntityRuntimeAssembler {
                 const color = isDestroyed ? 0x66ddff : 0x3388ff;
                 if (owner.particles) {
                     if (isRocketTierType(projectile?.type)) {
-                        owner.particles.spawnRocketImpact(position, projectile?.type, color);
+                        owner.particles.spawnRocketImpact(position, projectile?.type);
                     } else {
                         owner.particles.spawnTrailImpact(position, color, { destroyed: isDestroyed });
                     }

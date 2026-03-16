@@ -19,6 +19,7 @@ import {
     resolveHealthRatio,
     HuntBotPolicy,
 } from '../../hunt/HuntBotPolicy.js';
+import { resolveHuntTargetOwnerPlayer } from '../../hunt/HuntTargetingOps.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const TMP_TO_ENEMY = new THREE.Vector3();
@@ -35,17 +36,21 @@ function resolveObservationValue(observation, index, fallback = 0) {
 function resolveHuntBridgePriorities(player, runtimeContext) {
     const players = Array.isArray(runtimeContext?.players) ? runtimeContext.players : [];
     const observation = runtimeContext?.observation || null;
+    const huntTarget = runtimeContext?.huntTarget || null;
     const targetDistanceRatio = clamp(resolveObservationValue(observation, TARGET_DISTANCE_RATIO, 1), 0, 1);
     const pressureLevel = clamp(resolveObservationValue(observation, PRESSURE_LEVEL, 0), 0, 1);
     const projectileThreat = resolveObservationValue(observation, PROJECTILE_THREAT, 0) >= 0.5;
-    const targetInFront = resolveObservationValue(observation, TARGET_IN_FRONT, 0) >= 0.5;
 
     const nearest = getNearestEnemy(player, players, TMP_TO_ENEMY);
-    const enemy = nearest.enemy;
+    const enemy = resolveHuntTargetOwnerPlayer(huntTarget, players) || nearest.enemy;
     const healthRatio = resolveHealthRatio(player);
     const enemyHealthRatio = resolveHealthRatio(enemy);
     const aggression = clamp(0.55 + (healthRatio - enemyHealthRatio) * 0.8, 0.15, 1.0);
     const rocketIndex = findStrongestRocketIndex(player?.inventory || []);
+    const hasSharedTarget = !!huntTarget;
+    const targetDistanceSq = Number.isFinite(huntTarget?.distance)
+        ? huntTarget.distance * huntTarget.distance
+        : nearest.distSq;
 
     return {
         enemy,
@@ -55,8 +60,10 @@ function resolveHuntBridgePriorities(player, runtimeContext) {
         rocketIndex,
         pressureLevel,
         projectileThreat,
+        hasSharedTarget,
+        targetDistanceSq,
         targetDistanceRatio,
-        targetInFront,
+        targetInFront: hasSharedTarget || resolveObservationValue(observation, TARGET_IN_FRONT, 0) >= 0.5,
     };
 }
 
@@ -94,18 +101,20 @@ function resolveHuntBridgeAction(runtimeContext, player) {
     const mgRange = Math.max(12, Number(CONFIG?.HUNT?.MG?.RANGE || 95));
     const targetDistanceMax = Math.max(1, Number(runtimeContext?.observationContext?.targetDistanceMax || 120));
     const mgRangeRatio = clamp(mgRange / targetDistanceMax, 0, 1);
+    const withinMgWindow = priorities.hasSharedTarget
+        ? priorities.targetDistanceSq <= mgRange * mgRange
+        : (priorities.targetInFront && priorities.targetDistanceRatio <= mgRangeRatio);
 
     if (
-        priorities.enemy
-        && priorities.targetInFront
-        && priorities.targetDistanceRatio <= mgRangeRatio
+        (priorities.hasSharedTarget || priorities.enemy)
+        && withinMgWindow
         && priorities.healthRatio > 0.15
         && priorities.aggression >= 0.45
     ) {
         action.shootMG = true;
     }
 
-    if (priorities.rocketIndex >= 0 && priorities.enemy) {
+    if (priorities.rocketIndex >= 0 && (priorities.hasSharedTarget || priorities.enemy)) {
         const shouldUseRocket = (
             priorities.healthRatio < 0.55
             || priorities.enemyHealthRatio > 0.45

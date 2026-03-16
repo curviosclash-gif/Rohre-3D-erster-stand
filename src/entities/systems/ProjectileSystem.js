@@ -134,7 +134,7 @@ export class ProjectileSystem {
         projectile.homingReacquireTimer = 0;
         projectile.target = this.resolveLockOn(player);
         if (huntRocket && (!projectile.target || !projectile.target.alive)) {
-            projectile.target = this._acquireHomingTarget(projectile, this.getPlayers());
+            projectile.target = this._acquireHomingTarget(projectile, this.getPlayers(), this.getTrailSpatialIndex());
         }
         projectile.foamBounces = 0;
         projectile.foamBounceCooldown = 0;
@@ -255,8 +255,8 @@ export class ProjectileSystem {
         return this._simulationOps.bounceProjectileOnFoam(projectile, collisionInfo);
     }
 
-    _acquireHomingTarget(projectile, players) {
-        return this._simulationOps.acquireHomingTarget(projectile, players);
+    _acquireHomingTarget(projectile, players, trailSpatialIndex = null) {
+        return this._simulationOps.acquireHomingTarget(projectile, players, trailSpatialIndex);
     }
 
     update(dt) {
@@ -267,7 +267,7 @@ export class ProjectileSystem {
 
         for (let i = this.projectiles.length - 1; i >= 0; i--) {
             const projectile = this.projectiles[i];
-            const simulationResult = this._simulationOps.stepProjectile(projectile, i, dt, arena, players, time);
+            const simulationResult = this._simulationOps.stepProjectile(projectile, i, dt, arena, players, trailSpatialIndex, time);
             const shouldRemove = this._hitResolver.resolveProjectileOutcome(
                 projectile,
                 players,

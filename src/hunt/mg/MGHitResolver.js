@@ -1,9 +1,13 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
-
-const MG_TRAIL_SELF_SKIP_RECENT = 8;
-const MG_TRAIL_SAMPLE_STEP = 0.7;
-const MG_TRAIL_HIT_RADIUS = 0.45;
+import {
+    createHuntTargetingScratch,
+    isPlayerTargetDescriptor,
+    isTrailTargetDescriptor,
+    resolveHuntLineTarget,
+    resolveHuntTargetOwnerPlayer,
+    resolveTrailTargetEntry,
+} from '../HuntTargetingOps.js';
 
 function clamp(value, min, max) {
     return Math.min(Math.max(value, min), max);
@@ -13,85 +17,49 @@ export class MGHitResolver {
     constructor(runtimeContext) {
         this.runtime = runtimeContext || null;
         this._tmpAim = new THREE.Vector3();
-        this._tmpToTarget = new THREE.Vector3();
         this._tmpHit = new THREE.Vector3();
         this._tmpMuzzle = new THREE.Vector3();
-        this._tmpTrailProbe = new THREE.Vector3();
+        this._targetingScratch = createHuntTargetingScratch();
     }
 
     resolveHit(player, mg, outMuzzle = null, outAim = null) {
-        const players = this.runtime?.players || [];
         const maxRange = Math.max(10, Number(mg.RANGE || 95));
         this.resolveAimDirection(player, this._tmpAim);
-        this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
+        const muzzleOffset = Math.max(0, Number(CONFIG?.HUNT?.TARGETING?.MUZZLE_OFFSET || 2.1));
+        this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, muzzleOffset);
         if (outMuzzle) outMuzzle.copy(this._tmpMuzzle);
         if (outAim) outAim.copy(this._tmpAim);
 
-        let bestTarget = null;
-        let bestDistance = Infinity;
-        let bestPoint = null;
-        for (const target of players) {
-            if (!target || !target.alive || target === player) continue;
+        const target = resolveHuntLineTarget({
+            sourcePlayer: player,
+            players: this.runtime?.players || [],
+            trailSpatialIndex: this.runtime?.getTrailSpatialIndex?.() || this.runtime?.trails?.spatialIndex || null,
+            origin: this._tmpMuzzle,
+            direction: this._tmpAim,
+            playerRange: maxRange,
+            trailRange: maxRange,
+            trailSampleStep: Number(mg.TRAIL_SAMPLE_STEP),
+            trailHitRadius: Number(mg.TRAIL_HIT_RADIUS),
+            trailSelfSkipRecent: Number(mg.TRAIL_SELF_SKIP_RECENT),
+            allowSelfTrailFallback: true,
+            scratch: this._targetingScratch,
+        });
 
-            const hitboxRadius = Math.max(
-                0.2,
-                Number(target.hitboxRadius) || Number(CONFIG?.PLAYER?.HITBOX_RADIUS) || 0.8
-            );
-            const hitboxRadiusSq = hitboxRadius * hitboxRadius;
-
-            this._tmpToTarget.subVectors(target.position, this._tmpMuzzle);
-            const forwardDistance = this._tmpAim.dot(this._tmpToTarget);
-            if (forwardDistance < -hitboxRadius || forwardDistance > maxRange + hitboxRadius) continue;
-
-            const toTargetLenSq = this._tmpToTarget.lengthSq();
-            const closestDistanceSq = Math.max(0, toTargetLenSq - forwardDistance * forwardDistance);
-            if (closestDistanceSq > hitboxRadiusSq) continue;
-
-            const intersectionOffset = Math.sqrt(Math.max(0, hitboxRadiusSq - closestDistanceSq));
-            const entryDistance = Math.max(0, forwardDistance - intersectionOffset);
-            if (entryDistance > maxRange) continue;
-
-            if (entryDistance < bestDistance) {
-                bestDistance = entryDistance;
-                bestTarget = target;
-                this._tmpHit.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, entryDistance);
-                bestPoint = {
-                    x: this._tmpHit.x,
-                    y: this._tmpHit.y,
-                    z: this._tmpHit.z,
-                };
-            }
-        }
-
-        const trailHit = this._resolveTrailHit(player, mg, Math.min(maxRange, bestDistance));
-        if (trailHit && trailHit.distance <= bestDistance) {
+        if (isPlayerTargetDescriptor(target)) {
             return {
-                target: null,
-                distance: trailHit.distance,
-                trail: trailHit,
-                point: trailHit.point,
-            };
-        }
-
-        if (bestTarget) {
-            return {
-                target: bestTarget,
-                distance: bestDistance,
+                target,
+                distance: target.distance,
                 trail: null,
-                point: bestPoint || {
-                    x: bestTarget.position.x,
-                    y: bestTarget.position.y,
-                    z: bestTarget.position.z,
-                },
+                point: target.point || null,
             };
         }
 
-        if (trailHit) {
+        if (isTrailTargetDescriptor(target)) {
             return {
                 target: null,
-                distance: trailHit.distance,
-                trail: trailHit,
-                point: trailHit.point,
+                distance: target.distance,
+                trail: target,
+                point: target.point || null,
             };
         }
 
@@ -102,118 +70,14 @@ export class MGHitResolver {
         return player.getAimDirection(out).normalize();
     }
 
-    _scanTrailLine(
-        trailSpatialIndex,
-        player,
-        probeRadius,
-        maxRange,
-        sampleStep,
-        skipRecent,
-        allowSelfFallback = false
-    ) {
-        let fallbackSelfHit = null;
-        for (let distance = 0; distance <= maxRange; distance += sampleStep) {
-            this._tmpTrailProbe.copy(this._tmpMuzzle).addScaledVector(this._tmpAim, distance);
-            const hit = trailSpatialIndex.checkProjectileTrailCollision(this._tmpTrailProbe, probeRadius, {
-                excludePlayerIndex: player.index,
-                skipRecent,
-            });
-            if (!hit?.entry) continue;
-
-            const hitPlayerIndex = Number(hit.entry.playerIndex);
-            if (hitPlayerIndex === player.index) {
-                if (allowSelfFallback && !fallbackSelfHit) {
-                    fallbackSelfHit = this._createTrailHit(hit);
-                }
-                continue;
-            }
-            return this._createTrailHit(hit);
-        }
-        return fallbackSelfHit;
-    }
-
-    _resolveTrailHit(player, mg, maxRange) {
-        const trailSpatialIndex = this.runtime?.getTrailSpatialIndex?.() || this.runtime?.trails?.spatialIndex;
-        if (!trailSpatialIndex?.checkProjectileTrailCollision) return null;
-
-        const selfSkipRecent = Math.max(0, Math.floor(Number(mg.TRAIL_SELF_SKIP_RECENT) || MG_TRAIL_SELF_SKIP_RECENT));
-        const skipSelfCompletely = Math.max(
-            selfSkipRecent + 1,
-            Math.floor(Number(player?.trail?.maxSegments) || 0)
-        );
-        const sampleStep = Math.max(0.2, Number(mg.TRAIL_SAMPLE_STEP) || MG_TRAIL_SAMPLE_STEP);
-        const probeRadius = Math.max(0.12, Number(mg.TRAIL_HIT_RADIUS) || MG_TRAIL_HIT_RADIUS);
-        let fallbackSelfHit = null;
-
-        this.resolveAimDirection(player, this._tmpAim);
-        this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, 2.1);
-        const enemyHit = this._scanTrailLine(
-            trailSpatialIndex,
-            player,
-            probeRadius,
-            maxRange,
-            sampleStep,
-            skipSelfCompletely,
-            false
-        );
-        if (enemyHit) {
-            return enemyHit;
-        }
-
-        fallbackSelfHit = this._scanTrailLine(
-            trailSpatialIndex,
-            player,
-            probeRadius,
-            maxRange,
-            sampleStep,
-            selfSkipRecent,
-            true
-        );
-
-        if (fallbackSelfHit) {
-            const denseStep = Math.max(0.12, sampleStep * 0.5);
-            if (denseStep < sampleStep) {
-                const denseEnemyHit = this._scanTrailLine(
-                    trailSpatialIndex,
-                    player,
-                    probeRadius,
-                    maxRange,
-                    denseStep,
-                    skipSelfCompletely,
-                    false
-                );
-                if (denseEnemyHit) {
-                    return denseEnemyHit;
-                }
-            }
-        }
-
-        return fallbackSelfHit;
-    }
-
-    _createTrailHit(hit) {
-        if (!hit?.entry) return null;
-        if (hit.closestPoint) {
-            this._tmpHit.set(hit.closestPoint.closestX, hit.closestPoint.closestY, hit.closestPoint.closestZ);
-        } else {
-            this._tmpHit.copy(this._tmpTrailProbe);
-        }
-        return {
-            entry: hit.entry,
-            distance: this._tmpMuzzle.distanceTo(this._tmpHit),
-            point: {
-                x: this._tmpHit.x,
-                y: this._tmpHit.y,
-                z: this._tmpHit.z,
-            },
-        };
-    }
-
     applyTrailHit(attacker, trailHit, mg) {
         const trailSpatialIndex = this.runtime?.getTrailSpatialIndex?.() || this.runtime?.trails?.spatialIndex;
-        if (!trailSpatialIndex?.damageTrailSegment || !trailHit?.entry) return;
+        if (!trailSpatialIndex?.damageTrailSegment || !trailHit) return;
 
-        const entry = trailHit.entry;
+        const entry = resolveTrailTargetEntry(trailSpatialIndex, trailHit, {
+            scratch: this._targetingScratch,
+        });
+        if (!entry) return;
         const fallbackDamage = Math.max(1, Number(entry.maxHp) || Number(entry.hp) || 1);
         const configuredDamage = Number(mg.TRAIL_DAMAGE);
         const damage = Number.isFinite(configuredDamage) && configuredDamage > 0 ? configuredDamage : fallbackDamage;
@@ -240,7 +104,10 @@ export class MGHitResolver {
         }
     }
 
-    applyHit(attacker, target, distance, mg, impactPoint = null) {
+    applyHit(attacker, targetDescriptor, distance, mg, impactPoint = null) {
+        const target = resolveHuntTargetOwnerPlayer(targetDescriptor, this.runtime?.players || []);
+        if (!target?.alive || target === attacker) return;
+
         const maxRange = Math.max(10, Number(mg.RANGE || 95));
         const minFalloff = clamp(Number(mg.MIN_FALLOFF || 0.5), 0.2, 1);
         const baseDamage = Math.max(1, Number(mg.DAMAGE || 9));

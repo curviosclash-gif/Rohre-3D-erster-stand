@@ -94,6 +94,10 @@ export class TrailSpatialIndex {
         return this._segmentRegistry.damageTrailSegment(entry, damage);
     }
 
+    resolveTrailEntry(playerIndex, segmentIdx) {
+        return this._segmentRegistry.resolveTrailEntry(playerIndex, segmentIdx);
+    }
+
     destroySegment(entry) {
         return this._segmentRegistry.destroySegment(entry);
     }

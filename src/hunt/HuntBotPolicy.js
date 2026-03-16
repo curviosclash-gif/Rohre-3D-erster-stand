@@ -3,6 +3,7 @@ import { CONFIG } from '../core/Config.js';
 import { isRocketTierType } from './RocketPickupSystem.js';
 import { RuleBasedBotPolicy } from '../entities/ai/RuleBasedBotPolicy.js';
 import { BOT_POLICY_TYPES } from '../entities/ai/BotPolicyTypes.js';
+import { resolveHuntTargetOwnerPlayer } from './HuntTargetingOps.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
@@ -98,9 +99,28 @@ function applyRetreatSteeringFromSensors(input, snapshot) {
     }
 }
 
+function invokeFallbackPolicyUpdate(policy, dt, player, runtimeContext) {
+    const fallback = policy?._fallbackPolicy;
+    const update = fallback?.update;
+    if (typeof update !== 'function') return {};
+
+    if (fallback?.usesRuntimeContext === true || update.length <= 3) {
+        return update.call(fallback, dt, player, runtimeContext);
+    }
+    return update.call(
+        fallback,
+        dt,
+        player,
+        runtimeContext?.arena,
+        runtimeContext?.players,
+        runtimeContext?.projectiles
+    );
+}
+
 export class HuntBotPolicy {
     constructor(options = {}) {
         this.type = BOT_POLICY_TYPES.HUNT;
+        this.usesRuntimeContext = true;
         this.sensePhase = 0;
         this._fallbackPolicy = new RuleBasedBotPolicy(options);
         this._tmpToEnemy = new THREE.Vector3();
@@ -109,17 +129,23 @@ export class HuntBotPolicy {
         this._tmpUp = new THREE.Vector3();
     }
 
-    update(dt, player, arena, allPlayers, projectiles) {
-        const input = this._fallbackPolicy.update(dt, player, arena, allPlayers, projectiles);
+    update(dt, player, runtimeContext = null) {
+        const input = invokeFallbackPolicyUpdate(this, dt, player, runtimeContext);
         if (!player || !player.alive) return input;
 
+        const allPlayers = Array.isArray(runtimeContext?.players) ? runtimeContext.players : [];
         const snapshot = resolveSensorSnapshot(this);
+        const huntTarget = runtimeContext?.huntTarget || null;
         const nearest = getNearestEnemy(player, allPlayers, this._tmpToEnemy);
-        const enemy = snapshot?.targetPlayer && snapshot.targetPlayer.alive ? snapshot.targetPlayer : nearest.enemy;
-        const distSq = Number.isFinite(snapshot?.targetDistanceSq) ? snapshot.targetDistanceSq : nearest.distSq;
-        const targetInFront = snapshot ? !!snapshot.targetInFront : true;
+        const targetPlayer = resolveHuntTargetOwnerPlayer(huntTarget, allPlayers);
+        const enemy = targetPlayer || (snapshot?.targetPlayer && snapshot.targetPlayer.alive ? snapshot.targetPlayer : nearest.enemy);
+        const distSq = Number.isFinite(huntTarget?.distance)
+            ? huntTarget.distance * huntTarget.distance
+            : (Number.isFinite(snapshot?.targetDistanceSq) ? snapshot.targetDistanceSq : nearest.distSq);
+        const targetInFront = huntTarget ? true : (snapshot ? !!snapshot.targetInFront : true);
         const pressure = Number.isFinite(snapshot?.pressure) ? snapshot.pressure : 0;
         const projectileThreat = !!snapshot?.projectileThreat;
+        const hasSharedTarget = !!huntTarget;
 
         const healthRatio = resolveHealthRatio(player);
         const enemyHealthRatio = resolveHealthRatio(enemy);
@@ -128,12 +154,12 @@ export class HuntBotPolicy {
         const mgRangeSq = mgRange * mgRange;
         input.shootMG = false;
 
-        if (enemy && distSq <= mgRangeSq && healthRatio > 0.15 && aggression >= 0.45 && targetInFront) {
+        if ((hasSharedTarget || enemy) && distSq <= mgRangeSq && healthRatio > 0.15 && aggression >= 0.45 && targetInFront) {
             input.shootMG = true;
         }
 
         const rocketIndex = findStrongestRocketIndex(player.inventory);
-        if (rocketIndex >= 0 && enemy) {
+        if (rocketIndex >= 0 && (hasSharedTarget || enemy)) {
             const shouldUseRocket =
                 healthRatio < 0.55
                 || enemyHealthRatio > 0.45

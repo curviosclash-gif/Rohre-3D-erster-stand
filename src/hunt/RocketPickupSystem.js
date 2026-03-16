@@ -26,6 +26,13 @@ export function resolveRocketTierDamage(type) {
     return Math.max(1, Number(fallback || 15));
 }
 
+export function resolveRocketTrailBlastRadiusSegments(type) {
+    const normalized = String(type || '').toUpperCase();
+    const tier = TIER_BY_ITEM[normalized];
+    const tierConfig = CONFIG?.HUNT?.ROCKET_TIERS?.[tier];
+    return Math.max(0, Math.floor(Number(tierConfig?.trailBlastRadiusSegments) || 0));
+}
+
 export function pickWeightedRocketTierType() {
     const tiers = CONFIG?.HUNT?.ROCKET_TIERS || {};
     const weighted = [
