@@ -21,7 +21,7 @@ patch_phase1.py
 *.latest_commit
 
 # Lokale Laufzeit-/Screenshot-Artefakte
-output/web-game-agent-a/
+output/
 tmp/
 data/training/
 data/maps/editor_qa-disk-map-*.editor.json
@@ -32,3 +32,8 @@ test-results-*/
 
 # Videos
 videos/
+
+# Temporäre Dateien
+implementation_plan.md
+*.timestamp-*.mjs
+Fotos-*.zip

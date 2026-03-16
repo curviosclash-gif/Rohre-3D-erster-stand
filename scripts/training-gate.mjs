@@ -36,6 +36,16 @@ function parseArgs(argv = []) {
     return parsed;
 }
 
+function parseBoolean(value, fallback = false) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return fallback;
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return fallback;
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+    return fallback;
+}
+
 function toRepoPath(filePath) {
     return String(filePath || '').split(path.sep).join('/');
 }
@@ -325,6 +335,7 @@ async function upsertLatestIndex(runStamp, updates = {}) {
 
 async function main() {
     const args = parseArgs(process.argv.slice(2));
+    const writeLatest = parseBoolean(args['write-latest'], true);
     const latestIndex = await resolveLatestIndex();
     const latestRunStamp = typeof latestIndex.latest?.stamp === 'string' && latestIndex.latest.stamp.trim()
         ? latestIndex.latest.stamp.trim()
@@ -375,11 +386,13 @@ async function main() {
     const gatePath = path.join(runDir, 'gate.json');
     await writeJson(gatePath, gateArtifact);
 
-    const latestUpdate = await upsertLatestIndex(runStamp, {
-        run: latestIndex.latest?.artifacts?.run?.path || latestIndex.latest?.run || null,
-        eval: toRepoPath(evalPath),
-        gate: toRepoPath(gatePath),
-    });
+    const latestUpdate = writeLatest
+        ? await upsertLatestIndex(runStamp, {
+            run: latestIndex.latest?.artifacts?.run?.path || latestIndex.latest?.run || null,
+            eval: toRepoPath(evalPath),
+            gate: toRepoPath(gatePath),
+        })
+        : null;
 
     const reportLines = [
         ...gateResult.checks.map(formatMetricLine),
@@ -391,7 +404,7 @@ async function main() {
         status: combinedOk ? 'pass' : 'fail',
         runStamp,
         gatePath: toRepoPath(gatePath),
-        latestIndexPath: toRepoPath(latestUpdate.latestPath),
+        latestIndexPath: latestUpdate ? toRepoPath(latestUpdate.latestPath) : null,
         trendWindowSize,
         trendSampleCount: trendResult.sampleCount,
         report: reportLines,

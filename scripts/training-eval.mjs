@@ -75,6 +75,16 @@ function parseArgs(argv = []) {
     return parsed;
 }
 
+function parseBoolean(value, fallback = false) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return fallback;
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return fallback;
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+    return fallback;
+}
+
 function toInt(value, fallback = 0, min = 0, max = 1_000_000) {
     const numeric = Number(value);
     if (!Number.isFinite(numeric)) return fallback;
@@ -664,6 +674,7 @@ async function resolveRunArtifact(runDir) {
 
 async function main() {
     const args = parseArgs(process.argv.slice(2));
+    const writeLatest = parseBoolean(args['write-latest'], true);
     const runStampArg = typeof args.stamp === 'string' ? args.stamp.trim() : '';
     const runStamp = runStampArg || createRunStamp();
     const runDir = path.join(DEFAULT_RUNS_ROOT, runStamp);
@@ -762,16 +773,18 @@ async function main() {
 
     const evalPath = path.join(runDir, 'eval.json');
     await writeJson(evalPath, evalArtifact);
-    const latestResult = await upsertLatestIndex(runStamp, {
-        run: runArtifact.path ? toRepoPath(runArtifact.path) : null,
-        eval: toRepoPath(evalPath),
-    });
+    const latestResult = writeLatest
+        ? await upsertLatestIndex(runStamp, {
+            run: runArtifact.path ? toRepoPath(runArtifact.path) : null,
+            eval: toRepoPath(evalPath),
+        })
+        : null;
 
     console.log(JSON.stringify({
         ok: evalArtifact.ok,
         runStamp,
         evalPath: toRepoPath(evalPath),
-        latestIndexPath: toRepoPath(latestResult.latestPath),
+        latestIndexPath: latestResult ? toRepoPath(latestResult.latestPath) : null,
         episodeCount: kpis.episodeCount,
         metrics: {
             episodeReturnMean: kpis.episodeReturnMean,
