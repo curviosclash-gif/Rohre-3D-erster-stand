@@ -20,6 +20,7 @@ const BASE_MAP_KEYS = [
     'portal_madness',
     'the_loop',
     'upgrade_showcase',
+    'showcase_nexus',
 ];
 
 export const MAP_PRESETS_BASE = Object.freeze(

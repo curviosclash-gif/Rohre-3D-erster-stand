@@ -19,6 +19,7 @@ export class EditorMapManager {
         this._sceneMutationDepth = 0;
         this._pendingHudRefresh = false;
         this._pendingTunnelVisualRefresh = false;
+        this.mapDocumentMeta = {};
 
         this.setCallbacks(options?.callbacks || options);
         this.setupPrimitives();
@@ -264,6 +265,7 @@ export class EditorMapManager {
     clearAllObjects() {
         this.withSceneMutation(() => {
             this.callbacks.onBeforeManagedObjectsCleared?.();
+            this.mapDocumentMeta = {};
 
             const objects = [...this.core.objectsContainer.children];
             for (const object of objects) {

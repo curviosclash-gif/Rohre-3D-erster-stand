@@ -10,6 +10,7 @@ export class EntitySpawnOps {
         if (!owner) return;
         owner._roundEnded = false;
         owner._respawnSystem.reset();
+        owner._spawnPlacementSystem?.resetAssignments?.();
         const spawnContext = this.createSpawnContext();
         for (const player of owner.players) {
             this.spawnPlayer(player, spawnContext);
@@ -28,7 +29,10 @@ export class EntitySpawnOps {
         const owner = this.entityManager;
         if (!owner || !player) return;
         const context = spawnContext || this.createSpawnContext();
-        const pos = owner._findSpawnPosition(12, 12, context.planarSpawnLevel);
+        const pos = owner._findSpawnPosition(12, 12, {
+            planarLevel: context.planarSpawnLevel,
+            player,
+        });
         const dir = owner._findSafeSpawnDirection(pos, player.hitboxRadius);
         player.spawn(pos, dir);
         player.shootCooldown = 0;

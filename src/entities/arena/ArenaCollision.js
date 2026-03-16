@@ -43,6 +43,66 @@ function isInsideTunnel(point, tunnel, radius = 0) {
     return (d1 * d1 + d2 * d2) < (effectiveRadius * effectiveRadius);
 }
 
+function getTubeCollisionInfo(point, tube, radius = 0, outNormal = null) {
+    if (!point || !tube || typeof tube !== 'object') return false;
+    const ax = Number(tube.ax);
+    const ay = Number(tube.ay);
+    const az = Number(tube.az);
+    const bx = Number(tube.bx);
+    const by = Number(tube.by);
+    const bz = Number(tube.bz);
+    const lengthSq = Number(tube.lengthSq);
+    if (![ax, ay, az, bx, by, bz, lengthSq].every(Number.isFinite) || lengthSq <= 0.0001) {
+        return false;
+    }
+
+    const abx = bx - ax;
+    const aby = by - ay;
+    const abz = bz - az;
+    const apx = point.x - ax;
+    const apy = point.y - ay;
+    const apz = point.z - az;
+    const projection = (apx * abx + apy * aby + apz * abz) / lengthSq;
+    if (projection < 0 || projection > 1) {
+        return false;
+    }
+
+    const cx = ax + abx * projection;
+    const cy = ay + aby * projection;
+    const cz = az + abz * projection;
+    const rx = point.x - cx;
+    const ry = point.y - cy;
+    const rz = point.z - cz;
+    const radialDistanceSq = rx * rx + ry * ry + rz * rz;
+    const innerRadius = Number(tube.innerRadius);
+    const outerRadius = Number(tube.outerRadius);
+    if (!Number.isFinite(innerRadius) || !Number.isFinite(outerRadius) || outerRadius <= 0) {
+        return false;
+    }
+
+    const probeRadius = Number.isFinite(radius) && radius > 0 ? radius : 0;
+    const collisionRadius = outerRadius + probeRadius;
+    if (radialDistanceSq > collisionRadius * collisionRadius) {
+        return false;
+    }
+
+    const safeInnerRadius = innerRadius - probeRadius;
+    if (safeInnerRadius > 0 && radialDistanceSq < safeInnerRadius * safeInnerRadius) {
+        return false;
+    }
+
+    if (outNormal) {
+        outNormal.set(rx, ry, rz);
+        if (outNormal.lengthSq() <= 0.000001) {
+            outNormal.set(0, 1, 0);
+        } else {
+            outNormal.normalize();
+        }
+    }
+
+    return true;
+}
+
 export class ArenaCollision {
     constructor(arena) {
         this.arena = arena;
@@ -105,6 +165,14 @@ export class ArenaCollision {
         this._tmpSphere.radius = radius;
         for (const obs of this.arena.obstacles) {
             if (!obs.box.intersectsSphere(this._tmpSphere)) continue;
+            if (obs.tube && !getTubeCollisionInfo(position, obs.tube, radius, this._tmpNormal)) continue;
+            if (obs.tube) {
+                this._collisionResult.hit = true;
+                this._collisionResult.kind = obs.kind || (obs.isWall ? 'wall' : 'hard');
+                this._collisionResult.isWall = !!obs.isWall;
+                this._collisionResult.normal.copy(this._tmpNormal);
+                return this._collisionResult;
+            }
             if (obs.tunnel && isInsideTunnel(position, obs.tunnel, radius)) continue;
             this._collisionResult.hit = true;
             this._collisionResult.kind = obs.kind || (obs.isWall ? 'wall' : 'hard');
@@ -130,6 +198,8 @@ export class ArenaCollision {
         this._tmpSphere.radius = radius;
         for (const obs of this.arena.obstacles) {
             if (!obs.box.intersectsSphere(this._tmpSphere)) continue;
+            if (obs.tube && getTubeCollisionInfo(position, obs.tube, radius)) return true;
+            if (obs.tube) continue;
             if (obs.tunnel && isInsideTunnel(position, obs.tunnel, radius)) continue;
             return true;
         }

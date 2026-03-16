@@ -56,6 +56,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 | 2026-03-11 | A | PX V34 | `trainer/session/TrainerSession.mjs`, `trainer/server/TrainerServer.mjs`, `trainer/config/TrainerRuntimeContract.mjs`, `trainer/model/CheckpointValidation.mjs` | V36 Checkpoint-Resume-Haertung (`trainer-checkpoint-load-latest`) und Validierung | mittel |
 | 2026-03-13 | Codex | V27/V28 | `src/ui/menu/EventPlaylistCatalog.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuTextCatalog.js`, `src/ui/MenuController.js`, `src/core/GameBootstrap.js`, `src/core/GameRuntimeFacade.js` | V26.6 benoetigt einen additiven Event-Playlist-Quickstart ueber bestehende Menue-/Runtime-Pfade hinweg | mittel |
 | 2026-03-15 | Codex | V28 | `src/core/GameLoop.js` | Flugzeug-Stottern durch 60Hz-Resonanz (Alpha-Springen) behoben via Ringpuffer-Smoothing | mittel |
+| 2026-03-16 | Codex | V27/V28 | `src/core/config/maps/MapPresetCatalog.js`, `src/core/config/maps/MapPresetsBase.js`, `src/state/MatchSessionFactory.js`, `src/ui/menu/MenuPreviewCatalog.js`, `src/ui/UIStartSyncController.js` | V39 brauchte additive Preset-/Preview-/Runtime-Integration ueber Core-, State- und Menuepfade hinweg | mittel |
 
 ## Schnellindex Offener Arbeit
 
@@ -279,6 +280,13 @@ Template:
   - Konfliktregel: kurzer Hinweis zu Datei-Overlap oder bewusstem Non-Overlap
 
 <!-- PLAN-INTAKE-START -->
+- [/] PX Komplexe Showcase-Map V39
+  - Erstellt am: `2026-03-16`
+  - Agent: `Codex`
+  - Plan-Datei: `docs/Feature_Komplexe_Showcase_Map_V39.md`
+  - Datei-Scope: `src/core/config/maps/**`, `src/entities/**`, `src/state/MatchSessionFactory.js`, `src/ui/**`, `editor/**`, `tests/**`, `docs/**`
+  - Konfliktregel: Der Plan kreuzt bestehende Ownership-Bereiche aus V27/V28; Umsetzung nur additiv in Shared-Pfaden, aktive Runtime-Konflikte vor Umsetzung im Conflict-Log dokumentieren
+  - Status 2026-03-16: Runtime-/Preset-/Editor-Scope umgesetzt; Abschluss-Gate bleibt vorlaeufig offen wegen bestehendem Core-Fall `T12b` und zeitweisen Playwright-Locks aus parallelen V40-Laeufen
 - [ ] PX Menu UX Follow-up V26.3c
   - Erstellt am: `2026-03-06`
   - Agent: `A`
@@ -456,6 +464,18 @@ Template:
     - [ ] 38.9.1 `npm run architecture:guard` und `npm run test:core` gruen bestaetigen
     - [ ] 38.9.2 `npm run build`, `npm run docs:sync` und `npm run docs:check` gruen bestaetigen
   - Status 2026-03-14: Erste Praeventionsstufe umgesetzt. `main.js` ist um Bootstrap-/Error-/Playtest-Helfer entlastet, `prebuild` fuehrt jetzt einen additiven Architektur-Guard aus ESLint-`max-lines` plus inkrementellem `tsc --checkJs` aus; der verbleibende offene Rest ist die eigentliche Modularisierung von `UIManager.js`.
+- [ ] PX Hunt Rocket Trail Targeting V40
+  - Erstellt am: `2026-03-16`
+  - Agent: `Codex`
+  - Plan-Datei: `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md`
+  - Datei-Scope: `src/hunt/**`, `src/entities/systems/**`, `src/entities/runtime/EntityRuntimeAssembler.js`, `src/entities/ai/HuntBridgePolicy.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `docs/**`
+  - Konfliktregel: Scope ueberlappt historische V26-/V28-Pfade; bei Umsetzung Hunt-Targeting zentral kapseln, keine fremden UI-/Core-Themen mitsanieren und Doku nur append-only pflegen
+- [ ] PX Lokaler Multiplayer V41
+  - Erstellt am: `2026-03-16`
+  - Agent: `Codex`
+  - Plan-Datei: `docs/Feature_Lokaler_Multiplayer_V41.md`
+  - Datei-Scope: `index.html`, `style.css`, `src/ui/**`, `src/core/**`, `src/state/**`, `tests/**`, `docs/**`
+  - Konfliktregel: Der Plan kreuzt V27-/V28-Menue-, Runtime- und Input-Pfade; lokale Session-Logik strikt vom offenen Online-Backlog `N1` trennen und spaetere Umsetzungs-Fremdeingriffe vorab im Conflict-Log dokumentieren
 <!-- PLAN-INTAKE-END -->
 
 ## Archivierte Referenzen

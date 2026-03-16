@@ -33,6 +33,7 @@ export class PortalLayoutBuilder {
     }
 
     build(map, scale) {
+        this._mapDefinition = map || null;
         this._visualRegistry = createPortalGateVisualRegistry(this.arena.renderer);
         this._buildPortals(map, scale);
         this._buildSpecialGates(map, scale);
@@ -110,6 +111,18 @@ export class PortalLayoutBuilder {
         this.arena.portals = [];
         this._portalMeshCompactMode = false;
         if (!this.arena.portalsEnabled) return;
+
+        const authoredPortalsPreferred = !!map?.preferAuthoredPortals
+            && Array.isArray(map?.portals)
+            && map.portals.length > 0;
+        if (authoredPortalsPreferred) {
+            this._portalMeshCompactMode = map.portals.length >= 2;
+            for (const def of map.portals) {
+                this._createPortalFromDef(def, scale);
+            }
+            this._validatePortalPlacements();
+            return;
+        }
 
         const pairCount = Math.max(0, Math.floor(CONFIG.GAMEPLAY.PORTAL_COUNT || 0));
         if (pairCount > 0) {
@@ -239,7 +252,7 @@ export class PortalLayoutBuilder {
         const height = b.maxY - b.minY;
         if (height <= 0) return this.getPortalLevelsFallback();
 
-        const map = CONFIG.MAPS[this.arena.currentMapKey];
+        const map = this._mapDefinition || CONFIG.MAPS[this.arena.currentMapKey];
         if (map && Array.isArray(map.portalLevels) && map.portalLevels.length >= 2) {
             return map.portalLevels.map((y) => Number(y)).filter(Number.isFinite);
         }

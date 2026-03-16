@@ -1,8 +1,80 @@
 import * as THREE from 'three';
 import { createMapDocument, parseMapJSON } from '../../src/entities/MapSchema.js';
 
+function cloneSerializable(value) {
+    if (value === null || typeof value === 'string' || typeof value === 'boolean') {
+        return value;
+    }
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : 0;
+    }
+    if (Array.isArray(value)) {
+        return value.map((entry) => cloneSerializable(entry));
+    }
+    if (!value || typeof value !== 'object') {
+        return undefined;
+    }
+
+    const result = {};
+    Object.entries(value).forEach(([key, entry]) => {
+        const clonedEntry = cloneSerializable(entry);
+        if (clonedEntry !== undefined) {
+            result[key] = clonedEntry;
+        }
+    });
+    return result;
+}
+
+function readManagerMapMetadata(manager) {
+    const source = manager?.mapDocumentMeta && typeof manager.mapDocumentMeta === 'object'
+        ? manager.mapDocumentMeta
+        : {};
+    const metadata = {};
+
+    if (typeof source.glbModel === 'string' && source.glbModel) {
+        metadata.glbModel = source.glbModel;
+    }
+    if (typeof source.glbColliderMode === 'string' && source.glbColliderMode) {
+        metadata.glbColliderMode = source.glbColliderMode;
+    }
+    if (source.preferAuthoredPortals === true) {
+        metadata.preferAuthoredPortals = true;
+    }
+    if (Array.isArray(source.portalLevels)) {
+        metadata.portalLevels = cloneSerializable(source.portalLevels) || [];
+    }
+    if (Array.isArray(source.gates)) {
+        metadata.gates = cloneSerializable(source.gates) || [];
+    }
+
+    return metadata;
+}
+
+function extractMapMetadata(data) {
+    if (!data || typeof data !== 'object') return {};
+
+    const metadata = {};
+    if (typeof data.glbModel === 'string' && data.glbModel) {
+        metadata.glbModel = data.glbModel;
+    }
+    if (typeof data.glbColliderMode === 'string' && data.glbColliderMode) {
+        metadata.glbColliderMode = data.glbColliderMode;
+    }
+    if (data.preferAuthoredPortals === true) {
+        metadata.preferAuthoredPortals = true;
+    }
+    if (Array.isArray(data.portalLevels) && data.portalLevels.length > 0) {
+        metadata.portalLevels = cloneSerializable(data.portalLevels) || [];
+    }
+    if (Array.isArray(data.gates) && data.gates.length > 0) {
+        metadata.gates = cloneSerializable(data.gates) || [];
+    }
+    return metadata;
+}
+
 export function generateJSONExport(manager, arenaSize) {
     const payload = createMapDocument({
+        ...readManagerMapMetadata(manager),
         arenaSize,
         tunnels: [],
         hardBlocks: [],
@@ -60,7 +132,17 @@ export function generateJSONExport(manager, arenaSize) {
             }
         }
         else if (u.type === 'item') {
-            payload.items.push({ id: u.id, type: u.subType, x: p.x, y: p.y, z: p.z, rotateY: ry });
+            const itemEntry = { id: u.id, type: u.subType, x: p.x, y: p.y, z: p.z, rotateY: ry };
+            if (typeof u.model === 'string' && u.model) {
+                itemEntry.model = u.model;
+            }
+            if (typeof u.pickupType === 'string' && u.pickupType) {
+                itemEntry.pickupType = u.pickupType;
+            }
+            if (Number.isFinite(Number(u.weight))) {
+                itemEntry.weight = Number(u.weight);
+            }
+            payload.items.push(itemEntry);
         }
         else if (u.type === 'aircraft') {
             payload.aircraft.push({
@@ -107,6 +189,7 @@ export function importFromJSON(manager, jsonString, options = {}) {
         }
 
         manager.clearAllObjects();
+        manager.mapDocumentMeta = extractMapMetadata(data);
 
         manager.withSceneMutation(() => {
             if (data.hardBlocks) {
@@ -138,6 +221,9 @@ export function importFromJSON(manager, jsonString, options = {}) {
             if (data.items) {
                 data.items.forEach((b) => manager.createMesh('item', b.type, b.x, b.y, b.z, 0, {
                     id: b.id,
+                    model: b.model,
+                    pickupType: b.pickupType,
+                    weight: b.weight,
                     rotateY: b.rotateY || 0
                 }, { updateUi: false }));
             }

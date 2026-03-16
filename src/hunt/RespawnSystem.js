@@ -94,7 +94,10 @@ export class RespawnSystem {
                 ? this.runtime.spawn.getPlanarSpawnLevel()
                 : null;
             const minEnemyDistance = Math.max(12, Number(respawnConfig?.MIN_ENEMY_DISTANCE || 18));
-            const spawnPos = this.runtime.spawn.findSpawnPosition(minEnemyDistance, 12, planarSpawnLevel);
+            const spawnPos = this.runtime.spawn.findSpawnPosition(minEnemyDistance, 12, {
+                planarLevel: planarSpawnLevel,
+                player,
+            });
             const spawnDir = this.runtime.spawn.findSafeSpawnDirection(spawnPos, player.hitboxRadius);
             player.spawn(spawnPos, spawnDir);
 

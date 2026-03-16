@@ -366,20 +366,10 @@ export function deriveMapResolutionFeedbackPlan({ mapResolution, portalsEnabled,
         const runtimePortalCount = Array.isArray(mapResolution.mapDefinition.portals)
             ? mapResolution.mapDefinition.portals.length
             : 0;
-        const ignoredCount = (
-            (Array.isArray(doc.tunnels) ? doc.tunnels.length : 0) +
-            (Array.isArray(doc.items) ? doc.items.length : 0) +
-            (Array.isArray(doc.aircraft) ? doc.aircraft.length : 0) +
-            (Array.isArray(doc.botSpawns) ? doc.botSpawns.length : 0)
-        );
-
-        if (runtimeObstacleCount === 0 && runtimePortalCount === 0 && ignoredCount > 0) {
-            toasts.push({
-                message: 'Custom-Map enthaelt nur aktuell nicht unterstuetzte Editor-Objekte (Tunnel/Items/Aircraft/Spawns).',
-                durationMs: 4200,
-                tone: 'error',
-            });
-        } else if (runtimeObstacleCount === 0 && runtimePortalCount > 0 && !portalsEnabled) {
+        const runtimeGateCount = Array.isArray(mapResolution.mapDefinition.gates)
+            ? mapResolution.mapDefinition.gates.length
+            : 0;
+        if (runtimeObstacleCount === 0 && runtimePortalCount > 0 && runtimeGateCount === 0 && !portalsEnabled) {
             toasts.push({
                 message: 'Custom-Map hat nur Portale, aber Portale sind im Menue deaktiviert.',
                 durationMs: 3400,

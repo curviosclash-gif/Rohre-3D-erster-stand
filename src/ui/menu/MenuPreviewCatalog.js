@@ -11,6 +11,12 @@ function toNumber(value, fallback = 0) {
     return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function countTunnelFeatures(obstacles) {
+    return Array.isArray(obstacles)
+        ? obstacles.filter((entry) => entry?.tunnel || entry?.shape === 'tube').length
+        : 0;
+}
+
 export function resolveMapCategory(mapDefinition) {
     const size = Array.isArray(mapDefinition?.size) ? mapDefinition.size : [];
     const width = toNumber(size[0], 80);
@@ -33,16 +39,30 @@ export function listMapPreviewEntries() {
         const size = Array.isArray(mapDefinition?.size) ? mapDefinition.size : [80, 30, 80];
         const obstacles = Array.isArray(mapDefinition?.obstacles) ? mapDefinition.obstacles.length : 0;
         const portals = Array.isArray(mapDefinition?.portals) ? mapDefinition.portals.length : 0;
+        const gates = Array.isArray(mapDefinition?.gates) ? mapDefinition.gates.length : 0;
+        const items = Array.isArray(mapDefinition?.items) ? mapDefinition.items.length : 0;
+        const aircraft = Array.isArray(mapDefinition?.aircraft) ? mapDefinition.aircraft.length : 0;
+        const portalLevels = Array.isArray(mapDefinition?.portalLevels) ? mapDefinition.portalLevels.length : 0;
+        const spawnCount = (mapDefinition?.playerSpawn ? 1 : 0)
+            + (Array.isArray(mapDefinition?.botSpawns) ? mapDefinition.botSpawns.length : 0);
         const hasGlbModel = typeof mapDefinition?.glbModel === 'string' && mapDefinition.glbModel.trim().length > 0;
+        const usesFallbackColliders = hasGlbModel && String(mapDefinition?.glbColliderMode || '') === 'fallbackOnly';
         return {
             key: mapKey,
             name: normalizeString(mapDefinition?.name, mapKey),
             sizeText: `${toNumber(size[0], 80)} x ${toNumber(size[1], 30)} x ${toNumber(size[2], 80)}`,
             obstacleCount: obstacles,
             portalCount: portals,
+            gateCount: gates,
+            tunnelCount: countTunnelFeatures(mapDefinition?.obstacles),
+            spawnCount,
+            itemAnchorCount: items,
+            aircraftCount: aircraft,
+            portalLevelCount: portalLevels,
             category: resolveMapCategory(mapDefinition),
             hasGlbModel,
-            renderMode: hasGlbModel ? 'GLB' : 'BOX',
+            usesFallbackColliders,
+            renderMode: hasGlbModel ? (usesFallbackColliders ? 'GLB+FALLBACK' : 'GLB') : 'BOX',
         };
     });
 }
@@ -57,8 +77,15 @@ export function resolveMapPreview(mapKey) {
         sizeText: 'n/a',
         obstacleCount: 0,
         portalCount: 0,
+        gateCount: 0,
+        tunnelCount: 0,
+        spawnCount: 0,
+        itemAnchorCount: 0,
+        aircraftCount: 0,
+        portalLevelCount: 0,
         category: 'medium',
         hasGlbModel: false,
+        usesFallbackColliders: false,
         renderMode: 'BOX',
     };
 }

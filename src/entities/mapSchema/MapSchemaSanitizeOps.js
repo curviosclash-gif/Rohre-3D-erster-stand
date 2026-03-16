@@ -17,6 +17,30 @@ export function asArray(value) {
     return Array.isArray(value) ? value : [];
 }
 
+function cloneJsonValue(value) {
+    if (value === null || typeof value === 'string' || typeof value === 'boolean') {
+        return value;
+    }
+    if (typeof value === 'number') {
+        return Number.isFinite(value) ? value : 0;
+    }
+    if (Array.isArray(value)) {
+        return value.map((entry) => cloneJsonValue(entry));
+    }
+    if (!value || typeof value !== 'object') {
+        return undefined;
+    }
+
+    const result = {};
+    for (const [key, entry] of Object.entries(value)) {
+        const clonedEntry = cloneJsonValue(entry);
+        if (clonedEntry !== undefined) {
+            result[key] = clonedEntry;
+        }
+    }
+    return result;
+}
+
 function sanitizeOptionalId(value) {
     if (typeof value !== 'string') return undefined;
     const normalized = value.trim();
@@ -37,6 +61,32 @@ function withOptionalStringField(target, key, value) {
         target[key] = normalized;
     }
     return target;
+}
+
+function sanitizeVectorArray(raw, fallback = [0, 0, 0]) {
+    const source = Array.isArray(raw) ? raw : fallback;
+    return [
+        asFiniteNumber(source[0], fallback[0] || 0),
+        asFiniteNumber(source[1], fallback[1] || 0),
+        asFiniteNumber(source[2], fallback[2] || 0),
+    ];
+}
+
+function normalizeGateType(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'slingshot') return 'slingshot';
+    return 'boost';
+}
+
+function normalizeGlbColliderMode(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'fallbackonly' || normalized === 'fallback-only' || normalized === 'fallback_box') {
+        return 'fallbackOnly';
+    }
+    if (normalized === 'mesh') {
+        return 'mesh';
+    }
+    return undefined;
 }
 
 export function sanitizeArenaSize(raw) {
@@ -111,13 +161,17 @@ export function sanitizePortal(raw) {
 
 export function sanitizeItem(raw) {
     const source = raw && typeof raw === 'object' ? raw : {};
-    return withOptionalId({
+    const result = withOptionalId({
         type: String(source.type || 'item_crystal'),
         x: asFiniteNumber(source.x, 0),
         y: asFiniteNumber(source.y, 0),
         z: asFiniteNumber(source.z, 0),
         rotateY: asFiniteNumber(source.rotateY, 0),
+        weight: asPositiveNumber(source.weight, 1, 0.01),
     }, source.id);
+    withOptionalStringField(result, 'model', source.model);
+    withOptionalStringField(result, 'pickupType', source.pickupType);
+    return result;
 }
 
 export function sanitizeAircraft(raw) {
@@ -132,6 +186,62 @@ export function sanitizeAircraft(raw) {
     }, source.id);
 }
 
+export function sanitizePortalLevels(raw) {
+    const levels = asArray(raw)
+        .map((entry) => Number(entry))
+        .filter((entry) => Number.isFinite(entry));
+    if (levels.length === 0) return [];
+
+    const seen = new Set();
+    const uniqueLevels = [];
+    for (const level of levels) {
+        const rounded = Math.round(level * 1000) / 1000;
+        const key = String(rounded);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        uniqueLevels.push(level);
+    }
+    uniqueLevels.sort((a, b) => a - b);
+    return uniqueLevels;
+}
+
+export function sanitizeGate(raw) {
+    const source = raw && typeof raw === 'object' ? raw : {};
+    const type = normalizeGateType(source.type);
+    const fallbackPosition = [0, 0, 0];
+    const pos = Array.isArray(source.pos)
+        ? sanitizeVectorArray(source.pos, fallbackPosition)
+        : sanitizeVectorArray([source.x, source.y, source.z], fallbackPosition);
+    const result = withOptionalId({
+        type,
+        pos,
+        radius: asPositiveNumber(source.radius, type === 'boost' ? 3.25 : 2.9, 0.1),
+    }, source.id);
+
+    if (Array.isArray(source.rot)) {
+        result.rot = sanitizeVectorArray(source.rot, [0, 0, 0]);
+    }
+
+    if (Array.isArray(source.forward)) {
+        result.forward = sanitizeVectorArray(source.forward, [0, 0, 1]);
+    }
+
+    if (Array.isArray(source.up)) {
+        result.up = sanitizeVectorArray(source.up, [0, 1, 0]);
+    }
+
+    if (Number.isFinite(Number(source.color))) {
+        result.color = Math.round(Number(source.color));
+    }
+
+    const params = cloneJsonValue(source.params);
+    if (params && typeof params === 'object' && !Array.isArray(params)) {
+        result.params = params;
+    }
+
+    return result;
+}
+
 export function normalizeMapSchemaDocument(rawMap) {
     if (!rawMap || typeof rawMap !== 'object') {
         throw new Error('Map root must be an object.');
@@ -140,16 +250,26 @@ export function normalizeMapSchemaDocument(rawMap) {
     const arenaSize = sanitizeArenaSize(rawMap.arenaSize);
     const playerSpawnDefault = { x: -800, y: arenaSize.height * 0.55, z: 0 };
 
-    return withOptionalStringField({
+    const normalized = withOptionalStringField({
         schemaVersion: MAP_SCHEMA_VERSION,
         arenaSize,
         tunnels: asArray(rawMap.tunnels).map((entry) => sanitizeTunnel(entry)),
         hardBlocks: asArray(rawMap.hardBlocks).map((entry) => sanitizeBlock(entry)),
         foamBlocks: asArray(rawMap.foamBlocks).map((entry) => sanitizeBlock(entry)),
         portals: asArray(rawMap.portals).map((entry) => sanitizePortal(entry)),
+        portalLevels: sanitizePortalLevels(rawMap.portalLevels),
+        gates: asArray(rawMap.gates).map((entry) => sanitizeGate(entry)),
         items: asArray(rawMap.items).map((entry) => sanitizeItem(entry)),
         aircraft: asArray(rawMap.aircraft).map((entry) => sanitizeAircraft(entry)),
         botSpawns: asArray(rawMap.botSpawns).map((entry) => sanitizeVector3(entry, { x: 0, y: playerSpawnDefault.y, z: 0 })),
         playerSpawn: sanitizeVector3(rawMap.playerSpawn, playerSpawnDefault),
+        preferAuthoredPortals: rawMap.preferAuthoredPortals === true,
     }, 'glbModel', rawMap.glbModel);
+
+    const glbColliderMode = normalizeGlbColliderMode(rawMap.glbColliderMode);
+    if (glbColliderMode) {
+        normalized.glbColliderMode = glbColliderMode;
+    }
+
+    return normalized;
 }

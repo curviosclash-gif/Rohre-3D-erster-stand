@@ -22,9 +22,10 @@ function resolveColliderKind(mesh) {
     return name.includes('_foam') ? 'foam' : 'hard';
 }
 
-function collectSceneColliders(root) {
+function collectSceneColliders(root, options = {}) {
     const colliders = [];
     const bounds = new THREE.Box3();
+    const collectColliders = options.collectColliders !== false;
     root.updateWorldMatrix(true, true);
 
     root.traverse((child) => {
@@ -33,6 +34,7 @@ function collectSceneColliders(root) {
         child.receiveShadow = true;
         bounds.expandByObject(child);
 
+        if (!collectColliders) return;
         if (isMeshColliderDisabled(child)) return;
 
         const box = new THREE.Box3().setFromObject(child);
@@ -69,7 +71,9 @@ export async function loadGLBMap(glbModel, options = {}) {
     }
 
     scene.name = String(options.sceneName || 'glbMapScene');
-    const { colliders, bounds } = collectSceneColliders(scene);
+    const { colliders, bounds } = collectSceneColliders(scene, {
+        collectColliders: options.collectColliders !== false,
+    });
     return {
         sourceUrl: modelUrl,
         scene,

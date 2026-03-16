@@ -46,6 +46,8 @@ function sanitizeLegacyRuntimeMapDocument(rawMap, warnings) {
         hardBlocks,
         foamBlocks: [],
         portals,
+        portalLevels: [],
+        gates: [],
         items: [],
         aircraft: [],
         botSpawns: [],
@@ -54,7 +56,9 @@ function sanitizeLegacyRuntimeMapDocument(rawMap, warnings) {
             y: height * 0.55,
             z: 0,
         },
+        preferAuthoredPortals: false,
         glbModel: typeof rawMap?.glbModel === 'string' ? rawMap.glbModel : undefined,
+        glbColliderMode: typeof rawMap?.glbColliderMode === 'string' ? rawMap.glbColliderMode : undefined,
     };
 }
 
@@ -82,7 +86,10 @@ export function migrateMapDocument(rawMap) {
             migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
         }
     } else if (schemaVersion === 1) {
-        warnings.push('Map schema v1 detected. Migrating to v2.');
+        warnings.push('Map schema v1 detected. Migrating to v3.');
+        migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
+    } else if (schemaVersion === 2) {
+        warnings.push('Map schema v2 detected. Migrating to v3.');
         migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
     }
 

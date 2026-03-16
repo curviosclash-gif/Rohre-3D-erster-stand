@@ -29,6 +29,53 @@ function pickWeightedType(typeEntries = []) {
     return typeEntries[typeEntries.length - 1]?.type || null;
 }
 
+const AUTHORED_ITEM_TYPE_ALIASES = Object.freeze({
+    item_battery: 'SPEED_UP',
+    item_health: 'SHIELD',
+    item_rocket: 'ROCKET_WEAK',
+    item_shield: 'SHIELD',
+});
+
+function isTypeAllowedForMode(type, huntModeActive) {
+    const normalizedType = String(type || '').trim().toUpperCase();
+    const entry = CONFIG?.POWERUP?.TYPES?.[normalizedType];
+    if (!entry) return false;
+    if (entry.huntOnly && !huntModeActive) return false;
+    if (entry.classicOnly && huntModeActive) return false;
+    return true;
+}
+
+function resolveAuthoredPickupType(anchor, huntModeActive) {
+    if (!anchor || typeof anchor !== 'object') return null;
+    const candidates = [
+        anchor.pickupType,
+        anchor.type,
+        AUTHORED_ITEM_TYPE_ALIASES[String(anchor.type || '').trim().toLowerCase()],
+        AUTHORED_ITEM_TYPE_ALIASES[String(anchor.model || '').trim().toLowerCase()],
+    ];
+    for (const candidate of candidates) {
+        const normalizedType = String(candidate || '').trim().toUpperCase();
+        if (!normalizedType) continue;
+        if (isTypeAllowedForMode(normalizedType, huntModeActive)) {
+            return normalizedType;
+        }
+    }
+    return null;
+}
+
+function buildAnchorKey(anchor, index = 0) {
+    if (typeof anchor?.id === 'string' && anchor.id.trim()) {
+        return anchor.id.trim();
+    }
+    return [
+        'anchor',
+        index,
+        Math.round((Number(anchor?.x) || 0) * 1000),
+        Math.round((Number(anchor?.y) || 0) * 1000),
+        Math.round((Number(anchor?.z) || 0) * 1000),
+    ].join(':');
+}
+
 export class PowerupManager {
     constructor(renderer, arena) {
         this.renderer = renderer;
@@ -44,6 +91,7 @@ export class PowerupManager {
         this._modelFactory = new PowerupModelFactory(size);
         this._sharedGeo = new THREE.BoxGeometry(size, size, size);
         this._sharedWireGeo = new THREE.BoxGeometry(size * 1.15, size * 1.15, size * 1.15);
+        this._occupiedAnchorKeys = new Set();
     }
 
     update(dt) {
@@ -82,7 +130,16 @@ export class PowerupManager {
         });
         if (spawnableTypes.length === 0) return;
 
-        let type = spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
+        const authoredAnchors = this._getAvailableAuthoredAnchors();
+        const authoredAnchor = authoredAnchors.length > 0
+            ? this._pickAuthoredAnchor(authoredAnchors)
+            : null;
+        if (!authoredAnchor && (this.arena?.getAuthoredItemAnchors?.()?.length || 0) > 0) {
+            return;
+        }
+
+        let type = resolveAuthoredPickupType(authoredAnchor?.anchor, huntModeActive)
+            || spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
         if (huntModeActive) {
             const rocketSpawnChance = Math.max(0, Number(CONFIG?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0));
             const nonRocketTypes = spawnableTypes.filter((typeKey) => !isRocketTierType(typeKey));
@@ -105,10 +162,22 @@ export class PowerupManager {
                 type = nonRocketTypes[Math.floor(Math.random() * nonRocketTypes.length)];
             }
         }
+        if (authoredAnchor?.anchor) {
+            const fixedType = resolveAuthoredPickupType(authoredAnchor.anchor, huntModeActive);
+            if (fixedType) {
+                type = fixedType;
+            }
+        }
 
         const config = CONFIG.POWERUP.TYPES[type];
         let pos = null;
-        if (CONFIG.GAMEPLAY.PLANAR_MODE && this.arena?.getPortalLevels) {
+        if (authoredAnchor?.anchor) {
+            pos = new THREE.Vector3(
+                Number(authoredAnchor.anchor.x) || 0,
+                Number(authoredAnchor.anchor.y) || 0,
+                Number(authoredAnchor.anchor.z) || 0,
+            );
+        } else if (CONFIG.GAMEPLAY.PLANAR_MODE && this.arena?.getPortalLevels) {
             const levels = this.arena.getPortalLevels();
             if (levels.length > 0) {
                 const level = levels[Math.floor(Math.random() * levels.length)];
@@ -121,6 +190,9 @@ export class PowerupManager {
 
         const mesh = this._createPowerupMesh(type, config);
         mesh.position.copy(pos);
+        if (authoredAnchor?.anchor && Number.isFinite(Number(authoredAnchor.anchor.rotateY))) {
+            mesh.rotation.y = Number(authoredAnchor.anchor.rotateY);
+        }
         mesh.castShadow = false;
 
         this.renderer.addToScene(mesh);
@@ -136,7 +208,11 @@ export class PowerupManager {
             box,
             baseY: pos.y,
             phase: Math.random() * Math.PI * 2,
+            anchorKey: authoredAnchor?.key || null,
         });
+        if (authoredAnchor?.key) {
+            this._occupiedAnchorKeys.add(authoredAnchor.key);
+        }
     }
 
     _createPowerupMesh(type, config) {
@@ -175,17 +251,7 @@ export class PowerupManager {
         for (let i = this.items.length - 1; i >= 0; i--) {
             if (this.items[i].box.intersectsSphere(this._pickupSphere)) {
                 const item = this.items.splice(i, 1)[0];
-                this.renderer.removeFromScene(item.mesh);
-                // Alle Materialien disposen (Parent + Children wie Wireframe)
-                item.mesh.traverse((node) => {
-                    if (node.material) {
-                        if (Array.isArray(node.material)) {
-                            node.material.forEach(m => m.dispose());
-                        } else {
-                            node.material.dispose();
-                        }
-                    }
-                });
+                this._disposeSpawnedItem(item);
                 return item.type;
             }
         }
@@ -194,19 +260,11 @@ export class PowerupManager {
 
     clear() {
         for (const item of this.items) {
-            this.renderer.removeFromScene(item.mesh);
-            item.mesh.traverse((node) => {
-                if (node.material) {
-                    if (Array.isArray(node.material)) {
-                        node.material.forEach(m => m.dispose());
-                    } else {
-                        node.material.dispose();
-                    }
-                }
-            });
+            this._disposeSpawnedItem(item);
         }
         this.items = [];
         this.spawnTimer = 0;
+        this._occupiedAnchorKeys.clear();
     }
 
     dispose() {
@@ -223,6 +281,56 @@ export class PowerupManager {
             this._sharedWireGeo.dispose();
             this._sharedWireGeo = null;
         }
+    }
+
+    _getAvailableAuthoredAnchors() {
+        const anchors = this.arena?.getAuthoredItemAnchors?.() || [];
+        const availableAnchors = [];
+        for (let i = 0; i < anchors.length; i += 1) {
+            const anchor = anchors[i];
+            if (!anchor || !Number.isFinite(Number(anchor.x)) || !Number.isFinite(Number(anchor.z))) continue;
+            const key = buildAnchorKey(anchor, i);
+            if (this._occupiedAnchorKeys.has(key)) continue;
+            availableAnchors.push({
+                key,
+                anchor,
+                weight: Math.max(0.01, Number(anchor.weight) || 1),
+            });
+        }
+        return availableAnchors;
+    }
+
+    _pickAuthoredAnchor(availableAnchors = []) {
+        if (!Array.isArray(availableAnchors) || availableAnchors.length === 0) return null;
+        let totalWeight = 0;
+        for (const entry of availableAnchors) {
+            totalWeight += Math.max(0.01, Number(entry.weight) || 1);
+        }
+        let roll = Math.random() * totalWeight;
+        for (const entry of availableAnchors) {
+            roll -= Math.max(0.01, Number(entry.weight) || 1);
+            if (roll <= 0) {
+                return entry;
+            }
+        }
+        return availableAnchors[availableAnchors.length - 1];
+    }
+
+    _disposeSpawnedItem(item) {
+        if (!item) return;
+        if (item.anchorKey) {
+            this._occupiedAnchorKeys.delete(item.anchorKey);
+        }
+        this.renderer.removeFromScene(item.mesh);
+        item.mesh.traverse((node) => {
+            if (node.material) {
+                if (Array.isArray(node.material)) {
+                    node.material.forEach((material) => material.dispose());
+                } else {
+                    node.material.dispose();
+                }
+            }
+        });
     }
 }
 

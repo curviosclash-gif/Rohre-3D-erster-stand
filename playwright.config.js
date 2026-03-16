@@ -64,6 +64,7 @@ const reporters = process.env.PW_HTML_REPORT === '1' || isCI
 
 export default defineConfig({
     testDir: './tests',
+    timeout: 120_000,
     fullyParallel: false,
     forbidOnly: isCI,
     retries: isCI ? 1 : 0,

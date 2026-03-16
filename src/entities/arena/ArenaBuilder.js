@@ -56,6 +56,7 @@ export class ArenaBuilder {
             obstacleDefs: Array.isArray(mapResolution.map.obstacles) ? mapResolution.map.obstacles : [],
             glbModel: typeof mapResolution.map?.glbModel === 'string' ? mapResolution.map.glbModel : '',
             glbLoadDelayMs: Number(mapResolution.map?.glbLoadDelayMs) || 0,
+            glbColliderMode: typeof mapResolution.map?.glbColliderMode === 'string' ? mapResolution.map.glbColliderMode : 'mesh',
             materialBundle,
             buildSignature,
             rebuildPolicy: canReuse ? 'reuse' : 'rebuild',

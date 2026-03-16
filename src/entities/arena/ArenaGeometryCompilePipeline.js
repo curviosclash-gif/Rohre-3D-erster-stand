@@ -23,6 +23,10 @@ function resolveTunnelRadius(tunnelRadius, width, height, depth, axis) {
     return Math.min(radius, maxRadius);
 }
 
+function resolveStandaloneTunnelWallThickness(innerRadius) {
+    return Math.max(0.25, Math.min(1.2, innerRadius * 0.18));
+}
+
 function removeAndDisposeObject(arena, key) {
     const obj = arena[key];
     if (!obj) return;
@@ -42,6 +46,7 @@ export class ArenaGeometryCompilePipeline {
         const arena = this.arena;
         arena.obstacles = [];
         arena._clearLoadedGlbScene?.();
+        arena._clearAuthoredAircraftDecorations?.();
         arena._glbLoadError = null;
         arena._glbLoadWarnings = [];
 
@@ -75,6 +80,31 @@ export class ArenaGeometryCompilePipeline {
     compileObstacleStage({ obstacleDefs, scale }) {
         const arena = this.arena;
         for (const obs of obstacleDefs) {
+            const obstacleKind = String(obs.kind || 'hard').toLowerCase();
+            const isFoamObstacle = obstacleKind === 'foam';
+            const obstacleOptions = {
+                kind: isFoamObstacle ? 'foam' : 'hard',
+            };
+
+            if (String(obs.shape || '').toLowerCase() === 'tube') {
+                const start = Array.isArray(obs.start) ? obs.start : [];
+                const end = Array.isArray(obs.end) ? obs.end : [];
+                const innerRadius = Number(obs.radius);
+                if (start.length < 3 || end.length < 3) continue;
+                if (![start[0], start[1], start[2], end[0], end[1], end[2], innerRadius].every(Number.isFinite)) continue;
+                this._addStandaloneTunnel(
+                    start[0] * scale,
+                    start[1] * scale,
+                    start[2] * scale,
+                    end[0] * scale,
+                    end[1] * scale,
+                    end[2] * scale,
+                    innerRadius * scale,
+                    obstacleOptions,
+                );
+                continue;
+            }
+
             if (!obs || !Array.isArray(obs.pos) || !Array.isArray(obs.size)) continue;
             const px = Number(obs.pos[0]);
             const py = Number(obs.pos[1]);
@@ -84,12 +114,6 @@ export class ArenaGeometryCompilePipeline {
             const oz = Number(obs.size[2]);
             if (![px, py, pz, ox, oy, oz].every(Number.isFinite)) continue;
             if (ox <= 0 || oy <= 0 || oz <= 0) continue;
-
-            const obstacleKind = String(obs.kind || 'hard').toLowerCase();
-            const isFoamObstacle = obstacleKind === 'foam';
-            const obstacleOptions = {
-                kind: isFoamObstacle ? 'foam' : 'hard',
-            };
 
             const hasTunnel = obs.tunnel && typeof obs.tunnel === 'object';
             if (hasTunnel) {
@@ -214,6 +238,63 @@ export class ArenaGeometryCompilePipeline {
         }
 
         edgeGeo.dispose();
+        geo.dispose();
+    }
+
+    _addStandaloneTunnel(ax, ay, az, bx, by, bz, innerRadius, options = {}) {
+        const arena = this.arena;
+        const kind = typeof options.kind === 'string' ? options.kind : 'hard';
+        const isFoam = kind === 'foam';
+        const start = new THREE.Vector3(ax, ay, az);
+        const end = new THREE.Vector3(bx, by, bz);
+        const axis = end.clone().sub(start);
+        const length = axis.length();
+        if (!Number.isFinite(length) || length <= 0.001) return;
+
+        const safeInnerRadius = asPositiveNumber(innerRadius, 1);
+        const wallThickness = resolveStandaloneTunnelWallThickness(safeInnerRadius);
+        const outerRadius = safeInnerRadius + wallThickness;
+
+        const midpoint = start.clone().lerp(end, 0.5);
+        axis.divideScalar(length);
+
+        const geo = new THREE.CylinderGeometry(outerRadius, outerRadius, length, 28, 1, true);
+        const rotation = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), axis);
+        const transform = new THREE.Matrix4().compose(midpoint, rotation, new THREE.Vector3(1, 1, 1));
+        geo.applyMatrix4(transform);
+
+        const box = new THREE.Box3().setFromPoints([start, end]).expandByScalar(outerRadius);
+        arena.obstacles.push({
+            box,
+            isWall: false,
+            kind,
+            tube: {
+                ax,
+                ay,
+                az,
+                bx,
+                by,
+                bz,
+                innerRadius: safeInnerRadius,
+                outerRadius,
+                lengthSq: length * length,
+            },
+        });
+
+        const worldGeo = geo.clone();
+        if (isFoam) {
+            arena._pendingFoamGeos.push(worldGeo);
+        } else {
+            arena._pendingObstacleGeos.push(worldGeo);
+        }
+
+        const edgeGeo = new THREE.EdgesGeometry(geo);
+        if (isFoam) {
+            arena._pendingFoamEdgeGeos.push(edgeGeo);
+        } else {
+            arena._pendingObstacleEdgeGeos.push(edgeGeo);
+        }
+
         geo.dispose();
     }
 

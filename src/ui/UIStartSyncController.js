@@ -453,15 +453,19 @@ export class UIStartSyncController {
             renderPreviewCard(this.ui.mapPreview, {
                 title: mapPreview.name,
                 badges: [
-                    mapPreview.hasGlbModel ? 'GLB' : 'BOX',
+                    mapPreview.renderMode,
                     humanizePreviewCategory(mapPreview.category),
-                    mapPreview.sizeText,
+                    mapPreview.portalLevelCount > 1 ? `${mapPreview.portalLevelCount} Ebenen` : mapPreview.sizeText,
                 ],
                 facts: [
                     { label: 'Groesse', value: mapPreview.sizeText },
                     { label: 'Hindernisse', value: String(mapPreview.obstacleCount) },
+                    { label: 'Tunnel', value: String(mapPreview.tunnelCount) },
                     { label: 'Portale', value: String(mapPreview.portalCount) },
-                    { label: 'Render', value: mapPreview.renderMode },
+                    { label: 'Gates', value: String(mapPreview.gateCount) },
+                    { label: 'Spawns', value: String(mapPreview.spawnCount) },
+                    { label: 'Items', value: String(mapPreview.itemAnchorCount) },
+                    { label: 'Deko', value: String(mapPreview.aircraftCount) },
                 ],
             });
         }

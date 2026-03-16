@@ -4,6 +4,35 @@ import { ArenaCollision } from './arena/ArenaCollision.js';
 import { PortalGateSystem } from './arena/PortalGateSystem.js';
 import { loadGLBMap } from './GLBMapLoader.js';
 import { disposeObject3DResources } from '../core/three-disposal.js';
+import { createVehicleMesh, isValidVehicleId } from './vehicle-registry.js';
+
+const AIRCRAFT_DECORATION_PALETTE = Object.freeze([
+    0xe5e7eb,
+    0x93c5fd,
+    0xfca5a5,
+    0xfde68a,
+    0x86efac,
+    0xc4b5fd,
+]);
+
+function resolveAircraftDecorationVehicleId(jetId) {
+    const normalized = String(jetId || '').trim().toLowerCase();
+    if (normalized.startsWith('jet_ship')) {
+        const suffix = normalized.slice('jet_'.length);
+        if (isValidVehicleId(suffix)) return suffix;
+    }
+    if (normalized.startsWith('ship') && isValidVehicleId(normalized)) {
+        return normalized;
+    }
+    if (isValidVehicleId(normalized)) {
+        return normalized;
+    }
+    return 'aircraft';
+}
+
+function resolveAircraftDecorationColor(index = 0) {
+    return AIRCRAFT_DECORATION_PALETTE[index % AIRCRAFT_DECORATION_PALETTE.length];
+}
 
 export class Arena {
     constructor(renderer) {
@@ -13,6 +42,7 @@ export class Arena {
         this.specialGates = [];
         this.portalsEnabled = true;
         this.currentMapKey = 'standard';
+        this.currentMapDefinition = null;
         this.bounds = { minX: 0, maxX: 0, minY: 0, maxY: 0, minZ: 0, maxZ: 0 };
 
         this.particles = null;
@@ -26,6 +56,7 @@ export class Arena {
         this._glbLoadError = null;
         this._glbLoadWarnings = [];
         this._lastBuildSignature = null;
+        this._aircraftDecorations = [];
 
         this._builder = new ArenaBuilder(this);
         this._collision = new ArenaCollision(this);
@@ -39,10 +70,72 @@ export class Arena {
         this._glbScene = null;
     }
 
+    _clearAuthoredAircraftDecorations() {
+        if (!Array.isArray(this._aircraftDecorations) || this._aircraftDecorations.length === 0) return;
+        for (const entry of this._aircraftDecorations) {
+            const root = entry?.root;
+            if (!root) continue;
+            this.renderer.removeFromScene(root);
+            disposeObject3DResources(root);
+        }
+        this._aircraftDecorations = [];
+    }
+
+    _buildAuthoredAircraftDecorations(map) {
+        this._clearAuthoredAircraftDecorations();
+        const authoredAircraft = Array.isArray(map?.aircraft) ? map.aircraft : [];
+        if (authoredAircraft.length === 0) return;
+
+        for (let i = 0; i < authoredAircraft.length; i += 1) {
+            const entry = authoredAircraft[i];
+            if (!entry) continue;
+
+            const root = new THREE.Group();
+            root.name = `map-aircraft-${entry.id || i}`;
+            root.position.set(
+                Number(entry.x) || 0,
+                Number(entry.y) || 0,
+                Number(entry.z) || 0,
+            );
+            root.rotation.y = Number(entry.rotateY) || 0;
+            root.scale.setScalar(Math.max(0.05, Number(entry.scale) || 1));
+
+            const vehicleId = resolveAircraftDecorationVehicleId(entry.jetId);
+            const mesh = createVehicleMesh(vehicleId, resolveAircraftDecorationColor(i));
+            root.add(mesh);
+            root.userData = {
+                ...(root.userData || {}),
+                authoredAircraftId: entry.id || null,
+                authoredJetId: entry.jetId || vehicleId,
+            };
+            this.renderer.addToScene(root);
+            this._aircraftDecorations.push({
+                id: entry.id || null,
+                jetId: entry.jetId || vehicleId,
+                vehicleId,
+                root,
+                mesh,
+            });
+        }
+    }
+
+    getAuthoredPlayerSpawn() {
+        return this.currentMapDefinition?.playerSpawn || null;
+    }
+
+    getAuthoredBotSpawns() {
+        return Array.isArray(this.currentMapDefinition?.botSpawns) ? this.currentMapDefinition.botSpawns : [];
+    }
+
+    getAuthoredItemAnchors() {
+        return Array.isArray(this.currentMapDefinition?.items) ? this.currentMapDefinition.items : [];
+    }
+
     build(mapKey) {
         const buildContext = this._builder.build(mapKey, {
             previousBuildSignature: this._lastBuildSignature,
         });
+        this.currentMapDefinition = buildContext.map || null;
 
         if (buildContext.rebuildPolicy === 'reuse') {
             return buildContext;
@@ -50,7 +143,8 @@ export class Arena {
 
         let usedGlbModel = false;
         const finalizeBuild = () => {
-            if (!usedGlbModel) {
+            const useFallbackObstacles = !usedGlbModel || buildContext.glbColliderMode === 'fallbackOnly';
+            if (useFallbackObstacles) {
                 this._builder.geometryPipeline.compileObstacleStage({
                     obstacleDefs: buildContext.obstacleDefs,
                     scale: buildContext.scale,
@@ -59,6 +153,7 @@ export class Arena {
 
             this._builder.geometryPipeline.flushMergeStage(buildContext.materialBundle);
             this._portalGateSystem.build(buildContext.map, buildContext.scale);
+            this._buildAuthoredAircraftDecorations(buildContext.map);
             this._builder.compileParticleStage(buildContext.sx, buildContext.sy, buildContext.sz);
             this._lastBuildSignature = buildContext.buildSignature;
             return {
@@ -76,6 +171,7 @@ export class Arena {
         return loadGLBMap(buildContext.glbModel, {
             loadDelayMs: buildContext.glbLoadDelayMs,
             sceneName: `glbMap-${this.currentMapKey}`,
+            collectColliders: buildContext.glbColliderMode !== 'fallbackOnly',
         }).then((glbResult) => {
             this._glbScene = glbResult.scene;
             this.renderer.addToScene(this._glbScene);
@@ -166,5 +262,8 @@ export class Arena {
 
     update(dt) {
         this._portalGateSystem.update(dt);
+        for (const entry of this._aircraftDecorations) {
+            entry?.mesh?.tick?.(dt);
+        }
     }
 }
