@@ -7,7 +7,8 @@ import { resolveHuntTargetOwnerPlayer } from './HuntTargetingOps.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
-export { clamp } from '../utils/MathOps.js';
+import { clamp } from '../utils/MathOps.js';
+export { clamp };
 
 export function resolveHealthRatio(player) {
     if (!player) return 1;
