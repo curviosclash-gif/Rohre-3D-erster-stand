@@ -1274,3 +1274,22 @@ Offene TODOs naechster Schritt:
   - `npm run docs:sync` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
   - `npm run docs:check` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
   - `npm run build` PASS
+2026-03-16 (Crosshair-Reset nach Match-Neustart)
+- Nutzerproblem eingegrenzt: erster Matchstart zeigt Third-Person-Crosshair korrekt, zweiter Matchstart nach Rueckkehr ins Menue startet in `THIRD_PERSON` aber mit `display:none`.
+- Root Cause:
+  - `MatchFlowUiController` setzt das Fadenkreuz beim Round/Menu-Reset direkt per DOM auf `none`.
+  - `CrosshairSystem` cached `display/left/top/transform` separat und hat externe DOM-Resets bisher nicht erkannt.
+  - Folge: nach dem Neustart bleibt das DOM-Fadenkreuz unsichtbar, bis ein Kamerawechsel den Cache wieder auf `none -> block` umschaltet.
+- Fix:
+  - `src/ui/CrosshairSystem.js`: DOM-Schreibzugriffe vergleichen jetzt Cache und echten Inline-Style, damit externe Resets wieder korrekt ueberschrieben werden.
+  - `tests/core.spec.js`: neue Regression `T20ai3` fuer Match-Neustart mit erwartet sichtbarem Third-Person-Fadenkreuz.
+- Verifikation:
+  - Repro vor Fix bestaetigt: erster Start `block`, zweiter Start nach `returnToMenu()` `none`, obwohl Kamera in `THIRD_PERSON`.
+  - `TEST_PORT=5371 PW_RUN_TAG=crosshair-restart-target PW_OUTPUT_DIR=test-results/crosshair-restart-target PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js -g "T20ai3:" --workers=1` PASS
+  - Browser-Spotcheck mit `develop-web-game`-Client auf `http://127.0.0.1:5273/?playtest=1`:
+    - Artefakte: `tmp/crosshair-restart-spotcheck/shot-0.png`, `tmp/crosshair-restart-spotcheck/shot-1.png`
+    - Sichtpruefung: `shot-0.png` zeigt sichtbares Third-Person-Fadenkreuz im Match.
+  - `npm run docs:sync` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
+  - `npm run docs:check` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
+  - `npm run build` FAIL in bestehendem Architektur-Lint ausserhalb des Diffs: `src/core/config/maps/MapPresetCatalog.js` verletzt `max-lines` (627 > 500).
+  - `TEST_PORT=5372 PW_RUN_TAG=crosshair-restart-core PW_OUTPUT_DIR=test-results/crosshair-restart-core PW_WORKERS=1 npm run test:core` FAIL weiter im bekannten Legacy-Test `T12b` (`mapKey expected maze, got mega_maze`); der neue Crosshair-Test lief gezielt separat gruen.

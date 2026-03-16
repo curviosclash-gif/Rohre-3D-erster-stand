@@ -38,7 +38,7 @@ export class CrosshairSystem {
         if (!crosshairElement) return;
         const state = this._getDomState(crosshairElement);
         const nextDisplay = isVisible ? 'block' : 'none';
-        if (state.display !== nextDisplay) {
+        if (state.display !== nextDisplay || crosshairElement.style.display !== nextDisplay) {
             crosshairElement.style.display = nextDisplay;
             state.display = nextDisplay;
         }
@@ -47,7 +47,7 @@ export class CrosshairSystem {
     _setCrosshairStyleValue(crosshairElement, key, nextValue) {
         if (!crosshairElement) return;
         const state = this._getDomState(crosshairElement);
-        if (state[key] !== nextValue) {
+        if (state[key] !== nextValue || crosshairElement.style[key] !== nextValue) {
             crosshairElement.style[key] = nextValue;
             state[key] = nextValue;
         }
