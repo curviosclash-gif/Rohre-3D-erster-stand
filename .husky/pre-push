@@ -2,8 +2,8 @@ if [ -f ".husky/.bypass" ]; then
   exit 0
 fi
 
-echo "Running docs:check (aus AGENTS.md Regeln)..."
-npm run docs:check
+echo "Running docs:sync (Timestamps aktualisieren)..."
+npm run docs:sync
 
-echo "Führe Fast-Tests aus, um Code vor dem Pushen abzusichern..."
-npm run test:fast
+echo "Architektur-Lint prüfen..."
+npm run lint:architecture
