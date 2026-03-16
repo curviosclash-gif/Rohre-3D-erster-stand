@@ -67,7 +67,7 @@ function isProcessAlive(pid) {
 async function acquireFileLock(lockPath, payload, options = {}) {
     const waitMs = toPositiveInt(options.waitMs, 300_000, 1_000, 3_600_000);
     const pollMs = toPositiveInt(options.pollMs, 250, 50, 10_000);
-    const staleMs = toPositiveInt(options.staleMs, 14_400_000, 30_000, 86_400_000);
+    const staleMs = toPositiveInt(options.staleMs, 600_000, 30_000, 86_400_000);
     const startedAt = Date.now();
 
     while (Date.now() - startedAt < waitMs) {

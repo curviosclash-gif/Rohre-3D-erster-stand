@@ -9,6 +9,7 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -24,6 +25,12 @@ jobs:
 
     - name: Check Documentation State (AGENTS.md rules)
       run: npm run docs:check
+
+    - name: Cache Playwright Browsers
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ hashFiles('package-lock.json') }}
 
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps

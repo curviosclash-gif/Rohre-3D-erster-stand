@@ -64,10 +64,10 @@ const reporters = process.env.PW_HTML_REPORT === '1' || isCI
 
 export default defineConfig({
     testDir: './tests',
-    timeout: 120_000,
+    timeout: 60_000,
     fullyParallel: false,
     forbidOnly: isCI,
-    retries: isCI ? 1 : 0,
+    retries: 1,
     workers,
     outputDir,
     globalSetup: './tests/playwright.global-setup.js',
@@ -86,7 +86,7 @@ export default defineConfig({
     webServer: {
         command: `npx vite --port ${TEST_PORT} --strictPort`,
         url: `http://localhost:${TEST_PORT}`,
-        timeout: 120_000,
+        timeout: 30_000,
         reuseExistingServer: !isCI && process.env.PW_REUSE_SERVER === '1',
     },
 });

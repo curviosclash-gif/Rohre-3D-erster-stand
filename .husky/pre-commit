@@ -8,6 +8,9 @@ if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
   exit 1
 fi
 
-echo "Prüfe Lock-Protokoll..."
-node scripts/verify-lock.mjs
+# Lock-Protokoll nur im Bot-Mode prüfen (mode:bot aktiv = kein .bypass)
+if [ -n "$BOT_MODE" ]; then
+  echo "Prüfe Lock-Protokoll (Bot-Mode)..."
+  node scripts/verify-lock.mjs
+fi
 

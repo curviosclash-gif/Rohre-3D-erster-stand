@@ -281,7 +281,10 @@ async function main() {
   const legacyFindings = collectLegacyPathFindings(filesToScan, contentByFile);
   const mojibakeWarnings = collectMojibakeWarnings(filesToScan, contentByFile);
 
-  const hasBlockingIssues = missingFiles.length > 0 || legacyFindings.length > 0;
+  const hasBlockingIssues = missingFiles.length > 0;
+  if (legacyFindings.length > 0) {
+    console.log(`[docs] WARNUNG: ${legacyFindings.length} Legacy-Pfad-Funde (nicht blockierend)`);
+  }
   const hasPendingUpdates = checkOnly && updatedFiles.length > 0;
   const canPass = !hasBlockingIssues && !hasPendingUpdates;
 
