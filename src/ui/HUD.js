@@ -147,18 +147,12 @@ export class HUD {
 
         // --- Boost Bar Update (immer sichtbar) ---
         if (this.boostFill) {
-            if (player.isBoosting) {
-                const pct = (player.boostTimer / CONFIG.PLAYER.BOOST_DURATION) * 100;
-                this._setStyle(this.boostFill, 'width', `${Math.max(0, pct)}%`);
-                this._setClassFlag(this.boostFill, 'cooldown', false);
-            } else if (player.boostCooldown > 0) {
-                const pct = (1 - player.boostCooldown / CONFIG.PLAYER.BOOST_COOLDOWN) * 100;
-                this._setStyle(this.boostFill, 'width', `${Math.min(100, pct)}%`);
-                this._setClassFlag(this.boostFill, 'cooldown', true);
-            } else {
-                this._setStyle(this.boostFill, 'width', '100%');
-                this._setClassFlag(this.boostFill, 'cooldown', false);
-            }
+            const boostCapacity = Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1);
+            const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
+            const pct = (boostCharge / boostCapacity) * 100;
+            const isRecharging = !player?.manualBoostActive && boostCharge < (boostCapacity - 0.001);
+            this._setStyle(this.boostFill, 'width', `${pct.toFixed(1)}%`);
+            this._setClassFlag(this.boostFill, 'cooldown', isRecharging);
         }
 
         if (this.lifeBar && this.lifeFill) {

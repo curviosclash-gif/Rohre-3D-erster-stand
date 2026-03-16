@@ -16,6 +16,7 @@ const SHARED_EMPTY_INPUT = {
     rollLeft: false,
     rollRight: false,
     boost: false,
+    boostPressed: false,
     cameraSwitch: false,
     dropItem: false,
     shootItem: false,
@@ -33,6 +34,7 @@ function getEmptyInput() {
     SHARED_EMPTY_INPUT.rollLeft = false;
     SHARED_EMPTY_INPUT.rollRight = false;
     SHARED_EMPTY_INPUT.boost = false;
+    SHARED_EMPTY_INPUT.boostPressed = false;
     SHARED_EMPTY_INPUT.cameraSwitch = false;
     SHARED_EMPTY_INPUT.dropItem = false;
     SHARED_EMPTY_INPUT.shootItem = false;
@@ -440,6 +442,7 @@ export class PlayerInputSystem {
             input.rollLeft = inputState.rollLeft;
             input.rollRight = inputState.rollRight;
             input.boost = inputState.boost;
+            input.boostPressed = inputState.boostPressed;
             input.cameraSwitch = inputState.cameraSwitch;
             input.dropItem = inputState.dropItem;
             input.shootItem = inputState.shootItem;

@@ -62,8 +62,10 @@ export class Player {
         this._tmpMat = new THREE.Matrix4();
 
         // Boost
-        this.boostTimer = 0;
+        this.boostCharge = CONFIG.PLAYER.BOOST_DURATION;
+        this.boostTimer = this.boostCharge;
         this.boostCooldown = 0;
+        this.manualBoostActive = false;
         this.isBoosting = false;
 
         // Powerup effects
@@ -155,8 +157,10 @@ export class Player {
         this.position.copy(position);
         this.alive = true;
         this.speed = this.baseSpeed;
-        this.boostTimer = 0;
+        this.boostCharge = CONFIG.PLAYER.BOOST_DURATION;
+        this.boostTimer = this.boostCharge;
         this.boostCooldown = 0;
+        this.manualBoostActive = false;
         this.isBoosting = false;
         this.activeEffects = [];
         this.hasShield = false;
@@ -447,7 +451,6 @@ export class Player {
         this.boostPortalParams = params;
         this.boostPortalDir.copy(forward);
 
-        this.boostTimer = Math.max(this.boostTimer, this.boostPortalTimer);
         this.isBoosting = true;
     }
 

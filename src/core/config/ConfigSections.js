@@ -30,7 +30,7 @@ export const CONFIG_SECTIONS = {
         TURN_SPEED: 3.4,
         ROLL_SPEED: 2.0,
         BOOST_MULTIPLIER: 1.8,
-        BOOST_DURATION: 2.0,
+        BOOST_DURATION: 4.0,
         BOOST_COOLDOWN: 5.0,
         SPAWN_PROTECTION: 1.0,
         HITBOX_RADIUS: 0.8,

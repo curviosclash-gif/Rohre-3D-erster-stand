@@ -127,16 +127,10 @@ export class HuntHUD {
         if (refs.shieldFill) refs.shieldFill.style.width = toPercent(shieldRatio);
         if (refs.shieldText) refs.shieldText.textContent = `${Math.round(shield)} / ${Math.round(maxShield)}`;
 
-        const boostDuration = Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1);
-        const boostCooldown = Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_COOLDOWN) || 1);
-        let boostRatio = 1;
-        let isBoostCooldown = false;
-        if (player?.isBoosting) {
-            boostRatio = clamp01((Number(player.boostTimer) || 0) / boostDuration);
-        } else if ((Number(player?.boostCooldown) || 0) > 0) {
-            boostRatio = clamp01(1 - ((Number(player.boostCooldown) || 0) / boostCooldown));
-            isBoostCooldown = true;
-        }
+        const boostCapacity = Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1);
+        const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
+        const boostRatio = clamp01(boostCharge / boostCapacity);
+        const isBoostCooldown = !player?.manualBoostActive && boostCharge < (boostCapacity - 0.001);
         if (refs.boostFill) {
             refs.boostFill.style.width = toPercent(boostRatio);
             refs.boostFill.classList.toggle('cooldown', isBoostCooldown);

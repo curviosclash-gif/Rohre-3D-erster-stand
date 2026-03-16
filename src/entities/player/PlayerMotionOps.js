@@ -36,6 +36,60 @@ function clampAxisInput(value) {
     return numeric;
 }
 
+function resolveBoostCapacity() {
+    return Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1);
+}
+
+function resolveBoostRechargeTime() {
+    return Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_COOLDOWN) || 1);
+}
+
+function syncBoostUiState(player, maxCharge, rechargeRate) {
+    player.boostTimer = player.boostCharge;
+    const missingCharge = Math.max(0, maxCharge - player.boostCharge);
+    player.boostCooldown = rechargeRate > 0 ? missingCharge / rechargeRate : 0;
+}
+
+function updateBoostState(player, dt, controlState = null) {
+    const maxCharge = resolveBoostCapacity();
+    const rechargeTime = resolveBoostRechargeTime();
+    const rechargeRate = maxCharge / rechargeTime;
+    const minActivationCharge = Math.max(0.05, maxCharge * 0.02);
+    const boostHeld = !!controlState?.boost;
+    const boostPressed = !!controlState?.boostPressed;
+
+    if (!Number.isFinite(player.boostCharge)) {
+        player.boostCharge = maxCharge;
+    } else if (player.boostCharge < 0) {
+        player.boostCharge = 0;
+    } else if (player.boostCharge > maxCharge) {
+        player.boostCharge = maxCharge;
+    }
+
+    if (player.isBot) {
+        player.manualBoostActive = boostHeld && player.boostCharge > minActivationCharge;
+    } else if (boostPressed) {
+        if (player.manualBoostActive) {
+            player.manualBoostActive = false;
+        } else if (player.boostCharge > minActivationCharge) {
+            player.manualBoostActive = true;
+        }
+    }
+
+    if (player.manualBoostActive) {
+        player.boostCharge = Math.max(0, player.boostCharge - dt);
+        if (player.boostCharge <= 0.0001) {
+            player.boostCharge = 0;
+            player.manualBoostActive = false;
+        }
+    } else if (player.boostCharge < maxCharge) {
+        player.boostCharge = Math.min(maxCharge, player.boostCharge + rechargeRate * dt);
+    }
+
+    syncBoostUiState(player, maxCharge, rechargeRate);
+    return player.manualBoostActive;
+}
+
 export function initializePlayerHitbox(player, radius) {
     if (!player?.hitboxBox) return;
     const fallbackRadius = Math.max(MIN_HITBOX_RADIUS, Number(radius) || Number(CONFIG.PLAYER.HITBOX_RADIUS) || 0.8);
@@ -84,12 +138,9 @@ export function updatePlayerMotion(player, dt, controlState = null) {
     const pitchInput = clampAxisInput(controlState?.pitchInput);
     const yawInput = clampAxisInput(controlState?.yawInput);
     const rollInput = clampAxisInput(controlState?.rollInput);
-    const wantsBoost = !!controlState?.boost;
-
-    if (wantsBoost && player.boostCooldown <= 0 && !player.isBoosting) {
-        player.isBoosting = true;
-        player.boostTimer = CONFIG.PLAYER.BOOST_DURATION;
-    }
+    const manualBoostActive = updateBoostState(player, dt, controlState);
+    const boostEffectActive = manualBoostActive || player.boostPortalTimer > 0;
+    player.isBoosting = boostEffectActive;
 
     player._tmpEuler.set(
         pitchInput * turnSpeed,
@@ -115,18 +166,9 @@ export function updatePlayerMotion(player, dt, controlState = null) {
         player.quaternion.setFromEuler(player._tmpEuler2);
     }
 
-    if (player.isBoosting) {
-        player.boostTimer -= dt;
-        player.speed = player.baseSpeed * CONFIG.PLAYER.BOOST_MULTIPLIER;
-        if (player.boostTimer <= 0) {
-            player.isBoosting = false;
-            player.boostCooldown = CONFIG.PLAYER.BOOST_COOLDOWN;
-            player.speed = player.baseSpeed;
-        }
-    }
-    if (player.boostCooldown > 0) {
-        player.boostCooldown -= dt;
-    }
+    player.speed = boostEffectActive
+        ? player.baseSpeed * CONFIG.PLAYER.BOOST_MULTIPLIER
+        : player.baseSpeed;
 
     player._tmpVec.set(0, 0, -1).applyQuaternion(player.quaternion);
     player.velocity.copy(player._tmpVec).multiplyScalar(player.speed);

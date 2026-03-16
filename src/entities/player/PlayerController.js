@@ -46,6 +46,7 @@ export class PlayerController {
             yawInput: 0,
             rollInput: 0,
             boost: false,
+            boostPressed: false,
         };
         this._axisState = {
             pitch: 0,
@@ -85,14 +86,16 @@ export class PlayerController {
         let pitchTarget = 0;
         let yawTarget = 0;
         let rollTarget = 0;
-        let boost = false;
+        let boostHeld = false;
+        let boostPressed = false;
 
         const hasDirectInput = !!input && steeringLocked !== true;
         if (hasDirectInput) {
             pitchTarget = axisInput(input.pitchUp, input.pitchDown);
             yawTarget = axisInput(input.yawLeft, input.yawRight);
             rollTarget = axisInput(input.rollLeft, input.rollRight);
-            boost = !!input.boost;
+            boostHeld = !!input.boost;
+            boostPressed = !!input.boostPressed;
 
             if (player?.invertPitchBase) {
                 pitchTarget *= -1;
@@ -117,7 +120,8 @@ export class PlayerController {
             out.pitchInput = pitchTarget;
             out.yawInput = yawTarget;
             out.rollInput = rollTarget;
-            out.boost = boost;
+            out.boost = boostHeld;
+            out.boostPressed = boostPressed;
             return out;
         }
 
@@ -138,7 +142,8 @@ export class PlayerController {
         out.pitchInput = Math.abs(this._axisState.pitch) < AXIS_RELEASE_DEADZONE ? 0 : this._axisState.pitch;
         out.yawInput = Math.abs(this._axisState.yaw) < AXIS_RELEASE_DEADZONE ? 0 : this._axisState.yaw;
         out.rollInput = Math.abs(this._axisState.roll) < AXIS_RELEASE_DEADZONE ? 0 : this._axisState.roll;
-        out.boost = boost;
+        out.boost = boostHeld;
+        out.boostPressed = boostPressed;
         return out;
     }
 }

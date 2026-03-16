@@ -44,6 +44,7 @@ export class InputManager {
             rollLeft: false,
             rollRight: false,
             boost: false,
+            boostPressed: false,
             cameraSwitch: false,
             dropItem: false,
             shootItem: false,
@@ -158,6 +159,7 @@ export class InputManager {
         inputObj.rollLeft = false;
         inputObj.rollRight = false;
         inputObj.boost = false;
+        inputObj.boostPressed = false;
         inputObj.cameraSwitch = false;
         inputObj.dropItem = false;
         inputObj.shootItem = false;
@@ -203,6 +205,7 @@ export class InputManager {
         this._reuseInput.rollLeft = this._isActionDown(keyMap.ROLL_LEFT, altKeyMap?.ROLL_LEFT || '');
         this._reuseInput.rollRight = this._isActionDown(keyMap.ROLL_RIGHT, altKeyMap?.ROLL_RIGHT || '');
         this._reuseInput.boost = this._isActionDown(keyMap.BOOST, altKeyMap?.BOOST || '');
+        this._reuseInput.boostPressed = this._wasActionPressed(keyMap.BOOST, altKeyMap?.BOOST || '');
         this._reuseInput.cameraSwitch = this._wasActionPressed(keyMap.CAMERA, altKeyMap?.CAMERA || '');
         this._reuseInput.dropItem = this._wasActionPressed(keyMap.DROP, altKeyMap?.DROP || '');
         this._reuseInput.shootItem = this._wasActionPressed(keyMap.SHOOT, altKeyMap?.SHOOT || '');

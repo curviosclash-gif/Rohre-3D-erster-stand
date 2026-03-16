@@ -1238,3 +1238,39 @@ Offene TODOs naechster Schritt:
 - `npm run docs:check` PASS
 - `npm run test:core` FAIL, aber auf vorhandenem Legacy-Migrationsfall `T12b` (`mapKey expected maze, got mega_maze`), nicht auf dem Pause-Port.
 - `npm run test:stress` FAIL, aber auf vorhandenem Multiplayer-Ready-Test `T75` (disabled `#multiplayer-ready-toggle`), nicht auf dem Pause-Port.
+2026-03-16 (Boost-Toggle + doppelte Kapazitaet gestartet)
+- Nutzerwunsch aufgenommen: Boost soll doppelt so lange verfuegbar sein und sich fuer Human-Player per Taste ein-/ausschalten lassen, damit kurze Bursts moeglich sind.
+- Umsetzungsstand:
+  - `src/entities/player/PlayerMotionOps.js`: One-Shot-Boost wird auf ladbare Boost-Energie mit partieller Regeneration umgebaut.
+  - `src/entities/player/PlayerController.js`: Human-Boost erhaelt Press-Edge fuer Toggle; Bots bleiben beim direkten Boost-Intent.
+  - `src/core/InputManager.js`, `src/entities/systems/PlayerInputSystem.js`: `boostPressed` wird als `justPressed` sauber bis in den Player-Controller durchgereicht.
+  - `src/entities/Player.js`: separater Runtime-State fuer `boostCharge` / `manualBoostActive`.
+  - `src/ui/HUD.js`, `src/hunt/HuntHUD.js`: Boost-Balken zeigen jetzt den echten Ladestand statt Vollentladung+Cooldown.
+  - `tests/physics-core.spec.js`: neue Regression fuer Toggle + Teilaufladung.
+2026-03-16 (Boost-Toggle + doppelte Kapazitaet verifiziert)
+- Gezielte Verifikation:
+  - `TEST_PORT=5364 PW_RUN_TAG=boost-toggle-target PW_OUTPUT_DIR=test-results/boost-toggle-target PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test tests/physics-core.spec.js -g "T45c:" --workers=1` PASS
+- Browser-Spotcheck mit `develop-web-game`-Client:
+  - lokaler Vite-Server auf `http://127.0.0.1:5365/?playtest=1`
+  - Artefakte: `tmp/boost-toggle-spotcheck/shot-0.png`, `tmp/boost-toggle-spotcheck/shot-1.png`
+  - Sichtpruefung bestaetigt: Boost-Balken bleibt nach kurzem Einsatz nur teilweise entladen (`~86%` bzw. `~83%`) und laedt wieder auf.
+- Repo-Gates:
+  - `npm run docs:sync` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
+  - `npm run docs:check` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
+  - `npm run build` PASS
+- Bestehende / nicht dem Boost-Diff zugeordnete Suite-Probleme:
+  - `npm run test:core` FAIL weiter in `T12b` (Legacy-Settings-Migration erwartet `mapKey=maze`, bekommt `mega_maze`).
+  - `npm run test:physics` FAIL im Block `tests/physics-policy.spec.js` ab `T73` mit Menu-/`page.goto`-Startproblemen; der geaenderte Physics-Core-Pfad inkl. `T45c` lief davor gruen.
+  - `npm run test:stress` FAIL bereits in `T61`; zusaetzlich meldet der Vite-WebServer beim Suite-Abbruch einen bestehenden Dependency-Scan-Fehler ueber HTML-Artefakte unter `playwright-report/` und `tmp/`.
+2026-03-16 (MG-Trail-Lock-In-Slider auf x2 Range)
+- Nutzerwunsch umgesetzt: MG-Trail-Zielsuchradius-Slider hat jetzt die doppelte Obergrenze bis `6.0`.
+- Anpassungen:
+  - `index.html`: `#mg-trail-aim-slider` `max` von `3.0` auf `6.0`.
+  - `src/ui/menu/MenuGameplayBindings.js`: Input-Clamp fuer `settings.gameplay.mgTrailAimRadius` von `3.0` auf `6.0`.
+  - `src/core/config/SettingsRuntimeContract.js`: zentrales Limit `SETTINGS_LIMITS.gameplay.mgTrailAimRadius.max` von `3` auf `6`.
+- Verifikation:
+  - `TEST_PORT=5369 PW_RUN_TAG=mg-trail-radius-target PW_OUTPUT_DIR=test-results/mg-trail-radius-target PW_WORKERS=1 node scripts/verify-lock.mjs --playwright -- npx playwright test tests/physics-hunt.spec.js -g "T63:" --workers=1` PASS
+  - `TEST_PORT=5370 PW_RUN_TAG=mg-trail-radius-core PW_OUTPUT_DIR=test-results/mg-trail-radius-core PW_WORKERS=1 npm run test:core` FAIL weiterhin im bekannten Legacy-Migrationsfall `T12b` (`mapKey expected maze, got mega_maze`), nicht im MG-Trail-Pfad.
+  - `npm run docs:sync` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
+  - `npm run docs:check` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
+  - `npm run build` PASS

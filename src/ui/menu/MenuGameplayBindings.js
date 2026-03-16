@@ -252,7 +252,7 @@ export function setupMenuGameplayBindings(ctx) {
 
     if (ui.mgTrailAimSlider) {
         bind(ui.mgTrailAimSlider, 'input', () => {
-            settings.gameplay.mgTrailAimRadius = clamp(parseFloat(ui.mgTrailAimSlider.value), 0.2, 3.0);
+            settings.gameplay.mgTrailAimRadius = clamp(parseFloat(ui.mgTrailAimSlider.value), 0.2, 6.0);
             queueInputSettingsChanged([keys.GAMEPLAY_MG_TRAIL_AIM_RADIUS]);
         });
     }
