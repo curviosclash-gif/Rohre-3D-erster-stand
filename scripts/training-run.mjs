@@ -17,6 +17,8 @@ import {
 } from '../trainer/artifacts/TrainerArtifactStore.mjs';
 import { validateDqnCheckpointPayload } from '../trainer/model/CheckpointValidation.mjs';
 
+const DEFAULT_TRAINER_COMMAND_TIMEOUT_MS = 20_000;
+
 function parseBoolean(value, fallback = false) {
     if (typeof value === 'boolean') return value;
     if (typeof value !== 'string') return fallback;
@@ -72,25 +74,96 @@ function toRepoPath(path) {
     return String(path || '').replace(/\\/g, '/');
 }
 
+function toFiniteNumber(value, fallback = null) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : fallback;
+}
+
 async function sleep(ms) {
     await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function waitForBridgeDrain(bridge, timeoutMs = 1200) {
+function estimateOutstandingAckCount(snapshot = null) {
+    const trainingRequests = Math.max(0, Number(snapshot?.trainingRequests || 0));
+    const ackResponses = Math.max(0, Number(snapshot?.ackResponses || 0));
+    return Math.max(0, trainingRequests - ackResponses);
+}
+
+async function waitForBridgeDrain(bridge, timeoutMs = 180_000) {
     if (!bridge || typeof bridge.getTelemetrySnapshot !== 'function') {
         return null;
     }
-    const timeout = Math.max(20, Math.min(30_000, Number(timeoutMs) || 1200));
+    const timeout = Math.max(20, Math.min(10 * 60_000, Number(timeoutMs) || 180_000));
     const startedAt = Date.now();
     let snapshot = bridge.getTelemetrySnapshot();
     while ((Date.now() - startedAt) < timeout) {
-        if (Number(snapshot?.responsesReceived || 0) >= Number(snapshot?.requestsSent || 0)) {
+        const pendingActionRequest = snapshot?.pendingActionRequest === true;
+        const pendingAckCount = Number(snapshot?.pendingAckCount || 0);
+        const pendingCommandCount = Number(snapshot?.pendingCommandCount || 0);
+        const estimatedAckBacklog = estimateOutstandingAckCount(snapshot);
+        if (
+            !pendingActionRequest
+            && pendingAckCount === 0
+            && pendingCommandCount === 0
+            && estimatedAckBacklog === 0
+        ) {
             break;
         }
         await sleep(25);
         snapshot = bridge.getTelemetrySnapshot();
     }
     return snapshot;
+}
+
+function deriveCheckpointEpsilon(checkpoint, fallback = null) {
+    const envSteps = toFiniteNumber(checkpoint?.envSteps, null);
+    const epsilonStart = toFiniteNumber(checkpoint?.hyper?.epsilonStart, null);
+    const epsilonEnd = toFiniteNumber(checkpoint?.hyper?.epsilonEnd, null);
+    const epsilonDecaySteps = toFiniteNumber(checkpoint?.hyper?.epsilonDecaySteps, null);
+    if (
+        envSteps == null
+        || epsilonStart == null
+        || epsilonEnd == null
+        || epsilonDecaySteps == null
+        || epsilonDecaySteps <= 0
+    ) {
+        return fallback;
+    }
+    const progress = Math.max(0, Math.min(1, envSteps / epsilonDecaySteps));
+    return epsilonStart + ((epsilonEnd - epsilonStart) * progress);
+}
+
+function buildTrainerStatsFallback(checkpointResponse, bridgeTelemetry = null) {
+    if (!checkpointResponse || checkpointResponse.ok !== true) {
+        return null;
+    }
+    const checkpoint = checkpointResponse.checkpoint && typeof checkpointResponse.checkpoint === 'object'
+        ? checkpointResponse.checkpoint
+        : null;
+    const replay = checkpointResponse.replay && typeof checkpointResponse.replay === 'object'
+        ? checkpointResponse.replay
+        : null;
+    return {
+        ok: true,
+        type: 'trainer-stats-fallback',
+        source: 'checkpoint-request',
+        sessionId: checkpointResponse.sessionId || null,
+        replay,
+        model: {
+            optimizerSteps: toFiniteNumber(checkpoint?.optimizerSteps, null),
+            epsilon: toFiniteNumber(
+                bridgeTelemetry?.latestEpsilon,
+                deriveCheckpointEpsilon(checkpoint, null)
+            ),
+            envSteps: toFiniteNumber(checkpoint?.envSteps, null),
+            lastLoss: toFiniteNumber(
+                checkpoint?.lastLoss,
+                toFiniteNumber(bridgeTelemetry?.latestLoss, null)
+            ),
+        },
+        state: checkpointResponse.state || null,
+        resumeSource: checkpointResponse.resumeSource || null,
+    };
 }
 
 async function waitForBridgeActionProbe(bridge, options = {}) {
@@ -256,6 +329,9 @@ async function main() {
     const layout = resolveTrainingRunArtifactLayout(stamp);
 
     await mkdir(layout.runDir, { recursive: true });
+    const latestBefore = writeLatest
+        ? await readJsonIfExists(layout.latestIndexPath)
+        : null;
 
     let bridge = null;
     let bridgeReady = null;
@@ -308,7 +384,7 @@ async function main() {
                     {
                         strict: resumeStrict,
                     },
-                    parseInteger(args.get('trainer-command-timeout-ms'), 1500, 20, 30_000)
+                    parseInteger(args.get('trainer-command-timeout-ms'), DEFAULT_TRAINER_COMMAND_TIMEOUT_MS, 20, 10 * 60_000)
                 );
                 resumeInfo.responseOk = checkpointLoadLatestResponse?.ok === true;
                 resumeInfo.loaded = checkpointLoadLatestResponse?.ok === true && checkpointLoadLatestResponse?.loaded === true;
@@ -324,7 +400,7 @@ async function main() {
                         resumeSource: resumeCandidate.sourcePath,
                         strict: resumeStrict,
                     },
-                    parseInteger(args.get('trainer-command-timeout-ms'), 1500, 20, 30_000)
+                    parseInteger(args.get('trainer-command-timeout-ms'), DEFAULT_TRAINER_COMMAND_TIMEOUT_MS, 20, 10 * 60_000)
                 );
                 resumeInfo.responseOk = checkpointLoadResponse?.ok === true;
                 resumeInfo.loaded = checkpointLoadResponse?.ok === true && checkpointLoadResponse?.loaded === true;
@@ -349,15 +425,16 @@ async function main() {
     const runner = new TrainingAutomationRunner({ bridge });
     const summary = runner.run(config);
     if (bridge && typeof bridge.getTelemetrySnapshot === 'function') {
-        const drainTimeoutMs = parseInteger(args.get('bridge-drain-timeout-ms'), 1200, 20, 30_000);
+        const drainTimeoutMs = parseInteger(args.get('bridge-drain-timeout-ms'), 180_000, 20, 10 * 60_000);
         bridgeTelemetry = await waitForBridgeDrain(bridge, drainTimeoutMs);
         opsKpis = deriveTrainingOpsKpis(bridgeTelemetry);
 
-        const commandTimeoutMs = parseInteger(args.get('trainer-command-timeout-ms'), 1500, 20, 30_000);
-        const statsResponse = await submitBridgeCommand(bridge, 'trainer-stats-request', {}, commandTimeoutMs);
-        if (statsResponse?.ok === true) {
-            trainerStats = statsResponse;
-        }
+        const commandTimeoutMs = parseInteger(
+            args.get('trainer-command-timeout-ms'),
+            DEFAULT_TRAINER_COMMAND_TIMEOUT_MS,
+            20,
+            10 * 60_000
+        );
         const checkpointResponse = await submitBridgeCommand(
             bridge,
             'trainer-checkpoint-request',
@@ -366,6 +443,12 @@ async function main() {
         );
         if (checkpointResponse?.ok === true && checkpointResponse?.checkpoint) {
             checkpointExport = checkpointResponse;
+        }
+        const statsResponse = await submitBridgeCommand(bridge, 'trainer-stats-request', {}, commandTimeoutMs);
+        if (statsResponse?.ok === true) {
+            trainerStats = statsResponse;
+        } else if (checkpointExport) {
+            trainerStats = buildTrainerStatsFallback(checkpointExport, bridgeTelemetry);
         }
 
         if (writeCheckpoint) {
@@ -431,6 +514,16 @@ async function main() {
             checkpoint: { exists: checkpointExists, status: checkpointExists ? 'completed' : 'pending' },
         },
     });
+    if (!checkpointExists) {
+        const previousCheckpointPath = latestBefore?.artifacts?.checkpoint?.exists === true
+            ? latestBefore?.artifacts?.checkpoint?.path
+            : null;
+        if (typeof previousCheckpointPath === 'string' && previousCheckpointPath.trim()) {
+            latestIndex.artifacts.checkpoint.path = previousCheckpointPath.trim();
+            latestIndex.artifacts.checkpoint.exists = true;
+            latestIndex.artifacts.checkpoint.status = latestBefore?.artifacts?.checkpoint?.status || 'completed';
+        }
+    }
     if (writeLatest) {
         await mkdir(layout.rootDir, { recursive: true });
         await writeJson(layout.latestIndexPath, latestIndex);

@@ -149,11 +149,14 @@ export function resolveLatestCheckpointPayloadSync(options = {}) {
 
 export async function writeTrainerArtifacts(input = {}) {
     const paths = resolveTrainerArtifactPaths(input.stamp);
+    const checkpoint = input.checkpoint && typeof input.checkpoint === 'object'
+        ? input.checkpoint
+        : null;
     const trainerArtifact = {
         contractVersion: 'v34-trainer-artifact-v1',
         generatedAt: typeof input.generatedAt === 'string' ? input.generatedAt : new Date().toISOString(),
         stamp: paths.stamp,
-        checkpointPath: toRepoPath(paths.checkpointPath),
+        checkpointPath: checkpoint ? toRepoPath(paths.checkpointPath) : null,
         resumeSource: input.resumeSource || null,
         trainer: input.trainer || null,
         bridge: input.bridge || null,
@@ -165,15 +168,17 @@ export async function writeTrainerArtifacts(input = {}) {
         generatedAt: trainerArtifact.generatedAt,
         stamp: paths.stamp,
         resumeSource: input.resumeSource || null,
-        checkpoint: input.checkpoint || null,
+        checkpoint,
     };
 
     await writeJson(paths.trainerArtifactPath, trainerArtifact);
-    await writeJson(paths.checkpointPath, checkpointArtifact);
+    if (checkpoint) {
+        await writeJson(paths.checkpointPath, checkpointArtifact);
+    }
     return {
         trainerArtifactPath: paths.trainerArtifactPath,
-        checkpointPath: paths.checkpointPath,
+        checkpointPath: checkpoint ? paths.checkpointPath : null,
         trainerArtifact,
-        checkpointArtifact,
+        checkpointArtifact: checkpoint ? checkpointArtifact : null,
     };
 }

@@ -114,6 +114,9 @@ function cloneTelemetrySnapshot(state) {
         maxOptimizerSteps: state.maxOptimizerSteps,
         lastFailure: state.lastFailure,
         lastFallbackReason: state.lastFallbackReason,
+        pendingActionRequest: !!state.pendingActionRequest,
+        pendingAckCount: Number(state.pendingAckCount) || 0,
+        pendingCommandCount: Number(state.pendingCommandCount) || 0,
     };
 }
 
@@ -728,7 +731,12 @@ export class WebSocketTrainerBridge {
 
     getTelemetrySnapshot() {
         this._handleTimeout();
-        return cloneTelemetrySnapshot(this._telemetry);
+        return cloneTelemetrySnapshot({
+            ...this._telemetry,
+            pendingActionRequest: !!this._pendingRequest,
+            pendingAckCount: this._pendingAcks.size,
+            pendingCommandCount: this._pendingCommands.size,
+        });
     }
 
     resetTelemetry() {

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import net from 'node:net';
 import process from 'node:process';
 
 import {
@@ -10,6 +11,7 @@ import {
 } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
 
 const DEFAULT_STAGE_TIMEOUT_MS = 8 * 60_000;
+const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
 
 function parseBoolean(value, fallback = false) {
     if (typeof value === 'boolean') return value;
@@ -77,6 +79,29 @@ function collectForwardArgs(args, key, target = key) {
     return [`--${target}`, value.trim()];
 }
 
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function canConnect(host, port, timeoutMs = 500) {
+    return new Promise((resolve) => {
+        const socket = net.createConnection({
+            host,
+            port,
+        });
+        let settled = false;
+        const finish = (ok) => {
+            if (settled) return;
+            settled = true;
+            socket.destroy();
+            resolve(ok);
+        };
+        socket.once('connect', () => finish(true));
+        socket.once('error', () => finish(false));
+        socket.setTimeout(timeoutMs, () => finish(false));
+    });
+}
+
 function startTrainerServer(args) {
     const host = args.get('trainer-host') || process.env.TRAINER_HOST || '127.0.0.1';
     const port = args.get('trainer-port') || process.env.TRAINER_PORT || '8765';
@@ -96,6 +121,23 @@ function startTrainerServer(args) {
         host,
         port,
     };
+}
+
+async function waitForTrainerServerReady(server, timeoutMs = DEFAULT_SERVER_READY_TIMEOUT_MS) {
+    if (!server?.child) return;
+    const timeout = parseInteger(timeoutMs, DEFAULT_SERVER_READY_TIMEOUT_MS, 500, 120_000);
+    const port = parseInteger(server.port, 8765, 1, 65535);
+    const startedAt = Date.now();
+    while ((Date.now() - startedAt) < timeout) {
+        if (server.child.exitCode !== null) {
+            throw new Error(`trainer server exited before readiness (code=${server.child.exitCode})`);
+        }
+        if (await canConnect(server.host || '127.0.0.1', port, 400)) {
+            return;
+        }
+        await sleep(100);
+    }
+    throw new Error(`trainer server not ready after ${timeout}ms (${server.host || '127.0.0.1'}:${port})`);
 }
 
 async function stopTrainerServer(server) {
@@ -171,6 +213,11 @@ async function runStage(stage, stamp, args = [], options = {}) {
 
 function buildRunStageArgs(args) {
     const runArgs = [];
+    const bridgeUrl = args.get('bridge-url')
+        || process.env.TRAINER_BRIDGE_URL
+        || (args.get('trainer-host') || process.env.TRAINER_HOST || args.get('trainer-port') || process.env.TRAINER_PORT
+            ? `ws://${args.get('trainer-host') || process.env.TRAINER_HOST || '127.0.0.1'}:${args.get('trainer-port') || process.env.TRAINER_PORT || '8765'}`
+            : '');
     for (const [key, target] of [
         ['bridge-mode', 'bridge-mode'],
         ['resume-checkpoint', 'resume-checkpoint'],
@@ -179,12 +226,28 @@ function buildRunStageArgs(args) {
         ['seeds', 'seeds'],
         ['modes', 'modes'],
         ['max-steps', 'max-steps'],
+        ['timeout-step-ms', 'timeout-step-ms'],
+        ['timeout-episode-ms', 'timeout-episode-ms'],
+        ['timeout-run-ms', 'timeout-run-ms'],
+        ['bridge-strict', 'bridge-strict'],
+        ['bridge-require-ready-message', 'bridge-require-ready-message'],
+        ['bridge-ready-message-type', 'bridge-ready-message-type'],
         ['bridge-timeout-ms', 'bridge-timeout-ms'],
         ['bridge-max-retries', 'bridge-max-retries'],
         ['bridge-retry-delay-ms', 'bridge-retry-delay-ms'],
         ['bridge-connect-timeout-ms', 'bridge-connect-timeout-ms'],
+        ['trainer-command-timeout-ms', 'trainer-command-timeout-ms'],
+        ['bridge-action-probe-timeout-ms', 'bridge-action-probe-timeout-ms'],
+        ['bridge-action-probe-observation-length', 'bridge-action-probe-observation-length'],
+        ['bridge-drain-timeout-ms', 'bridge-drain-timeout-ms'],
+        ['write-checkpoint', 'write-checkpoint'],
+        ['write-latest', 'write-latest'],
+        ['quiet', 'quiet'],
     ]) {
         runArgs.push(...collectForwardArgs(args, key, target));
+    }
+    if (bridgeUrl) {
+        runArgs.push('--bridge-url', bridgeUrl);
     }
     if (!runArgs.includes('--bridge-mode')) {
         runArgs.push('--bridge-mode', 'bridge');
@@ -198,14 +261,21 @@ function buildRunStageArgs(args) {
     return runArgs;
 }
 
+function buildStageForwardArgs(args) {
+    return [
+        ...collectForwardArgs(args, 'write-latest', 'write-latest'),
+    ];
+}
+
 async function main() {
     const args = parseArgMap(process.argv.slice(2));
     const stamp = normalizeTrainingRunStamp(args.get('stamp') || process.env.TRAINING_RUN_STAMP || null);
     const strictMissing = parseBoolean(args.get('strict'), parseBoolean(process.env.TRAINING_E2E_STRICT, false));
     const withTrainerServer = parseBoolean(args.get('with-trainer-server'), true);
+    const writeLatest = parseBoolean(args.get('write-latest'), true);
     const stageTimeoutMs = parseInteger(args.get('stage-timeout-ms'), DEFAULT_STAGE_TIMEOUT_MS, 500, 24 * 60 * 60_000);
     const layout = resolveTrainingRunArtifactLayout(stamp);
-    const latestBefore = await readJsonIfExists(layout.latestIndexPath);
+    const latestBefore = writeLatest ? await readJsonIfExists(layout.latestIndexPath) : null;
     const stagePlan = [
         { name: 'run', scriptPath: 'scripts/training-run.mjs' },
         { name: 'eval', scriptPath: 'scripts/training-eval.mjs' },
@@ -219,7 +289,10 @@ async function main() {
     try {
         if (withTrainerServer) {
             trainerServer = startTrainerServer(args);
-            await new Promise((resolve) => setTimeout(resolve, 900));
+            await waitForTrainerServerReady(
+                trainerServer,
+                parseInteger(args.get('trainer-server-ready-timeout-ms'), DEFAULT_SERVER_READY_TIMEOUT_MS, 500, 120_000)
+            );
         }
 
         for (let i = 0; i < stagePlan.length; i++) {
@@ -238,7 +311,9 @@ async function main() {
                 }
                 continue;
             }
-            const stageArgs = stage.name === 'run' ? runStageArgs : [];
+            const stageArgs = stage.name === 'run'
+                ? runStageArgs
+                : buildStageForwardArgs(args);
             const stageResult = await runStage(stage, stamp, stageArgs, { timeoutMs: stageTimeoutMs });
             stageResults.push(stageResult);
             if (stageResult.status === 'completed') {
@@ -276,8 +351,20 @@ async function main() {
         resumeSource: latestBefore?.resumeSource || null,
         artifacts,
     });
-    await mkdir(layout.rootDir, { recursive: true });
-    await writeJson(layout.latestIndexPath, latestIndex);
+    if (!checkpointExists) {
+        const previousCheckpointPath = latestBefore?.artifacts?.checkpoint?.exists === true
+            ? latestBefore?.artifacts?.checkpoint?.path
+            : null;
+        if (typeof previousCheckpointPath === 'string' && previousCheckpointPath.trim()) {
+            latestIndex.artifacts.checkpoint.path = previousCheckpointPath.trim();
+            latestIndex.artifacts.checkpoint.exists = true;
+            latestIndex.artifacts.checkpoint.status = latestBefore?.artifacts?.checkpoint?.status || 'completed';
+        }
+    }
+    if (writeLatest) {
+        await mkdir(layout.rootDir, { recursive: true });
+        await writeJson(layout.latestIndexPath, latestIndex);
+    }
 
     const hasFailure = stageResults.some((result) => result.status === 'failed');
     console.log(JSON.stringify({
@@ -287,7 +374,7 @@ async function main() {
         stageTimeoutMs,
         runStageArgs,
         stageResults,
-        latestIndexPath: layout.latestIndexPath,
+        latestIndexPath: writeLatest ? layout.latestIndexPath : null,
     }, null, 2));
     if (hasFailure) {
         process.exitCode = 1;

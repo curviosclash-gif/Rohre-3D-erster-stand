@@ -423,6 +423,8 @@ Hinweise:
 
 - Fuer harte Resume-Policy `--resume-strict true` setzen.
 - Ohne extern gestarteten Server kann `training:e2e` oder `training-loop --with-trainer-server true` den Prozess selbst starten/stoppen.
+- `training:e2e` und `training-loop` warten beim Auto-Start aktiv auf den Trainer-Port statt nur mit fixer Schlafzeit.
+- Fuer isolierte Smoke-/Testlaeufe kann `--write-latest false` gesetzt werden; `run`, `eval` und `gate` lassen dann `data/training/runs/latest.json` unangetastet.
 
 ### 13.2 Trainingsserie fahren
 
@@ -446,6 +448,8 @@ Default:
 - nutzt Bridge-Mode
 - setzt `resume-checkpoint=latest`
 - startet Trainer-Server automatisch
+- leitet lange Run-/Trainer-Timeouts (`--timeout-run-ms`, `--trainer-command-timeout-ms`, `--trainer-server-ready-timeout-ms`, `--bridge-drain-timeout-ms`) an `training-run` durch
+- wartet vor Checkpoint-/Stats-Export auf den Abbau der offenen Ack-Backlog-Schaetzung (`trainingRequests - ackResponses`)
 
 ### 13.4 Match-Runtime mit Trainer nutzen
 
@@ -478,6 +482,7 @@ Checks:
 Massnahmen:
 
 - testweise `--bridge-connect-timeout-ms` erhoehen.
+- bei grossen Serien zusaetzlich `--trainer-server-ready-timeout-ms`, `--trainer-command-timeout-ms` und `--bridge-drain-timeout-ms` anheben.
 - fuer Cold-Start `--bridge-strict false` und `--resume-strict false` nutzen.
 
 ### 14.2 `checkpoint-import-failed` / `invalid-transition` bei Resume
@@ -496,6 +501,24 @@ Massnahmen:
 - einmal ohne Resume starten und neuen Checkpoint erzeugen.
 - danach erneut mit `--resume-checkpoint latest` starten.
 - fuer harte Gates `--resume-strict true` erst nach valider Baseline aktivieren.
+- unvollstaendige Laeufe veroeffentlichen kein leeres `checkpoint.json` mehr; `latest` behaelt in diesem Fall den letzten gueltigen Checkpoint-Pfad.
+
+### 14.4 Lauf beendet, aber kein neuer Checkpoint geschrieben
+
+Symptom:
+
+- `run.json` ist erfolgreich, `checkpointPath` bleibt aber `null`.
+
+Checks:
+
+1. Ist die Response-Coverage im `bridgeTelemetry` deutlich unter `1.0`?
+2. Liegt ein hoher Ack-Backlog vor (`trainingRequests - ackResponses`)?
+
+Massnahmen:
+
+- `--bridge-drain-timeout-ms` erhoehen, damit der Export erst nach Backlog-Abbau startet.
+- `--trainer-command-timeout-ms` fuer `trainer-checkpoint-request` / `trainer-stats-request` erhoehen.
+- bei Test-/CI-Laeufen ohne produktiven Fortschrittsbedarf `--write-latest false` nutzen, damit kein Teststempel den globalen `latest`-Index ueberlagert.
 
 ### 14.3 Hohe Fallback-/Timeout-Rate im Match
 

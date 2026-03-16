@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
+import net from 'node:net';
 import process from 'node:process';
 
 import { normalizeTrainingRunStamp } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
 
 const SERIES_ROOT = 'data/training/series';
 const DEFAULT_STAGE_TIMEOUT_MS = 10 * 60_000;
+const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
 
 function parseArgMap(argv) {
     const map = new Map();
@@ -68,6 +70,29 @@ function collectForwardArgs(args, key, target = key) {
     const value = args.get(key);
     if (typeof value !== 'string' || !value.trim()) return [];
     return [`--${target}`, value.trim()];
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function canConnect(host, port, timeoutMs = 500) {
+    return new Promise((resolve) => {
+        const socket = net.createConnection({
+            host,
+            port,
+        });
+        let settled = false;
+        const finish = (ok) => {
+            if (settled) return;
+            settled = true;
+            socket.destroy();
+            resolve(ok);
+        };
+        socket.once('connect', () => finish(true));
+        socket.once('error', () => finish(false));
+        socket.setTimeout(timeoutMs, () => finish(false));
+    });
 }
 
 async function writeJson(path, payload) {
@@ -150,6 +175,23 @@ function startTrainerServer(args) {
     };
 }
 
+async function waitForTrainerServerReady(server, timeoutMs = DEFAULT_SERVER_READY_TIMEOUT_MS) {
+    if (!server?.child) return;
+    const timeout = parseInteger(timeoutMs, DEFAULT_SERVER_READY_TIMEOUT_MS, 500, 120_000);
+    const port = parseInteger(server.port, 8765, 1, 65535);
+    const startedAt = Date.now();
+    while ((Date.now() - startedAt) < timeout) {
+        if (server.child.exitCode !== null) {
+            throw new Error(`trainer server exited before readiness (code=${server.child.exitCode})`);
+        }
+        if (await canConnect(server.host || '127.0.0.1', port, 400)) {
+            return;
+        }
+        await sleep(100);
+    }
+    throw new Error(`trainer server not ready after ${timeout}ms (${server.host || '127.0.0.1'}:${port})`);
+}
+
 async function stopTrainerServer(server) {
     if (!server?.child) return;
     const child = server.child;
@@ -171,6 +213,11 @@ async function stopTrainerServer(server) {
 function buildRunStageArgs(args, stamp) {
     const bridgeMode = (args.get('bridge-mode') || process.env.TRAINING_BRIDGE_MODE || 'bridge').trim();
     const resumeCheckpoint = (args.get('resume-checkpoint') || process.env.TRAINER_RESUME_CHECKPOINT || 'latest').trim();
+    const bridgeUrl = args.get('bridge-url')
+        || process.env.TRAINER_BRIDGE_URL
+        || (args.get('trainer-host') || process.env.TRAINER_HOST || args.get('trainer-port') || process.env.TRAINER_PORT
+            ? `ws://${args.get('trainer-host') || process.env.TRAINER_HOST || '127.0.0.1'}:${args.get('trainer-port') || process.env.TRAINER_PORT || '8765'}`
+            : '');
     const resumeStrict = parseBoolean(
         args.get('resume-strict'),
         parseBoolean(process.env.TRAINER_RESUME_STRICT, false)
@@ -181,19 +228,42 @@ function buildRunStageArgs(args, stamp) {
         '--resume-checkpoint', resumeCheckpoint,
         '--resume-strict', String(resumeStrict),
     ];
+    if (bridgeUrl) {
+        stageArgs.push('--bridge-url', bridgeUrl);
+    }
     for (const [key, target] of [
         ['episodes', 'episodes'],
         ['seeds', 'seeds'],
         ['modes', 'modes'],
         ['max-steps', 'max-steps'],
+        ['timeout-step-ms', 'timeout-step-ms'],
+        ['timeout-episode-ms', 'timeout-episode-ms'],
+        ['timeout-run-ms', 'timeout-run-ms'],
+        ['bridge-strict', 'bridge-strict'],
+        ['bridge-require-ready-message', 'bridge-require-ready-message'],
+        ['bridge-ready-message-type', 'bridge-ready-message-type'],
         ['bridge-timeout-ms', 'bridge-timeout-ms'],
         ['bridge-max-retries', 'bridge-max-retries'],
         ['bridge-retry-delay-ms', 'bridge-retry-delay-ms'],
         ['bridge-connect-timeout-ms', 'bridge-connect-timeout-ms'],
+        ['trainer-command-timeout-ms', 'trainer-command-timeout-ms'],
+        ['bridge-action-probe-timeout-ms', 'bridge-action-probe-timeout-ms'],
+        ['bridge-action-probe-observation-length', 'bridge-action-probe-observation-length'],
+        ['bridge-drain-timeout-ms', 'bridge-drain-timeout-ms'],
+        ['write-checkpoint', 'write-checkpoint'],
+        ['write-latest', 'write-latest'],
+        ['quiet', 'quiet'],
     ]) {
         stageArgs.push(...collectForwardArgs(args, key, target));
     }
     return stageArgs;
+}
+
+function buildStageForwardArgs(args, stamp) {
+    return [
+        '--stamp', stamp,
+        ...collectForwardArgs(args, 'write-latest', 'write-latest'),
+    ];
 }
 
 function buildSummary(input) {
@@ -227,6 +297,7 @@ async function main() {
     const runsRequested = parseInteger(args.get('runs'), 3, 1, 500);
     const stopOnFail = parseBoolean(args.get('stop-on-fail'), true);
     const withTrainerServer = parseBoolean(args.get('with-trainer-server'), true);
+    const writeLatest = parseBoolean(args.get('write-latest'), true);
     const stageTimeoutMs = parseInteger(args.get('stage-timeout-ms'), DEFAULT_STAGE_TIMEOUT_MS, 500, 24 * 60 * 60_000);
     const seriesStamp = resolveSeriesStamp(args);
     const seriesDir = `${SERIES_ROOT}/${seriesStamp}`;
@@ -239,7 +310,10 @@ async function main() {
     try {
         if (withTrainerServer) {
             trainerServer = startTrainerServer(args);
-            await new Promise((resolve) => setTimeout(resolve, 900));
+            await waitForTrainerServerReady(
+                trainerServer,
+                parseInteger(args.get('trainer-server-ready-timeout-ms'), DEFAULT_SERVER_READY_TIMEOUT_MS, 500, 120_000)
+            );
         }
 
         for (let runIndex = 1; runIndex <= runsRequested; runIndex++) {
@@ -258,23 +332,31 @@ async function main() {
             });
 
             if (runResult.status === 'completed') {
-                const evalResult = await runNodeScript('scripts/training-eval.mjs', ['--stamp', runStamp], {
+                const evalResult = await runNodeScript(
+                    'scripts/training-eval.mjs',
+                    buildStageForwardArgs(args, runStamp),
+                    {
                     timeoutMs: stageTimeoutMs,
                     env: {
                         TRAINING_RUN_STAMP: runStamp,
                     },
-                });
+                    }
+                );
                 stages.push({
                     stage: 'eval',
                     ...evalResult,
                 });
                 if (evalResult.status === 'completed') {
-                    const gateResult = await runNodeScript('scripts/training-gate.mjs', ['--stamp', runStamp], {
+                    const gateResult = await runNodeScript(
+                        'scripts/training-gate.mjs',
+                        buildStageForwardArgs(args, runStamp),
+                        {
                         timeoutMs: stageTimeoutMs,
                         env: {
                             TRAINING_RUN_STAMP: runStamp,
                         },
-                    });
+                        }
+                    );
                     stages.push({
                         stage: 'gate',
                         ...gateResult,
@@ -311,6 +393,7 @@ async function main() {
         seriesStamp,
         withTrainerServer,
         stopOnFail,
+        writeLatest,
         stageTimeoutMs,
         elapsedMs: Math.max(0, finishedAt - startedAt),
         runs: runResults,

@@ -175,3 +175,46 @@ Restrisiken:
 
 1. Der erste `training-loop`-Run mit `resume-checkpoint=latest` kann erwartbar noch `loaded=false` mit `invalid-transition` melden, wenn im frischen Serienlauf noch kein neues `latest` aus dieser Serie existiert; der Folgerun laedt den aktuellen Checkpoint anschließend korrekt.
 2. `npm run bot:validate` bleibt funktional gruen, zeigt im aktuellen Stand aber weiterhin viele erzwungene Rundenenden (`forcedRounds=10/17`) und sollte fuer kuenftige Gameplay-/Performance-Arbeit beobachtet werden.
+
+## Statuslog 2026-03-16 - Resume-/Long-Run-Haertung
+
+Umgesetzt:
+
+1. `training-loop` und `training:e2e` leiten lange Run-/Trainer-Timeouts jetzt vollstaendig an `training-run` durch (`timeout-step/episode/run`, `trainer-command-timeout-ms`, Ready-/Probe-Parameter).
+2. Auto-Start des Trainer-Servers wartet aktiv auf Port-Readiness statt auf eine fixe 900ms-Pause.
+3. `writeTrainerArtifacts` schreibt kein leeres `checkpoint.json` mehr; dadurch zeigen `latest`-Resume-Pfade nicht mehr auf Artefakte mit `checkpoint: null`.
+4. `training-run` behaelt beim Latest-Index den letzten gueltigen Checkpoint-Pfad, wenn ein Lauf selbst keinen neuen validen Checkpoint exportiert.
+5. `WebSocketTrainerBridge` expose't Pending-Zaehler im Telemetrie-Snapshot; der Run-Drain nutzt diese Infos fuer lange Serienlaeufe.
+
+Verifikation:
+
+1. `node --test tests/trainer-v34-bridge.test.mjs tests/trainer-v34-loop.test.mjs` -> PASS.
+2. `node scripts/training-e2e.mjs --bridge-mode bridge --resume-checkpoint latest --resume-strict true --with-trainer-server true --episodes 1 --seeds 11 --modes hunt-2d --timeout-run-ms 123456 --trainer-command-timeout-ms 20000 --trainer-server-ready-timeout-ms 30000` -> PASS (`stamp=20260316T180905Z`).
+3. `node scripts/training-loop.mjs --runs 2 --episodes 50 --seeds 11 --modes hunt-2d --bridge-mode bridge --resume-checkpoint latest --resume-strict true --with-trainer-server true --timeout-run-ms 900000 --stage-timeout-ms 900000 --trainer-command-timeout-ms 20000 --trainer-server-ready-timeout-ms 30000` -> PASS (`data/training/series/20260316T181558Z/loop.json`).
+
+Ergebnis:
+
+1. Kumulative Resume-Laeufe sind lokal wieder reproduzierbar.
+2. `latest.json` referenziert nach dem Abschluss einen validen Checkpoint unter `data/training/models/20260316T181558Z-r02/checkpoint.json`.
+
+## Statuslog 2026-03-16 - Export-/Latest-Isolation und weiterer Trainingsfortschritt
+
+Umgesetzt:
+
+1. `training-eval` und `training-gate` respektieren jetzt ebenfalls `--write-latest false`; `training-loop` und `training:e2e` reichen den Schalter an alle Stages weiter.
+2. Testlaeufe fuer Loop-/Resume-Pfade sichern `data/training/runs/latest.json` gegen Seiteneffekte ab; `trainer-v34-resume-latest` nutzt einen eigenen Latest-Index.
+3. `training-run` wartet beim Bridge-Drain jetzt auf die reale Ack-Backlog-Schaetzung (`trainingRequests - ackResponses`) statt nur auf den bei `512` gekappten Pending-Zaehler.
+4. Die Caps fuer `--bridge-drain-timeout-ms` und `--trainer-command-timeout-ms` wurden fuer echte Long-Runs angehoben; dadurch funktionieren Checkpoint-Export und `resume-checkpoint=latest` auch nach backlog-lastigen Serienlaeufen.
+
+Verifikation:
+
+1. `node --test tests/trainer-v34-loop.test.mjs tests/trainer-v34-resume-latest.integration.test.mjs tests/trainer-v34-run-fallback.test.mjs tests/trainer-v34-bridge.test.mjs` -> PASS.
+2. `node scripts/training-loop.mjs --runs 1 --episodes 25 --seeds 11,23,37,41 --modes classic-3d,classic-2d,hunt-3d,hunt-2d --bridge-mode bridge --resume-checkpoint data/training/models/20260316T181558Z-r02/checkpoint.json --resume-strict true --with-trainer-server true --timeout-run-ms 900000 --stage-timeout-ms 1200000 --trainer-command-timeout-ms 60000 --trainer-server-ready-timeout-ms 30000 --bridge-drain-timeout-ms 240000` -> PASS (`data/training/series/20260316T201750Z/loop.json`, neuer Checkpoint `data/training/models/20260316T201750Z-r01/checkpoint.json`).
+3. `node scripts/training-loop.mjs --runs 1 --episodes 25 --seeds 11,23,37,41 --modes classic-3d,classic-2d,hunt-3d,hunt-2d --bridge-mode bridge --resume-checkpoint latest --resume-strict true --with-trainer-server true --timeout-run-ms 900000 --stage-timeout-ms 1200000 --trainer-command-timeout-ms 60000 --trainer-server-ready-timeout-ms 30000 --bridge-drain-timeout-ms 240000` -> PASS (`data/training/series/20260316T201922Z/loop.json`, neuer Checkpoint `data/training/models/20260316T201922Z-r01/checkpoint.json`).
+4. `npm run bot:validate` -> PASS (`data/bot_validation_report.json`, `docs/Testergebnisse_Phase4b_2026-03-16.md`).
+
+Ergebnis:
+
+1. `latest.json` zeigt aktuell auf `20260316T201922Z-r01` mit validem Checkpoint unter `data/training/models/20260316T201922Z-r01/checkpoint.json`.
+2. Die aktuelle Bot-Validierung liegt bei `botWinRate=0.5`, `stuckEvents=0`, `forcedRounds=8/16`; Hunt-Szenarien sind deutlich staerker als Classic.
+3. `npm run build` ist aktuell nicht gruen, aber wegen eines bestehenden Architektur-/Lint-Gates in `src/core/config/maps/MapPresetCatalog.js` und nicht wegen des Trainingspfads.
