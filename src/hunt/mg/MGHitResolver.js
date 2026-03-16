@@ -8,10 +8,7 @@ import {
     resolveHuntTargetOwnerPlayer,
     resolveTrailTargetEntry,
 } from '../HuntTargetingOps.js';
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '../../utils/MathOps.js';
 
 export class MGHitResolver {
     constructor(runtimeContext) {

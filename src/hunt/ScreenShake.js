@@ -1,6 +1,4 @@
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '../utils/MathOps.js';
 
 function resolveDamageValue(event) {
     const damageResult = event?.damageResult || {};

@@ -1,11 +1,8 @@
 import { CONFIG } from '../../core/Config.js';
+import { clamp } from '../../utils/MathOps.js';
 
 function getMgConfig() {
     return CONFIG?.HUNT?.MG || {};
-}
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
 }
 
 function clearObject(target) {

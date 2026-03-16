@@ -5,13 +5,7 @@
 import { TRAINING_CONTRACT_VERSION } from './TrainingContractV1.js';
 import { createTrainerTransportEnvelope } from './TrainerPayloadAdapter.js';
 
-function clamp(value, min, max) {
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric)) return min;
-    if (numeric < min) return min;
-    if (numeric > max) return max;
-    return numeric;
-}
+import { clamp } from '../../../utils/MathOps.js';
 
 function toSafeUrl(value, fallback) {
     if (typeof value !== 'string') return fallback;

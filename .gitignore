@@ -1,14 +1,16 @@
 .editor-dev.err.log
 .editor-dev.out.log
 
+# Claude Code Worktrees
+.claude/
+
 # Abhängigkeiten
 node_modules/
 
 # Build-Output
 dist/
 
-# Tests
-tests/
+# Test-Ausgaben (nicht die Testdateien selbst!)
 playwright-report/
 test-results/
 

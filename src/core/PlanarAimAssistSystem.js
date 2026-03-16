@@ -9,10 +9,7 @@
 // - Hotpath guardrail: no per-frame object creation in update methods
 
 import { CONFIG } from './Config.js';
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '../utils/MathOps.js';
 
 export class PlanarAimAssistSystem {
     constructor(game) {

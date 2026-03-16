@@ -2,16 +2,7 @@
 // ObservationNormalizeOps.js - normalization helpers for bot observations
 // ============================================
 
-export function clamp(value, min, max) {
-    if (!Number.isFinite(value)) return min;
-    if (value < min) return min;
-    if (value > max) return max;
-    return value;
-}
-
-export function clamp01(value) {
-    return clamp(value, 0, 1);
-}
+export { clamp, clamp01 } from '../../../utils/MathOps.js';
 
 export function toBinaryFlag(value) {
     return value ? 1 : 0;

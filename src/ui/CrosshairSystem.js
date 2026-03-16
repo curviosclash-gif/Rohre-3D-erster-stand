@@ -4,10 +4,7 @@
 
 import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '../utils/MathOps.js';
 
 export class CrosshairSystem {
     constructor(game) {

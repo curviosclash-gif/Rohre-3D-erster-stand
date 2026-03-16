@@ -21,10 +21,7 @@ import {
     WALL_DISTANCE_RIGHT,
     WALL_DISTANCE_UP,
 } from './observation/ObservationSchemaV1.js';
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '../../utils/MathOps.js';
 
 function resolveObservationValue(observation, index, fallback = 0) {
     if (!observation || typeof observation.length !== 'number') return fallback;

@@ -2,10 +2,7 @@ import { CONFIG } from '../../core/Config.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
 import { normalizeShadowQuality } from '../../core/renderer/ShadowQuality.js';
-
-function clamp(value, min, max) {
-    return Math.min(Math.max(value, min), max);
-}
+import { clamp } from '../../utils/MathOps.js';
 
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;
