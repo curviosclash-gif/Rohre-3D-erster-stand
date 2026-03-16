@@ -197,7 +197,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await page.evaluate(({ currentKey, legacyKey }) => {
             localStorage.removeItem(currentKey);
             localStorage.setItem(legacyKey, JSON.stringify({
-                mapKey: 'maze',
+                mapKey: 'mega_maze',
                 winsNeeded: 7,
             }));
         }, {
@@ -214,7 +214,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             hasNewKey: !!localStorage.getItem(currentKey),
         }), { currentKey: SETTINGS_STORAGE_KEY });
 
-        expect(migratedState.mapKey).toBe('maze');
+        expect(migratedState.mapKey).toBe('mega_maze');
         expect(migratedState.winsNeeded).toBe(7);
         expect(migratedState.hasNewKey).toBeTruthy();
 
