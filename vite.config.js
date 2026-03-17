@@ -1092,6 +1092,30 @@ export default defineConfig({
                     if (id.includes('node_modules/three')) {
                         return 'three-core';
                     }
+                    const normalizedId = id.replace(/\\/g, '/');
+                    if (normalizedId.includes('/entities/ai/training/') ||
+                        normalizedId.includes('/state/training/')) {
+                        return 'training';
+                    }
+                    if (normalizedId.includes('/state/validation/')) {
+                        return 'validation';
+                    }
+                    if (normalizedId.includes('/trainer/') && !normalizedId.includes('node_modules')) {
+                        return 'trainer';
+                    }
+                    if (normalizedId.includes('/state/recorder/')) {
+                        return 'recorder';
+                    }
+                    if (normalizedId.includes('/config/maps/MapPresetCatalog') ||
+                        normalizedId.includes('/config/maps/MapPresetCatalogBaseData') ||
+                        normalizedId.includes('/config/maps/MapPresetCatalogExpertData')) {
+                        return 'map-presets';
+                    }
+                    if (normalizedId.includes('/menu/MenuTelemetryDashboard') ||
+                        normalizedId.includes('/menu/MenuTelemetryStore') ||
+                        normalizedId.includes('/state/TelemetryHistoryStore')) {
+                        return 'developer-ui';
+                    }
                     return undefined;
                 },
             },
