@@ -304,34 +304,34 @@ export async function startHuntGameWithBots(page, botCount = 1) {
 
 // Press ESC and wait for main menu.
 export async function returnToMenu(page) {
-    const isMenuVisible = () => page.evaluate(() => {
+    const getMenuState = () => page.evaluate(() => {
         const mainMenu = document.getElementById('main-menu');
-        return !!(mainMenu && !mainMenu.classList.contains('hidden'));
+        const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+        return {
+            menuVisible: !!(mainMenu && !mainMenu.classList.contains('hidden')),
+            visiblePanelId: visiblePanel?.id || '',
+        };
     });
+    const isMainNavVisible = async () => {
+        const menuState = await getMenuState();
+        return menuState.menuVisible && !menuState.visiblePanelId;
+    };
 
-    if (await isMenuVisible()) return;
+    if (await isMainNavVisible()) return;
 
     await page.keyboard.press('Escape');
     await page.waitForTimeout(120);
 
-    if (await isMenuVisible()) return;
-
-    const pauseVisible = await page.evaluate(() => {
-        const pauseOverlay = document.getElementById('pause-overlay');
-        return !!(pauseOverlay && !pauseOverlay.classList.contains('hidden'));
-    });
-    if (pauseVisible) {
-        await page.evaluate(() => {
-            window.GAME_INSTANCE?.matchFlowUiController?.returnToMenuFromPause?.();
-        });
-        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 8000 });
-        return;
-    }
+    if (await isMainNavVisible()) return;
 
     await page.evaluate(() => {
         window.GAME_INSTANCE?._returnToMenu?.();
     });
-    await page.waitForSelector('#main-menu', { state: 'visible', timeout: 8000 });
+    await page.waitForFunction(() => {
+        const mainMenu = document.getElementById('main-menu');
+        const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+        return !!(mainMenu && !mainMenu.classList.contains('hidden') && !visiblePanel);
+    }, null, { timeout: 8000 });
 }
 
 // Register error listeners and return captured error list.

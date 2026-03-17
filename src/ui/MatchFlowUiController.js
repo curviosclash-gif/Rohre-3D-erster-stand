@@ -348,6 +348,7 @@ export class MatchFlowUiController {
         game.gameLoop.setTimeScale(1.0);
         this.applyMatchUiState(roundStartTransition.uiState);
         game.hudRuntimeSystem.updateScoreHud();
+        game.crosshairSystem?.updateCrosshairs?.();
     }
 
     onRoundEnd(winner) {
