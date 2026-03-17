@@ -249,8 +249,9 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
   - Ziel: bestehende Platzhaltertests entlang des geaenderten Codes ersetzen.
   - Status 2026-03-07: Playwright-Menuecheck erfolgreich (`npm run test:core` = 48 passed / 1 skipped, `npm run test:stress` = 19 passed).
   - Offene Befunde 2026-03-07: `Profil speichern` bleibt nach Eingabe deaktiviert; `Build-Info kopieren` hat kein Runtime-Binding.
-- [ ] T2 Bundle-Groesse weiter optimieren
+- [x] T2 Bundle-Groesse weiter optimieren
   - Ziel: Code-Splitting und Ladepfade nur dann vertiefen, wenn der Nutzen messbar bleibt.
+  - Status 2026-03-17: manualChunks in vite.config.js: training, validation, trainer, map-presets, recorder, developer-ui Chunks. index.js von 871 kB auf 793 kB reduziert (unter 800 kB Limit). MapPresetCatalog.js in BaseData + ExpertData gesplittet (ESLint max-lines Guard behoben).
 - [ ] N4 Object-Pooling fuer Partikel & Projektile
   - Ziel: Garbage Collection (GC) Spikes reduzieren durch Ringpuffer-Wiederverwendung von Partikeln und Geschossen (MG, Raketen, Schilde).
   - Zielpfade: `src/entities/**`, Render-Effekte.
@@ -488,7 +489,7 @@ Template:
   - Datei-Scope: `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuPresetCatalog.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuConfigShareOps.js`, `src/core/SettingsManager.js`, `tests/**`, `docs/**`
   - Konfliktregel: Nur die Menue-Default- und Preset-Quelle zentralisieren; kein paralleles UX-Redesign und keine Seitensanierung in unbeteiligten Runtime-Pfaden
   - Status 2026-03-17: Zentrale Menue-Default-Datei plus Rewire fuer Defaults, Presets, Drafts/Config-Share und Level-3-Reset umgesetzt; gezielte Core-/Stress-Regressionspfade sind gruen.
-  - Gate-Status 2026-03-17: Vollgates bleiben ausserhalb des Scopes offen: `npm run test:core` scheitert im bestehenden `T14`, `npm run test:stress` im bestehenden `T71b`, und `npm run build` am bestehenden `max-lines`-Guard in `src/core/config/maps/MapPresetCatalog.js` (`627 > 500`).
+  - Gate-Status 2026-03-17: `npm run build` und `T14` sind durch Agent-C-Fixes (T2 Bundle-Split + MapPresetCatalog-Split) behoben. `npm run test:stress` (`T71b`) bleibt offen.
 - [ ] PX Projektstruktur Spiel und Dev-Ordner V43
   - Erstellt am: `2026-03-17`
   - Agent: `Codex`
