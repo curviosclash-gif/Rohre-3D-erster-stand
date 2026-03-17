@@ -32,6 +32,7 @@ import { MenuDraftStore, normalizeSessionType } from '../ui/menu/MenuDraftStore.
 import { MenuTextOverrideStore } from '../ui/menu/MenuTextOverrideStore.js';
 import { MENU_TEXT_CATALOG } from '../ui/menu/MenuTextCatalog.js';
 import { MenuTelemetryStore } from '../ui/menu/MenuTelemetryStore.js';
+import { createMenuSettingsDefaults } from '../ui/menu/MenuDefaultsEditorConfig.js';
 import {
     applyDeveloperThemeToDocument,
     setDeveloperActorId,
@@ -210,59 +211,10 @@ export class SettingsManager {
     }
 
     createDefaultSettings() {
-        const defaults = {
-            settingsVersion: 2,
-            mode: '2p',
-            gameMode: resolveActiveGameMode(CONFIG.HUNT?.DEFAULT_MODE, CONFIG.HUNT?.ENABLED !== false),
-            mapKey: 'mega_maze',
-            numBots: 5,
-            botDifficulty: 'HARD',
-            botPolicyStrategy: BOT_POLICY_STRATEGIES.AUTO,
-            winsNeeded: 5,
-            autoRoll: true,
-            invertPitch: {
-                PLAYER_1: true,
-                PLAYER_2: true,
-            },
-            cockpitCamera: {
-                PLAYER_1: false,
-                PLAYER_2: false,
-            },
-            vehicles: {
-                PLAYER_1: 'ship8',
-                PLAYER_2: 'ship5',
-            },
-            portalsEnabled: true,
-            hunt: {
-                respawnEnabled: !!CONFIG.HUNT?.DEFAULT_RESPAWN_ENABLED,
-            },
-            gameplay: {
-                speed: 35,
-                turnSensitivity: 3.4,
-                planeScale: 1.0,
-                trailWidth: 0.6,
-                gapSize: 0.3,
-                gapFrequency: 0.02,
-                itemAmount: 10,
-                fireRate: 1.25,
-                lockOnAngle: 11,
-                mgTrailAimRadius: 3.0,
-                planarMode: false,
-                portalCount: 8,
-                planarLevelCount: 5,
-                portalBeams: false,
-            },
-            botBridge: {
-                enabled: false,
-                url: 'ws://127.0.0.1:8765',
-                timeoutMs: 80,
-                maxRetries: 1,
-                retryDelayMs: 0,
-                resumeCheckpoint: '',
-                resumeStrict: false,
-            },
-            controls: this.cloneDefaultControls(),
-        };
+        const defaults = createMenuSettingsDefaults();
+        defaults.gameMode = resolveActiveGameMode(defaults.gameMode, CONFIG.HUNT?.ENABLED !== false);
+        defaults.botPolicyStrategy = defaults.botPolicyStrategy || BOT_POLICY_STRATEGIES.AUTO;
+        defaults.controls = this.cloneDefaultControls();
         return ensureMenuContractState(defaults);
     }
 

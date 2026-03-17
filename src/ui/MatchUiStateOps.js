@@ -51,6 +51,7 @@ export function deriveReturnToMenuUiState() {
 export function deriveRoundStartUiState() {
     return {
         visibility: {
+            hudHidden: false,
             messageOverlayHidden: true,
             pauseOverlayHidden: true,
             statusToastHidden: true,

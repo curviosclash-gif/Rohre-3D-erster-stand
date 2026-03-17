@@ -912,6 +912,10 @@ test.describe('T1-20: Core & Infrastruktur', () => {
     test('T20f: Fixed-Preset setzt Match-Contract auf fixed', async ({ page }) => {
         await loadGame(page);
         await openGameSubmenu(page);
+        const expectedPreset = await page.evaluate(async () => {
+            const mod = await import('/src/ui/menu/MenuDefaultsEditorConfig.js');
+            return mod.findFixedMenuPresetSeedById('competitive');
+        });
         await page.evaluate(() => {
             const button = document.querySelector('#submenu-game [data-preset-id="competitive"]');
             button?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -921,10 +925,16 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         const matchPreset = await page.evaluate(() => ({
             id: window.GAME_INSTANCE?.settings?.matchSettings?.activePresetId || '',
             kind: window.GAME_INSTANCE?.settings?.matchSettings?.activePresetKind || '',
+            mapKey: window.GAME_INSTANCE?.settings?.mapKey || '',
+            numBots: window.GAME_INSTANCE?.settings?.numBots ?? null,
+            winsNeeded: window.GAME_INSTANCE?.settings?.winsNeeded ?? null,
         }));
 
         expect(matchPreset.id).toBe('competitive');
         expect(matchPreset.kind).toBe('fixed');
+        expect(matchPreset.mapKey).toBe(expectedPreset.values.mapKey);
+        expect(matchPreset.numBots).toBe(expectedPreset.values.numBots);
+        expect(matchPreset.winsNeeded).toBe(expectedPreset.values.winsNeeded);
     });
 
     test('T20bb: Event-Playlist Quickstart ist sichtbar, startet direkt und persistiert den Cursor', async ({ page }) => {
@@ -1656,13 +1666,30 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T20q: Ebene-3- und Ebene-4-Reset greifen auf Defaults', async ({ page }) => {
         await loadGame(page);
+        const expectedDefaults = await page.evaluate(async () => {
+            const mod = await import('/src/ui/menu/MenuDefaultsEditorConfig.js');
+            const level3Reset = mod.createMenuLevel3ResetDefaults();
+            const baseSettings = mod.createMenuBaseSettingsDefaults();
+            return {
+                level3MapKey: level3Reset.mapKey,
+                level3ThemeMode: level3Reset.themeMode,
+                level3VehicleP1: level3Reset.vehicles.PLAYER_1,
+                level4Speed: String(baseSettings.gameplay.speed),
+            };
+        });
         await openGameSubmenu(page);
         await page.selectOption('#map-select', 'complex');
+        await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.settings.vehicles.PLAYER_1 = 'ship8';
+            game.runtimeFacade.onSettingsChanged({ changedKeys: ['vehicles.player1'] });
+        });
         await openStartSetupSection(page, 'match');
         await page.selectOption('#theme-mode-select', 'hell');
         await page.click('#btn-level3-reset');
-        expect(await page.inputValue('#map-select')).toBe('standard');
-        expect(await page.inputValue('#theme-mode-select')).toBe('dunkel');
+        expect(await page.inputValue('#map-select')).toBe(expectedDefaults.level3MapKey);
+        expect(await page.inputValue('#theme-mode-select')).toBe(expectedDefaults.level3ThemeMode);
+        expect(await page.inputValue('#vehicle-select-p1')).toBe(expectedDefaults.level3VehicleP1);
 
         await openLevel4Drawer(page, { section: 'gameplay' });
         await page.evaluate(() => {
@@ -1673,7 +1700,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         });
         await page.click('#btn-level4-reset');
         await page.waitForTimeout(100);
-        expect(await page.inputValue('#speed-slider')).toBe('18');
+        expect(await page.inputValue('#speed-slider')).toBe(expectedDefaults.level4Speed);
     });
 
     test('T20r: Textkatalog-Override greift und Release-Vorschau deaktiviert ihn', async ({ page }) => {

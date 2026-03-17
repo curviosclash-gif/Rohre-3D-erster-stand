@@ -1,6 +1,5 @@
 import { findFixedMenuPresetById } from './MenuPresetCatalog.js';
-
-export const DEFAULT_EVENT_PLAYLIST_ID = 'fun_rotation';
+import { MENU_DEFAULT_EVENT_PLAYLIST_ID as DEFAULT_EVENT_PLAYLIST_ID } from './MenuDefaultsEditorConfig.js';
 
 function freezePlaylist(playlist) {
     return Object.freeze({

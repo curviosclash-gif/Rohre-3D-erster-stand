@@ -6,6 +6,7 @@ import { CONFIG } from '../Config.js';
 import { SETTINGS_CHANGE_KEYS } from '../../ui/SettingsChangeKeys.js';
 import { getNextEventPlaylistEntry } from '../../ui/menu/EventPlaylistCatalog.js';
 import { LEVEL4_SECTION_IDS } from '../../ui/menu/MenuStateContracts.js';
+import { createMenuLevel3ResetDefaults } from '../../ui/menu/MenuDefaultsEditorConfig.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
     arcade: 'arcade',
@@ -200,15 +201,16 @@ export function handleQuickStartRandomStartAction(ctx) {
 export function handleLevel3ResetAction(ctx) {
     const { game, onSettingsChanged } = ctx;
     const sessionType = String(game?.settings?.localSettings?.sessionType || 'single').toLowerCase();
-    game.settings.mapKey = 'standard';
-    game.settings.vehicles.PLAYER_1 = 'ship5';
+    const defaults = createMenuLevel3ResetDefaults();
+    game.settings.mapKey = defaults.mapKey;
+    game.settings.vehicles.PLAYER_1 = defaults.vehicles.PLAYER_1;
     if (sessionType === 'splitscreen') {
-        game.settings.vehicles.PLAYER_2 = 'ship5';
+        game.settings.vehicles.PLAYER_2 = defaults.vehicles.PLAYER_2;
     }
     if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
         game.settings.localSettings = {};
     }
-    game.settings.localSettings.themeMode = 'dunkel';
+    game.settings.localSettings.themeMode = defaults.themeMode;
 
     onSettingsChanged({
         changedKeys: [

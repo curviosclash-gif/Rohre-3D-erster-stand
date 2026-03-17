@@ -1,4 +1,5 @@
 import { MENU_SESSION_TYPES } from './MenuStateContracts.js';
+import { createMenuConfigSharePayloadDefaults } from './MenuDefaultsEditorConfig.js';
 import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
@@ -44,61 +45,63 @@ function createSessionDraftSnapshot(settings, sessionType) {
     const localSettings = source.localSettings && typeof source.localSettings === 'object'
         ? source.localSettings
         : {};
+    const defaults = createMenuConfigSharePayloadDefaults();
 
     return {
-        sessionType: normalizeSessionType(sessionType, localSettings.sessionType || MENU_SESSION_TYPES.SINGLE),
+        sessionType: normalizeSessionType(sessionType, localSettings.sessionType || defaults.sessionType || MENU_SESSION_TYPES.SINGLE),
         mode: resolveModeFromSessionType(sessionType),
-        modePath: normalizeString(localSettings.modePath, 'normal'),
-        themeMode: normalizeString(localSettings.themeMode, 'dunkel'),
-        mapKey: String(source.mapKey || 'standard'),
-        gameMode: String(source.gameMode || 'CLASSIC'),
-        numBots: Number.isFinite(Number(source.numBots)) ? Number(source.numBots) : 1,
-        botDifficulty: String(source.botDifficulty || 'NORMAL').toUpperCase(),
-        winsNeeded: Number.isFinite(Number(source.winsNeeded)) ? Number(source.winsNeeded) : 5,
-        autoRoll: !!source.autoRoll,
-        portalsEnabled: !!source.portalsEnabled,
-        vehicles: cloneObject(source.vehicles, { PLAYER_1: 'ship5', PLAYER_2: 'ship5' }),
+        modePath: normalizeString(localSettings.modePath, defaults.modePath),
+        themeMode: normalizeString(localSettings.themeMode, defaults.themeMode),
+        mapKey: String(source.mapKey || defaults.mapKey),
+        gameMode: String(source.gameMode || defaults.gameMode),
+        numBots: Number.isFinite(Number(source.numBots)) ? Number(source.numBots) : defaults.numBots,
+        botDifficulty: String(source.botDifficulty || defaults.botDifficulty).toUpperCase(),
+        winsNeeded: Number.isFinite(Number(source.winsNeeded)) ? Number(source.winsNeeded) : defaults.winsNeeded,
+        autoRoll: typeof source.autoRoll === 'boolean' ? source.autoRoll : defaults.autoRoll,
+        portalsEnabled: typeof source.portalsEnabled === 'boolean' ? source.portalsEnabled : defaults.portalsEnabled,
+        vehicles: cloneObject(source.vehicles, defaults.vehicles),
         hunt: {
-            respawnEnabled: !!source?.hunt?.respawnEnabled,
+            respawnEnabled: !!(source?.hunt?.respawnEnabled ?? defaults?.hunt?.respawnEnabled),
         },
-        gameplay: cloneObject(source.gameplay, {}),
+        gameplay: cloneObject(source.gameplay, defaults.gameplay),
     };
 }
 
 function applySnapshotToSettings(settings, snapshot) {
     if (!settings || typeof settings !== 'object' || !snapshot || typeof snapshot !== 'object') return false;
+    const defaults = createMenuConfigSharePayloadDefaults();
 
     settings.mode = snapshot.mode === '2p' ? '2p' : '1p';
-    settings.mapKey = String(snapshot.mapKey || settings.mapKey || 'standard');
-    settings.gameMode = String(snapshot.gameMode || settings.gameMode || 'CLASSIC');
+    settings.mapKey = String(snapshot.mapKey || settings.mapKey || defaults.mapKey);
+    settings.gameMode = String(snapshot.gameMode || settings.gameMode || defaults.gameMode);
     settings.numBots = Number.isFinite(Number(snapshot.numBots)) ? Number(snapshot.numBots) : settings.numBots;
-    settings.botDifficulty = String(snapshot.botDifficulty || settings.botDifficulty || 'NORMAL').toUpperCase();
+    settings.botDifficulty = String(snapshot.botDifficulty || settings.botDifficulty || defaults.botDifficulty).toUpperCase();
     settings.winsNeeded = Number.isFinite(Number(snapshot.winsNeeded)) ? Number(snapshot.winsNeeded) : settings.winsNeeded;
-    settings.autoRoll = !!snapshot.autoRoll;
-    settings.portalsEnabled = !!snapshot.portalsEnabled;
+    settings.autoRoll = typeof snapshot.autoRoll === 'boolean' ? snapshot.autoRoll : defaults.autoRoll;
+    settings.portalsEnabled = typeof snapshot.portalsEnabled === 'boolean' ? snapshot.portalsEnabled : defaults.portalsEnabled;
 
     if (!settings.vehicles || typeof settings.vehicles !== 'object') {
-        settings.vehicles = { PLAYER_1: 'ship5', PLAYER_2: 'ship5' };
+        settings.vehicles = cloneObject(defaults.vehicles, { PLAYER_1: 'ship5', PLAYER_2: 'ship5' });
     }
-    settings.vehicles.PLAYER_1 = String(snapshot?.vehicles?.PLAYER_1 || settings.vehicles.PLAYER_1 || 'ship5');
-    settings.vehicles.PLAYER_2 = String(snapshot?.vehicles?.PLAYER_2 || settings.vehicles.PLAYER_2 || 'ship5');
+    settings.vehicles.PLAYER_1 = String(snapshot?.vehicles?.PLAYER_1 || settings.vehicles.PLAYER_1 || defaults.vehicles.PLAYER_1);
+    settings.vehicles.PLAYER_2 = String(snapshot?.vehicles?.PLAYER_2 || settings.vehicles.PLAYER_2 || defaults.vehicles.PLAYER_2);
 
     if (!settings.hunt || typeof settings.hunt !== 'object') {
-        settings.hunt = { respawnEnabled: false };
+        settings.hunt = cloneObject(defaults.hunt, { respawnEnabled: false });
     }
-    settings.hunt.respawnEnabled = !!snapshot?.hunt?.respawnEnabled;
+    settings.hunt.respawnEnabled = !!(snapshot?.hunt?.respawnEnabled ?? defaults?.hunt?.respawnEnabled);
 
     settings.gameplay = {
-        ...(settings.gameplay && typeof settings.gameplay === 'object' ? settings.gameplay : {}),
-        ...cloneObject(snapshot.gameplay, {}),
+        ...(settings.gameplay && typeof settings.gameplay === 'object' ? settings.gameplay : cloneObject(defaults.gameplay, {})),
+        ...cloneObject(snapshot.gameplay, defaults.gameplay),
     };
 
     if (!settings.localSettings || typeof settings.localSettings !== 'object') {
         settings.localSettings = {};
     }
     settings.localSettings.sessionType = normalizeSessionType(snapshot.sessionType, settings.localSettings.sessionType);
-    settings.localSettings.modePath = normalizeString(snapshot.modePath, settings.localSettings.modePath || 'normal');
-    settings.localSettings.themeMode = normalizeString(snapshot.themeMode, settings.localSettings.themeMode || 'dunkel');
+    settings.localSettings.modePath = normalizeString(snapshot.modePath, settings.localSettings.modePath || defaults.modePath);
+    settings.localSettings.themeMode = normalizeString(snapshot.themeMode, settings.localSettings.themeMode || defaults.themeMode);
     return true;
 }
 
