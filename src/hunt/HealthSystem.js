@@ -1,4 +1,5 @@
 import { CONFIG } from '../core/Config.js';
+import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { GAME_MODE_TYPES, isHuntMode } from './HuntMode.js';
 
 function toSafeNumber(value, fallback) {
@@ -13,27 +14,36 @@ function getNowSeconds() {
     return Date.now() * 0.001;
 }
 
+function resolveConfig(config = CONFIG) {
+    return config === CONFIG ? getActiveRuntimeConfig(CONFIG) : (config || CONFIG);
+}
+
 function getActiveMode(config = CONFIG) {
-    return String(config?.HUNT?.ACTIVE_MODE || config?.HUNT?.DEFAULT_MODE || GAME_MODE_TYPES.CLASSIC).toUpperCase();
+    const activeConfig = resolveConfig(config);
+    return String(activeConfig?.HUNT?.ACTIVE_MODE || activeConfig?.HUNT?.DEFAULT_MODE || GAME_MODE_TYPES.CLASSIC).toUpperCase();
 }
 
 export function isHuntHealthActive(config = CONFIG) {
-    const enabled = config?.HUNT?.ENABLED !== false;
-    return enabled && isHuntMode(getActiveMode(config), enabled);
+    const activeConfig = resolveConfig(config);
+    const enabled = activeConfig?.HUNT?.ENABLED !== false;
+    return enabled && isHuntMode(getActiveMode(activeConfig), enabled);
 }
 
 export function getPlayerMaxHp(config = CONFIG) {
-    return Math.max(1, toSafeNumber(config?.HUNT?.PLAYER_MAX_HP, 100));
+    const activeConfig = resolveConfig(config);
+    return Math.max(1, toSafeNumber(activeConfig?.HUNT?.PLAYER_MAX_HP, 100));
 }
 
 export function getShieldMaxHp(config = CONFIG) {
-    return Math.max(1, toSafeNumber(config?.HUNT?.SHIELD_MAX_HP, 40));
+    const activeConfig = resolveConfig(config);
+    return Math.max(1, toSafeNumber(activeConfig?.HUNT?.SHIELD_MAX_HP, 40));
 }
 
 export function resetPlayerHealth(player, config = CONFIG) {
+    const activeConfig = resolveConfig(config);
     if (!player) return null;
 
-    if (!isHuntHealthActive(config)) {
+    if (!isHuntHealthActive(activeConfig)) {
         player.maxHp = 1;
         player.hp = 1;
         player.maxShieldHp = 1;
@@ -43,10 +53,10 @@ export function resetPlayerHealth(player, config = CONFIG) {
         return player;
     }
 
-    const maxHp = getPlayerMaxHp(config);
+    const maxHp = getPlayerMaxHp(activeConfig);
     player.maxHp = maxHp;
     player.hp = maxHp;
-    player.maxShieldHp = getShieldMaxHp(config);
+    player.maxShieldHp = getShieldMaxHp(activeConfig);
     if (player.hasShield) {
         player.shieldHP = player.maxShieldHp;
     } else {
@@ -58,6 +68,7 @@ export function resetPlayerHealth(player, config = CONFIG) {
 }
 
 export function applyDamage(player, amount, options = {}, config = CONFIG) {
+    const activeConfig = resolveConfig(config);
     if (!player) {
         return { applied: 0, absorbedByShield: 0, remainingHp: 0, isDead: true };
     }
@@ -72,7 +83,7 @@ export function applyDamage(player, amount, options = {}, config = CONFIG) {
         };
     }
 
-    if (!isHuntHealthActive(config)) {
+    if (!isHuntHealthActive(activeConfig)) {
         player.maxHp = 1;
         player.hp = 0;
         player.shieldHP = 0;
@@ -94,7 +105,7 @@ export function applyDamage(player, amount, options = {}, config = CONFIG) {
         player.shieldHP = Math.max(0, player.shieldHP - absorbedByShield);
         remainingDamage -= absorbedByShield;
         if (absorbedByShield > 0) {
-            const feedbackValue = Math.min(1, Math.max(0.2, absorbedByShield / Math.max(1, player.maxShieldHp || getShieldMaxHp(config))));
+            const feedbackValue = Math.min(1, Math.max(0.2, absorbedByShield / Math.max(1, player.maxShieldHp || getShieldMaxHp(activeConfig))));
             player.shieldHitFeedback = Math.max(player.shieldHitFeedback || 0, feedbackValue);
         }
         if (player.shieldHP <= 0) {
@@ -116,47 +127,50 @@ export function applyDamage(player, amount, options = {}, config = CONFIG) {
 }
 
 export function applyHealing(player, amount, config = CONFIG) {
+    const activeConfig = resolveConfig(config);
     if (!player) return { healed: 0, hp: 0 };
     const healing = Math.max(0, toSafeNumber(amount, 0));
     if (healing <= 0) {
         return { healed: 0, hp: toSafeNumber(player.hp, 0) };
     }
 
-    if (!isHuntHealthActive(config)) {
+    if (!isHuntHealthActive(activeConfig)) {
         player.maxHp = 1;
         player.hp = 1;
         return { healed: 1, hp: 1 };
     }
 
-    const maxHp = Math.max(1, toSafeNumber(player.maxHp, getPlayerMaxHp(config)));
+    const maxHp = Math.max(1, toSafeNumber(player.maxHp, getPlayerMaxHp(activeConfig)));
     const before = Math.max(0, toSafeNumber(player.hp, maxHp));
     player.hp = Math.min(maxHp, before + healing);
     return { healed: player.hp - before, hp: player.hp };
 }
 
 export function updatePlayerHealthRegen(player, dt, config = CONFIG, nowSeconds = getNowSeconds()) {
-    if (!player || !isHuntHealthActive(config)) return;
+    const activeConfig = resolveConfig(config);
+    if (!player || !isHuntHealthActive(activeConfig)) return;
     if (player.hp <= 0) return;
 
-    const maxHp = Math.max(1, toSafeNumber(player.maxHp, getPlayerMaxHp(config)));
+    const maxHp = Math.max(1, toSafeNumber(player.maxHp, getPlayerMaxHp(activeConfig)));
     if (player.hp >= maxHp) return;
 
-    const regenDelay = Math.max(0, toSafeNumber(config?.HUNT?.PLAYER_REGEN_DELAY, 3.0));
+    const regenDelay = Math.max(0, toSafeNumber(activeConfig?.HUNT?.PLAYER_REGEN_DELAY, 3.0));
     const lastDamageTimestamp = toSafeNumber(player.lastDamageTimestamp, -Infinity);
     if ((nowSeconds - lastDamageTimestamp) < regenDelay) return;
 
-    const regenPerSecond = Math.max(0, toSafeNumber(config?.HUNT?.PLAYER_REGEN_PER_SECOND, 2.5));
+    const regenPerSecond = Math.max(0, toSafeNumber(activeConfig?.HUNT?.PLAYER_REGEN_PER_SECOND, 2.5));
     if (regenPerSecond <= 0) return;
 
     player.hp = Math.min(maxHp, player.hp + regenPerSecond * Math.max(0, dt));
 }
 
 export function resolveCollisionDamage(cause = 'WALL', config = CONFIG) {
-    if (!isHuntHealthActive(config)) {
+    const activeConfig = resolveConfig(config);
+    if (!isHuntHealthActive(activeConfig)) {
         return 1;
     }
 
-    const table = config?.HUNT?.COLLISION_DAMAGE || {};
+    const table = activeConfig?.HUNT?.COLLISION_DAMAGE || {};
     const key = String(cause || '').toUpperCase();
     if (key === 'TRAIL' || key === 'TRAIL_SELF' || key === 'TRAIL_OTHER') {
         return Math.max(1, toSafeNumber(table.TRAIL, 34));
@@ -168,15 +182,16 @@ export function resolveCollisionDamage(cause = 'WALL', config = CONFIG) {
 }
 
 export function grantShield(player, config = CONFIG) {
+    const activeConfig = resolveConfig(config);
     if (!player) return 0;
     player.hasShield = true;
-    if (!isHuntHealthActive(config)) {
+    if (!isHuntHealthActive(activeConfig)) {
         player.maxShieldHp = 1;
         player.shieldHP = 1;
         player.shieldHitFeedback = 0;
         return player.shieldHP;
     }
-    player.maxShieldHp = getShieldMaxHp(config);
+    player.maxShieldHp = getShieldMaxHp(activeConfig);
     player.shieldHP = player.maxShieldHp;
     player.shieldHitFeedback = 0;
     return player.shieldHP;

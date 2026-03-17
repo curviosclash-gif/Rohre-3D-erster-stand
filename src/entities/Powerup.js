@@ -4,12 +4,13 @@
 
 import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
+import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { isHuntHealthActive } from '../hunt/HealthSystem.js';
 import { isRocketTierType, pickWeightedRocketTierType } from '../hunt/RocketPickupSystem.js';
 import { PowerupModelFactory } from './PowerupModelFactory.js';
 
 function getHuntPickupWeights() {
-    return CONFIG?.HUNT?.PICKUP_WEIGHTS || {};
+    return getActiveRuntimeConfig(CONFIG)?.HUNT?.PICKUP_WEIGHTS || {};
 }
 
 function pickWeightedType(typeEntries = []) {
@@ -38,7 +39,7 @@ const AUTHORED_ITEM_TYPE_ALIASES = Object.freeze({
 
 function isTypeAllowedForMode(type, huntModeActive) {
     const normalizedType = String(type || '').trim().toUpperCase();
-    const entry = CONFIG?.POWERUP?.TYPES?.[normalizedType];
+    const entry = getActiveRuntimeConfig(CONFIG)?.POWERUP?.TYPES?.[normalizedType];
     if (!entry) return false;
     if (entry.huntOnly && !huntModeActive) return false;
     if (entry.classicOnly && huntModeActive) return false;
@@ -77,17 +78,19 @@ function buildAnchorKey(anchor, index = 0) {
 }
 
 export class PowerupManager {
-    constructor(renderer, arena) {
+    constructor(renderer, arena, runtimeConfig = null) {
+        const config = getActiveRuntimeConfig(CONFIG);
         this.renderer = renderer;
         this.arena = arena;
+        this.runtimeConfig = runtimeConfig;
         this.items = []; // { mesh, type, box }
         this.spawnTimer = 0;
-        this.typeKeys = Object.keys(CONFIG.POWERUP.TYPES);
+        this.typeKeys = Object.keys(config.POWERUP.TYPES);
         this._pickupBoxSize = new THREE.Vector3();
         this._pickupSphere = new THREE.Sphere();
 
         // Shared Geometries (einmal erstellen, wiederverwenden)
-        const size = CONFIG.POWERUP.SIZE;
+        const size = config.POWERUP.SIZE;
         this._modelFactory = new PowerupModelFactory(size);
         this._sharedGeo = new THREE.BoxGeometry(size, size, size);
         this._sharedWireGeo = new THREE.BoxGeometry(size * 1.15, size * 1.15, size * 1.15);
@@ -95,21 +98,22 @@ export class PowerupManager {
     }
 
     update(dt) {
+        const config = getActiveRuntimeConfig(CONFIG);
         this.spawnTimer += dt;
 
         // Neue Items spawnen
-        if (this.spawnTimer >= CONFIG.POWERUP.SPAWN_INTERVAL && this.items.length < CONFIG.POWERUP.MAX_ON_FIELD) {
+        if (this.spawnTimer >= config.POWERUP.SPAWN_INTERVAL && this.items.length < config.POWERUP.MAX_ON_FIELD) {
             this.spawnTimer = 0;
             this._spawnRandom();
         }
 
         // Animation
         const time = performance.now() * 0.001;
-        const pickupSize = CONFIG.POWERUP.PICKUP_RADIUS * 2;
+        const pickupSize = config.POWERUP.PICKUP_RADIUS * 2;
         this._pickupBoxSize.set(pickupSize, pickupSize, pickupSize);
         for (const item of this.items) {
-            item.mesh.rotation.y += CONFIG.POWERUP.ROTATION_SPEED * dt;
-            item.mesh.position.y = item.baseY + Math.sin(time * CONFIG.POWERUP.BOUNCE_SPEED + item.phase) * CONFIG.POWERUP.BOUNCE_HEIGHT;
+            item.mesh.rotation.y += config.POWERUP.ROTATION_SPEED * dt;
+            item.mesh.position.y = item.baseY + Math.sin(time * config.POWERUP.BOUNCE_SPEED + item.phase) * config.POWERUP.BOUNCE_HEIGHT;
 
             // Bounding Box aktualisieren
             item.box.setFromCenterAndSize(
@@ -120,9 +124,10 @@ export class PowerupManager {
     }
 
     _spawnRandom() {
+        const config = getActiveRuntimeConfig(CONFIG);
         const huntModeActive = isHuntHealthActive();
         const spawnableTypes = this.typeKeys.filter((typeKey) => {
-            const entry = CONFIG.POWERUP.TYPES[typeKey];
+            const entry = config.POWERUP.TYPES[typeKey];
             if (!entry) return false;
             if (entry.huntOnly && !huntModeActive) return false;
             if (entry.classicOnly && huntModeActive) return false;
@@ -141,7 +146,7 @@ export class PowerupManager {
         let type = resolveAuthoredPickupType(authoredAnchor?.anchor, huntModeActive)
             || spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
         if (huntModeActive) {
-            const rocketSpawnChance = Math.max(0, Number(CONFIG?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0));
+            const rocketSpawnChance = Math.max(0, Number(config?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0));
             const nonRocketTypes = spawnableTypes.filter((typeKey) => !isRocketTierType(typeKey));
             const huntWeights = getHuntPickupWeights();
             const weightedNonRocketTypes = nonRocketTypes
@@ -169,7 +174,7 @@ export class PowerupManager {
             }
         }
 
-        const config = CONFIG.POWERUP.TYPES[type];
+        const powerupConfig = config.POWERUP.TYPES[type];
         let pos = null;
         if (authoredAnchor?.anchor) {
             pos = new THREE.Vector3(
@@ -177,7 +182,7 @@ export class PowerupManager {
                 Number(authoredAnchor.anchor.y) || 0,
                 Number(authoredAnchor.anchor.z) || 0,
             );
-        } else if (CONFIG.GAMEPLAY.PLANAR_MODE && this.arena?.getPortalLevels) {
+        } else if (config.GAMEPLAY.PLANAR_MODE && this.arena?.getPortalLevels) {
             const levels = this.arena.getPortalLevels();
             if (levels.length > 0) {
                 const level = levels[Math.floor(Math.random() * levels.length)];
@@ -188,7 +193,7 @@ export class PowerupManager {
             pos = this.arena.getRandomPosition(8);
         }
 
-        const mesh = this._createPowerupMesh(type, config);
+        const mesh = this._createPowerupMesh(type, powerupConfig);
         mesh.position.copy(pos);
         if (authoredAnchor?.anchor && Number.isFinite(Number(authoredAnchor.anchor.rotateY))) {
             mesh.rotation.y = Number(authoredAnchor.anchor.rotateY);
@@ -199,7 +204,7 @@ export class PowerupManager {
 
         const box = new THREE.Box3().setFromCenterAndSize(
             pos,
-            new THREE.Vector3(CONFIG.POWERUP.PICKUP_RADIUS * 2, CONFIG.POWERUP.PICKUP_RADIUS * 2, CONFIG.POWERUP.PICKUP_RADIUS * 2)
+            new THREE.Vector3(config.POWERUP.PICKUP_RADIUS * 2, config.POWERUP.PICKUP_RADIUS * 2, config.POWERUP.PICKUP_RADIUS * 2)
         );
 
         this.items.push({
@@ -246,7 +251,7 @@ export class PowerupManager {
     /** Prueft ob ein Spieler ein Item einsammelt */
     checkPickup(playerPosition, radius) {
         this._pickupSphere.center.copy(playerPosition);
-        this._pickupSphere.radius = radius + CONFIG.POWERUP.PICKUP_RADIUS;
+        this._pickupSphere.radius = radius + getActiveRuntimeConfig(CONFIG).POWERUP.PICKUP_RADIUS;
 
         for (let i = this.items.length - 1; i >= 0; i--) {
             if (this.items[i].box.intersectsSphere(this._pickupSphere)) {

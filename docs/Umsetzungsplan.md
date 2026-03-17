@@ -35,6 +35,7 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 |---|---|---|
 | `src/hunt/**` | V26 | frei |
 | `src/entities/ai/**` | V26 | frei |
+| `src/ui/menu/MenuDefaultsEditorConfig.js` | PX V42 | frei |
 | `src/ui/menu/**` | V27 | frei |
 | `src/state/**` | V27 | frei |
 | `src/core/**` | V28 | frei |
@@ -44,6 +45,8 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 | `tests/**` | shared | alle (append-only) |
 | `docs/**` | shared | alle (append-only) |
 | `editor/**` | shared | alle |
+| `dev/**` | PX V43 | frei |
+| `game/**` | PX V43 | frei |
 
 ## Conflict-Log (append-only)
 
@@ -57,6 +60,8 @@ Abgeschlossene oder abgeloeste Planstaende liegen unter `docs/archive/plans/`.
 | 2026-03-13 | Codex | V27/V28 | `src/ui/menu/EventPlaylistCatalog.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuTextCatalog.js`, `src/ui/MenuController.js`, `src/core/GameBootstrap.js`, `src/core/GameRuntimeFacade.js` | V26.6 benoetigt einen additiven Event-Playlist-Quickstart ueber bestehende Menue-/Runtime-Pfade hinweg | mittel |
 | 2026-03-15 | Codex | V28 | `src/core/GameLoop.js` | Flugzeug-Stottern durch 60Hz-Resonanz (Alpha-Springen) behoben via Ringpuffer-Smoothing | mittel |
 | 2026-03-16 | Codex | V27/V28 | `src/core/config/maps/MapPresetCatalog.js`, `src/core/config/maps/MapPresetsBase.js`, `src/state/MatchSessionFactory.js`, `src/ui/menu/MenuPreviewCatalog.js`, `src/ui/UIStartSyncController.js` | V39 brauchte additive Preset-/Preview-/Runtime-Integration ueber Core-, State- und Menuepfade hinweg | mittel |
+| 2026-03-17 | Codex | V27/V28 | `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuPresetCatalog.js`, `src/ui/menu/EventPlaylistCatalog.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuConfigShareOps.js`, `src/ui/menu/MenuDraftStore.js`, `src/core/SettingsManager.js`, `src/core/runtime/MenuRuntimeSessionService.js` | V42 zentralisiert Menue-Defaults, Reset-Fallbacks und Fixed-Preset-Seeds ueber Menue- und Core-Pfade hinweg | mittel |
+| 2026-03-17 | Codex | V27/V28 | `src/ui/UIManager.js`, `src/ui/MatchFlowUiController.js`, `src/ui/dom/**`, `src/state/MatchSessionFactory.js`, `src/state/match-session/**`, `src/core/GameBootstrap.js`, `src/core/GameRuntimeFacade.js`, `src/core/Config.js`, `src/core/RuntimeConfig.js`, `src/entities/EntityManager.js`, `src/entities/runtime/**`, `src/entities/systems/**`, `tests/**` | V44 haertet Layer-Grenzen, absorbiert die offenen V38-Architektur-Restpunkte und braucht dafuer koordinierte Cross-Block-Aenderungen ueber UI-, State-, Core- und Entity-Runtime-Pfade | hoch |
 
 ## Schnellindex Offener Arbeit
 
@@ -441,29 +446,29 @@ Template:
   - Datei-Scope: `src/core/**`, `src/entities/**`, `tests/core.spec.js`, `docs/**`
   - Konfliktregel: Nur Performance-Hotpaths bearbeiten, keine funktionale Logik aendern. Start-Latenzen (T7) zuerst angehen.
   - Status 2026-03-13: Phasen `37.1` bis `37.9` abgeschlossen (`[x]`). Der finale Jitter-Matrixlauf `tmp/perf_jitter_matrix_1773422511548.json` ist gruen (`interactiveAggregateP99=17.10ms`, `worstRecordingGapMs=55.556ms`, `benchmarkPass=true`), `npm run test:core` laeuft stabil ohne T7-Timeout durch, und `npm run test:gpu` sowie `npm run test:physics` sind PASS. Browser-Spotchecks bestaetigen Menue -> Setup -> Match-Transition unter `tmp/develop-web-game-v37-menu/shot-0.png`, `tmp/develop-web-game-v37-level2/shot-0.png` und `tmp/develop-web-game-v37-play2/shot-0.png`; ein abgeschnittener Three.js-Bounding-Warnhinweis trat nur im Skill-Client mit synthetischem Quickstart auf und liess sich im aequivalenten direkten Playwright-Selektorpfad nicht reproduzieren.
-- [/] PX Architektur-Verbesserung & Prävention V38
+- [x] PX Architektur-Verbesserung & Praevention V38
   - Erstellt am: `2026-03-13`
   - Agent: `Codex`
   - Plan-Datei: `docs/Feature_Architektur_Massnahmenplan_V38.md`
   - Datei-Scope: `src/core/main.js`, `src/ui/UIManager.js`, `package.json`, `.eslint*`, `tsconfig.json`
-  - Konfliktregel: Tooling-Updates (ESLint, TS-Check) separat von funktionalen Anpassungen durchführen. "God Object"-Splits nur nach Absprache/Sicherung der Tests.
+  - Konfliktregel: Tooling-Updates (ESLint, TS-Check) separat von funktionalen Anpassungen durchfuehren. "God Object"-Splits nur nach Absprache/Sicherung der Tests.
   - [x] 38.1 Tooling-Grails fuer Dateigroesse und JS-Vertraege
     - [x] 38.1.1 `eslint.config.js` mit `max-lines`-Guard und additiven Legacy-Ceilings fuer bestehende Grossdateien einfuehren
     - [x] 38.1.2 `tsconfig.json` + `npm run typecheck:architecture` fuer neue Bootstrap-Helfer mit `tsc --checkJs` aufbauen
   - [x] 38.2 `main.js` entlasten
     - [x] 38.2.1 Runtime-Error-Overlay und DOM-Bootstrap nach `src/core/RuntimeErrorOverlay.js` und `src/core/AppInitializer.js` auslagern
     - [x] 38.2.2 Playtest-URL-Parsing nach `src/core/PlaytestLaunchParams.js` verschieben
-  - [ ] 38.3 `UIManager.js` modularisieren
-    - [ ] 38.3.1 Start-/Preview-/Summary-Sync in dedizierte Controller/Ops extrahieren
-    - [ ] 38.3.2 Navigation-/Access-/Dispose-Lifecycle in dedizierte Controller ueberfuehren
+  - [x] 38.3 `UIManager.js` modularisieren
+    - [x] 38.3.1 Start-/Preview-/Summary-Sync in dedizierte Controller/Ops extrahieren
+    - [x] 38.3.2 Navigation-/Access-/Dispose-Lifecycle in dedizierte Controller ueberfuehren
   - [x] 38.4 Jitter-Stabilisierung (60Hz-Resonanz)
     - [x] 38.4.1 Problem-Analyse: fixedStep/rawDt Resonanz identifiziert (Alpha 0<->1 Jitter bei rAF-Schwankungen)
     - [x] 38.4.2 Dt-Smoothing via 4-Frame-Ringpuffer in `GameLoop.js` implementiert
     - Status 2026-03-15: Flugzeug-Stottern behoben; Core-Resonanz geglaettet. All 22 `physics-core` tests PASS.
-  - [ ] 38.9 Abschluss-Gate
-    - [ ] 38.9.1 `npm run architecture:guard` und `npm run test:core` gruen bestaetigen
-    - [ ] 38.9.2 `npm run build`, `npm run docs:sync` und `npm run docs:check` gruen bestaetigen
-  - Status 2026-03-14: Erste Praeventionsstufe umgesetzt. `main.js` ist um Bootstrap-/Error-/Playtest-Helfer entlastet, `prebuild` fuehrt jetzt einen additiven Architektur-Guard aus ESLint-`max-lines` plus inkrementellem `tsc --checkJs` aus; der verbleibende offene Rest ist die eigentliche Modularisierung von `UIManager.js`.
+  - [x] 38.9 Abschluss-Gate
+    - [x] 38.9.1 `npm run architecture:guard` und `npm run test:core` gruen bestaetigen
+    - [x] 38.9.2 `npm run build`, `npm run docs:sync` und `npm run docs:check` gruen bestaetigen
+  - Status 2026-03-17: V38 ist ueber V44 vollstaendig absorbiert und abgeschlossen. Die offene `UIManager`-Modularisierung lief ueber `44.4`, die finalen Architektur-/Build-/Doku-Gates ueber `44.8` und `44.9`; `architecture:guard`, `test:core`, `build`, `docs:sync` und `docs:check` sind gruen.
 - [ ] PX Hunt Rocket Trail Targeting V40
   - Erstellt am: `2026-03-16`
   - Agent: `Codex`
@@ -476,6 +481,29 @@ Template:
   - Plan-Datei: `docs/Feature_Lokaler_Multiplayer_V41.md`
   - Datei-Scope: `index.html`, `style.css`, `src/ui/**`, `src/core/**`, `src/state/**`, `tests/**`, `docs/**`
   - Konfliktregel: Der Plan kreuzt V27-/V28-Menue-, Runtime- und Input-Pfade; lokale Session-Logik strikt vom offenen Online-Backlog `N1` trennen und spaetere Umsetzungs-Fremdeingriffe vorab im Conflict-Log dokumentieren
+- [/] PX Menu Default Editor V42
+  - Erstellt am: `2026-03-17`
+  - Agent: `Codex`
+  - Plan-Datei: `docs/Feature_Menu_Default_Editor_V42.md`
+  - Datei-Scope: `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuPresetCatalog.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuConfigShareOps.js`, `src/core/SettingsManager.js`, `tests/**`, `docs/**`
+  - Konfliktregel: Nur die Menue-Default- und Preset-Quelle zentralisieren; kein paralleles UX-Redesign und keine Seitensanierung in unbeteiligten Runtime-Pfaden
+  - Status 2026-03-17: Zentrale Menue-Default-Datei plus Rewire fuer Defaults, Presets, Drafts/Config-Share und Level-3-Reset umgesetzt; gezielte Core-/Stress-Regressionspfade sind gruen.
+  - Gate-Status 2026-03-17: Vollgates bleiben ausserhalb des Scopes offen: `npm run test:core` scheitert im bestehenden `T14`, `npm run test:stress` im bestehenden `T71b`, und `npm run build` am bestehenden `max-lines`-Guard in `src/core/config/maps/MapPresetCatalog.js` (`627 > 500`).
+- [ ] PX Projektstruktur Spiel und Dev-Ordner V43
+  - Erstellt am: `2026-03-17`
+  - Agent: `Codex`
+  - Plan-Datei: `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`
+  - Datei-Scope: `package.json`, `vite.config.js`, `index.html`, `style.css`, `src/**`, `editor/**`, `scripts/**`, `tests/**`, `trainer/**`, Root-Startskripte, `docs/**`, neue Zielpfade `dev/**` und optional `game/**`
+  - Konfliktregel: Der Plan kreuzt nahezu alle aktiven Ownership-Bereiche; vor einer Umsetzung zuerst nur als Intake behandeln, Dev-Pfade vor Spielpfaden migrieren und groessere Runtime-Umbauten nicht parallel zu offenen V38/V40/V41/V42-Scope-Aenderungen starten
+- [x] PX Architektur-Haertung und Boundary Guards V44
+  - Erstellt am: `2026-03-17`
+  - Agent: `Codex`
+  - Plan-Datei: `docs/Feature_Architektur_Haertung_Boundary_Guards_V44.md`
+  - Datei-Scope: `src/core/**`, `src/ui/**`, `src/state/**`, `src/entities/runtime/**`, `src/entities/EntityManager.js`, `src/hunt/HuntHUD.js`, `scripts/check-architecture-*.mjs`, `eslint.config.js`, `tsconfig*.json`, `package.json`, `tests/**`, `docs/**`
+  - Konfliktregel: Der Plan kreuzt V27-, V28-, V38-, V40-, V41- und V42-Pfade. Cross-Block-Aenderungen sind im Conflict-Log dokumentiert; die offenen Architektur-Restpunkte aus V38 wurden in V44 absorbiert statt parallel weitergefuehrt.
+  - Status 2026-03-17: Phasen `44.0` bis `44.9` abgeschlossen. Eingefuehrt wurden Architektur-Scorecard/Boundary-Guards, eine neutrale Shared-Contract-Schicht, runtime-isolierte `CONFIG`-Snapshots, kleine `runtimePorts`, eine neue UI-DOM-Schicht, gesplittete Match-Session- und Entity-Runtime-Assemblies sowie eine Menue-Handler-Registry.
+  - Scorecard 2026-03-17: `CONFIG writes=0`, `constructor(game)=17` (`0` disallowed), `DOM ausserhalb ui=41` (`0` disallowed), `ui -> core=9` (`0` disallowed), `entities -> core=43` (`0` disallowed).
+  - Gate-Status 2026-03-17: `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run test:physics`, `npm run test:stress`, `npm run smoke:roundstate`, `npm run test:gpu`, `npm run build`, `npm run benchmark:baseline`, `npm run benchmark:lifecycle`, `npm run docs:sync` und `npm run docs:check` PASS.
 <!-- PLAN-INTAKE-END -->
 
 ## Archivierte Referenzen

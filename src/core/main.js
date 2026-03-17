@@ -16,7 +16,7 @@ import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { bootstrapGameRuntime } from './GameBootstrap.js';
 import { GameRuntimeFacade } from './GameRuntimeFacade.js';
 import { GameDebugApi } from './GameDebugApi.js';
-import { GAME_STATE_IDS } from './runtime/GameStateIds.js';
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { LIFECYCLE_EVENT_TYPES } from './MediaRecorderSystem.js';
 import { RuntimePerfProfiler } from './perf/RuntimePerfProfiler.js';
 import { initializeGameApp } from './AppInitializer.js';
@@ -51,7 +51,7 @@ export class Game {
         this.roundPause = 0;
         this.roundStateController = createRoundStateController({ defaultRoundPause: 3.0 });
         this.playingStateSystem = new PlayingStateSystem(this);
-        this.roundStateTickSystem = new RoundStateTickSystem(this);
+        this.roundStateTickSystem = new RoundStateTickSystem({ game: this });
         this._hudTimer = 0;
         this._renderAlpha = 1;
         this._renderDelta = 1 / 60;
@@ -69,7 +69,7 @@ export class Game {
             buildTime: BUILD_TIME,
             showStatusToast: (message, durationMs, tone) => this._showStatusToast(message, durationMs, tone),
         });
-        this.runtimeFacade = new GameRuntimeFacade(this);
+        this.runtimeFacade = new GameRuntimeFacade({ game: this, ports: this.runtimePorts });
         this.debugApi = new GameDebugApi(this);
 
         // Debug Recorder
@@ -84,7 +84,7 @@ export class Game {
         this.entityManager = null;
         this.powerupManager = null;
 
-        this.uiManager = new UIManager(this);
+        this.uiManager = new UIManager({ game: this, ports: this.runtimePorts });
         this.uiManager.init();
         this.keybindEditorController.renderEditor();
 
@@ -202,8 +202,8 @@ export class Game {
         this.runtimeFacade.updateSaveButtonState();
     }
 
-    _syncProfileControls() {
-        this.profileUiController?.syncProfileControls();
+    _syncProfileControls(options = null) {
+        this.profileUiController?.syncProfileControls(options || undefined);
     }
 
     _syncProfileActionState() {

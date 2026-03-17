@@ -1,4 +1,5 @@
 import { CONFIG } from '../../core/Config.js';
+import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 
 const MIN_HITBOX_RADIUS = 0.2;
 const HITBOX_HEIGHT_FACTOR = 0.7;
@@ -130,8 +131,9 @@ export function syncPlayerHitboxFromVehicleMesh(player, mesh = null) {
 }
 
 export function updatePlayerMotion(player, dt, controlState = null) {
-    const resolvedTurnSpeed = Number(player?.turnSpeed) || Number(CONFIG.PLAYER.TURN_SPEED) || 0;
-    const resolvedRollSpeed = Number(player?.rollSpeed) || Number(CONFIG.PLAYER.ROLL_SPEED) || 0;
+    const config = getActiveRuntimeConfig(CONFIG);
+    const resolvedTurnSpeed = Number(player?.turnSpeed) || Number(config.PLAYER.TURN_SPEED) || 0;
+    const resolvedRollSpeed = Number(player?.rollSpeed) || Number(config.PLAYER.ROLL_SPEED) || 0;
     const turnSpeed = resolvedTurnSpeed * dt;
     const rollSpeed = resolvedRollSpeed * dt;
 
@@ -151,23 +153,23 @@ export function updatePlayerMotion(player, dt, controlState = null) {
     player._tmpQuat.setFromEuler(player._tmpEuler);
     player.quaternion.multiply(player._tmpQuat);
 
-    if (CONFIG.PLAYER.AUTO_ROLL && rollInput === 0) {
+    if (config.PLAYER.AUTO_ROLL && rollInput === 0) {
         player._tmpEuler2.setFromQuaternion(player.quaternion, 'YXZ');
-        player._tmpEuler2.z *= (1 - CONFIG.PLAYER.AUTO_ROLL_SPEED * dt);
+        player._tmpEuler2.z *= (1 - config.PLAYER.AUTO_ROLL_SPEED * dt);
 
-        if (CONFIG.GAMEPLAY.PLANAR_MODE) {
+        if (config.GAMEPLAY.PLANAR_MODE) {
             player._tmpEuler2.x = 0;
         }
 
         player.quaternion.setFromEuler(player._tmpEuler2);
-    } else if (CONFIG.GAMEPLAY.PLANAR_MODE) {
+    } else if (config.GAMEPLAY.PLANAR_MODE) {
         player._tmpEuler2.setFromQuaternion(player.quaternion, 'YXZ');
         player._tmpEuler2.x = 0;
         player.quaternion.setFromEuler(player._tmpEuler2);
     }
 
     player.speed = boostEffectActive
-        ? player.baseSpeed * CONFIG.PLAYER.BOOST_MULTIPLIER
+        ? player.baseSpeed * config.PLAYER.BOOST_MULTIPLIER
         : player.baseSpeed;
 
     player._tmpVec.set(0, 0, -1).applyQuaternion(player.quaternion);
@@ -188,13 +190,13 @@ export function updatePlayerMotion(player, dt, controlState = null) {
         player.velocity.addScaledVector(player.slingshotUp, uStrength);
     }
 
-    if (CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (config.GAMEPLAY.PLANAR_MODE) {
         player.velocity.y = 0;
         player.position.y = player.currentPlanarY;
     }
 
     player.position.x += player.velocity.x * dt;
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!config.GAMEPLAY.PLANAR_MODE) {
         player.position.y += player.velocity.y * dt;
     }
     player.position.z += player.velocity.z * dt;

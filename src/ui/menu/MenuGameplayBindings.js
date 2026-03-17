@@ -1,7 +1,7 @@
 import { CONFIG } from '../../core/Config.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
-import { normalizeShadowQuality } from '../../core/renderer/ShadowQuality.js';
+import { normalizeShadowQuality } from '../../shared/contracts/ShadowQualityContract.js';
 import { clamp } from '../../utils/MathOps.js';
 
 export function setupMenuGameplayBindings(ctx) {
@@ -190,9 +190,8 @@ export function setupMenuGameplayBindings(ctx) {
         emitSettingsChangedImmediate([keys.RULES_COCKPIT_P2]);
     });
 
-    const planarModeToggle = document.getElementById('planar-mode-toggle');
-    if (planarModeToggle) {
-        bind(planarModeToggle, 'change', (e) => {
+    if (ui.planarModeToggle) {
+        bind(ui.planarModeToggle, 'change', (e) => {
             applyPlanarMode(!!e.target.checked);
         });
     }
@@ -282,7 +281,7 @@ export function setupMenuGameplayBindings(ctx) {
         });
     }
 
-    const legacyLevel4OpenButtons = Array.from(document.querySelectorAll('[data-menu-action="level4-open"]'));
+    const legacyLevel4OpenButtons = Array.isArray(ui.legacyLevel4OpenButtons) ? ui.legacyLevel4OpenButtons : [];
     legacyLevel4OpenButtons.forEach((button) => {
         bind(button, 'click', () => {
             emit(eventTypes.LEVEL4_OPEN, {
@@ -335,24 +334,20 @@ export function setupMenuGameplayBindings(ctx) {
         });
     }
 
-    const portalCountSlider = document.getElementById('portal-count-slider');
-    const portalCountLabel = document.getElementById('portal-count-label');
-    if (portalCountSlider && portalCountLabel) {
-        bind(portalCountSlider, 'input', (e) => {
+    if (ui.portalCountSlider && ui.portalCountLabel) {
+        bind(ui.portalCountSlider, 'input', (e) => {
             const val = parseInt(e.target.value, 10);
-            portalCountLabel.textContent = val;
+            ui.portalCountLabel.textContent = val;
             if (!settings.gameplay) settings.gameplay = {};
             settings.gameplay.portalCount = val;
             queueInputSettingsChanged([keys.GAMEPLAY_PORTAL_COUNT]);
         });
     }
 
-    const planarLevelCountSlider = document.getElementById('planar-level-count-slider');
-    const planarLevelCountLabel = document.getElementById('planar-level-count-label');
-    if (planarLevelCountSlider && planarLevelCountLabel) {
-        bind(planarLevelCountSlider, 'input', (e) => {
+    if (ui.planarLevelCountSlider && ui.planarLevelCountLabel) {
+        bind(ui.planarLevelCountSlider, 'input', (e) => {
             const val = clamp(parseInt(e.target.value, 10), 2, 10);
-            planarLevelCountLabel.textContent = val;
+            ui.planarLevelCountLabel.textContent = val;
             if (!settings.gameplay) settings.gameplay = {};
             settings.gameplay.planarLevelCount = val;
             queueInputSettingsChanged([keys.GAMEPLAY_PLANAR_LEVEL_COUNT]);

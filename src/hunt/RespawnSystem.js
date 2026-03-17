@@ -1,4 +1,5 @@
 import { CONFIG } from '../core/Config.js';
+import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { grantShield, isHuntHealthActive } from './HealthSystem.js';
 
 function getLabel(player) {
@@ -7,7 +8,7 @@ function getLabel(player) {
 }
 
 function getRespawnConfig() {
-    return CONFIG?.HUNT?.RESPAWN || {};
+    return getActiveRuntimeConfig(CONFIG)?.HUNT?.RESPAWN || {};
 }
 
 function resetRespawnInventory(player, respawnConfig) {
@@ -41,7 +42,7 @@ export class RespawnSystem {
     }
 
     isEnabled() {
-        return isHuntHealthActive() && !!CONFIG?.HUNT?.RESPAWN_ENABLED;
+        return isHuntHealthActive() && !!getActiveRuntimeConfig(CONFIG)?.HUNT?.RESPAWN_ENABLED;
     }
 
     reset() {
@@ -90,7 +91,8 @@ export class RespawnSystem {
             if (pending.remaining > 0) continue;
 
             const respawnConfig = getRespawnConfig();
-            const planarSpawnLevel = CONFIG.GAMEPLAY.PLANAR_MODE && this.runtime?.spawn?.getPlanarSpawnLevel
+            const activeConfig = getActiveRuntimeConfig(CONFIG);
+            const planarSpawnLevel = activeConfig.GAMEPLAY.PLANAR_MODE && this.runtime?.spawn?.getPlanarSpawnLevel
                 ? this.runtime.spawn.getPlanarSpawnLevel()
                 : null;
             const minEnemyDistance = Math.max(12, Number(respawnConfig?.MIN_ENEMY_DISTANCE || 18));

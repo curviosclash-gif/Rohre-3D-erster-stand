@@ -8,8 +8,9 @@
 // - Side effects: applies/clears game runtime refs (arena/entity/powerup/particles)
 
 export class MatchSessionRuntimeBridge {
-    constructor(game) {
-        this.game = game || null;
+    constructor(deps = {}) {
+        this.game = deps.game || null;
+        this.ports = deps.ports || null;
     }
 
     applyInitializedMatchSession(initializedMatch) {

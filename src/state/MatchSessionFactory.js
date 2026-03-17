@@ -1,81 +1,39 @@
-import { CONFIG } from '../core/Config.js';
 import { Arena } from '../entities/Arena.js';
 import { EntityManager } from '../entities/EntityManager.js';
 import { PowerupManager } from '../entities/Powerup.js';
 import { ParticleSystem } from '../entities/Particles.js';
-import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
-import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
-import { createArenaMapFingerprint } from '../entities/arena/ArenaBuildResourceCache.js';
+import {
+    buildArenaSessionKey,
+    resolveMatchMap,
+    toSafeInt,
+} from './match-session/MatchSessionMapOps.js';
+import {
+    buildEntityManagerSetupOptions,
+    disposeMatchSessionSystems,
+} from './match-session/MatchSessionSetupOps.js';
+import { deriveMapResolutionFeedbackPlan } from './match-session/MatchSessionFeedbackPlan.js';
+import {
+    awaitActivePrewarmForRenderer,
+    clearPrewarmedArenaSession,
+    consumePrewarmedArenaSessionIfMatch,
+    getActivePrewarmPromiseForRenderer,
+    storePrewarmedArenaSession,
+    trackPrewarmPromise,
+} from './match-session/MatchSessionPrewarmStore.js';
 
-let PREWARMED_ARENA_SESSION = null;
-let PREWARMED_ARENA_SESSION_PROMISE = null;
-let PREWARMED_ARENA_SESSION_META = null;
-
-function toSafeInt(value, fallback) {
-    const parsed = Number(value);
-    if (!Number.isFinite(parsed)) {
-        return fallback;
-    }
-    return Math.round(parsed);
-}
-
-function resolveArenaSourceMap(mapResolution, effectiveMapKey) {
-    if (mapResolution?.mapDefinition && typeof mapResolution.mapDefinition === 'object') {
-        return mapResolution.mapDefinition;
-    }
-    if (effectiveMapKey && CONFIG?.MAPS?.[effectiveMapKey]) {
-        return CONFIG.MAPS[effectiveMapKey];
-    }
-    return CONFIG?.MAPS?.standard || null;
-}
-
-function buildArenaSessionKey(mapResolution, runtimeConfig, portalsEnabled) {
-    const effectiveMapKey = mapResolution?.effectiveMapKey || 'standard';
-    const gameplay = runtimeConfig?.gameplay || {};
-    const arenaSourceMap = resolveArenaSourceMap(mapResolution, effectiveMapKey);
-    const mapFingerprint = createArenaMapFingerprint(arenaSourceMap);
-    return [
-        String(effectiveMapKey || 'standard'),
-        mapFingerprint,
-        portalsEnabled ? '1' : '0',
-        gameplay.planarMode ? '1' : '0',
-        Math.max(0, Math.round(Number(gameplay.portalCount) || 0)),
-        Math.max(0, Math.round(Number(gameplay.planarLevelCount) || 0)),
-    ].join('|');
-}
-
-function resolveMatchMap(runtimeConfig = null, requestedMapKey = null) {
-    const resolvedRequestedMapKey = runtimeConfig?.session?.mapKey || requestedMapKey;
-    const mapResolution = resolveArenaMapSelection(resolvedRequestedMapKey);
-    if (mapResolution.isCustom && mapResolution.mapDefinition) {
-        CONFIG.MAPS[CUSTOM_MAP_KEY] = mapResolution.mapDefinition;
-    }
-    return mapResolution;
-}
+export { disposeMatchSessionSystems } from './match-session/MatchSessionSetupOps.js';
 
 function isPromiseLike(value) {
     return !!value && typeof value.then === 'function';
 }
 
-function consumePrewarmedArenaSessionIfMatch(renderer, sessionKey) {
-    if (!PREWARMED_ARENA_SESSION) return null;
-    if (PREWARMED_ARENA_SESSION.renderer !== renderer) return null;
-    if (PREWARMED_ARENA_SESSION.sessionKey !== sessionKey) return null;
-
-    const prepared = PREWARMED_ARENA_SESSION;
-    PREWARMED_ARENA_SESSION = null;
-    return prepared;
-}
-
-async function awaitActivePrewarmForRenderer(renderer) {
-    if (!PREWARMED_ARENA_SESSION_PROMISE) return null;
-    if (PREWARMED_ARENA_SESSION_META?.renderer !== renderer) return null;
-    try {
-        await PREWARMED_ARENA_SESSION_PROMISE;
-    } catch {
-        return null;
-    }
-    return PREWARMED_ARENA_SESSION;
+function bindArenaRuntimeMap(arena, mapResolution, effectiveMapKey) {
+    if (!arena) return;
+    const useRuntimeMap = !!mapResolution?.isCustom
+        && !!mapResolution?.mapDefinition
+        && typeof mapResolution.mapDefinition === 'object';
+    arena.runtimeMapKey = useRuntimeMap ? effectiveMapKey : null;
+    arena.runtimeMapDefinition = useRuntimeMap ? mapResolution.mapDefinition : null;
 }
 
 export async function prewarmMatchArenaSession({
@@ -91,47 +49,48 @@ export async function prewarmMatchArenaSession({
     const effectiveMapKey = mapResolution.effectiveMapKey;
     const sessionKey = buildArenaSessionKey(mapResolution, runtimeConfig, portalsEnabled);
 
-    if (PREWARMED_ARENA_SESSION
-        && PREWARMED_ARENA_SESSION.renderer === renderer
-        && PREWARMED_ARENA_SESSION.sessionKey === sessionKey) {
+    const existingPrewarmedSession = consumePrewarmedArenaSessionIfMatch(renderer, sessionKey);
+    if (existingPrewarmedSession) {
+        storePrewarmedArenaSession(existingPrewarmedSession);
         return {
             prewarmed: true,
             reusedExisting: true,
             effectiveMapKey,
             sessionKey,
-            arenaBuildResult: PREWARMED_ARENA_SESSION.arenaBuildResult || null,
+            arenaBuildResult: existingPrewarmedSession.arenaBuildResult || null,
         };
     }
-    if (PREWARMED_ARENA_SESSION_PROMISE
-        && PREWARMED_ARENA_SESSION_META?.renderer === renderer
-        && PREWARMED_ARENA_SESSION_META?.sessionKey === sessionKey) {
-        return PREWARMED_ARENA_SESSION_PROMISE;
+    const activePrewarmPromise = getActivePrewarmPromiseForRenderer(renderer);
+    if (activePrewarmPromise) {
+        return activePrewarmPromise;
     }
 
     await awaitActivePrewarmForRenderer(renderer);
 
-    if (PREWARMED_ARENA_SESSION
-        && PREWARMED_ARENA_SESSION.renderer === renderer
-        && PREWARMED_ARENA_SESSION.sessionKey === sessionKey) {
+    const awaitedPrewarmedSession = consumePrewarmedArenaSessionIfMatch(renderer, sessionKey);
+    if (awaitedPrewarmedSession) {
+        storePrewarmedArenaSession(awaitedPrewarmedSession);
         return {
             prewarmed: true,
             reusedExisting: true,
             effectiveMapKey,
             sessionKey,
-            arenaBuildResult: PREWARMED_ARENA_SESSION.arenaBuildResult || null,
+            arenaBuildResult: awaitedPrewarmedSession.arenaBuildResult || null,
         };
     }
 
-    PREWARMED_ARENA_SESSION = null;
+    clearPrewarmedArenaSession();
 
     const prewarmPromise = (async () => {
         renderer.clearMatchScene();
 
         const arena = new Arena(renderer);
         arena.portalsEnabled = !!portalsEnabled;
+        arena.runtimeConfig = runtimeConfig;
+        bindArenaRuntimeMap(arena, mapResolution, effectiveMapKey);
         const arenaBuildResult = await arena.build(effectiveMapKey);
 
-        PREWARMED_ARENA_SESSION = {
+        storePrewarmedArenaSession({
             renderer,
             sessionKey,
             mapResolution,
@@ -139,7 +98,7 @@ export async function prewarmMatchArenaSession({
             portalsEnabled: !!portalsEnabled,
             arena,
             arenaBuildResult,
-        };
+        });
 
         return {
             prewarmed: true,
@@ -150,70 +109,7 @@ export async function prewarmMatchArenaSession({
         };
     })();
 
-    const trackedPromise = prewarmPromise.finally(() => {
-        if (PREWARMED_ARENA_SESSION_PROMISE === trackedPromise) {
-            PREWARMED_ARENA_SESSION_PROMISE = null;
-        }
-        if (PREWARMED_ARENA_SESSION_META?.renderer === renderer
-            && PREWARMED_ARENA_SESSION_META?.sessionKey === sessionKey) {
-            PREWARMED_ARENA_SESSION_META = null;
-        }
-    });
-
-    PREWARMED_ARENA_SESSION_PROMISE = trackedPromise;
-    PREWARMED_ARENA_SESSION_META = { renderer, sessionKey };
-    return trackedPromise;
-}
-
-function getActivePrewarmPromiseForRenderer(renderer) {
-    if (!PREWARMED_ARENA_SESSION_PROMISE) return null;
-    if (PREWARMED_ARENA_SESSION_META?.renderer !== renderer) return null;
-    return PREWARMED_ARENA_SESSION_PROMISE;
-}
-
-export function disposeMatchSessionSystems(renderer, currentSession, options = {}) {
-    if (currentSession?.entityManager) {
-        currentSession.entityManager.dispose();
-    }
-    if (currentSession?.powerupManager) {
-        currentSession.powerupManager.dispose();
-    }
-    if (currentSession?.particles?.dispose) {
-        currentSession.particles.dispose();
-    }
-    if (options.clearScene !== false) {
-        renderer.clearMatchScene();
-    }
-}
-
-function buildHumanConfigs(settings, runtimeConfig = null) {
-    const runtimeVehicles = runtimeConfig?.player?.vehicles || null;
-    return [
-        {
-            invertPitch: !!settings?.invertPitch?.PLAYER_1,
-            cockpitCamera: !!settings?.cockpitCamera?.PLAYER_1,
-            vehicleId: runtimeVehicles?.PLAYER_1 || settings?.vehicles?.PLAYER_1,
-        },
-        {
-            invertPitch: !!settings?.invertPitch?.PLAYER_2,
-            cockpitCamera: !!settings?.cockpitCamera?.PLAYER_2,
-            vehicleId: runtimeVehicles?.PLAYER_2 || settings?.vehicles?.PLAYER_2,
-        },
-    ];
-}
-
-function buildEntityManagerSetupOptions(settings, runtimeConfig = null) {
-    const runtimeBotConfig = runtimeConfig?.bot || null;
-    const setupPlanarMode = runtimeConfig?.gameplay?.planarMode ?? settings?.gameplay?.planarMode;
-    return {
-        modelScale: runtimeConfig?.player?.modelScale ?? settings?.gameplay?.planeScale,
-        botDifficulty: runtimeConfig?.bot?.activeDifficulty || settings?.botDifficulty || 'NORMAL',
-        botPolicyType: runtimeBotConfig?.policyType || null,
-        activeGameMode: runtimeConfig?.session?.activeGameMode || settings?.gameMode || null,
-        planarMode: typeof setupPlanarMode === 'boolean' ? setupPlanarMode : undefined,
-        runtimeConfig,
-        humanConfigs: buildHumanConfigs(settings, runtimeConfig),
-    };
+    return trackPrewarmPromise(renderer, sessionKey, prewarmPromise);
 }
 
 export function createMatchSession({
@@ -252,9 +148,11 @@ export function createMatchSession({
         const particles = new ParticleSystem(renderer);
         const arena = reusablePrewarmedArenaSession?.arena || new Arena(renderer);
         arena.portalsEnabled = !!portalsEnabled;
+        arena.runtimeConfig = runtimeConfig;
+        bindArenaRuntimeMap(arena, mapResolution, effectiveMapKey);
 
         const buildSessionPayload = (arenaBuildResult = reusablePrewarmedArenaSession?.arenaBuildResult || null) => {
-            const powerupManager = new PowerupManager(renderer, arena);
+            const powerupManager = new PowerupManager(renderer, arena, runtimeConfig);
             const entityManager = new EntityManager(
                 renderer,
                 arena,
@@ -300,85 +198,6 @@ export function createMatchSession({
     }
 
     return finalizeSession(consumePrewarmedArenaSessionIfMatch(renderer, sessionKey));
-}
-
-export function deriveMapResolutionFeedbackPlan({ mapResolution, portalsEnabled, arenaBuildResult = null }) {
-    const consoleEntries = [];
-    const toasts = [];
-
-    if (!mapResolution) {
-        return { consoleEntries, toasts };
-    }
-
-    if (mapResolution.error) {
-        consoleEntries.push({
-            level: 'warn',
-            args: ['[Game] Map loading fallback:', mapResolution.error],
-        });
-    }
-    if (Array.isArray(mapResolution.warnings) && mapResolution.warnings.length > 0) {
-        consoleEntries.push({
-            level: 'warn',
-            args: ['[Game] Map loading warnings:', mapResolution.warnings],
-        });
-    }
-    if (Array.isArray(arenaBuildResult?.glbLoadWarnings) && arenaBuildResult.glbLoadWarnings.length > 0) {
-        consoleEntries.push({
-            level: 'warn',
-            args: ['[Game] GLB map loading warnings:', arenaBuildResult.glbLoadWarnings],
-        });
-    }
-
-    if (mapResolution.isFallback && mapResolution.requestedMapKey === CUSTOM_MAP_KEY) {
-        toasts.push({
-            message: 'Custom-Map ungueltig, Standard-Map geladen',
-            durationMs: 2600,
-            tone: 'error',
-        });
-    } else if (mapResolution.isFallback) {
-        toasts.push({
-            message: `Map-Fallback aktiv: ${mapResolution.effectiveMapKey}`,
-            durationMs: 2200,
-            tone: 'error',
-        });
-    } else if (mapResolution.isCustom && Array.isArray(mapResolution.warnings) && mapResolution.warnings.length > 0) {
-        const extraCount = Math.max(0, mapResolution.warnings.length - 1);
-        const suffix = extraCount > 0 ? ` (+${extraCount} Hinweis(e) in Konsole)` : '';
-        toasts.push({
-            message: `Custom-Map Hinweis: ${mapResolution.warnings[0]}${suffix}`,
-            durationMs: 3600,
-            tone: 'info',
-        });
-    }
-    if (arenaBuildResult?.glbLoadError) {
-        toasts.push({
-            message: 'GLB-Map konnte nicht geladen werden, Box-Fallback aktiv',
-            durationMs: 2600,
-            tone: 'error',
-        });
-    }
-
-    if (mapResolution.isCustom && mapResolution.mapDocument && mapResolution.mapDefinition) {
-        const doc = mapResolution.mapDocument;
-        const runtimeObstacleCount = Array.isArray(mapResolution.mapDefinition.obstacles)
-            ? mapResolution.mapDefinition.obstacles.length
-            : 0;
-        const runtimePortalCount = Array.isArray(mapResolution.mapDefinition.portals)
-            ? mapResolution.mapDefinition.portals.length
-            : 0;
-        const runtimeGateCount = Array.isArray(mapResolution.mapDefinition.gates)
-            ? mapResolution.mapDefinition.gates.length
-            : 0;
-        if (runtimeObstacleCount === 0 && runtimePortalCount > 0 && runtimeGateCount === 0 && !portalsEnabled) {
-            toasts.push({
-                message: 'Custom-Map hat nur Portale, aber Portale sind im Menue deaktiviert.',
-                durationMs: 3400,
-                tone: 'error',
-            });
-        }
-    }
-
-    return { consoleEntries, toasts };
 }
 
 export function wireMatchSessionRuntime({

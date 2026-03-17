@@ -1,5 +1,11 @@
-import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality } from '../../core/renderer/ShadowQuality.js';
-import { DEFAULT_EVENT_PLAYLIST_ID } from './EventPlaylistCatalog.js';
+import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality } from '../../shared/contracts/ShadowQualityContract.js';
+import {
+    createMenuEventPlaylistStateDefaults,
+    createMenuLocalSettingsDefaults,
+    createMenuStartSetupDefaults,
+    createMenuTelemetryStateDefaults,
+    createMenuToolsStateDefaults,
+} from './MenuDefaultsEditorConfig.js';
 
 export const MENU_STATE_SCHEMA_VERSION = 'menu-state.v1';
 export const MATCH_SETTINGS_SCHEMA_VERSION = 'match-settings.v1';
@@ -70,12 +76,13 @@ function cloneObject(value, fallback = {}) {
 
 function normalizeEventPlaylistState(eventPlaylistState = null) {
     const source = eventPlaylistState && typeof eventPlaylistState === 'object' ? eventPlaylistState : {};
-    const activePlaylistId = normalizeString(source.activePlaylistId, DEFAULT_EVENT_PLAYLIST_ID);
+    const defaults = createMenuEventPlaylistStateDefaults();
+    const activePlaylistId = normalizeString(source.activePlaylistId, defaults.activePlaylistId);
     const nextIndex = Number.isFinite(Number(source.nextIndex)) ? Math.max(0, Math.floor(Number(source.nextIndex))) : 0;
     return {
         activePlaylistId,
         nextIndex,
-        lastPresetId: normalizeString(source.lastPresetId, ''),
+        lastPresetId: normalizeString(source.lastPresetId, defaults.lastPresetId),
     };
 }
 
@@ -102,35 +109,22 @@ export function createMenuContractState(contractState = null) {
 
 function normalizeLocalSettingsState(localSettings = null) {
     const source = localSettings && typeof localSettings === 'object' ? localSettings : {};
-    const ownerId = normalizeString(source.ownerId, 'owner');
+    const defaults = createMenuLocalSettingsDefaults();
+    const ownerId = normalizeString(source.ownerId, defaults.ownerId);
     const actorId = normalizeString(source.actorId, ownerId);
-    const requestedAccessMode = normalizeString(source.developerModeVisibility, MENU_DEVELOPER_ACCESS_MODES.OWNER_ONLY);
+    const requestedAccessMode = normalizeString(source.developerModeVisibility, defaults.developerModeVisibility);
     const developerModeVisibility = VALID_DEVELOPER_ACCESS_MODE_SET.has(requestedAccessMode)
         ? requestedAccessMode
-        : MENU_DEVELOPER_ACCESS_MODES.OWNER_ONLY;
-    const sessionType = normalizeSessionType(source.sessionType, MENU_SESSION_TYPES.SPLITSCREEN);
-    const modePath = normalizeModePath(source.modePath, MENU_MODE_PATHS.FIGHT);
-    const startSetup = cloneObject(source.startSetup, {
-        mapSearch: '',
-        mapFilter: 'all',
-        vehicleSearch: '',
-        vehicleFilter: 'all',
-    });
-    const toolsState = cloneObject(source.toolsState, {
-        level4Open: false,
-        activeSection: LEVEL4_SECTION_IDS.CONTROLS,
-    });
+        : defaults.developerModeVisibility;
+    const sessionType = normalizeSessionType(source.sessionType, defaults.sessionType);
+    const modePath = normalizeModePath(source.modePath, defaults.modePath);
+    const startSetup = cloneObject(source.startSetup, createMenuStartSetupDefaults());
+    const toolsState = cloneObject(source.toolsState, createMenuToolsStateDefaults());
     toolsState.activeSection = VALID_LEVEL4_SECTION_SET.has(String(toolsState.activeSection || '').trim())
         ? String(toolsState.activeSection || '').trim()
         : LEVEL4_SECTION_IDS.CONTROLS;
     const draftStateBySessionType = cloneObject(source.draftStateBySessionType, {});
-    const telemetryState = cloneObject(source.telemetryState, {
-        abortCount: 0,
-        backtrackCount: 0,
-        quickStartCount: 0,
-        startAttempts: 0,
-        lastEvents: [],
-    });
+    const telemetryState = cloneObject(source.telemetryState, createMenuTelemetryStateDefaults());
     const eventPlaylistState = normalizeEventPlaylistState(source.eventPlaylistState);
 
     return {
@@ -138,15 +132,15 @@ function normalizeLocalSettingsState(localSettings = null) {
         ownerId,
         actorId,
         developerModeVisibility,
-        developerModeEnabled: normalizeBoolean(source.developerModeEnabled, false),
-        developerThemeId: normalizeString(source.developerThemeId, 'classic-console'),
-        releasePreviewEnabled: normalizeBoolean(source.releasePreviewEnabled, false),
-        fixedPresetId: normalizeString(source.fixedPresetId, ''),
-        fixedPresetLockEnabled: normalizeBoolean(source.fixedPresetLockEnabled, false),
+        developerModeEnabled: normalizeBoolean(source.developerModeEnabled, defaults.developerModeEnabled),
+        developerThemeId: normalizeString(source.developerThemeId, defaults.developerThemeId),
+        releasePreviewEnabled: normalizeBoolean(source.releasePreviewEnabled, defaults.releasePreviewEnabled),
+        fixedPresetId: normalizeString(source.fixedPresetId, defaults.fixedPresetId),
+        fixedPresetLockEnabled: normalizeBoolean(source.fixedPresetLockEnabled, defaults.fixedPresetLockEnabled),
         sessionType,
         modePath,
-        themeMode: normalizeString(source.themeMode, 'dunkel').toLowerCase() === 'hell' ? 'hell' : 'dunkel',
-        shadowQuality: normalizeShadowQuality(source.shadowQuality, DEFAULT_SHADOW_QUALITY),
+        themeMode: normalizeString(source.themeMode, defaults.themeMode).toLowerCase() === 'hell' ? 'hell' : 'dunkel',
+        shadowQuality: normalizeShadowQuality(source.shadowQuality, defaults.shadowQuality || DEFAULT_SHADOW_QUALITY),
         startSetup,
         toolsState,
         draftStateBySessionType,

@@ -7,8 +7,9 @@ import { CONFIG } from '../core/Config.js';
 import { clamp } from '../utils/MathOps.js';
 
 export class CrosshairSystem {
-    constructor(game) {
-        this.game = game;
+    constructor(deps = {}) {
+        this.game = deps.game || null;
+        this.ports = deps.ports || null;
         this._tmpAimVec = new THREE.Vector3();
         this._tmpAimDir = new THREE.Vector3();
         this._tmpRollEuler = new THREE.Euler(0, 0, 0, 'YXZ');

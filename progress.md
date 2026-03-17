@@ -58,7 +58,56 @@
 - MG-Trail-Treffen erleichtert ueber Defaults in HUNT.MG (TRAIL_HIT_RADIUS=0.78, TRAIL_SAMPLE_STEP=0.45).
 - ProjectileSystem erweitert: Hunt-Raketen werden sichtbar groesser skaliert, erhalten vergroesserten Hit-Radius und robustes Homing mit periodischem Reacquire/Fallback auf naechstes Ziel.
 - Neuer Test T62 in tests/physics.spec.js prueft groessere Hunt-Rakete + Zielsuche.
+
+2026-03-17 (Planung: Menu Default Editor V42)
+- Nutzerwunsch aufgenommen: eine zentrale Datei, in der Menue-Voreinstellungen gebuendelt geaendert werden koennen.
+- Iststand geprueft: Defaults sind aktuell ueber `src/core/SettingsManager.js`, `src/ui/menu/MenuStateContracts.js`, `src/ui/menu/MenuPresetCatalog.js` und `src/ui/menu/MenuConfigShareOps.js` verteilt.
+- Plan erstellt: `docs/Feature_Menu_Default_Editor_V42.md`.
+- Masterplan erweitert: Intake-Eintrag `PX Menu Default Editor V42` plus gezielter Ownership-Hinweis fuer die neue Quelldatei.
+- Zielbild fuer spaetere Umsetzung: `src/ui/menu/MenuDefaultsEditorConfig.js` als Single Source fuer Session-, Gameplay-, Local-UI- und Preset-Defaults; kein separater HTML-Editor in Phase 1.
+
+2026-03-17 (Umsetzung: Menu Default Editor V42)
+- Neue zentrale Datei `src/ui/menu/MenuDefaultsEditorConfig.js` angelegt.
+- Rewire abgeschlossen:
+  - `src/core/SettingsManager.js`
+  - `src/ui/menu/MenuStateContracts.js`
+  - `src/ui/menu/MenuConfigShareOps.js`
+  - `src/ui/menu/MenuDraftStore.js`
+  - `src/ui/menu/MenuPresetCatalog.js`
+  - `src/ui/menu/EventPlaylistCatalog.js`
+  - `src/core/runtime/MenuRuntimeSessionService.js`
+- Neue direkte Regression in `tests/core.spec.js` koppelt Fixed-Preset- und Reset-Pfade an die zentrale Datei.
+- Gezielte Verifikation PASS:
+  - `T12b`
+  - `T20f`
+  - `T20o`
+  - `T20q`
+  - `T20s`
+  - `T20bb`
+  - `T20bc`
+  - `T74`
+  - `T77b`
+  - `T79`
+- Browser-Spotcheck PASS:
+  - `tmp/develop-web-game-v42/shot-0.png` zeigt Level-2-Menuepfad nach Klick auf `Single Player`.
+- Offener Repo-Blocker ausserhalb des Diffs:
+  - `npm run test:core` FAIL im bestehenden `T14: Alle Maps ladbar`.
+  - `npm run test:stress` FAIL im bestehenden `T71b: Showcase-Nexus startet mehrfach ohne Aircraft-Deko-Leaks`.
+  - `npm run build` FAIL wegen bestehendem Architektur-Lint in `src/core/config/maps/MapPresetCatalog.js` (`max-lines`, `627 > 500`).
 - Verifikation: npx playwright test tests/physics.spec.js -g T62 PASS; npm run test:physics PASS; npm run test:core PASS; npm run build PASS; docs:sync/check PASS.
+
+2026-03-17 (Follow-up: bestehende HUD-Timeouts + MapPresetCatalog-Lint)
+- Root Cause fuer `T14` und `T71b` verifiziert:
+  - `showcase_nexus` startet erfolgreich bis `state=PLAYING`, aber der GLB-Loading-UI-Pfad setzt `hudHidden=true`.
+  - `deriveRoundStartUiState()` hat das HUD danach nicht wieder eingeblendet; Folge: bestehende Tests warten auf ein HUD, das dauerhaft verborgen bleibt.
+  - Der beobachtete `returnToMenu`-Haenger in einem T14-Retry war ein Sekundaereffekt des 120s-Testtimeouts, nicht die Primaerursache.
+- Fix umgesetzt:
+  - `src/ui/MatchUiStateOps.js`: `deriveRoundStartUiState()` blendet das HUD explizit wieder ein.
+  - `src/core/config/maps/MapPresetCatalog.js` in Aggregator aufgeteilt; Daten liegen jetzt in `MapPresetCatalogBaseData.js` und `MapPresetCatalogExpertData.js`, damit der Architektur-Lint `max-lines` wieder eingehalten wird.
+- Gezielte Verifikation PASS:
+  - `npx playwright test tests/core.spec.js --grep "T14: Alle Maps ladbar" --workers=1`
+  - `npx playwright test tests/stress.spec.js --grep "T71b: Showcase-Nexus startet mehrfach ohne Aircraft-Deko-Leaks" --workers=1`
+- Nächster Schritt: geforderte Vollverifikation (`test:core`, `test:stress`, `build`, `docs:sync`, `docs:check`).
 
 
 2026-03-03 (Follow-up: Gegner-Trail vs eigener Trail bei MG)
@@ -1293,3 +1342,37 @@ Offene TODOs naechster Schritt:
   - `npm run docs:check` PASS (`updated=0`, `missing=0`, `legacy=0`, `mojibake=0`)
   - `npm run build` FAIL in bestehendem Architektur-Lint ausserhalb des Diffs: `src/core/config/maps/MapPresetCatalog.js` verletzt `max-lines` (627 > 500).
   - `TEST_PORT=5372 PW_RUN_TAG=crosshair-restart-core PW_OUTPUT_DIR=test-results/crosshair-restart-core PW_WORKERS=1 npm run test:core` FAIL weiter im bekannten Legacy-Test `T12b` (`mapKey expected maze, got mega_maze`); der neue Crosshair-Test lief gezielt separat gruen.
+2026-03-17 (V44 Architektur-Haertung und Boundary Guards abgeschlossen)
+- Skill `develop-web-game` aktiv; V44 wurde als One-Stop-Durchlauf ueber `44.0` bis `44.9` umgesetzt.
+- Architektur-/Boundary-Arbeit:
+  - Neue Scorecard- und Guard-Skripte unter `scripts/architecture/**`, `scripts/architecture-report.mjs`, `scripts/check-architecture-boundaries.mjs`, `scripts/check-architecture-metrics.mjs`, `tsconfig.architecture.json` und neue `package.json`-Kommandos fuer `architecture:guard`.
+  - Shared Contracts / Runtime-Ports nach `src/shared/**` verschoben; `GameStateIds`, `ShadowQuality`, Menu-Contracts und `runtimePorts` laufen nicht mehr ueber implizite Core-Abkuerzungen.
+  - `CONFIG` entmachtet ueber `src/core/runtime/ActiveRuntimeConfigStore.js`, `CONFIG_BASE`, Runtime-Snapshots und kompatible Clone-Pfade; Runtime-Code schreibt nicht mehr in globale Defaults.
+  - `UIManager`, `MatchFlowUiController`, `HudRuntimeSystem`, `CrosshairSystem`, `MatchSessionRuntimeBridge` und `RoundStateTickSystem` auf explizite `deps`/`ports` umgestellt; DOM-Refs nach `src/ui/dom/**` verschoben.
+  - `MatchSessionFactory` in `src/state/match-session/**` gesplittet; `EntityRuntimeAssembler` in Support-/System-/Compat-Assemblies zerlegt; `GameRuntimeFacade` nutzt jetzt eine feature-basierte Menu-Handler-Registry.
+- Zusatzfixes waehrend der Gates:
+  - Custom-Map-Runtime-Binding fuer authored GLB-/Spawn-Pfade korrigiert (`ArenaBuilder`, `Arena`, `MatchSessionFactory`), damit `T14c` und `T43b` wieder gruen laufen.
+  - `tests/helpers.js` fuer das Expert-Menue gehaertet.
+  - `src/core/GameLoop.js` Ringpuffer-/Accumulator-Reset korrigiert, damit die `T20ab`-Familie stabil bleibt.
+  - `tests/stress.spec.js` (`T75`) und `tests/gpu.spec.js` (`T31a`) an den neuen Runtime-/Shared-Contract-Stand angepasst.
+- Scorecard-Freeze 2026-03-17:
+  - `CONFIG writes=0`
+  - `constructor(game)=17` in `10` Dateien, `0` disallowed
+  - `DOM ausserhalb ui=41` in `9` Dateien, `0` disallowed
+  - `ui -> core=9`, `entities -> core=43`, jeweils `0` disallowed
+- Verifikation:
+  - `node scripts/architecture-report.mjs` PASS
+  - `npm run architecture:guard` PASS
+  - `npm run test:fast` PASS
+  - `npm run test:physics` PASS
+  - `npm run test:stress` PASS
+  - `npm run smoke:roundstate` PASS
+  - `npm run test:gpu` PASS
+  - `npm run build` PASS
+  - `npm run benchmark:baseline` PASS
+  - `npm run benchmark:lifecycle` PASS (`domToGameInstanceMs=10377`, `startMatchLatencyMs=4169`, `returnToMenuLatencyMs=98`)
+  - `npm run docs:sync` PASS
+  - `npm run docs:check` PASS
+- Ergebnis:
+  - V38-Restpunkte `38.3` und `38.9` sind in V44 absorbiert und im Masterplan geschlossen.
+  - V44 ist ohne offene fachliche Restpunkte abgeschlossen; verbleibende Groesse-Hotspots sind nur noch Scorecard-/Abbaukandidaten.

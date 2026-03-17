@@ -43,6 +43,9 @@ export class Arena {
         this.portalsEnabled = true;
         this.currentMapKey = 'standard';
         this.currentMapDefinition = null;
+        this.runtimeConfig = null;
+        this.runtimeMapKey = null;
+        this.runtimeMapDefinition = null;
         this.bounds = { minX: 0, maxX: 0, minY: 0, maxY: 0, minZ: 0, maxZ: 0 };
 
         this.particles = null;
@@ -140,6 +143,10 @@ export class Arena {
         if (buildContext.rebuildPolicy === 'reuse') {
             return buildContext;
         }
+
+        this._glbLoadError = null;
+        this._glbLoadWarnings = [];
+        this._clearLoadedGlbScene();
 
         let usedGlbModel = false;
         const finalizeBuild = () => {

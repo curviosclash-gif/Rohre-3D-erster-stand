@@ -1,16 +1,18 @@
-import { CONFIG } from './Config.js';
+import { CONFIG, CONFIG_BASE } from './Config.js';
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import {
     MenuController,
-    MENU_CONTROLLER_EVENT_CONTRACT_VERSION,
-    MENU_CONTROLLER_EVENT_TYPES,
 } from '../ui/MenuController.js';
+import {
+    MENU_CONTROLLER_EVENT_CONTRACT_VERSION,
+} from '../shared/contracts/MenuControllerContract.js';
 import { SETTINGS_CHANGE_KEYS } from '../ui/SettingsChangeKeys.js';
 import { guardMenuRuntimeEvent, resolveMenuAccessContext } from '../ui/menu/MenuAccessPolicy.js';
 import { MenuMultiplayerBridge } from '../ui/menu/MenuMultiplayerBridge.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
-import { GAME_STATE_IDS } from './runtime/GameStateIds.js';
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
+import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
 import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
 import {
     applyMenuPresetAction,
@@ -62,6 +64,7 @@ import {
     handleLevel4CloseAction,
     handleLevel4ResetAction,
 } from './runtime/MenuRuntimeSessionService.js';
+import { createMenuEventHandlerRegistry } from './runtime/menu-handlers/CreateMenuEventHandlerRegistry.js';
 
 const MATCH_SETTING_CHANGE_KEY_SET = new Set([
     SETTINGS_CHANGE_KEYS.MODE,
@@ -99,10 +102,12 @@ const START_VALIDATION_RELEVANT_KEY_SET = new Set([
 ]);
 
 export class GameRuntimeFacade {
-    constructor(game) {
-        this.game = game || null;
+    constructor(deps = {}) {
+        this.game = deps.game || null;
+        this.ports = deps.ports || null;
         this.menuMultiplayerBridge = null;
         this._matchPrewarmTimer = null;
+        this._menuEventHandlers = createMenuEventHandlerRegistry(this);
     }
 
     _clearMatchPrewarmTimer() {
@@ -148,8 +153,8 @@ export class GameRuntimeFacade {
         game.mapKey = game.runtimeConfig.session.mapKey;
         game.winsNeeded = game.runtimeConfig.session.winsNeeded;
         game.activeGameMode = game.runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC;
-
-        applyRuntimeConfigCompatibility(game.runtimeConfig, CONFIG);
+        game.config = applyRuntimeConfigCompatibility(game.runtimeConfig, CONFIG_BASE);
+        setActiveRuntimeConfig(game.config);
 
         if (game.arena && game.arena.toggleBeams) {
             game.arena.toggleBeams(game.runtimeConfig.gameplay.portalBeams);
@@ -263,160 +268,9 @@ export class GameRuntimeFacade {
             return;
         }
 
-        switch (event.type) {
-            case MENU_CONTROLLER_EVENT_TYPES.SETTINGS_CHANGED:
-                this.onSettingsChanged(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.SESSION_TYPE_CHANGE:
-                this.handleSessionTypeChange(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.MODE_PATH_CHANGE:
-                this.handleModePathChange(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_LAST_START:
-                this.handleQuickStartLastStart();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_EVENT_PLAYLIST_START:
-                this.handleQuickStartEventPlaylistStart();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_RANDOM_START:
-                this.handleQuickStartRandomStart();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.LEVEL3_RESET:
-                this.handleLevel3Reset();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.LEVEL4_OPEN:
-                this.handleLevel4Open();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.LEVEL4_CLOSE:
-                this.handleLevel4Close();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.LEVEL4_RESET:
-                this.handleLevel4Reset();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.CONFIG_EXPORT_CODE:
-                this.handleConfigExportCode();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.CONFIG_EXPORT_JSON:
-                this.handleConfigExportJson();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.CONFIG_IMPORT:
-                this.handleConfigImport(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.START_MATCH:
-                this.startMatch();
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.PRESET_APPLY:
-                this.applyMenuPreset(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.PRESET_SAVE_OPEN:
-                this.saveMenuPreset(event, 'open');
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.PRESET_SAVE_FIXED:
-                this.saveMenuPreset(event, 'fixed');
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.PRESET_DELETE:
-                this.deleteMenuPreset(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.MULTIPLAYER_HOST:
-                this.handleMultiplayerHost(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.MULTIPLAYER_JOIN:
-                this.handleMultiplayerJoin(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.MULTIPLAYER_READY_TOGGLE:
-                this.handleMultiplayerReadyToggle(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_MODE_TOGGLE:
-                this.handleDeveloperModeToggle(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_THEME_CHANGE:
-                this.handleDeveloperThemeChange(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_VISIBILITY_CHANGE:
-                this.handleDeveloperVisibilityChange(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_FIXED_PRESET_LOCK_TOGGLE:
-                this.handleDeveloperFixedPresetLockToggle(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_ACTOR_CHANGE:
-                this.handleDeveloperActorChange(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_RELEASE_PREVIEW_TOGGLE:
-                this.handleDeveloperReleasePreviewToggle(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TEXT_OVERRIDE_SET:
-                this.handleDeveloperTextOverrideSet(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TEXT_OVERRIDE_CLEAR:
-                this.handleDeveloperTextOverrideClear(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RESET:
-                this.handleDeveloperTrainingReset(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_STEP:
-                this.handleDeveloperTrainingStep(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_AUTO_STEP:
-                this.handleDeveloperTrainingAutoStep(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RUN_BATCH:
-                this.handleDeveloperTrainingRunBatch(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RUN_EVAL:
-                this.handleDeveloperTrainingRunEval(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DEVELOPER_TRAINING_RUN_GATE:
-                this.handleDeveloperTrainingRunGate(event);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.START_KEY_CAPTURE:
-                game.keybindEditorController.startKeyCapture(event.player, event.action);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.PROFILE_UI_STATE_SYNC:
-                if (typeof event.selectedName === 'string') {
-                    game.selectedProfileName = event.selectedName;
-                }
-                if (event.fullRefresh) {
-                    game._syncProfileControls();
-                } else {
-                    game._syncProfileActionState();
-                }
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.SAVE_PROFILE:
-                game._saveProfile(event.name);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.LOAD_PROFILE:
-                game._loadProfile(event.name);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DELETE_PROFILE:
-                game._deleteProfile(event.name);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.DUPLICATE_PROFILE:
-                game._duplicateProfile(event.sourceName, event.targetName);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.EXPORT_PROFILE:
-                game._exportProfile(event.name);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.IMPORT_PROFILE:
-                game._importProfile(event.inputValue, event.targetName);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.SET_DEFAULT_PROFILE:
-                game._setDefaultProfile(event.name);
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.RESET_KEYS:
-                game.settings.controls = game.settingsManager.cloneDefaultControls();
-                this.onSettingsChanged();
-                game._showStatusToast('✅ Standard-Tasten wiederhergestellt');
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.SAVE_KEYS:
-                game._saveSettings();
-                game._showStatusToast('Einstellungen gespeichert');
-                return;
-            case MENU_CONTROLLER_EVENT_TYPES.SHOW_STATUS_TOAST:
-                game._showStatusToast(event.message, event.duration, event.tone);
-                return;
-            default:
-                return;
+        const handler = this._menuEventHandlers.get(event.type);
+        if (typeof handler === 'function') {
+            handler(event);
         }
     }
 
@@ -693,6 +547,69 @@ export class GameRuntimeFacade {
             game: this.game,
             event,
         });
+    }
+
+    startKeyCapture(event) {
+        this.game?.keybindEditorController?.startKeyCapture?.(event?.player, event?.action);
+    }
+
+    syncProfileUiState(event) {
+        const game = this.game;
+        if (typeof event?.selectedName === 'string') {
+            game.selectedProfileName = event.selectedName;
+        }
+        if (event?.fullRefresh) {
+            game._syncProfileControls({
+                forceMirrorProfileNameInput: true,
+                preferredProfileName: event.selectedName,
+            });
+            return;
+        }
+        game._syncProfileActionState();
+    }
+
+    saveProfile(event) {
+        this.game?._saveProfile?.(event?.name);
+    }
+
+    loadProfile(event) {
+        this.game?._loadProfile?.(event?.name);
+    }
+
+    deleteProfile(event) {
+        this.game?._deleteProfile?.(event?.name);
+    }
+
+    duplicateProfile(event) {
+        this.game?._duplicateProfile?.(event?.sourceName, event?.targetName);
+    }
+
+    exportProfile(event) {
+        this.game?._exportProfile?.(event?.name);
+    }
+
+    importProfile(event) {
+        this.game?._importProfile?.(event?.inputValue, event?.targetName);
+    }
+
+    setDefaultProfile(event) {
+        this.game?._setDefaultProfile?.(event?.name);
+    }
+
+    resetKeys() {
+        const game = this.game;
+        game.settings.controls = game.settingsManager.cloneDefaultControls();
+        this.onSettingsChanged();
+        game._showStatusToast('✅ Standard-Tasten wiederhergestellt');
+    }
+
+    saveKeys() {
+        this.game?._saveSettings?.();
+        this.game?._showStatusToast?.('Einstellungen gespeichert');
+    }
+
+    showStatusToast(event) {
+        this.game?._showStatusToast?.(event?.message, event?.duration, event?.tone);
     }
 
     _resolveStartValidationIssue() {

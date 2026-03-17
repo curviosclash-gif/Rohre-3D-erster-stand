@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-03-16
+Stand: 2026-03-17
 
 ## 1. Architekturparadigma
 
@@ -55,6 +55,7 @@ Stand: 2026-03-16
 - `UISettingsSyncMap.js`: Zuordnung `changedKey -> UI-Sync-Teilfunktion`
 - `SettingsChangeKeys.js`, `SettingsChangeSetOps.js`: stabiler Key-Vertrag und Set-Operationen fuer Event-Coalescing
 - `MenuController.js`: emittiert typisierte `SETTINGS_CHANGED`-Payloads und coalesct `input`-Storms pro Frame
+- `menu/MenuDefaultsEditorConfig.js`: zentrale Datenquelle fuer Menue-Basisdefaults, Local-UI-Defaults, Level-3-Reset und Fixed-Preset-Seeds
 - `SettingsStore.js`, `Profile*Ops.js`, `MatchUiStateOps.js`
 
 ### 2.5 Hunt (`src/hunt`)

@@ -1,4 +1,3 @@
-import { CONFIG } from '../core/Config.js';
 import {
     derivePauseTransition,
     deriveResumeTransition,
@@ -6,9 +5,10 @@ import {
 } from '../state/MatchLifecycleStateTransitions.js';
 
 export class PauseOverlayController {
-    constructor(matchFlowUiController) {
-        this.matchFlowUiController = matchFlowUiController;
-        this.game = matchFlowUiController.game;
+    constructor(deps = {}) {
+        this.matchFlowUiController = deps.matchFlowUiController;
+        this.game = deps.game || this.matchFlowUiController?.game || null;
+        this.ports = deps.ports || null;
         this._listenersInitialized = false;
     }
 
@@ -57,7 +57,7 @@ export class PauseOverlayController {
         const pauseTransition = derivePauseTransition();
         controller.applyLifecycleTransition(pauseTransition);
         controller.applyMatchUiState(pauseTransition.uiState);
-        this.game.input?.clearJustPressed?.();
+        this.ports?.inputPort?.clearJustPressed?.();
         this._hideSettings();
     }
 
@@ -76,18 +76,17 @@ export class PauseOverlayController {
         const returnTransition = deriveReturnToMenuTransition();
         this._hideSettings();
         controller.applyLifecycleTransition(returnTransition);
-        game.entityManager?.clearLastRoundGhost?.();
-        controller.sessionOrchestrator.teardownMatchSession();
+        this.ports?.sessionPort?.clearLastRoundGhost?.();
+        this.ports?.sessionPort?.teardownMatchSession?.();
         controller.applyMatchUiState(returnTransition.uiState);
         controller.resetCrosshairUi();
 
-        const navRuntime = game.uiManager?.menuNavigationRuntime;
-        if (navRuntime?.showPanel) {
-            navRuntime.showPanel('submenu-game', { trigger: 'pause_menu_return' });
+        if (this.ports?.uiFeedbackPort?.showMenuPanel) {
+            this.ports.uiFeedbackPort.showMenuPanel('submenu-game', { trigger: 'pause_menu_return' });
         } else {
             game._showMainNav();
         }
-        game.uiManager.syncAll();
+        this.ports?.uiFeedbackPort?.syncAll?.();
     }
 
     _setupKeybindClickHandlers() {
@@ -96,7 +95,7 @@ export class PauseOverlayController {
             if (game.state !== 'PAUSED') return;
             const button = event.target.closest('button.keybind-btn');
             if (!button) return;
-            game.keybindEditorController.startKeyCapture(playerKey, button.dataset.action);
+            this.ports?.inputPort?.startKeyCapture?.(playerKey, button.dataset.action);
         };
 
         if (game.ui.pauseKeybindP1) {
@@ -113,13 +112,7 @@ export class PauseOverlayController {
             game.ui.pauseAutoRollToggle.addEventListener('change', () => {
                 if (game.state !== 'PAUSED') return;
                 const checked = !!game.ui.pauseAutoRollToggle.checked;
-                game.settings.autoRoll = checked;
-                if (game.runtimeConfig?.player) {
-                    game.runtimeConfig.player.autoRoll = checked;
-                }
-                if (CONFIG?.PLAYER) {
-                    CONFIG.PLAYER.AUTO_ROLL = checked;
-                }
+                this.ports?.settingsPort?.applyAutoRoll?.(checked);
             });
         }
         if (game.ui.pauseInvertP1) {

@@ -4,13 +4,14 @@
 
 import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
+import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 
 const UNIT_CYLINDER_GEOMETRY = new THREE.CylinderGeometry(1, 1, 1, 4);
 const UP_AXIS = new THREE.Vector3(0, 1, 0);
 const DUMMY = new THREE.Object3D();
 
 function getTrailSegmentHp() {
-    const configured = Number(CONFIG?.HUNT?.TRAIL_SEGMENT_HP);
+    const configured = Number(getActiveRuntimeConfig(CONFIG)?.HUNT?.TRAIL_SEGMENT_HP);
     if (!Number.isFinite(configured) || configured <= 0) {
         return 3;
     }
@@ -19,6 +20,7 @@ function getTrailSegmentHp() {
 
 export class Trail {
     constructor(renderer, color, playerIndex, entityManager = null) {
+        const config = getActiveRuntimeConfig(CONFIG);
         this.renderer = renderer;
         this.color = color;
         this.playerIndex = playerIndex;
@@ -28,7 +30,7 @@ export class Trail {
             : null;
 
         // Ring Buffer Logic
-        this.maxSegments = CONFIG.TRAIL.MAX_SEGMENTS || 1400;
+        this.maxSegments = config.TRAIL.MAX_SEGMENTS || 1400;
         this.writeIndex = 0;
         this.segmentCount = 0;
         this._dirty = false;
@@ -41,7 +43,7 @@ export class Trail {
         this.lastZ = 0;
         this.inGap = false;
         this.gapTimer = 0;
-        this.width = CONFIG.TRAIL.WIDTH;
+        this.width = config.TRAIL.WIDTH;
         this._tmpDir = new THREE.Vector3();
 
         // Material
@@ -77,7 +79,7 @@ export class Trail {
     }
 
     resetWidth() {
-        this.width = CONFIG.TRAIL.WIDTH;
+        this.width = getActiveRuntimeConfig(CONFIG).TRAIL.WIDTH;
     }
 
     forceGap(duration = 0.5) {
@@ -87,6 +89,7 @@ export class Trail {
     }
 
     update(dt, position, direction) {
+        const config = getActiveRuntimeConfig(CONFIG);
         if (this.inGap) {
             this.gapTimer -= dt;
             if (this.gapTimer <= 0) {
@@ -98,12 +101,12 @@ export class Trail {
 
         this.timeSinceUpdate += dt;
 
-        if (this.timeSinceUpdate >= CONFIG.TRAIL.UPDATE_INTERVAL) {
-            this.timeSinceUpdate -= CONFIG.TRAIL.UPDATE_INTERVAL;
+        if (this.timeSinceUpdate >= config.TRAIL.UPDATE_INTERVAL) {
+            this.timeSinceUpdate -= config.TRAIL.UPDATE_INTERVAL;
 
-            if (Math.random() < CONFIG.TRAIL.GAP_CHANCE) {
+            if (Math.random() < config.TRAIL.GAP_CHANCE) {
                 this.inGap = true;
-                this.gapTimer = CONFIG.TRAIL.GAP_DURATION;
+                this.gapTimer = config.TRAIL.GAP_DURATION;
                 this._setLastPosition(position);
                 return;
             }

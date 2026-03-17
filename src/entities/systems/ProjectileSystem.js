@@ -4,6 +4,7 @@
 
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
+import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
 import { isRocketTierType } from '../../hunt/RocketPickupSystem.js';
 import { ProjectileStatePool } from './projectile/ProjectileStatePool.js';
@@ -67,6 +68,7 @@ export class ProjectileSystem {
     }
 
     shootItemProjectile(player, preferredIndex = -1) {
+        const config = getActiveRuntimeConfig(CONFIG);
         if ((player.shootCooldown || 0) > 0) {
             return { ok: false, reason: `Schuss bereit in ${player.shootCooldown.toFixed(1)}s` };
         }
@@ -77,7 +79,7 @@ export class ProjectileSystem {
         }
 
         const type = itemResult.type;
-        const power = CONFIG.POWERUP.TYPES[type];
+        const power = config.POWERUP.TYPES[type];
         if (!power) {
             return { ok: false, reason: 'Item ungueltig' };
         }
@@ -87,15 +89,15 @@ export class ProjectileSystem {
         const collisionRadiusMultiplier = huntRocket
             ? Math.max(1, Number(huntRocketConfig.COLLISION_RADIUS_MULTIPLIER || 1.65))
             : 1;
-        const baseTurnRate = Math.max(0.1, Number(CONFIG?.HOMING?.TURN_RATE || 3));
+        const baseTurnRate = Math.max(0.1, Number(config?.HOMING?.TURN_RATE || 3));
         const homingTurnRate = huntRocket
             ? Math.max(baseTurnRate, Number(huntRocketConfig.HOMING_TURN_RATE || 6.2))
             : baseTurnRate;
-        const baseLockOnAngle = Math.max(5, Number(CONFIG?.HOMING?.LOCK_ON_ANGLE || 15));
+        const baseLockOnAngle = Math.max(5, Number(config?.HOMING?.LOCK_ON_ANGLE || 15));
         const homingLockOnAngle = huntRocket
             ? Math.max(baseLockOnAngle, Number(huntRocketConfig.HOMING_LOCK_ON_ANGLE || 32))
             : baseLockOnAngle;
-        const baseHomingRange = Math.max(10, Number(CONFIG?.HOMING?.MAX_LOCK_RANGE || 100));
+        const baseHomingRange = Math.max(10, Number(config?.HOMING?.MAX_LOCK_RANGE || 100));
         const homingRange = huntRocket
             ? Math.max(baseHomingRange, Number(huntRocketConfig.HOMING_RANGE || 130))
             : baseHomingRange;
@@ -106,8 +108,8 @@ export class ProjectileSystem {
         player.getAimDirection(this._tmpDir).normalize();
         this._tmpVec.copy(player.position).addScaledVector(this._tmpDir, 2.2);
 
-        const speed = CONFIG.PROJECTILE.SPEED;
-        const radius = CONFIG.PROJECTILE.RADIUS;
+        const speed = config.PROJECTILE.SPEED;
+        const radius = config.PROJECTILE.RADIUS;
         const rocketGroup = this._acquireProjectileMesh(type, power.color);
         rocketGroup.scale.setScalar(visualScale);
         rocketGroup.position.copy(this._tmpVec);
@@ -125,7 +127,7 @@ export class ProjectileSystem {
         projectile.position.copy(this._tmpVec);
         projectile.velocity.copy(this._tmpDir).multiplyScalar(speed);
         projectile.radius = radius * collisionRadiusMultiplier;
-        projectile.ttl = CONFIG.PROJECTILE.LIFE_TIME;
+        projectile.ttl = config.PROJECTILE.LIFE_TIME;
         projectile.traveled = 0;
         projectile.homingTurnRate = homingTurnRate;
         projectile.homingLockOnAngle = homingLockOnAngle;
@@ -140,7 +142,7 @@ export class ProjectileSystem {
         projectile.foamBounceCooldown = 0;
         this.projectiles.push(projectile);
 
-        player.shootCooldown = CONFIG.PROJECTILE.COOLDOWN;
+        player.shootCooldown = config.PROJECTILE.COOLDOWN;
         this.onShoot(player, type, projectile);
         return { ok: true, type };
     }

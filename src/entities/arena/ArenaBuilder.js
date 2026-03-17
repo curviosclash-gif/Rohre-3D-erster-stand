@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
+import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import { ArenaGeometryCompilePipeline } from './ArenaGeometryCompilePipeline.js';
 import { createArenaBuildSignature, createArenaMapFingerprint, getArenaMaterialBundle } from './ArenaBuildResourceCache.js';
 
@@ -15,10 +16,11 @@ export class ArenaBuilder {
     }
 
     build(mapKey, { previousBuildSignature = null } = {}) {
+        const config = getActiveRuntimeConfig(CONFIG);
         const mapResolution = this._resolveMapDefinition(mapKey);
         this.arena.currentMapKey = mapResolution.currentMapKey;
 
-        const scale = asPositiveScale(CONFIG.ARENA.MAP_SCALE, 1);
+        const scale = asPositiveScale(config.ARENA.MAP_SCALE, 1);
         const size = this._resolveScaledMapSize(mapResolution.map, mapResolution.fallbackMap, scale);
         this._applyArenaBounds(size);
 
@@ -30,9 +32,9 @@ export class ArenaBuilder {
             sy: size.sy,
             sz: size.sz,
             portalsEnabled: this.arena.portalsEnabled,
-            planarMode: !!CONFIG.GAMEPLAY.PLANAR_MODE,
-            portalCount: CONFIG.GAMEPLAY.PORTAL_COUNT,
-            planarLevelCount: CONFIG.GAMEPLAY.PLANAR_LEVEL_COUNT,
+            planarMode: !!config.GAMEPLAY.PLANAR_MODE,
+            portalCount: config.GAMEPLAY.PORTAL_COUNT,
+            planarLevelCount: config.GAMEPLAY.PLANAR_LEVEL_COUNT,
         });
         const canReuse = previousBuildSignature
             && previousBuildSignature === buildSignature
@@ -93,15 +95,24 @@ export class ArenaBuilder {
     }
 
     _resolveMapDefinition(mapKey) {
-        const fallbackMap = CONFIG.MAPS.standard || Object.values(CONFIG.MAPS || {})[0] || {
+        const config = getActiveRuntimeConfig(CONFIG);
+        const runtimeMapKey = typeof this.arena.runtimeMapKey === 'string'
+            ? this.arena.runtimeMapKey
+            : null;
+        const runtimeMap = this.arena.runtimeMapDefinition;
+        const fallbackMap = config.MAPS.standard || Object.values(config.MAPS || {})[0] || {
             name: 'Fallback Map',
             size: [80, 30, 80],
             obstacles: [],
             portals: [],
         };
-        const hasRequestedMap = typeof mapKey === 'string' && !!CONFIG.MAPS[mapKey];
-        const map = hasRequestedMap ? CONFIG.MAPS[mapKey] : fallbackMap;
-        const currentMapKey = hasRequestedMap ? mapKey : 'standard';
+        const hasRuntimeMap = typeof mapKey === 'string'
+            && runtimeMapKey === mapKey
+            && runtimeMap
+            && typeof runtimeMap === 'object';
+        const hasRequestedMap = typeof mapKey === 'string' && !!config.MAPS[mapKey];
+        const map = hasRuntimeMap ? runtimeMap : (hasRequestedMap ? config.MAPS[mapKey] : fallbackMap);
+        const currentMapKey = hasRuntimeMap || hasRequestedMap ? mapKey : 'standard';
         return { map, fallbackMap, currentMapKey };
     }
 

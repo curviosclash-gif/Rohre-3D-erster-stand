@@ -5,8 +5,8 @@
 import { deriveRoundEndCountdownUiState } from '../ui/MatchUiStateOps.js';
 
 export class RoundStateTickSystem {
-    constructor(game) {
-        this.game = game;
+    constructor(deps = {}) {
+        this.game = deps.game || null;
     }
 
     _executeRoundStateTickAction(action) {

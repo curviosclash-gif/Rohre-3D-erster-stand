@@ -5,8 +5,9 @@
 import { CONFIG } from '../core/Config.js';
 
 export class HudRuntimeSystem {
-    constructor(game) {
-        this.game = game;
+    constructor(deps = {}) {
+        this.game = deps.game || null;
+        this.ports = deps.ports || null;
         this._hudP2Visible = null;
         this._fighterHudTimer = 0;
     }
@@ -75,6 +76,10 @@ export class HudRuntimeSystem {
     _setHudP2Visibility(isVisible) {
         if (this._hudP2Visible === isVisible) return;
         this._hudP2Visible = isVisible;
+        if (this.ports?.uiFeedbackPort?.toggleP2Hud) {
+            this.ports.uiFeedbackPort.toggleP2Hud(isVisible);
+            return;
+        }
         this.game.hudP2.setVisibility(isVisible);
     }
 

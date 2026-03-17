@@ -156,8 +156,16 @@ test.describe('T21-40: Rendering & GPU', () => {
         await loadGame(page);
         await openLevel4Drawer(page, { section: 'gameplay' });
 
-        await expect(page.locator('#shadow-quality-slider')).toHaveValue('2');
-        await expect(page.locator('#shadow-quality-label')).toHaveText('Mittel');
+        const expectedDefaultShadowQuality = await page.evaluate(async () => {
+            const mod = await import('/src/shared/contracts/ShadowQualityContract.js');
+            return {
+                value: String(mod.DEFAULT_SHADOW_QUALITY),
+                label: mod.resolveShadowQualityLabel(mod.DEFAULT_SHADOW_QUALITY),
+            };
+        });
+
+        await expect(page.locator('#shadow-quality-slider')).toHaveValue(expectedDefaultShadowQuality.value);
+        await expect(page.locator('#shadow-quality-label')).toHaveText(expectedDefaultShadowQuality.label);
 
         await page.evaluate(() => {
             const slider = document.getElementById('shadow-quality-slider');

@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-03-13",
+  "generatedAt": "2026-03-17",
   "baseline": {
     "sourceReportPath": "data/bot_validation_report.json",
-    "sourceGeneratedAt": "2026-03-13",
+    "sourceGeneratedAt": "2026-03-16",
     "roundsPerScenario": 4,
     "matrix": [
       {
@@ -75,28 +75,28 @@
         "expectedPolicyType": "rule-based"
       },
       "metrics": {
-        "rounds": 5,
-        "botWinRate": 1,
+        "rounds": 4,
+        "botWinRate": 0.25,
         "stuckEvents": 0,
-        "averageBotSurvival": 37.23923944702401,
-        "fpsAverage": 38.94123563829034,
-        "drawCallsAverage": 19.5,
-        "performanceSamples": 6
+        "averageBotSurvival": 28.214187178788052,
+        "fpsAverage": 44.26405088911124,
+        "drawCallsAverage": 10,
+        "performanceSamples": 10
       },
       "performance": {
-        "sampleCount": 6,
-        "fpsAverage": 38.94123563829034,
-        "drawCallsAverage": 19.5,
-        "fpsMin": 34,
-        "fpsMax": 43.225806451612904,
-        "drawCallsMin": 6,
-        "drawCallsMax": 31,
-        "observedDurationMs": 13080
+        "sampleCount": 10,
+        "fpsAverage": 44.26405088911124,
+        "drawCallsAverage": 10,
+        "fpsMin": 37.142857142857146,
+        "fpsMax": 48.36363636363637,
+        "drawCallsMin": 10,
+        "drawCallsMax": 10,
+        "observedDurationMs": 8134
       },
       "sourceRunner": {
-        "forcedRounds": 4,
-        "timeoutRounds": 4,
-        "elapsedMs": 166361
+        "forcedRounds": 1,
+        "timeoutRounds": 1,
+        "elapsedMs": 119167
       }
     },
     {
@@ -114,27 +114,27 @@
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 1,
+        "botWinRate": 0.25,
         "stuckEvents": 0,
-        "averageBotSurvival": 22.99222493171692,
-        "fpsAverage": 55.168698747084235,
-        "drawCallsAverage": 20,
-        "performanceSamples": 5
+        "averageBotSurvival": 27.4165001594738,
+        "fpsAverage": 50.9659469545515,
+        "drawCallsAverage": 55.333333333333336,
+        "performanceSamples": 9
       },
       "performance": {
-        "sampleCount": 5,
-        "fpsAverage": 55.168698747084235,
-        "drawCallsAverage": 20,
-        "fpsMin": 53.168698747084235,
-        "fpsMax": 55.8353654137509,
-        "drawCallsMin": 20,
-        "drawCallsMax": 20,
-        "observedDurationMs": 8701
+        "sampleCount": 9,
+        "fpsAverage": 50.9659469545515,
+        "drawCallsAverage": 55.333333333333336,
+        "fpsMin": 48.299280287884834,
+        "fpsMax": 53.63261362121817,
+        "drawCallsMin": 50,
+        "drawCallsMax": 58,
+        "observedDurationMs": 8856
       },
       "sourceRunner": {
         "forcedRounds": 1,
         "timeoutRounds": 1,
-        "elapsedMs": 111404
+        "elapsedMs": 119926
       }
     },
     {
@@ -152,27 +152,27 @@
       },
       "metrics": {
         "rounds": 4,
-        "botWinRate": 1,
+        "botWinRate": 0.75,
         "stuckEvents": 0,
-        "averageBotSurvival": 33.277000222771676,
-        "fpsAverage": 48.133782792452664,
-        "drawCallsAverage": 83.27272727272727,
-        "performanceSamples": 11
+        "averageBotSurvival": 37.99038276190671,
+        "fpsAverage": 55.30660379374823,
+        "drawCallsAverage": 35.88235294117647,
+        "performanceSamples": 17
       },
       "performance": {
-        "sampleCount": 11,
-        "fpsAverage": 48.133782792452664,
-        "drawCallsAverage": 83.27272727272727,
-        "fpsMin": 47.66373277541368,
-        "fpsMax": 49.828367321057804,
-        "drawCallsMin": 44,
-        "drawCallsMax": 92,
-        "observedDurationMs": 8476
+        "sampleCount": 17,
+        "fpsAverage": 55.30660379374823,
+        "drawCallsAverage": 35.88235294117647,
+        "fpsMin": 55.267388107473714,
+        "fpsMax": 55.93405477414038,
+        "drawCallsMin": 22,
+        "drawCallsMax": 38,
+        "observedDurationMs": 8304
       },
       "sourceRunner": {
         "forcedRounds": 3,
         "timeoutRounds": 3,
-        "elapsedMs": 138425
+        "elapsedMs": 165039
       }
     },
     {
@@ -192,46 +192,46 @@
         "rounds": 4,
         "botWinRate": 0.75,
         "stuckEvents": 0,
-        "averageBotSurvival": 32.1675756317145,
-        "fpsAverage": 49.73790095107285,
-        "drawCallsAverage": 36.4,
-        "performanceSamples": 10
+        "averageBotSurvival": 34.01276223982768,
+        "fpsAverage": 54.21044007406653,
+        "drawCallsAverage": 45,
+        "performanceSamples": 11
       },
       "performance": {
-        "sampleCount": 10,
-        "fpsAverage": 49.73790095107285,
-        "drawCallsAverage": 36.4,
-        "fpsMin": 49.67123428440619,
-        "fpsMax": 50.337900951072854,
-        "drawCallsMin": 35,
-        "drawCallsMax": 38,
-        "observedDurationMs": 10480
+        "sampleCount": 11,
+        "fpsAverage": 54.21044007406653,
+        "drawCallsAverage": 45,
+        "fpsMin": 52.7342245439022,
+        "fpsMax": 55.10161085320803,
+        "drawCallsMin": 45,
+        "drawCallsMax": 45,
+        "observedDurationMs": 9135
       },
       "sourceRunner": {
-        "forcedRounds": 2,
-        "timeoutRounds": 2,
-        "elapsedMs": 137070
+        "forcedRounds": 3,
+        "timeoutRounds": 3,
+        "elapsedMs": 140447
       }
     }
   ],
   "overall": {
-    "rounds": 17,
-    "botWinRate": 0.9411764705882353,
+    "rounds": 16,
+    "botWinRate": 0.5,
     "stuckEvents": 0,
-    "averageBotSurvival": 31.761376492937202,
-    "fpsAverage": 48.010672743527216,
-    "drawCallsAverage": 46.78125,
-    "performanceSamples": 32
+    "averageBotSurvival": 31.908458084999058,
+    "fpsAverage": 51.869385889160164,
+    "drawCallsAverage": 36.234042553191486,
+    "performanceSamples": 47
   },
   "sourceRunner": {
-    "forcedRounds": 10,
-    "timeoutRounds": 10,
+    "forcedRounds": 8,
+    "timeoutRounds": 8,
     "failOnForcedRound": false,
     "maxForcedRounds": 9007199254740991
   },
   "paths": {
     "json": "data/performance_ki_baseline_report.json",
     "sourceJson": "data/bot_validation_report.json",
-    "doc": "docs/Testergebnisse_2026-03-13.md"
+    "doc": "docs/Testergebnisse_2026-03-17.md"
   }
 }

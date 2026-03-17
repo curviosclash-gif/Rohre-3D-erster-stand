@@ -120,13 +120,39 @@ export async function openExpertSubmenu(page) {
     }
     const level4DrawerVisible = await page.locator('#submenu-level4:not(.hidden)').count();
     if (level4DrawerVisible) {
-        await page.click('#btn-close-level4');
-        await page.waitForFunction(() => {
+        const closeDrawer = async () => {
             const drawer = document.getElementById('submenu-level4');
-            return !!drawer && drawer.classList.contains('hidden');
-        }, null, { timeout: 4000 });
+            if (!drawer || drawer.classList.contains('hidden')) return true;
+            window.GAME_INSTANCE?.uiManager?.setLevel4Open?.(false);
+            return !!drawer.classList.contains('hidden');
+        };
+        const closeButton = page.locator('#btn-close-level4').first();
+        if (await closeButton.count()) {
+            await closeButton.click({ force: true }).catch(() => {});
+        }
+        const drawerHiddenAfterClick = await page.evaluate(closeDrawer);
+        if (!drawerHiddenAfterClick) {
+            await page.waitForFunction(closeDrawer, null, { timeout: 4000 });
+        }
     }
-    await page.click('#btn-open-expert');
+    const expertButton = page.locator('#btn-open-expert').first();
+    if (await expertButton.count()) {
+        await expertButton.waitFor({ state: 'visible', timeout: 4000 });
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+            await expertButton.click({ force: true });
+            const panelVisible = await expertPanel.isVisible().catch(() => false);
+            if (panelVisible) return;
+            try {
+                await openViaNavigationRuntime(page, 'submenu-expert');
+                return;
+            } catch {
+                await page.waitForTimeout(150 * (attempt + 1));
+            }
+        }
+    } else {
+        await openViaNavigationRuntime(page, 'submenu-expert');
+        return;
+    }
     await page.waitForSelector('#submenu-expert:not(.hidden)', { timeout: 4000 });
 }
 
@@ -278,14 +304,28 @@ export async function startHuntGameWithBots(page, botCount = 1) {
 
 // Press ESC and wait for main menu.
 export async function returnToMenu(page) {
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-        await page.keyboard.press('Escape');
-        const menuVisible = await page.evaluate(() => {
-            const mainMenu = document.getElementById('main-menu');
-            return !!(mainMenu && !mainMenu.classList.contains('hidden'));
+    const isMenuVisible = () => page.evaluate(() => {
+        const mainMenu = document.getElementById('main-menu');
+        return !!(mainMenu && !mainMenu.classList.contains('hidden'));
+    });
+
+    if (await isMenuVisible()) return;
+
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(120);
+
+    if (await isMenuVisible()) return;
+
+    const pauseVisible = await page.evaluate(() => {
+        const pauseOverlay = document.getElementById('pause-overlay');
+        return !!(pauseOverlay && !pauseOverlay.classList.contains('hidden'));
+    });
+    if (pauseVisible) {
+        await page.evaluate(() => {
+            window.GAME_INSTANCE?.matchFlowUiController?.returnToMenuFromPause?.();
         });
-        if (menuVisible) return;
-        await page.waitForTimeout(180);
+        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 8000 });
+        return;
     }
 
     await page.evaluate(() => {

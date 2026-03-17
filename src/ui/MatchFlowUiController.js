@@ -3,6 +3,7 @@ import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
 import { MatchFeedbackAdapter } from './MatchFeedbackAdapter.js';
 import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
 import { PauseOverlayController } from './PauseOverlayController.js';
+import { clearMessageStats, renderMessageStats } from './dom/MessageStatsDom.js';
 import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
 import { deriveMatchLoadingUiState } from './MatchUiStateOps.js';
 import {
@@ -38,9 +39,10 @@ function resolveRoundTelemetryWinnerLabel(players, roundMetrics) {
 }
 
 export class MatchFlowUiController {
-    constructor(game) {
-        this.game = game;
-        this.sessionOrchestrator = new MatchLifecycleSessionOrchestrator(game);
+    constructor(deps = {}) {
+        this.game = deps.game || null;
+        this.ports = deps.ports || null;
+        this.sessionOrchestrator = new MatchLifecycleSessionOrchestrator(this.game);
         this.feedbackAdapter = new MatchFeedbackAdapter({
             showToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone),
             logger: console,
@@ -50,66 +52,23 @@ export class MatchFlowUiController {
         this._damageRight = new THREE.Vector3();
         this._damageWorldUp = new THREE.Vector3(0, 1, 0);
         this._startMatchPromise = null;
-        this.pauseOverlayController = new PauseOverlayController(this);
+        this.pauseOverlayController = new PauseOverlayController({
+            matchFlowUiController: this,
+            game: this.game,
+            ports: this.ports,
+        });
     }
 
     _resolveMessageStatsContainer() {
-        return document.getElementById('message-stats');
+        return this.game?.ui?.messageStats || null;
     }
 
     _clearMessageStatsUi() {
-        const statsContainer = this._resolveMessageStatsContainer();
-        if (!statsContainer) return;
-        statsContainer.innerHTML = '';
-        statsContainer.classList.add('hidden');
+        clearMessageStats(this._resolveMessageStatsContainer());
     }
 
     _renderMessageStatsUi(overlayStats) {
-        const statsContainer = this._resolveMessageStatsContainer();
-        if (!statsContainer) return;
-
-        const blocks = Array.isArray(overlayStats?.blocks) ? overlayStats.blocks : [];
-        if (overlayStats?.visible === false || blocks.length === 0) {
-            this._clearMessageStatsUi();
-            return;
-        }
-
-        statsContainer.innerHTML = '';
-        blocks.forEach((block) => {
-            const blockElement = document.createElement('section');
-            blockElement.className = 'message-stats-card';
-            blockElement.setAttribute('data-stats-block-id', String(block?.id || 'block'));
-
-            const title = document.createElement('h3');
-            title.className = 'message-stats-title';
-            title.textContent = String(block?.title || 'Stats');
-            blockElement.appendChild(title);
-
-            const list = document.createElement('dl');
-            list.className = 'message-stats-list';
-            const rows = Array.isArray(block?.rows) ? block.rows : [];
-            rows.forEach((row) => {
-                const rowElement = document.createElement('div');
-                rowElement.className = 'message-stats-row';
-                rowElement.setAttribute('data-stats-row-key', String(row?.key || 'row'));
-
-                const label = document.createElement('dt');
-                label.className = 'message-stats-label';
-                label.textContent = String(row?.label || '');
-
-                const value = document.createElement('dd');
-                value.className = 'message-stats-value';
-                value.textContent = String(row?.value || '');
-
-                rowElement.append(label, value);
-                list.appendChild(rowElement);
-            });
-
-            blockElement.appendChild(list);
-            statsContainer.appendChild(blockElement);
-        });
-
-        statsContainer.classList.remove('hidden');
+        renderMessageStats(this._resolveMessageStatsContainer(), overlayStats);
     }
 
     applyMatchUiState(uiState) {
@@ -144,7 +103,11 @@ export class MatchFlowUiController {
         }
 
         if (typeof uiState?.splitScreenEnabled === 'boolean') {
-            game.renderer.setSplitScreen(uiState.splitScreenEnabled);
+            if (this.ports?.renderPort?.setSplitScreen) {
+                this.ports.renderPort.setSplitScreen(uiState.splitScreenEnabled);
+            } else {
+                game.renderer.setSplitScreen(uiState.splitScreenEnabled);
+            }
         }
         if (typeof uiState?.p2HudVisible === 'boolean') {
             if (game.ui.p2Hud) {

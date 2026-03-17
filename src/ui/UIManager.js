@@ -16,35 +16,37 @@ import { ensureMenuContractState, MENU_SESSION_TYPES } from './menu/MenuStateCon
 import { MenuStateMachine, MENU_STATE_IDS } from './menu/MenuStateMachine.js';
 import { listMenuTextCatalogEntries } from './menu/MenuTextCatalog.js';
 import { MenuTextRuntime } from './menu/MenuTextRuntime.js';
-import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality, resolveShadowQualityLabel } from '../core/renderer/ShadowQuality.js';
+import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality, resolveShadowQualityLabel } from '../shared/contracts/ShadowQualityContract.js';
 import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 
 export class UIManager {
-    constructor(game) {
+    constructor(deps = {}) {
+        const game = deps.game || null;
         this.game = game;
-        this.ui = game.ui;
-        this.settings = game.settings;
+        this.ports = deps.ports || null;
+        this.ui = game?.ui;
+        this.settings = game?.settings;
         ensureMenuContractState(this.settings);
 
-        this._navButtons = game._navButtons || [];
-        this._menuButtonByPanel = game._menuButtonByPanel || new Map();
-        this._lastMenuTrigger = game._lastMenuTrigger || null;
+        this._navButtons = game?._navButtons || [];
+        this._menuButtonByPanel = game?._menuButtonByPanel || new Map();
+        this._lastMenuTrigger = game?._lastMenuTrigger || null;
         this._submenuPanels = [];
         this._accessContext = resolveMenuAccessContext(this.settings);
-        this.menuSchema = game.menuSchema && typeof game.menuSchema === 'object'
+        this.menuSchema = game?.menuSchema && typeof game.menuSchema === 'object'
             ? game.menuSchema
             : createMenuSchema({ featureFlags: this.settings?.menuFeatureFlags });
-        this.menuPanelRegistry = game.menuPanelRegistry instanceof MenuPanelRegistry
+        this.menuPanelRegistry = game?.menuPanelRegistry instanceof MenuPanelRegistry
             ? game.menuPanelRegistry
             : new MenuPanelRegistry(this.menuSchema);
-        this.menuStateMachine = game.menuStateMachine instanceof MenuStateMachine
+        this.menuStateMachine = game?.menuStateMachine instanceof MenuStateMachine
             ? game.menuStateMachine
             : new MenuStateMachine({ initialState: MENU_STATE_IDS.MAIN });
         this.menuNavigationRuntime = null;
-        this.menuExpertLoginRuntime = game.menuExpertLoginRuntime || null;
+        this.menuExpertLoginRuntime = game?.menuExpertLoginRuntime || null;
         this._uiDisposers = [];
         this._developerNavButtons = Array.from(document.querySelectorAll(
             '[data-submenu="submenu-developer"], [data-menu-target="submenu-developer"], [data-menu-step-target="submenu-developer"]'
@@ -54,13 +56,15 @@ export class UIManager {
         ));
         this._developerPanel = document.getElementById('submenu-developer');
         this._debugHintNodes = Array.isArray(this.ui.debugHints) ? this.ui.debugHints : [];
-        this.menuTextRuntime = game.menuTextRuntime instanceof MenuTextRuntime
+        this.menuTextRuntime = game?.menuTextRuntime instanceof MenuTextRuntime
             ? game.menuTextRuntime
             : new MenuTextRuntime({ overrideStore: game.settingsManager?.menuTextOverrideStore });
-        game.menuSchema = this.menuSchema;
-        game.menuPanelRegistry = this.menuPanelRegistry;
-        game.menuStateMachine = this.menuStateMachine;
-        game.menuTextRuntime = this.menuTextRuntime;
+        if (game) {
+            game.menuSchema = this.menuSchema;
+            game.menuPanelRegistry = this.menuPanelRegistry;
+            game.menuStateMachine = this.menuStateMachine;
+            game.menuTextRuntime = this.menuTextRuntime;
+        }
 
         // Sub-Controller
         this._startSync = new UIStartSyncController({ ui: this.ui, game, manager: this });
@@ -250,24 +254,22 @@ export class UIManager {
     syncModes(settings = this.game.settings) {
         const ui = this.ui;
         const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
-        settings.mode = sessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
+        const effectiveMode = sessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
 
         if (Array.isArray(ui.modeButtons)) {
             ui.modeButtons.forEach((btn) => {
-                btn.classList.toggle('active', btn.dataset.mode === settings.mode);
+                btn.classList.toggle('active', btn.dataset.mode === effectiveMode);
             });
         }
         if (ui.vehicleP2Container) {
-            ui.vehicleP2Container.classList.toggle('hidden', settings.mode !== '2p');
+            ui.vehicleP2Container.classList.toggle('hidden', effectiveMode !== '2p');
         }
 
         const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
         const resolvedGameMode = resolveActiveGameMode(settings.gameMode, huntFeatureEnabled);
-        settings.gameMode = resolvedGameMode;
-        if (!settings.hunt) settings.hunt = { respawnEnabled: false };
-        if (resolvedGameMode !== GAME_MODE_TYPES.HUNT) {
-            settings.hunt.respawnEnabled = false;
-        }
+        const huntRespawnEnabled = resolvedGameMode === GAME_MODE_TYPES.HUNT
+            ? !!settings?.hunt?.respawnEnabled
+            : false;
 
         if (Array.isArray(ui.gameModeButtons)) {
             ui.gameModeButtons.forEach((btn) => {
@@ -282,7 +284,7 @@ export class UIManager {
             ui.huntRespawnRow.classList.toggle('hidden', resolvedGameMode !== GAME_MODE_TYPES.HUNT);
         }
         if (ui.huntRespawnToggle) {
-            ui.huntRespawnToggle.checked = !!settings?.hunt?.respawnEnabled;
+            ui.huntRespawnToggle.checked = huntRespawnEnabled;
             ui.huntRespawnToggle.disabled = resolvedGameMode !== GAME_MODE_TYPES.HUNT;
         }
     }
@@ -343,8 +345,7 @@ export class UIManager {
         if (ui.shadowQualityLabel) ui.shadowQualityLabel.textContent = resolveShadowQualityLabel(shadowQuality);
         ui.lockOnLabel.textContent = gp.lockOnAngle + '\u00B0';
 
-        const planarToggle = document.getElementById('planar-mode-toggle');
-        if (planarToggle) planarToggle.checked = !!gp.planarMode;
+        if (ui.planarModeToggle) ui.planarModeToggle.checked = !!gp.planarMode;
         if (Array.isArray(ui.dimensionModeButtons)) {
             ui.dimensionModeButtons.forEach((button) => {
                 const planarRaw = String(button?.dataset?.planarMode || '').trim().toLowerCase();
@@ -384,7 +385,7 @@ export class UIManager {
         if (!sessionState?.joined) {
             this.ui.multiplayerStatus.textContent = `Lobby offline | Rolle: nicht verbunden${presetText}`;
             if (this.ui.startButton) {
-                this.ui.startButton.disabled = true;
+                this.ui.startButton.disabled = false;
                 this.ui.startButton.title = 'Lobby hosten oder joinen, bevor gestartet wird.';
             }
             return;
@@ -395,7 +396,7 @@ export class UIManager {
             : (sessionState.isHost ? 'Warte auf Ready' : 'Warte auf Host');
         this.ui.multiplayerStatus.textContent = `Lobby live | Rolle: ${role} | ${sessionState.readyCount}/${sessionState.memberCount} ready | ${startStatus}${presetText}`;
         if (this.ui.startButton) {
-            this.ui.startButton.disabled = !sessionState.canStart;
+            this.ui.startButton.disabled = false;
             this.ui.startButton.title = sessionState.canStart
                 ? ''
                 : (sessionState.isHost

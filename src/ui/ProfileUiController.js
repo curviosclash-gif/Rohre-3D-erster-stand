@@ -4,6 +4,7 @@
 
 import { deriveProfileControlSelectState } from './ProfileControlStateOps.js';
 import { deriveProfileActionUiState } from './ProfileUiStateOps.js';
+import { renderProfileSelectOptions } from './dom/ProfileSelectDom.js';
 
 export class ProfileUiController {
     /**
@@ -41,14 +42,18 @@ export class ProfileUiController {
         this.loadedProfileName = '';
     }
 
-    syncProfileControls() {
+    syncProfileControls(options = {}) {
         const ui = this._getUi();
         if (!ui.profileSelect) return;
+        const forceMirrorProfileNameInput = options.forceMirrorProfileNameInput === true;
+        const preferredProfileName = typeof options.preferredProfileName === 'string'
+            ? options.preferredProfileName
+            : '';
 
         const controlState = deriveProfileControlSelectState(
             this.settingsProfiles,
             {
-                activeProfileName: this.selectedProfileName || this.activeProfileName,
+                activeProfileName: preferredProfileName || this.selectedProfileName || this.activeProfileName,
                 selectValue: ui.profileSelect.value,
                 isProfileNameInputFocused: ui.profileNameInput
                     ? document.activeElement?.isSameNode(ui.profileNameInput)
@@ -56,26 +61,13 @@ export class ProfileUiController {
             },
             this._profileControlStateOps
         );
-        ui.profileSelect.innerHTML = '';
-
-        const placeholder = document.createElement('option');
-        placeholder.value = controlState.placeholderOption.value;
-        placeholder.textContent = controlState.placeholderOption.text;
-        ui.profileSelect.appendChild(placeholder);
-
-        for (const optionData of controlState.profileOptions) {
-            const opt = document.createElement('option');
-            opt.value = optionData.value;
-            opt.textContent = optionData.text;
-            ui.profileSelect.appendChild(opt);
-        }
+        renderProfileSelectOptions(ui.profileSelect, controlState);
 
         const validSelected = controlState.resolvedActiveProfileName;
         this.selectedProfileName = validSelected;
         this.activeProfileName = validSelected;
-        ui.profileSelect.value = validSelected;
 
-        if (ui.profileNameInput && controlState.shouldMirrorProfileNameInput) {
+        if (ui.profileNameInput && (forceMirrorProfileNameInput || controlState.shouldMirrorProfileNameInput)) {
             ui.profileNameInput.value = validSelected;
         }
         this.syncProfileActionState();

@@ -3,6 +3,7 @@
 // ============================================
 
 import { CONFIG } from '../core/Config.js';
+import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { BotPolicyRegistry } from './ai/BotPolicyRegistry.js';
 import { DEFAULT_BOT_POLICY_TYPE } from './ai/BotPolicyTypes.js';
 import { createBotRuntimeContext } from './ai/BotRuntimeContextFactory.js';
@@ -57,13 +58,14 @@ export class EntityManager {
         this.onHuntFeedEvent = null;
         this.onHuntDamageEvent = null;
         this.botDifficulty = CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL';
-        Object.assign(this, assembleEntityRuntime(this));
+        this.runtime = assembleEntityRuntime(this);
+        Object.assign(this, this.runtime.compat);
         this._lastRoundGhostSystem = new LastRoundGhostSystem(renderer);
-        this.projectiles = this._projectileSystem.projectiles;
+        this.projectiles = this.runtime.systems.projectileSystem.projectiles;
         this.botPolicyRegistry = new BotPolicyRegistry();
         this.botPolicyType = DEFAULT_BOT_POLICY_TYPE;
         this.botBridgeEnabled = false;
-        this.activeGameMode = CONFIG?.HUNT?.ACTIVE_MODE || 'classic';
+        this.activeGameMode = getActiveRuntimeConfig(CONFIG)?.HUNT?.ACTIVE_MODE || 'classic';
         this.huntEnabled = isHuntHealthActive();
         this.runtimeConfig = null;
     }
@@ -170,7 +172,7 @@ export class EntityManager {
     }
 
     _getPendingHumanRespawns(players = this.humanPlayers) {
-        const huntRespawnEnabled = isHuntHealthActive() && !!CONFIG?.HUNT?.RESPAWN_ENABLED;
+        const huntRespawnEnabled = isHuntHealthActive() && !!getActiveRuntimeConfig(CONFIG)?.HUNT?.RESPAWN_ENABLED;
         if (!huntRespawnEnabled) return 0;
         return this._respawnSystem.getPendingCountForPlayers(players);
     }
@@ -326,7 +328,7 @@ export class EntityManager {
     }
 
     getHumanPlayers() { return this.humanPlayers; }
-    getRuntimeContext() { return this._runtimeContext; }
+    getRuntimeContext() { return this.runtime?.context || this._runtimeContext; }
     getTrailSpatialIndex() { return this._trailSpatialIndex; }
 
     registerTrailSegment(playerIndex, segmentIdx, data, reusableRef = null) {

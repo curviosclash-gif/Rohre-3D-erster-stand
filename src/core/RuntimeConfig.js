@@ -1,4 +1,4 @@
-import { CONFIG } from './Config.js';
+import { CONFIG, CONFIG_BASE } from './Config.js';
 import { GAME_MODE_TYPES, isHuntMode, resolveActiveGameMode } from '../hunt/HuntMode.js';
 import { BOT_POLICY_TYPES, resolveMatchBotPolicyType } from '../entities/ai/BotPolicyTypes.js';
 import {
@@ -72,7 +72,7 @@ export function resolveBotPolicyType(
     });
 }
 
-export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = {}) {
+export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE } = {}) {
     const source = settings && typeof settings === 'object' ? settings : {};
     const gameplaySource = source.gameplay && typeof source.gameplay === 'object' ? source.gameplay : {};
     const huntSource = source.hunt && typeof source.hunt === 'object' ? source.hunt : {};
@@ -181,52 +181,53 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG } = 
     return runtimeConfig;
 }
 
-export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CONFIG) {
-    if (!runtimeConfig || typeof runtimeConfig !== 'object' || !targetConfig) {
-        return targetConfig;
+export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CONFIG_BASE) {
+    const nextConfig = deepClone(targetConfig || CONFIG_BASE);
+    if (!runtimeConfig || typeof runtimeConfig !== 'object') {
+        return nextConfig;
     }
 
-    targetConfig.PLAYER.SPEED = runtimeConfig.player.speed;
-    targetConfig.PLAYER.TURN_SPEED = runtimeConfig.player.turnSpeed;
-    targetConfig.PLAYER.MODEL_SCALE = runtimeConfig.player.modelScale;
-    targetConfig.PLAYER.AUTO_ROLL = runtimeConfig.player.autoRoll;
-    targetConfig.PLAYER.VEHICLES = {
+    nextConfig.PLAYER.SPEED = runtimeConfig.player.speed;
+    nextConfig.PLAYER.TURN_SPEED = runtimeConfig.player.turnSpeed;
+    nextConfig.PLAYER.MODEL_SCALE = runtimeConfig.player.modelScale;
+    nextConfig.PLAYER.AUTO_ROLL = runtimeConfig.player.autoRoll;
+    nextConfig.PLAYER.VEHICLES = {
         PLAYER_1: runtimeConfig.player.vehicles.PLAYER_1,
         PLAYER_2: runtimeConfig.player.vehicles.PLAYER_2,
     };
 
-    targetConfig.GAMEPLAY.PLANAR_MODE = runtimeConfig.gameplay.planarMode;
-    targetConfig.GAMEPLAY.PORTAL_COUNT = runtimeConfig.gameplay.portalCount;
-    targetConfig.GAMEPLAY.PLANAR_LEVEL_COUNT = runtimeConfig.gameplay.planarLevelCount;
-    targetConfig.GAMEPLAY.PORTAL_BEAMS = runtimeConfig.gameplay.portalBeams;
+    nextConfig.GAMEPLAY.PLANAR_MODE = runtimeConfig.gameplay.planarMode;
+    nextConfig.GAMEPLAY.PORTAL_COUNT = runtimeConfig.gameplay.portalCount;
+    nextConfig.GAMEPLAY.PLANAR_LEVEL_COUNT = runtimeConfig.gameplay.planarLevelCount;
+    nextConfig.GAMEPLAY.PORTAL_BEAMS = runtimeConfig.gameplay.portalBeams;
 
-    targetConfig.TRAIL.WIDTH = runtimeConfig.trail.width;
-    targetConfig.TRAIL.GAP_DURATION = runtimeConfig.trail.gapDuration;
-    targetConfig.TRAIL.GAP_CHANCE = runtimeConfig.trail.gapChance;
+    nextConfig.TRAIL.WIDTH = runtimeConfig.trail.width;
+    nextConfig.TRAIL.GAP_DURATION = runtimeConfig.trail.gapDuration;
+    nextConfig.TRAIL.GAP_CHANCE = runtimeConfig.trail.gapChance;
 
-    targetConfig.POWERUP.MAX_ON_FIELD = runtimeConfig.powerup.maxOnField;
-    targetConfig.PROJECTILE.COOLDOWN = runtimeConfig.projectile.cooldown;
-    targetConfig.BOT.ACTIVE_DIFFICULTY = runtimeConfig.bot.activeDifficulty;
-    targetConfig.BOT.ACTIVE_POLICY_STRATEGY = runtimeConfig?.bot?.policyStrategy || BOT_POLICY_STRATEGIES.AUTO;
-    targetConfig.BOT.ACTIVE_POLICY_TYPE = runtimeConfig?.bot?.policyType || BOT_POLICY_TYPES.RULE_BASED;
-    targetConfig.BOT.TRAINER_BRIDGE_ENABLED = !!runtimeConfig.bot.trainerBridgeEnabled;
-    targetConfig.BOT.TRAINER_BRIDGE_URL = runtimeConfig.bot.trainerBridgeUrl;
-    targetConfig.BOT.TRAINER_BRIDGE_TIMEOUT_MS = runtimeConfig.bot.trainerBridgeTimeoutMs;
-    targetConfig.BOT.TRAINER_BRIDGE_MAX_RETRIES = runtimeConfig.bot.trainerBridgeMaxRetries;
-    targetConfig.BOT.TRAINER_BRIDGE_RETRY_DELAY_MS = runtimeConfig.bot.trainerBridgeRetryDelayMs;
-    targetConfig.BOT.TRAINER_CHECKPOINT_RESUME_TOKEN = runtimeConfig.bot.trainerCheckpointResumeToken;
-    targetConfig.BOT.TRAINER_CHECKPOINT_RESUME_STRICT = runtimeConfig.bot.trainerCheckpointResumeStrict;
-    targetConfig.HOMING.LOCK_ON_ANGLE = runtimeConfig.homing.lockOnAngle;
-    if (targetConfig.HUNT) {
-        targetConfig.HUNT.ACTIVE_MODE = runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC;
-        targetConfig.HUNT.RESPAWN_ENABLED = !!runtimeConfig?.hunt?.respawnEnabled;
-        if (targetConfig.HUNT.MG && runtimeConfig?.huntCombat) {
-            targetConfig.HUNT.MG = {
-                ...targetConfig.HUNT.MG,
-                TRAIL_HIT_RADIUS: runtimeConfig.huntCombat.mgTrailAimRadius
+    nextConfig.POWERUP.MAX_ON_FIELD = runtimeConfig.powerup.maxOnField;
+    nextConfig.PROJECTILE.COOLDOWN = runtimeConfig.projectile.cooldown;
+    nextConfig.BOT.ACTIVE_DIFFICULTY = runtimeConfig.bot.activeDifficulty;
+    nextConfig.BOT.ACTIVE_POLICY_STRATEGY = runtimeConfig?.bot?.policyStrategy || BOT_POLICY_STRATEGIES.AUTO;
+    nextConfig.BOT.ACTIVE_POLICY_TYPE = runtimeConfig?.bot?.policyType || BOT_POLICY_TYPES.RULE_BASED;
+    nextConfig.BOT.TRAINER_BRIDGE_ENABLED = !!runtimeConfig.bot.trainerBridgeEnabled;
+    nextConfig.BOT.TRAINER_BRIDGE_URL = runtimeConfig.bot.trainerBridgeUrl;
+    nextConfig.BOT.TRAINER_BRIDGE_TIMEOUT_MS = runtimeConfig.bot.trainerBridgeTimeoutMs;
+    nextConfig.BOT.TRAINER_BRIDGE_MAX_RETRIES = runtimeConfig.bot.trainerBridgeMaxRetries;
+    nextConfig.BOT.TRAINER_BRIDGE_RETRY_DELAY_MS = runtimeConfig.bot.trainerBridgeRetryDelayMs;
+    nextConfig.BOT.TRAINER_CHECKPOINT_RESUME_TOKEN = runtimeConfig.bot.trainerCheckpointResumeToken;
+    nextConfig.BOT.TRAINER_CHECKPOINT_RESUME_STRICT = runtimeConfig.bot.trainerCheckpointResumeStrict;
+    nextConfig.HOMING.LOCK_ON_ANGLE = runtimeConfig.homing.lockOnAngle;
+    if (nextConfig.HUNT) {
+        nextConfig.HUNT.ACTIVE_MODE = runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC;
+        nextConfig.HUNT.RESPAWN_ENABLED = !!runtimeConfig?.hunt?.respawnEnabled;
+        if (nextConfig.HUNT.MG && runtimeConfig?.huntCombat) {
+            nextConfig.HUNT.MG = {
+                ...nextConfig.HUNT.MG,
+                TRAIL_HIT_RADIUS: runtimeConfig.huntCombat.mgTrailAimRadius,
             };
         }
     }
 
-    return targetConfig;
+    return nextConfig;
 }

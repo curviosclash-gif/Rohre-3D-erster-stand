@@ -243,6 +243,12 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
     test('T75: Host-Settings invalidieren Ready-Status per Event-Contract', async ({ page }) => {
         await loadGame(page);
         await openMultiplayerSubmenu(page);
+        await page.fill('#multiplayer-lobby-code', 'STRESS-T75');
+        await page.click('#btn-multiplayer-host');
+        await page.waitForFunction(() => {
+            const state = window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.();
+            return state?.joined === true && state?.isHost === true;
+        }, null, { timeout: 5000 });
         await page.check('#multiplayer-ready-toggle');
         await page.waitForTimeout(80);
 

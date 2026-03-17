@@ -5,7 +5,10 @@
   "main": "src/core/main.js",
   "type": "module",
   "scripts": {
-    "architecture:guard": "npm run lint:architecture && npm run typecheck:architecture",
+    "architecture:guard": "npm run lint:architecture && npm run check:architecture:boundaries && npm run check:architecture:metrics && npm run typecheck:architecture",
+    "architecture:report": "node scripts/architecture-report.mjs",
+    "check:architecture:boundaries": "node scripts/check-architecture-boundaries.mjs",
+    "check:architecture:metrics": "node scripts/check-architecture-metrics.mjs",
     "dev": "vite",
     "build": "vite build",
     "lint:architecture": "eslint src --max-warnings 0",
@@ -35,7 +38,7 @@
     "test:physics:hunt": "node scripts/verify-lock.mjs --playwright -- npx playwright test tests/physics-hunt.spec.js",
     "test:physics:policy": "node scripts/verify-lock.mjs --playwright -- npx playwright test tests/physics-policy.spec.js",
     "test:stress": "node scripts/verify-lock.mjs --playwright -- npx playwright test tests/stress.spec.js",
-    "typecheck:architecture": "tsc -p tsconfig.json",
+    "typecheck:architecture": "tsc -p tsconfig.architecture.json",
     "prepare": "husky"
   },
   "keywords": [
@@ -53,6 +56,7 @@
     "@commitlint/cli": "^20.4.4",
     "@commitlint/config-conventional": "^20.4.4",
     "@playwright/test": "^1.58.2",
+    "@types/node": "^25.5.0",
     "eslint": "^10.0.3",
     "husky": "^9.1.7",
     "typescript": "^5.9.3",

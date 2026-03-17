@@ -10,6 +10,7 @@
 
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
+import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
 import {
     createHuntTargetingScratch,
@@ -59,8 +60,9 @@ export class HuntCombatSystem {
 
     _resolveClassicLockOn(player, tmpDir, tmpVec) {
         const runtime = this.runtime;
-        const maxAngle = (CONFIG.HOMING.LOCK_ON_ANGLE * Math.PI) / 180;
-        const maxRangeSq = CONFIG.HOMING.MAX_LOCK_RANGE * CONFIG.HOMING.MAX_LOCK_RANGE;
+        const config = getActiveRuntimeConfig(CONFIG);
+        const maxAngle = (config.HOMING.LOCK_ON_ANGLE * Math.PI) / 180;
+        const maxRangeSq = config.HOMING.MAX_LOCK_RANGE * config.HOMING.MAX_LOCK_RANGE;
         let bestTarget = null;
         let bestDistSq = Infinity;
 
@@ -81,6 +83,7 @@ export class HuntCombatSystem {
     }
 
     checkLockOn(player) {
+        const config = getActiveRuntimeConfig(CONFIG);
         const runtime = this.runtime;
         if (!runtime || !player) return null;
 
@@ -101,21 +104,21 @@ export class HuntCombatSystem {
         }
 
         const muzzle = this._fallbackMuzzle;
-        const muzzleOffset = Math.max(0, Number(CONFIG?.HUNT?.TARGETING?.MUZZLE_OFFSET || 2.1));
+        const muzzleOffset = Math.max(0, Number(config?.HUNT?.TARGETING?.MUZZLE_OFFSET || 2.1));
         muzzle.copy(player.position).addScaledVector(tmpDir, muzzleOffset);
 
-        const mgRange = Math.max(10, Number(CONFIG?.HUNT?.MG?.RANGE || 95));
+        const mgRange = Math.max(10, Number(config?.HUNT?.MG?.RANGE || 95));
         const descriptor = resolveHuntLineTarget({
             sourcePlayer: player,
             players: runtime.players,
             trailSpatialIndex: runtime.getTrailSpatialIndex?.() || runtime.trails?.spatialIndex || null,
             origin: muzzle,
             direction: tmpDir,
-            playerRange: Math.max(10, Number(CONFIG?.HOMING?.MAX_LOCK_RANGE || 100)),
+            playerRange: Math.max(10, Number(config?.HOMING?.MAX_LOCK_RANGE || 100)),
             trailRange: mgRange,
-            trailSampleStep: Number(CONFIG?.HUNT?.MG?.TRAIL_SAMPLE_STEP),
-            trailHitRadius: Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS),
-            trailSelfSkipRecent: Number(CONFIG?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
+            trailSampleStep: Number(config?.HUNT?.MG?.TRAIL_SAMPLE_STEP),
+            trailHitRadius: Number(config?.HUNT?.MG?.TRAIL_HIT_RADIUS),
+            trailSelfSkipRecent: Number(config?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
             allowSelfTrailFallback: false,
             scratch: this._targetingScratch,
         });
