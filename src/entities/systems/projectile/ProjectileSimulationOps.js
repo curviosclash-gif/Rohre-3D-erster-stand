@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../../core/Config.js';
+import { getActiveRuntimeConfig } from '../../../core/runtime/ActiveRuntimeConfigStore.js';
 import {
     createHuntTargetingScratch,
     createPlayerTargetDescriptor,
@@ -24,12 +25,13 @@ export class ProjectileSimulationOps {
     }
 
     acquireHomingTarget(projectile, players, trailSpatialIndex = null) {
+        const config = getActiveRuntimeConfig(CONFIG);
         if (!projectile || !Array.isArray(players) || players.length === 0) return null;
 
         const owner = projectile.owner;
-        const maxRange = Math.max(10, Number(projectile.homingRange || CONFIG?.HOMING?.MAX_LOCK_RANGE || 100));
+        const maxRange = Math.max(10, Number(projectile.homingRange || config?.HOMING?.MAX_LOCK_RANGE || 100));
         const maxRangeSq = maxRange * maxRange;
-        const lockOnAngle = Math.max(5, Number(projectile.homingLockOnAngle || CONFIG?.HOMING?.LOCK_ON_ANGLE || 15));
+        const lockOnAngle = Math.max(5, Number(projectile.homingLockOnAngle || config?.HOMING?.LOCK_ON_ANGLE || 15));
         const minDot = Math.cos(THREE.MathUtils.degToRad(lockOnAngle));
 
         this._tmpVec2.copy(projectile.velocity);
@@ -40,7 +42,7 @@ export class ProjectileSimulationOps {
         if (projectile.huntRocket) {
             const trailHitRadius = Math.max(
                 Number(projectile.radius) || 0,
-                Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS || 0.78)
+                Number(config?.HUNT?.MG?.TRAIL_HIT_RADIUS || 0.78)
             );
             const sharedTarget = resolveHuntLineTarget({
                 sourcePlayer: owner,
@@ -50,9 +52,9 @@ export class ProjectileSimulationOps {
                 direction: this._tmpVec2,
                 playerRange: maxRange,
                 trailRange: maxRange,
-                trailSampleStep: Number(CONFIG?.HUNT?.MG?.TRAIL_SAMPLE_STEP),
+                trailSampleStep: Number(config?.HUNT?.MG?.TRAIL_SAMPLE_STEP),
                 trailHitRadius,
-                trailSelfSkipRecent: Number(CONFIG?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
+                trailSelfSkipRecent: Number(config?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
                 allowSelfTrailFallback: false,
                 scratch: this._targetingScratch,
             });
@@ -130,6 +132,7 @@ export class ProjectileSimulationOps {
     }
 
     stepProjectile(projectile, index, dt, arena, players, trailSpatialIndex, time) {
+        const config = getActiveRuntimeConfig(CONFIG);
         projectile.foamBounceCooldown = Math.max(0, (projectile.foamBounceCooldown || 0) - dt);
 
         const vx = projectile.velocity.x * dt;
@@ -183,7 +186,7 @@ export class ProjectileSimulationOps {
                 this._tmpVec.normalize();
                 this._tmpVec2.copy(projectile.velocity);
                 const speed = this._tmpVec2.length();
-                const turnRate = Math.max(0.1, Number(projectile.homingTurnRate || CONFIG.HOMING.TURN_RATE));
+                const turnRate = Math.max(0.1, Number(projectile.homingTurnRate || config?.HOMING?.TURN_RATE || CONFIG?.HOMING?.TURN_RATE));
                 this._tmpVec2.normalize().lerp(this._tmpVec, Math.min(turnRate * dt, 1.0)).normalize();
                 projectile.velocity.copy(this._tmpVec2.multiplyScalar(speed));
                 this._tmpVec.addVectors(projectile.position, projectile.velocity);
@@ -203,7 +206,7 @@ export class ProjectileSimulationOps {
             arenaCollision = { hit: true, kind: 'wall', normal: null };
         }
 
-        const projectileExpired = projectile.ttl <= 0 || projectile.traveled >= CONFIG.PROJECTILE.MAX_DISTANCE;
+        const projectileExpired = projectile.ttl <= 0 || projectile.traveled >= (config?.PROJECTILE?.MAX_DISTANCE || CONFIG?.PROJECTILE?.MAX_DISTANCE || Infinity);
         const projectileHitArena = !!arenaCollision?.hit;
         const arenaKind = String(arenaCollision?.kind || 'wall').toLowerCase();
         const bouncedOnFoam = projectileHitArena && arenaKind === 'foam'

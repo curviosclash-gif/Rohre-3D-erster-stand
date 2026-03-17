@@ -1,12 +1,13 @@
 import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
+import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { isHuntHealthActive } from './HealthSystem.js';
 import { MGOverheatState } from './mg/MGOverheatState.js';
 import { MGHitResolver } from './mg/MGHitResolver.js';
 import { MGTracerFx } from './mg/MGTracerFx.js';
 
 function getMgConfig() {
-    return CONFIG?.HUNT?.MG || {};
+    return getActiveRuntimeConfig(CONFIG)?.HUNT?.MG || CONFIG?.HUNT?.MG || {};
 }
 
 function createLegacyRuntimeContext(entityManager) {
