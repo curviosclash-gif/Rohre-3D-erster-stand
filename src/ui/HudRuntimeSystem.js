@@ -127,6 +127,16 @@ export class HudRuntimeSystem {
         return container;
     }
 
+    /**
+     * Removes the network scoreboard DOM element (e.g. when returning to menu).
+     */
+    clearNetworkScoreboard() {
+        if (this._scoreboardContainer) {
+            this._scoreboardContainer.remove();
+            this._scoreboardContainer = null;
+        }
+    }
+
     _updateItemBar(container, player) {
         this._ensureItemSlots(container);
 

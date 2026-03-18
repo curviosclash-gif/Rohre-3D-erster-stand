@@ -448,6 +448,7 @@ export class MatchFlowUiController {
         game.entityManager?.clearLastRoundGhost?.();
         this.sessionOrchestrator.teardownMatchSession();
         game.runtimeFacade?._teardownSession?.();
+        game.hudRuntimeSystem?.clearNetworkScoreboard?.();
         this.applyMatchUiState(returnTransition.uiState);
         game._showMainNav();
         this.resetCrosshairUi();

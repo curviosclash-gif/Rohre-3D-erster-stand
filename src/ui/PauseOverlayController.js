@@ -150,6 +150,7 @@ export class PauseOverlayController {
         this.ports?.sessionPort?.clearLastRoundGhost?.();
         this.ports?.sessionPort?.teardownMatchSession?.();
         game.runtimeFacade?._teardownSession?.();
+        game.hudRuntimeSystem?.clearNetworkScoreboard?.();
         controller.applyMatchUiState(returnTransition.uiState);
         controller.resetCrosshairUi();
 
