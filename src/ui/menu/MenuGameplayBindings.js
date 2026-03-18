@@ -358,13 +358,17 @@ export function setupMenuGameplayBindings(ctx) {
         bind(ui.multiplayerHostButton, 'click', () => {
             const canHost = ctx.featureFlags?.canHost === true;
             if (!canHost) return;
-            emit(eventTypes.HOST_GAME);
+            emit(eventTypes.MULTIPLAYER_HOST, {
+                lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
+            });
         });
     }
 
     if (ui.multiplayerJoinButton) {
         bind(ui.multiplayerJoinButton, 'click', () => {
-            emit(eventTypes.JOIN_GAME);
+            emit(eventTypes.MULTIPLAYER_JOIN, {
+                lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
+            });
         });
     }
 
