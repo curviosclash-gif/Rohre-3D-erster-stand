@@ -30,6 +30,8 @@ export const MENU_SESSION_TYPES = Object.freeze({
     SINGLE: 'single',
     MULTIPLAYER: 'multiplayer',
     SPLITSCREEN: 'splitscreen',
+    LAN: 'lan',
+    ONLINE: 'online',
 });
 
 export const MENU_MODE_PATHS = Object.freeze({

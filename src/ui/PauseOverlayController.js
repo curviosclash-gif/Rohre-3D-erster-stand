@@ -119,25 +119,32 @@ export class PauseOverlayController {
             game.ui.pauseInvertP1.addEventListener('change', () => {
                 if (game.state !== 'PAUSED') return;
                 const checked = !!game.ui.pauseInvertP1.checked;
-                game.settings.invertPitch.PLAYER_1 = checked;
-                const players = game.entityManager?.players;
-                if (players) {
-                    const human = players.find((player) => !player.isBot && player.index === 0);
-                    human?.setControlOptions?.({ invertPitch: checked });
-                }
+                this._applyInvertPitch(0, 'PLAYER_1', checked);
             });
         }
         if (game.ui.pauseInvertP2) {
             game.ui.pauseInvertP2.addEventListener('change', () => {
                 if (game.state !== 'PAUSED') return;
                 const checked = !!game.ui.pauseInvertP2.checked;
-                game.settings.invertPitch.PLAYER_2 = checked;
-                const players = game.entityManager?.players;
-                if (players) {
-                    const human = players.find((player) => !player.isBot && player.index === 1);
-                    human?.setControlOptions?.({ invertPitch: checked });
-                }
+                this._applyInvertPitch(1, 'PLAYER_2', checked);
             });
+        }
+    }
+
+    _applyInvertPitch(playerIndex, playerKey, checked) {
+        const game = this.game;
+        if (this.ports?.actionDispatcher) {
+            this.ports.actionDispatcher.dispatch({
+                type: 'settings.invertPitch',
+                payload: { playerIndex, playerKey, value: checked },
+            });
+        } else {
+            game.settings.invertPitch[playerKey] = checked;
+            const players = game.entityManager?.players;
+            if (players) {
+                const human = players.find((player) => !player.isBot && player.index === playerIndex);
+                human?.setControlOptions?.({ invertPitch: checked });
+            }
         }
     }
 

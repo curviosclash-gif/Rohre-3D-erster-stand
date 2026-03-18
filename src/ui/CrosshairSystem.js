@@ -67,7 +67,8 @@ export class CrosshairSystem {
 
         const screenW = window.innerWidth;
         const screenH = window.innerHeight;
-        const split = game.numHumans === 2;
+        const localHumans = game.numHumans || 1;
+        const split = localHumans >= 2 && !game.runtimeConfig?.session?.networkEnabled;
         const viewportW = split ? screenW * 0.5 : screenW;
         const viewportX = split ? (player.index === 0 ? 0 : viewportW) : 0;
 
@@ -138,7 +139,7 @@ export class CrosshairSystem {
         }
 
         if (game.ui.crosshairP2) {
-            if (game.numHumans === 2) {
+            if ((game.numHumans || 1) >= 2 && !game.runtimeConfig?.session?.networkEnabled) {
                 if (shouldShowScreenCrosshair(p2)) {
                     this._updateCrosshairPosition(p2, game.ui.crosshairP2);
                 } else {

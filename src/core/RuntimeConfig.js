@@ -79,8 +79,9 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
     const botBridgeSource = source.botBridge && typeof source.botBridge === 'object' ? source.botBridge : {};
 
     const sessionType = normalizeSessionType(source?.localSettings?.sessionType || (source.mode === '2p' ? 'splitscreen' : 'single'));
+    const networkEnabled = sessionType === 'lan' || sessionType === 'online';
     const mode = sessionType === 'splitscreen' ? '2p' : '1p';
-    const numHumans = mode === '2p' ? 2 : 1;
+    const numHumans = networkEnabled ? 1 : (mode === '2p' ? 2 : 1);
     const huntFeatureEnabled = baseConfig?.HUNT?.ENABLED !== false;
     const activeGameMode = resolveActiveGameMode(source.gameMode, huntFeatureEnabled);
     const huntModeActive = isHuntMode(activeGameMode, huntFeatureEnabled);
@@ -109,6 +110,8 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             sessionType,
             mode,
             numHumans,
+            networkEnabled,
+            maxPlayers: clampSettingValue(source.maxPlayers, { min: 2, max: 10, step: 1 }, 10),
             numBots: clampSettingValue(source.numBots, SETTINGS_LIMITS.session.numBots, 0),
             winsNeeded: clampSettingValue(source.winsNeeded, SETTINGS_LIMITS.session.winsNeeded, 5),
             mapKey: String(source.mapKey || 'standard'),

@@ -125,17 +125,14 @@ export class HudRuntimeSystem {
         const fighterElapsed = this._consumeInterval('_fighterHudTimer', dt, fighterHudInterval);
 
         // FIGHTER HUD UPDATE
-        if (game.numHumans === 2) {
-            this._setHudP2Visibility(true);
-        } else {
-            this._setHudP2Visibility(false);
-        }
+        const localHumans = game.numHumans || 1;
+        this._setHudP2Visibility(localHumans >= 2);
         if (fighterElapsed <= 0) return;
 
         const p1 = game.entityManager.players[0];
         if (p1) game.hudP1.update(p1, fighterElapsed, game.entityManager);
 
-        if (game.numHumans === 2) {
+        if (localHumans >= 2) {
             const p2 = game.entityManager.players[1];
             if (p2) game.hudP2.update(p2, fighterElapsed, game.entityManager);
         }
