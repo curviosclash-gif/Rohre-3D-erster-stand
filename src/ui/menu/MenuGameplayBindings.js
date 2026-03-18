@@ -353,4 +353,38 @@ export function setupMenuGameplayBindings(ctx) {
             queueInputSettingsChanged([keys.GAMEPLAY_PLANAR_LEVEL_COUNT]);
         });
     }
+
+    if (ui.multiplayerHostButton) {
+        bind(ui.multiplayerHostButton, 'click', () => {
+            const canHost = ctx.featureFlags?.canHost === true;
+            if (!canHost) return;
+            emit(eventTypes.HOST_GAME);
+        });
+    }
+
+    if (ui.multiplayerJoinButton) {
+        bind(ui.multiplayerJoinButton, 'click', () => {
+            emit(eventTypes.JOIN_GAME);
+        });
+    }
+
+    if (ui.multiplayerLeaveLobbyButton) {
+        bind(ui.multiplayerLeaveLobbyButton, 'click', () => {
+            emit(eventTypes.LEAVE_LOBBY);
+        });
+    }
+
+    if (ui.multiplayerReadyButton) {
+        bind(ui.multiplayerReadyButton, 'click', () => {
+            emit(eventTypes.TOGGLE_READY);
+        });
+    }
+
+    if (ui.multiplayerStartMatchButton) {
+        bind(ui.multiplayerStartMatchButton, 'click', () => {
+            const canHost = ctx.featureFlags?.canHost === true;
+            if (!canHost) return;
+            emit(eventTypes.START_MATCH_MULTIPLAYER);
+        });
+    }
 }
