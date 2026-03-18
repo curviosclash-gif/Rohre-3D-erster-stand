@@ -58,6 +58,27 @@ function createPanelSchema(featureFlags) {
             visibility: featureFlags.multiplayerStubEnabled ? 'visible' : 'hidden',
             legacyIds: [],
             settingsDomain: 'matchSettings',
+            items: [
+                {
+                    id: 'multiplayer-host',
+                    label: 'Spiel erstellen',
+                    action: 'multiplayer_host',
+                    accessPolicy: MENU_ACCESS_POLICIES.OPEN,
+                    visibilityCondition: 'canHost',
+                },
+                {
+                    id: 'multiplayer-join',
+                    label: 'Spiel beitreten',
+                    action: 'multiplayer_join',
+                    accessPolicy: MENU_ACCESS_POLICIES.OPEN,
+                },
+                {
+                    id: 'multiplayer-back',
+                    label: 'Zurueck',
+                    action: 'navigate_back',
+                    accessPolicy: MENU_ACCESS_POLICIES.OPEN,
+                },
+            ],
         },
         {
             id: 'submenu-settings',
