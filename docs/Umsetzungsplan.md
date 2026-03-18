@@ -19,139 +19,223 @@ V26, V27, V28 (inkl. 28.5), V29b, V30, V31, V32, V33, V34, V35, V36, V37, V38, V
 
 ---
 
-## Offene Arbeit
-
-### Block V41: Multiplayer — LAN + Internet, bis 10 Spieler
+## Block V41: Multiplayer — LAN + Internet, bis 10 Spieler
 
 Plan-Datei: `docs/Feature_Lokaler_Multiplayer_V41.md`
-Datei-Scope: `src/**`, `server/**`, `electron/**`, `index.html`, `style.css`, `tests/**`
 
-#### Phase 0: Architektur-Vorbereitung
+### Bereits implementiert (Scaffolds + vollstaendige Implementierungen)
 
-Voraussetzung fuer stabilen Multiplayer. Jede Unterphase ist eigenstaendig ausfuehrbar.
+Die folgenden Dateien existieren als vollstaendige Implementierungen:
 
-- [ ] 0.1 Player-Array-Migration
-  - [ ] 0.1.1 `InputManager`: `PLAYER_1`/`PLAYER_2` Bindings durch `players[i]`-Array ersetzen; `getPlayerInput(index)` beibehalten
-  - [ ] 0.1.2 `RuntimeConfig`: `vehicles.PLAYER_1`/`PLAYER_2` durch `vehicles[i]`-Array ersetzen; `numHumans` als dynamischen Wert statt Hardcode
-  - [ ] 0.1.3 `HudRuntimeSystem`: `numHumans === 2` Check durch `players.length`-Schleife ersetzen
-  - [ ] 0.1.4 `CrosshairSystem`: `players[0]`/`players[1]` Hardcode durch Schleife ueber lokale Spieler ersetzen
-  - [ ] 0.1.5 `PauseOverlayController`: `PLAYER_1`/`PLAYER_2` invertPitch durch `players[i]`-Schleife ersetzen
-  - [ ] 0.1.6 Test: bestehende `test:core`, `test:physics` muessen gruen bleiben
+- [x] `src/core/ActionDispatcher.js` — zentraler State-Change-Dispatcher
+- [x] `src/core/GameStateSnapshot.js` + `crc32` — serialisierbarer State
+- [x] `src/core/session/SessionAdapter.js` — Interface
+- [x] `src/core/session/LocalSessionAdapter.js` — Splitscreen-Adapter
+- [x] `src/core/input/PlayerInputSource.js` — Interface
+- [x] `src/core/input/KeyboardInputSource.js` — Keyboard-Adapter
+- [x] `src/core/input/GamepadInputSource.js` — Gamepad API + Hot-plug
+- [x] `src/core/lobby/MatchLobby.js` — Interface
+- [x] `src/core/lobby/LocalMatchLobby.js` — Splitscreen-Lobby
+- [x] `src/core/player/PlayerRole.js` — Enum (ACTIVE, SPECTATOR, BOT)
+- [x] `src/core/replay/ReplayRecorder.js` — Match-Aufzeichnung
+- [x] `src/core/replay/ReplayPlayer.js` — Playback mit Speed-Control
+- [x] `src/network/PeerConnectionManager.js` — WebRTC Star-Topologie
+- [x] `src/network/DataChannelManager.js` — inputs (unreliable) + state (reliable)
+- [x] `src/network/LANSessionAdapter.js` — LAN-Play via HTTP-Signaling
+- [x] `src/network/OnlineSessionAdapter.js` — Internet-Play via WebSocket
+- [x] `src/network/LANMatchLobby.js` — Lobby via HTTP
+- [x] `src/network/OnlineMatchLobby.js` — Lobby via WebSocket
+- [x] `src/network/LatencyMonitor.js` — RTT/Jitter pro Peer
+- [x] `src/network/InputDelayBuffer.js` — adaptiv 1-12 Frames
+- [x] `src/network/RemoteInputSource.js` — Netzwerk-Input-Buffer
+- [x] `src/network/StateReconciler.js` — Client-seitige State-Korrektur
+- [x] `src/ui/NetworkHud.js` — Ping, Spieleranzahl, Status
+- [x] `src/ui/TouchInputSource.js` — virtueller Joystick + Touch-Buttons
+- [x] `server/lan-signaling.js` — HTTP LAN-Server
+- [x] `server/signaling-server.js` — WebSocket Internet-Server
+- [x] `server/package.json` + `server/Dockerfile`
+- [x] `electron/main.js` + `electron/preload.js` + `electron/package.json`
+- [x] `src/ui/menu/MenuMultiplayerBridge.js` — Lobby-State via localStorage+BroadcastChannel
+- [x] `src/ui/menu/MenuStateMachine.js` — MULTIPLAYER State-ID definiert
+- [x] `src/ui/menu/MenuSchema.js` — submenu-multiplayer Panel (hinter Feature-Flag)
+- [x] `src/ui/HudRuntimeSystem.js` — N-Player-flexibel (localHumans >= 2)
+- [x] `src/ui/CrosshairSystem.js` — networkEnabled-aware
+- [x] `src/ui/PauseOverlayController.js` — ActionDispatcher-Fallback
+- [x] `src/core/RuntimeConfig.js` — networkEnabled, maxPlayers, sessionType
+- [x] `src/ui/menu/MenuStateContracts.js` — LAN/ONLINE Session-Typen
 
-- [ ] 0.2 State-Mutation durch Dispatcher ersetzen
-  - [ ] 0.2.1 `ActionDispatcher` einfuehren: `dispatch({ type, payload, playerId })` — zentrale Stelle fuer State-Aenderungen
-  - [ ] 0.2.2 `PauseOverlayController`: direkte `game.settings.invertPitch` Mutation durch Dispatcher-Call ersetzen
-  - [ ] 0.2.3 `MatchFlowUiController`: `game._applySettingsToRuntime()` durch Dispatcher ersetzen
-  - [ ] 0.2.4 Test: bestehende Tests gruen
+---
 
-- [ ] 0.3 God-Object `game` in UI-Controllern reduzieren
-  - [ ] 0.3.1 `MatchFlowUiController`: statt `game`-Objekt nur noch benoetigte Ports/Interfaces injizieren
-  - [ ] 0.3.2 `PauseOverlayController`: `game`-Referenz durch Ports ersetzen (Settings-Dispatcher, Player-Liste, UI-Elemente)
-  - [ ] 0.3.3 `HudRuntimeSystem`: `game`-Referenz durch Ports ersetzen (Players, UI-Elemente, Match-State)
-  - [ ] 0.3.4 Test: bestehende Tests gruen
+### Offene Arbeit — 3 parallele Workstreams
 
-- [ ] 0.4 State-Serialisierung vorbereiten
-  - [ ] 0.4.1 Player-State von THREE.js trennen: `getSerializableState()` Methode auf Player/Bot, gibt `{ pos: [x,y,z], rot: [x,y,z,w], health, score }` zurueck
-  - [ ] 0.4.2 `GameStateSnapshot` Klasse: sammelt serialisierbaren State aller Entities fuer Netzwerk-Transport
-  - [ ] 0.4.3 Test: Snapshot erstellen, JSON.stringify/parse roundtrip, Werte pruefen
+> **WICHTIG: Jeder Workstream hat exklusive Datei-Ownership.**
+> Kein Agent darf Dateien ausserhalb seines Scopes aendern.
+> Gemeinsame Schnittstellen sind durch Interfaces definiert.
 
-#### Phase 41.1: Interfaces und Grundstruktur
+---
 
-- [ ] 41.1.1 `src/core/session/SessionAdapter.js` — Interface mit Methoden: `connect()`, `disconnect()`, `sendInput()`, `onStateUpdate()`, `getPlayers()`
-- [ ] 41.1.2 `src/core/input/PlayerInputSource.js` — Interface: `poll()` gibt `{ pitch, yaw, roll, throttle, firing, boost }` zurueck
-- [ ] 41.1.3 `src/core/lobby/MatchLobby.js` — Interface: `create()`, `join(code)`, `leave()`, `onPlayersChanged()`, `startMatch()`
-- [ ] 41.1.4 `src/core/player/PlayerRole.js` — Enum: `ACTIVE`, `SPECTATOR`, `BOT`
-- [ ] 41.1.5 `LocalSessionAdapter` implementieren (Splitscreen, shared memory, kein Netzwerk)
-- [ ] 41.1.6 `KeyboardInputSource` implementieren (bestehenden Keyboard-Code auf Interface refactoren)
-- [ ] 41.1.7 `LocalMatchLobby` implementieren (Splitscreen-Lobby, sofort-start)
-- [ ] 41.1.8 Bestehenden Spielfluss auf neue Interfaces umverdrahten; Tests gruen
+### Workstream A: Menu & Lobby UI
 
-#### Phase 41.2: Menue und Lobby-UI
+**Owner:** Agent A
+**Datei-Scope (exklusiv):**
+- `src/ui/menu/MenuTextCatalog.js` (neue Multiplayer-Texte)
+- `src/ui/menu/MenuSchema.js` (Multiplayer-Panel aktivieren, Items erweitern)
+- `src/ui/menu/MenuGameplayBindings.js` (Multiplayer-Events binden)
+- `src/ui/menu/MenuMultiplayerPanel.js` (NEU: Host/Join UI-Komponente)
+- `src/ui/menu/MenuLobbyRenderer.js` (NEU: Lobby-Darstellung)
+- `style.css` (Multiplayer-spezifische Styles)
 
-- [ ] 41.2.1 `MenuSchema`/`MenuTextCatalog`: Multiplayer-Submenue mit "Spiel erstellen" (nur wenn `canHost`) und "Spiel beitreten"
-- [ ] 41.2.2 Feature-Flag `canHost`: `window.__CURVIOS_APP__ === true` (App) vs. `false` (Website)
-- [ ] 41.2.3 Host-UI: IP-Anzeige, Lobby-Code, Spieler-Liste (bis 10), Settings, "Match starten" Button
-- [ ] 41.2.4 Client-UI: IP/Code-Eingabe, Verbindungsstatus, Fehler-Feedback
-- [ ] 41.2.5 `RuntimeConfig` erweitern: `sessionType='lan'`/`'online'`, `networkEnabled`, `maxPlayers`
-- [ ] 41.2.6 Test: Menue-Navigation, Feature-Flag-Steuerung
+**Aufgaben:**
 
-#### Phase 41.3: WebRTC-Stack
+- [ ] A.1 `MenuTextCatalog.js` erweitern: alle Multiplayer-Texte
+  - `menu.multiplayer.title`, `menu.multiplayer.host.label`, `menu.multiplayer.join.label`
+  - `menu.multiplayer.lobby.code`, `menu.multiplayer.lobby.players`, `menu.multiplayer.lobby.ready`
+  - `menu.multiplayer.lobby.start`, `menu.multiplayer.lobby.waiting`
+  - `menu.multiplayer.error.full`, `menu.multiplayer.error.connection`
 
-- [ ] 41.3.1 `src/network/PeerConnectionManager.js`: WebRTC Lifecycle, Star-Topologie (Host haelt N-1 Connections)
-- [ ] 41.3.2 `src/network/DataChannelManager.js`: pro-Client "inputs" (unreliable) + "state" (reliable) Channels
-- [ ] 41.3.3 `src/network/LANSignalingClient.js`: HTTP fetch-basierter Client fuer LAN-Signaling
-- [ ] 41.3.4 `src/network/WebSocketSignalingClient.js`: WS-Client fuer Internet-Signaling
-- [ ] 41.3.5 `src/network/LatencyMonitor.js`: RTT pro Client, Jitter-Tracking
-- [ ] 41.3.6 STUN/TURN-Konfiguration: Google STUN + coturn Config
-- [ ] 41.3.7 Test: 2 PeerConnections im selben Browser verbinden, Nachrichten tauschen
+- [ ] A.2 `MenuSchema.js`: `multiplayerStubEnabled` auf `true` setzen, Panel-Items definieren
+  - "Spiel erstellen" (nur wenn `canHost === true`)
+  - "Spiel beitreten"
+  - Zurueck zum Hauptmenue
 
-#### Phase 41.4: Signaling-Server
+- [ ] A.3 `MenuMultiplayerPanel.js` (NEU): Host/Join UI
+  - Host-Ansicht: IP-Anzeige, Lobby-Code, Spieler-Liste (bis 10), Settings, "Match starten"
+  - Join-Ansicht: Code-Eingabe, Verbindungsstatus, Fehler-Feedback
+  - Nutzt `MenuMultiplayerBridge` fuer State-Management
+  - Nutzt `MenuTextCatalog` fuer alle Texte
 
-- [ ] 41.4.1 `server/lan-signaling.js`: HTTP-basierter LAN-Server (~100 Zeilen): Lobby CRUD, SDP/ICE Forwarding
-- [ ] 41.4.2 `server/signaling-server.js`: WebSocket-Server (~200 Zeilen): Lobby CRUD, SDP/ICE, Heartbeat, Cleanup
-- [ ] 41.4.3 `server/package.json`: Abhaengigkeit `ws`
-- [ ] 41.4.4 `server/Dockerfile`: fuer VPS-Deployment
-- [ ] 41.4.5 Test: Server starten, Lobby erstellen/joinen, SDP austauschen (Node.js Unit-Test)
+- [ ] A.4 `MenuGameplayBindings.js`: Multiplayer-Events verdrahten
+  - HOST_GAME, JOIN_GAME, LEAVE_LOBBY, TOGGLE_READY, START_MATCH Events
+  - Feature-Flag `canHost` pruefen bei Host-Aktion
 
-#### Phase 41.5: Input-System erweitern
+- [ ] A.5 `MenuLobbyRenderer.js` (NEU): Lobby-Darstellung
+  - Spieler-Liste mit Ready-Status, Ping-Anzeige
+  - Settings-Zusammenfassung (Map, Modus, Rundenanzahl)
+  - Dynamische Updates via BroadcastChannel Events
 
-- [ ] 41.5.1 `src/core/input/GamepadInputSource.js`: Gamepad API, konfigurierbares Mapping, Hot-plug, Multi-Gamepad
-- [ ] 41.5.2 `src/core/input/TouchInputSource.js`: virtueller Joystick + Touch-Buttons, Auto-Detection (`'ontouchstart' in window`)
-- [ ] 41.5.3 `src/network/RemoteInputSource.js`: deserialisiert Netzwerk-Inputs, Input-Buffer
-- [ ] 41.5.4 `InputManager` refactoren: jeder Spieler bekommt eine `PlayerInputSource`-Instanz zugewiesen
-- [ ] 41.5.5 `src/network/InputDelayBuffer.js`: 1-12 Frames Delay, adaptiv basierend auf RTT
-- [ ] 41.5.6 Input-Source-Auswahl im Menue: Auto-Detect als Default, manuell ueberschreibbar
-- [ ] 41.5.7 Touch-Controls in `index.html`/`style.css`: virtueller Joystick (links), Buttons (rechts)
-- [ ] 41.5.8 Test: Gamepad-Mock, Touch-Event-Mock, RemoteInput Roundtrip
+- [ ] A.6 `style.css`: Multiplayer-Styles
+  - Lobby-Layout, Spieler-Karten, Ready-Indikator
+  - Responsive fuer Touch/Tablet
 
-#### Phase 41.6: Session-Adapter und State-Sync
+- [ ] A.7 Test: Menue-Navigation Multiplayer, Feature-Flag canHost
 
-- [ ] 41.6.1 `src/network/LANSessionAdapter.js`: verbindet via LAN-Signaling, WebRTC aufbauen, Input/State tauschen
-- [ ] 41.6.2 `src/network/OnlineSessionAdapter.js`: verbindet via WS-Signaling, STUN/TURN, WebRTC
-- [ ] 41.6.3 `src/network/LANMatchLobby.js` + `src/network/OnlineMatchLobby.js`
-- [ ] 41.6.4 Host: State-Snapshots (10/s) an alle Clients senden, CRC32 Checksums
-- [ ] 41.6.5 Client: Prediction + State-Korrektur via Interpolation
-- [ ] 41.6.6 Arena-Load-Gate: alle Spieler signalisieren "loaded" vor Tick 0
-- [ ] 41.6.7 `GameRuntimeFacade` auf SessionAdapter-Integration umbauen
-- [ ] 41.6.8 Test: Host + Client Session aufbauen, State-Snapshot senden/empfangen
+**Schnittstelle zu B:** Agent A ruft `MenuMultiplayerBridge.requestMatchStart()` auf.
+Agent B verdrahtet den Callback in `GameRuntimeFacade`.
 
-#### Phase 41.7: Runtime und HUD fuer N Spieler
+**Schnittstelle zu C:** Keine direkte. Agent A nutzt nur bereits implementierte Bridge-APIs.
 
-- [ ] 41.7.1 N-Player HUD: dynamisches Scoreboard fuer bis zu 10 Spieler
-- [ ] 41.7.2 N-Player Kamera: nur eigener Spieler lokal gerendert (Vollbild statt Splitscreen bei Netzwerk)
-- [ ] 41.7.3 `RenderViewportSystem`: Vollbild fuer Netzwerk-Sessions, Splitscreen nur bei `sessionType='splitscreen'`
-- [ ] 41.7.4 Round-Lifecycle synchron: `round_start`/`round_end`/`match_end` ueber alle Peers
-- [ ] 41.7.5 Nach-Match: Rematch, Return-to-Lobby, Spieler-Slot-Verwaltung
-- [ ] 41.7.6 Test: Scoreboard mit 5+ Spielern rendern, Viewport-Modi pruefen
+---
 
-#### Phase 41.8: Netzwerk-Robustheit
+### Workstream B: Core Runtime Integration
 
-- [ ] 41.8.1 Netzwerk-HUD: Ping-Anzeige, Spieleranzahl, Verbindungsstatus (gruen/gelb/rot)
-- [ ] 41.8.2 Disconnect-Detection: Data Channel close + Heartbeat (5s Timeout)
-- [ ] 41.8.3 Client-Disconnect: Bot-Uebernahme oder leerer Slot, andere Clients informiert
-- [ ] 41.8.4 Host-Disconnect: "Host getrennt" Dialog, Match beendet
-- [ ] 41.8.5 Reconnect: 30s Fenster, Full State Sync bei Wiedereintritt
-- [ ] 41.8.6 Graceful Leave: `beforeunload` sendet Leave-Nachricht
-- [ ] 41.8.7 Test: Disconnect simulieren, Reconnect pruefen
+**Owner:** Agent B
+**Datei-Scope (exklusiv):**
+- `src/core/GameRuntimeFacade.js` (SessionAdapter-Integration)
+- `src/core/main.js` (Initialisierung erweitern)
+- `src/core/InputManager.js` (PlayerInputSource-Integration)
+- `src/ui/MatchFlowUiController.js` (Multiplayer Match-Flow)
+- `src/ui/HudRuntimeSystem.js` (N-Player Scoreboard)
+- `src/ui/CrosshairSystem.js` (Vollbild bei Netzwerk)
+- `src/ui/PauseOverlayController.js` (Netzwerk-Pause-Logik)
+- `src/ui/RenderViewportSystem.js` (Viewport-Modi)
 
-#### Phase 41.9: App-Build
+**Aufgaben:**
 
-- [ ] 41.9.1 Electron Projekt-Setup: `electron/main.js`, `electron/preload.js`, `electron/package.json`
-- [ ] 41.9.2 Main Process: LAN-Signaling-Server als Child-Process starten
-- [ ] 41.9.3 IPC Bridge: `window.__CURVIOS_APP__ = true` setzen, LAN-Server-Status kommunizieren
-- [ ] 41.9.4 Web-Build: statische Website, `canHost=false`, nur Join
-- [ ] 41.9.5 Build-Skripte: `npm run build:web` und `npm run build:app`
-- [ ] 41.9.6 Test: App kann hosten+joinen, Website kann nur joinen
+- [ ] B.1 `GameRuntimeFacade.js`: SessionAdapter-Integration
+  - Bei `startMatch()`: SessionAdapter basierend auf `sessionType` waehlen (Local/LAN/Online)
+  - Host: State-Snapshots (10/s) via `session.broadcastState()` senden
+  - Client: `session.onStateUpdate()` an `StateReconciler` weiterleiten
+  - Arena-Load-Gate: alle Spieler signalisieren "loaded" vor Tick 0
 
-#### Phase 41.10: Replay und Spectator-Vorbereitung
+- [ ] B.2 `InputManager.js`: PlayerInputSource-Architektur
+  - Jeder Spieler bekommt `PlayerInputSource`-Instanz (Keyboard/Gamepad/Touch/Remote)
+  - `getPlayerInput(index)` delegiert an zugewiesene Source
+  - Auto-Detection: Keyboard als Default, Gamepad bei Verbindung
 
-- [ ] 41.10.1 `src/core/replay/ReplayRecorder.js`: `{ initialState, actions[], playerCount }` aufzeichnen
-- [ ] 41.10.2 `src/core/replay/ReplayPlayer.js`: Playback mit Play/Pause/Speed
-- [ ] 41.10.3 Replay-Persistenz: JSON-Export (App: Dateisystem, Demo: Download)
-- [ ] 41.10.4 Spectator-Interface: `SpectatorInputSource`-Stub + `PlayerRole.SPECTATOR`
-- [ ] 41.10.5 Test: Record + Playback = identischer Endstate
+- [ ] B.3 `MatchFlowUiController.js`: Multiplayer Match-Lifecycle
+  - Netzwerk-Match: kein lokaler Pause (nur Host kann pausieren)
+  - Round-Lifecycle synchron: `round_start`/`round_end`/`match_end` ueber alle Peers
+  - Nach-Match: Rematch, Return-to-Lobby, Spieler-Slot-Verwaltung
 
-#### Phase 41.99: Abschluss-Gate
+- [ ] B.4 `HudRuntimeSystem.js`: N-Player Scoreboard
+  - Dynamisches Scoreboard fuer bis zu 10 Spieler
+  - Zeigt nur lokale HUD-Elemente (Items, Health) fuer eigenen Spieler
+  - Scoreboard zeigt alle Spieler mit Ping-Indikator
+
+- [ ] B.5 `RenderViewportSystem.js`: Viewport-Modi
+  - Vollbild fuer Netzwerk-Sessions (`networkEnabled === true`)
+  - Splitscreen nur bei `sessionType='splitscreen'` (lokal 2P)
+  - Kamera folgt nur eigenem Spieler bei Netzwerk
+
+- [ ] B.6 `PauseOverlayController.js`: Netzwerk-Pause
+  - Bei Netzwerk: Pause nur durch Host, Clients bekommen "Host hat pausiert" Overlay
+  - ESC bei Client: Disconnect-Bestaetigung statt Pause
+
+- [ ] B.7 Test: bestehende `test:core` + `test:physics` muessen gruen bleiben
+
+**Schnittstelle zu A:** Agent B implementiert den `onMatchStart` Callback in GameRuntimeFacade,
+der von MenuMultiplayerBridge.requestMatchStart() getriggert wird.
+
+**Schnittstelle zu C:** Agent B ruft `SessionAdapter.connect()`, `.sendInput()`, `.broadcastState()`,
+`.onStateUpdate()` auf — Interfaces die Agent C's Netzwerk-Code implementiert.
+
+---
+
+### Workstream C: Network Robustness, Build & Replay
+
+**Owner:** Agent C
+**Datei-Scope (exklusiv):**
+- `src/network/*` (alle Netzwerk-Dateien)
+- `src/ui/NetworkHud.js` (Netzwerk-HUD erweitern)
+- `src/ui/TouchInputSource.js` (Touch-Integration)
+- `src/core/replay/*` (Replay-System)
+- `server/*` (Signaling-Server)
+- `electron/*` (Electron App)
+- `index.html` (Touch-Controls Markup)
+- `package.json` (Build-Skripte hinzufuegen)
+
+**Aufgaben:**
+
+- [ ] C.1 Netzwerk-Robustheit
+  - Disconnect-Detection: Data Channel close + Heartbeat (5s Timeout)
+  - Client-Disconnect: Bot-Uebernahme oder leerer Slot, andere Clients informiert
+  - Host-Disconnect: "Host getrennt" Dialog, Match beendet
+  - Reconnect: 30s Fenster, Full State Sync bei Wiedereintritt
+  - Graceful Leave: `beforeunload` sendet Leave-Nachricht
+
+- [ ] C.2 `NetworkHud.js` erweitern
+  - Disconnect-Warning Overlay
+  - Reconnect-Countdown
+  - Bandbreiten-Anzeige (optional)
+
+- [ ] C.3 Build-Skripte
+  - `npm run build:web` — statische Website, `canHost=false`, nur Join
+  - `npm run build:app` — Electron-App mit eingebettetem LAN-Server
+  - Vite-Config: Env-Variable `VITE_APP_MODE=web|app`
+
+- [ ] C.4 Touch-Integration
+  - `index.html`: Touch-Control Container Markup
+  - `TouchInputSource.js`: Auto-Show bei Touch-Geraet, Auto-Hide bei Desktop
+  - Touch-Controls nur im Match sichtbar, nicht im Menue
+
+- [ ] C.5 Replay-Integration
+  - `ReplayRecorder`: in GameRuntimeFacade einklinken (Start/Stop bei Match)
+  - Replay-Persistenz: JSON-Export (App: Dateisystem via IPC, Demo: Download)
+  - Spectator-Stub: `SpectatorInputSource` + `PlayerRole.SPECTATOR`
+
+- [ ] C.6 Electron App finalisieren
+  - Build-Config: `electron-builder` oder `electron-forge`
+  - Auto-Start LAN-Server beim App-Start
+  - Tray-Icon mit Server-Status (optional)
+
+- [ ] C.7 Test: Disconnect-Simulation, Reconnect, Build-Skripte
+
+**Schnittstelle zu B:** Agent C implementiert `SessionAdapter`-Interface Methoden.
+Agent B ruft diese auf. Kein direkter Datei-Overlap.
+
+---
+
+### Phase 41.99: Abschluss-Gate (nach allen Workstreams)
 
 - [ ] 41.99.1 LAN-Match: 2+ Rechner, stabiles Match, App hostet, Website joint
 - [ ] 41.99.2 Internet-Match: 2+ Rechner ueber Internet via Signaling-Server
