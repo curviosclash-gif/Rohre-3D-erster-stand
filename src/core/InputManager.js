@@ -51,6 +51,13 @@ export class InputManager {
             nextItem: false,
         };
 
+        /**
+         * PlayerInputSource instances indexed by player slot.
+         * When a source is assigned for a slot, getPlayerInput() delegates to it.
+         * @type {Map<number, import('./input/PlayerInputSource.js').PlayerInputSource>}
+         */
+        this._playerSources = new Map();
+
         this._rebuildPreventDefaultCodes();
         this._onKeyDown = (e) => this._handleKeyDown(e);
         this._onKeyUp = (e) => this._handleKeyUp(e);
@@ -190,7 +197,53 @@ export class InputManager {
         return this._wasActionPressed(code);
     }
 
+    /**
+     * Assigns a PlayerInputSource for a given player slot.
+     * When assigned, getPlayerInput() delegates to the source's poll() method.
+     * @param {number} playerIndex
+     * @param {import('./input/PlayerInputSource.js').PlayerInputSource} source
+     */
+    setPlayerSource(playerIndex, source) {
+        const existing = this._playerSources.get(playerIndex);
+        if (existing && existing !== source) {
+            existing.unbind();
+        }
+        if (source) {
+            source.bind(playerIndex);
+            this._playerSources.set(playerIndex, source);
+        } else {
+            this._playerSources.delete(playerIndex);
+        }
+    }
+
+    /**
+     * Returns the PlayerInputSource for a given slot, or null.
+     * @param {number} playerIndex
+     * @returns {import('./input/PlayerInputSource.js').PlayerInputSource|null}
+     */
+    getPlayerSource(playerIndex) {
+        return this._playerSources.get(playerIndex) || null;
+    }
+
+    /**
+     * Removes and disposes all assigned PlayerInputSources.
+     */
+    clearPlayerSources() {
+        for (const source of this._playerSources.values()) {
+            source.dispose();
+        }
+        this._playerSources.clear();
+    }
+
     getPlayerInput(playerIndex, options = {}) {
+        // Delegate to assigned PlayerInputSource if available
+        const source = this._playerSources.get(playerIndex);
+        if (source) {
+            const polled = source.poll();
+            if (polled) return polled;
+        }
+
+        // Fallback: keyboard bindings (original behavior)
         const includeSecondaryBindings = !!options.includeSecondaryBindings && playerIndex === 0;
         const keyMap = playerIndex === 0 ? this.bindings.PLAYER_1 : this.bindings.PLAYER_2;
         const altKeyMap = includeSecondaryBindings ? this.bindings.PLAYER_2 : null;
@@ -216,6 +269,7 @@ export class InputManager {
     }
 
     dispose() {
+        this.clearPlayerSources();
         if (this._onKeyDown) {
             window.removeEventListener('keydown', this._onKeyDown);
             this._onKeyDown = null;

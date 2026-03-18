@@ -293,23 +293,49 @@ export class MatchFlowUiController {
             this.applyMatchUiState(loadingUiState);
         }
 
-        const initializedMatch = this.sessionOrchestrator.createMatchSession({
-            onPlayerFeedback: (player, message) => {
-                game._showPlayerFeedback(player, message);
-            },
-            onPlayerDied: (player, cause) => {
-                if (!player.isBot) {
-                    game._showStatusToast(game._getDeathMessage(cause), 2500, 'error');
+        // Initialize session adapter (Local/LAN/Online)
+        const sessionInitPromise = game.runtimeFacade?._initSession?.();
+
+        const createMatch = () => {
+            const initializedMatch = this.sessionOrchestrator.createMatchSession({
+                onPlayerFeedback: (player, message) => {
+                    game._showPlayerFeedback(player, message);
+                },
+                onPlayerDied: (player, cause) => {
+                    if (!player.isBot) {
+                        game._showStatusToast(game._getDeathMessage(cause), 2500, 'error');
+                    }
+                },
+                onRoundEnd: (winner) => {
+                    this.onRoundEnd(winner);
+                },
+            });
+            return initializedMatch;
+        };
+
+        const completeWithLoadGate = (resolvedMatch) => {
+            const loadGate = game.runtimeFacade?._waitForAllPlayersLoaded?.();
+            if (isPromiseLike(loadGate)) {
+                return Promise.resolve(loadGate).then(() => this._completeStartedMatch(resolvedMatch));
+            }
+            return this._completeStartedMatch(resolvedMatch);
+        };
+
+        if (isPromiseLike(sessionInitPromise)) {
+            return Promise.resolve(sessionInitPromise).then(() => {
+                const initializedMatch = createMatch();
+                if (isPromiseLike(initializedMatch)) {
+                    return Promise.resolve(initializedMatch).then((r) => completeWithLoadGate(r));
                 }
-            },
-            onRoundEnd: (winner) => {
-                this.onRoundEnd(winner);
-            },
-        });
-        if (isPromiseLike(initializedMatch)) {
-            return Promise.resolve(initializedMatch).then((resolvedMatch) => this._completeStartedMatch(resolvedMatch));
+                return completeWithLoadGate(initializedMatch);
+            });
         }
-        return this._completeStartedMatch(initializedMatch);
+
+        const initializedMatch = createMatch();
+        if (isPromiseLike(initializedMatch)) {
+            return Promise.resolve(initializedMatch).then((resolvedMatch) => completeWithLoadGate(resolvedMatch));
+        }
+        return completeWithLoadGate(initializedMatch);
     }
 
     startMatch() {
@@ -421,13 +447,34 @@ export class MatchFlowUiController {
         this.applyLifecycleTransition(returnTransition);
         game.entityManager?.clearLastRoundGhost?.();
         this.sessionOrchestrator.teardownMatchSession();
+        game.runtimeFacade?._teardownSession?.();
+        game.hudRuntimeSystem?.clearNetworkScoreboard?.();
         this.applyMatchUiState(returnTransition.uiState);
         game._showMainNav();
         this.resetCrosshairUi();
         game.uiManager.syncAll();
     }
 
+    /**
+     * Returns true if the current match is a network session.
+     */
+    _isNetworkMatch() {
+        return !!this.game?.runtimeFacade?.isNetworkSession?.();
+    }
+
+    /**
+     * Returns true if the local client is the host.
+     */
+    _isHost() {
+        return this.game?.runtimeFacade?.isHost?.() ?? true;
+    }
+
     pause() {
+        // In network matches only the host can pause; clients get disconnect confirmation
+        if (this._isNetworkMatch() && !this._isHost()) {
+            this.pauseOverlayController.showDisconnectConfirmation();
+            return;
+        }
         this.pauseOverlayController.pause();
     }
 

@@ -14,6 +14,8 @@ import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
 import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
+import { LocalSessionAdapter } from './session/LocalSessionAdapter.js';
+import { createGameStateSnapshot } from './GameStateSnapshot.js';
 import {
     applyMenuPresetAction,
     deleteMenuPresetAction,
@@ -101,6 +103,9 @@ const START_VALIDATION_RELEVANT_KEY_SET = new Set([
     SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED,
 ]);
 
+/** @type {number} Host broadcasts state snapshots at this interval (ms). */
+const STATE_BROADCAST_INTERVAL_MS = 100; // 10/s
+
 export class GameRuntimeFacade {
     constructor(deps = {}) {
         this.game = deps.game || null;
@@ -108,6 +113,15 @@ export class GameRuntimeFacade {
         this.menuMultiplayerBridge = null;
         this._matchPrewarmTimer = null;
         this._menuEventHandlers = createMenuEventHandlerRegistry(this);
+
+        /** @type {import('./session/SessionAdapter.js').SessionAdapter|null} */
+        this.session = null;
+        /** @type {import('../network/StateReconciler.js').StateReconciler|null} */
+        this._stateReconciler = null;
+        this._stateBroadcastTimer = null;
+        this._arenaLoadedPeers = new Set();
+        this._onStateUpdateHandler = null;
+        this._onPlayerLoadedHandler = null;
     }
 
     _clearMatchPrewarmTimer() {
@@ -653,6 +667,142 @@ export class GameRuntimeFacade {
         game.uiManager?.updateContext();
     }
 
+    // ---- SessionAdapter lifecycle ----
+
+    /**
+     * Creates and connects the appropriate SessionAdapter based on runtimeConfig.sessionType.
+     * Called at the beginning of a match.
+     */
+    async _initSession() {
+        const game = this.game;
+        const sessionType = String(game?.runtimeConfig?.session?.sessionType || 'single').toLowerCase();
+
+        this._teardownSession();
+
+        if (sessionType === 'lan') {
+            // Lazy-import to avoid bundling network code in single-player builds
+            const { LANSessionAdapter } = await import(/* webpackChunkName: "net" */ '../network/LANSessionAdapter.js');
+            this.session = new LANSessionAdapter();
+        } else if (sessionType === 'online') {
+            const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../network/OnlineSessionAdapter.js');
+            this.session = new OnlineSessionAdapter();
+        } else {
+            this.session = new LocalSessionAdapter();
+        }
+
+        const numHumans = game?.runtimeConfig?.session?.numHumans || 1;
+        await this.session.connect({ numHumans });
+
+        if (this.session.isHost && (sessionType === 'lan' || sessionType === 'online')) {
+            this._startStateBroadcast();
+        }
+
+        if (!this.session.isHost && (sessionType === 'lan' || sessionType === 'online')) {
+            this._setupClientStateReceiver();
+        }
+    }
+
+    /**
+     * Host: broadcasts state snapshots at 10/s to all connected clients.
+     */
+    _startStateBroadcast() {
+        this._stopStateBroadcast();
+        this._stateBroadcastTimer = setInterval(() => {
+            const game = this.game;
+            if (!game?.entityManager || game.state !== GAME_STATE_IDS.PLAYING) return;
+            const snapshot = createGameStateSnapshot(game.entityManager, game.roundStateController);
+            this.session?.broadcastState?.(snapshot);
+        }, STATE_BROADCAST_INTERVAL_MS);
+    }
+
+    _stopStateBroadcast() {
+        if (this._stateBroadcastTimer) {
+            clearInterval(this._stateBroadcastTimer);
+            this._stateBroadcastTimer = null;
+        }
+    }
+
+    /**
+     * Client: listens for authoritative state from the host and feeds it to StateReconciler.
+     */
+    _setupClientStateReceiver() {
+        if (!this.session) return;
+        // Lazy-create reconciler
+        if (!this._stateReconciler) {
+            // StateReconciler is already bundled as part of the network chunk
+            import('../network/StateReconciler.js').then(({ StateReconciler }) => {
+                this._stateReconciler = new StateReconciler();
+            }).catch(() => { /* reconciler unavailable — degrade gracefully */ });
+        }
+
+        this._onStateUpdateHandler = (serverState) => {
+            if (this._stateReconciler) {
+                this._stateReconciler.receiveServerState(serverState);
+                const game = this.game;
+                if (game?.entityManager?.players) {
+                    this._stateReconciler.reconcile(game.entityManager.players, game.entityManager);
+                }
+            }
+        };
+        this.session.on('stateUpdate', this._onStateUpdateHandler);
+    }
+
+    /**
+     * Arena-Load-Gate: waits for all peers to signal "loaded" before tick 0.
+     * For LocalSessionAdapter this resolves immediately.
+     */
+    async _waitForAllPlayersLoaded() {
+        if (!this.session || this.session instanceof LocalSessionAdapter) return;
+
+        const players = this.session.getPlayers();
+        if (!players || players.length <= 1) return;
+
+        return new Promise((resolve) => {
+            // Mark self as loaded
+            this._arenaLoadedPeers.add(this.session.localPlayerId);
+            this.session.sendInput({ type: 'arena_loaded', playerId: this.session.localPlayerId });
+
+            this._onPlayerLoadedHandler = (data) => {
+                if (data?.playerId) this._arenaLoadedPeers.add(data.playerId);
+                if (this._arenaLoadedPeers.size >= players.length) {
+                    resolve();
+                }
+            };
+            this.session.on('playerLoaded', this._onPlayerLoadedHandler);
+
+            // Safety timeout: don't block forever
+            setTimeout(() => resolve(), 10000);
+        });
+    }
+
+    _teardownSession() {
+        this._stopStateBroadcast();
+        if (this._onStateUpdateHandler && this.session) {
+            this.session.off('stateUpdate', this._onStateUpdateHandler);
+            this._onStateUpdateHandler = null;
+        }
+        if (this._onPlayerLoadedHandler && this.session) {
+            this.session.off('playerLoaded', this._onPlayerLoadedHandler);
+            this._onPlayerLoadedHandler = null;
+        }
+        this._arenaLoadedPeers.clear();
+        if (this.session) {
+            this.session.dispose();
+            this.session = null;
+        }
+        this._stateReconciler?.reset?.();
+    }
+
+    /** Returns true if the current session is a network (LAN/Online) session. */
+    isNetworkSession() {
+        return !!this.game?.runtimeConfig?.session?.networkEnabled;
+    }
+
+    /** Returns true if the local client is the host of the session. */
+    isHost() {
+        return this.session?.isHost ?? true;
+    }
+
     startMatch() {
         this._clearMatchPrewarmTimer();
         const telemetryPayload = {
@@ -711,6 +861,7 @@ export class GameRuntimeFacade {
 
     dispose() {
         this._clearMatchPrewarmTimer();
+        this._teardownSession();
         this.game?.menuController?.dispose?.();
         this.game?.menuMultiplayerBridge?.dispose?.();
         if (this.game) {
