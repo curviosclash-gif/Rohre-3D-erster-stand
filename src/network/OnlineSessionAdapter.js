@@ -7,10 +7,15 @@ import { PeerConnectionManager } from './PeerConnectionManager.js';
 import { DataChannelManager } from './DataChannelManager.js';
 import { LatencyMonitor } from './LatencyMonitor.js';
 
-const DEFAULT_TURN_SERVERS = [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
-];
+/**
+ * Resolve signaling server URL from build-time env.
+ * Set VITE_SIGNALING_URL to override (e.g. wss://myserver.com:9090).
+ */
+function resolveSignalingUrl(explicit) {
+    if (explicit) return explicit;
+    /* global __SIGNALING_URL__ */
+    return (typeof __SIGNALING_URL__ !== 'undefined' && __SIGNALING_URL__) || '';
+}
 
 /** Reconnect window in ms (C.1) */
 const RECONNECT_WINDOW_MS = 30_000;
@@ -24,8 +29,8 @@ export class OnlineSessionAdapter extends SessionAdapter {
     constructor(options = {}) {
         super();
         this.isHost = !!options.isHost;
-        this._signalingUrl = options.signalingUrl || '';
-        this._iceServers = options.iceServers || DEFAULT_TURN_SERVERS;
+        this._signalingUrl = resolveSignalingUrl(options.signalingUrl);
+        this._iceServers = options.iceServers || null;
         this._ws = null;
         this._dataChannelManager = new DataChannelManager();
         this._peerManager = new PeerConnectionManager({

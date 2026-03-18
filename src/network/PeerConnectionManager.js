@@ -32,6 +32,31 @@ const DEFAULT_ICE_SERVERS = [
     { urls: 'stun:stun1.l.google.com:19302' },
 ];
 
+/**
+ * Build ICE server list from environment + defaults.
+ * Set VITE_TURN_URL, VITE_TURN_USERNAME, VITE_TURN_CREDENTIAL to add a TURN server.
+ * Example: VITE_TURN_URL=turn:myserver.com:3478
+ */
+function resolveIceServers(custom) {
+    if (custom && custom.length) return custom;
+
+    const servers = [...DEFAULT_ICE_SERVERS];
+
+    /* global __TURN_URL__, __TURN_USERNAME__, __TURN_CREDENTIAL__ */
+    const turnUrl = (typeof __TURN_URL__ !== 'undefined' && __TURN_URL__) || '';
+    const turnUser = (typeof __TURN_USERNAME__ !== 'undefined' && __TURN_USERNAME__) || '';
+    const turnCred = (typeof __TURN_CREDENTIAL__ !== 'undefined' && __TURN_CREDENTIAL__) || '';
+
+    if (turnUrl) {
+        const entry = { urls: turnUrl };
+        if (turnUser) entry.username = turnUser;
+        if (turnCred) entry.credential = turnCred;
+        servers.push(entry);
+    }
+
+    return servers;
+}
+
 /** Heartbeat interval and timeout for disconnect detection (C.1) */
 const HEARTBEAT_INTERVAL = 2000;
 const HEARTBEAT_TIMEOUT = 5000;
@@ -39,7 +64,7 @@ const HEARTBEAT_TIMEOUT = 5000;
 export class PeerConnectionManager {
     constructor(options = {}) {
         this.isHost = !!options.isHost;
-        this.iceServers = options.iceServers || DEFAULT_ICE_SERVERS;
+        this.iceServers = resolveIceServers(options.iceServers);
         this._peers = new Map();
         this._listeners = new Map();
         this._dataChannelManager = options.dataChannelManager || null;
