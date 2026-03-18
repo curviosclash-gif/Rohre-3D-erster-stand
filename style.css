@@ -2900,3 +2900,60 @@ input[type="range"]::-webkit-slider-thumb {
         flex: 1;
     }
 }
+
+/* --- LAN Discovery --- */
+
+.mp-discovery-hint {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--menu-theme-muted);
+    padding: 8px 0;
+    font-style: italic;
+}
+
+.mp-discovery-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 60px;
+}
+
+.mp-discovery-empty {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--menu-theme-muted);
+    padding: 18px 0;
+}
+
+.mp-discovery-host {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    text-align: left;
+    padding: 10px 14px;
+}
+
+.mp-discovery-host strong {
+    font-size: 0.95rem;
+}
+
+.mp-discovery-meta {
+    font-size: 0.75rem;
+    color: var(--menu-theme-muted);
+}
+
+.mp-lobby-ip-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--menu-theme-border);
+    border-radius: 6px;
+    padding: 10px 14px;
+}
+
+.mp-ip-value {
+    user-select: all;
+    cursor: text;
+}

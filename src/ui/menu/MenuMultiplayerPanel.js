@@ -32,6 +32,7 @@ const PANEL_VIEW = Object.freeze({
     HOST_LOBBY: 'host_lobby',
     JOIN_INPUT: 'join_input',
     JOIN_LOBBY: 'join_lobby',
+    DISCOVERY: 'discovery',
 });
 
 function normalizeString(value, fallback = '') {
@@ -68,6 +69,7 @@ export function createMultiplayerPanel(ctx) {
     let lobbyContainer = null;
     let errorEl = null;
     let joinCodeInput = null;
+    let discoveryCleanup = null;
     const bindings = [];
 
     function bind(el, event, handler) {
@@ -153,8 +155,9 @@ export function createMultiplayerPanel(ctx) {
             root.appendChild(hostBtn);
         }
 
+        const hasDiscovery = typeof window !== 'undefined' && window.curviosApp?.startDiscovery;
         const joinBtn = createButton('nav-btn mp-join-btn', t('menu.multiplayer.join.label', 'Spiel beitreten'), () => {
-            switchView(PANEL_VIEW.JOIN_INPUT);
+            switchView(hasDiscovery ? PANEL_VIEW.DISCOVERY : PANEL_VIEW.JOIN_INPUT);
         });
         root.appendChild(joinBtn);
 
@@ -188,6 +191,71 @@ export function createMultiplayerPanel(ctx) {
         root.appendChild(submitBtn);
 
         const backBtn = createButton('nav-btn mp-back-btn', t('menu.multiplayer.lobby.back', 'Zurueck'), () => {
+            switchView(PANEL_VIEW.MENU);
+        });
+        root.appendChild(backBtn);
+    }
+
+    function stopDiscovery() {
+        if (discoveryCleanup) { discoveryCleanup(); discoveryCleanup = null; }
+        window.curviosApp?.stopDiscovery?.();
+    }
+
+    function handleDiscoveryJoin(host) {
+        stopDiscovery();
+        clearError();
+        const result = bridge.join({ lobbyCode: host.lobbyCode, signalingUrl: `http://${host.ip}:${host.port}` });
+        if (!result.ok) {
+            showError(result.message);
+            switchView(PANEL_VIEW.MENU);
+            return;
+        }
+        switchView(PANEL_VIEW.JOIN_LOBBY);
+    }
+
+    function renderDiscoveryView(root) {
+        const title = createElement('h2', 'submenu-title', t('menu.multiplayer.join.label', 'Spiel beitreten'));
+        root.appendChild(title);
+
+        const hint = createElement('p', 'mp-discovery-hint', 'Suche Spiele im Netzwerk...');
+        root.appendChild(hint);
+
+        const hostList = createElement('div', 'mp-discovery-list');
+        root.appendChild(hostList);
+
+        function updateHostList(hosts) {
+            hostList.innerHTML = '';
+            if (!hosts || hosts.length === 0) {
+                const empty = createElement('div', 'mp-discovery-empty', 'Keine Spiele gefunden.');
+                hostList.appendChild(empty);
+                return;
+            }
+            for (const host of hosts) {
+                const card = createElement('button', 'nav-btn mp-discovery-host');
+                card.type = 'button';
+                card.innerHTML = `<strong>${host.hostName || host.ip}</strong>`
+                    + `<span class="mp-discovery-meta">${host.ip}:${host.port}`
+                    + ` &middot; Code: ${host.lobbyCode}`
+                    + ` &middot; ${host.playerCount || 0} Spieler</span>`;
+                bind(card, 'click', () => handleDiscoveryJoin(host));
+                hostList.appendChild(card);
+            }
+        }
+
+        // Start listening
+        window.curviosApp.startDiscovery();
+        window.curviosApp.getDiscoveredHosts?.().then((hosts) => updateHostList(hosts));
+        discoveryCleanup = window.curviosApp.onDiscoveredHosts((hosts) => updateHostList(hosts));
+
+        // Manual fallback
+        const manualBtn = createButton('nav-btn mp-manual-join-btn', 'Code manuell eingeben', () => {
+            stopDiscovery();
+            switchView(PANEL_VIEW.JOIN_INPUT);
+        });
+        root.appendChild(manualBtn);
+
+        const backBtn = createButton('nav-btn mp-back-btn', t('menu.multiplayer.lobby.back', 'Zurueck'), () => {
+            stopDiscovery();
             switchView(PANEL_VIEW.MENU);
         });
         root.appendChild(backBtn);
@@ -242,6 +310,9 @@ export function createMultiplayerPanel(ctx) {
             case PANEL_VIEW.JOIN_INPUT:
                 renderJoinInputView(panelRoot);
                 break;
+            case PANEL_VIEW.DISCOVERY:
+                renderDiscoveryView(panelRoot);
+                break;
             case PANEL_VIEW.JOIN_LOBBY:
                 renderLobbyUI(panelRoot, false);
                 break;
@@ -274,6 +345,7 @@ export function createMultiplayerPanel(ctx) {
     }
 
     function dispose() {
+        stopDiscovery();
         for (const b of bindings) {
             b.el.removeEventListener(b.event, b.handler);
         }
