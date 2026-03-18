@@ -1,3 +1,4 @@
+import { CONFIG } from '../../../core/Config.js';
 import { isHuntHealthActive } from '../../../hunt/HealthSystem.js';
 import { isRocketTierType, resolveRocketTierDamage } from '../../../hunt/RocketPickupSystem.js';
 import { applyTrailDamageFromProjectile } from '../../../hunt/DestructibleTrail.js';
@@ -6,6 +7,25 @@ export class ProjectileHitResolver {
     constructor(system) {
         this.system = system || null;
         this._tmpVec = this.system?._tmpVec || null;
+    }
+
+    _applyRocketExplosion(projectile, players, directHitTarget) {
+        const explosionRadius = Math.max(1, Number(CONFIG?.HUNT?.ROCKET?.EXPLOSION_RADIUS || 25));
+        const explosionDamageFalloff = Math.max(0, Math.min(1, Number(CONFIG?.HUNT?.ROCKET?.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
+        const baseDamage = resolveRocketTierDamage(projectile.type);
+        const damageAtCenter = baseDamage * (1 + explosionDamageFalloff);
+
+        for (const target of players || []) {
+            if (!target.alive || target === projectile.owner || target === directHitTarget) continue;
+
+            const distanceToTarget = target.position.distanceTo(projectile.position);
+            if (distanceToTarget > explosionRadius) continue;
+
+            const damageFalloff = 1 - (distanceToTarget / explosionRadius) * explosionDamageFalloff;
+            const explosionDamage = Math.max(1, Math.floor(damageAtCenter * damageFalloff));
+            const damageResult = target.takeDamage(explosionDamage);
+            this.system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult, projectile);
+        }
     }
 
     resolveProjectileOutcome(projectile, players, trailSpatialIndex, simulationResult) {
@@ -64,6 +84,7 @@ export class ProjectileHitResolver {
                 const damageResult = target.takeDamage(damage);
                 this.system?.onProjectilePowerup?.(target, projectile);
                 this.system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult, projectile);
+                this._applyRocketExplosion(projectile, players, target);
             } else if (target.hasShield) {
                 target.hasShield = false;
             } else {
