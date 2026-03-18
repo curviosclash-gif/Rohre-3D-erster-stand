@@ -1762,6 +1762,12 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(JSON.parse(exportedJson).mapKey).toBe('maze');
 
         await page.click('#btn-close-level4');
+        await page.waitForFunction(() => {
+            const drawer = document.getElementById('submenu-level4');
+            return !!drawer
+                && drawer.classList.contains('hidden')
+                && !window.GAME_INSTANCE?.settings?.localSettings?.toolsState?.level4Open;
+        }, null, { timeout: 4000 });
         await page.evaluate(() => {
             const game = window.GAME_INSTANCE;
             game.settings.mapKey = 'pyramid';
