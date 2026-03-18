@@ -23,7 +23,6 @@
  */
 
 import { resolveMenuCatalogText } from './MenuTextCatalog.js';
-import { MENU_MULTIPLAYER_EVENT_TYPES } from './MenuMultiplayerBridge.js';
 import { renderLobbyView, updateLobbyView, disposeLobbyView } from './MenuLobbyRenderer.js';
 
 const MULTIPLAYER_MAX_PLAYERS = 10;
