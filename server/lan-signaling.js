@@ -121,6 +121,16 @@ export function createLANSignalingServer(port = 9090) {
             return;
         }
 
+        // Discovery info endpoint — returns lobby metadata for auto-discovery
+        if (req.method === 'GET' && path === '/discovery/info') {
+            jsonResponse(res, {
+                lobbyCode: lobby.code,
+                playerCount: lobby.players.length,
+                maxPlayers: 10,
+            });
+            return;
+        }
+
         jsonResponse(res, { error: 'Not found' }, 404);
     });
 
