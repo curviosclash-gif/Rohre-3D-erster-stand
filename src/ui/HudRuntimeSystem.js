@@ -10,10 +10,43 @@ export class HudRuntimeSystem {
         this.ports = deps.ports || null;
         this._hudP2Visible = null;
         this._fighterHudTimer = 0;
+        /** @type {HTMLElement|null} */
+        this._scoreboardContainer = null;
+    }
+
+    /**
+     * Returns the local player index (0 for host / single-player).
+     */
+    _getLocalPlayerIndex() {
+        return this.game?.runtimeFacade?.session?.localPlayerId
+            ? (this.game.runtimeFacade.session.getPlayers?.() || [])
+                .findIndex((p) => p.id === this.game.runtimeFacade.session.localPlayerId)
+            : 0;
+    }
+
+    /**
+     * Returns true if this is a network session.
+     */
+    _isNetworkSession() {
+        return !!this.game?.runtimeConfig?.session?.networkEnabled;
     }
 
     updateScoreHud() {
         const game = this.game;
+
+        // Network mode: update N-player scoreboard
+        if (this._isNetworkSession()) {
+            this._updateNetworkScoreboard();
+            // Still update local player's item bar
+            const localIdx = Math.max(0, this._getLocalPlayerIndex());
+            const localPlayer = game.entityManager?.players?.[localIdx];
+            if (localPlayer && game.ui.p1Items) {
+                this._updateItemBar(game.ui.p1Items, localPlayer);
+            }
+            return;
+        }
+
+        // Original local scoreboard logic
         const humans = game.entityManager.getHumanPlayers();
 
         if (humans.length > 0) {
@@ -31,6 +64,67 @@ export class HudRuntimeSystem {
             }
             this._updateItemBar(game.ui.p2Items, humans[1]);
         }
+    }
+
+    /**
+     * Renders a dynamic N-player scoreboard for network sessions (up to 10 players).
+     * Shows all players with score and ping indicator.
+     */
+    _updateNetworkScoreboard() {
+        const game = this.game;
+        const players = game.entityManager?.players;
+        if (!players || players.length === 0) return;
+
+        const container = this._ensureScoreboardContainer();
+        if (!container) return;
+
+        // Ensure we have enough rows
+        while (container.children.length < players.length) {
+            const row = document.createElement('div');
+            row.className = 'mp-scoreboard-row';
+            row.innerHTML = '<span class="mp-sb-name"></span><span class="mp-sb-score"></span><span class="mp-sb-ping"></span>';
+            container.appendChild(row);
+        }
+        while (container.children.length > players.length) {
+            container.removeChild(container.lastChild);
+        }
+
+        const session = game.runtimeFacade?.session;
+        const sessionPlayers = session?.getPlayers?.() || [];
+
+        for (let i = 0; i < players.length; i++) {
+            const p = players[i];
+            const row = container.children[i];
+            const nameEl = row.children[0];
+            const scoreEl = row.children[1];
+            const pingEl = row.children[2];
+
+            const label = p.isBot ? `Bot ${p.index + 1}` : `P${p.index + 1}`;
+            if (nameEl.textContent !== label) nameEl.textContent = label;
+
+            const scoreStr = String(p.score ?? 0);
+            if (scoreEl.textContent !== scoreStr) scoreEl.textContent = scoreStr;
+
+            // Ping from session peer data (if available)
+            const peer = sessionPlayers.find((sp) => sp.index === p.index);
+            const pingMs = peer?.ping ?? (p.isBot ? 0 : -1);
+            const pingLabel = pingMs >= 0 ? `${pingMs}ms` : '';
+            if (pingEl.textContent !== pingLabel) pingEl.textContent = pingLabel;
+        }
+    }
+
+    _ensureScoreboardContainer() {
+        if (this._scoreboardContainer) return this._scoreboardContainer;
+        const hud = this.game?.ui?.hud;
+        if (!hud) return null;
+        let container = hud.querySelector('.mp-scoreboard');
+        if (!container) {
+            container = document.createElement('div');
+            container.className = 'mp-scoreboard';
+            hud.appendChild(container);
+        }
+        this._scoreboardContainer = container;
+        return container;
     }
 
     _updateItemBar(container, player) {
@@ -126,15 +220,24 @@ export class HudRuntimeSystem {
 
         // FIGHTER HUD UPDATE
         const localHumans = game.numHumans || 1;
-        this._setHudP2Visibility(localHumans >= 2);
+        const networkSession = this._isNetworkSession();
+        // In network mode only 1 local player — no P2 HUD
+        this._setHudP2Visibility(!networkSession && localHumans >= 2);
         if (fighterElapsed <= 0) return;
 
-        const p1 = game.entityManager.players[0];
-        if (p1) game.hudP1.update(p1, fighterElapsed, game.entityManager);
+        if (networkSession) {
+            // Show only the local player's fighter HUD
+            const localIdx = Math.max(0, this._getLocalPlayerIndex());
+            const localPlayer = game.entityManager.players[localIdx];
+            if (localPlayer) game.hudP1.update(localPlayer, fighterElapsed, game.entityManager);
+        } else {
+            const p1 = game.entityManager.players[0];
+            if (p1) game.hudP1.update(p1, fighterElapsed, game.entityManager);
 
-        if (localHumans >= 2) {
-            const p2 = game.entityManager.players[1];
-            if (p2) game.hudP2.update(p2, fighterElapsed, game.entityManager);
+            if (localHumans >= 2) {
+                const p2 = game.entityManager.players[1];
+                if (p2) game.hudP2.update(p2, fighterElapsed, game.entityManager);
+            }
         }
     }
 }
