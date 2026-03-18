@@ -19,6 +19,7 @@ function defineLazyUiRef(target, key, resolver) {
 }
 
 export function createGameUiRefs(doc = document) {
+    const level4CloseButton = doc.getElementById('btn-close-level4') || doc.getElementById('btn-level4-close');
     const ui = {
         mainMenu: doc.getElementById('main-menu'),
         hud: doc.getElementById('hud'),
@@ -78,7 +79,7 @@ export function createGameUiRefs(doc = document) {
         startButton: doc.getElementById('btn-start'),
         level3ResetButton: doc.getElementById('btn-level3-reset'),
         openLevel4Button: doc.getElementById('btn-open-level4'),
-        closeLevel4Button: doc.getElementById('btn-level4-close'),
+        closeLevel4Button: level4CloseButton,
         mapSelect: doc.getElementById('map-select'),
         mapSearchInput: doc.getElementById('map-search-input'),
         mapFilterSelect: doc.getElementById('map-filter-select'),
@@ -203,7 +204,7 @@ export function createGameUiRefs(doc = document) {
         developerTrainingRunGateButton: doc.getElementById('btn-developer-training-run-gate'),
         developerTrainingOutput: doc.getElementById('developer-training-output'),
         level4Drawer: doc.getElementById('submenu-level4'),
-        level4CloseButton: doc.getElementById('btn-level4-close'),
+        level4CloseButton: level4CloseButton,
         level4ResetButton: doc.getElementById('btn-level4-reset'),
         level4SectionTabs: null,
         level4SectionPanels: null,
