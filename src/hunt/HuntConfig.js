@@ -39,6 +39,8 @@ export const HUNT_CONFIG = Object.freeze({
         HOMING_LOCK_ON_ANGLE: 32,
         HOMING_REACQUIRE_INTERVAL: 0.12,
         HOMING_RANGE: 130,
+        EXPLOSION_RADIUS: 25,
+        EXPLOSION_DAMAGE_FALLOFF: 0.5,
     }),
     FEEDBACK: Object.freeze({
         MG_IMPACT: Object.freeze({

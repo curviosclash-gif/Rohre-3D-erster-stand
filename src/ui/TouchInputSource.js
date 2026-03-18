@@ -11,6 +11,8 @@ import { PlayerInputSource } from './PlayerInputSource.js';
  *   Right side: action buttons (fire, boost, next item)
  *
  * Auto-detected via 'ontouchstart' in window.
+ * Auto-show bei Touch-Gerät, Auto-hide bei Desktop (C.4).
+ * Touch-Controls nur im Match sichtbar, nicht im Menü (C.4).
  */
 export class TouchInputSource extends PlayerInputSource {
     constructor(options = {}) {
@@ -36,6 +38,11 @@ export class TouchInputSource extends PlayerInputSource {
         this._joystickKnobEl = null;
         this._buttonEls = {};
 
+        /** Whether the touch UI is currently shown (C.4) */
+        this._uiVisible = false;
+        /** Whether we are in a match (C.4) */
+        this._inMatch = false;
+
         this._touchStartHandler = (e) => this._onTouchStart(e);
         this._touchMoveHandler = (e) => this._onTouchMove(e);
         this._touchEndHandler = (e) => this._onTouchEnd(e);
@@ -46,8 +53,7 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     createUI(container) {
-        this._containerEl = container;
-        if (!container) return;
+        this._containerEl = container || document.getElementById('touch-controls') || document.body;
 
         // Create joystick
         this._joystickEl = document.createElement('div');
@@ -66,7 +72,7 @@ export class TouchInputSource extends PlayerInputSource {
             border-radius: 50%; background: rgba(255,255,255,0.6);
         `;
         this._joystickEl.appendChild(this._joystickKnobEl);
-        container.appendChild(this._joystickEl);
+        this._containerEl.appendChild(this._joystickEl);
 
         // Create buttons
         const buttonDefs = [
@@ -88,14 +94,58 @@ export class TouchInputSource extends PlayerInputSource {
                 font-size: 11px; font-weight: bold; touch-action: none;
                 user-select: none; z-index: 1000;
             `;
-            container.appendChild(btn);
+            this._containerEl.appendChild(btn);
             this._buttonEls[def.id] = btn;
         }
 
-        container.addEventListener('touchstart', this._touchStartHandler, { passive: false });
-        container.addEventListener('touchmove', this._touchMoveHandler, { passive: false });
-        container.addEventListener('touchend', this._touchEndHandler, { passive: false });
-        container.addEventListener('touchcancel', this._touchEndHandler, { passive: false });
+        this._containerEl.addEventListener('touchstart', this._touchStartHandler, { passive: false });
+        this._containerEl.addEventListener('touchmove', this._touchMoveHandler, { passive: false });
+        this._containerEl.addEventListener('touchend', this._touchEndHandler, { passive: false });
+        this._containerEl.addEventListener('touchcancel', this._touchEndHandler, { passive: false });
+
+        // Initially hidden until match starts (C.4)
+        this._setUIVisibility(false);
+    }
+
+    /** Auto-show if touch device, auto-hide if desktop (C.4) */
+    autoDetectAndShow() {
+        if (TouchInputSource.isAvailable() && this._inMatch) {
+            this._setUIVisibility(true);
+        } else {
+            this._setUIVisibility(false);
+        }
+    }
+
+    /** Called when a match starts — show touch controls on touch devices (C.4) */
+    onMatchStart() {
+        this._inMatch = true;
+        this.autoDetectAndShow();
+    }
+
+    /** Called when a match ends — hide touch controls (C.4) */
+    onMatchEnd() {
+        this._inMatch = false;
+        this._setUIVisibility(false);
+    }
+
+    /** Set visibility of all touch UI elements (C.4) */
+    _setUIVisibility(visible) {
+        this._uiVisible = visible;
+        const display = visible ? '' : 'none';
+
+        if (this._joystickEl) this._joystickEl.style.display = display;
+        for (const el of Object.values(this._buttonEls)) {
+            if (el) el.style.display = visible ? 'flex' : 'none';
+        }
+
+        // Also set the container visibility if using the #touch-controls container
+        if (this._containerEl?.id === 'touch-controls') {
+            this._containerEl.style.display = display;
+        }
+    }
+
+    get isUIVisible() {
+        return this._uiVisible;
     }
 
     _onTouchStart(e) {

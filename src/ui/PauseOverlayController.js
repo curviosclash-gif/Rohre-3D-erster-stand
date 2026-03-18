@@ -10,6 +10,17 @@ export class PauseOverlayController {
         this.game = deps.game || this.matchFlowUiController?.game || null;
         this.ports = deps.ports || null;
         this._listenersInitialized = false;
+        this._hostPausedOverlay = null;
+    }
+
+    /** Returns true if this is a network match. */
+    _isNetworkMatch() {
+        return !!this.game?.runtimeFacade?.isNetworkSession?.();
+    }
+
+    /** Returns true if the local player is the host. */
+    _isHost() {
+        return this.game?.runtimeFacade?.isHost?.() ?? true;
     }
 
     setupListeners() {
@@ -53,6 +64,9 @@ export class PauseOverlayController {
     }
 
     pause() {
+        // Network: only host may pause
+        if (this._isNetworkMatch() && !this._isHost()) return;
+
         const controller = this.matchFlowUiController;
         const pauseTransition = derivePauseTransition();
         controller.applyLifecycleTransition(pauseTransition);
@@ -61,7 +75,62 @@ export class PauseOverlayController {
         this._hideSettings();
     }
 
+    /**
+     * Shows a "Host hat pausiert" overlay for network clients.
+     * Called when a host-pause event is received from the session.
+     */
+    showHostPausedOverlay() {
+        if (this._isHost()) return;
+        const controller = this.matchFlowUiController;
+        const pauseTransition = derivePauseTransition();
+        controller.applyLifecycleTransition(pauseTransition);
+        controller.applyMatchUiState(pauseTransition.uiState);
+
+        if (!this._hostPausedOverlay) {
+            this._hostPausedOverlay = document.createElement('div');
+            this._hostPausedOverlay.className = 'host-paused-overlay';
+            this._hostPausedOverlay.textContent = 'Host hat pausiert';
+        }
+        const overlay = this.game?.ui?.pauseOverlay;
+        if (overlay && !overlay.contains(this._hostPausedOverlay)) {
+            overlay.appendChild(this._hostPausedOverlay);
+        }
+    }
+
+    /**
+     * Hides the "Host hat pausiert" overlay.
+     */
+    hideHostPausedOverlay() {
+        this._hostPausedOverlay?.remove?.();
+    }
+
+    /**
+     * ESC on a network client: show disconnect confirmation instead of pause.
+     */
+    showDisconnectConfirmation() {
+        const game = this.game;
+        if (!game?.ui?.pauseOverlay) return;
+        const pauseTransition = derivePauseTransition();
+        this.matchFlowUiController.applyLifecycleTransition(pauseTransition);
+        this.matchFlowUiController.applyMatchUiState(pauseTransition.uiState);
+
+        // Replace pause overlay content with disconnect prompt
+        if (game.ui.pauseMenuButton) {
+            game.ui.pauseMenuButton.textContent = 'Verbindung trennen';
+        }
+        if (game.ui.pauseResumeButton) {
+            game.ui.pauseResumeButton.textContent = 'Weiter spielen';
+        }
+        this._hideSettings();
+    }
+
     resumeFromPause() {
+        if (this._isNetworkMatch() && !this._isHost()) {
+            // Client was shown disconnect confirmation — just resume
+            this._restorePauseButtonLabels();
+        }
+        this.hideHostPausedOverlay();
+
         const controller = this.matchFlowUiController;
         const resumeTransition = deriveResumeTransition();
         this._hideSettings();
@@ -75,9 +144,13 @@ export class PauseOverlayController {
         const game = this.game;
         const returnTransition = deriveReturnToMenuTransition();
         this._hideSettings();
+        this.hideHostPausedOverlay();
+        this._restorePauseButtonLabels();
         controller.applyLifecycleTransition(returnTransition);
         this.ports?.sessionPort?.clearLastRoundGhost?.();
         this.ports?.sessionPort?.teardownMatchSession?.();
+        game.runtimeFacade?._teardownSession?.();
+        game.hudRuntimeSystem?.clearNetworkScoreboard?.();
         controller.applyMatchUiState(returnTransition.uiState);
         controller.resetCrosshairUi();
 
@@ -87,6 +160,16 @@ export class PauseOverlayController {
             game._showMainNav();
         }
         this.ports?.uiFeedbackPort?.syncAll?.();
+    }
+
+    _restorePauseButtonLabels() {
+        const game = this.game;
+        if (game?.ui?.pauseMenuButton) {
+            game.ui.pauseMenuButton.textContent = 'Hauptmenü';
+        }
+        if (game?.ui?.pauseResumeButton) {
+            game.ui.pauseResumeButton.textContent = 'Weiterspielen';
+        }
     }
 
     _setupKeybindClickHandlers() {

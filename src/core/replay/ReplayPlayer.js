@@ -15,6 +15,7 @@ export class ReplayPlayer {
         this._currentActionIndex = 0;
         this._elapsedTime = 0;
         this._onAction = null;
+        this._onComplete = null;
     }
 
     load(replay) {
@@ -25,11 +26,21 @@ export class ReplayPlayer {
         this._paused = false;
     }
 
-    play(onAction) {
+    /**
+     * Load replay from JSON string (C.5).
+     * @param {string} json
+     */
+    loadFromJSON(json) {
+        const replay = JSON.parse(json);
+        this.load(replay);
+    }
+
+    play(onAction, onComplete) {
         if (!this._replay) return;
         this._playing = true;
         this._paused = false;
         this._onAction = onAction;
+        this._onComplete = onComplete || null;
     }
 
     pause() {
@@ -62,6 +73,9 @@ export class ReplayPlayer {
 
         if (this._currentActionIndex >= actions.length) {
             this._playing = false;
+            if (this._onComplete) {
+                this._onComplete();
+            }
         }
     }
 
@@ -80,6 +94,10 @@ export class ReplayPlayer {
 
     get initialState() {
         return this._replay?.initialState || null;
+    }
+
+    get matchId() {
+        return this._replay?.matchId || null;
     }
 
     reset() {

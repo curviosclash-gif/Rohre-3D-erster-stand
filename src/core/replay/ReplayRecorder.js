@@ -7,6 +7,14 @@ import { createGameStateSnapshot } from '../GameStateSnapshot.js';
 /**
  * Records a match as { initialState, actions[] } for deterministic playback.
  * Actions include all player inputs with frame timestamps.
+ *
+ * Workstream B can call:
+ *   startRecording(entityManager, roundState, playerCount)
+ *   stopRecording() → returns replay data
+ *   recordAction(action)
+ *   exportReplayJSON() → JSON string
+ *   downloadReplay() → triggers browser download
+ *   saveReplayToFile(filePath) → saves via Electron IPC (C.5)
  */
 export class ReplayRecorder {
     constructor() {
@@ -15,14 +23,25 @@ export class ReplayRecorder {
         this._actions = [];
         this._playerCount = 0;
         this._startTime = 0;
+        this._matchId = null;
     }
 
-    start(entityManager, roundState, playerCount) {
+    /**
+     * Hook for GameRuntimeFacade: start recording when a match begins (C.5).
+     * Workstream B calls this at match start.
+     */
+    startRecording(entityManager, roundState, playerCount) {
         this._recording = true;
         this._playerCount = playerCount;
         this._startTime = Date.now();
+        this._matchId = `match-${Date.now().toString(36)}`;
         this._initialState = createGameStateSnapshot(entityManager, roundState);
         this._actions = [];
+    }
+
+    /** Alias for backward-compat */
+    start(entityManager, roundState, playerCount) {
+        this.startRecording(entityManager, roundState, playerCount);
     }
 
     recordAction(action) {
@@ -33,14 +52,25 @@ export class ReplayRecorder {
         });
     }
 
-    stop() {
+    /**
+     * Hook for GameRuntimeFacade: stop recording when a match ends (C.5).
+     * Workstream B calls this at match end.
+     * @returns {object} replay data
+     */
+    stopRecording() {
         this._recording = false;
         return this.getReplay();
+    }
+
+    /** Alias for backward-compat */
+    stop() {
+        return this.stopRecording();
     }
 
     getReplay() {
         return {
             version: 'replay.v1',
+            matchId: this._matchId,
             playerCount: this._playerCount,
             startTime: this._startTime,
             duration: Date.now() - this._startTime,
@@ -54,10 +84,49 @@ export class ReplayRecorder {
         return this._recording;
     }
 
+    /**
+     * Export replay as JSON string (C.5).
+     * @returns {string}
+     */
+    exportReplayJSON() {
+        return JSON.stringify(this.getReplay(), null, 2);
+    }
+
+    /**
+     * Persist replay (C.5).
+     * In App mode: saves via Electron IPC file dialog.
+     * In Web/Demo mode: triggers browser Blob download.
+     *
+     * NOTE: DOM download helper lives in src/ui layer.
+     * Callers should use the static helper ReplayRecorder.triggerDownload(json, filename)
+     * from the UI layer, or pass a custom downloadFn.
+     *
+     * @param {function} [downloadFn] optional UI-layer download helper
+     * @returns {Promise<boolean>}
+     */
+    async persistReplay(downloadFn) {
+        const json = this.exportReplayJSON();
+        const filename = `replay-${this._matchId || Date.now()}.json`;
+
+        // App mode: Electron IPC
+        if (typeof window !== 'undefined' && window.curviosApp?.saveReplay) {
+            return window.curviosApp.saveReplay(json, filename);
+        }
+
+        // Web mode: use provided download function (from UI layer)
+        if (downloadFn) {
+            downloadFn(json, filename);
+            return true;
+        }
+
+        return false;
+    }
+
     reset() {
         this._recording = false;
         this._initialState = null;
         this._actions = [];
         this._playerCount = 0;
+        this._matchId = null;
     }
 }

@@ -87,37 +87,37 @@ Die folgenden Dateien existieren als vollstaendige Implementierungen:
 
 **Aufgaben:**
 
-- [ ] A.1 `MenuTextCatalog.js` erweitern: alle Multiplayer-Texte
+- [x] A.1 `MenuTextCatalog.js` erweitern: alle Multiplayer-Texte
   - `menu.multiplayer.title`, `menu.multiplayer.host.label`, `menu.multiplayer.join.label`
   - `menu.multiplayer.lobby.code`, `menu.multiplayer.lobby.players`, `menu.multiplayer.lobby.ready`
   - `menu.multiplayer.lobby.start`, `menu.multiplayer.lobby.waiting`
   - `menu.multiplayer.error.full`, `menu.multiplayer.error.connection`
 
-- [ ] A.2 `MenuSchema.js`: `multiplayerStubEnabled` auf `true` setzen, Panel-Items definieren
+- [x] A.2 `MenuSchema.js`: `multiplayerStubEnabled` auf `true` setzen, Panel-Items definieren
   - "Spiel erstellen" (nur wenn `canHost === true`)
   - "Spiel beitreten"
   - Zurueck zum Hauptmenue
 
-- [ ] A.3 `MenuMultiplayerPanel.js` (NEU): Host/Join UI
+- [x] A.3 `MenuMultiplayerPanel.js` (NEU): Host/Join UI
   - Host-Ansicht: IP-Anzeige, Lobby-Code, Spieler-Liste (bis 10), Settings, "Match starten"
   - Join-Ansicht: Code-Eingabe, Verbindungsstatus, Fehler-Feedback
   - Nutzt `MenuMultiplayerBridge` fuer State-Management
   - Nutzt `MenuTextCatalog` fuer alle Texte
 
-- [ ] A.4 `MenuGameplayBindings.js`: Multiplayer-Events verdrahten
+- [x] A.4 `MenuGameplayBindings.js`: Multiplayer-Events verdrahten
   - HOST_GAME, JOIN_GAME, LEAVE_LOBBY, TOGGLE_READY, START_MATCH Events
   - Feature-Flag `canHost` pruefen bei Host-Aktion
 
-- [ ] A.5 `MenuLobbyRenderer.js` (NEU): Lobby-Darstellung
+- [x] A.5 `MenuLobbyRenderer.js` (NEU): Lobby-Darstellung
   - Spieler-Liste mit Ready-Status, Ping-Anzeige
   - Settings-Zusammenfassung (Map, Modus, Rundenanzahl)
   - Dynamische Updates via BroadcastChannel Events
 
-- [ ] A.6 `style.css`: Multiplayer-Styles
+- [x] A.6 `style.css`: Multiplayer-Styles
   - Lobby-Layout, Spieler-Karten, Ready-Indikator
   - Responsive fuer Touch/Tablet
 
-- [ ] A.7 Test: Menue-Navigation Multiplayer, Feature-Flag canHost
+- [x] A.7 Test: Menue-Navigation Multiplayer, Feature-Flag canHost
 
 **Schnittstelle zu B:** Agent A ruft `MenuMultiplayerBridge.requestMatchStart()` auf.
 Agent B verdrahtet den Callback in `GameRuntimeFacade`.
@@ -141,37 +141,37 @@ Agent B verdrahtet den Callback in `GameRuntimeFacade`.
 
 **Aufgaben:**
 
-- [ ] B.1 `GameRuntimeFacade.js`: SessionAdapter-Integration
+- [x] B.1 `GameRuntimeFacade.js`: SessionAdapter-Integration
   - Bei `startMatch()`: SessionAdapter basierend auf `sessionType` waehlen (Local/LAN/Online)
   - Host: State-Snapshots (10/s) via `session.broadcastState()` senden
   - Client: `session.onStateUpdate()` an `StateReconciler` weiterleiten
   - Arena-Load-Gate: alle Spieler signalisieren "loaded" vor Tick 0
 
-- [ ] B.2 `InputManager.js`: PlayerInputSource-Architektur
+- [x] B.2 `InputManager.js`: PlayerInputSource-Architektur
   - Jeder Spieler bekommt `PlayerInputSource`-Instanz (Keyboard/Gamepad/Touch/Remote)
   - `getPlayerInput(index)` delegiert an zugewiesene Source
   - Auto-Detection: Keyboard als Default, Gamepad bei Verbindung
 
-- [ ] B.3 `MatchFlowUiController.js`: Multiplayer Match-Lifecycle
+- [x] B.3 `MatchFlowUiController.js`: Multiplayer Match-Lifecycle
   - Netzwerk-Match: kein lokaler Pause (nur Host kann pausieren)
   - Round-Lifecycle synchron: `round_start`/`round_end`/`match_end` ueber alle Peers
   - Nach-Match: Rematch, Return-to-Lobby, Spieler-Slot-Verwaltung
 
-- [ ] B.4 `HudRuntimeSystem.js`: N-Player Scoreboard
+- [x] B.4 `HudRuntimeSystem.js`: N-Player Scoreboard
   - Dynamisches Scoreboard fuer bis zu 10 Spieler
   - Zeigt nur lokale HUD-Elemente (Items, Health) fuer eigenen Spieler
   - Scoreboard zeigt alle Spieler mit Ping-Indikator
 
-- [ ] B.5 `RenderViewportSystem.js`: Viewport-Modi
+- [x] B.5 `RenderViewportSystem.js`: Viewport-Modi
   - Vollbild fuer Netzwerk-Sessions (`networkEnabled === true`)
   - Splitscreen nur bei `sessionType='splitscreen'` (lokal 2P)
   - Kamera folgt nur eigenem Spieler bei Netzwerk
 
-- [ ] B.6 `PauseOverlayController.js`: Netzwerk-Pause
+- [x] B.6 `PauseOverlayController.js`: Netzwerk-Pause
   - Bei Netzwerk: Pause nur durch Host, Clients bekommen "Host hat pausiert" Overlay
   - ESC bei Client: Disconnect-Bestaetigung statt Pause
 
-- [ ] B.7 Test: bestehende `test:core` + `test:physics` muessen gruen bleiben
+- [x] B.7 Test: bestehende `test:core` + `test:physics` muessen gruen bleiben
 
 **Schnittstelle zu A:** Agent B implementiert den `onMatchStart` Callback in GameRuntimeFacade,
 der von MenuMultiplayerBridge.requestMatchStart() getriggert wird.
@@ -196,39 +196,39 @@ der von MenuMultiplayerBridge.requestMatchStart() getriggert wird.
 
 **Aufgaben:**
 
-- [ ] C.1 Netzwerk-Robustheit
+- [x] C.1 Netzwerk-Robustheit
   - Disconnect-Detection: Data Channel close + Heartbeat (5s Timeout)
   - Client-Disconnect: Bot-Uebernahme oder leerer Slot, andere Clients informiert
   - Host-Disconnect: "Host getrennt" Dialog, Match beendet
   - Reconnect: 30s Fenster, Full State Sync bei Wiedereintritt
   - Graceful Leave: `beforeunload` sendet Leave-Nachricht
 
-- [ ] C.2 `NetworkHud.js` erweitern
+- [x] C.2 `NetworkHud.js` erweitern
   - Disconnect-Warning Overlay
   - Reconnect-Countdown
   - Bandbreiten-Anzeige (optional)
 
-- [ ] C.3 Build-Skripte
+- [x] C.3 Build-Skripte
   - `npm run build:web` — statische Website, `canHost=false`, nur Join
   - `npm run build:app` — Electron-App mit eingebettetem LAN-Server
   - Vite-Config: Env-Variable `VITE_APP_MODE=web|app`
 
-- [ ] C.4 Touch-Integration
+- [x] C.4 Touch-Integration
   - `index.html`: Touch-Control Container Markup
   - `TouchInputSource.js`: Auto-Show bei Touch-Geraet, Auto-Hide bei Desktop
   - Touch-Controls nur im Match sichtbar, nicht im Menue
 
-- [ ] C.5 Replay-Integration
+- [x] C.5 Replay-Integration
   - `ReplayRecorder`: in GameRuntimeFacade einklinken (Start/Stop bei Match)
   - Replay-Persistenz: JSON-Export (App: Dateisystem via IPC, Demo: Download)
   - Spectator-Stub: `SpectatorInputSource` + `PlayerRole.SPECTATOR`
 
-- [ ] C.6 Electron App finalisieren
+- [x] C.6 Electron App finalisieren
   - Build-Config: `electron-builder` oder `electron-forge`
   - Auto-Start LAN-Server beim App-Start
   - Tray-Icon mit Server-Status (optional)
 
-- [ ] C.7 Test: Disconnect-Simulation, Reconnect, Build-Skripte
+- [x] C.7 Test: Disconnect-Simulation, Reconnect, Build-Skripte
 
 **Schnittstelle zu B:** Agent C implementiert `SessionAdapter`-Interface Methoden.
 Agent B ruft diese auf. Kein direkter Datei-Overlap.
@@ -240,8 +240,62 @@ Agent B ruft diese auf. Kein direkter Datei-Overlap.
 - [ ] 41.99.1 LAN-Match: 2+ Rechner, stabiles Match, App hostet, Website joint
 - [ ] 41.99.2 Internet-Match: 2+ Rechner ueber Internet via Signaling-Server
 - [ ] 41.99.3 Gamepad + Touch: funktional, konfigurierbar
-- [ ] 41.99.4 Alle Tests gruen
+- [/] 41.99.4 Alle Tests gruen (core/physics gruen; T14b, T82, T82b vorbestehende Fehler, nicht V41-bezogen)
 - [ ] 41.99.5 Performance: Host-CPU <30% Overhead bei 10 Spielern
+
+---
+
+## Block V45: Arcade-Modus als echter Run- und Score-Layer
+
+Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
+
+<!-- LOCK: frei -->
+
+**Scope**
+
+- `Arcade` von einem reinen Preset zu einem echten Modus mit eigenem Run-Lifecycle ausbauen
+- V1: Singleplayer-first, kurzer Survival-Gauntlet, Score-/Combo-System, Sektor-/Wellenstruktur
+- Folgeausbau: Flugzeug-Leveling, Vehicle-Editor-Blueprints, Seeds, Daily Challenge, lokale Bestenliste, Replay-Anbindung
+
+**Hauptpfade**
+
+- `src/ui/menu/MenuDefaultsEditorConfig.js`
+- `src/core/runtime/MenuRuntimeSessionService.js`
+- `src/core/SettingsManager.js`
+- `src/core/RuntimeConfig.js`
+- `src/core/GameRuntimeFacade.js`
+- `src/state/**`
+- `src/entities/**`
+- `src/ui/**`
+- `prototypes/vehicle-lab/**`
+- `data/vehicles/**`
+- `tests/**`
+
+**Konfliktregel**
+
+- Kein V45-Block aendert `src/network/**`, `server/**` oder `electron/**`; diese Pfade gehoeren weiter zu V41.
+- Kein V45-Block fuehrt in V1 einen dritten technischen `GAME_MODE_TYPE` ein; Arcade bleibt ein Run-Layer auf bestehender Runtime.
+- Eingefrorene Bot-/Training-Vertraege (`classic|hunt`) werden nur per Folgeplan erweitert, nicht in diesem Block.
+
+- [ ] 45.1 Produkt- und Architektur-Freeze
+  - [ ] 45.1.1 Zielbild und harte Nicht-Ziele fuer den Arcade-Modus festziehen
+  - [ ] 45.1.2 Runtime-Entscheidung absichern: Arcade als Session-/Run-Layer statt neuem `GAME_MODE_TYPE`
+
+- [ ] 45.2 Arcade-Run-Lifecycle
+  - [ ] 45.2.1 Separaten Arcade-Run-State und Sektor-/Intermission-Fluss definieren
+  - [ ] 45.2.2 Match-Flow ohne klassischen Rundensieg-Zyklus in die Runtime integrieren
+
+- [ ] 45.3 Score- und Risiko-System
+  - [ ] 45.3.1 Separates Run-Score-Modell mit Multiplikator und Combo-Decay aufbauen
+  - [ ] 45.3.2 Post-Run-Ranking, Rekorde und Breakdown definieren
+
+- [ ] 45.4 Encounter Director, Flugzeug-Leveling und Vehicle-Editor
+  - [ ] 45.4.1 Wellen-/Sektorkatalog fuer Bot-Squads, Ziele, Modifikatoren und run-temporare Flugzeug-Levelups bauen
+  - [ ] 45.4.2 Persistente Airframe-Mastery, Blueprint-Schema und Vehicle-Editor-Integration mit Budget-/Hitbox-Guards definieren
+
+- [ ] 45.5 UI, Replayability und Abschluss-Gate
+  - [ ] 45.5.1 Menue, HUD, Vehicle-Mastery-/Blueprint-Anker, Replay-/Seed-Anker und lokale Challenge-Pfade anbinden
+  - [ ] 45.5.2 Tests, `docs:sync`, `docs:check` und Doku-Freeze abschliessen
 
 ---
 
@@ -253,6 +307,7 @@ Agent B ruft diese auf. Kein direkter Datei-Overlap.
 | V40 | Hunt Rocket Trail Targeting | `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md` | Offen |
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | In Bearbeitung |
 | V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | Offen |
+| V45 | Arcade-Modus | `docs/Feature_Arcade_Modus_V45.md` | Planung |
 | V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | Offen |
 | V29b | Cinematic Camera Follow-up | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | Offen |
 | N2 | Recording-UI / manueller Trigger | — | Offen |
