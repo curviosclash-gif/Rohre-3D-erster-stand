@@ -139,7 +139,22 @@ export class InputManager {
     }
 
     _shouldPreventDefault(code) {
+        if (this._isTextInputFocused()) return false;
         return this._preventDefaultCodes.has(code);
+    }
+
+    _isTextInputFocused() {
+        const el = document.activeElement;
+        if (!el) return false;
+        const tag = el.tagName;
+        if (tag === 'TEXTAREA') return true;
+        if (tag === 'INPUT') {
+            const type = (el.getAttribute('type') || 'text').toLowerCase();
+            return type === 'text' || type === 'search' || type === 'url'
+                || type === 'email' || type === 'number' || type === 'password';
+        }
+        if (el.isContentEditable) return true;
+        return false;
     }
 
     isDown(code) {
