@@ -1125,5 +1125,11 @@ export default defineConfig({
         __APP_VERSION__: JSON.stringify(pkg.version),
         __BUILD_TIME__: JSON.stringify(buildTime),
         __BUILD_ID__: JSON.stringify(buildId),
+        /**
+         * APP_MODE: 'web' (join-only, canHost=false) or 'app' (Electron, canHost=true) (C.3).
+         * Set via: npm run build:web (--mode web) or npm run build:app (--mode app).
+         * Vite loads .env.web or .env.app respectively, setting VITE_APP_MODE.
+         */
+        __APP_MODE__: JSON.stringify(process.env.VITE_APP_MODE || 'web'),
     },
 });
