@@ -86,13 +86,60 @@ function renderPlayerList(container, sessionState) {
     container.appendChild(section);
 }
 
-function renderCodeDisplay(container, sessionState) {
+function renderCodeDisplay(container, sessionState, options) {
     const codeWrap = createElement('div', 'mp-lobby-code-display');
     const label = createElement('span', 'mp-code-label', t('menu.multiplayer.lobby.code', 'Lobby-Code'));
     const codeValue = createElement('span', 'mp-code-value', normalizeString(sessionState.lobbyCode, '—'));
     codeWrap.appendChild(label);
     codeWrap.appendChild(codeValue);
     container.appendChild(codeWrap);
+
+    // Show host IP for manual join fallback (only in host view)
+    if (options?.isHost) {
+        const ipWrap = createElement('div', 'mp-lobby-ip-display');
+        const ipLabel = createElement('span', 'mp-code-label', 'Deine IP');
+        const ipValue = createElement('span', 'mp-code-value mp-ip-value', '...');
+        ipWrap.appendChild(ipLabel);
+        ipWrap.appendChild(ipValue);
+        container.appendChild(ipWrap);
+
+        // Resolve IP: Electron IPC or fallback
+        if (typeof window !== 'undefined' && window.curviosApp?.getLanServerStatus) {
+            window.curviosApp.getLanServerStatus().then((status) => {
+                // IP comes from discovered hosts or we fetch it via the signaling server
+                const url = `http://localhost:${status.port || 9090}/discovery/info`;
+                fetch(url).then((r) => r.json()).then(() => {
+                    // Server is running — show local IPs via RTCPeerConnection trick
+                    resolveLocalIP().then((ip) => { ipValue.textContent = ip || 'localhost'; });
+                }).catch(() => { ipValue.textContent = 'localhost'; });
+            });
+        } else {
+            resolveLocalIP().then((ip) => { ipValue.textContent = ip || 'localhost'; });
+        }
+    }
+}
+
+/** Resolve local LAN IP via WebRTC (works in browsers without Node.js) */
+function resolveLocalIP() {
+    return new Promise((resolve) => {
+        try {
+            const pc = new RTCPeerConnection({ iceServers: [] });
+            pc.createDataChannel('');
+            pc.createOffer().then((offer) => pc.setLocalDescription(offer));
+            pc.onicecandidate = (e) => {
+                if (!e.candidate) return;
+                const match = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
+                if (match && match[1] !== '0.0.0.0') {
+                    pc.onicecandidate = null;
+                    pc.close();
+                    resolve(match[1]);
+                }
+            };
+            setTimeout(() => { pc.close(); resolve('localhost'); }, 2000);
+        } catch {
+            resolve('localhost');
+        }
+    });
 }
 
 function renderReadySummary(container, sessionState) {
@@ -110,7 +157,7 @@ export function renderLobbyView(container, options) {
     const sessionState = options?.sessionState || {};
     container.innerHTML = '';
 
-    renderCodeDisplay(container, sessionState);
+    renderCodeDisplay(container, sessionState, options);
     renderPlayerList(container, sessionState);
     renderReadySummary(container, sessionState);
     renderSettingsSummary(container, sessionState);
@@ -130,7 +177,7 @@ export function updateLobbyView(container, options) {
     const sessionState = options?.sessionState || {};
     container.innerHTML = '';
 
-    renderCodeDisplay(container, sessionState);
+    renderCodeDisplay(container, sessionState, options);
     renderPlayerList(container, sessionState);
     renderReadySummary(container, sessionState);
     renderSettingsSummary(container, sessionState);

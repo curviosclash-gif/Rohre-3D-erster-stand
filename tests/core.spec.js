@@ -880,6 +880,60 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         }
     });
 
+    test('T41a: MenuSchema markiert multiplayer-host mit visibilityCondition canHost', async ({ page }) => {
+        await loadGame(page);
+        const schema = await page.evaluate(() => {
+            const registry = window.GAME_INSTANCE?.menuPanelRegistry;
+            const s = registry?.getSchema?.();
+            const panel = Array.isArray(s?.panels) ? s.panels.find((p) => p.id === 'submenu-multiplayer') : null;
+            const hostItem = Array.isArray(panel?.items) ? panel.items.find((i) => i.id === 'multiplayer-host') : null;
+            return {
+                hasPanel: !!panel,
+                panelVisible: panel?.visibility !== 'hidden',
+                hostItemExists: !!hostItem,
+                hostItemCondition: hostItem?.visibilityCondition || null,
+            };
+        });
+
+        expect(schema.hasPanel).toBe(true);
+        expect(schema.panelVisible).toBe(true);
+        expect(schema.hostItemExists).toBe(true);
+        expect(schema.hostItemCondition).toBe('canHost');
+    });
+
+    test('T41b: MenuMultiplayerPanel zeigt Host-Button nur wenn canHost=true', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const mod = await import('/src/ui/menu/MenuMultiplayerPanel.js');
+            const mockBridge = {
+                host: () => ({ ok: false }),
+                join: () => ({ ok: false }),
+                leave: () => {},
+                toggleReady: () => {},
+                requestMatchStart: () => {},
+                getSessionState: () => ({ joined: false, memberCount: 0, localReady: false, canStart: false, members: [] }),
+            };
+
+            const containerA = document.createElement('div');
+            document.body.appendChild(containerA);
+            mod.createMultiplayerPanel({ bridge: mockBridge, container: containerA, canHost: false });
+            const hostBtnHidden = !containerA.querySelector('.mp-host-btn');
+            containerA.remove();
+
+            const containerB = document.createElement('div');
+            document.body.appendChild(containerB);
+            mod.createMultiplayerPanel({ bridge: mockBridge, container: containerB, canHost: true });
+            const hostBtnVisible = !!containerB.querySelector('.mp-host-btn');
+            containerB.remove();
+
+            return { hostBtnHidden, hostBtnVisible };
+        });
+
+        expect(result.hostBtnHidden).toBe(true);
+        expect(result.hostBtnVisible).toBe(true);
+    });
+
     test('T20e: Open-Preset speichert Metadatenvertrag vollstaendig', async ({ page }) => {
         await loadGame(page);
         await page.evaluate((storageKey) => localStorage.removeItem(storageKey), MENU_PRESETS_STORAGE_KEY);
