@@ -299,6 +299,252 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 
 ---
 
+## Block V46: Architektur-Verbesserungen — Deduplizierung, Contracts, God Objects
+
+<!-- LOCK: frei -->
+
+**Scope**
+
+- Duplizierte Utility-Funktionen zentralisieren
+- Shared Contracts fuer moduluebergreifende Kommunikation einfuehren
+- Bidirektionale Abhaengigkeiten (core<>entities, ui<>state, state<>core) aufloesen
+- God Objects (MediaRecorderSystem, GameRuntimeFacade, MenuMultiplayerBridge) aufbrechen
+- Magic Numbers in Hunt/Projectile/AI konsolidieren
+- Service-Locator-Pattern schrittweise durch Dependency Injection ersetzen
+- Event-Pattern vereinheitlichen
+- Modul-Grenzen korrigieren (HuntHUD, AI Sensing)
+
+**Konfliktregel**
+
+- Kein V46-Block aendert `src/network/**`, `server/**` oder `electron/**`; diese Pfade gehoeren zu V41.
+- Kein V46-Block aendert Spielmechanik oder Balance-Werte — nur strukturelle Verschiebungen.
+- Training-Contract-Versionen (v33, v36) werden nicht geaendert, nur Import-Pfade umgeleitet.
+
+**Hauptpfade**
+
+- `src/utils/MathOps.js`
+- `src/shared/contracts/**`
+- `src/core/MediaRecorderSystem.js` → `src/core/recorder/**`
+- `src/core/GameRuntimeFacade.js` → `src/core/runtime/**`
+- `src/ui/menu/MenuMultiplayerBridge.js` → `src/ui/menu/multiplayer/**`
+- `src/hunt/HuntConfig.js`, `src/hunt/HuntTargetingOps.js`
+- `src/entities/systems/ProjectileSystem.js`
+- `src/entities/ai/BotDecisionOps.js`
+- `scripts/architecture/ArchitectureConfig.mjs`
+- `eslint.config.js`
+
+---
+
+### 46.1 Utility-Deduplizierung
+
+- [ ] 46.1.1 `toFiniteNumber` zu `src/utils/MathOps.js` hinzufuegen (exportieren)
+- [ ] 46.1.2 Lokale `toFiniteNumber`-Definitionen in 12 Dateien entfernen, durch Import ersetzen:
+  - `src/core/config/SettingsRuntimeContract.js` (Z27)
+  - `src/core/DeveloperTrainingController.js` (Z31)
+  - `src/core/GameDebugApi.js` (Z24)
+  - `src/core/MediaRecorderSystem.js` (Z94)
+  - `src/core/perf/RuntimePerfProfiler.js` (Z29)
+  - `src/entities/ai/training/TrainerPayloadAdapter.js` (Z12)
+  - `src/entities/ai/training/TrainingAutomationContractV33.js` (Z31)
+  - `src/entities/ai/training/TrainingContractV1.js` (Z15)
+  - `src/hunt/HuntTargetingOps.js` (Z15)
+  - `src/state/training/RewardCalculator.js` (Z43)
+  - `src/state/training/TrainingGateEvaluator.js` (Z13)
+  - `src/state/training/TrainingOpsKpiContractV36.js` (Z7)
+- [ ] 46.1.3 `toSafeNumber` in `src/hunt/HealthSystem.js` (Z5) durch `toFiniteNumber`-Import ersetzen, Aufrufe umbenennen
+- [ ] 46.1.4 Lokale `clamp01`-Definitionen in 3 Dateien durch Import aus `MathOps.js` ersetzen:
+  - `src/hunt/HuntHUD.js` (Z4)
+  - `src/entities/ai/BotSensors.js` (Z31)
+  - `src/entities/ai/training/TrainingAutomationRunner.js` (Z30)
+
+---
+
+### 46.2 Shared Contracts ausbauen
+
+- [ ] 46.2.1 `src/shared/contracts/ConfigContract.js` erstellen: CONFIG-Interface, `getActiveRuntimeConfig()`-Signatur exportieren
+- [ ] 46.2.2 `src/shared/contracts/EntityContract.js` erstellen: `CUSTOM_MAP_KEY`, `VEHICLE_DEFINITIONS`, `resolveArenaMapSelection`
+- [ ] 46.2.3 `src/shared/contracts/HuntContract.js` erstellen: Hunt-State-Interfaces, Projectile-Event-Types
+- [ ] 46.2.4 `src/shared/contracts/MatchLifecycleContract.js` erstellen: `LIFECYCLE_EVENT_TYPES` (aus MediaRecorderSystem verschieben), RoundEnd-UI-State-Interfaces
+- [ ] 46.2.5 `src/shared/contracts/TrainingContract.js` erstellen: `BOT_POLICY_TYPES`, `resolveMatchBotPolicyType`, `ObservationSchema`
+
+---
+
+### 46.3 Bidirektionale Abhaengigkeiten aufloesen
+
+Abhaengig von: 46.2
+
+- [ ] 46.3.1 core→entities aufloesen (4 Import-Kanten):
+  - `RuntimeConfig.js:5` → Import `BOT_POLICY_TYPES` aus `shared/contracts/TrainingContract.js`
+  - `SettingsManager.js:11` → Import `CUSTOM_MAP_KEY` aus `shared/contracts/EntityContract.js`
+  - `DeveloperTrainingController.js:1-2` → Import aus `shared/contracts/TrainingContract.js`
+  - `main.js:5` → Import `CUSTOM_MAP_KEY` aus `shared/contracts/EntityContract.js`
+- [ ] 46.3.2 state→ui aufloesen (2 Import-Kanten):
+  - `state/RoundEndCoordinator.js:1` → `deriveRoundEndOverlayUiState` nach `shared/contracts/MatchLifecycleContract.js` verschieben
+  - `state/RoundStateTickSystem.js:1` → `deriveRoundEndCountdownUiState` nach `shared/contracts/MatchLifecycleContract.js` verschieben
+- [ ] 46.3.3 state→core aufloesen (2 Import-Kanten):
+  - `state/MatchLifecycleSessionOrchestrator.js:1` → `LIFECYCLE_EVENT_TYPES` aus `shared/contracts/MatchLifecycleContract.js`
+  - `state/match-session/MatchSessionMapOps.js:1` → `CONFIG` aus `shared/contracts/ConfigContract.js`
+- [ ] 46.3.4 `scripts/architecture/ArchitectureConfig.mjs` aktualisieren: Allowlists reduzieren, neue Regeln `state/ darf nicht aus ui/ importieren`, `core/ darf nicht aus entities/ importieren`
+
+---
+
+### 46.4 God Objects aufbrechen
+
+Abhaengig von: 46.2
+
+- [ ] 46.4.1 `MediaRecorderSystem.js` (1335 Zeilen) aufteilen:
+  - `src/core/recorder/RecorderEngineSelector.js` — Codec-Detection, MIME-Type-Auswahl (~150Z)
+  - `src/core/recorder/FrameCaptureEngine.js` — WebCodecs/MediaRecorder Frame-Capture, Encoding-Queue (~400Z)
+  - `src/core/recorder/RecordingExporter.js` — mp4-muxer, Blob-Assembly, Download (~200Z)
+  - `src/core/recorder/RecorderLifecycleAdapter.js` — Match-Events, Load-Level-Management (~150Z)
+  - `src/utils/RecorderUtils.js` — `toSafeDatePart`, `sanitizeFileToken`, `defaultDownload`, `resolveGlobalScope`, `resolvePerfNow`, `toPositiveInt`
+  - `MediaRecorderSystem.js` verbleibt als Facade (~200Z)
+- [ ] 46.4.2 `GameRuntimeFacade.js` (872 Zeilen) aufteilen:
+  - `src/core/runtime/SessionNetworkManager.js` — Session-Init, State-Broadcast, Teardown (~135Z)
+  - `src/core/runtime/MultiplayerCoordinator.js` — Bridge-Setup, UI-Sync, Ready-Invalidation (~120Z)
+  - `src/core/runtime/SettingsOrchestrator.js` — Settings-Apply, Dirty-Tracking (~60Z)
+  - `src/core/runtime/ProfileHandler.js` — Profile CRUD, Export/Import (~55Z)
+  - `GameRuntimeFacade.js` verbleibt als Event-Router (~350Z)
+- [ ] 46.4.3 `MenuMultiplayerBridge.js` (828 Zeilen) aufteilen:
+  - `src/ui/menu/multiplayer/LobbySnapshotStore.js` — Persistence, Storage-Events, BroadcastChannel (~200Z)
+  - `src/ui/menu/multiplayer/HeartbeatManager.js` — Heartbeat, Expiration, Stale-Member-Cleanup (~80Z)
+  - `src/ui/menu/multiplayer/MatchCommandValidator.js` — Command-Age-Validation (~60Z)
+  - `MenuMultiplayerBridge.js` verbleibt als Public API (~350Z)
+- [ ] 46.4.4 `eslint.config.js` Legacy-Ceilings senken: MediaRecorderSystem 1225→300, GameRuntimeFacade 1050→400, MenuMultiplayerBridge 760→400
+
+---
+
+### 46.5 Magic Numbers konsolidieren
+
+- [ ] 46.5.1 `src/hunt/HuntConfig.js` erweitern: `TARGETING.MIN_HITBOX_RADIUS` (0.2), `TARGETING.MIN_PROBE_RADIUS` (0.12), `TARGETING.MIN_SAMPLE_STEP` (0.2)
+- [ ] 46.5.2 `src/hunt/HuntTargetingOps.js` bereinigen: Inline-Fallbacks (0.45, 0.78, 0.2, 0.12) durch `HUNT_CONFIG.*` ersetzen
+- [ ] 46.5.3 `src/entities/systems/ProjectileSystem.js` bereinigen: Hardcodierte Rocket-Werte (1.65, 6.2, 32, 130, 0.12) durch `HUNT_CONFIG.ROCKET.*` ersetzen
+- [ ] 46.5.4 `src/entities/ai/BotDecisionOps.js` bereinigen: `BOT_DECISION_CONFIG = Object.freeze({...})` am Dateianfang mit allen ~20 Schwellwerten
+
+---
+
+### 46.6 Service-Locator schrittweise ersetzen
+
+Abhaengig von: 46.4
+
+- [ ] 46.6.1 Neue Module aus 46.4 direkt mit Dependency Injection bauen (kein `constructor(game)`)
+- [ ] 46.6.2 `PlayingStateSystem` refactoren: statt `game` nur `{ entityManager, arena, config, input }` uebergeben
+- [ ] 46.6.3 `RoundStateTickSystem` refactoren: statt `game` nur `{ roundStateController, matchFlowUi, config }` uebergeben
+- [ ] 46.6.4 `LEGACY_CONSTRUCTOR_GAME_ALLOWLIST` in ArchitectureConfig nach jedem Refactor reduzieren (Ziel: 11→5)
+- [ ] 46.6.5 `window.GAME_INSTANCE` global entfernen, Debug-API via explizite Referenz uebergeben
+
+---
+
+### 46.7 Event-Pattern vereinheitlichen
+
+Abhaengig von: 46.4
+
+- [ ] 46.7.1 Konvention dokumentieren: ActionDispatcher fuer Cross-Modul-Events, Callback-Injection fuer System-interne Events, direkte Aufrufe nur intra-Modul
+- [ ] 46.7.2 Architecture-Boundary-Check um Event-Konventions-Regel erweitern
+- [ ] 46.7.3 `LIFECYCLE_EVENT_TYPES` auf ActionDispatcher oder dedizierten LifecycleEventBus migrieren
+
+---
+
+### 46.8 Modul-Grenzen korrigieren
+
+Abhaengig von: 46.1
+
+- [ ] 46.8.1 `src/hunt/HuntHUD.js` nach `src/ui/HuntHUD.js` verschieben, Import-Pfade in Konsumenten anpassen
+- [ ] 46.8.2 HuntHUD DOM-Refs ueber `GameUiDomRefs.js` injizieren (Constructor-Injection statt getElementById)
+- [ ] 46.8.3 `LEGACY_DOM_ACCESS_ALLOWLIST` um HuntHUD-Eintrag reduzieren
+- [ ] 46.8.4 AI Sensing-Primitives (Raycasts, Distanzen) aus ObservationSystem + EnvironmentSamplingOps extrahieren nach `src/entities/ai/perception/SensingPrimitives.js`
+
+---
+
+### Phase 46.99: Abschluss-Gate
+
+- [ ] 46.99.1 `npm run lint` — keine Fehler, alle max-lines Ceilings eingehalten
+- [ ] 46.99.2 `npm run check:architecture` — Boundary-Checks bestanden, Allowlists reduziert
+- [ ] 46.99.3 `npx playwright test` — alle E2E-Tests gruen
+- [ ] 46.99.4 Manuell: Classic-Match + Hunt-Match + Multiplayer-Lobby funktional
+- [ ] 46.99.5 Keine bidirektionalen Imports zwischen core/entities, state/ui, state/core
+
+---
+
+## Block V47: Strategy Pattern — Game-Mode if/else eliminieren
+
+Plan-Datei: `docs/Feature_Strategy_Pattern_V47.md`
+
+<!-- LOCK: frei -->
+
+**Scope**
+
+- ~20 Dateien enthalten `if (isHuntHealthActive())` / `if (huntModeActive)` Checks
+- Jeder neue Modus (Arcade etc.) wuerde Aenderungen in all diesen Dateien erfordern
+- Ziel: Strategy Pattern einfuehren, sodass ein neuer Modus nur eine neue Strategy-Klasse braucht
+- 4 neue Dateien (`src/modes/`), 1 neue Test-Datei, 12 bestehende Dateien migrieren
+
+**Hauptpfade**
+
+- `src/modes/**` (NEU)
+- `src/entities/EntityManager.js`
+- `src/entities/runtime/EntitySetupOps.js`
+- `src/entities/systems/PlayerLifecycleSystem.js`
+- `src/entities/systems/lifecycle/PlayerCollisionPhase.js`
+- `src/entities/systems/lifecycle/PlayerActionPhase.js`
+- `src/entities/systems/ProjectileSystem.js`
+- `src/entities/systems/projectile/ProjectileHitResolver.js`
+- `src/entities/systems/HuntCombatSystem.js`
+- `src/entities/Powerup.js`
+- `src/hunt/HealthSystem.js`
+- `src/hunt/DestructibleTrail.js`
+- `src/hunt/OverheatGunSystem.js`
+- `src/hunt/RespawnSystem.js`
+- `tests/game-mode-strategy.spec.js` (NEU)
+
+**Konfliktregel**
+
+- Kein V47-Block aendert `src/network/**`, `server/**` oder `electron/**`
+- V47 fuehrt keinen neuen `GAME_MODE_TYPE` ein — nur das Strategy-Interface + 2 Implementierungen (Classic, Hunt)
+- `isHuntHealthActive()` bleibt als deprecated erhalten fuer nicht-migrierte Call-Sites
+
+**Phasen**
+
+- [ ] 47.0 Foundation (rein additiv, keine Verhaltensaenderung)
+  - [ ] 47.0.1 `src/modes/GameModeContract.js` — abstrakte Basis-Klasse
+  - [ ] 47.0.2 `src/modes/ClassicModeStrategy.js` — Classic-Modus-Implementierung
+  - [ ] 47.0.3 `src/modes/HuntModeStrategy.js` — Hunt-Modus-Implementierung
+  - [ ] 47.0.4 `src/modes/GameModeRegistry.js` — Factory + Fallback auf Classic
+  - [ ] 47.0.5 Strategy in EntityManager + EntitySetupOps verdrahten
+  - [ ] 47.0.6 `tests/game-mode-strategy.spec.js` — Unit-Tests
+
+- [ ] 47.1 Core Gameplay migrieren (hoechster Impact)
+  - [ ] 47.1.1 `PlayerLifecycleSystem.js` — Strategy statt boolean weiterreichen
+  - [ ] 47.1.2 `PlayerCollisionPhase.js` — Wall/Trail if/else durch Strategy-Calls ersetzen
+  - [ ] 47.1.3 `PlayerActionPhase.js` — Shoot/MG Guards auf Strategy umstellen
+  - [ ] 47.1.4 `HealthSystem.js` — Deprecation-Marker setzen
+
+- [ ] 47.2 Projectile-Systeme migrieren
+  - [ ] 47.2.1 `ProjectileSystem.js` — Rocket-Params via Strategy
+  - [ ] 47.2.2 `ProjectileHitResolver.js` — Hit-Resolution via Strategy
+  - [ ] 47.2.3 `DestructibleTrail.js` — Guard auf Strategy
+
+- [ ] 47.3 EntityManager-Interna migrieren
+  - [ ] 47.3.1 Respawn/DamageEvent/Scoring Guards auf Strategy
+
+- [ ] 47.4 Combat/Gun/Respawn migrieren
+  - [ ] 47.4.1 `HuntCombatSystem.js` — Lock-On via Strategy
+  - [ ] 47.4.2 `OverheatGunSystem.js` — Guard auf Strategy
+  - [ ] 47.4.3 `RespawnSystem.js` — Guard auf Strategy
+
+- [ ] 47.5 Powerup-Spawning migrieren
+  - [ ] 47.5.1 `Powerup.js` — Spawn-Logik via Strategy
+
+- [ ] 47.6 Cleanup
+  - [ ] 47.6.1 `isHuntHealthActive` Imports entfernen, tote Branches loeschen
+
+- [ ] 47.99 Abschluss-Gate
+  - [ ] 47.99.1 Alle bestehenden Tests gruen
+  - [ ] 47.99.2 Leere `ArcadeModeStrategy` registrieren — Spiel startet fehlerfrei
+  - [ ] 47.99.3 Classic + Hunt Playtest: Kollision, Shield, Tod, MG, Rocket, Respawn
+
+---
+
 ### Backlog (nach V41)
 
 | ID | Titel | Plan-Datei | Status |
@@ -308,6 +554,8 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | In Bearbeitung |
 | V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | Offen |
 | V45 | Arcade-Modus | `docs/Feature_Arcade_Modus_V45.md` | Planung |
+| V46 | Architektur-Verbesserungen | `docs/Umsetzungsplan.md` (Block V46) | Offen |
+| V47 | Strategy Pattern Refactoring | `docs/Feature_Strategy_Pattern_V47.md` | Offen |
 | V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | Offen |
 | V29b | Cinematic Camera Follow-up | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | Offen |
 | N2 | Recording-UI / manueller Trigger | — | Offen |
