@@ -44,6 +44,7 @@ export class ProjectileSimulationOps {
                 Number(projectile.radius) || 0,
                 Number(config?.HUNT?.MG?.TRAIL_HIT_RADIUS || 0.78)
             );
+            const mgTrailRange = Math.max(10, Number(config?.HUNT?.MG?.RANGE || 95));
             const sharedTarget = resolveHuntLineTarget({
                 sourcePlayer: owner,
                 players,
@@ -51,11 +52,11 @@ export class ProjectileSimulationOps {
                 origin: projectile.position,
                 direction: this._tmpVec2,
                 playerRange: maxRange,
-                trailRange: maxRange,
+                trailRange: mgTrailRange,
                 trailSampleStep: Number(config?.HUNT?.MG?.TRAIL_SAMPLE_STEP),
                 trailHitRadius,
                 trailSelfSkipRecent: Number(config?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
-                allowSelfTrailFallback: false,
+                allowSelfTrailFallback: true,
                 scratch: this._targetingScratch,
             });
             if (sharedTarget) {

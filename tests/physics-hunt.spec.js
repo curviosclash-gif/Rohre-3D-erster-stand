@@ -71,6 +71,106 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.destroyed).toBeTruthy();
     });
 
+    test('T62a: Hunt-Rakete verfolgt Spuren wie MG (Trail-Targeting)', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const enemy = entityManager?.players?.find((p, idx) => idx !== 0 && p?.alive);
+
+            if (!entityManager || !shooter || !enemy) {
+                return { error: 'missing-players' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            entityManager._projectileSystem?.clear?.();
+            shooter.trail?.clear?.();
+            enemy.trail?.clear?.();
+            shooter.shootCooldown = 0;
+            shooter.inventory = ['ROCKET_STRONG'];
+            shooter.selectedItemIndex = 0;
+
+            shooter.position.set(0, 50, 0);
+            shooter.setLookAtWorld?.(0, 50, -120);
+            enemy.position.set(4.0, 50, -20);
+
+            const aim = shooter.position.clone().set(0, 0, 0);
+            shooter.getAimDirection(aim).normalize();
+            const from = shooter.position.clone().addScaledVector(aim, 30);
+            const to = shooter.position.clone().addScaledVector(aim, 32);
+            const writeIndex = Math.max(0, Number(enemy?.trail?.writeIndex) || 0);
+            const maxSegments = Math.max(1, Number(enemy?.trail?.maxSegments) || 5000);
+            const segmentIdx = (writeIndex + Math.floor(maxSegments * 0.5)) % maxSegments;
+            const radius = Math.max(0.15, (Number(enemy?.trail?.width) || 0.6) * 0.5);
+
+            const trailRef = entityManager.registerTrailSegment(enemy.index, segmentIdx, {
+                fromX: from.x,
+                fromY: from.y,
+                fromZ: from.z,
+                toX: to.x,
+                toY: to.y,
+                toZ: to.z,
+                midX: (from.x + to.x) * 0.5,
+                midZ: (from.z + to.z) * 0.5,
+                radius,
+                hp: 3,
+                maxHp: 3,
+                ownerTrail: null,
+            });
+
+            const shot = entityManager._shootItemProjectile(shooter, 0);
+            if (!shot?.ok) {
+                return { error: 'shot-failed', reason: shot?.reason || null };
+            }
+
+            const projectile = entityManager.projectiles[entityManager.projectiles.length - 1];
+            if (!projectile) {
+                return { error: 'projectile-missing' };
+            }
+
+            let acquiredTrail = false;
+            let acquiredPlayer = false;
+            const initialTarget = projectile.target;
+            const isTrailTarget = initialTarget?.kind === 'trail' || (projectile.target?.segmentIdx !== undefined);
+            const isPlayerTarget = initialTarget?.kind === 'player' || (projectile.target?.playerIndex !== undefined && projectile.target?.segmentIdx === undefined);
+
+            for (let i = 0; i < 50; i++) {
+                entityManager._projectileSystem.update(1 / 60);
+                const stillActive = entityManager.projectiles.includes(projectile);
+                if (!stillActive) break;
+
+                if (projectile.target?.kind === 'trail' || (projectile.target?.segmentIdx !== undefined && projectile.target?.playerIndex === enemy.index)) {
+                    acquiredTrail = true;
+                }
+                if (projectile.target?.kind === 'player' && Number(projectile.target?.playerIndex) === Number(enemy.index)) {
+                    acquiredPlayer = true;
+                }
+            }
+
+            const destroyed = !!trailRef?.entry?.destroyed;
+            if (!destroyed && trailRef?.key && trailRef?.entry) {
+                entityManager.unregisterTrailSegment(trailRef.key, trailRef.entry);
+            }
+            entityManager._projectileSystem?.clear?.();
+
+            return {
+                error: null,
+                initialTargetKind: initialTarget?.kind || 'unknown',
+                isTrailTarget,
+                isPlayerTarget,
+                acquiredTrail,
+                acquiredPlayer,
+                trailTargeted: isTrailTarget || acquiredTrail,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.trailTargeted).toBeTruthy();
+    });
+
     test('T62: Hunt-Rakete ist groesser und sucht Ziele nach', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(() => {
