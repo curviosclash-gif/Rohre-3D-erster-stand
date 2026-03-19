@@ -23,6 +23,7 @@ function getActiveMode(config = CONFIG) {
     return String(activeConfig?.HUNT?.ACTIVE_MODE || activeConfig?.HUNT?.DEFAULT_MODE || GAME_MODE_TYPES.CLASSIC).toUpperCase();
 }
 
+/** @deprecated Use gameModeStrategy instead (V47 Strategy Pattern). */
 export function isHuntHealthActive(config = CONFIG) {
     const activeConfig = resolveConfig(config);
     const enabled = activeConfig?.HUNT?.ENABLED !== false;

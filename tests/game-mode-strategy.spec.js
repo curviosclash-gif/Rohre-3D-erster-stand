@@ -1,0 +1,239 @@
+import { test, expect } from '@playwright/test';
+import { loadGame, startGame } from './helpers.js';
+
+test.describe('Game Mode Strategy (V47)', () => {
+    test.describe.configure({ timeout: 60000 });
+
+    test('S01: GameModeRegistry returns ClassicModeStrategy for unknown mode', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createGameModeStrategy } = await import('/src/modes/GameModeRegistry.js');
+            const s = createGameModeStrategy('UNKNOWN_MODE');
+            return { modeType: s.modeType };
+        });
+        expect(result.modeType).toBe('CLASSIC');
+    });
+
+    test('S02: GameModeRegistry returns ClassicModeStrategy for "classic"', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createGameModeStrategy } = await import('/src/modes/GameModeRegistry.js');
+            const s = createGameModeStrategy('classic');
+            return { modeType: s.modeType };
+        });
+        expect(result.modeType).toBe('CLASSIC');
+    });
+
+    test('S03: GameModeRegistry returns HuntModeStrategy for "hunt"', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createGameModeStrategy } = await import('/src/modes/GameModeRegistry.js');
+            const s = createGameModeStrategy('HUNT');
+            return { modeType: s.modeType };
+        });
+        expect(result.modeType).toBe('HUNT');
+    });
+
+    test('S04: ClassicModeStrategy feature flags', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicModeStrategy } = await import('/src/modes/ClassicModeStrategy.js');
+            const s = new ClassicModeStrategy();
+            return {
+                requiresShootItemIndex: s.requiresShootItemIndex(),
+                hasMachineGun: s.hasMachineGun(),
+                isRespawnEnabled: s.isRespawnEnabled(),
+                hasScoring: s.hasScoring(),
+                hasDamageEvents: s.hasDamageEvents(),
+                hasDestructibleTrails: s.hasDestructibleTrails(),
+                isHudVisible: s.isHudVisible(),
+            };
+        });
+        expect(result.requiresShootItemIndex).toBe(false);
+        expect(result.hasMachineGun).toBe(false);
+        expect(result.isRespawnEnabled).toBe(false);
+        expect(result.hasScoring).toBe(false);
+        expect(result.hasDamageEvents).toBe(false);
+        expect(result.hasDestructibleTrails).toBe(false);
+        expect(result.isHudVisible).toBe(false);
+    });
+
+    test('S05: HuntModeStrategy feature flags', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { HuntModeStrategy } = await import('/src/modes/HuntModeStrategy.js');
+            const s = new HuntModeStrategy();
+            return {
+                requiresShootItemIndex: s.requiresShootItemIndex(),
+                hasMachineGun: s.hasMachineGun(),
+                hasScoring: s.hasScoring(),
+                hasDamageEvents: s.hasDamageEvents(),
+                hasDestructibleTrails: s.hasDestructibleTrails(),
+                isHudVisible: s.isHudVisible(),
+            };
+        });
+        expect(result.requiresShootItemIndex).toBe(true);
+        expect(result.hasMachineGun).toBe(true);
+        expect(result.hasScoring).toBe(true);
+        expect(result.hasDamageEvents).toBe(true);
+        expect(result.hasDestructibleTrails).toBe(true);
+        expect(result.isHudVisible).toBe(true);
+    });
+
+    test('S06: ClassicModeStrategy resetPlayerHealth sets hp=1', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicModeStrategy } = await import('/src/modes/ClassicModeStrategy.js');
+            const s = new ClassicModeStrategy();
+            const player = { hasShield: true, maxHp: 0, hp: 0, maxShieldHp: 0, shieldHP: 0, lastDamageTimestamp: 0, shieldHitFeedback: 0 };
+            s.resetPlayerHealth(player);
+            return { maxHp: player.maxHp, hp: player.hp, shieldHP: player.shieldHP };
+        });
+        expect(result.maxHp).toBe(1);
+        expect(result.hp).toBe(1);
+        expect(result.shieldHP).toBe(1);
+    });
+
+    test('S07: HuntModeStrategy resetPlayerHealth sets hp=100', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { HuntModeStrategy } = await import('/src/modes/HuntModeStrategy.js');
+            const s = new HuntModeStrategy();
+            const player = { hasShield: true, maxHp: 0, hp: 0, maxShieldHp: 0, shieldHP: 0, lastDamageTimestamp: 0, shieldHitFeedback: 0 };
+            s.resetPlayerHealth(player);
+            return { maxHp: player.maxHp, hp: player.hp, shieldHP: player.shieldHP };
+        });
+        expect(result.maxHp).toBe(100);
+        expect(result.hp).toBe(100);
+        expect(result.shieldHP).toBe(40);
+    });
+
+    test('S08: ClassicModeStrategy applyDamage is instant kill', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicModeStrategy } = await import('/src/modes/ClassicModeStrategy.js');
+            const s = new ClassicModeStrategy();
+            const player = { maxHp: 1, hp: 1, shieldHP: 0, hasShield: false, lastDamageTimestamp: 0 };
+            const dmg = s.applyDamage(player, 1, {});
+            return { isDead: dmg.isDead, remainingHp: dmg.remainingHp, hp: player.hp };
+        });
+        expect(result.isDead).toBe(true);
+        expect(result.remainingHp).toBe(0);
+        expect(result.hp).toBe(0);
+    });
+
+    test('S09: HuntModeStrategy applyDamage with shield absorption', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { HuntModeStrategy } = await import('/src/modes/HuntModeStrategy.js');
+            const s = new HuntModeStrategy();
+            const player = { maxHp: 100, hp: 100, maxShieldHp: 40, shieldHP: 40, hasShield: true, shieldHitFeedback: 0, lastDamageTimestamp: 0 };
+            const dmg = s.applyDamage(player, 30, {});
+            return { isDead: dmg.isDead, absorbedByShield: dmg.absorbedByShield, remainingHp: dmg.remainingHp, shieldHP: player.shieldHP };
+        });
+        expect(result.isDead).toBe(false);
+        expect(result.absorbedByShield).toBe(30);
+        expect(result.remainingHp).toBe(100);
+        expect(result.shieldHP).toBe(10);
+    });
+
+    test('S10: ClassicModeStrategy resolveCollisionDamage returns 1', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicModeStrategy } = await import('/src/modes/ClassicModeStrategy.js');
+            const s = new ClassicModeStrategy();
+            return {
+                wall: s.resolveCollisionDamage('WALL'),
+                trail: s.resolveCollisionDamage('TRAIL'),
+            };
+        });
+        expect(result.wall).toBe(1);
+        expect(result.trail).toBe(1);
+    });
+
+    test('S11: HuntModeStrategy resolveRocketProjectileParams returns params for rocket', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { HuntModeStrategy } = await import('/src/modes/HuntModeStrategy.js');
+            const s = new HuntModeStrategy();
+            const params = s.resolveRocketProjectileParams('ROCKET_WEAK');
+            const noParams = s.resolveRocketProjectileParams('SPEED_UP');
+            return {
+                hasParams: !!params,
+                hasVisualScale: params?.visualScale > 0,
+                noParamsIsNull: noParams === null,
+            };
+        });
+        expect(result.hasParams).toBe(true);
+        expect(result.hasVisualScale).toBe(true);
+        expect(result.noParamsIsNull).toBe(true);
+    });
+
+    test('S12: ClassicModeStrategy resolveRocketProjectileParams returns null', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicModeStrategy } = await import('/src/modes/ClassicModeStrategy.js');
+            const s = new ClassicModeStrategy();
+            return { result: s.resolveRocketProjectileParams('ROCKET_WEAK') };
+        });
+        expect(result.result).toBeNull();
+    });
+
+    test('S13: ClassicModeStrategy grantShield sets shieldHP=1', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ClassicModeStrategy } = await import('/src/modes/ClassicModeStrategy.js');
+            const s = new ClassicModeStrategy();
+            const player = { hasShield: false, maxShieldHp: 0, shieldHP: 0, shieldHitFeedback: 0 };
+            const hp = s.grantShield(player);
+            return { hp, shieldHP: player.shieldHP, hasShield: player.hasShield };
+        });
+        expect(result.hp).toBe(1);
+        expect(result.shieldHP).toBe(1);
+        expect(result.hasShield).toBe(true);
+    });
+
+    test('S14: HuntModeStrategy grantShield sets full shieldHP', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { HuntModeStrategy } = await import('/src/modes/HuntModeStrategy.js');
+            const s = new HuntModeStrategy();
+            const player = { hasShield: false, maxShieldHp: 0, shieldHP: 0, shieldHitFeedback: 0 };
+            const hp = s.grantShield(player);
+            return { hp, shieldHP: player.shieldHP, hasShield: player.hasShield };
+        });
+        expect(result.hp).toBe(40);
+        expect(result.shieldHP).toBe(40);
+        expect(result.hasShield).toBe(true);
+    });
+
+    test('S15: EntityManager has gameModeStrategy wired after setup', async ({ page }) => {
+        await startGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const em = game?.entityManager;
+            if (!em) return { error: 'no-entityManager' };
+            return {
+                hasStrategy: !!em.gameModeStrategy,
+                modeType: em.gameModeStrategy?.modeType || null,
+            };
+        });
+        expect(result.hasStrategy).toBe(true);
+        expect(result.modeType).toBeTruthy();
+    });
+
+    test('S16: registerGameModeStrategy allows adding new mode', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createGameModeStrategy, registerGameModeStrategy } = await import('/src/modes/GameModeRegistry.js');
+            const { GameModeContract } = await import('/src/modes/GameModeContract.js');
+            class ArcadeModeStrategy extends GameModeContract {
+                get modeType() { return 'ARCADE'; }
+            }
+            registerGameModeStrategy('ARCADE', () => new ArcadeModeStrategy());
+            const s = createGameModeStrategy('ARCADE');
+            return { modeType: s.modeType };
+        });
+        expect(result.modeType).toBe('ARCADE');
+    });
+});

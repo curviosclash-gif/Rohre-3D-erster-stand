@@ -473,41 +473,41 @@ Plan-Datei: `docs/Feature_Strategy_Pattern_V47.md`
 
 **Phasen**
 
-- [ ] 47.0 Foundation (rein additiv, keine Verhaltensaenderung)
-  - [ ] 47.0.1 `src/modes/GameModeContract.js` — abstrakte Basis-Klasse
-  - [ ] 47.0.2 `src/modes/ClassicModeStrategy.js` — Classic-Modus-Implementierung
-  - [ ] 47.0.3 `src/modes/HuntModeStrategy.js` — Hunt-Modus-Implementierung
-  - [ ] 47.0.4 `src/modes/GameModeRegistry.js` — Factory + Fallback auf Classic
-  - [ ] 47.0.5 Strategy in EntityManager + EntitySetupOps verdrahten
-  - [ ] 47.0.6 `tests/game-mode-strategy.spec.js` — Unit-Tests
+- [x] 47.0 Foundation (rein additiv, keine Verhaltensaenderung)
+  - [x] 47.0.1 `src/modes/GameModeContract.js` — abstrakte Basis-Klasse
+  - [x] 47.0.2 `src/modes/ClassicModeStrategy.js` — Classic-Modus-Implementierung
+  - [x] 47.0.3 `src/modes/HuntModeStrategy.js` — Hunt-Modus-Implementierung
+  - [x] 47.0.4 `src/modes/GameModeRegistry.js` — Factory + Fallback auf Classic
+  - [x] 47.0.5 Strategy in EntityManager + EntitySetupOps verdrahten
+  - [x] 47.0.6 `tests/game-mode-strategy.spec.js` — Unit-Tests
 
-- [ ] 47.1 Core Gameplay migrieren (hoechster Impact)
-  - [ ] 47.1.1 `PlayerLifecycleSystem.js` — Strategy statt boolean weiterreichen
-  - [ ] 47.1.2 `PlayerCollisionPhase.js` — Wall/Trail if/else durch Strategy-Calls ersetzen
-  - [ ] 47.1.3 `PlayerActionPhase.js` — Shoot/MG Guards auf Strategy umstellen
-  - [ ] 47.1.4 `HealthSystem.js` — Deprecation-Marker setzen
+- [x] 47.1 Core Gameplay migrieren (hoechster Impact)
+  - [x] 47.1.1 `PlayerLifecycleSystem.js` — Strategy statt boolean weiterreichen
+  - [x] 47.1.2 `PlayerCollisionPhase.js` — Wall/Trail if/else durch Strategy-Calls ersetzen
+  - [x] 47.1.3 `PlayerActionPhase.js` — Shoot/MG Guards auf Strategy umstellen
+  - [x] 47.1.4 `HealthSystem.js` — Deprecation-Marker setzen
 
-- [ ] 47.2 Projectile-Systeme migrieren
-  - [ ] 47.2.1 `ProjectileSystem.js` — Rocket-Params via Strategy
-  - [ ] 47.2.2 `ProjectileHitResolver.js` — Hit-Resolution via Strategy
-  - [ ] 47.2.3 `DestructibleTrail.js` — Guard auf Strategy
+- [x] 47.2 Projectile-Systeme migrieren
+  - [x] 47.2.1 `ProjectileSystem.js` — Rocket-Params via Strategy
+  - [x] 47.2.2 `ProjectileHitResolver.js` — Hit-Resolution via Strategy
+  - [x] 47.2.3 `DestructibleTrail.js` — Guard auf Strategy
 
-- [ ] 47.3 EntityManager-Interna migrieren
-  - [ ] 47.3.1 Respawn/DamageEvent/Scoring Guards auf Strategy
+- [x] 47.3 EntityManager-Interna migrieren
+  - [x] 47.3.1 Respawn/DamageEvent/Scoring Guards auf Strategy
 
-- [ ] 47.4 Combat/Gun/Respawn migrieren
-  - [ ] 47.4.1 `HuntCombatSystem.js` — Lock-On via Strategy
-  - [ ] 47.4.2 `OverheatGunSystem.js` — Guard auf Strategy
-  - [ ] 47.4.3 `RespawnSystem.js` — Guard auf Strategy
+- [x] 47.4 Combat/Gun/Respawn migrieren
+  - [x] 47.4.1 `HuntCombatSystem.js` — Lock-On via Strategy
+  - [x] 47.4.2 `OverheatGunSystem.js` — Guard auf Strategy
+  - [x] 47.4.3 `RespawnSystem.js` — Guard auf Strategy
 
-- [ ] 47.5 Powerup-Spawning migrieren
-  - [ ] 47.5.1 `Powerup.js` — Spawn-Logik via Strategy
+- [x] 47.5 Powerup-Spawning migrieren
+  - [x] 47.5.1 `Powerup.js` — Spawn-Logik via Strategy
 
-- [ ] 47.6 Cleanup
-  - [ ] 47.6.1 `isHuntHealthActive` Imports entfernen, tote Branches loeschen
+- [x] 47.6 Cleanup
+  - [x] 47.6.1 `isHuntHealthActive` Imports entfernen, tote Branches loeschen
 
-- [ ] 47.99 Abschluss-Gate
-  - [ ] 47.99.1 Alle bestehenden Tests gruen
+- [/] 47.99 Abschluss-Gate
+  - [/] 47.99.1 Alle bestehenden Tests gruen
   - [ ] 47.99.2 Leere `ArcadeModeStrategy` registrieren — Spiel startet fehlerfrei
   - [ ] 47.99.3 Classic + Hunt Playtest: Kollision, Shield, Tod, MG, Rocket, Respawn
 

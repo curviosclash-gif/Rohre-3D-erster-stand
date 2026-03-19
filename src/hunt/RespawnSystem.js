@@ -1,6 +1,6 @@
 import { CONFIG } from '../core/Config.js';
 import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
-import { grantShield, isHuntHealthActive } from './HealthSystem.js';
+import { grantShield } from './HealthSystem.js';
 
 function getLabel(player) {
     if (!player) return 'Spieler';
@@ -42,7 +42,8 @@ export class RespawnSystem {
     }
 
     isEnabled() {
-        return isHuntHealthActive() && !!getActiveRuntimeConfig(CONFIG)?.HUNT?.RESPAWN_ENABLED;
+        const strategy = this.runtime?.callbacks?.getStrategy?.() || null;
+        return strategy?.isRespawnEnabled() ?? false;
     }
 
     reset() {

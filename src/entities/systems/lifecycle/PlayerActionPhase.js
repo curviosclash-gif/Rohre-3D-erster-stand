@@ -3,7 +3,7 @@ export class PlayerActionPhase {
         this.entityManager = entityManager;
     }
 
-    run(player, input, huntModeActive) {
+    run(player, input, strategy) {
         const entityManager = this.entityManager;
 
         if (input.nextItem) player.cycleItem();
@@ -22,9 +22,9 @@ export class PlayerActionPhase {
 
         if (input.shootItem) {
             let result = null;
-            if (huntModeActive && Number.isInteger(input.shootItemIndex) && input.shootItemIndex >= 0) {
+            if (strategy?.requiresShootItemIndex() && Number.isInteger(input.shootItemIndex) && input.shootItemIndex >= 0) {
                 result = entityManager._shootItemProjectile(player, input.shootItemIndex);
-            } else if (!huntModeActive) {
+            } else if (!strategy?.requiresShootItemIndex()) {
                 result = entityManager._shootItemProjectile(player, input.shootItemIndex);
             }
             if (result && !result.ok && !player.isBot) {
@@ -34,7 +34,7 @@ export class PlayerActionPhase {
             }
         }
 
-        if (input.shootMG && huntModeActive) {
+        if (input.shootMG && strategy?.hasMachineGun()) {
             const result = entityManager._shootHuntGun(player);
             if (!result.ok && !player.isBot) {
                 entityManager._notifyPlayerFeedback(player, result.reason);

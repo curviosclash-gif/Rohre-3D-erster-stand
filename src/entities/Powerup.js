@@ -5,30 +5,7 @@
 import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
 import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
-import { isHuntHealthActive } from '../hunt/HealthSystem.js';
-import { isRocketTierType, pickWeightedRocketTierType } from '../hunt/RocketPickupSystem.js';
 import { PowerupModelFactory } from './PowerupModelFactory.js';
-
-function getHuntPickupWeights() {
-    return getActiveRuntimeConfig(CONFIG)?.HUNT?.PICKUP_WEIGHTS || {};
-}
-
-function pickWeightedType(typeEntries = []) {
-    let totalWeight = 0;
-    for (const entry of typeEntries) {
-        totalWeight += Math.max(0, Number(entry?.weight) || 0);
-    }
-    if (totalWeight <= 0) return null;
-
-    let roll = Math.random() * totalWeight;
-    for (const entry of typeEntries) {
-        roll -= Math.max(0, Number(entry?.weight) || 0);
-        if (roll <= 0) {
-            return entry.type;
-        }
-    }
-    return typeEntries[typeEntries.length - 1]?.type || null;
-}
 
 const AUTHORED_ITEM_TYPE_ALIASES = Object.freeze({
     item_battery: 'SPEED_UP',
@@ -83,6 +60,7 @@ export class PowerupManager {
         this.renderer = renderer;
         this.arena = arena;
         this.runtimeConfig = runtimeConfig;
+        this.getStrategy = null;
         this.items = []; // { mesh, type, box }
         this.spawnTimer = 0;
         this.typeKeys = Object.keys(config.POWERUP.TYPES);
@@ -125,14 +103,14 @@ export class PowerupManager {
 
     _spawnRandom() {
         const config = getActiveRuntimeConfig(CONFIG);
-        const huntModeActive = isHuntHealthActive();
-        const spawnableTypes = this.typeKeys.filter((typeKey) => {
-            const entry = config.POWERUP.TYPES[typeKey];
-            if (!entry) return false;
-            if (entry.huntOnly && !huntModeActive) return false;
-            if (entry.classicOnly && huntModeActive) return false;
-            return true;
-        });
+        const strategy = typeof this.getStrategy === 'function' ? this.getStrategy() : null;
+        const huntModeActive = strategy?.modeType === 'HUNT';
+        const spawnableTypes = strategy
+            ? strategy.filterSpawnableTypes(this.typeKeys, config.POWERUP.TYPES)
+            : this.typeKeys.filter((typeKey) => {
+                const entry = config.POWERUP.TYPES[typeKey];
+                return entry && !entry.huntOnly;
+            });
         if (spawnableTypes.length === 0) return;
 
         const authoredAnchors = this._getAvailableAuthoredAnchors();
@@ -145,27 +123,8 @@ export class PowerupManager {
 
         let type = resolveAuthoredPickupType(authoredAnchor?.anchor, huntModeActive)
             || spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
-        if (huntModeActive) {
-            const rocketSpawnChance = Math.max(0, Number(config?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0));
-            const nonRocketTypes = spawnableTypes.filter((typeKey) => !isRocketTierType(typeKey));
-            const huntWeights = getHuntPickupWeights();
-            const weightedNonRocketTypes = nonRocketTypes
-                .map((typeKey) => ({
-                    type: typeKey,
-                    weight: Number(huntWeights?.[typeKey] ?? 1),
-                }))
-                .filter((entry) => entry.weight > 0);
-
-            if (Math.random() < rocketSpawnChance) {
-                const weightedRocketType = pickWeightedRocketTierType();
-                if (spawnableTypes.includes(weightedRocketType) || isRocketTierType(weightedRocketType)) {
-                    type = weightedRocketType;
-                }
-            } else if (weightedNonRocketTypes.length > 0) {
-                type = pickWeightedType(weightedNonRocketTypes) || weightedNonRocketTypes[0].type;
-            } else if (nonRocketTypes.length > 0) {
-                type = nonRocketTypes[Math.floor(Math.random() * nonRocketTypes.length)];
-            }
+        if (strategy && huntModeActive) {
+            type = strategy.resolveSpawnType(spawnableTypes, config) || type;
         }
         if (authoredAnchor?.anchor) {
             const fixedType = resolveAuthoredPickupType(authoredAnchor.anchor, huntModeActive);
