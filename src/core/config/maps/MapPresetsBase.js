@@ -21,6 +21,7 @@ const BASE_MAP_KEYS = [
     'the_loop',
     'upgrade_showcase',
     'showcase_nexus',
+    'neon_abyss',
 ];
 
 export const MAP_PRESETS_BASE = Object.freeze(
