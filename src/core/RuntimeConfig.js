@@ -17,6 +17,36 @@ function deepClone(value) {
     return JSON.parse(JSON.stringify(value));
 }
 
+function clampInteger(value, min, max, fallback) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.max(min, Math.min(max, Math.floor(parsed)));
+}
+
+function hashSeed(input) {
+    const source = String(input || '');
+    let hash = 0;
+    for (let i = 0; i < source.length; i++) {
+        hash = ((hash << 5) - hash) + source.charCodeAt(i);
+        hash |= 0;
+    }
+    return Math.abs(hash);
+}
+
+function resolveArcadeSeed(settings = null, activeGameMode = GAME_MODE_TYPES.CLASSIC) {
+    const source = settings && typeof settings === 'object' ? settings : {};
+    const explicitSeed = source?.arcade && typeof source.arcade === 'object'
+        ? source.arcade.seed
+        : null;
+    if (Number.isFinite(Number(explicitSeed))) {
+        return clampInteger(explicitSeed, 0, 2_147_483_647, 0);
+    }
+    const mapKey = String(source.mapKey || 'standard');
+    const numBots = clampInteger(source.numBots, 0, 12, 0);
+    const modePath = String(source?.localSettings?.modePath || 'normal').trim().toLowerCase();
+    return hashSeed(`${mapKey}|${activeGameMode}|${numBots}|${modePath}`);
+}
+
 function resolveBotDifficulty(requestedDifficulty, botConfig) {
     const botDefaults = botConfig || CONFIG.BOT;
     const fallback = botDefaults.DEFAULT_DIFFICULTY || 'NORMAL';
@@ -77,8 +107,11 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
     const gameplaySource = source.gameplay && typeof source.gameplay === 'object' ? source.gameplay : {};
     const huntSource = source.hunt && typeof source.hunt === 'object' ? source.hunt : {};
     const botBridgeSource = source.botBridge && typeof source.botBridge === 'object' ? source.botBridge : {};
+    const arcadeSource = source.arcade && typeof source.arcade === 'object' ? source.arcade : {};
 
     const sessionType = normalizeSessionType(source?.localSettings?.sessionType || (source.mode === '2p' ? 'splitscreen' : 'single'));
+    const modePath = String(source?.localSettings?.modePath || 'normal').trim().toLowerCase();
+    const arcadeEnabled = modePath === 'arcade';
     const networkEnabled = sessionType === 'lan' || sessionType === 'online';
     const mode = sessionType === 'splitscreen' ? '2p' : '1p';
     const numHumans = networkEnabled ? 1 : (mode === '2p' ? 2 : 1);
@@ -177,6 +210,19 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
         hunt: {
             enabled: huntModeActive,
             respawnEnabled: huntModeActive ? !!huntSource.respawnEnabled : false,
+        },
+        arcade: {
+            enabled: arcadeEnabled,
+            profileId: String(arcadeSource.profileId || 'arcade-default'),
+            runType: String(arcadeSource.runType || 'gauntlet'),
+            seed: resolveArcadeSeed(source, activeGameMode),
+            scoreModel: String(arcadeSource.scoreModel || 'arcade-score.v1'),
+            sectorCount: clampInteger(arcadeSource.sectorCount, 1, 20, 5),
+            intermissionSeconds: clampSettingValue(arcadeSource.intermissionSeconds, { min: 1, max: 10 }, 3),
+            comboWindowMs: clampInteger(arcadeSource.comboWindowMs, 800, 20_000, 5000),
+            comboDecayPerSecond: clampSettingValue(arcadeSource.comboDecayPerSecond, { min: 0, max: 10 }, 1),
+            maxMultiplier: clampInteger(arcadeSource.maxMultiplier, 1, 25, 8),
+            replayHooksEnabled: arcadeSource.replayHooksEnabled !== false,
         },
         settingsSnapshot: deepClone(source),
     };

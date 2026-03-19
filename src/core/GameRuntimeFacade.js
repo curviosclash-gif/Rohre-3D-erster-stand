@@ -15,7 +15,10 @@ import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
 import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
 import { LocalSessionAdapter } from './session/LocalSessionAdapter.js';
+import { ReplayRecorder } from './replay/ReplayRecorder.js';
 import { createGameStateSnapshot } from './GameStateSnapshot.js';
+import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
+import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
 import {
     applyMenuPresetAction,
     deleteMenuPresetAction,
@@ -122,6 +125,16 @@ export class GameRuntimeFacade {
         this._arenaLoadedPeers = new Set();
         this._onStateUpdateHandler = null;
         this._onPlayerLoadedHandler = null;
+
+        this._baseRoundStateController = this.game?.roundStateController || null;
+        this._arcadeRoundStateController = null;
+        this._arcadeReplayRecorder = new ReplayRecorder();
+        this.arcadeRunRuntime = new ArcadeRunRuntime({
+            settingsManager: this.game?.settingsManager || null,
+            replayRecorder: this._arcadeReplayRecorder,
+            now: () => Date.now(),
+            logger: console,
+        });
     }
 
     _clearMatchPrewarmTimer() {
@@ -178,9 +191,63 @@ export class GameRuntimeFacade {
         }
 
         game.input?.setBindings?.(game.runtimeConfig.controls);
+        this._syncArcadeRuntimeConfig();
         if (schedulePrewarm) {
             this.scheduleMatchPrewarm();
         }
+    }
+
+    _activateArcadeRoundController() {
+        const game = this.game;
+        if (!game?.roundStateController) return;
+        if (!this._baseRoundStateController) {
+            this._baseRoundStateController = game.roundStateController;
+        }
+        if (!this._arcadeRoundStateController) {
+            this._arcadeRoundStateController = createArcadeRoundStateController({
+                baseController: this._baseRoundStateController,
+                arcadeRuntime: this.arcadeRunRuntime,
+            });
+        }
+        game.roundStateController = this._arcadeRoundStateController;
+    }
+
+    _deactivateArcadeRoundController() {
+        const game = this.game;
+        if (!game) return;
+        if (this._baseRoundStateController) {
+            game.roundStateController = this._baseRoundStateController;
+        }
+    }
+
+    _syncArcadeRuntimeConfig() {
+        const game = this.game;
+        if (!game?.runtimeConfig) return;
+        this.arcadeRunRuntime.configure(game.runtimeConfig);
+        if (game.runtimeConfig?.arcade?.enabled) {
+            this._activateArcadeRoundController();
+            return;
+        }
+        this._deactivateArcadeRoundController();
+        this.arcadeRunRuntime.resetRunState({ preserveRecords: true });
+    }
+
+    _startArcadeRunIfEnabled() {
+        const game = this.game;
+        if (!game?.runtimeConfig?.arcade?.enabled) return null;
+        return this.arcadeRunRuntime.startRun({
+            entityManager: game.entityManager,
+            roundStateController: game.roundStateController,
+            playerCount: Math.max(1, Number(game.numHumans) || 1),
+        });
+    }
+
+    _resetArcadeRunState() {
+        this.arcadeRunRuntime.resetRunState({ preserveRecords: true });
+    }
+
+    getArcadeRunState() {
+        return this.arcadeRunRuntime.getStateSnapshot();
     }
 
     setupMenuListeners() {
@@ -252,8 +319,11 @@ export class GameRuntimeFacade {
             this._applyAuthoritativeMultiplayerMatchSettings(command.settingsSnapshot);
         }
         game.uiManager?.clearStartValidationError?.();
-        game.matchFlowUiController?.startMatch?.();
-        return true;
+        const startResult = game.matchFlowUiController?.startMatch?.();
+        if (startResult !== false) {
+            this._startArcadeRunIfEnabled();
+        }
+        return startResult !== false;
     }
 
     _syncMultiplayerRuntimeContext(changedKeys = null) {
@@ -306,10 +376,12 @@ export class GameRuntimeFacade {
     }
 
     recordRoundEndTelemetry(payload = null) {
+        this.arcadeRunRuntime.handleRoundEndTelemetry(payload);
         return this._recordMenuTelemetry('round_end', payload);
     }
 
     recordMatchEndTelemetry(payload = null) {
+        this.arcadeRunRuntime.handleRoundEndTelemetry(payload);
         return this._recordMenuTelemetry('match_end', payload);
     }
 
@@ -791,6 +863,7 @@ export class GameRuntimeFacade {
             this.session = null;
         }
         this._stateReconciler?.reset?.();
+        this._resetArcadeRunState();
     }
 
     /** Returns true if the current session is a network (LAN/Online) session. */
@@ -841,8 +914,11 @@ export class GameRuntimeFacade {
             }
             return true;
         }
-        this.game?.matchFlowUiController?.startMatch?.();
-        return true;
+        const startResult = this.game?.matchFlowUiController?.startMatch?.();
+        if (startResult !== false) {
+            this._startArcadeRunIfEnabled();
+        }
+        return startResult !== false;
     }
 
     restartRound() {
@@ -851,6 +927,7 @@ export class GameRuntimeFacade {
 
     returnToMenu() {
         this.game?.matchFlowUiController?.returnToMenu?.();
+        this._resetArcadeRunState();
         this.scheduleMatchPrewarm();
     }
 
