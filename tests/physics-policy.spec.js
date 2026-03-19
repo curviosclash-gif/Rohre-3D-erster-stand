@@ -606,7 +606,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
 
             bot.maxHp = Math.max(1, Number(bot.maxHp) || 1);
             bot.hp = Math.max(1, bot.maxHp * 0.2);
-            bot.inventory = ['ROCKET_WEAK', 'ROCKET_STRONG'];
+            bot.inventory = ['ROCKET_WEAK', 'ROCKET_HEAVY'];
             bot.selectedItemIndex = 0;
             bot.position.set(0, 50, 0);
             bot.setLookAtWorld?.(0, 50, -100);
@@ -655,7 +655,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
             bot.position.set(0, 50, 0);
             bot.setLookAtWorld?.(0, 50, -120);
             bot.hp = Math.max(1, Number(bot.maxHp) || 100);
-            bot.inventory = ['ROCKET_STRONG'];
+            bot.inventory = ['ROCKET_HEAVY'];
             bot.selectedItemIndex = 0;
 
             enemy.position.set(8, 50, -24);
@@ -756,7 +756,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
             bot.position.set(0, 50, 0);
             bot.setLookAtWorld?.(0, 50, -120);
             bot.hp = Math.max(1, Number(bot.maxHp) || 100);
-            bot.inventory = ['ROCKET_STRONG'];
+            bot.inventory = ['ROCKET_HEAVY'];
             bot.selectedItemIndex = 0;
 
             enemy.position.set(9, 50, -26);

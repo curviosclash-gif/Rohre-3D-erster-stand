@@ -24,7 +24,8 @@ function getHuntRocketConfig() {
 
 function resolveRocketVisualScale(type, rocketConfig) {
     const normalized = String(type || '').toUpperCase();
-    if (normalized === 'ROCKET_STRONG') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_STRONG || 2.2));
+    if (normalized === 'ROCKET_MEGA') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_MEGA || 2.6));
+    if (normalized === 'ROCKET_HEAVY') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_HEAVY || 2.2));
     if (normalized === 'ROCKET_MEDIUM') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_MEDIUM || 1.95));
     if (normalized === 'ROCKET_WEAK') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_WEAK || 1.7));
     return 1;

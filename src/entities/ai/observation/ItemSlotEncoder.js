@@ -16,7 +16,8 @@ export const ITEM_SLOT_BY_TYPE = Object.freeze({
     INVERT: 7,
     ROCKET_WEAK: 8,
     ROCKET_MEDIUM: 9,
-    ROCKET_STRONG: 10,
+    ROCKET_HEAVY: 10,
+    ROCKET_MEGA: 11,
 });
 
 function normalizeItemType(type) {

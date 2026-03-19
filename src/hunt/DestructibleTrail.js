@@ -1,13 +1,24 @@
+import { CONFIG } from '../core/Config.js';
 import { isHuntHealthActive } from './HealthSystem.js';
-import { isRocketTierType, resolveRocketTrailBlastRadiusSegments } from './RocketPickupSystem.js';
+import { isRocketTierType, resolveRocketTrailBlastMeters } from './RocketPickupSystem.js';
 
 const DEFAULT_SELF_SKIP_RECENT = 8;
 
-function resolveTrailDamageByProjectileType(type) {
-    const normalized = String(type || '').toUpperCase();
-    if (normalized === 'ROCKET_STRONG') return 3;
-    if (normalized === 'ROCKET_MEDIUM') return 2;
-    return 1;
+function segmentLength(entry) {
+    if (!entry) return 0;
+    const dx = Number(entry.toX) - Number(entry.fromX);
+    const dy = Number(entry.toY) - Number(entry.fromY);
+    const dz = Number(entry.toZ) - Number(entry.fromZ);
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+function segmentMidpoint(entry) {
+    if (!entry) return null;
+    return {
+        x: (Number(entry.fromX) + Number(entry.toX)) * 0.5,
+        y: (Number(entry.fromY) + Number(entry.toY)) * 0.5,
+        z: (Number(entry.fromZ) + Number(entry.toZ)) * 0.5,
+    };
 }
 
 function buildImpactPoint(hit, projectile) {
@@ -25,56 +36,98 @@ function buildImpactPoint(hit, projectile) {
     };
 }
 
-function resolveBlastSegmentIndices(entry, blastRadiusSegments) {
-    const centerIdx = Number(entry?.segmentIdx);
-    if (!Number.isInteger(centerIdx)) return [];
-
-    const radius = Math.max(0, Math.floor(Number(blastRadiusSegments) || 0));
-    const maxSegments = Math.max(0, Math.floor(Number(entry?.ownerTrail?.maxSegments) || 0));
-    const indices = [];
-    for (let offset = -radius; offset <= radius; offset++) {
-        if (maxSegments > 0) {
-            indices.push((centerIdx + offset + maxSegments) % maxSegments);
-            continue;
-        }
-        indices.push(centerIdx + offset);
+/**
+ * Walk along the trail from the impact segment in both directions,
+ * collecting segments until the total distance reaches blastMeters.
+ * Returns { entries, totalDestroyedMeters }.
+ */
+function collectBlastEntriesByMeters(trailSpatialIndex, impactEntry, blastMeters) {
+    if (blastMeters <= 0 || !impactEntry || impactEntry.destroyed) {
+        return { entries: [], totalDestroyedMeters: 0 };
     }
-    return indices;
-}
 
-function collectBlastEntries(trailSpatialIndex, impactEntry, blastRadiusSegments) {
-    const entries = [];
+    const maxSegments = Math.max(0, Math.floor(Number(impactEntry?.ownerTrail?.maxSegments) || 0));
+    const playerIndex = impactEntry.playerIndex;
+    const centerIdx = Number(impactEntry.segmentIdx);
+    const halfBudget = blastMeters * 0.5;
+
     const seen = new Set();
-    const indices = resolveBlastSegmentIndices(impactEntry, blastRadiusSegments);
+    const entries = [];
+    let totalMeters = 0;
 
-    for (const segmentIdx of indices) {
-        const candidate = trailSpatialIndex?.resolveTrailEntry?.(impactEntry.playerIndex, segmentIdx);
-        if (!candidate || candidate.destroyed) continue;
-        if (impactEntry.ownerTrail && candidate.ownerTrail !== impactEntry.ownerTrail) continue;
+    // Always include the center segment
+    const centerLen = segmentLength(impactEntry);
+    if (!impactEntry.destroyed) {
+        seen.add(`${playerIndex}:${centerIdx}`);
+        entries.push(impactEntry);
+        totalMeters += centerLen;
+    }
+
+    // Walk forward (newer segments)
+    let forwardBudget = halfBudget;
+    for (let offset = 1; forwardBudget > 0 && offset < 500; offset++) {
+        const idx = maxSegments > 0
+            ? (centerIdx + offset + maxSegments) % maxSegments
+            : centerIdx + offset;
+        const candidate = trailSpatialIndex?.resolveTrailEntry?.(playerIndex, idx);
+        if (!candidate || candidate.destroyed) break;
+        if (impactEntry.ownerTrail && candidate.ownerTrail !== impactEntry.ownerTrail) break;
 
         const key = `${candidate.playerIndex}:${candidate.segmentIdx}`;
-        if (seen.has(key)) continue;
+        if (seen.has(key)) break;
         seen.add(key);
+
+        const len = segmentLength(candidate);
         entries.push(candidate);
+        totalMeters += len;
+        forwardBudget -= len;
     }
 
-    if (entries.length === 0 && impactEntry && !impactEntry.destroyed) {
-        entries.push(impactEntry);
+    // Walk backward (older segments)
+    let backwardBudget = halfBudget;
+    for (let offset = 1; backwardBudget > 0 && offset < 500; offset++) {
+        const idx = maxSegments > 0
+            ? (centerIdx - offset + maxSegments) % maxSegments
+            : centerIdx - offset;
+        const candidate = trailSpatialIndex?.resolveTrailEntry?.(playerIndex, idx);
+        if (!candidate || candidate.destroyed) break;
+        if (impactEntry.ownerTrail && candidate.ownerTrail !== impactEntry.ownerTrail) break;
+
+        const key = `${candidate.playerIndex}:${candidate.segmentIdx}`;
+        if (seen.has(key)) break;
+        seen.add(key);
+
+        const len = segmentLength(candidate);
+        entries.push(candidate);
+        totalMeters += len;
+        backwardBudget -= len;
     }
-    return entries;
+
+    return { entries, totalDestroyedMeters: totalMeters };
 }
 
 function applyRocketTrailBlast(trailSpatialIndex, impactEntry, projectile, hit) {
-    const blastRadiusSegments = resolveRocketTrailBlastRadiusSegments(projectile?.type);
-    const blastEntries = collectBlastEntries(trailSpatialIndex, impactEntry, blastRadiusSegments);
+    const blastMeters = resolveRocketTrailBlastMeters(projectile?.type);
+    const { entries: blastEntries, totalDestroyedMeters } =
+        collectBlastEntriesByMeters(trailSpatialIndex, impactEntry, blastMeters);
+
     let destroyedCount = 0;
     const destroyedSegmentIndices = [];
+    const explosionPoints = [];
 
     for (const entry of blastEntries) {
+        const mid = segmentMidpoint(entry);
         if (!trailSpatialIndex?.destroySegment?.(entry)) continue;
         destroyedCount += 1;
         destroyedSegmentIndices.push(Number(entry.segmentIdx));
+        if (mid) explosionPoints.push(mid);
     }
+
+    // Calculate overflow: meters that would have been destroyed but trail was too short
+    const overflowMeters = Math.max(0, blastMeters - totalDestroyedMeters);
+    const overflowDamagePerMeter = Math.max(0,
+        Number(CONFIG?.HUNT?.ROCKET?.TRAIL_OVERFLOW_DAMAGE_PER_METER) || 2.5);
+    const overflowDamage = Math.floor(overflowMeters * overflowDamagePerMeter);
 
     return {
         entry: impactEntry,
@@ -83,7 +136,11 @@ function applyRocketTrailBlast(trailSpatialIndex, impactEntry, projectile, hit) 
         destroyed: destroyedCount > 0,
         destroyedCount,
         destroyedSegmentIndices,
-        blastRadiusSegments,
+        blastMeters,
+        totalDestroyedMeters,
+        overflowMeters,
+        overflowDamage,
+        explosionPoints,
         remainingHp: 0,
         maxHp: Math.max(1, Number(impactEntry?.maxHp) || 1),
         impactPoint: buildImpactPoint(hit, projectile),
@@ -107,7 +164,7 @@ export function applyTrailDamageFromProjectile(trailSpatialIndex, projectile, op
         return applyRocketTrailBlast(trailSpatialIndex, hit.entry, projectile, hit);
     }
 
-    const damage = Math.max(1, Number(options.damage) || resolveTrailDamageByProjectileType(projectile.type));
+    const damage = Math.max(1, Number(options.damage) || 1);
     const damageResult = trailSpatialIndex.damageTrailSegment(hit.entry, damage);
     if (!damageResult.hit) {
         return null;

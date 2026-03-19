@@ -36,6 +36,10 @@ export function createEntityRuntimeSupport(owner) {
             if (owner.particles) {
                 if (isRocketTierType(projectile?.type)) {
                     owner.particles.spawnRocketImpact(position, projectile?.type);
+                    // Spawn explosion particles along all destroyed trail segments
+                    if (trailHit?.explosionPoints?.length > 0) {
+                        owner.particles.spawnTrailExplosion(trailHit.explosionPoints);
+                    }
                 } else {
                     owner.particles.spawnTrailImpact(position, color, { destroyed: isDestroyed });
                 }

@@ -65,7 +65,8 @@ export class PowerupModelFactory {
             if (normalizedType === 'INVERT') return this._createInvertModel(color);
             if (normalizedType === 'ROCKET_WEAK') return this._createRocketModel(color, 0.88);
             if (normalizedType === 'ROCKET_MEDIUM') return this._createRocketModel(color, 1.0);
-            if (normalizedType === 'ROCKET_STRONG') return this._createRocketModel(color, 1.14);
+            if (normalizedType === 'ROCKET_HEAVY') return this._createRocketModel(color, 1.14);
+            if (normalizedType === 'ROCKET_MEGA') return this._createRocketModel(color, 1.35);
             return this._createFallbackCube(color);
         } catch {
             return this._createFallbackCube(color);

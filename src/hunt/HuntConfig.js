@@ -33,7 +33,8 @@ export const HUNT_CONFIG = Object.freeze({
     ROCKET: Object.freeze({
         VISUAL_SCALE_WEAK: 1.7,
         VISUAL_SCALE_MEDIUM: 1.95,
-        VISUAL_SCALE_STRONG: 2.2,
+        VISUAL_SCALE_HEAVY: 2.2,
+        VISUAL_SCALE_MEGA: 2.6,
         COLLISION_RADIUS_MULTIPLIER: 1.65,
         HOMING_TURN_RATE: 6.2,
         HOMING_LOCK_ON_ANGLE: 32,
@@ -41,6 +42,7 @@ export const HUNT_CONFIG = Object.freeze({
         HOMING_RANGE: 130,
         EXPLOSION_RADIUS: 25,
         EXPLOSION_DAMAGE_FALLOFF: 0.5,
+        TRAIL_OVERFLOW_DAMAGE_PER_METER: 2.5,
     }),
     FEEDBACK: Object.freeze({
         MG_IMPACT: Object.freeze({
@@ -77,13 +79,23 @@ export const HUNT_CONFIG = Object.freeze({
             gravity: -6.4,
             weakColor: 0xffcc66,
             mediumColor: 0xff8844,
-            strongColor: 0xff3344,
+            heavyColor: 0xff3344,
+            megaColor: 0xcc11ff,
+        }),
+        TRAIL_EXPLOSION: Object.freeze({
+            countPerSegment: 8,
+            speed: 10.0,
+            size: 0.6,
+            life: 0.45,
+            gravity: -5.0,
+            color: 0x44ccff,
         }),
     }),
     ROCKET_TIERS: Object.freeze({
-        WEAK: Object.freeze({ damage: 15, spawnChance: 0.68, trailBlastRadiusSegments: 0 }),
-        MEDIUM: Object.freeze({ damage: 35, spawnChance: 0.24, trailBlastRadiusSegments: 1 }),
-        STRONG: Object.freeze({ damage: 60, spawnChance: 0.08, trailBlastRadiusSegments: 2 }),
+        WEAK: Object.freeze({ damage: 10, spawnChance: 0.45, trailBlastMeters: 2 }),
+        MEDIUM: Object.freeze({ damage: 20, spawnChance: 0.30, trailBlastMeters: 4 }),
+        HEAVY: Object.freeze({ damage: 40, spawnChance: 0.18, trailBlastMeters: 10 }),
+        MEGA: Object.freeze({ damage: 70, spawnChance: 0.07, trailBlastMeters: 30 }),
     }),
     ROCKET_PICKUP_SPAWN_CHANCE: 0.28,
     PICKUP_WEIGHTS: Object.freeze({

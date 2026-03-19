@@ -98,9 +98,10 @@ export const CONFIG_SECTIONS = {
             SLOW_TIME: { name: 'Zeitlupe', color: 0x44ff88, icon: '🕙', duration: 4, timeScale: 0.4 },
             GHOST: { name: 'Geist', color: 0xff66cc, icon: '👻', duration: 3 },
             INVERT: { name: 'Invertieren', color: 0xff00ff, icon: '🔀', duration: 4 },
-            ROCKET_WEAK: { name: 'Rakete S', color: 0xffcc66, icon: '🚀', duration: 0, damage: 15, huntOnly: true },
-            ROCKET_MEDIUM: { name: 'Rakete M', color: 0xff8844, icon: '🚀', duration: 0, damage: 35, huntOnly: true },
-            ROCKET_STRONG: { name: 'Rakete L', color: 0xff3344, icon: '🚀', duration: 0, damage: 60, huntOnly: true },
+            ROCKET_WEAK: { name: 'Rakete S', color: 0xffcc66, icon: '🚀', duration: 0, damage: 10, huntOnly: true },
+            ROCKET_MEDIUM: { name: 'Rakete M', color: 0xff8844, icon: '🚀', duration: 0, damage: 20, huntOnly: true },
+            ROCKET_HEAVY: { name: 'Rakete L', color: 0xff3344, icon: '🚀', duration: 0, damage: 40, huntOnly: true },
+            ROCKET_MEGA: { name: 'Rakete XL', color: 0xcc11ff, icon: '🚀', duration: 0, damage: 70, huntOnly: true },
         }
     },
 

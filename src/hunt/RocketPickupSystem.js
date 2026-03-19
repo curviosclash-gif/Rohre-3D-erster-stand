@@ -3,7 +3,8 @@ import { CONFIG } from '../core/Config.js';
 const TIER_BY_ITEM = Object.freeze({
     ROCKET_WEAK: 'WEAK',
     ROCKET_MEDIUM: 'MEDIUM',
-    ROCKET_STRONG: 'STRONG',
+    ROCKET_HEAVY: 'HEAVY',
+    ROCKET_MEGA: 'MEGA',
 });
 
 export function isRocketTierType(type) {
@@ -23,22 +24,28 @@ export function resolveRocketTierDamage(type) {
     }
 
     const fallback = CONFIG?.POWERUP?.TYPES?.[normalized]?.damage;
-    return Math.max(1, Number(fallback || 15));
+    return Math.max(1, Number(fallback || 10));
 }
 
-export function resolveRocketTrailBlastRadiusSegments(type) {
+export function resolveRocketTrailBlastMeters(type) {
     const normalized = String(type || '').toUpperCase();
     const tier = TIER_BY_ITEM[normalized];
     const tierConfig = CONFIG?.HUNT?.ROCKET_TIERS?.[tier];
-    return Math.max(0, Math.floor(Number(tierConfig?.trailBlastRadiusSegments) || 0));
+    return Math.max(0, Number(tierConfig?.trailBlastMeters) || 0);
+}
+
+/** @deprecated Use resolveRocketTrailBlastMeters instead */
+export function resolveRocketTrailBlastRadiusSegments(type) {
+    return 0;
 }
 
 export function pickWeightedRocketTierType() {
     const tiers = CONFIG?.HUNT?.ROCKET_TIERS || {};
     const weighted = [
-        { type: 'ROCKET_WEAK', weight: Number(tiers.WEAK?.spawnChance || 0.6) },
-        { type: 'ROCKET_MEDIUM', weight: Number(tiers.MEDIUM?.spawnChance || 0.3) },
-        { type: 'ROCKET_STRONG', weight: Number(tiers.STRONG?.spawnChance || 0.1) },
+        { type: 'ROCKET_WEAK', weight: Number(tiers.WEAK?.spawnChance || 0.45) },
+        { type: 'ROCKET_MEDIUM', weight: Number(tiers.MEDIUM?.spawnChance || 0.30) },
+        { type: 'ROCKET_HEAVY', weight: Number(tiers.HEAVY?.spawnChance || 0.18) },
+        { type: 'ROCKET_MEGA', weight: Number(tiers.MEGA?.spawnChance || 0.07) },
     ];
     const total = weighted.reduce((sum, entry) => sum + Math.max(0, entry.weight), 0);
     if (total <= 0) return 'ROCKET_WEAK';
@@ -51,5 +58,5 @@ export function pickWeightedRocketTierType() {
             return entry.type;
         }
     }
-    return 'ROCKET_STRONG';
+    return 'ROCKET_MEGA';
 }

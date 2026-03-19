@@ -38,7 +38,7 @@ export function findStrongestRocketIndex(inventory = []) {
     for (let i = 0; i < inventory.length; i++) {
         const type = inventory[i];
         if (!isRocketTierType(type)) continue;
-        const rank = type === 'ROCKET_STRONG' ? 3 : (type === 'ROCKET_MEDIUM' ? 2 : 1);
+        const rank = type === 'ROCKET_MEGA' ? 4 : (type === 'ROCKET_HEAVY' ? 3 : (type === 'ROCKET_MEDIUM' ? 2 : 1));
         if (rank > strongestRank) {
             strongestRank = rank;
             strongestIndex = i;

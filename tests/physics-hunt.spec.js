@@ -90,7 +90,7 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
             shooter.trail?.clear?.();
             enemy.trail?.clear?.();
             shooter.shootCooldown = 0;
-            shooter.inventory = ['ROCKET_STRONG'];
+            shooter.inventory = ['ROCKET_HEAVY'];
             shooter.selectedItemIndex = 0;
 
             shooter.position.set(0, 50, 0);
@@ -189,7 +189,7 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
             player.trail?.clear?.();
             target.trail?.clear?.();
             player.shootCooldown = 0;
-            player.inventory = ['ROCKET_STRONG'];
+            player.inventory = ['ROCKET_HEAVY'];
             player.selectedItemIndex = 0;
 
             player.position.set(0, 50, 0);
@@ -1118,7 +1118,7 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.particles).toContain('rocket-impact');
     });
 
-    test('T89e: Weak-Medium-Strong Rocket-Trail-Blasts entfernen unterschiedlich viele Segmente', async ({ page }) => {
+    test('T89e: Rocket-Trail-Blasts zerstoeren meter-basiert und staerkere Raketen zerstoeren mehr', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
             const { applyTrailDamageFromProjectile } = await import('/src/hunt/DestructibleTrail.js');
@@ -1136,24 +1136,17 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
             const maxSegments = Math.max(1, Number(enemy?.trail?.maxSegments) || 5000);
             const measureBlast = (type) => {
                 enemy.trail.clear();
-                const createdIndices = [];
-                for (let i = 0; i < 7; i++) {
-                    const x = -6 + i * 2;
-                    enemy.trail._addSegment(x, 50, -18, x + 0.8, 50, -18);
-                    createdIndices.push((Math.max(0, Number(enemy.trail.writeIndex) || 0) - 1 + maxSegments) % maxSegments);
+                // Create 40 segments of ~1 unit length each (total ~40 units of trail)
+                for (let i = 0; i < 40; i++) {
+                    enemy.trail._addSegment(i, 50, -18, i + 1, 50, -18);
                 }
 
-                const centerIdx = createdIndices[Math.floor(createdIndices.length * 0.5)];
+                const centerIdx = (Math.max(0, Number(enemy.trail.writeIndex) || 0) - 20 + maxSegments) % maxSegments;
                 const ref = enemy?.trail?.segmentRefs?.[centerIdx] || null;
                 if (!ref?.entry) {
                     return { error: `missing-center-${type}` };
                 }
 
-                const tierKey = String(type || '').replace('ROCKET_', '');
-                const expectedRadius = Math.max(
-                    0,
-                    Math.floor(Number(game?.config?.HUNT?.ROCKET_TIERS?.[tierKey]?.trailBlastRadiusSegments) || 0)
-                );
                 const before = enemy.trail.segmentRefs.reduce((count, entry) => count + (entry ? 1 : 0), 0);
                 const impactPoint = {
                     x: (Number(ref.entry.fromX) + Number(ref.entry.toX)) * 0.5,
@@ -1168,11 +1161,15 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
                 });
                 const after = enemy.trail.segmentRefs.reduce((count, entry) => count + (entry ? 1 : 0), 0);
 
+                const tierKey = String(type || '').replace('ROCKET_', '');
+                const blastMeters = Number(game?.config?.HUNT?.ROCKET_TIERS?.[tierKey]?.trailBlastMeters) || 0;
+
                 enemy.trail.clear();
                 return {
                     destroyedCount: before - after,
                     hitDestroyedCount: Number(hit?.destroyedCount || 0),
-                    expectedCount: expectedRadius * 2 + 1,
+                    blastMeters,
+                    overflowDamage: Number(hit?.overflowDamage || 0),
                 };
             };
 
@@ -1180,19 +1177,26 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
                 error: null,
                 weak: measureBlast('ROCKET_WEAK'),
                 medium: measureBlast('ROCKET_MEDIUM'),
-                strong: measureBlast('ROCKET_STRONG'),
+                heavy: measureBlast('ROCKET_HEAVY'),
+                mega: measureBlast('ROCKET_MEGA'),
             };
         });
 
         expect(result.error).toBeNull();
-        expect(result.weak.destroyedCount).toBe(result.weak.expectedCount);
-        expect(result.weak.hitDestroyedCount).toBe(result.weak.expectedCount);
-        expect(result.medium.destroyedCount).toBe(result.medium.expectedCount);
-        expect(result.medium.hitDestroyedCount).toBe(result.medium.expectedCount);
-        expect(result.strong.destroyedCount).toBe(result.strong.expectedCount);
-        expect(result.strong.hitDestroyedCount).toBe(result.strong.expectedCount);
+        // Each tier should destroy segments
+        expect(result.weak.destroyedCount).toBeGreaterThan(0);
+        expect(result.medium.destroyedCount).toBeGreaterThan(0);
+        expect(result.heavy.destroyedCount).toBeGreaterThan(0);
+        expect(result.mega.destroyedCount).toBeGreaterThan(0);
+        // Stronger rockets destroy more
         expect(result.medium.destroyedCount).toBeGreaterThan(result.weak.destroyedCount);
-        expect(result.strong.destroyedCount).toBeGreaterThan(result.medium.destroyedCount);
+        expect(result.heavy.destroyedCount).toBeGreaterThan(result.medium.destroyedCount);
+        expect(result.mega.destroyedCount).toBeGreaterThan(result.heavy.destroyedCount);
+        // No overflow when enough trail exists
+        expect(result.weak.overflowDamage).toBe(0);
+        expect(result.medium.overflowDamage).toBe(0);
+        expect(result.heavy.overflowDamage).toBe(0);
+        expect(result.mega.overflowDamage).toBe(0);
     });
 
     test('T89a: Hunt-MG braucht jetzt einen Lockout, bevor ein Full-HP-Ziel faellt', async ({ page }) => {
@@ -1304,7 +1308,7 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
             }
             Math.random = originalRandom;
 
-            const rocketTotal = ['ROCKET_WEAK', 'ROCKET_MEDIUM', 'ROCKET_STRONG']
+            const rocketTotal = ['ROCKET_WEAK', 'ROCKET_MEDIUM', 'ROCKET_HEAVY', 'ROCKET_MEGA']
                 .reduce((sum, key) => sum + Number(counts[key] || 0), 0);
 
             return {
@@ -1318,7 +1322,8 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.counts.SLOW_DOWN || 0).toBe(0);
         expect(result.counts.INVERT || 0).toBe(0);
         expect(result.rocketTotal).toBeLessThan(90);
-        expect(result.counts.ROCKET_STRONG || 0).toBeLessThan(result.counts.ROCKET_MEDIUM || 0);
+        expect(result.counts.ROCKET_MEGA || 0).toBeLessThan(result.counts.ROCKET_HEAVY || 0);
+        expect(result.counts.ROCKET_HEAVY || 0).toBeLessThan(result.counts.ROCKET_MEDIUM || 0);
         expect(result.counts.ROCKET_MEDIUM || 0).toBeLessThan(result.counts.ROCKET_WEAK || 0);
         expect(result.counts.SHIELD || 0).toBeGreaterThan(0);
     });
@@ -1339,7 +1344,7 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
             game.settings.hunt.respawnEnabled = true;
             game._applySettingsToRuntime?.();
 
-            player.inventory = ['ROCKET_STRONG', 'SHIELD'];
+            player.inventory = ['ROCKET_HEAVY', 'SHIELD'];
             player.selectedItemIndex = 1;
             player.shootCooldown = 0.5;
             entityManager._overheatGunSystem._overheatByPlayer[player.index] = 84;

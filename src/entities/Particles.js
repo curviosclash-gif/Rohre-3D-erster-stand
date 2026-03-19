@@ -187,7 +187,8 @@ export class ParticleSystem {
         const type = String(rocketType || '').toUpperCase();
         let fallbackColor = feedback.mediumColor;
         if (type === 'ROCKET_WEAK') fallbackColor = feedback.weakColor;
-        if (type === 'ROCKET_STRONG') fallbackColor = feedback.strongColor;
+        if (type === 'ROCKET_HEAVY') fallbackColor = feedback.heavyColor;
+        if (type === 'ROCKET_MEGA') fallbackColor = feedback.megaColor;
 
         this.spawn(
             position,
@@ -201,6 +202,28 @@ export class ParticleSystem {
                 type: 'rocket-impact',
             }
         );
+    }
+
+    spawnTrailExplosion(points, trailColor = null) {
+        const feedback = CONFIG?.HUNT?.FEEDBACK?.TRAIL_EXPLOSION || {};
+        const countPerPoint = Math.max(1, Number(feedback.countPerSegment) || 8);
+        const color = Number.isFinite(Number(trailColor)) ? Number(trailColor) : Number(feedback.color) || 0x44ccff;
+
+        for (const point of points || []) {
+            if (!point) continue;
+            this.spawn(
+                point,
+                countPerPoint,
+                color,
+                Math.max(0.1, Number(feedback.speed) || 10.0),
+                Math.max(0.05, Number(feedback.size) || 0.6),
+                Math.max(0.05, Number(feedback.life) || 0.45),
+                {
+                    gravity: Number(feedback.gravity) || -5.0,
+                    type: 'trail-explosion',
+                }
+            );
+        }
     }
 
     update(dt) {
