@@ -123,30 +123,38 @@ export class UIStartSyncController {
 
         if (this.ui.mapSelect) {
             listen(this.ui.mapSelect, 'change', () => {
-                pushRecentEntry(startSetup.recentMaps, this.ui.mapSelect.value);
+                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                pushRecentEntry(currentStartSetup.recentMaps, this.ui.mapSelect.value);
+                this.syncStartSetupState(this.game.settings);
             });
         }
         if (this.ui.vehicleSelectP1) {
             listen(this.ui.vehicleSelectP1, 'change', () => {
-                pushRecentEntry(startSetup.recentVehicles, this.ui.vehicleSelectP1.value);
+                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP1.value);
+                this.syncStartSetupState(this.game.settings);
             });
         }
         if (this.ui.vehicleSelectP2) {
             listen(this.ui.vehicleSelectP2, 'change', () => {
-                pushRecentEntry(startSetup.recentVehicles, this.ui.vehicleSelectP2.value);
+                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP2.value);
+                this.syncStartSetupState(this.game.settings);
             });
         }
 
         if (mapFavoriteToggleButton) {
             listen(mapFavoriteToggleButton, 'click', () => {
-                toggleFavoriteEntry(startSetup.favoriteMaps, this.ui.mapSelect?.value);
-                this.syncStartSetupState(settings);
+                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                toggleFavoriteEntry(currentStartSetup.favoriteMaps, this.ui.mapSelect?.value);
+                this.syncStartSetupState(this.game.settings);
             });
         }
         if (vehicleFavoriteToggleButton) {
             listen(vehicleFavoriteToggleButton, 'click', () => {
-                toggleFavoriteEntry(startSetup.favoriteVehicles, this.ui.vehicleSelectP1?.value);
-                this.syncStartSetupState(settings);
+                const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                toggleFavoriteEntry(currentStartSetup.favoriteVehicles, this.ui.vehicleSelectP1?.value);
+                this.syncStartSetupState(this.game.settings);
             });
         }
 
