@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-18
+Stand: 2026-03-19
 
 Dieser Masterplan ist die einzige aktive Planquelle fuer offene Arbeit.
 Abgeschlossene Plaene und historische Dokumente liegen unter `docs/archive/`.
@@ -10,6 +10,32 @@ Abgeschlossene Plaene und historische Dokumente liegen unter `docs/archive/`.
 - [ ] Offen
 - [/] In Bearbeitung
 - [x] Abgeschlossen
+
+## Parallelmodus fuer 3 Agenten
+
+- Maximal 3 aktive Agenten gleichzeitig.
+- Priorisierte Startbelegung: `Bot-1 -> V45 / 45.1`, `Bot-2 -> V45 / 45.2`, `Bot-3 -> V45 / 45.3`.
+- V46 wird erst nach `45.9` geclaimt, damit `src/core/**`, `src/state/**`, `src/ui/**` und `prototypes/vehicle-lab/**` nicht blockuebergreifend kollidieren.
+- Gemeinsame Pfade (`docs/**`, `tests/**`) bleiben shared; Fremdpfad-Aenderungen muessen vor dem Commit im `Conflict-Log` stehen.
+
+## Datei-Ownership
+
+| Pfadmuster | Block / Stream | Claim-Status | Hinweise |
+| --- | --- | --- | --- |
+| `src/network/**`, `server/**`, `electron/**` | V41 Abschluss-Gate | reserviert | Nicht in V45/V46 anfassen |
+| `docs/Feature_Arcade_Modus_V45.md`, `src/ui/menu/**`, `src/ui/arcade/**`, `style.css` | V45 / 45.1 | Bot-A seit 2026-03-19 | Produkt-Freeze, Menue, HUD, Post-Run-Flaechen |
+| `src/core/GameRuntimeFacade.js`, `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/RuntimeConfig.js`, `src/core/SettingsManager.js`, `src/core/arcade/**`, `src/state/arcade/**` | V45 / 45.2 | Bot-B seit 2026-03-19 | Run-State, Runtime-Hooks, Score/Persistenz |
+| `src/entities/arcade/**`, `src/entities/directors/**`, `prototypes/vehicle-lab/**`, `data/vehicles/**` | V45 / 45.3 | frei | Encounter Director, Mastery, Blueprints |
+| `src/utils/MathOps.js`, `src/shared/contracts/**`, `scripts/architecture/ArchitectureConfig.mjs` | V46 / 46.1 | blockiert bis `45.9` | Shared Foundations und Boundary-Regeln |
+| `src/core/MediaRecorderSystem.js`, `src/core/recorder/**`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/**`, `src/core/PlayingStateSystem.js`, `src/state/RoundStateTickSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/**`, `eslint.config.js` | V46 / 46.2 | blockiert bis `45.9` | Core-/UI-Aufspaltung, DI, Legacy-Ceilings |
+| `src/hunt/**`, `src/entities/systems/ProjectileSystem.js`, `src/entities/ai/**`, `src/ui/HuntHUD.js` | V46 / 46.3 | blockiert bis `45.9` | Hunt-, AI- und Modulgrenzen |
+| `docs/**`, `tests/**` | Shared | shared | Append-only oder eigener Abschnitt; Konflikte loggen |
+
+## Conflict-Log
+
+| Datum | Bot | Fremder Block/Stream | Datei | Grund | Risiko |
+| --- | --- | --- | --- | --- | --- |
+| - | - | - | - | Noch leer | niedrig |
 
 ## Abgeschlossene Bloecke (archiviert)
 
@@ -249,7 +275,7 @@ Agent B ruft diese auf. Kein direkter Datei-Overlap.
 
 Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-A seit 2026-03-19 -->
 
 **Scope**
 
@@ -257,51 +283,77 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 - V1: Singleplayer-first, kurzer Survival-Gauntlet, Score-/Combo-System, Sektor-/Wellenstruktur
 - Folgeausbau: Flugzeug-Leveling, Vehicle-Editor-Blueprints, Seeds, Daily Challenge, lokale Bestenliste, Replay-Anbindung
 
-**Hauptpfade**
+**Parallelregel**
 
-- `src/ui/menu/MenuDefaultsEditorConfig.js`
-- `src/core/runtime/MenuRuntimeSessionService.js`
-- `src/core/SettingsManager.js`
-- `src/core/RuntimeConfig.js`
-- `src/core/GameRuntimeFacade.js`
-- `src/state/**`
-- `src/entities/**`
-- `src/ui/**`
-- `prototypes/vehicle-lab/**`
-- `data/vehicles/**`
-- `tests/**`
-
-**Konfliktregel**
-
-- Kein V45-Block aendert `src/network/**`, `server/**` oder `electron/**`; diese Pfade gehoeren weiter zu V41.
-- Kein V45-Block fuehrt in V1 einen dritten technischen `GAME_MODE_TYPE` ein; Arcade bleibt ein Run-Layer auf bestehender Runtime.
-- Eingefrorene Bot-/Training-Vertraege (`classic|hunt`) werden nur per Folgeplan erweitert, nicht in diesem Block.
-
-- [ ] 45.1 Produkt- und Architektur-Freeze
-  - [ ] 45.1.1 Zielbild und harte Nicht-Ziele fuer den Arcade-Modus festziehen
-  - [ ] 45.1.2 Runtime-Entscheidung absichern: Arcade als Session-/Run-Layer statt neuem `GAME_MODE_TYPE`
-
-- [ ] 45.2 Arcade-Run-Lifecycle
-  - [ ] 45.2.1 Separaten Arcade-Run-State und Sektor-/Intermission-Fluss definieren
-  - [ ] 45.2.2 Match-Flow ohne klassischen Rundensieg-Zyklus in die Runtime integrieren
-
-- [ ] 45.3 Score- und Risiko-System
-  - [ ] 45.3.1 Separates Run-Score-Modell mit Multiplikator und Combo-Decay aufbauen
-  - [ ] 45.3.2 Post-Run-Ranking, Rekorde und Breakdown definieren
-
-- [ ] 45.4 Encounter Director, Flugzeug-Leveling und Vehicle-Editor
-  - [ ] 45.4.1 Wellen-/Sektorkatalog fuer Bot-Squads, Ziele, Modifikatoren und run-temporare Flugzeug-Levelups bauen
-  - [ ] 45.4.2 Persistente Airframe-Mastery, Blueprint-Schema und Vehicle-Editor-Integration mit Budget-/Hitbox-Guards definieren
-
-- [ ] 45.5 UI, Replayability und Abschluss-Gate
-  - [ ] 45.5.1 Menue, HUD, Vehicle-Mastery-/Blueprint-Anker, Replay-/Seed-Anker und lokale Challenge-Pfade anbinden
-  - [ ] 45.5.2 Tests, `docs:sync`, `docs:check` und Doku-Freeze abschliessen
+- V45 ist der primare 3-Agenten-Startblock.
+- Die Streams `45.1`, `45.2` und `45.3` koennen sofort parallel gestartet werden.
+- Integrationsdateien ausserhalb des eigenen Stream-Scopes werden erst in `45.9` oder mit `Conflict-Log`-Eintrag angefasst.
+- Kein V45-Stream fuehrt einen dritten technischen `GAME_MODE_TYPE` ein; Arcade bleibt ein Run-Layer auf bestehender Runtime.
 
 ---
 
-## Block V46: Architektur-Verbesserungen — Deduplizierung, Contracts, God Objects
+### 45.1 Agenten-Stream A: Produkt-Freeze, Menue und HUD
+
+<!-- SUB-LOCK: Bot-A seit 2026-03-19 -->
+
+**Owner-Scope**
+
+- `docs/Feature_Arcade_Modus_V45.md`
+- `src/ui/menu/**`
+- `src/ui/arcade/**`
+- `style.css`
+
+- [x] 45.1.1 Zielbild, Nicht-Ziele, UX-Fluss und Seed-/Challenge-Anker fuer Arcade finalisieren, ohne die Runtime-Grundentscheidung zu oeffnen (Bot-A, 2026-03-19)
+- [x] 45.1.2 Menue-Einstieg, HUD-Shell, Post-Run-Feedback, Replay-/Daily-Platzhalter und Vehicle-Mastery-Anker an vorhandene Runtime-Hooks anbinden (Bot-A, 2026-03-19)
+
+---
+
+### 45.2 Agenten-Stream B: Run-Lifecycle und Score-System
+
+<!-- SUB-LOCK: Bot-B seit 2026-03-19 -->
+
+**Owner-Scope**
+
+- `src/core/GameRuntimeFacade.js`
+- `src/core/runtime/MenuRuntimeSessionService.js`
+- `src/core/RuntimeConfig.js`
+- `src/core/SettingsManager.js`
+- `src/core/arcade/**`
+- `src/state/arcade/**`
+
+- [x] 45.2.1 Separaten Arcade-Run-State, Sektor-/Intermission-Fluss und Match-Flow ohne klassischen Rundensieg-Zyklus in Runtime und State verankern (Bot-B, 2026-03-19)
+- [x] 45.2.2 Score, Multiplikator, Combo-Decay, Breakdown, Rekorde sowie Persistenz-/Replay-Hooks als eigenen Run-Layer aufbauen (Bot-B, 2026-03-19)
+- Verifikation (Bot-B, 2026-03-19): `npm run smoke:roundstate` PASS, gezielte Core-Arcade-Cases PASS (`T20bb`, `T20q`, `T20v`, `T20x`), `npm run docs:sync` PASS, `npm run docs:check` PASS, `npm run build` BLOCKIERT durch vorbestehenden Boundary-Fehler in `src/entities/systems/projectile/ProjectileHitResolver.js -> src/core/Config.js`.
+
+---
+
+### 45.3 Agenten-Stream C: Encounter Director, Mastery und Blueprints
+
+<!-- SUB-LOCK: frei -->
+
+**Owner-Scope**
+
+- `src/entities/arcade/**`
+- `src/entities/directors/**`
+- `prototypes/vehicle-lab/**`
+- `data/vehicles/**`
+
+- [x] 45.3.1 Wellen-/Sektorkatalog fuer Bot-Squads, Ziele, Modifikatoren und run-temporaere Flugzeug-Levelups definieren (abgeschlossen: 2026-03-19)
+- [x] 45.3.2 Persistente Airframe-Mastery, Blueprint-Schema und Vehicle-Editor-Integration mit Budget-/Hitbox-Guards ausarbeiten (abgeschlossen: 2026-03-19)
+
+---
+
+### Phase 45.9: Integrations- und Abschluss-Gate
+
+- [/] 45.9.1 V45-A, V45-B und V45-C zusammenfuehren; Menue -> Run -> Post-Run -> Replay-/Seed-Handoff manuell und automatisiert verifizieren (Bot-A, 2026-03-19, in Umsetzung: `smoke:roundstate` + neuer `smoke:arcade` gruen; restliche Playwright-Gates und finaler Handoff warten auf freien Suite-Lock)
+- [/] 45.9.2 Tests, `docs:sync`, `docs:check`, Doku-Freeze sowie Lock-/Ownership-Bereinigung abschliessen (Bot-A, 2026-03-19, in Umsetzung: `docs:sync`, `docs:check`, `build` gruen; Lock-/Ownership-Cleanup nach vollstaendigem 45.9-Gate)
+
+---
+
+## Block V46: Architektur-Verbesserungen - Deduplizierung, Contracts, God Objects
 
 <!-- LOCK: frei -->
+<!-- DEPENDS-ON: V45.9 -->
 
 **Scope**
 
@@ -314,155 +366,71 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 - Event-Pattern vereinheitlichen
 - Modul-Grenzen korrigieren (HuntHUD, AI Sensing)
 
-**Konfliktregel**
+**Parallelregel**
 
-- Kein V46-Block aendert `src/network/**`, `server/**` oder `electron/**`; diese Pfade gehoeren zu V41.
-- Kein V46-Block aendert Spielmechanik oder Balance-Werte — nur strukturelle Verschiebungen.
-- Training-Contract-Versionen (v33, v36) werden nicht geaendert, nur Import-Pfade umgeleitet.
+- V46 startet erst nach `45.9`, damit die verbleibenden Runtime-/UI-Pfade konfliktfrei freiwerden.
+- Ab `45.9` koennen die Streams `46.1`, `46.2` und `46.3` parallel laufen.
+- `46.99` ist der einzige gemeinsame Integrationspunkt fuer shared Tests, Docs und Lock-Bereinigung.
+- Kein V46-Stream aendert Spielmechanik oder Balance-Werte; erlaubt sind nur strukturelle Verschiebungen und Konfig-Konsolidierung.
 
-**Hauptpfade**
+---
+
+### 46.1 Agenten-Stream A: Shared Foundations und Boundary Contracts
+
+<!-- SUB-LOCK: frei -->
+
+**Owner-Scope**
 
 - `src/utils/MathOps.js`
 - `src/shared/contracts/**`
-- `src/core/MediaRecorderSystem.js` → `src/core/recorder/**`
-- `src/core/GameRuntimeFacade.js` → `src/core/runtime/**`
-- `src/ui/menu/MenuMultiplayerBridge.js` → `src/ui/menu/multiplayer/**`
-- `src/hunt/HuntConfig.js`, `src/hunt/HuntTargetingOps.js`
-- `src/entities/systems/ProjectileSystem.js`
-- `src/entities/ai/BotDecisionOps.js`
 - `scripts/architecture/ArchitectureConfig.mjs`
+
+- [ ] 46.1.1 Utility-Deduplizierung und Shared Contracts extrahieren (`toFiniteNumber`, `clamp01`, Config/Entity/Hunt/Training/MatchLifecycle)
+- [ ] 46.1.2 Bidirektionale Import-Kanten ueber die neuen Contracts aufloesen und Boundary-Regeln/Allowlists im Architektur-Check verschaerfen
+
+---
+
+### 46.2 Agenten-Stream B: Core- und Menu-Decomposition
+
+<!-- SUB-LOCK: frei -->
+
+**Owner-Scope**
+
+- `src/core/MediaRecorderSystem.js`
+- `src/core/recorder/**`
+- `src/core/GameRuntimeFacade.js`
+- `src/core/runtime/**`
+- `src/core/PlayingStateSystem.js`
+- `src/state/RoundStateTickSystem.js`
+- `src/ui/menu/MenuMultiplayerBridge.js`
+- `src/ui/menu/multiplayer/**`
 - `eslint.config.js`
 
----
-
-### 46.1 Utility-Deduplizierung
-
-- [ ] 46.1.1 `toFiniteNumber` zu `src/utils/MathOps.js` hinzufuegen (exportieren)
-- [ ] 46.1.2 Lokale `toFiniteNumber`-Definitionen in 12 Dateien entfernen, durch Import ersetzen:
-  - `src/core/config/SettingsRuntimeContract.js` (Z27)
-  - `src/core/DeveloperTrainingController.js` (Z31)
-  - `src/core/GameDebugApi.js` (Z24)
-  - `src/core/MediaRecorderSystem.js` (Z94)
-  - `src/core/perf/RuntimePerfProfiler.js` (Z29)
-  - `src/entities/ai/training/TrainerPayloadAdapter.js` (Z12)
-  - `src/entities/ai/training/TrainingAutomationContractV33.js` (Z31)
-  - `src/entities/ai/training/TrainingContractV1.js` (Z15)
-  - `src/hunt/HuntTargetingOps.js` (Z15)
-  - `src/state/training/RewardCalculator.js` (Z43)
-  - `src/state/training/TrainingGateEvaluator.js` (Z13)
-  - `src/state/training/TrainingOpsKpiContractV36.js` (Z7)
-- [ ] 46.1.3 `toSafeNumber` in `src/hunt/HealthSystem.js` (Z5) durch `toFiniteNumber`-Import ersetzen, Aufrufe umbenennen
-- [ ] 46.1.4 Lokale `clamp01`-Definitionen in 3 Dateien durch Import aus `MathOps.js` ersetzen:
-  - `src/hunt/HuntHUD.js` (Z4)
-  - `src/entities/ai/BotSensors.js` (Z31)
-  - `src/entities/ai/training/TrainingAutomationRunner.js` (Z30)
+- [ ] 46.2.1 `MediaRecorderSystem` und `GameRuntimeFacade` in kleinere Module mit klaren Facades zerlegen
+- [ ] 46.2.2 `MenuMultiplayerBridge` entkoppeln, neue Module direkt per Dependency Injection bauen, Legacy-Ceilings senken und `window.GAME_INSTANCE`/`constructor(game)`-Altlasten reduzieren
 
 ---
 
-### 46.2 Shared Contracts ausbauen
+### 46.3 Agenten-Stream C: Hunt/AI-Cleanups und Modulgrenzen
 
-- [ ] 46.2.1 `src/shared/contracts/ConfigContract.js` erstellen: CONFIG-Interface, `getActiveRuntimeConfig()`-Signatur exportieren
-- [ ] 46.2.2 `src/shared/contracts/EntityContract.js` erstellen: `CUSTOM_MAP_KEY`, `VEHICLE_DEFINITIONS`, `resolveArenaMapSelection`
-- [ ] 46.2.3 `src/shared/contracts/HuntContract.js` erstellen: Hunt-State-Interfaces, Projectile-Event-Types
-- [ ] 46.2.4 `src/shared/contracts/MatchLifecycleContract.js` erstellen: `LIFECYCLE_EVENT_TYPES` (aus MediaRecorderSystem verschieben), RoundEnd-UI-State-Interfaces
-- [ ] 46.2.5 `src/shared/contracts/TrainingContract.js` erstellen: `BOT_POLICY_TYPES`, `resolveMatchBotPolicyType`, `ObservationSchema`
+<!-- SUB-LOCK: frei -->
 
----
+**Owner-Scope**
 
-### 46.3 Bidirektionale Abhaengigkeiten aufloesen
+- `src/hunt/**`
+- `src/entities/systems/ProjectileSystem.js`
+- `src/entities/ai/**`
+- `src/ui/HuntHUD.js`
 
-Abhaengig von: 46.2
-
-- [ ] 46.3.1 core→entities aufloesen (4 Import-Kanten):
-  - `RuntimeConfig.js:5` → Import `BOT_POLICY_TYPES` aus `shared/contracts/TrainingContract.js`
-  - `SettingsManager.js:11` → Import `CUSTOM_MAP_KEY` aus `shared/contracts/EntityContract.js`
-  - `DeveloperTrainingController.js:1-2` → Import aus `shared/contracts/TrainingContract.js`
-  - `main.js:5` → Import `CUSTOM_MAP_KEY` aus `shared/contracts/EntityContract.js`
-- [ ] 46.3.2 state→ui aufloesen (2 Import-Kanten):
-  - `state/RoundEndCoordinator.js:1` → `deriveRoundEndOverlayUiState` nach `shared/contracts/MatchLifecycleContract.js` verschieben
-  - `state/RoundStateTickSystem.js:1` → `deriveRoundEndCountdownUiState` nach `shared/contracts/MatchLifecycleContract.js` verschieben
-- [ ] 46.3.3 state→core aufloesen (2 Import-Kanten):
-  - `state/MatchLifecycleSessionOrchestrator.js:1` → `LIFECYCLE_EVENT_TYPES` aus `shared/contracts/MatchLifecycleContract.js`
-  - `state/match-session/MatchSessionMapOps.js:1` → `CONFIG` aus `shared/contracts/ConfigContract.js`
-- [ ] 46.3.4 `scripts/architecture/ArchitectureConfig.mjs` aktualisieren: Allowlists reduzieren, neue Regeln `state/ darf nicht aus ui/ importieren`, `core/ darf nicht aus entities/ importieren`
+- [ ] 46.3.1 Magic Numbers in Hunt, Projectile und AI in Konfig-Objekte ueberfuehren und Sensing-Primitives fuer AI-Perception extrahieren
+- [ ] 46.3.2 HuntHUD nach `src/ui/` verschieben, DOM-/Constructor-Legacy abbauen und Event-/Lifecycle-Migration fuer die beruehrten Pfade abschliessen
 
 ---
 
-### 46.4 God Objects aufbrechen
+### Phase 46.99: Integrations- und Abschluss-Gate
 
-Abhaengig von: 46.2
-
-- [ ] 46.4.1 `MediaRecorderSystem.js` (1335 Zeilen) aufteilen:
-  - `src/core/recorder/RecorderEngineSelector.js` — Codec-Detection, MIME-Type-Auswahl (~150Z)
-  - `src/core/recorder/FrameCaptureEngine.js` — WebCodecs/MediaRecorder Frame-Capture, Encoding-Queue (~400Z)
-  - `src/core/recorder/RecordingExporter.js` — mp4-muxer, Blob-Assembly, Download (~200Z)
-  - `src/core/recorder/RecorderLifecycleAdapter.js` — Match-Events, Load-Level-Management (~150Z)
-  - `src/utils/RecorderUtils.js` — `toSafeDatePart`, `sanitizeFileToken`, `defaultDownload`, `resolveGlobalScope`, `resolvePerfNow`, `toPositiveInt`
-  - `MediaRecorderSystem.js` verbleibt als Facade (~200Z)
-- [ ] 46.4.2 `GameRuntimeFacade.js` (872 Zeilen) aufteilen:
-  - `src/core/runtime/SessionNetworkManager.js` — Session-Init, State-Broadcast, Teardown (~135Z)
-  - `src/core/runtime/MultiplayerCoordinator.js` — Bridge-Setup, UI-Sync, Ready-Invalidation (~120Z)
-  - `src/core/runtime/SettingsOrchestrator.js` — Settings-Apply, Dirty-Tracking (~60Z)
-  - `src/core/runtime/ProfileHandler.js` — Profile CRUD, Export/Import (~55Z)
-  - `GameRuntimeFacade.js` verbleibt als Event-Router (~350Z)
-- [ ] 46.4.3 `MenuMultiplayerBridge.js` (828 Zeilen) aufteilen:
-  - `src/ui/menu/multiplayer/LobbySnapshotStore.js` — Persistence, Storage-Events, BroadcastChannel (~200Z)
-  - `src/ui/menu/multiplayer/HeartbeatManager.js` — Heartbeat, Expiration, Stale-Member-Cleanup (~80Z)
-  - `src/ui/menu/multiplayer/MatchCommandValidator.js` — Command-Age-Validation (~60Z)
-  - `MenuMultiplayerBridge.js` verbleibt als Public API (~350Z)
-- [ ] 46.4.4 `eslint.config.js` Legacy-Ceilings senken: MediaRecorderSystem 1225→300, GameRuntimeFacade 1050→400, MenuMultiplayerBridge 760→400
-
----
-
-### 46.5 Magic Numbers konsolidieren
-
-- [ ] 46.5.1 `src/hunt/HuntConfig.js` erweitern: `TARGETING.MIN_HITBOX_RADIUS` (0.2), `TARGETING.MIN_PROBE_RADIUS` (0.12), `TARGETING.MIN_SAMPLE_STEP` (0.2)
-- [ ] 46.5.2 `src/hunt/HuntTargetingOps.js` bereinigen: Inline-Fallbacks (0.45, 0.78, 0.2, 0.12) durch `HUNT_CONFIG.*` ersetzen
-- [ ] 46.5.3 `src/entities/systems/ProjectileSystem.js` bereinigen: Hardcodierte Rocket-Werte (1.65, 6.2, 32, 130, 0.12) durch `HUNT_CONFIG.ROCKET.*` ersetzen
-- [ ] 46.5.4 `src/entities/ai/BotDecisionOps.js` bereinigen: `BOT_DECISION_CONFIG = Object.freeze({...})` am Dateianfang mit allen ~20 Schwellwerten
-
----
-
-### 46.6 Service-Locator schrittweise ersetzen
-
-Abhaengig von: 46.4
-
-- [ ] 46.6.1 Neue Module aus 46.4 direkt mit Dependency Injection bauen (kein `constructor(game)`)
-- [ ] 46.6.2 `PlayingStateSystem` refactoren: statt `game` nur `{ entityManager, arena, config, input }` uebergeben
-- [ ] 46.6.3 `RoundStateTickSystem` refactoren: statt `game` nur `{ roundStateController, matchFlowUi, config }` uebergeben
-- [ ] 46.6.4 `LEGACY_CONSTRUCTOR_GAME_ALLOWLIST` in ArchitectureConfig nach jedem Refactor reduzieren (Ziel: 11→5)
-- [ ] 46.6.5 `window.GAME_INSTANCE` global entfernen, Debug-API via explizite Referenz uebergeben
-
----
-
-### 46.7 Event-Pattern vereinheitlichen
-
-Abhaengig von: 46.4
-
-- [ ] 46.7.1 Konvention dokumentieren: ActionDispatcher fuer Cross-Modul-Events, Callback-Injection fuer System-interne Events, direkte Aufrufe nur intra-Modul
-- [ ] 46.7.2 Architecture-Boundary-Check um Event-Konventions-Regel erweitern
-- [ ] 46.7.3 `LIFECYCLE_EVENT_TYPES` auf ActionDispatcher oder dedizierten LifecycleEventBus migrieren
-
----
-
-### 46.8 Modul-Grenzen korrigieren
-
-Abhaengig von: 46.1
-
-- [ ] 46.8.1 `src/hunt/HuntHUD.js` nach `src/ui/HuntHUD.js` verschieben, Import-Pfade in Konsumenten anpassen
-- [ ] 46.8.2 HuntHUD DOM-Refs ueber `GameUiDomRefs.js` injizieren (Constructor-Injection statt getElementById)
-- [ ] 46.8.3 `LEGACY_DOM_ACCESS_ALLOWLIST` um HuntHUD-Eintrag reduzieren
-- [ ] 46.8.4 AI Sensing-Primitives (Raycasts, Distanzen) aus ObservationSystem + EnvironmentSamplingOps extrahieren nach `src/entities/ai/perception/SensingPrimitives.js`
-
----
-
-### Phase 46.99: Abschluss-Gate
-
-- [ ] 46.99.1 `npm run lint` — keine Fehler, alle max-lines Ceilings eingehalten
-- [ ] 46.99.2 `npm run check:architecture` — Boundary-Checks bestanden, Allowlists reduziert
-- [ ] 46.99.3 `npx playwright test` — alle E2E-Tests gruen
-- [ ] 46.99.4 Manuell: Classic-Match + Hunt-Match + Multiplayer-Lobby funktional
-- [ ] 46.99.5 Keine bidirektionalen Imports zwischen core/entities, state/ui, state/core
+- [ ] 46.99.1 `npm run lint`, `npm run check:architecture` und `npx playwright test` gruen; keine verbotenen Import-Zyklen mehr
+- [ ] 46.99.2 Manuelle Smoke-Tests, `docs:sync`, `docs:check`, `Conflict-Log`-Abgleich und Lock-/Ownership-Bereinigung abschliessen
 
 ---
 

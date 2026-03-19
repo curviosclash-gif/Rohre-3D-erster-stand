@@ -1376,3 +1376,53 @@ Offene TODOs naechster Schritt:
 - Ergebnis:
   - V38-Restpunkte `38.3` und `38.9` sind in V44 absorbiert und im Masterplan geschlossen.
   - V44 ist ohne offene fachliche Restpunkte abgeschlossen; verbleibende Groesse-Hotspots sind nur noch Scorecard-/Abbaukandidaten.
+
+2026-03-19 (V45 Stream C: Encounter Director + Mastery/Blueprint-Guards)
+- Owner-Scope umgesetzt fuer `45.3.1` und `45.3.2`:
+  - Neue Encounter-Module:
+    - `src/entities/directors/ArcadeEncounterCatalog.js`
+    - `src/entities/directors/ArcadeEncounterDirector.js`
+    - Enthalten deterministischen Seed-Plan fuer Sektoren/Wellen inkl. Squad-, Ziel-, Modifikator- und Reward-Pools.
+  - Neue Mastery-/Blueprint-Module:
+    - `src/entities/arcade/AirframeMasteryCatalog.js`
+    - `src/entities/arcade/AirframeMasteryOps.js`
+    - `src/entities/arcade/ArcadeBlueprintSchema.js`
+  - Vehicle-Lab-Integration:
+    - `prototypes/vehicle-lab/src/ArcadeBlueprintValidation.js`
+    - `prototypes/vehicle-lab/main.js` validiert Blueprint vor Save, zeigt laufenden Blueprint-Status im HUD-Badge und sendet `arcadeBlueprint` an den Save-Endpoint.
+  - Datenbasis:
+    - `data/vehicles/arcade-blueprint.schema.json`
+    - `data/vehicles/airframe-mastery.defaults.json`
+  - Planstatus:
+    - `docs/Umsetzungsplan.md` -> `45.3.1` und `45.3.2` auf `[x]` mit Datum `2026-03-19`.
+- Neue Tests:
+  - `tests/arcade-blueprint.spec.js` (deterministischer Director, Mastery-Levelup, Blueprint-Validierung).
+- Verifikation:
+  - `node scripts/verify-lock.mjs --playwright -- npx playwright test tests/arcade-blueprint.spec.js` PASS (5/5).
+  - `node scripts/docs-freshness.mjs --write` PASS.
+  - `node scripts/docs-freshness.mjs --check` PASS.
+  - `npm run lint:architecture` PASS.
+  - `node scripts/check-architecture-boundaries.mjs` FAIL (bestehender Legacy-Verstoss ausserhalb dieses Diffs: `src/entities/systems/projectile/ProjectileHitResolver.js -> src/core/Config.js`).
+  - `node scripts/check-architecture-metrics.mjs` FAIL (bestehendes Budget 44/43 fuer `entities -> core`).
+  - `npm run typecheck:architecture` PASS.
+  - `npx vite build` PASS.
+  - `node scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js` FAIL (bestehender Test `T14b`, ausserhalb dieses Diffs).
+  - `node scripts/verify-lock.mjs --playwright -- npx playwright test tests/physics-core.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js` FAIL in bestehenden Tests `T89d`, `T89b`, `T82`, `T82b` (ausserhalb dieses Diffs).
+  - `npm run test:core`, `npm run test:physics`, `npm run docs:sync`, `npm run docs:check`, `npm run build` schlagen repo-weit bereits am falschen Script-Pfad `dev/scripts/**` fehl; funktionale Aequivalente ueber `scripts/**` wurden stattdessen ausgefuehrt.
+
+2026-03-19 (V45.9 Gate-Prep: Script-Pfade + Arcade-Smoke)
+- Infrastruktur-Fix:
+  - `package.json` Script-Pfade von `dev/scripts/**` und `dev/tests/**` auf `scripts/**` bzw. `tests/**` korrigiert.
+- Neuer Gate-Check fuer V45:
+  - `scripts/arcade-run-smoke.mjs` hinzugefuegt und als `npm run smoke:arcade` verdrahtet.
+  - Smoke deckt Arcade-Run-Runtime (`ArcadeRunRuntime` + `ArcadeRoundStateController`), Encounter-Director, Airframe-Mastery und Blueprint-Validierung in einem Node-Lauf ab.
+- Planstatus:
+  - `docs/Umsetzungsplan.md`: `45.9.1` und `45.9.2` auf `[/]` mit Verifikationsstand/Bottlenecks aktualisiert.
+- Verifikation:
+  - `npm run smoke:roundstate` PASS.
+  - `npm run smoke:arcade` PASS.
+  - `npm run docs:sync` PASS.
+  - `npm run docs:check` PASS.
+  - `npm run build` PASS (inkl. `architecture:guard`).
+  - `npm run test:core` FAIL weiterhin im bekannten `T14b`-Pfad (GLB-Map-Auswahl), ausserhalb der neuen `smoke:arcade`-Aenderung.
+  - `npm run test:physics` wurde durch einen haengenden Playwright-Lock-Lauf blockiert; keine parallele Suite gestartet.
