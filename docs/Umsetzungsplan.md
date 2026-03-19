@@ -466,6 +466,85 @@ Abhaengig von: 46.1
 
 ---
 
+## Block V47: Strategy Pattern — Game-Mode if/else eliminieren
+
+Plan-Datei: `docs/Feature_Strategy_Pattern_V47.md`
+
+<!-- LOCK: frei -->
+
+**Scope**
+
+- ~20 Dateien enthalten `if (isHuntHealthActive())` / `if (huntModeActive)` Checks
+- Jeder neue Modus (Arcade etc.) wuerde Aenderungen in all diesen Dateien erfordern
+- Ziel: Strategy Pattern einfuehren, sodass ein neuer Modus nur eine neue Strategy-Klasse braucht
+- 4 neue Dateien (`src/modes/`), 1 neue Test-Datei, 12 bestehende Dateien migrieren
+
+**Hauptpfade**
+
+- `src/modes/**` (NEU)
+- `src/entities/EntityManager.js`
+- `src/entities/runtime/EntitySetupOps.js`
+- `src/entities/systems/PlayerLifecycleSystem.js`
+- `src/entities/systems/lifecycle/PlayerCollisionPhase.js`
+- `src/entities/systems/lifecycle/PlayerActionPhase.js`
+- `src/entities/systems/ProjectileSystem.js`
+- `src/entities/systems/projectile/ProjectileHitResolver.js`
+- `src/entities/systems/HuntCombatSystem.js`
+- `src/entities/Powerup.js`
+- `src/hunt/HealthSystem.js`
+- `src/hunt/DestructibleTrail.js`
+- `src/hunt/OverheatGunSystem.js`
+- `src/hunt/RespawnSystem.js`
+- `tests/game-mode-strategy.spec.js` (NEU)
+
+**Konfliktregel**
+
+- Kein V47-Block aendert `src/network/**`, `server/**` oder `electron/**`
+- V47 fuehrt keinen neuen `GAME_MODE_TYPE` ein — nur das Strategy-Interface + 2 Implementierungen (Classic, Hunt)
+- `isHuntHealthActive()` bleibt als deprecated erhalten fuer nicht-migrierte Call-Sites
+
+**Phasen**
+
+- [ ] 47.0 Foundation (rein additiv, keine Verhaltensaenderung)
+  - [ ] 47.0.1 `src/modes/GameModeContract.js` — abstrakte Basis-Klasse
+  - [ ] 47.0.2 `src/modes/ClassicModeStrategy.js` — Classic-Modus-Implementierung
+  - [ ] 47.0.3 `src/modes/HuntModeStrategy.js` — Hunt-Modus-Implementierung
+  - [ ] 47.0.4 `src/modes/GameModeRegistry.js` — Factory + Fallback auf Classic
+  - [ ] 47.0.5 Strategy in EntityManager + EntitySetupOps verdrahten
+  - [ ] 47.0.6 `tests/game-mode-strategy.spec.js` — Unit-Tests
+
+- [ ] 47.1 Core Gameplay migrieren (hoechster Impact)
+  - [ ] 47.1.1 `PlayerLifecycleSystem.js` — Strategy statt boolean weiterreichen
+  - [ ] 47.1.2 `PlayerCollisionPhase.js` — Wall/Trail if/else durch Strategy-Calls ersetzen
+  - [ ] 47.1.3 `PlayerActionPhase.js` — Shoot/MG Guards auf Strategy umstellen
+  - [ ] 47.1.4 `HealthSystem.js` — Deprecation-Marker setzen
+
+- [ ] 47.2 Projectile-Systeme migrieren
+  - [ ] 47.2.1 `ProjectileSystem.js` — Rocket-Params via Strategy
+  - [ ] 47.2.2 `ProjectileHitResolver.js` — Hit-Resolution via Strategy
+  - [ ] 47.2.3 `DestructibleTrail.js` — Guard auf Strategy
+
+- [ ] 47.3 EntityManager-Interna migrieren
+  - [ ] 47.3.1 Respawn/DamageEvent/Scoring Guards auf Strategy
+
+- [ ] 47.4 Combat/Gun/Respawn migrieren
+  - [ ] 47.4.1 `HuntCombatSystem.js` — Lock-On via Strategy
+  - [ ] 47.4.2 `OverheatGunSystem.js` — Guard auf Strategy
+  - [ ] 47.4.3 `RespawnSystem.js` — Guard auf Strategy
+
+- [ ] 47.5 Powerup-Spawning migrieren
+  - [ ] 47.5.1 `Powerup.js` — Spawn-Logik via Strategy
+
+- [ ] 47.6 Cleanup
+  - [ ] 47.6.1 `isHuntHealthActive` Imports entfernen, tote Branches loeschen
+
+- [ ] 47.99 Abschluss-Gate
+  - [ ] 47.99.1 Alle bestehenden Tests gruen
+  - [ ] 47.99.2 Leere `ArcadeModeStrategy` registrieren — Spiel startet fehlerfrei
+  - [ ] 47.99.3 Classic + Hunt Playtest: Kollision, Shield, Tod, MG, Rocket, Respawn
+
+---
+
 ### Backlog (nach V41)
 
 | ID | Titel | Plan-Datei | Status |
@@ -476,6 +555,7 @@ Abhaengig von: 46.1
 | V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | Offen |
 | V45 | Arcade-Modus | `docs/Feature_Arcade_Modus_V45.md` | Planung |
 | V46 | Architektur-Verbesserungen | `docs/Umsetzungsplan.md` (Block V46) | Offen |
+| V47 | Strategy Pattern Refactoring | `docs/Feature_Strategy_Pattern_V47.md` | Offen |
 | V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | Offen |
 | V29b | Cinematic Camera Follow-up | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | Offen |
 | N2 | Recording-UI / manueller Trigger | — | Offen |
