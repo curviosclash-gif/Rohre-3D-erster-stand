@@ -2,7 +2,6 @@
 // PlayerLifecycleSystem.js - player tick and lifecycle updates
 // ============================================
 
-import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
 import { PlayerActionPhase } from './lifecycle/PlayerActionPhase.js';
 import { PlayerCollisionPhase } from './lifecycle/PlayerCollisionPhase.js';
 import { PlayerInteractionPhase } from './lifecycle/PlayerInteractionPhase.js';
@@ -20,9 +19,9 @@ export class PlayerLifecycleSystem {
     }
 
     updatePlayer(player, dt, input, renderFrameId = 0) {
-        const huntModeActive = isHuntHealthActive();
+        const strategy = this.entityManager?.gameModeStrategy || null;
         const runtimeProfiler = this.entityManager?.runtimeProfiler || null;
-        this._actionPhase.run(player, input, huntModeActive);
+        this._actionPhase.run(player, input, strategy);
 
         const prevPos = this._interactionPhase.capturePreviousPosition(player);
         player.update(dt, input, renderFrameId);
@@ -35,7 +34,7 @@ export class PlayerLifecycleSystem {
 
         this._interactionPhase.runSpecialGates(player, prevPos);
         const collisionStart = runtimeProfiler?.startSample?.();
-        const aborted = this._collisionPhase.run(player, prevPos, huntModeActive);
+        const aborted = this._collisionPhase.run(player, prevPos, strategy);
         runtimeProfiler?.endSample?.('collision', collisionStart);
         if (aborted || !player.alive) return;
 

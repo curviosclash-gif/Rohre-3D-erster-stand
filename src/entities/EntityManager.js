@@ -10,6 +10,7 @@ import { createBotRuntimeContext } from './ai/BotRuntimeContextFactory.js';
 import { assembleEntityRuntime } from './runtime/EntityRuntimeAssembler.js';
 import { isHuntHealthActive } from '../hunt/HealthSystem.js';
 import { emitHuntDamageFeedback } from '../hunt/HuntDamageFeedback.js';
+import { createGameModeStrategy } from '../modes/GameModeRegistry.js';
 import { LastRoundGhostSystem } from './LastRoundGhostSystem.js';
 
 function clampInt(value, min, max) {
@@ -67,6 +68,10 @@ export class EntityManager {
         this.botBridgeEnabled = false;
         this.activeGameMode = getActiveRuntimeConfig(CONFIG)?.HUNT?.ACTIVE_MODE || 'classic';
         this.huntEnabled = isHuntHealthActive();
+        this.gameModeStrategy = createGameModeStrategy(this.activeGameMode);
+        if (this.powerupManager) {
+            this.powerupManager.getStrategy = () => this.gameModeStrategy;
+        }
         this.runtimeConfig = null;
     }
 
@@ -172,8 +177,7 @@ export class EntityManager {
     }
 
     _getPendingHumanRespawns(players = this.humanPlayers) {
-        const huntRespawnEnabled = isHuntHealthActive() && !!getActiveRuntimeConfig(CONFIG)?.HUNT?.RESPAWN_ENABLED;
-        if (!huntRespawnEnabled) return 0;
+        if (!this.gameModeStrategy?.isRespawnEnabled()) return 0;
         return this._respawnSystem.getPendingCountForPlayers(players);
     }
 
@@ -219,7 +223,7 @@ export class EntityManager {
     _notifyPlayerFeedback(player, message) { this._eventBus.emitPlayerFeedback(player, message); }
 
     _emitHuntDamageEvent(event) {
-        if (isHuntHealthActive()) {
+        if (this.gameModeStrategy?.hasDamageEvents()) {
             this._huntScoring.registerDamage(event?.sourcePlayer, event?.target, event?.damageResult);
         }
         emitHuntDamageFeedback(event, {
@@ -232,7 +236,7 @@ export class EntityManager {
     _killPlayer(player, cause = 'UNKNOWN', options = {}) {
         if (!player || !player.alive) return;
         player.kill();
-        if (isHuntHealthActive()) {
+        if (this.gameModeStrategy?.hasScoring()) {
             this._huntScoring.registerElimination(player, {
                 killer: options?.killer || null,
             });

@@ -1,11 +1,9 @@
-import { resolveCollisionDamage } from '../../../hunt/HealthSystem.js';
-
 export class PlayerCollisionPhase {
     constructor(entityManager) {
         this.entityManager = entityManager;
     }
 
-    run(player, prevPos, huntModeActive) {
+    run(player, prevPos, strategy) {
         const entityManager = this.entityManager;
         const spawnProtected = (player.spawnProtectionTimer || 0) > 0;
         if (player.isGhost || spawnProtected) {
@@ -47,33 +45,8 @@ export class PlayerCollisionPhase {
                 entityManager._bouncePlayerOnFoam(player, arenaCollision.normal || null);
                 bouncedOnFoam = true;
             } else {
-                if (huntModeActive) {
-                    const wallDamage = resolveCollisionDamage('WALL');
-                    const damageResult = player.takeDamage(wallDamage);
-                    entityManager._emitHuntDamageEvent({
-                        target: player,
-                        sourcePlayer: null,
-                        cause: 'WALL',
-                        hitNormal: arenaCollision.normal || null,
-                        damageResult,
-                        impactPoint: player.position,
-                    });
-                    if (damageResult.isDead) {
-                        entityManager._killPlayer(player, 'WALL');
-                        return true;
-                    }
-                } else if (player.hasShield) {
-                    if (entityManager.audio) entityManager.audio.play('HIT');
-                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
-                    player.hasShield = false;
-                    player.getDirection(entityManager._tmpDir).multiplyScalar(2.2);
-                    player.position.sub(entityManager._tmpDir);
-                } else {
-                    if (entityManager.audio) entityManager.audio.play('HIT');
-                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
-                    entityManager._killPlayer(player, 'WALL');
-                    return true;
-                }
+                const died = strategy.handleWallCollision(player, arenaCollision, entityManager);
+                if (died) return true;
             }
         }
 
@@ -82,32 +55,11 @@ export class PlayerCollisionPhase {
             const collision = this._resolveTrailCollision(player, prevPos, hRadius * 2.0, selfTrailSkipRecent);
             if (collision?.hit) {
                 const trailCause = collision.playerIndex === player.index ? 'TRAIL_SELF' : 'TRAIL_OTHER';
-                if (huntModeActive) {
-                    const damageResult = player.takeDamage(resolveCollisionDamage('TRAIL'));
-                    const sourcePlayer = collision.playerIndex >= 0 && collision.playerIndex !== player.index
-                        ? entityManager.players[collision.playerIndex]
-                        : null;
-                    entityManager._emitHuntDamageEvent({
-                        target: player,
-                        sourcePlayer,
-                        cause: trailCause,
-                        damageResult,
-                        impactPoint: player.position,
-                    });
-                    if (damageResult.isDead) {
-                        entityManager._killPlayer(player, trailCause, { killer: sourcePlayer || null });
-                        return true;
-                    }
-                } else if (player.hasShield) {
-                    if (entityManager.audio) entityManager.audio.play('HIT');
-                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
-                    player.hasShield = false;
-                } else {
-                    if (entityManager.audio) entityManager.audio.play('HIT');
-                    if (entityManager.particles) entityManager.particles.spawnHit(player.position, player.color);
-                    entityManager._killPlayer(player, trailCause);
-                    return true;
-                }
+                const sourcePlayer = collision.playerIndex >= 0 && collision.playerIndex !== player.index
+                    ? entityManager.players[collision.playerIndex]
+                    : null;
+                const died = strategy.handleTrailCollision(player, collision, trailCause, sourcePlayer, entityManager);
+                if (died) return true;
             }
         }
 

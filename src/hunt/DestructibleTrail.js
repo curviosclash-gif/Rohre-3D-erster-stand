@@ -1,5 +1,4 @@
 import { CONFIG } from '../core/Config.js';
-import { isHuntHealthActive } from './HealthSystem.js';
 import { isRocketTierType, resolveRocketTrailBlastMeters } from './RocketPickupSystem.js';
 
 const DEFAULT_SELF_SKIP_RECENT = 8;
@@ -148,7 +147,10 @@ function applyRocketTrailBlast(trailSpatialIndex, impactEntry, projectile, hit) 
 }
 
 export function applyTrailDamageFromProjectile(trailSpatialIndex, projectile, options = {}) {
-    if (!trailSpatialIndex || !projectile || !isHuntHealthActive()) {
+    if (!trailSpatialIndex || !projectile) {
+        return null;
+    }
+    if (options.strategy && !options.strategy.hasDestructibleTrails()) {
         return null;
     }
 

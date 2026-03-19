@@ -5,8 +5,6 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
 import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
-import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
-import { isRocketTierType } from '../../hunt/RocketPickupSystem.js';
 import { ProjectileStatePool } from './projectile/ProjectileStatePool.js';
 import { ProjectileSimulationOps } from './projectile/ProjectileSimulationOps.js';
 import { ProjectileHitResolver } from './projectile/ProjectileHitResolver.js';
@@ -16,19 +14,6 @@ function getNowMilliseconds() {
         return performance.now();
     }
     return Date.now();
-}
-
-function getHuntRocketConfig() {
-    return CONFIG?.HUNT?.ROCKET || {};
-}
-
-function resolveRocketVisualScale(type, rocketConfig) {
-    const normalized = String(type || '').toUpperCase();
-    if (normalized === 'ROCKET_MEGA') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_MEGA || 2.6));
-    if (normalized === 'ROCKET_HEAVY') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_HEAVY || 2.2));
-    if (normalized === 'ROCKET_MEDIUM') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_MEDIUM || 1.95));
-    if (normalized === 'ROCKET_WEAK') return Math.max(1, Number(rocketConfig?.VISUAL_SCALE_WEAK || 1.7));
-    return 1;
 }
 
 export class ProjectileSystem {
@@ -49,6 +34,9 @@ export class ProjectileSystem {
         this.getTrailSpatialIndex = typeof options.getTrailSpatialIndex === 'function'
             ? options.getTrailSpatialIndex
             : (() => options.trailSpatialIndex || null);
+        this.getStrategy = typeof options.getStrategy === 'function'
+            ? options.getStrategy
+            : (() => null);
         this.onShoot = typeof options.onShoot === 'function' ? options.onShoot : (() => { });
         this.onProjectileHit = typeof options.onProjectileHit === 'function' ? options.onProjectileHit : (() => { });
         this.onProjectilePowerup = typeof options.onProjectilePowerup === 'function' ? options.onProjectilePowerup : (() => { });
@@ -84,26 +72,25 @@ export class ProjectileSystem {
         if (!power) {
             return { ok: false, reason: 'Item ungueltig' };
         }
-        const huntRocket = isHuntHealthActive() && isRocketTierType(type);
-        const huntRocketConfig = getHuntRocketConfig();
-        const visualScale = huntRocket ? resolveRocketVisualScale(type, huntRocketConfig) : 1;
-        const collisionRadiusMultiplier = huntRocket
-            ? Math.max(1, Number(huntRocketConfig.COLLISION_RADIUS_MULTIPLIER || 1.65))
-            : 1;
+        const strategy = this.getStrategy();
+        const rocketParams = strategy?.resolveRocketProjectileParams(type, config) || null;
+        const huntRocket = !!rocketParams;
+        const visualScale = huntRocket ? rocketParams.visualScale : 1;
+        const collisionRadiusMultiplier = huntRocket ? rocketParams.collisionRadiusMultiplier : 1;
         const baseTurnRate = Math.max(0.1, Number(config?.HOMING?.TURN_RATE || 3));
         const homingTurnRate = huntRocket
-            ? Math.max(baseTurnRate, Number(huntRocketConfig.HOMING_TURN_RATE || 6.2))
+            ? Math.max(baseTurnRate, rocketParams.homingTurnRate)
             : baseTurnRate;
         const baseLockOnAngle = Math.max(5, Number(config?.HOMING?.LOCK_ON_ANGLE || 15));
         const homingLockOnAngle = huntRocket
-            ? Math.max(baseLockOnAngle, Number(huntRocketConfig.HOMING_LOCK_ON_ANGLE || 32))
+            ? Math.max(baseLockOnAngle, rocketParams.homingLockOnAngle)
             : baseLockOnAngle;
         const baseHomingRange = Math.max(10, Number(config?.HOMING?.MAX_LOCK_RANGE || 100));
         const homingRange = huntRocket
-            ? Math.max(baseHomingRange, Number(huntRocketConfig.HOMING_RANGE || 130))
+            ? Math.max(baseHomingRange, rocketParams.homingRange)
             : baseHomingRange;
         const homingReacquireInterval = huntRocket
-            ? Math.max(0.04, Number(huntRocketConfig.HOMING_REACQUIRE_INTERVAL || 0.12))
+            ? rocketParams.homingReacquireInterval
             : 0.2;
 
         player.getAimDirection(this._tmpDir).normalize();

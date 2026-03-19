@@ -7,6 +7,7 @@ import {
     resolveMatchBotPolicyType,
 } from '../ai/BotPolicyTypes.js';
 import { getVehicleIds, isValidVehicleId } from '../vehicle-registry.js';
+import { createGameModeStrategy } from '../../modes/GameModeRegistry.js';
 
 function normalizeActiveMode(mode) {
     return String(mode || '').trim().toLowerCase();
@@ -81,6 +82,7 @@ export class EntitySetupOps {
             ? options.bridgeEnabled
             : (strategyForcesBridge || !!owner.runtimeConfig?.bot?.trainerBridgeEnabled);
         owner.huntEnabled = activeModeLower === 'hunt';
+        owner.gameModeStrategy = createGameModeStrategy(owner.activeGameMode);
         owner.botDifficulty = options.botDifficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || owner.botDifficulty;
         owner.botBridgeEnabled = setupBridgeEnabled;
         owner.botPolicyType = resolveConfiguredBotPolicyType({

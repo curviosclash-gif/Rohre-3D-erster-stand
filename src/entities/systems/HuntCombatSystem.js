@@ -11,7 +11,6 @@
 import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
 import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
-import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
 import {
     createHuntTargetingScratch,
     resolveHuntLineTarget,
@@ -97,7 +96,8 @@ export class HuntCombatSystem {
         } else {
             player.getDirection(tmpDir).normalize();
         }
-        if (!isHuntHealthActive()) {
+        const strategy = runtime.callbacks?.getStrategy?.() || null;
+        if (!strategy?.hasMachineGun()) {
             const legacyTarget = this._resolveClassicLockOn(player, tmpDir, tmpVec);
             lockOnCache.set(player.index, legacyTarget);
             return legacyTarget;

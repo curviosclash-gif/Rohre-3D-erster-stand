@@ -14,6 +14,7 @@ export function createEntityRuntimeSupport(owner) {
         renderer: owner.renderer,
         getArena: () => owner.arena,
         getPlayers: () => owner.players,
+        getStrategy: () => owner.gameModeStrategy || null,
         takeInventoryItem: (player, preferredIndex) => owner._takeInventoryItem(player, preferredIndex),
         resolveLockOn: (player) => owner._checkLockOn(player),
         getTrailSpatialIndex: () => owner._trailSpatialIndex,
@@ -147,6 +148,7 @@ export function createEntityRuntimeSupport(owner) {
             recorder: owner.recorder,
         },
         callbacks: {
+            getStrategy: () => owner.gameModeStrategy || null,
             combat: {
                 shootItemProjectile: (player, preferredIndex = -1) => projectileSystem.shootItemProjectile(player, preferredIndex),
                 shootHuntGun: (player) => owner._overheatGunSystem.tryFire(player),

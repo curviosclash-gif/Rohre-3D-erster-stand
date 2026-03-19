@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
 import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
-import { isHuntHealthActive } from './HealthSystem.js';
 import { MGOverheatState } from './mg/MGOverheatState.js';
 import { MGHitResolver } from './mg/MGHitResolver.js';
 import { MGTracerFx } from './mg/MGTracerFx.js';
@@ -99,7 +98,8 @@ export class OverheatGunSystem {
         if (!player || !player.alive) {
             return { ok: false, reason: 'Spieler inaktiv', type: 'MG_BULLET' };
         }
-        if (!isHuntHealthActive()) {
+        const strategy = this.entityManager?.gameModeStrategy || null;
+        if (!strategy?.hasMachineGun()) {
             return { ok: false, reason: 'Hunt-Modus inaktiv', type: 'MG_BULLET' };
         }
 
