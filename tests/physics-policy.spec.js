@@ -1060,7 +1060,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
 
     test('T82: Session-Wiring uebergibt aufgeloeste Bot-Policy an EntityManager', async ({ page }) => {
         await loadGame(page);
-        const result = await page.evaluate(() => {
+        const result = await page.evaluate(async () => {
             const game = window.GAME_INSTANCE;
             if (!game?.startMatch || !game?._returnToMenu) {
                 return { error: 'missing-game-hooks' };
@@ -1072,7 +1072,22 @@ test.describe('Physics Policy (Tests 65-82)', () => {
                 game.settings.gameplay = {};
             }
 
-            const runScenario = (gameMode, planarMode, strategy = 'auto') => {
+            const waitForScenarioStart = async (expectedBotCount, timeoutMs = 5000) => {
+                const startedAt = Date.now();
+                while (Date.now() - startedAt < timeoutMs) {
+                    const entityManager = game.entityManager;
+                    const botPlayers = entityManager?.players?.filter((player) => player?.isBot) || [];
+                    const hasPolicyBindings = botPlayers.length >= expectedBotCount
+                        && botPlayers.every((player) => !!entityManager?.botByPlayer?.get(player));
+                    if (entityManager && hasPolicyBindings) {
+                        return entityManager;
+                    }
+                    await new Promise((resolve) => setTimeout(resolve, 16));
+                }
+                return game.entityManager || null;
+            };
+
+            const runScenario = async (gameMode, planarMode, strategy = 'auto') => {
                 game.settings.gameMode = gameMode;
                 game.settings.botPolicyStrategy = strategy;
                 game.settings.gameplay.planarMode = !!planarMode;
@@ -1081,9 +1096,12 @@ test.describe('Physics Policy (Tests 65-82)', () => {
                 }
                 game.settings.localSettings.modePath = String(gameMode || '').toUpperCase() === 'HUNT' ? 'fight' : 'normal';
                 game._onSettingsChanged();
-                game.startMatch();
+                const startResult = game.startMatch();
+                if (startResult && typeof startResult.then === 'function') {
+                    await startResult;
+                }
 
-                const entityManager = game.entityManager;
+                const entityManager = await waitForScenarioStart(2);
                 const botPlayers = entityManager?.players?.filter((player) => player?.isBot) || [];
                 const botPolicyTypes = botPlayers.map((player) => String(entityManager?.botByPlayer?.get(player)?.type || ''));
                 const uniqueBotPolicyTypes = Array.from(new Set(botPolicyTypes.filter((type) => !!type)));
@@ -1103,10 +1121,10 @@ test.describe('Physics Policy (Tests 65-82)', () => {
 
             return {
                 error: null,
-                classic3d: runScenario('CLASSIC', false),
-                classic2d: runScenario('CLASSIC', true),
-                hunt3d: runScenario('HUNT', false),
-                hunt2d: runScenario('HUNT', true),
+                classic3d: await runScenario('CLASSIC', false),
+                classic2d: await runScenario('CLASSIC', true),
+                hunt3d: await runScenario('HUNT', false),
+                hunt2d: await runScenario('HUNT', true),
             };
         });
 
@@ -1131,7 +1149,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
 
     test('T82b: Rule-Based-Bot-Perception bleibt ueber Facade lauffaehig', async ({ page }) => {
         await loadGame(page);
-        const result = await page.evaluate(() => {
+        const result = await page.evaluate(async () => {
             const game = window.GAME_INSTANCE;
             if (!game?.startMatch || !game?._returnToMenu) {
                 return { error: 'missing-game-hooks' };
@@ -1146,11 +1164,21 @@ test.describe('Physics Policy (Tests 65-82)', () => {
             }
             game.settings.gameplay.planarMode = false;
             game._onSettingsChanged();
-            game.startMatch();
+            const startResult = game.startMatch();
+            if (startResult && typeof startResult.then === 'function') {
+                await startResult;
+            }
 
-            const entityManager = game.entityManager;
-            const botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
-            const policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+            const startedAt = Date.now();
+            let entityManager = game.entityManager;
+            let botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
+            let policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+            while ((!botPlayer || !policy) && Date.now() - startedAt < 5000) {
+                await new Promise((resolve) => setTimeout(resolve, 16));
+                entityManager = game.entityManager;
+                botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
+                policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+            }
             if (!botPlayer || !policy) {
                 game._returnToMenu();
                 return { error: 'missing-bot-policy' };
