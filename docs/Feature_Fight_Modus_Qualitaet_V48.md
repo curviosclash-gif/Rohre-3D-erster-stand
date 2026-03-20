@@ -98,8 +98,19 @@
 
 - [/] 48.99 Abschluss-Gate
   - [ ] 48.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:stress`, `npm run build` erfolgreich
-    - Stand 2026-03-19: `npm run build` PASS; `test:core` FAIL bei `T14b`; `test:physics:hunt` FAIL bei `T89b` und `T89d`; `test:stress` FAIL bei `T71b` (bestehende, V48-fremde Playwright-Fehler)
+    - Stand 2026-03-20:
+      - `npm run test:physics:hunt` PASS (17/17).
+      - Gezielte Regressionen PASS: `test:core -- --grep T14b`, `test:stress -- --grep T71b`.
+      - `npm run test:core` weiterhin nicht voll gruen: `T14` FAIL (`returnToMenu` Timeout), `T11` flaky.
+      - `npm run test:stress` Fullrun wurde durch Runner-Timeout abgebrochen (gezielter Problemfall `T71b` bleibt gruen).
+      - `npm run build` PASS.
   - [x] 48.99.2 `npm run docs:sync` und `npm run docs:check` erfolgreich, Lock/Ownership/Conflict-Log geprueft
+
+## Verbesserungs-Vorschlaege (Plan-Follow-up)
+
+- Return-to-Menu entkoppeln: Match-Teardown aus dem direkten UI-Call in einen kontrollierten async Pfad verschieben, damit `ESC`/`_returnToMenu` unter Last nicht im Browser-Thread blockiert.
+- Pause-Pfad haerten: expliziten `returnToMenu`-Fast-Path fuer `PAUSED` mit klarer Reihenfolge (UI zuerst, Teardown danach) und Guard gegen doppelte Teardown-Aufrufe einfuehren.
+- Gate-Stabilitaet: `T14`/`T11` mit Trace-Run und Runtime-Perf-Snapshot korrelieren (long tasks waehrend `returnToMenu`), danach gezielten Fix mit Regressionsfall absichern.
 
 ## Dokumentationswirkung
 

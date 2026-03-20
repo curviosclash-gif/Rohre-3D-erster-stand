@@ -61,7 +61,8 @@ export const TRAINER_CONTRACT_FREEZE_V34 = Object.freeze({
         fields: Object.freeze(['state', 'action', 'reward', 'nextState', 'done']),
     }),
     checkpointSchema: Object.freeze({
-        version: 'v34-dqn-checkpoint-v1',
+        version: 'v35-dqn-checkpoint-v1',
+        legacyVersions: Object.freeze(['v34-dqn-checkpoint-v1']),
         exportRequestType: TRAINER_MESSAGE_TYPES.CHECKPOINT_REQUEST,
         loadRequestType: TRAINER_MESSAGE_TYPES.CHECKPOINT_LOAD,
         responseType: TRAINER_RESPONSE_TYPES.CHECKPOINT,

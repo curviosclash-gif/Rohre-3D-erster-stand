@@ -31,49 +31,79 @@ function argMax(values) {
     return bestIndex;
 }
 
+function resolveHiddenLayers(options) {
+    if (Array.isArray(options.hiddenLayers) && options.hiddenLayers.length > 0) {
+        return options.hiddenLayers.map(size => clampInt(size, 64, 1, 4096));
+    }
+    const single = clampInt(options.hiddenSize, 64, 1, 4096);
+    return [single];
+}
+
 export class DqnMlpNetwork {
     constructor(options = {}) {
         this.inputSize = clampInt(options.inputSize, 40, 1, 10_000);
-        this.hiddenSize = clampInt(options.hiddenSize, 64, 1, 4096);
         this.outputSize = clampInt(options.outputSize, 8, 1, 1024);
+        this.hiddenLayers = resolveHiddenLayers(options);
         this._rng = options.rng instanceof SeededRng
             ? options.rng
             : new SeededRng(options.seed || 1);
 
-        this.weightsInputHidden = new Float64Array(this.inputSize * this.hiddenSize);
-        this.biasHidden = new Float64Array(this.hiddenSize);
-        this.weightsHiddenOutput = new Float64Array(this.hiddenSize * this.outputSize);
-        this.biasOutput = new Float64Array(this.outputSize);
+        // Legacy accessor: first hidden layer size
+        this.hiddenSize = this.hiddenLayers[0];
+
+        // Build layer descriptors: [input→h0, h0→h1, ..., hN→output]
+        const sizes = [this.inputSize, ...this.hiddenLayers, this.outputSize];
+        this.layers = [];
+        for (let l = 0; l < sizes.length - 1; l++) {
+            const inSize = sizes[l];
+            const outSize = sizes[l + 1];
+            this.layers.push({
+                inputSize: inSize,
+                outputSize: outSize,
+                weights: new Float64Array(inSize * outSize),
+                bias: new Float64Array(outSize),
+            });
+        }
+
+        // Legacy accessors for v34 compatibility (2-layer networks only)
+        this.weightsInputHidden = this.layers[0].weights;
+        this.biasHidden = this.layers[0].bias;
+        if (this.layers.length === 2) {
+            this.weightsHiddenOutput = this.layers[1].weights;
+            this.biasOutput = this.layers[1].bias;
+        } else {
+            // For multi-layer: point to last layer for basic compatibility
+            this.weightsHiddenOutput = this.layers[this.layers.length - 1].weights;
+            this.biasOutput = this.layers[this.layers.length - 1].bias;
+        }
 
         this._initializeWeights();
     }
 
     _initializeWeights() {
-        const scaleInput = Math.sqrt(6 / (this.inputSize + this.hiddenSize));
-        for (let i = 0; i < this.weightsInputHidden.length; i++) {
-            this.weightsInputHidden[i] = this._rng.nextRange(-scaleInput, scaleInput);
+        for (let l = 0; l < this.layers.length; l++) {
+            const layer = this.layers[l];
+            const scale = Math.sqrt(6 / (layer.inputSize + layer.outputSize));
+            for (let i = 0; i < layer.weights.length; i++) {
+                layer.weights[i] = this._rng.nextRange(-scale, scale);
+            }
+            layer.bias.fill(0);
         }
-        const scaleOutput = Math.sqrt(6 / (this.hiddenSize + this.outputSize));
-        for (let i = 0; i < this.weightsHiddenOutput.length; i++) {
-            this.weightsHiddenOutput[i] = this._rng.nextRange(-scaleOutput, scaleOutput);
-        }
-        this.biasHidden.fill(0);
-        this.biasOutput.fill(0);
     }
 
     copyFrom(other) {
         if (!(other instanceof DqnMlpNetwork)) return false;
-        if (
-            other.inputSize !== this.inputSize
-            || other.hiddenSize !== this.hiddenSize
-            || other.outputSize !== this.outputSize
-        ) {
-            return false;
+        if (other.layers.length !== this.layers.length) return false;
+        for (let l = 0; l < this.layers.length; l++) {
+            if (other.layers[l].inputSize !== this.layers[l].inputSize
+                || other.layers[l].outputSize !== this.layers[l].outputSize) {
+                return false;
+            }
         }
-        this.weightsInputHidden.set(other.weightsInputHidden);
-        this.biasHidden.set(other.biasHidden);
-        this.weightsHiddenOutput.set(other.weightsHiddenOutput);
-        this.biasOutput.set(other.biasOutput);
+        for (let l = 0; l < this.layers.length; l++) {
+            this.layers[l].weights.set(other.layers[l].weights);
+            this.layers[l].bias.set(other.layers[l].bias);
+        }
         return true;
     }
 
@@ -88,33 +118,53 @@ export class DqnMlpNetwork {
     }
 
     _forwardWithCache(input) {
-        const zHidden = new Float64Array(this.hiddenSize);
-        const aHidden = new Float64Array(this.hiddenSize);
-        const output = new Float64Array(this.outputSize);
+        const numLayers = this.layers.length;
+        const zPerLayer = new Array(numLayers);
+        const aPerLayer = new Array(numLayers);
 
-        for (let hiddenIndex = 0; hiddenIndex < this.hiddenSize; hiddenIndex++) {
-            let sum = this.biasHidden[hiddenIndex];
-            for (let inputIndex = 0; inputIndex < this.inputSize; inputIndex++) {
-                const weightIndex = inputIndex * this.hiddenSize + hiddenIndex;
-                sum += this._readInput(input, inputIndex) * this.weightsInputHidden[weightIndex];
+        // First layer reads from input
+        const firstLayer = this.layers[0];
+        const z0 = new Float64Array(firstLayer.outputSize);
+        const a0 = new Float64Array(firstLayer.outputSize);
+        for (let j = 0; j < firstLayer.outputSize; j++) {
+            let sum = firstLayer.bias[j];
+            for (let i = 0; i < firstLayer.inputSize; i++) {
+                sum += this._readInput(input, i) * firstLayer.weights[i * firstLayer.outputSize + j];
             }
-            zHidden[hiddenIndex] = sum;
-            aHidden[hiddenIndex] = sum > 0 ? sum : 0;
+            z0[j] = sum;
+            // ReLU for all hidden layers (not output)
+            a0[j] = numLayers > 1 ? (sum > 0 ? sum : 0) : sum;
         }
+        zPerLayer[0] = z0;
+        aPerLayer[0] = a0;
 
-        for (let outputIndex = 0; outputIndex < this.outputSize; outputIndex++) {
-            let sum = this.biasOutput[outputIndex];
-            for (let hiddenIndex = 0; hiddenIndex < this.hiddenSize; hiddenIndex++) {
-                const weightIndex = hiddenIndex * this.outputSize + outputIndex;
-                sum += aHidden[hiddenIndex] * this.weightsHiddenOutput[weightIndex];
+        // Subsequent layers
+        for (let l = 1; l < numLayers; l++) {
+            const layer = this.layers[l];
+            const prevA = aPerLayer[l - 1];
+            const z = new Float64Array(layer.outputSize);
+            const a = new Float64Array(layer.outputSize);
+            const isLastLayer = l === numLayers - 1;
+            for (let j = 0; j < layer.outputSize; j++) {
+                let sum = layer.bias[j];
+                for (let i = 0; i < layer.inputSize; i++) {
+                    sum += prevA[i] * layer.weights[i * layer.outputSize + j];
+                }
+                z[j] = sum;
+                // ReLU for hidden layers, linear for output layer
+                a[j] = isLastLayer ? sum : (sum > 0 ? sum : 0);
             }
-            output[outputIndex] = sum;
+            zPerLayer[l] = z;
+            aPerLayer[l] = a;
         }
 
         return {
-            zHidden,
-            aHidden,
-            output,
+            zPerLayer,
+            aPerLayer,
+            output: aPerLayer[numLayers - 1],
+            // Legacy fields for v34-compat callers
+            zHidden: zPerLayer[0],
+            aHidden: aPerLayer[0],
         };
     }
 
@@ -137,10 +187,11 @@ export class DqnMlpNetwork {
             ? options.targetNetwork
             : this;
 
-        const gradWInputHidden = new Float64Array(this.weightsInputHidden.length);
-        const gradBHidden = new Float64Array(this.biasHidden.length);
-        const gradWHiddenOutput = new Float64Array(this.weightsHiddenOutput.length);
-        const gradBOutput = new Float64Array(this.biasOutput.length);
+        const numLayers = this.layers.length;
+
+        // Allocate gradient accumulators per layer
+        const gradsW = this.layers.map(layer => new Float64Array(layer.weights.length));
+        const gradsB = this.layers.map(layer => new Float64Array(layer.bias.length));
 
         let totalLoss = 0;
         let trainedCount = 0;
@@ -151,18 +202,13 @@ export class DqnMlpNetwork {
                 tdErrors.push(0);
                 continue;
             }
-            const actionIndex = clampInt(
-                sample.actionIndex,
-                0,
-                0,
-                this.outputSize - 1
-            );
+            const actionIndex = clampInt(sample.actionIndex, 0, 0, this.outputSize - 1);
             const reward = toFinite(sample.reward, 0);
             const done = sample.done === true;
             const isWeight = toFinite(sample._isWeight, 1);
 
-            const online = this._forwardWithCache(sample.state);
-            const currentQ = online.output[actionIndex];
+            const fwd = this._forwardWithCache(sample.state);
+            const currentQ = fwd.output[actionIndex];
             const targetQValues = targetNetwork.predict(sample.nextState);
             const nextBestQ = targetQValues[argMax(targetQValues)];
             const target = reward + (done ? 0 : gamma * nextBestQ);
@@ -172,20 +218,48 @@ export class DqnMlpNetwork {
             trainedCount += 1;
             tdErrors.push(delta);
 
-            gradBOutput[actionIndex] += weightedDelta;
-            for (let hiddenIndex = 0; hiddenIndex < this.hiddenSize; hiddenIndex++) {
-                const outputWeightIndex = hiddenIndex * this.outputSize + actionIndex;
-                gradWHiddenOutput[outputWeightIndex] += online.aHidden[hiddenIndex] * weightedDelta;
+            // Backpropagation through all layers
+            // Start with output layer gradient
+            const deltaPerLayer = new Array(numLayers);
 
-                const gradHiddenPreActivation = this.weightsHiddenOutput[outputWeightIndex] * weightedDelta;
-                if (online.zHidden[hiddenIndex] <= 0) {
-                    continue;
+            // Output layer: gradient only for the selected action
+            const outputDelta = new Float64Array(this.layers[numLayers - 1].outputSize);
+            outputDelta[actionIndex] = weightedDelta;
+            deltaPerLayer[numLayers - 1] = outputDelta;
+
+            // Backprop through layers in reverse
+            for (let l = numLayers - 1; l >= 0; l--) {
+                const layer = this.layers[l];
+                const layerDelta = deltaPerLayer[l];
+
+                // Accumulate gradients for this layer
+                const prevActivation = l > 0 ? fwd.aPerLayer[l - 1] : null;
+                for (let j = 0; j < layer.outputSize; j++) {
+                    if (layerDelta[j] === 0) continue;
+                    gradsB[l][j] += layerDelta[j];
+                    for (let i = 0; i < layer.inputSize; i++) {
+                        const inputVal = l > 0
+                            ? prevActivation[i]
+                            : this._readInput(sample.state, i);
+                        gradsW[l][i * layer.outputSize + j] += inputVal * layerDelta[j];
+                    }
                 }
-                gradBHidden[hiddenIndex] += gradHiddenPreActivation;
-                for (let inputIndex = 0; inputIndex < this.inputSize; inputIndex++) {
-                    const inputWeightIndex = inputIndex * this.hiddenSize + hiddenIndex;
-                    const inputValue = this._readInput(sample.state, inputIndex);
-                    gradWInputHidden[inputWeightIndex] += inputValue * gradHiddenPreActivation;
+
+                // Propagate delta to previous layer (if not first layer)
+                if (l > 0) {
+                    const prevLayer = this.layers[l - 1];
+                    const prevDelta = new Float64Array(prevLayer.outputSize);
+                    for (let i = 0; i < prevLayer.outputSize; i++) {
+                        // ReLU derivative: pass through only if pre-activation > 0
+                        if (fwd.zPerLayer[l - 1][i] <= 0) continue;
+                        let grad = 0;
+                        for (let j = 0; j < layer.outputSize; j++) {
+                            if (layerDelta[j] === 0) continue;
+                            grad += layer.weights[i * layer.outputSize + j] * layerDelta[j];
+                        }
+                        prevDelta[i] = grad;
+                    }
+                    deltaPerLayer[l - 1] = prevDelta;
                 }
             }
         }
@@ -198,18 +272,16 @@ export class DqnMlpNetwork {
             };
         }
 
+        // Apply gradients
         const normalizedLr = learningRate / trainedCount;
-        for (let i = 0; i < this.weightsInputHidden.length; i++) {
-            this.weightsInputHidden[i] -= normalizedLr * gradWInputHidden[i];
-        }
-        for (let i = 0; i < this.biasHidden.length; i++) {
-            this.biasHidden[i] -= normalizedLr * gradBHidden[i];
-        }
-        for (let i = 0; i < this.weightsHiddenOutput.length; i++) {
-            this.weightsHiddenOutput[i] -= normalizedLr * gradWHiddenOutput[i];
-        }
-        for (let i = 0; i < this.biasOutput.length; i++) {
-            this.biasOutput[i] -= normalizedLr * gradBOutput[i];
+        for (let l = 0; l < numLayers; l++) {
+            const layer = this.layers[l];
+            for (let i = 0; i < layer.weights.length; i++) {
+                layer.weights[i] -= normalizedLr * gradsW[l][i];
+            }
+            for (let i = 0; i < layer.bias.length; i++) {
+                layer.bias[i] -= normalizedLr * gradsB[l][i];
+            }
         }
 
         return {
@@ -222,48 +294,76 @@ export class DqnMlpNetwork {
     exportState() {
         return {
             inputSize: this.inputSize,
-            hiddenSize: this.hiddenSize,
+            hiddenLayers: [...this.hiddenLayers],
             outputSize: this.outputSize,
-            weightsInputHidden: Array.from(this.weightsInputHidden),
-            biasHidden: Array.from(this.biasHidden),
-            weightsHiddenOutput: Array.from(this.weightsHiddenOutput),
-            biasOutput: Array.from(this.biasOutput),
+            // Legacy fields for v34 compat (2-layer only)
+            hiddenSize: this.hiddenLayers[0],
+            layers: this.layers.map(layer => ({
+                inputSize: layer.inputSize,
+                outputSize: layer.outputSize,
+                weights: Array.from(layer.weights),
+                bias: Array.from(layer.bias),
+            })),
+            // Legacy flat fields for v34 checkpoint readers
+            weightsInputHidden: Array.from(this.layers[0].weights),
+            biasHidden: Array.from(this.layers[0].bias),
+            weightsHiddenOutput: Array.from(this.layers[this.layers.length - 1].weights),
+            biasOutput: Array.from(this.layers[this.layers.length - 1].bias),
         };
     }
 
     importState(state) {
         if (!state || typeof state !== 'object') return false;
-        if (
-            clampInt(state.inputSize, 0, 0, Number.MAX_SAFE_INTEGER) !== this.inputSize
-            || clampInt(state.hiddenSize, 0, 0, Number.MAX_SAFE_INTEGER) !== this.hiddenSize
-            || clampInt(state.outputSize, 0, 0, Number.MAX_SAFE_INTEGER) !== this.outputSize
-        ) {
-            return false;
+
+        // v35 format: layers[] array
+        if (Array.isArray(state.layers) && state.layers.length === this.layers.length) {
+            for (let l = 0; l < this.layers.length; l++) {
+                const src = state.layers[l];
+                const dst = this.layers[l];
+                if (!src || typeof src !== 'object') return false;
+                if (!Array.isArray(src.weights) || src.weights.length !== dst.weights.length) return false;
+                if (!Array.isArray(src.bias) || src.bias.length !== dst.bias.length) return false;
+            }
+            for (let l = 0; l < this.layers.length; l++) {
+                const src = state.layers[l];
+                const dst = this.layers[l];
+                for (let i = 0; i < dst.weights.length; i++) {
+                    dst.weights[i] = toFinite(src.weights[i], 0);
+                }
+                for (let i = 0; i < dst.bias.length; i++) {
+                    dst.bias[i] = toFinite(src.bias[i], 0);
+                }
+            }
+            return true;
         }
-        if (!Array.isArray(state.weightsInputHidden) || state.weightsInputHidden.length !== this.weightsInputHidden.length) {
-            return false;
+
+        // v34 legacy format: flat weightsInputHidden / weightsHiddenOutput
+        if (this.layers.length === 2
+            && Array.isArray(state.weightsInputHidden)
+            && Array.isArray(state.weightsHiddenOutput)
+            && Array.isArray(state.biasHidden)
+            && Array.isArray(state.biasOutput)) {
+            const l0 = this.layers[0];
+            const l1 = this.layers[1];
+            if (state.weightsInputHidden.length !== l0.weights.length) return false;
+            if (state.biasHidden.length !== l0.bias.length) return false;
+            if (state.weightsHiddenOutput.length !== l1.weights.length) return false;
+            if (state.biasOutput.length !== l1.bias.length) return false;
+            for (let i = 0; i < l0.weights.length; i++) {
+                l0.weights[i] = toFinite(state.weightsInputHidden[i], 0);
+            }
+            for (let i = 0; i < l0.bias.length; i++) {
+                l0.bias[i] = toFinite(state.biasHidden[i], 0);
+            }
+            for (let i = 0; i < l1.weights.length; i++) {
+                l1.weights[i] = toFinite(state.weightsHiddenOutput[i], 0);
+            }
+            for (let i = 0; i < l1.bias.length; i++) {
+                l1.bias[i] = toFinite(state.biasOutput[i], 0);
+            }
+            return true;
         }
-        if (!Array.isArray(state.biasHidden) || state.biasHidden.length !== this.biasHidden.length) {
-            return false;
-        }
-        if (!Array.isArray(state.weightsHiddenOutput) || state.weightsHiddenOutput.length !== this.weightsHiddenOutput.length) {
-            return false;
-        }
-        if (!Array.isArray(state.biasOutput) || state.biasOutput.length !== this.biasOutput.length) {
-            return false;
-        }
-        for (let i = 0; i < this.weightsInputHidden.length; i++) {
-            this.weightsInputHidden[i] = toFinite(state.weightsInputHidden[i], 0);
-        }
-        for (let i = 0; i < this.biasHidden.length; i++) {
-            this.biasHidden[i] = toFinite(state.biasHidden[i], 0);
-        }
-        for (let i = 0; i < this.weightsHiddenOutput.length; i++) {
-            this.weightsHiddenOutput[i] = toFinite(state.weightsHiddenOutput[i], 0);
-        }
-        for (let i = 0; i < this.biasOutput.length; i++) {
-            this.biasOutput[i] = toFinite(state.biasOutput[i], 0);
-        }
-        return true;
+
+        return false;
     }
 }

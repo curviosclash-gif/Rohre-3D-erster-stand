@@ -79,20 +79,21 @@ export const DEFAULT_TRAINER_CONFIG = Object.freeze({
     port: 8765,
     verbose: true,
     observationLength: 40,
-    replayCapacity: 20_000,
+    replayCapacity: 50_000,
     maxItemIndex: 2,
     sessionSeed: 13_337,
     model: Object.freeze({
-        hiddenSize: 64,
-        learningRate: 0.00075,
+        hiddenLayers: Object.freeze([256, 128]),
+        hiddenSize: 256, // legacy: first hidden layer size
+        learningRate: 0.0003,
         gamma: 0.99,
-        batchSize: 32,
-        replayWarmup: 64,
+        batchSize: 64,
+        replayWarmup: 256,
         trainEvery: 4,
-        targetSyncInterval: 128,
+        targetSyncInterval: 500,
         epsilonStart: 1,
         epsilonEnd: 0.05,
-        epsilonDecaySteps: 5000,
+        epsilonDecaySteps: 20_000,
     }),
     contractFreeze: TRAINER_CONTRACT_FREEZE_V34,
     failurePolicy: TRAINER_FAILURE_POLICY,
@@ -162,18 +163,36 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
         1,
         2_147_483_647
     );
-    const modelHiddenSize = clampInt(
-        pickValue(
-            args,
-            env,
-            'model-hidden-size',
-            'TRAINER_MODEL_HIDDEN_SIZE',
-            DEFAULT_TRAINER_CONFIG.model.hiddenSize
-        ),
-        DEFAULT_TRAINER_CONFIG.model.hiddenSize,
-        8,
-        2048
+    const rawHiddenLayers = pickValue(
+        args,
+        env,
+        'model-hidden-layers',
+        'TRAINER_MODEL_HIDDEN_LAYERS',
+        null
     );
+    let modelHiddenLayers;
+    if (typeof rawHiddenLayers === 'string' && rawHiddenLayers.trim()) {
+        modelHiddenLayers = rawHiddenLayers.split(',')
+            .map(s => clampInt(s.trim(), 0, 0, 4096))
+            .filter(n => n > 0);
+    }
+    if (!modelHiddenLayers || modelHiddenLayers.length === 0) {
+        // Fallback: legacy --model-hidden-size creates a single-layer config
+        const modelHiddenSize = clampInt(
+            pickValue(
+                args,
+                env,
+                'model-hidden-size',
+                'TRAINER_MODEL_HIDDEN_SIZE',
+                null
+            ),
+            0, 0, 4096
+        );
+        modelHiddenLayers = modelHiddenSize > 0
+            ? [modelHiddenSize]
+            : [...DEFAULT_TRAINER_CONFIG.model.hiddenLayers];
+    }
+    const modelHiddenSize = modelHiddenLayers[0];
     const modelLearningRate = clampFloat(
         pickValue(
             args,
@@ -311,6 +330,7 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
         maxItemIndex,
         sessionSeed,
         model: Object.freeze({
+            hiddenLayers: Object.freeze([...modelHiddenLayers]),
             hiddenSize: modelHiddenSize,
             learningRate: modelLearningRate,
             gamma: modelGamma,
@@ -339,16 +359,17 @@ export function formatTrainerServerHelp() {
         '  --replay-capacity <n>          Replay capacity (default: 20000)',
         '  --max-item-index <n>           Max action item slot index (default: 2)',
         '  --seed <n>                     Session RNG seed (default: 13337)',
-        '  --model-hidden-size <n>        DQN hidden units (default: 64)',
-        '  --model-lr <n>                 DQN learning rate (default: 0.00075)',
+        '  --model-hidden-layers <n,n,...>  DQN hidden layer sizes (default: 256,128)',
+        '  --model-hidden-size <n>        Legacy: single hidden layer (default: 256)',
+        '  --model-lr <n>                 DQN learning rate (default: 0.0003)',
         '  --model-gamma <n>              DQN discount factor (default: 0.99)',
-        '  --model-batch-size <n>         DQN batch size (default: 32)',
-        '  --model-replay-warmup <n>      Min replay size before training (default: 64)',
+        '  --model-batch-size <n>         DQN batch size (default: 64)',
+        '  --model-replay-warmup <n>      Min replay size before training (default: 256)',
         '  --model-train-every <n>        Train every N steps (default: 4)',
-        '  --model-target-sync <n>        Target network sync interval (default: 128)',
+        '  --model-target-sync <n>        Target network sync interval (default: 500)',
         '  --model-epsilon-start <n>      Initial epsilon (default: 1.0)',
         '  --model-epsilon-end <n>        Final epsilon (default: 0.05)',
-        '  --model-epsilon-decay-steps <n> Epsilon decay steps (default: 5000)',
+        '  --model-epsilon-decay-steps <n> Epsilon decay steps (default: 20000)',
         '  --max-incoming-bytes <n>       Failure policy: max inbound payload bytes',
         '  --max-buffered-bytes <n>       Failure policy: max ws buffered bytes',
         '  --resume-checkpoint <token>    Optional startup resume checkpoint (path or "latest")',

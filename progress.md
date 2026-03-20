@@ -1426,3 +1426,17 @@ Offene TODOs naechster Schritt:
   - `npm run build` PASS (inkl. `architecture:guard`).
   - `npm run test:core` FAIL weiterhin im bekannten `T14b`-Pfad (GLB-Map-Auswahl), ausserhalb der neuen `smoke:arcade`-Aenderung.
   - `npm run test:physics` wurde durch einen haengenden Playwright-Lock-Lauf blockiert; keine parallele Suite gestartet.
+2026-03-20 (Input-Update: Item nutzen statt Abwerfen)
+- Nutzerwunsch aufgenommen: keine Taste mehr fuer Item-Abwerfen, stattdessen Taste fuer Item selbst nutzen.
+- Umsetzung gestartet:
+  - Keybinding-Aktion auf `USE_ITEM` umgestellt (Defaults + Runtime-Normalisierung mit Legacy-Fallback von `DROP`).
+  - Human-Input mappt Tastendruck jetzt auf `input.useItem` (aktueller `selectedItemIndex`), `dropItem` bleibt fuer Humans deaktiviert.
+  - UI-Label in Keybind-Liste auf `Item nutzen` gesetzt.
+- Verifikation laeuft als naechstes (Playwright + test:fast + docs/build gates).
+- Verifikation abgeschlossen:
+  - `develop-web-game` Client-Lauf gegen `http://localhost:4173` durchgefuehrt; Screenshots unter `output/web-game/use-item-key/` erstellt.
+  - `npm run test:fast` PASS (112 passed, 1 flaky Retry in T41).
+  - `npm run docs:sync` PASS.
+  - `npm run docs:check` PASS.
+  - `npm run build` PASS (inkl. architecture guard).
+- Hinweis: waehrend der Session sind weitere, nicht-taskbezogene Worktree-Aenderungen vorhanden; fuer diesen Task wurden nur die Input/Controls-Dateien angepasst.

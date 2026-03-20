@@ -48,12 +48,17 @@ export function readJsonIfExistsSync(path) {
     }
 }
 
+const CHECKPOINT_CONTRACT_VERSIONS = new Set([
+    'v35-dqn-checkpoint-v1',
+    'v34-dqn-checkpoint-v1',
+]);
+
 function extractCheckpointPayload(raw) {
     if (!raw || typeof raw !== 'object') return null;
     if (raw.checkpoint && typeof raw.checkpoint === 'object') {
         return raw.checkpoint;
     }
-    if (raw.contractVersion === 'v34-dqn-checkpoint-v1') {
+    if (CHECKPOINT_CONTRACT_VERSIONS.has(raw.contractVersion)) {
         return raw;
     }
     return null;
@@ -153,7 +158,7 @@ export async function writeTrainerArtifacts(input = {}) {
         ? input.checkpoint
         : null;
     const trainerArtifact = {
-        contractVersion: 'v34-trainer-artifact-v1',
+        contractVersion: 'v35-trainer-artifact-v1',
         generatedAt: typeof input.generatedAt === 'string' ? input.generatedAt : new Date().toISOString(),
         stamp: paths.stamp,
         checkpointPath: checkpoint ? toRepoPath(paths.checkpointPath) : null,
@@ -164,7 +169,7 @@ export async function writeTrainerArtifacts(input = {}) {
         runSummary: input.runSummary || null,
     };
     const checkpointArtifact = {
-        contractVersion: 'v34-checkpoint-artifact-v1',
+        contractVersion: 'v35-checkpoint-artifact-v1',
         generatedAt: trainerArtifact.generatedAt,
         stamp: paths.stamp,
         resumeSource: input.resumeSource || null,

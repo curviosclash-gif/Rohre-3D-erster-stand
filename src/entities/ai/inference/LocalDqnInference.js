@@ -3,7 +3,8 @@
 // ============================================
 //
 // Loads a DQN checkpoint and runs inference locally in the game loop.
-// Network: 2-layer MLP with ReLU activation (input → hidden → output).
+// Supports both v34 (2-layer) and v35 (multi-layer) checkpoint formats.
+// Network: N-layer MLP with ReLU activation (hidden layers), linear output.
 // Eliminates the ~80ms WebSocket round-trip latency.
 // ============================================
 
@@ -29,13 +30,11 @@ export class LocalDqnInference {
     constructor() {
         this._loaded = false;
         this._inputSize = 0;
-        this._hiddenSize = 0;
         this._outputSize = 0;
-        this._weightsInputHidden = null;
-        this._biasHidden = null;
-        this._weightsHiddenOutput = null;
-        this._biasOutput = null;
+        this._layers = []; // { inputSize, outputSize, weights: Float64Array, bias: Float64Array }
         this._checkpointMeta = null;
+        // Reusable buffers for zero-allocation forward pass
+        this._activationBuffers = [];
     }
 
     get loaded() {
@@ -54,53 +53,102 @@ export class LocalDqnInference {
         return this._checkpointMeta;
     }
 
+    _loadV35Layers(networkState) {
+        if (!Array.isArray(networkState.layers) || networkState.layers.length === 0) {
+            return false;
+        }
+        const layers = [];
+        for (let l = 0; l < networkState.layers.length; l++) {
+            const src = networkState.layers[l];
+            if (!src || typeof src !== 'object') return false;
+            const inSize = Number(src.inputSize) || 0;
+            const outSize = Number(src.outputSize) || 0;
+            if (inSize < 1 || outSize < 1) return false;
+            if (!Array.isArray(src.weights) || src.weights.length !== inSize * outSize) return false;
+            if (!Array.isArray(src.bias) || src.bias.length !== outSize) return false;
+            layers.push({
+                inputSize: inSize,
+                outputSize: outSize,
+                weights: new Float64Array(src.weights.map(v => toFinite(v))),
+                bias: new Float64Array(src.bias.map(v => toFinite(v))),
+            });
+        }
+        this._layers = layers;
+        this._inputSize = layers[0].inputSize;
+        this._outputSize = layers[layers.length - 1].outputSize;
+        return true;
+    }
+
+    _loadV34Layers(networkState) {
+        const inputSize = Number(networkState.inputSize) || 0;
+        const hiddenSize = Number(networkState.hiddenSize) || 0;
+        const outputSize = Number(networkState.outputSize) || 0;
+        if (inputSize < 1 || hiddenSize < 1 || outputSize < 1) return false;
+        if (!Array.isArray(networkState.weightsInputHidden)
+            || networkState.weightsInputHidden.length !== inputSize * hiddenSize) return false;
+        if (!Array.isArray(networkState.biasHidden)
+            || networkState.biasHidden.length !== hiddenSize) return false;
+        if (!Array.isArray(networkState.weightsHiddenOutput)
+            || networkState.weightsHiddenOutput.length !== hiddenSize * outputSize) return false;
+        if (!Array.isArray(networkState.biasOutput)
+            || networkState.biasOutput.length !== outputSize) return false;
+
+        this._layers = [
+            {
+                inputSize,
+                outputSize: hiddenSize,
+                weights: new Float64Array(networkState.weightsInputHidden.map(v => toFinite(v))),
+                bias: new Float64Array(networkState.biasHidden.map(v => toFinite(v))),
+            },
+            {
+                inputSize: hiddenSize,
+                outputSize,
+                weights: new Float64Array(networkState.weightsHiddenOutput.map(v => toFinite(v))),
+                bias: new Float64Array(networkState.biasOutput.map(v => toFinite(v))),
+            },
+        ];
+        this._inputSize = inputSize;
+        this._outputSize = outputSize;
+        return true;
+    }
+
     loadCheckpoint(checkpoint) {
         if (!checkpoint || typeof checkpoint !== 'object') {
             return { ok: false, error: 'checkpoint-missing' };
         }
-        if (checkpoint.contractVersion !== 'v34-dqn-checkpoint-v1') {
+        const version = checkpoint.contractVersion;
+        if (version !== 'v35-dqn-checkpoint-v1' && version !== 'v34-dqn-checkpoint-v1') {
             return { ok: false, error: 'contract-version-mismatch' };
         }
         const networkState = checkpoint.online;
         if (!networkState || typeof networkState !== 'object') {
             return { ok: false, error: 'online-network-missing' };
         }
-        const inputSize = Number(networkState.inputSize) || 0;
-        const hiddenSize = Number(networkState.hiddenSize) || 0;
-        const outputSize = Number(networkState.outputSize) || 0;
-        if (inputSize < 1 || hiddenSize < 1 || outputSize < 1) {
+
+        // Try v35 layers[] format first, then v34 flat format
+        let loaded = false;
+        if (Array.isArray(networkState.layers) && networkState.layers.length > 0) {
+            loaded = this._loadV35Layers(networkState);
+        }
+        if (!loaded) {
+            loaded = this._loadV34Layers(networkState);
+        }
+        if (!loaded) {
             return { ok: false, error: 'invalid-network-dimensions' };
         }
-        if (!Array.isArray(networkState.weightsInputHidden)
-            || networkState.weightsInputHidden.length !== inputSize * hiddenSize) {
-            return { ok: false, error: 'weightsInputHidden-shape-mismatch' };
-        }
-        if (!Array.isArray(networkState.biasHidden)
-            || networkState.biasHidden.length !== hiddenSize) {
-            return { ok: false, error: 'biasHidden-shape-mismatch' };
-        }
-        if (!Array.isArray(networkState.weightsHiddenOutput)
-            || networkState.weightsHiddenOutput.length !== hiddenSize * outputSize) {
-            return { ok: false, error: 'weightsHiddenOutput-shape-mismatch' };
-        }
-        if (!Array.isArray(networkState.biasOutput)
-            || networkState.biasOutput.length !== outputSize) {
-            return { ok: false, error: 'biasOutput-shape-mismatch' };
-        }
 
-        this._inputSize = inputSize;
-        this._hiddenSize = hiddenSize;
-        this._outputSize = outputSize;
-        this._weightsInputHidden = new Float64Array(networkState.weightsInputHidden.map(v => toFinite(v)));
-        this._biasHidden = new Float64Array(networkState.biasHidden.map(v => toFinite(v)));
-        this._weightsHiddenOutput = new Float64Array(networkState.weightsHiddenOutput.map(v => toFinite(v)));
-        this._biasOutput = new Float64Array(networkState.biasOutput.map(v => toFinite(v)));
+        // Pre-allocate activation buffers for zero-alloc forward pass
+        this._activationBuffers = this._layers.map(layer =>
+            new Float64Array(layer.outputSize)
+        );
+
         this._checkpointMeta = {
             envSteps: Number(checkpoint.envSteps) || 0,
             optimizerSteps: Number(checkpoint.optimizerSteps) || 0,
             maxItemIndex: Number(checkpoint.maxItemIndex) || 0,
             planarMode: checkpoint.planarMode === true,
-            actionCount: Number(checkpoint.actionCount) || outputSize,
+            actionCount: Number(checkpoint.actionCount) || this._outputSize,
+            hiddenLayers: this._layers.slice(0, -1).map(l => l.outputSize),
         };
         this._loaded = true;
         return { ok: true, error: null };
@@ -109,31 +157,34 @@ export class LocalDqnInference {
     predict(observation) {
         if (!this._loaded) return null;
         const input = Array.isArray(observation) ? observation : [];
-        const hiddenSize = this._hiddenSize;
-        const inputSize = this._inputSize;
-        const outputSize = this._outputSize;
+        const numLayers = this._layers.length;
 
-        // Hidden layer: z = W_ih * x + b_h, a = ReLU(z)
-        const aHidden = new Float64Array(hiddenSize);
-        for (let h = 0; h < hiddenSize; h++) {
-            let sum = this._biasHidden[h];
-            for (let i = 0; i < inputSize; i++) {
-                sum += toFinite(input[i]) * this._weightsInputHidden[i * hiddenSize + h];
+        // Forward pass through all layers
+        for (let l = 0; l < numLayers; l++) {
+            const layer = this._layers[l];
+            const out = this._activationBuffers[l];
+            const isLastLayer = l === numLayers - 1;
+            const prevOut = l > 0 ? this._activationBuffers[l - 1] : null;
+
+            for (let j = 0; j < layer.outputSize; j++) {
+                let sum = layer.bias[j];
+                if (l === 0) {
+                    // First layer reads from observation input
+                    for (let i = 0; i < layer.inputSize; i++) {
+                        sum += toFinite(input[i]) * layer.weights[i * layer.outputSize + j];
+                    }
+                } else {
+                    // Subsequent layers read from previous activation
+                    for (let i = 0; i < layer.inputSize; i++) {
+                        sum += prevOut[i] * layer.weights[i * layer.outputSize + j];
+                    }
+                }
+                // ReLU for hidden layers, linear for output
+                out[j] = isLastLayer ? sum : (sum > 0 ? sum : 0);
             }
-            aHidden[h] = sum > 0 ? sum : 0; // ReLU
         }
 
-        // Output layer: o = W_ho * a + b_o
-        const output = new Float64Array(outputSize);
-        for (let o = 0; o < outputSize; o++) {
-            let sum = this._biasOutput[o];
-            for (let h = 0; h < hiddenSize; h++) {
-                sum += aHidden[h] * this._weightsHiddenOutput[h * outputSize + o];
-            }
-            output[o] = sum;
-        }
-
-        return Array.from(output);
+        return Array.from(this._activationBuffers[numLayers - 1]);
     }
 
     selectBestAction(observation) {

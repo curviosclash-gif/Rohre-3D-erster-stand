@@ -145,7 +145,7 @@ test('V34 checkpoint contract exports and reloads model state via websocket', as
         });
         assert.equal(checkpointResponse.ok, true);
         assert.equal(checkpointResponse.type, 'trainer-checkpoint');
-        assert.equal(checkpointResponse.checkpoint?.contractVersion, 'v34-dqn-checkpoint-v1');
+        assert.equal(checkpointResponse.checkpoint?.contractVersion, 'v35-dqn-checkpoint-v1');
 
         const checkpointLoadResponse = await sendAndWait(socket, inbox, {
             id: 501,

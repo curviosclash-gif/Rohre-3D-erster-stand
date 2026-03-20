@@ -592,7 +592,7 @@ function latestCheckpointApiPlugin() {
         const raw = safeReadJson(absPath);
         if (!raw) return null;
         if (raw.checkpoint && typeof raw.checkpoint === 'object') return raw.checkpoint;
-        if (raw.contractVersion === 'v34-dqn-checkpoint-v1') return raw;
+        if (raw.contractVersion === 'v35-dqn-checkpoint-v1' || raw.contractVersion === 'v34-dqn-checkpoint-v1') return raw;
         return null;
     }
 
@@ -812,6 +812,7 @@ function trainingDashboardApiPlugin() {
         const checkpointExists = checkpointPath ? existsSync(path.resolve(__dirname, checkpointPath)) : false;
         const checkpointRaw = checkpointExists ? safeReadJson(path.resolve(__dirname, checkpointPath)) : null;
         const hasData = !!(checkpointRaw?.checkpoint && typeof checkpointRaw.checkpoint === 'object')
+            || checkpointRaw?.contractVersion === 'v35-dqn-checkpoint-v1'
             || checkpointRaw?.contractVersion === 'v34-dqn-checkpoint-v1';
 
         // Extract KPIs from run

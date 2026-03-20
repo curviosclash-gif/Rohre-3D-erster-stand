@@ -34,22 +34,37 @@ function argMax(values) {
     return bestIndex;
 }
 
+function resolveHiddenLayers(modelOptions) {
+    if (Array.isArray(modelOptions?.hiddenLayers) && modelOptions.hiddenLayers.length > 0) {
+        return modelOptions.hiddenLayers.map(s => clampInt(s, 64, 8, 4096));
+    }
+    const single = clampInt(modelOptions?.hiddenSize, 64, 8, 2048);
+    return [single];
+}
+
+export const CHECKPOINT_CONTRACT_V35 = 'v35-dqn-checkpoint-v1';
+export const CHECKPOINT_CONTRACT_V34 = 'v34-dqn-checkpoint-v1';
+
 export class DqnTrainer {
     constructor(options = {}) {
         this.observationLength = clampInt(options.observationLength, 40, 1, 4096);
         this.maxItemIndex = clampInt(options.maxItemIndex, 2, 0, 8);
         this.seed = clampInt(options.seed, 13_337, 1, 2_147_483_647);
+
+        const hiddenLayers = resolveHiddenLayers(options?.model);
+
         this.hyper = {
-            hiddenSize: clampInt(options?.model?.hiddenSize, 64, 8, 2048),
-            learningRate: clampFloat(options?.model?.learningRate, 0.00075, 0.0000001, 1),
+            hiddenLayers,
+            hiddenSize: hiddenLayers[0], // legacy accessor
+            learningRate: clampFloat(options?.model?.learningRate, 0.0003, 0.0000001, 1),
             gamma: clampFloat(options?.model?.gamma, 0.99, 0, 1),
-            batchSize: clampInt(options?.model?.batchSize, 32, 1, 4096),
-            replayWarmup: clampInt(options?.model?.replayWarmup, 64, 1, 1_000_000),
+            batchSize: clampInt(options?.model?.batchSize, 64, 1, 4096),
+            replayWarmup: clampInt(options?.model?.replayWarmup, 256, 1, 1_000_000),
             trainEvery: clampInt(options?.model?.trainEvery, 4, 1, 10_000),
-            targetSyncInterval: clampInt(options?.model?.targetSyncInterval, 128, 1, 1_000_000),
+            targetSyncInterval: clampInt(options?.model?.targetSyncInterval, 500, 1, 1_000_000),
             epsilonStart: clampFloat(options?.model?.epsilonStart, 1, 0, 1),
             epsilonEnd: clampFloat(options?.model?.epsilonEnd, 0.05, 0, 1),
-            epsilonDecaySteps: clampInt(options?.model?.epsilonDecaySteps, 5000, 1, 10_000_000),
+            epsilonDecaySteps: clampInt(options?.model?.epsilonDecaySteps, 20_000, 1, 10_000_000),
             rewardClamp: clampFloat(options?.model?.rewardClamp, 10, 0.1, 1000),
         };
 
@@ -66,13 +81,13 @@ export class DqnTrainer {
         });
         this.onlineNetwork = new DqnMlpNetwork({
             inputSize: this.observationLength,
-            hiddenSize: this.hyper.hiddenSize,
+            hiddenLayers,
             outputSize: this.actionVocabulary.size,
             rng: this.rng,
         });
         this.targetNetwork = new DqnMlpNetwork({
             inputSize: this.observationLength,
-            hiddenSize: this.hyper.hiddenSize,
+            hiddenLayers,
             outputSize: this.actionVocabulary.size,
             seed: this.seed + 1,
         });
@@ -268,7 +283,7 @@ export class DqnTrainer {
 
     exportCheckpoint() {
         return {
-            contractVersion: 'v34-dqn-checkpoint-v1',
+            contractVersion: CHECKPOINT_CONTRACT_V35,
             seed: this.seed,
             envSteps: this.envSteps,
             optimizerSteps: this.optimizerSteps,
@@ -288,17 +303,18 @@ export class DqnTrainer {
         if (!checkpoint || typeof checkpoint !== 'object') {
             return { ok: false, error: 'checkpoint-missing' };
         }
-        if (checkpoint.contractVersion !== 'v34-dqn-checkpoint-v1') {
+        const version = checkpoint.contractVersion;
+        if (version !== CHECKPOINT_CONTRACT_V35 && version !== CHECKPOINT_CONTRACT_V34) {
             return { ok: false, error: 'checkpoint-contract-version-mismatch', details: {
-                expected: 'v34-dqn-checkpoint-v1',
-                actual: checkpoint.contractVersion || null,
+                expected: [CHECKPOINT_CONTRACT_V35, CHECKPOINT_CONTRACT_V34],
+                actual: version || null,
             }};
         }
         const strict = options.strict !== false;
         const expectedActionCount = this.actionVocabulary.size;
         const checkpointObsLength = clampInt(checkpoint.observationLength, 0, 0, 10_000);
         const checkpointActionCount = clampInt(
-            checkpoint.online?.outputSize ?? checkpoint.target?.outputSize,
+            checkpoint.online?.outputSize ?? checkpoint.online?.layers?.[checkpoint.online?.layers?.length - 1]?.outputSize ?? checkpoint.target?.outputSize,
             0, 0, 10_000
         );
         if (checkpointObsLength && checkpointObsLength !== this.observationLength) {
