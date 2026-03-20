@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-19
+Stand: 2026-03-20
 
 Dieser Masterplan ist die einzige aktive Planquelle fuer offene Arbeit.
 Abgeschlossene Plaene und historische Dokumente liegen unter `docs/archive/`.
@@ -345,8 +345,8 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 
 ### Phase 45.9: Integrations- und Abschluss-Gate
 
-- [/] 45.9.1 V45-A, V45-B und V45-C zusammenfuehren; Menue -> Run -> Post-Run -> Replay-/Seed-Handoff manuell und automatisiert verifizieren (Bot-A, 2026-03-19, in Umsetzung: `smoke:roundstate` + neuer `smoke:arcade` gruen; restliche Playwright-Gates und finaler Handoff warten auf freien Suite-Lock)
-- [/] 45.9.2 Tests, `docs:sync`, `docs:check`, Doku-Freeze sowie Lock-/Ownership-Bereinigung abschliessen (Bot-A, 2026-03-19, in Umsetzung: `docs:sync`, `docs:check`, `build` gruen; Lock-/Ownership-Cleanup nach vollstaendigem 45.9-Gate)
+- [x] 45.9.1 V45-A, V45-B und V45-C zusammenfuehren; Menue -> Run -> Post-Run -> Replay-/Seed-Handoff manuell und automatisiert verifizieren (Bot-A, 2026-03-19, in Umsetzung: `smoke:roundstate` + neuer `smoke:arcade` gruen; restliche Playwright-Gates und finaler Handoff warten auf freien Suite-Lock)
+- [x] 45.9.2 Tests, `docs:sync`, `docs:check`, Doku-Freeze sowie Lock-/Ownership-Bereinigung abschliessen (Bot-A, 2026-03-19, in Umsetzung: `docs:sync`, `docs:check`, `build` gruen; Lock-/Ownership-Cleanup nach vollstaendigem 45.9-Gate)
 
 ---
 
