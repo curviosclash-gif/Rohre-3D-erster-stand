@@ -11,12 +11,26 @@ Abgeschlossene Plaene und historische Dokumente liegen unter `docs/archive/`.
 - [/] In Bearbeitung
 - [x] Abgeschlossen
 
-## Parallelmodus fuer 3 Agenten
+## Parallelmodus fuer 3 Agenten — Konfliktfreie Hauptarbeit auf `main`
 
-- Maximal 3 aktive Agenten gleichzeitig.
-- Priorisierte Startbelegung: `Bot-1 -> V45 / 45.1`, `Bot-2 -> V45 / 45.2`, `Bot-3 -> V45 / 45.3`.
-- V46 wird erst nach `45.9` geclaimt, damit `src/core/**`, `src/state/**`, `src/ui/**` und `prototypes/vehicle-lab/**` nicht blockuebergreifend kollidieren.
-- Gemeinsame Pfade (`docs/**`, `tests/**`) bleiben shared; Fremdpfad-Aenderungen muessen vor dem Commit im `Conflict-Log` stehen.
+**Kernregeln (no Worktrees, direkter main-Commit):**
+
+1. **Exklusive Datei-Ownership**: Jeder Agent hat nicht-überlappende Pfade (siehe Tabelle unten)
+2. **Keine Cross-Agent-Änderungen**: Außer im Conflict-Log dokumentiert
+3. **Klare Commit-Struktur**: `feat(V{BLOCK}-{STREAM}): Beschreibung` — Agent muss erkennbar sein
+4. **Interface-Contracts**: Agenten kommunizieren nur über definierte Schnittstellen (`js`, Enums, Konfigurationen)
+5. **Claim-vor-Start**: Agent reserviert seinen Block/Stream im Lock-Abschnitt unten
+6. **Test-Isolation**: Jeder Agent hat eigene Test-Dateien (`test:{V45-45.1}`, etc.)
+
+**Workflow:**
+- Agent claim Block/Stream in `Lock-Status`
+- Arbeitet nur in exklusiven Pfaden
+- Committed direkt auf `main` mit Block/Stream in Message
+- Bei Conflict-Log-Eintrag: Freigabe, Cross-Block-Sync, Agent B wartet oder alternative Pfade
+
+**Blockierungsregeln:**
+- V46 startet erst nach V45.9 ist COMPLETE (nicht nur geclaimt)
+- Shared Pfade (`docs/**`, `tests/**`, vite.config.js): Append-only oder per Conflict-Log-Eintrag mit Konsens
 
 ## Datei-Ownership
 
@@ -31,11 +45,46 @@ Abgeschlossene Plaene und historische Dokumente liegen unter `docs/archive/`.
 | `src/hunt/**`, `src/entities/systems/ProjectileSystem.js`, `src/entities/ai/**`, `src/ui/HuntHUD.js` | V46 / 46.3 | blockiert bis `45.9` | Hunt-, AI- und Modulgrenzen |
 | `docs/**`, `tests/**` | Shared | shared | Append-only oder eigener Abschnitt; Konflikte loggen |
 
-## Conflict-Log
+## Lock-Status (Aktive Claims)
 
-| Datum | Bot | Fremder Block/Stream | Datei | Grund | Risiko |
-| --- | --- | --- | --- | --- | --- |
-| - | - | - | - | Noch leer | niedrig |
+| Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
+| --- | --- | --- | --- | --- |
+| A | V47 (Strategy Pattern) | 2026-03-20 | ACTIVE | 2026-03-25 |
+| B | V48 (Hunt Quality) | 2026-03-20 | ACTIVE | 2026-03-25 |
+| C | N4-N7 (Perf + Telemetry) | 2026-03-20 | ACTIVE | 2026-03-22 |
+
+---
+
+## Conflict-Log (Cross-Block-Änderungen)
+
+| Datum | Agent | Fremder Block/Stream | Datei | Grund | Lösung | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| - | - | - | - | Noch leer | - | - |
+
+## Commit-Konvention fuer Parallelarbeit
+
+Um zu tracken, welcher Agent an welchem Block arbeitet:
+
+```
+feat(V{BLOCK}-{STREAM}): Beschreibung
+
+- Änderung 1
+- Änderung 2
+
+Co-Authored-By: Agent {A|B|C} <agent@cuvios>
+```
+
+**Beispiele:**
+- `feat(V45-45.1): Add Arcade menu panel styles`
+- `fix(V48-48.4): Optimize hunt targeting hotpath`
+- `feat(N6-N6.1): Add deterministic sim state snapshot ring buffer`
+
+**Regeln:**
+- Jeder Commit muss Abender Agent (A/B/C) und Block/Stream zeigen
+- Nur Agent-exklusive Dateien in einem Commit
+- Conflict-Log-Änderungen nur mit Konsens-Eintrag
+
+---
 
 ## Abgeschlossene Bloecke (archiviert)
 
