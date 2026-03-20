@@ -45,6 +45,7 @@ export class Game {
             overheatByPlayer: {},
             killFeed: [],
             damageIndicator: null,
+            damageIndicatorsByPlayer: {},
         };
 
         this.state = GAME_STATE_IDS.MENU;

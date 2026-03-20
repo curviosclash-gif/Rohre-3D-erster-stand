@@ -29,7 +29,8 @@ export class HuntHUD {
         this.killFeedList = document.getElementById('hunt-kill-feed-list');
         this._killFeedSlots = [];
         this._killFeedCachedTexts = new Array(5).fill('');
-        this.damageIndicator = document.getElementById('hunt-damage-indicator');
+        this.damageIndicatorP1 = document.getElementById('hunt-damage-indicator');
+        this.damageIndicatorP2 = document.getElementById('hunt-damage-indicator-p2');
         this._playerPanelTickTimer = 0;
         this._killFeedTickTimer = 0;
         this._indicatorTickTimer = 0;
@@ -58,6 +59,8 @@ export class HuntHUD {
         this._playerPanelTickTimer = 0;
         this._killFeedTickTimer = 0;
         this._indicatorTickTimer = 0;
+        this.damageIndicatorP1?.classList.add('hidden');
+        this.damageIndicatorP2?.classList.add('hidden');
     }
 
     update(dt) {
@@ -65,6 +68,7 @@ export class HuntHUD {
 
         const game = this.game;
         const huntActive = game.activeGameMode === GAME_MODE_TYPES.HUNT && game.state !== 'MENU';
+        const humans = game.entityManager ? game.entityManager.getHumanPlayers() : [];
         this.root.classList.toggle('hidden', !huntActive);
         if (!huntActive) {
             if (this._wasHuntActive) {
@@ -85,7 +89,6 @@ export class HuntHUD {
         }
 
         if (this._consumeTick('_playerPanelTickTimer', dt, playerPanelInterval) > 0) {
-            const humans = game.entityManager ? game.entityManager.getHumanPlayers() : [];
             this._updatePlayerPanel(humans[0], {
                 shieldFill: this.p1ShieldFill,
                 shieldText: this.p1ShieldText,
@@ -116,7 +119,7 @@ export class HuntHUD {
 
         const indicatorElapsed = this._consumeTick('_indicatorTickTimer', dt, indicatorInterval);
         if (indicatorElapsed > 0) {
-            this._updateDamageIndicator(indicatorElapsed);
+            this._updateDamageIndicators(indicatorElapsed, humans);
         }
     }
 
@@ -176,24 +179,56 @@ export class HuntHUD {
         }
     }
 
-    _updateDamageIndicator(dt) {
-        if (!this.damageIndicator) return;
-        const indicator = this.game?.huntState?.damageIndicator;
+    _resolveDamageIndicatorState(playerIndex, allowLegacyFallback = false) {
+        const byPlayer = this.game?.huntState?.damageIndicatorsByPlayer;
+        if (Number.isInteger(playerIndex) && byPlayer && typeof byPlayer === 'object') {
+            const indicatorByPlayer = byPlayer[playerIndex];
+            if (indicatorByPlayer) {
+                return indicatorByPlayer;
+            }
+        }
+        if (!allowLegacyFallback) return null;
+        return this.game?.huntState?.damageIndicator || null;
+    }
+
+    _updateDamageIndicatorElement(element, indicator, dt) {
+        if (!element) return;
         if (!indicator || indicator.ttl <= 0) {
-            this.damageIndicator.classList.add('hidden');
+            element.classList.add('hidden');
             return;
         }
 
         indicator.ttl = Math.max(0, indicator.ttl - dt);
         if (indicator.ttl <= 0) {
-            this.damageIndicator.classList.add('hidden');
+            element.classList.add('hidden');
             return;
         }
 
         const angle = Number(indicator.angleDeg) || 0;
         const intensity = clamp01(indicator.intensity || 0.6);
-        this.damageIndicator.classList.remove('hidden');
-        this.damageIndicator.style.opacity = String(Math.max(0.2, intensity));
-        this.damageIndicator.style.transform = `translate(-50%, -50%) rotate(${angle.toFixed(1)}deg)`;
+        element.classList.remove('hidden');
+        element.style.opacity = String(Math.max(0.2, intensity));
+        element.style.transform = `translate(-50%, -50%) rotate(${angle.toFixed(1)}deg)`;
+    }
+
+    _updateDamageIndicators(dt, humans = []) {
+        const p1 = humans[0] || null;
+        const p2Visible = humans.length > 1;
+        if (this.damageIndicatorP1) {
+            this.damageIndicatorP1.style.left = p2Visible ? '25%' : '50%';
+        }
+        if (this.damageIndicatorP2) {
+            this.damageIndicatorP2.style.left = p2Visible ? '75%' : '50%';
+        }
+        const p1Indicator = this._resolveDamageIndicatorState(p1?.index, true);
+        this._updateDamageIndicatorElement(this.damageIndicatorP1, p1Indicator, dt);
+
+        if (!p2Visible) {
+            this.damageIndicatorP2?.classList.add('hidden');
+            return;
+        }
+        const p2 = humans[1] || null;
+        const p2Indicator = this._resolveDamageIndicatorState(p2?.index, false);
+        this._updateDamageIndicatorElement(this.damageIndicatorP2, p2Indicator, dt);
     }
 }

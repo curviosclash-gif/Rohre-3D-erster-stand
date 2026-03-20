@@ -10,6 +10,7 @@ function createHuntStateReset() {
     return {
         killFeed: [],
         damageIndicator: null,
+        damageIndicatorsByPlayer: {},
         overheatByPlayer: {},
     };
 }

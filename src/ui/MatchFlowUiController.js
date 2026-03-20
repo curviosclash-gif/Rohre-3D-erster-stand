@@ -200,15 +200,23 @@ export class MatchFlowUiController {
         const damageResult = event?.damageResult || {};
         const applied = Math.max(0, Number(damageResult.applied) || 0);
         const absorbed = Math.max(0, Number(damageResult.absorbedByShield) || 0);
-        const damageValue = Math.max(applied, absorbed);
+        const hpApplied = Math.max(0, Number(damageResult.hpApplied) || (applied - absorbed));
+        const damageValue = hpApplied + absorbed;
         if (damageValue <= 0) return;
 
         const intensity = THREE.MathUtils.clamp(0.2 + damageValue / 60, 0.2, 1.0);
-        game.huntState.damageIndicator = {
+        const nextIndicator = {
             angleDeg: this._resolveDamageIndicatorAngle(target, event),
             intensity,
             ttl: THREE.MathUtils.clamp(0.35 + intensity * 0.55, 0.35, 0.95),
         };
+        if (!game.huntState.damageIndicatorsByPlayer || typeof game.huntState.damageIndicatorsByPlayer !== 'object') {
+            game.huntState.damageIndicatorsByPlayer = {};
+        }
+        game.huntState.damageIndicatorsByPlayer[target.index] = nextIndicator;
+        if (target.index === 0) {
+            game.huntState.damageIndicator = nextIndicator;
+        }
     }
 
     _pushHuntFeedEntry(entry) {

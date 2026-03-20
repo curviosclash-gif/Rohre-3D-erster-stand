@@ -11,6 +11,29 @@ import {
 } from '../HuntTargetingOps.js';
 import { clamp } from '../../utils/MathOps.js';
 
+function resolveDamageSplit(damageResult = {}) {
+    const applied = Math.max(0, Number(damageResult?.applied) || 0);
+    const absorbedByShield = Math.max(0, Number(damageResult?.absorbedByShield) || 0);
+    const hpApplied = Math.max(0, Number(damageResult?.hpApplied) || (applied - absorbedByShield));
+    return { hpApplied, absorbedByShield };
+}
+
+function formatDamageFeedSuffix(damageResult = {}, fallbackHp = 0) {
+    const split = resolveDamageSplit(damageResult);
+    const hpApplied = split.hpApplied > 0 ? split.hpApplied : Math.max(0, Number(fallbackHp) || 0);
+    const shieldApplied = split.absorbedByShield;
+    if (hpApplied > 0 && shieldApplied > 0) {
+        return `-${Math.round(hpApplied)} HP / -${Math.round(shieldApplied)} Schild`;
+    }
+    if (hpApplied > 0) {
+        return `-${Math.round(hpApplied)} HP`;
+    }
+    if (shieldApplied > 0) {
+        return `-${Math.round(shieldApplied)} Schild`;
+    }
+    return 'TREFFER';
+}
+
 export class MGHitResolver {
     constructor(runtimeContext) {
         this.runtime = runtimeContext || null;
@@ -129,7 +152,7 @@ export class MGHitResolver {
             return;
         }
 
-        this._pushKillFeed(attacker, target, `-${Math.round(damage)} HP`);
+        this._pushKillFeed(attacker, target, formatDamageFeedSuffix(damageResult, damage));
     }
 
     _pushKillFeed(attacker, target, suffix) {

@@ -3,6 +3,7 @@ import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
 import { normalizeShadowQuality } from '../../shared/contracts/ShadowQualityContract.js';
 import { clamp } from '../../utils/MathOps.js';
+import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
 
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;
@@ -43,6 +44,7 @@ export function setupMenuGameplayBindings(ctx) {
     if (Array.isArray(ui.modePathButtons)) {
         ui.modePathButtons.forEach((button) => {
             bind(button, 'click', () => {
+                if (button.disabled) return;
                 const modePath = String(button?.dataset?.modePath || '').trim().toLowerCase();
                 if (!modePath) return;
                 emit(eventTypes.MODE_PATH_CHANGE, { modePath });
@@ -131,7 +133,10 @@ export function setupMenuGameplayBindings(ctx) {
 
     bind(ui.mapSelect, 'change', (e) => {
         const selectedMapKey = String(e.target.value || '');
-        settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || CONFIG.MAPS[selectedMapKey])
+        const hasUiOption = Array.isArray(ui.mapSelect?.options)
+            ? ui.mapSelect.options.some((option) => String(option?.value || '') === selectedMapKey)
+            : false;
+        settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || hasUiOption || CONFIG.MAPS[selectedMapKey])
             ? selectedMapKey
             : 'standard';
         emitSettingsChangedImmediate([keys.MAP_KEY]);
@@ -391,4 +396,6 @@ export function setupMenuGameplayBindings(ctx) {
             emit(eventTypes.START_MATCH_MULTIPLAYER);
         });
     }
+
+    setupArcadeMenuSurface(ctx);
 }

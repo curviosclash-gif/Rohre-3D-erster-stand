@@ -70,10 +70,14 @@ export function handleSessionTypeChangeAction(ctx) {
 
 export function handleModePathChangeAction(ctx) {
     const { game, event, onSettingsChanged, resolveMenuAccessContext } = ctx;
+    const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
     const requestedModePath = String(event?.modePath || '').trim().toLowerCase();
-    const modePath = requestedModePath === 'arcade' || requestedModePath === 'fight' || requestedModePath === 'normal'
+    let modePath = requestedModePath === 'arcade' || requestedModePath === 'fight' || requestedModePath === 'normal'
         ? requestedModePath
         : 'normal';
+    if (modePath === 'fight' && !huntFeatureEnabled) {
+        modePath = 'normal';
+    }
     game.settings.localSettings.modePath = modePath;
 
     const changedKeys = [SETTINGS_CHANGE_KEYS.MODE_PATH];
@@ -91,9 +95,17 @@ export function handleModePathChangeAction(ctx) {
 
     if (modePath === 'fight') {
         game.settings.gameMode = 'HUNT';
+        if (!game.settings.hunt || typeof game.settings.hunt !== 'object') {
+            game.settings.hunt = {};
+        }
+        game.settings.hunt.respawnEnabled = true;
         changedKeys.push(SETTINGS_CHANGE_KEYS.GAME_MODE, SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED);
-    } else if (modePath === 'normal') {
+    } else if (modePath === 'normal' || modePath === 'arcade') {
         game.settings.gameMode = 'CLASSIC';
+        if (!game.settings.hunt || typeof game.settings.hunt !== 'object') {
+            game.settings.hunt = {};
+        }
+        game.settings.hunt.respawnEnabled = false;
         changedKeys.push(SETTINGS_CHANGE_KEYS.GAME_MODE, SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED);
     }
 
@@ -104,7 +116,11 @@ export function handleModePathChangeAction(ctx) {
     });
 
     const label = modePath === 'fight' ? 'Fight' : (modePath === 'arcade' ? 'Arcade' : 'Normal');
-    game._showStatusToast(`Modus gewaehlt: ${label}`, 1200, 'info');
+    if (requestedModePath === 'fight' && !huntFeatureEnabled) {
+        game._showStatusToast('Fight ist deaktiviert. Normal wurde gesetzt.', 1500, 'warning');
+    } else {
+        game._showStatusToast(`Modus gewaehlt: ${label}`, 1200, 'info');
+    }
 }
 
 export function handleQuickStartLastStartAction(ctx) {

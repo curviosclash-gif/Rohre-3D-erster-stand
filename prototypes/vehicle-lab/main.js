@@ -5,7 +5,19 @@ import { VehicleLabUI } from './src/VehicleLabUI.js';
 import { VehicleHistory } from './src/VehicleHistory.js';
 import { ModularVehicleMesh } from './src/ModularVehicleMesh.js';
 import { VEHICLE_PRESETS } from './src/VehiclePresets.js';
+import {
+    buildValidatedArcadeBlueprint,
+    describeArcadeBlueprintStatus,
+    formatArcadeBlueprintValidationMessage,
+} from './src/ArcadeBlueprintValidation.js';
 
+function toBlueprintId(value) {
+    return String(value || 'custom_blueprint')
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9_ -]/g, '')
+        .replace(/\s+/g, '_') || 'custom_blueprint';
+}
 
 class VehicleLabApp {
     constructor() {
@@ -58,6 +70,9 @@ class VehicleLabApp {
         this.selectedIndex = null;
         this.selectedPath = [];
         this.savedVehicles = [];
+        this.arcadeBlueprintStatus = 'Blueprint: n/a';
+        this.lastArcadeBlueprintResult = null;
+        this.updateArcadeBlueprintStatus();
         this.initPresets();
         this.updateUI();
         this.updateSavedVehiclesUi('');
@@ -126,6 +141,7 @@ class VehicleLabApp {
         this.updateUI();
         this.selectPart(null);
         localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
+        this.updateArcadeBlueprintStatus();
     }
 
     updateSavedVehiclesUi(errorMessage = '') {
@@ -217,6 +233,7 @@ class VehicleLabApp {
         this.vehicle.build();
         this.refreshGizmoAttachment();
         this.debouncedSave();
+        this.updateArcadeBlueprintStatus();
         this.updateUI();
     }
 
@@ -239,6 +256,20 @@ class VehicleLabApp {
         }
         this.history.save(this.vehicle.config);
         localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
+        this.updateArcadeBlueprintStatus();
+    }
+
+    updateArcadeBlueprintStatus(labelOverride = '') {
+        const config = this.vehicle?.config || {};
+        const resolvedLabel = String(labelOverride || config.label || 'Custom Vehicle').trim() || 'Custom Vehicle';
+        const result = buildValidatedArcadeBlueprint(config, {
+            blueprintId: toBlueprintId(resolvedLabel),
+            label: resolvedLabel,
+            source: 'vehicle-lab',
+        });
+        this.lastArcadeBlueprintResult = result;
+        this.arcadeBlueprintStatus = describeArcadeBlueprintStatus(result);
+        return result;
     }
 
     refreshGizmoAttachment() {
@@ -409,6 +440,15 @@ class VehicleLabApp {
             return;
         }
 
+        const guardResult = this.updateArcadeBlueprintStatus(vehicleName);
+        if (!guardResult.validation.ok) {
+            alert(
+                'Arcade-Blueprint Guard fehlgeschlagen.\n' +
+                `${formatArcadeBlueprintValidationMessage(guardResult)}`
+            );
+            return;
+        }
+
         try {
             const response = await fetch('/api/editor/save-vehicle-disk', {
                 method: 'POST',
@@ -417,7 +457,8 @@ class VehicleLabApp {
                 },
                 body: JSON.stringify({
                     jsonText: JSON.stringify(this.vehicle.config),
-                    vehicleName
+                    vehicleName,
+                    arcadeBlueprint: guardResult.blueprint,
                 })
             });
 
@@ -439,6 +480,7 @@ class VehicleLabApp {
                 `Label: ${payload.vehicleLabel}\n` +
                 `Config-Datei: ${payload.vehicleConfigPath}\n` +
                 `Registry: ${payload.generatedModulePath}\n` +
+                `${this.arcadeBlueprintStatus}\n` +
                 `Spielseite neu laden, damit das Fahrzeug in der Auswahl erscheint.`
             );
             this.refreshSavedVehiclesList();
@@ -596,7 +638,7 @@ class VehicleLabApp {
             }
         });
         const badge = document.getElementById('polyCountBadge');
-        if (badge) badge.textContent = `Polys: ${Math.round(polyCount)}`;
+        if (badge) badge.textContent = `Polys: ${Math.round(polyCount)} | ${this.arcadeBlueprintStatus}`;
     }
 
     handlePartKeyboardMovement(dt) {

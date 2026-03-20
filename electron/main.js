@@ -71,6 +71,7 @@ function startSignalingServer() {
     // We read the lobby code from the server's stdout (it prints it on startup)
     signalingProcess.stdout?.on('data', (data) => {
         const line = data.toString();
+        console.log(`[Signaling] ${line.trim()}`);
         const match = line.match(/lobby code:\s*(\S+)/i);
         if (match) {
             startBroadcast(match[1]);
@@ -136,7 +137,7 @@ function startBroadcast(lobbyCode) {
                 port: 9090,
                 lobbyCode,
                 hostName,
-                playerCount: 0, // updated lazily via /discovery/info
+                playerCount: 0, // TODO: update via signaling process IPC
             });
             const buf = Buffer.from(msg);
             broadcastSocket.send(buf, 0, buf.length, DISCOVERY_PORT, '255.255.255.255');

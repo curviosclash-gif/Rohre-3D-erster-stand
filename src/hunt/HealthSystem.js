@@ -71,14 +71,22 @@ export function resetPlayerHealth(player, config = CONFIG) {
 export function applyDamage(player, amount, options = {}, config = CONFIG) {
     const activeConfig = resolveConfig(config);
     if (!player) {
-        return { applied: 0, absorbedByShield: 0, remainingHp: 0, isDead: true };
+        return {
+            applied: 0,
+            absorbedByShield: 0,
+            hpApplied: 0,
+            remainingHp: 0,
+            isDead: true,
+        };
     }
+    const hpBefore = Math.max(0, toSafeNumber(player.hp, 0));
 
     const requestedDamage = Math.max(0, toSafeNumber(amount, 0));
     if (requestedDamage <= 0) {
         return {
             applied: 0,
             absorbedByShield: 0,
+            hpApplied: 0,
             remainingHp: Math.max(0, toSafeNumber(player.hp, 0)),
             isDead: toSafeNumber(player.hp, 0) <= 0,
         };
@@ -93,6 +101,7 @@ export function applyDamage(player, amount, options = {}, config = CONFIG) {
         return {
             applied: requestedDamage,
             absorbedByShield: 0,
+            hpApplied: Math.max(0, hpBefore - Math.max(0, toSafeNumber(player.hp, 0))),
             remainingHp: 0,
             isDead: true,
         };
@@ -119,9 +128,11 @@ export function applyDamage(player, amount, options = {}, config = CONFIG) {
         player.lastDamageTimestamp = toSafeNumber(options.nowSeconds, getNowSeconds());
     }
 
+    const hpApplied = Math.max(0, hpBefore - Math.max(0, toSafeNumber(player.hp, 0)));
     return {
         applied: requestedDamage,
         absorbedByShield,
+        hpApplied,
         remainingHp: player.hp,
         isDead: player.hp <= 0,
     };

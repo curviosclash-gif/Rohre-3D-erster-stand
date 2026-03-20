@@ -1,5 +1,5 @@
 @echo off
-echo === CuviosClash - Map Editor ===
+echo === Curvios Clash - Map Editor ===
 echo Starte Vite Dev-Server...
 echo.
 

@@ -156,7 +156,6 @@ export class PeerConnectionManager {
             if (Date.now() - hb.lastPong > HEARTBEAT_TIMEOUT) {
                 this._stopHeartbeat(peerId);
                 this._emit('heartbeatTimeout', { peerId });
-                this._emit('peerDisconnected', { peerId, state: 'heartbeat-timeout' });
             } else if (this._dataChannelManager) {
                 this._dataChannelManager.send(peerId, 'state', {
                     type: 'heartbeat',

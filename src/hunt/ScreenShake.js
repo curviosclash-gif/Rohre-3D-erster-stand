@@ -2,10 +2,10 @@ import { clamp } from '../utils/MathOps.js';
 
 function resolveDamageValue(event) {
     const damageResult = event?.damageResult || {};
-    const requested = Number(damageResult.applied) || 0;
-    const absorbed = Number(damageResult.absorbedByShield) || 0;
-    const effective = requested > 0 ? requested : absorbed;
-    return Math.max(0, effective);
+    const requested = Math.max(0, Number(damageResult.applied) || 0);
+    const absorbed = Math.max(0, Number(damageResult.absorbedByShield) || 0);
+    const hpApplied = Math.max(0, Number(damageResult.hpApplied) || (requested - absorbed));
+    return hpApplied + absorbed;
 }
 
 export function resolveScreenShakeProfile(event) {

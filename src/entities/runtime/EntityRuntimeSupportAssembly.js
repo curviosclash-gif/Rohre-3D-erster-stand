@@ -8,6 +8,22 @@ import { EntityEventBus } from './EntityEventBus.js';
 import { HuntScoring } from '../../hunt/HuntScoring.js';
 import { isRocketTierType } from '../../hunt/RocketPickupSystem.js';
 
+function formatFeedDamageSuffix(damageResult = {}) {
+    const applied = Math.max(0, Number(damageResult?.applied) || 0);
+    const absorbedByShield = Math.max(0, Number(damageResult?.absorbedByShield) || 0);
+    const hpApplied = Math.max(0, Number(damageResult?.hpApplied) || (applied - absorbedByShield));
+    if (hpApplied > 0 && absorbedByShield > 0) {
+        return `-${Math.round(hpApplied)} HP / -${Math.round(absorbedByShield)} Schild`;
+    }
+    if (hpApplied > 0) {
+        return `-${Math.round(hpApplied)} HP`;
+    }
+    if (absorbedByShield > 0) {
+        return `-${Math.round(absorbedByShield)} Schild`;
+    }
+    return 'TREFFER';
+}
+
 export function createEntityRuntimeSupport(owner) {
     let eventBus = null;
     const projectileSystem = new ProjectileSystem({
@@ -78,7 +94,7 @@ export function createEntityRuntimeSupport(owner) {
             if (!damageResult?.isDead && projectileOwner) {
                 const attackerLabel = projectileOwner.isBot ? `Bot ${projectileOwner.index + 1}` : `P${projectileOwner.index + 1}`;
                 const targetLabel = target.isBot ? `Bot ${target.index + 1}` : `P${target.index + 1}`;
-                eventBus?.emitHuntFeed(`${attackerLabel} -> ${targetLabel}: -${Math.round(damageResult?.applied || 0)} HP`);
+                eventBus?.emitHuntFeed(`${attackerLabel} -> ${targetLabel}: ${formatFeedDamageSuffix(damageResult)}`);
             }
         },
         runtimeProfiler: owner.runtimeProfiler || null,

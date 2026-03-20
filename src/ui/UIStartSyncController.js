@@ -124,6 +124,10 @@ export class UIStartSyncController {
         if (this.ui.mapSelect) {
             listen(this.ui.mapSelect, 'change', () => {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                const selectedMapKey = String(this.ui.mapSelect.value || '').trim();
+                if (selectedMapKey) {
+                    this.game.settings.mapKey = selectedMapKey;
+                }
                 pushRecentEntry(currentStartSetup.recentMaps, this.ui.mapSelect.value);
             });
         }

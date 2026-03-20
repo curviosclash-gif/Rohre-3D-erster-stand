@@ -1,6 +1,6 @@
 @echo off
 echo ====================================
-echo   CuviosClash - Launcher
+echo   Curvios Clash - Launcher
 echo ====================================
 echo.
 echo Projektpfad: %~dp0

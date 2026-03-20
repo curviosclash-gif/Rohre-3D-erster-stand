@@ -30,6 +30,7 @@ export class HuntScoring {
                 assists: 0,
                 deaths: 0,
                 damage: 0,
+                shieldDamage: 0,
             });
         }
         return this._statsByPlayer.get(playerIndex);
@@ -43,17 +44,25 @@ export class HuntScoring {
         }
 
         const applied = Math.max(0, Number(damageResult?.applied) || 0);
-        if (applied <= 0) return;
+        const absorbedByShield = Math.max(0, Number(damageResult?.absorbedByShield) || 0);
+        const hpApplied = Math.max(0, Number(damageResult?.hpApplied) || (applied - absorbedByShield));
+        if (hpApplied <= 0 && absorbedByShield <= 0) return;
 
         const sourceStats = this._ensureStats(sourceIndex);
-        sourceStats.damage += applied;
+        sourceStats.damage += hpApplied;
+        sourceStats.shieldDamage += absorbedByShield;
 
         if (!this._damageHistoryByTarget.has(targetIndex)) {
             this._damageHistoryByTarget.set(targetIndex, new Map());
         }
         const byAttacker = this._damageHistoryByTarget.get(targetIndex);
-        const existing = byAttacker.get(sourceIndex) || { damage: 0, lastHitAt: nowSeconds };
-        existing.damage += applied;
+        const existing = byAttacker.get(sourceIndex) || {
+            damage: 0,
+            shieldDamage: 0,
+            lastHitAt: nowSeconds,
+        };
+        existing.damage += hpApplied;
+        existing.shieldDamage += absorbedByShield;
         existing.lastHitAt = nowSeconds;
         byAttacker.set(sourceIndex, existing);
     }
@@ -103,6 +112,7 @@ export class HuntScoring {
                 assists: stats.assists,
                 deaths: stats.deaths,
                 damage: Math.round(stats.damage),
+                shieldDamage: Math.round(stats.shieldDamage || 0),
             });
         }
 
@@ -120,7 +130,11 @@ export class HuntScoring {
         const rows = this.getScoreboard(players).slice(0, maxEntries);
         if (rows.length === 0) return '';
         return rows
-            .map((entry) => `${entry.label} K${entry.kills}/A${entry.assists}/Dmg${entry.damage}`)
+            .map((entry) => (
+                entry.shieldDamage > 0
+                    ? `${entry.label} K${entry.kills}/A${entry.assists}/Dmg${entry.damage}/S${entry.shieldDamage}`
+                    : `${entry.label} K${entry.kills}/A${entry.assists}/Dmg${entry.damage}`
+            ))
             .join(' | ');
     }
 }

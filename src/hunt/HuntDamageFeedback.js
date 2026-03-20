@@ -9,6 +9,10 @@ function shouldEmitLocalFeedback(event) {
 }
 
 function resolveHpDamage(damageResult) {
+    const explicitHpApplied = Number(damageResult?.hpApplied);
+    if (Number.isFinite(explicitHpApplied)) {
+        return Math.max(0, explicitHpApplied);
+    }
     const requested = Math.max(0, Number(damageResult?.applied) || 0);
     const absorbed = Math.max(0, Number(damageResult?.absorbedByShield) || 0);
     return Math.max(0, requested - absorbed);

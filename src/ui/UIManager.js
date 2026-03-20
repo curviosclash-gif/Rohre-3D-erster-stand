@@ -224,6 +224,7 @@ export class UIManager {
 
     syncSessionState(settings = this.game.settings) {
         const ui = this.ui;
+        const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
         const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
         const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
         if (Array.isArray(ui.sessionButtons)) {
@@ -240,6 +241,9 @@ export class UIManager {
                 const isActive = buttonModePath === modePath;
                 button.classList.toggle('active', isActive);
                 button.setAttribute('aria-pressed', String(isActive));
+                const isFightPath = buttonModePath === 'fight';
+                button.disabled = isFightPath && !huntFeatureEnabled;
+                button.title = button.disabled ? 'Fight ist per Feature-Flag deaktiviert' : '';
             });
         }
         const themeMode = String(settings?.localSettings?.themeMode || 'dunkel').toLowerCase() === 'hell'

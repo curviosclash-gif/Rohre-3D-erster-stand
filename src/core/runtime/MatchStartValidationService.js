@@ -8,6 +8,7 @@ export function resolveMatchStartValidationIssue({
     multiplayerSessionState = null,
     maps = {},
     huntModeType = 'HUNT',
+    classicModeType = 'CLASSIC',
 } = {}) {
     const sessionType = String(settings?.localSettings?.sessionType || 'single').toLowerCase();
     const mapKey = String(settings?.mapKey || '').trim();
@@ -82,6 +83,13 @@ export function resolveMatchStartValidationIssue({
             message: 'Start nicht moeglich: Fight muss intern auf HUNT laufen.',
             fieldKey: 'match',
             fieldMessage: 'Fight-Konflikt: Modus auf HUNT synchronisieren.',
+        };
+    }
+    if ((modePath === 'normal' || modePath === 'arcade') && gameMode !== classicModeType) {
+        return {
+            message: 'Start nicht moeglich: Normal/Arcade muessen intern auf CLASSIC laufen.',
+            fieldKey: 'match',
+            fieldMessage: 'Modus-Konflikt: Normal/Arcade auf CLASSIC synchronisieren.',
         };
     }
 

@@ -70,9 +70,14 @@ function applyModePathGameModeSyncRule(settings, result) {
     if (!modePath) return;
 
     const shouldUseHunt = modePath === 'fight';
-    if (shouldUseHunt && settings.gameMode !== GAME_MODE_TYPES.HUNT) {
+    const shouldUseClassic = modePath === 'normal' || modePath === 'arcade';
+    const expectedGameMode = shouldUseHunt
+        ? GAME_MODE_TYPES.HUNT
+        : (shouldUseClassic ? GAME_MODE_TYPES.CLASSIC : null);
+
+    if (expectedGameMode && settings.gameMode !== expectedGameMode) {
         const previousGameMode = settings.gameMode;
-        settings.gameMode = GAME_MODE_TYPES.HUNT;
+        settings.gameMode = expectedGameMode;
         addChangedKey(result, SETTINGS_CHANGE_KEYS.GAME_MODE);
         trackFix(
             result,
@@ -87,9 +92,10 @@ function applyModePathGameModeSyncRule(settings, result) {
     if (!settings.hunt || typeof settings.hunt !== 'object') {
         settings.hunt = { respawnEnabled: false };
     }
-    if (shouldUseHunt && settings.hunt.respawnEnabled !== true) {
+    const expectedRespawnEnabled = shouldUseHunt;
+    if ((shouldUseHunt || shouldUseClassic) && settings.hunt.respawnEnabled !== expectedRespawnEnabled) {
         const previousRespawnEnabled = settings.hunt.respawnEnabled;
-        settings.hunt.respawnEnabled = true;
+        settings.hunt.respawnEnabled = expectedRespawnEnabled;
         addChangedKey(result, SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED);
         trackFix(
             result,
