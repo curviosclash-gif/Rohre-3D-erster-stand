@@ -7,6 +7,7 @@ const DEFAULT_SPIKE_LOG_COOLDOWN_MS = 1500;
 const SUBSYSTEM_IDS = Object.freeze([
     'update',
     'collision',
+    'hunt_targeting',
     'bot_sensing',
     'camera',
     'render',

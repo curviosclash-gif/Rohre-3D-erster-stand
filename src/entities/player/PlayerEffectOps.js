@@ -37,7 +37,11 @@ export function updatePlayerEffects(player, dt) {
 
         if (effect.remaining <= 0) {
             removePlayerEffect(player, effect);
-            player.activeEffects.splice(i, 1);
+            const last = player.activeEffects.length - 1;
+            if (i !== last) {
+                player.activeEffects[i] = player.activeEffects[last];
+            }
+            player.activeEffects.length = last;
         }
     }
 
@@ -61,13 +65,16 @@ export function applyPlayerPowerup(player, type) {
     const config = CONFIG.POWERUP.TYPES[type];
     if (!config) return;
 
-    player.activeEffects = player.activeEffects.filter((effect) => {
-        if (effect.type === type) {
-            removePlayerEffect(player, effect);
-            return false;
+    for (let i = player.activeEffects.length - 1; i >= 0; i--) {
+        if (player.activeEffects[i].type === type) {
+            removePlayerEffect(player, player.activeEffects[i]);
+            const last = player.activeEffects.length - 1;
+            if (i !== last) {
+                player.activeEffects[i] = player.activeEffects[last];
+            }
+            player.activeEffects.length = last;
         }
-        return true;
-    });
+    }
 
     const nextEffect = { type, remaining: config.duration };
     player.activeEffects.push(nextEffect);

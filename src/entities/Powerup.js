@@ -121,10 +121,12 @@ export class PowerupManager {
             return;
         }
 
-        let type = resolveAuthoredPickupType(authoredAnchor?.anchor, huntModeActive)
-            || spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
+        let type = resolveAuthoredPickupType(authoredAnchor?.anchor, huntModeActive) || null;
         if (strategy && huntModeActive) {
             type = strategy.resolveSpawnType(spawnableTypes, config) || type;
+        }
+        if (!type) {
+            type = spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
         }
         if (authoredAnchor?.anchor) {
             const fixedType = resolveAuthoredPickupType(authoredAnchor.anchor, huntModeActive);

@@ -3,6 +3,7 @@ import { CONFIG } from '../../../core/Config.js';
 import { getActiveRuntimeConfig } from '../../../core/runtime/ActiveRuntimeConfigStore.js';
 import {
     createHuntTargetingScratch,
+    createHuntTargetingTelemetry,
     createPlayerTargetDescriptor,
     resolveHuntLineTarget,
     resolveHuntTargetPosition,
@@ -16,6 +17,7 @@ export class ProjectileSimulationOps {
         this._tmpDir = new THREE.Vector3();
         this._tmpTargetPosition = new THREE.Vector3();
         this._targetingScratch = createHuntTargetingScratch();
+        this._targetingTelemetry = createHuntTargetingTelemetry();
         this._stepResult = {
             projectileExpired: false,
             projectileHitArena: false,
@@ -57,6 +59,9 @@ export class ProjectileSimulationOps {
                 trailHitRadius,
                 trailSelfSkipRecent: Number(config?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
                 allowSelfTrailFallback: true,
+                optimizedTrailScan: false,
+                runtimeProfiler: this.system?.runtimeProfiler || null,
+                targetingTelemetry: this._targetingTelemetry,
                 scratch: this._targetingScratch,
             });
             if (sharedTarget) {

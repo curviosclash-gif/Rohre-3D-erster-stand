@@ -36,6 +36,12 @@
 - `src/hunt/HuntHUD.js`
 - `src/ui/MatchFlowUiController.js`
 - `src/hunt/HuntTargetingOps.js`
+- `src/hunt/HuntTargetingPerf.js`
+- `src/core/perf/RuntimePerfProfiler.js`
+- `src/entities/systems/HuntCombatSystem.js`
+- `src/entities/systems/projectile/ProjectileSimulationOps.js`
+- `src/entities/systems/ProjectileSystem.js`
+- `src/hunt/OverheatGunSystem.js`
 - `tests/core.spec.js`
 - `tests/physics-hunt.spec.js`
 - `tests/stress.spec.js`
@@ -74,17 +80,26 @@
     - `npm run test:core`
     - `npm run test:stress`
 
-- [ ] 48.4 Hunt-Targeting-Hotpath
-  - [ ] 48.4.1 Baseline fuer MG-/Trail-Scan-Kosten erfassen und Profiling-Grenzen dokumentieren
-  - [ ] 48.4.2 Optimierte Scan-Strategie (adaptive Step oder Gitter-Traversal) unter Guard implementieren
+- [x] 48.4 Hunt-Targeting-Hotpath
+  - [x] 48.4.1 Baseline fuer MG-/Trail-Scan-Kosten erfassen und Profiling-Grenzen dokumentieren
+  - [x] 48.4.2 Optimierte Scan-Strategie (adaptive Step oder Gitter-Traversal) unter Guard implementieren
   - Verifikation:
     - `npm run test:physics:hunt -- --grep T61`
     - `npm run test:physics:hunt -- --grep T64`
     - `npm run test:physics:hunt -- --grep T89c`
+  - Baseline (2026-03-19, 240 Aufrufe gleicher MG-Linie, ohne Trail-Hit):
+    - Legacy (`optimizedTrailScan=false`): `50880` Probe-Queries gesamt, `212` pro Call
+    - Optimiert (`optimizedTrailScan=true`): `25440` Probe-Queries gesamt, `106` pro Call
+    - Ergebnis: ~`50%` weniger Trail-Probes im No-Hit-Korridor bei identischer Trefferselektion fuer die verifizierten MG-Szenarien
+  - Profiling-Grenzen:
+    - `RuntimePerfProfiler` Subsystem `hunt_targeting` ist aktiv; Ziel fuer Fight-Last: kein dominantes Top-3-Subsystem in Spike-Frames
+    - Guard-Rollback ueber `HUNT.TARGETING.OPTIMIZED_SCAN_ENABLED`
+    - Adaptive Parameter nur ueber `HUNT.TARGETING.OPTIMIZED_SCAN_STEP_MULTIPLIER` und `HUNT.TARGETING.OPTIMIZED_SCAN_MAX_STEP` aendern
 
-- [ ] 48.99 Abschluss-Gate
+- [/] 48.99 Abschluss-Gate
   - [ ] 48.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:stress`, `npm run build` erfolgreich
-  - [ ] 48.99.2 `npm run docs:sync` und `npm run docs:check` erfolgreich, Lock/Ownership/Conflict-Log geprueft
+    - Stand 2026-03-19: `npm run build` PASS; `test:core` FAIL bei `T14b`; `test:physics:hunt` FAIL bei `T89b` und `T89d`; `test:stress` FAIL bei `T71b` (bestehende, V48-fremde Playwright-Fehler)
+  - [x] 48.99.2 `npm run docs:sync` und `npm run docs:check` erfolgreich, Lock/Ownership/Conflict-Log geprueft
 
 ## Dokumentationswirkung
 

@@ -29,6 +29,9 @@ export const HUNT_CONFIG = Object.freeze({
     TARGETING: Object.freeze({
         MUZZLE_OFFSET: 2.1,
         TRAIL_DESCRIPTOR_MAX_DRIFT: 1.25,
+        OPTIMIZED_SCAN_ENABLED: true,
+        OPTIMIZED_SCAN_STEP_MULTIPLIER: 2.0,
+        OPTIMIZED_SCAN_MAX_STEP: 1.1,
     }),
     ROCKET: Object.freeze({
         VISUAL_SCALE_WEAK: 1.7,
@@ -92,10 +95,10 @@ export const HUNT_CONFIG = Object.freeze({
         }),
     }),
     ROCKET_TIERS: Object.freeze({
-        WEAK: Object.freeze({ damage: 10, spawnChance: 0.45, trailBlastMeters: 2 }),
-        MEDIUM: Object.freeze({ damage: 20, spawnChance: 0.30, trailBlastMeters: 4 }),
+        WEAK: Object.freeze({ damage: 10, spawnChance: 0.5, trailBlastMeters: 2 }),
+        MEDIUM: Object.freeze({ damage: 20, spawnChance: 0.28, trailBlastMeters: 4 }),
         HEAVY: Object.freeze({ damage: 40, spawnChance: 0.18, trailBlastMeters: 10 }),
-        MEGA: Object.freeze({ damage: 70, spawnChance: 0.07, trailBlastMeters: 30 }),
+        MEGA: Object.freeze({ damage: 70, spawnChance: 0.03, trailBlastMeters: 30 }),
     }),
     ROCKET_PICKUP_SPAWN_CHANCE: 0.28,
     PICKUP_WEIGHTS: Object.freeze({

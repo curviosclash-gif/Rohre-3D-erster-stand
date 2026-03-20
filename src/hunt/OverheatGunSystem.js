@@ -17,6 +17,7 @@ function createLegacyRuntimeContext(entityManager) {
             particles: entityManager.particles || null,
             audio: entityManager.audio || null,
             recorder: entityManager.recorder || null,
+            runtimeProfiler: entityManager.runtimeProfiler || null,
         },
         trails: {
             spatialIndex: entityManager._trailSpatialIndex || null,

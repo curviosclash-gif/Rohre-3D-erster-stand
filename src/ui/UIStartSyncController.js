@@ -125,21 +125,18 @@ export class UIStartSyncController {
             listen(this.ui.mapSelect, 'change', () => {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
                 pushRecentEntry(currentStartSetup.recentMaps, this.ui.mapSelect.value);
-                this.syncStartSetupState(this.game.settings);
             });
         }
         if (this.ui.vehicleSelectP1) {
             listen(this.ui.vehicleSelectP1, 'change', () => {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP1.value);
-                this.syncStartSetupState(this.game.settings);
             });
         }
         if (this.ui.vehicleSelectP2) {
             listen(this.ui.vehicleSelectP2, 'change', () => {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP2.value);
-                this.syncStartSetupState(this.game.settings);
             });
         }
 

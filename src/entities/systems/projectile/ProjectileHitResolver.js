@@ -40,20 +40,6 @@ export class ProjectileHitResolver {
                 this.system?.onTrailSegmentHit?.(projectile.position, projectile.owner, projectile, trailHit);
             }
 
-            // Apply overflow damage to the trail owner
-            if (trailHit.overflowDamage > 0 && trailHit.entry) {
-                const trailOwnerIndex = trailHit.entry.playerIndex;
-                const trailOwner = (players || []).find(
-                    p => p && p.alive && Number(p.index) === trailOwnerIndex
-                );
-                if (trailOwner && trailOwner !== projectile.owner) {
-                    const damageResult = trailOwner.takeDamage(trailHit.overflowDamage);
-                    this.system?.onProjectileDamage?.(
-                        trailOwner, projectile.owner, projectile.type, damageResult, projectile
-                    );
-                }
-            }
-
             return true;
         }
 

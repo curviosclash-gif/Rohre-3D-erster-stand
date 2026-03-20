@@ -573,11 +573,11 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 - `src/entities/systems/HuntCombatSystem.js` — Swap-and-Pop statt splice
 - `src/entities/systems/trails/TrailSegmentRegistry.js` — Key-Array-Pool statt keys.slice()
 
-- [ ] N4.1 `MGTracerFx.js`: splice() durch index-basierte Compaction ersetzen
-- [ ] N4.2 `PlayerEffectOps.js`, `PlayerInventoryOps.js`: Swap-and-Pop Pattern
-- [ ] N4.3 `HuntCombatSystem.js`: Swap-and-Pop fuer aktive Combats
-- [ ] N4.4 `TrailSegmentRegistry.js`: vorallokierten Key-Array-Pool einfuehren
-- [ ] N4.5 Verifikation: `test:physics:hunt`, `test:physics:core`, `docs:sync` PASS
+- [x] N4.1 `MGTracerFx.js`: splice() durch index-basierte Compaction ersetzen (abgeschlossen: 2026-03-20)
+- [x] N4.2 `PlayerEffectOps.js`, `PlayerInventoryOps.js`: Swap-and-Pop Pattern (abgeschlossen: 2026-03-20)
+- [x] N4.3 `HuntCombatSystem.js`: Swap-and-Pop fuer aktive Combats (abgeschlossen: 2026-03-20)
+- [x] N4.4 `TrailSegmentRegistry.js`: vorallokierten Key-Array-Pool einfuehren (abgeschlossen: 2026-03-20)
+- [x] N4.5 Verifikation: `test:physics:hunt`, `test:physics:core`, `docs:sync` PASS (abgeschlossen: 2026-03-20; T89b/T89d vorbestehende Failures)
 
 ---
 

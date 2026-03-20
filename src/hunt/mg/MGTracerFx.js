@@ -114,12 +114,10 @@ export class MGTracerFx {
     update(dt) {
         if (!Array.isArray(this.tracers) || this.tracers.length === 0) return;
         const renderer = this.entityManager?.renderer;
-        for (let i = this.tracers.length - 1; i >= 0; i--) {
+        let writeIdx = 0;
+        for (let i = 0; i < this.tracers.length; i++) {
             const tracer = this.tracers[i];
-            if (!tracer?.mesh) {
-                this.tracers.splice(i, 1);
-                continue;
-            }
+            if (!tracer?.mesh) continue;
             tracer.ttl -= Math.max(0, dt);
             const fade = clamp(tracer.ttl / Math.max(0.001, tracer.maxTtl), 0, 1);
             if (Array.isArray(tracer.materials)) {
@@ -128,16 +126,19 @@ export class MGTracerFx {
             } else if (tracer.mesh.material) {
                 tracer.mesh.material.opacity = fade * 0.92;
             }
-            if (tracer.ttl > 0) continue;
+            if (tracer.ttl > 0) {
+                this.tracers[writeIdx++] = tracer;
+                continue;
+            }
 
             if (renderer?.removeFromScene) {
                 renderer.removeFromScene(tracer.mesh);
             } else if (tracer.mesh.parent) {
                 tracer.mesh.parent.remove(tracer.mesh);
             }
-            this.tracers.splice(i, 1);
             this._releaseTracerEntry(tracer);
         }
+        this.tracers.length = writeIdx;
     }
 
     clear() {

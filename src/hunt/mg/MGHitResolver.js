@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { CONFIG } from '../../core/Config.js';
 import {
     createHuntTargetingScratch,
+    createHuntTargetingTelemetry,
     isPlayerTargetDescriptor,
     isTrailTargetDescriptor,
     resolveHuntLineTarget,
@@ -17,6 +18,7 @@ export class MGHitResolver {
         this._tmpHit = new THREE.Vector3();
         this._tmpMuzzle = new THREE.Vector3();
         this._targetingScratch = createHuntTargetingScratch();
+        this._targetingTelemetry = createHuntTargetingTelemetry();
     }
 
     resolveHit(player, mg, outMuzzle = null, outAim = null) {
@@ -39,6 +41,8 @@ export class MGHitResolver {
             trailHitRadius: Number(mg.TRAIL_HIT_RADIUS),
             trailSelfSkipRecent: Number(mg.TRAIL_SELF_SKIP_RECENT),
             allowSelfTrailFallback: true,
+            runtimeProfiler: this.runtime?.services?.runtimeProfiler || this.runtime?.runtimeProfiler || null,
+            targetingTelemetry: this._targetingTelemetry,
             scratch: this._targetingScratch,
         });
 

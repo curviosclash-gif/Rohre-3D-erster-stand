@@ -13,6 +13,7 @@ import { CONFIG } from '../../core/Config.js';
 import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import {
     createHuntTargetingScratch,
+    createHuntTargetingTelemetry,
     resolveHuntLineTarget,
 } from '../../hunt/HuntTargetingOps.js';
 
@@ -24,6 +25,7 @@ export class HuntCombatSystem {
         this._fallbackMuzzle = new THREE.Vector3();
         this._fallbackLockOnCache = new Map();
         this._targetingScratch = createHuntTargetingScratch();
+        this._targetingTelemetry = createHuntTargetingTelemetry();
     }
 
     takeInventoryItem(player, preferredIndex = -1) {
@@ -33,7 +35,12 @@ export class HuntCombatSystem {
         const index = Number.isInteger(preferredIndex) && preferredIndex >= 0
             ? Math.min(preferredIndex, player.inventory.length - 1)
             : Math.min(player.selectedItemIndex || 0, player.inventory.length - 1);
-        const type = player.inventory.splice(index, 1)[0];
+        const type = player.inventory[index];
+        const lastIdx = player.inventory.length - 1;
+        if (index !== lastIdx) {
+            player.inventory[index] = player.inventory[lastIdx];
+        }
+        player.inventory.length = lastIdx;
         if (player.inventory.length === 0 || player.selectedItemIndex >= player.inventory.length) {
             player.selectedItemIndex = 0;
         }
@@ -120,6 +127,9 @@ export class HuntCombatSystem {
             trailHitRadius: Number(config?.HUNT?.MG?.TRAIL_HIT_RADIUS),
             trailSelfSkipRecent: Number(config?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
             allowSelfTrailFallback: false,
+            optimizedTrailScan: false,
+            runtimeProfiler: runtime?.services?.runtimeProfiler || runtime?.runtimeProfiler || null,
+            targetingTelemetry: this._targetingTelemetry,
             scratch: this._targetingScratch,
         });
 

@@ -15,6 +15,8 @@ export class TrailSegmentRegistry {
         this.spatialGrid = options.spatialGrid instanceof Map ? options.spatialGrid : new Map();
         this._entryLookup = new Map();
         this._keysBuffer = [];
+        this._keyArrayPool = [];
+        this._maxKeyArrayPoolSize = 64;
     }
 
     _getEntryLookupKey(playerIndex, segmentIdx) {
@@ -94,7 +96,12 @@ export class TrailSegmentRegistry {
                 }
                 keyRef = reusableKeys;
             } else {
-                keyRef = keys.slice();
+                const pooled = this._keyArrayPool.length > 0 ? this._keyArrayPool.pop() : [];
+                pooled.length = 0;
+                for (let i = 0; i < keys.length; i++) {
+                    pooled.push(keys[i]);
+                }
+                keyRef = pooled;
             }
         }
 
@@ -119,6 +126,10 @@ export class TrailSegmentRegistry {
                     this._entryLookup.delete(entry._descriptorKey);
                 }
                 entry._gridKeyRef = null;
+                if (this._keyArrayPool.length < this._maxKeyArrayPoolSize) {
+                    key.length = 0;
+                    this._keyArrayPool.push(key);
+                }
             }
             return;
         }

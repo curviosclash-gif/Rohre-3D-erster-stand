@@ -1,5 +1,11 @@
-import * as THREE from 'three';
+﻿import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
+import {
+    createHuntTargetingTelemetryState,
+    finalizeHuntTargetingResult,
+    resetHuntTargetingCallMetrics,
+    resolveHuntTargetingHotpathSettings,
+} from './HuntTargetingPerf.js';
 
 export const HUNT_TARGET_KIND = Object.freeze({
     PLAYER: 'player',
@@ -43,6 +49,10 @@ function getTrailDescriptorMaxDrift() {
     return toPositiveNumber(CONFIG?.HUNT?.TARGETING?.TRAIL_DESCRIPTOR_MAX_DRIFT, 1.25);
 }
 
+export function createHuntTargetingTelemetry(reusable = null) {
+    return createHuntTargetingTelemetryState(reusable);
+}
+
 export function createHuntTargetingScratch(reusable = null) {
     const scratch = reusable || {};
     scratch.direction = scratch.direction instanceof THREE.Vector3 ? scratch.direction : new THREE.Vector3();
@@ -51,6 +61,15 @@ export function createHuntTargetingScratch(reusable = null) {
     scratch.trailProbe = scratch.trailProbe instanceof THREE.Vector3 ? scratch.trailProbe : new THREE.Vector3();
     scratch.segmentStart = scratch.segmentStart instanceof THREE.Vector3 ? scratch.segmentStart : new THREE.Vector3();
     scratch.segmentEnd = scratch.segmentEnd instanceof THREE.Vector3 ? scratch.segmentEnd : new THREE.Vector3();
+    scratch.metrics = scratch.metrics && typeof scratch.metrics === 'object'
+        ? scratch.metrics
+        : {
+            probeQueries: 0,
+            adaptiveProbeQueries: 0,
+            legacyProbeQueries: 0,
+            refinementScans: 0,
+            usedAdaptive: false,
+        };
     return scratch;
 }
 
@@ -188,21 +207,31 @@ function scanTrailLine({
     probeRadius,
     maxRange,
     sampleStep,
+    startDistance = 0,
     skipRecent,
     allowSelfFallback = false,
+    metrics = null,
     scratch = null,
 }) {
     if (!trailSpatialIndex?.checkProjectileTrailCollision) return null;
     const reusable = createHuntTargetingScratch(scratch);
     const ownerIndex = Number.isInteger(sourcePlayer?.index) ? sourcePlayer.index : -1;
+    const callMetrics = metrics && typeof metrics === 'object' ? metrics : null;
+    const step = Math.max(0.01, Number(sampleStep) || 0.45);
+    const start = Math.max(0, Number(startDistance) || 0);
+    const end = Math.max(start, Number(maxRange) || 0);
     let fallbackSelfHit = null;
 
-    for (let distance = 0; distance <= maxRange; distance += sampleStep) {
+    for (let distance = start; distance <= end; distance += step) {
         reusable.trailProbe.copy(origin).addScaledVector(direction, distance);
         const hit = trailSpatialIndex.checkProjectileTrailCollision(reusable.trailProbe, probeRadius, {
             excludePlayerIndex: ownerIndex,
             skipRecent,
         });
+        if (callMetrics) {
+            callMetrics.probeQueries += 1;
+            callMetrics.legacyProbeQueries += 1;
+        }
         if (!hit?.entry) continue;
 
         if (hit.closestPoint) {
@@ -234,6 +263,96 @@ function scanTrailLine({
     return fallbackSelfHit;
 }
 
+function scanTrailLineAdaptive({
+    trailSpatialIndex,
+    sourcePlayer,
+    origin,
+    direction,
+    probeRadius,
+    maxRange,
+    sampleStep,
+    skipRecent,
+    metrics = null,
+    scratch = null,
+    optimizedScanStepMultiplier = 2.0,
+    optimizedScanMaxStep = 1.1,
+}) {
+    if (!trailSpatialIndex?.checkProjectileTrailCollision) return null;
+
+    const reusable = createHuntTargetingScratch(scratch);
+    const ownerIndex = Number.isInteger(sourcePlayer?.index) ? sourcePlayer.index : -1;
+    const step = Math.max(0.01, Number(sampleStep) || 0.45);
+    const end = Math.max(0, Number(maxRange) || 0);
+    const coarseStep = Math.max(
+        step,
+        Math.min(
+            Math.max(step * toPositiveNumber(optimizedScanStepMultiplier, 2.0), step),
+            toPositiveNumber(optimizedScanMaxStep, 1.1)
+        )
+    );
+
+    if (coarseStep <= step + 0.000001) {
+        return scanTrailLine({
+            trailSpatialIndex,
+            sourcePlayer,
+            origin,
+            direction,
+            probeRadius,
+            maxRange: end,
+            sampleStep: step,
+            startDistance: 0,
+            skipRecent,
+            allowSelfFallback: false,
+            metrics,
+            scratch: reusable,
+        });
+    }
+
+    const callMetrics = metrics && typeof metrics === 'object' ? metrics : null;
+    if (callMetrics) {
+        callMetrics.usedAdaptive = true;
+    }
+    const expandedRadius = probeRadius + Math.max(0, (coarseStep - step) * 0.5);
+
+    for (let distance = 0; distance <= end; distance += coarseStep) {
+        reusable.trailProbe.copy(origin).addScaledVector(direction, distance);
+        const hit = trailSpatialIndex.checkProjectileTrailCollision(reusable.trailProbe, expandedRadius, {
+            excludePlayerIndex: ownerIndex,
+            skipRecent,
+        });
+        if (callMetrics) {
+            callMetrics.probeQueries += 1;
+            callMetrics.adaptiveProbeQueries += 1;
+        }
+        if (!hit?.entry) continue;
+
+        const refineStart = Math.max(0, (Math.floor((distance - coarseStep) / step)) * step);
+        const refineEnd = Math.min(end, distance + coarseStep);
+        if (callMetrics) {
+            callMetrics.refinementScans += 1;
+        }
+        const refinedHit = scanTrailLine({
+            trailSpatialIndex,
+            sourcePlayer,
+            origin,
+            direction,
+            probeRadius,
+            maxRange: refineEnd,
+            sampleStep: step,
+            startDistance: refineStart,
+            skipRecent,
+            allowSelfFallback: false,
+            metrics: callMetrics,
+            scratch: reusable,
+        });
+        if (refinedHit) {
+            return refinedHit;
+        }
+    }
+
+    return null;
+}
+
 export function resolveHuntLineTarget({
     sourcePlayer = null,
     players = [],
@@ -246,13 +365,39 @@ export function resolveHuntLineTarget({
     trailHitRadius = 0.78,
     trailSelfSkipRecent = 0,
     allowSelfTrailFallback = false,
+    optimizedTrailScan = undefined,
+    optimizedTrailScanStepMultiplier = undefined,
+    optimizedTrailScanMaxStep = undefined,
+    runtimeProfiler = null,
+    targetingTelemetry = null,
     scratch = null,
 } = {}) {
     if (!origin || !direction) return null;
 
     const reusable = createHuntTargetingScratch(scratch);
+    const metrics = resetHuntTargetingCallMetrics(reusable.metrics);
+    const telemetry = targetingTelemetry ? createHuntTargetingTelemetryState(targetingTelemetry) : null;
+    const profiler = runtimeProfiler || null;
+    const profilerSampleStart = profiler?.startSample?.();
+    const callStartedAtMs = telemetry
+        ? (typeof performance !== 'undefined' && typeof performance.now === 'function' ? performance.now() : Date.now())
+        : Number.NaN;
+    const hotpathSettings = resolveHuntTargetingHotpathSettings({
+        optimizedTrailScan,
+        optimizedTrailScanStepMultiplier,
+        optimizedTrailScanMaxStep,
+    });
     reusable.direction.copy(direction);
-    if (reusable.direction.lengthSq() <= 0.000001) return null;
+    if (reusable.direction.lengthSq() <= 0.000001) {
+        return finalizeHuntTargetingResult({
+            result: null,
+            runtimeProfiler: profiler,
+            profilerSampleStart,
+            callStartedAtMs,
+            telemetry,
+            metrics,
+        });
+    }
     reusable.direction.normalize();
 
     const maxPlayerRange = Math.max(0, Number(playerRange) || 0);
@@ -297,34 +442,61 @@ export function resolveHuntLineTarget({
             Math.floor(Number(sourcePlayer?.trail?.maxSegments) || 0)
         );
         const maxScanRange = Math.min(maxTrailRange, bestPlayerDistance);
-        const trailDescriptor = scanTrailLine({
-            trailSpatialIndex,
-            sourcePlayer,
-            origin,
-            direction: reusable.direction,
-            probeRadius: Math.max(0.12, Number(trailHitRadius) || 0.78),
-            maxRange: maxScanRange,
-            sampleStep: Math.max(0.2, Number(trailSampleStep) || 0.45),
-            skipRecent: skipSelfCompletely,
-            allowSelfFallback: false,
-            scratch: reusable,
-        });
+        const sampleStep = Math.max(0.2, Number(trailSampleStep) || 0.45);
+        const probeRadius = Math.max(0.12, Number(trailHitRadius) || 0.78);
+        const trailDescriptor = hotpathSettings.optimizedScanEnabled
+            ? scanTrailLineAdaptive({
+                trailSpatialIndex,
+                sourcePlayer,
+                origin,
+                direction: reusable.direction,
+                probeRadius,
+                maxRange: maxScanRange,
+                sampleStep,
+                skipRecent: skipSelfCompletely,
+                metrics,
+                scratch: reusable,
+                optimizedScanStepMultiplier: hotpathSettings.optimizedScanStepMultiplier,
+                optimizedScanMaxStep: hotpathSettings.optimizedScanMaxStep,
+            })
+            : scanTrailLine({
+                trailSpatialIndex,
+                sourcePlayer,
+                origin,
+                direction: reusable.direction,
+                probeRadius,
+                maxRange: maxScanRange,
+                sampleStep,
+                startDistance: 0,
+                skipRecent: skipSelfCompletely,
+                allowSelfFallback: false,
+                metrics,
+                scratch: reusable,
+            });
         if (trailDescriptor) {
-            return trailDescriptor;
+            return finalizeHuntTargetingResult({
+                result: trailDescriptor,
+                runtimeProfiler: profiler,
+                profilerSampleStart,
+                callStartedAtMs,
+                telemetry,
+                metrics,
+            });
         }
 
         if (allowSelfTrailFallback) {
-            const sampleStep = Math.max(0.2, Number(trailSampleStep) || 0.45);
             const selfFallback = scanTrailLine({
                 trailSpatialIndex,
                 sourcePlayer,
                 origin,
                 direction: reusable.direction,
-                probeRadius: Math.max(0.12, Number(trailHitRadius) || 0.78),
+                probeRadius,
                 maxRange: maxTrailRange,
                 sampleStep,
+                startDistance: 0,
                 skipRecent: selfSkipRecent,
                 allowSelfFallback: true,
+                metrics,
                 scratch: reusable,
             });
             if (selfFallback) {
@@ -335,21 +507,45 @@ export function resolveHuntLineTarget({
                         sourcePlayer,
                         origin,
                         direction: reusable.direction,
-                        probeRadius: Math.max(0.12, Number(trailHitRadius) || 0.78),
+                        probeRadius,
                         maxRange: maxScanRange,
                         sampleStep: denseStep,
+                        startDistance: 0,
                         skipRecent: skipSelfCompletely,
                         allowSelfFallback: false,
+                        metrics,
                         scratch: reusable,
                     });
                     if (denseEnemyHit) {
-                        return denseEnemyHit;
+                        return finalizeHuntTargetingResult({
+                            result: denseEnemyHit,
+                            runtimeProfiler: profiler,
+                            profilerSampleStart,
+                            callStartedAtMs,
+                            telemetry,
+                            metrics,
+                        });
                     }
                 }
-                return selfFallback;
+                return finalizeHuntTargetingResult({
+                    result: selfFallback,
+                    runtimeProfiler: profiler,
+                    profilerSampleStart,
+                    callStartedAtMs,
+                    telemetry,
+                    metrics,
+                });
             }
         }
     }
 
-    return bestPlayer;
+    return finalizeHuntTargetingResult({
+        result: bestPlayer,
+        runtimeProfiler: profiler,
+        profilerSampleStart,
+        callStartedAtMs,
+        telemetry,
+        metrics,
+    });
 }
+

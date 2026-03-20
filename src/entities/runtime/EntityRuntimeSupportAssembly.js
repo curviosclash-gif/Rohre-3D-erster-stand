@@ -81,6 +81,7 @@ export function createEntityRuntimeSupport(owner) {
                 eventBus?.emitHuntFeed(`${attackerLabel} -> ${targetLabel}: -${Math.round(damageResult?.applied || 0)} HP`);
             }
         },
+        runtimeProfiler: owner.runtimeProfiler || null,
     });
 
     const huntScoring = new HuntScoring();
@@ -146,6 +147,7 @@ export function createEntityRuntimeSupport(owner) {
             particles: owner.particles,
             audio: owner.audio,
             recorder: owner.recorder,
+            runtimeProfiler: owner.runtimeProfiler || null,
         },
         callbacks: {
             getStrategy: () => owner.gameModeStrategy || null,

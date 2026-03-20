@@ -42,6 +42,7 @@ export class ProjectileSystem {
         this.onProjectilePowerup = typeof options.onProjectilePowerup === 'function' ? options.onProjectilePowerup : (() => { });
         this.onProjectileDamage = typeof options.onProjectileDamage === 'function' ? options.onProjectileDamage : (() => { });
         this.onTrailSegmentHit = typeof options.onTrailSegmentHit === 'function' ? options.onTrailSegmentHit : (() => { });
+        this.runtimeProfiler = options.runtimeProfiler || null;
 
         this.projectiles = [];
         this._projectileAssets = new Map();

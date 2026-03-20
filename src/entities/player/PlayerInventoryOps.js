@@ -21,7 +21,12 @@ export function cyclePlayerInventoryItem(player) {
 export function usePlayerInventoryItem(player) {
     if (!player) return null;
     if (player.inventory.length > 0 && player.selectedItemIndex < player.inventory.length) {
-        const type = player.inventory.splice(player.selectedItemIndex, 1)[0];
+        const type = player.inventory[player.selectedItemIndex];
+        const lastIdx = player.inventory.length - 1;
+        if (player.selectedItemIndex !== lastIdx) {
+            player.inventory[player.selectedItemIndex] = player.inventory[lastIdx];
+        }
+        player.inventory.length = lastIdx;
         if (player.selectedItemIndex >= player.inventory.length && player.inventory.length > 0) {
             player.selectedItemIndex = 0;
         }
