@@ -5,10 +5,12 @@
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { ClassicModeStrategy } from './ClassicModeStrategy.js';
 import { HuntModeStrategy } from './HuntModeStrategy.js';
+import { ArcadeModeStrategy } from './ArcadeModeStrategy.js';
 
 const FACTORIES = {
     [GAME_MODE_TYPES.CLASSIC]: () => new ClassicModeStrategy(),
     [GAME_MODE_TYPES.HUNT]: () => new HuntModeStrategy(),
+    [GAME_MODE_TYPES.ARCADE]: () => new ArcadeModeStrategy(),
 };
 
 export function createGameModeStrategy(modeType) {

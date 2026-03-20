@@ -508,8 +508,240 @@ Plan-Datei: `docs/Feature_Strategy_Pattern_V47.md`
 
 - [/] 47.99 Abschluss-Gate
   - [/] 47.99.1 Alle bestehenden Tests gruen
-  - [ ] 47.99.2 Leere `ArcadeModeStrategy` registrieren — Spiel startet fehlerfrei
+  - [x] 47.99.2 Leere `ArcadeModeStrategy` registrieren — Spiel startet fehlerfrei (abgeschlossen: 2026-03-20)
   - [ ] 47.99.3 Classic + Hunt Playtest: Kollision, Shield, Tod, MG, Rocket, Respawn
+
+---
+
+## Block V48: Fight-Modus Qualitaet und Hunt-Targeting-Hotpath
+
+Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
+
+<!-- LOCK: frei -->
+
+- [x] 48.1 Modus-Konsistenz und Startvalidierung
+  - [x] 48.1.1 `modePath`/`gameMode` bidirektional synchronisieren
+  - [x] 48.1.2 Startvalidierung + Feature-Flag-UI-Guard angleichen
+
+- [x] 48.2 Schaden-/Feed-Semantik praezisieren
+  - [x] 48.2.1 `hpApplied`/Shield-Absorption sauber trennen
+  - [x] 48.2.2 Feed/Scoring auf HP-Schaden ausrichten, Shield separat ausweisen
+
+- [x] 48.3 HUD und Splitscreen-Feedback
+  - [x] 48.3.1 Damage-Indicator pro Human-Player im Hunt-HUD
+  - [x] 48.3.2 Sichtbarkeit/Update fuer Single und Splitscreen verifiziert
+
+- [x] 48.4 Hunt-Targeting-Hotpath
+  - [x] 48.4.1 Baseline + Profiling-Grenzen dokumentiert (`hunt_targeting`-Profiler + Probe-Query-Telemetrie)
+  - [x] 48.4.2 Adaptive Scan-Strategie unter Guard in Targeting-Ops implementiert
+  - Verifikation: `T61`, `T64`, `T89c` PASS
+
+- [/] 48.99 Abschluss-Gate
+  - [ ] 48.99.1 `test:core`, `test:physics:hunt`, `test:stress`, `build` komplett gruen
+    - Stand 2026-03-19: `build` PASS; `test:core` FAIL (`T14b`), `test:physics:hunt` FAIL (`T89b`, `T89d`), `test:stress` FAIL (`T71b`)
+  - [x] 48.99.2 `docs:sync` + `docs:check` PASS, Lock/Ownership/Conflict-Log geprueft
+
+---
+
+## Block N4-N7: Performance-Optimierung und Telemetrie (Neu-Implementierung)
+
+<!-- LOCK: frei -->
+
+> **Hintergrund:** Diese Features waren auf dem veralteten Branch `claude/optimistic-allen` implementiert,
+> konnten aber nicht gemergt werden, da der Branch zu weit hinter `main` lag.
+> Die folgenden Aufgaben muessen auf dem aktuellen `main`-Stand neu implementiert werden.
+> Die alten Commits (c7c6aa9, 17a39e8, c58cea0, 6d58fea, c11f216) sind im Reflog als Referenz verfuegbar.
+
+**Scope**
+
+- GC-Hotspots in per-Frame-Loops eliminieren
+- Allocation-Hotspots im Replay-Snapshot-System eliminieren
+- Deterministische State-Snapshot-Infrastruktur fuer kuenftigen Rollback
+- IndexedDB-basierte Telemetrie-History fuer Cross-Session-Vergleich
+- Bundle-Splitting und ESLint-max-lines-Fix fuer MapPresetCatalog
+
+---
+
+### N4: GC-Hotspot-Eliminierung in per-Frame Entity-Loops
+
+<!-- SUB-LOCK: frei -->
+
+**Betroffene Dateien:**
+- `src/hunt/mg/MGTracerFx.js` — `splice()` durch O(n)-Compaction ersetzen
+- `src/entities/player/PlayerEffectOps.js` — Swap-and-Pop statt splice
+- `src/entities/player/PlayerInventoryOps.js` — Swap-and-Pop statt splice
+- `src/entities/systems/HuntCombatSystem.js` — Swap-and-Pop statt splice
+- `src/entities/systems/trails/TrailSegmentRegistry.js` — Key-Array-Pool statt keys.slice()
+
+- [ ] N4.1 `MGTracerFx.js`: splice() durch index-basierte Compaction ersetzen
+- [ ] N4.2 `PlayerEffectOps.js`, `PlayerInventoryOps.js`: Swap-and-Pop Pattern
+- [ ] N4.3 `HuntCombatSystem.js`: Swap-and-Pop fuer aktive Combats
+- [ ] N4.4 `TrailSegmentRegistry.js`: vorallokierten Key-Array-Pool einfuehren
+- [ ] N4.5 Verifikation: `test:physics:hunt`, `test:physics:core`, `docs:sync` PASS
+
+---
+
+### N5: Allocation-Hotspots im Replay-Snapshot-System eliminieren
+
+<!-- SUB-LOCK: frei -->
+
+**Betroffene Dateien:**
+- `src/state/RoundRecorder.js` — `Math.round()` statt `.toFixed()` String-Roundtrip
+- `src/state/recorder/RoundSnapshotStore.js` — vorallokierte Arrays statt `.slice().map()` und Spread
+
+- [ ] N5.1 `RoundRecorder.js`: toFixed()-String-Roundtrip durch Math.round() ersetzen
+- [ ] N5.2 `RoundSnapshotStore.js`: getOrderedSnapshots() und getLastRoundGhostClip() mit vorallokierten Arrays
+- [ ] N5.3 Verifikation: `smoke:roundstate` PASS, Ghost-Replay funktional
+
+---
+
+### N6: Deterministische State-Snapshot-Infrastruktur
+
+<!-- SUB-LOCK: frei -->
+
+**Neue Dateien:**
+- `src/core/SimStateSnapshot.js` (NEU) — Ring-Buffer (30 Ticks, zero-alloc Capture)
+
+**Betroffene Dateien:**
+- `src/core/PlayingStateSystem.js` — opt-in `enableSimSnapshots()` Hook
+
+**Capture-Felder:**
+- Player: Transforms, Velocities, Boost, Health, Effects, Inventory
+- Trail-Metadata, Projectile-State
+
+- [ ] N6.1 `SimStateSnapshot.js`: Ring-Buffer mit vorallokierten Slots (30 Ticks)
+- [ ] N6.2 `PlayingStateSystem.js`: opt-in Capture-Hook, kein Performance-Impact wenn deaktiviert
+- [ ] N6.3 Verifikation: `test:core`, `test:physics:core` PASS
+
+---
+
+### N7: Persistente Telemetrie (IndexedDB) fuer Cross-Session-Vergleich
+
+<!-- SUB-LOCK: frei -->
+
+**Neue Dateien:**
+- `src/state/TelemetryHistoryStore.js` (NEU) — IndexedDB Store (max 500 Eintraege, Auto-Pruning)
+
+**Betroffene Dateien:**
+- `src/core/SettingsManager.js` — Telemetrie-Init-Hook
+- `src/ui/menu/MenuTelemetryDashboard.js` — History-Summary laden (Runden, Winrates, Avg-Dauer)
+- `src/ui/menu/MenuTelemetryStore.js` — Integration mit History-Store
+
+- [ ] N7.1 `TelemetryHistoryStore.js`: IndexedDB `cuviosclash-telemetry`, round_end Events persistieren
+- [ ] N7.2 Auto-Pruning bei >500 Eintraegen, aelteste zuerst
+- [ ] N7.3 Dashboard-Integration: Summary-Daten async laden und anzeigen
+- [ ] N7.4 Verifikation: Funktionaltest, `docs:sync` PASS
+
+---
+
+### MapPresetCatalog Bundle-Split
+
+<!-- SUB-LOCK: frei -->
+
+**Betroffene Dateien:**
+- `src/core/config/maps/MapPresetCatalog.js` — grosse Presets auslagern
+- `src/core/config/maps/MapPresetCatalogLarge.js` (NEU) — die_festung, mega_maze_xl
+- `vite.config.js` — manualChunks fuer Training, Validation, Map-Presets, Developer-UI
+
+- [ ] Split.1 Grosse Map-Presets in `MapPresetCatalogLarge.js` auslagern (ESLint max-lines)
+- [ ] Split.2 Vite manualChunks konfigurieren fuer besseres Bundle-Splitting
+- [ ] Split.3 Verifikation: `build` PASS, Bundle-Groesse pruefen
+
+---
+
+## Block V49: Neon Abyss Arcade-Map und modulare Map-Presets (Neu-Implementierung)
+
+<!-- LOCK: frei -->
+
+> **Hintergrund:** Dieses Feature war auf dem veralteten Branch `claude/vigorous-ritchie` implementiert.
+> Der alte Commit (b1bf0c8) ist im Reflog als Referenz verfuegbar.
+
+**Scope**
+
+- Neue vertikale Arcade-Map "Neon Abyss" (160x75x160) mit 5 Zonen
+- Map-Presets aus monolithischem `MapPresetCatalog.js` in modulares `presets/`-Verzeichnis extrahieren
+
+**Map-Zonen (Neon Abyss):**
+1. Foam Pit — offener Einstiegsbereich
+2. Bridge Network — Brueckengeflecht
+3. Cage Labyrinth — enge Kaefig-Gaenge
+4. Tower Zone — vertikale Turmstrukturen
+5. Crown Arena — finale Arena
+
+**Neue Dateien:**
+- `src/core/config/maps/presets/standard.js`
+- `src/core/config/maps/presets/arena_maps.js`
+- `src/core/config/maps/presets/themed_maps.js`
+- `src/core/config/maps/presets/showcase_maps.js`
+- `src/core/config/maps/presets/expert_maps.js`
+- `src/core/config/maps/presets/neon_abyss.js` (NEU)
+
+**Betroffene Dateien:**
+- `src/core/config/maps/MapPresetCatalog.js` — wird zum Aggregator (nur Imports + Spread)
+
+---
+
+- [ ] 49.1 Map-Presets modularisieren: bestehende Presets in `presets/`-Unterverzeichnis extrahieren
+- [ ] 49.2 `MapPresetCatalog.js` zum reinen Aggregator umbauen (Import + Spread aller Module)
+- [ ] 49.3 Neon Abyss Map-Definition in `presets/neon_abyss.js` erstellen (5 Zonen, Geometrie, Spawns)
+- [ ] 49.4 Verifikation: alle bestehenden Map-Presets laden korrekt, Neon Abyss spielbar
+- [ ] 49.5 `test:core`, `build`, `docs:sync` PASS
+
+---
+
+## Block V41-D: LAN Auto-Discovery und Multiplayer-UI Vervollstaendigung (Neu-Implementierung)
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V41 Workstreams A-C (abgeschlossen) -->
+
+> **Hintergrund:** Dieses Feature war auf dem veralteten Branch `claude/v41-workstream-a-completion` implementiert.
+> Die alten Commits (580722e, b851ab4) sind im Reflog als Referenz verfuegbar.
+
+**Scope**
+
+- UDP-Broadcast LAN-Discovery: Host annonciert, Clients sehen verfuegbare Spiele als klickbare Liste
+- TURN-Server-Konfiguration via Env-Variablen
+- Signaling-URL konfigurierbar
+- Host-IP-Anzeige in Lobby fuer manuellen Join-Fallback
+- Discovery-Endpoint auf LAN-Signaling-Server
+- Multiplayer-Panel: Discovery-Flow, canHost-Guard, BroadcastChannel-Updates
+- LobbyRenderer: Spieler-Karten mit Ready-Status und Settings-Anzeige
+- Multiplayer CSS-Styles (Lobby, Spieler-Karten, Discovery)
+
+---
+
+### V41-D.1: LAN Auto-Discovery und Server-Konfiguration
+
+**Betroffene Dateien:**
+- `server/lan-signaling.js` — `/discovery/info` Endpoint hinzufuegen
+- `src/network/PeerConnectionManager.js` — TURN-Server-Config aus Env-Variablen
+- `src/network/OnlineSessionAdapter.js` — Signaling-URL konfigurierbar
+- `electron/main.js` — UDP-Broadcast Discovery integrieren
+- `electron/preload.js` — Discovery-API exponieren
+- `vite.config.js` — `VITE_TURN_URL`, `VITE_SIGNALING_URL` Env-Variablen
+- `.env.app`, `.env.web` — Default-Werte fuer Env-Variablen
+
+- [ ] D.1.1 `/discovery/info` Endpoint auf LAN-Signaling-Server
+- [ ] D.1.2 TURN-Server-Config via `VITE_TURN_URL`, `VITE_TURN_USER`, `VITE_TURN_CREDENTIAL`
+- [ ] D.1.3 Signaling-URL via `VITE_SIGNALING_URL` konfigurierbar
+- [ ] D.1.4 Electron: UDP-Broadcast Advertise + Discovery-Listener
+- [ ] D.1.5 Host-IP-Anzeige im Lobby-View
+
+---
+
+### V41-D.2: Multiplayer-Panel und Lobby-UI vervollstaendigen
+
+**Betroffene Dateien:**
+- `src/ui/menu/MenuMultiplayerPanel.js` — Discovery-Flow, canHost-Guard, BroadcastChannel
+- `src/ui/menu/MenuLobbyRenderer.js` — Spieler-Karten, Ready-Status, Settings
+- `style.css` — Multiplayer-Styles (Lobby, Discovery, Spieler-Karten)
+- `tests/core.spec.js` — T41a (Schema canHost), T41b (Panel canHost-Flag)
+
+- [ ] D.2.1 `MenuMultiplayerPanel.js`: Discovery-Liste mit verfuegbaren Spielen
+- [ ] D.2.2 `MenuLobbyRenderer.js`: Spieler-Karten mit Ready-Zusammenfassung und Settings
+- [ ] D.2.3 `style.css`: Lobby-Layout, Spieler-Karten, Discovery-Liste, Responsive
+- [ ] D.2.4 Tests: T41a, T41b fuer canHost-Visibility und Panel-Logik
+- [ ] D.2.5 Verifikation: `test:core` PASS, manueller Lobby-Test
 
 ---
 
@@ -524,12 +756,10 @@ Plan-Datei: `docs/Feature_Strategy_Pattern_V47.md`
 | V45 | Arcade-Modus | `docs/Feature_Arcade_Modus_V45.md` | Planung |
 | V46 | Architektur-Verbesserungen | `docs/Umsetzungsplan.md` (Block V46) | Offen |
 | V47 | Strategy Pattern Refactoring | `docs/Feature_Strategy_Pattern_V47.md` | Offen |
+| V48 | Fight-Modus Qualitaet | `docs/Feature_Fight_Modus_Qualitaet_V48.md` | In Bearbeitung |
 | V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | Offen |
 | V29b | Cinematic Camera Follow-up | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | Offen |
 | N2 | Recording-UI / manueller Trigger | — | Offen |
-| N4 | Object-Pooling Partikel & Projektile | — | Offen |
-| N5 | Delta-Kompression Replay-System | — | Offen |
-| N7 | Persistente Telemetrie (IndexedDB) | — | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | — | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | — | Offen |
 | V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | Offen |
