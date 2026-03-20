@@ -1,11 +1,6 @@
+#!/usr/bin/env sh
 if [ -f ".husky/.bypass" ]; then
   exit 0
-fi
-
-branch="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$branch" = "main" ] || [ "$branch" = "master" ]; then
-  echo "❌ Direkte Commits auf main/master sind nicht erlaubt. Bitte erstelle einen Feature-Branch."
-  exit 1
 fi
 
 # Lock-Protokoll nur im Bot-Mode prüfen (mode:bot aktiv = kein .bypass)

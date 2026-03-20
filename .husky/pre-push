@@ -1,3 +1,4 @@
+#!/usr/bin/env sh
 if [ -f ".husky/.bypass" ]; then
   exit 0
 fi
