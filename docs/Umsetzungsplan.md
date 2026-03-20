@@ -609,9 +609,9 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 - Player: Transforms, Velocities, Boost, Health, Effects, Inventory
 - Trail-Metadata, Projectile-State
 
-- [ ] N6.1 `SimStateSnapshot.js`: Ring-Buffer mit vorallokierten Slots (30 Ticks)
-- [ ] N6.2 `PlayingStateSystem.js`: opt-in Capture-Hook, kein Performance-Impact wenn deaktiviert
-- [ ] N6.3 Verifikation: `test:core`, `test:physics:core` PASS
+- [x] N6.1 `SimStateSnapshot.js`: Ring-Buffer mit vorallokierten Slots (30 Ticks) (abgeschlossen: 2026-03-20)
+- [x] N6.2 `PlayingStateSystem.js`: opt-in Capture-Hook, kein Performance-Impact wenn deaktiviert (abgeschlossen: 2026-03-20)
+- [x] N6.3 Verifikation: `test:core`, `test:physics:core`, `build`, `docs:sync` PASS (abgeschlossen: 2026-03-20; T20ke, T14b vorbestehende Failures)
 
 ---
 

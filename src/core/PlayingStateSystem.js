@@ -2,10 +2,14 @@
 // PlayingStateSystem.js - playing state update orchestration
 // ============================================
 
+import { SimStateSnapshot } from './SimStateSnapshot.js';
+
 export class PlayingStateSystem {
     constructor(game) {
         this.game = game;
         this._lastOverheatSnapshotVersion = -1;
+        this._simSnapshot = null;
+        this._simSnapshotTick = 0;
     }
 
     _syncHuntOverheatSnapshot() {
@@ -51,6 +55,34 @@ export class PlayingStateSystem {
         game.arena.update(dt);
         game.hudRuntimeSystem.updatePlayingHudTick(dt);
         game._applyPlayingTimeScaleFromEffects();
+
+        // N6: opt-in sim state snapshot capture (zero-alloc when enabled)
+        if (this._simSnapshot?.enabled) {
+            this._simSnapshot.capture(
+                this._simSnapshotTick++,
+                game.gameLoop?.elapsedTime || 0,
+                game.entityManager
+            );
+        }
+    }
+
+    enableSimSnapshots() {
+        if (!this._simSnapshot) {
+            this._simSnapshot = new SimStateSnapshot();
+        }
+        this._simSnapshot.enable();
+        this._simSnapshotTick = 0;
+        return this._simSnapshot;
+    }
+
+    disableSimSnapshots() {
+        if (this._simSnapshot) {
+            this._simSnapshot.disable();
+        }
+    }
+
+    getSimSnapshot() {
+        return this._simSnapshot;
     }
 
     render(alpha = 1, renderDelta = null) {
