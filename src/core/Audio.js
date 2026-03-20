@@ -2,29 +2,49 @@
 // Audio.js - Synthesized Sound Effects (No assets needed)
 // ============================================
 
+const DEFAULT_COOLDOWN_MS = 50;
+
+const SOUND_COOLDOWNS_MS = Object.freeze({
+    SHOOT: 100,
+    MG_SHOOT: 50,
+    ROCKET_SHOOT: 180,
+    EXPLOSION: 200,
+    HIT: 100,
+    MG_HIT: 70,
+    ROCKET_IMPACT: 160,
+    SHIELD_HIT: 70,
+    POWERUP: 500,
+    BOOST: 200,
+});
+
+const AUDIO_INIT_EVENT_TYPES = ['click', 'keydown', 'touchstart'];
+
+function isDevEnvironment() {
+    try {
+        return Boolean(import.meta?.env?.DEV);
+    } catch {
+        return false;
+    }
+}
+
 export class AudioManager {
     constructor() {
         this.ctx = null;
         this.enabled = true;
         this.volume = 0.15;
         this.buffers = {};
+        this._isDevEnvironment = isDevEnvironment();
+        this._audioInitFailed = false;
         this._debugEvents = [];
         this._maxDebugEvents = 24;
+        this._listenerAbortController = typeof AbortController === 'function'
+            ? new AbortController()
+            : null;
+        this._registeredWindowListeners = [];
 
         // Throttling Logic
         this.lastPlayTime = {}; // { 'EXPLOSION': 123456789 }
-        this.cooldowns = {
-            'SHOOT': 100,      // Max 10 shots per second
-            'MG_SHOOT': 50,
-            'ROCKET_SHOOT': 180,
-            'EXPLOSION': 200,  // Max 5 explosions per second
-            'HIT': 100,
-            'MG_HIT': 70,
-            'ROCKET_IMPACT': 160,
-            'SHIELD_HIT': 70,
-            'POWERUP': 500,
-            'BOOST': 200
-        };
+        this.cooldowns = { ...SOUND_COOLDOWNS_MS };
 
         // Initialize on first user interaction (browser policy)
         this._onInitInteraction = () => {
@@ -34,28 +54,78 @@ export class AudioManager {
         this._onMuteToggle = (e) => {
             if (e.code === 'KeyM') {
                 this.enabled = !this.enabled;
-                console.log(`Audio ${this.enabled ? 'ENABLED' : 'DISABLED'}`);
+                this._debugLog(`Audio ${this.enabled ? 'ENABLED' : 'DISABLED'}`);
             }
         };
 
-        window.addEventListener('keydown', this._onInitInteraction);
-        window.addEventListener('mousedown', this._onInitInteraction);
-        window.addEventListener('keydown', this._onMuteToggle);
+        for (const eventType of AUDIO_INIT_EVENT_TYPES) {
+            this._addWindowListener(eventType, this._onInitInteraction);
+        }
+        this._addWindowListener('keydown', this._onMuteToggle);
+    }
+
+    _addWindowListener(type, listener) {
+        if (this._listenerAbortController) {
+            window.addEventListener(type, listener, { signal: this._listenerAbortController.signal });
+            return;
+        }
+        window.addEventListener(type, listener);
+        this._registeredWindowListeners.push({ type, listener });
+    }
+
+    _removeWindowListener(type, listener) {
+        window.removeEventListener(type, listener);
+        if (!this._registeredWindowListeners.length) return;
+        this._registeredWindowListeners = this._registeredWindowListeners.filter((entry) =>
+            !(entry.type === type && entry.listener === listener)
+        );
+    }
+
+    _removeAllWindowListeners() {
+        if (this._listenerAbortController) {
+            this._listenerAbortController.abort();
+            this._listenerAbortController = null;
+            return;
+        }
+        if (!this._registeredWindowListeners.length) return;
+        for (const entry of this._registeredWindowListeners) {
+            window.removeEventListener(entry.type, entry.listener);
+        }
+        this._registeredWindowListeners = [];
+    }
+
+    _debugLog(message, metadata) {
+        if (!this._isDevEnvironment) return;
+        if (metadata !== undefined) {
+            console.debug(`[AudioManager] ${message}`, metadata);
+            return;
+        }
+        console.debug(`[AudioManager] ${message}`);
     }
 
     _removeInitListeners() {
-        if (this._onInitInteraction) {
-            window.removeEventListener('keydown', this._onInitInteraction);
-            window.removeEventListener('mousedown', this._onInitInteraction);
+        if (!this._onInitInteraction) return;
+        for (const eventType of AUDIO_INIT_EVENT_TYPES) {
+            this._removeWindowListener(eventType, this._onInitInteraction);
         }
     }
 
     _init() {
-        if (this.ctx) return;
+        if (this.ctx || this._audioInitFailed) return;
         const AudioContext = window.AudioContext || window.webkitAudioContext;
-        if (AudioContext) {
+        if (!AudioContext) return;
+        try {
             this.ctx = new AudioContext();
             this._generateBuffers();
+        } catch (error) {
+            this.enabled = false;
+            this.ctx = null;
+            this.buffers = {};
+            this._audioInitFailed = true;
+            console.warn('[AudioManager] AudioContext initialization failed; audio muted.', error);
+            this._debugLog('AudioContext init failed', {
+                error: error instanceof Error ? error.message : String(error || ''),
+            });
         }
     }
 
@@ -112,7 +182,7 @@ export class AudioManager {
         // Check Cooldown
         const now = this._resolveTime();
         const last = this.lastPlayTime[type] || 0;
-        const cooldown = this.cooldowns[type] || 50;
+        const cooldown = this.cooldowns[type] || DEFAULT_COOLDOWN_MS;
 
         if (now - last < cooldown) return;
         this.lastPlayTime[type] = now;
@@ -334,9 +404,10 @@ export class AudioManager {
     dispose() {
         this._removeInitListeners();
         if (this._onMuteToggle) {
-            window.removeEventListener('keydown', this._onMuteToggle);
+            this._removeWindowListener('keydown', this._onMuteToggle);
             this._onMuteToggle = null;
         }
+        this._removeAllWindowListeners();
         this._onInitInteraction = null;
         if (this.ctx && typeof this.ctx.close === 'function') {
             this.ctx.close().catch(() => {});
@@ -344,5 +415,6 @@ export class AudioManager {
         this.ctx = null;
         this.buffers = {};
         this._debugEvents = [];
+        this._registeredWindowListeners = [];
     }
 }
