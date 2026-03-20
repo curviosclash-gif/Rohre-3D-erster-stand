@@ -144,7 +144,7 @@ export class RoundRecorder {
     finalizeRound(winner, players = []) {
         if (!this._enabled) return null;
         const roundSummary = this._metricsStore.finalizeRound(winner, players);
-        this.logEvent('ROUND_END', roundSummary.winnerIndex, `duration=${roundSummary.duration.toFixed(2)}`);
+        this.logEvent('ROUND_END', roundSummary.winnerIndex, `duration=${Math.round(roundSummary.duration * 100) / 100}`);
         return roundSummary;
     }
 
@@ -207,22 +207,28 @@ export class RoundRecorder {
             startIndex++;
         }
 
-        const selectedSnapshots = orderedSnapshots.slice(startIndex);
-        const startTime = Number(selectedSnapshots[0]?.time) || 0;
-        const normalizedFrames = [];
-        for (let index = 0; index < selectedSnapshots.length; index++) {
-            const snapshot = selectedSnapshots[index];
+        const selectedCount = orderedSnapshots.length - startIndex;
+        const startTime = Number(orderedSnapshots[startIndex]?.time) || 0;
+        const normalizedFrames = new Array(selectedCount);
+        for (let index = 0; index < selectedCount; index++) {
+            const snapshot = orderedSnapshots[startIndex + index];
             const rawTime = Math.max(0, (Number(snapshot?.time) || 0) - startTime);
-            const previousTime = index > 0 ? Number(normalizedFrames[index - 1]?.time) || 0 : 0;
+            const previousTime = index > 0 ? normalizedFrames[index - 1].time : 0;
             const normalizedTime = index > 0 && rawTime < (previousTime + fallbackSnapshotStep * 0.5)
                 ? previousTime + fallbackSnapshotStep
                 : rawTime;
-            normalizedFrames.push({
-                time: normalizedTime,
-                players: Array.isArray(snapshot?.players)
-                    ? snapshot.players.map((player) => ({ ...player }))
-                    : [],
-            });
+            const srcPlayers = Array.isArray(snapshot?.players) ? snapshot.players : [];
+            const framePlayers = new Array(srcPlayers.length);
+            for (let j = 0; j < srcPlayers.length; j++) {
+                const p = srcPlayers[j];
+                framePlayers[j] = {
+                    idx: p.idx, alive: p.alive,
+                    x: p.x, y: p.y, z: p.z,
+                    qx: p.qx, qy: p.qy, qz: p.qz, qw: p.qw,
+                    bot: p.bot,
+                };
+            }
+            normalizedFrames[index] = { time: normalizedTime, players: framePlayers };
         }
         const sourceDuration = Number(normalizedFrames[normalizedFrames.length - 1]?.time) || 0;
         if (normalizedFrames.length < 2 || sourceDuration <= 0) return null;
@@ -250,7 +256,7 @@ export class RoundRecorder {
         const aggregate = this.getAggregateMetrics();
 
         console.group('%cROUND LOG', 'color: #0af; font-size: 14px; font-weight: bold;');
-        console.log(`Duration: ${this._elapsedSeconds().toFixed(1)}s`);
+        console.log(`Duration: ${Math.round(this._elapsedSeconds() * 10) / 10}s`);
         console.log(`Events: ${this._eventStore.eventCount}`);
         console.table(eventList.map((e) => ({ log: e })));
         if (lastRound) {

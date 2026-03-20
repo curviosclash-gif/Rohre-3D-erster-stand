@@ -149,3 +149,38 @@ export function renderMenuTelemetryDashboard(container, telemetrySnapshot = null
     container.appendChild(grid);
     renderRecentRoundsCard(container, snapshot.recentRounds);
 }
+
+export function renderTelemetryHistorySection(container, historySummary) {
+    if (!container || !historySummary) return;
+    const section = document.createElement('div');
+    section.className = 'developer-telemetry-history';
+    section.setAttribute('data-telemetry-section', 'history');
+
+    const title = document.createElement('h3');
+    title.className = 'developer-telemetry-title';
+    title.textContent = 'Cross-Session History (IndexedDB)';
+    section.appendChild(title);
+
+    const list = document.createElement('dl');
+    list.className = 'developer-telemetry-list';
+
+    const rounds = Math.max(0, Number(historySummary.rounds) || 0);
+    appendRow(list, 'history-rounds', 'Gesamt-Runden', String(rounds));
+    appendRow(list, 'history-human-wr', 'Human-Winrate', formatPercent(historySummary.humanWinRate));
+    appendRow(list, 'history-bot-wr', 'Bot-Winrate', formatPercent(historySummary.botWinRate));
+    appendRow(list, 'history-avg-dur', 'Avg. Dauer', formatDuration(historySummary.averageDuration));
+    appendRow(list, 'history-self-cr', 'Selfcrash/R', formatDecimal(historySummary.selfCollisionsPerRound));
+    appendRow(list, 'history-items-r', 'Items/R', formatDecimal(historySummary.itemUsesPerRound));
+
+    if (Array.isArray(historySummary.topMaps) && historySummary.topMaps.length > 0) {
+        const mapsStr = historySummary.topMaps.map((m) => `${m.key}(${m.count})`).join(', ');
+        appendRow(list, 'history-top-maps', 'Top Maps', mapsStr);
+    }
+    if (Array.isArray(historySummary.topModes) && historySummary.topModes.length > 0) {
+        const modesStr = historySummary.topModes.map((m) => `${m.key}(${m.count})`).join(', ');
+        appendRow(list, 'history-top-modes', 'Top Modi', modesStr);
+    }
+
+    section.appendChild(list);
+    container.appendChild(section);
+}

@@ -32,6 +32,7 @@ import { MenuDraftStore, normalizeSessionType } from '../ui/menu/MenuDraftStore.
 import { MenuTextOverrideStore } from '../ui/menu/MenuTextOverrideStore.js';
 import { MENU_TEXT_CATALOG } from '../ui/menu/MenuTextCatalog.js';
 import { MenuTelemetryStore } from '../ui/menu/MenuTelemetryStore.js';
+import { TelemetryHistoryStore } from '../state/TelemetryHistoryStore.js';
 import { createMenuSettingsDefaults } from '../ui/menu/MenuDefaultsEditorConfig.js';
 import {
     applyDeveloperThemeToDocument,
@@ -208,6 +209,7 @@ export class SettingsManager {
         this.menuDraftStore = new MenuDraftStore();
         this.menuTextOverrideStore = new MenuTextOverrideStore();
         this.menuTelemetryStore = new MenuTelemetryStore();
+        this.telemetryHistoryStore = new TelemetryHistoryStore();
     }
 
     createDefaultSettings() {
@@ -572,7 +574,15 @@ export class SettingsManager {
                 ...snapshot,
             };
         }
+        const normalizedType = typeof eventType === 'string' ? eventType.trim().toLowerCase() : '';
+        if (normalizedType === 'round_end' && payload) {
+            this.telemetryHistoryStore.recordRound(payload).catch(() => {});
+        }
         return snapshot;
+    }
+
+    getTelemetryHistorySummary() {
+        return this.telemetryHistoryStore.getSummary();
     }
 
     createRuntimeConfig(settings) {

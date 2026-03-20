@@ -8,6 +8,11 @@ export class RoundSnapshotStore {
         }
         this.snapshotIndex = 0;
         this.snapshotCount = 0;
+
+        /** @internal Pre-allocated output buffer for getOrderedSnapshots() */
+        this._orderedBuf = [];
+        /** @internal Reusable view array returned by getOrderedSnapshots() (avoids .slice() alloc) */
+        this._viewBuf = [];
     }
 
     reset() {
@@ -40,13 +45,13 @@ export class RoundSnapshotStore {
             const s = snap.players[i];
             s.idx = p.index;
             s.alive = p.alive;
-            s.x = +p.position.x.toFixed(1);
-            s.y = +p.position.y.toFixed(1);
-            s.z = +p.position.z.toFixed(1);
-            s.qx = +p.quaternion.x.toFixed(4);
-            s.qy = +p.quaternion.y.toFixed(4);
-            s.qz = +p.quaternion.z.toFixed(4);
-            s.qw = +p.quaternion.w.toFixed(4);
+            s.x = Math.round(p.position.x * 10) / 10;
+            s.y = Math.round(p.position.y * 10) / 10;
+            s.z = Math.round(p.position.z * 10) / 10;
+            s.qx = Math.round(p.quaternion.x * 10000) / 10000;
+            s.qy = Math.round(p.quaternion.y * 10000) / 10000;
+            s.qz = Math.round(p.quaternion.z * 10000) / 10000;
+            s.qw = Math.round(p.quaternion.w * 10000) / 10000;
             s.bot = p.isBot;
         }
 
@@ -55,35 +60,52 @@ export class RoundSnapshotStore {
     }
 
     getOrderedSnapshots(limit = null) {
-        const ordered = [];
         const totalCount = limit == null
             ? this.snapshotCount
             : Math.min(this.snapshotCount, Math.max(1, Number(limit) || 1));
         const snapStart = this.snapshotCount >= this.maxSnapshots ? this.snapshotIndex : 0;
         const offset = Math.max(0, this.snapshotCount - totalCount);
 
+        // Grow output buffer on demand (never shrink — avoids GC)
+        while (this._orderedBuf.length < totalCount) {
+            this._orderedBuf.push({ time: 0, players: [] });
+        }
+
         for (let i = 0; i < totalCount; i++) {
             const idx = (snapStart + offset + i) % this.maxSnapshots;
             const snapshot = this.snapshots[idx];
             const playerCount = Math.max(0, Number(snapshot?.playerCount) || 0);
-            ordered.push({
-                time: Number(snapshot?.time) || 0,
-                players: snapshot.players.slice(0, playerCount).map((player) => ({
-                    idx: Number(player?.idx) || 0,
-                    alive: !!player?.alive,
-                    x: Number(player?.x) || 0,
-                    y: Number(player?.y) || 0,
-                    z: Number(player?.z) || 0,
-                    qx: Number(player?.qx) || 0,
-                    qy: Number(player?.qy) || 0,
-                    qz: Number(player?.qz) || 0,
-                    qw: Number(player?.qw) || 1,
-                    bot: !!player?.bot,
-                })),
-            });
+            const out = this._orderedBuf[i];
+            out.time = Number(snapshot?.time) || 0;
+
+            // Grow player slots on demand
+            while (out.players.length < playerCount) {
+                out.players.push({ idx: 0, alive: false, x: 0, y: 0, z: 0, qx: 0, qy: 0, qz: 0, qw: 1, bot: false });
+            }
+            out.players.length = playerCount;
+
+            for (let j = 0; j < playerCount; j++) {
+                const player = snapshot.players[j];
+                const op = out.players[j];
+                op.idx = Number(player?.idx) || 0;
+                op.alive = !!player?.alive;
+                op.x = Number(player?.x) || 0;
+                op.y = Number(player?.y) || 0;
+                op.z = Number(player?.z) || 0;
+                op.qx = Number(player?.qx) || 0;
+                op.qy = Number(player?.qy) || 0;
+                op.qz = Number(player?.qz) || 0;
+                op.qw = Number(player?.qw) || 1;
+                op.bot = !!player?.bot;
+            }
         }
 
-        return ordered;
+        // Reuse view buffer instead of .slice() to avoid per-call allocation
+        for (let i = 0; i < totalCount; i++) {
+            this._viewBuf[i] = this._orderedBuf[i];
+        }
+        this._viewBuf.length = totalCount;
+        return this._viewBuf;
     }
 
     getRecentSnapshotTable(limit = 20) {
@@ -95,7 +117,7 @@ export class RoundSnapshotStore {
                 .filter((p) => p.idx !== undefined)
                 .map((p) => `${p.bot ? 'Bot' : 'P'}${p.idx}:${p.alive ? 'alive' : 'dead'}(${p.x},${p.y},${p.z})`)
                 .join(' | ');
-            snapList.push({ time: `${s.time.toFixed(2)}s`, players: playerStr });
+            snapList.push({ time: `${Math.round(s.time * 100) / 100}s`, players: playerStr });
         }
         return snapList;
     }

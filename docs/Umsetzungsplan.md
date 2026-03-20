@@ -589,9 +589,9 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 - `src/state/RoundRecorder.js` — `Math.round()` statt `.toFixed()` String-Roundtrip
 - `src/state/recorder/RoundSnapshotStore.js` — vorallokierte Arrays statt `.slice().map()` und Spread
 
-- [ ] N5.1 `RoundRecorder.js`: toFixed()-String-Roundtrip durch Math.round() ersetzen
-- [ ] N5.2 `RoundSnapshotStore.js`: getOrderedSnapshots() und getLastRoundGhostClip() mit vorallokierten Arrays
-- [ ] N5.3 Verifikation: `smoke:roundstate` PASS, Ghost-Replay funktional
+- [x] N5.1 `RoundRecorder.js`: toFixed()-String-Roundtrip durch Math.round() ersetzen (abgeschlossen: 2026-03-20)
+- [x] N5.2 `RoundSnapshotStore.js`: getOrderedSnapshots() und getLastRoundGhostClip() mit vorallokierten Arrays (abgeschlossen: 2026-03-20)
+- [x] N5.3 Verifikation: `smoke:roundstate` PASS, Ghost-Replay funktional (abgeschlossen: 2026-03-20)
 
 ---
 
@@ -627,10 +627,10 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 - `src/ui/menu/MenuTelemetryDashboard.js` — History-Summary laden (Runden, Winrates, Avg-Dauer)
 - `src/ui/menu/MenuTelemetryStore.js` — Integration mit History-Store
 
-- [ ] N7.1 `TelemetryHistoryStore.js`: IndexedDB `cuviosclash-telemetry`, round_end Events persistieren
-- [ ] N7.2 Auto-Pruning bei >500 Eintraegen, aelteste zuerst
-- [ ] N7.3 Dashboard-Integration: Summary-Daten async laden und anzeigen
-- [ ] N7.4 Verifikation: Funktionaltest, `docs:sync` PASS
+- [x] N7.1 `TelemetryHistoryStore.js`: IndexedDB `cuviosclash-telemetry`, round_end Events persistieren (abgeschlossen: 2026-03-20)
+- [x] N7.2 Auto-Pruning bei >500 Eintraegen, aelteste zuerst (abgeschlossen: 2026-03-20)
+- [x] N7.3 Dashboard-Integration: Summary-Daten async laden und anzeigen (abgeschlossen: 2026-03-20)
+- [x] N7.4 Verifikation: Funktionaltest, `docs:sync` PASS (abgeschlossen: 2026-03-20)
 
 ---
 
