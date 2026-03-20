@@ -234,6 +234,7 @@ export class TouchInputSource extends PlayerInputSource {
             boostPressed,
             cameraSwitch: false,
             dropItem: false,
+            useItem: false,
             shootItem: this._buttons.fire,
             shootMG: this._buttons.shootMG,
             nextItem: this._buttons.nextItem,

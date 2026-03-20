@@ -26,6 +26,7 @@ export class RemoteInputSource extends PlayerInputSource {
                 rollLeft: false, rollRight: false,
                 boost: false, boostPressed: false,
                 cameraSwitch: false, dropItem: false,
+                useItem: false,
                 shootItem: false, shootMG: false, nextItem: false,
             };
         }

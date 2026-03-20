@@ -26,6 +26,7 @@ export class SpectatorInputSource extends PlayerInputSource {
             boostPressed: false,
             cameraSwitch: false,
             dropItem: false,
+            useItem: false,
             shootItem: false,
             shootMG: false,
             nextItem: false,

@@ -15,7 +15,7 @@ const ACTION_KEYS = [
     'SHOOT',
     'SHOOT_MG',
     'NEXT_ITEM',
-    'DROP',
+    'USE_ITEM',
     'CAMERA',
 ];
 
@@ -47,6 +47,7 @@ export class InputManager {
             boostPressed: false,
             cameraSwitch: false,
             dropItem: false,
+            useItem: false,
             shootItem: false,
             nextItem: false,
         };
@@ -184,6 +185,7 @@ export class InputManager {
         inputObj.boostPressed = false;
         inputObj.cameraSwitch = false;
         inputObj.dropItem = false;
+        inputObj.useItem = false;
         inputObj.shootItem = false;
         inputObj.shootMG = false;
         inputObj.nextItem = false;
@@ -275,7 +277,7 @@ export class InputManager {
         this._reuseInput.boost = this._isActionDown(keyMap.BOOST, altKeyMap?.BOOST || '');
         this._reuseInput.boostPressed = this._wasActionPressed(keyMap.BOOST, altKeyMap?.BOOST || '');
         this._reuseInput.cameraSwitch = this._wasActionPressed(keyMap.CAMERA, altKeyMap?.CAMERA || '');
-        this._reuseInput.dropItem = this._wasActionPressed(keyMap.DROP, altKeyMap?.DROP || '');
+        this._reuseInput.useItem = this._wasActionPressed(keyMap.USE_ITEM, altKeyMap?.USE_ITEM || '');
         this._reuseInput.shootItem = this._wasActionPressed(keyMap.SHOOT, altKeyMap?.SHOOT || '');
         this._reuseInput.shootMG = this._isActionDown(keyMap.SHOOT_MG, altKeyMap?.SHOOT_MG || '');
         this._reuseInput.nextItem = this._wasActionPressed(keyMap.NEXT_ITEM, altKeyMap?.NEXT_ITEM || '');

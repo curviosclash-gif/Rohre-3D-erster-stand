@@ -444,14 +444,21 @@ export class PlayerInputSystem {
             input.boost = inputState.boost;
             input.boostPressed = inputState.boostPressed;
             input.cameraSwitch = inputState.cameraSwitch;
-            input.dropItem = inputState.dropItem;
             input.shootItem = inputState.shootItem;
             input.shootMG = inputState.shootMG;
             input.nextItem = inputState.nextItem;
+            input.dropItem = false;
 
-            if (input.shootItem && Array.isArray(player.inventory) && player.inventory.length > 0) {
-                const selectedIndex = Number.isInteger(player.selectedItemIndex) ? player.selectedItemIndex : 0;
-                input.shootItemIndex = Math.max(0, Math.min(selectedIndex, player.inventory.length - 1));
+            const inventoryLength = Array.isArray(player.inventory) ? player.inventory.length : 0;
+            const selectedIndex = Number.isInteger(player.selectedItemIndex) ? player.selectedItemIndex : 0;
+
+            const wantsUseItem = !!(inputState.useItem || inputState.dropItem);
+            if (wantsUseItem && inventoryLength > 0) {
+                input.useItem = Math.max(0, Math.min(selectedIndex, inventoryLength - 1));
+            }
+
+            if (input.shootItem && inventoryLength > 0) {
+                input.shootItemIndex = Math.max(0, Math.min(selectedIndex, inventoryLength - 1));
             }
         }
 

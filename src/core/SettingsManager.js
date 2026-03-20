@@ -139,7 +139,7 @@ export const KEY_BIND_ACTIONS = [
     { label: 'Boost', key: 'BOOST' },
     { label: 'Schiessen (Item)', key: 'SHOOT' },
     { label: 'MG Schiessen', key: 'SHOOT_MG' },
-    { label: 'Item Abwerfen', key: 'DROP' },
+    { label: 'Item nutzen', key: 'USE_ITEM' },
     { label: 'Item Wechseln', key: 'NEXT_ITEM' },
     { label: 'Kamera', key: 'CAMERA' },
 ];

@@ -14,7 +14,7 @@ const DEFAULT_MAPPING = {
     boostButton: 0,     // A / Cross
     shootMGButton: 6,   // Left trigger (L2)
     nextItemButton: 3,  // Y / Triangle
-    dropItemButton: 2,  // X / Square
+    useItemButton: 2,   // X / Square
     cameraButton: 1,    // B / Circle
     pauseButton: 9,     // Start
 };
@@ -89,6 +89,7 @@ export class GamepadInputSource extends PlayerInputSource {
                 rollLeft: false, rollRight: false,
                 boost: false, boostPressed: false,
                 cameraSwitch: false, dropItem: false,
+                useItem: false,
                 shootItem: false, shootMG: false, nextItem: false,
             };
         }
@@ -108,7 +109,8 @@ export class GamepadInputSource extends PlayerInputSource {
             boost: this._isButtonDown(gp, m.boostButton),
             boostPressed: this._wasButtonPressed(gp, m.boostButton),
             cameraSwitch: this._wasButtonPressed(gp, m.cameraButton),
-            dropItem: this._wasButtonPressed(gp, m.dropItemButton),
+            dropItem: false,
+            useItem: this._wasButtonPressed(gp, m.useItemButton),
             shootItem: this._wasButtonPressed(gp, m.fireButton),
             shootMG: this._isButtonDown(gp, m.shootMGButton),
             nextItem: this._wasButtonPressed(gp, m.nextItemButton),

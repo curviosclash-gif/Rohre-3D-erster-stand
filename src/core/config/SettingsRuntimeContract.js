@@ -45,7 +45,8 @@ export function normalizeControlBindings(source, fallback, { guardCombatConflict
 
     const shoot = src.SHOOT || base.SHOOT;
     let shootMg = src.SHOOT_MG || base.SHOOT_MG;
-    let drop = src.DROP || base.DROP;
+    // Backward compatibility: legacy snapshots used DROP for this action.
+    let useItem = src.USE_ITEM || src.DROP || base.USE_ITEM || base.DROP;
 
     if (guardCombatConflicts) {
         if (shootMg === shoot) {
@@ -54,10 +55,10 @@ export function normalizeControlBindings(source, fallback, { guardCombatConflict
                 shootMg = fallbackShootMg;
             }
         }
-        if (drop === shootMg) {
-            const fallbackDrop = base.DROP;
-            if (fallbackDrop && fallbackDrop !== shoot && fallbackDrop !== shootMg) {
-                drop = fallbackDrop;
+        if (useItem === shoot || useItem === shootMg) {
+            const fallbackUseItem = base.USE_ITEM || base.DROP;
+            if (fallbackUseItem && fallbackUseItem !== shoot && fallbackUseItem !== shootMg) {
+                useItem = fallbackUseItem;
             }
         }
     }
@@ -73,7 +74,7 @@ export function normalizeControlBindings(source, fallback, { guardCombatConflict
         SHOOT: shoot,
         SHOOT_MG: shootMg,
         NEXT_ITEM: src.NEXT_ITEM || base.NEXT_ITEM,
-        DROP: drop,
+        USE_ITEM: useItem,
         CAMERA: src.CAMERA || base.CAMERA,
     };
 }

@@ -319,7 +319,7 @@ export const CONFIG_SECTIONS = {
             SHOOT: 'KeyF',
             SHOOT_MG: 'KeyX',
             NEXT_ITEM: 'KeyR',
-            DROP: 'KeyG',
+            USE_ITEM: 'KeyG',
             CAMERA: 'KeyC',
         },
         PLAYER_2: {
@@ -333,7 +333,7 @@ export const CONFIG_SECTIONS = {
             SHOOT: 'ArrowUp',
             SHOOT_MG: 'ArrowDown',
             NEXT_ITEM: 'ArrowLeft',
-            DROP: 'Quote',
+            USE_ITEM: 'Quote',
             CAMERA: 'NumpadDivide',
         },
         GLOBAL: {

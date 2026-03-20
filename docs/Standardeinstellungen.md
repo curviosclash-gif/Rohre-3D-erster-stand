@@ -93,7 +93,7 @@ oder wenn die Settings-Version sich aendert (aktuell: Version 2).
 | Boost             | Shift Links  | ShiftLeft   |
 | Schiessen (Item)  | F            | KeyF        |
 | MG Schiessen      | X            | KeyX        |
-| Item Abwerfen     | G            | KeyG        |
+| Item nutzen       | G            | KeyG        |
 | Item Wechseln     | R            | KeyR        |
 | Kamera            | C            | KeyC        |
 
@@ -112,7 +112,7 @@ oder wenn die Settings-Version sich aendert (aktuell: Version 2).
 | Boost             | Pfeil Rechts   | ArrowRight    |
 | Schiessen (Item)  | Pfeil Hoch     | ArrowUp       |
 | MG Schiessen      | Pfeil Runter   | ArrowDown     |
-| Item Abwerfen     | Anf.zeichen (')| Quote         |
+| Item nutzen       | Anf.zeichen (')| Quote         |
 | Item Wechseln     | Pfeil Links    | ArrowLeft     |
 | Kamera            | Num Divide (/) | NumpadDivide  |
 
