@@ -1,9 +1,31 @@
+import { HUNT_CONFIG } from '../../../hunt/HuntConfig.js';
+import { isHuntHealthActive } from '../../../hunt/HealthSystem.js';
+import { isRocketTierType, resolveRocketTierDamage } from '../../../hunt/RocketPickupSystem.js';
 import { applyTrailDamageFromProjectile } from '../../../hunt/DestructibleTrail.js';
 
 export class ProjectileHitResolver {
     constructor(system) {
         this.system = system || null;
         this._tmpVec = this.system?._tmpVec || null;
+    }
+
+    _applyRocketExplosion(projectile, players, directHitTarget) {
+        const explosionRadius = Math.max(1, Number(HUNT_CONFIG?.ROCKET?.EXPLOSION_RADIUS || 25));
+        const explosionDamageFalloff = Math.max(0, Math.min(1, Number(HUNT_CONFIG?.ROCKET?.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
+        const baseDamage = resolveRocketTierDamage(projectile.type);
+        const damageAtCenter = baseDamage * (1 + explosionDamageFalloff);
+
+        for (const target of players || []) {
+            if (!target.alive || target === projectile.owner || target === directHitTarget) continue;
+
+            const distanceToTarget = target.position.distanceTo(projectile.position);
+            if (distanceToTarget > explosionRadius) continue;
+
+            const damageFalloff = 1 - (distanceToTarget / explosionRadius) * explosionDamageFalloff;
+            const explosionDamage = Math.max(1, Math.floor(damageAtCenter * damageFalloff));
+            const damageResult = target.takeDamage(explosionDamage);
+            this.system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult, projectile);
+        }
     }
 
     resolveProjectileOutcome(projectile, players, trailSpatialIndex, simulationResult) {
@@ -22,8 +44,7 @@ export class ProjectileHitResolver {
             return false;
         }
 
-        const strategy = this.system?.getStrategy?.();
-        const trailHit = applyTrailDamageFromProjectile(trailSpatialIndex, projectile, { strategy });
+        const trailHit = applyTrailDamageFromProjectile(trailSpatialIndex, projectile);
         if (trailHit) {
             if (this._tmpVec) {
                 if (trailHit.closestPoint) {
@@ -38,6 +59,22 @@ export class ProjectileHitResolver {
                 this.system?.onTrailSegmentHit?.(this._tmpVec, projectile.owner, projectile, trailHit);
             } else {
                 this.system?.onTrailSegmentHit?.(projectile.position, projectile.owner, projectile, trailHit);
+            }
+
+            // Trail-overflow damage is disabled for rockets to keep trail impacts
+            // isolated from direct HP damage in hunt lock-on scenarios.
+            const allowOverflowDamage = !isRocketTierType(projectile.type);
+            if (allowOverflowDamage && trailHit.overflowDamage > 0 && trailHit.entry) {
+                const trailOwnerIndex = trailHit.entry.playerIndex;
+                const trailOwner = (players || []).find(
+                    p => p && p.alive && Number(p.index) === trailOwnerIndex
+                );
+                if (trailOwner && trailOwner !== projectile.owner) {
+                    const damageResult = trailOwner.takeDamage(trailHit.overflowDamage);
+                    this.system?.onProjectileDamage?.(
+                        trailOwner, projectile.owner, projectile.type, damageResult, projectile
+                    );
+                }
             }
 
             return true;
@@ -58,8 +95,13 @@ export class ProjectileHitResolver {
 
             if (!hit) continue;
 
-            if (strategy) {
-                strategy.resolveProjectileHitOnPlayer(target, projectile, players, this.system);
+            const huntRocketHit = isHuntHealthActive() && isRocketTierType(projectile.type);
+            if (huntRocketHit) {
+                const damage = resolveRocketTierDamage(projectile.type);
+                const damageResult = target.takeDamage(damage);
+                this.system?.onProjectilePowerup?.(target, projectile);
+                this.system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult, projectile);
+                this._applyRocketExplosion(projectile, players, target);
             } else if (target.hasShield) {
                 target.hasShield = false;
             } else {
