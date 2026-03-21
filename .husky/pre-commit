@@ -1,11 +1,10 @@
-#!/usr/bin/env sh
+#!/bin/sh
 if [ -f ".husky/.bypass" ]; then
   exit 0
 fi
 
-# Lock-Protokoll nur im Bot-Mode prüfen (mode:bot aktiv = kein .bypass)
+# Lock-Protokoll nur im Bot-Mode pruefen (mode:bot aktiv = kein .bypass)
 if [ -n "$BOT_MODE" ]; then
-  echo "Prüfe Lock-Protokoll (Bot-Mode)..."
+  echo "Pruefe Lock-Protokoll (Bot-Mode)..."
   node scripts/verify-lock.mjs
 fi
-

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/bin/sh
 if [ -f ".husky/.bypass" ]; then
   exit 0
 fi
@@ -6,5 +6,5 @@ fi
 echo "Running docs:sync (Timestamps aktualisieren)..."
 npm run docs:sync
 
-echo "Architektur-Lint prüfen..."
+echo "Architektur-Lint pruefen..."
 npm run lint:architecture
