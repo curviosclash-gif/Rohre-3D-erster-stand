@@ -3,11 +3,14 @@
 // ============================================
 
 import { CONFIG } from '../../core/Config.js';
+import {
+    AI_SENSOR_SCAN_POLICY,
+} from './perception/AiPerceptionConfig.js';
+import {
+    composePressureLevel,
+    computeTightSpacePressure,
+} from './perception/AiPerceptionPrimitives.js';
 import { estimateEnemyPressure, selectTarget } from './BotTargetingOps.js';
-
-const BOT_PROJECTILE_SENSE_STRIDE = 2;
-const BOT_SPACING_SENSE_STRIDE = 3;
-const BOT_SPACING_DECAY = 0.82;
 
 export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
     const mapBehavior = bot.mapBehavior(arena);
@@ -25,9 +28,15 @@ export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
     const isFullScanFrame = (bot.sensePhaseCounter === bot.sensePhase);
 
     // Adaptive Sensing: Reduce probes in open space or non-assigned frames
-    const useFewProbes = !isFullScanFrame || (!bot.sense.immediateDanger && (bot.sense.forwardRisk || 0) < 0.25 && (bot.sense.localOpenness || 0) > bot.sense.lookAhead * 0.7);
+    const useFewProbes = !isFullScanFrame || (
+        !bot.sense.immediateDanger
+        && (bot.sense.forwardRisk || 0) < AI_SENSOR_SCAN_POLICY.reducedProbeRiskThreshold
+        && (bot.sense.localOpenness || 0) > bot.sense.lookAhead * AI_SENSOR_SCAN_POLICY.reducedProbeOpennessRatio
+    );
     // In non-scan frames, only evaluate the most critical probes (forward, up, down, backwards)
-    const probesToProcess = useFewProbes ? Math.min(5, maxProbes) : maxProbes;
+    const probesToProcess = useFewProbes
+        ? Math.min(AI_SENSOR_SCAN_POLICY.reducedProbeCount, maxProbes)
+        : maxProbes;
 
     let opennessSum = 0;
     let opennessCount = 0;
@@ -39,7 +48,7 @@ export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
         if (i >= probesToProcess) break;
 
         const probe = bot._probes[i];
-        const isVertical = Math.abs(probe.pitch) > 0.001;
+        const isVertical = Math.abs(probe.pitch) > AI_SENSOR_SCAN_POLICY.planarPitchEpsilon;
 
         if (CONFIG.GAMEPLAY.PLANAR_MODE && isVertical) {
             continue;
@@ -64,11 +73,13 @@ export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
     bot.sense.bestProbe = bestProbe;
     bot.sense.forwardRisk = forwardProbe ? forwardProbe.risk : 1;
     bot.sense.immediateDanger = !!(forwardProbe && forwardProbe.immediateDanger);
-    bot.sense.localOpenness = opennessCount > 0 ? opennessSum / opennessCount : bot.sense.lookAhead * 0.4;
+    bot.sense.localOpenness = opennessCount > 0
+        ? opennessSum / opennessCount
+        : bot.sense.lookAhead * AI_SENSOR_SCAN_POLICY.fallbackLocalOpennessRatio;
 
     const nearestEnemyPressure = estimateEnemyPressure(bot, player.position, player, allPlayers);
-    const tightSpacePressure = 1 - Math.min(1, bot.sense.localOpenness / bot.sense.lookAhead);
-    bot.sense.pressure = Math.min(1.6, nearestEnemyPressure * 0.8 + tightSpacePressure * 0.9 + bot._recentBouncePressure * 0.2);
+    const tightSpacePressure = computeTightSpacePressure(bot.sense.localOpenness, bot.sense.lookAhead);
+    bot.sense.pressure = composePressureLevel(nearestEnemyPressure, tightSpacePressure, bot._recentBouncePressure);
 
     if (bot.state.targetRefreshTimer <= 0 || !bot.state.targetPlayer || !bot.state.targetPlayer.alive) {
         selectTarget(bot, player, allPlayers);
@@ -90,8 +101,8 @@ export function runPerception(bot, player, arena, allPlayers, projectiles) {
     const shouldSenseProjectiles = hasProjectiles && (
         fullScanFrame
         || bot.sense.immediateDanger
-        || bot.sense.forwardRisk > 0.42
-        || (sensePhaseCounter % BOT_PROJECTILE_SENSE_STRIDE) === (sensePhase % BOT_PROJECTILE_SENSE_STRIDE)
+        || bot.sense.forwardRisk > AI_SENSOR_SCAN_POLICY.projectileSenseRiskThreshold
+        || (sensePhaseCounter % AI_SENSOR_SCAN_POLICY.projectileSenseStride) === (sensePhase % AI_SENSOR_SCAN_POLICY.projectileSenseStride)
     );
 
     if (shouldSenseProjectiles) {
@@ -105,15 +116,15 @@ export function runPerception(bot, player, arena, allPlayers, projectiles) {
     bot.senseHeight(player, arena);
     const shouldSenseSpacing = fullScanFrame
         || bot.sense.immediateDanger
-        || bot.sense.forwardRisk > 0.65
-        || (sensePhaseCounter % BOT_SPACING_SENSE_STRIDE) === (sensePhase % BOT_SPACING_SENSE_STRIDE);
+        || bot.sense.forwardRisk > AI_SENSOR_SCAN_POLICY.spacingSenseRiskThreshold
+        || (sensePhaseCounter % AI_SENSOR_SCAN_POLICY.spacingSenseStride) === (sensePhase % AI_SENSOR_SCAN_POLICY.spacingSenseStride);
     if (shouldSenseSpacing) {
         bot.senseBotSpacing(player, allPlayers);
     } else {
-        bot.sense.botRepulsionYaw *= BOT_SPACING_DECAY;
-        bot.sense.botRepulsionPitch *= BOT_SPACING_DECAY;
-        if (Math.abs(bot.sense.botRepulsionYaw) < 0.05) bot.sense.botRepulsionYaw = 0;
-        if (Math.abs(bot.sense.botRepulsionPitch) < 0.05) bot.sense.botRepulsionPitch = 0;
+        bot.sense.botRepulsionYaw *= AI_SENSOR_SCAN_POLICY.spacingDecay;
+        bot.sense.botRepulsionPitch *= AI_SENSOR_SCAN_POLICY.spacingDecay;
+        if (Math.abs(bot.sense.botRepulsionYaw) < AI_SENSOR_SCAN_POLICY.spacingDeadzone) bot.sense.botRepulsionYaw = 0;
+        if (Math.abs(bot.sense.botRepulsionPitch) < AI_SENSOR_SCAN_POLICY.spacingDeadzone) bot.sense.botRepulsionPitch = 0;
     }
     bot.evaluatePursuit(player);
     bot.evaluatePortalIntent(player, arena, allPlayers);

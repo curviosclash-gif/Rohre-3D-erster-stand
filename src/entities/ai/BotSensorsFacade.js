@@ -1,4 +1,4 @@
-const SENSE_PHASE_WINDOW = 4;
+import { AI_SENSE_PHASE_WINDOW } from './perception/AiPerceptionConfig.js';
 
 function normalizeSensePhaseCounter(value) {
     return Number.isFinite(value) ? Math.max(0, Math.floor(value)) : 0;
@@ -89,7 +89,7 @@ export class BotSensorsFacade {
     }
 
     incrementSensePhaseCounter() {
-        this.setSensePhaseCounter((this.sensePhaseCounter + 1) % SENSE_PHASE_WINDOW);
+        this.setSensePhaseCounter((this.sensePhaseCounter + 1) % AI_SENSE_PHASE_WINDOW);
     }
 
     clearCollisionCache() {

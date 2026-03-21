@@ -9,6 +9,19 @@ import { estimateExitSafety, evaluatePortalIntent } from './BotPortalOps.js';
 import { senseProjectiles, senseHeight, senseBotSpacing, evaluatePursuit } from './BotThreatOps.js';
 import { BotSensorsFacade } from './BotSensorsFacade.js';
 import {
+    AI_SENSE_PHASE_WINDOW,
+    AI_SENSOR_LOOKAHEAD,
+    AI_SENSOR_TRAIL_COLLISION,
+} from './perception/AiPerceptionConfig.js';
+import {
+    clamp01,
+    normalizeDistance,
+    normalizePressure,
+    normalizeRisk,
+    normalizeSigned,
+    normalizeTargetDistance,
+} from './perception/AiPerceptionPrimitives.js';
+import {
     buildPerceptionBasis,
     computeTargetSteeringSignals,
     PERCEPTION_THRESHOLDS,
@@ -24,17 +37,9 @@ const MAP_BEHAVIOR = {
 
 const BOT_COLLISION_CACHE_POS_SCALE = 32;
 const BOT_COLLISION_CACHE_RADIUS_SCALE = 64;
-const SENSE_PHASE_WINDOW = 4;
+const PROBE_RISK_SENTINEL = 999;
 const BOT_SENSOR_ARRAY_PROBE_WIDTH = 5;
 const BOT_SENSOR_ARRAY_SCALAR_WIDTH = 24;
-
-function clamp01(value) {
-    return Math.max(0, Math.min(1, Number(value) || 0));
-}
-
-function normalizeSigned(value) {
-    return clamp01(((Number(value) || 0) + 1) * 0.5);
-}
 
 function createProbe(name, yaw, pitch, weight = 0) {
     return {
@@ -43,7 +48,7 @@ function createProbe(name, yaw, pitch, weight = 0) {
         pitch,
         weight,
         dir: new THREE.Vector3(),
-        risk: 999,
+        risk: PROBE_RISK_SENTINEL,
         wallDist: 0,
         trailDist: 0,
         clearance: 0,
@@ -171,7 +176,7 @@ export class BotSensors {
 
     setSensePhase(phase) {
         const normalized = Number.isFinite(phase)
-            ? Math.max(0, Math.floor(phase)) % SENSE_PHASE_WINDOW
+            ? Math.max(0, Math.floor(phase)) % AI_SENSE_PHASE_WINDOW
             : 0;
         this._sensePhase = normalized;
     }
@@ -181,11 +186,14 @@ export class BotSensors {
     }
 
     _computeDynamicLookAhead(player) {
-        const base = Math.max(8, Number(this.profile?.lookAhead) || 12);
+        const base = Math.max(
+            AI_SENSOR_LOOKAHEAD.minimumDistance,
+            Number(this.profile?.lookAhead) || AI_SENSOR_LOOKAHEAD.defaultBaseDistance
+        );
         const speedRatio = player.baseSpeed > 0 ? player.speed / player.baseSpeed : 1;
-        let lookAhead = base * (1 + (speedRatio - 1) * 0.75);
-        if (player.isBoosting) lookAhead *= 1.2;
-        return Math.max(8, lookAhead);
+        let lookAhead = base * (1 + (speedRatio - 1) * AI_SENSOR_LOOKAHEAD.speedRatioWeight);
+        if (player.isBoosting) lookAhead *= AI_SENSOR_LOOKAHEAD.boostMultiplier;
+        return Math.max(AI_SENSOR_LOOKAHEAD.minimumDistance, lookAhead);
     }
 
     _mapBehavior(arena) {
@@ -226,13 +234,25 @@ export class BotSensors {
         return hasHit;
     }
 
-    _checkTrailHit(position, player, _allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
+    _checkTrailHit(
+        position,
+        player,
+        _allPlayers,
+        radius = player.hitboxRadius * AI_SENSOR_TRAIL_COLLISION.radiusMultiplier,
+        skipRecent = AI_SENSOR_TRAIL_COLLISION.skipRecentSegments
+    ) {
         const entityManager = player?.trail?.entityManager;
         if (!entityManager) return false;
         return this._getCollisionMemoized(entityManager, position, radius, player.index, skipRecent, player);
     }
 
-    checkTrailHit(position, player, allPlayers, radius = player.hitboxRadius * 1.6, skipRecent = 20) {
+    checkTrailHit(
+        position,
+        player,
+        allPlayers,
+        radius = player.hitboxRadius * AI_SENSOR_TRAIL_COLLISION.radiusMultiplier,
+        skipRecent = AI_SENSOR_TRAIL_COLLISION.skipRecentSegments
+    ) {
         return this._checkTrailHit(position, player, allPlayers, radius, skipRecent);
     }
 
@@ -333,20 +353,20 @@ export class BotSensors {
 
         for (let i = 0; i < this._probes.length; i++) {
             const probe = this._probes[i];
-            out[cursor++] = clamp01((Number(probe.wallDist) || 0) / lookAhead);
-            out[cursor++] = clamp01((Number(probe.trailDist) || 0) / lookAhead);
-            out[cursor++] = clamp01((Number(probe.clearance) || 0) / lookAhead);
+            out[cursor++] = normalizeDistance(probe.wallDist, lookAhead);
+            out[cursor++] = normalizeDistance(probe.trailDist, lookAhead);
+            out[cursor++] = normalizeDistance(probe.clearance, lookAhead);
             out[cursor++] = probe.immediateDanger ? 1 : 0;
-            out[cursor++] = clamp01((Number(probe.risk) || 0) / 3);
+            out[cursor++] = normalizeRisk(probe.risk);
         }
 
         out[cursor++] = clamp01(this.sense.forwardRisk);
         out[cursor++] = this.sense.immediateDanger ? 1 : 0;
-        out[cursor++] = clamp01(this.sense.pressure / 1.6);
-        out[cursor++] = clamp01(this.sense.localOpenness / lookAhead);
-        out[cursor++] = clamp01((this.sense.mapCaution + 1) * 0.5);
-        out[cursor++] = clamp01((this.sense.mapPortalBias + 1) * 0.5);
-        out[cursor++] = clamp01((this.sense.mapAggressionBias + 1) * 0.5);
+        out[cursor++] = normalizePressure(this.sense.pressure);
+        out[cursor++] = normalizeDistance(this.sense.localOpenness, lookAhead);
+        out[cursor++] = normalizeSigned(this.sense.mapCaution);
+        out[cursor++] = normalizeSigned(this.sense.mapPortalBias);
+        out[cursor++] = normalizeSigned(this.sense.mapAggressionBias);
         out[cursor++] = this.sense.projectileThreat ? 1 : 0;
         out[cursor++] = normalizeSigned(this.sense.projectileEvadeYaw);
         out[cursor++] = normalizeSigned(this.sense.projectileEvadePitch);
@@ -356,14 +376,12 @@ export class BotSensors {
         out[cursor++] = this.sense.pursuitActive ? 1 : 0;
         out[cursor++] = normalizeSigned(this.sense.pursuitYaw);
         out[cursor++] = normalizeSigned(this.sense.pursuitPitch);
-        out[cursor++] = clamp01((this.sense.pursuitAimDot + 1) * 0.5);
-        out[cursor++] = Number.isFinite(this.sense.targetDistanceSq)
-            ? clamp01(Math.sqrt(this.sense.targetDistanceSq) / Math.max(1, lookAhead * 8))
-            : 1;
+        out[cursor++] = normalizeSigned(this.sense.pursuitAimDot);
+        out[cursor++] = normalizeTargetDistance(this.sense.targetDistanceSq, lookAhead);
         out[cursor++] = this.sense.targetInFront ? 1 : 0;
         out[cursor++] = normalizeSigned(this.sense.targetYaw);
         out[cursor++] = normalizeSigned(this.sense.targetPitch);
-        out[cursor++] = clamp01((this.sense.targetAimDot + 1) * 0.5);
+        out[cursor++] = normalizeSigned(this.sense.targetAimDot);
         out[cursor++] = this.state?.portalIntentActive ? 1 : 0;
         out[cursor++] = clamp01(this.state?.portalIntentScore);
 
