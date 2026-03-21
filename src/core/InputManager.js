@@ -68,6 +68,7 @@ export class InputManager {
     }
 
     _handleKeyDown(e) {
+        if (this._isTextInputFocused()) return;
         if (!this.keys[e.code]) {
             this.justPressed[e.code] = true;
         }
@@ -78,6 +79,7 @@ export class InputManager {
     }
 
     _handleKeyUp(e) {
+        if (this._isTextInputFocused()) return;
         this.keys[e.code] = false;
         if (this._shouldPreventDefault(e.code)) {
             e.preventDefault();
