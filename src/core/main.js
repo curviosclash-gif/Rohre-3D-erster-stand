@@ -481,6 +481,7 @@ export class Game {
         this.gameLoop?.stop?.();
         this.matchFlowUiController?.sessionOrchestrator?.teardownMatchSession?.();
         this.runtimeFacade?.dispose?.();
+        this.huntHud?.dispose?.();
         this.uiManager?.dispose?.();
         this.runtimeDiagnosticsSystem?.dispose?.();
         this.mediaRecorderSystem?.dispose?.();

@@ -1,44 +1,85 @@
-import { GAME_MODE_TYPES } from './HuntMode.js';
-import { CONFIG } from '../core/Config.js';
+import { clamp01 } from '../utils/MathOps.js';
+import { createHuntHudDomRefs } from './dom/HuntHudDomRefs.js';
 
-function clamp01(value) {
-    return Math.max(0, Math.min(1, Number(value) || 0));
-}
+const HOTPATH_INTERVAL_FALLBACKS = Object.freeze({
+    playerPanel: 0.12,
+    killFeed: 0.12,
+    indicator: 0.04,
+});
+const KILL_FEED_SLOT_COUNT = 5;
+const MIN_BOOST_CAPACITY = 0.001;
+const OVERHEAT_CAP = 100;
+const INDICATOR_DEFAULT_INTENSITY = 0.6;
+const INDICATOR_MIN_OPACITY = 0.2;
+const DEFAULT_BOOST_CAPACITY = 1;
 
 function toPercent(value) {
     return `${(clamp01(value) * 100).toFixed(1)}%`;
 }
 
+function normalizeConstructorOptions(input) {
+    if (!input || typeof input !== 'object') {
+        return { runtime: null };
+    }
+    const optionKeys = ['runtime', 'refs', 'isHuntActive', 'getBoostCapacity', 'documentRef', 'game'];
+    const isOptionsObject = optionKeys.some((key) => Object.prototype.hasOwnProperty.call(input, key));
+    if (isOptionsObject) {
+        return input;
+    }
+    return { runtime: input };
+}
+
+function resolveCreateListItem(refs) {
+    if (typeof refs?.createKillFeedItem === 'function') {
+        return refs.createKillFeedItem;
+    }
+    return () => globalThis.document?.createElement?.('li') ?? null;
+}
+
+function defaultIsHuntActive(runtime) {
+    return runtime?.activeGameMode === 'HUNT' && runtime?.state !== 'MENU';
+}
+
 export class HuntHUD {
-    constructor(game) {
-        this.game = game;
-        this.root = document.getElementById('hunt-hud');
-        this.p1ShieldFill = document.getElementById('hunt-p1-shield-fill');
-        this.p1ShieldText = document.getElementById('hunt-p1-shield-text');
-        this.p1BoostFill = document.getElementById('hunt-p1-boost-fill');
-        this.p1BoostText = document.getElementById('hunt-p1-boost-text');
-        this.p1OverheatFill = document.getElementById('hunt-p1-overheat-fill');
-        this.p1OverheatText = document.getElementById('hunt-p1-overheat-text');
-        this.p2Panel = document.getElementById('hunt-p2-panel');
-        this.p2ShieldFill = document.getElementById('hunt-p2-shield-fill');
-        this.p2ShieldText = document.getElementById('hunt-p2-shield-text');
-        this.p2BoostFill = document.getElementById('hunt-p2-boost-fill');
-        this.p2BoostText = document.getElementById('hunt-p2-boost-text');
-        this.p2OverheatFill = document.getElementById('hunt-p2-overheat-fill');
-        this.p2OverheatText = document.getElementById('hunt-p2-overheat-text');
-        this.killFeedList = document.getElementById('hunt-kill-feed-list');
+    constructor(input = {}) {
+        const options = normalizeConstructorOptions(input);
+        const refs = options.refs ?? createHuntHudDomRefs(options.documentRef);
+
+        this.runtime = options.runtime ?? options.game ?? null;
+        this.root = refs.root ?? null;
+        this.p1ShieldFill = refs.p1ShieldFill ?? null;
+        this.p1ShieldText = refs.p1ShieldText ?? null;
+        this.p1BoostFill = refs.p1BoostFill ?? null;
+        this.p1BoostText = refs.p1BoostText ?? null;
+        this.p1OverheatFill = refs.p1OverheatFill ?? null;
+        this.p1OverheatText = refs.p1OverheatText ?? null;
+        this.p2Panel = refs.p2Panel ?? null;
+        this.p2ShieldFill = refs.p2ShieldFill ?? null;
+        this.p2ShieldText = refs.p2ShieldText ?? null;
+        this.p2BoostFill = refs.p2BoostFill ?? null;
+        this.p2BoostText = refs.p2BoostText ?? null;
+        this.p2OverheatFill = refs.p2OverheatFill ?? null;
+        this.p2OverheatText = refs.p2OverheatText ?? null;
+        this.killFeedList = refs.killFeedList ?? null;
         this._killFeedSlots = [];
-        this._killFeedCachedTexts = new Array(5).fill('');
-        this.damageIndicatorP1 = document.getElementById('hunt-damage-indicator');
-        this.damageIndicatorP2 = document.getElementById('hunt-damage-indicator-p2');
+        this._killFeedCachedTexts = new Array(KILL_FEED_SLOT_COUNT).fill('');
+        this._createKillFeedItem = resolveCreateListItem(refs);
+        this.damageIndicatorP1 = refs.damageIndicatorP1 ?? null;
+        this.damageIndicatorP2 = refs.damageIndicatorP2 ?? null;
         this._playerPanelTickTimer = 0;
         this._killFeedTickTimer = 0;
         this._indicatorTickTimer = 0;
         this._wasHuntActive = false;
+        this._isHuntActive = typeof options.isHuntActive === 'function'
+            ? options.isHuntActive
+            : defaultIsHuntActive;
+        this._getBoostCapacity = typeof options.getBoostCapacity === 'function'
+            ? options.getBoostCapacity
+            : () => DEFAULT_BOOST_CAPACITY;
     }
 
     _resolveUiHotpathInterval(key, fallback) {
-        const configured = Number(this.game?.runtimeConfig?.uiHotpath?.[key]);
+        const configured = Number(this.runtime?.runtimeConfig?.uiHotpath?.[key]);
         if (Number.isFinite(configured) && configured > 0) {
             return configured;
         }
@@ -64,11 +105,11 @@ export class HuntHUD {
     }
 
     update(dt) {
-        if (!this.root) return;
+        if (!this.root || !this.runtime) return;
 
-        const game = this.game;
-        const huntActive = game.activeGameMode === GAME_MODE_TYPES.HUNT && game.state !== 'MENU';
-        const humans = game.entityManager ? game.entityManager.getHumanPlayers() : [];
+        const runtime = this.runtime;
+        const huntActive = this._isHuntActive(runtime);
+        const humans = runtime.entityManager ? runtime.entityManager.getHumanPlayers() : [];
         this.root.classList.toggle('hidden', !huntActive);
         if (!huntActive) {
             if (this._wasHuntActive) {
@@ -78,9 +119,9 @@ export class HuntHUD {
             return;
         }
 
-        const playerPanelInterval = this._resolveUiHotpathInterval('huntPlayerPanelInterval', 0.12);
-        const killFeedInterval = this._resolveUiHotpathInterval('huntKillFeedInterval', 0.12);
-        const indicatorInterval = this._resolveUiHotpathInterval('huntIndicatorInterval', 0.04);
+        const playerPanelInterval = this._resolveUiHotpathInterval('huntPlayerPanelInterval', HOTPATH_INTERVAL_FALLBACKS.playerPanel);
+        const killFeedInterval = this._resolveUiHotpathInterval('huntKillFeedInterval', HOTPATH_INTERVAL_FALLBACKS.killFeed);
+        const indicatorInterval = this._resolveUiHotpathInterval('huntIndicatorInterval', HOTPATH_INTERVAL_FALLBACKS.indicator);
         if (!this._wasHuntActive) {
             this._playerPanelTickTimer = playerPanelInterval;
             this._killFeedTickTimer = killFeedInterval;
@@ -130,18 +171,19 @@ export class HuntHUD {
         if (refs.shieldFill) refs.shieldFill.style.width = toPercent(shieldRatio);
         if (refs.shieldText) refs.shieldText.textContent = `${Math.round(shield)} / ${Math.round(maxShield)}`;
 
-        const boostCapacity = Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1);
+        const resolvedBoostCapacity = Number(this._getBoostCapacity(player, this.runtime));
+        const boostCapacity = Math.max(MIN_BOOST_CAPACITY, Number.isFinite(resolvedBoostCapacity) ? resolvedBoostCapacity : DEFAULT_BOOST_CAPACITY);
         const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
         const boostRatio = clamp01(boostCharge / boostCapacity);
-        const isBoostCooldown = !player?.manualBoostActive && boostCharge < (boostCapacity - 0.001);
+        const isBoostCooldown = !player?.manualBoostActive && boostCharge < (boostCapacity - MIN_BOOST_CAPACITY);
         if (refs.boostFill) {
             refs.boostFill.style.width = toPercent(boostRatio);
             refs.boostFill.classList.toggle('cooldown', isBoostCooldown);
         }
         if (refs.boostText) refs.boostText.textContent = `${Math.round(boostRatio * 100)}%`;
 
-        const overheatValue = Number(this.game?.huntState?.overheatByPlayer?.[player?.index] || 0);
-        const overheatRatio = clamp01(overheatValue / 100);
+        const overheatValue = Number(this.runtime?.huntState?.overheatByPlayer?.[player?.index] || 0);
+        const overheatRatio = clamp01(overheatValue / OVERHEAT_CAP);
         if (refs.overheatFill) refs.overheatFill.style.width = toPercent(overheatRatio);
         if (refs.overheatText) refs.overheatText.textContent = `${Math.round(overheatValue)}%`;
     }
@@ -149,8 +191,9 @@ export class HuntHUD {
     _ensureKillFeedSlots() {
         if (!this.killFeedList || this._killFeedSlots.length > 0) return;
         this.killFeedList.textContent = '';
-        for (let i = 0; i < 5; i++) {
-            const slot = document.createElement('li');
+        for (let i = 0; i < KILL_FEED_SLOT_COUNT; i += 1) {
+            const slot = this._createKillFeedItem();
+            if (!slot) break;
             slot.hidden = true;
             this.killFeedList.appendChild(slot);
             this._killFeedSlots.push(slot);
@@ -161,10 +204,12 @@ export class HuntHUD {
         if (!this.killFeedList) return;
         this._ensureKillFeedSlots();
 
-        const entries = Array.isArray(this.game?.huntState?.killFeed)
-            ? this.game.huntState.killFeed
+        const entries = Array.isArray(this.runtime?.huntState?.killFeed)
+            ? this.runtime.huntState.killFeed
             : [];
-        for (let i = 0; i < 5; i++) {
+
+        const slotCount = this._killFeedSlots.length;
+        for (let i = 0; i < slotCount; i += 1) {
             const slot = this._killFeedSlots[i];
             const nextText = i < entries.length ? String(entries[i]) : '';
             if (this._killFeedCachedTexts[i] !== nextText) {
@@ -180,7 +225,7 @@ export class HuntHUD {
     }
 
     _resolveDamageIndicatorState(playerIndex, allowLegacyFallback = false) {
-        const byPlayer = this.game?.huntState?.damageIndicatorsByPlayer;
+        const byPlayer = this.runtime?.huntState?.damageIndicatorsByPlayer;
         if (Number.isInteger(playerIndex) && byPlayer && typeof byPlayer === 'object') {
             const indicatorByPlayer = byPlayer[playerIndex];
             if (indicatorByPlayer) {
@@ -188,7 +233,7 @@ export class HuntHUD {
             }
         }
         if (!allowLegacyFallback) return null;
-        return this.game?.huntState?.damageIndicator || null;
+        return this.runtime?.huntState?.damageIndicator || null;
     }
 
     _updateDamageIndicatorElement(element, indicator, dt) {
@@ -205,9 +250,9 @@ export class HuntHUD {
         }
 
         const angle = Number(indicator.angleDeg) || 0;
-        const intensity = clamp01(indicator.intensity || 0.6);
+        const intensity = clamp01(indicator.intensity || INDICATOR_DEFAULT_INTENSITY);
         element.classList.remove('hidden');
-        element.style.opacity = String(Math.max(0.2, intensity));
+        element.style.opacity = String(Math.max(INDICATOR_MIN_OPACITY, intensity));
         element.style.transform = `translate(-50%, -50%) rotate(${angle.toFixed(1)}deg)`;
     }
 
@@ -230,5 +275,18 @@ export class HuntHUD {
         const p2 = humans[1] || null;
         const p2Indicator = this._resolveDamageIndicatorState(p2?.index, false);
         this._updateDamageIndicatorElement(this.damageIndicatorP2, p2Indicator, dt);
+    }
+
+    dispose() {
+        this._resetTickState();
+        this.root?.classList.add('hidden');
+        this.p2Panel?.classList.add('hidden');
+        if (this.killFeedList) {
+            this.killFeedList.textContent = '';
+        }
+        this._killFeedSlots.length = 0;
+        this._killFeedCachedTexts.fill('');
+        this._wasHuntActive = false;
+        this.runtime = null;
     }
 }

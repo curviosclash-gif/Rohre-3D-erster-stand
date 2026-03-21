@@ -7,7 +7,7 @@ import { HUD } from '../ui/HUD.js';
 import { MatchFlowUiController } from '../ui/MatchFlowUiController.js';
 import { RuntimeDiagnosticsSystem } from './RuntimeDiagnosticsSystem.js';
 import { KeybindEditorController } from '../ui/KeybindEditorController.js';
-import { HuntHUD } from '../hunt/HuntHUD.js';
+import { HuntHUD } from '../ui/HuntHUD.js';
 import { ScreenShake } from '../hunt/ScreenShake.js';
 import { PlanarAimAssistSystem } from './PlanarAimAssistSystem.js';
 import { MatchSessionRuntimeBridge } from './MatchSessionRuntimeBridge.js';
@@ -18,6 +18,9 @@ import { MediaRecorderSystem } from './MediaRecorderSystem.js';
 import { MenuExpertLoginRuntime } from '../ui/menu/MenuExpertLoginRuntime.js';
 import { createRuntimePorts } from '../shared/runtime/GameRuntimePorts.js';
 import { createGameUiRefs as createGameUiDomRefs } from '../ui/dom/GameUiDomRefs.js';
+import { createHuntHudDomRefs } from '../ui/dom/HuntHudDomRefs.js';
+import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
+import { CONFIG } from './Config.js';
 
 function readBooleanQueryParam(paramName, fallback = false) {
     try {
@@ -79,7 +82,12 @@ export function bootstrapGameRuntime(game, options = {}) {
 
     game.hudP1 = new HUD('p1-fighter-hud', 0);
     game.hudP2 = new HUD('p2-fighter-hud', 1);
-    game.huntHud = new HuntHUD(game);
+    game.huntHud = new HuntHUD({
+        runtime: game,
+        refs: createHuntHudDomRefs(document),
+        isHuntActive: (runtime) => runtime.activeGameMode === GAME_MODE_TYPES.HUNT && runtime.state !== 'MENU',
+        getBoostCapacity: () => Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1,
+    });
     game.screenShake = new ScreenShake(game.renderer);
     game.hudRuntimeSystem = new HudRuntimeSystem({ game, ports: game.runtimePorts });
     game.crosshairSystem = new CrosshairSystem({ game, ports: game.runtimePorts });

@@ -50,7 +50,7 @@ Stand: 2026-03-21
 ### 2.4 UI (`src/ui`)
 
 - `UIManager.js`: Menues, selektive Settings-Sync (`syncByChangeKeys`), Menu-Context und Status-Toast
-- `HUD.js`: Ingame-Overlay
+- `HUD.js`, `HuntHUD.js`: Ingame-Overlay
 - `MatchFlowUiController.js`, `KeybindEditorController.js`: UI-Flow/Settings-Controller-Splits aus `main.js`
 - `UISettingsSyncMap.js`: Zuordnung `changedKey -> UI-Sync-Teilfunktion`
 - `SettingsChangeKeys.js`, `SettingsChangeSetOps.js`: stabiler Key-Vertrag und Set-Operationen fuer Event-Coalescing
@@ -62,7 +62,7 @@ Stand: 2026-03-21
 
 - `HuntMode.js`, `HuntConfig.js`, `HealthSystem.js`: Game-Mode + HP/Shield-Logik
 - `OverheatGunSystem.js`, `RocketPickupSystem.js`, `DestructibleTrail.js`: Hunt-Kampfpfade
-- `HuntHUD.js`, `ScreenShake.js`: Hunt-UI/Feedback
+- `ScreenShake.js`: Hunt-Feedback
 - `RespawnSystem.js`, `HuntScoring.js`: Respawn + erweitertes Hunt-Scoring
 
 ## 3. State-Namen (aktuell)
