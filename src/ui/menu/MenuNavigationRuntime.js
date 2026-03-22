@@ -251,7 +251,10 @@ export class MenuNavigationRuntime {
 
     _handleMenuKeyDown(event) {
         if (!event) return;
-        if (event.key === 'Escape' && this.stateMachine?.getState?.() !== MENU_STATE_IDS.MAIN) {
+        if (
+            event.key === 'Escape'
+            && (this._isLevel4Open() || this.stateMachine?.getState?.() !== MENU_STATE_IDS.MAIN)
+        ) {
             event.preventDefault();
             this._goBackFromCurrent('escape');
             return;
@@ -388,7 +391,7 @@ export class MenuNavigationRuntime {
         if (consumePress(12)) this._moveFocusByDirection('up');
         if (consumePress(13)) this._moveFocusByDirection('down');
         if (consumePress(0)) this._activateFocusedElement();
-        if (consumePress(1) && this.stateMachine?.getState?.() !== MENU_STATE_IDS.MAIN) {
+        if (consumePress(1) && (this._isLevel4Open() || this.stateMachine?.getState?.() !== MENU_STATE_IDS.MAIN)) {
             this._goBackFromCurrent('controller_back');
         }
         if (consumePress(4)) this._moveFocusByDirection('left');

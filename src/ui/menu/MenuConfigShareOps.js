@@ -27,6 +27,7 @@ function createSharePayload(settings) {
         vehicles: deepClone(source.vehicles || defaults.vehicles),
         hunt: deepClone(source.hunt || defaults.hunt),
         gameplay: deepClone(source.gameplay || defaults.gameplay),
+        recording: deepClone(source.recording || defaults.recording),
     };
 }
 
@@ -55,6 +56,10 @@ function applySharePayload(settings, payload) {
     settings.gameplay = {
         ...(settings.gameplay && typeof settings.gameplay === 'object' ? settings.gameplay : deepClone(defaults.gameplay)),
         ...(payload.gameplay && typeof payload.gameplay === 'object' ? payload.gameplay : {}),
+    };
+    settings.recording = {
+        ...(settings.recording && typeof settings.recording === 'object' ? settings.recording : deepClone(defaults.recording || {})),
+        ...(payload.recording && typeof payload.recording === 'object' ? payload.recording : {}),
     };
     if (!settings.localSettings || typeof settings.localSettings !== 'object') {
         settings.localSettings = {};

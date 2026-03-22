@@ -1,5 +1,6 @@
 import { HUNT_CONFIG } from '../../hunt/HuntConfig.js';
 import { DEFAULT_SHADOW_QUALITY } from '../../shared/contracts/ShadowQualityContract.js';
+import { createDefaultRecordingCaptureSettings } from '../../shared/contracts/RecordingCaptureContract.js';
 
 export const MENU_DEFAULT_EDITOR_SCHEMA_VERSION = 'menu-default-editor.v1';
 export const MENU_DEFAULT_EVENT_PLAYLIST_ID = 'fun_rotation';
@@ -70,6 +71,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             resumeCheckpoint: '',
             resumeStrict: false,
         },
+        recording: createDefaultRecordingCaptureSettings(),
     },
     localSettings: {
         ownerId: 'owner',
@@ -136,6 +138,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             respawnEnabled: false,
         },
         gameplay: {},
+        recording: createDefaultRecordingCaptureSettings(),
     },
     fixedPresets: [
         {
@@ -325,6 +328,7 @@ export function createMenuDefaultsEditorSnapshotFromSettings(settings = {}) {
             hunt: deepClone(source.hunt || MENU_DEFAULT_EDITOR_CONFIG.baseSettings.hunt),
             gameplay: deepClone(source.gameplay || MENU_DEFAULT_EDITOR_CONFIG.baseSettings.gameplay),
             botBridge: deepClone(source.botBridge || MENU_DEFAULT_EDITOR_CONFIG.baseSettings.botBridge),
+            recording: deepClone(source.recording || MENU_DEFAULT_EDITOR_CONFIG.baseSettings.recording),
         },
         localSettings: {
             sessionType: String(localSettings.sessionType || MENU_DEFAULT_EDITOR_CONFIG.localSettings.sessionType),

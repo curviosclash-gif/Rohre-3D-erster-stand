@@ -17,6 +17,12 @@ import { MenuStateMachine, MENU_STATE_IDS } from './menu/MenuStateMachine.js';
 import { listMenuTextCatalogEntries } from './menu/MenuTextCatalog.js';
 import { MenuTextRuntime } from './menu/MenuTextRuntime.js';
 import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality, resolveShadowQualityLabel } from '../shared/contracts/ShadowQualityContract.js';
+import {
+    createDefaultRecordingCaptureSettings,
+    normalizeRecordingCaptureSettings,
+    RECORDING_CAPTURE_PROFILE,
+    RECORDING_HUD_MODE,
+} from '../shared/contracts/RecordingCaptureContract.js';
 import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
@@ -348,6 +354,25 @@ export class UIManager {
         if (ui.shadowQualitySlider) ui.shadowQualitySlider.value = String(shadowQuality);
         if (ui.shadowQualityLabel) ui.shadowQualityLabel.textContent = resolveShadowQualityLabel(shadowQuality);
         ui.lockOnLabel.textContent = gp.lockOnAngle + '\u00B0';
+        const recordingSettings = normalizeRecordingCaptureSettings(
+            settings?.recording,
+            createDefaultRecordingCaptureSettings()
+        );
+        if (ui.recordingProfileSelect) {
+            ui.recordingProfileSelect.value = recordingSettings.profile;
+        }
+        if (ui.recordingHudModeSelect) {
+            ui.recordingHudModeSelect.value = recordingSettings.hudMode;
+        }
+        if (ui.recordingProfileHint) {
+            const profileLabel = recordingSettings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
+                ? 'YouTube Shorts'
+                : 'Standard';
+            const hudLabel = recordingSettings.hudMode === RECORDING_HUD_MODE.WITH_HUD
+                ? 'mit HUD'
+                : 'clean';
+            ui.recordingProfileHint.textContent = `Aufnahmeprofil: ${profileLabel} - HUD: ${hudLabel}`;
+        }
 
         if (ui.planarModeToggle) ui.planarModeToggle.checked = !!gp.planarMode;
         if (Array.isArray(ui.dimensionModeButtons)) {

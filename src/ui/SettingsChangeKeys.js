@@ -31,6 +31,8 @@ export const SETTINGS_CHANGE_KEYS = Object.freeze({
     GAMEPLAY_PLANAR_MODE: 'gameplay.planarMode',
     GAMEPLAY_PORTAL_COUNT: 'gameplay.portalCount',
     GAMEPLAY_PLANAR_LEVEL_COUNT: 'gameplay.planarLevelCount',
+    RECORDING_PROFILE: 'recording.profile',
+    RECORDING_HUD_MODE: 'recording.hudMode',
     PRESET_ACTIVE_ID: 'preset.activeId',
     PRESET_ACTIVE_KIND: 'preset.activeKind',
     PRESET_LIST: 'preset.list',

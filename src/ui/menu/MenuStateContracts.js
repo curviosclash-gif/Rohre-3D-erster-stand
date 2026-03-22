@@ -199,6 +199,7 @@ export function createSettingsDomainSnapshot(settings) {
             portalsEnabled: source.portalsEnabled,
             hunt: source.hunt ? { ...source.hunt } : { respawnEnabled: false },
             gameplay: source.gameplay ? { ...source.gameplay } : {},
+            recording: source.recording ? { ...source.recording } : {},
             preset: { ...source.matchSettings },
         },
         playerLoadout: {

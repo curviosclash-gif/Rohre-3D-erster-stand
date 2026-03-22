@@ -7,6 +7,10 @@ import {
     SETTINGS_LIMITS,
 } from './config/SettingsRuntimeContract.js';
 import { normalizeSessionType } from '../ui/menu/MenuDraftStore.js';
+import {
+    createDefaultRecordingCaptureSettings,
+    normalizeRecordingCaptureSettings,
+} from '../shared/contracts/RecordingCaptureContract.js';
 
 function toNumber(value, fallback) {
     const parsed = Number(value);
@@ -108,6 +112,9 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
     const huntSource = source.hunt && typeof source.hunt === 'object' ? source.hunt : {};
     const botBridgeSource = source.botBridge && typeof source.botBridge === 'object' ? source.botBridge : {};
     const arcadeSource = source.arcade && typeof source.arcade === 'object' ? source.arcade : {};
+    const recordingSource = source.recording && typeof source.recording === 'object'
+        ? source.recording
+        : createDefaultRecordingCaptureSettings();
 
     const sessionType = normalizeSessionType(source?.localSettings?.sessionType || (source.mode === '2p' ? 'splitscreen' : 'single'));
     const modePath = String(source?.localSettings?.modePath || 'normal').trim().toLowerCase();
@@ -224,6 +231,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             maxMultiplier: clampInteger(arcadeSource.maxMultiplier, 1, 25, 8),
             replayHooksEnabled: arcadeSource.replayHooksEnabled !== false,
         },
+        recording: normalizeRecordingCaptureSettings(recordingSource, createDefaultRecordingCaptureSettings()),
         settingsSnapshot: deepClone(source),
     };
 

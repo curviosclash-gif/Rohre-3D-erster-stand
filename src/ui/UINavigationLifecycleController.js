@@ -26,6 +26,7 @@ export class UINavigationLifecycleController {
         this.game = game;
         this.manager = manager;
         this._level4SectionControlsSetup = false;
+        this._level4CloseFallbackSetup = false;
         this._developerTextCatalogSetup = false;
         this._toastTimer = null;
     }
@@ -230,6 +231,11 @@ export class UINavigationLifecycleController {
         manager._submenuPanels = Array.isArray(this.ui.menuPanels) && this.ui.menuPanels.length > 0
             ? this.ui.menuPanels
             : Array.from(document.querySelectorAll('.submenu-panel'));
+
+        if (!this._level4CloseFallbackSetup && this.ui.closeLevel4Button) {
+            this.manager._listen(this.ui.closeLevel4Button, 'click', () => manager.setLevel4Open(false));
+            this._level4CloseFallbackSetup = true;
+        }
 
         manager._menuButtonByPanel.clear();
         manager._navButtons.forEach(btn => {
@@ -459,6 +465,7 @@ export class UINavigationLifecycleController {
             this._toastTimer = null;
         }
         this._level4SectionControlsSetup = false;
+        this._level4CloseFallbackSetup = false;
         this._developerTextCatalogSetup = false;
     }
 }

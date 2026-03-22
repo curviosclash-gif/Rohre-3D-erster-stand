@@ -70,10 +70,13 @@ export function bootstrapGameRuntime(game, options = {}) {
         autoDownload: true,
         captureFps: recorderRuntimeConfig.captureFps,
         downloadDirectoryName: 'videos',
+        captureSourceResolver: () => game.renderer?.getRecordingCaptureCanvas?.() || canvas,
+        recordingCaptureSettings: game.settings?.recording,
         onRecordingStateChange: (isRecording) => game.renderer?.setRecordingActive?.(isRecording),
         runtimePerfProfiler: game.runtimePerfProfiler,
         logger: console,
     });
+    game.renderer.setRecordingCaptureSettings(game.settings?.recording);
     game.input = new InputManager();
     game.audio = new AudioManager();
     game.particles = new ParticleSystem(game.renderer);

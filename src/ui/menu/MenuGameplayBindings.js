@@ -1,7 +1,13 @@
 import { CONFIG } from '../../core/Config.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
+import { EDITOR_VIEW_PATHS } from '../../shared/contracts/EditorPathContract.js';
 import { normalizeShadowQuality } from '../../shared/contracts/ShadowQualityContract.js';
+import {
+    createDefaultRecordingCaptureSettings,
+    RECORDING_CAPTURE_PROFILE,
+    RECORDING_HUD_MODE,
+} from '../../shared/contracts/RecordingCaptureContract.js';
 import { clamp } from '../../utils/MathOps.js';
 import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
 
@@ -15,6 +21,22 @@ export function setupMenuGameplayBindings(ctx) {
     const keys = ctx.settingsChangeKeys;
     const bind = ctx.bind;
     const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
+    const ensureRecordingSettings = () => {
+        if (!settings.recording || typeof settings.recording !== 'object') {
+            settings.recording = createDefaultRecordingCaptureSettings();
+        }
+        return settings.recording;
+    };
+    const resolveRecordingProfileLabel = (profile) => (
+        profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
+            ? 'YouTube Shorts'
+            : 'Standard'
+    );
+    const resolveRecordingHudLabel = (hudMode) => (
+        hudMode === RECORDING_HUD_MODE.WITH_HUD
+            ? 'mit HUD'
+            : 'clean'
+    );
     const applyPlanarMode = (enabled) => {
         if (!settings.gameplay) settings.gameplay = {};
         settings.gameplay.planarMode = !!enabled;
@@ -267,6 +289,36 @@ export function setupMenuGameplayBindings(ctx) {
             queueInputSettingsChanged([keys.LOCAL_SHADOW_QUALITY]);
         });
     }
+    if (ui.recordingProfileSelect) {
+        bind(ui.recordingProfileSelect, 'change', () => {
+            const recordingSettings = ensureRecordingSettings();
+            const profile = String(ui.recordingProfileSelect.value || '').trim().toLowerCase();
+            recordingSettings.profile = profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
+                ? RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
+                : RECORDING_CAPTURE_PROFILE.STANDARD;
+            emitSettingsChangedImmediate([keys.RECORDING_PROFILE]);
+            emit(eventTypes.SHOW_STATUS_TOAST, {
+                message: `Recording-Profil: ${resolveRecordingProfileLabel(recordingSettings.profile)} (${resolveRecordingHudLabel(recordingSettings.hudMode)})`,
+                duration: 1300,
+                tone: 'info',
+            });
+        });
+    }
+    if (ui.recordingHudModeSelect) {
+        bind(ui.recordingHudModeSelect, 'change', () => {
+            const recordingSettings = ensureRecordingSettings();
+            const hudMode = String(ui.recordingHudModeSelect.value || '').trim().toLowerCase();
+            recordingSettings.hudMode = hudMode === RECORDING_HUD_MODE.WITH_HUD
+                ? RECORDING_HUD_MODE.WITH_HUD
+                : RECORDING_HUD_MODE.CLEAN;
+            emitSettingsChangedImmediate([keys.RECORDING_HUD_MODE]);
+            emit(eventTypes.SHOW_STATUS_TOAST, {
+                message: `Recording-HUD: ${resolveRecordingHudLabel(recordingSettings.hudMode)}`,
+                duration: 1300,
+                tone: 'info',
+            });
+        });
+    }
 
     bind(ui.startButton, 'click', () => {
         emit(eventTypes.START_MATCH);
@@ -329,13 +381,13 @@ export function setupMenuGameplayBindings(ctx) {
 
     if (ui.openEditorButton) {
         bind(ui.openEditorButton, 'click', () => {
-            window.open('editor/map-editor-3d.html', '_blank');
+            window.open(EDITOR_VIEW_PATHS.MAP_EDITOR, '_blank');
         });
     }
 
     if (ui.openVehicleEditorButton) {
         bind(ui.openVehicleEditorButton, 'click', () => {
-            window.open('prototypes/vehicle-lab/index.html', '_blank');
+            window.open(EDITOR_VIEW_PATHS.VEHICLE_LAB, '_blank');
         });
     }
 
