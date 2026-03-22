@@ -1916,6 +1916,57 @@ input[type="range"]::-webkit-slider-thumb {
     box-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
 }
 
+.parcours-hud {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 220px;
+    max-width: min(90vw, 380px);
+    padding: 10px 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(96, 200, 255, 0.35);
+    background: linear-gradient(180deg, rgba(6, 24, 34, 0.86), rgba(8, 14, 26, 0.9));
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.32);
+    backdrop-filter: blur(3px);
+    z-index: 21;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+}
+
+.parcours-route {
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #90d8ff;
+    opacity: 0.9;
+}
+
+.parcours-progress {
+    margin-top: 4px;
+    font-size: 1.08rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #e8f8ff;
+}
+
+.parcours-timer {
+    margin-top: 3px;
+    font-size: 0.82rem;
+    color: rgba(208, 238, 255, 0.85);
+}
+
+.parcours-status {
+    margin-top: 5px;
+    min-height: 1.05em;
+    font-size: 0.75rem;
+    color: rgba(255, 146, 146, 0.95);
+}
+
+.parcours-status.success {
+    color: rgba(132, 247, 160, 0.98);
+}
+
 .hunt-hud {
     position: absolute;
     left: 0;
@@ -2338,6 +2389,12 @@ input[type="range"]::-webkit-slider-thumb {
     .hunt-kill-feed {
         min-width: 0;
         max-width: none;
+    }
+
+    .parcours-hud {
+        top: 12px;
+        min-width: 180px;
+        padding: 8px 10px;
     }
 }
 

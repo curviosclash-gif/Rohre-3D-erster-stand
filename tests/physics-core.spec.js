@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test';
 import { loadGame, openGameSubmenu, startGame, startGameWithBots } from './helpers.js';
 import { stringifyMapDocument } from '../src/entities/MapSchema.js';
 import { TEST_HANGAR_GLB_DATA_URI } from '../src/core/config/maps/EmbeddedGlbMapAssets.js';
+import { ParcoursProgressSystem } from '../src/entities/systems/ParcoursProgressSystem.js';
 
 const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
 
@@ -51,6 +52,86 @@ function buildAuthoredRuntimeShowcaseMap() {
             { id: 'air_2', jetId: 'jet_ship6', x: 102, y: 60, z: 36, scale: 3.15, rotateY: -1.15 },
         ],
     });
+}
+
+function createParcoursDefinition(overrides = {}) {
+    const sourceRules = overrides.rules || {};
+    return {
+        enabled: true,
+        routeId: overrides.routeId || 'unit_test_route',
+        checkpoints: Array.isArray(overrides.checkpoints) ? overrides.checkpoints : [
+            { id: 'CP01', type: 'entry', pos: [0, 0, 0], radius: 1.2, forward: [1, 0, 0] },
+            { id: 'CP02', type: 'gate', pos: [10, 0, 0], radius: 1.2, forward: [1, 0, 0] },
+            { id: 'CP03', type: 'gate', pos: [20, 0, 0], radius: 1.2, forward: [1, 0, 0] },
+        ],
+        finish: overrides.finish || { id: 'FINISH', type: 'finish', pos: [30, 0, 0], radius: 1.3, forward: [1, 0, 0] },
+        rules: {
+            ordered: sourceRules.ordered !== false,
+            resetOnDeath: sourceRules.resetOnDeath !== false,
+            resetToLastValid: sourceRules.resetToLastValid === true,
+            maxSegmentTimeMs: Number.isFinite(Number(sourceRules.maxSegmentTimeMs)) ? Number(sourceRules.maxSegmentTimeMs) : 4000,
+            cooldownMs: Number.isFinite(Number(sourceRules.cooldownMs)) ? Number(sourceRules.cooldownMs) : 450,
+            allowLaneAliases: sourceRules.allowLaneAliases !== false,
+            winnerByParcoursComplete: sourceRules.winnerByParcoursComplete !== false,
+            wrongOrderCooldownMs: Number.isFinite(Number(sourceRules.wrongOrderCooldownMs)) ? Number(sourceRules.wrongOrderCooldownMs) : 700,
+            errorIndicatorMs: Number.isFinite(Number(sourceRules.errorIndicatorMs)) ? Number(sourceRules.errorIndicatorMs) : 1000,
+        },
+    };
+}
+
+function createParcoursHarness(parcoursDefinition) {
+    const nowRef = { value: 0 };
+    const recorderEvents = [];
+    const feedback = [];
+    const player = {
+        index: 0,
+        isBot: false,
+        alive: true,
+        hitboxRadius: 0.8,
+        position: { x: -1, y: 0, z: 0 },
+    };
+    const entityManager = {
+        arena: {
+            currentMapDefinition: {
+                parcours: parcoursDefinition,
+            },
+        },
+        players: [player],
+        recorder: {
+            logEvent(type, playerIndex, details) {
+                recorderEvents.push({ type, playerIndex, details });
+            },
+        },
+        _notifyPlayerFeedback(targetPlayer, message) {
+            feedback.push({ playerIndex: targetPlayer?.index ?? -1, message });
+        },
+    };
+    const system = new ParcoursProgressSystem(entityManager, {
+        nowProvider: () => nowRef.value,
+    });
+    system.startRound([player]);
+    system.onPlayerSpawn(player, { reason: 'spawn_all' });
+    return {
+        nowRef,
+        player,
+        system,
+        recorderEvents,
+        feedback,
+    };
+}
+
+function crossCheckpoint(system, player, entry, nowMs, distance = 0.45) {
+    const pos = Array.isArray(entry?.pos) ? entry.pos : [0, 0, 0];
+    const forward = Array.isArray(entry?.forward) ? entry.forward : [1, 0, 0];
+    const previousPosition = {
+        x: pos[0] - (forward[0] * distance),
+        y: pos[1] - (forward[1] * distance),
+        z: pos[2] - (forward[2] * distance),
+    };
+    player.position.x = pos[0] + (forward[0] * distance);
+    player.position.y = pos[1] + (forward[1] * distance);
+    player.position.z = pos[2] + (forward[2] * distance);
+    return system.updatePlayerProgress(player, previousPosition, nowMs);
 }
 
 test.describe('Physics Core (Tests 41-60)', () => {
@@ -651,6 +732,162 @@ test.describe('Physics Core (Tests 41-60)', () => {
             return botAI.sense.targetInFront;
         });
         expect(targetInFront).toBeTruthy();
+    });
+
+    test('T60a: Parcours-Happy-Path liefert Completion, HUD-State und Objective-Outcome', () => {
+        const harness = createParcoursHarness(createParcoursDefinition({
+            rules: {
+                ordered: true,
+                resetOnDeath: true,
+                maxSegmentTimeMs: 5000,
+                cooldownMs: 250,
+                winnerByParcoursComplete: true,
+            },
+        }));
+        const route = harness.system.getRouteSnapshot();
+        expect(route?.totalCheckpoints).toBe(3);
+
+        for (let checkpointIndex = 0; checkpointIndex < route.totalCheckpoints; checkpointIndex += 1) {
+            const entry = route.checkpoints.find((candidate) => candidate.routeIndex === checkpointIndex);
+            expect(entry).toBeTruthy();
+            harness.nowRef.value = 1000 + (checkpointIndex * 700);
+            const hit = crossCheckpoint(harness.system, harness.player, entry, harness.nowRef.value);
+            expect(hit?.type).toBe('checkpoint');
+        }
+
+        harness.nowRef.value = 3500;
+        const finishHit = crossCheckpoint(harness.system, harness.player, route.finish, harness.nowRef.value);
+        expect(finishHit?.type).toBe('finish');
+
+        const snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.completed).toBeTruthy();
+        expect(snapshot?.completionTimeMs).toBeGreaterThan(0);
+
+        const hudState = harness.system.getPlayerHudState(harness.player.index, harness.nowRef.value);
+        expect(hudState?.completed).toBeTruthy();
+        expect(hudState?.currentCheckpoint).toBe(3);
+        expect(hudState?.totalCheckpoints).toBe(3);
+
+        const outcome = harness.system.getRoundOutcome();
+        expect(outcome?.shouldEnd).toBeTruthy();
+        expect(outcome?.reason).toBe('PARCOURS_COMPLETE');
+        expect(outcome?.parcours?.routeId).toBe('unit_test_route');
+        expect(outcome?.parcours?.completionTimeMs).toBeGreaterThan(0);
+        expect(harness.recorderEvents.some((entry) => entry.type === 'PARCOURS_COMPLETE')).toBeTruthy();
+    });
+
+    test('T60b: Parcours blockiert Wrong-Order- und Cooldown-Exploit-Versuche', () => {
+        const harness = createParcoursHarness(createParcoursDefinition({
+            rules: {
+                ordered: true,
+                cooldownMs: 900,
+                wrongOrderCooldownMs: 1200,
+            },
+        }));
+        const route = harness.system.getRouteSnapshot();
+        const cp01 = route.checkpoints.find((entry) => entry.routeIndex === 0);
+        const cp02 = route.checkpoints.find((entry) => entry.routeIndex === 1);
+        expect(cp01).toBeTruthy();
+        expect(cp02).toBeTruthy();
+
+        harness.nowRef.value = 120;
+        const wrongOrderFirst = crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value);
+        expect(wrongOrderFirst?.type).toBe('wrong-order');
+
+        let snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(0);
+        expect(snapshot?.wrongOrderCount).toBe(1);
+
+        harness.nowRef.value = 300;
+        const wrongOrderSpam = crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value);
+        expect(wrongOrderSpam?.type).toBe('wrong-order');
+        snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.wrongOrderCount).toBe(1);
+
+        harness.nowRef.value = 1800;
+        const cp01Hit = crossCheckpoint(harness.system, harness.player, cp01, harness.nowRef.value);
+        expect(cp01Hit?.type).toBe('checkpoint');
+        snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(1);
+
+        harness.nowRef.value = 2100;
+        const cp02Hit = crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value);
+        expect(cp02Hit?.type).toBe('checkpoint');
+        snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(2);
+
+        harness.nowRef.value = 2200;
+        const cp02SpamAfterAdvance = crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value);
+        expect(cp02SpamAfterAdvance || null).toBeNull();
+        snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(2);
+    });
+
+    test('T60c: Parcours Segment-Timeout und Death-Reset-Regeln greifen deterministisch', () => {
+        const fullResetHarness = createParcoursHarness(createParcoursDefinition({
+            rules: {
+                ordered: true,
+                resetOnDeath: true,
+                resetToLastValid: false,
+                maxSegmentTimeMs: 500,
+            },
+        }));
+        const route = fullResetHarness.system.getRouteSnapshot();
+        const cp01 = route.checkpoints.find((entry) => entry.routeIndex === 0);
+        const cp02 = route.checkpoints.find((entry) => entry.routeIndex === 1);
+        expect(cp01).toBeTruthy();
+        expect(cp02).toBeTruthy();
+
+        fullResetHarness.nowRef.value = 100;
+        expect(crossCheckpoint(fullResetHarness.system, fullResetHarness.player, cp01, 100)?.type).toBe('checkpoint');
+
+        fullResetHarness.player.position.x = -50;
+        fullResetHarness.player.position.y = 0;
+        fullResetHarness.player.position.z = 0;
+        fullResetHarness.nowRef.value = 900;
+        const timeoutResult = fullResetHarness.system.updatePlayerProgress(
+            fullResetHarness.player,
+            { x: -52, y: 0, z: 0 },
+            fullResetHarness.nowRef.value
+        );
+        expect(timeoutResult?.type).toBe('segment-timeout');
+        let snapshot = fullResetHarness.system.getPlayerProgressSnapshot(fullResetHarness.player.index, fullResetHarness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(0);
+        expect(snapshot?.resetCount).toBeGreaterThan(0);
+
+        fullResetHarness.nowRef.value = 1200;
+        expect(crossCheckpoint(fullResetHarness.system, fullResetHarness.player, cp01, 1200)?.type).toBe('checkpoint');
+        fullResetHarness.system.onPlayerDeath(fullResetHarness.player, { cause: 'TRAIL_OTHER' });
+        snapshot = fullResetHarness.system.getPlayerProgressSnapshot(fullResetHarness.player.index, fullResetHarness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(0);
+        expect(snapshot?.resetCount).toBeGreaterThan(1);
+
+        const fallbackHarness = createParcoursHarness(createParcoursDefinition({
+            rules: {
+                ordered: true,
+                resetOnDeath: false,
+                resetToLastValid: true,
+                maxSegmentTimeMs: 5000,
+            },
+        }));
+        const fallbackRoute = fallbackHarness.system.getRouteSnapshot();
+        const fallbackCp01 = fallbackRoute.checkpoints.find((entry) => entry.routeIndex === 0);
+        const fallbackCp02 = fallbackRoute.checkpoints.find((entry) => entry.routeIndex === 1);
+        expect(fallbackCp01).toBeTruthy();
+        expect(fallbackCp02).toBeTruthy();
+
+        fallbackHarness.nowRef.value = 100;
+        expect(crossCheckpoint(fallbackHarness.system, fallbackHarness.player, fallbackCp01, 100)?.type).toBe('checkpoint');
+        fallbackHarness.nowRef.value = 300;
+        expect(crossCheckpoint(fallbackHarness.system, fallbackHarness.player, fallbackCp02, 300)?.type).toBe('checkpoint');
+        fallbackHarness.system.onPlayerDeath(fallbackHarness.player, { cause: 'TRAIL_OTHER' });
+
+        const fallbackSnapshot = fallbackHarness.system.getPlayerProgressSnapshot(
+            fallbackHarness.player.index,
+            fallbackHarness.nowRef.value
+        );
+        expect(fallbackSnapshot?.nextCheckpointIndex).toBe(1);
+        expect(fallbackSnapshot?.resetCount).toBeGreaterThan(0);
     });
 
 });

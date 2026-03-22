@@ -251,6 +251,7 @@ export class MatchFlowUiController {
             mapKey: normalizeTelemetryString(game?.arena?.currentMapKey || game?.mapKey, 'standard'),
             mode: normalizeTelemetryString(game?.activeGameMode || game?.runtimeConfig?.session?.activeGameMode, 'classic').toLowerCase(),
             state: normalizeTelemetryString(roundEndPlan?.outcome?.state, 'ROUND_END'),
+            reason: normalizeTelemetryString(roundEndPlan?.outcome?.reason, 'ELIMINATION'),
             winnerType: roundMetrics.winnerIndex < 0
                 ? 'draw'
                 : (roundMetrics.winnerIsBot ? 'bot' : 'human'),
@@ -259,6 +260,10 @@ export class MatchFlowUiController {
             selfCollisions: Math.max(0, Number(roundMetrics.selfCollisions) || 0),
             itemUses: Math.max(0, Number(roundMetrics.itemUseEvents) || 0),
             stuckEvents: Math.max(0, Number(roundMetrics.stuckEvents) || 0),
+            parcoursCompleted: roundMetrics.parcoursCompleted === true,
+            parcoursRouteId: normalizeTelemetryString(roundMetrics.parcoursRouteId, ''),
+            parcoursCompletionTimeMs: Math.max(0, Number(roundMetrics.parcoursCompletionTimeMs) || 0),
+            parcoursCheckpointCount: Math.max(0, Number(roundMetrics.parcoursCheckpointCount) || 0),
         };
     }
 
@@ -314,8 +319,8 @@ export class MatchFlowUiController {
                         game._showStatusToast(game._getDeathMessage(cause), 2500, 'error');
                     }
                 },
-                onRoundEnd: (winner) => {
-                    this.onRoundEnd(winner);
+                onRoundEnd: (winner, outcome) => {
+                    this.onRoundEnd(winner, outcome);
                 },
             });
             return initializedMatch;
@@ -385,12 +390,12 @@ export class MatchFlowUiController {
         game.crosshairSystem?.updateCrosshairs?.();
     }
 
-    onRoundEnd(winner) {
+    onRoundEnd(winner, outcome = null) {
         const game = this.game;
         game.state = 'ROUND_END';
         game.roundPause = 3.0;
 
-        const roundEndPlan = coordinateRoundEnd(this.buildRoundEndCoordinatorRequest(winner));
+        const roundEndPlan = coordinateRoundEnd(this.buildRoundEndCoordinatorRequest(winner, outcome));
         const ghostClip = game.recorder?.getLastRoundGhostClip?.(game.entityManager?.players, {
             displayDuration: game.roundPause,
         });
@@ -411,8 +416,9 @@ export class MatchFlowUiController {
         }
     }
 
-    buildRoundEndCoordinatorRequest(winner) {
+    buildRoundEndCoordinatorRequest(winner, outcome = null) {
         const game = this.game;
+        const normalizedOutcome = outcome && typeof outcome === 'object' ? outcome : {};
         return {
             recorder: game.recorder,
             winner,
@@ -421,6 +427,8 @@ export class MatchFlowUiController {
             humanPlayerCount: game.entityManager ? game.entityManager.getHumanPlayers().length : 0,
             totalBots: game.numBots,
             winsNeeded: game.winsNeeded,
+            outcomeReason: typeof normalizedOutcome.reason === 'string' ? normalizedOutcome.reason : '',
+            parcours: normalizedOutcome.parcours || null,
             logger: console,
         };
     }

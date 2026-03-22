@@ -209,6 +209,15 @@ export class EntityManager {
         return this._huntScoring.formatSummary(this.players, { maxEntries });
     }
 
+    getParcoursHudState(playerIndex, now = undefined) {
+        if (!this._parcoursProgressSystem) return null;
+        return this._parcoursProgressSystem.getPlayerHudState(playerIndex, now);
+    }
+
+    getParcoursRouteSnapshot() {
+        return this._parcoursProgressSystem?.getRouteSnapshot?.() || null;
+    }
+
     _checkLockOn(player) {
         return this._huntCombatSystem.checkLockOn(player);
     }
@@ -235,6 +244,7 @@ export class EntityManager {
 
     _killPlayer(player, cause = 'UNKNOWN', options = {}) {
         if (!player || !player.alive) return;
+        this._parcoursProgressSystem?.onPlayerDeath?.(player, { cause });
         player.kill();
         if (this.gameModeStrategy?.hasScoring()) {
             this._huntScoring.registerElimination(player, {
@@ -371,7 +381,9 @@ export class EntityManager {
         this._lastRoundGhostSystem?.clear?.();
         this._overheatGunSystem.reset();
         this._respawnSystem.reset();
+        this._parcoursProgressSystem?.reset?.();
         this._huntScoring.reset();
+        this._simulationClockMs = 0;
 
         if (this.powerupManager) {
             this.powerupManager.clear();

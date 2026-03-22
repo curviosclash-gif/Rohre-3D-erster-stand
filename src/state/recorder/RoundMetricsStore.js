@@ -4,6 +4,7 @@ function createRoundSummary() {
         duration: 0,
         winnerIndex: -1,
         winnerIsBot: false,
+        reason: '',
         botCount: 0,
         humanCount: 0,
         botSurvivalAverage: 0,
@@ -13,6 +14,10 @@ function createRoundSummary() {
         bounceTrailEvents: 0,
         itemUseEvents: 0,
         stuckPerMinute: 0,
+        parcoursCompleted: false,
+        parcoursRouteId: '',
+        parcoursCompletionTimeMs: 0,
+        parcoursCheckpointCount: 0,
     };
 }
 
@@ -28,6 +33,8 @@ function createAggregateSummary() {
         totalBounceTrailEvents: 0,
         totalItemUseEvents: 0,
         botWins: 0,
+        parcoursCompletions: 0,
+        totalParcoursCompletionTimeMs: 0,
     };
 }
 
@@ -121,7 +128,19 @@ export class RoundMetricsStore {
         }
     }
 
-    finalizeRound(winner, players = []) {
+    finalizeRound(winner, players = [], options = {}) {
+        const sourceOptions = options && typeof options === 'object' ? options : {};
+        const reason = typeof sourceOptions.reason === 'string' ? sourceOptions.reason.trim() : '';
+        const parcours = sourceOptions.parcours && typeof sourceOptions.parcours === 'object'
+            ? sourceOptions.parcours
+            : null;
+        const parcoursRouteId = typeof parcours?.routeId === 'string' ? parcours.routeId : '';
+        const parcoursCompletionTimeMs = Math.max(0, Number(parcours?.completionTimeMs) || 0);
+        const parcoursCheckpointCount = Math.max(0, Math.trunc(Number(parcours?.checkpointCount) || 0));
+        const parcoursCompleted = reason === 'PARCOURS_COMPLETE'
+            || parcoursCompletionTimeMs > 0
+            || (typeof parcours?.completedAtMs === 'number' && Number.isFinite(parcours.completedAtMs));
+
         const roundDuration = Math.max(0, this._elapsedSeconds());
         let botCount = 0;
         let humanCount = 0;
@@ -153,6 +172,7 @@ export class RoundMetricsStore {
         round.duration = roundDuration;
         round.winnerIndex = winner ? winner.index : -1;
         round.winnerIsBot = !!winner?.isBot;
+        round.reason = reason || (winner ? 'ELIMINATION' : '');
         round.botCount = botCount;
         round.humanCount = humanCount;
         round.botSurvivalAverage = botCount > 0 ? botSurvivalSum / botCount : 0;
@@ -162,6 +182,10 @@ export class RoundMetricsStore {
         round.bounceTrailEvents = this._roundBounceTrailEvents;
         round.itemUseEvents = this._roundItemUseEvents;
         round.stuckPerMinute = roundDuration > 0 ? this._roundStuckEvents / (roundDuration / 60) : 0;
+        round.parcoursCompleted = parcoursCompleted;
+        round.parcoursRouteId = parcoursRouteId;
+        round.parcoursCompletionTimeMs = parcoursCompletionTimeMs;
+        round.parcoursCheckpointCount = parcoursCheckpointCount;
 
         this.roundSummaryIndex = (this.roundSummaryIndex + 1) % this.maxRounds;
         if (this.roundSummaryCount < this.maxRounds) this.roundSummaryCount++;
@@ -176,12 +200,17 @@ export class RoundMetricsStore {
         this._aggregate.totalBounceTrailEvents += this._roundBounceTrailEvents;
         this._aggregate.totalItemUseEvents += this._roundItemUseEvents;
         if (winner?.isBot) this._aggregate.botWins += 1;
+        if (parcoursCompleted) {
+            this._aggregate.parcoursCompletions += 1;
+            this._aggregate.totalParcoursCompletionTimeMs += parcoursCompletionTimeMs;
+        }
 
         this._lastRoundSummary = {
             roundId: round.roundId,
             duration: round.duration,
             winnerIndex: round.winnerIndex,
             winnerIsBot: round.winnerIsBot,
+            reason: round.reason,
             botCount: round.botCount,
             humanCount: round.humanCount,
             botSurvivalAverage: round.botSurvivalAverage,
@@ -191,6 +220,10 @@ export class RoundMetricsStore {
             bounceTrailEvents: round.bounceTrailEvents,
             itemUseEvents: round.itemUseEvents,
             stuckPerMinute: round.stuckPerMinute,
+            parcoursCompleted: round.parcoursCompleted,
+            parcoursRouteId: round.parcoursRouteId,
+            parcoursCompletionTimeMs: round.parcoursCompletionTimeMs,
+            parcoursCheckpointCount: round.parcoursCheckpointCount,
         };
 
         return this._lastRoundSummary;
@@ -214,6 +247,10 @@ export class RoundMetricsStore {
             bounceWallPerRound: rounds > 0 ? this._aggregate.totalBounceWallEvents / rounds : 0,
             bounceTrailPerRound: rounds > 0 ? this._aggregate.totalBounceTrailEvents / rounds : 0,
             itemUsePerRound: rounds > 0 ? this._aggregate.totalItemUseEvents / rounds : 0,
+            parcoursCompletionRate: rounds > 0 ? this._aggregate.parcoursCompletions / rounds : 0,
+            averageParcoursCompletionTimeMs: this._aggregate.parcoursCompletions > 0
+                ? this._aggregate.totalParcoursCompletionTimeMs / this._aggregate.parcoursCompletions
+                : 0,
         };
     }
 
@@ -241,6 +278,7 @@ export class RoundMetricsStore {
                 duration: round.duration,
                 winnerIndex: round.winnerIndex,
                 winnerIsBot: round.winnerIsBot,
+                reason: round.reason,
                 botCount: round.botCount,
                 humanCount: round.humanCount,
                 botSurvivalAverage: round.botSurvivalAverage,
@@ -250,6 +288,10 @@ export class RoundMetricsStore {
                 bounceTrailEvents: round.bounceTrailEvents,
                 itemUseEvents: round.itemUseEvents,
                 stuckPerMinute: round.stuckPerMinute,
+                parcoursCompleted: round.parcoursCompleted,
+                parcoursRouteId: round.parcoursRouteId,
+                parcoursCompletionTimeMs: round.parcoursCompletionTimeMs,
+                parcoursCheckpointCount: round.parcoursCheckpointCount,
             });
         }
         return items;

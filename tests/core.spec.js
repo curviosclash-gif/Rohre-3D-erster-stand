@@ -20,6 +20,11 @@ import {
     unlockExpertMode,
 } from './helpers.js';
 import { parseMapJSON, stringifyMapDocument } from '../src/entities/MapSchema.js';
+import {
+    EDITOR_API_ROUTES,
+    EDITOR_DATA_PATHS,
+    EDITOR_VIEW_PATHS,
+} from '../src/shared/contracts/EditorPathContract.js';
 import { generateJSONExport, importFromJSON } from '../editor/js/EditorMapSerializer.js';
 
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
@@ -27,8 +32,8 @@ const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
 const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
 const MENU_PRESETS_STORAGE_KEY = 'cuviosclash.menu-presets.v1';
 const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
-const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(process.cwd(), 'src/entities/GeneratedLocalMaps.js');
-const EDITOR_MAP_DIR = path.resolve(process.cwd(), 'data/maps');
+const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(process.cwd(), EDITOR_DATA_PATHS.GENERATED_LOCAL_MAPS_MODULE);
+const EDITOR_MAP_DIR = path.resolve(process.cwd(), EDITOR_DATA_PATHS.MAPS_DIR);
 const EDITOR_JSON_SUFFIX = '.editor.json';
 const RUNTIME_JSON_SUFFIX = '.runtime.json';
 
@@ -510,6 +515,173 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(roundtrip.playerSpawn).toMatchObject({ id: 'spawn_player', x: -162, y: 36, z: 54 });
         expect(roundtrip.botSpawns).toHaveLength(1);
         expect(roundtrip.tunnels).toHaveLength(1);
+    });
+
+    test('T14f: Parcours-Rift erzwingt Reihenfolge und beendet Match mit Objective-Overlay', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await page.selectOption('#map-select', 'parcours_rift');
+        await page.waitForFunction(() => window.GAME_INSTANCE?.settings?.mapKey === 'parcours_rift', null, { timeout: 5000 });
+        await page.evaluate(() => {
+            const winsSlider = document.getElementById('win-count');
+            if (winsSlider) {
+                winsSlider.value = '1';
+                winsSlider.dispatchEvent(new Event('input', { bubbles: true }));
+                winsSlider.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            const botSlider = document.getElementById('bot-count');
+            if (botSlider) {
+                botSlider.value = '1';
+                botSlider.dispatchEvent(new Event('input', { bubbles: true }));
+                botSlider.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        });
+        await page.click('#btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const game = window.GAME_INSTANCE;
+            return !!(
+                hud
+                && !hud.classList.contains('hidden')
+                && game?.entityManager?.players?.length > 0
+            );
+        }, null, { timeout: 20000 });
+
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const system = entityManager?._parcoursProgressSystem;
+            const route = system?.getRouteSnapshot?.();
+            const player = entityManager?.players?.find((entry) => !entry?.isBot) || entityManager?.players?.[0] || null;
+            if (!route || !player) return { error: 'missing-route-or-player' };
+
+            const setPlayerPosition = (x, y, z) => {
+                if (player.position?.set) {
+                    player.position.set(x, y, z);
+                    return;
+                }
+                player.position.x = x;
+                player.position.y = y;
+                player.position.z = z;
+            };
+
+            const cross = (entry, nowMs) => {
+                const pos = Array.isArray(entry?.pos) ? entry.pos : [0, 0, 0];
+                const forward = Array.isArray(entry?.forward) ? entry.forward : [1, 0, 0];
+                const previousPosition = {
+                    x: pos[0] - (forward[0] * 0.65),
+                    y: pos[1] - (forward[1] * 0.65),
+                    z: pos[2] - (forward[2] * 0.65),
+                };
+                setPlayerPosition(
+                    pos[0] + (forward[0] * 0.35),
+                    pos[1] + (forward[1] * 0.35),
+                    pos[2] + (forward[2] * 0.35)
+                );
+                return system.updatePlayerProgress(player, previousPosition, nowMs);
+            };
+
+            let nowMs = 800;
+            const hitTypes = [];
+            for (let checkpointIndex = 0; checkpointIndex < route.totalCheckpoints; checkpointIndex += 1) {
+                const entry = route.checkpoints.find((candidate) => candidate.routeIndex === checkpointIndex);
+                if (!entry) return { error: `missing-checkpoint-${checkpointIndex}` };
+                const hit = cross(entry, nowMs);
+                hitTypes.push(hit?.type || 'none');
+                nowMs += 450;
+            }
+            const finishHit = cross(route.finish, nowMs + 400);
+            game.hudRuntimeSystem?.updatePlayingHudTick?.(0.2);
+
+            const outcome = entityManager?._roundOutcomeSystem?.resolve?.() || null;
+            if (outcome?.shouldEnd) {
+                entityManager?._eventBus?.emitRoundEnd?.(outcome.winner, outcome);
+            }
+
+            return {
+                error: '',
+                hitTypes,
+                finishType: finishHit?.type || '',
+                outcomeReason: outcome?.reason || '',
+                state: game.state,
+                messageText: document.getElementById('message-text')?.textContent || '',
+                messageSub: document.getElementById('message-sub')?.textContent || '',
+                parcoursProgress: document.getElementById('parcours-progress')?.textContent || '',
+                parcoursTimer: document.getElementById('parcours-timer')?.textContent || '',
+                parcoursStatus: document.getElementById('parcours-status')?.textContent || '',
+                roundMetrics: game.recorder?.getLastRoundMetrics?.() || null,
+                telemetryRecentRound: game.settings?.localSettings?.telemetryState?.recentRounds?.[0] || null,
+            };
+        });
+
+        expect(probe.error || '').toBe('');
+        expect(probe.hitTypes).toEqual(['checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint']);
+        expect(probe.finishType).toBe('finish');
+        expect(probe.outcomeReason).toBe('PARCOURS_COMPLETE');
+        expect(probe.state).toBe('MATCH_END');
+        expect(probe.messageText).toContain('Parcours abgeschlossen');
+        expect(probe.messageSub).toContain('ENTER');
+        expect(probe.parcoursProgress).toContain('CP 8/8');
+        expect(probe.parcoursTimer).toContain('Finish');
+        expect(probe.parcoursStatus).toContain('Parcours abgeschlossen');
+        expect(probe.roundMetrics?.reason).toBe('PARCOURS_COMPLETE');
+        expect(probe.roundMetrics?.parcoursCompleted).toBeTruthy();
+        expect(probe.roundMetrics?.parcoursRouteId).toBe('rift_gauntlet_v1');
+        expect(probe.roundMetrics?.parcoursCompletionTimeMs).toBeGreaterThan(0);
+        expect(probe.telemetryRecentRound?.parcoursCompleted).toBeTruthy();
+        expect(probe.telemetryRecentRound?.parcoursRouteId).toBe('rift_gauntlet_v1');
+    });
+
+    test('T14g: Editor-Import/Export behaelt Parcours-Definitionen im Roundtrip', async () => {
+        const manager = createMockEditorManager();
+        const sourceDocument = {
+            arenaSize: { width: 320, height: 120, depth: 280 },
+            hardBlocks: [
+                { id: 'lane_wall', x: 0, y: 16, z: 0, width: 30, height: 32, depth: 8 },
+            ],
+            parcours: {
+                enabled: true,
+                routeId: 'roundtrip_route_v1',
+                rules: {
+                    ordered: true,
+                    resetOnDeath: true,
+                    resetToLastValid: false,
+                    maxSegmentTimeMs: 12000,
+                    cooldownMs: 450,
+                    allowLaneAliases: true,
+                    winnerByParcoursComplete: true,
+                },
+                checkpoints: [
+                    { id: 'CP01', type: 'entry', pos: [-20, 10, 0], radius: 4.4, forward: [1, 0, 0] },
+                    { id: 'CP02', type: 'gate', pos: [0, 14, 0], radius: 4.2, forward: [1, 0, 0] },
+                    { id: 'CP03', type: 'split', pos: [20, 18, -6], radius: 4.3, forward: [1, 0, 0] },
+                    { id: 'CP03_R', type: 'split', aliasOf: 'CP03', pos: [20, 18, 6], radius: 4.3, forward: [1, 0, 0] },
+                ],
+                finish: { id: 'FINISH', type: 'finish', pos: [34, 18, 0], radius: 5.2, forward: [1, 0, 0] },
+            },
+        };
+
+        importFromJSON(manager, JSON.stringify(sourceDocument));
+        const exported = generateJSONExport(manager, sourceDocument.arenaSize);
+        const roundtrip = parseMapJSON(exported).map;
+
+        expect(roundtrip.parcours?.enabled).toBeTruthy();
+        expect(roundtrip.parcours?.routeId).toBe('roundtrip_route_v1');
+        expect(roundtrip.parcours?.checkpoints?.length).toBe(4);
+        expect(roundtrip.parcours?.checkpoints?.[3]).toMatchObject({
+            id: 'CP03_R',
+            aliasOf: 'CP03',
+            type: 'split',
+        });
+        expect(roundtrip.parcours?.finish).toMatchObject({
+            id: 'FINISH',
+            type: 'finish',
+        });
+        expect(roundtrip.parcours?.rules).toMatchObject({
+            ordered: true,
+            resetOnDeath: true,
+            winnerByParcoursComplete: true,
+        });
     });
 
     test('T15: Bot-Count Slider aktualisiert Label', async ({ page }) => {
@@ -1865,6 +2037,95 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(recorderState.captureFps).toBe(30);
     });
 
+    test('T20m1: Recording-Profil und HUD-Modus sind im Menu persistierbar', async ({ page }) => {
+        await loadGame(page);
+        await openLevel4Drawer(page, { section: 'gameplay' });
+        await page.selectOption('#recording-profile-select', 'youtube_short');
+        await page.selectOption('#recording-hud-mode-select', 'with_hud');
+        await page.evaluate(() => window.GAME_INSTANCE?._saveSettings?.());
+
+        await page.reload();
+        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
+
+        const persisted = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            return {
+                settingsProfile: game?.settings?.recording?.profile || null,
+                settingsHudMode: game?.settings?.recording?.hudMode || null,
+                runtimeProfile: game?.mediaRecorderSystem?.getRecordingCaptureSettings?.()?.profile || null,
+                runtimeHudMode: game?.mediaRecorderSystem?.getRecordingCaptureSettings?.()?.hudMode || null,
+            };
+        });
+
+        expect(persisted.settingsProfile).toBe('youtube_short');
+        expect(persisted.settingsHudMode).toBe('with_hud');
+        expect(persisted.runtimeProfile).toBe('youtube_short');
+        expect(persisted.runtimeHudMode).toBe('with_hud');
+    });
+
+    test('T20m2: Shorts-Recording nutzt dynamische Aufloesung und feste P1/P2-Zuordnung', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page, { sessionType: 'splitscreen' });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const game = window.GAME_INSTANCE;
+            return !!(
+                hud && !hud.classList.contains('hidden')
+                && game?.entityManager?.players?.length > 1
+            );
+        }, null, { timeout: 60000 });
+
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            if (!game?.renderer || !game?.entityManager || !game?.mediaRecorderSystem) return null;
+            const makeEven = (value) => {
+                const safe = Math.max(2, Math.floor(Number(value) || 0));
+                return safe - (safe % 2);
+            };
+
+            game.settings.recording = { profile: 'youtube_short', hudMode: 'with_hud' };
+            game._onSettingsChanged({ changedKeys: ['recording.profile', 'recording.hudMode'] });
+            game.renderer.prepareRecordingCaptureFrame({
+                recordingActive: true,
+                entityManager: game.entityManager,
+                renderAlpha: 1,
+                renderDelta: 1 / 60,
+                splitScreen: true,
+            });
+
+            const sourceCanvas = game.renderer.getRecordingCaptureCanvas?.();
+            const baseCanvas = game.renderer.canvas;
+            const baseHeight = makeEven(baseCanvas?.height || 0);
+            const expectedHeight = makeEven(baseHeight * 2);
+            const expectedWidth = makeEven((expectedHeight * 9) / 16);
+            const meta = game.renderer.getLastRecordingCaptureMeta?.() || null;
+            const recorderSettings = game.mediaRecorderSystem.getRecordingCaptureSettings?.() || null;
+            const rendererSettings = game.renderer.getRecordingCaptureSettings?.() || null;
+
+            return {
+                captureWidth: Number(sourceCanvas?.width || 0),
+                captureHeight: Number(sourceCanvas?.height || 0),
+                expectedWidth,
+                expectedHeight,
+                recorderSettings,
+                rendererSettings,
+                meta,
+            };
+        });
+
+        expect(probe).not.toBeNull();
+        expect(probe.recorderSettings?.profile).toBe('youtube_short');
+        expect(probe.recorderSettings?.hudMode).toBe('with_hud');
+        expect(probe.rendererSettings?.profile).toBe('youtube_short');
+        expect(probe.rendererSettings?.hudMode).toBe('with_hud');
+        expect(probe.captureWidth).toBe(probe.expectedWidth);
+        expect(probe.captureHeight).toBe(probe.expectedHeight);
+        expect(probe.meta?.layout).toBe('shorts_vertical_split');
+        expect(probe.meta?.segments?.[0]?.playerIndex).toBe(0);
+        expect(probe.meta?.segments?.[1]?.playerIndex).toBe(1);
+    });
+
     test('T20n: Escape-Return finalisiert Recording-Export trotz doppeltem Lifecycle-Stop', async ({ page }) => {
         await startGame(page);
         await page.waitForTimeout(500);
@@ -3159,11 +3420,11 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         let createdMapKey = '';
 
         try {
-            await page.goto('/editor/map-editor-3d.html', { waitUntil: 'domcontentloaded', timeout: 45000 });
+            await page.goto(EDITOR_VIEW_PATHS.MAP_EDITOR, { waitUntil: 'domcontentloaded', timeout: 45000 });
             await page.waitForSelector('#btnSaveToGame', { timeout: 15000 });
 
-            const saveResult = await page.evaluate(async ({ mapName, mapJson }) => {
-                const response = await fetch('/api/editor/save-map-disk', {
+            const saveResult = await page.evaluate(async ({ mapName, mapJson, saveMapRoute }) => {
+                const response = await fetch(saveMapRoute, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -3179,11 +3440,11 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                     ok: response.ok,
                     payload,
                 };
-            }, { mapName, mapJson });
+            }, { mapName, mapJson, saveMapRoute: EDITOR_API_ROUTES.SAVE_MAP_DISK });
 
             expect(saveResult.ok).toBeTruthy();
             expect(saveResult.payload?.ok).toBeTruthy();
-            expect(saveResult.payload?.generatedModulePath).toBe('src/entities/GeneratedLocalMaps.js');
+            expect(saveResult.payload?.generatedModulePath).toBe(EDITOR_DATA_PATHS.GENERATED_LOCAL_MAPS_MODULE);
 
             createdMapKey = String(saveResult.payload?.mapKey || '');
             expect(createdMapKey).toMatch(/^editor_/);

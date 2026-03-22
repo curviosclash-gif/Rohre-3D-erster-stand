@@ -103,6 +103,7 @@ export class RespawnSystem {
             });
             const spawnDir = this.runtime.spawn.findSafeSpawnDirection(spawnPos, player.hitboxRadius);
             player.spawn(spawnPos, spawnDir);
+            this.runtime?.callbacks?.parcours?.onPlayerSpawn?.(player, { reason: 'respawn' });
 
             resetRespawnInventory(player, respawnConfig);
             applyRespawnRecovery(player, respawnConfig);

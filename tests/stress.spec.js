@@ -405,4 +405,143 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
 
         expect(errors).toHaveLength(0);
     });
+
+    test('T80: Shorts-Recording-Layout mit HUD/clean bleibt unter Burst stabil', async ({ page }) => {
+        test.setTimeout(90000);
+        const errors = collectErrors(page);
+        await loadGame(page);
+        await selectSessionType(page, 'splitscreen');
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="normal"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const game = window.GAME_INSTANCE;
+            return !!(
+                hud && !hud.classList.contains('hidden')
+                && game?.entityManager?.players?.length > 1
+            );
+        }, null, { timeout: 60000 });
+
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const renderer = game?.renderer;
+            const recorder = game?.mediaRecorderSystem;
+            if (!game || !renderer || !recorder) return null;
+
+            const variants = [
+                { profile: 'youtube_short', hudMode: 'clean' },
+                { profile: 'youtube_short', hudMode: 'with_hud' },
+            ];
+
+            for (let i = 0; i < 12; i += 1) {
+                const variant = variants[i % variants.length];
+                game.settings.recording = { ...variant };
+                game._onSettingsChanged({ changedKeys: ['recording.profile', 'recording.hudMode'] });
+                renderer.prepareRecordingCaptureFrame({
+                    recordingActive: true,
+                    entityManager: game.entityManager,
+                    renderAlpha: 1,
+                    renderDelta: 1 / 60,
+                    splitScreen: true,
+                });
+            }
+
+            const meta = renderer.getLastRecordingCaptureMeta?.() || null;
+            const hudVisible = !document.getElementById('hud')?.classList?.contains('hidden');
+            return {
+                meta,
+                hudVisible,
+                splitScreen: renderer.splitScreen === true,
+                recorderProfile: recorder.getRecordingCaptureSettings?.()?.profile || '',
+                recorderHudMode: recorder.getRecordingCaptureSettings?.()?.hudMode || '',
+            };
+        });
+
+        expect(probe).not.toBeNull();
+        expect(probe.hudVisible).toBeTruthy();
+        expect(probe.splitScreen).toBeTruthy();
+        expect(probe.meta?.layout).toBe('shorts_vertical_split');
+        expect(probe.meta?.segments?.[0]?.playerIndex).toBe(0);
+        expect(probe.meta?.segments?.[1]?.playerIndex).toBe(1);
+        expect(probe.recorderProfile).toBe('youtube_short');
+        expect(['clean', 'with_hud']).toContain(probe.recorderHudMode);
+        expect(errors).toHaveLength(0);
+    });
+
+    test('T81: Parcours Wrong-Order-Spam fuehrt nicht zu Completion und bleibt stabil', async ({ page }) => {
+        const errors = collectErrors(page);
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await page.selectOption('#map-select', 'parcours_rift');
+        await page.evaluate(() => {
+            const botSlider = document.getElementById('bot-count');
+            if (botSlider) {
+                botSlider.value = '0';
+                botSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            return !!(hud && !hud.classList.contains('hidden') && window.GAME_INSTANCE?.entityManager?.players?.length > 0);
+        }, null, { timeout: 20000 });
+
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const system = entityManager?._parcoursProgressSystem;
+            const route = system?.getRouteSnapshot?.();
+            const player = entityManager?.players?.find((entry) => !entry?.isBot) || null;
+            if (!route || !player) return { error: 'missing-runtime' };
+
+            const cp02 = route.checkpoints.find((entry) => entry.routeIndex === 1) || route.checkpoints[0];
+            if (!cp02) return { error: 'missing-checkpoint' };
+
+            const setPlayerPosition = (x, y, z) => {
+                if (player.position?.set) {
+                    player.position.set(x, y, z);
+                    return;
+                }
+                player.position.x = x;
+                player.position.y = y;
+                player.position.z = z;
+            };
+
+            let nowMs = 1000;
+            for (let i = 0; i < 48; i += 1) {
+                const forward = Array.isArray(cp02.forward) ? cp02.forward : [1, 0, 0];
+                const previousPosition = {
+                    x: cp02.pos[0] - (forward[0] * 0.7),
+                    y: cp02.pos[1] - (forward[1] * 0.7),
+                    z: cp02.pos[2] - (forward[2] * 0.7),
+                };
+                setPlayerPosition(
+                    cp02.pos[0] + (forward[0] * 0.35),
+                    cp02.pos[1] + (forward[1] * 0.35),
+                    cp02.pos[2] + (forward[2] * 0.35)
+                );
+                system.updatePlayerProgress(player, previousPosition, nowMs);
+                nowMs += 55;
+            }
+
+            const snapshot = system.getPlayerProgressSnapshot(player.index, nowMs);
+            const outcome = system.getRoundOutcome();
+            return {
+                error: '',
+                nextCheckpointIndex: snapshot?.nextCheckpointIndex ?? -1,
+                wrongOrderCount: snapshot?.wrongOrderCount ?? -1,
+                completed: !!snapshot?.completed,
+                outcomeShouldEnd: !!outcome?.shouldEnd,
+            };
+        });
+
+        expect(probe.error || '').toBe('');
+        expect(probe.nextCheckpointIndex).toBe(0);
+        expect(probe.completed).toBeFalsy();
+        expect(probe.outcomeShouldEnd).toBeFalsy();
+        expect(probe.wrongOrderCount).toBeGreaterThanOrEqual(1);
+        expect(probe.wrongOrderCount).toBeLessThan(12);
+        expect(errors).toHaveLength(0);
+    });
 });

@@ -2,6 +2,73 @@ import { DEFAULT_PORTAL_COLORS } from './MapSchemaConstants.js';
 import { asPositiveNumber } from './MapSchemaSanitizeOps.js';
 import { createMapDocument } from './MapSchemaMigrationOps.js';
 
+function cloneObject(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+    return { ...value };
+}
+
+function scalePosArray(raw, invScale) {
+    const source = Array.isArray(raw) ? raw : [0, 0, 0];
+    return [
+        (Number(source[0]) || 0) * invScale,
+        (Number(source[1]) || 0) * invScale,
+        (Number(source[2]) || 0) * invScale,
+    ];
+}
+
+function mapParcoursCheckpoint(entry, invScale, fallbackType = 'gate') {
+    if (!entry || typeof entry !== 'object') return null;
+    const checkpoint = {
+        id: typeof entry.id === 'string' ? entry.id : undefined,
+        type: typeof entry.type === 'string' ? entry.type : fallbackType,
+        aliasOf: typeof entry.aliasOf === 'string' ? entry.aliasOf : undefined,
+        pos: scalePosArray(entry.pos, invScale),
+        radius: asPositiveNumber(entry.radius, 3.5, 0.1) * invScale,
+        forward: Array.isArray(entry.forward) ? [
+            Number(entry.forward[0]) || 0,
+            Number(entry.forward[1]) || 0,
+            Number(entry.forward[2]) || 0,
+        ] : undefined,
+        params: cloneObject(entry.params),
+    };
+    return checkpoint;
+}
+
+function mapParcoursToRuntime(parcours, invScale) {
+    if (!parcours || typeof parcours !== 'object' || parcours.enabled !== true) {
+        return undefined;
+    }
+
+    const checkpoints = Array.isArray(parcours.checkpoints)
+        ? parcours.checkpoints
+            .map((entry) => mapParcoursCheckpoint(entry, invScale, 'gate'))
+            .filter(Boolean)
+        : [];
+
+    const finish = mapParcoursCheckpoint(parcours.finish, invScale, 'finish');
+    if (finish) {
+        finish.type = 'finish';
+    }
+
+    return {
+        enabled: true,
+        routeId: typeof parcours.routeId === 'string' ? parcours.routeId : 'custom_route_v1',
+        checkpoints,
+        rules: {
+            ordered: parcours.rules?.ordered !== false,
+            resetOnDeath: parcours.rules?.resetOnDeath !== false,
+            resetToLastValid: parcours.rules?.resetToLastValid === true,
+            allowLaneAliases: parcours.rules?.allowLaneAliases !== false,
+            winnerByParcoursComplete: parcours.rules?.winnerByParcoursComplete !== false,
+            maxSegmentTimeMs: Math.max(0, Math.trunc(Number(parcours.rules?.maxSegmentTimeMs) || 0)),
+            cooldownMs: Math.max(0, Math.trunc(Number(parcours.rules?.cooldownMs) || 450)),
+            wrongOrderCooldownMs: Math.max(0, Math.trunc(Number(parcours.rules?.wrongOrderCooldownMs) || 650)),
+            errorIndicatorMs: Math.max(0, Math.trunc(Number(parcours.rules?.errorIndicatorMs) || 1400)),
+        },
+        finish,
+    };
+}
+
 export function toArenaMapDefinition(mapDocument, options = {}) {
     const normalized = createMapDocument(mapDocument);
     const mapScale = asPositiveNumber(options.mapScale, 1, 0.0001);
@@ -147,6 +214,8 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
         params: gate.params ? { ...gate.params } : undefined,
     }));
 
+    const parcours = mapParcoursToRuntime(normalized.parcours, invScale);
+
     return {
         map: {
             name: String(options.name || 'Custom Map'),
@@ -166,6 +235,7 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
             aircraft,
             glbModel: typeof normalized.glbModel === 'string' ? normalized.glbModel : undefined,
             glbColliderMode: typeof normalized.glbColliderMode === 'string' ? normalized.glbColliderMode : undefined,
+            parcours,
         },
         warnings,
         mapDocument: normalized,

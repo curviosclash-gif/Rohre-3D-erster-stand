@@ -14,6 +14,17 @@ function normalizeRequiredWins(winsNeeded) {
     return Math.max(1, parseInt(winsNeeded, 10) || 1);
 }
 
+function normalizeOutcomeReason(value) {
+    const normalized = typeof value === 'string' ? value.trim() : '';
+    return normalized || 'ELIMINATION';
+}
+
+function formatDurationMs(value) {
+    const ms = Math.max(0, Number(value) || 0);
+    const seconds = ms / 1000;
+    return `${seconds.toFixed(seconds >= 10 ? 1 : 2)}s`;
+}
+
 function getResultPlayerName(player) {
     if (!player) {
         return '';
@@ -24,6 +35,10 @@ function getResultPlayerName(player) {
 export function deriveRoundEndOutcome(players, inputs = {}) {
     const safePlayers = ensureArray(players);
     const winner = inputs.winner || null;
+    const reason = normalizeOutcomeReason(inputs.reason);
+    const parcours = inputs.parcours && typeof inputs.parcours === 'object'
+        ? { ...inputs.parcours }
+        : null;
     const humanPlayerCount = normalizeCount(inputs.humanPlayerCount);
     const totalBots = normalizeCount(inputs.totalBots);
     const requiredWins = normalizeRequiredWins(inputs.winsNeeded);
@@ -32,11 +47,28 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
 
     if (matchWinner) {
         const name = getResultPlayerName(matchWinner);
+        if (reason === 'PARCOURS_COMPLETE') {
+            const completionSuffix = Number.isFinite(Number(parcours?.completionTimeMs))
+                ? ` (${formatDurationMs(parcours.completionTimeMs)})`
+                : '';
+            return {
+                state: 'MATCH_END',
+                canWinMatch,
+                requiredWins,
+                matchWinner,
+                reason,
+                parcours,
+                messageText: `Parcours abgeschlossen: ${name}${completionSuffix}`,
+                messageSub: 'ENTER fuer neues Match oder ESC fuer Menue',
+            };
+        }
         return {
             state: 'MATCH_END',
             canWinMatch,
             requiredWins,
             matchWinner,
+            reason,
+            parcours,
             messageText: `Sieg: ${name} (Score: ${matchWinner.score})`,
             messageSub: 'ENTER fuer neues Match oder ESC fuer Menue',
         };
@@ -44,11 +76,28 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
 
     if (winner) {
         const name = getResultPlayerName(winner);
+        if (reason === 'PARCOURS_COMPLETE') {
+            const completionSuffix = Number.isFinite(Number(parcours?.completionTimeMs))
+                ? ` (${formatDurationMs(parcours.completionTimeMs)})`
+                : '';
+            return {
+                state: 'ROUND_END',
+                canWinMatch,
+                requiredWins,
+                matchWinner: null,
+                reason,
+                parcours,
+                messageText: `Parcours abgeschlossen: ${name}${completionSuffix}`,
+                messageSub: 'Naechste Runde in 3...',
+            };
+        }
         return {
             state: 'ROUND_END',
             canWinMatch,
             requiredWins,
             matchWinner: null,
+            reason,
+            parcours,
             messageText: `${name} gewinnt die Runde`,
             messageSub: 'Naechste Runde in 3...',
         };
@@ -59,6 +108,8 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
         canWinMatch,
         requiredWins,
         matchWinner: null,
+        reason,
+        parcours,
         messageText: 'Unentschieden',
         messageSub: 'Naechste Runde in 3...',
     };

@@ -20,6 +20,7 @@ export function createEntityRuntimeCompat(runtime) {
         _runtimeContext: runtime.context,
         _playerInputSystem: runtime.systems.playerInputSystem,
         _playerLifecycleSystem: runtime.systems.playerLifecycleSystem,
+        _parcoursProgressSystem: runtime.systems.parcoursProgressSystem,
         _overheatGunSystem: runtime.systems.overheatGunSystem,
         _respawnSystem: runtime.systems.respawnSystem,
         _huntCombatSystem: runtime.systems.huntCombatSystem,

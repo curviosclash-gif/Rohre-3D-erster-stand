@@ -141,10 +141,22 @@ export class RoundRecorder {
         this._metricsStore.markPlayerDeath(player, cause);
     }
 
-    finalizeRound(winner, players = []) {
+    finalizeRound(winner, players = [], options = {}) {
         if (!this._enabled) return null;
-        const roundSummary = this._metricsStore.finalizeRound(winner, players);
-        this.logEvent('ROUND_END', roundSummary.winnerIndex, `duration=${Math.round(roundSummary.duration * 100) / 100}`);
+        const roundSummary = this._metricsStore.finalizeRound(winner, players, options);
+        const duration = Math.round(roundSummary.duration * 100) / 100;
+        const reason = typeof roundSummary.reason === 'string' && roundSummary.reason.trim()
+            ? roundSummary.reason.trim()
+            : 'ELIMINATION';
+        const parcoursFlag = roundSummary.parcoursCompleted ? 1 : 0;
+        const routeId = typeof roundSummary.parcoursRouteId === 'string' && roundSummary.parcoursRouteId.trim()
+            ? roundSummary.parcoursRouteId.trim()
+            : '-';
+        this.logEvent(
+            'ROUND_END',
+            roundSummary.winnerIndex,
+            `duration=${duration} reason=${reason} parcours=${parcoursFlag} route=${routeId}`
+        );
         return roundSummary;
     }
 

@@ -18,7 +18,7 @@ export class PlayerLifecycleSystem {
         player.shootCooldown = Math.max(0, (player.shootCooldown || 0) - dt);
     }
 
-    updatePlayer(player, dt, input, renderFrameId = 0) {
+    updatePlayer(player, dt, input, renderFrameId = 0, simulationNowMs = undefined) {
         const strategy = this.entityManager?.gameModeStrategy || null;
         const runtimeProfiler = this.entityManager?.runtimeProfiler || null;
         this._actionPhase.run(player, input, strategy);
@@ -39,6 +39,11 @@ export class PlayerLifecycleSystem {
         if (aborted || !player.alive) return;
 
         this._interactionPhase.runPortalAndPickup(player);
+        this.entityManager?._parcoursProgressSystem?.updatePlayerProgress?.(
+            player,
+            prevPos,
+            simulationNowMs
+        );
     }
 }
 

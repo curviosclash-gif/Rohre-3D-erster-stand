@@ -114,8 +114,8 @@ export function createEntityRuntimeSupport(owner) {
         onPlayerDied: (player, cause) => {
             if (typeof owner.onPlayerDied === 'function') owner.onPlayerDied(player, cause);
         },
-        onRoundEnd: (winner) => {
-            if (typeof owner.onRoundEnd === 'function') owner.onRoundEnd(winner);
+        onRoundEnd: (winner, outcome = null) => {
+            if (typeof owner.onRoundEnd === 'function') owner.onRoundEnd(winner, outcome);
         },
     });
 
@@ -182,6 +182,10 @@ export function createEntityRuntimeSupport(owner) {
             },
             trails: {
                 getTrailSpatialIndex: () => trailSpatialIndex,
+            },
+            parcours: {
+                onPlayerSpawn: (player, options = {}) => owner._parcoursProgressSystem?.onPlayerSpawn?.(player, options),
+                onPlayerDeath: (player, options = {}) => owner._parcoursProgressSystem?.onPlayerDeath?.(player, options),
             },
         },
         events: {

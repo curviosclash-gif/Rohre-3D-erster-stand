@@ -9,12 +9,22 @@ function getSafeLogger(logger) {
     return logger && typeof logger.log === 'function' ? logger : console;
 }
 
-export function finalizeRoundRecording({ recorder, winner, players, logger = console }) {
+export function finalizeRoundRecording({
+    recorder,
+    winner,
+    players,
+    reason = '',
+    parcours = null,
+    logger = console,
+}) {
     const safeLogger = getSafeLogger(logger);
     safeLogger.log('--- ROUND END ---');
 
     try {
-        const roundMetrics = recorder?.finalizeRound?.(winner, players);
+        const roundMetrics = recorder?.finalizeRound?.(winner, players, {
+            reason,
+            parcours,
+        });
         if (roundMetrics) {
             safeLogger.log('[Recorder] Round KPI:', roundMetrics);
         }
@@ -40,6 +50,8 @@ export function buildRoundEndControllerInputs(inputs = {}) {
         humanPlayerCount: Math.max(0, Number(inputs.humanPlayerCount) || 0),
         totalBots: Math.max(0, Number(inputs.totalBots) || 0),
         winsNeeded: Math.max(1, Number(inputs.winsNeeded) || 1),
+        reason: typeof inputs.outcomeReason === 'string' ? inputs.outcomeReason : '',
+        parcours: inputs.parcours && typeof inputs.parcours === 'object' ? inputs.parcours : null,
     };
 }
 
@@ -70,14 +82,23 @@ export function coordinateRoundEnd({
     humanPlayerCount,
     totalBots,
     winsNeeded,
+    outcomeReason = '',
+    parcours = null,
     logger = console,
 }) {
-    const recording = finalizeRoundRecording({ recorder, winner, players, logger });
+    const recording = finalizeRoundRecording({
+        recorder,
+        winner,
+        players,
+        reason: outcomeReason,
+        parcours,
+        logger,
+    });
     const score = applyRoundEndWinnerScore(winner);
     const plan = deriveOnRoundEndCoordinatorPlan({
         roundStateController,
         players,
-        inputs: { winner, humanPlayerCount, totalBots, winsNeeded },
+        inputs: { winner, humanPlayerCount, totalBots, winsNeeded, outcomeReason, parcours },
     });
     const statsSummary = buildPostMatchStatsSummary({
         recorder,

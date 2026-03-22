@@ -9,7 +9,9 @@ export class EntitySpawnOps {
         const owner = this.entityManager;
         if (!owner) return;
         owner._roundEnded = false;
+        owner._simulationClockMs = 0;
         owner._respawnSystem.reset();
+        owner._parcoursProgressSystem?.startRound?.(owner.players);
         owner._spawnPlacementSystem?.resetAssignments?.();
         const spawnContext = this.createSpawnContext();
         for (const player of owner.players) {
@@ -36,6 +38,7 @@ export class EntitySpawnOps {
         const dir = owner._findSafeSpawnDirection(pos, player.hitboxRadius);
         player.spawn(pos, dir);
         player.shootCooldown = 0;
+        owner._parcoursProgressSystem?.onPlayerSpawn?.(player, { reason: 'spawn_all' });
         if (owner.recorder) {
             owner.recorder.markPlayerSpawn(player);
             owner.recorder.logEvent('SPAWN', player.index, player.isBot ? 'bot=1' : 'bot=0');

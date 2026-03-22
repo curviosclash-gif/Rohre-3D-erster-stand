@@ -35,10 +35,10 @@ export class EntityEventBus {
         }
     }
 
-    emitRoundEnd(winner) {
+    emitRoundEnd(winner, outcome = null) {
         const handler = this.handlers?.onRoundEnd;
         if (typeof handler === 'function') {
-            handler(winner);
+            handler(winner, outcome);
         }
     }
 }

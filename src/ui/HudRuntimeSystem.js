@@ -4,6 +4,12 @@
 
 import { CONFIG } from '../core/Config.js';
 
+function formatParcoursDurationMs(value) {
+    const ms = Math.max(0, Number(value) || 0);
+    const seconds = ms / 1000;
+    return `${seconds.toFixed(seconds >= 10 ? 1 : 2)}s`;
+}
+
 export class HudRuntimeSystem {
     constructor(deps = {}) {
         this.game = deps.game || null;
@@ -135,6 +141,71 @@ export class HudRuntimeSystem {
             this._scoreboardContainer.remove();
             this._scoreboardContainer = null;
         }
+        this._setParcoursHudVisible(false);
+    }
+
+    _setParcoursHudVisible(isVisible) {
+        const root = this.game?.ui?.parcoursHud;
+        if (!root) return;
+        root.classList.toggle('hidden', !isVisible);
+    }
+
+    _clearParcoursHud() {
+        const ui = this.game?.ui;
+        if (!ui) return;
+        if (ui.parcoursProgress) ui.parcoursProgress.textContent = 'CP 0/0';
+        if (ui.parcoursTimer) ui.parcoursTimer.textContent = '0.00s';
+        if (ui.parcoursStatus) {
+            ui.parcoursStatus.textContent = '';
+            ui.parcoursStatus.classList.remove('success');
+        }
+    }
+
+    _updateParcoursHud() {
+        const game = this.game;
+        const ui = game?.ui;
+        if (!ui?.parcoursHud || !game?.entityManager) return;
+
+        const localPlayerIndex = this._isNetworkSession()
+            ? Math.max(0, this._getLocalPlayerIndex())
+            : 0;
+        const hudState = game.entityManager.getParcoursHudState(localPlayerIndex);
+        if (!hudState?.enabled) {
+            this._setParcoursHudVisible(false);
+            this._clearParcoursHud();
+            return;
+        }
+
+        this._setParcoursHudVisible(true);
+        const routeLabel = String(hudState.routeId || 'parcours').replace(/_/g, ' ');
+        if (ui.parcoursRoute) ui.parcoursRoute.textContent = routeLabel;
+
+        const total = Math.max(0, Number(hudState.totalCheckpoints) || 0);
+        const current = Math.max(0, Math.min(total, Number(hudState.currentCheckpoint) || 0));
+        if (ui.parcoursProgress) {
+            ui.parcoursProgress.textContent = `CP ${current}/${total}`;
+        }
+
+        if (ui.parcoursTimer) {
+            if (hudState.completed) {
+                ui.parcoursTimer.textContent = `Finish ${formatParcoursDurationMs(hudState.completionTimeMs)}`;
+            } else {
+                ui.parcoursTimer.textContent = `Segment ${formatParcoursDurationMs(hudState.segmentElapsedMs)}`;
+            }
+        }
+
+        if (ui.parcoursStatus) {
+            let statusText = '';
+            let isSuccess = false;
+            if (hudState.completed) {
+                statusText = 'Parcours abgeschlossen';
+                isSuccess = true;
+            } else if (hudState.hasError && hudState.errorMessage) {
+                statusText = hudState.errorMessage;
+            }
+            ui.parcoursStatus.textContent = statusText;
+            ui.parcoursStatus.classList.toggle('success', isSuccess);
+        }
     }
 
     _updateItemBar(container, player) {
@@ -216,6 +287,7 @@ export class HudRuntimeSystem {
     updatePlayingHudTick(dt) {
         const game = this.game;
         if (!game.entityManager) return;
+        this._updateParcoursHud();
 
         // Score/Inventory laufen auf eigener, konservativer Tick-Frequenz.
         const scoreHudInterval = this._resolveScoreHudInterval();

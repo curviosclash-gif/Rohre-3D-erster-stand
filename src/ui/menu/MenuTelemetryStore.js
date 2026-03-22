@@ -50,6 +50,8 @@ function createDefaultBucket() {
         totalSelfCollisions: 0,
         totalItemUses: 0,
         totalStuckEvents: 0,
+        parcoursCompletions: 0,
+        totalParcoursCompletionTimeMs: 0,
         lastSeenAt: '',
     };
 }
@@ -69,6 +71,8 @@ function normalizeBucketCollection(source) {
             totalSelfCollisions: toNonNegativeInt(bucket.totalSelfCollisions, 0),
             totalItemUses: toNonNegativeInt(bucket.totalItemUses, 0),
             totalStuckEvents: toNonNegativeInt(bucket.totalStuckEvents, 0),
+            parcoursCompletions: toNonNegativeInt(bucket.parcoursCompletions, 0),
+            totalParcoursCompletionTimeMs: toNonNegativeNumber(bucket.totalParcoursCompletionTimeMs, 0),
             lastSeenAt: typeof bucket.lastSeenAt === 'string' ? bucket.lastSeenAt : '',
         };
     });
@@ -85,6 +89,8 @@ function createDefaultBalanceSummary() {
         totalSelfCollisions: 0,
         totalItemUses: 0,
         totalStuckEvents: 0,
+        parcoursCompletions: 0,
+        totalParcoursCompletionTimeMs: 0,
         maps: {},
         modes: {},
     };
@@ -101,6 +107,8 @@ function normalizeBalanceSummary(source) {
         totalSelfCollisions: toNonNegativeInt(summary.totalSelfCollisions, 0),
         totalItemUses: toNonNegativeInt(summary.totalItemUses, 0),
         totalStuckEvents: toNonNegativeInt(summary.totalStuckEvents, 0),
+        parcoursCompletions: toNonNegativeInt(summary.parcoursCompletions, 0),
+        totalParcoursCompletionTimeMs: toNonNegativeNumber(summary.totalParcoursCompletionTimeMs, 0),
         maps: normalizeBucketCollection(summary.maps),
         modes: normalizeBucketCollection(summary.modes),
     };
@@ -114,12 +122,16 @@ function normalizeRecentRoundEntry(entry) {
         mapKey: sanitizeBucketKey(source.mapKey, 'unknown'),
         mode: sanitizeBucketKey(source.mode, 'classic'),
         state: sanitizeBucketKey(source.state, 'ROUND_END'),
+        reason: sanitizeBucketKey(source.reason, 'ELIMINATION'),
         winnerType: winnerType === 'human' || winnerType === 'bot' ? winnerType : 'draw',
         winnerLabel: sanitizeBucketKey(source.winnerLabel, 'Unbekannt'),
         duration: toNonNegativeNumber(source.duration, 0),
         selfCollisions: toNonNegativeInt(source.selfCollisions, 0),
         itemUses: toNonNegativeInt(source.itemUses, 0),
         stuckEvents: toNonNegativeInt(source.stuckEvents, 0),
+        parcoursCompleted: source.parcoursCompleted === true,
+        parcoursRouteId: sanitizeBucketKey(source.parcoursRouteId, ''),
+        parcoursCompletionTimeMs: toNonNegativeNumber(source.parcoursCompletionTimeMs, 0),
     };
 }
 
@@ -199,12 +211,20 @@ export class MenuTelemetryStore {
         const selfCollisions = toNonNegativeInt(source.selfCollisions, 0);
         const itemUses = toNonNegativeInt(source.itemUses, 0);
         const stuckEvents = toNonNegativeInt(source.stuckEvents, 0);
+        const reason = sanitizeBucketKey(source.reason, 'ELIMINATION');
+        const parcoursCompleted = source.parcoursCompleted === true;
+        const parcoursRouteId = sanitizeBucketKey(source.parcoursRouteId, '');
+        const parcoursCompletionTimeMs = toNonNegativeNumber(source.parcoursCompletionTimeMs, 0);
 
         summary.rounds += 1;
         summary.totalDuration += duration;
         summary.totalSelfCollisions += selfCollisions;
         summary.totalItemUses += itemUses;
         summary.totalStuckEvents += stuckEvents;
+        if (parcoursCompleted) {
+            summary.parcoursCompletions += 1;
+            summary.totalParcoursCompletionTimeMs += parcoursCompletionTimeMs;
+        }
         if (winnerType === 'human') summary.humanWins += 1;
         if (winnerType === 'bot') summary.botWins += 1;
 
@@ -214,6 +234,10 @@ export class MenuTelemetryStore {
         mapBucket.totalSelfCollisions += selfCollisions;
         mapBucket.totalItemUses += itemUses;
         mapBucket.totalStuckEvents += stuckEvents;
+        if (parcoursCompleted) {
+            mapBucket.parcoursCompletions += 1;
+            mapBucket.totalParcoursCompletionTimeMs += parcoursCompletionTimeMs;
+        }
         if (winnerType === 'human') mapBucket.humanWins += 1;
         if (winnerType === 'bot') mapBucket.botWins += 1;
         mapBucket.lastSeenAt = recordedAt;
@@ -224,6 +248,10 @@ export class MenuTelemetryStore {
         modeBucket.totalSelfCollisions += selfCollisions;
         modeBucket.totalItemUses += itemUses;
         modeBucket.totalStuckEvents += stuckEvents;
+        if (parcoursCompleted) {
+            modeBucket.parcoursCompletions += 1;
+            modeBucket.totalParcoursCompletionTimeMs += parcoursCompletionTimeMs;
+        }
         if (winnerType === 'human') modeBucket.humanWins += 1;
         if (winnerType === 'bot') modeBucket.botWins += 1;
         modeBucket.lastSeenAt = recordedAt;
@@ -234,12 +262,16 @@ export class MenuTelemetryStore {
             mapKey,
             mode,
             state: sanitizeBucketKey(source.state, 'ROUND_END'),
+            reason,
             winnerType,
             winnerLabel: sanitizeBucketKey(source.winnerLabel, winnerType === 'bot' ? 'Bot' : 'Spieler'),
             duration,
             selfCollisions,
             itemUses,
             stuckEvents,
+            parcoursCompleted,
+            parcoursRouteId,
+            parcoursCompletionTimeMs,
         }));
         if (state.recentRounds.length > MAX_RECENT_ROUNDS) {
             state.recentRounds = state.recentRounds.slice(state.recentRounds.length - MAX_RECENT_ROUNDS);

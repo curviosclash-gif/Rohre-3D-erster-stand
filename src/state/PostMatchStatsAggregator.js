@@ -14,6 +14,12 @@ function formatDuration(seconds) {
     return `${value.toFixed(value >= 10 ? 1 : 2)}s`;
 }
 
+function formatDurationMs(ms) {
+    const valueMs = Math.max(0, normalizeNumber(ms, 0));
+    const seconds = valueMs / 1000;
+    return `${seconds.toFixed(seconds >= 10 ? 1 : 2)}s`;
+}
+
 function formatPercent(value) {
     return `${Math.round(Math.max(0, normalizeNumber(value, 0)) * 100)}%`;
 }
@@ -36,6 +42,13 @@ function resolveWinnerLabel(lastRoundMetrics, players) {
     return lastRoundMetrics.winnerIsBot ? `Bot ${winnerIndex + 1}` : `Spieler ${winnerIndex + 1}`;
 }
 
+function resolveObjectiveLabel(reason) {
+    const normalized = String(reason || '').trim();
+    if (normalized === 'PARCOURS_COMPLETE') return 'Parcours abgeschlossen';
+    if (normalized === 'ELIMINATION') return 'Elimination';
+    return normalized || '-';
+}
+
 function buildRoundBlock(lastRoundMetrics, players, outcome) {
     if (!lastRoundMetrics) return null;
     return {
@@ -43,11 +56,26 @@ function buildRoundBlock(lastRoundMetrics, players, outcome) {
         title: outcome?.state === 'MATCH_END' ? 'Finalrunde' : 'Diese Runde',
         rows: [
             { key: 'winner', label: 'Sieger', value: resolveWinnerLabel(lastRoundMetrics, players) },
+            { key: 'objective', label: 'Grund', value: resolveObjectiveLabel(lastRoundMetrics.reason || outcome?.reason) },
             { key: 'duration', label: 'Dauer', value: formatDuration(lastRoundMetrics.duration) },
             { key: 'bot-survival', label: 'Bot-Ueberleben', value: formatDuration(lastRoundMetrics.botSurvivalAverage) },
             { key: 'self-collisions', label: 'Selbstcrashs', value: String(Math.max(0, normalizeNumber(lastRoundMetrics.selfCollisions, 0))) },
             { key: 'item-uses', label: 'Items', value: String(Math.max(0, normalizeNumber(lastRoundMetrics.itemUseEvents, 0))) },
             { key: 'stuck-rate', label: 'Stuck/min', value: formatDecimal(lastRoundMetrics.stuckPerMinute, 1) },
+        ],
+    };
+}
+
+function buildParcoursBlock(lastRoundMetrics) {
+    if (!lastRoundMetrics) return null;
+    if (lastRoundMetrics.parcoursCompleted !== true) return null;
+    return {
+        id: 'parcours',
+        title: 'Parcours',
+        rows: [
+            { key: 'route', label: 'Route', value: String(lastRoundMetrics.parcoursRouteId || '-') },
+            { key: 'completion-time', label: 'Zeit', value: formatDurationMs(lastRoundMetrics.parcoursCompletionTimeMs) },
+            { key: 'checkpoints', label: 'Checkpoints', value: String(Math.max(0, normalizeNumber(lastRoundMetrics.parcoursCheckpointCount, 0))) },
         ],
     };
 }
@@ -112,6 +140,7 @@ export function buildPostMatchStatsSummary({ recorder, players = [], outcome = n
 
     const blocks = [
         buildRoundBlock(lastRoundMetrics, players, outcome),
+        buildParcoursBlock(lastRoundMetrics),
         buildMatchBlock(aggregateMetrics, outcome),
         buildScoreboardBlock(players, outcome),
     ].filter(Boolean);

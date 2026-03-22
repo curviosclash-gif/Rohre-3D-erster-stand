@@ -1,4 +1,4 @@
-export const MAP_SCHEMA_VERSION = 3;
+export const MAP_SCHEMA_VERSION = 4;
 export const CUSTOM_MAP_KEY = 'custom';
 export const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
 

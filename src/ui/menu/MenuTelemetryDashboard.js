@@ -10,6 +10,13 @@ function formatDuration(value) {
     return `${normalized.toFixed(normalized >= 10 ? 1 : 2)}s`;
 }
 
+function formatDurationMs(value) {
+    const parsed = Number(value);
+    const normalized = Number.isFinite(parsed) ? Math.max(0, parsed) : 0;
+    const seconds = normalized / 1000;
+    return `${seconds.toFixed(seconds >= 10 ? 1 : 2)}s`;
+}
+
 function formatDecimal(value) {
     const parsed = Number(value);
     const normalized = Number.isFinite(parsed) ? parsed : 0;
@@ -65,7 +72,9 @@ function renderBucketRows(list, entries = [], emptyLabel = 'Keine Daten') {
         const key = String(entry?.key || 'unknown');
         const rounds = Math.max(0, Number(entry?.rounds) || 0);
         const duration = formatDuration(entry?.averageRoundDuration);
-        const valueText = `${rounds} R | H ${formatPercent(entry?.humanWinRate)} | B ${formatPercent(entry?.botWinRate)} | ${duration}`;
+        const parcoursRate = formatPercent(entry?.parcoursCompletionRate);
+        const parcoursTime = formatDurationMs(entry?.averageParcoursCompletionTimeMs);
+        const valueText = `${rounds} R | H ${formatPercent(entry?.humanWinRate)} | B ${formatPercent(entry?.botWinRate)} | ${duration} | P ${parcoursRate}/${parcoursTime}`;
         appendRow(list, `bucket-${index}`, key, valueText);
     });
 }
@@ -99,6 +108,7 @@ function renderRecentRoundsCard(container, recentRounds = []) {
                 formatDuration(entry?.duration),
                 `Items ${Math.max(0, Number(entry?.itemUses) || 0)}`,
                 `Self ${Math.max(0, Number(entry?.selfCollisions) || 0)}`,
+                entry?.parcoursCompleted ? `Parcours ${formatDurationMs(entry?.parcoursCompletionTimeMs)}` : 'Parcours -',
             ].join(' | ');
             list.appendChild(item);
         });
@@ -139,6 +149,8 @@ export function renderMenuTelemetryDashboard(container, telemetrySnapshot = null
     appendRow(balanceCard, 'average-round-duration', 'Avg. Rundendauer', formatDuration(balance?.averageRoundDuration));
     appendRow(balanceCard, 'self-collisions-per-round', 'Selfcrash/R', formatDecimal(balance?.selfCollisionsPerRound));
     appendRow(balanceCard, 'item-uses-per-round', 'Items/R', formatDecimal(balance?.itemUsesPerRound));
+    appendRow(balanceCard, 'parcours-rate', 'Parcours-Rate', formatPercent(balance?.parcoursCompletionRate));
+    appendRow(balanceCard, 'parcours-time', 'Parcours-Zeit', formatDurationMs(balance?.averageParcoursCompletionTimeMs));
 
     const mapsCard = createCard(grid, 'maps', 'Top Maps');
     renderBucketRows(mapsCard, snapshot.topMaps, 'Noch keine Maps');
@@ -171,6 +183,8 @@ export function renderTelemetryHistorySection(container, historySummary) {
     appendRow(list, 'history-avg-dur', 'Avg. Dauer', formatDuration(historySummary.averageDuration));
     appendRow(list, 'history-self-cr', 'Selfcrash/R', formatDecimal(historySummary.selfCollisionsPerRound));
     appendRow(list, 'history-items-r', 'Items/R', formatDecimal(historySummary.itemUsesPerRound));
+    appendRow(list, 'history-parcours-rate', 'Parcours-Rate', formatPercent(historySummary.parcoursCompletionRate));
+    appendRow(list, 'history-parcours-time', 'Parcours-Zeit', formatDurationMs(historySummary.averageParcoursCompletionTimeMs));
 
     if (Array.isArray(historySummary.topMaps) && historySummary.topMaps.length > 0) {
         const mapsStr = historySummary.topMaps.map((m) => `${m.key}(${m.count})`).join(', ');

@@ -46,6 +46,9 @@ function readManagerMapMetadata(manager) {
     if (Array.isArray(source.gates)) {
         metadata.gates = cloneSerializable(source.gates) || [];
     }
+    if (source.parcours && typeof source.parcours === 'object') {
+        metadata.parcours = cloneSerializable(source.parcours) || {};
+    }
 
     return metadata;
 }
@@ -68,6 +71,9 @@ function extractMapMetadata(data) {
     }
     if (Array.isArray(data.gates) && data.gates.length > 0) {
         metadata.gates = cloneSerializable(data.gates) || [];
+    }
+    if (data.parcours && typeof data.parcours === 'object') {
+        metadata.parcours = cloneSerializable(data.parcours) || {};
     }
     return metadata;
 }

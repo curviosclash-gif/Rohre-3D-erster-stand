@@ -3,13 +3,25 @@ export class RoundOutcomeSystem {
         getHumanPlayers = () => [],
         getBots = () => [],
         getPendingHumanRespawns = () => 0,
+        getObjectiveOutcome = () => null,
     } = {}) {
         this.getHumanPlayers = getHumanPlayers;
         this.getBots = getBots;
         this.getPendingHumanRespawns = getPendingHumanRespawns;
+        this.getObjectiveOutcome = getObjectiveOutcome;
     }
 
     resolve() {
+        const objectiveOutcome = this.getObjectiveOutcome?.();
+        if (objectiveOutcome?.shouldEnd === true && objectiveOutcome?.winner) {
+            return {
+                shouldEnd: true,
+                winner: objectiveOutcome.winner,
+                reason: objectiveOutcome.reason || 'OBJECTIVE',
+                parcours: objectiveOutcome.parcours || null,
+            };
+        }
+
         const humanPlayers = this.getHumanPlayers();
         let humansAlive = 0;
         let lastHumanAlive = null;
@@ -42,6 +54,11 @@ export class RoundOutcomeSystem {
             }
         }
 
-        return { shouldEnd, winner };
+        return {
+            shouldEnd,
+            winner,
+            reason: shouldEnd ? 'ELIMINATION' : '',
+            parcours: null,
+        };
     }
 }

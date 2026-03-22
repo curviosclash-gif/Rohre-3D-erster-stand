@@ -48,12 +48,17 @@ function normalizeEntry(source) {
         at: sanitizeString(s.at, new Date().toISOString()),
         mapKey: sanitizeString(s.mapKey, 'unknown'),
         mode: sanitizeString(s.mode, 'classic'),
+        state: sanitizeString(s.state, 'ROUND_END'),
+        reason: sanitizeString(s.reason, 'ELIMINATION'),
         winnerType: sanitizeString(s.winnerType, 'draw'),
         winnerLabel: sanitizeString(s.winnerLabel, 'Unbekannt'),
         duration: toNonNegativeNumber(s.duration),
         selfCollisions: toNonNegativeInt(s.selfCollisions),
         itemUses: toNonNegativeInt(s.itemUses),
         stuckEvents: toNonNegativeInt(s.stuckEvents),
+        parcoursCompleted: s.parcoursCompleted === true,
+        parcoursRouteId: sanitizeString(s.parcoursRouteId, ''),
+        parcoursCompletionTimeMs: toNonNegativeNumber(s.parcoursCompletionTimeMs),
     };
 }
 
@@ -170,6 +175,8 @@ export class TelemetryHistoryStore {
         let totalSelfCollisions = 0;
         let totalItemUses = 0;
         let totalStuckEvents = 0;
+        let parcoursCompletions = 0;
+        let totalParcoursCompletionTimeMs = 0;
         const mapCounts = {};
         const modeCounts = {};
 
@@ -179,6 +186,10 @@ export class TelemetryHistoryStore {
             totalSelfCollisions += toNonNegativeInt(r.selfCollisions);
             totalItemUses += toNonNegativeInt(r.itemUses);
             totalStuckEvents += toNonNegativeInt(r.stuckEvents);
+            if (r.parcoursCompleted === true) {
+                parcoursCompletions += 1;
+                totalParcoursCompletionTimeMs += toNonNegativeNumber(r.parcoursCompletionTimeMs);
+            }
             if (r.winnerType === 'human') humanWins++;
             if (r.winnerType === 'bot') botWins++;
 
@@ -200,6 +211,11 @@ export class TelemetryHistoryStore {
             selfCollisionsPerRound: rounds > 0 ? totalSelfCollisions / rounds : 0,
             itemUsesPerRound: rounds > 0 ? totalItemUses / rounds : 0,
             stuckEventsPerRound: rounds > 0 ? totalStuckEvents / rounds : 0,
+            parcoursCompletions,
+            parcoursCompletionRate: rounds > 0 ? parcoursCompletions / rounds : 0,
+            averageParcoursCompletionTimeMs: parcoursCompletions > 0
+                ? totalParcoursCompletionTimeMs / parcoursCompletions
+                : 0,
             topMaps: this._topEntries(mapCounts, 3),
             topModes: this._topEntries(modeCounts, 3),
         };
@@ -223,6 +239,9 @@ export class TelemetryHistoryStore {
             selfCollisionsPerRound: 0,
             itemUsesPerRound: 0,
             stuckEventsPerRound: 0,
+            parcoursCompletions: 0,
+            parcoursCompletionRate: 0,
+            averageParcoursCompletionTimeMs: 0,
             topMaps: [],
             topModes: [],
         };

@@ -363,6 +363,17 @@
                             <input type="range" id="mg-trail-aim-slider" min="0.2" max="6.0" step="0.05" value="3.0">
                             <label for="shadow-quality-slider">Schattenqualitaet: <span id="shadow-quality-label">Hoch</span></label>
                             <input type="range" id="shadow-quality-slider" min="0" max="3" step="1" value="3">
+                            <label for="recording-profile-select">Recording-Profil</label>
+                            <select id="recording-profile-select">
+                                <option value="standard" selected>Standard</option>
+                                <option value="youtube_short">YouTube Shorts (vertikal)</option>
+                            </select>
+                            <label for="recording-hud-mode-select">Recording HUD</label>
+                            <select id="recording-hud-mode-select">
+                                <option value="clean" selected>Clean (ohne HUD)</option>
+                                <option value="with_hud">Mit HUD</option>
+                            </select>
+                            <p id="recording-profile-hint" class="field-hint">Aufnahmeprofil: Standard - HUD: clean</p>
 
                             <label class="toggle-row secondary-btn-spaced">
                                 <input type="checkbox" id="auto-roll-toggle" checked>
@@ -1091,6 +1102,13 @@
                     <div id="p2-hud-boost-fill" class="boost-fill"></div>
                 </div>
                 <div id="p2-items" class="item-bar"></div>
+            </div>
+
+            <div id="parcours-hud" class="parcours-hud hidden" aria-live="polite">
+                <div id="parcours-route" class="parcours-route">Parcours</div>
+                <div id="parcours-progress" class="parcours-progress">CP 0/0</div>
+                <div id="parcours-timer" class="parcours-timer">0.00s</div>
+                <div id="parcours-status" class="parcours-status"></div>
             </div>
 
             <div id="hunt-hud" class="hunt-hud hidden" aria-hidden="true">

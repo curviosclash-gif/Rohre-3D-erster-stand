@@ -21,6 +21,7 @@ const BASE_MAP_KEYS = [
     'the_loop',
     'upgrade_showcase',
     'showcase_nexus',
+    'parcours_rift',
     'neon_abyss',
 ];
 

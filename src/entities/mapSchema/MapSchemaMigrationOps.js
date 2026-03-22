@@ -37,7 +37,7 @@ function sanitizeLegacyRuntimeMapDocument(rawMap, warnings) {
         portals.push(sanitizePortal({ x: pair.b[0], y: pair.b[1], z: pair.b[2], radius: 80 }));
     }
 
-    warnings.push('Legacy runtime map format detected. Converted to editor schema v2.');
+    warnings.push('Legacy runtime map format detected. Converted to editor schema v4.');
 
     return {
         schemaVersion: MAP_SCHEMA_VERSION,
@@ -82,14 +82,17 @@ export function migrateMapDocument(rawMap) {
         if (looksLikeRuntimeMap) {
             migrated = sanitizeLegacyRuntimeMapDocument(rawMap, warnings);
         } else {
-            warnings.push('Legacy map format detected. Migrated to schema v2.');
+            warnings.push('Legacy map format detected. Migrated to schema v4.');
             migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
         }
     } else if (schemaVersion === 1) {
-        warnings.push('Map schema v1 detected. Migrating to v3.');
+        warnings.push('Map schema v1 detected. Migrating to v4.');
         migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
     } else if (schemaVersion === 2) {
-        warnings.push('Map schema v2 detected. Migrating to v3.');
+        warnings.push('Map schema v2 detected. Migrating to v4.');
+        migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
+    } else if (schemaVersion === 3) {
+        warnings.push('Map schema v3 detected. Migrating to v4.');
         migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
     }
 

@@ -89,6 +89,106 @@ function normalizeGlbColliderMode(value) {
     return undefined;
 }
 
+function normalizeParcoursCheckpointType(value) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (!normalized) return 'gate';
+    return normalized;
+}
+
+function sanitizeParcoursCheckpointPosition(source) {
+    if (Array.isArray(source?.pos)) {
+        return sanitizeVectorArray(source.pos, [0, 0, 0]);
+    }
+    return sanitizeVectorArray([source?.x, source?.y, source?.z], [0, 0, 0]);
+}
+
+function sanitizeForwardVector(raw) {
+    if (!Array.isArray(raw)) return undefined;
+    const vector = sanitizeVectorArray(raw, [0, 0, 1]);
+    const lengthSq = (vector[0] * vector[0]) + (vector[1] * vector[1]) + (vector[2] * vector[2]);
+    if (lengthSq < 0.000001) return undefined;
+    const invLength = 1 / Math.sqrt(lengthSq);
+    return [vector[0] * invLength, vector[1] * invLength, vector[2] * invLength];
+}
+
+function sanitizeParcoursRules(raw) {
+    const source = raw && typeof raw === 'object' ? raw : {};
+    return {
+        ordered: source.ordered !== false,
+        resetOnDeath: source.resetOnDeath !== false,
+        resetToLastValid: source.resetToLastValid === true,
+        allowLaneAliases: source.allowLaneAliases !== false,
+        winnerByParcoursComplete: source.winnerByParcoursComplete !== false,
+        maxSegmentTimeMs: Math.max(0, Math.trunc(asFiniteNumber(source.maxSegmentTimeMs, 0))),
+        cooldownMs: Math.max(0, Math.trunc(asFiniteNumber(source.cooldownMs, 450))),
+        wrongOrderCooldownMs: Math.max(0, Math.trunc(asFiniteNumber(source.wrongOrderCooldownMs, 650))),
+        errorIndicatorMs: Math.max(0, Math.trunc(asFiniteNumber(source.errorIndicatorMs, 1400))),
+    };
+}
+
+function sanitizeParcoursCheckpoint(raw, fallbackId = '') {
+    const source = raw && typeof raw === 'object' ? raw : {};
+    const id = sanitizeOptionalId(source.id) || fallbackId || undefined;
+    const type = normalizeParcoursCheckpointType(source.type);
+    const radius = asPositiveNumber(source.radius, 3.5, 0.1);
+    const checkpoint = {
+        type,
+        pos: sanitizeParcoursCheckpointPosition(source),
+        radius,
+    };
+
+    if (id) checkpoint.id = id;
+
+    const aliasOf = sanitizeOptionalId(source.aliasOf);
+    if (aliasOf) {
+        checkpoint.aliasOf = aliasOf;
+    }
+
+    const forward = sanitizeForwardVector(source.forward);
+    if (forward) {
+        checkpoint.forward = forward;
+    }
+
+    const params = cloneJsonValue(source.params);
+    if (params && typeof params === 'object' && !Array.isArray(params)) {
+        checkpoint.params = params;
+    }
+
+    return checkpoint;
+}
+
+function sanitizeParcoursFinish(raw) {
+    if (!raw || typeof raw !== 'object') return undefined;
+    const finish = sanitizeParcoursCheckpoint(raw, 'FINISH');
+    finish.type = 'finish';
+    return finish;
+}
+
+function sanitizeParcours(raw) {
+    if (!raw || typeof raw !== 'object') {
+        return undefined;
+    }
+
+    const source = raw;
+    const checkpoints = asArray(source.checkpoints)
+        .map((entry, index) => sanitizeParcoursCheckpoint(entry, `CP${String(index + 1).padStart(2, '0')}`))
+        .filter((entry) => Array.isArray(entry.pos));
+
+    const finish = sanitizeParcoursFinish(source.finish);
+    const enabled = source.enabled === true || checkpoints.length > 0 || !!finish;
+    if (!enabled) {
+        return undefined;
+    }
+
+    return {
+        enabled: true,
+        routeId: sanitizeOptionalId(source.routeId) || 'custom_route_v1',
+        checkpoints,
+        rules: sanitizeParcoursRules(source.rules),
+        finish,
+    };
+}
+
 export function sanitizeArenaSize(raw) {
     const source = raw && typeof raw === 'object' ? raw : {};
     return {
@@ -269,6 +369,11 @@ export function normalizeMapSchemaDocument(rawMap) {
     const glbColliderMode = normalizeGlbColliderMode(rawMap.glbColliderMode);
     if (glbColliderMode) {
         normalized.glbColliderMode = glbColliderMode;
+    }
+
+    const parcours = sanitizeParcours(rawMap.parcours);
+    if (parcours) {
+        normalized.parcours = parcours;
     }
 
     return normalized;

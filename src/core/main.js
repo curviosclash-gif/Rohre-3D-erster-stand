@@ -24,6 +24,7 @@ import {
 import { RuntimePerfProfiler } from './perf/RuntimePerfProfiler.js';
 import { initializeGameApp } from './AppInitializer.js';
 import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './PlaytestLaunchParams.js';
+import { RECORDING_CAPTURE_PROFILE, RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -285,9 +286,16 @@ export class Game {
             source: 'global_hotkey',
         });
         const isRecording = !!recorder.isRecording?.();
+        const recordingSettings = recorder.getRecordingCaptureSettings?.() || this.settings?.recording || {};
+        const profileLabel = recordingSettings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
+            ? 'YouTube Shorts'
+            : 'Standard';
+        const hudLabel = recordingSettings.hudMode === RECORDING_HUD_MODE.WITH_HUD
+            ? 'mit HUD'
+            : 'clean';
 
         if (!wasRecording && isRecording) {
-            this._showStatusToast('Videoaufnahme: gestartet', 1200, 'success');
+            this._showStatusToast(`Videoaufnahme: gestartet (${profileLabel}, ${hudLabel})`, 1400, 'success');
             return;
         }
         if (wasRecording && !isRecording) {
@@ -392,8 +400,8 @@ export class Game {
         return this.debugApi?.applyBotValidationScenario?.(idOrIndex) || null;
     }
 
-    _onRoundEnd(winner = null) {
-        this.matchFlowUiController?.onRoundEnd?.(winner);
+    _onRoundEnd(winner = null, outcome = null) {
+        this.matchFlowUiController?.onRoundEnd?.(winner, outcome);
     }
 
     _getPlanarAimAxis(playerIndex) {
@@ -466,6 +474,13 @@ export class Game {
         }
         const renderStart = this.runtimePerfProfiler?.startSample?.();
         this.renderer.render();
+        this.renderer.prepareRecordingCaptureFrame({
+            recordingActive: this.mediaRecorderSystem?.isRecording?.() === true,
+            entityManager: this.entityManager,
+            renderAlpha: this._renderAlpha,
+            renderDelta: this._renderDelta,
+            splitScreen: this.renderer?.splitScreen === true,
+        });
         this.runtimePerfProfiler?.endSample?.('render', renderStart);
         this.mediaRecorderSystem?.captureRenderedFrame?.(this._renderDelta);
     }
