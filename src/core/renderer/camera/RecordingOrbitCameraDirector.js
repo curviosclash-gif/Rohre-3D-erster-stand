@@ -11,6 +11,7 @@ const SHOT_TYPE = Object.freeze({
     CHASE_CLOSE: 1,
     SIDE_TRACK: 2,
     HIGH_OVERVIEW: 3,
+    DUEL_FOCUS: 4,
 });
 
 // --- Slot styles: cinematic (slot 0) vs action (slot 1) -------------------
@@ -64,19 +65,40 @@ function pickShotDuration(sequenceIndex, playerIndex, style) {
 
 // --- Gameplay event detection thresholds ----------------------------------
 
-const EVENT_HP_DROP_THRESHOLD = 0.08;       // 8% HP drop triggers reaction
-const EVENT_SCORE_CHANGE_THRESHOLD = 0.5;   // any score increase
-const EVENT_SPEED_BURST_THRESHOLD = 1.4;    // 40% above baseline speed
+const EVENT_HP_DROP_THRESHOLD = 0.08;
+const EVENT_SCORE_CHANGE_THRESHOLD = 0.5;
+const EVENT_SPEED_BURST_THRESHOLD = 1.4;
 
-// Override durations (seconds)
 const EVENT_OVERRIDE_HIT = 1.8;
 const EVENT_OVERRIDE_SCORE = 1.5;
 const EVENT_OVERRIDE_BOOST = 2.0;
+const EVENT_OVERRIDE_DUEL = 3.0;
 
-// Shake intensity per event type
 const SHAKE_HIT = 0.35;
 const SHAKE_SCORE = 0.15;
 const SHAKE_BOOST = 0.08;
+
+// --- Duel detection -------------------------------------------------------
+
+const DUEL_PROXIMITY_THRESHOLD = 15;
+const DUEL_PROXIMITY_SQ = DUEL_PROXIMITY_THRESHOLD * DUEL_PROXIMITY_THRESHOLD;
+
+// --- Dynamic FOV ----------------------------------------------------------
+
+const BASE_FOV_OFFSET = 0;
+const FOV_BOOST_OFFSET = 15;       // degrees wider on boost
+const FOV_HIT_OFFSET = -10;        // degrees narrower on hit (dolly zoom)
+const FOV_HIT_SNAP_BACK = 5;       // overshoot on recovery
+const FOV_DUEL_OFFSET = 8;         // slightly wider for duel framing
+const FOV_DECAY_SPEED = 6.0;
+const FOV_SNAP_BACK_DELAY = 0.25;  // seconds before snap-back starts
+
+// --- Letterbox transition -------------------------------------------------
+
+const LETTERBOX_FADE_IN = 0.12;    // seconds
+const LETTERBOX_HOLD = 0.06;       // seconds at full
+const LETTERBOX_FADE_OUT = 0.18;   // seconds
+const LETTERBOX_TOTAL = LETTERBOX_FADE_IN + LETTERBOX_HOLD + LETTERBOX_FADE_OUT;
 
 export { SHOT_TYPE, SLOT_STYLE };
 
@@ -110,6 +132,7 @@ export class RecordingOrbitCameraDirector {
         this._shotDurationByPlayer = [];
         this._shotSeqIndexByPlayer = [];
         this._slotStyleByPlayer = [];
+        this._prevShotType = [];
 
         // Gameplay event tracking per player.
         this._prevHpRatio = [];
@@ -121,12 +144,22 @@ export class RecordingOrbitCameraDirector {
         this._shakeIntensity = [];
         this._shakeDecay = [];
 
+        // Dynamic FOV per player.
+        this._fovOffset = [];
+        this._fovTarget = [];
+        this._fovSnapBackTimer = [];
+
+        // Letterbox transition per player.
+        this._letterboxTimer = [];
+
         this._tmpDir = new THREE.Vector3();
         this._tmpSide = new THREE.Vector3();
         this._tmpDesiredPosition = new THREE.Vector3();
         this._tmpDesiredLookAt = new THREE.Vector3();
         this._tmpTargetPosition = new THREE.Vector3();
         this._tmpTargetLookAt = new THREE.Vector3();
+        this._tmpMidpoint = new THREE.Vector3();
+        this._tmpToOther = new THREE.Vector3();
         this._up = new THREE.Vector3(0, 1, 0);
     }
 
@@ -137,6 +170,7 @@ export class RecordingOrbitCameraDirector {
         this._shotDurationByPlayer.length = 0;
         this._shotSeqIndexByPlayer.length = 0;
         this._slotStyleByPlayer.length = 0;
+        this._prevShotType.length = 0;
         this._prevHpRatio.length = 0;
         this._prevScore.length = 0;
         this._prevBoosting.length = 0;
@@ -145,6 +179,27 @@ export class RecordingOrbitCameraDirector {
         this._eventOverrideTimer.length = 0;
         this._shakeIntensity.length = 0;
         this._shakeDecay.length = 0;
+        this._fovOffset.length = 0;
+        this._fovTarget.length = 0;
+        this._fovSnapBackTimer.length = 0;
+        this._letterboxTimer.length = 0;
+    }
+
+    /** Returns letterbox progress 0..1 for the given player slot. */
+    getLetterboxProgress(playerIndex) {
+        const timer = this._letterboxTimer[playerIndex] || 0;
+        if (timer <= 0) return 0;
+        const remaining = Math.max(0, LETTERBOX_TOTAL - timer);
+        if (remaining <= 0) return 0;
+
+        if (timer < LETTERBOX_FADE_IN) {
+            return timer / LETTERBOX_FADE_IN;
+        }
+        if (timer < LETTERBOX_FADE_IN + LETTERBOX_HOLD) {
+            return 1;
+        }
+        const fadeOutElapsed = timer - LETTERBOX_FADE_IN - LETTERBOX_HOLD;
+        return Math.max(0, 1 - fadeOutElapsed / LETTERBOX_FADE_OUT);
     }
 
     _isWithinArenaBounds(position, arena) {
@@ -224,6 +279,35 @@ export class RecordingOrbitCameraDirector {
         this._tmpDesiredLookAt.y += 0.3;
     }
 
+    _computeDuelFocus(phase, playerIndex, playerPosition, otherPosition, cfg) {
+        // Camera frames both players from a raised side angle.
+        this._tmpMidpoint.copy(playerPosition).add(otherPosition).multiplyScalar(0.5);
+        this._tmpToOther.copy(otherPosition).sub(playerPosition);
+        const separation = Math.max(1, this._tmpToOther.length());
+        this._tmpToOther.normalize();
+
+        // Perpendicular to the line between players (horizontal).
+        const perpX = -this._tmpToOther.z;
+        const perpZ = this._tmpToOther.x;
+        const perpLen = Math.sqrt(perpX * perpX + perpZ * perpZ);
+        const normPerpX = perpLen > 0.001 ? perpX / perpLen : 1;
+        const normPerpZ = perpLen > 0.001 ? perpZ / perpLen : 0;
+
+        const sideOscillation = Math.sin(phase * 0.35 + playerIndex) * 0.3;
+        const camDist = (separation * 0.7 + 6.0) * cfg.radiusMul;
+        const side = (playerIndex % 2 === 0 ? 1 : -1) + sideOscillation;
+        const lift = (4.5 + separation * 0.2) * cfg.liftMul;
+
+        this._tmpDesiredPosition.set(
+            this._tmpMidpoint.x + normPerpX * camDist * side,
+            this._tmpMidpoint.y + lift,
+            this._tmpMidpoint.z + normPerpZ * camDist * side
+        );
+
+        this._tmpDesiredLookAt.copy(this._tmpMidpoint);
+        this._tmpDesiredLookAt.y += 0.5;
+    }
+
     // --- Shot selection ---------------------------------------------------
 
     _advanceShotTimer(playerIndex, dt, slotStyle) {
@@ -249,7 +333,11 @@ export class RecordingOrbitCameraDirector {
         return cfg.sequence[this._shotSeqIndexByPlayer[playerIndex]];
     }
 
-    _computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition, cfg) {
+    _computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition, cfg, otherPosition) {
+        if (shotType === SHOT_TYPE.DUEL_FOCUS && otherPosition) {
+            this._computeDuelFocus(phase, playerIndex, playerPosition, otherPosition, cfg);
+            return;
+        }
         switch (shotType) {
             case SHOT_TYPE.CHASE_CLOSE:
                 this._computeChaseClose(phase, playerIndex, playerPosition, cfg);
@@ -282,24 +370,19 @@ export class RecordingOrbitCameraDirector {
         const prevScore = this._prevScore[playerIndex];
         const prevBoosting = this._prevBoosting[playerIndex];
 
-        // Update baseline speed with slow EMA.
         const prevBaseline = this._baselineSpeed[playerIndex] || speed;
         this._baselineSpeed[playerIndex] = prevBaseline + (speed - prevBaseline) * Math.min(1, dt * 0.5);
 
-        // Store current values for next frame.
         this._prevHpRatio[playerIndex] = hpRatio;
         this._prevScore[playerIndex] = score;
         this._prevBoosting[playerIndex] = isBoosting;
 
-        // Skip detection on first frame (no previous data).
         if (prevHp === undefined) return;
 
-        // Decay existing override timer.
         if (this._eventOverrideTimer[playerIndex] > 0) {
             this._eventOverrideTimer[playerIndex] = Math.max(0, this._eventOverrideTimer[playerIndex] - dt);
         }
 
-        // Decay shake.
         if (this._shakeIntensity[playerIndex] > 0) {
             const decay = this._shakeDecay[playerIndex] || 4.0;
             this._shakeIntensity[playerIndex] = Math.max(0, this._shakeIntensity[playerIndex] - dt * decay);
@@ -312,6 +395,9 @@ export class RecordingOrbitCameraDirector {
             this._eventOverrideTimer[playerIndex] = EVENT_OVERRIDE_HIT;
             this._shakeIntensity[playerIndex] = Math.min(1, SHAKE_HIT + hpDrop * 0.5);
             this._shakeDecay[playerIndex] = 3.0;
+            // FOV: dolly zoom (narrow, then snap back).
+            this._fovTarget[playerIndex] = FOV_HIT_OFFSET;
+            this._fovSnapBackTimer[playerIndex] = FOV_SNAP_BACK_DELAY;
             return;
         }
 
@@ -321,6 +407,7 @@ export class RecordingOrbitCameraDirector {
             this._eventOverrideTimer[playerIndex] = EVENT_OVERRIDE_SCORE;
             this._shakeIntensity[playerIndex] = SHAKE_SCORE;
             this._shakeDecay[playerIndex] = 5.0;
+            this._fovTarget[playerIndex] = FOV_HIT_SNAP_BACK;
             return;
         }
 
@@ -330,10 +417,18 @@ export class RecordingOrbitCameraDirector {
             this._eventOverrideTimer[playerIndex] = EVENT_OVERRIDE_BOOST;
             this._shakeIntensity[playerIndex] = SHAKE_BOOST;
             this._shakeDecay[playerIndex] = 6.0;
+            // FOV: wider for speed feel.
+            this._fovTarget[playerIndex] = FOV_BOOST_OFFSET;
             return;
         }
 
-        // Detect speed burst (high speed relative to baseline).
+        // Sustained boost keeps FOV wide.
+        if (isBoosting) {
+            this._fovTarget[playerIndex] = FOV_BOOST_OFFSET;
+            return;
+        }
+
+        // Detect speed burst.
         const baseline = this._baselineSpeed[playerIndex] || 1;
         if (baseline > 0 && speed / baseline >= EVENT_SPEED_BURST_THRESHOLD && speed > 5) {
             this._eventOverrideShot[playerIndex] = SHOT_TYPE.CHASE_CLOSE;
@@ -345,6 +440,55 @@ export class RecordingOrbitCameraDirector {
         }
     }
 
+    // --- Duel proximity ---------------------------------------------------
+
+    _checkDuelProximity(playerIndex, playerPosition, otherPosition) {
+        if (!otherPosition) return false;
+        const distSq = playerPosition.distanceToSquared(otherPosition);
+        return distSq <= DUEL_PROXIMITY_SQ;
+    }
+
+    // --- Dynamic FOV ------------------------------------------------------
+
+    _updateFov(playerIndex, camera, dt, baseFov, isDuel) {
+        if (!camera) return;
+
+        // Snap-back timer for dolly zoom: after the initial narrow FOV,
+        // overshoots slightly wide before returning to baseline.
+        if ((this._fovSnapBackTimer[playerIndex] || 0) > 0) {
+            this._fovSnapBackTimer[playerIndex] -= dt;
+            if (this._fovSnapBackTimer[playerIndex] <= 0) {
+                this._fovTarget[playerIndex] = FOV_HIT_SNAP_BACK;
+                this._fovSnapBackTimer[playerIndex] = 0;
+            }
+        }
+
+        let target = this._fovTarget[playerIndex] || BASE_FOV_OFFSET;
+        if (isDuel) {
+            target = Math.max(target, FOV_DUEL_OFFSET);
+        }
+
+        // Decay FOV target toward zero when no event is driving it.
+        if ((this._eventOverrideTimer[playerIndex] || 0) <= 0
+            && (this._fovSnapBackTimer[playerIndex] || 0) <= 0) {
+            this._fovTarget[playerIndex] = target + (0 - target) * Math.min(1, dt * 3.0);
+            target = this._fovTarget[playerIndex];
+        }
+
+        const current = this._fovOffset[playerIndex] || 0;
+        const alpha = 1 - Math.exp(-FOV_DECAY_SPEED * dt);
+        const next = current + (target - current) * alpha;
+        this._fovOffset[playerIndex] = Math.abs(next) < 0.05 ? 0 : next;
+
+        const desiredFov = baseFov + this._fovOffset[playerIndex];
+        if (Math.abs(camera.fov - desiredFov) > 0.01) {
+            camera.fov = desiredFov;
+            camera.updateProjectionMatrix();
+        }
+    }
+
+    // --- Shake & letterbox ------------------------------------------------
+
     _applyShake(camera, playerIndex, phase) {
         const intensity = this._shakeIntensity[playerIndex] || 0;
         if (intensity <= 0.001) return;
@@ -354,6 +498,22 @@ export class RecordingOrbitCameraDirector {
         const oy = Math.cos(phase * freq * 1.3) * intensity * 0.08;
         camera.position.x += ox;
         camera.position.y += oy;
+    }
+
+    _updateLetterbox(playerIndex, shotType, dt) {
+        const prev = this._prevShotType[playerIndex];
+        // Trigger letterbox on shot change.
+        if (prev !== undefined && prev !== shotType) {
+            this._letterboxTimer[playerIndex] = 0.001; // start
+        }
+        this._prevShotType[playerIndex] = shotType;
+
+        if ((this._letterboxTimer[playerIndex] || 0) > 0) {
+            this._letterboxTimer[playerIndex] += dt;
+            if (this._letterboxTimer[playerIndex] >= LETTERBOX_TOTAL) {
+                this._letterboxTimer[playerIndex] = 0;
+            }
+        }
     }
 
     // --- Main entry point ------------------------------------------------
@@ -368,6 +528,8 @@ export class RecordingOrbitCameraDirector {
         arena = null,
         slotStyle = SLOT_STYLE.CINEMATIC,
         playerState = null,
+        otherPlayerPosition = null,
+        baseFov = 0,
     }) {
         if (!camera || !playerPosition || !playerDirection) return;
         if (!Number.isInteger(playerIndex) || playerIndex < 0) return;
@@ -396,6 +558,13 @@ export class RecordingOrbitCameraDirector {
         // Detect gameplay events and update overrides/shake.
         this._detectEvents(playerIndex, playerState, safeDt);
 
+        // Duel proximity check.
+        const isDuel = this._checkDuelProximity(playerIndex, playerPosition, otherPlayerPosition);
+        if (isDuel && (this._eventOverrideTimer[playerIndex] || 0) <= 0) {
+            this._eventOverrideShot[playerIndex] = SHOT_TYPE.DUEL_FOCUS;
+            this._eventOverrideTimer[playerIndex] = EVENT_OVERRIDE_DUEL;
+        }
+
         // Advance shot timer; use event override if active.
         let shotType = this._advanceShotTimer(playerIndex, safeDt, slotStyle);
         if ((this._eventOverrideTimer[playerIndex] || 0) > 0
@@ -403,7 +572,10 @@ export class RecordingOrbitCameraDirector {
             shotType = this._eventOverrideShot[playerIndex];
         }
 
-        this._computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition, cfg);
+        // Letterbox transition on shot change.
+        this._updateLetterbox(playerIndex, shotType, safeDt);
+
+        this._computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition, cfg, otherPlayerPosition);
 
         const finitePosition = Number.isFinite(this._tmpDesiredPosition.x)
             && Number.isFinite(this._tmpDesiredPosition.y)
@@ -429,6 +601,7 @@ export class RecordingOrbitCameraDirector {
         const fallbackLookAt = fallbackTarget?.lookAt || playerPosition;
         if (!useOrbitShot || blend <= 0.0001) {
             camera.lookAt(fallbackLookAt);
+            this._updateFov(playerIndex, camera, safeDt, baseFov || camera.fov, isDuel);
             return;
         }
 
@@ -442,5 +615,8 @@ export class RecordingOrbitCameraDirector {
 
         // Apply camera shake from gameplay events.
         this._applyShake(camera, playerIndex, phase);
+
+        // Apply dynamic FOV.
+        this._updateFov(playerIndex, camera, safeDt, baseFov || camera.fov, isDuel);
     }
 }

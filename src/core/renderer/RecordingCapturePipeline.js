@@ -170,7 +170,7 @@ export class RecordingCapturePipeline {
         this._shortsCameraRig.setCinematicEnabled(true);
     }
 
-    _updateShortsCamera({ slotIndex, player, renderAlpha, renderDelta, arena }) {
+    _updateShortsCamera({ slotIndex, player, otherPlayer, renderAlpha, renderDelta, arena }) {
         if (!player) return false;
         this._shortsCameraRig.cameraModes[slotIndex] = 0;
         player.resolveRenderTransform(renderAlpha, this._tmpPosition, this._tmpQuaternion);
@@ -186,9 +186,21 @@ export class RecordingCapturePipeline {
             arena,
             null
         );
+
+        // Resolve other player's position for duel-focus detection.
+        let otherPos = null;
+        if (otherPlayer && typeof otherPlayer.resolveRenderTransform === 'function') {
+            const tmpOther = this._tmpOtherPosition || (this._tmpOtherPosition = new THREE.Vector3());
+            const tmpOtherQ = this._tmpOtherQuaternion || (this._tmpOtherQuaternion = new THREE.Quaternion());
+            otherPlayer.resolveRenderTransform(renderAlpha, tmpOther, tmpOtherQ);
+            otherPos = tmpOther;
+        }
+
+        const camera = this._shortsCameraRig.cameras[slotIndex];
+        const baseFov = camera ? camera.fov : CONFIG.CAMERA.FOV;
         this._orbitDirector.apply({
             playerIndex: slotIndex,
-            camera: this._shortsCameraRig.cameras[slotIndex],
+            camera,
             fallbackTarget: this._shortsCameraRig.cameraTargets[slotIndex],
             playerPosition: this._tmpPosition,
             playerDirection: this._tmpDirection,
@@ -202,6 +214,8 @@ export class RecordingCapturePipeline {
                 speed: Number(player.speed) || 0,
                 isBoosting: player.isBoosting === true,
             },
+            otherPlayerPosition: otherPos,
+            baseFov,
         });
         return true;
     }
@@ -261,6 +275,29 @@ export class RecordingCapturePipeline {
         ctx.fillText('HP', x + padding + 10, hpBarY - 4);
         ctx.fillText('BOOST', x + padding + 10, boostBarY - 4);
         ctx.restore();
+    }
+
+    _drawLetterboxOverlay({ ctx, width, height, segments }) {
+        if (!ctx || !Array.isArray(segments)) return;
+        for (let i = 0; i < segments.length; i += 1) {
+            const segment = segments[i];
+            if (!segment) continue;
+            const progress = this._orbitDirector.getLetterboxProgress(segment.slotIndex ?? i);
+            if (progress <= 0.001) continue;
+
+            const barHeight = Math.floor(segment.height * 0.07 * progress);
+            if (barHeight <= 0) continue;
+            const sx = Math.floor(segment.x);
+            const sy = Math.floor(segment.y);
+            const sw = Math.floor(segment.width);
+            const sh = Math.floor(segment.height);
+
+            ctx.save();
+            ctx.fillStyle = `rgba(0, 0, 0, ${(0.85 * progress).toFixed(3)})`;
+            ctx.fillRect(sx, sy, sw, barHeight);
+            ctx.fillRect(sx, sy + sh - barHeight, sw, barHeight);
+            ctx.restore();
+        }
     }
 
     _drawHudOverlay({ ctx, width, height, segments }) {
@@ -391,6 +428,7 @@ export class RecordingCapturePipeline {
         this._updateShortsCamera({
             slotIndex: 0,
             player: player1,
+            otherPlayer: player2 !== player1 ? player2 : null,
             renderAlpha,
             renderDelta,
             arena: entityManager?.arena || null,
@@ -398,6 +436,7 @@ export class RecordingCapturePipeline {
         this._updateShortsCamera({
             slotIndex: 1,
             player: player2,
+            otherPlayer: player2 !== player1 ? player1 : null,
             renderAlpha,
             renderDelta,
             arena: entityManager?.arena || null,
@@ -411,8 +450,8 @@ export class RecordingCapturePipeline {
         if (!this._renderShortsToCapture({ sizes, topCamera, bottomCamera })) return;
 
         const segments = [
-            { x: 0, y: 0, width: sizes.width, height: halfHeight, player: player1, label: 'P1 oben' },
-            { x: 0, y: halfHeight, width: sizes.width, height: halfHeight, player: player2, label: 'P2 unten' },
+            { x: 0, y: 0, width: sizes.width, height: halfHeight, player: player1, label: 'P1 oben', slotIndex: 0 },
+            { x: 0, y: halfHeight, width: sizes.width, height: halfHeight, player: player2, label: 'P2 unten', slotIndex: 1 },
         ];
         if (this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD) {
             this._drawHudOverlay({
@@ -422,6 +461,13 @@ export class RecordingCapturePipeline {
                 segments,
             });
         }
+        // Letterbox bars are drawn on every shot transition, regardless of HUD mode.
+        this._drawLetterboxOverlay({
+            ctx: this._captureCtx,
+            width: sizes.width,
+            height: sizes.height,
+            segments,
+        });
 
         this._storeMeta({
             profile: RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT,
