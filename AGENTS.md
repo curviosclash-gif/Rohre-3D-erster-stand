@@ -50,7 +50,11 @@ This file defines repository-specific operating rules for Codex.
 - Never use destructive git operations without explicit user approval.
 - `main` is the default working branch; run `npm run guard:main` before commits/pushes (hooks enforce this too).
 - Non-main work needs explicit user approval and temporary `ALLOW_NON_MAIN=1` for that scoped command.
-- Use scoped staging (`git add [scoped-files]`) and verify scope via `git diff --name-only` before push.
+- Use scoped staging (`git add [scoped-files]`) and verify scope via `git diff --name-only` before push. Niemals `git add .` oder `git add -A`.
+- **Vor Arbeitsbeginn pullen** — `git pull --rebase origin main` ausfuehren, bevor Code geaendert wird.
+- **Niemals `git stash` verwenden.** Keine Ausnahmen. Stash hat wiederholt zu Datenverlust und doppelter Arbeit gefuehrt.
+- Fremde uncommittete Aenderungen ignorieren — nicht stashen, nicht committen, nicht verwerfen. Sie gehoeren einem anderen Agent.
+- Sofort committen nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
 - Keep `.husky/.bypass` local-only and untracked.
 - Create a local recovery tag via `npm run snapshot:tag` before push on `main`.
 - Keep commits atomic and use `git commit --amend` for immediate small corrections in the same task.
