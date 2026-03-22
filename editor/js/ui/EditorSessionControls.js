@@ -1,4 +1,5 @@
 import { CUSTOM_MAP_STORAGE_KEY } from '../../../src/entities/MapSchema.js';
+import { EDITOR_API_ROUTES } from '../../../src/shared/contracts/EditorPathContract.js';
 import { getJsonEditorText, setJsonEditorText } from './EditorFormState.js';
 
 const LAST_DISK_MAP_NAME_STORAGE_KEY = 'editor_last_disk_map_name';
@@ -49,7 +50,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
 
     const saveCurrentMapToDisk = async (mapName) => {
         const jsonText = generateCurrentMapJson();
-        const response = await fetch('/api/editor/save-map-disk', {
+        const response = await fetch(EDITOR_API_ROUTES.SAVE_MAP_DISK, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

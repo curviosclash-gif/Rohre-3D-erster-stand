@@ -196,21 +196,122 @@ Hauptgruende:
 
 ## Phasenplan
 
-- [ ] 43.0 Scope-Freeze und Ordnervertrag
-  - [ ] 43.0.1 Alle Root-Pfade in Kategorien einteilen: Spiel, Editor, Dev, Repo-Metadaten, Artefakte
-  - [ ] 43.0.2 Endgueltigen Namensvertrag festziehen: `dev/` statt `developer/`; Editoren explizit als Spielbereich markieren
+- [x] 43.0 Scope-Freeze und Ordnervertrag (abgeschlossen: 2026-03-22; evidence: `Get-ChildItem -Force | Select-Object Name,Mode` -> `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
+  - [x] 43.0.1 Alle Root-Pfade in Kategorien einteilen: Spiel, Editor, Dev, Repo-Metadaten, Artefakte (abgeschlossen: 2026-03-22; evidence: `Get-ChildItem -Force | Select-Object Name,Mode` -> `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
+  - [x] 43.0.2 Endgueltigen Namensvertrag festziehen: `dev/` statt `developer/`; Editoren explizit als Spielbereich markieren (abgeschlossen: 2026-03-22; evidence: `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` -> Abschnitt `Ordnervertrag 43.0`)
 
-- [ ] 43.1 Pfad-Inventar und Kopplungen zentralisieren
-  - [ ] 43.1.1 Alle hart codierten Editor-, Test- und Tool-Pfade in `vite.config.js`, Startskripten, Tests und Menuecode erfassen
-  - [ ] 43.1.2 Wo sinnvoll zentrale Konstanten oder Hilfsfunktionen fuer Editor-URLs, Tool-Roots und Generierungsziele einfuehren
+### Ordnervertrag 43.0 (Stand 2026-03-22)
 
-- [ ] 43.2 Dev-Bereich mit geringem Risiko auslagern
-  - [ ] 43.2.1 `scripts/**`, `tests/**`, `trainer/**`, `prototypes/**` und Hilfsskripte in einen gemeinsamen `dev/`-Pfad verschieben oder ueber Wrapper dorthin abstrahieren
-  - [ ] 43.2.2 `package.json`, CI-/Hook-Pfade, Startskripte und Doku auf den neuen Dev-Pfad anpassen, ohne Browser-Runtime-Pfade anzufassen
+| Kategorie | Root-Pfade |
+| --- | --- |
+| Spielbereich | `index.html`, `style.css`, `src/`, `assets/`, `data/`, `videos/`, `electron/`, `server/` |
+| Editorbereich (fachlich Spiel) | `editor/`, `training.html` |
+| Dev-/Tooling-Bereich (heute verteilt) | `scripts/`, `tests/`, `trainer/`, `prototypes/`, `backups/`, `tmp/`, `output/` |
+| Repo-Metadaten und Governance | `.git/`, `.github/`, `.agents/`, `.husky/`, `AGENTS.md`, `package.json`, `vite.config.js`, `tsconfig*.json`, `eslint.config.js` |
+| Build-/Test-Artefakte | `dist/`, `playwright-report/`, `test-results*/`, `.codex_tmp/`, `phase2_2026-03-02/` |
 
-- [ ] 43.3 Spielbereich stabilisieren
-  - [ ] 43.3.1 Editoren, Map-/Vehicle-Datenpfade und generierte Artefakte als klaren Spielbereich dokumentieren und gegen Drift absichern
-  - [ ] 43.3.2 Root nur soweit bereinigen, dass Spielstart, Editor-Start und lokale Speicherpfade unveraendert funktionieren
+Vertrag fuer die naechsten Schritte:
+
+- Zielname fuer den kuenftigen Dev-Sammelpfad bleibt `dev/` (nicht `developer/`).
+- Editoren bleiben fachlich im Spielbereich und werden nicht in den Dev-Bereich verschoben.
+- Runtime-Browserpfade (`/editor/...`, `/assets/...`) werden erst nach zentralisierten Pfad-Contracts migriert.
+
+- [x] 43.1 Pfad-Inventar und Kopplungen zentralisieren (abgeschlossen: 2026-03-22; evidence: `rg -n "EDITOR_VIEW_PATHS|EDITOR_API_ROUTES|EDITOR_DATA_PATHS" src/ui/menu/MenuGameplayBindings.js src/core/MediaRecorderSystem.js tests/core.spec.js tests/editor-vehicle.spec.js vite.config.js src/shared/contracts/EditorPathContract.js` -> `src/shared/contracts/EditorPathContract.js`)
+  - [x] 43.1.1 Alle hart codierten Editor-, Test- und Tool-Pfade in `vite.config.js`, Startskripten, Tests und Menuecode erfassen (abgeschlossen: 2026-03-22; evidence: `rg -n "editor/map-editor-3d\\.html|prototypes/vehicle-lab/index\\.html|save-map-disk|save-video-disk|save-vehicle-disk|list-vehicles-disk|get-vehicle-disk|rename-vehicle-disk|delete-vehicle-disk|data/maps|data/vehicles|GeneratedLocalMaps\\.js" src/ui/menu/MenuGameplayBindings.js src/core/MediaRecorderSystem.js tests/core.spec.js vite.config.js` -> `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
+  - [x] 43.1.2 Wo sinnvoll zentrale Konstanten oder Hilfsfunktionen fuer Editor-URLs, Tool-Roots und Generierungsziele einfuehren (abgeschlossen: 2026-03-22; evidence: `rg -n "EDITOR_VIEW_PATHS|EDITOR_API_ROUTES|EDITOR_DATA_PATHS" src/ui/menu/MenuGameplayBindings.js src/core/MediaRecorderSystem.js tests/core.spec.js tests/editor-vehicle.spec.js vite.config.js src/shared/contracts/EditorPathContract.js` -> `src/shared/contracts/EditorPathContract.js`)
+
+### Inventar 43.1.1 (Stand 2026-03-22)
+
+| Kategorie | Datei | Fundstellen | Hart codierter Pfad / Route |
+| --- | --- | --- | --- |
+| Menue -> Editor-URL | `src/ui/menu/MenuGameplayBindings.js` | 332 | `editor/map-editor-3d.html` |
+| Menue -> Tool-URL | `src/ui/menu/MenuGameplayBindings.js` | 338 | `prototypes/vehicle-lab/index.html` |
+| Runtime -> Editor-API | `src/core/MediaRecorderSystem.js` | 1077 | `/api/editor/save-video-disk` |
+| Test -> Editor-URL | `tests/core.spec.js` | 3162 | `/editor/map-editor-3d.html` |
+| Test -> Editor-API | `tests/core.spec.js` | 3166 | `/api/editor/save-map-disk` |
+| Test -> generiertes Modul | `tests/core.spec.js` | 30, 3186 | `src/entities/GeneratedLocalMaps.js` |
+| Test -> Editor-Datenpfad | `tests/core.spec.js` | 31 | `data/maps` |
+| Dev-Server -> Editor API-Routen | `vite.config.js` | 475-481 | `/api/editor/save-map-disk`, `/api/editor/save-vehicle-disk`, `/api/editor/list-vehicles-disk`, `/api/editor/get-vehicle-disk`, `/api/editor/rename-vehicle-disk`, `/api/editor/delete-vehicle-disk`, `/api/editor/save-video-disk` |
+| Build/Tooling -> Datenpfade | `vite.config.js` | 19, 31 | `data/maps`, `data/vehicles` |
+| Startskript -> Editor-URL | `start_editor.bat` | 8 | `http://localhost:5173/editor/map-editor-3d.html` |
+| Startskript -> Editor-URL (variabel) | `start_editor_local.bat` | 8 | `http://%HOST%:%PORT%/editor/map-editor-3d.html` |
+
+### Umsetzung 43.1.2 (Stand 2026-03-22)
+
+- Neue Contract-Datei: `src/shared/contracts/EditorPathContract.js`
+  - `EDITOR_VIEW_PATHS` fuer Editor-/Tool-Views
+  - `EDITOR_API_ROUTES` fuer Editor-Disk-API-Routen
+  - `EDITOR_DATA_PATHS` fuer Maps/Vehicles und generierte Modulziele
+- Konsumenten umgehaengt:
+  - `src/ui/menu/MenuGameplayBindings.js`
+  - `src/core/MediaRecorderSystem.js`
+  - `tests/core.spec.js`
+  - `tests/editor-vehicle.spec.js`
+  - `vite.config.js`
+- Weiterhin bewusst lokal in Startskripten:
+  - `start_editor.bat`
+  - `start_editor_local.bat`
+  - Grund: Batch-Dateien konsumieren keine JS-Contracts; Harmonisierung folgt erst mit geplanter Dev-Pfad-Migration.
+
+- [x] 43.2 Dev-Bereich mit geringem Risiko auslagern (abgeschlossen: 2026-03-22; evidence: `rg -n "dev/scripts/(training|verify-lock)|dev/bin/start_|resolveDevLayoutRelativePath" package.json .husky/pre-commit start_trainer_server.bat start_training_bridge.bat start_trainer_and_training.bat scripts/dev-layout-paths.mjs` -> `package.json`)
+  - [x] 43.2.1 `scripts/**`, `tests/**`, `trainer/**`, `prototypes/**` und Hilfsskripte in einen gemeinsamen `dev/`-Pfad verschieben oder ueber Wrapper dorthin abstrahieren (abgeschlossen: 2026-03-22; evidence: `rg -n "DEV_LAYOUT_CATEGORY_ROOTS|resolveDevLayoutRelativePath|forwardLegacyScriptAndExit|TRAINING_SCRIPT_PATHS" scripts/dev-layout-paths.mjs dev/scripts/_forward-legacy-script.mjs scripts/training-loop.mjs scripts/training-e2e.mjs tests/training-gate.test.mjs tests/trainer-v34-loop.test.mjs tests/trainer-v34-run-fallback.test.mjs tests/training-e2e.test.mjs` -> `scripts/dev-layout-paths.mjs`)
+  - [x] 43.2.2 `package.json`, CI-/Hook-Pfade, Startskripte und Doku auf den neuen Dev-Pfad anpassen, ohne Browser-Runtime-Pfade anzufassen (abgeschlossen: 2026-03-22; evidence: `rg -n "dev/scripts/(training|verify-lock)|dev/bin/start_" package.json .husky/pre-commit start_trainer_server.bat start_training_bridge.bat start_trainer_and_training.bat` -> `package.json`)
+
+### Umsetzung 43.2.1 (Stand 2026-03-22)
+
+- Neue Pfadabstraktion: `scripts/dev-layout-paths.mjs`
+  - zentrale Kategorien fuer `scripts`, `tests`, `trainer`, `prototypes` und `helpers`
+  - Resolver mit bevorzugtem `dev/**`-Pfad und Legacy-Fallback auf Root-Pfade
+- Neues `dev/`-Geruest fuer risikoarmen Uebergang:
+  - `dev/scripts/*` Wrapper-Einstiege fuer Trainings-/Bot-Tools
+  - `dev/bin/*` Wrapper fuer Trainings-Hilfsskripte
+  - reservierte Zielordner `dev/tests/`, `dev/trainer/`, `dev/prototypes/`
+- Root-Hilfsskripte auf Wrapper umgestellt:
+  - `start_trainer_server.bat`
+  - `start_training_bridge.bat`
+  - `start_trainer_and_training.bat`
+- Trainings-Orchestrierung und zugehoerige Node-Tests auf den Resolver umgestellt:
+  - `scripts/training-loop.mjs`
+  - `scripts/training-e2e.mjs`
+  - `tests/training-gate.test.mjs`
+  - `tests/trainer-v34-loop.test.mjs`
+  - `tests/trainer-v34-run-fallback.test.mjs`
+  - `tests/training-e2e.test.mjs`
+
+### Umsetzung 43.2.2 (Stand 2026-03-22)
+
+- `package.json` Trainings- und Playwright-Lock-Einstiege auf `dev/scripts/*`-Wrapper umgestellt:
+  - `training:*`, `training:e2e`, `bot:validate`
+  - `benchmark:jitter` und `test:*` ueber `dev/scripts/verify-lock.mjs`
+- Hook-Pfad angepasst:
+  - `.husky/pre-commit` nutzt fuer Bot-Mode-Lockcheck jetzt `node dev/scripts/verify-lock.mjs`
+- Startskript-Wrapping als Teil der `dev/`-Vorbereitung beibehalten:
+  - Root-`start_trainer*.bat` delegieren auf `dev/bin/*`
+- Browser-Runtime-Pfade (`/editor/**`, `/assets/**`) unveraendert gelassen.
+
+- [x] 43.3 Spielbereich stabilisieren (abgeschlossen: 2026-03-22; evidence: `npm run check:editor:path-drift && npm run check:root:runtime` -> `scripts/check-editor-path-drift.mjs`)
+  - [x] 43.3.1 Editoren, Map-/Vehicle-Datenpfade und generierte Artefakte als klaren Spielbereich dokumentieren und gegen Drift absichern (abgeschlossen: 2026-03-22; evidence: `npm run check:editor:path-drift` -> `scripts/check-editor-path-drift.mjs`)
+  - [x] 43.3.2 Root nur soweit bereinigen, dass Spielstart, Editor-Start und lokale Speicherpfade unveraendert funktionieren (abgeschlossen: 2026-03-22; evidence: `npm run check:root:runtime` -> `scripts/check-root-runtime-invariants.mjs`)
+
+### Umsetzung 43.3.1 (Stand 2026-03-22)
+
+- Editor-/Vehicle-Lab-API-Routen als Spielbereichspfad verankert:
+  - `editor/js/ui/EditorSessionControls.js` nutzt `EDITOR_API_ROUTES.SAVE_MAP_DISK`
+  - `prototypes/vehicle-lab/main.js` nutzt `EDITOR_API_ROUTES.*` fuer List/Get/Save/Rename/Delete
+- Neuer Drift-Guard eingefuehrt:
+  - `scripts/check-editor-path-drift.mjs` blockiert neue hart codierte Editor-/API-/Datenpfade ausserhalb erlaubter Dateien
+  - Guard ist in `architecture:guard` eingebunden (`package.json`), damit er in Build-/Architektur-Gates automatisch laeuft
+- Runtime-Browserpfade bleiben unveraendert; die Absicherung fokussiert bewusst auf Contract-Nutzung und Pfad-Drift.
+
+### Umsetzung 43.3.2 (Stand 2026-03-22)
+
+- Root-Invarianten fuer Runtime/Editor-Start explizit abgesichert:
+  - neuer Guard `scripts/check-root-runtime-invariants.mjs`
+  - prueft erforderliche Root-Dateien (`index.html`, `style.css`, `server.ps1`, `start_game.bat`, `start_editor*.bat`)
+  - prueft lokale Speicherpfade (`data/maps`, `data/vehicles`)
+  - prueft, dass `start_editor*.bat` weiterhin auf `/editor/map-editor-3d.html` zeigen
+- Guard ist in `architecture:guard` integriert (`npm run check:root:runtime`), damit Root-Cleanup nicht still regressiert.
+- Keine Browser-Runtime-Pfadmigration; Ziel bleibt bewusst ein risikoarmer Root-Cleanup mit stabilen Startpfaden.
 
 - [ ] 43.4 Optionaler `game/`-Unterordner als zweite Stufe
   - [ ] 43.4.1 Erst nach gruener Dev-Migration pruefen, ob `index.html`, `style.css`, `src/`, `editor/` und ggf. Assets explizit unter `game/` gezogen werden sollen
