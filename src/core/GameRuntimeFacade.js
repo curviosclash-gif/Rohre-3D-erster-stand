@@ -14,11 +14,17 @@ import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
 import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
-import { LocalSessionAdapter } from './session/LocalSessionAdapter.js';
 import { ReplayRecorder } from './replay/ReplayRecorder.js';
-import { createGameStateSnapshot } from './GameStateSnapshot.js';
 import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
 import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
+import {
+    initRuntimeSession,
+    setupRuntimeClientStateReceiver,
+    startRuntimeStateBroadcast,
+    stopRuntimeStateBroadcast,
+    teardownRuntimeSession,
+    waitForRuntimePlayersLoaded,
+} from './runtime/RuntimeSessionLifecycleService.js';
 import {
     applyMenuPresetAction,
     deleteMenuPresetAction,
@@ -106,9 +112,6 @@ const START_VALIDATION_RELEVANT_KEY_SET = new Set([
     SETTINGS_CHANGE_KEYS.GAME_MODE,
     SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED,
 ]);
-
-/** @type {number} Host broadcasts state snapshots at this interval (ms). */
-const STATE_BROADCAST_INTERVAL_MS = 100; // 10/s
 
 export class GameRuntimeFacade {
     constructor(deps = {}) {
@@ -741,77 +744,25 @@ export class GameRuntimeFacade {
      * Called at the beginning of a match.
      */
     async _initSession() {
-        const game = this.game;
-        const sessionType = String(game?.runtimeConfig?.session?.sessionType || 'single').toLowerCase();
-
-        this._teardownSession();
-
-        if (sessionType === 'lan') {
-            // Lazy-import to avoid bundling network code in single-player builds
-            const { LANSessionAdapter } = await import(/* webpackChunkName: "net" */ '../network/LANSessionAdapter.js');
-            this.session = new LANSessionAdapter();
-        } else if (sessionType === 'online') {
-            const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../network/OnlineSessionAdapter.js');
-            this.session = new OnlineSessionAdapter();
-        } else {
-            this.session = new LocalSessionAdapter();
-        }
-
-        const numHumans = game?.runtimeConfig?.session?.numHumans || 1;
-        await this.session.connect({ numHumans });
-
-        if (this.session.isHost && (sessionType === 'lan' || sessionType === 'online')) {
-            this._startStateBroadcast();
-        }
-
-        if (!this.session.isHost && (sessionType === 'lan' || sessionType === 'online')) {
-            this._setupClientStateReceiver();
-        }
+        return initRuntimeSession(this);
     }
 
     /**
      * Host: broadcasts state snapshots at 10/s to all connected clients.
      */
     _startStateBroadcast() {
-        this._stopStateBroadcast();
-        this._stateBroadcastTimer = setInterval(() => {
-            const game = this.game;
-            if (!game?.entityManager || game.state !== GAME_STATE_IDS.PLAYING) return;
-            const snapshot = createGameStateSnapshot(game.entityManager, game.roundStateController);
-            this.session?.broadcastState?.(snapshot);
-        }, STATE_BROADCAST_INTERVAL_MS);
+        startRuntimeStateBroadcast(this);
     }
 
     _stopStateBroadcast() {
-        if (this._stateBroadcastTimer) {
-            clearInterval(this._stateBroadcastTimer);
-            this._stateBroadcastTimer = null;
-        }
+        stopRuntimeStateBroadcast(this);
     }
 
     /**
      * Client: listens for authoritative state from the host and feeds it to StateReconciler.
      */
     _setupClientStateReceiver() {
-        if (!this.session) return;
-        // Lazy-create reconciler
-        if (!this._stateReconciler) {
-            // StateReconciler is already bundled as part of the network chunk
-            import('../network/StateReconciler.js').then(({ StateReconciler }) => {
-                this._stateReconciler = new StateReconciler();
-            }).catch(() => { /* reconciler unavailable — degrade gracefully */ });
-        }
-
-        this._onStateUpdateHandler = (serverState) => {
-            if (this._stateReconciler) {
-                this._stateReconciler.receiveServerState(serverState);
-                const game = this.game;
-                if (game?.entityManager?.players) {
-                    this._stateReconciler.reconcile(game.entityManager.players, game.entityManager);
-                }
-            }
-        };
-        this.session.on('stateUpdate', this._onStateUpdateHandler);
+        setupRuntimeClientStateReceiver(this);
     }
 
     /**
@@ -819,46 +770,11 @@ export class GameRuntimeFacade {
      * For LocalSessionAdapter this resolves immediately.
      */
     async _waitForAllPlayersLoaded() {
-        if (!this.session || this.session instanceof LocalSessionAdapter) return;
-
-        const players = this.session.getPlayers();
-        if (!players || players.length <= 1) return;
-
-        return new Promise((resolve) => {
-            // Mark self as loaded
-            this._arenaLoadedPeers.add(this.session.localPlayerId);
-            this.session.sendInput({ type: 'arena_loaded', playerId: this.session.localPlayerId });
-
-            this._onPlayerLoadedHandler = (data) => {
-                if (data?.playerId) this._arenaLoadedPeers.add(data.playerId);
-                if (this._arenaLoadedPeers.size >= players.length) {
-                    resolve();
-                }
-            };
-            this.session.on('playerLoaded', this._onPlayerLoadedHandler);
-
-            // Safety timeout: don't block forever
-            setTimeout(() => resolve(), 10000);
-        });
+        return waitForRuntimePlayersLoaded(this);
     }
 
     _teardownSession() {
-        this._stopStateBroadcast();
-        if (this._onStateUpdateHandler && this.session) {
-            this.session.off('stateUpdate', this._onStateUpdateHandler);
-            this._onStateUpdateHandler = null;
-        }
-        if (this._onPlayerLoadedHandler && this.session) {
-            this.session.off('playerLoaded', this._onPlayerLoadedHandler);
-            this._onPlayerLoadedHandler = null;
-        }
-        this._arenaLoadedPeers.clear();
-        if (this.session) {
-            this.session.dispose();
-            this.session = null;
-        }
-        this._stateReconciler?.reset?.();
-        this._resetArcadeRunState();
+        teardownRuntimeSession(this);
     }
 
     /** Returns true if the current session is a network (LAN/Online) session. */
@@ -942,3 +858,4 @@ export class GameRuntimeFacade {
         }
     }
 }
+

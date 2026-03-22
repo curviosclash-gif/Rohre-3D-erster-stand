@@ -115,7 +115,7 @@ Scope:
 
 ### 46.2 Core- und Menu-Decomposition
 
-- [ ] 46.2.1 `MediaRecorderSystem` und `GameRuntimeFacade` in kleinere Module mit klaren Facades zerlegen
+- [x] 46.2.1 `MediaRecorderSystem` und `GameRuntimeFacade` in kleinere Module mit klaren Facades zerlegen (abgeschlossen: 2026-03-22; evidence: npm run build -> PASS (inkl. architecture:guard))
 - [x] 46.2.2 `MenuMultiplayerBridge` entkoppeln und Runtime-Ports (`src/ui/menu/multiplayer/*`) per DI nutzen (abgeschlossen: 2026-03-22; evidence: npm run test:core -- --grep T41d -> commit 045de8b)
 
 ### 46.3 Hunt/AI-Cleanups und Modulgrenzen

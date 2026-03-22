@@ -4,23 +4,21 @@ import {
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
 import { toFiniteNumber } from '../utils/MathOps.js';
+import {
+    DEFAULT_FALLBACK_MIME_TYPE,
+    DEFAULT_MIME_TYPE,
+    detectNativeRecorderSupport,
+    RECORDER_ENGINE,
+    resolveGlobalScope,
+    resolvePerfNow,
+    resolveSafeMediaRecorderMimeType,
+    sanitizeFileToken,
+    toSafeDatePart,
+} from './recording/MediaRecorderSupport.js';
 const Mp4Muxer = Mp4MuxerModule;
 
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
-const DEFAULT_MIME_TYPE = 'video/mp4';
-const DEFAULT_FALLBACK_MIME_TYPE = 'video/webm';
 const WEB_CODECS_CODEC = 'avc1.4d002a';
-const MEDIA_RECORDER_MIME_CANDIDATES = Object.freeze([
-    'video/webm;codecs=vp9',
-    'video/webm;codecs=vp8',
-    'video/webm',
-]);
-
-const RECORDER_ENGINE = Object.freeze({
-    NATIVE_WEBCODECS: 'webcodecs-native',
-    NATIVE_MEDIARECORDER: 'mediarecorder-native',
-    NONE: 'none',
-});
 
 const ENCODE_QUEUE_SOFT_LIMIT = 2;
 const ENCODE_QUEUE_DROP_LIMIT = 10;
@@ -40,21 +38,6 @@ const MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS = 38;
 
 export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
 
-function toSafeDatePart(value) {
-    const date = value instanceof Date ? value : new Date(value);
-    if (Number.isNaN(date.getTime())) {
-        return 'invalid-date';
-    }
-    const iso = date.toISOString();
-    return iso.replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
-}
-
-function sanitizeFileToken(value, fallback = 'match') {
-    const normalized = String(value || '').trim().toLowerCase();
-    const cleaned = normalized.replace(/[^a-z0-9-_]+/g, '-').replace(/^-+|-+$/g, '');
-    return cleaned || fallback;
-}
-
 function defaultDownload({ blob, fileName }) {
     if (typeof document === 'undefined' || !blob || !fileName) return;
     const url = URL.createObjectURL(blob);
@@ -69,28 +52,6 @@ function defaultDownload({ blob, fileName }) {
     setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-function resolveGlobalScope(explicitScope = null) {
-    if (explicitScope && typeof explicitScope === 'object') {
-        return explicitScope;
-    }
-    if (typeof window !== 'undefined') {
-        return window;
-    }
-    if (typeof globalThis !== 'undefined') {
-        return globalThis;
-    }
-    return {};
-}
-
-function resolvePerfNow(globalScope) {
-    const scope = resolveGlobalScope(globalScope);
-    const perfNow = scope?.performance?.now;
-    if (typeof perfNow === 'function') {
-        return () => perfNow.call(scope.performance);
-    }
-    return () => Date.now();
-}
-
 function toPositiveInt(value, fallback, min = 1, max = 1_000_000) {
     const numeric = Number(value);
     if (!Number.isFinite(numeric)) return fallback;
@@ -102,83 +63,6 @@ function computePercentile(values, ratio) {
     const clamped = Math.max(0, Math.min(1, Number(ratio) || 0));
     const index = Math.max(0, Math.min(values.length - 1, Math.ceil(values.length * clamped) - 1));
     return toFiniteNumber(values[index], 0);
-}
-
-function resolveMediaRecorderMimeType(globalScope) {
-    const scope = resolveGlobalScope(globalScope);
-    const MediaRecorderCtor = scope?.MediaRecorder;
-    if (typeof MediaRecorderCtor !== 'function') return null;
-    const supportsTypeProbe = typeof MediaRecorderCtor.isTypeSupported === 'function';
-    if (!supportsTypeProbe) {
-        return MEDIA_RECORDER_MIME_CANDIDATES[MEDIA_RECORDER_MIME_CANDIDATES.length - 1];
-    }
-
-    for (const mimeType of MEDIA_RECORDER_MIME_CANDIDATES) {
-        try {
-            if (MediaRecorderCtor.isTypeSupported(mimeType)) {
-                return mimeType;
-            }
-        } catch {
-            // Ignore broken MIME probes and continue with next candidate.
-        }
-    }
-    return null;
-}
-
-function isMediaRecorderMimeTypeSupported(globalScope, mimeType) {
-    const normalizedMimeType = String(mimeType || '').trim();
-    if (!normalizedMimeType) return false;
-
-    const scope = resolveGlobalScope(globalScope);
-    const MediaRecorderCtor = scope?.MediaRecorder;
-    if (typeof MediaRecorderCtor !== 'function') return false;
-    if (typeof MediaRecorderCtor.isTypeSupported !== 'function') return false;
-
-    try {
-        return MediaRecorderCtor.isTypeSupported(normalizedMimeType);
-    } catch {
-        return false;
-    }
-}
-
-function resolveSafeMediaRecorderMimeType(globalScope, preferredMimeType = '') {
-    const preferred = String(preferredMimeType || '').trim();
-    if (preferred && isMediaRecorderMimeTypeSupported(globalScope, preferred)) {
-        return preferred;
-    }
-    return resolveMediaRecorderMimeType(globalScope) || '';
-}
-
-function detectNativeRecorderSupport(globalScope, canvas = null) {
-    const scope = resolveGlobalScope(globalScope);
-    const encoderCtor = scope?.VideoEncoder;
-    const frameCtor = scope?.VideoFrame;
-    const mediaRecorderCtor = scope?.MediaRecorder;
-    const canCaptureStream = !!canvas && typeof canvas.captureStream === 'function';
-    const hasEncoderCtor = typeof encoderCtor === 'function';
-    const hasFrameCtor = typeof frameCtor === 'function';
-    const hasNativeProbe = hasEncoderCtor && typeof encoderCtor.isConfigSupported === 'function';
-    const hasWebCodecs = hasEncoderCtor && hasFrameCtor && hasNativeProbe;
-    const hasMediaRecorder = typeof mediaRecorderCtor === 'function' && canCaptureStream;
-    const hasRecorder = hasWebCodecs || hasMediaRecorder;
-    const mediaRecorderMimeType = hasMediaRecorder ? resolveMediaRecorderMimeType(scope) : null;
-    const selectedMimeType = hasWebCodecs
-        ? DEFAULT_MIME_TYPE
-        : (mediaRecorderMimeType || DEFAULT_FALLBACK_MIME_TYPE);
-
-    return {
-        hasRecorder,
-        hasWebCodecs,
-        hasMediaRecorder,
-        mediaRecorderMimeType,
-        selectedMimeType,
-        recorderEngine: hasWebCodecs
-            ? RECORDER_ENGINE.NATIVE_WEBCODECS
-            : (hasMediaRecorder ? RECORDER_ENGINE.NATIVE_MEDIARECORDER : RECORDER_ENGINE.NONE),
-        supportReason: hasWebCodecs
-            ? 'native-webcodecs'
-            : (hasMediaRecorder ? 'native-mediarecorder' : 'missing-native-recorders'),
-    };
 }
 
 export class MediaRecorderSystem {
