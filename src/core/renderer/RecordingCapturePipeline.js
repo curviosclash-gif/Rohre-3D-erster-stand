@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CONFIG } from '../Config.js';
 import { CameraRigSystem } from './CameraRigSystem.js';
-import { RecordingOrbitCameraDirector } from './camera/RecordingOrbitCameraDirector.js';
+import { RecordingOrbitCameraDirector, SLOT_STYLE } from './camera/RecordingOrbitCameraDirector.js';
 import {
     createDefaultRecordingCaptureSettings,
     normalizeRecordingCaptureSettings,
@@ -194,6 +194,14 @@ export class RecordingCapturePipeline {
             playerDirection: this._tmpDirection,
             dt: renderDelta,
             arena,
+            slotStyle: slotIndex === 0 ? SLOT_STYLE.CINEMATIC : SLOT_STYLE.ACTION,
+            playerState: {
+                hp: Number(player.hp) || 0,
+                maxHp: Number(player.maxHp) || 1,
+                score: Number(player.score) || 0,
+                speed: Number(player.speed) || 0,
+                isBoosting: player.isBoosting === true,
+            },
         });
         return true;
     }

@@ -13,27 +13,72 @@ const SHOT_TYPE = Object.freeze({
     HIGH_OVERVIEW: 3,
 });
 
-const SHOT_SEQUENCE = Object.freeze([
-    SHOT_TYPE.WIDE_ORBIT,
-    SHOT_TYPE.CHASE_CLOSE,
-    SHOT_TYPE.SIDE_TRACK,
-    SHOT_TYPE.HIGH_OVERVIEW,
-    SHOT_TYPE.CHASE_CLOSE,
-    SHOT_TYPE.WIDE_ORBIT,
-]);
+// --- Slot styles: cinematic (slot 0) vs action (slot 1) -------------------
 
-// Duration range per shot in seconds.  Actual duration is picked
-// pseudo-randomly per cycle so cuts feel less mechanical.
-const SHOT_DURATION_MIN = 3.0;
-const SHOT_DURATION_MAX = 5.5;
+const SLOT_STYLE = Object.freeze({
+    CINEMATIC: 'cinematic',
+    ACTION: 'action',
+});
 
-function pickShotDuration(sequenceIndex, playerIndex) {
-    // Deterministic but varied duration derived from indices.
-    const t = Math.sin((sequenceIndex + 1) * 2.17 + playerIndex * 1.31) * 0.5 + 0.5;
-    return SHOT_DURATION_MIN + t * (SHOT_DURATION_MAX - SHOT_DURATION_MIN);
+const STYLE_CONFIG = Object.freeze({
+    [SLOT_STYLE.CINEMATIC]: Object.freeze({
+        sequence: Object.freeze([
+            SHOT_TYPE.WIDE_ORBIT,
+            SHOT_TYPE.HIGH_OVERVIEW,
+            SHOT_TYPE.CHASE_CLOSE,
+            SHOT_TYPE.SIDE_TRACK,
+        ]),
+        durationMin: 4.0,
+        durationMax: 6.0,
+        radiusMul: 1.15,
+        liftMul: 1.1,
+        orbitSpeedMul: 0.75,
+        transitionSpeedMul: 0.8,
+    }),
+    [SLOT_STYLE.ACTION]: Object.freeze({
+        sequence: Object.freeze([
+            SHOT_TYPE.CHASE_CLOSE,
+            SHOT_TYPE.SIDE_TRACK,
+            SHOT_TYPE.WIDE_ORBIT,
+            SHOT_TYPE.HIGH_OVERVIEW,
+            SHOT_TYPE.CHASE_CLOSE,
+        ]),
+        durationMin: 2.5,
+        durationMax: 4.0,
+        radiusMul: 0.85,
+        liftMul: 0.85,
+        orbitSpeedMul: 1.3,
+        transitionSpeedMul: 1.3,
+    }),
+});
+
+function getStyleConfig(slotStyle) {
+    return STYLE_CONFIG[slotStyle] || STYLE_CONFIG[SLOT_STYLE.CINEMATIC];
 }
 
-export { SHOT_TYPE };
+function pickShotDuration(sequenceIndex, playerIndex, style) {
+    const cfg = getStyleConfig(style);
+    const t = Math.sin((sequenceIndex + 1) * 2.17 + playerIndex * 1.31) * 0.5 + 0.5;
+    return cfg.durationMin + t * (cfg.durationMax - cfg.durationMin);
+}
+
+// --- Gameplay event detection thresholds ----------------------------------
+
+const EVENT_HP_DROP_THRESHOLD = 0.08;       // 8% HP drop triggers reaction
+const EVENT_SCORE_CHANGE_THRESHOLD = 0.5;   // any score increase
+const EVENT_SPEED_BURST_THRESHOLD = 1.4;    // 40% above baseline speed
+
+// Override durations (seconds)
+const EVENT_OVERRIDE_HIT = 1.8;
+const EVENT_OVERRIDE_SCORE = 1.5;
+const EVENT_OVERRIDE_BOOST = 2.0;
+
+// Shake intensity per event type
+const SHAKE_HIT = 0.35;
+const SHAKE_SCORE = 0.15;
+const SHAKE_BOOST = 0.08;
+
+export { SHOT_TYPE, SLOT_STYLE };
 
 export class RecordingOrbitCameraDirector {
     constructor({
@@ -64,6 +109,17 @@ export class RecordingOrbitCameraDirector {
         this._shotTimerByPlayer = [];
         this._shotDurationByPlayer = [];
         this._shotSeqIndexByPlayer = [];
+        this._slotStyleByPlayer = [];
+
+        // Gameplay event tracking per player.
+        this._prevHpRatio = [];
+        this._prevScore = [];
+        this._prevBoosting = [];
+        this._baselineSpeed = [];
+        this._eventOverrideShot = [];
+        this._eventOverrideTimer = [];
+        this._shakeIntensity = [];
+        this._shakeDecay = [];
 
         this._tmpDir = new THREE.Vector3();
         this._tmpSide = new THREE.Vector3();
@@ -80,6 +136,15 @@ export class RecordingOrbitCameraDirector {
         this._shotTimerByPlayer.length = 0;
         this._shotDurationByPlayer.length = 0;
         this._shotSeqIndexByPlayer.length = 0;
+        this._slotStyleByPlayer.length = 0;
+        this._prevHpRatio.length = 0;
+        this._prevScore.length = 0;
+        this._prevBoosting.length = 0;
+        this._baselineSpeed.length = 0;
+        this._eventOverrideShot.length = 0;
+        this._eventOverrideTimer.length = 0;
+        this._shakeIntensity.length = 0;
+        this._shakeDecay.length = 0;
     }
 
     _isWithinArenaBounds(position, arena) {
@@ -98,24 +163,26 @@ export class RecordingOrbitCameraDirector {
 
     // --- Shot computation helpers ----------------------------------------
 
-    _computeWideOrbit(phase, playerIndex, playerPosition) {
-        const orbitRadius = this.baseRadius + (Math.sin((phase * 0.7) + playerIndex * 0.4) * 1.8);
+    _computeWideOrbit(phase, playerIndex, playerPosition, cfg) {
+        const radius = this.baseRadius * cfg.radiusMul;
+        const lift = this.baseLift * cfg.liftMul;
+        const orbitRadius = radius + (Math.sin((phase * 0.7) + playerIndex * 0.4) * 1.8);
         const orbitOffset = Math.cos((phase * 1.1) + playerIndex * 0.3) * orbitRadius;
         const forwardOffset = -4.2 + (Math.sin((phase * 0.55) + playerIndex * 0.2) * 1.6);
-        const lift = this.baseLift + (Math.cos((phase * 0.4) + playerIndex) * 1.05);
+        const vertLift = lift + (Math.cos((phase * 0.4) + playerIndex) * 1.05);
 
         this._tmpDesiredPosition.copy(playerPosition)
             .addScaledVector(this._tmpSide, orbitOffset)
             .addScaledVector(this._tmpDir, forwardOffset);
-        this._tmpDesiredPosition.y += lift;
+        this._tmpDesiredPosition.y += vertLift;
 
         this._tmpDesiredLookAt.copy(playerPosition)
             .addScaledVector(this._tmpDir, this.baseLookAhead + (Math.sin(phase * 0.5) * 1.2));
     }
 
-    _computeChaseClose(phase, playerIndex, playerPosition) {
-        const behindDist = 3.8 + Math.sin(phase * 0.35 + playerIndex) * 0.6;
-        const lift = 1.6 + Math.cos(phase * 0.25 + playerIndex * 0.5) * 0.3;
+    _computeChaseClose(phase, playerIndex, playerPosition, cfg) {
+        const behindDist = (3.8 + Math.sin(phase * 0.35 + playerIndex) * 0.6) * cfg.radiusMul;
+        const lift = (1.6 + Math.cos(phase * 0.25 + playerIndex * 0.5) * 0.3) * cfg.liftMul;
         const sideWobble = Math.sin(phase * 0.6 + playerIndex * 0.7) * 0.8;
 
         this._tmpDesiredPosition.copy(playerPosition)
@@ -127,11 +194,11 @@ export class RecordingOrbitCameraDirector {
             .addScaledVector(this._tmpDir, 3.0);
     }
 
-    _computeSideTrack(phase, playerIndex, playerPosition) {
-        const sideDist = 6.5 + Math.sin(phase * 0.45 + playerIndex * 0.6) * 1.2;
+    _computeSideTrack(phase, playerIndex, playerPosition, cfg) {
+        const sideDist = (6.5 + Math.sin(phase * 0.45 + playerIndex * 0.6) * 1.2) * cfg.radiusMul;
         const side = (playerIndex % 2 === 0) ? 1 : -1;
         const forwardLead = 1.5 + Math.sin(phase * 0.3) * 1.0;
-        const lift = 2.2 + Math.cos(phase * 0.5 + playerIndex) * 0.6;
+        const lift = (2.2 + Math.cos(phase * 0.5 + playerIndex) * 0.6) * cfg.liftMul;
 
         this._tmpDesiredPosition.copy(playerPosition)
             .addScaledVector(this._tmpSide, sideDist * side)
@@ -143,8 +210,8 @@ export class RecordingOrbitCameraDirector {
         this._tmpDesiredLookAt.y += 0.5;
     }
 
-    _computeHighOverview(phase, playerIndex, playerPosition) {
-        const height = 12.0 + Math.sin(phase * 0.3 + playerIndex * 0.4) * 2.0;
+    _computeHighOverview(phase, playerIndex, playerPosition, cfg) {
+        const height = (12.0 + Math.sin(phase * 0.3 + playerIndex * 0.4) * 2.0) * cfg.liftMul;
         const slowOrbit = Math.cos(phase * 0.25 + playerIndex * 0.5) * 4.0;
         const forwardDrift = Math.sin(phase * 0.2) * 2.0;
 
@@ -159,41 +226,134 @@ export class RecordingOrbitCameraDirector {
 
     // --- Shot selection ---------------------------------------------------
 
-    _advanceShotTimer(playerIndex, dt) {
-        if (this._shotTimerByPlayer[playerIndex] === undefined) {
+    _advanceShotTimer(playerIndex, dt, slotStyle) {
+        if (this._shotTimerByPlayer[playerIndex] === undefined
+            || this._slotStyleByPlayer[playerIndex] !== slotStyle) {
             this._shotTimerByPlayer[playerIndex] = 0;
             this._shotSeqIndexByPlayer[playerIndex] = 0;
-            this._shotDurationByPlayer[playerIndex] = pickShotDuration(0, playerIndex);
+            this._shotDurationByPlayer[playerIndex] = pickShotDuration(0, playerIndex, slotStyle);
+            this._slotStyleByPlayer[playerIndex] = slotStyle;
         }
 
         this._shotTimerByPlayer[playerIndex] += dt;
 
+        const cfg = getStyleConfig(slotStyle);
         const duration = this._shotDurationByPlayer[playerIndex];
         if (this._shotTimerByPlayer[playerIndex] >= duration) {
             this._shotTimerByPlayer[playerIndex] -= duration;
-            const nextIdx = (this._shotSeqIndexByPlayer[playerIndex] + 1) % SHOT_SEQUENCE.length;
+            const nextIdx = (this._shotSeqIndexByPlayer[playerIndex] + 1) % cfg.sequence.length;
             this._shotSeqIndexByPlayer[playerIndex] = nextIdx;
-            this._shotDurationByPlayer[playerIndex] = pickShotDuration(nextIdx, playerIndex);
+            this._shotDurationByPlayer[playerIndex] = pickShotDuration(nextIdx, playerIndex, slotStyle);
         }
 
-        return SHOT_SEQUENCE[this._shotSeqIndexByPlayer[playerIndex]];
+        return cfg.sequence[this._shotSeqIndexByPlayer[playerIndex]];
     }
 
-    _computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition) {
+    _computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition, cfg) {
         switch (shotType) {
             case SHOT_TYPE.CHASE_CLOSE:
-                this._computeChaseClose(phase, playerIndex, playerPosition);
+                this._computeChaseClose(phase, playerIndex, playerPosition, cfg);
                 break;
             case SHOT_TYPE.SIDE_TRACK:
-                this._computeSideTrack(phase, playerIndex, playerPosition);
+                this._computeSideTrack(phase, playerIndex, playerPosition, cfg);
                 break;
             case SHOT_TYPE.HIGH_OVERVIEW:
-                this._computeHighOverview(phase, playerIndex, playerPosition);
+                this._computeHighOverview(phase, playerIndex, playerPosition, cfg);
                 break;
             default:
-                this._computeWideOrbit(phase, playerIndex, playerPosition);
+                this._computeWideOrbit(phase, playerIndex, playerPosition, cfg);
                 break;
         }
+    }
+
+    // --- Gameplay event detection ----------------------------------------
+
+    _detectEvents(playerIndex, playerState, dt) {
+        if (!playerState) return;
+
+        const hp = Number(playerState.hp) || 0;
+        const maxHp = Math.max(0.01, Number(playerState.maxHp) || 1);
+        const hpRatio = Math.max(0, Math.min(1, hp / maxHp));
+        const score = Number(playerState.score) || 0;
+        const speed = Number(playerState.speed) || 0;
+        const isBoosting = !!playerState.isBoosting;
+
+        const prevHp = this._prevHpRatio[playerIndex];
+        const prevScore = this._prevScore[playerIndex];
+        const prevBoosting = this._prevBoosting[playerIndex];
+
+        // Update baseline speed with slow EMA.
+        const prevBaseline = this._baselineSpeed[playerIndex] || speed;
+        this._baselineSpeed[playerIndex] = prevBaseline + (speed - prevBaseline) * Math.min(1, dt * 0.5);
+
+        // Store current values for next frame.
+        this._prevHpRatio[playerIndex] = hpRatio;
+        this._prevScore[playerIndex] = score;
+        this._prevBoosting[playerIndex] = isBoosting;
+
+        // Skip detection on first frame (no previous data).
+        if (prevHp === undefined) return;
+
+        // Decay existing override timer.
+        if (this._eventOverrideTimer[playerIndex] > 0) {
+            this._eventOverrideTimer[playerIndex] = Math.max(0, this._eventOverrideTimer[playerIndex] - dt);
+        }
+
+        // Decay shake.
+        if (this._shakeIntensity[playerIndex] > 0) {
+            const decay = this._shakeDecay[playerIndex] || 4.0;
+            this._shakeIntensity[playerIndex] = Math.max(0, this._shakeIntensity[playerIndex] - dt * decay);
+        }
+
+        // Detect HP drop (got hit).
+        const hpDrop = prevHp - hpRatio;
+        if (hpDrop >= EVENT_HP_DROP_THRESHOLD) {
+            this._eventOverrideShot[playerIndex] = SHOT_TYPE.CHASE_CLOSE;
+            this._eventOverrideTimer[playerIndex] = EVENT_OVERRIDE_HIT;
+            this._shakeIntensity[playerIndex] = Math.min(1, SHAKE_HIT + hpDrop * 0.5);
+            this._shakeDecay[playerIndex] = 3.0;
+            return;
+        }
+
+        // Detect score increase.
+        if (score > (prevScore || 0) + EVENT_SCORE_CHANGE_THRESHOLD) {
+            this._eventOverrideShot[playerIndex] = SHOT_TYPE.HIGH_OVERVIEW;
+            this._eventOverrideTimer[playerIndex] = EVENT_OVERRIDE_SCORE;
+            this._shakeIntensity[playerIndex] = SHAKE_SCORE;
+            this._shakeDecay[playerIndex] = 5.0;
+            return;
+        }
+
+        // Detect boost start.
+        if (isBoosting && !prevBoosting) {
+            this._eventOverrideShot[playerIndex] = SHOT_TYPE.SIDE_TRACK;
+            this._eventOverrideTimer[playerIndex] = EVENT_OVERRIDE_BOOST;
+            this._shakeIntensity[playerIndex] = SHAKE_BOOST;
+            this._shakeDecay[playerIndex] = 6.0;
+            return;
+        }
+
+        // Detect speed burst (high speed relative to baseline).
+        const baseline = this._baselineSpeed[playerIndex] || 1;
+        if (baseline > 0 && speed / baseline >= EVENT_SPEED_BURST_THRESHOLD && speed > 5) {
+            this._eventOverrideShot[playerIndex] = SHOT_TYPE.CHASE_CLOSE;
+            this._eventOverrideTimer[playerIndex] = 1.2;
+            this._shakeIntensity[playerIndex] = Math.max(
+                this._shakeIntensity[playerIndex] || 0, 0.05
+            );
+            this._shakeDecay[playerIndex] = 8.0;
+        }
+    }
+
+    _applyShake(camera, playerIndex, phase) {
+        const intensity = this._shakeIntensity[playerIndex] || 0;
+        if (intensity <= 0.001) return;
+
+        const freq = 25 + playerIndex * 3;
+        const ox = Math.sin(phase * freq) * intensity * 0.12;
+        const oy = Math.cos(phase * freq * 1.3) * intensity * 0.08;
+        camera.position.x += ox;
+        camera.position.y += oy;
     }
 
     // --- Main entry point ------------------------------------------------
@@ -206,13 +366,17 @@ export class RecordingOrbitCameraDirector {
         playerDirection,
         dt,
         arena = null,
+        slotStyle = SLOT_STYLE.CINEMATIC,
+        playerState = null,
     }) {
         if (!camera || !playerPosition || !playerDirection) return;
         if (!Number.isInteger(playerIndex) || playerIndex < 0) return;
 
         const safeDt = Math.max(0, Number(dt) || 0);
+        const cfg = getStyleConfig(slotStyle);
+        const effectiveOrbitSpeed = this.orbitSpeed * cfg.orbitSpeedMul;
         const previousPhase = this._phaseByPlayer[playerIndex] || 0;
-        const phase = previousPhase + (safeDt * this.orbitSpeed * (1 + playerIndex * 0.13));
+        const phase = previousPhase + (safeDt * effectiveOrbitSpeed * (1 + playerIndex * 0.13));
         this._phaseByPlayer[playerIndex] = phase;
 
         this._tmpDir.copy(playerDirection);
@@ -229,10 +393,17 @@ export class RecordingOrbitCameraDirector {
             this._tmpSide.normalize();
         }
 
-        // Advance shot timer and pick current shot type.
-        const shotType = this._advanceShotTimer(playerIndex, safeDt);
+        // Detect gameplay events and update overrides/shake.
+        this._detectEvents(playerIndex, playerState, safeDt);
 
-        this._computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition);
+        // Advance shot timer; use event override if active.
+        let shotType = this._advanceShotTimer(playerIndex, safeDt, slotStyle);
+        if ((this._eventOverrideTimer[playerIndex] || 0) > 0
+            && this._eventOverrideShot[playerIndex] !== undefined) {
+            shotType = this._eventOverrideShot[playerIndex];
+        }
+
+        this._computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition, cfg);
 
         const finitePosition = Number.isFinite(this._tmpDesiredPosition.x)
             && Number.isFinite(this._tmpDesiredPosition.y)
@@ -264,9 +435,12 @@ export class RecordingOrbitCameraDirector {
         this._tmpTargetPosition.copy(camera.position).lerp(this._tmpDesiredPosition, blend);
         this._tmpTargetLookAt.copy(fallbackLookAt).lerp(this._tmpDesiredLookAt, blend);
 
-        // Use transitionSpeed for smooth cuts between shot types.
-        const smoothAlpha = 1 - Math.exp(-this.transitionSpeed * safeDt);
+        const effectiveTransition = this.transitionSpeed * cfg.transitionSpeedMul;
+        const smoothAlpha = 1 - Math.exp(-effectiveTransition * safeDt);
         camera.position.lerp(this._tmpTargetPosition, smoothAlpha);
         camera.lookAt(this._tmpTargetLookAt);
+
+        // Apply camera shake from gameplay events.
+        this._applyShake(camera, playerIndex, phase);
     }
 }
