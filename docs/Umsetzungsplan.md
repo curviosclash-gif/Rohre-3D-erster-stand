@@ -32,8 +32,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V46 | V45.9 | hard | ja | V45-Integration abgeschlossen |
 | V50 | V41.99, V46.99 | hard | nein | V46.99 erledigt; Start wartet nur noch auf V41.99 |
 | V50 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Laufende Ratchet-Basis vorhanden |
-| V51 | V50.99 | hard | nein | Parcours-Objective greift in Core/State/UI-Grenzen ein |
-| V51 | V39.9 | soft | nein | Showcase-Map-Faehigkeiten als Basis weiterhin teilweise offen |
+| V51 | V50.99 | hard | ja | User-Override am 2026-03-22, Scope V51 vorgezogen umgesetzt |
+| V51 | V39.9 | soft | ja | `parcours_rift` nutzt vorhandene Showcase-Muster und erweitert sie |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -42,6 +42,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/core/MediaRecorderSystem.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/**`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/**` | V46 / 46.2 | abgeschlossen | Core/Menu-Decomposition abgeschlossen |
 | `src/hunt/**`, `src/entities/ai/**`, `src/entities/systems/ProjectileSystem.js`, `src/ui/HuntHUD.js` | V46 / 46.3 | abgeschlossen | Hunt/AI-Cleanups abgeschlossen |
 | `src/network/**`, `server/**`, `src/ui/menu/**`, `src/core/**`, `src/state/**` | V50 | offen | Architektur-Haertung II |
+| `src/entities/mapSchema/**`, `src/entities/systems/ParcoursProgress*`, `src/ui/HudRuntimeSystem.js`, `src/state/recorder/**`, `editor/js/EditorMapSerializer.js`, `src/core/config/maps/presets/parcours_maps.js` | V51 | abgeschlossen | Parcours-Objective End-to-End integriert |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -51,12 +52,13 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | A | V46.2 | 2026-03-22 | frei | - |
 | B | V46.3 | 2026-03-22 | frei | - |
 | C | V50 | 2026-03-22 | frei | - |
+| D | V51 | 2026-03-22 | closed | 2026-03-22 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
 | Datum | Agent | Fremder Block/Stream | Datei | Grund | Loesung | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| - | - | - | - | Noch leer | - | - |
+| 2026-03-22 | Bot-Codex | V50 | `src/core/**`, `src/state/**`, `src/ui/**` | V51 Objective/Overlay/Telemetry benoetigt Round-End- und HUD-Hooks in Shared-Schichten | Scope strikt auf Parcours-Felder und Objective-Reason begrenzt, Regressionstests (`test:core`, `test:physics`, `test:stress`) ausgefuehrt | abgeschlossen |
 
 ---
 
@@ -219,6 +221,71 @@ Scope:
 
 ---
 
+## Block V51: Parcours-Pflichtmap mit Lauf-Verifikation
+
+Plan-Datei: `docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V50.99, V39.9 -->
+
+Scope:
+
+- Neue Parcours-Pflichtmap `parcours_rift` mit geordneter Route und Finish-Gate.
+- Deterministische Runtime-Verifikation (Reihenfolge, Richtung, Cooldown, Segmentzeit, Respawn-Reset).
+- Objective-basiertes Match-End, HUD/Overlay-Feedback, Recorder/Telemetry und Anti-Exploit-Tests.
+
+### Definition of Done (DoD)
+
+- [x] DoD.1 Alle Phasen 51.1 bis 51.6 und 51.99 sind abgeschlossen und mit Evidence hinterlegt. (abgeschlossen: 2026-03-22; evidence: docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md + docs/Umsetzungsplan.md -> aktualisiert)
+- [x] DoD.2 Pflicht-Tests fuer Core/Physics/Stress sowie Build sind PASS. (abgeschlossen: 2026-03-22; evidence: npm run test:core && npm run test:physics && npm run test:stress && npm run build -> PASS)
+- [x] DoD.3 Plan-/Docs-Gates (`plan:check`, `docs:sync`, `docs:check`) sind PASS. (abgeschlossen: 2026-03-22; evidence: npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
+- [x] DoD.4 Conflict-Log, Lock-Status und Ownership sind fuer V51 konsistent gepflegt. (abgeschlossen: 2026-03-22; evidence: docs/Umsetzungsplan.md -> V51-Block/Conflict-Log/Ownership aktualisiert)
+
+### 51.1 Parcours-Design und Route-Spezifikation
+
+- [x] 51.1.1 Finale Topologie "Rift Gauntlet" mit Sektorfluss, Pflichtroute und Sichtachsen festgelegt (abgeschlossen: 2026-03-22; evidence: src/core/config/maps/presets/parcours_maps.js -> `parcours_rift` layout)
+- [x] 51.1.2 Checkpoint/Finish-Contract (IDs, Reihenfolge, Radius, Richtung, Segmentbudget) verbindlich definiert (abgeschlossen: 2026-03-22; evidence: src/core/config/maps/presets/parcours_maps.js + docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md -> Route-Contract)
+
+### 51.2 Schema- und Editor-Erweiterung
+
+- [x] 51.2.1 MapSchema um `parcours` (Migration, Sanitize, Runtime-Mapping) erweitert (abgeschlossen: 2026-03-22; evidence: src/entities/mapSchema/MapSchemaMigrationOps.js + MapSchemaSanitizeOps.js + MapSchemaRuntimeOps.js -> umgesetzt)
+- [x] 51.2.2 Editor-Import/Export fuer `parcours.checkpoints/rules/finish` roundtrip-faehig gemacht (abgeschlossen: 2026-03-22; evidence: editor/js/EditorMapSerializer.js + npm run test:core -> PASS (T14g))
+
+### 51.3 Runtime-Verifikation und Fortschrittszustand
+
+- [x] 51.3.1 `ParcoursProgressSystem` fuer Ordered-Checkpoints, Richtung, Timing, Cooldown und Reset-Regeln integriert (abgeschlossen: 2026-03-22; evidence: src/entities/systems/ParcoursProgressSystem.js + npm run test:physics -> PASS (T60a/T60b/T60c))
+- [x] 51.3.2 Player-/Lifecycle-/Tick-Pipeline deterministisch auf Parcours-Progress verdrahtet (abgeschlossen: 2026-03-22; evidence: src/entities/systems/PlayerLifecycleSystem.js + src/entities/runtime/EntityTickPipeline.js -> Integration aktiv)
+
+### 51.4 Match-Logik, HUD und Feedback
+
+- [x] 51.4.1 Round-Outcome um Gewinnergrund `PARCOURS_COMPLETE` inkl. Completion-Metadaten erweitert (abgeschlossen: 2026-03-22; evidence: src/entities/systems/RoundOutcomeSystem.js + src/state/RoundStateOps.js -> Objective Reason integriert)
+- [x] 51.4.2 HUD/Overlay/Feedback fuer `CP n/m`, Fehlerindikator und Completion-Time eingebunden (abgeschlossen: 2026-03-22; evidence: src/ui/HudRuntimeSystem.js + src/ui/MatchFlowUiController.js + npm run test:core -> PASS (T14f))
+
+### 51.5 Content-Authoring der Map
+
+- [x] 51.5.1 Neues Preset `parcours_rift` in den Map-Katalog aufgenommen (abgeschlossen: 2026-03-22; evidence: src/core/config/maps/presets/parcours_maps.js + MapPresetCatalog.js + MapPresetsBase.js -> registriert)
+- [x] 51.5.2 Spawn-/Item-/Lane-Setups fuer spielbare Pflichtroute austariert (abgeschlossen: 2026-03-22; evidence: src/core/config/maps/presets/parcours_maps.js + npm run test:core -> PASS (T14/T14f))
+
+### 51.6 Test- und Anti-Exploit-Absicherung
+
+- [x] 51.6.1 Automatisierte Happy-Path/Wrong-Order/Exploit/Respawn/Finish-Tests ergaenzt (abgeschlossen: 2026-03-22; evidence: tests/core.spec.js + tests/physics-core.spec.js + tests/stress.spec.js -> T14f/T14g/T60a-c/T81)
+- [x] 51.6.2 Recorder/Telemetry um Parcours-Completion erweitert und in Dashboard-/History-Pfad gespiegelt (abgeschlossen: 2026-03-22; evidence: src/state/recorder/RoundMetricsStore.js + src/ui/menu/MenuTelemetryDashboard.js -> Completion-Felder aktiv)
+
+### Phase 51.99: Integrations- und Abschluss-Gate
+
+- [x] 51.99.1 `npm run test:core`, `npm run test:physics`, `npm run test:stress`, `npm run build` sind gruen (abgeschlossen: 2026-03-22; evidence: test/build Pflichtlauf -> PASS)
+- [x] 51.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log/Governance abgeschlossen (abgeschlossen: 2026-03-22; evidence: docs-gates + Governance-Update -> PASS)
+
+### Risiko-Register V51
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Falsch-positive Checkpoint-Hits durch Bewegungsrauschen | mittel | Entities | Richtungs-Crossing + Radius-Schnitt + Cooldown je CP | Pendelbewegung an Gates |
+| Objective-Ende kollidiert mit bestehender K.O.-Logik | mittel | State | Objective-Precheck vor Legacy-Win-Path + Regression in Core-Tests | Unerwarteter Gewinnergrund |
+| HUD/Telemetry Drift zwischen Runtime und Round-End | mittel | UI/State | Gemeinsame Outcome-Payload + Dashboard-Regressionstests | Fehlende Completion-Daten |
+
+---
+
 ## Backlog (priorisiert, nicht gestartet)
 
 Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
@@ -227,9 +294,9 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V39 | Komplexe Showcase-Map | `docs/Feature_Komplexe_Showcase_Map_V39.md` | mittel | gross | P2 | Scope-Review nach V46 | In Bearbeitung |
 | V40 | Hunt Rocket Trail Targeting | `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md` | mittel | mittel | P1 | mit V50.1 Contract abstimmen | Offen |
-| V51 | Parcours-Pflichtmap mit Lauf-Verifikation | `docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md` | hoch | gross | P1 | Start nach V50.99; Route/Schema-Freeze mit 51.1/51.2 | Offen |
+| V51 | Parcours-Pflichtmap mit Lauf-Verifikation | `docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md` | hoch | gross | P1 | Abgeschlossen am 2026-03-22 | Abgeschlossen |
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | mittel | mittel | P2 | UX/Ownership klaeren | In Bearbeitung |
-| V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.2.1 Dev-Bereich ueber Wrapper vorbereiten (`scripts/tests/trainer/prototypes`) | In Bearbeitung |
+| V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.3.1 Spielbereich (Editor + Datenpfade + generierte Artefakte) gegen Drift absichern | In Bearbeitung |
 | V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | hoch | mittel | P1 | Benchmark baseline erneuern | Offen |
 | V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | mittel | klein | P2 | in UI backlog einsortieren | Offen |
 | V29b | Cinematic Camera Follow-up + YouTube Shorts Capture | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | mittel | mittel | P2 | 29b.1.1 Aufnahme-Contract fuer Shorts-Profil, HUD-Optionen und dynamische Aufloesung finalisieren | Offen |
