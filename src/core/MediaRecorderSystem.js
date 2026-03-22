@@ -3,6 +3,7 @@ import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
+import { EDITOR_API_ROUTES } from '../shared/contracts/EditorPathContract.js';
 import { toFiniteNumber } from '../utils/MathOps.js';
 import {
     DEFAULT_FALLBACK_MIME_TYPE,
@@ -15,6 +16,10 @@ import {
     sanitizeFileToken,
     toSafeDatePart,
 } from './recording/MediaRecorderSupport.js';
+import {
+    createDefaultRecordingCaptureSettings,
+    normalizeRecordingCaptureSettings,
+} from '../shared/contracts/RecordingCaptureContract.js';
 const Mp4Muxer = Mp4MuxerModule;
 
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
@@ -79,6 +84,8 @@ export class MediaRecorderSystem {
         now = () => Date.now(),
         downloadHandler = defaultDownload,
         capabilityProbe = null,
+        captureSourceResolver = null,
+        recordingCaptureSettings = null,
         globalScope = null,
         runtimePerfProfiler = null,
     } = {}) {
@@ -94,6 +101,11 @@ export class MediaRecorderSystem {
         this.now = typeof now === 'function' ? now : (() => Date.now());
         this.downloadHandler = typeof downloadHandler === 'function' ? downloadHandler : defaultDownload;
         this._capabilityProbe = typeof capabilityProbe === 'function' ? capabilityProbe : null;
+        this.captureSourceResolver = typeof captureSourceResolver === 'function' ? captureSourceResolver : null;
+        this.recordingCaptureSettings = normalizeRecordingCaptureSettings(
+            recordingCaptureSettings,
+            createDefaultRecordingCaptureSettings()
+        );
         this._globalScope = resolveGlobalScope(globalScope);
         this._perfNow = resolvePerfNow(this._globalScope);
         this.runtimePerfProfiler = runtimePerfProfiler || null;
@@ -129,6 +141,7 @@ export class MediaRecorderSystem {
         this._captureCanvasCtx = null;
         this._captureCanvasWidth = 0;
         this._captureCanvasHeight = 0;
+        this._resolvedCaptureCanvas = this.canvas || null;
 
         this._captureTimestampHistoryUs = new Float64Array(MAX_CAPTURE_TIMESTAMPS);
         this._captureTimestampHistoryCount = 0;
@@ -142,12 +155,13 @@ export class MediaRecorderSystem {
     }
 
     _resolveSupportState() {
-        const canCapture = !!this.canvas;
+        const sourceCanvas = this._resolveCaptureCanvas();
+        const canCapture = !!sourceCanvas;
         let customSupport = null;
         if (typeof this._capabilityProbe === 'function') {
             try {
                 customSupport = this._capabilityProbe({
-                    canvas: this.canvas,
+                    canvas: sourceCanvas,
                     globalScope: this._globalScope,
                     mimeType: DEFAULT_MIME_TYPE,
                 });
@@ -175,7 +189,7 @@ export class MediaRecorderSystem {
             };
         }
 
-        const nativeSupport = detectNativeRecorderSupport(this._globalScope, this.canvas);
+        const nativeSupport = detectNativeRecorderSupport(this._globalScope, sourceCanvas);
         const hasRecorder = nativeSupport.hasRecorder;
         return {
             canCapture,
@@ -192,6 +206,43 @@ export class MediaRecorderSystem {
 
     getSupportState() {
         return this._resolveSupportState();
+    }
+
+    setCaptureSourceResolver(resolver = null) {
+        this.captureSourceResolver = typeof resolver === 'function' ? resolver : null;
+        this._resolvedCaptureCanvas = null;
+    }
+
+    setRecordingCaptureSettings(settings = null) {
+        this.recordingCaptureSettings = normalizeRecordingCaptureSettings(
+            settings,
+            this.recordingCaptureSettings || createDefaultRecordingCaptureSettings()
+        );
+        return { ...this.recordingCaptureSettings };
+    }
+
+    getRecordingCaptureSettings() {
+        return { ...this.recordingCaptureSettings };
+    }
+
+    _resolveCaptureCanvas() {
+        let resolvedCanvas = this.canvas || null;
+        if (typeof this.captureSourceResolver === 'function') {
+            try {
+                const candidate = this.captureSourceResolver();
+                if (candidate && typeof candidate === 'object') {
+                    resolvedCanvas = candidate;
+                }
+            } catch (error) {
+                this.logger?.warn?.('[MediaRecorderSystem] capture source resolver failed', error);
+            }
+        }
+        this._resolvedCaptureCanvas = resolvedCanvas;
+        return resolvedCanvas;
+    }
+
+    _getCaptureCanvas() {
+        return this._resolvedCaptureCanvas || this._resolveCaptureCanvas();
     }
 
     setAutoRecordingEnabled(enabled) {
@@ -253,15 +304,17 @@ export class MediaRecorderSystem {
     }
 
     _ensureCaptureSurface(scale = 1) {
+        const sourceCanvas = this._getCaptureCanvas();
+        if (!sourceCanvas) return null;
         const resolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(scale, 1)));
-        const sourceWidth = Math.max(2, Math.floor(toFiniteNumber(this.canvas?.width, 0)));
-        const sourceHeight = Math.max(2, Math.floor(toFiniteNumber(this.canvas?.height, 0)));
+        const sourceWidth = Math.max(2, Math.floor(toFiniteNumber(sourceCanvas?.width, 0)));
+        const sourceHeight = Math.max(2, Math.floor(toFiniteNumber(sourceCanvas?.height, 0)));
         if (resolutionScale >= 0.999 || typeof document === 'undefined') {
             this._captureCanvas = null;
             this._captureCanvasCtx = null;
             this._captureCanvasWidth = sourceWidth;
             this._captureCanvasHeight = sourceHeight;
-            return this.canvas;
+            return sourceCanvas;
         }
 
         const targetWidth = Math.max(2, Math.floor(sourceWidth * resolutionScale));
@@ -271,7 +324,7 @@ export class MediaRecorderSystem {
             this._captureCanvasCtx = this._captureCanvas.getContext('2d', { alpha: false });
         }
         if (!this._captureCanvas || !this._captureCanvasCtx) {
-            return this.canvas;
+            return sourceCanvas;
         }
         if (this._captureCanvas.width !== targetWidth || this._captureCanvas.height !== targetHeight) {
             this._captureCanvas.width = targetWidth;
@@ -281,23 +334,25 @@ export class MediaRecorderSystem {
         this._captureCanvasHeight = targetHeight;
         this._captureCanvasCtx.imageSmoothingEnabled = true;
         this._captureCanvasCtx.clearRect(0, 0, targetWidth, targetHeight);
-        this._captureCanvasCtx.drawImage(this.canvas, 0, 0, targetWidth, targetHeight);
+        this._captureCanvasCtx.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
         return this._captureCanvas;
     }
 
     _ensureMediaRecorderCaptureSurface(scale = 1) {
+        const sourceCanvas = this._getCaptureCanvas();
+        if (!sourceCanvas) return null;
         if (typeof document === 'undefined') {
-            return this.canvas;
+            return sourceCanvas;
         }
         const resolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(scale, 1)));
-        const sourceWidth = Math.max(2, Math.floor(toFiniteNumber(this.canvas?.width, 0)));
-        const sourceHeight = Math.max(2, Math.floor(toFiniteNumber(this.canvas?.height, 0)));
+        const sourceWidth = Math.max(2, Math.floor(toFiniteNumber(sourceCanvas?.width, 0)));
+        const sourceHeight = Math.max(2, Math.floor(toFiniteNumber(sourceCanvas?.height, 0)));
         if (!this._captureCanvas) {
             this._captureCanvas = document.createElement('canvas');
             this._captureCanvasCtx = this._captureCanvas.getContext('2d', { alpha: false });
         }
         if (!this._captureCanvas || !this._captureCanvasCtx) {
-            return this.canvas;
+            return sourceCanvas;
         }
 
         const targetWidth = Math.max(2, Math.floor(sourceWidth * resolutionScale));
@@ -311,7 +366,7 @@ export class MediaRecorderSystem {
         this._captureCanvasHeight = targetHeight;
         this._captureCanvasCtx.imageSmoothingEnabled = true;
         this._captureCanvasCtx.clearRect(0, 0, targetWidth, targetHeight);
-        this._captureCanvasCtx.drawImage(this.canvas, 0, 0, targetWidth, targetHeight);
+        this._captureCanvasCtx.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
         return this._captureCanvas;
     }
 
@@ -469,6 +524,10 @@ export class MediaRecorderSystem {
 
         const level = this._getCaptureLevel();
         const frameSource = this._ensureCaptureSurface(level.resolutionScale);
+        if (!frameSource) {
+            this._captureDroppedFrames += 1;
+            return;
+        }
         const encodeStart = this._perfNow();
         try {
             const frame = new VideoFrameCtor(frameSource, { timestamp: this._captureTimestampUs });
@@ -580,13 +639,18 @@ export class MediaRecorderSystem {
 
     getRecordingDiagnostics() {
         const level = this._getCaptureLevel();
+        const sourceCanvas = this._getCaptureCanvas();
         return {
             recording: this._isRecording,
             recorderEngine: this._activeRecorderEngine,
+            captureProfile: this.recordingCaptureSettings?.profile || null,
+            hudMode: this.recordingCaptureSettings?.hudMode || null,
             captureFps: this.captureFps,
             effectiveCaptureFps: this._resolveEffectiveCaptureFps(),
             captureResolutionScale: level.resolutionScale,
             captureLevel: this._captureLevelIndex,
+            captureSourceWidth: Math.max(0, Math.floor(toFiniteNumber(sourceCanvas?.width, 0))),
+            captureSourceHeight: Math.max(0, Math.floor(toFiniteNumber(sourceCanvas?.height, 0))),
             requestFrameSupported: this._mediaRecorderSupportsRequestFrame,
             encodeQueueSoftLimit: ENCODE_QUEUE_SOFT_LIMIT,
             encodeQueueDropLimit: ENCODE_QUEUE_DROP_LIMIT,
@@ -615,6 +679,8 @@ export class MediaRecorderSystem {
             endedAt: this._lastExport.endedAt,
             durationMs: this._lastExport.durationMs,
             trigger: this._lastExport.trigger,
+            captureProfile: this._lastExport.captureProfile || null,
+            hudMode: this._lastExport.hudMode || null,
             frameIntervalStats: this._lastExport.frameIntervalStats
                 ? { ...this._lastExport.frameIntervalStats }
                 : null,
@@ -698,8 +764,9 @@ export class MediaRecorderSystem {
     }
 
     _resolveRecordingDimensions(scale = 1) {
-        const rawWidth = Number(this.canvas?.width || 0);
-        const rawHeight = Number(this.canvas?.height || 0);
+        const sourceCanvas = this._getCaptureCanvas();
+        const rawWidth = Number(sourceCanvas?.width || 0);
+        const rawHeight = Number(sourceCanvas?.height || 0);
         const resolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(scale, 1)));
         const width = Math.max(2, Math.floor(rawWidth * resolutionScale));
         const height = Math.max(2, Math.floor(rawHeight * resolutionScale));
@@ -773,6 +840,8 @@ export class MediaRecorderSystem {
         this._activeRecording = {
             startedAt: this.now(),
             trigger: trigger || null,
+            captureProfile: this.recordingCaptureSettings?.profile || null,
+            hudMode: this.recordingCaptureSettings?.hudMode || null,
         };
 
         this._notifyRecordingStateChange(true);
@@ -780,6 +849,8 @@ export class MediaRecorderSystem {
             mimeType: this._activeMimeType,
             timestampMs: this._activeRecording.startedAt,
             recorderEngine: this._activeRecorderEngine,
+            captureProfile: this._activeRecording.captureProfile,
+            hudMode: this._activeRecording.hudMode,
         });
     }
 
@@ -788,7 +859,8 @@ export class MediaRecorderSystem {
         if (typeof MediaRecorderCtor !== 'function') {
             return this._buildStartResult(false, 'missing-media-recorder', { support });
         }
-        if (!this.canvas || typeof this.canvas.captureStream !== 'function') {
+        const sourceCanvas = this._getCaptureCanvas();
+        if (!sourceCanvas || typeof sourceCanvas.captureStream !== 'function') {
             return this._buildStartResult(false, 'missing-capture-stream', { support });
         }
 
@@ -818,8 +890,8 @@ export class MediaRecorderSystem {
             const captureStreamSource = this._ensureMediaRecorderCaptureSurface(level.resolutionScale);
             const streamSourceCanvas = captureStreamSource && typeof captureStreamSource.captureStream === 'function'
                 ? captureStreamSource
-                : this.canvas;
-            this._mediaRecorderUsesCaptureCanvas = streamSourceCanvas !== this.canvas;
+                : sourceCanvas;
+            this._mediaRecorderUsesCaptureCanvas = streamSourceCanvas !== sourceCanvas;
 
             let captureStream = streamSourceCanvas.captureStream(0);
             let captureTrack = typeof captureStream?.getVideoTracks === 'function'
@@ -879,6 +951,8 @@ export class MediaRecorderSystem {
         this._activeRecording = {
             startedAt: this.now(),
             trigger: trigger || null,
+            captureProfile: this.recordingCaptureSettings?.profile || null,
+            hudMode: this.recordingCaptureSettings?.hudMode || null,
         };
         this._notifyRecordingStateChange(true);
 
@@ -887,6 +961,8 @@ export class MediaRecorderSystem {
             timestampMs: this._activeRecording.startedAt,
             recorderEngine: this._activeRecorderEngine,
             fallbackFromReason: fallbackFromReason || undefined,
+            captureProfile: this._activeRecording.captureProfile,
+            hudMode: this._activeRecording.hudMode,
         });
     }
 
@@ -899,6 +975,7 @@ export class MediaRecorderSystem {
             return this._buildStartResult(false, 'already_recording');
         }
 
+        this._resolveCaptureCanvas();
         const support = this.getSupportState();
         if (!support.canRecord) {
             this.logger?.warn?.('[MediaRecorderSystem] recording unsupported on this runtime', support);
@@ -995,12 +1072,13 @@ export class MediaRecorderSystem {
     _buildFilename(activeRecording, endedAtMs, mimeType) {
         const startedAt = activeRecording?.startedAt || endedAtMs;
         const mode = sanitizeFileToken(activeRecording?.trigger?.context?.activeGameMode, 'classic');
+        const profile = sanitizeFileToken(activeRecording?.captureProfile || this.recordingCaptureSettings?.profile, 'standard');
         const matchId = sanitizeFileToken(activeRecording?.trigger?.context?.sessionId, 'session');
         const normalizedMimeType = String(mimeType || '').toLowerCase();
         const ext = normalizedMimeType.includes('webm')
             ? 'webm'
             : (normalizedMimeType.includes('mp4') ? 'mp4' : 'video');
-        return `${this.filePrefix}-${mode}-${matchId}-${toSafeDatePart(startedAt)}-${toSafeDatePart(endedAtMs)}.${ext}`;
+        return `${this.filePrefix}-${mode}-${profile}-${matchId}-${toSafeDatePart(startedAt)}-${toSafeDatePart(endedAtMs)}.${ext}`;
     }
 
     _buildDownloadFileName(fileName) {
@@ -1074,7 +1152,7 @@ export class MediaRecorderSystem {
         }
 
         try {
-            fetch('/api/editor/save-video-disk', {
+            fetch(EDITOR_API_ROUTES.SAVE_VIDEO_DISK, {
                 method: 'POST',
                 headers: { 'x-file-name': safeFileName },
                 body: blob
@@ -1123,6 +1201,8 @@ export class MediaRecorderSystem {
             endedAt: timing.endedAt,
             durationMs: timing.durationMs,
             trigger: activeRecording?.stopTrigger || activeRecording?.trigger || null,
+            captureProfile: activeRecording?.captureProfile || this.recordingCaptureSettings?.profile || null,
+            hudMode: activeRecording?.hudMode || this.recordingCaptureSettings?.hudMode || null,
             frameIntervalStats: frameIntervalStats
                 ? { ...frameIntervalStats }
                 : null,
@@ -1148,6 +1228,8 @@ export class MediaRecorderSystem {
             startedAt: timing.startedAt,
             endedAt: timing.endedAt,
             durationMs: timing.durationMs,
+            captureProfile: this._lastExport.captureProfile,
+            hudMode: this._lastExport.hudMode,
             frameIntervalStats: frameIntervalStats
                 ? { ...frameIntervalStats }
                 : null,
@@ -1196,6 +1278,7 @@ export class MediaRecorderSystem {
         this._captureCanvasCtx = null;
         this._captureCanvasWidth = 0;
         this._captureCanvasHeight = 0;
+        this._resolvedCaptureCanvas = null;
         this._resetWebCodecsCaptureState();
         this._activeMimeType = DEFAULT_MIME_TYPE;
         this._activeRecorderEngine = RECORDER_ENGINE.NONE;

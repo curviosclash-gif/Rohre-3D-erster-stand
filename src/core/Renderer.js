@@ -8,6 +8,7 @@ import { CameraRigSystem } from './renderer/CameraRigSystem.js';
 import { RenderViewportSystem } from './renderer/RenderViewportSystem.js';
 import { SceneRootManager } from './renderer/SceneRootManager.js';
 import { RenderQualityController } from './renderer/RenderQualityController.js';
+import { RecordingCapturePipeline } from './renderer/RecordingCapturePipeline.js';
 
 export class Renderer {
     constructor(canvas) {
@@ -58,6 +59,11 @@ export class Renderer {
         this.splitScreen = this.viewportSystem.splitScreen;
 
         this.qualityController = new RenderQualityController(this.renderer, this.scene);
+        this.recordingCapturePipeline = new RecordingCapturePipeline({
+            sourceCanvas: this.canvas,
+            sourceRenderer: this.renderer,
+            scene: this.scene,
+        });
 
         this._onWindowResize = () => this._onResize();
         window.addEventListener('resize', this._onWindowResize);
@@ -115,10 +121,31 @@ export class Renderer {
 
     setRecordingActive(active) {
         this._recordingActive = !!active;
+        this.recordingCapturePipeline.setActive(this._recordingActive);
     }
 
     getRecordingActive() {
         return this._recordingActive;
+    }
+
+    setRecordingCaptureSettings(settings = null) {
+        return this.recordingCapturePipeline.setSettings(settings);
+    }
+
+    getRecordingCaptureSettings() {
+        return this.recordingCapturePipeline.getSettings();
+    }
+
+    getLastRecordingCaptureMeta() {
+        return this.recordingCapturePipeline.getLastMeta();
+    }
+
+    getRecordingCaptureCanvas() {
+        return this.recordingCapturePipeline.getCaptureCanvas();
+    }
+
+    prepareRecordingCaptureFrame(options = null) {
+        this.recordingCapturePipeline.prepareFrame(options || null);
     }
 
     updateCamera(
@@ -214,6 +241,7 @@ export class Renderer {
             window.removeEventListener('resize', this._onWindowResize);
             this._onWindowResize = null;
         }
+        this.recordingCapturePipeline.dispose();
         this.clearScene();
         this.renderer.dispose();
     }
