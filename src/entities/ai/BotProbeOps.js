@@ -9,8 +9,10 @@
 // - Hotpath guardrail: no new vectors/arrays in sensing loop
 
 import { CONFIG } from '../../core/Config.js';
-
-const BOT_PROBE_LATERAL_SCAN_CLEAR_RATIO = 0.92;
+import {
+    AI_SENSOR_PROBE_POLICY,
+    AI_SENSOR_TRAIL_COLLISION,
+} from './perception/AiPerceptionConfig.js';
 
 export function composeProbeDirection(bot, forward, right, up, probe) {
     const yawFactor = probe.yaw * bot.profile.probeSpread;
@@ -27,8 +29,8 @@ export function scanProbeRay(bot, player, arena, allPlayers, direction, lookAhea
     out.trailDist = lookAhead;
     out.immediateDanger = false;
 
-    const radius = player.hitboxRadius * 1.6;
-    const skipRecent = 20;
+    const radius = player.hitboxRadius * AI_SENSOR_TRAIL_COLLISION.radiusMultiplier;
+    const skipRecent = AI_SENSOR_TRAIL_COLLISION.skipRecentSegments;
     const stepX = direction.x * step;
     const stepY = direction.y * step;
     const stepZ = direction.z * step;
@@ -42,13 +44,13 @@ export function scanProbeRay(bot, player, arena, allPlayers, direction, lookAhea
     for (let d = step; d <= lookAhead; d += step) {
         if (arena.checkCollisionFast(bot._tmpVec, radius)) {
             out.wallDist = d;
-            if (d <= step * 1.5) out.immediateDanger = true;
+            if (d <= step * AI_SENSOR_PROBE_POLICY.immediateDangerStepMultiplier) out.immediateDanger = true;
             break;
         }
 
         if (bot.checkTrailHit(bot._tmpVec, player, allPlayers, radius, skipRecent)) {
             out.trailDist = d;
-            if (d <= step * 1.5) out.immediateDanger = true;
+            if (d <= step * AI_SENSOR_PROBE_POLICY.immediateDangerStepMultiplier) out.immediateDanger = true;
             break;
         }
 
@@ -63,19 +65,21 @@ export function scoreProbe(bot, player, arena, allPlayers, probe, lookAhead) {
 
     let probeLookAhead = lookAhead;
     const absYaw = Math.abs(probe.yaw);
-    if (absYaw > 2.5) {
-        probeLookAhead = lookAhead * 0.4;
-    } else if (absYaw > 1.2) {
-        probeLookAhead = lookAhead * 0.7;
+    if (absYaw > AI_SENSOR_PROBE_POLICY.sharpTurnYawThreshold) {
+        probeLookAhead = lookAhead * AI_SENSOR_PROBE_POLICY.sharpTurnLookAheadScale;
+    } else if (absYaw > AI_SENSOR_PROBE_POLICY.mediumTurnYawThreshold) {
+        probeLookAhead = lookAhead * AI_SENSOR_PROBE_POLICY.mediumTurnLookAheadScale;
     }
 
     scanProbeRay(bot, player, arena, allPlayers, probe.dir, probeLookAhead, step, bot._probeRayCenter);
 
-    const lateralStrength = CONFIG.GAMEPLAY.PLANAR_MODE ? 0.2 : 0.24;
-    const lateralLookAhead = probeLookAhead * 0.9;
+    const lateralStrength = CONFIG.GAMEPLAY.PLANAR_MODE
+        ? AI_SENSOR_PROBE_POLICY.planarLateralStrength
+        : AI_SENSOR_PROBE_POLICY.volumeLateralStrength;
+    const lateralLookAhead = probeLookAhead * AI_SENSOR_PROBE_POLICY.lateralLookAheadScale;
     const centerClearance = Math.min(bot._probeRayCenter.wallDist, bot._probeRayCenter.trailDist);
     const shouldScanLaterals = bot._probeRayCenter.immediateDanger
-        || centerClearance < probeLookAhead * BOT_PROBE_LATERAL_SCAN_CLEAR_RATIO;
+        || centerClearance < probeLookAhead * AI_SENSOR_PROBE_POLICY.lateralScanClearRatio;
 
     if (shouldScanLaterals) {
         bot._tmpVec2.copy(probe.dir).addScaledVector(bot._tmpRight, lateralStrength).normalize();
@@ -99,23 +103,33 @@ export function scoreProbe(bot, player, arena, allPlayers, probe, lookAhead) {
         || bot._probeRayRight.immediateDanger;
 
     const speedRatio = player.baseSpeed > 0 ? player.speed / player.baseSpeed : 1;
-    const speedFactor = Math.max(0, speedRatio - 1) * 0.3;
+    const speedFactor = Math.max(0, speedRatio - 1) * AI_SENSOR_PROBE_POLICY.speedFactorScale;
 
     const wallRisk = 1 - Math.min(1, wallDist / probeLookAhead);
     const trailRisk = 1 - Math.min(1, trailDist / probeLookAhead);
-    let risk = wallRisk * (1.1 + bot.sense.mapCaution + speedFactor)
-        + trailRisk * (1.45 + bot.sense.mapCaution * 0.5 + speedFactor * 0.7);
+    let risk = wallRisk * (AI_SENSOR_PROBE_POLICY.wallRiskBase + bot.sense.mapCaution + speedFactor)
+        + trailRisk * (
+            AI_SENSOR_PROBE_POLICY.trailRiskBase
+            + bot.sense.mapCaution * AI_SENSOR_PROBE_POLICY.trailMapCautionScale
+            + speedFactor * AI_SENSOR_PROBE_POLICY.trailSpeedFactorScale
+        );
 
     let lateralBlocks = 0;
-    if (bot._probeRayLeft.wallDist < lateralLookAhead * 0.5 || bot._probeRayLeft.trailDist < lateralLookAhead * 0.5) lateralBlocks++;
-    if (bot._probeRayRight.wallDist < lateralLookAhead * 0.5 || bot._probeRayRight.trailDist < lateralLookAhead * 0.5) lateralBlocks++;
+    if (
+        bot._probeRayLeft.wallDist < lateralLookAhead * AI_SENSOR_PROBE_POLICY.lateralBlockDistanceScale
+        || bot._probeRayLeft.trailDist < lateralLookAhead * AI_SENSOR_PROBE_POLICY.lateralBlockDistanceScale
+    ) lateralBlocks++;
+    if (
+        bot._probeRayRight.wallDist < lateralLookAhead * AI_SENSOR_PROBE_POLICY.lateralBlockDistanceScale
+        || bot._probeRayRight.trailDist < lateralLookAhead * AI_SENSOR_PROBE_POLICY.lateralBlockDistanceScale
+    ) lateralBlocks++;
 
     risk += probe.weight;
-    risk += lateralBlocks * 0.28;
-    if (immediateDanger) risk += 2.2;
+    risk += lateralBlocks * AI_SENSOR_PROBE_POLICY.lateralBlockRiskPenalty;
+    if (immediateDanger) risk += AI_SENSOR_PROBE_POLICY.immediateDangerRiskPenalty;
 
     if (bot.profile.errorRate > 0 && Math.random() < bot.profile.errorRate) {
-        risk += (Math.random() - 0.2) * 0.65;
+        risk += (Math.random() - AI_SENSOR_PROBE_POLICY.errorNoiseOffset) * AI_SENSOR_PROBE_POLICY.errorNoiseScale;
     }
 
     probe.wallDist = wallDist;

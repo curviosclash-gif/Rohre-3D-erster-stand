@@ -30,15 +30,17 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- | --- |
 | V41.99 | - | soft | ja | Rest-Gate kann isoliert weiterlaufen |
 | V46 | V45.9 | hard | ja | V45-Integration abgeschlossen |
-| V50 | V41.99, V46.99 | hard | nein | Start erst nach Abschluss beider Gates |
+| V50 | V41.99, V46.99 | hard | nein | V46.99 erledigt; Start wartet nur noch auf V41.99 |
 | V50 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Laufende Ratchet-Basis vorhanden |
+| V51 | V50.99 | hard | nein | Parcours-Objective greift in Core/State/UI-Grenzen ein |
+| V51 | V39.9 | soft | nein | Showcase-Map-Faehigkeiten als Basis weiterhin teilweise offen |
 
 ## Datei-Ownership (aktive Arbeit)
 
 | Pfadmuster | Block / Stream | Status | Hinweis |
 | --- | --- | --- | --- |
-| `src/core/MediaRecorderSystem.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/**`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/**` | V46 / 46.2 | offen | Core/Menu-Decomposition |
-| `src/hunt/**`, `src/entities/ai/**`, `src/entities/systems/ProjectileSystem.js`, `src/ui/HuntHUD.js` | V46 / 46.3 | offen | Hunt/AI-Cleanups |
+| `src/core/MediaRecorderSystem.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/**`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/**` | V46 / 46.2 | abgeschlossen | Core/Menu-Decomposition abgeschlossen |
+| `src/hunt/**`, `src/entities/ai/**`, `src/entities/systems/ProjectileSystem.js`, `src/ui/HuntHUD.js` | V46 / 46.3 | abgeschlossen | Hunt/AI-Cleanups abgeschlossen |
 | `src/network/**`, `server/**`, `src/ui/menu/**`, `src/core/**`, `src/state/**` | V50 | offen | Architektur-Haertung II |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -108,10 +110,10 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 46.2.* und 46.3.* sind abgeschlossen und per Tests abgesichert.
-- [ ] DoD.2 46.99.* ist abgeschlossen und Gate-Invariante erfuellt.
-- [ ] DoD.3 `npm run architecture:guard`, `npm run build` und relevante Tests sind PASS.
-- [ ] DoD.4 Evidence-Format, Conflict-Log und Lock-Bereinigung sind erledigt.
+- [x] DoD.1 46.2.* und 46.3.* sind abgeschlossen und per Tests abgesichert. (abgeschlossen: 2026-03-22; evidence: npm run test:core && npm run test:physics -> PASS)
+- [x] DoD.2 46.99.* ist abgeschlossen und Gate-Invariante erfuellt. (abgeschlossen: 2026-03-22; evidence: plan status audit -> docs/Umsetzungsplan.md)
+- [x] DoD.3 `npm run architecture:guard`, `npm run build` und relevante Tests sind PASS. (abgeschlossen: 2026-03-22; evidence: npm run architecture:guard && npm run build -> PASS)
+- [x] DoD.4 Evidence-Format, Conflict-Log und Lock-Bereinigung sind erledigt. (abgeschlossen: 2026-03-22; evidence: npm run plan:check -> PASS)
 
 ### 46.2 Core- und Menu-Decomposition
 
@@ -120,13 +122,13 @@ Scope:
 
 ### 46.3 Hunt/AI-Cleanups und Modulgrenzen
 
-- [ ] 46.3.1 Magic Numbers in Hunt/Projectile/AI in Konfig-Objekte ueberfuehren und Sensing-Primitives abschliessen
+- [x] 46.3.1 Magic Numbers in Hunt/Projectile/AI in Konfig-Objekte ueberfuehren und Sensing-Primitives abschliessen (abgeschlossen: 2026-03-22; evidence: npm run test:core && npm run test:physics -> PASS)
 - [x] 46.3.2 `HuntHUD` nach `src/ui/` migriert, Lifecycle/Dispose verdrahtet (abgeschlossen: 2026-03-21; evidence: npm run test:physics:hunt -> commit f4b7f1b)
 
 ### Phase 46.99: Integrations- und Abschluss-Gate
 
-- [ ] 46.99.1 `npm run architecture:guard`, relevante Tests und Build sind gruen (nach 46.2.1 + 46.3.1)
-- [ ] 46.99.2 `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen
+- [x] 46.99.1 `npm run architecture:guard`, relevante Tests und Build sind gruen (nach 46.2.1 + 46.3.1) (abgeschlossen: 2026-03-22; evidence: npm run architecture:guard && npm run build -> PASS)
+- [x] 46.99.2 `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen (abgeschlossen: 2026-03-22; evidence: npm run docs:sync && npm run docs:check -> PASS)
 
 ### Risiko-Register V46
 
@@ -225,12 +227,13 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V39 | Komplexe Showcase-Map | `docs/Feature_Komplexe_Showcase_Map_V39.md` | mittel | gross | P2 | Scope-Review nach V46 | In Bearbeitung |
 | V40 | Hunt Rocket Trail Targeting | `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md` | mittel | mittel | P1 | mit V50.1 Contract abstimmen | Offen |
+| V51 | Parcours-Pflichtmap mit Lauf-Verifikation | `docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md` | hoch | gross | P1 | Start nach V50.99; Route/Schema-Freeze mit 51.1/51.2 | Offen |
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | mittel | mittel | P2 | UX/Ownership klaeren | In Bearbeitung |
-| V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | nur nach Architekturfreeze starten | Offen |
+| V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.2.1 Dev-Bereich ueber Wrapper vorbereiten (`scripts/tests/trainer/prototypes`) | In Bearbeitung |
 | V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | hoch | mittel | P1 | Benchmark baseline erneuern | Offen |
 | V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | mittel | klein | P2 | in UI backlog einsortieren | Offen |
-| V29b | Cinematic Camera Follow-up | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | niedrig | mittel | P3 | Abhaengigkeit mit Replay pruefen | Offen |
-| N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | UX flow definieren | Offen |
+| V29b | Cinematic Camera Follow-up + YouTube Shorts Capture | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | mittel | mittel | P2 | 29b.1.1 Aufnahme-Contract fuer Shorts-Profil, HUD-Optionen und dynamische Aufloesung finalisieren | Offen |
+| N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
 
@@ -252,12 +255,12 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 
 Stand: 2026-03-22
 
-- Abgeschlossen diese Woche: V46.2.2, V46.3.2, Planarchiv-Bereinigung.
-- Blockiert: V50 (wartet auf V41.99 + V46.99).
+- Abgeschlossen diese Woche: V46.2.1, V46.2.2, V46.3.1, V46.3.2, V46.99, Planarchiv-Bereinigung.
+- Blockiert: V50 (wartet auf V41.99 Real-World-Gates).
 - Naechste 3 Ziele:
-  1. 46.2.1 Decomposition `MediaRecorderSystem` + `GameRuntimeFacade`.
-  2. 46.3.1 Magic Numbers + AI Sensing Primitives.
-  3. 41.99.1/41.99.2 Multiplayer Real-World-Gates.
+  1. 41.99.1 LAN-Match auf 2+ Rechnern verifizieren.
+  2. 41.99.2 Internet-Match auf 2+ Rechnern via Signaling-Server verifizieren.
+  3. 41.99.3/41.99.4 Input- und Host-Performance-Gates abschliessen.
 - Groesstes Risiko: V50 startet zu spaet, wenn V41.99 manuell blockiert.
 - Entscheidungsbedarf: reale Multiplayer-Testumgebung (2+ Maschinen) terminieren.
 

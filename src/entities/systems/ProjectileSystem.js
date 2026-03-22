@@ -59,6 +59,16 @@ export class ProjectileSystem {
 
     shootItemProjectile(player, preferredIndex = -1) {
         const config = getActiveRuntimeConfig(CONFIG);
+        const rocketConfig = config?.HUNT?.ROCKET || {};
+        const targetingConfig = config?.HUNT?.TARGETING || {};
+        const homingMinTurnRate = Math.max(0.000001, Number(rocketConfig.HOMING_MIN_TURN_RATE) || 0.1);
+        const homingMinLockOnAngle = Math.max(0.000001, Number(rocketConfig.HOMING_MIN_LOCK_ON_ANGLE) || 5);
+        const homingMinRange = Math.max(0.000001, Number(rocketConfig.HOMING_MIN_RANGE) || 10);
+        const homingMinReacquireInterval = Math.max(0.000001, Number(rocketConfig.HOMING_MIN_REACQUIRE_INTERVAL) || 0.04);
+        const fallbackReacquireInterval = Math.max(
+            homingMinReacquireInterval,
+            Number(rocketConfig.HOMING_FALLBACK_REACQUIRE_INTERVAL) || 0.2
+        );
         if ((player.shootCooldown || 0) > 0) {
             return { ok: false, reason: `Schuss bereit in ${player.shootCooldown.toFixed(1)}s` };
         }
@@ -78,24 +88,30 @@ export class ProjectileSystem {
         const huntRocket = !!rocketParams;
         const visualScale = huntRocket ? rocketParams.visualScale : 1;
         const collisionRadiusMultiplier = huntRocket ? rocketParams.collisionRadiusMultiplier : 1;
-        const baseTurnRate = Math.max(0.1, Number(config?.HOMING?.TURN_RATE || 3));
+        const baseTurnRate = Math.max(homingMinTurnRate, Number(config?.HOMING?.TURN_RATE || 3));
         const homingTurnRate = huntRocket
             ? Math.max(baseTurnRate, rocketParams.homingTurnRate)
             : baseTurnRate;
-        const baseLockOnAngle = Math.max(5, Number(config?.HOMING?.LOCK_ON_ANGLE || 15));
+        const baseLockOnAngle = Math.max(homingMinLockOnAngle, Number(config?.HOMING?.LOCK_ON_ANGLE || 15));
         const homingLockOnAngle = huntRocket
             ? Math.max(baseLockOnAngle, rocketParams.homingLockOnAngle)
             : baseLockOnAngle;
-        const baseHomingRange = Math.max(10, Number(config?.HOMING?.MAX_LOCK_RANGE || 100));
+        const baseHomingRange = Math.max(homingMinRange, Number(config?.HOMING?.MAX_LOCK_RANGE || 100));
         const homingRange = huntRocket
             ? Math.max(baseHomingRange, rocketParams.homingRange)
             : baseHomingRange;
         const homingReacquireInterval = huntRocket
             ? rocketParams.homingReacquireInterval
-            : 0.2;
+            : fallbackReacquireInterval;
+        const projectileSpawnOffset = Math.max(
+            0.1,
+            Number(targetingConfig.PROJECTILE_SPAWN_OFFSET)
+            || Number(targetingConfig.MUZZLE_OFFSET)
+            || 2.2
+        );
 
         player.getAimDirection(this._tmpDir).normalize();
-        this._tmpVec.copy(player.position).addScaledVector(this._tmpDir, 2.2);
+        this._tmpVec.copy(player.position).addScaledVector(this._tmpDir, projectileSpawnOffset);
 
         const speed = config.PROJECTILE.SPEED;
         const radius = config.PROJECTILE.RADIUS;

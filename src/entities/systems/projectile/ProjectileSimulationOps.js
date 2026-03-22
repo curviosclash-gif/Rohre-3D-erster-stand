@@ -9,6 +9,30 @@ import {
     resolveHuntTargetPosition,
 } from '../../../hunt/HuntTargetingOps.js';
 
+function resolveRocketRuntime(config) {
+    const rocket = config?.HUNT?.ROCKET || {};
+    return {
+        homingMinRange: Math.max(0.000001, Number(rocket.HOMING_MIN_RANGE) || 10),
+        homingMinLockOnAngle: Math.max(0.000001, Number(rocket.HOMING_MIN_LOCK_ON_ANGLE) || 5),
+        homingMinTurnRate: Math.max(0.000001, Number(rocket.HOMING_MIN_TURN_RATE) || 0.1),
+        homingMinReacquireInterval: Math.max(0.000001, Number(rocket.HOMING_MIN_REACQUIRE_INTERVAL) || 0.04),
+        homingReacquireInterval: Math.max(0.000001, Number(rocket.HOMING_REACQUIRE_INTERVAL) || 0.12),
+        homingSpeedEpsilon: Math.max(0.0000001, Number(rocket.HOMING_SPEED_EPSILON) || 0.0001),
+        portalExitForwardOffset: Math.max(0, Number(rocket.PORTAL_EXIT_FORWARD_OFFSET) || 1.5),
+        foamBounceMaxCount: Math.max(0, Math.floor(Number(rocket.FOAM_BOUNCE_MAX_COUNT) || 3)),
+        foamBounceNormalBias: Math.max(0, Number(rocket.FOAM_BOUNCE_NORMAL_BIAS) || 0.08),
+        foamBounceSpeedMultiplier: Math.max(0, Number(rocket.FOAM_BOUNCE_SPEED_MULTIPLIER) || 1.02),
+        foamBouncePositionMinOffset: Math.max(0, Number(rocket.FOAM_BOUNCE_POSITION_MIN_OFFSET) || 0.2),
+        foamBouncePositionRadiusScale: Math.max(0, Number(rocket.FOAM_BOUNCE_POSITION_RADIUS_SCALE) || 1.25),
+        foamBounceCooldown: Math.max(0, Number(rocket.FOAM_BOUNCE_COOLDOWN) || 0.045),
+        foamBounceTtlPenalty: Math.max(0, Number(rocket.FOAM_BOUNCE_TTL_PENALTY) || 0.02),
+        flameFlickerBase: Number(rocket.FLAME_FLICKER_BASE) || 0.7,
+        flameFlickerAmplitude: Number(rocket.FLAME_FLICKER_AMPLITUDE) || 0.3,
+        flameFlickerSpeed: Number(rocket.FLAME_FLICKER_SPEED) || 30,
+        flameFlickerIndexPhase: Number(rocket.FLAME_FLICKER_INDEX_PHASE) || 7,
+    };
+}
+
 export class ProjectileSimulationOps {
     constructor(system) {
         this.system = system || null;
@@ -28,17 +52,24 @@ export class ProjectileSimulationOps {
 
     acquireHomingTarget(projectile, players, trailSpatialIndex = null) {
         const config = getActiveRuntimeConfig(CONFIG);
+        const rocketRuntime = resolveRocketRuntime(config);
         if (!projectile || !Array.isArray(players) || players.length === 0) return null;
 
         const owner = projectile.owner;
-        const maxRange = Math.max(10, Number(projectile.homingRange || config?.HOMING?.MAX_LOCK_RANGE || 100));
+        const maxRange = Math.max(
+            rocketRuntime.homingMinRange,
+            Number(projectile.homingRange || config?.HOMING?.MAX_LOCK_RANGE || 100)
+        );
         const maxRangeSq = maxRange * maxRange;
-        const lockOnAngle = Math.max(5, Number(projectile.homingLockOnAngle || config?.HOMING?.LOCK_ON_ANGLE || 15));
+        const lockOnAngle = Math.max(
+            rocketRuntime.homingMinLockOnAngle,
+            Number(projectile.homingLockOnAngle || config?.HOMING?.LOCK_ON_ANGLE || 15)
+        );
         const minDot = Math.cos(THREE.MathUtils.degToRad(lockOnAngle));
 
         this._tmpVec2.copy(projectile.velocity);
         const speed = this._tmpVec2.length();
-        if (speed <= 0.0001) return null;
+        if (speed <= rocketRuntime.homingSpeedEpsilon) return null;
         this._tmpVec2.divideScalar(speed);
 
         if (projectile.huntRocket) {
@@ -46,7 +77,7 @@ export class ProjectileSimulationOps {
                 Number(projectile.radius) || 0,
                 Number(config?.HUNT?.MG?.TRAIL_HIT_RADIUS || 0.78)
             );
-            const mgTrailRange = Math.max(10, Number(config?.HUNT?.MG?.RANGE || 95));
+            const mgTrailRange = Math.max(rocketRuntime.homingMinRange, Number(config?.HUNT?.MG?.RANGE || 95));
             const sharedTarget = resolveHuntLineTarget({
                 sourcePlayer: owner,
                 players,
@@ -105,15 +136,16 @@ export class ProjectileSimulationOps {
     }
 
     bounceProjectileOnFoam(projectile, collisionInfo) {
+        const config = getActiveRuntimeConfig(CONFIG);
+        const rocketRuntime = resolveRocketRuntime(config);
         if (!projectile || !collisionInfo?.normal) return false;
 
-        const maxFoamBounces = 3;
-        if ((projectile.foamBounces || 0) >= maxFoamBounces) return false;
+        if ((projectile.foamBounces || 0) >= rocketRuntime.foamBounceMaxCount) return false;
         if ((projectile.foamBounceCooldown || 0) > 0) return false;
 
         this._tmpVec.copy(projectile.velocity);
         const speed = this._tmpVec.length();
-        if (speed <= 0.0001) return false;
+        if (speed <= rocketRuntime.homingSpeedEpsilon) return false;
 
         this._tmpVec2.copy(collisionInfo.normal).normalize();
         if (this._tmpVec.dot(this._tmpVec2) >= 0) {
@@ -121,17 +153,20 @@ export class ProjectileSimulationOps {
         }
 
         this._tmpVec.normalize().reflect(this._tmpVec2);
-        this._tmpVec.addScaledVector(this._tmpVec2, 0.08).normalize();
-        projectile.velocity.copy(this._tmpVec.multiplyScalar(speed * 1.02));
+        this._tmpVec.addScaledVector(this._tmpVec2, rocketRuntime.foamBounceNormalBias).normalize();
+        projectile.velocity.copy(this._tmpVec.multiplyScalar(speed * rocketRuntime.foamBounceSpeedMultiplier));
 
-        projectile.position.addScaledVector(this._tmpVec2, Math.max(0.2, projectile.radius * 1.25));
+        projectile.position.addScaledVector(
+            this._tmpVec2,
+            Math.max(rocketRuntime.foamBouncePositionMinOffset, projectile.radius * rocketRuntime.foamBouncePositionRadiusScale)
+        );
         projectile.mesh.position.copy(projectile.position);
         this._tmpVec.addVectors(projectile.position, projectile.velocity);
         projectile.mesh.lookAt(this._tmpVec);
 
         projectile.foamBounces = (projectile.foamBounces || 0) + 1;
-        projectile.foamBounceCooldown = 0.045;
-        projectile.ttl = Math.max(0, projectile.ttl - 0.02);
+        projectile.foamBounceCooldown = rocketRuntime.foamBounceCooldown;
+        projectile.ttl = Math.max(0, projectile.ttl - rocketRuntime.foamBounceTtlPenalty);
 
         this.system?.onProjectileHit?.(projectile.position, 0x34d399, projectile.owner, projectile);
         return true;
@@ -139,6 +174,7 @@ export class ProjectileSimulationOps {
 
     stepProjectile(projectile, index, dt, arena, players, trailSpatialIndex, time) {
         const config = getActiveRuntimeConfig(CONFIG);
+        const rocketRuntime = resolveRocketRuntime(config);
         projectile.foamBounceCooldown = Math.max(0, (projectile.foamBounceCooldown || 0) - dt);
 
         const vx = projectile.velocity.x * dt;
@@ -159,7 +195,7 @@ export class ProjectileSimulationOps {
             : null;
         if (portalResult) {
             projectile.position.copy(portalResult.target);
-            this._tmpVec.copy(projectile.velocity).normalize().multiplyScalar(1.5);
+            this._tmpVec.copy(projectile.velocity).normalize().multiplyScalar(rocketRuntime.portalExitForwardOffset);
             projectile.position.add(this._tmpVec);
             projectile.mesh.position.copy(projectile.position);
         }
@@ -175,7 +211,10 @@ export class ProjectileSimulationOps {
             );
             if (!currentTarget || projectile.homingReacquireTimer <= 0) {
                 projectile.target = this.acquireHomingTarget(projectile, players, trailSpatialIndex);
-                projectile.homingReacquireTimer = Math.max(0.04, Number(projectile.homingReacquireInterval || 0.12));
+                projectile.homingReacquireTimer = Math.max(
+                    rocketRuntime.homingMinReacquireInterval,
+                    Number(projectile.homingReacquireInterval || rocketRuntime.homingReacquireInterval)
+                );
             }
         }
 
@@ -192,7 +231,10 @@ export class ProjectileSimulationOps {
                 this._tmpVec.normalize();
                 this._tmpVec2.copy(projectile.velocity);
                 const speed = this._tmpVec2.length();
-                const turnRate = Math.max(0.1, Number(projectile.homingTurnRate || config?.HOMING?.TURN_RATE || CONFIG?.HOMING?.TURN_RATE));
+                const turnRate = Math.max(
+                    rocketRuntime.homingMinTurnRate,
+                    Number(projectile.homingTurnRate || config?.HOMING?.TURN_RATE || CONFIG?.HOMING?.TURN_RATE)
+                );
                 this._tmpVec2.normalize().lerp(this._tmpVec, Math.min(turnRate * dt, 1.0)).normalize();
                 projectile.velocity.copy(this._tmpVec2.multiplyScalar(speed));
                 this._tmpVec.addVectors(projectile.position, projectile.velocity);
@@ -201,7 +243,9 @@ export class ProjectileSimulationOps {
         }
 
         if (projectile.flame) {
-            const flicker = 0.7 + Math.sin(time * 30 + index * 7) * 0.3;
+            const flicker = rocketRuntime.flameFlickerBase
+                + Math.sin(time * rocketRuntime.flameFlickerSpeed + index * rocketRuntime.flameFlickerIndexPhase)
+                * rocketRuntime.flameFlickerAmplitude;
             projectile.flame.scale.set(1, 1, flicker);
         }
 
