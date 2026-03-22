@@ -1,27 +1,35 @@
-# Anleitung: GitHub Branch Protection aktivieren
+# GitHub Branch Protection Anleitung
 
-Um den `main`-Branch deines GitHub-Repositories vollständig abzusichern und zu verhindern, dass fehlerhafter Code gemerged wird, musst du die sogenannten "Branch Protection Rules" direkt auf GitHub konfigurieren.
+Stand: 2026-03-22
 
-Diese Schritte können nur von einem Repository-Admin (also dir) im Browser durchgeführt werden:
+Ziel: `main` absichern, ohne den lokalen Main-First-Workflow zu brechen.
 
-1. **Öffne GitHub:** Gehe zu deinem Projekt auf [github.com](github.com).
-2. **Settings öffnen:** Klicke oben rechts auf den Reiter **`Settings`** (Zahnrad-Symbol).
-3. **Branches wählen:** Wähle im linken Menü unter "Code and automation" den Menüpunkt **`Branches`**.
-4. **Regel hinzufügen:** Klicke in der Mitte auf den Button **`Add branch protection rule`** (Oder "Edit" neben einer bestehenden Regel für `main`).
-5. **Branch markieren:** Trage unter **"Branch name pattern"** genau `main` (oder `master`, je nachdem wie dein Haupt-Branch heißt) ein.
+## Profil A (empfohlen fuer dieses Repo): Direct Push auf `main` mit harten Checks
 
-### Die wichtigsten Haken aktivieren:
+Dieses Profil passt zur aktuellen lokalen Absicherung (`guard:main`, Husky-Hooks, Snapshot-Tags).
 
-*   [x] **Require a pull request before merging:** 
-    *Niemand darf mehr direkt auf `main` pushen. Jede Änderung muss über einen PR (Pull Request) kommen.*
-*   [x] (Optional aber empfohlen) **Require approvals:** 
-    *Mindestens 1 Person muss den Code absegnen, bevor er gemerged werden darf.*
-*   [x] **Require status checks to pass before merging:**
-    *Das ist der wichtigste Haken für die CI-Pipeline. Erst wenn alle automatischen Tests grün sind, darf der Code rein.*
-    * **Wichtig:** Sobald dieser Haken gesetzt ist, erscheint ein Suchfeld. Suche darin nach `build-and-test` (das ist der Name des Jobs aus unser neuen `.github/workflows/ci.yml`) und wähle ihn aus.
-*   [x] **Do not allow bypassing the above settings:** 
-    *Auch Admins (wie du) müssen sich an diese Regeln halten. Dies verhindert versehentliche Overrides.*
+1. GitHub Repo oeffnen -> `Settings` -> `Branches`.
+2. Rule fuer `main` anlegen (`Branch name pattern: main`).
+3. Aktivieren:
+   - `Require status checks to pass before merging`
+   - `Require branches to be up to date before merging` (optional, aber empfohlen)
+   - `Do not allow bypassing the above settings`
+4. Unter required checks mindestens den CI-Job `build-and-test` auswaehlen.
+5. Optional: `Restrict who can push to matching branches` aktivieren und nur Owner/Bot-Accounts erlauben.
+6. Speichern.
 
-6. **Speichern:** Ganz unten auf **`Save changes`** klicken.
+## Profil B (optional): PR-Pflicht statt Direct Push
 
-**Fertig!** Dein Repository ist nun gegen ungetesteten Code und direkte Pushes auf den Haupt-Branch abgesichert.
+Nur nutzen, wenn Team-Review zwingend ueber Pull Requests laufen soll.
+
+1. In derselben Rule zusaetzlich aktivieren:
+   - `Require a pull request before merging`
+   - `Require approvals` (mindestens 1)
+2. Lokal bleibt `guard:main` aktiv; gearbeitet wird dann auf Feature-Branches mit expliziter Freigabe.
+
+## Wichtige Hinweise zur lokalen Absicherung
+
+- Hooks blockieren Commits/Pushes ausserhalb von `main` (`npm run guard:main`).
+- Vor Push auf `main` wird ein lokales Recovery-Tag erzeugt (`npm run snapshot:tag`).
+- `.husky/.bypass` ist absichtlich nicht mehr versioniert und bleibt lokal.
+- Fuer seltene Ausnahmen ausserhalb `main` nur explizit und temporar: `ALLOW_NON_MAIN=1 <command>`.

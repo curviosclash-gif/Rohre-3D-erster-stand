@@ -21,6 +21,7 @@ This file defines repository-specific operating rules for Codex.
 - For non-destructive design decisions, proceed proactively with a short rationale.
 - Keep docs/workflows/rules in sync with code and test reality after each change.
 - Bot training planning source of truth is `docs/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
+- Future bot-training windows and KPI corridor are maintained in `docs/Bot_Trainings_Roadmap.md` and referenced from `docs/Bot_Trainingsplan.md`.
 
 ## Workflow Selection
 
@@ -47,7 +48,11 @@ This file defines repository-specific operating rules for Codex.
 ## Git Safety
 
 - Never use destructive git operations without explicit user approval.
+- `main` is the default working branch; run `npm run guard:main` before commits/pushes (hooks enforce this too).
+- Non-main work needs explicit user approval and temporary `ALLOW_NON_MAIN=1` for that scoped command.
 - Use scoped staging (`git add [scoped-files]`) and verify scope via `git diff --name-only` before push.
+- Keep `.husky/.bypass` local-only and untracked.
+- Create a local recovery tag via `npm run snapshot:tag` before push on `main`.
 - Keep commits atomic and use `git commit --amend` for immediate small corrections in the same task.
 
 ## UI Changes

@@ -6,6 +6,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 
 // turbo
 - `git pull --rebase`
+- `npm run guard:main`
 - Read `docs/Umsetzungsplan.md`.
 - For bot-training scope also read `docs/Bot_Trainingsplan.md` and treat it as selected master plan.
 - `git log -n 5 --oneline`.
@@ -23,6 +24,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 
 ```bash
 git pull --rebase
+npm run guard:main
 # lock setzen im ausgewaehlten Masterplan
 git add [masterplan-datei]
 git commit -m "chore: Bot-X claims Block VXX"
@@ -55,6 +57,7 @@ git push
 - `npm run plan:check`
 - `npm run docs:sync && npm run docs:check`
 - Commit scoped updates.
+- Before push on `main`: `npm run snapshot:tag`
 
 ## 5. Release block
 
@@ -62,6 +65,7 @@ git push
 - Clear own ownership rows if no longer needed.
 - `npm run plan:check`
 - Commit: `chore: Bot-X releases Block VXX` (update selected master plan file)
+- Before push on `main`: `npm run snapshot:tag`
 
 ## Report
 

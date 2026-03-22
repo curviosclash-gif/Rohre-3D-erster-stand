@@ -4,6 +4,7 @@ Stand: 2026-03-22
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
+Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`.
 
 ## Status-Legende
 
@@ -31,7 +32,8 @@ Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
 | Block | Depends-On | Typ | Erfuellt | Hinweis |
 | --- | --- | --- | --- | --- |
 | BT10 | - | soft | ja | Operatorlauf kann isoliert laufen |
-| BT20 | BT10 Baseline-Laufdaten | hard | teilweise | BT10 in Arbeit |
+| BT15 | BT10 Baseline-Laufdaten | soft | ja | Zukunftsplanung nutzt aktuelle Lauf-KPIs |
+| BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | teilweise | BT10 in Arbeit, BT15 aktiv |
 | BT30 | 20.9 | hard | nein | startet erst nach Survival-Policy-Phase |
 | BT40 | 30.9 | hard | nein | Eval/Gate-Haertung nach Curriculum/Hyperparameter |
 
@@ -51,6 +53,7 @@ Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
 | Train-Ops | BT10 | 2026-03-22 | active | 2026-03-22 |
+| Train-Ops | BT15 | 2026-03-22 | active | 2026-03-24 |
 | Bot-A | BT20 | 2026-03-22 | frei | - |
 | Bot-B | BT30 | 2026-03-22 | frei | - |
 | Bot-C | BT40 | 2026-03-22 | frei | - |
@@ -88,6 +91,13 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_12h.md`
 - [ ] 10.2.1 Alle 2h `bot:validate` refreshen und Report in Run-Ordner pinnen
 - [ ] 10.2.2 Survival-KPI-Delta (`avgStepsPerEpisode`, `averageBotSurvival`) pro Checkpoint protokollieren
 
+### Checkpoint-Log BT10 (laufend)
+
+| Datum | Typ | RunStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs Baseline | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-03-22 | Baseline | `20260321T180755Z-r01` | `123.799` | `31.908458` | `0.247460` | Referenz | `data/training/runs/20260321T180755Z-r01/run.json` |
+| 2026-03-22 | Zwischenstand | `20260322T023812Z-r4344` | `124.138` | `null` | `0.000000` | `+0.274%` (`+0.339`) | `data/training/runs/20260322T023812Z-r4344/run.json` |
+
 ### 10.9 Abschluss-Gate
 
 - [ ] 10.9.1 Finales `run -> eval -> gate` plus `bot:validate` mit passendem Report abschliessen
@@ -100,6 +110,44 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_12h.md`
 | Langlauf stoppt durch Timeout/Backpressure | hoch | Train-Ops | Guarded retries + Zwischencheck alle 2h | Unvollstaendige Laufserie |
 | KPI-Drift trotz gruenem Gate | mittel | Train-Ops | KPI-Deltas je Checkpoint protokollieren | Survival sinkt trotz Pass |
 | Artefakt-Luecken bei Resume | mittel | Trainer | latest/series pointers nach jedem Schritt pruefen | fehlende eval/gate Dateien |
+
+---
+
+## Block BT15: Zukunfts-Roadmap Survival (Q2)
+
+Plan-Datei: `docs/Bot_Trainings_Roadmap.md`
+
+<!-- LOCK: Bot-TrainOps seit 2026-03-22 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT15-Phasen inkl. 15.9.* sind abgeschlossen.
+- [ ] DoD.2 C1-C6 Zeitfenster, KPI-Zielkorridor und Entscheidungsregeln sind final dokumentiert.
+- [ ] DoD.3 Woechentliche Re-Planung ist an BT10-Checkpoint-Log und Weekly Review gekoppelt.
+- [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
+
+### 15.1 Baseline und Zielkorridor
+
+- [x] 15.1.1 Baseline-Snapshot aus Trainingsartefakten in Roadmap dokumentieren (abgeschlossen: 2026-03-22; evidence: update roadmap baseline -> docs/Bot_Trainings_Roadmap.md)
+- [x] 15.1.2 KPI-Zielkorridor und Trainingszyklen C1-C6 festlegen (abgeschlossen: 2026-03-22; evidence: define cycles/targets -> docs/Bot_Trainings_Roadmap.md)
+
+### 15.2 Operative Verzahnung BT10-BT40
+
+- [x] 15.2.1 Promotion-/Rollback-Regeln fuer zyklische Trainingsfenster definieren (abgeschlossen: 2026-03-22; evidence: add promotion rollback rules -> docs/Bot_Trainings_Roadmap.md)
+- [/] 15.2.2 Woechentliche Re-Planung in BT10-Checkpoint-Log und Weekly Review verankern
+
+### 15.9 Abschluss-Gate
+
+- [ ] 15.9.1 Ersten kompletten Zyklus (C1) mit KPI-Delta dokumentieren
+- [ ] 15.9.2 KW13-Roadmap-Review abschliessen und Lock auf `frei` setzen
+
+### Risiko-Register BT15
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Roadmap driftet von realen KPI-Trends weg | mittel | Train-Ops | weekly KPI checkpoint + zyklusweise Re-Baselining | Zielkorridor wird 2 Zyklen in Folge verfehlt |
+| Ueberoptimistische Zielwerte ohne Gate-Stabilitaet | hoch | Train-Ops/RL | harte Promotion-Regeln + rollback Pflicht | kurzfristige KPI-Spitze ohne Reproduzierbarkeit |
+| Plan bleibt statisch trotz neuer Artefakte | mittel | Train-Ops | BT10 Checkpoint-Log als Pflichtinput fuer BT15 updates | keine Roadmap-Aktualisierung nach Langlauf |
 
 ---
 
@@ -242,7 +290,7 @@ Stand: 2026-03-22
 - Naechste 3 Ziele:
   1. BT10.2.1 periodische `bot:validate` Reports sichern.
   2. BT10.2.2 KPI-Deltas pro Checkpoint dokumentieren.
-  3. BT10.9.1 finales Run/Eval/Gate Paket abschliessen.
+  3. BT15.2.2 woechentliche Roadmap-Replanung gegen Checkpoint-Log verankern.
 - Groesstes Risiko: Laufartefakte unvollstaendig bei langen Resume-Ketten.
 - Entscheidungsbedarf: feste 2h-Validierungszeitfenster und Owner festlegen.
 

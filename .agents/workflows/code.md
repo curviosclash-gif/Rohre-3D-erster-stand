@@ -8,6 +8,7 @@ description: Implement a planned change from coding to verification and commit.
 - Read `docs/Umsetzungsplan.md`.
 - For bot-training scope also read `docs/Bot_Trainingsplan.md` and keep training planning there.
 - `git log -n 3 --oneline`.
+- `npm run guard:main`.
 - If available, use `docs/Feature_*.md` for scope.
 
 ## 1. Scope
@@ -45,8 +46,10 @@ description: Implement a planned change from coding to verification and commit.
 
 ## 5. Commit (see AGENTS.md section Commit Convention)
 
+- `npm run guard:main`
 - `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`
 - Verify scope: `git diff --name-only`.
+- Before push on `main`: `npm run snapshot:tag`.
 - In parallel-agent scenarios, never stage unrelated files.
 
 ## Report

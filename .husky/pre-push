@@ -3,8 +3,14 @@ if [ -f ".husky/.bypass" ]; then
   exit 0
 fi
 
-echo "Running docs:sync (Timestamps aktualisieren)..."
-npm run docs:sync
+npm run guard:main
+
+echo "Running plan and docs gates..."
+npm run plan:check
+npm run docs:check
 
 echo "Architektur-Lint pruefen..."
 npm run lint:architecture
+
+echo "Creating auto snapshot tag..."
+npm run snapshot:tag

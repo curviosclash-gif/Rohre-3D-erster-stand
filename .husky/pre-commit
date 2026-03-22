@@ -3,7 +3,15 @@ if [ -f ".husky/.bypass" ]; then
   exit 0
 fi
 
-# Lock-Protokoll nur im Bot-Mode pruefen (mode:bot aktiv = kein .bypass)
+npm run guard:main
+
+# Plan governance check only when relevant files are staged.
+if git diff --cached --name-only | grep -Eq "^(docs/(Umsetzungsplan|Bot_Trainingsplan)\.md|\.agents/(workflows|rules)/|AGENTS\.md|scripts/validate-umsetzungsplan\.mjs|package\.json)$"; then
+  echo "Running plan:check for staged governance files..."
+  npm run plan:check
+fi
+
+# Lock protocol check in explicit bot mode.
 if [ -n "$BOT_MODE" ]; then
   echo "Pruefe Lock-Protokoll (Bot-Mode)..."
   node scripts/verify-lock.mjs

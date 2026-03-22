@@ -7,6 +7,7 @@ description: Verify docs/workflows/rules are current with an automated gate.
 // turbo
 - Read `docs/Umsetzungsplan.md`, `docs/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/Testergebnisse_*.md`.
 - `git log -n 5 --oneline`.
+- `npm run guard:main`.
 
 ## 1. Inventory
 

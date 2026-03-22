@@ -6,9 +6,11 @@ description: Plan and execute bot-training work outside the general Umsetzungspl
 
 // turbo
 - Read `docs/Bot_Trainingsplan.md` (primary source).
+- Read `docs/Bot_Trainings_Roadmap.md` for long-horizon cycle targets.
 - Read `docs/Umsetzungsplan.md` only for cross-plan dependencies.
 - `git log -n 5 --oneline`.
 - Review latest artifacts in `data/training/runs/` and `data/training/series/`.
+- `npm run guard:main`.
 - `npm run plan:check`.
 
 ## 1. Scope and ownership
@@ -20,6 +22,7 @@ description: Plan and execute bot-training work outside the general Umsetzungspl
   - training tests/docs
 - Keep bot-training phases out of `docs/Umsetzungsplan.md`.
 - Use only `docs/Bot_Trainingsplan.md` for block/phase tracking.
+- If future windows/quarter targets change, update `docs/Bot_Trainings_Roadmap.md` and mirror actionable status in `docs/Bot_Trainingsplan.md`.
 
 ## 2. Claim block
 
@@ -29,6 +32,7 @@ description: Plan and execute bot-training work outside the general Umsetzungspl
 
 ```bash
 git pull --rebase
+npm run guard:main
 # lock setzen im Bot-Trainingsplan
 git add docs/Bot_Trainingsplan.md
 git commit -m "chore: Bot-X claims BT block"
@@ -61,6 +65,7 @@ git push
 - Keep gate invariant valid (`*.99` only after all earlier phases are done).
 - Remove `implementation_plan.md`.
 - Commit scoped changes.
+- Before push on `main`: `npm run snapshot:tag`.
 - When block is complete, release lock back to `frei`.
 
 ## 6. Mandatory closure checks

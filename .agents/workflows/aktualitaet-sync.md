@@ -7,6 +7,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 // turbo
 - Read `docs/Umsetzungsplan.md`, `docs/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/Testergebnisse_*.md`.
 - `git log -n 5 --oneline`.
+- `npm run guard:main`.
 
 ## 1. Auto-sync
 
@@ -27,8 +28,10 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 ## 4. Commit
 
+- `npm run guard:main`
 - `git add docs/ .agents/ scripts/validate-umsetzungsplan.mjs package.json` (only what changed)
 - `git commit -m "docs: sync documentation and plan governance"`
+- Before push on `main`: `npm run snapshot:tag`
 
 ## 5. Optional reality checks
 

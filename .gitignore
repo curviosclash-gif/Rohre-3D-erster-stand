@@ -37,3 +37,7 @@ videos/
 implementation_plan.md
 *.timestamp-*.mjs
 Fotos-*.zip
+.husky/.bypass
+.playwright-suite.lock
+.playwright-start.lock
+.codex_tmp/
