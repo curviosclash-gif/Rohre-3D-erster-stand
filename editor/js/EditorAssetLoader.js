@@ -8,6 +8,9 @@ export class EditorAssetLoader {
         this.loadStatus = new Map();
         this.warnedMissingAssets = new Set();
         this.timeoutMs = Number.isFinite(options.timeoutMs) && options.timeoutMs > 0 ? options.timeoutMs : 8000;
+        this.maxConcurrentLoads = Number.isFinite(options.maxConcurrentLoads) && options.maxConcurrentLoads > 0
+            ? Math.max(1, Math.trunc(options.maxConcurrentLoads))
+            : 8;
         this.onStatus = typeof options.onStatus === 'function' ? options.onStatus : null;
 
         // Items & Categories that have an OBJ model
@@ -226,22 +229,18 @@ export class EditorAssetLoader {
     _loadModelWithTimeout(id, url) {
         return new Promise((resolve) => {
             let settled = false;
-            const finalize = (status, object = null, error = null) => {
-                if (settled) return;
-                settled = true;
-                clearTimeout(timeoutHandle);
+            let timedOut = false;
 
-                if (status === 'loaded' && object) {
-                    this._prepareLoadedObject(id, object);
-                    this.cache.set(id, object);
-                    this.loadStatus.set(id, {
-                        state: 'loaded',
-                        url
-                    });
-                    resolve({ id, status: 'loaded' });
-                    return;
-                }
+            const resolveLoaded = (object) => {
+                this._prepareLoadedObject(id, object);
+                this.cache.set(id, object);
+                this.loadStatus.set(id, {
+                    state: 'loaded',
+                    url
+                });
+            };
 
+            const resolveFailure = (status, error = null) => {
                 const failureReason = status === 'timeout' ? 'timeout' : 'error';
                 this._createAndCachePlaceholder(id, failureReason);
                 this.loadStatus.set(id, {
@@ -254,20 +253,64 @@ export class EditorAssetLoader {
                     ? `Timeout while loading "${id}" (${this.timeoutMs}ms). Placeholder is used.`
                     : `Failed to load "${id}" from "${url}". Placeholder is used.`;
                 this._emitStatus('warn', msg, { id, url, error: error?.message || String(error || '') });
+            };
+
+            const finalize = (status, object = null, error = null) => {
+                if (settled) return;
+                settled = true;
+                clearTimeout(timeoutHandle);
+                if (status === 'loaded' && object) {
+                    resolveLoaded(object);
+                    resolve({ id, status: 'loaded' });
+                    return;
+                }
+                resolveFailure(status, error);
                 resolve({ id, status, error });
             };
 
             const timeoutHandle = setTimeout(() => {
+                timedOut = true;
                 finalize('timeout', null, new Error(`Asset load timeout after ${this.timeoutMs}ms`));
             }, this.timeoutMs);
 
             this.loader.load(
                 url,
-                (object) => finalize('loaded', object),
+                (object) => {
+                    if (timedOut) {
+                        // Soft timeouts stay non-fatal: a late success must replace placeholder cache state.
+                        resolveLoaded(object);
+                        return;
+                    }
+                    finalize('loaded', object);
+                },
                 undefined,
-                (error) => finalize('error', null, error)
+                (error) => {
+                    if (timedOut) return;
+                    finalize('error', null, error);
+                }
             );
         });
+    }
+
+    async _runWithConcurrency(entries, task) {
+        const safeEntries = Array.isArray(entries) ? entries : [];
+        if (safeEntries.length === 0) return [];
+        const workerCount = Math.max(1, Math.min(this.maxConcurrentLoads, safeEntries.length));
+        const results = new Array(safeEntries.length);
+        let cursor = 0;
+
+        const worker = async () => {
+            while (true) {
+                const currentIndex = cursor;
+                if (currentIndex >= safeEntries.length) return;
+                cursor += 1;
+                results[currentIndex] = await task(safeEntries[currentIndex], currentIndex);
+            }
+        };
+
+        const workers = new Array(workerCount).fill(null).map(() => worker());
+        await Promise.all(workers);
+        return results;
     }
 
     async loadAll() {
@@ -279,7 +322,10 @@ export class EditorAssetLoader {
         ];
 
         this._emitStatus('info', `Loading ${allEntries.length} 3D assets...`);
-        const results = await Promise.all(allEntries.map((entry) => this._loadModelWithTimeout(entry.id, entry.url)));
+        const results = await this._runWithConcurrency(
+            allEntries,
+            (entry) => this._loadModelWithTimeout(entry.id, entry.url)
+        );
 
         const loaded = results.filter((entry) => entry.status === 'loaded').length;
         const timedOut = results.filter((entry) => entry.status === 'timeout').length;

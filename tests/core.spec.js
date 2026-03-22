@@ -934,6 +934,247 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.hostBtnVisible).toBe(true);
     });
 
+    test('T41c: MenuMultiplayerBridge akzeptiert Runtime-DI ohne implizite Browser-Globals', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const { MenuMultiplayerBridge } = await import('/src/ui/menu/MenuMultiplayerBridge.js');
+
+            const createMemoryStorage = () => {
+                const store = new Map();
+                return {
+                    getItem(key) {
+                        return store.has(key) ? store.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        store.set(key, String(value));
+                    },
+                    removeItem(key) {
+                        store.delete(key);
+                    },
+                };
+            };
+
+            const listeners = new Map();
+            let addCalls = 0;
+            let removeCalls = 0;
+            const eventTarget = {
+                addEventListener(type, handler) {
+                    addCalls += 1;
+                    const entries = listeners.get(type) || [];
+                    entries.push(handler);
+                    listeners.set(type, entries);
+                },
+                removeEventListener(type, handler) {
+                    removeCalls += 1;
+                    const entries = listeners.get(type) || [];
+                    listeners.set(type, entries.filter((entry) => entry !== handler));
+                },
+            };
+
+            const intervals = new Map();
+            const timeouts = new Map();
+            let intervalCount = 0;
+            let timeoutCount = 0;
+            let clearIntervalCount = 0;
+            let clearTimeoutCount = 0;
+            let intervalCursor = 0;
+            let timeoutCursor = 0;
+
+            const runtime = {
+                eventTarget,
+                createBroadcastChannel: () => null,
+                setInterval(fn) {
+                    intervalCount += 1;
+                    const id = `i-${++intervalCursor}`;
+                    intervals.set(id, fn);
+                    return id;
+                },
+                clearInterval(id) {
+                    clearIntervalCount += 1;
+                    intervals.delete(id);
+                },
+                setTimeout(fn) {
+                    timeoutCount += 1;
+                    const id = `t-${++timeoutCursor}`;
+                    timeouts.set(id, fn);
+                    return id;
+                },
+                clearTimeout(id) {
+                    clearTimeoutCount += 1;
+                    timeouts.delete(id);
+                },
+                now: () => 1700000000000,
+                random: () => 0.123456789,
+            };
+
+            const sharedStorage = createMemoryStorage();
+            const hostBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-host',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime,
+            });
+            const clientBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-client',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime,
+            });
+
+            const hostResult = hostBridge.host({ actorId: 'host', lobbyCode: 'qa-lobby' });
+            const joinResult = clientBridge.join({ actorId: 'client', lobbyCode: 'qa-lobby' });
+            hostBridge.toggleReady({ ready: true });
+            clientBridge.toggleReady({ ready: true });
+            const startResult = hostBridge.requestMatchStart({
+                settingsSnapshot: { mapKey: 'maze' },
+            });
+
+            hostBridge.dispose();
+            clientBridge.dispose();
+
+            return {
+                hostOk: hostResult?.ok === true,
+                joinOk: joinResult?.ok === true,
+                startOk: startResult?.ok === true,
+                commandId: String(startResult?.commandId || ''),
+                addCalls,
+                removeCalls,
+                remainingStorageListeners: (listeners.get('storage') || []).length,
+                remainingUnloadListeners: (listeners.get('beforeunload') || []).length,
+                intervalCount,
+                clearIntervalCount,
+                timeoutCount,
+                clearTimeoutCount,
+            };
+        });
+
+        expect(result.hostOk).toBe(true);
+        expect(result.joinOk).toBe(true);
+        expect(result.startOk).toBe(true);
+        expect(result.commandId.startsWith('match-')).toBe(true);
+        expect(result.addCalls).toBeGreaterThanOrEqual(4);
+        expect(result.removeCalls).toBeGreaterThanOrEqual(4);
+        expect(result.remainingStorageListeners).toBe(0);
+        expect(result.remainingUnloadListeners).toBe(0);
+        expect(result.intervalCount).toBeGreaterThanOrEqual(2);
+        expect(result.clearIntervalCount).toBeGreaterThanOrEqual(2);
+        expect(result.timeoutCount).toBeGreaterThanOrEqual(1);
+        expect(result.clearTimeoutCount).toBeGreaterThanOrEqual(1);
+    });
+
+    test('T41d: MenuMultiplayerPanel nutzt Discovery/Host-IP Ports via DI ohne window.curviosApp', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const mod = await import('/src/ui/menu/MenuMultiplayerPanel.js');
+            const calls = {
+                start: 0,
+                stop: 0,
+                getHosts: 0,
+                subscribe: 0,
+                unsubscribe: 0,
+                resolveHostIp: 0,
+            };
+
+            const sessionState = {
+                joined: true,
+                memberCount: 1,
+                readyCount: 0,
+                allReady: false,
+                localReady: false,
+                canStart: false,
+                lobbyCode: 'QA-DI',
+                members: [{
+                    peerId: 'peer-host',
+                    actorId: 'Host',
+                    ready: false,
+                    isHost: true,
+                    isLocal: true,
+                }],
+            };
+            const bridge = {
+                host: () => ({ ok: true }),
+                join: () => ({ ok: true }),
+                leave: () => {},
+                toggleReady: () => {},
+                requestMatchStart: () => ({ ok: false }),
+                getSessionState: () => ({ ...sessionState }),
+            };
+            const discoveryPort = {
+                isAvailable: () => true,
+                start: () => { calls.start += 1; },
+                stop: () => { calls.stop += 1; },
+                getHosts: async () => {
+                    calls.getHosts += 1;
+                    return [{
+                        hostName: 'QA Host',
+                        ip: '10.0.0.12',
+                        port: 9090,
+                        lobbyCode: 'QA-DI',
+                        playerCount: 1,
+                    }];
+                },
+                subscribe: () => {
+                    calls.subscribe += 1;
+                    return () => { calls.unsubscribe += 1; };
+                },
+            };
+            const hostIpResolver = {
+                resolve: async () => {
+                    calls.resolveHostIp += 1;
+                    return '10.0.0.12';
+                },
+            };
+
+            const container = document.createElement('div');
+            document.body.appendChild(container);
+            const panel = mod.createMultiplayerPanel({
+                bridge,
+                container,
+                canHost: true,
+                discoveryPort,
+                hostIpResolver,
+            });
+
+            container.querySelector('.mp-join-btn')?.click();
+            await Promise.resolve();
+            await Promise.resolve();
+            const hostEntryVisible = !!container.querySelector('.mp-discovery-host');
+
+            container.querySelector('.mp-back-btn')?.click();
+            const discoveryClosed = !!container.querySelector('.mp-host-btn');
+
+            container.querySelector('.mp-host-btn')?.click();
+            await Promise.resolve();
+            await Promise.resolve();
+            const ipText = String(container.querySelector('.mp-ip-value')?.textContent || '');
+
+            panel.dispose();
+            const panelRemoved = !container.firstChild;
+            container.remove();
+
+            return {
+                ...calls,
+                hostEntryVisible,
+                discoveryClosed,
+                ipText,
+                panelRemoved,
+            };
+        });
+
+        expect(result.start).toBe(1);
+        expect(result.stop).toBeGreaterThanOrEqual(1);
+        expect(result.getHosts).toBe(1);
+        expect(result.subscribe).toBe(1);
+        expect(result.unsubscribe).toBe(1);
+        expect(result.resolveHostIp).toBeGreaterThanOrEqual(1);
+        expect(result.hostEntryVisible).toBe(true);
+        expect(result.discoveryClosed).toBe(true);
+        expect(result.ipText).toBe('10.0.0.12');
+        expect(result.panelRemoved).toBe(true);
+    });
+
     test('T20e: Open-Preset speichert Metadatenvertrag vollstaendig', async ({ page }) => {
         await loadGame(page);
         await page.evaluate((storageKey) => localStorage.removeItem(storageKey), MENU_PRESETS_STORAGE_KEY);

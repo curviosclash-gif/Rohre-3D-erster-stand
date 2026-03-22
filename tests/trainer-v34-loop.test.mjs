@@ -89,3 +89,39 @@ test('V36 training loop forwards long-run timeout flags to training-run', async 
         await restoreFile(LATEST_INDEX_PATH, latestBefore);
     }
 });
+
+test('V50 training loop stops once duration budget is reached', async () => {
+    const seriesStamp = `TEST_LOOP_DURATION_${Date.now()}`;
+    const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
+    try {
+        await execFileAsync(process.execPath, [
+            'scripts/training-loop.mjs',
+            '--series-stamp', seriesStamp,
+            '--runs', '5',
+            '--duration-ms', '1',
+            '--with-trainer-server', 'false',
+            '--write-latest', 'false',
+            '--bridge-mode', 'local',
+            '--resume-checkpoint', 'latest',
+            '--resume-strict', 'false',
+            '--episodes', '1',
+            '--seeds', '3',
+            '--modes', 'classic-3d',
+            '--max-steps', '8',
+        ]);
+
+        const artifactRaw = await readFile(`data/training/series/${seriesStamp}/loop.json`, 'utf8');
+        const artifact = JSON.parse(artifactRaw);
+        const latestAfter = await readFileIfExists(LATEST_INDEX_PATH);
+        assert.equal(artifact.ok, true);
+        assert.equal(artifact.durationBudgetMs, 1);
+        assert.equal(artifact.stopReason, 'duration-budget-reached');
+        assert.equal(artifact.summary.durationBudgetMs, 1);
+        assert.equal(artifact.summary.stopReason, 'duration-budget-reached');
+        assert.equal(artifact.summary.durationBudgetReached, true);
+        assert.equal(artifact.summary.runsExecuted, 1);
+        assert.equal(latestAfter, latestBefore);
+    } finally {
+        await restoreFile(LATEST_INDEX_PATH, latestBefore);
+    }
+});

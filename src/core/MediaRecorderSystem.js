@@ -1,7 +1,12 @@
 import * as Mp4MuxerModule from 'mp4-muxer';
+import {
+    MATCH_LIFECYCLE_CONTRACT_VERSION,
+    MATCH_LIFECYCLE_EVENT_TYPES,
+} from '../shared/contracts/MatchLifecycleContract.js';
+import { toFiniteNumber } from '../utils/MathOps.js';
 const Mp4Muxer = Mp4MuxerModule;
 
-const DEFAULT_CONTRACT_VERSION = 'lifecycle.v1';
+const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
 const DEFAULT_MIME_TYPE = 'video/mp4';
 const DEFAULT_FALLBACK_MIME_TYPE = 'video/webm';
 const WEB_CODECS_CODEC = 'avc1.4d002a';
@@ -33,12 +38,7 @@ const MAX_CAPTURE_BACKLOG_STEPS = 2;
 const MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS = 22;
 const MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS = 38;
 
-export const LIFECYCLE_EVENT_TYPES = Object.freeze({
-    MATCH_STARTED: 'match_started',
-    MATCH_ENDED: 'match_ended',
-    MENU_OPENED: 'menu_opened',
-    RECORDING_REQUESTED: 'recording_requested',
-});
+export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
 
 function toSafeDatePart(value) {
     const date = value instanceof Date ? value : new Date(value);
@@ -89,11 +89,6 @@ function resolvePerfNow(globalScope) {
         return () => perfNow.call(scope.performance);
     }
     return () => Date.now();
-}
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
 }
 
 function toPositiveInt(value, fallback, min = 1, max = 1_000_000) {

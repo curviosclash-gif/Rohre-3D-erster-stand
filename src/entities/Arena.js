@@ -134,13 +134,23 @@ export class Arena {
         return Array.isArray(this.currentMapDefinition?.items) ? this.currentMapDefinition.items : [];
     }
 
-    build(mapKey) {
+    syncAuthoredAircraftDecorations() {
+        this._buildAuthoredAircraftDecorations(this.currentMapDefinition);
+    }
+
+    build(mapKey, options = {}) {
+        const includeAuthoredAircraft = options?.includeAuthoredAircraft !== false;
         const buildContext = this._builder.build(mapKey, {
             previousBuildSignature: this._lastBuildSignature,
         });
         this.currentMapDefinition = buildContext.map || null;
 
         if (buildContext.rebuildPolicy === 'reuse') {
+            if (includeAuthoredAircraft) {
+                this._buildAuthoredAircraftDecorations(buildContext.map);
+            } else {
+                this._clearAuthoredAircraftDecorations();
+            }
             return buildContext;
         }
 
@@ -160,7 +170,11 @@ export class Arena {
 
             this._builder.geometryPipeline.flushMergeStage(buildContext.materialBundle);
             this._portalGateSystem.build(buildContext.map, buildContext.scale);
-            this._buildAuthoredAircraftDecorations(buildContext.map);
+            if (includeAuthoredAircraft) {
+                this._buildAuthoredAircraftDecorations(buildContext.map);
+            } else {
+                this._clearAuthoredAircraftDecorations();
+            }
             this._builder.compileParticleStage(buildContext.sx, buildContext.sy, buildContext.sz);
             this._lastBuildSignature = buildContext.buildSignature;
             return {

@@ -20,6 +20,8 @@
 // Trainer clamps rewards to [-rewardClamp, +rewardClamp] (default +-10)
 // ============================================
 
+import { toFiniteNumber } from '../../utils/MathOps.js';
+
 const REWARD_PRECISION = 1_000_000;
 
 export const DEFAULT_TRAINING_REWARD_WEIGHTS = Object.freeze({
@@ -38,11 +40,6 @@ export const DEFAULT_TRAINING_REWARD_WEIGHTS = Object.freeze({
 
 function roundReward(value) {
     return Math.round(Number(value) * REWARD_PRECISION) / REWARD_PRECISION;
-}
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
 }
 
 function toCount(value) {

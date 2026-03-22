@@ -17,7 +17,10 @@ import { bootstrapGameRuntime } from './GameBootstrap.js';
 import { GameRuntimeFacade } from './GameRuntimeFacade.js';
 import { GameDebugApi } from './GameDebugApi.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
-import { LIFECYCLE_EVENT_TYPES } from './MediaRecorderSystem.js';
+import {
+    MATCH_LIFECYCLE_CONTRACT_VERSION,
+    MATCH_LIFECYCLE_EVENT_TYPES,
+} from '../shared/contracts/MatchLifecycleContract.js';
 import { RuntimePerfProfiler } from './perf/RuntimePerfProfiler.js';
 import { initializeGameApp } from './AppInitializer.js';
 import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './PlaytestLaunchParams.js';
@@ -39,7 +42,7 @@ export class Game {
         this.config = CONFIG;
         this.runtimeConfig = null;
         this.activeGameMode = GAME_MODE_TYPES.CLASSIC;
-        this.menuLifecycleContractVersion = 'lifecycle.v1';
+        this.menuLifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
         this.menuLifecycleEvents = [];
         this.huntState = {
             overheatByPlayer: {},
@@ -277,7 +280,7 @@ export class Game {
         }
 
         const wasRecording = !!recorder.isRecording?.();
-        recorder.notifyLifecycleEvent(LIFECYCLE_EVENT_TYPES.RECORDING_REQUESTED, {
+        recorder.notifyLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.RECORDING_REQUESTED, {
             command: 'toggle',
             source: 'global_hotkey',
         });

@@ -2,12 +2,9 @@
 // TrainingOpsKpiContractV36.js - production operations KPIs for bridge/trainer runtime
 // ============================================
 
-export const TRAINING_OPS_KPI_CONTRACT_VERSION = 'v36-ops-kpi-v1';
+import { toFiniteNumber } from '../../utils/MathOps.js';
 
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
-}
+export const TRAINING_OPS_KPI_CONTRACT_VERSION = 'v36-ops-kpi-v1';
 
 function toNonNegativeInt(value, fallback = 0) {
     return Math.max(0, Math.trunc(toFiniteNumber(value, fallback)));
@@ -30,7 +27,7 @@ export function deriveTrainingOpsKpis(bridgeTelemetry = null) {
     const requestsSent = toNonNegativeInt(telemetry.requestsSent, 0);
     const actionRequests = toNonNegativeInt(telemetry.actionRequests, requestsSent);
     const responsesReceived = toNonNegativeInt(telemetry.responsesReceived, 0);
-    const actionResponses = toNonNegativeInt(telemetry.actionResponses, 0);
+    const actionResponses = toNonNegativeInt(telemetry.actionResponses, responsesReceived);
     const ackResponses = toNonNegativeInt(telemetry.ackResponses, 0);
     const commandResponses = toNonNegativeInt(telemetry.commandResponses, 0);
     const retries = toNonNegativeInt(telemetry.retries, 0);

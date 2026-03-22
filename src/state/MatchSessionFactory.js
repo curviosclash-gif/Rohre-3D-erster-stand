@@ -88,7 +88,9 @@ export async function prewarmMatchArenaSession({
         arena.portalsEnabled = !!portalsEnabled;
         arena.runtimeConfig = runtimeConfig;
         bindArenaRuntimeMap(arena, mapResolution, effectiveMapKey);
-        const arenaBuildResult = await arena.build(effectiveMapKey);
+        const arenaBuildResult = await arena.build(effectiveMapKey, {
+            includeAuthoredAircraft: false,
+        });
 
         storePrewarmedArenaSession({
             renderer,
@@ -180,6 +182,7 @@ export function createMatchSession({
         };
 
         if (reusablePrewarmedArenaSession) {
+            arena.syncAuthoredAircraftDecorations?.();
             return buildSessionPayload();
         }
 

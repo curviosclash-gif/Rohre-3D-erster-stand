@@ -50,8 +50,8 @@ export function senseProjectiles(bot, player, projectiles) {
 
         const speed = proj.velocity.length();
         const timeToImpact = speed > 1 ? dist / speed : 999;
-        if (timeToImpact > 0.8) continue;
-        if (Math.random() > awareness) continue;
+        if (timeToImpact > (0.8 + awareness * 0.2)) continue;
+        if (awareness < 0.8 && Math.random() > awareness) continue;
 
         if (timeToImpact < nearestTime) {
             nearestTime = timeToImpact;

@@ -7,9 +7,9 @@ import {
 import {
     MENU_CONTROLLER_EVENT_CONTRACT_VERSION,
 } from '../shared/contracts/MenuControllerContract.js';
+import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
 import { SETTINGS_CHANGE_KEYS } from '../ui/SettingsChangeKeys.js';
 import { guardMenuRuntimeEvent, resolveMenuAccessContext } from '../ui/menu/MenuAccessPolicy.js';
-import { MenuMultiplayerBridge } from '../ui/menu/MenuMultiplayerBridge.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
@@ -29,6 +29,7 @@ import {
 } from './runtime/MenuRuntimePresetConfigService.js';
 import {
     applyMultiplayerMatchSettingsSnapshot,
+    createMenuMultiplayerBridge,
     createMultiplayerMatchSettingsSnapshot,
     didHostChangeMatchSettings,
     handleMultiplayerHostAction,
@@ -252,20 +253,14 @@ export class GameRuntimeFacade {
 
     setupMenuListeners() {
         const game = this.game;
-        if (!game.menuMultiplayerBridge) {
-            game.menuMultiplayerBridge = new MenuMultiplayerBridge({
-                contractVersion: game?.menuLifecycleContractVersion || 'lifecycle.v1',
-                onEvent: (lifecycleEvent) => game._handleMenuLifecycleEvent?.(lifecycleEvent),
-                onStatus: null,
-                onStateChanged: (sessionState) => this._handleMultiplayerSessionStateChanged(sessionState),
-                onMatchStart: (command) => this._handleMultiplayerMatchStart(command),
-            });
-        } else {
-            game.menuMultiplayerBridge.onEvent = (lifecycleEvent) => game._handleMenuLifecycleEvent?.(lifecycleEvent);
-            game.menuMultiplayerBridge.onStatus = null;
-            game.menuMultiplayerBridge.onStateChanged = (sessionState) => this._handleMultiplayerSessionStateChanged(sessionState);
-            game.menuMultiplayerBridge.onMatchStart = (command) => this._handleMultiplayerMatchStart(command);
-        }
+        game.menuMultiplayerBridge = createMenuMultiplayerBridge({
+            existingBridge: game.menuMultiplayerBridge,
+            contractVersion: game?.menuLifecycleContractVersion || MATCH_LIFECYCLE_CONTRACT_VERSION,
+            onEvent: (lifecycleEvent) => game._handleMenuLifecycleEvent?.(lifecycleEvent),
+            onStatus: null,
+            onStateChanged: (sessionState) => this._handleMultiplayerSessionStateChanged(sessionState),
+            onMatchStart: (command) => this._handleMultiplayerMatchStart(command),
+        });
         this.menuMultiplayerBridge = game.menuMultiplayerBridge;
         this.menuMultiplayerBridge?.syncActorIdentity?.(this._resolveMenuAccessContext()?.actorId);
         this._handleMultiplayerSessionStateChanged(this.menuMultiplayerBridge?.getSessionState?.());

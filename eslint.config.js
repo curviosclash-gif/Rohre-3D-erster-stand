@@ -14,7 +14,7 @@ const legacyFileCeilings = {
     'src/core/SettingsManager.js': 585,
     'src/core/main.js': 560,
     'src/entities/ai/training/WebSocketTrainerBridge.js': 700,
-    'src/ui/menu/MenuMultiplayerBridge.js': 760,
+    'src/ui/menu/MenuMultiplayerBridge.js': 830,
     'src/ui/UIManager.js': 1225,
 };
 

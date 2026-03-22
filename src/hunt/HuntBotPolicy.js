@@ -149,11 +149,23 @@ export class HuntBotPolicy {
         const healthRatio = resolveHealthRatio(player);
         const enemyHealthRatio = resolveHealthRatio(enemy);
         const aggression = clamp(0.55 + (healthRatio - enemyHealthRatio) * 0.8, 0.15, 1.0);
+        const survivalPressure = Math.max(
+            pressure,
+            projectileThreat ? 0.82 : 0,
+            (1 - healthRatio) * 0.9
+        );
         const mgRange = Math.max(12, Number(CONFIG?.HUNT?.MG?.RANGE || 95));
         const mgRangeSq = mgRange * mgRange;
         input.shootMG = false;
 
-        if ((hasSharedTarget || enemy) && distSq <= mgRangeSq && healthRatio > 0.15 && aggression >= 0.45 && targetInFront) {
+        if (
+            (hasSharedTarget || enemy)
+            && distSq <= mgRangeSq
+            && healthRatio > 0.2
+            && aggression >= 0.42
+            && targetInFront
+            && survivalPressure < 0.85
+        ) {
             input.shootMG = true;
         }
 
@@ -164,20 +176,23 @@ export class HuntBotPolicy {
                 || enemyHealthRatio > 0.45
                 || distSq > 20 * 20
                 || pressure > 0.58
-                || projectileThreat;
+                || projectileThreat
+                || survivalPressure > 0.55;
             if (shouldUseRocket) {
                 input.shootItem = true;
                 input.shootItemIndex = rocketIndex;
             }
         }
 
-        if (healthRatio <= 0.33 && enemy) {
+        const shouldRetreat = !!enemy && (healthRatio <= 0.38 || (healthRatio < 0.55 && survivalPressure > 0.78));
+        if (shouldRetreat) {
             const hasSensorSteering = snapshot && (Math.abs(snapshot.targetYaw || 0) > 0.01 || Math.abs(snapshot.targetPitch || 0) > 0.01);
             if (hasSensorSteering) {
                 applyRetreatSteeringFromSensors(input, snapshot);
             } else {
                 applyRetreatSteeringFallback(this, input, player, enemy);
             }
+            input.shootMG = false;
             input.boost = true;
             if (rocketIndex < 0) {
                 input.shootItem = false;

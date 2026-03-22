@@ -7,6 +7,7 @@ import { WebSocketTrainerBridge } from '../src/entities/ai/training/WebSocketTra
 import { deriveTrainingGateKpis } from '../src/state/training/TrainingGateEvaluator.js';
 import { TRAINING_GATE_BASELINE_REFERENCE } from '../src/state/training/TrainingGateThresholds.js';
 import { deriveTrainingOpsKpis } from '../src/state/training/TrainingOpsKpiContractV36.js';
+import { buildBotValidationEval } from './training-bot-validation-lane.mjs';
 import {
     buildTrainingLatestIndex,
     resolveTrainingRunArtifactLayout,
@@ -672,6 +673,17 @@ async function resolveRunArtifact(runDir) {
     };
 }
 
+async function resolveBotValidation(runDir, args) {
+    const configuredReportPath = typeof args['bot-validation-report'] === 'string' && args['bot-validation-report'].trim()
+        ? args['bot-validation-report'].trim()
+        : path.join(runDir, 'bot-validation-report.json');
+    const report = await readJsonIfExists(configuredReportPath);
+    return buildBotValidationEval(report, {
+        reportPath: toRepoPath(configuredReportPath),
+        exists: report != null,
+    });
+}
+
 async function main() {
     const args = parseArgs(process.argv.slice(2));
     const writeLatest = parseBoolean(args['write-latest'], true);
@@ -734,6 +746,7 @@ async function main() {
     });
     const runArtifact = await resolveRunArtifact(runDir);
     const playEval = buildPlayEvalResult();
+    const botValidation = await resolveBotValidation(runDir, args);
 
     const evalArtifact = {
         ok: runtimeErrors.length === 0,
@@ -748,6 +761,8 @@ async function main() {
         source: {
             runArtifactPath: runArtifact.path ? toRepoPath(runArtifact.path) : null,
             runArtifactImportedFromLegacy: runArtifact.importedFromLegacy,
+            botValidationReportPath: botValidation.source?.reportPath || null,
+            botValidationReportExists: botValidation.source?.exists === true,
         },
         episodes,
         bridge: {
@@ -762,8 +777,11 @@ async function main() {
             actionCoverage: opsKpis.actionCoverage,
             responseCoverage: opsKpis.responseCoverage,
             runtimeErrorCount: runtimeErrors.length,
+            botValidationEnabled: botValidation.enabled === true,
+            botValidationAverageBotSurvival: botValidation.metrics?.averageBotSurvival ?? null,
         },
         playEval,
+        botValidation,
         baseline: {
             reference: TRAINING_GATE_BASELINE_REFERENCE,
             drift: buildBaselineDrift(kpis),
@@ -800,6 +818,7 @@ async function main() {
             bridgeLatencyP95Ms: kpis.bridgeLatencyP95Ms,
             playEvalScenarioReturnMean: playEval.metrics.scenarioReturnMean,
             playEvalScenarioWinRate: playEval.metrics.scenarioWinRate,
+            botValidationAverageBotSurvival: botValidation.metrics?.averageBotSurvival ?? null,
         },
     }, null, 2));
 

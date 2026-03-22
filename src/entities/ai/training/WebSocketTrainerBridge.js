@@ -2,20 +2,20 @@
 // WebSocketTrainerBridge.js - optional async trainer bridge with timeout/retry/error telemetry
 // ============================================
 
-import { TRAINING_CONTRACT_VERSION } from './TrainingContractV1.js';
+import { TRAINING_CONTRACT_VERSION } from '../../../shared/contracts/TrainingRuntimeContract.js';
 import { createTrainerTransportEnvelope } from './TrainerPayloadAdapter.js';
 
 import { clamp } from '../../../utils/MathOps.js';
 
 function toSafeUrl(value, fallback) {
-    if (typeof value !== 'string') return fallback;
-    const trimmed = value.trim();
-    return trimmed || fallback;
+    return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
-function toNow(value) {
-    return typeof value === 'function' ? value : () => Date.now();
-}
+function toNow(value) { return typeof value === 'function' ? value : () => Date.now(); }
+
+const toBoundedInt = (value, fallback, min = 0, max = Number.MAX_SAFE_INTEGER) => (Number.isFinite(Number(value))
+    ? Math.max(min, Math.min(max, Math.trunc(Number(value))))
+    : fallback);
 
 function computePercentile(samples, percentile) {
     if (!Array.isArray(samples) || samples.length === 0) return null;
@@ -60,6 +60,7 @@ function createTelemetryState() {
         latestEpsilon: null,
         latestReplayFill: null,
         maxOptimizerSteps: 0,
+        maxPendingAcks: 0, backpressureThreshold: 0, backpressureDrops: 0, ackEvictions: 0,
         lastFailure: null,
         lastFallbackReason: null,
     };
@@ -105,7 +106,8 @@ function cloneTelemetrySnapshot(state) {
         replayFillSampleCount,
         replayFillMean: replayFillSampleCount > 0 ? state.replayFillTotal / replayFillSampleCount : null,
         latestReplayFill: state.latestReplayFill,
-        maxOptimizerSteps: state.maxOptimizerSteps,
+        maxOptimizerSteps: state.maxOptimizerSteps, maxPendingAcks: state.maxPendingAcks,
+        backpressureThreshold: state.backpressureThreshold, backpressureDrops: state.backpressureDrops, ackEvictions: state.ackEvictions,
         lastFailure: state.lastFailure,
         lastFallbackReason: state.lastFallbackReason,
         pendingActionRequest: !!state.pendingActionRequest,
@@ -155,6 +157,14 @@ export class WebSocketTrainerBridge {
             ? options.readyMessageType.trim()
             : 'trainer-ready';
         this.requireReadyMessage = options.requireReadyMessage !== false;
+        this.maxPendingAcks = toBoundedInt(options.maxPendingAcks, 512, 16, 8192);
+        this.backpressureThreshold = Math.min(this.maxPendingAcks, toBoundedInt(
+            options.backpressureThreshold,
+            Math.max(8, Math.floor(this.maxPendingAcks * 0.75)),
+            8,
+            this.maxPendingAcks
+        ));
+        this.dropTrainingPayloadWhenBacklogged = options.dropTrainingPayloadWhenBacklogged !== false;
         this._now = toNow(options.now);
         this._socketFactory = typeof options.socketFactory === 'function'
             ? options.socketFactory
@@ -170,22 +180,16 @@ export class WebSocketTrainerBridge {
         this._latestReadyPayload = null;
         this._isReady = false;
         this._telemetry = createTelemetryState();
-        this._boundOpenHandler = null;
-        this._boundMessageHandler = null;
-        this._boundErrorHandler = null;
-        this._boundCloseHandler = null;
+        this._telemetry.maxPendingAcks = this.maxPendingAcks; this._telemetry.backpressureThreshold = this.backpressureThreshold;
+        this._boundOpenHandler = null; this._boundMessageHandler = null; this._boundErrorHandler = null; this._boundCloseHandler = null;
     }
 
     _resolveOpenState() {
-        return typeof WebSocket === 'function' && Number.isInteger(WebSocket.OPEN)
-            ? WebSocket.OPEN
-            : 1;
+        return typeof WebSocket === 'function' && Number.isInteger(WebSocket.OPEN) ? WebSocket.OPEN : 1;
     }
 
     _resolveConnectingState() {
-        return typeof WebSocket === 'function' && Number.isInteger(WebSocket.CONNECTING)
-            ? WebSocket.CONNECTING
-            : 0;
+        return typeof WebSocket === 'function' && Number.isInteger(WebSocket.CONNECTING) ? WebSocket.CONNECTING : 0;
     }
 
     _recordFailure(reason) {
@@ -576,11 +580,16 @@ export class WebSocketTrainerBridge {
             return;
         }
 
+        const expectsAction = options.expectsAction !== false;
+        if (!expectsAction && this.dropTrainingPayloadWhenBacklogged && this._pendingAcks.size >= this.backpressureThreshold) {
+            this._telemetry.backpressureDrops += 1;
+            return;
+        }
+
         try {
             this._socket.send(serialized);
             const now = this._now();
             this._telemetry.requestsSent += 1;
-            const expectsAction = options.expectsAction !== false;
             if (expectsAction) {
                 this._telemetry.actionRequests += 1;
             } else {
@@ -599,9 +608,10 @@ export class WebSocketTrainerBridge {
             }
 
             this._pendingAcks.set(requestId, now);
-            if (this._pendingAcks.size > 512) {
+            if (this._pendingAcks.size > this.maxPendingAcks) {
                 const firstKey = this._pendingAcks.keys().next().value;
                 this._pendingAcks.delete(firstKey);
+                this._telemetry.ackEvictions += 1;
             }
         } catch {
             this._recordFailure('send-failed');
@@ -735,6 +745,8 @@ export class WebSocketTrainerBridge {
 
     resetTelemetry() {
         this._telemetry = createTelemetryState();
+        this._telemetry.maxPendingAcks = this.maxPendingAcks;
+        this._telemetry.backpressureThreshold = this.backpressureThreshold;
     }
 
     close() {

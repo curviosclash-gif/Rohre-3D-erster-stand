@@ -7,12 +7,8 @@ import {
     OBSERVATION_SCHEMA_VERSION,
 } from '../observation/ObservationSchemaV1.js';
 import { deriveTrainingDomain } from '../../../state/training/TrainingDomain.js';
-import { TRAINING_CONTRACT_VERSION } from './TrainingContractV1.js';
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
-}
+import { TRAINING_CONTRACT_VERSION } from '../../../shared/contracts/TrainingRuntimeContract.js';
+import { toFiniteNumber } from '../../../utils/MathOps.js';
 
 function cloneObservation(observation) {
     if (!observation || typeof observation.length !== 'number') return null;

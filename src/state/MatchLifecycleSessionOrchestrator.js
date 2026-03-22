@@ -1,5 +1,8 @@
 import { initializeMatchSession, disposeMatchSessionSystems } from './MatchSessionFactory.js';
-import { LIFECYCLE_EVENT_TYPES } from '../core/MediaRecorderSystem.js';
+import {
+    MATCH_LIFECYCLE_CONTRACT_VERSION,
+    MATCH_LIFECYCLE_EVENT_TYPES,
+} from '../shared/contracts/MatchLifecycleContract.js';
 
 function isPromiseLike(value) {
     return !!value && typeof value.then === 'function';
@@ -8,7 +11,7 @@ function isPromiseLike(value) {
 export class MatchLifecycleSessionOrchestrator {
     constructor(game) {
         this.game = game || null;
-        this._lifecycleContractVersion = 'lifecycle.v1';
+        this._lifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
         this._sessionSequence = 0;
         this._activeSessionId = null;
     }
@@ -39,17 +42,17 @@ export class MatchLifecycleSessionOrchestrator {
     _startLifecycleSession(extra = null) {
         this._sessionSequence += 1;
         this._activeSessionId = `match-${this._sessionSequence}`;
-        this._emitLifecycleEvent(LIFECYCLE_EVENT_TYPES.MATCH_STARTED, extra);
+        this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MATCH_STARTED, extra);
     }
 
     _endLifecycleSession(reason = 'match_teardown') {
         if (!this._activeSessionId) return;
-        this._emitLifecycleEvent(LIFECYCLE_EVENT_TYPES.MATCH_ENDED, { reason });
+        this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MATCH_ENDED, { reason });
         this._activeSessionId = null;
     }
 
     notifyMenuOpened(extra = null) {
-        this._emitLifecycleEvent(LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
+        this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
     _applyInitializedMatch(initializedMatch) {

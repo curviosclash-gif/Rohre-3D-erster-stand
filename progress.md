@@ -1440,3 +1440,67 @@ Offene TODOs naechster Schritt:
   - `npm run docs:check` PASS.
   - `npm run build` PASS (inkl. architecture guard).
 - Hinweis: waehrend der Session sind weitere, nicht-taskbezogene Worktree-Aenderungen vorhanden; fuer diesen Task wurden nur die Input/Controls-Dateien angepasst.
+2026-03-21 (V46.3.2 HuntHUD-Migration nach src/ui)
+- Aufgabe aus `docs/Umsetzungsplan.md` umgesetzt: `46.3.2` auf `[x]` gesetzt.
+- Architektur-/Modul-Migration:
+  - `src/hunt/HuntHUD.js` entfernt.
+  - Neue UI-Implementierung: `src/ui/HuntHUD.js`.
+  - Neue DOM-Ref-Fabrik: `src/ui/dom/HuntHudDomRefs.js`.
+  - `src/core/GameBootstrap.js` auf neuen Pfad und DI-Konstruktor (`runtime`, `refs`, `isHuntActive`, `getBoostCapacity`) umgestellt.
+  - `src/core/main.js` Lifecycle ergaenzt: `huntHud.dispose()` im `Game.dispose()`-Pfad.
+- Legacy-Reduktion fuer Architektur-Checks:
+  - `constructor(game)`/`this.game = game` im HuntHUD entfernt.
+  - Legacy-Allowlist-Eintraege fuer HuntHUD aus `scripts/architecture/ArchitectureConfig.mjs` entfernt.
+  - Architekturkontext aktualisiert (`docs/ai_architecture_context.md`).
+- Verifikation:
+  - `rg -n "(console.log|TODO:|FIXME:|HACK:)" src tests` (nur bestehende Treffer ausserhalb des Diffs).
+  - `npm run test:core` PASS (90 passed, 1 skipped).
+  - `npm run test:stress` PASS (21 passed).
+  - `npm run docs:sync` PASS.
+  - `npm run docs:check` PASS.
+  - `npm run build` PASS (inkl. `architecture:guard`, `lint`, `check:architecture:*`, `typecheck:architecture`).
+- develop-web-game Skill Lauf:
+  - Playwright-Client gegen `vite preview` ausgefuehrt.
+  - Artefakte: `output/web-game/v46-hunthud*`.
+  - Gameplay-Screenshot erfolgreich erzeugt: `output/web-game/v46-hunthud-quickstart/shot-0.png`.
+  - Dabei wurden bestehende Three-Console-Errors aus Geometry-Bounds (`computeBoundingBox/computeBoundingSphere NaN`) protokolliert (`errors-0.json`), ohne Zusammenhang mit HuntHUD-Migration.
+- Hinweis fuer naechsten Agenten:
+  - Worktree enthaelt viele fremde/unabhaengige Aenderungen; bei Commit nur strikt scoped Dateien stagen.
+2026-03-21 (Survival-Prioritaet + 12h Plan)
+- Nutzerziel umgesetzt: Bots sollen laenger ueberleben; Angriff wurde defensiver gewichtet.
+- Rule-based Bot-Logik geaendert:
+  - `src/entities/ai/BotDecisionOps.js`: Survival-Pressure aus Risiko/HP/Pressure eingefuehrt, fruehere Recovery-Triggers, risikoabhaengiges Boosting, defensivere Pursuit- und Item-Nutzung.
+  - `src/entities/ai/BotRecoveryOps.js`: Recovery-Maneuver bewertet weiter nach vorne, Boost in Recovery nur bei kleinerem Vorwaertsrisiko, StuckScore reagiert staerker auf akute Gefahr.
+  - `src/entities/ai/BotThreatOps.js`: hohe Projectile-Awareness reagiert konsistenter (weniger Zufalls-Miss bei hoher Awareness).
+- Profil-Tuning fuer mehr Ueberleben:
+  - `src/entities/ai/BotTuningConfig.js`: neue Survival-/Recovery-Parameter als Fallback.
+  - `src/core/config/ConfigSections.js`: EASY/NORMAL/HARD/PPO mit defensiveren Survival-Schwellen, reduzierter Aggression/Boost-Drang.
+- Hunt-Bots defensiver gemacht:
+  - `src/hunt/HuntBotPolicy.js` und `src/entities/ai/HuntBridgePolicy.js`: MG-Freigabe unter Hochdruck reduziert, frueher Retreat bei niedrigem HP + hoher Bedrohung, Rocket-Priorisierung in Stresslagen.
+- 12h-Trainingsplan hinzugefuegt:
+  - `docs/Bot_Survival_Training_Plan_12h.md` mit 6x2h Bloecken, KPI-Checkpoints und Abschluss-Gate.
+  - `package.json`: neues Startkommando `training:12h:survival`.
+2026-03-21 (V46.3.1 Teilfortschritt: AI-Sensing-Primitives + Magic-Number-Konsolidierung)
+- Neue AI-Perception-Konfiguration eingefuehrt:
+  - `src/entities/ai/perception/AiPerceptionConfig.js`
+  - zentrale Konstanten fuer Scan-Policy, LookAhead, Normalisierung, Pressure und Trail-Collision.
+- Neue Sensing-Primitives extrahiert:
+  - `src/entities/ai/perception/AiPerceptionPrimitives.js`
+  - `normalizeDistance`, `normalizeRisk`, `normalizePressure`, `normalizeSigned`, `normalizeTargetDistance`, `composePressureLevel`, `computeTightSpacePressure`.
+- Wiring umgesetzt:
+  - `src/entities/ai/BotSensors.js`: Normierungs-/LookAhead-/Trail-Magic-Numbers auf neue Config/Primitives umgestellt.
+  - `src/entities/ai/BotSensingOps.js`: Scan-Thresholds, Pressure-Mix, Strides/Decay/Deadzone zentralisiert.
+  - `src/entities/ai/BotSensorsFacade.js`: Sense-Phase-Window zentralisiert.
+- Verifikation:
+  - `npm run test:physics` PASS (64/64).
+  - `npm run docs:sync` PASS.
+  - `npm run docs:check` PASS.
+  - `npm run build` PASS (inkl. architecture guard).
+  - `npm run test:core` aktuell instabil/flake-lastig im Repo-UI-Pfad (u.a. T14/T20t Context-/Visibility-Flakes), nicht reproduzierbar auf die AI-Perception-Aenderung isolierbar.
+2026-03-21 (Verifikation nach Survival-Update)
+- `npm run test:physics` PASS (64/64).
+- `npm run test:core` mehrfach angestossen, aber lokal instabil wegen haengender Playwright-Lockprozesse (`.playwright-start.lock`) und unvollstaendiger/abgebrochener Core-Laeufe; kein belastbarer finaler Core-Gesamtreport verfuegbar.
+- `npm run docs:sync` PASS.
+- `npm run docs:check` PASS.
+- `npm run build` PASS (inkl. architecture guard + lint + boundaries + metrics + typecheck).
+- Quick-Validation (`BOT_RUNNER_SCENARIO_COUNT=2`, `BOT_RUNNER_ROUNDS=2`, `npm run bot:validate`) fehlgeschlagen: `[page:goto] timed out after 25000ms` beim Runner-Start.

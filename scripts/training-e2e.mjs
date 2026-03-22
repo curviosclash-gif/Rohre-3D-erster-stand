@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import process from 'node:process';
 
@@ -12,6 +12,7 @@ import {
 
 const DEFAULT_STAGE_TIMEOUT_MS = 8 * 60_000;
 const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
+const BOT_VALIDATION_SOURCE_PATH = 'data/bot_validation_report.json';
 
 function parseBoolean(value, fallback = false) {
     if (typeof value === 'boolean') return value;
@@ -226,6 +227,9 @@ function buildRunStageArgs(args) {
         ['seeds', 'seeds'],
         ['modes', 'modes'],
         ['max-steps', 'max-steps'],
+        ['runner-profile', 'runner-profile'],
+        ['inject-invalid-actions', 'inject-invalid-actions'],
+        ['step-timeout-retries', 'step-timeout-retries'],
         ['timeout-step-ms', 'timeout-step-ms'],
         ['timeout-episode-ms', 'timeout-episode-ms'],
         ['timeout-run-ms', 'timeout-run-ms'],
@@ -240,6 +244,9 @@ function buildRunStageArgs(args) {
         ['bridge-action-probe-timeout-ms', 'bridge-action-probe-timeout-ms'],
         ['bridge-action-probe-observation-length', 'bridge-action-probe-observation-length'],
         ['bridge-drain-timeout-ms', 'bridge-drain-timeout-ms'],
+        ['bridge-max-pending-acks', 'bridge-max-pending-acks'],
+        ['bridge-backpressure-threshold', 'bridge-backpressure-threshold'],
+        ['bridge-drop-training-when-backlogged', 'bridge-drop-training-when-backlogged'],
         ['write-checkpoint', 'write-checkpoint'],
         ['write-latest', 'write-latest'],
         ['quiet', 'quiet'],
@@ -261,10 +268,32 @@ function buildRunStageArgs(args) {
     return runArgs;
 }
 
-function buildStageForwardArgs(args) {
+function buildStageForwardArgs(args, botValidationReportPath) {
     return [
         ...collectForwardArgs(args, 'write-latest', 'write-latest'),
+        ...(typeof botValidationReportPath === 'string' && botValidationReportPath.trim()
+            ? ['--bot-validation-report', botValidationReportPath.trim()]
+            : []),
     ];
+}
+
+async function restoreLatestIndex(layout, fallbackLatest = null) {
+    const backup = await readJsonIfExists(layout.latestBackupPath);
+    if (backup && typeof backup === 'object') {
+        if (backup.exists === true && backup.latest && typeof backup.latest === 'object') {
+            await writeJson(layout.latestIndexPath, backup.latest);
+            return true;
+        }
+        if (backup.exists === false) {
+            await rm(layout.latestIndexPath, { force: true });
+            return true;
+        }
+    }
+    if (fallbackLatest && typeof fallbackLatest === 'object') {
+        await writeJson(layout.latestIndexPath, fallbackLatest);
+        return true;
+    }
+    return false;
 }
 
 async function main() {
@@ -273,11 +302,21 @@ async function main() {
     const strictMissing = parseBoolean(args.get('strict'), parseBoolean(process.env.TRAINING_E2E_STRICT, false));
     const withTrainerServer = parseBoolean(args.get('with-trainer-server'), true);
     const writeLatest = parseBoolean(args.get('write-latest'), true);
+    const refreshBotValidation = parseBoolean(args.get('refresh-bot-validation'), false);
     const stageTimeoutMs = parseInteger(args.get('stage-timeout-ms'), DEFAULT_STAGE_TIMEOUT_MS, 500, 24 * 60 * 60_000);
     const layout = resolveTrainingRunArtifactLayout(stamp);
+    const botValidationReportPath = (typeof args.get('bot-validation-report') === 'string' && args.get('bot-validation-report').trim())
+        ? args.get('bot-validation-report').trim()
+        : `${layout.runDir}/bot-validation-report.json`;
+    const botValidation = {
+        refreshed: false,
+        reportPath: botValidationReportPath.replace(/\\/g, '/'),
+        promotedReportPath: null,
+    };
     const latestBefore = writeLatest ? await readJsonIfExists(layout.latestIndexPath) : null;
     const stagePlan = [
         { name: 'run', scriptPath: 'scripts/training-run.mjs' },
+        ...(refreshBotValidation ? [{ name: 'bot-validation', scriptPath: 'scripts/bot-validation-runner.mjs' }] : []),
         { name: 'eval', scriptPath: 'scripts/training-eval.mjs' },
         { name: 'gate', scriptPath: 'scripts/training-gate.mjs' },
     ];
@@ -311,10 +350,35 @@ async function main() {
                 }
                 continue;
             }
+            if (stage.name === 'bot-validation' && !writeLatest) {
+                stageResults.push({
+                    stage: stage.name,
+                    status: 'skipped',
+                    exitCode: 0,
+                    reason: 'bot-validation refresh skipped because write-latest false',
+                });
+                continue;
+            }
             const stageArgs = stage.name === 'run'
                 ? runStageArgs
-                : buildStageForwardArgs(args);
-            const stageResult = await runStage(stage, stamp, stageArgs, { timeoutMs: stageTimeoutMs });
+                : buildStageForwardArgs(args, botValidationReportPath);
+            let stageResult = await runStage(stage, stamp, stageArgs, { timeoutMs: stageTimeoutMs });
+            if (stage.name === 'bot-validation' && stageResult.status === 'completed') {
+                const sourceExists = await fileExists(BOT_VALIDATION_SOURCE_PATH);
+                if (!sourceExists) {
+                    stageResult = {
+                        ...stageResult,
+                        status: 'failed',
+                        exitCode: 1,
+                        reason: `missing bot-validation source report: ${BOT_VALIDATION_SOURCE_PATH}`,
+                    };
+                } else {
+                    await mkdir(layout.runDir, { recursive: true });
+                    await copyFile(BOT_VALIDATION_SOURCE_PATH, botValidationReportPath);
+                    botValidation.refreshed = true;
+                    botValidation.promotedReportPath = botValidationReportPath.replace(/\\/g, '/');
+                }
+            }
             stageResults.push(stageResult);
             if (stageResult.status === 'completed') {
                 lastCompletedStage = stage.name;
@@ -343,6 +407,7 @@ async function main() {
         if (!Object.prototype.hasOwnProperty.call(artifacts, result.stage)) continue;
         artifacts[result.stage].status = result.status;
     }
+    const hasFailure = stageResults.some((result) => result.status === 'failed');
 
     const latestIndex = buildTrainingLatestIndex({
         stamp,
@@ -361,20 +426,26 @@ async function main() {
             latestIndex.artifacts.checkpoint.status = latestBefore?.artifacts?.checkpoint?.status || 'completed';
         }
     }
+    let latestRestored = false;
     if (writeLatest) {
-        await mkdir(layout.rootDir, { recursive: true });
-        await writeJson(layout.latestIndexPath, latestIndex);
+        if (hasFailure) {
+            latestRestored = await restoreLatestIndex(layout, latestBefore);
+        } else {
+            await mkdir(layout.rootDir, { recursive: true });
+            await writeJson(layout.latestIndexPath, latestIndex);
+        }
     }
 
-    const hasFailure = stageResults.some((result) => result.status === 'failed');
     console.log(JSON.stringify({
         ok: !hasFailure,
         stamp: layout.stamp,
         withTrainerServer,
         stageTimeoutMs,
         runStageArgs,
+        botValidation,
         stageResults,
         latestIndexPath: writeLatest ? layout.latestIndexPath : null,
+        latestRestored,
     }, null, 2));
     if (hasFailure) {
         process.exitCode = 1;

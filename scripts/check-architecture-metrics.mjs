@@ -28,6 +28,11 @@ const checks = [
         actual: report.scorecard.entitiesToCoreImports.totalEdges,
         max: report.budgets.entitiesToCoreImportEdges,
     },
+    {
+        label: 'state -> core legacy edge budget',
+        actual: report.scorecard.stateToCoreImports.totalEdges,
+        max: report.budgets.stateToCoreImportEdges,
+    },
 ];
 
 const failures = checks.filter((check) => check.actual > check.max);

@@ -1,3 +1,5 @@
+import { buildVehicleLabSelectionKey } from './VehicleLabSelection.js';
+
 export class VehicleLabUI {
     constructor(callbacks) {
         this.callbacks = callbacks;
@@ -51,15 +53,18 @@ export class VehicleLabUI {
         return '#' + color.toString(16).padStart(6, '0');
     }
 
-    updatePartsList(parts, selectedIndex, onSelect) {
+    updatePartsList(parts, selectedIndex, selectedPath = [], onSelect) {
         const list = document.getElementById('partsList');
         list.innerHTML = '';
         let totalCount = 0;
+        const activeSelectionKey = buildVehicleLabSelectionKey(selectedIndex, selectedPath);
 
         const renderItem = (part, index, depth = 0, path = []) => {
             totalCount++;
             const item = document.createElement('div');
-            item.className = 'part-item' + (index === selectedIndex ? ' is-selected' : '');
+            const itemSelectionKey = buildVehicleLabSelectionKey(index, path);
+            const isSelected = itemSelectionKey && itemSelectionKey === activeSelectionKey;
+            item.className = 'part-item' + (isSelected ? ' is-selected' : '');
             if (depth > 0) item.style.paddingLeft = `${depth * 12 + 8}px`;
 
             item.textContent = part.name || `Part ${index}`;
@@ -78,7 +83,7 @@ export class VehicleLabUI {
         document.getElementById('partCountBadge').textContent = `Parts: ${totalCount}`;
 
         // Update button states
-        const hasSelection = selectedIndex !== null;
+        const hasSelection = activeSelectionKey !== '';
         const btnDelete = document.getElementById('btnDeletePart');
         const btnAddChild = document.getElementById('btnAddChild');
         if (btnDelete) btnDelete.disabled = !hasSelection;

@@ -4,6 +4,8 @@
 
 import { OBSERVATION_LENGTH_V1 } from '../entities/ai/observation/ObservationSchemaV1.js';
 import { TrainingTransportFacade } from '../entities/ai/training/TrainingTransportFacade.js';
+import { encodeModeId } from '../shared/contracts/EntityModeContract.js';
+import { toFiniteNumber } from '../utils/MathOps.js';
 
 const DEFAULT_TRAINING_MODE = 'classic';
 const DEFAULT_MATCH_ID = 'developer-training';
@@ -28,11 +30,6 @@ function toInt(value, fallback, min, max) {
     return Math.max(clampedMin, Math.min(clampedMax, intValue));
 }
 
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
-}
-
 function normalizeMode(mode) {
     const raw = toTrimmedString(mode, DEFAULT_TRAINING_MODE).toLowerCase();
     if (raw === 'fight') return 'hunt';
@@ -42,10 +39,6 @@ function normalizeMode(mode) {
 function normalizeMatchId(value) {
     const normalized = toTrimmedString(value, DEFAULT_MATCH_ID);
     return normalized || DEFAULT_MATCH_ID;
-}
-
-function modeToModeId(mode) {
-    return mode === 'hunt' ? 1 : 0;
 }
 
 function deterministicValue(seed, index) {
@@ -63,7 +56,7 @@ function createObservationVector(seed, mode, planarMode, inventoryLength) {
     vector[15] = Number(Math.max(0, Math.min(1, inventoryLength / MAX_INVENTORY_LENGTH)).toFixed(6));
     vector[16] = inventoryLength > 0 ? 0 : -1;
     vector[17] = planarMode ? 1 : 0;
-    vector[18] = modeToModeId(mode);
+    vector[18] = encodeModeId(mode);
     return vector;
 }
 

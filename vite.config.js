@@ -1109,7 +1109,9 @@ export default defineConfig({
                     }
                     if (normalizedId.includes('/config/maps/MapPresetCatalog') ||
                         normalizedId.includes('/config/maps/MapPresetCatalogBaseData') ||
-                        normalizedId.includes('/config/maps/MapPresetCatalogExpertData')) {
+                        normalizedId.includes('/config/maps/MapPresetCatalogExpertData') ||
+                        normalizedId.includes('/config/maps/MapPresetCatalogLarge') ||
+                        normalizedId.includes('/config/maps/presets/')) {
                         return 'map-presets';
                     }
                     if (normalizedId.includes('/menu/MenuTelemetryDashboard') ||
@@ -1137,12 +1139,13 @@ export default defineConfig({
          * Network / WebRTC configuration.
          * VITE_SIGNALING_URL: WebSocket URL for online signaling (e.g. wss://myserver.com:9090)
          * VITE_TURN_URL:        TURN server URL   (e.g. turn:myserver.com:3478)
-         * VITE_TURN_USERNAME:   TURN username
+         * VITE_TURN_USER:       TURN username (preferred)
+         * VITE_TURN_USERNAME:   TURN username (legacy alias)
          * VITE_TURN_CREDENTIAL: TURN credential/password
          */
         __SIGNALING_URL__: JSON.stringify(process.env.VITE_SIGNALING_URL || ''),
         __TURN_URL__: JSON.stringify(process.env.VITE_TURN_URL || ''),
-        __TURN_USERNAME__: JSON.stringify(process.env.VITE_TURN_USERNAME || ''),
+        __TURN_USERNAME__: JSON.stringify(process.env.VITE_TURN_USER || process.env.VITE_TURN_USERNAME || ''),
         __TURN_CREDENTIAL__: JSON.stringify(process.env.VITE_TURN_CREDENTIAL || ''),
     },
 });

@@ -34,7 +34,7 @@ const DEFAULT_ICE_SERVERS = [
 
 /**
  * Build ICE server list from environment + defaults.
- * Set VITE_TURN_URL, VITE_TURN_USERNAME, VITE_TURN_CREDENTIAL to add a TURN server.
+ * Set VITE_TURN_URL, VITE_TURN_USER (or legacy VITE_TURN_USERNAME), VITE_TURN_CREDENTIAL to add a TURN server.
  * Example: VITE_TURN_URL=turn:myserver.com:3478
  */
 function resolveIceServers(custom) {

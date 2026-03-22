@@ -7,15 +7,12 @@ import {
     OBSERVATION_SCHEMA_VERSION,
 } from '../observation/ObservationSchemaV1.js';
 import { deriveTrainingDomain } from '../../../state/training/TrainingDomain.js';
+import { TRAINING_CONTRACT_VERSION as TRAINING_CONTRACT_VERSION_SHARED } from '../../../shared/contracts/TrainingRuntimeContract.js';
+import { toFiniteNumber } from '../../../utils/MathOps.js';
 
-export const TRAINING_CONTRACT_VERSION = 'v1';
+export const TRAINING_CONTRACT_VERSION = TRAINING_CONTRACT_VERSION_SHARED;
 export const TRAINING_OPERATION_RESET = 'reset';
 export const TRAINING_OPERATION_STEP = 'step';
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
-}
 
 function toPositiveInt(value, fallback = 0) {
     const numeric = Number(value);

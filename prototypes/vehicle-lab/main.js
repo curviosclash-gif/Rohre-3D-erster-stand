@@ -107,10 +107,6 @@ class VehicleLabApp {
             }
         };
 
-        window.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.key === 'z') this.undo();
-            if (e.ctrlKey && e.key === 'y') this.redo();
-        });
     }
 
     initPresets() {
@@ -377,11 +373,18 @@ class VehicleLabApp {
             this.vehicle.build();
             this.history.save(this.vehicle.config);
             this.updateUI();
+            localStorage.setItem('vehicle_lab_config', JSON.stringify(this.vehicle.config));
+            this.updateArcadeBlueprintStatus();
         }
     }
 
     updateUI() {
-        this.ui.updatePartsList(this.vehicle.config.parts, this.selectedIndex, (i, path) => this.selectPart(i, path));
+        this.ui.updatePartsList(
+            this.vehicle.config.parts,
+            this.selectedIndex,
+            this.selectedPath,
+            (i, path) => this.selectPart(i, path)
+        );
         this.ui.updateShipInfo(this.vehicle.config);
 
         if (this.selectedIndex !== null) {

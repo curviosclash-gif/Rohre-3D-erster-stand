@@ -4,6 +4,8 @@
 
 import { OBSERVATION_LENGTH_V1 } from '../observation/ObservationSchemaV1.js';
 import { TrainingTransportFacade } from './TrainingTransportFacade.js';
+import { encodeModeId } from '../../../shared/contracts/EntityModeContract.js';
+import { clamp01 } from '../../../utils/MathOps.js';
 import {
     TRAINING_AUTOMATION_RUN_CONTRACT_VERSION,
     buildTrainingKpiSnapshot,
@@ -25,10 +27,6 @@ function toBoundedInt(value, fallback, minValue = 0, maxValue = Number.MAX_SAFE_
     const numeric = Number(value);
     if (!Number.isFinite(numeric)) return fallback;
     return Math.max(minValue, Math.min(maxValue, Math.trunc(numeric)));
-}
-
-function clamp01(value) {
-    return Math.max(0, Math.min(1, Number(value) || 0));
 }
 
 function hashStringToUint32(input) {
@@ -53,7 +51,7 @@ function createDeterministicRng(seedInput) {
 
 function createDeterministicObservation(context) {
     const values = new Array(OBSERVATION_LENGTH_V1).fill(0);
-    const modeId = context.mode === 'hunt' ? 1 : 0;
+    const modeId = encodeModeId(context.mode);
     const stepRatio = context.maxSteps > 0 ? context.stepIndex / context.maxSteps : 0;
     for (let i = 0; i < values.length; i++) {
         const shaped = (context.rng() * 0.7) + (stepRatio * 0.3);
@@ -74,9 +72,32 @@ function resolveTerminalReason(rng) {
     return 'player-dead';
 }
 
+function buildLearnProfileAction(context) {
+    const inventoryLength = Math.max(1, toBoundedInt(context.inventoryLength, 1, 1, 20));
+    const yawSample = context.rng();
+    const yawLeft = yawSample >= 0.52;
+    const yawRight = !yawLeft && yawSample < 0.18;
+    const shootItem = context.rng() > 0.86;
+    const itemIndex = shootItem
+        ? Math.floor(context.rng() * inventoryLength)
+        : -1;
+    return {
+        yawLeft,
+        yawRight,
+        boost: context.rng() > 0.58,
+        shootMG: context.mode === 'hunt' && context.rng() > 0.7,
+        shootItem,
+        shootItemIndex: itemIndex,
+        useItem: shootItem ? itemIndex : -1,
+    };
+}
+
 function buildDeterministicAction(context) {
+    if (context.runnerProfile === 'learn') {
+        return buildLearnProfileAction(context);
+    }
     const inventoryLength = context.inventoryLength;
-    const forceInvalid = context.stepIndex % 4 === 0;
+    const forceInvalid = context.injectInvalidActions && (context.stepIndex % 4 === 0);
     const candidateItemIndex = forceInvalid
         ? inventoryLength + 1
         : Math.floor(context.rng() * Math.max(1, inventoryLength));
@@ -143,6 +164,7 @@ export class TrainingAutomationRunner {
             truncationCount: 0,
             invalidActionStepCount: 0,
             invalidActionEventCount: 0,
+            stepTimeoutRecoveryCount: 0,
             runtimeErrorCount: 0,
             deliveredPacketCount: 0,
             episodeReturnTotal: 0,
@@ -176,6 +198,7 @@ export class TrainingAutomationRunner {
                         totals.truncationCount += episodeResult.truncated ? 1 : 0;
                         totals.invalidActionStepCount += episodeResult.invalidActionSteps;
                         totals.invalidActionEventCount += episodeResult.invalidActionEvents;
+                        totals.stepTimeoutRecoveryCount += episodeResult.stepTimeoutRecoveries;
                         totals.deliveredPacketCount += episodeResult.deliveredPacketCount;
                         totals.episodeReturnTotal = roundMetric(totals.episodeReturnTotal + episodeResult.episodeReturn);
                         if (typeof options.onEpisodeComplete === 'function') {
@@ -200,6 +223,7 @@ export class TrainingAutomationRunner {
                             episodeReturn: 0,
                             invalidActionSteps: 0,
                             invalidActionEvents: 0,
+                            stepTimeoutRecoveries: 0,
                             deliveredPacketCount: 0,
                             terminalReason: null,
                             truncatedReason: null,
@@ -297,6 +321,8 @@ export class TrainingAutomationRunner {
         let stepCount = 0;
         let invalidActionSteps = 0;
         let invalidActionEvents = 0;
+        let stepTimeoutRecoveries = 0;
+        let remainingStepTimeoutRecoveries = toBoundedInt(config.stepTimeoutRetries, 0, 0, 10);
         let finalTransition = resetPacket?.transition || null;
 
         for (let stepIndex = 1; stepIndex <= config.maxSteps; stepIndex++) {
@@ -310,6 +336,8 @@ export class TrainingAutomationRunner {
                 mode: modeConfig.mode,
                 inventoryLength,
                 stepIndex,
+                runnerProfile: config.runnerProfile,
+                injectInvalidActions: config.injectInvalidActions,
             });
             const rewardSignals = buildDeterministicRewardSignals({
                 rng,
@@ -348,7 +376,12 @@ export class TrainingAutomationRunner {
                 },
             });
             if ((nowMs() - stepStartMs) > config.timeouts.stepMs) {
-                throw new Error('step timeout exceeded');
+                if (remainingStepTimeoutRecoveries > 0) {
+                    remainingStepTimeoutRecoveries -= 1;
+                    stepTimeoutRecoveries += 1;
+                } else {
+                    throw new Error('step timeout exceeded');
+                }
             }
             if (invalidInStep) {
                 invalidActionSteps += 1;
@@ -377,6 +410,7 @@ export class TrainingAutomationRunner {
             episodeReturn,
             invalidActionSteps,
             invalidActionEvents,
+            stepTimeoutRecoveries,
             deliveredPacketCount,
             terminalReason: finalTransition?.info?.terminalReason || null,
             truncatedReason: finalTransition?.info?.truncatedReason || null,

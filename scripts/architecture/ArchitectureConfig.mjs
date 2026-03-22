@@ -69,6 +69,10 @@ const entityThreeDisposalSources = [
     'src/entities/player/PlayerView.js',
 ];
 
+const stateConfigImportSources = [
+    'src/state/match-session/MatchSessionMapOps.js',
+];
+
 export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([
     ['src/core/GameDebugApi.js', 'Legacy debug bridge still wraps the full runtime while V44 only forbids new wide constructors.'],
     ['src/core/PlayingStateSystem.js', 'Existing playing loop shell still receives the game runtime directly.'],
@@ -120,9 +124,18 @@ const legacyEntitiesToCoreImportEntries = [
     )),
 ];
 
+/** @type {[string, string][]} */
+const legacyStateToCoreImportEntries = [
+    ...stateConfigImportSources.map((fromFile) => pair(
+        createEdgeKey(fromFile, 'src/core/Config.js'),
+        'Match session map setup still resolves runtime map presets from core config until shared map contracts are introduced.'
+    )),
+];
+
 export const LEGACY_UI_TO_CORE_IMPORTS = new Map(legacyUiToCoreImportEntries);
 
 export const LEGACY_ENTITIES_TO_CORE_IMPORTS = new Map(legacyEntitiesToCoreImportEntries);
+export const LEGACY_STATE_TO_CORE_IMPORTS = new Map(legacyStateToCoreImportEntries);
 
 export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     configWrites: 0,
@@ -130,6 +143,7 @@ export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     disallowedDomAccessFiles: 0,
     disallowedUiToCoreImports: 0,
     disallowedEntitiesToCoreImports: 0,
+    disallowedStateToCoreImports: 0,
 });
 
 export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
@@ -137,4 +151,5 @@ export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
     domAccessFiles: LEGACY_DOM_ACCESS_ALLOWLIST.size,
     uiToCoreImportEdges: LEGACY_UI_TO_CORE_IMPORTS.size,
     entitiesToCoreImportEdges: LEGACY_ENTITIES_TO_CORE_IMPORTS.size,
+    stateToCoreImportEdges: LEGACY_STATE_TO_CORE_IMPORTS.size,
 });

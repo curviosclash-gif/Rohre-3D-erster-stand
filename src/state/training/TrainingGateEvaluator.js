@@ -9,11 +9,7 @@ import {
     createTrainingGateThresholds,
 } from './TrainingGateThresholds.js';
 import { deriveTrainingOpsKpis } from './TrainingOpsKpiContractV36.js';
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
-}
+import { toFiniteNumber } from '../../utils/MathOps.js';
 
 function roundMetric(value) {
     return Math.round(toFiniteNumber(value, 0) * 1_000_000) / 1_000_000;
@@ -51,7 +47,7 @@ function resolveBridgeTelemetry(evalArtifact = {}) {
     const trainingRequests = Math.max(0, Math.trunc(toFiniteNumber(source.trainingRequests, 0)));
     const commandRequests = Math.max(0, Math.trunc(toFiniteNumber(source.commandRequests, 0)));
     const responsesReceived = Math.max(0, Math.trunc(toFiniteNumber(source.responsesReceived, 0)));
-    const actionResponses = Math.max(0, Math.trunc(toFiniteNumber(source.actionResponses, 0)));
+    const actionResponses = Math.max(0, Math.trunc(toFiniteNumber(source.actionResponses, responsesReceived)));
     const ackResponses = Math.max(0, Math.trunc(toFiniteNumber(source.ackResponses, 0)));
     const commandResponses = Math.max(0, Math.trunc(toFiniteNumber(source.commandResponses, 0)));
     const retries = Math.max(0, Math.trunc(toFiniteNumber(source.retries, 0)));

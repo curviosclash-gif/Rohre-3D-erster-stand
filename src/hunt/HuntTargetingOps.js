@@ -1,5 +1,7 @@
 ﻿import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
+import { HUNT_TARGET_KIND } from '../shared/contracts/HuntTargetingContract.js';
+import { toFiniteNumber } from '../utils/MathOps.js';
 import {
     createHuntTargetingTelemetryState,
     finalizeHuntTargetingResult,
@@ -7,20 +9,10 @@ import {
     resolveHuntTargetingHotpathSettings,
 } from './HuntTargetingPerf.js';
 
-export const HUNT_TARGET_KIND = Object.freeze({
-    PLAYER: 'player',
-    TRAIL: 'trail',
-});
-
 function toPositiveNumber(value, fallback) {
     const numeric = Number(value);
     if (!Number.isFinite(numeric) || numeric <= 0) return fallback;
     return numeric;
-}
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
 }
 
 function createPoint(source, fallback = null) {

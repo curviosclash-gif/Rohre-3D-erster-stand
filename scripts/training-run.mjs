@@ -29,6 +29,16 @@ function parseBoolean(value, fallback = false) {
     return fallback;
 }
 
+function parseOptionalBoolean(value) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return null;
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return null;
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+    return null;
+}
+
 function parseInteger(value, fallback, min = 0, max = Number.MAX_SAFE_INTEGER) {
     const parsed = Number.parseInt(String(value || ''), 10);
     if (!Number.isFinite(parsed)) return fallback;
@@ -264,12 +274,20 @@ async function submitBridgeCommand(bridge, type, payload = {}, timeoutMs = 1500)
 function buildRawConfigFromArgs(args) {
     const seeds = args.get('seeds');
     const modes = args.get('modes');
+    const runnerProfile = typeof args.get('runner-profile') === 'string'
+        ? args.get('runner-profile').trim()
+        : (typeof process.env.TRAINING_RUNNER_PROFILE === 'string' ? process.env.TRAINING_RUNNER_PROFILE.trim() : '');
+    const injectInvalidActions = parseOptionalBoolean(args.get('inject-invalid-actions'));
+    const stepTimeoutRetries = parseInteger(args.get('step-timeout-retries'), null, 0, 10);
     return {
         episodes: parseInteger(args.get('episodes'), 3, 1, 100_000),
         seeds: typeof seeds === 'string' && seeds.trim() ? seeds : undefined,
         modes: typeof modes === 'string' && modes.trim() ? modes : undefined,
         maxSteps: parseInteger(args.get('max-steps'), 180, 1, 1_000_000),
         bridgeMode: args.get('bridge-mode') || 'local',
+        runnerProfile: runnerProfile || undefined,
+        injectInvalidActions: injectInvalidActions == null ? undefined : injectInvalidActions,
+        stepTimeoutRetries: stepTimeoutRetries == null ? undefined : stepTimeoutRetries,
         timeouts: {
             stepMs: parseInteger(args.get('timeout-step-ms'), 75, 1, 60_000),
             episodeMs: parseInteger(args.get('timeout-episode-ms'), 20_000, 1, 10 * 60_000),
@@ -305,6 +323,22 @@ function buildBridgeOptionsFromArgs(args) {
             0,
             1_000
         ),
+        maxPendingAcks: parseInteger(
+            args.get('bridge-max-pending-acks'),
+            parseInteger(process.env.TRAINER_BRIDGE_MAX_PENDING_ACKS, 512, 16, 8192),
+            16,
+            8192
+        ),
+        backpressureThreshold: parseInteger(
+            args.get('bridge-backpressure-threshold'),
+            parseInteger(process.env.TRAINER_BRIDGE_BACKPRESSURE_THRESHOLD, 384, 8, 8192),
+            8,
+            8192
+        ),
+        dropTrainingPayloadWhenBacklogged: parseBoolean(
+            args.get('bridge-drop-training-when-backlogged'),
+            parseBoolean(process.env.TRAINER_BRIDGE_DROP_TRAINING_WHEN_BACKLOGGED, true)
+        ),
     };
 }
 
@@ -332,6 +366,13 @@ async function main() {
     const latestBefore = writeLatest
         ? await readJsonIfExists(layout.latestIndexPath)
         : null;
+    if (writeLatest) {
+        await writeJson(layout.latestBackupPath, {
+            generatedAt: new Date().toISOString(),
+            exists: latestBefore != null,
+            latest: latestBefore,
+        });
+    }
 
     let bridge = null;
     let bridgeReady = null;

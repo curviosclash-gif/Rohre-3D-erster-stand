@@ -3,6 +3,7 @@
 // ============================================
 
 import { deriveTrainingDomain } from '../../../state/training/TrainingDomain.js';
+import { toFiniteNumber } from '../../../utils/MathOps.js';
 
 export const TRAINING_AUTOMATION_RUN_CONTRACT_VERSION = 'v33-run-v1';
 export const TRAINING_AUTOMATION_KPI_CONTRACT_VERSION = 'v33-kpi-v1';
@@ -10,6 +11,7 @@ export const TRAINING_AUTOMATION_ARTIFACT_LAYOUT_VERSION = 'v33-artifact-v1';
 
 export const TRAINING_AUTOMATION_STAGE_ORDER = Object.freeze(['run', 'eval', 'gate']);
 export const TRAINING_AUTOMATION_BRIDGE_MODES = Object.freeze(['local', 'bridge']);
+export const TRAINING_AUTOMATION_RUNNER_PROFILES = Object.freeze(['ops', 'learn']);
 
 const DEFAULT_EPISODES = 3;
 const DEFAULT_SEEDS = Object.freeze([3, 7, 11]);
@@ -18,6 +20,7 @@ const DEFAULT_MODES = Object.freeze([
     { mode: 'hunt', planarMode: true },
 ]);
 const DEFAULT_MAX_STEPS = 180;
+const DEFAULT_RUNNER_PROFILE = 'ops';
 const DEFAULT_TIMEOUTS = Object.freeze({
     stepMs: 75,
     episodeMs: 20_000,
@@ -27,11 +30,6 @@ const DEFAULT_TIMEOUTS = Object.freeze({
 const RUNS_ROOT_DIR = 'data/training/runs';
 const MODELS_ROOT_DIR = 'data/training/models';
 const STAMP_SAFE_PATTERN = /[^a-zA-Z0-9_-]/g;
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
-}
 
 function toBoundedInt(value, fallback, minValue = 0, maxValue = Number.MAX_SAFE_INTEGER) {
     const numeric = Number(value);
@@ -148,6 +146,26 @@ function normalizeBridgeMode(input) {
     return 'local';
 }
 
+function normalizeRunnerProfile(input) {
+    const normalized = typeof input === 'string'
+        ? input.trim().toLowerCase()
+        : DEFAULT_RUNNER_PROFILE;
+    if (TRAINING_AUTOMATION_RUNNER_PROFILES.includes(normalized)) {
+        return normalized;
+    }
+    return DEFAULT_RUNNER_PROFILE;
+}
+
+function parseOptionalBoolean(value) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return null;
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return null;
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+    return null;
+}
+
 function normalizeTimeouts(input = {}) {
     return {
         stepMs: toBoundedInt(input.stepMs, DEFAULT_TIMEOUTS.stepMs, 1, 60_000),
@@ -159,6 +177,9 @@ function normalizeTimeouts(input = {}) {
 export function normalizeTrainingRunConfig(input = {}) {
     const episodes = toBoundedInt(input.episodes, DEFAULT_EPISODES, 1, 100_000);
     const maxSteps = toBoundedInt(input.maxSteps, DEFAULT_MAX_STEPS, 1, 1_000_000);
+    const runnerProfile = normalizeRunnerProfile(input.runnerProfile);
+    const injectInvalidActions = parseOptionalBoolean(input.injectInvalidActions);
+    const normalizedStepTimeoutRetries = toBoundedInt(input.stepTimeoutRetries, NaN, 0, 10);
     return {
         contractVersion: TRAINING_AUTOMATION_RUN_CONTRACT_VERSION,
         kpiContractVersion: TRAINING_AUTOMATION_KPI_CONTRACT_VERSION,
@@ -168,6 +189,13 @@ export function normalizeTrainingRunConfig(input = {}) {
         modes: normalizeModeList(input.modes),
         maxSteps,
         bridgeMode: normalizeBridgeMode(input.bridgeMode),
+        runnerProfile,
+        injectInvalidActions: injectInvalidActions == null
+            ? runnerProfile !== 'learn'
+            : injectInvalidActions,
+        stepTimeoutRetries: Number.isFinite(normalizedStepTimeoutRetries)
+            ? normalizedStepTimeoutRetries
+            : (runnerProfile === 'learn' ? 1 : 0),
         timeouts: normalizeTimeouts(input.timeouts || {}),
     };
 }
@@ -203,6 +231,7 @@ export function resolveTrainingRunArtifactLayout(stampInput = null) {
         evalArtifactPath: `${runDir}/eval.json`,
         gateArtifactPath: `${runDir}/gate.json`,
         trainerArtifactPath: `${runDir}/trainer.json`,
+        latestBackupPath: `${runDir}/latest-before.json`,
         checkpointPath: `${modelDir}/checkpoint.json`,
         latestIndexPath: `${RUNS_ROOT_DIR}/latest.json`,
     };

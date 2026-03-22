@@ -3,15 +3,12 @@
 // ============================================
 
 import { PERCEPTION_THRESHOLDS } from './perception/EnvironmentSamplingOps.js';
+import { clamp01 } from '../../utils/MathOps.js';
 
 const TARGET_RETAIN_BONUS = 0.08;
 const TARGET_SWITCH_MARGIN = 0.015;
 const TARGET_RETAIN_DISTANCE = 75;
 const TARGET_VULNERABILITY_WEIGHT = 0.2;
-
-function clamp01(value) {
-    return Math.max(0, Math.min(1, Number(value) || 0));
-}
 
 function resolveTargetVulnerability(target) {
     const maxHp = Number(target?.maxHp);

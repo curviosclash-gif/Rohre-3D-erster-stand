@@ -24,6 +24,8 @@
 
 import { resolveMenuCatalogText } from './MenuTextCatalog.js';
 import { renderLobbyView, updateLobbyView, disposeLobbyView } from './MenuLobbyRenderer.js';
+import { createMenuMultiplayerDiscoveryPort } from './multiplayer/MenuMultiplayerDiscoveryPort.js';
+import { createMenuMultiplayerHostIpResolver } from './multiplayer/MenuMultiplayerHostIpResolver.js';
 
 const MULTIPLAYER_MAX_PLAYERS = 10;
 
@@ -63,6 +65,23 @@ export function createMultiplayerPanel(ctx) {
     const container = ctx.container;
     const canHost = ctx.canHost === true;
     const onNavigateBack = typeof ctx.onNavigateBack === 'function' ? ctx.onNavigateBack : null;
+    const runtime = ctx.runtime && typeof ctx.runtime === 'object' ? ctx.runtime : null;
+    const discoveryRuntime = ctx.discoveryRuntime && typeof ctx.discoveryRuntime === 'object'
+        ? ctx.discoveryRuntime
+        : null;
+    const discoveryPort = ctx.discoveryPort && typeof ctx.discoveryPort === 'object'
+        ? ctx.discoveryPort
+        : createMenuMultiplayerDiscoveryPort({
+            runtime,
+            discoveryRuntime,
+        });
+    const hostIpResolver = ctx.hostIpResolver && typeof ctx.hostIpResolver.resolve === 'function'
+        ? ctx.hostIpResolver
+        : createMenuMultiplayerHostIpResolver({
+            runtime,
+            discoveryRuntime,
+            resolveHostIp: typeof ctx.resolveHostIp === 'function' ? ctx.resolveHostIp : null,
+        });
 
     let currentView = PANEL_VIEW.MENU;
     let panelRoot = null;
@@ -155,7 +174,7 @@ export function createMultiplayerPanel(ctx) {
             root.appendChild(hostBtn);
         }
 
-        const hasDiscovery = typeof window !== 'undefined' && window.curviosApp?.startDiscovery;
+        const hasDiscovery = discoveryPort?.isAvailable?.() === true;
         const joinBtn = createButton('nav-btn mp-join-btn', t('menu.multiplayer.join.label', 'Spiel beitreten'), () => {
             switchView(hasDiscovery ? PANEL_VIEW.DISCOVERY : PANEL_VIEW.JOIN_INPUT);
         });
@@ -198,7 +217,7 @@ export function createMultiplayerPanel(ctx) {
 
     function stopDiscovery() {
         if (discoveryCleanup) { discoveryCleanup(); discoveryCleanup = null; }
-        window.curviosApp?.stopDiscovery?.();
+        discoveryPort?.stop?.();
     }
 
     function handleDiscoveryJoin(host) {
@@ -243,9 +262,9 @@ export function createMultiplayerPanel(ctx) {
         }
 
         // Start listening
-        window.curviosApp.startDiscovery();
-        window.curviosApp.getDiscoveredHosts?.().then((hosts) => updateHostList(hosts));
-        discoveryCleanup = window.curviosApp.onDiscoveredHosts((hosts) => updateHostList(hosts));
+        discoveryPort?.start?.();
+        Promise.resolve(discoveryPort?.getHosts?.()).then((hosts) => updateHostList(hosts));
+        discoveryCleanup = discoveryPort?.subscribe?.((hosts) => updateHostList(hosts));
 
         // Manual fallback
         const manualBtn = createButton('nav-btn mp-manual-join-btn', 'Code manuell eingeben', () => {
@@ -265,7 +284,13 @@ export function createMultiplayerPanel(ctx) {
         const state = bridge.getSessionState();
 
         lobbyContainer = createElement('div', 'mp-lobby-container');
-        renderLobbyView(lobbyContainer, { sessionState: state, isHost });
+        renderLobbyView(lobbyContainer, {
+            sessionState: state,
+            isHost,
+            hostIpResolver,
+            runtime,
+            discoveryRuntime,
+        });
         root.appendChild(lobbyContainer);
 
         const actionBar = createElement('div', 'mp-lobby-actions');
@@ -323,7 +348,13 @@ export function createMultiplayerPanel(ctx) {
         if (!lobbyContainer) return;
         if (currentView === PANEL_VIEW.HOST_LOBBY || currentView === PANEL_VIEW.JOIN_LOBBY) {
             const isHost = currentView === PANEL_VIEW.HOST_LOBBY;
-            updateLobbyView(lobbyContainer, { sessionState, isHost });
+            updateLobbyView(lobbyContainer, {
+                sessionState,
+                isHost,
+                hostIpResolver,
+                runtime,
+                discoveryRuntime,
+            });
 
             const readyBtn = panelRoot?.querySelector('.mp-ready-btn');
             if (readyBtn) {

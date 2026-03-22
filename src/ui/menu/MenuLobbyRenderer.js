@@ -1,14 +1,12 @@
 /**
- * MenuLobbyRenderer.js — Lobby display component.
+ * MenuLobbyRenderer.js - Lobby display component.
  *
  * Renders player list with ready status, ping display,
- * settings summary (map, mode, rounds), and handles
- * dynamic updates via BroadcastChannel events.
+ * and settings summary (map, mode, rounds).
  */
 
 import { resolveMenuCatalogText } from './MenuTextCatalog.js';
-
-const MULTIPLAYER_CHANNEL_NAME = 'cuviosclash.multiplayer.v1';
+import { createMenuMultiplayerHostIpResolver } from './multiplayer/MenuMultiplayerHostIpResolver.js';
 
 function t(textId, fallback) {
     return resolveMenuCatalogText(textId, fallback);
@@ -27,7 +25,10 @@ function createElement(tag, className, textContent) {
 }
 
 function renderPlayerCard(member) {
-    const card = createElement('div', `mp-player-card${member.ready ? ' is-ready' : ''}${member.isHost ? ' is-host' : ''}${member.isLocal ? ' is-local' : ''}`);
+    const card = createElement(
+        'div',
+        `mp-player-card${member.ready ? ' is-ready' : ''}${member.isHost ? ' is-host' : ''}${member.isLocal ? ' is-local' : ''}`
+    );
 
     const nameRow = createElement('div', 'mp-player-name');
     const roleLabel = member.isHost ? ' (Host)' : '';
@@ -35,8 +36,11 @@ function renderPlayerCard(member) {
     card.appendChild(nameRow);
 
     const statusRow = createElement('div', 'mp-player-status');
-    const readyIndicator = createElement('span', `mp-ready-indicator${member.ready ? ' is-ready' : ''}`,
-        member.ready ? '\u2713' : '\u2014');
+    const readyIndicator = createElement(
+        'span',
+        `mp-ready-indicator${member.ready ? ' is-ready' : ''}`,
+        member.ready ? '\u2713' : '\u2014'
+    );
     statusRow.appendChild(readyIndicator);
     card.appendChild(statusRow);
 
@@ -50,9 +54,9 @@ function renderSettingsSummary(container, sessionState) {
 
     const settings = sessionState.members?.length > 0
         ? [
-            { label: t('menu.multiplayer.lobby.map', 'Map'), value: '—' },
-            { label: t('menu.multiplayer.lobby.mode', 'Modus'), value: '—' },
-            { label: t('menu.multiplayer.lobby.rounds', 'Runden'), value: '—' },
+            { label: t('menu.multiplayer.lobby.map', 'Map'), value: '\u2014' },
+            { label: t('menu.multiplayer.lobby.mode', 'Modus'), value: '\u2014' },
+            { label: t('menu.multiplayer.lobby.rounds', 'Runden'), value: '\u2014' },
         ]
         : [];
 
@@ -79,7 +83,7 @@ function renderPlayerList(container, sessionState) {
     }
 
     if (members.length === 0) {
-        const waiting = createElement('div', 'mp-waiting-message', t('menu.multiplayer.lobby.waiting', 'Warte auf Spieler…'));
+        const waiting = createElement('div', 'mp-waiting-message', t('menu.multiplayer.lobby.waiting', 'Warte auf Spieler...'));
         section.appendChild(waiting);
     }
 
@@ -89,57 +93,34 @@ function renderPlayerList(container, sessionState) {
 function renderCodeDisplay(container, sessionState, options) {
     const codeWrap = createElement('div', 'mp-lobby-code-display');
     const label = createElement('span', 'mp-code-label', t('menu.multiplayer.lobby.code', 'Lobby-Code'));
-    const codeValue = createElement('span', 'mp-code-value', normalizeString(sessionState.lobbyCode, '—'));
+    const codeValue = createElement('span', 'mp-code-value', normalizeString(sessionState.lobbyCode, '\u2014'));
     codeWrap.appendChild(label);
     codeWrap.appendChild(codeValue);
     container.appendChild(codeWrap);
 
-    // Show host IP for manual join fallback (only in host view)
     if (options?.isHost) {
         const ipWrap = createElement('div', 'mp-lobby-ip-display');
-        const ipLabel = createElement('span', 'mp-code-label', 'Deine IP');
+        const ipLabel = createElement('span', 'mp-code-label', t('menu.multiplayer.lobby.ip', 'Server-IP'));
         const ipValue = createElement('span', 'mp-code-value mp-ip-value', '...');
         ipWrap.appendChild(ipLabel);
         ipWrap.appendChild(ipValue);
         container.appendChild(ipWrap);
 
-        // Resolve IP: Electron IPC or fallback
-        if (typeof window !== 'undefined' && window.curviosApp?.getLanServerStatus) {
-            window.curviosApp.getLanServerStatus().then((status) => {
-                // IP comes from discovered hosts or we fetch it via the signaling server
-                const url = `http://localhost:${status.port || 9090}/discovery/info`;
-                fetch(url).then((r) => r.json()).then(() => {
-                    // Server is running — show local IPs via RTCPeerConnection trick
-                    resolveLocalIP().then((ip) => { ipValue.textContent = ip || 'localhost'; });
-                }).catch(() => { ipValue.textContent = 'localhost'; });
+        const hostIpResolver = options?.hostIpResolver
+            || createMenuMultiplayerHostIpResolver({
+                runtime: options?.runtime,
+                discoveryRuntime: options?.discoveryRuntime,
             });
-        } else {
-            resolveLocalIP().then((ip) => { ipValue.textContent = ip || 'localhost'; });
-        }
+        Promise.resolve(hostIpResolver?.resolve?.())
+            .then((ip) => {
+                if (!ipValue.isConnected) return;
+                ipValue.textContent = normalizeString(ip, 'localhost');
+            })
+            .catch(() => {
+                if (!ipValue.isConnected) return;
+                ipValue.textContent = 'localhost';
+            });
     }
-}
-
-/** Resolve local LAN IP via WebRTC (works in browsers without Node.js) */
-function resolveLocalIP() {
-    return new Promise((resolve) => {
-        try {
-            const pc = new RTCPeerConnection({ iceServers: [] });
-            pc.createDataChannel('');
-            pc.createOffer().then((offer) => pc.setLocalDescription(offer));
-            pc.onicecandidate = (e) => {
-                if (!e.candidate) return;
-                const match = e.candidate.candidate.match(/(\d+\.\d+\.\d+\.\d+)/);
-                if (match && match[1] !== '0.0.0.0') {
-                    pc.onicecandidate = null;
-                    pc.close();
-                    resolve(match[1]);
-                }
-            };
-            setTimeout(() => { pc.close(); resolve('localhost'); }, 2000);
-        } catch {
-            resolve('localhost');
-        }
-    });
 }
 
 function renderReadySummary(container, sessionState) {
@@ -150,8 +131,6 @@ function renderReadySummary(container, sessionState) {
     container.appendChild(readyWrap);
 }
 
-const activeBroadcastChannels = new WeakMap();
-
 export function renderLobbyView(container, options) {
     if (!container) return;
     const sessionState = options?.sessionState || {};
@@ -161,15 +140,6 @@ export function renderLobbyView(container, options) {
     renderPlayerList(container, sessionState);
     renderReadySummary(container, sessionState);
     renderSettingsSummary(container, sessionState);
-
-    if (!activeBroadcastChannels.has(container)) {
-        try {
-            const channel = new BroadcastChannel(MULTIPLAYER_CHANNEL_NAME);
-            activeBroadcastChannels.set(container, channel);
-        } catch {
-            // BroadcastChannel not available.
-        }
-    }
 }
 
 export function updateLobbyView(container, options) {
@@ -185,10 +155,5 @@ export function updateLobbyView(container, options) {
 
 export function disposeLobbyView(container) {
     if (!container) return;
-    const channel = activeBroadcastChannels.get(container);
-    if (channel) {
-        try { channel.close(); } catch { /* ignore */ }
-        activeBroadcastChannels.delete(container);
-    }
     container.innerHTML = '';
 }

@@ -27,7 +27,7 @@ function selectRecoveryManeuver(bot, player, arena, allPlayers) {
             { yaw: 1, pitch: 0, weight: 0.14, biasAwayFromNormal: true },
         ];
 
-    const sampleDistances = [3, 5.5, 8.5, 12];
+    const sampleDistances = [3, 5.5, 8.5, 12, 16];
     let best = null;
     let bestScore = Infinity;
 
@@ -87,7 +87,10 @@ function selectRecoveryManeuver(bot, player, arena, allPlayers) {
 function shouldBoostRecovery(bot, player, arena, allPlayers) {
     if (bot._recentBouncePressure > 1.2) return false;
     if (bot._bounceStreak >= 3) return false;
-    if (bot.sense.forwardRisk > 0.62) return false;
+    const recoveryBoostRiskCeiling = Number.isFinite(Number(bot.profile?.recoveryBoostRiskCeiling))
+        ? Number(bot.profile.recoveryBoostRiskCeiling)
+        : 0.55;
+    if (bot.sense.forwardRisk > recoveryBoostRiskCeiling) return false;
 
     player.getDirection(bot._tmpForward).normalize();
     bot._buildBasis(bot._tmpForward);
@@ -178,6 +181,14 @@ export function updateStuckState(bot, player, arena, allPlayers) {
     }
 
     bot._stuckScore += bot._recentBouncePressure * 0.06;
+    if (bot.sense.immediateDanger) {
+        bot._stuckScore += 0.16;
+    } else if (bot.sense.forwardRisk > 0.8) {
+        bot._stuckScore += 0.08;
+    }
+    if (bot.sense.pressure > 0.75) {
+        bot._stuckScore += 0.05;
+    }
     if (bot._bounceStreak >= 3) {
         bot._stuckScore += Math.min(0.35, 0.08 * (bot._bounceStreak - 2));
     }

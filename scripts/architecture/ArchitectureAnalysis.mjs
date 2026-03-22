@@ -6,6 +6,7 @@ import {
     LEGACY_CONSTRUCTOR_GAME_ALLOWLIST,
     LEGACY_DOM_ACCESS_ALLOWLIST,
     LEGACY_ENTITIES_TO_CORE_IMPORTS,
+    LEGACY_STATE_TO_CORE_IMPORTS,
     LEGACY_UI_TO_CORE_IMPORTS,
     createEdgeKey,
 } from './ArchitectureConfig.mjs';
@@ -155,6 +156,7 @@ function collectDomAccesses(filesByRelativePath) {
 function classifyEdgeViolations(edges) {
     const uiToCoreImports = [];
     const entitiesToCoreImports = [];
+    const stateToCoreImports = [];
 
     for (const edge of edges) {
         if (edge.from.startsWith('src/ui/') && edge.to.startsWith('src/core/')) {
@@ -173,11 +175,20 @@ function classifyEdgeViolations(edges) {
                 reason,
             });
         }
+        if (edge.from.startsWith('src/state/') && edge.to.startsWith('src/core/')) {
+            const reason = LEGACY_STATE_TO_CORE_IMPORTS.get(createEdgeKey(edge.from, edge.to)) || null;
+            stateToCoreImports.push({
+                ...edge,
+                allowed: !!reason,
+                reason,
+            });
+        }
     }
 
     return {
         uiToCoreImports,
         entitiesToCoreImports,
+        stateToCoreImports,
     };
 }
 
@@ -221,7 +232,11 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
     }));
 
     const importEdges = collectImportEdges(rootDir, filesByRelativePath);
-    const { uiToCoreImports, entitiesToCoreImports } = classifyEdgeViolations(importEdges);
+    const {
+        uiToCoreImports,
+        entitiesToCoreImports,
+        stateToCoreImports,
+    } = classifyEdgeViolations(importEdges);
     const constructorGameMatches = collectConstructorGameMatches(filesByRelativePath);
     const configWrites = collectConfigWrites(filesByRelativePath);
     const domAccessesOutsideUi = collectDomAccesses(filesByRelativePath);
@@ -238,6 +253,7 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             domAccessesOutsideUi,
             uiToCoreImports,
             entitiesToCoreImports,
+            stateToCoreImports,
         },
         importGraph: {
             localEdgeCount: importEdges.length,
@@ -277,6 +293,11 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             disallowedEdges: entitiesToCoreImports.filter((entry) => !entry.allowed).length,
             legacyEdges: summarizeEdges(entitiesToCoreImports.filter((entry) => entry.allowed)),
         },
+        stateToCoreImports: {
+            totalEdges: stateToCoreImports.length,
+            disallowedEdges: stateToCoreImports.filter((entry) => !entry.allowed).length,
+            legacyEdges: summarizeEdges(stateToCoreImports.filter((entry) => entry.allowed)),
+        },
     };
 
     return report;
@@ -298,6 +319,7 @@ export function formatArchitectureReport(report) {
     lines.push(`DOM outside src/ui: ${report.scorecard.domAccessOutsideUi.totalOccurrences} across ${report.scorecard.domAccessOutsideUi.totalFiles} files (${report.scorecard.domAccessOutsideUi.disallowedFiles} disallowed files)`);
     lines.push(`ui -> core imports: ${report.scorecard.uiToCoreImports.totalEdges} edges (${report.scorecard.uiToCoreImports.disallowedEdges} disallowed)`);
     lines.push(`entities -> core imports: ${report.scorecard.entitiesToCoreImports.totalEdges} edges (${report.scorecard.entitiesToCoreImports.disallowedEdges} disallowed)`);
+    lines.push(`state -> core imports: ${report.scorecard.stateToCoreImports.totalEdges} edges (${report.scorecard.stateToCoreImports.disallowedEdges} disallowed)`);
     lines.push('');
     lines.push('Largest src files:');
     lines.push(formatList(report.fileSizes.largestFiles.slice(0, 8), (entry) => `${entry.file} (${entry.lines} lines)`));

@@ -2,12 +2,61 @@
 // MenuRuntimeMultiplayerService.js - multiplayer lobby/runtime helpers
 // ============================================
 
+import { MenuMultiplayerBridge } from '../../ui/menu/MenuMultiplayerBridge.js';
+import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
+
 function deepClone(value) {
     try {
         return JSON.parse(JSON.stringify(value));
     } catch {
         return null;
     }
+}
+
+function ensureMultiplayerSessionType(game) {
+    if (!game?.settings || typeof game.settings !== 'object') return;
+    if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+        game.settings.localSettings = {};
+    }
+    game.settings.localSettings.sessionType = 'multiplayer';
+}
+
+export function createMenuMultiplayerBridge(options = {}) {
+    const {
+        existingBridge = null,
+        contractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION,
+        onEvent = null,
+        onStatus = null,
+        onStateChanged = null,
+        onMatchStart = null,
+        now,
+        runtime,
+        storage,
+        sessionStorage,
+        peerId,
+    } = options;
+
+    if (existingBridge) {
+        existingBridge.contractVersion = contractVersion;
+        existingBridge.onEvent = typeof onEvent === 'function' ? onEvent : null;
+        existingBridge.onStatus = typeof onStatus === 'function' ? onStatus : null;
+        existingBridge.onStateChanged = typeof onStateChanged === 'function' ? onStateChanged : null;
+        existingBridge.onMatchStart = typeof onMatchStart === 'function' ? onMatchStart : null;
+        return existingBridge;
+    }
+
+    return new MenuMultiplayerBridge({
+        contractVersion,
+        onEvent,
+        onStatus,
+        onStateChanged,
+        onMatchStart,
+        now,
+        runtime,
+        storage,
+        sessionStorage,
+        peerId,
+    });
 }
 
 export function didHostChangeMatchSettings(changedKeys, matchSettingChangeKeySet) {
@@ -147,6 +196,7 @@ export function handleMultiplayerHostAction({
         return result;
     }
 
+    ensureMultiplayerSessionType(game);
     if (game.ui?.multiplayerLobbyCodeInput) {
         game.ui.multiplayerLobbyCodeInput.value = result.lobbyCode || '';
     }
@@ -173,6 +223,7 @@ export function handleMultiplayerJoinAction({
         return result;
     }
 
+    ensureMultiplayerSessionType(game);
     if (game.ui?.multiplayerLobbyCodeInput) {
         game.ui.multiplayerLobbyCodeInput.value = result.lobbyCode || '';
     }
@@ -187,6 +238,7 @@ export function handleMultiplayerReadyToggleAction({
     menuMultiplayerBridge,
     syncUiState,
 }) {
+    ensureMultiplayerSessionType(game);
     const result = menuMultiplayerBridge?.toggleReady({
         actorId: resolveMenuAccessContext?.()?.actorId,
         ready: !!event?.ready,

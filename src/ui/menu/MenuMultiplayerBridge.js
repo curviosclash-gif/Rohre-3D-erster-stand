@@ -2,6 +2,14 @@ import {
     MENU_LIFECYCLE_EVENT_CONTRACT_VERSION,
     buildMenuLifecycleEventPayload,
 } from './MenuStateContracts.js';
+import {
+    createBroadcastChannelHandle,
+    resolveEventTarget,
+    resolveGlobalObject,
+    resolveRuntimeTimer,
+    resolveStorage,
+    toCallable,
+} from './multiplayer/MenuMultiplayerBridgeRuntime.js';
 
 export const MENU_MULTIPLAYER_EVENT_TYPES = Object.freeze({
     HOST: 'multiplayer_host',
@@ -24,7 +32,6 @@ function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
     return normalized || fallback;
 }
-
 function normalizeLobbyCode(value, fallback = '') {
     const normalized = normalizeString(value, fallback)
         .toUpperCase()
@@ -39,7 +46,6 @@ function toTimestamp(value, fallback) {
     const parsed = Number(value);
     return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : fallback;
 }
-
 function deepClone(value) {
     try {
         return JSON.parse(JSON.stringify(value));
@@ -48,22 +54,37 @@ function deepClone(value) {
     }
 }
 
-function resolveStorage(providedStorage, storageName) {
-    if (providedStorage && typeof providedStorage.getItem === 'function') {
-        return providedStorage;
-    }
+function buildRuntimeId(nowProvider, randomProvider, randomLength = 6) {
+    const fallbackNow = Date.now();
+    let rawNow = Number.NaN;
     try {
-        return globalThis?.[storageName] || null;
+        rawNow = Number(toCallable(nowProvider, () => fallbackNow)());
     } catch {
-        return null;
+        rawNow = Number.NaN;
     }
+    const safeNow = Number.isFinite(rawNow) ? Math.max(0, Math.floor(rawNow)) : fallbackNow;
+    let randomValue = Number.NaN;
+    try {
+        randomValue = Number(toCallable(randomProvider, Math.random)());
+    } catch {
+        randomValue = Number.NaN;
+    }
+
+    const normalizedRandom = Number.isFinite(randomValue)
+        ? Math.abs(randomValue % 1)
+        : Math.random();
+    const randomToken = normalizedRandom
+        .toString(36)
+        .slice(2, 2 + randomLength)
+        .padEnd(randomLength, '0');
+    return `${safeNow.toString(36)}-${randomToken}`;
 }
 
-function createPeerId() {
-    return `mp-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+function createPeerId(nowProvider, randomProvider) {
+    return `mp-${buildRuntimeId(nowProvider, randomProvider, 6)}`;
 }
 
-function ensurePeerId(providedPeerId, sessionStorage) {
+function ensurePeerId(providedPeerId, sessionStorage, nowProvider, randomProvider) {
     const normalizedProvidedPeerId = normalizeString(providedPeerId, '');
     if (normalizedProvidedPeerId) return normalizedProvidedPeerId;
 
@@ -74,7 +95,7 @@ function ensurePeerId(providedPeerId, sessionStorage) {
         // Ignore sessionStorage lookup failures.
     }
 
-    const nextPeerId = createPeerId();
+    const nextPeerId = createPeerId(nowProvider, randomProvider);
     try {
         sessionStorage?.setItem?.(MULTIPLAYER_PEER_SESSION_KEY, nextPeerId);
     } catch {
@@ -220,8 +241,9 @@ function deriveSessionState(snapshot, peerId) {
     };
 }
 
-function generateLobbyCode() {
-    return `LOBBY-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+function generateLobbyCode(randomProvider) {
+    const randomToken = buildRuntimeId(Date.now, randomProvider, 4).split('-')[1] || '0000';
+    return `LOBBY-${randomToken.toUpperCase()}`;
 }
 
 function readSnapshotFromStorage(storage, lobbyCode, now) {
@@ -253,17 +275,13 @@ function persistSnapshotToStorage(storage, snapshot) {
     }
 }
 
-function createBroadcastChannelHandle() {
-    if (typeof BroadcastChannel !== 'function') return null;
-    try {
-        return new BroadcastChannel(MULTIPLAYER_CHANNEL_NAME);
-    } catch {
-        return null;
-    }
-}
-
 export class MenuMultiplayerBridge {
     constructor(options = {}) {
+        const runtime = options.runtime && typeof options.runtime === 'object' ? options.runtime : {};
+        const runtimeGlobal = resolveGlobalObject(runtime.global || null);
+        const runtimeNow = toCallable(runtime.now, null);
+        const runtimeRandom = toCallable(runtime.random, null);
+
         this.contractVersion = normalizeString(options.contractVersion, MENU_LIFECYCLE_EVENT_CONTRACT_VERSION);
         this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : null;
         this.onStatus = typeof options.onStatus === 'function' ? options.onStatus : null;
@@ -271,11 +289,17 @@ export class MenuMultiplayerBridge {
         this.onMatchStart = typeof options.onMatchStart === 'function' ? options.onMatchStart : null;
 
         this._events = [];
-        this._now = typeof options.now === 'function' ? options.now : (() => Date.now());
-        this._storage = resolveStorage(options.storage, 'localStorage');
-        this._sessionStorage = resolveStorage(options.sessionStorage, 'sessionStorage');
-        this._peerId = ensurePeerId(options.peerId, this._sessionStorage);
-        this._channel = createBroadcastChannelHandle();
+        this._now = toCallable(options.now, runtimeNow || (() => Date.now()));
+        this._random = runtimeRandom || Math.random;
+        this._eventTarget = resolveEventTarget(runtime.eventTarget || runtimeGlobal);
+        this._setInterval = resolveRuntimeTimer(runtime.setInterval, runtimeGlobal, 'setInterval');
+        this._clearInterval = resolveRuntimeTimer(runtime.clearInterval, runtimeGlobal, 'clearInterval');
+        this._setTimeout = resolveRuntimeTimer(runtime.setTimeout, runtimeGlobal, 'setTimeout');
+        this._clearTimeout = resolveRuntimeTimer(runtime.clearTimeout, runtimeGlobal, 'clearTimeout');
+        this._storage = resolveStorage(options.storage, 'localStorage', runtimeGlobal);
+        this._sessionStorage = resolveStorage(options.sessionStorage, 'sessionStorage', runtimeGlobal);
+        this._peerId = ensurePeerId(options.peerId, this._sessionStorage, this._now, this._random);
+        this._channel = createBroadcastChannelHandle(runtime.createBroadcastChannel, runtimeGlobal, MULTIPLAYER_CHANNEL_NAME);
         this._activeLobbyCode = '';
         this._sessionSnapshot = null;
         this._sessionState = createIdleSessionState(this._peerId);
@@ -287,8 +311,8 @@ export class MenuMultiplayerBridge {
         this._boundBeforeUnload = () => this.dispose();
         this._boundChannelHandler = (event) => this._handleBroadcastChannelMessage(event);
 
-        globalThis?.addEventListener?.('storage', this._boundStorageHandler);
-        globalThis?.addEventListener?.('beforeunload', this._boundBeforeUnload);
+        this._eventTarget?.addEventListener?.('storage', this._boundStorageHandler);
+        this._eventTarget?.addEventListener?.('beforeunload', this._boundBeforeUnload);
         this._channel?.addEventListener?.('message', this._boundChannelHandler);
     }
 
@@ -389,15 +413,17 @@ export class MenuMultiplayerBridge {
     }
 
     _startHeartbeat() {
-        if (this._heartbeatTimer) return;
-        this._heartbeatTimer = setInterval(() => {
+        if (this._heartbeatTimer || typeof this._setInterval !== 'function') return;
+        this._heartbeatTimer = this._setInterval(() => {
             this._updateHeartbeat();
         }, HEARTBEAT_INTERVAL_MS);
     }
 
     _stopHeartbeat() {
         if (!this._heartbeatTimer) return;
-        clearInterval(this._heartbeatTimer);
+        if (typeof this._clearInterval === 'function') {
+            this._clearInterval(this._heartbeatTimer);
+        }
         this._heartbeatTimer = null;
     }
 
@@ -431,10 +457,12 @@ export class MenuMultiplayerBridge {
 
     _schedulePendingMatchCommandClear(lobbyCode, commandId) {
         if (this._pendingMatchClearTimer) {
-            clearTimeout(this._pendingMatchClearTimer);
+            if (typeof this._clearTimeout === 'function') {
+                this._clearTimeout(this._pendingMatchClearTimer);
+            }
             this._pendingMatchClearTimer = null;
         }
-        this._pendingMatchClearTimer = setTimeout(() => {
+        const clearPendingCommand = () => {
             this._pendingMatchClearTimer = null;
             this._updateActiveSnapshot((snapshot) => {
                 if (!snapshot) return null;
@@ -446,7 +474,13 @@ export class MenuMultiplayerBridge {
                     pendingMatchStart: null,
                 };
             }, 'match_start_cleared');
-        }, MATCH_START_CLEAR_DELAY_MS);
+        };
+
+        if (typeof this._setTimeout !== 'function') {
+            clearPendingCommand();
+            return;
+        }
+        this._pendingMatchClearTimer = this._setTimeout(clearPendingCommand, MATCH_START_CLEAR_DELAY_MS);
     }
 
     _handleStorageEvent(event) {
@@ -522,7 +556,7 @@ export class MenuMultiplayerBridge {
 
     host(options = {}) {
         const actorId = normalizeString(options.actorId, 'host');
-        const requestedLobbyCode = normalizeLobbyCode(options.lobbyCode, generateLobbyCode());
+        const requestedLobbyCode = normalizeLobbyCode(options.lobbyCode, generateLobbyCode(this._random));
         if (this._activeLobbyCode && this._activeLobbyCode !== requestedLobbyCode) {
             this.leave({ silent: true });
         }
@@ -767,7 +801,7 @@ export class MenuMultiplayerBridge {
             return this._fail('Alle Teilnehmer muessen Ready sein.', 'members_not_ready');
         }
 
-        const commandId = `match-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+        const commandId = `match-${buildRuntimeId(this._now, this._random, 5)}`;
         const command = {
             commandId,
             lobbyCode: this._activeLobbyCode,
@@ -817,11 +851,13 @@ export class MenuMultiplayerBridge {
         this.leave({ silent: true });
         this._stopHeartbeat();
         if (this._pendingMatchClearTimer) {
-            clearTimeout(this._pendingMatchClearTimer);
+            if (typeof this._clearTimeout === 'function') {
+                this._clearTimeout(this._pendingMatchClearTimer);
+            }
             this._pendingMatchClearTimer = null;
         }
-        globalThis?.removeEventListener?.('storage', this._boundStorageHandler);
-        globalThis?.removeEventListener?.('beforeunload', this._boundBeforeUnload);
+        this._eventTarget?.removeEventListener?.('storage', this._boundStorageHandler);
+        this._eventTarget?.removeEventListener?.('beforeunload', this._boundBeforeUnload);
         this._channel?.removeEventListener?.('message', this._boundChannelHandler);
         this._channel?.close?.();
     }

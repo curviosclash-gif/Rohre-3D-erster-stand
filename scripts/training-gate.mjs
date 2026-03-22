@@ -1,4 +1,4 @@
-import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -11,6 +11,10 @@ import {
     TRAINING_GATE_BASELINE_REFERENCE,
     TRAINING_GATE_THRESHOLD_VERSION,
 } from '../src/state/training/TrainingGateThresholds.js';
+import {
+    buildBotValidationEval,
+    evaluateBotValidationDrift,
+} from './training-bot-validation-lane.mjs';
 
 const RUNS_ROOT = path.join('data', 'training', 'runs');
 
@@ -333,6 +337,25 @@ async function upsertLatestIndex(runStamp, updates = {}) {
     };
 }
 
+async function restoreLatestIndex(layout, latestSnapshot = null) {
+    const backup = await readJsonIfExists(layout.latestBackupPath);
+    if (backup && typeof backup === 'object') {
+        if (backup.exists === true && backup.latest && typeof backup.latest === 'object') {
+            await writeJson(layout.latestIndexPath, backup.latest);
+            return true;
+        }
+        if (backup.exists === false) {
+            await rm(layout.latestIndexPath, { force: true });
+            return true;
+        }
+    }
+    if (latestSnapshot && typeof latestSnapshot === 'object') {
+        await writeJson(layout.latestIndexPath, latestSnapshot);
+        return true;
+    }
+    return false;
+}
+
 async function main() {
     const args = parseArgs(process.argv.slice(2));
     const writeLatest = parseBoolean(args['write-latest'], true);
@@ -348,11 +371,35 @@ async function main() {
     }
 
     const runDir = path.join(RUNS_ROOT, runStamp);
+    const layout = resolveTrainingRunArtifactLayout(runStamp);
     const evalPath = typeof args.eval === 'string' && args.eval.trim()
         ? args.eval.trim()
         : path.join(runDir, 'eval.json');
     const trendWindowSize = Math.max(2, Math.min(12, Number(args.window) || 3));
-    const evalArtifact = await readJson(evalPath);
+    const latestBefore = writeLatest ? await readJsonIfExists(layout.latestIndexPath) : null;
+    let evalArtifact = await readJson(evalPath);
+
+    const botValidationReportPath = (
+        typeof args['bot-validation-report'] === 'string' && args['bot-validation-report'].trim()
+            ? args['bot-validation-report'].trim()
+            : (
+                typeof evalArtifact?.source?.botValidationReportPath === 'string' && evalArtifact.source.botValidationReportPath.trim()
+                    ? evalArtifact.source.botValidationReportPath.trim()
+                    : (
+                        typeof evalArtifact?.botValidation?.source?.reportPath === 'string' && evalArtifact.botValidation.source.reportPath.trim()
+                            ? evalArtifact.botValidation.source.reportPath.trim()
+                            : path.join(runDir, 'bot-validation-report.json')
+                    )
+            )
+    );
+    const botValidationReport = await readJsonIfExists(botValidationReportPath);
+    evalArtifact = {
+        ...evalArtifact,
+        botValidation: buildBotValidationEval(botValidationReport, {
+            reportPath: toRepoPath(botValidationReportPath),
+            exists: botValidationReport != null,
+        }),
+    };
 
     const gateResult = evaluateTrainingGate(evalArtifact, {
         baseline: TRAINING_GATE_BASELINE_REFERENCE,
@@ -360,7 +407,8 @@ async function main() {
     const trendWindowRows = await resolveRollingWindow(runStamp, trendWindowSize);
     const trendResult = evaluateRollingTrend(trendWindowRows);
     const playEvalResult = evaluatePlayEvalDrift(evalArtifact);
-    const combinedOk = gateResult.ok && trendResult.ok && playEvalResult.ok;
+    const botValidationResult = evaluateBotValidationDrift(evalArtifact);
+    const combinedOk = gateResult.ok && trendResult.ok && playEvalResult.ok && botValidationResult.ok;
     const gateArtifact = {
         ok: combinedOk,
         status: combinedOk ? 'pass' : 'fail',
@@ -381,23 +429,31 @@ async function main() {
             ...trendResult,
         },
         playEvalGate: playEvalResult,
+        botValidationGate: botValidationResult,
     };
 
     const gatePath = path.join(runDir, 'gate.json');
     await writeJson(gatePath, gateArtifact);
 
-    const latestUpdate = writeLatest
-        ? await upsertLatestIndex(runStamp, {
-            run: latestIndex.latest?.artifacts?.run?.path || latestIndex.latest?.run || null,
-            eval: toRepoPath(evalPath),
-            gate: toRepoPath(gatePath),
-        })
-        : null;
+    let latestUpdate = null;
+    let latestRestored = false;
+    if (writeLatest) {
+        if (combinedOk) {
+            latestUpdate = await upsertLatestIndex(runStamp, {
+                run: latestIndex.latest?.artifacts?.run?.path || latestIndex.latest?.run || null,
+                eval: toRepoPath(evalPath),
+                gate: toRepoPath(gatePath),
+            });
+        } else {
+            latestRestored = await restoreLatestIndex(layout, latestBefore);
+        }
+    }
 
     const reportLines = [
         ...gateResult.checks.map(formatMetricLine),
         ...trendResult.checks.map(formatTrendLine),
         ...playEvalResult.checks.map(formatMetricLine),
+        ...botValidationResult.checks.map(formatMetricLine),
     ];
     console.log(JSON.stringify({
         ok: combinedOk,
@@ -405,6 +461,7 @@ async function main() {
         runStamp,
         gatePath: toRepoPath(gatePath),
         latestIndexPath: latestUpdate ? toRepoPath(latestUpdate.latestPath) : null,
+        latestRestored,
         trendWindowSize,
         trendSampleCount: trendResult.sampleCount,
         report: reportLines,

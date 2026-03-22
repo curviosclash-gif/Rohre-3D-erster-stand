@@ -7,7 +7,7 @@ import process from 'node:process';
 import { normalizeTrainingRunStamp } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
 
 const SERIES_ROOT = 'data/training/series';
-const DEFAULT_STAGE_TIMEOUT_MS = 10 * 60_000;
+const DEFAULT_STAGE_TIMEOUT_MS = 60 * 60_000;
 const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
 
 function parseArgMap(argv) {
@@ -48,6 +48,19 @@ function parseInteger(value, fallback, min = 0, max = Number.MAX_SAFE_INTEGER) {
     return Math.max(min, Math.min(max, Math.trunc(numeric)));
 }
 
+function parseOptionalInteger(value, min = 0, max = Number.MAX_SAFE_INTEGER) {
+    if (value == null || value === '') return null;
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return null;
+    return Math.max(min, Math.min(max, Math.trunc(numeric)));
+}
+
+function parsePositiveNumber(value, fallback = null) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric) || numeric <= 0) return fallback;
+    return numeric;
+}
+
 function toRepoPath(targetPath) {
     return String(targetPath || '').replace(/\\/g, '/');
 }
@@ -70,6 +83,24 @@ function collectForwardArgs(args, key, target = key) {
     const value = args.get(key);
     if (typeof value !== 'string' || !value.trim()) return [];
     return [`--${target}`, value.trim()];
+}
+
+function resolveDurationBudgetMs(args) {
+    if (typeof args.get('duration-ms') === 'string') {
+        const durationMs = parseInteger(args.get('duration-ms'), null, 1, 7 * 24 * 60 * 60_000);
+        if (durationMs == null) {
+            throw new Error('duration-ms must be a positive integer');
+        }
+        return durationMs;
+    }
+    if (typeof args.get('duration-hours') === 'string') {
+        const durationHours = parsePositiveNumber(args.get('duration-hours'), null);
+        if (durationHours == null) {
+            throw new Error('duration-hours must be a positive number');
+        }
+        return parseInteger(durationHours * 60 * 60_000, null, 1, 7 * 24 * 60 * 60_000);
+    }
+    return null;
 }
 
 function sleep(ms) {
@@ -236,6 +267,9 @@ function buildRunStageArgs(args, stamp) {
         ['seeds', 'seeds'],
         ['modes', 'modes'],
         ['max-steps', 'max-steps'],
+        ['runner-profile', 'runner-profile'],
+        ['inject-invalid-actions', 'inject-invalid-actions'],
+        ['step-timeout-retries', 'step-timeout-retries'],
         ['timeout-step-ms', 'timeout-step-ms'],
         ['timeout-episode-ms', 'timeout-episode-ms'],
         ['timeout-run-ms', 'timeout-run-ms'],
@@ -250,6 +284,9 @@ function buildRunStageArgs(args, stamp) {
         ['bridge-action-probe-timeout-ms', 'bridge-action-probe-timeout-ms'],
         ['bridge-action-probe-observation-length', 'bridge-action-probe-observation-length'],
         ['bridge-drain-timeout-ms', 'bridge-drain-timeout-ms'],
+        ['bridge-max-pending-acks', 'bridge-max-pending-acks'],
+        ['bridge-backpressure-threshold', 'bridge-backpressure-threshold'],
+        ['bridge-drop-training-when-backlogged', 'bridge-drop-training-when-backlogged'],
         ['write-checkpoint', 'write-checkpoint'],
         ['write-latest', 'write-latest'],
         ['quiet', 'quiet'],
@@ -263,6 +300,7 @@ function buildStageForwardArgs(args, stamp) {
     return [
         '--stamp', stamp,
         ...collectForwardArgs(args, 'write-latest', 'write-latest'),
+        ...collectForwardArgs(args, 'bot-validation-report', 'bot-validation-report'),
     ];
 }
 
@@ -270,6 +308,11 @@ function buildSummary(input) {
     const runs = Array.isArray(input?.runs) ? input.runs : [];
     const completedRuns = runs.filter((entry) => entry.status === 'completed').length;
     const failedRuns = runs.filter((entry) => entry.status === 'failed').length;
+    const durationBudgetMs = parseOptionalInteger(input?.durationBudgetMs, 1, 7 * 24 * 60 * 60_000);
+    const elapsedMs = parseInteger(input?.elapsedMs, 0, 0, 30 * 24 * 60 * 60_000);
+    const stopReason = typeof input?.stopReason === 'string' && input.stopReason.trim()
+        ? input.stopReason.trim()
+        : null;
     const stageFailures = [];
     for (const run of runs) {
         for (const stage of run.stages || []) {
@@ -288,13 +331,23 @@ function buildSummary(input) {
         runsExecuted: runs.length,
         runsCompleted: completedRuns,
         runsFailed: failedRuns,
+        elapsedMs,
+        durationBudgetMs,
+        durationBudgetReached: durationBudgetMs != null && elapsedMs >= durationBudgetMs,
+        stopReason,
         stageFailures,
     };
 }
 
 async function main() {
     const args = parseArgMap(process.argv.slice(2));
-    const runsRequested = parseInteger(args.get('runs'), 3, 1, 500);
+    const durationBudgetMs = resolveDurationBudgetMs(args);
+    const runsRequested = parseInteger(
+        args.get('runs'),
+        durationBudgetMs != null ? 100_000 : 3,
+        1,
+        100_000
+    );
     const stopOnFail = parseBoolean(args.get('stop-on-fail'), true);
     const withTrainerServer = parseBoolean(args.get('with-trainer-server'), true);
     const writeLatest = parseBoolean(args.get('write-latest'), true);
@@ -306,6 +359,7 @@ async function main() {
     let trainerServer = null;
     const runResults = [];
     const startedAt = Date.now();
+    let stopReason = null;
 
     try {
         if (withTrainerServer) {
@@ -317,6 +371,10 @@ async function main() {
         }
 
         for (let runIndex = 1; runIndex <= runsRequested; runIndex++) {
+            if (durationBudgetMs != null && (Date.now() - startedAt) >= durationBudgetMs) {
+                stopReason = 'duration-budget-reached';
+                break;
+            }
             const runStamp = resolveRunStamp(seriesStamp, runIndex);
             const stages = [];
             const runStageArgs = buildRunStageArgs(args, runStamp);
@@ -374,6 +432,7 @@ async function main() {
                 stages,
             });
             if (failedStage && stopOnFail) {
+                stopReason = 'stage-failure-stop-on-fail';
                 break;
             }
         }
@@ -382,8 +441,20 @@ async function main() {
     }
 
     const finishedAt = Date.now();
+    if (!stopReason) {
+        if (runResults.length >= runsRequested) {
+            stopReason = 'runs-limit-reached';
+        } else if (durationBudgetMs != null && (finishedAt - startedAt) >= durationBudgetMs) {
+            stopReason = 'duration-budget-reached';
+        } else {
+            stopReason = 'completed';
+        }
+    }
     const summary = buildSummary({
         runsRequested,
+        elapsedMs: Math.max(0, finishedAt - startedAt),
+        durationBudgetMs,
+        stopReason,
         runs: runResults,
     });
     const output = {
@@ -395,6 +466,8 @@ async function main() {
         stopOnFail,
         writeLatest,
         stageTimeoutMs,
+        durationBudgetMs,
+        stopReason,
         elapsedMs: Math.max(0, finishedAt - startedAt),
         runs: runResults,
         summary,

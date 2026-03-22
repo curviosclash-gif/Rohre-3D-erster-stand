@@ -1,3 +1,5 @@
+import { toFiniteNumber } from '../../utils/MathOps.js';
+
 export const SETTINGS_LIMITS = Object.freeze({
     session: Object.freeze({
         numBots: Object.freeze({ min: 0, max: 8, integer: true }),
@@ -23,11 +25,6 @@ export const SETTINGS_LIMITS = Object.freeze({
         retryDelayMs: Object.freeze({ min: 0, max: 1000, integer: true }),
     }),
 });
-
-function toFiniteNumber(value, fallback) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-}
 
 export function clampSettingValue(value, limits, fallback) {
     const min = Number(limits?.min);

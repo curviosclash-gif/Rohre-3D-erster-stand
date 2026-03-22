@@ -10,6 +10,7 @@ export class ModularVehicleMesh extends THREE.Group {
         this.config = config;
         this.materials = new Map();
         this.geometries = new Map();
+        this.dynamicGeometries = new Set();
         this.isWireframe = false;
 
         this.initMaterials(config);
@@ -37,6 +38,8 @@ export class ModularVehicleMesh extends THREE.Group {
     }
 
     build() {
+        this.disposeDynamicGeometries();
+
         // Resource Disposal (Geometries & Cloned Materials)
         this.traverse(child => {
             if (child.isMesh) {
@@ -59,6 +62,19 @@ export class ModularVehicleMesh extends THREE.Group {
         this.config.parts.forEach((partConfig, index) => {
             this.buildRecursive(this, partConfig, index, [], false);
         });
+    }
+
+    trackDynamicGeometry(geometry) {
+        if (!geometry || !geometry.isBufferGeometry) return geometry;
+        this.dynamicGeometries.add(geometry);
+        return geometry;
+    }
+
+    disposeDynamicGeometries() {
+        this.dynamicGeometries.forEach((geometry) => {
+            geometry.dispose();
+        });
+        this.dynamicGeometries.clear();
     }
 
     buildRecursive(parentGroup, partConfig, index, path = [], isMirror = false) {
@@ -161,20 +177,20 @@ export class ModularVehicleMesh extends THREE.Group {
         const s = data.size || [0.28, 0.28, 0.5]; // radiusTop, radiusBottom, height
 
         // Shroud
-        const shroudGeo = new THREE.CylinderGeometry(s[0], s[1], s[2], 12);
+        const shroudGeo = this.trackDynamicGeometry(new THREE.CylinderGeometry(s[0], s[1], s[2], 12));
         shroudGeo.rotateX(Math.PI / 2);
         const shroud = new THREE.Mesh(shroudGeo, this.materials.get('secondary').clone());
         group.add(shroud);
 
         // Nozzle
-        const nozzleGeo = new THREE.CylinderGeometry(s[0] * 0.7, s[0] * 0.8, s[2] * 0.3, 12, 1, true);
+        const nozzleGeo = this.trackDynamicGeometry(new THREE.CylinderGeometry(s[0] * 0.7, s[0] * 0.8, s[2] * 0.3, 12, 1, true));
         nozzleGeo.rotateX(Math.PI / 2);
         const nozzle = new THREE.Mesh(nozzleGeo, new THREE.MeshStandardMaterial({ color: 0x111111, metalness: 1, roughness: 0.2 }));
         nozzle.position.z = s[2] * 0.5;
         group.add(nozzle);
 
         // Core
-        const coreGeo = new THREE.SphereGeometry(s[0] * 0.4, 8, 8);
+        const coreGeo = this.trackDynamicGeometry(new THREE.SphereGeometry(s[0] * 0.4, 8, 8));
         const core = new THREE.Mesh(coreGeo, this.materials.get('glow').clone());
         core.position.z = s[2] * 0.4;
         group.add(core);
@@ -185,7 +201,7 @@ export class ModularVehicleMesh extends THREE.Group {
 
     createForceFieldCompound(data) {
         const s = data.size || [0.06, 0.06, 1.2]; // radiusTop, radiusBottom, length
-        const geo = new THREE.CylinderGeometry(s[0], s[1], s[2], 8, 1, true);
+        const geo = this.trackDynamicGeometry(new THREE.CylinderGeometry(s[0], s[1], s[2], 8, 1, true));
         geo.rotateX(Math.PI / 2);
 
         const mat = new THREE.MeshStandardMaterial({
@@ -215,7 +231,7 @@ export class ModularVehicleMesh extends THREE.Group {
 
     createFlameCompound(data) {
         const s = data.size || [0.15, 0.01, 0.5]; // radiusTop, radiusBottom, length
-        const geo = new THREE.CylinderGeometry(s[0], s[1], s[2], 8);
+        const geo = this.trackDynamicGeometry(new THREE.CylinderGeometry(s[0], s[1], s[2], 8));
         geo.rotateX(-Math.PI / 2);
 
         const mat = new THREE.MeshBasicMaterial({
@@ -286,6 +302,7 @@ export class ModularVehicleMesh extends THREE.Group {
     }
 
     dispose() {
+        this.disposeDynamicGeometries();
         this.traverse(child => {
             if (child.isMesh) {
                 if (child.material) {

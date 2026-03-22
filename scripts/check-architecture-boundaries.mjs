@@ -36,6 +36,13 @@ const violations = [
             location: `${entry.from}:${entry.line}`,
             detail: `${entry.from} -> ${entry.to}`,
         })),
+    ...report.findings.stateToCoreImports
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: 'state -> core import',
+            location: `${entry.from}:${entry.line}`,
+            detail: `${entry.from} -> ${entry.to}`,
+        })),
 ];
 
 if (violations.length === 0) {
@@ -45,6 +52,7 @@ if (violations.length === 0) {
     console.log(`DOM outside src/ui disallowed files: ${report.scorecard.domAccessOutsideUi.disallowedFiles}`);
     console.log(`ui -> core disallowed imports: ${report.scorecard.uiToCoreImports.disallowedEdges}`);
     console.log(`entities -> core disallowed imports: ${report.scorecard.entitiesToCoreImports.disallowedEdges}`);
+    console.log(`state -> core disallowed imports: ${report.scorecard.stateToCoreImports.disallowedEdges}`);
     process.exit(0);
 }
 

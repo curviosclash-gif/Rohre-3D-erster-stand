@@ -1,8 +1,11 @@
 import { BotValidationService } from '../state/validation/BotValidationService.js';
 import { DeveloperTrainingController } from './DeveloperTrainingController.js';
+import {
+    TRAINING_AUTOMATION_CONTRACT_VERSION,
+    TRAINING_GATE_CONTRACT_VERSION,
+} from '../shared/contracts/TrainingRuntimeContract.js';
+import { toFiniteNumber } from '../utils/MathOps.js';
 
-const TRAINING_AUTOMATION_CONTRACT_VERSION = 'training-automation.v33';
-const TRAINING_GATE_CONTRACT_VERSION = 'training-gate.v33';
 const TRAINING_ARTIFACT_ROOT = 'data/training/runs';
 const DEFAULT_AUTOMATION_CONFIG = Object.freeze({
     episodes: 3,
@@ -20,11 +23,6 @@ const DEFAULT_GATE_THRESHOLDS = Object.freeze({
     maxInvalidActionRate: 0.05,
     maxRuntimeErrorCount: 0,
 });
-
-function toFiniteNumber(value, fallback = 0) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
-}
 
 function toInt(value, fallback, min, max) {
     const numeric = Number(value);

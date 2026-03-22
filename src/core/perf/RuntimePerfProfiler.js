@@ -1,3 +1,5 @@
+import { toFiniteNumber } from '../../utils/MathOps.js';
+
 const DEFAULT_BUFFER_SIZE = 720;
 const DEFAULT_STATS_WINDOW = 300;
 const DEFAULT_SPIKE_THRESHOLD_MS = 30;
@@ -25,11 +27,6 @@ function toPositiveInt(value, fallback, min = 1, max = 1_000_000) {
     const numeric = Number(value);
     if (!Number.isFinite(numeric)) return fallback;
     return Math.max(min, Math.min(max, Math.trunc(numeric)));
-}
-
-function toFiniteNumber(value, fallback) {
-    const numeric = Number(value);
-    return Number.isFinite(numeric) ? numeric : fallback;
 }
 
 function nowMs() {

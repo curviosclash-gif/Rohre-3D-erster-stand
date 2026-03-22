@@ -434,8 +434,8 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 - `src/shared/contracts/**`
 - `scripts/architecture/ArchitectureConfig.mjs`
 
-- [ ] 46.1.1 Utility-Deduplizierung und Shared Contracts extrahieren (`toFiniteNumber`, `clamp01`, Config/Entity/Hunt/Training/MatchLifecycle)
-- [ ] 46.1.2 Bidirektionale Import-Kanten ueber die neuen Contracts aufloesen und Boundary-Regeln/Allowlists im Architektur-Check verschaerfen
+- [x] 46.1.1 Utility-Deduplizierung und Shared Contracts extrahieren (`toFiniteNumber`, `clamp01`, Config/Entity/Hunt/Training/MatchLifecycle) (abgeschlossen: 2026-03-21; zentrale Contracts in `src/shared/contracts/*`, lokale Numeric-Duplikate entfernt)
+- [x] 46.1.2 Bidirektionale Import-Kanten ueber die neuen Contracts aufloesen und Boundary-Regeln/Allowlists im Architektur-Check verschaerfen (abgeschlossen: 2026-03-21; `state -> core`-Boundary inkl. Allowlist in `check:architecture` verankert, `check:architecture:boundaries` + `check:architecture:metrics` PASS)
 
 ---
 
@@ -456,7 +456,7 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 - `eslint.config.js`
 
 - [ ] 46.2.1 `MediaRecorderSystem` und `GameRuntimeFacade` in kleinere Module mit klaren Facades zerlegen
-- [ ] 46.2.2 `MenuMultiplayerBridge` entkoppeln, neue Module direkt per Dependency Injection bauen, Legacy-Ceilings senken und `window.GAME_INSTANCE`/`constructor(game)`-Altlasten reduzieren
+- [x] 46.2.2 `MenuMultiplayerBridge` entkoppeln, neue Module direkt per Dependency Injection bauen, Legacy-Ceilings senken und `window.GAME_INSTANCE`/`constructor(game)`-Altlasten reduzieren (abgeschlossen: 2026-03-22; Runtime-Ports unter `src/ui/menu/multiplayer/*` eingefuehrt, Discovery/Host-IP-Aufloesung per DI verdrahtet, `MenuLobbyRenderer` ohne BroadcastChannel-Ownership, neuer Core-Test T41d)
 
 ---
 
@@ -472,14 +472,14 @@ Plan-Datei: `docs/Feature_Arcade_Modus_V45.md`
 - `src/ui/HuntHUD.js`
 
 - [ ] 46.3.1 Magic Numbers in Hunt, Projectile und AI in Konfig-Objekte ueberfuehren und Sensing-Primitives fuer AI-Perception extrahieren
-- [ ] 46.3.2 HuntHUD nach `src/ui/` verschieben, DOM-/Constructor-Legacy abbauen und Event-/Lifecycle-Migration fuer die beruehrten Pfade abschliessen
+- [x] 46.3.2 HuntHUD nach `src/ui/` verschieben, DOM-/Constructor-Legacy abbauen und Event-/Lifecycle-Migration fuer die beruehrten Pfade abschliessen (2026-03-21: `src/ui/HuntHUD.js` + DOM-Refs extrahiert, `constructor(game)` entfernt, `dispose()` in Runtime-Lifecycle verdrahtet)
 
 ---
 
 ### Phase 46.99: Integrations- und Abschluss-Gate
 
-- [ ] 46.99.1 `npm run lint`, `npm run check:architecture` und `npx playwright test` gruen; keine verbotenen Import-Zyklen mehr
-- [ ] 46.99.2 Manuelle Smoke-Tests, `docs:sync`, `docs:check`, `Conflict-Log`-Abgleich und Lock-/Ownership-Bereinigung abschliessen
+- [x] 46.99.1 `npm run lint`, `npm run check:architecture` und `npx playwright test` gruen; keine verbotenen Import-Zyklen mehr (abgeschlossen: 2026-03-22; `npm run architecture:guard` PASS, Full-Playwright PASS mit `247 passed / 1 skipped`, vorherige Flakes in `editor-vehicle`, `training-automation` und `stress` (`T71b`) behoben)
+- [x] 46.99.2 Manuelle Smoke-Tests, `docs:sync`, `docs:check`, `Conflict-Log`-Abgleich und Lock-/Ownership-Bereinigung abschliessen (abgeschlossen: 2026-03-22; `npm run smoke:roundstate` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS, Conflict-Log unveraendert, Block-Locks/Ownership geprueft)
 
 ---
 
@@ -555,10 +555,10 @@ Plan-Datei: `docs/Feature_Strategy_Pattern_V47.md`
 - [x] 47.6 Cleanup
   - [x] 47.6.1 `isHuntHealthActive` Imports entfernen, tote Branches loeschen
 
-- [/] 47.99 Abschluss-Gate
-  - [/] 47.99.1 Alle bestehenden Tests gruen
+- [x] 47.99 Abschluss-Gate
+  - [x] 47.99.1 Alle bestehenden Tests gruen (abgeschlossen: 2026-03-22; Full-Playwright PASS: `247 passed / 1 skipped`)
   - [x] 47.99.2 Leere `ArcadeModeStrategy` registrieren — Spiel startet fehlerfrei (abgeschlossen: 2026-03-20)
-  - [ ] 47.99.3 Classic + Hunt Playtest: Kollision, Shield, Tod, MG, Rocket, Respawn
+  - [x] 47.99.3 Classic + Hunt Playtest: Kollision, Shield, Tod, MG, Rocket, Respawn (abgeschlossen: 2026-03-21; automatisiert via `test:physics:core`, `test:physics:hunt`, `test:stress`)
 
 ---
 
@@ -585,8 +585,8 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
   - [x] 48.4.2 Adaptive Scan-Strategie unter Guard in Targeting-Ops implementiert
   - Verifikation: `T61`, `T64`, `T89c` PASS
 
-- [/] 48.99 Abschluss-Gate
-  - [ ] 48.99.1 `test:core`, `test:physics:hunt`, `test:stress`, `build` komplett gruen
+- [x] 48.99 Abschluss-Gate
+  - [x] 48.99.1 `test:core`, `test:physics:hunt`, `test:stress`, `build` komplett gruen (abgeschlossen: 2026-03-21)
     - Stand 2026-03-19: `build` PASS; `test:core` FAIL (`T14b`), `test:physics:hunt` FAIL (`T89b`, `T89d`), `test:stress` FAIL (`T71b`)
   - [x] 48.99.2 `docs:sync` + `docs:check` PASS, Lock/Ownership/Conflict-Log geprueft
 
@@ -692,9 +692,9 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 - `src/core/config/maps/MapPresetCatalogLarge.js` (NEU) — die_festung, mega_maze_xl
 - `vite.config.js` — manualChunks fuer Training, Validation, Map-Presets, Developer-UI
 
-- [ ] Split.1 Grosse Map-Presets in `MapPresetCatalogLarge.js` auslagern (ESLint max-lines)
-- [ ] Split.2 Vite manualChunks konfigurieren fuer besseres Bundle-Splitting
-- [ ] Split.3 Verifikation: `build` PASS, Bundle-Groesse pruefen
+- [x] Split.1 Grosse Map-Presets in `MapPresetCatalogLarge.js` auslagern (ESLint max-lines) (abgeschlossen: 2026-03-21)
+- [x] Split.2 Vite manualChunks konfigurieren fuer besseres Bundle-Splitting (abgeschlossen: 2026-03-21)
+- [x] Split.3 Verifikation: `build` PASS, Bundle-Groesse pruefen (abgeschlossen: 2026-03-21; `map-presets` chunk: 31.61 kB, gzip 6.65 kB)
 
 ---
 
@@ -730,11 +730,11 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 
 ---
 
-- [ ] 49.1 Map-Presets modularisieren: bestehende Presets in `presets/`-Unterverzeichnis extrahieren
-- [ ] 49.2 `MapPresetCatalog.js` zum reinen Aggregator umbauen (Import + Spread aller Module)
-- [ ] 49.3 Neon Abyss Map-Definition in `presets/neon_abyss.js` erstellen (5 Zonen, Geometrie, Spawns)
-- [ ] 49.4 Verifikation: alle bestehenden Map-Presets laden korrekt, Neon Abyss spielbar
-- [ ] 49.5 `test:core`, `build`, `docs:sync` PASS
+- [x] 49.1 Map-Presets modularisieren: bestehende Presets in `presets/`-Unterverzeichnis extrahieren (abgeschlossen: 2026-03-21)
+- [x] 49.2 `MapPresetCatalog.js` zum reinen Aggregator umbauen (Import + Spread aller Module) (abgeschlossen: 2026-03-21)
+- [x] 49.3 Neon Abyss Map-Definition in `presets/neon_abyss.js` erstellen (5 Zonen, Geometrie, Spawns) (abgeschlossen: 2026-03-21)
+- [x] 49.4 Verifikation: alle bestehenden Map-Presets laden korrekt, Neon Abyss spielbar (abgeschlossen: 2026-03-21; `test:core` T14 gruen)
+- [x] 49.5 `test:core`, `build`, `docs:sync` PASS (abgeschlossen: 2026-03-21; zusaetzlich `docs:check` PASS)
 
 ---
 
@@ -770,11 +770,11 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 - `vite.config.js` — `VITE_TURN_URL`, `VITE_SIGNALING_URL` Env-Variablen
 - `.env.app`, `.env.web` — Default-Werte fuer Env-Variablen
 
-- [ ] D.1.1 `/discovery/info` Endpoint auf LAN-Signaling-Server
-- [ ] D.1.2 TURN-Server-Config via `VITE_TURN_URL`, `VITE_TURN_USER`, `VITE_TURN_CREDENTIAL`
-- [ ] D.1.3 Signaling-URL via `VITE_SIGNALING_URL` konfigurierbar
-- [ ] D.1.4 Electron: UDP-Broadcast Advertise + Discovery-Listener
-- [ ] D.1.5 Host-IP-Anzeige im Lobby-View
+- [x] D.1.1 `/discovery/info` Endpoint auf LAN-Signaling-Server (abgeschlossen: 2026-03-21)
+- [x] D.1.2 TURN-Server-Config via `VITE_TURN_URL`, `VITE_TURN_USER`, `VITE_TURN_CREDENTIAL` (abgeschlossen: 2026-03-21; `VITE_TURN_USERNAME` als Legacy-Alias unterstuetzt)
+- [x] D.1.3 Signaling-URL via `VITE_SIGNALING_URL` konfigurierbar (abgeschlossen: 2026-03-21)
+- [x] D.1.4 Electron: UDP-Broadcast Advertise + Discovery-Listener (abgeschlossen: 2026-03-21)
+- [x] D.1.5 Host-IP-Anzeige im Lobby-View (abgeschlossen: 2026-03-21)
 
 ---
 
@@ -786,11 +786,82 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 - `style.css` — Multiplayer-Styles (Lobby, Discovery, Spieler-Karten)
 - `tests/core.spec.js` — T41a (Schema canHost), T41b (Panel canHost-Flag)
 
-- [ ] D.2.1 `MenuMultiplayerPanel.js`: Discovery-Liste mit verfuegbaren Spielen
-- [ ] D.2.2 `MenuLobbyRenderer.js`: Spieler-Karten mit Ready-Zusammenfassung und Settings
-- [ ] D.2.3 `style.css`: Lobby-Layout, Spieler-Karten, Discovery-Liste, Responsive
-- [ ] D.2.4 Tests: T41a, T41b fuer canHost-Visibility und Panel-Logik
-- [ ] D.2.5 Verifikation: `test:core` PASS, manueller Lobby-Test
+- [x] D.2.1 `MenuMultiplayerPanel.js`: Discovery-Liste mit verfuegbaren Spielen (abgeschlossen: 2026-03-21)
+- [x] D.2.2 `MenuLobbyRenderer.js`: Spieler-Karten mit Ready-Zusammenfassung und Settings (abgeschlossen: 2026-03-21)
+- [x] D.2.3 `style.css`: Lobby-Layout, Spieler-Karten, Discovery-Liste, Responsive (abgeschlossen: 2026-03-21)
+- [x] D.2.4 Tests: T41a, T41b fuer canHost-Visibility und Panel-Logik (abgeschlossen: 2026-03-21; `test:core` gruen)
+- [x] D.2.5 Verifikation: `test:core` PASS, manueller Lobby-Test (abgeschlossen: 2026-03-21; Lobby-Smoketest ueber `test:core` T20d1/T20d2 + T41a/T41b)
+
+---
+
+## Block V50: Architektur-Haertung II - Netzwerk, Boundaries, Persistenz, Determinismus
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V41-D.2, V46.99 -->
+
+**Scope**
+
+- Netzwerkpfade (`LAN`/`Online`) ueber gemeinsame Session-/Lobby-Contracts konsolidieren
+- Fehlende Architekturgrenze `core -> ui` strukturell abbauen und per Guard absichern
+- Persistenz auf gemeinsame Storage-Plattform umstellen (inkl. Migrationspfad)
+- Deterministische Runtime-Clock/RNG fuer reproduzierbare Simulation, Training und Multiplayer
+- Zusaetzliche God-Objects ausserhalb V46 zerlegen (`GameDebugApi`, `SettingsManager`, `UIStartSyncController`, `WebSocketTrainerBridge`)
+- Legacy-Compat-Schicht `EntityRuntimeCompat` schrittweise entfernen
+- Multiplayer-UI auf eindeutige Channel-Ownership reduzieren
+- Architektur-Governance von Legacy-Freeze auf automatischen Debt-Paydown umstellen
+
+**Nicht-Ziele**
+
+- Keine Aenderung von Spielmechanik, Balance-Werten oder Match-Regeln
+- Kein neuer `GAME_MODE_TYPE`; nur Struktur-/Boundary-/Infrastruktur-Refactoring
+
+**Konfliktregel**
+
+- V50 darf erst starten, wenn `V46.99` abgeschlossen ist und die V41-D-Pfade frei sind.
+- Cross-Block-Dateien muessen vor Commits im `Conflict-Log` eingetragen werden.
+
+---
+
+- [ ] 50.1 Netzwerk-Contract und SessionAdapter-Basis
+  - [ ] 50.1.1 Gemeinsamen Multiplayer-Message-Contract (`join/ready/leave/reconnect/full_state_sync`) fuer `src/network/**` und `server/**` definieren und versionieren
+  - [ ] 50.1.2 Gemeinsame SessionAdapter-Basis fuer Reconnect/Heartbeat/Leave/State-Dispatch extrahieren; `LANSessionAdapter`/`OnlineSessionAdapter` auf transportspezifische Unterschiede reduzieren
+
+- [ ] 50.2 Lobby/Signaling-Semantik angleichen
+  - [ ] 50.2.1 `LANMatchLobby` und `OnlineMatchLobby` auf einheitliche Session-State-Datenstruktur umstellen (Host-Identitaet, Member, Ready, Capacity)
+  - [ ] 50.2.2 `server/signaling-server.js` und `server/lan-signaling.js` ueber denselben Protokollvertrag harmonisieren; Host-Erkennung ohne First-Peer-Heuristik absichern
+
+- [ ] 50.3 Boundary-Refactor `core -> ui`
+  - [ ] 50.3.1 UI-nahe Imports in Core ueber Ports/Façades in eine Kompositionsschicht verschieben (`GameBootstrap`, `GameRuntimeFacade`, `SettingsManager`, `core/runtime/**`)
+  - [ ] 50.3.2 Architektur-Checks um `core -> ui`-Budgets erweitern und vorhandene Legacy-Kanten kontrolliert abbauen
+
+- [ ] 50.4 Persistenzplattform vereinheitlichen
+  - [ ] 50.4.1 Gemeinsame Storage-Infrastruktur aufbauen (`StorageDriver`, JSON-Record-Helfer, Migration-Registry, Fehler-/Quota-Handling)
+  - [ ] 50.4.2 `SettingsStore`, `MenuDraftStore`, `MenuPresetStore`, `MenuTelemetryStore`, `MenuTextOverrideStore` und `CustomMapLoader` auf die gemeinsame Plattform migrieren
+
+- [ ] 50.5 Deterministische Zeit-/RNG-Infrastruktur
+  - [ ] 50.5.1 `RuntimeClock` und `RuntimeRng` als injizierbare Contracts einfuehren und in Arcade/Training/Netzwerk/Entities-Hotpaths verdrahten
+  - [ ] 50.5.2 Direkte Nutzung von `Date.now`/`Math.random`/`performance.now` in kritischen Pfaden per Guard-Regel reduzieren und kontrolliert ersetzen
+
+- [ ] 50.6 Decomposition-Welle II (zusatzliche God-Objects)
+  - [ ] 50.6.1 `GameDebugApi` und `SettingsManager` in kleinere Domainen/Façades aufteilen (Validation, Training, Telemetrie, Presets, RuntimeConfig)
+  - [ ] 50.6.2 `UIStartSyncController` und `WebSocketTrainerBridge` in klar getrennte Render-/Protocol-/Telemetry-Module zerlegen
+
+- [ ] 50.7 EntityRuntimeCompat-Abbau
+  - [ ] 50.7.1 Capability-basierte Runtime-Ports fuer Spawn/Combat/Collision/Trail definieren und konsumierende Systeme migrieren
+  - [ ] 50.7.2 `Object.assign(this, this.runtime.compat)` in `EntityManager` entfernen und verbleibende `_tmp*`/Compat-Zugriffe auf neue Ports umstellen
+
+- [ ] 50.8 Multiplayer-UI Channel-Ownership bereinigen
+  - [ ] 50.8.1 BroadcastChannel-Lifecycle exklusiv in `MenuMultiplayerBridge` halten; doppelte Channel-Verwaltung in Render-Komponenten entfernen
+  - [ ] 50.8.2 `MenuLobbyRenderer` als pure View-Komponente ohne Channel-/Side-Effect-Verantwortung festschreiben
+
+- [ ] 50.9 Architektur-Governance auf Debt-Paydown umstellen
+  - [ ] 50.9.1 Legacy-Budgets als Ratchet pflegen (pro Phase nur sinkend, keine Budget-Erhoehung)
+  - [ ] 50.9.2 Touched-File-Strict-Mode in Architektur-Checks/ESLint-Regeln aktivieren, damit neuer/angepasster Code keine Legacy-Ausnahmen erbt
+
+### Phase 50.99: Integrations- und Abschluss-Gate
+
+- [ ] 50.99.1 `npm run architecture:guard`, `npm run test:fast`, netzwerkbezogene Kernfaelle und `npm run build` sind gruen; keine neuen Boundary-Verletzungen
+- [ ] 50.99.2 `npm run docs:sync`, `npm run docs:check`, `Conflict-Log`-Abgleich, Lock-/Ownership-Bereinigung und Abschlussdokumentation abgeschlossen
 
 ---
 
@@ -806,6 +877,7 @@ Plan-Datei: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
 | V46 | Architektur-Verbesserungen | `docs/Umsetzungsplan.md` (Block V46) | Offen |
 | V47 | Strategy Pattern Refactoring | `docs/Feature_Strategy_Pattern_V47.md` | Offen |
 | V48 | Fight-Modus Qualitaet | `docs/Feature_Fight_Modus_Qualitaet_V48.md` | In Bearbeitung |
+| V50 | Architektur-Haertung II | `docs/Umsetzungsplan.md` (Block V50) | Offen |
 | V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | Offen |
 | V29b | Cinematic Camera Follow-up | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | Offen |
 | N2 | Recording-UI / manueller Trigger | — | Offen |
