@@ -4,8 +4,11 @@ import { readFile, rm, writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import { promisify } from 'node:util';
 
+import { resolveDevLayoutRelativePath } from '../scripts/dev-layout-paths.mjs';
+
 const execFileAsync = promisify(execFile);
 const LATEST_INDEX_PATH = 'data/training/runs/latest.json';
+const TRAINING_LOOP_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-loop.mjs');
 
 async function readFileIfExists(filePath) {
     try {
@@ -29,7 +32,7 @@ test('V36 training loop orchestrates multi-run series with reproducible summary 
     const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
     try {
         await execFileAsync(process.execPath, [
-            'scripts/training-loop.mjs',
+            TRAINING_LOOP_SCRIPT,
             '--series-stamp', seriesStamp,
             '--runs', '2',
             '--with-trainer-server', 'false',
@@ -61,7 +64,7 @@ test('V36 training loop forwards long-run timeout flags to training-run', async 
     const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
     try {
         await execFileAsync(process.execPath, [
-            'scripts/training-loop.mjs',
+            TRAINING_LOOP_SCRIPT,
             '--series-stamp', seriesStamp,
             '--runs', '1',
             '--with-trainer-server', 'false',
@@ -95,7 +98,7 @@ test('V50 training loop stops once duration budget is reached', async () => {
     const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
     try {
         await execFileAsync(process.execPath, [
-            'scripts/training-loop.mjs',
+            TRAINING_LOOP_SCRIPT,
             '--series-stamp', seriesStamp,
             '--runs', '5',
             '--duration-ms', '1',

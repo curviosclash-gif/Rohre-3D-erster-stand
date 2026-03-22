@@ -4,6 +4,7 @@ import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import process from 'node:process';
 
+import { resolveDevLayoutRelativePath } from './dev-layout-paths.mjs';
 import {
     buildTrainingLatestIndex,
     normalizeTrainingRunStamp,
@@ -13,6 +14,13 @@ import {
 const DEFAULT_STAGE_TIMEOUT_MS = 8 * 60_000;
 const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
 const BOT_VALIDATION_SOURCE_PATH = 'data/bot_validation_report.json';
+const TRAINING_SCRIPT_PATHS = Object.freeze({
+    TRAINER_SERVER: resolveDevLayoutRelativePath('scripts', 'trainer-server.mjs'),
+    TRAINING_RUN: resolveDevLayoutRelativePath('scripts', 'training-run.mjs'),
+    BOT_VALIDATION: resolveDevLayoutRelativePath('scripts', 'bot-validation-runner.mjs'),
+    TRAINING_EVAL: resolveDevLayoutRelativePath('scripts', 'training-eval.mjs'),
+    TRAINING_GATE: resolveDevLayoutRelativePath('scripts', 'training-gate.mjs'),
+});
 
 function parseBoolean(value, fallback = false) {
     if (typeof value === 'boolean') return value;
@@ -108,7 +116,7 @@ function startTrainerServer(args) {
     const port = args.get('trainer-port') || process.env.TRAINER_PORT || '8765';
     const verbose = args.get('trainer-verbose') || process.env.TRAINER_VERBOSE || 'false';
     const child = spawn(process.execPath, [
-        'scripts/trainer-server.mjs',
+        TRAINING_SCRIPT_PATHS.TRAINER_SERVER,
         '--host', host,
         '--port', port,
         '--verbose', verbose,
@@ -315,10 +323,10 @@ async function main() {
     };
     const latestBefore = writeLatest ? await readJsonIfExists(layout.latestIndexPath) : null;
     const stagePlan = [
-        { name: 'run', scriptPath: 'scripts/training-run.mjs' },
-        ...(refreshBotValidation ? [{ name: 'bot-validation', scriptPath: 'scripts/bot-validation-runner.mjs' }] : []),
-        { name: 'eval', scriptPath: 'scripts/training-eval.mjs' },
-        { name: 'gate', scriptPath: 'scripts/training-gate.mjs' },
+        { name: 'run', scriptPath: TRAINING_SCRIPT_PATHS.TRAINING_RUN },
+        ...(refreshBotValidation ? [{ name: 'bot-validation', scriptPath: TRAINING_SCRIPT_PATHS.BOT_VALIDATION }] : []),
+        { name: 'eval', scriptPath: TRAINING_SCRIPT_PATHS.TRAINING_EVAL },
+        { name: 'gate', scriptPath: TRAINING_SCRIPT_PATHS.TRAINING_GATE },
     ];
     const stageResults = [];
     const runStageArgs = buildRunStageArgs(args);

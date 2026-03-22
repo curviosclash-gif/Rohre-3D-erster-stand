@@ -4,9 +4,14 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import { promisify } from 'node:util';
 
+import { resolveDevLayoutRelativePath } from '../scripts/dev-layout-paths.mjs';
+
 const execFileAsync = promisify(execFile);
 const LATEST_INDEX_PATH = 'data/training/runs/latest.json';
 const LATEST_LOCK_PATH = 'tmp/test-latest-index.lock';
+const TRAINING_RUN_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-run.mjs');
+const TRAINING_EVAL_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-eval.mjs');
+const TRAINING_GATE_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-gate.mjs');
 
 async function readFileIfExists(filePath) {
     try {
@@ -75,7 +80,7 @@ test('V36 training gate restores latest index after standalone eval+gate failure
     try {
         await writeFailingBotValidationReport(reportPath);
         await execFileAsync(process.execPath, [
-            'scripts/training-run.mjs',
+            TRAINING_RUN_SCRIPT,
             '--stamp', stamp,
             '--write-latest', 'true',
             '--bridge-mode', 'local',
@@ -87,7 +92,7 @@ test('V36 training gate restores latest index after standalone eval+gate failure
             '--max-steps', '8',
         ]);
         await execFileAsync(process.execPath, [
-            'scripts/training-eval.mjs',
+            TRAINING_EVAL_SCRIPT,
             '--stamp', stamp,
             '--write-latest', 'true',
             '--bot-validation-report', reportPath,
@@ -96,7 +101,7 @@ test('V36 training gate restores latest index after standalone eval+gate failure
         let stdout = '';
         try {
             await execFileAsync(process.execPath, [
-                'scripts/training-gate.mjs',
+                TRAINING_GATE_SCRIPT,
                 '--stamp', stamp,
                 '--write-latest', 'true',
             ]);

@@ -4,9 +4,12 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import test from 'node:test';
 import { promisify } from 'node:util';
 
+import { resolveDevLayoutRelativePath } from '../scripts/dev-layout-paths.mjs';
+
 const execFileAsync = promisify(execFile);
 const LATEST_INDEX_PATH = 'data/training/runs/latest.json';
 const LATEST_LOCK_PATH = 'tmp/test-latest-index.lock';
+const TRAINING_E2E_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-e2e.mjs');
 
 async function readFileIfExists(filePath) {
     try {
@@ -73,7 +76,7 @@ test('V36 training e2e records skipped bot-validation refresh when latest writes
     const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
     try {
         const { stdout } = await execFileAsync(process.execPath, [
-            'scripts/training-e2e.mjs',
+            TRAINING_E2E_SCRIPT,
             '--stamp', stamp,
             '--with-trainer-server', 'false',
             '--write-latest', 'false',
@@ -112,7 +115,7 @@ test('V36 training e2e restores latest index after failing gate', async () => {
         let stdout = '';
         try {
             await execFileAsync(process.execPath, [
-                'scripts/training-e2e.mjs',
+                TRAINING_E2E_SCRIPT,
                 '--stamp', stamp,
                 '--with-trainer-server', 'false',
                 '--write-latest', 'true',

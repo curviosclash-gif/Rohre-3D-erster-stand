@@ -4,11 +4,18 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import process from 'node:process';
 
+import { resolveDevLayoutRelativePath } from './dev-layout-paths.mjs';
 import { normalizeTrainingRunStamp } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
 
 const SERIES_ROOT = 'data/training/series';
 const DEFAULT_STAGE_TIMEOUT_MS = 60 * 60_000;
 const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
+const TRAINING_SCRIPT_PATHS = Object.freeze({
+    TRAINER_SERVER: resolveDevLayoutRelativePath('scripts', 'trainer-server.mjs'),
+    TRAINING_RUN: resolveDevLayoutRelativePath('scripts', 'training-run.mjs'),
+    TRAINING_EVAL: resolveDevLayoutRelativePath('scripts', 'training-eval.mjs'),
+    TRAINING_GATE: resolveDevLayoutRelativePath('scripts', 'training-gate.mjs'),
+});
 
 function parseArgMap(argv) {
     const map = new Map();
@@ -190,7 +197,7 @@ function startTrainerServer(args) {
     const port = args.get('trainer-port') || process.env.TRAINER_PORT || '8765';
     const verbose = args.get('trainer-verbose') || process.env.TRAINER_VERBOSE || 'false';
     const child = spawn(process.execPath, [
-        'scripts/trainer-server.mjs',
+        TRAINING_SCRIPT_PATHS.TRAINER_SERVER,
         '--host', host,
         '--port', port,
         '--verbose', verbose,
@@ -378,7 +385,7 @@ async function main() {
             const runStamp = resolveRunStamp(seriesStamp, runIndex);
             const stages = [];
             const runStageArgs = buildRunStageArgs(args, runStamp);
-            const runResult = await runNodeScript('scripts/training-run.mjs', runStageArgs, {
+            const runResult = await runNodeScript(TRAINING_SCRIPT_PATHS.TRAINING_RUN, runStageArgs, {
                 timeoutMs: stageTimeoutMs,
                 env: {
                     TRAINING_RUN_STAMP: runStamp,
@@ -391,7 +398,7 @@ async function main() {
 
             if (runResult.status === 'completed') {
                 const evalResult = await runNodeScript(
-                    'scripts/training-eval.mjs',
+                    TRAINING_SCRIPT_PATHS.TRAINING_EVAL,
                     buildStageForwardArgs(args, runStamp),
                     {
                     timeoutMs: stageTimeoutMs,
@@ -406,7 +413,7 @@ async function main() {
                 });
                 if (evalResult.status === 'completed') {
                     const gateResult = await runNodeScript(
-                        'scripts/training-gate.mjs',
+                        TRAINING_SCRIPT_PATHS.TRAINING_GATE,
                         buildStageForwardArgs(args, runStamp),
                         {
                         timeoutMs: stageTimeoutMs,

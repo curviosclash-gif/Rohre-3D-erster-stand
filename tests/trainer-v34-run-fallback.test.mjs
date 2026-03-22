@@ -7,9 +7,11 @@ import { promisify } from 'node:util';
 
 import { WebSocketServer } from 'ws';
 
+import { resolveDevLayoutRelativePath } from '../scripts/dev-layout-paths.mjs';
 import { DqnTrainer } from '../trainer/model/DqnTrainer.mjs';
 
 const execFileAsync = promisify(execFile);
+const TRAINING_RUN_SCRIPT = resolveDevLayoutRelativePath('scripts', 'training-run.mjs');
 
 function createCheckpoint() {
     const trainer = new DqnTrainer({
@@ -110,7 +112,7 @@ test('V36 training-run falls back to checkpoint response when trainer-stats time
 
     try {
         await execFileAsync(process.execPath, [
-            'scripts/training-run.mjs',
+            TRAINING_RUN_SCRIPT,
             '--stamp', stamp,
             '--bridge-mode', 'bridge',
             '--bridge-url', `ws://127.0.0.1:${port}`,

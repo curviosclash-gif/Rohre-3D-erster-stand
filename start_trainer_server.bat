@@ -2,20 +2,12 @@
 setlocal
 set "ROOT=%~dp0"
 if "%ROOT:~-1%"=="\" set "ROOT=%ROOT:~0,-1%"
+set "WRAPPER=%ROOT%\dev\bin\start_trainer_server.bat"
 
-cd /d "%ROOT%"
-if errorlevel 1 (
-  echo Invalid project path: "%ROOT%"
-  pause
+if not exist "%WRAPPER%" (
+  echo Missing wrapper script: "%WRAPPER%"
   exit /b 1
 )
 
-node "%ROOT%\scripts\trainer-server.mjs"
-set EXIT_CODE=%ERRORLEVEL%
-if not "%EXIT_CODE%"=="0" (
-  echo.
-  echo Trainer server exited with code %EXIT_CODE%.
-  echo If dependency is missing, run: npm i -D ws
-  pause
-)
-exit /b %EXIT_CODE%
+call "%WRAPPER%" %*
+exit /b %ERRORLEVEL%
