@@ -20,6 +20,7 @@ This file defines repository-specific operating rules for Codex.
 - Ask questions only when critical information is missing.
 - For non-destructive design decisions, proceed proactively with a short rationale.
 - Keep docs/workflows/rules in sync with code and test reality after each change.
+- Bot training planning source of truth is `docs/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
 
 ## Workflow Selection
 
@@ -27,6 +28,7 @@ This file defines repository-specific operating rules for Codex.
 - Feature implementation: use `.agents/workflows/code.md`
 - Bug fixing: use `.agents/workflows/bugfix.md`
 - Phase execution from master plan: use `.agents/workflows/fix-planung.md`
+- Bot training planning/execution: use `.agents/workflows/bot-training-plan.md`
 - Documentation/process freshness check: use `.agents/workflows/aktualitaet-check.md`
 - Documentation/process freshness sync: use `.agents/workflows/aktualitaet-sync.md`
 - Cleanup/refactor/release/status/rollback: use matching workflow in `.agents/workflows/`
@@ -36,7 +38,11 @@ This file defines repository-specific operating rules for Codex.
 - Select tests using `.agents/test_mapping.md`.
 - If no mapping matches, run `npm run test:core` as fallback.
 - For phase execution via `/fix-planung`, `/code` is the single source of truth for DoD and verification checks.
-- For any code/process update, run `npm run docs:sync` and `npm run docs:check` before closing the task.
+- For bot-training phase execution via `/bot-training-plan`, `/code` remains the single source of truth for implementation checks.
+- For any code/process update, run:
+  - `npm run plan:check`
+  - `npm run docs:sync`
+  - `npm run docs:check`
 
 ## Git Safety
 
@@ -55,7 +61,7 @@ All workflows follow this pattern unless stated otherwise:
 
 1. Stage only scoped files: `git add [scoped-files]`
 2. Verify scope: `git diff --name-only`
-3. Commit: `git commit -m "[type]: [short reason]"` — type matches workflow intent (`feat`, `fix`, `refactor`, `perf`, `chore`, `release`, `docs`)
+3. Commit: `git commit -m "[type]: [short reason]"` - type matches workflow intent (`feat`, `fix`, `refactor`, `perf`, `chore`, `release`, `docs`)
 4. Push only after scope confirmation. In parallel-agent scenarios, never stage unrelated files.
 5. For immediate small corrections in the same task, use `git commit --amend`.
 
@@ -67,24 +73,26 @@ All workflows follow this pattern unless stated otherwise:
 ## Parallel Bots
 
 Multiple bots can work on different blocks in `docs/Umsetzungsplan.md` simultaneously.
+For bot-training-only work, use the same lock protocol in `docs/Bot_Trainingsplan.md`.
 
 ### Lock-Protokoll
 
 - Each block has a `<!-- LOCK: frei -->` or `<!-- LOCK: Bot-X seit YYYY-MM-DD -->` header.
-- A bot **claims** a free block via atomic commit: `git pull --rebase` → set lock → `git push`. On push failure: retry.
-- A bot **releases** a block after completing all phases: set lock back to `frei`.
-- **Stale-Lock**: If lock is >24h old without commits in that block, another bot may take over after user confirmation.
-- **Sub-Locks**: Optionally, 2 bots can work on the same block if they claim different top-level phases via `<!-- SUB-LOCK: Bot-X -->`.
+- A bot claims a free block via atomic commit: `git pull --rebase` -> set lock -> `git push`. On push failure: retry.
+- A bot releases a block after completing all phases: set lock back to `frei`.
+- Stale-lock: If lock is >24h old without commits in that block, another bot may take over after user confirmation.
+- Sub-locks: Optionally, 2 bots can work on the same block if they claim different top-level phases via `<!-- SUB-LOCK: Bot-X -->`.
 
 ### Datei-Ownership
 
-- `docs/Umsetzungsplan.md` contains a `Datei-Ownership` table mapping path patterns to blocks/bots.
+- `docs/Umsetzungsplan.md` contains the ownership table for non-training paths.
+- `docs/Bot_Trainingsplan.md` contains the ownership table for training paths (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs).
 - A bot must not modify files owned by another bot's block unless absolutely necessary.
 - `tests/**` and `docs/**` are shared (append-only or own sections).
 
 ### Conflict-Log
 
-- Any cross-block file change **must** be logged in the `Conflict-Log` section of `docs/Umsetzungsplan.md` before committing.
+- Any cross-block file change must be logged in the matching master plan's `Conflict-Log` section before commit.
 - Format: date, bot, foreign block, file, reason, risk rating.
 
 ### Dependencies
@@ -93,9 +101,10 @@ Multiple bots can work on different blocks in `docs/Umsetzungsplan.md` simultane
 
 ## Phasen-Schema
 
-All plans in `docs/Umsetzungsplan.md` must follow this structure:
+All master plans (`docs/Umsetzungsplan.md` and `docs/Bot_Trainingsplan.md`) must follow this structure:
 
-- Every block contains top-level phases (e.g. `26.1`, `26.2`).
-- Every phase must have at least 2 sub-phases (e.g. `26.1.1`, `26.1.2`).
-- Every block ends with an Abschluss-Gate phase.
+- Every block contains top-level phases (for example `26.1`, `26.2`).
+- Every phase must have at least 2 sub-phases (for example `26.1.1`, `26.1.2`).
+- Every block ends with an Abschluss-Gate phase (`*.99`).
 - Single-step items are modeled as sub-phases, never as standalone phases.
+- A completed checkbox (`[x]`) must carry evidence metadata in the agreed format.

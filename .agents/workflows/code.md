@@ -6,6 +6,7 @@ description: Implement a planned change from coding to verification and commit.
 
 // turbo
 - Read `docs/Umsetzungsplan.md`.
+- For bot-training scope also read `docs/Bot_Trainingsplan.md` and keep training planning there.
 - `git log -n 3 --oneline`.
 - If available, use `docs/Feature_*.md` for scope.
 
@@ -14,34 +15,38 @@ description: Implement a planned change from coding to verification and commit.
 - Define target files and expected behavior.
 - If scope is clear, proceed directly.
 - Ask only for critical missing constraints.
-- If unrelated worktree changes exist, do not absorb them – commit only scoped files.
+- If unrelated worktree changes exist, do not absorb them; commit only scoped files.
 
 ## 2. Implement
 
 - Follow existing project patterns.
 - Avoid hardcoded config values.
 - Include cleanup/dispose for new runtime objects.
+- If task scope is bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs), update phase/status only in `docs/Bot_Trainingsplan.md`.
 
 ## 3. Self-check
 
 // turbo
 - `rg -n "(console\.log|TODO:|FIXME:|HACK:)" src tests`
 - No open TODOs in changed code.
-- Multi-agent Playwright safety: never run multiple Playwright suites in parallel on the same repo/port/output directory.
-- If parallel bots must test at the same time, each bot must use unique values for `TEST_PORT`, `PW_RUN_TAG`, and `PW_OUTPUT_DIR`.
-- Select tests via `.agents/test_mapping.md`. Focus on meaningful tests for the change, not the full suite.
-- Fallback: `npm run test:core`.
+- Multi-agent Playwright safety: never run multiple suites concurrently on same repo/port/output directory.
+- If parallel bots test at same time, each bot must use unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR`.
+- Select tests via `.agents/test_mapping.md`; fallback `npm run test:core`.
 
-## 4. Doc-freshness + build gate
+## 4. Governance + doc gates
 
 // turbo
+- If `docs/Umsetzungsplan.md`, `docs/Feature_*.md`, `.agents/workflows/**` or `.agents/rules/**` changed:
+  - `npm run plan:check`
+- If `docs/Bot_Trainingsplan.md` changed:
+  - `npm run plan:check`
 - `npm run docs:sync && npm run docs:check`
 - `npm run build`
 
-## 5. Commit (see AGENTS.md §Commit Convention)
+## 5. Commit (see AGENTS.md section Commit Convention)
 
-- `git add [scoped-files]` → `git commit -m "[type]: [name] - [short reason]"`
-- Verify scope: `git diff --name-only`. Push only after confirmation.
+- `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`
+- Verify scope: `git diff --name-only`.
 - In parallel-agent scenarios, never stage unrelated files.
 
 ## Report

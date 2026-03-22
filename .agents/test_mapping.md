@@ -21,10 +21,10 @@ Use this table to select verification commands from changed paths.
 
 ## Schnellpfad (nur bei kleinen Aenderungen)
 
-- `src/ui/**` nur visuell → `npm run test:core` reicht, `test:stress` entfaellt
-- `src/entities/Bot*.js` → `npm run test:physics:core` reicht, `test:physics:hunt` und `test:physics:policy` entfallen
-- `src/core/MediaRecorderSystem.js` → nur T20a/T20af/T20n aus `test:core`
-- Workflow-/Doc-Aenderungen → keine Tests noetig
+- `src/ui/**` nur visuell -> `npm run test:core` reicht, `test:stress` entfaellt
+- `src/entities/Bot*.js` -> `npm run test:physics:core` reicht, `test:physics:hunt` und `test:physics:policy` entfallen
+- `src/core/MediaRecorderSystem.js` -> nur T20a/T20af/T20n aus `test:core`
+- Workflow-/Plan-/Rule-Aenderungen -> `npm run plan:check` und `npm run docs:check`
 
 ## Parallelisierung
 

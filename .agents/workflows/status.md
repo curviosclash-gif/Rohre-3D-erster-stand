@@ -5,7 +5,9 @@ description: Quick project status snapshot.
 
 ## 1. Plan status
 
-- Read `docs/Umsetzungsplan.md`. Identify next open phase.
+- Read `docs/Umsetzungsplan.md` and `docs/Bot_Trainingsplan.md`.
+- Identify next open phase and dependency blockers for both master plans.
+- Run `npm run plan:check`.
 
 ## 2. Git state
 
@@ -15,8 +17,8 @@ description: Quick project status snapshot.
 
 ## 3. Output
 
-- Next phase, uncommitted changes, active branches.
-- If documentation drift suspected: `npm run docs:sync && npm run docs:check`.
+- Next phase, open dependencies, lock status, uncommitted changes, active branches.
+- If documentation/process drift suspected: `npm run docs:sync && npm run docs:check`.
 
 ## Report
 

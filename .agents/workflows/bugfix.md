@@ -22,13 +22,19 @@ description: Diagnose a reported issue and apply a targeted fix.
 ## 3. Fix
 
 - Apply smallest safe change for root cause.
-- Multi-agent Playwright safety: do not run multiple Playwright suites concurrently on the same repo/port/output directory.
-- If concurrent bot validation is required, assign unique `TEST_PORT`, `PW_RUN_TAG`, and `PW_OUTPUT_DIR` per bot run.
+- Multi-agent Playwright safety: do not run multiple Playwright suites concurrently on same repo/port/output directory.
+- If concurrent bot validation is required, assign unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR`.
 - Re-run relevant checks: `npm run build` + focused tests via `.agents/test_mapping.md`.
 
-## 4. Commit (see AGENTS.md §Commit Convention)
+## 4. Governance + docs
 
-- `git add [scoped-files]` → `fix: [short reason]`
+// turbo
+- If bugfix touches plans/workflows/rules: `npm run plan:check`.
+- `npm run docs:sync && npm run docs:check`.
+
+## 5. Commit (see AGENTS.md section Commit Convention)
+
+- `git add [scoped-files]` -> `fix: [short reason]`
 - Verify scope: `git diff --name-only`.
 
 ## Report

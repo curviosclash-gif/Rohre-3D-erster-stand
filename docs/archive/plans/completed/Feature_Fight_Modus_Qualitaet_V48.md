@@ -114,7 +114,7 @@
 
 ## Dokumentationswirkung
 
-- Neuer Detailplan: `docs/Feature_Fight_Modus_Qualitaet_V48.md`
+- Neuer Detailplan: `docs/archive/plans/completed/Feature_Fight_Modus_Qualitaet_V48.md`
 - Neuer Masterblock: `docs/Umsetzungsplan.md` Block V48
 - Ownership/Backlog in `docs/Umsetzungsplan.md` aktualisiert
 

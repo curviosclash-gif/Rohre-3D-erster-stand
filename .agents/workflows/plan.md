@@ -6,6 +6,7 @@ description: Create a compact implementation plan for a new feature or extension
 
 // turbo
 - Read `docs/Umsetzungsplan.md`.
+- For bot-training scope also read `docs/Bot_Trainingsplan.md` and treat it as active master plan.
 - `git log -n 5 --oneline`.
 - Scan impacted modules in `src/`, `tests/`, `editor/js/`.
 
@@ -13,47 +14,48 @@ description: Create a compact implementation plan for a new feature or extension
 
 - What, why, which module?
 
-## 2. Architecture check
+## 2. Architecture + governance check
 
-- Existing modules/interfaces/events
-- Reuse vs new file decision
-- Risk rating (low/medium/high)
-- Documentation impact list
-- Datei-Ownership prüfen: kollidiert der Scope mit einem gelockten Block?
+- Existing modules/interfaces/events.
+- Reuse vs new file decision.
+- Risk rating (low/medium/high).
+- Documentation impact list.
+- Datei-Ownership pruefen: kollidiert der Scope mit einem gelockten Block?
+- Dependencies klassifizieren (`hard`/`soft`).
 
 ## 3. Write plan
 
-Create `docs/Feature_[Name].md`:
-- Goal, affected files
-- **Phasen mit Pflicht-Unterphasen** (jede Phase mindestens 2 Unterphasen):
-
-```markdown
-- [ ] X.1 [Phasenname]
-  - [ ] X.1.1 [Unterphasen-Schritt 1]
-  - [ ] X.1.2 [Unterphasen-Schritt 2]
-- [ ] X.2 [Phasenname]
-  - [ ] X.2.1 ...
-  - [ ] X.2.2 ...
-- [ ] X.9 Abschluss-Gate
-  - [ ] X.9.1 Tests und Build verifizieren
-  - [ ] X.9.2 docs:sync, docs:check, Doku-Freeze
-```
-
-- Verification at functional-unit boundaries (not after every sub-phase)
-- Include freshness note: run `npm run docs:sync && npm run docs:check` at closure
+Create `docs/Feature_[Name].md` with:
+- Goal, affected files.
+- Phasen mit Pflicht-Unterphasen (jede Phase mindestens 2 Unterphasen).
+- Abschluss-Gate als `X.99`.
+- Evidence format for completed items:
+  - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 
 ## 4. Update master plan
 
-- Add new block in `docs/Umsetzungsplan.md`:
-  - Lock-Header: `<!-- LOCK: frei -->`
-  - Optional: `<!-- DEPENDS-ON: ... -->`
-  - Scope, Hauptpfade, Konfliktregel
-  - Sub-phase checkboxes
-- Update `Datei-Ownership`-Tabelle with new paths
+- Select master plan file by scope:
+  - Default: `docs/Umsetzungsplan.md`
+  - Bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs): `docs/Bot_Trainingsplan.md`
 
-## 5. Commit
+- Add or update block with:
+  - `<!-- LOCK: frei -->`
+  - optional `<!-- DEPENDS-ON: ... -->`
+  - `Definition of Done (DoD)` section
+  - risk register section
+- Update dependency table (`hard/soft`) and backlog priority table.
+- Keep gate invariant valid: `*.99` cannot be `[x]` while prior phases are open.
 
-- `git add docs/Umsetzungsplan.md docs/Feature_[Name].md` → `docs: add implementation plan for [Name]`
+## 5. Validate
+
+// turbo
+- `npm run plan:check`
+- `npm run docs:sync && npm run docs:check`
+
+## 6. Commit
+
+- `git add [masterplan-datei] docs/Feature_[Name].md .agents/workflows/plan.md` when changed.
+- Commit message: `docs: add implementation plan for [Name]`.
 
 ## Report
 

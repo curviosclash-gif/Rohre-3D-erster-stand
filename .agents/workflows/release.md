@@ -17,16 +17,17 @@ description: Prepare and publish a safe release.
 
 - Update `CHANGELOG.md` from `git log`. Include new/changed/fixed sections.
 
-## 3. Build + freshness gate
+## 3. Build + governance + freshness gates
 
 // turbo
 - `npm run build`
+- `npm run plan:check`
 - `npm run docs:sync && npm run docs:check`
 - Ensure release notes and plan status are date-accurate.
 
-## 4. Tag and push (see AGENTS.md §Commit Convention)
+## 4. Tag and push (see AGENTS.md section Commit Convention)
 
-- `git add [release-files]` → `release: v[X.Y.Z]`
+- `git add [release-files]` -> `release: v[X.Y.Z]`
 - `git tag -a v[X.Y.Z] -m "Release v[X.Y.Z]"`
 - Verify scope before push.
 
