@@ -7,6 +7,19 @@ fi
 
 npm run guard:main
 
+# Block commits that mix Umsetzungsplan with code changes.
+STAGED=$(git diff --cached --name-only)
+if echo "$STAGED" | grep -q "^docs/Umsetzungsplan\.md$"; then
+  CODE_FILES=$(echo "$STAGED" | grep -v "^docs/" | grep -v "^\.agents/" | grep -v "^AGENTS\.md$" | grep -v "^CLAUDE\.md$" || true)
+  if [ -n "$CODE_FILES" ]; then
+    echo ""
+    echo "BLOCKED: docs/Umsetzungsplan.md darf nicht zusammen mit Code-Dateien committed werden."
+    echo "Bitte separater Commit: erst Code, dann Umsetzungsplan."
+    echo "Gemischte Dateien: $CODE_FILES"
+    exit 1
+  fi
+fi
+
 # Plan governance check only when relevant files are staged.
 if git diff --cached --name-only | grep -Eq "^(docs/(Umsetzungsplan|Bot_Trainingsplan)\.md|\.agents/(workflows|rules)/|AGENTS\.md|scripts/validate-umsetzungsplan\.mjs|package\.json)$"; then
   echo "Running plan:check for staged governance files..."

@@ -16,6 +16,7 @@ Mehrere Agents arbeiten gleichzeitig auf `main`. Jeder Agent MUSS:
 4. **Nur eigene Dateien stagen** — `git add <datei1> <datei2>`, niemals `git add .` oder `git add -A`. Aenderungen anderer Agents ignorieren.
 5. **Niemals `git stash` verwenden.** Keine Ausnahmen.
 6. **Fremde uncommittete Aenderungen ignorieren** — nicht stashen, nicht committen, nicht verwerfen. Sie gehoeren einem anderen Agent.
+7. **Umsetzungsplan immer als eigener Commit** — `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`. So konflikten Plan-Updates nicht mit Code anderer Agents.
 
 ## Vor einem Merge
 
