@@ -10,6 +10,7 @@ import {
     describeArcadeBlueprintStatus,
     formatArcadeBlueprintValidationMessage,
 } from './src/ArcadeBlueprintValidation.js';
+import { EDITOR_API_ROUTES } from '../../src/shared/contracts/EditorPathContract.js';
 
 function toBlueprintId(value) {
     return String(value || 'custom_blueprint')
@@ -150,7 +151,7 @@ class VehicleLabApp {
 
     async refreshSavedVehiclesList() {
         try {
-            const response = await fetch('/api/editor/list-vehicles-disk', { method: 'GET' });
+            const response = await fetch(EDITOR_API_ROUTES.LIST_VEHICLES_DISK, { method: 'GET' });
             let payload = null;
             try {
                 payload = await response.json();
@@ -184,7 +185,7 @@ class VehicleLabApp {
 
         try {
             const query = new URLSearchParams({ vehicleId });
-            const response = await fetch(`/api/editor/get-vehicle-disk?${query.toString()}`, { method: 'GET' });
+            const response = await fetch(`${EDITOR_API_ROUTES.GET_VEHICLE_DISK}?${query.toString()}`, { method: 'GET' });
             let payload = null;
             try {
                 payload = await response.json();
@@ -453,7 +454,7 @@ class VehicleLabApp {
         }
 
         try {
-            const response = await fetch('/api/editor/save-vehicle-disk', {
+            const response = await fetch(EDITOR_API_ROUTES.SAVE_VEHICLE_DISK, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -513,7 +514,7 @@ class VehicleLabApp {
         }
 
         try {
-            const response = await fetch('/api/editor/rename-vehicle-disk', {
+            const response = await fetch(EDITOR_API_ROUTES.RENAME_VEHICLE_DISK, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -558,7 +559,7 @@ class VehicleLabApp {
         if (!confirmed) return;
 
         try {
-            const response = await fetch('/api/editor/delete-vehicle-disk', {
+            const response = await fetch(EDITOR_API_ROUTES.DELETE_VEHICLE_DISK, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

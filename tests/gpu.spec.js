@@ -307,6 +307,81 @@ test.describe('T21-40: Rendering & GPU', () => {
         expect(probe.blend).toBeGreaterThan(0);
     });
 
+    test('T33c: Recording-Only-Camera erzeugt Shorts-Shots ohne Live-Kamera-Regressionspfad', async ({ page }) => {
+        await loadGame(page);
+        await page.click('#menu-nav [data-session-type="splitscreen"]');
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="normal"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const g = window.GAME_INSTANCE;
+            return !!(
+                hud && !hud.classList.contains('hidden')
+                && g?.entityManager?.players?.length > 1
+            );
+        }, null, { timeout: 60000 });
+
+        const probe = await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            const renderer = g?.renderer;
+            const liveRig = renderer?.cameraRigSystem;
+            const liveCamera = liveRig?.cameras?.[0];
+            if (!g || !renderer || !liveRig || !liveCamera) return null;
+
+            const before = {
+                mode: renderer.getCameraMode(0),
+                x: Number(liveCamera.position.x || 0),
+                y: Number(liveCamera.position.y || 0),
+                z: Number(liveCamera.position.z || 0),
+                splitScreen: renderer.splitScreen === true,
+            };
+
+            g.settings.recording = { profile: 'youtube_short', hudMode: 'clean' };
+            g._onSettingsChanged({ changedKeys: ['recording.profile', 'recording.hudMode'] });
+            renderer.prepareRecordingCaptureFrame({
+                recordingActive: true,
+                entityManager: g.entityManager,
+                renderAlpha: 1,
+                renderDelta: 1 / 60,
+                splitScreen: true,
+            });
+
+            const after = {
+                mode: renderer.getCameraMode(0),
+                x: Number(liveCamera.position.x || 0),
+                y: Number(liveCamera.position.y || 0),
+                z: Number(liveCamera.position.z || 0),
+                splitScreen: renderer.splitScreen === true,
+            };
+
+            const dx = after.x - before.x;
+            const dy = after.y - before.y;
+            const dz = after.z - before.z;
+            const liveCameraDelta = Math.hypot(dx, dy, dz);
+            const meta = renderer.getLastRecordingCaptureMeta?.() || null;
+
+            return {
+                before,
+                after,
+                liveCameraDelta,
+                meta,
+                recordingCaptureIsMainCanvas: renderer.getRecordingCaptureCanvas?.() === renderer.canvas,
+            };
+        });
+
+        expect(probe).not.toBeNull();
+        expect(probe.before.mode).toBe('THIRD_PERSON');
+        expect(probe.after.mode).toBe('THIRD_PERSON');
+        expect(probe.before.splitScreen).toBeTruthy();
+        expect(probe.after.splitScreen).toBeTruthy();
+        expect(probe.liveCameraDelta).toBeLessThan(0.0001);
+        expect(probe.meta?.layout).toBe('shorts_vertical_split');
+        expect(probe.meta?.segments?.[0]?.playerIndex).toBe(0);
+        expect(probe.meta?.segments?.[1]?.playerIndex).toBe(1);
+        expect(probe.recordingCaptureIsMainCanvas).toBeFalsy();
+    });
+
     test('T21b: Portal-Szenarien nutzen InstancedMesh fuer Portal-Visuals', async ({ page }) => {
         await loadGame(page);
         await page.evaluate(() => {

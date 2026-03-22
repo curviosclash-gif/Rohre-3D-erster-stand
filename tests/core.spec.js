@@ -1802,6 +1802,50 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(visiblePanels).toHaveLength(0);
     });
 
+    test('T20ha: Escape schliesst Ebene 4 auch bei State-Desync', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await openLevel4Drawer(page, { section: 'gameplay' });
+
+        await page.evaluate(() => {
+            const stateMachine = window.GAME_INSTANCE?.uiManager?.menuStateMachine;
+            stateMachine?.transition?.('main', { trigger: 'test_desync_escape_level4' });
+        });
+
+        await page.keyboard.press('Escape');
+        await page.waitForFunction(() => {
+            const drawer = document.getElementById('submenu-level4');
+            return !!drawer
+                && drawer.classList.contains('hidden')
+                && drawer.getAttribute('aria-hidden') === 'true';
+        }, null, { timeout: 4000 });
+    });
+
+    test('T20hb: Close-Button schliesst Ebene 4 trotz Event-Desync', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+        await openLevel4Drawer(page, { section: 'tools' });
+
+        await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            if (game?.runtimeFacade?._menuEventHandlers instanceof Map) {
+                game.runtimeFacade._menuEventHandlers.delete('level4_close');
+            }
+            if (game?.uiManager?.menuNavigationRuntime) {
+                game.uiManager.menuNavigationRuntime.onLevel4CloseRequested = null;
+            }
+        });
+
+        await page.click('#btn-close-level4');
+        await page.waitForFunction(() => {
+            const drawer = document.getElementById('submenu-level4');
+            return !!drawer
+                && drawer.classList.contains('hidden')
+                && drawer.getAttribute('aria-hidden') === 'true'
+                && !window.GAME_INSTANCE?.settings?.localSettings?.toolsState?.level4Open;
+        }, null, { timeout: 4000 });
+    });
+
     test('T20i: ARIA-Status wird bei Panelwechsel konsistent gesetzt', async ({ page }) => {
         await loadGame(page);
         await openCustomSubmenu(page);

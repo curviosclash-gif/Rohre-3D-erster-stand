@@ -16,5 +16,5 @@ fi
 # Lock protocol check in explicit bot mode.
 if [ -n "$BOT_MODE" ]; then
   echo "Pruefe Lock-Protokoll (Bot-Mode)..."
-  node scripts/verify-lock.mjs
+  node dev/scripts/verify-lock.mjs
 fi

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { spawn } from 'node:child_process';
 import { WebSocketServer } from 'ws';
 import { parseMapJSON, toArenaMapDefinition } from './src/entities/MapSchema.js';
+import { EDITOR_API_ROUTES, EDITOR_DATA_PATHS } from './src/shared/contracts/EditorPathContract.js';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 const buildTime = new Date().toISOString();
@@ -16,8 +17,8 @@ const __dirname = path.dirname(__filename);
 const GENERATED_EDITOR_MAP_KEY_PREFIX = 'editor_';
 const DEFAULT_EDITOR_DISK_MAP_NAME = 'Editor Map';
 const EDITOR_MAP_NAME_MAX_LENGTH = 80;
-const EDITOR_MAP_DIR = path.resolve(__dirname, 'data', 'maps');
-const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(__dirname, 'src', 'entities', 'GeneratedLocalMaps.js');
+const EDITOR_MAP_DIR = path.resolve(__dirname, EDITOR_DATA_PATHS.MAPS_DIR);
+const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(__dirname, EDITOR_DATA_PATHS.GENERATED_LOCAL_MAPS_MODULE);
 const EDITOR_JSON_SUFFIX = '.editor.json';
 const RUNTIME_JSON_SUFFIX = '.runtime.json';
 
@@ -28,8 +29,8 @@ const RUNTIME_MAP_SCALE = 3;
 const GENERATED_EDITOR_VEHICLE_KEY_PREFIX = 'editor_vehicle_';
 const DEFAULT_EDITOR_VEHICLE_NAME = 'Custom Vehicle';
 const VEHICLE_NAME_MAX_LENGTH = 80;
-const VEHICLE_CONFIG_DIR = path.resolve(__dirname, 'data', 'vehicles');
-const GENERATED_VEHICLE_CONFIGS_MODULE_PATH = path.resolve(__dirname, 'js', 'entities', 'GeneratedVehicleConfigs.js');
+const VEHICLE_CONFIG_DIR = path.resolve(__dirname, EDITOR_DATA_PATHS.VEHICLES_DIR);
+const GENERATED_VEHICLE_CONFIGS_MODULE_PATH = path.resolve(__dirname, EDITOR_DATA_PATHS.GENERATED_VEHICLE_CONFIGS_MODULE);
 const VEHICLE_CONFIG_SUFFIX = '.vehicle.json';
 const DEFAULT_GENERATED_VEHICLE_HITBOX_RADIUS = 1.2;
 
@@ -472,13 +473,13 @@ function deleteVehicleConfigFromDisk({ vehicleId }) {
 }
 
 function editorDiskSaveApiPlugin() {
-    const mapRoutePath = '/api/editor/save-map-disk';
-    const vehicleRoutePath = '/api/editor/save-vehicle-disk';
-    const listVehiclesRoutePath = '/api/editor/list-vehicles-disk';
-    const getVehicleRoutePath = '/api/editor/get-vehicle-disk';
-    const renameVehicleRoutePath = '/api/editor/rename-vehicle-disk';
-    const deleteVehicleRoutePath = '/api/editor/delete-vehicle-disk';
-    const videoRoutePath = '/api/editor/save-video-disk';
+    const mapRoutePath = EDITOR_API_ROUTES.SAVE_MAP_DISK;
+    const vehicleRoutePath = EDITOR_API_ROUTES.SAVE_VEHICLE_DISK;
+    const listVehiclesRoutePath = EDITOR_API_ROUTES.LIST_VEHICLES_DISK;
+    const getVehicleRoutePath = EDITOR_API_ROUTES.GET_VEHICLE_DISK;
+    const renameVehicleRoutePath = EDITOR_API_ROUTES.RENAME_VEHICLE_DISK;
+    const deleteVehicleRoutePath = EDITOR_API_ROUTES.DELETE_VEHICLE_DISK;
+    const videoRoutePath = EDITOR_API_ROUTES.SAVE_VIDEO_DISK;
 
     const registerMiddleware = (middlewares) => {
         middlewares.use(async (req, res, next) => {

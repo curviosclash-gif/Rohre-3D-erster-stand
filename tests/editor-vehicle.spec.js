@@ -3,6 +3,7 @@ import * as THREE from 'three';
 
 import { EditorAssetLoader } from '../editor/js/EditorAssetLoader.js';
 import { ModularVehicleMesh } from '../prototypes/vehicle-lab/src/ModularVehicleMesh.js';
+import { EDITOR_VIEW_PATHS } from '../src/shared/contracts/EditorPathContract.js';
 
 function createTestAssetObject() {
     const group = new THREE.Group();
@@ -14,7 +15,7 @@ function createTestAssetObject() {
 }
 
 async function resetVehicleLab(page) {
-    await page.goto('/prototypes/vehicle-lab/index.html', { waitUntil: 'domcontentloaded' });
+    await page.goto(EDITOR_VIEW_PATHS.VEHICLE_LAB, { waitUntil: 'domcontentloaded' });
     await page.evaluate(() => {
         localStorage.removeItem('vehicle_lab_config');
     });
