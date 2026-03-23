@@ -131,7 +131,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 ### 11.1 Plan und Laufstart
 
 - [x] 11.1.1 10h-Trainingsplan mit KPI-/Checkpoint-Vorgaben anlegen (abgeschlossen: 2026-03-23; evidence: create 10h plan -> docs/Bot_Survival_Training_Plan_10h.md)
-- [/] 11.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren
+- [x] 11.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-23; evidence: npm run training:10h -- --series-stamp BT11_20260323T013933 --stop-on-fail false -> output/training/BT11_20260323T013933-10h.log, PID 9332)
 
 ### 11.2 Laufmonitoring im 2h-Takt
 
@@ -143,6 +143,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 | Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs Baseline | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-03-23 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT10 | `docs/Bot_Survival_Training_Plan_10h.md` |
+| 2026-03-23 | Laufstart | `BT11_20260323T013933` | `pending` | `pending` | `pending` | wird in 2h-Checkpoints gefuellt | `output/training/BT11_20260323T013933-10h.log` |
 
 ### 11.99 Abschluss-Gate
 
