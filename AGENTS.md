@@ -58,7 +58,9 @@ This file defines repository-specific operating rules for Codex.
 - **Zwingende Regel nach jeder Aenderung:** Jede abgeschlossene Aenderung sofort per scoped Commit sichern (kein Sammeln von Aenderungen).
 - Sofort committen nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
 - Commit-Preflight ist Pflicht: Vor neuem Task, Kontextwechsel oder `git pull --rebase origin main` muessen eigene offene Aenderungen bereits per scoped Commit gesichert sein.
-- Wenn `git pull --rebase origin main` wegen uncommitteter Dateien blockiert: zuerst nur eigene Task-Aenderungen committen; blockieren fremde Dateien den Pull weiterhin, User-Freigabe fuer "ohne Pull fortfahren" einholen.
+- Wenn `git pull --rebase origin main` wegen uncommitteter Dateien blockiert: zuerst nur eigene Task-Aenderungen committen.
+- Blockieren danach weiterhin fremde Dateien den Pull, ist vor "ohne Pull fortfahren" ein Pflicht-Check noetig: `git status --short`, Dateiueberschneidungen zum eigenen Scope, Branch-Status und absehbare Merge-/Rebase-Risiken pruefen.
+- Ergibt der Pflicht-Check kein relevantes Konflikt- oder Integrationsrisiko, darf nach User-Freigabe scoped ohne Pull weitergearbeitet werden; bei Risiko muss vor Aenderungen geklaert oder synchronisiert werden.
 - **Umsetzungsplan immer als eigener Commit** - `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`.
 - Keep `.husky/.bypass` local-only and untracked.
 - Create a local recovery tag via `npm run snapshot:tag` before push on `main`.
