@@ -33,6 +33,7 @@ export function orchestrateRuntimeSettingsChanged({
     markSettingsDirty?.(true);
     game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
     game.renderer?.setRecordingCaptureSettings?.(game.settings?.recording);
+    game.renderer?.setCameraPerspectiveSettings?.(game.settings?.cameraPerspective);
     game.mediaRecorderSystem?.setRecordingCaptureSettings?.(game.settings?.recording);
     if (game.uiManager) {
         if (Array.isArray(changedKeys) && changedKeys.length > 0 && typeof game.uiManager.syncByChangeKeys === 'function') {

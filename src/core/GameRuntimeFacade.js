@@ -182,6 +182,7 @@ export class GameRuntimeFacade {
         game.runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
         game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
         game.renderer?.setRecordingCaptureSettings?.(game.runtimeConfig?.recording);
+        game.renderer?.setCameraPerspectiveSettings?.(game.runtimeConfig?.cameraPerspective);
         game.mediaRecorderSystem?.setRecordingCaptureSettings?.(game.runtimeConfig?.recording);
 
         game.numHumans = game.runtimeConfig.session.numHumans;

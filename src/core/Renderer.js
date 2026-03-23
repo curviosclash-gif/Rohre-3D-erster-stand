@@ -136,6 +136,14 @@ export class Renderer {
         return this.recordingCapturePipeline.getSettings();
     }
 
+    setCameraPerspectiveSettings(settings = null) {
+        return this.cameraRigSystem.setCameraPerspectiveSettings(settings);
+    }
+
+    getCameraPerspectiveSettings() {
+        return this.cameraRigSystem.getCameraPerspectiveSettings();
+    }
+
     getLastRecordingCaptureMeta() {
         return this.recordingCapturePipeline.getLastMeta();
     }
@@ -157,7 +165,8 @@ export class Renderer {
         cockpitCamera = false,
         isBoosting = false,
         arena = null,
-        firstPersonAnchor = null
+        firstPersonAnchor = null,
+        cameraContext = null
     ) {
         this.cameraRigSystem.updateCamera(
             playerIndex,
@@ -168,7 +177,8 @@ export class Renderer {
             cockpitCamera,
             isBoosting,
             arena,
-            firstPersonAnchor
+            firstPersonAnchor,
+            cameraContext
         );
     }
 

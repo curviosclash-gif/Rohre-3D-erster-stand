@@ -3,7 +3,13 @@ import { CONFIG } from '../Config.js';
 import { CameraCollisionSolver } from './camera/CameraCollisionSolver.js';
 import { CameraModeStrategySet } from './camera/CameraModeStrategySet.js';
 import { CameraShakeSolver } from './camera/CameraShakeSolver.js';
+import { RecordingOrbitCameraDirector, SLOT_STYLE } from './camera/RecordingOrbitCameraDirector.js';
 import { CinematicCameraSystem } from '../../entities/systems/CinematicCameraSystem.js';
+import {
+    CAMERA_PERSPECTIVE_MODE,
+    createDefaultCameraPerspectiveSettings,
+    normalizeCameraPerspectiveSettings,
+} from '../../shared/contracts/CameraPerspectiveContract.js';
 
 export class CameraRigSystem {
     constructor({ cinematicEnabled = true } = {}) {
@@ -39,6 +45,18 @@ export class CameraRigSystem {
             this.cameraShakeDurations,
             this.cameraShakeIntensities
         );
+        this.cameraPerspectiveSettings = createDefaultCameraPerspectiveSettings();
+        this.liveOrbitDirector = new RecordingOrbitCameraDirector({
+            orbitSpeed: 0.78,
+            smoothSpeed: 8.0,
+            enterSpeed: 3.1,
+            exitSpeed: 7.0,
+            minDistance: 2.5,
+            baseRadius: 9.8,
+            baseLift: 3.4,
+            baseLookAhead: 4.8,
+            transitionSpeed: 3.6,
+        });
         this.cinematicCameraSystem = new CinematicCameraSystem({
             enabled: cinematicEnabled,
         });
@@ -132,11 +150,90 @@ export class CameraRigSystem {
             return;
         }
         this.cinematicCameraSystem.reset();
+        this.liveOrbitDirector.reset();
         this._resetTimingState('cinematic-toggle');
     }
 
     getCinematicEnabled() {
         return this.cinematicCameraSystem.isEnabled();
+    }
+
+    setCameraPerspectiveSettings(settings = null) {
+        const previous = this.cameraPerspectiveSettings || createDefaultCameraPerspectiveSettings();
+        const next = normalizeCameraPerspectiveSettings(settings, previous);
+        const changed = previous.normal !== next.normal
+            || previous.reduceMotion !== next.reduceMotion;
+        this.cameraPerspectiveSettings = next;
+        if (changed) {
+            this.liveOrbitDirector.reset();
+            this._resetTimingState('camera-perspective-toggle');
+        }
+        return { ...this.cameraPerspectiveSettings };
+    }
+
+    getCameraPerspectiveSettings() {
+        return { ...(this.cameraPerspectiveSettings || createDefaultCameraPerspectiveSettings()) };
+    }
+
+    _restoreBaseFov(camera) {
+        if (!camera) return;
+        const baseFov = Number(CONFIG?.CAMERA?.FOV) || 75;
+        if (Math.abs(camera.fov - baseFov) <= 0.01) return;
+        camera.fov = baseFov;
+        camera.updateProjectionMatrix();
+    }
+
+    _applyLivePerspective({
+        playerIndex,
+        mode,
+        camera,
+        fallbackTarget,
+        playerPosition,
+        playerDirection,
+        dt,
+        arena = null,
+        cameraContext = null,
+        cockpitCamera = false,
+    }) {
+        if (!camera) return;
+        const settings = this.cameraPerspectiveSettings || createDefaultCameraPerspectiveSettings();
+        const perspectiveMode = settings.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC;
+        const reduceMotion = settings.reduceMotion === true;
+        const cinematicEnabled = this.cinematicCameraSystem.isEnabled() === true;
+        const shouldApply = cinematicEnabled
+            && mode === 'THIRD_PERSON'
+            && !cockpitCamera
+            && perspectiveMode !== CAMERA_PERSPECTIVE_MODE.CLASSIC;
+        if (!shouldApply) {
+            this._restoreBaseFov(camera);
+            return;
+        }
+
+        const slotStyle = perspectiveMode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION && !reduceMotion
+            ? SLOT_STYLE.ACTION
+            : SLOT_STYLE.CINEMATIC;
+        const timeScale = reduceMotion
+            ? 0.56
+            : (perspectiveMode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT ? 0.72 : 0.86);
+        const safeDt = Math.max(0, Number(dt) || 0) * timeScale;
+        const playerState = cameraContext?.playerState && typeof cameraContext.playerState === 'object'
+            ? cameraContext.playerState
+            : null;
+        const otherPlayerPosition = cameraContext?.otherPlayerPosition || null;
+
+        this.liveOrbitDirector.apply({
+            playerIndex,
+            camera,
+            fallbackTarget,
+            playerPosition,
+            playerDirection,
+            dt: safeDt,
+            arena,
+            slotStyle,
+            playerState: reduceMotion ? null : playerState,
+            otherPlayerPosition: reduceMotion ? null : otherPlayerPosition,
+            baseFov: Number(CONFIG?.CAMERA?.FOV) || 75,
+        });
     }
 
     setFrameTiming(timing = null) {
@@ -173,7 +270,8 @@ export class CameraRigSystem {
         cockpitCamera = false,
         isBoosting = false,
         arena = null,
-        firstPersonAnchor = null
+        firstPersonAnchor = null,
+        cameraContext = null
     ) {
         if (playerIndex >= this.cameras.length) return;
 
@@ -244,10 +342,12 @@ export class CameraRigSystem {
             const smoothFactor = firstPersonHardLock ? 1 : (1 - Math.pow(1 - smooth, stableDt * 60));
             cam.position.lerp(target.position, smoothFactor);
             if (firstPersonHardLock) {
+                this._restoreBaseFov(cam);
                 cam.quaternion.copy(playerQuaternion);
             } else {
                 cam.quaternion.slerp(playerQuaternion, smoothFactor);
             }
+            this._restoreBaseFov(cam);
             return;
         }
 
@@ -291,6 +391,7 @@ export class CameraRigSystem {
         if (firstPersonHardLock) {
             cam.position.copy(target.position);
             cam.lookAt(target.lookAt);
+            this._restoreBaseFov(cam);
             return;
         }
 
@@ -305,6 +406,18 @@ export class CameraRigSystem {
         this._tmpLookAt.multiplyScalar(10).add(cam.position);
         this._tmpLookAt.lerp(target.lookAt, smoothFactor);
         cam.lookAt(this._tmpLookAt);
+        this._applyLivePerspective({
+            playerIndex,
+            mode,
+            camera: cam,
+            fallbackTarget: target,
+            playerPosition,
+            playerDirection,
+            dt: stableDt,
+            arena,
+            cameraContext,
+            cockpitCamera,
+        });
     }
 
     resetCameras() {
@@ -320,5 +433,6 @@ export class CameraRigSystem {
         this._resetTimingState('camera-reset');
         this.collisionSolver.reset();
         this.cinematicCameraSystem.reset();
+        this.liveOrbitDirector.reset();
     }
 }

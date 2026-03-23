@@ -79,6 +79,7 @@ export function bootstrapGameRuntime(game, options = {}) {
         logger: console,
     });
     game.renderer.setRecordingCaptureSettings(game.settings?.recording);
+    game.renderer.setCameraPerspectiveSettings(game.settings?.cameraPerspective);
     game.input = new InputManager();
     game.audio = new AudioManager();
     game.particles = new ParticleSystem(game.renderer);

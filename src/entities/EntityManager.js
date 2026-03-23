@@ -323,6 +323,7 @@ export class EntityManager {
     }
 
     updateCameras(dt, renderAlpha = 1, useRenderedTransforms = false) {
+        const hasMultipleHumans = Array.isArray(this.humanPlayers) && this.humanPlayers.length > 1;
         for (const player of this.players) {
             if (!player.isBot && player.index < this.renderer.cameras.length) {
                 const mode = this.renderer.getCameraMode(player.index);
@@ -337,6 +338,13 @@ export class EntityManager {
                 const firstPersonAnchor = mode === 'FIRST_PERSON'
                     ? player.getFirstPersonCameraAnchor(this._tmpCamAnchor)
                     : null;
+                let otherPlayerPosition = null;
+                if (hasMultipleHumans) {
+                    const otherPlayer = this.humanPlayers.find((entry) => entry && entry !== player) || null;
+                    if (otherPlayer && typeof otherPlayer.resolveRenderPosition === 'function') {
+                        otherPlayerPosition = otherPlayer.resolveRenderPosition(renderAlpha);
+                    }
+                }
                 this.renderer.updateCamera(
                     player.index,
                     this._tmpCamRenderPos,
@@ -346,7 +354,17 @@ export class EntityManager {
                     player.cockpitCamera,
                     player.isBoosting,
                     this.arena,
-                    firstPersonAnchor
+                    firstPersonAnchor,
+                    {
+                        playerState: {
+                            hp: Number(player.hp) || 0,
+                            maxHp: Number(player.maxHp) || 1,
+                            score: Number(player.score) || 0,
+                            speed: Number(player.speed) || 0,
+                            isBoosting: player.isBoosting === true,
+                        },
+                        otherPlayerPosition,
+                    }
                 );
             }
         }
