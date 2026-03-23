@@ -1,8 +1,6 @@
 import { CONFIG } from '../../core/Config.js';
 import { Player } from '../Player.js';
 import {
-    BOT_POLICY_TYPES,
-    isBridgeBotPolicyType,
     normalizeBotPolicyType,
     resolveMatchBotPolicyType,
 } from '../ai/BotPolicyTypes.js';
@@ -13,16 +11,7 @@ function normalizeActiveMode(mode) {
     return String(mode || '').trim().toLowerCase();
 }
 
-function resolveLocalPolicyFallbackByMode(activeMode) {
-    return normalizeActiveMode(activeMode) === 'hunt'
-        ? BOT_POLICY_TYPES.HUNT
-        : BOT_POLICY_TYPES.RULE_BASED;
-}
-
-function resolvePolicyFallbackByMode(activeMode, planarMode = false, bridgeEnabled = false) {
-    if (!bridgeEnabled) {
-        return resolveLocalPolicyFallbackByMode(activeMode);
-    }
+function resolvePolicyFallbackByMode(activeMode, planarMode = false) {
     return resolveMatchBotPolicyType({
         huntModeActive: normalizeActiveMode(activeMode) === 'hunt',
         planarMode: !!planarMode,
@@ -37,15 +26,8 @@ function resolveConfiguredBotPolicyType({ requestedPolicyType, runtimeConfig, ac
     const effectiveBridgeEnabled = typeof bridgeEnabled === 'boolean'
         ? bridgeEnabled
         : !!runtimeConfig?.bot?.trainerBridgeEnabled;
-    const fallbackPolicyType = resolvePolicyFallbackByMode(
-        activeGameMode,
-        effectivePlanarMode,
-        effectiveBridgeEnabled
-    );
+    const fallbackPolicyType = resolvePolicyFallbackByMode(activeGameMode, effectivePlanarMode);
     const resolvedPolicyType = normalizeBotPolicyType(requestedPolicyType || runtimePolicyType || fallbackPolicyType);
-    if (!effectiveBridgeEnabled && isBridgeBotPolicyType(resolvedPolicyType)) {
-        return normalizeBotPolicyType(resolveLocalPolicyFallbackByMode(activeGameMode));
-    }
     return resolvedPolicyType;
 }
 

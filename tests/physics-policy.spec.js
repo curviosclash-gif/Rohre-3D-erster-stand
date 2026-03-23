@@ -436,8 +436,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
 
         expect(result.unknownType).toBe('rule-based');
         expect(result.brokenType).toBe('rule-based');
-        expect(result.disabledBridgeType).toBe('rule-based');
-        expect(result.disabledMatchBotType).toBe('hunt');
+        expect(result.disabledBridgeType).toBe('classic-bridge');
+        expect(result.disabledMatchBotType).toBe('hunt-2d');
         expect(result.unknownHasUpdate).toBeTruthy();
         expect(result.brokenHasUpdate).toBeTruthy();
     });
@@ -1130,20 +1130,20 @@ test.describe('Physics Policy (Tests 65-82)', () => {
 
         expect(result.error).toBeNull();
         expect(result.classic3d.runtimePolicyType).toBe('classic-3d');
-        expect(result.classic3d.entityPolicyType).toBe('rule-based');
-        expect(result.classic3d.uniqueBotPolicyTypes).toEqual(['rule-based']);
+        expect(result.classic3d.entityPolicyType).toBe('classic-3d');
+        expect(result.classic3d.uniqueBotPolicyTypes).toEqual(['classic-3d']);
         expect(result.classic3d.botCount).toBe(2);
         expect(result.classic2d.runtimePolicyType).toBe('classic-2d');
-        expect(result.classic2d.entityPolicyType).toBe('rule-based');
-        expect(result.classic2d.uniqueBotPolicyTypes).toEqual(['rule-based']);
+        expect(result.classic2d.entityPolicyType).toBe('classic-2d');
+        expect(result.classic2d.uniqueBotPolicyTypes).toEqual(['classic-2d']);
         expect(result.classic2d.botCount).toBe(2);
         expect(result.hunt3d.runtimePolicyType).toBe('hunt-3d');
-        expect(result.hunt3d.entityPolicyType).toBe('hunt');
-        expect(result.hunt3d.uniqueBotPolicyTypes).toEqual(['hunt']);
+        expect(result.hunt3d.entityPolicyType).toBe('hunt-3d');
+        expect(result.hunt3d.uniqueBotPolicyTypes).toEqual(['hunt-3d']);
         expect(result.hunt3d.botCount).toBe(2);
         expect(result.hunt2d.runtimePolicyType).toBe('hunt-2d');
-        expect(result.hunt2d.entityPolicyType).toBe('hunt');
-        expect(result.hunt2d.uniqueBotPolicyTypes).toEqual(['hunt']);
+        expect(result.hunt2d.entityPolicyType).toBe('hunt-2d');
+        expect(result.hunt2d.uniqueBotPolicyTypes).toEqual(['hunt-2d']);
         expect(result.hunt2d.botCount).toBe(2);
     });
 

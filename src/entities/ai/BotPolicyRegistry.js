@@ -6,7 +6,6 @@ import {
     assertBotPolicyContract,
     BOT_POLICY_TYPES,
     DEFAULT_BOT_POLICY_TYPE,
-    isBridgeBotPolicyType,
     normalizeBotPolicyType,
 } from './BotPolicyTypes.js';
 import { RuleBasedBotPolicy } from './RuleBasedBotPolicy.js';
@@ -28,25 +27,6 @@ function createHuntBridgeFactory(type) {
         type,
         fallbackPolicy: options.fallbackPolicy || new HuntBotPolicy(options),
     });
-}
-
-function resolveLocalFallbackType(requestedType, options = {}) {
-    const normalizedRequestedType = normalizeBotPolicyType(requestedType);
-    if (normalizedRequestedType.includes('hunt')) {
-        return BOT_POLICY_TYPES.HUNT;
-    }
-    if (normalizedRequestedType.includes('classic')) {
-        return BOT_POLICY_TYPES.RULE_BASED;
-    }
-
-    const activeGameMode = String(
-        options?.activeGameMode
-        || options?.runtimeConfig?.session?.activeGameMode
-        || ''
-    ).trim().toLowerCase();
-    return activeGameMode === 'hunt'
-        ? BOT_POLICY_TYPES.HUNT
-        : BOT_POLICY_TYPES.RULE_BASED;
 }
 
 export class BotPolicyRegistry {
@@ -82,16 +62,10 @@ export class BotPolicyRegistry {
         }
     }
 
-    _resolveFactory(type, options = {}) {
+    _resolveFactory(type) {
         const requestedType = normalizeBotPolicyType(type);
-        const bridgeEnabled = options?.bridgeEnabled !== false;
         let resolvedType = requestedType;
         let fallbackReason = null;
-
-        if (!bridgeEnabled && isBridgeBotPolicyType(requestedType)) {
-            resolvedType = resolveLocalFallbackType(requestedType, options);
-            fallbackReason = 'bridge-disabled';
-        }
 
         let factory = this._factories.get(resolvedType);
         if (!factory) {
@@ -111,7 +85,7 @@ export class BotPolicyRegistry {
     }
 
     create(type, options = {}) {
-        const resolved = this._resolveFactory(type, options);
+        const resolved = this._resolveFactory(type);
         let factory = resolved.factory;
         if (!factory) {
             throw new Error('[BotPolicyRegistry] No default bot policy registered');

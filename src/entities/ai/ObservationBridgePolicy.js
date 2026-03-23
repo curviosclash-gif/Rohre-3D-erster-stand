@@ -7,6 +7,7 @@ import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
 import { buildTrainerRuntimeObservationPayload } from './training/TrainerPayloadAdapter.js';
 import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
 import { LocalDqnInference } from './inference/LocalDqnInference.js';
+import { createCheckpointActionVocabulary } from './inference/CheckpointActionVocabulary.js';
 
 const WARNING_COOLDOWN_BASE_MS = 2000;
 const WARNING_COOLDOWN_MAX_MS = 30000;
@@ -323,7 +324,8 @@ export class ObservationBridgePolicy {
             })
             .then((data) => {
                 if (!data?.ok || !data?.checkpoint) return;
-                const result = this.loadLocalCheckpoint(data.checkpoint);
+                const actionVocabulary = createCheckpointActionVocabulary(data.checkpoint);
+                const result = this.loadLocalCheckpoint(data.checkpoint, actionVocabulary);
                 if (result.ok) {
                     console.info('[ObservationBridgePolicy] auto-loaded trained bot checkpoint');
                 }
@@ -340,8 +342,9 @@ export class ObservationBridgePolicy {
             this._warn(`local checkpoint load failed: ${result.error}`, null, 'local-checkpoint-load');
             return result;
         }
+        const resolvedActionVocabulary = actionVocabulary || createCheckpointActionVocabulary(checkpoint) || null;
         this._localInference = inference;
-        this._localInferenceVocabulary = actionVocabulary || null;
+        this._localInferenceVocabulary = resolvedActionVocabulary;
         return result;
     }
 
