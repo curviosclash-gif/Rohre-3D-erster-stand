@@ -23,6 +23,11 @@ import {
     RECORDING_CAPTURE_PROFILE,
     RECORDING_HUD_MODE,
 } from '../shared/contracts/RecordingCaptureContract.js';
+import {
+    CAMERA_PERSPECTIVE_MODE,
+    createDefaultCameraPerspectiveSettings,
+    normalizeCameraPerspectiveSettings,
+} from '../shared/contracts/CameraPerspectiveContract.js';
 import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
@@ -374,6 +379,26 @@ export class UIManager {
                 ? 'mit HUD'
                 : 'clean';
             ui.recordingProfileHint.textContent = `Aufnahmeprofil: ${profileLabel} - HUD: ${hudLabel}`;
+        }
+        const cameraPerspectiveSettings = normalizeCameraPerspectiveSettings(
+            settings?.cameraPerspective,
+            createDefaultCameraPerspectiveSettings()
+        );
+        if (ui.normalCameraPerspectiveSelect) {
+            ui.normalCameraPerspectiveSelect.value = cameraPerspectiveSettings.normal;
+        }
+        if (ui.normalCameraReduceMotionToggle) {
+            ui.normalCameraReduceMotionToggle.checked = !!cameraPerspectiveSettings.reduceMotion;
+        }
+        if (ui.normalCameraPerspectiveHint) {
+            let perspectiveLabel = 'Klassisch';
+            if (cameraPerspectiveSettings.normal === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) {
+                perspectiveLabel = 'Cinematic Soft';
+            } else if (cameraPerspectiveSettings.normal === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) {
+                perspectiveLabel = 'Cinematic Action';
+            }
+            const reduceMotionLabel = cameraPerspectiveSettings.reduceMotion ? 'an' : 'aus';
+            ui.normalCameraPerspectiveHint.textContent = `Perspektive Normal: ${perspectiveLabel} - beruhigt: ${reduceMotionLabel}`;
         }
 
         if (ui.planarModeToggle) ui.planarModeToggle.checked = !!gp.planarMode;

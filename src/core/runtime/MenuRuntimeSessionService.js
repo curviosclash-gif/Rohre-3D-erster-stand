@@ -301,6 +301,7 @@ export function handleLevel4ResetAction(ctx) {
     game.settings.botDifficulty = defaults.botDifficulty;
     game.settings.winsNeeded = defaults.winsNeeded;
     game.settings.hunt = { ...defaults.hunt };
+    game.settings.cameraPerspective = { ...defaults.cameraPerspective };
 
     onSettingsChanged({
         changedKeys: [
@@ -330,6 +331,8 @@ export function handleLevel4ResetAction(ctx) {
             SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_MODE,
             SETTINGS_CHANGE_KEYS.GAMEPLAY_PORTAL_COUNT,
             SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_LEVEL_COUNT,
+            SETTINGS_CHANGE_KEYS.CAMERA_PERSPECTIVE_NORMAL,
+            SETTINGS_CHANGE_KEYS.CAMERA_PERSPECTIVE_REDUCE_MOTION,
         ],
     });
     game._showStatusToast('Ebene 4 zurueckgesetzt', 1200, 'info');

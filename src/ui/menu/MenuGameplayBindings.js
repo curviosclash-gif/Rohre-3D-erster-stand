@@ -8,6 +8,10 @@ import {
     RECORDING_CAPTURE_PROFILE,
     RECORDING_HUD_MODE,
 } from '../../shared/contracts/RecordingCaptureContract.js';
+import {
+    CAMERA_PERSPECTIVE_MODE,
+    createDefaultCameraPerspectiveSettings,
+} from '../../shared/contracts/CameraPerspectiveContract.js';
 import { clamp } from '../../utils/MathOps.js';
 import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
 
@@ -27,6 +31,12 @@ export function setupMenuGameplayBindings(ctx) {
         }
         return settings.recording;
     };
+    const ensureCameraPerspectiveSettings = () => {
+        if (!settings.cameraPerspective || typeof settings.cameraPerspective !== 'object') {
+            settings.cameraPerspective = createDefaultCameraPerspectiveSettings();
+        }
+        return settings.cameraPerspective;
+    };
     const resolveRecordingProfileLabel = (profile) => (
         profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
             ? 'YouTube Shorts'
@@ -37,6 +47,11 @@ export function setupMenuGameplayBindings(ctx) {
             ? 'mit HUD'
             : 'clean'
     );
+    const resolveNormalCameraPerspectiveLabel = (mode) => {
+        if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) return 'Cinematic Soft';
+        if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) return 'Cinematic Action';
+        return 'Klassisch';
+    };
     const isFightModePathActive = () => String(settings?.localSettings?.modePath || '').trim().toLowerCase() === 'fight';
     const applyPlanarMode = (enabled) => {
         if (!settings.gameplay) settings.gameplay = {};
@@ -329,6 +344,39 @@ export function setupMenuGameplayBindings(ctx) {
             emitSettingsChangedImmediate([keys.RECORDING_HUD_MODE]);
             emit(eventTypes.SHOW_STATUS_TOAST, {
                 message: `Recording-HUD: ${resolveRecordingHudLabel(recordingSettings.hudMode)}`,
+                duration: 1300,
+                tone: 'info',
+            });
+        });
+    }
+    if (ui.normalCameraPerspectiveSelect) {
+        bind(ui.normalCameraPerspectiveSelect, 'change', () => {
+            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
+            const perspective = String(ui.normalCameraPerspectiveSelect.value || '').trim().toLowerCase();
+            if (perspective === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) {
+                cameraPerspectiveSettings.normal = CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT;
+            } else if (perspective === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) {
+                cameraPerspectiveSettings.normal = CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION;
+            } else {
+                cameraPerspectiveSettings.normal = CAMERA_PERSPECTIVE_MODE.CLASSIC;
+            }
+            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_NORMAL]);
+            emit(eventTypes.SHOW_STATUS_TOAST, {
+                message: `Perspektive Normal: ${resolveNormalCameraPerspectiveLabel(cameraPerspectiveSettings.normal)}`,
+                duration: 1300,
+                tone: 'info',
+            });
+        });
+    }
+    if (ui.normalCameraReduceMotionToggle) {
+        bind(ui.normalCameraReduceMotionToggle, 'change', () => {
+            const cameraPerspectiveSettings = ensureCameraPerspectiveSettings();
+            cameraPerspectiveSettings.reduceMotion = !!ui.normalCameraReduceMotionToggle.checked;
+            emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_REDUCE_MOTION]);
+            emit(eventTypes.SHOW_STATUS_TOAST, {
+                message: cameraPerspectiveSettings.reduceMotion
+                    ? 'Perspektive Normal: beruhigt'
+                    : 'Perspektive Normal: dynamisch',
                 duration: 1300,
                 tone: 'info',
             });
