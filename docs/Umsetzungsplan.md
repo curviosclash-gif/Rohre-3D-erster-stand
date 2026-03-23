@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-23
+Stand: 2026-03-24
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
@@ -32,6 +32,9 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V52 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Bestehende Guard-Basis wird auf `server/**` und dynamic imports erweitert |
 | V53 | V52.6 | soft | nein | Settings-Persistenz-Refactor bevorzugt nach zentralem Storage-Rollout, Parallelisierung nur ohne Contract-Drift |
 | V53 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Decomposition und Import-Grenzen vorhanden |
+| V54 | V52.99 | hard | nein | Gesamtfix startet nach Abschluss der Event-/Boundary-Haertung |
+| V54 | V53.99 | hard | nein | Settings-Decomposition muss integriert abgeschlossen sein |
+| V54 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Ratchet-/Boundary-Guards bilden die Mess-Basis |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -39,6 +42,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- |
 | `src/network/OnlineSessionAdapter.js`, `src/network/LANSessionAdapter.js`, `src/network/StateReconciler.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/core/InputManager.js`, `src/ui/TouchInputSource.js`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V52 | offen | Event-Contract, Layering-Guards, Input/Persistenz-Resthaertung |
 | `src/core/SettingsManager.js`, `src/core/settings/**`, `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/MenuRuntimePresetConfigService.js`, `src/core/runtime/MenuRuntimeDeveloperModeService.js`, `src/core/GameRuntimeFacade.js`, `tests/core.spec.js` | V53 | offen | Settings-Domain-Decomposition in Facades/Operations geplant |
+| `src/core/MediaRecorderSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/core/GameRuntimeFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/main.js`, `src/entities/**`, `src/ui/**`, `src/state/**`, `src/shared/**`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V54 | offen | Gesamtfix fuer God-Objects, Layer-Kopplung, Legacy-Patterns und Global-Kapselung |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -47,6 +51,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- | --- |
 | E | V52 | 2026-03-23 | frei | - |
 | F | V53 | 2026-03-23 | frei | - |
+| G | V54 | 2026-03-24 | frei | - |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -196,6 +201,75 @@ Scope:
 
 ---
 
+## Block V54: Gesamtfix Architektur-/Qualitaetspunkte
+
+Plan-Datei: `docs/Feature_Gesamtfix_Architektur_Qualitaet_V54.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V52.99, V53.99 -->
+
+Scope:
+
+- Alle identifizierten Architektur-/Qualitaets-Punkte als zusammenhaengenden Fix-Fahrplan umsetzen.
+- Schwerpunkt auf Decomposition, Layer-Grenzen, Legacy-Pattern-Abbau und Guard-Ratchet-Senkung.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 54.1 bis 54.7 und 54.99 sind abgeschlossen.
+- [ ] DoD.2 Architektur-Metriken sind gegenueber Baseline verbessert (`entities -> core`, `ui -> core`, Legacy-Pattern).
+- [ ] DoD.3 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS.
+- [ ] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Evidence/Lock/Ownership sind konsistent.
+
+### 54.1 Architektur-Baseline und Kanteninventar
+
+- [ ] 54.1.1 Vollstaendige Kantenmatrix fuer `entities -> core`, `ui -> core`, `state -> core` erfassen
+- [ ] 54.1.2 Zielbudgets pro Kantenklasse und Legacy-Muster (`constructor(game)`, DOM ausserhalb `src/ui`) festschreiben
+
+### 54.2 God-Object-Decomposition
+
+- [ ] 54.2.1 `MediaRecorderSystem`, `MenuMultiplayerBridge`, `GameRuntimeFacade`, `WebSocketTrainerBridge` entlang Domain-Grenzen splitten
+- [ ] 54.2.2 Oeffentliche APIs stabil halten und Call-Sites schrittweise migrieren
+
+### 54.3 Layer-Kopplung abbauen
+
+- [ ] 54.3.1 Direkte `entities -> core` Imports auf shared Contracts/Ports migrieren
+- [ ] 54.3.2 Direkte `ui -> core` Imports auf Composition-/Port-Schichten migrieren
+
+### 54.4 Legacy-Konstruktor-/Game-Referenzen reduzieren
+
+- [ ] 54.4.1 `constructor(game)` auf explizite Dependency-Objekte umstellen
+- [ ] 54.4.2 `this.game = game`-Pattern entfernen oder auf read-only Ports begrenzen
+
+### 54.5 Clone-/Determinismus-/Zeitpfade vereinheitlichen
+
+- [ ] 54.5.1 Einheitlichen Clone-Helper einfuehren und `JSON.parse(JSON.stringify(...))` in Kernpfaden ersetzen
+- [ ] 54.5.2 Zeit-/RNG-Nutzung in kritischen Pfaden auf injizierbare Contracts vereinheitlichen
+
+### 54.6 Browser-Globals kapseln
+
+- [ ] 54.6.1 `window`/`document`/Storage-Zugriffe ausserhalb `src/ui` hinter Runtime-Adaptern kapseln
+- [ ] 54.6.2 Legacy-Ausnahmen reduzieren und Boundary-Checks verschaerfen
+
+### 54.7 Test- und Guard-Haertung
+
+- [ ] 54.7.1 Regressions-Tests fuer Menu/Runtime/Physics auf den Refactor-Scope erweitern
+- [ ] 54.7.2 Guard-/Build-Gates pro Teilphase gruen halten
+
+### Phase 54.99: Integrations- und Abschluss-Gate
+
+- [ ] 54.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen
+- [ ] 54.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen
+
+### Risiko-Register V54
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Gleichzeitige Multi-Layer-Refactors erzeugen schwer isolierbare Regressionen | hoch | Core/Architektur | Kleine Teilphasen, strikte Guard-/Test-Gates je Schritt | Mehrere Subsysteme brechen parallel |
+| Ratchet-Budgets sinken nicht trotz Umbau | mittel | Architektur | Kanteninventar + priorisierter Abbau der teuersten Imports | Metriken bleiben auf Baseline |
+| API-Drift bei Decomposition grosser Klassen | hoch | Core/UI | Facade-Contract zuerst fixieren, Migration call-site-weise | Runtime/Menu Fehler nach Split |
+
+---
+
 ## Backlog (priorisiert, nicht gestartet)
 
 Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
@@ -205,6 +279,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V39 | Komplexe Showcase-Map | `docs/Feature_Komplexe_Showcase_Map_V39.md` | mittel | gross | P2 | Scope-Review nach V46 | In Bearbeitung |
 | V40 | Hunt Rocket Trail Targeting | `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md` | mittel | mittel | P1 | mit V50.1 Contract abstimmen | Offen |
 | V53 | SettingsManager Decomposition und Settings-Domain-Entkopplung | `docs/Feature_SettingsManager_Decomposition_V53.md` | hoch | mittel | P1 | 53.1.1 API-Inventar + Call-Site-Matrix erstellen | Offen |
+| V54 | Gesamtfix Architektur-/Qualitaetspunkte | `docs/Feature_Gesamtfix_Architektur_Qualitaet_V54.md` | sehr hoch | gross | P1 | 54.1.1 Architektur-Kantenmatrix und Zielbudgets erfassen | Offen |
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | mittel | mittel | P2 | UX/Ownership klaeren | In Bearbeitung |
 | V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.4.1 Optionalen `game/`-Unterordner evaluieren (nur bei weiter gruener Dev-Migration) | In Bearbeitung |
 | V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | hoch | mittel | P1 | Benchmark baseline erneuern | Offen |
@@ -234,16 +309,16 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 
 ## Weekly Review (KW 12/2026)
 
-Stand: 2026-03-23
+Stand: 2026-03-24
 
 - Abgeschlossen diese Woche: V46.2.1, V46.2.2, V46.3.1, V46.3.2, V46.99, 41.99.1, 41.99.2, 41.99.3, 41.99.4, V50.1-V50.9, V50.99, Planarchiv-Bereinigung.
 - Blockiert: kein aktiver Blocker; V50 abgeschlossen.
 - Naechste 3 Ziele:
   1. 52.1.1 `stateUpdate`-Payload in LAN/Online/StateReconciler auf gemeinsames Schema bringen.
   2. 52.2.1 State-UI-Boundary weiter entkoppeln (`state -> ui` via Ports/Events).
-  3. 53.1.1 `SettingsManager`-API/Call-Site-Matrix als Refactor-Baseline fixieren.
+  3. 54.1.1 Architektur-Kantenmatrix (`entities/ui/state -> core`) fuer Gesamtfix erheben.
 - Groesstes Risiko: V52-Haertung bricht bestehende Session-Edge-Cases in LAN/Online.
-- Entscheidungsbedarf: Reihenfolge V52-Resthaertung vs. V53-Decomposition fuer minimale Konflikte auf `src/core/**`.
+- Entscheidungsbedarf: Sequenzierung V52/V53-Abschluss vs. V54-Gesamtfix fuer minimale Merge-Konflikte.
 
 ## Dokumentations-Hook
 
