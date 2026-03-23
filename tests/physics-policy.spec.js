@@ -988,6 +988,54 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         expect(result.fallbackCalls).toBeGreaterThanOrEqual(2);
     });
 
+    test('T80b: ObservationBridgePolicy faellt bei lokaler Inference ohne Vokabular auf Fallback zurueck', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            let fallbackCalls = 0;
+            const fallbackPolicy = {
+                type: 'rule-based',
+                update() {
+                    fallbackCalls += 1;
+                    return { yawRight: true, boost: true };
+                },
+            };
+            const policy = new ObservationBridgePolicy({
+                type: 'classic-bridge',
+                fallbackPolicy,
+                trainerBridgeEnabled: false,
+            });
+            policy._localInference = {
+                loaded: true,
+                selectBestAction() {
+                    return { actionIndex: 4 };
+                },
+            };
+            policy._localInferenceVocabulary = null;
+
+            const bot = { index: 0, inventory: [] };
+            const context = {
+                mode: 'classic',
+                dt: 1 / 60,
+                players: [],
+                projectiles: [],
+                observation: new Array(40).fill(0),
+            };
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                fallbackCalls,
+                yawRight: !!action?.yawRight,
+                boost: !!action?.boost,
+                yawLeft: !!action?.yawLeft,
+            };
+        });
+
+        expect(result.fallbackCalls).toBeGreaterThanOrEqual(1);
+        expect(result.yawRight).toBeTruthy();
+        expect(result.boost).toBeTruthy();
+        expect(result.yawLeft).toBeFalsy();
+    });
+
     test('T81: RuntimeConfig loest Bot-Policy-Strategie reproduzierbar nach Modus auf', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

@@ -345,6 +345,13 @@ export class ObservationBridgePolicy {
         const resolvedActionVocabulary = actionVocabulary || createCheckpointActionVocabulary(checkpoint) || null;
         this._localInference = inference;
         this._localInferenceVocabulary = resolvedActionVocabulary;
+        if (!resolvedActionVocabulary || typeof resolvedActionVocabulary.decode !== 'function') {
+            this._warn(
+                'local checkpoint loaded without action vocabulary, using fallback policy actions',
+                null,
+                'local-checkpoint-vocabulary-missing',
+            );
+        }
         return result;
     }
 
@@ -361,7 +368,7 @@ export class ObservationBridgePolicy {
                 domainId: runtimeContext?.rules?.domainId,
             });
         }
-        return { _actionIndex: actionIndex };
+        return null;
     }
 
     _resolveTrainerBridgeAction(runtimeContext, player) {
