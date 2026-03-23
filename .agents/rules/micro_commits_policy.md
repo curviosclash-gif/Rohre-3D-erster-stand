@@ -4,6 +4,7 @@ description: Rule for meaningful micro-commits without cluttering the history
 ---
 
 - Scope commits logically: A commit should represent an isolated, functional change (e.g., "Fix trail hitbox calculation" or "Add object pooling for bullets").
+- After every completed subtask, create a scoped commit before starting the next subtask to keep pull/rebase paths unblocked.
 - Do NOT create a commit for every single typo out of context or single variables changed in isolation without a functional reason.
 - Avoid monolithic commits mixing unrelated changes (e.g., combining UI fixes with physics adjustments).
 - Provide concise, clear commit messages that explain the *why*, not just the *what*.

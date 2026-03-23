@@ -14,5 +14,7 @@ description: Rule for safe git operations
 - In parallel situations (second agent or user editing at the same time), leave foreign changes untouched unless the user explicitly asks to include them.
 - Stage and commit only the files changed for the current task; a dirty worktree alone is not a reason to widen scope.
 - Sofort committen nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
+- Commit-Preflight ist Pflicht: Vor neuem Task, Kontextwechsel oder `git pull --rebase origin main` muessen eigene offene Aenderungen bereits per scoped Commit gesichert sein.
+- Wenn `git pull --rebase origin main` wegen uncommitteter Dateien blockiert: zuerst nur eigene Task-Aenderungen committen; blockieren fremde Dateien den Pull weiterhin, User-Freigabe fuer "ohne Pull fortfahren" einholen.
 - **Umsetzungsplan immer als eigener Commit** — `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`. Der Pre-Commit Hook blockiert Misch-Commits.
 - Keep `.husky/.bypass` local-only; never commit it.

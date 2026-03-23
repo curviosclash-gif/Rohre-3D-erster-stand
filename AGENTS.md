@@ -55,6 +55,8 @@ This file defines repository-specific operating rules for Codex.
 - **Niemals `git stash` verwenden.** Keine Ausnahmen. Stash hat wiederholt zu Datenverlust und doppelter Arbeit gefuehrt.
 - Fremde uncommittete Aenderungen ignorieren — nicht stashen, nicht committen, nicht verwerfen. Sie gehoeren einem anderen Agent.
 - Sofort committen nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
+- Commit-Preflight ist Pflicht: Vor neuem Task, Kontextwechsel oder `git pull --rebase origin main` muessen eigene offene Aenderungen bereits per scoped Commit gesichert sein.
+- Wenn `git pull --rebase origin main` wegen uncommitteter Dateien blockiert: zuerst nur eigene Task-Aenderungen committen; blockieren fremde Dateien den Pull weiterhin, User-Freigabe fuer "ohne Pull fortfahren" einholen.
 - **Umsetzungsplan immer als eigener Commit** — `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`.
 - Keep `.husky/.bypass` local-only and untracked.
 - Create a local recovery tag via `npm run snapshot:tag` before push on `main`.
