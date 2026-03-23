@@ -170,23 +170,20 @@ export function createMultiplayerPanel(ctx) {
     function requestHostIpResolution() {
         if (hostIpLookupInFlight) return;
         hostIpLookupInFlight = true;
-        Promise.resolve(hostIpResolver?.resolve?.())
-            .then((ip) => {
-                resolvedHostIp = normalizeString(ip, 'localhost');
-            })
-            .catch(() => {
-                resolvedHostIp = 'localhost';
-            })
-            .finally(() => {
-                hostIpLookupInFlight = false;
-                if (!lobbyContainer) return;
-                if (currentView !== PANEL_VIEW.HOST_LOBBY) return;
-                updateLobbyView(lobbyContainer, {
-                    sessionState: bridge.getSessionState(),
-                    isHost: true,
-                    hostIp: resolvedHostIp,
-                });
+        const applyResolvedHostIp = (ip) => {
+            resolvedHostIp = normalizeString(ip, 'localhost');
+            hostIpLookupInFlight = false;
+            if (!lobbyContainer) return;
+            if (currentView !== PANEL_VIEW.HOST_LOBBY) return;
+            updateLobbyView(lobbyContainer, {
+                sessionState: bridge.getSessionState(),
+                isHost: true,
+                hostIp: resolvedHostIp,
             });
+        };
+        Promise.resolve(hostIpResolver?.resolve?.())
+            .then((ip) => applyResolvedHostIp(ip))
+            .catch(() => applyResolvedHostIp('localhost'));
     }
 
     function renderMenuView(root) {
