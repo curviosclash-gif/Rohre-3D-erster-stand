@@ -2087,6 +2087,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await openLevel4Drawer(page, { section: 'gameplay' });
         await page.selectOption('#recording-profile-select', 'youtube_short');
         await page.selectOption('#recording-hud-mode-select', 'with_hud');
+        await page.selectOption('#normal-camera-perspective-select', 'cinematic_soft');
+        await page.uncheck('#normal-camera-reduce-motion-toggle');
         await page.evaluate(() => window.GAME_INSTANCE?._saveSettings?.());
 
         await page.reload();
@@ -2099,6 +2101,10 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                 settingsHudMode: game?.settings?.recording?.hudMode || null,
                 runtimeProfile: game?.mediaRecorderSystem?.getRecordingCaptureSettings?.()?.profile || null,
                 runtimeHudMode: game?.mediaRecorderSystem?.getRecordingCaptureSettings?.()?.hudMode || null,
+                settingsPerspectiveNormal: game?.settings?.cameraPerspective?.normal || null,
+                settingsPerspectiveReduceMotion: game?.settings?.cameraPerspective?.reduceMotion,
+                runtimePerspectiveNormal: game?.renderer?.getCameraPerspectiveSettings?.()?.normal || null,
+                runtimePerspectiveReduceMotion: game?.renderer?.getCameraPerspectiveSettings?.()?.reduceMotion,
             };
         });
 
@@ -2106,6 +2112,10 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(persisted.settingsHudMode).toBe('with_hud');
         expect(persisted.runtimeProfile).toBe('youtube_short');
         expect(persisted.runtimeHudMode).toBe('with_hud');
+        expect(persisted.settingsPerspectiveNormal).toBe('cinematic_soft');
+        expect(persisted.settingsPerspectiveReduceMotion).toBeFalsy();
+        expect(persisted.runtimePerspectiveNormal).toBe('cinematic_soft');
+        expect(persisted.runtimePerspectiveReduceMotion).toBeFalsy();
     });
 
     test('T20m2: Shorts-Recording nutzt dynamische Aufloesung und feste P1/P2-Zuordnung', async ({ page }) => {
@@ -2362,6 +2372,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                 level3ThemeMode: level3Reset.themeMode,
                 level3VehicleP1: level3Reset.vehicles.PLAYER_1,
                 level4Speed: String(baseSettings.gameplay.speed),
+                level4PerspectiveNormal: String(baseSettings.cameraPerspective?.normal || 'classic'),
+                level4PerspectiveReduceMotion: !!baseSettings.cameraPerspective?.reduceMotion,
             };
         });
         await openGameSubmenu(page);
@@ -2385,9 +2397,16 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             slider.value = '30';
             slider.dispatchEvent(new Event('input', { bubbles: true }));
         });
+        await page.selectOption('#normal-camera-perspective-select', 'cinematic_action');
+        await page.uncheck('#normal-camera-reduce-motion-toggle');
         await page.click('#btn-level4-reset');
         await page.waitForTimeout(100);
         expect(await page.inputValue('#speed-slider')).toBe(expectedDefaults.level4Speed);
+        expect(await page.inputValue('#normal-camera-perspective-select')).toBe(expectedDefaults.level4PerspectiveNormal);
+        await expect(page.locator('#normal-camera-reduce-motion-toggle')).toHaveJSProperty(
+            'checked',
+            expectedDefaults.level4PerspectiveReduceMotion
+        );
     });
 
     test('T20r: Textkatalog-Override greift und Release-Vorschau deaktiviert ihn', async ({ page }) => {
