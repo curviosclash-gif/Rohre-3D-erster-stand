@@ -77,6 +77,17 @@ function hasSteeringIntent(action = null) {
     );
 }
 
+function isPassiveForwardIntent(action = null) {
+    if (!action || typeof action !== 'object') return true;
+    if (hasSteeringIntent(action)) return false;
+    const hasCombatIntent = action.shootMG === true
+        || action.shootItem === true
+        || action.dropItem === true
+        || action.nextItem === true
+        || (Number.isInteger(action.useItem) && action.useItem >= 0);
+    return !hasCombatIntent;
+}
+
 export class ObservationBridgePolicy {
     constructor(options = {}) {
         this.type = normalizeBotPolicyType(options.type || BOT_POLICY_TYPES.CLASSIC_BRIDGE);
@@ -402,12 +413,48 @@ export class ObservationBridgePolicy {
         }
         const observation = runtimeContext?.observation;
         if (!Array.isArray(observation)) return null;
-        const { actionIndex } = this._localInference.selectBestAction(observation);
         if (this._localInferenceVocabulary && typeof this._localInferenceVocabulary.decode === 'function') {
-            return this._localInferenceVocabulary.decode(actionIndex, {
+            const decodeContext = {
                 planarMode: runtimeContext?.rules?.planarMode,
                 domainId: runtimeContext?.rules?.domainId,
-            });
+            };
+
+            const qValues = typeof this._localInference.predict === 'function'
+                ? this._localInference.predict(observation)
+                : null;
+
+            if (Array.isArray(qValues) && qValues.length > 0) {
+                const rankedIndices = qValues
+                    .map((value, index) => ({
+                        index,
+                        qValue: Number.isFinite(Number(value)) ? Number(value) : Number.NEGATIVE_INFINITY,
+                    }))
+                    .sort((left, right) => right.qValue - left.qValue)
+                    .map((entry) => entry.index);
+
+                if (rankedIndices.length > 0) {
+                    const primaryAction = this._localInferenceVocabulary.decode(rankedIndices[0], decodeContext);
+                    if (!isPassiveForwardIntent(primaryAction)) {
+                        return primaryAction;
+                    }
+
+                    for (let i = 1; i < rankedIndices.length; i += 1) {
+                        const candidateAction = this._localInferenceVocabulary.decode(rankedIndices[i], decodeContext);
+                        if (!hasSteeringIntent(candidateAction)) continue;
+                        this._warn(
+                            'local inference selected passive forward action; using next best steering action',
+                            null,
+                            'local-steering-rank-assist',
+                        );
+                        return candidateAction;
+                    }
+
+                    return primaryAction;
+                }
+            }
+
+            const { actionIndex } = this._localInference.selectBestAction(observation);
+            return this._localInferenceVocabulary.decode(actionIndex, decodeContext);
         }
         return null;
     }

@@ -1088,6 +1088,66 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         expect(result.yawRight).toBeFalsy();
     });
 
+    test('T80d: ObservationBridgePolicy bevorzugt Steering statt lokaler boost-only Top-Action', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            let fallbackCalls = 0;
+            const fallbackPolicy = {
+                type: 'rule-based',
+                update() {
+                    fallbackCalls += 1;
+                    return { yawRight: true };
+                },
+            };
+            const policy = new ObservationBridgePolicy({
+                type: 'classic-bridge',
+                fallbackPolicy,
+                trainerBridgeEnabled: false,
+            });
+            policy._localInference = {
+                loaded: true,
+                predict() {
+                    const q = new Array(6).fill(0);
+                    q[1] = 0.7; // steering candidate
+                    q[5] = 1.0; // boost-only top action
+                    return q;
+                },
+                selectBestAction() {
+                    return { actionIndex: 5 };
+                },
+            };
+            policy._localInferenceVocabulary = {
+                decode(index) {
+                    if (index === 5) return { boost: true };
+                    if (index === 1) return { yawLeft: true };
+                    return {};
+                },
+            };
+
+            const bot = { index: 0, inventory: [] };
+            const context = {
+                mode: 'classic',
+                dt: 1 / 60,
+                players: [],
+                projectiles: [],
+                observation: new Array(40).fill(0.2),
+            };
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                fallbackCalls,
+                yawLeft: !!action?.yawLeft,
+                boost: !!action?.boost,
+                yawRight: !!action?.yawRight,
+            };
+        });
+
+        expect(result.fallbackCalls).toBe(0);
+        expect(result.yawLeft).toBeTruthy();
+        expect(result.boost).toBeFalsy();
+        expect(result.yawRight).toBeFalsy();
+    });
+
     test('T81: RuntimeConfig loest Bot-Policy-Strategie reproduzierbar nach Modus auf', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
