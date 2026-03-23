@@ -47,6 +47,10 @@ import {
     createDefaultRecordingCaptureSettings,
     normalizeRecordingCaptureSettings,
 } from '../shared/contracts/RecordingCaptureContract.js';
+import {
+    createDefaultCameraPerspectiveSettings,
+    normalizeCameraPerspectiveSettings,
+} from '../shared/contracts/CameraPerspectiveContract.js';
 import { normalizeTelemetrySnapshot } from './settings/SettingsTelemetryFacade.js';
 
 function deepClone(obj) {
@@ -106,6 +110,10 @@ export class SettingsManager {
         defaults.recording = normalizeRecordingCaptureSettings(
             defaults.recording,
             createDefaultRecordingCaptureSettings()
+        );
+        defaults.cameraPerspective = normalizeCameraPerspectiveSettings(
+            defaults.cameraPerspective,
+            createDefaultCameraPerspectiveSettings()
         );
         defaults.controls = this.cloneDefaultControls();
         return ensureMenuContractState(defaults);
@@ -217,6 +225,10 @@ export class SettingsManager {
         merged.recording = normalizeRecordingCaptureSettings(
             src?.recording,
             defaults.recording || createDefaultRecordingCaptureSettings()
+        );
+        merged.cameraPerspective = normalizeCameraPerspectiveSettings(
+            src?.cameraPerspective,
+            defaults.cameraPerspective || createDefaultCameraPerspectiveSettings()
         );
 
         merged.controls.PLAYER_1 = normalizeControlBindings(src?.controls?.PLAYER_1, defaults.controls.PLAYER_1, { guardCombatConflicts: true });

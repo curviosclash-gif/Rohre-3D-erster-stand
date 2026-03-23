@@ -11,6 +11,10 @@ import {
     createDefaultRecordingCaptureSettings,
     normalizeRecordingCaptureSettings,
 } from '../shared/contracts/RecordingCaptureContract.js';
+import {
+    createDefaultCameraPerspectiveSettings,
+    normalizeCameraPerspectiveSettings,
+} from '../shared/contracts/CameraPerspectiveContract.js';
 
 function toNumber(value, fallback) {
     const parsed = Number(value);
@@ -115,6 +119,9 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
     const recordingSource = source.recording && typeof source.recording === 'object'
         ? source.recording
         : createDefaultRecordingCaptureSettings();
+    const cameraPerspectiveSource = source.cameraPerspective && typeof source.cameraPerspective === 'object'
+        ? source.cameraPerspective
+        : createDefaultCameraPerspectiveSettings();
 
     const sessionType = normalizeSessionType(source?.localSettings?.sessionType || (source.mode === '2p' ? 'splitscreen' : 'single'));
     const modePath = String(source?.localSettings?.modePath || 'normal').trim().toLowerCase();
@@ -244,6 +251,10 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             replayHooksEnabled: arcadeSource.replayHooksEnabled !== false,
         },
         recording: normalizeRecordingCaptureSettings(recordingSource, createDefaultRecordingCaptureSettings()),
+        cameraPerspective: normalizeCameraPerspectiveSettings(
+            cameraPerspectiveSource,
+            createDefaultCameraPerspectiveSettings()
+        ),
         settingsSnapshot: deepClone(source),
     };
 
