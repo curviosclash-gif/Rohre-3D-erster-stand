@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-22
+Stand: 2026-03-23
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
@@ -34,6 +34,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V50 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Laufende Ratchet-Basis vorhanden |
 | V51 | V50.99 | hard | ja | User-Override am 2026-03-22, Scope V51 vorgezogen umgesetzt |
 | V51 | V39.9 | soft | ja | `parcours_rift` nutzt vorhandene Showcase-Muster und erweitert sie |
+| V52 | V50.99 | hard | nein | Folge-Haertung setzt auf den finalisierten V50-Fundamenten auf |
+| V52 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Bestehende Guard-Basis wird auf `server/**` und dynamic imports erweitert |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -42,6 +44,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/core/MediaRecorderSystem.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/**`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/**` | V46 / 46.2 | abgeschlossen | Core/Menu-Decomposition abgeschlossen |
 | `src/hunt/**`, `src/entities/ai/**`, `src/entities/systems/ProjectileSystem.js`, `src/ui/HuntHUD.js` | V46 / 46.3 | abgeschlossen | Hunt/AI-Cleanups abgeschlossen |
 | `src/network/**`, `server/**`, `src/ui/menu/**`, `src/core/**`, `src/state/**` | V50 | offen | Architektur-Haertung II |
+| `src/network/OnlineSessionAdapter.js`, `src/network/LANSessionAdapter.js`, `src/network/StateReconciler.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/core/InputManager.js`, `src/ui/TouchInputSource.js`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V52 | offen | Event-Contract, Layering-Guards, Input/Persistenz-Resthaertung |
 | `scripts/perf-host-budget-v41.mjs`, `tmp/perf-host-budget-report-v41.json` | V41 / 41.99.4 | abgeschlossen | Host-Performance-Gate fuer 10 Spieler als Smoke + Report abgesichert |
 | `src/entities/mapSchema/**`, `src/entities/systems/ParcoursProgress*`, `src/ui/HudRuntimeSystem.js`, `src/state/recorder/**`, `editor/js/EditorMapSerializer.js`, `src/core/config/maps/presets/parcours_maps.js` | V51 | abgeschlossen | Parcours-Objective End-to-End integriert |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
@@ -54,6 +57,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | B | V46.3 | 2026-03-22 | frei | - |
 | C | V50 | 2026-03-22 | frei | - |
 | D | V51 | 2026-03-22 | closed | 2026-03-22 |
+| E | V52 | 2026-03-23 | frei | - |
 | Bot-Codex | V41 / 41.99.4 | 2026-03-22 | closed | 2026-03-23 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -285,6 +289,80 @@ Scope:
 | Falsch-positive Checkpoint-Hits durch Bewegungsrauschen | mittel | Entities | Richtungs-Crossing + Radius-Schnitt + Cooldown je CP | Pendelbewegung an Gates |
 | Objective-Ende kollidiert mit bestehender K.O.-Logik | mittel | State | Objective-Precheck vor Legacy-Win-Path + Regression in Core-Tests | Unerwarteter Gewinnergrund |
 | HUD/Telemetry Drift zwischen Runtime und Round-End | mittel | UI/State | Gemeinsame Outcome-Payload + Dashboard-Regressionstests | Fehlende Completion-Daten |
+
+---
+
+## Block V52: Architektur-Haertung III - Event-Konsistenz, Layer-Grenzen, Guard-Coverage
+
+Plan-Datei: `docs/Umsetzungsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V50.99 -->
+
+Scope:
+
+- Session-Event-Pipeline, State/UI-Schichtung und Protokollhaertung konsolidieren.
+- Architektur-Guards auf `server/**` und dynamic imports erweitern, Input-/Persistenz-Restpfade finalisieren.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 52.1 bis 52.8 sind abgeschlossen.
+- [ ] DoD.2 52.99.* ist abgeschlossen und Gate-Invariante erfuellt.
+- [ ] DoD.3 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core` und `npm run build` sind PASS.
+- [ ] DoD.4 Evidence, Conflict-Log, Ownership und Lock-Status sind konsistent gepflegt.
+
+### 52.1 Session-Event-Contract und Player-Registry stabilisieren
+
+- [ ] 52.1.1 `stateUpdate`-Payload in LAN/Online-Adaptern und `StateReconciler` auf ein gemeinsames Schema vereinheitlichen (inkl. Version/Felder)
+- [ ] 52.1.2 `playerLoaded`-Lifecycle und `getPlayers()` aus realen Session-Daten statt Schattenlisten verdrahten
+
+### 52.2 State-UI-Boundary entkoppeln
+
+- [ ] 52.2.1 Direkte `state -> ui` Imports auf Ports/Events migrieren, damit die Layer-Richtung wieder eindeutig ist
+- [ ] 52.2.2 Direkte `ui -> state` Mutationen auf einen klaren Command-/Reducer-Pfad mit Ownership umstellen
+
+### 52.3 Architektur-Guards erweitern
+
+- [ ] 52.3.1 `ArchitectureAnalysis` fuer `src/**` und `server/**` ausbauen und `import(...)` (dynamic import) in die Kantenanalyse aufnehmen
+- [ ] 52.3.2 Budget-/Ratchet-Checks fuer bidirektionale Drift (`state <-> ui`) ergaenzen und als Gate erzwingen
+
+### 52.4 Command- und Mutationspfad vereinheitlichen
+
+- [ ] 52.4.1 `ActionDispatcher` entweder produktiv in Runtime/UI integrieren oder komplett entfernen (kein halber Pfad)
+- [ ] 52.4.2 Direkte Store-Schreibpfade reduzieren und ueber dokumentierte Commands zentralisieren
+
+### 52.5 Input-Source-Architektur finalisieren
+
+- [ ] 52.5.1 `InputManager.setPlayerSource` in Runtime/Setup aktiv nutzen und Prioritaeten fuer Touch/Gamepad/Keyboard deterministisch festlegen
+- [ ] 52.5.2 Defekte oder tote Input-Pfade bereinigen (inkl. `TouchInputSource`-Importpfad) und Regressionstests hinterlegen
+
+### 52.6 Persistenz-Rollout vervollstaendigen
+
+- [ ] 52.6.1 Verbleibende ad-hoc Storage-Keys auf zentrale Storage-Contracts migrieren
+- [ ] 52.6.2 Migrations-/Kompatibilitaetstests fuer Menu-, Arcade- und Multiplayer-Datenpfade abschliessen
+
+### 52.7 Protokollhaertung und Decoder-Strictness
+
+- [ ] 52.7.1 Multiplayer-Decoder auf strict validation (required fields, type guards, unknown-field policy) umstellen
+- [ ] 52.7.2 Contract-Tests fuer LAN/Online/Server inkl. Negativfaelle (invalid payload, version mismatch, reconnect edge cases) erweitern
+
+### 52.8 Decomposition-Welle III (Rest-God-Objects)
+
+- [ ] 52.8.1 Ueberlaenge-Module (`MediaRecorderSystem`, `MenuMultiplayerBridge`, `GameRuntimeFacade`) entlang Domain-Grenzen weiter zerlegen
+- [ ] 52.8.2 Dead-Code-/Orphan-Module identifizieren, entfernen und Import-Graph-Regression absichern
+
+### Phase 52.99: Integrations- und Abschluss-Gate
+
+- [ ] 52.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core` und `npm run build` sind gruen
+- [ ] 52.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen
+
+### Risiko-Register V52
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Event-Contract-Umstellung bricht bestehende Session-Flows | hoch | Netzwerk | Versionierter Payload-Contract + Adapter-Compatibility-Tests + Rollout-Flag | Join/Reconnect-Fehler in LAN/Online |
+| Striktere Decoder verursachen kurzfristig mehr Drops | mittel | Netzwerk/Server | Shadow-Mode mit Telemetrie vor Hard-Enforce | Erhoehte Rate an abgewiesenen Paketen |
+| Guard-Erweiterung erzeugt viele Legacy-Verstoesse gleichzeitig | mittel | Architektur | Ratchet mit Baseline + touched-file strict rollout in Schritten | Pipeline wird rot durch Altlasten |
 
 ---
 
