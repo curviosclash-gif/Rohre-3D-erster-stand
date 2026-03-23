@@ -8,13 +8,19 @@ import { chromium } from '@playwright/test';
 const HOST = '127.0.0.1';
 const PORT = parseIntEnv('BOT_RUNNER_PORT', 4273, 1024);
 const BASE_URL = `http://${HOST}:${PORT}`;
+const FORCE_KILL_PORT = parseBoolEnv('BOT_RUNNER_FORCE_KILL_PORT', true);
 const DEFAULT_SCENARIO_COUNT = parseIntEnv('BOT_RUNNER_SCENARIO_COUNT', 4, 1);
 const ROUNDS_PER_SCENARIO = parseIntEnv('BOT_RUNNER_ROUNDS', 4, 1);
 const FAIL_ON_FORCED_ROUND = parseBoolEnv('BOT_RUNNER_FAIL_ON_FORCED_ROUND', false);
 const MAX_FORCED_ROUNDS = parseIntEnv('BOT_RUNNER_MAX_FORCED_ROUNDS', Number.MAX_SAFE_INTEGER, 0);
 
 const SERVER_READY_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_SERVER_TIMEOUT', 45000, 5000);
-const APP_READY_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_BOOT_TIMEOUT', 25000, 5000);
+const APP_READY_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_BOOT_TIMEOUT', 180000, 5000);
+const NAVIGATION_TIMEOUT_MS = parseIntEnv(
+    'BOT_RUNNER_NAV_TIMEOUT',
+    Math.max(APP_READY_TIMEOUT_MS, 60000),
+    5000
+);
 const ROUND_START_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_PLAYING_TIMEOUT', 10000, 1000);
 const ROUND_ACTIVE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_MATCH_TIMEOUT', 35000, 10000);
 const ROUND_FORCE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_FORCE_TIMEOUT', 12000, 1000);
@@ -22,6 +28,7 @@ const MENU_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_MENU_TIMEOUT', 12000, 1000);
 const EVAL_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_EVAL_TIMEOUT', 10000, 1000);
 const CLEANUP_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_CLEANUP_TIMEOUT', 12000, 1000);
 const SERVER_STOP_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_SERVER_STOP_TIMEOUT', 8000, 1000);
+const SERVER_PROBE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_PROBE_TIMEOUT', 10000, 500);
 const SCENARIO_TIMEOUT_MS = parseIntEnv(
     'BOT_RUNNER_SCENARIO_TIMEOUT',
     Math.max(
@@ -35,6 +42,7 @@ const TOTAL_TIMEOUT_MS = parseIntEnv(
     Math.max(180000, DEFAULT_SCENARIO_COUNT * SCENARIO_TIMEOUT_MS + 60000),
     60000
 );
+const GOTO_WAIT_UNTIL = resolveGotoWaitUntil(process.env.BOT_RUNNER_GOTO_WAIT_UNTIL);
 
 function parseIntEnv(name, fallback, minValue = 1) {
     const raw = process.env[name];
@@ -49,6 +57,15 @@ function parseBoolEnv(name, fallback = false) {
     if (!raw) return fallback;
     const normalized = String(raw).trim().toLowerCase();
     return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+}
+
+function resolveGotoWaitUntil(value) {
+    const raw = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    if (!raw) return 'commit';
+    if (raw === 'commit' || raw === 'domcontentloaded' || raw === 'load' || raw === 'networkidle') {
+        return raw;
+    }
+    return 'commit';
 }
 
 function log(message, payload) {
@@ -118,7 +135,7 @@ async function sleep(ms) {
     await delay(ms);
 }
 
-async function fetchProbe(url, timeoutMs = 1500) {
+async function fetchProbe(url, timeoutMs = SERVER_PROBE_TIMEOUT_MS) {
     return fetch(url, {
         redirect: 'follow',
         signal: AbortSignal.timeout(timeoutMs),
@@ -523,7 +540,9 @@ async function run() {
     }, TOTAL_TIMEOUT_MS + 15000);
     hardStopTimer.unref();
 
-    forceKillPort(PORT);
+    if (FORCE_KILL_PORT) {
+        forceKillPort(PORT);
+    }
     let serverHandle = null;
     let browser = null;
     let context = null;
@@ -531,6 +550,7 @@ async function run() {
     try {
         log('Runner config', {
             baseUrl: BASE_URL,
+            forceKillPort: FORCE_KILL_PORT,
             roundsPerScenario: ROUNDS_PER_SCENARIO,
             forcedRoundPolicy: {
                 failOnForcedRound: FAIL_ON_FORCED_ROUND,
@@ -538,7 +558,9 @@ async function run() {
             },
             timeoutsMs: {
                 serverReady: SERVER_READY_TIMEOUT_MS,
+                serverProbe: SERVER_PROBE_TIMEOUT_MS,
                 appReady: APP_READY_TIMEOUT_MS,
+                navigation: NAVIGATION_TIMEOUT_MS,
                 roundStart: ROUND_START_TIMEOUT_MS,
                 roundActive: ROUND_ACTIVE_TIMEOUT_MS,
                 forceRound: ROUND_FORCE_TIMEOUT_MS,
@@ -546,6 +568,7 @@ async function run() {
                 scenario: SCENARIO_TIMEOUT_MS,
                 total: TOTAL_TIMEOUT_MS,
             },
+            gotoWaitUntil: GOTO_WAIT_UNTIL,
         });
 
         const serverAlreadyRunning = await isServerReady(BASE_URL);
@@ -577,10 +600,14 @@ async function run() {
             resolveTimeout(APP_READY_TIMEOUT_MS, 'browser:new-page', [runDeadline]),
             'browser:new-page'
         );
+        const appReadyTimeoutMs = resolveTimeout(APP_READY_TIMEOUT_MS, 'app:bootstrap', [runDeadline]);
+        const navigationTimeoutMs = resolveTimeout(NAVIGATION_TIMEOUT_MS, 'page:navigation', [runDeadline]);
+        page.setDefaultTimeout(appReadyTimeoutMs);
+        page.setDefaultNavigationTimeout(navigationTimeoutMs);
 
         await withTimeout(
-            () => page.goto(BASE_URL, { waitUntil: 'domcontentloaded' }),
-            resolveTimeout(APP_READY_TIMEOUT_MS, 'page:goto', [runDeadline]),
+            () => page.goto(BASE_URL, { waitUntil: GOTO_WAIT_UNTIL, timeout: navigationTimeoutMs }),
+            navigationTimeoutMs,
             'page:goto'
         );
         await waitForGameInstance(
@@ -796,7 +823,9 @@ async function run() {
         await safeClose('context', () => context?.close());
         await safeClose('browser', () => browser?.close());
         await stopServer(serverHandle);
-        forceKillPort(PORT);
+        if (FORCE_KILL_PORT) {
+            forceKillPort(PORT);
+        }
     }
 }
 

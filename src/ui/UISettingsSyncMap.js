@@ -2,7 +2,7 @@ import { SETTINGS_CHANGE_KEYS } from './SettingsChangeKeys.js';
 
 export const UI_SETTINGS_SYNC_MAP = Object.freeze({
     [SETTINGS_CHANGE_KEYS.SESSION_TYPE]: ['syncSessionState', 'syncModes', 'syncMultiplayerState'],
-    [SETTINGS_CHANGE_KEYS.MODE_PATH]: ['syncSessionState'],
+    [SETTINGS_CHANGE_KEYS.MODE_PATH]: ['syncSessionState', 'syncGameplay'],
     [SETTINGS_CHANGE_KEYS.LOCAL_THEME_MODE]: ['syncSessionState'],
     [SETTINGS_CHANGE_KEYS.LOCAL_SHADOW_QUALITY]: ['syncGameplay'],
     [SETTINGS_CHANGE_KEYS.MODE]: ['syncModes'],
@@ -28,6 +28,8 @@ export const UI_SETTINGS_SYNC_MAP = Object.freeze({
     [SETTINGS_CHANGE_KEYS.GAMEPLAY_FIRE_RATE]: ['syncGameplay'],
     [SETTINGS_CHANGE_KEYS.GAMEPLAY_LOCK_ON_ANGLE]: ['syncGameplay'],
     [SETTINGS_CHANGE_KEYS.GAMEPLAY_MG_TRAIL_AIM_RADIUS]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_FIGHT_PLAYER_HP]: ['syncGameplay'],
+    [SETTINGS_CHANGE_KEYS.GAMEPLAY_FIGHT_MG_DAMAGE]: ['syncGameplay'],
     [SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_MODE]: ['syncGameplay'],
     [SETTINGS_CHANGE_KEYS.GAMEPLAY_PORTAL_COUNT]: ['syncGameplay'],
     [SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_LEVEL_COUNT]: ['syncGameplay'],

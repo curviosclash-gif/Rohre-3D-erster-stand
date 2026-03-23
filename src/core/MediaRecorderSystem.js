@@ -873,16 +873,6 @@ export class MediaRecorderSystem {
             preferredMediaRecorderMimeType
         ) || DEFAULT_FALLBACK_MIME_TYPE;
         const recorderOptions = selectedMimeType ? { mimeType: selectedMimeType } : undefined;
-        const stopStreamTracks = (stream) => {
-            if (!stream || typeof stream.getTracks !== 'function') return;
-            for (const track of stream.getTracks()) {
-                try {
-                    track.stop();
-                } catch {
-                    // Ignore track-stop cleanup errors.
-                }
-            }
-        };
         try {
             this._mediaRecorderChunks = [];
             this._captureLevelIndex = Math.min(2, CAPTURE_LOAD_LEVELS.length - 1);
@@ -893,19 +883,13 @@ export class MediaRecorderSystem {
                 : sourceCanvas;
             this._mediaRecorderUsesCaptureCanvas = streamSourceCanvas !== sourceCanvas;
 
-            let captureStream = streamSourceCanvas.captureStream(0);
-            let captureTrack = typeof captureStream?.getVideoTracks === 'function'
+            // Use a fixed capture FPS so MediaRecorder always receives frames,
+            // even when requestFrame pacing is delayed by runtime load.
+            const captureStream = streamSourceCanvas.captureStream(this.captureFps);
+            const captureTrack = typeof captureStream?.getVideoTracks === 'function'
                 ? captureStream.getVideoTracks()[0] || null
                 : null;
-            let supportsRequestFrame = !!(captureTrack && typeof captureTrack.requestFrame === 'function');
-
-            if (!supportsRequestFrame) {
-                stopStreamTracks(captureStream);
-                captureStream = streamSourceCanvas.captureStream(this.captureFps);
-                captureTrack = typeof captureStream?.getVideoTracks === 'function'
-                    ? captureStream.getVideoTracks()[0] || null
-                    : null;
-            }
+            const supportsRequestFrame = !!(captureTrack && typeof captureTrack.requestFrame === 'function');
 
             this._mediaRecorderStream = captureStream;
             this._mediaRecorderVideoTrack = captureTrack;
@@ -1033,6 +1017,20 @@ export class MediaRecorderSystem {
                         resolve(result);
                     }
                     return result;
+                }
+                if (this._mediaRecorderVideoTrack?.requestFrame) {
+                    try {
+                        this._mediaRecorderVideoTrack.requestFrame();
+                    } catch {
+                        // Ignore final-frame request errors on stop.
+                    }
+                }
+                if (typeof this._mediaRecorder.requestData === 'function') {
+                    try {
+                        this._mediaRecorder.requestData();
+                    } catch {
+                        // Ignore flush failures and still attempt final stop.
+                    }
                 }
                 this._mediaRecorder.stop();
                 return this._pendingStop;

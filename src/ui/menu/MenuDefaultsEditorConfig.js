@@ -57,6 +57,8 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             fireRate: 0.45,
             lockOnAngle: 11,
             mgTrailAimRadius: 3.0,
+            fightPlayerHp: HUNT_CONFIG.PLAYER_MAX_HP,
+            fightMgDamage: HUNT_CONFIG.MG.DAMAGE,
             planarMode: false,
             portalCount: 8,
             planarLevelCount: 5,

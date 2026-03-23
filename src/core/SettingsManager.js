@@ -180,6 +180,8 @@ export class SettingsManager {
             SETTINGS_LIMITS.gameplay.mgTrailAimRadius,
             defaults.gameplay.mgTrailAimRadius
         );
+        merged.gameplay.fightPlayerHp = clampSettingValue(src?.gameplay?.fightPlayerHp ?? defaults.gameplay.fightPlayerHp, SETTINGS_LIMITS.gameplay.fightPlayerHp, defaults.gameplay.fightPlayerHp);
+        merged.gameplay.fightMgDamage = clampSettingValue(src?.gameplay?.fightMgDamage ?? defaults.gameplay.fightMgDamage, SETTINGS_LIMITS.gameplay.fightMgDamage, defaults.gameplay.fightMgDamage);
         merged.gameplay.planarMode = !!(src?.gameplay?.planarMode ?? defaults.gameplay.planarMode);
         merged.gameplay.portalCount = clampSettingValue(src?.gameplay?.portalCount ?? defaults.gameplay.portalCount, SETTINGS_LIMITS.gameplay.portalCount, defaults.gameplay.portalCount);
         merged.gameplay.planarLevelCount = clampSettingValue(src?.gameplay?.planarLevelCount ?? defaults.gameplay.planarLevelCount, SETTINGS_LIMITS.gameplay.planarLevelCount, defaults.gameplay.planarLevelCount);

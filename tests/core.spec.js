@@ -2184,30 +2184,32 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             );
         }, null, { timeout: 60000 });
 
-        const probe = await page.evaluate(() => {
+        const probe = await page.evaluate(async () => {
             const game = window.GAME_INSTANCE;
             const renderer = game?.renderer;
             const entityManager = game?.entityManager;
-            if (!game || !renderer || !entityManager) return null;
+            const recorder = game?.mediaRecorderSystem;
+            if (!game || !renderer || !entityManager || !recorder) return null;
 
             game.settings.recording = { profile: 'youtube_short', hudMode: 'clean' };
             game._onSettingsChanged({ changedKeys: ['recording.profile', 'recording.hudMode'] });
 
             const pipeline = renderer.recordingCapturePipeline;
             const originalEnsure = pipeline?._ensureShortsRenderer?.bind?.(pipeline);
-            if (typeof originalEnsure !== 'function') return null;
+            const originalIsRecording = recorder?.isRecording?.bind?.(recorder);
+            if (typeof originalEnsure !== 'function' || typeof originalIsRecording !== 'function') return null;
 
             pipeline._shortsRendererUnavailable = true;
             pipeline._ensureShortsRenderer = () => null;
-            renderer.prepareRecordingCaptureFrame({
-                recordingActive: true,
-                entityManager,
-                renderAlpha: 1,
-                renderDelta: 1 / 60,
-                splitScreen: true,
-            });
+            recorder.isRecording = () => true;
+
+            // Let the normal render loop run a couple of frames so the fallback
+            // is exercised under real recording timing.
+            await new Promise((resolve) => setTimeout(resolve, 800));
+
             pipeline._ensureShortsRenderer = originalEnsure;
             pipeline._shortsRendererUnavailable = false;
+            recorder.isRecording = originalIsRecording;
 
             const captureCanvas = renderer.getRecordingCaptureCanvas?.() || null;
             const captureCtx = captureCanvas?.getContext?.('2d', { willReadFrequently: true }) || null;
@@ -2607,6 +2609,134 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(menuState.depth).toBe('3');
         expect(menuState.panel).toBe('submenu-game');
         expect(menuState.modePath).toBe('arcade');
+    });
+
+    test('T20x0: Ebene-4 Fight-HP/MG-Regler sind nur im Fight-Modus aktiv', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="normal"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await openLevel4Drawer(page, { section: 'gameplay' });
+
+        const normalState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const hpSetting = document.getElementById('fight-player-hp-setting');
+            const damageSetting = document.getElementById('fight-mg-damage-setting');
+            const hint = document.getElementById('fight-tuning-hint');
+            const hpSlider = document.getElementById('fight-player-hp-slider');
+            const damageSlider = document.getElementById('fight-mg-damage-slider');
+
+            const beforeHp = Number(game?.settings?.gameplay?.fightPlayerHp || 0);
+            const beforeDamage = Number(game?.settings?.gameplay?.fightMgDamage || 0);
+            const runtimeHp = Number(game?.config?.HUNT?.PLAYER_MAX_HP || 0);
+            const runtimeDamage = Number(game?.config?.HUNT?.MG?.DAMAGE || 0);
+
+            if (hpSlider) {
+                hpSlider.value = '220';
+                hpSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (damageSlider) {
+                damageSlider.value = '15.50';
+                damageSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+
+            return {
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                hpHidden: !!hpSetting?.classList?.contains('hidden'),
+                damageHidden: !!damageSetting?.classList?.contains('hidden'),
+                hpDisabled: !!hpSlider?.disabled,
+                damageDisabled: !!damageSlider?.disabled,
+                hintHidden: !!hint?.classList?.contains('hidden'),
+                beforeHp,
+                afterHp: Number(game?.settings?.gameplay?.fightPlayerHp || 0),
+                beforeDamage,
+                afterDamage: Number(game?.settings?.gameplay?.fightMgDamage || 0),
+                runtimeHp,
+                runtimeDamage,
+            };
+        });
+
+        expect(normalState.modePath).toBe('normal');
+        expect(normalState.hpHidden).toBeTruthy();
+        expect(normalState.damageHidden).toBeTruthy();
+        expect(normalState.hpDisabled).toBeTruthy();
+        expect(normalState.damageDisabled).toBeTruthy();
+        expect(normalState.hintHidden).toBeFalsy();
+        expect(normalState.afterHp).toBe(normalState.beforeHp);
+        expect(normalState.afterDamage).toBe(normalState.beforeDamage);
+
+        await page.click('#btn-close-level4');
+        await page.click('#submenu-game:not(.hidden) [data-back]');
+        await page.waitForSelector('#submenu-custom:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="fight"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await openLevel4Drawer(page, { section: 'gameplay' });
+
+        await page.evaluate(() => {
+            const hpSlider = document.getElementById('fight-player-hp-slider');
+            const damageSlider = document.getElementById('fight-mg-damage-slider');
+            if (hpSlider) {
+                hpSlider.value = '170';
+                hpSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            if (damageSlider) {
+                damageSlider.value = '12.50';
+                damageSlider.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+        await page.waitForTimeout(220);
+
+        const fightState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const hpSetting = document.getElementById('fight-player-hp-setting');
+            const damageSetting = document.getElementById('fight-mg-damage-setting');
+            const hint = document.getElementById('fight-tuning-hint');
+            const hpSlider = document.getElementById('fight-player-hp-slider');
+            const damageSlider = document.getElementById('fight-mg-damage-slider');
+            return {
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                hpHidden: !!hpSetting?.classList?.contains('hidden'),
+                damageHidden: !!damageSetting?.classList?.contains('hidden'),
+                hpDisabled: !!hpSlider?.disabled,
+                damageDisabled: !!damageSlider?.disabled,
+                hintHidden: !!hint?.classList?.contains('hidden'),
+                settingsHp: Number(game?.settings?.gameplay?.fightPlayerHp || 0),
+                settingsDamage: Number(game?.settings?.gameplay?.fightMgDamage || 0),
+                runtimeHp: Number(game?.config?.HUNT?.PLAYER_MAX_HP || 0),
+                runtimeDamage: Number(game?.config?.HUNT?.MG?.DAMAGE || 0),
+            };
+        });
+
+        expect(fightState.modePath).toBe('fight');
+        expect(fightState.hpHidden).toBeFalsy();
+        expect(fightState.damageHidden).toBeFalsy();
+        expect(fightState.hpDisabled).toBeFalsy();
+        expect(fightState.damageDisabled).toBeFalsy();
+        expect(fightState.hintHidden).toBeTruthy();
+        expect(fightState.settingsHp).toBe(170);
+        expect(fightState.settingsDamage).toBeCloseTo(12.5, 2);
+        expect(fightState.runtimeHp).toBe(170);
+        expect(fightState.runtimeDamage).toBeCloseTo(12.5, 2);
+
+        await page.click('#btn-close-level4');
+        await page.click('#submenu-game:not(.hidden) [data-back]');
+        await page.waitForSelector('#submenu-custom:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="normal"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.waitForTimeout(160);
+
+        const revertedState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            return {
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                runtimeHp: Number(game?.config?.HUNT?.PLAYER_MAX_HP || 0),
+                runtimeDamage: Number(game?.config?.HUNT?.MG?.DAMAGE || 0),
+            };
+        });
+
+        expect(revertedState.modePath).toBe('normal');
+        expect(revertedState.runtimeHp).toBe(normalState.runtimeHp);
+        expect(revertedState.runtimeDamage).toBeCloseTo(normalState.runtimeDamage, 2);
     });
 
     test('T20x1: Map-Auswahl folgt Moduspfad (Arcade nur Parcours, sonst ohne Parcours)', async ({ page }) => {
@@ -3274,6 +3404,127 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.captureLevel).toBeGreaterThan(1);
         expect(result.captureResolutionScale).toBeLessThanOrEqual(0.5);
         expect(result.effectiveCaptureFps).toBeGreaterThanOrEqual(18);
+    });
+
+    test('T20aj3: MediaRecorder-Stop erzwingt finalen Flush und exportiert keinen leeren Clip', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const sourceCanvas = document.createElement('canvas');
+            sourceCanvas.width = 320;
+            sourceCanvas.height = 180;
+            const sourceCtx = sourceCanvas.getContext('2d');
+            sourceCtx.fillStyle = '#ffffff';
+            sourceCtx.fillRect(0, 0, sourceCanvas.width, sourceCanvas.height);
+
+            const captureFpsCalls = [];
+            const fakeTrack = {
+                requestFrameCalls: 0,
+                stopCalls: 0,
+                requestFrame() {
+                    this.requestFrameCalls += 1;
+                },
+                stop() {
+                    this.stopCalls += 1;
+                },
+            };
+            const fakeStream = {
+                getVideoTracks() {
+                    return [fakeTrack];
+                },
+                getTracks() {
+                    return [fakeTrack];
+                },
+            };
+            const originalCaptureStream = HTMLCanvasElement.prototype.captureStream;
+
+            class FakeMediaRecorder {
+                static lastInstance = null;
+                static isTypeSupported() {
+                    return true;
+                }
+                constructor(stream, options = undefined) {
+                    this.stream = stream;
+                    this.options = options;
+                    this.state = 'inactive';
+                    this.ondataavailable = null;
+                    this.onerror = null;
+                    this.onstop = null;
+                    this.requestDataCalls = 0;
+                    this.stopCalls = 0;
+                    this.startTimeslice = null;
+                    FakeMediaRecorder.lastInstance = this;
+                }
+                start(timeslice = 0) {
+                    this.startTimeslice = timeslice;
+                    this.state = 'recording';
+                }
+                requestData() {
+                    this.requestDataCalls += 1;
+                    const mimeType = this.options?.mimeType || 'video/webm';
+                    this.ondataavailable?.({
+                        data: new Blob([new Uint8Array([1, 2, 3, 4])], { type: mimeType }),
+                    });
+                }
+                stop() {
+                    this.stopCalls += 1;
+                    this.state = 'inactive';
+                    Promise.resolve().then(() => {
+                        this.onstop?.();
+                    });
+                }
+            }
+
+            HTMLCanvasElement.prototype.captureStream = function captureStreamStub(fps = 0) {
+                captureFpsCalls.push(Number(fps));
+                return fakeStream;
+            };
+
+            try {
+                const recorder = new MediaRecorderSystem({
+                    canvas: sourceCanvas,
+                    autoDownload: false,
+                    captureFps: 30,
+                    globalScope: { MediaRecorder: FakeMediaRecorder },
+                    capabilityProbe: () => ({
+                        canCapture: true,
+                        hasRecorder: true,
+                        canRecord: true,
+                        selectedMimeType: 'video/webm;codecs=vp9',
+                        recorderEngine: 'mediarecorder-native',
+                        supportReason: 'native-mediarecorder',
+                    }),
+                });
+
+                const started = await recorder.startRecording({ type: 'manual-test' });
+                const stopped = await recorder.stopRecording({ type: 'manual-test' });
+                const exportMeta = recorder.getLastExportMeta();
+                const recorderInstance = FakeMediaRecorder.lastInstance;
+                recorder.dispose();
+
+                return {
+                    startStarted: !!started?.started,
+                    stopStopped: !!stopped?.stopped,
+                    captureFpsCalls,
+                    requestDataCalls: Number(recorderInstance?.requestDataCalls || 0),
+                    stopCalls: Number(recorderInstance?.stopCalls || 0),
+                    requestFrameCalls: Number(fakeTrack.requestFrameCalls || 0),
+                    exportSizeBytes: Number(exportMeta?.sizeBytes || 0),
+                };
+            } finally {
+                HTMLCanvasElement.prototype.captureStream = originalCaptureStream;
+            }
+        });
+
+        expect(result.startStarted).toBeTruthy();
+        expect(result.stopStopped).toBeTruthy();
+        expect(result.captureFpsCalls.length).toBeGreaterThan(0);
+        expect(result.captureFpsCalls.includes(0)).toBeFalsy();
+        expect(result.captureFpsCalls.every((fps) => fps === 30)).toBeTruthy();
+        expect(result.requestDataCalls).toBe(1);
+        expect(result.stopCalls).toBe(1);
+        expect(result.requestFrameCalls).toBeGreaterThan(0);
+        expect(result.exportSizeBytes).toBeGreaterThan(0);
     });
 
     test('T20ak: Recorder normalisiert Export-Zeitstempel bei fehlerhafter Stop-Reihenfolge', async ({ page }) => {

@@ -16,6 +16,8 @@ export const SETTINGS_LIMITS = Object.freeze({
         fireRate: Object.freeze({ min: 0.1, max: 2 }),
         lockOnAngle: Object.freeze({ min: 5, max: 45, integer: true }),
         mgTrailAimRadius: Object.freeze({ min: 0.2, max: 6 }),
+        fightPlayerHp: Object.freeze({ min: 80, max: 250, integer: true }),
+        fightMgDamage: Object.freeze({ min: 4, max: 20 }),
         portalCount: Object.freeze({ min: 0, max: 20, integer: true }),
         planarLevelCount: Object.freeze({ min: 2, max: 10, integer: true }),
     }),

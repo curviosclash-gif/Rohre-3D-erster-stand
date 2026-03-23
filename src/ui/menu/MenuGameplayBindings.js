@@ -37,6 +37,7 @@ export function setupMenuGameplayBindings(ctx) {
             ? 'mit HUD'
             : 'clean'
     );
+    const isFightModePathActive = () => String(settings?.localSettings?.modePath || '').trim().toLowerCase() === 'fight';
     const applyPlanarMode = (enabled) => {
         if (!settings.gameplay) settings.gameplay = {};
         settings.gameplay.planarMode = !!enabled;
@@ -277,6 +278,20 @@ export function setupMenuGameplayBindings(ctx) {
         bind(ui.mgTrailAimSlider, 'input', () => {
             settings.gameplay.mgTrailAimRadius = clamp(parseFloat(ui.mgTrailAimSlider.value), 0.2, 6.0);
             queueInputSettingsChanged([keys.GAMEPLAY_MG_TRAIL_AIM_RADIUS]);
+        });
+    }
+    if (ui.fightPlayerHpSlider) {
+        bind(ui.fightPlayerHpSlider, 'input', () => {
+            if (!isFightModePathActive()) return;
+            settings.gameplay.fightPlayerHp = clamp(parseInt(ui.fightPlayerHpSlider.value, 10), 80, 250);
+            queueInputSettingsChanged([keys.GAMEPLAY_FIGHT_PLAYER_HP]);
+        });
+    }
+    if (ui.fightMgDamageSlider) {
+        bind(ui.fightMgDamageSlider, 'input', () => {
+            if (!isFightModePathActive()) return;
+            settings.gameplay.fightMgDamage = clamp(parseFloat(ui.fightMgDamageSlider.value), 4, 20);
+            queueInputSettingsChanged([keys.GAMEPLAY_FIGHT_MG_DAMAGE]);
         });
     }
 

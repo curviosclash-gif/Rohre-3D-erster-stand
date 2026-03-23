@@ -362,6 +362,15 @@
                             <input type="range" id="lockon-slider" min="5" max="45" step="1" value="11">
                             <label for="mg-trail-aim-slider">MG Trail-Zielsuchradius: <span id="mg-trail-aim-label">3.00</span></label>
                             <input type="range" id="mg-trail-aim-slider" min="0.2" max="6.0" step="0.05" value="3.0">
+                            <div id="fight-player-hp-setting" class="fight-only-setting hidden">
+                                <label for="fight-player-hp-slider">Fight Spieler-HP: <span id="fight-player-hp-label">100</span></label>
+                                <input type="range" id="fight-player-hp-slider" min="80" max="250" step="5" value="100">
+                            </div>
+                            <div id="fight-mg-damage-setting" class="fight-only-setting hidden">
+                                <label for="fight-mg-damage-slider">Fight MG Schaden: <span id="fight-mg-damage-label">7.75</span></label>
+                                <input type="range" id="fight-mg-damage-slider" min="4" max="20" step="0.25" value="7.75">
+                            </div>
+                            <p id="fight-tuning-hint" class="field-hint hidden">Nur im Fight-Spielweg aktiv (Ebene 2 -> Fight).</p>
                             <label for="shadow-quality-slider">Schattenqualitaet: <span id="shadow-quality-label">Hoch</span></label>
                             <input type="range" id="shadow-quality-slider" min="0" max="3" step="1" value="3">
                             <label for="recording-profile-select">Recording-Profil</label>

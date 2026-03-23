@@ -25,6 +25,7 @@ import {
 } from '../shared/contracts/RecordingCaptureContract.js';
 import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
+import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 
@@ -350,6 +351,7 @@ export class UIManager {
             : Math.max(0.2, Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
         if (ui.mgTrailAimSlider) ui.mgTrailAimSlider.value = mgTrailAimRadius;
         if (ui.mgTrailAimLabel) ui.mgTrailAimLabel.textContent = mgTrailAimRadius.toFixed(2);
+        syncFightMenuTuningUi({ ui, settings, gameplay: gp, config: CONFIG });
         const shadowQuality = normalizeShadowQuality(settings?.localSettings?.shadowQuality, DEFAULT_SHADOW_QUALITY);
         if (ui.shadowQualitySlider) ui.shadowQualitySlider.value = String(shadowQuality);
         if (ui.shadowQualityLabel) ui.shadowQualityLabel.textContent = resolveShadowQualityLabel(shadowQuality);

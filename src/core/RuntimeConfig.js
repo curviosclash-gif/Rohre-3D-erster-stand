@@ -149,6 +149,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
         session: {
             sessionType,
             mode,
+            modePath,
             numHumans,
             networkEnabled,
             maxPlayers: clampSettingValue(source.maxPlayers, { min: 2, max: 10, step: 1 }, 10),
@@ -212,6 +213,17 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
                 gameplaySource.mgTrailAimRadius,
                 SETTINGS_LIMITS.gameplay.mgTrailAimRadius,
                 baseConfig?.HUNT?.MG?.TRAIL_HIT_RADIUS ?? CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS ?? 0.78
+            ),
+            fightTuningEnabled: modePath === 'fight',
+            fightPlayerHp: clampSettingValue(
+                gameplaySource.fightPlayerHp,
+                SETTINGS_LIMITS.gameplay.fightPlayerHp,
+                baseConfig?.HUNT?.PLAYER_MAX_HP ?? CONFIG?.HUNT?.PLAYER_MAX_HP ?? 100
+            ),
+            fightMgDamage: clampSettingValue(
+                gameplaySource.fightMgDamage,
+                SETTINGS_LIMITS.gameplay.fightMgDamage,
+                baseConfig?.HUNT?.MG?.DAMAGE ?? CONFIG?.HUNT?.MG?.DAMAGE ?? 7.75
             ),
         },
         hunt: {
@@ -278,10 +290,25 @@ export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CO
     if (nextConfig.HUNT) {
         nextConfig.HUNT.ACTIVE_MODE = runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC;
         nextConfig.HUNT.RESPAWN_ENABLED = !!runtimeConfig?.hunt?.respawnEnabled;
+        const fightTuningEnabled = runtimeConfig?.huntCombat?.fightTuningEnabled === true;
+        if (fightTuningEnabled) {
+            nextConfig.HUNT.PLAYER_MAX_HP = Math.max(
+                1,
+                Number(runtimeConfig?.huntCombat?.fightPlayerHp || nextConfig?.HUNT?.PLAYER_MAX_HP || 100)
+            );
+        }
         if (nextConfig.HUNT.MG && runtimeConfig?.huntCombat) {
             nextConfig.HUNT.MG = {
                 ...nextConfig.HUNT.MG,
                 TRAIL_HIT_RADIUS: runtimeConfig.huntCombat.mgTrailAimRadius,
+                ...(fightTuningEnabled
+                    ? {
+                        DAMAGE: Math.max(
+                            1,
+                            Number(runtimeConfig?.huntCombat?.fightMgDamage || nextConfig?.HUNT?.MG?.DAMAGE || 7.75)
+                        ),
+                    }
+                    : {}),
             };
         }
     }
