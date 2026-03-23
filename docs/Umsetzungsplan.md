@@ -36,6 +36,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V51 | V39.9 | soft | ja | `parcours_rift` nutzt vorhandene Showcase-Muster und erweitert sie |
 | V52 | V50.99 | hard | ja | V50.99 am 2026-03-23 abgeschlossen; Folge-Haertung kann starten |
 | V52 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Bestehende Guard-Basis wird auf `server/**` und dynamic imports erweitert |
+| V53 | V52.6 | soft | nein | Settings-Persistenz-Refactor bevorzugt nach zentralem Storage-Rollout, Parallelisierung nur ohne Contract-Drift |
+| V53 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Decomposition und Import-Grenzen vorhanden |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -45,6 +47,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/hunt/**`, `src/entities/ai/**`, `src/entities/systems/ProjectileSystem.js`, `src/ui/HuntHUD.js` | V46 / 46.3 | abgeschlossen | Hunt/AI-Cleanups abgeschlossen |
 | `src/network/**`, `server/**`, `src/ui/menu/**`, `src/core/**`, `src/state/**` | V50 | abgeschlossen | Architektur-Haertung II abgeschlossen (Gate 50.99) |
 | `src/network/OnlineSessionAdapter.js`, `src/network/LANSessionAdapter.js`, `src/network/StateReconciler.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/core/InputManager.js`, `src/ui/TouchInputSource.js`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V52 | offen | Event-Contract, Layering-Guards, Input/Persistenz-Resthaertung |
+| `src/core/SettingsManager.js`, `src/core/settings/**`, `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/MenuRuntimePresetConfigService.js`, `src/core/runtime/MenuRuntimeDeveloperModeService.js`, `src/core/GameRuntimeFacade.js`, `tests/core.spec.js` | V53 | offen | Settings-Domain-Decomposition in Facades/Operations geplant |
 | `scripts/perf-host-budget-v41.mjs`, `tmp/perf-host-budget-report-v41.json` | V41 / 41.99.4 | abgeschlossen | Host-Performance-Gate fuer 10 Spieler als Smoke + Report abgesichert |
 | `src/entities/mapSchema/**`, `src/entities/systems/ParcoursProgress*`, `src/ui/HudRuntimeSystem.js`, `src/state/recorder/**`, `editor/js/EditorMapSerializer.js`, `src/core/config/maps/presets/parcours_maps.js` | V51 | abgeschlossen | Parcours-Objective End-to-End integriert |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
@@ -58,6 +61,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | C | V50 | 2026-03-22 | frei | - |
 | D | V51 | 2026-03-22 | closed | 2026-03-22 |
 | E | V52 | 2026-03-23 | frei | - |
+| F | V53 | 2026-03-23 | frei | - |
 | Bot-Codex | V41 / 41.99.4 | 2026-03-22 | closed | 2026-03-23 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -366,6 +370,70 @@ Scope:
 
 ---
 
+## Block V53: SettingsManager Decomposition und Settings-Domain-Entkopplung
+
+Plan-Datei: `docs/Feature_SettingsManager_Decomposition_V53.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V52 -->
+
+Scope:
+
+- `SettingsManager` von monolithischer Logik in klar getrennte Settings-Domain-Module ueberfuehren.
+- API-Stabilitaet fuer Runtime/Menu-Call-Sites sichern und Regressionen in Settings-/Preset-/Telemetry-Flows vermeiden.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 53.1 bis 53.6 und 53.99 sind abgeschlossen.
+- [ ] DoD.2 `SettingsManager` ist als schlanke Facade umgesetzt; Domain-Logik liegt in `src/core/settings/**`.
+- [ ] DoD.3 `npm run test:core`, `npm run architecture:guard` und `npm run build` sind PASS.
+- [ ] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Evidence/Lock/Ownership sind konsistent.
+
+### 53.1 Scope-Baseline und API-Inventar
+
+- [ ] 53.1.1 Oeffentliche `SettingsManager`-Methoden und Call-Sites (`src/core/runtime/**`, `GameRuntimeFacade`) inventarisieren und Facade-Vertrag fixieren
+- [ ] 53.1.2 Characterization-Baseline fuer kritische Flows (`sanitizeSettings`, Session-Switch, Preset-Apply/Save, Telemetry) dokumentieren
+
+### 53.2 Settings-Normalisierung zerlegen
+
+- [ ] 53.2.1 `sanitizeSettings` in dedizierte Ops/Funktionen entlang Domain-Grenzen (`session`, `gameplay`, `botBridge`, `controls`, `menuContracts`) auslagern
+- [ ] 53.2.2 Migrations-/Clamp-/Kompatibilitaetsregeln (`settingsVersion`, Hunt-Respawn, `modePath`, Recording) unveraendert absichern
+
+### 53.3 Preset- und Session-Draft-Domain trennen
+
+- [ ] 53.3.1 Session-Draft-Flow (`saveSessionDraft`, `applySessionDraft`, `switchSessionType`) als eigene Service-Schicht kapseln
+- [ ] 53.3.2 Preset-Flow (`applyMenuPreset`, `saveMenuPreset`, `deleteMenuPreset`) auf klaren Result-Contract und getrennte Ops migrieren
+
+### 53.4 Developer/Text/Telemetry-Domain extrahieren
+
+- [ ] 53.4.1 Developer-Aktionen (Mode/Theme/Actor/Visibility/Lock/ReleasePreview) in dedizierte Facade auslagern
+- [ ] 53.4.2 Text-Override- und Telemetry-History-Pfade als eigene Services mit stabilen I/O-Contracts ausfuehren
+
+### 53.5 Orchestrator-Manager finalisieren
+
+- [ ] 53.5.1 `SettingsManager` auf Store-Wiring + Domain-Orchestrierung + Runtime-Config reduzieren
+- [ ] 53.5.2 Imports/Exporte fuer Call-Sites stabilisieren, Legacy-Helfer entfernen, Import-Grenzen dokumentieren
+
+### 53.6 Verifikation und Guard-Haertung
+
+- [ ] 53.6.1 `test:core` fuer Settings/Menu/Session/Preset/Telemetry-Flows erweitern bzw. nachziehen
+- [ ] 53.6.2 `architecture:guard` gegen neue Grenzen fahren und Ratchet-Verstoesse beheben
+
+### Phase 53.99: Integrations- und Abschluss-Gate
+
+- [ ] 53.99.1 `npm run test:core`, `npm run architecture:guard`, `npm run build` sind gruen
+- [ ] 53.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen
+
+### Risiko-Register V53
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Versteckte Seiteneffekte beim Split von `sanitizeSettings` | hoch | Core | Characterization-Tests + schrittweise Extraktion mit unveraenderter API | Abweichende Defaults/Migrationswerte |
+| API-Drift bei Runtime-Call-Sites (`MenuRuntime*`, `GameRuntimeFacade`) | mittel | Core/UI | Facade-Contract zuerst fixieren, danach interne Migration | Laufzeitfehler in Menu-Flows |
+| Import-Grenzen werden durch neue Module verletzt | mittel | Architektur | `architecture:guard` pro Teilphase + Ratchet-Review | Neue disallowed edges |
+
+---
+
 ## Backlog (priorisiert, nicht gestartet)
 
 Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
@@ -375,6 +443,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V39 | Komplexe Showcase-Map | `docs/Feature_Komplexe_Showcase_Map_V39.md` | mittel | gross | P2 | Scope-Review nach V46 | In Bearbeitung |
 | V40 | Hunt Rocket Trail Targeting | `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md` | mittel | mittel | P1 | mit V50.1 Contract abstimmen | Offen |
 | V51 | Parcours-Pflichtmap mit Lauf-Verifikation | `docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md` | hoch | gross | P1 | Abgeschlossen am 2026-03-22 | Abgeschlossen |
+| V53 | SettingsManager Decomposition und Settings-Domain-Entkopplung | `docs/Feature_SettingsManager_Decomposition_V53.md` | hoch | mittel | P1 | 53.1.1 API-Inventar + Call-Site-Matrix erstellen | Offen |
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | mittel | mittel | P2 | UX/Ownership klaeren | In Bearbeitung |
 | V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.4.1 Optionalen `game/`-Unterordner evaluieren (nur bei weiter gruener Dev-Migration) | In Bearbeitung |
 | V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | hoch | mittel | P1 | Benchmark baseline erneuern | Offen |
@@ -407,9 +476,9 @@ Stand: 2026-03-23
 - Naechste 3 Ziele:
   1. 52.1.1 `stateUpdate`-Payload in LAN/Online/StateReconciler auf gemeinsames Schema bringen.
   2. 52.2.1 State-UI-Boundary weiter entkoppeln (`state -> ui` via Ports/Events).
-  3. 52.3.1 Architektur-Guards auf `server/**` + dynamic imports ausweiten.
+  3. 53.1.1 `SettingsManager`-API/Call-Site-Matrix als Refactor-Baseline fixieren.
 - Groesstes Risiko: V52-Haertung bricht bestehende Session-Edge-Cases in LAN/Online.
-- Entscheidungsbedarf: Reihenfolge V52.1 (Event-Contract) vs. V52.3 (Guard-Ausbau) fuer minimalen Integrationsdruck.
+- Entscheidungsbedarf: Reihenfolge V52-Resthaertung vs. V53-Decomposition fuer minimale Konflikte auf `src/core/**`.
 
 ## Dokumentations-Hook
 
