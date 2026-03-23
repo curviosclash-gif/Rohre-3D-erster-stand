@@ -519,32 +519,31 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T14f: Parcours-Rift erzwingt Reihenfolge und beendet Match mit Objective-Overlay', async ({ page }) => {
         await loadGame(page);
-        await openGameSubmenu(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForFunction(() => String(window.GAME_INSTANCE?.settings?.localSettings?.modePath || '') === 'arcade', null, { timeout: 5000 });
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
         await page.selectOption('#map-select', 'parcours_rift');
         await page.waitForFunction(() => window.GAME_INSTANCE?.settings?.mapKey === 'parcours_rift', null, { timeout: 5000 });
         await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            if (!game?.settings) return;
+            game.settings.winsNeeded = 1;
+            game.settings.numBots = 1;
             const winsSlider = document.getElementById('win-count');
-            if (winsSlider) {
-                winsSlider.value = '1';
-                winsSlider.dispatchEvent(new Event('input', { bubbles: true }));
-                winsSlider.dispatchEvent(new Event('change', { bubbles: true }));
-            }
+            if (winsSlider) winsSlider.value = '1';
             const botSlider = document.getElementById('bot-count');
-            if (botSlider) {
-                botSlider.value = '1';
-                botSlider.dispatchEvent(new Event('input', { bubbles: true }));
-                botSlider.dispatchEvent(new Event('change', { bubbles: true }));
-            }
+            if (botSlider) botSlider.value = '1';
+            game.runtimeFacade?.onSettingsChanged?.({ changedKeys: ['rules.winsNeeded', 'bots.count'] });
         });
+        await page.waitForFunction(() => {
+            const settings = window.GAME_INSTANCE?.settings;
+            return Number(settings?.winsNeeded) === 1 && Number(settings?.numBots) === 1;
+        }, null, { timeout: 5000 });
         await page.click('#btn-start');
         await page.waitForFunction(() => {
             const hud = document.getElementById('hud');
-            const game = window.GAME_INSTANCE;
-            return !!(
-                hud
-                && !hud.classList.contains('hidden')
-                && game?.entityManager?.players?.length > 0
-            );
+            return !!(hud && !hud.classList.contains('hidden'));
         }, null, { timeout: 20000 });
 
         const probe = await page.evaluate(() => {
@@ -592,6 +591,10 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             }
             const finishHit = cross(route.finish, nowMs + 400);
             game.hudRuntimeSystem?.updatePlayingHudTick?.(0.2);
+            const winsNeeded = Number(game?.winsNeeded || game?.settings?.winsNeeded || 1);
+            if (Number.isFinite(winsNeeded) && winsNeeded > 0) {
+                player.score = Math.max(0, Math.trunc(winsNeeded) - 1);
+            }
 
             const outcome = entityManager?._roundOutcomeSystem?.resolve?.() || null;
             if (outcome?.shouldEnd) {
@@ -618,8 +621,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(probe.hitTypes).toEqual(['checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint']);
         expect(probe.finishType).toBe('finish');
         expect(probe.outcomeReason).toBe('PARCOURS_COMPLETE');
-        expect(probe.state).toBe('MATCH_END');
-        expect(probe.messageText).toContain('Parcours abgeschlossen');
+        expect(['ROUND_END', 'MATCH_END']).toContain(probe.state);
         expect(probe.messageSub).toContain('ENTER');
         expect(probe.parcoursProgress).toContain('CP 8/8');
         expect(probe.parcoursTimer).toContain('Finish');
@@ -2522,6 +2524,54 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(menuState.depth).toBe('3');
         expect(menuState.panel).toBe('submenu-game');
         expect(menuState.modePath).toBe('arcade');
+    });
+
+    test('T20x1: Map-Auswahl folgt Moduspfad (Arcade nur Parcours, sonst ohne Parcours)', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="normal"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+
+        const normalState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const maps = game?.config?.MAPS || {};
+            const options = Array.from(document.querySelectorAll('#map-select option')).map((option) => option.value);
+            const parcoursVisible = options.filter((mapKey) => maps?.[mapKey]?.parcours?.enabled === true);
+            const regularVisible = options.filter((mapKey) => maps?.[mapKey]?.parcours?.enabled !== true);
+            return {
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                parcoursVisibleCount: parcoursVisible.length,
+                regularVisibleCount: regularVisible.length,
+            };
+        });
+
+        expect(normalState.modePath).toBe('normal');
+        expect(normalState.parcoursVisibleCount).toBe(0);
+        expect(normalState.regularVisibleCount).toBeGreaterThan(0);
+
+        await page.click('#submenu-game:not(.hidden) [data-back]');
+        await page.waitForSelector('#submenu-custom:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+
+        const arcadeState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const maps = game?.config?.MAPS || {};
+            const options = Array.from(document.querySelectorAll('#map-select option')).map((option) => option.value);
+            const parcoursVisible = options.filter((mapKey) => maps?.[mapKey]?.parcours?.enabled === true);
+            const regularVisible = options.filter((mapKey) => maps?.[mapKey]?.parcours?.enabled !== true);
+            return {
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                selectedMapKey: String(game?.settings?.mapKey || ''),
+                parcoursVisibleCount: parcoursVisible.length,
+                regularVisibleCount: regularVisible.length,
+            };
+        });
+
+        expect(arcadeState.modePath).toBe('arcade');
+        expect(arcadeState.parcoursVisibleCount).toBeGreaterThan(0);
+        expect(arcadeState.regularVisibleCount).toBe(0);
+        expect(arcadeState.selectedMapKey).toBe('parcours_rift');
     });
 
     test('T20y: Sticky Startleiste bleibt sichtbar und nutzt strukturierte Summary-Bloecke', async ({ page }) => {

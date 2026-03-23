@@ -3,6 +3,10 @@ import { GAME_MODE_TYPES } from '../../hunt/HuntMode.js';
 import { SETTINGS_CHANGE_KEYS } from '../SettingsChangeKeys.js';
 import { findFixedMenuPresetById } from './MenuPresetCatalog.js';
 import { MENU_DEVELOPER_ACCESS_MODES } from './MenuStateContracts.js';
+import {
+    isMapEligibleForModePath,
+    resolveModePathFallbackMapKey,
+} from '../../shared/contracts/MapModeContract.js';
 
 export const MENU_COMPATIBILITY_CONTRACT_VERSION = 'menu-compatibility.v1';
 
@@ -111,11 +115,14 @@ function applyModePathGameModeSyncRule(settings, result) {
 function applyMapKeyValidityGuardRule(settings, result) {
     const currentMapKey = normalizeString(settings?.mapKey);
     if (!currentMapKey) return;
-    if (currentMapKey === 'custom') return;
-    if (CONFIG?.MAPS?.[currentMapKey]) return;
+    const modePath = normalizeString(settings?.localSettings?.modePath || 'normal').toLowerCase();
+    const mapDefinition = CONFIG?.MAPS?.[currentMapKey];
+    const mapExists = !!mapDefinition;
+    const mapModeEligible = mapExists ? isMapEligibleForModePath(mapDefinition, modePath) : false;
+    if (mapExists && mapModeEligible) return;
 
     const previousMapKey = settings.mapKey;
-    settings.mapKey = 'standard';
+    settings.mapKey = resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, previousMapKey);
     addChangedKey(result, SETTINGS_CHANGE_KEYS.MAP_KEY);
     trackFix(
         result,
@@ -123,7 +130,7 @@ function applyMapKeyValidityGuardRule(settings, result) {
         'mapKey',
         previousMapKey,
         settings.mapKey,
-        'invalid_map_fallback_standard'
+        mapExists ? 'map_not_allowed_for_mode_path' : 'invalid_map_fallback_standard'
     );
 }
 

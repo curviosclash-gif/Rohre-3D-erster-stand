@@ -1,6 +1,7 @@
 // ============================================
 // MatchStartValidationService.js - validates menu state before match start
 // ============================================
+import { isMapEligibleForModePath } from '../../shared/contracts/MapModeContract.js';
 
 export function resolveMatchStartValidationIssue({
     settings = {},
@@ -77,6 +78,21 @@ export function resolveMatchStartValidationIssue({
     }
 
     const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
+    if (mapExists && !isMapEligibleForModePath(maps?.[mapKey], modePath)) {
+        if (modePath === 'arcade') {
+            return {
+                message: 'Start nicht moeglich: Arcade erlaubt nur Parcours-Maps.',
+                fieldKey: 'map',
+                fieldMessage: 'Bitte eine Parcours-Map auswaehlen.',
+            };
+        }
+        return {
+            message: 'Start nicht moeglich: Parcours-Maps sind nur im Arcade-Modus verfuegbar.',
+            fieldKey: 'map',
+            fieldMessage: 'Modus auf Arcade wechseln oder eine Standard-Map waehlen.',
+        };
+    }
+
     const gameMode = String(settings?.gameMode || 'CLASSIC').toUpperCase();
     if (modePath === 'fight' && gameMode !== huntModeType) {
         return {

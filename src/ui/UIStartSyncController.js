@@ -14,6 +14,10 @@ import {
     resolveVehiclePreview,
 } from './menu/MenuPreviewCatalog.js';
 import {
+    isMapEligibleForModePath,
+    resolveModePathFallbackMapKey,
+} from '../shared/contracts/MapModeContract.js';
+import {
     ensureStartSetupLocalState,
     humanizePreviewCategory,
     pushRecentEntry,
@@ -60,10 +64,15 @@ export class UIStartSyncController {
         const select = this.ui.mapSelect;
         if (!select) return;
 
+        const modePath = String(this.game?.settings?.localSettings?.modePath || 'normal').toLowerCase();
         const currentValue = String(select.value || this.game.settings?.mapKey || 'standard');
+        const fallbackMapKey = resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, currentValue);
         select.innerHTML = '';
 
         Object.entries(CONFIG.MAPS || {}).forEach(([key, mapDef]) => {
+            if (!isMapEligibleForModePath(mapDef, modePath)) {
+                return;
+            }
             const opt = document.createElement('option');
             opt.value = key;
             opt.textContent = this._formatMapLabel({
@@ -73,10 +82,11 @@ export class UIStartSyncController {
             select.appendChild(opt);
         });
 
-        if (CONFIG.MAPS?.[currentValue]) {
+        if (CONFIG.MAPS?.[currentValue] && isMapEligibleForModePath(CONFIG.MAPS[currentValue], modePath)) {
             select.value = currentValue;
-        } else if (CONFIG.MAPS?.standard) {
-            select.value = 'standard';
+        } else if (CONFIG.MAPS?.[fallbackMapKey]) {
+            select.value = fallbackMapKey;
+            this.game.settings.mapKey = fallbackMapKey;
         }
     }
 
@@ -331,6 +341,7 @@ export class UIStartSyncController {
         const mapFilter = String(startSetup.mapFilter || 'all').toLowerCase();
         const vehicleSearch = String(startSetup.vehicleSearch || '').trim().toLowerCase();
         const vehicleFilter = String(startSetup.vehicleFilter || 'all').toLowerCase();
+        const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
 
         if (this.ui.mapSearchInput && this.ui.mapSearchInput.value !== startSetup.mapSearch) {
             this.ui.mapSearchInput.value = startSetup.mapSearch;
@@ -352,7 +363,9 @@ export class UIStartSyncController {
                 .filter((entry) => {
                     const matchesSearch = !mapSearch || entry.name.toLowerCase().includes(mapSearch) || entry.key.toLowerCase().includes(mapSearch);
                     const matchesFilter = mapFilter === 'all' || entry.category === mapFilter;
-                    return matchesSearch && matchesFilter;
+                    const mapDefinition = CONFIG?.MAPS?.[entry.key];
+                    const matchesModePath = isMapEligibleForModePath(mapDefinition, modePath);
+                    return matchesSearch && matchesFilter && matchesModePath;
                 })
                 .forEach((entry) => {
                     const option = document.createElement('option');
@@ -366,9 +379,15 @@ export class UIStartSyncController {
                 option.textContent = previousValue;
                 this.ui.mapSelect.appendChild(option);
             }
-            this.ui.mapSelect.value = Array.from(this.ui.mapSelect.options).some((option) => option.value === previousValue)
+            const hasPreviousOption = Array.from(this.ui.mapSelect.options).some((option) => option.value === previousValue);
+            this.ui.mapSelect.value = hasPreviousOption
                 ? previousValue
                 : this.ui.mapSelect.options[0].value;
+            const previousDefinition = CONFIG?.MAPS?.[previousValue];
+            const previousModeEligible = isMapEligibleForModePath(previousDefinition, modePath);
+            if (!previousModeEligible && settings.mapKey !== this.ui.mapSelect.value) {
+                settings.mapKey = this.ui.mapSelect.value;
+            }
         }
 
         const vehicleCandidates = this._vehiclePreviewEntries.filter((entry) => {
@@ -421,7 +440,6 @@ export class UIStartSyncController {
         renderQuickList(this.ui.vehicleRecentList, startSetup.recentVehicles, 'vehicleId');
 
         const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
-        const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
         const sessionLabel = sessionType === MENU_SESSION_TYPES.SPLITSCREEN
             ? 'Splitscreen'
             : (sessionType === MENU_SESSION_TYPES.MULTIPLAYER ? 'Multiplayer' : 'Single Player');

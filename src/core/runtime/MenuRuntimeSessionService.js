@@ -7,6 +7,7 @@ import { SETTINGS_CHANGE_KEYS } from '../../ui/SettingsChangeKeys.js';
 import { getNextEventPlaylistEntry } from '../../ui/menu/EventPlaylistCatalog.js';
 import { LEVEL4_SECTION_IDS } from '../../ui/menu/MenuStateContracts.js';
 import { createMenuLevel3ResetDefaults } from '../../ui/menu/MenuDefaultsEditorConfig.js';
+import { listEligibleMapKeysForModePath } from '../../shared/contracts/MapModeContract.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
     arcade: 'arcade',
@@ -193,7 +194,7 @@ export function handleQuickStartEventPlaylistStartAction(ctx) {
 
 export function handleQuickStartRandomStartAction(ctx) {
     const { game, onSettingsChanged, recordMenuTelemetry, startMatch } = ctx;
-    const mapKeys = Object.keys(CONFIG?.MAPS || {}).filter((key) => key && key !== 'custom');
+    const mapKeys = listEligibleMapKeysForModePath(CONFIG?.MAPS, 'quick_action', { includeCustom: false });
     if (mapKeys.length > 0) {
         const randomIndex = Math.floor(Math.random() * mapKeys.length);
         game.settings.mapKey = mapKeys[randomIndex];
