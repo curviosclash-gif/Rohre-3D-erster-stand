@@ -5,9 +5,8 @@
 import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
-    migrateStorageValue,
-    readFirstAvailableStorageValue,
 } from './StorageKeys.js';
+import { createDefaultStoragePlatform } from '../state/storage/StoragePlatform.js';
 
 const SETTINGS_STORAGE_KEY = STORAGE_KEYS.settings;
 const SETTINGS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settings;
@@ -46,7 +45,11 @@ function getDefaultStorage() {
 
 export class SettingsStore {
     constructor(options = {}) {
-        this.storage = options.storage ?? getDefaultStorage();
+        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
+            storage: options.storage ?? getDefaultStorage(),
+            onQuotaExceeded: options.onQuotaExceeded,
+        });
+        this.storage = this.storagePlatform?.driver?.storage || null;
         this.sanitizeSettings = typeof options.sanitizeSettings === 'function'
             ? options.sanitizeSettings
             : (settings) => settings;
@@ -68,20 +71,14 @@ export class SettingsStore {
     }
 
     loadSettings() {
-        if (!this.storage || typeof this.storage.getItem !== 'function') {
-            return this.createDefaultSettings();
-        }
-
         try {
-            const resolved = readFirstAvailableStorageValue(
-                this.storage,
+            const saved = this.storagePlatform.readJson(
                 this.settingsStorageKey,
-                this.settingsStorageLegacyKeys
+                this.settingsStorageLegacyKeys,
+                null
             );
-            if (!resolved) return this.createDefaultSettings();
-            const saved = JSON.parse(resolved.raw);
+            if (!saved || typeof saved !== 'object') return this.createDefaultSettings();
             const sanitized = this.sanitizeSettings(saved);
-            migrateStorageValue(this.storage, this.settingsStorageKey, resolved);
             return sanitized;
         } catch {
             // Ignore malformed storage and fall back to defaults.
@@ -90,32 +87,17 @@ export class SettingsStore {
     }
 
     saveSettings(settings) {
-        if (!this.storage || typeof this.storage.setItem !== 'function') {
-            return false;
-        }
-
-        try {
-            this.storage.setItem(this.settingsStorageKey, JSON.stringify(settings));
-            return true;
-        } catch {
-            // Ignore persistence errors (private mode, quotas, etc.)
-            return false;
-        }
+        const result = this.storagePlatform.writeJson(this.settingsStorageKey, settings);
+        return result.ok;
     }
 
     loadProfiles() {
-        if (!this.storage || typeof this.storage.getItem !== 'function') {
-            return [];
-        }
-
         try {
-            const resolved = readFirstAvailableStorageValue(
-                this.storage,
+            const parsed = this.storagePlatform.readJson(
                 this.settingsProfilesStorageKey,
-                this.settingsProfilesStorageLegacyKeys
+                this.settingsProfilesStorageLegacyKeys,
+                []
             );
-            if (!resolved) return [];
-            const parsed = JSON.parse(resolved.raw);
             if (!Array.isArray(parsed)) return [];
 
             const out = [];
@@ -132,7 +114,6 @@ export class SettingsStore {
                     isDefault: Boolean(entry?.isDefault),
                 });
             }
-            migrateStorageValue(this.storage, this.settingsProfilesStorageKey, resolved);
             return normalizeProfileEntries(out);
         } catch {
             return [];
@@ -140,35 +121,22 @@ export class SettingsStore {
     }
 
     saveProfiles(profiles) {
-        if (!this.storage || typeof this.storage.setItem !== 'function') {
-            return false;
-        }
-
-        try {
-            this.storage.setItem(this.settingsProfilesStorageKey, JSON.stringify(normalizeProfileEntries(profiles)));
-            return true;
-        } catch {
-            // Ignore persistence errors.
-            return false;
-        }
+        const result = this.storagePlatform.writeJson(
+            this.settingsProfilesStorageKey,
+            normalizeProfileEntries(profiles)
+        );
+        return result.ok;
     }
 
     loadJsonRecord(storageKey, fallbackValue = null) {
         const key = String(storageKey || '').trim();
         if (!key) return fallbackValue;
-        if (!this.storage || typeof this.storage.getItem !== 'function') {
-            return fallbackValue;
-        }
-
         try {
-            const resolved = readFirstAvailableStorageValue(
-                this.storage,
+            const parsed = this.storagePlatform.readJson(
                 key,
-                this._resolveLegacyKeysForStorageKey(key)
+                this._resolveLegacyKeysForStorageKey(key),
+                fallbackValue
             );
-            if (!resolved) return fallbackValue;
-            const parsed = JSON.parse(resolved.raw);
-            migrateStorageValue(this.storage, key, resolved);
             return parsed;
         } catch {
             return fallbackValue;
@@ -178,16 +146,8 @@ export class SettingsStore {
     saveJsonRecord(storageKey, value) {
         const key = String(storageKey || '').trim();
         if (!key) return false;
-        if (!this.storage || typeof this.storage.setItem !== 'function') {
-            return false;
-        }
-
-        try {
-            this.storage.setItem(key, JSON.stringify(value));
-            return true;
-        } catch {
-            return false;
-        }
+        const result = this.storagePlatform.writeJson(key, value);
+        return result.ok;
     }
 
     _resolveLegacyKeysForStorageKey(storageKey) {

@@ -1,9 +1,8 @@
 import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
-    migrateStorageValue,
-    readFirstAvailableStorageValue,
 } from '../StorageKeys.js';
+import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
 
 const MENU_TEXT_OVERRIDE_STORAGE_KEY = STORAGE_KEYS.menuTextOverrides;
 const MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTextOverrides;
@@ -27,7 +26,11 @@ function sanitizeTextValue(value) {
 
 export class MenuTextOverrideStore {
     constructor(options = {}) {
-        this.storage = options.storage ?? getDefaultStorage();
+        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
+            storage: options.storage ?? getDefaultStorage(),
+            onQuotaExceeded: options.onQuotaExceeded,
+        });
+        this.storage = this.storagePlatform?.driver?.storage || null;
         this.storageKey = options.storageKey || MENU_TEXT_OVERRIDE_STORAGE_KEY;
         this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
             ? [...options.storageLegacyKeys]
@@ -35,12 +38,8 @@ export class MenuTextOverrideStore {
     }
 
     _loadRaw() {
-        if (!this.storage || typeof this.storage.getItem !== 'function') return {};
         try {
-            const resolved = readFirstAvailableStorageValue(this.storage, this.storageKey, this.storageLegacyKeys);
-            if (!resolved) return {};
-            const parsed = JSON.parse(resolved.raw);
-            migrateStorageValue(this.storage, this.storageKey, resolved);
+            const parsed = this.storagePlatform.readJson(this.storageKey, this.storageLegacyKeys, {});
             return parsed && typeof parsed === 'object' ? parsed : {};
         } catch {
             return {};
@@ -48,13 +47,7 @@ export class MenuTextOverrideStore {
     }
 
     _saveRaw(rawOverrides) {
-        if (!this.storage || typeof this.storage.setItem !== 'function') return false;
-        try {
-            this.storage.setItem(this.storageKey, JSON.stringify(rawOverrides));
-            return true;
-        } catch {
-            return false;
-        }
+        return this.storagePlatform.writeJson(this.storageKey, rawOverrides).ok;
     }
 
     listOverrides() {

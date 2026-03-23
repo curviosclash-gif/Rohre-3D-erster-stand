@@ -6,7 +6,7 @@ import {
     createControlBindingsSnapshot,
     SETTINGS_LIMITS,
 } from './config/SettingsRuntimeContract.js';
-import { normalizeSessionType } from '../ui/menu/MenuDraftStore.js';
+import { normalizeSessionType } from '../composition/core-ui/CoreSettingsPorts.js';
 import {
     createDefaultRecordingCaptureSettings,
     normalizeRecordingCaptureSettings,

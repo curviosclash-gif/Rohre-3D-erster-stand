@@ -3,6 +3,7 @@ import path from 'node:path';
 import {
     ARCHITECTURE_SCORECARD_BUDGETS,
     ARCHITECTURE_SCORECARD_TARGETS,
+    LEGACY_CORE_TO_UI_IMPORTS,
     LEGACY_CONSTRUCTOR_GAME_ALLOWLIST,
     LEGACY_DOM_ACCESS_ALLOWLIST,
     LEGACY_ENTITIES_TO_CORE_IMPORTS,
@@ -154,11 +155,20 @@ function collectDomAccesses(filesByRelativePath) {
 }
 
 function classifyEdgeViolations(edges) {
+    const coreToUiImports = [];
     const uiToCoreImports = [];
     const entitiesToCoreImports = [];
     const stateToCoreImports = [];
 
     for (const edge of edges) {
+        if (edge.from.startsWith('src/core/') && edge.to.startsWith('src/ui/')) {
+            const reason = LEGACY_CORE_TO_UI_IMPORTS.get(createEdgeKey(edge.from, edge.to)) || null;
+            coreToUiImports.push({
+                ...edge,
+                allowed: !!reason,
+                reason,
+            });
+        }
         if (edge.from.startsWith('src/ui/') && edge.to.startsWith('src/core/')) {
             const reason = LEGACY_UI_TO_CORE_IMPORTS.get(createEdgeKey(edge.from, edge.to)) || null;
             uiToCoreImports.push({
@@ -186,6 +196,7 @@ function classifyEdgeViolations(edges) {
     }
 
     return {
+        coreToUiImports,
         uiToCoreImports,
         entitiesToCoreImports,
         stateToCoreImports,
@@ -233,6 +244,7 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
 
     const importEdges = collectImportEdges(rootDir, filesByRelativePath);
     const {
+        coreToUiImports,
         uiToCoreImports,
         entitiesToCoreImports,
         stateToCoreImports,
@@ -251,6 +263,7 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             configWrites,
             constructorGameMatches,
             domAccessesOutsideUi,
+            coreToUiImports,
             uiToCoreImports,
             entitiesToCoreImports,
             stateToCoreImports,
@@ -282,6 +295,11 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             disallowedOccurrences: domAccessesOutsideUi.filter((entry) => !entry.allowed).length,
             disallowedFiles: summarizeFiles(domAccessesOutsideUi.filter((entry) => !entry.allowed)).length,
             legacyFiles: summarizeFiles(domAccessesOutsideUi.filter((entry) => entry.allowed)),
+        },
+        coreToUiImports: {
+            totalEdges: coreToUiImports.length,
+            disallowedEdges: coreToUiImports.filter((entry) => !entry.allowed).length,
+            legacyEdges: summarizeEdges(coreToUiImports.filter((entry) => entry.allowed)),
         },
         uiToCoreImports: {
             totalEdges: uiToCoreImports.length,
@@ -317,6 +335,7 @@ export function formatArchitectureReport(report) {
     lines.push(`CONFIG writes: ${report.scorecard.configWrites.total} (target ${report.targets.configWrites})`);
     lines.push(`constructor(game)/this.game = game: ${report.scorecard.constructorGame.totalOccurrences} across ${report.scorecard.constructorGame.totalFiles} files (${report.scorecard.constructorGame.disallowedFiles} disallowed files)`);
     lines.push(`DOM outside src/ui: ${report.scorecard.domAccessOutsideUi.totalOccurrences} across ${report.scorecard.domAccessOutsideUi.totalFiles} files (${report.scorecard.domAccessOutsideUi.disallowedFiles} disallowed files)`);
+    lines.push(`core -> ui imports: ${report.scorecard.coreToUiImports.totalEdges} edges (${report.scorecard.coreToUiImports.disallowedEdges} disallowed)`);
     lines.push(`ui -> core imports: ${report.scorecard.uiToCoreImports.totalEdges} edges (${report.scorecard.uiToCoreImports.disallowedEdges} disallowed)`);
     lines.push(`entities -> core imports: ${report.scorecard.entitiesToCoreImports.totalEdges} edges (${report.scorecard.entitiesToCoreImports.disallowedEdges} disallowed)`);
     lines.push(`state -> core imports: ${report.scorecard.stateToCoreImports.totalEdges} edges (${report.scorecard.stateToCoreImports.disallowedEdges} disallowed)`);

@@ -51,6 +51,8 @@ function resolveIsolatedPlaywrightEnv() {
 
 const isolatedEnv = resolveIsolatedPlaywrightEnv();
 const TEST_PORT = isolatedEnv.testPort;
+const TEST_HOST = String(process.env.TEST_HOST || '127.0.0.1');
+process.env.TEST_HOST = TEST_HOST;
 const runTag = isolatedEnv.runTag;
 const outputDir = isolatedEnv.outputDir;
 const htmlReportDir = String(process.env.PW_HTML_REPORT_DIR || `playwright-report/${runTag}`);
@@ -74,7 +76,7 @@ export default defineConfig({
     globalTeardown: './tests/playwright.global-teardown.js',
     reporter: reporters,
     use: {
-        baseURL: `http://localhost:${TEST_PORT}`,
+        baseURL: `http://${TEST_HOST}:${TEST_PORT}`,
         trace: traceMode,
     },
     projects: [
@@ -84,8 +86,8 @@ export default defineConfig({
         },
     ],
     webServer: {
-        command: `npx vite --port ${TEST_PORT} --strictPort`,
-        url: `http://localhost:${TEST_PORT}`,
+        command: `npx vite --host ${TEST_HOST} --port ${TEST_PORT} --strictPort`,
+        url: `http://${TEST_HOST}:${TEST_PORT}`,
         timeout: 30_000,
         reuseExistingServer: !isCI && process.env.PW_REUSE_SERVER === '1',
     },

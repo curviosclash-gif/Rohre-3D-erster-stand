@@ -5,10 +5,9 @@
 import { CONFIG } from './Config.js';
 import { RoundRecorder } from '../state/RoundRecorder.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
-import { UIManager } from '../ui/UIManager.js';
+import { UIManager, ProfileUiController } from '../composition/core-ui/CoreUiAppPorts.js';
 import { SettingsManager } from './SettingsManager.js';
 import { ProfileManager } from './ProfileManager.js';
-import { ProfileUiController } from '../ui/ProfileUiController.js';
 import { createRoundStateController } from '../state/RoundStateController.js';
 import { PlayingStateSystem } from './PlayingStateSystem.js';
 import { RoundStateTickSystem } from '../state/RoundStateTickSystem.js';

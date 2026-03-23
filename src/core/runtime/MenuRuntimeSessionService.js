@@ -3,11 +3,14 @@
 // ============================================
 
 import { CONFIG } from '../Config.js';
-import { SETTINGS_CHANGE_KEYS } from '../../ui/SettingsChangeKeys.js';
-import { getNextEventPlaylistEntry } from '../../ui/menu/EventPlaylistCatalog.js';
-import { LEVEL4_SECTION_IDS } from '../../ui/menu/MenuStateContracts.js';
-import { createMenuLevel3ResetDefaults } from '../../ui/menu/MenuDefaultsEditorConfig.js';
+import {
+    createMenuLevel3ResetDefaults,
+    getNextEventPlaylistEntry,
+    LEVEL4_SECTION_IDS,
+    SETTINGS_CHANGE_KEYS,
+} from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { listEligibleMapKeysForModePath } from '../../shared/contracts/MapModeContract.js';
+import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
     arcade: 'arcade',
@@ -46,6 +49,19 @@ const SESSION_SWITCH_CHANGED_KEYS = Object.freeze([
 ]);
 
 export { SESSION_SWITCH_CHANGED_KEYS, MODE_PATH_TO_PRESET_ID };
+
+function resolveQuickStartRng(game, event = null) {
+    const runtimeRng = game?.runtimeRng && typeof game.runtimeRng.next === 'function'
+        ? game.runtimeRng
+        : createRuntimeRng({
+            random: typeof game?.random === 'function' ? game.random : Math.random,
+        });
+    const hasSeed = Number.isFinite(Number(event?.seed));
+    if (!hasSeed) {
+        return runtimeRng;
+    }
+    return createRuntimeRng({ seed: Number(event.seed) });
+}
 
 export function handleSessionTypeChangeAction(ctx) {
     const { game, event, onSettingsChanged } = ctx;
@@ -193,10 +209,11 @@ export function handleQuickStartEventPlaylistStartAction(ctx) {
 }
 
 export function handleQuickStartRandomStartAction(ctx) {
-    const { game, onSettingsChanged, recordMenuTelemetry, startMatch } = ctx;
+    const { game, event, onSettingsChanged, recordMenuTelemetry, startMatch } = ctx;
     const mapKeys = listEligibleMapKeysForModePath(CONFIG?.MAPS, 'quick_action', { includeCustom: false });
     if (mapKeys.length > 0) {
-        const randomIndex = Math.floor(Math.random() * mapKeys.length);
+        const rng = resolveQuickStartRng(game, event);
+        const randomIndex = rng.int(mapKeys.length);
         game.settings.mapKey = mapKeys[randomIndex];
     }
     game.settings.localSettings.modePath = 'quick_action';

@@ -10,6 +10,8 @@ import {
     resolveStorage,
     toCallable,
 } from './multiplayer/MenuMultiplayerBridgeRuntime.js';
+import { createRuntimeClock } from '../../shared/contracts/RuntimeClockContract.js';
+import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
 export const MENU_MULTIPLAYER_EVENT_TYPES = Object.freeze({
     HOST: 'multiplayer_host',
@@ -55,24 +57,23 @@ function deepClone(value) {
 }
 
 function buildRuntimeId(nowProvider, randomProvider, randomLength = 6) {
-    const fallbackNow = Date.now();
     let rawNow = Number.NaN;
     try {
-        rawNow = Number(toCallable(nowProvider, () => fallbackNow)());
+        rawNow = Number(toCallable(nowProvider, () => 0)());
     } catch {
         rawNow = Number.NaN;
     }
-    const safeNow = Number.isFinite(rawNow) ? Math.max(0, Math.floor(rawNow)) : fallbackNow;
+    const safeNow = Number.isFinite(rawNow) ? Math.max(0, Math.floor(rawNow)) : 0;
     let randomValue = Number.NaN;
     try {
-        randomValue = Number(toCallable(randomProvider, Math.random)());
+        randomValue = Number(toCallable(randomProvider, () => 0.5)());
     } catch {
         randomValue = Number.NaN;
     }
 
     const normalizedRandom = Number.isFinite(randomValue)
         ? Math.abs(randomValue % 1)
-        : Math.random();
+        : 0.5;
     const randomToken = normalizedRandom
         .toString(36)
         .slice(2, 2 + randomLength)
@@ -241,8 +242,8 @@ function deriveSessionState(snapshot, peerId) {
     };
 }
 
-function generateLobbyCode(randomProvider) {
-    const randomToken = buildRuntimeId(Date.now, randomProvider, 4).split('-')[1] || '0000';
+function generateLobbyCode(nowProvider, randomProvider) {
+    const randomToken = buildRuntimeId(nowProvider, randomProvider, 4).split('-')[1] || '0000';
     return `LOBBY-${randomToken.toUpperCase()}`;
 }
 
@@ -279,8 +280,13 @@ export class MenuMultiplayerBridge {
     constructor(options = {}) {
         const runtime = options.runtime && typeof options.runtime === 'object' ? options.runtime : {};
         const runtimeGlobal = resolveGlobalObject(runtime.global || null);
-        const runtimeNow = toCallable(runtime.now, null);
-        const runtimeRandom = toCallable(runtime.random, null);
+        const runtimeClock = createRuntimeClock({
+            nowMs: options.now || runtime.now,
+            runtime: runtimeGlobal,
+        });
+        const runtimeRng = createRuntimeRng({
+            random: options.random || runtime.random,
+        });
 
         this.contractVersion = normalizeString(options.contractVersion, MENU_LIFECYCLE_EVENT_CONTRACT_VERSION);
         this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : null;
@@ -289,8 +295,10 @@ export class MenuMultiplayerBridge {
         this.onMatchStart = typeof options.onMatchStart === 'function' ? options.onMatchStart : null;
 
         this._events = [];
-        this._now = toCallable(options.now, runtimeNow || (() => Date.now()));
-        this._random = runtimeRandom || Math.random;
+        this._clock = runtimeClock;
+        this._rng = runtimeRng;
+        this._now = runtimeClock.nowMs;
+        this._random = runtimeRng.next;
         this._eventTarget = resolveEventTarget(runtime.eventTarget || runtimeGlobal);
         this._setInterval = resolveRuntimeTimer(runtime.setInterval, runtimeGlobal, 'setInterval');
         this._clearInterval = resolveRuntimeTimer(runtime.clearInterval, runtimeGlobal, 'clearInterval');
@@ -556,7 +564,7 @@ export class MenuMultiplayerBridge {
 
     host(options = {}) {
         const actorId = normalizeString(options.actorId, 'host');
-        const requestedLobbyCode = normalizeLobbyCode(options.lobbyCode, generateLobbyCode(this._random));
+        const requestedLobbyCode = normalizeLobbyCode(options.lobbyCode, generateLobbyCode(this._now, this._random));
         if (this._activeLobbyCode && this._activeLobbyCode !== requestedLobbyCode) {
             this.leave({ silent: true });
         }

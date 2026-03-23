@@ -1,9 +1,8 @@
 import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
-    migrateStorageValue,
-    readFirstAvailableStorageValue,
 } from '../StorageKeys.js';
+import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
 
 const MENU_TELEMETRY_STORAGE_KEY = STORAGE_KEYS.menuTelemetry;
 const MENU_TELEMETRY_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTelemetry;
@@ -149,7 +148,11 @@ function createDefaultState() {
 
 export class MenuTelemetryStore {
     constructor(options = {}) {
-        this.storage = options.storage ?? getDefaultStorage();
+        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
+            storage: options.storage ?? getDefaultStorage(),
+            onQuotaExceeded: options.onQuotaExceeded,
+        });
+        this.storage = this.storagePlatform?.driver?.storage || null;
         this.storageKey = options.storageKey || MENU_TELEMETRY_STORAGE_KEY;
         this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
             ? [...options.storageLegacyKeys]
@@ -157,12 +160,12 @@ export class MenuTelemetryStore {
     }
 
     _loadState() {
-        if (!this.storage || typeof this.storage.getItem !== 'function') return createDefaultState();
         try {
-            const resolved = readFirstAvailableStorageValue(this.storage, this.storageKey, this.storageLegacyKeys);
-            if (!resolved) return createDefaultState();
-            const parsed = JSON.parse(resolved.raw);
-            migrateStorageValue(this.storage, this.storageKey, resolved);
+            const parsed = this.storagePlatform.readJson(
+                this.storageKey,
+                this.storageLegacyKeys,
+                createDefaultState()
+            );
             return {
                 ...createDefaultState(),
                 ...(parsed && typeof parsed === 'object' ? parsed : {}),
@@ -178,13 +181,7 @@ export class MenuTelemetryStore {
     }
 
     _saveState(state) {
-        if (!this.storage || typeof this.storage.setItem !== 'function') return false;
-        try {
-            this.storage.setItem(this.storageKey, JSON.stringify(state));
-            return true;
-        } catch {
-            return false;
-        }
+        return this.storagePlatform.writeJson(this.storageKey, state).ok;
     }
 
     _resolveBucket(collection, key) {

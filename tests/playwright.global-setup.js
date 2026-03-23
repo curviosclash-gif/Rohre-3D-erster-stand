@@ -43,8 +43,8 @@ function isProcessAlive(pid) {
     }
 }
 
-async function prewarmRuntime(testPort) {
-    const url = `http://localhost:${testPort}/`;
+async function prewarmRuntime(testHost, testPort) {
+    const url = `http://${testHost}:${testPort}/`;
     let lastError = null;
 
     for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -67,6 +67,7 @@ async function prewarmRuntime(testPort) {
 
 export default async function globalSetup() {
     const runTag = String(process.env.PW_RUN_TAG || `pid-${process.pid}`).trim();
+    const testHost = String(process.env.TEST_HOST || '127.0.0.1').trim() || '127.0.0.1';
     const testPort = String(process.env.TEST_PORT || '').trim();
     const outputDir = String(process.env.PW_OUTPUT_DIR || '').trim();
     const workers = toPositiveInt(process.env.PW_WORKERS, 1, 1, 32);
@@ -102,8 +103,8 @@ export default async function globalSetup() {
             process.env.PW_SUITE_LOCK_PATH = lockPath;
             process.env.PW_SUITE_LOCK_OWNER = ownerToken;
             console.log(`[PlaywrightIsolation] lock acquired: ${lockPath}`);
-            console.log(`[PlaywrightIsolation] TEST_PORT=${testPort} PW_RUN_TAG=${runTag} PW_OUTPUT_DIR=${outputDir} PW_WORKERS=${workers}`);
-            await prewarmRuntime(testPort);
+            console.log(`[PlaywrightIsolation] TEST_HOST=${testHost} TEST_PORT=${testPort} PW_RUN_TAG=${runTag} PW_OUTPUT_DIR=${outputDir} PW_WORKERS=${workers}`);
+            await prewarmRuntime(testHost, testPort);
             return;
         } catch (error) {
             if (error?.code !== 'EEXIST') {

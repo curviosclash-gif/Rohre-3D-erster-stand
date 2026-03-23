@@ -73,6 +73,9 @@ const stateConfigImportSources = [
     'src/state/match-session/MatchSessionMapOps.js',
 ];
 
+/** @type {[string, string][]} */
+const legacyCoreToUiImportEntries = [];
+
 export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([
     ['src/core/GameDebugApi.js', 'Legacy debug bridge still wraps the full runtime while V44 only forbids new wide constructors.'],
     ['src/core/PlayingStateSystem.js', 'Existing playing loop shell still receives the game runtime directly.'],
@@ -133,6 +136,7 @@ const legacyStateToCoreImportEntries = [
 ];
 
 export const LEGACY_UI_TO_CORE_IMPORTS = new Map(legacyUiToCoreImportEntries);
+export const LEGACY_CORE_TO_UI_IMPORTS = new Map(legacyCoreToUiImportEntries);
 
 export const LEGACY_ENTITIES_TO_CORE_IMPORTS = new Map(legacyEntitiesToCoreImportEntries);
 export const LEGACY_STATE_TO_CORE_IMPORTS = new Map(legacyStateToCoreImportEntries);
@@ -141,6 +145,7 @@ export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     configWrites: 0,
     disallowedConstructorGameFiles: 0,
     disallowedDomAccessFiles: 0,
+    disallowedCoreToUiImports: 0,
     disallowedUiToCoreImports: 0,
     disallowedEntitiesToCoreImports: 0,
     disallowedStateToCoreImports: 0,
@@ -149,6 +154,7 @@ export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
 export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
     constructorGameFiles: LEGACY_CONSTRUCTOR_GAME_ALLOWLIST.size,
     domAccessFiles: LEGACY_DOM_ACCESS_ALLOWLIST.size,
+    coreToUiImportEdges: LEGACY_CORE_TO_UI_IMPORTS.size,
     uiToCoreImportEdges: LEGACY_UI_TO_CORE_IMPORTS.size,
     entitiesToCoreImportEdges: LEGACY_ENTITIES_TO_CORE_IMPORTS.size,
     stateToCoreImportEdges: LEGACY_STATE_TO_CORE_IMPORTS.size,

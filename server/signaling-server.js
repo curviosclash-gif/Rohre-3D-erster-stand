@@ -1,16 +1,20 @@
 // ============================================
 // signaling-server.js - WebSocket signaling server for Internet play
 // ============================================
-// Self-hosted on VPS. Handles lobby CRUD, SDP/ICE forwarding.
-// Deploy: node server/signaling-server.js [port]
-// Or via Docker: see server/Dockerfile
 
 import { WebSocketServer } from 'ws';
+import {
+    SIGNALING_COMMAND_TYPES,
+    SIGNALING_EVENT_TYPES,
+    SIGNALING_SESSION_CONTRACT_VERSION,
+    createSignalingEnvelope,
+    normalizeSignalingEnvelope,
+} from '../src/shared/contracts/SignalingSessionContract.js';
 
 function generateLobbyCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 8; i += 1) {
         code += chars[Math.floor(Math.random() * chars.length)];
     }
     return code;
@@ -31,12 +35,32 @@ function sendJson(ws, data) {
     }
 }
 
-function broadcastToLobby(lobby, data, excludeWs) {
+function sendSignaling(ws, type, payload = null) {
+    sendJson(ws, createSignalingEnvelope(type, payload));
+}
+
+function broadcastToLobby(lobby, type, payload = null, excludeWs = null) {
     for (const player of lobby.players) {
-        if (player.ws !== excludeWs) {
-            sendJson(player.ws, data);
-        }
+        if (player.ws === excludeWs) continue;
+        sendSignaling(player.ws, type, payload);
     }
+}
+
+function buildLobbyState(lobby) {
+    if (!lobby) return null;
+    return {
+        contractVersion: SIGNALING_SESSION_CONTRACT_VERSION,
+        lobbyCode: lobby.code,
+        hostPeerId: lobby.hostPeerId,
+        maxPlayers: lobby.maxPlayers,
+        createdAt: lobby.createdAt,
+        players: lobby.players.map((player) => ({
+            peerId: player.peerId,
+            playerId: player.peerId,
+            isHost: player.isHost === true,
+            ready: player.ready === true,
+        })),
+    };
 }
 
 function removePeerFromLobby(ws) {
@@ -46,17 +70,26 @@ function removePeerFromLobby(ws) {
     const lobby = lobbies.get(lobbyCode);
     if (!lobby) return;
 
-    const player = lobby.players.find((p) => p.ws === ws);
+    const player = lobby.players.find((entry) => entry.ws === ws);
     if (!player) return;
 
-    lobby.players = lobby.players.filter((p) => p.ws !== ws);
+    lobby.players = lobby.players.filter((entry) => entry.ws !== ws);
     peerToLobby.delete(ws);
 
-    broadcastToLobby(lobby, { type: 'player_left', peerId: player.peerId });
+    broadcastToLobby(lobby, SIGNALING_EVENT_TYPES.PLAYER_LEFT, { peerId: player.peerId });
 
     if (lobby.players.length === 0) {
         lobbies.delete(lobbyCode);
     }
+}
+
+function findPeerWs(senderWs, targetPeerId) {
+    const lobbyCode = peerToLobby.get(senderWs);
+    if (!lobbyCode) return null;
+    const lobby = lobbies.get(lobbyCode);
+    if (!lobby) return null;
+    const target = lobby.players.find((entry) => entry.peerId === targetPeerId);
+    return target?.ws || null;
 }
 
 export function createSignalingServer(port = 9090) {
@@ -74,11 +107,17 @@ export function createSignalingServer(port = 9090) {
         });
 
         ws.on('message', (raw) => {
-            let msg;
-            try { msg = JSON.parse(raw); } catch { return; }
+            let parsed;
+            try {
+                parsed = JSON.parse(raw);
+            } catch {
+                return;
+            }
+            const envelope = normalizeSignalingEnvelope(parsed);
+            const msg = envelope.payload;
 
-            switch (msg.type) {
-            case 'create_lobby': {
+            switch (envelope.type) {
+            case SIGNALING_COMMAND_TYPES.CREATE_LOBBY: {
                 const code = generateLobbyCode();
                 const maxPlayers = Math.min(Math.max(msg.maxPlayers || 10, 2), 10);
                 const lobby = {
@@ -90,64 +129,94 @@ export function createSignalingServer(port = 9090) {
                 };
                 lobbies.set(code, lobby);
                 peerToLobby.set(ws, code);
-                sendJson(ws, { type: 'lobby_created', lobbyCode: code, playerId: peerId });
+                sendSignaling(ws, SIGNALING_EVENT_TYPES.LOBBY_CREATED, {
+                    lobbyCode: code,
+                    playerId: peerId,
+                    maxPlayers,
+                    sessionState: buildLobbyState(lobby),
+                });
                 break;
             }
 
-            case 'join_lobby': {
+            case SIGNALING_COMMAND_TYPES.JOIN_LOBBY: {
                 const lobby = lobbies.get(msg.lobbyCode);
                 if (!lobby) {
-                    sendJson(ws, { type: 'error', message: 'Lobby not found' });
+                    sendSignaling(ws, SIGNALING_EVENT_TYPES.ERROR, { message: 'Lobby not found' });
                     return;
                 }
                 if (lobby.players.length >= lobby.maxPlayers) {
-                    sendJson(ws, { type: 'error', message: 'Lobby full' });
+                    sendSignaling(ws, SIGNALING_EVENT_TYPES.ERROR, { message: 'Lobby full' });
                     return;
                 }
                 lobby.players.push({ peerId, ws, isHost: false, ready: false });
                 peerToLobby.set(ws, msg.lobbyCode);
-                sendJson(ws, { type: 'lobby_joined', playerId: peerId });
-                broadcastToLobby(lobby, { type: 'player_joined', peerId, name: msg.name || peerId }, ws);
+                sendSignaling(ws, SIGNALING_EVENT_TYPES.LOBBY_JOINED, {
+                    playerId: peerId,
+                    lobbyCode: msg.lobbyCode,
+                    sessionState: buildLobbyState(lobby),
+                });
+                broadcastToLobby(lobby, SIGNALING_EVENT_TYPES.PLAYER_JOINED, {
+                    peerId,
+                    name: msg.name || peerId,
+                    sessionState: buildLobbyState(lobby),
+                }, ws);
                 break;
             }
 
-            case 'offer': {
+            case SIGNALING_COMMAND_TYPES.OFFER: {
                 const target = findPeerWs(ws, msg.targetPeerId);
                 if (target) {
-                    sendJson(target, { type: 'offer', fromPeerId: peerId, offer: msg.offer });
+                    sendSignaling(target, SIGNALING_COMMAND_TYPES.OFFER, {
+                        fromPeerId: peerId,
+                        offer: msg.offer,
+                    });
                 }
                 break;
             }
 
-            case 'answer': {
+            case SIGNALING_COMMAND_TYPES.ANSWER: {
                 const target = findPeerWs(ws, msg.targetPeerId);
                 if (target) {
-                    sendJson(target, { type: 'answer', fromPeerId: peerId, answer: msg.answer });
+                    sendSignaling(target, SIGNALING_COMMAND_TYPES.ANSWER, {
+                        fromPeerId: peerId,
+                        answer: msg.answer,
+                    });
                 }
                 break;
             }
 
-            case 'ice': {
+            case SIGNALING_COMMAND_TYPES.ICE: {
                 const target = findPeerWs(ws, msg.targetPeerId);
                 if (target) {
-                    sendJson(target, { type: 'ice', fromPeerId: peerId, candidate: msg.candidate });
+                    sendSignaling(target, SIGNALING_COMMAND_TYPES.ICE, {
+                        fromPeerId: peerId,
+                        candidate: msg.candidate,
+                    });
                 }
                 break;
             }
 
-            case 'ready': {
+            case SIGNALING_COMMAND_TYPES.READY: {
                 const lobbyCode = peerToLobby.get(ws);
                 const lobby = lobbyCode ? lobbies.get(lobbyCode) : null;
-                if (lobby) {
-                    const player = lobby.players.find((p) => p.peerId === peerId);
-                    if (player) player.ready = !!msg.ready;
-                    broadcastToLobby(lobby, { type: 'player_ready', peerId, ready: !!msg.ready });
+                if (!lobby) break;
+                const player = lobby.players.find((entry) => entry.peerId === peerId);
+                if (player) {
+                    player.ready = msg.ready === true;
                 }
+                broadcastToLobby(lobby, SIGNALING_EVENT_TYPES.PLAYER_READY, {
+                    peerId,
+                    ready: msg.ready === true,
+                    sessionState: buildLobbyState(lobby),
+                });
                 break;
             }
 
-            case 'leave':
+            case SIGNALING_COMMAND_TYPES.LEAVE:
                 removePeerFromLobby(ws);
+                break;
+
+            default:
                 break;
             }
         });
@@ -157,7 +226,6 @@ export function createSignalingServer(port = 9090) {
         });
     });
 
-    // Heartbeat and lobby cleanup
     const heartbeatInterval = setInterval(() => {
         wss.clients.forEach((ws) => {
             if (!ws.isAlive || Date.now() - ws._lastPong > STALE_TIMEOUT) {
@@ -169,16 +237,14 @@ export function createSignalingServer(port = 9090) {
             ws.ping();
         });
 
-        // Clean up old lobbies
         const now = Date.now();
         for (const [code, lobby] of lobbies) {
-            if (now - lobby.createdAt > LOBBY_TIMEOUT) {
-                for (const player of lobby.players) {
-                    sendJson(player.ws, { type: 'error', message: 'Lobby expired' });
-                    peerToLobby.delete(player.ws);
-                }
-                lobbies.delete(code);
+            if (now - lobby.createdAt <= LOBBY_TIMEOUT) continue;
+            for (const player of lobby.players) {
+                sendSignaling(player.ws, SIGNALING_EVENT_TYPES.ERROR, { message: 'Lobby expired' });
+                peerToLobby.delete(player.ws);
             }
+            lobbies.delete(code);
         }
     }, HEARTBEAT_INTERVAL);
 
@@ -186,20 +252,10 @@ export function createSignalingServer(port = 9090) {
         clearInterval(heartbeatInterval);
     });
 
-    function findPeerWs(senderWs, targetPeerId) {
-        const lobbyCode = peerToLobby.get(senderWs);
-        if (!lobbyCode) return null;
-        const lobby = lobbies.get(lobbyCode);
-        if (!lobby) return null;
-        const target = lobby.players.find((p) => p.peerId === targetPeerId);
-        return target?.ws || null;
-    }
-
     console.log(`Signaling Server running on ws://0.0.0.0:${port}`);
     return wss;
 }
 
-// Allow standalone execution
 if (process.argv[1] && process.argv[1].endsWith('signaling-server.js')) {
     const port = parseInt(process.argv[2] || '9090', 10);
     createSignalingServer(port);

@@ -4,14 +4,15 @@
 
 import {
     cloneProfileEntry,
+    exportProfileAsJson,
+    parseProfileImport,
     removeProfileByName,
     resolveActiveProfileName,
     resolveDefaultProfileName,
     resolveUniqueProfileName,
     setDefaultProfileByName,
     upsertProfileEntry,
-} from '../ui/ProfileDataOps.js';
-import { exportProfileAsJson, parseProfileImport } from '../ui/ProfileTransferOps.js';
+} from '../composition/core-ui/CoreProfilePorts.js';
 
 export class ProfileManager {
     constructor(settingsStore) {

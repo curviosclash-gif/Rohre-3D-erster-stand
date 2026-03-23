@@ -90,6 +90,8 @@ export function createMultiplayerPanel(ctx) {
     let joinCodeInput = null;
     let discoveryCleanup = null;
     const bindings = [];
+    let resolvedHostIp = 'localhost';
+    let hostIpLookupInFlight = false;
 
     function bind(el, event, handler) {
         el.addEventListener(event, handler);
@@ -163,6 +165,28 @@ export function createMultiplayerPanel(ctx) {
         const state = bridge.getSessionState();
         if (!state.canStart) return;
         bridge.requestMatchStart();
+    }
+
+    function requestHostIpResolution() {
+        if (hostIpLookupInFlight) return;
+        hostIpLookupInFlight = true;
+        Promise.resolve(hostIpResolver?.resolve?.())
+            .then((ip) => {
+                resolvedHostIp = normalizeString(ip, 'localhost');
+            })
+            .catch(() => {
+                resolvedHostIp = 'localhost';
+            })
+            .finally(() => {
+                hostIpLookupInFlight = false;
+                if (!lobbyContainer) return;
+                if (currentView !== PANEL_VIEW.HOST_LOBBY) return;
+                updateLobbyView(lobbyContainer, {
+                    sessionState: bridge.getSessionState(),
+                    isHost: true,
+                    hostIp: resolvedHostIp,
+                });
+            });
     }
 
     function renderMenuView(root) {
@@ -287,9 +311,7 @@ export function createMultiplayerPanel(ctx) {
         renderLobbyView(lobbyContainer, {
             sessionState: state,
             isHost,
-            hostIpResolver,
-            runtime,
-            discoveryRuntime,
+            hostIp: resolvedHostIp,
         });
         root.appendChild(lobbyContainer);
 
@@ -312,6 +334,10 @@ export function createMultiplayerPanel(ctx) {
         actionBar.appendChild(leaveBtn);
 
         root.appendChild(actionBar);
+
+        if (isHost) {
+            requestHostIpResolution();
+        }
     }
 
     function render() {
@@ -351,9 +377,7 @@ export function createMultiplayerPanel(ctx) {
             updateLobbyView(lobbyContainer, {
                 sessionState,
                 isHost,
-                hostIpResolver,
-                runtime,
-                discoveryRuntime,
+                hostIp: resolvedHostIp,
             });
 
             const readyBtn = panelRoot?.querySelector('.mp-ready-btn');

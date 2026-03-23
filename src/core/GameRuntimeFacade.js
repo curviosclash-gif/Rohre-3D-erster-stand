@@ -2,14 +2,9 @@ import { CONFIG, CONFIG_BASE } from './Config.js';
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import {
-    MenuController,
-} from '../ui/MenuController.js';
-import {
     MENU_CONTROLLER_EVENT_CONTRACT_VERSION,
 } from '../shared/contracts/MenuControllerContract.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
-import { SETTINGS_CHANGE_KEYS } from '../ui/SettingsChangeKeys.js';
-import { guardMenuRuntimeEvent, resolveMenuAccessContext } from '../ui/menu/MenuAccessPolicy.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
@@ -17,6 +12,12 @@ import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidation
 import { ReplayRecorder } from './replay/ReplayRecorder.js';
 import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
 import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
+import {
+    guardMenuRuntimeEvent,
+    MenuController,
+    resolveMenuAccessContext,
+    SETTINGS_CHANGE_KEYS,
+} from '../composition/core-ui/CoreUiMenuPorts.js';
 import {
     initRuntimeSession,
     setupRuntimeClientStateReceiver,

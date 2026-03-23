@@ -22,6 +22,13 @@ const violations = [
             location: `${entry.file}:${entry.line}`,
             detail: entry.snippet,
         })),
+    ...report.findings.coreToUiImports
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: 'core -> ui import',
+            location: `${entry.from}:${entry.line}`,
+            detail: `${entry.from} -> ${entry.to}`,
+        })),
     ...report.findings.uiToCoreImports
         .filter((entry) => !entry.allowed)
         .map((entry) => ({
@@ -50,6 +57,7 @@ if (violations.length === 0) {
     console.log(`CONFIG writes: ${report.scorecard.configWrites.total}`);
     console.log(`constructor(game)/this.game = game disallowed files: ${report.scorecard.constructorGame.disallowedFiles}`);
     console.log(`DOM outside src/ui disallowed files: ${report.scorecard.domAccessOutsideUi.disallowedFiles}`);
+    console.log(`core -> ui disallowed imports: ${report.scorecard.coreToUiImports.disallowedEdges}`);
     console.log(`ui -> core disallowed imports: ${report.scorecard.uiToCoreImports.disallowedEdges}`);
     console.log(`entities -> core disallowed imports: ${report.scorecard.entitiesToCoreImports.disallowedEdges}`);
     console.log(`state -> core disallowed imports: ${report.scorecard.stateToCoreImports.disallowedEdges}`);

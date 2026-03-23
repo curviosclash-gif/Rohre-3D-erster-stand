@@ -3,9 +3,8 @@ import { createMenuConfigSharePayloadDefaults } from './MenuDefaultsEditorConfig
 import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
-    migrateStorageValue,
-    readFirstAvailableStorageValue,
 } from '../StorageKeys.js';
+import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
 
 const MENU_DRAFT_STORAGE_KEY = STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuDrafts;
@@ -107,7 +106,11 @@ function applySnapshotToSettings(settings, snapshot) {
 
 export class MenuDraftStore {
     constructor(options = {}) {
-        this.storage = options.storage ?? getDefaultStorage();
+        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
+            storage: options.storage ?? getDefaultStorage(),
+            onQuotaExceeded: options.onQuotaExceeded,
+        });
+        this.storage = this.storagePlatform?.driver?.storage || null;
         this.storageKey = options.storageKey || MENU_DRAFT_STORAGE_KEY;
         this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
             ? [...options.storageLegacyKeys]
@@ -115,15 +118,11 @@ export class MenuDraftStore {
     }
 
     _loadStore() {
-        if (!this.storage || typeof this.storage.getItem !== 'function') {
-            return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
-        }
-
         try {
-            const resolved = readFirstAvailableStorageValue(this.storage, this.storageKey, this.storageLegacyKeys);
-            if (!resolved) return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
-            const parsed = JSON.parse(resolved.raw);
-            migrateStorageValue(this.storage, this.storageKey, resolved);
+            const parsed = this.storagePlatform.readJson(this.storageKey, this.storageLegacyKeys, null);
+            if (!parsed || typeof parsed !== 'object') {
+                return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
+            }
             return {
                 schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION,
                 drafts: parsed?.drafts && typeof parsed.drafts === 'object' ? parsed.drafts : {},
@@ -134,13 +133,7 @@ export class MenuDraftStore {
     }
 
     _saveStore(store) {
-        if (!this.storage || typeof this.storage.setItem !== 'function') return false;
-        try {
-            this.storage.setItem(this.storageKey, JSON.stringify(store));
-            return true;
-        } catch {
-            return false;
-        }
+        return this.storagePlatform.writeJson(this.storageKey, store).ok;
     }
 
     saveDraft(sessionType, settings) {

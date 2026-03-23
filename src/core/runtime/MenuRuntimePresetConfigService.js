@@ -6,7 +6,7 @@ import {
     exportMenuConfigAsCode,
     exportMenuConfigAsJson,
     importMenuConfigFromInput,
-} from '../../ui/menu/MenuConfigShareOps.js';
+} from '../../composition/core-ui/CoreUiMenuPorts.js';
 
 function setConfigShareStatus(ui, message, tone = 'info') {
     if (!ui?.configShareStatus) return;

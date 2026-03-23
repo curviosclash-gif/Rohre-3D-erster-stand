@@ -2,13 +2,14 @@
 // LANSessionAdapter.js - LAN session via embedded signaling
 // ============================================
 
-import { SessionAdapter } from '../core/session/SessionAdapter.js';
+import { SessionAdapterBase } from './SessionAdapterBase.js';
 import { PeerConnectionManager } from './PeerConnectionManager.js';
 import { DataChannelManager } from './DataChannelManager.js';
 import { LatencyMonitor } from './LatencyMonitor.js';
-
-/** Reconnect window in ms (C.1) */
-const RECONNECT_WINDOW_MS = 30_000;
+import {
+    MULTIPLAYER_MESSAGE_TYPES,
+    normalizeMultiplayerSessionMessage,
+} from '../shared/contracts/MultiplayerSessionContract.js';
 
 /**
  * SessionAdapter for LAN play.
@@ -16,10 +17,13 @@ const RECONNECT_WINDOW_MS = 30_000;
  * Clients connect via fetch() to the host's IP:port.
  * After signaling, communication is P2P via WebRTC data channels.
  */
-export class LANSessionAdapter extends SessionAdapter {
+export class LANSessionAdapter extends SessionAdapterBase {
     constructor(options = {}) {
-        super();
-        this.isHost = !!options.isHost;
+        super({
+            isHost: !!options.isHost,
+            reconnectWindowMs: options.reconnectWindowMs,
+            now: options.now,
+        });
         this._signalingUrl = options.signalingUrl || null;
         this._dataChannelManager = new DataChannelManager();
         this._peerManager = new PeerConnectionManager({
@@ -28,34 +32,31 @@ export class LANSessionAdapter extends SessionAdapter {
         });
         this._latencyMonitor = new LatencyMonitor({
             onPingNeeded: (peerId, pingId) => {
-                this._dataChannelManager.send(peerId, 'state', { type: 'ping', pingId });
+                this._sendStateToPeer(
+                    peerId,
+                    this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.PING, { pingId })
+                );
             },
         });
         this._players = [];
         this._pollingInterval = null;
 
-        /** Disconnected peers awaiting reconnect (C.1) */
-        this._disconnectedPeers = new Map();
-
         this._dataChannelManager.on('message', ({ peerId, channel, data }) => {
             this._handleMessage(peerId, channel, data);
         });
 
-        // Channel close detection (C.1)
         this._dataChannelManager.on('channelClose', ({ peerId }) => {
-            this._handlePeerDisconnect(peerId, 'channel-close');
+            this._registerPeerDisconnect(peerId, 'channel-close');
         });
 
         this._peerManager.on('peerDisconnected', ({ peerId, state }) => {
-            this._handlePeerDisconnect(peerId, state);
+            this._registerPeerDisconnect(peerId, state);
         });
 
-        // Heartbeat timeout detection (C.1)
         this._peerManager.on('heartbeatTimeout', ({ peerId }) => {
-            this._handlePeerDisconnect(peerId, 'heartbeat-timeout');
+            this._registerPeerDisconnect(peerId, 'heartbeat-timeout');
         });
 
-        // Graceful leave: beforeunload (C.1)
         this._beforeUnloadHandler = () => {
             this._sendLeaveMessage();
         };
@@ -73,9 +74,10 @@ export class LANSessionAdapter extends SessionAdapter {
             this._emit('connected', { playerId: this.localPlayerId });
             this._latencyMonitor.start();
             this._startPolling();
-        } else {
-            await this._joinAsClient(options.lobbyCode);
+            return;
         }
+
+        await this._joinAsClient(options.lobbyCode);
     }
 
     async _joinAsClient(lobbyCode) {
@@ -87,7 +89,6 @@ export class LANSessionAdapter extends SessionAdapter {
         const joinData = await joinRes.json();
         this.localPlayerId = joinData.playerId;
 
-        // Get SDP offer from host
         const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${this.localPlayerId}`);
         const offerData = await offerRes.json();
 
@@ -109,7 +110,7 @@ export class LANSessionAdapter extends SessionAdapter {
             try {
                 const res = await fetch(`${this._signalingUrl}/lobby/status`);
                 const data = await res.json();
-                if (data.pendingPlayers) {
+                if (Array.isArray(data.pendingPlayers)) {
                     for (const pending of data.pendingPlayers) {
                         await this._connectToPendingClient(pending);
                     }
@@ -121,213 +122,147 @@ export class LANSessionAdapter extends SessionAdapter {
     }
 
     async _connectToPendingClient(pending) {
-        const offer = await this._peerManager.createOffer(pending.playerId);
+        const targetPeerId = String(pending?.playerId || '').trim();
+        if (!targetPeerId) return;
+        const offer = await this._peerManager.createOffer(targetPeerId);
 
         await fetch(`${this._signalingUrl}/signaling/offer`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetPlayerId: pending.playerId, offer }),
+            body: JSON.stringify({ targetPlayerId: targetPeerId, offer }),
         });
 
-        // Poll for answer
-        const pollAnswer = async () => {
-            for (let i = 0; i < 30; i++) {
-                const res = await fetch(`${this._signalingUrl}/signaling/answer?playerId=${pending.playerId}`);
-                const data = await res.json();
-                if (data.answer) {
-                    await this._peerManager.handleAnswer(pending.playerId, data.answer);
-                    this._latencyMonitor.addPeer(pending.playerId);
-
-                    // Check if this is a reconnect (C.1)
-                    if (this._disconnectedPeers.has(pending.playerId)) {
-                        this._handleReconnect(pending.playerId);
-                    } else {
-                        this._emit('playerConnected', { peerId: pending.playerId });
-                    }
-                    return;
-                }
-                await new Promise((r) => setTimeout(r, 200));
+        for (let i = 0; i < 30; i += 1) {
+            const res = await fetch(`${this._signalingUrl}/signaling/answer?playerId=${targetPeerId}`);
+            const data = await res.json();
+            if (!data.answer) {
+                await new Promise((resolve) => setTimeout(resolve, 200));
+                continue;
             }
-        };
-        await pollAnswer();
-    }
-
-    /** Handle peer disconnect with reconnect window (C.1) */
-    _handlePeerDisconnect(peerId, reason) {
-        // Avoid duplicate handling
-        if (this._disconnectedPeers.has(peerId)) return;
-
-        if (this.isHost) {
-            // Start reconnect window
-            const timer = setTimeout(() => {
-                this._finalizePeerRemoval(peerId);
-            }, RECONNECT_WINDOW_MS);
-
-            this._disconnectedPeers.set(peerId, {
-                reason,
-                disconnectedAt: Date.now(),
-                timer,
-            });
-
-            // Inform other clients about the disconnect
-            this._dataChannelManager.sendToAll('state', {
-                type: 'player_disconnected',
-                peerId,
-                reason,
-                reconnectWindowMs: RECONNECT_WINDOW_MS,
-            }, peerId);
-
-            this._emit('playerDisconnected', { peerId, reason, canReconnect: true });
-        } else if (peerId === 'host') {
-            // Host disconnected — show dialog, end match (C.1)
-            this._emit('hostDisconnected', { reason });
-            this._emit('playerDisconnected', { peerId, reason, isHost: true });
-        } else {
-            this._emit('playerDisconnected', { peerId, reason });
+            await this._peerManager.handleAnswer(targetPeerId, data.answer);
+            this._latencyMonitor.addPeer(targetPeerId);
+            if (this._disconnectedPeers.has(targetPeerId)) {
+                this._resolvePeerReconnect(targetPeerId);
+            } else {
+                this._emit('playerConnected', { peerId: targetPeerId });
+            }
+            return;
         }
     }
 
-    /** Finalize removal after reconnect window expires (C.1) */
-    _finalizePeerRemoval(peerId) {
-        this._disconnectedPeers.delete(peerId);
+    _sendStateToAll(message, excludePeerId = null) {
+        if (!message) return;
+        this._dataChannelManager.sendToAll('state', message, excludePeerId);
+    }
+
+    _sendStateToPeer(peerId, message) {
+        if (!peerId || !message) return;
+        this._dataChannelManager.send(peerId, 'state', message);
+    }
+
+    _closePeerConnection(peerId) {
         this._peerManager.closePeer(peerId);
+    }
+
+    _removePeerLatency(peerId) {
         this._latencyMonitor.removePeer(peerId);
-
-        this._dataChannelManager.sendToAll('state', {
-            type: 'player_removed',
-            peerId,
-        });
-
-        this._emit('playerRemoved', { peerId });
     }
 
-    /** Handle successful reconnect with full state sync (C.1) */
-    _handleReconnect(peerId) {
-        const info = this._disconnectedPeers.get(peerId);
-        if (info?.timer) clearTimeout(info.timer);
-        this._disconnectedPeers.delete(peerId);
-
-        // Notify about reconnect
-        this._dataChannelManager.sendToAll('state', {
-            type: 'player_reconnected',
-            peerId,
-        });
-
-        this._emit('playerReconnected', { peerId });
-
-        // Request full state sync for reconnected client
-        this._emit('fullStateSyncNeeded', { peerId });
+    _handleClientPeerDisconnect(peerId, reason) {
+        if (peerId !== 'host') return false;
+        this._emit('hostDisconnected', { reason });
+        this._emit('playerDisconnected', { peerId, reason, isHost: true });
+        return true;
     }
 
-    /** Send graceful leave message (C.1) */
     _sendLeaveMessage() {
         if (!this.isConnected) return;
         if (this.isHost) {
-            this._dataChannelManager.sendToAll('state', {
-                type: 'host_leaving',
-            });
-        } else {
-            this._dataChannelManager.send('host', 'state', {
-                type: 'leave',
-                playerId: this.localPlayerId,
-            });
+            this._sendStateToAll(this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.HOST_LEAVING));
+            return;
         }
+        this._sendStateToPeer('host', this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.LEAVE, {
+            playerId: this.localPlayerId,
+        }));
     }
 
     sendInput(inputData) {
         if (this.isHost) return;
         this._dataChannelManager.send('host', 'inputs', {
-            type: 'input',
+            ...this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.INPUT),
             playerId: this.localPlayerId,
             inputs: inputData,
-            timestamp: Date.now(),
+            timestamp: this._now(),
         });
     }
 
     broadcastState(stateSnapshot) {
         if (!this.isHost) return;
-        this._dataChannelManager.sendToAll('state', {
-            type: 'state_snapshot',
-            ...stateSnapshot,
-        });
+        this._sendStateToAll(this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT, stateSnapshot));
     }
 
-    /** Send full state to a specific peer (for reconnect) (C.1) */
     sendStateToPeer(peerId, stateSnapshot) {
-        this._dataChannelManager.send(peerId, 'state', {
-            type: 'full_state_sync',
-            ...stateSnapshot,
-        });
+        this._sendFullStateSync(peerId, stateSnapshot);
     }
 
     _handleMessage(peerId, channel, data) {
-        if (data.type === 'input') {
+        const message = normalizeMultiplayerSessionMessage(data);
+        switch (message.type) {
+        case MULTIPLAYER_MESSAGE_TYPES.INPUT:
             this._emit('remoteInput', { peerId, input: data.inputs, playerId: data.playerId });
-        } else if (data.type === 'state_snapshot') {
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT:
             this._emit('stateUpdate', { state: data });
-        } else if (data.type === 'full_state_sync') {
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.FULL_STATE_SYNC:
             this._emit('fullStateSync', { state: data });
-        } else if (data.type === 'ping') {
-            this._dataChannelManager.send(peerId, channel === 'inputs' ? 'inputs' : 'state', {
-                type: 'pong', pingId: data.pingId,
-            });
-        } else if (data.type === 'pong') {
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.PING:
+            this._dataChannelManager.send(
+                peerId,
+                channel === 'inputs' ? 'inputs' : 'state',
+                this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.PONG, { pingId: data.pingId })
+            );
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.PONG:
             this._latencyMonitor.recordPongReceived(peerId, data.pingId);
-        } else if (data.type === 'heartbeat') {
-            // Reply to heartbeat (C.1)
-            this._dataChannelManager.send(peerId, 'state', { type: 'heartbeat_ack' });
-        } else if (data.type === 'heartbeat_ack') {
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.HEARTBEAT:
+            this._sendStateToPeer(peerId, this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.HEARTBEAT_ACK));
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.HEARTBEAT_ACK:
             this._peerManager.recordHeartbeatAck(peerId);
-        } else if (data.type === 'leave') {
-            // Graceful leave from client (C.1)
-            this._peerManager.closePeer(data.playerId || peerId);
-            this._latencyMonitor.removePeer(data.playerId || peerId);
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.LEAVE:
+            this._closePeerConnection(data.playerId || peerId);
+            this._removePeerLatency(data.playerId || peerId);
             this._emit('playerDisconnected', { peerId: data.playerId || peerId, reason: 'graceful-leave' });
-        } else if (data.type === 'host_leaving') {
-            // Host sent graceful leave (C.1)
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.HOST_LEAVING:
             this._emit('hostDisconnected', { reason: 'graceful-leave' });
             this._emit('playerDisconnected', { peerId, reason: 'host-leaving', isHost: true });
-        } else if (data.type === 'player_disconnected') {
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.PLAYER_DISCONNECTED:
             this._emit('playerDisconnected', {
                 peerId: data.peerId,
                 reason: data.reason,
                 canReconnect: true,
                 reconnectWindowMs: data.reconnectWindowMs,
             });
-        } else if (data.type === 'player_reconnected') {
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.PLAYER_RECONNECTED:
             this._emit('playerReconnected', { peerId: data.peerId });
-        } else if (data.type === 'player_removed') {
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED:
             this._emit('playerRemoved', { peerId: data.peerId });
+            break;
+        default:
+            break;
         }
     }
 
     getPlayers() {
         return this._players;
-    }
-
-    /** Get reconnect status for a disconnected peer (C.2) */
-    getReconnectInfo(peerId) {
-        const info = this._disconnectedPeers.get(peerId);
-        if (!info) return null;
-        const elapsed = Date.now() - info.disconnectedAt;
-        return {
-            remainingMs: Math.max(0, RECONNECT_WINDOW_MS - elapsed),
-            reason: info.reason,
-        };
-    }
-
-    /** Get all disconnected peers awaiting reconnect (C.2) */
-    getDisconnectedPeers() {
-        const result = [];
-        for (const [peerId, info] of this._disconnectedPeers) {
-            const elapsed = Date.now() - info.disconnectedAt;
-            result.push({
-                peerId,
-                remainingMs: Math.max(0, RECONNECT_WINDOW_MS - elapsed),
-                reason: info.reason,
-            });
-        }
-        return result;
     }
 
     disconnect() {
@@ -338,12 +273,7 @@ export class LANSessionAdapter extends SessionAdapter {
             this._pollingInterval = null;
         }
 
-        // Clear reconnect timers
-        for (const [, info] of this._disconnectedPeers) {
-            if (info.timer) clearTimeout(info.timer);
-        }
-        this._disconnectedPeers.clear();
-
+        this._clearReconnectPeers();
         this._latencyMonitor.stop();
         this._peerManager.dispose();
         this._dataChannelManager.dispose();

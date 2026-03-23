@@ -2,7 +2,7 @@
 // MenuRuntimeMultiplayerService.js - multiplayer lobby/runtime helpers
 // ============================================
 
-import { MenuMultiplayerBridge } from '../../ui/menu/MenuMultiplayerBridge.js';
+import { MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
 
 function deepClone(value) {

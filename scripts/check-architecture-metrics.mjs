@@ -19,6 +19,11 @@ const checks = [
         max: report.budgets.domAccessFiles,
     },
     {
+        label: 'core -> ui legacy edge budget',
+        actual: report.scorecard.coreToUiImports.totalEdges,
+        max: report.budgets.coreToUiImportEdges,
+    },
+    {
         label: 'ui -> core legacy edge budget',
         actual: report.scorecard.uiToCoreImports.totalEdges,
         max: report.budgets.uiToCoreImportEdges,

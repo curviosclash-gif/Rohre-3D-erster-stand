@@ -17,6 +17,38 @@ function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
 }
 
+function bindRuntimePorts(owner, runtime) {
+    owner.runtimePorts = runtime?.ports || null;
+    owner._projectileSystem = runtime?.systems?.projectileSystem || null;
+    owner._huntScoring = runtime?.support?.huntScoring || null;
+    owner._eventBus = runtime?.support?.eventBus || null;
+    owner._tmpVec = runtime?.support?.tempVectors?.primary || null;
+    owner._tmpVec2 = runtime?.support?.tempVectors?.secondary || null;
+    owner._tmpDir = runtime?.support?.tempVectors?.direction || null;
+    owner._tmpDir2 = runtime?.support?.tempVectors?.alternateDirection || null;
+    owner._tmpCamAnchor = runtime?.support?.tempVectors?.cameraAnchor || null;
+    owner._tmpCamRenderPos = runtime?.support?.tempVectors?.cameraRenderPosition || null;
+    owner._tmpCamRenderQuat = runtime?.support?.tempQuaternion || null;
+    owner._tmpCollisionNormal = runtime?.support?.tempVectors?.collisionNormal || null;
+    owner._tmpPrevPlayerPosition = runtime?.support?.tempVectors?.previousPlayerPosition || null;
+    owner._fallbackArenaCollision = runtime?.support?.fallbackArenaCollision || null;
+    owner._lockOnCache = runtime?.support?.lockOnCache || new Map();
+    owner._trailSpatialIndex = runtime?.support?.trailSpatialIndex || null;
+    owner._spawnPlacementSystem = runtime?.support?.spawnPlacementSystem || null;
+    owner._collisionResponseSystem = runtime?.support?.collisionResponseSystem || null;
+    owner._runtimeContext = runtime?.context || null;
+    owner._playerInputSystem = runtime?.systems?.playerInputSystem || null;
+    owner._playerLifecycleSystem = runtime?.systems?.playerLifecycleSystem || null;
+    owner._parcoursProgressSystem = runtime?.systems?.parcoursProgressSystem || null;
+    owner._overheatGunSystem = runtime?.systems?.overheatGunSystem || null;
+    owner._respawnSystem = runtime?.systems?.respawnSystem || null;
+    owner._huntCombatSystem = runtime?.systems?.huntCombatSystem || null;
+    owner._roundOutcomeSystem = runtime?.systems?.roundOutcomeSystem || null;
+    owner._setupOps = runtime?.systems?.setupOps || null;
+    owner._spawnOps = runtime?.systems?.spawnOps || null;
+    owner._tickPipeline = runtime?.systems?.tickPipeline || null;
+}
+
 export class EntityManager {
     static deriveSelfTrailSkipRecentSegments(player) {
         const updateInterval = Math.max(0.01, Number(CONFIG.TRAIL?.UPDATE_INTERVAL) || 0.07);
@@ -60,7 +92,7 @@ export class EntityManager {
         this.onHuntDamageEvent = null;
         this.botDifficulty = CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL';
         this.runtime = assembleEntityRuntime(this);
-        Object.assign(this, this.runtime.compat);
+        bindRuntimePorts(this, this.runtime);
         this._lastRoundGhostSystem = new LastRoundGhostSystem(renderer);
         this.projectiles = this.runtime.systems.projectileSystem.projectiles;
         this.botPolicyRegistry = new BotPolicyRegistry();

@@ -1,6 +1,6 @@
 import { createEntityRuntimeSupport } from './EntityRuntimeSupportAssembly.js';
 import { createEntityRuntimeSystems } from './EntityRuntimeSystemAssembly.js';
-import { createEntityRuntimeCompat } from './EntityRuntimeCompat.js';
+import { createEntityRuntimePorts } from './EntityRuntimePorts.js';
 
 export class EntityRuntimeAssembler {
     constructor(entityManager) {
@@ -16,7 +16,7 @@ export class EntityRuntimeAssembler {
             context: support.runtimeContext,
             systems,
         };
-        runtime.compat = createEntityRuntimeCompat(runtime);
+        runtime.ports = createEntityRuntimePorts(runtime);
         return runtime;
     }
 }

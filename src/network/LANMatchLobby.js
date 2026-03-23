@@ -3,6 +3,13 @@
 // ============================================
 
 import { MatchLobby } from '../core/lobby/MatchLobby.js';
+import {
+    createInitialLobbySessionState,
+    normalizeLobbySessionState,
+} from './MatchLobbySessionState.js';
+import {
+    SIGNALING_HTTP_ROUTES,
+} from '../shared/contracts/SignalingSessionContract.js';
 
 /**
  * Lobby for LAN play. Communicates with the embedded LAN signaling server
@@ -13,20 +20,44 @@ export class LANMatchLobby extends MatchLobby {
         super('lan');
         this._signalingUrl = options.signalingUrl || 'http://localhost:9090';
         this._pollingInterval = null;
+        this.sessionState = createInitialLobbySessionState();
+        this._localPeerId = '';
+    }
+
+    _applySessionState(nextState) {
+        this.sessionState = normalizeLobbySessionState(nextState);
+        this.lobbyCode = this.sessionState.lobbyCode;
+        this.players = this.sessionState.players;
+        this._emit('playersChanged', { players: this.players, sessionState: this.sessionState });
+        this._emit('sessionStateChanged', { sessionState: this.sessionState });
     }
 
     async create(options = {}) {
         this.isHost = true;
         this.settings = { ...options };
-        this.players = [{ id: 'host', name: 'Host', isHost: true, ready: true }];
-        this._emit('playersChanged', { players: this.players });
+        const createdAt = Date.now();
+        this._localPeerId = 'host';
+        this._applySessionState({
+            lobbyCode: this.lobbyCode,
+            hostPeerId: this._localPeerId,
+            members: [{
+                peerId: this._localPeerId,
+                actorId: 'Host',
+                name: 'Host',
+                role: 'host',
+                ready: true,
+                joinedAt: createdAt,
+                lastSeenAt: createdAt,
+            }],
+            maxPlayers: Number(options.maxPlayers || 10),
+            updatedAt: createdAt,
+        });
         this._startPolling();
 
-        // Get lobby code from signaling server
         try {
-            const res = await fetch(`${this._signalingUrl}/lobby/status`);
+            const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_STATUS}`);
             const data = await res.json();
-            this.lobbyCode = data.lobbyCode;
+            this._syncWithServerStatus(data);
         } catch {
             // Server may not be ready yet
         }
@@ -34,34 +65,66 @@ export class LANMatchLobby extends MatchLobby {
 
     async join(codeOrAddress) {
         this.isHost = false;
-        const url = codeOrAddress.includes('://') ? codeOrAddress : `http://${codeOrAddress}`;
+        const url = String(codeOrAddress || '').includes('://')
+            ? String(codeOrAddress)
+            : `http://${String(codeOrAddress || '')}`;
         this._signalingUrl = url;
 
-        const res = await fetch(`${this._signalingUrl}/lobby/join`, {
+        const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_JOIN}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ lobbyCode: this.lobbyCode }),
         });
         const data = await res.json();
-        this.players.push({ id: data.playerId, name: data.playerId, isHost: false, ready: false });
-        this._emit('playersChanged', { players: this.players });
+        this._localPeerId = String(data.playerId || '').trim();
+        this._syncWithServerStatus(data);
+    }
+
+    _syncWithServerStatus(serverState = {}) {
+        const status = serverState && typeof serverState === 'object' ? serverState : {};
+        const existingMembers = Array.isArray(this.sessionState?.members) ? this.sessionState.members : [];
+        const serverPlayers = Array.isArray(status.players) ? status.players : [];
+
+        const merged = [];
+        const hostPeerId = String(status.hostPeerId || this.sessionState.hostPeerId || 'host').trim() || 'host';
+        const now = Date.now();
+
+        const ensureMember = (player, fallbackRole = 'client') => {
+            const peerId = String(player?.playerId || player?.peerId || player?.id || '').trim();
+            if (!peerId) return;
+            const existing = existingMembers.find((member) => member.peerId === peerId);
+            merged.push({
+                peerId,
+                actorId: String(existing?.actorId || player?.name || (peerId === hostPeerId ? 'Host' : peerId)).trim(),
+                name: String(player?.name || existing?.name || peerId).trim(),
+                role: peerId === hostPeerId ? 'host' : fallbackRole,
+                ready: player?.ready === true || existing?.ready === true,
+                joinedAt: Number(existing?.joinedAt || now),
+                lastSeenAt: now,
+            });
+        };
+
+        ensureMember({ playerId: hostPeerId, name: 'Host', ready: true }, 'host');
+        for (const player of serverPlayers) {
+            ensureMember(player, 'client');
+        }
+
+        this._applySessionState({
+            lobbyCode: status.lobbyCode || this.sessionState.lobbyCode,
+            hostPeerId,
+            maxPlayers: Number(status.maxPlayers || this.sessionState.maxPlayers || 10),
+            members: merged,
+            updatedAt: now,
+            revision: Number(this.sessionState.revision || 0) + 1,
+        });
     }
 
     _startPolling() {
         this._pollingInterval = setInterval(async () => {
             try {
-                const res = await fetch(`${this._signalingUrl}/lobby/status`);
+                const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_STATUS}`);
                 const data = await res.json();
-                this.players = [
-                    { id: 'host', name: 'Host', isHost: true, ready: true },
-                    ...data.players.map((p) => ({
-                        id: p.playerId,
-                        name: p.playerId,
-                        isHost: false,
-                        ready: p.ready,
-                    })),
-                ];
-                this._emit('playersChanged', { players: this.players });
+                this._syncWithServerStatus(data);
             } catch {
                 // polling failure
             }
@@ -74,20 +137,32 @@ export class LANMatchLobby extends MatchLobby {
             this._pollingInterval = null;
         }
         this.players = [];
+        this.sessionState = createInitialLobbySessionState();
         this._emit('closed', {});
     }
 
     setReady(ready) {
-        this._emit('readyChanged', { ready });
+        const nextMembers = this.sessionState.members.map((member) => (
+            member.peerId === this._localPeerId
+                ? { ...member, ready: ready === true, lastSeenAt: Date.now() }
+                : member
+        ));
+        this._applySessionState({
+            ...this.sessionState,
+            members: nextMembers,
+            updatedAt: Date.now(),
+            revision: Number(this.sessionState.revision || 0) + 1,
+        });
+        this._emit('readyChanged', { ready: ready === true, sessionState: this.sessionState });
     }
 
     updateSettings(settings) {
         Object.assign(this.settings, settings);
-        this._emit('settingsChanged', { settings: this.settings });
+        this._emit('settingsChanged', { settings: this.settings, sessionState: this.sessionState });
     }
 
     startMatch() {
-        this._emit('matchStart', { players: this.players, settings: this.settings });
+        this._emit('matchStart', { players: this.players, settings: this.settings, sessionState: this.sessionState });
     }
 
     dispose() {

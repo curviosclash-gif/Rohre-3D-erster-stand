@@ -3,9 +3,8 @@ import { createPresetMetadata } from './MenuPresetApplyOps.js';
 import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
-    migrateStorageValue,
-    readFirstAvailableStorageValue,
 } from '../StorageKeys.js';
+import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
 
 const MENU_PRESET_STORAGE_KEY = STORAGE_KEYS.menuPresets;
 const MENU_PRESET_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
@@ -73,7 +72,11 @@ function sortPresets(left, right) {
 
 export class MenuPresetStore {
     constructor(options = {}) {
-        this.storage = options.storage ?? getDefaultStorage();
+        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
+            storage: options.storage ?? getDefaultStorage(),
+            onQuotaExceeded: options.onQuotaExceeded,
+        });
+        this.storage = this.storagePlatform?.driver?.storage || null;
         this.storageKey = options.storageKey || MENU_PRESET_STORAGE_KEY;
         this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
             ? [...options.storageLegacyKeys]
@@ -89,16 +92,10 @@ export class MenuPresetStore {
     }
 
     _loadPersistedPresets() {
-        if (!this.storage || typeof this.storage.getItem !== 'function') {
-            return [];
-        }
-
         try {
-            const resolved = readFirstAvailableStorageValue(this.storage, this.storageKey, this.storageLegacyKeys);
-            if (!resolved) return [];
-            const parsed = JSON.parse(resolved.raw);
+            const parsed = this.storagePlatform.readJson(this.storageKey, this.storageLegacyKeys, null);
+            if (!parsed || typeof parsed !== 'object') return [];
             const presets = Array.isArray(parsed?.presets) ? parsed.presets : [];
-            migrateStorageValue(this.storage, this.storageKey, resolved);
             return presets
                 .map((preset) => ensurePresetMetadataContract(preset))
                 .filter(Boolean);
@@ -108,19 +105,10 @@ export class MenuPresetStore {
     }
 
     _savePersistedPresets(presets) {
-        if (!this.storage || typeof this.storage.setItem !== 'function') {
-            return false;
-        }
-
-        try {
-            this.storage.setItem(this.storageKey, JSON.stringify({
-                schemaVersion: MENU_PRESET_STORAGE_SCHEMA_VERSION,
-                presets,
-            }));
-            return true;
-        } catch {
-            return false;
-        }
+        return this.storagePlatform.writeJson(this.storageKey, {
+            schemaVersion: MENU_PRESET_STORAGE_SCHEMA_VERSION,
+            presets,
+        }).ok;
     }
 
     listPresets() {

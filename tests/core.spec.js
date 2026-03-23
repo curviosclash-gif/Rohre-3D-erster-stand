@@ -2171,6 +2171,90 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(probe.meta?.segments?.[1]?.playerIndex).toBe(1);
     });
 
+    test('T20m3: Shorts-Recording faellt bei Renderer-Ausfall auf Source-Fallback zurueck', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page, { sessionType: 'splitscreen' });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const game = window.GAME_INSTANCE;
+            return !!(
+                hud && !hud.classList.contains('hidden')
+                && game?.entityManager?.players?.length > 1
+            );
+        }, null, { timeout: 60000 });
+
+        const probe = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const renderer = game?.renderer;
+            const entityManager = game?.entityManager;
+            if (!game || !renderer || !entityManager) return null;
+
+            game.settings.recording = { profile: 'youtube_short', hudMode: 'clean' };
+            game._onSettingsChanged({ changedKeys: ['recording.profile', 'recording.hudMode'] });
+
+            const pipeline = renderer.recordingCapturePipeline;
+            const originalEnsure = pipeline?._ensureShortsRenderer?.bind?.(pipeline);
+            if (typeof originalEnsure !== 'function') return null;
+
+            pipeline._shortsRendererUnavailable = true;
+            pipeline._ensureShortsRenderer = () => null;
+            renderer.prepareRecordingCaptureFrame({
+                recordingActive: true,
+                entityManager,
+                renderAlpha: 1,
+                renderDelta: 1 / 60,
+                splitScreen: true,
+            });
+            pipeline._ensureShortsRenderer = originalEnsure;
+            pipeline._shortsRendererUnavailable = false;
+
+            const captureCanvas = renderer.getRecordingCaptureCanvas?.() || null;
+            const captureCtx = captureCanvas?.getContext?.('2d', { willReadFrequently: true }) || null;
+            const width = Math.max(0, Math.floor(Number(captureCanvas?.width || 0)));
+            const height = Math.max(0, Math.floor(Number(captureCanvas?.height || 0)));
+            let maxLuma = 0;
+            let averageLuma = 0;
+            let sampleCount = 0;
+
+            if (captureCtx && width > 1 && height > 1) {
+                const frame = captureCtx.getImageData(0, 0, width, height).data;
+                const step = Math.max(4, Math.floor(Math.min(width, height) / 96));
+                let lumaSum = 0;
+                for (let y = 0; y < height; y += step) {
+                    for (let x = 0; x < width; x += step) {
+                        const idx = ((y * width) + x) * 4;
+                        const r = Number(frame[idx] || 0);
+                        const g = Number(frame[idx + 1] || 0);
+                        const b = Number(frame[idx + 2] || 0);
+                        const luma = (0.2126 * r) + (0.7152 * g) + (0.0722 * b);
+                        sampleCount += 1;
+                        lumaSum += luma;
+                        if (luma > maxLuma) maxLuma = luma;
+                    }
+                }
+                averageLuma = sampleCount > 0 ? (lumaSum / sampleCount) : 0;
+            }
+
+            return {
+                width,
+                height,
+                maxLuma,
+                averageLuma,
+                sampleCount,
+                meta: renderer.getLastRecordingCaptureMeta?.() || null,
+            };
+        });
+
+        expect(probe).not.toBeNull();
+        expect(probe.width).toBeGreaterThan(100);
+        expect(probe.height).toBeGreaterThan(100);
+        expect(probe.sampleCount).toBeGreaterThan(0);
+        expect(probe.maxLuma).toBeGreaterThan(8);
+        expect(probe.averageLuma).toBeGreaterThan(2);
+        expect(probe.meta?.layout).toBe('shorts_vertical_split');
+    });
+
     test('T20n: Escape-Return finalisiert Recording-Export trotz doppeltem Lifecycle-Stop', async ({ page }) => {
         await startGame(page);
         await page.waitForTimeout(500);

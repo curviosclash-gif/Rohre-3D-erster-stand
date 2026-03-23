@@ -26,6 +26,10 @@ import {
     renderSummaryBlocks,
     toggleFavoriteEntry,
 } from './start-setup/StartSetupUiOps.js';
+import {
+    formatStartSetupMapLabel,
+    renderStartFieldHints,
+} from './start-setup/StartSetupValidationView.js';
 
 export class UIStartSyncController {
     /**
@@ -208,106 +212,18 @@ export class UIStartSyncController {
     // ------------------------------------------------------------------
 
     _formatMapLabel(entry = {}) {
-        const name = String(entry?.name || entry?.key || 'Map');
-        return entry?.hasGlbModel ? `${name} [GLB]` : name;
-    }
-
-    _getStartFieldBinding(fieldKey) {
-        const dimensionModeButton = Array.isArray(this.ui.dimensionModeButtons) ? this.ui.dimensionModeButtons[0] : null;
-        const gameModeButton = Array.isArray(this.ui.gameModeButtons) ? this.ui.gameModeButtons[0] : null;
-        const bindings = {
-            map: { control: this.ui.mapSelect, hint: this.ui.mapFieldHint, sectionId: 'map' },
-            vehicleP1: { control: this.ui.vehicleSelectP1, hint: this.ui.vehicleP1FieldHint, sectionId: 'vehicle' },
-            vehicleP2: { control: this.ui.vehicleSelectP2, hint: this.ui.vehicleP2FieldHint, sectionId: 'vehicle' },
-            theme: { control: this.ui.themeModeSelect, hint: this.ui.themeFieldHint, sectionId: 'match' },
-            match: { control: dimensionModeButton || gameModeButton || this.ui.huntRespawnToggle, hint: this.ui.matchFieldHint, sectionId: 'match' },
-            multiplayer: { control: this.ui.multiplayerLobbyCodeInput, hint: this.ui.matchFieldHint, sectionId: 'multiplayer' },
-        };
-        return bindings[fieldKey] || { control: null, hint: null, sectionId: '' };
-    }
-
-    _setFieldHint(hintElement, message, tone = 'info') {
-        if (!hintElement) return;
-        const normalizedMessage = String(message || '').trim();
-        const normalizedTone = tone === 'error' ? 'error' : (tone === 'lock' ? 'lock' : 'info');
-        hintElement.textContent = normalizedMessage;
-        hintElement.classList.remove('hidden', 'is-error', 'is-lock');
-        hintElement.classList.toggle('hidden', !normalizedMessage);
-        hintElement.classList.toggle('is-error', !!normalizedMessage && normalizedTone === 'error');
-        hintElement.classList.toggle('is-lock', !!normalizedMessage && normalizedTone === 'lock');
-    }
-
-    _clearFieldHints() {
-        ['map', 'vehicleP1', 'vehicleP2', 'theme', 'match', 'multiplayer'].forEach((fieldKey) => {
-            const binding = this._getStartFieldBinding(fieldKey);
-            if (binding.control) binding.control.classList.remove('menu-field-error');
-            if (binding.hint) this._setFieldHint(binding.hint, '', 'info');
-        });
-        if (this.ui.startValidationStatus) {
-            this._setFieldHint(this.ui.startValidationStatus, '', 'info');
-        }
-    }
-
-    _resolveLockedFieldHints(settings = this.game.settings) {
-        const lockHints = new Map();
-        const activePresetId = String(settings?.matchSettings?.activePresetId || '').trim();
-        const activePresetKind = String(settings?.matchSettings?.activePresetKind || '').trim();
-        if (!activePresetId || activePresetKind !== 'fixed') return lockHints;
-
-        const presets = this.game.settingsManager?.listMenuPresets?.() || [];
-        const activePreset = presets.find((preset) => String(preset?.id || '').trim() === activePresetId);
-        const lockedFields = Array.isArray(activePreset?.metadata?.lockedFields) ? activePreset.metadata.lockedFields : [];
-        if (lockedFields.length === 0) return lockHints;
-
-        const lockMessagesByField = { map: [], vehicleP1: [], vehicleP2: [], match: [] };
-        lockedFields.forEach((fieldPath) => {
-            const normalizedPath = String(fieldPath || '').trim();
-            if (!normalizedPath) return;
-            if (normalizedPath === 'mapKey') { lockMessagesByField.map.push('Map'); return; }
-            if (normalizedPath === 'vehicles.PLAYER_1') { lockMessagesByField.vehicleP1.push('Flugzeug P1'); return; }
-            if (normalizedPath === 'vehicles.PLAYER_2') { lockMessagesByField.vehicleP2.push('Flugzeug P2'); return; }
-            lockMessagesByField.match.push(normalizedPath);
-        });
-
-        Object.entries(lockMessagesByField).forEach(([fieldKey, labels]) => {
-            if (!Array.isArray(labels) || labels.length === 0) return;
-            const uniqueLabels = Array.from(new Set(labels));
-            lockHints.set(fieldKey, `Verbindliches Preset aktiv: ${uniqueLabels.join(', ')}`);
-        });
-        return lockHints;
+        return formatStartSetupMapLabel(entry);
     }
 
     _renderStartFieldHints(settings = this.game.settings, options = {}) {
-        this._clearFieldHints();
-        const lockHints = this._resolveLockedFieldHints(settings);
-        lockHints.forEach((message, fieldKey) => {
-            const binding = this._getStartFieldBinding(fieldKey);
-            if (binding.hint) this._setFieldHint(binding.hint, message, 'lock');
+        renderStartFieldHints({
+            ui: this.ui,
+            settings,
+            settingsManager: this.game?.settingsManager,
+            startValidationIssue: this._startValidationIssue,
+            focusField: options.focusField === true,
+            onOpenSection: (sectionId) => this.manager?._setStartSectionOpen?.(sectionId, true),
         });
-
-        const issue = this._startValidationIssue;
-        if (!issue) return;
-
-        const summaryMessage = String(issue.message || '').trim();
-        if (this.ui.startValidationStatus) {
-            this._setFieldHint(this.ui.startValidationStatus, summaryMessage, 'error');
-        }
-
-        const fieldKey = String(issue.fieldKey || '').trim();
-        if (!fieldKey) return;
-        const binding = this._getStartFieldBinding(fieldKey);
-        if (binding.hint) {
-            this._setFieldHint(binding.hint, String(issue.fieldMessage || issue.message || ''), 'error');
-        }
-        if (binding.control) {
-            if (binding.sectionId) {
-                this.manager._setStartSectionOpen(binding.sectionId, true);
-            }
-            binding.control.classList.add('menu-field-error');
-            if (options.focusField) {
-                binding.control.focus();
-            }
-        }
     }
 
     // ------------------------------------------------------------------

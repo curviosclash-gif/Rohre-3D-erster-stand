@@ -6,7 +6,6 @@
  */
 
 import { resolveMenuCatalogText } from './MenuTextCatalog.js';
-import { createMenuMultiplayerHostIpResolver } from './multiplayer/MenuMultiplayerHostIpResolver.js';
 
 function t(textId, fallback) {
     return resolveMenuCatalogText(textId, fallback);
@@ -101,25 +100,10 @@ function renderCodeDisplay(container, sessionState, options) {
     if (options?.isHost) {
         const ipWrap = createElement('div', 'mp-lobby-ip-display');
         const ipLabel = createElement('span', 'mp-code-label', t('menu.multiplayer.lobby.ip', 'Server-IP'));
-        const ipValue = createElement('span', 'mp-code-value mp-ip-value', '...');
+        const ipValue = createElement('span', 'mp-code-value mp-ip-value', normalizeString(options?.hostIp, 'localhost'));
         ipWrap.appendChild(ipLabel);
         ipWrap.appendChild(ipValue);
         container.appendChild(ipWrap);
-
-        const hostIpResolver = options?.hostIpResolver
-            || createMenuMultiplayerHostIpResolver({
-                runtime: options?.runtime,
-                discoveryRuntime: options?.discoveryRuntime,
-            });
-        Promise.resolve(hostIpResolver?.resolve?.())
-            .then((ip) => {
-                if (!ipValue.isConnected) return;
-                ipValue.textContent = normalizeString(ip, 'localhost');
-            })
-            .catch(() => {
-                if (!ipValue.isConnected) return;
-                ipValue.textContent = 'localhost';
-            });
     }
 }
 
