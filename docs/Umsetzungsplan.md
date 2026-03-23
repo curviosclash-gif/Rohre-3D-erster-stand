@@ -42,7 +42,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/core/MediaRecorderSystem.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/**`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/**` | V46 / 46.2 | abgeschlossen | Core/Menu-Decomposition abgeschlossen |
 | `src/hunt/**`, `src/entities/ai/**`, `src/entities/systems/ProjectileSystem.js`, `src/ui/HuntHUD.js` | V46 / 46.3 | abgeschlossen | Hunt/AI-Cleanups abgeschlossen |
 | `src/network/**`, `server/**`, `src/ui/menu/**`, `src/core/**`, `src/state/**` | V50 | offen | Architektur-Haertung II |
-| `scripts/perf-host-budget-v41.mjs`, `scripts/perf-host-budget-report-v41.json` | V41 / 41.99.4 | in Bearbeitung | Host-Performance-Gate fuer 10 Spieler absichern |
+| `scripts/perf-host-budget-v41.mjs`, `tmp/perf-host-budget-report-v41.json` | V41 / 41.99.4 | abgeschlossen | Host-Performance-Gate fuer 10 Spieler als Smoke + Report abgesichert |
 | `src/entities/mapSchema/**`, `src/entities/systems/ParcoursProgress*`, `src/ui/HudRuntimeSystem.js`, `src/state/recorder/**`, `editor/js/EditorMapSerializer.js`, `src/core/config/maps/presets/parcours_maps.js` | V51 | abgeschlossen | Parcours-Objective End-to-End integriert |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -54,7 +54,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | B | V46.3 | 2026-03-22 | frei | - |
 | C | V50 | 2026-03-22 | frei | - |
 | D | V51 | 2026-03-22 | closed | 2026-03-22 |
-| Bot-Codex | V41 / 41.99.4 | 2026-03-22 | active | 2026-03-22 |
+| Bot-Codex | V41 / 41.99.4 | 2026-03-22 | closed | 2026-03-23 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -70,7 +70,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 Plan-Datei: `docs/Feature_Lokaler_Multiplayer_V41.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-22 -->
+<!-- LOCK: frei -->
 
 Scope:
 
@@ -88,7 +88,7 @@ Scope:
 - [ ] 41.99.1 LAN-Match auf 2+ Rechnern manuell verifizieren (stabiler Session-Lebenszyklus)
 - [ ] 41.99.2 Internet-Match auf 2+ Rechnern via Signaling-Server verifizieren
 - [ ] 41.99.3 Gamepad + Touch in Multiplayer validieren
-- [ ] 41.99.4 Host-Performance bei 10 Spielern gegen Zielbudget pruefen
+- [x] 41.99.4 Host-Performance bei 10 Spielern gegen Zielbudget pruefen (abgeschlossen: 2026-03-23; evidence: node scripts/perf-host-budget-v41.mjs -> tmp/perf-host-budget-report-v41.json)
 
 ### Risiko-Register V41
 
