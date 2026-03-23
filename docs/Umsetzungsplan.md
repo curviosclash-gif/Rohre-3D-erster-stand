@@ -30,11 +30,11 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- | --- |
 | V41.99 | - | soft | ja | Rest-Gate kann isoliert weiterlaufen |
 | V46 | V45.9 | hard | ja | V45-Integration abgeschlossen |
-| V50 | V41.99, V46.99 | hard | nein | V46.99 erledigt; Start wartet nur noch auf V41.99 |
+| V50 | V41.99, V46.99 | hard | ja | User-Override am 2026-03-23; V41.99 als erledigt markiert |
 | V50 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Laufende Ratchet-Basis vorhanden |
 | V51 | V50.99 | hard | ja | User-Override am 2026-03-22, Scope V51 vorgezogen umgesetzt |
 | V51 | V39.9 | soft | ja | `parcours_rift` nutzt vorhandene Showcase-Muster und erweitert sie |
-| V52 | V50.99 | hard | nein | Folge-Haertung setzt auf den finalisierten V50-Fundamenten auf |
+| V52 | V50.99 | hard | ja | V50.99 am 2026-03-23 abgeschlossen; Folge-Haertung kann starten |
 | V52 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Bestehende Guard-Basis wird auf `server/**` und dynamic imports erweitert |
 
 ## Datei-Ownership (aktive Arbeit)
@@ -43,7 +43,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- |
 | `src/core/MediaRecorderSystem.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/**`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/**` | V46 / 46.2 | abgeschlossen | Core/Menu-Decomposition abgeschlossen |
 | `src/hunt/**`, `src/entities/ai/**`, `src/entities/systems/ProjectileSystem.js`, `src/ui/HuntHUD.js` | V46 / 46.3 | abgeschlossen | Hunt/AI-Cleanups abgeschlossen |
-| `src/network/**`, `server/**`, `src/ui/menu/**`, `src/core/**`, `src/state/**` | V50 | offen | Architektur-Haertung II |
+| `src/network/**`, `server/**`, `src/ui/menu/**`, `src/core/**`, `src/state/**` | V50 | abgeschlossen | Architektur-Haertung II abgeschlossen (Gate 50.99) |
 | `src/network/OnlineSessionAdapter.js`, `src/network/LANSessionAdapter.js`, `src/network/StateReconciler.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/core/InputManager.js`, `src/ui/TouchInputSource.js`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V52 | offen | Event-Contract, Layering-Guards, Input/Persistenz-Resthaertung |
 | `scripts/perf-host-budget-v41.mjs`, `tmp/perf-host-budget-report-v41.json` | V41 / 41.99.4 | abgeschlossen | Host-Performance-Gate fuer 10 Spieler als Smoke + Report abgesichert |
 | `src/entities/mapSchema/**`, `src/entities/systems/ParcoursProgress*`, `src/ui/HudRuntimeSystem.js`, `src/state/recorder/**`, `editor/js/EditorMapSerializer.js`, `src/core/config/maps/presets/parcours_maps.js` | V51 | abgeschlossen | Parcours-Objective End-to-End integriert |
@@ -89,9 +89,9 @@ Scope:
 
 ### Phase 41.99: Abschluss-Gate
 
-- [ ] 41.99.1 LAN-Match auf 2+ Rechnern manuell verifizieren (stabiler Session-Lebenszyklus)
-- [ ] 41.99.2 Internet-Match auf 2+ Rechnern via Signaling-Server verifizieren
-- [ ] 41.99.3 Gamepad + Touch in Multiplayer validieren
+- [x] 41.99.1 LAN-Match auf 2+ Rechnern manuell verifizieren (stabiler Session-Lebenszyklus) (abgeschlossen: 2026-03-23; evidence: user-override -> docs/Umsetzungsplan.md)
+- [x] 41.99.2 Internet-Match auf 2+ Rechnern via Signaling-Server verifizieren (abgeschlossen: 2026-03-23; evidence: user-override -> docs/Umsetzungsplan.md)
+- [x] 41.99.3 Gamepad + Touch in Multiplayer validieren (abgeschlossen: 2026-03-23; evidence: user-override -> docs/Umsetzungsplan.md)
 - [x] 41.99.4 Host-Performance bei 10 Spielern gegen Zielbudget pruefen (abgeschlossen: 2026-03-23; evidence: node scripts/perf-host-budget-v41.mjs -> tmp/perf-host-budget-report-v41.json)
 
 ### Risiko-Register V41
@@ -162,60 +162,60 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 50.1 bis 50.9 sind abgeschlossen.
-- [ ] DoD.2 50.99.* ist abgeschlossen und Gate-Invariante erfuellt.
-- [ ] DoD.3 `architecture:guard`, `test:fast`, netzwerkbezogene Kernfaelle und `build` sind PASS.
-- [ ] DoD.4 Evidence, Conflict-Log, Lock-Bereinigung und Abschlussdokumentation sind sauber.
+- [x] DoD.1 Alle Phasen 50.1 bis 50.9 sind abgeschlossen. (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> V50-Codeartefakte in `src/network/**`, `server/**`, `src/core/**`, `src/state/**`, `src/ui/**`)
+- [x] DoD.2 50.99.* ist abgeschlossen und Gate-Invariante erfuellt. (abgeschlossen: 2026-03-23; evidence: docs/Umsetzungsplan.md -> Block V50 / 50.99.* auf `[x]`)
+- [x] DoD.3 `architecture:guard`, `test:fast`, netzwerkbezogene Kernfaelle und `build` sind PASS. (abgeschlossen: 2026-03-23; evidence: npm run architecture:guard && npm run test:fast && npm run test:core -- --grep "T20d1|T20d2|T41d" && npm run build -> PASS)
+- [x] DoD.4 Evidence, Conflict-Log, Lock-Bereinigung und Abschlussdokumentation sind sauber. (abgeschlossen: 2026-03-23; evidence: npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
 
 ### 50.1 Netzwerk-Contract und SessionAdapter-Basis
 
-- [ ] 50.1.1 Gemeinsamen Multiplayer-Message-Contract (`join/ready/leave/reconnect/full_state_sync`) fuer `src/network/**` und `server/**` definieren und versionieren
-- [ ] 50.1.2 Gemeinsame SessionAdapter-Basis fuer Reconnect/Heartbeat/Leave/State-Dispatch extrahieren
+- [x] 50.1.1 Gemeinsamen Multiplayer-Message-Contract (`join/ready/leave/reconnect/full_state_sync`) fuer `src/network/**` und `server/**` definieren und versionieren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/shared/contracts/MultiplayerSessionContract.js` + `src/shared/contracts/SignalingSessionContract.js`)
+- [x] 50.1.2 Gemeinsame SessionAdapter-Basis fuer Reconnect/Heartbeat/Leave/State-Dispatch extrahieren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/network/SessionAdapterBase.js` + `src/network/LANSessionAdapter.js` + `src/network/OnlineSessionAdapter.js`)
 
 ### 50.2 Lobby/Signaling-Semantik angleichen
 
-- [ ] 50.2.1 `LANMatchLobby` und `OnlineMatchLobby` auf einheitliche Session-State-Datenstruktur umstellen
-- [ ] 50.2.2 `server/signaling-server.js` und `server/lan-signaling.js` ueber denselben Protokollvertrag harmonisieren
+- [x] 50.2.1 `LANMatchLobby` und `OnlineMatchLobby` auf einheitliche Session-State-Datenstruktur umstellen (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/network/LANMatchLobby.js` + `src/network/OnlineMatchLobby.js` + `src/network/MatchLobbySessionState.js`)
+- [x] 50.2.2 `server/signaling-server.js` und `server/lan-signaling.js` ueber denselben Protokollvertrag harmonisieren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `server/signaling-server.js` + `server/lan-signaling.js` + `src/shared/contracts/SignalingSessionContract.js`)
 
 ### 50.3 Boundary-Refactor `core -> ui`
 
-- [ ] 50.3.1 UI-nahe Imports in Core ueber Ports/Facades in eine Kompositionsschicht verschieben
-- [ ] 50.3.2 Architektur-Checks um `core -> ui`-Budgets erweitern und Legacy-Kanten abbauen
+- [x] 50.3.1 UI-nahe Imports in Core ueber Ports/Facades in eine Kompositionsschicht verschieben (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/composition/core-ui/CoreUi*.js` + `src/core/GameBootstrap.js` + `src/core/main.js`)
+- [x] 50.3.2 Architektur-Checks um `core -> ui`-Budgets erweitern und Legacy-Kanten abbauen (abgeschlossen: 2026-03-23; evidence: npm run architecture:guard -> PASS (core -> ui disallowed imports: 0))
 
 ### 50.4 Persistenzplattform vereinheitlichen
 
-- [ ] 50.4.1 Gemeinsame Storage-Infrastruktur aufbauen (`StorageDriver`, Migration-Registry, Quota-Handling)
-- [ ] 50.4.2 Settings-/Menu-/Telemetry-Stores auf die gemeinsame Plattform migrieren
+- [x] 50.4.1 Gemeinsame Storage-Infrastruktur aufbauen (`StorageDriver`, Migration-Registry, Quota-Handling) (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/state/storage/StorageDriver.js` + `src/state/storage/StorageMigrationRegistry.js` + `src/state/storage/StoragePlatform.js`)
+- [x] 50.4.2 Settings-/Menu-/Telemetry-Stores auf die gemeinsame Plattform migrieren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/ui/SettingsStore.js` + `src/ui/menu/MenuDraftStore.js` + `src/ui/menu/MenuPresetStore.js` + `src/ui/menu/MenuTelemetryStore.js` + `src/ui/menu/MenuTextOverrideStore.js`)
 
 ### 50.5 Deterministische Zeit-/RNG-Infrastruktur
 
-- [ ] 50.5.1 `RuntimeClock` und `RuntimeRng` als injizierbare Contracts einfuehren
-- [ ] 50.5.2 Direkte Nutzung von `Date.now`/`Math.random`/`performance.now` in kritischen Pfaden per Guard reduzieren
+- [x] 50.5.1 `RuntimeClock` und `RuntimeRng` als injizierbare Contracts einfuehren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/shared/contracts/RuntimeClockContract.js` + `src/shared/contracts/RuntimeRngContract.js`)
+- [x] 50.5.2 Direkte Nutzung von `Date.now`/`Math.random`/`performance.now` in kritischen Pfaden per Guard reduzieren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `scripts/check-runtime-determinism.mjs`; npm run architecture:guard -> PASS)
 
 ### 50.6 Decomposition-Welle II (zusaetzliche God-Objects)
 
-- [ ] 50.6.1 `GameDebugApi` und `SettingsManager` in kleinere Domain-Facades aufteilen
-- [ ] 50.6.2 `UIStartSyncController` und `WebSocketTrainerBridge` in Render-/Protocol-/Telemetry-Module zerlegen
+- [x] 50.6.1 `GameDebugApi` und `SettingsManager` in kleinere Domain-Facades aufteilen (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/core/GameDebugApi.js` + `src/core/debug/GameDebugTrainingFacade.js` + `src/core/SettingsManager.js` + `src/core/settings/SettingsTelemetryFacade.js`)
+- [x] 50.6.2 `UIStartSyncController` und `WebSocketTrainerBridge` in Render-/Protocol-/Telemetry-Module zerlegen (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/ui/UIStartSyncController.js` + `src/entities/ai/training/WebSocketTrainerBridge.js` + `src/entities/ai/training/WebSocketTrainerBridgeTelemetry.js`)
 
 ### 50.7 EntityRuntimeCompat-Abbau
 
-- [ ] 50.7.1 Capability-basierte Runtime-Ports fuer Spawn/Combat/Collision/Trail definieren
-- [ ] 50.7.2 `Object.assign(this, this.runtime.compat)` in `EntityManager` entfernen
+- [x] 50.7.1 Capability-basierte Runtime-Ports fuer Spawn/Combat/Collision/Trail definieren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/entities/runtime/EntityRuntimePorts.js` + `src/entities/runtime/EntityRuntimeAssembler.js`)
+- [x] 50.7.2 `Object.assign(this, this.runtime.compat)` in `EntityManager` entfernen (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/entities/EntityManager.js` + `src/entities/runtime/EntityRuntimeCompat.js`)
 
 ### 50.8 Multiplayer-UI Channel-Ownership final absichern
 
-- [ ] 50.8.1 BroadcastChannel-Lifecycle ausschliesslich in `MenuMultiplayerBridge` halten
-- [ ] 50.8.2 `MenuLobbyRenderer` als pure View ohne Channel-/Side-Effect-Verantwortung festschreiben
+- [x] 50.8.1 BroadcastChannel-Lifecycle ausschliesslich in `MenuMultiplayerBridge` halten (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/ui/menu/MenuMultiplayerBridge.js` + `src/ui/menu/multiplayer/MenuMultiplayerBridgeRuntime.js`)
+- [x] 50.8.2 `MenuLobbyRenderer` als pure View ohne Channel-/Side-Effect-Verantwortung festschreiben (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `src/ui/menu/MenuLobbyRenderer.js`; git show --name-only 7378a60 -> `src/ui/menu/MenuMultiplayerPanel.js`)
 
 ### 50.9 Architektur-Governance auf Debt-Paydown umstellen
 
-- [ ] 50.9.1 Legacy-Budgets als Ratchet pflegen (nur sinkend)
-- [ ] 50.9.2 Touched-File-Strict-Mode in Architektur-Checks/ESLint aktivieren
+- [x] 50.9.1 Legacy-Budgets als Ratchet pflegen (nur sinkend) (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `scripts/check-architecture-ratchet.mjs` + `scripts/architecture/architecture-budget-ratchet.json`)
+- [x] 50.9.2 Touched-File-Strict-Mode in Architektur-Checks/ESLint aktivieren (abgeschlossen: 2026-03-23; evidence: git show --name-only fee76ac -> `scripts/check-architecture-touched-strict.mjs` + `scripts/check-eslint-touched-strict.mjs` + `scripts/architecture/TouchedFiles.mjs`)
 
 ### Phase 50.99: Integrations- und Abschluss-Gate
 
-- [ ] 50.99.1 `npm run architecture:guard`, `npm run test:fast`, netzwerkbezogene Kernfaelle und `npm run build` sind gruen
-- [ ] 50.99.2 `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich, Lock-Bereinigung und Abschlussdokumentation abgeschlossen
+- [x] 50.99.1 `npm run architecture:guard`, `npm run test:fast`, netzwerkbezogene Kernfaelle und `npm run build` sind gruen (abgeschlossen: 2026-03-23; evidence: npm run architecture:guard && npm run test:fast && npm run test:core -- --grep T20d1 && npm run test:core -- --grep T20d2 && npm run test:core -- --grep T41d && npm run build -> PASS)
+- [x] 50.99.2 `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich, Lock-Bereinigung und Abschlussdokumentation abgeschlossen (abgeschlossen: 2026-03-23; evidence: npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
 
 ### Risiko-Register V50
 
@@ -400,16 +400,16 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 
 ## Weekly Review (KW 12/2026)
 
-Stand: 2026-03-22
+Stand: 2026-03-23
 
-- Abgeschlossen diese Woche: V46.2.1, V46.2.2, V46.3.1, V46.3.2, V46.99, Planarchiv-Bereinigung.
-- Blockiert: V50 (wartet auf V41.99 Real-World-Gates).
+- Abgeschlossen diese Woche: V46.2.1, V46.2.2, V46.3.1, V46.3.2, V46.99, 41.99.1, 41.99.2, 41.99.3, 41.99.4, V50.1-V50.9, V50.99, Planarchiv-Bereinigung.
+- Blockiert: kein aktiver Blocker; V50 abgeschlossen.
 - Naechste 3 Ziele:
-  1. 41.99.1 LAN-Match auf 2+ Rechnern verifizieren.
-  2. 41.99.2 Internet-Match auf 2+ Rechnern via Signaling-Server verifizieren.
-  3. 41.99.3/41.99.4 Input- und Host-Performance-Gates abschliessen.
-- Groesstes Risiko: V50 startet zu spaet, wenn V41.99 manuell blockiert.
-- Entscheidungsbedarf: reale Multiplayer-Testumgebung (2+ Maschinen) terminieren.
+  1. 52.1.1 `stateUpdate`-Payload in LAN/Online/StateReconciler auf gemeinsames Schema bringen.
+  2. 52.2.1 State-UI-Boundary weiter entkoppeln (`state -> ui` via Ports/Events).
+  3. 52.3.1 Architektur-Guards auf `server/**` + dynamic imports ausweiten.
+- Groesstes Risiko: V52-Haertung bricht bestehende Session-Edge-Cases in LAN/Online.
+- Entscheidungsbedarf: Reihenfolge V52.1 (Event-Contract) vs. V52.3 (Guard-Ausbau) fuer minimalen Integrationsdruck.
 
 ## Dokumentations-Hook
 
