@@ -41,6 +41,7 @@
     "smoke:roundstate": "node scripts/round-state-controller-smoke.mjs",
     "smoke:arcade": "node scripts/arcade-run-smoke.mjs",
     "bot:validate": "node dev/scripts/bot-validation-runner.mjs",
+    "bot:validate:publish": "node dev/scripts/bot-validation-runner.mjs --publish-evidence true",
     "benchmark:baseline": "node scripts/bot-benchmark-baseline.mjs",
     "benchmark:lifecycle": "node scripts/perf-lifecycle-measure.mjs",
     "benchmark:jitter": "node dev/scripts/verify-lock.mjs --playwright -- node scripts/perf-jitter-matrix.mjs",

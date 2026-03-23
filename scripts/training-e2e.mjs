@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process';
-import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import process from 'node:process';
 
@@ -13,7 +13,6 @@ import {
 
 const DEFAULT_STAGE_TIMEOUT_MS = 8 * 60_000;
 const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
-const BOT_VALIDATION_SOURCE_PATH = 'data/bot_validation_report.json';
 const TRAINING_SCRIPT_PATHS = Object.freeze({
     TRAINER_SERVER: resolveDevLayoutRelativePath('scripts', 'trainer-server.mjs'),
     TRAINING_RUN: resolveDevLayoutRelativePath('scripts', 'training-run.mjs'),
@@ -372,17 +371,15 @@ async function main() {
                 : buildStageForwardArgs(args, botValidationReportPath);
             let stageResult = await runStage(stage, stamp, stageArgs, { timeoutMs: stageTimeoutMs });
             if (stage.name === 'bot-validation' && stageResult.status === 'completed') {
-                const sourceExists = await fileExists(BOT_VALIDATION_SOURCE_PATH);
-                if (!sourceExists) {
+                const reportExists = await fileExists(botValidationReportPath);
+                if (!reportExists) {
                     stageResult = {
                         ...stageResult,
                         status: 'failed',
                         exitCode: 1,
-                        reason: `missing bot-validation source report: ${BOT_VALIDATION_SOURCE_PATH}`,
+                        reason: `missing bot-validation report: ${botValidationReportPath}`,
                     };
                 } else {
-                    await mkdir(layout.runDir, { recursive: true });
-                    await copyFile(BOT_VALIDATION_SOURCE_PATH, botValidationReportPath);
                     botValidation.refreshed = true;
                     botValidation.promotedReportPath = botValidationReportPath.replace(/\\/g, '/');
                 }

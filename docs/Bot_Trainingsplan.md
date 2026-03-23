@@ -27,6 +27,11 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 - Leit-KPI 2: `averageBotSurvival` aus `bot:validate` mindestens +30% gegen Baseline.
 - Stabilitaets-KPI: `runtimeErrorCount = 0`, Gate bleibt gruen.
 
+## Report-Modi (bot:validate)
+
+- `npm run bot:validate` schreibt Standard-Reports lokal nach `tmp/` (nicht versioniert).
+- `npm run bot:validate:publish` schreibt zusaetzlich Evidence nach `data/bot_validation_report.json` sowie einen Tagesreport unter `docs/` (Dateiname `Testergebnisse_Phase4b_<Datum>.md`).
+
 ## Abhaengigkeiten (Hard/Soft)
 
 | Block | Depends-On | Typ | Erfuellt | Hinweis |

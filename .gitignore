@@ -23,6 +23,8 @@ patch_phase1.py
 # Lokale Laufzeit-/Screenshot-Artefakte
 output/
 tmp/
+tmp-vite*.out.log
+tmp-vite*.err.log
 data/training/
 data/maps/editor_qa-disk-map-*.editor.json
 data/maps/editor_qa-disk-map-*.runtime.json

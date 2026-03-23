@@ -1,10 +1,11 @@
 import { spawn, execSync } from 'node:child_process';
-import { writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join } from 'node:path';
 import process from 'node:process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium } from '@playwright/test';
 
+const CLI_ARGS = parseArgMap(process.argv.slice(2));
 const HOST = '127.0.0.1';
 const PORT = parseIntEnv('BOT_RUNNER_PORT', 4273, 1024);
 const BASE_URL = `http://${HOST}:${PORT}`;
@@ -43,6 +44,64 @@ const TOTAL_TIMEOUT_MS = parseIntEnv(
     60000
 );
 const GOTO_WAIT_UNTIL = resolveGotoWaitUntil(process.env.BOT_RUNNER_GOTO_WAIT_UNTIL);
+const PUBLISH_EVIDENCE = parseBoolOption(
+    resolveFirstValue(CLI_ARGS, ['publish-evidence'], process.env.BOT_RUNNER_PUBLISH_EVIDENCE),
+    false
+);
+const REPORT_JSON_OVERRIDE = resolveFirstValue(
+    CLI_ARGS,
+    ['bot-validation-report', 'report-json'],
+    process.env.BOT_RUNNER_REPORT_JSON
+);
+const REPORT_MD_OVERRIDE = resolveFirstValue(CLI_ARGS, ['report-md'], process.env.BOT_RUNNER_REPORT_MD);
+
+function parseArgMap(argv) {
+    const result = new Map();
+    for (let i = 0; i < argv.length; i++) {
+        const token = String(argv[i] || '');
+        if (!token.startsWith('--')) continue;
+        const trimmed = token.slice(2);
+        const eqIndex = trimmed.indexOf('=');
+        if (eqIndex >= 0) {
+            const key = trimmed.slice(0, eqIndex).trim();
+            const value = trimmed.slice(eqIndex + 1).trim();
+            if (key) result.set(key, value);
+            continue;
+        }
+        const key = trimmed.trim();
+        if (!key) continue;
+        const next = argv[i + 1];
+        if (typeof next === 'string' && !next.startsWith('--')) {
+            result.set(key, next.trim());
+            i += 1;
+            continue;
+        }
+        result.set(key, 'true');
+    }
+    return result;
+}
+
+function resolveFirstValue(argMap, keys = [], envValue = '') {
+    for (const key of keys) {
+        const candidate = argMap?.get?.(key);
+        if (typeof candidate === 'string' && candidate.trim()) {
+            return candidate.trim();
+        }
+    }
+    if (typeof envValue === 'string' && envValue.trim()) {
+        return envValue.trim();
+    }
+    return '';
+}
+
+function parseBoolOption(value, fallback = false) {
+    if (typeof value !== 'string') return fallback;
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return fallback;
+    if (normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on') return true;
+    if (normalized === '0' || normalized === 'false' || normalized === 'no' || normalized === 'off') return false;
+    return fallback;
+}
 
 function parseIntEnv(name, fallback, minValue = 1) {
     const raw = process.env[name];
@@ -57,6 +116,16 @@ function parseBoolEnv(name, fallback = false) {
     if (!raw) return fallback;
     const normalized = String(raw).trim().toLowerCase();
     return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+}
+
+function normalizeOutputPath(rawValue, fallback) {
+    const value = typeof rawValue === 'string' ? rawValue.trim() : '';
+    return value || fallback;
+}
+
+async function writeTextFile(targetPath, content) {
+    await mkdir(dirname(targetPath), { recursive: true });
+    await writeFile(targetPath, content, 'utf8');
 }
 
 function resolveGotoWaitUntil(value) {
@@ -773,19 +842,33 @@ async function run() {
             },
         };
 
-        const jsonPath = 'data/bot_validation_report.json';
-        const mdPath = `docs/Testergebnisse_Phase4b_${generatedAt}.md`;
-        await writeFile(jsonPath, JSON.stringify(report, null, 2), 'utf8');
-        await writeFile(
-            mdPath,
-            buildMarkdownReport({
-                generatedAt,
-                roundsPerScenario: ROUNDS_PER_SCENARIO,
-                scenarioResults,
-                overall,
-            }),
-            'utf8'
-        );
+        const canonicalJsonPath = 'data/bot_validation_report.json';
+        const canonicalMdPath = `docs/Testergebnisse_Phase4b_${generatedAt}.md`;
+        const jsonPath = normalizeOutputPath(REPORT_JSON_OVERRIDE, 'tmp/bot-validation-report.json');
+        const mdPath = normalizeOutputPath(REPORT_MD_OVERRIDE, `tmp/Testergebnisse_Phase4b_${generatedAt}.md`);
+        const markdownReport = buildMarkdownReport({
+            generatedAt,
+            roundsPerScenario: ROUNDS_PER_SCENARIO,
+            scenarioResults,
+            overall,
+        });
+
+        const writtenPaths = [];
+        await writeTextFile(jsonPath, JSON.stringify(report, null, 2));
+        writtenPaths.push(jsonPath);
+        await writeTextFile(mdPath, markdownReport);
+        writtenPaths.push(mdPath);
+
+        if (PUBLISH_EVIDENCE) {
+            if (jsonPath !== canonicalJsonPath) {
+                await writeTextFile(canonicalJsonPath, JSON.stringify(report, null, 2));
+                writtenPaths.push(canonicalJsonPath);
+            }
+            if (mdPath !== canonicalMdPath) {
+                await writeTextFile(canonicalMdPath, markdownReport);
+                writtenPaths.push(canonicalMdPath);
+            }
+        }
 
         const forcedRoundRatio = overall.rounds > 0 ? runnerStats.forcedRounds / overall.rounds : 0;
         log('Runner round-end summary', {
@@ -810,8 +893,12 @@ async function run() {
 
         console.log('\nBOT_VALIDATION_RESULT');
         console.log(JSON.stringify(report, null, 2));
-        console.log(`\nWrote: ${jsonPath}`);
-        console.log(`Wrote: ${mdPath}`);
+        for (const targetPath of writtenPaths) {
+            console.log(`\nWrote: ${targetPath}`);
+        }
+        if (!PUBLISH_EVIDENCE) {
+            console.log('Evidence publish skipped (set --publish-evidence true to write data/docs reports).');
+        }
         log('Runner finished successfully', {
             elapsedMs: runDeadline.elapsedMs(),
             forcedRounds: runnerStats.forcedRounds,
