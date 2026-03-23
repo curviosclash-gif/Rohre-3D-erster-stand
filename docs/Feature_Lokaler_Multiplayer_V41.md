@@ -1,6 +1,6 @@
 # Feature: Multiplayer — LAN + Internet, bis 10 Spieler (V41)
 
-Stand: 2026-03-18
+Stand: 2026-03-23
 Status: In Umsetzung
 Owner: Single-Agent
 
@@ -57,7 +57,7 @@ Bis zu **10 Spieler** auf verschiedenen Computern (oder Tablets) spielen ueber *
 - [ ] LAN-Signaling in Electron einbetten und testen
 - [ ] Internet-Signaling deployed + getestet
 - [ ] Gamepad/Touch im Match getestet
-- [ ] 10-Spieler-Stresstest
+- [x] 10-Spieler-Stresstest (abgeschlossen: 2026-03-23; evidence: node scripts/perf-host-budget-v41.mjs -> tmp/perf-host-budget-report-v41.json)
 - [ ] Replay-Verifikation
 - [ ] Abschluss-Gate
 
