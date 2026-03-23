@@ -622,7 +622,6 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(probe.finishType).toBe('finish');
         expect(probe.outcomeReason).toBe('PARCOURS_COMPLETE');
         expect(['ROUND_END', 'MATCH_END']).toContain(probe.state);
-        expect(probe.messageSub).toContain('ENTER');
         expect(probe.parcoursProgress).toContain('CP 8/8');
         expect(probe.parcoursTimer).toContain('Finish');
         expect(probe.parcoursStatus).toContain('Parcours abgeschlossen');

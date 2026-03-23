@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-03-22
+Stand: 2026-03-23
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -32,6 +32,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | Block | Depends-On | Typ | Erfuellt | Hinweis |
 | --- | --- | --- | --- | --- |
 | BT10 | - | soft | ja | Operatorlauf kann isoliert laufen |
+| BT11 | BT10 Baseline-Laufdaten | soft | ja | Folgefenster fuer 10h-Operatorlauf |
 | BT15 | BT10 Baseline-Laufdaten | soft | ja | Zukunftsplanung nutzt aktuelle Lauf-KPIs |
 | BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | teilweise | BT10 in Arbeit, BT15 aktiv |
 | BT30 | 20.9 | hard | nein | startet erst nach Survival-Policy-Phase |
@@ -45,7 +46,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | `src/entities/ai/training/**`, `trainer/**` | BT20-BT30 | offen | Runner/Bridge/Trainer-Verhalten |
 | `src/state/training/**` | BT20-BT40 | offen | Gate-, KPI- und Reward-Logik |
 | `tests/trainer-*.mjs`, `tests/training-*.mjs` | BT10-BT40 | shared | Nur trainingsnahe Tests |
-| `docs/Bot_Trainingsplan.md`, `docs/Bot_Survival_Training_Plan_12h.md` | BT10-BT40 | shared | Masterplan + Detailplan |
+| `docs/Bot_Trainingsplan.md`, `docs/Bot_Survival_Training_Plan_12h.md`, `docs/Bot_Survival_Training_Plan_10h.md` | BT10-BT40 | shared | Masterplan + Detailplan |
 | `data/training/**`, `output/training/**` | BT10 | shared | Laufartefakte, Logs, Serien |
 
 ## Lock-Status
@@ -53,6 +54,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
 | Train-Ops | BT10 | 2026-03-22 | active | 2026-03-22 |
+| Bot-Codex | BT11 | 2026-03-23 | active | 2026-03-24 |
 | Train-Ops | BT15 | 2026-03-22 | active | 2026-03-24 |
 | Bot-A | BT20 | 2026-03-22 | frei | - |
 | Bot-B | BT30 | 2026-03-22 | frei | - |
@@ -110,6 +112,50 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_12h.md`
 | Langlauf stoppt durch Timeout/Backpressure | hoch | Train-Ops | Guarded retries + Zwischencheck alle 2h | Unvollstaendige Laufserie |
 | KPI-Drift trotz gruenem Gate | mittel | Train-Ops | KPI-Deltas je Checkpoint protokollieren | Survival sinkt trotz Pass |
 | Artefakt-Luecken bei Resume | mittel | Trainer | latest/series pointers nach jedem Schritt pruefen | fehlende eval/gate Dateien |
+
+---
+
+## Block BT11: 10h Survival Folgefenster
+
+Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
+
+<!-- LOCK: Bot-Codex seit 2026-03-23 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT11-Phasen inkl. 11.99.* sind abgeschlossen.
+- [ ] DoD.2 `training:run/eval/gate` sowie `bot:validate` sind mit Artefaktpfaden dokumentiert.
+- [ ] DoD.3 KPI-Deltas gegen BT10-Baseline sind im Checkpoint-Log eingetragen.
+- [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
+
+### 11.1 Plan und Laufstart
+
+- [x] 11.1.1 10h-Trainingsplan mit KPI-/Checkpoint-Vorgaben anlegen (abgeschlossen: 2026-03-23; evidence: create 10h plan -> docs/Bot_Survival_Training_Plan_10h.md)
+- [/] 11.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren
+
+### 11.2 Laufmonitoring im 2h-Takt
+
+- [ ] 11.2.1 Alle 2h `bot:validate` ausfuehren und Report im aktiven Run-Ordner pinnen
+- [ ] 11.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT10-Baseline protokollieren
+
+### Checkpoint-Log BT11 (laufend)
+
+| Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs Baseline | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-03-23 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT10 | `docs/Bot_Survival_Training_Plan_10h.md` |
+
+### 11.99 Abschluss-Gate
+
+- [ ] 11.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen
+- [ ] 11.99.2 Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren
+
+### Risiko-Register BT11
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Lauf stoppt vor 10h durch Stage-Failure | hoch | Bot-Codex | `stop-on-fail` aus + Logmonitoring + Resume ueber latest checkpoint | `loop.json` zeigt fruehen stopReason |
+| KPI-Delta unklar ohne valide Zwischenreports | mittel | Bot-Codex | fester 2h Checkpoint-Rhythmus mit `bot:validate` | fehlendes `averageBotSurvival` im Abschluss |
+| Artefaktdrift zwischen runs/series/logs | mittel | Bot-Codex | SeriesStamp fixieren und Logpfad im Plan pinnen | mismatch zwischen `loop.json` und run stamps |
 
 ---
 
