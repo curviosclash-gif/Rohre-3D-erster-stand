@@ -1148,6 +1148,91 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         expect(result.yawRight).toBeFalsy();
     });
 
+    test('T80e: Matchpfad liefert fuer Bridge-Bot ueber Zeit Steering-Inputs (kein Dauer-Geradeaus)', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            if (!game?.startMatch || !game?._returnToMenu || !game?._onSettingsChanged) {
+                return { error: 'missing-game-hooks' };
+            }
+
+            game.settings.mode = '1p';
+            game.settings.numBots = 1;
+            game.settings.gameMode = 'CLASSIC';
+            game.settings.botPolicyStrategy = 'auto';
+            if (!game.settings.gameplay || typeof game.settings.gameplay !== 'object') {
+                game.settings.gameplay = {};
+            }
+            game.settings.gameplay.planarMode = false;
+            game._onSettingsChanged();
+
+            const startResult = game.startMatch();
+            if (startResult && typeof startResult.then === 'function') {
+                await startResult;
+            }
+
+            const startedAt = Date.now();
+            let entityManager = game.entityManager;
+            let botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
+            let policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+            while ((!botPlayer || !policy) && Date.now() - startedAt < 5000) {
+                await new Promise((resolve) => setTimeout(resolve, 16));
+                entityManager = game.entityManager;
+                botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
+                policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
+            }
+            if (!botPlayer || !policy || !entityManager?._playerInputSystem) {
+                game._returnToMenu();
+                return { error: 'missing-bot-policy' };
+            }
+
+            const bounds = entityManager?.arena?.bounds;
+            if (bounds && botPlayer?.position?.set) {
+                const centerY = ((Number(bounds.minY) || 0) + (Number(bounds.maxY) || 0)) * 0.5;
+                botPlayer.position.set((Number(bounds.maxX) || 0) - 1.5, centerY, 0);
+                botPlayer.velocity?.set?.(0, 0, 0);
+                botPlayer.setLookAtWorld?.((Number(bounds.maxX) || 0) + 80, centerY, 0);
+            }
+
+            let steeringCount = 0;
+            let sampleCount = 0;
+            const sampleTarget = 160;
+            for (let i = 0; i < sampleTarget; i += 1) {
+                if (!botPlayer?.alive) break;
+                const input = entityManager._playerInputSystem.resolvePlayerInput(botPlayer, 1 / 60, null);
+                const hasSteering = !!(
+                    input?.yawLeft
+                    || input?.yawRight
+                    || input?.pitchUp
+                    || input?.pitchDown
+                    || input?.rollLeft
+                    || input?.rollRight
+                );
+                if (hasSteering) {
+                    steeringCount += 1;
+                }
+                sampleCount += 1;
+                await new Promise((resolve) => setTimeout(resolve, 16));
+            }
+
+            const steeringRatio = sampleCount > 0 ? steeringCount / sampleCount : 0;
+            const policyType = String(policy?.type || '');
+            game._returnToMenu();
+            return {
+                error: null,
+                policyType,
+                sampleCount,
+                steeringCount,
+                steeringRatio,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.policyType.includes('classic')).toBeTruthy();
+        expect(result.sampleCount).toBeGreaterThan(40);
+        expect(result.steeringRatio).toBeGreaterThan(0.02);
+    });
+
     test('T81: RuntimeConfig loest Bot-Policy-Strategie reproduzierbar nach Modus auf', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
