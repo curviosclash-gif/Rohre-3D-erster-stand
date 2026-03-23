@@ -118,6 +118,8 @@ export class MediaRecorderSystem {
         this._mediaRecorderVideoTrack = null;
         this._mediaRecorderSupportsRequestFrame = false;
         this._mediaRecorderUsesCaptureCanvas = false;
+        this._mediaRecorderPumpTimer = null;
+        this._mediaRecorderPumpResolutionScale = 1;
         this._activeRecording = null;
         this._pendingStop = null;
         this._lastExport = null;
@@ -292,6 +294,36 @@ export class MediaRecorderSystem {
         this._captureTimestampHistoryWriteIndex = 0;
         this._lastFrameIntervalStats = null;
         this._frameIntervalStatsDirty = false;
+    }
+
+    _stopMediaRecorderPump() {
+        if (this._mediaRecorderPumpTimer != null && typeof clearInterval === 'function') {
+            clearInterval(this._mediaRecorderPumpTimer);
+        }
+        this._mediaRecorderPumpTimer = null;
+    }
+
+    _startMediaRecorderPump(resolutionScale = 1) {
+        this._stopMediaRecorderPump();
+        this._mediaRecorderPumpResolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(resolutionScale, 1)));
+
+        if (typeof setInterval !== 'function') return;
+        if (!this._mediaRecorderUsesCaptureCanvas && !this._mediaRecorderSupportsRequestFrame) return;
+
+        const intervalMs = Math.max(16, Math.round(1000 / Math.max(1, this.captureFps)));
+        this._mediaRecorderPumpTimer = setInterval(() => {
+            if (!this._isRecording || this._activeRecorderEngine !== RECORDER_ENGINE.NATIVE_MEDIARECORDER) return;
+            try {
+                if (this._mediaRecorderUsesCaptureCanvas) {
+                    this._ensureMediaRecorderCaptureSurface(this._mediaRecorderPumpResolutionScale);
+                }
+                if (this._mediaRecorderVideoTrack?.requestFrame) {
+                    this._mediaRecorderVideoTrack.requestFrame();
+                }
+            } catch {
+                // Ignore timer-driven capture hiccups.
+            }
+        }, intervalMs);
     }
 
     _getCaptureLevel() {
@@ -894,6 +926,7 @@ export class MediaRecorderSystem {
             this._mediaRecorderStream = captureStream;
             this._mediaRecorderVideoTrack = captureTrack;
             this._mediaRecorderSupportsRequestFrame = supportsRequestFrame;
+            this._startMediaRecorderPump(level.resolutionScale);
             this._mediaRecorder = recorderOptions
                 ? new MediaRecorderCtor(this._mediaRecorderStream, recorderOptions)
                 : new MediaRecorderCtor(this._mediaRecorderStream);
@@ -1017,6 +1050,13 @@ export class MediaRecorderSystem {
                         resolve(result);
                     }
                     return result;
+                }
+                if (this._mediaRecorderUsesCaptureCanvas) {
+                    try {
+                        this._ensureMediaRecorderCaptureSurface(this._mediaRecorderPumpResolutionScale);
+                    } catch {
+                        // Ignore final capture-copy failures on stop.
+                    }
                 }
                 if (this._mediaRecorderVideoTrack?.requestFrame) {
                     try {
@@ -1253,6 +1293,7 @@ export class MediaRecorderSystem {
 
     _cleanupRuntimeRecorder() {
         this._isRecording = false;
+        this._stopMediaRecorderPump();
         if (this._mediaRecorderStream && typeof this._mediaRecorderStream.getTracks === 'function') {
             for (const track of this._mediaRecorderStream.getTracks()) {
                 try {
@@ -1270,6 +1311,7 @@ export class MediaRecorderSystem {
         this._mediaRecorderVideoTrack = null;
         this._mediaRecorderSupportsRequestFrame = false;
         this._mediaRecorderUsesCaptureCanvas = false;
+        this._mediaRecorderPumpResolutionScale = 1;
         this._activeRecording = null;
         this._frameCount = 0;
         this._captureCanvas = null;
