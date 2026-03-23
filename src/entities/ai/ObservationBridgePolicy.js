@@ -65,6 +65,18 @@ function resolveTrainerBridgeOptions(options = {}) {
     };
 }
 
+function hasSteeringIntent(action = null) {
+    if (!action || typeof action !== 'object') return false;
+    return !!(
+        action.yawLeft
+        || action.yawRight
+        || action.pitchUp
+        || action.pitchDown
+        || action.rollLeft
+        || action.rollRight
+    );
+}
+
 export class ObservationBridgePolicy {
     constructor(options = {}) {
         this.type = normalizeBotPolicyType(options.type || BOT_POLICY_TYPES.CLASSIC_BRIDGE);
@@ -300,7 +312,7 @@ export class ObservationBridgePolicy {
         }
     }
 
-    _sanitizeAction(action, player) {
+    _sanitizeAction(action, player, target = this._neutralAction) {
         return sanitizeBotAction(action, {
             inventoryLength: Array.isArray(player?.inventory) ? player.inventory.length : 0,
             onInvalid: (reason) => this._warn(
@@ -308,7 +320,36 @@ export class ObservationBridgePolicy {
                 null,
                 `sanitized-action:${reason}`
             ),
-        }, this._neutralAction);
+        }, target);
+    }
+
+    _injectFallbackSteeringIfNeeded(action, dt, player, runtimeContext) {
+        if (hasSteeringIntent(action)) {
+            return action;
+        }
+
+        const fallbackRawAction = this._delegateFallbackUpdate(dt, player, runtimeContext);
+        const fallbackAction = this._sanitizeAction(fallbackRawAction, player, {});
+        if (!hasSteeringIntent(fallbackAction)) {
+            return action;
+        }
+
+        action.yawLeft = fallbackAction.yawLeft === true;
+        action.yawRight = fallbackAction.yawRight === true;
+        action.pitchUp = fallbackAction.pitchUp === true;
+        action.pitchDown = fallbackAction.pitchDown === true;
+        action.rollLeft = fallbackAction.rollLeft === true;
+        action.rollRight = fallbackAction.rollRight === true;
+        if (!action.boost && fallbackAction.boost === true) {
+            action.boost = true;
+        }
+
+        this._warn(
+            'local action without steering; injected fallback steering assist',
+            null,
+            'local-steering-assist',
+        );
+        return action;
     }
 
     _buildTrainerPayload(runtimeContext, player) {
@@ -436,7 +477,11 @@ export class ObservationBridgePolicy {
             this._bridgeFailureState.updatedAt = Date.now();
         }
         if (trainerResult.action && typeof trainerResult.action === 'object') {
-            return this._sanitizeAction(trainerResult.action, player);
+            let action = this._sanitizeAction(trainerResult.action, player, {});
+            if (!trainerResult.usedBridge) {
+                action = this._injectFallbackSteeringIfNeeded(action, dt, player, runtimeContext);
+            }
+            return action;
         }
         if (trainerResult.usedBridge) {
             this._recordTrainerFallback(
