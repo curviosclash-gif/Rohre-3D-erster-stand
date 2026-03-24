@@ -4,6 +4,7 @@ import {
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
 import { EDITOR_API_ROUTES } from '../shared/contracts/EditorPathContract.js';
+import { toFiniteNumber } from '../utils/MathOps.js';
 import {
     DEFAULT_FALLBACK_MIME_TYPE,
     DEFAULT_MIME_TYPE,
