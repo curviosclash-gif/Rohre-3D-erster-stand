@@ -4,7 +4,6 @@ import {
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
 import { EDITOR_API_ROUTES } from '../shared/contracts/EditorPathContract.js';
-import { toFiniteNumber } from '../utils/MathOps.js';
 import {
     DEFAULT_FALLBACK_MIME_TYPE,
     DEFAULT_MIME_TYPE,
@@ -20,26 +19,22 @@ import {
     createDefaultRecordingCaptureSettings,
     normalizeRecordingCaptureSettings,
 } from '../shared/contracts/RecordingCaptureContract.js';
+import {
+    CAPTURE_LOAD_LEVELS,
+    computePercentile,
+    ENCODE_QUEUE_DROP_LIMIT,
+    ENCODE_QUEUE_SOFT_LIMIT,
+    MAX_CAPTURE_BACKLOG_STEPS,
+    MAX_CAPTURE_STEPS_PER_RENDER,
+    MAX_CAPTURE_TIMESTAMPS,
+    MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS,
+    MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS,
+    toPositiveInt,
+} from './recording/MediaRecorderSystemOps.js';
 const Mp4Muxer = Mp4MuxerModule;
 
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
 const WEB_CODECS_CODEC = 'avc1.4d002a';
-
-const ENCODE_QUEUE_SOFT_LIMIT = 2;
-const ENCODE_QUEUE_DROP_LIMIT = 10;
-const CAPTURE_LOAD_LEVELS = Object.freeze([
-    Object.freeze({ fpsScale: 1.0, resolutionScale: 1.0 }),
-    Object.freeze({ fpsScale: 0.95, resolutionScale: 0.9 }),
-    Object.freeze({ fpsScale: 0.9, resolutionScale: 0.78 }),
-    Object.freeze({ fpsScale: 0.8, resolutionScale: 0.65 }),
-    Object.freeze({ fpsScale: 0.7, resolutionScale: 0.5 }),
-    Object.freeze({ fpsScale: 0.6, resolutionScale: 0.42 }),
-]);
-const MAX_CAPTURE_TIMESTAMPS = 4096;
-const MAX_CAPTURE_STEPS_PER_RENDER = 1;
-const MAX_CAPTURE_BACKLOG_STEPS = 2;
-const MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS = 22;
-const MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS = 38;
 
 export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
 
@@ -55,19 +50,6 @@ function defaultDownload({ blob, fileName }) {
     anchor.click();
     anchor.remove();
     setTimeout(() => URL.revokeObjectURL(url), 0);
-}
-
-function toPositiveInt(value, fallback, min = 1, max = 1_000_000) {
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric)) return fallback;
-    return Math.max(min, Math.min(max, Math.trunc(numeric)));
-}
-
-function computePercentile(values, ratio) {
-    if (!Array.isArray(values) || values.length === 0) return 0;
-    const clamped = Math.max(0, Math.min(1, Number(ratio) || 0));
-    const index = Math.max(0, Math.min(values.length - 1, Math.ceil(values.length * clamped) - 1));
-    return toFiniteNumber(values[index], 0);
 }
 
 export class MediaRecorderSystem {
