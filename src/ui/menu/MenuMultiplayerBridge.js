@@ -12,6 +12,7 @@ import {
 } from './multiplayer/MenuMultiplayerBridgeRuntime.js';
 import { createRuntimeClock } from '../../shared/contracts/RuntimeClockContract.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
+import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
 
 export const MENU_MULTIPLAYER_EVENT_TYPES = Object.freeze({
     HOST: 'multiplayer_host',
@@ -49,11 +50,7 @@ function toTimestamp(value, fallback) {
     return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : fallback;
 }
 function deepClone(value) {
-    try {
-        return JSON.parse(JSON.stringify(value));
-    } catch {
-        return null;
-    }
+    return tryCloneJsonValue(value, null);
 }
 
 function buildRuntimeId(nowProvider, randomProvider, randomLength = 6) {

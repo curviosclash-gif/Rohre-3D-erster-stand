@@ -4,13 +4,10 @@
 
 import { MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
+import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
 
 function deepClone(value) {
-    try {
-        return JSON.parse(JSON.stringify(value));
-    } catch {
-        return null;
-    }
+    return tryCloneJsonValue(value, null);
 }
 
 function ensureMultiplayerSessionType(game) {

@@ -1,7 +1,9 @@
+import { cloneJsonValue } from '../../shared/utils/JsonClone.js';
+
 let ACTIVE_RUNTIME_CONFIG = null;
 
 function cloneValue(value) {
-    return JSON.parse(JSON.stringify(value));
+    return cloneJsonValue(value);
 }
 
 function deepFreeze(value) {

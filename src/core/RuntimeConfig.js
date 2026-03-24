@@ -15,6 +15,7 @@ import {
     createDefaultCameraPerspectiveSettings,
     normalizeCameraPerspectiveSettings,
 } from '../shared/contracts/CameraPerspectiveContract.js';
+import { cloneJsonValue } from '../shared/utils/JsonClone.js';
 
 function toNumber(value, fallback) {
     const parsed = Number(value);
@@ -22,7 +23,7 @@ function toNumber(value, fallback) {
 }
 
 function deepClone(value) {
-    return JSON.parse(JSON.stringify(value));
+    return cloneJsonValue(value);
 }
 
 function clampInteger(value, min, max, fallback) {

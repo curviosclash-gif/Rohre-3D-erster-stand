@@ -1,5 +1,7 @@
+import { cloneJsonValue } from '../../shared/utils/JsonClone.js';
+
 export function deepClone(value) {
-    return JSON.parse(JSON.stringify(value));
+    return cloneJsonValue(value);
 }
 
 export function normalizePresetId(rawValue) {
