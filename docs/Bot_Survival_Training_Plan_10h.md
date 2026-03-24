@@ -1,29 +1,30 @@
 # Bot Survival Trainingsplan (10h Folgefenster)
 
-Stand: 2026-03-23
+Stand: 2026-03-24
 
 ## Ziel
 
 - Primaeres Ziel: 10h Survival-Training als Folgefenster zu BT10 ausfuehren.
+- Fokus fuer dieses Fenster: Fight-Profil (`hunt-3d`, `hunt-2d`) priorisieren.
 - Zielmetriken:
   - `avgStepsPerEpisode` darf nicht unter BT10-Baseline (`123.799`) fallen.
   - `averageBotSurvival` muss ueber frische `bot:validate` Reports messbar sein (nicht `null` im Abschlusslauf).
   - Stabilitaet bleibt hart: `runtimeErrorCount = 0`, Gate bleibt gruen.
 
-## Startkommando (10h)
+## Startkommando (10h Fight-Profil)
 
 ```powershell
-$seriesStamp = "BT11_$(Get-Date -Format 'yyyyMMddTHHmmss')"
-npm run training:10h -- --series-stamp $seriesStamp --stop-on-fail false
+$seriesStamp = "BT11_FIGHT_$(Get-Date -Format 'yyyyMMddTHHmmss')"
+npm run training:10h -- --series-stamp $seriesStamp --stop-on-fail false --stage-timeout-ms 5400000 --episodes 8 --seeds 11,23,37,41,53 --modes hunt-3d,hunt-2d --max-steps 220 --runner-profile learn --inject-invalid-actions false --step-timeout-retries 1 --timeout-step-ms 220 --timeout-episode-ms 240000 --timeout-run-ms 1200000 --bridge-max-pending-acks 1024 --bridge-backpressure-threshold 768 --bridge-drop-training-when-backlogged true
 ```
 
-## Startkommando (Hintergrund mit Log)
+## Startkommando (Hintergrund mit Log, Fight-Profil)
 
 ```powershell
-$seriesStamp = "BT11_$(Get-Date -Format 'yyyyMMddTHHmmss')"
+$seriesStamp = "BT11_FIGHT_$(Get-Date -Format 'yyyyMMddTHHmmss')"
 $logPath = "output/training/$seriesStamp-10h.log"
 New-Item -ItemType Directory -Path output/training -Force | Out-Null
-$proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:10h -- --series-stamp $seriesStamp --stop-on-fail false > `"$logPath`" 2>&1" -WorkingDirectory "." -PassThru
+$proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:10h -- --series-stamp $seriesStamp --stop-on-fail false --stage-timeout-ms 5400000 --episodes 8 --seeds 11,23,37,41,53 --modes hunt-3d,hunt-2d --max-steps 220 --runner-profile learn --inject-invalid-actions false --step-timeout-retries 1 --timeout-step-ms 220 --timeout-episode-ms 240000 --timeout-run-ms 1200000 --bridge-max-pending-acks 1024 --bridge-backpressure-threshold 768 --bridge-drop-training-when-backlogged true > `"$logPath`" 2>&1" -WorkingDirectory "." -PassThru
 "PID=$($proc.Id) seriesStamp=$seriesStamp log=$logPath"
 ```
 

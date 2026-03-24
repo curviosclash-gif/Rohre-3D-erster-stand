@@ -137,6 +137,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 
 - [x] 11.1.1 10h-Trainingsplan mit KPI-/Checkpoint-Vorgaben anlegen (abgeschlossen: 2026-03-23; evidence: create 10h plan -> docs/Bot_Survival_Training_Plan_10h.md)
 - [x] 11.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-23; evidence: npm run training:10h -- --series-stamp BT11_20260323T013933 --stop-on-fail false -> output/training/BT11_20260323T013933-10h.log, PID 9332)
+- [x] 11.1.3 Fight-Profil fuer 10h-Lauf festlegen (`hunt-3d`,`hunt-2d`, stabile Seeds/Timeouts) (abgeschlossen: 2026-03-24; evidence: update fight profile commands -> docs/Bot_Survival_Training_Plan_10h.md)
 
 ### 11.2 Laufmonitoring im 2h-Takt
 
@@ -150,6 +151,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 | 2026-03-23 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT10 | `docs/Bot_Survival_Training_Plan_10h.md` |
 | 2026-03-23 | Laufstart | `BT11_20260323T013933` | `pending` | `pending` | `pending` | wird in 2h-Checkpoints gefuellt | `output/training/BT11_20260323T013933-10h.log` |
 | 2026-03-23 | Checkpoint C1 | `BT11_20260323T013933` | `126.444444` | `40.690933` | `0.248243` | Steps `+2.137%`, Survival `+27.524%` (vs BT10 Baseline) | `data/training/runs/BT11_20260323T013933-r2137/run.json`, `data/bot_validation_report.json`, `docs/Testergebnisse_Phase4b_2026-03-23.md`; Hinweis: forced-round-rate `100%` |
+| 2026-03-24 | Fight-Plan aktualisiert | `BT11_FIGHT_pending` | `pending` | `pending` | `pending` | hunt-only Fenster vorbereitet | `docs/Bot_Survival_Training_Plan_10h.md` |
 
 ### 11.99 Abschluss-Gate
 
