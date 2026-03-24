@@ -27,6 +27,17 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:1
 "PID=$($proc.Id) seriesStamp=$seriesStamp log=$logPath"
 ```
 
+## Aktiver Lauf (Operator-Status)
+
+- Start: `2026-03-24 15:21:03` (Europe/Berlin)
+- SeriesStamp: `BT12_20260324T152103`
+- Log: `output/training/BT12_20260324T152103-10h.log`
+- PID: `3476`
+- Warm-up Evidence: `data/training/runs/BT12_20260324T152103-r01/{run,eval,gate}.json`
+- Checkpoint Validate:
+  - `output/training/BT12_20260324T152103-botvalidate-cp01.log` -> FAIL (`phase=app:game-instance`)
+  - `output/training/BT12_20260324T152103-botvalidate-cp01-retry.log` -> FAIL (`phase=app:game-instance`)
+
 ## 10h Ablauf
 
 | Block | Stunde | Fokus | Pflicht-Checks |

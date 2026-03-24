@@ -192,7 +192,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 ### 12.1 Plan und Laufstart
 
 - [x] 12.1.1 10h-Folgeplan fuer Classic/Fight Matrix anlegen (abgeschlossen: 2026-03-24; evidence: create BT12 plan -> docs/Bot_Survival_Training_Plan_10h_BT12.md)
-- [ ] 12.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren
+- [x] 12.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-24; evidence: Start-Process `npm run training:10h -- --series-stamp BT12_20260324T152103 ...` -> `output/training/BT12_20260324T152103-10h.log`, PID `3476`)
 
 ### 12.2 Laufmonitoring im 2h-Takt
 
@@ -204,6 +204,9 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs BT11-Final | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-03-24 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT11-Final (`117.525` / `37.376986`) | `docs/Bot_Survival_Training_Plan_10h_BT12.md` |
+| 2026-03-24 | Laufstart + Warm-up | `BT12_20260324T152103` | `124.137500` | `-` | `0.000000` | Steps `+5.626%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_20260324T152103-10h.log`, `data/training/runs/BT12_20260324T152103-r01/run.json`, `data/training/runs/BT12_20260324T152103-r01/gate.json` |
+| 2026-03-24 | Checkpoint Validate fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01.log` (`phase=app:game-instance`) |
+| 2026-03-24 | Checkpoint Validate Retry fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01-retry.log` (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`) |
 
 ### 12.99 Abschluss-Gate
 
@@ -217,6 +220,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | Lauf stoppt vor 10h durch Stage-Failure | hoch | Bot-Codex | `stop-on-fail=false`, Logmonitoring und Resume ueber latest checkpoint | `loop.json` mit vorzeitigem stopReason |
 | KPI-Regression in Fight oder Classic unentdeckt | hoch | Bot-Codex | Matrix-Run (`classic-*`,`hunt-*`) + 2h Checkpoints | Delta kippt in Teilmodus trotz gruenem Gate |
 | `bot:validate` Laufzeit > global timeout | mittel | Bot-Codex | scenarioLimit `2`, `BOT_RUNNER_TOTAL_TIMEOUT=600000` fuer Abschlusslauf | Abbruch bei `total-run timeout` |
+| `bot:validate` kann `GAME_INSTANCE` waehrend aktivem Loop nicht initialisieren | hoch | Bot-Codex | Checkpoint-Validate nach Loop-Ende oder auf separatem Port (`BOT_RUNNER_PORT`) ausfuehren | Timeout in `phase=app:game-instance` trotz laufendem Dev-Server |
 
 ---
 
