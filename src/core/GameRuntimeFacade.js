@@ -5,6 +5,7 @@ import {
     MENU_CONTROLLER_EVENT_CONTRACT_VERSION,
 } from '../shared/contracts/MenuControllerContract.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
+import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
@@ -87,6 +88,11 @@ export class GameRuntimeFacade {
     constructor(deps = {}) {
         this.game = deps.game || null;
         this.ports = deps.ports || null;
+        this.runtimeClock = createRuntimeClock({
+            runtime: deps.runtimeClockRuntime || null,
+            nowMs: deps.nowMs,
+            nowHighRes: deps.nowHighRes,
+        });
         this.menuMultiplayerBridge = null;
         this._matchPrewarmTimer = null;
         this._menuEventHandlers = createMenuEventHandlerRegistry(this);
@@ -106,7 +112,7 @@ export class GameRuntimeFacade {
         this.arcadeRunRuntime = new ArcadeRunRuntime({
             settingsManager: this.game?.settingsManager || null,
             replayRecorder: this._arcadeReplayRecorder,
-            now: () => Date.now(),
+            now: this.runtimeClock.nowMs,
             logger: console,
         });
     }
