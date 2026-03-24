@@ -209,12 +209,10 @@ export class CameraRigSystem {
             return false;
         }
 
-        const slotStyle = perspectiveMode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION && !reduceMotion
-            ? SLOT_STYLE.ACTION
-            : SLOT_STYLE.CINEMATIC;
-        const timeScale = reduceMotion
-            ? 0.56
-            : (perspectiveMode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT ? 0.72 : 0.86);
+        const actionPerspective = perspectiveMode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION;
+        const slotStyle = actionPerspective ? SLOT_STYLE.ACTION : SLOT_STYLE.CINEMATIC;
+        const baseTimeScale = actionPerspective ? 0.86 : 0.72;
+        const timeScale = reduceMotion ? (baseTimeScale * 0.72) : baseTimeScale;
         const safeDt = Math.max(0, Number(dt) || 0) * timeScale;
         const playerState = cameraContext?.playerState && typeof cameraContext.playerState === 'object'
             ? cameraContext.playerState
