@@ -35,7 +35,8 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:1
 - `PID`: `2772`
 - Status beim Start: Trainer-Server auf `ws://127.0.0.1:8765` online, erster Run `BT11_FIGHT_20260324T014853-r01` gestartet.
 - Abschluss: `duration-budget-reached`, `runsExecuted=4042`, `runsFailed=0`, letzter Run `BT11_FIGHT_20260324T014853-r4042`.
-- Abschluss-Blocker: `bot:validate` liefert wegen `phase=app:game-instance` aktuell keinen gueltigen Survival-Report (Evidence: `output/training/BT11_FIGHT_20260324T014853-botvalidate-final.log`).
+- Finale Validation: `bot:validate` erfolgreich mit scenarioLimit `2` und gueltigem Survival-Report (`averageBotSurvival=37.376986`, Delta vs BT10 `+17.138%`).
+- Finale Evidence: `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`, `docs/Testergebnisse_Phase4b_2026-03-24.md`.
 
 ## 10h Ablauf in 5 Bloecken
 

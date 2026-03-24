@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-23",
+  "generatedAt": "2026-03-24",
   "baseUrl": "http://127.0.0.1:4273",
   "roundsPerScenario": 3,
   "scenarios": [
@@ -14,22 +14,22 @@
         "planarMode": false,
         "portalCount": 0,
         "rounds": 10,
-        "expectedPolicyType": "rule-based"
+        "expectedPolicyType": "classic-3d"
       },
       "metrics": {
-        "rounds": 3,
-        "botWinRate": 1,
+        "rounds": 4,
+        "botWinRate": 0.75,
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 41.00586691285813,
+        "averageBotSurvival": 37.5049740921022,
         "stuckPerMinute": 0,
-        "totalDuration": 123.01809999996422
+        "totalDuration": 151.01259999999405
       },
       "runner": {
         "forcedRounds": 3,
         "timeoutRounds": 3,
-        "elapsedMs": 128213
+        "elapsedMs": 116537
       }
     },
     {
@@ -43,7 +43,7 @@
         "planarMode": true,
         "portalCount": 0,
         "rounds": 10,
-        "expectedPolicyType": "rule-based"
+        "expectedPolicyType": "classic-2d"
       },
       "metrics": {
         "rounds": 3,
@@ -51,88 +51,30 @@
         "stuckEvents": 0,
         "wallHits": 0,
         "trailHits": 0,
-        "averageBotSurvival": 42.04199954426198,
+        "averageBotSurvival": 37.20633443196615,
         "stuckPerMinute": 0,
-        "totalDuration": 126.12610000002385
+        "totalDuration": 111.61899999999999
       },
       "runner": {
         "forcedRounds": 3,
         "timeoutRounds": 3,
-        "elapsedMs": 133553
-      }
-    },
-    {
-      "scenario": {
-        "id": "V3",
-        "mode": "1p",
-        "bots": 3,
-        "mapKey": "complex",
-        "gameMode": "HUNT",
-        "botPolicyStrategy": "auto",
-        "planarMode": true,
-        "portalCount": 4,
-        "rounds": 10,
-        "expectedPolicyType": "hunt"
-      },
-      "metrics": {
-        "rounds": 3,
-        "botWinRate": 1,
-        "stuckEvents": 0,
-        "wallHits": 0,
-        "trailHits": 0,
-        "averageBotSurvival": 42.168633778889976,
-        "stuckPerMinute": 0,
-        "totalDuration": 126.50589999997615
-      },
-      "runner": {
-        "forcedRounds": 3,
-        "timeoutRounds": 3,
-        "elapsedMs": 134794
-      }
-    },
-    {
-      "scenario": {
-        "id": "V4",
-        "mode": "2p",
-        "bots": 2,
-        "mapKey": "standard",
-        "gameMode": "HUNT",
-        "botPolicyStrategy": "auto",
-        "planarMode": false,
-        "portalCount": 6,
-        "rounds": 10,
-        "expectedPolicyType": "hunt"
-      },
-      "metrics": {
-        "rounds": 3,
-        "botWinRate": 1,
-        "stuckEvents": 0,
-        "wallHits": 0,
-        "trailHits": 0,
-        "averageBotSurvival": 37.54723358154297,
-        "stuckPerMinute": 0,
-        "totalDuration": 112.64170000004768
-      },
-      "runner": {
-        "forcedRounds": 3,
-        "timeoutRounds": 3,
-        "elapsedMs": 116756
+        "elapsedMs": 114192
       }
     }
   ],
   "overall": {
-    "rounds": 12,
-    "botWinRate": 1,
+    "rounds": 7,
+    "botWinRate": 0.8571428571428571,
     "stuckEvents": 0,
     "wallHits": 0,
     "trailHits": 0,
-    "averageBotSurvival": 40.690933454388265,
+    "averageBotSurvival": 37.37698566632961,
     "stuckPerMinute": 0,
-    "totalDuration": 488.2918000000119
+    "totalDuration": 262.6315999999941
   },
   "runner": {
-    "forcedRounds": 12,
-    "timeoutRounds": 12,
+    "forcedRounds": 6,
+    "timeoutRounds": 6,
     "failOnForcedRound": false,
     "maxForcedRounds": 9007199254740991
   }
