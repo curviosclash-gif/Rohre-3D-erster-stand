@@ -28,6 +28,13 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:1
 "PID=$($proc.Id) seriesStamp=$seriesStamp log=$logPath"
 ```
 
+## Aktiver Lauf (2026-03-24)
+
+- `seriesStamp`: `BT11_FIGHT_20260324T014853`
+- `logPath`: `output/training/BT11_FIGHT_20260324T014853-10h.log`
+- `PID`: `2772`
+- Status beim Start: Trainer-Server auf `ws://127.0.0.1:8765` online, erster Run `BT11_FIGHT_20260324T014853-r01` gestartet.
+
 ## 10h Ablauf in 5 Bloecken
 
 | Block | Stunde | Fokus | Pflicht-Checks |
