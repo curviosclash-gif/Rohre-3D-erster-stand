@@ -1,3 +1,5 @@
+import { resolveLocalStorage } from '../../shared/runtime/BrowserStoragePorts.js';
+
 function resolveQuotaExceeded(error) {
     const message = String(error?.message || '').toLowerCase();
     const name = String(error?.name || '').toLowerCase();
@@ -56,12 +58,7 @@ export class StorageDriver {
 }
 
 export function resolveDefaultStorage(runtimeGlobal = null) {
-    const scope = runtimeGlobal && typeof runtimeGlobal === 'object' ? runtimeGlobal : globalThis;
-    try {
-        return scope?.localStorage || null;
-    } catch {
-        return null;
-    }
+    return resolveLocalStorage(null, runtimeGlobal);
 }
 
 export function createDefaultStorageDriver(options = {}) {

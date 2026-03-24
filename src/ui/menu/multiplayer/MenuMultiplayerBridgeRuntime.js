@@ -1,3 +1,7 @@
+import {
+    resolveLocalStorage,
+    resolveSessionStorage,
+} from '../../../shared/runtime/BrowserStoragePorts.js';
 const DEFAULT_CHANNEL_NAME = 'cuviosclash.multiplayer.v1';
 
 export function toCallable(value, fallback = null) {
@@ -35,9 +39,13 @@ export function resolveEventTarget(candidate) {
 }
 
 export function resolveStorage(providedStorage, storageName, runtimeGlobal) {
-    if (providedStorage && typeof providedStorage.getItem === 'function') {
-        return providedStorage;
+    if (storageName === 'localStorage') {
+        return resolveLocalStorage(providedStorage, runtimeGlobal);
     }
+    if (storageName === 'sessionStorage') {
+        return resolveSessionStorage(providedStorage, runtimeGlobal);
+    }
+    if (providedStorage && typeof providedStorage.getItem === 'function') return providedStorage;
     try {
         return runtimeGlobal?.[storageName] || null;
     } catch {

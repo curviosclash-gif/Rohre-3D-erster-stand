@@ -8,6 +8,7 @@ import {
     getRuntimeMapCatalog,
     getRuntimeMapScale,
 } from '../shared/contracts/RuntimeMapCatalogContract.js';
+import { resolveLocalStorage } from '../shared/runtime/BrowserStoragePorts.js';
 import {
     resolveCustomMapSelection,
     resolveFallbackMapKey,
@@ -18,12 +19,7 @@ const LEGACY_EDITOR_PLAYTEST_SCALE = 35;
 const LEGACY_EDITOR_LARGE_DIM_THRESHOLD = 500;
 
 function getStorage(storageOverride) {
-    if (storageOverride) return storageOverride;
-    try {
-        return window.localStorage;
-    } catch {
-        return null;
-    }
+    return resolveLocalStorage(storageOverride);
 }
 
 function getRuntimeScale() {
