@@ -1,10 +1,13 @@
-import { CONFIG } from '../core/Config.js';
 import {
     CUSTOM_MAP_KEY,
     CUSTOM_MAP_STORAGE_KEY,
     parseMapJSON,
     toArenaMapDefinition,
 } from './MapSchema.js';
+import {
+    getRuntimeMapCatalog,
+    getRuntimeMapScale,
+} from '../shared/contracts/RuntimeMapCatalogContract.js';
 import {
     resolveCustomMapSelection,
     resolveFallbackMapKey,
@@ -24,9 +27,7 @@ function getStorage(storageOverride) {
 }
 
 function getRuntimeScale() {
-    const scale = Number(CONFIG?.ARENA?.MAP_SCALE);
-    if (!Number.isFinite(scale) || scale <= 0) return 1;
-    return scale;
+    return getRuntimeMapScale(1);
 }
 
 function getCustomMapConversionScale(mapDocument) {
@@ -114,13 +115,14 @@ export function loadCustomMapFromStorage(storageOverride) {
 }
 
 export function resolveArenaMapSelection(requestedMapKey, storageOverride) {
+    const maps = getRuntimeMapCatalog();
     const mapKey = String(requestedMapKey || '');
-    const fallbackMapKey = resolveFallbackMapKey(CONFIG.MAPS);
+    const fallbackMapKey = resolveFallbackMapKey(maps);
 
     if (mapKey !== CUSTOM_MAP_KEY) {
         return resolveKnownMapSelection({
             requestedMapKey: mapKey,
-            maps: CONFIG.MAPS,
+            maps,
             fallbackMapKey,
         });
     }
@@ -129,7 +131,7 @@ export function resolveArenaMapSelection(requestedMapKey, storageOverride) {
 
     const selection = resolveCustomMapSelection({
         requestedMapKey: mapKey,
-        maps: CONFIG.MAPS,
+        maps,
         fallbackMapKey,
         customResult,
     });

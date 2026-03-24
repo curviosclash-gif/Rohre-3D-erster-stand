@@ -1,4 +1,7 @@
-import { CONFIG } from '../../core/Config.js';
+import {
+    getRuntimeMapCatalog,
+    getRuntimeMapDefinition,
+} from '../../shared/contracts/RuntimeMapCatalogContract.js';
 import { resolveArenaMapSelection } from '../../entities/CustomMapLoader.js';
 import { createArenaMapFingerprint } from '../../entities/arena/ArenaBuildResourceCache.js';
 
@@ -14,10 +17,11 @@ export function resolveArenaSourceMap(mapResolution, effectiveMapKey) {
     if (mapResolution?.mapDefinition && typeof mapResolution.mapDefinition === 'object') {
         return mapResolution.mapDefinition;
     }
-    if (effectiveMapKey && CONFIG?.MAPS?.[effectiveMapKey]) {
-        return CONFIG.MAPS[effectiveMapKey];
+    const maps = getRuntimeMapCatalog();
+    if (effectiveMapKey && maps?.[effectiveMapKey]) {
+        return maps[effectiveMapKey];
     }
-    return CONFIG?.MAPS?.standard || null;
+    return getRuntimeMapDefinition('standard', maps);
 }
 
 export function buildArenaSessionKey(mapResolution, runtimeConfig, portalsEnabled) {

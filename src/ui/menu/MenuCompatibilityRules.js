@@ -1,8 +1,8 @@
-import { CONFIG } from '../../core/Config.js';
 import { GAME_MODE_TYPES } from '../../hunt/HuntMode.js';
 import { SETTINGS_CHANGE_KEYS } from '../SettingsChangeKeys.js';
 import { findFixedMenuPresetById } from './MenuPresetCatalog.js';
 import { MENU_DEVELOPER_ACCESS_MODES } from './MenuStateContracts.js';
+import { getRuntimeMapCatalog } from '../../shared/contracts/RuntimeMapCatalogContract.js';
 import {
     isMapEligibleForModePath,
     resolveModePathFallbackMapKey,
@@ -116,13 +116,14 @@ function applyMapKeyValidityGuardRule(settings, result) {
     const currentMapKey = normalizeString(settings?.mapKey);
     if (!currentMapKey) return;
     const modePath = normalizeString(settings?.localSettings?.modePath || 'normal').toLowerCase();
-    const mapDefinition = CONFIG?.MAPS?.[currentMapKey];
+    const maps = getRuntimeMapCatalog();
+    const mapDefinition = maps?.[currentMapKey];
     const mapExists = !!mapDefinition;
     const mapModeEligible = mapExists ? isMapEligibleForModePath(mapDefinition, modePath) : false;
     if (mapExists && mapModeEligible) return;
 
     const previousMapKey = settings.mapKey;
-    settings.mapKey = resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, previousMapKey);
+    settings.mapKey = resolveModePathFallbackMapKey(maps, modePath, previousMapKey);
     addChangedKey(result, SETTINGS_CHANGE_KEYS.MAP_KEY);
     trackFix(
         result,

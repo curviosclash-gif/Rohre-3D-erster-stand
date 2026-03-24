@@ -1,5 +1,5 @@
-import { CONFIG } from '../../core/Config.js';
 import { VEHICLE_DEFINITIONS } from '../../entities/vehicle-registry.js';
+import { getRuntimeMapCatalog } from '../../shared/contracts/RuntimeMapCatalogContract.js';
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -35,7 +35,8 @@ export function resolveVehicleCategory(vehicleDefinition) {
 }
 
 export function listMapPreviewEntries() {
-    return Object.entries(CONFIG?.MAPS || {}).map(([mapKey, mapDefinition]) => {
+    const maps = getRuntimeMapCatalog();
+    return Object.entries(maps).map(([mapKey, mapDefinition]) => {
         const size = Array.isArray(mapDefinition?.size) ? mapDefinition.size : [80, 30, 80];
         const obstacles = Array.isArray(mapDefinition?.obstacles) ? mapDefinition.obstacles.length : 0;
         const portals = Array.isArray(mapDefinition?.portals) ? mapDefinition.portals.length : 0;
