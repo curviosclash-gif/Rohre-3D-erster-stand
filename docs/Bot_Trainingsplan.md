@@ -143,7 +143,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 ### 11.2 Laufmonitoring im 2h-Takt
 
 - [x] 11.2.1 Alle 2h `bot:validate` ausfuehren und Report im aktiven Run-Ordner pinnen (abgeschlossen: 2026-03-23; evidence: BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 npm run bot:validate -> data/bot_validation_report.json, docs/Testergebnisse_Phase4b_2026-03-23.md)
-- [/] 11.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT10-Baseline protokollieren
+- [/] 11.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT10-Baseline protokollieren (Stand 2026-03-24: Steps dokumentiert, Survival weiter blockiert durch `bot:validate`-Boot-Timeout)
 
 ### Checkpoint-Log BT11 (laufend)
 
@@ -154,10 +154,12 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 | 2026-03-23 | Checkpoint C1 | `BT11_20260323T013933` | `126.444444` | `40.690933` | `0.248243` | Steps `+2.137%`, Survival `+27.524%` (vs BT10 Baseline) | `data/training/runs/BT11_20260323T013933-r2137/run.json`, `data/bot_validation_report.json`, `docs/Testergebnisse_Phase4b_2026-03-23.md`; Hinweis: forced-round-rate `100%` |
 | 2026-03-24 | Fight-Plan aktualisiert | `BT11_FIGHT_pending` | `pending` | `pending` | `pending` | hunt-only Fenster vorbereitet | `docs/Bot_Survival_Training_Plan_10h.md` |
 | 2026-03-24 | Fight-Laufstart | `BT11_FIGHT_20260324T014853` | `pending` | `pending` | `pending` | 10h-Operatorlauf aktiv; 2h-Checkpoints offen | `output/training/BT11_FIGHT_20260324T014853-10h.log`, PID `2772` |
+| 2026-03-24 | 10h-Loop abgeschlossen | `BT11_FIGHT_20260324T014853` | `117.525000` | `pending` | `1.000000` | Steps `-5.068%`, Survival offen (vs BT10 Baseline) | `data/training/series/BT11_FIGHT_20260324T014853/loop.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/eval.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/gate.json` |
+| 2026-03-24 | Abschlussvalidate blockiert | `BT11_FIGHT_20260324T014853` | `117.525000` | `null` | `1.000000` | `bot:validate` bricht in `app:game-instance` ab | `output/training/BT11_FIGHT_20260324T014853-botvalidate-final.log`; Hinweis: frueherer HUD-NPE gefixt via commit `40dc4ab` |
 
 ### 11.99 Abschluss-Gate
 
-- [ ] 11.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen
+- [/] 11.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen (blockiert seit 2026-03-24; evidence: `bot:validate` -> `output/training/BT11_FIGHT_20260324T014853-botvalidate-final.log` mit `phase=app:game-instance`)
 - [ ] 11.99.2 Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren
 
 ### Risiko-Register BT11
@@ -167,6 +169,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 | Lauf stoppt vor 10h durch Stage-Failure | hoch | Bot-Codex | `stop-on-fail` aus + Logmonitoring + Resume ueber latest checkpoint | `loop.json` zeigt fruehen stopReason |
 | KPI-Delta unklar ohne valide Zwischenreports | mittel | Bot-Codex | fester 2h Checkpoint-Rhythmus mit `bot:validate` | fehlendes `averageBotSurvival` im Abschluss |
 | Artefaktdrift zwischen runs/series/logs | mittel | Bot-Codex | SeriesStamp fixieren und Logpfad im Plan pinnen | mismatch zwischen `loop.json` und run stamps |
+| `bot:validate`-Boot timeout (`GAME_INSTANCE` bleibt `null`) | hoch | Bot-Codex | UI-Guard-Fix (commit `40dc4ab`) + Runtime-Boot-Debug vor erneutem Abschlusslauf | `phase=app:game-instance` in Final-Validate-Log |
 
 ---
 

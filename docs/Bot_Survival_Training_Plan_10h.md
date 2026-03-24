@@ -28,12 +28,14 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:1
 "PID=$($proc.Id) seriesStamp=$seriesStamp log=$logPath"
 ```
 
-## Aktiver Lauf (2026-03-24)
+## Laufstatus (2026-03-24)
 
 - `seriesStamp`: `BT11_FIGHT_20260324T014853`
 - `logPath`: `output/training/BT11_FIGHT_20260324T014853-10h.log`
 - `PID`: `2772`
 - Status beim Start: Trainer-Server auf `ws://127.0.0.1:8765` online, erster Run `BT11_FIGHT_20260324T014853-r01` gestartet.
+- Abschluss: `duration-budget-reached`, `runsExecuted=4042`, `runsFailed=0`, letzter Run `BT11_FIGHT_20260324T014853-r4042`.
+- Abschluss-Blocker: `bot:validate` liefert wegen `phase=app:game-instance` aktuell keinen gueltigen Survival-Report (Evidence: `output/training/BT11_FIGHT_20260324T014853-botvalidate-final.log`).
 
 ## 10h Ablauf in 5 Bloecken
 
