@@ -10,9 +10,7 @@ const uiConfigImportSources = [
     'src/ui/CrosshairSystem.js',
     'src/ui/HUD.js',
     'src/ui/HudRuntimeSystem.js',
-    'src/ui/menu/MenuCompatibilityRules.js',
     'src/ui/menu/MenuGameplayBindings.js',
-    'src/ui/menu/MenuPreviewCatalog.js',
     'src/ui/UIManager.js',
     'src/ui/UIStartSyncController.js',
 ];
@@ -31,7 +29,6 @@ const entityConfigImportSources = [
     'src/entities/arena/portal/PortalRuntimeSystem.js',
     'src/entities/arena/PortalGateMeshFactory.js',
     'src/entities/Bot.js',
-    'src/entities/CustomMapLoader.js',
     'src/entities/EntityManager.js',
     'src/entities/Particles.js',
     'src/entities/player/PlayerController.js',
@@ -69,9 +66,7 @@ const entityThreeDisposalSources = [
     'src/entities/player/PlayerView.js',
 ];
 
-const stateConfigImportSources = [
-    'src/state/match-session/MatchSessionMapOps.js',
-];
+const stateConfigImportSources = [];
 
 /** @type {[string, string][]} */
 const legacyStateToUiImportEntries = [
