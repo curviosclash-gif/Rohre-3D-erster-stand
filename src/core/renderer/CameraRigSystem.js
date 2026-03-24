@@ -195,7 +195,7 @@ export class CameraRigSystem {
         cameraContext = null,
         cockpitCamera = false,
     }) {
-        if (!camera) return;
+        if (!camera) return false;
         const settings = this.cameraPerspectiveSettings || createDefaultCameraPerspectiveSettings();
         const perspectiveMode = settings.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC;
         const reduceMotion = settings.reduceMotion === true;
@@ -206,7 +206,7 @@ export class CameraRigSystem {
             && perspectiveMode !== CAMERA_PERSPECTIVE_MODE.CLASSIC;
         if (!shouldApply) {
             this._restoreBaseFov(camera);
-            return;
+            return false;
         }
 
         const slotStyle = perspectiveMode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION && !reduceMotion
@@ -234,6 +234,7 @@ export class CameraRigSystem {
             otherPlayerPosition: reduceMotion ? null : otherPlayerPosition,
             baseFov: Number(CONFIG?.CAMERA?.FOV) || 75,
         });
+        return true;
     }
 
     setFrameTiming(timing = null) {
@@ -388,6 +389,22 @@ export class CameraRigSystem {
             target.lookAt.addScaledVector(shakeOffset, 0.35);
         }
 
+        const livePerspectiveApplied = this._applyLivePerspective({
+            playerIndex,
+            mode,
+            camera: cam,
+            fallbackTarget: target,
+            playerPosition,
+            playerDirection,
+            dt: stableDt,
+            arena,
+            cameraContext,
+            cockpitCamera,
+        });
+        if (livePerspectiveApplied) {
+            return;
+        }
+
         if (firstPersonHardLock) {
             cam.position.copy(target.position);
             cam.lookAt(target.lookAt);
@@ -406,18 +423,6 @@ export class CameraRigSystem {
         this._tmpLookAt.multiplyScalar(10).add(cam.position);
         this._tmpLookAt.lerp(target.lookAt, smoothFactor);
         cam.lookAt(this._tmpLookAt);
-        this._applyLivePerspective({
-            playerIndex,
-            mode,
-            camera: cam,
-            fallbackTarget: target,
-            playerPosition,
-            playerDirection,
-            dt: stableDt,
-            arena,
-            cameraContext,
-            cockpitCamera,
-        });
     }
 
     resetCameras() {
