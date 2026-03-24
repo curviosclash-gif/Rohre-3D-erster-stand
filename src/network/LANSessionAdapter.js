@@ -39,7 +39,6 @@ export class LANSessionAdapter extends SessionAdapterBase {
                 );
             },
         });
-        this._players = [];
         this._pollingInterval = null;
 
         this._dataChannelManager.on('message', ({ peerId, channel, data }) => {
@@ -210,6 +209,9 @@ export class LANSessionAdapter extends SessionAdapterBase {
         const message = normalizeMultiplayerSessionMessage(data);
         switch (message.type) {
         case MULTIPLAYER_MESSAGE_TYPES.INPUT:
+            if (data?.inputs?.type === 'arena_loaded') {
+                this._emit('playerLoaded', { playerId: data.playerId || peerId });
+            }
             this._emit('remoteInput', { peerId, input: data.inputs, playerId: data.playerId });
             break;
         case MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT:
@@ -265,7 +267,34 @@ export class LANSessionAdapter extends SessionAdapterBase {
     }
 
     getPlayers() {
-        return this._players;
+        const players = [];
+        const localPlayerId = String(this.localPlayerId || '').trim();
+        if (localPlayerId) {
+            players.push({
+                id: localPlayerId,
+                peerId: localPlayerId,
+                name: localPlayerId === 'host' ? 'Host' : localPlayerId,
+                isHost: this.isHost,
+                ready: this.isConnected,
+                connected: this.isConnected,
+            });
+        }
+
+        const peerIds = this._peerManager?.getAllPeerIds?.() || [];
+        for (const peerId of peerIds) {
+            const normalizedPeerId = String(peerId || '').trim();
+            if (!normalizedPeerId || normalizedPeerId === localPlayerId) continue;
+            players.push({
+                id: normalizedPeerId,
+                peerId: normalizedPeerId,
+                name: normalizedPeerId === 'host' ? 'Host' : normalizedPeerId,
+                isHost: normalizedPeerId === 'host',
+                ready: true,
+                connected: true,
+            });
+        }
+
+        return players;
     }
 
     disconnect() {

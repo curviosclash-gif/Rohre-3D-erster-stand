@@ -6,6 +6,7 @@ import { PauseOverlayController } from './PauseOverlayController.js';
 import { clearMessageStats, renderMessageStats } from './dom/MessageStatsDom.js';
 import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
 import { deriveMatchLoadingUiState } from './MatchUiStateOps.js';
+import { createPreferredMatchInputSource } from './MatchInputSourceResolver.js';
 import {
     deriveMatchStartTransition,
     deriveReturnToMenuTransition,
@@ -293,10 +294,34 @@ export class MatchFlowUiController {
         return false;
     }
 
+    _createPreferredInputSource(playerIndex, localHumanCount) {
+        return createPreferredMatchInputSource({
+            inputManager: this.game?.input,
+            playerIndex,
+            localHumanCount,
+        });
+    }
+
+    _configureInputSourcesForMatch() {
+        const game = this.game;
+        const input = game?.input;
+        if (!input?.setPlayerSource || !input?.clearPlayerSources) return;
+
+        input.clearPlayerSources();
+        const localHumanCount = Math.max(1, Number(game?.runtimeConfig?.session?.numHumans) || 1);
+        for (let playerIndex = 0; playerIndex < localHumanCount; playerIndex += 1) {
+            const source = this._createPreferredInputSource(playerIndex, localHumanCount);
+            if (source) {
+                input.setPlayerSource(playerIndex, source);
+            }
+        }
+    }
+
     _startMatchInternal() {
         const game = this.game;
         game.keyCapture = null;
         game._applySettingsToRuntime({ schedulePrewarm: false });
+        this._configureInputSourcesForMatch();
 
         const matchStartTransition = deriveMatchStartTransition({ numHumans: game.numHumans });
         this.applyLifecycleTransition(matchStartTransition);
@@ -464,6 +489,7 @@ export class MatchFlowUiController {
         game.entityManager?.clearLastRoundGhost?.();
         this.sessionOrchestrator.teardownMatchSession();
         game.runtimeFacade?._teardownSession?.();
+        game.input?.clearPlayerSources?.();
         game.hudRuntimeSystem?.clearNetworkScoreboard?.();
         this.applyMatchUiState(returnTransition.uiState);
         game._showMainNav();

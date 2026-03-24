@@ -254,15 +254,7 @@ export class InputManager {
         this._playerSources.clear();
     }
 
-    getPlayerInput(playerIndex, options = {}) {
-        // Delegate to assigned PlayerInputSource if available
-        const source = this._playerSources.get(playerIndex);
-        if (source) {
-            const polled = source.poll();
-            if (polled) return polled;
-        }
-
-        // Fallback: keyboard bindings (original behavior)
+    getKeyboardInput(playerIndex, options = {}) {
         const includeSecondaryBindings = !!options.includeSecondaryBindings && playerIndex === 0;
         const keyMap = playerIndex === 0 ? this.bindings.PLAYER_1 : this.bindings.PLAYER_2;
         const altKeyMap = includeSecondaryBindings ? this.bindings.PLAYER_2 : null;
@@ -285,6 +277,18 @@ export class InputManager {
         this._reuseInput.nextItem = this._wasActionPressed(keyMap.NEXT_ITEM, altKeyMap?.NEXT_ITEM || '');
 
         return this._reuseInput;
+    }
+
+    getPlayerInput(playerIndex, options = {}) {
+        // Delegate to assigned PlayerInputSource if available
+        const source = this._playerSources.get(playerIndex);
+        if (source) {
+            const polled = source.poll();
+            if (polled) return polled;
+        }
+
+        // Fallback: keyboard bindings (original behavior)
+        return this.getKeyboardInput(playerIndex, options);
     }
 
     dispose() {

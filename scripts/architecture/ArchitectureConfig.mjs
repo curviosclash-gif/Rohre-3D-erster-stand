@@ -74,6 +74,62 @@ const stateConfigImportSources = [
 ];
 
 /** @type {[string, string][]} */
+const legacyStateToUiImportEntries = [
+    pair(
+        createEdgeKey('src/state/MatchLifecycleStateTransitions.js', 'src/ui/MatchUiStateOps.js'),
+        'Lifecycle transitions still derive UI visibility payloads while state/ui contracts are being reduced incrementally.'
+    ),
+    pair(
+        createEdgeKey('src/state/RoundEndCoordinator.js', 'src/ui/MatchUiStateOps.js'),
+        'Round-end coordinator still reuses shared match UI state derivation helpers during the transition to dedicated ports.'
+    ),
+    pair(
+        createEdgeKey('src/state/RoundStateTickSystem.js', 'src/ui/MatchUiStateOps.js'),
+        'Round tick state still consumes shared match UI state derivation helpers until reducer ownership is finalized.'
+    ),
+];
+
+/** @type {[string, string][]} */
+const legacyUiToStateImportEntries = [
+    pair(
+        createEdgeKey('src/ui/MatchFlowUiController.js', 'src/state/MatchLifecycleSessionOrchestrator.js'),
+        'Match flow UI still orchestrates state session lifecycle while command/reducer ownership is being consolidated.'
+    ),
+    pair(
+        createEdgeKey('src/ui/MatchFlowUiController.js', 'src/state/MatchLifecycleStateTransitions.js'),
+        'Match flow UI still consumes explicit lifecycle transition builders during the ongoing state/ui split.'
+    ),
+    pair(
+        createEdgeKey('src/ui/MatchFlowUiController.js', 'src/state/RoundEndCoordinator.js'),
+        'Match flow UI still calls round-end coordinator while transition responsibilities are incrementally moved to state orchestration.'
+    ),
+    pair(
+        createEdgeKey('src/ui/PauseOverlayController.js', 'src/state/MatchLifecycleStateTransitions.js'),
+        'Pause overlay still consumes lifecycle transition builders while pause ownership is migrated to command reducers.'
+    ),
+    pair(
+        createEdgeKey('src/ui/SettingsStore.js', 'src/state/storage/StoragePlatform.js'),
+        'UI settings store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
+    ),
+    pair(
+        createEdgeKey('src/ui/menu/MenuDraftStore.js', 'src/state/storage/StoragePlatform.js'),
+        'Menu draft store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
+    ),
+    pair(
+        createEdgeKey('src/ui/menu/MenuPresetStore.js', 'src/state/storage/StoragePlatform.js'),
+        'Menu preset store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
+    ),
+    pair(
+        createEdgeKey('src/ui/menu/MenuTelemetryStore.js', 'src/state/storage/StoragePlatform.js'),
+        'Menu telemetry store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
+    ),
+    pair(
+        createEdgeKey('src/ui/menu/MenuTextOverrideStore.js', 'src/state/storage/StoragePlatform.js'),
+        'Menu text-override store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
+    ),
+];
+
+/** @type {[string, string][]} */
 const legacyCoreToUiImportEntries = [];
 
 export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([
@@ -137,6 +193,8 @@ const legacyStateToCoreImportEntries = [
 
 export const LEGACY_UI_TO_CORE_IMPORTS = new Map(legacyUiToCoreImportEntries);
 export const LEGACY_CORE_TO_UI_IMPORTS = new Map(legacyCoreToUiImportEntries);
+export const LEGACY_UI_TO_STATE_IMPORTS = new Map(legacyUiToStateImportEntries);
+export const LEGACY_STATE_TO_UI_IMPORTS = new Map(legacyStateToUiImportEntries);
 
 export const LEGACY_ENTITIES_TO_CORE_IMPORTS = new Map(legacyEntitiesToCoreImportEntries);
 export const LEGACY_STATE_TO_CORE_IMPORTS = new Map(legacyStateToCoreImportEntries);
@@ -147,6 +205,8 @@ export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     disallowedDomAccessFiles: 0,
     disallowedCoreToUiImports: 0,
     disallowedUiToCoreImports: 0,
+    disallowedUiToStateImports: 0,
+    disallowedStateToUiImports: 0,
     disallowedEntitiesToCoreImports: 0,
     disallowedStateToCoreImports: 0,
 });
@@ -156,6 +216,8 @@ export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
     domAccessFiles: LEGACY_DOM_ACCESS_ALLOWLIST.size,
     coreToUiImportEdges: LEGACY_CORE_TO_UI_IMPORTS.size,
     uiToCoreImportEdges: LEGACY_UI_TO_CORE_IMPORTS.size,
+    uiToStateImportEdges: LEGACY_UI_TO_STATE_IMPORTS.size,
+    stateToUiImportEdges: LEGACY_STATE_TO_UI_IMPORTS.size,
     entitiesToCoreImportEdges: LEGACY_ENTITIES_TO_CORE_IMPORTS.size,
     stateToCoreImportEdges: LEGACY_STATE_TO_CORE_IMPORTS.size,
 });

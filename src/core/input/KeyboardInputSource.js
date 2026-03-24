@@ -18,7 +18,7 @@ export class KeyboardInputSource extends PlayerInputSource {
 
     poll() {
         if (!this._inputManager || this.playerIndex < 0) return null;
-        return this._inputManager.getPlayerInput(this.playerIndex, {
+        return this._inputManager.getKeyboardInput(this.playerIndex, {
             includeSecondaryBindings: this._includeSecondaryBindings,
         });
     }

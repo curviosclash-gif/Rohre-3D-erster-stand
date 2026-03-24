@@ -36,6 +36,20 @@ const violations = [
             location: `${entry.from}:${entry.line}`,
             detail: `${entry.from} -> ${entry.to}`,
         })),
+    ...report.findings.uiToStateImports
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: 'ui -> state import',
+            location: `${entry.from}:${entry.line}`,
+            detail: `${entry.from} -> ${entry.to}`,
+        })),
+    ...report.findings.stateToUiImports
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: 'state -> ui import',
+            location: `${entry.from}:${entry.line}`,
+            detail: `${entry.from} -> ${entry.to}`,
+        })),
     ...report.findings.entitiesToCoreImports
         .filter((entry) => !entry.allowed)
         .map((entry) => ({
@@ -59,6 +73,8 @@ if (violations.length === 0) {
     console.log(`DOM outside src/ui disallowed files: ${report.scorecard.domAccessOutsideUi.disallowedFiles}`);
     console.log(`core -> ui disallowed imports: ${report.scorecard.coreToUiImports.disallowedEdges}`);
     console.log(`ui -> core disallowed imports: ${report.scorecard.uiToCoreImports.disallowedEdges}`);
+    console.log(`ui -> state disallowed imports: ${report.scorecard.uiToStateImports.disallowedEdges}`);
+    console.log(`state -> ui disallowed imports: ${report.scorecard.stateToUiImports.disallowedEdges}`);
     console.log(`entities -> core disallowed imports: ${report.scorecard.entitiesToCoreImports.disallowedEdges}`);
     console.log(`state -> core disallowed imports: ${report.scorecard.stateToCoreImports.disallowedEdges}`);
     process.exit(0);

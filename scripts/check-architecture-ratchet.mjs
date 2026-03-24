@@ -30,6 +30,16 @@ const checks = [
         actual: report.scorecard.uiToCoreImports.totalEdges,
     },
     {
+        key: 'uiToStateImportEdges',
+        label: 'ui -> state legacy edge budget',
+        actual: report.scorecard.uiToStateImports.totalEdges,
+    },
+    {
+        key: 'stateToUiImportEdges',
+        label: 'state -> ui legacy edge budget',
+        actual: report.scorecard.stateToUiImports.totalEdges,
+    },
+    {
         key: 'entitiesToCoreImportEdges',
         label: 'entities -> core legacy edge budget',
         actual: report.scorecard.entitiesToCoreImports.totalEdges,

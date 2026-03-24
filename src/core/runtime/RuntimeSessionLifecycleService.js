@@ -80,24 +80,71 @@ export function setupRuntimeClientStateReceiver(facade) {
 export async function waitForRuntimePlayersLoaded(facade) {
     if (!facade?.session || facade.session instanceof LocalSessionAdapter) return;
 
-    const players = facade.session.getPlayers();
-    if (!players || players.length <= 1) return;
+    const players = Array.isArray(facade.session.getPlayers?.()) ? facade.session.getPlayers() : [];
+    if (players.length <= 1) return;
+
+    const localPlayerId = String(facade.session.localPlayerId || '').trim();
+    if (localPlayerId) {
+        facade._arenaLoadedPeers.add(localPlayerId);
+    }
+
+    if (!facade.session.isHost) {
+        facade.session.sendInput({ type: 'arena_loaded', playerId: localPlayerId });
+        return;
+    }
+
+    const expectedPeerIds = new Set(
+        players
+            .map((player) => String(player?.peerId || player?.id || '').trim())
+            .filter(Boolean)
+    );
+    if (localPlayerId) {
+        expectedPeerIds.add(localPlayerId);
+    }
 
     return new Promise((resolve) => {
-        // Mark self as loaded
-        facade._arenaLoadedPeers.add(facade.session.localPlayerId);
-        facade.session.sendInput({ type: 'arena_loaded', playerId: facade.session.localPlayerId });
+        let completed = false;
+        let timeoutId = null;
+
+        const finish = () => {
+            if (completed) return;
+            completed = true;
+            if (timeoutId) {
+                clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            if (facade._onPlayerLoadedHandler && facade.session) {
+                facade.session.off('playerLoaded', facade._onPlayerLoadedHandler);
+                facade._onPlayerLoadedHandler = null;
+            }
+            resolve();
+        };
+
+        const hasAllPlayersLoaded = () => {
+            for (const peerId of expectedPeerIds.values()) {
+                if (!facade._arenaLoadedPeers.has(peerId)) return false;
+            }
+            return true;
+        };
 
         facade._onPlayerLoadedHandler = (data) => {
-            if (data?.playerId) facade._arenaLoadedPeers.add(data.playerId);
-            if (facade._arenaLoadedPeers.size >= players.length) {
-                resolve();
+            const playerId = String(data?.playerId || '').trim();
+            if (playerId) {
+                facade._arenaLoadedPeers.add(playerId);
+            }
+            if (hasAllPlayersLoaded()) {
+                finish();
             }
         };
         facade.session.on('playerLoaded', facade._onPlayerLoadedHandler);
 
+        if (hasAllPlayersLoaded()) {
+            finish();
+            return;
+        }
+
         // Safety timeout: don't block forever
-        setTimeout(() => resolve(), 10000);
+        timeoutId = setTimeout(() => finish(), 10000);
     });
 }
 

@@ -29,6 +29,16 @@ const checks = [
         max: report.budgets.uiToCoreImportEdges,
     },
     {
+        label: 'ui -> state legacy edge budget',
+        actual: report.scorecard.uiToStateImports.totalEdges,
+        max: report.budgets.uiToStateImportEdges,
+    },
+    {
+        label: 'state -> ui legacy edge budget',
+        actual: report.scorecard.stateToUiImports.totalEdges,
+        max: report.budgets.stateToUiImportEdges,
+    },
+    {
         label: 'entities -> core legacy edge budget',
         actual: report.scorecard.entitiesToCoreImports.totalEdges,
         max: report.budgets.entitiesToCoreImportEdges,
