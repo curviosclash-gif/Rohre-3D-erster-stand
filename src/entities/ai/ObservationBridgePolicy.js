@@ -8,85 +8,17 @@ import { buildTrainerRuntimeObservationPayload } from './training/TrainerPayload
 import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
 import { LocalDqnInference } from './inference/LocalDqnInference.js';
 import { createCheckpointActionVocabulary } from './inference/CheckpointActionVocabulary.js';
+import {
+    createRuntimeContextFromLegacyArgs,
+    hasSteeringIntent,
+    initializeTrainerCheckpointResume,
+    isRuntimeContextPayload,
+    resolveLocalInferenceAction,
+    resolveTrainerBridgeOptions,
+} from './ObservationBridgePolicyHelpers.js';
 
 const WARNING_COOLDOWN_BASE_MS = 2000;
 const WARNING_COOLDOWN_MAX_MS = 30000;
-
-function isRuntimeContextPayload(value) {
-    return !!(
-        value
-        && typeof value === 'object'
-        && ('arena' in value || 'players' in value || 'projectiles' in value || 'observation' in value)
-    );
-}
-
-function createRuntimeContextFromLegacyArgs(player, arena, allPlayers, projectiles, dt) {
-    return {
-        dt: Number.isFinite(dt) ? dt : 0,
-        player: player || null,
-        arena: arena || null,
-        players: Array.isArray(allPlayers) ? allPlayers : [],
-        projectiles: Array.isArray(projectiles) ? projectiles : [],
-        observation: null,
-    };
-}
-
-function resolveTrainerBridgeOptions(options = {}) {
-    const runtimeBotConfig = options?.runtimeConfig?.bot || null;
-    const trainerConfig = options?.trainerBridge && typeof options.trainerBridge === 'object'
-        ? options.trainerBridge
-        : null;
-    const enabled = !!(
-        options?.trainerBridgeEnabled
-        ?? trainerConfig?.enabled
-        ?? runtimeBotConfig?.trainerBridgeEnabled
-        ?? false
-    );
-    return {
-        enabled,
-        url: trainerConfig?.url || options?.trainerBridgeUrl || runtimeBotConfig?.trainerBridgeUrl || 'ws://127.0.0.1:8765',
-        timeoutMs: trainerConfig?.timeoutMs || options?.trainerBridgeTimeoutMs || runtimeBotConfig?.trainerBridgeTimeoutMs || 80,
-        maxRetries: trainerConfig?.maxRetries
-            ?? options?.trainerBridgeMaxRetries
-            ?? runtimeBotConfig?.trainerBridgeMaxRetries
-            ?? 1,
-        retryDelayMs: trainerConfig?.retryDelayMs
-            ?? options?.trainerBridgeRetryDelayMs
-            ?? runtimeBotConfig?.trainerBridgeRetryDelayMs
-            ?? 0,
-        resumeCheckpoint: trainerConfig?.resumeCheckpoint
-            ?? options?.trainerCheckpointResumeToken
-            ?? runtimeBotConfig?.trainerCheckpointResumeToken
-            ?? '',
-        resumeStrict: trainerConfig?.resumeStrict
-            ?? options?.trainerCheckpointResumeStrict
-            ?? runtimeBotConfig?.trainerCheckpointResumeStrict
-            ?? false,
-    };
-}
-
-function hasSteeringIntent(action = null) {
-    if (!action || typeof action !== 'object') return false;
-    return !!(
-        action.yawLeft
-        || action.yawRight
-        || action.pitchUp
-        || action.pitchDown
-        || action.rollLeft
-        || action.rollRight
-    );
-}
-
-function isPassiveForwardIntent(action = null) {
-    if (!action || typeof action !== 'object') return true;
-    if (hasSteeringIntent(action)) return false;
-    const hasCombatIntent = action.shootMG === true
-        || action.shootItem === true
-        || action.dropItem === true
-        || action.nextItem === true
-        || (Number.isInteger(action.useItem) && action.useItem >= 0);
-    return !hasCombatIntent;
-}
 
 export class ObservationBridgePolicy {
     constructor(options = {}) {
@@ -167,76 +99,7 @@ export class ObservationBridgePolicy {
     }
 
     async _initializeTrainerCheckpointResume(resumeToken, trainerBridgeOptions) {
-        if (!this._trainerBridge) return;
-        const resumeStrict = trainerBridgeOptions?.resumeStrict === true;
-        const commandTimeoutMs = Math.max(
-            40,
-            Number(trainerBridgeOptions?.timeoutMs || 80) * 4
-        );
-        try {
-            if (typeof this._trainerBridge.waitForReady === 'function') {
-                const ready = await this._trainerBridge.waitForReady(commandTimeoutMs);
-                if (!ready) {
-                    if (resumeStrict) {
-                        this._setTrainerBridgeInitState({
-                            status: 'failed',
-                            resumeRequested: true,
-                            resumeToken,
-                            loaded: false,
-                            error: 'ready-timeout',
-                        });
-                        return;
-                    }
-                    this._setTrainerBridgeInitState({
-                        status: 'ready',
-                        resumeRequested: true,
-                        resumeToken,
-                        loaded: false,
-                        error: 'ready-timeout',
-                    });
-                    return;
-                }
-            }
-
-            const payload = {
-                strict: resumeStrict,
-            };
-            let requestType = 'trainer-checkpoint-load-latest';
-            if (resumeToken.toLowerCase() !== 'latest') {
-                payload.checkpointPath = resumeToken;
-            }
-            const response = await this._trainerBridge.submitCommand(requestType, payload, {
-                timeoutMs: commandTimeoutMs,
-            });
-            const loaded = response?.ok === true && response?.loaded === true;
-            if (!loaded && resumeStrict) {
-                this._setTrainerBridgeInitState({
-                    status: 'failed',
-                    resumeRequested: true,
-                    resumeToken,
-                    loaded: false,
-                    error: response?.error || 'checkpoint-load-failed',
-                    resumeSource: response?.resumeSource || null,
-                });
-                return;
-            }
-            this._setTrainerBridgeInitState({
-                status: 'ready',
-                resumeRequested: true,
-                resumeToken,
-                loaded,
-                error: loaded ? null : (response?.error || 'checkpoint-load-failed'),
-                resumeSource: response?.resumeSource || null,
-            });
-        } catch (error) {
-            this._setTrainerBridgeInitState({
-                status: resumeStrict ? 'failed' : 'ready',
-                resumeRequested: true,
-                resumeToken,
-                loaded: false,
-                error: error?.message || 'checkpoint-load-exception',
-            });
-        }
+        return initializeTrainerCheckpointResume(this, resumeToken, trainerBridgeOptions);
     }
 
     _warn(message, error = null, key = null) {
@@ -408,55 +271,7 @@ export class ObservationBridgePolicy {
     }
 
     _resolveLocalInferenceAction(runtimeContext) {
-        if (!this._localInference || !this._localInference.loaded) {
-            return null;
-        }
-        const observation = runtimeContext?.observation;
-        if (!Array.isArray(observation)) return null;
-        if (this._localInferenceVocabulary && typeof this._localInferenceVocabulary.decode === 'function') {
-            const decodeContext = {
-                planarMode: runtimeContext?.rules?.planarMode,
-                domainId: runtimeContext?.rules?.domainId,
-            };
-
-            const qValues = typeof this._localInference.predict === 'function'
-                ? this._localInference.predict(observation)
-                : null;
-
-            if (Array.isArray(qValues) && qValues.length > 0) {
-                const rankedIndices = qValues
-                    .map((value, index) => ({
-                        index,
-                        qValue: Number.isFinite(Number(value)) ? Number(value) : Number.NEGATIVE_INFINITY,
-                    }))
-                    .sort((left, right) => right.qValue - left.qValue)
-                    .map((entry) => entry.index);
-
-                if (rankedIndices.length > 0) {
-                    const primaryAction = this._localInferenceVocabulary.decode(rankedIndices[0], decodeContext);
-                    if (!isPassiveForwardIntent(primaryAction)) {
-                        return primaryAction;
-                    }
-
-                    for (let i = 1; i < rankedIndices.length; i += 1) {
-                        const candidateAction = this._localInferenceVocabulary.decode(rankedIndices[i], decodeContext);
-                        if (!hasSteeringIntent(candidateAction)) continue;
-                        this._warn(
-                            'local inference selected passive forward action; using next best steering action',
-                            null,
-                            'local-steering-rank-assist',
-                        );
-                        return candidateAction;
-                    }
-
-                    return primaryAction;
-                }
-            }
-
-            const { actionIndex } = this._localInference.selectBestAction(observation);
-            return this._localInferenceVocabulary.decode(actionIndex, decodeContext);
-        }
-        return null;
+        return resolveLocalInferenceAction(this, runtimeContext);
     }
 
     _resolveTrainerBridgeAction(runtimeContext, player) {
