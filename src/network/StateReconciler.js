@@ -1,6 +1,7 @@
 // ============================================
 // StateReconciler.js - client-side state correction
 // ============================================
+import { normalizeMultiplayerStateUpdateEvent } from '../shared/contracts/MultiplayerSessionContract.js';
 
 /**
  * Compares local predicted state with authoritative host state.
@@ -12,17 +13,17 @@ export class StateReconciler {
     constructor(options = {}) {
         this._correctionRate = options.correctionRate || 0.3;
         this._snapThreshold = options.snapThreshold || 5.0;
-        this._lastServerState = null;
+        this._lastStateUpdate = null;
     }
 
     receiveServerState(serverState) {
-        this._lastServerState = serverState;
+        this._lastStateUpdate = normalizeMultiplayerStateUpdateEvent(serverState);
     }
 
     reconcile(localPlayers, entityManager) {
-        if (!this._lastServerState || !localPlayers) return;
+        if (!this._lastStateUpdate || !localPlayers) return;
 
-        const serverPlayers = this._lastServerState.players;
+        const serverPlayers = this._lastStateUpdate?.state?.players;
         if (!serverPlayers) return;
 
         for (const serverPlayer of serverPlayers) {
@@ -60,6 +61,6 @@ export class StateReconciler {
     }
 
     reset() {
-        this._lastServerState = null;
+        this._lastStateUpdate = null;
     }
 }

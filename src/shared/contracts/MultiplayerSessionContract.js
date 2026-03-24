@@ -1,4 +1,5 @@
 export const MULTIPLAYER_SESSION_CONTRACT_VERSION = 'multiplayer-session.v2';
+export const MULTIPLAYER_STATE_UPDATE_EVENT_SCHEMA_VERSION = 'multiplayer-state-update-event.v1';
 
 export const MULTIPLAYER_MESSAGE_TYPES = Object.freeze({
     JOIN: 'join',
@@ -49,4 +50,53 @@ export function normalizeMultiplayerSessionMessage(rawMessage, fallbackType = ''
         type,
         payload: source,
     };
+}
+
+function resolveStateUpdateMessageType(source, fallbackType = MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT) {
+    const normalizedFallbackType = normalizeType(fallbackType, MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT);
+    const normalizedType = normalizeType(source?.messageType || source?.type, normalizedFallbackType);
+    return isMultiplayerMessageType(normalizedType)
+        ? normalizedType
+        : MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT;
+}
+
+export function buildMultiplayerStateUpdateEvent(rawState, options = {}) {
+    const state = rawState && typeof rawState === 'object' ? rawState : {};
+    const messageType = resolveStateUpdateMessageType(state, options?.messageType);
+    const contractVersion = typeof state.contractVersion === 'string'
+        ? state.contractVersion
+        : MULTIPLAYER_SESSION_CONTRACT_VERSION;
+    return {
+        schemaVersion: MULTIPLAYER_STATE_UPDATE_EVENT_SCHEMA_VERSION,
+        contractVersion,
+        messageType,
+        state,
+    };
+}
+
+export function normalizeMultiplayerStateUpdateEvent(rawEvent) {
+    const source = rawEvent && typeof rawEvent === 'object' ? rawEvent : {};
+    const state = source.state && typeof source.state === 'object'
+        ? source.state
+        : source;
+    const normalized = buildMultiplayerStateUpdateEvent(state, {
+        messageType: source.messageType || source.type || state?.type,
+    });
+    if (typeof source.schemaVersion === 'string') {
+        const schemaVersion = source.schemaVersion.trim();
+        if (schemaVersion) {
+            normalized.schemaVersion = schemaVersion;
+        }
+    }
+    if (typeof source.contractVersion === 'string') {
+        const contractVersion = source.contractVersion.trim();
+        if (contractVersion) {
+            normalized.contractVersion = contractVersion;
+        }
+    }
+    if (typeof source.messageType === 'string') {
+        const messageType = resolveStateUpdateMessageType({ messageType: source.messageType }, normalized.messageType);
+        normalized.messageType = messageType;
+    }
+    return normalized;
 }

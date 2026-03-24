@@ -7,6 +7,7 @@ import { PeerConnectionManager } from './PeerConnectionManager.js';
 import { DataChannelManager } from './DataChannelManager.js';
 import { LatencyMonitor } from './LatencyMonitor.js';
 import {
+    buildMultiplayerStateUpdateEvent,
     MULTIPLAYER_MESSAGE_TYPES,
     normalizeMultiplayerSessionMessage,
 } from '../shared/contracts/MultiplayerSessionContract.js';
@@ -212,7 +213,9 @@ export class LANSessionAdapter extends SessionAdapterBase {
             this._emit('remoteInput', { peerId, input: data.inputs, playerId: data.playerId });
             break;
         case MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT:
-            this._emit('stateUpdate', { state: data });
+            this._emit('stateUpdate', buildMultiplayerStateUpdateEvent(data, {
+                messageType: MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT,
+            }));
             break;
         case MULTIPLAYER_MESSAGE_TYPES.FULL_STATE_SYNC:
             this._emit('fullStateSync', { state: data });
