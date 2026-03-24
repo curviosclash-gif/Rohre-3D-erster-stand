@@ -37,6 +37,7 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:1
 - Checkpoint Validate:
   - `output/training/BT12_20260324T152103-botvalidate-cp01.log` -> FAIL (`phase=app:game-instance`)
   - `output/training/BT12_20260324T152103-botvalidate-cp01-retry.log` -> FAIL (`phase=app:game-instance`)
+  - `output/training/BT12_20260324T152103-botvalidate-cp02-port4275.log` -> FAIL (`BOT_RUNNER_PORT=4275`, `phase=app:game-instance`)
 
 ## 10h Ablauf
 
