@@ -1,76 +1,84 @@
 # Feature: SettingsManager Decomposition und Settings-Domain-Entkopplung (V53)
 
-Stand: 2026-03-23  
-Status: Geplant  
+Stand: 2026-03-24  
+Status: Abgeschlossen  
 Owner: Codex
 
 ## Ziel
 
-`src/core/SettingsManager.js` ist aktuell ein Sammelpunkt fuer mehrere Domains (Sanitizing, Session-Drafts, Presets, Developer-Mode, Text-Overrides, Telemetrie, Runtime-Config).  
-Ziel ist eine klare Zerlegung in kleinere, testbare Module mit stabiler oeffentlicher API fuer bestehende Call-Sites.
+`src/core/SettingsManager.js` wurde von monolithischer Logik auf eine schlanke Orchestrator-Fassade umgestellt.  
+Domain-Logik liegt jetzt in dedizierten Modulen unter `src/core/settings/**` bei unveraenderter oeffentlicher API.
 
-## Betroffene Dateien (geplant)
+## Betroffene Dateien (ist)
 
 - `src/core/SettingsManager.js`
-- `src/core/settings/**` (neu/erweitert)
-- `src/core/runtime/MenuRuntimeSessionService.js`
-- `src/core/runtime/MenuRuntimePresetConfigService.js`
-- `src/core/runtime/MenuRuntimeDeveloperModeService.js`
+- `src/core/settings/SettingsDefaultsFacade.js`
+- `src/core/settings/SettingsSanitizerOps.js`
+- `src/core/settings/SettingsSessionDraftFacade.js`
+- `src/core/settings/SettingsPresetFacade.js`
+- `src/core/settings/SettingsDeveloperFacade.js`
+- `src/core/settings/SettingsTextOverrideFacade.js`
+- `src/core/settings/SettingsTelemetryFacade.js`
+- `src/core/settings/SettingsDomainUtils.js`
 - `src/core/GameRuntimeFacade.js`
-- `src/ui/KeybindEditorController.js` (nur falls Exportpfad angepasst wird)
 - `tests/core.spec.js`
-- `docs/Umsetzungsplan.md`
 
-## Architektur-Check
+## API-Inventar (53.1.1)
 
-- Reuse vor Neubau: bestehende Store-Ports (`SettingsStore`, `MenuPresetStore`, `MenuDraftStore`, `MenuTelemetryStore`, `MenuTextOverrideStore`) bleiben erhalten.
-- `SettingsManager` wird auf Facade/Orchestrator reduziert; Domain-Logik wandert in `src/core/settings/**`.
-- Keine Verhaltensaenderung an Runtime-Contracts ohne passende Regressionstests.
+Stabile `SettingsManager`-Fassade und aktive Call-Sites:
 
-Risiko-Einstufung: **mittel-hoch**  
-Grund: zentrale Klasse fuer Start-/Menu-/Persistenzpfade, hohe Regressionsempfindlichkeit.
+- `switchSessionType`, `applyMenuPreset`, `createDefaultSettings`: `src/core/runtime/MenuRuntimeSessionService.js`
+- `applyMenuPreset`, `saveMenuPreset`, `deleteMenuPreset`: `src/core/runtime/MenuRuntimePresetConfigService.js`
+- `setDeveloperMode`, `setDeveloperTheme`, `setDeveloperVisibility`, `setMenuTextOverride`: `src/core/runtime/MenuRuntimeDeveloperModeService.js`
+- `recordMenuTelemetry`, `applyMenuCompatibilityRules`, `createRuntimeConfig`, `cloneDefaultControls`: `src/core/GameRuntimeFacade.js`
+- `saveSessionDraft`, `applySessionDraft`, `sanitizeSettings`: `tests/core.spec.js` (Characterization)
 
-## Evidence-Format
+Evidence: `rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js`
 
-Abgeschlossene Punkte werden in Masterplan/Feature-Plan so dokumentiert:  
-`(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
+## Characterization-Baseline (53.1.2)
+
+Kritische Flows sind durch bestehende + ergaenzte `test:core`-Faelle abgedeckt:
+
+- `sanitizeSettings`: `T20o1`
+- Session-Switch und Session-Drafts: `T20o`
+- Preset-Apply/Save-Contracts: `T20e`, `T20f`, `T20bb`, `T20bc`
+- Telemetry/History/UI: `T20ke`, `T20t`
+- Fight-Tuning Runtime-Apply: `T20x0`
+
+Evidence: `TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2`
 
 ## Phasenplan
 
-- [ ] 53.1 Scope-Baseline und API-Inventar
-  - [ ] 53.1.1 Oeffentliche `SettingsManager`-Methoden inkl. Aufrufer (`src/core/runtime/**`, `GameRuntimeFacade`) inventarisieren und als stabile Facade-API festschreiben
-  - [ ] 53.1.2 Characterization-Baseline fuer kritische Flows (`sanitizeSettings`, Session-Switch, Preset-Apply/Save, Telemetry) mit bestehenden Tests referenzieren
+- [x] 53.1 Scope-Baseline und API-Inventar (abgeschlossen: 2026-03-24; evidence: rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js -> docs/Feature_SettingsManager_Decomposition_V53.md)
+  - [x] 53.1.1 Oeffentliche `SettingsManager`-Methoden inkl. Aufrufer inventarisiert und Facade-Vertrag fixiert (abgeschlossen: 2026-03-24; evidence: rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js -> docs/Feature_SettingsManager_Decomposition_V53.md)
+  - [x] 53.1.2 Characterization-Baseline fuer kritische Flows dokumentiert (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
 
-- [ ] 53.2 Settings-Normalisierung zerlegen
-  - [ ] 53.2.1 `sanitizeSettings` in dedizierte Ops/Funktionen splitten (`session`, `gameplay`, `botBridge`, `controls`, `menuContracts`) und in `src/core/settings/**` auslagern
-  - [ ] 53.2.2 Migrations- und Clamp-Regeln unveraendert absichern (insb. `settingsVersion`, Hunt-Respawn, `modePath`, Recording-Normalisierung)
+- [x] 53.2 Settings-Normalisierung zerlegen (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.2.1 `sanitizeSettings` in dedizierte Ops/Funktionen entlang Domain-Grenzen ausgelagert (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.2.2 Migrations-/Clamp-/Kompatibilitaetsregeln unveraendert abgesichert (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5302 PW_RUN_TAG=botFv53d PW_OUTPUT_DIR=test-results/botFv53d npm run test:core -- --grep "T20o1" -> test-results/botFv53d)
 
-- [ ] 53.3 Preset- und Session-Draft-Domain trennen
-  - [ ] 53.3.1 Session-Draft-Logik (`saveSessionDraft`, `applySessionDraft`, `switchSessionType`) als eigene Domain-Service-Schicht kapseln
-  - [ ] 53.3.2 Preset-Operationen (`applyMenuPreset`, `saveMenuPreset`, `deleteMenuPreset`) in klar getrennte Operations mit einheitlichem Result-Contract ueberfuehren
+- [x] 53.3 Preset- und Session-Draft-Domain trennen (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.3.1 Session-Draft-Flow als eigene Service-Schicht gekapselt (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.3.2 Preset-Flow auf getrennte Ops mit stabilem Result-Contract migriert (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
 
-- [ ] 53.4 Developer/Text/Telemetry-Domain extrahieren
-  - [ ] 53.4.1 Developer-Aktionen (Mode/Theme/Actor/Visibility/Lock/ReleasePreview) in dedizierte Facade auslagern und Side-Effects begrenzen
-  - [ ] 53.4.2 Text-Override- und Telemetry-History-Pfade (`setMenuTextOverride`, `recordMenuTelemetry`, Summary) in eigene Services auslagern
+- [x] 53.4 Developer/Text/Telemetry-Domain extrahieren (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.4.1 Developer-Aktionen in dedizierte Facade ausgelagert (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.4.2 Text-Override- und Telemetry-History-Pfade als eigene Services ausgefuehrt (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
 
-- [ ] 53.5 Orchestrator-Manager finalisieren
-  - [ ] 53.5.1 `SettingsManager` auf schlanke Komposition/Fassade reduzieren (Store-Wiring + Domain-Aufrufe + Runtime-Config)
-  - [ ] 53.5.2 Exporte/Imports fuer Call-Sites stabilisieren, Legacy-Helfer entfernen und Import-Grenzen dokumentieren
+- [x] 53.5 Orchestrator-Manager finalisieren (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.5.1 `SettingsManager` auf Store-Wiring + Domain-Orchestrierung + Runtime-Config reduziert (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
+  - [x] 53.5.2 Imports/Exporte fuer Call-Sites stabilisiert, Legacy-Helfer entfernt (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
 
-- [ ] 53.6 Verifikation und Guard-Haertung
-  - [ ] 53.6.1 Relevante `test:core`-Faelle fuer Settings/Menu/Session/Preset/Telemetry erweitern bzw. nachziehen
-  - [ ] 53.6.2 Architektur-/Boundary-Checks (`architecture:guard`) gegen neue Kanten validieren und Ratchet-Verstoesse beheben
+- [x] 53.6 Verifikation und Guard-Haertung (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
+  - [x] 53.6.1 `test:core` fuer Settings/Menu/Session/Preset/Telemetry-Flows erweitert/nachgezogen (`T20o1`) (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
+  - [x] 53.6.2 `architecture:guard` gegen neue Grenzen gefahren (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard -> 0f04006)
 
-- [ ] 53.99 Integrations- und Abschluss-Gate
-  - [ ] 53.99.1 `npm run test:core`, `npm run architecture:guard`, `npm run build` sind fuer den Scope gruen
-  - [ ] 53.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Conflict-/Lock-Abgleich sind abgeschlossen
+- [x] 53.99 Integrations- und Abschluss-Gate (abgeschlossen: 2026-03-24; evidence: npm run build -> 0f04006)
+  - [x] 53.99.1 `npm run test:core`, `npm run architecture:guard`, `npm run build` sind fuer den Scope gruen (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
+  - [x] 53.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` abgeschlossen (abgeschlossen: 2026-03-24; evidence: npm run docs:check -> docs/Dokumentationsstatus.md)
 
 ## Verifikationsstrategie (DoD-fokussiert)
 
-- API-stabil: bestehende Call-Sites nutzen unveraenderte oder sauber migrierte Entry-Points.
-- Verhaltensstabil: identische Ergebnisse fuer Sanitizing, Presets, Session-Typ-Wechsel und Telemetrie.
-- Wartbarer: deutlich kleinere Domain-Module statt monolithischer Klasse.
-
-## Frische-Hinweis
-
-Vor Abschluss der Umsetzung immer: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
+- API-stabil: bestehende Runtime/Menu-Call-Sites nutzen unveraenderte Entry-Points.
+- Verhaltensstabil: Sanitizing-, Preset-, Session- und Telemetry-Pfade bleiben regressionsabgesichert.
+- Wartbarer: klar getrennte Domain-Module statt monolithischer Klasse.
