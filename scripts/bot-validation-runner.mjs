@@ -703,7 +703,7 @@ async function run() {
             }
         );
 
-        const scenarios = await evaluatePhase(
+        const scenarioMatrix = await evaluatePhase(
             page,
             'setup:get-scenarios',
             resolveTimeout(EVAL_TIMEOUT_MS, 'setup:get-scenarios', [runDeadline]),
@@ -713,10 +713,16 @@ async function run() {
                 return g.getBotValidationMatrix();
             }
         );
-        if (!Array.isArray(scenarios) || scenarios.length === 0) {
+        if (!Array.isArray(scenarioMatrix) || scenarioMatrix.length === 0) {
             throw new Error('No bot validation scenarios available');
         }
-        log('Loaded validation matrix', { scenarios: scenarios.length });
+        const scenarioLimit = Math.max(1, DEFAULT_SCENARIO_COUNT);
+        const scenarios = scenarioMatrix.slice(0, scenarioLimit);
+        log('Loaded validation matrix', {
+            availableScenarios: scenarioMatrix.length,
+            selectedScenarios: scenarios.length,
+            scenarioLimit,
+        });
 
         const scenarioResults = [];
         const runnerStats = {
