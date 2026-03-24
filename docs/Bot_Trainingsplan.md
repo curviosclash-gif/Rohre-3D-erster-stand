@@ -38,6 +38,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | --- | --- | --- | --- | --- |
 | BT10 | - | soft | ja | Operatorlauf kann isoliert laufen |
 | BT11 | BT10 Baseline-Laufdaten | soft | ja | Folgefenster fuer 10h-Operatorlauf |
+| BT12 | BT11 Abschlussartefakte | soft | ja | weiteres 10h-Folgefenster fuer Bot-Stabilisierung |
 | BT15 | BT10 Baseline-Laufdaten | soft | ja | Zukunftsplanung nutzt aktuelle Lauf-KPIs |
 | BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | teilweise | BT10 in Arbeit, BT15 aktiv |
 | BT30 | 20.9 | hard | nein | startet erst nach Survival-Policy-Phase |
@@ -51,7 +52,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | `src/entities/ai/training/**`, `trainer/**` | BT20-BT30 | offen | Runner/Bridge/Trainer-Verhalten |
 | `src/state/training/**` | BT20-BT40 | offen | Gate-, KPI- und Reward-Logik |
 | `tests/trainer-*.mjs`, `tests/training-*.mjs` | BT10-BT40 | shared | Nur trainingsnahe Tests |
-| `docs/Bot_Trainingsplan.md`, `docs/Bot_Survival_Training_Plan_12h.md`, `docs/Bot_Survival_Training_Plan_10h.md` | BT10-BT40 | shared | Masterplan + Detailplan |
+| `docs/Bot_Trainingsplan.md`, `docs/Bot_Survival_Training_Plan_12h.md`, `docs/Bot_Survival_Training_Plan_10h.md`, `docs/Bot_Survival_Training_Plan_10h_BT12.md` | BT10-BT40 | shared | Masterplan + Detailplan |
 | `data/training/**`, `output/training/**` | BT10 | shared | Laufartefakte, Logs, Serien |
 
 ## Lock-Status
@@ -60,6 +61,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | --- | --- | --- | --- | --- |
 | Train-Ops | BT10 | 2026-03-22 | active | 2026-03-22 |
 | Bot-Codex | BT11 | 2026-03-23 | frei | 2026-03-24 (abgeschlossen) |
+| Bot-Codex | BT12 | 2026-03-24 | active | 2026-03-25 |
 | Train-Ops | BT15 | 2026-03-22 | active | 2026-03-24 |
 | Bot-A | BT20 | 2026-03-22 | frei | - |
 | Bot-B | BT30 | 2026-03-22 | frei | - |
@@ -171,6 +173,50 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 | KPI-Delta unklar ohne valide Zwischenreports | mittel | Bot-Codex | fester 2h Checkpoint-Rhythmus mit `bot:validate` | fehlendes `averageBotSurvival` im Abschluss |
 | Artefaktdrift zwischen runs/series/logs | mittel | Bot-Codex | SeriesStamp fixieren und Logpfad im Plan pinnen | mismatch zwischen `loop.json` und run stamps |
 | `bot:validate`-Boot timeout (`GAME_INSTANCE` bleibt `null`) | mittel | Bot-Codex | Runtime fallback ueber statischen Localhost-Server + Szenario-Limit-Fix (`8ef8b75`) fuer stabilen Abschlusslauf | erneuter Timeout bei Final-Validate trotz Fallback |
+
+---
+
+## Block BT12: 10h Bot Folgefenster (Classic + Fight Matrix)
+
+Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
+
+<!-- LOCK: Bot-Codex seit 2026-03-24 -->
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle BT12-Phasen inkl. 12.99.* sind abgeschlossen.
+- [ ] DoD.2 `training:run/eval/gate` sowie `bot:validate` sind mit Artefaktpfaden dokumentiert.
+- [ ] DoD.3 KPI-Deltas gegen BT11-Abschlusswerte sind im Checkpoint-Log eingetragen.
+- [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
+
+### 12.1 Plan und Laufstart
+
+- [x] 12.1.1 10h-Folgeplan fuer Classic/Fight Matrix anlegen (abgeschlossen: 2026-03-24; evidence: create BT12 plan -> docs/Bot_Survival_Training_Plan_10h_BT12.md)
+- [ ] 12.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren
+
+### 12.2 Laufmonitoring im 2h-Takt
+
+- [ ] 12.2.1 `bot:validate`-Checkpoint im 2h-Rhythmus mit stabilen Runtime-Parametern ausfuehren
+- [ ] 12.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT11-Finalwerte protokollieren
+
+### Checkpoint-Log BT12 (laufend)
+
+| Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs BT11-Final | Evidence |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 2026-03-24 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT11-Final (`117.525` / `37.376986`) | `docs/Bot_Survival_Training_Plan_10h_BT12.md` |
+
+### 12.99 Abschluss-Gate
+
+- [ ] 12.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen
+- [ ] 12.99.2 Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren
+
+### Risiko-Register BT12
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Lauf stoppt vor 10h durch Stage-Failure | hoch | Bot-Codex | `stop-on-fail=false`, Logmonitoring und Resume ueber latest checkpoint | `loop.json` mit vorzeitigem stopReason |
+| KPI-Regression in Fight oder Classic unentdeckt | hoch | Bot-Codex | Matrix-Run (`classic-*`,`hunt-*`) + 2h Checkpoints | Delta kippt in Teilmodus trotz gruenem Gate |
+| `bot:validate` Laufzeit > global timeout | mittel | Bot-Codex | scenarioLimit `2`, `BOT_RUNNER_TOTAL_TIMEOUT=600000` fuer Abschlusslauf | Abbruch bei `total-run timeout` |
 
 ---
 
