@@ -40,6 +40,7 @@ export class Renderer {
 
         this.cameraRigSystem = new CameraRigSystem({
             cinematicEnabled: CONFIG?.CAMERA?.CINEMATIC_ENABLED !== false,
+            livePerspectiveEnabled: false,
         });
         this.cameras = this.cameraRigSystem.cameras;
         this.cameraTargets = this.cameraRigSystem.cameraTargets;
@@ -137,7 +138,9 @@ export class Renderer {
     }
 
     setCameraPerspectiveSettings(settings = null) {
-        return this.cameraRigSystem.setCameraPerspectiveSettings(settings);
+        const normalized = this.cameraRigSystem.setCameraPerspectiveSettings(settings);
+        this.recordingCapturePipeline.setCameraPerspectiveSettings(normalized);
+        return normalized;
     }
 
     getCameraPerspectiveSettings() {

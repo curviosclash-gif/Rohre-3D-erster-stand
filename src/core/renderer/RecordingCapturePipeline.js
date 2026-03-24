@@ -10,6 +10,11 @@ import {
     RECORDING_CAPTURE_PROFILE,
     RECORDING_HUD_MODE,
 } from '../../shared/contracts/RecordingCaptureContract.js';
+import {
+    CAMERA_PERSPECTIVE_MODE,
+    createDefaultCameraPerspectiveSettings,
+    normalizeCameraPerspectiveSettings,
+} from '../../shared/contracts/CameraPerspectiveContract.js';
 
 const SHORTS_OUTPUT_ASPECT = Object.freeze({
     width: 9,
@@ -52,12 +57,16 @@ export class RecordingCapturePipeline {
 
         this._active = false;
         this._settings = createDefaultRecordingCaptureSettings();
+        this._cameraPerspectiveSettings = createDefaultCameraPerspectiveSettings();
         this._captureCanvas = null;
         this._captureCtx = null;
         this._shortsCanvas = null;
         this._shortsRenderer = null;
         this._shortsRendererUnavailable = false;
-        this._shortsCameraRig = new CameraRigSystem({ cinematicEnabled: true });
+        this._shortsCameraRig = new CameraRigSystem({
+            cinematicEnabled: true,
+            livePerspectiveEnabled: false,
+        });
         this._orbitDirector = new RecordingOrbitCameraDirector();
         this._tmpPosition = new THREE.Vector3();
         this._tmpQuaternion = new THREE.Quaternion();
@@ -81,6 +90,18 @@ export class RecordingCapturePipeline {
     setSettings(settings = null) {
         this._settings = normalizeRecordingCaptureSettings(settings, this._settings);
         return { ...this._settings };
+    }
+
+    setCameraPerspectiveSettings(settings = null) {
+        this._cameraPerspectiveSettings = normalizeCameraPerspectiveSettings(
+            settings,
+            this._cameraPerspectiveSettings
+        );
+        return { ...this._cameraPerspectiveSettings };
+    }
+
+    getCameraPerspectiveSettings() {
+        return { ...this._cameraPerspectiveSettings };
     }
 
     getSettings() {
@@ -203,6 +224,27 @@ export class RecordingCapturePipeline {
         this._shortsCameraRig.setCinematicEnabled(true);
     }
 
+    _resolveShortsSlotStyle(slotIndex) {
+        const mode = this._cameraPerspectiveSettings?.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC;
+        if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) {
+            return SLOT_STYLE.CINEMATIC;
+        }
+        if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) {
+            return SLOT_STYLE.ACTION;
+        }
+        return slotIndex === 0 ? SLOT_STYLE.CINEMATIC : SLOT_STYLE.ACTION;
+    }
+
+    _resolveShortsDt(renderDelta) {
+        const mode = this._cameraPerspectiveSettings?.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC;
+        const reduceMotion = this._cameraPerspectiveSettings?.reduceMotion === true;
+        const baseScale = mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION
+            ? 0.96
+            : (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT ? 0.78 : 0.86);
+        const scaled = reduceMotion ? (baseScale * 0.72) : baseScale;
+        return Math.max(0, Number(renderDelta) || 0) * scaled;
+    }
+
     _updateShortsCamera({ slotIndex, player, otherPlayer, renderAlpha, renderDelta, arena }) {
         if (!player) return false;
         this._shortsCameraRig.cameraModes[slotIndex] = 0;
@@ -231,15 +273,17 @@ export class RecordingCapturePipeline {
 
         const camera = this._shortsCameraRig.cameras[slotIndex];
         const baseFov = camera ? camera.fov : CONFIG.CAMERA.FOV;
+        const slotStyle = this._resolveShortsSlotStyle(slotIndex);
+        const perspectiveDt = this._resolveShortsDt(renderDelta);
         this._orbitDirector.apply({
             playerIndex: slotIndex,
             camera,
             fallbackTarget: this._shortsCameraRig.cameraTargets[slotIndex],
             playerPosition: this._tmpPosition,
             playerDirection: this._tmpDirection,
-            dt: renderDelta,
+            dt: perspectiveDt,
             arena,
-            slotStyle: slotIndex === 0 ? SLOT_STYLE.CINEMATIC : SLOT_STYLE.ACTION,
+            slotStyle,
             playerState: {
                 hp: Number(player.hp) || 0,
                 maxHp: Number(player.maxHp) || 1,

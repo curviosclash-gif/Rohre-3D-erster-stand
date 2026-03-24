@@ -12,7 +12,10 @@ import {
 } from '../../shared/contracts/CameraPerspectiveContract.js';
 
 export class CameraRigSystem {
-    constructor({ cinematicEnabled = true } = {}) {
+    constructor({
+        cinematicEnabled = true,
+        livePerspectiveEnabled = true,
+    } = {}) {
         this.cameras = [];
         this.cameraTargets = [];
         this.cameraModes = [];
@@ -45,6 +48,7 @@ export class CameraRigSystem {
             this.cameraShakeDurations,
             this.cameraShakeIntensities
         );
+        this.livePerspectiveEnabled = livePerspectiveEnabled !== false;
         this.cameraPerspectiveSettings = createDefaultCameraPerspectiveSettings();
         this.liveOrbitDirector = new RecordingOrbitCameraDirector({
             orbitSpeed: 0.78,
@@ -201,6 +205,7 @@ export class CameraRigSystem {
         const reduceMotion = settings.reduceMotion === true;
         const cinematicEnabled = this.cinematicCameraSystem.isEnabled() === true;
         const shouldApply = cinematicEnabled
+            && this.livePerspectiveEnabled === true
             && mode === 'THIRD_PERSON'
             && !cockpitCamera
             && perspectiveMode !== CAMERA_PERSPECTIVE_MODE.CLASSIC;
