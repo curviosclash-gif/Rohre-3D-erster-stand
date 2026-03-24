@@ -449,7 +449,9 @@ export class MatchFlowUiController {
             winner,
             players: game.entityManager ? game.entityManager.players : [],
             roundStateController: game.roundStateController,
-            humanPlayerCount: game.entityManager ? game.entityManager.getHumanPlayers().length : 0,
+            humanPlayerCount: game.entityManager?.getHumanPlayers
+                ? game.entityManager.getHumanPlayers().length
+                : 0,
             totalBots: game.numBots,
             winsNeeded: game.winsNeeded,
             outcomeReason: typeof normalizedOutcome.reason === 'string' ? normalizedOutcome.reason : '',

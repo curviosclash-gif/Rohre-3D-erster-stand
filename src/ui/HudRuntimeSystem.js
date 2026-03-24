@@ -53,7 +53,9 @@ export class HudRuntimeSystem {
         }
 
         // Original local scoreboard logic
-        const humans = game.entityManager.getHumanPlayers();
+        const humans = game.entityManager?.getHumanPlayers
+            ? game.entityManager.getHumanPlayers()
+            : [];
 
         if (humans.length > 0) {
             const p1Score = String(humans[0].score);
