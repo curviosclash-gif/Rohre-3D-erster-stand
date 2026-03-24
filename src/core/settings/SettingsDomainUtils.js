@@ -1,0 +1,25 @@
+export function deepClone(value) {
+    return JSON.parse(JSON.stringify(value));
+}
+
+export function normalizePresetId(rawValue) {
+    const base = String(rawValue || '')
+        .trim()
+        .toLocaleLowerCase()
+        .replace(/[^a-z0-9\-_]+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 40);
+    return base || '';
+}
+
+export function normalizeModePath(value, fallback = 'normal') {
+    const normalized = String(value || fallback).trim().toLowerCase();
+    if (normalized === 'quick_action'
+        || normalized === 'arcade'
+        || normalized === 'fight'
+        || normalized === 'normal') {
+        return normalized;
+    }
+    return fallback;
+}

@@ -1,3 +1,5 @@
+import { ensureMenuContractState } from '../../composition/core-ui/CoreSettingsPorts.js';
+
 function toNonNegativeInt(value, fallback = 0) {
     const parsed = Number(value);
     if (!Number.isFinite(parsed)) return fallback;
@@ -128,5 +130,49 @@ export function normalizeTelemetrySnapshot(snapshot) {
         topMaps: deriveTelemetryTopBuckets(balanceSource.maps, 'unknown'),
         topModes: deriveTelemetryTopBuckets(balanceSource.modes, 'classic'),
         recentRounds: normalizeTelemetryRecentRounds(source.recentRounds),
+    };
+}
+
+export function createSettingsTelemetryFacade(options = {}) {
+    const menuTelemetryStore = options.menuTelemetryStore;
+    const telemetryHistoryStore = options.telemetryHistoryStore;
+
+    function getMenuTelemetrySnapshot(settings = null) {
+        const snapshot = normalizeTelemetrySnapshot(menuTelemetryStore.getSnapshot());
+        if (settings && typeof settings === 'object') {
+            ensureMenuContractState(settings);
+            settings.localSettings.telemetryState = {
+                ...settings.localSettings.telemetryState,
+                ...snapshot,
+            };
+        }
+        return snapshot;
+    }
+
+    function recordMenuTelemetry(settings, eventType, payload = null) {
+        const snapshot = normalizeTelemetrySnapshot(menuTelemetryStore.recordEvent(eventType, payload));
+        if (settings && typeof settings === 'object') {
+            ensureMenuContractState(settings);
+            settings.localSettings.telemetryState = {
+                ...settings.localSettings.telemetryState,
+                ...snapshot,
+            };
+        }
+        const normalizedType = typeof eventType === 'string' ? eventType.trim().toLowerCase() : '';
+        if (normalizedType === 'round_end' && payload && telemetryHistoryStore?.recordRound) {
+            telemetryHistoryStore.recordRound(payload).catch(() => {});
+        }
+        return snapshot;
+    }
+
+    function getTelemetryHistorySummary() {
+        if (!telemetryHistoryStore?.getSummary) return {};
+        return telemetryHistoryStore.getSummary();
+    }
+
+    return {
+        getMenuTelemetrySnapshot,
+        recordMenuTelemetry,
+        getTelemetryHistorySummary,
     };
 }

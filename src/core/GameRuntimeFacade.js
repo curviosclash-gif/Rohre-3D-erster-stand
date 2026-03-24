@@ -723,6 +723,7 @@ export class GameRuntimeFacade {
             updateSaveButtonState: () => this.updateSaveButtonState(),
             scheduleMatchPrewarm: () => this.scheduleMatchPrewarm(),
         });
+        this.applySettingsToRuntime({ schedulePrewarm: false });
         this._syncMultiplayerRuntimeContext(changedKeys);
         return changedKeys;
     }

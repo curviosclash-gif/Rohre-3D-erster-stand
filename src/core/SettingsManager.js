@@ -3,59 +3,28 @@
 // ============================================
 
 import { CONFIG } from './Config.js';
-import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import {
-    applyDeveloperThemeToDocument,
     applyMenuCompatibilityRuleSet,
-    applyPresetToSettings,
-    capturePresetValuesFromSettings,
-    createMenuSettingsDefaults,
-    createPresetMetadata,
     ensureMenuContractState,
     getFixedMenuPresetCatalog,
-    MENU_SESSION_TYPES,
-    MENU_TEXT_CATALOG,
     MenuDraftStore,
     MenuPresetStore,
     MenuTelemetryStore,
     MenuTextOverrideStore,
-    normalizeSessionType,
-    resolveMenuAccessContext,
-    setDeveloperActorId,
-    setDeveloperFixedPresetLock,
-    setDeveloperModeEnabled,
-    setDeveloperReleasePreviewEnabled,
-    setDeveloperTheme,
-    setDeveloperVisibilityMode,
     SettingsStore,
 } from '../composition/core-ui/CoreSettingsPorts.js';
-import {
-    BOT_POLICY_STRATEGIES,
-    createRuntimeConfigSnapshot,
-    normalizeBotPolicyStrategy,
-} from './RuntimeConfig.js';
-import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
-import {
-    clampSettingValue,
-    createControlBindingsSnapshot,
-    normalizeControlBindings,
-    normalizeGlobalControlBindings,
-    SETTINGS_LIMITS,
-} from './config/SettingsRuntimeContract.js';
+import { createRuntimeConfigSnapshot } from './RuntimeConfig.js';
 import { TelemetryHistoryStore } from '../state/TelemetryHistoryStore.js';
 import {
-    createDefaultRecordingCaptureSettings,
-    normalizeRecordingCaptureSettings,
-} from '../shared/contracts/RecordingCaptureContract.js';
-import {
-    createDefaultCameraPerspectiveSettings,
-    normalizeCameraPerspectiveSettings,
-} from '../shared/contracts/CameraPerspectiveContract.js';
-import { normalizeTelemetrySnapshot } from './settings/SettingsTelemetryFacade.js';
-
-function deepClone(obj) {
-    return JSON.parse(JSON.stringify(obj));
-}
+    cloneDefaultControlsSnapshot,
+    createDefaultSettingsSnapshot,
+} from './settings/SettingsDefaultsFacade.js';
+import { sanitizeSettingsSnapshot } from './settings/SettingsSanitizerOps.js';
+import { createSettingsSessionDraftFacade } from './settings/SettingsSessionDraftFacade.js';
+import { createSettingsPresetFacade } from './settings/SettingsPresetFacade.js';
+import { createSettingsDeveloperFacade } from './settings/SettingsDeveloperFacade.js';
+import { createSettingsTextOverrideFacade } from './settings/SettingsTextOverrideFacade.js';
+import { createSettingsTelemetryFacade } from './settings/SettingsTelemetryFacade.js';
 
 export const KEY_BIND_ACTIONS = [
     { label: 'Pitch Hoch', key: 'UP' },
@@ -77,17 +46,6 @@ export const GLOBAL_KEY_BIND_ACTIONS = [
     { label: 'Videoaufnahme Start/Stopp', key: 'RECORDING_TOGGLE' },
 ];
 
-function normalizePresetId(rawValue) {
-    const base = String(rawValue || '')
-        .trim()
-        .toLocaleLowerCase()
-        .replace(/[^a-z0-9\-_]+/g, '-')
-        .replace(/-+/g, '-')
-        .replace(/^-|-$/g, '')
-        .slice(0, 40);
-    return base || '';
-}
-
 export class SettingsManager {
     constructor() {
         this.store = new SettingsStore({
@@ -101,167 +59,34 @@ export class SettingsManager {
         this.menuTextOverrideStore = new MenuTextOverrideStore();
         this.menuTelemetryStore = new MenuTelemetryStore();
         this.telemetryHistoryStore = new TelemetryHistoryStore();
+
+        this.sessionDraftFacade = createSettingsSessionDraftFacade({
+            menuDraftStore: this.menuDraftStore,
+        });
+        this.presetFacade = createSettingsPresetFacade({
+            menuPresetStore: this.menuPresetStore,
+            applyMenuCompatibilityRules: (settings, options = {}) => this.applyMenuCompatibilityRules(settings, options),
+        });
+        this.developerFacade = createSettingsDeveloperFacade();
+        this.textOverrideFacade = createSettingsTextOverrideFacade({
+            menuTextOverrideStore: this.menuTextOverrideStore,
+        });
+        this.telemetryFacade = createSettingsTelemetryFacade({
+            menuTelemetryStore: this.menuTelemetryStore,
+            telemetryHistoryStore: this.telemetryHistoryStore,
+        });
     }
 
     createDefaultSettings() {
-        const defaults = createMenuSettingsDefaults();
-        defaults.gameMode = resolveActiveGameMode(defaults.gameMode, CONFIG.HUNT?.ENABLED !== false);
-        defaults.botPolicyStrategy = defaults.botPolicyStrategy || BOT_POLICY_STRATEGIES.AUTO;
-        defaults.recording = normalizeRecordingCaptureSettings(
-            defaults.recording,
-            createDefaultRecordingCaptureSettings()
-        );
-        defaults.cameraPerspective = normalizeCameraPerspectiveSettings(
-            defaults.cameraPerspective,
-            createDefaultCameraPerspectiveSettings()
-        );
-        defaults.controls = this.cloneDefaultControls();
-        return ensureMenuContractState(defaults);
+        return createDefaultSettingsSnapshot();
     }
 
     cloneDefaultControls() {
-        const base = deepClone(CONFIG.KEYS);
-        return createControlBindingsSnapshot(base, base);
+        return cloneDefaultControlsSnapshot();
     }
 
     sanitizeSettings(saved) {
-        const defaults = this.createDefaultSettings();
-        const src = saved && typeof saved === 'object' ? saved : {};
-        // Bei Versionswechsel: alte gespeicherte Settings verwerfen, neue Defaults nutzen
-        if ((src.settingsVersion || 0) < (defaults.settingsVersion || 0)) {
-            return deepClone(defaults);
-        }
-        const merged = deepClone(defaults);
-        const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
-        const migratedSessionType = normalizeSessionType(
-            src?.localSettings?.sessionType || (src.mode === '2p' ? MENU_SESSION_TYPES.SPLITSCREEN : MENU_SESSION_TYPES.SINGLE)
-        );
-
-        merged.mode = migratedSessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
-        merged.gameMode = resolveActiveGameMode(src.gameMode, huntFeatureEnabled);
-        const requestedMapKey = String(src.mapKey || '');
-        merged.mapKey = (requestedMapKey === CUSTOM_MAP_KEY || CONFIG.MAPS[requestedMapKey])
-            ? requestedMapKey
-            : defaults.mapKey;
-        merged.numBots = clampSettingValue(
-            src.numBots ?? defaults.numBots,
-            SETTINGS_LIMITS.session.numBots,
-            defaults.numBots
-        );
-        merged.botDifficulty = ['EASY', 'NORMAL', 'HARD'].includes(src.botDifficulty)
-            ? src.botDifficulty
-            : defaults.botDifficulty;
-        merged.botPolicyStrategy = normalizeBotPolicyStrategy(src.botPolicyStrategy, defaults.botPolicyStrategy);
-        merged.winsNeeded = clampSettingValue(
-            src.winsNeeded ?? defaults.winsNeeded,
-            SETTINGS_LIMITS.session.winsNeeded,
-            defaults.winsNeeded
-        );
-        merged.autoRoll = typeof src.autoRoll === 'boolean' ? src.autoRoll : defaults.autoRoll;
-
-        merged.invertPitch.PLAYER_1 = !!src?.invertPitch?.PLAYER_1;
-        merged.invertPitch.PLAYER_2 = !!src?.invertPitch?.PLAYER_2;
-        merged.cockpitCamera.PLAYER_1 = !!src?.cockpitCamera?.PLAYER_1;
-        merged.cockpitCamera.PLAYER_2 = !!src?.cockpitCamera?.PLAYER_2;
-
-        if (!merged.vehicles) merged.vehicles = { PLAYER_1: 'ship5', PLAYER_2: 'ship5' };
-        merged.vehicles.PLAYER_1 = src?.vehicles?.PLAYER_1 || 'ship5';
-        merged.vehicles.PLAYER_2 = src?.vehicles?.PLAYER_2 || 'ship5';
-
-        merged.portalsEnabled = src?.portalsEnabled !== undefined ? !!src.portalsEnabled : defaults.portalsEnabled;
-        merged.hunt.respawnEnabled = !!(src?.hunt?.respawnEnabled ?? defaults.hunt.respawnEnabled);
-        if (merged.gameMode !== GAME_MODE_TYPES.HUNT) {
-            merged.hunt.respawnEnabled = false;
-        }
-
-        merged.gameplay.speed = clampSettingValue(src?.gameplay?.speed ?? defaults.gameplay.speed, SETTINGS_LIMITS.gameplay.speed, defaults.gameplay.speed);
-        merged.gameplay.turnSensitivity = clampSettingValue(src?.gameplay?.turnSensitivity ?? defaults.gameplay.turnSensitivity, SETTINGS_LIMITS.gameplay.turnSensitivity, defaults.gameplay.turnSensitivity);
-        merged.gameplay.planeScale = clampSettingValue(src?.gameplay?.planeScale ?? defaults.gameplay.planeScale, SETTINGS_LIMITS.gameplay.planeScale, defaults.gameplay.planeScale);
-        merged.gameplay.trailWidth = clampSettingValue(src?.gameplay?.trailWidth ?? defaults.gameplay.trailWidth, SETTINGS_LIMITS.gameplay.trailWidth, defaults.gameplay.trailWidth);
-        merged.gameplay.gapSize = clampSettingValue(src?.gameplay?.gapSize ?? defaults.gameplay.gapSize, SETTINGS_LIMITS.gameplay.gapSize, defaults.gameplay.gapSize);
-        merged.gameplay.gapFrequency = clampSettingValue(src?.gameplay?.gapFrequency ?? defaults.gameplay.gapFrequency, SETTINGS_LIMITS.gameplay.gapFrequency, defaults.gameplay.gapFrequency);
-        merged.gameplay.itemAmount = clampSettingValue(src?.gameplay?.itemAmount ?? defaults.gameplay.itemAmount, SETTINGS_LIMITS.gameplay.itemAmount, defaults.gameplay.itemAmount);
-        merged.gameplay.fireRate = clampSettingValue(src?.gameplay?.fireRate ?? defaults.gameplay.fireRate, SETTINGS_LIMITS.gameplay.fireRate, defaults.gameplay.fireRate);
-        merged.gameplay.lockOnAngle = clampSettingValue(src?.gameplay?.lockOnAngle ?? defaults.gameplay.lockOnAngle, SETTINGS_LIMITS.gameplay.lockOnAngle, defaults.gameplay.lockOnAngle);
-        merged.gameplay.mgTrailAimRadius = clampSettingValue(
-            src?.gameplay?.mgTrailAimRadius ?? defaults.gameplay.mgTrailAimRadius,
-            SETTINGS_LIMITS.gameplay.mgTrailAimRadius,
-            defaults.gameplay.mgTrailAimRadius
-        );
-        merged.gameplay.fightPlayerHp = clampSettingValue(src?.gameplay?.fightPlayerHp ?? defaults.gameplay.fightPlayerHp, SETTINGS_LIMITS.gameplay.fightPlayerHp, defaults.gameplay.fightPlayerHp);
-        merged.gameplay.fightMgDamage = clampSettingValue(src?.gameplay?.fightMgDamage ?? defaults.gameplay.fightMgDamage, SETTINGS_LIMITS.gameplay.fightMgDamage, defaults.gameplay.fightMgDamage);
-        merged.gameplay.planarMode = !!(src?.gameplay?.planarMode ?? defaults.gameplay.planarMode);
-        merged.gameplay.portalCount = clampSettingValue(src?.gameplay?.portalCount ?? defaults.gameplay.portalCount, SETTINGS_LIMITS.gameplay.portalCount, defaults.gameplay.portalCount);
-        merged.gameplay.planarLevelCount = clampSettingValue(src?.gameplay?.planarLevelCount ?? defaults.gameplay.planarLevelCount, SETTINGS_LIMITS.gameplay.planarLevelCount, defaults.gameplay.planarLevelCount);
-        merged.gameplay.portalBeams = false;
-
-        merged.botBridge = {
-            enabled: !!(src?.botBridge?.enabled ?? defaults.botBridge.enabled),
-            url: typeof src?.botBridge?.url === 'string' && src.botBridge.url.trim()
-                ? src.botBridge.url.trim()
-                : defaults.botBridge.url,
-            timeoutMs: clampSettingValue(
-                src?.botBridge?.timeoutMs ?? defaults.botBridge.timeoutMs,
-                SETTINGS_LIMITS.botBridge.timeoutMs,
-                defaults.botBridge.timeoutMs
-            ),
-            maxRetries: clampSettingValue(
-                src?.botBridge?.maxRetries ?? defaults.botBridge.maxRetries,
-                SETTINGS_LIMITS.botBridge.maxRetries,
-                defaults.botBridge.maxRetries
-            ),
-            retryDelayMs: clampSettingValue(
-                src?.botBridge?.retryDelayMs ?? defaults.botBridge.retryDelayMs,
-                SETTINGS_LIMITS.botBridge.retryDelayMs,
-                defaults.botBridge.retryDelayMs
-            ),
-            resumeCheckpoint: typeof src?.botBridge?.resumeCheckpoint === 'string'
-                ? src.botBridge.resumeCheckpoint.trim()
-                : defaults.botBridge.resumeCheckpoint,
-            resumeStrict: typeof src?.botBridge?.resumeStrict === 'boolean'
-                ? src.botBridge.resumeStrict
-                : defaults.botBridge.resumeStrict,
-        };
-        merged.recording = normalizeRecordingCaptureSettings(
-            src?.recording,
-            defaults.recording || createDefaultRecordingCaptureSettings()
-        );
-        merged.cameraPerspective = normalizeCameraPerspectiveSettings(
-            src?.cameraPerspective,
-            defaults.cameraPerspective || createDefaultCameraPerspectiveSettings()
-        );
-
-        merged.controls.PLAYER_1 = normalizeControlBindings(src?.controls?.PLAYER_1, defaults.controls.PLAYER_1, { guardCombatConflicts: true });
-        merged.controls.PLAYER_2 = normalizeControlBindings(src?.controls?.PLAYER_2, defaults.controls.PLAYER_2, { guardCombatConflicts: true });
-        merged.controls.GLOBAL = normalizeGlobalControlBindings(src?.controls?.GLOBAL, defaults.controls.GLOBAL);
-
-        if (src?.menuFeatureFlags && typeof src.menuFeatureFlags === 'object') {
-            merged.menuFeatureFlags = { ...src.menuFeatureFlags };
-        }
-        if (src?.menuContracts && typeof src.menuContracts === 'object') {
-            merged.menuContracts = { ...src.menuContracts };
-        }
-        if (src?.matchSettings && typeof src.matchSettings === 'object') {
-            merged.matchSettings = { ...src.matchSettings };
-        }
-        if (src?.playerLoadout && typeof src.playerLoadout === 'object') {
-            merged.playerLoadout = { ...src.playerLoadout };
-        }
-        if (src?.localSettings && typeof src.localSettings === 'object') {
-            merged.localSettings = { ...src.localSettings };
-        }
-
-        ensureMenuContractState(merged);
-        merged.localSettings.sessionType = migratedSessionType;
-        merged.localSettings.modePath = String(merged.localSettings.modePath || 'normal').toLowerCase();
-        if (merged.localSettings.modePath !== 'quick_action'
-            && merged.localSettings.modePath !== 'arcade'
-            && merged.localSettings.modePath !== 'fight'
-            && merged.localSettings.modePath !== 'normal') {
-            merged.localSettings.modePath = 'normal';
-        }
-        applyMenuCompatibilityRuleSet(merged);
-        return merged;
+        return sanitizeSettingsSnapshot(saved, () => this.createDefaultSettings());
     }
 
     loadSettings() {
@@ -273,60 +98,19 @@ export class SettingsManager {
     }
 
     listMenuPresets() {
-        return this.menuPresetStore.listPresets();
+        return this.presetFacade.listMenuPresets();
     }
 
     saveSessionDraft(settings, sessionType) {
-        ensureMenuContractState(settings);
-        const normalizedSessionType = normalizeSessionType(sessionType, settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE);
-        const result = this.menuDraftStore.saveDraft(normalizedSessionType, settings);
-        if (result.success) {
-            if (!settings.localSettings.draftStateBySessionType || typeof settings.localSettings.draftStateBySessionType !== 'object') {
-                settings.localSettings.draftStateBySessionType = {};
-            }
-            settings.localSettings.draftStateBySessionType[normalizedSessionType] = {
-                updatedAt: new Date().toISOString(),
-                mapKey: String(settings.mapKey || ''),
-                vehicleP1: String(settings?.vehicles?.PLAYER_1 || ''),
-                vehicleP2: String(settings?.vehicles?.PLAYER_2 || ''),
-            };
-        }
-        return result;
+        return this.sessionDraftFacade.saveSessionDraft(settings, sessionType);
     }
 
     applySessionDraft(settings, sessionType) {
-        ensureMenuContractState(settings);
-        return this.menuDraftStore.applyDraft(settings, sessionType);
+        return this.sessionDraftFacade.applySessionDraft(settings, sessionType);
     }
 
     switchSessionType(settings, nextSessionType) {
-        ensureMenuContractState(settings);
-        const currentSessionType = normalizeSessionType(settings?.localSettings?.sessionType, MENU_SESSION_TYPES.SINGLE);
-        const targetSessionType = normalizeSessionType(nextSessionType, currentSessionType);
-        if (targetSessionType === currentSessionType) {
-            return {
-                success: true,
-                changed: false,
-                targetSessionType,
-                loadedDraft: false,
-            };
-        }
-
-        this.saveSessionDraft(settings, currentSessionType);
-        const draftResult = this.applySessionDraft(settings, targetSessionType);
-        settings.localSettings.sessionType = targetSessionType;
-        settings.mode = targetSessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
-        if (!draftResult.success) {
-            settings.localSettings.modePath = 'normal';
-        }
-
-        return {
-            success: true,
-            changed: true,
-            targetSessionType,
-            loadedDraft: draftResult.success,
-            draftResult,
-        };
+        return this.sessionDraftFacade.switchSessionType(settings, nextSessionType);
     }
 
     applyMenuCompatibilityRules(settings, options = {}) {
@@ -335,163 +119,63 @@ export class SettingsManager {
     }
 
     applyMenuPreset(settings, presetId, accessContext = null) {
-        const normalizedPresetId = String(presetId || '').trim();
-        if (!normalizedPresetId) {
-            return { success: false, reason: 'invalid_preset_id' };
-        }
-        const preset = this.menuPresetStore.getPresetById(normalizedPresetId);
-        if (!preset) {
-            return { success: false, reason: 'preset_not_found' };
-        }
-
-        ensureMenuContractState(settings);
-        const resolvedContext = accessContext && typeof accessContext === 'object'
-            ? accessContext
-            : resolveMenuAccessContext(settings);
-        const result = applyPresetToSettings({
-            settings,
-            preset,
-            accessContext: resolvedContext,
-            allowOpenPresetEditing: settings?.menuFeatureFlags?.allowOpenPresetEditing !== false,
-        });
-        const compatibilityResult = this.applyMenuCompatibilityRules(settings, { accessContext: resolvedContext });
-        ensureMenuContractState(settings);
-        const changedKeys = Array.from(new Set([
-            ...(Array.isArray(result.changedKeys) ? result.changedKeys : []),
-            ...(Array.isArray(compatibilityResult.changedKeys) ? compatibilityResult.changedKeys : []),
-        ]));
-
-        return {
-            success: result.reason !== 'invalid_payload',
-            preset,
-            ...result,
-            changedKeys,
-            compatibilityResult,
-        };
+        return this.presetFacade.applyMenuPreset(settings, presetId, accessContext);
     }
 
     saveMenuPreset(settings, options = {}, accessContext = null) {
-        ensureMenuContractState(settings);
-        const resolvedContext = accessContext && typeof accessContext === 'object'
-            ? accessContext
-            : resolveMenuAccessContext(settings);
-        const kind = options.kind === 'fixed' ? 'fixed' : 'open';
-        if (kind === 'fixed' && !resolvedContext.isOwner) {
-            return { success: false, reason: 'owner_required' };
-        }
-
-        const requestedName = String(options.name || '').trim();
-        const requestedId = String(options.id || '').trim();
-        const derivedId = normalizePresetId(requestedId || requestedName || `preset-${Date.now()}`);
-        if (!derivedId) {
-            return { success: false, reason: 'invalid_preset_id' };
-        }
-
-        const metadata = createPresetMetadata({
-            id: derivedId,
-            kind,
-            ownerId: resolvedContext.ownerId || 'owner',
-            lockedFields: Array.isArray(options.lockedFields) ? options.lockedFields : [],
-            sourcePresetId: options.sourcePresetId || settings?.matchSettings?.activePresetId || '',
-            createdAt: options.createdAt,
-            updatedAt: options.updatedAt,
-            timestamp: options.timestamp,
-        });
-        const preset = {
-            id: metadata.id,
-            name: requestedName || metadata.id,
-            description: String(options.description || '').trim(),
-            metadata,
-            values: capturePresetValuesFromSettings(settings),
-        };
-        return this.menuPresetStore.upsertPreset(preset, resolvedContext);
+        return this.presetFacade.saveMenuPreset(settings, options, accessContext);
     }
 
     deleteMenuPreset(presetId, settings, accessContext = null) {
-        ensureMenuContractState(settings);
-        const resolvedContext = accessContext && typeof accessContext === 'object'
-            ? accessContext
-            : resolveMenuAccessContext(settings);
-        return this.menuPresetStore.deletePreset(presetId, resolvedContext);
+        return this.presetFacade.deleteMenuPreset(presetId, settings, accessContext);
     }
 
     setDeveloperMode(settings, enabled, accessContext = null) {
-        return setDeveloperModeEnabled(settings, enabled, accessContext);
+        return this.developerFacade.setDeveloperMode(settings, enabled, accessContext);
     }
 
     setDeveloperTheme(settings, themeId, accessContext = null) {
-        const result = setDeveloperTheme(settings, themeId, accessContext);
-        if (!result.success) return result;
-        applyDeveloperThemeToDocument(settings?.localSettings?.developerThemeId);
-        return result;
+        return this.developerFacade.setDeveloperThemeById(settings, themeId, accessContext);
     }
 
     setDeveloperFixedPresetLock(settings, enabled, accessContext = null) {
-        return setDeveloperFixedPresetLock(settings, enabled, accessContext);
+        return this.developerFacade.setDeveloperFixedPresetLockState(settings, enabled, accessContext);
     }
 
     setDeveloperActor(settings, actorId, accessContext = null) {
-        return setDeveloperActorId(settings, actorId, accessContext);
+        return this.developerFacade.setDeveloperActor(settings, actorId, accessContext);
     }
 
     setDeveloperReleasePreview(settings, enabled, accessContext = null) {
-        return setDeveloperReleasePreviewEnabled(settings, enabled, accessContext);
+        return this.developerFacade.setDeveloperReleasePreview(settings, enabled, accessContext);
     }
 
     setDeveloperVisibility(settings, mode, accessContext = null) {
-        return setDeveloperVisibilityMode(settings, mode, accessContext);
+        return this.developerFacade.setDeveloperVisibility(settings, mode, accessContext);
     }
 
     listMenuTextOverrides() {
-        return this.menuTextOverrideStore.listOverrides();
+        return this.textOverrideFacade.listMenuTextOverrides();
     }
 
     setMenuTextOverride(textId, textValue) {
-        const normalizedTextId = String(textId || '').trim();
-        if (!normalizedTextId || !Object.prototype.hasOwnProperty.call(MENU_TEXT_CATALOG, normalizedTextId)) {
-            return { success: false, reason: 'unknown_text_id' };
-        }
-        return this.menuTextOverrideStore.setOverride(textId, textValue);
+        return this.textOverrideFacade.setMenuTextOverride(textId, textValue);
     }
 
     clearMenuTextOverride(textId) {
-        const normalizedTextId = String(textId || '').trim();
-        if (!normalizedTextId || !Object.prototype.hasOwnProperty.call(MENU_TEXT_CATALOG, normalizedTextId)) {
-            return { success: false, reason: 'unknown_text_id' };
-        }
-        return this.menuTextOverrideStore.clearOverride(textId);
+        return this.textOverrideFacade.clearMenuTextOverride(textId);
     }
 
     getMenuTelemetrySnapshot(settings = null) {
-        const snapshot = normalizeTelemetrySnapshot(this.menuTelemetryStore.getSnapshot());
-        if (settings && typeof settings === 'object') {
-            ensureMenuContractState(settings);
-            settings.localSettings.telemetryState = {
-                ...settings.localSettings.telemetryState,
-                ...snapshot,
-            };
-        }
-        return snapshot;
+        return this.telemetryFacade.getMenuTelemetrySnapshot(settings);
     }
 
     recordMenuTelemetry(settings, eventType, payload = null) {
-        const snapshot = normalizeTelemetrySnapshot(this.menuTelemetryStore.recordEvent(eventType, payload));
-        if (settings && typeof settings === 'object') {
-            ensureMenuContractState(settings);
-            settings.localSettings.telemetryState = {
-                ...settings.localSettings.telemetryState,
-                ...snapshot,
-            };
-        }
-        const normalizedType = typeof eventType === 'string' ? eventType.trim().toLowerCase() : '';
-        if (normalizedType === 'round_end' && payload) {
-            this.telemetryHistoryStore.recordRound(payload).catch(() => {});
-        }
-        return snapshot;
+        return this.telemetryFacade.recordMenuTelemetry(settings, eventType, payload);
     }
 
     getTelemetryHistorySummary() {
-        return this.telemetryHistoryStore.getSummary();
+        return this.telemetryFacade.getTelemetryHistorySummary();
     }
 
     createRuntimeConfig(settings) {

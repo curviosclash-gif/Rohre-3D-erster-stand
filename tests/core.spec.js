@@ -2352,6 +2352,66 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(draftState.mapAfterSplit).toBe('pyramid');
     });
 
+    test('T20o1: sanitizeSettings haelt Session-, Clamp- und Kompatibilitaetsvertrag stabil', async ({ page }) => {
+        await loadGame(page);
+        const sanitized = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const defaults = game.settingsManager.createDefaultSettings();
+            const settingsVersion = Number(defaults?.settingsVersion || game.settings?.settingsVersion || 1);
+            const snapshot = game.settingsManager.sanitizeSettings({
+                settingsVersion,
+                mode: '1p',
+                gameMode: 'CLASSIC',
+                mapKey: 'unknown_map',
+                numBots: 999,
+                botDifficulty: 'UNSUPPORTED',
+                winsNeeded: -5,
+                hunt: { respawnEnabled: true },
+                gameplay: {
+                    speed: 999,
+                    portalCount: -3,
+                    planarMode: 'invalid',
+                    portalBeams: true,
+                },
+                botBridge: {
+                    enabled: true,
+                    url: '  ws://localhost:8765/test  ',
+                    timeoutMs: -1,
+                    maxRetries: 999,
+                    retryDelayMs: -99,
+                    resumeCheckpoint: '  cp-01  ',
+                    resumeStrict: true,
+                },
+                localSettings: {
+                    sessionType: 'splitscreen',
+                    modePath: 'unsupported_path',
+                },
+            });
+            return {
+                defaultsMapKey: String(defaults?.mapKey || ''),
+                mapKey: String(snapshot?.mapKey || ''),
+                mode: String(snapshot?.mode || ''),
+                sessionType: String(snapshot?.localSettings?.sessionType || ''),
+                modePath: String(snapshot?.localSettings?.modePath || ''),
+                huntRespawnEnabled: !!snapshot?.hunt?.respawnEnabled,
+                portalBeams: snapshot?.gameplay?.portalBeams,
+                botBridgeUrl: String(snapshot?.botBridge?.url || ''),
+                botBridgeResumeCheckpoint: String(snapshot?.botBridge?.resumeCheckpoint || ''),
+                botBridgeResumeStrict: !!snapshot?.botBridge?.resumeStrict,
+            };
+        });
+
+        expect(sanitized.mapKey).toBe(sanitized.defaultsMapKey);
+        expect(sanitized.mode).toBe('2p');
+        expect(sanitized.sessionType).toBe('splitscreen');
+        expect(sanitized.modePath).toBe('fight');
+        expect(sanitized.huntRespawnEnabled).toBeTruthy();
+        expect(sanitized.portalBeams).toBe(false);
+        expect(sanitized.botBridgeUrl).toBe('ws://localhost:8765/test');
+        expect(sanitized.botBridgeResumeCheckpoint).toBe('cp-01');
+        expect(sanitized.botBridgeResumeStrict).toBeTruthy();
+    });
+
     test('T20p: Start-Validierung zeigt Feldgrund und fokussiert Ziel', async ({ page }) => {
         await loadGame(page);
         await openMultiplayerSubmenu(page);
