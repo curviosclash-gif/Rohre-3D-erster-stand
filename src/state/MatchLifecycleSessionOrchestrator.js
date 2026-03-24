@@ -9,15 +9,16 @@ function isPromiseLike(value) {
 }
 
 export class MatchLifecycleSessionOrchestrator {
-    constructor(game) {
-        this.game = game || null;
+    constructor(runtimeOrDeps = null) {
+        const runtime = runtimeOrDeps?.runtime || runtimeOrDeps;
+        this.runtime = runtime || null;
         this._lifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
         this._sessionSequence = 0;
         this._activeSessionId = null;
     }
 
     _buildLifecycleContext(extra = null) {
-        const game = this.game;
+        const game = this.runtime;
         const context = {
             contractVersion: this._lifecycleContractVersion,
             sessionId: this._activeSessionId,
@@ -34,7 +35,7 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     _emitLifecycleEvent(type, extra = null) {
-        const game = this.game;
+        const game = this.runtime;
         if (!game?.mediaRecorderSystem?.notifyLifecycleEvent) return;
         game.mediaRecorderSystem.notifyLifecycleEvent(type, this._buildLifecycleContext(extra));
     }
@@ -56,7 +57,7 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     _applyInitializedMatch(initializedMatch) {
-        const game = this.game;
+        const game = this.runtime;
         game.matchSessionRuntimeBridge.applyInitializedMatchSession(initializedMatch);
         this._startLifecycleSession({
             mapKey: initializedMatch?.session?.effectiveMapKey || game.mapKey || null,
@@ -68,9 +69,9 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     createMatchSession({ onPlayerFeedback, onPlayerDied, onRoundEnd } = {}) {
-        const game = this.game;
+        const game = this.runtime;
         if (!game) {
-            throw new Error('MatchLifecycleSessionOrchestrator requires game runtime');
+            throw new Error('MatchLifecycleSessionOrchestrator requires runtime context');
         }
         if (this._activeSessionId) {
             this._endLifecycleSession('new_match_session');
@@ -96,14 +97,14 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     bindHuntEventHandlers({ onHuntFeedEvent, onHuntDamageEvent } = {}) {
-        const game = this.game;
+        const game = this.runtime;
         if (!game?.entityManager) return;
         game.entityManager.onHuntFeedEvent = typeof onHuntFeedEvent === 'function' ? onHuntFeedEvent : null;
         game.entityManager.onHuntDamageEvent = typeof onHuntDamageEvent === 'function' ? onHuntDamageEvent : null;
     }
 
     resetRoundRuntime() {
-        const game = this.game;
+        const game = this.runtime;
         if (!game?.entityManager || !game?.powerupManager) return;
 
         for (const player of game.entityManager.players) {
@@ -119,7 +120,7 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     teardownMatchSession() {
-        const game = this.game;
+        const game = this.runtime;
         if (!game) return;
         this._endLifecycleSession('return_to_menu');
         disposeMatchSessionSystems(game.renderer, game.matchSessionRuntimeBridge.getCurrentMatchSessionRefs());

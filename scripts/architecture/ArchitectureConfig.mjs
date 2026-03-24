@@ -137,7 +137,6 @@ export const LEGACY_CONSTRUCTOR_GAME_ALLOWLIST = new Map([
     ['src/core/PlayingStateSystem.js', 'Existing playing loop shell still receives the game runtime directly.'],
     ['src/core/PlanarAimAssistSystem.js', 'Planar aim hotpath still consumes the runtime facade directly.'],
     ['src/core/RuntimeDiagnosticsSystem.js', 'Diagnostics overlay remains an infrastructure exception with runtime-wide read access.'],
-    ['src/state/MatchLifecycleSessionOrchestrator.js', 'Session orchestrator still fronts the runtime until the session port split is deeper.'],
     ['src/ui/KeybindEditorController.js', 'Keybind editor remains a UI infrastructure shell around the runtime key capture path.'],
     ['src/ui/UIManager.js', 'UIManager keeps a legacy game alias while sync responsibilities are being reduced.'],
     ['src/ui/UIStartSyncController.js', 'Start sync controller still receives the runtime shell while V44 freezes new occurrences.'],
