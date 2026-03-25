@@ -1,4 +1,4 @@
-﻿// ============================================
+// ============================================
 // main.js - entry point and game controller
 // ============================================
 
@@ -293,6 +293,17 @@ export class Game {
             // Without this, the NATIVE_MEDIARECORDER fallback triggers with a broken black video.
             if (typeof this.render === 'function') {
                 this.render();
+                
+                // We MUST force the pipeline to prepare the frame right now 
+                // while treating recording as active, otherwise the render is ignored 
+                // and the capture canvas remains 0x0/null, causing WebM fallback.
+                this.renderer?.prepareRecordingCaptureFrame?.({
+                    recordingActive: true,
+                    entityManager: this.entityManager,
+                    renderAlpha: this._renderAlpha,
+                    renderDelta: this._renderDelta,
+                    splitScreen: this.renderer?.splitScreen === true,
+                });
             }
         }
 
