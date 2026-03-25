@@ -280,6 +280,22 @@ export class Game {
         }
 
         const wasRecording = !!recorder.isRecording?.();
+        
+        if (!wasRecording) {
+            recorder.setRecordingCaptureSettings?.({
+                profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
+            });
+            this.renderer?.setRecordingCaptureSettings?.({
+                profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
+            });
+            // Force a synchronous render frame to initialize the cinematic capture canvas 
+            // with the right dimensions before the WebCodecs encoder is created.
+            // Without this, the NATIVE_MEDIARECORDER fallback triggers with a broken black video.
+            if (typeof this.render === 'function') {
+                this.render();
+            }
+        }
+
         recorder.notifyLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.RECORDING_REQUESTED, {
             command: 'toggle',
             source: 'global_hotkey',

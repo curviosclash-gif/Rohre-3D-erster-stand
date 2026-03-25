@@ -136,35 +136,5 @@ export function bootstrapGameRuntime(game, options = {}) {
         showStatusToast,
     });
 
-    // F9: Cinematic-Aufnahme starten / stoppen
-    if (typeof window !== 'undefined') {
-        window.addEventListener('keydown', (event) => {
-            if (event.code !== 'F9') return;
-            event.preventDefault();
-            const mrs = game.mediaRecorderSystem;
-            if (!mrs) return;
-            if (mrs.isRecording()) {
-                mrs.stopRecording({ type: 'cinematic_manual_stop' }).catch(() => {});
-            } else {
-                // Cinematic-Profil setzen, dann Recording starten
-                mrs.setRecordingCaptureSettings({
-                    profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
-                });
-                game.renderer?.setRecordingCaptureSettings?.({
-                    profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
-                });
-                
-                // FORCE eine Synchron-Render-Ausführung, damit der _captureCanvas 
-                // mit den richtigen Cinematic-Dimensionen initialisiert wird!
-                // Ohne dies bekommt MediaRecorder den Main-Canvas (mit preserveDrawingBuffer: false),
-                // was in kaputten schwarzen Videos oder WebM-Fallbacks resultiert.
-                if (typeof game.render === 'function') {
-                    game.render();
-                }
 
-                mrs.startRecording({ type: 'cinematic_manual_start' });
-                showStatusToast?.('🎬 Cinematic-Aufnahme läuft (F9 zum Stoppen)', 3000, 'info');
-            }
-        });
-    }
 }
