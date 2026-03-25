@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import * as THREE from 'three';
 import { CONFIG } from '../Config.js';
 import { CameraRigSystem } from './CameraRigSystem.js';
@@ -68,6 +69,15 @@ export class RecordingCapturePipeline {
             livePerspectiveEnabled: false,
         });
         this._orbitDirector = new RecordingOrbitCameraDirector();
+        // Cinematic-MP4 renderer state
+        this._cinematicCanvas = null;
+        this._cinematicRenderer = null;
+        this._cinematicRendererUnavailable = false;
+        this._cinematicCameraRig = new CameraRigSystem({
+            cinematicEnabled: true,
+            livePerspectiveEnabled: false,
+        });
+        this._cinematicOrbitDirector = new RecordingOrbitCameraDirector();
         this._tmpPosition = new THREE.Vector3();
         this._tmpQuaternion = new THREE.Quaternion();
         this._tmpDirection = new THREE.Vector3();
@@ -85,6 +95,8 @@ export class RecordingCapturePipeline {
         }
         this._orbitDirector.reset();
         this._shortsCameraRig.resetCameras();
+        this._cinematicOrbitDirector.reset();
+        this._cinematicCameraRig.resetCameras();
     }
 
     setSettings(settings = null) {
@@ -508,10 +520,147 @@ export class RecordingCapturePipeline {
             this._prepareShortsSurface({ entityManager, renderAlpha, renderDelta, splitScreen });
             return;
         }
+        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+            this._prepareCinematicSurface({ entityManager, renderAlpha, renderDelta });
+            return;
+        }
         // Always copy the WebGL source canvas to a preserved 2D capture canvas.
         // Without this, preserveDrawingBuffer:false on the main renderer can
         // cause black frames on some browsers/drivers (notably Windows + ANGLE).
         this._prepareStandardSurface({ entityManager, splitScreen });
+    }
+
+
+    _ensureCinematicRenderer(width, height) {
+        if (this._cinematicRendererUnavailable) return null;
+        const safeWidth = toPositiveEven(width, 2);
+        const safeHeight = toPositiveEven(height, 2);
+        if (!this._cinematicCanvas) {
+            this._cinematicCanvas = createCanvasClone(this.sourceCanvas, safeWidth, safeHeight);
+        }
+        if (!this._cinematicCanvas) return null;
+        if (!this._cinematicRenderer) {
+            try {
+                this._cinematicRenderer = new THREE.WebGLRenderer({
+                    canvas: this._cinematicCanvas,
+                    antialias: false,
+                    alpha: false,
+                    preserveDrawingBuffer: true,
+                });
+                this._cinematicRenderer.setPixelRatio(1);
+                this._cinematicRenderer.shadowMap.enabled = true;
+                this._cinematicRenderer.shadowMap.type = THREE.BasicShadowMap;
+                this._cinematicRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+                this._cinematicRenderer.toneMappingExposure = this.sourceRenderer?.toneMappingExposure || 1.2;
+                this._cinematicRenderer.setClearColor(CONFIG.COLORS.BACKGROUND);
+            } catch {
+                this._cinematicRendererUnavailable = true;
+                this._cinematicRenderer = null;
+                return null;
+            }
+        }
+        try {
+            this._cinematicRenderer.shadowMap.enabled = this.sourceRenderer?.shadowMap?.enabled === true;
+            this._cinematicRenderer.shadowMap.type = this.sourceRenderer?.shadowMap?.type || THREE.BasicShadowMap;
+            this._cinematicRenderer.toneMapping = this.sourceRenderer?.toneMapping ?? THREE.ACESFilmicToneMapping;
+            this._cinematicRenderer.toneMappingExposure = this.sourceRenderer?.toneMappingExposure || 1.2;
+            this._cinematicRenderer.setClearColor(CONFIG.COLORS.BACKGROUND);
+            this._cinematicRenderer.setSize(safeWidth, safeHeight, false);
+        } catch {
+            this._cinematicRendererUnavailable = true;
+            this._cinematicRenderer = null;
+            return null;
+        }
+        return this._cinematicRenderer;
+    }
+
+    _prepareCinematicSurface({ entityManager, renderAlpha, renderDelta }) {
+        const width = toPositiveEven(this.sourceCanvas?.width, 2);
+        const height = toPositiveEven(this.sourceCanvas?.height, 2);
+        const cinRenderer = this._ensureCinematicRenderer(width, height);
+        const captureCanvas = this._ensureCaptureCanvas(width, height);
+        const captureCtx = this._captureCtx;
+        if (!cinRenderer || !captureCanvas || !captureCtx || !this.scene) {
+            if (captureCanvas && captureCtx && this.sourceCanvas) {
+                captureCtx.clearRect(0, 0, width, height);
+                captureCtx.drawImage(this.sourceCanvas, 0, 0, width, height);
+            }
+            return;
+        }
+
+        const players = this._resolveRecordingPlayers(entityManager);
+        const player = players[0] || null;
+        const otherPlayer = players[1] || null;
+
+        const aspect = toRatio(width / Math.max(1, height), 16 / 9);
+        while (this._cinematicCameraRig.cameras.length < 1) {
+            this._cinematicCameraRig.createCamera(aspect);
+        }
+        const camera = this._cinematicCameraRig.cameras[0];
+        if (!camera) return;
+        camera.aspect = aspect;
+        camera.updateProjectionMatrix();
+        this._cinematicCameraRig.cameraModes[0] = 0;
+
+        if (player && typeof player.resolveRenderTransform === 'function') {
+            player.resolveRenderTransform(renderAlpha, this._tmpPosition, this._tmpQuaternion);
+            this._tmpDirection.set(0, 0, -1).applyQuaternion(this._tmpQuaternion);
+
+            this._cinematicCameraRig.updateCamera(
+                0,
+                this._tmpPosition,
+                this._tmpDirection,
+                renderDelta,
+                this._tmpQuaternion,
+                false,
+                player.isBoosting === true,
+                entityManager?.arena || null,
+                null
+            );
+
+            let otherPos = null;
+            if (otherPlayer && typeof otherPlayer.resolveRenderTransform === 'function') {
+                const tmpOther = this._tmpOtherPosition || (this._tmpOtherPosition = new THREE.Vector3());
+                const tmpOtherQ = this._tmpOtherQuaternion || (this._tmpOtherQuaternion = new THREE.Quaternion());
+                otherPlayer.resolveRenderTransform(renderAlpha, tmpOther, tmpOtherQ);
+                otherPos = tmpOther;
+            }
+
+            this._cinematicOrbitDirector.apply({
+                playerIndex: 0,
+                camera,
+                fallbackTarget: this._cinematicCameraRig.cameraTargets[0],
+                playerPosition: this._tmpPosition,
+                playerDirection: this._tmpDirection,
+                dt: Math.max(0, Number(renderDelta) || 0),
+                arena: entityManager?.arena || null,
+                slotStyle: SLOT_STYLE.CINEMATIC,
+                playerState: {
+                    hp: Number(player.hp) || 0,
+                    maxHp: Number(player.maxHp) || 1,
+                    score: Number(player.score) || 0,
+                    speed: Number(player.speed) || 0,
+                    isBoosting: player.isBoosting === true,
+                },
+                otherPlayerPosition: otherPos,
+                baseFov: camera.fov || CONFIG.CAMERA.FOV,
+            });
+        }
+
+        cinRenderer.render(this.scene, camera);
+        cinRenderer.getContext()?.flush?.();
+
+        captureCtx.clearRect(0, 0, width, height);
+        captureCtx.drawImage(this._cinematicCanvas, 0, 0, width, height);
+
+        this._storeMeta({
+            profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
+            hudMode: RECORDING_HUD_MODE.CLEAN,
+            overlay: 'clean',
+            layout: 'cinematic_single',
+            width,
+            height,
+        }, player ? [{ x: 0, y: 0, width, height, player, label: 'CINEMATIC' }] : []);
     }
 
     dispose() {
@@ -521,10 +670,16 @@ export class RecordingCapturePipeline {
         this._shortsRenderer = null;
         this._shortsRendererUnavailable = false;
         this._shortsCanvas = null;
+        if (this._cinematicRenderer) { this._cinematicRenderer.dispose(); }
+        this._cinematicRenderer = null;
+        this._cinematicRendererUnavailable = false;
+        this._cinematicCanvas = null;
         this._captureCanvas = null;
         this._captureCtx = null;
         this._shortsCameraRig.resetCameras();
         this._orbitDirector.reset();
+        this._cinematicCameraRig.resetCameras();
+        this._cinematicOrbitDirector.reset();
         this._lastMeta = null;
     }
 }

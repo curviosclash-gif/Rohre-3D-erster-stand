@@ -1,6 +1,7 @@
 export const RECORDING_CAPTURE_PROFILE = Object.freeze({
     STANDARD: 'standard',
     YOUTUBE_SHORT: 'youtube_short',
+    CINEMATIC_MP4: 'cinematic_mp4',
 });
 
 export const RECORDING_HUD_MODE = Object.freeze({

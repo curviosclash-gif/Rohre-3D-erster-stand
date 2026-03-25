@@ -9,6 +9,7 @@ import { PlanarAimAssistSystem } from './PlanarAimAssistSystem.js';
 import { MatchSessionRuntimeBridge } from './MatchSessionRuntimeBridge.js';
 import { BuildInfoController } from './BuildInfoController.js';
 import { MediaRecorderSystem } from './MediaRecorderSystem.js';
+import { RECORDING_CAPTURE_PROFILE } from '../shared/contracts/RecordingCaptureContract.js';
 import { createRuntimePorts } from '../shared/runtime/GameRuntimePorts.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { CONFIG } from './Config.js';
@@ -134,4 +135,27 @@ export function bootstrapGameRuntime(game, options = {}) {
         ui: game.ui,
         showStatusToast,
     });
+
+    // F9: Cinematic-Aufnahme starten / stoppen
+    if (typeof window !== 'undefined') {
+        window.addEventListener('keydown', (event) => {
+            if (event.code !== 'F9') return;
+            event.preventDefault();
+            const mrs = game.mediaRecorderSystem;
+            if (!mrs) return;
+            if (mrs.isRecording()) {
+                mrs.stopRecording({ type: 'cinematic_manual_stop' }).catch(() => {});
+            } else {
+                // Cinematic-Profil setzen, dann Recording starten
+                mrs.setRecordingCaptureSettings({
+                    profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
+                });
+                game.renderer?.setRecordingCaptureSettings?.({
+                    profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
+                });
+                mrs.startRecording({ type: 'cinematic_manual_start' });
+                showStatusToast?.('🎬 Cinematic-Aufnahme läuft (F9 zum Stoppen)', 3000, 'info');
+            }
+        });
+    }
 }
