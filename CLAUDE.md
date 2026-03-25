@@ -6,6 +6,25 @@
 - Niemals `EnterWorktree` verwenden oder Agents mit `isolation: "worktree"` starten.
 - Commits direkt auf `main` erstellen.
 
+## Token-Effizienz (WICHTIG!)
+
+**Ziel: Minimaler Token-Verbrauch bei maximaler Produktivität.**
+
+Regeln:
+- **Keine wiederholten Reads:** Gleiche Datei zweimal lesen = Token verschwenden. Stattdessen Memory nutzen oder Info aus vorherigem Read verwenden.
+- **Richtige Tool-Wahl:** `Glob`/`Grep` direkt nutzen, nicht `Agent`. Agent nur für komplexe Explore-Aufgaben mit Background-Mode.
+- **Teilweise lesen:** Mit `limit` und `offset` nur relevante Teile von großen Dateien lesen.
+- **Agent-Background:** Für lange Explorations-Aufgaben: `run_in_background: true` starten, nicht blockierend.
+- **Keine großen Kontexte:** Alte Chats, große Dateien oder Ergebnisse nicht einfach komplett in Prompts kopieren.
+- **Memory statt wiederholte Reads:** Wichtige Infos (Struktur, Patterns, Conventions) in Memory-Files speichern und abrufen.
+
+**Anti-Patterns:**
+- ❌ `Agent` für einfache Dateisuche (nutze `Glob` statt)
+- ❌ Gleiche Datei 3x hintereinander lesen
+- ❌ Ganze Umsetzungsplan lesen, wenn nur ein Block relevant ist
+- ❌ Große Dateien ohne `limit` Parameter auslesen
+- ❌ Mehrere Agents sequenziell starten (nutze parallele Tool-Calls)
+
 ## Commit-Disziplin fuer parallele Agents (KRITISCH!)
 
 Mehrere Agents arbeiten gleichzeitig auf `main`. Jeder Agent MUSS:
