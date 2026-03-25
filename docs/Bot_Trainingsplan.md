@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-03-24
+Stand: 2026-03-25
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -61,7 +61,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | --- | --- | --- | --- | --- |
 | Train-Ops | BT10 | 2026-03-22 | active | 2026-03-22 |
 | Bot-Codex | BT11 | 2026-03-23 | frei | 2026-03-24 (abgeschlossen) |
-| Bot-Codex | BT12 | 2026-03-24 | active | 2026-03-25 |
+| Bot-Codex | BT12 | 2026-03-25 | active | 2026-03-25 |
 | Train-Ops | BT15 | 2026-03-22 | active | 2026-03-24 |
 | Bot-A | BT20 | 2026-03-22 | frei | - |
 | Bot-B | BT30 | 2026-03-22 | frei | - |
@@ -180,7 +180,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 
 Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-24 -->
+<!-- LOCK: Bot-Codex seit 2026-03-25 -->
 
 ### Definition of Done (DoD)
 
@@ -193,6 +193,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 
 - [x] 12.1.1 10h-Folgeplan fuer Classic/Fight Matrix anlegen (abgeschlossen: 2026-03-24; evidence: create BT12 plan -> docs/Bot_Survival_Training_Plan_10h_BT12.md)
 - [x] 12.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-24; evidence: Start-Process `npm run training:10h -- --series-stamp BT12_20260324T152103 ...` -> `output/training/BT12_20260324T152103-10h.log`, PID `3476`)
+- [x] 12.1.3 Survival-First-Restart (Classic + Fight) mit 10h-Matrixlauf starten und dokumentieren (abgeschlossen: 2026-03-25; evidence: `npm run training:10h -- --series-stamp BT12_SURV_20260325T030951 --stop-on-fail false --stage-timeout-ms 5400000 --episodes 8 --seeds 11,23,37,41,53 --modes classic-3d,classic-2d,hunt-3d,hunt-2d --max-steps 240 --runner-profile learn --inject-invalid-actions false --step-timeout-retries 1 --timeout-step-ms 220 --timeout-episode-ms 240000 --timeout-run-ms 1200000 --bridge-max-pending-acks 1024 --bridge-backpressure-threshold 768 --bridge-drop-training-when-backlogged true` -> `output/training/BT12_SURV_20260325T030951-10h.log`, PID `5856`)
 
 ### 12.2 Laufmonitoring im 2h-Takt
 
@@ -208,6 +209,8 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | 2026-03-24 | Checkpoint Validate fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01.log` (`phase=app:game-instance`) |
 | 2026-03-24 | Checkpoint Validate Retry fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01-retry.log` (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`) |
 | 2026-03-25 | Checkpoint Validate Port-Shift fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp02-port4275.log` (`BOT_RUNNER_PORT=4275`, `phase=app:game-instance`) |
+| 2026-03-25 | Survival-First-Restart Laufstart | `BT12_SURV_20260325T030951` | `pending` | `pending` | `pending` | neues 10h-Fenster gestartet | `output/training/BT12_SURV_20260325T030951-10h.log`, PID `5856` |
+| 2026-03-25 | Survival-First-Restart Warm-up | `BT12_SURV_20260325T030951` | `135.368750` | `pending` | `0.000000` | Steps `+15.183%`, Survival `pending` (vs BT11-Final) | `data/training/runs/BT12_SURV_20260325T030951-r08/run.json`, `data/training/runs/latest.json` |
 
 ### 12.99 Abschluss-Gate
 
