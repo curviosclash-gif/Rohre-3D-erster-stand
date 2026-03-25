@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-24
+Stand: 2026-03-25
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
@@ -35,6 +35,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V54 | V52.99 | hard | ja | V52 abgeschlossen; Rest-Ratchets laufen in V54.3/V54.7 weiter |
 | V54 | V53.99 | hard | ja | Settings-Decomposition ist abgeschlossen (`docs/Feature_SettingsManager_Decomposition_V53.md`) |
 | V54 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Ratchet-/Boundary-Guards bilden die Mess-Basis |
+| V55 | V54.99 | hard | ja | V54 abgeschlossen; V55 setzt Tiefenaudit-Findings fuer Stabilitaet, Konsistenz und Robustheit um |
+| V55 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Refactors in Runtime-/Netzwerk-Hotspots vorhanden |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -43,6 +45,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/OnlineSessionAdapter.js`, `src/network/LANSessionAdapter.js`, `src/network/StateReconciler.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/core/InputManager.js`, `src/ui/TouchInputSource.js`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V52 | offen | Event-Contract, Layering-Guards, Input/Persistenz-Resthaertung |
 | `src/core/SettingsManager.js`, `src/core/settings/**`, `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/MenuRuntimePresetConfigService.js`, `src/core/runtime/MenuRuntimeDeveloperModeService.js`, `src/core/GameRuntimeFacade.js`, `tests/core.spec.js` | V53 | abgeschlossen | Settings-Domain-Decomposition in Facades/Operations umgesetzt |
 | `src/core/MediaRecorderSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/core/GameRuntimeFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/main.js`, `src/entities/**`, `src/ui/**`, `src/state/**`, `src/shared/**`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V54 | abgeschlossen | Gesamtfix fuer God-Objects, Layer-Kopplung, Legacy-Patterns und Global-Kapselung |
+| `tests/playwright.global-setup.js`, `tests/playwright.global-teardown.js`, `playwright.config.js`, `scripts/verify-lock.mjs`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/entities/arena/portal/PortalRuntimeSystem.js`, `src/ui/PauseOverlayController.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/core/MediaRecorderSystem.js`, `src/state/TelemetryHistoryStore.js`, `tests/core.spec.js`, `tests/training-automation.spec.js` | V55 | offen | Tiefenaudit-Remediation fuer Teststabilitaet, Race-Conditions, Backpressure und Lifecycle-Haertung |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -52,6 +55,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | E | V52 | 2026-03-23 | frei | - |
 | F | V53 | 2026-03-23 | frei | - |
 | G | V54 | 2026-03-24 | frei | - |
+| H | V55 | 2026-03-25 | frei | - |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -272,6 +276,82 @@ Scope:
 
 ---
 
+## Block V55: Tiefenaudit-Remediation - Teststabilitaet, Multiplayer-Konsistenz, Runtime-Robustheit
+
+Plan-Datei: `docs/Umsetzungsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V54.99 -->
+
+Scope:
+
+- Die im Tiefenaudit identifizierten Qualitaetsrisiken gezielt und priorisiert abbauen: flaky Tests, konkurrierende Session-Updates, stille Request-Drops, Lifecycle-Leaks und inkonsistente Export-/Persistenzpfade.
+- Fokus auf reproduzierbare Stabilitaet unter Last sowie klare Telemetrie fuer Fehlerbilder statt stiller Degradation.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 55.1 bis 55.8 sowie 55.99 sind abgeschlossen und jeweils mit Evidence dokumentiert.
+- [ ] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS; Test-Setup ist ohne `global-setup` Timeout in Wiederholungslauf stabil.
+- [ ] DoD.3 Concurrency-/Backpressure-Regressionen sind durch neue/erweiterte Tests in `tests/core.spec.js` und `tests/training-automation.spec.js` abgesichert.
+- [ ] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Conflict-Log-Pflege sind konsistent abgeschlossen.
+
+### 55.1 Playwright-Setup und Test-Isolation haerten
+
+- [ ] 55.1.1 `tests/playwright.global-setup.js` um explizite Readiness-Probe + aussagekraeftige Diagnoseartefakte (URL, Retry-Status, relevante Server-Logs) erweitern, damit `page.goto`-Timeouts reproduzierbar analysierbar sind.
+- [ ] 55.1.2 Stabilitaets-Validierung fuer `npm run test:fast` mit Wiederholungslaeufen und dokumentierter Flake-Rate durchfuehren; Abbruchkriterien und Eskalationspfad fuer Infrastrukturprobleme festlegen.
+
+### 55.2 MenuMultiplayerBridge gegen konkurrierende Snapshot-Updates absichern
+
+- [ ] 55.2.1 Read-Modify-Write-Pfade in `src/ui/menu/MenuMultiplayerBridge.js` auf revision-gesicherte CAS-/Retry-Strategie umstellen, um verlorene Updates bei parallelen Host/Client-Operationen zu vermeiden.
+- [ ] 55.2.2 Regressionstests fuer gleichzeitige `ready_toggle`, Heartbeat und `match_start`-Mutationen ergaenzen; Nachweis, dass Revisionen monotonic bleiben und kein Snapshot-Rollback auftritt.
+
+### 55.3 WebSocketTrainerBridge Backpressure- und Drop-Semantik klarziehen
+
+- [ ] 55.3.1 Request-Fluss fuer Action-Requests in `src/entities/ai/training/WebSocketTrainerBridge.js` um `latest-wins`-Queue/Koaleszierung erweitern; stille Drops ohne Telemetrie entfernen.
+- [ ] 55.3.2 Telemetrie um differenzierte Zaehler (`actionDrops`, `actionSendSkipped`, `backpressureDrops`) erweitern und in `tests/training-automation.spec.js` deterministisch absichern.
+
+### 55.4 RuntimeSessionLifecycle Start- und Reconcile-Gates robust machen
+
+- [ ] 55.4.1 Client-Seite in `waitForRuntimePlayersLoaded` auf explizites Host-Startsignal haerten, damit Matchstart bei Netzwerkschwankungen nicht asymmetrisch erfolgt.
+- [ ] 55.4.2 Fruehe `stateUpdate`-Pakete vor Verfuegbarkeit des `StateReconciler` puffern und nach Initialisierung kontrolliert replayen; Kein Verlust der ersten autoritativen Snapshots.
+
+### 55.5 Hotpath-Logging und Portal-Update-Kosten reduzieren
+
+- [ ] 55.5.1 `console.log` im Portal-Hotpath (`src/entities/arena/portal/PortalRuntimeSystem.js`) entfernen oder strikt debug-gated machen; Laufzeitkosten bei haeufigen Portalhits minimieren.
+- [ ] 55.5.2 Performance-Sanity fuer betroffene Hotpaths (Portal/Update) dokumentieren und mit vorhandenem Perf-Tooling (`benchmark:jitter`, `benchmark:lifecycle`) gegen Regressionen absichern.
+
+### 55.6 PauseOverlay-Lifecycle und Event-Listener-Disposal vervollstaendigen
+
+- [ ] 55.6.1 `src/ui/PauseOverlayController.js` um vollstaendige Listener-Verwaltung inkl. `dispose()` erweitern, damit Re-Init/HMR keine Mehrfach-Bindings erzeugt.
+- [ ] 55.6.2 Tests fuer wiederholtes Setup/Teardown und idempotentes Verhalten ergaenzen; Nachweis, dass keine doppelten Handler oder verwaisten UI-Aktionen verbleiben.
+
+### 55.7 Text-/Encoding-Integritaet im Runtime-UI-Pfad herstellen
+
+- [ ] 55.7.1 Mojibake-Literale in `GameRuntimeFacade`, `RuntimeSettingsChangeOrchestrator` und `PauseOverlayController` korrigieren; konsistente UTF-8-Ausgabe in UI/Toasts sicherstellen.
+- [ ] 55.7.2 Leichtgewichtigen Check gegen neue Encoding-Schaeden in Runtime-Strings integrieren (z. B. Script/Lint-Regel), damit defekte Literale frueh in der Pipeline auffallen.
+
+### 55.8 Recorder-Export- und Telemetry-Persistenz robustifizieren
+
+- [ ] 55.8.1 Exportpfad in `MediaRecorderSystem` so nachschaerfen, dass API-Save-Erfolg/Fallback semantisch klar reportet wird (kein vorzeitiges Erfolgs-Signal ohne Abschlussstatus).
+- [ ] 55.8.2 `TelemetryHistoryStore` um Retry-/Reopen-Strategie bei temporaeren IndexedDB-Fehlern erweitern, damit Persistenz nicht dauerhaft bis zum Reload deaktiviert bleibt.
+
+### Phase 55.99: Integrations- und Abschluss-Gate
+
+- [ ] 55.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen; Teststabilitaet fuer den Playwright-Startpfad ist mit Evidence belegt.
+- [ ] 55.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung sind abgeschlossen und dokumentiert.
+
+### Risiko-Register V55
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Concurrency-Fixes im Multiplayer-Snapshot-Pfad erzeugen neue Edge-Case-Deadlocks | hoch | UI/Netzwerk | CAS mit begrenzten Retries, deterministische Konflikt-Tests, Fallback auf letzte valide Revision | Lobbies frieren bei parallelen Host/Client-Aktionen |
+| Backpressure-Haertung veraendert Trainer-Verhalten und maskiert reale Latenzprobleme | hoch | AI/Training | Telemetrie-Ausbau + Replay-Tests fuer Drop-/Retry-Pfade + klare Alert-Schwellen | Erhoehte Fallback-Rate oder sinkende Action-Qualitaet |
+| Test-Infrastruktur-Haertung reduziert Timeouts nicht nachhaltig | mittel | QA/Tooling | Diagnoseartefakte pro Fehlversuch, Wiederholungsmatrix, klarer Infra-vs-Code-Entscheidungsbaum | Weiterhin `global-setup` Timeout in Serienlaeufen |
+| Lifecycle-/Disposal-Refactors verursachen regressives UI-Verhalten im Pause-Flow | mittel | UI/Core | Idempotenz-Tests fuer Setup/Dispose, schrittweiser Rollout, Guarded Feature Flags falls noetig | Doppelte Klick-Aktionen oder blockierte Pause-Menues |
+| Recorder-/Persistenz-Resilienz aendert bestehende Export-/Telemetrie-Erwartungen | mittel | Core/State | Rueckwaertskompatible Result-Flags, abgestimmte Kontrakt-Tests, Dokumentation der neuen Semantik | Nutzer meldet falsche Export-Erfolgsanzeige oder fehlende Historie |
+
+---
+
 ## Backlog (priorisiert, nicht gestartet)
 
 Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
@@ -282,6 +362,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V40 | Hunt Rocket Trail Targeting | `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md` | mittel | mittel | P1 | mit V50.1 Contract abstimmen | Offen |
 | V53 | SettingsManager Decomposition und Settings-Domain-Entkopplung | `docs/Feature_SettingsManager_Decomposition_V53.md` | hoch | mittel | P1 | abgeschlossen (V53.99) | Abgeschlossen |
 | V54 | Gesamtfix Architektur-/Qualitaetspunkte | `docs/Feature_Gesamtfix_Architektur_Qualitaet_V54.md` | sehr hoch | gross | P1 | abgeschlossen (V54.99) | Abgeschlossen |
+| V55 | Tiefenaudit-Remediation (Teststabilitaet, Concurrency, Runtime-Robustheit) | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 55.1.1 Readiness-/Diagnose-Haertung in `playwright.global-setup.js` starten | In Bearbeitung |
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | mittel | mittel | P2 | UX/Ownership klaeren | In Bearbeitung |
 | V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.4.1 Optionalen `game/`-Unterordner evaluieren (nur bei weiter gruener Dev-Migration) | In Bearbeitung |
 | V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | hoch | mittel | P1 | Benchmark baseline erneuern | Offen |
@@ -311,16 +392,16 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 
 ## Weekly Review (KW 12/2026)
 
-Stand: 2026-03-24
+Stand: 2026-03-25
 
 - Abgeschlossen diese Woche: V46.2.1, V46.2.2, V46.3.1, V46.3.2, V46.99, 41.99.1, 41.99.2, 41.99.3, 41.99.4, V50.1-V50.9, V50.99, V52.1-V52.99, V54.1-V54.99, Planarchiv-Bereinigung.
 - Blockiert: kein aktiver Blocker; V54 abgeschlossen.
 - Naechste 3 Ziele:
-  1. V42: Menu-Default-Editor UX/Ownership finalisieren.
-  2. V2: Test-Performance-Baseline erneuern und Ratchet aktualisieren.
-  3. V29b: Aufnahme-Contract fuer Shorts-Profil/HUD/Aufloesung finalisieren.
-- Groesstes Risiko: Parallel laufende Backlog-Bloecke koennen erneut Lock-/Merge-Konflikte ausloesen.
-- Entscheidungsbedarf: Priorisierung V42 vs. V2 fuer den naechsten Hauptblock.
+  1. V55: Test-/Runtime-Stabilitaet aus Tiefenaudit systematisch remediieren (55.1 bis 55.4 priorisiert).
+  2. V42: Menu-Default-Editor UX/Ownership finalisieren.
+  3. V2: Test-Performance-Baseline erneuern und Ratchet aktualisieren.
+- Groesstes Risiko: V55 adressiert mehrere kritische Schichten gleichzeitig (Tooling, UI, Netzwerk, Core) und erfordert strikte Teilphasen-Gates.
+- Entscheidungsbedarf: Nach 55.4 priorisieren, ob 55.5/55.6 (Runtime/UI) oder 55.7/55.8 (Qualitaet/Resilienz) zuerst abgeschlossen werden.
 
 ## Dokumentations-Hook
 
