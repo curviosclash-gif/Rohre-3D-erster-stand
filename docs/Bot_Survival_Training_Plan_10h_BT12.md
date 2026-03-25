@@ -43,6 +43,9 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList @('/c', "$cmd > `"$logPa
   - `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` -> FAIL (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`)
 - Checkpoint Validate C2:
   - `output/training/BT12_SURV_20260325T030951-botvalidate-cp02.log` -> FAIL (`BOT_RUNNER_BOOT_TIMEOUT=240000`, `phase=app:game-instance`)
+- Checkpoint Validate C3:
+  - `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log` -> PASS (`BOT_RUNNER_SERVER_MODE=preview`, `BOT_RUNNER_PREVIEW_BUILD=true`)
+  - KPI: `averageBotSurvival=38.770150` (`+3.727%` vs BT11-Final), forced-round-rate `83.3%`
 
 ## 10h Ablauf
 
@@ -65,10 +68,14 @@ Get-Content "output/training/<series-stamp>-10h.log" -Tail 120
 2. Validation ausfuehren:
 
 ```powershell
+$env:BOT_RUNNER_SERVER_MODE='preview'
+$env:BOT_RUNNER_PREVIEW_BUILD='true'
 $env:BOT_RUNNER_SCENARIO_COUNT='2'
 $env:BOT_RUNNER_ROUNDS='3'
 $env:BOT_RUNNER_TOTAL_TIMEOUT='600000'
 npm run bot:validate
+Remove-Item Env:BOT_RUNNER_SERVER_MODE -ErrorAction SilentlyContinue
+Remove-Item Env:BOT_RUNNER_PREVIEW_BUILD -ErrorAction SilentlyContinue
 Remove-Item Env:BOT_RUNNER_SCENARIO_COUNT -ErrorAction SilentlyContinue
 Remove-Item Env:BOT_RUNNER_ROUNDS -ErrorAction SilentlyContinue
 Remove-Item Env:BOT_RUNNER_TOTAL_TIMEOUT -ErrorAction SilentlyContinue

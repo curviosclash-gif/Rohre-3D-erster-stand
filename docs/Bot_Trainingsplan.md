@@ -199,6 +199,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 
 - [/] 12.2.1 `bot:validate`-Checkpoint im 2h-Rhythmus mit stabilen Runtime-Parametern ausfuehren
 - [/] 12.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT11-Finalwerte protokollieren
+- [x] 12.2.3 Runner-Stabilisierung via `BOT_RUNNER_SERVER_MODE=preview` fuer Checkpoint-Validierung aktivieren (abgeschlossen: 2026-03-25; evidence: `BOT_RUNNER_SERVER_MODE=preview BOT_RUNNER_PREVIEW_BUILD=true BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 BOT_RUNNER_TOTAL_TIMEOUT=900000 BOT_RUNNER_BOOT_TIMEOUT=240000 npm run bot:validate` -> `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log`, `tmp/bot-validation-report.json`)
 
 ### Checkpoint-Log BT12 (laufend)
 
@@ -214,6 +215,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | 2026-03-25 | C1 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01.log` (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`) |
 | 2026-03-25 | C1 Validate Retry fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`) |
 | 2026-03-25 | C2 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp02.log` (`BOT_RUNNER_BOOT_TIMEOUT=240000`, `phase=app:game-instance`) |
+| 2026-03-25 | C3 Validate erfolgreich (preview mode) | `BT12_SURV_20260325T030951` | `135.368750` | `38.770150` | `0.000000` | Steps `+15.183%`, Survival `+3.727%` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log`, `tmp/bot-validation-report.json`, `tmp/Testergebnisse_Phase4b_2026-03-25.md`; Hinweis: forced-round-rate `83.3%` |
 
 ### 12.99 Abschluss-Gate
 
