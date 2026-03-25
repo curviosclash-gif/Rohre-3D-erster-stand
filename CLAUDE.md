@@ -10,13 +10,12 @@
 
 Mehrere Agents arbeiten gleichzeitig auf `main`. Jeder Agent MUSS:
 
-1. **Vor Arbeitsbeginn pullen** — `git pull --rebase origin main` ausfuehren, bevor Code geaendert wird. So arbeitet jeder Agent auf dem aktuellen Stand.
-2. **NUR eigene Scope-Dateien aendern und committen** — ausschliesslich Dateien aus dem eigenen Block/Stream (siehe Datei-Ownership im Umsetzungsplan). Wenn jeder nur seine Dateien anfasst, gibt es keine Konflikte.
-3. **Sofort committen** — nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
-4. **Nur eigene Dateien stagen** — `git add <datei1> <datei2>`, niemals `git add .` oder `git add -A`. Aenderungen anderer Agents ignorieren.
-5. **Niemals `git stash` verwenden.** Keine Ausnahmen.
-6. **Fremde uncommittete Aenderungen ignorieren** — nicht stashen, nicht committen, nicht verwerfen. Sie gehoeren einem anderen Agent.
-7. **Umsetzungsplan immer als eigener Commit** — `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`. So konflikten Plan-Updates nicht mit Code anderer Agents.
+1. **NUR eigene Scope-Dateien aendern und committen** — ausschliesslich Dateien aus dem eigenen Block/Stream (siehe Datei-Ownership im Umsetzungsplan). Wenn jeder nur seine Dateien anfasst, gibt es keine Konflikte.
+2. **Sofort committen** — nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
+3. **Nur eigene Dateien stagen** — `git add <datei1> <datei2>`, niemals `git add .` oder `git add -A`. Aenderungen anderer Agents ignorieren.
+4. **Niemals `git stash` verwenden.** Keine Ausnahmen.
+5. **Fremde uncommittete Aenderungen ignorieren** — nicht stashen, nicht committen, nicht verwerfen. Sie gehoeren einem anderen Agent.
+6. **Umsetzungsplan immer als eigener Commit** — `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`. So konflikten Plan-Updates nicht mit Code anderer Agents.
 
 ## Vor einem Merge
 

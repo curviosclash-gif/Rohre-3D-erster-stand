@@ -51,16 +51,11 @@ This file defines repository-specific operating rules for Codex.
 - `main` is the default working branch; run `npm run guard:main` before commits/pushes (hooks enforce this too).
 - Non-main work needs explicit user approval and temporary `ALLOW_NON_MAIN=1` for that scoped command.
 - Use scoped staging (`git add [scoped-files]`) and verify scope via `git diff --name-only` before push. Niemals `git add .` oder `git add -A`.
-- **Zwingende Regel vor jeder Aenderung:** Unmittelbar vor jeder Code-, Doku- oder Konfigurationsaenderung `git pull --rebase origin main` ausfuehren.
-- **Vor Arbeitsbeginn pullen** - `git pull --rebase origin main` ausfuehren, bevor Code geaendert wird.
 - **Niemals `git stash` verwenden.** Keine Ausnahmen. Stash hat wiederholt zu Datenverlust und doppelter Arbeit gefuehrt.
 - Fremde uncommittete Aenderungen ignorieren - nicht stashen, nicht committen, nicht verwerfen. Sie gehoeren einem anderen Agent.
 - **Zwingende Regel nach jeder Aenderung:** Jede abgeschlossene Aenderung sofort per scoped Commit sichern (kein Sammeln von Aenderungen).
 - Sofort committen nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
-- Commit-Preflight ist Pflicht: Vor neuem Task, Kontextwechsel oder `git pull --rebase origin main` muessen eigene offene Aenderungen bereits per scoped Commit gesichert sein.
-- Wenn `git pull --rebase origin main` wegen uncommitteter Dateien blockiert: zuerst nur eigene Task-Aenderungen committen.
-- Blockieren danach weiterhin fremde Dateien den Pull, ist vor "ohne Pull fortfahren" ein Pflicht-Check noetig: `git status --short`, Dateiueberschneidungen zum eigenen Scope, Branch-Status und absehbare Merge-/Rebase-Risiken pruefen.
-- Ergibt der Pflicht-Check kein relevantes Konflikt- oder Integrationsrisiko, darf nach User-Freigabe scoped ohne Pull weitergearbeitet werden; bei Risiko muss vor Aenderungen geklaert oder synchronisiert werden.
+- Commit-Preflight ist Pflicht: Vor neuem Task oder Kontextwechsel muessen eigene offene Aenderungen bereits per scoped Commit gesichert sein.
 - **Umsetzungsplan immer als eigener Commit** - `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`.
 - Keep `.husky/.bypass` local-only and untracked.
 - Create a local recovery tag via `npm run snapshot:tag` before push on `main`.
