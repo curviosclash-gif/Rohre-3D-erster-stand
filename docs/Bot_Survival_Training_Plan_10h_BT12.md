@@ -35,9 +35,12 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList @('/c', "$cmd > `"$logPa
 - SeriesStamp: `BT12_SURV_20260325T030951`
 - Log: `output/training/BT12_SURV_20260325T030951-10h.log`
 - PID (node): `5856`
-- Warm-up Evidence: `data/training/runs/BT12_SURV_20260325T030951-r08/{run,eval,gate}.json`
+- Warm-up Evidence: `data/training/runs/BT12_SURV_20260325T030951-r37/{run,eval,gate}.json`
 - Warm-up KPI: `avgStepsPerEpisode=135.368750`, `invalidActionRate=0.000000`, Delta Steps `+15.183%` vs BT11-Final
 - Vorlauf-Hinweis: vorheriges BT12-Fenster (`BT12_20260324T152103`) blieb bei Checkpoint-Validate mehrfach in `phase=app:game-instance` haengen.
+- Checkpoint Validate C1:
+  - `output/training/BT12_SURV_20260325T030951-botvalidate-cp01.log` -> FAIL (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`)
+  - `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` -> FAIL (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`)
 
 ## 10h Ablauf
 
