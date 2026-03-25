@@ -43,6 +43,13 @@ const TOTAL_TIMEOUT_MS = parseIntEnv(
     Math.max(180000, DEFAULT_SCENARIO_COUNT * SCENARIO_TIMEOUT_MS + 60000),
     60000
 );
+const SERVER_MODE = resolveServerMode(
+    resolveFirstValue(CLI_ARGS, ['server-mode'], process.env.BOT_RUNNER_SERVER_MODE)
+);
+const PREVIEW_BUILD_BEFORE_START = parseBoolOption(
+    resolveFirstValue(CLI_ARGS, ['preview-build'], process.env.BOT_RUNNER_PREVIEW_BUILD),
+    true
+);
 const GOTO_WAIT_UNTIL = resolveGotoWaitUntil(process.env.BOT_RUNNER_GOTO_WAIT_UNTIL);
 const PUBLISH_EVIDENCE = parseBoolOption(
     resolveFirstValue(CLI_ARGS, ['publish-evidence'], process.env.BOT_RUNNER_PUBLISH_EVIDENCE),
@@ -135,6 +142,12 @@ function resolveGotoWaitUntil(value) {
         return raw;
     }
     return 'commit';
+}
+
+function resolveServerMode(value) {
+    const raw = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    if (raw === 'preview') return 'preview';
+    return 'dev';
 }
 
 function log(message, payload) {
@@ -272,9 +285,10 @@ function killProcessTree(pid) {
     }
 }
 
-function startViteServer() {
+function startViteServer(mode = 'dev') {
     const viteBin = join(process.cwd(), 'node_modules', 'vite', 'bin', 'vite.js');
-    const child = spawn(process.execPath, [viteBin, 'dev', '--host', HOST, '--port', String(PORT), '--strictPort'], {
+    const command = mode === 'preview' ? 'preview' : 'dev';
+    const child = spawn(process.execPath, [viteBin, command, '--host', HOST, '--port', String(PORT), '--strictPort'], {
         cwd: process.cwd(),
         stdio: ['ignore', 'pipe', 'pipe'],
         shell: false,
@@ -620,6 +634,8 @@ async function run() {
         log('Runner config', {
             baseUrl: BASE_URL,
             forceKillPort: FORCE_KILL_PORT,
+            serverMode: SERVER_MODE,
+            previewBuildBeforeStart: PREVIEW_BUILD_BEFORE_START,
             roundsPerScenario: ROUNDS_PER_SCENARIO,
             forcedRoundPolicy: {
                 failOnForcedRound: FAIL_ON_FORCED_ROUND,
@@ -642,16 +658,20 @@ async function run() {
 
         const serverAlreadyRunning = await isServerReady(BASE_URL);
         if (!serverAlreadyRunning) {
-            log('Starting Vite dev server', { baseUrl: BASE_URL });
-            serverHandle = startViteServer();
+            if (SERVER_MODE === 'preview' && PREVIEW_BUILD_BEFORE_START) {
+                log('Building app before preview server start');
+                execSync('npm run build', { stdio: 'inherit' });
+            }
+            log(`Starting Vite ${SERVER_MODE} server`, { baseUrl: BASE_URL });
+            serverHandle = startViteServer(SERVER_MODE);
             await waitForServer(
                 BASE_URL,
                 serverHandle,
                 resolveTimeout(SERVER_READY_TIMEOUT_MS, 'server:start', [runDeadline])
             );
-            log('Dev server ready');
+            log(`${SERVER_MODE} server ready`);
         } else {
-            log('Reusing existing server', { baseUrl: BASE_URL });
+            log('Reusing existing server', { baseUrl: BASE_URL, requestedServerMode: SERVER_MODE });
         }
 
         browser = await withTimeout(
