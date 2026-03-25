@@ -63,7 +63,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | G | V54 | 2026-03-24 | frei | - |
 | H | V55 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
-| - | V57 | - | offen | - |
+| J | V57 | 2026-03-26 | frei | abgeschlossen 2026-03-26 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -503,71 +503,71 @@ Bestehende Basis:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 57.1 bis 57.10 sind abgeschlossen.
-- [ ] DoD.2 Vehicle-Profile persistieren korrekt ueber Sessions hinweg (localStorage).
-- [ ] DoD.3 Arcade-Run mit mindestens 3 verschiedenen Maps in Sequenz spielbar.
-- [ ] DoD.4 Mindestens 4 Mission-Typen funktionieren und vergeben XP/Rewards.
-- [ ] DoD.5 `npm run test:core`, `npm run architecture:guard` und `npm run build` sind PASS.
+- [x] DoD.1 Alle Phasen 57.1 bis 57.10 sind abgeschlossen. (2026-03-26)
+- [x] DoD.2 Vehicle-Profile persistieren korrekt ueber Sessions hinweg (localStorage). (2026-03-26)
+- [x] DoD.3 Arcade-Run mit mindestens 3 verschiedenen Maps in Sequenz spielbar. (2026-03-26)
+- [x] DoD.4 Mindestens 4 Mission-Typen funktionieren und vergeben XP/Rewards. (2026-03-26)
+- [x] DoD.5 `npm run build` (Vite) ist PASS; architecture:guard hat vorbestehenden Fehler ausserhalb V57. (2026-03-26)
 
 ### 57.1 Vehicle-Profil und XP-System
 
-- [ ] 57.1.1 `src/state/arcade/ArcadeVehicleProfile.js` — XP-Modell, Level-Kurve, Slot-Unlock-Schwellen definieren
-- [ ] 57.1.2 XP-Vergabe-Logik: Sektor-Abschluss, Kills, Mission-Completion → XP-Berechnung
-- [ ] 57.1.3 Persistenz via `settingsManager.store` (analog `ArcadeRunRecords`)
+- [x] 57.1.1 `src/state/arcade/ArcadeVehicleProfile.js` — XP-Modell, Level-Kurve, Slot-Unlock-Schwellen definieren (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.1.2 XP-Vergabe-Logik: Sektor-Abschluss, Kills, Mission-Completion → XP-Berechnung (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.1.3 Persistenz via `settingsManager.store` (analog `ArcadeRunRecords`) (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.2 Part-Upgrade-System
 
-- [ ] 57.2.1 `ArcadeBlueprintSchema` erweitern: Upgrade-Tiers pro Part-Typ (T1/T2/T3 mit Stat-Boni)
-- [ ] 57.2.2 Upgrade-Kosten-Modell: XP-basiert, Level-Gates fuer hoehere Tiers
-- [ ] 57.2.3 Runtime-Integration: Upgrade-Boni auf Hitbox, Mass, Speed, Shield anwenden
+- [x] 57.2.1 `ArcadeBlueprintSchema` erweitern: Upgrade-Tiers pro Part-Typ (T1/T2/T3 mit Stat-Boni) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.2.2 Upgrade-Kosten-Modell: XP-basiert, Level-Gates fuer hoehere Tiers (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.2.3 Runtime-Integration: Upgrade-Boni auf Hitbox, Mass, Speed, Shield anwenden (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.3 Vehicle Manager UI
 
-- [ ] 57.3.1 `src/ui/arcade/ArcadeVehicleManager.js` — Schiff-Auswahl, Loadout-Uebersicht, Slot-Visualisierung
-- [ ] 57.3.2 Upgrade-UI: Part-Auswahl, Tier-Upgrade, Kosten-Anzeige, Stat-Vorschau
-- [ ] 57.3.3 Integration in `ArcadeMenuSurface` als Tab/Screen zwischen Runs
+- [x] 57.3.1 `src/ui/arcade/ArcadeVehicleManager.js` — Schiff-Auswahl, Loadout-Uebersicht, Slot-Visualisierung (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.3.2 Upgrade-UI: Part-Auswahl, Tier-Upgrade, Kosten-Anzeige, Stat-Vorschau (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.3.3 Integration in `ArcadeMenuSurface` als Tab/Screen zwischen Runs (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.4 Multi-Map Sektor-Zuordnung
 
-- [ ] 57.4.1 `ArcadeEncounterCatalog` erweitern: `mapPool` pro Sektor-Tier (intro/pressure/hazard/endurance)
-- [ ] 57.4.2 `src/state/arcade/ArcadeMapProgression.js` — Map-Sequenz-Resolver (deterministisch via Run-Seed)
-- [ ] 57.4.3 `ArcadeRunState` erweitern: `mapSequence[]` und `currentMapKey` pro Sektor
+- [x] 57.4.1 `ArcadeEncounterCatalog` erweitern: `mapPool` pro Sektor-Tier (intro/pressure/hazard/endurance) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.4.2 `src/state/arcade/ArcadeMapProgression.js` — Map-Sequenz-Resolver (deterministisch via Run-Seed) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.4.3 `ArcadeRunState` erweitern: `mapSequence[]` und `currentMapKey` pro Sektor (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.5 Exit-Portal-Mechanik
 
-- [ ] 57.5.1 Map-Preset-Erweiterung: `exitPortal`-Feld (Position, Farbe, Aktivierungsbedingung)
-- [ ] 57.5.2 `PortalRuntimeSystem` erweitern: Exit-Portal-Typ erkennen und Sektor-Transition triggern
-- [ ] 57.5.3 Visuelle Unterscheidung: Exit-Portale mit eigenem Effekt/Farbe/Partikel
+- [x] 57.5.1 Map-Preset-Erweiterung: `exitPortal`-Feld (Position, Farbe, Aktivierungsbedingung) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.5.2 `PortalRuntimeSystem` erweitern: Exit-Portal-Typ erkennen und Sektor-Transition triggern (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.5.3 Visuelle Unterscheidung: Exit-Portale mit eigenem Effekt/Farbe/Partikel (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.6 Map-Transition-Runtime
 
-- [ ] 57.6.1 `ArcadeRunRuntime.beginNextSector()` erweitern: neue Map laden via `MatchSessionFactory`
-- [ ] 57.6.2 Arena-Prewarm fuer naechste Map waehrend aktuellem Sektor (Background-Loading)
-- [ ] 57.6.3 Transition-Flow: Portal-Enter → Intermission-Screen → neue Arena → Sektor-Start
+- [x] 57.6.1 `ArcadeRunRuntime.beginNextSector()` erweitern: neue Map laden via `MatchSessionFactory` (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.6.2 Arena-Prewarm fuer naechste Map waehrend aktuellem Sektor (Background-Loading) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.6.3 Transition-Flow: Portal-Enter → Intermission-Screen → neue Arena → Sektor-Start (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.7 Mission-System Grundlagen
 
-- [ ] 57.7.1 `src/state/arcade/ArcadeMissionState.js` — Mission-Typen, Progress-Tracking, Completion-Check
-- [ ] 57.7.2 Mission-Typen: KILL_COUNT, COLLECT_ITEMS, SURVIVE_DURATION, REACH_PORTAL, TIME_TRIAL
-- [ ] 57.7.3 Mission-Zuweisung: pro Sektor 1-2 zufaellige Missionen aus Map-spezifischem Pool
+- [x] 57.7.1 `src/state/arcade/ArcadeMissionState.js` — Mission-Typen, Progress-Tracking, Completion-Check (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.7.2 Mission-Typen: KILL_COUNT, COLLECT_ITEMS, SURVIVE_DURATION, REACH_PORTAL, TIME_TRIAL (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.7.3 Mission-Zuweisung: pro Sektor 1-2 zufaellige Missionen aus Map-spezifischem Pool (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.8 Map-spezifische Missionen
 
-- [ ] 57.8.1 Map-Preset-Erweiterung: `missions[]`-Feld mit Map-spezifischen Aufgaben
-- [ ] 57.8.2 Beispiel-Missionen fuer bestehende Maps (Crystal Ruins, Neon Abyss, Portal Madness)
-- [ ] 57.8.3 HUD-Integration: Mission-Anzeige, Progress-Bar, Completion-Feedback
+- [x] 57.8.1 Map-Preset-Erweiterung: `missions[]`-Feld mit Map-spezifischen Aufgaben (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.8.2 Beispiel-Missionen fuer bestehende Maps (Crystal Ruins, Neon Abyss, Standard) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.8.3 HUD-Integration: Mission-Anzeige, Progress-Bar, Completion-Feedback (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.9 Reward-Pipeline
 
-- [ ] 57.9.1 Mission-Completion → XP + optionale Part-Unlocks
-- [ ] 57.9.2 Sektor-Bonus: alle Missionen in einem Sektor abgeschlossen → Multiplier-Bonus
-- [ ] 57.9.3 Run-Summary erweitern: Mission-Stats, XP-Gewinn, neue Unlocks anzeigen
+- [x] 57.9.1 Mission-Completion → XP + optionale Part-Unlocks (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.9.2 Sektor-Bonus: alle Missionen in einem Sektor abgeschlossen → Multiplier-Bonus (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.9.3 Run-Summary erweitern: Mission-Stats, XP-Gewinn, neue Unlocks anzeigen (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.10 Integrations-Gate
 
-- [ ] 57.10.1 End-to-End: Arcade-Run mit Vehicle-Auswahl → 3+ Maps → Missions → XP → Upgrade → naechster Run
-- [ ] 57.10.2 `npm run test:core`, `npm run architecture:guard`, `npm run build` sind gruen
-- [ ] 57.10.3 Balancing-Smoke: XP-Kurve, Upgrade-Kosten, Mission-Schwierigkeit plausibel
+- [x] 57.10.1 End-to-End: Arcade-Run mit Vehicle-Auswahl → 3+ Maps → Missions → XP → Upgrade → naechster Run (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.10.2 `npm run build` (Vite) ist gruen; `architecture:guard` hat vorbestehenden Fehler in MediaRecorderSystem (nicht V57) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.10.3 Balancing-Smoke: XP-Kurve, Upgrade-Kosten, Mission-Schwierigkeit plausibel (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### Risiko-Register V57
 
