@@ -105,6 +105,8 @@ export class GameRuntimeFacade {
         this._arenaLoadedPeers = new Set();
         this._onStateUpdateHandler = null;
         this._onPlayerLoadedHandler = null;
+        this._onArenaStartSignalHandler = null;
+        this._pendingStateUpdates = [];
 
         this._baseRoundStateController = this.game?.roundStateController || null;
         this._arcadeRoundStateController = null;
@@ -663,7 +665,7 @@ export class GameRuntimeFacade {
         const game = this.game;
         game.settings.controls = game.settingsManager.cloneDefaultControls();
         this.onSettingsChanged();
-        game._showStatusToast('✅ Standard-Tasten wiederhergestellt');
+        game._showStatusToast('Standard-Tasten wiederhergestellt');
     }
 
     saveKeys() {
@@ -712,8 +714,8 @@ export class GameRuntimeFacade {
         if (!game.ui?.saveKeysButton) return;
         game.ui.saveKeysButton.classList.toggle('unsaved', game.settingsDirty);
         game.ui.saveKeysButton.textContent = game.settingsDirty
-            ? '💾 Einstellungen explizit speichern *'
-            : '💾 Einstellungen explizit speichern';
+            ? 'Einstellungen explizit speichern *'
+            : 'Einstellungen explizit speichern';
         game.uiManager?.updateContext();
     }
 

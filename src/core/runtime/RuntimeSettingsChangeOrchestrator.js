@@ -57,7 +57,7 @@ export function updateSaveButtonUi(game) {
     if (!game?.ui?.saveKeysButton) return;
     game.ui.saveKeysButton.classList.toggle('unsaved', game.settingsDirty);
     game.ui.saveKeysButton.textContent = game.settingsDirty
-        ? 'ðŸ’¾ Einstellungen explizit speichern *'
-        : 'ðŸ’¾ Einstellungen explizit speichern';
+        ? 'Einstellungen explizit speichern *'
+        : 'Einstellungen explizit speichern';
     game.uiManager?.updateContext?.();
 }

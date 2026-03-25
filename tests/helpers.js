@@ -1,7 +1,72 @@
 // Load page and wait for visible main menu.
 export async function loadGame(page) {
-    await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 90000 });
-    await page.waitForSelector('#main-menu', { state: 'visible', timeout: 30000 });
+    const maxAttempts = 2;
+    const gotoTimeoutMs = 45000;
+    const readyTimeoutMs = 30000;
+    let lastError = null;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+        try {
+            await page.goto('/', { waitUntil: 'commit', timeout: gotoTimeoutMs });
+            await page.waitForFunction(() => {
+                const menu = document.getElementById('main-menu');
+                const menuVisible = !!(menu && !menu.classList.contains('hidden'));
+                return menuVisible || !!globalThis?.GAME_INSTANCE;
+            }, null, { timeout: readyTimeoutMs });
+
+            const state = await page.evaluate(() => {
+                const menu = document.getElementById('main-menu');
+                const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+                return {
+                    menuVisible: !!(menu && !menu.classList.contains('hidden')),
+                    runtimeReady: !!globalThis?.GAME_INSTANCE,
+                    visiblePanelId: visiblePanel ? visiblePanel.id : null,
+                };
+            });
+
+            if (!state.runtimeReady) {
+                await page.waitForFunction(() => !!globalThis?.GAME_INSTANCE, null, { timeout: readyTimeoutMs });
+            }
+
+            const shouldReturnToMenu = state.runtimeReady
+                ? (!state.menuVisible || state.visiblePanelId)
+                : await page.evaluate(() => {
+                    const menu = document.getElementById('main-menu');
+                    const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+                    const runtimeReady = !!globalThis?.GAME_INSTANCE;
+                    const menuVisible = !!(menu && !menu.classList.contains('hidden'));
+                    return runtimeReady && (!menuVisible || !!visiblePanel);
+                });
+
+            if (shouldReturnToMenu) {
+                await page.evaluate(() => {
+                    globalThis?.GAME_INSTANCE?._returnToMenu?.();
+                });
+            }
+
+            await page.waitForFunction(() => {
+                const menu = document.getElementById('main-menu');
+                const menuVisible = !!(menu && !menu.classList.contains('hidden'));
+                const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+                return menuVisible && !visiblePanel;
+            }, null, { timeout: readyTimeoutMs });
+
+            return;
+        } catch (error) {
+            lastError = error;
+            const message = String(error?.message || '');
+            if (page.isClosed() || message.includes('Target page, context or browser has been closed')) {
+                throw error;
+            }
+            if (attempt >= maxAttempts) {
+                break;
+            }
+            await page.waitForTimeout(250 * attempt);
+        }
+    }
+
+    const message = lastError instanceof Error ? lastError.message : String(lastError || 'unknown');
+    throw new Error(`loadGame failed after ${maxAttempts} attempts: ${message}`);
 }
 
 export async function selectSessionType(page, sessionType = 'single') {

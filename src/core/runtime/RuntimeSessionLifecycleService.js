@@ -8,6 +8,10 @@ import { createGameStateSnapshot } from '../GameStateSnapshot.js';
 
 /** @type {number} Host broadcasts state snapshots at this interval (ms). */
 const STATE_BROADCAST_INTERVAL_MS = 100; // 10/s
+const STATE_UPDATE_BUFFER_LIMIT = 24;
+const ARENA_START_SIGNAL_TIMEOUT_MS = 12_000;
+const ARENA_LOADED_SIGNAL_TYPE = 'arena_loaded';
+const ARENA_START_SIGNAL_TYPE = 'arena_start';
 
 export async function initRuntimeSession(facade) {
     const game = facade?.game;
@@ -57,21 +61,49 @@ export function stopRuntimeStateBroadcast(facade) {
 
 export function setupRuntimeClientStateReceiver(facade) {
     if (!facade?.session) return;
+    if (!Array.isArray(facade._pendingStateUpdates)) {
+        facade._pendingStateUpdates = [];
+    }
+    const loadStateReconciler = typeof facade._loadStateReconciler === 'function'
+        ? facade._loadStateReconciler
+        : async () => {
+            const { StateReconciler } = await import('../../network/StateReconciler.js');
+            return new StateReconciler();
+        };
+
+    const replayBufferedStateUpdates = () => {
+        if (!facade._stateReconciler) return;
+        if (!Array.isArray(facade._pendingStateUpdates) || facade._pendingStateUpdates.length <= 0) return;
+        const buffered = facade._pendingStateUpdates.splice(0, facade._pendingStateUpdates.length);
+        for (const stateUpdate of buffered) {
+            facade._stateReconciler.receiveServerState(stateUpdate);
+        }
+        const game = facade?.game;
+        if (game?.entityManager?.players) {
+            facade._stateReconciler.reconcile(game.entityManager.players, game.entityManager);
+        }
+    };
+
     // Lazy-create reconciler
     if (!facade._stateReconciler) {
-        // StateReconciler is already bundled as part of the network chunk
-        import('../../network/StateReconciler.js').then(({ StateReconciler }) => {
-            facade._stateReconciler = new StateReconciler();
+        loadStateReconciler().then((stateReconciler) => {
+            facade._stateReconciler = stateReconciler || null;
+            replayBufferedStateUpdates();
         }).catch(() => { /* reconciler unavailable - degrade gracefully */ });
     }
 
     facade._onStateUpdateHandler = (serverState) => {
-        if (facade._stateReconciler) {
-            facade._stateReconciler.receiveServerState(serverState);
-            const game = facade?.game;
-            if (game?.entityManager?.players) {
-                facade._stateReconciler.reconcile(game.entityManager.players, game.entityManager);
+        if (!facade._stateReconciler) {
+            facade._pendingStateUpdates.push(serverState);
+            if (facade._pendingStateUpdates.length > STATE_UPDATE_BUFFER_LIMIT) {
+                facade._pendingStateUpdates.splice(0, facade._pendingStateUpdates.length - STATE_UPDATE_BUFFER_LIMIT);
             }
+            return;
+        }
+        facade._stateReconciler.receiveServerState(serverState);
+        const game = facade?.game;
+        if (game?.entityManager?.players) {
+            facade._stateReconciler.reconcile(game.entityManager.players, game.entityManager);
         }
     };
     facade.session.on('stateUpdate', facade._onStateUpdateHandler);
@@ -89,8 +121,35 @@ export async function waitForRuntimePlayersLoaded(facade) {
     }
 
     if (!facade.session.isHost) {
-        facade.session.sendInput({ type: 'arena_loaded', playerId: localPlayerId });
-        return;
+        return new Promise((resolve) => {
+            let completed = false;
+            let timeoutId = null;
+
+            const finish = () => {
+                if (completed) return;
+                completed = true;
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
+                if (facade._onArenaStartSignalHandler && facade.session) {
+                    facade.session.off('remoteInput', facade._onArenaStartSignalHandler);
+                    facade._onArenaStartSignalHandler = null;
+                }
+                resolve();
+            };
+
+            facade._onArenaStartSignalHandler = (payload) => {
+                const inputType = String(payload?.input?.type || '').trim().toLowerCase();
+                if (inputType !== ARENA_START_SIGNAL_TYPE) return;
+                finish();
+            };
+
+            facade.session.on('remoteInput', facade._onArenaStartSignalHandler);
+            facade.session.sendInput({ type: ARENA_LOADED_SIGNAL_TYPE, playerId: localPlayerId });
+
+            timeoutId = setTimeout(() => finish(), ARENA_START_SIGNAL_TIMEOUT_MS);
+        });
     }
 
     const expectedPeerIds = new Set(
@@ -112,6 +171,16 @@ export async function waitForRuntimePlayersLoaded(facade) {
             if (timeoutId) {
                 clearTimeout(timeoutId);
                 timeoutId = null;
+            }
+            try {
+                facade.session?.sendInput?.({
+                    type: ARENA_START_SIGNAL_TYPE,
+                    playerId: localPlayerId || 'host',
+                    expectedPeerIds: Array.from(expectedPeerIds.values()),
+                    timestamp: Date.now(),
+                });
+            } catch {
+                // Ignore best-effort host start signaling failures.
             }
             if (facade._onPlayerLoadedHandler && facade.session) {
                 facade.session.off('playerLoaded', facade._onPlayerLoadedHandler);
@@ -158,7 +227,14 @@ export function teardownRuntimeSession(facade) {
         facade.session.off('playerLoaded', facade._onPlayerLoadedHandler);
         facade._onPlayerLoadedHandler = null;
     }
+    if (facade?._onArenaStartSignalHandler && facade.session) {
+        facade.session.off('remoteInput', facade._onArenaStartSignalHandler);
+        facade._onArenaStartSignalHandler = null;
+    }
     facade?._arenaLoadedPeers?.clear?.();
+    if (Array.isArray(facade?._pendingStateUpdates)) {
+        facade._pendingStateUpdates.length = 0;
+    }
     if (facade?.session) {
         facade.session.dispose();
         facade.session = null;

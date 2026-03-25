@@ -21,14 +21,12 @@ export class PortalRuntimeSystem {
                 const dist = portal.posA.distanceTo(portal.posB);
                 const dynamicCooldown = Math.min(2.5, Math.max(CONFIG.PORTAL.COOLDOWN, dist / 80));
                 portal.cooldowns.set(entityId, dynamicCooldown);
-                console.log(`[Arena] PORTAL HIT: Entity ${entityId} teleporting A -> B (Cooldown: ${dynamicCooldown.toFixed(1)}s)`);
                 return { target: portal.posB, portal };
             }
             if (distBSq < triggerRadiusSq) {
                 const dist = portal.posA.distanceTo(portal.posB);
                 const dynamicCooldown = Math.min(2.5, Math.max(CONFIG.PORTAL.COOLDOWN, dist / 80));
                 portal.cooldowns.set(entityId, dynamicCooldown);
-                console.log(`[Arena] PORTAL HIT: Entity ${entityId} teleporting B -> A (Cooldown: ${dynamicCooldown.toFixed(1)}s)`);
                 return { target: portal.posA, portal };
             }
         }

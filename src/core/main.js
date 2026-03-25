@@ -497,6 +497,7 @@ export class Game {
         this.keyCapture = null;
         this.gameLoop?.stop?.();
         this.matchFlowUiController?.sessionOrchestrator?.teardownMatchSession?.();
+        this.matchFlowUiController?.dispose?.();
         this.runtimeFacade?.dispose?.();
         this.huntHud?.dispose?.();
         this.uiManager?.dispose?.();

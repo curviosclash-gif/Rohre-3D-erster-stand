@@ -106,17 +106,19 @@ test.describe('Training Automation V33', () => {
                         return;
                     }
                     actionRequestCount += 1;
-                    if (actionRequestCount === 1) {
-                        return;
-                    }
+                    const sequence = actionRequestCount;
                     setTimeout(() => {
                         this._emit('message', {
                             data: JSON.stringify({
                                 id: envelope.id,
-                                action: { yawRight: true },
+                                action: {
+                                    yawRight: true,
+                                    requestTick: Number(envelope?.payload?.tick || 0),
+                                    requestSequence: sequence,
+                                },
                             }),
                         });
-                    }, 2);
+                    }, sequence === 1 ? 10 : 2);
                 }
 
                 close() {
@@ -129,20 +131,23 @@ test.describe('Training Automation V33', () => {
             try {
                 const bridge = new WebSocketTrainerBridge({
                     enabled: true,
-                    timeoutMs: 8,
-                    maxRetries: 1,
+                    timeoutMs: 12,
+                    maxRetries: 0,
                     retryDelayMs: 0,
                     url: 'ws://127.0.0.1:8765',
+                    maxPendingAcks: 4,
+                    backpressureThreshold: 2,
+                    dropTrainingPayloadWhenBacklogged: true,
                 });
-                bridge.submitObservation({
-                    mode: 'classic',
-                    planarMode: false,
-                    dt: 1 / 60,
-                    observation: new Array(40).fill(0),
-                });
-                await new Promise((resolve) => setTimeout(resolve, 18));
-                bridge.consumeFailure();
-                await new Promise((resolve) => setTimeout(resolve, 12));
+                bridge.submitObservation({ tick: 1 });
+                bridge.submitObservation({ tick: 2 });
+                bridge.submitObservation({ tick: 3 });
+                await new Promise((resolve) => setTimeout(resolve, 20));
+
+                bridge.submitTrainingStep({ frame: 1 });
+                bridge.submitTrainingStep({ frame: 2 });
+                bridge.submitTrainingStep({ frame: 3 });
+                bridge.submitTrainingStep({ frame: 4 });
 
                 const action = bridge.consumeLatestAction();
                 if (!action) {
@@ -155,26 +160,32 @@ test.describe('Training Automation V33', () => {
 
                 return {
                     actionYawRight: !!action?.yawRight,
+                    latestActionTick: Number(action?.requestTick || 0),
                     failure: failure || null,
                     requestsSent: Number(telemetry.requestsSent || 0),
                     responsesReceived: Number(telemetry.responsesReceived || 0),
                     retries: Number(telemetry.retries || 0),
                     timeouts: Number(telemetry.timeouts || 0),
                     fallbacks: Number(telemetry.fallbacks || 0),
+                    actionDrops: Number(telemetry.actionDrops || 0),
+                    actionSendSkipped: Number(telemetry.actionSendSkipped || 0),
+                    backpressureDrops: Number(telemetry.backpressureDrops || 0),
                 };
             } finally {
                 globalThis.WebSocket = originalWebSocket;
             }
         });
 
-        expect(typeof result.actionYawRight).toBe('boolean');
-        if (result.failure !== null) {
-            expect(result.failure).toBe('timeout');
-        }
-        expect(result.requestsSent).toBe(1);
-        expect(result.responsesReceived).toBeGreaterThanOrEqual(0);
-        expect(result.retries).toBeGreaterThanOrEqual(1);
-        expect(result.timeouts).toBeGreaterThanOrEqual(1);
+        expect(result.actionYawRight).toBeTruthy();
+        expect(result.latestActionTick).toBe(3);
+        expect(result.failure).toBeNull();
+        expect(result.requestsSent).toBeGreaterThanOrEqual(2);
+        expect(result.responsesReceived).toBeGreaterThanOrEqual(2);
+        expect(result.retries).toBe(0);
+        expect(result.timeouts).toBe(0);
         expect(result.fallbacks).toBeGreaterThanOrEqual(1);
+        expect(result.actionDrops).toBeGreaterThanOrEqual(1);
+        expect(result.actionSendSkipped).toBeGreaterThanOrEqual(2);
+        expect(result.backpressureDrops).toBeGreaterThanOrEqual(1);
     });
 });

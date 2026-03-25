@@ -1,7 +1,6 @@
 // ============================================
 // WebSocketTrainerBridge.js - optional async trainer bridge with timeout/retry/error telemetry
 // ============================================
-
 import { TRAINING_CONTRACT_VERSION } from '../../../shared/contracts/TrainingRuntimeContract.js';
 import { createTrainerTransportEnvelope } from './TrainerPayloadAdapter.js';
 import {
@@ -10,19 +9,14 @@ import {
     pushLatencySample,
     pushTelemetrySample,
 } from './WebSocketTrainerBridgeTelemetry.js';
-
 import { clamp } from '../../../utils/MathOps.js';
-
 function toSafeUrl(value, fallback) {
     return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
-
 function toNow(value) { return typeof value === 'function' ? value : () => Date.now(); }
-
 const toBoundedInt = (value, fallback, min = 0, max = Number.MAX_SAFE_INTEGER) => (Number.isFinite(Number(value))
     ? Math.max(min, Math.min(max, Math.trunc(Number(value))))
     : fallback);
-
 export class WebSocketTrainerBridge {
     constructor(options = {}) {
         this.enabled = !!options.enabled;
@@ -34,11 +28,11 @@ export class WebSocketTrainerBridge {
             ? options.readyMessageType.trim()
             : 'trainer-ready';
         this.requireReadyMessage = options.requireReadyMessage !== false;
-        this.maxPendingAcks = toBoundedInt(options.maxPendingAcks, 512, 16, 8192);
+        this.maxPendingAcks = toBoundedInt(options.maxPendingAcks, 512, 1, 8192);
         this.backpressureThreshold = Math.min(this.maxPendingAcks, toBoundedInt(
             options.backpressureThreshold,
-            Math.max(8, Math.floor(this.maxPendingAcks * 0.75)),
-            8,
+            Math.max(1, Math.floor(this.maxPendingAcks * 0.75)),
+            1,
             this.maxPendingAcks
         ));
         this.dropTrainingPayloadWhenBacklogged = options.dropTrainingPayloadWhenBacklogged !== false;
@@ -51,6 +45,7 @@ export class WebSocketTrainerBridge {
         this._pendingRequest = null;
         this._pendingAcks = new Map();
         this._pendingCommands = new Map();
+        this._latestQueuedActionRequest = null;
         this._latestAction = null;
         this._latestResponse = null;
         this._latestFailure = null;
@@ -60,22 +55,18 @@ export class WebSocketTrainerBridge {
         this._telemetry.maxPendingAcks = this.maxPendingAcks; this._telemetry.backpressureThreshold = this.backpressureThreshold;
         this._boundOpenHandler = null; this._boundMessageHandler = null; this._boundErrorHandler = null; this._boundCloseHandler = null;
     }
-
     _resolveOpenState() {
         return typeof WebSocket === 'function' && Number.isInteger(WebSocket.OPEN) ? WebSocket.OPEN : 1;
     }
-
     _resolveConnectingState() {
         return typeof WebSocket === 'function' && Number.isInteger(WebSocket.CONNECTING) ? WebSocket.CONNECTING : 0;
     }
-
     _recordFailure(reason) {
         const normalizedReason = String(reason || 'bridge-error');
         this._latestFailure = normalizedReason;
         this._telemetry.failures += 1;
         this._telemetry.lastFailure = normalizedReason;
     }
-
     _markReady(payload = null) {
         this._isReady = true;
         this._telemetry.readyMessages += 1;
@@ -83,11 +74,9 @@ export class WebSocketTrainerBridge {
             this._latestReadyPayload = payload;
         }
     }
-
     _markNotReady() {
         this._isReady = false;
     }
-
     _ingestTrainingTelemetry(parsed) {
         const training = parsed?.training;
         if (!training || typeof training !== 'object') {
@@ -114,11 +103,32 @@ export class WebSocketTrainerBridge {
             );
         }
     }
-
-    _clearPending() {
+    _clearPending(options = {}) {
         this._pendingRequest = null;
+        if (options.flushLatest !== false) {
+            this._flushLatestActionRequest();
+        }
     }
-
+    _queueLatestActionRequest(payload) {
+        if (this._latestQueuedActionRequest) {
+            this._telemetry.actionDrops += 1;
+        }
+        this._latestQueuedActionRequest = payload;
+    }
+    _flushLatestActionRequest() {
+        if (!this._latestQueuedActionRequest) return false;
+        if (!this._canSendRequest()) return false;
+        const queuedPayload = this._latestQueuedActionRequest;
+        this._latestQueuedActionRequest = null;
+        const sent = this._submitRequest('bot-action-request', queuedPayload, {
+            expectsAction: true,
+        });
+        if (!sent) {
+            this._latestQueuedActionRequest = queuedPayload;
+            return false;
+        }
+        return true;
+    }
     _attachSocketHandlers(socket) {
         this._boundOpenHandler = () => {
             if (!this.requireReadyMessage) {
@@ -138,13 +148,11 @@ export class WebSocketTrainerBridge {
             this._clearPending();
             this._resolvePendingCommands(null);
         };
-
         this._addSocketListener(socket, 'open', this._boundOpenHandler);
         this._addSocketListener(socket, 'message', this._boundMessageHandler);
         this._addSocketListener(socket, 'error', this._boundErrorHandler);
         this._addSocketListener(socket, 'close', this._boundCloseHandler);
     }
-
     _detachSocketHandlers() {
         const socket = this._socket;
         if (!socket) return;
@@ -157,7 +165,6 @@ export class WebSocketTrainerBridge {
         this._boundErrorHandler = null;
         this._boundCloseHandler = null;
     }
-
     _addSocketListener(socket, type, handler) {
         if (!socket || typeof handler !== 'function') return;
         if (typeof socket.addEventListener === 'function') {
@@ -168,7 +175,6 @@ export class WebSocketTrainerBridge {
             socket.on(type, handler);
         }
     }
-
     _removeSocketListener(socket, type, handler) {
         if (!socket || typeof handler !== 'function') return;
         if (typeof socket.removeEventListener === 'function') {
@@ -183,7 +189,6 @@ export class WebSocketTrainerBridge {
             socket.removeListener(type, handler);
         }
     }
-
     _resolvePendingCommands(response) {
         if (this._pendingCommands.size <= 0) return;
         for (const entry of this._pendingCommands.values()) {
@@ -196,11 +201,9 @@ export class WebSocketTrainerBridge {
         }
         this._pendingCommands.clear();
     }
-
     _handleSocketMessage(event) {
         const raw = event?.data;
         if (!raw) return;
-
         let parsed = null;
         try {
             parsed = JSON.parse(raw);
@@ -208,19 +211,16 @@ export class WebSocketTrainerBridge {
             this._recordFailure('invalid-json');
             return;
         }
-
         const responseType = typeof parsed?.type === 'string' ? parsed.type.trim().toLowerCase() : '';
         if (responseType && responseType === this.readyMessageType.trim().toLowerCase()) {
             this._markReady(parsed);
             this._latestResponse = parsed;
             return;
         }
-
         const responseId = Number(parsed?.id);
         if (!Number.isInteger(responseId)) {
             return;
         }
-
         if (this._pendingCommands.has(responseId)) {
             const pendingCommand = this._pendingCommands.get(responseId);
             this._pendingCommands.delete(responseId);
@@ -239,7 +239,6 @@ export class WebSocketTrainerBridge {
             }
             return;
         }
-
         if (this._pendingAcks.has(responseId)) {
             const sentAt = this._pendingAcks.get(responseId);
             this._pendingAcks.delete(responseId);
@@ -252,7 +251,6 @@ export class WebSocketTrainerBridge {
             this._ingestTrainingTelemetry(parsed);
             return;
         }
-
         if (!this._pendingRequest || responseId !== this._pendingRequest.id) {
             if (
                 parsed?.ok === true
@@ -265,7 +263,6 @@ export class WebSocketTrainerBridge {
             }
             return;
         }
-
         const pending = this._pendingRequest;
         this._telemetry.responsesReceived += 1;
         pushLatencySample(this._telemetry, this._now() - pending.sentAt);
@@ -277,7 +274,6 @@ export class WebSocketTrainerBridge {
             this._telemetry.ackResponses += 1;
             return;
         }
-
         const actionPayload = parsed?.action ?? parsed?.payload?.action ?? null;
         if (actionPayload && typeof actionPayload === 'object') {
             this._latestAction = actionPayload;
@@ -286,7 +282,6 @@ export class WebSocketTrainerBridge {
         }
         this._recordFailure('missing-action');
     }
-
     _ensureSocket() {
         if (!this.enabled) return;
         const openState = this._resolveOpenState();
@@ -295,14 +290,12 @@ export class WebSocketTrainerBridge {
         const isSocketConnecting = this._socket && this._socket.readyState === connectingState;
         if (isSocketOpen || isSocketConnecting) return;
         this._markNotReady();
-
         if (typeof WebSocket !== 'function') {
             if (!this._socketFactory) {
                 this._recordFailure('websocket-unavailable');
                 return;
             }
         }
-
         try {
             this._socket = this._socketFactory
                 ? this._socketFactory(this.url)
@@ -327,21 +320,17 @@ export class WebSocketTrainerBridge {
             this._socket = null;
         }
     }
-
     waitForReady(timeoutMs = this.timeoutMs) {
         if (!this.enabled) return Promise.resolve(false);
-
         const timeout = clamp(timeoutMs, 20, 30_000);
         this._ensureSocket();
         const socket = this._socket;
         if (!socket) return Promise.resolve(false);
-
         const openState = this._resolveOpenState();
         const isReady = socket.readyState === openState && (this._isReady || !this.requireReadyMessage);
         if (isReady) {
             return Promise.resolve(true);
         }
-
         return new Promise((resolve) => {
             let settled = false;
             const finish = (ready) => {
@@ -376,20 +365,17 @@ export class WebSocketTrainerBridge {
                 this._recordFailure(this.requireReadyMessage ? 'ready-timeout' : 'connect-timeout');
                 finish(false);
             }, timeout);
-
             this._addSocketListener(socket, 'open', handleOpen);
             this._addSocketListener(socket, 'error', handleError);
             this._addSocketListener(socket, 'close', handleClose);
             this._addSocketListener(socket, 'message', handleMessage);
         });
     }
-
     _retryPendingRequest(pending) {
         if (!pending) return false;
         if (pending.retryCount >= this.maxRetries) return false;
         const now = this._now();
         if (now < pending.retryAt) return false;
-
         try {
             this._socket.send(pending.serialized);
             pending.retryCount += 1;
@@ -403,7 +389,6 @@ export class WebSocketTrainerBridge {
             return false;
         }
     }
-
     _handleTimeout() {
         if (!this._pendingRequest) return;
         const now = this._now();
@@ -425,7 +410,6 @@ export class WebSocketTrainerBridge {
             }
         }
     }
-
     _canSendRequest() {
         const openState = this._resolveOpenState();
         return (
@@ -434,13 +418,11 @@ export class WebSocketTrainerBridge {
             && !this._pendingRequest
         );
     }
-
     _submitRequest(type, payload, options = {}) {
-        if (!this.enabled) return;
+        if (!this.enabled) return false;
         this._ensureSocket();
         this._handleTimeout();
-        if (!this._canSendRequest()) return;
-
+        if (!this._canSendRequest()) return false;
         const requestId = this._nextRequestId++;
         const envelope = createTrainerTransportEnvelope(
             type,
@@ -448,21 +430,18 @@ export class WebSocketTrainerBridge {
             payload,
             options.envelopeOptions || {}
         );
-
         let serialized = '';
         try {
             serialized = JSON.stringify(envelope);
         } catch {
             this._recordFailure('serialize-failed');
-            return;
+            return false;
         }
-
         const expectsAction = options.expectsAction !== false;
         if (!expectsAction && this.dropTrainingPayloadWhenBacklogged && this._pendingAcks.size >= this.backpressureThreshold) {
             this._telemetry.backpressureDrops += 1;
-            return;
+            return false;
         }
-
         try {
             this._socket.send(serialized);
             const now = this._now();
@@ -481,26 +460,28 @@ export class WebSocketTrainerBridge {
                     retryCount: 0,
                     serialized,
                 };
-                return;
+                return true;
             }
-
             this._pendingAcks.set(requestId, now);
             if (this._pendingAcks.size > this.maxPendingAcks) {
                 const firstKey = this._pendingAcks.keys().next().value;
                 this._pendingAcks.delete(firstKey);
                 this._telemetry.ackEvictions += 1;
             }
+            return true;
         } catch {
             this._recordFailure('send-failed');
+            return false;
         }
     }
-
     submitObservation(payload) {
-        this._submitRequest('bot-action-request', payload, {
+        const sent = this._submitRequest('bot-action-request', payload, {
             expectsAction: true,
         });
+        if (sent) return;
+        this._telemetry.actionSendSkipped += 1;
+        this._queueLatestActionRequest(payload);
     }
-
     submitTrainingPayload(messageType, payload) {
         const type = typeof messageType === 'string' && messageType.trim()
             ? messageType.trim()
@@ -513,15 +494,12 @@ export class WebSocketTrainerBridge {
             },
         });
     }
-
     submitTrainingReset(payload) {
         this.submitTrainingPayload('training-reset', payload);
     }
-
     submitTrainingStep(payload) {
         this.submitTrainingPayload('training-step', payload);
     }
-
     submitCommand(messageType, payload = {}, options = {}) {
         if (!this.enabled) return Promise.resolve(null);
         const type = typeof messageType === 'string' && messageType.trim()
@@ -533,7 +511,6 @@ export class WebSocketTrainerBridge {
         if (!this._canSendRequest()) {
             return Promise.resolve(null);
         }
-
         const requestId = this._nextRequestId++;
         const envelope = createTrainerTransportEnvelope(
             type,
@@ -544,7 +521,6 @@ export class WebSocketTrainerBridge {
                 sentAtMs: this._now(),
             }
         );
-
         let serialized = '';
         try {
             serialized = JSON.stringify(envelope);
@@ -552,7 +528,6 @@ export class WebSocketTrainerBridge {
             this._recordFailure('serialize-failed');
             return Promise.resolve(null);
         }
-
         return new Promise((resolve) => {
             try {
                 this._socket.send(serialized);
@@ -579,37 +554,31 @@ export class WebSocketTrainerBridge {
             });
         });
     }
-
     consumeLatestAction() {
         const action = this._latestAction;
         this._latestAction = null;
         return action;
     }
-
     consumeLatestResponse() {
         const response = this._latestResponse;
         this._latestResponse = null;
         return response;
     }
-
     consumeLatestReadyPayload() {
         const readyPayload = this._latestReadyPayload;
         this._latestReadyPayload = null;
         return readyPayload;
     }
-
     consumeFailure() {
         this._handleTimeout();
         const failure = this._latestFailure;
         this._latestFailure = null;
         return failure;
     }
-
     recordFallback(reason = 'external-fallback') {
         this._telemetry.fallbacks += 1;
         this._telemetry.lastFallbackReason = String(reason || 'external-fallback');
     }
-
     getTelemetrySnapshot() {
         this._handleTimeout();
         return cloneTelemetrySnapshot({
@@ -619,13 +588,11 @@ export class WebSocketTrainerBridge {
             pendingCommandCount: this._pendingCommands.size,
         });
     }
-
     resetTelemetry() {
         this._telemetry = createTelemetryState();
         this._telemetry.maxPendingAcks = this.maxPendingAcks;
         this._telemetry.backpressureThreshold = this.backpressureThreshold;
     }
-
     close() {
         if (this._socket) {
             this._detachSocketHandlers();
@@ -637,6 +604,7 @@ export class WebSocketTrainerBridge {
         }
         this._socket = null;
         this._clearPending();
+        this._latestQueuedActionRequest = null;
         this._pendingAcks.clear();
         this._resolvePendingCommands(null);
         this._latestReadyPayload = null;

@@ -8,6 +8,7 @@ const DB_VERSION = 1;
 const STORE_NAME = 'rounds';
 const MAX_ENTRIES = 500;
 const PRUNE_BATCH = 50;
+const DB_RETRY_ATTEMPTS = 2;
 
 function openDb() {
     return new Promise((resolve, reject) => {
@@ -24,7 +25,8 @@ function openDb() {
             }
         };
         request.onsuccess = () => resolve(request.result);
-        request.onerror = () => reject(request.error);
+        request.onerror = () => reject(request.error || new Error('indexeddb-open-failed'));
+        request.onblocked = () => reject(new Error('indexeddb-open-blocked'));
     });
 }
 
@@ -62,41 +64,98 @@ function normalizeEntry(source) {
     };
 }
 
+function isRetryableDbError(error) {
+    const name = String(error?.name || '').trim();
+    if (!name) return false;
+    return (
+        name === 'AbortError'
+        || name === 'InvalidStateError'
+        || name === 'TransactionInactiveError'
+        || name === 'UnknownError'
+        || name === 'NotReadableError'
+        || name === 'QuotaExceededError'
+    );
+}
+
 export class TelemetryHistoryStore {
     constructor() {
         this._dbPromise = null;
+        this._db = null;
     }
 
-    _getDb() {
-        if (!this._dbPromise) {
-            this._dbPromise = openDb().catch(() => null);
+    async _getDb() {
+        if (this._db) {
+            return this._db;
         }
-        return this._dbPromise;
+        if (!this._dbPromise) {
+            this._dbPromise = openDb()
+                .then((db) => {
+                    this._db = db;
+                    return db;
+                })
+                .catch(() => {
+                    this._dbPromise = null;
+                    this._db = null;
+                    return null;
+                });
+        }
+        const db = await this._dbPromise;
+        if (!db) {
+            this._dbPromise = null;
+        }
+        return db;
+    }
+
+    _invalidateDb() {
+        if (this._db && typeof this._db.close === 'function') {
+            try {
+                this._db.close();
+            } catch {
+                // Ignore close errors.
+            }
+        }
+        this._db = null;
+        this._dbPromise = null;
+    }
+
+    async _runWithDbRetry(operation, fallbackValue) {
+        for (let attempt = 0; attempt <= DB_RETRY_ATTEMPTS; attempt += 1) {
+            const db = await this._getDb();
+            if (!db) return fallbackValue;
+
+            try {
+                return await operation(db);
+            } catch (error) {
+                const shouldRetry = attempt < DB_RETRY_ATTEMPTS && isRetryableDbError(error);
+                this._invalidateDb();
+                if (!shouldRetry) {
+                    return fallbackValue;
+                }
+            }
+        }
+        return fallbackValue;
     }
 
     async recordRound(payload) {
-        const db = await this._getDb();
-        if (!db) return false;
-
         const entry = normalizeEntry(payload);
-
-        return new Promise((resolve) => {
+        return this._runWithDbRetry(async (db) => new Promise((resolve, reject) => {
             try {
                 const tx = db.transaction(STORE_NAME, 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
                 store.add(entry);
                 tx.oncomplete = () => {
-                    this._pruneIfNeeded(db).then(() => resolve(true));
+                    this._pruneIfNeeded(db).then(() => resolve(true)).catch(reject);
                 };
-                tx.onerror = () => resolve(false);
-            } catch {
-                resolve(false);
+                tx.onerror = () => reject(tx.error || new Error('record-round-failed'));
+                tx.onabort = () => reject(tx.error || new Error('record-round-aborted'));
+            } catch (error) {
+                reject(error);
             }
-        });
+        }), false);
     }
 
     async _pruneIfNeeded(db) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             try {
                 const tx = db.transaction(STORE_NAME, 'readwrite');
                 const store = tx.objectStore(STORE_NAME);
@@ -114,43 +173,41 @@ export class TelemetryHistoryStore {
                         const c = event.target.result;
                         if (c && deleted < deleteCount) {
                             c.delete();
-                            deleted++;
+                            deleted += 1;
                             c.continue();
-                        } else {
-                            resolve();
+                            return;
                         }
+                        resolve();
                     };
-                    cursor.onerror = () => resolve();
+                    cursor.onerror = () => reject(cursor.error || new Error('prune-cursor-failed'));
                 };
-                countReq.onerror = () => resolve();
-            } catch {
-                resolve();
+                countReq.onerror = () => reject(countReq.error || new Error('prune-count-failed'));
+                tx.onerror = () => reject(tx.error || new Error('prune-tx-failed'));
+                tx.onabort = () => reject(tx.error || new Error('prune-tx-aborted'));
+            } catch (error) {
+                reject(error);
             }
         });
     }
 
     async getCount() {
-        const db = await this._getDb();
-        if (!db) return 0;
-
-        return new Promise((resolve) => {
+        return this._runWithDbRetry(async (db) => new Promise((resolve, reject) => {
             try {
                 const tx = db.transaction(STORE_NAME, 'readonly');
                 const store = tx.objectStore(STORE_NAME);
                 const req = store.count();
                 req.onsuccess = () => resolve(req.result);
-                req.onerror = () => resolve(0);
-            } catch {
-                resolve(0);
+                req.onerror = () => reject(req.error || new Error('count-failed'));
+                tx.onerror = () => reject(tx.error || new Error('count-tx-failed'));
+                tx.onabort = () => reject(tx.error || new Error('count-tx-aborted'));
+            } catch (error) {
+                reject(error);
             }
-        });
+        }), 0);
     }
 
     async getSummary() {
-        const db = await this._getDb();
-        if (!db) return this._emptySummary();
-
-        return new Promise((resolve) => {
+        return this._runWithDbRetry(async (db) => new Promise((resolve, reject) => {
             try {
                 const tx = db.transaction(STORE_NAME, 'readonly');
                 const store = tx.objectStore(STORE_NAME);
@@ -159,11 +216,13 @@ export class TelemetryHistoryStore {
                     const rows = req.result || [];
                     resolve(this._computeSummary(rows));
                 };
-                req.onerror = () => resolve(this._emptySummary());
-            } catch {
-                resolve(this._emptySummary());
+                req.onerror = () => reject(req.error || new Error('summary-failed'));
+                tx.onerror = () => reject(tx.error || new Error('summary-tx-failed'));
+                tx.onabort = () => reject(tx.error || new Error('summary-tx-aborted'));
+            } catch (error) {
+                reject(error);
             }
-        });
+        }), this._emptySummary());
     }
 
     _computeSummary(rows) {
@@ -190,8 +249,8 @@ export class TelemetryHistoryStore {
                 parcoursCompletions += 1;
                 totalParcoursCompletionTimeMs += toNonNegativeNumber(r.parcoursCompletionTimeMs);
             }
-            if (r.winnerType === 'human') humanWins++;
-            if (r.winnerType === 'bot') botWins++;
+            if (r.winnerType === 'human') humanWins += 1;
+            if (r.winnerType === 'bot') botWins += 1;
 
             const mk = sanitizeString(r.mapKey, 'unknown');
             mapCounts[mk] = (mapCounts[mk] || 0) + 1;
@@ -248,18 +307,16 @@ export class TelemetryHistoryStore {
     }
 
     async clear() {
-        const db = await this._getDb();
-        if (!db) return false;
-
-        return new Promise((resolve) => {
+        return this._runWithDbRetry(async (db) => new Promise((resolve, reject) => {
             try {
                 const tx = db.transaction(STORE_NAME, 'readwrite');
                 tx.objectStore(STORE_NAME).clear();
                 tx.oncomplete = () => resolve(true);
-                tx.onerror = () => resolve(false);
-            } catch {
-                resolve(false);
+                tx.onerror = () => reject(tx.error || new Error('clear-failed'));
+                tx.onabort = () => reject(tx.error || new Error('clear-aborted'));
+            } catch (error) {
+                reject(error);
             }
-        });
+        }), false);
     }
 }

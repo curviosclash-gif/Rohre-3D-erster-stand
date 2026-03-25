@@ -168,7 +168,7 @@ export class CameraRigSystem {
         const changed = previous.normal !== next.normal
             || previous.reduceMotion !== next.reduceMotion;
         this.cameraPerspectiveSettings = next;
-        if (changed) {
+        if (changed && this.livePerspectiveEnabled === true) {
             this.liveOrbitDirector.reset();
             this._resetTimingState('camera-perspective-toggle');
         }

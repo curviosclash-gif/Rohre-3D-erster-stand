@@ -362,7 +362,7 @@ export function setupMenuGameplayBindings(ctx) {
             }
             emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_NORMAL]);
             emit(eventTypes.SHOW_STATUS_TOAST, {
-                message: `Perspektive Normal: ${resolveNormalCameraPerspectiveLabel(cameraPerspectiveSettings.normal)}`,
+                message: `Video-Perspektive: ${resolveNormalCameraPerspectiveLabel(cameraPerspectiveSettings.normal)}`,
                 duration: 1300,
                 tone: 'info',
             });
@@ -375,8 +375,8 @@ export function setupMenuGameplayBindings(ctx) {
             emitSettingsChangedImmediate([keys.CAMERA_PERSPECTIVE_REDUCE_MOTION]);
             emit(eventTypes.SHOW_STATUS_TOAST, {
                 message: cameraPerspectiveSettings.reduceMotion
-                    ? 'Perspektive Normal: beruhigt'
-                    : 'Perspektive Normal: dynamisch',
+                    ? 'Video-Perspektive: beruhigt'
+                    : 'Video-Perspektive: dynamisch',
                 duration: 1300,
                 tone: 'info',
             });

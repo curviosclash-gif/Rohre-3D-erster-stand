@@ -11,6 +11,8 @@ export class PauseOverlayController {
         this.ports = deps.ports || null;
         this._listenersInitialized = false;
         this._hostPausedOverlay = null;
+        this._managedListeners = [];
+        this._boundHandlers = null;
     }
 
     /** Returns true if this is a network match. */
@@ -23,44 +25,81 @@ export class PauseOverlayController {
         return this.game?.runtimeFacade?.isHost?.() ?? true;
     }
 
+    _addManagedListener(target, type, handler) {
+        if (!target || typeof target.addEventListener !== 'function' || typeof handler !== 'function') {
+            return;
+        }
+        target.addEventListener(type, handler);
+        this._managedListeners.push({ target, type, handler });
+    }
+
+    _removeManagedListeners() {
+        for (const listener of this._managedListeners) {
+            listener.target?.removeEventListener?.(listener.type, listener.handler);
+        }
+        this._managedListeners.length = 0;
+    }
+
     setupListeners() {
         if (this._listenersInitialized) {
             return;
         }
 
         const game = this.game;
+        if (!game?.ui) return;
+
         this._listenersInitialized = true;
-        if (game.ui.pauseResumeButton) {
-            game.ui.pauseResumeButton.addEventListener('click', () => {
-                if (game.state === 'PAUSED') {
-                    this.resumeFromPause();
-                }
-            });
-        }
-        if (game.ui.pauseSettingsButton) {
-            game.ui.pauseSettingsButton.addEventListener('click', () => {
-                if (game.state === 'PAUSED') {
-                    this._showSettings();
-                }
-            });
-        }
-        if (game.ui.pauseSettingsBackButton) {
-            game.ui.pauseSettingsBackButton.addEventListener('click', () => {
-                if (game.state === 'PAUSED') {
-                    this._hideSettings();
-                }
-            });
-        }
-        if (game.ui.pauseMenuButton) {
-            game.ui.pauseMenuButton.addEventListener('click', () => {
-                if (game.state === 'PAUSED') {
-                    this.returnToMenuFromPause();
-                }
-            });
+        if (!this._boundHandlers) {
+            this._boundHandlers = {
+                onPauseResumeClick: () => {
+                    if (game.state === 'PAUSED') {
+                        this.resumeFromPause();
+                    }
+                },
+                onPauseSettingsClick: () => {
+                    if (game.state === 'PAUSED') {
+                        this._showSettings();
+                    }
+                },
+                onPauseSettingsBackClick: () => {
+                    if (game.state === 'PAUSED') {
+                        this._hideSettings();
+                    }
+                },
+                onPauseMenuClick: () => {
+                    if (game.state === 'PAUSED') {
+                        this.returnToMenuFromPause();
+                    }
+                },
+                onPauseKeybindP1Click: (event) => this._handleKeybindClick(event, 'PLAYER_1'),
+                onPauseKeybindP2Click: (event) => this._handleKeybindClick(event, 'PLAYER_2'),
+                onAutoRollChange: () => {
+                    if (game.state !== 'PAUSED') return;
+                    const checked = !!game.ui.pauseAutoRollToggle?.checked;
+                    this.ports?.settingsPort?.applyAutoRoll?.(checked);
+                },
+                onInvertP1Change: () => {
+                    if (game.state !== 'PAUSED') return;
+                    const checked = !!game.ui.pauseInvertP1?.checked;
+                    this._applyInvertPitch(0, 'PLAYER_1', checked);
+                },
+                onInvertP2Change: () => {
+                    if (game.state !== 'PAUSED') return;
+                    const checked = !!game.ui.pauseInvertP2?.checked;
+                    this._applyInvertPitch(1, 'PLAYER_2', checked);
+                },
+            };
         }
 
-        this._setupSettingsBindings();
-        this._setupKeybindClickHandlers();
+        this._addManagedListener(game.ui.pauseResumeButton, 'click', this._boundHandlers.onPauseResumeClick);
+        this._addManagedListener(game.ui.pauseSettingsButton, 'click', this._boundHandlers.onPauseSettingsClick);
+        this._addManagedListener(game.ui.pauseSettingsBackButton, 'click', this._boundHandlers.onPauseSettingsBackClick);
+        this._addManagedListener(game.ui.pauseMenuButton, 'click', this._boundHandlers.onPauseMenuClick);
+        this._addManagedListener(game.ui.pauseKeybindP1, 'click', this._boundHandlers.onPauseKeybindP1Click);
+        this._addManagedListener(game.ui.pauseKeybindP2, 'click', this._boundHandlers.onPauseKeybindP2Click);
+        this._addManagedListener(game.ui.pauseAutoRollToggle, 'change', this._boundHandlers.onAutoRollChange);
+        this._addManagedListener(game.ui.pauseInvertP1, 'change', this._boundHandlers.onInvertP1Change);
+        this._addManagedListener(game.ui.pauseInvertP2, 'change', this._boundHandlers.onInvertP2Change);
     }
 
     pause() {
@@ -126,7 +165,7 @@ export class PauseOverlayController {
 
     resumeFromPause() {
         if (this._isNetworkMatch() && !this._isHost()) {
-            // Client was shown disconnect confirmation — just resume
+            // Client was shown disconnect confirmation - just resume
             this._restorePauseButtonLabels();
         }
         this.hideHostPausedOverlay();
@@ -165,53 +204,19 @@ export class PauseOverlayController {
     _restorePauseButtonLabels() {
         const game = this.game;
         if (game?.ui?.pauseMenuButton) {
-            game.ui.pauseMenuButton.textContent = 'Hauptmenü';
+            game.ui.pauseMenuButton.textContent = 'Hauptmenue';
         }
         if (game?.ui?.pauseResumeButton) {
             game.ui.pauseResumeButton.textContent = 'Weiterspielen';
         }
     }
 
-    _setupKeybindClickHandlers() {
+    _handleKeybindClick(event, playerKey) {
         const game = this.game;
-        const handleKeybindClick = (playerKey) => (event) => {
-            if (game.state !== 'PAUSED') return;
-            const button = event.target.closest('button.keybind-btn');
-            if (!button) return;
-            this.ports?.inputPort?.startKeyCapture?.(playerKey, button.dataset.action);
-        };
-
-        if (game.ui.pauseKeybindP1) {
-            game.ui.pauseKeybindP1.addEventListener('click', handleKeybindClick('PLAYER_1'));
-        }
-        if (game.ui.pauseKeybindP2) {
-            game.ui.pauseKeybindP2.addEventListener('click', handleKeybindClick('PLAYER_2'));
-        }
-    }
-
-    _setupSettingsBindings() {
-        const game = this.game;
-        if (game.ui.pauseAutoRollToggle) {
-            game.ui.pauseAutoRollToggle.addEventListener('change', () => {
-                if (game.state !== 'PAUSED') return;
-                const checked = !!game.ui.pauseAutoRollToggle.checked;
-                this.ports?.settingsPort?.applyAutoRoll?.(checked);
-            });
-        }
-        if (game.ui.pauseInvertP1) {
-            game.ui.pauseInvertP1.addEventListener('change', () => {
-                if (game.state !== 'PAUSED') return;
-                const checked = !!game.ui.pauseInvertP1.checked;
-                this._applyInvertPitch(0, 'PLAYER_1', checked);
-            });
-        }
-        if (game.ui.pauseInvertP2) {
-            game.ui.pauseInvertP2.addEventListener('change', () => {
-                if (game.state !== 'PAUSED') return;
-                const checked = !!game.ui.pauseInvertP2.checked;
-                this._applyInvertPitch(1, 'PLAYER_2', checked);
-            });
-        }
+        if (game.state !== 'PAUSED') return;
+        const button = event?.target?.closest?.('button.keybind-btn');
+        if (!button) return;
+        this.ports?.inputPort?.startKeyCapture?.(playerKey, button.dataset.action);
     }
 
     _applyInvertPitch(playerIndex, playerKey, checked) {
@@ -265,5 +270,12 @@ export class PauseOverlayController {
         if (game.ui.pauseSettingsButton) {
             game.ui.pauseSettingsButton.classList.remove('hidden');
         }
+    }
+
+    dispose() {
+        this._removeManagedListeners();
+        this._listenersInitialized = false;
+        this._hideSettings();
+        this.hideHostPausedOverlay();
     }
 }

@@ -224,7 +224,7 @@ export class RecordingCapturePipeline {
         this._shortsCameraRig.setCinematicEnabled(true);
     }
 
-    _resolveShortsSlotStyle(slotIndex) {
+    _resolveShortsSlotStyle() {
         const mode = this._cameraPerspectiveSettings?.normal || CAMERA_PERSPECTIVE_MODE.CLASSIC;
         if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) {
             return SLOT_STYLE.CINEMATIC;
@@ -232,7 +232,7 @@ export class RecordingCapturePipeline {
         if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) {
             return SLOT_STYLE.ACTION;
         }
-        return slotIndex === 0 ? SLOT_STYLE.CINEMATIC : SLOT_STYLE.ACTION;
+        return null;
     }
 
     _resolveShortsDt(renderDelta) {
@@ -248,6 +248,8 @@ export class RecordingCapturePipeline {
     _updateShortsCamera({ slotIndex, player, otherPlayer, renderAlpha, renderDelta, arena }) {
         if (!player) return false;
         this._shortsCameraRig.cameraModes[slotIndex] = 0;
+        const slotStyle = this._resolveShortsSlotStyle();
+        const useRecordingOrbit = typeof slotStyle === 'string' && slotStyle.length > 0;
         player.resolveRenderTransform(renderAlpha, this._tmpPosition, this._tmpQuaternion);
         this._tmpDirection.set(0, 0, -1).applyQuaternion(this._tmpQuaternion);
         this._shortsCameraRig.updateCamera(
@@ -272,8 +274,11 @@ export class RecordingCapturePipeline {
         }
 
         const camera = this._shortsCameraRig.cameras[slotIndex];
-        const baseFov = camera ? camera.fov : CONFIG.CAMERA.FOV;
-        const slotStyle = this._resolveShortsSlotStyle(slotIndex);
+        if (!camera) return false;
+        if (!useRecordingOrbit) {
+            return true;
+        }
+        const baseFov = camera.fov || CONFIG.CAMERA.FOV;
         const perspectiveDt = this._resolveShortsDt(renderDelta);
         this._orbitDirector.apply({
             playerIndex: slotIndex,

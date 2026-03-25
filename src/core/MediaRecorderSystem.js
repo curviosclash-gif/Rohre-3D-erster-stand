@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import * as Mp4MuxerModule from 'mp4-muxer';
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
@@ -33,12 +34,9 @@ import {
     toPositiveInt,
 } from './recording/MediaRecorderSystemOps.js';
 const Mp4Muxer = Mp4MuxerModule;
-
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
 const WEB_CODECS_CODEC = 'avc1.4d002a';
-
 export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
-
 function defaultDownload({ blob, fileName }) {
     if (typeof document === 'undefined' || !blob || !fileName) return;
     const url = URL.createObjectURL(blob);
@@ -52,7 +50,6 @@ function defaultDownload({ blob, fileName }) {
     anchor.remove();
     setTimeout(() => URL.revokeObjectURL(url), 0);
 }
-
 export class MediaRecorderSystem {
     constructor({
         canvas = null,
@@ -92,7 +89,6 @@ export class MediaRecorderSystem {
         this._globalScope = resolveGlobalScope(globalScope);
         this._perfNow = resolvePerfNow(this._globalScope);
         this.runtimePerfProfiler = runtimePerfProfiler || null;
-
         this._muxer = null;
         this._videoEncoder = null;
         this._mediaRecorder = null;
@@ -111,7 +107,6 @@ export class MediaRecorderSystem {
         this._isRecording = false;
         this._activeMimeType = DEFAULT_MIME_TYPE;
         this._activeRecorderEngine = RECORDER_ENGINE.NONE;
-
         this._captureLevelIndex = 0;
         this._captureAccumulatorMs = 0;
         this._captureLastNowMs = 0;
@@ -127,18 +122,15 @@ export class MediaRecorderSystem {
         this._captureCanvasWidth = 0;
         this._captureCanvasHeight = 0;
         this._resolvedCaptureCanvas = this.canvas || null;
-
         this._captureTimestampHistoryUs = new Float64Array(MAX_CAPTURE_TIMESTAMPS);
         this._captureTimestampHistoryCount = 0;
         this._captureTimestampHistoryWriteIndex = 0;
         this._lastFrameIntervalStats = null;
         this._frameIntervalStatsDirty = false;
     }
-
     getContractVersion() {
         return this.contractVersion;
     }
-
     _resolveSupportState() {
         const sourceCanvas = this._resolveCaptureCanvas();
         const canCapture = !!sourceCanvas;
@@ -154,7 +146,6 @@ export class MediaRecorderSystem {
                 this.logger?.warn?.('[MediaRecorderSystem] capability probe failed', error);
             }
         }
-
         if (customSupport && typeof customSupport === 'object') {
             const hasRecorder = !!customSupport.hasRecorder;
             const canRecord = !!customSupport.canRecord;
@@ -173,7 +164,6 @@ export class MediaRecorderSystem {
                 supportReason: String(customSupport.supportReason || (canRecord ? 'capability-probe' : 'probe-disabled')),
             };
         }
-
         const nativeSupport = detectNativeRecorderSupport(this._globalScope, sourceCanvas);
         const hasRecorder = nativeSupport.hasRecorder;
         return {
@@ -188,16 +178,13 @@ export class MediaRecorderSystem {
             supportReason: canCapture ? nativeSupport.supportReason : 'missing-canvas',
         };
     }
-
     getSupportState() {
         return this._resolveSupportState();
     }
-
     setCaptureSourceResolver(resolver = null) {
         this.captureSourceResolver = typeof resolver === 'function' ? resolver : null;
         this._resolvedCaptureCanvas = null;
     }
-
     setRecordingCaptureSettings(settings = null) {
         this.recordingCaptureSettings = normalizeRecordingCaptureSettings(
             settings,
@@ -205,11 +192,9 @@ export class MediaRecorderSystem {
         );
         return { ...this.recordingCaptureSettings };
     }
-
     getRecordingCaptureSettings() {
         return { ...this.recordingCaptureSettings };
     }
-
     _resolveCaptureCanvas() {
         let resolvedCanvas = this.canvas || null;
         if (typeof this.captureSourceResolver === 'function') {
@@ -225,19 +210,15 @@ export class MediaRecorderSystem {
         this._resolvedCaptureCanvas = resolvedCanvas;
         return resolvedCanvas;
     }
-
     _getCaptureCanvas() {
         return this._resolvedCaptureCanvas || this._resolveCaptureCanvas();
     }
-
     setAutoRecordingEnabled(enabled) {
         this.autoRecordingEnabled = !!enabled;
     }
-
     isRecording() {
         return this._isRecording;
     }
-
     setCaptureFps(fps) {
         const nextFps = Math.max(1, Math.floor(Number(fps) || 0));
         if (!Number.isFinite(nextFps)) {
@@ -249,7 +230,6 @@ export class MediaRecorderSystem {
         }
         return this.captureFps;
     }
-
     _notifyRecordingStateChange(isRecording) {
         if (typeof this.onRecordingStateChange !== 'function') return;
         try {
@@ -258,7 +238,6 @@ export class MediaRecorderSystem {
             this.logger?.warn?.('[MediaRecorderSystem] recording state callback failed', error);
         }
     }
-
     _resetWebCodecsCaptureState(initialLevelIndex = 1) {
         this._captureAccumulatorMs = 0;
         this._captureLastNowMs = 0;
@@ -278,21 +257,17 @@ export class MediaRecorderSystem {
         this._lastFrameIntervalStats = null;
         this._frameIntervalStatsDirty = false;
     }
-
     _stopMediaRecorderPump() {
         if (this._mediaRecorderPumpTimer != null && typeof clearInterval === 'function') {
             clearInterval(this._mediaRecorderPumpTimer);
         }
         this._mediaRecorderPumpTimer = null;
     }
-
     _startMediaRecorderPump(resolutionScale = 1) {
         this._stopMediaRecorderPump();
         this._mediaRecorderPumpResolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(resolutionScale, 1)));
-
         if (typeof setInterval !== 'function') return;
         if (!this._mediaRecorderUsesCaptureCanvas && !this._mediaRecorderSupportsRequestFrame) return;
-
         const intervalMs = Math.max(16, Math.round(1000 / Math.max(1, this.captureFps)));
         this._mediaRecorderPumpTimer = setInterval(() => {
             if (!this._isRecording || this._activeRecorderEngine !== RECORDER_ENGINE.NATIVE_MEDIARECORDER) return;
@@ -308,16 +283,13 @@ export class MediaRecorderSystem {
             }
         }, intervalMs);
     }
-
     _getCaptureLevel() {
         return CAPTURE_LOAD_LEVELS[Math.max(0, Math.min(CAPTURE_LOAD_LEVELS.length - 1, this._captureLevelIndex))];
     }
-
     _resolveEffectiveCaptureFps() {
         const level = this._getCaptureLevel();
         return Math.max(1, this.captureFps * level.fpsScale);
     }
-
     _ensureCaptureSurface(scale = 1) {
         const sourceCanvas = this._getCaptureCanvas();
         if (!sourceCanvas) return null;
@@ -331,7 +303,6 @@ export class MediaRecorderSystem {
             this._captureCanvasHeight = sourceHeight;
             return sourceCanvas;
         }
-
         const targetWidth = Math.max(2, Math.floor(sourceWidth * resolutionScale));
         const targetHeight = Math.max(2, Math.floor(sourceHeight * resolutionScale));
         if (!this._captureCanvas) {
@@ -352,7 +323,6 @@ export class MediaRecorderSystem {
         this._captureCanvasCtx.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
         return this._captureCanvas;
     }
-
     _ensureMediaRecorderCaptureSurface(scale = 1) {
         const sourceCanvas = this._getCaptureCanvas();
         if (!sourceCanvas) return null;
@@ -369,14 +339,12 @@ export class MediaRecorderSystem {
         if (!this._captureCanvas || !this._captureCanvasCtx) {
             return sourceCanvas;
         }
-
         const targetWidth = Math.max(2, Math.floor(sourceWidth * resolutionScale));
         const targetHeight = Math.max(2, Math.floor(sourceHeight * resolutionScale));
         if (this._captureCanvas.width !== targetWidth || this._captureCanvas.height !== targetHeight) {
             this._captureCanvas.width = targetWidth;
             this._captureCanvas.height = targetHeight;
         }
-
         this._captureCanvasWidth = targetWidth;
         this._captureCanvasHeight = targetHeight;
         this._captureCanvasCtx.imageSmoothingEnabled = true;
@@ -384,21 +352,18 @@ export class MediaRecorderSystem {
         this._captureCanvasCtx.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
         return this._captureCanvas;
     }
-
     _recordCaptureTimestampUs(timestampUs) {
         this._captureTimestampHistoryUs[this._captureTimestampHistoryWriteIndex] = timestampUs;
         this._captureTimestampHistoryWriteIndex = (this._captureTimestampHistoryWriteIndex + 1) % MAX_CAPTURE_TIMESTAMPS;
         this._captureTimestampHistoryCount = Math.min(MAX_CAPTURE_TIMESTAMPS, this._captureTimestampHistoryCount + 1);
         this._frameIntervalStatsDirty = true;
     }
-
     _resolveCaptureTimestampUs(sequenceIndex) {
         if (sequenceIndex < 0 || sequenceIndex >= this._captureTimestampHistoryCount) return null;
         const oldestIndex = (this._captureTimestampHistoryWriteIndex - this._captureTimestampHistoryCount + MAX_CAPTURE_TIMESTAMPS) % MAX_CAPTURE_TIMESTAMPS;
         const ringIndex = (oldestIndex + sequenceIndex) % MAX_CAPTURE_TIMESTAMPS;
         return this._captureTimestampHistoryUs[ringIndex];
     }
-
     _computeFrameIntervalStats() {
         if (this._captureTimestampHistoryCount < 2) {
             return null;
@@ -416,7 +381,6 @@ export class MediaRecorderSystem {
         if (intervals.length === 0) {
             return null;
         }
-
         let sum = 0;
         let max = 0;
         for (let i = 0; i < intervals.length; i++) {
@@ -433,7 +397,6 @@ export class MediaRecorderSystem {
             max,
         };
     }
-
     _getFrameIntervalStats(forceRecompute = false) {
         if (!forceRecompute && this._frameIntervalStatsDirty !== true) {
             return this._lastFrameIntervalStats;
@@ -442,11 +405,9 @@ export class MediaRecorderSystem {
         this._frameIntervalStatsDirty = false;
         return this._lastFrameIntervalStats;
     }
-
     _updateCaptureLoadLevel(encodeQueueSize) {
         const safeQueueSize = Math.max(0, Math.trunc(toFiniteNumber(encodeQueueSize, 0)));
         this._captureMaxEncodeQueueSize = Math.max(this._captureMaxEncodeQueueSize, safeQueueSize);
-
         if (safeQueueSize >= ENCODE_QUEUE_DROP_LIMIT) {
             const nextLevel = Math.min(CAPTURE_LOAD_LEVELS.length - 1, this._captureLevelIndex + 2);
             if (nextLevel !== this._captureLevelIndex) {
@@ -462,7 +423,6 @@ export class MediaRecorderSystem {
             this._captureLowPressureFrames = 0;
             return;
         }
-
         if (safeQueueSize >= ENCODE_QUEUE_SOFT_LIMIT) {
             this._captureHighPressureFrames += 1;
             this._captureLowPressureFrames = 0;
@@ -473,7 +433,6 @@ export class MediaRecorderSystem {
             this._captureHighPressureFrames = Math.max(0, this._captureHighPressureFrames - 1);
             this._captureLowPressureFrames = Math.max(0, this._captureLowPressureFrames - 1);
         }
-
         if (
             this._captureHighPressureFrames >= 2
             && this._captureLevelIndex < (CAPTURE_LOAD_LEVELS.length - 1)
@@ -493,7 +452,6 @@ export class MediaRecorderSystem {
             });
         }
     }
-
     _resolveSyntheticQueueSizeFromRenderDelta(deltaMs) {
         const safeDeltaMs = Math.max(0, toFiniteNumber(deltaMs, 0));
         if (safeDeltaMs >= MEDIARECORDER_SYNTHETIC_QUEUE_HARD_MS) {
@@ -507,14 +465,12 @@ export class MediaRecorderSystem {
         }
         return 0;
     }
-
     _dropCaptureBacklog(stepIntervalMs) {
         const safeStepIntervalMs = Math.max(1, toFiniteNumber(stepIntervalMs, 1000 / Math.max(1, this.captureFps)));
         const maxBacklogMs = safeStepIntervalMs * MAX_CAPTURE_BACKLOG_STEPS;
         if (!(this._captureAccumulatorMs > maxBacklogMs)) {
             return 0;
         }
-
         const retainedAccumulatorMs = safeStepIntervalMs;
         const overflowMs = Math.max(0, this._captureAccumulatorMs - retainedAccumulatorMs);
         const droppedFrames = Math.max(1, Math.floor(overflowMs / safeStepIntervalMs));
@@ -522,21 +478,17 @@ export class MediaRecorderSystem {
         this._captureDroppedFrames += droppedFrames;
         return droppedFrames;
     }
-
     _captureWebCodecsFrame(stepIntervalMs) {
         if (!this._isRecording || !this._videoEncoder || this._videoEncoder.state !== 'configured') return;
         const VideoFrameCtor = this._globalScope?.VideoFrame;
         if (typeof VideoFrameCtor !== 'function') return;
-
         const encodeQueueSize = toPositiveInt(this._videoEncoder.encodeQueueSize, 0, 0, 10_000);
         this._updateCaptureLoadLevel(encodeQueueSize);
         this._captureTimestampUs += Math.max(1, Math.round(stepIntervalMs * 1000));
-
         if (encodeQueueSize >= ENCODE_QUEUE_DROP_LIMIT) {
             this._captureDroppedFrames += 1;
             return;
         }
-
         const level = this._getCaptureLevel();
         const frameSource = this._ensureCaptureSurface(level.resolutionScale);
         if (!frameSource) {
@@ -559,11 +511,9 @@ export class MediaRecorderSystem {
             this.runtimePerfProfiler?.recordSubsystemDuration?.('recorder_encode', durationMs);
         }
     }
-
     _captureMediaRecorderFrame(stepIntervalMs) {
         if (!this._isRecording || this._activeRecorderEngine !== RECORDER_ENGINE.NATIVE_MEDIARECORDER) return;
         this._captureTimestampUs += Math.max(1, Math.round(stepIntervalMs * 1000));
-
         const encodeStart = this._perfNow();
         try {
             if (this._mediaRecorderUsesCaptureCanvas) {
@@ -583,7 +533,6 @@ export class MediaRecorderSystem {
             this.runtimePerfProfiler?.recordSubsystemDuration?.('recorder_encode', durationMs);
         }
     }
-
     captureRenderedFrame(renderDelta = null) {
         if (!this._isRecording) return;
         if (
@@ -598,20 +547,17 @@ export class MediaRecorderSystem {
         ) {
             return;
         }
-
         const now = this._perfNow();
         if (!(this._captureLastNowMs > 0)) {
             this._captureLastNowMs = now;
             return;
         }
-
         let deltaMs = now - this._captureLastNowMs;
         this._captureLastNowMs = now;
         if (!(deltaMs > 0)) {
             deltaMs = Math.max(1, Math.round(toFiniteNumber(renderDelta, 1 / 60) * 1000));
         }
         deltaMs = Math.min(250, deltaMs);
-
         this._captureAccumulatorMs += deltaMs;
         let syntheticQueueSize = 0;
         if (this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER) {
@@ -620,11 +566,9 @@ export class MediaRecorderSystem {
             );
             this._updateCaptureLoadLevel(syntheticQueueSize);
         }
-
         const effectiveFps = this._resolveEffectiveCaptureFps();
         const stepIntervalMs = 1000 / effectiveFps;
         this._dropCaptureBacklog(stepIntervalMs);
-
         if (
             this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER
             && !this._mediaRecorderSupportsRequestFrame
@@ -634,7 +578,6 @@ export class MediaRecorderSystem {
             this._captureDroppedFrames += 1;
             return;
         }
-
         let captureSteps = 0;
         while (
             this._captureAccumulatorMs >= stepIntervalMs
@@ -648,10 +591,8 @@ export class MediaRecorderSystem {
             }
             captureSteps += 1;
         }
-
         this._dropCaptureBacklog(stepIntervalMs);
     }
-
     getRecordingDiagnostics() {
         const level = this._getCaptureLevel();
         const sourceCanvas = this._getCaptureCanvas();
@@ -678,11 +619,9 @@ export class MediaRecorderSystem {
                 : null,
         };
     }
-
     getLifecycleEvents() {
         return this._lifecycleEvents.slice();
     }
-
     getLastExportMeta() {
         if (!this._lastExport) return null;
         return {
@@ -705,13 +644,14 @@ export class MediaRecorderSystem {
             timestampValidation: this._lastExport.timestampValidation
                 ? { ...this._lastExport.timestampValidation }
                 : null,
+            exportStatus: this._lastExport.exportStatus
+                ? { ...this._lastExport.exportStatus }
+                : null,
         };
     }
-
     notifyLifecycleEvent(type, context = null) {
         const eventType = String(type || '').trim();
         if (!eventType) return null;
-
         const event = {
             version: this.contractVersion,
             type: eventType,
@@ -722,7 +662,6 @@ export class MediaRecorderSystem {
         if (this._lifecycleEvents.length > 24) {
             this._lifecycleEvents.shift();
         }
-
         if (eventType === LIFECYCLE_EVENT_TYPES.MATCH_STARTED && this.autoRecordingEnabled) {
             this.startRecording(event);
             return event;
@@ -751,7 +690,6 @@ export class MediaRecorderSystem {
         }
         return event;
     }
-
     _buildStartResult(started, reason, extra = null) {
         const result = {
             action: 'start',
@@ -764,7 +702,6 @@ export class MediaRecorderSystem {
         }
         return result;
     }
-
     _buildStopResult(stopped, reason, extra = null) {
         const result = {
             action: 'stop',
@@ -777,7 +714,6 @@ export class MediaRecorderSystem {
         }
         return result;
     }
-
     _resolveRecordingDimensions(scale = 1) {
         const sourceCanvas = this._getCaptureCanvas();
         const rawWidth = Number(sourceCanvas?.width || 0);
@@ -787,7 +723,6 @@ export class MediaRecorderSystem {
         const height = Math.max(2, Math.floor(rawHeight * resolutionScale));
         return { width, height };
     }
-
     _buildWebCodecsEncoderConfig(width, height) {
         return {
             codec: WEB_CODECS_CODEC,
@@ -799,7 +734,6 @@ export class MediaRecorderSystem {
             avc: { format: 'avc' },
         };
     }
-
     async _startWithWebCodecs(trigger, support) {
         const VideoEncoderCtor = this._globalScope?.VideoEncoder;
         const VideoFrameCtor = this._globalScope?.VideoFrame;
@@ -809,7 +743,6 @@ export class MediaRecorderSystem {
         if (typeof VideoFrameCtor !== 'function') {
             return this._buildStartResult(false, 'missing-video-frame', { support });
         }
-
         const { width, height } = this._resolveRecordingDimensions();
         const encoderConfig = this._buildWebCodecsEncoderConfig(width, height);
         if (typeof VideoEncoderCtor.isConfigSupported === 'function') {
@@ -822,7 +755,6 @@ export class MediaRecorderSystem {
                 return this._buildStartResult(false, 'encoder_probe_failed', { error, support });
             }
         }
-
         try {
             this._muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
@@ -834,19 +766,16 @@ export class MediaRecorderSystem {
                 fastStart: 'in-memory',
                 firstTimestampBehavior: 'offset',
             });
-
             this._videoEncoder = new VideoEncoderCtor({
                 output: (chunk, meta) => this._muxer.addVideoChunk(chunk, meta),
                 error: (e) => this.logger?.error?.('[MediaRecorderSystem] VideoEncoder error', e),
             });
-
             this._videoEncoder.configure(encoderConfig);
         } catch (error) {
             this._cleanupRuntimeRecorder();
             this.logger?.warn?.('[MediaRecorderSystem] WebCodecs setup failed', error);
             return this._buildStartResult(false, 'encoder_creation_failed', { error, support });
         }
-
         this._isRecording = true;
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_WEBCODECS;
         this._activeMimeType = DEFAULT_MIME_TYPE;
@@ -858,7 +787,6 @@ export class MediaRecorderSystem {
             captureProfile: this.recordingCaptureSettings?.profile || null,
             hudMode: this.recordingCaptureSettings?.hudMode || null,
         };
-
         this._notifyRecordingStateChange(true);
         return this._buildStartResult(true, 'started', {
             mimeType: this._activeMimeType,
@@ -868,7 +796,6 @@ export class MediaRecorderSystem {
             hudMode: this._activeRecording.hudMode,
         });
     }
-
     async _startWithMediaRecorder(trigger, support, fallbackFromReason = null) {
         const MediaRecorderCtor = this._globalScope?.MediaRecorder;
         if (typeof MediaRecorderCtor !== 'function') {
@@ -878,7 +805,6 @@ export class MediaRecorderSystem {
         if (!sourceCanvas || typeof sourceCanvas.captureStream !== 'function') {
             return this._buildStartResult(false, 'missing-capture-stream', { support });
         }
-
         // WebCodecs can report MP4 support while MediaRecorder still needs a WebM fallback.
         const preferredMediaRecorderMimeType = fallbackFromReason
             ? (support?.mediaRecorderMimeType || '')
@@ -897,7 +823,6 @@ export class MediaRecorderSystem {
                 ? captureStreamSource
                 : sourceCanvas;
             this._mediaRecorderUsesCaptureCanvas = streamSourceCanvas !== sourceCanvas;
-
             // Use a fixed capture FPS so MediaRecorder always receives frames,
             // even when requestFrame pacing is delayed by runtime load.
             const captureStream = streamSourceCanvas.captureStream(this.captureFps);
@@ -905,7 +830,6 @@ export class MediaRecorderSystem {
                 ? captureStream.getVideoTracks()[0] || null
                 : null;
             const supportsRequestFrame = !!(captureTrack && typeof captureTrack.requestFrame === 'function');
-
             this._mediaRecorderStream = captureStream;
             this._mediaRecorderVideoTrack = captureTrack;
             this._mediaRecorderSupportsRequestFrame = supportsRequestFrame;
@@ -913,25 +837,23 @@ export class MediaRecorderSystem {
             this._mediaRecorder = recorderOptions
                 ? new MediaRecorderCtor(this._mediaRecorderStream, recorderOptions)
                 : new MediaRecorderCtor(this._mediaRecorderStream);
-
             this._mediaRecorder.ondataavailable = (event) => {
                 const chunk = event?.data;
                 if (chunk && Number(chunk.size) > 0) {
                     this._mediaRecorderChunks.push(chunk);
                 }
             };
-
             this._mediaRecorder.onerror = (event) => {
                 this.logger?.error?.('[MediaRecorderSystem] MediaRecorder error', event?.error || event);
             };
-
             this._mediaRecorder.onstop = () => {
                 const chunks = Array.isArray(this._mediaRecorderChunks) ? this._mediaRecorderChunks : [];
                 const mimeType = selectedMimeType || chunks[0]?.type || DEFAULT_FALLBACK_MIME_TYPE;
                 const blob = new Blob(chunks, { type: mimeType });
-                this._finalizeBlobExport(blob, mimeType);
+                this._finalizeBlobExport(blob, mimeType).catch((error) => {
+                    this.logger?.warn?.('[MediaRecorderSystem] finalize export failed after mediarecorder stop', error);
+                });
             };
-
             this._mediaRecorder.start(1000);
         } catch (error) {
             this._cleanupRuntimeRecorder();
@@ -942,7 +864,6 @@ export class MediaRecorderSystem {
                 fallbackFromReason: fallbackFromReason || undefined,
             });
         }
-
         this._isRecording = true;
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_MEDIARECORDER;
         this._activeMimeType = selectedMimeType || DEFAULT_FALLBACK_MIME_TYPE;
@@ -955,7 +876,6 @@ export class MediaRecorderSystem {
             hudMode: this.recordingCaptureSettings?.hudMode || null,
         };
         this._notifyRecordingStateChange(true);
-
         return this._buildStartResult(true, 'started', {
             mimeType: this._activeMimeType,
             timestampMs: this._activeRecording.startedAt,
@@ -965,55 +885,44 @@ export class MediaRecorderSystem {
             hudMode: this._activeRecording.hudMode,
         });
     }
-
     async startRecording(trigger = null) {
         if (this._pendingStop) {
             return this._buildStartResult(false, 'stop_pending');
         }
-
         if (this.isRecording()) {
             return this._buildStartResult(false, 'already_recording');
         }
-
         this._resolveCaptureCanvas();
         const support = this.getSupportState();
         if (!support.canRecord) {
             this.logger?.warn?.('[MediaRecorderSystem] recording unsupported on this runtime', support);
             return this._buildStartResult(false, 'unsupported', { support });
         }
-
         if (support.recorderEngine === RECORDER_ENGINE.NATIVE_WEBCODECS) {
             const webCodecsResult = await this._startWithWebCodecs(trigger, support);
             if (webCodecsResult.started) {
                 return webCodecsResult;
             }
-
             if (support.hasMediaRecorder) {
                 this.logger?.warn?.('[MediaRecorderSystem] WebCodecs start failed, falling back to MediaRecorder', webCodecsResult);
                 return this._startWithMediaRecorder(trigger, support, webCodecsResult.reason);
             }
             return webCodecsResult;
         }
-
         if (support.recorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER) {
             return this._startWithMediaRecorder(trigger, support);
         }
-
         this.logger?.warn?.('[MediaRecorderSystem] no recorder engine available', support);
         return this._buildStartResult(false, 'unsupported_engine', { support });
     }
-
     async stopRecording(trigger = null) {
         if (this._pendingStop) {
             return this._pendingStop;
         }
-
         if (!this._isRecording) {
             return this._buildStopResult(false, 'not_recording');
         }
-
         this._isRecording = false;
-
         this._pendingStop = new Promise((resolve) => {
             this._activeRecording = {
                 ...(this._activeRecording || {}),
@@ -1021,7 +930,6 @@ export class MediaRecorderSystem {
                 stopResolve: resolve,
             };
         });
-
         try {
             if (this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER) {
                 if (!this._mediaRecorder || this._mediaRecorder.state === 'inactive') {
@@ -1058,14 +966,13 @@ export class MediaRecorderSystem {
                 this._mediaRecorder.stop();
                 return this._pendingStop;
             }
-
             if (this._videoEncoder) {
                 await this._videoEncoder.flush();
                 this._videoEncoder.close();
             }
             if (this._muxer) {
                 this._muxer.finalize();
-                this._handleRecorderStop();
+                await this._handleRecorderStop();
             } else {
                 const result = this._buildStopResult(false, 'muxer_null');
                 const resolve = this._activeRecording?.stopResolve;
@@ -1086,10 +993,8 @@ export class MediaRecorderSystem {
             }
             return result;
         }
-
         return this._pendingStop;
     }
-
     _buildFilename(activeRecording, endedAtMs, mimeType) {
         const startedAt = activeRecording?.startedAt || endedAtMs;
         const mode = sanitizeFileToken(activeRecording?.trigger?.context?.activeGameMode, 'classic');
@@ -1101,14 +1006,12 @@ export class MediaRecorderSystem {
             : (normalizedMimeType.includes('mp4') ? 'mp4' : 'video');
         return `${this.filePrefix}-${mode}-${profile}-${matchId}-${toSafeDatePart(startedAt)}-${toSafeDatePart(endedAtMs)}.${ext}`;
     }
-
     _buildDownloadFileName(fileName) {
         const baseName = String(fileName || '').trim();
         if (!baseName) return baseName;
         if (!this.downloadDirectoryName) return baseName;
         return `${this.downloadDirectoryName}/${baseName}`;
     }
-
     _estimateCapturedDurationMs(frameIntervalStats = null) {
         const sampleCount = Math.max(0, Math.trunc(toFiniteNumber(frameIntervalStats?.sampleCount, 0)));
         const meanMs = Math.max(0, toFiniteNumber(frameIntervalStats?.mean, 0));
@@ -1117,14 +1020,12 @@ export class MediaRecorderSystem {
         }
         return Math.max(0, Math.round(this._captureTimestampUs / 1000));
     }
-
     _normalizeExportTiming(activeRecording, endedAtMs, frameIntervalStats = null) {
         const rawEndedAt = toFiniteNumber(endedAtMs, this.now());
         const estimatedDurationMs = this._estimateCapturedDurationMs(frameIntervalStats);
         let startedAt = toFiniteNumber(activeRecording?.startedAt, rawEndedAt);
         let endedAt = rawEndedAt;
         let adjusted = false;
-
         if (!(startedAt > 0)) {
             startedAt = Math.max(0, rawEndedAt - estimatedDurationMs);
             adjusted = true;
@@ -1133,7 +1034,6 @@ export class MediaRecorderSystem {
             endedAt = startedAt + Math.max(1, estimatedDurationMs);
             adjusted = true;
         }
-
         return {
             startedAt,
             endedAt,
@@ -1142,12 +1042,16 @@ export class MediaRecorderSystem {
             estimatedDurationMs,
         };
     }
-
-    _attemptAutoDownload(blob, fileName, mimeType) {
+    async _attemptAutoDownload(blob, fileName, mimeType) {
         if (!this.autoDownload || !blob || blob.size <= 0) {
-            return { requested: false, transport: 'disabled' };
+            return {
+                requested: false,
+                transport: 'disabled',
+                status: 'not_requested',
+                fallbackReason: null,
+                apiStatus: null,
+            };
         }
-
         const safeFileName = String(fileName || '').trim();
         const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
         const downloadViaBrowser = (reason, error = null) => {
@@ -1166,32 +1070,54 @@ export class MediaRecorderSystem {
                 return false;
             }
         };
-
         if (typeof fetch !== 'function') {
-            downloadViaBrowser('fetch-unavailable');
-            return { requested: true, transport: 'download' };
+            const downloaded = downloadViaBrowser('fetch-unavailable');
+            return {
+                requested: true,
+                transport: downloaded ? 'download' : 'download-failed',
+                status: downloaded ? 'saved_via_download' : 'download_failed',
+                fallbackReason: 'fetch-unavailable',
+                apiStatus: null,
+            };
         }
-
         try {
-            fetch(EDITOR_API_ROUTES.SAVE_VIDEO_DISK, {
+            const response = await fetch(EDITOR_API_ROUTES.SAVE_VIDEO_DISK, {
                 method: 'POST',
                 headers: { 'x-file-name': safeFileName },
                 body: blob
-            }).then((response) => {
-                if (!response.ok) throw new Error(`http_${response.status}`);
-                this.logger?.info?.('[MediaRecorderSystem] recording export saved via api', safeFileName);
-            }).catch((error) => {
-                this.logger?.warn?.('[MediaRecorderSystem] recording export api failed, using browser download', error);
-                downloadViaBrowser('api-failed', error);
             });
-            return { requested: true, transport: 'api-with-download-fallback' };
+            if (response?.ok) {
+                this.logger?.info?.('[MediaRecorderSystem] recording export saved via api', safeFileName);
+                return {
+                    requested: true,
+                    transport: 'api',
+                    status: 'saved_via_api',
+                    fallbackReason: null,
+                    apiStatus: Number(response.status) || 200,
+                };
+            }
+            const apiStatus = Number(response?.status) || 0;
+            const apiError = new Error(`http_${apiStatus || 'unknown'}`);
+            const downloaded = downloadViaBrowser('api-failed', apiError);
+            return {
+                requested: true,
+                transport: downloaded ? 'api-fallback-download' : 'api-fallback-download-failed',
+                status: downloaded ? 'saved_via_download_fallback' : 'download_fallback_failed',
+                fallbackReason: 'api-failed',
+                apiStatus: apiStatus || null,
+            };
         } catch (error) {
-            downloadViaBrowser('api-throw', error);
-            return { requested: true, transport: 'download' };
+            const downloaded = downloadViaBrowser('api-throw', error);
+            return {
+                requested: true,
+                transport: downloaded ? 'download' : 'download-failed',
+                status: downloaded ? 'saved_via_download' : 'download_failed',
+                fallbackReason: 'api-throw',
+                apiStatus: null,
+            };
         }
     }
-
-    _finalizeBlobExport(blob, mimeType = DEFAULT_MIME_TYPE) {
+    async _finalizeBlobExport(blob, mimeType = DEFAULT_MIME_TYPE) {
         const activeRecording = this._activeRecording || null;
         const safeBlob = blob instanceof Blob ? blob : new Blob([], { type: String(mimeType || DEFAULT_MIME_TYPE) });
         const resolvedMimeType = String(mimeType || safeBlob.type || this._activeMimeType || DEFAULT_MIME_TYPE);
@@ -1206,7 +1132,7 @@ export class MediaRecorderSystem {
         );
         const downloadFileName = this._buildDownloadFileName(fileName);
         const recorderDiagnostics = this.getRecordingDiagnostics();
-
+        const exportStatus = await this._attemptAutoDownload(safeBlob, downloadFileName || fileName, resolvedMimeType);
         if (this._lastExport?.objectUrl) {
             URL.revokeObjectURL(this._lastExport.objectUrl);
         }
@@ -1234,10 +1160,8 @@ export class MediaRecorderSystem {
                 adjusted: timing.adjusted,
                 estimatedDurationMs: timing.estimatedDurationMs,
             },
+            exportStatus: { ...exportStatus },
         };
-
-        const exportTransport = this._attemptAutoDownload(safeBlob, downloadFileName || fileName, resolvedMimeType);
-
         const resolve = activeRecording?.stopResolve;
         this._cleanupRuntimeRecorder();
         const result = this._buildStopResult(true, 'stopped', {
@@ -1245,7 +1169,8 @@ export class MediaRecorderSystem {
             downloadFileName,
             mimeType: resolvedMimeType,
             sizeBytes: safeBlob.size,
-            exportTransport: exportTransport.transport,
+            exportTransport: exportStatus.transport,
+            exportStatus: { ...exportStatus },
             startedAt: timing.startedAt,
             endedAt: timing.endedAt,
             durationMs: timing.durationMs,
@@ -1267,13 +1192,11 @@ export class MediaRecorderSystem {
         }
         this._pendingStop = null;
     }
-
-    _handleRecorderStop() {
+    async _handleRecorderStop() {
         const buffer = this._muxer?.target?.buffer;
         const blob = new Blob([buffer || new ArrayBuffer(0)], { type: DEFAULT_MIME_TYPE });
-        this._finalizeBlobExport(blob, DEFAULT_MIME_TYPE);
+        await this._finalizeBlobExport(blob, DEFAULT_MIME_TYPE);
     }
-
     _cleanupRuntimeRecorder() {
         this._isRecording = false;
         this._stopMediaRecorderPump();
@@ -1307,7 +1230,6 @@ export class MediaRecorderSystem {
         this._activeRecorderEngine = RECORDER_ENGINE.NONE;
         this._notifyRecordingStateChange(false);
     }
-
     dispose() {
         if (this._lastExport?.objectUrl) {
             URL.revokeObjectURL(this._lastExport.objectUrl);

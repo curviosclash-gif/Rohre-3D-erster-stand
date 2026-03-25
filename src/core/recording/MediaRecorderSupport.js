@@ -5,6 +5,9 @@
 export const DEFAULT_MIME_TYPE = 'video/mp4';
 export const DEFAULT_FALLBACK_MIME_TYPE = 'video/webm';
 const MEDIA_RECORDER_MIME_CANDIDATES = Object.freeze([
+    'video/mp4;codecs=avc1.4d002a',
+    'video/mp4;codecs=avc1.42E01E',
+    'video/mp4',
     'video/webm;codecs=vp9',
     'video/webm;codecs=vp8',
     'video/webm',

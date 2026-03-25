@@ -1,4 +1,5 @@
 import { execSync, spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import process from 'node:process';
 import { setTimeout as delay } from 'node:timers/promises';
@@ -9,7 +10,11 @@ import { getBotValidationMatrix } from '../src/state/validation/BotValidationMat
 const HOST = '127.0.0.1';
 const PORT = parsePositiveInt(process.env.PERF_RUCKLER_PORT, 4286, 1024, 65_535);
 const BASE_URL = `http://${HOST}:${PORT}`;
-const APP_READY_TIMEOUT_MS = parsePositiveInt(process.env.PERF_RUCKLER_APP_READY_TIMEOUT_MS, 30_000, 5_000, 120_000);
+const APP_READY_TIMEOUT_MS = parsePositiveInt(process.env.PERF_RUCKLER_APP_READY_TIMEOUT_MS, 120_000, 5_000, 180_000);
+const NAVIGATION_MAX_ATTEMPTS = parsePositiveInt(process.env.PERF_RUCKLER_NAV_ATTEMPTS, 4, 1, 12);
+const NAVIGATION_RETRY_DELAY_MS = parsePositiveInt(process.env.PERF_RUCKLER_NAV_RETRY_DELAY_MS, 800, 0, 30_000);
+const SERVER_MODE = String(process.env.PERF_RUCKLER_SERVER_MODE || 'preview').trim().toLowerCase();
+const AUTO_BUILD = String(process.env.PERF_RUCKLER_AUTO_BUILD || '1').trim() !== '0';
 const SAMPLE_DURATION_MS = parsePositiveInt(process.env.PERF_RUCKLER_SAMPLE_DURATION_MS, 15_000, 2_000, 120_000);
 const AFTER_TOGGLE_WAIT_MS = parsePositiveInt(process.env.PERF_RUCKLER_AFTER_TOGGLE_WAIT_MS, 250, 0, 5_000);
 const RECORDING_SAMPLE_DURATION_MS = parsePositiveInt(
@@ -71,7 +76,7 @@ function forceKillPort(port) {
     }
 }
 
-function startViteServer() {
+function startViteDevServer() {
     const viteBin = fileURLToPath(new URL('../node_modules/vite/bin/vite.js', import.meta.url));
     return spawn(process.execPath, [viteBin, 'dev', '--host', HOST, '--port', String(PORT), '--strictPort'], {
         cwd: process.cwd(),
@@ -79,6 +84,38 @@ function startViteServer() {
         shell: false,
         windowsHide: true,
     });
+}
+
+function startVitePreviewServer() {
+    const viteBin = fileURLToPath(new URL('../node_modules/vite/bin/vite.js', import.meta.url));
+    return spawn(process.execPath, [viteBin, 'preview', '--host', HOST, '--port', String(PORT), '--strictPort'], {
+        cwd: process.cwd(),
+        stdio: ['ignore', 'pipe', 'pipe'],
+        shell: false,
+        windowsHide: true,
+    });
+}
+
+function ensureDistBuild() {
+    const distIndexPath = fileURLToPath(new URL('../dist/index.html', import.meta.url));
+    if (existsSync(distIndexPath)) {
+        return;
+    }
+    if (!AUTO_BUILD) {
+        throw new Error('dist/index.html missing and PERF_RUCKLER_AUTO_BUILD=0');
+    }
+    execSync('npm run build', { stdio: 'inherit' });
+    if (!existsSync(distIndexPath)) {
+        throw new Error('dist/index.html missing after build');
+    }
+}
+
+function startAppServer() {
+    if (SERVER_MODE === 'dev') {
+        return startViteDevServer();
+    }
+    ensureDistBuild();
+    return startVitePreviewServer();
 }
 
 async function stopServer(server) {
@@ -114,6 +151,40 @@ async function waitForServer(url, timeoutMs = 45_000) {
         await delay(250);
     }
     throw new Error(`Server not reachable after ${timeoutMs}ms (${toShortError(lastError)})`);
+}
+
+async function waitForAppReadiness(page, timeoutMs) {
+    await page.waitForFunction(() => {
+        const menu = document.getElementById('main-menu');
+        const menuVisible = !!(menu && !menu.classList.contains('hidden'));
+        const runtimeReady = !!globalThis?.GAME_INSTANCE;
+        return menuVisible || runtimeReady;
+    }, null, { timeout: timeoutMs });
+}
+
+async function navigateToApp(page, url, timeoutMs) {
+    let lastError = null;
+    for (let attempt = 1; attempt <= NAVIGATION_MAX_ATTEMPTS; attempt += 1) {
+        try {
+            logVerbose('browser:goto:attempt', {
+                attempt,
+                waitUntil: 'commit',
+                timeoutMs,
+            });
+            await page.goto(url, { waitUntil: 'commit', timeout: timeoutMs });
+            await waitForAppReadiness(page, timeoutMs);
+            return;
+        } catch (error) {
+            lastError = error;
+            logVerbose('browser:goto:retry', {
+                attempt,
+                error: toShortError(error),
+            });
+            if (attempt >= NAVIGATION_MAX_ATTEMPTS) break;
+            await delay(NAVIGATION_RETRY_DELAY_MS);
+        }
+    }
+    throw new Error(`App navigation failed after ${NAVIGATION_MAX_ATTEMPTS} attempts (${toShortError(lastError)})`);
 }
 
 function detectPeriodicSpikes(spikeEvents = []) {
@@ -499,7 +570,7 @@ async function runSingleMatrixCase(page, scenario, options) {
 
 async function run() {
     forceKillPort(PORT);
-    const server = startViteServer();
+    const server = startAppServer();
     let browser = null;
     let context = null;
     try {
@@ -520,7 +591,7 @@ async function run() {
         });
         const page = await context.newPage();
         logVerbose('browser:goto', { host: BASE_URL });
-        await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: APP_READY_TIMEOUT_MS });
+        await navigateToApp(page, BASE_URL, APP_READY_TIMEOUT_MS);
         await page.bringToFront();
         await ensureMenuState(page);
         logVerbose('browser:ready');

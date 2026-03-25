@@ -227,13 +227,17 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
     }
 
     sendInput(inputData) {
-        if (this.isHost) return;
-        this._dataChannelManager.send('host', 'inputs', {
+        const payload = {
             ...this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.INPUT),
-            playerId: this.localPlayerId,
+            playerId: this.localPlayerId || (this.isHost ? 'host' : ''),
             inputs: inputData,
             timestamp: this._now(),
-        });
+        };
+        if (this.isHost) {
+            this._sendStateToAll(payload);
+            return;
+        }
+        this._dataChannelManager.send('host', 'inputs', payload);
     }
 
     broadcastState(stateSnapshot) {

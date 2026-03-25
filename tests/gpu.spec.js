@@ -382,6 +382,118 @@ test.describe('T21-40: Rendering & GPU', () => {
         expect(probe.recordingCaptureIsMainCanvas).toBeFalsy();
     });
 
+    test('T33d: Video-Perspektive steuert nur Shorts-Capture (classic neutral, soft/action distinct)', async ({ page }) => {
+        await loadGame(page);
+        await page.click('#menu-nav [data-session-type="splitscreen"]');
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="normal"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => {
+            const hud = document.getElementById('hud');
+            const g = window.GAME_INSTANCE;
+            return !!(
+                hud && !hud.classList.contains('hidden')
+                && g?.entityManager?.players?.length > 1
+            );
+        }, null, { timeout: 60000 });
+
+        const probe = await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            const renderer = g?.renderer;
+            const pipeline = renderer?.recordingCapturePipeline;
+            const liveCamera = renderer?.cameraRigSystem?.cameras?.[0];
+            if (!g || !renderer || !pipeline || !liveCamera) return null;
+
+            g.settings.recording = { profile: 'youtube_short', hudMode: 'clean' };
+            g._onSettingsChanged({ changedKeys: ['recording.profile', 'recording.hudMode'] });
+
+            const samplePerspective = (mode) => {
+                const perspective = g.settings.cameraPerspective && typeof g.settings.cameraPerspective === 'object'
+                    ? g.settings.cameraPerspective
+                    : {};
+                g.settings.cameraPerspective = {
+                    ...perspective,
+                    normal: mode,
+                    reduceMotion: false,
+                };
+                g._onSettingsChanged({
+                    changedKeys: ['cameraPerspective.normal', 'cameraPerspective.reduceMotion'],
+                });
+
+                pipeline._orbitDirector?.reset?.();
+                pipeline._shortsCameraRig?.resetCameras?.();
+                if (typeof pipeline._clearShortsOrbitPose === 'function') {
+                    pipeline._clearShortsOrbitPose();
+                }
+
+                const before = {
+                    x: Number(liveCamera.position.x || 0),
+                    y: Number(liveCamera.position.y || 0),
+                    z: Number(liveCamera.position.z || 0),
+                };
+
+                for (let i = 0; i < 18; i += 1) {
+                    renderer.prepareRecordingCaptureFrame({
+                        recordingActive: true,
+                        entityManager: g.entityManager,
+                        renderAlpha: 1,
+                        renderDelta: 1 / 60,
+                        splitScreen: true,
+                    });
+                }
+
+                const after = {
+                    x: Number(liveCamera.position.x || 0),
+                    y: Number(liveCamera.position.y || 0),
+                    z: Number(liveCamera.position.z || 0),
+                };
+                const styles = Array.isArray(pipeline?._orbitDirector?._slotStyleByPlayer)
+                    ? pipeline._orbitDirector._slotStyleByPlayer.slice(0, 2)
+                    : [];
+                const blends = Array.isArray(pipeline?._orbitDirector?._blendByPlayer)
+                    ? pipeline._orbitDirector._blendByPlayer.slice(0, 2)
+                    : [];
+
+                return {
+                    mode,
+                    slotStyles: [
+                        styles[0] || null,
+                        styles[1] || null,
+                    ],
+                    slotBlends: [
+                        Number(blends[0] || 0),
+                        Number(blends[1] || 0),
+                    ],
+                    liveDelta: Math.hypot(
+                        after.x - before.x,
+                        after.y - before.y,
+                        after.z - before.z
+                    ),
+                };
+            };
+
+            return {
+                classic: samplePerspective('classic'),
+                soft: samplePerspective('cinematic_soft'),
+                action: samplePerspective('cinematic_action'),
+            };
+        });
+
+        expect(probe).not.toBeNull();
+        expect(probe.classic.slotStyles).toEqual([null, null]);
+        expect(probe.classic.slotBlends[0]).toBe(0);
+        expect(probe.classic.slotBlends[1]).toBe(0);
+        expect(probe.soft.slotStyles).toEqual(['cinematic', 'cinematic']);
+        expect(probe.action.slotStyles).toEqual(['action', 'action']);
+        expect(probe.soft.slotBlends[0]).toBeGreaterThan(0.01);
+        expect(probe.soft.slotBlends[1]).toBeGreaterThan(0.01);
+        expect(probe.action.slotBlends[0]).toBeGreaterThan(0.01);
+        expect(probe.action.slotBlends[1]).toBeGreaterThan(0.01);
+        expect(probe.classic.liveDelta).toBeLessThan(0.0001);
+        expect(probe.soft.liveDelta).toBeLessThan(0.0001);
+        expect(probe.action.liveDelta).toBeLessThan(0.0001);
+    });
+
     test('T21b: Portal-Szenarien nutzen InstancedMesh fuer Portal-Visuals', async ({ page }) => {
         await loadGame(page);
         await page.evaluate(() => {

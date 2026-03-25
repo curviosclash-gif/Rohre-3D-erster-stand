@@ -398,7 +398,7 @@ export class UIManager {
                 perspectiveLabel = 'Cinematic Action';
             }
             const reduceMotionLabel = cameraPerspectiveSettings.reduceMotion ? 'an' : 'aus';
-            ui.normalCameraPerspectiveHint.textContent = `Perspektive Normal: ${perspectiveLabel} - beruhigt: ${reduceMotionLabel}`;
+            ui.normalCameraPerspectiveHint.textContent = `Video-Perspektive: ${perspectiveLabel} - beruhigt: ${reduceMotionLabel}`;
         }
 
         if (ui.planarModeToggle) ui.planarModeToggle.checked = !!gp.planarMode;

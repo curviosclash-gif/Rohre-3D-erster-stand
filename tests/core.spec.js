@@ -1236,6 +1236,143 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.clearTimeoutCount).toBeGreaterThanOrEqual(1);
     });
 
+    test('T41c1: MenuMultiplayerBridge haelt Revisionen bei ready/heartbeat/match_start Mutationen monoton', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const { MenuMultiplayerBridge } = await import('/src/ui/menu/MenuMultiplayerBridge.js');
+
+            const createMemoryStorage = () => {
+                const store = new Map();
+                return {
+                    getItem(key) {
+                        return store.has(key) ? store.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        store.set(key, String(value));
+                    },
+                    removeItem(key) {
+                        store.delete(key);
+                    },
+                };
+            };
+
+            let now = 1_700_000_000_000;
+            const intervalHandlers = new Map();
+            const timeoutHandlers = new Map();
+            let intervalCursor = 0;
+            let timeoutCursor = 0;
+            const runtime = {
+                eventTarget: {
+                    addEventListener() { },
+                    removeEventListener() { },
+                },
+                createBroadcastChannel: () => null,
+                now: () => {
+                    now += 11;
+                    return now;
+                },
+                random: () => 0.123456,
+                setInterval(fn) {
+                    const id = `int-${++intervalCursor}`;
+                    intervalHandlers.set(id, fn);
+                    return id;
+                },
+                clearInterval(id) {
+                    intervalHandlers.delete(id);
+                },
+                setTimeout(fn) {
+                    const id = `tout-${++timeoutCursor}`;
+                    timeoutHandlers.set(id, fn);
+                    return id;
+                },
+                clearTimeout(id) {
+                    timeoutHandlers.delete(id);
+                },
+            };
+
+            const sharedStorage = createMemoryStorage();
+            const hostBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-host',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime,
+            });
+            const clientBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-client',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime,
+            });
+
+            const captureSnapshot = (lobbyCode) => {
+                const raw = sharedStorage.getItem(`cuviosclash.multiplayer.lobby.${lobbyCode}`);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            };
+
+            const revisions = [];
+            const pendingCommandIds = [];
+            const lobbyCode = 'CAS-LOBBY';
+
+            const hostResult = hostBridge.host({ actorId: 'host', lobbyCode });
+            const joinResult = clientBridge.join({ actorId: 'client', lobbyCode });
+
+            const recordRevision = () => {
+                const snapshot = captureSnapshot(lobbyCode);
+                if (!snapshot) return;
+                revisions.push(Number(snapshot.revision || 0));
+                pendingCommandIds.push(String(snapshot.pendingMatchStart?.commandId || ''));
+            };
+
+            recordRevision();
+            hostBridge.toggleReady({ ready: true });
+            recordRevision();
+            clientBridge.toggleReady({ ready: true });
+            recordRevision();
+
+            hostBridge._updateHeartbeat();
+            clientBridge._updateHeartbeat();
+            recordRevision();
+
+            const startResult = hostBridge.requestMatchStart({
+                settingsSnapshot: { mapKey: 'maze', winsNeeded: 3 },
+            });
+            recordRevision();
+
+            hostBridge._updateHeartbeat();
+            clientBridge._updateHeartbeat();
+            recordRevision();
+
+            const finalSnapshot = captureSnapshot(lobbyCode);
+            const monotonic = revisions.every((revision, index) => index === 0 || revision >= revisions[index - 1]);
+            const nonEmptyPendingIds = pendingCommandIds.filter(Boolean);
+
+            hostBridge.dispose();
+            clientBridge.dispose();
+
+            return {
+                hostOk: hostResult?.ok === true,
+                joinOk: joinResult?.ok === true,
+                startOk: startResult?.ok === true,
+                revisions,
+                monotonic,
+                finalRevision: Number(finalSnapshot?.revision || 0),
+                finalPendingCommandId: String(finalSnapshot?.pendingMatchStart?.commandId || ''),
+                nonEmptyPendingIds,
+            };
+        });
+
+        expect(result.hostOk).toBeTruthy();
+        expect(result.joinOk).toBeTruthy();
+        expect(result.startOk).toBeTruthy();
+        expect(result.revisions.length).toBeGreaterThanOrEqual(5);
+        expect(result.monotonic).toBeTruthy();
+        expect(result.finalRevision).toBeGreaterThanOrEqual(result.revisions[0]);
+        expect(result.finalPendingCommandId.startsWith('match-')).toBeTruthy();
+        expect(result.nonEmptyPendingIds.length).toBeGreaterThanOrEqual(1);
+    });
+
     test('T41d: MenuMultiplayerPanel nutzt Discovery/Host-IP Ports via DI ohne window.curviosApp', async ({ page }) => {
         await loadGame(page);
 
@@ -3637,7 +3774,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                 p99: 48,
                 max: 48,
             };
-            recorder._finalizeBlobExport(new Blob(['clip'], { type: 'video/webm' }), 'video/webm');
+            await recorder._finalizeBlobExport(new Blob(['clip'], { type: 'video/webm' }), 'video/webm');
             const exportMeta = recorder.getLastExportMeta();
             recorder.dispose();
             return exportMeta;
@@ -3648,6 +3785,74 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.durationMs).toBeGreaterThan(0);
         expect(result.timestampValidation?.adjusted).toBeTruthy();
         expect(String(result.fileName || '')).not.toContain('invalid-date');
+    });
+
+    test('T20ak1: Recorder-Export wartet auf API-Ergebnis und reportet Fallback-Status korrekt', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const originalFetch = globalThis.fetch;
+            let fetchCalls = 0;
+            let downloadCalls = 0;
+            let stopResolveAt = 0;
+            let stopResult = null;
+
+            globalThis.fetch = async () => {
+                fetchCalls += 1;
+                await new Promise((resolve) => setTimeout(resolve, 15));
+                return {
+                    ok: false,
+                    status: 500,
+                };
+            };
+
+            try {
+                const recorder = new MediaRecorderSystem({
+                    canvas: { width: 320, height: 180 },
+                    autoDownload: true,
+                    now: () => Date.now(),
+                    globalScope: {},
+                    downloadHandler: () => {
+                        downloadCalls += 1;
+                    },
+                });
+                recorder._isRecording = true;
+                recorder._activeMimeType = 'video/webm';
+                recorder._activeRecorderEngine = 'mediarecorder-native';
+                recorder._activeRecording = {
+                    startedAt: Date.now() - 120,
+                    trigger: { type: 'qa' },
+                    stopResolve: (result) => {
+                        stopResolveAt = Date.now();
+                        stopResult = result;
+                    },
+                };
+
+                const startedAt = Date.now();
+                await recorder._finalizeBlobExport(new Blob(['clip'], { type: 'video/webm' }), 'video/webm');
+                const elapsedUntilResolve = Math.max(0, stopResolveAt - startedAt);
+                const exportMeta = recorder.getLastExportMeta();
+                recorder.dispose();
+
+                return {
+                    fetchCalls,
+                    downloadCalls,
+                    elapsedUntilResolve,
+                    exportStatus: exportMeta?.exportStatus || null,
+                    stopResultExportStatus: stopResult?.exportStatus || null,
+                    stopResultTransport: stopResult?.exportTransport || null,
+                };
+            } finally {
+                globalThis.fetch = originalFetch;
+            }
+        });
+
+        expect(result.fetchCalls).toBeGreaterThanOrEqual(1);
+        expect(result.downloadCalls).toBe(1);
+        expect(result.elapsedUntilResolve).toBeGreaterThanOrEqual(12);
+        expect(result.exportStatus?.status).toBe('saved_via_download_fallback');
+        expect(result.stopResultExportStatus?.status).toBe('saved_via_download_fallback');
+        expect(result.stopResultTransport).toBe('api-fallback-download');
     });
 
     test('T20ae: Runtime-Dispose entfernt globale und Menue-Listener vor Reinit', async ({ page }) => {
@@ -3735,6 +3940,344 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.firstInputUpdated).toBeFalsy();
         expect(result.secondInputUpdated).toBeTruthy();
         expect(errors).toHaveLength(0);
+    });
+
+    test('T20ae1: PauseOverlayController setup/dispose bleibt idempotent ohne doppelte Handler', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { PauseOverlayController } = await import('/src/ui/PauseOverlayController.js');
+
+            const makeButton = () => document.createElement('button');
+            const makeCheckbox = () => {
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                return input;
+            };
+
+            const keybindP1 = document.createElement('div');
+            const keybindButton = document.createElement('button');
+            keybindButton.className = 'keybind-btn';
+            keybindButton.dataset.action = 'THRUST';
+            keybindP1.appendChild(keybindButton);
+
+            const keybindP2 = document.createElement('div');
+            const pauseOverlay = document.createElement('div');
+            const pauseSettingsPanel = document.createElement('div');
+            pauseSettingsPanel.classList.add('hidden');
+
+            const ui = {
+                pauseOverlay,
+                pauseResumeButton: makeButton(),
+                pauseSettingsButton: makeButton(),
+                pauseSettingsBackButton: makeButton(),
+                pauseMenuButton: makeButton(),
+                pauseSettingsPanel,
+                pauseKeybindP1: keybindP1,
+                pauseKeybindP2: keybindP2,
+                pauseAutoRollToggle: makeCheckbox(),
+                pauseInvertP1: makeCheckbox(),
+                pauseInvertP2: makeCheckbox(),
+            };
+
+            let keyCaptureCalls = 0;
+            const game = {
+                state: 'PAUSED',
+                ui,
+                settings: {
+                    autoRoll: false,
+                    invertPitch: { PLAYER_1: false, PLAYER_2: false },
+                },
+                entityManager: { players: [] },
+                keybindEditorController: { renderPauseEditor() { } },
+                gameLoop: { requestDeltaReset() { } },
+                runtimeFacade: {
+                    isNetworkSession: () => false,
+                    isHost: () => true,
+                    _teardownSession() { },
+                },
+                hudRuntimeSystem: { clearNetworkScoreboard() { } },
+                _showMainNav() { },
+                keyCapture: null,
+            };
+
+            const matchFlowUiController = {
+                game,
+                applyLifecycleTransition() { },
+                applyMatchUiState() { },
+                resetCrosshairUi() { },
+            };
+            const ports = {
+                inputPort: {
+                    clearJustPressed() { },
+                    startKeyCapture() { keyCaptureCalls += 1; },
+                },
+                settingsPort: { applyAutoRoll() { } },
+                sessionPort: {
+                    clearLastRoundGhost() { },
+                    teardownMatchSession() { },
+                },
+                uiFeedbackPort: {
+                    showMenuPanel() { },
+                    syncAll() { },
+                },
+            };
+
+            const controller = new PauseOverlayController({
+                matchFlowUiController,
+                game,
+                ports,
+            });
+
+            let resumeCalls = 0;
+            let menuCalls = 0;
+            controller.resumeFromPause = () => {
+                resumeCalls += 1;
+            };
+            controller.returnToMenuFromPause = () => {
+                menuCalls += 1;
+            };
+
+            controller.setupListeners();
+            controller.setupListeners();
+
+            ui.pauseResumeButton.click();
+            ui.pauseMenuButton.click();
+            keybindButton.click();
+
+            const beforeDispose = {
+                resumeCalls,
+                menuCalls,
+                keyCaptureCalls,
+            };
+
+            controller.dispose();
+            ui.pauseResumeButton.click();
+            ui.pauseMenuButton.click();
+            keybindButton.click();
+
+            const afterDispose = {
+                resumeCalls,
+                menuCalls,
+                keyCaptureCalls,
+            };
+
+            controller.setupListeners();
+            ui.pauseResumeButton.click();
+            ui.pauseMenuButton.click();
+            keybindButton.click();
+
+            const afterRebind = {
+                resumeCalls,
+                menuCalls,
+                keyCaptureCalls,
+            };
+
+            controller.dispose();
+
+            return {
+                beforeDispose,
+                afterDispose,
+                afterRebind,
+            };
+        });
+
+        expect(result.beforeDispose.resumeCalls).toBe(1);
+        expect(result.beforeDispose.menuCalls).toBe(1);
+        expect(result.beforeDispose.keyCaptureCalls).toBe(1);
+        expect(result.afterDispose.resumeCalls).toBe(result.beforeDispose.resumeCalls);
+        expect(result.afterDispose.menuCalls).toBe(result.beforeDispose.menuCalls);
+        expect(result.afterDispose.keyCaptureCalls).toBe(result.beforeDispose.keyCaptureCalls);
+        expect(result.afterRebind.resumeCalls).toBe(2);
+        expect(result.afterRebind.menuCalls).toBe(2);
+        expect(result.afterRebind.keyCaptureCalls).toBe(2);
+    });
+
+    test('T20ae2: RuntimeSessionLifecycle puffert fruehe stateUpdate-Pakete und wartet als Client auf Host-Startsignal', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const lifecycleModule = await import('/src/core/runtime/RuntimeSessionLifecycleService.js');
+            const {
+                setupRuntimeClientStateReceiver,
+                waitForRuntimePlayersLoaded,
+            } = lifecycleModule;
+
+            const createEventBusSession = ({ isHost, localPlayerId, players }) => {
+                const listeners = new Map();
+                const sentInputs = [];
+                return {
+                    isHost,
+                    localPlayerId,
+                    getPlayers() {
+                        return players;
+                    },
+                    sendInput(payload) {
+                        sentInputs.push(payload);
+                    },
+                    on(event, handler) {
+                        const entries = listeners.get(event) || [];
+                        entries.push(handler);
+                        listeners.set(event, entries);
+                    },
+                    off(event, handler) {
+                        const entries = listeners.get(event) || [];
+                        listeners.set(event, entries.filter((entry) => entry !== handler));
+                    },
+                    emit(event, payload) {
+                        const entries = listeners.get(event) || [];
+                        for (const handler of entries) {
+                            handler(payload);
+                        }
+                    },
+                    listenerCount(event) {
+                        return (listeners.get(event) || []).length;
+                    },
+                    sentInputs,
+                };
+            };
+
+            const hostSession = createEventBusSession({
+                isHost: true,
+                localPlayerId: 'host',
+                players: [{ peerId: 'host' }, { peerId: 'client' }],
+            });
+            const hostFacade = {
+                session: hostSession,
+                _arenaLoadedPeers: new Set(),
+                _onPlayerLoadedHandler: null,
+            };
+
+            const hostWaitPromise = waitForRuntimePlayersLoaded(hostFacade);
+            hostSession.emit('playerLoaded', { playerId: 'client' });
+            await hostWaitPromise;
+
+            const clientSession = createEventBusSession({
+                isHost: false,
+                localPlayerId: 'client',
+                players: [{ peerId: 'host' }, { peerId: 'client' }],
+            });
+            const clientFacade = {
+                session: clientSession,
+                _arenaLoadedPeers: new Set(),
+                _onArenaStartSignalHandler: null,
+            };
+
+            const clientWaitPromise = waitForRuntimePlayersLoaded(clientFacade);
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            clientSession.emit('remoteInput', { input: { type: 'arena_start' } });
+            await clientWaitPromise;
+
+            let resolveReconcilerFactory = null;
+            const receiveCalls = [];
+            let reconcileCalls = 0;
+            const delayedReconciler = new Promise((resolve) => {
+                resolveReconcilerFactory = resolve;
+            });
+
+            const receiverSession = createEventBusSession({
+                isHost: false,
+                localPlayerId: 'client',
+                players: [{ peerId: 'host' }, { peerId: 'client' }],
+            });
+            const receiverFacade = {
+                session: receiverSession,
+                game: {
+                    entityManager: {
+                        players: [{ index: 0, position: { x: 0, y: 0, z: 0 } }],
+                    },
+                },
+                _pendingStateUpdates: [],
+                _loadStateReconciler: () => delayedReconciler,
+            };
+
+            setupRuntimeClientStateReceiver(receiverFacade);
+            receiverSession.emit('stateUpdate', { id: 1, state: { players: [] } });
+            receiverSession.emit('stateUpdate', { id: 2, state: { players: [] } });
+
+            const bufferedBeforeResolve = receiverFacade._pendingStateUpdates.length;
+            resolveReconcilerFactory({
+                receiveServerState(serverState) {
+                    receiveCalls.push(serverState?.id || 0);
+                },
+                reconcile() {
+                    reconcileCalls += 1;
+                },
+                reset() { },
+            });
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            receiverSession.emit('stateUpdate', { id: 3, state: { players: [] } });
+
+            return {
+                hostStartSignalType: hostSession.sentInputs[0]?.type || null,
+                hostStartSignalPeers: hostSession.sentInputs[0]?.expectedPeerIds || [],
+                clientLoadedSignalType: clientSession.sentInputs[0]?.type || null,
+                clientRemoteInputListenersAfterResolve: clientSession.listenerCount('remoteInput'),
+                bufferedBeforeResolve,
+                bufferedAfterResolve: receiverFacade._pendingStateUpdates.length,
+                receiveCalls,
+                reconcileCalls,
+            };
+        });
+
+        expect(result.hostStartSignalType).toBe('arena_start');
+        expect(Array.isArray(result.hostStartSignalPeers)).toBeTruthy();
+        expect(result.hostStartSignalPeers.includes('host')).toBeTruthy();
+        expect(result.hostStartSignalPeers.includes('client')).toBeTruthy();
+        expect(result.clientLoadedSignalType).toBe('arena_loaded');
+        expect(result.clientRemoteInputListenersAfterResolve).toBe(0);
+        expect(result.bufferedBeforeResolve).toBe(2);
+        expect(result.bufferedAfterResolve).toBe(0);
+        expect(result.receiveCalls).toEqual([1, 2, 3]);
+        expect(result.reconcileCalls).toBeGreaterThanOrEqual(2);
+    });
+
+    test('T20ae3: TelemetryHistoryStore wiederholt temporaere DB-Fehler und oeffnet Verbindung neu', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { TelemetryHistoryStore } = await import('/src/state/TelemetryHistoryStore.js');
+
+            const store = new TelemetryHistoryStore();
+            let getDbCalls = 0;
+            let invalidateCalls = 0;
+            let operationCalls = 0;
+            store._getDb = async () => {
+                getDbCalls += 1;
+                return { id: `db-${getDbCalls}` };
+            };
+            store._invalidateDb = () => {
+                invalidateCalls += 1;
+            };
+
+            const retryResult = await store._runWithDbRetry(async () => {
+                operationCalls += 1;
+                if (operationCalls === 1) {
+                    const transientError = new Error('temporary');
+                    transientError.name = 'AbortError';
+                    throw transientError;
+                }
+                return 'ok-after-retry';
+            }, 'fallback');
+
+            const terminalResult = await store._runWithDbRetry(async () => {
+                const terminalError = new Error('terminal');
+                terminalError.name = 'TypeError';
+                throw terminalError;
+            }, 'fallback-terminal');
+
+            return {
+                retryResult,
+                terminalResult,
+                getDbCalls,
+                invalidateCalls,
+                operationCalls,
+            };
+        });
+
+        expect(result.retryResult).toBe('ok-after-retry');
+        expect(result.terminalResult).toBe('fallback-terminal');
+        expect(result.operationCalls).toBe(2);
+        expect(result.getDbCalls).toBeGreaterThanOrEqual(3);
+        expect(result.invalidateCalls).toBeGreaterThanOrEqual(2);
     });
 
     test('T10b: Portal-Runtime bleibt im Validierungsszenario funktionsfaehig', async ({ page }) => {

@@ -533,4 +533,8 @@ export class MatchFlowUiController {
     _setupPauseOverlayListeners() {
         this.pauseOverlayController.setupListeners();
     }
+
+    dispose() {
+        this.pauseOverlayController?.dispose?.();
+    }
 }

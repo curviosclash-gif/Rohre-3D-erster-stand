@@ -3,6 +3,14 @@ import {
     buildMenuLifecycleEventPayload,
 } from './MenuStateContracts.js';
 import {
+    hostMultiplayerLobby,
+    invalidateMultiplayerReadyForAll,
+    joinMultiplayerLobby,
+    publishMultiplayerHostSettings,
+    requestMultiplayerMatchStart,
+    toggleReadyMultiplayerLobby,
+} from './multiplayer/MenuMultiplayerBridgeMutations.js';
+import {
     createBroadcastChannelHandle,
     resolveEventTarget,
     resolveGlobalObject,
@@ -10,6 +18,13 @@ import {
     resolveStorage,
     toCallable,
 } from './multiplayer/MenuMultiplayerBridgeRuntime.js';
+import {
+    acquireMenuMultiplayerSnapshotLock,
+    persistMenuMultiplayerSnapshotWithCas,
+    releaseMenuMultiplayerSnapshotLock,
+    SNAPSHOT_CAS_MAX_RETRIES,
+    SNAPSHOT_NOOP,
+} from './multiplayer/MenuMultiplayerBridgeCas.js';
 import { createRuntimeClock } from '../../shared/contracts/RuntimeClockContract.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
@@ -390,13 +405,28 @@ export class MenuMultiplayerBridge {
     }
 
     _persistSnapshot(snapshot, reason, options = {}) {
+        const expectedRevision = Number(options?.expectedRevision);
+        const baseRevision = Number.isFinite(expectedRevision)
+            ? Math.max(0, Math.floor(expectedRevision))
+            : Math.max(0, Math.floor(Number(snapshot?.revision) || 0));
         const nextSnapshot = snapshot ? normalizeSessionSnapshot({
             ...snapshot,
             updatedAt: this._now(),
-            revision: Math.max(0, Math.floor(Number(snapshot?.revision) || 0)) + 1,
+            revision: baseRevision + 1,
         }, this._now()) : null;
 
-        persistSnapshotToStorage(this._storage, nextSnapshot);
+        if (!nextSnapshot && options.previousLobbyCode) {
+            const previousStorageKey = createLobbyStorageKey(options.previousLobbyCode);
+            if (previousStorageKey) {
+                try {
+                    this._storage?.removeItem?.(previousStorageKey);
+                } catch {
+                    // Ignore localStorage cleanup failures.
+                }
+            }
+        } else {
+            persistSnapshotToStorage(this._storage, nextSnapshot);
+        }
         this._syncStateFromSnapshot(nextSnapshot, options);
         if (nextSnapshot?.lobbyCode) {
             this._announceSnapshotChange(nextSnapshot.lobbyCode, reason, nextSnapshot.revision);
@@ -409,12 +439,62 @@ export class MenuMultiplayerBridge {
     _updateActiveSnapshot(mutator, reason, options = {}) {
         const activeLobbyCode = normalizeLobbyCode(options.lobbyCode || this._activeLobbyCode, '');
         if (!activeLobbyCode) return null;
-        const currentSnapshot = this._getSnapshot(activeLobbyCode);
-        const nextSnapshot = mutator(currentSnapshot ? deepClone(currentSnapshot) : null);
-        return this._persistSnapshot(nextSnapshot, reason, {
-            previousLobbyCode: activeLobbyCode,
+
+        for (let attempt = 0; attempt < SNAPSHOT_CAS_MAX_RETRIES; attempt += 1) {
+            const lockLease = acquireMenuMultiplayerSnapshotLock({
+                storage: this._storage,
+                lobbyCode: activeLobbyCode,
+                peerId: this._peerId,
+                nowProvider: this._now,
+                randomProvider: this._random,
+                buildRuntimeId,
+                normalizeString,
+                toTimestamp,
+                createLobbyStorageKey,
+            });
+            if (!lockLease) continue;
+            try {
+                const currentSnapshot = this._getSnapshot(activeLobbyCode);
+                const baseRevision = Math.max(0, Math.floor(Number(currentSnapshot?.revision) || 0));
+                const nextSnapshot = mutator(currentSnapshot ? deepClone(currentSnapshot) : null, {
+                    attempt,
+                    baseRevision,
+                });
+                if (nextSnapshot === SNAPSHOT_NOOP) {
+                    this._syncStateFromSnapshot(currentSnapshot, {
+                        preserveLobbyCode: options.preserveLobbyCode === true,
+                    });
+                    return currentSnapshot;
+                }
+                const persistResult = persistMenuMultiplayerSnapshotWithCas({
+                    normalizeLobbyCode,
+                    lobbyCode: activeLobbyCode,
+                    snapshot: nextSnapshot,
+                    expectedRevision: baseRevision,
+                    getSnapshot: (lobbyCode) => this._getSnapshot(lobbyCode),
+                    persistSnapshot: (snapshot, persistOptions = {}) => this._persistSnapshot(snapshot, reason, {
+                        ...persistOptions,
+                        previousLobbyCode: activeLobbyCode,
+                    }),
+                    preserveLobbyCode: options.preserveLobbyCode === true,
+                });
+                if (persistResult.ok) {
+                    return persistResult.snapshot;
+                }
+            } finally {
+                releaseMenuMultiplayerSnapshotLock({
+                    storage: this._storage,
+                    lease: lockLease,
+                    normalizeString,
+                });
+            }
+        }
+
+        const latestSnapshot = this._getSnapshot(activeLobbyCode);
+        this._syncStateFromSnapshot(latestSnapshot, {
             preserveLobbyCode: options.preserveLobbyCode === true,
         });
+        return latestSnapshot;
     }
 
     _startHeartbeat() {
@@ -439,7 +519,7 @@ export class MenuMultiplayerBridge {
             const now = this._now();
             const members = Array.isArray(snapshot.members) ? snapshot.members : [];
             const hasLocalMember = members.some((member) => member?.peerId === this._peerId);
-            if (!hasLocalMember) return snapshot;
+            if (!hasLocalMember) return SNAPSHOT_NOOP;
             return {
                 ...snapshot,
                 members: members.map((member) => (
@@ -471,9 +551,9 @@ export class MenuMultiplayerBridge {
             this._pendingMatchClearTimer = null;
             this._updateActiveSnapshot((snapshot) => {
                 if (!snapshot) return null;
-                if (normalizeLobbyCode(snapshot.lobbyCode, '') !== normalizeLobbyCode(lobbyCode, '')) return snapshot;
+                if (normalizeLobbyCode(snapshot.lobbyCode, '') !== normalizeLobbyCode(lobbyCode, '')) return SNAPSHOT_NOOP;
                 const activeCommandId = normalizeString(snapshot.pendingMatchStart?.commandId, '');
-                if (activeCommandId !== normalizeString(commandId, '')) return snapshot;
+                if (activeCommandId !== normalizeString(commandId, '')) return SNAPSHOT_NOOP;
                 return {
                     ...snapshot,
                     pendingMatchStart: null,
@@ -530,8 +610,7 @@ export class MenuMultiplayerBridge {
 
         const silent = options?.silent === true;
         const previousState = this.getSessionState();
-        this._persistSnapshot((() => {
-            const snapshot = this._getSnapshot(previousLobbyCode);
+        this._updateActiveSnapshot((snapshot) => {
             if (!snapshot) return null;
             const remainingMembers = snapshot.members.filter((member) => member.peerId !== this._peerId);
             if (remainingMembers.length === 0) {
@@ -544,8 +623,8 @@ export class MenuMultiplayerBridge {
                 ...snapshot,
                 members: remainingMembers,
             };
-        })(), 'leave', {
-            previousLobbyCode,
+        }, 'leave', {
+            lobbyCode: previousLobbyCode,
             preserveLobbyCode: false,
         });
         this._syncStateFromSnapshot(null);
@@ -560,193 +639,39 @@ export class MenuMultiplayerBridge {
     }
 
     host(options = {}) {
-        const actorId = normalizeString(options.actorId, 'host');
-        const requestedLobbyCode = normalizeLobbyCode(options.lobbyCode, generateLobbyCode(this._now, this._random));
-        if (this._activeLobbyCode && this._activeLobbyCode !== requestedLobbyCode) {
-            this.leave({ silent: true });
-        }
-
-        const existingSnapshot = this._getSnapshot(requestedLobbyCode);
-        const existingHostPeerId = normalizeString(existingSnapshot?.hostPeerId, '');
-        if (existingHostPeerId && existingHostPeerId !== this._peerId) {
-            return this._fail(`Lobby bereits aktiv: ${requestedLobbyCode}`, 'lobby_taken');
-        }
-
-        const now = this._now();
-        const preservedMembers = Array.isArray(existingSnapshot?.members)
-            ? existingSnapshot.members
-                .filter((member) => member.peerId !== this._peerId)
-                .map((member) => ({
-                    ...member,
-                    role: 'client',
-                    ready: false,
-                    lastSeenAt: now,
-                }))
-            : [];
-        const nextSnapshot = {
-            schemaVersion: MULTIPLAYER_SESSION_SCHEMA_VERSION,
-            lobbyCode: requestedLobbyCode,
-            hostPeerId: this._peerId,
-            hostActorId: actorId,
-            revision: existingSnapshot?.revision || 0,
-            updatedAt: now,
-            members: [
-                {
-                    peerId: this._peerId,
-                    actorId,
-                    role: 'host',
-                    ready: false,
-                    joinedAt: now,
-                    lastSeenAt: now,
-                },
-                ...preservedMembers,
-            ],
-            hostSettingsSnapshot: deepClone(existingSnapshot?.hostSettingsSnapshot),
-            pendingMatchStart: null,
-        };
-        const persistedSnapshot = this._persistSnapshot(nextSnapshot, 'host');
-        this._setStatus(`Lobby erstellt: ${requestedLobbyCode}`);
-        const event = this._emit(MENU_MULTIPLAYER_EVENT_TYPES.HOST, {
-            actorId,
-            lobbyCode: requestedLobbyCode,
-            mode: 'host',
-            peerId: this._peerId,
+        return hostMultiplayerLobby(this, options, {
+            normalizeString,
+            normalizeLobbyCode,
+            generateLobbyCode,
+            deepClone,
+            sessionSchemaVersion: MULTIPLAYER_SESSION_SCHEMA_VERSION,
+            eventTypes: MENU_MULTIPLAYER_EVENT_TYPES,
         });
-        return {
-            ok: true,
-            lobbyCode: requestedLobbyCode,
-            event,
-            sessionState: this.getSessionState(),
-            snapshot: deepClone(persistedSnapshot),
-        };
     }
 
     join(options = {}) {
-        const actorId = normalizeString(options.actorId, 'player');
-        const requestedLobbyCode = normalizeLobbyCode(options.lobbyCode, '');
-        if (!requestedLobbyCode) {
-            return this._fail('Lobby-Code fehlt.', 'missing_lobby_code');
-        }
-        if (this._activeLobbyCode && this._activeLobbyCode !== requestedLobbyCode) {
-            this.leave({ silent: true });
-        }
-
-        const existingSnapshot = this._getSnapshot(requestedLobbyCode);
-        if (!existingSnapshot?.hostPeerId) {
-            return this._fail(`Lobby nicht gefunden: ${requestedLobbyCode}`, 'lobby_not_found');
-        }
-
-        const now = this._now();
-        const existingLocalMember = existingSnapshot.members.find((member) => member.peerId === this._peerId);
-        const nextSnapshot = {
-            ...existingSnapshot,
-            members: [
-                ...existingSnapshot.members.filter((member) => member.peerId !== this._peerId),
-                {
-                    peerId: this._peerId,
-                    actorId,
-                    role: existingSnapshot.hostPeerId === this._peerId ? 'host' : 'client',
-                    ready: false,
-                    joinedAt: existingLocalMember?.joinedAt || now,
-                    lastSeenAt: now,
-                },
-            ],
-        };
-        const persistedSnapshot = this._persistSnapshot(nextSnapshot, 'join');
-        if (!persistedSnapshot) {
-            return this._fail(`Lobby nicht verfuegbar: ${requestedLobbyCode}`, 'lobby_not_found');
-        }
-
-        this._setStatus(`Lobby beigetreten: ${requestedLobbyCode}`);
-        const event = this._emit(MENU_MULTIPLAYER_EVENT_TYPES.JOIN, {
-            actorId,
-            lobbyCode: requestedLobbyCode,
-            mode: 'join',
-            peerId: this._peerId,
+        return joinMultiplayerLobby(this, options, {
+            normalizeString,
+            normalizeLobbyCode,
+            deepClone,
+            eventTypes: MENU_MULTIPLAYER_EVENT_TYPES,
         });
-        return {
-            ok: true,
-            lobbyCode: requestedLobbyCode,
-            event,
-            sessionState: this.getSessionState(),
-            snapshot: deepClone(persistedSnapshot),
-        };
     }
 
     toggleReady(options = {}) {
-        if (!this._activeLobbyCode) {
-            return this._fail('Noch keiner Lobby beigetreten.', 'not_in_lobby');
-        }
-
-        const existingSnapshot = this._getSnapshot(this._activeLobbyCode);
-        if (!existingSnapshot) {
-            return this._fail('Lobby nicht mehr verfuegbar.', 'lobby_not_found');
-        }
-
-        const localMember = existingSnapshot.members.find((member) => member.peerId === this._peerId);
-        if (!localMember) {
-            return this._fail('Noch keiner Lobby beigetreten.', 'not_in_lobby');
-        }
-
-        const actorId = normalizeString(options.actorId, localMember.actorId || 'player');
-        const ready = typeof options.ready === 'boolean' ? options.ready : !localMember.ready;
-        const persistedSnapshot = this._persistSnapshot({
-            ...existingSnapshot,
-            members: existingSnapshot.members.map((member) => (
-                member.peerId === this._peerId
-                    ? {
-                        ...member,
-                        actorId,
-                        ready,
-                        lastSeenAt: this._now(),
-                    }
-                    : member
-            )),
-        }, 'ready_toggle');
-        this._setStatus(ready ? 'Ready gesetzt' : 'Ready entfernt');
-        const event = this._emit(MENU_MULTIPLAYER_EVENT_TYPES.READY_TOGGLE, {
-            actorId,
-            ready,
-            lobbyCode: this._activeLobbyCode,
-            peerId: this._peerId,
+        return toggleReadyMultiplayerLobby(this, options, {
+            normalizeString,
+            deepClone,
+            eventTypes: MENU_MULTIPLAYER_EVENT_TYPES,
         });
-        return {
-            ok: true,
-            ready,
-            event,
-            sessionState: this.getSessionState(),
-            snapshot: deepClone(persistedSnapshot),
-        };
     }
 
     invalidateReadyForAll(reason = 'host_settings_changed') {
-        if (!this._activeLobbyCode) return null;
-        const existingSnapshot = this._getSnapshot(this._activeLobbyCode);
-        if (!existingSnapshot || existingSnapshot.hostPeerId !== this._peerId) return null;
-
-        const hadReady = existingSnapshot.members.some((member) => member.ready === true);
-        if (!hadReady) return null;
-
-        const persistedSnapshot = this._persistSnapshot({
-            ...existingSnapshot,
-            members: existingSnapshot.members.map((member) => ({
-                ...member,
-                ready: false,
-                lastSeenAt: member.peerId === this._peerId ? this._now() : member.lastSeenAt,
-            })),
-        }, 'ready_invalidated');
-        this._setStatus('Ready-Status zurueckgesetzt (Host-Aenderung)');
-        const event = this._emit(MENU_MULTIPLAYER_EVENT_TYPES.READY_INVALIDATED, {
-            reason: normalizeString(reason, 'host_settings_changed'),
-            lobbyCode: this._activeLobbyCode,
-            peerId: this._peerId,
+        return invalidateMultiplayerReadyForAll(this, reason, {
+            normalizeString,
+            deepClone,
+            eventTypes: MENU_MULTIPLAYER_EVENT_TYPES,
         });
-        return {
-            ok: true,
-            event,
-            sessionState: this.getSessionState(),
-            snapshot: deepClone(persistedSnapshot),
-        };
     }
 
     syncActorIdentity(actorId) {
@@ -756,7 +681,7 @@ export class MenuMultiplayerBridge {
         return this._updateActiveSnapshot((snapshot) => {
             if (!snapshot) return null;
             const hasLocalMember = snapshot.members.some((member) => member.peerId === this._peerId);
-            if (!hasLocalMember) return snapshot;
+            if (!hasLocalMember) return SNAPSHOT_NOOP;
             return {
                 ...snapshot,
                 hostActorId: snapshot.hostPeerId === this._peerId
@@ -776,64 +701,18 @@ export class MenuMultiplayerBridge {
     }
 
     publishHostSettings(settingsSnapshot) {
-        if (!this._activeLobbyCode) return null;
-        const existingSnapshot = this._getSnapshot(this._activeLobbyCode);
-        if (!existingSnapshot || existingSnapshot.hostPeerId !== this._peerId) return null;
-
-        return this._persistSnapshot({
-            ...existingSnapshot,
-            hostActorId: existingSnapshot.hostActorId,
-            hostSettingsSnapshot: deepClone(settingsSnapshot),
-        }, 'host_settings_sync');
+        return publishMultiplayerHostSettings(this, settingsSnapshot, {
+            deepClone,
+        });
     }
 
     requestMatchStart(options = {}) {
-        if (!this._activeLobbyCode) {
-            return this._fail('Lobby fehlt.', 'not_in_lobby');
-        }
-        const existingSnapshot = this._getSnapshot(this._activeLobbyCode);
-        if (!existingSnapshot) {
-            return this._fail('Lobby nicht mehr verfuegbar.', 'lobby_not_found');
-        }
-        const sessionState = deriveSessionState(existingSnapshot, this._peerId);
-        if (!sessionState.isHost) {
-            return this._fail('Nur der Host kann starten.', 'host_required');
-        }
-        if (sessionState.memberCount < 2) {
-            return this._fail('Mindestens zwei Teilnehmer werden benoetigt.', 'not_enough_members');
-        }
-        if (!sessionState.allReady) {
-            return this._fail('Alle Teilnehmer muessen Ready sein.', 'members_not_ready');
-        }
-
-        const commandId = `match-${buildRuntimeId(this._now, this._random, 5)}`;
-        const command = {
-            commandId,
-            lobbyCode: this._activeLobbyCode,
-            hostPeerId: this._peerId,
-            issuedAt: this._now(),
-            settingsSnapshot: deepClone(options.settingsSnapshot),
-        };
-        const persistedSnapshot = this._persistSnapshot({
-            ...existingSnapshot,
-            hostSettingsSnapshot: deepClone(options.settingsSnapshot),
-            pendingMatchStart: command,
-        }, 'match_start');
-        this._schedulePendingMatchCommandClear(this._activeLobbyCode, commandId);
-        this._setStatus(`Match-Start an Lobby gesendet: ${this._activeLobbyCode}`);
-        const event = this._emit(MENU_MULTIPLAYER_EVENT_TYPES.MATCH_START, {
-            lobbyCode: this._activeLobbyCode,
-            commandId,
-            participantCount: sessionState.memberCount,
-            peerId: this._peerId,
+        return requestMultiplayerMatchStart(this, options, {
+            deriveSessionState,
+            buildRuntimeId,
+            deepClone,
+            eventTypes: MENU_MULTIPLAYER_EVENT_TYPES,
         });
-        return {
-            ok: true,
-            commandId,
-            event,
-            sessionState: this.getSessionState(),
-            snapshot: deepClone(persistedSnapshot),
-        };
     }
 
     getPeerId() {
