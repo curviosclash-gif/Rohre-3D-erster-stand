@@ -32,6 +32,9 @@ Weitere Regeln:
 - ❌ Mehrere Agents sequenziell starten (nutze parallele Tool-Calls)
 - ❌ Lange Zusammenfassungen nach jeder Aktion
 - ❌ Tool-Calls wiederholen deren Ergebnis schon im Kontext ist
+- ❌ Agent-Explore mit `"very thorough"` als Default (nutze `"quick"` oder `"medium"`, nur `"very thorough"` wenn der User explizit tiefe Suche anfordert)
+- ❌ Sequenzielle Tool-Calls wenn sie parallel laufen koennten (2+ unabhaengige Reads/Greps IMMER parallel)
+- ❌ `EnterPlanMode` fuer kleine Tasks (nur bei 5+ betroffenen Dateien, kleine Fixes direkt umsetzen)
 
 ## Commit-Disziplin fuer parallele Agents (KRITISCH!)
 
