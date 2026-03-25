@@ -18,12 +18,20 @@ Regeln:
 - **Keine großen Kontexte:** Alte Chats, große Dateien oder Ergebnisse nicht einfach komplett in Prompts kopieren.
 - **Memory statt wiederholte Reads:** Wichtige Infos (Struktur, Patterns, Conventions) in Memory-Files speichern und abrufen.
 
+Weitere Regeln:
+- **Umsetzungsplan nur teilweise lesen:** Nur den relevanten Block/Stream mit `limit`/`offset` lesen, nie die ganze Datei.
+- **Antworten kurz halten:** Keine langen Zusammenfassungen nach Aktionen. Der User sieht den Diff.
+- **Keine redundanten Tool-Calls:** Wenn `git status` oder ein Read schon im Chat-Kontext ist, nicht nochmal ausfuehren.
+- **Memory fuer Projekt-Struktur:** Haeufig gebrauchte Pfade, Patterns und Conventions in Memory-Files speichern statt immer wieder mit Glob zu suchen.
+
 **Anti-Patterns:**
 - ❌ `Agent` für einfache Dateisuche (nutze `Glob` statt)
 - ❌ Gleiche Datei 3x hintereinander lesen
 - ❌ Ganze Umsetzungsplan lesen, wenn nur ein Block relevant ist
 - ❌ Große Dateien ohne `limit` Parameter auslesen
 - ❌ Mehrere Agents sequenziell starten (nutze parallele Tool-Calls)
+- ❌ Lange Zusammenfassungen nach jeder Aktion
+- ❌ Tool-Calls wiederholen deren Ergebnis schon im Kontext ist
 
 ## Commit-Disziplin fuer parallele Agents (KRITISCH!)
 
