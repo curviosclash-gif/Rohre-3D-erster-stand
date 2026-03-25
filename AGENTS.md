@@ -23,6 +23,27 @@ This file defines repository-specific operating rules for Codex.
 - Bot training planning source of truth is `docs/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
 - Future bot-training windows and KPI corridor are maintained in `docs/Bot_Trainings_Roadmap.md` and referenced from `docs/Bot_Trainingsplan.md`.
 
+## Token-Effizienz (KRITISCH!)
+
+**Ziel: Minimaler Token-Verbrauch bei maximaler Produktivitaet.**
+
+- **Keine wiederholten Reads:** Gleiche Datei zweimal lesen = Token verschwenden. Info aus vorherigem Read verwenden.
+- **Teilweise lesen:** Nur relevante Teile von grossen Dateien lesen (z.B. Umsetzungsplan nur den relevanten Block, nicht alles).
+- **Keine grossen Kontexte:** Grosse Dateien oder Ergebnisse nicht komplett in den Kontext laden.
+- **Keine redundanten Tool-Calls:** Wenn ein Read/Search-Ergebnis schon im Kontext ist, nicht nochmal ausfuehren.
+- **Parallele Tool-Calls erzwingen:** 2+ unabhaengige Reads/Searches IMMER parallel, niemals sequenziell.
+- **Antworten kurz halten:** Keine langen Zusammenfassungen nach Aktionen. Der User sieht den Diff.
+- **Kein Plan-Mode fuer kleine Tasks:** Nur bei 5+ betroffenen Dateien planen. Kleine Fixes direkt umsetzen.
+- **Agent-Explore sparsam:** Default `quick` oder `medium` Tiefe. Nur `very thorough` wenn der User explizit tiefe Suche anfordert.
+
+**Anti-Patterns:**
+- NICHT gleiche Datei mehrfach lesen
+- NICHT ganze Umsetzungsplan lesen wenn nur ein Block relevant ist
+- NICHT grosse Dateien ohne Zeilenbegrenzung auslesen
+- NICHT lange Zusammenfassungen nach jeder Aktion
+- NICHT Tool-Calls wiederholen deren Ergebnis schon im Kontext ist
+- NICHT mehrere Agents sequenziell starten (parallel nutzen)
+
 ## Workflow Selection
 
 - Feature planning: use `.agents/workflows/plan.md`
