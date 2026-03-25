@@ -55,7 +55,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | E | V52 | 2026-03-23 | frei | - |
 | F | V53 | 2026-03-23 | frei | - |
 | G | V54 | 2026-03-24 | frei | - |
-| H | V55 | 2026-03-25 | frei | - |
+| H | V55 | 2026-03-25 | in-bearbeitung | nach 55.99 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -73,7 +73,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-H seit 2026-03-25 -->
 <!-- DEPENDS-ON: V50.99 -->
 
 Scope:
