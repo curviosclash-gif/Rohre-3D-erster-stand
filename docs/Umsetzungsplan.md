@@ -39,6 +39,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V55 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Refactors in Runtime-/Netzwerk-Hotspots vorhanden |
 | V56 | V55.99 | hard | nein | V56 behandelt Edge-Cases und Defensive Improvements aus Code-Audit |
 | V56 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Keine neuen Layer-Drifts, keine grossen Decompositions-Aenderungen |
+| V57 | V45 (Arcade-Basis) | soft | ja | Arcade-Run-Infrastruktur (ArcadeRunRuntime, EncounterDirector, BlueprintSchema) ist vorhanden |
+| V57 | V53.99 | soft | ja | Settings-Persistenz fuer Vehicle-Profile benoetigt Storage-Contracts |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -49,6 +51,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/core/MediaRecorderSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/core/GameRuntimeFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/main.js`, `src/entities/**`, `src/ui/**`, `src/state/**`, `src/shared/**`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V54 | abgeschlossen | Gesamtfix fuer God-Objects, Layer-Kopplung, Legacy-Patterns und Global-Kapselung |
 | `tests/playwright.global-setup.js`, `tests/playwright.global-teardown.js`, `playwright.config.js`, `scripts/verify-lock.mjs`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/entities/arena/portal/PortalRuntimeSystem.js`, `src/ui/PauseOverlayController.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/core/MediaRecorderSystem.js`, `src/state/TelemetryHistoryStore.js`, `tests/core.spec.js`, `tests/training-automation.spec.js` | V55 | offen | Tiefenaudit-Remediation fuer Teststabilitaet, Race-Conditions, Backpressure und Lifecycle-Haertung |
 | `src/state/MatchLifecycleSessionOrchestrator.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/ui/TouchInputSource.js`, `src/ui/MatchFlowUiController.js`, `tests/core.spec.js`, `tests/physics-core.spec.js` | V56 | offen | Edge-Case-Fixes, Defensive Improvements, idempotency guards |
+| `src/state/arcade/ArcadeVehicleProfile.js`, `src/state/arcade/ArcadeMapProgression.js`, `src/state/arcade/ArcadeMissionState.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/ArcadeMapSelect.js`, `src/entities/directors/ArcadeEncounterCatalog.js` (mapPool-Erweiterung), `src/entities/arcade/ArcadeBlueprintSchema.js` (Upgrade-Tiers), `src/core/arcade/ArcadeRunRuntime.js` (Multi-Map) | V57 | offen | Arcade Progression: Vehicle Manager, Multi-Map, Missions |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -59,7 +62,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | F | V53 | 2026-03-23 | frei | - |
 | G | V54 | 2026-03-24 | frei | - |
 | H | V55 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
-| - | V56 | 2026-03-25 | frei | - |
+| I | V56 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
+| - | V57 | - | offen | - |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -373,43 +377,43 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 56.1 bis 56.4 sowie 56.99 sind abgeschlossen und dokumentiert.
-- [ ] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS.
-- [ ] DoD.3 Neue Regressionstests fuer die behandelten Edge-Cases existieren in `tests/core.spec.js` oder `tests/physics-core.spec.js`.
-- [ ] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen.
+- [x] DoD.1 Alle Phasen 56.1 bis 56.4 sowie 56.99 sind abgeschlossen und dokumentiert. (abgeschlossen: 2026-03-25)
+- [x] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS. (abgeschlossen: 2026-03-25)
+- [x] DoD.3 Neue Regressionstests fuer die behandelten Edge-Cases existieren in `tests/core.spec.js` oder `tests/physics-core.spec.js`. (abgeschlossen: 2026-03-25)
+- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen. (abgeschlossen: 2026-03-25)
 
 ### 56.1 Async Race Condition in MatchLifecycleSessionOrchestrator
 
 **Issue:** Wenn `createMatchSession()` waehrend einer laufenden async `initializeMatchSession()` erneut aufgerufen wird, kann die alte Promise nach Erstellen der neuen Session noch resolven und stale Match-Daten anwenden (Lifecycle-Corruption).
 
 **Fix-Strategie:**
-- [x] 56.1.1 `_applyInitializedMatch()` mit Session-ID-Guard versehen: nur anwenden wenn `resolvedMatch._sessionId === this._activeSessionId` (abgeschlossen: 2026-03-25; evidence: TBD)
-- [x] 56.1.2 Regressionstest in `tests/core.spec.js` fuer parallele `createMatchSession()`-Aufrufe hinzufuegen (abgeschlossen: 2026-03-25; evidence: TBD)
+- [x] 56.1.1 `_applyInitializedMatch()` mit Session-ID-Guard versehen: nur anwenden wenn `resolvedMatch._sessionId === this._activeSessionId` (abgeschlossen: 2026-03-25; evidence: provisional session ID in createMatchSession + expectedSessionId guard in _applyInitializedMatch)
+- [x] 56.1.2 Regressionstest in `tests/core.spec.js` fuer parallele `createMatchSession()`-Aufrufe hinzufuegen (abgeschlossen: 2026-03-25; evidence: test 'V56.1 Session-ID guard rejects stale async createMatchSession result' in tests/core.spec.js)
 
 ### 56.2 Defensive Null-Checks in ProjectileSimulationOps
 
 **Issue:** `portalResult.target` wird nach `if (portalResult)` Check ohne Null-Assertion verwendet. Obwohl in der Praxis immer set, sollte defensiv geprueft werden.
 
 **Fix-Strategie:**
-- [x] 56.2.1 Linie 197 in ProjectileSimulationOps: `if (portalResult?.target)` statt `if (portalResult)` (abgeschlossen: 2026-03-25; evidence: TBD)
-- [x] 56.2.2 Vergleichbare Portal-Zugriffe in `PortalRuntimeSystem.js`, `SpecialGateRuntime.js` durchsuchen und absichern (abgeschlossen: 2026-03-25; evidence: TBD)
+- [x] 56.2.1 Linie 197 in ProjectileSimulationOps: `if (portalResult?.target)` statt `if (portalResult)` (abgeschlossen: 2026-03-25; evidence: ProjectileSimulationOps.js:196 + PlayerInteractionPhase.js:32 geaendert)
+- [x] 56.2.2 Vergleichbare Portal-Zugriffe in `PortalRuntimeSystem.js`, `SpecialGateRuntime.js` durchsuchen und absichern (abgeschlossen: 2026-03-25; evidence: PlayerInteractionPhase.js:32 ebenfalls auf portalResult?.target geaendert; PortalRuntimeSystem/SpecialGateRuntime haben keine unsicheren target-Zugriffe)
 
 ### 56.3 Double-Dispose Guard in TouchInputSource
 
 **Issue:** `dispose()` ruft `removeUI()` auf, bevor `super.dispose()` aufgerufen wird. Doppelaufrufe oder Fehler in `super.dispose()` könnten zu Problemen fuehren. Fehlende Idempotenz-Guard.
 
 **Fix-Strategie:**
-- [x] 56.3.1 `TouchInputSource` mit `_disposed` Flag versehen, sodass `dispose()` und `removeUI()` idempotent sind (abgeschlossen: 2026-03-25; evidence: TBD)
-- [x] 56.3.2 `dispose()` -> if (this._disposed) return; am Anfang (abgeschlossen: 2026-03-25; evidence: TBD)
-- [x] 56.3.3 Regressionstest fuer doppelter `dispose()`-Aufruf in `tests/core.spec.js` (abgeschlossen: 2026-03-25; evidence: TBD)
+- [x] 56.3.1 `TouchInputSource` mit `_disposed` Flag versehen, sodass `dispose()` und `removeUI()` idempotent sind (abgeschlossen: 2026-03-25; evidence: this._disposed = false in constructor, guard in dispose())
+- [x] 56.3.2 `dispose()` -> if (this._disposed) return; am Anfang (abgeschlossen: 2026-03-25; evidence: TouchInputSource.js dispose() hat _disposed guard)
+- [x] 56.3.3 Regressionstest fuer doppelter `dispose()`-Aufruf in `tests/core.spec.js` (abgeschlossen: 2026-03-25; evidence: test 'V56.3 TouchInputSource double-dispose does not throw' in tests/core.spec.js)
 
 ### 56.4 huntState Mutation-Pattern in MatchFlowUiController
 
 **Issue:** `Object.assign(game.huntState, transition.huntStatePatch)` mutiert direkt ein Shared-State-Objekt. Wenn Patches verzögert oder aus Closures angewendet werden, könnten sie stale sein (keine dokumentierte Contract fuer Patchreihenfolge).
 
 **Fix-Strategie:**
-- [x] 56.4.1 `MatchFlowUiController` auf sichere Mutation umstellen: entweder Kopie vor assign oder Revision-Guard hinzufuegen (abgeschlossen: 2026-03-25; evidence: TBD)
-- [x] 56.4.2 Comment hinzufuegen dass `transition.huntStatePatch` bis zum naechsten Frame gebueffert werden kann; Reihenfolge-Garantie dokumentieren (abgeschlossen: 2026-03-25; evidence: TBD)
+- [x] 56.4.1 `MatchFlowUiController` auf sichere Mutation umstellen: entweder Kopie vor assign oder Revision-Guard hinzufuegen (abgeschlossen: 2026-03-25; evidence: Object.assign(game.huntState, { ...transition.huntStatePatch }) — shallow-copy vor Anwendung)
+- [x] 56.4.2 Comment hinzufuegen dass `transition.huntStatePatch` bis zum naechsten Frame gebueffert werden kann; Reihenfolge-Garantie dokumentieren (abgeschlossen: 2026-03-25; evidence: Inline-Kommentar in MatchFlowUiController.js bei huntStatePatch-Anwendung)
 
 ### 56.5 Code-Quality Improvements (kleinere Punkte)
 
@@ -417,12 +421,12 @@ Scope:
 
 - [x] 56.5.1 `ProfileManager.js:97` — `JSON.parse/stringify` Clone ersetzen durch dedizierte Cloning-Utility (bereits in V54.5.1 gemacht via `JsonClone.js`) (abgeschlossen: 2026-03-25; evidence: src/shared/utils/JsonClone.js exists)
 - [x] 56.5.2 Debugging/Hotpath `console.log` in `PortalRuntimeSystem.js` ueberpruefung (bereits in V55.5.1 gemacht) (abgeschlossen: 2026-03-25; evidence: V55.5.1 completed)
-- [x] 56.5.3 Unused exports (z. B. `crc32()` in `GameStateSnapshot.js`) identifizieren und entfernen oder dokumentieren (abgeschlossen: 2026-03-25; evidence: TBD)
+- [x] 56.5.3 Unused exports (z. B. `crc32()` in `GameStateSnapshot.js`) identifizieren und entfernen oder dokumentieren (abgeschlossen: 2026-03-25; evidence: crc32 export entfernt aus GameStateSnapshot.js — kein Import in src/ oder tests/)
 
 ### Phase 56.99: Integrations- und Abschluss-Gate
 
-- [ ] 56.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen (evidence: TBD)
-- [ ] 56.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert (evidence: TBD)
+- [x] 56.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen (abgeschlossen: 2026-03-25; evidence: build OK, architecture:guard OK, test:fast 27 passed / 1 flaky T1 startup, test:core 106 passed / 1 flaky T1 startup)
+- [x] 56.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert (abgeschlossen: 2026-03-25; evidence: Lock-Status auf COMPLETE gesetzt)
 
 ### Risiko-Register V56
 
@@ -445,7 +449,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V53 | SettingsManager Decomposition und Settings-Domain-Entkopplung | `docs/Feature_SettingsManager_Decomposition_V53.md` | hoch | mittel | P1 | abgeschlossen (V53.99) | Abgeschlossen |
 | V54 | Gesamtfix Architektur-/Qualitaetspunkte | `docs/Feature_Gesamtfix_Architektur_Qualitaet_V54.md` | sehr hoch | gross | P1 | abgeschlossen (V54.99) | Abgeschlossen |
 | V55 | Tiefenaudit-Remediation (Teststabilitaet, Concurrency, Runtime-Robustheit) | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | abgeschlossen (55.99) | Abgeschlossen |
-| V56 | Code-Audit Remediation - Defensive Improvements & Edge-Case Fixes | `docs/Umsetzungsplan.md` | mittel | mittel | P2 | Impl. starten (56.1-56.4) | Offen |
+| V56 | Code-Audit Remediation - Defensive Improvements & Edge-Case Fixes | `docs/Umsetzungsplan.md` | mittel | mittel | P2 | abgeschlossen (56.99) | Abgeschlossen |
 | V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | mittel | mittel | P2 | UX/Ownership klaeren | In Bearbeitung |
 | V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.4.1 Optionalen `game/`-Unterordner evaluieren (nur bei weiter gruener Dev-Migration) | In Bearbeitung |
 | V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | hoch | mittel | P1 | Benchmark baseline erneuern | Offen |
@@ -454,6 +458,125 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
+
+---
+
+## Block V57: Arcade Progression - Vehicle Manager, Multi-Map-Portale, Missions
+
+Plan-Datei: `docs/Umsetzungsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V45 (Arcade-Basis) -->
+
+Scope:
+
+- Langfrist-Feature: Spieler leveln ihr Flugzeug ueber mehrere Arcade-Runs hinweg hoch.
+- Maps werden per Portal-Uebergaenge verkettet; jeder Sektor spielt auf einer anderen Map.
+- Pro Map gibt es spezifische Aufgaben (Missions), deren Abschluss XP und Upgrades bringt.
+
+### Architektur-Uebersicht
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                  ARCADE PROGRESSION (V57)                │
+├──────────────────┬──────────────────┬───────────────────┤
+│  57.1-57.3       │  57.4-57.6       │  57.7-57.9        │
+│  VEHICLE MANAGER │  MULTI-MAP       │  MISSIONS         │
+├──────────────────┼──────────────────┼───────────────────┤
+│ XP & Level-System│ Map-Sequenz pro  │ Aufgaben pro Map  │
+│ Part-Upgrades    │ Arcade-Run       │ (Kill, Collect,   │
+│ Slot-Unlock      │ Exit-Portale     │  Survive, Race)   │
+│ Loadout-Save     │ Sektor→Map-Link  │ Belohnungen       │
+│ Persist via Store│ Portal-Transition│ Freischaltungen   │
+│                  │ Map-Prewarm      │ Mastery-Track     │
+└──────────────────┴──────────────────┴───────────────────┘
+```
+
+Bestehende Basis:
+- `ArcadeRunRuntime` (Sektor-Lifecycle, Scoring, Combo) — V45
+- `ArcadeEncounterDirector` (Sektor-Sequenzierung, Squad-Eskalation) — V45
+- `ArcadeBlueprintSchema` (Part-Slots, Kosten, Hitbox-Klassen) — V45
+- `vehicle-registry.js` (15+ Schiffe inkl. modular generierter) — bestehend
+- `VehicleLab` Prototype (modularer Schiffbau-Editor) — Prototype
+- Portal-System (`PortalLayoutBuilder`, `PortalRuntimeSystem`) — bestehend
+- `settingsManager.store` (JSON-Persistenz fuer Profile) — V53
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 57.1 bis 57.10 sind abgeschlossen.
+- [ ] DoD.2 Vehicle-Profile persistieren korrekt ueber Sessions hinweg (localStorage).
+- [ ] DoD.3 Arcade-Run mit mindestens 3 verschiedenen Maps in Sequenz spielbar.
+- [ ] DoD.4 Mindestens 4 Mission-Typen funktionieren und vergeben XP/Rewards.
+- [ ] DoD.5 `npm run test:core`, `npm run architecture:guard` und `npm run build` sind PASS.
+
+### 57.1 Vehicle-Profil und XP-System
+
+- [ ] 57.1.1 `src/state/arcade/ArcadeVehicleProfile.js` — XP-Modell, Level-Kurve, Slot-Unlock-Schwellen definieren
+- [ ] 57.1.2 XP-Vergabe-Logik: Sektor-Abschluss, Kills, Mission-Completion → XP-Berechnung
+- [ ] 57.1.3 Persistenz via `settingsManager.store` (analog `ArcadeRunRecords`)
+
+### 57.2 Part-Upgrade-System
+
+- [ ] 57.2.1 `ArcadeBlueprintSchema` erweitern: Upgrade-Tiers pro Part-Typ (T1/T2/T3 mit Stat-Boni)
+- [ ] 57.2.2 Upgrade-Kosten-Modell: XP-basiert, Level-Gates fuer hoehere Tiers
+- [ ] 57.2.3 Runtime-Integration: Upgrade-Boni auf Hitbox, Mass, Speed, Shield anwenden
+
+### 57.3 Vehicle Manager UI
+
+- [ ] 57.3.1 `src/ui/arcade/ArcadeVehicleManager.js` — Schiff-Auswahl, Loadout-Uebersicht, Slot-Visualisierung
+- [ ] 57.3.2 Upgrade-UI: Part-Auswahl, Tier-Upgrade, Kosten-Anzeige, Stat-Vorschau
+- [ ] 57.3.3 Integration in `ArcadeMenuSurface` als Tab/Screen zwischen Runs
+
+### 57.4 Multi-Map Sektor-Zuordnung
+
+- [ ] 57.4.1 `ArcadeEncounterCatalog` erweitern: `mapPool` pro Sektor-Tier (intro/pressure/hazard/endurance)
+- [ ] 57.4.2 `src/state/arcade/ArcadeMapProgression.js` — Map-Sequenz-Resolver (deterministisch via Run-Seed)
+- [ ] 57.4.3 `ArcadeRunState` erweitern: `mapSequence[]` und `currentMapKey` pro Sektor
+
+### 57.5 Exit-Portal-Mechanik
+
+- [ ] 57.5.1 Map-Preset-Erweiterung: `exitPortal`-Feld (Position, Farbe, Aktivierungsbedingung)
+- [ ] 57.5.2 `PortalRuntimeSystem` erweitern: Exit-Portal-Typ erkennen und Sektor-Transition triggern
+- [ ] 57.5.3 Visuelle Unterscheidung: Exit-Portale mit eigenem Effekt/Farbe/Partikel
+
+### 57.6 Map-Transition-Runtime
+
+- [ ] 57.6.1 `ArcadeRunRuntime.beginNextSector()` erweitern: neue Map laden via `MatchSessionFactory`
+- [ ] 57.6.2 Arena-Prewarm fuer naechste Map waehrend aktuellem Sektor (Background-Loading)
+- [ ] 57.6.3 Transition-Flow: Portal-Enter → Intermission-Screen → neue Arena → Sektor-Start
+
+### 57.7 Mission-System Grundlagen
+
+- [ ] 57.7.1 `src/state/arcade/ArcadeMissionState.js` — Mission-Typen, Progress-Tracking, Completion-Check
+- [ ] 57.7.2 Mission-Typen: KILL_COUNT, COLLECT_ITEMS, SURVIVE_DURATION, REACH_PORTAL, TIME_TRIAL
+- [ ] 57.7.3 Mission-Zuweisung: pro Sektor 1-2 zufaellige Missionen aus Map-spezifischem Pool
+
+### 57.8 Map-spezifische Missionen
+
+- [ ] 57.8.1 Map-Preset-Erweiterung: `missions[]`-Feld mit Map-spezifischen Aufgaben
+- [ ] 57.8.2 Beispiel-Missionen fuer bestehende Maps (Crystal Ruins, Neon Abyss, Portal Madness)
+- [ ] 57.8.3 HUD-Integration: Mission-Anzeige, Progress-Bar, Completion-Feedback
+
+### 57.9 Reward-Pipeline
+
+- [ ] 57.9.1 Mission-Completion → XP + optionale Part-Unlocks
+- [ ] 57.9.2 Sektor-Bonus: alle Missionen in einem Sektor abgeschlossen → Multiplier-Bonus
+- [ ] 57.9.3 Run-Summary erweitern: Mission-Stats, XP-Gewinn, neue Unlocks anzeigen
+
+### 57.10 Integrations-Gate
+
+- [ ] 57.10.1 End-to-End: Arcade-Run mit Vehicle-Auswahl → 3+ Maps → Missions → XP → Upgrade → naechster Run
+- [ ] 57.10.2 `npm run test:core`, `npm run architecture:guard`, `npm run build` sind gruen
+- [ ] 57.10.3 Balancing-Smoke: XP-Kurve, Upgrade-Kosten, Mission-Schwierigkeit plausibel
+
+### Risiko-Register V57
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Map-Transition verursacht Memory-Leaks (alte Arena nicht disposed) | hoch | Runtime | Arena-Dispose-Audit vor Transition; Leak-Detection in Smoke-Tests | Speicher waechst linear mit Sektoren |
+| Vehicle-Upgrades brechen Balance in Standard-Modi | mittel | Gameplay | Upgrades nur im Arcade-Modus aktiv; Standard-Modi nutzen Base-Stats | Beschwerden ueber unfaire Werte |
+| Exit-Portal-Kollision mit bestehenden Intra-Map-Portalen | mittel | Arena | Eigener Portal-Typ (`kind: 'exit'`) mit separatem Collision-Layer | Spieler teleportiert statt Map-Wechsel |
+| Prewarm der naechsten Map blockiert Gameplay-Thread | mittel | Performance | Async Prewarm mit Budget-Cap; Fallback auf synchrones Load in Intermission | Frame-Drops waehrend Sektor |
 
 ---
 
@@ -481,8 +604,8 @@ Stand: 2026-03-25
 - Blockiert: kein aktiver Blocker; V55 abgeschlossen, V56 geplant basierend auf Code-Audit.
 - Naechste 3 Ziele:
   1. V56: Defensive Improvements aus Code-Audit implementieren (56.1-56.4, edge-case focus).
-  2. V42: Menu-Default-Editor UX/Ownership finalisieren.
-  3. V2: Test-Performance-Baseline erneuern und Ratchet aktualisieren.
+  2. V57: Arcade Progression — Vehicle Manager, Multi-Map-Portale, Missions (Langfrist-Feature).
+  3. V42: Menu-Default-Editor UX/Ownership finalisieren.
 - Audit-Befunde: Code-Qualitaets-Audit identifizierte 4 konkrete Verbesserungsmoeglichkeiten (Async Race Condition, Defensive Null-Checks, Double-Dispose Guard, Mutation Pattern). V55 hatte bereits viele potenzielle Probleme adressiert.
 - Entscheidungsbedarf: Nach V56 absolviert, ob V42 oder V2 prioritaer werden sollen.
 
