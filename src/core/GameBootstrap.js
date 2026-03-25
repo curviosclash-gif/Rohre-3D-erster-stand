@@ -153,6 +153,15 @@ export function bootstrapGameRuntime(game, options = {}) {
                 game.renderer?.setRecordingCaptureSettings?.({
                     profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
                 });
+                
+                // FORCE eine Synchron-Render-Ausführung, damit der _captureCanvas 
+                // mit den richtigen Cinematic-Dimensionen initialisiert wird!
+                // Ohne dies bekommt MediaRecorder den Main-Canvas (mit preserveDrawingBuffer: false),
+                // was in kaputten schwarzen Videos oder WebM-Fallbacks resultiert.
+                if (typeof game.render === 'function') {
+                    game.render();
+                }
+
                 mrs.startRecording({ type: 'cinematic_manual_start' });
                 showStatusToast?.('🎬 Cinematic-Aufnahme läuft (F9 zum Stoppen)', 3000, 'info');
             }
