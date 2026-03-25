@@ -213,6 +213,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | 2026-03-25 | Survival-First-Restart Warm-up | `BT12_SURV_20260325T030951` | `135.368750` | `pending` | `0.000000` | Steps `+15.183%`, Survival `pending` (vs BT11-Final) | `data/training/runs/BT12_SURV_20260325T030951-r08/run.json`, `data/training/runs/latest.json` |
 | 2026-03-25 | C1 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01.log` (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`) |
 | 2026-03-25 | C1 Validate Retry fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`) |
+| 2026-03-25 | C2 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp02.log` (`BOT_RUNNER_BOOT_TIMEOUT=240000`, `phase=app:game-instance`) |
 
 ### 12.99 Abschluss-Gate
 

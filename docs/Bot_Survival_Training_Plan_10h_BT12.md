@@ -41,6 +41,8 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList @('/c', "$cmd > `"$logPa
 - Checkpoint Validate C1:
   - `output/training/BT12_SURV_20260325T030951-botvalidate-cp01.log` -> FAIL (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`)
   - `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` -> FAIL (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`)
+- Checkpoint Validate C2:
+  - `output/training/BT12_SURV_20260325T030951-botvalidate-cp02.log` -> FAIL (`BOT_RUNNER_BOOT_TIMEOUT=240000`, `phase=app:game-instance`)
 
 ## 10h Ablauf
 
