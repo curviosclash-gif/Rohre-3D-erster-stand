@@ -17,7 +17,12 @@ export const MAP_PRESET_CATALOG_BASE_DATA = {
         ],
         portals: [
             { a: [-30, 12, 0], b: [30, 12, 0], color: 0x00ffcc },
-        ]
+        ],
+        exitPortal: { pos: [0, 25, 0], color: 0x00ff88, activateOnClear: true },
+        missions: [
+            { type: 'KILL_COUNT', params: { target: 3 }, weight: 2 },
+            { type: 'SURVIVE_DURATION', params: { target: 30 }, weight: 1 },
+        ],
     },
     custom: {
         name: 'Custom (Editor gespeichert)',

@@ -38,6 +38,38 @@ export class PortalLayoutBuilder {
         this._visualRegistry = createPortalGateVisualRegistry(this.arena.renderer);
         this._buildPortals(map, scale);
         this._buildSpecialGates(map, scale);
+        this._buildExitPortals(map, scale);
+    }
+
+    _buildExitPortals(map, scale) {
+        this.arena.exitPortals = [];
+        if (!map || !map.exitPortal) return;
+        const def = map.exitPortal;
+        if (!Array.isArray(def.pos)) return;
+
+        const pos = new THREE.Vector3(
+            asFiniteNumber(def.pos[0]) * scale,
+            asFiniteNumber(def.pos[1]) * scale,
+            asFiniteNumber(def.pos[2]) * scale
+        );
+        const color = Number.isFinite(def.color) ? def.color : 0x00ff88;
+        const activateOnClear = def.activateOnClear !== false;
+
+        const mesh = createPortalMesh(pos, color, 'NEUTRAL', this._visualRegistry, { compact: false });
+        if (mesh) {
+            mesh.scale.set(1.4, 1.4, 1.4);
+            mesh.visible = !activateOnClear;
+        }
+
+        this.arena.exitPortals.push({
+            kind: 'exit',
+            pos,
+            color,
+            mesh,
+            active: !activateOnClear,
+            activateOnClear,
+            cooldowns: new Map(),
+        });
     }
 
     _buildSpecialGates(map, scale) {

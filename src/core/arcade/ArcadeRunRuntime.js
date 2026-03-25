@@ -12,6 +12,23 @@ import {
     buildArcadeRunSummary,
     mergeArcadeRunRecords,
 } from '../../state/arcade/ArcadeScoreOps.js';
+import {
+    resolveMapSequence,
+    getMapKeyForSector,
+    needsMapTransition,
+} from '../../state/arcade/ArcadeMapProgression.js';
+import {
+    calculateSectorXp,
+    loadVehicleProfiles,
+    saveVehicleProfiles,
+    getOrCreateProfile,
+    addXp,
+} from '../../state/arcade/ArcadeVehicleProfile.js';
+import {
+    assignSectorMissions,
+    createSectorMissionState,
+    updateSectorMissionState,
+} from '../../state/arcade/ArcadeMissionState.js';
 
 const ARCADE_PROFILE_STORAGE_KEY = 'cuviosclash.arcade-run-profile.v1';
 
@@ -40,6 +57,10 @@ export class ArcadeRunRuntime {
         this._records = createArcadeRunRecords();
         this._state = null;
         this._enabled = false;
+        this._vehicleProfiles = null;
+        this._activeVehicleId = null;
+        this._missionState = null;
+        this._onMapTransition = null;
     }
 
     _nextRunId(nowMs = Date.now()) {
@@ -113,6 +134,31 @@ export class ArcadeRunRuntime {
         return null;
     }
 
+    setMapTransitionHandler(handler) {
+        this._onMapTransition = typeof handler === 'function' ? handler : null;
+    }
+
+    setActiveVehicle(vehicleId) {
+        this._activeVehicleId = String(vehicleId || 'ship1');
+    }
+
+    getVehicleProfile() {
+        if (!this._vehicleProfiles || !this._activeVehicleId) return null;
+        return getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
+    }
+
+    getMissionState() {
+        return this._missionState ? { ...this._missionState } : null;
+    }
+
+    updateMissions(event) {
+        if (!this._missionState) return;
+        this._missionState = updateSectorMissionState(this._missionState, event);
+        if (this._state) {
+            this._state.missions = this._missionState;
+        }
+    }
+
     startRun(options = {}) {
         if (!this._enabled) return null;
         const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
@@ -123,7 +169,25 @@ export class ArcadeRunRuntime {
             nowMs,
             runId,
         });
+
+        // Load vehicle profiles
+        const store = this.settingsManager?.store;
+        this._vehicleProfiles = loadVehicleProfiles(store);
+
+        // Resolve map sequence from encounter plan if available
+        if (options.encounterPlan) {
+            const mapSequence = resolveMapSequence(options.encounterPlan, this._config.seed);
+            this._state.mapSequence = mapSequence;
+            if (mapSequence.length > 0) {
+                this._state.currentMapKey = mapSequence[0];
+            }
+        }
+
         this._state = beginArcadeSector(this._state, nowMs);
+
+        // Assign initial missions
+        this._assignMissionsForCurrentSector();
+
         this._startReplayRecording(options);
         return this.getStateSnapshot();
     }
@@ -135,8 +199,48 @@ export class ArcadeRunRuntime {
             return this.getStateSnapshot();
         }
         const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
+
+        // Check if map transition is needed
+        const prevMapKey = this._state.currentMapKey;
+        const nextSectorIdx = this._state.completedSectors;
+        if (needsMapTransition(this._state.mapSequence, nextSectorIdx - 1)) {
+            const nextMapKey = getMapKeyForSector(this._state.mapSequence, nextSectorIdx);
+            this._state.currentMapKey = nextMapKey;
+
+            if (this._onMapTransition && prevMapKey !== nextMapKey) {
+                try {
+                    this._onMapTransition({
+                        fromMap: prevMapKey,
+                        toMap: nextMapKey,
+                        sectorIndex: nextSectorIdx,
+                    });
+                } catch (err) {
+                    this.logger?.warn?.('[ArcadeRunRuntime] Map transition handler error:', err);
+                }
+            }
+        }
+
         this._state = beginArcadeSector(this._state, nowMs);
+
+        // Assign new missions for the sector
+        this._assignMissionsForCurrentSector();
+
         return this.getStateSnapshot();
+    }
+
+    _assignMissionsForCurrentSector() {
+        if (!this._state) return;
+        const sectorIdx = Math.max(0, this._state.sectorIndex - 1);
+        const planEntry = this._state.mapSequence?.length > 0 ? { id: 'sector' } : null;
+        const mapKey = this._state.currentMapKey || 'standard';
+        const missions = assignSectorMissions(
+            planEntry,
+            null,
+            `${this._config.seed}-${this._state.runId}`,
+            sectorIdx
+        );
+        this._missionState = createSectorMissionState(missions);
+        this._state.missions = this._missionState;
     }
 
     deriveRoundEndPlan({ players, inputs = {}, baseController } = {}) {
@@ -189,11 +293,49 @@ export class ArcadeRunRuntime {
 
         const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
         this._state = applyArcadeSectorScore(this._state, payload, { nowMs });
+
+        // Apply XP from sector
+        this._applySectorXpReward(payload);
+
         const payloadState = String(payload.state || '').trim().toUpperCase();
         if (payloadState === 'MATCH_END' || this._state.phase === ARCADE_RUN_PHASES.FINISHED) {
             this._finalizeRun(nowMs);
         }
         return this.getStateSnapshot();
+    }
+
+    _applySectorXpReward(telemetryPayload) {
+        if (!this._activeVehicleId || !this._vehicleProfiles) return;
+        const store = this.settingsManager?.store;
+
+        const missionsCompleted = this._missionState?.completedCount || 0;
+        const totalMissions = this._missionState?.missions?.length || 0;
+        const telemetry = {
+            kills: toSafeNumber(telemetryPayload?.kills, 0),
+            multiplier: toSafeNumber(this._state?.score?.multiplier, 1),
+            missionsCompleted,
+            totalMissions,
+            cleanSector: telemetryPayload?.cleanSector === true,
+        };
+
+        const xpEarned = calculateSectorXp(telemetry);
+        if (xpEarned <= 0) return;
+
+        let profile = getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
+        const result = addXp(profile, xpEarned);
+        profile = result.profile;
+        this._vehicleProfiles[this._activeVehicleId] = profile;
+        saveVehicleProfiles(store, this._vehicleProfiles);
+
+        // Attach XP info to state for UI consumption
+        if (this._state) {
+            this._state.lastSectorXp = {
+                earned: xpEarned,
+                leveledUp: result.leveledUp,
+                newLevel: result.newLevel,
+                unlocksGained: result.unlocksGained,
+            };
+        }
     }
 
     _finalizeRun(nowMs = Date.now()) {

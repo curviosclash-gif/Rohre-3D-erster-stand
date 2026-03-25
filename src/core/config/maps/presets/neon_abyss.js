@@ -136,6 +136,12 @@ export const NEON_ABYSS_MAP = {
             { id: 'abyss_air_3', jetId: 'aircraft', x: -35, y: 58, z: 0, scale: 1.4, rotateY: 1.57 },
             { id: 'abyss_air_4', jetId: 'ship1', x: 0, y: 72, z: 0, scale: 0.9, rotateY: 3.14 },
         ],
+        exitPortal: { pos: [0, 68, 0], color: 0x00ff88, activateOnClear: true },
+        missions: [
+            { type: 'KILL_COUNT', params: { target: 5 }, weight: 2 },
+            { type: 'SURVIVE_DURATION', params: { target: 50 }, weight: 1.5 },
+            { type: 'COLLECT_ITEMS', params: { target: 3 }, weight: 1 },
+        ],
     },
 };
 

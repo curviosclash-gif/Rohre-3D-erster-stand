@@ -1,4 +1,5 @@
 import { resolveMenuCatalogText } from '../menu/MenuTextCatalog.js';
+import { setupArcadeVehicleManager } from './ArcadeVehicleManager.js';
 
 const ARCADE_SEED_STORAGE_KEY = 'cuviosclash.arcade.seed.v1';
 const ARCADE_LAST_RUN_STORAGE_KEY = 'cuviosclash.arcade.last_run.v1';
@@ -174,6 +175,11 @@ function buildArcadeSurface(level3Body, ui) {
 
     body.appendChild(cardGrid);
 
+    // Vehicle Manager card placeholder (inserted by setupArcadeMenuSurface)
+    const vehicleManagerSlot = createElement('div', 'arcade-vehicle-manager-slot');
+    vehicleManagerSlot.id = 'arcade-vehicle-manager-slot';
+    body.appendChild(vehicleManagerSlot);
+
     const ctaRow = createElement('div', 'arcade-surface-cta');
     const startRunButton = createElement('button', 'start-btn', t('menu.arcade.start.label', 'Arcade Run starten'));
     startRunButton.type = 'button';
@@ -251,6 +257,20 @@ export function setupArcadeMenuSurface(ctx = {}) {
     const refs = buildArcadeSurface(level3Body, ui);
     let activeSeed = loadSeed();
     let lastRunSnapshot = loadLastRunSnapshot();
+
+    // Setup Vehicle Manager (V57)
+    const vehicleManager = setupArcadeVehicleManager({
+        ui,
+        settings,
+        emit,
+        eventTypes,
+        bind,
+        settingsManager: ctx.settingsManager || null,
+    });
+    if (vehicleManager?.container) {
+        const slot = document.getElementById('arcade-vehicle-manager-slot');
+        if (slot) slot.appendChild(vehicleManager.container);
+    }
 
     const sync = () => {
         const isArcade = shouldShowArcade(settings);

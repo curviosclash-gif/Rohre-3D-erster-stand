@@ -320,11 +320,95 @@ export function formatArcadeBlueprintValidation(validation) {
     return lines.join('\n');
 }
 
+// ─── Upgrade Tiers (V57) ───
+
+export const UPGRADE_TIERS = Object.freeze({
+    T1: Object.freeze({ label: 'Base', statMultiplier: 1.0, xpCost: 0, levelGate: 1 }),
+    T2: Object.freeze({ label: 'Enhanced', statMultiplier: 1.15, xpCost: 200, levelGate: 5 }),
+    T3: Object.freeze({ label: 'Superior', statMultiplier: 1.35, xpCost: 500, levelGate: 15 }),
+});
+
+export const UPGRADE_BONUSES = Object.freeze({
+    engine: Object.freeze({
+        T2: Object.freeze({ speed: 0.1, accel: 0.05 }),
+        T3: Object.freeze({ speed: 0.25, accel: 0.12 }),
+    }),
+    core: Object.freeze({
+        T2: Object.freeze({ shield: 15, mass: -0.05 }),
+        T3: Object.freeze({ shield: 35, mass: -0.1 }),
+    }),
+    wing: Object.freeze({
+        T2: Object.freeze({ turnRate: 0.08 }),
+        T3: Object.freeze({ turnRate: 0.18 }),
+    }),
+    nose: Object.freeze({
+        T2: Object.freeze({ damage: 0.1 }),
+        T3: Object.freeze({ damage: 0.22 }),
+    }),
+    utility: Object.freeze({
+        T2: Object.freeze({ cooldown: -0.1 }),
+        T3: Object.freeze({ cooldown: -0.2 }),
+    }),
+});
+
+function resolvePartCategory(slotName) {
+    const s = String(slotName || '').toLowerCase();
+    if (s.includes('engine')) return 'engine';
+    if (s.includes('core') || s === 'fuselage') return 'core';
+    if (s.includes('wing')) return 'wing';
+    if (s.includes('nose') || s === 'cockpit') return 'nose';
+    if (s.includes('utility') || s.includes('module') || s.includes('sensor')) return 'utility';
+    return null;
+}
+
+export function getUpgradeCost(slotName, targetTier) {
+    const tier = UPGRADE_TIERS[targetTier];
+    if (!tier) return Infinity;
+    return tier.xpCost;
+}
+
+export function canUpgrade(slotName, targetTier, level) {
+    const tier = UPGRADE_TIERS[targetTier];
+    if (!tier) return false;
+    return level >= tier.levelGate;
+}
+
+export function applyUpgradeBonuses(blueprint, upgrades) {
+    if (!blueprint || typeof blueprint !== 'object') return blueprint;
+    if (!upgrades || typeof upgrades !== 'object') return blueprint;
+
+    const bonusAccum = { speed: 0, accel: 0, shield: 0, mass: 0, turnRate: 0, damage: 0, cooldown: 0 };
+    const entries = Object.entries(upgrades);
+
+    for (let i = 0; i < entries.length; i += 1) {
+        const [slotName, tier] = entries[i];
+        if (tier === 'T1' || !UPGRADE_TIERS[tier]) continue;
+        const category = resolvePartCategory(slotName);
+        if (!category) continue;
+        const bonusDef = UPGRADE_BONUSES[category]?.[tier];
+        if (!bonusDef) continue;
+        const bonusKeys = Object.keys(bonusDef);
+        for (let j = 0; j < bonusKeys.length; j += 1) {
+            bonusAccum[bonusKeys[j]] = (bonusAccum[bonusKeys[j]] || 0) + bonusDef[bonusKeys[j]];
+        }
+    }
+
+    return {
+        ...blueprint,
+        upgradeBonuses: { ...bonusAccum },
+    };
+}
+
 export default {
     ARCADE_BLUEPRINT_SCHEMA_VERSION,
     ARCADE_HITBOX_CLASSES,
     ARCADE_REQUIRED_SLOTS,
+    UPGRADE_TIERS,
+    UPGRADE_BONUSES,
     createArcadeBlueprintFromVehicleConfig,
     validateArcadeBlueprint,
     formatArcadeBlueprintValidation,
+    getUpgradeCost,
+    canUpgrade,
+    applyUpgradeBonuses,
 };

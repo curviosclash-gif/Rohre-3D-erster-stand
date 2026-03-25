@@ -63,6 +63,7 @@ export const ARCADE_SECTOR_CATALOG = Object.freeze([
         objectivePool: ['survive_window', 'clean_sector'],
         modifierPool: ['tight_turns'],
         rewardPool: ['run_speed_t1', 'run_armor_t1', 'run_combo_t1'],
+        mapPool: ['standard', 'foam_forest', 'crossfire'],
     }),
     Object.freeze({
         id: 'sector_pressure',
@@ -72,6 +73,7 @@ export const ARCADE_SECTOR_CATALOG = Object.freeze([
         objectivePool: ['survive_window', 'bounty_hunt', 'clean_sector'],
         modifierPool: ['tight_turns', 'heat_stress'],
         rewardPool: ['run_speed_t1', 'run_combo_t1', 'run_pickup_t1'],
+        mapPool: ['maze', 'vertical_maze', 'trench', 'neon_abyss'],
     }),
     Object.freeze({
         id: 'sector_hazard',
@@ -81,6 +83,7 @@ export const ARCADE_SECTOR_CATALOG = Object.freeze([
         objectivePool: ['bounty_hunt', 'hazard_lane'],
         modifierPool: ['heat_stress', 'portal_storm', 'boost_tax'],
         rewardPool: ['run_armor_t1', 'run_pickup_t1', 'run_portal_t1'],
+        mapPool: ['complex', 'pyramid', 'crystal_ruins'],
     }),
     Object.freeze({
         id: 'sector_endurance',
@@ -90,6 +93,7 @@ export const ARCADE_SECTOR_CATALOG = Object.freeze([
         objectivePool: ['hazard_lane', 'bounty_hunt'],
         modifierPool: ['portal_storm', 'boost_tax'],
         rewardPool: ['run_combo_t1', 'run_pickup_t1', 'run_portal_t1'],
+        mapPool: ['expert_gauntlet', 'portal_madness', 'crystal_ruins'],
     }),
 ]);
 
@@ -163,6 +167,8 @@ export function buildArcadeSectorPlan(options = {}) {
         const basePressure = ARCADE_SQUAD_PROFILES[squadId]?.pressure || 0.35;
         const pressure = (basePressure + (modifierDef?.difficultyDelta || 0)) * difficultyScale;
 
+        const mapKey = pickFromPool(template.mapPool || ['standard'], randomFn);
+
         sequence.push({
             sectorNumber,
             templateId: template.id,
@@ -171,6 +177,7 @@ export function buildArcadeSectorPlan(options = {}) {
             modifierId,
             rewardChoices,
             pressure: Number(pressure.toFixed(3)),
+            mapKey,
         });
     }
 

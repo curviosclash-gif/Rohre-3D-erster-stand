@@ -153,6 +153,9 @@ export function createArcadeRunState({
             runReplayId: '',
         },
         lastSectorSummary: null,
+        mapSequence: [],
+        currentMapKey: null,
+        missions: null,
     };
 }
 
