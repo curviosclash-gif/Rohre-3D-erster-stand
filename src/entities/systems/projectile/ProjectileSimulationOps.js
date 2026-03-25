@@ -193,7 +193,7 @@ export class ProjectileSimulationOps {
         const portalResult = arena?.checkPortal
             ? arena.checkPortal(projectile.position, projectile.radius, 1000 + index)
             : null;
-        if (portalResult) {
+        if (portalResult?.target) {
             projectile.position.copy(portalResult.target);
             this._tmpVec.copy(projectile.velocity).normalize().multiplyScalar(rocketRuntime.portalExitForwardOffset);
             projectile.position.add(this._tmpVec);

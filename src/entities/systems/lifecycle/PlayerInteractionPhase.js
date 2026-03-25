@@ -29,7 +29,7 @@ export class PlayerInteractionPhase {
     runPortalAndPickup(player) {
         const entityManager = this.entityManager;
         const portalResult = entityManager.arena.checkPortal(player.position, player.hitboxRadius, player.index);
-        if (portalResult) {
+        if (portalResult?.target) {
             player.getAimDirection(entityManager._tmpDir).normalize();
             player.position.copy(portalResult.target).addScaledVector(entityManager._tmpDir, 1.8);
 

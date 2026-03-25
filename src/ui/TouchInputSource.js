@@ -17,6 +17,7 @@ import { PlayerInputSource } from './PlayerInputSource.js';
 export class TouchInputSource extends PlayerInputSource {
     constructor(options = {}) {
         super('touch');
+        this._disposed = false;
         this._joystickRadius = options.joystickRadius || 60;
         this._joystickCenter = null;
         this._joystickDelta = { x: 0, y: 0 };
@@ -258,6 +259,8 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     dispose() {
+        if (this._disposed) return;
+        this._disposed = true;
         this.removeUI();
         super.dispose();
     }

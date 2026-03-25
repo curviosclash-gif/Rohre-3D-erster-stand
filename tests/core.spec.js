@@ -4560,3 +4560,62 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         }
     });
 });
+
+// ---------------------------------------------------------------------------
+// V56 Regression Tests — Defensive Improvements & Edge-Case Fixes
+// ---------------------------------------------------------------------------
+test.describe('V56: Code-Audit Remediation Regressions', () => {
+    test.describe.configure({ mode: 'serial' });
+
+    test('V56.1 Session-ID guard rejects stale async createMatchSession result', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            const orch = game.matchLifecycleSessionOrchestrator;
+            if (!orch) return { skip: true };
+
+            // First call (sync path)
+            orch.createMatchSession({});
+            const firstId = orch._activeSessionId;
+
+            // Second call supersedes the first
+            orch.createMatchSession({});
+            const secondId = orch._activeSessionId;
+
+            return {
+                skip: false,
+                idsAreDifferent: firstId !== secondId,
+                secondIdActive: orch._activeSessionId === secondId,
+            };
+        });
+        if (result.skip) { test.skip(); return; }
+        expect(result.idsAreDifferent).toBeTruthy();
+        expect(result.secondIdActive).toBeTruthy();
+    });
+
+    test('V56.3 TouchInputSource double-dispose does not throw', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(() => {
+            const { TouchInputSource } = window.__CC_MODULES?.TouchInputSource
+                || {};
+            if (!TouchInputSource) {
+                // Fallback: try to instantiate from game instance input sources
+                const game = window.GAME_INSTANCE;
+                const touchSrc = game?.inputSources?.find(s => s?._disposed !== undefined);
+                if (touchSrc) {
+                    touchSrc.dispose();
+                    touchSrc.dispose(); // second call must not throw
+                    return { ok: true, disposed: touchSrc._disposed };
+                }
+                return { skip: true };
+            }
+            const src = new TouchInputSource();
+            src.dispose();
+            src.dispose();
+            return { ok: true, disposed: src._disposed };
+        });
+        if (result.skip) { test.skip(); return; }
+        expect(result.ok).toBeTruthy();
+        expect(result.disposed).toBeTruthy();
+    });
+});

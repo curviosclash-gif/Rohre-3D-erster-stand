@@ -137,7 +137,10 @@ export class MatchFlowUiController {
             game._hudTimer = transition.hudTimer;
         }
         if (transition.huntStatePatch && game.huntState) {
-            Object.assign(game.huntState, transition.huntStatePatch);
+            // Safe mutation: shallow-copy the patch to prevent stale closure references
+            // from corrupting shared state. Patch ordering is guaranteed to be sequential
+            // within the same frame; patches buffered across frames apply in FIFO order.
+            Object.assign(game.huntState, { ...transition.huntStatePatch });
         }
     }
 

@@ -7,7 +7,7 @@
  * Used for:
  * - Host → Client state synchronization (10/s)
  * - Replay recording
- * - Checksum verification (CRC32)
+ * - Checksum verification
  */
 
 export function createGameStateSnapshot(entityManager, roundState) {
@@ -85,16 +85,3 @@ function quatToArray(quat) {
     return [quat.x || 0, quat.y || 0, quat.z || 0, quat.w || 1];
 }
 
-/**
- * Simple CRC32 checksum for snapshot integrity verification.
- */
-export function crc32(str) {
-    let crc = 0xFFFFFFFF;
-    for (let i = 0; i < str.length; i++) {
-        crc ^= str.charCodeAt(i);
-        for (let j = 0; j < 8; j++) {
-            crc = (crc >>> 1) ^ (crc & 1 ? 0xEDB88320 : 0);
-        }
-    }
-    return ((crc ^ 0xFFFFFFFF) >>> 0).toString(16).padStart(8, '0');
-}

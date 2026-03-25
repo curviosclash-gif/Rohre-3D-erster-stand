@@ -41,8 +41,12 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     _startLifecycleSession(extra = null) {
-        this._sessionSequence += 1;
-        this._activeSessionId = `match-${this._sessionSequence}`;
+        // Session ID is now assigned in createMatchSession() before async work.
+        // If called without a prior provisional ID (legacy path), assign one now.
+        if (!this._activeSessionId) {
+            this._sessionSequence += 1;
+            this._activeSessionId = `match-${this._sessionSequence}`;
+        }
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MATCH_STARTED, extra);
     }
 
@@ -56,7 +60,11 @@ export class MatchLifecycleSessionOrchestrator {
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
-    _applyInitializedMatch(initializedMatch) {
+    _applyInitializedMatch(initializedMatch, expectedSessionId) {
+        // Session-ID guard: reject stale async results from a superseded createMatchSession() call
+        if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
+            return initializedMatch;
+        }
         const game = this.runtime;
         game.matchSessionRuntimeBridge.applyInitializedMatchSession(initializedMatch);
         this._startLifecycleSession({
@@ -77,6 +85,12 @@ export class MatchLifecycleSessionOrchestrator {
             this._endLifecycleSession('new_match_session');
         }
 
+        // Stamp a provisional session ID before any async work so that
+        // a concurrent createMatchSession() call will invalidate this one.
+        this._sessionSequence += 1;
+        const provisionalId = `match-${this._sessionSequence}`;
+        this._activeSessionId = provisionalId;
+
         const initializedMatch = initializeMatchSession({
             renderer: game.renderer,
             audio: game.audio,
@@ -91,9 +105,9 @@ export class MatchLifecycleSessionOrchestrator {
             onRoundEnd,
         });
         if (isPromiseLike(initializedMatch)) {
-            return Promise.resolve(initializedMatch).then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch));
+            return Promise.resolve(initializedMatch).then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch, provisionalId));
         }
-        return this._applyInitializedMatch(initializedMatch);
+        return this._applyInitializedMatch(initializedMatch, provisionalId);
     }
 
     bindHuntEventHandlers({ onHuntFeedEvent, onHuntDamageEvent } = {}) {
