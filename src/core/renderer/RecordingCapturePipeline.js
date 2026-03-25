@@ -134,11 +134,32 @@ export class RecordingCapturePipeline {
     }
 
     _ensureCaptureCanvas(width, height) {
-        const safeWidth = toPositiveEven(width, 2);
-        const safeHeight = toPositiveEven(height, 2);
+        let safeWidth = toPositiveEven(width, 2);
+        let safeHeight = toPositiveEven(height, 2);
+
+        // Cap to 1920x1080 max to ensure WebCodecs avc1.4d002a support
+        const MAX_W = 1920;
+        const MAX_H = 1080;
+        if (safeWidth > MAX_W || safeHeight > MAX_H) {
+            const aspect = safeWidth / Math.max(1, safeHeight);
+            if (safeWidth > safeHeight) {
+                safeWidth = MAX_W;
+                safeHeight = Math.round(MAX_W / aspect);
+            } else {
+                safeHeight = MAX_H;
+                safeWidth = Math.round(MAX_H * aspect);
+            }
+            safeWidth = toPositiveEven(safeWidth, 2);
+            safeHeight = toPositiveEven(safeHeight, 2);
+        }
+
         if (!this._captureCanvas) {
             this._captureCanvas = createCanvasClone(this.sourceCanvas, safeWidth, safeHeight);
             this._captureCtx = this._captureCanvas?.getContext?.('2d', { alpha: false }) || null;
+            if (this._captureCtx) {
+                this._captureCtx.imageSmoothingEnabled = true;
+                this._captureCtx.imageSmoothingQuality = 'high';
+            }
         }
         if (!this._captureCanvas || !this._captureCtx) {
             return null;
@@ -215,7 +236,7 @@ export class RecordingCapturePipeline {
         return renderShortsFallbackFromSource({
             captureCtx,
             sourceCanvas,
-            sizes,
+            sizes: { width: captureCanvas.width, height: captureCanvas.height },
             splitScreen,
         });
     }
@@ -390,8 +411,8 @@ export class RecordingCapturePipeline {
         shortsRenderer.setScissorTest(false);
         shortsRenderer.getContext()?.flush?.();
 
-        captureCtx.clearRect(0, 0, sizes.width, sizes.height);
-        captureCtx.drawImage(this._shortsCanvas, 0, 0, sizes.width, sizes.height);
+        captureCtx.clearRect(0, 0, captureCanvas.width, captureCanvas.height);
+        captureCtx.drawImage(this._shortsCanvas, 0, 0, captureCanvas.width, captureCanvas.height);
         return true;
     }
 
@@ -465,11 +486,23 @@ export class RecordingCapturePipeline {
             { x: 0, y: 0, width: sizes.width, height: halfHeight, player: player1, label: 'P1 oben', slotIndex: 0 },
             { x: 0, y: halfHeight, width: sizes.width, height: halfHeight, player: player2, label: 'P2 unten', slotIndex: 1 },
         ];
+        
+        let finalWidth = sizes.width;
+        let finalHeight = sizes.height;
+        if (this._captureCanvas) {
+            finalWidth = this._captureCanvas.width;
+            finalHeight = this._captureCanvas.height;
+            segments[0].width = finalWidth;
+            segments[0].height = Math.floor(finalHeight / 2);
+            segments[1].width = finalWidth;
+            segments[1].height = finalHeight - segments[0].height;
+            segments[1].y = segments[0].height;
+        }
         if (this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD) {
             drawHudOverlay({
                 ctx: this._captureCtx,
-                width: sizes.width,
-                height: sizes.height,
+                width: finalWidth,
+                height: finalHeight,
                 segments,
                 tmpColor: this._tmpColor,
                 boostDuration: Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1,
@@ -487,8 +520,8 @@ export class RecordingCapturePipeline {
             hudMode: this._settings.hudMode,
             overlay: this._settings.hudMode === RECORDING_HUD_MODE.WITH_HUD ? 'hud' : 'clean',
             layout: 'shorts_vertical_split',
-            width: sizes.width,
-            height: sizes.height,
+            width: finalWidth,
+            height: finalHeight,
         }, [
             { ...segments[0], label: 'top' },
             { ...segments[1], label: 'bottom' },
@@ -582,8 +615,10 @@ export class RecordingCapturePipeline {
         const captureCtx = this._captureCtx;
         if (!cinRenderer || !captureCanvas || !captureCtx || !this.scene) {
             if (captureCanvas && captureCtx && this.sourceCanvas) {
-                captureCtx.clearRect(0, 0, width, height);
-                captureCtx.drawImage(this.sourceCanvas, 0, 0, width, height);
+                const cW = captureCanvas.width;
+                const cH = captureCanvas.height;
+                captureCtx.clearRect(0, 0, cW, cH);
+                captureCtx.drawImage(this.sourceCanvas, 0, 0, cW, cH);
             }
             return;
         }
@@ -650,17 +685,19 @@ export class RecordingCapturePipeline {
         cinRenderer.render(this.scene, camera);
         cinRenderer.getContext()?.flush?.();
 
-        captureCtx.clearRect(0, 0, width, height);
-        captureCtx.drawImage(this._cinematicCanvas, 0, 0, width, height);
+        const cW = captureCanvas.width;
+        const cH = captureCanvas.height;
+        captureCtx.clearRect(0, 0, cW, cH);
+        captureCtx.drawImage(this._cinematicCanvas, 0, 0, cW, cH);
 
         this._storeMeta({
             profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
             hudMode: RECORDING_HUD_MODE.CLEAN,
             overlay: 'clean',
             layout: 'cinematic_single',
-            width,
-            height,
-        }, player ? [{ x: 0, y: 0, width, height, player, label: 'CINEMATIC' }] : []);
+            width: cW,
+            height: cH,
+        }, player ? [{ x: 0, y: 0, width: cW, height: cH, player, label: 'CINEMATIC' }] : []);
     }
 
     dispose() {

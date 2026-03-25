@@ -744,24 +744,45 @@ export class MediaRecorderSystem {
             return this._buildStartResult(false, 'missing-video-frame', { support });
         }
         const { width, height } = this._resolveRecordingDimensions();
-        const encoderConfig = this._buildWebCodecsEncoderConfig(width, height);
+        const baseConfig = this._buildWebCodecsEncoderConfig(width, height);
+        let validConfig = baseConfig;
+
         if (typeof VideoEncoderCtor.isConfigSupported === 'function') {
-            try {
-                const supportProbe = await VideoEncoderCtor.isConfigSupported(encoderConfig);
-                if (!supportProbe?.supported) {
-                    return this._buildStartResult(false, 'encoder_config_unsupported', { support });
+            const profilesToTry = [
+                baseConfig, 
+                { ...baseConfig, hardwareAcceleration: 'prefer-software' }, 
+                { ...baseConfig, codec: 'avc1.42E01E' }, 
+                { ...baseConfig, codec: 'avc1.42E01E', hardwareAcceleration: 'prefer-software' }, 
+                { ...baseConfig, codec: 'avc1.640034' }, 
+                { ...baseConfig, codec: 'avc1.640034', hardwareAcceleration: 'prefer-software' }
+            ];
+            
+            let found = false;
+            let lastError = null;
+            for (const cfg of profilesToTry) {
+                try {
+                    const supportProbe = await VideoEncoderCtor.isConfigSupported(cfg);
+                    if (supportProbe?.supported) {
+                        validConfig = supportProbe.config || cfg;
+                        found = true;
+                        break;
+                    }
+                } catch (e) {
+                    lastError = e;
                 }
-            } catch (error) {
-                return this._buildStartResult(false, 'encoder_probe_failed', { error, support });
+            }
+            if (!found) {
+                return this._buildStartResult(false, 'encoder_config_unsupported', { support, lastError });
             }
         }
+
         try {
             this._muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: {
                     codec: 'avc',
-                    width,
-                    height,
+                    width: validConfig.width || width,
+                    height: validConfig.height || height,
                 },
                 fastStart: 'in-memory',
                 firstTimestampBehavior: 'offset',
@@ -770,7 +791,7 @@ export class MediaRecorderSystem {
                 output: (chunk, meta) => this._muxer.addVideoChunk(chunk, meta),
                 error: (e) => this.logger?.error?.('[MediaRecorderSystem] VideoEncoder error', e),
             });
-            this._videoEncoder.configure(encoderConfig);
+            this._videoEncoder.configure(validConfig);
         } catch (error) {
             this._cleanupRuntimeRecorder();
             this.logger?.warn?.('[MediaRecorderSystem] WebCodecs setup failed', error);
@@ -898,12 +919,24 @@ export class MediaRecorderSystem {
             this.logger?.warn?.('[MediaRecorderSystem] recording unsupported on this runtime', support);
             return this._buildStartResult(false, 'unsupported', { support });
         }
+        if (support.recorderEngine !== RECORDER_ENGINE.NATIVE_WEBCODECS) {
+            try {
+                if (typeof window !== 'undefined' && window.alert) {
+                    window.alert('Browser does not support WebCodecs or VideoEncoder is missing! Engine: ' + support.recorderEngine);
+                }
+            } catch (e) {}
+        }
         if (support.recorderEngine === RECORDER_ENGINE.NATIVE_WEBCODECS) {
             const webCodecsResult = await this._startWithWebCodecs(trigger, support);
             if (webCodecsResult.started) {
                 return webCodecsResult;
             }
             if (support.hasMediaRecorder) {
+                try {
+                    if (typeof window !== 'undefined' && window.alert) {
+                        window.alert('WebCodecs failed! Reason: ' + (webCodecsResult.reason || 'Unknown') + '\\nExtra: ' + JSON.stringify(webCodecsResult.extra || {}));
+                    }
+                } catch (e) {}
                 this.logger?.warn?.('[MediaRecorderSystem] WebCodecs start failed, falling back to MediaRecorder', webCodecsResult);
                 return this._startWithMediaRecorder(trigger, support, webCodecsResult.reason);
             }
