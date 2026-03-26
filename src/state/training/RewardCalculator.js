@@ -4,19 +4,19 @@
 //
 // Expected reward ranges per step (with default weights):
 //   baseStep:     0        (constant)
-//   survival:     0..0.01  (per step)
+//   survival:     0..0.1   (per step — 10x for longer survival)
 //   kill:         0..1     (rare, 0-1 per step)
-//   crash:       -1..0     (rare)
+//   crash:       -5..0     (rare — 5x penalty to discourage crashing)
 //   stuck:       -0.35..0  (rare)
 //   itemPickup:   0..0.08  (0-1 per step)
 //   itemUse:      0..0.03  (0-1 per step)
 //   damageDealt:  0..~0.5  (0-25 damage units typical)
-//   damageTaken: -0.5..0   (0-20 damage units typical)
+//   damageTaken: -3..0     (0-20 damage units typical — 6x penalty)
 //   win:          0..1.5   (terminal only)
 //   loss:        -1.5..0   (terminal only)
 //
-// Typical per-step range: ~[-2.5, +3.0]
-// Terminal step range:    ~[-3.5, +4.5]
+// Typical per-step range: ~[-8.5, +3.0]
+// Terminal step range:    ~[-9.5, +4.5]
 // Trainer clamps rewards to [-rewardClamp, +rewardClamp] (default +-10)
 // ============================================
 
@@ -26,14 +26,14 @@ const REWARD_PRECISION = 1_000_000;
 
 export const DEFAULT_TRAINING_REWARD_WEIGHTS = Object.freeze({
     baseStep: 0,
-    survival: 0.01,
+    survival: 0.1,
     kill: 1,
-    crash: -1,
+    crash: -5,
     stuck: -0.35,
     itemPickup: 0.08,
     itemUse: 0.03,
     damageDealt: 0.02,
-    damageTaken: -0.025,
+    damageTaken: -0.15,
     win: 1.5,
     loss: -1.5,
 });
@@ -122,9 +122,9 @@ export const CURRICULUM_STAGES = Object.freeze([
         minSteps: 0,
         description: 'Navigation + survival only',
         weightOverrides: {
-            kill: 0, crash: -0.5, stuck: -0.5, itemPickup: 0, itemUse: 0,
+            kill: 0, crash: -3, stuck: -0.5, itemPickup: 0, itemUse: 0,
             damageDealt: 0, damageTaken: 0, win: 0, loss: 0,
-            survival: 0.02, baseStep: 0.001,
+            survival: 0.2, baseStep: 0.001,
         },
     },
     {
@@ -133,7 +133,7 @@ export const CURRICULUM_STAGES = Object.freeze([
         description: 'Navigation + shooting',
         weightOverrides: {
             itemPickup: 0, itemUse: 0,
-            survival: 0.015, baseStep: 0,
+            survival: 0.12, baseStep: 0,
         },
     },
     {
