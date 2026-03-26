@@ -2,7 +2,10 @@
 // RoundRecorder.js - Lightweight debug logger + KPI recorder
 // ============================================
 
+import { createLogger } from '../shared/logging/Logger.js';
 import { RoundEventStore } from './recorder/RoundEventStore.js';
+
+const logger = createLogger('RoundRecorder');
 import { RoundMetricsStore } from './recorder/RoundMetricsStore.js';
 import { RoundSnapshotStore } from './recorder/RoundSnapshotStore.js';
 
@@ -267,21 +270,17 @@ export class RoundRecorder {
         const lastRound = this.getLastRoundMetrics();
         const aggregate = this.getAggregateMetrics();
 
-        console.group('%cROUND LOG', 'color: #0af; font-size: 14px; font-weight: bold;');
-        console.log(`Duration: ${Math.round(this._elapsedSeconds() * 10) / 10}s`);
-        console.log(`Events: ${this._eventStore.eventCount}`);
-        console.table(eventList.map((e) => ({ log: e })));
+        logger.debug(`Duration: ${Math.round(this._elapsedSeconds() * 10) / 10}s`);
+        logger.debug(`Events: ${this._eventStore.eventCount}`);
         if (lastRound) {
-            console.log('Round KPI:', lastRound);
+            logger.debug('Round KPI:', lastRound);
         }
-        console.log('Aggregate KPI:', aggregate);
+        logger.debug('Aggregate KPI:', aggregate);
 
         const snapList = this._snapshotStore.getRecentSnapshotTable(20);
         if (snapList.length > 0) {
-            console.log('Recent positions:');
-            console.table(snapList);
+            logger.debug('Recent positions:', snapList);
         }
-        console.groupEnd();
 
         return {
             events: eventList,

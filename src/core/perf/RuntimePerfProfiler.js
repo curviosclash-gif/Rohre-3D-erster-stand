@@ -1,5 +1,7 @@
 import { toFiniteNumber } from '../../utils/MathOps.js';
+import { createLogger } from '../../shared/logging/Logger.js';
 
+const logger = createLogger('PerfSpike');
 const DEFAULT_BUFFER_SIZE = 720;
 const DEFAULT_STATS_WINDOW = 300;
 const DEFAULT_SPIKE_THRESHOLD_MS = 30;
@@ -238,8 +240,8 @@ export class RuntimePerfProfiler {
                 const suppressedSummary = this._suppressedSpikeLogs > 0
                     ? ` suppressed=${this._suppressedSpikeLogs}`
                     : '';
-                console.warn(
-                    `[PerfSpike] frame=${resolvedFrameTimeMs.toFixed(2)}ms threshold=${this.spikeThresholdMs.toFixed(1)}ms top=[${topSummary}]${botSummary}${suppressedSummary}`
+                logger.warn(
+                    `frame=${resolvedFrameTimeMs.toFixed(2)}ms threshold=${this.spikeThresholdMs.toFixed(1)}ms top=[${topSummary}]${botSummary}${suppressedSummary}`
                 );
                 this._lastSpikeLogTimestampMs = resolvedTimestampMs;
                 this._suppressedSpikeLogs = 0;

@@ -1,4 +1,7 @@
+import { createLogger } from '../shared/logging/Logger.js';
 import { CONFIG, CONFIG_BASE } from './Config.js';
+
+const logger = createLogger('GameRuntimeFacade');
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import {
@@ -144,7 +147,7 @@ export class GameRuntimeFacade {
                 runtimeConfig,
                 requestedMapKey: runtimeConfig?.session?.mapKey || game.mapKey,
             })).catch((error) => {
-                console.warn('[GameRuntimeFacade] Match prewarm skipped:', error);
+                logger.warn('Match prewarm skipped:', error);
             });
         }, 50);
     }

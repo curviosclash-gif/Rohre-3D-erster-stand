@@ -2,6 +2,9 @@
 // Audio.js - Synthesized Sound Effects (No assets needed)
 // ============================================
 
+import { createLogger } from '../shared/logging/Logger.js';
+
+const logger = createLogger('AudioManager');
 const DEFAULT_COOLDOWN_MS = 50;
 
 const SOUND_COOLDOWNS_MS = Object.freeze({
@@ -122,7 +125,7 @@ export class AudioManager {
             this.ctx = null;
             this.buffers = {};
             this._audioInitFailed = true;
-            console.warn('[AudioManager] AudioContext initialization failed; audio muted.', error);
+            logger.warn('AudioContext initialization failed; audio muted.', error);
             this._debugLog('AudioContext init failed', {
                 error: error instanceof Error ? error.message : String(error || ''),
             });

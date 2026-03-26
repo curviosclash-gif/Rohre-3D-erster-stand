@@ -2,7 +2,10 @@
 // ObservationBridgePolicy.js - bridge policy shell with resilient local fallback
 // ============================================
 
+import { createLogger } from '../../shared/logging/Logger.js';
 import { createNeutralBotAction, sanitizeBotAction } from './actions/BotActionContract.js';
+
+const logger = createLogger('ObservationBridgePolicy');
 import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
 import { buildTrainerRuntimeObservationPayload } from './training/TrainerPayloadAdapter.js';
 import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
@@ -134,7 +137,7 @@ export class ObservationBridgePolicy {
             ? ` (suppressed=${suppressedCount})`
             : '';
         const errorMessage = error ? ` (${error.message || String(error)})` : '';
-        console.warn(`[ObservationBridgePolicy] ${this.type}: ${message}${suppressedMessage}${errorMessage}`);
+        logger.warn(`${this.type}: ${message}${suppressedMessage}${errorMessage}`);
     }
 
     _recordBridgeFailure(reason) {

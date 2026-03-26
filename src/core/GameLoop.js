@@ -1,6 +1,9 @@
 // ============================================
 // GameLoop.js - fixed-step simulation loop with scaled game time
 // ============================================
+import { createLogger } from '../shared/logging/Logger.js';
+
+const logger = createLogger('GameLoop');
 
 export class GameLoop {
     constructor(updateFn, renderFn, options = {}) {
@@ -195,7 +198,7 @@ export class GameLoop {
         } catch (err) {
             if (!this._errorShown) {
                 this._errorShown = true;
-                console.error('GameLoop error:', err);
+                logger.error('GameLoop error:', err);
                 const overlay = document.createElement('div');
                 overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;padding:20px;background:#c00;color:#fff;font:16px monospace;z-index:99999;white-space:pre-wrap;';
                 overlay.textContent = 'FEHLER: ' + err.message + '\n\n' + err.stack;

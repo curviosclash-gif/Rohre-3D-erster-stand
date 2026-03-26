@@ -1,6 +1,9 @@
 import * as THREE from 'three';
+import { createLogger } from '../shared/logging/Logger.js';
 import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
 import { MatchFeedbackAdapter } from './MatchFeedbackAdapter.js';
+
+const logger = createLogger('MatchFlowUiController');
 import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
 import { PauseOverlayController } from './PauseOverlayController.js';
 import { clearMessageStats, renderMessageStats } from './dom/MessageStatsDom.js';
@@ -291,7 +294,7 @@ export class MatchFlowUiController {
     }
 
     _handleStartMatchFailure(error) {
-        console.error('[MatchFlowUiController] startMatch failed:', error);
+        logger.error('startMatch failed:', error);
         this.game?._showStatusToast?.('Map-Start fehlgeschlagen. Fallback oder Menue wird geladen.', 2600, 'error');
         this.returnToMenu();
         return false;

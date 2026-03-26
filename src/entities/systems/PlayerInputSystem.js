@@ -2,7 +2,10 @@
 // PlayerInputSystem.js - resolves human and bot player input
 // ============================================
 
+import { createLogger } from '../../shared/logging/Logger.js';
 import { sanitizeBotAction } from '../ai/actions/BotActionContract.js';
+
+const logger = createLogger('PlayerInputSystem');
 import { createBotRuntimeContext } from '../ai/BotRuntimeContextFactory.js';
 import { buildObservation } from '../ai/observation/ObservationSystem.js';
 import { OBSERVATION_LENGTH_V1 } from '../ai/observation/ObservationSchemaV1.js';
@@ -125,7 +128,7 @@ export class PlayerInputSystem {
         if (now - lastWarning < this._botActionWarningCooldownMs) return;
         this._botActionWarnings.set(playerIndex, now);
         const errorMessage = error ? ` (${error.message || String(error)})` : '';
-        console.warn(`[BotActionContract] Sanitized invalid action for bot index ${playerIndex}: ${reason}${errorMessage}`);
+        logger.warn(`Sanitized invalid action for bot index ${playerIndex}: ${reason}${errorMessage}`);
     }
 
     _warnInvalidBotObservation(player, reason, error = null) {
@@ -135,7 +138,7 @@ export class PlayerInputSystem {
         if (now - lastWarning < this._botObservationWarningCooldownMs) return;
         this._botObservationWarnings.set(playerIndex, now);
         const errorMessage = error ? ` (${error.message || String(error)})` : '';
-        console.warn(`[ObservationSystem] Fallback observation for bot index ${playerIndex}: ${reason}${errorMessage}`);
+        logger.warn(`Fallback observation for bot index ${playerIndex}: ${reason}${errorMessage}`);
     }
 
     _resolveRuntimeContext(player, dt, entityManager, options = {}) {

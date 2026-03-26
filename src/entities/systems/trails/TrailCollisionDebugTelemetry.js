@@ -1,3 +1,7 @@
+import { createLogger } from '../../../shared/logging/Logger.js';
+
+const logger = createLogger('TrailCollisionDebug');
+
 function isTruthyFlag(value) {
     const raw = String(value || '').trim().toLowerCase();
     return raw === '1' || raw === 'true' || raw === 'yes' || raw === 'on';
@@ -45,7 +49,7 @@ export class TrailCollisionDebugTelemetry {
         this.logCount++;
         console.debug(`[TrailCollisionDebug:${tag}]`, payload);
         if (this.logCount === this.maxLogs) {
-            console.warn('[TrailCollisionDebug] log cap reached; suppressing further logs');
+            logger.warn('log cap reached; suppressing further logs');
         }
     }
 

@@ -4,7 +4,9 @@
  */
 
 import * as THREE from 'three';
+import { createLogger } from '../shared/logging/Logger.js';
 
+const logger = createLogger('OBJVehicleMesh');
 let OBJ_MTL_LOADER_PROMISE = null;
 
 function loadObjAndMtlModules() {
@@ -89,7 +91,7 @@ export class OBJVehicleMesh extends THREE.Group {
                 return true;
             })
             .catch((error) => {
-                console.warn(`[OBJVehicleMesh] Failed to load ${this.shipId}.obj/.mtl, using fallback mesh.`, error);
+                logger.warn(`Failed to load ${this.shipId}.obj/.mtl, using fallback mesh.`, error);
                 this._applyFallbackModel();
                 return false;
             })

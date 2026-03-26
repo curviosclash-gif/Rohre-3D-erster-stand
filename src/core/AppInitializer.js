@@ -1,6 +1,9 @@
 // @ts-check
 
 import { attachGlobalRuntimeErrorHandler, showRuntimeErrorOverlay } from './RuntimeErrorOverlay.js';
+import { createLogger } from '../shared/logging/Logger.js';
+
+const logger = createLogger('AppInitializer');
 
 /**
  * @typedef {{
@@ -76,7 +79,7 @@ export function initializeGameApp({ createGame }) {
         try {
             mountGameInstance(createGame);
         } catch (error) {
-            console.error('Fatal Game Init Error:', error);
+            logger.error('Fatal Game Init Error:', error);
             showRuntimeErrorOverlay({
                 title: 'INIT ERROR',
                 lines: [resolveErrorMessage(error)],
