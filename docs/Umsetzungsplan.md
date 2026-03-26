@@ -60,7 +60,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/OnlineSessionAdapter.js`, `src/network/LANSessionAdapter.js`, `src/network/StateReconciler.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/core/InputManager.js`, `src/ui/TouchInputSource.js`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V52 | offen | Event-Contract, Layering-Guards, Input/Persistenz-Resthaertung |
 | `src/core/SettingsManager.js`, `src/core/settings/**`, `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/MenuRuntimePresetConfigService.js`, `src/core/runtime/MenuRuntimeDeveloperModeService.js`, `src/core/GameRuntimeFacade.js`, `tests/core.spec.js` | V53 | abgeschlossen | Settings-Domain-Decomposition in Facades/Operations umgesetzt |
 | `src/core/MediaRecorderSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/core/GameRuntimeFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/main.js`, `src/entities/**`, `src/ui/**`, `src/state/**`, `src/shared/**`, `scripts/architecture/**`, `scripts/check-architecture-*.mjs` | V54 | abgeschlossen | Gesamtfix fuer God-Objects, Layer-Kopplung, Legacy-Patterns und Global-Kapselung |
-| `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js` | V62 | offen | Cinematic-Camera funktionale Verbesserungen: Boost-Blend, Speed-Sway, Cockpit-Cleanup |
+| `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js` | V62 | in Bearbeitung | Cinematic-Camera funktionale Verbesserungen: Boost-Blend, Speed-Sway, Cockpit-Cleanup |
 | `tests/playwright.global-setup.js`, `tests/playwright.global-teardown.js`, `playwright.config.js`, `scripts/verify-lock.mjs`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/entities/arena/portal/PortalRuntimeSystem.js`, `src/ui/PauseOverlayController.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/core/MediaRecorderSystem.js`, `src/state/TelemetryHistoryStore.js`, `tests/core.spec.js`, `tests/training-automation.spec.js` | V55 | offen | Tiefenaudit-Remediation fuer Teststabilitaet, Race-Conditions, Backpressure und Lifecycle-Haertung |
 | `src/state/MatchLifecycleSessionOrchestrator.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/ui/TouchInputSource.js`, `src/ui/MatchFlowUiController.js`, `tests/core.spec.js`, `tests/physics-core.spec.js` | V56 | offen | Edge-Case-Fixes, Defensive Improvements, idempotency guards |
 | `src/state/arcade/ArcadeVehicleProfile.js`, `src/state/arcade/ArcadeMapProgression.js`, `src/state/arcade/ArcadeMissionState.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/ArcadeMapSelect.js`, `src/entities/directors/ArcadeEncounterCatalog.js` (mapPool-Erweiterung), `src/entities/arcade/ArcadeBlueprintSchema.js` (Upgrade-Tiers), `src/core/arcade/ArcadeRunRuntime.js` (Multi-Map) | V57 | offen | Arcade Progression: Vehicle Manager, Multi-Map, Missions |
@@ -85,6 +85,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-B | V59 | 2026-03-26 | active | - |
 | - | V60 | - | frei | - |
 | - | V61 | - | frei | - |
+| Bot-Codex | V62 | 2026-03-26 | active | - |
 | - | V63 | - | frei | - |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -979,7 +980,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-26 -->
 <!-- DEPENDS-ON: V59.5 (Camera Polish) -->
 
 Scope:
@@ -1136,4 +1137,3 @@ Vor Task-Abschluss immer:
 - `npm run plan:check`
 - `npm run docs:sync`
 - `npm run docs:check`
-
