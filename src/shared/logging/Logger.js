@@ -1,3 +1,18 @@
+// Async Error-Handling Pattern (V59.4.3)
+// ─────────────────────────────────────
+// All async operations MUST use try-catch with a specific logger call.
+// No bare-catch blocks (i.e. `catch { }` or `.catch(() => {})`).
+//
+//   try {
+//       const res = await fetch(url);
+//       const data = await res.json();
+//   } catch (err) {
+//       logger.warn('descriptive context:', err);
+//   }
+//
+// For fire-and-forget fetch: `.catch((err) => { logger.debug('context:', err); })`
+// Production builds suppress debug/info — only warn+error reach the console.
+
 const LOG_LEVEL = Object.freeze({
     DEBUG: 0,
     INFO: 1,
