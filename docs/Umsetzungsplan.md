@@ -81,13 +81,11 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | H | V55 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | frei | abgeschlossen 2026-03-26 |
-| - | V58 | - | frei | - |
-| - | V59 | - | frei | - |
+| Bot-A | V58 | 2026-03-26 | active | - |
+| Bot-B | V59 | 2026-03-26 | active | - |
 | - | V60 | - | frei | - |
 | - | V61 | - | frei | - |
 | - | V63 | - | frei | - |
-| A | V58 | 2026-03-26 | ACTIVE | - |
-| B | V59 | 2026-03-26 | ACTIVE | - |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -98,7 +96,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | 2026-03-24 | Codex | V54 | `src/ui/MatchFlowUiController.js`, `src/ui/MatchInputSourceResolver.js`, `src/ui/PlayerInputSource.js` | V52.5 Input-Source-Priorisierung benoetigt Runtime-Wiring im Match-UI-Lifecycle | Scope auf Input-Quellen-Wiring begrenzt, Guard/Budget-Gates (`architecture:guard`, `build`) ausgefuehrt | abgeschlossen |
 | 2026-03-25 | Bot-H | V2 | `scripts/perf-lifecycle-measure.mjs`, `scripts/perf-jitter-matrix.mjs` | V55.5.2 benoetigt belastbare Perf-Sanity ohne Dev-Server-Startup-Deadlocks | Benchmark-Runner auf `vite preview` mit Auto-Build-Fallback und robuster Navigation/Readiness umgestellt; `benchmark:lifecycle`/`benchmark:jitter` ausgefuehrt | abgeschlossen |
 | 2026-03-25 | Bot-H | Shared | `tests/helpers.js`, `package.json` | V55.1 Startup-Flakes erfordern robusteren `loadGame`-Pfad und testseitige Timeout-Haertung | `loadGame` um Runtime-Readiness+Retry erweitert; `test:core`/`test:fast` auf `--timeout=240000` standardisiert; Gate-Laeufe dokumentiert | abgeschlossen |
-| 2026-03-26 | Agent A | V57 | `src/ui/arcade/ArcadeVehicleManager.js` | V58 Architektur-Guard zeigt ui->state import zu ArcadeVehicleProfile; muss via Facade/Contract entkoppelt werden | Contract fÃ¼r Vehicle-Operationen erstellen, ArcadeVehicleManager via Dependency Injection nutzen | PENDING |
+| 2026-03-26 | Agent A | V57 | `src/ui/arcade/ArcadeVehicleManager.js` | V58 Architektur-Guard zeigt ui->state import zu ArcadeVehicleProfile; muss via Facade/Contract entkoppelt werden | Contract fuer Vehicle-Operationen erstellen, ArcadeVehicleManager via Dependency Injection nutzen | PENDING |
 
 ---
 
@@ -425,7 +423,7 @@ Scope:
 
 ### 56.3 Double-Dispose Guard in TouchInputSource
 
-**Issue:** `dispose()` ruft `removeUI()` auf, bevor `super.dispose()` aufgerufen wird. Doppelaufrufe oder Fehler in `super.dispose()` kÃ¶nnten zu Problemen fuehren. Fehlende Idempotenz-Guard.
+**Issue:** `dispose()` ruft `removeUI()` auf, bevor `super.dispose()` aufgerufen wird. Doppelaufrufe oder Fehler in `super.dispose()` koennten zu Problemen fuehren. Fehlende Idempotenz-Guard.
 
 **Fix-Strategie:**
 - [x] 56.3.1 `TouchInputSource` mit `_disposed` Flag versehen, sodass `dispose()` und `removeUI()` idempotent sind (abgeschlossen: 2026-03-25; evidence: this._disposed = false in constructor, guard in dispose())
@@ -434,19 +432,19 @@ Scope:
 
 ### 56.4 huntState Mutation-Pattern in MatchFlowUiController
 
-**Issue:** `Object.assign(game.huntState, transition.huntStatePatch)` mutiert direkt ein Shared-State-Objekt. Wenn Patches verzÃ¶gert oder aus Closures angewendet werden, kÃ¶nnten sie stale sein (keine dokumentierte Contract fuer Patchreihenfolge).
+**Issue:** `Object.assign(game.huntState, transition.huntStatePatch)` mutiert direkt ein Shared-State-Objekt. Wenn Patches verzoegert oder aus Closures angewendet werden, koennten sie stale sein (keine dokumentierte Contract fuer Patchreihenfolge).
 
 **Fix-Strategie:**
-- [x] 56.4.1 `MatchFlowUiController` auf sichere Mutation umstellen: entweder Kopie vor assign oder Revision-Guard hinzufuegen (abgeschlossen: 2026-03-25; evidence: Object.assign(game.huntState, { ...transition.huntStatePatch }) â€” shallow-copy vor Anwendung)
+- [x] 56.4.1 `MatchFlowUiController` auf sichere Mutation umstellen: entweder Kopie vor assign oder Revision-Guard hinzufuegen (abgeschlossen: 2026-03-25; evidence: Object.assign(game.huntState, { ...transition.huntStatePatch }) - shallow-copy vor Anwendung)
 - [x] 56.4.2 Comment hinzufuegen dass `transition.huntStatePatch` bis zum naechsten Frame gebueffert werden kann; Reihenfolge-Garantie dokumentieren (abgeschlossen: 2026-03-25; evidence: Inline-Kommentar in MatchFlowUiController.js bei huntStatePatch-Anwendung)
 
 ### 56.5 Code-Quality Improvements (kleinere Punkte)
 
 **Verbesserungen, die im Audit identifiziert wurden:**
 
-- [x] 56.5.1 `ProfileManager.js:97` â€” `JSON.parse/stringify` Clone ersetzen durch dedizierte Cloning-Utility (bereits in V54.5.1 gemacht via `JsonClone.js`) (abgeschlossen: 2026-03-25; evidence: src/shared/utils/JsonClone.js exists)
+- [x] 56.5.1 `ProfileManager.js:97` - `JSON.parse/stringify` Clone ersetzen durch dedizierte Cloning-Utility (bereits in V54.5.1 gemacht via `JsonClone.js`) (abgeschlossen: 2026-03-25; evidence: src/shared/utils/JsonClone.js exists)
 - [x] 56.5.2 Debugging/Hotpath `console.log` in `PortalRuntimeSystem.js` ueberpruefung (bereits in V55.5.1 gemacht) (abgeschlossen: 2026-03-25; evidence: V55.5.1 completed)
-- [x] 56.5.3 Unused exports (z. B. `crc32()` in `GameStateSnapshot.js`) identifizieren und entfernen oder dokumentieren (abgeschlossen: 2026-03-25; evidence: crc32 export entfernt aus GameStateSnapshot.js â€” kein Import in src/ oder tests/)
+- [x] 56.5.3 Unused exports (z. B. `crc32()` in `GameStateSnapshot.js`) identifizieren und entfernen oder dokumentieren (abgeschlossen: 2026-03-25; evidence: crc32 export entfernt aus GameStateSnapshot.js - kein Import in src/ oder tests/)
 
 ### Phase 56.99: Integrations- und Abschluss-Gate
 
@@ -463,7 +461,7 @@ Scope:
 
 ---
 
-## Backlog (priorisiert, nicht gestartet)
+## Priorisierte Pipeline
 
 Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 
@@ -483,8 +481,8 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
-| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.1.1 ArcadeMissionHUD entkoppeln | Offen |
-| V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | Offen |
+| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.3 MediaRecorderSystem auf Strategie-Pattern umstellen | In Bearbeitung |
+| V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | In Bearbeitung |
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.1 Architektur-Guard wieder voll belastbar machen | Offen |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 61.1.1 Score-System dynamisieren | Offen |
 | V63 | Fight-Modus Follow-up - Runtime-Config, Trail-Targeting, HUD | `docs/Feature_Fight_Modus_Followup_V63.md` | hoch | mittel | P1 | 63.1.1 Runtime-Config-Pfad und Guard-Rollout beginnen | Offen |
@@ -507,33 +505,27 @@ Scope:
 ### Architektur-Uebersicht
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                  ARCADE PROGRESSION (V57)                â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  57.1-57.3       â”‚  57.4-57.6       â”‚  57.7-57.9        â”‚
-â”‚  VEHICLE MANAGER â”‚  MULTI-MAP       â”‚  MISSIONS         â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ XP & Level-Systemâ”‚ Map-Sequenz pro  â”‚ Aufgaben pro Map  â”‚
-â”‚ Part-Upgrades    â”‚ Arcade-Run       â”‚ (Kill, Collect,   â”‚
-â”‚ Slot-Unlock      â”‚ Exit-Portale     â”‚  Survive, Race)   â”‚
-â”‚ Loadout-Save     â”‚ Sektorâ†’Map-Link  â”‚ Belohnungen       â”‚
-â”‚ Persist via Storeâ”‚ Portal-Transitionâ”‚ Freischaltungen   â”‚
-â”‚                  â”‚ Map-Prewarm      â”‚ Mastery-Track     â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+```text
++------------------------ ARCADE PROGRESSION (V57) ------------------------+
+| 57.1-57.3 Vehicle Manager | 57.4-57.6 Multi-Map | 57.7-57.9 Missions    |
+| XP/Level, upgrades, slots | map sequence, portals| map tasks, rewards   |
+| Persist via settingsStore | transitions, prewarm | HUD, unlocks, mastery|
++---------------------------------------------------------------------------+
+```
 ```
 
 Bestehende Basis:
-- `ArcadeRunRuntime` (Sektor-Lifecycle, Scoring, Combo) â€” V45
-- `ArcadeEncounterDirector` (Sektor-Sequenzierung, Squad-Eskalation) â€” V45
-- `ArcadeBlueprintSchema` (Part-Slots, Kosten, Hitbox-Klassen) â€” V45
-- `vehicle-registry.js` (15+ Schiffe inkl. modular generierter) â€” bestehend
-- `VehicleLab` Prototype (modularer Schiffbau-Editor) â€” Prototype
-- Portal-System (`PortalLayoutBuilder`, `PortalRuntimeSystem`) â€” bestehend
-- `settingsManager.store` (JSON-Persistenz fuer Profile) â€” V53
+- `ArcadeRunRuntime` (Sektor-Lifecycle, Scoring, Combo) - V45
+- `ArcadeEncounterDirector` (Sektor-Sequenzierung, Squad-Eskalation) - V45
+- `ArcadeBlueprintSchema` (Part-Slots, Kosten, Hitbox-Klassen) - V45
+- `vehicle-registry.js` (15+ Schiffe inkl. modular generierter) - bestehend
+- `VehicleLab` Prototype (modularer Schiffbau-Editor) - Prototype
+- Portal-System (`PortalLayoutBuilder`, `PortalRuntimeSystem`) - bestehend
+- `settingsManager.store` (JSON-Persistenz fuer Profile) - V53
 
 ### Definition of Done (DoD)
 
-- [x] DoD.1 Alle Phasen 57.1 bis 57.10 sind abgeschlossen. (2026-03-26)
+- [x] DoD.1 Alle Phasen 57.1 bis 57.9 und 57.99 sind abgeschlossen. (2026-03-26)
 - [x] DoD.2 Vehicle-Profile persistieren korrekt ueber Sessions hinweg (localStorage). (2026-03-26)
 - [x] DoD.3 Arcade-Run mit mindestens 3 verschiedenen Maps in Sequenz spielbar. (2026-03-26)
 - [x] DoD.4 Mindestens 4 Mission-Typen funktionieren und vergeben XP/Rewards. (2026-03-26)
@@ -541,8 +533,8 @@ Bestehende Basis:
 
 ### 57.1 Vehicle-Profil und XP-System
 
-- [x] 57.1.1 `src/state/arcade/ArcadeVehicleProfile.js` â€” XP-Modell, Level-Kurve, Slot-Unlock-Schwellen definieren (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.1.2 XP-Vergabe-Logik: Sektor-Abschluss, Kills, Mission-Completion â†’ XP-Berechnung (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.1.1 `src/state/arcade/ArcadeVehicleProfile.js` - XP-Modell, Level-Kurve, Slot-Unlock-Schwellen definieren (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.1.2 XP-Vergabe-Logik: Sektor-Abschluss, Kills, Mission-Completion -> XP-Berechnung (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.1.3 Persistenz via `settingsManager.store` (analog `ArcadeRunRecords`) (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.2 Part-Upgrade-System
@@ -553,14 +545,14 @@ Bestehende Basis:
 
 ### 57.3 Vehicle Manager UI
 
-- [x] 57.3.1 `src/ui/arcade/ArcadeVehicleManager.js` â€” Schiff-Auswahl, Loadout-Uebersicht, Slot-Visualisierung (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.3.1 `src/ui/arcade/ArcadeVehicleManager.js` - Schiff-Auswahl, Loadout-Uebersicht, Slot-Visualisierung (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.3.2 Upgrade-UI: Part-Auswahl, Tier-Upgrade, Kosten-Anzeige, Stat-Vorschau (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.3.3 Integration in `ArcadeMenuSurface` als Tab/Screen zwischen Runs (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.4 Multi-Map Sektor-Zuordnung
 
 - [x] 57.4.1 `ArcadeEncounterCatalog` erweitern: `mapPool` pro Sektor-Tier (intro/pressure/hazard/endurance) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.4.2 `src/state/arcade/ArcadeMapProgression.js` â€” Map-Sequenz-Resolver (deterministisch via Run-Seed) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.4.2 `src/state/arcade/ArcadeMapProgression.js` - Map-Sequenz-Resolver (deterministisch via Run-Seed) (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.4.3 `ArcadeRunState` erweitern: `mapSequence[]` und `currentMapKey` pro Sektor (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.5 Exit-Portal-Mechanik
@@ -573,11 +565,11 @@ Bestehende Basis:
 
 - [x] 57.6.1 `ArcadeRunRuntime.beginNextSector()` erweitern: neue Map laden via `MatchSessionFactory` (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.6.2 Arena-Prewarm fuer naechste Map waehrend aktuellem Sektor (Background-Loading) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.6.3 Transition-Flow: Portal-Enter â†’ Intermission-Screen â†’ neue Arena â†’ Sektor-Start (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.6.3 Transition-Flow: Portal-Enter -> Intermission-Screen -> neue Arena -> Sektor-Start (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
 ### 57.7 Mission-System Grundlagen
 
-- [x] 57.7.1 `src/state/arcade/ArcadeMissionState.js` â€” Mission-Typen, Progress-Tracking, Completion-Check (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.7.1 `src/state/arcade/ArcadeMissionState.js` - Mission-Typen, Progress-Tracking, Completion-Check (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.7.2 Mission-Typen: KILL_COUNT, COLLECT_ITEMS, SURVIVE_DURATION, REACH_PORTAL, TIME_TRIAL (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.7.3 Mission-Zuweisung: pro Sektor 1-2 zufaellige Missionen aus Map-spezifischem Pool (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
@@ -589,57 +581,83 @@ Bestehende Basis:
 
 ### 57.9 Reward-Pipeline
 
-- [x] 57.9.1 Mission-Completion â†’ XP + optionale Part-Unlocks (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.9.2 Sektor-Bonus: alle Missionen in einem Sektor abgeschlossen â†’ Multiplier-Bonus (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.9.1 Mission-Completion -> XP + optionale Part-Unlocks (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.9.2 Sektor-Bonus: alle Missionen in einem Sektor abgeschlossen -> Multiplier-Bonus (abgeschlossen: 2026-03-26; evidence: 5941df7)
 - [x] 57.9.3 Run-Summary erweitern: Mission-Stats, XP-Gewinn, neue Unlocks anzeigen (abgeschlossen: 2026-03-26; evidence: 5941df7)
 
-### 57.10 Integrations-Gate
+### Phase 57.99: Integrations- und Abschluss-Gate
 
-- [x] 57.10.1 End-to-End: Arcade-Run mit Vehicle-Auswahl â†’ 3+ Maps â†’ Missions â†’ XP â†’ Upgrade â†’ naechster Run (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.10.2 `npm run build` (Vite) ist gruen; `architecture:guard` hat vorbestehenden Fehler in MediaRecorderSystem (nicht V57) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.10.3 Balancing-Smoke: XP-Kurve, Upgrade-Kosten, Mission-Schwierigkeit plausibel (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.99.1 End-to-End: Arcade-Run mit Vehicle-Auswahl -> 3+ Maps -> Missions -> XP -> Upgrade -> naechster Run (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.99.2 `npm run build` (Vite) ist gruen; `architecture:guard` hat vorbestehenden Fehler in MediaRecorderSystem (nicht V57) (abgeschlossen: 2026-03-26; evidence: 5941df7)
+- [x] 57.99.3 Balancing-Smoke: XP-Kurve, Upgrade-Kosten, Mission-Schwierigkeit plausibel (abgeschlossen: 2026-03-26; evidence: 5941df7)
+
+### Risiko-Register V57
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| XP- und Upgrade-Kurve kippt spaete Arcade-Runs zu stark | mittel | Design | XP-Kurve und Upgrade-Kosten per Smoke und Telemetry plausibilisieren | Spieler snowballen nach wenigen Runs |
+| Portal-Transition verliert Runtime-State zwischen Maps | hoch | Core | Multi-Map-Smoke fuer Portal-Enter, Intermission und Map-Load als Gate beibehalten | Run springt auf falsche Map oder bricht ab |
+| Mission- und Vehicle-Profil-Persistenz driftet gegen den Storage-Contract | mittel | State | Mission- und Profil-Serialisierung gemeinsam gegen denselben Settings-Contract pruefen | Unlocks oder Fortschritt fehlen nach Reload |
 
 ## Block V58: Architektur-Bereinigung & God-Object Refactoring
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-A seit 2026-03-26 -->
 <!-- DEPENDS-ON: V57 (Arcade Progression) -->
 
 Scope:
 
 - Behebung der Architektur-Budget-Verletzungen (`ui -> state`, `state -> core`) aus dem Audit 2026-03-26.
 - Refactoring von "God Objects" wie `MediaRecorderSystem.js` (SRP-Verletzung).
-- Konsolidierung der UI-Store Redundanzen und EinfÃ¼hrung einer `knip`-basierten Dead-Code Ãœberwachung.
+- Konsolidierung der UI-Store Redundanzen und Einfuehrung einer `knip`-basierten Dead-Code Ueberwachung.
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 58.1 bis 58.4 sind abgeschlossen.
-- [ ] DoD.2 `npm run architecture:guard` ist vollstÃ¤ndig grÃ¼n (0 disallowed edges).
+- [ ] DoD.1 Alle Phasen 58.1 bis 58.4 und 58.99 sind abgeschlossen.
+- [ ] DoD.2 `npm run architecture:guard` ist vollstaendig gruen (0 disallowed edges).
 - [ ] DoD.3 Video-Aufnahme (WebCodecs & MediaRecorder Fallback) funktioniert nach Refactoring.
-- [ ] DoD.4 Settings-Persistenz funktioniert konsistent Ã¼ber alle UI-Stores.
+- [ ] DoD.4 Settings-Persistenz funktioniert konsistent ueber alle UI-Stores.
 
 ### 58.1 Entkopplung und Budget-Fixes
 
 - [x] 58.1.1 `ArcadeMissionHUD.js` (UI) entkoppeln: `MISSION_TYPES` und Format-Helper in Shared Contract auslagern. (abgeschlossen: 2026-03-26; evidence: ArcadeMissionContract.js created, imports redirected; commit 4556033)
 - [x] 58.1.2 `ArcadeMapProgression.js` (State) entkoppeln: `MAP_PRESET_CATALOG` Zugriff via Dependency Injection oder Shared Contract. (abgeschlossen: 2026-03-26; evidence: resolveMapSequence() now accepts mapCatalog parameter, ArcadeRunRuntime injects it; commit 9265534)
-- [x] 58.1.3 `ArchitectureConfig.mjs` bereinigen: TemporÃ¤re Allowlist-EintrÃ¤ge fÃ¼r V57/V58 nach Entkopplung entfernen. (abgeschlossen: 2026-03-26; evidence: No temporary exceptions needed; decoupling was clean, no new violations introduced)
+- [x] 58.1.3 `ArchitectureConfig.mjs` bereinigen: Temporaere Allowlist-Eintraege fuer V57/V58 nach Entkopplung entfernen. (abgeschlossen: 2026-03-26; evidence: No temporary exceptions needed; decoupling was clean, no new violations introduced)
 
 ### 58.2 MediaRecorderSystem & Facade Decomposition
 
 - [x] 58.2.1 `src/core/recording/engines/WebCodecsRecorderEngine.js` extrahieren (VideoEncoder & Muxer Logik). (abgeschlossen: 2026-03-26; evidence: WebCodecsRecorderEngine with initialize/encodeFrame/finalize; commit 606ff1e)
 - [x] 58.2.2 `src/core/recording/engines/NativeMediaRecorderEngine.js` extrahieren (MediaRecorder Fallback). (abgeschlossen: 2026-03-26; evidence: NativeMediaRecorderEngine with start/stop/requestFrame; commit 606ff1e)
-- [/] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen. (in Arbeit: Engines extrahiert, Integration der Strategien lÃ¤uft)
-- [ ] 58.2.4 `DownloadService` aus `MediaRecorderSystem` extrahieren (DOM/Blob-Handling fÃ¼r Exporte).
-- [ ] 58.2.5 `GameRuntimeFacade` dekomponieren: `ProfileLifecycleController` fÃ¼r Profil-Lade/Speicher-Logik extrahieren.
+- [/] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen. (in Arbeit: Engines extrahiert, Integration der Strategien laeuft)
+- [ ] 58.2.4 `DownloadService` aus `MediaRecorderSystem` extrahieren (DOM/Blob-Handling fuer Exporte).
+- [ ] 58.2.5 `GameRuntimeFacade` dekomponieren: `ProfileLifecycleController` fuer Profil-Lade/Speicher-Logik extrahieren.
+
+### 58.3 Settings-Store-Konsolidierung und Persistenz
+
+- [ ] 58.3.1 `src/ui/base/PersistentStore.js` und betroffene UI-Stores inventarisieren; doppelte Storage-Keys und redundante Write-Pfade abbauen.
+- [ ] 58.3.2 Gemeinsamen Settings-/Profile-Contract extrahieren, damit Runtime-, Menu- und Arcade-Stores denselben Normalisierungs- und Persistenzpfad nutzen.
+- [ ] 58.3.3 Backward-Compatibility fuer bestehende `localStorage`-Daten per Migrations- oder Smoke-Check absichern.
+
+### 58.4 Dead-Code-Guard und Ownership-Cleanup
+
+- [ ] 58.4.1 `knip` fuer Runtime-, Editor- und Training-Entry-Points so konfigurieren, dass echte Dead-Code-Funde reproduzierbar sind.
+- [ ] 58.4.2 False-Positive-Policy und Ignore-Liste fuer bekannte Entry-Point-Sonderfaelle dokumentieren und versionieren.
+- [ ] 58.4.3 Restliche Ownership- und Conflict-Log-Nacharbeiten aus der Decomposition festhalten, bevor V60 auf `V58.99` aufsetzt.
+
+### Phase 58.99: Integrations- und Abschluss-Gate
+
+- [ ] 58.99.1 `npm run architecture:guard`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen und Lock-/Ownership-Daten sind aktualisiert.
+- [ ] 58.99.2 Video-Aufnahme (WebCodecs + MediaRecorder-Fallback) und Settings-Persistenz laufen in einem End-to-End-Smoke stabil.
+- [ ] 58.99.3 `knip`/Dead-Code-Checks liefern nur noch akzeptierte Restbefunde; V60- und V61-Abhaengigkeiten koennen auf `erfuellt` wechseln.
 
 ### Risiko-Register V58
 
 | Risiko | Severity | Owner | Mitigation | Trigger |
 | --- | --- | --- | --- | --- |
-| Refactoring bricht Video-Aufnahme auf Safari/Mobil | hoch | Core | Tests mit MediaRecorder-Fallback Engine sicherstellen | Video-Export schlÃ¤gt fehl |
-| Datenverlust bei Store-Migration | mittel | UI | AbwÃ¤rtskompatibilitÃ¤t der Storage-Keys garantieren | Benutzereinstellungen sind nach Update weg |
-| Knip meldet zu viele False Positives | niedrig | Dev | Konfiguration verfeinern (Ignore-Listen fÃ¼r entry points) | Build-Pipeline schlÃ¤gt fÃ¤lschlich fehl |
+| Refactoring bricht Video-Aufnahme auf Safari/Mobil | hoch | Core | Tests mit MediaRecorder-Fallback Engine sicherstellen | Video-Export schlaegt fehl |
+| Datenverlust bei Store-Migration | mittel | UI | Abwaertskompatibilitaet der Storage-Keys garantieren | Benutzereinstellungen sind nach Update weg |
+| Knip meldet zu viele False Positives | niedrig | Dev | Konfiguration verfeinern (Ignore-Listen fuer entry points) | Build-Pipeline schlaegt faelschlich fehl |
 
 ---
 
@@ -647,7 +665,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-B seit 2026-03-26 -->
 <!-- DEPENDS-ON: V58.1, V55.99 -->
 
 Scope:
@@ -661,25 +679,19 @@ Scope:
 ### Architektur-Uebersicht
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                  CODE-QUALITAET & NETZWERK (V59)                â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚  59.1-59.2       â”‚  59.3-59.4       â”‚  59.5-59.7               â”‚
-â”‚  NETZWERK-LAYER  â”‚  LOGGING &       â”‚  CAMERA/RECORDING &      â”‚
-â”‚  KONSOLIDIERUNG  â”‚  ASYNC-KONSIST.  â”‚  SERVER-HAERTUNG         â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
-â”‚ Adapter-Dedup    â”‚ Logger-Abstrakt. â”‚ Perf-Hotpath-Fixes       â”‚
-â”‚ Bare-Catch-Fix   â”‚ console.* migr.  â”‚ Bounds-Validierung       â”‚
-â”‚ Retry-Konstanten â”‚ Async-Error-     â”‚ Lazy-Init-Bereinigung    â”‚
-â”‚ Error-Handling   â”‚ Pattern          â”‚ Server-Route-Konstanten  â”‚
-â”‚ Fetch-Guards     â”‚ Fetch-Catch-Gate â”‚ Magic-Number-Extraktion  â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+```text
++--------------------- CODE-QUALITAET & NETZWERK (V59) ---------------------+
+| 59.1-59.2 Netzwerk | 59.3-59.4 Logging/Async | 59.5-59.7 Camera/Server |
+| adapter dedup      | logger + error patterns | recording + hardening   |
+| fail-fast + guards | console cleanup         | tests + cleanup         |
++---------------------------------------------------------------------------+
+```
 ```
 
 Bestehende Basis:
-- V55 Tiefenaudit (CAS, Backpressure, Lifecycle-Haertung) â€” abgeschlossen
-- V56 Defensive Improvements (Session-ID-Guard, Null-Checks, Idempotenz) â€” abgeschlossen
-- V58 Architektur-Bereinigung (Budget-Fixes, MediaRecorder-Decomposition) â€” offen
+- V55 Tiefenaudit (CAS, Backpressure, Lifecycle-Haertung) - abgeschlossen
+- V56 Defensive Improvements (Session-ID-Guard, Null-Checks, Idempotenz) - abgeschlossen
+- V58 Architektur-Bereinigung (Budget-Fixes, MediaRecorder-Decomposition) - offen
 
 ### Definition of Done (DoD)
 
@@ -699,7 +711,7 @@ Bestehende Basis:
 - [x] 59.1.2 Hardcodierte Retry-Konstanten (`for (let i = 0; i < 30; ...)`, 200ms Delay) in benannte Konstanten mit Default-Werten umwandeln: `MAX_CONNECT_RETRIES`, `RETRY_DELAY_MS`. (abgeschlossen: 2026-03-26; evidence: retry loops with explicit limits in LANSessionAdapter)
 - [x] 59.1.3 Bare-catch-Bloecke in `LANMatchLobby.js` (Zeilen 57-63, 142-150) und `LANSessionAdapter.js` (Zeilen 141-150) durch spezifisches Logging und differenziertes Error-Handling ersetzen. (abgeschlossen: 2026-03-26; evidence: all bare-catch blocks replaced with logger.warn/debug)
 - [x] 59.1.4 `_connectingPeers` Set in `LANSessionAdapter._startPolling()` auf explizites Clear vor Neuinitialisierung umstellen, um verwaiste Eintraege zu vermeiden. (abgeschlossen: 2026-03-26; evidence: _connectingPeers = new Set() in _startPolling)
-- [x] 59.1.5 `_findHostPeerId()` in `OnlineSessionAdapter.js` â€” Null-Rueckgabe absichern: alle Call-Sites (Zeilen 195, 214) mit explizitem Guard versehen. (abgeschlossen: 2026-03-26; evidence: explicit _hostPeerId tracking, null guards on all call-sites)
+- [x] 59.1.5 `_findHostPeerId()` in `OnlineSessionAdapter.js` - Null-Rueckgabe absichern: alle Call-Sites (Zeilen 195, 214) mit explizitem Guard versehen. (abgeschlossen: 2026-03-26; evidence: explicit _hostPeerId tracking, null guards on all call-sites)
 - [ ] 59.1.6 `OnlineSessionAdapter.js` und `OnlineMatchLobby.js` auf fail-fast Error-Contracts bringen: Signaling-`error`, Socket-Close und Timeout muessen `connect()`/`create()`/`join()` deterministisch rejecten statt haengen.
 - [ ] 59.1.7 `LANSessionAdapter.js` ICE-Polling so nachziehen, dass Trickle-ICE bis zu einem klaren Quiet-Window oder Timeout weiterlaeuft und spaete Kandidaten nach Answer/erstem Batch nicht verworfen werden.
 
@@ -711,7 +723,7 @@ Bestehende Basis:
 
 - [x] 59.2.1 `maxPlayers`-Wert (Zeilen 53, 70, 203) in Server-Konstante `DEFAULT_MAX_PLAYERS` zentralisieren. (abgeschlossen: 2026-03-26; evidence: DEFAULT_MAX_PLAYERS const added)
 - [x] 59.2.2 Fehlende Routes (`/lobby/ready`, `/lobby/leave`, `/lobby/ack-pending`, Zeilen 98, 112, 141) in `SIGNALING_HTTP_ROUTES`-Objekt aufnehmen (konsistent mit bestehenden Routen-Konstanten). (abgeschlossen: 2026-03-26; evidence: /lobby/ack-pending route added, non-destructive pendingPlayers)
-- [x] 59.2.3 `LOBBY_STATUS`-Endpoint (Zeile 127): Redundante Top-Level-Properties (`lobbyCode`, `playerCount`, `maxPlayers`) entfernen â€” sind bereits in `sessionState` enthalten. (abgeschlossen: 2026-03-26; evidence: lobbyState variable reuse, pending via map)
+- [x] 59.2.3 `LOBBY_STATUS`-Endpoint (Zeile 127): Redundante Top-Level-Properties (`lobbyCode`, `playerCount`, `maxPlayers`) entfernen - sind bereits in `sessionState` enthalten. (abgeschlossen: 2026-03-26; evidence: lobbyState variable reuse, pending via map)
 
 ### 59.3 Logger-Abstraktion und Console-Cleanup
 
@@ -731,13 +743,13 @@ Bestehende Basis:
 
 **Dateien:** `src/network/*.js`, `src/core/main.js`, diverse async Call-Sites
 
-- [x] 59.4.1 Audit aller `fetch()`-Aufrufe in `src/` und `server/` â€” jeden ohne try-catch/`.catch()` mit explizitem Error-Handling versehen. (abgeschlossen: 2026-03-26; evidence: all bare catches in network adapters replaced with logger calls)
+- [x] 59.4.1 Audit aller `fetch()`-Aufrufe in `src/` und `server/` - jeden ohne try-catch/`.catch()` mit explizitem Error-Handling versehen. (abgeschlossen: 2026-03-26; evidence: all bare catches in network adapters replaced with logger calls)
 - [x] 59.4.2 `src/core/main.js` Zeilen 159-161: Retry-Loop (`for (let i = 0; i < 30; ...)`) mit Abbruchbedingung und aussagekraeftigem Fehler bei Timeout erweitern. (abgeschlossen: 2026-03-26; evidence: retry loop already refactored in LANSessionAdapter with explicit timeout error)
 - [x] 59.4.3 Einheitliches Async-Error-Pattern dokumentieren und in `CONTRIBUTING.md` oder Code-Kommentar festhalten: try-catch mit spezifischem Logger-Aufruf, kein bare-catch. (abgeschlossen: 2026-03-26; evidence: pattern documented as header comment in src/shared/logging/Logger.js)
 
 ### 59.5 Camera/Recording-Subsystem Polish
 
-**Issue:** `CameraShakeSolver.js` prueft `typeof performance !== 'undefined'` auf jedem Frame (Hotpath). `CameraModeStrategySet.js` hat Methoden mit 9+ Parametern. `CinematicCameraSystem.js` wÃ¤chst sparse Arrays ohne Bounds-Check. `RecordingCapturePipeline.js` nutzt Lazy-Init mit OR-Pattern statt Eager-Init und klont `_lastMeta` mit `JSON.parse(JSON.stringify(...))`.
+**Issue:** `CameraShakeSolver.js` prueft `typeof performance !== 'undefined'` auf jedem Frame (Hotpath). `CameraModeStrategySet.js` hat Methoden mit 9+ Parametern. `CinematicCameraSystem.js` waechst sparse Arrays ohne Bounds-Check. `RecordingCapturePipeline.js` nutzt Lazy-Init mit OR-Pattern statt Eager-Init und klont `_lastMeta` mit `JSON.parse(JSON.stringify(...))`.
 
 **Dateien:** `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/RecordingCapturePipeline.js`
 
@@ -756,7 +768,7 @@ Bestehende Basis:
 **Dateien:** `src/shared/contracts/RecordingCaptureContract.js`, `src/core/main.js`, `src/core/config/maps/MapPresetsBase.js`, `src/core/config/maps/MapPresetCatalog.js`
 
 - [x] 59.6.1 `RecordingCaptureContract.js` Zeilen 23-37: Duplizierte Normalisierungs-Logik (`normalizeRecordingCaptureProfile`/`normalizeRecordingHudMode`) in generische `normalizeEnumValue(value, validSet, defaultValue)` Utility zusammenfuehren. (abgeschlossen: 2026-03-26; evidence: normalizeEnumValue() extracted, both functions delegate to it)
-- [x] 59.6.2 `main.js` Zeilen 109-113: Backward-Compat-Aliase (`settingsProfiles`, `activeProfileName`, `selectedProfileName`, `loadedProfileName`) aufraeumen â€” pruefen ob noch referenziert, ggf. entfernen oder Deprecation-Warning hinzufuegen. (abgeschlossen: 2026-03-26; evidence: settingsProfiles + loadedProfileName removed (unused), activeProfileName + selectedProfileName kept (still referenced))
+- [x] 59.6.2 `main.js` Zeilen 109-113: Backward-Compat-Aliase (`settingsProfiles`, `activeProfileName`, `selectedProfileName`, `loadedProfileName`) aufraeumen - pruefen ob noch referenziert, ggf. entfernen oder Deprecation-Warning hinzufuegen. (abgeschlossen: 2026-03-26; evidence: settingsProfiles + loadedProfileName removed (unused), activeProfileName + selectedProfileName kept (still referenced))
 - [x] 59.6.3 `MapPresetsBase.js` Zeilen 31-33: Stilles Filtern fehlender Keys durch Warn-Log ersetzen, damit Map-Konfigurationsfehler sichtbar werden. (abgeschlossen: 2026-03-26; evidence: logger.warn for missing keys)
 - [x] 59.6.4 `MapPresetCatalog.js` Zeilen 17-18: Undefined-Guard vor Spread-Operationen hinzufuegen, um stille Fehler bei fehlenden Map-Imports zu verhindern. (abgeschlossen: 2026-03-26; evidence: || {} guards on all spread operations)
 
@@ -776,7 +788,7 @@ Bestehende Basis:
 - [ ] 59.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen.
 - [ ] 59.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert.
 - [ ] 59.99.3 `grep -r "console\\.log" src/ --include="*.js"` zeigt nur erlaubte Dateien (`src/core/debug/`, `src/core/GameDebugApi.js`).
-- [ ] 59.99.4 `grep -r "fetch(" src/ --include="*.js"` â€” jede Call-Site hat dokumentiertes Error-Handling.
+- [ ] 59.99.4 `grep -r "fetch(" src/ --include="*.js"` - jede Call-Site hat dokumentiertes Error-Handling.
 
 ### Risiko-Register V59
 
@@ -878,71 +890,71 @@ Scope:
 
 ### 61.1 Score-System dynamisieren
 
-- [ ] 61.1.1 `ArcadeScoreOps.js` â€” Dynamischer Base-Score pro Sektor-Template: `sector_intro=180`, `sector_pressure=250`, `sector_hazard=320`, `sector_endurance=400` statt fester `220`
-- [ ] 61.1.2 `ArcadeScoreOps.js` â€” Kill-basiertes Scoring einfuehren: Kills geben direkten Score (nicht nur XP), skaliert mit Multiplier
-- [ ] 61.1.3 `ArcadeScoreOps.js` â€” Nicht-lineares Survival-Scoring: exponentielle Kurve, letzte 10 Sekunden eines Sektors wertvoller (Risiko-Belohnung)
-- [ ] 61.1.4 `ArcadeMissionHUD.js` / neues `ArcadeScoreHUD.js` â€” Score-Breakdown im HUD anzeigen (Base/Survival/Clean/Risk/Penalty), damit Spieler versteht woher sein Score kommt
+- [ ] 61.1.1 `ArcadeScoreOps.js` - Dynamischer Base-Score pro Sektor-Template: `sector_intro=180`, `sector_pressure=250`, `sector_hazard=320`, `sector_endurance=400` statt fester `220`
+- [ ] 61.1.2 `ArcadeScoreOps.js` - Kill-basiertes Scoring einfuehren: Kills geben direkten Score (nicht nur XP), skaliert mit Multiplier
+- [ ] 61.1.3 `ArcadeScoreOps.js` - Nicht-lineares Survival-Scoring: exponentielle Kurve, letzte 10 Sekunden eines Sektors wertvoller (Risiko-Belohnung)
+- [ ] 61.1.4 `ArcadeMissionHUD.js` / neues `ArcadeScoreHUD.js` - Score-Breakdown im HUD anzeigen (Base/Survival/Clean/Risk/Penalty), damit Spieler versteht woher sein Score kommt
 
 ### 61.2 Combo-System auf In-Game-Actions umstellen
 
-- [ ] 61.2.1 `ArcadeScoreOps.js` / `ArcadeRunRuntime.js` â€” Combo durch Kills (+1), Item-Pickups (+0.5), Clean-Dodges (+0.3) erhoehen statt nur am Sektor-Ende +1
-- [ ] 61.2.2 `ArcadeScoreOps.js` â€” Beschleunigender Combo-Decay: langsam in den ersten 2s, schnell nach 3s (statt linearem `comboDecayPerSecond`)
-- [ ] 61.2.3 `ArcadeRunRuntime.js` â€” Combo-Freeze bei Mission-Completion: Combo fuer 3s einfrieren als Belohnung
+- [ ] 61.2.1 `ArcadeScoreOps.js` / `ArcadeRunRuntime.js` - Combo durch Kills (+1), Item-Pickups (+0.5), Clean-Dodges (+0.3) erhoehen statt nur am Sektor-Ende +1
+- [ ] 61.2.2 `ArcadeScoreOps.js` - Beschleunigender Combo-Decay: langsam in den ersten 2s, schnell nach 3s (statt linearem `comboDecayPerSecond`)
+- [ ] 61.2.3 `ArcadeRunRuntime.js` - Combo-Freeze bei Mission-Completion: Combo fuer 3s einfrieren als Belohnung
 - [ ] 61.2.4 In-Game Combo-Feedback: visuelles Feedback bei Combo-Aufbau (Counter-Animation, Edge-Glow)
 
 ### 61.3 Mission-System erweitern
 
-- [ ] 61.3.1 `ArcadeMissionContract.js` + `ArcadeMissionState.js` â€” Neue Mission-Typen: `NO_DAMAGE` (Sektor ohne Schaden ueberleben), `MULTI_KILL` (X Kills in Y Sekunden), `TRAIL_MASTER` (X Meter Trail ohne Selbstkollision)
-- [ ] 61.3.2 `ArcadeMissionContract.js` + `ArcadeMissionState.js` â€” Neue Mission-Typen: `ITEM_CHAIN` (3 Items in Folge ohne Pause), `CLOSE_CALL` (X-mal unter 20% HP ueberleben)
-- [ ] 61.3.3 `ArcadeMissionState.js` â€” Mission-Schwierigkeit skalieren: Kill-Targets steigen aggressiver in spaeten Sektoren (aktuell 3â†’5â†’7â†’10, Ziel: 3â†’5â†’8â†’12â†’18)
-- [ ] 61.3.4 `ArcadeMissionState.js` â€” Bonus-Missionen: optionale dritte Mission pro Sektor mit hoeherem Reward und erhoehter Schwierigkeit
-- [ ] 61.3.5 `ArcadeRunRuntime.js` â€” Mission-Combo-Bonus: Wenn alle Missionen eines Sektors abgeschlossen â†’ Score-Boost + Combo-Freeze (nicht nur XP-Bonus)
+- [ ] 61.3.1 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `NO_DAMAGE` (Sektor ohne Schaden ueberleben), `MULTI_KILL` (X Kills in Y Sekunden), `TRAIL_MASTER` (X Meter Trail ohne Selbstkollision)
+- [ ] 61.3.2 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `ITEM_CHAIN` (3 Items in Folge ohne Pause), `CLOSE_CALL` (X-mal unter 20% HP ueberleben)
+- [ ] 61.3.3 `ArcadeMissionState.js` - Mission-Schwierigkeit skalieren: Kill-Targets steigen aggressiver in spaeten Sektoren (aktuell 3->5->7->10, Ziel: 3->5->8->12->18)
+- [ ] 61.3.4 `ArcadeMissionState.js` - Bonus-Missionen: optionale dritte Mission pro Sektor mit hoeherem Reward und erhoehter Schwierigkeit
+- [ ] 61.3.5 `ArcadeRunRuntime.js` - Mission-Combo-Bonus: Wenn alle Missionen eines Sektors abgeschlossen -> Score-Boost + Combo-Freeze (nicht nur XP-Bonus)
 
 ### 61.4 Sektor-Modifiers im Gameplay anwenden
 
-- [ ] 61.4.1 `ArcadeModeStrategy.js` / `ArcadeRunRuntime.js` â€” Modifier-Effekte implementieren: `tight_turns` (Turning-Rate-Reduktion), `heat_stress` (HP-Drain ueber Zeit), `portal_storm` (Portale spawnen oefter), `boost_tax` (Boost verbraucht HP)
-- [ ] 61.4.2 `ArcadeScoreOps.js` â€” `scoreBonus` der Modifiers auf Sektor-Score anwenden (aktuell definiert aber ignoriert)
-- [ ] 61.4.3 `ArcadeMissionHUD.js` â€” Aktiven Modifier im HUD anzeigen (Icon + Label + Effekt-Beschreibung)
+- [ ] 61.4.1 `ArcadeModeStrategy.js` / `ArcadeRunRuntime.js` - Modifier-Effekte implementieren: `tight_turns` (Turning-Rate-Reduktion), `heat_stress` (HP-Drain ueber Zeit), `portal_storm` (Portale spawnen oefter), `boost_tax` (Boost verbraucht HP)
+- [ ] 61.4.2 `ArcadeScoreOps.js` - `scoreBonus` der Modifiers auf Sektor-Score anwenden (aktuell definiert aber ignoriert)
+- [ ] 61.4.3 `ArcadeMissionHUD.js` - Aktiven Modifier im HUD anzeigen (Icon + Label + Effekt-Beschreibung)
 
 ### 61.5 Sektor-Progression verbessern
 
-- [ ] 61.5.1 `ArcadeRunState.js` / `ArcadeEncounterCatalog.js` â€” Default-Sektoranzahl auf 8 erhoehen, damit alle 4 Templates genutzt werden (aktuell 5, `sector_hazard` und `sector_endurance` werden nie erreicht)
-- [ ] 61.5.2 `ArcadeEncounterCatalog.js` â€” Boss-Sektor als finaler Sektor: staerkerer Gegner-Squad (`elite_lance` + erhoehte Aggressivitaet), doppelter Score-Multiplier
-- [ ] 61.5.3 `ArcadeRunRuntime.js` â€” Zwischen-Sektoren-Wahl: nach jedem Sektor 2-3 naechste Sektoren zur Wahl geben (unterschiedliche Map + Modifier), Roguelike-Style
+- [ ] 61.5.1 `ArcadeRunState.js` / `ArcadeEncounterCatalog.js` - Default-Sektoranzahl auf 8 erhoehen, damit alle 4 Templates genutzt werden (aktuell 5, `sector_hazard` und `sector_endurance` werden nie erreicht)
+- [ ] 61.5.2 `ArcadeEncounterCatalog.js` - Boss-Sektor als finaler Sektor: staerkerer Gegner-Squad (`elite_lance` + erhoehte Aggressivitaet), doppelter Score-Multiplier
+- [ ] 61.5.3 `ArcadeRunRuntime.js` - Zwischen-Sektoren-Wahl: nach jedem Sektor 2-3 naechste Sektoren zur Wahl geben (unterschiedliche Map + Modifier), Roguelike-Style
 
 ### 61.6 Sudden Death implementieren
 
-- [ ] 61.6.1 `ArcadeRunState.js` â€” `SUDDEN_DEATH`-Phase aktivieren wenn Spieler alle regulaeren Sektoren ueberlebt: endloser Modus mit steigender Schwierigkeit
-- [ ] 61.6.2 `ArcadeModeStrategy.js` â€” Sudden-Death-Mechanik: alle 30s ein zusaetzlicher Modifier gestapelt, Damage-Incoming erhoehen, kein Healing
-- [ ] 61.6.3 `ArcadeScoreOps.js` â€” Sudden-Death-Score: Multiplier steigt schneller, separater Sudden-Death-Score fuer Leaderboard
+- [ ] 61.6.1 `ArcadeRunState.js` - `SUDDEN_DEATH`-Phase aktivieren wenn Spieler alle regulaeren Sektoren ueberlebt: endloser Modus mit steigender Schwierigkeit
+- [ ] 61.6.2 `ArcadeModeStrategy.js` - Sudden-Death-Mechanik: alle 30s ein zusaetzlicher Modifier gestapelt, Damage-Incoming erhoehen, kein Healing
+- [ ] 61.6.3 `ArcadeScoreOps.js` - Sudden-Death-Score: Multiplier steigt schneller, separater Sudden-Death-Score fuer Leaderboard
 - [ ] 61.6.4 HUD-Feedback: visuelles Sudden-Death-Overlay (rote Raender, Pulsieren, Timer seit SD-Start)
 
 ### 61.7 Intermission-Gameplay
 
-- [ ] 61.7.1 `ArcadeRunRuntime.js` â€” Reward-Auswahl: `ARCADE_RUN_LEVELUP_REWARDS` dem Spieler anbieten (aktuell generiert in `rewardChoices[]` aber nie angezeigt)
+- [ ] 61.7.1 `ArcadeRunRuntime.js` - Reward-Auswahl: `ARCADE_RUN_LEVELUP_REWARDS` dem Spieler anbieten (aktuell generiert in `rewardChoices[]` aber nie angezeigt)
 - [ ] 61.7.2 Intermission-HUD: Score-Breakdown des letzten Sektors, naechster Sektor-Preview (Map + Modifier + Squad), Reward-Buttons
-- [ ] 61.7.3 `ArcadeModeStrategy.js` â€” Intermission-Healing: teilweise HP-Regeneration zwischen Sektoren (aktuell `updateHealthRegen()` ist leer)
+- [ ] 61.7.3 `ArcadeModeStrategy.js` - Intermission-Healing: teilweise HP-Regeneration zwischen Sektoren (aktuell `updateHealthRegen()` ist leer)
 
 ### 61.8 Vehicle-Mastery-Effekte
 
-- [ ] 61.8.1 `ArcadeVehicleProfile.js` / `ArcadeModeStrategy.js` â€” Slot-Effekte implementieren: T2 Wing = +10% Turning, T2 Engine = +8% Speed, T2 Core = +15 Max HP
-- [ ] 61.8.2 `ArcadeVehicleProfile.js` â€” Mastery-Perks: alle 5 Level ein passiver Perk (Level 5: +5% Score, Level 10: Combo decayed 20% langsamer, Level 15: +10% XP)
-- [ ] 61.8.3 `ArcadeMenuSurface.js` â€” Mastery-Anzeige dynamisch: echtes Level und XP-Progress aus Vehicle-Profil lesen statt hardcoded `Mastery 0/5`
+- [ ] 61.8.1 `ArcadeVehicleProfile.js` / `ArcadeModeStrategy.js` - Slot-Effekte implementieren: T2 Wing = +10% Turning, T2 Engine = +8% Speed, T2 Core = +15 Max HP
+- [ ] 61.8.2 `ArcadeVehicleProfile.js` - Mastery-Perks: alle 5 Level ein passiver Perk (Level 5: +5% Score, Level 10: Combo decayed 20% langsamer, Level 15: +10% XP)
+- [ ] 61.8.3 `ArcadeMenuSurface.js` - Mastery-Anzeige dynamisch: echtes Level und XP-Progress aus Vehicle-Profil lesen statt hardcoded `Mastery 0/5`
 
 ### 61.9 In-Game Score/Combo-HUD
 
-- [ ] 61.9.1 Neues `ArcadeScoreHUD.js` â€” Echtzeit-Score-Anzeige, Combo-Counter mit Decay-Visualisierung (Countdown-Ring), Multiplier-Badge
+- [ ] 61.9.1 Neues `ArcadeScoreHUD.js` - Echtzeit-Score-Anzeige, Combo-Counter mit Decay-Visualisierung (Countdown-Ring), Multiplier-Badge
 - [ ] 61.9.2 Sektor-Transition-Animation: kurze Map-Wechsel-Animation statt nur Text-Overlay
 - [ ] 61.9.3 Post-Run-Summary-Screen: detaillierte Auswertung mit Score-Breakdown pro Sektor, Best-Combo, Mission-Completion-Rate, XP-Earned-Animation
 
 ### 61.10 Daily Challenge und Replay
 
-- [ ] 61.10.1 `ArcadeMenuSurface.js` / `ArcadeRunRuntime.js` â€” Daily Challenge implementieren: `computeDailySeed()` als Arcade-Seed verwenden, gleiche Sektor-Sequenz fuer alle Spieler
+- [ ] 61.10.1 `ArcadeMenuSurface.js` / `ArcadeRunRuntime.js` - Daily Challenge implementieren: `computeDailySeed()` als Arcade-Seed verwenden, gleiche Sektor-Sequenz fuer alle Spieler
 - [ ] 61.10.2 Replay-Integration: `replayRecorder` wird bereits gestartet/gestoppt, Replay-Abspielen implementieren oder als Feature-Flag vorbereiten
 
 ### 61.11 Code-Bereinigung und Shared Utilities
 
-- [ ] 61.11.1 `src/shared/utils/ArcadeUtils.js` (neu) â€” Gemeinsame Utility-Funktionen extrahieren: `toSafeNumber`, `clampNumber`, `clampInteger`, `normalizeSeed`, `createSeededRandom` (aktuell in 5+ Dateien dupliziert)
+- [ ] 61.11.1 `src/shared/utils/ArcadeUtils.js` (neu) - Gemeinsame Utility-Funktionen extrahieren: `toSafeNumber`, `clampNumber`, `clampInteger`, `normalizeSeed`, `createSeededRandom` (aktuell in 5+ Dateien dupliziert)
 - [ ] 61.11.2 Alle Arcade-Module (`ArcadeRunState.js`, `ArcadeScoreOps.js`, `ArcadeMissionState.js`, `ArcadeMapProgression.js`, `ArcadeEncounterCatalog.js`) auf Shared Utilities umstellen
 
 ### Phase 61.99: Integrations- und Abschluss-Gate
@@ -987,18 +999,18 @@ Scope:
 
 ### 62.1 Boost-Blend und Speed-Sway
 
-**Issue:** `CinematicCameraSystem.apply()` erhaelt nur `isBoosting` (Boolean), obwohl `CameraRigSystem` bereits einen smooth `boostBlend`-Float berechnet (Zeilen 293-300). Dadurch springt der Boost-Offset hart. Ausserdem ist der Sway rein zeitbasiert ohne Geschwindigkeitsabhaengigkeit â€” bei Stillstand schwingt die Kamera genauso wie bei Vollgas. Beim Boosten sollte der Sway gedaempft werden.
+**Issue:** `CinematicCameraSystem.apply()` erhaelt nur `isBoosting` (Boolean), obwohl `CameraRigSystem` bereits einen smooth `boostBlend`-Float berechnet (Zeilen 293-300). Dadurch springt der Boost-Offset hart. Ausserdem ist der Sway rein zeitbasiert ohne Geschwindigkeitsabhaengigkeit - bei Stillstand schwingt die Kamera genauso wie bei Vollgas. Beim Boosten sollte der Sway gedaempft werden.
 
 **Dateien:** `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js`
 
-- [ ] 62.1.1 `CinematicCameraSystem.apply()` â€” Neuen optionalen Parameter `boostBlend` (Float 0-1) akzeptieren statt nur `isBoosting`. Fallback: `isBoosting ? 1 : 0` fuer Rueckwaertskompatibilitaet.
-- [ ] 62.1.2 `CameraRigSystem.updateCamera()` â€” Den berechneten `boostBlend`-Float (Zeile 300) an `cinematicCameraSystem.apply()` als `boostBlend` durchreichen statt nur `isBoosting`.
-- [ ] 62.1.3 `CinematicCameraSystem.apply()` â€” Neuen optionalen Parameter `speed` (Float, Fahrzeuggeschwindigkeit) akzeptieren. Sway-Amount mit `clamp(speed / referenceSpeed, 0.1, 1.0)` skalieren, sodass bei Stillstand kaum Sway und bei Vollgas voller Sway wirkt.
-- [ ] 62.1.4 `CinematicCameraSystem.apply()` â€” Sway-Damping bei Boost: `swayAmount * (1 - boostBlend * 0.6)` â€” beim Boosten zieht sich die Kamera zusammen, weniger seitliches Schwingen.
+- [ ] 62.1.1 `CinematicCameraSystem.apply()` - Neuen optionalen Parameter `boostBlend` (Float 0-1) akzeptieren statt nur `isBoosting`. Fallback: `isBoosting ? 1 : 0` fuer Rueckwaertskompatibilitaet.
+- [ ] 62.1.2 `CameraRigSystem.updateCamera()` - Den berechneten `boostBlend`-Float (Zeile 300) an `cinematicCameraSystem.apply()` als `boostBlend` durchreichen statt nur `isBoosting`.
+- [ ] 62.1.3 `CinematicCameraSystem.apply()` - Neuen optionalen Parameter `speed` (Float, Fahrzeuggeschwindigkeit) akzeptieren. Sway-Amount mit `clamp(speed / referenceSpeed, 0.1, 1.0)` skalieren, sodass bei Stillstand kaum Sway und bei Vollgas voller Sway wirkt.
+- [ ] 62.1.4 `CinematicCameraSystem.apply()` - Sway-Damping bei Boost: `swayAmount * (1 - boostBlend * 0.6)` - beim Boosten zieht sich die Kamera zusammen, weniger seitliches Schwingen.
 
 ### 62.2 Code-Bereinigung und Redundanz-Abbau
 
-**Issue:** `cockpitCamera` wird an `CinematicCameraSystem.apply()` uebergeben aber im Destructuring ignoriert. `CameraRigSystem` Zeilen 420-428 berechnen einen `smoothFactor` mit `effectiveSmooth=1.0`, was das Lerp wirkungslos macht â€” ein einfaches `copy`/`lookAt` reicht. `_restoreBaseFov` wird im Cockpit-Pfad doppelt aufgerufen (Zeilen 349 + 354).
+**Issue:** `cockpitCamera` wird an `CinematicCameraSystem.apply()` uebergeben aber im Destructuring ignoriert. `CameraRigSystem` Zeilen 420-428 berechnen einen `smoothFactor` mit `effectiveSmooth=1.0`, was das Lerp wirkungslos macht - ein einfaches `copy`/`lookAt` reicht. `_restoreBaseFov` wird im Cockpit-Pfad doppelt aufgerufen (Zeilen 349 + 354).
 
 **Dateien:** `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js`
 
@@ -1107,13 +1119,13 @@ Scope:
 
 Stand: 2026-03-26
 
-- Abgeschlossen diese Woche: V56.1-V56.99, V57.1-V57.10 (Arcade Progression komplett).
+- Abgeschlossen diese Woche: V56.1-V56.99, V57.1-V57.99 (Arcade Progression komplett).
 - Blockiert: kein aktiver Blocker.
 - Naechste 4 Ziele:
-  1. V58: Architektur-Bereinigung â€” MediaRecorderSystem-Decomposition (1324â†’3 Module), Budget-Fixes (ui->state, state->core), UI-Store-Konsolidierung.
-  2. V59: Code-Qualitaet & Netzwerk-Haertung â€” Logger-Abstraktion (14 Dateien), Netzwerk-Adapter-Dedup, Async-Error-Konsistenz, Camera/Recording-Polish.
+  1. V58: Architektur-Bereinigung - MediaRecorderSystem-Decomposition (1324->3 Module), Budget-Fixes (ui->state, state->core), UI-Store-Konsolidierung.
+  2. V59: Code-Qualitaet & Netzwerk-Haertung - Logger-Abstraktion (14 Dateien), Netzwerk-Adapter-Dedup, Async-Error-Konsistenz, Camera/Recording-Polish.
   3. V60: Architektur- und Totcode-Konsolidierung - Architektur-Guard voll belastbar machen, `knip`-Blindspots schliessen, dormant multiplayer/input paths entscheiden.
-  4. V61: Arcade-Modus Gameplay-Verbesserungen â€” Score dynamisieren, Combo durch In-Game-Actions, Modifier-Effekte, Sudden Death, Mission-Erweiterung, In-Game HUD, Daily Challenge.
+  4. V61: Arcade-Modus Gameplay-Verbesserungen - Score dynamisieren, Combo durch In-Game-Actions, Modifier-Effekte, Sudden Death, Mission-Erweiterung, In-Game HUD, Daily Challenge.
 - Audit-Befunde (2026-03-26): Tiefenanalyse ueber 384 JS-Dateien identifizierte 47 konkrete Issues in 15 modifizierten Dateien + codebase-weite Patterns. Kernprobleme: MediaRecorderSystem God-Object (1324 Zeilen), 3 Architektur-Budget-Verletzungen, 14 Dateien mit Production-Console-Logging, 21 Browser-Global-Zugriffe in Core, 18+ async-Pfade ohne Error-Handling, fehlende Tests fuer groesste Module.
 - Entscheidungsbedarf: V58 vor V59 (sequenziell) oder parallele Streams (V58.2 + V59.1 gleichzeitig moeglich da keine Datei-Ueberlappung).
 
