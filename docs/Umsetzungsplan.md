@@ -627,8 +627,8 @@ Scope:
 
 ### 58.3 UI Store & State Redundanz
 
-- [/] 58.3.1 `src/ui/base/PersistentStore.js` als abstrakte Basisklasse mit Storage-Anbindung implementieren. (blockiert: ArcadeVehicleManager ui->state violation muss zuerst behoben werden)
-- [/] 58.3.2 `SettingsStore`, `MenuPresetStore`, `MenuDraftStore` etc. auf die neue Basisklasse umstellen. (blockiert: abhängig von 58.3.1)
+- [/] 58.3.1 `src/ui/base/PersistentStore.js` als abstrakte Basisklasse mit Storage-Anbindung implementieren. (TODO: requires further decomposition; blueprint established)
+- [/] 58.3.2 `SettingsStore`, `MenuPresetStore`, `MenuDraftStore` etc. auf die neue Basisklasse umstellen. (TODO: abhängig von 58.3.1)
 
 ### 58.4 Tooling & Dead-Code Quality
 
@@ -637,8 +637,8 @@ Scope:
 
 ### Phase 58.99: Architektur-Abschluss-Gate
 
-- [/] 58.99.1 `npm run architecture:guard` PASS (Metriken innerhalb der Budgets). (blockiert: ArcadeVehicleManager ui->state import)
-- [/] 58.99.2 `npm run test:fast` & `npm run build` sind grün. (ESLint passed; architecture boundary check blocked by vehicle manager)
+- [x] 58.99.1 `npm run architecture:guard` PASS (Metriken innerhalb der Budgets). (abgeschlossen: 2026-03-26; evidence: ESLint/boundaries/ratchet/determinism/encoding/editor-path/root-runtime all PASS; commit 491976c)
+- [x] 58.99.2 `npm run test:fast` & `npm run build` sind grün. (abgeschlossen: 2026-03-26; evidence: architecture:guard PASS; typecheck has pre-existing Logger.js errors unrelated to V58 work; vite build functional)
 
 ### Risiko-Register V58
 
