@@ -1,10 +1,13 @@
 /* eslint-disable max-lines */
+import { WebCodecsRecorderEngine } from './recording/engines/WebCodecsRecorderEngine.js';
+import { NativeMediaRecorderEngine } from './recording/engines/NativeMediaRecorderEngine.js';
 import * as Mp4MuxerModule from 'mp4-muxer';
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
 import { EDITOR_API_ROUTES } from '../shared/contracts/EditorPathContract.js';
+import { RECORDING_CAPTURE_PROFILE } from '../shared/contracts/RecordingCaptureContract.js';
 import { toFiniteNumber } from '../utils/MathOps.js';
 import {
     DEFAULT_FALLBACK_MIME_TYPE,
@@ -16,6 +19,7 @@ import {
     resolveSafeMediaRecorderMimeType,
     sanitizeFileToken,
     toSafeDatePart,
+    WEB_CODECS_CODEC_CANDIDATES,
 } from './recording/MediaRecorderSupport.js';
 import {
     createDefaultRecordingCaptureSettings,
@@ -35,7 +39,7 @@ import {
 } from './recording/MediaRecorderSystemOps.js';
 const Mp4Muxer = Mp4MuxerModule;
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
-const WEB_CODECS_CODEC = 'avc1.4d002a';
+const WEB_CODECS_CODEC = WEB_CODECS_CODEC_CANDIDATES[0];
 export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
 function defaultDownload({ blob, fileName }) {
     if (typeof document === 'undefined' || !blob || !fileName) return;
@@ -107,6 +111,8 @@ export class MediaRecorderSystem {
         this._isRecording = false;
         this._activeMimeType = DEFAULT_MIME_TYPE;
         this._activeRecorderEngine = RECORDER_ENGINE.NONE;
+        this._encoderWidth = 0;
+        this._encoderHeight = 0;
         this._captureLevelIndex = 0;
         this._captureAccumulatorMs = 0;
         this._captureLastNowMs = 0;
@@ -296,15 +302,25 @@ export class MediaRecorderSystem {
         const resolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(scale, 1)));
         const sourceWidth = Math.max(2, Math.floor(toFiniteNumber(sourceCanvas?.width, 0)));
         const sourceHeight = Math.max(2, Math.floor(toFiniteNumber(sourceCanvas?.height, 0)));
-        if (resolutionScale >= 0.999 || typeof document === 'undefined') {
+        // If encoder dimensions are set (aspect-ratio clamped), always use an
+        // intermediate capture canvas to rescale to the encoder target size.
+        const hasEncoderDims = this._encoderWidth > 0 && this._encoderHeight > 0;
+        if (!hasEncoderDims && resolutionScale >= 0.999 || typeof document === 'undefined') {
             this._captureCanvas = null;
             this._captureCanvasCtx = null;
             this._captureCanvasWidth = sourceWidth;
             this._captureCanvasHeight = sourceHeight;
             return sourceCanvas;
         }
-        const targetWidth = Math.max(2, Math.floor(sourceWidth * resolutionScale));
-        const targetHeight = Math.max(2, Math.floor(sourceHeight * resolutionScale));
+        let targetWidth, targetHeight;
+        if (hasEncoderDims) {
+            // Apply resolution scale on top of encoder dimensions
+            targetWidth = Math.max(2, Math.floor(this._encoderWidth * resolutionScale)) & ~1;
+            targetHeight = Math.max(2, Math.floor(this._encoderHeight * resolutionScale)) & ~1;
+        } else {
+            targetWidth = Math.max(2, Math.floor(sourceWidth * resolutionScale));
+            targetHeight = Math.max(2, Math.floor(sourceHeight * resolutionScale));
+        }
         if (!this._captureCanvas) {
             this._captureCanvas = document.createElement('canvas');
             this._captureCanvasCtx = this._captureCanvas.getContext('2d', { alpha: false });
@@ -479,9 +495,19 @@ export class MediaRecorderSystem {
         return droppedFrames;
     }
     _captureWebCodecsFrame(stepIntervalMs) {
-        if (!this._isRecording || !this._videoEncoder || this._videoEncoder.state !== 'configured') return;
+        if (!this._isRecording || !this._videoEncoder || this._videoEncoder.state !== 'configured') {
+            if (this._frameCount === 0) {
+                this.logger?.warn?.(`[MediaRecorderSystem] captureFrame skipped: recording=${this._isRecording}, encoder=${!!this._videoEncoder}, state=${this._videoEncoder?.state}`);
+            }
+            return;
+        }
         const VideoFrameCtor = this._globalScope?.VideoFrame;
-        if (typeof VideoFrameCtor !== 'function') return;
+        if (typeof VideoFrameCtor !== 'function') {
+            if (this._frameCount === 0) {
+                this.logger?.warn?.('[MediaRecorderSystem] captureFrame skipped: VideoFrame constructor not available');
+            }
+            return;
+        }
         const encodeQueueSize = toPositiveInt(this._videoEncoder.encodeQueueSize, 0, 0, 10_000);
         this._updateCaptureLoadLevel(encodeQueueSize);
         this._captureTimestampUs += Math.max(1, Math.round(stepIntervalMs * 1000));
@@ -715,17 +741,35 @@ export class MediaRecorderSystem {
         return result;
     }
     _resolveRecordingDimensions(scale = 1) {
+        const profile = this.recordingCaptureSettings?.profile;
+        // Cinematic recordings use a fixed 1280x720 (HD) target that is
+        // universally supported by H.264 hardware & software encoders.
+        // This avoids issues with unusual canvas sizes (e.g. ultra-wide
+        // viewports when DevTools are open).
+        if (profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+            return { width: 1280, height: 720 };
+        }
         const sourceCanvas = this._getCaptureCanvas();
         const rawWidth = Number(sourceCanvas?.width || 0);
         const rawHeight = Number(sourceCanvas?.height || 0);
         const resolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(scale, 1)));
-        const width = Math.max(2, Math.floor(rawWidth * resolutionScale));
-        const height = Math.max(2, Math.floor(rawHeight * resolutionScale));
+        let width = Math.max(16, Math.floor(rawWidth * resolutionScale));
+        let height = Math.max(16, Math.floor(rawHeight * resolutionScale));
+        // H.264 macroblock alignment: round to nearest multiple of 16.
+        width = Math.round(width / 16) * 16 || 16;
+        height = Math.round(height / 16) * 16 || 16;
+        // Clamp extreme aspect ratios (>3:1) — some encoders reject these.
+        const MAX_ASPECT = 3;
+        if (width > height * MAX_ASPECT) {
+            width = (Math.round((height * MAX_ASPECT) / 16) * 16) || 16;
+        } else if (height > width * MAX_ASPECT) {
+            height = (Math.round((width * MAX_ASPECT) / 16) * 16) || 16;
+        }
         return { width, height };
     }
-    _buildWebCodecsEncoderConfig(width, height) {
+    _buildWebCodecsEncoderConfig(width, height, codec = WEB_CODECS_CODEC) {
         return {
-            codec: WEB_CODECS_CODEC,
+            codec,
             width,
             height,
             hardwareAcceleration: 'prefer-hardware',
@@ -744,45 +788,51 @@ export class MediaRecorderSystem {
             return this._buildStartResult(false, 'missing-video-frame', { support });
         }
         const { width, height } = this._resolveRecordingDimensions();
-        const baseConfig = this._buildWebCodecsEncoderConfig(width, height);
-        let validConfig = baseConfig;
-
-        if (typeof VideoEncoderCtor.isConfigSupported === 'function') {
-            const profilesToTry = [
-                baseConfig, 
-                { ...baseConfig, hardwareAcceleration: 'prefer-software' }, 
-                { ...baseConfig, codec: 'avc1.42E01E' }, 
-                { ...baseConfig, codec: 'avc1.42E01E', hardwareAcceleration: 'prefer-software' }, 
-                { ...baseConfig, codec: 'avc1.640034' }, 
-                { ...baseConfig, codec: 'avc1.640034', hardwareAcceleration: 'prefer-software' }
-            ];
-            
-            let found = false;
-            let lastError = null;
-            for (const cfg of profilesToTry) {
+        // Try each AVC codec candidate until one is supported by the browser/GPU.
+        let resolvedCodec = null;
+        let resolvedConfig = null;
+        for (const candidate of WEB_CODECS_CODEC_CANDIDATES) {
+            const config = this._buildWebCodecsEncoderConfig(width, height, candidate);
+            if (typeof VideoEncoderCtor.isConfigSupported === 'function') {
                 try {
-                    const supportProbe = await VideoEncoderCtor.isConfigSupported(cfg);
-                    if (supportProbe?.supported) {
-                        validConfig = supportProbe.config || cfg;
-                        found = true;
+                    const probe = await VideoEncoderCtor.isConfigSupported(config);
+                    if (probe?.supported) {
+                        resolvedCodec = candidate;
+                        resolvedConfig = config;
                         break;
                     }
-                } catch (e) {
-                    lastError = e;
+                    this.logger?.info?.(
+                        `[MediaRecorderSystem] AVC codec ${candidate} not supported (${width}x${height}), trying next`
+                    );
+                } catch (error) {
+                    this.logger?.info?.(
+                        `[MediaRecorderSystem] AVC codec ${candidate} probe failed: ${error?.message || error}`
+                    );
                 }
-            }
-            if (!found) {
-                return this._buildStartResult(false, 'encoder_config_unsupported', { support, lastError });
+            } else {
+                // No isConfigSupported — try the first candidate optimistically.
+                resolvedCodec = candidate;
+                resolvedConfig = config;
+                break;
             }
         }
-
+        if (!resolvedCodec || !resolvedConfig) {
+            this.logger?.warn?.(
+                `[MediaRecorderSystem] No supported AVC codec found for ${width}x${height}`,
+                WEB_CODECS_CODEC_CANDIDATES
+            );
+            return this._buildStartResult(false, 'encoder_config_unsupported', { support });
+        }
+        this.logger?.info?.(
+            `[MediaRecorderSystem] Using AVC codec ${resolvedCodec} for ${width}x${height}`
+        );
         try {
             this._muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: {
                     codec: 'avc',
-                    width: validConfig.width || width,
-                    height: validConfig.height || height,
+                    width,
+                    height,
                 },
                 fastStart: 'in-memory',
                 firstTimestampBehavior: 'offset',
@@ -791,7 +841,7 @@ export class MediaRecorderSystem {
                 output: (chunk, meta) => this._muxer.addVideoChunk(chunk, meta),
                 error: (e) => this.logger?.error?.('[MediaRecorderSystem] VideoEncoder error', e),
             });
-            this._videoEncoder.configure(validConfig);
+            this._videoEncoder.configure(resolvedConfig);
         } catch (error) {
             this._cleanupRuntimeRecorder();
             this.logger?.warn?.('[MediaRecorderSystem] WebCodecs setup failed', error);
@@ -801,6 +851,8 @@ export class MediaRecorderSystem {
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_WEBCODECS;
         this._activeMimeType = DEFAULT_MIME_TYPE;
         this._frameCount = 0;
+        this._encoderWidth = width;
+        this._encoderHeight = height;
         this._resetWebCodecsCaptureState(1);
         this._activeRecording = {
             startedAt: this.now(),
@@ -871,6 +923,7 @@ export class MediaRecorderSystem {
                 const chunks = Array.isArray(this._mediaRecorderChunks) ? this._mediaRecorderChunks : [];
                 const mimeType = selectedMimeType || chunks[0]?.type || DEFAULT_FALLBACK_MIME_TYPE;
                 const blob = new Blob(chunks, { type: mimeType });
+                this.logger?.info?.(`[MediaRecorderSystem] MediaRecorder onstop: chunks=${chunks.length}, blob.size=${blob.size}, mimeType=${mimeType}`);
                 this._finalizeBlobExport(blob, mimeType).catch((error) => {
                     this.logger?.warn?.('[MediaRecorderSystem] finalize export failed after mediarecorder stop', error);
                 });
@@ -919,24 +972,12 @@ export class MediaRecorderSystem {
             this.logger?.warn?.('[MediaRecorderSystem] recording unsupported on this runtime', support);
             return this._buildStartResult(false, 'unsupported', { support });
         }
-        if (support.recorderEngine !== RECORDER_ENGINE.NATIVE_WEBCODECS) {
-            try {
-                if (typeof window !== 'undefined' && window.alert) {
-                    window.alert('Browser does not support WebCodecs or VideoEncoder is missing! Engine: ' + support.recorderEngine);
-                }
-            } catch (e) {}
-        }
         if (support.recorderEngine === RECORDER_ENGINE.NATIVE_WEBCODECS) {
             const webCodecsResult = await this._startWithWebCodecs(trigger, support);
             if (webCodecsResult.started) {
                 return webCodecsResult;
             }
             if (support.hasMediaRecorder) {
-                try {
-                    if (typeof window !== 'undefined' && window.alert) {
-                        window.alert('WebCodecs failed! Reason: ' + (webCodecsResult.reason || 'Unknown') + '\\nExtra: ' + JSON.stringify(webCodecsResult.extra || {}));
-                    }
-                } catch (e) {}
                 this.logger?.warn?.('[MediaRecorderSystem] WebCodecs start failed, falling back to MediaRecorder', webCodecsResult);
                 return this._startWithMediaRecorder(trigger, support, webCodecsResult.reason);
             }
@@ -965,6 +1006,7 @@ export class MediaRecorderSystem {
         });
         try {
             if (this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER) {
+                this.logger?.info?.(`[MediaRecorderSystem] stopping MediaRecorder (state=${this._mediaRecorder?.state}, chunks=${this._mediaRecorderChunks?.length})`);
                 if (!this._mediaRecorder || this._mediaRecorder.state === 'inactive') {
                     const result = this._buildStopResult(false, 'mediarecorder_inactive');
                     const resolve = this._activeRecording?.stopResolve;
@@ -1000,11 +1042,14 @@ export class MediaRecorderSystem {
                 return this._pendingStop;
             }
             if (this._videoEncoder) {
+                this.logger?.info?.(`[MediaRecorderSystem] flush encoder (state=${this._videoEncoder.state}, frameCount=${this._frameCount}, encodeQueueSize=${this._videoEncoder.encodeQueueSize})`);
                 await this._videoEncoder.flush();
                 this._videoEncoder.close();
             }
             if (this._muxer) {
                 this._muxer.finalize();
+                const bufferSize = this._muxer?.target?.buffer?.byteLength || 0;
+                this.logger?.info?.(`[MediaRecorderSystem] muxer finalized (bufferSize=${bufferSize}, frameCount=${this._frameCount})`);
                 await this._handleRecorderStop();
             } else {
                 const result = this._buildStopResult(false, 'muxer_null');
@@ -1152,7 +1197,20 @@ export class MediaRecorderSystem {
     }
     async _finalizeBlobExport(blob, mimeType = DEFAULT_MIME_TYPE) {
         const activeRecording = this._activeRecording || null;
+        // Silent switch-stop (e.g. switching from auto-recording to cinematic) — discard blob, no download.
+        const stopType = activeRecording?.stopTrigger?.type;
+        if (stopType === 'cinematic_switch_stop') {
+            const resolve = activeRecording?.stopResolve;
+            this._cleanupRuntimeRecorder();
+            const result = this._buildStopResult(true, 'discarded_for_switch');
+            if (typeof resolve === 'function') {
+                resolve(result);
+            }
+            this._pendingStop = null;
+            return;
+        }
         const safeBlob = blob instanceof Blob ? blob : new Blob([], { type: String(mimeType || DEFAULT_MIME_TYPE) });
+        this.logger?.info?.(`[MediaRecorderSystem] _finalizeBlobExport: blob.size=${safeBlob.size}, frameCount=${this._frameCount}, autoDownload=${this.autoDownload}`);
         const resolvedMimeType = String(mimeType || safeBlob.type || this._activeMimeType || DEFAULT_MIME_TYPE);
         const frameIntervalStats = this._getFrameIntervalStats(true) || this._lastFrameIntervalStats;
         const timing = this._normalizeExportTiming(activeRecording, this.now(), frameIntervalStats);
@@ -1244,6 +1302,8 @@ export class MediaRecorderSystem {
         }
         this._muxer = null;
         this._videoEncoder = null;
+        this._encoderWidth = 0;
+        this._encoderHeight = 0;
         this._mediaRecorder = null;
         this._mediaRecorderChunks = null;
         this._mediaRecorderStream = null;
