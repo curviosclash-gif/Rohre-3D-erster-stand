@@ -22,6 +22,60 @@ $mimeTypes = @{
     ".map"  = "application/json"
 }
 
+function Get-ChromeExecutablePath {
+    $chromeCommand = Get-Command "chrome.exe" -ErrorAction SilentlyContinue
+    if ($chromeCommand -and $chromeCommand.Source) {
+        return $chromeCommand.Source
+    }
+
+    $registryKeys = @(
+        "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe",
+        "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe"
+    )
+
+    foreach ($registryKey in $registryKeys) {
+        try {
+            $registryItem = Get-Item $registryKey -ErrorAction Stop
+            $registryPath = $registryItem.GetValue("")
+            if ($registryPath -and (Test-Path $registryPath)) {
+                return $registryPath
+            }
+        }
+        catch {}
+    }
+
+    $baseDirectories = @(
+        $env:ProgramFiles,
+        ${env:ProgramFiles(x86)},
+        $env:LocalAppData
+    ) | Where-Object { $_ }
+
+    foreach ($baseDirectory in $baseDirectories) {
+        $chromePath = Join-Path $baseDirectory "Google\Chrome\Application\chrome.exe"
+        if (Test-Path $chromePath) {
+            return $chromePath
+        }
+    }
+
+    return $null
+}
+
+function Open-UrlInChrome {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Url
+    )
+
+    $chromePath = Get-ChromeExecutablePath
+    if ($chromePath) {
+        Start-Process -FilePath $chromePath -ArgumentList $Url
+        return
+    }
+
+    Write-Host "Chrome nicht gefunden. Verwende Standardbrowser." -ForegroundColor Yellow
+    Start-Process $Url
+}
+
 function Start-ListenerOnFirstFreePort {
     param(
         [int]$StartPort,
@@ -72,7 +126,7 @@ try {
     Write-Host ""
 
     if (-not $NoBrowser) {
-        Start-Process "http://localhost:$activePort"
+        Open-UrlInChrome -Url "http://localhost:$activePort"
     }
 
     while ($listener.IsListening) {
