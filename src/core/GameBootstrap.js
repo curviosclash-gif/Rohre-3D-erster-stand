@@ -9,7 +9,6 @@ import { PlanarAimAssistSystem } from './PlanarAimAssistSystem.js';
 import { MatchSessionRuntimeBridge } from './MatchSessionRuntimeBridge.js';
 import { BuildInfoController } from './BuildInfoController.js';
 import { MediaRecorderSystem } from './MediaRecorderSystem.js';
-import { RECORDING_CAPTURE_PROFILE } from '../shared/contracts/RecordingCaptureContract.js';
 import { createRuntimePorts } from '../shared/runtime/GameRuntimePorts.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { CONFIG } from './Config.js';
@@ -136,5 +135,6 @@ export function bootstrapGameRuntime(game, options = {}) {
         showStatusToast,
     });
 
-
+    // F9 cinematic recording is handled exclusively via main.js _toggleRecordingFromGlobalHotkey()
+    // to avoid double-trigger with InputManager's justPressed cache.
 }

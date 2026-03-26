@@ -6,16 +6,18 @@
   "description": "CurviosClash Desktop App - Host multiplayer games",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --config electron-builder.json"
+    "build": "electron-builder"
   },
   "build": {
     "appId": "com.curviosclash.app",
     "productName": "CurviosClash",
     "files": [
       "main.js",
-      "preload.js",
+      "preload.cjs",
+      "static-server.js",
       "../dist/**/*",
-      "../server/lan-signaling.js"
+      "../server/**/*.js",
+      "../src/shared/contracts/**/*.js"
     ],
     "directories": {
       "output": "../release"

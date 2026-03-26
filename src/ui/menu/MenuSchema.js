@@ -1,21 +1,7 @@
 import { MENU_ACCESS_POLICIES } from './MenuAccessPolicy.js';
-import { DEFAULT_MENU_FEATURE_FLAGS } from './MenuStateContracts.js';
+import { createMenuFeatureFlags } from './MenuStateContracts.js';
 
 export const MENU_SCHEMA_VERSION = 'menu-schema.v1';
-
-function normalizeBoolean(value, fallback) {
-    return typeof value === 'boolean' ? value : fallback;
-}
-
-function createFeatureFlags(sourceFlags = null) {
-    const source = sourceFlags && typeof sourceFlags === 'object' ? sourceFlags : {};
-    return {
-        menuV26Enabled: normalizeBoolean(source.menuV26Enabled, DEFAULT_MENU_FEATURE_FLAGS.menuV26Enabled),
-        multiplayerStubEnabled: normalizeBoolean(source.multiplayerStubEnabled, DEFAULT_MENU_FEATURE_FLAGS.multiplayerStubEnabled),
-        developerModeEnabled: normalizeBoolean(source.developerModeEnabled, DEFAULT_MENU_FEATURE_FLAGS.developerModeEnabled),
-        allowOpenPresetEditing: normalizeBoolean(source.allowOpenPresetEditing, DEFAULT_MENU_FEATURE_FLAGS.allowOpenPresetEditing),
-    };
-}
 
 function createPanelSchema(featureFlags) {
     return [
@@ -180,7 +166,7 @@ function createCompatibilityAliases() {
 }
 
 export function createMenuSchema(options = {}) {
-    const featureFlags = createFeatureFlags(options.featureFlags);
+    const featureFlags = createMenuFeatureFlags(options.featureFlags);
     const panels = createPanelSchema(featureFlags);
     const navItems = panels
         .filter((panel) => panel.visibility !== 'hidden')

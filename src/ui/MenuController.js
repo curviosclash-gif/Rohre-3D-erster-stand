@@ -4,6 +4,7 @@ import { setupMenuGameplayBindings } from './menu/MenuGameplayBindings.js';
 import { setupMenuProfileBindings } from './menu/MenuProfileBindings.js';
 import { setupMenuControlBindings } from './menu/MenuControlBindings.js';
 import { setupMenuDevPanelBindings } from './menu/MenuDevPanelBindings.js';
+import { resolveRuntimeMenuFeatureFlags } from './menu/MenuRuntimeFeatureFlags.js';
 import {
     MENU_CONTROLLER_EVENT_CONTRACT_VERSION,
     MENU_CONTROLLER_EVENT_TYPES,
@@ -121,6 +122,7 @@ export class MenuController {
         const bindingContext = {
             ui: this.ui,
             settings: this.settings,
+            featureFlags: resolveRuntimeMenuFeatureFlags(this.settings?.menuFeatureFlags),
             eventTypes: MENU_CONTROLLER_EVENT_TYPES,
             settingsChangeKeys: SETTINGS_CHANGE_KEYS,
             emit: (type, payload) => this._emit(type, payload),

@@ -283,8 +283,18 @@ export class Game {
 
         // Case 1: Cinematic recording is active → stop it
         if (isCinematicRecording) {
-            recorder.stopRecording({ type: 'cinematic_manual_stop' }).catch(() => {});
-            this._showStatusToast('Cinematic-Aufnahme: gestoppt', 1200, 'info');
+            this._showStatusToast('Cinematic-Aufnahme: wird gespeichert...', 1200, 'info');
+            recorder.stopRecording({ type: 'cinematic_manual_stop' }).then((result) => {
+                if (result?.stopped) {
+                    const sizeMB = ((result.sizeBytes || 0) / (1024 * 1024)).toFixed(1);
+                    const ext = (result.mimeType || '').includes('mp4') ? 'MP4' : 'WebM';
+                    this._showStatusToast(`Cinematic ${ext} gespeichert (${sizeMB} MB)`, 2500, 'success');
+                } else {
+                    this._showStatusToast('Cinematic-Aufnahme: Speichern fehlgeschlagen', 2000, 'error');
+                }
+            }).catch(() => {
+                this._showStatusToast('Cinematic-Aufnahme: Fehler beim Stoppen', 2000, 'error');
+            });
             return;
         }
 
@@ -314,7 +324,9 @@ export class Game {
         }
         const result = await recorder.startRecording({ type: 'cinematic_manual_start' });
         if (result?.started) {
-            this._showStatusToast('Cinematic-Aufnahme: gestartet (F9 zum Stoppen)', 1400, 'success');
+            const engine = result?.recorderEngine || 'unknown';
+            const format = engine === 'native-webcodecs' ? 'MP4' : 'WebM';
+            this._showStatusToast(`Cinematic-Aufnahme: gestartet als ${format} (F9 zum Stoppen)`, 1800, 'success');
         } else {
             this._showStatusToast(`Cinematic-Aufnahme: Start fehlgeschlagen (${result?.reason || 'unknown'})`, 2500, 'error');
         }

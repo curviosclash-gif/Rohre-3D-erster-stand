@@ -13,6 +13,15 @@ const MEDIA_RECORDER_MIME_CANDIDATES = Object.freeze([
     'video/webm',
 ]);
 
+export const WEB_CODECS_CODEC_CANDIDATES = Object.freeze([
+    // AVC (H.264) — best compatibility with editors (CapCut, Premiere, etc.)
+    { codec: 'avc1.4d002a', muxerCodec: 'avc', family: 'avc' },  // High Profile, Level 4.2
+    { codec: 'avc1.4d401f', muxerCodec: 'avc', family: 'avc' },  // Main Profile, Level 3.1
+    { codec: 'avc1.42001f', muxerCodec: 'avc', family: 'avc' },  // Baseline Profile, Level 3.1
+    // VP9 — Firefox fallback, produces MP4 with VP9 (CapCut compatible)
+    { codec: 'vp09.00.10.08', muxerCodec: 'vp9', family: 'vp9' },  // VP9 Profile 0, Level 1.0
+]);
+
 export const RECORDER_ENGINE = Object.freeze({
     NATIVE_WEBCODECS: 'webcodecs-native',
     NATIVE_MEDIARECORDER: 'mediarecorder-native',

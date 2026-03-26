@@ -1081,6 +1081,9 @@ function trainingDashboardApiPlugin() {
 
 export default defineConfig({
     plugins: [editorDiskSaveApiPlugin(), latestCheckpointApiPlugin(), trainingDashboardApiPlugin()],
+    server: {
+        open: true,
+    },
     build: {
         chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT_KB,
         rollupOptions: {

@@ -767,16 +767,22 @@ export class MediaRecorderSystem {
         }
         return { width, height };
     }
-    _buildWebCodecsEncoderConfig(width, height, codec = WEB_CODECS_CODEC) {
-        return {
+    _buildWebCodecsEncoderConfig(width, height, candidate) {
+        const codec = typeof candidate === 'object' ? candidate.codec : candidate;
+        const family = typeof candidate === 'object' ? candidate.family : 'avc';
+        const config = {
             codec,
             width,
             height,
             hardwareAcceleration: 'prefer-hardware',
             bitrate: 8000000,
             framerate: this.captureFps,
-            avc: { format: 'avc' },
         };
+        // AVC-specific: annex-b format needed for mp4-muxer
+        if (family === 'avc') {
+            config.avc = { format: 'avc' };
+        }
+        return config;
     }
     async _startWithWebCodecs(trigger, support) {
         const VideoEncoderCtor = this._globalScope?.VideoEncoder;
@@ -788,49 +794,51 @@ export class MediaRecorderSystem {
             return this._buildStartResult(false, 'missing-video-frame', { support });
         }
         const { width, height } = this._resolveRecordingDimensions();
-        // Try each AVC codec candidate until one is supported by the browser/GPU.
-        let resolvedCodec = null;
+        // Try each codec candidate (AVC first, then VP9) until one is supported.
+        let resolvedCandidate = null;
         let resolvedConfig = null;
         for (const candidate of WEB_CODECS_CODEC_CANDIDATES) {
             const config = this._buildWebCodecsEncoderConfig(width, height, candidate);
+            const codecStr = typeof candidate === 'object' ? candidate.codec : candidate;
             if (typeof VideoEncoderCtor.isConfigSupported === 'function') {
                 try {
                     const probe = await VideoEncoderCtor.isConfigSupported(config);
                     if (probe?.supported) {
-                        resolvedCodec = candidate;
+                        resolvedCandidate = candidate;
                         resolvedConfig = config;
                         break;
                     }
                     this.logger?.info?.(
-                        `[MediaRecorderSystem] AVC codec ${candidate} not supported (${width}x${height}), trying next`
+                        `[MediaRecorderSystem] codec ${codecStr} not supported (${width}x${height}), trying next`
                     );
                 } catch (error) {
                     this.logger?.info?.(
-                        `[MediaRecorderSystem] AVC codec ${candidate} probe failed: ${error?.message || error}`
+                        `[MediaRecorderSystem] codec ${codecStr} probe failed: ${error?.message || error}`
                     );
                 }
             } else {
-                // No isConfigSupported — try the first candidate optimistically.
-                resolvedCodec = candidate;
+                resolvedCandidate = candidate;
                 resolvedConfig = config;
                 break;
             }
         }
-        if (!resolvedCodec || !resolvedConfig) {
+        if (!resolvedCandidate || !resolvedConfig) {
             this.logger?.warn?.(
-                `[MediaRecorderSystem] No supported AVC codec found for ${width}x${height}`,
+                `[MediaRecorderSystem] No supported codec found for ${width}x${height}`,
                 WEB_CODECS_CODEC_CANDIDATES
             );
             return this._buildStartResult(false, 'encoder_config_unsupported', { support });
         }
+        const muxerCodec = typeof resolvedCandidate === 'object' ? resolvedCandidate.muxerCodec : 'avc';
+        const codecStr = typeof resolvedCandidate === 'object' ? resolvedCandidate.codec : resolvedCandidate;
         this.logger?.info?.(
-            `[MediaRecorderSystem] Using AVC codec ${resolvedCodec} for ${width}x${height}`
+            `[MediaRecorderSystem] Using codec ${codecStr} (muxer: ${muxerCodec}) for ${width}x${height}`
         );
         try {
             this._muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: {
-                    codec: 'avc',
+                    codec: muxerCodec,
                     width,
                     height,
                 },

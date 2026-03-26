@@ -13,6 +13,7 @@ import { createMenuSchema } from './menu/MenuSchema.js';
 import { MenuPanelRegistry } from './menu/MenuPanelRegistry.js';
 import { resolveMenuAccessContext } from './menu/MenuAccessPolicy.js';
 import { ensureMenuContractState, MENU_SESSION_TYPES } from './menu/MenuStateContracts.js';
+import { resolveRuntimeMenuFeatureFlags } from './menu/MenuRuntimeFeatureFlags.js';
 import { MenuStateMachine, MENU_STATE_IDS } from './menu/MenuStateMachine.js';
 import { listMenuTextCatalogEntries } from './menu/MenuTextCatalog.js';
 import { MenuTextRuntime } from './menu/MenuTextRuntime.js';
@@ -48,9 +49,10 @@ export class UIManager {
         this._lastMenuTrigger = game?._lastMenuTrigger || null;
         this._submenuPanels = [];
         this._accessContext = resolveMenuAccessContext(this.settings);
+        this._runtimeFeatureFlags = resolveRuntimeMenuFeatureFlags(this.settings?.menuFeatureFlags);
         this.menuSchema = game?.menuSchema && typeof game.menuSchema === 'object'
             ? game.menuSchema
-            : createMenuSchema({ featureFlags: this.settings?.menuFeatureFlags });
+            : createMenuSchema({ featureFlags: this._runtimeFeatureFlags });
         this.menuPanelRegistry = game?.menuPanelRegistry instanceof MenuPanelRegistry
             ? game.menuPanelRegistry
             : new MenuPanelRegistry(this.menuSchema);

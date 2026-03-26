@@ -19,6 +19,7 @@ export const DEFAULT_MENU_FEATURE_FLAGS = Object.freeze({
     multiplayerStubEnabled: true,
     developerModeEnabled: true,
     allowOpenPresetEditing: true,
+    canHost: false,
 });
 
 export const MENU_DEVELOPER_ACCESS_MODES = Object.freeze({
@@ -96,6 +97,7 @@ export function createMenuFeatureFlags(flags = null) {
         multiplayerStubEnabled: normalizeBoolean(source.multiplayerStubEnabled, DEFAULT_MENU_FEATURE_FLAGS.multiplayerStubEnabled),
         developerModeEnabled: normalizeBoolean(source.developerModeEnabled, DEFAULT_MENU_FEATURE_FLAGS.developerModeEnabled),
         allowOpenPresetEditing: normalizeBoolean(source.allowOpenPresetEditing, DEFAULT_MENU_FEATURE_FLAGS.allowOpenPresetEditing),
+        canHost: normalizeBoolean(source.canHost, DEFAULT_MENU_FEATURE_FLAGS.canHost),
     };
 }
 
