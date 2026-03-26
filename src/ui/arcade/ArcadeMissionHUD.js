@@ -1,6 +1,6 @@
 // ─── Arcade Mission HUD: In-Game Mission Display Overlay ───
 
-import { formatMissionProgress, MISSION_TYPES } from '../../state/arcade/ArcadeMissionState.js';
+import { formatMissionProgress, MISSION_TYPES } from '../../shared/contracts/ArcadeMissionContract.js';
 
 const MISSION_ICON_MAP = {
     crosshair: '\u2316',
