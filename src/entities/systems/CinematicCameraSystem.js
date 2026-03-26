@@ -4,6 +4,7 @@ const DIRECTION_MIN_LENGTH_SQ = 1e-6;
 const SIDE_MIN_LENGTH_SQ = 1e-6;
 const BLEND_EPSILON = 0.0001;
 const SWAY_PLAYER_PHASE_OFFSET = 0.7;
+const MAX_PLAYER_INDEX = 7;
 
 export class CinematicCameraSystem {
     constructor({
@@ -55,7 +56,7 @@ export class CinematicCameraSystem {
         isBoosting = false,
     }) {
         if (!target || !playerDirection || !playerPosition) return;
-        if (!Number.isInteger(playerIndex) || playerIndex < 0) return;
+        if (!Number.isInteger(playerIndex) || playerIndex < 0 || playerIndex > MAX_PLAYER_INDEX) return;
 
         const cinematicPreferred = this.enabled && mode === 'THIRD_PERSON';
         const targetBlend = cinematicPreferred ? 1 : 0;

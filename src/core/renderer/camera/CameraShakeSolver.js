@@ -19,6 +19,8 @@ const SHAKE_Z_PHASE_SHIFT = 2.4;
 
 const SHAKE_AMPLITUDE_EPSILON = 0.0001;
 
+const HAS_PERFORMANCE = typeof performance !== 'undefined' && typeof performance.now === 'function';
+
 export class CameraShakeSolver {
     constructor(timers, durations, intensities) {
         this.timers = timers;
@@ -68,7 +70,7 @@ export class CameraShakeSolver {
             return out;
         }
 
-        const now = (typeof performance !== 'undefined' && performance.now)
+        const now = HAS_PERFORMANCE
             ? performance.now() * 0.001
             : Date.now() * 0.001;
         const phase = now * SHAKE_BASE_FREQUENCY + playerIndex * SHAKE_PLAYER_PHASE_OFFSET;
