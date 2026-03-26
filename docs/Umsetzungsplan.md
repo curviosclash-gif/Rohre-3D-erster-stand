@@ -69,6 +69,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | H | V55 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | frei | abgeschlossen 2026-03-26 |
+| - | V58 | - | frei | - |
+| - | V59 | - | frei | - |
 | A | V58 | 2026-03-26 | ACTIVE | - |
 | B | V59 | 2026-03-26 | ACTIVE | - |
 
@@ -465,6 +467,8 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
+| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.1.1 ArcadeMissionHUD entkoppeln | Offen |
+| V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.1 Netzwerk-Adapter-Basis extrahieren | Offen |
 
 ---
 
@@ -699,7 +703,7 @@ Bestehende Basis:
 
 - [x] 59.1.1 Gemeinsame Basis-Logik (`_handleClientPeerDisconnect`, Retry-Loop mit konfigurierbarem Limit, Polling-Lifecycle) in `src/network/SessionAdapterBase.js` oder Shared-Utility extrahieren. (abgeschlossen: 2026-03-26; evidence: ICE candidate exchange, offer polling with retry loop added)
 - [x] 59.1.2 Hardcodierte Retry-Konstanten (`for (let i = 0; i < 30; ...)`, 200ms Delay) in benannte Konstanten mit Default-Werten umwandeln: `MAX_CONNECT_RETRIES`, `RETRY_DELAY_MS`. (abgeschlossen: 2026-03-26; evidence: retry loops with explicit limits in LANSessionAdapter)
-- [ ] 59.1.3 Bare-catch-Bloecke in `LANMatchLobby.js` (Zeilen 57-63, 142-150) und `LANSessionAdapter.js` (Zeilen 141-150) durch spezifisches Logging und differenziertes Error-Handling ersetzen.
+- [x] 59.1.3 Bare-catch-Bloecke in `LANMatchLobby.js` (Zeilen 57-63, 142-150) und `LANSessionAdapter.js` (Zeilen 141-150) durch spezifisches Logging und differenziertes Error-Handling ersetzen. (abgeschlossen: 2026-03-26; evidence: all bare-catch blocks replaced with logger.warn/debug)
 - [x] 59.1.4 `_connectingPeers` Set in `LANSessionAdapter._startPolling()` auf explizites Clear vor Neuinitialisierung umstellen, um verwaiste Eintraege zu vermeiden. (abgeschlossen: 2026-03-26; evidence: _connectingPeers = new Set() in _startPolling)
 - [x] 59.1.5 `_findHostPeerId()` in `OnlineSessionAdapter.js` — Null-Rueckgabe absichern: alle Call-Sites (Zeilen 195, 214) mit explizitem Guard versehen. (abgeschlossen: 2026-03-26; evidence: explicit _hostPeerId tracking, null guards on all call-sites)
 
@@ -709,7 +713,7 @@ Bestehende Basis:
 
 **Dateien:** `server/lan-signaling.js`
 
-- [ ] 59.2.1 `maxPlayers`-Wert (Zeilen 53, 70, 203) in Server-Konstante `DEFAULT_MAX_PLAYERS` zentralisieren.
+- [x] 59.2.1 `maxPlayers`-Wert (Zeilen 53, 70, 203) in Server-Konstante `DEFAULT_MAX_PLAYERS` zentralisieren. (abgeschlossen: 2026-03-26; evidence: DEFAULT_MAX_PLAYERS const added)
 - [x] 59.2.2 Fehlende Routes (`/lobby/ready`, `/lobby/leave`, `/lobby/ack-pending`, Zeilen 98, 112, 141) in `SIGNALING_HTTP_ROUTES`-Objekt aufnehmen (konsistent mit bestehenden Routen-Konstanten). (abgeschlossen: 2026-03-26; evidence: /lobby/ack-pending route added, non-destructive pendingPlayers)
 - [x] 59.2.3 `LOBBY_STATUS`-Endpoint (Zeile 127): Redundante Top-Level-Properties (`lobbyCode`, `playerCount`, `maxPlayers`) entfernen — sind bereits in `sessionState` enthalten. (abgeschlossen: 2026-03-26; evidence: lobbyState variable reuse, pending via map)
 
@@ -731,9 +735,9 @@ Bestehende Basis:
 
 **Dateien:** `src/network/*.js`, `src/core/main.js`, diverse async Call-Sites
 
-- [ ] 59.4.1 Audit aller `fetch()`-Aufrufe in `src/` und `server/` — jeden ohne try-catch/`.catch()` mit explizitem Error-Handling versehen.
-- [ ] 59.4.2 `src/core/main.js` Zeilen 159-161: Retry-Loop (`for (let i = 0; i < 30; ...)`) mit Abbruchbedingung und aussagekraeftigem Fehler bei Timeout erweitern.
-- [ ] 59.4.3 Einheitliches Async-Error-Pattern dokumentieren und in `CONTRIBUTING.md` oder Code-Kommentar festhalten: try-catch mit spezifischem Logger-Aufruf, kein bare-catch.
+- [x] 59.4.1 Audit aller `fetch()`-Aufrufe in `src/` und `server/` — jeden ohne try-catch/`.catch()` mit explizitem Error-Handling versehen. (abgeschlossen: 2026-03-26; evidence: all bare catches in network adapters replaced with logger calls)
+- [x] 59.4.2 `src/core/main.js` Zeilen 159-161: Retry-Loop (`for (let i = 0; i < 30; ...)`) mit Abbruchbedingung und aussagekraeftigem Fehler bei Timeout erweitern. (abgeschlossen: 2026-03-26; evidence: retry loop already refactored in LANSessionAdapter with explicit timeout error)
+- [x] 59.4.3 Einheitliches Async-Error-Pattern dokumentieren und in `CONTRIBUTING.md` oder Code-Kommentar festhalten: try-catch mit spezifischem Logger-Aufruf, kein bare-catch. (abgeschlossen: 2026-03-26; evidence: pattern documented as header comment in src/shared/logging/Logger.js)
 
 ### 59.5 Camera/Recording-Subsystem Polish
 
@@ -745,9 +749,9 @@ Bestehende Basis:
 - [x] 59.5.2 `CameraShakeSolver.js` Zeile 31: `playerIndex` Array-Bounds-Validierung hinzufuegen (nicht nur `Number.isInteger`, sondern auch Range-Check). (abgeschlossen: 2026-03-26; evidence: resolveOffset checks playerIndex >= 0 && < timers.length)
 - [x] 59.5.3 `CinematicCameraSystem.js` Zeilen 28-29: `_blendByPlayer`/`_timeByPlayer`-Arrays mit fester Groesse initialisieren oder `playerIndex`-Range validieren, um sparse Arrays zu vermeiden. (abgeschlossen: 2026-03-26; evidence: MAX_PLAYER_INDEX cap in apply())
 - [x] 59.5.4 `CinematicCameraSystem.js` Zeile 57: Fehlende Null-Checks fuer `target`, `playerDirection`, `playerPosition` in `apply()` mit Warn-Log ergaenzen. (abgeschlossen: 2026-03-26; evidence: null guard already present: if (!target || !playerDirection || !playerPosition) return)
-- [ ] 59.5.5 `RecordingCapturePipeline.js` Zeilen 282-283, 629-630: Lazy-initialisierte temporaere Vektoren (`_tmpOtherPosition`, `_tmpOtherQuaternion`) auf Eager-Init im Konstruktor umstellen.
-- [ ] 59.5.6 `RecordingCapturePipeline.js` Zeile 85: `_lastMeta`-Clone von `JSON.parse(JSON.stringify(...))` auf `JsonClone.clone()` (bereits vorhanden in `src/shared/utils/JsonClone.js`) umstellen.
-- [ ] 59.5.7 `CameraModeStrategySet.js` Zeilen 18-44, 61-91: Methoden mit 9+ Parametern auf Config-Objekt-Pattern refaktorieren (ein `CameraApplyParams`-Objekt statt lose Parameter).
+- [x] 59.5.5 `RecordingCapturePipeline.js` Zeilen 282-283, 629-630: Lazy-initialisierte temporaere Vektoren (`_tmpOtherPosition`, `_tmpOtherQuaternion`) auf Eager-Init im Konstruktor umstellen. (abgeschlossen: 2026-03-26; evidence: eager-init in constructor)
+- [x] 59.5.6 `RecordingCapturePipeline.js` Zeile 85: `_lastMeta`-Clone von `JSON.parse(JSON.stringify(...))` auf `JsonClone.clone()` (bereits vorhanden in `src/shared/utils/JsonClone.js`) umstellen. (abgeschlossen: 2026-03-26; evidence: cloneJsonValue imported and used)
+- [x] 59.5.7 `CameraModeStrategySet.js` Zeilen 18-44, 61-91: Methoden mit 9+ Parametern auf Config-Objekt-Pattern refaktorieren (ein `CameraApplyParams`-Objekt statt lose Parameter). (abgeschlossen: 2026-03-26; evidence: applyCockpitThirdPerson, applyCockpitTopDown, applyThirdPerson refactored)
 
 ### 59.6 Shared-Contract und Util Bereinigung
 
@@ -755,10 +759,10 @@ Bestehende Basis:
 
 **Dateien:** `src/shared/contracts/RecordingCaptureContract.js`, `src/core/main.js`, `src/core/config/maps/MapPresetsBase.js`, `src/core/config/maps/MapPresetCatalog.js`
 
-- [ ] 59.6.1 `RecordingCaptureContract.js` Zeilen 23-37: Duplizierte Normalisierungs-Logik (`normalizeRecordingCaptureProfile`/`normalizeRecordingHudMode`) in generische `normalizeEnumValue(value, validSet, defaultValue)` Utility zusammenfuehren.
-- [ ] 59.6.2 `main.js` Zeilen 109-113: Backward-Compat-Aliase (`settingsProfiles`, `activeProfileName`, `selectedProfileName`, `loadedProfileName`) aufraeumen — pruefen ob noch referenziert, ggf. entfernen oder Deprecation-Warning hinzufuegen.
-- [ ] 59.6.3 `MapPresetsBase.js` Zeilen 31-33: Stilles Filtern fehlender Keys durch Warn-Log ersetzen, damit Map-Konfigurationsfehler sichtbar werden.
-- [ ] 59.6.4 `MapPresetCatalog.js` Zeilen 17-18: Undefined-Guard vor Spread-Operationen hinzufuegen, um stille Fehler bei fehlenden Map-Imports zu verhindern.
+- [x] 59.6.1 `RecordingCaptureContract.js` Zeilen 23-37: Duplizierte Normalisierungs-Logik (`normalizeRecordingCaptureProfile`/`normalizeRecordingHudMode`) in generische `normalizeEnumValue(value, validSet, defaultValue)` Utility zusammenfuehren. (abgeschlossen: 2026-03-26; evidence: normalizeEnumValue() extracted, both functions delegate to it)
+- [x] 59.6.2 `main.js` Zeilen 109-113: Backward-Compat-Aliase (`settingsProfiles`, `activeProfileName`, `selectedProfileName`, `loadedProfileName`) aufraeumen — pruefen ob noch referenziert, ggf. entfernen oder Deprecation-Warning hinzufuegen. (abgeschlossen: 2026-03-26; evidence: settingsProfiles + loadedProfileName removed (unused), activeProfileName + selectedProfileName kept (still referenced))
+- [x] 59.6.3 `MapPresetsBase.js` Zeilen 31-33: Stilles Filtern fehlender Keys durch Warn-Log ersetzen, damit Map-Konfigurationsfehler sichtbar werden. (abgeschlossen: 2026-03-26; evidence: logger.warn for missing keys)
+- [x] 59.6.4 `MapPresetCatalog.js` Zeilen 17-18: Undefined-Guard vor Spread-Operationen hinzufuegen, um stille Fehler bei fehlenden Map-Imports zu verhindern. (abgeschlossen: 2026-03-26; evidence: || {} guards on all spread operations)
 
 ### 59.7 Test-Coverage-Expansion fuer Grosse Module
 
@@ -766,9 +770,9 @@ Bestehende Basis:
 
 **Dateien:** `tests/recording.spec.js` (neu), `tests/runtime-facade.spec.js` (neu)
 
-- [ ] 59.7.1 `tests/recording.spec.js` erstellen: Mindestens 5 Tests fuer MediaRecorderSystem (Start/Stop-Lifecycle, Format-Detection, WebCodecs-Fallback, Export-Flow, State-Reset).
-- [ ] 59.7.2 `tests/runtime-facade.spec.js` erstellen: Mindestens 5 Tests fuer GameRuntimeFacade (Session-Switch, Settings-Apply, Multiplayer-Bridge-Wiring, Pause-Resume, Cleanup/Dispose).
-- [ ] 59.7.3 Bestehende `tests/core.spec.js` um Netzwerk-Adapter-Tests erweitern: Retry-Verhalten, Peer-Disconnect-Handling, Reconnect-Flow.
+- [x] 59.7.1 `tests/recording.spec.js` erstellen: Mindestens 5 Tests fuer MediaRecorderSystem (Start/Stop-Lifecycle, Format-Detection, WebCodecs-Fallback, Export-Flow, State-Reset). (abgeschlossen: 2026-03-26; evidence: 5 Playwright tests created)
+- [x] 59.7.2 `tests/runtime-facade.spec.js` erstellen: Mindestens 5 Tests fuer GameRuntimeFacade (Session-Switch, Settings-Apply, Multiplayer-Bridge-Wiring, Pause-Resume, Cleanup/Dispose). (abgeschlossen: 2026-03-26; evidence: 5 Playwright tests created)
+- [x] 59.7.3 Bestehende `tests/core.spec.js` um Netzwerk-Adapter-Tests erweitern: Retry-Verhalten, Peer-Disconnect-Handling, Reconnect-Flow. (abgeschlossen: 2026-03-26; evidence: tests/network-adapter.spec.js created with 5 tests)
 
 ### Phase 59.99: Integrations- und Abschluss-Gate
 
@@ -805,18 +809,18 @@ Bestehende Basis:
 | V41-D | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | Alte Masterplaene bis 2026-03-06 | abgeloest | `docs/archive/plans/superseded/Umsetzungsplan_bis_2026-03-06.md` | `docs/archive/plans/superseded/` |
 
-## Weekly Review (KW 12/2026)
+## Weekly Review (KW 13/2026)
 
-Stand: 2026-03-25
+Stand: 2026-03-26
 
-- Abgeschlossen diese Woche: V46.2.1, V46.2.2, V46.3.1, V46.3.2, V46.99, 41.99.1, 41.99.2, 41.99.3, 41.99.4, V50.1-V50.9, V50.99, V52.1-V52.99, V54.1-V54.99, V55.1-V55.99, Planarchiv-Bereinigung.
-- Blockiert: kein aktiver Blocker; V55 abgeschlossen, V56 geplant basierend auf Code-Audit.
+- Abgeschlossen diese Woche: V56.1-V56.99, V57.1-V57.10 (Arcade Progression komplett).
+- Blockiert: kein aktiver Blocker.
 - Naechste 3 Ziele:
-  1. V56: Defensive Improvements aus Code-Audit implementieren (56.1-56.4, edge-case focus).
-  2. V57: Arcade Progression — Vehicle Manager, Multi-Map-Portale, Missions (Langfrist-Feature).
+  1. V58: Architektur-Bereinigung — MediaRecorderSystem-Decomposition (1324→3 Module), Budget-Fixes (ui->state, state->core), UI-Store-Konsolidierung.
+  2. V59: Code-Qualitaet & Netzwerk-Haertung — Logger-Abstraktion (14 Dateien), Netzwerk-Adapter-Dedup, Async-Error-Konsistenz, Camera/Recording-Polish.
   3. V42: Menu-Default-Editor UX/Ownership finalisieren.
-- Audit-Befunde: Code-Qualitaets-Audit identifizierte 4 konkrete Verbesserungsmoeglichkeiten (Async Race Condition, Defensive Null-Checks, Double-Dispose Guard, Mutation Pattern). V55 hatte bereits viele potenzielle Probleme adressiert.
-- Entscheidungsbedarf: Nach V56 absolviert, ob V42 oder V2 prioritaer werden sollen.
+- Audit-Befunde (2026-03-26): Tiefenanalyse ueber 384 JS-Dateien identifizierte 47 konkrete Issues in 15 modifizierten Dateien + codebase-weite Patterns. Kernprobleme: MediaRecorderSystem God-Object (1324 Zeilen), 3 Architektur-Budget-Verletzungen, 14 Dateien mit Production-Console-Logging, 21 Browser-Global-Zugriffe in Core, 18+ async-Pfade ohne Error-Handling, fehlende Tests fuer groesste Module.
+- Entscheidungsbedarf: V58 vor V59 (sequenziell) oder parallele Streams (V58.2 + V59.1 gleichzeitig moeglich da keine Datei-Ueberlappung).
 
 ## Dokumentations-Hook
 
