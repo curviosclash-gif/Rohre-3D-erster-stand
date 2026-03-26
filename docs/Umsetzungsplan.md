@@ -1004,10 +1004,10 @@ Scope:
 
 **Dateien:** `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js`
 
-- [ ] 62.1.1 `CinematicCameraSystem.apply()` - Neuen optionalen Parameter `boostBlend` (Float 0-1) akzeptieren statt nur `isBoosting`. Fallback: `isBoosting ? 1 : 0` fuer Rueckwaertskompatibilitaet.
-- [ ] 62.1.2 `CameraRigSystem.updateCamera()` - Den berechneten `boostBlend`-Float (Zeile 300) an `cinematicCameraSystem.apply()` als `boostBlend` durchreichen statt nur `isBoosting`.
-- [ ] 62.1.3 `CinematicCameraSystem.apply()` - Neuen optionalen Parameter `speed` (Float, Fahrzeuggeschwindigkeit) akzeptieren. Sway-Amount mit `clamp(speed / referenceSpeed, 0.1, 1.0)` skalieren, sodass bei Stillstand kaum Sway und bei Vollgas voller Sway wirkt.
-- [ ] 62.1.4 `CinematicCameraSystem.apply()` - Sway-Damping bei Boost: `swayAmount * (1 - boostBlend * 0.6)` - beim Boosten zieht sich die Kamera zusammen, weniger seitliches Schwingen.
+- [x] 62.1.1 `CinematicCameraSystem.apply()` - Neuen optionalen Parameter `boostBlend` (Float 0-1) akzeptieren statt nur `isBoosting`. Fallback: `isBoosting ? 1 : 0` fuer Rueckwaertskompatibilitaet. (abgeschlossen: 2026-03-26; evidence: commit `6377c76`)
+- [x] 62.1.2 `CameraRigSystem.updateCamera()` - Den berechneten `boostBlend`-Float (Zeile 300) an `cinematicCameraSystem.apply()` als `boostBlend` durchreichen statt nur `isBoosting`. (abgeschlossen: 2026-03-26; evidence: commit `6377c76`)
+- [x] 62.1.3 `CinematicCameraSystem.apply()` - Neuen optionalen Parameter `speed` (Float, Fahrzeuggeschwindigkeit) akzeptieren. Sway-Amount mit `clamp(speed / referenceSpeed, 0.1, 1.0)` skalieren, sodass bei Stillstand kaum Sway und bei Vollgas voller Sway wirkt. (abgeschlossen: 2026-03-26; evidence: commit `6377c76`)
+- [x] 62.1.4 `CinematicCameraSystem.apply()` - Sway-Damping bei Boost: `swayAmount * (1 - boostBlend * 0.6)` - beim Boosten zieht sich die Kamera zusammen, weniger seitliches Schwingen. (abgeschlossen: 2026-03-26; evidence: commit `6377c76`)
 
 ### 62.2 Code-Bereinigung und Redundanz-Abbau
 
@@ -1015,14 +1015,14 @@ Scope:
 
 **Dateien:** `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js`
 
-- [ ] 62.2.1 `CameraRigSystem.updateCamera()` Cockpit-Pfad (Zeile 339): `cockpitCamera` aus dem Aufruf an `cinematicCameraSystem.apply()` entfernen (wird nicht verwendet).
-- [ ] 62.2.2 `CameraRigSystem.updateCamera()` Cockpit-Pfad (Zeile 354): Redundanten zweiten `_restoreBaseFov(cam)` Aufruf entfernen (bereits in Zeile 349).
-- [ ] 62.2.3 `CameraRigSystem.updateCamera()` Zeilen 418-428: Da `effectiveSmooth = 1.0` immer `smoothFactor = 1.0` ergibt, den Lerp-basierten Code durch direktes `cam.position.copy(target.position)` und `cam.lookAt(target.lookAt)` ersetzen.
+- [x] 62.2.1 `CameraRigSystem.updateCamera()` Cockpit-Pfad (Zeile 339): `cockpitCamera` aus dem Aufruf an `cinematicCameraSystem.apply()` entfernen (wird nicht verwendet). (abgeschlossen: 2026-03-26; evidence: commit `6377c76`)
+- [x] 62.2.2 `CameraRigSystem.updateCamera()` Cockpit-Pfad (Zeile 354): Redundanten zweiten `_restoreBaseFov(cam)` Aufruf entfernen (bereits in Zeile 349). (abgeschlossen: 2026-03-26; evidence: commit `6377c76`)
+- [x] 62.2.3 `CameraRigSystem.updateCamera()` Zeilen 418-428: Da `effectiveSmooth = 1.0` immer `smoothFactor = 1.0` ergibt, den Lerp-basierten Code durch direktes `cam.position.copy(target.position)` und `cam.lookAt(target.lookAt)` ersetzen. (abgeschlossen: 2026-03-26; evidence: commit `6377c76`)
 
 ### Phase 62.99: Integrations- und Abschluss-Gate
 
 - [ ] 62.99.1 `npm run build`, `npm run test:core` sind gruen.
-- [ ] 62.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert.
+- [x] 62.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert. (abgeschlossen: 2026-03-26; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS)
 - [ ] 62.99.3 Visueller Smoke-Test: Boost-Uebergang smooth, Sway bei Stillstand minimal, Kamera-Verhalten bei Cockpit-Modus unveraendert.
 
 ### Risiko-Register V62
@@ -1032,6 +1032,7 @@ Scope:
 | Speed-abhaengiger Sway veraendert Kamera-Feeling merklich | mittel | Renderer | `referenceSpeed`-Wert konfigurierbar, visueller Vergleich vor/nach | Spieler empfindet Kamera als unruhig oder zu statisch |
 | Boost-Blend-Float statt Boolean bricht externe Call-Sites | niedrig | Renderer | Fallback `isBoosting ? 1 : 0` wenn `boostBlend` nicht uebergeben wird | Tests oder externe Aufrufer brechen |
 | Smoothing-Vereinfachung (copy statt lerp) erzeugt Mikro-Ruckler | niedrig | Renderer | Da effectiveSmooth bereits 1.0 ist, aendert sich das Ergebnis mathematisch nicht | Visueller Unterschied im Smooth-Pfad |
+| Repo-weite Verifikations-Gates ausserhalb V62 blockieren den Abschluss | mittel | Bot-Codex | Nach Logger-Typecheck-Fix und stabilisiertem Playwright-Startup `62.99.1` und `62.99.3` erneut ausfuehren | `npm run build` scheitert in `src/shared/logging/Logger.js` oder `test:core`/visueller Smoke haengen im Startup |
 
 ---
 
