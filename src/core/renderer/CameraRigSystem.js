@@ -63,6 +63,7 @@ export class CameraRigSystem {
         });
         this.cinematicCameraSystem = new CinematicCameraSystem({
             enabled: cinematicEnabled,
+            referenceSpeed: Number(CONFIG?.PLAYER?.SPEED) || 18,
         });
     }
 
@@ -283,12 +284,16 @@ export class CameraRigSystem {
         const target = this.cameraTargets[playerIndex];
         const mode = this.getCameraMode(playerIndex);
         const stableDt = this._resolveSmoothedDt(playerIndex, dt);
+        const playerState = cameraContext?.playerState && typeof cameraContext.playerState === 'object'
+            ? cameraContext.playerState
+            : null;
+        const cameraSpeed = Number(playerState?.speed);
         const smooth = CONFIG.CAMERA.SMOOTHING;
         const isCockpitFirstPerson = cockpitCamera && mode === 'FIRST_PERSON';
         const lockToNose = (mode === 'FIRST_PERSON' && !!CONFIG.CAMERA.FIRST_PERSON_LOCK_TO_NOSE && !!firstPersonAnchor) || isCockpitFirstPerson;
         const noseClearance = CONFIG.CAMERA.FIRST_PERSON_NOSE_CLEARANCE || 0;
         const firstPersonHardLock = lockToNose && mode === 'FIRST_PERSON';
-        const boostTarget = mode === 'FIRST_PERSON' && isBoosting ? 1 : 0;
+        const boostTarget = isBoosting ? 1 : 0;
         const boostBlendSpeed = Math.max(0.001, CONFIG.CAMERA.FIRST_PERSON_BOOST_BLEND_SPEED || 8.5);
         const boostAlpha = 1 - Math.exp(-boostBlendSpeed * stableDt);
         const previousBoostBlend = this.cameraBoostBlend[playerIndex] || 0;
@@ -335,8 +340,8 @@ export class CameraRigSystem {
                 playerDirection,
                 playerPosition,
                 dt: stableDt,
-                isBoosting,
-                cockpitCamera,
+                boostBlend,
+                speed: cameraSpeed,
             });
 
             if (hasShake) {
@@ -351,7 +356,6 @@ export class CameraRigSystem {
             } else {
                 cam.quaternion.slerp(playerQuaternion, smoothFactor);
             }
-            this._restoreBaseFov(cam);
             return;
         }
 
@@ -383,8 +387,8 @@ export class CameraRigSystem {
             playerDirection,
             playerPosition,
             dt: stableDt,
-            isBoosting,
-            cockpitCamera,
+            boostBlend,
+            speed: cameraSpeed,
         });
 
         if (hasShake) {
@@ -415,17 +419,8 @@ export class CameraRigSystem {
             return;
         }
 
-        // Fix: Doppeltes Smoothing erzeugt Schwebung mit Interpolation. 
-        // Deshalb immer Hard-Lock, da das `target` durch `Player.js` _renderInterpolationPosition bereits "butterweich" ist.
-        const effectiveSmooth = 1.0; 
-        const smoothFactor = 1 - Math.pow(1 - effectiveSmooth, stableDt * 60);
-
-        cam.position.lerp(target.position, smoothFactor);
-
-        cam.getWorldDirection(this._tmpLookAt);
-        this._tmpLookAt.multiplyScalar(10).add(cam.position);
-        this._tmpLookAt.lerp(target.lookAt, smoothFactor);
-        cam.lookAt(this._tmpLookAt);
+        cam.position.copy(target.position);
+        cam.lookAt(target.lookAt);
     }
 
     resetCameras() {

@@ -5,6 +5,7 @@ const SIDE_MIN_LENGTH_SQ = 1e-6;
 const BLEND_EPSILON = 0.0001;
 const SWAY_PLAYER_PHASE_OFFSET = 0.7;
 const MAX_PLAYER_INDEX = 7;
+const DEFAULT_REFERENCE_SPEED = 18;
 
 export class CinematicCameraSystem {
     constructor({
@@ -16,6 +17,7 @@ export class CinematicCameraSystem {
         swayFrequency = 0.8,
         swayAmount = 0.5,
         liftAmount = 0.35,
+        referenceSpeed = DEFAULT_REFERENCE_SPEED,
     } = {}) {
         this.enabled = enabled !== false;
         this.enterSpeed = Math.max(0.001, Number(enterSpeed) || 5.5);
@@ -25,6 +27,7 @@ export class CinematicCameraSystem {
         this.swayFrequency = Math.max(0, Number(swayFrequency) || 0.8);
         this.swayAmount = Number.isFinite(Number(swayAmount)) ? Number(swayAmount) : 0.5;
         this.liftAmount = Number.isFinite(Number(liftAmount)) ? Number(liftAmount) : 0.35;
+        this.referenceSpeed = Math.max(0.001, Number(referenceSpeed) || DEFAULT_REFERENCE_SPEED);
 
         this._blendByPlayer = [];
         this._timeByPlayer = [];
@@ -53,6 +56,8 @@ export class CinematicCameraSystem {
         playerDirection,
         playerPosition,
         dt,
+        boostBlend = null,
+        speed = null,
         isBoosting = false,
     }) {
         if (!target || !playerDirection || !playerPosition) return;
@@ -91,10 +96,24 @@ export class CinematicCameraSystem {
             this._tmpSide.normalize();
         }
 
-        const boostBlend = isBoosting ? 1 : 0;
-        const sway = Math.sin((elapsed * this.swayFrequency) + playerIndex * SWAY_PLAYER_PHASE_OFFSET) * this.swayAmount * blend;
+        const fallbackBoostBlend = isBoosting ? 1 : 0;
+        const resolvedBoostBlend = THREE.MathUtils.clamp(
+            Number.isFinite(Number(boostBlend)) ? Number(boostBlend) : fallbackBoostBlend,
+            0,
+            1
+        );
+        const speedValue = Number(speed);
+        const speedScale = Number.isFinite(speedValue)
+            ? THREE.MathUtils.clamp(speedValue / this.referenceSpeed, 0.1, 1.0)
+            : 1;
+        const swayBoostDamping = 1 - (resolvedBoostBlend * 0.6);
+        const sway = Math.sin((elapsed * this.swayFrequency) + playerIndex * SWAY_PLAYER_PHASE_OFFSET)
+            * this.swayAmount
+            * speedScale
+            * swayBoostDamping
+            * blend;
         const lift = this.liftAmount * blend;
-        const lookAhead = (this.baseLookAhead + this.boostOffset * boostBlend) * blend;
+        const lookAhead = (this.baseLookAhead + this.boostOffset * resolvedBoostBlend) * blend;
 
         target.position.addScaledVector(this._tmpSide, sway);
         target.position.y += lift;

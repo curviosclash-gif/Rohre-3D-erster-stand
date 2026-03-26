@@ -3452,6 +3452,86 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.firstPersonAnchorDelta).toBe(1);
     });
 
+    test('T20ai4: Third-Person-Cinematic nutzt smoothes Boost-Blend und speed-basierten Sway', async ({ page }) => {
+        await startGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const rig = game?.renderer?.cameraRigSystem;
+            const cinematic = rig?.cinematicCameraSystem;
+            const target = rig?.cameraTargets?.[0];
+            if (!game || !rig || !cinematic || !target?.position || !target?.lookAt) {
+                return { error: 'missing-runtime' };
+            }
+
+            const previousLivePerspectiveEnabled = rig.livePerspectiveEnabled;
+            const modes = Array.isArray(game?.config?.CAMERA?.MODES)
+                ? game.config.CAMERA.MODES
+                : ['THIRD_PERSON', 'FIRST_PERSON', 'TOP_DOWN'];
+            const thirdPersonIndex = Math.max(0, modes.indexOf('THIRD_PERSON'));
+            const playerPosition = target.position.clone().set(0, 0, 0);
+            const playerDirection = target.lookAt.clone().set(0, 0, -1);
+
+            const runScenario = ({ speed, isBoosting }) => {
+                cinematic.reset();
+                rig.cameraBoostBlend[0] = 0;
+                target.position.set(0, 0, 0);
+                target.lookAt.set(0, 0, -1);
+
+                let maxSway = 0;
+                let maxBoostBlend = 0;
+                let finalLookAhead = 0;
+
+                for (let i = 0; i < 90; i++) {
+                    rig.updateCamera(
+                        0,
+                        playerPosition,
+                        playerDirection,
+                        1 / 60,
+                        null,
+                        false,
+                        isBoosting,
+                        null,
+                        null,
+                        { playerState: { speed } }
+                    );
+                    maxSway = Math.max(maxSway, Math.abs(Number(target.position.x) || 0));
+                    maxBoostBlend = Math.max(maxBoostBlend, Number(rig.cameraBoostBlend[0] || 0));
+                    finalLookAhead = target.lookAt.distanceTo(playerPosition);
+                }
+
+                return {
+                    maxSway,
+                    maxBoostBlend,
+                    finalLookAhead,
+                };
+            };
+
+            try {
+                rig.livePerspectiveEnabled = false;
+                rig.cameraModes[0] = thirdPersonIndex;
+
+                const lowSpeed = runScenario({ speed: 0, isBoosting: false });
+                const cruiseSpeed = runScenario({ speed: cinematic.referenceSpeed || 18, isBoosting: false });
+                const boosted = runScenario({ speed: cinematic.referenceSpeed || 18, isBoosting: true });
+
+                return {
+                    error: null,
+                    lowSpeed,
+                    cruiseSpeed,
+                    boosted,
+                };
+            } finally {
+                rig.livePerspectiveEnabled = previousLivePerspectiveEnabled;
+            }
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.cruiseSpeed.maxSway).toBeGreaterThan(result.lowSpeed.maxSway * 4);
+        expect(result.boosted.maxBoostBlend).toBeGreaterThan(0.5);
+        expect(result.boosted.maxSway).toBeLessThan(result.cruiseSpeed.maxSway * 0.7);
+        expect(result.boosted.finalLookAhead).toBeGreaterThan(result.cruiseSpeed.finalLookAhead);
+    });
+
     test('T20ai3: Third-Person-Fadenkreuz bleibt nach Match-Neustart sichtbar', async ({ page }) => {
         await startGame(page);
         await returnToMenu(page);
