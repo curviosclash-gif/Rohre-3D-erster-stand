@@ -13,6 +13,18 @@
 // For fire-and-forget fetch: `.catch((err) => { logger.debug('context:', err); })`
 // Production builds suppress debug/info — only warn+error reach the console.
 
+/** @typedef {{ DEV?: boolean }} LoggerImportMetaEnv */
+/** @typedef {{ env?: LoggerImportMetaEnv }} LoggerImportMeta */
+/**
+ * @typedef {object} LoggerOutput
+ * @property {((...args: any[]) => void)=} debug
+ * @property {((...args: any[]) => void)=} info
+ * @property {((...args: any[]) => void)=} log
+ * @property {((...args: any[]) => void)=} warn
+ * @property {((...args: any[]) => void)=} error
+ */
+/** @typedef {{ level?: number, output?: LoggerOutput }} LoggerOptions */
+
 const LOG_LEVEL = Object.freeze({
     DEBUG: 0,
     INFO: 1,
@@ -23,11 +35,19 @@ const LOG_LEVEL = Object.freeze({
 
 const LEVEL_NAMES = ['debug', 'info', 'warn', 'error', 'silent'];
 
-const DEFAULT_LEVEL = (typeof import.meta !== 'undefined' && import.meta.env?.DEV)
+const IMPORT_META = /** @type {LoggerImportMeta | undefined} */ (
+    typeof import.meta !== 'undefined' ? import.meta : undefined
+);
+
+const DEFAULT_LEVEL = IMPORT_META?.env?.DEV
     ? LOG_LEVEL.DEBUG
     : LOG_LEVEL.WARN;
 
 export class Logger {
+    /**
+     * @param {string} namespace
+     * @param {LoggerOptions} [options]
+     */
     constructor(namespace, { level, output } = {}) {
         this._namespace = namespace ? `[${namespace}]` : '';
         this._level = level ?? DEFAULT_LEVEL;
