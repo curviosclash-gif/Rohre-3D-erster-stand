@@ -609,9 +609,9 @@ Scope:
 
 ### 58.1 Entkopplung und Budget-Fixes
 
-- [ ] 58.1.1 `ArcadeMissionHUD.js` (UI) entkoppeln: `MISSION_TYPES` und Format-Helper in Shared Contract auslagern.
-- [ ] 58.1.2 `ArcadeMapProgression.js` (State) entkoppeln: `MAP_PRESET_CATALOG` Zugriff via Dependency Injection oder Shared Contract.
-- [ ] 58.1.3 `ArchitectureConfig.mjs` bereinigen: Temporäre Allowlist-Einträge für V57/V58 nach Entkopplung entfernen.
+- [x] 58.1.1 `ArcadeMissionHUD.js` (UI) entkoppeln: `MISSION_TYPES` und Format-Helper in Shared Contract auslagern. (abgeschlossen: 2026-03-26; evidence: ArcadeMissionContract.js created, imports redirected; commit 4556033)
+- [x] 58.1.2 `ArcadeMapProgression.js` (State) entkoppeln: `MAP_PRESET_CATALOG` Zugriff via Dependency Injection oder Shared Contract. (abgeschlossen: 2026-03-26; evidence: resolveMapSequence() now accepts mapCatalog parameter, ArcadeRunRuntime injects it; commit 9265534)
+- [x] 58.1.3 `ArchitectureConfig.mjs` bereinigen: Temporäre Allowlist-Einträge für V57/V58 nach Entkopplung entfernen. (abgeschlossen: 2026-03-26; evidence: No temporary exceptions needed; decoupling was clean, no new violations introduced)
 
 ### 58.2 MediaRecorderSystem Decomposition
 
