@@ -91,12 +91,42 @@ export class PlayerInputSystem {
         this._observationPhaseSlots = OBSERVATION_PHASE_SLOTS;
         this._observationMaxRebuildsPerFrame = OBSERVATION_MAX_REBUILDS_PER_FRAME;
         this._observationMaxReuseFrames = OBSERVATION_MAX_REUSE_FRAMES;
+        // Reusable sanitize options object to avoid per-frame allocation
+        this._sharedSanitizeOptions = {
+            inventoryLength: 0,
+            onInvalid: null,
+        };
     }
 
     beginFrame() {
         this._observationFrameId += 1;
         this._observationRebuildsThisFrame = 0;
         this._syncObservationScheduleConfig();
+        // Purge stale warning entries every 256 frames to prevent unbounded Map growth
+        if ((this._observationFrameId & 0xFF) === 0) {
+            this._purgeStaleWarnings();
+        }
+    }
+
+    _purgeStaleWarnings() {
+        const now = Date.now();
+        const actionCutoff = now - this._botActionWarningCooldownMs * 4;
+        const obsCutoff = now - this._botObservationWarningCooldownMs * 4;
+        for (const [key, ts] of this._botActionWarnings) {
+            if (ts < actionCutoff) this._botActionWarnings.delete(key);
+        }
+        for (const [key, ts] of this._botObservationWarnings) {
+            if (ts < obsCutoff) this._botObservationWarnings.delete(key);
+        }
+    }
+
+    resetBotState() {
+        this._botActionWarnings.clear();
+        this._botObservationWarnings.clear();
+        this._lastBotObservationByIndex.clear();
+        this._observationMetaByIndex.clear();
+        this._observationFrameId = 0;
+        this._observationRebuildsThisFrame = 0;
     }
 
     _syncObservationScheduleConfig() {
@@ -243,8 +273,6 @@ export class PlayerInputSystem {
     }
 
     _buildBotObservation(player, policy, runtimeContext) {
-        const observationContext = runtimeContext?.observationContext || runtimeContext;
-        const observationTarget = this._resolveObservationTarget(runtimeContext);
         if (typeof policy?.getObservation === 'function') {
             try {
                 const customObservation = policy.getObservation(player, runtimeContext);
@@ -255,11 +283,17 @@ export class PlayerInputSystem {
                 ) {
                     return customObservation;
                 }
-                this._warnInvalidBotObservation(player, 'policy.getObservation returned empty payload');
+                // null/undefined = policy has no custom observation source (expected for bridge policies)
+                // Only warn for non-null invalid returns (e.g. empty array, malformed object)
+                if (customObservation != null) {
+                    this._warnInvalidBotObservation(player, 'policy.getObservation returned empty payload');
+                }
             } catch (error) {
                 this._warnInvalidBotObservation(player, 'policy.getObservation threw', error);
             }
         }
+        const observationContext = runtimeContext?.observationContext || runtimeContext;
+        const observationTarget = this._resolveObservationTarget(runtimeContext);
         return buildObservation(player, observationContext, observationTarget);
     }
 
@@ -291,18 +325,24 @@ export class PlayerInputSystem {
             try {
                 return update.call(policy, dt, player, runtimeContext);
             } catch (error) {
-                this._warnInvalidBotAction(player, 'runtime-context update threw, fallback to legacy signature', error);
+                this._warnInvalidBotAction(player, 'runtime-context update threw', error);
+                return getEmptyInput();
             }
         }
 
-        return update.call(
-            policy,
-            dt,
-            player,
-            runtimeContext?.arena,
-            runtimeContext?.players,
-            runtimeContext?.projectiles
-        );
+        try {
+            return update.call(
+                policy,
+                dt,
+                player,
+                runtimeContext?.arena,
+                runtimeContext?.players,
+                runtimeContext?.projectiles
+            );
+        } catch (error) {
+            this._warnInvalidBotAction(player, 'legacy update threw', error);
+            return getEmptyInput();
+        }
     }
 
     _isDynamicActionAdapterEnabled(runtimeContext) {
@@ -419,10 +459,9 @@ export class PlayerInputSystem {
                     this._lastBotObservationByIndex.delete(player.index);
                 }
 
-                const sanitizeOptions = {
-                    inventoryLength: Array.isArray(player.inventory) ? player.inventory.length : 0,
-                    onInvalid: (reason) => this._warnInvalidBotAction(player, reason),
-                };
+                this._sharedSanitizeOptions.inventoryLength = Array.isArray(player.inventory) ? player.inventory.length : 0;
+                this._sharedSanitizeOptions.onInvalid = (reason) => this._warnInvalidBotAction(player, reason);
+                const sanitizeOptions = this._sharedSanitizeOptions;
                 try {
                     const output = this._invokeBotPolicyUpdate(botAI, dt, player, runtimeContext);
                     input = sanitizeBotAction(output, sanitizeOptions, input);
