@@ -308,7 +308,7 @@ export class CameraRigSystem {
 
         if (cockpitCamera && playerQuaternion) {
             if (mode === 'THIRD_PERSON') {
-                this.modeStrategies.applyCockpitThirdPerson(target, playerPosition, playerQuaternion, this._tmpVec);
+                this.modeStrategies.applyCockpitThirdPerson({ target, playerPosition, playerQuaternion, tmpVec: this._tmpVec });
             } else if (mode === 'FIRST_PERSON') {
                 this.modeStrategies.applyCockpitFirstPerson({
                     playerIndex,
@@ -325,7 +325,7 @@ export class CameraRigSystem {
                     tmpVec: this._tmpVec,
                 });
             } else if (mode === 'TOP_DOWN') {
-                this.modeStrategies.applyCockpitTopDown(target, playerPosition, playerQuaternion, this._tmpVec);
+                this.modeStrategies.applyCockpitTopDown({ target, playerPosition, playerQuaternion, tmpVec: this._tmpVec });
             }
 
             this.cinematicCameraSystem.apply({
@@ -356,7 +356,7 @@ export class CameraRigSystem {
         }
 
         if (mode === 'THIRD_PERSON') {
-            this.modeStrategies.applyThirdPerson(target, playerPosition, playerDirection, this._tmpVec, this._tmpVec2);
+            this.modeStrategies.applyThirdPerson({ target, playerPosition, playerDirection, tmpVec: this._tmpVec, tmpVec2: this._tmpVec2 });
         } else if (mode === 'FIRST_PERSON') {
             this.modeStrategies.applyFirstPerson({
                 playerIndex,

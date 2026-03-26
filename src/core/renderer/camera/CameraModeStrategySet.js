@@ -9,7 +9,7 @@ export class CameraModeStrategySet {
         this.collisionSolver = collisionSolver;
     }
 
-    applyCockpitThirdPerson(target, playerPosition, playerQuaternion, tmpVec) {
+    applyCockpitThirdPerson({ target, playerPosition, playerQuaternion, tmpVec }) {
         tmpVec.set(0, CONFIG.CAMERA.FOLLOW_HEIGHT, CONFIG.CAMERA.FOLLOW_DISTANCE);
         tmpVec.applyQuaternion(playerQuaternion);
         target.position.copy(playerPosition).add(tmpVec);
@@ -43,13 +43,13 @@ export class CameraModeStrategySet {
         this.collisionSolver.resolve(playerIndex, mode, playerPosition, target.position, arena);
     }
 
-    applyCockpitTopDown(target, playerPosition, playerQuaternion, tmpVec) {
+    applyCockpitTopDown({ target, playerPosition, playerQuaternion, tmpVec }) {
         tmpVec.set(0, TOPDOWN_HEIGHT, TOPDOWN_Z_OFFSET);
         tmpVec.applyQuaternion(playerQuaternion);
         target.position.copy(playerPosition).add(tmpVec);
     }
 
-    applyThirdPerson(target, playerPosition, playerDirection, tmpVec, tmpVec2) {
+    applyThirdPerson({ target, playerPosition, playerDirection, tmpVec, tmpVec2 }) {
         tmpVec.copy(playerDirection).multiplyScalar(-CONFIG.CAMERA.FOLLOW_DISTANCE);
         tmpVec.y += CONFIG.CAMERA.FOLLOW_HEIGHT;
         target.position.copy(playerPosition).add(tmpVec);
