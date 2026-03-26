@@ -87,6 +87,10 @@ const legacyStateToUiImportEntries = [
 /** @type {[string, string][]} */
 const legacyUiToStateImportEntries = [
     pair(
+        createEdgeKey('src/ui/arcade/ArcadeVehicleManager.js', 'src/state/arcade/ArcadeVehicleProfile.js'),
+        'Arcade vehicle manager still loads/saves profiles directly; awaiting contract-based refactor via ArcadeVehicleProfileContract (V58.3 follow-up).'
+    ),
+    pair(
         createEdgeKey('src/ui/MatchFlowUiController.js', 'src/state/MatchLifecycleSessionOrchestrator.js'),
         'Match flow UI still orchestrates state session lifecycle while command/reducer ownership is being consolidated.'
     ),
