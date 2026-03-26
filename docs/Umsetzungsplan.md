@@ -41,6 +41,9 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V56 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Keine neuen Layer-Drifts, keine grossen Decompositions-Aenderungen |
 | V57 | V45 (Arcade-Basis) | soft | ja | Arcade-Run-Infrastruktur (ArcadeRunRuntime, EncounterDirector, BlueprintSchema) ist vorhanden |
 | V57 | V53.99 | soft | ja | Settings-Persistenz fuer Vehicle-Profile benoetigt Storage-Contracts |
+| V58 | V57 | soft | ja | Architektur-Budget-Verletzungen aus V57 werden in V58 bereinigt |
+| V59 | V58.1 | soft | nein | Netzwerk-Haertung und Logger-Abstraktion setzen stabile Architektur-Budgets voraus |
+| V59 | V55.99 | hard | ja | V55 Tiefenaudit-Remediation ist Voraussetzung fuer weitere Qualitaetsarbeit |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -52,6 +55,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `tests/playwright.global-setup.js`, `tests/playwright.global-teardown.js`, `playwright.config.js`, `scripts/verify-lock.mjs`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`, `src/entities/arena/portal/PortalRuntimeSystem.js`, `src/ui/PauseOverlayController.js`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/core/MediaRecorderSystem.js`, `src/state/TelemetryHistoryStore.js`, `tests/core.spec.js`, `tests/training-automation.spec.js` | V55 | offen | Tiefenaudit-Remediation fuer Teststabilitaet, Race-Conditions, Backpressure und Lifecycle-Haertung |
 | `src/state/MatchLifecycleSessionOrchestrator.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/ui/TouchInputSource.js`, `src/ui/MatchFlowUiController.js`, `tests/core.spec.js`, `tests/physics-core.spec.js` | V56 | offen | Edge-Case-Fixes, Defensive Improvements, idempotency guards |
 | `src/state/arcade/ArcadeVehicleProfile.js`, `src/state/arcade/ArcadeMapProgression.js`, `src/state/arcade/ArcadeMissionState.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/ArcadeMapSelect.js`, `src/entities/directors/ArcadeEncounterCatalog.js` (mapPool-Erweiterung), `src/entities/arcade/ArcadeBlueprintSchema.js` (Upgrade-Tiers), `src/core/arcade/ArcadeRunRuntime.js` (Multi-Map) | V57 | offen | Arcade Progression: Vehicle Manager, Multi-Map, Missions |
+| `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/ui/base/PersistentStore.js` | V58 | offen | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz |
+| `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | offen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -64,6 +69,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | H | V55 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | frei | abgeschlossen 2026-03-26 |
+| A | V58 | 2026-03-26 | ACTIVE | - |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -577,6 +583,208 @@ Bestehende Basis:
 | Vehicle-Upgrades brechen Balance in Standard-Modi | mittel | Gameplay | Upgrades nur im Arcade-Modus aktiv; Standard-Modi nutzen Base-Stats | Beschwerden ueber unfaire Werte |
 | Exit-Portal-Kollision mit bestehenden Intra-Map-Portalen | mittel | Arena | Eigener Portal-Typ (`kind: 'exit'`) mit separatem Collision-Layer | Spieler teleportiert statt Map-Wechsel |
 | Prewarm der naechsten Map blockiert Gameplay-Thread | mittel | Performance | Async Prewarm mit Budget-Cap; Fallback auf synchrones Load in Intermission | Frame-Drops waehrend Sektor |
+
+
+---
+
+## Block V58: Architektur-Bereinigung & God-Object Refactoring
+
+Plan-Datei: `docs/Umsetzungsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V57 (Arcade Progression) -->
+
+Scope:
+
+- Behebung der Architektur-Budget-Verletzungen (`ui -> state`, `state -> core`) aus dem Audit 2026-03-26.
+- Refactoring von "God Objects" wie `MediaRecorderSystem.js` (SRP-Verletzung).
+- Konsolidierung der UI-Store Redundanzen und Einführung einer `knip`-basierten Dead-Code Überwachung.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 58.1 bis 58.4 sind abgeschlossen.
+- [ ] DoD.2 `npm run architecture:guard` ist vollständig grün (0 disallowed edges).
+- [ ] DoD.3 Video-Aufnahme (WebCodecs & MediaRecorder Fallback) funktioniert nach Refactoring.
+- [ ] DoD.4 Settings-Persistenz funktioniert konsistent über alle UI-Stores.
+
+### 58.1 Entkopplung und Budget-Fixes
+
+- [ ] 58.1.1 `ArcadeMissionHUD.js` (UI) entkoppeln: `MISSION_TYPES` und Format-Helper in Shared Contract auslagern.
+- [ ] 58.1.2 `ArcadeMapProgression.js` (State) entkoppeln: `MAP_PRESET_CATALOG` Zugriff via Dependency Injection oder Shared Contract.
+- [ ] 58.1.3 `ArchitectureConfig.mjs` bereinigen: Temporäre Allowlist-Einträge für V57/V58 nach Entkopplung entfernen.
+
+### 58.2 MediaRecorderSystem Decomposition
+
+- [ ] 58.2.1 `src/core/recording/engines/WebCodecsRecorderEngine.js` extrahieren (VideoEncoder & Muxer Logik).
+- [ ] 58.2.2 `src/core/recording/engines/NativeMediaRecorderEngine.js` extrahieren (MediaRecorder Fallback).
+- [ ] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen und Download-Logik delegieren.
+
+### 58.3 UI Store & State Redundanz
+
+- [ ] 58.3.1 `src/ui/base/PersistentStore.js` als abstrakte Basisklasse mit Storage-Anbindung implementieren.
+- [ ] 58.3.2 `SettingsStore`, `MenuPresetStore`, `MenuDraftStore` etc. auf die neue Basisklasse umstellen.
+
+### 58.4 Tooling & Dead-Code Quality
+
+- [ ] 58.4.1 `knip` als Dev-Dependency installieren und `knip.json` für das Projekt validieren.
+- [ ] 58.4.2 Manueller Audit der "Unused"-Liste: Echten Dead-Code (z.B. veraltete Mesh-Files) sicher entfernen.
+
+### Phase 58.99: Architektur-Abschluss-Gate
+
+- [ ] 58.99.1 `npm run architecture:guard` PASS (Metriken innerhalb der Budgets).
+- [ ] 58.99.2 `npm run test:fast` & `npm run build` sind grün.
+
+### Risiko-Register V58
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Refactoring bricht Video-Aufnahme auf Safari/Mobil | hoch | Core | Tests mit MediaRecorder-Fallback Engine sicherstellen | Video-Export schlägt fehl |
+| Datenverlust bei Store-Migration | mittel | UI | Abwärtskompatibilität der Storage-Keys garantieren | Benutzereinstellungen sind nach Update weg |
+| Knip meldet zu viele False Positives | niedrig | Dev | Konfiguration verfeinern (Ignore-Listen für entry points) | Build-Pipeline schlägt fälschlich fehl |
+
+---
+
+## Block V59: Code-Qualitaet & Netzwerk-Haertung - Logger, Async-Konsistenz, Camera/Recording-Polish
+
+Plan-Datei: `docs/Umsetzungsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V58.1, V55.99 -->
+
+Scope:
+
+- Systematische Bereinigung der im Audit 2026-03-26 identifizierten Code-Qualitaets-Defizite.
+- Netzwerk-Layer konsolidieren: duplizierte Logik in LAN/Online-Adaptern, bare-catch-Bloecke, hardcodierte Werte.
+- Logger-Abstraktion einfuehren, um 14+ Produktionsdateien von direktem `console.log` zu befreien.
+- Camera/Recording-Subsystem polieren: Performance-Hotpath-Checks, Bounds-Validierung, Cleanup-Konsistenz.
+- Server-Haertung (`lan-signaling.js`): fehlende Routen-Konstanten, Payload-Redundanz, Magic Numbers.
+
+### Architektur-Uebersicht
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  CODE-QUALITAET & NETZWERK (V59)                │
+├──────────────────┬──────────────────┬───────────────────────────┤
+│  59.1-59.2       │  59.3-59.4       │  59.5-59.7               │
+│  NETZWERK-LAYER  │  LOGGING &       │  CAMERA/RECORDING &      │
+│  KONSOLIDIERUNG  │  ASYNC-KONSIST.  │  SERVER-HAERTUNG         │
+├──────────────────┼──────────────────┼───────────────────────────┤
+│ Adapter-Dedup    │ Logger-Abstrakt. │ Perf-Hotpath-Fixes       │
+│ Bare-Catch-Fix   │ console.* migr.  │ Bounds-Validierung       │
+│ Retry-Konstanten │ Async-Error-     │ Lazy-Init-Bereinigung    │
+│ Error-Handling   │ Pattern          │ Server-Route-Konstanten  │
+│ Fetch-Guards     │ Fetch-Catch-Gate │ Magic-Number-Extraktion  │
+└──────────────────┴──────────────────┴───────────────────────────┘
+```
+
+Bestehende Basis:
+- V55 Tiefenaudit (CAS, Backpressure, Lifecycle-Haertung) — abgeschlossen
+- V56 Defensive Improvements (Session-ID-Guard, Null-Checks, Idempotenz) — abgeschlossen
+- V58 Architektur-Bereinigung (Budget-Fixes, MediaRecorder-Decomposition) — offen
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 59.1 bis 59.7 und 59.99 sind abgeschlossen und mit Evidence dokumentiert.
+- [ ] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS.
+- [ ] DoD.3 Kein direkter `console.log`/`console.warn`/`console.error` in Produktionscode ausserhalb `src/core/debug/` und `src/core/GameDebugApi.js`.
+- [ ] DoD.4 Alle `fetch()`-Aufrufe haben explizites Error-Handling (try-catch oder `.catch()`).
+- [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen.
+
+### 59.1 Netzwerk-Adapter Konsolidierung
+
+**Issue:** `LANSessionAdapter.js` und `OnlineSessionAdapter.js` enthalten duplizierte Logik (`_handleClientPeerDisconnect`, Retry-Loops, Polling-Muster). `LANMatchLobby.js` hat bare-catch-Bloecke und hardcodierte Retry-Limits. Inkonsistente Error-Handling-Patterns.
+
+**Dateien:** `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/LANMatchLobby.js`
+
+- [ ] 59.1.1 Gemeinsame Basis-Logik (`_handleClientPeerDisconnect`, Retry-Loop mit konfigurierbarem Limit, Polling-Lifecycle) in `src/network/SessionAdapterBase.js` oder Shared-Utility extrahieren.
+- [ ] 59.1.2 Hardcodierte Retry-Konstanten (`for (let i = 0; i < 30; ...)`, 200ms Delay) in benannte Konstanten mit Default-Werten umwandeln: `MAX_CONNECT_RETRIES`, `RETRY_DELAY_MS`.
+- [ ] 59.1.3 Bare-catch-Bloecke in `LANMatchLobby.js` (Zeilen 57-63, 142-150) und `LANSessionAdapter.js` (Zeilen 141-150) durch spezifisches Logging und differenziertes Error-Handling ersetzen.
+- [ ] 59.1.4 `_connectingPeers` Set in `LANSessionAdapter._startPolling()` auf explizites Clear vor Neuinitialisierung umstellen, um verwaiste Eintraege zu vermeiden.
+- [ ] 59.1.5 `_findHostPeerId()` in `OnlineSessionAdapter.js` — Null-Rueckgabe absichern: alle Call-Sites (Zeilen 195, 214) mit explizitem Guard versehen.
+
+### 59.2 Server-Haertung (lan-signaling.js)
+
+**Issue:** Hardcodierte Magic Numbers (`maxPlayers: 10` an 3 Stellen), fehlende Routen-Konstanten fuer `/lobby/ready`, `/lobby/leave`, `/lobby/ack-pending`, und Payload-Redundanz im `LOBBY_STATUS`-Endpoint.
+
+**Dateien:** `server/lan-signaling.js`
+
+- [ ] 59.2.1 `maxPlayers`-Wert (Zeilen 53, 70, 203) in Server-Konstante `DEFAULT_MAX_PLAYERS` zentralisieren.
+- [ ] 59.2.2 Fehlende Routes (`/lobby/ready`, `/lobby/leave`, `/lobby/ack-pending`, Zeilen 98, 112, 141) in `SIGNALING_HTTP_ROUTES`-Objekt aufnehmen (konsistent mit bestehenden Routen-Konstanten).
+- [ ] 59.2.3 `LOBBY_STATUS`-Endpoint (Zeile 127): Redundante Top-Level-Properties (`lobbyCode`, `playerCount`, `maxPlayers`) entfernen — sind bereits in `sessionState` enthalten.
+
+### 59.3 Logger-Abstraktion und Console-Cleanup
+
+**Issue:** 14+ Produktionsdateien verwenden direkt `console.log/warn/error` ohne Logger-Abstraktion. Debugging-Output bleibt in Production-Builds aktiv. Kein einheitliches Log-Level-System.
+
+**Dateien:** `src/shared/logging/Logger.js` (neu), diverse Produktionsdateien
+
+- [ ] 59.3.1 `src/shared/logging/Logger.js` implementieren: schlanke Logger-Klasse mit Level-Support (`debug`, `info`, `warn`, `error`), konfigurierbarem Output-Target und optionalem Prefix/Namespace.
+- [ ] 59.3.2 `console.log`-Aufrufe in Core-Layer migrieren: `AppInitializer.js`, `Audio.js`, `GameLoop.js`, `GameRuntimeFacade.js` auf Logger umstellen.
+- [ ] 59.3.3 `console.log`-Aufrufe in Entities-Layer migrieren: `ObservationBridgePolicy.js`, `PlayerInputSystem.js`, `obj-vehicle-mesh.js`, `TrailCollisionDebugTelemetry.js` auf Logger umstellen.
+- [ ] 59.3.4 `console.log`-Aufrufe in State/UI-Layer migrieren: `RoundRecorder.js`, `MatchFlowUiController.js`, `RuntimePerfProfiler.js` auf Logger umstellen.
+- [ ] 59.3.5 Production-Build: Logger auf `warn`+`error`-only konfigurieren (debug/info nur im Dev-Modus). Nachweis via Build-Output-Analyse.
+
+### 59.4 Async Error-Handling Konsistenz
+
+**Issue:** 18+ Dateien nutzen `fetch()` oder `async/await` ohne konsistentes Error-Handling. Mehrere `fetch()`-Aufrufe in Netzwerk-Adaptern ohne try-catch. Kein einheitliches Pattern fuer Fehlerbehandlung bei async Operationen.
+
+**Dateien:** `src/network/*.js`, `src/core/main.js`, diverse async Call-Sites
+
+- [ ] 59.4.1 Audit aller `fetch()`-Aufrufe in `src/` und `server/` — jeden ohne try-catch/`.catch()` mit explizitem Error-Handling versehen.
+- [ ] 59.4.2 `src/core/main.js` Zeilen 159-161: Retry-Loop (`for (let i = 0; i < 30; ...)`) mit Abbruchbedingung und aussagekraeftigem Fehler bei Timeout erweitern.
+- [ ] 59.4.3 Einheitliches Async-Error-Pattern dokumentieren und in `CONTRIBUTING.md` oder Code-Kommentar festhalten: try-catch mit spezifischem Logger-Aufruf, kein bare-catch.
+
+### 59.5 Camera/Recording-Subsystem Polish
+
+**Issue:** `CameraShakeSolver.js` prueft `typeof performance !== 'undefined'` auf jedem Frame (Hotpath). `CameraModeStrategySet.js` hat Methoden mit 9+ Parametern. `CinematicCameraSystem.js` wächst sparse Arrays ohne Bounds-Check. `RecordingCapturePipeline.js` nutzt Lazy-Init mit OR-Pattern statt Eager-Init und klont `_lastMeta` mit `JSON.parse(JSON.stringify(...))`.
+
+**Dateien:** `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/RecordingCapturePipeline.js`
+
+- [ ] 59.5.1 `CameraShakeSolver.js` Zeile 71-73: `performance`-Verfuegbarkeit im Konstruktor einmalig pruefen und als Flag cachen, statt auf jedem Frame zu testen.
+- [ ] 59.5.2 `CameraShakeSolver.js` Zeile 31: `playerIndex` Array-Bounds-Validierung hinzufuegen (nicht nur `Number.isInteger`, sondern auch Range-Check).
+- [ ] 59.5.3 `CinematicCameraSystem.js` Zeilen 28-29: `_blendByPlayer`/`_timeByPlayer`-Arrays mit fester Groesse initialisieren oder `playerIndex`-Range validieren, um sparse Arrays zu vermeiden.
+- [ ] 59.5.4 `CinematicCameraSystem.js` Zeile 57: Fehlende Null-Checks fuer `target`, `playerDirection`, `playerPosition` in `apply()` mit Warn-Log ergaenzen.
+- [ ] 59.5.5 `RecordingCapturePipeline.js` Zeilen 282-283, 629-630: Lazy-initialisierte temporaere Vektoren (`_tmpOtherPosition`, `_tmpOtherQuaternion`) auf Eager-Init im Konstruktor umstellen.
+- [ ] 59.5.6 `RecordingCapturePipeline.js` Zeile 85: `_lastMeta`-Clone von `JSON.parse(JSON.stringify(...))` auf `JsonClone.clone()` (bereits vorhanden in `src/shared/utils/JsonClone.js`) umstellen.
+- [ ] 59.5.7 `CameraModeStrategySet.js` Zeilen 18-44, 61-91: Methoden mit 9+ Parametern auf Config-Objekt-Pattern refaktorieren (ein `CameraApplyParams`-Objekt statt lose Parameter).
+
+### 59.6 Shared-Contract und Util Bereinigung
+
+**Issue:** `RecordingCaptureContract.js` hat doppelte Normalisierungs-Logik. `main.js` hat 4 Backward-Compat-Aliase. `MapPresetsBase.js` filtert fehlende Keys still. `MapPresetCatalog.js` spread ohne Undefined-Guard.
+
+**Dateien:** `src/shared/contracts/RecordingCaptureContract.js`, `src/core/main.js`, `src/core/config/maps/MapPresetsBase.js`, `src/core/config/maps/MapPresetCatalog.js`
+
+- [ ] 59.6.1 `RecordingCaptureContract.js` Zeilen 23-37: Duplizierte Normalisierungs-Logik (`normalizeRecordingCaptureProfile`/`normalizeRecordingHudMode`) in generische `normalizeEnumValue(value, validSet, defaultValue)` Utility zusammenfuehren.
+- [ ] 59.6.2 `main.js` Zeilen 109-113: Backward-Compat-Aliase (`settingsProfiles`, `activeProfileName`, `selectedProfileName`, `loadedProfileName`) aufraeumen — pruefen ob noch referenziert, ggf. entfernen oder Deprecation-Warning hinzufuegen.
+- [ ] 59.6.3 `MapPresetsBase.js` Zeilen 31-33: Stilles Filtern fehlender Keys durch Warn-Log ersetzen, damit Map-Konfigurationsfehler sichtbar werden.
+- [ ] 59.6.4 `MapPresetCatalog.js` Zeilen 17-18: Undefined-Guard vor Spread-Operationen hinzufuegen, um stille Fehler bei fehlenden Map-Imports zu verhindern.
+
+### 59.7 Test-Coverage-Expansion fuer Grosse Module
+
+**Issue:** Die groessten Module (MediaRecorderSystem 1324 Zeilen, GameRuntimeFacade 843 Zeilen, MenuMultiplayerBridge 748 Zeilen) haben keine dedizierten Unit-Tests. Nur Integration-Tests via Playwright decken Teile ab.
+
+**Dateien:** `tests/recording.spec.js` (neu), `tests/runtime-facade.spec.js` (neu)
+
+- [ ] 59.7.1 `tests/recording.spec.js` erstellen: Mindestens 5 Tests fuer MediaRecorderSystem (Start/Stop-Lifecycle, Format-Detection, WebCodecs-Fallback, Export-Flow, State-Reset).
+- [ ] 59.7.2 `tests/runtime-facade.spec.js` erstellen: Mindestens 5 Tests fuer GameRuntimeFacade (Session-Switch, Settings-Apply, Multiplayer-Bridge-Wiring, Pause-Resume, Cleanup/Dispose).
+- [ ] 59.7.3 Bestehende `tests/core.spec.js` um Netzwerk-Adapter-Tests erweitern: Retry-Verhalten, Peer-Disconnect-Handling, Reconnect-Flow.
+
+### Phase 59.99: Integrations- und Abschluss-Gate
+
+- [ ] 59.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen.
+- [ ] 59.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert.
+- [ ] 59.99.3 `grep -r "console\\.log" src/ --include="*.js"` zeigt nur erlaubte Dateien (`src/core/debug/`, `src/core/GameDebugApi.js`).
+- [ ] 59.99.4 `grep -r "fetch(" src/ --include="*.js"` — jede Call-Site hat dokumentiertes Error-Handling.
+
+### Risiko-Register V59
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Logger-Migration aendert Timing/Output von bestehenden Debug-Flows | mittel | Core | Schrittweise Migration pro Layer, Test-Gates nach jedem Batch | Debug-Info fehlt nach Migration |
+| Netzwerk-Adapter-Refactor bricht LAN/Online-Multiplayer | hoch | Netzwerk | Characterization-Tests vor Refactor, Adapter-Kompatibilitaets-Smoke nach jedem Schritt | Join/Reconnect schlaegt fehl |
+| Camera-Parameter-Refactor veraendert visuelles Verhalten | mittel | Renderer | Visueller Vergleich vor/nach Refactor, keine Werteaenderungen nur Struktur-Umbau | Kamera-Verhalten weicht ab |
+| Test-Coverage-Expansion erfordert Mocking-Infrastruktur die nicht existiert | mittel | QA | Playwright-basierte Integration-Tests bevorzugen, minimales Mocking nur wo noetig | Tests sind zu fragil oder aufwaendig |
+| Server-Haertung in lan-signaling.js bricht bestehende Client-Kompatibilitaet | mittel | Server | Payload-Aenderungen nur additiv, alte Felder deprecaten statt entfernen | LAN-Lobby funktioniert nicht mehr |
 
 ---
 
