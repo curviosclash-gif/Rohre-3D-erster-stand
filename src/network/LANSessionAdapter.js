@@ -2,7 +2,10 @@
 // LANSessionAdapter.js - LAN session via embedded signaling
 // ============================================
 
+import { createLogger } from '../shared/logging/Logger.js';
 import { SessionAdapterBase } from './SessionAdapterBase.js';
+
+const logger = createLogger('LANSessionAdapter');
 import { PeerConnectionManager } from './PeerConnectionManager.js';
 import { DataChannelManager } from './DataChannelManager.js';
 import { LatencyMonitor } from './LatencyMonitor.js';
@@ -131,8 +134,8 @@ export class LANSessionAdapter extends SessionAdapterBase {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ playerId: this.localPlayerId || peerId, candidate }),
             });
-        } catch {
-            // ICE send failure — connection may still succeed via other candidates
+        } catch (err) {
+            logger.debug('ICE send failed (may still connect via other candidates):', err);
         }
     }
 
@@ -147,8 +150,8 @@ export class LANSessionAdapter extends SessionAdapterBase {
                     }
                     if (data.candidates.length > 0) return;
                 }
-            } catch {
-                // polling failure
+            } catch (err) {
+                logger.debug('ICE candidate poll failed:', err);
             }
             await new Promise((resolve) => setTimeout(resolve, 200));
         }
@@ -171,8 +174,8 @@ export class LANSessionAdapter extends SessionAdapterBase {
                         });
                     }
                 }
-            } catch {
-                // signaling server might not be ready yet
+            } catch (err) {
+                logger.debug('Polling lobby status failed:', err);
             }
         }, 1000);
     }
@@ -198,8 +201,8 @@ export class LANSessionAdapter extends SessionAdapterBase {
                         await this._peerManager.addIceCandidate(targetPeerId, candidate);
                     }
                 }
-            } catch {
-                // ICE poll failure
+            } catch (err) {
+                logger.debug('ICE poll for pending client failed:', err);
             }
 
             const res = await fetch(`${this._signalingUrl}/signaling/answer?playerId=${targetPeerId}`);

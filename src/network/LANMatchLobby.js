@@ -2,7 +2,10 @@
 // LANMatchLobby.js - LAN lobby via embedded signaling
 // ============================================
 
+import { createLogger } from '../shared/logging/Logger.js';
 import { MatchLobby } from '../core/lobby/MatchLobby.js';
+
+const logger = createLogger('LANMatchLobby');
 import {
     createInitialLobbySessionState,
     normalizeLobbySessionState,
@@ -58,8 +61,8 @@ export class LANMatchLobby extends MatchLobby {
             const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_STATUS}`);
             const data = await res.json();
             this._syncWithServerStatus(data);
-        } catch {
-            // Server may not be ready yet
+        } catch (err) {
+            logger.warn('Initial lobby status fetch failed (server may not be ready):', err);
         }
     }
 
@@ -144,9 +147,9 @@ export class LANMatchLobby extends MatchLobby {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ playerId: this._localPeerId }),
-                }).catch(() => {});
-            } catch {
-                // best-effort cleanup
+                }).catch((err) => { logger.debug('Leave notification failed:', err); });
+            } catch (err) {
+                logger.debug('Leave notification error:', err);
             }
         }
 
