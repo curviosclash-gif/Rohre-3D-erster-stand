@@ -12,6 +12,7 @@ import {
     buildArcadeRunSummary,
     mergeArcadeRunRecords,
 } from '../../state/arcade/ArcadeScoreOps.js';
+import { MAP_PRESET_CATALOG } from '../config/maps/MapPresetCatalog.js';
 import {
     resolveMapSequence,
     getMapKeyForSector,
@@ -176,7 +177,7 @@ export class ArcadeRunRuntime {
 
         // Resolve map sequence from encounter plan if available
         if (options.encounterPlan) {
-            const mapSequence = resolveMapSequence(options.encounterPlan, this._config.seed);
+            const mapSequence = resolveMapSequence(options.encounterPlan, this._config.seed, MAP_PRESET_CATALOG);
             this._state.mapSequence = mapSequence;
             if (mapSequence.length > 0) {
                 this._state.currentMapKey = mapSequence[0];

@@ -1,6 +1,6 @@
 // ─── Arcade Map Progression: Multi-Map Sequencing per Arcade Run ───
-
-import { MAP_PRESET_CATALOG } from '../../core/config/maps/MapPresetCatalog.js';
+// Note: This module is now decoupled from MapPresetCatalog via dependency injection.
+// Consumers must provide mapCatalog as a parameter to resolveMapSequence().
 
 export const SECTOR_MAP_POOLS = Object.freeze({
     sector_intro: Object.freeze(['standard', 'foam_forest', 'crossfire']),
@@ -30,13 +30,13 @@ function createSeededRandom(seed) {
     };
 }
 
-function isValidMapKey(mapKey) {
-    return typeof mapKey === 'string' && mapKey in MAP_PRESET_CATALOG;
+function isValidMapKey(mapKey, mapCatalog) {
+    return typeof mapKey === 'string' && mapKey in mapCatalog;
 }
 
-function pickValidMap(pool, randomFn) {
+function pickValidMap(pool, randomFn, mapCatalog) {
     if (!Array.isArray(pool) || pool.length === 0) return DEFAULT_MAP;
-    const validPool = pool.filter(isValidMapKey);
+    const validPool = pool.filter((key) => isValidMapKey(key, mapCatalog));
     if (validPool.length === 0) return DEFAULT_MAP;
     const index = Math.floor(randomFn() * validPool.length);
     return validPool[Math.max(0, Math.min(validPool.length - 1, index))];
@@ -46,8 +46,11 @@ function pickValidMap(pool, randomFn) {
  * Resolves a map sequence from a sector plan.
  * Each sector gets a map picked from the template's map pool.
  * Avoids repeating the same map in consecutive sectors when possible.
+ * @param {Object} sectorPlan - Sector plan with sequence array
+ * @param {string} seed - Seed for randomization
+ * @param {Object} mapCatalog - Map catalog for validation (injected dependency)
  */
-export function resolveMapSequence(sectorPlan, seed) {
+export function resolveMapSequence(sectorPlan, seed, mapCatalog) {
     if (!sectorPlan || !Array.isArray(sectorPlan.sequence)) return [];
     const randomFn = createSeededRandom(`${seed}-mapseq`);
     const sequence = [];
@@ -57,11 +60,11 @@ export function resolveMapSequence(sectorPlan, seed) {
         const templateId = String(entry?.templateId || 'sector_intro');
         const pool = SECTOR_MAP_POOLS[templateId] || SECTOR_MAP_POOLS.sector_intro;
 
-        let mapKey = pickValidMap(pool, randomFn);
+        let mapKey = pickValidMap(pool, randomFn, mapCatalog);
 
         // Avoid consecutive duplicate maps when pool has alternatives
         if (i > 0 && mapKey === sequence[i - 1] && pool.length > 1) {
-            const alternatives = pool.filter((k) => k !== mapKey && isValidMapKey(k));
+            const alternatives = pool.filter((k) => k !== mapKey && isValidMapKey(k, mapCatalog));
             if (alternatives.length > 0) {
                 mapKey = alternatives[Math.floor(randomFn() * alternatives.length)];
             }
