@@ -48,6 +48,7 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
             },
         });
         this._lobbyCode = null;
+        this._hostPeerId = null;
 
         this._dataChannelManager.on('message', ({ peerId, channel, data }) => {
             this._handleDataMessage(peerId, channel, data);
@@ -139,6 +140,7 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
 
         case 'offer':
             if (!this.isHost) {
+                this._hostPeerId = msg.fromPeerId;
                 const answer = await this._peerManager.handleOffer(msg.fromPeerId, msg.offer);
                 this._sendSignaling({ type: 'answer', targetPeerId: msg.fromPeerId, answer });
             }
@@ -168,8 +170,7 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
     }
 
     _findHostPeerId() {
-        const peerIds = this._peerManager.getAllPeerIds();
-        return peerIds.length > 0 ? peerIds[0] : null;
+        return this._hostPeerId || null;
     }
 
     _sendStateToAll(message, excludePeerId = null) {
@@ -210,12 +211,15 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
         if (this.isHost) {
             this._sendStateToAll(this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.HOST_LEAVING));
         } else {
-            this._sendStateToPeer(
-                this._peerManager.getAllPeerIds()[0] || 'host',
-                this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.LEAVE, {
-                    playerId: this.localPlayerId,
-                })
-            );
+            const hostPeerId = this._findHostPeerId();
+            if (hostPeerId) {
+                this._sendStateToPeer(
+                    hostPeerId,
+                    this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.LEAVE, {
+                        playerId: this.localPlayerId,
+                    })
+                );
+            }
         }
         this._sendSignaling({ type: 'leave' });
     }
@@ -237,7 +241,10 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
             this._sendStateToAll(payload);
             return;
         }
-        this._dataChannelManager.send('host', 'inputs', payload);
+        const hostPeerId = this._findHostPeerId();
+        if (hostPeerId) {
+            this._dataChannelManager.send(hostPeerId, 'inputs', payload);
+        }
     }
 
     broadcastState(stateSnapshot) {

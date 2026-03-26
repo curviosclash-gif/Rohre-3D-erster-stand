@@ -124,15 +124,29 @@ export function createLANSignalingServer(port = 9090) {
         }
 
         if (req.method === 'GET' && path === SIGNALING_HTTP_ROUTES.LOBBY_STATUS) {
-            const pending = lobby.pendingPlayers.splice(0);
+            // Return pending players non-destructively — host acks via POST /lobby/ack-pending
+            const pending = lobby.pendingPlayers.map((entry) => ({ playerId: entry.playerId }));
+            const lobbyState = buildLobbyState(lobby);
             jsonResponse(res, {
                 sessionState: {
-                    ...buildLobbyState(lobby),
+                    ...lobbyState,
                     pendingPlayers: pending,
                 },
-                ...buildLobbyState(lobby),
+                ...lobbyState,
                 pendingPlayers: pending,
             });
+            return;
+        }
+
+        if (req.method === 'POST' && path === '/lobby/ack-pending') {
+            const body = await readBody(req);
+            const playerId = String(body.playerId || '').trim();
+            if (playerId) {
+                lobby.pendingPlayers = lobby.pendingPlayers.filter(
+                    (entry) => entry.playerId !== playerId
+                );
+            }
+            jsonResponse(res, { ok: true });
             return;
         }
 

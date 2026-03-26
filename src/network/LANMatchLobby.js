@@ -136,6 +136,20 @@ export class LANMatchLobby extends MatchLobby {
             clearInterval(this._pollingInterval);
             this._pollingInterval = null;
         }
+
+        // Notify the LAN signaling server so the player slot is freed
+        if (this._signalingUrl && this._localPeerId && !this.isHost) {
+            try {
+                fetch(`${this._signalingUrl}/lobby/leave`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ playerId: this._localPeerId }),
+                }).catch(() => {});
+            } catch {
+                // best-effort cleanup
+            }
+        }
+
         this.players = [];
         this.sessionState = createInitialLobbySessionState();
         this._emit('closed', {});

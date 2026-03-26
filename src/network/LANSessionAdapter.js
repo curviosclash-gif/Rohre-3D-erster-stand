@@ -57,6 +57,10 @@ export class LANSessionAdapter extends SessionAdapterBase {
             this._registerPeerDisconnect(peerId, 'heartbeat-timeout');
         });
 
+        this._peerManager.on('iceCandidate', ({ peerId, candidate }) => {
+            this._sendIceCandidate(peerId, candidate);
+        });
+
         this._beforeUnloadHandler = () => {
             this._sendLeaveMessage();
         };
@@ -89,8 +93,20 @@ export class LANSessionAdapter extends SessionAdapterBase {
         const joinData = await joinRes.json();
         this.localPlayerId = joinData.playerId;
 
-        const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${this.localPlayerId}`);
-        const offerData = await offerRes.json();
+        // Poll for the offer from host
+        let offerData = null;
+        for (let i = 0; i < 30; i += 1) {
+            const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${this.localPlayerId}`);
+            const data = await offerRes.json();
+            if (data.offer) {
+                offerData = data;
+                break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+        if (!offerData?.offer) {
+            throw new Error('Timed out waiting for host offer');
+        }
 
         const answer = await this._peerManager.handleOffer('host', offerData.offer);
 
@@ -100,19 +116,59 @@ export class LANSessionAdapter extends SessionAdapterBase {
             body: JSON.stringify({ playerId: this.localPlayerId, answer }),
         });
 
+        // Exchange ICE candidates with host
+        await this._pollIceCandidates('host');
+
         this.isConnected = true;
         this._emit('connected', { playerId: this.localPlayerId });
     }
 
+    async _sendIceCandidate(peerId, candidate) {
+        if (!this._signalingUrl) return;
+        try {
+            await fetch(`${this._signalingUrl}/signaling/ice`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ playerId: this.localPlayerId || peerId, candidate }),
+            });
+        } catch {
+            // ICE send failure — connection may still succeed via other candidates
+        }
+    }
+
+    async _pollIceCandidates(peerId) {
+        for (let i = 0; i < 15; i += 1) {
+            try {
+                const res = await fetch(`${this._signalingUrl}/signaling/ice?playerId=${this.localPlayerId}`);
+                const data = await res.json();
+                if (Array.isArray(data.candidates)) {
+                    for (const candidate of data.candidates) {
+                        await this._peerManager.addIceCandidate(peerId, candidate);
+                    }
+                    if (data.candidates.length > 0) return;
+                }
+            } catch {
+                // polling failure
+            }
+            await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+    }
+
     _startPolling() {
         if (!this.isHost || !this._signalingUrl) return;
+        this._connectingPeers = new Set();
         this._pollingInterval = setInterval(async () => {
             try {
                 const res = await fetch(`${this._signalingUrl}/lobby/status`);
                 const data = await res.json();
                 if (Array.isArray(data.pendingPlayers)) {
                     for (const pending of data.pendingPlayers) {
-                        await this._connectToPendingClient(pending);
+                        const peerId = String(pending?.playerId || '').trim();
+                        if (!peerId || this._connectingPeers.has(peerId)) continue;
+                        this._connectingPeers.add(peerId);
+                        this._connectToPendingClient(pending).finally(() => {
+                            this._connectingPeers.delete(peerId);
+                        });
                     }
                 }
             } catch {
@@ -133,6 +189,19 @@ export class LANSessionAdapter extends SessionAdapterBase {
         });
 
         for (let i = 0; i < 30; i += 1) {
+            // Poll for ICE candidates from client while waiting for answer
+            try {
+                const iceRes = await fetch(`${this._signalingUrl}/signaling/ice?playerId=${targetPeerId}`);
+                const iceData = await iceRes.json();
+                if (Array.isArray(iceData.candidates)) {
+                    for (const candidate of iceData.candidates) {
+                        await this._peerManager.addIceCandidate(targetPeerId, candidate);
+                    }
+                }
+            } catch {
+                // ICE poll failure
+            }
+
             const res = await fetch(`${this._signalingUrl}/signaling/answer?playerId=${targetPeerId}`);
             const data = await res.json();
             if (!data.answer) {
@@ -141,6 +210,14 @@ export class LANSessionAdapter extends SessionAdapterBase {
             }
             await this._peerManager.handleAnswer(targetPeerId, data.answer);
             this._latencyMonitor.addPeer(targetPeerId);
+
+            // Acknowledge successful connection — removes from pending list on server
+            fetch(`${this._signalingUrl}/lobby/ack-pending`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ playerId: targetPeerId }),
+            }).catch(() => {});
+
             if (this._disconnectedPeers.has(targetPeerId)) {
                 this._resolvePeerReconnect(targetPeerId);
             } else {
