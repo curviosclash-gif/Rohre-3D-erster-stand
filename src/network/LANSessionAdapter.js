@@ -219,7 +219,7 @@ export class LANSessionAdapter extends SessionAdapterBase {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ playerId: targetPeerId }),
-            }).catch(() => {});
+            }).catch((err) => { logger.debug('Ack-pending failed:', err); });
 
             if (this._disconnectedPeers.has(targetPeerId)) {
                 this._resolvePeerReconnect(targetPeerId);

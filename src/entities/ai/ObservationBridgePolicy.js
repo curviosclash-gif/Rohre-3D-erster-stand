@@ -245,11 +245,11 @@ export class ObservationBridgePolicy {
                 const actionVocabulary = createCheckpointActionVocabulary(data.checkpoint);
                 const result = this.loadLocalCheckpoint(data.checkpoint, actionVocabulary);
                 if (result.ok) {
-                    console.info('[ObservationBridgePolicy] auto-loaded trained bot checkpoint');
+                    logger.info('Auto-loaded trained bot checkpoint');
                 }
             })
-            .catch(() => {
-                // No checkpoint available — silent fallback to rule-based
+            .catch((err) => {
+                logger.debug('No checkpoint available, using rule-based fallback:', err);
             });
     }
 

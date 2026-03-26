@@ -128,8 +128,8 @@ export class LANMatchLobby extends MatchLobby {
                 const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_STATUS}`);
                 const data = await res.json();
                 this._syncWithServerStatus(data);
-            } catch {
-                // polling failure
+            } catch (err) {
+                logger.debug('Lobby status poll failed:', err);
             }
         }, 2000);
     }
