@@ -83,6 +83,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | 2026-03-24 | Codex | V54 | `src/ui/MatchFlowUiController.js`, `src/ui/MatchInputSourceResolver.js`, `src/ui/PlayerInputSource.js` | V52.5 Input-Source-Priorisierung benoetigt Runtime-Wiring im Match-UI-Lifecycle | Scope auf Input-Quellen-Wiring begrenzt, Guard/Budget-Gates (`architecture:guard`, `build`) ausgefuehrt | abgeschlossen |
 | 2026-03-25 | Bot-H | V2 | `scripts/perf-lifecycle-measure.mjs`, `scripts/perf-jitter-matrix.mjs` | V55.5.2 benoetigt belastbare Perf-Sanity ohne Dev-Server-Startup-Deadlocks | Benchmark-Runner auf `vite preview` mit Auto-Build-Fallback und robuster Navigation/Readiness umgestellt; `benchmark:lifecycle`/`benchmark:jitter` ausgefuehrt | abgeschlossen |
 | 2026-03-25 | Bot-H | Shared | `tests/helpers.js`, `package.json` | V55.1 Startup-Flakes erfordern robusteren `loadGame`-Pfad und testseitige Timeout-Haertung | `loadGame` um Runtime-Readiness+Retry erweitert; `test:core`/`test:fast` auf `--timeout=240000` standardisiert; Gate-Laeufe dokumentiert | abgeschlossen |
+| 2026-03-26 | Agent A | V57 | `src/ui/arcade/ArcadeVehicleManager.js` | V58 Architektur-Guard zeigt ui->state import zu ArcadeVehicleProfile; muss via Facade/Contract entkoppelt werden | Contract für Vehicle-Operationen erstellen, ArcadeVehicleManager via Dependency Injection nutzen | PENDING |
 
 ---
 
@@ -620,24 +621,24 @@ Scope:
 
 ### 58.2 MediaRecorderSystem Decomposition
 
-- [ ] 58.2.1 `src/core/recording/engines/WebCodecsRecorderEngine.js` extrahieren (VideoEncoder & Muxer Logik).
-- [ ] 58.2.2 `src/core/recording/engines/NativeMediaRecorderEngine.js` extrahieren (MediaRecorder Fallback).
-- [ ] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen und Download-Logik delegieren.
+- [x] 58.2.1 `src/core/recording/engines/WebCodecsRecorderEngine.js` extrahieren (VideoEncoder & Muxer Logik). (abgeschlossen: 2026-03-26; evidence: WebCodecsRecorderEngine with initialize/encodeFrame/finalize; commit 606ff1e)
+- [x] 58.2.2 `src/core/recording/engines/NativeMediaRecorderEngine.js` extrahieren (MediaRecorder Fallback). (abgeschlossen: 2026-03-26; evidence: NativeMediaRecorderEngine with start/stop/requestFrame; commit 606ff1e)
+- [/] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen und Download-Logik delegieren. (in Arbeit: Engines importiert, volle Integration benötigt 1332->multiple-file refactor; ESLint budget jetzt passing nach Engine-Extraktion)
 
 ### 58.3 UI Store & State Redundanz
 
-- [ ] 58.3.1 `src/ui/base/PersistentStore.js` als abstrakte Basisklasse mit Storage-Anbindung implementieren.
-- [ ] 58.3.2 `SettingsStore`, `MenuPresetStore`, `MenuDraftStore` etc. auf die neue Basisklasse umstellen.
+- [/] 58.3.1 `src/ui/base/PersistentStore.js` als abstrakte Basisklasse mit Storage-Anbindung implementieren. (blockiert: ArcadeVehicleManager ui->state violation muss zuerst behoben werden)
+- [/] 58.3.2 `SettingsStore`, `MenuPresetStore`, `MenuDraftStore` etc. auf die neue Basisklasse umstellen. (blockiert: abhängig von 58.3.1)
 
 ### 58.4 Tooling & Dead-Code Quality
 
-- [ ] 58.4.1 `knip` als Dev-Dependency installieren und `knip.json` für das Projekt validieren.
-- [ ] 58.4.2 Manueller Audit der "Unused"-Liste: Echten Dead-Code (z.B. veraltete Mesh-Files) sicher entfernen.
+- [ ] 58.4.1 `knip` als Dev-Dependency installieren und `knip.json` für das Projekt validieren. (TODO)
+- [ ] 58.4.2 Manueller Audit der "Unused"-Liste: Echten Dead-Code (z.B. veraltete Mesh-Files) sicher entfernen. (TODO)
 
 ### Phase 58.99: Architektur-Abschluss-Gate
 
-- [ ] 58.99.1 `npm run architecture:guard` PASS (Metriken innerhalb der Budgets).
-- [ ] 58.99.2 `npm run test:fast` & `npm run build` sind grün.
+- [/] 58.99.1 `npm run architecture:guard` PASS (Metriken innerhalb der Budgets). (blockiert: ArcadeVehicleManager ui->state import)
+- [/] 58.99.2 `npm run test:fast` & `npm run build` sind grün. (ESLint passed; architecture boundary check blocked by vehicle manager)
 
 ### Risiko-Register V58
 
