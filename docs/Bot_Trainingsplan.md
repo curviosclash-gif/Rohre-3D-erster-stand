@@ -41,8 +41,8 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | BT12 | BT11 Abschlussartefakte | soft | ja | weiteres 10h-Folgefenster fuer Bot-Stabilisierung |
 | BT15 | BT10 Baseline-Laufdaten | soft | ja | Zukunftsplanung nutzt aktuelle Lauf-KPIs |
 | BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | teilweise | BT10 in Arbeit, BT15 aktiv |
-| BT30 | 20.9 | hard | nein | startet erst nach Survival-Policy-Phase |
-| BT40 | 30.9 | hard | nein | Eval/Gate-Haertung nach Curriculum/Hyperparameter |
+| BT30 | 20.99 | hard | nein | startet erst nach Survival-Policy-Phase |
+| BT40 | 30.99 | hard | nein | Eval/Gate-Haertung nach Curriculum/Hyperparameter |
 
 ## Datei-Ownership (Bot-Training)
 
@@ -85,7 +85,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_12h.md`
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle BT10-Phasen inkl. 10.9.* sind abgeschlossen.
+- [ ] DoD.1 Alle BT10-Phasen inkl. 10.99.* sind abgeschlossen.
 - [ ] DoD.2 `training:run/eval/gate` sowie `bot:validate` sind mit finalen Artefakten dokumentiert.
 - [ ] DoD.3 KPI-Vergleich gegen Baseline ist im Plan eingetragen.
 - [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
@@ -107,10 +107,10 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_12h.md`
 | 2026-03-22 | Baseline | `20260321T180755Z-r01` | `123.799` | `31.908458` | `0.247460` | Referenz | `data/training/runs/20260321T180755Z-r01/run.json` |
 | 2026-03-22 | Zwischenstand | `20260322T023812Z-r4344` | `124.138` | `null` | `0.000000` | `+0.274%` (`+0.339`) | `data/training/runs/20260322T023812Z-r4344/run.json` |
 
-### 10.9 Abschluss-Gate
+### 10.99 Abschluss-Gate
 
-- [ ] 10.9.1 Finales `run -> eval -> gate` plus `bot:validate` mit passendem Report abschliessen
-- [ ] 10.9.2 Finale Artefaktpfade + KPI-Vergleich dokumentieren und Lock freigeben
+- [ ] 10.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit passendem Report abschliessen
+- [ ] 10.99.2 Finale Artefaktpfade + KPI-Vergleich dokumentieren und Lock freigeben
 
 ### Risiko-Register BT10
 
@@ -241,7 +241,7 @@ Plan-Datei: `docs/Bot_Trainings_Roadmap.md`
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle BT15-Phasen inkl. 15.9.* sind abgeschlossen.
+- [ ] DoD.1 Alle BT15-Phasen inkl. 15.99.* sind abgeschlossen.
 - [ ] DoD.2 C1-C6 Zeitfenster, KPI-Zielkorridor und Entscheidungsregeln sind final dokumentiert.
 - [ ] DoD.3 Woechentliche Re-Planung ist an BT10-Checkpoint-Log und Weekly Review gekoppelt.
 - [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
@@ -256,10 +256,10 @@ Plan-Datei: `docs/Bot_Trainings_Roadmap.md`
 - [x] 15.2.1 Promotion-/Rollback-Regeln fuer zyklische Trainingsfenster definieren (abgeschlossen: 2026-03-22; evidence: add promotion rollback rules -> docs/Bot_Trainings_Roadmap.md)
 - [/] 15.2.2 Woechentliche Re-Planung in BT10-Checkpoint-Log und Weekly Review verankern
 
-### 15.9 Abschluss-Gate
+### 15.99 Abschluss-Gate
 
-- [ ] 15.9.1 Ersten kompletten Zyklus (C1) mit KPI-Delta dokumentieren
-- [ ] 15.9.2 KW13-Roadmap-Review abschliessen und Lock auf `frei` setzen
+- [ ] 15.99.1 Ersten kompletten Zyklus (C1) mit KPI-Delta dokumentieren
+- [ ] 15.99.2 KW13-Roadmap-Review abschliessen und Lock auf `frei` setzen
 
 ### Risiko-Register BT15
 
@@ -279,7 +279,7 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle BT20-Phasen inkl. 20.9.* sind abgeschlossen.
+- [ ] DoD.1 Alle BT20-Phasen inkl. 20.99.* sind abgeschlossen.
 - [ ] DoD.2 A/B-Lauf gegen BT10-Baseline zeigt positives Survival-Delta.
 - [ ] DoD.3 Training-Gates und betroffene Tests sind PASS.
 - [ ] DoD.4 Evidence, Risikoabgleich und Doku-Gates sind abgeschlossen.
@@ -294,10 +294,10 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 - [ ] 20.2.1 Schrittweises Survival-Reward und klare Death-Penalty kalibrieren
 - [ ] 20.2.2 Risk-Proximity-Penalties (Wall/Trail/Opponent) einfuehren und testen
 
-### 20.9 Abschluss-Gate
+### 20.99 Abschluss-Gate
 
-- [ ] 20.9.1 A/B-Lauf gegen BT10-Baseline mit identischen Seeds/Modes durchfuehren
-- [ ] 20.9.2 Verbesserung nur bei positivem Survival-Delta und stabilen Gates uebernehmen
+- [ ] 20.99.1 A/B-Lauf gegen BT10-Baseline mit identischen Seeds/Modes durchfuehren
+- [ ] 20.99.2 Verbesserung nur bei positivem Survival-Delta und stabilen Gates uebernehmen
 
 ### Risiko-Register BT20
 
@@ -314,11 +314,11 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 Plan-Datei: `docs/Bot_Trainingsplan.md`
 
 <!-- LOCK: frei -->
-<!-- DEPENDS-ON: 20.9 -->
+<!-- DEPENDS-ON: 20.99 -->
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle BT30-Phasen inkl. 30.9.* sind abgeschlossen.
+- [ ] DoD.1 Alle BT30-Phasen inkl. 30.99.* sind abgeschlossen.
 - [ ] DoD.2 Gewinner-Setting ist reproduzierbar ueber Vergleichslaeufe.
 - [ ] DoD.3 Standard-Training-Skripte nutzen Gewinner-Setting.
 - [ ] DoD.4 Evidence + Doku-Gates sind abgeschlossen.
@@ -333,10 +333,10 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 - [ ] 30.2.1 Priorisierte Samples fuer near-death/death-leading Situationen einfuehren
 - [ ] 30.2.2 Survival-orientierte Hyperparameter-Tuning-Laeufe (gamma/epsilon/step-limits) automatisieren
 
-### 30.9 Abschluss-Gate
+### 30.99 Abschluss-Gate
 
-- [ ] 30.9.1 Gewinner-Setting per reproduzierbarem Vergleichslauf bestimmen
-- [ ] 30.9.2 Gewinner-Setting in Standard-Training-Skripten verankern und dokumentieren
+- [ ] 30.99.1 Gewinner-Setting per reproduzierbarem Vergleichslauf bestimmen
+- [ ] 30.99.2 Gewinner-Setting in Standard-Training-Skripten verankern und dokumentieren
 
 ### Risiko-Register BT30
 
@@ -353,11 +353,11 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 Plan-Datei: `docs/Bot_Trainingsplan.md`
 
 <!-- LOCK: frei -->
-<!-- DEPENDS-ON: 30.9 -->
+<!-- DEPENDS-ON: 30.99 -->
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle BT40-Phasen inkl. 40.9.* sind abgeschlossen.
+- [ ] DoD.1 Alle BT40-Phasen inkl. 40.99.* sind abgeschlossen.
 - [ ] DoD.2 Survival-Metriken sind als harte Gates verankert.
 - [ ] DoD.3 Trainingsnahe Regressionstests und Operator-Runbook sind aktualisiert.
 - [ ] DoD.4 `plan:check`, `docs:sync`, `docs:check`, `build` sind PASS.
@@ -372,10 +372,10 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 - [ ] 40.2.1 Trainingsnahe Regressionstests fuer Survival-Deltas und Guardrails erweitern
 - [ ] 40.2.2 Operator-Runbook fuer Start/Resume/Stop/Recovery standardisieren
 
-### 40.9 Abschluss-Gate
+### 40.99 Abschluss-Gate
 
-- [ ] 40.9.1 `training-run/eval/gate`, `bot:validate`, trainingsnahe Tests und Build sind gruen
-- [ ] 40.9.2 Plan-Doku, Lock-Bereinigung und Handoff an `docs/Umsetzungsplan.md` (nur Referenz) abgeschlossen
+- [ ] 40.99.1 `training-run/eval/gate`, `bot:validate`, trainingsnahe Tests und Build sind gruen
+- [ ] 40.99.2 Plan-Doku, Lock-Bereinigung und Handoff an `docs/Umsetzungsplan.md` (nur Referenz) abgeschlossen
 
 ### Risiko-Register BT40
 
