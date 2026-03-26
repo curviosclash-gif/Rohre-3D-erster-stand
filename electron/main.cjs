@@ -1,17 +1,14 @@
 // ============================================
-// electron/main.js - Electron main process
+// electron/main.cjs - Electron main process
 // ============================================
 
-import { app, BrowserWindow, ipcMain, dialog, Tray, nativeImage } from 'electron';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { writeFileSync } from 'node:fs';
-import dgram from 'node:dgram';
-import os from 'node:os';
-import { createLANSignalingServer } from '../server/lan-signaling.js';
-import { startStaticServer } from './static-server.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const { app, BrowserWindow, ipcMain, dialog, Tray, nativeImage } = require('electron');
+const path = require('node:path');
+const { writeFileSync } = require('node:fs');
+const dgram = require('node:dgram');
+const os = require('node:os');
+const { pathToFileURL } = require('node:url');
+const { startStaticServer } = require('./static-server.cjs');
 
 let mainWindow = null;
 let tray = null;
@@ -25,6 +22,16 @@ let broadcastSocket = null;
 let broadcastTimer = null;
 let discoverySocket = null;
 const discoveredHosts = new Map();
+const hasSingleInstanceLock = app.requestSingleInstanceLock();
+
+if (!hasSingleInstanceLock) {
+    app.quit();
+}
+
+async function loadLanSignalingModule() {
+    const moduleUrl = pathToFileURL(path.resolve(__dirname, '..', 'server', 'lan-signaling.js')).href;
+    return import(moduleUrl);
+}
 
 function getLocalIPs() {
     const interfaces = os.networkInterfaces();
@@ -76,7 +83,8 @@ function startBroadcast(resolveState) {
     broadcastSocket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
     broadcastSocket.on('error', () => {});
     broadcastSocket.bind(0, () => {
-        broadcastSocket?.setBroadcast(true);
+        if (!broadcastSocket) return;
+        broadcastSocket.setBroadcast(true);
         const hostName = os.hostname();
         const ips = getLocalIPs();
         broadcastTimer = setInterval(() => {
@@ -98,9 +106,10 @@ function startBroadcast(resolveState) {
     });
 }
 
-function startSignalingServer() {
+async function startSignalingServer() {
     if (signalingRuntime) return signalingRuntime;
 
+    const { createLANSignalingServer } = await loadLanSignalingModule();
     const runtime = createLANSignalingServer(9090);
     runtime.server.on('error', (error) => {
         console.error('[Signaling] Error:', error);
@@ -227,8 +236,8 @@ ipcMain.handle('get-lan-server-status', () => ({
     port: signalingRuntime ? 9090 : null,
 }));
 
-ipcMain.handle('start-lan-server', () => {
-    startSignalingServer();
+ipcMain.handle('start-lan-server', async () => {
+    await startSignalingServer();
     return { running: true, port: 9090 };
 });
 
@@ -282,8 +291,11 @@ async function shutdownRuntime() {
 }
 
 app.whenReady().then(async () => {
+    if (!hasSingleInstanceLock) {
+        return;
+    }
     try {
-        startSignalingServer();
+        await startSignalingServer();
         await createWindow();
         createTray();
     } catch (error) {
@@ -292,6 +304,14 @@ app.whenReady().then(async () => {
         await shutdownRuntime();
         app.quit();
     }
+});
+
+app.on('second-instance', () => {
+    if (!mainWindow) return;
+    if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+    }
+    mainWindow.focus();
 });
 
 app.on('window-all-closed', () => {

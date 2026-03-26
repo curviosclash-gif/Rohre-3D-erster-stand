@@ -1,6 +1,6 @@
-import http from 'node:http';
-import path from 'node:path';
-import { createReadStream, existsSync } from 'node:fs';
+const http = require('node:http');
+const path = require('node:path');
+const { createReadStream, existsSync } = require('node:fs');
 
 const MIME_TYPES = Object.freeze({
     '.css': 'text/css; charset=utf-8',
@@ -67,7 +67,7 @@ function closeServer(server) {
     });
 }
 
-export async function startStaticServer({ rootDir, host = '127.0.0.1', port = 0 }) {
+async function startStaticServer({ rootDir, host = '127.0.0.1', port = 0 }) {
     const resolvedRoot = path.resolve(rootDir);
     const indexPath = path.join(resolvedRoot, 'index.html');
 
@@ -96,3 +96,7 @@ export async function startStaticServer({ rootDir, host = '127.0.0.1', port = 0 
         close: () => closeServer(server),
     };
 }
+
+module.exports = {
+    startStaticServer,
+};
