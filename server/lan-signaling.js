@@ -8,6 +8,8 @@ import {
     SIGNALING_SESSION_CONTRACT_VERSION,
 } from '../src/shared/contracts/SignalingSessionContract.js';
 
+const DEFAULT_MAX_PLAYERS = 10;
+
 function generateLobbyCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
     let code = '';
@@ -50,7 +52,7 @@ function buildLobbyState(lobby) {
     return {
         lobbyCode: lobby.code,
         hostPeerId: 'host',
-        maxPlayers: 10,
+        maxPlayers: DEFAULT_MAX_PLAYERS,
         updatedAt: Date.now(),
         players: lobby.players.map((player) => ({
             peerId: player.playerId,
@@ -200,7 +202,7 @@ export function createLANSignalingServer(port = 9090) {
             jsonResponse(res, {
                 lobbyCode: lobby.code,
                 playerCount: lobby.players.length,
-                maxPlayers: 10,
+                maxPlayers: DEFAULT_MAX_PLAYERS,
                 sessionState: buildLobbyState(lobby),
             });
             return;
