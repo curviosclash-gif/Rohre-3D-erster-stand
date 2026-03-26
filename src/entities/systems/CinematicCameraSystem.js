@@ -1,5 +1,10 @@
 import * as THREE from 'three';
 
+const DIRECTION_MIN_LENGTH_SQ = 1e-6;
+const SIDE_MIN_LENGTH_SQ = 1e-6;
+const BLEND_EPSILON = 0.0001;
+const SWAY_PLAYER_PHASE_OFFSET = 0.7;
+
 export class CinematicCameraSystem {
     constructor({
         enabled = true,
@@ -14,8 +19,8 @@ export class CinematicCameraSystem {
         this.enabled = enabled !== false;
         this.enterSpeed = Math.max(0.001, Number(enterSpeed) || 5.5);
         this.exitSpeed = Math.max(0.001, Number(exitSpeed) || 8.0);
-        this.boostOffset = Number.isFinite(Number(boostOffset)) ? Number(boostOffset) : 0.85;
-        this.baseLookAhead = Number.isFinite(Number(baseLookAhead)) ? Number(baseLookAhead) : 1.6;
+        this.boostOffset = Math.max(0, Number.isFinite(Number(boostOffset)) ? Number(boostOffset) : 0.85);
+        this.baseLookAhead = Math.max(0, Number.isFinite(Number(baseLookAhead)) ? Number(baseLookAhead) : 1.6);
         this.swayFrequency = Math.max(0, Number(swayFrequency) || 0.8);
         this.swayAmount = Number.isFinite(Number(swayAmount)) ? Number(swayAmount) : 0.5;
         this.liftAmount = Number.isFinite(Number(liftAmount)) ? Number(liftAmount) : 0.35;
@@ -64,7 +69,7 @@ export class CinematicCameraSystem {
             return;
         }
 
-        if (blend <= 0.0001) {
+        if (blend <= BLEND_EPSILON) {
             return;
         }
 
@@ -72,21 +77,21 @@ export class CinematicCameraSystem {
         this._timeByPlayer[playerIndex] = elapsed;
 
         this._tmpDir.copy(playerDirection);
-        if (this._tmpDir.lengthSq() <= 0.000001) {
+        if (this._tmpDir.lengthSq() <= DIRECTION_MIN_LENGTH_SQ) {
             this._tmpDir.set(0, 0, -1);
         } else {
             this._tmpDir.normalize();
         }
 
         this._tmpSide.crossVectors(this._up, this._tmpDir);
-        if (this._tmpSide.lengthSq() <= 0.000001) {
+        if (this._tmpSide.lengthSq() <= SIDE_MIN_LENGTH_SQ) {
             this._tmpSide.set(1, 0, 0);
         } else {
             this._tmpSide.normalize();
         }
 
         const boostBlend = isBoosting ? 1 : 0;
-        const sway = Math.sin((elapsed * this.swayFrequency) + playerIndex * 0.7) * this.swayAmount * blend;
+        const sway = Math.sin((elapsed * this.swayFrequency) + playerIndex * SWAY_PLAYER_PHASE_OFFSET) * this.swayAmount * blend;
         const lift = this.liftAmount * blend;
         const lookAhead = (this.baseLookAhead + this.boostOffset * boostBlend) * blend;
 

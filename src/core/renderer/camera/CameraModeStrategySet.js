@@ -1,5 +1,9 @@
 import { CONFIG } from '../../Config.js';
 
+const TOPDOWN_HEIGHT = 40;
+const TOPDOWN_Z_OFFSET = 5;
+const FIRST_PERSON_LOOK_AHEAD = 20;
+
 export class CameraModeStrategySet {
     constructor(collisionSolver) {
         this.collisionSolver = collisionSolver;
@@ -40,7 +44,7 @@ export class CameraModeStrategySet {
     }
 
     applyCockpitTopDown(target, playerPosition, playerQuaternion, tmpVec) {
-        tmpVec.set(0, 40, 5);
+        tmpVec.set(0, TOPDOWN_HEIGHT, TOPDOWN_Z_OFFSET);
         tmpVec.applyQuaternion(playerQuaternion);
         target.position.copy(playerPosition).add(tmpVec);
     }
@@ -73,7 +77,7 @@ export class CameraModeStrategySet {
             if (noseClearance !== 0) {
                 target.position.addScaledVector(playerDirection, noseClearance);
             }
-            tmpVec2.copy(playerDirection).multiplyScalar(20);
+            tmpVec2.copy(playerDirection).multiplyScalar(FIRST_PERSON_LOOK_AHEAD);
             target.lookAt.copy(target.position).add(tmpVec2);
             return;
         }
@@ -82,12 +86,12 @@ export class CameraModeStrategySet {
         target.position.copy(playerPosition).add(tmpVec);
         this.collisionSolver.resolve(playerIndex, mode, playerPosition, target.position, arena);
 
-        tmpVec2.copy(playerDirection).multiplyScalar(20);
+        tmpVec2.copy(playerDirection).multiplyScalar(FIRST_PERSON_LOOK_AHEAD);
         target.lookAt.copy(playerPosition).add(tmpVec2);
     }
 
     applyTopDown(target, playerPosition) {
-        target.position.set(playerPosition.x, playerPosition.y + 40, playerPosition.z + 5);
+        target.position.set(playerPosition.x, playerPosition.y + TOPDOWN_HEIGHT, playerPosition.z + TOPDOWN_Z_OFFSET);
         target.lookAt.copy(playerPosition);
     }
 }

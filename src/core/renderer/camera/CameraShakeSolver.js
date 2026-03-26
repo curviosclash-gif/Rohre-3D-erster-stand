@@ -1,5 +1,24 @@
 import * as THREE from 'three';
 
+// Shake oscillation base frequency (Hz-like) — high value produces rapid jitter
+const SHAKE_BASE_FREQUENCY = 44;
+// Per-player phase offset to decorrelate shake between split-screen players
+const SHAKE_PLAYER_PHASE_OFFSET = 11.7;
+
+// Axis amplitude weights — asymmetric to feel more natural
+const SHAKE_X_WEIGHT = 0.58;
+const SHAKE_Y_WEIGHT = 0.36;
+const SHAKE_Z_WEIGHT = 0.42;
+
+// Phase multipliers per axis — co-prime-ish to avoid repeating patterns
+const SHAKE_X_PHASE_MUL = 1.9;
+const SHAKE_Y_PHASE_MUL = 2.3;
+const SHAKE_Y_PHASE_SHIFT = 1.2;
+const SHAKE_Z_PHASE_MUL = 2.7;
+const SHAKE_Z_PHASE_SHIFT = 2.4;
+
+const SHAKE_AMPLITUDE_EPSILON = 0.0001;
+
 export class CameraShakeSolver {
     constructor(timers, durations, intensities) {
         this.timers = timers;
@@ -44,7 +63,7 @@ export class CameraShakeSolver {
 
         const normalized = THREE.MathUtils.clamp(nextTimer / duration, 0, 1);
         const amplitude = Math.max(0, this.intensities[playerIndex] || 0) * normalized;
-        if (amplitude <= 0.0001) {
+        if (amplitude <= SHAKE_AMPLITUDE_EPSILON) {
             this.intensities[playerIndex] = 0;
             return out;
         }
@@ -52,11 +71,11 @@ export class CameraShakeSolver {
         const now = (typeof performance !== 'undefined' && performance.now)
             ? performance.now() * 0.001
             : Date.now() * 0.001;
-        const phase = now * 44 + playerIndex * 11.7;
+        const phase = now * SHAKE_BASE_FREQUENCY + playerIndex * SHAKE_PLAYER_PHASE_OFFSET;
         out.set(
-            Math.sin(phase * 1.9) * amplitude * 0.58,
-            Math.cos(phase * 2.3 + 1.2) * amplitude * 0.36,
-            Math.sin(phase * 2.7 + 2.4) * amplitude * 0.42
+            Math.sin(phase * SHAKE_X_PHASE_MUL) * amplitude * SHAKE_X_WEIGHT,
+            Math.cos(phase * SHAKE_Y_PHASE_MUL + SHAKE_Y_PHASE_SHIFT) * amplitude * SHAKE_Y_WEIGHT,
+            Math.sin(phase * SHAKE_Z_PHASE_MUL + SHAKE_Z_PHASE_SHIFT) * amplitude * SHAKE_Z_WEIGHT
         );
         return out;
     }
