@@ -106,11 +106,9 @@ export class Game {
             profileUiStateOps: this.profileManager.getProfileUiStateOps(),
         });
 
-        // Backward-compat aliases for callers that read these from game.*
-        this.settingsProfiles = this.profileUiController.settingsProfiles;
+        // Backward-compat aliases — still referenced by UINavigationLifecycleController and GameRuntimeFacade
         this.activeProfileName = this.profileUiController.activeProfileName;
         this.selectedProfileName = this.profileUiController.selectedProfileName;
-        this.loadedProfileName = this.profileUiController.loadedProfileName;
 
         this._setupMenuListeners();
         this._syncProfileControls();
@@ -280,55 +278,46 @@ export class Game {
         }
 
         const wasRecording = !!recorder.isRecording?.();
-        
-        if (!wasRecording) {
-            recorder.setRecordingCaptureSettings?.({
-                profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
-            });
-            this.renderer?.setRecordingCaptureSettings?.({
-                profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
-            });
-            // Force a synchronous render frame to initialize the cinematic capture canvas 
-            // with the right dimensions before the WebCodecs encoder is created.
-            // Without this, the NATIVE_MEDIARECORDER fallback triggers with a broken black video.
-            if (typeof this.render === 'function') {
-                this.render();
-                
-                // We MUST force the pipeline to prepare the frame right now 
-                // while treating recording as active, otherwise the render is ignored 
-                // and the capture canvas remains 0x0/null, causing WebM fallback.
-                this.renderer?.prepareRecordingCaptureFrame?.({
-                    recordingActive: true,
-                    entityManager: this.entityManager,
-                    renderAlpha: this._renderAlpha,
-                    renderDelta: this._renderDelta,
-                    splitScreen: this.renderer?.splitScreen === true,
-                });
-            }
+        const isCinematicRecording = wasRecording
+            && recorder.getRecordingCaptureSettings?.()?.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4;
+
+        // Case 1: Cinematic recording is active → stop it
+        if (isCinematicRecording) {
+            recorder.stopRecording({ type: 'cinematic_manual_stop' }).catch(() => {});
+            this._showStatusToast('Cinematic-Aufnahme: gestoppt', 1200, 'info');
+            return;
         }
 
-        recorder.notifyLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.RECORDING_REQUESTED, {
-            command: 'toggle',
-            source: 'global_hotkey',
+        // Case 2: Non-cinematic (auto) recording is running → silently stop, then start cinematic
+        if (wasRecording) {
+            recorder.stopRecording({ type: 'cinematic_switch_stop' }).catch(() => {}).then(() => {
+                this._startCinematicRecording(recorder);
+            });
+            return;
+        }
+
+        // Case 3: Nothing recording → start cinematic
+        this._startCinematicRecording(recorder);
+    }
+
+    async _startCinematicRecording(recorder) {
+        recorder.setRecordingCaptureSettings?.({
+            profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
         });
-        const isRecording = !!recorder.isRecording?.();
-        const recordingSettings = recorder.getRecordingCaptureSettings?.() || this.settings?.recording || {};
-        const profileLabel = recordingSettings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
-            ? 'YouTube Shorts'
-            : 'Standard';
-        const hudLabel = recordingSettings.hudMode === RECORDING_HUD_MODE.WITH_HUD
-            ? 'mit HUD'
-            : 'clean';
-
-        if (!wasRecording && isRecording) {
-            this._showStatusToast(`Videoaufnahme: gestartet (${profileLabel}, ${hudLabel})`, 1400, 'success');
-            return;
+        this.renderer?.setRecordingCaptureSettings?.({
+            profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
+        });
+        // Force a synchronous render frame to initialize the cinematic capture canvas
+        // with the right dimensions before the WebCodecs encoder is created.
+        if (typeof this.render === 'function') {
+            this.render();
         }
-        if (wasRecording && !isRecording) {
-            this._showStatusToast('Videoaufnahme: gestoppt', 1200, 'info');
-            return;
+        const result = await recorder.startRecording({ type: 'cinematic_manual_start' });
+        if (result?.started) {
+            this._showStatusToast('Cinematic-Aufnahme: gestartet (F9 zum Stoppen)', 1400, 'success');
+        } else {
+            this._showStatusToast(`Cinematic-Aufnahme: Start fehlgeschlagen (${result?.reason || 'unknown'})`, 2500, 'error');
         }
-        this._showStatusToast('Videoaufnahme: keine Aenderung', 1200, 'warning');
     }
 
     _handleGlobalInputHotkeys() {

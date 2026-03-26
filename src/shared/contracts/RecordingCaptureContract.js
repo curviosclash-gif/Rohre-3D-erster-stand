@@ -1,7 +1,6 @@
 export const RECORDING_CAPTURE_PROFILE = Object.freeze({
     STANDARD: 'standard',
     YOUTUBE_SHORT: 'youtube_short',
-    CINEMATIC_MP4: 'cinematic_mp4',
 });
 
 export const RECORDING_HUD_MODE = Object.freeze({
@@ -21,20 +20,18 @@ function normalizeString(value) {
     return typeof value === 'string' ? value.trim().toLowerCase() : '';
 }
 
-export function normalizeRecordingCaptureProfile(value, fallback = DEFAULT_RECORDING_CAPTURE_SETTINGS.profile) {
-    const normalizedFallback = VALID_PROFILE_SET.has(fallback)
-        ? fallback
-        : DEFAULT_RECORDING_CAPTURE_SETTINGS.profile;
+export function normalizeEnumValue(value, validSet, defaultValue) {
     const candidate = normalizeString(value);
-    return VALID_PROFILE_SET.has(candidate) ? candidate : normalizedFallback;
+    if (validSet.has(candidate)) return candidate;
+    return validSet.has(defaultValue) ? defaultValue : validSet.values().next().value;
+}
+
+export function normalizeRecordingCaptureProfile(value, fallback = DEFAULT_RECORDING_CAPTURE_SETTINGS.profile) {
+    return normalizeEnumValue(value, VALID_PROFILE_SET, fallback);
 }
 
 export function normalizeRecordingHudMode(value, fallback = DEFAULT_RECORDING_CAPTURE_SETTINGS.hudMode) {
-    const normalizedFallback = VALID_HUD_MODE_SET.has(fallback)
-        ? fallback
-        : DEFAULT_RECORDING_CAPTURE_SETTINGS.hudMode;
-    const candidate = normalizeString(value);
-    return VALID_HUD_MODE_SET.has(candidate) ? candidate : normalizedFallback;
+    return normalizeEnumValue(value, VALID_HUD_MODE_SET, fallback);
 }
 
 export function createDefaultRecordingCaptureSettings() {
