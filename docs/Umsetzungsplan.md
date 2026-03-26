@@ -70,6 +70,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | I | V56 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | frei | abgeschlossen 2026-03-26 |
 | A | V58 | 2026-03-26 | ACTIVE | - |
+| B | V59 | 2026-03-26 | ACTIVE | - |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
