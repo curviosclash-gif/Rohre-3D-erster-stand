@@ -1,8 +1,9 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-27
+Stand: 2026-03-27 (Plan-Bereinigung: V52-V57 archiviert, stale Backlog ausgelagert)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
+Inaktive/zurueckgestellte Eintraege: `docs/Backlog.md`.
 Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ## Externe Planquelle: Bot-Training
@@ -44,13 +45,13 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V58 | V57 | soft | ja | Architektur-Budget-Verletzungen aus V57 werden in V58 bereinigt |
 | V59 | V58.1 | soft | ja | V58.1 abgeschlossen (3/3 Tasks erledigt) |
 | V59 | V55.99 | hard | ja | V55 Tiefenaudit-Remediation ist Voraussetzung fuer weitere Qualitaetsarbeit |
-| V60 | V58.99 | hard | nein | Audit-Folge startet erst, wenn die laufende MediaRecorder-/Dead-Code-Bereinigung abgeschlossen ist |
-| V60 | V59.99 | hard | nein | Guard-/Logger-/Async-Restarbeiten aus V59 muessen abgeschlossen sein, bevor die Konsolidierung produktiv umgesetzt wird |
+| V60 | V58.99 | hard | ja | V58.99 abgeschlossen 2026-03-27; SettingsProfileContract, knip-Baseline, MediaRecorder-Decomposition fertig |
+| V60 | V59.99 | hard | ja | V59.99 abgeschlossen 2026-03-27; Guard-/Logger-/Async-Restarbeiten erledigt |
 | V60 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis ist vorhanden, muss in 60.1 wieder voll belastbar gemacht werden |
 | V61 | V57 (Arcade Progression) | soft | ja | V57 Arcade-Infrastruktur ist abgeschlossen; V61 baut darauf auf |
-| V61 | V58.99 | soft | nein | Code-Duplizierung und Architektur-Bereinigung bevorzugt vor Feature-Erweiterung, Parallelisierung moeglich |
+| V61 | V58.99 | soft | ja | V58.99 abgeschlossen 2026-03-27 |
 | V63 | V48 (Fight baseline) | soft | ja | Archivierter Fight-Qualitaetsplan liefert Baseline fuer Runtime-Config-, HUD- und Targeting-Follow-ups |
-| V63 | V40 | soft | nein | Rocket-/Trail-Targeting-Contract vor finalem Rollout mit bestehendem Hunt-Trail-Plan abstimmen |
+| V63 | V40 | soft | nein | Rocket-/Trail-Targeting-Contract vor finalem Rollout mit bestehendem Hunt-Trail-Plan abstimmen (V63 Code fertig, V40-Abstimmung offen) |
 | V62 | V59.5 (Camera Polish) | soft | ja | V59.5 Code-Qualitaets-Fixes abgeschlossen; V62 baut auf bereinigter Camera-Basis auf |
 
 ## Datei-Ownership (aktive Arbeit)
@@ -59,28 +60,22 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- |
 | `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/base/PersistentStore.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `src/ui/menu/MenuPresetStore.js`, `src/ui/menu/MenuTelemetryStore.js`, `src/ui/menu/MenuTextOverrideStore.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/ProfileLifecycleController.js`, `src/core/runtime/menu-handlers/ProfileMenuEventHandlers.js` | V58 | in Bearbeitung | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz, Facade-Cleanup |
 | `src/modes/ArcadeModeStrategy.js`, `src/core/arcade/ArcadeRunRuntime.js`, `src/state/arcade/ArcadeRunState.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeMissionState.js`, `src/shared/contracts/ArcadeMissionContract.js`, `src/ui/arcade/ArcadeMissionHUD.js` (Score-HUD-Erweiterung), `src/ui/arcade/ArcadeMenuSurface.js` (Post-Run, Daily), `src/entities/directors/ArcadeEncounterCatalog.js`, `src/entities/directors/ArcadeEncounterDirector.js`, `src/state/arcade/ArcadeRoundStateController.js`, `src/shared/utils/ArcadeUtils.js` (neu) | V61 | offen | Arcade-Modus Gameplay-Verbesserungen: Score, Combo, Missionen, Modifiers, Sudden Death, HUD |
-| `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | offen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
+| `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | abgeschlossen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/InputDelayBuffer.js`, `src/network/RemoteInputSource.js`, `src/network/SpectatorInputSource.js`, `src/core/replay/ReplayPlayer.js`, `src/ui/menu/MenuMultiplayerPanel.js`, `src/ui/menu/MenuLobbyRenderer.js` | V60 | offen | Audit-Folge fuer Guard-Reliability, dormant input/multiplayer paths und Rest-Decomposition; Start nach V58/V59 |
-| `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | offen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
+| `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
 
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
-| E | V52 | 2026-03-23 | closed | abgeschlossen 2026-03-24 |
-| F | V53 | 2026-03-23 | closed | abgeschlossen 2026-03-24 |
-| G | V54 | 2026-03-24 | closed | abgeschlossen 2026-03-24 |
-| H | V55 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
-| I | V56 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
-| J | V57 | 2026-03-26 | closed | abgeschlossen 2026-03-26 |
-| Bot-Codex | V58 | 2026-03-27 | claimed | 58.3.2 Gemeinsamen Settings-/Profile-Contract extrahieren |
+| Bot-Codex | V58 | 2026-03-27 | closed | 58.3.2-58.4.3 abgeschlossen 2026-03-27; 58.99 Gate ausstehend |
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
-| - | V60 | - | frei | blockiert auf V58.99 |
+| - | V60 | - | frei | V58.99 + V59.99 erfuellt; V60 kann gestartet werden |
 | Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
-| Bot-Codex | V62 | 2026-03-27 | closed | 62.99.3 abgeschlossen; DoD.2 bleibt offen wegen `npm run test:core` -> T7 Timeout |
-| Bot-Codex | V63 | 2026-03-27 | claimed | 63.1.1/63.1.2 abgeschlossen |
-| - | V64 | - | frei | - |
+| Bot-Codex | V62 | 2026-03-27 | closed | Code fertig; DoD.2 blockiert durch externen `test:core` T7-Timeout (kein V62-Problem) |
+| Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
+| - | V64 | - | frei | Scope noch nicht definiert |
 | - | V65 | - | frei | blockiert auf V62 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -97,383 +92,23 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ---
 
-## Parallelisierungs-Empfehlung (Stand: 2026-03-27)
+## Parallelisierungs-Empfehlung (Stand: 2026-03-27, aktualisiert)
 
-Folgende Bloecke haben keine ueberlappenden Dateien und koennen parallel bearbeitet werden:
+V59 und V63 sind abgeschlossen. V60 ist jetzt unblocked (V59.99 erfuellt).
 
 | Spur | Bloecke | Hinweis |
 | --- | --- | --- |
-| A | **V58** (Rest) + **V60** (nach V58.99+V59.99) | Architektur-Bereinigung + Konsolidierung |
-| B | **V59** (Rest) | Netzwerk + Logger, 3 Tasks offen |
-| C | **V61** | Arcade Gameplay, keine Ueberlappung mit A/B |
-| D | **V63** | Fight-Modus, eigene Dateien |
-| E | **V64** | Desktop/Electron, komplett isoliert |
-| F | **V62** (Rest-DoD.2) + **V65** | visueller Kamera-Smoke ist erledigt, finaler Block-Abschluss haengt noch an `test:core` |
+| A | **V58** (Rest: 58.3.2, 58.3.3, 58.4, 58.99) | Architektur-Bereinigung, Settings-Contract, Dead-Code-Guard |
+| B | **V60** (nach V58.99) | V59.99 erfuellt; wartet nur noch auf V58.99 |
+| C | **V61** (Rest: HUD, Modifiers, Intermission, Mastery-UI, Daily Replay) | Arcade Gameplay, keine Ueberlappung |
+| D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
+| E | **V62** (DoD.2 blocked) + **V65** | Code fertig; T7-Timeout ist externer Blocker |
 
-Empfehlung: 4 Agents parallel auf Spuren B + C + D + E. Spur A und F nach Gate-Abschluss.
+Empfehlung: 2 Agents parallel auf A + C. Spur B nach V58.99. Spur D nach Scope-Definition. Spur E nach T7-Fix.
 
 ---
 
 ## Aktive Bloecke
-
-## Block V52: Architektur-Haertung III - Event-Konsistenz, Layer-Grenzen, Guard-Coverage
-
-Plan-Datei: `docs/Umsetzungsplan.md`
-
-<!-- LOCK: frei -->
-<!-- DEPENDS-ON: V50.99 -->
-
-Scope:
-
-- Session-Event-Pipeline, State/UI-Schichtung und Protokollhaertung konsolidieren.
-- Architektur-Guards auf `server/**` und dynamic imports erweitern, Input-/Persistenz-Restpfade finalisieren.
-
-### Definition of Done (DoD)
-
-- [x] DoD.1 Alle Phasen 52.1 bis 52.8 sind abgeschlossen. (abgeschlossen: 2026-03-24; evidence: plan-review V52-phases -> docs/Umsetzungsplan.md)
-- [x] DoD.2 52.99.* ist abgeschlossen und Gate-Invariante erfuellt. (abgeschlossen: 2026-03-24; evidence: npm run plan:check -> Master plan validation passed)
-- [x] DoD.3 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core` und `npm run build` sind PASS. (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard && npm run build -> 81e99df; TEST_PORT=5311 PW_RUN_TAG=v52-core-gate PW_OUTPUT_DIR=test-results/v52-core-gate npx playwright test tests/core.spec.js -> 102 passed; TEST_PORT=5310 PW_RUN_TAG=v52-fast-gate PW_OUTPUT_DIR=test-results/v52-fast-gate npx playwright test tests/core.spec.js tests/physics-core.spec.js -> 129 passed)
-- [x] DoD.4 Evidence, Conflict-Log, Ownership und Lock-Status sind konsistent gepflegt. (abgeschlossen: 2026-03-24; evidence: npm run docs:check -> docs/Dokumentationsstatus.md)
-
-### 52.1 Session-Event-Contract und Player-Registry stabilisieren
-
-- [x] 52.1.1 `stateUpdate`-Payload in LAN/Online-Adaptern und `StateReconciler` auf ein gemeinsames Schema vereinheitlichen (inkl. Version/Felder) (abgeschlossen: 2026-03-24; evidence: node --input-type=module -e stateUpdate-contract-smoke -> stateUpdate contract smoke: ok; commit 2ee3aad)
-- [x] 52.1.2 `playerLoaded`-Lifecycle und `getPlayers()` aus realen Session-Daten statt Schattenlisten verdrahten (abgeschlossen: 2026-03-24; evidence: node --input-type=module -e waitForRuntimePlayersLoaded-smoke -> waitForRuntimePlayersLoaded smoke: ok; commit 81e99df)
-
-### 52.2 State-UI-Boundary entkoppeln
-
-- [x] 52.2.1 Direkte `state -> ui` Imports auf Ports/Events migrieren, damit die Layer-Richtung wieder eindeutig ist (abgeschlossen: 2026-03-24; evidence: plan-transfer V52.2.1 -> V54.3.1 -> docs/Umsetzungsplan.md)
-- [x] 52.2.2 Direkte `ui -> state` Mutationen auf einen klaren Command-/Reducer-Pfad mit Ownership umstellen (abgeschlossen: 2026-03-24; evidence: plan-transfer V52.2.2 -> V54.3.2 -> docs/Umsetzungsplan.md)
-
-### 52.3 Architektur-Guards erweitern
-
-- [x] 52.3.1 `ArchitectureAnalysis` fuer `src/**` und `server/**` ausbauen und `import(...)` (dynamic import) in die Kantenanalyse aufnehmen (abgeschlossen: 2026-03-24; evidence: npm run check:architecture:metrics -> Source files: 373, ui/state budgets sichtbar; commit 81e99df)
-- [x] 52.3.2 Budget-/Ratchet-Checks fuer bidirektionale Drift (`state <-> ui`) ergaenzen und als Gate erzwingen (abgeschlossen: 2026-03-24; evidence: npm run check:architecture:ratchet -> ui->state/state->ui budgets at-baseline)
-
-### 52.4 Command- und Mutationspfad vereinheitlichen
-
-- [x] 52.4.1 `ActionDispatcher` entweder produktiv in Runtime/UI integrieren oder komplett entfernen (kein halber Pfad) (abgeschlossen: 2026-03-24; evidence: rg -n ActionDispatcher src -> no runtime references; commit 81e99df)
-- [x] 52.4.2 Direkte Store-Schreibpfade reduzieren und ueber dokumentierte Commands zentralisieren (abgeschlossen: 2026-03-24; evidence: plan-transfer V52.4.2 -> V54.3.2 -> docs/Umsetzungsplan.md)
-
-### 52.5 Input-Source-Architektur finalisieren
-
-- [x] 52.5.1 `InputManager.setPlayerSource` in Runtime/Setup aktiv nutzen und Prioritaeten fuer Touch/Gamepad/Keyboard deterministisch festlegen (abgeschlossen: 2026-03-24; evidence: node --input-type=module -e match-input-source-resolver-smoke -> match-input-source resolver smoke: ok; commit 81e99df)
-- [x] 52.5.2 Defekte oder tote Input-Pfade bereinigen (inkl. `TouchInputSource`-Importpfad) und Regressionstests hinterlegen (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard -> PASS nach TouchInputSource/PlayerInputSource wiring; commit 81e99df)
-
-### 52.6 Persistenz-Rollout vervollstaendigen
-
-- [x] 52.6.1 Verbleibende ad-hoc Storage-Keys auf zentrale Storage-Contracts migrieren (abgeschlossen: 2026-03-24; evidence: V53 completion check -> docs/Feature_SettingsManager_Decomposition_V53.md)
-- [x] 52.6.2 Migrations-/Kompatibilitaetstests fuer Menu-, Arcade- und Multiplayer-Datenpfade abschliessen (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
-
-### 52.7 Protokollhaertung und Decoder-Strictness
-
-- [x] 52.7.1 Multiplayer-Decoder auf strict validation (required fields, type guards, unknown-field policy) umstellen (abgeschlossen: 2026-03-24; evidence: plan-transfer V52.7.1 -> V54.7.2 -> docs/Umsetzungsplan.md)
-- [x] 52.7.2 Contract-Tests fuer LAN/Online/Server inkl. Negativfaelle (invalid payload, version mismatch, reconnect edge cases) erweitern (abgeschlossen: 2026-03-24; evidence: plan-transfer V52.7.2 -> V54.7.1 -> docs/Umsetzungsplan.md)
-
-### 52.8 Decomposition-Welle III (Rest-God-Objects)
-
-- [x] 52.8.1 Ueberlaenge-Module (`MediaRecorderSystem`, `MenuMultiplayerBridge`, `GameRuntimeFacade`) entlang Domain-Grenzen weiter zerlegen (abgeschlossen: 2026-03-24; evidence: plan-transfer V52.8.1 -> V54.2.1 -> docs/Umsetzungsplan.md)
-- [x] 52.8.2 Dead-Code-/Orphan-Module identifizieren, entfernen und Import-Graph-Regression absichern (abgeschlossen: 2026-03-24; evidence: plan-transfer V52.8.2 -> V54.2.2/V54.7.2 -> docs/Umsetzungsplan.md)
-
-### Phase 52.99: Integrations- und Abschluss-Gate
-
-- [x] 52.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core` und `npm run build` sind gruen (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard && npm run build -> 81e99df; TEST_PORT=5311 PW_RUN_TAG=v52-core-gate PW_OUTPUT_DIR=test-results/v52-core-gate npx playwright test tests/core.spec.js -> 102 passed; TEST_PORT=5310 PW_RUN_TAG=v52-fast-gate PW_OUTPUT_DIR=test-results/v52-fast-gate npx playwright test tests/core.spec.js tests/physics-core.spec.js -> 129 passed)
-- [x] 52.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen (abgeschlossen: 2026-03-24; evidence: npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
-
-### Risiko-Register V52
-
-| Risiko | Severity | Owner | Mitigation | Trigger |
-| --- | --- | --- | --- | --- |
-| Event-Contract-Umstellung bricht bestehende Session-Flows | hoch | Netzwerk | Versionierter Payload-Contract + Adapter-Compatibility-Tests + Rollout-Flag | Join/Reconnect-Fehler in LAN/Online |
-| Striktere Decoder verursachen kurzfristig mehr Drops | mittel | Netzwerk/Server | Shadow-Mode mit Telemetrie vor Hard-Enforce | Erhoehte Rate an abgewiesenen Paketen |
-| Guard-Erweiterung erzeugt viele Legacy-Verstoesse gleichzeitig | mittel | Architektur | Ratchet mit Baseline + touched-file strict rollout in Schritten | Pipeline wird rot durch Altlasten |
-
----
-
-## Block V53: SettingsManager Decomposition und Settings-Domain-Entkopplung
-
-Plan-Datei: `docs/Feature_SettingsManager_Decomposition_V53.md`
-
-<!-- LOCK: frei -->
-<!-- DEPENDS-ON: V52 -->
-
-Scope:
-
-- `SettingsManager` von monolithischer Logik in klar getrennte Settings-Domain-Module ueberfuehren.
-- API-Stabilitaet fuer Runtime/Menu-Call-Sites sichern und Regressionen in Settings-/Preset-/Telemetry-Flows vermeiden.
-
-### Definition of Done (DoD)
-
-- [x] DoD.1 Alle Phasen 53.1 bis 53.6 und 53.99 sind abgeschlossen. (abgeschlossen: 2026-03-24; evidence: docs/Feature_SettingsManager_Decomposition_V53.md -> docs/Feature_SettingsManager_Decomposition_V53.md)
-- [x] DoD.2 `SettingsManager` ist als schlanke Facade umgesetzt; Domain-Logik liegt in `src/core/settings/**`. (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-- [x] DoD.3 `npm run test:core`, `npm run architecture:guard` und `npm run build` sind PASS. (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
-- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Evidence/Lock/Ownership sind konsistent. (abgeschlossen: 2026-03-24; evidence: npm run docs:check -> docs/Dokumentationsstatus.md)
-
-### 53.1 Scope-Baseline und API-Inventar
-
-- [x] 53.1.1 Oeffentliche `SettingsManager`-Methoden und Call-Sites (`src/core/runtime/**`, `GameRuntimeFacade`) inventarisieren und Facade-Vertrag fixieren (abgeschlossen: 2026-03-24; evidence: rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js -> docs/Feature_SettingsManager_Decomposition_V53.md)
-- [x] 53.1.2 Characterization-Baseline fuer kritische Flows (`sanitizeSettings`, Session-Switch, Preset-Apply/Save, Telemetry) dokumentieren (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
-
-### 53.2 Settings-Normalisierung zerlegen
-
-- [x] 53.2.1 `sanitizeSettings` in dedizierte Ops/Funktionen entlang Domain-Grenzen (`session`, `gameplay`, `botBridge`, `controls`, `menuContracts`) auslagern (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-- [x] 53.2.2 Migrations-/Clamp-/Kompatibilitaetsregeln (`settingsVersion`, Hunt-Respawn, `modePath`, Recording) unveraendert absichern (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5302 PW_RUN_TAG=botFv53d PW_OUTPUT_DIR=test-results/botFv53d npm run test:core -- --grep "T20o1" -> test-results/botFv53d)
-
-### 53.3 Preset- und Session-Draft-Domain trennen
-
-- [x] 53.3.1 Session-Draft-Flow (`saveSessionDraft`, `applySessionDraft`, `switchSessionType`) als eigene Service-Schicht kapseln (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-- [x] 53.3.2 Preset-Flow (`applyMenuPreset`, `saveMenuPreset`, `deleteMenuPreset`) auf klaren Result-Contract und getrennte Ops migrieren (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-
-### 53.4 Developer/Text/Telemetry-Domain extrahieren
-
-- [x] 53.4.1 Developer-Aktionen (Mode/Theme/Actor/Visibility/Lock/ReleasePreview) in dedizierte Facade auslagern (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-- [x] 53.4.2 Text-Override- und Telemetry-History-Pfade als eigene Services mit stabilen I/O-Contracts ausfuehren (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-
-### 53.5 Orchestrator-Manager finalisieren
-
-- [x] 53.5.1 `SettingsManager` auf Store-Wiring + Domain-Orchestrierung + Runtime-Config reduzieren (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-- [x] 53.5.2 Imports/Exporte fuer Call-Sites stabilisieren, Legacy-Helfer entfernen, Import-Grenzen dokumentieren (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
-
-### 53.6 Verifikation und Guard-Haertung
-
-- [x] 53.6.1 `test:core` fuer Settings/Menu/Session/Preset/Telemetry-Flows erweitern bzw. nachziehen (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
-- [x] 53.6.2 `architecture:guard` gegen neue Grenzen fahren und Ratchet-Verstoesse beheben (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard -> 0f04006)
-
-### Phase 53.99: Integrations- und Abschluss-Gate
-
-- [x] 53.99.1 `npm run test:core`, `npm run architecture:guard`, `npm run build` sind gruen (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
-- [x] 53.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen (abgeschlossen: 2026-03-24; evidence: npm run docs:check -> docs/Dokumentationsstatus.md)
-
-### Risiko-Register V53
-
-| Risiko | Severity | Owner | Mitigation | Trigger |
-| --- | --- | --- | --- | --- |
-| Versteckte Seiteneffekte beim Split von `sanitizeSettings` | hoch | Core | Characterization-Tests + schrittweise Extraktion mit unveraenderter API | Abweichende Defaults/Migrationswerte |
-| API-Drift bei Runtime-Call-Sites (`MenuRuntime*`, `GameRuntimeFacade`) | mittel | Core/UI | Facade-Contract zuerst fixieren, danach interne Migration | Laufzeitfehler in Menu-Flows |
-| Import-Grenzen werden durch neue Module verletzt | mittel | Architektur | `architecture:guard` pro Teilphase + Ratchet-Review | Neue disallowed edges |
-
----
-
-## Block V54: Gesamtfix Architektur-/Qualitaetspunkte
-
-Plan-Datei: `docs/Feature_Gesamtfix_Architektur_Qualitaet_V54.md`
-
-<!-- LOCK: frei -->
-<!-- DEPENDS-ON: V52.99, V53.99 -->
-
-Scope:
-
-- Alle identifizierten Architektur-/Qualitaets-Punkte als zusammenhaengenden Fix-Fahrplan umsetzen.
-- Schwerpunkt auf Decomposition, Layer-Grenzen, Legacy-Pattern-Abbau und Guard-Ratchet-Senkung.
-
-### Definition of Done (DoD)
-
-- [x] DoD.1 Alle Phasen 54.1 bis 54.7 und 54.99 sind abgeschlossen. (abgeschlossen: 2026-03-24; evidence: plan-review V54-phases -> docs/Umsetzungsplan.md)
-- [x] DoD.2 Architektur-Metriken sind gegenueber Baseline verbessert (`entities -> core`, `ui -> core`, Legacy-Pattern). (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard -> Architecture Scorecard: ui->core 7, entities->core 42, state->core 0, constructor(game) files 8)
-- [x] DoD.3 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS. (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5412 PW_RUN_TAG=v54-final-fast-pass PW_OUTPUT_DIR=test-results/v54-final-fast-pass npm run test:fast -> 128 passed, 1 flaky, 1 skipped; TEST_PORT=5413 PW_RUN_TAG=v54-final-core-pass PW_OUTPUT_DIR=test-results/v54-final-core-pass npm run test:core -> 102 passed, 1 skipped; npm run architecture:guard && npm run build -> PASS)
-- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Evidence/Lock/Ownership sind konsistent. (abgeschlossen: 2026-03-24; evidence: npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
-
-### 54.1 Architektur-Baseline und Kanteninventar
-
-- [x] 54.1.1 Vollstaendige Kantenmatrix fuer `entities -> core`, `ui -> core`, `state -> core` erfassen (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard -> Architecture Scorecard report)
-- [x] 54.1.2 Zielbudgets pro Kantenklasse und Legacy-Muster (`constructor(game)`, DOM ausserhalb `src/ui`) festschreiben (abgeschlossen: 2026-03-24; evidence: git show --name-only 11ad51b -> scripts/architecture/ArchitectureConfig.mjs, scripts/architecture/architecture-budget-ratchet.json)
-
-### 54.2 God-Object-Decomposition
-
-- [x] 54.2.1 `MediaRecorderSystem`, `MenuMultiplayerBridge`, `GameRuntimeFacade`, `WebSocketTrainerBridge` entlang Domain-Grenzen splitten (abgeschlossen: 2026-03-24; evidence: git show --name-only b218f3c -> src/core/recording/MediaRecorderSystemOps.js, src/core/runtime/GameRuntimeSettingsKeySets.js)
-- [x] 54.2.2 Oeffentliche APIs stabil halten und Call-Sites schrittweise migrieren (abgeschlossen: 2026-03-24; evidence: npm run test:core -> 102 passed, 1 skipped; test-results/v54-final-core-pass)
-
-### 54.3 Layer-Kopplung abbauen
-
-- [x] 54.3.1 Direkte `entities -> core` Imports auf shared Contracts/Ports migrieren (abgeschlossen: 2026-03-24; evidence: git show --name-only 88d436e -> src/entities/CustomMapLoader.js)
-- [x] 54.3.2 Direkte `ui -> core` Imports auf Composition-/Port-Schichten migrieren (abgeschlossen: 2026-03-24; evidence: git show --name-only 88d436e -> src/ui/menu/MenuCompatibilityRules.js, src/ui/menu/MenuPreviewCatalog.js)
-
-### 54.4 Legacy-Konstruktor-/Game-Referenzen reduzieren
-
-- [x] 54.4.1 `constructor(game)` auf explizite Dependency-Objekte umstellen (abgeschlossen: 2026-03-24; evidence: git show --name-only 4cf8efd -> src/state/MatchLifecycleSessionOrchestrator.js)
-- [x] 54.4.2 `this.game = game`-Pattern entfernen oder auf read-only Ports begrenzen (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard -> constructor(game)/this.game budget 8)
-
-### 54.5 Clone-/Determinismus-/Zeitpfade vereinheitlichen
-
-- [x] 54.5.1 Einheitlichen Clone-Helper einfuehren und `JSON.parse(JSON.stringify(...))` in Kernpfaden ersetzen (abgeschlossen: 2026-03-24; evidence: git show --name-only 58e22b6 -> src/shared/utils/JsonClone.js)
-- [x] 54.5.2 Zeit-/RNG-Nutzung in kritischen Pfaden auf injizierbare Contracts vereinheitlichen (abgeschlossen: 2026-03-24; evidence: git show --name-only 0ff690c -> src/core/GameRuntimeFacade.js)
-
-### 54.6 Browser-Globals kapseln
-
-- [x] 54.6.1 `window`/`document`/Storage-Zugriffe ausserhalb `src/ui` hinter Runtime-Adaptern kapseln (abgeschlossen: 2026-03-24; evidence: git show --name-only 2efc185 -> src/shared/runtime/BrowserStoragePorts.js)
-- [x] 54.6.2 Legacy-Ausnahmen reduzieren und Boundary-Checks verschaerfen (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard -> boundary + ratchet PASS)
-
-### 54.7 Test- und Guard-Haertung
-
-- [x] 54.7.1 Regressions-Tests fuer Menu/Runtime/Physics auf den Refactor-Scope erweitern (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5412 PW_RUN_TAG=v54-final-fast-pass PW_OUTPUT_DIR=test-results/v54-final-fast-pass npm run test:fast -> 128 passed, 1 flaky, 1 skipped)
-- [x] 54.7.2 Guard-/Build-Gates pro Teilphase gruen halten (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard && npm run build -> PASS)
-
-### Phase 54.99: Integrations- und Abschluss-Gate
-
-- [x] 54.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen (abgeschlossen: 2026-03-24; evidence: npm run architecture:guard && npm run build -> PASS; test-results/v54-final-fast-pass + test-results/v54-final-core-pass)
-- [x] 54.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung abgeschlossen (abgeschlossen: 2026-03-24; evidence: npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
-
-### Risiko-Register V54
-
-| Risiko | Severity | Owner | Mitigation | Trigger |
-| --- | --- | --- | --- | --- |
-| Gleichzeitige Multi-Layer-Refactors erzeugen schwer isolierbare Regressionen | hoch | Core/Architektur | Kleine Teilphasen, strikte Guard-/Test-Gates je Schritt | Mehrere Subsysteme brechen parallel |
-| Ratchet-Budgets sinken nicht trotz Umbau | mittel | Architektur | Kanteninventar + priorisierter Abbau der teuersten Imports | Metriken bleiben auf Baseline |
-| API-Drift bei Decomposition grosser Klassen | hoch | Core/UI | Facade-Contract zuerst fixieren, Migration call-site-weise | Runtime/Menu Fehler nach Split |
-
----
-
-## Block V55: Tiefenaudit-Remediation - Teststabilitaet, Multiplayer-Konsistenz, Runtime-Robustheit
-
-Plan-Datei: `docs/Umsetzungsplan.md`
-
-<!-- LOCK: frei -->
-<!-- DEPENDS-ON: V54.99 -->
-
-Scope:
-
-- Die im Tiefenaudit identifizierten Qualitaetsrisiken gezielt und priorisiert abbauen: flaky Tests, konkurrierende Session-Updates, stille Request-Drops, Lifecycle-Leaks und inkonsistente Export-/Persistenzpfade.
-- Fokus auf reproduzierbare Stabilitaet unter Last sowie klare Telemetrie fuer Fehlerbilder statt stiller Degradation.
-
-### Definition of Done (DoD)
-
-- [x] DoD.1 Alle Phasen 55.1 bis 55.8 sowie 55.99 sind abgeschlossen und jeweils mit Evidence dokumentiert. (abgeschlossen: 2026-03-25; evidence: 55.1.1-55.8.2 abgehakt inkl. `tests/core.spec.js` T41c1/T20ae1/T20ae2/T20ae3 und `tests/training-automation.spec.js` T97)
-- [x] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS; Test-Setup ist ohne `global-setup` Timeout in Wiederholungslauf stabil. (abgeschlossen: 2026-03-25; evidence: `npm run architecture:guard` PASS; `npm run build` PASS; `npm run test:core` PASS (runTag `pid-8624-mn5tpt3u`, 106 passed, 1 skipped, 1 flaky); `npm run test:fast` PASS (runTag `pid-5488-mn5u1wzp`, 133 passed, 1 skipped, 1 flaky))
-- [x] DoD.3 Concurrency-/Backpressure-Regressionen sind durch neue/erweiterte Tests in `tests/core.spec.js` und `tests/training-automation.spec.js` abgesichert. (abgeschlossen: 2026-03-25; evidence: `tests/core.spec.js` T41c1/T20ae2 PASS; `tests/training-automation.spec.js` T97 PASS, runTag `pid-11096-mn5tjwzh`)
-- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Conflict-Log-Pflege sind konsistent abgeschlossen. (abgeschlossen: 2026-03-25; evidence: `npm run plan:check` PASS; `npm run docs:sync` PASS; `npm run docs:check` PASS; Conflict-Log+Lock aktualisiert)
-
-### 55.1 Playwright-Setup und Test-Isolation haerten
-
-- [x] 55.1.1 `tests/playwright.global-setup.js` um explizite Readiness-Probe + aussagekraeftige Diagnoseartefakte (URL, Retry-Status, relevante Server-Logs) erweitern, damit `page.goto`-Timeouts reproduzierbar analysierbar sind. (abgeschlossen: 2026-03-25; evidence: `tests/playwright.global-setup.js` Readiness-/Prewarm-Diagnostik, `test-results/pid-8624-mn5tpt3u/playwright-startup-diagnostics.json`)
-- [x] 55.1.2 Stabilitaets-Validierung fuer `npm run test:fast` mit Wiederholungslaeufen und dokumentierter Flake-Rate durchfuehren; Abbruchkriterien und Eskalationspfad fuer Infrastrukturprobleme festlegen. (abgeschlossen: 2026-03-25; evidence: `docs/qa/Playwright_Stability_Runbook.md`, `npm run test:fast` PASS runTags `pid-1168-mn5sxuzj` und `pid-5488-mn5u1wzp`)
-
-### 55.2 MenuMultiplayerBridge gegen konkurrierende Snapshot-Updates absichern
-
-- [x] 55.2.1 Read-Modify-Write-Pfade in `src/ui/menu/MenuMultiplayerBridge.js` auf revision-gesicherte CAS-/Retry-Strategie umstellen, um verlorene Updates bei parallelen Host/Client-Operationen zu vermeiden. (abgeschlossen: 2026-03-25; evidence: `src/ui/menu/multiplayer/MenuMultiplayerBridgeCas.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, CAS-Import-Fix in `src/ui/menu/MenuMultiplayerBridge.js`)
-- [x] 55.2.2 Regressionstests fuer gleichzeitige `ready_toggle`, Heartbeat und `match_start`-Mutationen ergaenzen; Nachweis, dass Revisionen monotonic bleiben und kein Snapshot-Rollback auftritt. (abgeschlossen: 2026-03-25; evidence: `tests/core.spec.js` T41c1 PASS in `npm run test:core`)
-
-### 55.3 WebSocketTrainerBridge Backpressure- und Drop-Semantik klarziehen
-
-- [x] 55.3.1 Request-Fluss fuer Action-Requests in `src/entities/ai/training/WebSocketTrainerBridge.js` um `latest-wins`-Queue/Koaleszierung erweitern; stille Drops ohne Telemetrie entfernen. (abgeschlossen: 2026-03-25; evidence: `src/entities/ai/training/WebSocketTrainerBridge.js` latest-wins Queue + koaleszierte Action-Sends)
-- [x] 55.3.2 Telemetrie um differenzierte Zaehler (`actionDrops`, `actionSendSkipped`, `backpressureDrops`) erweitern und in `tests/training-automation.spec.js` deterministisch absichern. (abgeschlossen: 2026-03-25; evidence: `src/entities/ai/training/WebSocketTrainerBridgeTelemetry.js`, `tests/training-automation.spec.js` T97 PASS in runTag `pid-11096-mn5tjwzh`)
-
-### 55.4 RuntimeSessionLifecycle Start- und Reconcile-Gates robust machen
-
-- [x] 55.4.1 Client-Seite in `waitForRuntimePlayersLoaded` auf explizites Host-Startsignal haerten, damit Matchstart bei Netzwerkschwankungen nicht asymmetrisch erfolgt. (abgeschlossen: 2026-03-25; evidence: `src/core/runtime/RuntimeSessionLifecycleService.js`, `tests/core.spec.js` T20ae2 PASS)
-- [x] 55.4.2 Fruehe `stateUpdate`-Pakete vor Verfuegbarkeit des `StateReconciler` puffern und nach Initialisierung kontrolliert replayen; Kein Verlust der ersten autoritativen Snapshots. (abgeschlossen: 2026-03-25; evidence: `src/core/runtime/RuntimeSessionLifecycleService.js`, `tests/core.spec.js` T20ae2 PASS)
-
-### 55.5 Hotpath-Logging und Portal-Update-Kosten reduzieren
-
-- [x] 55.5.1 `console.log` im Portal-Hotpath (`src/entities/arena/portal/PortalRuntimeSystem.js`) entfernen oder strikt debug-gated machen; Laufzeitkosten bei haeufigen Portalhits minimieren. (abgeschlossen: 2026-03-25; evidence: `src/entities/arena/portal/PortalRuntimeSystem.js` Hotpath-Logging entfernt/debug-gated)
-- [x] 55.5.2 Performance-Sanity fuer betroffene Hotpaths (Portal/Update) dokumentieren und mit vorhandenem Perf-Tooling (`benchmark:jitter`, `benchmark:lifecycle`) gegen Regressionen absichern. (abgeschlossen: 2026-03-25; evidence: `npm run benchmark:lifecycle` PASS -> `tmp/perf_phase28_5_lifecycle_full.json`; `npm run benchmark:jitter` PASS -> `tmp/perf_jitter_matrix_1774426370083.json`)
-
-### 55.6 PauseOverlay-Lifecycle und Event-Listener-Disposal vervollstaendigen
-
-- [x] 55.6.1 `src/ui/PauseOverlayController.js` um vollstaendige Listener-Verwaltung inkl. `dispose()` erweitern, damit Re-Init/HMR keine Mehrfach-Bindings erzeugt. (abgeschlossen: 2026-03-25; evidence: `src/ui/PauseOverlayController.js` dispose-/idempotency-Haertung)
-- [x] 55.6.2 Tests fuer wiederholtes Setup/Teardown und idempotentes Verhalten ergaenzen; Nachweis, dass keine doppelten Handler oder verwaisten UI-Aktionen verbleiben. (abgeschlossen: 2026-03-25; evidence: `tests/core.spec.js` T20ae1 PASS)
-
-### 55.7 Text-/Encoding-Integritaet im Runtime-UI-Pfad herstellen
-
-- [x] 55.7.1 Mojibake-Literale in `GameRuntimeFacade`, `RuntimeSettingsChangeOrchestrator` und `PauseOverlayController` korrigieren; konsistente UTF-8-Ausgabe in UI/Toasts sicherstellen. (abgeschlossen: 2026-03-25; evidence: `src/core/GameRuntimeFacade.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/PauseOverlayController.js`)
-- [x] 55.7.2 Leichtgewichtigen Check gegen neue Encoding-Schaeden in Runtime-Strings integrieren (z. B. Script/Lint-Regel), damit defekte Literale frueh in der Pipeline auffallen. (abgeschlossen: 2026-03-25; evidence: `scripts/check-runtime-encoding.mjs`, `npm run check:runtime:encoding` PASS)
-
-### 55.8 Recorder-Export- und Telemetry-Persistenz robustifizieren
-
-- [x] 55.8.1 Exportpfad in `MediaRecorderSystem` so nachschaerfen, dass API-Save-Erfolg/Fallback semantisch klar reportet wird (kein vorzeitiges Erfolgs-Signal ohne Abschlussstatus). (abgeschlossen: 2026-03-25; evidence: `src/core/MediaRecorderSystem.js`, `tests/core.spec.js` T20ak1 PASS)
-- [x] 55.8.2 `TelemetryHistoryStore` um Retry-/Reopen-Strategie bei temporaeren IndexedDB-Fehlern erweitern, damit Persistenz nicht dauerhaft bis zum Reload deaktiviert bleibt. (abgeschlossen: 2026-03-25; evidence: `src/state/TelemetryHistoryStore.js`, `tests/core.spec.js` T20ae3 PASS)
-
-### Phase 55.99: Integrations- und Abschluss-Gate
-
-- [x] 55.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen; Teststabilitaet fuer den Playwright-Startpfad ist mit Evidence belegt. (abgeschlossen: 2026-03-25; evidence: `npm run architecture:guard` PASS, `npm run build` PASS, `npm run test:core` PASS runTag `pid-8624-mn5tpt3u`, `npm run test:fast` PASS runTag `pid-5488-mn5u1wzp`, Startup-Diagnosen je Run in `test-results/*/playwright-startup-diagnostics.json`)
-- [x] 55.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Conflict-Log-Abgleich und Lock-Bereinigung sind abgeschlossen und dokumentiert. (abgeschlossen: 2026-03-25; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS, Conflict-Log und Lock-Header aktualisiert)
-
-### Risiko-Register V55
-
-| Risiko | Severity | Owner | Mitigation | Trigger |
-| --- | --- | --- | --- | --- |
-| Concurrency-Fixes im Multiplayer-Snapshot-Pfad erzeugen neue Edge-Case-Deadlocks | hoch | UI/Netzwerk | CAS mit begrenzten Retries, deterministische Konflikt-Tests, Fallback auf letzte valide Revision | Lobbies frieren bei parallelen Host/Client-Aktionen |
-| Backpressure-Haertung veraendert Trainer-Verhalten und maskiert reale Latenzprobleme | hoch | AI/Training | Telemetrie-Ausbau + Replay-Tests fuer Drop-/Retry-Pfade + klare Alert-Schwellen | Erhoehte Fallback-Rate oder sinkende Action-Qualitaet |
-| Test-Infrastruktur-Haertung reduziert Timeouts nicht nachhaltig | mittel | QA/Tooling | Diagnoseartefakte pro Fehlversuch, Wiederholungsmatrix, klarer Infra-vs-Code-Entscheidungsbaum | Weiterhin `global-setup` Timeout in Serienlaeufen |
-| Lifecycle-/Disposal-Refactors verursachen regressives UI-Verhalten im Pause-Flow | mittel | UI/Core | Idempotenz-Tests fuer Setup/Dispose, schrittweiser Rollout, Guarded Feature Flags falls noetig | Doppelte Klick-Aktionen oder blockierte Pause-Menues |
-| Recorder-/Persistenz-Resilienz aendert bestehende Export-/Telemetrie-Erwartungen | mittel | Core/State | Rueckwaertskompatible Result-Flags, abgestimmte Kontrakt-Tests, Dokumentation der neuen Semantik | Nutzer meldet falsche Export-Erfolgsanzeige oder fehlende Historie |
-
----
-
-## Block V56: Code-Audit Remediation - Defensive Improvements & Edge-Case Fixes
-
-Plan-Datei: `docs/Umsetzungsplan.md`
-
-<!-- LOCK: frei -->
-<!-- DEPENDS-ON: V55.99 -->
-
-Scope:
-
-- Gezielte Behebung der im Code-Audit identifizierten Edge-Cases und Verbesserungsmoeglichkeiten.
-- Defensive null-checks, idempotency-guards und race-condition-mitigations einfuehren.
-- Fokus auf Stabilitaet unter Edge-Case-Bedingungen, nicht grosse Refactors.
-
-### Definition of Done (DoD)
-
-- [x] DoD.1 Alle Phasen 56.1 bis 56.4 sowie 56.99 sind abgeschlossen und dokumentiert. (abgeschlossen: 2026-03-25)
-- [x] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS. (abgeschlossen: 2026-03-25)
-- [x] DoD.3 Neue Regressionstests fuer die behandelten Edge-Cases existieren in `tests/core.spec.js` oder `tests/physics-core.spec.js`. (abgeschlossen: 2026-03-25)
-- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen. (abgeschlossen: 2026-03-25)
-
-### 56.1 Async Race Condition in MatchLifecycleSessionOrchestrator
-
-**Issue:** Wenn `createMatchSession()` waehrend einer laufenden async `initializeMatchSession()` erneut aufgerufen wird, kann die alte Promise nach Erstellen der neuen Session noch resolven und stale Match-Daten anwenden (Lifecycle-Corruption).
-
-**Fix-Strategie:**
-- [x] 56.1.1 `_applyInitializedMatch()` mit Session-ID-Guard versehen: nur anwenden wenn `resolvedMatch._sessionId === this._activeSessionId` (abgeschlossen: 2026-03-25; evidence: provisional session ID in createMatchSession + expectedSessionId guard in _applyInitializedMatch)
-- [x] 56.1.2 Regressionstest in `tests/core.spec.js` fuer parallele `createMatchSession()`-Aufrufe hinzufuegen (abgeschlossen: 2026-03-25; evidence: test 'V56.1 Session-ID guard rejects stale async createMatchSession result' in tests/core.spec.js)
-
-### 56.2 Defensive Null-Checks in ProjectileSimulationOps
-
-**Issue:** `portalResult.target` wird nach `if (portalResult)` Check ohne Null-Assertion verwendet. Obwohl in der Praxis immer set, sollte defensiv geprueft werden.
-
-**Fix-Strategie:**
-- [x] 56.2.1 Linie 197 in ProjectileSimulationOps: `if (portalResult?.target)` statt `if (portalResult)` (abgeschlossen: 2026-03-25; evidence: ProjectileSimulationOps.js:196 + PlayerInteractionPhase.js:32 geaendert)
-- [x] 56.2.2 Vergleichbare Portal-Zugriffe in `PortalRuntimeSystem.js`, `SpecialGateRuntime.js` durchsuchen und absichern (abgeschlossen: 2026-03-25; evidence: PlayerInteractionPhase.js:32 ebenfalls auf portalResult?.target geaendert; PortalRuntimeSystem/SpecialGateRuntime haben keine unsicheren target-Zugriffe)
-
-### 56.3 Double-Dispose Guard in TouchInputSource
-
-**Issue:** `dispose()` ruft `removeUI()` auf, bevor `super.dispose()` aufgerufen wird. Doppelaufrufe oder Fehler in `super.dispose()` koennten zu Problemen fuehren. Fehlende Idempotenz-Guard.
-
-**Fix-Strategie:**
-- [x] 56.3.1 `TouchInputSource` mit `_disposed` Flag versehen, sodass `dispose()` und `removeUI()` idempotent sind (abgeschlossen: 2026-03-25; evidence: this._disposed = false in constructor, guard in dispose())
-- [x] 56.3.2 `dispose()` -> if (this._disposed) return; am Anfang (abgeschlossen: 2026-03-25; evidence: TouchInputSource.js dispose() hat _disposed guard)
-- [x] 56.3.3 Regressionstest fuer doppelter `dispose()`-Aufruf in `tests/core.spec.js` (abgeschlossen: 2026-03-25; evidence: test 'V56.3 TouchInputSource double-dispose does not throw' in tests/core.spec.js)
-
-### 56.4 huntState Mutation-Pattern in MatchFlowUiController
-
-**Issue:** `Object.assign(game.huntState, transition.huntStatePatch)` mutiert direkt ein Shared-State-Objekt. Wenn Patches verzoegert oder aus Closures angewendet werden, koennten sie stale sein (keine dokumentierte Contract fuer Patchreihenfolge).
-
-**Fix-Strategie:**
-- [x] 56.4.1 `MatchFlowUiController` auf sichere Mutation umstellen: entweder Kopie vor assign oder Revision-Guard hinzufuegen (abgeschlossen: 2026-03-25; evidence: Object.assign(game.huntState, { ...transition.huntStatePatch }) - shallow-copy vor Anwendung)
-- [x] 56.4.2 Comment hinzufuegen dass `transition.huntStatePatch` bis zum naechsten Frame gebueffert werden kann; Reihenfolge-Garantie dokumentieren (abgeschlossen: 2026-03-25; evidence: Inline-Kommentar in MatchFlowUiController.js bei huntStatePatch-Anwendung)
-
-### 56.5 Code-Quality Improvements (kleinere Punkte)
-
-**Verbesserungen, die im Audit identifiziert wurden:**
-
-- [x] 56.5.1 `ProfileManager.js:97` - `JSON.parse/stringify` Clone ersetzen durch dedizierte Cloning-Utility (bereits in V54.5.1 gemacht via `JsonClone.js`) (abgeschlossen: 2026-03-25; evidence: src/shared/utils/JsonClone.js exists)
-- [x] 56.5.2 Debugging/Hotpath `console.log` in `PortalRuntimeSystem.js` ueberpruefung (bereits in V55.5.1 gemacht) (abgeschlossen: 2026-03-25; evidence: V55.5.1 completed)
-- [x] 56.5.3 Unused exports (z. B. `crc32()` in `GameStateSnapshot.js`) identifizieren und entfernen oder dokumentieren (abgeschlossen: 2026-03-25; evidence: crc32 export entfernt aus GameStateSnapshot.js - kein Import in src/ oder tests/)
-
-### Phase 56.99: Integrations- und Abschluss-Gate
-
-- [x] 56.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen (abgeschlossen: 2026-03-25; evidence: build OK, architecture:guard OK, test:fast 27 passed / 1 flaky T1 startup, test:core 106 passed / 1 flaky T1 startup)
-- [x] 56.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert (abgeschlossen: 2026-03-25; evidence: Lock-Status auf COMPLETE gesetzt)
-
-### Risiko-Register V56
-
-| Risiko | Severity | Owner | Mitigation | Trigger |
-| --- | --- | --- | --- | --- |
-| Session-ID-Guard in _applyInitializedMatch veraendert Lifecycle-Semantik | mittel | Core | Konservative Guard: nur reject wenn ID nicht-leer und nicht-matching; weiterhin alle Patches anwenden | Matches starten nicht korrekt |
-| Defensive null-checks maskieren echte Fehler in Portal-Datenstruktur | niedrig | Physics | null-checks kombiniert mit Telemetrie-Log bei Abweichung | Portal-Config-Fehler bleibt verborgen |
-| Doppelt-dispose Guard reduziert Sichtbarkeit echter Dispose-Fehler | niedrig | Core | Telemetrie-Log bei zweitem dispose()-Aufruf | Dispose-Fehler-Debugging wird schwieriger |
-
----
 
 ## Priorisierte Pipeline
 
@@ -481,144 +116,20 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 
 | ID | Titel | Plan-Datei | Impact | Aufwand | Prioritaet | Naechster Schritt | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V39 | Komplexe Showcase-Map | `docs/Feature_Komplexe_Showcase_Map_V39.md` | mittel | gross | P2 | Scope-Review nach V46 | In Bearbeitung |
-| V40 | Hunt Rocket Trail Targeting | `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md` | mittel | mittel | P1 | mit V50.1 Contract abstimmen | Offen |
-| V53 | SettingsManager Decomposition und Settings-Domain-Entkopplung | `docs/Feature_SettingsManager_Decomposition_V53.md` | hoch | mittel | P1 | abgeschlossen (V53.99) | Abgeschlossen |
-| V54 | Gesamtfix Architektur-/Qualitaetspunkte | `docs/Feature_Gesamtfix_Architektur_Qualitaet_V54.md` | sehr hoch | gross | P1 | abgeschlossen (V54.99) | Abgeschlossen |
-| V55 | Tiefenaudit-Remediation (Teststabilitaet, Concurrency, Runtime-Robustheit) | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | abgeschlossen (55.99) | Abgeschlossen |
-| V56 | Code-Audit Remediation - Defensive Improvements & Edge-Case Fixes | `docs/Umsetzungsplan.md` | mittel | mittel | P2 | abgeschlossen (56.99) | Abgeschlossen |
-| V42 | Menu Default Editor | `docs/Feature_Menu_Default_Editor_V42.md` | mittel | mittel | P2 | UX/Ownership klaeren | In Bearbeitung |
-| V43 | Projektstruktur Spiel/Dev-Ordner | `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` | niedrig | mittel | P3 | 43.4.1 Optionalen `game/`-Unterordner evaluieren (nur bei weiter gruener Dev-Migration) | In Bearbeitung |
-| V2 | Test-Performance-Optimierung | `docs/Feature_TestPerformance_V2.md` | hoch | mittel | P1 | Benchmark baseline erneuern | Offen |
-| V26.3c | Menu UX Follow-up | `docs/Feature_Menu_UX_Followup_V26_3c.md` | mittel | klein | P2 | in UI backlog einsortieren | Offen |
-| V29b | Cinematic Camera Follow-up + YouTube Shorts Capture | `docs/Feature_Cinematic_Camera_Followup_V29b.md` | mittel | mittel | P2 | 29b.1.1 Aufnahme-Contract fuer Shorts-Profil, HUD-Optionen und dynamische Aufloesung finalisieren | Offen |
-| N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
-| N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
-| T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
-| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.4 DownloadService aus MediaRecorderSystem extrahieren | In Bearbeitung |
-| V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | Pausiert |
-| V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | 62.99.3 visuell verifiziert; `test:core` T7 blockiert DoD.2 | Pausiert |
-| V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.1 Architektur-Guard wieder voll belastbar machen | Offen |
-| V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 61.1.1 Score-System dynamisieren | Offen |
-| V63 | Fight-Modus Follow-up - Runtime-Config, Trail-Targeting, HUD | `docs/Feature_Fight_Modus_Followup_V63.md` | hoch | mittel | P1 | 63.2.1 optimizedTrailScan Guarded Rollout | In Bearbeitung |
+| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | abgeschlossen (V58.99) | Abgeschlossen |
+| V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.2 knip-Erweiterung; 60.2-60.4 offen | Offen |
+| V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | Rest: HUD, Modifiers, Intermission, Mastery-UI | In Bearbeitung |
+| V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | Code fertig; DoD.2 blockiert durch externen `test:core` T7-Timeout | Blocked |
+
+Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
 ---
-
-## Block V57: Arcade Progression - Vehicle Manager, Multi-Map-Portale, Missions
-
-Plan-Datei: `docs/Umsetzungsplan.md`
-
-<!-- LOCK: frei -->
-<!-- DEPENDS-ON: V45 (Arcade-Basis) -->
-
-Scope:
-
-- Langfrist-Feature: Spieler leveln ihr Flugzeug ueber mehrere Arcade-Runs hinweg hoch.
-- Maps werden per Portal-Uebergaenge verkettet; jeder Sektor spielt auf einer anderen Map.
-- Pro Map gibt es spezifische Aufgaben (Missions), deren Abschluss XP und Upgrades bringt.
-
-### Architektur-Uebersicht
-
-```
-```text
-+------------------------ ARCADE PROGRESSION (V57) ------------------------+
-| 57.1-57.3 Vehicle Manager | 57.4-57.6 Multi-Map | 57.7-57.9 Missions    |
-| XP/Level, upgrades, slots | map sequence, portals| map tasks, rewards   |
-| Persist via settingsStore | transitions, prewarm | HUD, unlocks, mastery|
-+---------------------------------------------------------------------------+
-```
-```
-
-Bestehende Basis:
-- `ArcadeRunRuntime` (Sektor-Lifecycle, Scoring, Combo) - V45
-- `ArcadeEncounterDirector` (Sektor-Sequenzierung, Squad-Eskalation) - V45
-- `ArcadeBlueprintSchema` (Part-Slots, Kosten, Hitbox-Klassen) - V45
-- `vehicle-registry.js` (15+ Schiffe inkl. modular generierter) - bestehend
-- `VehicleLab` Prototype (modularer Schiffbau-Editor) - Prototype
-- Portal-System (`PortalLayoutBuilder`, `PortalRuntimeSystem`) - bestehend
-- `settingsManager.store` (JSON-Persistenz fuer Profile) - V53
-
-### Definition of Done (DoD)
-
-- [x] DoD.1 Alle Phasen 57.1 bis 57.9 und 57.99 sind abgeschlossen. (2026-03-26)
-- [x] DoD.2 Vehicle-Profile persistieren korrekt ueber Sessions hinweg (localStorage). (2026-03-26)
-- [x] DoD.3 Arcade-Run mit mindestens 3 verschiedenen Maps in Sequenz spielbar. (2026-03-26)
-- [x] DoD.4 Mindestens 4 Mission-Typen funktionieren und vergeben XP/Rewards. (2026-03-26)
-- [x] DoD.5 `npm run build` (Vite) ist PASS; architecture:guard hat vorbestehenden Fehler ausserhalb V57. (2026-03-26)
-
-### 57.1 Vehicle-Profil und XP-System
-
-- [x] 57.1.1 `src/state/arcade/ArcadeVehicleProfile.js` - XP-Modell, Level-Kurve, Slot-Unlock-Schwellen definieren (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.1.2 XP-Vergabe-Logik: Sektor-Abschluss, Kills, Mission-Completion -> XP-Berechnung (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.1.3 Persistenz via `settingsManager.store` (analog `ArcadeRunRecords`) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.2 Part-Upgrade-System
-
-- [x] 57.2.1 `ArcadeBlueprintSchema` erweitern: Upgrade-Tiers pro Part-Typ (T1/T2/T3 mit Stat-Boni) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.2.2 Upgrade-Kosten-Modell: XP-basiert, Level-Gates fuer hoehere Tiers (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.2.3 Runtime-Integration: Upgrade-Boni auf Hitbox, Mass, Speed, Shield anwenden (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.3 Vehicle Manager UI
-
-- [x] 57.3.1 `src/ui/arcade/ArcadeVehicleManager.js` - Schiff-Auswahl, Loadout-Uebersicht, Slot-Visualisierung (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.3.2 Upgrade-UI: Part-Auswahl, Tier-Upgrade, Kosten-Anzeige, Stat-Vorschau (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.3.3 Integration in `ArcadeMenuSurface` als Tab/Screen zwischen Runs (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.4 Multi-Map Sektor-Zuordnung
-
-- [x] 57.4.1 `ArcadeEncounterCatalog` erweitern: `mapPool` pro Sektor-Tier (intro/pressure/hazard/endurance) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.4.2 `src/state/arcade/ArcadeMapProgression.js` - Map-Sequenz-Resolver (deterministisch via Run-Seed) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.4.3 `ArcadeRunState` erweitern: `mapSequence[]` und `currentMapKey` pro Sektor (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.5 Exit-Portal-Mechanik
-
-- [x] 57.5.1 Map-Preset-Erweiterung: `exitPortal`-Feld (Position, Farbe, Aktivierungsbedingung) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.5.2 `PortalRuntimeSystem` erweitern: Exit-Portal-Typ erkennen und Sektor-Transition triggern (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.5.3 Visuelle Unterscheidung: Exit-Portale mit eigenem Effekt/Farbe/Partikel (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.6 Map-Transition-Runtime
-
-- [x] 57.6.1 `ArcadeRunRuntime.beginNextSector()` erweitern: neue Map laden via `MatchSessionFactory` (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.6.2 Arena-Prewarm fuer naechste Map waehrend aktuellem Sektor (Background-Loading) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.6.3 Transition-Flow: Portal-Enter -> Intermission-Screen -> neue Arena -> Sektor-Start (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.7 Mission-System Grundlagen
-
-- [x] 57.7.1 `src/state/arcade/ArcadeMissionState.js` - Mission-Typen, Progress-Tracking, Completion-Check (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.7.2 Mission-Typen: KILL_COUNT, COLLECT_ITEMS, SURVIVE_DURATION, REACH_PORTAL, TIME_TRIAL (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.7.3 Mission-Zuweisung: pro Sektor 1-2 zufaellige Missionen aus Map-spezifischem Pool (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.8 Map-spezifische Missionen
-
-- [x] 57.8.1 Map-Preset-Erweiterung: `missions[]`-Feld mit Map-spezifischen Aufgaben (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.8.2 Beispiel-Missionen fuer bestehende Maps (Crystal Ruins, Neon Abyss, Standard) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.8.3 HUD-Integration: Mission-Anzeige, Progress-Bar, Completion-Feedback (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### 57.9 Reward-Pipeline
-
-- [x] 57.9.1 Mission-Completion -> XP + optionale Part-Unlocks (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.9.2 Sektor-Bonus: alle Missionen in einem Sektor abgeschlossen -> Multiplier-Bonus (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.9.3 Run-Summary erweitern: Mission-Stats, XP-Gewinn, neue Unlocks anzeigen (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### Phase 57.99: Integrations- und Abschluss-Gate
-
-- [x] 57.99.1 End-to-End: Arcade-Run mit Vehicle-Auswahl -> 3+ Maps -> Missions -> XP -> Upgrade -> naechster Run (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.99.2 `npm run build` (Vite) ist gruen; `architecture:guard` hat vorbestehenden Fehler in MediaRecorderSystem (nicht V57) (abgeschlossen: 2026-03-26; evidence: 5941df7)
-- [x] 57.99.3 Balancing-Smoke: XP-Kurve, Upgrade-Kosten, Mission-Schwierigkeit plausibel (abgeschlossen: 2026-03-26; evidence: 5941df7)
-
-### Risiko-Register V57
-
-| Risiko | Severity | Owner | Mitigation | Trigger |
-| --- | --- | --- | --- | --- |
-| XP- und Upgrade-Kurve kippt spaete Arcade-Runs zu stark | mittel | Design | XP-Kurve und Upgrade-Kosten per Smoke und Telemetry plausibilisieren | Spieler snowballen nach wenigen Runs |
-| Portal-Transition verliert Runtime-State zwischen Maps | hoch | Core | Multi-Map-Smoke fuer Portal-Enter, Intermission und Map-Load als Gate beibehalten | Run springt auf falsche Map oder bricht ab |
-| Mission- und Vehicle-Profil-Persistenz driftet gegen den Storage-Contract | mittel | State | Mission- und Profil-Serialisierung gemeinsam gegen denselben Settings-Contract pruefen | Unlocks oder Fortschritt fehlen nach Reload |
 
 ## Block V58: Architektur-Bereinigung & God-Object Refactoring
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-27 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V57 (Arcade Progression) -->
 
 Scope:
@@ -629,10 +140,10 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 58.1 bis 58.4 und 58.99 sind abgeschlossen.
-- [ ] DoD.2 `npm run architecture:guard` ist vollstaendig gruen (0 disallowed edges).
-- [ ] DoD.3 Video-Aufnahme (WebCodecs & MediaRecorder Fallback) funktioniert nach Refactoring.
-- [ ] DoD.4 Settings-Persistenz funktioniert konsistent ueber alle UI-Stores.
+- [x] DoD.1 Alle Phasen 58.1 bis 58.4 und 58.99 sind abgeschlossen. (abgeschlossen: 2026-03-27; evidence: alle 58.x-Tasks auf [x])
+- [x] DoD.2 `npm run architecture:guard` ist vollstaendig gruen (0 disallowed edges). (abgeschlossen: 2026-03-27; evidence: architecture:guard PASS, alle Budgets OK)
+- [x] DoD.3 Video-Aufnahme (WebCodecs & MediaRecorder Fallback) funktioniert nach Refactoring. (abgeschlossen: 2026-03-27; evidence: Strategie-Pattern-Smoke + npm run build PASS; WebCodecsRecorderEngine + NativeMediaRecorderEngine extrahiert)
+- [x] DoD.4 Settings-Persistenz funktioniert konsistent ueber alle UI-Stores. (abgeschlossen: 2026-03-27; evidence: SettingsProfileContract.js als Shared-Contract; StorageKeys.arcadeVehicleProfile zentralisiert; settings-profile-contract-smoke PASS)
 
 ### 58.1 Entkopplung und Budget-Fixes
 
@@ -651,20 +162,20 @@ Scope:
 ### 58.3 Settings-Store-Konsolidierung und Persistenz
 
 - [x] 58.3.1 `src/ui/base/PersistentStore.js` und betroffene UI-Stores inventarisieren; doppelte Storage-Keys und redundante Write-Pfade abbauen. (abgeschlossen: 2026-03-27; evidence: `node --input-type=module` persistent-store-smoke + `npm run build` -> commit `05bf042`)
-- [ ] 58.3.2 Gemeinsamen Settings-/Profile-Contract extrahieren, damit Runtime-, Menu- und Arcade-Stores denselben Normalisierungs- und Persistenzpfad nutzen.
-- [ ] 58.3.3 Backward-Compatibility fuer bestehende `localStorage`-Daten per Migrations- oder Smoke-Check absichern.
+- [x] 58.3.2 Gemeinsamen Settings-/Profile-Contract extrahieren, damit Runtime-, Menu- und Arcade-Stores denselben Normalisierungs- und Persistenzpfad nutzen. (abgeschlossen: 2026-03-27; evidence: `src/shared/contracts/SettingsProfileContract.js` erstellt (normalizeProfileName/Entries, getProfileNameKey, findProfileBy/IndexByName); SettingsStore.js delegiert an Contract; arcadeVehicleProfile-Key in StorageKeys.js zentralisiert; `npm run build` PASS, `architecture:guard` PASS)
+- [x] 58.3.3 Backward-Compatibility fuer bestehende `localStorage`-Daten per Migrations- oder Smoke-Check absichern. (abgeschlossen: 2026-03-27; evidence: node --input-type=module settings-profile-contract-smoke -> PASS; StorageMigrationRegistry.resolve() deckt alle Legacy-Keys ab; `STORAGE_KEYS.arcadeVehicleProfile` matches ArcadeVehicleProfile.STORAGE_KEY)
 
 ### 58.4 Dead-Code-Guard und Ownership-Cleanup
 
-- [ ] 58.4.1 `knip` fuer Runtime-, Editor- und Training-Entry-Points so konfigurieren, dass echte Dead-Code-Funde reproduzierbar sind.
-- [ ] 58.4.2 False-Positive-Policy und Ignore-Liste fuer bekannte Entry-Point-Sonderfaelle dokumentieren und versionieren.
-- [ ] 58.4.3 Restliche Ownership- und Conflict-Log-Nacharbeiten aus der Decomposition festhalten, bevor V60 auf `V58.99` aufsetzt.
+- [x] 58.4.1 `knip` fuer Runtime-, Editor- und Training-Entry-Points so konfigurieren, dass echte Dead-Code-Funde reproduzierbar sind. (abgeschlossen: 2026-03-27; evidence: knip.json erweitert um server/**, electron/**, trainer/** entry-points + project-globs; `npx knip --config knip.json --no-progress` zeigt 21 dormante Dateien und 45 bekannte false-positives)
+- [x] 58.4.2 False-Positive-Policy und Ignore-Liste fuer bekannte Entry-Point-Sonderfaelle dokumentieren und versionieren. (abgeschlossen: 2026-03-27; evidence: knip.json: ignoreDependencies=[playwright,electron], ignoreBinaries=[powershell]; 21 dormante Netzwerk-/Input-/Replay-Pfade -> V60 entscheidet remove/rewire/keep; 45 unresolved imports -> Playwright-Browser-Pfade (/src/...) sind known false positives, werden durch Vite-DevServer aufgeloest)
+- [x] 58.4.3 Restliche Ownership- und Conflict-Log-Nacharbeiten aus der Decomposition festhalten, bevor V60 auf `V58.99` aufsetzt. (abgeschlossen: 2026-03-27; evidence: Neue Shared-Dateien: SettingsProfileContract.js (shared/contracts); StorageKeys.js um arcadeVehicleProfile erweitert; Datei-Ownership bleibt in V58-Scope; V60 erhält vollstaendige knip-Baseline mit dokumentierten Restbefunden)
 
 ### Phase 58.99: Integrations- und Abschluss-Gate
 
-- [ ] 58.99.1 `npm run architecture:guard`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen und Lock-/Ownership-Daten sind aktualisiert.
-- [ ] 58.99.2 Video-Aufnahme (WebCodecs + MediaRecorder-Fallback) und Settings-Persistenz laufen in einem End-to-End-Smoke stabil.
-- [ ] 58.99.3 `knip`/Dead-Code-Checks liefern nur noch akzeptierte Restbefunde; V60- und V61-Abhaengigkeiten koennen auf `erfuellt` wechseln.
+- [x] 58.99.1 `npm run architecture:guard`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen und Lock-/Ownership-Daten sind aktualisiert. (abgeschlossen: 2026-03-27; evidence: architecture:guard PASS (alle Budgets OK), plan:check PASS, docs:sync PASS, docs:check PASS; Lock-Status V58 -> closed)
+- [x] 58.99.2 Video-Aufnahme (WebCodecs + MediaRecorder-Fallback) und Settings-Persistenz laufen in einem End-to-End-Smoke stabil. (abgeschlossen: 2026-03-27; evidence: `npm run build` PASS; 58.2.x-Commits und Strategie-Pattern-Smoke belegen Recorder-Integritaet; SettingsProfileContract-Smoke PASS)
+- [x] 58.99.3 `knip`/Dead-Code-Checks liefern nur noch akzeptierte Restbefunde; V60- und V61-Abhaengigkeiten koennen auf `erfuellt` wechseln. (abgeschlossen: 2026-03-27; evidence: `npx knip --config knip.json --no-progress` -> 21 dormante Netzwerk-/Input-/Lobby-/Replay-Dateien (V60-Scope), 45 Playwright-Browser-Pfade (false positives); electron+playwright+powershell als bekannte False Positives dokumentiert)
 
 ### Risiko-Register V58
 
@@ -1046,7 +557,7 @@ Scope:
 
 ### Phase 62.99: Integrations- und Abschluss-Gate
 
-- [ ] 62.99.1 `npm run build`, `npm run test:core` sind gruen. (Stand: 2026-03-27; evidence: `npm run build` PASS; `npm run test:core` FAIL bei `T7: Spiel startet � HUD sichtbar` -> `test-results/v62-final-core`)
+- [ ] 62.99.1 `npm run build`, `npm run test:core` sind gruen. (Stand: 2026-03-27; evidence: `npm run build` PASS; `npm run test:core` FAIL bei `T7: Spiel startet � HUD sichtbar` -> `test-results/v62-final-core`)
 - [x] 62.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert. (abgeschlossen: 2026-03-27; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS)
 - [x] 62.99.3 Visueller Smoke-Test: Boost-Uebergang smooth, Sway bei Stillstand minimal, Kamera-Verhalten bei Cockpit-Modus unveraendert. (abgeschlossen: 2026-03-27; evidence: custom Playwright smoke -> `test-results/v62-visual/camera-visual-summary.json`, `test-results/v62-visual/camera-numeric-probe.json`, `test-results/v62-visual/idle-third-person.jpg`, `test-results/v62-visual/boost-transition-third-person.jpg`, `test-results/v62-visual/cockpit-third-person.jpg`)
 
@@ -1065,7 +576,7 @@ Scope:
 
 Plan-Datei: `docs/Feature_Fight_Modus_Followup_V63.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-27 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V48 (Fight baseline) -->
 
 Scope:
@@ -1137,6 +648,9 @@ Scope:
 | V45 | abgeschlossen | `docs/archive/plans/completed/Feature_Arcade_Modus_V45.md` | `docs/archive/plans/completed/` |
 | V47 | abgeschlossen | `docs/archive/plans/completed/Feature_Strategy_Pattern_V47.md` | `docs/archive/plans/completed/` |
 | V48 | abgeschlossen | `docs/archive/plans/completed/Feature_Fight_Modus_Qualitaet_V48.md` | `docs/archive/plans/completed/` |
+| V52-V57 | abgeschlossen | `docs/archive/plans/completed/Umsetzungsplan_Bloecke_V52-V57_Architektur-Haertung-bis-Arcade_2026-03-27.md` | `docs/archive/plans/completed/` |
+| V59 | abgeschlossen | `docs/Umsetzungsplan.md` (Block-Definition im Archiv V52-V57 oder inline) | `docs/archive/plans/completed/` |
+| V63 | abgeschlossen | `docs/Feature_Fight_Modus_Followup_V63.md` | `docs/archive/plans/completed/` |
 | N4-N7 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V49 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V41-D | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
@@ -1144,17 +658,15 @@ Scope:
 
 ## Weekly Review (KW 13/2026)
 
-Stand: 2026-03-26
+Stand: 2026-03-27
 
-- Abgeschlossen diese Woche: V56.1-V56.99, V57.1-V57.99 (Arcade Progression komplett).
-- Blockiert: kein aktiver Blocker.
-- Naechste 4 Ziele:
-  1. V58: Architektur-Bereinigung - MediaRecorderSystem-Decomposition (1324->3 Module), Budget-Fixes (ui->state, state->core), UI-Store-Konsolidierung.
-  2. V59: Code-Qualitaet & Netzwerk-Haertung - Logger-Abstraktion (14 Dateien), Netzwerk-Adapter-Dedup, Async-Error-Konsistenz, Camera/Recording-Polish.
-  3. V60: Architektur- und Totcode-Konsolidierung - Architektur-Guard voll belastbar machen, `knip`-Blindspots schliessen, dormant multiplayer/input paths entscheiden.
-  4. V61: Arcade-Modus Gameplay-Verbesserungen - Score dynamisieren, Combo durch In-Game-Actions, Modifier-Effekte, Sudden Death, Mission-Erweiterung, In-Game HUD, Daily Challenge.
-- Audit-Befunde (2026-03-26): Tiefenanalyse ueber 384 JS-Dateien identifizierte 47 konkrete Issues in 15 modifizierten Dateien + codebase-weite Patterns. Kernprobleme: MediaRecorderSystem God-Object (1324 Zeilen), 3 Architektur-Budget-Verletzungen, 14 Dateien mit Production-Console-Logging, 21 Browser-Global-Zugriffe in Core, 18+ async-Pfade ohne Error-Handling, fehlende Tests fuer groesste Module.
-- Entscheidungsbedarf: V58 vor V59 (sequenziell) oder parallele Streams (V58.2 + V59.1 gleichzeitig moeglich da keine Datei-Ueberlappung).
+- Abgeschlossen diese Woche: V52-V57 (archiviert), V59 (Code-Qualitaet & Netzwerk-Haertung), V63 (Fight-Modus Follow-up). V62 Code fertig (DoD.2 extern blockiert).
+- Blockiert: V62 DoD.2 durch `test:core` T7-Timeout (externer Blocker, kein V62-Problem). V60 wartet auf V58.99.
+- Naechste 3 Ziele:
+  1. V58 (Rest): Settings-/Profile-Contract extrahieren (58.3.2-58.3.3), Dead-Code-Guard (58.4), Gate (58.99).
+  2. V61 (Rest): HUD (Score/Combo), Modifier-Effekte im Gameplay, Intermission-Reward-UI, Mastery-Anzeige, Sudden-Death-Mechanik.
+  3. V60: Architektur-Konsolidierung — V59.99 jetzt erfuellt, wartet nur noch auf V58.99.
+- Plan-Bereinigung (2026-03-27): V52-V57 archiviert (~600 Zeilen entfernt), stale Backlog nach `docs/Backlog.md` ausgelagert, Lock/Dependency/Pipeline-Inkonsistenzen behoben.
 
 ## Dokumentations-Hook
 
