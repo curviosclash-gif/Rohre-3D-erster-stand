@@ -58,7 +58,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Pfadmuster | Block / Stream | Status | Hinweis |
 | --- | --- | --- | --- |
 | `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js` | V62 | pausiert | Code fertig, Gate 62.99.1/62.99.3 offen |
-| `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/ui/base/PersistentStore.js`, `src/core/GameRuntimeFacade.js` | V58 | pausiert | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz, Facade-Cleanup |
+| `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/ui/base/PersistentStore.js`, `src/core/GameRuntimeFacade.js` | V58 | in Bearbeitung | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz, Facade-Cleanup |
 | `src/modes/ArcadeModeStrategy.js`, `src/core/arcade/ArcadeRunRuntime.js`, `src/state/arcade/ArcadeRunState.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeMissionState.js`, `src/shared/contracts/ArcadeMissionContract.js`, `src/ui/arcade/ArcadeMissionHUD.js` (Score-HUD-Erweiterung), `src/ui/arcade/ArcadeMenuSurface.js` (Post-Run, Daily), `src/entities/directors/ArcadeEncounterCatalog.js`, `src/entities/directors/ArcadeEncounterDirector.js`, `src/state/arcade/ArcadeRoundStateController.js`, `src/shared/utils/ArcadeUtils.js` (neu) | V61 | offen | Arcade-Modus Gameplay-Verbesserungen: Score, Combo, Missionen, Modifiers, Sudden Death, HUD |
 | `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | offen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/InputDelayBuffer.js`, `src/network/RemoteInputSource.js`, `src/network/SpectatorInputSource.js`, `src/core/replay/ReplayPlayer.js`, `src/ui/menu/MenuMultiplayerPanel.js`, `src/ui/menu/MenuLobbyRenderer.js` | V60 | offen | Audit-Folge fuer Guard-Reliability, dormant input/multiplayer paths und Rest-Decomposition; Start nach V58/V59 |
@@ -75,7 +75,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | H | V55 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | closed | abgeschlossen 2026-03-26 |
-| - | V58 | 2026-03-26 | frei | pausiert, 58.2.3 in Arbeit gewesen |
+| Bot-Codex | V58 | 2026-03-27 | claimed | 58.2.3 Strategie-Integration fuer Recorder-Engines |
 | - | V59 | 2026-03-26 | frei | pausiert, 59.1.6/59.1.7/59.7.4 offen |
 | - | V60 | - | frei | blockiert auf V58.99 + V59.99 |
 | - | V61 | - | frei | - |
@@ -496,7 +496,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
-| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.3 MediaRecorderSystem auf Strategie-Pattern umstellen | Pausiert |
+| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.3 MediaRecorderSystem auf Strategie-Pattern umstellen | In Bearbeitung |
 | V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | Pausiert |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | 62.99.1 build/test Gate (Logger-Fix erledigt) | Pausiert |
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.1 Architektur-Guard wieder voll belastbar machen | Offen |
@@ -619,7 +619,7 @@ Bestehende Basis:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-27 -->
 <!-- DEPENDS-ON: V57 (Arcade Progression) -->
 
 Scope:
