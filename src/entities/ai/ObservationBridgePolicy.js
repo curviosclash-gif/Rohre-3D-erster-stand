@@ -23,6 +23,10 @@ import {
 const WARNING_COOLDOWN_BASE_MS = 2000;
 const WARNING_COOLDOWN_MAX_MS = 30000;
 
+function isDesktopAppRuntime(runtimeGlobal = globalThis) {
+    return runtimeGlobal?.curviosApp?.isApp === true || runtimeGlobal?.__CURVIOS_APP__ === true;
+}
+
 export class ObservationBridgePolicy {
     constructor(options = {}) {
         this.type = normalizeBotPolicyType(options.type || BOT_POLICY_TYPES.CLASSIC_BRIDGE);
@@ -234,6 +238,9 @@ export class ObservationBridgePolicy {
     }
 
     _autoLoadLatestCheckpoint() {
+        if (isDesktopAppRuntime()) {
+            return;
+        }
         const CHECKPOINT_API_URL = '/api/bot/latest-checkpoint';
         fetch(CHECKPOINT_API_URL)
             .then((res) => {
