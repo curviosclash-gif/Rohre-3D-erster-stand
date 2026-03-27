@@ -1476,4 +1476,64 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.optimizedScanEnabled).toBe(true);
     });
 
+    test('T89h: HuntHUD delta-updates schreiben Bars/Texte korrekt nach Wertaenderung', async ({ page }) => {
+        await startHuntGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            if (!entityManager || !player) return { error: 'missing-entity-state' };
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') return { error: 'hunt-not-active' };
+
+            const hud = game?.huntHud || game?.huntHUD || game?._huntHUD || null;
+            if (!hud || typeof hud.update !== 'function') return { error: 'missing-hunt-hud' };
+
+            // Force known shield values and run one HUD update cycle
+            const originalShieldHP = player.shieldHP;
+            const originalMaxShieldHp = player.maxShieldHp;
+            player.shieldHP = 50;
+            player.maxShieldHp = 100;
+
+            // Flush pending timers by passing a large dt to trigger playerPanel update
+            hud._playerPanelTickTimer = 9999;
+            hud.update(0.001);
+
+            const shieldTextAfterFirst = hud.p1ShieldText?.textContent ?? null;
+            const cachedShieldTxt = hud._panelCache?.[0]?.shieldTxt ?? null;
+
+            // Now set the same values - cache should prevent DOM write (text stays same)
+            hud._playerPanelTickTimer = 9999;
+            hud.update(0.001);
+            const shieldTextAfterSecond = hud.p1ShieldText?.textContent ?? null;
+
+            // Change value - delta check must allow the write
+            player.shieldHP = 25;
+            hud._playerPanelTickTimer = 9999;
+            hud.update(0.001);
+            const shieldTextAfterChange = hud.p1ShieldText?.textContent ?? null;
+
+            // Restore
+            player.shieldHP = originalShieldHP;
+            player.maxShieldHp = originalMaxShieldHp;
+
+            return {
+                error: null,
+                shieldTextAfterFirst,
+                cachedShieldTxt,
+                shieldTextAfterSecond,
+                shieldTextAfterChange,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        // First update wrote correct value
+        expect(result.shieldTextAfterFirst).toBe('50 / 100');
+        // Cache was updated
+        expect(result.cachedShieldTxt).toBe('50 / 100');
+        // Second update with same value: same DOM content
+        expect(result.shieldTextAfterSecond).toBe('50 / 100');
+        // After changing shieldHP to 25, DOM must update
+        expect(result.shieldTextAfterChange).toBe('25 / 100');
+    });
+
 });

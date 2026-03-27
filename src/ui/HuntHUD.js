@@ -70,6 +70,11 @@ export class HuntHUD {
         this._killFeedTickTimer = 0;
         this._indicatorTickTimer = 0;
         this._wasHuntActive = false;
+        this._panelCache = [
+            { shieldW: null, shieldTxt: null, boostW: null, boostCooldown: null, boostTxt: null, overheatW: null, overheatTxt: null },
+            { shieldW: null, shieldTxt: null, boostW: null, boostCooldown: null, boostTxt: null, overheatW: null, overheatTxt: null },
+        ];
+        this._indicatorP2Visible = null;
         this._isHuntActive = typeof options.isHuntActive === 'function'
             ? options.isHuntActive
             : defaultIsHuntActive;
@@ -102,6 +107,12 @@ export class HuntHUD {
         this._indicatorTickTimer = 0;
         this.damageIndicatorP1?.classList.add('hidden');
         this.damageIndicatorP2?.classList.add('hidden');
+        for (const c of this._panelCache) {
+            c.shieldW = null; c.shieldTxt = null;
+            c.boostW = null; c.boostCooldown = null; c.boostTxt = null;
+            c.overheatW = null; c.overheatTxt = null;
+        }
+        this._indicatorP2Visible = null;
     }
 
     update(dt) {
@@ -137,7 +148,7 @@ export class HuntHUD {
                 boostText: this.p1BoostText,
                 overheatFill: this.p1OverheatFill,
                 overheatText: this.p1OverheatText,
-            });
+            }, this._panelCache[0]);
             if (this.p2Panel) {
                 const p2Visible = humans.length > 1;
                 this.p2Panel.classList.toggle('hidden', !p2Visible);
@@ -149,7 +160,7 @@ export class HuntHUD {
                         boostText: this.p2BoostText,
                         overheatFill: this.p2OverheatFill,
                         overheatText: this.p2OverheatText,
-                    });
+                    }, this._panelCache[1]);
                 }
             }
         }
@@ -164,28 +175,55 @@ export class HuntHUD {
         }
     }
 
-    _updatePlayerPanel(player, refs) {
+    _updatePlayerPanel(player, refs, cache = null) {
         const shield = Math.max(0, Number(player?.shieldHP) || 0);
         const maxShield = Math.max(1, Number(player?.maxShieldHp) || 1);
         const shieldRatio = shield / maxShield;
-        if (refs.shieldFill) refs.shieldFill.style.width = toPercent(shieldRatio);
-        if (refs.shieldText) refs.shieldText.textContent = `${Math.round(shield)} / ${Math.round(maxShield)}`;
+        const shieldW = toPercent(shieldRatio);
+        const shieldTxt = `${Math.round(shield)} / ${Math.round(maxShield)}`;
+        if (refs.shieldFill && shieldW !== cache?.shieldW) {
+            refs.shieldFill.style.width = shieldW;
+            if (cache) cache.shieldW = shieldW;
+        }
+        if (refs.shieldText && shieldTxt !== cache?.shieldTxt) {
+            refs.shieldText.textContent = shieldTxt;
+            if (cache) cache.shieldTxt = shieldTxt;
+        }
 
         const resolvedBoostCapacity = Number(this._getBoostCapacity(player, this.runtime));
         const boostCapacity = Math.max(MIN_BOOST_CAPACITY, Number.isFinite(resolvedBoostCapacity) ? resolvedBoostCapacity : DEFAULT_BOOST_CAPACITY);
         const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
         const boostRatio = clamp01(boostCharge / boostCapacity);
         const isBoostCooldown = !player?.manualBoostActive && boostCharge < (boostCapacity - MIN_BOOST_CAPACITY);
+        const boostW = toPercent(boostRatio);
         if (refs.boostFill) {
-            refs.boostFill.style.width = toPercent(boostRatio);
-            refs.boostFill.classList.toggle('cooldown', isBoostCooldown);
+            if (boostW !== cache?.boostW) {
+                refs.boostFill.style.width = boostW;
+                if (cache) cache.boostW = boostW;
+            }
+            if (isBoostCooldown !== cache?.boostCooldown) {
+                refs.boostFill.classList.toggle('cooldown', isBoostCooldown);
+                if (cache) cache.boostCooldown = isBoostCooldown;
+            }
         }
-        if (refs.boostText) refs.boostText.textContent = `${Math.round(boostRatio * 100)}%`;
+        const boostTxt = `${Math.round(boostRatio * 100)}%`;
+        if (refs.boostText && boostTxt !== cache?.boostTxt) {
+            refs.boostText.textContent = boostTxt;
+            if (cache) cache.boostTxt = boostTxt;
+        }
 
         const overheatValue = Number(this.runtime?.huntState?.overheatByPlayer?.[player?.index] || 0);
         const overheatRatio = clamp01(overheatValue / OVERHEAT_CAP);
-        if (refs.overheatFill) refs.overheatFill.style.width = toPercent(overheatRatio);
-        if (refs.overheatText) refs.overheatText.textContent = `${Math.round(overheatValue)}%`;
+        const overheatW = toPercent(overheatRatio);
+        const overheatTxt = `${Math.round(overheatValue)}%`;
+        if (refs.overheatFill && overheatW !== cache?.overheatW) {
+            refs.overheatFill.style.width = overheatW;
+            if (cache) cache.overheatW = overheatW;
+        }
+        if (refs.overheatText && overheatTxt !== cache?.overheatTxt) {
+            refs.overheatText.textContent = overheatTxt;
+            if (cache) cache.overheatTxt = overheatTxt;
+        }
     }
 
     _ensureKillFeedSlots() {
@@ -259,11 +297,14 @@ export class HuntHUD {
     _updateDamageIndicators(dt, humans = []) {
         const p1 = humans[0] || null;
         const p2Visible = humans.length > 1;
-        if (this.damageIndicatorP1) {
-            this.damageIndicatorP1.style.left = p2Visible ? '25%' : '50%';
-        }
-        if (this.damageIndicatorP2) {
-            this.damageIndicatorP2.style.left = p2Visible ? '75%' : '50%';
+        if (p2Visible !== this._indicatorP2Visible) {
+            if (this.damageIndicatorP1) {
+                this.damageIndicatorP1.style.left = p2Visible ? '25%' : '50%';
+            }
+            if (this.damageIndicatorP2) {
+                this.damageIndicatorP2.style.left = p2Visible ? '75%' : '50%';
+            }
+            this._indicatorP2Visible = p2Visible;
         }
         const p1Indicator = this._resolveDamageIndicatorState(p1?.index, true);
         this._updateDamageIndicatorElement(this.damageIndicatorP1, p1Indicator, dt);
