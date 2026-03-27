@@ -50,43 +50,69 @@ export class OnlineMatchLobby extends MatchLobby {
         });
     }
 
+    _makeConnectPromise(setupFn, timeoutMs = 30_000) {
+        return new Promise((resolve, reject) => {
+            let settled = false;
+            const settle = (fn, arg) => {
+                if (settled) return;
+                settled = true;
+                fn(arg);
+            };
+
+            const timer = setTimeout(
+                () => settle(reject, new Error('Signaling connect timed out')),
+                timeoutMs
+            );
+            const connectResolve = () => { clearTimeout(timer); settle(resolve); };
+            const connectReject = (err) => { clearTimeout(timer); settle(reject, err); };
+
+            this._ws = new WebSocket(this._signalingUrl);
+            setupFn(this._ws, connectResolve, connectReject);
+
+            this._ws.onerror = () => {
+                clearTimeout(timer);
+                settle(reject, new Error('WebSocket connection failed'));
+            };
+            this._ws.onclose = () => {
+                clearTimeout(timer);
+                settle(reject, new Error('WebSocket closed before connection was established'));
+            };
+        });
+    }
+
     async create(options = {}) {
         this.isHost = true;
         this.settings = { ...options };
         this._signalingUrl = options.signalingUrl || this._signalingUrl;
 
-        return new Promise((resolve, reject) => {
-            this._ws = new WebSocket(this._signalingUrl);
-            this._ws.onopen = () => {
+        return this._makeConnectPromise((ws, connectResolve, connectReject) => {
+            ws.onopen = () => {
                 this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.CREATE_LOBBY, {
                     maxPlayers: options.maxPlayers || 10,
                 }));
             };
-            this._ws.onmessage = (event) => {
+            ws.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
-                this._handleMessage(msg, resolve);
+                this._handleMessage(msg, connectResolve, connectReject);
             };
-            this._ws.onerror = () => reject(new Error('WebSocket connection failed'));
-        });
+        }, options.connectTimeoutMs);
     }
 
-    async join(lobbyCode) {
+    async join(lobbyCode, options = {}) {
         this.isHost = false;
 
-        return new Promise((resolve, reject) => {
-            this._ws = new WebSocket(this._signalingUrl);
-            this._ws.onopen = () => {
+        return this._makeConnectPromise((ws, connectResolve, connectReject) => {
+            ws.onopen = () => {
                 this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.JOIN_LOBBY, { lobbyCode }));
             };
-            this._ws.onmessage = (event) => {
+            ws.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
-                this._handleMessage(msg, resolve);
+                this._handleMessage(msg, connectResolve, connectReject);
             };
-            this._ws.onerror = () => reject(new Error('WebSocket connection failed'));
-        });
+        }, options.connectTimeoutMs);
     }
 
-    _handleMessage(msg, connectResolve) {
+    _handleMessage(msg, connectResolve, connectReject) {
         switch (msg.type) {
         case SIGNALING_EVENT_TYPES.LOBBY_CREATED: {
             this.lobbyCode = msg.lobbyCode;
@@ -182,6 +208,7 @@ export class OnlineMatchLobby extends MatchLobby {
 
         case SIGNALING_EVENT_TYPES.ERROR:
             this._emit('error', { message: msg.message });
+            if (connectReject) connectReject(new Error(`Signaling error: ${msg.message}`));
             break;
 
         default:

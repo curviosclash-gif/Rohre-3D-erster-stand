@@ -80,8 +80,21 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
 
     async connect(options = {}) {
         this._signalingUrl = options.signalingUrl || this._signalingUrl;
+        const timeoutMs = options.connectTimeoutMs || 30_000;
 
         return new Promise((resolve, reject) => {
+            let settled = false;
+            const settle = (fn, arg) => {
+                if (settled) return;
+                settled = true;
+                fn(arg);
+            };
+
+            const timer = setTimeout(
+                () => settle(reject, new Error('Signaling connect timed out')),
+                timeoutMs
+            );
+
             this._ws = new WebSocket(this._signalingUrl);
 
             this._ws.onopen = () => {
@@ -99,17 +112,26 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
                 } catch {
                     return;
                 }
-                this._handleSignalingMessage(msg, resolve);
+                this._handleSignalingMessage(
+                    msg,
+                    () => { clearTimeout(timer); settle(resolve); },
+                    (err) => { clearTimeout(timer); settle(reject, err); }
+                );
             };
 
-            this._ws.onerror = () => reject(new Error('WebSocket connection failed'));
+            this._ws.onerror = () => {
+                clearTimeout(timer);
+                settle(reject, new Error('WebSocket connection failed'));
+            };
             this._ws.onclose = () => {
+                clearTimeout(timer);
+                settle(reject, new Error('WebSocket closed before connection was established'));
                 this._emit('signalingDisconnected', {});
             };
         });
     }
 
-    async _handleSignalingMessage(msg, connectResolve) {
+    async _handleSignalingMessage(msg, connectResolve, connectReject) {
         switch (msg.type) {
         case 'lobby_created':
             this._lobbyCode = msg.lobbyCode;
@@ -162,6 +184,7 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
 
         case 'error':
             this._emit('error', { message: msg.message });
+            if (connectReject) connectReject(new Error(`Signaling error: ${msg.message}`));
             break;
 
         default:

@@ -140,20 +140,33 @@ export class LANSessionAdapter extends SessionAdapterBase {
     }
 
     async _pollIceCandidates(peerId) {
-        for (let i = 0; i < 15; i += 1) {
+        // Continue polling after first batch to support Trickle-ICE:
+        // stop only after ICE_QUIET_WINDOW_POLLS consecutive empty polls once at least one
+        // candidate has been received, or after ICE_POLL_MAX_RETRIES total iterations.
+        const ICE_POLL_MAX_RETRIES = 20;
+        const ICE_QUIET_WINDOW_POLLS = 3;
+        const ICE_POLL_DELAY_MS = 200;
+
+        let hasReceivedAny = false;
+        let quietCount = 0;
+        for (let i = 0; i < ICE_POLL_MAX_RETRIES; i += 1) {
             try {
                 const res = await fetch(`${this._signalingUrl}/signaling/ice?playerId=${this.localPlayerId}`);
                 const data = await res.json();
-                if (Array.isArray(data.candidates)) {
+                if (Array.isArray(data.candidates) && data.candidates.length > 0) {
                     for (const candidate of data.candidates) {
                         await this._peerManager.addIceCandidate(peerId, candidate);
                     }
-                    if (data.candidates.length > 0) return;
+                    hasReceivedAny = true;
+                    quietCount = 0;
+                } else if (hasReceivedAny) {
+                    quietCount += 1;
+                    if (quietCount >= ICE_QUIET_WINDOW_POLLS) return;
                 }
             } catch (err) {
                 logger.debug('ICE candidate poll failed:', err);
             }
-            await new Promise((resolve) => setTimeout(resolve, 200));
+            await new Promise((resolve) => setTimeout(resolve, ICE_POLL_DELAY_MS));
         }
     }
 
