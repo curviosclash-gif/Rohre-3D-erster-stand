@@ -50,7 +50,7 @@ Der groesste Engpass ist aktuell nicht fehlender Feature-Umfang, sondern:
 
 - V58: Persistenz-/Store-Konsolidierung, Recording-End-to-End-Smoke, Dead-Code-/Ownership-Cleanup.
 - V61: Arcade-Loop ist nur teilweise fertig; mehrere Kernmechaniken und UX-Schichten sind offen.
-- V62: Technisch fast abgeschlossen, aber visueller Kamera-Smoke fehlt.
+- V62: visueller Kamera-Smoke ist erledigt; finales Gate haengt noch an DoD.2 (`npm run test:core`, T7 Start/HUD sichtbar).
 
 ## Release-These
 
@@ -198,7 +198,7 @@ Aufgaben:
 - Core-Suite mehrmals hintereinander stabil laufen lassen.
 - V58.3.2 und V58.3.3 abschliessen.
 - V58.99.2 mit echten End-to-End-Smokes fuer Recording und Persistenz schliessen.
-- V62.99.3 visuellen Kamera-Smoke abschliessen.
+- V62 visuellen Kamera-Smoke ist erledigt; offenes Final-Gate bleibt DoD.2 (`npm run test:core`, T7 Start/HUD sichtbar).
 
 Ergebnis:
 
@@ -302,7 +302,7 @@ Ergebnis:
 ### Woche 2
 
 - V58 abschliessen
-- V62 visuellen Smoke abschliessen
+- V62 Rest-Gate DoD.2 (Start/HUD-Flake in `test:core`) stabilisieren
 - mehrfache Core-/Physics-/Stress-Laeufe fahren
 
 ### Woche 3
