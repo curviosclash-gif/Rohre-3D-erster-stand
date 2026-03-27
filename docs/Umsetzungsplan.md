@@ -58,7 +58,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Pfadmuster | Block / Stream | Status | Hinweis |
 | --- | --- | --- | --- |
 | `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js` | V62 | pausiert | Code fertig, Gate 62.99.1/62.99.3 offen |
-| `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/ui/base/PersistentStore.js`, `src/core/GameRuntimeFacade.js` | V58 | in Bearbeitung | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz, Facade-Cleanup |
+| `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/base/PersistentStore.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `src/ui/menu/MenuPresetStore.js`, `src/ui/menu/MenuTelemetryStore.js`, `src/ui/menu/MenuTextOverrideStore.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/ProfileLifecycleController.js`, `src/core/runtime/menu-handlers/ProfileMenuEventHandlers.js` | V58 | in Bearbeitung | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz, Facade-Cleanup |
 | `src/modes/ArcadeModeStrategy.js`, `src/core/arcade/ArcadeRunRuntime.js`, `src/state/arcade/ArcadeRunState.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeMissionState.js`, `src/shared/contracts/ArcadeMissionContract.js`, `src/ui/arcade/ArcadeMissionHUD.js` (Score-HUD-Erweiterung), `src/ui/arcade/ArcadeMenuSurface.js` (Post-Run, Daily), `src/entities/directors/ArcadeEncounterCatalog.js`, `src/entities/directors/ArcadeEncounterDirector.js`, `src/state/arcade/ArcadeRoundStateController.js`, `src/shared/utils/ArcadeUtils.js` (neu) | V61 | offen | Arcade-Modus Gameplay-Verbesserungen: Score, Combo, Missionen, Modifiers, Sudden Death, HUD |
 | `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | offen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/InputDelayBuffer.js`, `src/network/RemoteInputSource.js`, `src/network/SpectatorInputSource.js`, `src/core/replay/ReplayPlayer.js`, `src/ui/menu/MenuMultiplayerPanel.js`, `src/ui/menu/MenuLobbyRenderer.js` | V60 | offen | Audit-Folge fuer Guard-Reliability, dormant input/multiplayer paths und Rest-Decomposition; Start nach V58/V59 |
@@ -75,7 +75,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | H | V55 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | closed | abgeschlossen 2026-03-26 |
-| Bot-Codex | V58 | 2026-03-27 | claimed | 58.3.1 PersistentStore- und UI-Store-Inventar fuer Settings-Persistenz |
+| Bot-Codex | V58 | 2026-03-27 | claimed | 58.3.2 Gemeinsamen Settings-/Profile-Contract extrahieren |
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
 | - | V60 | - | frei | blockiert auf V58.99 |
 | Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
@@ -651,7 +651,7 @@ Scope:
 
 ### 58.3 Settings-Store-Konsolidierung und Persistenz
 
-- [ ] 58.3.1 `src/ui/base/PersistentStore.js` und betroffene UI-Stores inventarisieren; doppelte Storage-Keys und redundante Write-Pfade abbauen.
+- [x] 58.3.1 `src/ui/base/PersistentStore.js` und betroffene UI-Stores inventarisieren; doppelte Storage-Keys und redundante Write-Pfade abbauen. (abgeschlossen: 2026-03-27; evidence: `node --input-type=module` persistent-store-smoke + `npm run build` -> commit `05bf042`)
 - [ ] 58.3.2 Gemeinsamen Settings-/Profile-Contract extrahieren, damit Runtime-, Menu- und Arcade-Stores denselben Normalisierungs- und Persistenzpfad nutzen.
 - [ ] 58.3.3 Backward-Compatibility fuer bestehende `localStorage`-Daten per Migrations- oder Smoke-Check absichern.
 
