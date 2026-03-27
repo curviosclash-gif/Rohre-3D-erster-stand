@@ -3823,6 +3823,106 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.exportSizeBytes).toBeGreaterThan(0);
     });
 
+    test('T20aj4: Recorder nutzt NativeMediaRecorderEngine als Strategie und spiegelt Runtime-State', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const sourceCanvas = document.createElement('canvas');
+            sourceCanvas.width = 320;
+            sourceCanvas.height = 180;
+
+            const fakeTrack = {
+                requestFrame() { },
+                stop() { },
+            };
+            const fakeStream = {
+                getVideoTracks() {
+                    return [fakeTrack];
+                },
+                getTracks() {
+                    return [fakeTrack];
+                },
+            };
+            const originalCaptureStream = HTMLCanvasElement.prototype.captureStream;
+
+            class FakeMediaRecorder {
+                static isTypeSupported() {
+                    return true;
+                }
+                constructor(stream, options = undefined) {
+                    this.stream = stream;
+                    this.options = options;
+                    this.state = 'inactive';
+                    this.ondataavailable = null;
+                    this.onerror = null;
+                    this.onstop = null;
+                }
+                start() {
+                    this.state = 'recording';
+                }
+                requestData() {
+                    const mimeType = this.options?.mimeType || 'video/webm';
+                    this.ondataavailable?.({
+                        data: new Blob([new Uint8Array([9, 8, 7])], { type: mimeType }),
+                    });
+                }
+                stop() {
+                    this.state = 'inactive';
+                    Promise.resolve().then(() => {
+                        this.onstop?.();
+                    });
+                }
+            }
+
+            HTMLCanvasElement.prototype.captureStream = function captureStreamStub() {
+                return fakeStream;
+            };
+
+            try {
+                const recorder = new MediaRecorderSystem({
+                    canvas: sourceCanvas,
+                    autoDownload: false,
+                    captureFps: 30,
+                    globalScope: { MediaRecorder: FakeMediaRecorder },
+                    capabilityProbe: () => ({
+                        canCapture: true,
+                        hasRecorder: true,
+                        canRecord: true,
+                        mediaRecorderMimeType: 'video/webm;codecs=vp9',
+                        selectedMimeType: 'video/webm;codecs=vp9',
+                        recorderEngine: 'mediarecorder-native',
+                        supportReason: 'native-mediarecorder',
+                    }),
+                });
+
+                const started = await recorder.startRecording({ type: 'strategy-test' });
+                const runtimeState = recorder._activeRecorderStrategy?.getRuntimeState?.() || null;
+                const strategySnapshot = {
+                    started: !!started?.started,
+                    strategyName: recorder._activeRecorderStrategy?.constructor?.name || null,
+                    mirroredRecorder: recorder._mediaRecorder === runtimeState?.mediaRecorder,
+                    mirroredTrack: recorder._mediaRecorderVideoTrack === runtimeState?.mediaRecorderVideoTrack,
+                    requestFrameSupported: recorder._mediaRecorderSupportsRequestFrame,
+                };
+                const stopped = await recorder.stopRecording({ type: 'strategy-stop' });
+                recorder.dispose();
+                return {
+                    ...strategySnapshot,
+                    stopped: !!stopped?.stopped,
+                };
+            } finally {
+                HTMLCanvasElement.prototype.captureStream = originalCaptureStream;
+            }
+        });
+
+        expect(result.started).toBeTruthy();
+        expect(result.strategyName).toBe('NativeMediaRecorderEngine');
+        expect(result.mirroredRecorder).toBeTruthy();
+        expect(result.mirroredTrack).toBeTruthy();
+        expect(result.requestFrameSupported).toBeTruthy();
+        expect(result.stopped).toBeTruthy();
+    });
+
     test('T20ak: Recorder normalisiert Export-Zeitstempel bei fehlerhafter Stop-Reihenfolge', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

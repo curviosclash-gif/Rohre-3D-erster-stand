@@ -1,148 +1,209 @@
-// ─── WebCodecs Recorder Engine: VideoEncoder & MP4 Muxer Strategy ───
-// Handles WebCodecs API recording via VideoEncoder and mp4-muxer
-
 import * as Mp4MuxerModule from 'mp4-muxer';
-import { WEB_CODECS_CODEC_CANDIDATES } from '../MediaRecorderSupport.js';
-import { toPositiveInt, ENCODE_QUEUE_DROP_LIMIT, ENCODE_QUEUE_SOFT_LIMIT } from '../MediaRecorderSystemOps.js';
+import {
+    DEFAULT_MIME_TYPE,
+    WEB_CODECS_CODEC_CANDIDATES,
+    resolveGlobalScope,
+} from '../MediaRecorderSupport.js';
+import { toPositiveInt } from '../MediaRecorderSystemOps.js';
 
 const Mp4Muxer = Mp4MuxerModule;
-const WEB_CODECS_CODEC = WEB_CODECS_CODEC_CANDIDATES[0];
 
-/**
- * WebCodecs-based recording engine using VideoEncoder + MP4 muxer.
- * Provides fine-grained control over encoding but requires explicit frame submission.
- */
 export class WebCodecsRecorderEngine {
     constructor(options = {}) {
         this.logger = options.logger || console;
+        this.globalScope = resolveGlobalScope(options.globalScope);
         this.width = toPositiveInt(options.width, 1920);
         this.height = toPositiveInt(options.height, 1080);
-        this.bitrate = toPositiveInt(options.bitrate, 15_000_000);
+        this.bitrate = toPositiveInt(options.bitrate, 8_000_000);
         this.frameRate = toPositiveInt(options.frameRate, 60);
         this._muxer = null;
         this._videoEncoder = null;
-        this._encodeQueue = [];
-        this._isConfigured = false;
+        this._resolvedCandidate = null;
+        this._resolvedConfig = null;
     }
 
-    /**
-     * Initialize the WebCodecs encoder and muxer.
-     */
+    _buildEncoderConfig(candidate) {
+        const codec = typeof candidate === 'object' ? candidate.codec : candidate;
+        const family = typeof candidate === 'object' ? candidate.family : 'avc';
+        const config = {
+            codec,
+            width: this.width,
+            height: this.height,
+            hardwareAcceleration: 'prefer-hardware',
+            bitrate: this.bitrate,
+            framerate: this.frameRate,
+        };
+        if (family === 'avc') {
+            config.avc = { format: 'avc' };
+        }
+        return config;
+    }
+
     async initialize() {
-        if (this._isConfigured) return true;
+        if (this.isReady()) {
+            return {
+                ok: true,
+                mimeType: DEFAULT_MIME_TYPE,
+                codec: this._resolvedCandidate?.codec || null,
+                muxerCodec: this._resolvedCandidate?.muxerCodec || null,
+            };
+        }
+
+        const VideoEncoderCtor = this.globalScope?.VideoEncoder;
+        const VideoFrameCtor = this.globalScope?.VideoFrame;
+        if (typeof VideoEncoderCtor !== 'function') {
+            return { ok: false, reason: 'missing-video-encoder' };
+        }
+        if (typeof VideoFrameCtor !== 'function') {
+            return { ok: false, reason: 'missing-video-frame' };
+        }
+
+        let resolvedCandidate = null;
+        let resolvedConfig = null;
+        for (const candidate of WEB_CODECS_CODEC_CANDIDATES) {
+            const config = this._buildEncoderConfig(candidate);
+            const codec = typeof candidate === 'object' ? candidate.codec : candidate;
+            if (typeof VideoEncoderCtor.isConfigSupported === 'function') {
+                try {
+                    const probe = await VideoEncoderCtor.isConfigSupported(config);
+                    if (probe?.supported) {
+                        resolvedCandidate = candidate;
+                        resolvedConfig = config;
+                        break;
+                    }
+                    this.logger?.info?.(
+                        `[WebCodecsRecorderEngine] codec ${codec} not supported (${this.width}x${this.height}), trying next`
+                    );
+                } catch (error) {
+                    this.logger?.info?.(
+                        `[WebCodecsRecorderEngine] codec ${codec} probe failed: ${error?.message || error}`
+                    );
+                }
+            } else {
+                resolvedCandidate = candidate;
+                resolvedConfig = config;
+                break;
+            }
+        }
+
+        if (!resolvedCandidate || !resolvedConfig) {
+            return {
+                ok: false,
+                reason: 'encoder_config_unsupported',
+                candidates: WEB_CODECS_CODEC_CANDIDATES,
+            };
+        }
+
         try {
+            const muxerCodec = typeof resolvedCandidate === 'object' ? resolvedCandidate.muxerCodec : 'avc';
             this._muxer = new Mp4Muxer.Muxer({
                 target: new Mp4Muxer.ArrayBufferTarget(),
                 video: {
-                    codec: 'avc1',
+                    codec: muxerCodec,
                     width: this.width,
                     height: this.height,
                 },
+                fastStart: 'in-memory',
+                firstTimestampBehavior: 'offset',
             });
-
-            const config = {
-                codec: WEB_CODECS_CODEC,
-                width: this.width,
-                height: this.height,
-                bitrate: this.bitrate,
-                framerate: this.frameRate,
+            this._videoEncoder = new VideoEncoderCtor({
+                output: (chunk, meta) => this._muxer.addVideoChunk(chunk, meta),
+                error: (error) => this.logger?.error?.('[WebCodecsRecorderEngine] VideoEncoder error', error),
+            });
+            this._videoEncoder.configure(resolvedConfig);
+            this._resolvedCandidate = resolvedCandidate;
+            this._resolvedConfig = resolvedConfig;
+            return {
+                ok: true,
+                mimeType: DEFAULT_MIME_TYPE,
+                codec: typeof resolvedCandidate === 'object' ? resolvedCandidate.codec : resolvedCandidate,
+                muxerCodec,
             };
-
-            this._videoEncoder = new VideoEncoder({
-                output: this._handleEncodedChunk.bind(this),
-                error: (error) => {
-                    this.logger?.error?.('[WebCodecsRecorderEngine] Encoder error:', error);
-                },
-            });
-
-            await this._videoEncoder.configure(config);
-            this._isConfigured = true;
-            return true;
         } catch (error) {
-            this.logger?.error?.('[WebCodecsRecorderEngine] Initialize failed:', error);
-            return false;
+            this.logger?.warn?.('[WebCodecsRecorderEngine] initialize failed', error);
+            this.dispose();
+            return { ok: false, reason: 'encoder_creation_failed', error };
         }
     }
 
-    /**
-     * Submit a frame for encoding.
-     */
-    encodeFrame(videoFrame, timestamp) {
-        if (!this._videoEncoder || !this._isConfigured) return false;
+    isReady() {
+        return !!this._videoEncoder && this._videoEncoder.state === 'configured';
+    }
+
+    getEncodeQueueSize() {
+        return Number(this._videoEncoder?.encodeQueueSize || 0);
+    }
+
+    getEncoderState() {
+        return this._videoEncoder?.state || 'inactive';
+    }
+
+    getRuntimeState() {
+        return {
+            muxer: this._muxer,
+            videoEncoder: this._videoEncoder,
+        };
+    }
+
+    encodeFrame(frameSource, { timestampUs = 0, keyFrame = false } = {}) {
+        if (!this.isReady()) {
+            return false;
+        }
+        const VideoFrameCtor = this.globalScope?.VideoFrame;
+        if (typeof VideoFrameCtor !== 'function') {
+            return false;
+        }
+        let frame = null;
         try {
-            if (this._encodeQueue.length >= ENCODE_QUEUE_HARD_LIMIT) {
-                this._encodeQueue.shift();
-            }
-            this._videoEncoder.encode(videoFrame, { timestamp });
-            this._encodeQueue.push(timestamp);
+            frame = new VideoFrameCtor(frameSource, {
+                timestamp: Math.max(0, Math.trunc(timestampUs)),
+            });
+            this._videoEncoder.encode(frame, { keyFrame: !!keyFrame });
             return true;
         } catch (error) {
-            this.logger?.warn?.('[WebCodecsRecorderEngine] Encode failed:', error);
+            this.logger?.warn?.('[WebCodecsRecorderEngine] encode failed', error);
             return false;
+        } finally {
+            frame?.close?.();
         }
     }
 
-    /**
-     * Finalize recording and return the blob.
-     */
-    async finalize() {
+    async stop() {
+        if (!this._muxer) {
+            return { ok: false, reason: 'muxer_missing' };
+        }
         try {
             if (this._videoEncoder) {
                 await this._videoEncoder.flush();
                 this._videoEncoder.close();
             }
-
-            if (this._muxer) {
-                this._muxer.finalize();
-                const buffer = this._muxer.target.getBuffer();
-                return new Blob([buffer], { type: 'video/mp4' });
-            }
-            return null;
+            this._muxer.finalize();
+            const buffer = this._muxer?.target?.buffer
+                || this._muxer?.target?.getBuffer?.()
+                || new ArrayBuffer(0);
+            return {
+                ok: true,
+                blob: new Blob([buffer], { type: DEFAULT_MIME_TYPE }),
+                mimeType: DEFAULT_MIME_TYPE,
+                bufferSize: Number(buffer?.byteLength || 0),
+            };
         } catch (error) {
-            this.logger?.error?.('[WebCodecsRecorderEngine] Finalize failed:', error);
-            return null;
+            this.logger?.warn?.('[WebCodecsRecorderEngine] stop failed', error);
+            return { ok: false, reason: 'stop_failed', error };
         }
     }
 
-    /**
-     * Internal handler for encoded chunks from VideoEncoder.
-     */
-    _handleEncodedChunk(chunk) {
-        if (!this._muxer) return;
+    dispose() {
         try {
-            if (chunk.type === 'key') {
-                this._muxer.addVideoChunk(chunk, undefined, true);
-            } else {
-                this._muxer.addVideoChunk(chunk);
+            if (this._videoEncoder && this._videoEncoder.state !== 'closed') {
+                this._videoEncoder.close();
             }
-        } catch (error) {
-            this.logger?.warn?.('[WebCodecsRecorderEngine] Mux chunk failed:', error);
+        } catch {
+            // Ignore cleanup errors during recorder teardown.
         }
-    }
-
-    /**
-     * Check if WebCodecs is supported.
-     */
-    static isSupported() {
-        return typeof VideoEncoder !== 'undefined' && typeof AudioEncoder !== 'undefined';
-    }
-
-    /**
-     * Get current queue length.
-     */
-    getQueueLength() {
-        return this._encodeQueue.length;
-    }
-
-    /**
-     * Reset encoder state.
-     */
-    reset() {
-        this._encodeQueue = [];
-        this._muxer = null;
         this._videoEncoder = null;
-        this._isConfigured = false;
+        this._muxer = null;
+        this._resolvedCandidate = null;
+        this._resolvedConfig = null;
     }
 }
-
-const ENCODE_QUEUE_HARD_LIMIT = 300; // Drop oldest if exceeded

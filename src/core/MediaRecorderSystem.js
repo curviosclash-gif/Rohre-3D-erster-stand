@@ -1,7 +1,6 @@
 /* eslint-disable max-lines */
 import { WebCodecsRecorderEngine } from './recording/engines/WebCodecsRecorderEngine.js';
 import { NativeMediaRecorderEngine } from './recording/engines/NativeMediaRecorderEngine.js';
-import * as Mp4MuxerModule from 'mp4-muxer';
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
@@ -19,7 +18,6 @@ import {
     resolveSafeMediaRecorderMimeType,
     sanitizeFileToken,
     toSafeDatePart,
-    WEB_CODECS_CODEC_CANDIDATES,
 } from './recording/MediaRecorderSupport.js';
 import {
     createDefaultRecordingCaptureSettings,
@@ -37,9 +35,7 @@ import {
     MEDIARECORDER_SYNTHETIC_QUEUE_SOFT_MS,
     toPositiveInt,
 } from './recording/MediaRecorderSystemOps.js';
-const Mp4Muxer = Mp4MuxerModule;
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
-const WEB_CODECS_CODEC = WEB_CODECS_CODEC_CANDIDATES[0];
 export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
 function defaultDownload({ blob, fileName }) {
     if (typeof document === 'undefined' || !blob || !fileName) return;
@@ -103,6 +99,7 @@ export class MediaRecorderSystem {
         this._mediaRecorderUsesCaptureCanvas = false;
         this._mediaRecorderPumpTimer = null;
         this._mediaRecorderPumpResolutionScale = 1;
+        this._activeRecorderStrategy = null;
         this._activeRecording = null;
         this._pendingStop = null;
         this._lastExport = null;
@@ -200,6 +197,20 @@ export class MediaRecorderSystem {
     }
     getRecordingCaptureSettings() {
         return { ...this.recordingCaptureSettings };
+    }
+    _setActiveRecorderStrategy(strategy = null) {
+        this._activeRecorderStrategy = strategy || null;
+        this._syncRecorderRuntimeState();
+    }
+    _syncRecorderRuntimeState() {
+        const runtimeState = this._activeRecorderStrategy?.getRuntimeState?.() || null;
+        this._muxer = runtimeState?.muxer || null;
+        this._videoEncoder = runtimeState?.videoEncoder || null;
+        this._mediaRecorder = runtimeState?.mediaRecorder || null;
+        this._mediaRecorderChunks = runtimeState?.mediaRecorderChunks || null;
+        this._mediaRecorderStream = runtimeState?.mediaRecorderStream || null;
+        this._mediaRecorderVideoTrack = runtimeState?.mediaRecorderVideoTrack || null;
+        this._mediaRecorderSupportsRequestFrame = !!runtimeState?.mediaRecorderSupportsRequestFrame;
     }
     _resolveCaptureCanvas() {
         let resolvedCanvas = this.canvas || null;
@@ -785,79 +796,31 @@ export class MediaRecorderSystem {
         return config;
     }
     async _startWithWebCodecs(trigger, support) {
-        const VideoEncoderCtor = this._globalScope?.VideoEncoder;
-        const VideoFrameCtor = this._globalScope?.VideoFrame;
-        if (typeof VideoEncoderCtor !== 'function') {
-            return this._buildStartResult(false, 'missing-video-encoder', { support });
-        }
-        if (typeof VideoFrameCtor !== 'function') {
-            return this._buildStartResult(false, 'missing-video-frame', { support });
-        }
         const { width, height } = this._resolveRecordingDimensions();
-        // Try each codec candidate (AVC first, then VP9) until one is supported.
-        let resolvedCandidate = null;
-        let resolvedConfig = null;
-        for (const candidate of WEB_CODECS_CODEC_CANDIDATES) {
-            const config = this._buildWebCodecsEncoderConfig(width, height, candidate);
-            const codecStr = typeof candidate === 'object' ? candidate.codec : candidate;
-            if (typeof VideoEncoderCtor.isConfigSupported === 'function') {
-                try {
-                    const probe = await VideoEncoderCtor.isConfigSupported(config);
-                    if (probe?.supported) {
-                        resolvedCandidate = candidate;
-                        resolvedConfig = config;
-                        break;
-                    }
-                    this.logger?.info?.(
-                        `[MediaRecorderSystem] codec ${codecStr} not supported (${width}x${height}), trying next`
-                    );
-                } catch (error) {
-                    this.logger?.info?.(
-                        `[MediaRecorderSystem] codec ${codecStr} probe failed: ${error?.message || error}`
-                    );
-                }
-            } else {
-                resolvedCandidate = candidate;
-                resolvedConfig = config;
-                break;
-            }
+        const strategy = new WebCodecsRecorderEngine({
+            logger: this.logger,
+            globalScope: this._globalScope,
+            width,
+            height,
+            frameRate: this.captureFps,
+            bitrate: 8_000_000,
+        });
+        const initializeResult = await strategy.initialize();
+        if (!initializeResult?.ok) {
+            strategy.dispose?.();
+            this._setActiveRecorderStrategy(null);
+            return this._buildStartResult(false, initializeResult?.reason || 'encoder_creation_failed', {
+                error: initializeResult?.error,
+                support,
+            });
         }
-        if (!resolvedCandidate || !resolvedConfig) {
-            this.logger?.warn?.(
-                `[MediaRecorderSystem] No supported codec found for ${width}x${height}`,
-                WEB_CODECS_CODEC_CANDIDATES
-            );
-            return this._buildStartResult(false, 'encoder_config_unsupported', { support });
-        }
-        const muxerCodec = typeof resolvedCandidate === 'object' ? resolvedCandidate.muxerCodec : 'avc';
-        const codecStr = typeof resolvedCandidate === 'object' ? resolvedCandidate.codec : resolvedCandidate;
         this.logger?.info?.(
-            `[MediaRecorderSystem] Using codec ${codecStr} (muxer: ${muxerCodec}) for ${width}x${height}`
+            `[MediaRecorderSystem] Using codec ${initializeResult?.codec || 'unknown'} (muxer: ${initializeResult?.muxerCodec || 'unknown'}) for ${width}x${height}`
         );
-        try {
-            this._muxer = new Mp4Muxer.Muxer({
-                target: new Mp4Muxer.ArrayBufferTarget(),
-                video: {
-                    codec: muxerCodec,
-                    width,
-                    height,
-                },
-                fastStart: 'in-memory',
-                firstTimestampBehavior: 'offset',
-            });
-            this._videoEncoder = new VideoEncoderCtor({
-                output: (chunk, meta) => this._muxer.addVideoChunk(chunk, meta),
-                error: (e) => this.logger?.error?.('[MediaRecorderSystem] VideoEncoder error', e),
-            });
-            this._videoEncoder.configure(resolvedConfig);
-        } catch (error) {
-            this._cleanupRuntimeRecorder();
-            this.logger?.warn?.('[MediaRecorderSystem] WebCodecs setup failed', error);
-            return this._buildStartResult(false, 'encoder_creation_failed', { error, support });
-        }
+        this._setActiveRecorderStrategy(strategy);
         this._isRecording = true;
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_WEBCODECS;
-        this._activeMimeType = DEFAULT_MIME_TYPE;
+        this._activeMimeType = initializeResult?.mimeType || DEFAULT_MIME_TYPE;
         this._frameCount = 0;
         this._encoderWidth = width;
         this._encoderHeight = height;
@@ -878,10 +841,6 @@ export class MediaRecorderSystem {
         });
     }
     async _startWithMediaRecorder(trigger, support, fallbackFromReason = null) {
-        const MediaRecorderCtor = this._globalScope?.MediaRecorder;
-        if (typeof MediaRecorderCtor !== 'function') {
-            return this._buildStartResult(false, 'missing-media-recorder', { support });
-        }
         const sourceCanvas = this._getCaptureCanvas();
         if (!sourceCanvas || typeof sourceCanvas.captureStream !== 'function') {
             return this._buildStartResult(false, 'missing-capture-stream', { support });
@@ -894,61 +853,44 @@ export class MediaRecorderSystem {
             this._globalScope,
             preferredMediaRecorderMimeType
         ) || DEFAULT_FALLBACK_MIME_TYPE;
-        const recorderOptions = selectedMimeType ? { mimeType: selectedMimeType } : undefined;
-        try {
-            this._mediaRecorderChunks = [];
-            this._captureLevelIndex = Math.min(2, CAPTURE_LOAD_LEVELS.length - 1);
-            const level = this._getCaptureLevel();
-            const captureStreamSource = this._ensureMediaRecorderCaptureSurface(level.resolutionScale);
-            const streamSourceCanvas = captureStreamSource && typeof captureStreamSource.captureStream === 'function'
-                ? captureStreamSource
-                : sourceCanvas;
-            this._mediaRecorderUsesCaptureCanvas = streamSourceCanvas !== sourceCanvas;
-            // Use a fixed capture FPS so MediaRecorder always receives frames,
-            // even when requestFrame pacing is delayed by runtime load.
-            const captureStream = streamSourceCanvas.captureStream(this.captureFps);
-            const captureTrack = typeof captureStream?.getVideoTracks === 'function'
-                ? captureStream.getVideoTracks()[0] || null
-                : null;
-            const supportsRequestFrame = !!(captureTrack && typeof captureTrack.requestFrame === 'function');
-            this._mediaRecorderStream = captureStream;
-            this._mediaRecorderVideoTrack = captureTrack;
-            this._mediaRecorderSupportsRequestFrame = supportsRequestFrame;
-            this._startMediaRecorderPump(level.resolutionScale);
-            this._mediaRecorder = recorderOptions
-                ? new MediaRecorderCtor(this._mediaRecorderStream, recorderOptions)
-                : new MediaRecorderCtor(this._mediaRecorderStream);
-            this._mediaRecorder.ondataavailable = (event) => {
-                const chunk = event?.data;
-                if (chunk && Number(chunk.size) > 0) {
-                    this._mediaRecorderChunks.push(chunk);
-                }
-            };
-            this._mediaRecorder.onerror = (event) => {
-                this.logger?.error?.('[MediaRecorderSystem] MediaRecorder error', event?.error || event);
-            };
-            this._mediaRecorder.onstop = () => {
-                const chunks = Array.isArray(this._mediaRecorderChunks) ? this._mediaRecorderChunks : [];
-                const mimeType = selectedMimeType || chunks[0]?.type || DEFAULT_FALLBACK_MIME_TYPE;
-                const blob = new Blob(chunks, { type: mimeType });
-                this.logger?.info?.(`[MediaRecorderSystem] MediaRecorder onstop: chunks=${chunks.length}, blob.size=${blob.size}, mimeType=${mimeType}`);
-                this._finalizeBlobExport(blob, mimeType).catch((error) => {
-                    this.logger?.warn?.('[MediaRecorderSystem] finalize export failed after mediarecorder stop', error);
-                });
-            };
-            this._mediaRecorder.start(1000);
-        } catch (error) {
-            this._cleanupRuntimeRecorder();
-            this.logger?.warn?.('[MediaRecorderSystem] MediaRecorder setup failed', error);
+        this._captureLevelIndex = Math.min(2, CAPTURE_LOAD_LEVELS.length - 1);
+        const level = this._getCaptureLevel();
+        const captureStreamSource = this._ensureMediaRecorderCaptureSurface(level.resolutionScale);
+        const streamSourceCanvas = captureStreamSource && typeof captureStreamSource.captureStream === 'function'
+            ? captureStreamSource
+            : sourceCanvas;
+        this._mediaRecorderUsesCaptureCanvas = streamSourceCanvas !== sourceCanvas;
+        const strategy = new NativeMediaRecorderEngine({
+            logger: this.logger,
+            globalScope: this._globalScope,
+            canvas: streamSourceCanvas,
+            mimeType: selectedMimeType,
+            captureFps: this.captureFps,
+            videoBitsPerSecond: 15_000_000,
+        });
+        const initializeResult = await strategy.initialize();
+        if (!initializeResult?.ok) {
+            strategy.dispose?.();
+            this._setActiveRecorderStrategy(null);
             return this._buildStartResult(false, 'mediarecorder_creation_failed', {
-                error,
+                error: initializeResult?.error,
                 support,
                 fallbackFromReason: fallbackFromReason || undefined,
             });
         }
+        if (!strategy.start(1000)) {
+            strategy.dispose?.();
+            this._setActiveRecorderStrategy(null);
+            return this._buildStartResult(false, 'mediarecorder_start_failed', {
+                support,
+                fallbackFromReason: fallbackFromReason || undefined,
+            });
+        }
+        this._setActiveRecorderStrategy(strategy);
+        this._startMediaRecorderPump(level.resolutionScale);
         this._isRecording = true;
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_MEDIARECORDER;
-        this._activeMimeType = selectedMimeType || DEFAULT_FALLBACK_MIME_TYPE;
+        this._activeMimeType = initializeResult?.mimeType || selectedMimeType || DEFAULT_FALLBACK_MIME_TYPE;
         this._frameCount = 0;
         this._resetWebCodecsCaptureState(Math.min(2, CAPTURE_LOAD_LEVELS.length - 1));
         this._activeRecording = {
@@ -1012,9 +954,41 @@ export class MediaRecorderSystem {
                 stopResolve: resolve,
             };
         });
+        const pendingStop = this._pendingStop;
         try {
             if (this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER) {
                 this.logger?.info?.(`[MediaRecorderSystem] stopping MediaRecorder (state=${this._mediaRecorder?.state}, chunks=${this._mediaRecorderChunks?.length})`);
+                if (this._activeRecorderStrategy?.stop) {
+                    if (this._mediaRecorderUsesCaptureCanvas) {
+                        try {
+                            this._ensureMediaRecorderCaptureSurface(this._mediaRecorderPumpResolutionScale);
+                        } catch {
+                            // Ignore final capture-copy failures on stop.
+                        }
+                    }
+                    const strategyStopResult = await this._activeRecorderStrategy.stop();
+                    this._syncRecorderRuntimeState();
+                    if (!strategyStopResult?.ok || !(strategyStopResult.blob instanceof Blob)) {
+                        const result = this._buildStopResult(false, strategyStopResult?.reason || 'mediarecorder_stop_failed', {
+                            error: strategyStopResult?.error,
+                        });
+                        const resolve = this._activeRecording?.stopResolve;
+                        this._cleanupRuntimeRecorder();
+                        this._pendingStop = null;
+                        if (typeof resolve === 'function') {
+                            resolve(result);
+                        }
+                        return result;
+                    }
+                    this.logger?.info?.(
+                        `[MediaRecorderSystem] MediaRecorder stopped: chunks=${this._mediaRecorderChunks?.length || 0}, blob.size=${strategyStopResult.blob.size}, mimeType=${strategyStopResult.mimeType || this._activeMimeType}`
+                    );
+                    await this._finalizeBlobExport(
+                        strategyStopResult.blob,
+                        strategyStopResult.mimeType || this._activeMimeType || DEFAULT_FALLBACK_MIME_TYPE
+                    );
+                    return pendingStop;
+                }
                 if (!this._mediaRecorder || this._mediaRecorder.state === 'inactive') {
                     const result = this._buildStopResult(false, 'mediarecorder_inactive');
                     const resolve = this._activeRecording?.stopResolve;
@@ -1047,27 +1021,55 @@ export class MediaRecorderSystem {
                     }
                 }
                 this._mediaRecorder.stop();
-                return this._pendingStop;
+                return pendingStop;
             }
-            if (this._videoEncoder) {
-                this.logger?.info?.(`[MediaRecorderSystem] flush encoder (state=${this._videoEncoder.state}, frameCount=${this._frameCount}, encodeQueueSize=${this._videoEncoder.encodeQueueSize})`);
-                await this._videoEncoder.flush();
-                this._videoEncoder.close();
-            }
-            if (this._muxer) {
-                this._muxer.finalize();
-                const bufferSize = this._muxer?.target?.buffer?.byteLength || 0;
-                this.logger?.info?.(`[MediaRecorderSystem] muxer finalized (bufferSize=${bufferSize}, frameCount=${this._frameCount})`);
-                await this._handleRecorderStop();
-            } else {
-                const result = this._buildStopResult(false, 'muxer_null');
-                const resolve = this._activeRecording?.stopResolve;
-                this._cleanupRuntimeRecorder();
-                this._pendingStop = null;
-                if (typeof resolve === 'function') {
-                    resolve(result);
+            if (this._activeRecorderStrategy?.stop) {
+                this.logger?.info?.(
+                    `[MediaRecorderSystem] flush encoder (state=${this._videoEncoder?.state}, frameCount=${this._frameCount}, encodeQueueSize=${this._videoEncoder?.encodeQueueSize})`
+                );
+                const strategyStopResult = await this._activeRecorderStrategy.stop();
+                this._syncRecorderRuntimeState();
+                if (!strategyStopResult?.ok || !(strategyStopResult.blob instanceof Blob)) {
+                    const result = this._buildStopResult(false, strategyStopResult?.reason || 'muxer_null', {
+                        error: strategyStopResult?.error,
+                    });
+                    const resolve = this._activeRecording?.stopResolve;
+                    this._cleanupRuntimeRecorder();
+                    this._pendingStop = null;
+                    if (typeof resolve === 'function') {
+                        resolve(result);
+                    }
+                    return result;
                 }
-                return result;
+                this.logger?.info?.(
+                    `[MediaRecorderSystem] muxer finalized (bufferSize=${strategyStopResult.bufferSize || strategyStopResult.blob.size || 0}, frameCount=${this._frameCount})`
+                );
+                await this._finalizeBlobExport(
+                    strategyStopResult.blob,
+                    strategyStopResult.mimeType || DEFAULT_MIME_TYPE
+                );
+                return pendingStop;
+            } else {
+                if (this._videoEncoder) {
+                    this.logger?.info?.(`[MediaRecorderSystem] flush encoder (state=${this._videoEncoder.state}, frameCount=${this._frameCount}, encodeQueueSize=${this._videoEncoder.encodeQueueSize})`);
+                    await this._videoEncoder.flush();
+                    this._videoEncoder.close();
+                }
+                if (this._muxer) {
+                    this._muxer.finalize();
+                    const bufferSize = this._muxer?.target?.buffer?.byteLength || 0;
+                    this.logger?.info?.(`[MediaRecorderSystem] muxer finalized (bufferSize=${bufferSize}, frameCount=${this._frameCount})`);
+                    await this._handleRecorderStop();
+                } else {
+                    const result = this._buildStopResult(false, 'muxer_null');
+                    const resolve = this._activeRecording?.stopResolve;
+                    this._cleanupRuntimeRecorder();
+                    this._pendingStop = null;
+                    if (typeof resolve === 'function') {
+                        resolve(result);
+                    }
+                    return result;
+                }
             }
         } catch (error) {
             const resolve = this._activeRecording?.stopResolve;
@@ -1079,7 +1081,7 @@ export class MediaRecorderSystem {
             }
             return result;
         }
-        return this._pendingStop;
+        return pendingStop;
     }
     _buildFilename(activeRecording, endedAtMs, mimeType) {
         const startedAt = activeRecording?.startedAt || endedAtMs;
@@ -1299,7 +1301,13 @@ export class MediaRecorderSystem {
     _cleanupRuntimeRecorder() {
         this._isRecording = false;
         this._stopMediaRecorderPump();
-        if (this._mediaRecorderStream && typeof this._mediaRecorderStream.getTracks === 'function') {
+        if (this._activeRecorderStrategy?.dispose) {
+            try {
+                this._activeRecorderStrategy.dispose();
+            } catch {
+                // Ignore strategy cleanup errors during recorder teardown.
+            }
+        } else if (this._mediaRecorderStream && typeof this._mediaRecorderStream.getTracks === 'function') {
             for (const track of this._mediaRecorderStream.getTracks()) {
                 try {
                     track.stop();
@@ -1319,6 +1327,7 @@ export class MediaRecorderSystem {
         this._mediaRecorderSupportsRequestFrame = false;
         this._mediaRecorderUsesCaptureCanvas = false;
         this._mediaRecorderPumpResolutionScale = 1;
+        this._activeRecorderStrategy = null;
         this._activeRecording = null;
         this._frameCount = 0;
         this._captureCanvas = null;
