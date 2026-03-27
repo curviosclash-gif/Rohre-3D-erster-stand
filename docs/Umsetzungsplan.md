@@ -355,7 +355,7 @@ Scope:
 ### 60.1 Guard- und Tooling-Verlaesslichkeit
 
 - [x] 60.1.1 `src/shared/logging/Logger.js` und die Architektur-Typecheck-Basis so nachziehen, dass `npm run typecheck:architecture` wieder gruen ist und `prebuild` nicht mehr an einem bekannten Guard-Bruch haengt. (abgeschlossen: 2026-03-27; evidence: commit `9fe3809` Logger-Typecheck-Fix; `npm run build` PASS, `tsc -p tsconfig.architecture.json` PASS)
-- [ ] 60.1.2 `knip.json` auf `server/**`, `electron/**`, `trainer/**`, `tests/**/*.mjs` sowie reale Entry-Points erweitern und mindestens ein dokumentiertes False-Positive-Beispiel aus dem Audit eliminieren.
+- [x] 60.1.2 `knip.json` auf `server/**`, `electron/**`, `trainer/**`, `tests/**/*.mjs` sowie reale Entry-Points erweitern und mindestens ein dokumentiertes False-Positive-Beispiel aus dem Audit eliminieren. (abgeschlossen: 2026-03-27; evidence: `tests/**/*.mjs` in entry+project; `ignoreUnresolved: ["^/src/.*"]` eliminiert alle 45 Playwright-Browser-Pfad-False-Positives; schema auf knip@6 aktualisiert; `npm run build` PASS, `npx knip --config knip.json --no-progress` zeigt 0 unresolved imports)
 
 ### 60.2 Dormante Runtime-Pfade konsolidieren
 
