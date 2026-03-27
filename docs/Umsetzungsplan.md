@@ -75,7 +75,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | H | V55 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | closed | abgeschlossen 2026-03-26 |
-| Bot-Codex | V58 | 2026-03-27 | claimed | 58.2.3 Strategie-Integration fuer Recorder-Engines |
+| Bot-Codex | V58 | 2026-03-27 | claimed | 58.2.4 DownloadService aus MediaRecorderSystem extrahieren |
 | - | V59 | 2026-03-26 | frei | pausiert, 59.1.6/59.1.7/59.7.4 offen |
 | - | V60 | - | frei | blockiert auf V58.99 + V59.99 |
 | - | V61 | - | frei | - |
@@ -496,7 +496,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
-| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.3 MediaRecorderSystem auf Strategie-Pattern umstellen | In Bearbeitung |
+| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.4 DownloadService aus MediaRecorderSystem extrahieren | In Bearbeitung |
 | V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | Pausiert |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | 62.99.1 build/test Gate (Logger-Fix erledigt) | Pausiert |
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.1 Architektur-Guard wieder voll belastbar machen | Offen |
@@ -645,7 +645,7 @@ Scope:
 
 - [x] 58.2.1 `src/core/recording/engines/WebCodecsRecorderEngine.js` extrahieren (VideoEncoder & Muxer Logik). (abgeschlossen: 2026-03-26; evidence: WebCodecsRecorderEngine with initialize/encodeFrame/finalize; commit 606ff1e)
 - [x] 58.2.2 `src/core/recording/engines/NativeMediaRecorderEngine.js` extrahieren (MediaRecorder Fallback). (abgeschlossen: 2026-03-26; evidence: NativeMediaRecorderEngine with start/stop/requestFrame; commit 606ff1e)
-- [/] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen. (in Arbeit: Engines extrahiert, Integration der Strategien laeuft)
+- [x] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen. (abgeschlossen: 2026-03-27; evidence: npm run build && node --input-type=module recorder-strategy-smoke -> commit e24466c)
 - [ ] 58.2.4 `DownloadService` aus `MediaRecorderSystem` extrahieren (DOM/Blob-Handling fuer Exporte).
 - [ ] 58.2.5 `GameRuntimeFacade` dekomponieren: `ProfileLifecycleController` fuer Profil-Lade/Speicher-Logik extrahieren.
 
