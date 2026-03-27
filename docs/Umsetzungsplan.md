@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-26
+Stand: 2026-03-27
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
@@ -30,19 +30,19 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- | --- |
 | V52 | V50.99 | hard | ja | V50.99 abgeschlossen; Details im Archiv unter `docs/archive/plans/completed/Umsetzungsplan_Block_V50_Architektur-Haertung_II_2026-03-23.md` |
 | V52 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Bestehende Guard-Basis wird auf `server/**` und dynamic imports erweitert |
-| V53 | V52.6 | soft | nein | Settings-Persistenz-Refactor bevorzugt nach zentralem Storage-Rollout, Parallelisierung nur ohne Contract-Drift |
+| V53 | V52.6 | soft | ja | V52.6 und V53 abgeschlossen |
 | V53 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Decomposition und Import-Grenzen vorhanden |
 | V54 | V52.99 | hard | ja | V52 abgeschlossen; Rest-Ratchets laufen in V54.3/V54.7 weiter |
 | V54 | V53.99 | hard | ja | Settings-Decomposition ist abgeschlossen (`docs/Feature_SettingsManager_Decomposition_V53.md`) |
 | V54 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Ratchet-/Boundary-Guards bilden die Mess-Basis |
 | V55 | V54.99 | hard | ja | V54 abgeschlossen; V55 setzt Tiefenaudit-Findings fuer Stabilitaet, Konsistenz und Robustheit um |
 | V55 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Refactors in Runtime-/Netzwerk-Hotspots vorhanden |
-| V56 | V55.99 | hard | nein | V56 behandelt Edge-Cases und Defensive Improvements aus Code-Audit |
+| V56 | V55.99 | hard | ja | V55.99 und V56 abgeschlossen |
 | V56 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Keine neuen Layer-Drifts, keine grossen Decompositions-Aenderungen |
 | V57 | V45 (Arcade-Basis) | soft | ja | Arcade-Run-Infrastruktur (ArcadeRunRuntime, EncounterDirector, BlueprintSchema) ist vorhanden |
 | V57 | V53.99 | soft | ja | Settings-Persistenz fuer Vehicle-Profile benoetigt Storage-Contracts |
 | V58 | V57 | soft | ja | Architektur-Budget-Verletzungen aus V57 werden in V58 bereinigt |
-| V59 | V58.1 | soft | nein | Netzwerk-Haertung und Logger-Abstraktion setzen stabile Architektur-Budgets voraus |
+| V59 | V58.1 | soft | ja | V58.1 abgeschlossen (3/3 Tasks erledigt) |
 | V59 | V55.99 | hard | ja | V55 Tiefenaudit-Remediation ist Voraussetzung fuer weitere Qualitaetsarbeit |
 | V60 | V58.99 | hard | nein | Audit-Folge startet erst, wenn die laufende MediaRecorder-/Dead-Code-Bereinigung abgeschlossen ist |
 | V60 | V59.99 | hard | nein | Guard-/Logger-/Async-Restarbeiten aus V59 muessen abgeschlossen sein, bevor die Konsolidierung produktiv umgesetzt wird |
@@ -75,18 +75,20 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
-| E | V52 | 2026-03-23 | frei | - |
-| F | V53 | 2026-03-23 | frei | - |
-| G | V54 | 2026-03-24 | frei | - |
-| H | V55 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
-| I | V56 | 2026-03-25 | frei | abgeschlossen 2026-03-25 |
-| J | V57 | 2026-03-26 | frei | abgeschlossen 2026-03-26 |
-| Bot-A | V58 | 2026-03-26 | active | - |
-| Bot-B | V59 | 2026-03-26 | active | - |
-| - | V60 | - | frei | - |
+| E | V52 | 2026-03-23 | closed | abgeschlossen 2026-03-24 |
+| F | V53 | 2026-03-23 | closed | abgeschlossen 2026-03-24 |
+| G | V54 | 2026-03-24 | closed | abgeschlossen 2026-03-24 |
+| H | V55 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
+| I | V56 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
+| J | V57 | 2026-03-26 | closed | abgeschlossen 2026-03-26 |
+| - | V58 | 2026-03-26 | frei | pausiert, 58.2.3 in Arbeit gewesen |
+| - | V59 | 2026-03-26 | frei | pausiert, 59.1.6/59.1.7/59.7.4 offen |
+| - | V60 | - | frei | blockiert auf V58.99 + V59.99 |
 | - | V61 | - | frei | - |
-| Bot-Codex | V62 | 2026-03-26 | active | - |
+| - | V62 | 2026-03-26 | frei | pausiert, Gate 62.99.1/62.99.3 offen |
 | - | V63 | - | frei | - |
+| - | V64 | - | frei | - |
+| - | V65 | - | frei | blockiert auf V62 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -97,8 +99,25 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | 2026-03-24 | Codex | V54 | `src/ui/MatchFlowUiController.js`, `src/ui/MatchInputSourceResolver.js`, `src/ui/PlayerInputSource.js` | V52.5 Input-Source-Priorisierung benoetigt Runtime-Wiring im Match-UI-Lifecycle | Scope auf Input-Quellen-Wiring begrenzt, Guard/Budget-Gates (`architecture:guard`, `build`) ausgefuehrt | abgeschlossen |
 | 2026-03-25 | Bot-H | V2 | `scripts/perf-lifecycle-measure.mjs`, `scripts/perf-jitter-matrix.mjs` | V55.5.2 benoetigt belastbare Perf-Sanity ohne Dev-Server-Startup-Deadlocks | Benchmark-Runner auf `vite preview` mit Auto-Build-Fallback und robuster Navigation/Readiness umgestellt; `benchmark:lifecycle`/`benchmark:jitter` ausgefuehrt | abgeschlossen |
 | 2026-03-25 | Bot-H | Shared | `tests/helpers.js`, `package.json` | V55.1 Startup-Flakes erfordern robusteren `loadGame`-Pfad und testseitige Timeout-Haertung | `loadGame` um Runtime-Readiness+Retry erweitert; `test:core`/`test:fast` auf `--timeout=240000` standardisiert; Gate-Laeufe dokumentiert | abgeschlossen |
-| 2026-03-26 | Agent A | V57 | `src/ui/arcade/ArcadeVehicleManager.js` | V58 Architektur-Guard zeigt ui->state import zu ArcadeVehicleProfile; muss via Facade/Contract entkoppelt werden | Contract fuer Vehicle-Operationen erstellen, ArcadeVehicleManager via Dependency Injection nutzen | PENDING |
-| 2026-03-26 | Bot-Codex | V59/V60 | `src/shared/logging/Logger.js` | V62-Abschluss-Gate benoetigt gruene `build`-/Architecture-Typecheck-Laeufe; aktueller Blocker ist ein JSDoc/ImportMeta-Typfehler in Shared-Logging ausserhalb des Kamera-Diffs | Scope strikt auf Typisierung/JSDoc begrenzen, anschliessend `build`, `test:core` und visuellen Smoke fuer V62 erneut fahren | offen |
+| 2026-03-26 | Agent A | V57 | `src/ui/arcade/ArcadeVehicleManager.js` | V58 Architektur-Guard zeigt ui->state import zu ArcadeVehicleProfile; muss via Facade/Contract entkoppelt werden | V58.1 hat Budget-Fixes umgesetzt; verbleibende Entkopplung in V58.3 oder V60 | DEFERRED |
+| 2026-03-26 | Bot-Codex | V59/V60 | `src/shared/logging/Logger.js` | V62-Abschluss-Gate benoetigt gruene `build`-/Architecture-Typecheck-Laeufe; Blocker war JSDoc/ImportMeta-Typfehler | Commit `9fe3809` hat Logger-Typecheck gefixt; `npm run build` und `tsc -p tsconfig.architecture.json` gruen (2026-03-27) | abgeschlossen |
+
+---
+
+## Parallelisierungs-Empfehlung (Stand: 2026-03-27)
+
+Folgende Bloecke haben keine ueberlappenden Dateien und koennen parallel bearbeitet werden:
+
+| Spur | Bloecke | Hinweis |
+| --- | --- | --- |
+| A | **V58** (Rest) + **V60** (nach V58.99+V59.99) | Architektur-Bereinigung + Konsolidierung |
+| B | **V59** (Rest) | Netzwerk + Logger, 3 Tasks offen |
+| C | **V61** | Arcade Gameplay, keine Ueberlappung mit A/B |
+| D | **V63** | Fight-Modus, eigene Dateien |
+| E | **V64** | Desktop/Electron, komplett isoliert |
+| F | **V62** (Gate) + **V65** | Camera Gate schliessen, dann MP4-Modularisierung |
+
+Empfehlung: 4 Agents parallel auf Spuren B + C + D + E. Spur A und F nach Gate-Abschluss.
 
 ---
 
@@ -483,8 +502,9 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | N2 | Recording-UI / manueller Trigger | - | mittel | klein | P2 | mit V29b.5 Menue-Flow zusammenfuehren | Offen |
 | N8 | Bot-Dynamikprofile als UI-Gegnerklassen | - | mittel | gross | P3 | Design-Note erstellen | Offen |
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
-| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.3 MediaRecorderSystem auf Strategie-Pattern umstellen | In Bearbeitung |
-| V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | In Bearbeitung |
+| V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.3 MediaRecorderSystem auf Strategie-Pattern umstellen | Pausiert |
+| V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | Pausiert |
+| V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | 62.99.1 build/test Gate (Logger-Fix erledigt) | Pausiert |
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.1 Architektur-Guard wieder voll belastbar machen | Offen |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 61.1.1 Score-System dynamisieren | Offen |
 | V63 | Fight-Modus Follow-up - Runtime-Config, Trail-Targeting, HUD | `docs/Feature_Fight_Modus_Followup_V63.md` | hoch | mittel | P1 | 63.1.1 Runtime-Config-Pfad und Guard-Rollout beginnen | Offen |
@@ -605,7 +625,7 @@ Bestehende Basis:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-A seit 2026-03-26 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V57 (Arcade Progression) -->
 
 Scope:
@@ -667,7 +687,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-B seit 2026-03-26 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V58.1, V55.99 -->
 
 Scope:
@@ -829,7 +849,7 @@ Scope:
 
 ### 60.1 Guard- und Tooling-Verlaesslichkeit
 
-- [ ] 60.1.1 `src/shared/logging/Logger.js` und die Architektur-Typecheck-Basis so nachziehen, dass `npm run typecheck:architecture` wieder gruen ist und `prebuild` nicht mehr an einem bekannten Guard-Bruch haengt.
+- [x] 60.1.1 `src/shared/logging/Logger.js` und die Architektur-Typecheck-Basis so nachziehen, dass `npm run typecheck:architecture` wieder gruen ist und `prebuild` nicht mehr an einem bekannten Guard-Bruch haengt. (abgeschlossen: 2026-03-27; evidence: commit `9fe3809` Logger-Typecheck-Fix; `npm run build` PASS, `tsc -p tsconfig.architecture.json` PASS)
 - [ ] 60.1.2 `knip.json` auf `server/**`, `electron/**`, `trainer/**`, `tests/**/*.mjs` sowie reale Entry-Points erweitern und mindestens ein dokumentiertes False-Positive-Beispiel aus dem Audit eliminieren.
 
 ### 60.2 Dormante Runtime-Pfade konsolidieren
@@ -981,7 +1001,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-26 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V59.5 (Camera Polish) -->
 
 Scope:
