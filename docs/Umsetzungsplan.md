@@ -728,8 +728,8 @@ Bestehende Basis:
 - [x] 59.1.3 Bare-catch-Bloecke in `LANMatchLobby.js` (Zeilen 57-63, 142-150) und `LANSessionAdapter.js` (Zeilen 141-150) durch spezifisches Logging und differenziertes Error-Handling ersetzen. (abgeschlossen: 2026-03-26; evidence: all bare-catch blocks replaced with logger.warn/debug)
 - [x] 59.1.4 `_connectingPeers` Set in `LANSessionAdapter._startPolling()` auf explizites Clear vor Neuinitialisierung umstellen, um verwaiste Eintraege zu vermeiden. (abgeschlossen: 2026-03-26; evidence: _connectingPeers = new Set() in _startPolling)
 - [x] 59.1.5 `_findHostPeerId()` in `OnlineSessionAdapter.js` - Null-Rueckgabe absichern: alle Call-Sites (Zeilen 195, 214) mit explizitem Guard versehen. (abgeschlossen: 2026-03-26; evidence: explicit _hostPeerId tracking, null guards on all call-sites)
-- [ ] 59.1.6 `OnlineSessionAdapter.js` und `OnlineMatchLobby.js` auf fail-fast Error-Contracts bringen: Signaling-`error`, Socket-Close und Timeout muessen `connect()`/`create()`/`join()` deterministisch rejecten statt haengen.
-- [ ] 59.1.7 `LANSessionAdapter.js` ICE-Polling so nachziehen, dass Trickle-ICE bis zu einem klaren Quiet-Window oder Timeout weiterlaeuft und spaete Kandidaten nach Answer/erstem Batch nicht verworfen werden.
+- [x] 59.1.6 `OnlineSessionAdapter.js` und `OnlineMatchLobby.js` auf fail-fast Error-Contracts bringen: Signaling-`error`, Socket-Close und Timeout muessen `connect()`/`create()`/`join()` deterministisch rejecten statt haengen. (abgeschlossen: 2026-03-27; evidence: settled-flag + connectTimeoutMs + onclose/onerror → reject in OnlineSessionAdapter.connect() und OnlineMatchLobby._makeConnectPromise(); npm run build -> PASS)
+- [x] 59.1.7 `LANSessionAdapter.js` ICE-Polling so nachziehen, dass Trickle-ICE bis zu einem klaren Quiet-Window oder Timeout weiterlaeuft und spaete Kandidaten nach Answer/erstem Batch nicht verworfen werden. (abgeschlossen: 2026-03-27; evidence: _pollIceCandidates mit ICE_QUIET_WINDOW_POLLS=3 und ICE_POLL_MAX_RETRIES=20; npm run build -> PASS)
 
 ### 59.2 Server-Haertung (lan-signaling.js)
 
@@ -797,7 +797,7 @@ Bestehende Basis:
 - [x] 59.7.1 `tests/recording.spec.js` erstellen: Mindestens 5 Tests fuer MediaRecorderSystem (Start/Stop-Lifecycle, Format-Detection, WebCodecs-Fallback, Export-Flow, State-Reset). (abgeschlossen: 2026-03-26; evidence: 5 Playwright tests created)
 - [x] 59.7.2 `tests/runtime-facade.spec.js` erstellen: Mindestens 5 Tests fuer GameRuntimeFacade (Session-Switch, Settings-Apply, Multiplayer-Bridge-Wiring, Pause-Resume, Cleanup/Dispose). (abgeschlossen: 2026-03-26; evidence: 5 Playwright tests created)
 - [x] 59.7.3 Bestehende `tests/core.spec.js` um Netzwerk-Adapter-Tests erweitern: Retry-Verhalten, Peer-Disconnect-Handling, Reconnect-Flow. (abgeschlossen: 2026-03-26; evidence: tests/network-adapter.spec.js created with 5 tests)
-- [ ] 59.7.4 Characterization-Tests fuer Signaling-Fehler und spaete ICE-Kandidaten ergaenzen, damit `OnlineSessionAdapter`, `OnlineMatchLobby` und `LANSessionAdapter` nicht mehr auf stilles Timeout regressieren.
+- [x] 59.7.4 Characterization-Tests fuer Signaling-Fehler und spaete ICE-Kandidaten ergaenzen, damit `OnlineSessionAdapter`, `OnlineMatchLobby` und `LANSessionAdapter` nicht mehr auf stilles Timeout regressieren. (abgeschlossen: 2026-03-27; evidence: 5 Tests in tests/network-adapter.spec.js (V59-59.7.4 describe-Block): WS-error reject, signaling-error reject, OnlineMatchLobby error reject, Trickle-ICE quiet-window, Timeout reject)
 
 ### Phase 59.99: Integrations- und Abschluss-Gate
 
