@@ -10,15 +10,23 @@ export async function loadGame(page) {
             await page.goto('/', { waitUntil: 'commit', timeout: gotoTimeoutMs });
             await page.waitForFunction(() => {
                 const menu = document.getElementById('main-menu');
-                const menuVisible = !!(menu && !menu.classList.contains('hidden'));
-                return menuVisible || !!globalThis?.GAME_INSTANCE;
+                const runtimeReady = !!globalThis?.GAME_INSTANCE;
+                if (runtimeReady) return true;
+                if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                const style = window.getComputedStyle(menu);
+                return style.display !== 'none' && style.visibility !== 'hidden';
             }, null, { timeout: readyTimeoutMs });
 
             const state = await page.evaluate(() => {
                 const menu = document.getElementById('main-menu');
                 const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+                const menuVisible = (() => {
+                    if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                    const style = window.getComputedStyle(menu);
+                    return style.display !== 'none' && style.visibility !== 'hidden';
+                })();
                 return {
-                    menuVisible: !!(menu && !menu.classList.contains('hidden')),
+                    menuVisible,
                     runtimeReady: !!globalThis?.GAME_INSTANCE,
                     visiblePanelId: visiblePanel ? visiblePanel.id : null,
                 };
@@ -34,7 +42,11 @@ export async function loadGame(page) {
                     const menu = document.getElementById('main-menu');
                     const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
                     const runtimeReady = !!globalThis?.GAME_INSTANCE;
-                    const menuVisible = !!(menu && !menu.classList.contains('hidden'));
+                    const menuVisible = (() => {
+                        if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                        const style = window.getComputedStyle(menu);
+                        return style.display !== 'none' && style.visibility !== 'hidden';
+                    })();
                     return runtimeReady && (!menuVisible || !!visiblePanel);
                 });
 
@@ -46,7 +58,11 @@ export async function loadGame(page) {
 
             await page.waitForFunction(() => {
                 const menu = document.getElementById('main-menu');
-                const menuVisible = !!(menu && !menu.classList.contains('hidden'));
+                const menuVisible = (() => {
+                    if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                    const style = window.getComputedStyle(menu);
+                    return style.display !== 'none' && style.visibility !== 'hidden';
+                })();
                 const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
                 return menuVisible && !visiblePanel;
             }, null, { timeout: readyTimeoutMs });
@@ -372,8 +388,13 @@ export async function returnToMenu(page) {
     const getMenuState = () => page.evaluate(() => {
         const mainMenu = document.getElementById('main-menu');
         const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+        const menuVisible = (() => {
+            if (!(mainMenu instanceof HTMLElement) || mainMenu.classList.contains('hidden')) return false;
+            const style = window.getComputedStyle(mainMenu);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        })();
         return {
-            menuVisible: !!(mainMenu && !mainMenu.classList.contains('hidden')),
+            menuVisible,
             visiblePanelId: visiblePanel?.id || '',
         };
     });
@@ -395,7 +416,11 @@ export async function returnToMenu(page) {
     await page.waitForFunction(() => {
         const mainMenu = document.getElementById('main-menu');
         const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-        return !!(mainMenu && !mainMenu.classList.contains('hidden') && !visiblePanel);
+        if (!(mainMenu instanceof HTMLElement) || mainMenu.classList.contains('hidden') || visiblePanel) {
+            return false;
+        }
+        const style = window.getComputedStyle(mainMenu);
+        return style.display !== 'none' && style.visibility !== 'hidden';
     }, null, { timeout: 8000 });
 }
 

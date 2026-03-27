@@ -13,6 +13,23 @@ const buildId = Date.now().toString(36).toUpperCase();
 const CHUNK_SIZE_WARNING_LIMIT_KB = 800;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const shouldAutoOpenDevBrowser = !process.env.PW_RUN_TAG && !process.env.CI;
+const isPlaywrightRuntime = !!process.env.PW_RUN_TAG;
+const playwrightWarmupClientFiles = isPlaywrightRuntime
+    ? [
+        './src/core/main.js',
+        './src/core/**/*.js',
+        './src/state/**/*.js',
+        './src/ui/**/*.js',
+        './src/composition/core-ui/**/*.js',
+        './src/hunt/**/*.js',
+        './src/entities/MapSchema.js',
+        './src/entities/Particles.js',
+        './src/entities/mapSchema/**/*.js',
+        './src/shared/contracts/**/*.js',
+        './src/shared/runtime/**/*.js',
+    ]
+    : [];
 
 const GENERATED_EDITOR_MAP_KEY_PREFIX = 'editor_';
 const DEFAULT_EDITOR_DISK_MAP_NAME = 'Editor Map';
@@ -1102,7 +1119,10 @@ function copyObjVehicleAssetsPlugin() {
 export default defineConfig({
     plugins: [editorDiskSaveApiPlugin(), latestCheckpointApiPlugin(), trainingDashboardApiPlugin(), copyObjVehicleAssetsPlugin()],
     server: {
-        open: true,
+        open: shouldAutoOpenDevBrowser,
+        warmup: playwrightWarmupClientFiles.length > 0
+            ? { clientFiles: playwrightWarmupClientFiles }
+            : undefined,
     },
     build: {
         chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT_KB,

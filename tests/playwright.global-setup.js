@@ -12,6 +12,89 @@ const PREWARM_MENU_TIMEOUT_MS = 180_000;
 const PREWARM_RETRY_DELAY_MS = 2_000;
 const STARTUP_LOG_SNIPPET_FILES = 4;
 const STARTUP_LOG_SNIPPET_LINES = 60;
+const MODULE_WARMUP_REQUEST_PATHS = [
+    '/src/core/main.js',
+    '/src/core/Config.js',
+    '/src/state/RoundRecorder.js',
+    '/src/entities/MapSchema.js',
+    '/src/composition/core-ui/CoreUiAppPorts.js',
+    '/src/core/SettingsManager.js',
+    '/src/core/ProfileManager.js',
+    '/src/state/RoundStateController.js',
+    '/src/core/PlayingStateSystem.js',
+    '/src/state/RoundStateTickSystem.js',
+    '/src/hunt/HuntMode.js',
+    '/src/core/GameBootstrap.js',
+    '/src/core/GameRuntimeFacade.js',
+    '/src/core/GameDebugApi.js',
+    '/src/shared/contracts/GameStateIds.js',
+    '/src/shared/contracts/MatchLifecycleContract.js',
+    '/src/core/perf/RuntimePerfProfiler.js',
+    '/src/core/AppInitializer.js',
+    '/src/core/PlaytestLaunchParams.js',
+    '/src/shared/contracts/RecordingCaptureContract.js',
+    '/src/core/recording/MediaRecorderSupport.js',
+    '/src/core/config/ConfigSections.js',
+    '/src/core/config/MapPresets.js',
+    '/src/core/runtime/ActiveRuntimeConfigStore.js',
+    '/src/shared/logging/Logger.js',
+    '/src/state/recorder/RoundEventStore.js',
+    '/src/state/recorder/RoundMetricsStore.js',
+    '/src/state/recorder/RoundSnapshotStore.js',
+    '/src/state/RoundStateControllerOps.js',
+    '/src/state/RoundStateOps.js',
+    '/src/entities/mapSchema/MapSchemaConstants.js',
+    '/src/entities/mapSchema/MapSchemaMigrationOps.js',
+    '/src/entities/mapSchema/MapSchemaRuntimeOps.js',
+    '/src/ui/UIManager.js',
+    '/src/ui/ProfileUiController.js',
+    '/src/composition/core-ui/CoreSettingsPorts.js',
+    '/src/core/RuntimeConfig.js',
+    '/src/state/TelemetryHistoryStore.js',
+    '/src/core/settings/SettingsDefaultsFacade.js',
+    '/src/core/settings/SettingsSanitizerOps.js',
+    '/src/core/settings/SettingsSessionDraftFacade.js',
+    '/src/core/settings/SettingsPresetFacade.js',
+    '/src/core/settings/SettingsDeveloperFacade.js',
+    '/src/core/settings/SettingsTextOverrideFacade.js',
+    '/src/core/settings/SettingsTelemetryFacade.js',
+    '/src/composition/core-ui/CoreProfilePorts.js',
+    '/src/core/SimStateSnapshot.js',
+    '/src/ui/MatchUiStateOps.js',
+    '/src/core/Renderer.js',
+    '/src/core/GameLoop.js',
+    '/src/core/InputManager.js',
+    '/src/entities/Particles.js',
+    '/src/core/Audio.js',
+    '/src/core/RuntimeDiagnosticsSystem.js',
+    '/src/hunt/ScreenShake.js',
+    '/src/core/PlanarAimAssistSystem.js',
+    '/src/core/MatchSessionRuntimeBridge.js',
+    '/src/core/BuildInfoController.js',
+    '/src/core/MediaRecorderSystem.js',
+    '/src/shared/runtime/GameRuntimePorts.js',
+    '/src/composition/core-ui/CoreUiBootstrapPorts.js',
+    '/src/shared/contracts/MenuControllerContract.js',
+    '/src/shared/contracts/RuntimeClockContract.js',
+    '/src/state/MatchSessionFactory.js',
+    '/src/core/runtime/MatchStartValidationService.js',
+    '/src/core/replay/ReplayRecorder.js',
+    '/src/core/arcade/ArcadeRunRuntime.js',
+    '/src/state/arcade/ArcadeRoundStateController.js',
+    '/src/composition/core-ui/CoreUiMenuPorts.js',
+    '/src/core/runtime/GameRuntimeSettingsKeySets.js',
+    '/src/core/runtime/RuntimeSessionLifecycleService.js',
+    '/src/core/runtime/MenuRuntimePresetConfigService.js',
+    '/src/core/runtime/MenuRuntimeMultiplayerService.js',
+    '/src/core/runtime/RuntimeSettingsChangeOrchestrator.js',
+    '/src/core/runtime/MenuRuntimeDeveloperTrainingService.js',
+    '/src/core/runtime/MenuRuntimeDeveloperModeService.js',
+    '/src/core/runtime/MenuRuntimeSessionService.js',
+    '/src/core/runtime/menu-handlers/CreateMenuEventHandlerRegistry.js',
+    '/src/core/runtime/ProfileLifecycleController.js',
+];
+const MODULE_WARMUP_REQUEST_TIMEOUT_MS = 30_000;
+const MODULE_WARMUP_CONCURRENCY = 3;
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -109,6 +192,52 @@ async function fetchWithTimeout(url, timeoutMs) {
     } finally {
         clearTimeout(timer);
     }
+}
+
+async function runClientModuleWarmup(baseUrl) {
+    const origin = new URL(baseUrl).origin;
+    const queue = MODULE_WARMUP_REQUEST_PATHS.map((requestPath) => new URL(requestPath, origin).toString());
+    const attempts = [];
+
+    const worker = async () => {
+        while (queue.length > 0) {
+            const url = queue.shift();
+            if (!url) break;
+            const startedAt = Date.now();
+            const attempt = {
+                url,
+                path: new URL(url).pathname,
+                startedAtIso: toIsoNow(startedAt),
+                status: null,
+                ok: false,
+                error: null,
+                durationMs: 0,
+            };
+            try {
+                const response = await fetchWithTimeout(url, MODULE_WARMUP_REQUEST_TIMEOUT_MS);
+                attempt.status = Number(response?.status) || 0;
+                attempt.ok = response?.ok === true;
+                await response.text();
+            } catch (error) {
+                attempt.error = serializeError(error);
+            } finally {
+                attempt.durationMs = Math.max(0, Date.now() - startedAt);
+                attempts.push(attempt);
+            }
+        }
+    };
+
+    await Promise.all(Array.from({ length: MODULE_WARMUP_CONCURRENCY }, () => worker()));
+
+    return {
+        origin,
+        requestPaths: [...MODULE_WARMUP_REQUEST_PATHS],
+        concurrency: MODULE_WARMUP_CONCURRENCY,
+        requestTimeoutMs: MODULE_WARMUP_REQUEST_TIMEOUT_MS,
+        requestedUrls: MODULE_WARMUP_REQUEST_PATHS.length,
+        attempts,
+        failedCount: attempts.filter((attempt) => attempt.ok !== true).length,
+    };
 }
 
 async function runHttpReadinessProbe(url) {
@@ -212,14 +341,22 @@ async function runBrowserPrewarm(url, options = {}) {
             browserAttempt.gotoCompleted = true;
             await page.waitForFunction(() => {
                 const menu = document.getElementById('main-menu');
-                const mainMenuVisible = !!(menu && !menu.classList.contains('hidden'));
+                const mainMenuVisible = (() => {
+                    if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                    const style = window.getComputedStyle(menu);
+                    return style.display !== 'none' && style.visibility !== 'hidden';
+                })();
                 const runtimeReady = !!globalThis?.GAME_INSTANCE;
                 return mainMenuVisible || runtimeReady;
             }, null, { timeout: menuTimeoutMs });
             const readinessSnapshot = await page.evaluate(() => {
                 const menu = document.getElementById('main-menu');
                 return {
-                    mainMenuVisible: !!(menu && !menu.classList.contains('hidden')),
+                    mainMenuVisible: (() => {
+                        if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                        const style = window.getComputedStyle(menu);
+                        return style.display !== 'none' && style.visibility !== 'hidden';
+                    })(),
                     runtimeReady: !!globalThis?.GAME_INSTANCE,
                 };
             });
@@ -385,6 +522,7 @@ export default async function globalSetup() {
         readiness: {
             url: `http://${testHost}:${testPort}/`,
             strictPrewarm,
+            moduleWarmup: null,
             prewarmConfig: {
                 maxAttempts: prewarmMaxAttempts,
                 gotoTimeoutMs: prewarmGotoTimeoutMs,
@@ -449,6 +587,7 @@ export default async function globalSetup() {
 
                 const readinessUrl = `http://${testHost}:${testPort}/`;
                 diagnostics.readiness.httpProbe = await runHttpReadinessProbe(readinessUrl);
+                diagnostics.readiness.moduleWarmup = await runClientModuleWarmup(readinessUrl);
                 diagnostics.readiness.browserPrewarm = await runBrowserPrewarm(readinessUrl, {
                     maxAttempts: prewarmMaxAttempts,
                     gotoTimeoutMs: prewarmGotoTimeoutMs,
