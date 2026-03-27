@@ -86,7 +86,19 @@ export class BotValidationService {
         const scenario = this.resolveScenario(idOrIndex);
         if (!scenario || !game?.settings) return null;
 
+        const nextSessionType = scenario.mode === '2p' ? 'splitscreen' : 'single';
+        const nextModePath = scenario.gameMode === 'HUNT' ? 'fight' : 'normal';
+
+        if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+            game.settings.localSettings = {};
+        }
         if (!game.settings.gameplay) game.settings.gameplay = {};
+        if (!game.settings.hunt || typeof game.settings.hunt !== 'object') {
+            game.settings.hunt = {};
+        }
+
+        game.settings.localSettings.sessionType = nextSessionType;
+        game.settings.localSettings.modePath = nextModePath;
         game.settings.mode = scenario.mode === '2p' ? '2p' : '1p';
         game.settings.numBots = scenario.bots;
         game.settings.mapKey = scenario.mapKey;
@@ -95,6 +107,7 @@ export class BotValidationService {
         game.settings.gameplay.planarMode = !!scenario.planarMode;
         game.settings.gameplay.portalCount = scenario.portalCount;
         game.settings.portalsEnabled = scenario.portalCount > 0;
+        game.settings.hunt.respawnEnabled = scenario.gameMode === 'HUNT';
         game.settings.winsNeeded = Math.max(1, game.settings.winsNeeded);
         if (typeof game._onSettingsChanged === 'function') {
             game._onSettingsChanged();

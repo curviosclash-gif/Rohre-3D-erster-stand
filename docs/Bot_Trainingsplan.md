@@ -216,6 +216,8 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | 2026-03-25 | C1 Validate Retry fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`) |
 | 2026-03-25 | C2 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp02.log` (`BOT_RUNNER_BOOT_TIMEOUT=240000`, `phase=app:game-instance`) |
 | 2026-03-25 | C3 Validate erfolgreich (preview mode) | `BT12_SURV_20260325T030951` | `135.368750` | `38.770150` | `0.000000` | Steps `+15.183%`, Survival `+3.727%` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log`, `tmp/bot-validation-report.json`, `tmp/Testergebnisse_Phase4b_2026-03-25.md`; Hinweis: forced-round-rate `83.3%` |
+| 2026-03-27 | Abschlussvalidate erfolgreich, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `40.037833` | `0.000000` | Steps `+5.626%`, Survival `+7.119%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/run.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` PASS nach Portal-Visual-Fix, aber `training:gate` FAIL auf `forcedRoundRate=1.0` und `timeoutRoundRate=1.0` |
+| 2026-03-27 | Runner-Fix validiert, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `6.132433` | `1.000000` | Steps `+5.626%`, Survival `-83.593%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` jetzt ohne Forced-/Timeout-Rounds (`0/0`), aber `training:gate` FAIL auf `averageBotSurvival=6.132433 < 19.145075` |
 
 ### 12.99 Abschluss-Gate
 
@@ -230,6 +232,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | KPI-Regression in Fight oder Classic unentdeckt | hoch | Bot-Codex | Matrix-Run (`classic-*`,`hunt-*`) + 2h Checkpoints | Delta kippt in Teilmodus trotz gruenem Gate |
 | `bot:validate` Laufzeit > global timeout | mittel | Bot-Codex | scenarioLimit `2`, `BOT_RUNNER_TOTAL_TIMEOUT=600000` fuer Abschlusslauf | Abbruch bei `total-run timeout` |
 | `bot:validate` kann `GAME_INSTANCE` waehrend aktivem Loop nicht initialisieren | hoch | Bot-Codex | Checkpoint-Validate nach Loop-Ende oder auf separatem Port (`BOT_RUNNER_PORT`) ausfuehren | Timeout in `phase=app:game-instance` trotz laufendem Dev-Server |
+| Abschluss-Gate faellt nach Runner-Stabilisierung auf Survival-KPI | hoch | Bot-Codex | V1/V2-Survival unter natuerlichem Round-End analysieren und Policy/Training gegen fruehes Bot-Sterben nachziehen | `averageBotSurvival < 19.145075` |
 
 ---
 

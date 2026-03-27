@@ -23,7 +23,7 @@ const NAVIGATION_TIMEOUT_MS = parseIntEnv(
     5000
 );
 const ROUND_START_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_PLAYING_TIMEOUT', 10000, 1000);
-const ROUND_ACTIVE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_MATCH_TIMEOUT', 35000, 10000);
+const ROUND_ACTIVE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_MATCH_TIMEOUT', 50000, 10000);
 const ROUND_FORCE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_FORCE_TIMEOUT', 12000, 1000);
 const MENU_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_MENU_TIMEOUT', 12000, 1000);
 const EVAL_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_EVAL_TIMEOUT', 10000, 1000);
@@ -45,6 +45,10 @@ const TOTAL_TIMEOUT_MS = parseIntEnv(
 );
 const SERVER_MODE = resolveServerMode(
     resolveFirstValue(CLI_ARGS, ['server-mode'], process.env.BOT_RUNNER_SERVER_MODE)
+);
+const HEADLESS = parseBoolOption(
+    resolveFirstValue(CLI_ARGS, ['headless'], process.env.BOT_RUNNER_HEADLESS),
+    false
 );
 const PREVIEW_BUILD_BEFORE_START = parseBoolOption(
     resolveFirstValue(CLI_ARGS, ['preview-build'], process.env.BOT_RUNNER_PREVIEW_BUILD),
@@ -503,24 +507,35 @@ async function runRound(page, scenario, scenarioIndex, scenarioCount, roundIndex
 
     await waitForGameState(
         page,
-        ['PLAYING'],
+        ['PLAYING', 'ROUND_END', 'MATCH_END'],
         resolveTimeout(ROUND_START_TIMEOUT_MS, `${roundLabel}:wait-playing`, deadlines),
         `${roundLabel}:wait-playing`
     );
 
+    const stateAfterStart = await evaluatePhase(
+        page,
+        `${roundLabel}:read-state-after-start`,
+        resolveTimeout(EVAL_TIMEOUT_MS, `${roundLabel}:read-state-after-start`, deadlines),
+        () => window.GAME_INSTANCE?.state || null
+    );
+
     let forced = false;
-    try {
-        await waitForGameState(
-            page,
-            ['ROUND_END', 'MATCH_END'],
-            resolveTimeout(ROUND_ACTIVE_TIMEOUT_MS, `${roundLabel}:wait-round-end`, deadlines),
-            `${roundLabel}:wait-round-end`
-        );
-    } catch (error) {
-        forced = true;
-        stats.timeoutRounds += 1;
-        log(`${roundLabel} active phase timeout, forcing round-end`, { error: toShortError(error) });
-        await forceRoundEnd(page, roundLabel, deadlines);
+    if (stateAfterStart !== 'ROUND_END' && stateAfterStart !== 'MATCH_END') {
+        try {
+            await waitForGameState(
+                page,
+                ['ROUND_END', 'MATCH_END'],
+                resolveTimeout(ROUND_ACTIVE_TIMEOUT_MS, `${roundLabel}:wait-round-end`, deadlines),
+                `${roundLabel}:wait-round-end`
+            );
+        } catch (error) {
+            forced = true;
+            stats.timeoutRounds += 1;
+            log(`${roundLabel} active phase timeout, forcing round-end`, { error: toShortError(error) });
+            await forceRoundEnd(page, roundLabel, deadlines);
+        }
+    } else {
+        log(`${roundLabel} finished before active wait`, { stateAfterStart });
     }
 
     await evaluatePhase(
@@ -635,6 +650,7 @@ async function run() {
             baseUrl: BASE_URL,
             forceKillPort: FORCE_KILL_PORT,
             serverMode: SERVER_MODE,
+            headless: HEADLESS,
             previewBuildBeforeStart: PREVIEW_BUILD_BEFORE_START,
             roundsPerScenario: ROUNDS_PER_SCENARIO,
             forcedRoundPolicy: {
@@ -675,7 +691,7 @@ async function run() {
         }
 
         browser = await withTimeout(
-            () => chromium.launch({ headless: true }),
+            () => chromium.launch({ headless: HEADLESS }),
             resolveTimeout(APP_READY_TIMEOUT_MS, 'browser:launch', [runDeadline]),
             'browser:launch'
         );

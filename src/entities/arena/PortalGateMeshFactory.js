@@ -181,6 +181,10 @@ class PortalGateVisualRegistry {
         }
 
         this._tmpScale.copy(component.localScale);
+        this._tmpScale.multiply(handle._scaleVector);
+        if (!handle.visible) {
+            this._tmpScale.set(0, 0, 0);
+        }
         this._tmpMatrix.compose(this._tmpWorldPosition, this._tmpWorldQuaternion, this._tmpScale);
         component.batch.setMatrix(component.instanceId, this._tmpMatrix);
     }
@@ -234,12 +238,38 @@ class InstancedVisualHandle {
         this.registry = registry;
         this.position = position ? position.clone() : new THREE.Vector3();
         this.quaternion = quaternion ? quaternion.clone() : new THREE.Quaternion();
+        this._scaleVector = new THREE.Vector3(1, 1, 1);
+        this.scale = {
+            set: (x = 1, y = x, z = x) => {
+                this._scaleVector.set(x, y, z);
+                this.syncAll();
+                return this.scale;
+            },
+            setScalar: (value = 1) => {
+                this._scaleVector.setScalar(value);
+                this.syncAll();
+                return this.scale;
+            },
+            toArray: () => this._scaleVector.toArray(),
+        };
+        this._visible = true;
         this.up = new THREE.Vector3(0, 1, 0);
         this.userData = {};
         this._components = [];
         this._spinQuaternion = new THREE.Quaternion();
         this._spinAngle = 0;
         this._spinActive = false;
+    }
+
+    get visible() {
+        return this._visible;
+    }
+
+    set visible(value) {
+        const nextVisible = value !== false;
+        if (this._visible === nextVisible) return;
+        this._visible = nextVisible;
+        this.syncAll();
     }
 
     addComponent(name, { batchKey, geometry, material, colorHex, localPosition, localQuaternion, localScale }) {
