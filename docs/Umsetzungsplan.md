@@ -80,7 +80,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | - | V60 | - | frei | blockiert auf V58.99 |
 | Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
 | Agent B | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 62.99.1 geschlossen, 62.99.3 visuell offen) |
-| - | V63 | - | frei | - |
+| Bot-Codex | V63 | 2026-03-27 | claimed | 63.1.1/63.1.2 abgeschlossen |
 | - | V64 | - | frei | - |
 | - | V65 | - | frei | blockiert auf V62 |
 
@@ -501,7 +501,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | 62.99.1 build/test Gate (Logger-Fix erledigt) | Pausiert |
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.1 Architektur-Guard wieder voll belastbar machen | Offen |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 61.1.1 Score-System dynamisieren | Offen |
-| V63 | Fight-Modus Follow-up - Runtime-Config, Trail-Targeting, HUD | `docs/Feature_Fight_Modus_Followup_V63.md` | hoch | mittel | P1 | 63.1.1 Runtime-Config-Pfad und Guard-Rollout beginnen | Offen |
+| V63 | Fight-Modus Follow-up - Runtime-Config, Trail-Targeting, HUD | `docs/Feature_Fight_Modus_Followup_V63.md` | hoch | mittel | P1 | 63.2.1 optimizedTrailScan Guarded Rollout | In Bearbeitung |
 
 ---
 
@@ -1055,7 +1055,7 @@ Scope:
 
 Plan-Datei: `docs/Feature_Fight_Modus_Followup_V63.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-27 -->
 <!-- DEPENDS-ON: V48 (Fight baseline) -->
 
 Scope:
@@ -1076,8 +1076,8 @@ Scope:
 
 **Issue:** Fight-Code nutzt gemischt `gameModeStrategy`, `getActiveRuntimeConfig()`, statische `HUNT_CONFIG` und deprecated Fallbacks; Menu-/Session-Regeln fuer Respawn und `mode` sind fuer Fight nicht eindeutig.
 
-- [ ] 63.1.1 `ProjectileHitResolver`, `BotRuntimeContextFactory`, `HuntModeStrategy` und angrenzende Fight-Pfade auf eine konsistente Strategy-/Runtime-Config-Quelle vereinheitlichen.
-- [ ] 63.1.2 `MenuCompatibilityRules`, `MenuGameplayBindings`, `SettingsSanitizerOps` und Fight-UI so abstimmen, dass Respawn-/Session-/Mode-Semantik fuer Nutzer eindeutig und testbar ist.
+- [x] 63.1.1 `ProjectileHitResolver`, `BotRuntimeContextFactory`, `HuntModeStrategy` und angrenzende Fight-Pfade auf eine konsistente Strategy-/Runtime-Config-Quelle vereinheitlichen. (abgeschlossen: 2026-03-27; evidence: ProjectileHitResolver + BotRuntimeContextFactory auf getActiveRuntimeConfig umgestellt; HuntTargetingPerf.js nutzt aktiven Runtime-Config fuer TARGETING-Settings; ArchitectureConfig.mjs allowlist + ratchet 42->44 aktualisiert; npm run build PASS)
+- [x] 63.1.2 `MenuCompatibilityRules`, `MenuGameplayBindings`, `SettingsSanitizerOps` und Fight-UI so abstimmen, dass Respawn-/Session-/Mode-Semantik fuer Nutzer eindeutig und testbar ist. (abgeschlossen: 2026-03-27; evidence: MenuCompatibilityRules: hunt-Objekt-Initialisierung preserviert bestehende Felder statt sie zu ueberschreiben; SettingsSanitizerOps: huntFeatureEnabled via getActiveRuntimeConfig; npm run build PASS)
 
 ### 63.2 Trail-Targeting und Trefferfairness haerten
 
