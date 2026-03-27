@@ -1,32 +1,9 @@
 // ─── Arcade Mission System: Types, Progress Tracking, Completion ───
 
 import { MISSION_TYPES, formatMissionProgress } from '../../shared/contracts/ArcadeMissionContract.js';
+import { toSafeNumber, createSeededRandom } from '../../shared/utils/ArcadeUtils.js';
 
 const MISSION_TYPE_KEYS = Object.keys(MISSION_TYPES);
-
-function toSafeNumber(value, fallback = 0) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-function normalizeSeed(seed) {
-    const text = String(seed ?? 'mission-default');
-    let hash = 2166136261 >>> 0;
-    for (let i = 0; i < text.length; i += 1) {
-        hash ^= text.charCodeAt(i);
-        hash = Math.imul(hash, 16777619) >>> 0;
-    }
-    return hash >>> 0;
-}
-
-function createSeededRandom(seed) {
-    let state = normalizeSeed(seed) || 1;
-    return () => {
-        state = Math.imul(1664525, state) + 1013904223;
-        state >>>= 0;
-        return state / 0x100000000;
-    };
-}
 
 // ─── Mission Instance ───
 
@@ -77,6 +54,62 @@ export function updateMissionProgress(mission, event) {
                 progress.elapsed = toSafeNumber(event.elapsed, 0);
             }
             break;
+        // 61.3.1 — New mission types
+        case 'NO_DAMAGE':
+            if (event.type === 'damage' || event.type === 'hit') {
+                progress.hitCount = (progress.hitCount || 0) + 1;
+            }
+            break;
+        case 'MULTI_KILL': {
+            if (event.type === 'kill') {
+                const nowMs = toSafeNumber(event.nowMs, Date.now());
+                const windowSec = toSafeNumber(progress.windowSec || mission.params?.windowSec, 15);
+                const windowMs = windowSec * 1000;
+                const times = Array.isArray(progress.killTimes) ? [...progress.killTimes] : [];
+                times.push(nowMs);
+                // Keep only kills within the rolling window
+                const cutoff = nowMs - windowMs;
+                const recentKills = times.filter((t) => t >= cutoff);
+                progress.killTimes = recentKills;
+                progress.windowKills = recentKills.length;
+            }
+            break;
+        }
+        case 'TRAIL_MASTER':
+            if (event.type === 'trail_extend') {
+                progress.metersSafe = (progress.metersSafe || 0) + Math.max(0, toSafeNumber(event.delta, 0));
+            } else if (event.type === 'self_collision') {
+                progress.metersSafe = 0;
+            }
+            break;
+        // 61.3.2 — Additional new mission types
+        case 'ITEM_CHAIN': {
+            if (event.type === 'collect') {
+                const nowMs = toSafeNumber(event.nowMs, Date.now());
+                const gapMs = 10000; // 10s gap resets chain
+                const lastMs = toSafeNumber(progress.lastPickupMs, 0);
+                if (lastMs > 0 && (nowMs - lastMs) <= gapMs) {
+                    progress.chain = (progress.chain || 1) + 1;
+                } else {
+                    progress.chain = 1;
+                }
+                progress.lastPickupMs = nowMs;
+            }
+            break;
+        }
+        case 'CLOSE_CALL': {
+            if (event.type === 'health_update') {
+                const hp = toSafeNumber(event.hp, 100);
+                const maxHp = Math.max(1, toSafeNumber(event.maxHp, 100));
+                const isLow = (hp / maxHp) < 0.20;
+                const wasLow = progress.wasLowHealth === true;
+                if (isLow && !wasLow) {
+                    progress.count = (progress.count || 0) + 1;
+                }
+                progress.wasLowHealth = isLow;
+            }
+            break;
+        }
         default:
             return mission;
     }
@@ -151,29 +184,39 @@ export function assignSectorMissions(sectorTemplate, mapMissions, seed, sectorNu
 }
 
 function buildGenericMissionPool(templateId) {
+    // 61.3.3: Kill targets scale more aggressively (3->5->8->12->18 goal)
     switch (templateId) {
         case 'sector_intro':
             return [
                 { type: 'KILL_COUNT', params: { target: 3 }, weight: 2 },
                 { type: 'SURVIVE_DURATION', params: { target: 30 }, weight: 1 },
+                { type: 'NO_DAMAGE', params: {}, weight: 1 },
+                { type: 'ITEM_CHAIN', params: { target: 3 }, weight: 0.8 },
             ];
         case 'sector_pressure':
             return [
                 { type: 'KILL_COUNT', params: { target: 5 }, weight: 2 },
                 { type: 'SURVIVE_DURATION', params: { target: 45 }, weight: 1.5 },
                 { type: 'COLLECT_ITEMS', params: { target: 3 }, weight: 1 },
+                { type: 'MULTI_KILL', params: { target: 3, windowSec: 15 }, weight: 1.2 },
+                { type: 'TRAIL_MASTER', params: { target: 80 }, weight: 1 },
             ];
         case 'sector_hazard':
             return [
-                { type: 'KILL_COUNT', params: { target: 7 }, weight: 1.5 },
+                { type: 'KILL_COUNT', params: { target: 8 }, weight: 1.5 },
                 { type: 'SURVIVE_DURATION', params: { target: 55 }, weight: 1 },
                 { type: 'TIME_TRIAL', params: { target: 40 }, weight: 1.5 },
+                { type: 'MULTI_KILL', params: { target: 4, windowSec: 12 }, weight: 1.3 },
+                { type: 'CLOSE_CALL', params: { target: 2 }, weight: 0.8 },
             ];
         case 'sector_endurance':
             return [
-                { type: 'KILL_COUNT', params: { target: 10 }, weight: 2 },
+                { type: 'KILL_COUNT', params: { target: 12 }, weight: 2 },
                 { type: 'SURVIVE_DURATION', params: { target: 60 }, weight: 1 },
                 { type: 'REACH_PORTAL', params: {}, weight: 1.5 },
+                { type: 'MULTI_KILL', params: { target: 5, windowSec: 10 }, weight: 1.2 },
+                { type: 'TRAIL_MASTER', params: { target: 150 }, weight: 1 },
+                { type: 'CLOSE_CALL', params: { target: 3 }, weight: 0.9 },
             ];
         default:
             return [

@@ -1,18 +1,16 @@
 import { ARCADE_RUN_PHASES, createArcadeRunRecords, createArcadeRunState } from './ArcadeRunState.js';
+import { toSafeNumber, clampNumber, clampInteger } from '../../shared/utils/ArcadeUtils.js';
 
-function toSafeNumber(value, fallback = 0) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-}
+/** Base score per sector template — harder templates reward more. */
+const SECTOR_BASE_SCORES = Object.freeze({
+    sector_intro: 180,
+    sector_pressure: 250,
+    sector_hazard: 320,
+    sector_endurance: 400,
+});
 
-function clampNumber(value, min, max, fallback) {
-    const parsed = toSafeNumber(value, fallback);
-    return Math.max(min, Math.min(max, parsed));
-}
-
-function clampInteger(value, min, max, fallback) {
-    return Math.floor(clampNumber(value, min, max, fallback));
-}
+/** Points per kill, multiplied by the current multiplier. */
+const KILL_SCORE_BASE = 35;
 
 function normalizeTelemetryPayload(payload = null) {
     const source = payload && typeof payload === 'object' ? payload : {};
@@ -21,6 +19,7 @@ function normalizeTelemetryPayload(payload = null) {
         selfCollisions: Math.max(0, clampInteger(source.selfCollisions, 0, 9999, 0)),
         itemUses: Math.max(0, clampInteger(source.itemUses, 0, 9999, 0)),
         stuckEvents: Math.max(0, clampInteger(source.stuckEvents, 0, 9999, 0)),
+        kills: Math.max(0, clampInteger(source.kills, 0, 9999, 0)),
     };
 }
 
@@ -28,13 +27,15 @@ function createScoreBreakdown(source = null) {
     const input = source && typeof source === 'object' ? source : {};
     const base = Math.max(0, toSafeNumber(input.base, 0));
     const survival = Math.max(0, toSafeNumber(input.survival, 0));
+    const kills = Math.max(0, toSafeNumber(input.kills, 0));
     const cleanSector = Math.max(0, toSafeNumber(input.cleanSector, 0));
     const risk = Math.max(0, toSafeNumber(input.risk, 0));
     const penalty = Math.max(0, toSafeNumber(input.penalty, 0));
-    const total = Math.max(0, toSafeNumber(input.total, base + survival + cleanSector + risk - penalty));
+    const total = Math.max(0, toSafeNumber(input.total, base + survival + kills + cleanSector + risk - penalty));
     return {
         base,
         survival,
+        kills,
         cleanSector,
         risk,
         penalty,
@@ -86,19 +87,32 @@ export function applyArcadeComboDecay(scoreState = null, config = null, nowMs = 
     };
 }
 
-export function computeArcadeSectorScoreBreakdown(payload = null) {
+export function computeArcadeSectorScoreBreakdown(payload = null, { sectorTemplateId = '' } = {}) {
     const telemetry = normalizeTelemetryPayload(payload);
-    const base = 220;
-    const survival = Math.round(telemetry.duration * 12);
+
+    // 61.1.1 — Dynamic base score per sector template
+    const base = SECTOR_BASE_SCORES[sectorTemplateId] || SECTOR_BASE_SCORES.sector_intro;
+
+    // 61.1.3 — Non-linear survival scoring: exponential curve, last 10s are worth more
+    const dur = telemetry.duration;
+    const linearPart = dur * 10;
+    const lateBonusSec = Math.max(0, dur - Math.max(0, dur - 10));
+    const lateBonus = Math.round(lateBonusSec * lateBonusSec * 0.8);
+    const survival = Math.round(linearPart + lateBonus);
+
+    // 61.1.2 — Kill-based scoring
+    const kills = telemetry.kills * KILL_SCORE_BASE;
+
     const cleanSector = telemetry.selfCollisions === 0 ? 120 : 0;
     const risk = telemetry.itemUses === 0
         ? 90
         : Math.max(0, 60 - telemetry.itemUses * 12);
     const penalty = (telemetry.selfCollisions * 80) + (telemetry.stuckEvents * 60);
-    const total = Math.max(0, base + survival + cleanSector + risk - penalty);
+    const total = Math.max(0, base + survival + kills + cleanSector + risk - penalty);
     return {
         base,
         survival,
+        kills,
         cleanSector,
         risk,
         penalty,
@@ -124,12 +138,18 @@ export function applyArcadeSectorScore(runState, payload = null, { nowMs = Date.
     const decayedScore = applyArcadeComboDecay(sourceScore, runState.config, now);
     const nextCombo = Math.max(1, clampInteger(decayedScore.combo + 1, 1, 99_999, 1));
     const nextMultiplier = resolveMultiplierFromCombo(nextCombo, runState?.config?.maxMultiplier);
-    const breakdown = computeArcadeSectorScoreBreakdown(payload);
+
+    // Resolve sector template for dynamic base-score
+    const sectorSeq = Array.isArray(runState.encounterSequence) ? runState.encounterSequence : [];
+    const sectorEntry = sectorSeq[Math.max(0, completedSectors - 1)] || null;
+    const sectorTemplateId = String(sectorEntry?.templateId || '');
+    const breakdown = computeArcadeSectorScoreBreakdown(payload, { sectorTemplateId });
     const sectorPoints = Math.round(Math.max(0, breakdown.total) * nextMultiplier);
 
     const nextBreakdown = createScoreBreakdown({
         base: toSafeNumber(sourceScore?.breakdown?.base, 0) + breakdown.base,
         survival: toSafeNumber(sourceScore?.breakdown?.survival, 0) + breakdown.survival,
+        kills: toSafeNumber(sourceScore?.breakdown?.kills, 0) + breakdown.kills,
         cleanSector: toSafeNumber(sourceScore?.breakdown?.cleanSector, 0) + breakdown.cleanSector,
         risk: toSafeNumber(sourceScore?.breakdown?.risk, 0) + breakdown.risk,
         penalty: toSafeNumber(sourceScore?.breakdown?.penalty, 0) + breakdown.penalty,

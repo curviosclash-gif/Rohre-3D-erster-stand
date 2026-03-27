@@ -35,14 +35,7 @@ const BASE_SLOTS = Object.freeze([
     'core', 'nose', 'wing_left', 'wing_right', 'engine_left', 'engine_right',
 ]);
 
-function toSafeNumber(value, fallback = 0) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-function clampInt(value, min, max, fallback) {
-    return Math.floor(Math.max(min, Math.min(max, toSafeNumber(value, fallback))));
-}
+import { toSafeNumber, clampInteger as clampInt } from '../../shared/utils/ArcadeUtils.js';
 
 function toIsoString(nowMs) {
     return new Date(Math.max(0, toSafeNumber(nowMs, Date.now()))).toISOString();

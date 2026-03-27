@@ -43,6 +43,48 @@ export const MISSION_TYPES = Object.freeze({
         check: (progress) => progress.elapsed > 0 && progress.elapsed <= (progress.target || 30),
         format: (progress) => `${Math.floor(progress.elapsed || 0)}/${progress.target || 30}s`,
     }),
+    // 61.3.1 — New mission types
+    NO_DAMAGE: Object.freeze({
+        id: 'NO_DAMAGE',
+        label: 'No Damage',
+        icon: 'shield',
+        defaultParams: {},
+        check: (progress) => progress.hitCount === 0,
+        format: (progress) => (progress.hitCount || 0) === 0 ? 'Untouched' : `Hits: ${progress.hitCount}`,
+    }),
+    MULTI_KILL: Object.freeze({
+        id: 'MULTI_KILL',
+        label: 'Multi-Kill',
+        icon: 'burst',
+        defaultParams: { target: 3, windowSec: 15 },
+        check: (progress) => (progress.windowKills || 0) >= (progress.target || 3),
+        format: (progress) => `${Math.min(progress.windowKills || 0, progress.target || 3)}/${progress.target || 3} in ${progress.windowSec || 15}s`,
+    }),
+    TRAIL_MASTER: Object.freeze({
+        id: 'TRAIL_MASTER',
+        label: 'Trail Master',
+        icon: 'trail',
+        defaultParams: { target: 100 },
+        check: (progress) => (progress.metersSafe || 0) >= (progress.target || 100),
+        format: (progress) => `${Math.floor(progress.metersSafe || 0)}/${progress.target || 100}m`,
+    }),
+    // 61.3.2 — Additional new mission types
+    ITEM_CHAIN: Object.freeze({
+        id: 'ITEM_CHAIN',
+        label: 'Item Chain',
+        icon: 'chain',
+        defaultParams: { target: 3 },
+        check: (progress) => (progress.chain || 0) >= (progress.target || 3),
+        format: (progress) => `${Math.min(progress.chain || 0, progress.target || 3)}/${progress.target || 3} chain`,
+    }),
+    CLOSE_CALL: Object.freeze({
+        id: 'CLOSE_CALL',
+        label: 'Close Call',
+        icon: 'heartbeat',
+        defaultParams: { target: 3 },
+        check: (progress) => (progress.count || 0) >= (progress.target || 3),
+        format: (progress) => `${Math.min(progress.count || 0, progress.target || 3)}/${progress.target || 3} survived`,
+    }),
 });
 
 /**

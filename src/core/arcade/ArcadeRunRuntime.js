@@ -33,14 +33,11 @@ import {
 
 const ARCADE_PROFILE_STORAGE_KEY = 'cuviosclash.arcade-run-profile.v1';
 
+import { toSafeNumber } from '../../shared/utils/ArcadeUtils.js';
+
 function resolveLogger(logger) {
     if (logger && typeof logger.log === 'function') return logger;
     return console;
-}
-
-function toSafeNumber(value, fallback = 0) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function isPromiseLike(value) {
@@ -181,6 +178,10 @@ export class ArcadeRunRuntime {
             this._state.mapSequence = mapSequence;
             if (mapSequence.length > 0) {
                 this._state.currentMapKey = mapSequence[0];
+            }
+            // Store encounter sequence for dynamic sector scoring (V61.1)
+            if (Array.isArray(options.encounterPlan.sequence)) {
+                this._state.encounterSequence = options.encounterPlan.sequence;
             }
         }
 

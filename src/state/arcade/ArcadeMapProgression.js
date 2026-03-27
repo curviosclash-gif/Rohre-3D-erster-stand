@@ -9,26 +9,9 @@ export const SECTOR_MAP_POOLS = Object.freeze({
     sector_endurance: Object.freeze(['expert_gauntlet', 'portal_madness', 'crystal_ruins']),
 });
 
+import { createSeededRandom } from '../../shared/utils/ArcadeUtils.js';
+
 const DEFAULT_MAP = 'standard';
-
-function normalizeSeed(seed) {
-    const text = String(seed ?? 'arcade-map-default');
-    let hash = 2166136261 >>> 0;
-    for (let i = 0; i < text.length; i += 1) {
-        hash ^= text.charCodeAt(i);
-        hash = Math.imul(hash, 16777619) >>> 0;
-    }
-    return hash >>> 0;
-}
-
-function createSeededRandom(seed) {
-    let state = normalizeSeed(seed) || 1;
-    return () => {
-        state = Math.imul(1664525, state) + 1013904223;
-        state >>>= 0;
-        return state / 0x100000000;
-    };
-}
 
 function isValidMapKey(mapKey, mapCatalog) {
     return typeof mapKey === 'string' && mapKey in mapCatalog;

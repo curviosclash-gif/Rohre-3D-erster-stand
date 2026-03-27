@@ -22,22 +22,10 @@ export const ARCADE_RUN_PHASES = Object.freeze({
 
 const ARCADE_PHASE_SET = new Set(Object.values(ARCADE_RUN_PHASES));
 
+import { toSafeNumber, clampNumber, clampInteger } from '../../shared/utils/ArcadeUtils.js';
+
 function deepClone(value) {
     return JSON.parse(JSON.stringify(value));
-}
-
-function toSafeNumber(value, fallback = 0) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-}
-
-function clampNumber(value, min, max, fallback) {
-    const parsed = toSafeNumber(value, fallback);
-    return Math.max(min, Math.min(max, parsed));
-}
-
-function clampInteger(value, min, max, fallback) {
-    return Math.floor(clampNumber(value, min, max, fallback));
 }
 
 function normalizeText(value, fallback = '') {
@@ -53,13 +41,15 @@ function createEmptyBreakdown(source = null) {
     const input = source && typeof source === 'object' ? source : {};
     const base = Math.max(0, toSafeNumber(input.base, 0));
     const survival = Math.max(0, toSafeNumber(input.survival, 0));
+    const kills = Math.max(0, toSafeNumber(input.kills, 0));
     const cleanSector = Math.max(0, toSafeNumber(input.cleanSector, 0));
     const risk = Math.max(0, toSafeNumber(input.risk, 0));
     const penalty = Math.max(0, toSafeNumber(input.penalty, 0));
-    const total = Math.max(0, toSafeNumber(input.total, base + survival + cleanSector + risk - penalty));
+    const total = Math.max(0, toSafeNumber(input.total, base + survival + kills + cleanSector + risk - penalty));
     return {
         base,
         survival,
+        kills,
         cleanSector,
         risk,
         penalty,
