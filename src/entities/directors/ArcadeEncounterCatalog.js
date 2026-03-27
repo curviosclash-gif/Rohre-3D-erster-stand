@@ -152,17 +152,25 @@ export function buildArcadeSectorPlan(options = {}) {
 
         const mapKey = pickFromPool(template.mapPool || ['standard'], randomFn);
 
+        // 61.5.2: Final sector is a boss sector — elite_lance, double score multiplier
+        const isBoss = sectorIndex === sectorCount - 1;
+        const resolvedSquadId = isBoss ? 'elite_lance' : squadId;
+        const bossPressure = isBoss
+            ? Math.min(1.0, (ARCADE_SQUAD_PROFILES.elite_lance?.pressure || 0.85) * 1.2 * difficultyScale)
+            : pressure;
+
         sequence.push({
             sectorNumber,
             templateId: template.id,
-            squadId,
+            squadId: resolvedSquadId,
             objectiveId,
             modifierId,
-            // 61.4.2: pre-compute scoreBonus so ArcadeScoreOps doesn't need to import catalog
             scoreBonus: Number((modifierDef?.scoreBonus || 0).toFixed(3)),
             rewardChoices,
-            pressure: Number(pressure.toFixed(3)),
+            pressure: Number(bossPressure.toFixed(3)),
             mapKey,
+            isBoss,
+            bossMultiplier: isBoss ? 2 : 1,
         });
     }
 

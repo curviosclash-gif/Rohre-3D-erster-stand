@@ -70,3 +70,17 @@ export function createSeededRandom(seed, defaultText = 'arcade-default') {
         return state / 0x100000000;
     };
 }
+
+/**
+ * Compute a deterministic integer seed from a UTC calendar date.
+ * All players on the same calendar day get the same seed.
+ * @param {Date|string|null} [date=null] - Date to use (defaults to current UTC date)
+ * @returns {number} Positive integer seed (e.g., 20260327 for 2026-03-27)
+ */
+export function computeDailySeed(date = null) {
+    const d = date instanceof Date ? date : (date ? new Date(date) : new Date());
+    const year = d.getUTCFullYear();
+    const month = d.getUTCMonth() + 1;
+    const day = d.getUTCDate();
+    return year * 10000 + month * 100 + day;
+}

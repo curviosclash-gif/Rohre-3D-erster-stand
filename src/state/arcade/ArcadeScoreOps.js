@@ -185,7 +185,10 @@ export function applyArcadeSectorScore(runState, payload = null, { nowMs = Date.
 
     const now = Math.max(0, toSafeNumber(nowMs, Date.now()));
     const decayedScore = applyArcadeComboDecay(sourceScore, runState.config, now);
-    const nextCombo = Math.max(1, clampInteger(decayedScore.combo + 1, 1, 99_999, 1));
+    // 61.6.3: In SUDDEN_DEATH, combo increments by 2 per sector for faster multiplier growth
+    const isSuddenDeath = String(runState.phase || '') === ARCADE_RUN_PHASES.SUDDEN_DEATH;
+    const comboStep = isSuddenDeath ? 2 : 1;
+    const nextCombo = Math.max(1, clampInteger(decayedScore.combo + comboStep, 1, 99_999, 1));
     const nextMultiplier = resolveMultiplierFromCombo(nextCombo, runState?.config?.maxMultiplier);
 
     // Resolve sector template and modifier bonus (61.1.1, 61.4.2)
@@ -195,8 +198,10 @@ export function applyArcadeSectorScore(runState, payload = null, { nowMs = Date.
     const scoreBonus = Math.max(0, toSafeNumber(sectorEntry?.scoreBonus, 0));
     const breakdown = computeArcadeSectorScoreBreakdown(payload, { sectorTemplateId });
     // 61.4.2: apply modifier scoreBonus as a multiplier on top of the sector total
+    // 61.5.2: apply bossMultiplier for the final boss sector (doubles sector score)
     const bonusMultiplier = 1 + scoreBonus;
-    const sectorPoints = Math.round(Math.max(0, breakdown.total) * nextMultiplier * bonusMultiplier);
+    const bossMultiplier = Math.max(1, toSafeNumber(sectorEntry?.bossMultiplier, 1));
+    const sectorPoints = Math.round(Math.max(0, breakdown.total) * nextMultiplier * bonusMultiplier * bossMultiplier);
 
     const nextBreakdown = createScoreBreakdown({
         base: toSafeNumber(sourceScore?.breakdown?.base, 0) + breakdown.base,
@@ -207,6 +212,10 @@ export function applyArcadeSectorScore(runState, payload = null, { nowMs = Date.
         penalty: toSafeNumber(sourceScore?.breakdown?.penalty, 0) + breakdown.penalty,
         total: toSafeNumber(sourceScore?.breakdown?.total, 0) + sectorPoints,
     });
+
+    // 61.6.3: Track separate sudden death score for leaderboard
+    const prevSuddenDeathScore = Math.max(0, toSafeNumber(sourceScore.suddenDeathScore, 0));
+    const suddenDeathScore = isSuddenDeath ? prevSuddenDeathScore + sectorPoints : prevSuddenDeathScore;
 
     return {
         ...runState,
@@ -226,6 +235,7 @@ export function applyArcadeSectorScore(runState, payload = null, { nowMs = Date.
             lastComboAtMs: now,
             lastScoredSector: completedSectors,
             lastSectorPoints: sectorPoints,
+            suddenDeathScore,
             breakdown: nextBreakdown,
         },
         lastSectorSummary: {
@@ -255,6 +265,7 @@ export function buildArcadeRunSummary(runState, { endedAtMs = Date.now(), replay
         finishedAtIso: endedAtIso,
         replayId: String(replayId || ''),
         breakdown: createScoreBreakdown(safeScore.breakdown),
+        suddenDeathScore: Math.max(0, toSafeNumber(safeScore.suddenDeathScore, 0)),
     };
     return summary;
 }

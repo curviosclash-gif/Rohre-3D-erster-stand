@@ -72,6 +72,25 @@ function computeLevel(totalXp) {
     return level;
 }
 
+// ─── Mastery Perks (61.8.2) ───
+
+/**
+ * Returns passive perks earned at the given mastery level.
+ * Level 5: +5% score bonus, Level 10: combo decays 20% slower, Level 15: +10% XP bonus.
+ */
+export function getMasteryPerks(level) {
+    const lvl = Math.max(1, Math.floor(clampInt(level, 1, XP_CONFIG.MAX_LEVEL, 1)));
+    const perks = {
+        scoreBonusPct: 0,
+        comboDecaySlowPct: 0,
+        xpBonusPct: 0,
+    };
+    if (lvl >= 5) perks.scoreBonusPct = 5;
+    if (lvl >= 10) perks.comboDecaySlowPct = 20;
+    if (lvl >= 15) perks.xpBonusPct = 10;
+    return perks;
+}
+
 // ─── Slot Unlocks ───
 
 export function getUnlockedSlots(level) {
@@ -188,6 +207,7 @@ export default {
     XP_REWARD_TABLE,
     xpForLevel,
     xpToNextLevel,
+    getMasteryPerks,
     getUnlockedSlots,
     createArcadeVehicleProfile,
     addXp,

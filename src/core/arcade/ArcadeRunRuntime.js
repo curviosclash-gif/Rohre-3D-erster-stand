@@ -25,6 +25,7 @@ import {
     saveVehicleProfiles,
     getOrCreateProfile,
     addXp,
+    getMasteryPerks,
 } from '../../state/arcade/ArcadeVehicleProfile.js';
 import {
     assignSectorMissions,
@@ -34,7 +35,7 @@ import {
 
 const ARCADE_PROFILE_STORAGE_KEY = 'cuviosclash.arcade-run-profile.v1';
 
-import { toSafeNumber } from '../../shared/utils/ArcadeUtils.js';
+import { toSafeNumber, computeDailySeed } from '../../shared/utils/ArcadeUtils.js';
 
 function resolveLogger(logger) {
     if (logger && typeof logger.log === 'function') return logger;
@@ -161,7 +162,7 @@ export class ArcadeRunRuntime {
     /**
      * Apply an in-game action event: updates missions and increments combo.
      * Supported event types: 'kill', 'collect', 'clean_dodge'.
-     * 61.2.1 + 61.2.3
+     * 61.2.1 + 61.2.3 + 61.3.5
      */
     applyGameplayEvent(event) {
         if (!this._enabled || !this._state) return null;
@@ -173,11 +174,20 @@ export class ArcadeRunRuntime {
         this.updateMissions(eventWithTime);
 
         // 61.2.3: Freeze combo 3s on mission-all-complete (first time only)
+        // 61.3.5: Also award score boost when all sector missions completed
         const justCompleted = !wasAllCompleted && this._missionState?.allCompleted === true;
         if (justCompleted && this._state.score) {
+            const MISSION_ALL_COMPLETE_BONUS = 500;
+            const multiplier = Math.max(1, toSafeNumber(this._state.score?.multiplier, 1));
+            const bonus = Math.round(MISSION_ALL_COMPLETE_BONUS * multiplier);
             this._state = {
                 ...this._state,
                 comboFreezeUntilMs: nowMs + 3000,
+                score: {
+                    ...this._state.score,
+                    total: Math.max(0, toSafeNumber(this._state.score.total, 0) + bonus),
+                    lastMissionBonus: bonus,
+                },
             };
         }
 
@@ -197,12 +207,19 @@ export class ArcadeRunRuntime {
         if (!this._enabled) return null;
         const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
         const runId = this._nextRunId(nowMs);
+        // 61.10.1: Allow options.seed to override config seed (e.g., for daily challenge)
+        const runConfig = options.seed != null
+            ? { ...this._config, seed: toSafeNumber(options.seed, this._config.seed) }
+            : this._config;
         this._state = createArcadeRunState({
-            config: this._config,
+            config: runConfig,
             records: this._records,
             nowMs,
             runId,
         });
+        if (options.dailyChallenge) {
+            this._state.isDailyChallenge = true;
+        }
 
         // Load vehicle profiles
         const store = this.settingsManager?.store;
@@ -228,6 +245,15 @@ export class ArcadeRunRuntime {
 
         this._startReplayRecording(options);
         return this.getStateSnapshot();
+    }
+
+    /**
+     * Start a Daily Challenge run using today's UTC date as the seed.
+     * All players on the same calendar day get the same sector sequence. (61.10.1)
+     */
+    startDailyChallenge(options = {}) {
+        const seed = computeDailySeed(options.date || null);
+        return this.startRun({ ...options, dailyChallenge: true, seed });
     }
 
     beginNextSector() {
@@ -356,10 +382,13 @@ export class ArcadeRunRuntime {
             cleanSector: telemetryPayload?.cleanSector === true,
         };
 
-        const xpEarned = calculateSectorXp(telemetry);
+        let profile = getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
+        // 61.8.2: Apply mastery XP perk before awarding XP
+        const perks = getMasteryPerks(profile.level);
+        const baseXp = calculateSectorXp(telemetry);
+        const xpEarned = baseXp <= 0 ? 0 : Math.round(baseXp * (1 + perks.xpBonusPct / 100));
         if (xpEarned <= 0) return;
 
-        let profile = getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
         const result = addXp(profile, xpEarned);
         profile = result.profile;
         this._vehicleProfiles[this._activeVehicleId] = profile;

@@ -169,13 +169,8 @@ export function setArcadeRunPhase(state, nextPhase, nowMs = Date.now()) {
 export function beginArcadeSector(state, nowMs = Date.now()) {
     if (!state || typeof state !== 'object') return state;
     if (state.phase === ARCADE_RUN_PHASES.FINISHED) return state;
-    const nextSectorIndex = Math.max(
-        1,
-        Math.min(
-            state.config?.sectorCount || 1,
-            (Math.max(0, toSafeNumber(state.completedSectors, 0)) || 0) + 1
-        )
-    );
+    // 61.6.1: Allow sectorIndex to exceed sectorCount for SUDDEN_DEATH (endless mode)
+    const nextSectorIndex = Math.max(1, (Math.max(0, toSafeNumber(state.completedSectors, 0)) || 0) + 1);
     return {
         ...state,
         phase: resolveSectorPhase(state.config, nextSectorIndex),
@@ -188,19 +183,22 @@ export function completeArcadeSector(state, nowMs = Date.now()) {
     if (!state || typeof state !== 'object') return state;
     if (state.phase === ARCADE_RUN_PHASES.FINISHED) return state;
     const maxSectors = Math.max(1, toSafeNumber(state?.config?.sectorCount, 1));
-    const completedSectors = Math.min(
-        maxSectors,
-        Math.max(
+    const isSuddenDeath = state.phase === ARCADE_RUN_PHASES.SUDDEN_DEATH;
+    // 61.6.1: In SUDDEN_DEATH, completedSectors can exceed maxSectors (endless mode)
+    const completedSectors = isSuddenDeath
+        ? Math.max(0, Math.max(
+            clampInteger(state.completedSectors, 0, 99_999, 0),
+            clampInteger(state.sectorIndex, 0, 99_999, 0)
+        ))
+        : Math.min(maxSectors, Math.max(
             Math.max(0, clampInteger(state.completedSectors, 0, maxSectors, 0)),
             Math.max(0, clampInteger(state.sectorIndex, 0, maxSectors, 0))
-        )
-    );
-    const isFinished = completedSectors >= maxSectors;
+        ));
+    // 61.6.1: Always go to INTERMISSION — FINISHED is set by _finalizeRun when player dies/quits
     return {
         ...state,
         completedSectors,
-        phase: isFinished ? ARCADE_RUN_PHASES.FINISHED : ARCADE_RUN_PHASES.INTERMISSION,
-        finishedAtIso: isFinished ? toIsoString(nowMs) : state.finishedAtIso,
+        phase: ARCADE_RUN_PHASES.INTERMISSION,
         updatedAtIso: toIsoString(nowMs),
     };
 }
