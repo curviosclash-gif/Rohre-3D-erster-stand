@@ -1,5 +1,5 @@
 import { defineConfig } from 'vite';
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'node:child_process';
@@ -33,6 +33,8 @@ const VEHICLE_CONFIG_DIR = path.resolve(__dirname, EDITOR_DATA_PATHS.VEHICLES_DI
 const GENERATED_VEHICLE_CONFIGS_MODULE_PATH = path.resolve(__dirname, EDITOR_DATA_PATHS.GENERATED_VEHICLE_CONFIGS_MODULE);
 const VEHICLE_CONFIG_SUFFIX = '.vehicle.json';
 const DEFAULT_GENERATED_VEHICLE_HITBOX_RADIUS = 1.2;
+const OBJ_VEHICLE_ASSET_SOURCE_DIR = path.resolve(__dirname, 'assets', 'models', 'jets', 'cc0', 'spaceship_pack', 'dist', 'obj_mtl');
+const OBJ_VEHICLE_ASSET_OUTPUT_SEGMENTS = ['assets', 'models', 'jets', 'cc0', 'spaceship_pack', 'dist', 'obj_mtl'];
 
 function createJsonResponse(res, statusCode, payload) {
     res.statusCode = statusCode;
@@ -1079,8 +1081,26 @@ function trainingDashboardApiPlugin() {
     };
 }
 
+function copyObjVehicleAssetsPlugin() {
+    let resolvedOutDir = path.resolve(__dirname, 'dist');
+
+    return {
+        name: 'copy-obj-vehicle-assets',
+        apply: 'build',
+        configResolved(config) {
+            resolvedOutDir = path.resolve(config.root, config.build.outDir || 'dist');
+        },
+        writeBundle() {
+            if (!existsSync(OBJ_VEHICLE_ASSET_SOURCE_DIR)) return;
+            const targetDir = path.join(resolvedOutDir, ...OBJ_VEHICLE_ASSET_OUTPUT_SEGMENTS);
+            mkdirSync(path.dirname(targetDir), { recursive: true });
+            cpSync(OBJ_VEHICLE_ASSET_SOURCE_DIR, targetDir, { recursive: true, force: true });
+        },
+    };
+}
+
 export default defineConfig({
-    plugins: [editorDiskSaveApiPlugin(), latestCheckpointApiPlugin(), trainingDashboardApiPlugin()],
+    plugins: [editorDiskSaveApiPlugin(), latestCheckpointApiPlugin(), trainingDashboardApiPlugin(), copyObjVehicleAssetsPlugin()],
     server: {
         open: true,
     },

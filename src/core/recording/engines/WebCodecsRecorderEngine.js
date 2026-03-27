@@ -7,6 +7,18 @@ import {
 import { toPositiveInt } from '../MediaRecorderSystemOps.js';
 
 const Mp4Muxer = Mp4MuxerModule;
+const STOP_FLUSH_TIMEOUT_MS = 2000;
+const STOP_QUEUE_POLL_MS = 16;
+
+function wait(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function createFlushTimeoutError(timeoutMs, queueSize = 0) {
+    const error = new Error(`VideoEncoder.flush timed out after ${timeoutMs}ms (queue=${queueSize})`);
+    error.name = 'AbortError';
+    return error;
+}
 
 export class WebCodecsRecorderEngine {
     constructor(options = {}) {
@@ -145,6 +157,53 @@ export class WebCodecsRecorderEngine {
         };
     }
 
+    async _waitForEncodeQueueDrain(timeoutMs = STOP_FLUSH_TIMEOUT_MS) {
+        const encoder = this._videoEncoder;
+        if (!encoder) return 0;
+
+        const deadline = Date.now() + Math.max(0, timeoutMs);
+        let queueSize = Number(encoder.encodeQueueSize || 0);
+        while (queueSize > 0 && Date.now() < deadline) {
+            await wait(STOP_QUEUE_POLL_MS);
+            queueSize = Number(encoder.encodeQueueSize || 0);
+        }
+        return queueSize;
+    }
+
+    async _flushEncoderSafely(timeoutMs = STOP_FLUSH_TIMEOUT_MS) {
+        const encoder = this._videoEncoder;
+        if (!encoder) {
+            return { ok: true, timedOut: false, queueSize: 0 };
+        }
+
+        await this._waitForEncodeQueueDrain(Math.max(250, Math.floor(timeoutMs / 2)));
+        let timeoutHandle = null;
+        try {
+            return await Promise.race([
+                encoder.flush().then(() => ({
+                    ok: true,
+                    timedOut: false,
+                    queueSize: Number(encoder.encodeQueueSize || 0),
+                })),
+                new Promise((resolve) => {
+                    timeoutHandle = setTimeout(() => {
+                        const queueSize = Number(encoder.encodeQueueSize || 0);
+                        resolve({
+                            ok: false,
+                            timedOut: true,
+                            queueSize,
+                            error: createFlushTimeoutError(timeoutMs, queueSize),
+                        });
+                    }, timeoutMs);
+                }),
+            ]);
+        } finally {
+            if (timeoutHandle !== null) {
+                clearTimeout(timeoutHandle);
+            }
+        }
+    }
+
     encodeFrame(frameSource, { timestampUs = 0, keyFrame = false } = {}) {
         if (!this.isReady()) {
             return false;
@@ -173,19 +232,53 @@ export class WebCodecsRecorderEngine {
             return { ok: false, reason: 'muxer_missing' };
         }
         try {
+            let flushState = { ok: true, timedOut: false, queueSize: 0, error: null };
             if (this._videoEncoder) {
-                await this._videoEncoder.flush();
-                this._videoEncoder.close();
+                flushState = await this._flushEncoderSafely();
+                if (!flushState.ok && !flushState.timedOut) {
+                    throw flushState.error;
+                }
+                if (flushState.timedOut) {
+                    this.logger?.warn?.('[WebCodecsRecorderEngine] flush timed out, finalizing partial buffer', {
+                        timeoutMs: STOP_FLUSH_TIMEOUT_MS,
+                        queueSize: flushState.queueSize,
+                    });
+                    try {
+                        if (typeof this._videoEncoder.reset === 'function' && this._videoEncoder.state === 'configured') {
+                            this._videoEncoder.reset();
+                        }
+                    } catch {
+                        // Ignore timeout cleanup errors; partial muxer data is still usable.
+                    }
+                }
+                try {
+                    if (typeof this._videoEncoder.close === 'function' && this._videoEncoder.state !== 'closed') {
+                        this._videoEncoder.close();
+                    }
+                } catch {
+                    // Ignore close errors after timed-out flush/reset cleanup.
+                }
             }
             this._muxer.finalize();
             const buffer = this._muxer?.target?.buffer
                 || this._muxer?.target?.getBuffer?.()
                 || new ArrayBuffer(0);
+            const bufferSize = Number(buffer?.byteLength || 0);
+            if (flushState.timedOut && bufferSize <= 0) {
+                return {
+                    ok: false,
+                    reason: 'flush_timeout',
+                    error: flushState.error,
+                    bufferSize,
+                };
+            }
             return {
                 ok: true,
                 blob: new Blob([buffer], { type: DEFAULT_MIME_TYPE }),
                 mimeType: DEFAULT_MIME_TYPE,
-                bufferSize: Number(buffer?.byteLength || 0),
+                bufferSize,
+                partial: flushState.timedOut === true,
+                partialReason: flushState.timedOut ? 'flush_timeout' : null,
             };
         } catch (error) {
             this.logger?.warn?.('[WebCodecsRecorderEngine] stop failed', error);

@@ -2202,6 +2202,49 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(probeState.recording).toBeFalsy();
     });
 
+    test('T20l2: Cinematic-Aufnahme meldet WebCodecs-Starts als MP4', async ({ page }) => {
+        await page.goto('/', { waitUntil: 'commit' });
+        await page.waitForFunction(() => !!window.GAME_INSTANCE, null, { timeout: 30000 });
+        const result = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            const messages = [];
+            const originalShowStatusToast = game._showStatusToast;
+            const originalRender = game.render;
+            const originalSetRecordingCaptureSettings = game.renderer?.setRecordingCaptureSettings;
+            const recorder = {
+                setRecordingCaptureSettings() { },
+                async startRecording() {
+                    return {
+                        started: true,
+                        recorderEngine: 'webcodecs-native',
+                    };
+                },
+            };
+
+            game._showStatusToast = (message) => messages.push(String(message || ''));
+            game.render = () => { };
+            if (game.renderer) {
+                game.renderer.setRecordingCaptureSettings = () => { };
+            }
+
+            try {
+                await game._startCinematicRecording(recorder);
+                return {
+                    message: messages[messages.length - 1] || '',
+                };
+            } finally {
+                game._showStatusToast = originalShowStatusToast;
+                game.render = originalRender;
+                if (game.renderer && originalSetRecordingCaptureSettings) {
+                    game.renderer.setRecordingCaptureSettings = originalSetRecordingCaptureSettings;
+                }
+            }
+        });
+
+        expect(result.message).toContain('MP4');
+        expect(result.message).not.toContain('WebM');
+    });
+
     test('T20m: Recording-AutoDownload ist aktiv und nutzt Videos-Ordnername', async ({ page }) => {
         await loadGame(page);
         const recorderState = await page.evaluate(() => {
@@ -3921,6 +3964,71 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.mirroredTrack).toBeTruthy();
         expect(result.requestFrameSupported).toBeTruthy();
         expect(result.stopped).toBeTruthy();
+    });
+
+    test('T20aj5: WebCodecs-Stop finalisiert Partial-Buffer wenn flush haengt', async ({ page }) => {
+        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        const result = await page.evaluate(async () => {
+            const { WebCodecsRecorderEngine } = await import('/src/core/recording/engines/WebCodecsRecorderEngine.js');
+            const engine = new WebCodecsRecorderEngine({ globalScope: {} });
+            let resetCalls = 0;
+            let closeCalls = 0;
+            let finalizeCalls = 0;
+
+            engine._muxer = {
+                finalize() {
+                    finalizeCalls += 1;
+                },
+                target: {
+                    buffer: new ArrayBuffer(8),
+                },
+            };
+            engine._videoEncoder = {
+                state: 'configured',
+                encodeQueueSize: 9,
+                flush() {
+                    return new Promise(() => { });
+                },
+                reset() {
+                    resetCalls += 1;
+                    this.state = 'unconfigured';
+                },
+                close() {
+                    closeCalls += 1;
+                    this.state = 'closed';
+                },
+            };
+
+            const startedAt = performance.now();
+            const stopResult = await engine.stop();
+            const elapsedMs = performance.now() - startedAt;
+
+            return {
+                elapsedMs,
+                resetCalls,
+                closeCalls,
+                finalizeCalls,
+                stopResult: {
+                    ok: !!stopResult?.ok,
+                    mimeType: stopResult?.mimeType || null,
+                    bufferSize: Number(stopResult?.bufferSize || 0),
+                    blobSize: stopResult?.blob instanceof Blob ? stopResult.blob.size : 0,
+                    partial: stopResult?.partial === true,
+                    partialReason: stopResult?.partialReason || null,
+                },
+            };
+        });
+
+        expect(result.elapsedMs).toBeLessThan(5000);
+        expect(result.resetCalls).toBe(1);
+        expect(result.finalizeCalls).toBe(1);
+        expect(result.closeCalls).toBeLessThanOrEqual(1);
+        expect(result.stopResult.ok).toBeTruthy();
+        expect(result.stopResult.mimeType).toBe('video/mp4');
+        expect(result.stopResult.bufferSize).toBe(8);
+        expect(result.stopResult.blobSize).toBe(8);
+        expect(result.stopResult.partial).toBeTruthy();
+        expect(result.stopResult.partialReason).toBe('flush_timeout');
     });
 
     test('T20ak: Recorder normalisiert Export-Zeitstempel bei fehlerhafter Stop-Reihenfolge', async ({ page }) => {

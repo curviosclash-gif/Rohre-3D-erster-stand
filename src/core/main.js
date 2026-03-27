@@ -24,6 +24,7 @@ import { RuntimePerfProfiler } from './perf/RuntimePerfProfiler.js';
 import { initializeGameApp } from './AppInitializer.js';
 import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './PlaytestLaunchParams.js';
 import { RECORDING_CAPTURE_PROFILE, RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
+import { RECORDER_ENGINE } from './recording/MediaRecorderSupport.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -325,7 +326,7 @@ export class Game {
         const result = await recorder.startRecording({ type: 'cinematic_manual_start' });
         if (result?.started) {
             const engine = result?.recorderEngine || 'unknown';
-            const format = engine === 'native-webcodecs' ? 'MP4' : 'WebM';
+            const format = engine === RECORDER_ENGINE.NATIVE_WEBCODECS ? 'MP4' : 'WebM';
             this._showStatusToast(`Cinematic-Aufnahme: gestartet als ${format} (F9 zum Stoppen)`, 1800, 'success');
         } else {
             this._showStatusToast(`Cinematic-Aufnahme: Start fehlgeschlagen (${result?.reason || 'unknown'})`, 2500, 'error');

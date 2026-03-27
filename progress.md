@@ -1528,3 +1528,22 @@ Offene TODOs naechster Schritt:
 - Zusatzvalidierung ueber `tmp.playwright.local.config.mjs` bestaetigt denselben Loader-Blocker: `page.goto(..., waitUntil: domcontentloaded)` timeout bereits in `loadGame`.
 - Build-Gate erneut geprueft: `npm run build` scheitert weiter an bestehenden `max-lines`-Verstoessen in fremd-geaenderten Dateien (`src/core/MediaRecorderSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js`).
 - Fuer den umgesetzten Scope wurden stattdessen lokale Assertions + gezieltes ESLint auf den geaenderten Dateien erfolgreich ausgefuehrt.
+2026-03-27 (Desktop-App Diagnose: Cinematic/Flugzeugauswahl)
+- Skill `develop-web-game` fuer reproduzierbare Browser-/Runtime-Diagnose verwendet.
+- Nutzerfehler reproduziert und getrennt:
+  - Cinematic-Aufnahme (`F9`) konnte starten, hing aber beim Stoppen im WebCodecs-Pfad (`VideoEncoder.flush`) und hinterliess kein Export-Meta.
+  - Desktop-App-Build lieferte OBJ-Jet-Assets (`ship5`/`ship8` usw.) nicht nach `dist/assets/models/...`, obwohl diese Default-/Auswahl-Flugzeuge sind.
+- Umgesetzte Fixes:
+  - `src/core/recording/engines/WebCodecsRecorderEngine.js`: Stop-Pfad gegen haengendes `flush()` abgesichert; bei Timeout wird ein Partial-Buffer finalisiert statt den Promise offen zu lassen.
+  - `src/core/main.js`: Toast-Format fuer WebCodecs korrigiert (`webcodecs-native` => MP4 statt WebM).
+  - `vite.config.js`: Build-Plugin kopiert OBJ/MTL-Jet-Assets in den Desktop-Build.
+  - `tests/core.spec.js`: neue Regressionen fuer MP4-Toast und haengenden WebCodecs-Flush.
+- Verifikation:
+  - `npm run build:app` PASS; `dist/assets/models/jets/cc0/spaceship_pack/dist/obj_mtl/*.obj|*.mtl` vorhanden.
+  - Browser-Runtime-Check PASS: isolierter `MediaRecorderSystem` startet/stoppt wieder und liefert `video/mp4` + Export-Meta statt Timeout.
+  - Browser-Runtime-Check PASS: `_startCinematicRecording()` meldet jetzt `MP4`.
+  - `npm run plan:check` PASS.
+  - `npm run docs:sync` PASS.
+  - `npm run docs:check` PASS.
+- Resthinweis:
+  - `ObservationBridgePolicy` versucht lokal weiter `/api/bot/latest-checkpoint`; im Desktop-Static-Server fuehrt das zu 404-Noise, war aber nicht Ursache der gemeldeten Bugs.
