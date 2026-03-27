@@ -57,7 +57,6 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 | Pfadmuster | Block / Stream | Status | Hinweis |
 | --- | --- | --- | --- |
-| `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js` | V62 | in Bearbeitung | Code fertig, visuelles Gate 62.99.3 wird abgeschlossen |
 | `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/base/PersistentStore.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `src/ui/menu/MenuPresetStore.js`, `src/ui/menu/MenuTelemetryStore.js`, `src/ui/menu/MenuTextOverrideStore.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/ProfileLifecycleController.js`, `src/core/runtime/menu-handlers/ProfileMenuEventHandlers.js` | V58 | in Bearbeitung | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz, Facade-Cleanup |
 | `src/modes/ArcadeModeStrategy.js`, `src/core/arcade/ArcadeRunRuntime.js`, `src/state/arcade/ArcadeRunState.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeMissionState.js`, `src/shared/contracts/ArcadeMissionContract.js`, `src/ui/arcade/ArcadeMissionHUD.js` (Score-HUD-Erweiterung), `src/ui/arcade/ArcadeMenuSurface.js` (Post-Run, Daily), `src/entities/directors/ArcadeEncounterCatalog.js`, `src/entities/directors/ArcadeEncounterDirector.js`, `src/state/arcade/ArcadeRoundStateController.js`, `src/shared/utils/ArcadeUtils.js` (neu) | V61 | offen | Arcade-Modus Gameplay-Verbesserungen: Score, Combo, Missionen, Modifiers, Sudden Death, HUD |
 | `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | offen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
@@ -79,7 +78,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
 | - | V60 | - | frei | blockiert auf V58.99 |
 | Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
-| Bot-Codex | V62 | 2026-03-27 | claimed | 62.99.3 visueller Smoke-Test abschliessen |
+| Bot-Codex | V62 | 2026-03-27 | closed | 62.99.3 abgeschlossen; DoD.2 bleibt offen wegen `npm run test:core` -> T7 Timeout |
 | Bot-Codex | V63 | 2026-03-27 | claimed | 63.1.1/63.1.2 abgeschlossen |
 | - | V64 | - | frei | - |
 | - | V65 | - | frei | blockiert auf V62 |
@@ -109,7 +108,7 @@ Folgende Bloecke haben keine ueberlappenden Dateien und koennen parallel bearbei
 | C | **V61** | Arcade Gameplay, keine Ueberlappung mit A/B |
 | D | **V63** | Fight-Modus, eigene Dateien |
 | E | **V64** | Desktop/Electron, komplett isoliert |
-| F | **V62** (Gate) + **V65** | Camera Gate schliessen, dann MP4-Modularisierung |
+| F | **V62** (Rest-DoD.2) + **V65** | visueller Kamera-Smoke ist erledigt, finaler Block-Abschluss haengt noch an `test:core` |
 
 Empfehlung: 4 Agents parallel auf Spuren B + C + D + E. Spur A und F nach Gate-Abschluss.
 
@@ -498,7 +497,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | T1 | Dummy-Tests durch echte ersetzen | - | hoch | mittel | P1 | Testkatalog priorisieren | Offen |
 | V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | 58.2.4 DownloadService aus MediaRecorderSystem extrahieren | In Bearbeitung |
 | V59 | Code-Qualitaet & Netzwerk-Haertung | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 59.1.6 Signaling-Fehlerpfade fail-fast schliessen | Pausiert |
-| V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | 62.99.1 build/test Gate (Logger-Fix erledigt) | Pausiert |
+| V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | 62.99.3 visuell verifiziert; `test:core` T7 blockiert DoD.2 | Pausiert |
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.1 Architektur-Guard wieder voll belastbar machen | Offen |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | 61.1.1 Score-System dynamisieren | Offen |
 | V63 | Fight-Modus Follow-up - Runtime-Config, Trail-Targeting, HUD | `docs/Feature_Fight_Modus_Followup_V63.md` | hoch | mittel | P1 | 63.2.1 optimizedTrailScan Guarded Rollout | In Bearbeitung |
@@ -1006,7 +1005,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-27 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V59.5 (Camera Polish) -->
 
 Scope:
@@ -1021,8 +1020,8 @@ Scope:
 
 - [ ] DoD.1 Alle Phasen 62.1 bis 62.2 und 62.99 sind abgeschlossen und mit Evidence dokumentiert.
 - [ ] DoD.2 `npm run build`, `npm run test:core` sind PASS.
-- [ ] DoD.3 Kamera-Verhalten visuell verifiziert: Boost-Uebergang smooth, Sway bei Stillstand reduziert.
-- [ ] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS.
+- [x] DoD.3 Kamera-Verhalten visuell verifiziert: Boost-Uebergang smooth, Sway bei Stillstand reduziert. (abgeschlossen: 2026-03-27; evidence: custom Playwright smoke -> `test-results/v62-visual/camera-numeric-probe.json`, `test-results/v62-visual/idle-third-person.jpg`, `test-results/v62-visual/boost-transition-third-person.jpg`, `test-results/v62-visual/cockpit-third-person.jpg`)
+- [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS. (abgeschlossen: 2026-03-27; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS)
 
 ### 62.1 Boost-Blend und Speed-Sway
 
@@ -1047,9 +1046,9 @@ Scope:
 
 ### Phase 62.99: Integrations- und Abschluss-Gate
 
-- [x] 62.99.1 `npm run build`, `npm run test:core` sind gruen. (abgeschlossen: 2026-03-27; evidence: build PASS (42.23s); test:core durch Playwright-Suite-Lock blockiert â€” build + architecture:guard bestaetigen Code-Integritaet)
-- [x] 62.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert. (abgeschlossen: 2026-03-26; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS)
-- [ ] 62.99.3 Visueller Smoke-Test: Boost-Uebergang smooth, Sway bei Stillstand minimal, Kamera-Verhalten bei Cockpit-Modus unveraendert.
+- [ ] 62.99.1 `npm run build`, `npm run test:core` sind gruen. (Stand: 2026-03-27; evidence: `npm run build` PASS; `npm run test:core` FAIL bei `T7: Spiel startet – HUD sichtbar` -> `test-results/v62-final-core`)
+- [x] 62.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert. (abgeschlossen: 2026-03-27; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS)
+- [x] 62.99.3 Visueller Smoke-Test: Boost-Uebergang smooth, Sway bei Stillstand minimal, Kamera-Verhalten bei Cockpit-Modus unveraendert. (abgeschlossen: 2026-03-27; evidence: custom Playwright smoke -> `test-results/v62-visual/camera-visual-summary.json`, `test-results/v62-visual/camera-numeric-probe.json`, `test-results/v62-visual/idle-third-person.jpg`, `test-results/v62-visual/boost-transition-third-person.jpg`, `test-results/v62-visual/cockpit-third-person.jpg`)
 
 ### Risiko-Register V62
 
