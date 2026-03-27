@@ -4,7 +4,7 @@ const DEFAULT_ARCADE_RUN_CONFIG = Object.freeze({
     runType: 'gauntlet',
     seed: 0,
     scoreModel: 'arcade-score.v1',
-    sectorCount: 5,
+    sectorCount: 8,
     intermissionSeconds: 3,
     comboWindowMs: 5000,
     comboDecayPerSecond: 1,

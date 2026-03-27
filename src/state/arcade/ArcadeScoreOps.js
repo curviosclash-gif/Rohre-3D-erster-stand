@@ -12,6 +12,13 @@ const SECTOR_BASE_SCORES = Object.freeze({
 /** Points per kill, multiplied by the current multiplier. */
 const KILL_SCORE_BASE = 35;
 
+/** Fractional combo increments per in-game action (61.2.1). */
+const COMBO_ACTION_INCREMENTS = Object.freeze({
+    kill: 1,
+    collect: 0.5,
+    clean_dodge: 0.3,
+});
+
 function normalizeTelemetryPayload(payload = null) {
     const source = payload && typeof payload === 'object' ? payload : {};
     return {
@@ -77,13 +84,55 @@ export function applyArcadeComboDecay(scoreState = null, config = null, nowMs = 
         };
     }
 
+    // 61.2.2 — Accelerating decay: slow first 2s, fast after 3s
     const decaySeconds = (elapsedMs - comboWindowMs) / 1000;
-    const decayAmount = Math.max(0, Math.floor(decaySeconds * comboDecayPerSecond));
-    const decayedCombo = Math.max(0, currentCombo - decayAmount);
+    let decayAmount;
+    if (decaySeconds <= 2) {
+        decayAmount = Math.floor(decaySeconds * comboDecayPerSecond * 0.5);
+    } else if (decaySeconds <= 3) {
+        const slowPart = Math.floor(2 * comboDecayPerSecond * 0.5);
+        const fastPart = Math.floor((decaySeconds - 2) * comboDecayPerSecond * 2.5);
+        decayAmount = slowPart + fastPart;
+    } else {
+        const slowPart = Math.floor(2 * comboDecayPerSecond * 0.5);
+        const midPart = Math.floor(1 * comboDecayPerSecond * 2.5);
+        const superFastPart = Math.floor((decaySeconds - 3) * comboDecayPerSecond * 2.5);
+        decayAmount = slowPart + midPart + superFastPart;
+    }
+    const decayedCombo = Math.max(0, currentCombo - Math.max(0, decayAmount));
     return {
         ...sourceScore,
         combo: decayedCombo,
         multiplier: resolveMultiplierFromCombo(decayedCombo, maxMultiplier),
+    };
+}
+
+/**
+ * Increment combo based on an in-game action (kill, collect, clean_dodge).
+ * Uses fractional accumulation — partial increments add up over time.
+ * 61.2.1
+ */
+export function applyComboAction(scoreState = null, event = null, config = null) {
+    const sourceScore = scoreState && typeof scoreState === 'object' ? scoreState : {};
+    const sourceConfig = config && typeof config === 'object' ? config : {};
+    const eventType = typeof event?.type === 'string' ? event.type : '';
+    const increment = COMBO_ACTION_INCREMENTS[eventType] ?? 0;
+    if (increment <= 0) return sourceScore;
+
+    const maxMultiplier = Math.max(1, clampInteger(sourceConfig.maxMultiplier, 1, 99, 8));
+    const currentCombo = Math.max(0, clampInteger(sourceScore.combo, 0, 99_999, 0));
+    const currentAccum = Math.max(0, toSafeNumber(sourceScore.comboAccum, 0));
+    const newAccum = currentAccum + increment;
+    const comboGain = Math.floor(newAccum);
+    const nextCombo = Math.min(99_999, currentCombo + comboGain);
+    const nowMs = Math.max(0, toSafeNumber(event?.nowMs, Date.now()));
+
+    return {
+        ...sourceScore,
+        combo: nextCombo,
+        comboAccum: newAccum - comboGain,
+        multiplier: resolveMultiplierFromCombo(nextCombo, maxMultiplier),
+        lastComboAtMs: nowMs,
     };
 }
 
@@ -139,12 +188,15 @@ export function applyArcadeSectorScore(runState, payload = null, { nowMs = Date.
     const nextCombo = Math.max(1, clampInteger(decayedScore.combo + 1, 1, 99_999, 1));
     const nextMultiplier = resolveMultiplierFromCombo(nextCombo, runState?.config?.maxMultiplier);
 
-    // Resolve sector template for dynamic base-score
+    // Resolve sector template and modifier bonus (61.1.1, 61.4.2)
     const sectorSeq = Array.isArray(runState.encounterSequence) ? runState.encounterSequence : [];
     const sectorEntry = sectorSeq[Math.max(0, completedSectors - 1)] || null;
     const sectorTemplateId = String(sectorEntry?.templateId || '');
+    const scoreBonus = Math.max(0, toSafeNumber(sectorEntry?.scoreBonus, 0));
     const breakdown = computeArcadeSectorScoreBreakdown(payload, { sectorTemplateId });
-    const sectorPoints = Math.round(Math.max(0, breakdown.total) * nextMultiplier);
+    // 61.4.2: apply modifier scoreBonus as a multiplier on top of the sector total
+    const bonusMultiplier = 1 + scoreBonus;
+    const sectorPoints = Math.round(Math.max(0, breakdown.total) * nextMultiplier * bonusMultiplier);
 
     const nextBreakdown = createScoreBreakdown({
         base: toSafeNumber(sourceScore?.breakdown?.base, 0) + breakdown.base,

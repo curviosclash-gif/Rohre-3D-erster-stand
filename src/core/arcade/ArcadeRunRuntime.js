@@ -9,6 +9,7 @@ import {
 } from '../../state/arcade/ArcadeRunState.js';
 import {
     applyArcadeSectorScore,
+    applyComboAction,
     buildArcadeRunSummary,
     mergeArcadeRunRecords,
 } from '../../state/arcade/ArcadeScoreOps.js';
@@ -155,6 +156,41 @@ export class ArcadeRunRuntime {
         if (this._state) {
             this._state.missions = this._missionState;
         }
+    }
+
+    /**
+     * Apply an in-game action event: updates missions and increments combo.
+     * Supported event types: 'kill', 'collect', 'clean_dodge'.
+     * 61.2.1 + 61.2.3
+     */
+    applyGameplayEvent(event) {
+        if (!this._enabled || !this._state) return null;
+        const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
+        const eventWithTime = { ...event, nowMs };
+
+        // Update missions first so allCompleted flag reflects current action
+        const wasAllCompleted = this._missionState?.allCompleted === true;
+        this.updateMissions(eventWithTime);
+
+        // 61.2.3: Freeze combo 3s on mission-all-complete (first time only)
+        const justCompleted = !wasAllCompleted && this._missionState?.allCompleted === true;
+        if (justCompleted && this._state.score) {
+            this._state = {
+                ...this._state,
+                comboFreezeUntilMs: nowMs + 3000,
+            };
+        }
+
+        // Apply combo increment (skip if frozen)
+        const frozenUntil = toSafeNumber(this._state.comboFreezeUntilMs, 0);
+        if (frozenUntil <= 0 || nowMs > frozenUntil) {
+            const newScore = applyComboAction(this._state.score, eventWithTime, this._state.config);
+            if (newScore !== this._state.score) {
+                this._state = { ...this._state, score: newScore };
+            }
+        }
+
+        return this.getStateSnapshot();
     }
 
     startRun(options = {}) {

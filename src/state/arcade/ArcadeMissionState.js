@@ -180,7 +180,43 @@ export function assignSectorMissions(sectorTemplate, mapMissions, seed, sectorNu
         }
     }
 
+    // 61.3.4: Optional bonus mission in non-intro sectors (50% chance, harder params)
+    const templateId = String(sectorTemplate?.id || sectorTemplate || 'sector_intro');
+    if (templateId !== 'sector_intro' && randomFn() < 0.5) {
+        const bonusPool = buildBonusMissionPool(templateId, usedTypes);
+        if (bonusPool.length > 0) {
+            const bonusEntry = bonusPool[Math.floor(randomFn() * bonusPool.length)];
+            const bonusInstance = createMissionInstance(bonusEntry.type, bonusEntry.params);
+            if (bonusInstance) {
+                bonusInstance.bonus = true;
+                missions.push(bonusInstance);
+            }
+        }
+    }
+
     return missions;
+}
+
+function buildBonusMissionPool(templateId, usedTypes = new Set()) {
+    const allBonus = {
+        sector_pressure: [
+            { type: 'MULTI_KILL', params: { target: 4, windowSec: 12 } },
+            { type: 'NO_DAMAGE', params: {} },
+            { type: 'TRAIL_MASTER', params: { target: 120 } },
+        ],
+        sector_hazard: [
+            { type: 'MULTI_KILL', params: { target: 5, windowSec: 10 } },
+            { type: 'KILL_COUNT', params: { target: 10 } },
+            { type: 'TRAIL_MASTER', params: { target: 200 } },
+        ],
+        sector_endurance: [
+            { type: 'MULTI_KILL', params: { target: 6, windowSec: 10 } },
+            { type: 'KILL_COUNT', params: { target: 15 } },
+            { type: 'CLOSE_CALL', params: { target: 4 } },
+        ],
+    };
+    const pool = allBonus[templateId] || allBonus.sector_pressure;
+    return pool.filter((entry) => !usedTypes.has(entry.type));
 }
 
 function buildGenericMissionPool(templateId) {

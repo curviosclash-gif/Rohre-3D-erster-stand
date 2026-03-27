@@ -158,6 +158,8 @@ export function buildArcadeSectorPlan(options = {}) {
             squadId,
             objectiveId,
             modifierId,
+            // 61.4.2: pre-compute scoreBonus so ArcadeScoreOps doesn't need to import catalog
+            scoreBonus: Number((modifierDef?.scoreBonus || 0).toFixed(3)),
             rewardChoices,
             pressure: Number(pressure.toFixed(3)),
             mapKey,
