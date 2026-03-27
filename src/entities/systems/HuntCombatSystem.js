@@ -127,7 +127,6 @@ export class HuntCombatSystem {
             trailHitRadius: Number(config?.HUNT?.MG?.TRAIL_HIT_RADIUS),
             trailSelfSkipRecent: Number(config?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
             allowSelfTrailFallback: false,
-            optimizedTrailScan: false,
             runtimeProfiler: runtime?.services?.runtimeProfiler || runtime?.runtimeProfiler || null,
             targetingTelemetry: this._targetingTelemetry,
             scratch: this._targetingScratch,

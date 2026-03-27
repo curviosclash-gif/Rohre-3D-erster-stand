@@ -90,7 +90,6 @@ export class ProjectileSimulationOps {
                 trailHitRadius,
                 trailSelfSkipRecent: Number(config?.HUNT?.MG?.TRAIL_SELF_SKIP_RECENT),
                 allowSelfTrailFallback: true,
-                optimizedTrailScan: false,
                 runtimeProfiler: this.system?.runtimeProfiler || null,
                 targetingTelemetry: this._targetingTelemetry,
                 scratch: this._targetingScratch,

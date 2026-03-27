@@ -23,6 +23,7 @@ export class TrailCollisionQuery {
             entry: null,
             closestPoint: { closestX: 0, closestY: 0, closestZ: 0 },
             cellKey: 0,
+            _bestDistSq: Infinity,
         };
         this._tmpClosestPoint = new THREE.Vector3();
         this._tmpClosestPointData = { closestX: 0, closestY: 0, closestZ: 0 };
@@ -107,6 +108,7 @@ export class TrailCollisionQuery {
         const queryStamp = this._nextProjectileQueryStamp();
         const result = this._projectileTrailCollisionResult;
         result.entry = null;
+        result._bestDistSq = Infinity;
 
         for (let i = 0; i < CELL_OFFSETS_3X3.length; i++) {
             const [dx, dz] = CELL_OFFSETS_3X3[i];
@@ -132,16 +134,22 @@ export class TrailCollisionQuery {
 
                     if (!this._segmentIntersectsSphere(seg, position, radius, this._tmpClosestPointData)) continue;
 
-                    result.entry = seg;
-                    result.closestPoint.closestX = this._tmpClosestPointData.closestX;
-                    result.closestPoint.closestY = this._tmpClosestPointData.closestY;
-                    result.closestPoint.closestZ = this._tmpClosestPointData.closestZ;
-                    result.cellKey = key;
-                    return result;
+                    const hdx = position.x - this._tmpClosestPointData.closestX;
+                    const hdy = position.y - this._tmpClosestPointData.closestY;
+                    const hdz = position.z - this._tmpClosestPointData.closestZ;
+                    const hitDistSq = hdx * hdx + hdy * hdy + hdz * hdz;
+                    if (hitDistSq < result._bestDistSq) {
+                        result._bestDistSq = hitDistSq;
+                        result.entry = seg;
+                        result.closestPoint.closestX = this._tmpClosestPointData.closestX;
+                        result.closestPoint.closestY = this._tmpClosestPointData.closestY;
+                        result.closestPoint.closestZ = this._tmpClosestPointData.closestZ;
+                        result.cellKey = key;
+                    }
                 }
             }
 
-        return null;
+        return result.entry ? result : null;
     }
 
     checkGlobalCollision(position, radius, excludePlayerIndex = -1, skipRecent = 0, playerRef = null) {
