@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-03-25
+Stand: 2026-03-28
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -40,7 +40,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | BT11 | BT10 Baseline-Laufdaten | soft | ja | Folgefenster fuer 10h-Operatorlauf |
 | BT12 | BT11 Abschlussartefakte | soft | ja | weiteres 10h-Folgefenster fuer Bot-Stabilisierung |
 | BT15 | BT10 Baseline-Laufdaten | soft | ja | Zukunftsplanung nutzt aktuelle Lauf-KPIs |
-| BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | teilweise | BT10 in Arbeit, BT15 aktiv |
+| BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | ja | BT10-Baseline vorhanden; BT15 Zielkorridor in 15.1/15.2.1 dokumentiert |
 | BT30 | 20.99 | hard | nein | startet erst nach Survival-Policy-Phase |
 | BT40 | 30.99 | hard | nein | Eval/Gate-Haertung nach Curriculum/Hyperparameter |
 
@@ -63,7 +63,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | Bot-Codex | BT11 | 2026-03-23 | frei | 2026-03-24 (abgeschlossen) |
 | Bot-Codex | BT12 | 2026-03-25 | active | 2026-03-25 |
 | Train-Ops | BT15 | 2026-03-22 | active | 2026-03-24 |
-| Bot-A | BT20 | 2026-03-22 | frei | - |
+| Bot-Codex | BT20 | 2026-03-28 | active | 2026-03-28 |
 | Bot-B | BT30 | 2026-03-22 | frei | - |
 | Bot-C | BT40 | 2026-03-22 | frei | - |
 
@@ -276,9 +276,9 @@ Plan-Datei: `docs/Bot_Trainings_Roadmap.md`
 
 ## Block BT20: Survival-Policy und Reward-Shaping
 
-Plan-Datei: `docs/Bot_Trainingsplan.md`
+Plan-Datei: `docs/Bot_Survival_Training_Plan_BT20.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-27 -->
 
 ### Definition of Done (DoD)
 
@@ -296,6 +296,13 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 
 - [ ] 20.2.1 Schrittweises Survival-Reward und klare Death-Penalty kalibrieren
 - [ ] 20.2.2 Risk-Proximity-Penalties (Wall/Trail/Opponent) einfuehren und testen
+
+### Checkpoint-Log BT20 (laufend)
+
+| Datum | Typ | SeriesStamp | Resume-Quelle | Zielbild | Evidence |
+| --- | --- | --- | --- | --- | --- |
+| 2026-03-27 | Plan erstellt | `pending` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | Survival-First Resume-Fenster mit 4-Mode-Matrix vorbereiten | `docs/Bot_Survival_Training_Plan_BT20.md` |
+| 2026-03-28 | 10h-Laufstart | `BT20_SURV_20260328T000841` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | 10h-Operatorlauf aktiv; Resume ueber Startup-Checkpoint bestaetigt (`checkpointLoads=1`, `optimizerSteps=1588329`) | `output/training/BT20_SURV_20260328T000841-10h.log`, `data/training/runs/BT20_SURV_20260328T000841-r01/run.json`, `data/training/runs/BT20_SURV_20260328T000841-r01/trainer.json`, `data/training/runs/latest.json` |
 
 ### 20.99 Abschluss-Gate
 
