@@ -86,6 +86,7 @@ import {
     handleLevel4ResetAction,
 } from './runtime/MenuRuntimeSessionService.js';
 import { createMenuEventHandlerRegistry } from './runtime/menu-handlers/CreateMenuEventHandlerRegistry.js';
+import { ProfileLifecycleController } from './runtime/ProfileLifecycleController.js';
 
 export class GameRuntimeFacade {
     constructor(deps = {}) {
@@ -98,6 +99,7 @@ export class GameRuntimeFacade {
         });
         this.menuMultiplayerBridge = null;
         this._matchPrewarmTimer = null;
+        this.profileLifecycleController = new ProfileLifecycleController({ game: this.game });
         this._menuEventHandlers = createMenuEventHandlerRegistry(this);
 
         /** @type {import('./session/SessionAdapter.js').SessionAdapter|null} */
@@ -621,49 +623,6 @@ export class GameRuntimeFacade {
         this.game?.keybindEditorController?.startKeyCapture?.(event?.player, event?.action);
     }
 
-    syncProfileUiState(event) {
-        const game = this.game;
-        if (typeof event?.selectedName === 'string') {
-            game.selectedProfileName = event.selectedName;
-        }
-        if (event?.fullRefresh) {
-            game._syncProfileControls({
-                forceMirrorProfileNameInput: true,
-                preferredProfileName: event.selectedName,
-            });
-            return;
-        }
-        game._syncProfileActionState();
-    }
-
-    saveProfile(event) {
-        this.game?._saveProfile?.(event?.name);
-    }
-
-    loadProfile(event) {
-        this.game?._loadProfile?.(event?.name);
-    }
-
-    deleteProfile(event) {
-        this.game?._deleteProfile?.(event?.name);
-    }
-
-    duplicateProfile(event) {
-        this.game?._duplicateProfile?.(event?.sourceName, event?.targetName);
-    }
-
-    exportProfile(event) {
-        this.game?._exportProfile?.(event?.name);
-    }
-
-    importProfile(event) {
-        this.game?._importProfile?.(event?.inputValue, event?.targetName);
-    }
-
-    setDefaultProfile(event) {
-        this.game?._setDefaultProfile?.(event?.name);
-    }
-
     resetKeys() {
         const game = this.game;
         game.settings.controls = game.settingsManager.cloneDefaultControls();
@@ -843,4 +802,3 @@ export class GameRuntimeFacade {
         }
     }
 }
-
