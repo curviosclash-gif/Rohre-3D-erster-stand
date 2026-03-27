@@ -8,6 +8,13 @@ import {
 } from './StorageKeys.js';
 import { createDefaultStoragePlatform } from '../state/storage/StoragePlatform.js';
 import { getDefaultBrowserStorage } from './base/PersistentStore.js';
+import {
+    normalizeProfileEntries,
+    normalizeProfileName,
+    getProfileNameKey,
+    findProfileIndexByName,
+    findProfileByName,
+} from '../shared/contracts/SettingsProfileContract.js';
 
 const SETTINGS_STORAGE_KEY = STORAGE_KEYS.settings;
 const SETTINGS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settings;
@@ -15,25 +22,6 @@ const SETTINGS_PROFILES_STORAGE_KEY = STORAGE_KEYS.settingsProfiles;
 const SETTINGS_PROFILES_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settingsProfiles;
 const MENU_PRESETS_STORAGE_KEY = STORAGE_KEYS.menuPresets;
 const MENU_PRESETS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
-
-function normalizeProfileEntries(profiles) {
-    const sortedProfiles = Array.isArray(profiles)
-        ? [...profiles].sort((a, b) => Number(b?.updatedAt || 0) - Number(a?.updatedAt || 0))
-        : [];
-    let defaultAssigned = false;
-    return sortedProfiles.map((profile) => {
-        const isDefault = Boolean(profile?.isDefault) && !defaultAssigned;
-        if (isDefault) {
-            defaultAssigned = true;
-        }
-        return {
-            name: String(profile?.name || '').trim(),
-            updatedAt: Number(profile?.updatedAt || Date.now()),
-            settings: profile?.settings || {},
-            isDefault,
-        };
-    });
-}
 
 export class SettingsStore {
     constructor(options = {}) {
@@ -156,25 +144,18 @@ export class SettingsStore {
     }
 
     normalizeProfileName(rawName) {
-        return String(rawName || '')
-            .trim()
-            .replace(/\s+/g, ' ')
-            .slice(0, 32);
+        return normalizeProfileName(rawName);
     }
 
     getProfileNameKey(rawName) {
-        return this.normalizeProfileName(rawName).toLocaleLowerCase();
+        return getProfileNameKey(rawName);
     }
 
     findProfileIndexByName(profiles, profileName) {
-        const key = this.getProfileNameKey(profileName);
-        if (!key) return -1;
-        if (!Array.isArray(profiles)) return -1;
-        return profiles.findIndex((profile) => this.getProfileNameKey(profile.name) === key);
+        return findProfileIndexByName(profiles, profileName);
     }
 
     findProfileByName(profiles, profileName) {
-        const index = this.findProfileIndexByName(profiles, profileName);
-        return index >= 0 ? profiles[index] : null;
+        return findProfileByName(profiles, profileName);
     }
 }

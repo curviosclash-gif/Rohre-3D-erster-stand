@@ -12,6 +12,9 @@ export const STORAGE_KEYS = Object.freeze({
     menuTextOverrides: buildStorageKey(APP_STORAGE_NAMESPACE, 'menu-text-overrides.v1'),
     menuTelemetry: buildStorageKey(APP_STORAGE_NAMESPACE, 'menu-telemetry.v1'),
     menuDrafts: buildStorageKey(APP_STORAGE_NAMESPACE, 'menu-drafts.v1'),
+    // Note: arcadeVehicleProfile key is owned by src/state/arcade/ArcadeVehicleProfile.js
+    // and must match: 'cuviosclash.arcade-vehicle-profile.v1'
+    arcadeVehicleProfile: buildStorageKey(APP_STORAGE_NAMESPACE, 'arcade-vehicle-profile.v1'),
 });
 
 export const LEGACY_STORAGE_KEYS = Object.freeze({
@@ -25,6 +28,7 @@ export const LEGACY_STORAGE_KEYS = Object.freeze({
     menuTextOverrides: Object.freeze([buildStorageKey(LEGACY_APP_STORAGE_NAMESPACE, 'menu-text-overrides.v1')]),
     menuTelemetry: Object.freeze([buildStorageKey(LEGACY_APP_STORAGE_NAMESPACE, 'menu-telemetry.v1')]),
     menuDrafts: Object.freeze([buildStorageKey(LEGACY_APP_STORAGE_NAMESPACE, 'menu-drafts.v1')]),
+    arcadeVehicleProfile: Object.freeze([]),
 });
 
 export function readFirstAvailableStorageValue(storage, primaryKey, legacyKeys = []) {
