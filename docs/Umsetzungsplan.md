@@ -75,7 +75,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | H | V55 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | I | V56 | 2026-03-25 | closed | abgeschlossen 2026-03-25 |
 | J | V57 | 2026-03-26 | closed | abgeschlossen 2026-03-26 |
-| Bot-Codex | V58 | 2026-03-27 | claimed | 58.2.5 ProfileLifecycleController aus GameRuntimeFacade extrahieren |
+| Bot-Codex | V58 | 2026-03-27 | claimed | 58.3.1 PersistentStore- und UI-Store-Inventar fuer Settings-Persistenz |
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
 | - | V60 | - | frei | blockiert auf V58.99 |
 | Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
@@ -647,7 +647,7 @@ Scope:
 - [x] 58.2.2 `src/core/recording/engines/NativeMediaRecorderEngine.js` extrahieren (MediaRecorder Fallback). (abgeschlossen: 2026-03-26; evidence: NativeMediaRecorderEngine with start/stop/requestFrame; commit 606ff1e)
 - [x] 58.2.3 `MediaRecorderSystem.js` auf Strategie-Pattern umstellen. (abgeschlossen: 2026-03-27; evidence: npm run build && node --input-type=module recorder-strategy-smoke -> commit e24466c)
 - [x] 58.2.4 `DownloadService` aus `MediaRecorderSystem` extrahieren (DOM/Blob-Handling fuer Exporte). (abgeschlossen: 2026-03-27; evidence: `node --input-type=module` download-service-smoke + `npm run build` -> commit `1bd5907`)
-- [ ] 58.2.5 `GameRuntimeFacade` dekomponieren: `ProfileLifecycleController` fuer Profil-Lade/Speicher-Logik extrahieren.
+- [x] 58.2.5 `GameRuntimeFacade` dekomponieren: `ProfileLifecycleController` fuer Profil-Lade/Speicher-Logik extrahieren. (abgeschlossen: 2026-03-27; evidence: `node --input-type=module` profile-lifecycle-smoke + `npm run build` -> commit `2f1e10f`)
 
 ### 58.3 Settings-Store-Konsolidierung und Persistenz
 
