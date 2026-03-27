@@ -88,36 +88,45 @@ export class LANSessionAdapter extends SessionAdapterBase {
     }
 
     async _joinAsClient(lobbyCode) {
-        const joinRes = await fetch(`${this._signalingUrl}/lobby/join`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lobbyCode }),
-        });
-        const joinData = await joinRes.json();
-        this.localPlayerId = joinData.playerId;
+        try {
+            const joinRes = await fetch(`${this._signalingUrl}/lobby/join`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lobbyCode }),
+            });
+            const joinData = await joinRes.json();
+            this.localPlayerId = joinData.playerId;
 
-        // Poll for the offer from host
-        let offerData = null;
-        for (let i = 0; i < 30; i += 1) {
-            const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${this.localPlayerId}`);
-            const data = await offerRes.json();
-            if (data.offer) {
-                offerData = data;
-                break;
+            // Poll for the offer from host
+            let offerData = null;
+            for (let i = 0; i < 30; i += 1) {
+                try {
+                    const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${this.localPlayerId}`);
+                    const data = await offerRes.json();
+                    if (data.offer) {
+                        offerData = data;
+                        break;
+                    }
+                } catch (err) {
+                    logger.debug('Offer poll failed:', err);
+                }
+                await new Promise((resolve) => setTimeout(resolve, 200));
             }
-            await new Promise((resolve) => setTimeout(resolve, 200));
-        }
-        if (!offerData?.offer) {
-            throw new Error('Timed out waiting for host offer');
-        }
+            if (!offerData?.offer) {
+                throw new Error('Timed out waiting for host offer');
+            }
 
-        const answer = await this._peerManager.handleOffer('host', offerData.offer);
+            const answer = await this._peerManager.handleOffer('host', offerData.offer);
 
-        await fetch(`${this._signalingUrl}/signaling/answer`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ playerId: this.localPlayerId, answer }),
-        });
+            await fetch(`${this._signalingUrl}/signaling/answer`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ playerId: this.localPlayerId, answer }),
+            }).catch((err) => { logger.warn('Answer send failed:', err); });
+        } catch (err) {
+            logger.error('Join as client failed:', err);
+            throw err;
+        }
 
         // Exchange ICE candidates with host
         await this._pollIceCandidates('host');
@@ -196,50 +205,59 @@ export class LANSessionAdapter extends SessionAdapterBase {
     async _connectToPendingClient(pending) {
         const targetPeerId = String(pending?.playerId || '').trim();
         if (!targetPeerId) return;
-        const offer = await this._peerManager.createOffer(targetPeerId);
+        try {
+            const offer = await this._peerManager.createOffer(targetPeerId);
 
-        await fetch(`${this._signalingUrl}/signaling/offer`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ targetPlayerId: targetPeerId, offer }),
-        });
-
-        for (let i = 0; i < 30; i += 1) {
-            // Poll for ICE candidates from client while waiting for answer
-            try {
-                const iceRes = await fetch(`${this._signalingUrl}/signaling/ice?playerId=${targetPeerId}`);
-                const iceData = await iceRes.json();
-                if (Array.isArray(iceData.candidates)) {
-                    for (const candidate of iceData.candidates) {
-                        await this._peerManager.addIceCandidate(targetPeerId, candidate);
-                    }
-                }
-            } catch (err) {
-                logger.debug('ICE poll for pending client failed:', err);
-            }
-
-            const res = await fetch(`${this._signalingUrl}/signaling/answer?playerId=${targetPeerId}`);
-            const data = await res.json();
-            if (!data.answer) {
-                await new Promise((resolve) => setTimeout(resolve, 200));
-                continue;
-            }
-            await this._peerManager.handleAnswer(targetPeerId, data.answer);
-            this._latencyMonitor.addPeer(targetPeerId);
-
-            // Acknowledge successful connection — removes from pending list on server
-            fetch(`${this._signalingUrl}/lobby/ack-pending`, {
+            await fetch(`${this._signalingUrl}/signaling/offer`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerId: targetPeerId }),
-            }).catch((err) => { logger.debug('Ack-pending failed:', err); });
+                body: JSON.stringify({ targetPlayerId: targetPeerId, offer }),
+            }).catch((err) => { logger.warn('Offer send to pending client failed:', err); });
 
-            if (this._disconnectedPeers.has(targetPeerId)) {
-                this._resolvePeerReconnect(targetPeerId);
-            } else {
-                this._emit('playerConnected', { peerId: targetPeerId });
+            for (let i = 0; i < 30; i += 1) {
+                // Poll for ICE candidates from client while waiting for answer
+                try {
+                    const iceRes = await fetch(`${this._signalingUrl}/signaling/ice?playerId=${targetPeerId}`);
+                    const iceData = await iceRes.json();
+                    if (Array.isArray(iceData.candidates)) {
+                        for (const candidate of iceData.candidates) {
+                            await this._peerManager.addIceCandidate(targetPeerId, candidate);
+                        }
+                    }
+                } catch (err) {
+                    logger.debug('ICE poll for pending client failed:', err);
+                }
+
+                try {
+                    const res = await fetch(`${this._signalingUrl}/signaling/answer?playerId=${targetPeerId}`);
+                    const data = await res.json();
+                    if (!data.answer) {
+                        await new Promise((resolve) => setTimeout(resolve, 200));
+                        continue;
+                    }
+                    await this._peerManager.handleAnswer(targetPeerId, data.answer);
+                    this._latencyMonitor.addPeer(targetPeerId);
+
+                    // Acknowledge successful connection — removes from pending list on server
+                    fetch(`${this._signalingUrl}/lobby/ack-pending`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ playerId: targetPeerId }),
+                    }).catch((err) => { logger.debug('Ack-pending failed:', err); });
+
+                    if (this._disconnectedPeers.has(targetPeerId)) {
+                        this._resolvePeerReconnect(targetPeerId);
+                    } else {
+                        this._emit('playerConnected', { peerId: targetPeerId });
+                    }
+                    return;
+                } catch (err) {
+                    logger.debug('Answer poll for pending client failed:', err);
+                    await new Promise((resolve) => setTimeout(resolve, 200));
+                }
             }
-            return;
+        } catch (err) {
+            logger.error('Connect to pending client failed:', err);
         }
     }
 
