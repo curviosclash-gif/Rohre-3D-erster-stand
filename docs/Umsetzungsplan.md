@@ -832,6 +832,7 @@ Scope:
 - Dormante Input-/Lobby-/Replay-/Menu-Pfade aus dem Audit 2026-03-26 inventarisieren und auf `remove`, `rewire` oder `keep-with-contract` entscheiden.
 - Die verbliebene Doppel-Orchestrierung zwischen `main.js`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` auf ein klares Zielbild reduzieren.
 - Multiplayer-Menue-/Bridge-Vertraege haerten: echte Erfolgssemantik, Max-Player-Gate, deduplizierte Button-Wiring-Pfade und sichere Discovery-Render-Pfade.
+- Audit 2026-03-27 absichern: Session-Typ-Mapping zwischen Menu-`multiplayer` und Runtime-`lan`/`online`, Presence-Stabilitaet bei Background-Tab-Throttling sowie echte Netzwerk-Verifikation statt nur `PLAYING`-Smokes.
 
 ### Definition of Done (DoD)
 
@@ -839,7 +840,7 @@ Scope:
 - [ ] DoD.2 `npm run architecture:guard`, `npm run build` und `npx knip --config knip.json --no-progress` liefern fuer den Scope verwertbare, dokumentierte Ergebnisse ohne bekannte Blindspots fuer `server/**`, `electron/**` und `trainer/**`.
 - [ ] DoD.3 Dormante Pfade sind pro Modulgruppe als `remove`, `rewire` oder `keep-with-contract` dokumentiert und umgesetzt.
 - [ ] DoD.4 Ownership, Lock-Status, Conflict-Log, Plan-Datei und Verifikationsstrategie sind synchron gepflegt.
-- [ ] DoD.5 Multiplayer-Menue-/Bridge-Pfade erzwingen konsistente Erfolgs-/Fehlerkontrakte, `maxPlayers`-Grenzen und einmaliges UI-Wiring.
+- [ ] DoD.5 Multiplayer-Menue-/Bridge-Pfade erzwingen konsistente Erfolgs-/Fehlerkontrakte, `maxPlayers`-Grenzen, einmaliges UI-Wiring sowie ein belegtes Mapping auf echte Runtime-Netzwerksessions.
 
 ### 60.1 Guard- und Tooling-Verlaesslichkeit
 
@@ -855,11 +856,20 @@ Scope:
 
 - [ ] 60.3.1 Verantwortungsgrenzen zwischen `Game`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` als Zielbild dokumentieren und verbliebene Wrapper-/Pass-through-Pfade priorisieren.
 - [ ] 60.3.2 Die Rest-Decomposition fuer `MediaRecorderSystem`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` in kleine, testbare Folgeschritte zerlegen und die Transfers zu V58/V59/V60 festhalten.
+- [ ] 60.3.3 Den Architekturbruch zwischen Menu-Sessiontyp `multiplayer` und Runtime-Sessiontypen `lan`/`online` explizit aufloesen: Zielbild dokumentieren, Matchstart auf einen echten Transportpfad umstellen und den reinen Storage-Bridge-Pfad klar als Mock/Test-Helfer oder Vorstufe kennzeichnen.
 
 ### 60.4 Multiplayer-Menue-Vertraege und UI-Wiring konsolidieren
 
+Audit-Befund 2026-03-27:
+
+- Menu-Multiplayer erreicht die Runtime aktuell mit `sessionType=multiplayer`; `networkEnabled` bleibt dabei `false`, obwohl `lan` und `online` bereits als echte Runtime-Pfade modelliert sind.
+- Zwei-Tab-UI-Probe auf `localhost:5190` reproduziert Presence-Kollaps: `2/2 ready` kippt beim Startversuch auf `1/2 ready`, danach promoted sich der verbleibende Tab zu `Host | 1/1 ready`.
+- Bestehende Multiplayer-Tests validieren bisher vor allem `PLAYING`-/Import-Smokes, nicht aber Adapter-Typ, `networkEnabled` oder Background-Tab-Stabilitaet.
+
 - [ ] 60.4.1 `MenuMultiplayerBridge.js` und `menu/multiplayer/MenuMultiplayerBridgeMutations.js` so haerten, dass `host()` nur bei persistiertem Snapshot Erfolg meldet und `join()` die `maxPlayers`-Grenze mit einem konsistenten Fehlercontract erzwingt.
 - [ ] 60.4.2 `MenuController.js`, `MenuGameplayBindings.js`, `MenuDevPanelBindings.js` und `MenuMultiplayerPanel.js` auf einen aktiven Runtime-Pfad reduzieren: doppelte `multiplayer_host`-/`multiplayer_join`-Bindings entfernen und Discovery-Rendering auf sichere DOM-APIs ohne `innerHTML` umstellen.
+- [ ] 60.4.3 `MenuMultiplayerBridge.js` Presence-/Heartbeat-Logik gegen Browser-Timer-Throttling haerten: Lease-/Stale-Fenster pruefen, `visibilitychange`/Resume beruecksichtigen und automatische Host-Promotion nach reinem Stale-Pruning verhindern.
+- [ ] 60.4.4 Multiplayer-Charakterisierung auf echte Netzwerksignale erweitern: nach Matchstart `runtimeConfig.session.networkEnabled`, Adapter-Typ (`LANSessionAdapter`/`OnlineSessionAdapter`) und Remote-Presence pruefen sowie einen Zwei-Tab-Background-Stability-Test (>15s) ergaenzen.
 
 ### Phase 60.99: Audit-Abschluss-Gate
 
@@ -874,6 +884,7 @@ Scope:
 | Guard-Fix fuer `Logger.js` veraendert Logging-Verhalten in Dev/Prod subtil | mittel | Shared | Characterization fuer Log-Level-Defaults und Build-Gates vorziehen | Production-Logs verschwinden oder werden zu laut |
 | Abschluss der Rest-Decomposition erzeugt neue Verantwortungsgrenzen ohne klare Ownership | mittel | Architektur | Zielbild vor Refactor fixieren und Teilphaen klein schneiden | Weitere God-Objects oder Wrapper entstehen |
 | Konsolidierung der Multiplayer-Menue-Pfade aendert test-only oder dormant Wiring unerwartet | mittel | UI | Aktiven Runtime-Pfad vor Removal festziehen und Characterization fuer Host/Join/Discovery vorziehen | Host/Join feuert nicht mehr oder doppelt |
+| Background-Tab-Throttling oder Stale-Pruning zerlegt aktive Lobbies und erzeugt falsche Host-Promotion | hoch | UI/Netzwerk | Presence-Leases entkoppeln, Resume-Signale vorziehen und Zwei-Tab-Stability-Test >15s in den Gate aufnehmen | `2/2 ready` kippt auf `1/1`, Host wird ungewollt neu bestimmt |
 
 ---
 
