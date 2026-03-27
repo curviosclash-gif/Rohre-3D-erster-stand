@@ -57,7 +57,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 | Pfadmuster | Block / Stream | Status | Hinweis |
 | --- | --- | --- | --- |
-| `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js` | V62 | pausiert | Code fertig, Gate 62.99.1/62.99.3 offen |
+| `src/entities/systems/CinematicCameraSystem.js`, `src/core/renderer/CameraRigSystem.js` | V62 | in Bearbeitung | Code fertig, visuelles Gate 62.99.3 wird abgeschlossen |
 | `src/core/MediaRecorderSystem.js`, `src/core/recording/**`, `src/ui/base/PersistentStore.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `src/ui/menu/MenuPresetStore.js`, `src/ui/menu/MenuTelemetryStore.js`, `src/ui/menu/MenuTextOverrideStore.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `src/state/arcade/ArcadeMapProgression.js`, `scripts/architecture/ArchitectureConfig.mjs`, `src/core/GameRuntimeFacade.js`, `src/core/runtime/ProfileLifecycleController.js`, `src/core/runtime/menu-handlers/ProfileMenuEventHandlers.js` | V58 | in Bearbeitung | Architektur-Bereinigung, MediaRecorder-Decomposition, UI-Store-Redundanz, Facade-Cleanup |
 | `src/modes/ArcadeModeStrategy.js`, `src/core/arcade/ArcadeRunRuntime.js`, `src/state/arcade/ArcadeRunState.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeMissionState.js`, `src/shared/contracts/ArcadeMissionContract.js`, `src/ui/arcade/ArcadeMissionHUD.js` (Score-HUD-Erweiterung), `src/ui/arcade/ArcadeMenuSurface.js` (Post-Run, Daily), `src/entities/directors/ArcadeEncounterCatalog.js`, `src/entities/directors/ArcadeEncounterDirector.js`, `src/state/arcade/ArcadeRoundStateController.js`, `src/shared/utils/ArcadeUtils.js` (neu) | V61 | offen | Arcade-Modus Gameplay-Verbesserungen: Score, Combo, Missionen, Modifiers, Sudden Death, HUD |
 | `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | offen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
@@ -79,7 +79,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
 | - | V60 | - | frei | blockiert auf V58.99 |
 | Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
-| Agent B | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 62.99.1 geschlossen, 62.99.3 visuell offen) |
+| Bot-Codex | V62 | 2026-03-27 | claimed | 62.99.3 visueller Smoke-Test abschliessen |
 | Bot-Codex | V63 | 2026-03-27 | claimed | 63.1.1/63.1.2 abgeschlossen |
 | - | V64 | - | frei | - |
 | - | V65 | - | frei | blockiert auf V62 |
@@ -1006,7 +1006,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-27 -->
 <!-- DEPENDS-ON: V59.5 (Camera Polish) -->
 
 Scope:
