@@ -1,4 +1,5 @@
 import { HUNT_CONFIG } from '../../../hunt/HuntConfig.js';
+import { getActiveRuntimeConfig } from '../../../core/runtime/ActiveRuntimeConfigStore.js';
 import { isHuntHealthActive } from '../../../hunt/HealthSystem.js';
 import { isRocketTierType, resolveRocketTierDamage } from '../../../hunt/RocketPickupSystem.js';
 import { applyTrailDamageFromProjectile } from '../../../hunt/DestructibleTrail.js';
@@ -10,8 +11,9 @@ export class ProjectileHitResolver {
     }
 
     _applyRocketExplosion(projectile, players, directHitTarget) {
-        const explosionRadius = Math.max(1, Number(HUNT_CONFIG?.ROCKET?.EXPLOSION_RADIUS || 25));
-        const explosionDamageFalloff = Math.max(0, Math.min(1, Number(HUNT_CONFIG?.ROCKET?.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
+        const rocketConfig = getActiveRuntimeConfig(HUNT_CONFIG)?.ROCKET || HUNT_CONFIG.ROCKET;
+        const explosionRadius = Math.max(1, Number(rocketConfig?.EXPLOSION_RADIUS || 25));
+        const explosionDamageFalloff = Math.max(0, Math.min(1, Number(rocketConfig?.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
         const baseDamage = resolveRocketTierDamage(projectile.type);
         const damageAtCenter = baseDamage * (1 + explosionDamageFalloff);
 

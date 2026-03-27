@@ -3,6 +3,7 @@
 // ============================================
 
 import { CONFIG } from '../../core/Config.js';
+import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
 import { GAME_MODE_TYPES, normalizeGameMode } from '../../hunt/HuntMode.js';
 import { createObservationContext } from './observation/ObservationSystem.js';
@@ -16,7 +17,7 @@ const ANY_PROFILE_TOKENS = new Set(['*', 'any', 'multi', 'multi-profile', 'multi
 function resolveRuntimeMode(entityManager) {
     const requestedMode = entityManager?.activeGameMode
         || entityManager?.runtimeConfig?.session?.activeGameMode
-        || CONFIG?.HUNT?.ACTIVE_MODE
+        || getActiveRuntimeConfig(CONFIG)?.HUNT?.ACTIVE_MODE
         || GAME_MODE_TYPES.CLASSIC;
     const normalized = normalizeGameMode(requestedMode, GAME_MODE_TYPES.CLASSIC);
     if (normalized === GAME_MODE_TYPES.HUNT) {

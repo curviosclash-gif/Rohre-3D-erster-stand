@@ -55,9 +55,11 @@ const entityRuntimeConfigStoreSources = [
     'src/entities/player/PlayerMotionOps.js',
     'src/entities/Powerup.js',
     'src/entities/systems/HuntCombatSystem.js',
+    'src/entities/systems/projectile/ProjectileHitResolver.js',
     'src/entities/systems/projectile/ProjectileSimulationOps.js',
     'src/entities/systems/ProjectileSystem.js',
     'src/entities/Trail.js',
+    'src/entities/ai/BotRuntimeContextFactory.js',
 ];
 
 const entityThreeDisposalSources = [

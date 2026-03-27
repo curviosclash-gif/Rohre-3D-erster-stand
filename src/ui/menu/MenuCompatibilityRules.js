@@ -94,7 +94,10 @@ function applyModePathGameModeSyncRule(settings, result) {
     }
 
     if (!settings.hunt || typeof settings.hunt !== 'object') {
-        settings.hunt = { respawnEnabled: false };
+        settings.hunt = {};
+    }
+    if (!('respawnEnabled' in settings.hunt)) {
+        settings.hunt.respawnEnabled = false;
     }
     const expectedRespawnEnabled = shouldUseHunt;
     if ((shouldUseHunt || shouldUseClassic) && settings.hunt.respawnEnabled !== expectedRespawnEnabled) {
