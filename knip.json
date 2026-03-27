@@ -1,9 +1,10 @@
 {
-    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "$schema": "https://unpkg.com/knip@6/schema.json",
     "entry": [
         "index.html",
         "src/core/main.js",
         "tests/**/*.spec.js",
+        "tests/**/*.test.mjs",
         "scripts/**/*.mjs",
         "scripts/**/*.js",
         "editor/js/main.js",
@@ -22,10 +23,14 @@
         "src/**/*.js",
         "editor/js/**/*.js",
         "tests/**/*.js",
+        "tests/**/*.mjs",
         "scripts/**/*.mjs",
         "server/**/*.js",
         "electron/**/*.cjs",
         "trainer/**/*.mjs"
+    ],
+    "ignoreUnresolved": [
+        "^/src/.*"
     ],
     "ignore": [
         "tmp/**",
