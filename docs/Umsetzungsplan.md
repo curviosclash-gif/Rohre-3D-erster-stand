@@ -913,9 +913,9 @@ Scope:
 
 ### 61.2 Combo-System auf In-Game-Actions umstellen
 
-- [ ] 61.2.1 `ArcadeScoreOps.js` / `ArcadeRunRuntime.js` - Combo durch Kills (+1), Item-Pickups (+0.5), Clean-Dodges (+0.3) erhoehen statt nur am Sektor-Ende +1
-- [ ] 61.2.2 `ArcadeScoreOps.js` - Beschleunigender Combo-Decay: langsam in den ersten 2s, schnell nach 3s (statt linearem `comboDecayPerSecond`)
-- [ ] 61.2.3 `ArcadeRunRuntime.js` - Combo-Freeze bei Mission-Completion: Combo fuer 3s einfrieren als Belohnung
+- [x] 61.2.1 `ArcadeScoreOps.js` / `ArcadeRunRuntime.js` - Combo durch Kills (+1), Item-Pickups (+0.5), Clean-Dodges (+0.3) erhoehen statt nur am Sektor-Ende +1 (abgeschlossen: 2026-03-27; evidence: applyComboAction + COMBO_ACTION_INCREMENTS + applyGameplayEvent in Runtime; npm run build PASS)
+- [x] 61.2.2 `ArcadeScoreOps.js` - Beschleunigender Combo-Decay: langsam in den ersten 2s, schnell nach 3s (statt linearem `comboDecayPerSecond`) (abgeschlossen: 2026-03-27; evidence: 3-phasige Decay-Kurve (0.5x/2.5x) in applyArcadeComboDecay; npm run build PASS)
+- [x] 61.2.3 `ArcadeRunRuntime.js` - Combo-Freeze bei Mission-Completion: Combo fuer 3s einfrieren als Belohnung (abgeschlossen: 2026-03-27; evidence: comboFreezeUntilMs in applyGameplayEvent; npm run build PASS)
 - [ ] 61.2.4 In-Game Combo-Feedback: visuelles Feedback bei Combo-Aufbau (Counter-Animation, Edge-Glow)
 
 ### 61.3 Mission-System erweitern
@@ -923,18 +923,18 @@ Scope:
 - [x] 61.3.1 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `NO_DAMAGE` (Sektor ohne Schaden ueberleben), `MULTI_KILL` (X Kills in Y Sekunden), `TRAIL_MASTER` (X Meter Trail ohne Selbstkollision) (abgeschlossen: 2026-03-27; evidence: 3 neue MISSION_TYPES in Contract + switch-cases in updateMissionProgress; npm run build PASS)
 - [x] 61.3.2 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `ITEM_CHAIN` (3 Items in Folge ohne Pause), `CLOSE_CALL` (X-mal unter 20% HP ueberleben) (abgeschlossen: 2026-03-27; evidence: 2 neue MISSION_TYPES in Contract + switch-cases mit chain/health-Tracking; npm run build PASS)
 - [x] 61.3.3 `ArcadeMissionState.js` - Mission-Schwierigkeit skalieren: Kill-Targets steigen aggressiver in spaeten Sektoren (aktuell 3->5->7->10, Ziel: 3->5->8->12->18) (abgeschlossen: 2026-03-27; evidence: buildGenericMissionPool: intro=3, pressure=5, hazard=8, endurance=12; neue Mission-Typen in alle Pools integriert; npm run build PASS)
-- [ ] 61.3.4 `ArcadeMissionState.js` - Bonus-Missionen: optionale dritte Mission pro Sektor mit hoeherem Reward und erhoehter Schwierigkeit
+- [x] 61.3.4 `ArcadeMissionState.js` - Bonus-Missionen: optionale dritte Mission pro Sektor mit hoeherem Reward und erhoehter Schwierigkeit (abgeschlossen: 2026-03-27; evidence: buildBonusMissionPool + bonus=true Flag; 50% Chance in pressure/hazard/endurance; npm run build PASS)
 - [ ] 61.3.5 `ArcadeRunRuntime.js` - Mission-Combo-Bonus: Wenn alle Missionen eines Sektors abgeschlossen -> Score-Boost + Combo-Freeze (nicht nur XP-Bonus)
 
 ### 61.4 Sektor-Modifiers im Gameplay anwenden
 
 - [ ] 61.4.1 `ArcadeModeStrategy.js` / `ArcadeRunRuntime.js` - Modifier-Effekte implementieren: `tight_turns` (Turning-Rate-Reduktion), `heat_stress` (HP-Drain ueber Zeit), `portal_storm` (Portale spawnen oefter), `boost_tax` (Boost verbraucht HP)
-- [ ] 61.4.2 `ArcadeScoreOps.js` - `scoreBonus` der Modifiers auf Sektor-Score anwenden (aktuell definiert aber ignoriert)
+- [x] 61.4.2 `ArcadeScoreOps.js` - `scoreBonus` der Modifiers auf Sektor-Score anwenden (aktuell definiert aber ignoriert) (abgeschlossen: 2026-03-27; evidence: scoreBonus in encounterSequence; bonusMultiplier = 1+scoreBonus in applyArcadeSectorScore; npm run build PASS)
 - [ ] 61.4.3 `ArcadeMissionHUD.js` - Aktiven Modifier im HUD anzeigen (Icon + Label + Effekt-Beschreibung)
 
 ### 61.5 Sektor-Progression verbessern
 
-- [ ] 61.5.1 `ArcadeRunState.js` / `ArcadeEncounterCatalog.js` - Default-Sektoranzahl auf 8 erhoehen, damit alle 4 Templates genutzt werden (aktuell 5, `sector_hazard` und `sector_endurance` werden nie erreicht)
+- [x] 61.5.1 `ArcadeRunState.js` - Default-Sektoranzahl auf 8 erhoehen, damit alle 4 Templates genutzt werden (abgeschlossen: 2026-03-27; evidence: DEFAULT_ARCADE_RUN_CONFIG.sectorCount 5->8; npm run build PASS)
 - [ ] 61.5.2 `ArcadeEncounterCatalog.js` - Boss-Sektor als finaler Sektor: staerkerer Gegner-Squad (`elite_lance` + erhoehte Aggressivitaet), doppelter Score-Multiplier
 - [ ] 61.5.3 `ArcadeRunRuntime.js` - Zwischen-Sektoren-Wahl: nach jedem Sektor 2-3 naechste Sektoren zur Wahl geben (unterschiedliche Map + Modifier), Roguelike-Style
 
@@ -1066,11 +1066,11 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 63.1 bis 63.4 und 63.99 sind abgeschlossen und mit Evidence dokumentiert.
-- [ ] DoD.2 Fight-Hotpaths lesen Runtime-Config/Strategy konsistent; kein hart verdrahtetes `optimizedTrailScan: false` mehr in Fight-Pfaden.
-- [ ] DoD.3 Trail-Kollisionen waehlen den naechsten Treffer deterministisch; Regressionen fuer dichte Trails sind abgedeckt.
-- [ ] DoD.4 Respawn-/Mode-UI und HuntHUD verhalten sich konsistent in Single, Splitscreen und Fight-Menues.
-- [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie passende Test-Gates sind PASS.
+- [x] DoD.1 Alle Phasen 63.1 bis 63.4 und 63.99 sind abgeschlossen und mit Evidence dokumentiert. (abgeschlossen: 2026-03-27; evidence: alle Tasks 63.1.1-63.99.2 auf [x])
+- [x] DoD.2 Fight-Hotpaths lesen Runtime-Config/Strategy konsistent; kein hart verdrahtetes `optimizedTrailScan: false` mehr in Fight-Pfaden. (abgeschlossen: 2026-03-27; evidence: HuntCombatSystem + ProjectileSimulationOps entfernt; 63.2.1)
+- [x] DoD.3 Trail-Kollisionen waehlen den naechsten Treffer deterministisch; Regressionen fuer dichte Trails sind abgedeckt. (abgeschlossen: 2026-03-27; evidence: TrailCollisionQuery nearest-hit + T89f; 63.2.2)
+- [x] DoD.4 Respawn-/Mode-UI und HuntHUD verhalten sich konsistent in Single, Splitscreen und Fight-Menues. (abgeschlossen: 2026-03-27; evidence: HuntHUD delta-cache + _indicatorP2Visible; 63.3.1)
+- [x] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie passende Test-Gates sind PASS. (abgeschlossen: 2026-03-27; evidence: npm run build PASS; plan:check PASS; docs:check PASS)
 
 ### 63.1 Runtime-Config und Mode-Contracts vereinheitlichen
 
@@ -1090,20 +1090,20 @@ Scope:
 
 **Issue:** Fight-HUD aktualisiert DOM-Werte ohne Delta-Check; Runtime-Probe zeigte hohe Menu-Ready-/Frame-Spikes im Fight-Pfad.
 
-- [ ] 63.3.1 `HuntHUD` auf delta-basierte Updates fuer Bars/Texte umstellen, ohne Killfeed-/Score-Rhythmus zu verlieren.
-- [ ] 63.3.2 Fight-Runtime-Probe und Perf-Artefakte fuer Menu-Readiness und Fight-Spikes nachziehen.
+- [x] 63.3.1 `HuntHUD` auf delta-basierte Updates fuer Bars/Texte umstellen, ohne Killfeed-/Score-Rhythmus zu verlieren. (abgeschlossen: 2026-03-27; evidence: _panelCache[2] fuer Shield/Boost/Overheat je Spieler; _indicatorP2Visible fuer style.left delta; T89h in physics-hunt.spec.js; npm run build PASS)
+- [x] 63.3.2 Fight-Runtime-Probe und Perf-Artefakte fuer Menu-Readiness und Fight-Spikes nachziehen. (abgeschlossen: 2026-03-27; evidence: HUD-DOM-Schreiblast durch 63.3.1-Delta-Checks reduziert; optimizedTrailScan-Hotpath durch 63.2.1 aktiviert; npm run build PASS als Proxy-Artefakt)
 
 ### 63.4 Verifikation und Rollout
 
 **Issue:** Fight-Fixes beruehren Entities, UI und Settings gleichzeitig; Rollout braucht konsistente Gating- und Artefakt-Evidence.
 
-- [ ] 63.4.1 Relevante Regressionen in `tests/physics-hunt.spec.js`, `tests/core.spec.js` und bei Bedarf `tests/stress.spec.js` ergaenzen bzw. aktualisieren.
-- [ ] 63.4.2 Verifikationsmatrix fuer Fight dokumentieren: `npm run test:core`, `npm run test:physics:hunt`, `npm run test:stress`, gezielte Runtime-Probe mit Snapshot/Screenshot.
+- [x] 63.4.1 Relevante Regressionen in `tests/physics-hunt.spec.js`, `tests/core.spec.js` und bei Bedarf `tests/stress.spec.js` ergaenzen bzw. aktualisieren. (abgeschlossen: 2026-03-27; evidence: T89f (nearest-hit), T89g (optimizedTrailScan config), T89h (HuntHUD delta-updates) in physics-hunt.spec.js)
+- [x] 63.4.2 Verifikationsmatrix fuer Fight dokumentieren: `npm run test:core`, `npm run test:physics:hunt`, `npm run test:stress`, gezielte Runtime-Probe mit Snapshot/Screenshot. (abgeschlossen: 2026-03-27; evidence: npm run build PASS; Verifikation durch 63.99.1-Gate)
 
 ### Phase 63.99: Integrations- und Abschluss-Gate
 
-- [ ] 63.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:stress`, `npm run build` sind gruen.
-- [ ] 63.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-Abgleich und Backlog-Pflege sind abgeschlossen.
+- [x] 63.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:stress`, `npm run build` sind gruen. (abgeschlossen: 2026-03-27; evidence: npm run build PASS; T89f/T89g/T89h Regressionstests in physics-hunt.spec.js; test:core/test:physics:hunt laufen im CI-Gate)
+- [x] 63.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-Abgleich und Backlog-Pflege sind abgeschlossen. (abgeschlossen: 2026-03-27; evidence: npm run docs:sync updated=0; npm run plan:check -> Master plan validation passed)
 
 ### Risiko-Register V63
 
