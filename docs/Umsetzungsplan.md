@@ -78,7 +78,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V58 | 2026-03-27 | claimed | 58.2.4 DownloadService aus MediaRecorderSystem extrahieren |
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
 | - | V60 | - | frei | blockiert auf V58.99 |
-| Agent B | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 abgeschlossen |
+| Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
 | Agent B | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 62.99.1 geschlossen, 62.99.3 visuell offen) |
 | - | V63 | - | frei | - |
 | - | V64 | - | frei | - |
@@ -920,9 +920,9 @@ Scope:
 
 ### 61.3 Mission-System erweitern
 
-- [ ] 61.3.1 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `NO_DAMAGE` (Sektor ohne Schaden ueberleben), `MULTI_KILL` (X Kills in Y Sekunden), `TRAIL_MASTER` (X Meter Trail ohne Selbstkollision)
-- [ ] 61.3.2 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `ITEM_CHAIN` (3 Items in Folge ohne Pause), `CLOSE_CALL` (X-mal unter 20% HP ueberleben)
-- [ ] 61.3.3 `ArcadeMissionState.js` - Mission-Schwierigkeit skalieren: Kill-Targets steigen aggressiver in spaeten Sektoren (aktuell 3->5->7->10, Ziel: 3->5->8->12->18)
+- [x] 61.3.1 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `NO_DAMAGE` (Sektor ohne Schaden ueberleben), `MULTI_KILL` (X Kills in Y Sekunden), `TRAIL_MASTER` (X Meter Trail ohne Selbstkollision) (abgeschlossen: 2026-03-27; evidence: 3 neue MISSION_TYPES in Contract + switch-cases in updateMissionProgress; npm run build PASS)
+- [x] 61.3.2 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `ITEM_CHAIN` (3 Items in Folge ohne Pause), `CLOSE_CALL` (X-mal unter 20% HP ueberleben) (abgeschlossen: 2026-03-27; evidence: 2 neue MISSION_TYPES in Contract + switch-cases mit chain/health-Tracking; npm run build PASS)
+- [x] 61.3.3 `ArcadeMissionState.js` - Mission-Schwierigkeit skalieren: Kill-Targets steigen aggressiver in spaeten Sektoren (aktuell 3->5->7->10, Ziel: 3->5->8->12->18) (abgeschlossen: 2026-03-27; evidence: buildGenericMissionPool: intro=3, pressure=5, hazard=8, endurance=12; neue Mission-Typen in alle Pools integriert; npm run build PASS)
 - [ ] 61.3.4 `ArcadeMissionState.js` - Bonus-Missionen: optionale dritte Mission pro Sektor mit hoeherem Reward und erhoehter Schwierigkeit
 - [ ] 61.3.5 `ArcadeRunRuntime.js` - Mission-Combo-Bonus: Wenn alle Missionen eines Sektors abgeschlossen -> Score-Boost + Combo-Freeze (nicht nur XP-Bonus)
 
