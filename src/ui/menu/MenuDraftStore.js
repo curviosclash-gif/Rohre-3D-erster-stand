@@ -5,20 +5,13 @@ import {
     STORAGE_KEYS,
 } from '../StorageKeys.js';
 import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
+import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
 
 const MENU_DRAFT_STORAGE_KEY = STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_SCHEMA_VERSION = 'menu-draft-store.v1';
 
 const VALID_SESSION_TYPE_SET = new Set(Object.values(MENU_SESSION_TYPES));
-
-function getDefaultStorage() {
-    try {
-        return typeof localStorage !== 'undefined' ? localStorage : null;
-    } catch {
-        return null;
-    }
-}
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
@@ -104,22 +97,24 @@ function applySnapshotToSettings(settings, snapshot) {
     return true;
 }
 
-export class MenuDraftStore {
+export class MenuDraftStore extends PersistentStore {
     constructor(options = {}) {
-        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
-            storage: options.storage ?? getDefaultStorage(),
-            onQuotaExceeded: options.onQuotaExceeded,
+        super({
+            ...options,
+            storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
+                storage: options.storage ?? getDefaultBrowserStorage(),
+                onQuotaExceeded: options.onQuotaExceeded,
+            }),
+            storageKey: options.storageKey || MENU_DRAFT_STORAGE_KEY,
+            storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
+                ? [...options.storageLegacyKeys]
+                : [...MENU_DRAFT_STORAGE_LEGACY_KEYS],
         });
-        this.storage = this.storagePlatform?.driver?.storage || null;
-        this.storageKey = options.storageKey || MENU_DRAFT_STORAGE_KEY;
-        this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
-            ? [...options.storageLegacyKeys]
-            : [...MENU_DRAFT_STORAGE_LEGACY_KEYS];
     }
 
     _loadStore() {
         try {
-            const parsed = this.storagePlatform.readJson(this.storageKey, this.storageLegacyKeys, null);
+            const parsed = this.readJsonRecord(null);
             if (!parsed || typeof parsed !== 'object') {
                 return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
             }
@@ -133,7 +128,7 @@ export class MenuDraftStore {
     }
 
     _saveStore(store) {
-        return this.storagePlatform.writeJson(this.storageKey, store).ok;
+        return this.writeJsonRecord(store).ok;
     }
 
     saveDraft(sessionType, settings) {

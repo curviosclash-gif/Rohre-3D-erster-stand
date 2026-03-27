@@ -5,18 +5,11 @@ import {
     STORAGE_KEYS,
 } from '../StorageKeys.js';
 import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
+import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
 
 const MENU_PRESET_STORAGE_KEY = STORAGE_KEYS.menuPresets;
 const MENU_PRESET_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
 const MENU_PRESET_STORAGE_SCHEMA_VERSION = 'menu-preset-store.v1';
-
-function getDefaultStorage() {
-    try {
-        return typeof localStorage !== 'undefined' ? localStorage : null;
-    } catch {
-        return null;
-    }
-}
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -70,17 +63,19 @@ function sortPresets(left, right) {
     return left.name.localeCompare(right.name, 'de', { sensitivity: 'base' });
 }
 
-export class MenuPresetStore {
+export class MenuPresetStore extends PersistentStore {
     constructor(options = {}) {
-        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
-            storage: options.storage ?? getDefaultStorage(),
-            onQuotaExceeded: options.onQuotaExceeded,
+        super({
+            ...options,
+            storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
+                storage: options.storage ?? getDefaultBrowserStorage(),
+                onQuotaExceeded: options.onQuotaExceeded,
+            }),
+            storageKey: options.storageKey || MENU_PRESET_STORAGE_KEY,
+            storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
+                ? [...options.storageLegacyKeys]
+                : [...MENU_PRESET_STORAGE_LEGACY_KEYS],
         });
-        this.storage = this.storagePlatform?.driver?.storage || null;
-        this.storageKey = options.storageKey || MENU_PRESET_STORAGE_KEY;
-        this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
-            ? [...options.storageLegacyKeys]
-            : [...MENU_PRESET_STORAGE_LEGACY_KEYS];
         this.fixedCatalog = Array.isArray(options.fixedCatalog) && options.fixedCatalog.length > 0
             ? options.fixedCatalog.map((preset) => ensurePresetMetadataContract(preset))
             : getFixedMenuPresetCatalog().map((preset) => ensurePresetMetadataContract(preset));
@@ -93,7 +88,7 @@ export class MenuPresetStore {
 
     _loadPersistedPresets() {
         try {
-            const parsed = this.storagePlatform.readJson(this.storageKey, this.storageLegacyKeys, null);
+            const parsed = this.readJsonRecord(null);
             if (!parsed || typeof parsed !== 'object') return [];
             const presets = Array.isArray(parsed?.presets) ? parsed.presets : [];
             return presets
@@ -105,7 +100,7 @@ export class MenuPresetStore {
     }
 
     _savePersistedPresets(presets) {
-        return this.storagePlatform.writeJson(this.storageKey, {
+        return this.writeJsonRecord({
             schemaVersion: MENU_PRESET_STORAGE_SCHEMA_VERSION,
             presets,
         }).ok;

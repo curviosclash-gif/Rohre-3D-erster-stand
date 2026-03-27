@@ -3,17 +3,10 @@ import {
     STORAGE_KEYS,
 } from '../StorageKeys.js';
 import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
+import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
 
 const MENU_TEXT_OVERRIDE_STORAGE_KEY = STORAGE_KEYS.menuTextOverrides;
 const MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTextOverrides;
-
-function getDefaultStorage() {
-    try {
-        return typeof localStorage !== 'undefined' ? localStorage : null;
-    } catch {
-        return null;
-    }
-}
 
 function sanitizeTextId(value) {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -24,22 +17,24 @@ function sanitizeTextValue(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
 
-export class MenuTextOverrideStore {
+export class MenuTextOverrideStore extends PersistentStore {
     constructor(options = {}) {
-        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
-            storage: options.storage ?? getDefaultStorage(),
-            onQuotaExceeded: options.onQuotaExceeded,
+        super({
+            ...options,
+            storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
+                storage: options.storage ?? getDefaultBrowserStorage(),
+                onQuotaExceeded: options.onQuotaExceeded,
+            }),
+            storageKey: options.storageKey || MENU_TEXT_OVERRIDE_STORAGE_KEY,
+            storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
+                ? [...options.storageLegacyKeys]
+                : [...MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS],
         });
-        this.storage = this.storagePlatform?.driver?.storage || null;
-        this.storageKey = options.storageKey || MENU_TEXT_OVERRIDE_STORAGE_KEY;
-        this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
-            ? [...options.storageLegacyKeys]
-            : [...MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS];
     }
 
     _loadRaw() {
         try {
-            const parsed = this.storagePlatform.readJson(this.storageKey, this.storageLegacyKeys, {});
+            const parsed = this.readJsonRecord({});
             return parsed && typeof parsed === 'object' ? parsed : {};
         } catch {
             return {};
@@ -47,7 +42,7 @@ export class MenuTextOverrideStore {
     }
 
     _saveRaw(rawOverrides) {
-        return this.storagePlatform.writeJson(this.storageKey, rawOverrides).ok;
+        return this.writeJsonRecord(rawOverrides).ok;
     }
 
     listOverrides() {

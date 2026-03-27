@@ -7,6 +7,7 @@ import {
     STORAGE_KEYS,
 } from './StorageKeys.js';
 import { createDefaultStoragePlatform } from '../state/storage/StoragePlatform.js';
+import { getDefaultBrowserStorage } from './base/PersistentStore.js';
 
 const SETTINGS_STORAGE_KEY = STORAGE_KEYS.settings;
 const SETTINGS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settings;
@@ -34,19 +35,10 @@ function normalizeProfileEntries(profiles) {
     });
 }
 
-function getDefaultStorage() {
-    try {
-        return typeof localStorage !== 'undefined' ? localStorage : null;
-    } catch {
-        // Some browser contexts can throw on localStorage access.
-        return null;
-    }
-}
-
 export class SettingsStore {
     constructor(options = {}) {
         this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
-            storage: options.storage ?? getDefaultStorage(),
+            storage: options.storage ?? getDefaultBrowserStorage(),
             onQuotaExceeded: options.onQuotaExceeded,
         });
         this.storage = this.storagePlatform?.driver?.storage || null;

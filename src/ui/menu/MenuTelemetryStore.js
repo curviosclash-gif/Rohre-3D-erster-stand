@@ -3,19 +3,12 @@ import {
     STORAGE_KEYS,
 } from '../StorageKeys.js';
 import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
+import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
 
 const MENU_TELEMETRY_STORAGE_KEY = STORAGE_KEYS.menuTelemetry;
 const MENU_TELEMETRY_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTelemetry;
 const MAX_EVENTS = 30;
 const MAX_RECENT_ROUNDS = 12;
-
-function getDefaultStorage() {
-    try {
-        return typeof localStorage !== 'undefined' ? localStorage : null;
-    } catch {
-        return null;
-    }
-}
 
 function sanitizeEventType(value) {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -146,26 +139,24 @@ function createDefaultState() {
     };
 }
 
-export class MenuTelemetryStore {
+export class MenuTelemetryStore extends PersistentStore {
     constructor(options = {}) {
-        this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
-            storage: options.storage ?? getDefaultStorage(),
-            onQuotaExceeded: options.onQuotaExceeded,
+        super({
+            ...options,
+            storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
+                storage: options.storage ?? getDefaultBrowserStorage(),
+                onQuotaExceeded: options.onQuotaExceeded,
+            }),
+            storageKey: options.storageKey || MENU_TELEMETRY_STORAGE_KEY,
+            storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
+                ? [...options.storageLegacyKeys]
+                : [...MENU_TELEMETRY_STORAGE_LEGACY_KEYS],
         });
-        this.storage = this.storagePlatform?.driver?.storage || null;
-        this.storageKey = options.storageKey || MENU_TELEMETRY_STORAGE_KEY;
-        this.storageLegacyKeys = Array.isArray(options.storageLegacyKeys)
-            ? [...options.storageLegacyKeys]
-            : [...MENU_TELEMETRY_STORAGE_LEGACY_KEYS];
     }
 
     _loadState() {
         try {
-            const parsed = this.storagePlatform.readJson(
-                this.storageKey,
-                this.storageLegacyKeys,
-                createDefaultState()
-            );
+            const parsed = this.readJsonRecord(createDefaultState());
             return {
                 ...createDefaultState(),
                 ...(parsed && typeof parsed === 'object' ? parsed : {}),
@@ -181,7 +172,7 @@ export class MenuTelemetryStore {
     }
 
     _saveState(state) {
-        return this.storagePlatform.writeJson(this.storageKey, state).ok;
+        return this.writeJsonRecord(state).ok;
     }
 
     _resolveBucket(collection, key) {
