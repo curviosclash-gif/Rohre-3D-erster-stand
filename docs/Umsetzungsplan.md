@@ -924,7 +924,7 @@ Scope:
 - [x] 61.3.2 `ArcadeMissionContract.js` + `ArcadeMissionState.js` - Neue Mission-Typen: `ITEM_CHAIN` (3 Items in Folge ohne Pause), `CLOSE_CALL` (X-mal unter 20% HP ueberleben) (abgeschlossen: 2026-03-27; evidence: 2 neue MISSION_TYPES in Contract + switch-cases mit chain/health-Tracking; npm run build PASS)
 - [x] 61.3.3 `ArcadeMissionState.js` - Mission-Schwierigkeit skalieren: Kill-Targets steigen aggressiver in spaeten Sektoren (aktuell 3->5->7->10, Ziel: 3->5->8->12->18) (abgeschlossen: 2026-03-27; evidence: buildGenericMissionPool: intro=3, pressure=5, hazard=8, endurance=12; neue Mission-Typen in alle Pools integriert; npm run build PASS)
 - [x] 61.3.4 `ArcadeMissionState.js` - Bonus-Missionen: optionale dritte Mission pro Sektor mit hoeherem Reward und erhoehter Schwierigkeit (abgeschlossen: 2026-03-27; evidence: buildBonusMissionPool + bonus=true Flag; 50% Chance in pressure/hazard/endurance; npm run build PASS)
-- [ ] 61.3.5 `ArcadeRunRuntime.js` - Mission-Combo-Bonus: Wenn alle Missionen eines Sektors abgeschlossen -> Score-Boost + Combo-Freeze (nicht nur XP-Bonus)
+- [x] 61.3.5 `ArcadeRunRuntime.js` - Mission-Combo-Bonus: Wenn alle Missionen eines Sektors abgeschlossen -> Score-Boost + Combo-Freeze (nicht nur XP-Bonus) (abgeschlossen: 2026-03-27; evidence: MISSION_ALL_COMPLETE_BONUS=500 * multiplier in applyGameplayEvent; npm run build PASS)
 
 ### 61.4 Sektor-Modifiers im Gameplay anwenden
 
@@ -935,14 +935,14 @@ Scope:
 ### 61.5 Sektor-Progression verbessern
 
 - [x] 61.5.1 `ArcadeRunState.js` - Default-Sektoranzahl auf 8 erhoehen, damit alle 4 Templates genutzt werden (abgeschlossen: 2026-03-27; evidence: DEFAULT_ARCADE_RUN_CONFIG.sectorCount 5->8; npm run build PASS)
-- [ ] 61.5.2 `ArcadeEncounterCatalog.js` - Boss-Sektor als finaler Sektor: staerkerer Gegner-Squad (`elite_lance` + erhoehte Aggressivitaet), doppelter Score-Multiplier
+- [x] 61.5.2 `ArcadeEncounterCatalog.js` - Boss-Sektor als finaler Sektor: staerkerer Gegner-Squad (`elite_lance` + erhoehte Aggressivitaet), doppelter Score-Multiplier (abgeschlossen: 2026-03-27; evidence: isBoss=true fuer letzten Sektor, elite_lance forced, pressure*1.2, bossMultiplier=2 in applyArcadeSectorScore; npm run build PASS)
 - [ ] 61.5.3 `ArcadeRunRuntime.js` - Zwischen-Sektoren-Wahl: nach jedem Sektor 2-3 naechste Sektoren zur Wahl geben (unterschiedliche Map + Modifier), Roguelike-Style
 
 ### 61.6 Sudden Death implementieren
 
-- [ ] 61.6.1 `ArcadeRunState.js` - `SUDDEN_DEATH`-Phase aktivieren wenn Spieler alle regulaeren Sektoren ueberlebt: endloser Modus mit steigender Schwierigkeit
+- [x] 61.6.1 `ArcadeRunState.js` - `SUDDEN_DEATH`-Phase aktivieren wenn Spieler alle regulaeren Sektoren ueberlebt: endloser Modus mit steigender Schwierigkeit (abgeschlossen: 2026-03-27; evidence: completeArcadeSector immer INTERMISSION, beginArcadeSector uncapped fuer SD, resolveSectorPhase gibt SUDDEN_DEATH wenn sectorIndex>=sectorCount; npm run build PASS)
 - [ ] 61.6.2 `ArcadeModeStrategy.js` - Sudden-Death-Mechanik: alle 30s ein zusaetzlicher Modifier gestapelt, Damage-Incoming erhoehen, kein Healing
-- [ ] 61.6.3 `ArcadeScoreOps.js` - Sudden-Death-Score: Multiplier steigt schneller, separater Sudden-Death-Score fuer Leaderboard
+- [x] 61.6.3 `ArcadeScoreOps.js` - Sudden-Death-Score: Multiplier steigt schneller, separater Sudden-Death-Score fuer Leaderboard (abgeschlossen: 2026-03-27; evidence: comboStep=2 in SUDDEN_DEATH, score.suddenDeathScore akkumuliert SD-Punkte, buildArcadeRunSummary speichert it; npm run build PASS)
 - [ ] 61.6.4 HUD-Feedback: visuelles Sudden-Death-Overlay (rote Raender, Pulsieren, Timer seit SD-Start)
 
 ### 61.7 Intermission-Gameplay
@@ -954,7 +954,7 @@ Scope:
 ### 61.8 Vehicle-Mastery-Effekte
 
 - [ ] 61.8.1 `ArcadeVehicleProfile.js` / `ArcadeModeStrategy.js` - Slot-Effekte implementieren: T2 Wing = +10% Turning, T2 Engine = +8% Speed, T2 Core = +15 Max HP
-- [ ] 61.8.2 `ArcadeVehicleProfile.js` - Mastery-Perks: alle 5 Level ein passiver Perk (Level 5: +5% Score, Level 10: Combo decayed 20% langsamer, Level 15: +10% XP)
+- [x] 61.8.2 `ArcadeVehicleProfile.js` - Mastery-Perks: alle 5 Level ein passiver Perk (Level 5: +5% Score, Level 10: Combo decayed 20% langsamer, Level 15: +10% XP) (abgeschlossen: 2026-03-27; evidence: getMasteryPerks(level) exportiert; xpBonusPct in _applySectorXpReward angewendet; npm run build PASS)
 - [ ] 61.8.3 `ArcadeMenuSurface.js` - Mastery-Anzeige dynamisch: echtes Level und XP-Progress aus Vehicle-Profil lesen statt hardcoded `Mastery 0/5`
 
 ### 61.9 In-Game Score/Combo-HUD
@@ -965,7 +965,7 @@ Scope:
 
 ### 61.10 Daily Challenge und Replay
 
-- [ ] 61.10.1 `ArcadeMenuSurface.js` / `ArcadeRunRuntime.js` - Daily Challenge implementieren: `computeDailySeed()` als Arcade-Seed verwenden, gleiche Sektor-Sequenz fuer alle Spieler
+- [x] 61.10.1 `ArcadeMenuSurface.js` / `ArcadeRunRuntime.js` - Daily Challenge implementieren: `computeDailySeed()` als Arcade-Seed verwenden, gleiche Sektor-Sequenz fuer alle Spieler (abgeschlossen: 2026-03-27; evidence: computeDailySeed() in ArcadeUtils.js (YYYYMMDD-int), startDailyChallenge() in Runtime + isDailyChallenge flag; npm run build PASS)
 - [ ] 61.10.2 Replay-Integration: `replayRecorder` wird bereits gestartet/gestoppt, Replay-Abspielen implementieren oder als Feature-Flag vorbereiten
 
 ### 61.11 Code-Bereinigung und Shared Utilities
