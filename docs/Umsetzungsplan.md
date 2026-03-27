@@ -1083,8 +1083,8 @@ Scope:
 
 **Issue:** Optimierter Trail-Scan ist in zentralen Fight-Pfaden deaktiviert; `TrailCollisionQuery` nimmt den ersten statt den naechsten Treffer entlang der Linie.
 
-- [ ] 63.2.1 Guarded Rollout fuer `optimizedTrailScan` in `HuntCombatSystem`, `ProjectileSimulationOps` und `HuntTargetingPerf` umsetzen und bestehende Hunt-Contracts absichern.
-- [ ] 63.2.2 `TrailCollisionQuery` auf nearest-hit Auswahl umstellen und Characterization-Tests fuer dichte Trail-Szenarien hinterlegen.
+- [x] 63.2.1 Guarded Rollout fuer `optimizedTrailScan` in `HuntCombatSystem`, `ProjectileSimulationOps` und `HuntTargetingPerf` umsetzen und bestehende Hunt-Contracts absichern. (abgeschlossen: 2026-03-27; evidence: `optimizedTrailScan: false` aus HuntCombatSystem.js + ProjectileSimulationOps.js entfernt; HuntTargetingPerf liest jetzt HUNT.TARGETING.OPTIMIZED_SCAN_ENABLED; npm run build PASS)
+- [x] 63.2.2 `TrailCollisionQuery` auf nearest-hit Auswahl umstellen und Characterization-Tests fuer dichte Trail-Szenarien hinterlegen. (abgeschlossen: 2026-03-27; evidence: checkProjectileTrailCollision scannt alle Zellen und waehlt naechsten Treffer per _bestDistSq; T89f + T89g Tests in physics-hunt.spec.js; npm run build PASS)
 
 ### 63.3 HUD- und Runtime-Polish
 
