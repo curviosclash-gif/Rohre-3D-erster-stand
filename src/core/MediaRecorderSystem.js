@@ -5,8 +5,12 @@ import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
-import { EDITOR_API_ROUTES } from '../shared/contracts/EditorPathContract.js';
 import { RECORDING_CAPTURE_PROFILE } from '../shared/contracts/RecordingCaptureContract.js';
+import {
+    attemptAutoDownload,
+    buildDownloadFileName,
+    defaultDownload,
+} from './recording/DownloadService.js';
 import { toFiniteNumber } from '../utils/MathOps.js';
 import {
     DEFAULT_FALLBACK_MIME_TYPE,
@@ -37,19 +41,6 @@ import {
 } from './recording/MediaRecorderSystemOps.js';
 const DEFAULT_CONTRACT_VERSION = MATCH_LIFECYCLE_CONTRACT_VERSION;
 export const LIFECYCLE_EVENT_TYPES = MATCH_LIFECYCLE_EVENT_TYPES;
-function defaultDownload({ blob, fileName }) {
-    if (typeof document === 'undefined' || !blob || !fileName) return;
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = fileName;
-    anchor.rel = 'noopener';
-    anchor.style.display = 'none';
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 0);
-}
 export class MediaRecorderSystem {
     constructor({
         canvas = null,
@@ -1095,10 +1086,7 @@ export class MediaRecorderSystem {
         return `${this.filePrefix}-${mode}-${profile}-${matchId}-${toSafeDatePart(startedAt)}-${toSafeDatePart(endedAtMs)}.${ext}`;
     }
     _buildDownloadFileName(fileName) {
-        const baseName = String(fileName || '').trim();
-        if (!baseName) return baseName;
-        if (!this.downloadDirectoryName) return baseName;
-        return `${this.downloadDirectoryName}/${baseName}`;
+        return buildDownloadFileName(this.downloadDirectoryName, fileName);
     }
     _estimateCapturedDurationMs(frameIntervalStats = null) {
         const sampleCount = Math.max(0, Math.trunc(toFiniteNumber(frameIntervalStats?.sampleCount, 0)));
@@ -1131,79 +1119,14 @@ export class MediaRecorderSystem {
         };
     }
     async _attemptAutoDownload(blob, fileName, mimeType) {
-        if (!this.autoDownload || !blob || blob.size <= 0) {
-            return {
-                requested: false,
-                transport: 'disabled',
-                status: 'not_requested',
-                fallbackReason: null,
-                apiStatus: null,
-            };
-        }
-        const safeFileName = String(fileName || '').trim();
-        const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
-        const downloadViaBrowser = (reason, error = null) => {
-            if (error) {
-                this.logger?.warn?.(`[MediaRecorderSystem] recording export fallback (${reason})`, error);
-            }
-            try {
-                this.downloadHandler({
-                    blob,
-                    fileName: browserFileName,
-                    mimeType,
-                });
-                return true;
-            } catch (downloadError) {
-                this.logger?.warn?.('[MediaRecorderSystem] recording export browser download failed', downloadError);
-                return false;
-            }
-        };
-        if (typeof fetch !== 'function') {
-            const downloaded = downloadViaBrowser('fetch-unavailable');
-            return {
-                requested: true,
-                transport: downloaded ? 'download' : 'download-failed',
-                status: downloaded ? 'saved_via_download' : 'download_failed',
-                fallbackReason: 'fetch-unavailable',
-                apiStatus: null,
-            };
-        }
-        try {
-            const response = await fetch(EDITOR_API_ROUTES.SAVE_VIDEO_DISK, {
-                method: 'POST',
-                headers: { 'x-file-name': safeFileName },
-                body: blob
-            });
-            if (response?.ok) {
-                this.logger?.info?.('[MediaRecorderSystem] recording export saved via api', safeFileName);
-                return {
-                    requested: true,
-                    transport: 'api',
-                    status: 'saved_via_api',
-                    fallbackReason: null,
-                    apiStatus: Number(response.status) || 200,
-                };
-            }
-            const apiStatus = Number(response?.status) || 0;
-            const apiError = new Error(`http_${apiStatus || 'unknown'}`);
-            const downloaded = downloadViaBrowser('api-failed', apiError);
-            return {
-                requested: true,
-                transport: downloaded ? 'api-fallback-download' : 'api-fallback-download-failed',
-                status: downloaded ? 'saved_via_download_fallback' : 'download_fallback_failed',
-                fallbackReason: 'api-failed',
-                apiStatus: apiStatus || null,
-            };
-        } catch (error) {
-            const downloaded = downloadViaBrowser('api-throw', error);
-            return {
-                requested: true,
-                transport: downloaded ? 'download' : 'download-failed',
-                status: downloaded ? 'saved_via_download' : 'download_failed',
-                fallbackReason: 'api-throw',
-                apiStatus: null,
-            };
-        }
+        return attemptAutoDownload({
+            blob,
+            fileName,
+            mimeType,
+            autoDownload: this.autoDownload,
+            downloadHandler: this.downloadHandler,
+            logger: this.logger,
+        });
     }
     async _finalizeBlobExport(blob, mimeType = DEFAULT_MIME_TYPE) {
         const activeRecording = this._activeRecording || null;
