@@ -299,7 +299,15 @@ export function setupArcadeMenuSurface(ctx = {}) {
             refs.postRunLine.textContent = t('menu.arcade.postrun.empty', 'Noch kein Arcade-Run gestartet.');
         }
 
-        refs.masteryLine.textContent = `${t('menu.arcade.mastery.current.label', 'Aktives Airframe')}: ${vehicleId} | ${t('menu.arcade.mastery.progress.label', 'Mastery')} 0/5`;
+        const profilesRaw = safeReadLocalStorage('cuviosclash.arcade-vehicle-profile.v1');
+        const profilesMap = profilesRaw ? (() => { try { return JSON.parse(profilesRaw); } catch { return {}; } })() : {};
+        const profile = (profilesMap && typeof profilesMap === 'object' && profilesMap[vehicleId]) || { level: 1, xp: 0 };
+        const MAX_LEVEL = 30;
+        const lvl = Math.max(1, Math.min(MAX_LEVEL, Number(profile.level) || 1));
+        const masteryLabel = lvl >= MAX_LEVEL
+            ? `${t('menu.arcade.mastery.progress.label', 'Mastery')} ${t('menu.arcade.mastery.max', 'MAX')}`
+            : `${t('menu.arcade.mastery.progress.label', 'Mastery')} Lv.${lvl}/${MAX_LEVEL}`;
+        refs.masteryLine.textContent = `${t('menu.arcade.mastery.current.label', 'Aktives Airframe')}: ${vehicleId} | ${masteryLabel}`;
     };
 
     const recordRunStart = () => {
