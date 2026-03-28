@@ -130,11 +130,14 @@ export function syncPlayerHitboxFromVehicleMesh(player, mesh = null) {
     return player.hitboxBox;
 }
 
-export function updatePlayerMotion(player, dt, controlState = null) {
+export function updatePlayerMotion(player, dt, controlState = null, motionOptions = null) {
     const config = getActiveRuntimeConfig(CONFIG);
     const resolvedTurnSpeed = Number(player?.turnSpeed) || Number(config.PLAYER.TURN_SPEED) || 0;
     const resolvedRollSpeed = Number(player?.rollSpeed) || Number(config.PLAYER.ROLL_SPEED) || 0;
-    const turnSpeed = resolvedTurnSpeed * dt;
+    // 61.4.1: tight_turns modifier reduces turn rate
+    const turnRateMul = (motionOptions && typeof motionOptions.turnRateMultiplier === 'number')
+        ? Math.max(0.1, motionOptions.turnRateMultiplier) : 1.0;
+    const turnSpeed = resolvedTurnSpeed * turnRateMul * dt;
     const rollSpeed = resolvedRollSpeed * dt;
 
     const pitchInput = clampAxisInput(controlState?.pitchInput);

@@ -80,7 +80,14 @@ export class PowerupManager {
         this.spawnTimer += dt;
 
         // Neue Items spawnen
-        if (this.spawnTimer >= config.POWERUP.SPAWN_INTERVAL && this.items.length < config.POWERUP.MAX_ON_FIELD) {
+        // 61.4.1: portal_storm modifier increases spawn rate via strategy multiplier
+        const strategy = typeof this.getStrategy === 'function' ? this.getStrategy() : null;
+        const spawnRateMul = (strategy && typeof strategy.getSpawnRateMultiplier === 'function')
+            ? strategy.getSpawnRateMultiplier() : 1.0;
+        const effectiveInterval = spawnRateMul > 0
+            ? config.POWERUP.SPAWN_INTERVAL / spawnRateMul
+            : config.POWERUP.SPAWN_INTERVAL;
+        if (this.spawnTimer >= effectiveInterval && this.items.length < config.POWERUP.MAX_ON_FIELD) {
             this.spawnTimer = 0;
             this._spawnRandom();
         }

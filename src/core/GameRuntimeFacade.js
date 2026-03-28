@@ -122,6 +122,14 @@ export class GameRuntimeFacade {
             now: this.runtimeClock.nowMs,
             logger: console,
         });
+
+        // 61.4.1: Sync active modifier from runtime to strategy
+        this.arcadeRunRuntime.setModifierChangedHandler((modifierId) => {
+            const strategy = this.game?.entityManager?.gameModeStrategy;
+            if (strategy && typeof strategy.setActiveModifier === 'function') {
+                strategy.setActiveModifier(modifierId);
+            }
+        });
     }
 
     _clearMatchPrewarmTimer() {

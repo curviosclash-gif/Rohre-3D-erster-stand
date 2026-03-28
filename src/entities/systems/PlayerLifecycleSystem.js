@@ -24,7 +24,7 @@ export class PlayerLifecycleSystem {
         this._actionPhase.run(player, input, strategy);
 
         const prevPos = this._interactionPhase.capturePreviousPosition(player);
-        player.update(dt, input, renderFrameId);
+        player.update(dt, input, renderFrameId, strategy);
         if (player.alive && typeof player.prepareObbCollisionQuery === 'function') {
             player.prepareObbCollisionQuery();
         }

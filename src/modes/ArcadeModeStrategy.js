@@ -22,8 +22,34 @@ function nowSeconds() {
     return Date.now() * 0.001;
 }
 
+// 61.4.1: Modifier effect constants
+const MODIFIER_EFFECTS = Object.freeze({
+    tight_turns: Object.freeze({ turnRateMultiplier: 0.7 }),
+    heat_stress: Object.freeze({ hpDrainPerSecond: 2.5 }),
+    portal_storm: Object.freeze({ spawnRateMultiplier: 2.0 }),
+    boost_tax: Object.freeze({ boostHpCostPerSecond: 8.0 }),
+});
+
 export class ArcadeModeStrategy extends GameModeContract {
+    constructor() {
+        super();
+        this._activeModifierId = null;
+    }
+
     get modeType() { return 'ARCADE'; }
+
+    // 61.4.1: Active sector modifier
+    setActiveModifier(modifierId) {
+        this._activeModifierId = typeof modifierId === 'string' ? modifierId : null;
+    }
+
+    getActiveModifier() {
+        return this._activeModifierId;
+    }
+
+    _getModifierEffect() {
+        return this._activeModifierId ? (MODIFIER_EFFECTS[this._activeModifierId] || null) : null;
+    }
 
     // --- Health & Damage ---
     resetPlayerHealth(player) {
@@ -91,7 +117,43 @@ export class ArcadeModeStrategy extends GameModeContract {
         return player.shieldHP;
     }
 
-    updateHealthRegen() { /* no regen in Arcade stub — will be replaced by sector-based healing */ }
+    // 61.4.1: heat_stress drains HP over time; no natural regen in Arcade
+    updateHealthRegen(player, dt) {
+        if (!player || player.hp <= 0) return;
+        const fx = this._getModifierEffect();
+        if (!fx || !fx.hpDrainPerSecond) return;
+        const drain = fx.hpDrainPerSecond * Math.max(0, dt);
+        if (drain <= 0) return;
+        player.hp = Math.max(0, toSafe(player.hp, player.maxHp) - drain);
+        if (player.hp <= 0) {
+            player.lastDamageTimestamp = nowSeconds();
+        }
+    }
+
+    // 61.4.1: boost_tax — drains HP while boosting
+    applyBoostTick(player, dt) {
+        if (!player || player.hp <= 0 || !player.isBoosting) return;
+        const fx = this._getModifierEffect();
+        if (!fx || !fx.boostHpCostPerSecond) return;
+        const cost = fx.boostHpCostPerSecond * Math.max(0, dt);
+        if (cost <= 0) return;
+        player.hp = Math.max(0, toSafe(player.hp, player.maxHp) - cost);
+        if (player.hp <= 0) {
+            player.lastDamageTimestamp = nowSeconds();
+        }
+    }
+
+    // 61.4.1: tight_turns — multiplier applied to turn rate
+    getTurnRateMultiplier() {
+        const fx = this._getModifierEffect();
+        return (fx && fx.turnRateMultiplier) ? fx.turnRateMultiplier : 1.0;
+    }
+
+    // 61.4.1: portal_storm — multiplier for item/portal spawn frequency
+    getSpawnRateMultiplier() {
+        const fx = this._getModifierEffect();
+        return (fx && fx.spawnRateMultiplier) ? fx.spawnRateMultiplier : 1.0;
+    }
 
     // --- Collision Response ---
     handleWallCollision(player, arenaCollision, entityManager) {

@@ -209,7 +209,7 @@ export class Player {
         return success;
     }
 
-    update(dt, input, renderFrameId = 0) {
+    update(dt, input, renderFrameId = 0, strategy = null) {
         if (!this.alive) return;
         this._obbCollisionPrepared = false;
 
@@ -221,6 +221,16 @@ export class Player {
         updatePlayerHealthRegen(this, dt);
         updatePlayerEffects(this, dt);
 
+        // 61.4.1: Apply modifier per-frame effects via strategy
+        if (strategy) {
+            if (typeof strategy.updateHealthRegen === 'function') {
+                strategy.updateHealthRegen(this, dt);
+            }
+            if (typeof strategy.applyBoostTick === 'function') {
+                strategy.applyBoostTick(this, dt);
+            }
+        }
+
         // Capture vor JEDEM Substep, nicht nur einmal pro Frame.
         // So interpoliert render() immer zwischen den letzten beiden Physics-States
         // statt über N Substeps hinweg (was bei Framedrops zum Ruckeln fuehrt).
@@ -228,7 +238,10 @@ export class Player {
         this._renderPrevQuaternion.copy(this.quaternion);
 
         const controlState = this.controller.resolveControlState(this, input, steeringLocked, dt);
-        updatePlayerMotion(this, dt, controlState);
+        // 61.4.1: Thread turn rate multiplier from strategy
+        const motionOptions = (strategy && typeof strategy.getTurnRateMultiplier === 'function')
+            ? { turnRateMultiplier: strategy.getTurnRateMultiplier() } : null;
+        updatePlayerMotion(this, dt, controlState, motionOptions);
 
         this.view?.update(dt);
     }

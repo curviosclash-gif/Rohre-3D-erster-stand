@@ -61,6 +61,8 @@ export class ArcadeRunRuntime {
         this._activeVehicleId = null;
         this._missionState = null;
         this._onMapTransition = null;
+        this._activeModifierId = null;
+        this._onModifierChanged = null;
     }
 
     _nextRunId(nowMs = Date.now()) {
@@ -138,6 +140,17 @@ export class ArcadeRunRuntime {
         this._onMapTransition = typeof handler === 'function' ? handler : null;
     }
 
+    // 61.4.1: Callback when active modifier changes (used to sync strategy)
+    setModifierChangedHandler(handler) {
+        this._onModifierChanged = typeof handler === 'function' ? handler : null;
+    }
+
+    _notifyModifierChanged(modifierId) {
+        if (this._onModifierChanged) {
+            try { this._onModifierChanged(modifierId); } catch { /* no-op */ }
+        }
+    }
+
     setActiveVehicle(vehicleId) {
         this._activeVehicleId = String(vehicleId || 'ship1');
     }
@@ -145,6 +158,18 @@ export class ArcadeRunRuntime {
     getVehicleProfile() {
         if (!this._vehicleProfiles || !this._activeVehicleId) return null;
         return getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
+    }
+
+    // 61.4.1: Active modifier for the current sector
+    getActiveModifierId() {
+        return this._activeModifierId;
+    }
+
+    _resolveModifierForSector(sectorIndex) {
+        const seq = this._state?.encounterSequence;
+        if (!Array.isArray(seq) || sectorIndex < 1) return null;
+        const entry = seq[sectorIndex - 1];
+        return (entry && typeof entry.modifierId === 'string') ? entry.modifierId : null;
     }
 
     getMissionState() {
@@ -240,6 +265,10 @@ export class ArcadeRunRuntime {
 
         this._state = beginArcadeSector(this._state, nowMs);
 
+        // 61.4.1: Resolve modifier for the first sector
+        this._activeModifierId = this._resolveModifierForSector(this._state.sectorIndex);
+        this._notifyModifierChanged(this._activeModifierId);
+
         // Assign initial missions
         this._assignMissionsForCurrentSector();
 
@@ -285,6 +314,10 @@ export class ArcadeRunRuntime {
         }
 
         this._state = beginArcadeSector(this._state, nowMs);
+
+        // 61.4.1: Resolve modifier for the new sector
+        this._activeModifierId = this._resolveModifierForSector(this._state.sectorIndex);
+        this._notifyModifierChanged(this._activeModifierId);
 
         // Assign new missions for the sector
         this._assignMissionsForCurrentSector();
