@@ -1609,6 +1609,297 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.memberCount).toBe(10);
     });
 
+    test('T41c4: MenuMultiplayerBridge verlaengert Presence-Leases bei visibilitychange und Resume', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const { MenuMultiplayerBridge } = await import('/src/ui/menu/MenuMultiplayerBridge.js');
+
+            const createMemoryStorage = () => {
+                const store = new Map();
+                return {
+                    getItem(key) {
+                        return store.has(key) ? store.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        store.set(key, String(value));
+                    },
+                    removeItem(key) {
+                        store.delete(key);
+                    },
+                };
+            };
+
+            const createListenerTarget = () => {
+                const listeners = new Map();
+                return {
+                    target: {
+                        addEventListener(type, handler) {
+                            if (!listeners.has(type)) listeners.set(type, new Set());
+                            listeners.get(type).add(handler);
+                        },
+                        removeEventListener(type, handler) {
+                            listeners.get(type)?.delete(handler);
+                        },
+                    },
+                    dispatch(type, event = {}) {
+                        for (const handler of Array.from(listeners.get(type) || [])) {
+                            handler({ type, ...event });
+                        }
+                    },
+                };
+            };
+
+            let now = 1_700_000_000_000;
+            let timerCursor = 0;
+            const timers = new Map();
+            const createRuntimeHarness = (randomValue) => {
+                const eventHarness = createListenerTarget();
+                const documentHarness = createListenerTarget();
+                let visibilityState = 'visible';
+                const documentTarget = {
+                    addEventListener(type, handler) {
+                        documentHarness.target.addEventListener(type, handler);
+                    },
+                    removeEventListener(type, handler) {
+                        documentHarness.target.removeEventListener(type, handler);
+                    },
+                    get visibilityState() {
+                        return visibilityState;
+                    },
+                };
+                return {
+                    runtime: {
+                        global: { document: documentTarget },
+                        document: documentTarget,
+                        eventTarget: eventHarness.target,
+                        createBroadcastChannel: () => null,
+                        now: () => now,
+                        random: () => randomValue,
+                        setInterval(fn) {
+                            const id = `i-${++timerCursor}`;
+                            timers.set(id, fn);
+                            return id;
+                        },
+                        clearInterval(id) {
+                            timers.delete(id);
+                        },
+                        setTimeout(fn) {
+                            const id = `t-${++timerCursor}`;
+                            timers.set(id, fn);
+                            return id;
+                        },
+                        clearTimeout(id) {
+                            timers.delete(id);
+                        },
+                    },
+                    setVisibility(nextState) {
+                        visibilityState = nextState;
+                        documentHarness.dispatch('visibilitychange', { visibilityState });
+                    },
+                    dispatchResume() {
+                        eventHarness.dispatch('focus');
+                    },
+                };
+            };
+
+            const sharedStorage = createMemoryStorage();
+            const hostHarness = createRuntimeHarness(0.111111);
+            const clientHarness = createRuntimeHarness(0.222222);
+            const hostBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-host',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime: hostHarness.runtime,
+            });
+            const clientBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-client',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime: clientHarness.runtime,
+            });
+
+            const lobbyCode = 'LEASE-QA';
+            hostBridge.host({ actorId: 'host', lobbyCode });
+            clientBridge.join({ actorId: 'client', lobbyCode });
+
+            const captureSnapshot = () => JSON.parse(
+                sharedStorage.getItem(`cuviosclash.multiplayer.lobby.${lobbyCode}`) || 'null'
+            );
+            const hostLeaseAt = () => {
+                const snapshot = captureSnapshot();
+                return Number(
+                    snapshot?.members?.find((member) => member.peerId === 'peer-host')?.leaseExpiresAt || 0
+                );
+            };
+
+            const initialLease = hostLeaseAt();
+            now += 1;
+            hostHarness.setVisibility('hidden');
+            const hiddenLease = hostLeaseAt();
+
+            now += 20_000;
+            clientBridge._syncStateFromSnapshot(clientBridge._getSnapshot(lobbyCode), { preserveLobbyCode: true });
+            const backgroundState = clientBridge.getSessionState();
+
+            now += 1;
+            hostHarness.setVisibility('visible');
+            hostHarness.dispatchResume();
+            const resumedLease = hostLeaseAt();
+
+            hostBridge.dispose();
+            clientBridge.dispose();
+
+            return {
+                initialLease,
+                hiddenLease,
+                resumedLease,
+                memberCount: backgroundState.memberCount,
+                hostConnected: backgroundState.hostConnected === true,
+                isHost: backgroundState.isHost === true,
+                role: String(backgroundState.role || ''),
+            };
+        });
+
+        expect(result.hiddenLease).toBeGreaterThan(result.initialLease);
+        expect(result.resumedLease).toBeGreaterThan(result.hiddenLease);
+        expect(result.memberCount).toBe(2);
+        expect(result.hostConnected).toBeTruthy();
+        expect(result.isHost).toBeFalsy();
+        expect(result.role).toBe('client');
+    });
+
+    test('T41c5: MenuMultiplayerBridge verhindert implizite Host-Promotion nach Host-Stale und erlaubt nur manuelles Re-Hosting', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const { MenuMultiplayerBridge } = await import('/src/ui/menu/MenuMultiplayerBridge.js');
+
+            const createMemoryStorage = () => {
+                const store = new Map();
+                return {
+                    getItem(key) {
+                        return store.has(key) ? store.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        store.set(key, String(value));
+                    },
+                    removeItem(key) {
+                        store.delete(key);
+                    },
+                };
+            };
+
+            let now = 1_700_000_100_000;
+            let timerCursor = 0;
+            const timers = new Map();
+            const createRuntime = (randomValue) => ({
+                global: {},
+                eventTarget: {
+                    addEventListener() { },
+                    removeEventListener() { },
+                },
+                createBroadcastChannel: () => null,
+                now: () => now,
+                random: () => randomValue,
+                setInterval(fn) {
+                    const id = `i-${++timerCursor}`;
+                    timers.set(id, fn);
+                    return id;
+                },
+                clearInterval(id) {
+                    timers.delete(id);
+                },
+                setTimeout(fn) {
+                    const id = `t-${++timerCursor}`;
+                    timers.set(id, fn);
+                    return id;
+                },
+                clearTimeout(id) {
+                    timers.delete(id);
+                },
+            });
+
+            const sharedStorage = createMemoryStorage();
+            const hostBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-host',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime: createRuntime(0.111111),
+            });
+            const clientBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-client',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime: createRuntime(0.222222),
+            });
+
+            const lobbyCode = 'STALE-QA';
+            hostBridge.host({ actorId: 'host', lobbyCode });
+            clientBridge.join({ actorId: 'client', lobbyCode });
+
+            now += 30_000;
+            clientBridge._updateHeartbeat();
+
+            now += 35_000;
+            clientBridge._updateHeartbeat();
+            const staleState = clientBridge.getSessionState();
+
+            const blockedJoinBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-join',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime: createRuntime(0.333333),
+            });
+            const blockedJoin = blockedJoinBridge.join({ actorId: 'late-client', lobbyCode });
+
+            const recoveryBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-rehost',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime: createRuntime(0.444444),
+            });
+            const rehostResult = recoveryBridge.host({ actorId: 'rehost', lobbyCode });
+            const recoveredState = recoveryBridge.getSessionState();
+            const recoveredSnapshot = JSON.parse(
+                sharedStorage.getItem(`cuviosclash.multiplayer.lobby.${lobbyCode}`) || 'null'
+            );
+
+            recoveryBridge.dispose();
+            blockedJoinBridge.dispose();
+            clientBridge.dispose();
+            hostBridge.dispose();
+
+            return {
+                staleIsHost: staleState.isHost === true,
+                staleRole: String(staleState.role || ''),
+                staleHostConnected: staleState.hostConnected === true,
+                staleHostPeerId: String(staleState.hostPeerId || ''),
+                staleMemberCount: Number(staleState.memberCount || 0),
+                blockedJoinOk: blockedJoin?.ok === true,
+                blockedJoinCode: String(blockedJoin?.code || ''),
+                rehostOk: rehostResult?.ok === true,
+                rehostIsHost: recoveredState.isHost === true,
+                recoveredHostPeerId: String(recoveredSnapshot?.hostPeerId || ''),
+                recoveredHostRolePeerId: String(
+                    recoveredSnapshot?.members?.find((member) => member.role === 'host')?.peerId || ''
+                ),
+            };
+        });
+
+        expect(result.staleIsHost).toBeFalsy();
+        expect(result.staleRole).toBe('client');
+        expect(result.staleHostConnected).toBeFalsy();
+        expect(result.staleHostPeerId).toBe('peer-host');
+        expect(result.staleMemberCount).toBe(1);
+        expect(result.blockedJoinOk).toBeFalsy();
+        expect(result.blockedJoinCode).toBe('host_unavailable');
+        expect(result.rehostOk).toBeTruthy();
+        expect(result.rehostIsHost).toBeTruthy();
+        expect(result.recoveredHostPeerId).toBe('peer-rehost');
+        expect(result.recoveredHostRolePeerId).toBe('peer-rehost');
+    });
+
     test('T41d: MenuMultiplayerPanel nutzt Discovery/Host-IP Ports via DI ohne window.curviosApp', async ({ page }) => {
         await loadGame(page);
 

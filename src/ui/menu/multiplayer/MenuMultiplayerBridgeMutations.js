@@ -21,7 +21,9 @@ export function hostMultiplayerLobby(bridge, options, helpers) {
     let hostConflict = false;
     const persistedSnapshot = bridge._updateActiveSnapshot((existingSnapshot) => {
         const existingHostPeerId = helpers.normalizeString(existingSnapshot?.hostPeerId, '');
-        if (existingHostPeerId && existingHostPeerId !== bridge._peerId) {
+        const hostStillPresent = existingHostPeerId
+            && snapshotHasPeer(existingSnapshot, existingHostPeerId, helpers.normalizeString);
+        if (hostStillPresent && existingHostPeerId !== bridge._peerId) {
             hostConflict = true;
             return SNAPSHOT_NOOP;
         }
@@ -95,9 +97,15 @@ export function joinMultiplayerLobby(bridge, options, helpers) {
 
     let lobbyMissing = false;
     let lobbyFull = false;
+    let hostUnavailable = false;
     const persistedSnapshot = bridge._updateActiveSnapshot((existingSnapshot) => {
         if (!existingSnapshot?.hostPeerId) {
             lobbyMissing = true;
+            return SNAPSHOT_NOOP;
+        }
+        const hostAvailable = snapshotHasPeer(existingSnapshot, existingSnapshot.hostPeerId, helpers.normalizeString);
+        if (!hostAvailable) {
+            hostUnavailable = true;
             return SNAPSHOT_NOOP;
         }
 
@@ -130,6 +138,9 @@ export function joinMultiplayerLobby(bridge, options, helpers) {
     }
     if (lobbyFull) {
         return bridge._fail(`Lobby ist voll (max. ${MULTIPLAYER_MAX_PLAYERS} Spieler).`, 'lobby_full');
+    }
+    if (hostUnavailable) {
+        return bridge._fail(`Lobby hat aktuell keinen aktiven Host: ${requestedLobbyCode}`, 'host_unavailable');
     }
     if (!persistedSnapshot) {
         return bridge._fail(`Lobby nicht verfuegbar: ${requestedLobbyCode}`, 'lobby_not_found');

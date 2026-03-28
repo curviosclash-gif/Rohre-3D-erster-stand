@@ -19,6 +19,11 @@ import {
     toCallable,
 } from './multiplayer/MenuMultiplayerBridgeRuntime.js';
 import {
+    extendMultiplayerPresenceLease,
+    MENU_MULTIPLAYER_HEARTBEAT_INTERVAL_MS,
+    normalizeMultiplayerMembers,
+} from './multiplayer/MenuMultiplayerPresence.js';
+import {
     acquireMenuMultiplayerSnapshotLock,
     persistMenuMultiplayerSnapshotWithCas,
     releaseMenuMultiplayerSnapshotLock,
@@ -41,8 +46,6 @@ const MULTIPLAYER_SESSION_SCHEMA_VERSION = 'multiplayer-session.v1';
 const MULTIPLAYER_STORAGE_KEY_PREFIX = 'cuviosclash.multiplayer.lobby.';
 const MULTIPLAYER_PEER_SESSION_KEY = 'cuviosclash.multiplayer.peer.v1';
 const MULTIPLAYER_CHANNEL_NAME = 'cuviosclash.multiplayer.v1';
-const HEARTBEAT_INTERVAL_MS = 4000;
-const MEMBER_STALE_AFTER_MS = 15000;
 const MATCH_START_MAX_AGE_MS = 12000;
 const MATCH_START_CLEAR_DELAY_MS = 2500;
 
@@ -141,49 +144,6 @@ function createIdleSessionState(peerId, lobbyCode = '') {
     };
 }
 
-function normalizeMemberSnapshot(member, fallbackRole, now) {
-    const peerId = normalizeString(member?.peerId, '');
-    if (!peerId) return null;
-    const role = normalizeString(member?.role, fallbackRole) === 'host' ? 'host' : 'client';
-    return {
-        peerId,
-        actorId: normalizeString(member?.actorId, role === 'host' ? 'host' : 'player'),
-        role,
-        ready: member?.ready === true,
-        joinedAt: toTimestamp(member?.joinedAt, now),
-        lastSeenAt: toTimestamp(member?.lastSeenAt, now),
-    };
-}
-
-function pruneMembers(members, now) {
-    if (!Array.isArray(members)) return [];
-    return members.filter((member) => {
-        const lastSeenAt = toTimestamp(member?.lastSeenAt, 0);
-        return lastSeenAt > 0 && (now - lastSeenAt) <= MEMBER_STALE_AFTER_MS;
-    });
-}
-
-function normalizeMembers(members, hostPeerId, now) {
-    const hostId = normalizeString(hostPeerId, '');
-    const normalizedMembers = pruneMembers(members, now)
-        .map((member) => normalizeMemberSnapshot(member, member?.peerId === hostId ? 'host' : 'client', now))
-        .filter(Boolean);
-
-    if (normalizedMembers.length === 0) return [];
-
-    const hostMember = normalizedMembers.find((member) => member.peerId === hostId) || normalizedMembers[0];
-    return normalizedMembers
-        .map((member) => ({
-            ...member,
-            role: member.peerId === hostMember.peerId ? 'host' : 'client',
-        }))
-        .sort((left, right) => {
-            if (left.role !== right.role) return left.role === 'host' ? -1 : 1;
-            if (left.joinedAt !== right.joinedAt) return left.joinedAt - right.joinedAt;
-            return left.peerId.localeCompare(right.peerId);
-        });
-}
-
 function normalizePendingMatchStart(command, now) {
     if (!command || typeof command !== 'object') return null;
     const commandId = normalizeString(command.commandId, '');
@@ -202,18 +162,22 @@ function normalizeSessionSnapshot(snapshot, now) {
     const lobbyCode = normalizeLobbyCode(snapshot.lobbyCode, '');
     if (!lobbyCode) return null;
 
-    const normalizedMembers = normalizeMembers(snapshot.members, snapshot.hostPeerId, now);
+    const normalizedMembers = normalizeMultiplayerMembers(snapshot.members, snapshot.hostPeerId, now, {
+        normalizeString,
+        toTimestamp,
+    });
     if (normalizedMembers.length === 0) return null;
 
-    const hostMember = normalizedMembers.find((member) => member.role === 'host') || normalizedMembers[0];
-    const hostPeerId = normalizeString(hostMember?.peerId, '');
+    const declaredHostPeerId = normalizeString(snapshot.hostPeerId, '');
+    const hostPeerId = declaredHostPeerId || normalizeString(normalizedMembers[0]?.peerId, '');
     if (!hostPeerId) return null;
+    const hostMember = normalizedMembers.find((member) => member.peerId === hostPeerId) || null;
 
     return {
         schemaVersion: MULTIPLAYER_SESSION_SCHEMA_VERSION,
         lobbyCode,
         hostPeerId,
-        hostActorId: normalizeString(snapshot.hostActorId, hostMember.actorId),
+        hostActorId: normalizeString(snapshot.hostActorId, hostMember?.actorId || 'host'),
         updatedAt: toTimestamp(snapshot.updatedAt, now),
         revision: Math.max(0, Math.floor(Number(snapshot.revision) || 0)),
         members: normalizedMembers,
@@ -227,15 +191,18 @@ function deriveSessionState(snapshot, peerId) {
 
     const localPeerId = normalizeString(peerId, '');
     const localMember = snapshot.members.find((member) => member.peerId === localPeerId) || null;
+    const hostConnected = snapshot.members.some((member) => member.peerId === snapshot.hostPeerId);
     const readyCount = snapshot.members.filter((member) => member.ready === true).length;
-    const allReady = snapshot.members.length > 0 && snapshot.members.every((member) => member.ready === true);
+    const allReady = hostConnected
+        && snapshot.members.length > 0
+        && snapshot.members.every((member) => member.ready === true);
     const isHost = localMember?.peerId === snapshot.hostPeerId && localMember?.role === 'host';
     const joined = !!localMember;
 
     return {
         peerId: localPeerId,
         joined,
-        connected: joined,
+        connected: joined && (isHost || hostConnected),
         lobbyCode: snapshot.lobbyCode,
         role: joined ? (isHost ? 'host' : 'client') : 'offline',
         isHost,
@@ -243,8 +210,9 @@ function deriveSessionState(snapshot, peerId) {
         memberCount: snapshot.members.length,
         readyCount,
         allReady,
-        canStart: joined && isHost && snapshot.members.length >= 2 && allReady,
+        canStart: joined && isHost && hostConnected && snapshot.members.length >= 2 && allReady,
         hostPeerId: snapshot.hostPeerId,
+        hostConnected,
         pendingMatchCommandId: normalizeString(snapshot.pendingMatchStart?.commandId, ''),
         members: snapshot.members.map((member) => ({
             ...member,
@@ -320,6 +288,7 @@ export class MenuMultiplayerBridge {
         this._sessionStorage = resolveStorage(options.sessionStorage, 'sessionStorage', runtimeGlobal);
         this._peerId = ensurePeerId(options.peerId, this._sessionStorage, this._now, this._random);
         this._channel = createBroadcastChannelHandle(runtime.createBroadcastChannel, runtimeGlobal, MULTIPLAYER_CHANNEL_NAME);
+        this._document = resolveEventTarget(runtime.document || runtimeGlobal?.document || null);
         this._activeLobbyCode = '';
         this._sessionSnapshot = null;
         this._sessionState = createIdleSessionState(this._peerId);
@@ -330,10 +299,15 @@ export class MenuMultiplayerBridge {
         this._boundStorageHandler = (event) => this._handleStorageEvent(event);
         this._boundBeforeUnload = () => this.dispose();
         this._boundChannelHandler = (event) => this._handleBroadcastChannelMessage(event);
+        this._boundVisibilityHandler = () => this._handleVisibilityChange();
+        this._boundResumeHandler = () => this._handleRuntimeResume();
 
         this._eventTarget?.addEventListener?.('storage', this._boundStorageHandler);
         this._eventTarget?.addEventListener?.('beforeunload', this._boundBeforeUnload);
+        this._eventTarget?.addEventListener?.('focus', this._boundResumeHandler);
+        this._eventTarget?.addEventListener?.('pageshow', this._boundResumeHandler);
         this._channel?.addEventListener?.('message', this._boundChannelHandler);
+        this._document?.addEventListener?.('visibilitychange', this._boundVisibilityHandler);
     }
 
     _emit(eventType, payload = null) {
@@ -501,7 +475,7 @@ export class MenuMultiplayerBridge {
         if (this._heartbeatTimer || typeof this._setInterval !== 'function') return;
         this._heartbeatTimer = this._setInterval(() => {
             this._updateHeartbeat();
-        }, HEARTBEAT_INTERVAL_MS);
+        }, MENU_MULTIPLAYER_HEARTBEAT_INTERVAL_MS);
     }
 
     _stopHeartbeat() {
@@ -510,6 +484,23 @@ export class MenuMultiplayerBridge {
             this._clearInterval(this._heartbeatTimer);
         }
         this._heartbeatTimer = null;
+    }
+
+    _handleVisibilityChange() {
+        const visibilityState = normalizeString(this._document?.visibilityState, 'visible');
+        if (visibilityState === 'hidden') {
+            this._updateHeartbeat();
+            return;
+        }
+        this._handleRuntimeResume();
+    }
+
+    _handleRuntimeResume() {
+        if (!this._activeLobbyCode) return;
+        this._syncStateFromSnapshot(this._getSnapshot(this._activeLobbyCode), {
+            preserveLobbyCode: true,
+        });
+        this._updateHeartbeat();
     }
 
     _updateHeartbeat() {
@@ -524,7 +515,7 @@ export class MenuMultiplayerBridge {
                 ...snapshot,
                 members: members.map((member) => (
                     member?.peerId === this._peerId
-                        ? { ...member, lastSeenAt: now }
+                        ? extendMultiplayerPresenceLease(member, now)
                         : member
                 )),
             };
@@ -742,7 +733,10 @@ export class MenuMultiplayerBridge {
         }
         this._eventTarget?.removeEventListener?.('storage', this._boundStorageHandler);
         this._eventTarget?.removeEventListener?.('beforeunload', this._boundBeforeUnload);
+        this._eventTarget?.removeEventListener?.('focus', this._boundResumeHandler);
+        this._eventTarget?.removeEventListener?.('pageshow', this._boundResumeHandler);
         this._channel?.removeEventListener?.('message', this._boundChannelHandler);
+        this._document?.removeEventListener?.('visibilitychange', this._boundVisibilityHandler);
         this._channel?.close?.();
     }
 }
