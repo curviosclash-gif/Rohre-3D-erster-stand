@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-28 (V65 Map-Editor-UX-Plan ergaenzt; V52-V57 bleiben archiviert, stale Backlog ausgelagert)
+Stand: 2026-03-28 (V66 Vehicle-Manager-Plan ergaenzt; V65 Map-Editor-UX-Plan aktiv; V52-V57 bleiben archiviert, stale Backlog ausgelagert)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/Backlog.md`.
@@ -55,6 +55,9 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V62 | V59.5 (Camera Polish) | soft | ja | V59.5 Code-Qualitaets-Fixes abgeschlossen; V62 baut auf bereinigter Camera-Basis auf |
 | V65 | Bestehender 3D-Map-Editor (`editor/map-editor-3d.html`, `editor/js/**`) | soft | ja | Bestehende Editor-Architektur und Asset-Pipeline liefern die Umbau-Basis fuer die neue RTS-aehnliche Build-Leiste |
 | V65 | Editor-Asset-Katalog (`EditorAssetLoader`, vorhandene Item-/Portal-/Jet-Assets) | soft | ja | Vorschaubilder und Kartenaufbau koennen auf bestehende Asset-IDs und Placeholder-Logik aufsetzen |
+| V66 | V57 (Arcade Progression) | soft | ja | Arcade-Infrastruktur (ArcadeVehicleProfile, ArcadeVehicleManager, BlueprintSchema) ist vorhanden |
+| V66 | `vehicle-registry.js` + Mesh-Module | soft | ja | Bestehende Fahrzeug-Registry und Mesh-Factory liefern die Datenbasis fuer den neuen Katalog |
+| V66 | V53.99 (Settings-Decomposition) | soft | ja | Storage-Contracts fuer Favoriten, Loadout-Presets und Persistenz sind vorhanden |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -454,7 +457,7 @@ Scope:
 
 ### 61.4 Sektor-Modifiers im Gameplay anwenden
 
-- [ ] 61.4.1 `ArcadeModeStrategy.js` / `ArcadeRunRuntime.js` - Modifier-Effekte implementieren: `tight_turns` (Turning-Rate-Reduktion), `heat_stress` (HP-Drain ueber Zeit), `portal_storm` (Portale spawnen oefter), `boost_tax` (Boost verbraucht HP)
+- [x] 61.4.1 `ArcadeModeStrategy.js` / `ArcadeRunRuntime.js` - Modifier-Effekte implementieren: `tight_turns` (Turning-Rate-Reduktion), `heat_stress` (HP-Drain ueber Zeit), `portal_storm` (Portale spawnen oefter), `boost_tax` (Boost verbraucht HP) (abgeschlossen: 2026-03-28; evidence: MODIFIER_EFFECTS in ArcadeModeStrategy mit 4 Effekten; ArcadeRunRuntime resolved modifierId pro Sektor; PlayerMotionOps akzeptiert turnRateMultiplier; Player.update threading strategy fuer heat_stress/boost_tax; Powerup.update liest spawnRateMultiplier; npm run build PASS)
 - [x] 61.4.2 `ArcadeScoreOps.js` - `scoreBonus` der Modifiers auf Sektor-Score anwenden (aktuell definiert aber ignoriert) (abgeschlossen: 2026-03-27; evidence: scoreBonus in encounterSequence; bonusMultiplier = 1+scoreBonus in applyArcadeSectorScore; npm run build PASS)
 - [ ] 61.4.3 `ArcadeMissionHUD.js` - Aktiven Modifier im HUD anzeigen (Icon + Label + Effekt-Beschreibung)
 
@@ -699,6 +702,71 @@ Scope:
 | Thumbnail-/Preview-Erzeugung verlangsamt Asset-Load oder Editorstart | hoch | Editor/Rendering | Lazy Preview Cache, sofortige Fallback-Karten, echte Asset-Previews nur bei Bedarf rendern | Editorstart wird deutlich langsamer oder zeigt Spaet-Rendering |
 | Umbau der Auswahl-UI bricht bestehende Placement-/Serializer-Pfade | hoch | Editor/Core | `currentTool`/`subType` als Contract erhalten, vorhandene Placement-Faelle und Export/Import gezielt testen | Platzierung, Speichern oder Reload erzeugen falsche Typen |
 | Parallele alte und neue Auswahlmuster verwirren Nutzer | mittel | UX | Alte Submenu-Pfade nach Migration konsequent entfernen oder nur intern weiterverwenden | Doppelte Auswahlorte mit abweichendem Zustand tauchen auf |
+
+---
+
+## Block V66: Vehicle-Manager UX - 3D-Vorschau, Kategorien und Upgrade-Visualisierung
+
+Plan-Datei: `docs/Feature_Vehicle_Manager_V66.md`
+
+<!-- LOCK: frei -->
+
+Scope:
+
+- Vehicle-Manager von flachem Grid auf Drei-Zonen-Layout umbauen (Fahrzeugliste, 3D-Preview, Detail-Panel).
+- Fahrzeuge ueber Kategorien, Suchfeld, Filter und Favoriten schnell waehlbar machen.
+- Upgrade-Slots visuell auf dem 3D-Modell darstellen statt nur als abstrakte Liste.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 66.1 bis 66.5 und 66.99 sind abgeschlossen.
+- [ ] DoD.2 Alle registrierten Fahrzeuge (inkl. Custom-Fahrzeuge aus Vehicle-Lab) sind ueber den neuen Katalog mit Kategorien, Filter und Suche erreichbar.
+- [ ] DoD.3 3D-Vorschau zeigt das gewaehlte Fahrzeug in Spielerfarbe und ist per Maus drehbar; Upgrade-Slots sind visuell erkennbar.
+- [ ] DoD.4 `npm run test:core` deckt Fahrzeugliste, Kategorie-Wechsel, 3D-Preview und Upgrade-Interaktion ab; bestehende Arcade-Tests bleiben gruen.
+
+### 66.1 Katalog- und Interaktionskonzept
+
+- [ ] 66.1.1 Zentrale Vehicle-Katalog-Metadaten definieren: `vehicleId`, `label`, `kategorie`, `hitboxKlasse`, `kurzbeschreibung`, `sortOrder`, `keywords`, `previewToken`, `statsSummary`.
+- [ ] 66.1.2 Finale Interaktionsregeln fuer den Vehicle-Manager festlegen: Kategorien, Filter-Chips, 3D-Preview-Verhalten, Upgrade-Flow, Responsive-Breakpoints.
+
+### 66.2 UI-Architektur und State-Management (parallel zu 66.3)
+
+- [ ] 66.2.1 `ArcadeVehicleManager.js` von flachem Grid auf Drei-Zonen-Layout umbauen (Fahrzeugliste, 3D-Preview, Detail-Panel).
+- [ ] 66.2.2 Auswahl-, Filter- und Favoritenzustand in dedizierte Module auslagern.
+- [ ] 66.2.3 Suchfeld und Filter-Chips implementieren: Freitext-Suche, Kategorie-/Hitbox-/Level-Filter.
+
+### 66.3 3D-Preview und Upgrade-Visualisierung (parallel zu 66.2)
+
+- [ ] 66.3.1 Mini-Three.js-Renderer fuer die zentrale Preview: Orbit Controls, Spielerfarbe, Hintergrund.
+- [ ] 66.3.2 Fahrzeug-Mesh ueber `createVehicleMesh()` laden und bei Auswahl-Wechsel austauschen; Fallback bei Ladefehler.
+- [ ] 66.3.3 Upgrade-Slots als interaktive Overlay-Punkte auf dem 3D-Modell; Klick oeffnet Tier-Auswahl.
+
+### 66.4 Bedienfluss, Vergleich und Loadouts (nach 66.2 + 66.3)
+
+- [ ] 66.4.1 Ein-Klick-Auswahl, Favoriten-Toggle, zuletzt genutzte Fahrzeuge und Badge-System.
+- [ ] 66.4.2 Vergleichsmodus: zwei Fahrzeuge nebeneinander mit Stats-Balken.
+- [ ] 66.4.3 Loadout-Presets: Upgrade-Konfigurationen speichern/laden/wechseln.
+- [ ] 66.4.4 Tastatur-/Mausfluss: Kategorien wechseln, Fahrzeuge durchlaufen, Shortcuts.
+
+### 66.5 Verifikation und visuelle Abnahme
+
+- [ ] 66.5.1 Playwright-Abdeckung fuer Fahrzeugliste, Kategorie-Wechsel, 3D-Preview, Upgrade-Interaktion und Auswahl-Persistenz.
+- [ ] 66.5.2 Visuelle Evidence: Screenshot des Vehicle-Managers plus manuelle Smoke-Probe fuer Auswahl → Spielstart.
+
+### 66.99 Integrations- und Abschluss-Gate
+
+- [ ] 66.99.1 `npm run test:core` sowie Vehicle-Manager-UI-Checks und `npm run build` sind fuer den Scope gruen.
+- [ ] 66.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+
+### Risiko-Register V66
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| 3D-Preview-Renderer erhoeht Bundle-Groesse und Ladezeit | mittel | UI/Rendering | Mini-Renderer mit minimalem Three.js-Setup; nur noetigstes Mesh laden | Vehicle-Manager oeffnet merklich langsamer als bisher |
+| Upgrade-Overlay schwer positionierbar bei unterschiedlichen Mesh-Geometrien | hoch | UI/3D | Slot-Positionen aus Anchor-Offsets ableiten; Fallback auf abstrakte Liste | Overlay-Punkte schweben sichtbar neben dem Modell |
+| Custom-Fahrzeuge ohne standardisierte Preview-Tokens | mittel | Editor/Vehicle-Lab | On-Demand-Thumbnail oder generischer "Custom"-Platzhalter | Custom-Fahrzeuge zeigen leere Vorschau |
+| Umbau von ArcadeVehicleManager bricht bestehende Arcade-Flows | hoch | Arcade/Core | vehicleId und ArcadeVehicleProfileContract als stabilen Contract beibehalten | Bestehende Arcade-Tests schlagen fehl |
+| Vergleichsmodus braucht normierte Stats die aktuell nicht existieren | mittel | Gameplay/UI | Stats aus Hitbox-Radius, Upgrade-Potenzial und Kategorie ableiten; keine erfundenen Werte | Stats-Balken zeigen unsinnige oder identische Werte |
 
 ---
 
