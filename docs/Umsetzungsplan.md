@@ -134,7 +134,7 @@ Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) so
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-28 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V57 (Arcade Progression) -->
 
 Scope:
@@ -371,7 +371,7 @@ Scope:
 
 - [x] 60.3.1 Verantwortungsgrenzen zwischen `Game`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` als Zielbild dokumentieren und verbliebene Wrapper-/Pass-through-Pfade priorisieren. (abgeschlossen: 2026-03-28; evidence: `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` Abschnitt `Zielbild Rest-Orchestratoren (2026-03-28)`)
 - [x] 60.3.2 Die Rest-Decomposition fuer `MediaRecorderSystem`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` in kleine, testbare Folgeschritte zerlegen und die Transfers zu V58/V59/V60 festhalten. (abgeschlossen: 2026-03-28; evidence: `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` Abschnitt `Decomposition-Roadmap (2026-03-28)`)
-- [ ] 60.3.3 Den Architekturbruch zwischen Menu-Sessiontyp `multiplayer` und Runtime-Sessiontypen `lan`/`online` explizit aufloesen: Zielbild dokumentieren, Matchstart auf einen echten Transportpfad umstellen und den reinen Storage-Bridge-Pfad klar als Mock/Test-Helfer oder Vorstufe kennzeichnen.
+- [x] 60.3.3 Den Architekturbruch zwischen Menu-Sessiontyp `multiplayer` und Runtime-Sessiontypen `lan`/`online` explizit aufloesen: Zielbild dokumentieren, Matchstart auf einen echten Transportpfad umstellen und den reinen Storage-Bridge-Pfad klar als Mock/Test-Helfer oder Vorstufe kennzeichnen. (abgeschlossen: 2026-03-28; evidence: `multiplayerTransport: 'storage-bridge'` in Settings-Snapshot und `ensureMultiplayerSessionType`; expliziter `multiplayer`-Zweig in `RuntimeSessionLifecycleService` mit Erklaerungskommentar; Session-Typ-Mapping-Tabelle in V60-Feature-Plan; `npm run build` PASS, `docs:sync`/`plan:check` PASS)
 
 ### 60.4 Multiplayer-Menue-Vertraege und UI-Wiring konsolidieren
 
@@ -383,7 +383,7 @@ Audit-Befund 2026-03-27:
 
 - [x] 60.4.1 `MenuMultiplayerBridge.js` und `menu/multiplayer/MenuMultiplayerBridgeMutations.js` so haerten, dass `host()` nur bei persistiertem Snapshot Erfolg meldet und `join()` die `maxPlayers`-Grenze mit einem konsistenten Fehlercontract erzwingt. (abgeschlossen: 2026-03-28; evidence: `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js` liefert `lobby_persist_failed`, `join_persist_failed`, `lobby_full`; T41c2/T41c3 ueber `TEST_PORT=5204 PW_RUN_TAG=v60-t41-rerun PW_OUTPUT_DIR=test-results/v60-t41-rerun` PASS; `npm run test:core` PASS)
 - [x] 60.4.2 `MenuController.js`, `MenuGameplayBindings.js`, `MenuDevPanelBindings.js` und `MenuMultiplayerPanel.js` auf einen aktiven Runtime-Pfad reduzieren: doppelte `multiplayer_host`-/`multiplayer_join`-Bindings entfernen und Discovery-Rendering auf sichere DOM-APIs ohne `innerHTML` umstellen. (abgeschlossen: 2026-03-28; evidence: `MenuDevPanelBindings.js` Host/Join-Doppelbindungen entfernt; `src/ui/menu/testing/**` trennt Discovery/Renderer vom aktiven Runtime-Pfad; T41a1, T20d, T75 und `npm run test:stress` PASS)
-- [ ] 60.4.3 `MenuMultiplayerBridge.js` Presence-/Heartbeat-Logik gegen Browser-Timer-Throttling haerten: Lease-/Stale-Fenster pruefen, `visibilitychange`/Resume beruecksichtigen und automatische Host-Promotion nach reinem Stale-Pruning verhindern.
+- [/] 60.4.3 `MenuMultiplayerBridge.js` Presence-/Heartbeat-Logik gegen Browser-Timer-Throttling haerten: Lease-/Stale-Fenster pruefen, `visibilitychange`/Resume beruecksichtigen und automatische Host-Promotion nach reinem Stale-Pruning verhindern. (in Arbeit: 2026-03-28; evidence: `src/ui/menu/MenuMultiplayerPresence.js` extrahiert Lease-/Stale-Normalisierung, `MenuMultiplayerBridge.js` reagiert auf `visibilitychange`/Resume und promoted keinen Host mehr implizit; `MenuMultiplayerBridgeMutations.js` blockiert hostlose Joins mit `host_unavailable`; `npm run build` PASS, `npx playwright test tests/core.spec.js --grep T41c4` PASS, `node --input-type=module` multiplayer stale smoke PASS; finaler Browser-Rerun fuer `T41c5` durch fremden `.playwright-suite.lock` blockiert, siehe `docs/Fehlerberichte/2026-03-28_v60-playwright-suite-lock.md`)
 - [ ] 60.4.4 Multiplayer-Charakterisierung auf echte Netzwerksignale erweitern: nach Matchstart `runtimeConfig.session.networkEnabled`, Adapter-Typ (`LANSessionAdapter`/`OnlineSessionAdapter`) und Remote-Presence pruefen sowie einen Zwei-Tab-Background-Stability-Test (>15s) ergaenzen.
 
 ### Phase 60.99: Audit-Abschluss-Gate
@@ -646,7 +646,7 @@ Scope:
 
 Plan-Datei: `docs/Feature_Map_Editor_UX_V65.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-28 -->
 
 Scope:
 

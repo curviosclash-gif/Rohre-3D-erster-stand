@@ -70,11 +70,13 @@ Kernausloeser:
 - [ ] 60.3 Zielarchitektur fuer Rest-Orchestratoren fixieren
   - [x] 60.3.1 Zielgrenzen zwischen `Game`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` dokumentieren.
   - [x] 60.3.2 Decomposition-Roadmap fuer `MediaRecorderSystem`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` in kleine, testbare Folgeschritte zerlegen.
-  - [ ] 60.3.3 Session-Typ-Bruch `multiplayer` vs. echte Runtime-Transporte `lan`/`online` aufloesen und den Storage-Bridge-Pfad explizit als Mock/Test-Helfer oder Vorstufe kennzeichnen.
+  - [x] 60.3.3 Session-Typ-Bruch `multiplayer` vs. echte Runtime-Transporte `lan`/`online` aufloesen und den Storage-Bridge-Pfad explizit als Mock/Test-Helfer oder Vorstufe kennzeichnen. (abgeschlossen: 2026-03-28; evidence: `multiplayerTransport: 'storage-bridge'` in Snapshot und `ensureMultiplayerSessionType`; `multiplayer`-Zweig in `RuntimeSessionLifecycleService` explizit mit Erklaerungskommentar; `applyMultiplayerMatchSettingsSnapshot` liest Transport-Feld durch; `npm run build` PASS)
 
 - [x] 60.4 Multiplayer-Menue-Vertraege und UI-Wiring konsolidieren
   - [x] 60.4.1 `MenuMultiplayerBridge.js` und `menu/multiplayer/MenuMultiplayerBridgeMutations.js` so haerten, dass `host()` nur bei persistiertem Snapshot Erfolg meldet und `join()` die `maxPlayers`-Grenze mit einem konsistenten Fehlercontract erzwingt.
   - [x] 60.4.2 `MenuController.js`, `MenuGameplayBindings.js`, `MenuDevPanelBindings.js` und `MenuMultiplayerPanel.js` auf einen aktiven Runtime-Pfad reduzieren: doppelte `multiplayer_host`-/`multiplayer_join`-Bindings entfernen und Discovery-Rendering auf sichere DOM-APIs ohne `innerHTML` umstellen.
+  - [/] 60.4.3 Presence-/Heartbeat-Logik gegen Browser-Timer-Throttling haerten: Lease-/Stale-Fenster in `MenuMultiplayerBridge` absichern, `visibilitychange`/Resume einbinden, automatische Host-Promotion nach reinem Stale-Pruning verhindern. (in Arbeit: 2026-03-28; evidence: `src/ui/menu/MenuMultiplayerPresence.js` neu, `npm run build` PASS, `T41c4` PASS, `node --input-type=module` stale smoke PASS; finaler Playwright-Rerun fuer `T41c5` durch fremden `.playwright-suite.lock` blockiert)
+  - [ ] 60.4.4 Multiplayer-Charakterisierung auf echte Netzwerksignale erweitern: nach Matchstart `runtimeConfig.session.networkEnabled`, Adapter-Typ (`LANSessionAdapter`/`OnlineSessionAdapter`) und Remote-Presence pruefen sowie einen Zwei-Tab-Background-Stability-Test (>15s) ergaenzen.
 
 - [ ] 60.99 Integrations- und Abschluss-Gate
   - [ ] 60.99.1 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind PASS.
@@ -86,6 +88,29 @@ Kernausloeser:
 - Architektur: `npm run architecture:guard`, `npm run typecheck:architecture`
 - Dead-Code-Qualitaet: `npx knip --config knip.json --no-progress`
 - Scope-spezifische Tests: `npm run build`, `npm run test:core -g T41*`, danach `npm run test:core` und `npm run test:stress`
+- Aktueller Blocker fuer `60.4.3`: fremder `.playwright-suite.lock`; Details und Reproduktion in `docs/Fehlerberichte/2026-03-28_v60-playwright-suite-lock.md`
+
+## Session-Typ-Mapping (2026-03-28)
+
+Architektur-Entscheidung zu `sessionType: 'multiplayer'` vs. `lan`/`online`:
+
+| Typ | Beschreibung | networkEnabled | Transport |
+| --- | --- | --- | --- |
+| `single` | Lokal, 1 Spieler | false | LocalSessionAdapter |
+| `splitscreen` | Lokal, 2 Spieler | false | LocalSessionAdapter |
+| `multiplayer` | Storage-Bridge-Koordination (localStorage + BroadcastChannel, gleicher Browser) | false | LocalSessionAdapter je Tab |
+| `lan` | Echtes LAN-Netzwerk via LANSessionAdapter | true | LANSessionAdapter |
+| `online` | Echtes Online-Netzwerk via OnlineSessionAdapter | true | OnlineSessionAdapter |
+
+**Storage-Bridge (`sessionType: 'multiplayer'`):**
+- Koordiniert Lobby-Join/Ready/Matchstart ueber `localStorage` und `BroadcastChannel` (nur gleicher Browser/Origin).
+- Bei Matchstart laeuft jeder Tab einen `LocalSessionAdapter` — kein Echtzeit-State-Sync zwischen Tabs.
+- Erkennbar durch `localSettings.multiplayerTransport === 'storage-bridge'` im Settings-Snapshot.
+- Zweck: Menu-Koordination und Test-Smokes. Kein Ersatz fuer echte Netzwerkverbindungen.
+
+**Upgrade-Pfad:**
+- Wenn `localSettings.multiplayerTransport` auf `'lan'` oder `'online'` gesetzt wird, muss `sessionType` in `RuntimeConfig.js` entsprechend auf den echten Transport-Typ abgebildet werden.
+- `RuntimeSessionLifecycleService.initRuntimeSession()` laedt dann den jeweiligen Adapter.
 
 ## Dormant-Pfad-Inventar (2026-03-28)
 
