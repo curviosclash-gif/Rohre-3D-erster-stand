@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-27 (Plan-Bereinigung: V52-V57 archiviert, stale Backlog ausgelagert)
+Stand: 2026-03-28 (V65 Map-Editor-UX-Plan ergaenzt; V52-V57 bleiben archiviert, stale Backlog ausgelagert)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/Backlog.md`.
@@ -53,6 +53,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V63 | V48 (Fight baseline) | soft | ja | Archivierter Fight-Qualitaetsplan liefert Baseline fuer Runtime-Config-, HUD- und Targeting-Follow-ups |
 | V63 | V40 | soft | nein | Rocket-/Trail-Targeting-Contract vor finalem Rollout mit bestehendem Hunt-Trail-Plan abstimmen (V63 Code fertig, V40-Abstimmung offen) |
 | V62 | V59.5 (Camera Polish) | soft | ja | V59.5 Code-Qualitaets-Fixes abgeschlossen; V62 baut auf bereinigter Camera-Basis auf |
+| V65 | Bestehender 3D-Map-Editor (`editor/map-editor-3d.html`, `editor/js/**`) | soft | ja | Bestehende Editor-Architektur und Asset-Pipeline liefern die Umbau-Basis fuer die neue RTS-aehnliche Build-Leiste |
+| V65 | Editor-Asset-Katalog (`EditorAssetLoader`, vorhandene Item-/Portal-/Jet-Assets) | soft | ja | Vorschaubilder und Kartenaufbau koennen auf bestehende Asset-IDs und Placeholder-Logik aufsetzen |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -63,6 +65,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | abgeschlossen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/*Lobby.js`, `src/ui/menu/testing/**`, `tests/core.spec.js`, `tests/stress.spec.js` | V60 | in Bearbeitung | Bot-Codex claim 2026-03-28 fuer dormant multiplayer/input cleanup, test-only Panel-Extraktion und Bridge-Vertrags-Haertung |
 | `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
+| `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | offen | Map-Editor UX-Refit: Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -76,7 +79,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (`npm run build` PASS, `npm run test:core` PASS; T1-Startup-Flake nur im ersten Versuch, Retry gruen) |
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
-| - | V65 | - | frei | V62 erledigt; kann gestartet werden |
+| - | V65 | - | frei | Map-Editor-UX-Refit geplant; Block kann fuer Umsetzung geclaimt werden |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -103,9 +106,9 @@ V59 und V63 sind abgeschlossen. V60 ist jetzt unblocked (V59.99 erfuellt).
 | B | **V60** (nach V58.99) | V59.99 erfuellt; wartet nur noch auf V58.99 |
 | C | **V61** (Rest: HUD, Modifiers, Intermission, Mastery-UI, Daily Replay) | Arcade Gameplay, keine Ueberlappung |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
-| E | **V65** | V62 ist geschlossen; Spur frei fuer Nachfolgeblock |
+| E | **V65** (Map-Editor UX) | Editor-UX/Umbau ist isoliert in `editor/**`; kann parallel zu V60/V61 laufen |
 
-Empfehlung: 2 Agents parallel auf A + C. Spur B nach V58.99. Spur D nach Scope-Definition. Spur E kann mit V65 starten.
+Empfehlung: 2 Agents parallel auf A + C. Spur B nach V58.99. Spur D nach Scope-Definition. Spur E kann V65 unabhaengig fuer den Editor-Umbau starten.
 
 ---
 
@@ -121,6 +124,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | Rest: 60.3.3 Session-Typ/Transport, 60.4.3 Presence-Stability, 60.4.4 echte Netzwerk-Charakterisierung, 60.99 Gate | In Bearbeitung |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | Rest: HUD, Modifiers, Intermission, Mastery-UI | In Bearbeitung |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
+| V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | 65.1 Katalogstruktur und Dock-Interaktion finalisieren | Geplant |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
@@ -635,6 +639,66 @@ Scope:
 | Vereinheitlichte Respawn-/Mode-Semantik aendert bestehende Presets oder UI-Erwartungen | mittel | UI/Core | Sanitizer-/Compatibility-Regressionen und klare Disable-/Copy-Entscheidung im Menue | Fight-Setup wirkt widerspruechlich oder Presets driften |
 | HUD-Delta-Updates verschlucken echte Statuswechsel | mittel | UI | DOM-Assertions fuer HP/Shield/Overheat plus Splitscreen-Snapshot-Check | Bars/Fight-Status aktualisieren nicht sichtbar |
 | Zusaetzliche Fight-Probes machen Startup-/Readiness-Probleme schwerer statt klarer | mittel | QA/Tooling | Probe-Skripte auf kurze, reproduzierbare Artefakte begrenzen; bestehende Perf-Diagnostik wiederverwenden | Runtime-Probe haengt oder erzeugt keine belastbaren Artefakte |
+
+---
+
+## Block V65: Map-Editor UX Refit - horizontale Build-Leiste und visuelle Objektwahl
+
+Plan-Datei: `docs/Feature_Map_Editor_UX_V65.md`
+
+<!-- LOCK: frei -->
+
+Scope:
+
+- Werkzeug- und Objektwahl von linker Button-/Select-Struktur auf eine horizontale Bottom-Dock-Leiste umbauen.
+- Platzierbare Objekte ueber Mini-Bild, Klartextnamen und sinnvolle Gruppen direkt waehlbar machen.
+- Bedienung an RTS-Bauleisten orientieren: schnelle Kategorien, wenig Klicktiefe, klare aktive Auswahl.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 65.1 bis 65.5 und 65.99 sind abgeschlossen.
+- [ ] DoD.2 Alle platzierbaren Editor-Objekte sind ohne versteckte Pflicht-`select`-Felder ueber den neuen Katalog erreichbar.
+- [ ] DoD.3 Die aktive Auswahl ist ueber Highlight, Namen und Kategorie jederzeit klar sichtbar; zuletzt genutzte Objekte bleiben schnell erreichbar.
+- [ ] DoD.4 `npm run test:core` deckt Dock-Rendering, Kartenwahl und Platzierung relevanter Objektarten ab; Save/Export/Playtest bleiben funktionsfaehig.
+
+### 65.1 Katalog- und Interaktionskonzept
+
+- [ ] 65.1.1 Einen zentralen Editor-Build-Katalog fuer `type`/`subType`, Labels, Sortierung, Kategorien, Preview-Metadaten und Featured-Eintraege definieren.
+- [ ] 65.1.2 Die neue Dock-Interaktion festlegen: Kategorie-Tabs, Kartenreihe, aktive Auswahl, Inspector-Abgrenzung, Responsive-Verhalten und Quick-Actions.
+
+### 65.2 DOM- und State-Umbau
+
+- [ ] 65.2.1 `editor/map-editor-3d.html` auf klares Layout aus Inspector, Szene und Bottom-Dock umbauen und die verteilte Tool-/Submenu-Struktur ersetzen.
+- [ ] 65.2.2 Auswahl- und Filterzustand in dedizierte UI-Module auslagern, damit `currentTool`, `subType`, Kategorie, Favoriten und Recents konsistent bleiben.
+
+### 65.3 Vorschaukarten und Asset-Previews
+
+- [ ] 65.3.1 Objektkarten mit Mini-Vorschau, Namen und Status-Badge aufbauen; Asset-Previews aus vorhandenen Modellen oder Fallback-Renderings erzeugen.
+- [ ] 65.3.2 Lade-, Placeholder- und Fehlerfaelle sichtbar behandeln, ohne die Auswahl oder Platzierung der Objekte zu blockieren.
+
+### 65.4 Bedienfluss und Auswahl-Polish
+
+- [ ] 65.4.1 Ein-Klick-Auswahl, letzte Auswahl pro Kategorie, Favoriten und zuletzt benutzte Objekte fuer haeufige Bauaktionen nutzbar machen.
+- [ ] 65.4.2 Tastatur-, Mausrad- und Hover-Flows fuer Kategorien, Kartenwechsel, aktive Rueckmeldung und schnellen Wechsel zur Auswahl ergaenzen.
+
+### 65.5 Verifikation und visuelle Abnahme
+
+- [ ] 65.5.1 Editor-Playwright-Checks fuer Bottom-Dock, Kategorien, Kartenwahl und Platzierung von Block, Portal, Item und Flugobjekt ergaenzen oder neu anlegen.
+- [ ] 65.5.2 Visuelle Evidence (Screenshot) plus kurze manuelle Smoke-Probe fuer Save/Export/Playtest dokumentieren.
+
+### 65.99 Integrations- und Abschluss-Gate
+
+- [ ] 65.99.1 `npm run test:core` und `npm run build` sind fuer den Scope gruen; editorrelevante UI-Checks laufen stabil.
+- [ ] 65.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-Abgleich und Backlog-Pflege sind abgeschlossen.
+
+### Risiko-Register V65
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Zu viele sichtbare Objektkarten ueberladen das Dock und verschlechtern die Orientierung | mittel | UI/UX | Strenge Kataloggruppen, Featured-/Recent-Reihe, feste Sortierung und visuelle Priorisierung | Nutzer scrollen haeufig ohne Ziel oder waehlen falsche Objekte |
+| Thumbnail-/Preview-Erzeugung verlangsamt Asset-Load oder Editorstart | hoch | Editor/Rendering | Lazy Preview Cache, sofortige Fallback-Karten, echte Asset-Previews nur bei Bedarf rendern | Editorstart wird deutlich langsamer oder zeigt Spaet-Rendering |
+| Umbau der Auswahl-UI bricht bestehende Placement-/Serializer-Pfade | hoch | Editor/Core | `currentTool`/`subType` als Contract erhalten, vorhandene Placement-Faelle und Export/Import gezielt testen | Platzierung, Speichern oder Reload erzeugen falsche Typen |
+| Parallele alte und neue Auswahlmuster verwirren Nutzer | mittel | UX | Alte Submenu-Pfade nach Migration konsequent entfernen oder nur intern weiterverwenden | Doppelte Auswahlorte mit abweichendem Zustand tauchen auf |
 
 ---
 
