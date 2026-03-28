@@ -4,7 +4,7 @@
 
 /**
  * Abstract interface for player input sources.
- * Implementations: KeyboardInputSource, GamepadInputSource, TouchInputSource, RemoteInputSource
+ * Implementations: KeyboardInputSource, GamepadInputSource, TouchInputSource
  *
  * Each player in a match has exactly one PlayerInputSource assigned.
  * The poll() method returns the current input state as a normalized object.

@@ -932,6 +932,9 @@ test.describe('T1-20: Core & Infrastruktur', () => {
     });
 
     test('T20d: Multiplayer-Bridge emittiert lifecycle.v1 Event-Contract', async ({ page }) => {
+        await page.context().addInitScript(() => {
+            globalThis.__CURVIOS_APP__ = true;
+        });
         await loadGame(page);
         await openMultiplayerSubmenu(page);
         await page.fill('#multiplayer-lobby-code', 'QA-LOBBY');
@@ -948,6 +951,9 @@ test.describe('T1-20: Core & Infrastruktur', () => {
     });
 
     test('T20d1: Multiplayer-Lobby synchronisiert Join, Ready und Host-Invalidation ueber zwei Tabs', async ({ page }) => {
+        await page.context().addInitScript(() => {
+            globalThis.__CURVIOS_APP__ = true;
+        });
         const secondPage = await page.context().newPage();
         try {
             await loadGame(page);
@@ -1003,6 +1009,9 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
     test('T20d2: Multiplayer-Host startet Match synchron mit autoritativem Snapshot ueber zwei Tabs', async ({ page }) => {
         test.setTimeout(120000);
+        await page.context().addInitScript(() => {
+            globalThis.__CURVIOS_APP__ = true;
+        });
         const secondPage = await page.context().newPage();
         try {
             await loadGame(page);
@@ -1074,11 +1083,61 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(schema.hostItemCondition).toBe('canHost');
     });
 
+    test('T41a1: MenuController emittiert multiplayer host/join nur einmal pro Klick', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const mod = await import('/src/ui/MenuController.js');
+            const previousAppFlag = globalThis.__CURVIOS_APP__;
+            globalThis.__CURVIOS_APP__ = true;
+            const hostButton = document.createElement('button');
+            const joinButton = document.createElement('button');
+            const lobbyCodeInput = document.createElement('input');
+            lobbyCodeInput.value = 'qa-lobby';
+            document.body.append(hostButton, joinButton, lobbyCodeInput);
+
+            const events = [];
+            const controller = new mod.MenuController({
+                ui: {
+                    multiplayerHostButton: hostButton,
+                    multiplayerJoinButton: joinButton,
+                    multiplayerLobbyCodeInput: lobbyCodeInput,
+                },
+                settings: {
+                    menuFeatureFlags: {
+                        canHost: true,
+                    },
+                },
+                onEvent: (event) => events.push(event),
+            });
+            controller.setupListeners();
+            hostButton.click();
+            joinButton.click();
+            controller.dispose();
+            hostButton.remove();
+            joinButton.remove();
+            lobbyCodeInput.remove();
+            if (typeof previousAppFlag === 'undefined') {
+                delete globalThis.__CURVIOS_APP__;
+            } else {
+                globalThis.__CURVIOS_APP__ = previousAppFlag;
+            }
+
+            return {
+                hostCount: events.filter((event) => event.type === mod.MENU_CONTROLLER_EVENT_TYPES.MULTIPLAYER_HOST).length,
+                joinCount: events.filter((event) => event.type === mod.MENU_CONTROLLER_EVENT_TYPES.MULTIPLAYER_JOIN).length,
+            };
+        });
+
+        expect(result.hostCount).toBe(1);
+        expect(result.joinCount).toBe(1);
+    });
+
     test('T41b: MenuMultiplayerPanel zeigt Host-Button nur wenn canHost=true', async ({ page }) => {
         await loadGame(page);
 
         const result = await page.evaluate(async () => {
-            const mod = await import('/src/ui/menu/MenuMultiplayerPanel.js');
+            const mod = await import('/src/ui/menu/testing/MenuMultiplayerPanel.js');
             const mockBridge = {
                 host: () => ({ ok: false }),
                 join: () => ({ ok: false }),
@@ -1236,6 +1295,79 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.clearTimeoutCount).toBeGreaterThanOrEqual(1);
     });
 
+    test('T41c2: MenuMultiplayerBridge meldet fehlgeschlagene Host-Persistenz als Fehler', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const { MenuMultiplayerBridge } = await import('/src/ui/menu/MenuMultiplayerBridge.js');
+
+            const createMemoryStorage = () => {
+                const store = new Map();
+                return {
+                    getItem(key) {
+                        return store.has(key) ? store.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        store.set(key, String(value));
+                    },
+                    removeItem(key) {
+                        store.delete(key);
+                    },
+                };
+            };
+
+            const lockOnlyStorage = () => {
+                const store = new Map();
+                return {
+                    getItem(key) {
+                        return store.has(key) ? store.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        if (String(key).endsWith('.lock')) {
+                            store.set(key, String(value));
+                        }
+                    },
+                    removeItem(key) {
+                        store.delete(key);
+                    },
+                };
+            };
+
+            const runtime = {
+                eventTarget: {
+                    addEventListener() { },
+                    removeEventListener() { },
+                },
+                createBroadcastChannel: () => null,
+                now: () => 1_700_000_000_000,
+                random: () => 0.123456,
+            };
+
+            const bridge = new MenuMultiplayerBridge({
+                peerId: 'peer-host',
+                storage: lockOnlyStorage(),
+                sessionStorage: createMemoryStorage(),
+                runtime,
+            });
+
+            const hostResult = bridge.host({ actorId: 'host', lobbyCode: 'persist-fail' });
+            const sessionState = bridge.getSessionState();
+            bridge.dispose();
+
+            return {
+                ok: hostResult?.ok === true,
+                code: String(hostResult?.code || ''),
+                joined: sessionState?.joined === true,
+                lobbyCode: String(sessionState?.lobbyCode || ''),
+            };
+        });
+
+        expect(result.ok).toBeFalsy();
+        expect(result.code).toBe('lobby_persist_failed');
+        expect(result.joined).toBeFalsy();
+        expect(result.lobbyCode).toBe('');
+    });
+
     test('T41c1: MenuMultiplayerBridge haelt Revisionen bei ready/heartbeat/match_start Mutationen monoton', async ({ page }) => {
         await loadGame(page);
 
@@ -1373,11 +1505,115 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.nonEmptyPendingIds.length).toBeGreaterThanOrEqual(1);
     });
 
+    test('T41c3: MenuMultiplayerBridge weist zusaetzliche Joiner bei voller Lobby ab', async ({ page }) => {
+        await loadGame(page);
+
+        const result = await page.evaluate(async () => {
+            const { MenuMultiplayerBridge } = await import('/src/ui/menu/MenuMultiplayerBridge.js');
+
+            const createMemoryStorage = () => {
+                const store = new Map();
+                return {
+                    getItem(key) {
+                        return store.has(key) ? store.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        store.set(key, String(value));
+                    },
+                    removeItem(key) {
+                        store.delete(key);
+                    },
+                };
+            };
+
+            let timerCursor = 0;
+            const timers = new Map();
+            const runtime = {
+                eventTarget: {
+                    addEventListener() { },
+                    removeEventListener() { },
+                },
+                createBroadcastChannel: () => null,
+                now: () => 1_700_000_000_000 + timerCursor,
+                random: () => 0.654321,
+                setInterval(fn) {
+                    const id = `i-${++timerCursor}`;
+                    timers.set(id, fn);
+                    return id;
+                },
+                clearInterval(id) {
+                    timers.delete(id);
+                },
+                setTimeout(fn) {
+                    const id = `t-${++timerCursor}`;
+                    timers.set(id, fn);
+                    return id;
+                },
+                clearTimeout(id) {
+                    timers.delete(id);
+                },
+            };
+
+            const sharedStorage = createMemoryStorage();
+            const bridges = [];
+            const lobbyCode = 'FULL-QA';
+
+            const hostBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-host',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime,
+            });
+            bridges.push(hostBridge);
+            const hostResult = hostBridge.host({ actorId: 'host', lobbyCode });
+
+            for (let index = 1; index < 10; index += 1) {
+                const bridge = new MenuMultiplayerBridge({
+                    peerId: `peer-${index}`,
+                    storage: sharedStorage,
+                    sessionStorage: createMemoryStorage(),
+                    runtime,
+                });
+                bridges.push(bridge);
+                bridge.join({ actorId: `player-${index}`, lobbyCode });
+            }
+
+            const overflowBridge = new MenuMultiplayerBridge({
+                peerId: 'peer-overflow',
+                storage: sharedStorage,
+                sessionStorage: createMemoryStorage(),
+                runtime,
+            });
+            bridges.push(overflowBridge);
+
+            const overflowResult = overflowBridge.join({ actorId: 'overflow', lobbyCode });
+            const snapshot = JSON.parse(
+                sharedStorage.getItem('cuviosclash.multiplayer.lobby.FULL-QA') || 'null'
+            );
+
+            while (bridges.length > 0) {
+                bridges.pop()?.dispose?.();
+            }
+
+            return {
+                hostOk: hostResult?.ok === true,
+                overflowOk: overflowResult?.ok === true,
+                overflowCode: String(overflowResult?.code || ''),
+                memberCount: Array.isArray(snapshot?.members) ? snapshot.members.length : 0,
+            };
+        });
+
+        expect(result.hostOk).toBeTruthy();
+        expect(result.overflowOk).toBeFalsy();
+        expect(result.overflowCode).toBe('lobby_full');
+        expect(result.memberCount).toBe(10);
+    });
+
     test('T41d: MenuMultiplayerPanel nutzt Discovery/Host-IP Ports via DI ohne window.curviosApp', async ({ page }) => {
         await loadGame(page);
 
         const result = await page.evaluate(async () => {
-            const mod = await import('/src/ui/menu/MenuMultiplayerPanel.js');
+            const mod = await import('/src/ui/menu/testing/MenuMultiplayerPanel.js');
             const calls = {
                 start: 0,
                 stop: 0,

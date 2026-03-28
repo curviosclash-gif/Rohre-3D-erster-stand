@@ -81,22 +81,6 @@ export function setupMenuDevPanelBindings(ctx) {
         });
     }
 
-    if (ui.multiplayerHostButton) {
-        bind(ui.multiplayerHostButton, 'click', () => {
-            emit(eventTypes.MULTIPLAYER_HOST, {
-                lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
-            });
-        });
-    }
-
-    if (ui.multiplayerJoinButton) {
-        bind(ui.multiplayerJoinButton, 'click', () => {
-            emit(eventTypes.MULTIPLAYER_JOIN, {
-                lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
-            });
-        });
-    }
-
     if (ui.multiplayerReadyToggle) {
         bind(ui.multiplayerReadyToggle, 'change', () => {
             emit(eventTypes.MULTIPLAYER_READY_TOGGLE, {

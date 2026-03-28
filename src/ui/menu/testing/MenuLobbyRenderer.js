@@ -5,7 +5,8 @@
  * and settings summary (map, mode, rounds).
  */
 
-import { resolveMenuCatalogText } from './MenuTextCatalog.js';
+// Test-only renderer for dormant multiplayer lobby UI coverage.
+import { resolveMenuCatalogText } from '../MenuTextCatalog.js';
 
 function t(textId, fallback) {
     return resolveMenuCatalogText(textId, fallback);

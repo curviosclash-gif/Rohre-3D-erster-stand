@@ -1,5 +1,13 @@
 import { SNAPSHOT_NOOP } from './MenuMultiplayerBridgeCas.js';
 
+const MULTIPLAYER_MAX_PLAYERS = 10;
+
+function snapshotHasPeer(snapshot, peerId, normalizeString) {
+    const normalizedPeerId = normalizeString(peerId, '');
+    if (!normalizedPeerId || !Array.isArray(snapshot?.members)) return false;
+    return snapshot.members.some((member) => normalizeString(member?.peerId, '') === normalizedPeerId);
+}
+
 export function hostMultiplayerLobby(bridge, options, helpers) {
     const actorId = helpers.normalizeString(options.actorId, 'host');
     const requestedLobbyCode = helpers.normalizeLobbyCode(
@@ -56,6 +64,9 @@ export function hostMultiplayerLobby(bridge, options, helpers) {
     if (hostConflict) {
         return bridge._fail(`Lobby bereits aktiv: ${requestedLobbyCode}`, 'lobby_taken');
     }
+    if (!persistedSnapshot || helpers.normalizeString(persistedSnapshot.hostPeerId, '') !== bridge._peerId) {
+        return bridge._fail(`Lobby konnte nicht persistent erstellt werden: ${requestedLobbyCode}`, 'lobby_persist_failed');
+    }
     bridge._setStatus(`Lobby erstellt: ${requestedLobbyCode}`);
     const event = bridge._emit(helpers.eventTypes.HOST, {
         actorId,
@@ -83,6 +94,7 @@ export function joinMultiplayerLobby(bridge, options, helpers) {
     }
 
     let lobbyMissing = false;
+    let lobbyFull = false;
     const persistedSnapshot = bridge._updateActiveSnapshot((existingSnapshot) => {
         if (!existingSnapshot?.hostPeerId) {
             lobbyMissing = true;
@@ -90,11 +102,16 @@ export function joinMultiplayerLobby(bridge, options, helpers) {
         }
 
         const now = bridge._now();
-        const existingLocalMember = existingSnapshot.members.find((member) => member.peerId === bridge._peerId);
+        const existingMembers = Array.isArray(existingSnapshot.members) ? existingSnapshot.members : [];
+        const existingLocalMember = existingMembers.find((member) => member.peerId === bridge._peerId);
+        if (!existingLocalMember && existingMembers.length >= MULTIPLAYER_MAX_PLAYERS) {
+            lobbyFull = true;
+            return SNAPSHOT_NOOP;
+        }
         return {
             ...existingSnapshot,
             members: [
-                ...existingSnapshot.members.filter((member) => member.peerId !== bridge._peerId),
+                ...existingMembers.filter((member) => member.peerId !== bridge._peerId),
                 {
                     peerId: bridge._peerId,
                     actorId,
@@ -111,8 +128,14 @@ export function joinMultiplayerLobby(bridge, options, helpers) {
     if (lobbyMissing) {
         return bridge._fail(`Lobby nicht gefunden: ${requestedLobbyCode}`, 'lobby_not_found');
     }
+    if (lobbyFull) {
+        return bridge._fail(`Lobby ist voll (max. ${MULTIPLAYER_MAX_PLAYERS} Spieler).`, 'lobby_full');
+    }
     if (!persistedSnapshot) {
         return bridge._fail(`Lobby nicht verfuegbar: ${requestedLobbyCode}`, 'lobby_not_found');
+    }
+    if (!snapshotHasPeer(persistedSnapshot, bridge._peerId, helpers.normalizeString)) {
+        return bridge._fail(`Lobby konnte nicht persistent beigetreten werden: ${requestedLobbyCode}`, 'join_persist_failed');
     }
 
     bridge._setStatus(`Lobby beigetreten: ${requestedLobbyCode}`);

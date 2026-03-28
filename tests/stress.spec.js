@@ -241,6 +241,9 @@ test.describe('T61-125: Stress, I/O & Sicherheit', () => {
     });
 
     test('T75: Host-Settings invalidieren Ready-Status per Event-Contract', async ({ page }) => {
+        await page.context().addInitScript(() => {
+            globalThis.__CURVIOS_APP__ = true;
+        });
         await loadGame(page);
         await openMultiplayerSubmenu(page);
         await page.fill('#multiplayer-lobby-code', 'STRESS-T75');

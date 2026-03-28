@@ -22,10 +22,11 @@
  * [ ] Responsive layout on touch/tablet devices
  */
 
-import { resolveMenuCatalogText } from './MenuTextCatalog.js';
+// Test-only harness for characterization coverage. Not imported by the active menu runtime.
+import { resolveMenuCatalogText } from '../MenuTextCatalog.js';
 import { renderLobbyView, updateLobbyView, disposeLobbyView } from './MenuLobbyRenderer.js';
-import { createMenuMultiplayerDiscoveryPort } from './multiplayer/MenuMultiplayerDiscoveryPort.js';
-import { createMenuMultiplayerHostIpResolver } from './multiplayer/MenuMultiplayerHostIpResolver.js';
+import { createMenuMultiplayerDiscoveryPort } from '../multiplayer/MenuMultiplayerDiscoveryPort.js';
+import { createMenuMultiplayerHostIpResolver } from '../multiplayer/MenuMultiplayerHostIpResolver.js';
 
 const MULTIPLAYER_MAX_PLAYERS = 10;
 
