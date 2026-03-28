@@ -3,6 +3,54 @@ import { EditorAssetLoader } from './EditorAssetLoader.js';
 import { EditorUI } from './EditorUI.js';
 import { EditorMapManager } from './EditorMapManager.js';
 
+function buildEditorRuntimeSnapshot({ ui, mapManager, core }) {
+    const activeEntry = ui?.toolDockState?.getActiveEntry?.() || null;
+    const recentEntries = ui?.toolDockState?.getRecentEntries?.() || [];
+    const favoriteEntries = ui?.toolDockState?.getFavoriteEntries?.() || [];
+    const objects = Array.from(core?.objectsContainer?.children || []).map((object) => ({
+        id: object?.userData?.id || null,
+        type: object?.userData?.type || null,
+        subType: object?.userData?.subType ?? null,
+        x: Math.round(Number(object?.position?.x) || 0),
+        y: Math.round(Number(object?.position?.y) || 0),
+        z: Math.round(Number(object?.position?.z) || 0)
+    }));
+
+    return {
+        mode: ui?.currentTool === 'select' ? 'select' : 'place',
+        currentTool: ui?.currentTool || 'select',
+        activeCategoryId: ui?.toolDockState?.getCurrentCategoryId?.() || null,
+        activeEntryId: activeEntry?.id || null,
+        activeEntryLabel: activeEntry?.label || null,
+        activeEntrySubType: activeEntry?.subType || null,
+        objectCount: Number(mapManager?.getObjectCount?.() || 0),
+        recentEntryIds: recentEntries.map((entry) => entry.id),
+        favoriteEntryIds: favoriteEntries.map((entry) => entry.id),
+        objects
+    };
+}
+
+function installEditorRuntimeHooks({ core, ui, mapManager, assetLoader }) {
+    const runtimeApi = {
+        core,
+        ui,
+        mapManager,
+        assetLoader,
+        getState() {
+            return buildEditorRuntimeSnapshot({ ui, mapManager, core });
+        }
+    };
+
+    globalThis.CURVIOS_EDITOR = runtimeApi;
+    globalThis.render_game_to_text = () => JSON.stringify(runtimeApi.getState());
+    globalThis.advanceTime = async (ms = 16) => {
+        const waitMs = Math.max(0, Number(ms) || 0);
+        await new Promise((resolve) => window.setTimeout(resolve, waitMs));
+        return globalThis.render_game_to_text();
+    };
+    document.body.dataset.editorReady = '1';
+}
+
 export async function initEditor() {
     try {
         const assetStatusText = document.getElementById("assetStatusText");
@@ -44,6 +92,7 @@ export async function initEditor() {
             onBeforeManagedObjectsCleared: () => ui.beforeManagedObjectsCleared()
         });
 
+        installEditorRuntimeHooks({ core, ui, mapManager, assetLoader });
         core.animate();
         console.log("3D Map Editor successfully initialized.");
     } catch (error) {
@@ -53,6 +102,8 @@ export async function initEditor() {
             assetStatusText.textContent = "Init fehlgeschlagen";
             assetStatusText.style.color = "var(--danger)";
         }
+        document.body.dataset.editorReady = '0';
+        globalThis.CURVIOS_EDITOR_INIT_ERROR = String(error?.message || error || 'unknown');
         alert("Fehler beim Starten des 3D Map Editors. Details in der Konsole.");
     }
 }

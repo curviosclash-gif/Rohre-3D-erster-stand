@@ -51,6 +51,7 @@ export class EditorUI {
         this.mapManager = null; // Injected later
 
         this.currentTool = "select";
+        this.toolDockState = null;
         this.selectedObject = null;
         this.clipboardData = null;
         this.syncArenaValues = null;

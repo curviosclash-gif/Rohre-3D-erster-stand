@@ -3,6 +3,21 @@ export function createEditorDomRefs(doc = document) {
         toolButtons: Array.from(doc.querySelectorAll('.tool')),
         subMenus: Array.from(doc.querySelectorAll('.sub-menu')),
 
+        buildDock: doc.getElementById('buildDock'),
+        dockModeBadge: doc.getElementById('dockModeBadge'),
+        dockActiveTitle: doc.getElementById('dockActiveTitle'),
+        dockActiveDescription: doc.getElementById('dockActiveDescription'),
+        dockCategoryTabs: doc.getElementById('dockCategoryTabs'),
+        dockCards: doc.getElementById('dockCards'),
+        dockRecentList: doc.getElementById('dockRecentList'),
+        dockFavoriteList: doc.getElementById('dockFavoriteList'),
+        btnDockSelectMode: doc.getElementById('btnDockSelectMode'),
+        btnDockFavoriteToggle: doc.getElementById('btnDockFavoriteToggle'),
+
+        inspectorToolModeBadge: doc.getElementById('inspectorToolModeBadge'),
+        inspectorToolTitle: doc.getElementById('inspectorToolTitle'),
+        inspectorToolDescription: doc.getElementById('inspectorToolDescription'),
+
         subSpawn: doc.getElementById("subSpawn"),
         subTunnel: doc.getElementById("subTunnel"),
         subPortal: doc.getElementById("subPortal"),

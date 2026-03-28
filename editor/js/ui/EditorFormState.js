@@ -36,6 +36,10 @@ export function getYLayerValue(editor, fallback = 0) {
 
 export function getCurrentToolSubtype(editor) {
     if (!editor) return null;
+    const dockEntry = editor.toolDockState?.getActiveEntry?.();
+    if (editor.currentTool !== 'select' && dockEntry && dockEntry.tool === editor.currentTool) {
+        return dockEntry.subType || null;
+    }
     const dom = editor.dom || {};
     if (editor.currentTool === 'spawn') return dom.selSpawnType?.value || null;
     if (editor.currentTool === 'tunnel') return dom.selTunnelType?.value || null;
