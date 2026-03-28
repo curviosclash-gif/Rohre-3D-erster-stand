@@ -73,10 +73,10 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
 | - | V60 | - | frei | V58.99 + V59.99 erfuellt; V60 kann gestartet werden |
 | Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
-| Bot-Codex | V62 | 2026-03-27 | closed | Code fertig; DoD.2 blockiert durch externen `test:core` T7-Timeout (kein V62-Problem) |
+| Bot-Codex | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (`npm run build` PASS, `npm run test:core` PASS; T1-Startup-Flake nur im ersten Versuch, Retry gruen) |
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
-| - | V65 | - | frei | blockiert auf V62 |
+| - | V65 | - | frei | V62 erledigt; kann gestartet werden |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -89,6 +89,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | 2026-03-25 | Bot-H | Shared | `tests/helpers.js`, `package.json` | V55.1 Startup-Flakes erfordern robusteren `loadGame`-Pfad und testseitige Timeout-Haertung | `loadGame` um Runtime-Readiness+Retry erweitert; `test:core`/`test:fast` auf `--timeout=240000` standardisiert; Gate-Laeufe dokumentiert | abgeschlossen |
 | 2026-03-26 | Agent A | V57 | `src/ui/arcade/ArcadeVehicleManager.js` | V58 Architektur-Guard zeigt ui->state import zu ArcadeVehicleProfile; muss via Facade/Contract entkoppelt werden | V58.1 hat Budget-Fixes umgesetzt; verbleibende Entkopplung in V58.3 oder V60 | DEFERRED |
 | 2026-03-26 | Bot-Codex | V59/V60 | `src/shared/logging/Logger.js` | V62-Abschluss-Gate benoetigt gruene `build`-/Architecture-Typecheck-Laeufe; Blocker war JSDoc/ImportMeta-Typfehler | Commit `9fe3809` hat Logger-Typecheck gefixt; `npm run build` und `tsc -p tsconfig.architecture.json` gruen (2026-03-27) | abgeschlossen |
+| 2026-03-27 | Bot-Codex | V59/V60 | `src/core/main.js`, `src/ui/UIStartSyncController.js`, `tests/core.spec.js` | V62.99-Gate blieb an `test:core` haengen: ungueltige Vehicle-Fallbacks blieben nur im DOM sichtbar, und der Recording-Hotkey nutzte Recorder-Doubles ohne Lifecycle-Fallback nicht mehr | Vehicle-Select sync schreibt reparierte Werte jetzt in `settings`; Recording-Hotkey faellt fuer Recorder-Doubles auf `recording_requested` zurueck; `T20qa`, `T7`, `npm run test:core`, `npm run build` verifiziert | abgeschlossen |
 
 ---
 
@@ -102,9 +103,9 @@ V59 und V63 sind abgeschlossen. V60 ist jetzt unblocked (V59.99 erfuellt).
 | B | **V60** (nach V58.99) | V59.99 erfuellt; wartet nur noch auf V58.99 |
 | C | **V61** (Rest: HUD, Modifiers, Intermission, Mastery-UI, Daily Replay) | Arcade Gameplay, keine Ueberlappung |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
-| E | **V62** (DoD.2 blocked) + **V65** | Code fertig; T7-Timeout ist externer Blocker |
+| E | **V65** | V62 ist geschlossen; Spur frei fuer Nachfolgeblock |
 
-Empfehlung: 2 Agents parallel auf A + C. Spur B nach V58.99. Spur D nach Scope-Definition. Spur E nach T7-Fix.
+Empfehlung: 2 Agents parallel auf A + C. Spur B nach V58.99. Spur D nach Scope-Definition. Spur E kann mit V65 starten.
 
 ---
 
@@ -119,7 +120,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | abgeschlossen (V58.99) | Abgeschlossen |
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | 60.1.2 knip-Erweiterung; 60.2-60.4 offen | Offen |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | Rest: HUD, Modifiers, Intermission, Mastery-UI | In Bearbeitung |
-| V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | Code fertig; DoD.2 blockiert durch externen `test:core` T7-Timeout | Blocked |
+| V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
@@ -529,8 +530,8 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 62.1 bis 62.2 und 62.99 sind abgeschlossen und mit Evidence dokumentiert.
-- [ ] DoD.2 `npm run build`, `npm run test:core` sind PASS.
+- [x] DoD.1 Alle Phasen 62.1 bis 62.2 und 62.99 sind abgeschlossen und mit Evidence dokumentiert. (abgeschlossen: 2026-03-27; evidence: 62.1.x, 62.2.x und 62.99.x vollstaendig auf [x], Gate-Unblocker fuer `test:core` in `UIStartSyncController.js` + `main.js`)
+- [x] DoD.2 `npm run build`, `npm run test:core` sind PASS. (abgeschlossen: 2026-03-27; evidence: `npm run build` PASS; `TEST_PORT=5202 PW_RUN_TAG=v62-core-rerun PW_OUTPUT_DIR=test-results/v62-core-rerun npm run test:core` PASS, T1-Startup-Flake nur im ersten Versuch, Retry gruen)
 - [x] DoD.3 Kamera-Verhalten visuell verifiziert: Boost-Uebergang smooth, Sway bei Stillstand reduziert. (abgeschlossen: 2026-03-27; evidence: custom Playwright smoke -> `test-results/v62-visual/camera-numeric-probe.json`, `test-results/v62-visual/idle-third-person.jpg`, `test-results/v62-visual/boost-transition-third-person.jpg`, `test-results/v62-visual/cockpit-third-person.jpg`)
 - [x] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS. (abgeschlossen: 2026-03-27; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS)
 
@@ -557,7 +558,7 @@ Scope:
 
 ### Phase 62.99: Integrations- und Abschluss-Gate
 
-- [ ] 62.99.1 `npm run build`, `npm run test:core` sind gruen. (Stand: 2026-03-27; evidence: `npm run build` PASS; `npm run test:core` FAIL bei `T7: Spiel startet � HUD sichtbar` -> `test-results/v62-final-core`)
+- [x] 62.99.1 `npm run build`, `npm run test:core` sind gruen. (abgeschlossen: 2026-03-27; evidence: `npm run build` PASS; `TEST_PORT=5202 PW_RUN_TAG=v62-core-rerun PW_OUTPUT_DIR=test-results/v62-core-rerun npm run test:core` PASS; gezielte Repros `T7` -> `test-results/v62-t7-only`, `T20qa` -> `test-results/v62-vehicle-fallback`)
 - [x] 62.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert. (abgeschlossen: 2026-03-27; evidence: `npm run plan:check` PASS, `npm run docs:sync` PASS, `npm run docs:check` PASS)
 - [x] 62.99.3 Visueller Smoke-Test: Boost-Uebergang smooth, Sway bei Stillstand minimal, Kamera-Verhalten bei Cockpit-Modus unveraendert. (abgeschlossen: 2026-03-27; evidence: custom Playwright smoke -> `test-results/v62-visual/camera-visual-summary.json`, `test-results/v62-visual/camera-numeric-probe.json`, `test-results/v62-visual/idle-third-person.jpg`, `test-results/v62-visual/boost-transition-third-person.jpg`, `test-results/v62-visual/cockpit-third-person.jpg`)
 
@@ -568,7 +569,7 @@ Scope:
 | Speed-abhaengiger Sway veraendert Kamera-Feeling merklich | mittel | Renderer | `referenceSpeed`-Wert konfigurierbar, visueller Vergleich vor/nach | Spieler empfindet Kamera als unruhig oder zu statisch |
 | Boost-Blend-Float statt Boolean bricht externe Call-Sites | niedrig | Renderer | Fallback `isBoosting ? 1 : 0` wenn `boostBlend` nicht uebergeben wird | Tests oder externe Aufrufer brechen |
 | Smoothing-Vereinfachung (copy statt lerp) erzeugt Mikro-Ruckler | niedrig | Renderer | Da effectiveSmooth bereits 1.0 ist, aendert sich das Ergebnis mathematisch nicht | Visueller Unterschied im Smooth-Pfad |
-| Repo-weite Verifikations-Gates ausserhalb V62 blockieren den Abschluss | mittel | Bot-Codex | Nach Logger-Typecheck-Fix und stabilisiertem Playwright-Startup `62.99.1` und `62.99.3` erneut ausfuehren | `npm run build` scheitert in `src/shared/logging/Logger.js` oder `test:core`/visueller Smoke haengen im Startup |
+| Playwright-Startup kann im ersten Versuch noch flaken (`page.goto`/Prewarm), obwohl der Retry-Gate gruen ist | mittel | Bot-Codex | Einzigartige `TEST_PORT`/`PW_RUN_TAG`/`PW_OUTPUT_DIR` nutzen; Retry-Artefakte im Gate belassen; bei wiederholten Flakes V55.1-Setup weiter haerten | Fruehe Core-Tests wie `T1` oder `T20l1` kippen nur im ersten Versuch mit Startup-/Prewarm-Timeout |
 
 ---
 
@@ -660,8 +661,8 @@ Scope:
 
 Stand: 2026-03-27
 
-- Abgeschlossen diese Woche: V52-V57 (archiviert), V59 (Code-Qualitaet & Netzwerk-Haertung), V63 (Fight-Modus Follow-up). V62 Code fertig (DoD.2 extern blockiert).
-- Blockiert: V62 DoD.2 durch `test:core` T7-Timeout (externer Blocker, kein V62-Problem). V60 wartet auf V58.99.
+- Abgeschlossen diese Woche: V52-V57 (archiviert), V59 (Code-Qualitaet & Netzwerk-Haertung), V62 (Cinematic-Camera + Gate-Unblocker), V63 (Fight-Modus Follow-up).
+- Blockiert: V60 wartet auf V58.99. Kein offener V62-Blocker mehr; Residualrisiko ist nur ein gelegentlicher Playwright-Startup-Flake im ersten Versuch.
 - Naechste 3 Ziele:
   1. V58 (Rest): Settings-/Profile-Contract extrahieren (58.3.2-58.3.3), Dead-Code-Guard (58.4), Gate (58.99).
   2. V61 (Rest): HUD (Score/Combo), Modifier-Effekte im Gameplay, Intermission-Reward-UI, Mastery-Anzeige, Sudden-Death-Mechanik.
