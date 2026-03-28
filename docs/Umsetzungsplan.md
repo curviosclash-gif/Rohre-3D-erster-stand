@@ -85,7 +85,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (`npm run build` PASS, `npm run test:core` PASS; T1-Startup-Flake nur im ersten Versuch, Retry gruen) |
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
-| Bot-Codex | V65 | 2026-03-28 | claimed | 65.1.1-65.2.2, 65.3.1 und 65.4.1 umgesetzt; Rest: 65.3.2, 65.4.2, 65.5.x, 65.99 |
+| Bot-Codex | V65 | 2026-03-28 | claimed | 65.1.1-65.4.2 umgesetzt; Rest: 65.5.x, 65.99 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -681,12 +681,12 @@ Scope:
 ### 65.3 Vorschaukarten und Asset-Previews
 
 - [x] 65.3.1 Objektkarten mit Mini-Vorschau, Namen und Status-Badge aufbauen; Asset-Previews aus vorhandenen Modellen oder Fallback-Renderings erzeugen. (abgeschlossen: 2026-03-28; evidence: Fallback-Preview-Karten in `EditorToolPaletteControls.js` + `editor/map-editor-3d.html`; `npm run build` -> PASS; commit `87cb45d`)
-- [ ] 65.3.2 Lade-, Placeholder- und Fehlerfaelle sichtbar behandeln, ohne die Auswahl oder Platzierung der Objekte zu blockieren.
+- [x] 65.3.2 Lade-, Placeholder- und Fehlerfaelle sichtbar behandeln, ohne die Auswahl oder Platzierung der Objekte zu blockieren. (abgeschlossen: 2026-03-28; evidence: `node --input-type=module` editor-asset-status-smoke -> PASS; Asset-Status-Badges in `EditorAssetLoader.js` + `EditorToolPaletteControls.js`; commit `d33f042`)
 
 ### 65.4 Bedienfluss und Auswahl-Polish
 
 - [x] 65.4.1 Ein-Klick-Auswahl, letzte Auswahl pro Kategorie, Favoriten und zuletzt benutzte Objekte fuer haeufige Bauaktionen nutzbar machen. (abgeschlossen: 2026-03-28; evidence: `node --input-type=module` editor-tool-dock-smoke -> PASS; commit `87cb45d`)
-- [ ] 65.4.2 Tastatur-, Mausrad- und Hover-Flows fuer Kategorien, Kartenwechsel, aktive Rueckmeldung und schnellen Wechsel zur Auswahl ergaenzen.
+- [x] 65.4.2 Tastatur-, Mausrad- und Hover-Flows fuer Kategorien, Kartenwechsel, aktive Rueckmeldung und schnellen Wechsel zur Auswahl ergaenzen. (abgeschlossen: 2026-03-28; evidence: Keyboard-/Hover-Navigation in `EditorToolPaletteControls.js`, Runtime-Refresh in `EditorUI.js` + `main.js`; `npm run build` -> PASS; commit `d33f042`)
 
 ### 65.5 Verifikation und visuelle Abnahme
 
@@ -771,6 +771,72 @@ Scope:
 | Custom-Fahrzeuge ohne standardisierte Preview-Tokens | mittel | Editor/Vehicle-Lab | On-Demand-Thumbnail oder generischer "Custom"-Platzhalter | Custom-Fahrzeuge zeigen leere Vorschau |
 | Umbau von ArcadeVehicleManager bricht bestehende Arcade-Flows | hoch | Arcade/Core | vehicleId und ArcadeVehicleProfileContract als stabilen Contract beibehalten | Bestehende Arcade-Tests schlagen fehl |
 | Vergleichsmodus braucht normierte Stats die aktuell nicht existieren | mittel | Gameplay/UI | Stats aus Hitbox-Radius, Upgrade-Potenzial und Kategorie ableiten; keine erfundenen Werte | Stats-Balken zeigen unsinnige oder identische Werte |
+
+---
+
+## Block V67: Multiplayer-Netzwerk-Haertung - ICE, Retry, Reconciler, Ghost-Cleanup
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V60.99, V59.99 -->
+
+Scope:
+
+- ICE-Candidate-Handling in LAN-Modus fixen: Race-Condition bei gleichzeitigem Polling von Host und Client beseitigen.
+- Retry-/Backoff-Logik fuer WebSocket- und HTTP-Signaling einfuehren, damit transiente Netzwerk-Hiccups nicht zu permanentem Verbindungsabbruch fuehren.
+- StateReconciler auf alle spielrelevanten Felder erweitern (Rotation, Velocity, Effects), nicht nur Position/Score/Health.
+- Ghost-Player-Cleanup im LAN-Signaling-Server: inaktive Spieler nach Timeout automatisch entfernen.
+- DataChannelManager um Backpressure-Erkennung erweitern und stille Paketverluste vermeiden.
+- connectReject-Mehrfachaufruf in OnlineMatchLobby absichern.
+- Multiplayer-Testabdeckung signifikant erweitern.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 67.1 bis 67.4 und 67.99 sind abgeschlossen.
+- [ ] DoD.2 ICE-Candidate-Race ist behoben und durch einen Test abgedeckt.
+- [ ] DoD.3 WebSocket-/HTTP-Retry mit Backoff ist implementiert und konfigurierbar.
+- [ ] DoD.4 `npm run test:core` und `npm run build` sind gruen; neue Netzwerk-Tests decken Disconnect, Reconnect, Heartbeat-Timeout und Host-Disconnect ab.
+
+### 67.1 Kritische Verbindungsfehler beheben
+
+- [ ] 67.1.1 ICE-Candidate Double-Deletion in `LANSessionAdapter._pollIceCandidates()` fixen: separate Maps fuer Host→Client und Client→Host Kandidaten einfuehren, oder non-destructive Peek statt `delete`-on-read.
+- [ ] 67.1.2 `OnlineMatchLobby._handleMessage()` gegen mehrfachen `connectReject`-Aufruf absichern (Guard-Flag analog zu `settled` in `OnlineSessionAdapter.connect()`).
+- [ ] 67.1.3 Offer-Polling-Timeout in `LANSessionAdapter._joinAsClient()` erhoehen und exponentiellen Backoff einfuehren (statt 30×200ms konstant).
+
+### 67.2 Retry- und Resilience-Logik
+
+- [ ] 67.2.1 `OnlineSessionAdapter.connect()` um konfigurierbare Retry-Logik mit exponentiellem Backoff erweitern (max 3 Versuche, 1s/2s/4s).
+- [ ] 67.2.2 `OnlineMatchLobby._makeConnectPromise()` analog absichern: WebSocket-Verbindungsaufbau mit Retry statt Single-Shot.
+- [ ] 67.2.3 `DataChannelManager.sendToAll()` um Backpressure-Erkennung erweitern: bei vollem Channel `bufferedAmount` pruefen und Callback/Event emittieren statt stille Drops.
+- [ ] 67.2.4 `LatencyMonitor` nur bei verbundenen Peers pingen; bei leerer Peer-Liste Heartbeat pausieren.
+
+### 67.3 State-Synchronisation und Server-Cleanup
+
+- [ ] 67.3.1 `StateReconciler.reconcile()` auf Rotation, Velocity und aktive Effects erweitern; Snap-Threshold pro Feld konfigurierbar machen.
+- [ ] 67.3.2 `server/lan-signaling.js` um automatischen Ghost-Player-Cleanup erweitern: Spieler ohne Aktivitaet nach 60s aus `pending`/`players`-Liste entfernen.
+- [ ] 67.3.3 `RuntimeSessionLifecycleService.waitForRuntimePlayersLoaded()` Timeout dynamisch anpassen: pro Client 5s extra statt festes 10s-Fenster.
+
+### 67.4 Test-Abdeckung erweitern
+
+- [ ] 67.4.1 Unit-Tests fuer ICE-Candidate-Handling: gleichzeitiges Polling darf keine Kandidaten verlieren.
+- [ ] 67.4.2 Unit-Tests fuer Heartbeat-Timeout: Disconnect-Event nach 5s ohne Pong.
+- [ ] 67.4.3 Unit-Tests fuer Reconnect-Window: Peer innerhalb 30s → reconnected, nach 30s → removed.
+- [ ] 67.4.4 Characterization-Test fuer Host-Disconnect: Clients erhalten `host_leaving` und raeumen auf.
+- [ ] 67.4.5 Integration-Test: Zwei-Tab-Multiplayer-Smoke mit >15s Stabilitaet (baut auf 60.4.4 auf).
+
+### 67.99 Integrations- und Abschluss-Gate
+
+- [ ] 67.99.1 `npm run test:core`, `npm run build` und neue Netzwerk-Tests sind gruen.
+- [ ] 67.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+
+### Risiko-Register V67
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| ICE-Fix aendert Signaling-Protokoll und bricht bestehende LAN-Verbindungen | hoch | Netzwerk | Aenderung auf Server- und Client-Seite synchron deployen; Characterization-Test vorher schreiben | LAN-Verbindung schlaegt nach Update fehl |
+| Retry-Logik maskiert echte Verbindungsfehler durch wiederholte Versuche | mittel | Netzwerk | Max-Retries begrenzen, Fehlermeldung nach letztem Versuch klar an UI weiterleiten | User wartet 10s+ ohne Feedback |
+| StateReconciler-Erweiterung erzeugt sichtbares Snapping bei hoher Latenz | mittel | Gameplay | Interpolationsrate und Snap-Threshold pro Feld tunen; visuelles Smoothing | Fahrzeuge springen sichtbar bei >100ms RTT |
+| Ghost-Cleanup entfernt aktive Spieler bei kurzer Inaktivitaet | hoch | Server | Timeout konservativ (60s), Heartbeat als Aktivitaetssignal werten | Aktiver Spieler wird aus Lobby entfernt |
+| DataChannel-Backpressure bremst Host-Broadcasting und erzeugt Lags | mittel | Netzwerk | Nur warnen/loggen statt blockieren; langsame Clients nach Threshold kicken | Alle Clients laggen weil ein Client langsam ist |
 
 ---
 
