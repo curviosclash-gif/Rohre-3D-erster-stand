@@ -278,6 +278,15 @@ export class Game {
             return;
         }
 
+        const supportsDirectRecording = typeof recorder.startRecording === 'function'
+            && typeof recorder.stopRecording === 'function';
+        if (!supportsDirectRecording) {
+            recorder.notifyLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.RECORDING_REQUESTED, {
+                command: 'toggle',
+            });
+            return;
+        }
+
         const wasRecording = !!recorder.isRecording?.();
         const isCinematicRecording = wasRecording
             && recorder.getRecordingCaptureSettings?.()?.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4;

@@ -2649,6 +2649,26 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         );
     });
 
+    test('T20qa: Start-Setup repariert ungueltige Vehicle-IDs in Settings', async ({ page }) => {
+        await loadGame(page);
+        await openGameSubmenu(page);
+        const repairedState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.settings.vehicles.PLAYER_1 = 'missing_vehicle';
+            game.runtimeFacade.onSettingsChanged({ changedKeys: ['vehicles.player1'] });
+            return {
+                domValue: document.getElementById('vehicle-select-p1')?.value ?? '',
+                settingsValue: game.settings?.vehicles?.PLAYER_1 ?? '',
+                validationField: game.runtimeFacade?._resolveStartValidationIssue?.()?.fieldKey ?? '',
+            };
+        });
+
+        expect(repairedState.domValue).toBeTruthy();
+        expect(repairedState.domValue).not.toBe('missing_vehicle');
+        expect(repairedState.settingsValue).toBe(repairedState.domValue);
+        expect(repairedState.validationField).not.toBe('vehicleP1');
+    });
+
     test('T20r: Textkatalog-Override greift und Release-Vorschau deaktiviert ihn', async ({ page }) => {
         await loadGame(page);
         await openDeveloperSubmenu(page);

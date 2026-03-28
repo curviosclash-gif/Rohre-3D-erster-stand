@@ -258,6 +258,26 @@ export class UIStartSyncController {
         const vehicleSearch = String(startSetup.vehicleSearch || '').trim().toLowerCase();
         const vehicleFilter = String(startSetup.vehicleFilter || 'all').toLowerCase();
         const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
+        const knownVehicleIds = new Set(this._vehiclePreviewEntries.map((entry) => entry.id));
+        const appendVehicleOption = (select, vehicleId) => {
+            const normalizedVehicleId = String(vehicleId || '').trim();
+            if (!(select instanceof HTMLSelectElement) || !normalizedVehicleId) return;
+            if (Array.from(select.options).some((option) => option.value === normalizedVehicleId)) return;
+            const option = document.createElement('option');
+            option.value = normalizedVehicleId;
+            option.textContent = resolveVehiclePreview(normalizedVehicleId).label;
+            select.appendChild(option);
+        };
+        const resolveVehicleSelectValue = (select, currentValue) => {
+            const normalizedCurrentValue = String(currentValue || '').trim();
+            if (knownVehicleIds.has(normalizedCurrentValue)) {
+                appendVehicleOption(select, normalizedCurrentValue);
+                return normalizedCurrentValue;
+            }
+            const fallbackVehicleId = this._vehiclePreviewEntries[0]?.id || 'ship5';
+            appendVehicleOption(select, fallbackVehicleId);
+            return fallbackVehicleId;
+        };
 
         if (this.ui.mapSearchInput && this.ui.mapSearchInput.value !== startSetup.mapSearch) {
             this.ui.mapSearchInput.value = startSetup.mapSearch;
@@ -320,15 +340,11 @@ export class UIStartSyncController {
                 option.textContent = entry.label;
                 this.ui.vehicleSelectP1.appendChild(option);
             });
-            if (this.ui.vehicleSelectP1.options.length === 0) {
-                const fallbackOption = document.createElement('option');
-                fallbackOption.value = currentValue || 'ship5';
-                fallbackOption.textContent = currentValue || 'ship5';
-                this.ui.vehicleSelectP1.appendChild(fallbackOption);
+            const resolvedValue = resolveVehicleSelectValue(this.ui.vehicleSelectP1, currentValue);
+            this.ui.vehicleSelectP1.value = resolvedValue;
+            if (settings?.vehicles?.PLAYER_1 !== resolvedValue) {
+                settings.vehicles.PLAYER_1 = resolvedValue;
             }
-            this.ui.vehicleSelectP1.value = Array.from(this.ui.vehicleSelectP1.options).some((option) => option.value === currentValue)
-                ? currentValue
-                : this.ui.vehicleSelectP1.options[0].value;
         }
         if (this.ui.vehicleSelectP2) {
             const currentValue = String(settings?.vehicles?.PLAYER_2 || this.ui.vehicleSelectP2.value || '');
@@ -339,15 +355,11 @@ export class UIStartSyncController {
                 option.textContent = entry.label;
                 this.ui.vehicleSelectP2.appendChild(option);
             });
-            if (this.ui.vehicleSelectP2.options.length === 0) {
-                const fallbackOption = document.createElement('option');
-                fallbackOption.value = currentValue || 'ship5';
-                fallbackOption.textContent = currentValue || 'ship5';
-                this.ui.vehicleSelectP2.appendChild(fallbackOption);
+            const resolvedValue = resolveVehicleSelectValue(this.ui.vehicleSelectP2, currentValue);
+            this.ui.vehicleSelectP2.value = resolvedValue;
+            if (settings?.vehicles?.PLAYER_2 !== resolvedValue) {
+                settings.vehicles.PLAYER_2 = resolvedValue;
             }
-            this.ui.vehicleSelectP2.value = Array.from(this.ui.vehicleSelectP2.options).some((option) => option.value === currentValue)
-                ? currentValue
-                : this.ui.vehicleSelectP2.options[0].value;
         }
 
         renderQuickList(this.ui.mapFavoritesList, startSetup.favoriteMaps, 'mapKey');
