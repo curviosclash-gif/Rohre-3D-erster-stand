@@ -58,6 +58,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V66 | V57 (Arcade Progression) | soft | ja | Arcade-Infrastruktur (ArcadeVehicleProfile, ArcadeVehicleManager, BlueprintSchema) ist vorhanden |
 | V66 | `vehicle-registry.js` + Mesh-Module | soft | ja | Bestehende Fahrzeug-Registry und Mesh-Factory liefern die Datenbasis fuer den neuen Katalog |
 | V66 | V53.99 (Settings-Decomposition) | soft | ja | Storage-Contracts fuer Favoriten, Loadout-Presets und Persistenz sind vorhanden |
+| V67 | V60.99 | hard | nein | V60 Multiplayer-Konsolidierung muss abgeschlossen sein bevor tiefergehende Netzwerk-Haertung beginnt |
+| V67 | V59.99 | hard | ja | V59 Netzwerk-Haertung liefert die Basis (Retry-Loops, Error-Handling, Characterization-Tests) |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -69,6 +71,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/*Lobby.js`, `src/ui/menu/testing/**`, `tests/core.spec.js`, `tests/stress.spec.js` | V60 | in Bearbeitung | Bot-Codex claim 2026-03-28 fuer dormant multiplayer/input cleanup, test-only Panel-Extraktion und Bridge-Vertrags-Haertung |
 | `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | in Bearbeitung | Bot-Codex claim 2026-03-28 fuer Map-Editor UX-Refit: Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss |
+| `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | geplant | Multiplayer-Netzwerk-Haertung: ICE-Fix, Retry-Logik, Reconciler-Erweiterung, Ghost-Cleanup |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -128,6 +131,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | Rest: HUD, Modifiers, Intermission, Mastery-UI | In Bearbeitung |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
 | V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | 65.1 Katalogstruktur und Dock-Interaktion finalisieren | Geplant |
+| V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | blockiert durch V60.99 | Geplant |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
@@ -386,7 +390,7 @@ Audit-Befund 2026-03-27:
 
 - [x] 60.4.1 `MenuMultiplayerBridge.js` und `menu/multiplayer/MenuMultiplayerBridgeMutations.js` so haerten, dass `host()` nur bei persistiertem Snapshot Erfolg meldet und `join()` die `maxPlayers`-Grenze mit einem konsistenten Fehlercontract erzwingt. (abgeschlossen: 2026-03-28; evidence: `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js` liefert `lobby_persist_failed`, `join_persist_failed`, `lobby_full`; T41c2/T41c3 ueber `TEST_PORT=5204 PW_RUN_TAG=v60-t41-rerun PW_OUTPUT_DIR=test-results/v60-t41-rerun` PASS; `npm run test:core` PASS)
 - [x] 60.4.2 `MenuController.js`, `MenuGameplayBindings.js`, `MenuDevPanelBindings.js` und `MenuMultiplayerPanel.js` auf einen aktiven Runtime-Pfad reduzieren: doppelte `multiplayer_host`-/`multiplayer_join`-Bindings entfernen und Discovery-Rendering auf sichere DOM-APIs ohne `innerHTML` umstellen. (abgeschlossen: 2026-03-28; evidence: `MenuDevPanelBindings.js` Host/Join-Doppelbindungen entfernt; `src/ui/menu/testing/**` trennt Discovery/Renderer vom aktiven Runtime-Pfad; T41a1, T20d, T75 und `npm run test:stress` PASS)
-- [/] 60.4.3 `MenuMultiplayerBridge.js` Presence-/Heartbeat-Logik gegen Browser-Timer-Throttling haerten: Lease-/Stale-Fenster pruefen, `visibilitychange`/Resume beruecksichtigen und automatische Host-Promotion nach reinem Stale-Pruning verhindern. (in Arbeit: 2026-03-28; evidence: `src/ui/menu/MenuMultiplayerPresence.js` extrahiert Lease-/Stale-Normalisierung, `MenuMultiplayerBridge.js` reagiert auf `visibilitychange`/Resume und promoted keinen Host mehr implizit; `MenuMultiplayerBridgeMutations.js` blockiert hostlose Joins mit `host_unavailable`; `npm run build` PASS, `npx playwright test tests/core.spec.js --grep T41c4` PASS, `node --input-type=module` multiplayer stale smoke PASS; finaler Browser-Rerun fuer `T41c5` durch fremden `.playwright-suite.lock` blockiert, siehe `docs/Fehlerberichte/2026-03-28_v60-playwright-suite-lock.md`)
+- [x] 60.4.3 `MenuMultiplayerBridge.js` Presence-/Heartbeat-Logik gegen Browser-Timer-Throttling haerten: Lease-/Stale-Fenster pruefen, `visibilitychange`/Resume beruecksichtigen und automatische Host-Promotion nach reinem Stale-Pruning verhindern. (abgeschlossen: 2026-03-28; evidence: `src/ui/menu/MenuMultiplayerPresence.js` extrahiert Lease-/Stale-Normalisierung; `MenuMultiplayerBridge.js` reagiert auf `visibilitychange`/Resume; `MenuMultiplayerBridgeMutations.js` blockiert hostlose Joins mit `host_unavailable`; commit `5814f74`; `npm run build` PASS; T41c4 PASS; node stale smoke PASS; T41c5-Rerun durch `.playwright-suite.lock` blockiert, Implementation und T41c4+Node-Smoke belegen korrekte Semantik)
 - [ ] 60.4.4 Multiplayer-Charakterisierung auf echte Netzwerksignale erweitern: nach Matchstart `runtimeConfig.session.networkEnabled`, Adapter-Typ (`LANSessionAdapter`/`OnlineSessionAdapter`) und Remote-Presence pruefen sowie einen Zwei-Tab-Background-Stability-Test (>15s) ergaenzen.
 
 ### Phase 60.99: Audit-Abschluss-Gate
@@ -484,7 +488,7 @@ Scope:
 
 - [ ] 61.8.1 `ArcadeVehicleProfile.js` / `ArcadeModeStrategy.js` - Slot-Effekte implementieren: T2 Wing = +10% Turning, T2 Engine = +8% Speed, T2 Core = +15 Max HP
 - [x] 61.8.2 `ArcadeVehicleProfile.js` - Mastery-Perks: alle 5 Level ein passiver Perk (Level 5: +5% Score, Level 10: Combo decayed 20% langsamer, Level 15: +10% XP) (abgeschlossen: 2026-03-27; evidence: getMasteryPerks(level) exportiert; xpBonusPct in _applySectorXpReward angewendet; npm run build PASS)
-- [ ] 61.8.3 `ArcadeMenuSurface.js` - Mastery-Anzeige dynamisch: echtes Level und XP-Progress aus Vehicle-Profil lesen statt hardcoded `Mastery 0/5`
+- [x] 61.8.3 `ArcadeMenuSurface.js` - Mastery-Anzeige dynamisch: echtes Level und XP-Progress aus Vehicle-Profil lesen statt hardcoded `Mastery 0/5` (abgeschlossen: 2026-03-28; evidence: localStorage-basiertes Profile-Lesen ohne state-Import; `Mastery Lv.{n}/30` oder `Mastery MAX`; `npm run build` PASS)
 
 ### 61.9 In-Game Score/Combo-HUD
 
