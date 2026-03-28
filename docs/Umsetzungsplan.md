@@ -79,7 +79,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (`npm run build` PASS, `npm run test:core` PASS; T1-Startup-Flake nur im ersten Versuch, Retry gruen) |
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
-| Bot-Codex | V65 | 2026-03-28 | claimed | 65.1.x und 65.2.x fuer Bottom-Dock-/Katalog-Refit in Arbeit |
+| Bot-Codex | V65 | 2026-03-28 | claimed | 65.1.1-65.2.2, 65.3.1 und 65.4.1 umgesetzt; Rest: 65.3.2, 65.4.2, 65.5.x, 65.99 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -663,22 +663,22 @@ Scope:
 
 ### 65.1 Katalog- und Interaktionskonzept
 
-- [ ] 65.1.1 Einen zentralen Editor-Build-Katalog fuer `type`/`subType`, Labels, Sortierung, Kategorien, Preview-Metadaten und Featured-Eintraege definieren.
-- [ ] 65.1.2 Die neue Dock-Interaktion festlegen: Kategorie-Tabs, Kartenreihe, aktive Auswahl, Inspector-Abgrenzung, Responsive-Verhalten und Quick-Actions.
+- [x] 65.1.1 Einen zentralen Editor-Build-Katalog fuer `type`/`subType`, Labels, Sortierung, Kategorien, Preview-Metadaten und Featured-Eintraege definieren. (abgeschlossen: 2026-03-28; evidence: `node --input-type=module` editor-tool-dock-smoke -> PASS; commit `87cb45d`)
+- [x] 65.1.2 Die neue Dock-Interaktion festlegen: Kategorie-Tabs, Kartenreihe, aktive Auswahl, Inspector-Abgrenzung, Responsive-Verhalten und Quick-Actions. (abgeschlossen: 2026-03-28; evidence: Bottom-Dock in `editor/map-editor-3d.html` + `EditorToolPaletteControls.js`; `npm run build` -> PASS; commit `87cb45d`)
 
 ### 65.2 DOM- und State-Umbau
 
-- [ ] 65.2.1 `editor/map-editor-3d.html` auf klares Layout aus Inspector, Szene und Bottom-Dock umbauen und die verteilte Tool-/Submenu-Struktur ersetzen.
-- [ ] 65.2.2 Auswahl- und Filterzustand in dedizierte UI-Module auslagern, damit `currentTool`, `subType`, Kategorie, Favoriten und Recents konsistent bleiben.
+- [x] 65.2.1 `editor/map-editor-3d.html` auf klares Layout aus Inspector, Szene und Bottom-Dock umbauen und die verteilte Tool-/Submenu-Struktur ersetzen. (abgeschlossen: 2026-03-28; evidence: `npm run build` -> PASS; commit `87cb45d`)
+- [x] 65.2.2 Auswahl- und Filterzustand in dedizierte UI-Module auslagern, damit `currentTool`, `subType`, Kategorie, Favoriten und Recents konsistent bleiben. (abgeschlossen: 2026-03-28; evidence: `node --input-type=module` editor-tool-dock-smoke -> PASS; commit `87cb45d`)
 
 ### 65.3 Vorschaukarten und Asset-Previews
 
-- [ ] 65.3.1 Objektkarten mit Mini-Vorschau, Namen und Status-Badge aufbauen; Asset-Previews aus vorhandenen Modellen oder Fallback-Renderings erzeugen.
+- [x] 65.3.1 Objektkarten mit Mini-Vorschau, Namen und Status-Badge aufbauen; Asset-Previews aus vorhandenen Modellen oder Fallback-Renderings erzeugen. (abgeschlossen: 2026-03-28; evidence: Fallback-Preview-Karten in `EditorToolPaletteControls.js` + `editor/map-editor-3d.html`; `npm run build` -> PASS; commit `87cb45d`)
 - [ ] 65.3.2 Lade-, Placeholder- und Fehlerfaelle sichtbar behandeln, ohne die Auswahl oder Platzierung der Objekte zu blockieren.
 
 ### 65.4 Bedienfluss und Auswahl-Polish
 
-- [ ] 65.4.1 Ein-Klick-Auswahl, letzte Auswahl pro Kategorie, Favoriten und zuletzt benutzte Objekte fuer haeufige Bauaktionen nutzbar machen.
+- [x] 65.4.1 Ein-Klick-Auswahl, letzte Auswahl pro Kategorie, Favoriten und zuletzt benutzte Objekte fuer haeufige Bauaktionen nutzbar machen. (abgeschlossen: 2026-03-28; evidence: `node --input-type=module` editor-tool-dock-smoke -> PASS; commit `87cb45d`)
 - [ ] 65.4.2 Tastatur-, Mausrad- und Hover-Flows fuer Kategorien, Kartenwechsel, aktive Rueckmeldung und schnellen Wechsel zur Auswahl ergaenzen.
 
 ### 65.5 Verifikation und visuelle Abnahme
