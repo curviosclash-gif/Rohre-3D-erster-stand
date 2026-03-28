@@ -90,6 +90,7 @@ export class EditorUI {
     setMapManager(mana) {
         this.mapManager = mana;
         this.updateUndoRedoUi();
+        this.refreshToolDock?.();
     }
 
     detachTransformControl() {

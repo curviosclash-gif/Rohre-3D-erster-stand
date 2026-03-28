@@ -7,6 +7,14 @@ function buildEditorRuntimeSnapshot({ ui, mapManager, core }) {
     const activeEntry = ui?.toolDockState?.getActiveEntry?.() || null;
     const recentEntries = ui?.toolDockState?.getRecentEntries?.() || [];
     const favoriteEntries = ui?.toolDockState?.getFavoriteEntries?.() || [];
+    const assetId = activeEntry ? (
+        activeEntry.tool === 'item' || activeEntry.tool === 'aircraft'
+            ? activeEntry.subType
+            : ((activeEntry.tool === 'portal' || activeEntry.tool === 'tunnel') ? activeEntry.subType : null)
+    ) : null;
+    const activeAssetStatus = assetId
+        ? mapManager?.assetLoader?.getLoadStatus?.(assetId) || null
+        : { state: 'builtin', id: null };
     const objects = Array.from(core?.objectsContainer?.children || []).map((object) => ({
         id: object?.userData?.id || null,
         type: object?.userData?.type || null,
@@ -23,6 +31,7 @@ function buildEditorRuntimeSnapshot({ ui, mapManager, core }) {
         activeEntryId: activeEntry?.id || null,
         activeEntryLabel: activeEntry?.label || null,
         activeEntrySubType: activeEntry?.subType || null,
+        activeEntryAssetState: activeAssetStatus?.state || null,
         objectCount: Number(mapManager?.getObjectCount?.() || 0),
         recentEntryIds: recentEntries.map((entry) => entry.id),
         favoriteEntryIds: favoriteEntries.map((entry) => entry.id),
@@ -54,6 +63,7 @@ function installEditorRuntimeHooks({ core, ui, mapManager, assetLoader }) {
 export async function initEditor() {
     try {
         const assetStatusText = document.getElementById("assetStatusText");
+        let ui = null;
         const setAssetStatus = ({ level = 'info', message = '' } = {}) => {
             if (!assetStatusText) return;
             assetStatusText.textContent = message || 'Unbekannt';
@@ -62,26 +72,15 @@ export async function initEditor() {
                     level === 'warn' ? '#fbbf24' :
                         'var(--muted)'
             );
+            ui?.refreshToolDock?.();
         };
 
         setAssetStatus({ level: 'info', message: 'Lade Assets...' });
-        const assetLoader = new EditorAssetLoader({ timeoutMs: 8000, onStatus: setAssetStatus });
-        const assetSummary = await assetLoader.loadAll();
-
-        if ((assetSummary.failed + assetSummary.timedOut) > 0) {
-            setAssetStatus({
-                level: 'warn',
-                message: `${assetSummary.loaded}/${assetSummary.total} geladen, ${assetSummary.failed + assetSummary.timedOut} Placeholder`
-            });
-        } else {
-            setAssetStatus({
-                level: 'info',
-                message: `${assetSummary.loaded}/${assetSummary.total} geladen`
-            });
-        }
+        const assetLoader = new EditorAssetLoader({ timeoutMs: 8000 });
+        assetLoader.setStatusHandler(setAssetStatus);
 
         const core = new EditorCore("threeCanvas");
-        const ui = new EditorUI(core);
+        ui = new EditorUI(core);
         const mapManager = new EditorMapManager(core, assetLoader);
 
         ui.setMapManager(mapManager);
@@ -94,6 +93,20 @@ export async function initEditor() {
 
         installEditorRuntimeHooks({ core, ui, mapManager, assetLoader });
         core.animate();
+
+        const assetSummary = await assetLoader.loadAll();
+        if ((assetSummary.failed + assetSummary.timedOut) > 0) {
+            setAssetStatus({
+                level: 'warn',
+                message: `${assetSummary.loaded}/${assetSummary.total} geladen, ${assetSummary.failed + assetSummary.timedOut} Placeholder`
+            });
+        } else {
+            setAssetStatus({
+                level: 'info',
+                message: `${assetSummary.loaded}/${assetSummary.total} geladen`
+            });
+        }
+
         console.log("3D Map Editor successfully initialized.");
     } catch (error) {
         console.error("Editor initialization failed:", error);

@@ -321,6 +321,13 @@ export class EditorAssetLoader {
             ...this.trailModelsToLoad.map((modelName) => ({ id: modelName, url: `../assets/trails/${modelName}.obj` }))
         ];
 
+        for (const entry of allEntries) {
+            this.loadStatus.set(entry.id, {
+                state: 'loading',
+                url: entry.url
+            });
+        }
+
         this._emitStatus('info', `Loading ${allEntries.length} 3D assets...`);
         const results = await this._runWithConcurrency(
             allEntries,
@@ -357,5 +364,25 @@ export class EditorAssetLoader {
         const original = this.cache.get(modelName);
         if (!original) return null;
         return this._cloneAssetObject(original, modelName);
+    }
+
+    getLoadStatus(modelName) {
+        const normalizedName = String(modelName || '').trim();
+        if (!normalizedName) {
+            return { state: 'builtin', id: null };
+        }
+
+        const status = this.loadStatus.get(normalizedName);
+        if (!status) {
+            return {
+                state: 'idle',
+                id: normalizedName
+            };
+        }
+
+        return {
+            id: normalizedName,
+            ...status
+        };
     }
 }

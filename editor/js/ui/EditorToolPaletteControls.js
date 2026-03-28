@@ -1,9 +1,86 @@
 import {
+    findEditorBuildEntryById,
     findEditorBuildEntryByToolAndSubtype,
     getEditorBuildCategories,
     getEditorBuildEntriesForCategory
 } from './EditorBuildCatalog.js';
 import { createEditorToolDockState } from './EditorToolDockState.js';
+
+function resolveAssetIdForEntry(entry) {
+    if (!entry) return null;
+    if (entry.tool === 'item' || entry.tool === 'aircraft') {
+        return entry.subType || null;
+    }
+    if (entry.tool === 'portal' && typeof entry.subType === 'string' && entry.subType.startsWith('portal_')) {
+        return entry.subType;
+    }
+    if (entry.tool === 'tunnel' && typeof entry.subType === 'string' && entry.subType.startsWith('trail_')) {
+        return entry.subType;
+    }
+    return null;
+}
+
+function resolveEntryAssetState(editor, entry) {
+    const assetId = resolveAssetIdForEntry(entry);
+    if (!assetId) {
+        return {
+            state: 'builtin',
+            label: 'Direkt',
+            detail: 'Keine externe Asset-Datei noetig.'
+        };
+    }
+
+    const assetLoader = editor?.mapManager?.assetLoader;
+    const status = assetLoader?.getLoadStatus?.(assetId) || { state: 'idle', id: assetId };
+
+    if (status.state === 'loaded') {
+        return {
+            state: 'loaded',
+            label: 'Ready',
+            detail: 'Asset geladen.'
+        };
+    }
+
+    if (status.state === 'loading' || status.state === 'idle') {
+        return {
+            state: 'loading',
+            label: 'Laedt',
+            detail: 'Asset wird geladen, Platzierung bleibt moeglich.'
+        };
+    }
+
+    if (status.state === 'timeout') {
+        return {
+            state: 'timeout',
+            label: 'Timeout',
+            detail: 'Zeitlimit erreicht, Karte nutzt Fallback-Preview.'
+        };
+    }
+
+    if (status.state === 'error') {
+        return {
+            state: 'error',
+            label: 'Fehler',
+            detail: 'Asset fehlgeschlagen, Platzierung nutzt Placeholder.'
+        };
+    }
+
+    if (status.state === 'placeholder') {
+        return {
+            state: 'placeholder',
+            label: 'Fallback',
+            detail: status.reason === 'missing'
+                ? 'Asset noch nicht im Cache, Platzierung nutzt Placeholder.'
+                : 'Asset wird ueber Placeholder abgesichert.'
+        };
+    }
+
+    return {
+        state: 'placeholder',
+        label: 'Fallback',
+        detail: 'Assetstatus unbekannt, Fallback bleibt waehlbar.'
+    };
+}
 
 function syncLegacySubtypeInputs(dom, entry) {
     if (!dom || !entry) return;
@@ -18,12 +95,19 @@ function syncLegacySubtypeInputs(dom, entry) {
 
 function createEntryButton(entry, options = {}) {
     const button = document.createElement('button');
+    const assetState = options.assetState || {
+        state: 'builtin',
+        label: 'Direkt',
+        detail: 'Keine externe Asset-Datei noetig.'
+    };
     button.type = 'button';
     button.dataset.entryId = entry.id;
     button.dataset.tool = entry.tool;
     button.dataset.subType = String(entry.subType ?? '');
+    button.dataset.assetState = assetState.state;
     button.style.setProperty('--entry-accent', entry.accentColor);
     button.className = options.compact ? 'dockMiniCard' : 'buildCard';
+    button.title = `${entry.label}: ${entry.description} ${assetState.detail}`;
 
     if (options.isActive) {
         button.classList.add('is-active');
@@ -34,7 +118,10 @@ function createEntryButton(entry, options = {}) {
     if (options.compact) {
         button.innerHTML = `
             <span class="dockMiniGlyph">${entry.previewGlyph}</span>
-            <span class="dockMiniLabel">${entry.label}</span>
+            <span class="dockMiniLabelGroup">
+                <span class="dockMiniLabel">${entry.label}</span>
+                <span class="dockMiniState state-${assetState.state}">${assetState.label}</span>
+            </span>
         `;
         return button;
     }
@@ -49,13 +136,17 @@ function createEntryButton(entry, options = {}) {
                 ${entry.badge ? `<span class="buildCardBadge">${entry.badge}</span>` : ''}
             </span>
             <span class="buildCardDescription">${entry.description}</span>
+            <span class="buildCardFooter">
+                <span class="buildCardState state-${assetState.state}">${assetState.label}</span>
+                <span class="buildCardStateDetail">${assetState.detail}</span>
+            </span>
         </span>
     `;
 
     return button;
 }
 
-function renderShortcutList(container, entries, snapshot, onSelect, emptyLabel) {
+function renderShortcutList(container, entries, snapshot, onSelect, emptyLabel, editor, onHoverChange) {
     if (!container) return;
     container.replaceChildren();
 
@@ -71,9 +162,14 @@ function renderShortcutList(container, entries, snapshot, onSelect, emptyLabel) 
         const button = createEntryButton(entry, {
             compact: true,
             isActive: snapshot.mode === 'place' && snapshot.selectedEntry?.id === entry.id,
-            isSelected: snapshot.selectedEntry?.id === entry.id
+            isSelected: snapshot.selectedEntry?.id === entry.id,
+            assetState: resolveEntryAssetState(editor, entry)
         });
         button.addEventListener('click', () => onSelect(entry.id));
+        button.addEventListener('mouseenter', () => onHoverChange?.(entry.id));
+        button.addEventListener('mouseleave', () => onHoverChange?.(null));
+        button.addEventListener('focus', () => onHoverChange?.(entry.id));
+        button.addEventListener('blur', () => onHoverChange?.(null));
         container.appendChild(button);
     }
 }
@@ -89,14 +185,14 @@ function enableHorizontalWheelScroll(container) {
 }
 
 function updateSummaryViews(dom, snapshot) {
-    const activeEntry = snapshot.selectedEntry;
+    const activeEntry = snapshot.activeEntry || snapshot.selectedEntry;
     const isSelectionMode = snapshot.mode === 'select';
     const title = isSelectionMode
         ? 'Auswahl / Bewegen'
         : (activeEntry?.label || 'Build-Dock');
     const description = isSelectionMode
         ? `Letzte Baukarte: ${activeEntry?.label || 'keine'}. Unten eine Karte anklicken und dann in die Szene klicken.`
-        : `${activeEntry?.description || 'Objekt platzieren.'} Klick in die Szene, um die Platzierung auszufuehren.`;
+        : `${activeEntry?.description || 'Objekt platzieren.'} ${snapshot.assetState?.detail || 'Klick in die Szene, um die Platzierung auszufuehren.'}`;
     const badgeText = isSelectionMode ? 'Auswahl' : 'Bau-Modus';
 
     if (dom.inspectorToolModeBadge) dom.inspectorToolModeBadge.textContent = badgeText;
@@ -113,6 +209,23 @@ export function bindEditorToolPaletteControls(editor) {
     const categories = getEditorBuildCategories();
     const toolDockState = createEditorToolDockState();
     editor.toolDockState = toolDockState;
+    let hoveredEntryId = null;
+
+    const buildSnapshotView = (snapshot) => {
+        const hoveredEntry = hoveredEntryId ? findEditorBuildEntryById(hoveredEntryId) : null;
+        const displayEntry = hoveredEntry || snapshot.selectedEntry || null;
+        const isSelectionMode = hoveredEntry ? false : snapshot.mode === 'select';
+        const assetState = displayEntry ? resolveEntryAssetState(editor, displayEntry) : null;
+        return {
+            ...snapshot,
+            editor,
+            activeEntry: displayEntry,
+            selectedEntry: snapshot.selectedEntry,
+            mode: isSelectionMode ? 'select' : 'place',
+            assetState,
+            isHoverPreview: !!hoveredEntry
+        };
+    };
 
     const applySnapshotToEditor = (snapshot, options = {}) => {
         const activeEntry = snapshot.selectedEntry;
@@ -126,7 +239,7 @@ export function bindEditorToolPaletteControls(editor) {
             editor.selectObject(null);
         }
 
-        updateSummaryViews(dom, snapshot);
+        updateSummaryViews(dom, buildSnapshotView(snapshot));
 
         if (dom.btnDockSelectMode) {
             dom.btnDockSelectMode.classList.toggle('active', snapshot.mode === 'select');
@@ -159,10 +272,25 @@ export function bindEditorToolPaletteControls(editor) {
                 <span class="dockCategoryLabel">${category.label}</span>
                 <span class="dockCategoryCount">${categoryCount}</span>
             `;
+            button.title = `${category.label}: ${category.description}`;
             button.addEventListener('click', () => {
+                hoveredEntryId = null;
                 const nextSnapshot = toolDockState.activateCategory(category.id);
                 applySnapshotToEditor(nextSnapshot, { clearSelection: true });
                 renderAll(nextSnapshot);
+            });
+            button.addEventListener('keydown', (event) => {
+                const buttons = Array.from(dom.dockCategoryTabs?.querySelectorAll('.dockCategoryTab') || []);
+                const currentIndex = buttons.indexOf(button);
+                if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    const delta = event.key === 'ArrowRight' ? 1 : -1;
+                    const nextIndex = (currentIndex + delta + buttons.length) % buttons.length;
+                    buttons[nextIndex]?.focus();
+                } else if (event.key === 'ArrowDown') {
+                    event.preventDefault();
+                    dom.dockCards?.querySelector('[data-entry-id]')?.focus();
+                }
             });
             dom.dockCategoryTabs.appendChild(button);
         }
@@ -177,12 +305,53 @@ export function bindEditorToolPaletteControls(editor) {
         for (const entry of entries) {
             const button = createEntryButton(entry, {
                 isActive: snapshot.mode === 'place' && snapshot.selectedEntry?.id === entry.id,
-                isSelected: snapshot.selectedEntry?.id === entry.id
+                isSelected: snapshot.selectedEntry?.id === entry.id,
+                assetState: resolveEntryAssetState(editor, entry)
             });
             button.addEventListener('click', () => {
+                hoveredEntryId = null;
                 const nextSnapshot = toolDockState.activateEntry(entry.id);
                 applySnapshotToEditor(nextSnapshot, { clearSelection: true });
                 renderAll(nextSnapshot);
+            });
+            button.addEventListener('mouseenter', () => {
+                hoveredEntryId = entry.id;
+                updateSummaryViews(dom, buildSnapshotView(snapshot));
+            });
+            button.addEventListener('mouseleave', () => {
+                if (hoveredEntryId !== entry.id) return;
+                hoveredEntryId = null;
+                updateSummaryViews(dom, buildSnapshotView(snapshot));
+            });
+            button.addEventListener('focus', () => {
+                hoveredEntryId = entry.id;
+                updateSummaryViews(dom, buildSnapshotView(snapshot));
+            });
+            button.addEventListener('blur', () => {
+                if (hoveredEntryId !== entry.id) return;
+                hoveredEntryId = null;
+                updateSummaryViews(dom, buildSnapshotView(snapshot));
+            });
+            button.addEventListener('keydown', (event) => {
+                const buttons = Array.from(dom.dockCards?.querySelectorAll('[data-entry-id]') || []);
+                const currentIndex = buttons.indexOf(button);
+                if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+                    event.preventDefault();
+                    const delta = event.key === 'ArrowRight' ? 1 : -1;
+                    const nextIndex = (currentIndex + delta + buttons.length) % buttons.length;
+                    buttons[nextIndex]?.focus();
+                    buttons[nextIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else if (event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    dom.dockCategoryTabs?.querySelector('.dockCategoryTab.active')?.focus();
+                } else if (event.key === 'Escape') {
+                    event.preventDefault();
+                    hoveredEntryId = null;
+                    const nextSnapshot = toolDockState.activateSelectionMode();
+                    applySnapshotToEditor(nextSnapshot);
+                    renderAll(nextSnapshot);
+                    dom.btnDockSelectMode?.focus();
+                }
             });
             dom.dockCards.appendChild(button);
         }
@@ -200,7 +369,12 @@ export function bindEditorToolPaletteControls(editor) {
                 applySnapshotToEditor(nextSnapshot, { clearSelection: true });
                 renderAll(nextSnapshot);
             },
-            'Noch nichts benutzt'
+            'Noch nichts benutzt',
+            editor,
+            (entryId) => {
+                hoveredEntryId = entryId;
+                updateSummaryViews(dom, buildSnapshotView(snapshot));
+            }
         );
         renderShortcutList(
             dom.dockFavoriteList,
@@ -211,11 +385,22 @@ export function bindEditorToolPaletteControls(editor) {
                 applySnapshotToEditor(nextSnapshot, { clearSelection: true });
                 renderAll(nextSnapshot);
             },
-            'Keine Favoriten'
+            'Keine Favoriten',
+            editor,
+            (entryId) => {
+                hoveredEntryId = entryId;
+                updateSummaryViews(dom, buildSnapshotView(snapshot));
+            }
         );
+        updateSummaryViews(dom, buildSnapshotView(snapshot));
+    };
+
+    editor.refreshToolDock = () => {
+        renderAll(toolDockState.getSnapshot());
     };
 
     dom.btnDockSelectMode?.addEventListener('click', () => {
+        hoveredEntryId = null;
         const nextSnapshot = toolDockState.activateSelectionMode();
         applySnapshotToEditor(nextSnapshot);
         renderAll(nextSnapshot);
@@ -223,6 +408,21 @@ export function bindEditorToolPaletteControls(editor) {
 
     dom.btnDockFavoriteToggle?.addEventListener('click', () => {
         const nextSnapshot = toolDockState.toggleFavorite();
+        applySnapshotToEditor(nextSnapshot);
+        renderAll(nextSnapshot);
+    });
+
+    document.addEventListener('keydown', (event) => {
+        if (event.target instanceof HTMLElement) {
+            const tagName = event.target.tagName.toLowerCase();
+            if (tagName === 'input' || tagName === 'textarea' || tagName === 'select' || event.target.isContentEditable) {
+                return;
+            }
+        }
+        if (event.key !== 'Escape') return;
+        if (editor.currentTool === 'select') return;
+        hoveredEntryId = null;
+        const nextSnapshot = toolDockState.activateSelectionMode();
         applySnapshotToEditor(nextSnapshot);
         renderAll(nextSnapshot);
     });
@@ -237,6 +437,7 @@ export function bindEditorToolPaletteControls(editor) {
         select?.addEventListener('change', () => {
             const entry = findEditorBuildEntryByToolAndSubtype(tool, select.value);
             if (!entry) return;
+            hoveredEntryId = null;
             const nextSnapshot = toolDockState.activateEntry(entry.id, { recordRecent: false });
             applySnapshotToEditor(nextSnapshot);
             renderAll(nextSnapshot);
