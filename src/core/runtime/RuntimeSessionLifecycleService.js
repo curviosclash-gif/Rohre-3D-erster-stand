@@ -26,6 +26,13 @@ export async function initRuntimeSession(facade) {
     } else if (sessionType === 'online') {
         const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/OnlineSessionAdapter.js');
         facade.session = new OnlineSessionAdapter();
+    } else if (sessionType === 'multiplayer') {
+        // 'multiplayer' is the Storage-Bridge coordination type: each participant runs a
+        // LocalSessionAdapter independently. Real-time state sync is NOT performed — the
+        // BroadcastChannel/localStorage bridge only handles lobby coordination and match-start
+        // signalling. Use 'lan' or 'online' sessionType (via localSettings.multiplayerTransport)
+        // to enable actual network state sync in a future transport upgrade.
+        facade.session = new LocalSessionAdapter();
     } else {
         facade.session = new LocalSessionAdapter();
     }

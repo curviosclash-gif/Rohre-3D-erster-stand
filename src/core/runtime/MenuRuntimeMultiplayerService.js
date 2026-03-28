@@ -10,12 +10,20 @@ function deepClone(value) {
     return tryCloneJsonValue(value, null);
 }
 
+// NOTE: 'multiplayer' is a menu-layer coordination type, not a real network transport.
+// The current implementation uses a Storage-Bridge (localStorage + BroadcastChannel) for
+// lobby coordination within the same browser. At match start, each tab runs a
+// LocalSessionAdapter independently — no real-time state sync occurs across tabs.
+// Future transport types ('lan', 'online') are plumbed via localSettings.multiplayerTransport.
 function ensureMultiplayerSessionType(game) {
     if (!game?.settings || typeof game.settings !== 'object') return;
     if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
         game.settings.localSettings = {};
     }
     game.settings.localSettings.sessionType = 'multiplayer';
+    if (!game.settings.localSettings.multiplayerTransport) {
+        game.settings.localSettings.multiplayerTransport = 'storage-bridge';
+    }
 }
 
 export function createMenuMultiplayerBridge(options = {}) {
@@ -78,6 +86,9 @@ export function createMultiplayerMatchSettingsSnapshot(settings = {}) {
         playerLoadout: settings?.playerLoadout ? { ...settings.playerLoadout } : {},
         localSettings: {
             sessionType: 'multiplayer',
+            // 'storage-bridge' = localStorage + BroadcastChannel (in-browser only, no real network sync).
+            // Future values: 'lan' (LANSessionAdapter), 'online' (OnlineSessionAdapter).
+            multiplayerTransport: 'storage-bridge',
             modePath: settings?.localSettings?.modePath || 'normal',
         },
     });
@@ -143,6 +154,7 @@ export function applyMultiplayerMatchSettingsSnapshot(targetSettings, snapshot =
         ...(snapshot.playerLoadout && typeof snapshot.playerLoadout === 'object' ? snapshot.playerLoadout : {}),
     };
     targetSettings.localSettings.sessionType = 'multiplayer';
+    targetSettings.localSettings.multiplayerTransport = snapshot?.localSettings?.multiplayerTransport || 'storage-bridge';
     if (typeof snapshot?.localSettings?.modePath === 'string' && snapshot.localSettings.modePath.trim()) {
         targetSettings.localSettings.modePath = snapshot.localSettings.modePath.trim();
     }
