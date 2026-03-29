@@ -1127,6 +1127,10 @@ export default defineConfig({
     build: {
         chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT_KB,
         rollupOptions: {
+            input: {
+                app: path.resolve(__dirname, 'index.html'),
+                editorMap3d: path.resolve(__dirname, 'editor/map-editor-3d.html'),
+            },
             output: {
                 manualChunks(id) {
                     if (!id) return undefined;

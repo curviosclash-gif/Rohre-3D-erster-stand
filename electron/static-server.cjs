@@ -1,6 +1,7 @@
 const http = require('node:http');
 const path = require('node:path');
 const { createReadStream, existsSync } = require('node:fs');
+const { access, constants: fsConstants } = require('node:fs/promises');
 
 const MIME_TYPES = Object.freeze({
     '.css': 'text/css; charset=utf-8',
@@ -32,8 +33,18 @@ function toFilePath(rootDir, requestPath) {
     return resolvedPath;
 }
 
+const CSP_HEADER = [
+    "default-src 'self'",
+    "script-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob:",
+    "connect-src 'self' ws: wss:",
+    "media-src 'self' blob:",
+    "font-src 'self'",
+].join('; ');
+
 function createStaticRequestHandler(rootDir) {
-    return (req, res) => {
+    return async (req, res) => {
         try {
             const requestUrl = new URL(req.url || '/', 'http://127.0.0.1');
             const filePath = toFilePath(rootDir, decodeURIComponent(requestUrl.pathname || '/'));
@@ -43,16 +54,32 @@ function createStaticRequestHandler(rootDir) {
                 return;
             }
 
-            if (!existsSync(filePath)) {
+            try {
+                await access(filePath, fsConstants.R_OK);
+            } catch {
                 sendText(res, 404, '404 - Nicht gefunden');
                 return;
             }
 
             const contentType = MIME_TYPES[path.extname(filePath).toLowerCase()] || 'application/octet-stream';
-            res.writeHead(200, { 'Content-Type': contentType });
-            createReadStream(filePath).pipe(res);
+            const headers = { 'Content-Type': contentType };
+            if (contentType.startsWith('text/html')) {
+                headers['Content-Security-Policy'] = CSP_HEADER;
+            }
+            res.writeHead(200, headers);
+            const stream = createReadStream(filePath);
+            stream.on('error', () => {
+                if (!res.headersSent) {
+                    sendText(res, 500, '500 - Interner Serverfehler');
+                } else {
+                    res.end();
+                }
+            });
+            stream.pipe(res);
         } catch {
-            sendText(res, 500, '500 - Interner Serverfehler');
+            if (!res.headersSent) {
+                sendText(res, 500, '500 - Interner Serverfehler');
+            }
         }
     };
 }

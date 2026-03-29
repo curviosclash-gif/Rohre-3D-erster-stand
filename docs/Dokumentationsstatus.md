@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-03-27
+Stand: 2026-03-29
 Modus: sync
 Gate: PASS
 
@@ -11,10 +11,10 @@ Gate: PASS
 - Alle Pflichtdateien vorhanden.
 
 ## Legacy-Pfad-Funde (aktiv, ohne docs/archive)
-- Keine Legacy-Pfade gefunden.
+- docs/Feature_Map_Editor_UX_V65.md: Zeilen 241
 
 ## Encoding-Warnungen (Mojibake)
-- docs/Umsetzungsplan.md: Zeilen 1049
+- Keine Mojibake-Muster gefunden.
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-03-27).
+- Dokumentation aktuell (geprueft am 2026-03-29).

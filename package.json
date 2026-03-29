@@ -54,6 +54,7 @@
     "test:v28:regression": "node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/v28-regression.spec.js",
     "test:fast": "node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js tests/physics-core.spec.js --timeout=240000",
     "test:core": "node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js --timeout=240000",
+    "test:editor-ui": "npx playwright test --config playwright.editor.config.mjs tests/editor-map-ui.spec.js",
     "test:gpu": "node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/gpu.spec.js",
     "test:physics": "node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/physics-core.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js",
     "test:physics:core": "node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/physics-core.spec.js",
