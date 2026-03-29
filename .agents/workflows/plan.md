@@ -1,4 +1,4 @@
----
+﻿---
 description: Create a compact implementation plan for a new feature or extension.
 ---
 
@@ -6,7 +6,7 @@ description: Create a compact implementation plan for a new feature or extension
 
 // turbo
 - Read `docs/Umsetzungsplan.md`.
-- For bot-training scope also read `docs/Bot_Trainingsplan.md` and treat it as active master plan.
+- For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and treat it as active master plan.
 - `git log -n 5 --oneline`.
 - Scan impacted modules in `src/`, `tests/`, `editor/js/`.
 
@@ -32,7 +32,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 - Evidence format for completed items:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Intake-Hinweis fuer den User:
-  - Ziel-Masterplan (`docs/Umsetzungsplan.md` oder `docs/Bot_Trainingsplan.md`)
+  - Ziel-Masterplan (`docs/Umsetzungsplan.md` oder `docs/bot-training/Bot_Trainingsplan.md`)
   - vorgeschlagene Block-ID
   - hard/soft dependencies
   - Hinweis `Manuelle Uebernahme erforderlich`
@@ -40,7 +40,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 ## 4. Manual intake handoff (no direct master-plan edits)
 
 - Do not create or change planning scopes directly in `docs/Umsetzungsplan.md`.
-- Do not create or change planning scopes directly in `docs/Bot_Trainingsplan.md`.
+- Do not create or change planning scopes directly in `docs/bot-training/Bot_Trainingsplan.md`.
 - Keep all planning deltas in `docs/plaene/neu/Feature_[Name].md`.
 - Wait for user-managed intake into master plan.
 - After user confirms intake is complete, move plan file to `docs/plaene/alt/`.
@@ -59,3 +59,4 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 ## Report
 
 Standardformat verwenden.
+

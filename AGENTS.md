@@ -1,4 +1,4 @@
-# AGENTS.md
+﻿# AGENTS.md
 
 This file defines repository-specific operating rules for Codex.
 
@@ -24,8 +24,8 @@ This file defines repository-specific operating rules for Codex.
 - Do not create or restructure planning content directly inside `docs/Umsetzungsplan.md`.
 - Manual intake into `docs/Umsetzungsplan.md` and subsequent archival to `docs/plaene/alt/` is user-owned.
 - When implementation problems or blockers occur, create or update a task-scoped error report in `docs/Fehlerberichte/` before handoff or task close.
-- Bot training planning source of truth is `docs/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
-- Future bot-training windows and KPI corridor are maintained in `docs/Bot_Trainings_Roadmap.md` and referenced from `docs/Bot_Trainingsplan.md`.
+- Bot training planning source of truth is `docs/bot-training/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
+- Future bot-training windows and KPI corridor are maintained in `docs/bot-training/Bot_Trainings_Roadmap.md` and referenced from `docs/bot-training/Bot_Trainingsplan.md`.
 
 ## Token-Effizienz (KRITISCH!)
 
@@ -109,7 +109,7 @@ All workflows follow this pattern unless stated otherwise:
 ## Parallel Bots
 
 Multiple bots can work on different blocks in `docs/Umsetzungsplan.md` simultaneously.
-For bot-training-only work, use the same lock protocol in `docs/Bot_Trainingsplan.md`.
+For bot-training-only work, use the same lock protocol in `docs/bot-training/Bot_Trainingsplan.md`.
 
 ### Lock-Protokoll
 
@@ -122,7 +122,7 @@ For bot-training-only work, use the same lock protocol in `docs/Bot_Trainingspla
 ### Datei-Ownership
 
 - `docs/Umsetzungsplan.md` contains the ownership table for non-training paths.
-- `docs/Bot_Trainingsplan.md` contains the ownership table for training paths (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs).
+- `docs/bot-training/Bot_Trainingsplan.md` contains the ownership table for training paths (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs).
 - A bot must not modify files owned by another bot's block unless absolutely necessary.
 - `tests/**` and `docs/**` are shared (append-only or own sections).
 
@@ -137,10 +137,11 @@ For bot-training-only work, use the same lock protocol in `docs/Bot_Trainingspla
 
 ## Phasen-Schema
 
-All master plans (`docs/Umsetzungsplan.md` and `docs/Bot_Trainingsplan.md`) must follow this structure:
+All master plans (`docs/Umsetzungsplan.md` and `docs/bot-training/Bot_Trainingsplan.md`) must follow this structure:
 
 - Every block contains top-level phases (for example `26.1`, `26.2`).
 - Every phase must have at least 2 sub-phases (for example `26.1.1`, `26.1.2`).
 - Every block ends with an Abschluss-Gate phase (`*.99`).
 - Single-step items are modeled as sub-phases, never as standalone phases.
 - A completed checkbox (`[x]`) must carry evidence metadata in the agreed format.
+

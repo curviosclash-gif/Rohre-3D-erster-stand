@@ -1,4 +1,4 @@
-# Bot Survival Trainingsplan (10h Folgefenster)
+﻿# Bot Survival Trainingsplan (10h Folgefenster)
 
 Stand: 2026-03-24
 
@@ -36,7 +36,7 @@ $proc = Start-Process -FilePath "cmd.exe" -ArgumentList "/c","npm run training:1
 - Status beim Start: Trainer-Server auf `ws://127.0.0.1:8765` online, erster Run `BT11_FIGHT_20260324T014853-r01` gestartet.
 - Abschluss: `duration-budget-reached`, `runsExecuted=4042`, `runsFailed=0`, letzter Run `BT11_FIGHT_20260324T014853-r4042`.
 - Finale Validation: `bot:validate` erfolgreich mit scenarioLimit `2` und gueltigem Survival-Report (`averageBotSurvival=37.376986`, Delta vs BT10 `+17.138%`).
-- Finale Evidence: `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`, `docs/Testergebnisse_Phase4b_2026-03-24.md`.
+- Finale Evidence: `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-24.md`.
 
 ## 10h Ablauf in 5 Bloecken
 
@@ -60,7 +60,7 @@ Remove-Item Env:BOT_RUNNER_SCENARIO_COUNT -ErrorAction SilentlyContinue
 Remove-Item Env:BOT_RUNNER_ROUNDS -ErrorAction SilentlyContinue
 ```
 
-2. KPI-Eintrag in `docs/Bot_Trainingsplan.md` (BT11 Checkpoint-Log):
+2. KPI-Eintrag in `docs/bot-training/Bot_Trainingsplan.md` (BT11 Checkpoint-Log):
 - `avgStepsPerEpisode`
 - `averageBotSurvival`
 - `invalidActionRate`
@@ -79,3 +79,4 @@ Remove-Item Env:BOT_RUNNER_ROUNDS -ErrorAction SilentlyContinue
 - `data/training/runs/<run-stamp>/run.json`
 - `data/training/runs/<run-stamp>/eval.json`
 - `data/training/runs/<run-stamp>/gate.json`
+

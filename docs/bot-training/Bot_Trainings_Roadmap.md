@@ -1,8 +1,8 @@
-# Bot Trainings Roadmap (Survival 2026-Q2)
+﻿# Bot Trainings Roadmap (Survival 2026-Q2)
 
 Stand: 2026-03-22
 Horizon: 2026-03-22 bis 2026-06-30
-Quelle fuer operative Phase-Checks: `docs/Bot_Trainingsplan.md`
+Quelle fuer operative Phase-Checks: `docs/bot-training/Bot_Trainingsplan.md`
 
 ## Status-Legende
 
@@ -49,7 +49,7 @@ Aktueller Laufstand:
 
 - [ ] 1.1 Reproduzierbare Baseline + Kontrolllauf
   - [ ] 1.1.1 Learn-Lauf und Ops-Kontrolllauf mit identischen Seeds dokumentieren
-  - [ ] 1.1.2 KPI-Delta und Gate-Status in `docs/Bot_Trainingsplan.md` festhalten
+  - [ ] 1.1.2 KPI-Delta und Gate-Status in `docs/bot-training/Bot_Trainingsplan.md` festhalten
 - [ ] 1.2 Bot-Validation in den Lauf integrieren
   - [ ] 1.2.1 Alle 2h `bot:validate` Report in Run-Ordner pinnen
   - [ ] 1.2.2 `averageBotSurvival` als nicht-null Pflichtfeld fuer Abschlusslaeufe erzwingen
@@ -114,7 +114,8 @@ Rollback (auf letztes stabiles Setting), wenn ein Punkt wahr ist:
 3. Validierung:
    - `npm run training:eval -- --stamp <runStamp> --bot-validation-report <reportPath>`
    - `npm run training:gate -- --stamp <runStamp> --bot-validation-report <reportPath>`
-4. Eintrag in `docs/Bot_Trainingsplan.md`:
+4. Eintrag in `docs/bot-training/Bot_Trainingsplan.md`:
    - Artefaktpfade
    - KPI-Deltas
    - Promotion/rollback Entscheidung
+

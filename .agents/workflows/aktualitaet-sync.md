@@ -1,11 +1,11 @@
----
+﻿---
 description: Check and auto-update docs/workflows/rules to current repository reality.
 ---
 
 ## 0. Context
 
 // turbo
-- Read `docs/Umsetzungsplan.md`, `docs/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/Testergebnisse_*.md`.
+- Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md`.
 - `git log -n 5 --oneline`.
 - `npm run guard:main`.
 
@@ -13,7 +13,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 // turbo
 - `npm run docs:sync`
-- Review findings in `docs/Dokumentationsstatus.md`.
+- Review findings in `docs/prozess/Dokumentationsstatus.md`.
 
 ## 2. Resolve remaining drift
 
@@ -42,8 +42,9 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 - `npm run plan:check` PASS.
 - `npm run docs:check` PASS.
-- `docs/Dokumentationsstatus.md` reflects current date.
+- `docs/prozess/Dokumentationsstatus.md` reflects current date.
 
 ## Report
 
 Standardformat verwenden.
+

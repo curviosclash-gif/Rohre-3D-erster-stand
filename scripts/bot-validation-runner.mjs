@@ -1,4 +1,4 @@
-import { spawn, execSync } from 'node:child_process';
+﻿import { spawn, execSync } from 'node:child_process';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import process from 'node:process';
@@ -885,7 +885,7 @@ async function run() {
         };
 
         const canonicalJsonPath = 'data/bot_validation_report.json';
-        const canonicalMdPath = `docs/Testergebnisse_Phase4b_${generatedAt}.md`;
+        const canonicalMdPath = `docs/tests/Testergebnisse_Phase4b_${generatedAt}.md`;
         const jsonPath = normalizeOutputPath(REPORT_JSON_OVERRIDE, 'tmp/bot-validation-report.json');
         const mdPath = normalizeOutputPath(REPORT_MD_OVERRIDE, `tmp/Testergebnisse_Phase4b_${generatedAt}.md`);
         const markdownReport = buildMarkdownReport({
@@ -966,3 +966,4 @@ run()
         console.error('[bot-validation-runner] failed:', error?.stack || toShortError(error));
         process.exit(1);
     });
+

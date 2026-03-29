@@ -1,10 +1,10 @@
-# Bot Trainingsplan (Aktiver Master)
+﻿# Bot Trainingsplan (Aktiver Master)
 
 Stand: 2026-03-28
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
-Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`.
+Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Trainings_Roadmap.md`.
 
 ## Status-Legende
 
@@ -52,7 +52,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 | `src/entities/ai/training/**`, `trainer/**` | BT20-BT30 | offen | Runner/Bridge/Trainer-Verhalten |
 | `src/state/training/**` | BT20-BT40 | offen | Gate-, KPI- und Reward-Logik |
 | `tests/trainer-*.mjs`, `tests/training-*.mjs` | BT10-BT40 | shared | Nur trainingsnahe Tests |
-| `docs/Bot_Trainingsplan.md`, `docs/Bot_Survival_Training_Plan_12h.md`, `docs/Bot_Survival_Training_Plan_10h.md`, `docs/Bot_Survival_Training_Plan_10h_BT12.md` | BT10-BT40 | shared | Masterplan + Detailplan |
+| `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_12h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md` | BT10-BT40 | shared | Masterplan + Detailplan |
 | `data/training/**`, `output/training/**` | BT10 | shared | Laufartefakte, Logs, Serien |
 
 ## Lock-Status
@@ -79,7 +79,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/Bot_Trainings_Roadmap.md`
 
 ## Block BT10: 12h Survival Operatorlauf
 
-Plan-Datei: `docs/Bot_Survival_Training_Plan_12h.md`
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_12h.md`
 
 <!-- LOCK: Bot-TrainOps seit 2026-03-22 -->
 
@@ -124,7 +124,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_12h.md`
 
 ## Block BT11: 10h Survival Folgefenster
 
-Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_10h.md`
 
 <!-- LOCK: frei -->
 
@@ -137,33 +137,33 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 
 ### 11.1 Plan und Laufstart
 
-- [x] 11.1.1 10h-Trainingsplan mit KPI-/Checkpoint-Vorgaben anlegen (abgeschlossen: 2026-03-23; evidence: create 10h plan -> docs/Bot_Survival_Training_Plan_10h.md)
+- [x] 11.1.1 10h-Trainingsplan mit KPI-/Checkpoint-Vorgaben anlegen (abgeschlossen: 2026-03-23; evidence: create 10h plan -> docs/bot-training/Bot_Survival_Training_Plan_10h.md)
 - [x] 11.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-23; evidence: npm run training:10h -- --series-stamp BT11_20260323T013933 --stop-on-fail false -> output/training/BT11_20260323T013933-10h.log, PID 9332)
-- [x] 11.1.3 Fight-Profil fuer 10h-Lauf festlegen (`hunt-3d`,`hunt-2d`, stabile Seeds/Timeouts) (abgeschlossen: 2026-03-24; evidence: update fight profile commands -> docs/Bot_Survival_Training_Plan_10h.md)
+- [x] 11.1.3 Fight-Profil fuer 10h-Lauf festlegen (`hunt-3d`,`hunt-2d`, stabile Seeds/Timeouts) (abgeschlossen: 2026-03-24; evidence: update fight profile commands -> docs/bot-training/Bot_Survival_Training_Plan_10h.md)
 - [x] 11.1.4 Fight-10h-Lauf starten und Operator-Artefakte dokumentieren (abgeschlossen: 2026-03-24; evidence: npm run training:10h -- --series-stamp BT11_FIGHT_20260324T014853 --modes hunt-3d,hunt-2d --stop-on-fail false -> output/training/BT11_FIGHT_20260324T014853-10h.log, PID 2772)
 
 ### 11.2 Laufmonitoring im 2h-Takt
 
-- [x] 11.2.1 Alle 2h `bot:validate` ausfuehren und Report im aktiven Run-Ordner pinnen (abgeschlossen: 2026-03-23; evidence: BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 npm run bot:validate -> data/bot_validation_report.json, docs/Testergebnisse_Phase4b_2026-03-23.md)
+- [x] 11.2.1 Alle 2h `bot:validate` ausfuehren und Report im aktiven Run-Ordner pinnen (abgeschlossen: 2026-03-23; evidence: BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3 npm run bot:validate -> data/bot_validation_report.json, docs/tests/Testergebnisse_Phase4b_2026-03-23.md)
 - [x] 11.2.2 `avgStepsPerEpisode` und `averageBotSurvival` je Checkpoint gegen BT10-Baseline protokollieren (abgeschlossen: 2026-03-24; evidence: final checkpoint update -> `data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json`, `data/bot_validation_report.json`)
 
 ### Checkpoint-Log BT11 (laufend)
 
 | Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs Baseline | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-03-23 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT10 | `docs/Bot_Survival_Training_Plan_10h.md` |
+| 2026-03-23 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT10 | `docs/bot-training/Bot_Survival_Training_Plan_10h.md` |
 | 2026-03-23 | Laufstart | `BT11_20260323T013933` | `pending` | `pending` | `pending` | wird in 2h-Checkpoints gefuellt | `output/training/BT11_20260323T013933-10h.log` |
-| 2026-03-23 | Checkpoint C1 | `BT11_20260323T013933` | `126.444444` | `40.690933` | `0.248243` | Steps `+2.137%`, Survival `+27.524%` (vs BT10 Baseline) | `data/training/runs/BT11_20260323T013933-r2137/run.json`, `data/bot_validation_report.json`, `docs/Testergebnisse_Phase4b_2026-03-23.md`; Hinweis: forced-round-rate `100%` |
-| 2026-03-24 | Fight-Plan aktualisiert | `BT11_FIGHT_pending` | `pending` | `pending` | `pending` | hunt-only Fenster vorbereitet | `docs/Bot_Survival_Training_Plan_10h.md` |
+| 2026-03-23 | Checkpoint C1 | `BT11_20260323T013933` | `126.444444` | `40.690933` | `0.248243` | Steps `+2.137%`, Survival `+27.524%` (vs BT10 Baseline) | `data/training/runs/BT11_20260323T013933-r2137/run.json`, `data/bot_validation_report.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-23.md`; Hinweis: forced-round-rate `100%` |
+| 2026-03-24 | Fight-Plan aktualisiert | `BT11_FIGHT_pending` | `pending` | `pending` | `pending` | hunt-only Fenster vorbereitet | `docs/bot-training/Bot_Survival_Training_Plan_10h.md` |
 | 2026-03-24 | Fight-Laufstart | `BT11_FIGHT_20260324T014853` | `pending` | `pending` | `pending` | 10h-Operatorlauf aktiv; 2h-Checkpoints offen | `output/training/BT11_FIGHT_20260324T014853-10h.log`, PID `2772` |
 | 2026-03-24 | 10h-Loop abgeschlossen | `BT11_FIGHT_20260324T014853` | `117.525000` | `pending` | `1.000000` | Steps `-5.068%`, Survival offen (vs BT10 Baseline) | `data/training/series/BT11_FIGHT_20260324T014853/loop.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/run.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/eval.json`, `data/training/runs/BT11_FIGHT_20260324T014853-r4042/gate.json` |
 | 2026-03-24 | Abschlussvalidate blockiert | `BT11_FIGHT_20260324T014853` | `117.525000` | `null` | `1.000000` | `bot:validate` bricht in `app:game-instance` ab | `output/training/BT11_FIGHT_20260324T014853-botvalidate-final.log`; Hinweis: frueherer HUD-NPE gefixt via commit `40dc4ab` |
-| 2026-03-24 | Abschlussvalidate erfolgreich | `BT11_FIGHT_20260324T014853` | `117.525000` | `37.376986` | `1.000000` | Steps `-5.068%`, Survival `+17.138%` (vs BT10 Baseline) | `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`, `docs/Testergebnisse_Phase4b_2026-03-24.md`; Hinweis: scenarioLimit `2`, forced-round-rate `85.714%` |
+| 2026-03-24 | Abschlussvalidate erfolgreich | `BT11_FIGHT_20260324T014853` | `117.525000` | `37.376986` | `1.000000` | Steps `-5.068%`, Survival `+17.138%` (vs BT10 Baseline) | `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-24.md`; Hinweis: scenarioLimit `2`, forced-round-rate `85.714%` |
 
 ### 11.99 Abschluss-Gate
 
 - [x] 11.99.1 Finales `run -> eval -> gate` plus `bot:validate` mit gueltigem Report abschliessen (abgeschlossen: 2026-03-24; evidence: `npm run bot:validate` mit `BOT_RUNNER_FORCE_KILL_PORT=false BOT_RUNNER_SCENARIO_COUNT=2 BOT_RUNNER_ROUNDS=3` -> `output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log`, `data/bot_validation_report.json`)
-- [x] 11.99.2 Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren (abgeschlossen: 2026-03-24; evidence: final KPI row + lock release -> `docs/Bot_Trainingsplan.md`, `docs/Bot_Survival_Training_Plan_10h.md`)
+- [x] 11.99.2 Finale KPI-Deltas, Artefaktpfade und Lock-Release dokumentieren (abgeschlossen: 2026-03-24; evidence: final KPI row + lock release -> `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`)
 
 ### Risiko-Register BT11
 
@@ -178,7 +178,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h.md`
 
 ## Block BT12: 10h Bot Folgefenster (Classic + Fight Matrix)
 
-Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md`
 
 <!-- LOCK: Bot-Codex seit 2026-03-25 -->
 
@@ -191,7 +191,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 
 ### 12.1 Plan und Laufstart
 
-- [x] 12.1.1 10h-Folgeplan fuer Classic/Fight Matrix anlegen (abgeschlossen: 2026-03-24; evidence: create BT12 plan -> docs/Bot_Survival_Training_Plan_10h_BT12.md)
+- [x] 12.1.1 10h-Folgeplan fuer Classic/Fight Matrix anlegen (abgeschlossen: 2026-03-24; evidence: create BT12 plan -> docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md)
 - [x] 12.1.2 10h-Lauf starten und Operator-Artefakte (Series, Log, PID) dokumentieren (abgeschlossen: 2026-03-24; evidence: Start-Process `npm run training:10h -- --series-stamp BT12_20260324T152103 ...` -> `output/training/BT12_20260324T152103-10h.log`, PID `3476`)
 - [x] 12.1.3 Survival-First-Restart (Classic + Fight) mit 10h-Matrixlauf starten und dokumentieren (abgeschlossen: 2026-03-25; evidence: `npm run training:10h -- --series-stamp BT12_SURV_20260325T030951 --stop-on-fail false --stage-timeout-ms 5400000 --episodes 8 --seeds 11,23,37,41,53 --modes classic-3d,classic-2d,hunt-3d,hunt-2d --max-steps 240 --runner-profile learn --inject-invalid-actions false --step-timeout-retries 1 --timeout-step-ms 220 --timeout-episode-ms 240000 --timeout-run-ms 1200000 --bridge-max-pending-acks 1024 --bridge-backpressure-threshold 768 --bridge-drop-training-when-backlogged true` -> `output/training/BT12_SURV_20260325T030951-10h.log`, PID `5856`)
 
@@ -205,7 +205,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 
 | Datum | Typ | SeriesStamp | `avgStepsPerEpisode` | `averageBotSurvival` | `invalidActionRate` | Delta vs BT11-Final | Evidence |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 2026-03-24 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT11-Final (`117.525` / `37.376986`) | `docs/Bot_Survival_Training_Plan_10h_BT12.md` |
+| 2026-03-24 | Plan erstellt | `pending` | `-` | `-` | `-` | Referenz BT11-Final (`117.525` / `37.376986`) | `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md` |
 | 2026-03-24 | Laufstart + Warm-up | `BT12_20260324T152103` | `124.137500` | `-` | `0.000000` | Steps `+5.626%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_20260324T152103-10h.log`, `data/training/runs/BT12_20260324T152103-r01/run.json`, `data/training/runs/BT12_20260324T152103-r01/gate.json` |
 | 2026-03-24 | Checkpoint Validate fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01.log` (`phase=app:game-instance`) |
 | 2026-03-24 | Checkpoint Validate Retry fehlgeschlagen | `BT12_20260324T152103` | `-` | `-` | `-` | `n/a` | `output/training/BT12_20260324T152103-botvalidate-cp01-retry.log` (`BOT_RUNNER_FORCE_KILL_PORT=false`, `phase=app:game-instance`) |
@@ -216,8 +216,8 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 | 2026-03-25 | C1 Validate Retry fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp01-retry.log` (`BOT_RUNNER_PORT=4275`, `BOT_RUNNER_BOOT_TIMEOUT=300000`, `phase=app:game-instance`) |
 | 2026-03-25 | C2 Validate fehlgeschlagen | `BT12_SURV_20260325T030951` | `135.368750` | `-` | `0.000000` | Steps `+15.183%`, Survival `n/a` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp02.log` (`BOT_RUNNER_BOOT_TIMEOUT=240000`, `phase=app:game-instance`) |
 | 2026-03-25 | C3 Validate erfolgreich (preview mode) | `BT12_SURV_20260325T030951` | `135.368750` | `38.770150` | `0.000000` | Steps `+15.183%`, Survival `+3.727%` (vs BT11-Final) | `output/training/BT12_SURV_20260325T030951-botvalidate-cp03-preview.log`, `tmp/bot-validation-report.json`, `tmp/Testergebnisse_Phase4b_2026-03-25.md`; Hinweis: forced-round-rate `83.3%` |
-| 2026-03-27 | Abschlussvalidate erfolgreich, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `40.037833` | `0.000000` | Steps `+5.626%`, Survival `+7.119%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/run.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` PASS nach Portal-Visual-Fix, aber `training:gate` FAIL auf `forcedRoundRate=1.0` und `timeoutRoundRate=1.0` |
-| 2026-03-27 | Runner-Fix validiert, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `6.132433` | `1.000000` | Steps `+5.626%`, Survival `-83.593%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` jetzt ohne Forced-/Timeout-Rounds (`0/0`), aber `training:gate` FAIL auf `averageBotSurvival=6.132433 < 19.145075` |
+| 2026-03-27 | Abschlussvalidate erfolgreich, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `40.037833` | `0.000000` | Steps `+5.626%`, Survival `+7.119%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/run.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` PASS nach Portal-Visual-Fix, aber `training:gate` FAIL auf `forcedRoundRate=1.0` und `timeoutRoundRate=1.0` |
+| 2026-03-27 | Runner-Fix validiert, Gate weiter rot | `BT12b_SURVIVAL_20260327T035615-r491` | `124.137500` | `6.132433` | `1.000000` | Steps `+5.626%`, Survival `-83.593%` (vs BT11-Final) | `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/bot-validation-report.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/eval.json`, `data/training/runs/BT12b_SURVIVAL_20260327T035615-r491/gate.json`, `docs/tests/Testergebnisse_Phase4b_2026-03-27.md`; Hinweis: `bot:validate` jetzt ohne Forced-/Timeout-Rounds (`0/0`), aber `training:gate` FAIL auf `averageBotSurvival=6.132433 < 19.145075` |
 
 ### 12.99 Abschluss-Gate
 
@@ -238,7 +238,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_10h_BT12.md`
 
 ## Block BT15: Zukunfts-Roadmap Survival (Q2)
 
-Plan-Datei: `docs/Bot_Trainings_Roadmap.md`
+Plan-Datei: `docs/bot-training/Bot_Trainings_Roadmap.md`
 
 <!-- LOCK: Bot-TrainOps seit 2026-03-22 -->
 
@@ -251,12 +251,12 @@ Plan-Datei: `docs/Bot_Trainings_Roadmap.md`
 
 ### 15.1 Baseline und Zielkorridor
 
-- [x] 15.1.1 Baseline-Snapshot aus Trainingsartefakten in Roadmap dokumentieren (abgeschlossen: 2026-03-22; evidence: update roadmap baseline -> docs/Bot_Trainings_Roadmap.md)
-- [x] 15.1.2 KPI-Zielkorridor und Trainingszyklen C1-C6 festlegen (abgeschlossen: 2026-03-22; evidence: define cycles/targets -> docs/Bot_Trainings_Roadmap.md)
+- [x] 15.1.1 Baseline-Snapshot aus Trainingsartefakten in Roadmap dokumentieren (abgeschlossen: 2026-03-22; evidence: update roadmap baseline -> docs/bot-training/Bot_Trainings_Roadmap.md)
+- [x] 15.1.2 KPI-Zielkorridor und Trainingszyklen C1-C6 festlegen (abgeschlossen: 2026-03-22; evidence: define cycles/targets -> docs/bot-training/Bot_Trainings_Roadmap.md)
 
 ### 15.2 Operative Verzahnung BT10-BT40
 
-- [x] 15.2.1 Promotion-/Rollback-Regeln fuer zyklische Trainingsfenster definieren (abgeschlossen: 2026-03-22; evidence: add promotion rollback rules -> docs/Bot_Trainings_Roadmap.md)
+- [x] 15.2.1 Promotion-/Rollback-Regeln fuer zyklische Trainingsfenster definieren (abgeschlossen: 2026-03-22; evidence: add promotion rollback rules -> docs/bot-training/Bot_Trainings_Roadmap.md)
 - [/] 15.2.2 Woechentliche Re-Planung in BT10-Checkpoint-Log und Weekly Review verankern
 
 ### 15.99 Abschluss-Gate
@@ -276,7 +276,7 @@ Plan-Datei: `docs/Bot_Trainings_Roadmap.md`
 
 ## Block BT20: Survival-Policy und Reward-Shaping
 
-Plan-Datei: `docs/Bot_Survival_Training_Plan_BT20.md`
+Plan-Datei: `docs/bot-training/Bot_Survival_Training_Plan_BT20.md`
 
 <!-- LOCK: Bot-Codex seit 2026-03-27 -->
 
@@ -301,7 +301,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_BT20.md`
 
 | Datum | Typ | SeriesStamp | Resume-Quelle | Zielbild | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| 2026-03-27 | Plan erstellt | `pending` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | Survival-First Resume-Fenster mit 4-Mode-Matrix vorbereiten | `docs/Bot_Survival_Training_Plan_BT20.md` |
+| 2026-03-27 | Plan erstellt | `pending` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | Survival-First Resume-Fenster mit 4-Mode-Matrix vorbereiten | `docs/bot-training/Bot_Survival_Training_Plan_BT20.md` |
 | 2026-03-28 | 10h-Laufstart | `BT20_SURV_20260328T000841` | `data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json` | 10h-Operatorlauf aktiv; Resume ueber Startup-Checkpoint bestaetigt (`checkpointLoads=1`, `optimizerSteps=1588329`) | `output/training/BT20_SURV_20260328T000841-10h.log`, `data/training/runs/BT20_SURV_20260328T000841-r01/run.json`, `data/training/runs/BT20_SURV_20260328T000841-r01/trainer.json`, `data/training/runs/latest.json` |
 
 ### 20.99 Abschluss-Gate
@@ -321,7 +321,7 @@ Plan-Datei: `docs/Bot_Survival_Training_Plan_BT20.md`
 
 ## Block BT30: Curriculum, Replay-Priorisierung und Hyperparameter
 
-Plan-Datei: `docs/Bot_Trainingsplan.md`
+Plan-Datei: `docs/bot-training/Bot_Trainingsplan.md`
 
 <!-- LOCK: frei -->
 <!-- DEPENDS-ON: 20.99 -->
@@ -360,7 +360,7 @@ Plan-Datei: `docs/Bot_Trainingsplan.md`
 
 ## Block BT40: Eval-/Gate-Haertung und Regression-Schutz
 
-Plan-Datei: `docs/Bot_Trainingsplan.md`
+Plan-Datei: `docs/bot-training/Bot_Trainingsplan.md`
 
 <!-- LOCK: frei -->
 <!-- DEPENDS-ON: 30.99 -->
@@ -431,3 +431,4 @@ Vor Task-Abschluss immer:
 - `npm run plan:check`
 - `npm run docs:sync`
 - `npm run docs:check`
+

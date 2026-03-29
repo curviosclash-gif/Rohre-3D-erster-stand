@@ -1,4 +1,4 @@
----
+﻿---
 description: Implement a planned change from coding to verification and commit.
 ---
 
@@ -6,7 +6,7 @@ description: Implement a planned change from coding to verification and commit.
 
 // turbo
 - Read `docs/Umsetzungsplan.md`.
-- For bot-training scope also read `docs/Bot_Trainingsplan.md` and keep training planning there.
+- For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and keep training planning there.
 - `git log -n 3 --oneline`.
 - `npm run guard:main`.
 - If available, use external plan docs in `docs/plaene/neu/*.md` or `docs/plaene/alt/*.md` for scope.
@@ -24,7 +24,7 @@ description: Implement a planned change from coding to verification and commit.
 - Avoid hardcoded config values.
 - Include cleanup/dispose for new runtime objects.
 - Do not create or rewrite planning scopes directly in `docs/Umsetzungsplan.md`; keep plan drafting in `docs/plaene/neu/`.
-- If task scope is bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs), update phase/status only in `docs/Bot_Trainingsplan.md`.
+- If task scope is bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs), update phase/status only in `docs/bot-training/Bot_Trainingsplan.md`.
 
 ## 3. Self-check
 
@@ -40,7 +40,7 @@ description: Implement a planned change from coding to verification and commit.
 // turbo
 - If `docs/Umsetzungsplan.md`, `docs/plaene/**/*.md`, `.agents/workflows/**` or `.agents/rules/**` changed:
   - `npm run plan:check`
-- If `docs/Bot_Trainingsplan.md` changed:
+- If `docs/bot-training/Bot_Trainingsplan.md` changed:
   - `npm run plan:check`
 - `npm run docs:sync && npm run docs:check`
 - `npm run build`
@@ -56,3 +56,4 @@ description: Implement a planned change from coding to verification and commit.
 ## Report
 
 Standardformat verwenden.
+

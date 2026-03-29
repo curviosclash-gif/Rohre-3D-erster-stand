@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -6,7 +6,7 @@ import { pathToFileURL } from 'node:url';
 const ROOT = process.cwd();
 const MASTER_PLANS = [
     'docs/Umsetzungsplan.md',
-    'docs/Bot_Trainingsplan.md',
+    'docs/bot-training/Bot_Trainingsplan.md',
 ];
 
 const ACTIVE_LOCK_STATUSES = new Set([
@@ -518,3 +518,4 @@ const isDirectRun = process.argv[1]
 if (isDirectRun) {
     await main();
 }
+

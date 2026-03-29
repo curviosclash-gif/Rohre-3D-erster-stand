@@ -1,4 +1,4 @@
-# Bot Survival Trainingsplan (BT12, 10h Folgefenster)
+﻿# Bot Survival Trainingsplan (BT12, 10h Folgefenster)
 
 Stand: 2026-03-25
 
@@ -81,7 +81,7 @@ Remove-Item Env:BOT_RUNNER_ROUNDS -ErrorAction SilentlyContinue
 Remove-Item Env:BOT_RUNNER_TOTAL_TIMEOUT -ErrorAction SilentlyContinue
 ```
 
-3. KPI-Eintrag in `docs/Bot_Trainingsplan.md` (BT12 Checkpoint-Log):
+3. KPI-Eintrag in `docs/bot-training/Bot_Trainingsplan.md` (BT12 Checkpoint-Log):
 - `avgStepsPerEpisode`
 - `averageBotSurvival`
 - `invalidActionRate`
@@ -98,3 +98,4 @@ Remove-Item Env:BOT_RUNNER_TOTAL_TIMEOUT -ErrorAction SilentlyContinue
 - `data/training/runs/<run-stamp>/eval.json`
 - `data/training/runs/<run-stamp>/gate.json`
 - `data/bot_validation_report.json`
+

@@ -397,7 +397,7 @@ async function run() {
 
         const overallPerfMetrics = toPerfMetrics(overallPerf);
         const generatedAt = new Date().toISOString().slice(0, 10);
-        const docPath = `docs/Testergebnisse_${generatedAt}.md`;
+        const docPath = `docs/tests/Testergebnisse_${generatedAt}.md`;
 
         const report = {
             generatedAt,
@@ -457,3 +457,4 @@ run().catch((error) => {
     console.error('[bot-baseline] failed:', error?.stack || toShortError(error));
     process.exit(1);
 });
+

@@ -1,4 +1,4 @@
-# AI Project Onboarding (Aktiv)
+﻿# AI Project Onboarding (Aktiv)
 
 Stand: 2026-03-29
 
@@ -11,11 +11,11 @@ Hauptziel im Match: ueberleben, Gegner zu Kollisionen zwingen, Round- und Match-
 
 ## 2. Canonical Quellen (zuerst lesen)
 
-1. `docs/ai_architecture_context.md`
+1. `docs/referenz/ai_architecture_context.md`
 2. `docs/Umsetzungsplan.md`
 3. `docs/Analysebericht.md`
-4. Neuester `docs/Testergebnisse_YYYY-MM-DD.md`
-5. `docs/Dokumentationsstatus.md`
+4. Neuester `docs/tests/Testergebnisse_YYYY-MM-DD.md`
+5. `docs/prozess/Dokumentationsstatus.md`
 
 Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/`.
 
@@ -33,3 +33,4 @@ Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/`.
 2. Betroffene Module in `src/` und `tests/` identifizieren.
 3. Aendern, dann Tests gemaess `.agents/test_mapping.md` ausfuehren.
 4. Doku-/Prozess-Aktualitaet mit `npm run docs:sync` und `npm run docs:check` pruefen.
+

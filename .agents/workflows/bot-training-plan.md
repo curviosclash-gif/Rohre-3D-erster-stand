@@ -1,12 +1,12 @@
----
+﻿---
 description: Plan and execute bot-training work outside the general Umsetzungsplan.
 ---
 
 ## 0. Context
 
 // turbo
-- Read `docs/Bot_Trainingsplan.md` (primary source).
-- Read `docs/Bot_Trainings_Roadmap.md` for long-horizon cycle targets.
+- Read `docs/bot-training/Bot_Trainingsplan.md` (primary source).
+- Read `docs/bot-training/Bot_Trainings_Roadmap.md` for long-horizon cycle targets.
 - Read `docs/Umsetzungsplan.md` only for cross-plan dependencies.
 - `git log -n 5 --oneline`.
 - Review latest artifacts in `data/training/runs/` and `data/training/series/`.
@@ -21,12 +21,12 @@ description: Plan and execute bot-training work outside the general Umsetzungspl
   - `trainer/**`
   - training tests/docs
 - Keep bot-training phases out of `docs/Umsetzungsplan.md`.
-- Use only `docs/Bot_Trainingsplan.md` for block/phase tracking.
-- If future windows/quarter targets change, update `docs/Bot_Trainings_Roadmap.md` and mirror actionable status in `docs/Bot_Trainingsplan.md`.
+- Use only `docs/bot-training/Bot_Trainingsplan.md` for block/phase tracking.
+- If future windows/quarter targets change, update `docs/bot-training/Bot_Trainings_Roadmap.md` and mirror actionable status in `docs/bot-training/Bot_Trainingsplan.md`.
 
 ## 2. Claim block
 
-- Find first free lock in `docs/Bot_Trainingsplan.md`.
+- Find first free lock in `docs/bot-training/Bot_Trainingsplan.md`.
 - Verify hard dependencies are completed.
 - Atomically claim:
 
@@ -34,7 +34,7 @@ description: Plan and execute bot-training work outside the general Umsetzungspl
 git pull --rebase
 npm run guard:main
 # lock setzen im Bot-Trainingsplan
-git add docs/Bot_Trainingsplan.md
+git add docs/bot-training/Bot_Trainingsplan.md
 git commit -m "chore: Bot-X claims BT block"
 git push
 ```
@@ -57,7 +57,7 @@ git push
   - `npm run bot:validate` when survival KPIs are affected
 - For completed phase items (`[x]`), append evidence metadata:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
-- Keep artifact paths and KPI deltas documented in `docs/Bot_Trainingsplan.md`.
+- Keep artifact paths and KPI deltas documented in `docs/bot-training/Bot_Trainingsplan.md`.
 
 ## 5. Close and release
 
@@ -78,3 +78,4 @@ git push
 ## Report
 
 Standardformat verwenden. For next bot-training phase set `Next Step` to `/bot-training-plan` or `/fix-planung` with bot-training scope.
+

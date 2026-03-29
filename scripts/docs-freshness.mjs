@@ -12,14 +12,14 @@ const EXCLUDED_PREFIXES = ['docs/archive'];
 const EXTRA_ACTIVE_FILES = ['AGENTS.md', 'walkthrough.md'];
 
 const STAMPED_FILES = [
-  'docs/ai_project_onboarding.md',
-  'docs/ai_architecture_context.md',
-  'docs/architektur_ausfuehrlich.md'
+  'docs/referenz/ai_project_onboarding.md',
+  'docs/referenz/ai_architecture_context.md',
+  'docs/referenz/architektur_ausfuehrlich.md'
 ];
 
 const REQUIRED_FILES = [
-  'docs/ai_project_onboarding.md',
-  'docs/ai_architecture_context.md',
+  'docs/referenz/ai_project_onboarding.md',
+  'docs/referenz/ai_architecture_context.md',
   'docs/Umsetzungsplan.md',
   '.agents/test_mapping.md',
   '.agents/workflows/aktualitaet-check.md'
@@ -27,10 +27,10 @@ const REQUIRED_FILES = [
 
 const LEGACY_PATH_ALLOWLIST = new Set([
   '.agents/rules/documentation_freshness.md',
-  'docs/ai_project_onboarding.md'
+  'docs/referenz/ai_project_onboarding.md'
 ]);
 
-const REPORT_FILE = 'docs/Dokumentationsstatus.md';
+const REPORT_FILE = 'docs/prozess/Dokumentationsstatus.md';
 
 function todayLocalISO() {
   const d = new Date();
@@ -319,3 +319,4 @@ main().catch((err) => {
   console.error('[docs] fatal:', err?.message || err);
   process.exit(1);
 });
+

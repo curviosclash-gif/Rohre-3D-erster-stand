@@ -1,11 +1,11 @@
----
+﻿---
 trigger: planning_or_phase_tracking_changes
 description: Rule for strict governance across both master plans
 ---
 
 - Both master plans are governed artifacts:
   - `docs/Umsetzungsplan.md`
-  - `docs/Bot_Trainingsplan.md`
+  - `docs/bot-training/Bot_Trainingsplan.md`
 - External implementation plans are first-class artifacts and must be authored in:
   - `docs/plaene/neu/`
 - Do not create or rewrite plan scopes directly in `docs/Umsetzungsplan.md`.
@@ -25,3 +25,4 @@ description: Rule for strict governance across both master plans
   - `npm run docs:sync`
   - `npm run docs:check`
 - Do not close a task if any governance/doc gate fails.
+

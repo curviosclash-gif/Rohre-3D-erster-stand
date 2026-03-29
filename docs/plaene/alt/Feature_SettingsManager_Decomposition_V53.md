@@ -75,11 +75,12 @@ Evidence: `TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/bo
 
 - [x] 53.99 Integrations- und Abschluss-Gate (abgeschlossen: 2026-03-24; evidence: npm run build -> 0f04006)
   - [x] 53.99.1 `npm run test:core`, `npm run architecture:guard`, `npm run build` sind fuer den Scope gruen (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
-  - [x] 53.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` abgeschlossen (abgeschlossen: 2026-03-24; evidence: npm run docs:check -> docs/Dokumentationsstatus.md)
+  - [x] 53.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` abgeschlossen (abgeschlossen: 2026-03-24; evidence: npm run docs:check -> docs/prozess/Dokumentationsstatus.md)
 
 ## Verifikationsstrategie (DoD-fokussiert)
 
 - API-stabil: bestehende Runtime/Menu-Call-Sites nutzen unveraenderte Entry-Points.
 - Verhaltensstabil: Sanitizing-, Preset-, Session- und Telemetry-Pfade bleiben regressionsabgesichert.
 - Wartbarer: klar getrennte Domain-Module statt monolithischer Klasse.
+
 

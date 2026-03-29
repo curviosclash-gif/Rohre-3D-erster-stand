@@ -1,4 +1,4 @@
----
+﻿---
 description: Execute the next open phase from master plan with dynamic N-bot parallel support.
 ---
 
@@ -8,7 +8,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - `git pull --rebase`
 - `npm run guard:main`
 - Read `docs/Umsetzungsplan.md`.
-- For bot-training scope also read `docs/Bot_Trainingsplan.md` and treat it as selected master plan.
+- For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and treat it as selected master plan.
 - `git log -n 5 --oneline`.
 - `npm run plan:check`
 
@@ -17,7 +17,7 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - Identify your Bot-ID from the kickoff command (for example `/fix-planung Bot-1`).
 - Select master plan file by scope:
   - Default: `docs/Umsetzungsplan.md`
-  - Bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs): `docs/Bot_Trainingsplan.md`
+  - Bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs): `docs/bot-training/Bot_Trainingsplan.md`
 - Execute only blocks already manually integrated by the user.
 - Do not create new blocks or planning scopes directly in master plans.
 - Find first block with `<!-- LOCK: frei -->` and fulfilled hard dependencies.
@@ -72,3 +72,4 @@ git push
 ## Report
 
 Standardformat verwenden. Set `Next Step` to `/fix-planung`.
+

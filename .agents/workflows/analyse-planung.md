@@ -1,4 +1,4 @@
----
+﻿---
 description: Run full test analysis, persist results, and update prioritized action plan.
 ---
 
@@ -12,7 +12,7 @@ description: Run full test analysis, persist results, and update prioritized act
 - Use `.agents/test_mapping.md` to select commands based on changed paths.
 - Always run core tests; specialized tests (GPU, physics, stress) only if relevant or at milestones.
 - Extra smoke: `npm run smoke:roundstate`, `npm run smoke:selftrail`.
-- Save to `docs/Testergebnisse_YYYY-MM-DD.md` with per-test `PASS`/`FAIL`/`WARN`.
+- Save to `docs/tests/Testergebnisse_YYYY-MM-DD.md` with per-test `PASS`/`FAIL`/`WARN`.
 
 ## 2. Analyze deltas
 
@@ -33,3 +33,4 @@ description: Run full test analysis, persist results, and update prioritized act
 ## Report
 
 Standardformat verwenden.
+

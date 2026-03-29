@@ -1,4 +1,4 @@
-# Architektur (Aktiver Einstieg)
+﻿# Architektur (Aktiver Einstieg)
 
 Stand: 2026-03-29
 
@@ -9,6 +9,7 @@ Die detaillierte historische Langfassung liegt unter:
 
 Fuer aktuelle Arbeit mit KI-Assistenz zuerst lesen:
 
-1. `docs/ai_project_onboarding.md`
-2. `docs/ai_architecture_context.md`
+1. `docs/referenz/ai_project_onboarding.md`
+2. `docs/referenz/ai_architecture_context.md`
 3. `docs/Umsetzungsplan.md`
+

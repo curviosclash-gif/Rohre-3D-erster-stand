@@ -1,11 +1,11 @@
----
+﻿---
 description: Quick project status snapshot.
 ---
 // turbo-all
 
 ## 1. Plan status
 
-- Read `docs/Umsetzungsplan.md` and `docs/Bot_Trainingsplan.md`.
+- Read `docs/Umsetzungsplan.md` and `docs/bot-training/Bot_Trainingsplan.md`.
 - Identify next open phase and dependency blockers for both master plans.
 - Check pending external intake plans in `docs/plaene/neu/`.
 - Run `npm run plan:check`.
@@ -25,3 +25,4 @@ description: Quick project status snapshot.
 ## Report
 
 Standardformat verwenden.
+
