@@ -12,6 +12,9 @@ import { RuleBasedBotPolicy } from './RuleBasedBotPolicy.js';
 import { HuntBotPolicy } from '../../hunt/HuntBotPolicy.js';
 import { ClassicBridgePolicy } from './ClassicBridgePolicy.js';
 import { HuntBridgePolicy } from './HuntBridgePolicy.js';
+import { createLogger } from '../../shared/logging/Logger.js';
+
+const logger = createLogger('BotPolicyRegistry');
 
 function createClassicBridgeFactory(type) {
     return (options = {}) => new ClassicBridgePolicy({
@@ -58,7 +61,7 @@ export class BotPolicyRegistry {
         this._creationLogCache.add(cacheKey);
 
         if (fallbackReason) {
-            console.warn(`[BotPolicyRegistry] requested=${requestedType} resolved=${resolvedType} fallback=${fallbackReason}`);
+            logger.warn(`requested=${requestedType} resolved=${resolvedType} fallback=${fallbackReason}`);
         }
     }
 

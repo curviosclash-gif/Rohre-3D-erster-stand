@@ -73,14 +73,19 @@ export class LANMatchLobby extends MatchLobby {
             : `http://${String(codeOrAddress || '')}`;
         this._signalingUrl = url;
 
-        const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_JOIN}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ lobbyCode: this.lobbyCode }),
-        });
-        const data = await res.json();
-        this._localPeerId = String(data.playerId || '').trim();
-        this._syncWithServerStatus(data);
+        try {
+            const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_JOIN}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ lobbyCode: this.lobbyCode }),
+            });
+            const data = await res.json();
+            this._localPeerId = String(data.playerId || '').trim();
+            this._syncWithServerStatus(data);
+        } catch (err) {
+            logger.warn('Lobby join request failed:', err);
+            throw err;
+        }
     }
 
     _syncWithServerStatus(serverState = {}) {

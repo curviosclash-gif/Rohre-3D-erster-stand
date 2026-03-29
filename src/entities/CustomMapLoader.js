@@ -14,9 +14,11 @@ import {
     resolveFallbackMapKey,
     resolveKnownMapSelection,
 } from './mapSchema/CustomMapSelectionResolver.js';
+import { createLogger } from '../shared/logging/Logger.js';
 
 const LEGACY_EDITOR_PLAYTEST_SCALE = 35;
 const LEGACY_EDITOR_LARGE_DIM_THRESHOLD = 500;
+const logger = createLogger('CustomMapLoader');
 
 function getStorage(storageOverride) {
     return resolveLocalStorage(storageOverride);
@@ -101,7 +103,7 @@ export function loadCustomMapFromStorage(storageOverride) {
             ],
         };
     } catch (error) {
-        console.error('[CustomMapLoader] Error parsing custom map:', error);
+        logger.error('Error parsing custom map:', error);
         return {
             ok: false,
             error: error.message || 'Unknown custom map parsing error.',
@@ -133,7 +135,7 @@ export function resolveArenaMapSelection(requestedMapKey, storageOverride) {
     });
 
     if (selection.isFallback) {
-        console.warn(`[CustomMapLoader] Failed to load custom map, falling back to "${fallbackMapKey}". Error:`, selection.error);
+        logger.warn(`Failed to load custom map, falling back to "${fallbackMapKey}". Error:`, selection.error);
     }
 
     return selection;
