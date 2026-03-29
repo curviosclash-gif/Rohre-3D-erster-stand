@@ -239,7 +239,7 @@ Der erste funktionsfaehige Slice fuer V65 ist umgesetzt:
 - `editor/js/ui/EditorToolDockState.js` merkt letzte Auswahl je Kategorie sowie Favoriten und Recents persistent in `localStorage`.
 - `editor/js/ui/EditorToolPaletteControls.js` rendert Kategorien, Karten, Schnellzugriff und Dock-Header direkt aus dem Katalog und synchronisiert weiterhin den Legacy-`currentTool/subType`-Contract.
 - `editor/js/main.js` stellt `CURVIOS_EDITOR` plus `render_game_to_text()` als Runtime-Hooks fuer Smoke-Checks bereit.
-- `tests/editor-map-ui.spec.js` deckt Dock-Rendering, Kategorie-/Kartenwahl und Platzierung fuer Block, Portal, Item und Flugobjekt ab; die Ausfuehrung ist aktuell noch von einem lokalen Playwright/Dev-Server-Blocker abhaengig.
+- `tests/editor-map-ui.spec.js` deckt Dock-Rendering, Kategorie-/Kartenwahl, Platzierung sowie Save/Export/Playtest-Smoke ab; der vorherige lokale Playwright-Blocker ist behoben.
 
 ## Phasenplan
 
@@ -250,29 +250,29 @@ Abhaengigkeiten: 65.1 muss abgeschlossen sein, bevor 65.2–65.4 starten. 65.2 u
        └── 65.3 ──┴── 65.4 ── 65.5 ── 65.99
 ```
 
-- [ ] 65.1 Katalog- und Interaktionskonzept festziehen
-  - [ ] 65.1.1 Zentrale Build-Katalog-Metadaten definieren: `type`, `subType`, `label`, `gruppe`, `sortOrder`, `keywords`, `previewToken`, `isFeatured`, Default-Auswahl.
-  - [ ] 65.1.2 Finale Interaktionsregeln fuer Dock festlegen: Kategorien, aktive Karte, Quick-Actions, Responsive-Verhalten und Inspector-Abgrenzung.
+- [x] 65.1 Katalog- und Interaktionskonzept festziehen (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
+  - [x] 65.1.1 Zentrale Build-Katalog-Metadaten definieren: `type`, `subType`, `label`, `gruppe`, `sortOrder`, `keywords`, `previewToken`, `isFeatured`, Default-Auswahl. (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
+  - [x] 65.1.2 Finale Interaktionsregeln fuer Dock festlegen: Kategorien, aktive Karte, Quick-Actions, Responsive-Verhalten und Inspector-Abgrenzung. (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
 
-- [ ] 65.2 DOM- und State-Architektur umbauen (parallel zu 65.3)
-  - [ ] 65.2.1 `editor/map-editor-3d.html` von verstreuten Tool-/Submenu-Feldern auf Inspector plus Bottom-Dock umbauen, ohne Save/Playtest/Property-Funktionen zu verlieren.
-  - [ ] 65.2.2 Auswahlzustand in dedizierte UI-Module auslagern, damit Kategorie, aktive Karte, Recents/Favoriten und `currentTool/subType` konsistent bleiben.
+- [x] 65.2 DOM- und State-Architektur umbauen (parallel zu 65.3) (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
+  - [x] 65.2.1 `editor/map-editor-3d.html` von verstreuten Tool-/Submenu-Feldern auf Inspector plus Bottom-Dock umbauen, ohne Save/Playtest/Property-Funktionen zu verlieren. (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
+  - [x] 65.2.2 Auswahlzustand in dedizierte UI-Module auslagern, damit Kategorie, aktive Karte, Recents/Favoriten und `currentTool/subType` konsistent bleiben. (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
 
-- [ ] 65.3 Kartenansicht und Preview-System einfuehren (parallel zu 65.2)
-  - [ ] 65.3.1 Objektkarten mit Mini-Vorschau, Namen und Status-Badge rendern; Previews aus geladenen Assets oder stilisierten Fallbacks ableiten.
-  - [ ] 65.3.2 Placeholder-, Lade- und Fehlerfaelle sichtbar machen, ohne die Platzierung zu blockieren.
+- [x] 65.3 Kartenansicht und Preview-System einfuehren (parallel zu 65.2) (abgeschlossen: 2026-03-29; evidence: commits `87cb45d`, `d33f042`)
+  - [x] 65.3.1 Objektkarten mit Mini-Vorschau, Namen und Status-Badge rendern; Previews aus geladenen Assets oder stilisierten Fallbacks ableiten. (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
+  - [x] 65.3.2 Placeholder-, Lade- und Fehlerfaelle sichtbar machen, ohne die Platzierung zu blockieren. (abgeschlossen: 2026-03-29; evidence: commit `d33f042`)
 
-- [ ] 65.4 Bedienfluss vereinfachen und beschleunigen (nach 65.2 + 65.3)
-  - [ ] 65.4.1 Klick auf Karte waehlt sofort das Platzierungsobjekt; letzte Auswahl pro Kategorie, Favoriten und zuletzt genutzte Objekte werden mitgefuehrt.
-  - [ ] 65.4.2 Tastatur- und Mausfluss nachziehen: Kategorien schnell wechseln, Karten horizontal durchlaufen, klare aktive Zustandsanzeige, schneller Rueckweg zur Auswahl.
+- [x] 65.4 Bedienfluss vereinfachen und beschleunigen (nach 65.2 + 65.3) (abgeschlossen: 2026-03-29; evidence: commits `87cb45d`, `d33f042`)
+  - [x] 65.4.1 Klick auf Karte waehlt sofort das Platzierungsobjekt; letzte Auswahl pro Kategorie, Favoriten und zuletzt genutzte Objekte werden mitgefuehrt. (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
+  - [x] 65.4.2 Tastatur- und Mausfluss nachziehen: Kategorien schnell wechseln, Karten horizontal durchlaufen, klare aktive Zustandsanzeige, schneller Rueckweg zur Auswahl. (abgeschlossen: 2026-03-29; evidence: commit `d33f042`)
 
-- [ ] 65.5 Verifikation und visuelle Abnahme
-  - [ ] 65.5.1 Playwright-Abdeckung fuer Dock-Rendering, Kategorie-Wechsel, Kartenwahl und Platzierung von mindestens Block, Portal, Item und Flugobjekt ergaenzen.
-  - [ ] 65.5.2 Leichte visuelle Evidence erstellen: Screenshot der Build-Leiste plus kurze manuelle Smoke-Probe fuer Save/Export/Playtest.
+- [x] 65.5 Verifikation und visuelle Abnahme (abgeschlossen: 2026-03-29; evidence: `tests/editor-map-ui.spec.js` T65a-T65d -> `test-results/v65-final-pass2`)
+  - [x] 65.5.1 Playwright-Abdeckung fuer Dock-Rendering, Kategorie-Wechsel, Kartenwahl und Platzierung von mindestens Block, Portal, Item und Flugobjekt ergaenzen. (abgeschlossen: 2026-03-29; evidence: `node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/editor-map-ui.spec.js -c playwright.editor.config.mjs --timeout=240000` -> `test-results/v65-final-pass2`)
+  - [x] 65.5.2 Leichte visuelle Evidence erstellen: Screenshot der Build-Leiste plus kurze manuelle Smoke-Probe fuer Save/Export/Playtest. (abgeschlossen: 2026-03-29; evidence: `docs/qa/V65_Editor_Dock_Smoke_2026-03-29.md` + `docs/qa/V65_Editor_Build_Dock_2026-03-29.png`)
 
-- [ ] 65.99 Integrations- und Abschluss-Gate
-  - [ ] 65.99.1 `npm run test:core` sowie editorrelevante UI-Checks und `npm run build` sind fuer den Scope gruen.
-  - [ ] 65.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+- [x] 65.99 Integrations- und Abschluss-Gate (abgeschlossen: 2026-03-29; evidence: Gate-Kommandos fuer Core/UI/Build/Docs gruen)
+  - [x] 65.99.1 `npm run test:core` sowie editorrelevante UI-Checks und `npm run build` sind fuer den Scope gruen. (abgeschlossen: 2026-03-29; evidence: `TEST_PORT=5314 PW_RUN_TAG=v65-core PW_OUTPUT_DIR=test-results/v65-core npm run test:core` -> `117 passed, 3 skipped`; `TEST_PORT=5312 PW_RUN_TAG=v65-final-pass2 PW_OUTPUT_DIR=test-results/v65-final-pass2 node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/editor-map-ui.spec.js -c playwright.editor.config.mjs --timeout=240000` -> `4 passed`; `npm run build` -> PASS)
+  - [x] 65.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` -> PASS; lock + backlog in `docs/Umsetzungsplan.md` und `docs/Backlog.md` aktualisiert)
 
 ## Verifikationsstrategie
 

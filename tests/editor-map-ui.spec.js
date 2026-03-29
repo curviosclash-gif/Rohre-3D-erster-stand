@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { collectErrors } from './helpers.js';
-import { EDITOR_VIEW_PATHS } from '../src/shared/contracts/EditorPathContract.js';
+import { EDITOR_API_ROUTES, EDITOR_DATA_PATHS, EDITOR_VIEW_PATHS } from '../src/shared/contracts/EditorPathContract.js';
 
 const TOOL_DOCK_STORAGE_KEY = 'cuviosclash.editor.tool-dock.v1';
 const KNOWN_EDITOR_WARNING_PATTERNS = [
@@ -20,20 +20,32 @@ async function loadEditorPage(page) {
         }
     }, TOOL_DOCK_STORAGE_KEY);
 
-    await page.goto(EDITOR_VIEW_PATHS.MAP_EDITOR, {
-        waitUntil: 'domcontentloaded',
-        timeout: 45_000
-    });
+    let lastError = null;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+        try {
+            await page.goto(EDITOR_VIEW_PATHS.MAP_EDITOR, {
+                waitUntil: 'domcontentloaded',
+                timeout: 45_000
+            });
 
-    await page.waitForFunction(() => (
-        !!window.CURVIOS_EDITOR?.getState
-        && typeof window.render_game_to_text === 'function'
-    ), null, {
-        timeout: 30_000
-    });
+            await page.waitForFunction(() => (
+                !!window.CURVIOS_EDITOR?.getState
+                && typeof window.render_game_to_text === 'function'
+            ), null, {
+                timeout: 30_000
+            });
 
-    await page.waitForSelector('#dockCategoryTabs .dockCategoryTab', { timeout: 15_000 });
-    await page.waitForSelector('#dockCards [data-entry-id]', { timeout: 15_000 });
+            await page.waitForSelector('#dockCategoryTabs .dockCategoryTab', { timeout: 30_000 });
+            await page.waitForSelector('#dockCards [data-entry-id]', { timeout: 30_000 });
+            return;
+        } catch (error) {
+            lastError = error;
+            if (attempt >= 3) break;
+            await page.goto('about:blank', { waitUntil: 'domcontentloaded', timeout: 10_000 });
+        }
+    }
+
+    throw lastError;
 }
 
 async function getEditorState(page) {
@@ -129,6 +141,70 @@ test.describe('V65: Editor Build Dock', () => {
             const lastObject = state?.objects?.[state.objects.length - 1] || null;
             expect(lastObject?.type).toBe(placement.tool);
             expect(lastObject?.subType ?? null).toBe(placement.subType);
+        }
+
+        expect(filterKnownEditorWarnings(errors)).toHaveLength(0);
+    });
+
+    test('T65d: Save/Export/Playtest bleiben ueber den Dock-Flow stabil nutzbar', async ({ page }) => {
+        const errors = collectErrors(page);
+        await loadEditorPage(page);
+
+        await activateDockEntry(page, 'build', 'build-hard');
+        await clickCanvas(page, 0.34);
+
+        await page.locator('#btnExport').click();
+        const exportedJson = await page.locator('#jsonOutput').inputValue();
+        expect(exportedJson.length).toBeGreaterThan(20);
+
+        const mapName = `V65 Smoke ${Date.now()}`;
+        let saveRequestBody = null;
+        let saveAlertMessage = '';
+        await page.route(`**${EDITOR_API_ROUTES.SAVE_MAP_DISK}`, async (route) => {
+            const request = route.request();
+            saveRequestBody = JSON.parse(request.postData() || '{}');
+            await route.fulfill({
+                status: 200,
+                contentType: 'application/json',
+                body: JSON.stringify({
+                    ok: true,
+                    mapName,
+                    mapKey: 'editor_v65_smoke',
+                    overwritten: false,
+                    editorSchemaPath: `${EDITOR_DATA_PATHS.MAPS_DIR}/editor_v65_smoke.editor.json`,
+                    runtimeMapPath: `${EDITOR_DATA_PATHS.MAPS_DIR}/editor_v65_smoke.runtime.json`,
+                    generatedModulePath: EDITOR_DATA_PATHS.GENERATED_LOCAL_MAPS_MODULE,
+                    warnings: []
+                })
+            });
+        });
+
+        page.on('dialog', async (dialog) => {
+            if (dialog.type() === 'prompt') {
+                await dialog.accept(mapName);
+                return;
+            }
+            if (dialog.type() === 'alert') {
+                saveAlertMessage = dialog.message();
+            }
+            await dialog.accept();
+        });
+
+        await page.locator('#btnSaveToGame').click();
+        await expect.poll(() => saveRequestBody?.mapName || null).toBe(mapName);
+        await expect.poll(() => saveAlertMessage).toContain('Map auf Festplatte neu gespeichert.');
+
+        const popupPromise = page.waitForEvent('popup');
+        await page.locator('#btnPlaytest').click();
+        const popup = await popupPromise;
+        await popup.waitForURL(/index\.html\?/, { timeout: 15_000 });
+        expect(popup.url()).toContain('playtest=1');
+        expect(popup.url()).toContain('planar=0');
+        await popup.close();
+
+        const evidenceScreenshotPath = String(process.env.V65_EVIDENCE_SCREENSHOT || '').trim();
+        if (evidenceScreenshotPath) {
+            await page.screenshot({ path: evidenceScreenshotPath, fullPage: true });
         }
 
         expect(filterKnownEditorWarnings(errors)).toHaveLength(0);
