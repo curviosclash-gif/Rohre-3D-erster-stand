@@ -74,7 +74,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
-| `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `tests/core.spec.js` | V68 | geplant | Arcade-HUD, Intermission-UX und Replay-Follow-up nach Abschluss von V61 |
+| `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `tests/core.spec.js` | V68 | aktiv | Bot-Codex seit 2026-03-29; Arcade-HUD, Intermission-UX und Replay-Follow-up nach Abschluss von V61 |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -90,7 +90,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | - | V64 | - | frei | Scope noch nicht definiert |
 | Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
-| - | V68 | - | frei | Follow-up fuer V61-Rest: HUD, Intermission, Replay |
+| Bot-Codex | V68 | 2026-03-29 | active | in Bearbeitung: 68.1-68.99 |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -849,7 +849,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-29 -->
 <!-- DEPENDS-ON: V61.99 -->
 
 Scope:
