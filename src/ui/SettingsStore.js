@@ -23,6 +23,14 @@ const SETTINGS_PROFILES_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settingsProfil
 const MENU_PRESETS_STORAGE_KEY = STORAGE_KEYS.menuPresets;
 const MENU_PRESETS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
 
+function safeJsonStringify(value) {
+    try {
+        return JSON.stringify(value);
+    } catch {
+        return '';
+    }
+}
+
 export class SettingsStore {
     constructor(options = {}) {
         this.storagePlatform = options.storagePlatform || createDefaultStoragePlatform({
@@ -59,6 +67,9 @@ export class SettingsStore {
             );
             if (!saved || typeof saved !== 'object') return this.createDefaultSettings();
             const sanitized = this.sanitizeSettings(saved);
+            if (safeJsonStringify(saved) !== safeJsonStringify(sanitized)) {
+                this.storagePlatform.writeJson(this.settingsStorageKey, sanitized);
+            }
             return sanitized;
         } catch {
             // Ignore malformed storage and fall back to defaults.

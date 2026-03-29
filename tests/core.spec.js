@@ -30,6 +30,7 @@ import { generateJSONExport, importFromJSON } from '../editor/js/EditorMapSerial
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
 const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
 const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
+const MENU_DRAFTS_STORAGE_KEY = 'cuviosclash.menu-drafts.v1';
 const MENU_PRESETS_STORAGE_KEY = 'cuviosclash.menu-presets.v1';
 const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
 const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(process.cwd(), EDITOR_DATA_PATHS.GENERATED_LOCAL_MAPS_MODULE);
@@ -2073,6 +2074,10 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await loadGame(page);
         await openCustomSubmenu(page);
         await expect(page.locator('#btn-quick-event-playlist')).toBeVisible();
+        const baselineState = await page.evaluate(() => ({
+            mapKey: String(window.GAME_INSTANCE?.settings?.mapKey || ''),
+            modePath: String(window.GAME_INSTANCE?.settings?.localSettings?.modePath || ''),
+        }));
 
         await page.evaluate(() => {
             const game = window.GAME_INSTANCE;
@@ -2099,6 +2104,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                 eventPlaylistState: game?.settings?.localSettings?.eventPlaylistState || null,
                 toastText: document.getElementById('status-toast')?.textContent || '',
                 persistedEventPlaylistState: persistedSettings?.localSettings?.eventPlaylistState || null,
+                persistedMapKey: String(persistedSettings?.mapKey || ''),
+                persistedModePath: String(persistedSettings?.localSettings?.modePath || ''),
             };
         }, SETTINGS_STORAGE_KEY);
 
@@ -2109,6 +2116,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(firstState.eventPlaylistState?.nextIndex).toBe(1);
         expect(firstState.toastText).toContain('Event-Playlist');
         expect(firstState.persistedEventPlaylistState?.nextIndex).toBe(1);
+        expect(firstState.persistedMapKey).toBe(baselineState.mapKey);
+        expect(firstState.persistedModePath).toBe(baselineState.modePath);
 
         await page.reload();
         await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
@@ -3176,7 +3185,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         );
     });
 
-    test('T20qa: Start-Setup repariert ungueltige Vehicle-IDs in Settings', async ({ page }) => {
+    test('T20qa: Start-Setup zeigt Fallback im UI ohne stille Vehicle-Reparatur im Settings-State', async ({ page }) => {
         await loadGame(page);
         await openGameSubmenu(page);
         const repairedState = await page.evaluate(() => {
@@ -3192,8 +3201,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
         expect(repairedState.domValue).toBeTruthy();
         expect(repairedState.domValue).not.toBe('missing_vehicle');
-        expect(repairedState.settingsValue).toBe(repairedState.domValue);
-        expect(repairedState.validationField).not.toBe('vehicleP1');
+        expect(repairedState.settingsValue).toBe('missing_vehicle');
+        expect(repairedState.validationField).toBe('');
     });
 
     test('T20r: Textkatalog-Override greift und Release-Vorschau deaktiviert ihn', async ({ page }) => {
@@ -3591,6 +3600,153 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(arcadeState.parcoursVisibleCount).toBeGreaterThan(0);
         expect(arcadeState.regularVisibleCount).toBe(0);
         expect(arcadeState.selectedMapKey).toBe('parcours_rift');
+    });
+
+    test('T70a: syncAll/syncByChangeKeys mutieren map/vehicle ohne Input nicht still', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="normal"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+
+        const state = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            game.settings.localSettings.modePath = 'normal';
+            game.settings.mapKey = 'parcours_rift';
+            game.settings.vehicles.PLAYER_1 = 'ghost_ship_1';
+            game.settings.vehicles.PLAYER_2 = 'ghost_ship_2';
+            const before = {
+                mapKey: String(game.settings.mapKey || ''),
+                vehicleP1: String(game.settings?.vehicles?.PLAYER_1 || ''),
+                vehicleP2: String(game.settings?.vehicles?.PLAYER_2 || ''),
+            };
+
+            game.uiManager.syncAll();
+            const afterSyncAll = {
+                mapKey: String(game.settings.mapKey || ''),
+                vehicleP1: String(game.settings?.vehicles?.PLAYER_1 || ''),
+                vehicleP2: String(game.settings?.vehicles?.PLAYER_2 || ''),
+            };
+
+            game.uiManager.syncByChangeKeys(['session.modePath']);
+            const afterSyncByKeys = {
+                mapKey: String(game.settings.mapKey || ''),
+                vehicleP1: String(game.settings?.vehicles?.PLAYER_1 || ''),
+                vehicleP2: String(game.settings?.vehicles?.PLAYER_2 || ''),
+            };
+
+            return {
+                before,
+                afterSyncAll,
+                afterSyncByKeys,
+                uiMapValue: String(document.getElementById('map-select')?.value || ''),
+                uiVehicleP1Value: String(document.getElementById('vehicle-p1')?.value || ''),
+                uiVehicleP2Value: String(document.getElementById('vehicle-p2')?.value || ''),
+            };
+        });
+
+        expect(state.afterSyncAll.mapKey).toBe(state.before.mapKey);
+        expect(state.afterSyncAll.vehicleP1).toBe(state.before.vehicleP1);
+        expect(state.afterSyncAll.vehicleP2).toBe(state.before.vehicleP2);
+        expect(state.afterSyncByKeys.mapKey).toBe(state.before.mapKey);
+        expect(state.afterSyncByKeys.vehicleP1).toBe(state.before.vehicleP1);
+        expect(state.afterSyncByKeys.vehicleP2).toBe(state.before.vehicleP2);
+        expect(state.uiMapValue).not.toBe(state.before.mapKey);
+        expect(state.uiVehicleP1Value).not.toBe(state.before.vehicleP1);
+        expect(state.uiVehicleP2Value).not.toBe(state.before.vehicleP2);
+    });
+
+    test('T70b: Legacy-Migration plus Session-Drafts behalten modePath/Preset stabil ueber Reload', async ({ page }) => {
+        await loadGame(page);
+        const versionState = await page.evaluate(({ settingsStorageKey, menuDraftsStorageKey }) => {
+            const game = window.GAME_INSTANCE;
+            const defaults = game.settingsManager.createDefaultSettings();
+            const targetVersion = Number(defaults?.settingsVersion || 1);
+            const legacyVersion = Math.max(0, targetVersion - 1);
+            const legacySnapshot = {
+                ...defaults,
+                settingsVersion: legacyVersion,
+                mode: '1p',
+                mapKey: 'maze',
+                vehicles: {
+                    ...(defaults?.vehicles || {}),
+                    PLAYER_1: 'ship5',
+                    PLAYER_2: 'ship8',
+                },
+                localSettings: {
+                    ...(defaults?.localSettings || {}),
+                    sessionType: 'single',
+                    modePath: 'normal',
+                },
+            };
+            localStorage.removeItem(menuDraftsStorageKey);
+            localStorage.setItem(settingsStorageKey, JSON.stringify(legacySnapshot));
+            return { targetVersion, legacyVersion };
+        }, {
+            settingsStorageKey: SETTINGS_STORAGE_KEY,
+            menuDraftsStorageKey: MENU_DRAFTS_STORAGE_KEY,
+        });
+
+        await page.reload();
+        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15000 });
+
+        const migratedState = await page.evaluate((settingsStorageKey) => {
+            const game = window.GAME_INSTANCE;
+            const persisted = JSON.parse(localStorage.getItem(settingsStorageKey) || '{}');
+            return {
+                runtimeVersion: Number(game?.settings?.settingsVersion || 0),
+                runtimeMapKey: String(game?.settings?.mapKey || ''),
+                persistedVersion: Number(persisted?.settingsVersion || 0),
+                persistedMapKey: String(persisted?.mapKey || ''),
+            };
+        }, SETTINGS_STORAGE_KEY);
+        expect(migratedState.runtimeVersion).toBe(versionState.targetVersion);
+        expect(migratedState.persistedVersion).toBe(versionState.targetVersion);
+        expect(migratedState.runtimeMapKey).toBe('maze');
+        expect(migratedState.persistedMapKey).toBe('maze');
+
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+
+        const switchState = await page.evaluate(({ menuDraftsStorageKey }) => {
+            const game = window.GAME_INSTANCE;
+            localStorage.removeItem(menuDraftsStorageKey);
+            const resultToSplit = game.settingsManager.switchSessionType(game.settings, 'splitscreen');
+            const afterSplit = {
+                success: !!resultToSplit?.success,
+                loadedDraft: !!resultToSplit?.loadedDraft,
+                sessionType: String(game?.settings?.localSettings?.sessionType || ''),
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                activePresetId: String(game?.settings?.matchSettings?.activePresetId || ''),
+                mapKey: String(game?.settings?.mapKey || ''),
+            };
+            const resultBackSingle = game.settingsManager.switchSessionType(game.settings, 'single');
+            const afterSingle = {
+                success: !!resultBackSingle?.success,
+                loadedDraft: !!resultBackSingle?.loadedDraft,
+                sessionType: String(game?.settings?.localSettings?.sessionType || ''),
+                modePath: String(game?.settings?.localSettings?.modePath || ''),
+                activePresetId: String(game?.settings?.matchSettings?.activePresetId || ''),
+                mapKey: String(game?.settings?.mapKey || ''),
+            };
+            return { afterSplit, afterSingle };
+        }, {
+            menuDraftsStorageKey: MENU_DRAFTS_STORAGE_KEY,
+        });
+
+        expect(switchState.afterSplit.success).toBeTruthy();
+        expect(switchState.afterSplit.loadedDraft).toBeFalsy();
+        expect(switchState.afterSplit.sessionType).toBe('splitscreen');
+        expect(switchState.afterSplit.modePath).toBe('arcade');
+        expect(switchState.afterSplit.activePresetId).toBe('arcade');
+        expect(switchState.afterSplit.mapKey).toBe('parcours_rift');
+
+        expect(switchState.afterSingle.success).toBeTruthy();
+        expect(switchState.afterSingle.loadedDraft).toBeTruthy();
+        expect(switchState.afterSingle.sessionType).toBe('single');
+        expect(switchState.afterSingle.modePath).toBe('arcade');
+        expect(switchState.afterSingle.activePresetId).toBe('arcade');
+        expect(switchState.afterSingle.mapKey).toBe('parcours_rift');
     });
 
     test('T68a: Arcade-HUD zeigt Score-Breakdown und Modifier-Update live im Run', async ({ page }) => {

@@ -90,7 +90,6 @@ export class UIStartSyncController {
             select.value = currentValue;
         } else if (CONFIG.MAPS?.[fallbackMapKey]) {
             select.value = fallbackMapKey;
-            this.game.settings.mapKey = fallbackMapKey;
         }
     }
 
@@ -319,11 +318,6 @@ export class UIStartSyncController {
             this.ui.mapSelect.value = hasPreviousOption
                 ? previousValue
                 : this.ui.mapSelect.options[0].value;
-            const previousDefinition = CONFIG?.MAPS?.[previousValue];
-            const previousModeEligible = isMapEligibleForModePath(previousDefinition, modePath);
-            if (!previousModeEligible && settings.mapKey !== this.ui.mapSelect.value) {
-                settings.mapKey = this.ui.mapSelect.value;
-            }
         }
 
         const vehicleCandidates = this._vehiclePreviewEntries.filter((entry) => {
@@ -342,9 +336,6 @@ export class UIStartSyncController {
             });
             const resolvedValue = resolveVehicleSelectValue(this.ui.vehicleSelectP1, currentValue);
             this.ui.vehicleSelectP1.value = resolvedValue;
-            if (settings?.vehicles?.PLAYER_1 !== resolvedValue) {
-                settings.vehicles.PLAYER_1 = resolvedValue;
-            }
         }
         if (this.ui.vehicleSelectP2) {
             const currentValue = String(settings?.vehicles?.PLAYER_2 || this.ui.vehicleSelectP2.value || '');
@@ -357,9 +348,6 @@ export class UIStartSyncController {
             });
             const resolvedValue = resolveVehicleSelectValue(this.ui.vehicleSelectP2, currentValue);
             this.ui.vehicleSelectP2.value = resolvedValue;
-            if (settings?.vehicles?.PLAYER_2 !== resolvedValue) {
-                settings.vehicles.PLAYER_2 = resolvedValue;
-            }
         }
 
         renderQuickList(this.ui.mapFavoritesList, startSetup.favoriteMaps, 'mapKey');

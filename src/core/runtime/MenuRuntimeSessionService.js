@@ -9,7 +9,11 @@ import {
     LEVEL4_SECTION_IDS,
     SETTINGS_CHANGE_KEYS,
 } from '../../composition/core-ui/CoreUiMenuPorts.js';
-import { listEligibleMapKeysForModePath } from '../../shared/contracts/MapModeContract.js';
+import {
+    isMapEligibleForModePath,
+    listEligibleMapKeysForModePath,
+    resolveModePathFallbackMapKey,
+} from '../../shared/contracts/MapModeContract.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
@@ -51,6 +55,28 @@ const SESSION_SWITCH_CHANGED_KEYS = Object.freeze([
 ]);
 
 export { SESSION_SWITCH_CHANGED_KEYS, MODE_PATH_TO_PRESET_ID };
+
+function cloneJsonSnapshot(value) {
+    try {
+        return JSON.parse(JSON.stringify(value));
+    } catch {
+        return null;
+    }
+}
+
+function buildEventPlaylistPersistedSettings(baseSettingsSnapshot, runtimeSettings) {
+    const baseSettings = baseSettingsSnapshot && typeof baseSettingsSnapshot === 'object'
+        ? baseSettingsSnapshot
+        : cloneJsonSnapshot(runtimeSettings);
+    if (!baseSettings || typeof baseSettings !== 'object') return null;
+    if (!baseSettings.localSettings || typeof baseSettings.localSettings !== 'object') {
+        baseSettings.localSettings = {};
+    }
+    baseSettings.localSettings.eventPlaylistState = {
+        ...(runtimeSettings?.localSettings?.eventPlaylistState || {}),
+    };
+    return baseSettings;
+}
 
 function resolveQuickStartRng(game, event = null) {
     const runtimeRng = game?.runtimeRng && typeof game.runtimeRng.next === 'function'
@@ -111,6 +137,12 @@ export function handleModePathChangeAction(ctx) {
             changedKeys.push(...presetResult.changedKeys);
         }
     }
+    const currentMapKey = String(game.settings?.mapKey || '').trim();
+    const currentMapDefinition = CONFIG?.MAPS?.[currentMapKey];
+    if (!isMapEligibleForModePath(currentMapDefinition, modePath)) {
+        game.settings.mapKey = resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, currentMapKey);
+        changedKeys.push(SETTINGS_CHANGE_KEYS.MAP_KEY);
+    }
 
     if (modePath === 'fight') {
         game.settings.gameMode = 'HUNT';
@@ -155,13 +187,14 @@ export function handleQuickStartLastStartAction(ctx) {
 }
 
 export function handleQuickStartEventPlaylistStartAction(ctx) {
-    const { game, onSettingsChanged, resolveMenuAccessContext, recordMenuTelemetry, startMatch, markSettingsDirty } = ctx;
+    const { game, onSettingsChanged, resolveMenuAccessContext, recordMenuTelemetry, startMatch } = ctx;
     const playlistStep = getNextEventPlaylistEntry(game?.settings?.localSettings?.eventPlaylistState);
     const presetId = String(playlistStep?.entry?.presetId || '').trim();
     if (!presetId) {
         game._showStatusToast('Event-Playlist ist nicht verfuegbar.', 1500, 'error');
         return;
     }
+    const baselineSettingsSnapshot = cloneJsonSnapshot(game.settings);
 
     const presetResult = game.settingsManager.applyMenuPreset(
         game.settings,
@@ -198,9 +231,10 @@ export function handleQuickStartEventPlaylistStartAction(ctx) {
             totalSteps: playlistStep.totalSteps,
             sessionType: game?.settings?.localSettings?.sessionType || 'single',
         });
-        const persisted = game.settingsManager.saveSettings(game.settings);
-        if (persisted) {
-            markSettingsDirty(false);
+        // Event-Playlist darf nur den Cursor persistieren, nicht still die komplette Runtime-Konfiguration als neue Baseline speichern.
+        const persistedSettings = buildEventPlaylistPersistedSettings(baselineSettingsSnapshot, game.settings);
+        if (persistedSettings) {
+            game.settingsManager.saveSettings(persistedSettings);
         }
         game._showStatusToast(
             `Event-Playlist: ${presetName} (${playlistStep.displayIndex}/${playlistStep.totalSteps})`,

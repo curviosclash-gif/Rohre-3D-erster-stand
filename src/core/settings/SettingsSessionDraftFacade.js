@@ -33,7 +33,15 @@ export function createSettingsSessionDraftFacade(options = {}) {
 
     function applySessionDraft(settings, sessionType) {
         ensureMenuContractState(settings);
-        return menuDraftStore.applyDraft(settings, sessionType);
+        const normalizedSessionType = normalizeSessionType(
+            sessionType,
+            settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE
+        );
+        const draftResult = menuDraftStore.applyDraft(settings, normalizedSessionType);
+        return {
+            ...draftResult,
+            sessionType: normalizedSessionType,
+        };
     }
 
     function switchSessionType(settings, nextSessionType) {
@@ -53,9 +61,6 @@ export function createSettingsSessionDraftFacade(options = {}) {
         const draftResult = applySessionDraft(settings, targetSessionType);
         settings.localSettings.sessionType = targetSessionType;
         settings.mode = targetSessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
-        if (!draftResult.success) {
-            settings.localSettings.modePath = 'normal';
-        }
 
         return {
             success: true,

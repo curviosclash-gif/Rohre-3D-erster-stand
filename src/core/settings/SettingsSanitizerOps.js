@@ -217,13 +217,24 @@ function finalizeSanitizedSettings({ merged, migratedSessionType }) {
     return merged;
 }
 
+function migrateLegacySettingsSnapshot(src, defaults) {
+    const sourceVersion = Number(src?.settingsVersion || 0);
+    const targetVersion = Number(defaults?.settingsVersion || sourceVersion || 0);
+    if (!Number.isFinite(targetVersion) || targetVersion <= 0) {
+        return src;
+    }
+    if (!Number.isFinite(sourceVersion) || sourceVersion >= targetVersion) {
+        return src;
+    }
+    const migrated = deepClone(src);
+    migrated.settingsVersion = targetVersion;
+    return migrated;
+}
+
 export function sanitizeSettingsSnapshot(saved, createDefaultSettings) {
     const defaults = createDefaultSettings();
-    const src = saved && typeof saved === 'object' ? saved : {};
-
-    if ((src.settingsVersion || 0) < (defaults.settingsVersion || 0)) {
-        return deepClone(defaults);
-    }
+    const rawSource = saved && typeof saved === 'object' ? saved : {};
+    const src = migrateLegacySettingsSnapshot(rawSource, defaults);
 
     const merged = deepClone(defaults);
     const migratedSessionType = normalizeSessionType(

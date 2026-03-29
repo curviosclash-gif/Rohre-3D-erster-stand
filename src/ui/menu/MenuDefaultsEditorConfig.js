@@ -154,7 +154,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             values: {
                 mode: '1p',
                 gameMode: 'CLASSIC',
-                mapKey: 'standard',
+                mapKey: 'parcours_rift',
                 numBots: 2,
                 botDifficulty: 'NORMAL',
                 winsNeeded: 5,

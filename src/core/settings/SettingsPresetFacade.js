@@ -37,7 +37,10 @@ export function createSettingsPresetFacade(options = {}) {
             accessContext: resolvedContext,
             allowOpenPresetEditing: settings?.menuFeatureFlags?.allowOpenPresetEditing !== false,
         });
-        const compatibilityResult = applyMenuCompatibilityRules(settings, { accessContext: resolvedContext });
+        const compatibilityResult = applyMenuCompatibilityRules(settings, {
+            accessContext: resolvedContext,
+            changedKeys: Array.isArray(result.changedKeys) ? result.changedKeys : [],
+        });
         ensureMenuContractState(settings);
         const changedKeys = Array.from(new Set([
             ...(Array.isArray(result.changedKeys) ? result.changedKeys : []),

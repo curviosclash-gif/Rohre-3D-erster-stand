@@ -17,10 +17,16 @@ export function orchestrateRuntimeSettingsChanged({
     if (incomingChangedKeys.some((key) => startValidationRelevantKeySet?.has(key))) {
         game.uiManager?.clearStartValidationError?.();
     }
-    const compatibilityResult = game.settingsManager?.applyMenuCompatibilityRules?.(
-        game.settings,
-        { accessContext: resolveMenuAccessContext?.() }
-    );
+    const shouldApplyCompatibilityRules = event?.forceCompatibility === true || incomingChangedKeys.length > 0;
+    const compatibilityResult = shouldApplyCompatibilityRules
+        ? game.settingsManager?.applyMenuCompatibilityRules?.(
+            game.settings,
+            {
+                accessContext: resolveMenuAccessContext?.(),
+                changedKeys: incomingChangedKeys,
+            }
+        )
+        : null;
     const compatibilityKeys = Array.isArray(compatibilityResult?.changedKeys)
         ? compatibilityResult.changedKeys
         : [];

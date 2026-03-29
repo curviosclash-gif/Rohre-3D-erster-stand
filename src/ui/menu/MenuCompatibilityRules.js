@@ -25,6 +25,57 @@ const MENU_COMPATIBILITY_RULES = Object.freeze([
     { id: 'developer_visibility_guard', priority: 70 },
 ]);
 
+const MENU_COMPATIBILITY_RULE_TRIGGER_KEYS = Object.freeze({
+    session_type_mode_sync: Object.freeze([
+        SETTINGS_CHANGE_KEYS.SESSION_TYPE,
+        SETTINGS_CHANGE_KEYS.MODE,
+    ]),
+    mode_path_game_mode_sync: Object.freeze([
+        SETTINGS_CHANGE_KEYS.MODE_PATH,
+        SETTINGS_CHANGE_KEYS.GAME_MODE,
+        SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED,
+    ]),
+    map_key_validity_guard: Object.freeze([
+        SETTINGS_CHANGE_KEYS.MODE_PATH,
+        SETTINGS_CHANGE_KEYS.MAP_KEY,
+    ]),
+    mode_hunt_respawn: Object.freeze([
+        SETTINGS_CHANGE_KEYS.GAME_MODE,
+        SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED,
+    ]),
+    theme_mode_local_guard: Object.freeze([
+        SETTINGS_CHANGE_KEYS.LOCAL_THEME_MODE,
+    ]),
+    preset_identity_integrity: Object.freeze([
+        SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_ID,
+        SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_KIND,
+        SETTINGS_CHANGE_KEYS.PRESET_STATUS,
+    ]),
+    fixed_preset_exists: Object.freeze([
+        SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_ID,
+        SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_KIND,
+        SETTINGS_CHANGE_KEYS.PRESET_STATUS,
+    ]),
+    fixed_preset_binding: Object.freeze([
+        SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_ID,
+        SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_KIND,
+        SETTINGS_CHANGE_KEYS.PRESET_STATUS,
+    ]),
+    fixed_lock_requires_fixed_preset: Object.freeze([
+        SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_KIND,
+        SETTINGS_CHANGE_KEYS.PRESET_STATUS,
+        SETTINGS_CHANGE_KEYS.DEVELOPER_FIXED_PRESET_LOCK,
+    ]),
+    developer_release_preview_guard: Object.freeze([
+        SETTINGS_CHANGE_KEYS.DEVELOPER_RELEASE_PREVIEW,
+        SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED,
+    ]),
+    developer_visibility_guard: Object.freeze([
+        SETTINGS_CHANGE_KEYS.DEVELOPER_VISIBILITY_MODE,
+        SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED,
+    ]),
+});
+
 function normalizeString(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
@@ -386,6 +437,9 @@ export function applyMenuCompatibilityRules(settings, options = {}) {
     const accessContext = options.accessContext && typeof options.accessContext === 'object'
         ? options.accessContext
         : null;
+    const changedKeySet = Array.isArray(options.changedKeys)
+        ? new Set(options.changedKeys.filter((key) => typeof key === 'string' && key.trim()))
+        : null;
     const result = {
         contractVersion: MENU_COMPATIBILITY_CONTRACT_VERSION,
         appliedRuleIds: [],
@@ -398,18 +452,29 @@ export function applyMenuCompatibilityRules(settings, options = {}) {
         return result;
     }
 
-    applySessionTypeModeSyncRule(source, result);
-    applyModePathGameModeSyncRule(source, result);
-    applyMapKeyValidityGuardRule(source, result);
-    applyModeHuntRespawnRule(source, result);
-    applyThemeModeLocalGuardRule(source, result);
-    applyPresetIdentityIntegrityRule(source, result);
-    applyFixedPresetExistsRule(source, result);
-    applyFixedPresetBindingRule(source, result);
-    applyFixedLockRequiresFixedPresetRule(source, result);
-    applyDeveloperFeatureFlagGuardRule(source, result);
-    applyDeveloperReleasePreviewGuardRule(source, result);
-    applyDeveloperVisibilityGuardRule(source, result, accessContext);
+    const shouldRunRule = (ruleId) => {
+        if (!(changedKeySet instanceof Set) || changedKeySet.size === 0) return true;
+        const triggerKeys = MENU_COMPATIBILITY_RULE_TRIGGER_KEYS[ruleId];
+        if (!Array.isArray(triggerKeys) || triggerKeys.length === 0) return true;
+        return triggerKeys.some((key) => changedKeySet.has(key));
+    };
+    const runRule = (ruleId, callback) => {
+        if (!shouldRunRule(ruleId)) return;
+        callback();
+    };
+
+    runRule('session_type_mode_sync', () => applySessionTypeModeSyncRule(source, result));
+    runRule('mode_path_game_mode_sync', () => applyModePathGameModeSyncRule(source, result));
+    runRule('map_key_validity_guard', () => applyMapKeyValidityGuardRule(source, result));
+    runRule('mode_hunt_respawn', () => applyModeHuntRespawnRule(source, result));
+    runRule('theme_mode_local_guard', () => applyThemeModeLocalGuardRule(source, result));
+    runRule('preset_identity_integrity', () => applyPresetIdentityIntegrityRule(source, result));
+    runRule('fixed_preset_exists', () => applyFixedPresetExistsRule(source, result));
+    runRule('fixed_preset_binding', () => applyFixedPresetBindingRule(source, result));
+    runRule('fixed_lock_requires_fixed_preset', () => applyFixedLockRequiresFixedPresetRule(source, result));
+    runRule('developer_feature_flag_guard', () => applyDeveloperFeatureFlagGuardRule(source, result));
+    runRule('developer_release_preview_guard', () => applyDeveloperReleasePreviewGuardRule(source, result));
+    runRule('developer_visibility_guard', () => applyDeveloperVisibilityGuardRule(source, result, accessContext));
 
     result.changedKeys = Array.from(result._changedKeySet);
     delete result._changedKeySet;
