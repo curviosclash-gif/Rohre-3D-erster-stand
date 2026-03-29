@@ -82,7 +82,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
 | Bot-Codex | V58 | 2026-03-27 | closed | abgeschlossen 2026-03-27 inkl. 58.99-Gate |
-| Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
+| Bot-Codex | V59 | 2026-03-29 | active | DoD-Nachverifikation und Abschluss von V59 |
 | Bot-Codex | V60 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (60.4.4 nach V67.4.5 ueberfuehrt; 60.99 geschlossen) |
 | Bot-Codex | V61 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (HUD-/Intermission-/Replay-Rest nach V68 ueberfuehrt) |
 | Bot-Codex | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (`npm run build` PASS, `npm run test:core` PASS; T1-Startup-Flake nur im ersten Versuch, Retry gruen) |
@@ -207,7 +207,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-29 -->
 <!-- DEPENDS-ON: V58.1, V55.99 -->
 
 Scope:
