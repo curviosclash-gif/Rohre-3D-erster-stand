@@ -72,6 +72,26 @@ function computeLevel(totalXp) {
     return level;
 }
 
+// ─── Slot Stat Bonuses (61.8.1) ───
+
+/**
+ * Returns stat bonuses from installed T2 upgrade slots.
+ * T2 Wing (either left or right) = +10% turning.
+ * T2 Engine (either left or right) = +8% speed.
+ * T2 Core = +15 max HP.
+ */
+export function getSlotStatBonuses(upgrades) {
+    const u = upgrades && typeof upgrades === 'object' ? upgrades : {};
+    const hasWingT2 = u.wing_left_t2 === 'T2' || u.wing_right_t2 === 'T2';
+    const hasEngineT2 = u.engine_left_t2 === 'T2' || u.engine_right_t2 === 'T2';
+    const hasCoreT2 = u.core_t2 === 'T2';
+    return {
+        turningBonusPct: hasWingT2 ? 10 : 0,
+        speedBonusPct: hasEngineT2 ? 8 : 0,
+        maxHpBonus: hasCoreT2 ? 15 : 0,
+    };
+}
+
 // ─── Mastery Perks (61.8.2) ───
 
 /**
@@ -207,6 +227,7 @@ export default {
     XP_REWARD_TABLE,
     xpForLevel,
     xpToNextLevel,
+    getSlotStatBonuses,
     getMasteryPerks,
     getUnlockedSlots,
     createArcadeVehicleProfile,

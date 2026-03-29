@@ -26,6 +26,7 @@ import {
     getOrCreateProfile,
     addXp,
     getMasteryPerks,
+    getSlotStatBonuses,
 } from '../../state/arcade/ArcadeVehicleProfile.js';
 import {
     assignSectorMissions,
@@ -63,6 +64,8 @@ export class ArcadeRunRuntime {
         this._onMapTransition = null;
         this._activeModifierId = null;
         this._onModifierChanged = null;
+        this._onVehicleUpgradesChanged = null;
+        this._onSuddenDeathEntered = null;
     }
 
     _nextRunId(nowMs = Date.now()) {
@@ -148,6 +151,28 @@ export class ArcadeRunRuntime {
     _notifyModifierChanged(modifierId) {
         if (this._onModifierChanged) {
             try { this._onModifierChanged(modifierId); } catch { /* no-op */ }
+        }
+    }
+
+    // 61.8.1: Callback when vehicle slot bonuses change (used to sync strategy)
+    setVehicleUpgradesHandler(handler) {
+        this._onVehicleUpgradesChanged = typeof handler === 'function' ? handler : null;
+    }
+
+    _notifyVehicleUpgradesChanged(bonuses) {
+        if (this._onVehicleUpgradesChanged) {
+            try { this._onVehicleUpgradesChanged(bonuses); } catch { /* no-op */ }
+        }
+    }
+
+    // 61.6.2: Callback when Sudden Death phase is entered (used to sync strategy)
+    setSuddenDeathEnteredHandler(handler) {
+        this._onSuddenDeathEntered = typeof handler === 'function' ? handler : null;
+    }
+
+    _notifySuddenDeathEntered() {
+        if (this._onSuddenDeathEntered) {
+            try { this._onSuddenDeathEntered(); } catch { /* no-op */ }
         }
     }
 
@@ -246,9 +271,11 @@ export class ArcadeRunRuntime {
             this._state.isDailyChallenge = true;
         }
 
-        // Load vehicle profiles
+        // Load vehicle profiles and notify slot bonuses
         const store = this.settingsManager?.store;
         this._vehicleProfiles = loadVehicleProfiles(store);
+        const activeProfile = this.getVehicleProfile();
+        this._notifyVehicleUpgradesChanged(getSlotStatBonuses(activeProfile?.upgrades));
 
         // Resolve map sequence from encounter plan if available
         if (options.encounterPlan) {
@@ -318,6 +345,11 @@ export class ArcadeRunRuntime {
         // 61.4.1: Resolve modifier for the new sector
         this._activeModifierId = this._resolveModifierForSector(this._state.sectorIndex);
         this._notifyModifierChanged(this._activeModifierId);
+
+        // 61.6.2: Notify when Sudden Death phase is entered
+        if (this._state.phase === ARCADE_RUN_PHASES.SUDDEN_DEATH) {
+            this._notifySuddenDeathEntered();
+        }
 
         // Assign new missions for the sector
         this._assignMissionsForCurrentSector();

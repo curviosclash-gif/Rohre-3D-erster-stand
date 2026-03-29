@@ -30,13 +30,92 @@ const MODIFIER_EFFECTS = Object.freeze({
     boost_tax: Object.freeze({ boostHpCostPerSecond: 8.0 }),
 });
 
+const NULL_SLOT_BONUSES = Object.freeze({ turningBonusPct: 0, speedBonusPct: 0, maxHpBonus: 0 });
+
+// 61.6.2: Incoming damage increase per stacked SD modifier (10% per stack)
+const SD_DAMAGE_STACK_MULTIPLIER = 0.1;
+// 61.6.2: Seconds between each additional stacked modifier in Sudden Death
+const SD_MODIFIER_STACK_INTERVAL_S = 30;
+
 export class ArcadeModeStrategy extends GameModeContract {
     constructor() {
         super();
         this._activeModifierId = null;
+        this._slotBonuses = NULL_SLOT_BONUSES;
+        // 61.6.2: Sudden Death state
+        this._sdActive = false;
+        this._sdAccumulatedSeconds = 0;
+        this._sdStackedModifiers = [];
+        this._sdDamageMultiplier = 1.0;
+    }
+
+    // 61.8.1: Apply vehicle upgrade slot bonuses (turning, speed, max HP)
+    applyVehicleUpgrades(bonuses) {
+        if (!bonuses || typeof bonuses !== 'object') {
+            this._slotBonuses = NULL_SLOT_BONUSES;
+        } else {
+            this._slotBonuses = Object.freeze({
+                turningBonusPct: Number.isFinite(bonuses.turningBonusPct) ? bonuses.turningBonusPct : 0,
+                speedBonusPct: Number.isFinite(bonuses.speedBonusPct) ? bonuses.speedBonusPct : 0,
+                maxHpBonus: Number.isFinite(bonuses.maxHpBonus) ? bonuses.maxHpBonus : 0,
+            });
+        }
     }
 
     get modeType() { return 'ARCADE'; }
+
+    // --- Sudden Death (61.6.2) ---
+
+    /**
+     * Activate Sudden Death mode. Disables healing and begins stacking modifiers.
+     */
+    enterSuddenDeath() {
+        this._sdActive = true;
+        this._sdAccumulatedSeconds = 0;
+        this._sdStackedModifiers = [];
+        this._sdDamageMultiplier = 1.0;
+    }
+
+    /**
+     * Advance Sudden Death timer by dt seconds.
+     * Every SD_MODIFIER_STACK_INTERVAL_S seconds a new modifier is stacked and
+     * incoming damage multiplier increases by SD_DAMAGE_STACK_MULTIPLIER per stack.
+     * Returns { addedModifiers, damageMultiplier } if new stacks were added, else null.
+     */
+    tickSuddenDeath(dt) {
+        if (!this._sdActive) return null;
+        this._sdAccumulatedSeconds += Math.max(0, toSafe(dt, 0));
+        const targetStacks = Math.floor(this._sdAccumulatedSeconds / SD_MODIFIER_STACK_INTERVAL_S);
+        const currentStacks = this._sdStackedModifiers.length;
+        if (targetStacks <= currentStacks) return null;
+
+        const modifierKeys = Object.keys(MODIFIER_EFFECTS);
+        const addedModifiers = [];
+        for (let i = currentStacks; i < targetStacks; i += 1) {
+            addedModifiers.push(modifierKeys[i % modifierKeys.length]);
+        }
+        this._sdStackedModifiers = this._sdStackedModifiers.concat(addedModifiers);
+        this._sdDamageMultiplier = 1.0 + this._sdStackedModifiers.length * SD_DAMAGE_STACK_MULTIPLIER;
+        return { addedModifiers, damageMultiplier: this._sdDamageMultiplier };
+    }
+
+    exitSuddenDeath() {
+        this._sdActive = false;
+        this._sdAccumulatedSeconds = 0;
+        this._sdStackedModifiers = [];
+        this._sdDamageMultiplier = 1.0;
+    }
+
+    isSuddenDeathActive() { return this._sdActive; }
+
+    getSuddenDeathState() {
+        return {
+            active: this._sdActive,
+            stackedModifiers: [...this._sdStackedModifiers],
+            damageMultiplier: this._sdDamageMultiplier,
+            accumulatedSeconds: this._sdAccumulatedSeconds,
+        };
+    }
 
     // 61.4.1: Active sector modifier
     setActiveModifier(modifierId) {
@@ -51,11 +130,39 @@ export class ArcadeModeStrategy extends GameModeContract {
         return this._activeModifierId ? (MODIFIER_EFFECTS[this._activeModifierId] || null) : null;
     }
 
+    // 61.6.2: Aggregate effects from base modifier + all SD stacked modifiers
+    _getAggregatedModifierEffects() {
+        const base = this._getModifierEffect();
+        const sdMods = this._sdActive ? this._sdStackedModifiers : [];
+        if (!base && sdMods.length === 0) return null;
+
+        const agg = {
+            turnRateMultiplier: 1.0,
+            hpDrainPerSecond: 0,
+            spawnRateMultiplier: 1.0,
+            boostHpCostPerSecond: 0,
+        };
+
+        const allEffects = base ? [base, ...sdMods.map((id) => MODIFIER_EFFECTS[id]).filter(Boolean)]
+            : sdMods.map((id) => MODIFIER_EFFECTS[id]).filter(Boolean);
+
+        for (const fx of allEffects) {
+            if (fx.turnRateMultiplier != null) agg.turnRateMultiplier *= fx.turnRateMultiplier;
+            if (fx.hpDrainPerSecond != null) agg.hpDrainPerSecond += fx.hpDrainPerSecond;
+            if (fx.spawnRateMultiplier != null) agg.spawnRateMultiplier *= fx.spawnRateMultiplier;
+            if (fx.boostHpCostPerSecond != null) agg.boostHpCostPerSecond += fx.boostHpCostPerSecond;
+        }
+
+        return agg;
+    }
+
     // --- Health & Damage ---
     resetPlayerHealth(player) {
         if (!player) return null;
-        player.maxHp = DEFAULT_MAX_HP;
-        player.hp = DEFAULT_MAX_HP;
+        // 61.8.1: T2 Core adds +15 max HP
+        const hpBonus = Math.max(0, this._slotBonuses.maxHpBonus);
+        player.maxHp = DEFAULT_MAX_HP + hpBonus;
+        player.hp = player.maxHp;
         player.maxShieldHp = DEFAULT_SHIELD_HP;
         player.shieldHP = player.hasShield ? DEFAULT_SHIELD_HP : 0;
         player.lastDamageTimestamp = -Infinity;
@@ -65,7 +172,9 @@ export class ArcadeModeStrategy extends GameModeContract {
 
     applyDamage(player, amount, options) {
         if (!player) return { applied: 0, absorbedByShield: 0, remainingHp: 0, isDead: true };
-        const dmg = Math.max(0, toSafe(amount, 0));
+        // 61.6.2: Scale incoming damage by SD damage multiplier
+        const rawDmg = Math.max(0, toSafe(amount, 0));
+        const dmg = this._sdActive ? rawDmg * this._sdDamageMultiplier : rawDmg;
         if (dmg <= 0) {
             return { applied: 0, absorbedByShield: 0, remainingHp: Math.max(0, toSafe(player.hp, 0)), isDead: toSafe(player.hp, 0) <= 0 };
         }
@@ -93,6 +202,8 @@ export class ArcadeModeStrategy extends GameModeContract {
 
     applyHealing(player, amount) {
         if (!player) return { healed: 0, hp: 0 };
+        // 61.6.2: No healing in Sudden Death
+        if (this._sdActive) return { healed: 0, hp: Math.max(0, toSafe(player.hp, 0)) };
         const heal = Math.max(0, toSafe(amount, 0));
         if (heal <= 0) return { healed: 0, hp: toSafe(player.hp, 0) };
         const maxHp = Math.max(1, toSafe(player.maxHp, DEFAULT_MAX_HP));
@@ -118,9 +229,10 @@ export class ArcadeModeStrategy extends GameModeContract {
     }
 
     // 61.4.1: heat_stress drains HP over time; no natural regen in Arcade
+    // 61.6.2: Also aggregates SD stacked modifier effects
     updateHealthRegen(player, dt) {
         if (!player || player.hp <= 0) return;
-        const fx = this._getModifierEffect();
+        const fx = this._getAggregatedModifierEffects();
         if (!fx || !fx.hpDrainPerSecond) return;
         const drain = fx.hpDrainPerSecond * Math.max(0, dt);
         if (drain <= 0) return;
@@ -131,9 +243,10 @@ export class ArcadeModeStrategy extends GameModeContract {
     }
 
     // 61.4.1: boost_tax — drains HP while boosting
+    // 61.6.2: Also aggregates SD stacked modifier effects
     applyBoostTick(player, dt) {
         if (!player || player.hp <= 0 || !player.isBoosting) return;
-        const fx = this._getModifierEffect();
+        const fx = this._getAggregatedModifierEffects();
         if (!fx || !fx.boostHpCostPerSecond) return;
         const cost = fx.boostHpCostPerSecond * Math.max(0, dt);
         if (cost <= 0) return;
@@ -144,14 +257,24 @@ export class ArcadeModeStrategy extends GameModeContract {
     }
 
     // 61.4.1: tight_turns — multiplier applied to turn rate
+    // 61.6.2: Also aggregates SD stacked modifier effects
+    // 61.8.1: T2 Wing adds +10% turning on top of modifier
     getTurnRateMultiplier() {
-        const fx = this._getModifierEffect();
-        return (fx && fx.turnRateMultiplier) ? fx.turnRateMultiplier : 1.0;
+        const fx = this._getAggregatedModifierEffects();
+        const modifierMultiplier = (fx && fx.turnRateMultiplier) ? fx.turnRateMultiplier : 1.0;
+        const upgradeMultiplier = 1.0 + (this._slotBonuses.turningBonusPct / 100);
+        return modifierMultiplier * upgradeMultiplier;
+    }
+
+    // 61.8.1: T2 Engine adds +8% speed
+    getSpeedMultiplier() {
+        return 1.0 + (this._slotBonuses.speedBonusPct / 100);
     }
 
     // 61.4.1: portal_storm — multiplier for item/portal spawn frequency
+    // 61.6.2: Also aggregates SD stacked modifier effects
     getSpawnRateMultiplier() {
-        const fx = this._getModifierEffect();
+        const fx = this._getAggregatedModifierEffects();
         return (fx && fx.spawnRateMultiplier) ? fx.spawnRateMultiplier : 1.0;
     }
 
