@@ -16,6 +16,7 @@ import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidation
 import { ReplayRecorder } from './replay/ReplayRecorder.js';
 import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
 import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
+import { buildArcadeSectorPlan } from '../entities/directors/ArcadeEncounterCatalog.js';
 import {
     guardMenuRuntimeEvent,
     MenuController,
@@ -123,13 +124,13 @@ export class GameRuntimeFacade {
             logger: console,
         });
 
-        // 61.4.1: Sync active modifier from runtime to strategy
-        this.arcadeRunRuntime.setModifierChangedHandler((modifierId) => {
+        const withArcadeStrategy = (handler) => {
             const strategy = this.game?.entityManager?.gameModeStrategy;
-            if (strategy && typeof strategy.setActiveModifier === 'function') {
-                strategy.setActiveModifier(modifierId);
-            }
-        });
+            if (strategy) handler(strategy);
+        };
+        this.arcadeRunRuntime.setModifierChangedHandler((modifierId) => withArcadeStrategy((strategy) => strategy.setActiveModifier?.(modifierId)));
+        this.arcadeRunRuntime.setVehicleUpgradesHandler((bonuses) => withArcadeStrategy((strategy) => strategy.applyVehicleUpgrades?.(bonuses)));
+        this.arcadeRunRuntime.setSuddenDeathEnteredHandler(() => withArcadeStrategy((strategy) => strategy.enterSuddenDeath?.()));
     }
 
     _clearMatchPrewarmTimer() {
@@ -137,19 +138,16 @@ export class GameRuntimeFacade {
         clearTimeout(this._matchPrewarmTimer);
         this._matchPrewarmTimer = null;
     }
-
     scheduleMatchPrewarm() {
         const game = this.game;
         if (!game?.renderer || !game?.settingsManager) return;
         if (game.state !== GAME_STATE_IDS.MENU) return;
         if (game.entityManager) return;
-
         this._clearMatchPrewarmTimer();
         this._matchPrewarmTimer = setTimeout(() => {
             this._matchPrewarmTimer = null;
             if (game.state !== GAME_STATE_IDS.MENU) return;
             if (game.entityManager) return;
-
             const runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
             Promise.resolve(prewarmMatchArenaSession({
                 renderer: game.renderer,
@@ -233,17 +231,27 @@ export class GameRuntimeFacade {
     _startArcadeRunIfEnabled() {
         const game = this.game;
         if (!game?.runtimeConfig?.arcade?.enabled) return null;
+        const strategy = game?.entityManager?.gameModeStrategy || null;
+        this.arcadeRunRuntime.setStrategy(strategy);
+        const existing = this.arcadeRunRuntime.getStateSnapshot?.();
+        if (existing && String(existing.phase || '').toLowerCase() !== 'finished') return existing;
+        const encounterPlan = buildArcadeSectorPlan({
+            seed: game.runtimeConfig?.arcade?.seed,
+            sectorCount: game.runtimeConfig?.arcade?.sectorCount,
+            difficulty: game.runtimeConfig?.bot?.activeDifficulty || game.runtimeConfig?.bot?.difficulty || 'normal',
+        });
         return this.arcadeRunRuntime.startRun({
             entityManager: game.entityManager,
             roundStateController: game.roundStateController,
             playerCount: Math.max(1, Number(game.numHumans) || 1),
+            encounterPlan,
+            strategy,
         });
     }
 
     _resetArcadeRunState() {
         this.arcadeRunRuntime.resetRunState({ preserveRecords: true });
     }
-
     getArcadeRunState() {
         return this.arcadeRunRuntime.getStateSnapshot();
     }

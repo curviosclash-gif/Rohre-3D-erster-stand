@@ -2155,6 +2155,214 @@ input[type="range"]::-webkit-slider-thumb {
     text-align: right;
 }
 
+#arcade-score-hud .hidden {
+    display: none !important;
+}
+
+#arcade-score-hud.is-edge-glow {
+    box-shadow: 0 0 0 1px rgba(110, 230, 255, 0.34), 0 0 26px rgba(90, 220, 255, 0.42), 0 8px 22px rgba(0, 0, 0, 0.32);
+}
+
+#arcade-score-hud.is-sudden-death {
+    border-color: rgba(255, 110, 110, 0.6) !important;
+    animation: arcade-sd-pulse 1.05s ease-in-out infinite;
+}
+
+#arcade-score-hud .arcade-score-hud-metric.is-pop {
+    animation: arcade-combo-pop 0.2s ease;
+}
+
+#arcade-score-hud .arcade-score-hud-metric.is-decaying {
+    border-color: rgba(255, 170, 120, 0.55);
+    background: rgba(90, 45, 24, 0.34);
+}
+
+#arcade-score-hud .arcade-score-hud-transition {
+    animation: arcade-transition-in 0.22s ease;
+}
+
+#arcade-score-hud .arcade-score-hud-sd {
+    animation: arcade-sd-banner-pulse 0.95s ease-in-out infinite;
+}
+
+#arcade-sudden-death-overlay {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 904;
+    border: 8px solid rgba(255, 70, 70, 0.52);
+    box-shadow: inset 0 0 46px rgba(255, 30, 30, 0.24);
+    animation: arcade-sd-screen-pulse 0.95s ease-in-out infinite;
+}
+
+#arcade-sector-transition-overlay {
+    position: fixed;
+    top: 44%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(150, 228, 255, 0.58);
+    background: rgba(10, 26, 40, 0.86);
+    color: #d8f5ff;
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    z-index: 906;
+    pointer-events: none;
+    animation: arcade-transition-in 0.24s ease;
+}
+
+#arcade-overlay-panel {
+    width: min(920px, calc(100% - 32px));
+    margin-top: 18px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 198, 108, 0.35);
+    background: linear-gradient(170deg, rgba(22, 16, 8, 0.92), rgba(8, 12, 20, 0.9));
+    color: #f2efe6;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+}
+
+#arcade-overlay-panel.hidden {
+    display: none;
+}
+
+.arcade-overlay-header h3 {
+    margin: 0;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.05rem;
+    letter-spacing: 0.04em;
+    color: #ffdca2;
+}
+
+.arcade-overlay-header p {
+    margin: 6px 0 0;
+    font-size: 0.9rem;
+    color: #d8d6cc;
+}
+
+.arcade-overlay-body {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    margin-top: 10px;
+}
+
+.arcade-overlay-section {
+    border: 1px solid rgba(255, 218, 162, 0.2);
+    border-radius: 12px;
+    background: rgba(12, 18, 28, 0.54);
+    padding: 10px;
+    display: grid;
+    gap: 6px;
+}
+
+.arcade-overlay-section h4 {
+    margin: 0;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #ffd69a;
+}
+
+.arcade-overlay-section p {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #e4ecf5;
+    line-height: 1.35;
+}
+
+.arcade-overlay-choice-grid,
+.arcade-overlay-reward-grid {
+    display: grid;
+    gap: 6px;
+}
+
+.arcade-overlay-choice-btn,
+.arcade-overlay-reward-btn,
+.arcade-overlay-action-btn {
+    border: 1px solid rgba(255, 216, 166, 0.28);
+    background: rgba(28, 24, 18, 0.8);
+    color: #f9f7f1;
+    border-radius: 8px;
+    padding: 8px 10px;
+    text-align: left;
+    display: grid;
+    gap: 2px;
+    cursor: pointer;
+}
+
+.arcade-overlay-choice-btn strong,
+.arcade-overlay-reward-btn strong {
+    font-size: 0.84rem;
+}
+
+.arcade-overlay-choice-btn span,
+.arcade-overlay-choice-btn small,
+.arcade-overlay-reward-btn small {
+    font-size: 0.75rem;
+    color: #c7d6e7;
+}
+
+.arcade-overlay-choice-btn.is-active,
+.arcade-overlay-reward-btn.is-active {
+    border-color: rgba(106, 226, 255, 0.72);
+    background: rgba(16, 42, 58, 0.84);
+}
+
+.arcade-overlay-list {
+    margin: 0;
+    padding-left: 18px;
+    display: grid;
+    gap: 4px;
+    font-size: 0.78rem;
+    color: #d5e8f4;
+}
+
+.arcade-overlay-empty {
+    margin: 0;
+    font-size: 0.78rem;
+    color: rgba(220, 220, 220, 0.8);
+}
+
+@keyframes arcade-combo-pop {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+@keyframes arcade-sd-pulse {
+    0% { border-color: rgba(255, 110, 110, 0.5); }
+    50% { border-color: rgba(255, 58, 58, 0.86); }
+    100% { border-color: rgba(255, 110, 110, 0.5); }
+}
+
+@keyframes arcade-sd-banner-pulse {
+    0% { opacity: 0.78; }
+    50% { opacity: 1; }
+    100% { opacity: 0.78; }
+}
+
+@keyframes arcade-sd-screen-pulse {
+    0% { opacity: 0.55; }
+    50% { opacity: 0.92; }
+    100% { opacity: 0.55; }
+}
+
+@keyframes arcade-transition-in {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -54%);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
 /* ============================================
    PAUSE OVERLAY
    ============================================ */

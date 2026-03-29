@@ -22,6 +22,10 @@ export class HudRuntimeSystem {
         this._scoreboardContainer = null;
         this._arcadeMissionHud = null;
         this._arcadeScoreHud = null;
+        this._arcadeSuddenDeathOverlay = null;
+        this._arcadeSectorTransitionOverlay = null;
+        this._arcadeTransitionVisibleUntilMs = 0;
+        this._lastArcadeSectorIndex = 0;
     }
 
     /**
@@ -163,9 +167,38 @@ export class HudRuntimeSystem {
     _hideArcadeHud() {
         this._arcadeMissionHud?.hide?.();
         this._arcadeScoreHud?.hide?.();
+        this._hideArcadeFeedbackOverlays();
     }
 
-    _updateArcadeHud() {
+    _ensureArcadeFeedbackOverlays() {
+        if (!this._arcadeSuddenDeathOverlay) {
+            const overlay = document.createElement('div');
+            overlay.id = 'arcade-sudden-death-overlay';
+            overlay.className = 'hidden';
+            document.body.appendChild(overlay);
+            this._arcadeSuddenDeathOverlay = overlay;
+        }
+        if (!this._arcadeSectorTransitionOverlay) {
+            const overlay = document.createElement('div');
+            overlay.id = 'arcade-sector-transition-overlay';
+            overlay.className = 'hidden';
+            document.body.appendChild(overlay);
+            this._arcadeSectorTransitionOverlay = overlay;
+        }
+    }
+
+    _hideArcadeFeedbackOverlays() {
+        if (this._arcadeSuddenDeathOverlay) {
+            this._arcadeSuddenDeathOverlay.classList.add('hidden');
+        }
+        if (this._arcadeSectorTransitionOverlay) {
+            this._arcadeSectorTransitionOverlay.classList.add('hidden');
+        }
+        this._arcadeTransitionVisibleUntilMs = 0;
+        this._lastArcadeSectorIndex = 0;
+    }
+
+    _updateArcadeHud(dt = 0) {
         const game = this.game;
         const arcadeEnabled = game?.runtimeConfig?.arcade?.enabled === true;
         const modePath = String(game?.settings?.localSettings?.modePath || '').trim().toLowerCase();
@@ -184,6 +217,31 @@ export class HudRuntimeSystem {
         this._ensureArcadeHud();
         this._arcadeScoreHud?.update?.(hudState);
         this._arcadeMissionHud?.update?.(hudState.missionState);
+        this._ensureArcadeFeedbackOverlays();
+
+        const nowMs = Math.max(0, Number(hudState.nowMs) || Date.now());
+        const suddenDeathActive = String(hudState.phase || '') === 'sudden_death';
+        if (suddenDeathActive) {
+            const strategy = game?.entityManager?.gameModeStrategy;
+            if (strategy && typeof strategy.tickSuddenDeath === 'function') {
+                strategy.tickSuddenDeath(Math.max(0, Number(dt) || 0));
+            }
+        }
+        this._arcadeSuddenDeathOverlay?.classList?.toggle('hidden', !suddenDeathActive);
+
+        const sectorIndex = Math.max(0, Math.floor(Number(hudState.sectorIndex) || 0));
+        if (sectorIndex > 0 && sectorIndex !== this._lastArcadeSectorIndex) {
+            this._arcadeTransitionVisibleUntilMs = nowMs + 1200;
+            if (this._arcadeSectorTransitionOverlay) {
+                const mapKey = String(hudState.currentMapKey || '').trim() || 'unknown';
+                this._arcadeSectorTransitionOverlay.textContent = `Sektor ${sectorIndex}  |  ${mapKey}`;
+                this._arcadeSectorTransitionOverlay.classList.remove('hidden');
+            }
+        }
+        this._lastArcadeSectorIndex = sectorIndex;
+        if (this._arcadeSectorTransitionOverlay) {
+            this._arcadeSectorTransitionOverlay.classList.toggle('hidden', nowMs >= this._arcadeTransitionVisibleUntilMs);
+        }
     }
 
     _setParcoursHudVisible(isVisible) {
@@ -342,7 +400,7 @@ export class HudRuntimeSystem {
         const fighterHudInterval = this._resolveFighterHudInterval();
         const fighterElapsed = this._consumeInterval('_fighterHudTimer', dt, fighterHudInterval);
         if (fighterElapsed > 0) {
-            this._updateArcadeHud();
+            this._updateArcadeHud(fighterElapsed);
         }
 
         // FIGHTER HUD UPDATE
@@ -374,5 +432,15 @@ export class HudRuntimeSystem {
         this._arcadeScoreHud?.dispose?.();
         this._arcadeMissionHud = null;
         this._arcadeScoreHud = null;
+        if (this._arcadeSuddenDeathOverlay?.parentElement) {
+            this._arcadeSuddenDeathOverlay.parentElement.removeChild(this._arcadeSuddenDeathOverlay);
+        }
+        if (this._arcadeSectorTransitionOverlay?.parentElement) {
+            this._arcadeSectorTransitionOverlay.parentElement.removeChild(this._arcadeSectorTransitionOverlay);
+        }
+        this._arcadeSuddenDeathOverlay = null;
+        this._arcadeSectorTransitionOverlay = null;
+        this._arcadeTransitionVisibleUntilMs = 0;
+        this._lastArcadeSectorIndex = 0;
     }
 }

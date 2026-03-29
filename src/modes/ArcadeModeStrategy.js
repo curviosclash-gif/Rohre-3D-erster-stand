@@ -36,6 +36,13 @@ const NULL_SLOT_BONUSES = Object.freeze({ turningBonusPct: 0, speedBonusPct: 0, 
 const SD_DAMAGE_STACK_MULTIPLIER = 0.1;
 // 61.6.2: Seconds between each additional stacked modifier in Sudden Death
 const SD_MODIFIER_STACK_INTERVAL_S = 30;
+const BASE_INTERMISSION_HEAL_PCT = 0.12;
+const SD_INTERMISSION_HEAL_PCT = 0.04;
+
+function toSafeInt(value, fallback = 0) {
+    const parsed = Math.floor(Number(value));
+    return Number.isFinite(parsed) ? parsed : fallback;
+}
 
 export class ArcadeModeStrategy extends GameModeContract {
     constructor() {
@@ -210,6 +217,55 @@ export class ArcadeModeStrategy extends GameModeContract {
         const before = Math.max(0, toSafe(player.hp, maxHp));
         player.hp = Math.min(maxHp, before + heal);
         return { healed: player.hp - before, hp: player.hp };
+    }
+
+    // 68.3.3: Intermission healing with mission/reward scaling.
+    applyIntermissionHealing(player, context = {}) {
+        if (!player || !player.alive) {
+            return { healed: 0, shieldGranted: 0, requestedHeal: 0 };
+        }
+        const maxHp = Math.max(1, toSafe(player.maxHp, DEFAULT_MAX_HP));
+        const missionTotal = Math.max(0, toSafeInt(context.totalMissions, 0));
+        const missionCompleted = Math.max(0, Math.min(missionTotal, toSafeInt(context.completedMissions, 0)));
+        const missionRatio = missionTotal > 0 ? missionCompleted / missionTotal : 0;
+        const rewardId = String(context.selectedRewardId || '').trim().toLowerCase();
+
+        let healPct = this._sdActive ? SD_INTERMISSION_HEAL_PCT : BASE_INTERMISSION_HEAL_PCT;
+        healPct += missionRatio * 0.08;
+        if (rewardId === 'run_armor_t1') healPct += 0.16;
+        if (rewardId === 'run_speed_t1') healPct += 0.08;
+        if (rewardId === 'run_pickup_t1') healPct += 0.06;
+        healPct = Math.max(0, Math.min(0.4, healPct));
+
+        const requestedHeal = Math.max(0, Math.round(maxHp * healPct));
+        const hpBefore = Math.max(0, toSafe(player.hp, maxHp));
+        let healed = 0;
+        if (this._sdActive) {
+            player.hp = Math.min(maxHp, hpBefore + requestedHeal);
+            healed = Math.max(0, player.hp - hpBefore);
+        } else {
+            const healResult = this.applyHealing(player, requestedHeal);
+            healed = Math.max(0, toSafe(healResult.healed, 0));
+        }
+
+        let shieldGranted = 0;
+        const spill = Math.max(0, requestedHeal - healed);
+        if (spill > 0) {
+            const shieldTopupFactor = rewardId === 'run_portal_t1' ? 1.0 : 0.5;
+            const maxShield = Math.max(0, toSafe(player.maxShieldHp, DEFAULT_SHIELD_HP));
+            const targetShield = Math.min(maxShield, Math.max(0, toSafe(player.shieldHP, 0)) + Math.round(spill * shieldTopupFactor));
+            shieldGranted = Math.max(0, targetShield - Math.max(0, toSafe(player.shieldHP, 0)));
+            if (shieldGranted > 0) {
+                player.shieldHP = targetShield;
+                player.hasShield = player.shieldHP > 0;
+            }
+        }
+
+        return {
+            healed,
+            shieldGranted,
+            requestedHeal,
+        };
     }
 
     resolveCollisionDamage(cause) {

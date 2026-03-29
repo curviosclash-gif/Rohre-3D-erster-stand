@@ -96,6 +96,16 @@ function createMetric(labelText, valueText = '-') {
     return { metric, value };
 }
 
+function resolveRuntimeFacade() {
+    if (typeof window === 'undefined') return null;
+    return window.GAME_INSTANCE?.runtimeFacade || null;
+}
+
+function showToast(message, tone = 'info', duration = 1300) {
+    if (typeof window === 'undefined') return;
+    window.GAME_INSTANCE?._showStatusToast?.(message, duration, tone);
+}
+
 function buildArcadeSurface(level3Body, ui) {
     const details = createElement('details', 'menu-section menu-accordion start-section-card arcade-inline-surface hidden');
     details.id = 'arcade-inline-surface';
@@ -153,12 +163,12 @@ function buildArcadeSurface(level3Body, ui) {
     postRunLine.id = 'arcade-post-run-line';
     postRunCard.appendChild(postRunLine);
     const postRunActions = createElement('div', 'arcade-surface-actions');
-    const replayButton = createElement('button', 'secondary-btn', t('menu.arcade.postrun.replay.label', 'Replay (Platzhalter)'));
+    const replayButton = createElement('button', 'secondary-btn', t('menu.arcade.postrun.replay.label', 'Replay/Fallback'));
     replayButton.type = 'button';
-    replayButton.id = 'btn-arcade-replay-placeholder';
-    const dailyButton = createElement('button', 'secondary-btn', t('menu.arcade.postrun.daily.label', 'Daily Seed (Platzhalter)'));
+    replayButton.id = 'btn-arcade-replay';
+    const dailyButton = createElement('button', 'secondary-btn', t('menu.arcade.postrun.daily.label', 'Daily starten'));
     dailyButton.type = 'button';
-    dailyButton.id = 'btn-arcade-daily-placeholder';
+    dailyButton.id = 'btn-arcade-daily';
     postRunActions.appendChild(replayButton);
     postRunActions.appendChild(dailyButton);
     postRunCard.appendChild(postRunActions);
@@ -200,8 +210,8 @@ function buildArcadeSurface(level3Body, ui) {
     ui.arcadeStartInlineButton = startRunButton;
     ui.arcadeSeedRerollButton = rerollSeedButton;
     ui.arcadeSeedCopyButton = copySeedButton;
-    ui.arcadeReplayPlaceholderButton = replayButton;
-    ui.arcadeDailyPlaceholderButton = dailyButton;
+    ui.arcadeReplayButton = replayButton;
+    ui.arcadeDailyButton = dailyButton;
 
     return {
         details,
@@ -257,6 +267,12 @@ export function setupArcadeMenuSurface(ctx = {}) {
     const refs = buildArcadeSurface(level3Body, ui);
     let activeSeed = loadSeed();
     let lastRunSnapshot = loadLastRunSnapshot();
+    const applySeedToSettings = (seedValue) => {
+        if (!settings.arcade || typeof settings.arcade !== 'object') {
+            settings.arcade = {};
+        }
+        settings.arcade.seed = toInt(seedValue, 0);
+    };
 
     // Setup Vehicle Manager (V57)
     const vehicleManager = setupArcadeVehicleManager({
@@ -283,20 +299,47 @@ export function setupArcadeMenuSurface(ctx = {}) {
         const difficulty = normalizeString(settings?.botDifficulty, 'NORMAL').toUpperCase();
         const botCount = toInt(settings?.numBots, 0);
         const dailySeed = computeDailySeed();
+        const runtimeState = resolveRuntimeFacade()?.arcadeRunRuntime?.getMenuSurfaceState?.() || null;
+        const records = runtimeState?.records && typeof runtimeState.records === 'object' ? runtimeState.records : null;
+        const replayState = runtimeState?.replay && typeof runtimeState.replay === 'object' ? runtimeState.replay : null;
+        const postRunSummary = runtimeState?.postRunSummary && typeof runtimeState.postRunSummary === 'object'
+            ? runtimeState.postRunSummary
+            : null;
+        const intermission = runtimeState?.intermission && typeof runtimeState.intermission === 'object'
+            ? runtimeState.intermission
+            : null;
 
-        refs.runLine.textContent = `${t('menu.arcade.runline.label', 'Aktueller Arcade-Layer')}: ${mapKey} | Bots ${botCount} | ${difficulty}`;
+        const phaseLabel = runtimeState?.phase ? ` | ${String(runtimeState.phase).toUpperCase()}` : '';
+        refs.runLine.textContent = `${t('menu.arcade.runline.label', 'Aktueller Arcade-Layer')}: ${mapKey} | Bots ${botCount} | ${difficulty}${phaseLabel}`;
         refs.seedLine.textContent = `${t('menu.arcade.seed.current.label', 'Run-Seed')}: ${activeSeed} | ${t('menu.arcade.seed.daily.label', 'Daily')}: ${dailySeed}`;
 
-        refs.metricScore.textContent = String((botCount + 1) * 1000);
-        refs.metricMultiplier.textContent = botCount > 3 ? 'x1.8' : 'x1.2';
-        refs.metricSector.textContent = botCount > 3 ? '2' : '1';
-        refs.metricChain.textContent = botCount > 3 ? '6' : '3';
+        refs.metricScore.textContent = records ? String(Math.max(0, Math.round(Number(records.lastScore) || 0))) : '0';
+        refs.metricMultiplier.textContent = records
+            ? `x${Math.max(1, Number(records.lastMultiplier) || 1).toFixed(1)}`
+            : 'x1.0';
+        refs.metricSector.textContent = records
+            ? String(Math.max(0, Number(records.lastSector) || 0))
+            : (intermission ? String(Math.max(0, Number(intermission.nextSectorIndex) || 0)) : '0');
+        refs.metricChain.textContent = records
+            ? String(Math.max(0, Number(records.lastCombo) || 0))
+            : '0';
 
-        if (lastRunSnapshot) {
+        if (postRunSummary) {
+            refs.postRunLine.textContent = `Score ${Math.max(0, Math.round(Number(postRunSummary.score) || 0))} | Combo ${Math.max(0, Number(postRunSummary.bestCombo) || 0)} | Mission-Rate ${Math.round(Math.max(0, Math.min(1, Number(postRunSummary.missionCompletionRate) || 0)) * 100)}%`;
+        } else if (lastRunSnapshot) {
             const timeLabel = formatRunTime(lastRunSnapshot.at);
             refs.postRunLine.textContent = `${t('menu.arcade.postrun.last.label', 'Letzter Start')}: ${timeLabel} | ${lastRunSnapshot.mapKey} | ${lastRunSnapshot.vehicleId} | Seed ${lastRunSnapshot.seed}`;
         } else {
             refs.postRunLine.textContent = t('menu.arcade.postrun.empty', 'Noch kein Arcade-Run gestartet.');
+        }
+        if (replayState) {
+            refs.replayButton.disabled = replayState.payloadAvailable !== true;
+            refs.replayButton.title = replayState.payloadAvailable === true
+                ? 'Replay/Fallback aus letztem Run'
+                : 'Noch kein Replay verfuegbar';
+        } else {
+            refs.replayButton.disabled = true;
+            refs.replayButton.title = 'Noch kein Replay verfuegbar';
         }
 
         const profilesRaw = safeReadLocalStorage('cuviosclash.arcade-vehicle-profile.v1');
@@ -319,6 +362,7 @@ export function setupArcadeMenuSurface(ctx = {}) {
     };
 
     bind(refs.startRunButton, 'click', () => {
+        applySeedToSettings(activeSeed);
         recordRunStart();
         emit(eventTypes.START_MATCH);
     });
@@ -335,6 +379,7 @@ export function setupArcadeMenuSurface(ctx = {}) {
     });
 
     bind(refs.copySeedButton, 'click', () => {
+        applySeedToSettings(activeSeed);
         emit(eventTypes.SHOW_STATUS_TOAST, {
             message: `${t('menu.arcade.seed.challenge.toast', 'Challenge-Seed bereit')}: ${activeSeed}`,
             tone: 'info',
@@ -343,23 +388,36 @@ export function setupArcadeMenuSurface(ctx = {}) {
     });
 
     bind(refs.replayButton, 'click', () => {
-        emit(eventTypes.SHOW_STATUS_TOAST, {
-            message: t('menu.arcade.postrun.replay.toast', 'Replay-Hook folgt in V45.2.'),
-            tone: 'warning',
-            duration: 1300,
-        });
+        const result = resolveRuntimeFacade()?.arcadeRunRuntime?.requestReplayPlayback?.();
+        const code = String(result?.code || 'replay_unavailable');
+        if (code === 'replay_player_unavailable') {
+            showToast(t('menu.arcade.postrun.replay.toast.ready', 'Replay-Fallback bereit.'), 'warning', 1300);
+            return;
+        }
+        if (code === 'replay_disabled') {
+            showToast(t('menu.arcade.postrun.replay.toast.disabled', 'Replay ist deaktiviert.'), 'warning', 1300);
+            return;
+        }
+        showToast(t('menu.arcade.postrun.replay.toast.empty', 'Kein Replay verfuegbar.'), 'info', 1200);
     });
 
     bind(refs.dailyButton, 'click', () => {
+        activeSeed = computeDailySeed();
+        saveSeed(activeSeed);
+        applySeedToSettings(activeSeed);
+        sync();
+        recordRunStart();
         emit(eventTypes.SHOW_STATUS_TOAST, {
-            message: `${t('menu.arcade.postrun.daily.toast', 'Daily-Seed-Hook folgt in V45.8')}: ${computeDailySeed()}`,
-            tone: 'warning',
+            message: `${t('menu.arcade.postrun.daily.toast', 'Daily-Challenge startet mit Seed')}: ${activeSeed}`,
+            tone: 'info',
             duration: 1400,
         });
+        emit(eventTypes.START_MATCH);
     });
 
     if (ui.startButton) {
         bind(ui.startButton, 'click', () => {
+            applySeedToSettings(activeSeed);
             recordRunStart();
         });
     }

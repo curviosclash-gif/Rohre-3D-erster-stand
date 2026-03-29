@@ -3679,6 +3679,203 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         await returnToMenu(page);
     });
 
+    test('T68b: Arcade-HUD zeigt Combo-Decay, Sudden-Death-Overlay und Sektor-Transition', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => window.GAME_INSTANCE?.state === 'PLAYING', null, { timeout: 60000 });
+
+        const visualState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const runtime = game?.runtimeFacade?.arcadeRunRuntime;
+            if (!runtime || !runtime._state) return null;
+            const nowMs = Date.now();
+            runtime._state = {
+                ...runtime._state,
+                phase: 'sudden_death',
+                sectorIndex: 5,
+                completedSectors: 4,
+                currentMapKey: 'maze',
+                suddenDeathStartedAtMs: nowMs - 12000,
+                score: {
+                    ...(runtime._state.score || {}),
+                    total: 4200,
+                    combo: 7,
+                    multiplier: 3.5,
+                    lastComboAtMs: nowMs - 7200,
+                    breakdown: {
+                        ...((runtime._state.score && runtime._state.score.breakdown) || {}),
+                        base: 420,
+                        survival: 700,
+                        kills: 590,
+                        cleanSector: 120,
+                        risk: 70,
+                        penalty: 80,
+                        total: 1820,
+                    },
+                },
+            };
+            game.hudRuntimeSystem._lastArcadeSectorIndex = 4;
+            game.hudRuntimeSystem.updatePlayingHudTick(0.06);
+            const scoreRoot = document.getElementById('arcade-score-hud');
+            const comboMetric = scoreRoot?.querySelector('.arcade-score-hud-metric');
+            const sdOverlay = document.getElementById('arcade-sudden-death-overlay');
+            const transitionOverlay = document.getElementById('arcade-sector-transition-overlay');
+            return {
+                hudVisible: !!scoreRoot && window.getComputedStyle(scoreRoot).display !== 'none',
+                edgeGlow: scoreRoot?.classList.contains('is-edge-glow') || false,
+                suddenDeathHud: scoreRoot?.classList.contains('is-sudden-death') || false,
+                comboDecaying: comboMetric?.classList.contains('is-decaying') || false,
+                suddenDeathOverlayVisible: !!sdOverlay && !sdOverlay.classList.contains('hidden'),
+                transitionVisible: !!transitionOverlay && !transitionOverlay.classList.contains('hidden'),
+                transitionText: String(transitionOverlay?.textContent || ''),
+            };
+        });
+
+        expect(visualState).not.toBeNull();
+        expect(visualState.hudVisible).toBeTruthy();
+        expect(visualState.edgeGlow).toBeTruthy();
+        expect(visualState.suddenDeathHud).toBeTruthy();
+        expect(visualState.comboDecaying).toBeTruthy();
+        expect(visualState.suddenDeathOverlayVisible).toBeTruthy();
+        expect(visualState.transitionVisible).toBeTruthy();
+        expect(visualState.transitionText).toContain('Sektor 5');
+
+        await returnToMenu(page);
+    });
+
+    test('T68c: Arcade-Intermission/Post-Run-Panel mit Reward-Choice und Replay-Fallback', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => window.GAME_INSTANCE?.state === 'PLAYING', null, { timeout: 60000 });
+
+        const state = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const runtime = game?.runtimeFacade?.arcadeRunRuntime;
+            if (!game || !runtime || !runtime._state) return null;
+            runtime.setStrategy?.({
+                applyIntermissionHealing: (player) => {
+                    const before = Math.max(0, Number(player?.hp) || 0);
+                    const maxHp = Math.max(1, Number(player?.maxHp) || 100);
+                    const nextHp = Math.min(maxHp, before + 24);
+                    player.hp = nextHp;
+                    return { healed: Math.max(0, nextHp - before), shieldGranted: 0, requestedHeal: 24 };
+                },
+            });
+            const nowMs = Date.now();
+            runtime._state.mapSequence = ['parcours_rift', 'maze', 'trench'];
+            runtime._state.encounterSequence = [
+                { templateId: 'sector_intro', objectiveId: 'survive_window', squadId: 'scout_duo', modifierId: 'tight_turns', scoreBonus: 0.08 },
+                { templateId: 'sector_pressure', objectiveId: 'bounty_hunt', squadId: 'striker_tri', modifierId: 'heat_stress', scoreBonus: 0.12 },
+                { templateId: 'sector_hazard', objectiveId: 'hazard_lane', squadId: 'hunter_pack', modifierId: 'portal_storm', scoreBonus: 0.15 },
+            ];
+            runtime._state.lastSectorSummary = {
+                sectorIndex: 2,
+                awardedPoints: 1440,
+                multiplierApplied: 3,
+                comboAtSectorEnd: 8,
+                breakdown: { base: 220, survival: 410, kills: 300, cleanSector: 0, risk: 80, penalty: 20, total: 990 },
+            };
+            runtime._state.lastSectorXp = { earned: 180 };
+            runtime._state.completedSectors = 2;
+            runtime._state.sectorIndex = 2;
+            runtime._state.phase = 'intermission';
+            runtime._missionState = {
+                missions: [{ completed: true }, { completed: false }, { completed: true }],
+                completedCount: 2,
+                allCompleted: false,
+            };
+            runtime._prepareIntermission(nowMs);
+
+            game.state = 'ROUND_END';
+            game.ui.messageOverlay.classList.remove('hidden');
+            game.matchFlowUiController.applyMatchUiState({ visibility: { messageOverlayHidden: false }, overlayStats: null });
+            const intermissionPanel = document.getElementById('arcade-overlay-panel');
+            const choiceButtons = Array.from(document.querySelectorAll('[data-arcade-choice-id]'));
+            const rewardButtons = Array.from(document.querySelectorAll('[data-arcade-reward-id]'));
+            if (choiceButtons[1]) choiceButtons[1].click();
+            if (rewardButtons[1]) rewardButtons[1].click();
+            const selectedChoiceId = String(runtime._state?.intermission?.selectedChoiceId || '');
+            const selectedRewardId = String(runtime._state?.intermission?.selectedRewardId || '');
+
+            runtime.beginNextSector();
+            const syntheticPlayer = {
+                isBot: false,
+                alive: true,
+                maxHp: 120,
+                hp: 40,
+                maxShieldHp: 40,
+                shieldHP: 0,
+                hasShield: false,
+            };
+            const beforeHp = syntheticPlayer.hp;
+            const healResult = runtime.applyPendingIntermissionEffects({ players: [syntheticPlayer] }) || null;
+            const afterHp = syntheticPlayer.hp;
+
+            runtime._latestReplaySnapshot = {
+                matchId: 'arcade-run-replay',
+                initialState: { seed: 42 },
+                actions: [],
+            };
+            runtime._state.postRunSummary = {
+                score: 4820,
+                bestCombo: 11,
+                missionCompletionRate: 0.67,
+                xpEarned: 240,
+                peakMultiplier: 4,
+                xpAnimation: { durationMs: 260 },
+                scorePerSector: [
+                    { sectorIndex: 1, mapKey: 'parcours_rift', awardedPoints: 1200 },
+                    { sectorIndex: 2, mapKey: 'maze', awardedPoints: 1440 },
+                ],
+            };
+            runtime._state.replay = { runReplayId: 'arcade-run-replay', playbackEnabled: true };
+            game.state = 'MATCH_END';
+            game.matchFlowUiController.applyMatchUiState({ visibility: { messageOverlayHidden: false }, overlayStats: null });
+
+            const postRunPanel = document.getElementById('arcade-overlay-panel');
+            const replayBtn = document.getElementById('btn-arcade-overlay-replay');
+            if (replayBtn) replayBtn.click();
+            return {
+                intermissionVisible: !!intermissionPanel && !intermissionPanel.classList.contains('hidden'),
+                intermissionChoiceCount: choiceButtons.length,
+                intermissionRewardCount: rewardButtons.length,
+                selectedChoiceId,
+                selectedRewardId,
+                healedDelta: Math.max(0, afterHp - beforeHp),
+                healedPlayers: Math.max(0, Number(healResult?.playersAffected) || 0),
+                postRunVisible: !!postRunPanel && !postRunPanel.classList.contains('hidden'),
+                replayCode: String(game.runtimeFacade.arcadeRunRuntime?.requestReplayPlayback?.()?.code || ''),
+                replayButtonExists: !!replayBtn,
+                menuReplayLabel: String(document.querySelector('#btn-arcade-replay')?.textContent || ''),
+                menuDailyLabel: String(document.querySelector('#btn-arcade-daily')?.textContent || ''),
+            };
+        });
+
+        expect(state).not.toBeNull();
+        expect(state.intermissionVisible).toBeTruthy();
+        expect(state.intermissionChoiceCount).toBeGreaterThanOrEqual(2);
+        expect(state.intermissionRewardCount).toBeGreaterThanOrEqual(2);
+        expect(state.selectedChoiceId).not.toBe('');
+        expect(state.selectedRewardId).not.toBe('');
+        expect(state.healedDelta).toBeGreaterThan(0);
+        expect(state.healedPlayers).toBeGreaterThan(0);
+        expect(state.postRunVisible).toBeTruthy();
+        expect(state.replayCode).toBe('replay_player_unavailable');
+        expect(state.replayButtonExists).toBeTruthy();
+        expect(state.menuReplayLabel).toContain('Replay');
+        expect(state.menuReplayLabel).not.toContain('Platzhalter');
+        expect(state.menuDailyLabel).toContain('Daily');
+        expect(state.menuDailyLabel).not.toContain('Platzhalter');
+
+        await returnToMenu(page);
+    });
+
     test('T20y: Sticky Startleiste bleibt sichtbar und nutzt strukturierte Summary-Bloecke', async ({ page }) => {
         await loadGame(page);
         await openGameSubmenu(page);

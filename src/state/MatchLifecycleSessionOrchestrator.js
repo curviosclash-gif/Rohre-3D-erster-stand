@@ -128,6 +128,9 @@ export class MatchLifecycleSessionOrchestrator {
 
         game.recorder.startRound(game.entityManager.players);
         game.entityManager.spawnAll();
+        game.runtimeFacade?.arcadeRunRuntime?.applyPendingIntermissionEffects?.({
+            players: game.entityManager.players,
+        });
         for (const player of game.entityManager.getHumanPlayers()) {
             player.planarAimOffset = 0;
         }
