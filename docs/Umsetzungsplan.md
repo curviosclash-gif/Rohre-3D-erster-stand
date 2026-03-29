@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-29 (V60 und V61 abgeschlossen; offene Restpunkte nach V67/V68 ueberfuehrt; V65 abgeschlossen inkl. 65.99-Gate und Smoke-Evidence; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG neu angelegt)
+Stand: 2026-03-29 (V60 und V61 abgeschlossen; offene Restpunkte nach V67/V68 ueberfuehrt; V65 abgeschlossen inkl. 65.99-Gate und Smoke-Evidence; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG neu angelegt; V70 Settings-/Preset-Stabilisierung geplant)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/Backlog.md`.
@@ -64,6 +64,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V68 | V66 | soft | ja | V66 und V68 koennen parallel laufen, solange gemeinsame Arcade-UI-Contracts stabil bleiben |
 | V69 | V63.99 | soft | ja | Fight-/Hunt-Baseline und bestehende Characterization-Tests aus V63 sind abgeschlossen und bilden die Balancing-Basis |
 | V69 | V68 | soft | ja | V69 greift primar Fight/Hunt-Combat an; parallel zu V68 moeglich bei stabilen Shared-UI-Contracts |
+| V70 | V53.99 | hard | ja | Settings-Decomposition liefert Sanitizer-/Store-Basis fuer den Drift-Fix |
+| V70 | V60.99 | soft | ja | Runtime-Orchestrierung und Menu-Event-Flows sind nach V60 stabilisiert und koennen gezielt gehaertet werden |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -78,6 +80,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `tests/core.spec.js` | V68 | aktiv | Bot-Codex seit 2026-03-29; Arcade-HUD, Intermission-UX und Replay-Follow-up nach Abschluss von V61 |
 | `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | geplant | Item-/Rocket-/Shield-/MG-Balance und Telemetrie-Konsolidierung fuer Fight/Hunt |
+| `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | geplant | Settings-/Preset-Drift-Fix fuer unbeabsichtigte Voreinstellungs-Aenderungen (Auto-Korrektur, ModePath/Preset, Persistenz) |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -95,6 +98,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | active | in Bearbeitung: 68.1-68.99 |
 | - | V69 | - | frei | Balance-Plan angelegt; Start nach expliziter Priorisierung |
+| - | V70 | - | frei | geplant: Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -113,7 +117,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ## Parallelisierungs-Empfehlung (Stand: 2026-03-29, aktualisiert)
 
-V60, V61 und V67 sind abgeschlossen. Aktive Planung liegt auf V66 und V68.
+V60, V61 und V67 sind abgeschlossen. Aktive Planung liegt auf V66, V68, V69 und V70.
 
 | Spur | Bloecke | Hinweis |
 | --- | --- | --- |
@@ -122,8 +126,9 @@ V60, V61 und V67 sind abgeschlossen. Aktive Planung liegt auf V66 und V68.
 | C | **V68** | Arcade-HUD/Intermission/Replay-Follow-up aus V61 |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
 | E | **V69** | Item-/Rocket-/Shield-/MG-Balance fuer Fight/Hunt (Telemetry + Tuning) |
+| F | **V70** | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen |
 
-Empfehlung: 2-3 Agents parallel auf A + C + E; Spur D nach Scope-Definition.
+Empfehlung: 2-3 Agents parallel auf A + C + E; Spur F kann parallel starten, da sie primaer Settings-/UI-Konsistenz betrifft. Spur D nach Scope-Definition.
 
 ---
 
@@ -143,6 +148,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | neu: uebernommene V61-Restpunkte umsetzen | Geplant |
 | V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
+| V70 | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen | `docs/Umsetzungsplan.md` | hoch | mittel | P1 | 70.1 Auto-Mutationspfade identifizieren und fixieren | Geplant |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
@@ -877,8 +883,8 @@ Scope:
 
 ### 68.1 Score-/Modifier-HUD
 
-- [ ] 68.1.1 `ArcadeMissionHUD.js` + neues `ArcadeScoreHUD.js`: Score-Breakdown (Base/Survival/Clean/Risk/Penalty), Echtzeit-Score, Combo-Counter und Multiplier-Badge anzeigen.
-- [ ] 68.1.2 Aktiven Modifier im HUD mit Icon/Label/Effektbeschreibung anzeigen; Anzeige bei Sektorwechsel konsistent aktualisieren.
+- [x] 68.1.1 `ArcadeMissionHUD.js` + neues `ArcadeScoreHUD.js`: Score-Breakdown (Base/Survival/Clean/Risk/Penalty), Echtzeit-Score, Combo-Counter und Multiplier-Badge anzeigen. (abgeschlossen: 2026-03-29; evidence: npm run test:core -> tests/core.spec.js (T68a PASS), npm run build -> PASS)
+- [x] 68.1.2 Aktiven Modifier im HUD mit Icon/Label/Effektbeschreibung anzeigen; Anzeige bei Sektorwechsel konsistent aktualisieren. (abgeschlossen: 2026-03-29; evidence: npm run test:core -> tests/core.spec.js (T68a Modifier-Switch PASS), npm run build -> PASS)
 
 ### 68.2 In-Game-Feedback und Transition-Polish
 
@@ -981,6 +987,62 @@ Scope:
 
 ---
 
+## Block V70: Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen
+
+Plan-Datei: `docs/Umsetzungsplan.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V53.99 -->
+
+Scope:
+
+- Unerwuenschte Auto-Mutationen von Settings beseitigen (ModePath/Preset, Compatibility-Autofix, UI-Sync-Seiteneffekte).
+- Persistenz- und Migrationspfad so haerten, dass Nutzerwerte nicht still driftend ueberschrieben werden.
+- Save-Semantik klarziehen (explizites Speichern vs. gezielte Auto-Saves) und vertraglich testen.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 70.1 bis 70.4 und 70.99 sind abgeschlossen.
+- [ ] DoD.2 Settings aendern sich ohne explizite User-Aktion nicht mehr still durch reine UI-Sync-Laeufe.
+- [ ] DoD.3 ModePath-/Preset-/Map-Elegibility-Verhalten ist konsistent und ohne widerspruechliche Doppelkorrekturen.
+- [ ] DoD.4 Versionierte Migrationen sind reproduzierbar; veraltete Snapshots werden deterministisch ueberfuehrt statt wiederholt hart ersetzt.
+- [ ] DoD.5 `npm run build`, `npm run test:core`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS.
+
+### 70.1 Auto-Mutationspfade entkoppeln
+
+- [ ] 70.1.1 `UIStartSyncController` so refactoren, dass `syncStartSetupState()` keine stillen Runtime-Schreibzugriffe mehr fuer Map/Fahrzeug ausfuehrt; Normalisierung auf explizite User- oder Import-Aktionen begrenzen.
+- [ ] 70.1.2 `RuntimeSettingsChangeOrchestrator` + `MenuCompatibilityRules` so zuschneiden, dass Korrekturen nur bei tatsaechlichen Vertragsverletzungen und nicht bei jedem Sync-Render durchlaufen.
+
+### 70.2 ModePath-/Preset- und Session-Draft-Konsistenz
+
+- [ ] 70.2.1 `MenuRuntimeSessionService` und Preset-Mapping (`MODE_PATH_TO_PRESET_ID`) mit Map-Elegibility-Regeln harmonisieren, damit kein Preset-Wert direkt vom naechsten Kompatibilitaetslauf wieder gekippt wird.
+- [ ] 70.2.2 Session-Draft-Verhalten (`switchSessionType`, `applySessionDraft`) fuer Nutzer nachvollziehbar und reproduzierbar machen; automatische Ruecksetzungen (`modePath`) nur bei klaren Fehlerfaellen.
+
+### 70.3 Persistenz-/Migrationspfad und Save-Semantik haerten
+
+- [ ] 70.3.1 Settings-Version-Migration so erweitern, dass alte Snapshots kontrolliert auf den neuen Vertrag ueberfuehrt und anschliessend stabil gespeichert werden (kein wiederholter Hard-Reset bei jedem Start).
+- [ ] 70.3.2 Auto-Save-Ausnahmen (insb. Event-Playlist-Quickstart) explizit dokumentieren und technisch begrenzen, damit Baseline-Voreinstellungen nicht unbeabsichtigt driftend persistiert werden.
+
+### 70.4 Test- und Diagnoseabdeckung
+
+- [ ] 70.4.1 `tests/core.spec.js` um Charakterisierung erweitern: reine `syncAll`-/`syncByChangeKeys`-Laeufe duerfen ohne Input keine Settings-Mutation erzeugen.
+- [ ] 70.4.2 End-to-End-Tests fuer ModePath/Preset/Draft/Migration-Szenarien ergaenzen (inkl. Reload), sodass unbeabsichtigte Voreinstellungs-Aenderungen reproduzierbar abgefangen werden.
+
+### 70.99 Integrations- und Abschluss-Gate
+
+- [ ] 70.99.1 `npm run build`, `npm run test:core` sind fuer den Scope gruen.
+- [ ] 70.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+
+### Risiko-Register V70
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Entfernen von Auto-Korrekturen laesst echte Inkonsistenzen unentdeckt | hoch | Core/UI | Characterization-Tests vor Refactor und Guarded-Fallbacks bei Vertragsverletzung | Nutzer landet mit unstartbarem Setup |
+| Save-Semantik-Aenderungen brechen erwartete Quickstart-Workflows | mittel | UI/Core | Auto-Save nur fuer klar benannte Pfade, UX-Copy + Tests fuer Reload-Verhalten | Event-Playlist-/Quickstart-Verhalten wirkt regressiv |
+| Migrationspfad fuer alte Settings verliert Felder oder Profile | hoch | Core/Storage | Einmalige Migrations-Tests mit Legacy-Snapshots und persistierter Nachkontrolle | Alte Browserdaten gehen nach Update verloren |
+
+---
+
 ## Abgeschlossene Bloecke (archiviert)
 
 | Block | Grund | Plan-Datei | Archiv-Pfad |
@@ -1008,12 +1070,12 @@ Scope:
 Stand: 2026-03-29
 
 - Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65.
-- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66, V68 und V69.
+- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66, V68, V69 und V70.
 - Naechste 3 Ziele:
   1. V66 starten: Vehicle-Manager UX mit 3D-Preview und Filter-/Loadout-Flows.
   2. V68 umsetzen: Arcade HUD/Intermission/Replay-Restpunkte aus V61.
-  3. V69 starten: Fight/Hunt-Balance fuer Item/Raketen/Schild/MG ueber KPI-Baseline und Tuning-Phasen.
-- Plan-Bereinigung (2026-03-29): aktive In-Bearbeitung-Spuren geschlossen; Restarbeiten in V68 gebuendelt und neuer Combat-Balance-Block V69 angelegt.
+  3. V70 starten: Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen.
+- Plan-Bereinigung (2026-03-29): aktive In-Bearbeitung-Spuren geschlossen; Restarbeiten in V68 gebuendelt, Combat-Balance als V69 und Settings-/Preset-Stabilisierung als V70 angelegt.
 
 ## Dokumentations-Hook
 
