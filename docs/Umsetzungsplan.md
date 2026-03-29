@@ -73,7 +73,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/*Lobby.js`, `src/ui/menu/testing/**`, `tests/core.spec.js`, `tests/stress.spec.js` | V60 | abgeschlossen | Audit-Restarbeiten abgeschlossen; tieferer Netzwerk-Nachweis in V67.4.5 gebuendelt |
 | `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
-| `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | aktiv | Bot-Codex seit 2026-03-29; Multiplayer-Netzwerk-Haertung: ICE-Fix, Retry-Logik, Reconciler-Erweiterung, Ghost-Cleanup |
+| `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `tests/core.spec.js` | V68 | geplant | Arcade-HUD, Intermission-UX und Replay-Follow-up nach Abschluss von V61 |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -89,7 +89,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
 | Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
-| Bot-Codex | V67 | 2026-03-29 | active | in Bearbeitung: 67.1-67.99 |
+| Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | - | V68 | - | frei | Follow-up fuer V61-Rest: HUD, Intermission, Replay |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -109,12 +109,12 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ## Parallelisierungs-Empfehlung (Stand: 2026-03-29, aktualisiert)
 
-V60 und V61 sind abgeschlossen. Aktive Planung liegt auf V66, V67 und V68.
+V60, V61 und V67 sind abgeschlossen. Aktive Planung liegt auf V66 und V68.
 
 | Spur | Bloecke | Hinweis |
 | --- | --- | --- |
 | A | **V66** | Vehicle-Manager-UX (3D-Preview, Kategorien, Upgrade-Flows) |
-| B | **V67** | Multiplayer-Netzwerk-Haertung inkl. uebernommener 60.4.4-Charakterisierung |
+| B | **V67** | abgeschlossen 2026-03-29 (inkl. 67.4.5 Characterization) |
 | C | **V68** | Arcade-HUD/Intermission/Replay-Follow-up aus V61 |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
 
@@ -135,10 +135,10 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | abgeschlossen; HUD-/Intermission-/Replay-Rest in V68 ueberfuehrt | Abgeschlossen |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
 | V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
-| V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | startklar; enthaelt uebernommene 60.4.4-Charakterisierung in 67.4.5 | Geplant |
+| V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | neu: uebernommene V61-Restpunkte umsetzen | Geplant |
 
-Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
+Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
 ---
 
@@ -781,7 +781,7 @@ Scope:
 
 ## Block V67: Multiplayer-Netzwerk-Haertung - ICE, Retry, Reconciler, Ghost-Cleanup
 
-<!-- LOCK: Bot-Codex seit 2026-03-29 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V60.99, V59.99 -->
 
 Scope:
@@ -796,42 +796,42 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 67.1 bis 67.4 und 67.99 sind abgeschlossen.
-- [ ] DoD.2 ICE-Candidate-Race ist behoben und durch einen Test abgedeckt.
-- [ ] DoD.3 WebSocket-/HTTP-Retry mit Backoff ist implementiert und konfigurierbar.
-- [ ] DoD.4 `npm run test:core` und `npm run build` sind gruen; neue Netzwerk-Tests decken Disconnect, Reconnect, Heartbeat-Timeout und Host-Disconnect ab.
+- [x] DoD.1 Alle Phasen 67.1 bis 67.4 und 67.99 sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: 67.1-67.4 + 67.99 vollstaendig auf [x], inklusive Code- und Test-Commits `7738e35`, `b05f337`)
+- [x] DoD.2 ICE-Candidate-Race ist behoben und durch einen Test abgedeckt. (abgeschlossen: 2026-03-29; evidence: `67.4.1` in `tests/network-adapter.spec.js` gegen directionale ICE-Queues (`server/lan-signaling.js`) -> `TEST_PORT=5333 PW_RUN_TAG=v67-network-r2 PW_OUTPUT_DIR=test-results/v67-network-r2 ... tests/network-adapter.spec.js` PASS)
+- [x] DoD.3 WebSocket-/HTTP-Retry mit Backoff ist implementiert und konfigurierbar. (abgeschlossen: 2026-03-29; evidence: `OnlineSessionAdapter.connect()` + `OnlineMatchLobby._makeConnectPromise()` mit Retry/Backoff und `maxConnectAttempts<=3`; `67.2`-Tests PASS -> `test-results/v67-network-r2`)
+- [x] DoD.4 `npm run test:core` und `npm run build` sind gruen; neue Netzwerk-Tests decken Disconnect, Reconnect, Heartbeat-Timeout und Host-Disconnect ab. (abgeschlossen: 2026-03-29; evidence: `TEST_PORT=5334 PW_RUN_TAG=v67-core-r2 PW_OUTPUT_DIR=test-results/v67-core-r2 npm run test:core` PASS; `TEST_PORT=5333 ... tests/network-adapter.spec.js` PASS; `npm run build` PASS)
 
 ### 67.1 Kritische Verbindungsfehler beheben
 
-- [ ] 67.1.1 ICE-Candidate Double-Deletion in `LANSessionAdapter._pollIceCandidates()` fixen: separate Maps fuer Host'Client und Client'Host Kandidaten einfuehren, oder non-destructive Peek statt `delete`-on-read.
-- [ ] 67.1.2 `OnlineMatchLobby._handleMessage()` gegen mehrfachen `connectReject`-Aufruf absichern (Guard-Flag analog zu `settled` in `OnlineSessionAdapter.connect()`).
-- [ ] 67.1.3 Offer-Polling-Timeout in `LANSessionAdapter._joinAsClient()` erhoehen und exponentiellen Backoff einfuehren (statt 30-200ms konstant).
+- [x] 67.1.1 ICE-Candidate Double-Deletion in `LANSessionAdapter._pollIceCandidates()` fixen: separate Maps fuer Host'Client und Client'Host Kandidaten einfuehren, oder non-destructive Peek statt `delete`-on-read. (abgeschlossen: 2026-03-29; evidence: directionale ICE-Queues + selektives `fromPlayerId`-Polling in `server/lan-signaling.js`/`LANSessionAdapter.js`; commit `7738e35`)
+- [x] 67.1.2 `OnlineMatchLobby._handleMessage()` gegen mehrfachen `connectReject`-Aufruf absichern (Guard-Flag analog zu `settled` in `OnlineSessionAdapter.connect()`). (abgeschlossen: 2026-03-29; evidence: `connectState.rejected` Guard + single-shot reject in `OnlineMatchLobby.js`; commit `7738e35`)
+- [x] 67.1.3 Offer-Polling-Timeout in `LANSessionAdapter._joinAsClient()` erhoehen und exponentiellen Backoff einfuehren (statt 30-200ms konstant). (abgeschlossen: 2026-03-29; evidence: `JOIN_OFFER_MAX_WAIT_MS` + exponentieller Backoff in `LANSessionAdapter.js`; commit `7738e35`)
 
 ### 67.2 Retry- und Resilience-Logik
 
-- [ ] 67.2.1 `OnlineSessionAdapter.connect()` um konfigurierbare Retry-Logik mit exponentiellem Backoff erweitern (max 3 Versuche, 1s/2s/4s).
-- [ ] 67.2.2 `OnlineMatchLobby._makeConnectPromise()` analog absichern: WebSocket-Verbindungsaufbau mit Retry statt Single-Shot.
-- [ ] 67.2.3 `DataChannelManager.sendToAll()` um Backpressure-Erkennung erweitern: bei vollem Channel `bufferedAmount` pruefen und Callback/Event emittieren statt stille Drops.
-- [ ] 67.2.4 `LatencyMonitor` nur bei verbundenen Peers pingen; bei leerer Peer-Liste Heartbeat pausieren.
+- [x] 67.2.1 `OnlineSessionAdapter.connect()` um konfigurierbare Retry-Logik mit exponentiellem Backoff erweitern (max 3 Versuche, 1s/2s/4s). (abgeschlossen: 2026-03-29; evidence: retry-fhige `_connectSingleAttempt`-Schleife mit Backoff/`maxConnectAttempts<=3` in `OnlineSessionAdapter.js`; commit `7738e35`)
+- [x] 67.2.2 `OnlineMatchLobby._makeConnectPromise()` analog absichern: WebSocket-Verbindungsaufbau mit Retry statt Single-Shot. (abgeschlossen: 2026-03-29; evidence: `_makeConnectAttempt` + Retry-Schleife in `OnlineMatchLobby.js`; commit `7738e35`)
+- [x] 67.2.3 `DataChannelManager.sendToAll()` um Backpressure-Erkennung erweitern: bei vollem Channel `bufferedAmount` pruefen und Callback/Event emittieren statt stille Drops. (abgeschlossen: 2026-03-29; evidence: Backpressure-Threshold + `backpressure`-Event/Callback in `DataChannelManager.js`; test `V67-67.2 DataChannelManager` PASS in `test-results/v67-network-r2`)
+- [x] 67.2.4 `LatencyMonitor` nur bei verbundenen Peers pingen; bei leerer Peer-Liste Heartbeat pausieren. (abgeschlossen: 2026-03-29; evidence: ping-loop startet/stoppt dynamisch nach Peer-Set in `LatencyMonitor.js`; test `V67-67.2 LatencyMonitor` PASS in `test-results/v67-network-r2`)
 
 ### 67.3 State-Synchronisation und Server-Cleanup
 
-- [ ] 67.3.1 `StateReconciler.reconcile()` auf Rotation, Velocity und aktive Effects erweitern; Snap-Threshold pro Feld konfigurierbar machen.
-- [ ] 67.3.2 `server/lan-signaling.js` um automatischen Ghost-Player-Cleanup erweitern: Spieler ohne Aktivitaet nach 60s aus `pending`/`players`-Liste entfernen.
-- [ ] 67.3.3 `RuntimeSessionLifecycleService.waitForRuntimePlayersLoaded()` Timeout dynamisch anpassen: pro Client 5s extra statt festes 10s-Fenster.
+- [x] 67.3.1 `StateReconciler.reconcile()` auf Rotation, Velocity und aktive Effects erweitern; Snap-Threshold pro Feld konfigurierbar machen. (abgeschlossen: 2026-03-29; evidence: Feld-spezifische Reconcile-Pfade + konfigurierbare Thresholds in `StateReconciler.js`; Snapshot erweitert in `GameStateSnapshot.js`; test `V67-67.3 StateReconciler` PASS in `test-results/v67-network-r2`)
+- [x] 67.3.2 `server/lan-signaling.js` um automatischen Ghost-Player-Cleanup erweitern: Spieler ohne Aktivitaet nach 60s aus `pending`/`players`-Liste entfernen. (abgeschlossen: 2026-03-29; evidence: `ghostPlayerTimeoutMs`/Cleanup-Loop + Activity-Touch in `server/lan-signaling.js`; test `V67-67.3 ghost-player cleanup` PASS in `test-results/v67-network-r2`)
+- [x] 67.3.3 `RuntimeSessionLifecycleService.waitForRuntimePlayersLoaded()` Timeout dynamisch anpassen: pro Client 5s extra statt festes 10s-Fenster. (abgeschlossen: 2026-03-29; evidence: dynamischer Timeout in `RuntimeSessionLifecycleService.js`; test `V67-67.3 waitForRuntimePlayersLoaded` PASS in `test-results/v67-network-r2`)
 
 ### 67.4 Test-Abdeckung erweitern
 
-- [ ] 67.4.1 Unit-Tests fuer ICE-Candidate-Handling: gleichzeitiges Polling darf keine Kandidaten verlieren.
-- [ ] 67.4.2 Unit-Tests fuer Heartbeat-Timeout: Disconnect-Event nach 5s ohne Pong.
-- [ ] 67.4.3 Unit-Tests fuer Reconnect-Window: Peer innerhalb 30s ' reconnected, nach 30s ' removed.
-- [ ] 67.4.4 Characterization-Test fuer Host-Disconnect: Clients erhalten `host_leaving` und raeumen auf.
-- [ ] 67.4.5 Integration-Test: Zwei-Tab-Multiplayer-Smoke mit >15s Stabilitaet inkl. Checks auf `runtimeConfig.session.networkEnabled`, Adapter-Typ (`LANSessionAdapter`/`OnlineSessionAdapter`) und Remote-Presence (uebernommener Scope aus 60.4.4).
+- [x] 67.4.1 Unit-Tests fuer ICE-Candidate-Handling: gleichzeitiges Polling darf keine Kandidaten verlieren. (abgeschlossen: 2026-03-29; evidence: neuer Test `67.4.1` in `tests/network-adapter.spec.js` -> PASS in `test-results/v67-network-r2`)
+- [x] 67.4.2 Unit-Tests fuer Heartbeat-Timeout: Disconnect-Event nach 5s ohne Pong. (abgeschlossen: 2026-03-29; evidence: neuer Test `67.4.2` (`PeerConnectionManager`) -> PASS in `test-results/v67-network-r2`)
+- [x] 67.4.3 Unit-Tests fuer Reconnect-Window: Peer innerhalb 30s ' reconnected, nach 30s ' removed. (abgeschlossen: 2026-03-29; evidence: neuer Test `67.4.3` (`SessionAdapterBase`) -> PASS in `test-results/v67-network-r2`)
+- [x] 67.4.4 Characterization-Test fuer Host-Disconnect: Clients erhalten `host_leaving` und raeumen auf. (abgeschlossen: 2026-03-29; evidence: neuer Test `67.4.4` + Cleanup im `HOST_LEAVING`-Pfad der Adapter -> PASS in `test-results/v67-network-r2`)
+- [x] 67.4.5 Integration-Test: Zwei-Tab-Multiplayer-Smoke mit >15s Stabilitaet inkl. Checks auf `runtimeConfig.session.networkEnabled`, Adapter-Typ (`LANSessionAdapter`/`OnlineSessionAdapter`) und Remote-Presence (uebernommener Scope aus 60.4.4). (abgeschlossen: 2026-03-29; evidence: neuer Zwei-Tab-Test `67.4.5` in `tests/network-adapter.spec.js` (16s Stability-Wait, network mapping + remote presence) -> PASS in `test-results/v67-network-r2`)
 
 ### 67.99 Integrations- und Abschluss-Gate
 
-- [ ] 67.99.1 `npm run test:core`, `npm run build` und neue Netzwerk-Tests sind gruen.
-- [ ] 67.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+- [x] 67.99.1 `npm run test:core`, `npm run build` und neue Netzwerk-Tests sind gruen. (abgeschlossen: 2026-03-29; evidence: `TEST_PORT=5334 PW_RUN_TAG=v67-core-r2 PW_OUTPUT_DIR=test-results/v67-core-r2 npm run test:core` PASS; `TEST_PORT=5333 PW_RUN_TAG=v67-network-r2 PW_OUTPUT_DIR=test-results/v67-network-r2 ... tests/network-adapter.spec.js` PASS; `npm run build` PASS)
+- [x] 67.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: `npm run plan:check` PASS; `npm run docs:sync` updated=0 missing=0; `npm run docs:check` PASS; V67 Lock auf `frei`, Ownership/Lock-Status/Pipeline aktualisiert)
 
 ### Risiko-Register V67
 
