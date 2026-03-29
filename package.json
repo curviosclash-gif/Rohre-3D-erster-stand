@@ -17,6 +17,8 @@
     "check:runtime:determinism": "node scripts/check-runtime-determinism.mjs",
     "check:runtime:encoding": "node scripts/check-runtime-encoding.mjs",
     "dev": "vite",
+    "dev:logged": "node scripts/dev-with-logs.mjs",
+    "logs:clean": "node scripts/clean-dev-temp-logs.mjs",
     "build": "vite build",
     "build:web": "vite build --mode web",
     "build:app": "vite build --mode app",
