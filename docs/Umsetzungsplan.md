@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-29 (V60, V61, V65, V67 und V68 abgeschlossen; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG neu angelegt; V70 Settings-/Preset-Stabilisierung geplant)
+Stand: 2026-03-29 (V60, V61, V65, V67, V68 und V70 abgeschlossen; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG aktiv)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/prozess/Backlog.md`.
@@ -80,7 +80,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/MatchFlowUiController.js`, `src/core/GameRuntimeFacade.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/shared/contracts/ArcadeRewardContract.js`, `src/ui/menu/MenuTextCatalog.js`, `style.css`, `tests/core.spec.js` | V68 | abgeschlossen | abgeschlossen 2026-03-29; 68.1-68.4 inkl. Intermission-/Post-Run-Loop und Replay-Fallback abgeschlossen |
 | `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | geplant | Item-/Rocket-/Shield-/MG-Balance und Telemetrie-Konsolidierung fuer Fight/Hunt |
-| `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | geplant | Settings-/Preset-Drift-Fix fuer unbeabsichtigte Voreinstellungs-Aenderungen (Auto-Korrektur, ModePath/Preset, Persistenz) |
+| `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | abgeschlossen | abgeschlossen 2026-03-29; Settings-/Preset-Drift-Fix inkl. Migration-/Autosave-Haertung und T70-Regressionstests |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -98,7 +98,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (68.1-68.4 + 68.99 inkl. test:core/test:stress/build/docs-gates) |
 | - | V69 | - | frei | Balance-Plan angelegt; Start nach expliziter Priorisierung |
-| - | V70 | - | frei | geplant: Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen |
+| Bot-Codex | V70 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -118,7 +118,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ## Parallelisierungs-Empfehlung (Stand: 2026-03-29, aktualisiert)
 
-V60, V61, V67 und V68 sind abgeschlossen. Aktive Planung liegt auf V66, V69 und V70.
+V60, V61, V67, V68 und V70 sind abgeschlossen. Aktive Planung liegt auf V66 und V69.
 
 | Spur | Bloecke | Hinweis |
 | --- | --- | --- |
@@ -127,9 +127,9 @@ V60, V61, V67 und V68 sind abgeschlossen. Aktive Planung liegt auf V66, V69 und 
 | C | **V68** | abgeschlossen 2026-03-29 (Intermission-/Post-Run-/Replay-Follow-up umgesetzt) |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
 | E | **V69** | Item-/Rocket-/Shield-/MG-Balance fuer Fight/Hunt (Telemetry + Tuning) |
-| F | **V70** | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen |
+| F | **V70** | abgeschlossen 2026-03-29 (Drift-Fix, Migration-/Autosave-Haertung, T70-Testabdeckung) |
 
-Empfehlung: 2-3 Agents parallel auf A + E + F; Spur D nach Scope-Definition.
+Empfehlung: 2 Agents parallel auf A + E; Spur D nach Scope-Definition.
 
 ---
 
@@ -149,7 +149,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/bot-training/Bot_Trainingsplan.md` g
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (68.1-68.4 + 68.99; HUD/Intermission/Post-Run/Replay-Fallback verifiziert) | Abgeschlossen |
 | V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
-| V70 | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen | `docs/Umsetzungsplan.md` | hoch | mittel | P1 | 70.1 Auto-Mutationspfade identifizieren und fixieren | Geplant |
+| V70 | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen | `docs/Umsetzungsplan.md` | hoch | mittel | P1 | abgeschlossen (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) | Abgeschlossen |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/prozess/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
@@ -1003,36 +1003,36 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 70.1 bis 70.4 und 70.99 sind abgeschlossen.
-- [ ] DoD.2 Settings aendern sich ohne explizite User-Aktion nicht mehr still durch reine UI-Sync-Laeufe.
-- [ ] DoD.3 ModePath-/Preset-/Map-Elegibility-Verhalten ist konsistent und ohne widerspruechliche Doppelkorrekturen.
-- [ ] DoD.4 Versionierte Migrationen sind reproduzierbar; veraltete Snapshots werden deterministisch ueberfuehrt statt wiederholt hart ersetzt.
-- [ ] DoD.5 `npm run build`, `npm run test:core`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS.
+- [x] DoD.1 Alle Phasen 70.1 bis 70.4 und 70.99 sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: 70.1-70.4 + 70.99 auf [x] -> docs/Umsetzungsplan.md)
+- [x] DoD.2 Settings aendern sich ohne explizite User-Aktion nicht mehr still durch reine UI-Sync-Laeufe. (abgeschlossen: 2026-03-29; evidence: npx playwright test tests/core.spec.js --grep "T70a|T20qa" -> PASS)
+- [x] DoD.3 ModePath-/Preset-/Map-Elegibility-Verhalten ist konsistent und ohne widerspruechliche Doppelkorrekturen. (abgeschlossen: 2026-03-29; evidence: npm run test:core -> PASS (T20x1, T70b, T20bb))
+- [x] DoD.4 Versionierte Migrationen sind reproduzierbar; veraltete Snapshots werden deterministisch ueberfuehrt statt wiederholt hart ersetzt. (abgeschlossen: 2026-03-29; evidence: npx playwright test tests/core.spec.js --grep "T70b" -> PASS)
+- [x] DoD.5 `npm run build`, `npm run test:core`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS. (abgeschlossen: 2026-03-29; evidence: npm run build && npm run test:core && npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
 
 ### 70.1 Auto-Mutationspfade entkoppeln
 
-- [ ] 70.1.1 `UIStartSyncController` so refactoren, dass `syncStartSetupState()` keine stillen Runtime-Schreibzugriffe mehr fuer Map/Fahrzeug ausfuehrt; Normalisierung auf explizite User- oder Import-Aktionen begrenzen.
-- [ ] 70.1.2 `RuntimeSettingsChangeOrchestrator` + `MenuCompatibilityRules` so zuschneiden, dass Korrekturen nur bei tatsaechlichen Vertragsverletzungen und nicht bei jedem Sync-Render durchlaufen.
+- [x] 70.1.1 `UIStartSyncController` so refactoren, dass `syncStartSetupState()` keine stillen Runtime-Schreibzugriffe mehr fuer Map/Fahrzeug ausfuehrt; Normalisierung auf explizite User- oder Import-Aktionen begrenzen. (abgeschlossen: 2026-03-29; evidence: commit aefcdfc)
+- [x] 70.1.2 `RuntimeSettingsChangeOrchestrator` + `MenuCompatibilityRules` so zuschneiden, dass Korrekturen nur bei tatsaechlichen Vertragsverletzungen und nicht bei jedem Sync-Render durchlaufen. (abgeschlossen: 2026-03-29; evidence: commit aefcdfc)
 
 ### 70.2 ModePath-/Preset- und Session-Draft-Konsistenz
 
-- [ ] 70.2.1 `MenuRuntimeSessionService` und Preset-Mapping (`MODE_PATH_TO_PRESET_ID`) mit Map-Elegibility-Regeln harmonisieren, damit kein Preset-Wert direkt vom naechsten Kompatibilitaetslauf wieder gekippt wird.
-- [ ] 70.2.2 Session-Draft-Verhalten (`switchSessionType`, `applySessionDraft`) fuer Nutzer nachvollziehbar und reproduzierbar machen; automatische Ruecksetzungen (`modePath`) nur bei klaren Fehlerfaellen.
+- [x] 70.2.1 `MenuRuntimeSessionService` und Preset-Mapping (`MODE_PATH_TO_PRESET_ID`) mit Map-Elegibility-Regeln harmonisieren, damit kein Preset-Wert direkt vom naechsten Kompatibilitaetslauf wieder gekippt wird. (abgeschlossen: 2026-03-29; evidence: commit aefcdfc)
+- [x] 70.2.2 Session-Draft-Verhalten (`switchSessionType`, `applySessionDraft`) fuer Nutzer nachvollziehbar und reproduzierbar machen; automatische Ruecksetzungen (`modePath`) nur bei klaren Fehlerfaellen. (abgeschlossen: 2026-03-29; evidence: commit aefcdfc)
 
 ### 70.3 Persistenz-/Migrationspfad und Save-Semantik haerten
 
-- [ ] 70.3.1 Settings-Version-Migration so erweitern, dass alte Snapshots kontrolliert auf den neuen Vertrag ueberfuehrt und anschliessend stabil gespeichert werden (kein wiederholter Hard-Reset bei jedem Start).
-- [ ] 70.3.2 Auto-Save-Ausnahmen (insb. Event-Playlist-Quickstart) explizit dokumentieren und technisch begrenzen, damit Baseline-Voreinstellungen nicht unbeabsichtigt driftend persistiert werden.
+- [x] 70.3.1 Settings-Version-Migration so erweitern, dass alte Snapshots kontrolliert auf den neuen Vertrag ueberfuehrt und anschliessend stabil gespeichert werden (kein wiederholter Hard-Reset bei jedem Start). (abgeschlossen: 2026-03-29; evidence: commit aefcdfc)
+- [x] 70.3.2 Auto-Save-Ausnahmen (insb. Event-Playlist-Quickstart) explizit dokumentieren und technisch begrenzen, damit Baseline-Voreinstellungen nicht unbeabsichtigt driftend persistiert werden. (abgeschlossen: 2026-03-29; evidence: commit aefcdfc)
 
 ### 70.4 Test- und Diagnoseabdeckung
 
-- [ ] 70.4.1 `tests/core.spec.js` um Charakterisierung erweitern: reine `syncAll`-/`syncByChangeKeys`-Laeufe duerfen ohne Input keine Settings-Mutation erzeugen.
-- [ ] 70.4.2 End-to-End-Tests fuer ModePath/Preset/Draft/Migration-Szenarien ergaenzen (inkl. Reload), sodass unbeabsichtigte Voreinstellungs-Aenderungen reproduzierbar abgefangen werden.
+- [x] 70.4.1 `tests/core.spec.js` um Charakterisierung erweitern: reine `syncAll`-/`syncByChangeKeys`-Laeufe duerfen ohne Input keine Settings-Mutation erzeugen. (abgeschlossen: 2026-03-29; evidence: npx playwright test tests/core.spec.js --grep "T70a|T20qa" -> PASS)
+- [x] 70.4.2 End-to-End-Tests fuer ModePath/Preset/Draft/Migration-Szenarien ergaenzen (inkl. Reload), sodass unbeabsichtigte Voreinstellungs-Aenderungen reproduzierbar abgefangen werden. (abgeschlossen: 2026-03-29; evidence: npx playwright test tests/core.spec.js --grep "T20bb|T70b" -> PASS)
 
 ### 70.99 Integrations- und Abschluss-Gate
 
-- [ ] 70.99.1 `npm run build`, `npm run test:core` sind fuer den Scope gruen.
-- [ ] 70.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+- [x] 70.99.1 `npm run build`, `npm run test:core` sind fuer den Scope gruen. (abgeschlossen: 2026-03-29; evidence: npm run build && npm run test:core -> PASS)
+- [x] 70.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: npm run plan:check && npm run docs:sync && npm run docs:check -> PASS)
 
 ### Risiko-Register V70
 
@@ -1061,6 +1061,7 @@ Scope:
 | V61 | abgeschlossen (mit Rest-Transfer nach V68) | `docs/Umsetzungsplan.md` | `docs/archive/plans/completed/` |
 | V63 | abgeschlossen | `docs/plaene/alt/Feature_Fight_Modus_Followup_V63.md` | `docs/archive/plans/completed/` |
 | V65 | abgeschlossen | `docs/plaene/alt/Feature_Map_Editor_UX_V65.md` | `docs/archive/plans/completed/` |
+| V70 | abgeschlossen | `docs/Umsetzungsplan.md` | `docs/archive/plans/completed/` |
 | N4-N7 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V49 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V41-D | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
@@ -1070,13 +1071,13 @@ Scope:
 
 Stand: 2026-03-29
 
-- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65, V67, V68.
-- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66, V69 und V70.
+- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65, V67, V68, V70.
+- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66 und V69.
 - Naechste 3 Ziele:
   1. V66 starten: Vehicle-Manager UX mit 3D-Preview und Filter-/Loadout-Flows.
   2. V69 starten: Fight/Hunt Combat-Balance fuer Item/Raketen/Schild/MG.
-  3. V70 starten: Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen.
-- Plan-Bereinigung (2026-03-29): V68 abgeschlossen; aktive In-Bearbeitung-Spuren liegen auf V66, V69 und V70.
+  3. V64 konkretisieren: Desktop/Electron-Scope und Priorisierung klaeren.
+- Plan-Bereinigung (2026-03-29): V68 und V70 abgeschlossen; aktive In-Bearbeitung-Spuren liegen auf V66 und V69.
 
 ## Dokumentations-Hook
 
