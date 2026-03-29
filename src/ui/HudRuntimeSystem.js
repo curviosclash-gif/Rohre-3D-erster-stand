@@ -3,6 +3,8 @@
 // ============================================
 
 import { CONFIG } from '../core/Config.js';
+import { ArcadeMissionHUD } from './arcade/ArcadeMissionHUD.js';
+import { ArcadeScoreHUD } from './arcade/ArcadeScoreHUD.js';
 
 function formatParcoursDurationMs(value) {
     const ms = Math.max(0, Number(value) || 0);
@@ -18,6 +20,8 @@ export class HudRuntimeSystem {
         this._fighterHudTimer = 0;
         /** @type {HTMLElement|null} */
         this._scoreboardContainer = null;
+        this._arcadeMissionHud = null;
+        this._arcadeScoreHud = null;
     }
 
     /**
@@ -144,6 +148,42 @@ export class HudRuntimeSystem {
             this._scoreboardContainer = null;
         }
         this._setParcoursHudVisible(false);
+        this._hideArcadeHud();
+    }
+
+    _ensureArcadeHud() {
+        if (!this._arcadeMissionHud) {
+            this._arcadeMissionHud = new ArcadeMissionHUD(document.body);
+        }
+        if (!this._arcadeScoreHud) {
+            this._arcadeScoreHud = new ArcadeScoreHUD(document.body);
+        }
+    }
+
+    _hideArcadeHud() {
+        this._arcadeMissionHud?.hide?.();
+        this._arcadeScoreHud?.hide?.();
+    }
+
+    _updateArcadeHud() {
+        const game = this.game;
+        const arcadeEnabled = game?.runtimeConfig?.arcade?.enabled === true;
+        const modePath = String(game?.settings?.localSettings?.modePath || '').trim().toLowerCase();
+        if (!arcadeEnabled || modePath !== 'arcade') {
+            this._hideArcadeHud();
+            return;
+        }
+
+        const arcadeRuntime = game?.runtimeFacade?.arcadeRunRuntime;
+        const hudState = arcadeRuntime?.getHudState?.();
+        if (!hudState || hudState.phase === 'finished') {
+            this._hideArcadeHud();
+            return;
+        }
+
+        this._ensureArcadeHud();
+        this._arcadeScoreHud?.update?.(hudState);
+        this._arcadeMissionHud?.update?.(hudState.missionState);
     }
 
     _setParcoursHudVisible(isVisible) {
@@ -301,6 +341,9 @@ export class HudRuntimeSystem {
 
         const fighterHudInterval = this._resolveFighterHudInterval();
         const fighterElapsed = this._consumeInterval('_fighterHudTimer', dt, fighterHudInterval);
+        if (fighterElapsed > 0) {
+            this._updateArcadeHud();
+        }
 
         // FIGHTER HUD UPDATE
         const localHumans = game.numHumans || 1;
@@ -323,5 +366,13 @@ export class HudRuntimeSystem {
                 if (p2) game.hudP2.update(p2, fighterElapsed, game.entityManager);
             }
         }
+    }
+
+    dispose() {
+        this.clearNetworkScoreboard();
+        this._arcadeMissionHud?.dispose?.();
+        this._arcadeScoreHud?.dispose?.();
+        this._arcadeMissionHud = null;
+        this._arcadeScoreHud = null;
     }
 }

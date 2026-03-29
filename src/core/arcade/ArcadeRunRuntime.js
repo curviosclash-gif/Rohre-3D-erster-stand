@@ -201,6 +201,37 @@ export class ArcadeRunRuntime {
         return this._missionState ? { ...this._missionState } : null;
     }
 
+    getHudState() {
+        if (!this._enabled || !this._state) return null;
+        const score = this._state.score && typeof this._state.score === 'object'
+            ? this._state.score
+            : {};
+        const breakdown = score.breakdown && typeof score.breakdown === 'object'
+            ? score.breakdown
+            : {};
+        return {
+            phase: String(this._state.phase || ''),
+            sectorIndex: Math.max(0, Math.floor(toSafeNumber(this._state.sectorIndex, 0))),
+            completedSectors: Math.max(0, Math.floor(toSafeNumber(this._state.completedSectors, 0))),
+            activeModifierId: this._activeModifierId,
+            missionState: this._missionState,
+            score: {
+                total: Math.max(0, toSafeNumber(score.total, 0)),
+                combo: Math.max(0, Math.floor(toSafeNumber(score.combo, 0))),
+                multiplier: Math.max(1, toSafeNumber(score.multiplier, 1)),
+                breakdown: {
+                    base: Math.max(0, toSafeNumber(breakdown.base, 0)),
+                    survival: Math.max(0, toSafeNumber(breakdown.survival, 0)),
+                    kills: Math.max(0, toSafeNumber(breakdown.kills, 0)),
+                    cleanSector: Math.max(0, toSafeNumber(breakdown.cleanSector, 0)),
+                    risk: Math.max(0, toSafeNumber(breakdown.risk, 0)),
+                    penalty: Math.max(0, toSafeNumber(breakdown.penalty, 0)),
+                    total: Math.max(0, toSafeNumber(breakdown.total, 0)),
+                },
+            },
+        };
+    }
+
     updateMissions(event) {
         if (!this._missionState) return;
         this._missionState = updateSectorMissionState(this._missionState, event);

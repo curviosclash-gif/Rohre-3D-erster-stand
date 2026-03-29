@@ -538,6 +538,7 @@ export class Game {
         this.matchFlowUiController?.dispose?.();
         this.runtimeFacade?.dispose?.();
         this.huntHud?.dispose?.();
+        this.hudRuntimeSystem?.dispose?.();
         this.uiManager?.dispose?.();
         this.runtimeDiagnosticsSystem?.dispose?.();
         this.mediaRecorderSystem?.dispose?.();

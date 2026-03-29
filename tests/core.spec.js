@@ -3593,6 +3593,92 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(arcadeState.selectedMapKey).toBe('parcours_rift');
     });
 
+    test('T68a: Arcade-HUD zeigt Score-Breakdown und Modifier-Update live im Run', async ({ page }) => {
+        await loadGame(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForSelector('#submenu-game:not(.hidden)', { timeout: 5000 });
+        await page.click('#submenu-game:not(.hidden) #btn-start');
+        await page.waitForFunction(() => window.GAME_INSTANCE?.state === 'PLAYING', null, { timeout: 60000 });
+
+        const initialHudState = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const runtime = game?.runtimeFacade?.arcadeRunRuntime;
+            if (!runtime || !runtime._state) return null;
+
+            runtime._activeModifierId = 'portal_storm';
+            runtime._missionState = {
+                missions: [
+                    { type: 'KILL_COUNT', completed: false, progress: { kills: 2, target: 5 } },
+                    { type: 'COLLECT_ITEMS', completed: false, progress: { collected: 1, target: 3 } },
+                ],
+                allCompleted: false,
+                completedCount: 0,
+            };
+
+            const previousScore = runtime._state.score && typeof runtime._state.score === 'object'
+                ? runtime._state.score
+                : {};
+            const previousBreakdown = previousScore.breakdown && typeof previousScore.breakdown === 'object'
+                ? previousScore.breakdown
+                : {};
+            runtime._state = {
+                ...runtime._state,
+                phase: 'sector_active',
+                sectorIndex: 3,
+                completedSectors: 2,
+                missions: runtime._missionState,
+                score: {
+                    ...previousScore,
+                    total: 1337,
+                    combo: 9,
+                    multiplier: 4,
+                    breakdown: {
+                        ...previousBreakdown,
+                        base: 250,
+                        survival: 420,
+                        kills: 350,
+                        cleanSector: 120,
+                        risk: 90,
+                        penalty: 40,
+                        total: 1337,
+                    },
+                },
+            };
+
+            game?.hudRuntimeSystem?.updatePlayingHudTick?.(0.06);
+            const scoreRoot = document.getElementById('arcade-score-hud');
+            const missionRoot = document.getElementById('arcade-mission-hud');
+            return {
+                scoreVisible: !!scoreRoot && window.getComputedStyle(scoreRoot).display !== 'none',
+                missionVisible: !!missionRoot && window.getComputedStyle(missionRoot).display !== 'none',
+                scoreText: String(scoreRoot?.textContent || ''),
+                modifierLabel: String(scoreRoot?.querySelector('.arcade-score-hud-modifier-label')?.textContent || ''),
+                missionCardCount: missionRoot?.querySelectorAll('.arcade-mission-card').length || 0,
+            };
+        });
+
+        expect(initialHudState).not.toBeNull();
+        expect(initialHudState.scoreVisible).toBeTruthy();
+        expect(initialHudState.missionVisible).toBeTruthy();
+        expect(initialHudState.scoreText).toContain('1337');
+        expect(initialHudState.scoreText).toContain('x4.0');
+        expect(initialHudState.modifierLabel).toContain('Portal Storm');
+        expect(initialHudState.missionCardCount).toBeGreaterThanOrEqual(2);
+
+        const modifierSwitchLabel = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const runtime = game?.runtimeFacade?.arcadeRunRuntime;
+            if (!runtime || !runtime._state) return '';
+            runtime._activeModifierId = 'boost_tax';
+            game?.hudRuntimeSystem?.updatePlayingHudTick?.(0.06);
+            return String(document.querySelector('#arcade-score-hud .arcade-score-hud-modifier-label')?.textContent || '');
+        });
+        expect(modifierSwitchLabel).toContain('Boost Tax');
+
+        await returnToMenu(page);
+    });
+
     test('T20y: Sticky Startleiste bleibt sichtbar und nutzt strukturierte Summary-Bloecke', async ({ page }) => {
         await loadGame(page);
         await openGameSubmenu(page);
