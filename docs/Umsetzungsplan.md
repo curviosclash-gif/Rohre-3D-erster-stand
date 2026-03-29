@@ -82,7 +82,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
 | Bot-Codex | V58 | 2026-03-27 | closed | abgeschlossen 2026-03-27 inkl. 58.99-Gate |
-| Bot-Codex | V59 | 2026-03-29 | active | DoD-Nachverifikation und Abschluss von V59 |
+| Bot-Codex | V59 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (DoD-Nachverifikation inkl. test:fast/test:core/build) |
 | Bot-Codex | V60 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (60.4.4 nach V67.4.5 ueberfuehrt; 60.99 geschlossen) |
 | Bot-Codex | V61 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (HUD-/Intermission-/Replay-Rest nach V68 ueberfuehrt) |
 | Bot-Codex | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (`npm run build` PASS, `npm run test:core` PASS; T1-Startup-Flake nur im ersten Versuch, Retry gruen) |
@@ -207,7 +207,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-29 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V58.1, V55.99 -->
 
 Scope:
@@ -237,11 +237,11 @@ Bestehende Basis:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 59.1 bis 59.7 und 59.99 sind abgeschlossen und mit Evidence dokumentiert.
-- [ ] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS.
-- [ ] DoD.3 Kein direkter `console.log`/`console.warn`/`console.error` in Produktionscode ausserhalb `src/core/debug/` und `src/core/GameDebugApi.js`.
-- [ ] DoD.4 Alle `fetch()`-Aufrufe haben explizites Error-Handling (try-catch oder `.catch()`).
-- [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen.
+- [x] DoD.1 Alle Phasen 59.1 bis 59.7 und 59.99 sind abgeschlossen und mit Evidence dokumentiert. (abgeschlossen: 2026-03-29; evidence: 59.1-59.7 + 59.99 vollstaendig auf [x], Evidence aktualisiert)
+- [x] DoD.2 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind PASS. (abgeschlossen: 2026-03-29; evidence: architecture:guard PASS; `TEST_PORT=5321 PW_RUN_TAG=v59-fast PW_OUTPUT_DIR=test-results/v59-fast npm run test:fast` -> 144 passed/3 skipped; `TEST_PORT=5322 PW_RUN_TAG=v59-core PW_OUTPUT_DIR=test-results/v59-core npm run test:core` -> 117 passed/3 skipped; npm run build PASS)
+- [x] DoD.3 Kein direkter `console.log`/`console.warn`/`console.error` in Produktionscode ausserhalb `src/core/debug/` und `src/core/GameDebugApi.js`. (abgeschlossen: 2026-03-29; evidence: `rg -n "console\\.(log|warn|error)\\(" src --glob "*.js"` -> nur `src/core/GameDebugApi.js`)
+- [x] DoD.4 Alle `fetch()`-Aufrufe haben explizites Error-Handling (try-catch oder `.catch()`). (abgeschlossen: 2026-03-29; evidence: `rg -n "fetch\\(" src server --glob "*.js"` + Audit der Call-Sites; `src/network/LANMatchLobby.js` join() auf try/catch gehaertet)
+- [x] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-Pflege sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: plan:check PASS; docs:sync updated=0 missing=0; docs:check PASS; V59 Lock-Header auf `frei`, Lock-Status auf `closed`)
 
 ### 59.1 Netzwerk-Adapter Konsolidierung
 
@@ -327,10 +327,10 @@ Bestehende Basis:
 
 ### Phase 59.99: Integrations- und Abschluss-Gate
 
-- [x] 59.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen. (abgeschlossen: 2026-03-27; evidence: build PASS (42.23s), architecture:guard PASS (all budgets OK, typecheck:architecture PASS); test:core/test:fast konnten wegen Playwright-Suite-Lock nicht ausgefuehrt werden " build + architecture:guard + console.log + fetch-Audit bestaetigen Code-Integritaet)
-- [x] 59.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert. (abgeschlossen: 2026-03-27; evidence: docs:sync 0 updated/0 missing, docs:check PASS, plan:check PASS)
-- [x] 59.99.3 `grep -r "console\\.log" src/ --include="*.js"` zeigt nur erlaubte Dateien (`src/core/debug/`, `src/core/GameDebugApi.js`). (abgeschlossen: 2026-03-27; evidence: nur src/core/GameDebugApi.js gefunden " erlaubt)
-- [x] 59.99.4 `grep -r "fetch(" src/ --include="*.js"` - jede Call-Site hat dokumentiertes Error-Handling. (abgeschlossen: 2026-03-27; evidence: 5 Dateien mit fetch(): LANSessionAdapter.js (try/catch + .catch()), LANMatchLobby.js (try/catch), MediaRecorderSystem.js (try/catch), ObservationBridgePolicy.js (.catch()), Logger.js (nur Kommentar) " alle mit spezifischem Error-Handling)
+- [x] 59.99.1 `npm run architecture:guard`, `npm run test:fast`, `npm run test:core`, `npm run build` sind gruen. (abgeschlossen: 2026-03-29; evidence: architecture:guard PASS; `TEST_PORT=5321 PW_RUN_TAG=v59-fast PW_OUTPUT_DIR=test-results/v59-fast npm run test:fast` -> 144 passed/3 skipped; `TEST_PORT=5322 PW_RUN_TAG=v59-core PW_OUTPUT_DIR=test-results/v59-core npm run test:core` -> 117 passed/3 skipped; npm run build PASS)
+- [x] 59.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-Status aktualisiert. (abgeschlossen: 2026-03-29; evidence: npm run plan:check PASS; npm run docs:sync -> updated=0/missing=0; npm run docs:check PASS; V59 Lock-Status `closed`)
+- [x] 59.99.3 `grep -r "console\\.log" src/ --include="*.js"` zeigt nur erlaubte Dateien (`src/core/debug/`, `src/core/GameDebugApi.js`). (abgeschlossen: 2026-03-29; evidence: `rg -n "console\\.(log|warn|error)\\(" src --glob "*.js"` -> nur `src/core/GameDebugApi.js`)
+- [x] 59.99.4 `grep -r "fetch(" src/ --include="*.js"` - jede Call-Site hat dokumentiertes Error-Handling. (abgeschlossen: 2026-03-29; evidence: `rg -n "fetch\\(" src server --glob "*.js"` + Code-Audit, inkl. `LANMatchLobby.join()` try/catch)
 
 ### Risiko-Register V59
 
