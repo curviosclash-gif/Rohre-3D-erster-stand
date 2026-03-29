@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-29 (V60 und V61 abgeschlossen; offene Restpunkte nach V67/V68 ueberfuehrt; V65 abgeschlossen inkl. 65.99-Gate und Smoke-Evidence; V66 Vehicle-Manager-Plan aktiv)
+Stand: 2026-03-29 (V60 und V61 abgeschlossen; offene Restpunkte nach V67/V68 ueberfuehrt; V65 abgeschlossen inkl. 65.99-Gate und Smoke-Evidence; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG neu angelegt)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/Backlog.md`.
@@ -62,6 +62,8 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V67 | V59.99 | hard | ja | V59 Netzwerk-Haertung liefert die Basis (Retry-Loops, Error-Handling, Characterization-Tests) |
 | V68 | V61.99 | hard | ja | V61 abgeschlossen 2026-03-29; HUD/Intermission/Replay-Rest ist als Follow-up in V68 geplant |
 | V68 | V66 | soft | ja | V66 und V68 koennen parallel laufen, solange gemeinsame Arcade-UI-Contracts stabil bleiben |
+| V69 | V63.99 | soft | ja | Fight-/Hunt-Baseline und bestehende Characterization-Tests aus V63 sind abgeschlossen und bilden die Balancing-Basis |
+| V69 | V68 | soft | ja | V69 greift primar Fight/Hunt-Combat an; parallel zu V68 moeglich bei stabilen Shared-UI-Contracts |
 
 ## Datei-Ownership (aktive Arbeit)
 
@@ -75,6 +77,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `tests/core.spec.js` | V68 | aktiv | Bot-Codex seit 2026-03-29; Arcade-HUD, Intermission-UX und Replay-Follow-up nach Abschluss von V61 |
+| `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | geplant | Item-/Rocket-/Shield-/MG-Balance und Telemetrie-Konsolidierung fuer Fight/Hunt |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
 ## Lock-Status
@@ -91,6 +94,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | active | in Bearbeitung: 68.1-68.99 |
+| - | V69 | - | frei | Balance-Plan angelegt; Start nach expliziter Priorisierung |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -117,8 +121,9 @@ V60, V61 und V67 sind abgeschlossen. Aktive Planung liegt auf V66 und V68.
 | B | **V67** | abgeschlossen 2026-03-29 (inkl. 67.4.5 Characterization) |
 | C | **V68** | Arcade-HUD/Intermission/Replay-Follow-up aus V61 |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
+| E | **V69** | Item-/Rocket-/Shield-/MG-Balance fuer Fight/Hunt (Telemetry + Tuning) |
 
-Empfehlung: 2 Agents parallel auf A + C; Spur B kann parallel starten, da V60 geschlossen ist. Spur D nach Scope-Definition.
+Empfehlung: 2-3 Agents parallel auf A + C + E; Spur D nach Scope-Definition.
 
 ---
 
@@ -137,6 +142,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | neu: uebernommene V61-Restpunkte umsetzen | Geplant |
+| V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
@@ -743,6 +749,7 @@ Scope:
 - [ ] 66.2.1 `ArcadeVehicleManager.js` von flachem Grid auf Drei-Zonen-Layout umbauen (Fahrzeugliste, 3D-Preview, Detail-Panel).
 - [ ] 66.2.2 Auswahl-, Filter- und Favoritenzustand in dedizierte Module auslagern.
 - [ ] 66.2.3 Suchfeld und Filter-Chips implementieren: Freitext-Suche, Kategorie-/Hitbox-/Level-Filter.
+- [ ] 66.2.4 Auswahl-Contract haerten: Vehicle-Auswahl aus dem Arcade-Manager muss `settings.vehicles.PLAYER_1` und Start-/Snapshot-Pfade synchron halten (kein Drift zwischen UI-Auswahl und Match-Spawn).
 
 ### 66.3 3D-Preview und Upgrade-Visualisierung (parallel zu 66.2)
 
@@ -761,6 +768,7 @@ Scope:
 
 - [ ] 66.5.1 Playwright-Abdeckung fuer Fahrzeugliste, Kategorie-Wechsel, 3D-Preview, Upgrade-Interaktion und Auswahl-Persistenz.
 - [ ] 66.5.2 Visuelle Evidence: Screenshot des Vehicle-Managers plus manuelle Smoke-Probe fuer Auswahl ' Spielstart.
+- [ ] 66.5.3 Regressionstest fuer Vehicle-Selection-Drift: im Arcade-Flow gewaehltes Fahrzeug wird in `settings.vehicles.PLAYER_1`, Run-Snapshot und Match-Spawn konsistent uebernommen.
 
 ### 66.99 Integrations- und Abschluss-Gate
 
@@ -775,6 +783,7 @@ Scope:
 | Upgrade-Overlay schwer positionierbar bei unterschiedlichen Mesh-Geometrien | hoch | UI/3D | Slot-Positionen aus Anchor-Offsets ableiten; Fallback auf abstrakte Liste | Overlay-Punkte schweben sichtbar neben dem Modell |
 | Custom-Fahrzeuge ohne standardisierte Preview-Tokens | mittel | Editor/Vehicle-Lab | On-Demand-Thumbnail oder generischer "Custom"-Platzhalter | Custom-Fahrzeuge zeigen leere Vorschau |
 | Umbau von ArcadeVehicleManager bricht bestehende Arcade-Flows | hoch | Arcade/Core | vehicleId und ArcadeVehicleProfileContract als stabilen Contract beibehalten | Bestehende Arcade-Tests schlagen fehl |
+| Vehicle-Auswahl driftet zwischen Arcade-UI und Runtime-Settings | hoch | Arcade/Core | Einziger Source-of-Truth fuer Auswahl (`settings.vehicles.PLAYER_1`), plus Regressionstest fuer Start-/Spawn-Konsistenz | Arcade-UI zeigt anderes Fahrzeug als im Match gespawnt |
 | Vergleichsmodus braucht normierte Stats die aktuell nicht existieren | mittel | Gameplay/UI | Stats aus Hitbox-Radius, Upgrade-Potenzial und Kategorie ableiten; keine erfundenen Werte | Stats-Balken zeigen unsinnige oder identische Werte |
 
 ---
@@ -905,6 +914,73 @@ Scope:
 
 ---
 
+## Block V69: Fight/Hunt Combat-Balance - Item, Raketen, Schild, MG
+
+Plan-Datei: `docs/Feature_Item_Raketen_Schild_MG_Balance_V69.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: V63.99 -->
+
+Scope:
+
+- Fight/Hunt-Balance fuer MG, Raketen, Shield und Item-Oekonomie datengetrieben stabilisieren.
+- Runtime-/UI-Defaults fuer relevante Combat-Parameter harmonisieren und Legacy-Spawn-/Item-Contracts bereinigen.
+- Telemetrie so erweitern, dass Balance-Entscheidungen reproduzierbar ueber KPI-Korridore gesteuert werden.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 69.1 bis 69.6 und 69.99 sind abgeschlossen.
+- [ ] DoD.2 Telemetrie differenziert Item-Nutzung und Combat-Impact mindestens nach `mode`, `itemType`, `hpDamage`, `shieldAbsorb`.
+- [ ] DoD.3 MG-, Rocket- und Shield-Tuning ist per Tests und kurzer QA-Dokumentation gegen definierte KPI-Zielkorridore validiert.
+- [ ] DoD.4 Legacy-Map-/Pickup-Typen sind auf aktive Rocket-Tiers normalisiert oder mit stabiler Alias-Strategie abgesichert.
+- [ ] DoD.5 `npm run build`, `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS.
+
+### 69.1 Balance-Telemetrie und KPI-Baseline
+
+- [ ] 69.1.1 Round-/Combat-Metriken fuer `itemUse.mode`, `itemType`, `mgHits`, `rocketHits`, `shieldAbsorb`, `hpDamage` granular erfassen und durch den Telemetriepfad persistieren.
+- [ ] 69.1.2 KPI-Baseline fuer Fight/Hunt dokumentieren (TTK, Pickrate, Hitrate, Kill-Share, Shield-Uptime) und als Vergleichswert fuer die Folgephasen fixieren.
+
+### 69.2 MG-Tuning und Trefferfenster
+
+- [ ] 69.2.1 Default-/Preset-Werte fuer `mgTrailAimRadius` und angrenzende MG-Parameter in Runtime, UI und Settings-Haertung konsistent machen.
+- [ ] 69.2.2 MG-Falloff/Overheat/Lockout gegen Zielkorridor validieren und Tests fuer Midrange-TTK plus Trail-Hit-Fairness erweitern.
+
+### 69.3 Rocket-Tiers und Spawn-Oekonomie
+
+- [ ] 69.3.1 Legacy-Rocket-Pickup-Typen (`ROCKET_STRONG` etc.) per Alias/Migration auf aktive Tier-Typen normalisieren.
+- [ ] 69.3.2 Rocket-/Non-Rocket-Spawngewichte robust machen (normalisierte Gewichte, deterministische Verteilung, Regressionstests fuer Grenzfaelle).
+
+### 69.4 Shield- und Damage-Semantik
+
+- [ ] 69.4.1 Shield-Hit-, Regen- und Damage-Timestamp-Interaktion klar definieren und konsistent in Health-/Feedback-Pfaden umsetzen.
+- [ ] 69.4.2 Item-Nutzungsfenster fuer defensive Ketten (Shield-Spam) absichern, ohne Utility-Flow fuer normale Nutzung zu verlieren.
+
+### 69.5 Bot-/Policy-Anpassung
+
+- [ ] 69.5.1 HuntBotPolicy/BotDecisionOps an neue Balance-Parameter und Item-Oekonomie anpassen (offensiv/defensiv konsistent).
+- [ ] 69.5.2 HuntBridgePolicy-Entscheidungsregeln fuer MG/Rocket/Retreat mit den neuen KPI-Zielen synchronisieren.
+
+### 69.6 Verifikation und Rollout
+
+- [ ] 69.6.1 Tests erweitern: MG-Window, Rocket-Alias/Verteilung, Shield-Regen-Interaktion, Telemetrie-Schema-Regression.
+- [ ] 69.6.2 Manuelle Fight/Hunt-QA aktualisieren und kurze Balancing-Auswertung als Evidence dokumentieren.
+
+### 69.99 Integrations- und Abschluss-Gate
+
+- [ ] 69.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run build` sind fuer den Scope gruen.
+- [ ] 69.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Pipeline-Abgleich sind abgeschlossen.
+
+### Risiko-Register V69
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| MG-Tuning kippt von "zu stark" auf "zu schwach" | hoch | Gameplay | Parameter in kleinen Schritten aendern und Hitrate/TTK je Build gegen Baseline vergleichen | Spielerfeedback driftet stark, Kills verlagern sich abrupt |
+| Rocket-Alias-/Spawn-Aenderungen brechen bestehende Maps | mittel | Gameplay/Content | Alias + Map-Validation + Smoke fuer betroffene Presets | Rockets fehlen oder kommen als falscher Typ |
+| Shield-Anpassung erzeugt neue Burst-/Unsterblichkeitsprobleme | hoch | Gameplay | Characterization-Tests fuer Shield-Absorb, Regen und TTK vor Rollout | Unerwartete TTK-Spikes oder Shield-Dominanz |
+| Mehr Telemetrie erzeugt Runtime-Overhead im Fight-Hotpath | mittel | Core | Sampling/Batching, kompakte Payloads, Profiler-Vergleich vorher/nachher | Fight-Frames zeigen neue Spikes |
+
+---
+
 ## Abgeschlossene Bloecke (archiviert)
 
 | Block | Grund | Plan-Datei | Archiv-Pfad |
@@ -932,12 +1008,12 @@ Scope:
 Stand: 2026-03-29
 
 - Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65.
-- Blockiert: Kein harter Blocker im Masterplan; V67 ist nach V60-Abschluss startklar, V61-Rest liegt geplant in V68.
+- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66, V68 und V69.
 - Naechste 3 Ziele:
   1. V66 starten: Vehicle-Manager UX mit 3D-Preview und Filter-/Loadout-Flows.
-  2. V67 umsetzen: Netzwerk-Haertung inkl. uebernommener 60.4.4-Charakterisierung.
-  3. V68 umsetzen: Arcade HUD/Intermission/Replay-Restpunkte aus V61.
-- Plan-Bereinigung (2026-03-29): aktive In-Bearbeitung-Spuren geschlossen; Restarbeiten explizit in V67/V68 ueberfuehrt.
+  2. V68 umsetzen: Arcade HUD/Intermission/Replay-Restpunkte aus V61.
+  3. V69 starten: Fight/Hunt-Balance fuer Item/Raketen/Schild/MG ueber KPI-Baseline und Tuning-Phasen.
+- Plan-Bereinigung (2026-03-29): aktive In-Bearbeitung-Spuren geschlossen; Restarbeiten in V68 gebuendelt und neuer Combat-Balance-Block V69 angelegt.
 
 ## Dokumentations-Hook
 
