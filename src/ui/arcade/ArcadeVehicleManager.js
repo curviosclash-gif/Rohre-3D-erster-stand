@@ -13,7 +13,11 @@ import {
     getUpgradeCost,
     canUpgrade,
 } from '../../entities/arcade/ArcadeBlueprintSchema.js';
-import { getVehicleIds } from '../../entities/vehicle-registry.js';
+import {
+    getVehicleManagerInteractionRules,
+    listVehicleManagerCatalogEntries,
+    resolveVehicleManagerCatalogEntry,
+} from './VehicleManagerCatalog.js';
 
 function t(textId, fallback) {
     return resolveMenuCatalogText(textId, fallback);
@@ -57,16 +61,27 @@ export function setupArcadeVehicleManager(ctx = {}) {
     const container = createElement('section', 'arcade-surface-card arcade-vehicle-manager');
     container.id = 'arcade-vehicle-manager';
     container.appendChild(createElement('h3', 'arcade-surface-card-title', t('menu.arcade.vehicle.title', 'Vehicle Manager')));
+    const interactionRules = getVehicleManagerInteractionRules();
+    container.dataset.vehiclePreviewMode = String(interactionRules?.preview?.mode || 'interactive-3d');
+    container.dataset.vehicleBreakpointStacked = String(interactionRules?.responsiveBreakpoints?.stackedPanelMaxWidth || 1000);
+    container.dataset.vehicleBreakpointCompact = String(interactionRules?.responsiveBreakpoints?.compactListMaxWidth || 700);
 
     // Ship selector grid
     const shipGrid = createElement('div', 'arcade-vehicle-grid');
-    const vehicleIds = getVehicleIds();
+    const catalogEntries = listVehicleManagerCatalogEntries();
+    const catalogByVehicleId = new Map(catalogEntries.map((entry) => [entry.vehicleId, entry]));
+    const vehicleIds = catalogEntries.map((entry) => entry.vehicleId);
     const shipButtons = [];
 
-    for (let i = 0; i < vehicleIds.length; i += 1) {
-        const btn = createElement('button', 'arcade-vehicle-card', vehicleIds[i]);
+    for (let i = 0; i < catalogEntries.length; i += 1) {
+        const vehicleEntry = catalogEntries[i];
+        const btn = createElement('button', 'arcade-vehicle-card', vehicleEntry.label);
         btn.type = 'button';
-        btn.dataset.vehicleId = vehicleIds[i];
+        btn.dataset.vehicleId = vehicleEntry.vehicleId;
+        btn.dataset.vehicleCategory = vehicleEntry.kategorie;
+        btn.dataset.vehicleHitbox = vehicleEntry.hitboxKlasse;
+        btn.dataset.vehiclePreviewToken = vehicleEntry.previewToken;
+        btn.title = `${vehicleEntry.label} | ${vehicleEntry.kategorie} | ${vehicleEntry.kurzbeschreibung}`;
         shipGrid.appendChild(btn);
         shipButtons.push(btn);
     }
@@ -74,6 +89,8 @@ export function setupArcadeVehicleManager(ctx = {}) {
 
     // Profile display
     const profileDisplay = createElement('div', 'arcade-vehicle-profile');
+    const vehicleMetaLine = createElement('p', 'arcade-vehicle-meta');
+    profileDisplay.appendChild(vehicleMetaLine);
     const levelLine = createElement('p', 'arcade-vehicle-level', 'Level 1 | XP 0/100');
     profileDisplay.appendChild(levelLine);
     const xpBar = createElement('div', 'arcade-vehicle-xp-bar');
@@ -110,6 +127,9 @@ export function setupArcadeVehicleManager(ctx = {}) {
 
     let profiles = loadVehicleProfiles(store);
     let selectedVehicleId = String(settings?.vehicles?.PLAYER_1 || vehicleIds[0] || 'ship1');
+    if (!catalogByVehicleId.has(selectedVehicleId) && vehicleIds.length > 0) {
+        selectedVehicleId = vehicleIds[0];
+    }
 
     function getProfile() {
         return getOrCreateProfile(profiles, selectedVehicleId);
@@ -117,7 +137,10 @@ export function setupArcadeVehicleManager(ctx = {}) {
 
     function syncDisplay() {
         const profile = getProfile();
+        const catalogEntry = catalogByVehicleId.get(selectedVehicleId)
+            || resolveVehicleManagerCatalogEntry(selectedVehicleId);
         const xpInfo = xpToNextLevel(profile);
+        vehicleMetaLine.textContent = `${catalogEntry.label} | ${catalogEntry.kategorie} | ${catalogEntry.hitboxKlasse}`;
 
         // Level line
         levelLine.textContent = `Level ${profile.level} | XP ${xpInfo.current}/${xpInfo.required}`;

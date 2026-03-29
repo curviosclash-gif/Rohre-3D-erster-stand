@@ -26,6 +26,11 @@ import {
     EDITOR_VIEW_PATHS,
 } from '../src/shared/contracts/EditorPathContract.js';
 import { generateJSONExport, importFromJSON } from '../editor/js/EditorMapSerializer.js';
+import {
+    getVehicleManagerInteractionRules,
+    listVehicleManagerCatalogEntries,
+    resolveVehicleManagerCatalogEntry,
+} from '../src/ui/arcade/VehicleManagerCatalog.js';
 
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
 const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
@@ -97,6 +102,60 @@ async function loadGameWithRetry(page, attempts = 4) {
     }
     throw lastError;
 }
+
+test.describe('T66x: Vehicle-Manager-Katalogvertrag', () => {
+    test('T66x1: Katalog liefert Pflichtmetadaten fuer jedes Vehicle', () => {
+        const entries = listVehicleManagerCatalogEntries();
+        expect(entries.length).toBeGreaterThan(0);
+
+        for (let i = 0; i < entries.length; i += 1) {
+            const entry = entries[i];
+            expect(typeof entry.vehicleId).toBe('string');
+            expect(entry.vehicleId.length).toBeGreaterThan(0);
+            expect(typeof entry.label).toBe('string');
+            expect(entry.label.length).toBeGreaterThan(0);
+            expect(['jaeger', 'kreuzer', 'spezial', 'custom']).toContain(entry.kategorie);
+            expect(['kompakt', 'standard', 'schwer']).toContain(entry.hitboxKlasse);
+            expect(typeof entry.kurzbeschreibung).toBe('string');
+            expect(entry.kurzbeschreibung.length).toBeGreaterThan(0);
+            expect(Number.isInteger(entry.sortOrder)).toBeTruthy();
+            expect(Array.isArray(entry.keywords)).toBeTruthy();
+            expect(entry.keywords.length).toBeGreaterThan(0);
+            expect(typeof entry.previewToken).toBe('string');
+            expect(entry.previewToken.length).toBeGreaterThan(0);
+            expect(typeof entry.statsSummary).toBe('object');
+            expect(entry.statsSummary).not.toBeNull();
+            expect(typeof entry.statsSummary.armor).toBe('number');
+            expect(typeof entry.statsSummary.agility).toBe('number');
+            expect(typeof entry.statsSummary.control).toBe('number');
+            expect(typeof entry.statsSummary.upgradePotential).toBe('number');
+        }
+    });
+
+    test('T66x2: Interaktionsregeln definieren Kategorien, Filter und Breakpoints', () => {
+        const rules = getVehicleManagerInteractionRules();
+        expect(rules.version).toBe('66.1');
+        expect(Array.isArray(rules.categories)).toBeTruthy();
+        expect(rules.categories.map((entry) => entry.id)).toEqual(['all', 'jaeger', 'kreuzer', 'spezial', 'custom']);
+        expect(rules.filterChips.category).toContain('jaeger');
+        expect(rules.filterChips.hitboxKlasse).toContain('kompakt');
+        expect(rules.preview.mode).toBe('interactive-3d');
+        expect(rules.preview.allowOrbit).toBeTruthy();
+        expect(rules.upgradeFlow.maxTier).toBe('T3');
+        expect(rules.responsiveBreakpoints.stackedPanelMaxWidth).toBe(1000);
+        expect(rules.responsiveBreakpoints.compactListMaxWidth).toBe(700);
+    });
+
+    test('T66x3: Unbekannte Vehicle-IDs liefern stabilen Katalog-Fallback', () => {
+        const fallback = resolveVehicleManagerCatalogEntry('ghost_vehicle');
+        expect(fallback.vehicleId).toBe('ghost_vehicle');
+        expect(fallback.label).toBe('ghost_vehicle');
+        expect(fallback.kategorie).toBe('custom');
+        expect(fallback.hitboxKlasse).toBe('standard');
+        expect(fallback.previewToken).toBe('vehicle:placeholder');
+        expect(fallback.statsSummary.upgradePotential).toBeGreaterThan(0);
+    });
+});
 
 test.describe('T1-20: Core & Infrastruktur', () => {
     test.describe.configure({ mode: 'serial' });
