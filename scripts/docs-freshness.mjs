@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -9,7 +9,7 @@ const writeMode = args.has('--write') || !checkOnly;
 
 const ACTIVE_SCAN_ROOTS = ['.agents', 'docs'];
 const EXCLUDED_PREFIXES = ['docs/archive'];
-const EXTRA_ACTIVE_FILES = ['AGENTS.md', 'walkthrough.md'];
+const EXTRA_ACTIVE_FILES = ['AGENTS.md', 'walkthrough.md', 'README.md', 'CLAUDE.md'];
 
 const STAMPED_FILES = [
   'docs/referenz/ai_project_onboarding.md',
@@ -18,6 +18,8 @@ const STAMPED_FILES = [
 ];
 
 const REQUIRED_FILES = [
+  'README.md',
+  'docs/INDEX.md',
   'docs/referenz/ai_project_onboarding.md',
   'docs/referenz/ai_architecture_context.md',
   'docs/Umsetzungsplan.md',
@@ -31,6 +33,7 @@ const LEGACY_PATH_ALLOWLIST = new Set([
 ]);
 
 const REPORT_FILE = 'docs/prozess/Dokumentationsstatus.md';
+const ONBOARDING_FILE = 'docs/referenz/ai_project_onboarding.md';
 
 function todayLocalISO() {
   const d = new Date();
@@ -161,11 +164,77 @@ function applyStampUpdate(text, today) {
   return { updated: next !== text, content: next };
 }
 
+function escapeRegex(input) {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function extractOnboardingCanonicalRefs(onboardingText) {
+  const sectionMatch = onboardingText.match(
+    /## 2\. Canonical Quellen \(zuerst lesen\)([\s\S]*?)(?:\r?\n##\s|\s*$)/
+  );
+  if (!sectionMatch) {
+    return [];
+  }
+
+  const refs = [];
+  const refRegex = /`([^`]+)`/g;
+  let match = refRegex.exec(sectionMatch[1]);
+  while (match) {
+    const ref = normalize(match[1].trim());
+    if (ref.length > 0) {
+      refs.push(ref);
+    }
+    match = refRegex.exec(sectionMatch[1]);
+  }
+
+  return Array.from(new Set(refs));
+}
+
+function canonicalRefPatternToRegex(refPattern) {
+  const escaped = escapeRegex(refPattern);
+  const withDateToken = escaped.replace(/YYYY-MM-DD/g, '\\d{4}-\\d{2}-\\d{2}');
+  const withWildcards = withDateToken.replace(/\\\*/g, '[^/]+');
+  return new RegExp(`^${withWildcards}$`);
+}
+
+async function collectOnboardingCanonicalFindings(onboardingText, filesToScan) {
+  const refs = extractOnboardingCanonicalRefs(onboardingText);
+  const findings = [];
+
+  if (refs.length === 0) {
+    findings.push({
+      ref: ONBOARDING_FILE,
+      reason: 'missing-canonical-section'
+    });
+    return { refs, findings };
+  }
+
+  for (const ref of refs) {
+    const isPattern = ref.includes('*') || ref.includes('YYYY-MM-DD');
+    if (!isPattern) {
+      if (!(await exists(ref))) {
+        findings.push({ ref, reason: 'missing-file' });
+      }
+      continue;
+    }
+
+    const patternRegex = canonicalRefPatternToRegex(ref);
+    const hasMatch = filesToScan.some((file) => patternRegex.test(file));
+    if (!hasMatch) {
+      findings.push({ ref, reason: 'pattern-no-match' });
+    }
+  }
+
+  return { refs, findings };
+}
+
 function buildReport({
   today,
   modeLabel,
   updatedFiles,
   missingFiles,
+  onboardingRefs,
+  onboardingFindings,
   legacyFindings,
   mojibakeWarnings,
   canPass
@@ -194,6 +263,24 @@ function buildReport({
   } else {
     for (const f of missingFiles) {
       lines.push(`- FEHLT: ${f}`);
+    }
+  }
+  lines.push('');
+
+  lines.push('## Onboarding-Canonical-Quellen');
+  if (onboardingRefs.length === 0) {
+    lines.push(`- FEHLT: Keine Canonical-Quellen in ${ONBOARDING_FILE} gefunden.`);
+  } else if (onboardingFindings.length === 0) {
+    lines.push('- Alle Canonical-Quellen aus dem Onboarding sind valide.');
+  } else {
+    for (const finding of onboardingFindings) {
+      if (finding.reason === 'missing-file') {
+        lines.push(`- FEHLT: ${finding.ref}`);
+      } else if (finding.reason === 'pattern-no-match') {
+        lines.push(`- KEIN TREFFER FUER MUSTER: ${finding.ref}`);
+      } else {
+        lines.push(`- FEHLT: Canonical-Section in ${ONBOARDING_FILE}`);
+      }
     }
   }
   lines.push('');
@@ -278,10 +365,14 @@ async function main() {
     }
   }
 
+  const onboardingText = contentByFile.get(ONBOARDING_FILE) || '';
+  const { refs: onboardingRefs, findings: onboardingFindings } =
+    await collectOnboardingCanonicalFindings(onboardingText, filesToScan);
+
   const legacyFindings = collectLegacyPathFindings(filesToScan, contentByFile);
   const mojibakeWarnings = collectMojibakeWarnings(filesToScan, contentByFile);
 
-  const hasBlockingIssues = missingFiles.length > 0;
+  const hasBlockingIssues = missingFiles.length > 0 || onboardingFindings.length > 0;
   if (legacyFindings.length > 0) {
     console.log(`[docs] WARNUNG: ${legacyFindings.length} Legacy-Pfad-Funde (nicht blockierend)`);
   }
@@ -294,6 +385,8 @@ async function main() {
     modeLabel,
     updatedFiles,
     missingFiles,
+    onboardingRefs,
+    onboardingFindings,
     legacyFindings,
     mojibakeWarnings,
     canPass
@@ -307,6 +400,7 @@ async function main() {
   console.log(`[docs] mode=${modeLabel}`);
   console.log(`[docs] updated=${updatedFiles.length}`);
   console.log(`[docs] missing=${missingFiles.length}`);
+  console.log(`[docs] onboarding=${onboardingFindings.length}`);
   console.log(`[docs] legacy=${legacyFindings.length}`);
   console.log(`[docs] mojibake=${mojibakeWarnings.length}`);
 
@@ -319,4 +413,3 @@ main().catch((err) => {
   console.error('[docs] fatal:', err?.message || err);
   process.exit(1);
 });
-

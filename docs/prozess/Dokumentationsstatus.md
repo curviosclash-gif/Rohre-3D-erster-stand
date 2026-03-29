@@ -10,6 +10,9 @@ Gate: PASS
 ## Pflichtdateien
 - Alle Pflichtdateien vorhanden.
 
+## Onboarding-Canonical-Quellen
+- Alle Canonical-Quellen aus dem Onboarding sind valide.
+
 ## Legacy-Pfad-Funde (aktiv, ohne docs/archive)
 - docs/plaene/alt/Feature_Map_Editor_UX_V65.md: Zeilen 241
 

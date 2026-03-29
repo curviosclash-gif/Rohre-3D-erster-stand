@@ -1,4 +1,4 @@
-﻿# AI Project Onboarding (Aktiv)
+# AI Project Onboarding (Aktiv)
 
 Stand: 2026-03-29
 
@@ -13,11 +13,12 @@ Hauptziel im Match: ueberleben, Gegner zu Kollisionen zwingen, Round- und Match-
 
 1. `docs/referenz/ai_architecture_context.md`
 2. `docs/Umsetzungsplan.md`
-3. `docs/Analysebericht.md`
-4. Neuester `docs/tests/Testergebnisse_YYYY-MM-DD.md`
+3. `docs/release/Releaseplan_Spiel_2026.md`
+4. Neuester `docs/tests/Testergebnisse_Phase4b_YYYY-MM-DD.md`
 5. `docs/prozess/Dokumentationsstatus.md`
+6. `docs/INDEX.md`
 
-Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/`.
+Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/` (u. a. `docs/archive/Analysebericht.md`).
 
 ## 3. Harte Entwicklungsregeln
 
@@ -29,8 +30,7 @@ Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/`.
 
 ## 4. Task-Start Checkliste
 
-1. Scope aus User-Anfrage und `docs/Umsetzungsplan.md` ableiten.
+1. Scope aus User-Anfrage, `docs/INDEX.md` und `docs/Umsetzungsplan.md` ableiten.
 2. Betroffene Module in `src/` und `tests/` identifizieren.
 3. Aendern, dann Tests gemaess `.agents/test_mapping.md` ausfuehren.
 4. Doku-/Prozess-Aktualitaet mit `npm run docs:sync` und `npm run docs:check` pruefen.
-

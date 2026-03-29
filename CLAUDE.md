@@ -1,17 +1,20 @@
 # CLAUDE.md - Projektregeln fuer Claude Code
 
+> Status: Legacy-Hinweisdatei fuer Claude-Workflows.
+> Verbindliche Governance fuer alle Agents: `AGENTS.md` und `.agents/rules/*`.
+
 ## Git-Workflow
 
 - **Immer direkt auf `main` arbeiten.** Keine Worktrees, keine Feature-Branches.
 - Niemals `git stash` verwenden. Bei Bedarf WIP-Commits.
-- Niemals alte Branches blind in main mergen — vorher pruefen ob Branch hinter main liegt.
+- Niemals alte Branches blind in main mergen - vorher pruefen ob Branch hinter main liegt.
 
 ## Token-Effizienz
 
-- Gleiche Datei nicht mehrmals lesen — Memory oder vorherigen Read nutzen.
+- Gleiche Datei nicht mehrmals lesen - Memory oder vorherigen Read nutzen.
 - `Glob`/`Grep` direkt nutzen, nicht `Agent` (Agent nur fuer komplexe Explore-Aufgaben).
 - Grosse Dateien mit `limit`/`offset` teilweise lesen.
-- Antworten kurz halten — keine Zusammenfassungen nach Aktionen.
+- Antworten kurz halten - keine Zusammenfassungen nach Aktionen.
 - Unabhaengige Tool-Calls immer parallel ausfuehren.
 
 ## Commit-Konvention
@@ -26,10 +29,10 @@ Co-Author immer setzen. Block-Nummer muss im Commit stehen.
 
 ## Aufgaben-Workflow
 
-1. Offene Tasks stehen in `docs/Umsetzungsplan.md` — das ist die einzige Quelle.
+1. Offene Tasks stehen in `docs/Umsetzungsplan.md` - das ist die einzige Quelle.
 2. Abhaengigkeiten beachten: blockierte Bloecke nicht starten.
 3. Nach Abschluss: Task als `[x]` markieren mit Datum und Evidence.
-4. Umsetzungsplan-Updates koennen zusammen mit Code committet werden.
+4. Umsetzungsplan-Updates immer separat von Code-Aenderungen committen.
 
 ## Tests vor Push
 
