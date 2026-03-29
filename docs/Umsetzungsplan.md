@@ -79,6 +79,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/MatchFlowUiController.js`, `src/core/GameRuntimeFacade.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/shared/contracts/ArcadeRewardContract.js`, `src/ui/menu/MenuTextCatalog.js`, `style.css`, `tests/core.spec.js` | V68 | abgeschlossen | abgeschlossen 2026-03-29; 68.1-68.4 inkl. Intermission-/Post-Run-Loop und Replay-Fallback abgeschlossen |
+| `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/VehicleManagerCatalog.js`, `src/ui/menu/MenuPreviewCatalog.js`, `src/entities/vehicle-registry.js`, `tests/core.spec.js` | V66 | aktiv | Phase 66.1: Katalog-Metadaten + Interaktionsregeln |
 | `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | geplant | Item-/Rocket-/Shield-/MG-Balance und Telemetrie-Konsolidierung fuer Fight/Hunt |
 | `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | abgeschlossen | abgeschlossen 2026-03-29; Settings-/Preset-Drift-Fix inkl. Migration-/Autosave-Haertung und T70-Regressionstests |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
@@ -95,6 +96,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
 | Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
+| Bot-Codex | V66 | 2026-03-30 | active | Phase 66.1 (Katalog + Interaktionsregeln) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (68.1-68.4 + 68.99 inkl. test:core/test:stress/build/docs-gates) |
 | - | V69 | - | frei | Balance-Plan angelegt; Start nach expliziter Priorisierung |
@@ -146,6 +148,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/bot-training/Bot_Trainingsplan.md` g
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | abgeschlossen; HUD-/Intermission-/Replay-Rest in V68 ueberfuehrt | Abgeschlossen |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
 | V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/plaene/alt/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
+| V66 | Vehicle-Manager UX - 3D-Vorschau, Kategorien und Upgrade-Visualisierung | `docs/plaene/alt/Feature_Vehicle_Manager_V66.md` | hoch | mittel | P2 | 66.1 Katalog-/Interaktionskonzept in Arbeit | In Arbeit |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (68.1-68.4 + 68.99; HUD/Intermission/Post-Run/Replay-Fallback verifiziert) | Abgeschlossen |
 | V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
@@ -731,7 +734,7 @@ Scope:
 
 Plan-Datei: `docs/plaene/alt/Feature_Vehicle_Manager_V66.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-30 -->
 
 Scope:
 
