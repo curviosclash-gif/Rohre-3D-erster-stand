@@ -20,6 +20,9 @@ This file defines repository-specific operating rules for Codex.
 - Ask questions only when critical information is missing.
 - For non-destructive design decisions, proceed proactively with a short rationale.
 - Keep docs/workflows/rules in sync with code and test reality after each change.
+- Create and revise implementation plans only in external docs under `docs/plaene/neu/`.
+- Do not create or restructure planning content directly inside `docs/Umsetzungsplan.md`.
+- Manual intake into `docs/Umsetzungsplan.md` and subsequent archival to `docs/plaene/alt/` is user-owned.
 - When implementation problems or blockers occur, create or update a task-scoped error report in `docs/Fehlerberichte/` before handoff or task close.
 - Bot training planning source of truth is `docs/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
 - Future bot-training windows and KPI corridor are maintained in `docs/Bot_Trainings_Roadmap.md` and referenced from `docs/Bot_Trainingsplan.md`.

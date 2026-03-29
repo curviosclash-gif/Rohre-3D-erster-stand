@@ -6,6 +6,12 @@ description: Rule for strict governance across both master plans
 - Both master plans are governed artifacts:
   - `docs/Umsetzungsplan.md`
   - `docs/Bot_Trainingsplan.md`
+- External implementation plans are first-class artifacts and must be authored in:
+  - `docs/plaene/neu/`
+- Do not create or rewrite plan scopes directly in `docs/Umsetzungsplan.md`.
+- Intake into `docs/Umsetzungsplan.md` is manual and user-owned.
+- After manual intake, move the corresponding external plan to:
+  - `docs/plaene/alt/`
 - Enforce gate invariant: a `*.99` phase may be `[x]` only when all earlier phases in the same block are `[x]`.
 - Every completed checklist item (`[x]`) with phase ID must include evidence metadata:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`

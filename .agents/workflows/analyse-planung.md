@@ -19,10 +19,11 @@ description: Run full test analysis, persist results, and update prioritized act
 - Compare against previous `docs/Analysebericht.md`.
 - Document only: new issues, regressions, resolved items.
 
-## 3. Update master plan
+## 3. Update follow-up plan (external)
 
-- Sync findings into `docs/Umsetzungsplan.md`.
-- Keep completed items for history. Use checkbox format: `## Phase X: [ ] Title`.
+- Sync findings into an external follow-up plan in `docs/plaene/neu/` (for example `docs/plaene/neu/Analyse_Followup_YYYY-MM-DD.md`).
+- Do not create or update planning scopes directly in `docs/Umsetzungsplan.md`.
+- Add intake notes for manual transfer by the user (target block, dependencies, risk).
 
 ## 4. Final consistency
 

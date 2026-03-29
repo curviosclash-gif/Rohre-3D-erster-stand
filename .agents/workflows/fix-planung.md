@@ -18,6 +18,8 @@ description: Execute the next open phase from master plan with dynamic N-bot par
 - Select master plan file by scope:
   - Default: `docs/Umsetzungsplan.md`
   - Bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs): `docs/Bot_Trainingsplan.md`
+- Execute only blocks already manually integrated by the user.
+- Do not create new blocks or planning scopes directly in master plans.
 - Find first block with `<!-- LOCK: frei -->` and fulfilled hard dependencies.
 - If `<!-- SUB-LOCK -->` exists, claim a specific top-level phase.
 - Atomic claim commit:
@@ -40,7 +42,7 @@ git push
 - Identify first open phase (`[ ]`) in claimed block.
 - List open sub-phases and affected files.
 - Check `Datei-Ownership` table for conflicts.
-- If phase has no sub-phases: split into at least 2 before starting.
+- If phase has no sub-phases: create/update an external plan in `docs/plaene/neu/` and wait for manual intake by the user.
 
 ## 3. Execute
 

@@ -7,6 +7,7 @@ description: Quick project status snapshot.
 
 - Read `docs/Umsetzungsplan.md` and `docs/Bot_Trainingsplan.md`.
 - Identify next open phase and dependency blockers for both master plans.
+- Check pending external intake plans in `docs/plaene/neu/`.
 - Run `npm run plan:check`.
 
 ## 2. Git state
@@ -18,6 +19,7 @@ description: Quick project status snapshot.
 ## 3. Output
 
 - Next phase, open dependencies, lock status, uncommitted changes, active branches.
+- List pending external plans waiting for manual intake.
 - If documentation/process drift suspected: `npm run docs:sync && npm run docs:check`.
 
 ## Report

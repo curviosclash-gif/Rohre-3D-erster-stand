@@ -25,26 +25,25 @@ description: Create a compact implementation plan for a new feature or extension
 
 ## 3. Write plan
 
-Create `docs/Feature_[Name].md` with:
+Create `docs/plaene/neu/Feature_[Name].md` with:
 - Goal, affected files.
 - Phasen mit Pflicht-Unterphasen (jede Phase mindestens 2 Unterphasen).
 - Abschluss-Gate als `X.99`.
 - Evidence format for completed items:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
+- Intake-Hinweis fuer den User:
+  - Ziel-Masterplan (`docs/Umsetzungsplan.md` oder `docs/Bot_Trainingsplan.md`)
+  - vorgeschlagene Block-ID
+  - hard/soft dependencies
+  - Hinweis `Manuelle Uebernahme erforderlich`
 
-## 4. Update master plan
+## 4. Manual intake handoff (no direct master-plan edits)
 
-- Select master plan file by scope:
-  - Default: `docs/Umsetzungsplan.md`
-  - Bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs): `docs/Bot_Trainingsplan.md`
-
-- Add or update block with:
-  - `<!-- LOCK: frei -->`
-  - optional `<!-- DEPENDS-ON: ... -->`
-  - `Definition of Done (DoD)` section
-  - risk register section
-- Update dependency table (`hard/soft`) and backlog priority table.
-- Keep gate invariant valid: `*.99` cannot be `[x]` while prior phases are open.
+- Do not create or change planning scopes directly in `docs/Umsetzungsplan.md`.
+- Do not create or change planning scopes directly in `docs/Bot_Trainingsplan.md`.
+- Keep all planning deltas in `docs/plaene/neu/Feature_[Name].md`.
+- Wait for user-managed intake into master plan.
+- After user confirms intake is complete, move plan file to `docs/plaene/alt/`.
 
 ## 5. Validate
 
@@ -54,8 +53,8 @@ Create `docs/Feature_[Name].md` with:
 
 ## 6. Commit
 
-- `git add [masterplan-datei] docs/Feature_[Name].md .agents/workflows/plan.md` when changed.
-- Commit message: `docs: add implementation plan for [Name]`.
+- `git add docs/plaene/neu/Feature_[Name].md .agents/workflows/plan.md` when changed.
+- Commit message: `docs: add external implementation plan for [Name]`.
 
 ## Report
 
