@@ -13,6 +13,7 @@ export class LatencyMonitor {
         this._peers = new Map();
         this._intervalId = null;
         this._onPingNeeded = options.onPingNeeded || null;
+        this._running = false;
     }
 
     addPeer(peerId) {
@@ -24,10 +25,15 @@ export class LatencyMonitor {
             lastPingSent: 0,
             pendingPingId: null,
         });
+        this._ensurePingLoop();
     }
 
     removePeer(peerId) {
         this._peers.delete(peerId);
+        if (this._peers.size <= 0 && this._intervalId) {
+            clearInterval(this._intervalId);
+            this._intervalId = null;
+        }
     }
 
     recordPingSent(peerId, pingId) {
@@ -90,23 +96,35 @@ export class LatencyMonitor {
     }
 
     start() {
-        if (this._intervalId) return;
-        this._intervalId = setInterval(() => {
-            if (this._onPingNeeded) {
-                for (const peerId of this._peers.keys()) {
-                    const pingId = `ping-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-                    this.recordPingSent(peerId, pingId);
-                    this._onPingNeeded(peerId, pingId);
-                }
-            }
-        }, this._pingInterval);
+        this._running = true;
+        this._ensurePingLoop();
     }
 
     stop() {
+        this._running = false;
         if (this._intervalId) {
             clearInterval(this._intervalId);
             this._intervalId = null;
         }
+    }
+
+    _ensurePingLoop() {
+        if (!this._running) return;
+        if (this._intervalId) return;
+        if (this._peers.size <= 0) return;
+        this._intervalId = setInterval(() => {
+            if (this._peers.size <= 0) {
+                clearInterval(this._intervalId);
+                this._intervalId = null;
+                return;
+            }
+            if (!this._onPingNeeded) return;
+            for (const peerId of this._peers.keys()) {
+                const pingId = `ping-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+                this.recordPingSent(peerId, pingId);
+                this._onPingNeeded(peerId, pingId);
+            }
+        }, this._pingInterval);
     }
 
     dispose() {

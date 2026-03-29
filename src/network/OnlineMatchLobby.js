@@ -13,6 +13,22 @@ import {
     createSignalingEnvelope,
 } from '../shared/contracts/SignalingSessionContract.js';
 
+const DEFAULT_CONNECT_RETRY_DELAYS_MS = [1000, 2000, 4000];
+
+function resolveRetryDelays(delays) {
+    if (!Array.isArray(delays) || delays.length <= 0) {
+        return [...DEFAULT_CONNECT_RETRY_DELAYS_MS];
+    }
+    return delays
+        .map((value) => Number(value))
+        .filter((value) => Number.isFinite(value) && value >= 0)
+        .map((value) => Math.floor(value));
+}
+
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * Lobby for Internet play. Communicates with the self-hosted
  * WebSocket signaling server.
@@ -50,12 +66,46 @@ export class OnlineMatchLobby extends MatchLobby {
         });
     }
 
-    _makeConnectPromise(setupFn, timeoutMs = 30_000) {
+    async _makeConnectPromise(setupFn, options = {}) {
+        const timeoutMs = Number.isFinite(Number(options.connectTimeoutMs))
+            ? Math.max(1, Math.floor(Number(options.connectTimeoutMs)))
+            : 30_000;
+        const retryDelays = resolveRetryDelays(options.connectRetryDelaysMs);
+        const configuredAttempts = Number.isFinite(Number(options.maxConnectAttempts))
+            ? Math.max(1, Math.floor(Number(options.maxConnectAttempts)))
+            : 3;
+        const maxAttempts = Math.min(3, configuredAttempts);
+        let lastError = null;
+
+        for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+            try {
+                await this._makeConnectAttempt(setupFn, timeoutMs);
+                return;
+            } catch (err) {
+                lastError = err;
+                this._closeSocket();
+                if (attempt >= maxAttempts) {
+                    break;
+                }
+                const retryDelayMs = retryDelays[Math.min(attempt - 1, retryDelays.length - 1)] || 0;
+                if (retryDelayMs > 0) {
+                    await delay(retryDelayMs);
+                }
+            }
+        }
+
+        throw lastError || new Error('Signaling connect failed');
+    }
+
+    _makeConnectAttempt(setupFn, timeoutMs) {
         return new Promise((resolve, reject) => {
-            let settled = false;
+            const connectState = {
+                settled: false,
+                rejected: false,
+            };
             const settle = (fn, arg) => {
-                if (settled) return;
-                settled = true;
+                if (connectState.settled) return;
+                connectState.settled = true;
                 fn(arg);
             };
 
@@ -64,20 +114,34 @@ export class OnlineMatchLobby extends MatchLobby {
                 timeoutMs
             );
             const connectResolve = () => { clearTimeout(timer); settle(resolve); };
-            const connectReject = (err) => { clearTimeout(timer); settle(reject, err); };
+            const connectReject = (err) => {
+                if (connectState.rejected) return;
+                connectState.rejected = true;
+                clearTimeout(timer);
+                settle(reject, err);
+            };
 
             this._ws = new WebSocket(this._signalingUrl);
-            setupFn(this._ws, connectResolve, connectReject);
+            setupFn(this._ws, connectResolve, connectReject, connectState);
 
             this._ws.onerror = () => {
-                clearTimeout(timer);
-                settle(reject, new Error('WebSocket connection failed'));
+                connectReject(new Error('WebSocket connection failed'));
             };
             this._ws.onclose = () => {
-                clearTimeout(timer);
-                settle(reject, new Error('WebSocket closed before connection was established'));
+                connectReject(new Error('WebSocket closed before connection was established'));
             };
         });
+    }
+
+    _closeSocket() {
+        if (this._ws) {
+            try {
+                this._ws.close();
+            } catch {
+                // Ignore socket close failures during retries.
+            }
+            this._ws = null;
+        }
     }
 
     async create(options = {}) {
@@ -85,7 +149,7 @@ export class OnlineMatchLobby extends MatchLobby {
         this.settings = { ...options };
         this._signalingUrl = options.signalingUrl || this._signalingUrl;
 
-        return this._makeConnectPromise((ws, connectResolve, connectReject) => {
+        return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
             ws.onopen = () => {
                 this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.CREATE_LOBBY, {
                     maxPlayers: options.maxPlayers || 10,
@@ -93,26 +157,26 @@ export class OnlineMatchLobby extends MatchLobby {
             };
             ws.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
-                this._handleMessage(msg, connectResolve, connectReject);
+                this._handleMessage(msg, connectResolve, connectReject, connectState);
             };
-        }, options.connectTimeoutMs);
+        }, options);
     }
 
     async join(lobbyCode, options = {}) {
         this.isHost = false;
 
-        return this._makeConnectPromise((ws, connectResolve, connectReject) => {
+        return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
             ws.onopen = () => {
                 this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.JOIN_LOBBY, { lobbyCode }));
             };
             ws.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
-                this._handleMessage(msg, connectResolve, connectReject);
+                this._handleMessage(msg, connectResolve, connectReject, connectState);
             };
-        }, options.connectTimeoutMs);
+        }, options);
     }
 
-    _handleMessage(msg, connectResolve, connectReject) {
+    _handleMessage(msg, connectResolve, connectReject, connectState = null) {
         switch (msg.type) {
         case SIGNALING_EVENT_TYPES.LOBBY_CREATED: {
             this.lobbyCode = msg.lobbyCode;
@@ -208,7 +272,13 @@ export class OnlineMatchLobby extends MatchLobby {
 
         case SIGNALING_EVENT_TYPES.ERROR:
             this._emit('error', { message: msg.message });
-            if (connectReject) connectReject(new Error(`Signaling error: ${msg.message}`));
+            if (connectReject) {
+                if (connectState?.rejected) break;
+                if (connectState) {
+                    connectState.rejected = true;
+                }
+                connectReject(new Error(`Signaling error: ${msg.message}`));
+            }
             break;
 
         default:

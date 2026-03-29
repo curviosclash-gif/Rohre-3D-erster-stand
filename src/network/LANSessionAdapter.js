@@ -15,6 +15,17 @@ import {
     normalizeMultiplayerSessionMessage,
 } from '../shared/contracts/MultiplayerSessionContract.js';
 
+const JOIN_OFFER_MAX_WAIT_MS = 12_000;
+const JOIN_OFFER_INITIAL_BACKOFF_MS = 200;
+const JOIN_OFFER_MAX_BACKOFF_MS = 1_600;
+const ICE_POLL_MAX_RETRIES = 20;
+const ICE_QUIET_WINDOW_POLLS = 3;
+const ICE_POLL_DELAY_MS = 200;
+
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 /**
  * SessionAdapter for LAN play.
  * Host runs an embedded HTTP signaling server (in Electron/Tauri main process).
@@ -94,14 +105,22 @@ export class LANSessionAdapter extends SessionAdapterBase {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ lobbyCode }),
             });
+            if (joinRes?.ok === false) {
+                throw new Error(`Lobby join failed (${joinRes.status || 'unknown'})`);
+            }
             const joinData = await joinRes.json();
             this.localPlayerId = joinData.playerId;
 
             // Poll for the offer from host
             let offerData = null;
-            for (let i = 0; i < 30; i += 1) {
+            let offerPollDelayMs = JOIN_OFFER_INITIAL_BACKOFF_MS;
+            const offerPollingStartedAt = Number(this._now()) || 0;
+            while ((Number(this._now()) || 0) - offerPollingStartedAt < JOIN_OFFER_MAX_WAIT_MS) {
                 try {
                     const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${this.localPlayerId}`);
+                    if (offerRes?.ok === false) {
+                        throw new Error(`Offer poll failed (${offerRes.status || 'unknown'})`);
+                    }
                     const data = await offerRes.json();
                     if (data.offer) {
                         offerData = data;
@@ -110,7 +129,8 @@ export class LANSessionAdapter extends SessionAdapterBase {
                 } catch (err) {
                     logger.debug('Offer poll failed:', err);
                 }
-                await new Promise((resolve) => setTimeout(resolve, 200));
+                await delay(offerPollDelayMs);
+                offerPollDelayMs = Math.min(JOIN_OFFER_MAX_BACKOFF_MS, offerPollDelayMs * 2);
             }
             if (!offerData?.offer) {
                 throw new Error('Timed out waiting for host offer');
@@ -129,7 +149,10 @@ export class LANSessionAdapter extends SessionAdapterBase {
         }
 
         // Exchange ICE candidates with host
-        await this._pollIceCandidates('host');
+        await this._pollIceCandidates('host', {
+            playerId: this.localPlayerId,
+            fromPeerId: 'host',
+        });
 
         this.isConnected = true;
         this._emit('connected', { playerId: this.localPlayerId });
@@ -137,30 +160,50 @@ export class LANSessionAdapter extends SessionAdapterBase {
 
     async _sendIceCandidate(peerId, candidate) {
         if (!this._signalingUrl) return;
+        const sourcePlayerId = String(this.localPlayerId || (this.isHost ? 'host' : '') || '').trim();
+        const targetPlayerId = String(peerId || '').trim() || 'host';
         try {
             await fetch(`${this._signalingUrl}/signaling/ice`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerId: this.localPlayerId || peerId, candidate }),
+                body: JSON.stringify({
+                    playerId: sourcePlayerId,
+                    targetPlayerId,
+                    candidate,
+                }),
             });
         } catch (err) {
             logger.debug('ICE send failed (may still connect via other candidates):', err);
         }
     }
 
-    async _pollIceCandidates(peerId) {
+    async _pollIceCandidates(peerId, options = {}) {
         // Continue polling after first batch to support Trickle-ICE:
         // stop only after ICE_QUIET_WINDOW_POLLS consecutive empty polls once at least one
         // candidate has been received, or after ICE_POLL_MAX_RETRIES total iterations.
-        const ICE_POLL_MAX_RETRIES = 20;
-        const ICE_QUIET_WINDOW_POLLS = 3;
-        const ICE_POLL_DELAY_MS = 200;
+        const playerId = String(options.playerId || this.localPlayerId || '').trim();
+        if (!playerId) return;
+        const fromPeerId = String(options.fromPeerId || '').trim();
+        const maxRetries = Number.isFinite(Number(options.maxRetries))
+            ? Math.max(1, Math.floor(Number(options.maxRetries)))
+            : ICE_POLL_MAX_RETRIES;
+        const quietWindowPolls = Number.isFinite(Number(options.quietWindowPolls))
+            ? Math.max(1, Math.floor(Number(options.quietWindowPolls)))
+            : ICE_QUIET_WINDOW_POLLS;
+        const pollDelayMs = Number.isFinite(Number(options.pollDelayMs))
+            ? Math.max(0, Math.floor(Number(options.pollDelayMs)))
+            : ICE_POLL_DELAY_MS;
+        const params = new URLSearchParams({ playerId });
+        if (fromPeerId) {
+            params.set('fromPlayerId', fromPeerId);
+        }
+        const pollUrl = `${this._signalingUrl}/signaling/ice?${params.toString()}`;
 
         let hasReceivedAny = false;
         let quietCount = 0;
-        for (let i = 0; i < ICE_POLL_MAX_RETRIES; i += 1) {
+        for (let i = 0; i < maxRetries; i += 1) {
             try {
-                const res = await fetch(`${this._signalingUrl}/signaling/ice?playerId=${this.localPlayerId}`);
+                const res = await fetch(pollUrl);
                 const data = await res.json();
                 if (Array.isArray(data.candidates) && data.candidates.length > 0) {
                     for (const candidate of data.candidates) {
@@ -170,12 +213,12 @@ export class LANSessionAdapter extends SessionAdapterBase {
                     quietCount = 0;
                 } else if (hasReceivedAny) {
                     quietCount += 1;
-                    if (quietCount >= ICE_QUIET_WINDOW_POLLS) return;
+                    if (quietCount >= quietWindowPolls) return;
                 }
             } catch (err) {
                 logger.debug('ICE candidate poll failed:', err);
             }
-            await new Promise((resolve) => setTimeout(resolve, ICE_POLL_DELAY_MS));
+            await delay(pollDelayMs);
         }
     }
 
@@ -217,7 +260,11 @@ export class LANSessionAdapter extends SessionAdapterBase {
             for (let i = 0; i < 30; i += 1) {
                 // Poll for ICE candidates from client while waiting for answer
                 try {
-                    const iceRes = await fetch(`${this._signalingUrl}/signaling/ice?playerId=${targetPeerId}`);
+                    const iceParams = new URLSearchParams({
+                        playerId: 'host',
+                        fromPlayerId: targetPeerId,
+                    });
+                    const iceRes = await fetch(`${this._signalingUrl}/signaling/ice?${iceParams.toString()}`);
                     const iceData = await iceRes.json();
                     if (Array.isArray(iceData.candidates)) {
                         for (const candidate of iceData.candidates) {
@@ -232,7 +279,7 @@ export class LANSessionAdapter extends SessionAdapterBase {
                     const res = await fetch(`${this._signalingUrl}/signaling/answer?playerId=${targetPeerId}`);
                     const data = await res.json();
                     if (!data.answer) {
-                        await new Promise((resolve) => setTimeout(resolve, 200));
+                        await delay(200);
                         continue;
                     }
                     await this._peerManager.handleAnswer(targetPeerId, data.answer);
@@ -253,7 +300,7 @@ export class LANSessionAdapter extends SessionAdapterBase {
                     return;
                 } catch (err) {
                     logger.debug('Answer poll for pending client failed:', err);
-                    await new Promise((resolve) => setTimeout(resolve, 200));
+                    await delay(200);
                 }
             }
         } catch (err) {
@@ -359,6 +406,8 @@ export class LANSessionAdapter extends SessionAdapterBase {
             this._emit('playerDisconnected', { peerId: data.playerId || peerId, reason: 'graceful-leave' });
             break;
         case MULTIPLAYER_MESSAGE_TYPES.HOST_LEAVING:
+            this._closePeerConnection(peerId || 'host');
+            this._removePeerLatency(peerId || 'host');
             this._emit('hostDisconnected', { reason: 'graceful-leave' });
             this._emit('playerDisconnected', { peerId, reason: 'host-leaving', isHost: true });
             break;

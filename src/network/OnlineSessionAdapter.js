@@ -2,6 +2,7 @@
 // OnlineSessionAdapter.js - Internet session via WebSocket signaling + STUN/TURN
 // ============================================
 
+import { createLogger } from '../shared/logging/Logger.js';
 import { SessionAdapterBase } from './SessionAdapterBase.js';
 import { PeerConnectionManager } from './PeerConnectionManager.js';
 import { DataChannelManager } from './DataChannelManager.js';
@@ -11,6 +12,23 @@ import {
     MULTIPLAYER_MESSAGE_TYPES,
     normalizeMultiplayerSessionMessage,
 } from '../shared/contracts/MultiplayerSessionContract.js';
+
+const logger = createLogger('OnlineSessionAdapter');
+const DEFAULT_CONNECT_RETRY_DELAYS_MS = [1000, 2000, 4000];
+
+function resolveRetryDelays(delays) {
+    if (!Array.isArray(delays) || delays.length <= 0) {
+        return [...DEFAULT_CONNECT_RETRY_DELAYS_MS];
+    }
+    return delays
+        .map((value) => Number(value))
+        .filter((value) => Number.isFinite(value) && value >= 0)
+        .map((value) => Math.floor(value));
+}
+
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function resolveSignalingUrl(explicit) {
     if (explicit) return explicit;
@@ -80,8 +98,42 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
 
     async connect(options = {}) {
         this._signalingUrl = options.signalingUrl || this._signalingUrl;
-        const timeoutMs = options.connectTimeoutMs || 30_000;
+        const retryDelays = resolveRetryDelays(options.connectRetryDelaysMs);
+        const maxAttempts = Number.isFinite(Number(options.maxConnectAttempts))
+            ? Math.min(3, Math.max(1, Math.floor(Number(options.maxConnectAttempts))))
+            : 3;
+        let lastError = null;
 
+        for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+            try {
+                await this._connectSingleAttempt(options);
+                return;
+            } catch (err) {
+                lastError = err;
+                this._teardownSignalingSocket();
+                if (attempt >= maxAttempts) {
+                    break;
+                }
+                const retryDelayMs = retryDelays[Math.min(attempt - 1, retryDelays.length - 1)] || 0;
+                if (retryDelayMs > 0) {
+                    logger.debug('Signaling connect attempt failed; retrying', {
+                        attempt,
+                        maxAttempts,
+                        retryDelayMs,
+                        error: err?.message || String(err),
+                    });
+                    await delay(retryDelayMs);
+                }
+            }
+        }
+
+        throw lastError || new Error('Signaling connect failed');
+    }
+
+    _connectSingleAttempt(options = {}) {
+        const timeoutMs = Number.isFinite(Number(options.connectTimeoutMs))
+            ? Math.max(1, Math.floor(Number(options.connectTimeoutMs)))
+            : 30_000;
         return new Promise((resolve, reject) => {
             let settled = false;
             const settle = (fn, arg) => {
@@ -94,6 +146,14 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
                 () => settle(reject, new Error('Signaling connect timed out')),
                 timeoutMs
             );
+            const connectResolve = () => {
+                clearTimeout(timer);
+                settle(resolve);
+            };
+            const connectReject = (err) => {
+                clearTimeout(timer);
+                settle(reject, err);
+            };
 
             this._ws = new WebSocket(this._signalingUrl);
 
@@ -112,23 +172,27 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
                 } catch {
                     return;
                 }
-                this._handleSignalingMessage(
-                    msg,
-                    () => { clearTimeout(timer); settle(resolve); },
-                    (err) => { clearTimeout(timer); settle(reject, err); }
-                );
+                this._handleSignalingMessage(msg, connectResolve, connectReject);
             };
 
             this._ws.onerror = () => {
-                clearTimeout(timer);
-                settle(reject, new Error('WebSocket connection failed'));
+                connectReject(new Error('WebSocket connection failed'));
             };
             this._ws.onclose = () => {
-                clearTimeout(timer);
-                settle(reject, new Error('WebSocket closed before connection was established'));
+                connectReject(new Error('WebSocket closed before connection was established'));
                 this._emit('signalingDisconnected', {});
             };
         });
+    }
+
+    _teardownSignalingSocket() {
+        if (!this._ws) return;
+        try {
+            this._ws.close();
+        } catch {
+            // Best-effort cleanup between retries.
+        }
+        this._ws = null;
     }
 
     async _handleSignalingMessage(msg, connectResolve, connectReject) {
@@ -318,6 +382,8 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
             this._emit('playerDisconnected', { peerId: data.playerId || peerId, reason: 'graceful-leave' });
             break;
         case MULTIPLAYER_MESSAGE_TYPES.HOST_LEAVING:
+            this._closePeerConnection(peerId || 'host');
+            this._removePeerLatency(peerId || 'host');
             this._emit('hostDisconnected', { reason: 'graceful-leave' });
             this._emit('playerDisconnected', { peerId, reason: 'host-leaving', isHost: true });
             break;

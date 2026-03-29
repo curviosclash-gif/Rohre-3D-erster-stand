@@ -10,32 +10,34 @@ import { createGameStateSnapshot } from '../GameStateSnapshot.js';
 const STATE_BROADCAST_INTERVAL_MS = 100; // 10/s
 const STATE_UPDATE_BUFFER_LIMIT = 24;
 const ARENA_START_SIGNAL_TIMEOUT_MS = 12_000;
+const ARENA_LOADED_BASE_TIMEOUT_MS = 10_000;
+const ARENA_LOADED_TIMEOUT_PER_REMOTE_PLAYER_MS = 5_000;
 const ARENA_LOADED_SIGNAL_TYPE = 'arena_loaded';
 const ARENA_START_SIGNAL_TYPE = 'arena_start';
+
+export async function createRuntimeSessionAdapter(sessionType) {
+    const normalizedSessionType = String(sessionType || 'single').trim().toLowerCase();
+    if (normalizedSessionType === 'lan') {
+        const { LANSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/LANSessionAdapter.js');
+        return new LANSessionAdapter();
+    }
+    if (normalizedSessionType === 'online') {
+        const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/OnlineSessionAdapter.js');
+        return new OnlineSessionAdapter();
+    }
+    if (normalizedSessionType === 'multiplayer') {
+        // Storage-Bridge coordination: no real-time network adapter in this mode.
+        return new LocalSessionAdapter();
+    }
+    return new LocalSessionAdapter();
+}
 
 export async function initRuntimeSession(facade) {
     const game = facade?.game;
     const sessionType = String(game?.runtimeConfig?.session?.sessionType || 'single').toLowerCase();
 
     teardownRuntimeSession(facade);
-
-    if (sessionType === 'lan') {
-        // Lazy-import to avoid bundling network code in single-player builds
-        const { LANSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/LANSessionAdapter.js');
-        facade.session = new LANSessionAdapter();
-    } else if (sessionType === 'online') {
-        const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/OnlineSessionAdapter.js');
-        facade.session = new OnlineSessionAdapter();
-    } else if (sessionType === 'multiplayer') {
-        // 'multiplayer' is the Storage-Bridge coordination type: each participant runs a
-        // LocalSessionAdapter independently. Real-time state sync is NOT performed — the
-        // BroadcastChannel/localStorage bridge only handles lobby coordination and match-start
-        // signalling. Use 'lan' or 'online' sessionType (via localSettings.multiplayerTransport)
-        // to enable actual network state sync in a future transport upgrade.
-        facade.session = new LocalSessionAdapter();
-    } else {
-        facade.session = new LocalSessionAdapter();
-    }
+    facade.session = await createRuntimeSessionAdapter(sessionType);
 
     const numHumans = game?.runtimeConfig?.session?.numHumans || 1;
     await facade.session.connect({ numHumans });
@@ -219,8 +221,10 @@ export async function waitForRuntimePlayersLoaded(facade) {
             return;
         }
 
-        // Safety timeout: don't block forever
-        timeoutId = setTimeout(() => finish(), 10000);
+        const expectedRemotePeers = Math.max(0, expectedPeerIds.size - 1);
+        const dynamicTimeoutMs = ARENA_LOADED_BASE_TIMEOUT_MS
+            + expectedRemotePeers * ARENA_LOADED_TIMEOUT_PER_REMOTE_PLAYER_MS;
+        timeoutId = setTimeout(() => finish(), dynamicTimeoutMs);
     });
 }
 

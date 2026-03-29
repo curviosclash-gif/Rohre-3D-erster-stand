@@ -67,9 +67,11 @@ export function serializePlayer(player) {
         alive: !!player.alive,
         pos: vecToArray(player.position),
         rot: quatToArray(player.quaternion),
+        vel: vecToArray(player.velocity),
         health: player.health ?? 100,
         score: player.score ?? 0,
         inventory: Array.isArray(player.inventory) ? [...player.inventory] : [],
+        effects: serializeEffects(player.activeEffects),
         shieldHP: player.shieldHP ?? 0,
         speed: player.speed ?? 0,
     };
@@ -83,5 +85,19 @@ function vecToArray(vec) {
 function quatToArray(quat) {
     if (!quat) return [0, 0, 0, 1];
     return [quat.x || 0, quat.y || 0, quat.z || 0, quat.w || 1];
+}
+
+function serializeEffects(effects) {
+    if (!Array.isArray(effects) || effects.length <= 0) return [];
+    return effects
+        .map((effect) => {
+            const type = String(effect?.type || '').trim();
+            if (!type) return null;
+            return {
+                type,
+                remaining: Number(effect?.remaining) || 0,
+            };
+        })
+        .filter(Boolean);
 }
 
