@@ -1,6 +1,6 @@
 # Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-28 (V66 Vehicle-Manager-Plan ergaenzt; V65 Map-Editor-UX-Plan aktiv; V52-V57 bleiben archiviert, stale Backlog ausgelagert)
+Stand: 2026-03-29 (V65 abgeschlossen inkl. 65.99-Gate und Smoke-Evidence; V66 Vehicle-Manager-Plan aktiv; V52-V57 bleiben archiviert, stale Backlog ausgelagert)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/Backlog.md`.
@@ -70,7 +70,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/LANSessionAdapter.js`, `src/network/LANMatchLobby.js`, `src/network/OnlineSessionAdapter.js`, `src/network/OnlineMatchLobby.js`, `server/lan-signaling.js`, `src/shared/logging/**`, `src/core/renderer/camera/CameraShakeSolver.js`, `src/core/renderer/camera/CameraModeStrategySet.js`, `src/core/renderer/RecordingCapturePipeline.js`, `src/entities/systems/CinematicCameraSystem.js`, `src/shared/contracts/RecordingCaptureContract.js`, `src/core/GameBootstrap.js`, `src/core/main.js` | V59 | abgeschlossen | Netzwerk-Haertung, Logger-Abstraktion, Camera/Recording-Polish, Async-Error-Konsistenz |
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/*Lobby.js`, `src/ui/menu/testing/**`, `tests/core.spec.js`, `tests/stress.spec.js` | V60 | in Bearbeitung | Bot-Codex claim 2026-03-28 fuer dormant multiplayer/input cleanup, test-only Panel-Extraktion und Bridge-Vertrags-Haertung |
 | `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
-| `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | in Bearbeitung | Bot-Codex claim 2026-03-28 fuer Map-Editor UX-Refit: Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss |
+| `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | geplant | Multiplayer-Netzwerk-Haertung: ICE-Fix, Retry-Logik, Reconciler-Erweiterung, Ghost-Cleanup |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -80,12 +80,12 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | --- | --- | --- | --- | --- |
 | Bot-Codex | V58 | 2026-03-27 | closed | 58.3.2-58.4.3 abgeschlossen 2026-03-27; 58.99 Gate ausstehend |
 | Agent B | V59 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (Gate 59.99 geschlossen) |
-| Bot-Codex | V60 | 2026-03-28 | claimed | Rest: 60.3.3, 60.4.3-60.4.4 und 60.99; 60.2.x, 60.3.1-60.3.2 und 60.4.1-60.4.2 erledigt |
-| Bot-Codex | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
+| - | V60 | - | frei | Rest: 60.3.3, 60.4.3-60.4.4 und 60.99 |
+| Bot-B | V61 | 2026-03-27 | claimed | 61.1.1-61.1.3 + 61.11.1-61.11.2 + 61.3.1-61.3.3 abgeschlossen |
 | Bot-Codex | V62 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (`npm run build` PASS, `npm run test:core` PASS; T1-Startup-Flake nur im ersten Versuch, Retry gruen) |
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
-| Bot-Codex | V65 | 2026-03-28 | claimed | 65.1.1-65.4.2 umgesetzt; Rest: 65.5.x, 65.99 |
+| Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -130,10 +130,10 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | Rest: 60.3.3 Session-Typ/Transport, 60.4.3 Presence-Stability, 60.4.4 echte Netzwerk-Charakterisierung, 60.99 Gate | In Bearbeitung |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | Rest: HUD, Modifiers, Intermission, Mastery-UI | In Bearbeitung |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
-| V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | 65.1 Katalogstruktur und Dock-Interaktion finalisieren | Geplant |
+| V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | blockiert durch V60.99 | Geplant |
 
-Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
+Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
 ---
 
@@ -345,7 +345,7 @@ Bestehende Basis:
 
 Plan-Datei: `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-28 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V58.99, V59.99 -->
 
 Scope:
@@ -653,7 +653,7 @@ Scope:
 
 Plan-Datei: `docs/Feature_Map_Editor_UX_V65.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-28 -->
+<!-- LOCK: frei -->
 
 Scope:
 
@@ -663,10 +663,10 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 65.1 bis 65.5 und 65.99 sind abgeschlossen.
-- [ ] DoD.2 Alle platzierbaren Editor-Objekte sind ohne versteckte Pflicht-`select`-Felder ueber den neuen Katalog erreichbar.
-- [ ] DoD.3 Die aktive Auswahl ist ueber Highlight, Namen und Kategorie jederzeit klar sichtbar; zuletzt genutzte Objekte bleiben schnell erreichbar.
-- [ ] DoD.4 `npm run test:core` deckt Dock-Rendering, Kartenwahl und Platzierung relevanter Objektarten ab; Save/Export/Playtest bleiben funktionsfaehig.
+- [x] DoD.1 Alle Phasen 65.1 bis 65.5 und 65.99 sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: 65.1.1-65.99.2 alle auf [x])
+- [x] DoD.2 Alle platzierbaren Editor-Objekte sind ohne versteckte Pflicht-`select`-Felder ueber den neuen Katalog erreichbar. (abgeschlossen: 2026-03-29; evidence: Katalog-/Dock-Umbau in commits `87cb45d`, `d33f042`, `40d1d33`)
+- [x] DoD.3 Die aktive Auswahl ist ueber Highlight, Namen und Kategorie jederzeit klar sichtbar; zuletzt genutzte Objekte bleiben schnell erreichbar. (abgeschlossen: 2026-03-29; evidence: `tests/editor-map-ui.spec.js` T65a/T65b -> `test-results/v65-final-pass2`)
+- [x] DoD.4 `npm run test:core` deckt Dock-Rendering, Kartenwahl und Platzierung relevanter Objektarten ab; Save/Export/Playtest bleiben funktionsfaehig. (abgeschlossen: 2026-03-29; evidence: `TEST_PORT=5314 PW_RUN_TAG=v65-core PW_OUTPUT_DIR=test-results/v65-core npm run test:core` -> `117 passed, 3 skipped`; T65d Save/Export/Playtest -> `test-results/v65-final-pass2`)
 
 ### 65.1 Katalog- und Interaktionskonzept
 
@@ -690,13 +690,13 @@ Scope:
 
 ### 65.5 Verifikation und visuelle Abnahme
 
-- [ ] 65.5.1 Editor-Playwright-Checks fuer Bottom-Dock, Kategorien, Kartenwahl und Platzierung von Block, Portal, Item und Flugobjekt ergaenzen oder neu anlegen.
-- [ ] 65.5.2 Visuelle Evidence (Screenshot) plus kurze manuelle Smoke-Probe fuer Save/Export/Playtest dokumentieren.
+- [x] 65.5.1 Editor-Playwright-Checks fuer Bottom-Dock, Kategorien, Kartenwahl und Platzierung von Block, Portal, Item und Flugobjekt ergaenzen oder neu anlegen. (abgeschlossen: 2026-03-29; evidence: `node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/editor-map-ui.spec.js -c playwright.editor.config.mjs --timeout=240000` -> `test-results/v65-final-pass2`)
+- [x] 65.5.2 Visuelle Evidence (Screenshot) plus kurze manuelle Smoke-Probe fuer Save/Export/Playtest dokumentieren. (abgeschlossen: 2026-03-29; evidence: `docs/qa/V65_Editor_Dock_Smoke_2026-03-29.md` + `docs/qa/V65_Editor_Build_Dock_2026-03-29.png`)
 
 ### 65.99 Integrations- und Abschluss-Gate
 
-- [ ] 65.99.1 `npm run test:core` und `npm run build` sind fuer den Scope gruen; editorrelevante UI-Checks laufen stabil.
-- [ ] 65.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-Abgleich und Backlog-Pflege sind abgeschlossen.
+- [x] 65.99.1 `npm run test:core` und `npm run build` sind fuer den Scope gruen; editorrelevante UI-Checks laufen stabil. (abgeschlossen: 2026-03-29; evidence: `TEST_PORT=5314 PW_RUN_TAG=v65-core PW_OUTPUT_DIR=test-results/v65-core npm run test:core` -> `117 passed, 3 skipped`; `npm run build` -> PASS; `tests/editor-map-ui.spec.js` T65a-T65d -> `test-results/v65-final-pass2`)
+- [x] 65.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-Abgleich und Backlog-Pflege sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` -> PASS; V65 Lock auf `frei`; Status-Tabelle aktualisiert)
 
 ### Risiko-Register V65
 
@@ -854,6 +854,7 @@ Scope:
 | V52-V57 | abgeschlossen | `docs/archive/plans/completed/Umsetzungsplan_Bloecke_V52-V57_Architektur-Haertung-bis-Arcade_2026-03-27.md` | `docs/archive/plans/completed/` |
 | V59 | abgeschlossen | `docs/Umsetzungsplan.md` (Block-Definition im Archiv V52-V57 oder inline) | `docs/archive/plans/completed/` |
 | V63 | abgeschlossen | `docs/Feature_Fight_Modus_Followup_V63.md` | `docs/archive/plans/completed/` |
+| V65 | abgeschlossen | `docs/Feature_Map_Editor_UX_V65.md` | `docs/archive/plans/completed/` |
 | N4-N7 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V49 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V41-D | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
