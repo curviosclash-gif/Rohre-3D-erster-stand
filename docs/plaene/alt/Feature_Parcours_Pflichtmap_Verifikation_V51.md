@@ -1,4 +1,4 @@
-# Feature: Parcours-Pflichtmap mit Lauf-Verifikation (V51)
+﻿# Feature: Parcours-Pflichtmap mit Lauf-Verifikation (V51)
 
 Stand: 2026-03-22  
 Status: Abgeschlossen  
@@ -133,7 +133,7 @@ Datei-Ownership-Check:
 
 Dokumentationswirkung:
 
-- `docs/Feature_Parcours_Pflichtmap_Verifikation_V51.md`
+- `docs/plaene/alt/Feature_Parcours_Pflichtmap_Verifikation_V51.md`
 - `docs/Umsetzungsplan.md`
 - bei Umsetzung zusaetzlich Test-/Playtest-Artefakte fuer Laufverifikation
 
@@ -177,3 +177,4 @@ Dokumentationswirkung:
 ## Frische-Hinweis
 
 Vor Abschluss der spaeteren Umsetzung muessen `npm run docs:sync` und `npm run docs:check` als letzter Schritt laufen.
+

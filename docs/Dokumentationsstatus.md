@@ -11,7 +11,7 @@ Gate: PASS
 - Alle Pflichtdateien vorhanden.
 
 ## Legacy-Pfad-Funde (aktiv, ohne docs/archive)
-- docs/Feature_Map_Editor_UX_V65.md: Zeilen 241
+- docs/plaene/alt/Feature_Map_Editor_UX_V65.md: Zeilen 241
 
 ## Encoding-Warnungen (Mojibake)
 - Keine Mojibake-Muster gefunden.

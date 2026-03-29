@@ -1,4 +1,4 @@
-# Feature: SettingsManager Decomposition und Settings-Domain-Entkopplung (V53)
+﻿# Feature: SettingsManager Decomposition und Settings-Domain-Entkopplung (V53)
 
 Stand: 2026-03-24  
 Status: Abgeschlossen  
@@ -49,8 +49,8 @@ Evidence: `TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/bo
 
 ## Phasenplan
 
-- [x] 53.1 Scope-Baseline und API-Inventar (abgeschlossen: 2026-03-24; evidence: rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js -> docs/Feature_SettingsManager_Decomposition_V53.md)
-  - [x] 53.1.1 Oeffentliche `SettingsManager`-Methoden inkl. Aufrufer inventarisiert und Facade-Vertrag fixiert (abgeschlossen: 2026-03-24; evidence: rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js -> docs/Feature_SettingsManager_Decomposition_V53.md)
+- [x] 53.1 Scope-Baseline und API-Inventar (abgeschlossen: 2026-03-24; evidence: rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js -> docs/plaene/alt/Feature_SettingsManager_Decomposition_V53.md)
+  - [x] 53.1.1 Oeffentliche `SettingsManager`-Methoden inkl. Aufrufer inventarisiert und Facade-Vertrag fixiert (abgeschlossen: 2026-03-24; evidence: rg -n "settingsManager\\." src/core/runtime src/core/GameRuntimeFacade.js tests/core.spec.js -> docs/plaene/alt/Feature_SettingsManager_Decomposition_V53.md)
   - [x] 53.1.2 Characterization-Baseline fuer kritische Flows dokumentiert (abgeschlossen: 2026-03-24; evidence: TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/botFv53-full2 npm run test:core -> test-results/botFv53-full2)
 
 - [x] 53.2 Settings-Normalisierung zerlegen (abgeschlossen: 2026-03-24; evidence: git show --name-only 0f04006 -> 0f04006)
@@ -82,3 +82,4 @@ Evidence: `TEST_PORT=5306 PW_RUN_TAG=botFv53-full2 PW_OUTPUT_DIR=test-results/bo
 - API-stabil: bestehende Runtime/Menu-Call-Sites nutzen unveraenderte Entry-Points.
 - Verhaltensstabil: Sanitizing-, Preset-, Session- und Telemetry-Pfade bleiben regressionsabgesichert.
 - Wartbarer: klar getrennte Domain-Module statt monolithischer Klasse.
+

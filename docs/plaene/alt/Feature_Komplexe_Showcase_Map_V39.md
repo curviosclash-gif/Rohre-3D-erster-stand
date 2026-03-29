@@ -1,4 +1,4 @@
-# Feature: Komplexe Showcase-Map (V39)
+﻿# Feature: Komplexe Showcase-Map (V39)
 
 Stand: 2026-03-16  
 Status: In Umsetzung abgeschlossen, Abschluss-Gate offen  
@@ -70,7 +70,7 @@ Datei-Ownership-Check:
 
 Dokumentationswirkung:
 
-- `docs/Feature_Komplexe_Showcase_Map_V39.md`
+- `docs/plaene/alt/Feature_Komplexe_Showcase_Map_V39.md`
 - `docs/Umsetzungsplan.md`
 - bei Umsetzung zusaetzlich Testergebnis-/Analyse-Dokumente fuer Playtests und Runtime-Warnungen
 
@@ -134,3 +134,4 @@ Dokumentationswirkung:
 ## Frische-Hinweis
 
 Bei Abschluss der spaeteren Umsetzung muessen `npm run docs:sync` und `npm run docs:check` zwingend als letzter Schritt laufen.
+

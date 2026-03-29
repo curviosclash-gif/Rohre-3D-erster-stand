@@ -1,4 +1,4 @@
-# Feature: Cinematic Camera Follow-up + YouTube Shorts Capture (V29b)
+﻿# Feature: Cinematic Camera Follow-up + YouTube Shorts Capture (V29b)
 
 Stand: 2026-03-22  
 Status: Abgeschlossen  
@@ -81,7 +81,7 @@ Risiko-Einstufung: **hoch** (Render-/Recorder-Hotpath, Layout-Komposition, Kamer
 
 - [x] **29b.99 Abschluss-Gate** (abgeschlossen: 2026-03-22; evidence: `npm run test:core && npm run test:gpu && npm run test:stress && npm run build && npm run plan:check && npm run docs:sync && npm run docs:check` -> `test-results/pid-13680-mn259urp`)
   - [x] 29b.99.1 Relevante Tests + Build + Architektur-Guard sind gruen. (abgeschlossen: 2026-03-22; evidence: `npm run test:core && npm run test:gpu && npm run test:stress && npm run build` -> `test-results/pid-13680-mn259urp`)
-  - [x] 29b.99.2 Dokumentations- und Governance-Gates (`plan:check`, `docs:sync`, `docs:check`) sind gruen. (abgeschlossen: 2026-03-22; evidence: `npm run plan:check && npm run docs:sync && npm run docs:check` -> `docs/Feature_Cinematic_Camera_Followup_V29b.md`)
+  - [x] 29b.99.2 Dokumentations- und Governance-Gates (`plan:check`, `docs:sync`, `docs:check`) sind gruen. (abgeschlossen: 2026-03-22; evidence: `npm run plan:check && npm run docs:sync && npm run docs:check` -> `docs/plaene/alt/Feature_Cinematic_Camera_Followup_V29b.md`)
 
 ## Evidence-Format bei Abschluss
 
@@ -104,3 +104,4 @@ Risiko-Einstufung: **hoch** (Render-/Recorder-Hotpath, Layout-Komposition, Kamer
   - `npm run plan:check`
   - `npm run docs:sync`
   - `npm run docs:check`
+

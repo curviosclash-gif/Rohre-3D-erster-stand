@@ -1,4 +1,4 @@
-# Feature Hunt Rocket Trail Targeting V40
+﻿# Feature Hunt Rocket Trail Targeting V40
 
 ## Ziel
 
@@ -84,7 +84,7 @@
 
 ## Dokumentationswirkung
 
-- Neuer Detailplan in `docs/Feature_Hunt_Rocket_Trail_Targeting_V40.md`
+- Neuer Detailplan in `docs/plaene/alt/Feature_Hunt_Rocket_Trail_Targeting_V40.md`
 - Neuer Eintrag im `Plan-Eingang` von `docs/Umsetzungsplan.md`
 - Datei-Ownership im Masterplan bleibt fuer diesen Planungsschritt bewusst unveraendert, weil neue Plaene laut append-only-Regel zuerst im Eingang gesammelt und spaeter in einem separaten Cleanup in Hauptbloecke ueberfuehrt werden
 
@@ -94,3 +94,4 @@ Vor Abschluss der spaeteren Implementierung immer:
 
 - `npm run docs:sync`
 - `npm run docs:check`
+

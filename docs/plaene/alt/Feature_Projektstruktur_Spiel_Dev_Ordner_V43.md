@@ -1,4 +1,4 @@
-# Feature Plan: Projektstruktur Spiel und Dev-Ordner V43
+﻿# Feature Plan: Projektstruktur Spiel und Dev-Ordner V43
 
 Stand: 2026-03-17
 Status: Geplant
@@ -196,9 +196,9 @@ Hauptgruende:
 
 ## Phasenplan
 
-- [x] 43.0 Scope-Freeze und Ordnervertrag (abgeschlossen: 2026-03-22; evidence: `Get-ChildItem -Force | Select-Object Name,Mode` -> `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
-  - [x] 43.0.1 Alle Root-Pfade in Kategorien einteilen: Spiel, Editor, Dev, Repo-Metadaten, Artefakte (abgeschlossen: 2026-03-22; evidence: `Get-ChildItem -Force | Select-Object Name,Mode` -> `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
-  - [x] 43.0.2 Endgueltigen Namensvertrag festziehen: `dev/` statt `developer/`; Editoren explizit als Spielbereich markieren (abgeschlossen: 2026-03-22; evidence: `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` -> Abschnitt `Ordnervertrag 43.0`)
+- [x] 43.0 Scope-Freeze und Ordnervertrag (abgeschlossen: 2026-03-22; evidence: `Get-ChildItem -Force | Select-Object Name,Mode` -> `docs/plaene/alt/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
+  - [x] 43.0.1 Alle Root-Pfade in Kategorien einteilen: Spiel, Editor, Dev, Repo-Metadaten, Artefakte (abgeschlossen: 2026-03-22; evidence: `Get-ChildItem -Force | Select-Object Name,Mode` -> `docs/plaene/alt/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
+  - [x] 43.0.2 Endgueltigen Namensvertrag festziehen: `dev/` statt `developer/`; Editoren explizit als Spielbereich markieren (abgeschlossen: 2026-03-22; evidence: `docs/plaene/alt/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md` -> Abschnitt `Ordnervertrag 43.0`)
 
 ### Ordnervertrag 43.0 (Stand 2026-03-22)
 
@@ -217,7 +217,7 @@ Vertrag fuer die naechsten Schritte:
 - Runtime-Browserpfade (`/editor/...`, `/assets/...`) werden erst nach zentralisierten Pfad-Contracts migriert.
 
 - [x] 43.1 Pfad-Inventar und Kopplungen zentralisieren (abgeschlossen: 2026-03-22; evidence: `rg -n "EDITOR_VIEW_PATHS|EDITOR_API_ROUTES|EDITOR_DATA_PATHS" src/ui/menu/MenuGameplayBindings.js src/core/MediaRecorderSystem.js tests/core.spec.js tests/editor-vehicle.spec.js vite.config.js src/shared/contracts/EditorPathContract.js` -> `src/shared/contracts/EditorPathContract.js`)
-  - [x] 43.1.1 Alle hart codierten Editor-, Test- und Tool-Pfade in `vite.config.js`, Startskripten, Tests und Menuecode erfassen (abgeschlossen: 2026-03-22; evidence: `rg -n "editor/map-editor-3d\\.html|prototypes/vehicle-lab/index\\.html|save-map-disk|save-video-disk|save-vehicle-disk|list-vehicles-disk|get-vehicle-disk|rename-vehicle-disk|delete-vehicle-disk|data/maps|data/vehicles|GeneratedLocalMaps\\.js" src/ui/menu/MenuGameplayBindings.js src/core/MediaRecorderSystem.js tests/core.spec.js vite.config.js` -> `docs/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
+  - [x] 43.1.1 Alle hart codierten Editor-, Test- und Tool-Pfade in `vite.config.js`, Startskripten, Tests und Menuecode erfassen (abgeschlossen: 2026-03-22; evidence: `rg -n "editor/map-editor-3d\\.html|prototypes/vehicle-lab/index\\.html|save-map-disk|save-video-disk|save-vehicle-disk|list-vehicles-disk|get-vehicle-disk|rename-vehicle-disk|delete-vehicle-disk|data/maps|data/vehicles|GeneratedLocalMaps\\.js" src/ui/menu/MenuGameplayBindings.js src/core/MediaRecorderSystem.js tests/core.spec.js vite.config.js` -> `docs/plaene/alt/Feature_Projektstruktur_Spiel_Dev_Ordner_V43.md`)
   - [x] 43.1.2 Wo sinnvoll zentrale Konstanten oder Hilfsfunktionen fuer Editor-URLs, Tool-Roots und Generierungsziele einfuehren (abgeschlossen: 2026-03-22; evidence: `rg -n "EDITOR_VIEW_PATHS|EDITOR_API_ROUTES|EDITOR_DATA_PATHS" src/ui/menu/MenuGameplayBindings.js src/core/MediaRecorderSystem.js tests/core.spec.js tests/editor-vehicle.spec.js vite.config.js src/shared/contracts/EditorPathContract.js` -> `src/shared/contracts/EditorPathContract.js`)
 
 ### Inventar 43.1.1 (Stand 2026-03-22)
@@ -341,3 +341,4 @@ Vertrag fuer die naechsten Schritte:
 ## Freshness-Hinweis
 
 Der Plan gilt erst als abgeschlossen, wenn nach der finalen Umsetzungsstufe `npm run docs:sync` und `npm run docs:check` erfolgreich gelaufen sind.
+
