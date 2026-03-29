@@ -1,14 +1,14 @@
 ﻿# Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-29 (V60 und V61 abgeschlossen; offene Restpunkte nach V67/V68 ueberfuehrt; V65 abgeschlossen inkl. 65.99-Gate und Smoke-Evidence; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG neu angelegt; V70 Settings-/Preset-Stabilisierung geplant)
+Stand: 2026-03-29 (V60, V61, V65, V67 und V68 abgeschlossen; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG neu angelegt; V70 Settings-/Preset-Stabilisierung geplant)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
-Inaktive/zurueckgestellte Eintraege: `docs/Backlog.md`.
+Inaktive/zurueckgestellte Eintraege: `docs/prozess/Backlog.md`.
 Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ## Externe Planquelle: Bot-Training
 
-- Bot-Training wird ausschliesslich in `docs/Bot_Trainingsplan.md` geplant und verfolgt.
+- Bot-Training wird ausschliesslich in `docs/bot-training/Bot_Trainingsplan.md` geplant und verfolgt.
 - In diesem Plan werden keine Bot-Training-Phasen, -Locks oder -Conflict-Log-Eintraege gepflegt.
 
 ## Status-Legende
@@ -78,7 +78,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
-| `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `tests/core.spec.js` | V68 | aktiv | Bot-Codex seit 2026-03-29; Arcade-HUD, Intermission-UX und Replay-Follow-up nach Abschluss von V61 |
+| `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/MatchFlowUiController.js`, `src/core/GameRuntimeFacade.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/shared/contracts/ArcadeRewardContract.js`, `src/ui/menu/MenuTextCatalog.js`, `style.css`, `tests/core.spec.js` | V68 | abgeschlossen | abgeschlossen 2026-03-29; 68.1-68.4 inkl. Intermission-/Post-Run-Loop und Replay-Fallback abgeschlossen |
 | `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | geplant | Item-/Rocket-/Shield-/MG-Balance und Telemetrie-Konsolidierung fuer Fight/Hunt |
 | `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | geplant | Settings-/Preset-Drift-Fix fuer unbeabsichtigte Voreinstellungs-Aenderungen (Auto-Korrektur, ModePath/Preset, Persistenz) |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
@@ -96,7 +96,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | - | V64 | - | frei | Scope noch nicht definiert |
 | Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
-| Bot-Codex | V68 | 2026-03-29 | active | in Bearbeitung: 68.1-68.99 |
+| Bot-Codex | V68 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (68.1-68.4 + 68.99 inkl. test:core/test:stress/build/docs-gates) |
 | - | V69 | - | frei | Balance-Plan angelegt; Start nach expliziter Priorisierung |
 | - | V70 | - | frei | geplant: Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen |
 
@@ -112,23 +112,24 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | 2026-03-26 | Agent A | V57 | `src/ui/arcade/ArcadeVehicleManager.js` | V58 Architektur-Guard zeigt ui->state import zu ArcadeVehicleProfile; muss via Facade/Contract entkoppelt werden | V58.1 hat Budget-Fixes umgesetzt; verbleibende Entkopplung in V58.3 oder V60 | DEFERRED |
 | 2026-03-26 | Bot-Codex | V59/V60 | `src/shared/logging/Logger.js` | V62-Abschluss-Gate benoetigt gruene `build`-/Architecture-Typecheck-Laeufe; Blocker war JSDoc/ImportMeta-Typfehler | Commit `9fe3809` hat Logger-Typecheck gefixt; `npm run build` und `tsc -p tsconfig.architecture.json` gruen (2026-03-27) | abgeschlossen |
 | 2026-03-27 | Bot-Codex | V59/V60 | `src/core/main.js`, `src/ui/UIStartSyncController.js`, `tests/core.spec.js` | V62.99-Gate blieb an `test:core` haengen: ungueltige Vehicle-Fallbacks blieben nur im DOM sichtbar, und der Recording-Hotkey nutzte Recorder-Doubles ohne Lifecycle-Fallback nicht mehr | Vehicle-Select sync schreibt reparierte Werte jetzt in `settings`; Recording-Hotkey faellt fuer Recorder-Doubles auf `recording_requested` zurueck; `T20qa`, `T7`, `npm run test:core`, `npm run build` verifiziert | abgeschlossen |
+| 2026-03-29 | Bot-Codex | V60 | `src/core/GameRuntimeFacade.js`, `src/ui/MatchFlowUiController.js` | V68 Intermission-/Post-Run-/Replay-Loop brauchte Runtime- und Overlay-Wiring ausserhalb der urspruenglichen V68-Datei-Ownership | Scope auf Arcade-spezifische Hooks/Panel-Flows begrenzt; Guards `npm run build`, `npm run test:core`, `npm run test:stress` und `npm run smoke:roundstate` gruen | abgeschlossen |
 
 ---
 
 ## Parallelisierungs-Empfehlung (Stand: 2026-03-29, aktualisiert)
 
-V60, V61 und V67 sind abgeschlossen. Aktive Planung liegt auf V66, V68, V69 und V70.
+V60, V61, V67 und V68 sind abgeschlossen. Aktive Planung liegt auf V66, V69 und V70.
 
 | Spur | Bloecke | Hinweis |
 | --- | --- | --- |
 | A | **V66** | Vehicle-Manager-UX (3D-Preview, Kategorien, Upgrade-Flows) |
 | B | **V67** | abgeschlossen 2026-03-29 (inkl. 67.4.5 Characterization) |
-| C | **V68** | Arcade-HUD/Intermission/Replay-Follow-up aus V61 |
+| C | **V68** | abgeschlossen 2026-03-29 (Intermission-/Post-Run-/Replay-Follow-up umgesetzt) |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
 | E | **V69** | Item-/Rocket-/Shield-/MG-Balance fuer Fight/Hunt (Telemetry + Tuning) |
 | F | **V70** | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen |
 
-Empfehlung: 2-3 Agents parallel auf A + C + E; Spur F kann parallel starten, da sie primaer Settings-/UI-Konsistenz betrifft. Spur D nach Scope-Definition.
+Empfehlung: 2-3 Agents parallel auf A + E + F; Spur D nach Scope-Definition.
 
 ---
 
@@ -136,7 +137,7 @@ Empfehlung: 2-3 Agents parallel auf A + C + E; Spur F kann parallel starten, da 
 
 ## Priorisierte Pipeline
 
-Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
+Hinweis: Bot-Training-Backlog wird in `docs/bot-training/Bot_Trainingsplan.md` gepflegt.
 
 | ID | Titel | Plan-Datei | Impact | Aufwand | Prioritaet | Naechster Schritt | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -146,11 +147,11 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
 | V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/plaene/alt/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
-| V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | neu: uebernommene V61-Restpunkte umsetzen | Geplant |
+| V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (68.1-68.4 + 68.99; HUD/Intermission/Post-Run/Replay-Fallback verifiziert) | Abgeschlossen |
 | V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
 | V70 | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen | `docs/Umsetzungsplan.md` | hoch | mittel | P1 | 70.1 Auto-Mutationspfade identifizieren und fixieren | Geplant |
 
-Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
+Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/prozess/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
 
 ---
 
@@ -864,7 +865,7 @@ Scope:
 
 Plan-Datei: `docs/Umsetzungsplan.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-29 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V61.99 -->
 
 Scope:
@@ -875,11 +876,11 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 68.1 bis 68.4 und 68.99 sind abgeschlossen.
-- [ ] DoD.2 Arcade-HUD zeigt Score-Breakdown, Combo-Status und aktiven Modifier klar im Run.
-- [ ] DoD.3 Intermission und Post-Run liefern Reward-Auswahl, Sektor-Preview und nachvollziehbare Abschlussauswertung.
-- [ ] DoD.4 Replay ist als lauffaehiges Playback oder klar dokumentiertes Feature-Flag integriert.
-- [ ] DoD.5 `npm run build`, `npm run test:core`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS.
+- [x] DoD.1 Alle Phasen 68.1 bis 68.4 und 68.99 sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: 68.2-68.4 sowie 68.99 auf [x])
+- [x] DoD.2 Arcade-HUD zeigt Score-Breakdown, Combo-Status und aktiven Modifier klar im Run. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68" -> T68a/T68b PASS)
+- [x] DoD.3 Intermission und Post-Run liefern Reward-Auswahl, Sektor-Preview und nachvollziehbare Abschlussauswertung. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68" -> T68c PASS)
+- [x] DoD.4 Replay ist als lauffaehiges Playback oder klar dokumentiertes Feature-Flag integriert. (abgeschlossen: 2026-03-29; evidence: T68c Replay-Fallback-Code `replay_player_unavailable` + Menu-Placeholder entfernt)
+- [x] DoD.5 `npm run build`, `npm run test:core`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS. (abgeschlossen: 2026-03-29; evidence: Build-/Core-/Plan-/Docs-Gates PASS)
 
 ### 68.1 Score-/Modifier-HUD
 
@@ -888,26 +889,26 @@ Scope:
 
 ### 68.2 In-Game-Feedback und Transition-Polish
 
-- [ ] 68.2.1 Combo-Feedback mit Counter-Animation und Edge-Glow implementieren, inklusive klarer Decay-Rueckmeldung.
-- [ ] 68.2.2 Sudden-Death-Overlay (rote Raender, Pulsieren, SD-Timer) implementieren und mit `SUDDEN_DEATH`-Phase koppeln.
-- [ ] 68.2.3 Sektor-Transition-Animation beim Map-/Sektorwechsel einfuehren, sodass Wechsel nicht nur als Text-Overlay erscheinen.
+- [x] 68.2.1 Combo-Feedback mit Counter-Animation und Edge-Glow implementieren, inklusive klarer Decay-Rueckmeldung. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68b" -> PASS)
+- [x] 68.2.2 Sudden-Death-Overlay (rote Raender, Pulsieren, SD-Timer) implementieren und mit `SUDDEN_DEATH`-Phase koppeln. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68b" -> PASS)
+- [x] 68.2.3 Sektor-Transition-Animation beim Map-/Sektorwechsel einfuehren, sodass Wechsel nicht nur als Text-Overlay erscheinen. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68b" -> PASS)
 
 ### 68.3 Intermission und Post-Run-Loop
 
-- [ ] 68.3.1 Zwischen-Sektoren-Wahl (2-3 Optionen mit Map + Modifier) in `ArcadeRunRuntime.js` implementieren.
-- [ ] 68.3.2 Reward-Auswahl (`ARCADE_RUN_LEVELUP_REWARDS`) plus Intermission-HUD mit Sektor-Preview und Buttons einbauen.
-- [ ] 68.3.3 Intermission-Healing in `ArcadeModeStrategy.js` fuellen und balancen.
-- [ ] 68.3.4 Post-Run-Summary-Screen mit Score pro Sektor, Best-Combo, Mission-Rate und XP-Animation ausbauen.
+- [x] 68.3.1 Zwischen-Sektoren-Wahl (2-3 Optionen mit Map + Modifier) in `ArcadeRunRuntime.js` implementieren. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68c" -> PASS)
+- [x] 68.3.2 Reward-Auswahl (`ARCADE_RUN_LEVELUP_REWARDS`) plus Intermission-HUD mit Sektor-Preview und Buttons einbauen. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68c" -> PASS)
+- [x] 68.3.3 Intermission-Healing in `ArcadeModeStrategy.js` fuellen und balancen. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68c" -> PASS)
+- [x] 68.3.4 Post-Run-Summary-Screen mit Score pro Sektor, Best-Combo, Mission-Rate und XP-Animation ausbauen. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68c" -> PASS)
 
 ### 68.4 Replay-Integration
 
-- [ ] 68.4.1 Replay-Feature-Flag und UI-Hooks in `ArcadeMenuSurface.js`/`ArcadeRunRuntime.js` vorbereiten, sodass Placeholder-Text entfaellt.
-- [ ] 68.4.2 Replay-Playback fuer abgeschlossene Runs integrieren oder als klaren, testbaren Fallback deaktivierbar machen.
+- [x] 68.4.1 Replay-Feature-Flag und UI-Hooks in `ArcadeMenuSurface.js`/`ArcadeRunRuntime.js` vorbereiten, sodass Placeholder-Text entfaellt. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68c" -> PASS; Menu-Labels ohne Platzhalter)
+- [x] 68.4.2 Replay-Playback fuer abgeschlossene Runs integrieren oder als klaren, testbaren Fallback deaktivierbar machen. (abgeschlossen: 2026-03-29; evidence: npm run test:core -- --grep "T68c" -> PASS; Fallback-Code `replay_player_unavailable`)
 
 ### 68.99 Integrations- und Abschluss-Gate
 
-- [ ] 68.99.1 `npm run build` und `npm run test:core` sind fuer den Scope gruen.
-- [ ] 68.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+- [x] 68.99.1 `npm run build` und `npm run test:core` sind fuer den Scope gruen. (abgeschlossen: 2026-03-29; evidence: npm run build -> PASS, npm run test:core -> PASS)
+- [x] 68.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`, Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: npm run test:stress -> PASS, npm run smoke:roundstate -> PASS, npm run plan:check -> PASS, npm run docs:sync -> PASS, npm run docs:check -> PASS)
 
 ### Risiko-Register V68
 
@@ -1069,13 +1070,13 @@ Scope:
 
 Stand: 2026-03-29
 
-- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65.
-- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66, V68, V69 und V70.
+- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65, V67, V68.
+- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66, V69 und V70.
 - Naechste 3 Ziele:
   1. V66 starten: Vehicle-Manager UX mit 3D-Preview und Filter-/Loadout-Flows.
-  2. V68 umsetzen: Arcade HUD/Intermission/Replay-Restpunkte aus V61.
+  2. V69 starten: Fight/Hunt Combat-Balance fuer Item/Raketen/Schild/MG.
   3. V70 starten: Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen.
-- Plan-Bereinigung (2026-03-29): aktive In-Bearbeitung-Spuren geschlossen; Restarbeiten in V68 gebuendelt, Combat-Balance als V69 und Settings-/Preset-Stabilisierung als V70 angelegt.
+- Plan-Bereinigung (2026-03-29): V68 abgeschlossen; aktive In-Bearbeitung-Spuren liegen auf V66, V69 und V70.
 
 ## Dokumentations-Hook
 
@@ -1084,4 +1085,5 @@ Vor Task-Abschluss immer:
 - `npm run plan:check`
 - `npm run docs:sync`
 - `npm run docs:check`
+
 
