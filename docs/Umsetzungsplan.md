@@ -1,4 +1,4 @@
-# Umsetzungsplan (Aktiver Master)
+﻿# Umsetzungsplan (Aktiver Master)
 
 Stand: 2026-03-29 (V60 und V61 abgeschlossen; offene Restpunkte nach V67/V68 ueberfuehrt; V65 abgeschlossen inkl. 65.99-Gate und Smoke-Evidence; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG neu angelegt; V70 Settings-/Preset-Stabilisierung geplant)
 
@@ -34,7 +34,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | V53 | V52.6 | soft | ja | V52.6 und V53 abgeschlossen |
 | V53 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Decomposition und Import-Grenzen vorhanden |
 | V54 | V52.99 | hard | ja | V52 abgeschlossen; Rest-Ratchets laufen in V54.3/V54.7 weiter |
-| V54 | V53.99 | hard | ja | Settings-Decomposition ist abgeschlossen (`docs/Feature_SettingsManager_Decomposition_V53.md`) |
+| V54 | V53.99 | hard | ja | Settings-Decomposition ist abgeschlossen (`docs/plaene/alt/Feature_SettingsManager_Decomposition_V53.md`) |
 | V54 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Ratchet-/Boundary-Guards bilden die Mess-Basis |
 | V55 | V54.99 | hard | ja | V54 abgeschlossen; V55 setzt Tiefenaudit-Findings fuer Stabilitaet, Konsistenz und Robustheit um |
 | V55 | Architektur-Governance Baseline (`architecture:guard`) | soft | ja | Guard-Basis fuer Refactors in Runtime-/Netzwerk-Hotspots vorhanden |
@@ -141,13 +141,13 @@ Hinweis: Bot-Training-Backlog wird in `docs/Bot_Trainingsplan.md` gepflegt.
 | ID | Titel | Plan-Datei | Impact | Aufwand | Prioritaet | Naechster Schritt | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V58 | Architektur-Bereinigung & God-Object Refactoring | `docs/Umsetzungsplan.md` | sehr hoch | gross | P1 | abgeschlossen (V58.99) | Abgeschlossen |
-| V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | abgeschlossen; 60.4.4 in V67.4.5 ueberfuehrt | Abgeschlossen |
+| V60 | Architektur- und Totcode-Konsolidierung nach Audit | `docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md` | hoch | gross | P1 | abgeschlossen; 60.4.4 in V67.4.5 ueberfuehrt | Abgeschlossen |
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | abgeschlossen; HUD-/Intermission-/Replay-Rest in V68 ueberfuehrt | Abgeschlossen |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
-| V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
+| V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/plaene/alt/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | neu: uebernommene V61-Restpunkte umsetzen | Geplant |
-| V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
+| V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
 | V70 | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen | `docs/Umsetzungsplan.md` | hoch | mittel | P1 | 70.1 Auto-Mutationspfade identifizieren und fixieren | Geplant |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
@@ -360,7 +360,7 @@ Bestehende Basis:
 
 ## Block V60: Architektur- und Totcode-Konsolidierung nach Audit
 
-Plan-Datei: `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md`
+Plan-Datei: `docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md`
 
 <!-- LOCK: frei -->
 <!-- DEPENDS-ON: V58.99, V59.99 -->
@@ -377,7 +377,7 @@ Scope:
 
 - [x] DoD.1 Alle Phasen 60.1 bis 60.4 sind abgeschlossen. (abgeschlossen: 2026-03-29; evidence: V60.1-V60.4 auf [x] inkl. Transfer-Nachweis fuer 60.4.4)
 - [x] DoD.2 `npm run architecture:guard`, `npm run build` und `npx knip --config knip.json --no-progress` liefern fuer den Scope verwertbare, dokumentierte Ergebnisse ohne bekannte Blindspots fuer `server/**`, `electron/**` und `trainer/**`. (abgeschlossen: 2026-03-29; evidence: V60.1.1, 60.1.2, 60.99.1)
-- [x] DoD.3 Dormante Pfade sind pro Modulgruppe als `remove`, `rewire` oder `keep-with-contract` dokumentiert und umgesetzt. (abgeschlossen: 2026-03-29; evidence: V60.2.1, V60.2.2 und Inventar in `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md`)
+- [x] DoD.3 Dormante Pfade sind pro Modulgruppe als `remove`, `rewire` oder `keep-with-contract` dokumentiert und umgesetzt. (abgeschlossen: 2026-03-29; evidence: V60.2.1, V60.2.2 und Inventar in `docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md`)
 - [x] DoD.4 Ownership, Lock-Status, Conflict-Log, Plan-Datei und Verifikationsstrategie sind synchron gepflegt. (abgeschlossen: 2026-03-29; evidence: V60.99.2 + aktualisierte Tabellen in `docs/Umsetzungsplan.md`)
 - [x] DoD.5 Multiplayer-Menue-/Bridge-Pfade erzwingen konsistente Erfolgs-/Fehlerkontrakte, `maxPlayers`-Grenzen, einmaliges UI-Wiring; der tiefe Netzwerksignal-Nachweis ist als Folgearbeit in V67.4.5 uebernommen. (abgeschlossen: 2026-03-29; evidence: V60.4.1-60.4.4)
 
@@ -388,13 +388,13 @@ Scope:
 
 ### 60.2 Dormante Runtime-Pfade konsolidieren
 
-- [x] 60.2.1 Altpfade in `src/core/input/**`, `src/core/lobby/**`, `src/network/*Lobby.js`, `src/network/RemoteInputSource.js`, `src/network/SpectatorInputSource.js` und `src/core/replay/ReplayPlayer.js` inventarisieren und je Modulgruppe als `remove`, `rewire` oder `keep-with-contract` entscheiden. (abgeschlossen: 2026-03-28; evidence: `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` Inventar-Tabelle dokumentiert Entscheidungen; `src/network/RemoteInputSource.js`, `src/network/SpectatorInputSource.js`, `src/network/InputDelayBuffer.js`, `src/core/replay/ReplayPlayer.js` entfernt; `npm run build` PASS)
+- [x] 60.2.1 Altpfade in `src/core/input/**`, `src/core/lobby/**`, `src/network/*Lobby.js`, `src/network/RemoteInputSource.js`, `src/network/SpectatorInputSource.js` und `src/core/replay/ReplayPlayer.js` inventarisieren und je Modulgruppe als `remove`, `rewire` oder `keep-with-contract` entscheiden. (abgeschlossen: 2026-03-28; evidence: `docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md` Inventar-Tabelle dokumentiert Entscheidungen; `src/network/RemoteInputSource.js`, `src/network/SpectatorInputSource.js`, `src/network/InputDelayBuffer.js`, `src/core/replay/ReplayPlayer.js` entfernt; `npm run build` PASS)
 - [x] 60.2.2 Die test-only Multiplayer-UI (`MenuMultiplayerPanel`, `MenuLobbyRenderer`, Discovery/Host-IP Ports) entweder in den aktiven Runtime-Pfad integrieren oder mit Characterization-Tests und Dokumentation sauber aus dem Hauptpfad entfernen. (abgeschlossen: 2026-03-28; evidence: `src/ui/menu/testing/**` als test-only Pfad; T41b/T41d ueber `TEST_PORT=5204 PW_RUN_TAG=v60-t41-rerun PW_OUTPUT_DIR=test-results/v60-t41-rerun` PASS; `npm run test:core` PASS)
 
 ### 60.3 Zielarchitektur fuer Rest-Orchestratoren fixieren
 
-- [x] 60.3.1 Verantwortungsgrenzen zwischen `Game`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` als Zielbild dokumentieren und verbliebene Wrapper-/Pass-through-Pfade priorisieren. (abgeschlossen: 2026-03-28; evidence: `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` Abschnitt `Zielbild Rest-Orchestratoren (2026-03-28)`)
-- [x] 60.3.2 Die Rest-Decomposition fuer `MediaRecorderSystem`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` in kleine, testbare Folgeschritte zerlegen und die Transfers zu V58/V59/V60 festhalten. (abgeschlossen: 2026-03-28; evidence: `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` Abschnitt `Decomposition-Roadmap (2026-03-28)`)
+- [x] 60.3.1 Verantwortungsgrenzen zwischen `Game`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` als Zielbild dokumentieren und verbliebene Wrapper-/Pass-through-Pfade priorisieren. (abgeschlossen: 2026-03-28; evidence: `docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md` Abschnitt `Zielbild Rest-Orchestratoren (2026-03-28)`)
+- [x] 60.3.2 Die Rest-Decomposition fuer `MediaRecorderSystem`, `GameRuntimeFacade`, `MatchFlowUiController` und `MenuMultiplayerBridge` in kleine, testbare Folgeschritte zerlegen und die Transfers zu V58/V59/V60 festhalten. (abgeschlossen: 2026-03-28; evidence: `docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md` Abschnitt `Decomposition-Roadmap (2026-03-28)`)
 - [x] 60.3.3 Den Architekturbruch zwischen Menu-Sessiontyp `multiplayer` und Runtime-Sessiontypen `lan`/`online` explizit aufloesen: Zielbild dokumentieren, Matchstart auf einen echten Transportpfad umstellen und den reinen Storage-Bridge-Pfad klar als Mock/Test-Helfer oder Vorstufe kennzeichnen. (abgeschlossen: 2026-03-28; evidence: `multiplayerTransport: 'storage-bridge'` in Settings-Snapshot und `ensureMultiplayerSessionType`; expliziter `multiplayer`-Zweig in `RuntimeSessionLifecycleService` mit Erklaerungskommentar; Session-Typ-Mapping-Tabelle in V60-Feature-Plan; `npm run build` PASS, `docs:sync`/`plan:check` PASS)
 
 ### 60.4 Multiplayer-Menue-Vertraege und UI-Wiring konsolidieren
@@ -603,7 +603,7 @@ Scope:
 
 ## Block V63: Fight-Modus Follow-up - Runtime-Config, Trail-Targeting, HUD-Polish
 
-Plan-Datei: `docs/Feature_Fight_Modus_Followup_V63.md`
+Plan-Datei: `docs/plaene/alt/Feature_Fight_Modus_Followup_V63.md`
 
 <!-- LOCK: frei -->
 <!-- DEPENDS-ON: V48 (Fight baseline) -->
@@ -668,7 +668,7 @@ Scope:
 
 ## Block V65: Map-Editor UX Refit - horizontale Build-Leiste und visuelle Objektwahl
 
-Plan-Datei: `docs/Feature_Map_Editor_UX_V65.md`
+Plan-Datei: `docs/plaene/alt/Feature_Map_Editor_UX_V65.md`
 
 <!-- LOCK: frei -->
 
@@ -728,7 +728,7 @@ Scope:
 
 ## Block V66: Vehicle-Manager UX - 3D-Vorschau, Kategorien und Upgrade-Visualisierung
 
-Plan-Datei: `docs/Feature_Vehicle_Manager_V66.md`
+Plan-Datei: `docs/plaene/alt/Feature_Vehicle_Manager_V66.md`
 
 <!-- LOCK: frei -->
 
@@ -922,7 +922,7 @@ Scope:
 
 ## Block V69: Fight/Hunt Combat-Balance - Item, Raketen, Schild, MG
 
-Plan-Datei: `docs/Feature_Item_Raketen_Schild_MG_Balance_V69.md`
+Plan-Datei: `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md`
 
 <!-- LOCK: frei -->
 <!-- DEPENDS-ON: V63.99 -->
@@ -1056,10 +1056,10 @@ Scope:
 | V48 | abgeschlossen | `docs/archive/plans/completed/Feature_Fight_Modus_Qualitaet_V48.md` | `docs/archive/plans/completed/` |
 | V52-V57 | abgeschlossen | `docs/archive/plans/completed/Umsetzungsplan_Bloecke_V52-V57_Architektur-Haertung-bis-Arcade_2026-03-27.md` | `docs/archive/plans/completed/` |
 | V59 | abgeschlossen | `docs/Umsetzungsplan.md` (Block-Definition im Archiv V52-V57 oder inline) | `docs/archive/plans/completed/` |
-| V60 | abgeschlossen | `docs/Feature_Architektur_Totcode_Konsolidierung_V60.md` | `docs/archive/plans/completed/` |
+| V60 | abgeschlossen | `docs/plaene/alt/Feature_Architektur_Totcode_Konsolidierung_V60.md` | `docs/archive/plans/completed/` |
 | V61 | abgeschlossen (mit Rest-Transfer nach V68) | `docs/Umsetzungsplan.md` | `docs/archive/plans/completed/` |
-| V63 | abgeschlossen | `docs/Feature_Fight_Modus_Followup_V63.md` | `docs/archive/plans/completed/` |
-| V65 | abgeschlossen | `docs/Feature_Map_Editor_UX_V65.md` | `docs/archive/plans/completed/` |
+| V63 | abgeschlossen | `docs/plaene/alt/Feature_Fight_Modus_Followup_V63.md` | `docs/archive/plans/completed/` |
+| V65 | abgeschlossen | `docs/plaene/alt/Feature_Map_Editor_UX_V65.md` | `docs/archive/plans/completed/` |
 | N4-N7 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V49 | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
 | V41-D | abgeschlossen | `docs/archive/plans/superseded/Umsetzungsplan_2026-03-22_pre-restrukturierung.md` | `docs/archive/plans/superseded/` |
@@ -1084,3 +1084,4 @@ Vor Task-Abschluss immer:
 - `npm run plan:check`
 - `npm run docs:sync`
 - `npm run docs:check`
+
