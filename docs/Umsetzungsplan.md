@@ -474,7 +474,7 @@ Scope:
 ### 61.6 Sudden Death implementieren
 
 - [x] 61.6.1 `ArcadeRunState.js` - `SUDDEN_DEATH`-Phase aktivieren wenn Spieler alle regulaeren Sektoren ueberlebt: endloser Modus mit steigender Schwierigkeit (abgeschlossen: 2026-03-27; evidence: completeArcadeSector immer INTERMISSION, beginArcadeSector uncapped fuer SD, resolveSectorPhase gibt SUDDEN_DEATH wenn sectorIndex>=sectorCount; npm run build PASS)
-- [ ] 61.6.2 `ArcadeModeStrategy.js` - Sudden-Death-Mechanik: alle 30s ein zusaetzlicher Modifier gestapelt, Damage-Incoming erhoehen, kein Healing
+- [x] 61.6.2 `ArcadeModeStrategy.js` - Sudden-Death-Mechanik: alle 30s ein zusaetzlicher Modifier gestapelt, Damage-Incoming erhoehen, kein Healing (abgeschlossen: 2026-03-29; evidence: enterSuddenDeath/tickSuddenDeath/exitSuddenDeath in ArcadeModeStrategy; applyHealing gibt 0 zurueck; applyDamage multipliziert mit sdDamageMultiplier; _getAggregatedModifierEffects aggregiert Base+SD-Stack; ArcadeRunRuntime.setSuddenDeathEnteredHandler + _notifySuddenDeathEntered; npm run build PASS)
 - [x] 61.6.3 `ArcadeScoreOps.js` - Sudden-Death-Score: Multiplier steigt schneller, separater Sudden-Death-Score fuer Leaderboard (abgeschlossen: 2026-03-27; evidence: comboStep=2 in SUDDEN_DEATH, score.suddenDeathScore akkumuliert SD-Punkte, buildArcadeRunSummary speichert it; npm run build PASS)
 - [ ] 61.6.4 HUD-Feedback: visuelles Sudden-Death-Overlay (rote Raender, Pulsieren, Timer seit SD-Start)
 
@@ -486,7 +486,7 @@ Scope:
 
 ### 61.8 Vehicle-Mastery-Effekte
 
-- [ ] 61.8.1 `ArcadeVehicleProfile.js` / `ArcadeModeStrategy.js` - Slot-Effekte implementieren: T2 Wing = +10% Turning, T2 Engine = +8% Speed, T2 Core = +15 Max HP
+- [x] 61.8.1 `ArcadeVehicleProfile.js` / `ArcadeModeStrategy.js` - Slot-Effekte implementieren: T2 Wing = +10% Turning, T2 Engine = +8% Speed, T2 Core = +15 Max HP (abgeschlossen: 2026-03-29; evidence: getSlotStatBonuses(upgrades) in ArcadeVehicleProfile; applyVehicleUpgrades + getSpeedMultiplier in ArcadeModeStrategy; resetPlayerHealth addiert maxHpBonus; getTurnRateMultiplier kombiniert Modifier+Upgrade; ArcadeRunRuntime.setVehicleUpgradesHandler + _notifyVehicleUpgradesChanged; npm run build PASS)
 - [x] 61.8.2 `ArcadeVehicleProfile.js` - Mastery-Perks: alle 5 Level ein passiver Perk (Level 5: +5% Score, Level 10: Combo decayed 20% langsamer, Level 15: +10% XP) (abgeschlossen: 2026-03-27; evidence: getMasteryPerks(level) exportiert; xpBonusPct in _applySectorXpReward angewendet; npm run build PASS)
 - [x] 61.8.3 `ArcadeMenuSurface.js` - Mastery-Anzeige dynamisch: echtes Level und XP-Progress aus Vehicle-Profil lesen statt hardcoded `Mastery 0/5` (abgeschlossen: 2026-03-28; evidence: localStorage-basiertes Profile-Lesen ohne state-Import; `Mastery Lv.{n}/30` oder `Mastery MAX`; `npm run build` PASS)
 
