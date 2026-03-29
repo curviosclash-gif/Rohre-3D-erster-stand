@@ -73,7 +73,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `knip.json`, `src/shared/logging/Logger.js`, `src/core/main.js`, `src/core/GameRuntimeFacade.js`, `src/ui/MenuController.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/ui/menu/multiplayer/MenuMultiplayerBridgeMutations.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuDevPanelBindings.js`, `src/ui/MatchInputSourceResolver.js`, `src/core/input/**`, `src/core/lobby/**`, `src/network/*Lobby.js`, `src/ui/menu/testing/**`, `tests/core.spec.js`, `tests/stress.spec.js` | V60 | abgeschlossen | Audit-Restarbeiten abgeschlossen; tieferer Netzwerk-Nachweis in V67.4.5 gebuendelt |
 | `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/ProjectileSimulationOps.js`, `src/entities/systems/projectile/ProjectileHitResolver.js`, `src/entities/systems/trails/TrailCollisionQuery.js`, `src/entities/ai/BotRuntimeContextFactory.js`, `src/hunt/**`, `src/ui/HuntHUD.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `tests/physics-hunt.spec.js`, `tests/core.spec.js`, `tests/stress.spec.js` | V63 | abgeschlossen | Fight-Follow-up fuer Runtime-Config, Trail-Scan, HUD-Delta-Updates und Respawn-/Mode-Semantik |
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
-| `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | geplant | Multiplayer-Netzwerk-Haertung: ICE-Fix, Retry-Logik, Reconciler-Erweiterung, Ghost-Cleanup |
+| `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | aktiv | Bot-Codex seit 2026-03-29; Multiplayer-Netzwerk-Haertung: ICE-Fix, Retry-Logik, Reconciler-Erweiterung, Ghost-Cleanup |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `tests/core.spec.js` | V68 | geplant | Arcade-HUD, Intermission-UX und Replay-Follow-up nach Abschluss von V61 |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -89,6 +89,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
 | Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
+| Bot-Codex | V67 | 2026-03-29 | active | in Bearbeitung: 67.1-67.99 |
 | - | V68 | - | frei | Follow-up fuer V61-Rest: HUD, Intermission, Replay |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -780,7 +781,7 @@ Scope:
 
 ## Block V67: Multiplayer-Netzwerk-Haertung - ICE, Retry, Reconciler, Ghost-Cleanup
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-29 -->
 <!-- DEPENDS-ON: V60.99, V59.99 -->
 
 Scope:
