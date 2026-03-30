@@ -18,10 +18,15 @@ npm run dev
 npm run dev:logged
 npm run dev:raw
 npm run logs:clean
+npm run cleanup:workspace
+npm run cleanup:workspace:apply
 npm run test:core
 npm run docs:sync
 npm run docs:check
 ```
+
+`cleanup:workspace` erzeugt zuerst einen Dry-Run-Bericht unter `tmp/workspace-cleanup-report.json`.
+`cleanup:workspace:apply` entfernt nur konservativ freigegebene Artefakte und schuetzt aktive Playwright-/Dev-Spuren.
 
 ## Einstieg fuer AI und Dev
 

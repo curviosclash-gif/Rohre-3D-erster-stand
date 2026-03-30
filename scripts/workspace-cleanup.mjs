@@ -1,0 +1,422 @@
+import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { execFile } from 'node:child_process';
+import path from 'node:path';
+import process from 'node:process';
+import { promisify } from 'node:util';
+
+const execFileAsync = promisify(execFile);
+
+const cwd = process.cwd();
+const args = new Set(process.argv.slice(2));
+const applyMode = args.has('--apply');
+const reportPath = path.resolve(
+    cwd,
+    String(process.env.WORKSPACE_CLEAN_REPORT || 'tmp/workspace-cleanup-report.json').trim()
+);
+const activeMinutes = Math.max(
+    1,
+    Number.parseInt(process.env.WORKSPACE_CLEAN_ACTIVE_MINUTES || '30', 10) || 30
+);
+const activeThresholdMs = activeMinutes * 60 * 1000;
+const now = Date.now();
+
+const ROOT_LOG_PATTERNS = Object.freeze([
+    /^tmp-dev-\d+\.(out|err)\.log$/i,
+    /^tmp-vite(?:-diag)?(?:-\d+)?\.(out|err)\.log$/i,
+]);
+
+const DEV_LOG_DIRECTORY = path.resolve(cwd, 'tmp', 'dev-logs');
+const DEV_LOG_PATTERNS = Object.freeze([
+    /^vite-dev-.*\.(out|err)\.log$/i,
+    /^vite-dev-.*\.meta\.json$/i,
+]);
+
+const ARCHIVE_ROOTS = Object.freeze([
+    {
+        name: 'backups',
+        risk: 'low',
+        reason: 'Versionierter Altstand; nur archivieren, nicht blind loeschen.',
+    },
+    {
+        name: 'output',
+        risk: 'medium',
+        reason: 'Kann Trainings- und Operator-Artefakte enthalten; nur per Retention-Regel archivieren.',
+    },
+    {
+        name: 'phase2_2026-03-02',
+        risk: 'low',
+        reason: 'Versionierter Historienordner; vor Move Referenzen pruefen.',
+    },
+]);
+
+const PROTECTED_ROOTS = Object.freeze([
+    {
+        name: '.codex_tmp',
+        risk: 'medium',
+        reason: 'Lokaler Agent-Arbeitsbereich; waehrend aktiver Session nicht automatisch entfernen.',
+    },
+    {
+        name: 'prototypes',
+        risk: 'high',
+        reason: 'Vehicle-Lab und Runtime importieren noch direkt aus diesem Pfad.',
+    },
+    {
+        name: 'tmp',
+        risk: 'medium',
+        reason: 'Enthaelt Locks, Diagnoseartefakte und lokale Evidence; nur selektive Unterpfade bereinigen.',
+    },
+    {
+        name: 'videos',
+        risk: 'medium',
+        reason: 'Ordnername ist aktiver Recording-Contract und bleibt bestehen.',
+    },
+]);
+
+function createItem({
+    path: relativePath,
+    type,
+    action,
+    risk,
+    reason,
+    sizeBytes = null,
+    mtimeMs = null,
+}) {
+    return {
+        path: relativePath.replace(/\\/g, '/'),
+        type,
+        action,
+        risk,
+        reason,
+        sizeBytes,
+        mtimeIso: Number.isFinite(mtimeMs) ? new Date(mtimeMs).toISOString() : null,
+    };
+}
+
+async function exists(targetPath) {
+    try {
+        await stat(targetPath);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
+async function readActivePlaywrightLock() {
+    const lockPath = path.resolve(cwd, '.playwright-suite.lock');
+    if (!(await exists(lockPath))) {
+        return {
+            active: false,
+            outputRoot: null,
+            reportRoot: null,
+            reason: 'Keine Playwright-Lockdatei gefunden.',
+        };
+    }
+
+    try {
+        const [lockStat, raw] = await Promise.all([
+            stat(lockPath),
+            readFile(lockPath, 'utf8'),
+        ]);
+        const ageMs = now - Number(lockStat.mtimeMs || 0);
+        if (ageMs > activeThresholdMs) {
+            return {
+                active: false,
+                outputRoot: null,
+                reportRoot: null,
+                reason: `Lock aelter als ${activeMinutes} Minuten.`,
+            };
+        }
+
+        const parsed = JSON.parse(raw);
+        const outputRoot = String(parsed?.outputDir || '')
+            .trim()
+            .split(/[\\/]/)
+            .filter(Boolean)[0] || null;
+        const runTag = String(parsed?.runTag || '').trim();
+        const reportRoot = runTag ? 'playwright-report' : null;
+        return {
+            active: true,
+            outputRoot,
+            reportRoot,
+            reason: `Aktiver Playwright-Lock fuer runTag=${runTag || 'unknown'}.`,
+        };
+    } catch (error) {
+        return {
+            active: true,
+            outputRoot: 'test-results',
+            reportRoot: 'playwright-report',
+            reason: `Lock vorhanden, aber nicht sauber lesbar: ${error?.message || String(error)}`,
+        };
+    }
+}
+
+function matchesPattern(patterns, filename) {
+    return patterns.some((pattern) => pattern.test(filename));
+}
+
+function isRecentlyTouched(fileStat) {
+    return now - Number(fileStat.mtimeMs || 0) <= activeThresholdMs;
+}
+
+async function collectRootEntries() {
+    try {
+        return await readdir(cwd, { withFileTypes: true });
+    } catch {
+        return [];
+    }
+}
+
+async function collectDevLogItems() {
+    try {
+        const entries = await readdir(DEV_LOG_DIRECTORY, { withFileTypes: true });
+        const items = [];
+        for (const entry of entries) {
+            if (!entry.isFile() || !matchesPattern(DEV_LOG_PATTERNS, entry.name)) continue;
+            const targetPath = path.resolve(DEV_LOG_DIRECTORY, entry.name);
+            const targetStat = await stat(targetPath);
+            const relativePath = path.relative(cwd, targetPath);
+            if (isRecentlyTouched(targetStat)) {
+                items.push(createItem({
+                    path: relativePath,
+                    type: 'file',
+                    action: 'protect',
+                    risk: 'medium',
+                    reason: `Juenger als ${activeMinutes} Minuten; moeglicherweise aktiver Dev-Log.`,
+                    sizeBytes: Number(targetStat.size || 0),
+                    mtimeMs: Number(targetStat.mtimeMs || 0),
+                }));
+                continue;
+            }
+
+            items.push(createItem({
+                path: relativePath,
+                type: 'file',
+                action: 'delete',
+                risk: 'low',
+                reason: 'Verwaister Dev-Log nach Altersregel.',
+                sizeBytes: Number(targetStat.size || 0),
+                mtimeMs: Number(targetStat.mtimeMs || 0),
+            }));
+        }
+        return items;
+    } catch {
+        return [];
+    }
+}
+
+async function collectInventory() {
+    const items = [];
+    const activeLock = await readActivePlaywrightLock();
+    const rootEntries = await collectRootEntries();
+
+    for (const root of ARCHIVE_ROOTS) {
+        const targetPath = path.resolve(cwd, root.name);
+        if (!(await exists(targetPath))) continue;
+        const targetStat = await stat(targetPath);
+        items.push(createItem({
+            path: root.name,
+            type: targetStat.isDirectory() ? 'dir' : 'file',
+            action: 'archive',
+            risk: root.risk,
+            reason: root.reason,
+            sizeBytes: Number(targetStat.size || 0),
+            mtimeMs: Number(targetStat.mtimeMs || 0),
+        }));
+    }
+
+    for (const root of PROTECTED_ROOTS) {
+        const targetPath = path.resolve(cwd, root.name);
+        if (!(await exists(targetPath))) continue;
+        const targetStat = await stat(targetPath);
+        items.push(createItem({
+            path: root.name,
+            type: targetStat.isDirectory() ? 'dir' : 'file',
+            action: 'protect',
+            risk: root.risk,
+            reason: root.reason,
+            sizeBytes: Number(targetStat.size || 0),
+            mtimeMs: Number(targetStat.mtimeMs || 0),
+        }));
+    }
+
+    for (const entry of rootEntries) {
+        const targetPath = path.resolve(cwd, entry.name);
+        if (entry.isFile() && matchesPattern(ROOT_LOG_PATTERNS, entry.name)) {
+            const targetStat = await stat(targetPath);
+            const recent = isRecentlyTouched(targetStat);
+            items.push(createItem({
+                path: entry.name,
+                type: 'file',
+                action: recent ? 'protect' : 'delete',
+                risk: recent ? 'medium' : 'low',
+                reason: recent
+                    ? `Juenger als ${activeMinutes} Minuten; moeglicherweise aktiver Root-Log.`
+                    : 'Verwaister Root-Log nach Altersregel.',
+                sizeBytes: Number(targetStat.size || 0),
+                mtimeMs: Number(targetStat.mtimeMs || 0),
+            }));
+            continue;
+        }
+
+        if (!entry.isDirectory()) continue;
+
+        if (entry.name === 'dist') {
+            const targetStat = await stat(targetPath);
+            items.push(createItem({
+                path: entry.name,
+                type: 'dir',
+                action: 'delete',
+                risk: 'low',
+                reason: 'Ignoriertes Build-Artefakt; bei Bedarf reproduzierbar ueber npm run build.',
+                sizeBytes: null,
+                mtimeMs: Number(targetStat.mtimeMs || 0),
+            }));
+            continue;
+        }
+
+        if (/^test-results($|-)/i.test(entry.name)) {
+            const targetStat = await stat(targetPath);
+            const isActiveRoot = activeLock.active && activeLock.outputRoot === entry.name;
+            items.push(createItem({
+                path: entry.name,
+                type: 'dir',
+                action: isActiveRoot ? 'protect' : 'delete',
+                risk: isActiveRoot ? 'medium' : 'low',
+                reason: isActiveRoot
+                    ? activeLock.reason
+                    : 'Ignoriertes Playwright-Artefakt ausserhalb des aktiven Lock-Ziels.',
+                sizeBytes: null,
+                mtimeMs: Number(targetStat.mtimeMs || 0),
+            }));
+            continue;
+        }
+
+        if (entry.name === 'playwright-report') {
+            const targetStat = await stat(targetPath);
+            const isActiveRoot = activeLock.active && activeLock.reportRoot === entry.name;
+            items.push(createItem({
+                path: entry.name,
+                type: 'dir',
+                action: isActiveRoot ? 'protect' : 'delete',
+                risk: isActiveRoot ? 'medium' : 'low',
+                reason: isActiveRoot
+                    ? activeLock.reason
+                    : 'Ignoriertes HTML-Report-Artefakt ausserhalb aktiver Runs.',
+                sizeBytes: null,
+                mtimeMs: Number(targetStat.mtimeMs || 0),
+            }));
+        }
+    }
+
+    const devLogItems = await collectDevLogItems();
+    items.push(...devLogItems);
+
+    await protectTrackedDeleteTargets(items);
+    items.sort((left, right) => left.path.localeCompare(right.path));
+    return { items, activeLock };
+}
+
+async function protectTrackedDeleteTargets(items) {
+    const deleteCandidates = items.filter((item) => item.action === 'delete');
+    if (deleteCandidates.length === 0) return;
+
+    try {
+        const { stdout } = await execFileAsync(
+            'git',
+            ['ls-files', '-z', '--', ...deleteCandidates.map((item) => item.path)],
+            { cwd, maxBuffer: 8 * 1024 * 1024 }
+        );
+        const trackedPaths = String(stdout || '')
+            .split('\0')
+            .map((entry) => entry.trim())
+            .filter(Boolean);
+        if (trackedPaths.length === 0) return;
+
+        for (const item of deleteCandidates) {
+            const normalizedPath = item.path.replace(/\\/g, '/');
+            const hasTrackedMatch = trackedPaths.some((trackedPath) => (
+                trackedPath === normalizedPath
+                || trackedPath.startsWith(`${normalizedPath}/`)
+            ));
+            if (!hasTrackedMatch) continue;
+
+            item.action = 'protect';
+            item.risk = 'medium';
+            item.reason = 'Enthaelt versionierte Dateien; automatischer Cleanup ueberspringt git-getrackte Inhalte.';
+        }
+    } catch {
+        for (const item of deleteCandidates) {
+            item.action = 'protect';
+            item.risk = 'medium';
+            item.reason = 'Git-Tracking-Pruefung fehlgeschlagen; automatischer Cleanup bleibt konservativ.';
+        }
+    }
+}
+
+async function writeReport(report) {
+    await mkdir(path.dirname(reportPath), { recursive: true });
+    await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
+}
+
+async function applyDeletes(items) {
+    const results = [];
+    for (const item of items) {
+        if (item.action !== 'delete') continue;
+        const absolutePath = path.resolve(cwd, item.path);
+        try {
+            await rm(absolutePath, { recursive: item.type === 'dir', force: true });
+            results.push({ path: item.path, ok: true });
+        } catch (error) {
+            results.push({ path: item.path, ok: false, error: error?.message || String(error) });
+        }
+    }
+    return results;
+}
+
+function summarize(items) {
+    return items.reduce((accumulator, item) => {
+        accumulator[item.action] = (accumulator[item.action] || 0) + 1;
+        return accumulator;
+    }, { delete: 0, archive: 0, protect: 0 });
+}
+
+async function main() {
+    const { items, activeLock } = await collectInventory();
+    const summary = summarize(items);
+    const report = {
+        generatedAt: new Date(now).toISOString(),
+        mode: applyMode ? 'apply' : 'dry-run',
+        activeMinutes,
+        activePlaywrightLock: activeLock,
+        summary,
+        items,
+        applyResults: [],
+    };
+
+    process.stdout.write(`[cleanup:workspace] mode=${report.mode}\n`);
+    process.stdout.write(`[cleanup:workspace] report=${path.relative(cwd, reportPath).replace(/\\/g, '/')}\n`);
+    process.stdout.write(`[cleanup:workspace] delete=${summary.delete} archive=${summary.archive} protect=${summary.protect}\n`);
+
+    for (const item of items) {
+        process.stdout.write(
+            `[cleanup:workspace] ${item.action} ${item.type} ${item.path} :: ${item.reason}\n`
+        );
+    }
+
+    if (applyMode) {
+        report.applyResults = await applyDeletes(items);
+        const failed = report.applyResults.filter((entry) => !entry.ok);
+        process.stdout.write(`[cleanup:workspace] applied=${report.applyResults.length - failed.length}\n`);
+        process.stdout.write(`[cleanup:workspace] failed=${failed.length}\n`);
+        if (failed.length > 0) {
+            process.exitCode = 1;
+        }
+    }
+
+    await writeReport(report);
+}
+
+main().catch((error) => {
+    process.stderr.write(`${error?.stack || String(error)}\n`);
+    process.exitCode = 1;
+});

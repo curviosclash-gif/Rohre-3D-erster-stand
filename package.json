@@ -20,6 +20,8 @@
     "dev:logged": "node scripts/dev-with-logs.mjs",
     "dev:raw": "vite",
     "logs:clean": "node scripts/clean-dev-temp-logs.mjs",
+    "cleanup:workspace": "node scripts/workspace-cleanup.mjs --dry-run",
+    "cleanup:workspace:apply": "node scripts/workspace-cleanup.mjs --apply",
     "build": "vite build",
     "build:web": "vite build --mode web",
     "build:app": "vite build --mode app",
