@@ -1,15 +1,16 @@
 # Dokumentationsindex (Aktiv)
 
-Stand: 2026-03-29
+Stand: 2026-03-30
 
 ## Schnellstart
 
 1. `docs/referenz/ai_project_onboarding.md`
 2. `docs/referenz/ai_architecture_context.md`
-3. `docs/Umsetzungsplan.md`
-4. `docs/release/Releaseplan_Spiel_2026.md`
-5. Neuester `docs/tests/Testergebnisse_Phase4b_YYYY-MM-DD.md`
-6. `docs/prozess/Dokumentationsstatus.md`
+3. `docs/referenz/gameplay_powerups_portale_gates.md`
+4. `docs/Umsetzungsplan.md`
+5. `docs/release/Releaseplan_Spiel_2026.md`
+6. Neuester `docs/tests/Testergebnisse_Phase4b_YYYY-MM-DD.md`
+7. `docs/prozess/Dokumentationsstatus.md`
 
 ## Aktive Verzeichnisse
 
