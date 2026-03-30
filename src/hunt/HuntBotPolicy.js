@@ -17,6 +17,13 @@ export function resolveHealthRatio(player) {
     return clamp(hp / maxHp, 0, 1);
 }
 
+export function resolveShieldRatio(player) {
+    if (!player) return 0;
+    const shield = Math.max(0, Number(player.shieldHP) || 0);
+    const maxShield = Math.max(1, Number(player.maxShieldHp) || 1);
+    return clamp(shield / maxShield, 0, 1);
+}
+
 export function getNearestEnemy(player, allPlayers, outVec) {
     let nearest = null;
     let nearestDistSq = Infinity;
@@ -147,12 +154,16 @@ export class HuntBotPolicy {
         const hasSharedTarget = !!huntTarget;
 
         const healthRatio = resolveHealthRatio(player);
+        const shieldRatio = resolveShieldRatio(player);
         const enemyHealthRatio = resolveHealthRatio(enemy);
-        const aggression = clamp(0.55 + (healthRatio - enemyHealthRatio) * 0.8, 0.15, 1.0);
+        const enemyShieldRatio = resolveShieldRatio(enemy);
+        const vitalityRatio = clamp(healthRatio * 0.72 + shieldRatio * 0.28, 0, 1);
+        const enemyVitalityRatio = clamp(enemyHealthRatio * 0.72 + enemyShieldRatio * 0.28, 0, 1);
+        const aggression = clamp(0.5 + (vitalityRatio - enemyVitalityRatio) * 0.9, 0.12, 1.0);
         const survivalPressure = Math.max(
             pressure,
             projectileThreat ? 0.82 : 0,
-            (1 - healthRatio) * 0.9
+            (1 - vitalityRatio) * 0.95
         );
         const mgRange = Math.max(12, Number(CONFIG?.HUNT?.MG?.RANGE || 95));
         const mgRangeSq = mgRange * mgRange;
@@ -161,8 +172,8 @@ export class HuntBotPolicy {
         if (
             (hasSharedTarget || enemy)
             && distSq <= mgRangeSq
-            && healthRatio > 0.2
-            && aggression >= 0.42
+            && (shieldRatio > 0.08 || healthRatio > 0.32)
+            && aggression >= 0.4
             && targetInFront
             && survivalPressure < 0.85
         ) {
@@ -172,19 +183,20 @@ export class HuntBotPolicy {
         const rocketIndex = findStrongestRocketIndex(player.inventory);
         if (rocketIndex >= 0 && (hasSharedTarget || enemy)) {
             const shouldUseRocket =
-                healthRatio < 0.55
+                enemyShieldRatio > 0.18
                 || enemyHealthRatio > 0.45
-                || distSq > 20 * 20
-                || pressure > 0.58
+                || distSq > 22 * 22
+                || pressure > 0.56
                 || projectileThreat
-                || survivalPressure > 0.55;
+                || survivalPressure > 0.54
+                || vitalityRatio < 0.52;
             if (shouldUseRocket) {
                 input.shootItem = true;
                 input.shootItemIndex = rocketIndex;
             }
         }
 
-        const shouldRetreat = !!enemy && (healthRatio <= 0.38 || (healthRatio < 0.55 && survivalPressure > 0.78));
+        const shouldRetreat = !!enemy && (vitalityRatio <= 0.34 || (vitalityRatio < 0.52 && survivalPressure > 0.76));
         if (shouldRetreat) {
             const hasSensorSteering = snapshot && (Math.abs(snapshot.targetYaw || 0) > 0.01 || Math.abs(snapshot.targetPitch || 0) > 0.01);
             if (hasSensorSteering) {

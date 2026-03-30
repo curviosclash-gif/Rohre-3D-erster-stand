@@ -833,6 +833,216 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         expect(result.shootItemIndex).toBe(0);
     });
 
+    test('T78d: HuntBotPolicy haelt MG-Druck bei niedrigem HP mit stabilem Shield aufrecht', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(async () => {
+            const { HuntBotPolicy } = await import('/src/hunt/HuntBotPolicy.js');
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const bot = entityManager?.players?.find((player) => player?.isBot);
+            const enemy = entityManager?.players?.find((player) => !player?.isBot);
+            if (!entityManager || !bot || !enemy) {
+                return { error: 'missing-hunt-state' };
+            }
+
+            bot.position.set(0, 50, 0);
+            bot.setLookAtWorld?.(0, 50, -120);
+            bot.maxHp = Math.max(1, Number(bot.maxHp) || 100);
+            bot.hp = Math.max(1, bot.maxHp * 0.22);
+            bot.maxShieldHp = Math.max(10, Number(bot.maxShieldHp) || 40);
+            bot.shieldHP = bot.maxShieldHp * 0.7;
+            bot.hasShield = true;
+            bot.inventory = [];
+
+            enemy.position.set(0, 50, -16);
+            enemy.maxHp = Math.max(1, Number(enemy.maxHp) || 100);
+            enemy.hp = Math.max(1, enemy.maxHp * 0.16);
+            enemy.maxShieldHp = Math.max(10, Number(enemy.maxShieldHp) || 40);
+            enemy.shieldHP = 0;
+            enemy.hasShield = false;
+
+            const policy = new HuntBotPolicy();
+            policy._fallbackPolicy.update = () => ({
+                shootMG: false,
+                shootItem: false,
+                shootItemIndex: -1,
+                boost: false,
+            });
+            policy._fallbackPolicy.getSensorSnapshot = () => ({
+                targetInFront: true,
+                targetDistanceSq: 16 * 16,
+                pressure: 0.24,
+                projectileThreat: false,
+                targetYaw: 0,
+                targetPitch: 0,
+                targetPlayer: enemy,
+            });
+
+            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                error: null,
+                shootMG: !!action?.shootMG,
+                shootItem: !!action?.shootItem,
+                boost: !!action?.boost,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.shootMG).toBeTruthy();
+        expect(result.shootItem).toBeFalsy();
+        expect(result.boost).toBeFalsy();
+    });
+
+    test('T78e: HuntBridgePolicy priorisiert Retreat bei kritischer Vitalitaet und behaelt Rocket-Shot bei', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(async () => {
+            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
+            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const bot = entityManager?.players?.find((player) => player?.isBot);
+            const enemy = entityManager?.players?.find((player) => !player?.isBot);
+            if (!entityManager || !bot || !enemy) {
+                return { error: 'missing-hunt-state' };
+            }
+
+            bot.position.set(0, 50, 0);
+            bot.setLookAtWorld?.(0, 50, -120);
+            bot.maxHp = Math.max(1, Number(bot.maxHp) || 100);
+            bot.hp = Math.max(1, bot.maxHp * 0.28);
+            bot.maxShieldHp = Math.max(10, Number(bot.maxShieldHp) || 40);
+            bot.shieldHP = bot.maxShieldHp * 0.04;
+            bot.hasShield = true;
+            bot.inventory = ['ROCKET_HEAVY'];
+            bot.selectedItemIndex = 0;
+
+            enemy.position.set(10, 50, -20);
+            enemy.maxHp = Math.max(1, Number(enemy.maxHp) || 100);
+            enemy.hp = Math.max(1, enemy.maxHp * 0.75);
+            enemy.maxShieldHp = Math.max(10, Number(enemy.maxShieldHp) || 40);
+            enemy.shieldHP = enemy.maxShieldHp * 0.1;
+            enemy.hasShield = true;
+
+            const context = entityManager.createBotRuntimeContext(bot, 1 / 60);
+            context.observation = new Array(schema.OBSERVATION_LENGTH_V1).fill(0);
+            context.observation[schema.TARGET_DISTANCE_RATIO] = 0.2;
+            context.observation[schema.TARGET_IN_FRONT] = 1;
+            context.observation[schema.PRESSURE_LEVEL] = 0.82;
+            context.observation[schema.PROJECTILE_THREAT] = 0;
+
+            const policy = new HuntBridgePolicy();
+            const action = policy.update(1 / 60, bot, context);
+            return {
+                error: null,
+                shootMG: !!action?.shootMG,
+                shootItem: !!action?.shootItem,
+                shootItemIndex: Number(action?.shootItemIndex),
+                boost: !!action?.boost,
+                yawCommand: !!action?.yawLeft || !!action?.yawRight,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.shootMG).toBeFalsy();
+        expect(result.shootItem).toBeTruthy();
+        expect(result.shootItemIndex).toBe(0);
+        expect(result.boost).toBeTruthy();
+        expect(result.yawCommand).toBeTruthy();
+    });
+
+    test('T78f: BotDecisionOps trennt Shield-Selbstnutzung von Rocket-Offensivfenster ueber Shield-Ratio', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { decideItemUsage } = await import('/src/entities/ai/BotDecisionOps.js');
+
+            function createBot(senseOverrides = {}) {
+                return {
+                    profile: {
+                        aggression: 0.4,
+                        itemContextWeight: 0.6,
+                        itemUseCooldown: 1.0,
+                        itemShootCooldown: 0.5,
+                    },
+                    sense: {
+                        pressure: 0.2,
+                        mapAggressionBias: 0,
+                        targetInFront: true,
+                        targetDistanceSq: 400,
+                        immediateDanger: false,
+                        forwardRisk: 0.1,
+                        ...senseOverrides,
+                    },
+                    state: {
+                        itemUseCooldown: 0,
+                        itemShootCooldown: 0,
+                    },
+                    _decision: {
+                        useItem: -1,
+                        shootItem: false,
+                        shootItemIndex: -1,
+                    },
+                };
+            }
+
+            const itemRules = {
+                SHIELD: { self: 0.72, offense: 0.02, defensiveScale: 0.28, emergencyScale: 0.52, combatSelf: 0.2 },
+                ROCKET_HEAVY: { self: 0.06, offense: 0.48, defensiveScale: 0.02, emergencyScale: 0.06, combatSelf: 0 },
+            };
+
+            const saturatedBot = createBot({
+                pressure: 0.24,
+                targetDistanceSq: 420,
+                immediateDanger: false,
+                forwardRisk: 0.12,
+            });
+            const saturatedPlayer = {
+                maxHp: 100,
+                hp: 92,
+                maxShieldHp: 40,
+                shieldHP: 40,
+                inventory: ['SHIELD', 'ROCKET_HEAVY'],
+            };
+            decideItemUsage(saturatedBot, saturatedPlayer, itemRules);
+
+            const depletedBot = createBot({
+                pressure: 0.9,
+                targetDistanceSq: 64,
+                immediateDanger: true,
+                forwardRisk: 0.92,
+            });
+            const depletedPlayer = {
+                maxHp: 100,
+                hp: 24,
+                maxShieldHp: 40,
+                shieldHP: 0,
+                inventory: ['SHIELD', 'ROCKET_HEAVY'],
+            };
+            decideItemUsage(depletedBot, depletedPlayer, itemRules);
+
+            return {
+                saturated: {
+                    useItem: Number(saturatedBot._decision.useItem),
+                    shootItem: !!saturatedBot._decision.shootItem,
+                    shootItemIndex: Number(saturatedBot._decision.shootItemIndex),
+                },
+                depleted: {
+                    useItem: Number(depletedBot._decision.useItem),
+                    shootItem: !!depletedBot._decision.shootItem,
+                    shootItemIndex: Number(depletedBot._decision.shootItemIndex),
+                },
+            };
+        });
+
+        expect(result.saturated.useItem).toBe(-1);
+        expect(result.saturated.shootItem).toBeTruthy();
+        expect(result.saturated.shootItemIndex).toBe(1);
+
+        expect(result.depleted.useItem).toBe(0);
+        expect(result.depleted.shootItem).toBeFalsy();
+        expect(result.depleted.shootItemIndex).toBe(-1);
+    });
+
     test('T79: RuntimeConfig setzt Trainer-WebSocket-Flag standardmaessig auf false', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

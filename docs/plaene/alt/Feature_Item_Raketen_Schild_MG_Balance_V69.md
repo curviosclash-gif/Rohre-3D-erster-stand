@@ -69,9 +69,9 @@ Hinweis fuer Abschluss-Evidence:
   - [x] 69.4.1 Shield-Hit-, Regen- und Damage-Timestamp-Interaktion klar definieren und konsistent in Health-/Feedback-Pfaden abbilden. (abgeschlossen: 2026-03-30; evidence: `src/hunt/HealthSystem.js` + `src/modes/HuntModeStrategy.js` + `S14d`/`T89k`)
   - [x] 69.4.2 Item-Nutzungsfenster fuer defensive Ketten (Shield-Spam) absichern, ohne Utility-Flow fuer normale Nutzung zu zerstoeren. (abgeschlossen: 2026-03-30; evidence: `src/entities/systems/HuntCombatSystem.js` + `src/entities/Player.js` + `src/hunt/HuntConfig.js` + `T89j`)
 
-- [ ] 69.5 Bot-/Policy-Anpassung
-  - [ ] 69.5.1 HuntBotPolicy/BotDecisionOps an neue Balance-Parameter und Item-Oekonomie anpassen (offensiv/defensiv sauber getrennt).
-  - [ ] 69.5.2 HuntBridgePolicy-Entscheidungsregeln fuer MG/Rocket/Retreat mit den neuen KPI-Zielen synchronisieren.
+- [x] 69.5 Bot-/Policy-Anpassung (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5386 PW_RUN_TAG=v69-5-policy PW_OUTPUT_DIR=test-results/v69-5-policy npx playwright test tests/physics-policy.spec.js --grep "T77|T78|T78b|T78c|T78d|T78e|T78f"` -> `test-results/v69-5-policy`)
+  - [x] 69.5.1 HuntBotPolicy/BotDecisionOps an neue Balance-Parameter und Item-Oekonomie anpassen (offensiv/defensiv sauber getrennt). (abgeschlossen: 2026-03-30; evidence: `src/hunt/HuntBotPolicy.js` + `src/entities/ai/BotDecisionOps.js` + `T78d`/`T78f`)
+  - [x] 69.5.2 HuntBridgePolicy-Entscheidungsregeln fuer MG/Rocket/Retreat mit den neuen KPI-Zielen synchronisieren. (abgeschlossen: 2026-03-30; evidence: `src/entities/ai/HuntBridgePolicy.js` + `T78e`)
 
 - [ ] 69.6 Verifikation und Rollout
   - [ ] 69.6.1 Tests erweitern: MG-Window, Rocket-Alias/Verteilung, Shield-Regen-Interaktion, Telemetrie-Schema-Regression.

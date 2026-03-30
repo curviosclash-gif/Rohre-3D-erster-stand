@@ -20,6 +20,13 @@ function resolveHealthRatio(player) {
     return clamp01(hp / maxHp);
 }
 
+function resolveShieldRatio(player) {
+    const maxShieldHp = Number(player?.maxShieldHp);
+    const shieldHp = Number(player?.shieldHP);
+    if (!Number.isFinite(maxShieldHp) || maxShieldHp <= 0 || !Number.isFinite(shieldHp)) return 0;
+    return clamp01(shieldHp / maxShieldHp);
+}
+
 function resolveSurvivalPressure(bot, player) {
     const sense = bot?.sense || {};
     const healthRatio = resolveHealthRatio(player);
@@ -172,6 +179,7 @@ export function decideItemUsage(bot, player, itemRules) {
     const aggression = Math.max(0, bot.profile.aggression + bot.sense.mapAggressionBias);
     const targetBonus = bot.sense.targetInFront ? 1.1 : 0.5;
     const healthRatio = resolveHealthRatio(player);
+    const shieldRatio = resolveShieldRatio(player);
     const survivalPressure = resolveSurvivalPressure(bot, player);
 
     // Phase 3: Kontextvariablen
@@ -181,14 +189,22 @@ export function decideItemUsage(bot, player, itemRules) {
 
     for (let i = 0; i < player.inventory.length; i++) {
         const type = player.inventory[i];
+        const normalizedType = String(type || '').trim().toUpperCase();
         const rule = itemRules[type] || { self: 0, offense: 0, defensiveScale: 0, emergencyScale: 0, combatSelf: 0 };
+        const shieldSaturationPenalty = normalizedType === 'SHIELD'
+            ? shieldRatio * 0.65
+            : 0;
+        const rocketOpportunityBonus = normalizedType.startsWith('ROCKET_') && bot.sense.targetDistanceSq > 196
+            ? 0.15
+            : 0;
 
         // Phase 3: Erweitertes Self-Scoring mit Kontext
         const selfScore = rule.self
             + pressure * rule.defensiveScale
             + crashRisk * (rule.emergencyScale || 0) * contextWeight
-            + (enemyClose ? (rule.combatSelf || 0) * contextWeight : 0);
-        const shootScore = rule.offense * (0.55 + aggression) * targetBonus;
+            + (enemyClose ? (rule.combatSelf || 0) * contextWeight : 0)
+            - shieldSaturationPenalty;
+        const shootScore = rule.offense * (0.55 + aggression) * targetBonus + rocketOpportunityBonus;
 
         if (selfScore > bestUseScore) {
             bestUseScore = selfScore;
@@ -202,7 +218,7 @@ export function decideItemUsage(bot, player, itemRules) {
 
     const defensiveUseThreshold = Math.max(
         0.42,
-        0.72 - survivalPressure * 0.24 - (healthRatio < 0.45 ? 0.08 : 0)
+        0.74 - survivalPressure * 0.22 - (healthRatio < 0.45 ? 0.08 : 0) + shieldRatio * 0.12
     );
     if (bestUseIndex >= 0 && bestUseScore > defensiveUseThreshold && bot.state.itemUseCooldown <= 0) {
         bot._decision.useItem = bestUseIndex;
