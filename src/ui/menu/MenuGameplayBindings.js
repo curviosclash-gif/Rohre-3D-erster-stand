@@ -1,5 +1,5 @@
 import { CONFIG } from '../../core/Config.js';
-import { SETTINGS_LIMITS } from '../../core/config/SettingsRuntimeContract.js';
+import { SETTINGS_LIMITS } from '../../shared/contracts/SettingsRuntimeContract.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
 import { EDITOR_VIEW_PATHS } from '../../shared/contracts/EditorPathContract.js';

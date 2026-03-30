@@ -6,7 +6,7 @@
 // ============================================
 
 import { CONFIG } from '../core/Config.js';
-import { SETTINGS_LIMITS } from '../core/config/SettingsRuntimeContract.js';
+import { SETTINGS_LIMITS } from '../shared/contracts/SettingsRuntimeContract.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
 import { isSettingsChangeKey, normalizeSettingsChangeKeys } from './SettingsChangeKeys.js';
 import { resolveSyncMethodNamesForChangeKeys } from './UISettingsSyncMap.js';

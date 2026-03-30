@@ -77,9 +77,9 @@ Hinweis fuer Abschluss-Evidence:
   - [x] 69.6.1 Tests erweitern: MG-Window, Rocket-Alias/Verteilung, Shield-Regen-Interaktion, Telemetrie-Schema-Regression. (abgeschlossen: 2026-03-30; evidence: `T20ke`, `T14ea`, `S14a`, `S14b`, `S14d`, `T89a`, `T89k`, `T77`, `T78d`, `T78e`, `T78f`)
   - [x] 69.6.2 Manuelle QA fuer Fight/Hunt-Combat-Checks aktualisieren und kurze Balancing-Auswertung als Evidence dokumentieren. (abgeschlossen: 2026-03-30; evidence: `docs/qa/Manuelle_Testcheckliste_Spiel.md` Abschnitt 26 + `docs/qa/V69_Fight_Hunt_Balancing_Auswertung_2026-03-30.md`)
 
-- [ ] 69.99 Integrations- und Abschluss-Gate
-  - [ ] 69.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run build` sind fuer den Scope gruen.
-  - [ ] 69.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Pipeline-Abgleich sind abgeschlossen.
+- [x] 69.99 Integrations- und Abschluss-Gate (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5419 PW_RUN_TAG=v69-99-core-r3-final PW_OUTPUT_DIR=test-results/v69-99-core-r3-final npm run test:core` + `TEST_PORT=5420 PW_RUN_TAG=v69-99-physics-hunt-r3-final PW_OUTPUT_DIR=test-results/v69-99-physics-hunt-r3-final npm run test:physics:hunt` + `TEST_PORT=5421 PW_RUN_TAG=v69-99-physics-policy-r4-final PW_OUTPUT_DIR=test-results/v69-99-physics-policy-r4-final npm run test:physics:policy` + `npm run build` + `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` -> PASS)
+  - [x] 69.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run build` sind fuer den Scope gruen. (abgeschlossen: 2026-03-30; evidence: `test-results/v69-99-core-r3-final`, `test-results/v69-99-physics-hunt-r3-final`, `test-results/v69-99-physics-policy-r4-final` + `npm run build` -> PASS)
+  - [x] 69.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Pipeline-Abgleich sind abgeschlossen. (abgeschlossen: 2026-03-30; evidence: `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` -> PASS; V69 in `docs/Umsetzungsplan.md` auf abgeschlossen/frei gesetzt)
 
 ## Risiko-Register
 

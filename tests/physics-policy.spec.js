@@ -1373,6 +1373,10 @@ test.describe('Physics Policy (Tests 65-82)', () => {
             if (!game.settings.gameplay || typeof game.settings.gameplay !== 'object') {
                 game.settings.gameplay = {};
             }
+            if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+                game.settings.localSettings = {};
+            }
+            game.settings.localSettings.modePath = 'normal';
             game.settings.gameplay.planarMode = false;
             game._onSettingsChanged();
 
@@ -1399,7 +1403,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
             const bounds = entityManager?.arena?.bounds;
             if (bounds && botPlayer?.position?.set) {
                 const centerY = ((Number(bounds.minY) || 0) + (Number(bounds.maxY) || 0)) * 0.5;
-                botPlayer.position.set((Number(bounds.maxX) || 0) - 1.5, centerY, 0);
+                botPlayer.position.set((Number(bounds.maxX) || 0) - 120, centerY, 0);
                 botPlayer.velocity?.set?.(0, 0, 0);
                 botPlayer.setLookAtWorld?.((Number(bounds.maxX) || 0) + 80, centerY, 0);
             }
@@ -1617,6 +1621,10 @@ test.describe('Physics Policy (Tests 65-82)', () => {
             if (!game.settings.gameplay || typeof game.settings.gameplay !== 'object') {
                 game.settings.gameplay = {};
             }
+            if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+                game.settings.localSettings = {};
+            }
+            game.settings.localSettings.modePath = 'normal';
             game.settings.gameplay.planarMode = false;
             game._onSettingsChanged();
             const startResult = game.startMatch();
