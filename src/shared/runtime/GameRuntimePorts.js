@@ -1,20 +1,37 @@
 function noop() {}
 
+function getRuntimeBundle(game) {
+    return game?.runtimeBundle || null;
+}
+
+function getRuntimeState(game) {
+    return getRuntimeBundle(game)?.state || null;
+}
+
+function getRuntimeComponents(game) {
+    return getRuntimeBundle(game)?.components || null;
+}
+
 export function createSettingsPort(game) {
     return {
         getSettings: () => game?.settings || null,
-        getRuntimeConfig: () => game?.runtimeConfig || null,
+        getRuntimeConfig: () => getRuntimeState(game)?.runtimeConfig || game?.runtimeConfig || null,
         applyAutoRoll(value) {
             const checked = !!value;
+            const runtimeState = getRuntimeState(game);
             if (game?.settings) {
                 game.settings.autoRoll = checked;
+            }
+            if (runtimeState?.runtimeConfig?.player) {
+                runtimeState.runtimeConfig.player.autoRoll = checked;
+                return;
             }
             if (game?.runtimeConfig?.player) {
                 game.runtimeConfig.player.autoRoll = checked;
             }
         },
         setBindings(bindings) {
-            game?.input?.setBindings?.(bindings);
+            getRuntimeComponents(game)?.input?.setBindings?.(bindings);
         },
         syncUiByChangedKeys(changedKeys) {
             if (Array.isArray(changedKeys) && changedKeys.length > 0) {
@@ -31,7 +48,7 @@ export function createSettingsPort(game) {
 
 export function createUiFeedbackPort(game) {
     return {
-        getUi: () => game?.ui || null,
+        getUi: () => getRuntimeComponents(game)?.ui || game?.ui || null,
         showStatusToast(message, durationMs, tone) {
             game?._showStatusToast?.(message, durationMs, tone);
         },
@@ -42,7 +59,7 @@ export function createUiFeedbackPort(game) {
             game?.uiManager?.menuNavigationRuntime?.showPanel?.(panelId, options);
         },
         toggleP2Hud(isVisible) {
-            game?.hudP2?.setVisibility?.(!!isVisible);
+            getRuntimeComponents(game)?.hudP2?.setVisibility?.(!!isVisible);
         },
     };
 }
@@ -56,15 +73,18 @@ export function createSessionPort(game) {
                 game.state = state;
             }
         },
-        getEntityManager: () => game?.entityManager || null,
+        getEntityManager: () => getRuntimeState(game)?.entityManager || game?.entityManager || null,
         clearLastRoundGhost() {
-            game?.entityManager?.clearLastRoundGhost?.();
+            const entityManager = getRuntimeState(game)?.entityManager || game?.entityManager || null;
+            entityManager?.clearLastRoundGhost?.();
         },
         teardownMatchSession() {
-            game?.matchFlowUiController?.sessionOrchestrator?.teardownMatchSession?.();
+            const matchFlowUiController = getRuntimeComponents(game)?.matchFlowUiController || game?.matchFlowUiController || null;
+            matchFlowUiController?.sessionOrchestrator?.teardownMatchSession?.();
         },
         requestDeltaReset(reason) {
-            game?.gameLoop?.requestDeltaReset?.(reason);
+            const gameLoop = getRuntimeComponents(game)?.gameLoop || game?.gameLoop || null;
+            gameLoop?.requestDeltaReset?.(reason);
         },
     };
 }
@@ -72,13 +92,14 @@ export function createSessionPort(game) {
 export function createRenderPort(game) {
     return {
         setSplitScreen(isEnabled) {
-            game?.renderer?.setSplitScreen?.(!!isEnabled);
+            getRuntimeComponents(game)?.renderer?.setSplitScreen?.(!!isEnabled);
         },
         setShadowQuality(level) {
-            game?.renderer?.setShadowQuality?.(level);
+            getRuntimeComponents(game)?.renderer?.setShadowQuality?.(level);
         },
         syncPortalBeams(isEnabled) {
-            game?.arena?.toggleBeams?.(!!isEnabled);
+            const arena = getRuntimeState(game)?.arena || game?.arena || null;
+            arena?.toggleBeams?.(!!isEnabled);
         },
     };
 }
@@ -86,10 +107,11 @@ export function createRenderPort(game) {
 export function createInputPort(game) {
     return {
         clearJustPressed() {
-            game?.input?.clearJustPressed?.();
+            getRuntimeComponents(game)?.input?.clearJustPressed?.();
         },
         startKeyCapture(playerKey, action) {
-            game?.keybindEditorController?.startKeyCapture?.(playerKey, action);
+            const keybindEditorController = getRuntimeComponents(game)?.keybindEditorController || game?.keybindEditorController || null;
+            keybindEditorController?.startKeyCapture?.(playerKey, action);
         },
     };
 }

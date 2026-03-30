@@ -11,7 +11,9 @@ import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifec
 import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
-import { setActiveRuntimeConfig } from './runtime/ActiveRuntimeConfigStore.js';
+import {
+    applyRuntimeSettingsState,
+} from './runtime/GameRuntimeBundle.js';
 import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
 import { ReplayRecorder } from './replay/ReplayRecorder.js';
 import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
@@ -93,6 +95,7 @@ export class GameRuntimeFacade {
     constructor(deps = {}) {
         this.game = deps.game || null;
         this.ports = deps.ports || null;
+        this.runtimeBundle = deps.runtimeBundle || this.game?.runtimeBundle || null;
         this.runtimeClock = createRuntimeClock({
             runtime: deps.runtimeClockRuntime || null,
             nowMs: deps.nowMs,
@@ -164,29 +167,34 @@ export class GameRuntimeFacade {
         const game = this.game;
         if (!game?.settingsManager) return;
         const schedulePrewarm = options?.schedulePrewarm !== false;
+        const runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
+        const compatibilityConfig = applyRuntimeConfigCompatibility(runtimeConfig, CONFIG_BASE);
 
-        game.runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
         game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
-        game.renderer?.setRecordingCaptureSettings?.(game.runtimeConfig?.recording);
-        game.renderer?.setCameraPerspectiveSettings?.(game.runtimeConfig?.cameraPerspective);
-        game.mediaRecorderSystem?.setRecordingCaptureSettings?.(game.runtimeConfig?.recording);
+        game.renderer?.setRecordingCaptureSettings?.(runtimeConfig?.recording);
+        game.renderer?.setCameraPerspectiveSettings?.(runtimeConfig?.cameraPerspective);
+        game.mediaRecorderSystem?.setRecordingCaptureSettings?.(runtimeConfig?.recording);
 
-        game.numHumans = game.runtimeConfig.session.numHumans;
-        game.numBots = game.runtimeConfig.session.numBots;
-        game.mapKey = game.runtimeConfig.session.mapKey;
-        game.winsNeeded = game.runtimeConfig.session.winsNeeded;
-        game.activeGameMode = game.runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC;
-        game.config = applyRuntimeConfigCompatibility(game.runtimeConfig, CONFIG_BASE);
-        setActiveRuntimeConfig(game.config);
+        applyRuntimeSettingsState(this.runtimeBundle || game.runtimeBundle, {
+            runtimeConfig,
+            config: compatibilityConfig,
+            session: {
+                numHumans: runtimeConfig?.session?.numHumans,
+                numBots: runtimeConfig?.session?.numBots,
+                mapKey: runtimeConfig?.session?.mapKey,
+                winsNeeded: runtimeConfig?.session?.winsNeeded,
+                activeGameMode: runtimeConfig?.session?.activeGameMode || GAME_MODE_TYPES.CLASSIC,
+            },
+        });
 
         if (game.arena && game.arena.toggleBeams) {
-            game.arena.toggleBeams(game.runtimeConfig.gameplay.portalBeams);
+            game.arena.toggleBeams(runtimeConfig.gameplay.portalBeams);
         }
         if (game.entityManager && game.entityManager.setBotDifficulty) {
-            game.entityManager.setBotDifficulty(game.runtimeConfig.bot.activeDifficulty);
+            game.entityManager.setBotDifficulty(runtimeConfig.bot.activeDifficulty);
         }
 
-        game.input?.setBindings?.(game.runtimeConfig.controls);
+        game.input?.setBindings?.(runtimeConfig.controls);
         this._syncArcadeRuntimeConfig();
         if (schedulePrewarm) {
             this.scheduleMatchPrewarm();

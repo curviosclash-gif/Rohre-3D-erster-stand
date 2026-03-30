@@ -2,7 +2,6 @@
 // main.js - entry point and game controller
 // ============================================
 
-import { CONFIG } from './Config.js';
 import { RoundRecorder } from '../state/RoundRecorder.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
 import { UIManager, ProfileUiController } from '../composition/core-ui/CoreUiAppPorts.js';
@@ -11,7 +10,6 @@ import { ProfileManager } from './ProfileManager.js';
 import { createRoundStateController } from '../state/RoundStateController.js';
 import { PlayingStateSystem } from './PlayingStateSystem.js';
 import { RoundStateTickSystem } from '../state/RoundStateTickSystem.js';
-import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { bootstrapGameRuntime } from './GameBootstrap.js';
 import { GameRuntimeFacade } from './GameRuntimeFacade.js';
 import { GameDebugApi } from './GameDebugApi.js';
@@ -25,6 +23,7 @@ import { initializeGameApp } from './AppInitializer.js';
 import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './PlaytestLaunchParams.js';
 import { RECORDING_CAPTURE_PROFILE, RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
 import { RECORDER_ENGINE } from './recording/MediaRecorderSupport.js';
+import { clearGameRuntimeState } from './runtime/GameRuntimeBundle.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -40,9 +39,6 @@ export class Game {
 
         this.settings = this._loadSettings();
         this.settingsDirty = false;
-        this.config = CONFIG;
-        this.runtimeConfig = null;
-        this.activeGameMode = GAME_MODE_TYPES.CLASSIC;
         this.menuLifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
         this.menuLifecycleEvents = [];
         this.huntState = {
@@ -68,13 +64,13 @@ export class Game {
         this._playtestStartTimeoutId = null;
         this._boundKeyCaptureHandler = (event) => this.keybindEditorController.handleKeyCapture(event);
 
-        bootstrapGameRuntime(this, {
+        const runtimeBundle = bootstrapGameRuntime(this, {
             appVersion: APP_VERSION,
             buildId: BUILD_ID,
             buildTime: BUILD_TIME,
             showStatusToast: (message, durationMs, tone) => this._showStatusToast(message, durationMs, tone),
         });
-        this.runtimeFacade = new GameRuntimeFacade({ game: this, ports: this.runtimePorts });
+        this.runtimeFacade = new GameRuntimeFacade({ game: this, ports: runtimeBundle?.ports || this.runtimePorts, runtimeBundle });
         this.debugApi = new GameDebugApi(this);
 
         // Debug Recorder
@@ -85,11 +81,7 @@ export class Game {
         this._applySettingsToRuntime();
         this.input.setBindings(this.settings.controls);
 
-        this.arena = null;
-        this.entityManager = null;
-        this.powerupManager = null;
-
-        this.uiManager = new UIManager({ game: this, ports: this.runtimePorts });
+        this.uiManager = new UIManager({ game: this, ports: runtimeBundle?.ports || this.runtimePorts });
         this.uiManager.init();
         this.keybindEditorController.renderEditor();
 
@@ -119,7 +111,7 @@ export class Game {
             this.ui.mainMenu.style.visibility = '';
         }
 
-        this.gameLoop.start();
+        runtimeBundle?.components?.gameLoop?.start?.();
 
         window.addEventListener('keydown', this._boundKeyCaptureHandler, true);
 
@@ -545,6 +537,7 @@ export class Game {
         this.input?.dispose?.();
         this.audio?.dispose?.();
         this.renderer?.dispose?.();
+        clearGameRuntimeState(this.runtimeBundle);
 
         if (window.GAME_INSTANCE === this) window.GAME_INSTANCE = null;
         if (window.GAME_RUNTIME === this.runtimeFacade) window.GAME_RUNTIME = null;

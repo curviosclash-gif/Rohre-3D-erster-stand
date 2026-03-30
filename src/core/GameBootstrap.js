@@ -14,6 +14,11 @@ import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { CONFIG } from './Config.js';
 import { RECORDING_DOWNLOAD_DIRECTORY } from '../shared/contracts/RecordingCaptureContract.js';
 import {
+    attachGameRuntimeBundle,
+    createGameRuntimeBundle,
+    createInitialGameRuntimeState,
+} from './runtime/GameRuntimeBundle.js';
+import {
     CrosshairSystem,
     createGameUiDomRefs,
     createHuntHudDomRefs,
@@ -64,47 +69,84 @@ export function createGameUiRefs() {
 
 export function bootstrapGameRuntime(game, options = {}) {
     const canvas = document.getElementById('game-canvas');
-    game.renderer = new Renderer(canvas);
-    game.renderer.setShadowQuality(game.settings?.localSettings?.shadowQuality);
+    const renderer = new Renderer(canvas);
+    renderer.setShadowQuality(game.settings?.localSettings?.shadowQuality);
     const recorderRuntimeConfig = resolveRecorderRuntimeConfig();
-    game.mediaRecorderSystem = new MediaRecorderSystem({
+    const mediaRecorderSystem = new MediaRecorderSystem({
         canvas,
         autoRecordingEnabled: recorderRuntimeConfig.autoRecordingEnabled,
         autoDownload: true,
         captureFps: recorderRuntimeConfig.captureFps,
         downloadDirectoryName: RECORDING_DOWNLOAD_DIRECTORY,
-        captureSourceResolver: () => game.renderer?.getRecordingCaptureCanvas?.() || canvas,
+        captureSourceResolver: () => renderer.getRecordingCaptureCanvas?.() || canvas,
         recordingCaptureSettings: game.settings?.recording,
-        onRecordingStateChange: (isRecording) => game.renderer?.setRecordingActive?.(isRecording),
+        onRecordingStateChange: (isRecording) => renderer.setRecordingActive?.(isRecording),
         runtimePerfProfiler: game.runtimePerfProfiler,
         logger: console,
     });
-    game.renderer.setRecordingCaptureSettings(game.settings?.recording);
-    game.renderer.setCameraPerspectiveSettings(game.settings?.cameraPerspective);
-    game.input = new InputManager();
-    game.audio = new AudioManager();
-    game.particles = new ParticleSystem(game.renderer);
-    game.ui = createGameUiRefs();
-    game.runtimePorts = createRuntimePorts(game);
+    renderer.setRecordingCaptureSettings(game.settings?.recording);
+    renderer.setCameraPerspectiveSettings(game.settings?.cameraPerspective);
 
-    game.hudP1 = new HUD('p1-fighter-hud', 0);
-    game.hudP2 = new HUD('p2-fighter-hud', 1);
-    game.huntHud = new HuntHUD({
+    const initialParticles = new ParticleSystem(renderer);
+    const ui = createGameUiRefs();
+    const runtimeBundle = createGameRuntimeBundle({
+        state: createInitialGameRuntimeState({
+            config: game.config ?? CONFIG,
+            runtimeConfig: game.runtimeConfig ?? null,
+            activeGameMode: game.activeGameMode ?? GAME_MODE_TYPES.CLASSIC,
+            roundStateController: game.roundStateController ?? null,
+            mapKey: game.mapKey ?? null,
+            numHumans: game.numHumans ?? 1,
+            numBots: game.numBots ?? 0,
+            winsNeeded: game.winsNeeded ?? 1,
+            arena: game.arena ?? null,
+            entityManager: game.entityManager ?? null,
+            powerupManager: game.powerupManager ?? null,
+            particles: initialParticles,
+            menuController: game.menuController ?? null,
+            menuMultiplayerBridge: game.menuMultiplayerBridge ?? null,
+            _navButtons: Array.isArray(game._navButtons) ? game._navButtons : [],
+            _menuButtonByPanel: game._menuButtonByPanel instanceof Map ? game._menuButtonByPanel : new Map(),
+            _activeSubmenu: game._activeSubmenu ?? null,
+            _lastMenuTrigger: game._lastMenuTrigger ?? null,
+            _buildInfoClipboardText: String(game._buildInfoClipboardText || ''),
+        }),
+        components: {
+            renderer,
+            mediaRecorderSystem,
+            input: new InputManager(),
+            audio: new AudioManager(),
+            ui,
+        },
+    });
+    attachGameRuntimeBundle(game, runtimeBundle);
+
+    const runtimePorts = createRuntimePorts(game);
+    runtimeBundle.ports = runtimePorts;
+    runtimeBundle.components.runtimePorts = runtimePorts;
+
+    runtimeBundle.components.hudP1 = new HUD('p1-fighter-hud', 0);
+    runtimeBundle.components.hudP2 = new HUD('p2-fighter-hud', 1);
+    runtimeBundle.components.huntHud = new HuntHUD({
         runtime: game,
         refs: createHuntHudDomRefs(document),
         isHuntActive: (runtime) => runtime.activeGameMode === GAME_MODE_TYPES.HUNT && runtime.state !== 'MENU',
-        getBoostCapacity: () => Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1,
+        getBoostCapacity: () => Number(game.config?.PLAYER?.BOOST_DURATION) || 1,
     });
-    game.screenShake = new ScreenShake(game.renderer);
-    game.hudRuntimeSystem = new HudRuntimeSystem({ game, ports: game.runtimePorts });
-    game.crosshairSystem = new CrosshairSystem({ game, ports: game.runtimePorts });
-    game.matchFlowUiController = new MatchFlowUiController({ game, ports: game.runtimePorts });
-    game.runtimeDiagnosticsSystem = new RuntimeDiagnosticsSystem(game);
-    game.keybindEditorController = new KeybindEditorController(game);
-    game.planarAimAssistSystem = new PlanarAimAssistSystem(game);
-    game.matchSessionRuntimeBridge = new MatchSessionRuntimeBridge({ game, ports: game.runtimePorts });
+    runtimeBundle.components.screenShake = new ScreenShake(renderer);
+    runtimeBundle.components.hudRuntimeSystem = new HudRuntimeSystem({ game, ports: runtimePorts });
+    runtimeBundle.components.crosshairSystem = new CrosshairSystem({ game, ports: runtimePorts });
+    runtimeBundle.components.matchFlowUiController = new MatchFlowUiController({ game, ports: runtimePorts });
+    runtimeBundle.components.runtimeDiagnosticsSystem = new RuntimeDiagnosticsSystem(game);
+    runtimeBundle.components.keybindEditorController = new KeybindEditorController(game);
+    runtimeBundle.components.planarAimAssistSystem = new PlanarAimAssistSystem(game);
+    runtimeBundle.components.matchSessionRuntimeBridge = new MatchSessionRuntimeBridge({
+        game,
+        ports: runtimePorts,
+        runtimeBundle,
+    });
 
-    game.gameLoop = new GameLoop(
+    runtimeBundle.components.gameLoop = new GameLoop(
         (dt) => game.update(dt),
         (renderAlpha, renderDelta) => game.render(renderAlpha, renderDelta),
         {
@@ -112,30 +154,31 @@ export function bootstrapGameRuntime(game, options = {}) {
         }
     );
 
-    game.matchFlowUiController._setupPauseOverlayListeners();
-    game._navButtons = [];
-    game._menuButtonByPanel = new Map();
-    game._activeSubmenu = null;
-    game._lastMenuTrigger = null;
-    game._buildInfoClipboardText = '';
+    runtimeBundle.components.matchFlowUiController._setupPauseOverlayListeners();
+    runtimeBundle.state._navButtons = [];
+    runtimeBundle.state._menuButtonByPanel = new Map();
+    runtimeBundle.state._activeSubmenu = null;
+    runtimeBundle.state._lastMenuTrigger = null;
+    runtimeBundle.state._buildInfoClipboardText = '';
 
     const showStatusToast = typeof options.showStatusToast === 'function'
         ? options.showStatusToast
         : (message, durationMs, tone) => game?._showStatusToast?.(message, durationMs, tone);
 
-    game.buildInfoController = new BuildInfoController({
-        ui: game.ui,
+    runtimeBundle.components.buildInfoController = new BuildInfoController({
+        ui,
         showStatusToast,
         appVersion: options.appVersion,
         buildId: options.buildId,
         buildTime: options.buildTime,
     });
-    game.menuExpertLoginRuntime = new MenuExpertLoginRuntime({
+    runtimeBundle.components.menuExpertLoginRuntime = new MenuExpertLoginRuntime({
         settings: game.settings,
-        ui: game.ui,
+        ui,
         showStatusToast,
     });
 
     // F9 cinematic recording is handled exclusively via main.js _toggleRecordingFromGlobalHotkey()
     // to avoid double-trigger with InputManager's justPressed cache.
+    return runtimeBundle;
 }

@@ -7,42 +7,31 @@
 // - Outputs: stable current-session reference object for lifecycle operations
 // - Side effects: applies/clears game runtime refs (arena/entity/powerup/particles)
 
+import {
+    applyMatchSessionState,
+    clearMatchSessionState,
+    getCurrentMatchSessionRefs,
+} from './runtime/GameRuntimeBundle.js';
+
 export class MatchSessionRuntimeBridge {
     constructor(deps = {}) {
         this.game = deps.game || null;
         this.ports = deps.ports || null;
+        this.runtimeBundle = deps.runtimeBundle || this.game?.runtimeBundle || null;
     }
 
     applyInitializedMatchSession(initializedMatch) {
-        const game = this.game;
         const matchSession = initializedMatch?.session;
-        if (!game || !matchSession) return;
-
-        game.particles = matchSession.particles;
-        game.arena = matchSession.arena;
-        game.powerupManager = matchSession.powerupManager;
-        game.entityManager = matchSession.entityManager;
-        game.mapKey = matchSession.effectiveMapKey;
-        game.numHumans = matchSession.numHumans;
-        game.numBots = matchSession.numBots;
-        game.winsNeeded = matchSession.winsNeeded;
+        if (!this.game || !matchSession) return;
+        applyMatchSessionState(this.runtimeBundle || this.game.runtimeBundle, matchSession);
     }
 
     getCurrentMatchSessionRefs() {
-        const game = this.game;
-        return {
-            entityManager: game?.entityManager || null,
-            powerupManager: game?.powerupManager || null,
-            particles: game?.particles || null,
-        };
+        return getCurrentMatchSessionRefs(this.runtimeBundle || this.game?.runtimeBundle);
     }
 
     clearMatchSessionRefs() {
-        const game = this.game;
-        if (!game) return;
-        game.particles = null;
-        game.arena = null;
-        game.entityManager = null;
-        game.powerupManager = null;
+        if (!this.game) return;
+        clearMatchSessionState(this.runtimeBundle || this.game.runtimeBundle);
     }
 }

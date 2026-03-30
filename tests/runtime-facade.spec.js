@@ -28,6 +28,62 @@ test.describe('V59-59.7.2: GameRuntimeFacade', () => {
         expect(result.ok).toBe(true);
     });
 
+    test('Runtime bundle groups aliases and legacy inventories', async ({ page }) => {
+        await loadGame(page);
+        const snapshot = await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            g?.runtimeFacade?.applySettingsToRuntime?.({ schedulePrewarm: false });
+            const bundle = g?.runtimeBundle || null;
+            const metadata = bundle?.metadata || null;
+            return {
+                hasBundle: !!bundle,
+                runtimeConfigAliased: g?.runtimeConfig === bundle?.state?.runtimeConfig,
+                configAliased: g?.config === bundle?.state?.config,
+                roundStateAliased: g?.roundStateController === bundle?.state?.roundStateController,
+                navButtonsAliased: g?._navButtons === bundle?.state?._navButtons,
+                menuButtonMapAliased: g?._menuButtonByPanel === bundle?.state?._menuButtonByPanel,
+                wrapperKeys: Array.isArray(metadata?.legacyWrappers) ? metadata.legacyWrappers.map((entry) => entry.key) : [],
+                aliasKeys: Array.isArray(metadata?.legacyAliases) ? metadata.legacyAliases.map((entry) => entry.key) : [],
+                runtimeConfigAdapter: metadata?.runtimeConfigAdapter || null,
+            };
+        });
+        expect(snapshot.hasBundle).toBe(true);
+        expect(snapshot.runtimeConfigAliased).toBe(true);
+        expect(snapshot.configAliased).toBe(true);
+        expect(snapshot.roundStateAliased).toBe(true);
+        expect(snapshot.navButtonsAliased).toBe(true);
+        expect(snapshot.menuButtonMapAliased).toBe(true);
+        expect(snapshot.wrapperKeys).toEqual(expect.arrayContaining(['_applySettingsToRuntime', '_returnToMenu', 'startMatch']));
+        expect(snapshot.aliasKeys).toEqual(expect.arrayContaining(['roundStateController', '_navButtons', '_menuButtonByPanel']));
+        expect(snapshot.runtimeConfigAdapter?.kind).toBe('ActiveRuntimeConfigStore');
+        expect(snapshot.runtimeConfigAdapter?.ownerScope).toBe('runtimeBundle');
+    });
+
+    test('Owned runtime config store clears on dispose only for the owning bundle', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const runtimeConfigStore = await import('/src/core/runtime/ActiveRuntimeConfigStore.js');
+            const g = window.GAME_INSTANCE;
+            g?.runtimeFacade?.applySettingsToRuntime?.({ schedulePrewarm: false });
+            const foreignClearResult = runtimeConfigStore.clearActiveRuntimeConfig?.({ owner: { foreign: true } });
+            const stillPresentAfterForeignClear = !!runtimeConfigStore.getActiveRuntimeConfig?.(null);
+            const ownerBeforeDispose = runtimeConfigStore.getActiveRuntimeConfigOwner?.() === g?.runtimeBundle;
+            g?.dispose?.();
+            return {
+                foreignClearResult,
+                stillPresentAfterForeignClear,
+                ownerBeforeDispose,
+                clearedAfterDispose: runtimeConfigStore.getActiveRuntimeConfig?.(null) === null,
+                ownerAfterDispose: runtimeConfigStore.getActiveRuntimeConfigOwner?.() ?? 'missing',
+            };
+        });
+        expect(result.foreignClearResult).toBe(false);
+        expect(result.stillPresentAfterForeignClear).toBe(true);
+        expect(result.ownerBeforeDispose).toBe(true);
+        expect(result.clearedAfterDispose).toBe(true);
+        expect(result.ownerAfterDispose).toBeNull();
+    });
+
     test('Session switch: start match then return to menu', async ({ page }) => {
         await startGameWithBots(page, 1);
         await page.waitForTimeout(2000);

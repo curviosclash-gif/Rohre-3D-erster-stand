@@ -1,6 +1,7 @@
 import { cloneJsonValue } from '../../shared/utils/JsonClone.js';
 
 let ACTIVE_RUNTIME_CONFIG = null;
+let ACTIVE_RUNTIME_CONFIG_OWNER = null;
 
 function cloneValue(value) {
     return cloneJsonValue(value);
@@ -17,10 +18,14 @@ function deepFreeze(value) {
     return value;
 }
 
-export function setActiveRuntimeConfig(config) {
+export function setActiveRuntimeConfig(config, options = undefined) {
+    const nextOwner = options && typeof options === 'object' && Object.prototype.hasOwnProperty.call(options, 'owner')
+        ? options.owner
+        : ACTIVE_RUNTIME_CONFIG_OWNER;
     ACTIVE_RUNTIME_CONFIG = config && typeof config === 'object'
         ? deepFreeze(cloneValue(config))
         : null;
+    ACTIVE_RUNTIME_CONFIG_OWNER = ACTIVE_RUNTIME_CONFIG ? nextOwner ?? null : null;
     return ACTIVE_RUNTIME_CONFIG;
 }
 
@@ -31,6 +36,21 @@ export function getActiveRuntimeConfig(fallback = null) {
     return fallback;
 }
 
-export function clearActiveRuntimeConfig() {
+export function getActiveRuntimeConfigOwner() {
+    return ACTIVE_RUNTIME_CONFIG_OWNER;
+}
+
+export function clearActiveRuntimeConfig(options = undefined) {
+    if (options && typeof options === 'object' && Object.prototype.hasOwnProperty.call(options, 'owner')) {
+        const requestedOwner = options.owner;
+        if (ACTIVE_RUNTIME_CONFIG_OWNER && requestedOwner && ACTIVE_RUNTIME_CONFIG_OWNER !== requestedOwner) {
+            return false;
+        }
+        if (ACTIVE_RUNTIME_CONFIG_OWNER && requestedOwner == null) {
+            return false;
+        }
+    }
     ACTIVE_RUNTIME_CONFIG = null;
+    ACTIVE_RUNTIME_CONFIG_OWNER = null;
+    return true;
 }
