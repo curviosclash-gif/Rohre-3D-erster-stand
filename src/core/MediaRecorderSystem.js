@@ -5,7 +5,6 @@ import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
-import { RECORDING_CAPTURE_PROFILE } from '../shared/contracts/RecordingCaptureContract.js';
 import {
     attemptAutoDownload,
     buildDownloadFileName,
@@ -26,6 +25,8 @@ import {
 import {
     createDefaultRecordingCaptureSettings,
     normalizeRecordingCaptureSettings,
+    RECORDING_CAPTURE_PROFILE,
+    RECORDING_DOWNLOAD_DIRECTORY,
 } from '../shared/contracts/RecordingCaptureContract.js';
 import {
     CAPTURE_LOAD_LEVELS,
@@ -46,7 +47,7 @@ export class MediaRecorderSystem {
         canvas = null,
         autoRecordingEnabled = true,
         autoDownload = false,
-        downloadDirectoryName = 'videos',
+        downloadDirectoryName = RECORDING_DOWNLOAD_DIRECTORY,
         captureFps = 60,
         onRecordingStateChange = null,
         contractVersion = DEFAULT_CONTRACT_VERSION,
@@ -63,7 +64,7 @@ export class MediaRecorderSystem {
         this.canvas = canvas || null;
         this.autoRecordingEnabled = autoRecordingEnabled !== false;
         this.autoDownload = !!autoDownload;
-        this.downloadDirectoryName = sanitizeFileToken(downloadDirectoryName, 'videos');
+        this.downloadDirectoryName = sanitizeFileToken(downloadDirectoryName, RECORDING_DOWNLOAD_DIRECTORY);
         this.captureFps = Math.max(1, Number(captureFps) || 60);
         this.onRecordingStateChange = typeof onRecordingStateChange === 'function' ? onRecordingStateChange : null;
         this.contractVersion = String(contractVersion || DEFAULT_CONTRACT_VERSION);

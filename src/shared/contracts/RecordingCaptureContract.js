@@ -4,6 +4,8 @@ export const RECORDING_CAPTURE_PROFILE = Object.freeze({
     CINEMATIC_MP4: 'cinematic_mp4',
 });
 
+export const RECORDING_DOWNLOAD_DIRECTORY = 'videos';
+
 export const RECORDING_HUD_MODE = Object.freeze({
     CLEAN: 'clean',
     WITH_HUD: 'with_hud',

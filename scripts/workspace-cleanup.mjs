@@ -3,6 +3,7 @@ import { execFile } from 'node:child_process';
 import path from 'node:path';
 import process from 'node:process';
 import { promisify } from 'node:util';
+import { collectRootRuntimeProtectionSources } from './root-runtime-protection.mjs';
 
 const execFileAsync = promisify(execFile);
 
@@ -22,13 +23,55 @@ const now = Date.now();
 
 const ROOT_LOG_PATTERNS = Object.freeze([
     /^tmp-dev-\d+\.(out|err)\.log$/i,
-    /^tmp-vite(?:-diag)?(?:-\d+)?\.(out|err)\.log$/i,
+    /^tmp-vite(?:-[^.\\/]+)*\.(out|err)\.log$/i,
 ]);
 
 const DEV_LOG_DIRECTORY = path.resolve(cwd, 'tmp', 'dev-logs');
+const TMP_DIRECTORY = path.resolve(cwd, 'tmp');
 const DEV_LOG_PATTERNS = Object.freeze([
     /^vite-dev-.*\.(out|err)\.log$/i,
     /^vite-dev-.*\.meta\.json$/i,
+]);
+const TMP_PROTECTED_ENTRY_NAMES = new Set([
+    'dev-logs',
+    'test-latest-index.lock',
+]);
+const TMP_DELETE_DIR_PATTERNS = Object.freeze([
+    /^boost-toggle-spotcheck$/i,
+    /^crosshair-restart-spotcheck$/i,
+    /^develop-web-game-/i,
+    /^fight-mode-analysis-runtime$/i,
+    /^repro-/i,
+    /^trace[-_]/i,
+]);
+const TMP_DELETE_FILE_PATTERNS = Object.freeze([
+    /^audit_phase/i,
+    /^bot[-_]/i,
+    /^boost-toggle-/i,
+    /^bv-/i,
+    /^camera-/i,
+    /^canvas-/i,
+    /^dev-/i,
+    /^devserver/i,
+    /^develop-web-game-/i,
+    /^knip-/i,
+    /^map-/i,
+    /^menu-review/i,
+    /^normal-start/i,
+    /^patch_/i,
+    /^perf[-_]/i,
+    /^playwright\./i,
+    /^portal-/i,
+    /^preview-/i,
+    /^repro-/i,
+    /^run-runtime-/i,
+    /^runtime-/i,
+    /^start-vite-/i,
+    /^t\d+/i,
+    /^v\d+/i,
+    /^vite/i,
+    /^web_game_playwright_/i,
+    /^workspace-cleanup-/i,
 ]);
 
 const ARCHIVE_ROOTS = Object.freeze([
@@ -204,6 +247,75 @@ async function collectDevLogItems() {
     }
 }
 
+async function collectTmpRetentionItems() {
+    try {
+        const entries = await readdir(TMP_DIRECTORY, { withFileTypes: true });
+        const items = [];
+        for (const entry of entries) {
+            const targetPath = path.resolve(TMP_DIRECTORY, entry.name);
+            const targetStat = await stat(targetPath);
+            const relativePath = path.relative(cwd, targetPath);
+            const recent = isRecentlyTouched(targetStat);
+
+            if (TMP_PROTECTED_ENTRY_NAMES.has(entry.name)) {
+                items.push(createItem({
+                    path: relativePath,
+                    type: entry.isDirectory() ? 'dir' : 'file',
+                    action: 'protect',
+                    risk: 'medium',
+                    reason: 'Explizit geschuetzter tmp-Pfad fuer Locks oder laufende Diagnose.',
+                    sizeBytes: Number(targetStat.size || 0),
+                    mtimeMs: Number(targetStat.mtimeMs || 0),
+                }));
+                continue;
+            }
+
+            if (entry.isDirectory() && matchesPattern(TMP_DELETE_DIR_PATTERNS, entry.name)) {
+                items.push(createItem({
+                    path: relativePath,
+                    type: 'dir',
+                    action: recent ? 'protect' : 'delete',
+                    risk: recent ? 'medium' : 'low',
+                    reason: recent
+                        ? `Juenger als ${activeMinutes} Minuten; moeglicherweise aktiver tmp-Diagnoseordner.`
+                        : 'Verwaister tmp-Diagnoseordner nach Retention-Regel.',
+                    sizeBytes: null,
+                    mtimeMs: Number(targetStat.mtimeMs || 0),
+                }));
+                continue;
+            }
+
+            if (entry.isFile() && matchesPattern(TMP_DELETE_FILE_PATTERNS, entry.name)) {
+                items.push(createItem({
+                    path: relativePath,
+                    type: 'file',
+                    action: recent ? 'protect' : 'delete',
+                    risk: recent ? 'medium' : 'low',
+                    reason: recent
+                        ? `Juenger als ${activeMinutes} Minuten; moeglicherweise aktives tmp-Diagnoseartefakt.`
+                        : 'Verwaistes tmp-Diagnoseartefakt nach Retention-Regel.',
+                    sizeBytes: Number(targetStat.size || 0),
+                    mtimeMs: Number(targetStat.mtimeMs || 0),
+                }));
+                continue;
+            }
+
+            items.push(createItem({
+                path: relativePath,
+                type: entry.isDirectory() ? 'dir' : 'file',
+                action: 'protect',
+                risk: 'medium',
+                reason: 'Nicht in konservativer tmp-Retention-Allowlist.',
+                sizeBytes: Number(targetStat.size || 0),
+                mtimeMs: Number(targetStat.mtimeMs || 0),
+            }));
+        }
+        return items;
+    } catch {
+        return [];
+    }
+}
+
 async function collectInventory() {
     const items = [];
     const activeLock = await readActivePlaywrightLock();
@@ -310,6 +422,8 @@ async function collectInventory() {
 
     const devLogItems = await collectDevLogItems();
     items.push(...devLogItems);
+    const tmpRetentionItems = await collectTmpRetentionItems();
+    items.push(...tmpRetentionItems);
 
     await protectTrackedDeleteTargets(items);
     items.sort((left, right) => left.path.localeCompare(right.path));
@@ -383,11 +497,13 @@ function summarize(items) {
 async function main() {
     const { items, activeLock } = await collectInventory();
     const summary = summarize(items);
+    const protectionSources = collectRootRuntimeProtectionSources(cwd);
     const report = {
         generatedAt: new Date(now).toISOString(),
         mode: applyMode ? 'apply' : 'dry-run',
         activeMinutes,
         activePlaywrightLock: activeLock,
+        protectionSources,
         summary,
         items,
         applyResults: [],
@@ -395,6 +511,7 @@ async function main() {
 
     process.stdout.write(`[cleanup:workspace] mode=${report.mode}\n`);
     process.stdout.write(`[cleanup:workspace] report=${path.relative(cwd, reportPath).replace(/\\/g, '/')}\n`);
+    process.stdout.write(`[cleanup:workspace] protection_sources=${protectionSources.length}\n`);
     process.stdout.write(`[cleanup:workspace] delete=${summary.delete} archive=${summary.archive} protect=${summary.protect}\n`);
 
     for (const item of items) {

@@ -1,7 +1,7 @@
 # Feature Repo-Aufraeumen Runtime-sicher V71
 
 Stand: 2026-03-30
-Status: Geplant
+Status: In Arbeit
 Owner: Codex
 
 <!-- LOCK: frei -->
@@ -61,6 +61,7 @@ Vor jeder physischen Bereinigung gelten diese Grenzen:
 - `package.json`
 - `scripts/clean-dev-temp-logs.mjs`
 - `scripts/check-root-runtime-invariants.mjs`
+- `scripts/root-runtime-protection.mjs`
 - `scripts/` (neuer Cleanup-Dry-Run/Apply-Entry)
 - `tmp/`
 - `.codex_tmp/`
@@ -71,6 +72,9 @@ Vor jeder physischen Bereinigung gelten diese Grenzen:
 - `videos/`
 - `phase2_2026-03-02/`
 - `backups/`
+- `src/shared/contracts/RecordingCaptureContract.js`
+- `src/core/GameBootstrap.js`
+- `src/core/MediaRecorderSystem.js`
 - `src/shared/contracts/EditorPathContract.js`
 - `src/entities/runtime-modular-vehicle-mesh.js`
 - `tests/editor-vehicle.spec.js`
@@ -94,13 +98,13 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 ### 71.1 Schutzgrenzen und Inventar
 
-- [ ] 71.1.1 Eine verbindliche Allowlist fuer runtime- und editor-kritische Root-Pfade aus `scripts/check-root-runtime-invariants.mjs`, `EditorPathContract`, Recorder-Contract und Startskripten ableiten.
-- [ ] 71.1.2 Einen Dry-Run-Inventarbericht erstellen, der alle Root-/Artefaktordner in `delete`, `archive` oder `protect` einsortiert und pro Eintrag `low`, `medium` oder `high` Risiko vergibt.
+- [x] 71.1.1 Eine verbindliche Allowlist fuer runtime- und editor-kritische Root-Pfade aus `scripts/check-root-runtime-invariants.mjs`, `EditorPathContract`, Recorder-Contract und Startskripten ableiten. (abgeschlossen: 2026-03-30; evidence: `npm run check:root:runtime && npm run cleanup:workspace` -> `tmp/workspace-cleanup-report.json`)
+- [x] 71.1.2 Einen Dry-Run-Inventarbericht erstellen, der alle Root-/Artefaktordner in `delete`, `archive` oder `protect` einsortiert und pro Eintrag `low`, `medium` oder `high` Risiko vergibt. (abgeschlossen: 2026-03-30; evidence: `npm run cleanup:workspace` -> `tmp/workspace-cleanup-report.json`)
 
 ### 71.2 Sofort sichere Artefakte bereinigen
 
-- [ ] 71.2.1 Den bestehenden Log-Cleanup auf einen allgemeinen Workspace-Cleanup-Dry-Run erweitern oder einen eigenen Script-Entry anlegen, der mindestens `.codex_tmp/`, `dist/`, `playwright-report/`, `test-results*/`, Root-Temp-Logs und `tmp/dev-logs/*` sicher behandelt.
-- [ ] 71.2.2 Fuer `tmp/` eine konservative Retention-Regel einziehen: Locks, aktuelle Diagnosen und explizit referenzierte Evidence bleiben; verwaiste Repros, Screenshots, alte JSON-Snapshots und lokale Diagnosekopien koennen nach Dry-Run entfernt werden.
+- [x] 71.2.1 Den bestehenden Log-Cleanup auf einen allgemeinen Workspace-Cleanup-Dry-Run erweitern oder einen eigenen Script-Entry anlegen, der mindestens `.codex_tmp/`, `dist/`, `playwright-report/`, `test-results*/`, Root-Temp-Logs und `tmp/dev-logs/*` sicher behandelt. (abgeschlossen: 2026-03-30; evidence: `npm run logs:clean -- --dry-run && npm run cleanup:workspace` -> `tmp/workspace-cleanup-report.json`)
+- [x] 71.2.2 Fuer `tmp/` eine konservative Retention-Regel einziehen: Locks, aktuelle Diagnosen und explizit referenzierte Evidence bleiben; verwaiste Repros, Screenshots, alte JSON-Snapshots und lokale Diagnosekopien koennen nach Dry-Run entfernt werden. (abgeschlossen: 2026-03-30; evidence: `npm run cleanup:workspace` -> `tmp/workspace-cleanup-report.json`)
 
 ### 71.3 Archivierungsfaehige Langzeitordner ordnen
 

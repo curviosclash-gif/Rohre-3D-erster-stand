@@ -1,4 +1,4 @@
-# Fehlerbericht: Workspace-Cleanup Verifikation Blockiert
+# Fehlerbericht: Workspace-Cleanup Verifikation Blockiert (geloest)
 
 ## Aufgabe/Kontext
 
@@ -54,14 +54,17 @@
 - Relevante Commits:
   - wird im Task-Commit referenziert
 
-## Aktueller Stand
+## Aufloesung
 
-- Status: konservativer Cleanup umgesetzt; Vollverifikation teilweise blockiert
+- Status: geloest am 2026-03-30
+- Ergebnis:
+  - `npm run build` PASS
+  - `TEST_PORT=5335 PW_RUN_TAG=v71-core-rerun PW_OUTPUT_DIR=test-results/v71-core-rerun node scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js --timeout=240000 --reporter=line` -> `127 passed`, `4 skipped`
+  - `npm run cleanup:workspace` liefert jetzt einen erweiterten Dry-Run mit `protectionSources`, Root-Temp-Logs und konservativer `tmp/`-Retention
 - Root-Cause-Stand:
-  - Build-Blocker ist eine bereits vorhandene Architekturabweichung ausserhalb des Cleanup-Scopes
-  - `test:core` wurde aus Ruecksicht auf den aktiven User-Run nicht parallel erzwungen
+  - Der fruehere Build-Blocker ist im aktuellen Repo-Stand nicht mehr reproduzierbar
+  - Der verwaiste fruehere `test:core`-Versuch war ein Tool-Timeout, kein reproduzierbarer Runner-Defekt
 
 ## Naechster Schritt
 
-- Separaten Fix fuer die bestehenden `ui -> core`-Boundary-Verletzungen anlegen
-- `test:core` nach Ende des aktiven Playwright-Locks erneut als Abschlussgate ausfuehren
+- Fehlerbericht geschlossen; verbleibender Scope liegt in V71.3 bis V71.99

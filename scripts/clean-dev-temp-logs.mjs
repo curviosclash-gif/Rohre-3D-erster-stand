@@ -6,7 +6,7 @@ const DRY_RUN = process.argv.includes('--dry-run');
 
 const ROOT_LOG_PATTERNS = Object.freeze([
   /^tmp-dev-\d+\.(out|err)\.log$/i,
-  /^tmp-vite(?:-diag)?(?:-\d+)?\.(out|err)\.log$/i,
+  /^tmp-vite(?:-[^.\\/]+)*\.(out|err)\.log$/i,
 ]);
 
 const DEV_LOG_DIRECTORY = path.resolve(process.cwd(), 'tmp', 'dev-logs');

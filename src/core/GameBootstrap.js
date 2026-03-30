@@ -12,6 +12,7 @@ import { MediaRecorderSystem } from './MediaRecorderSystem.js';
 import { createRuntimePorts } from '../shared/runtime/GameRuntimePorts.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { CONFIG } from './Config.js';
+import { RECORDING_DOWNLOAD_DIRECTORY } from '../shared/contracts/RecordingCaptureContract.js';
 import {
     CrosshairSystem,
     createGameUiDomRefs,
@@ -71,7 +72,7 @@ export function bootstrapGameRuntime(game, options = {}) {
         autoRecordingEnabled: recorderRuntimeConfig.autoRecordingEnabled,
         autoDownload: true,
         captureFps: recorderRuntimeConfig.captureFps,
-        downloadDirectoryName: 'videos',
+        downloadDirectoryName: RECORDING_DOWNLOAD_DIRECTORY,
         captureSourceResolver: () => game.renderer?.getRecordingCaptureCanvas?.() || canvas,
         recordingCaptureSettings: game.settings?.recording,
         onRecordingStateChange: (isRecording) => game.renderer?.setRecordingActive?.(isRecording),
