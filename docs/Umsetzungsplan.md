@@ -80,7 +80,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/MatchFlowUiController.js`, `src/core/GameRuntimeFacade.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/shared/contracts/ArcadeRewardContract.js`, `src/ui/menu/MenuTextCatalog.js`, `style.css`, `tests/core.spec.js` | V68 | abgeschlossen | abgeschlossen 2026-03-29; 68.1-68.4 inkl. Intermission-/Post-Run-Loop und Replay-Fallback abgeschlossen |
 | `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/ui/arcade/VehicleManagerCatalog.js`, `src/ui/arcade/vehicle-manager/**`, `src/ui/menu/MenuPreviewCatalog.js`, `src/entities/vehicle-registry.js`, `style.css`, `tests/core.spec.js` | V66 | abgeschlossen | abgeschlossen 2026-03-30; 66.1-66.5 + 66.99 inkl. 3D-Preview, Filter/Loadout, Drift-Regression und Gate-Verifikation |
-| `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | aktiv | 69.1 abgeschlossen (Telemetrie + KPI-Baseline), 69.2 als naechste Phase |
+| `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | aktiv | 69.1 und 69.2 abgeschlossen (Telemetrie + MG-Tuning), 69.3 als naechste Phase |
 | `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | abgeschlossen | abgeschlossen 2026-03-29; Settings-/Preset-Drift-Fix inkl. Migration-/Autosave-Haertung und T70-Regressionstests |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -99,7 +99,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V66 | 2026-03-30 | closed | abgeschlossen 2026-03-30 (66.1-66.5 + 66.99 inkl. test:core/test:stress/build/docs-gates) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (68.1-68.4 + 68.99 inkl. test:core/test:stress/build/docs-gates) |
-| Bot-Codex | V69 | 2026-03-30 | in-bearbeitung | 69.2 MG-Tuning und Trefferfenster |
+| Bot-Codex | V69 | 2026-03-30 | in-bearbeitung | 69.3 Rocket-Tiers und Spawn-Oekonomie |
 | Bot-Codex | V70 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -151,7 +151,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/bot-training/Bot_Trainingsplan.md` g
 | V66 | Vehicle-Manager UX - 3D-Vorschau, Kategorien und Upgrade-Visualisierung | `docs/plaene/alt/Feature_Vehicle_Manager_V66.md` | hoch | mittel | P2 | abgeschlossen (66.1-66.5 + 66.99; Drei-Zonen-Manager, 3D-Preview, Drift-Regression und Docs-Gates verifiziert) | Abgeschlossen |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (68.1-68.4 + 68.99; HUD/Intermission/Post-Run/Replay-Fallback verifiziert) | Abgeschlossen |
-| V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
+| V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | 69.1-69.2 abgeschlossen; naechster Fokus 69.3 Rocket-Tiers/Spawn-Oekonomie | In Arbeit |
 | V70 | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen | `docs/Umsetzungsplan.md` | hoch | mittel | P1 | abgeschlossen (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) | Abgeschlossen |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/prozess/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
@@ -952,8 +952,8 @@ Scope:
 
 ### 69.2 MG-Tuning und Trefferfenster
 
-- [ ] 69.2.1 Default-/Preset-Werte fuer `mgTrailAimRadius` und angrenzende MG-Parameter in Runtime, UI und Settings-Haertung konsistent machen.
-- [ ] 69.2.2 MG-Falloff/Overheat/Lockout gegen Zielkorridor validieren und Tests fuer Midrange-TTK plus Trail-Hit-Fairness erweitern.
+- [x] 69.2.1 Default-/Preset-Werte fuer `mgTrailAimRadius` und angrenzende MG-Parameter in Runtime, UI und Settings-Haertung konsistent machen. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5381 PW_RUN_TAG=v69-2-core PW_OUTPUT_DIR=test-results/v69-2-core npx playwright test tests/core.spec.js --grep "T20x0"` -> PASS + Defaults-Harmonisierung in `src/ui/menu/MenuDefaultsEditorConfig.js`/`src/core/config/SettingsRuntimeContract.js`/`src/ui/menu/MenuGameplayBindings.js`)
+- [x] 69.2.2 MG-Falloff/Overheat/Lockout gegen Zielkorridor validieren und Tests fuer Midrange-TTK plus Trail-Hit-Fairness erweitern. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5382 PW_RUN_TAG=v69-2-physics PW_OUTPUT_DIR=test-results/v69-2-physics npx playwright test tests/physics-hunt.spec.js --grep "T64|T89a|T89i"` -> PASS)
 
 ### 69.3 Rocket-Tiers und Spawn-Oekonomie
 
