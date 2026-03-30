@@ -424,6 +424,8 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
                 destroyed,
                 enemyHpBefore,
                 enemyHpAfter,
+                appliedRadius: Number(game?.config?.HUNT?.MG?.TRAIL_HIT_RADIUS || 0),
+                offAxisDistance: Math.abs(Number(enemy.position.x || 0) - Number(from.x || 0)),
             };
         });
 
@@ -433,6 +435,8 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.trailHit).toBeTruthy();
         expect(result.destroyed).toBeTruthy();
         expect(result.enemyHpAfter).toBe(result.enemyHpBefore);
+        expect(result.appliedRadius).toBeLessThan(1.2);
+        expect(result.offAxisDistance).toBeGreaterThan(result.appliedRadius + 1.5);
     });
 
     test('T83: Hunt-MG priorisiert gegnerische Spur vor eigener Spur auf Schusslinie', async ({ page }) => {
@@ -1266,6 +1270,97 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.ttk).toBeGreaterThan(1.6);
         expect(result.ttk).toBeLessThan(2.4);
         expect(result.shots).toBeGreaterThanOrEqual(14);
+    });
+
+    test('T89i: Hunt-MG Midrange-TTK bleibt ueber Nahdistanz und respektiert Falloff/Lockout', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const target = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !shooter || !target) {
+                return { error: 'missing-state' };
+            }
+
+            const simulateKillAtDistance = (distance) => {
+                shooter.position.set(0, 50, 0);
+                shooter.setLookAtWorld?.(0, 50, -120);
+                shooter.spawnProtectionTimer = 0;
+
+                target.position.set(0, 50, -Math.max(12, Number(distance) || 12));
+                target.setLookAtWorld?.(0, 50, -120);
+                target.spawnProtectionTimer = 0;
+                target.alive = true;
+                target.maxHp = Math.max(100, Number(target.maxHp) || 100);
+                target.hp = target.maxHp;
+                target.hasShield = false;
+                target.shieldHP = 0;
+
+                shooter.shootCooldown = 0;
+                if (entityManager._overheatGunSystem?._overheatByPlayer) {
+                    entityManager._overheatGunSystem._overheatByPlayer[shooter.index] = 0;
+                }
+                if (entityManager._overheatGunSystem?._lockoutByPlayer) {
+                    entityManager._overheatGunSystem._lockoutByPlayer[shooter.index] = 0;
+                }
+
+                const step = 1 / 120;
+                let elapsed = 0;
+                let shots = 0;
+                let firstLockoutAt = null;
+
+                while (elapsed < 12 && target.alive) {
+                    shooter.shootCooldown = Math.max(0, Number(shooter.shootCooldown || 0) - step);
+                    entityManager._overheatGunSystem.update(step);
+                    const lockout = Math.max(0, Number(entityManager._overheatGunSystem._lockoutByPlayer?.[shooter.index] || 0));
+                    if (lockout > 0 && firstLockoutAt === null) {
+                        firstLockoutAt = elapsed;
+                    }
+                    if (shooter.shootCooldown <= 0 && lockout <= 0) {
+                        const shot = entityManager._shootHuntGun(shooter);
+                        if (shot?.ok) shots += 1;
+                    }
+                    elapsed += step;
+                }
+
+                return {
+                    distance: Math.max(12, Number(distance) || 12),
+                    ttk: target.alive ? null : elapsed,
+                    shots,
+                    firstLockoutAt,
+                };
+            };
+
+            const closeRange = simulateKillAtDistance(18);
+            const midRange = simulateKillAtDistance(68);
+
+            return {
+                error: null,
+                closeRange,
+                midRange,
+                mgConfig: {
+                    range: Number(game?.config?.HUNT?.MG?.RANGE || 0),
+                    minFalloff: Number(game?.config?.HUNT?.MG?.MIN_FALLOFF || 0),
+                    lockoutThreshold: Number(game?.config?.HUNT?.MG?.LOCKOUT_THRESHOLD || 0),
+                    lockoutSeconds: Number(game?.config?.HUNT?.MG?.LOCKOUT_SECONDS || 0),
+                },
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.closeRange.ttk).not.toBeNull();
+        expect(result.midRange.ttk).not.toBeNull();
+        expect(result.closeRange.firstLockoutAt).not.toBeNull();
+        expect(result.midRange.firstLockoutAt).not.toBeNull();
+        expect(result.midRange.ttk).toBeGreaterThan(result.closeRange.ttk + 0.35);
+        expect(result.midRange.ttk).toBeGreaterThan(2.2);
+        expect(result.midRange.ttk).toBeLessThan(5.2);
+        expect(result.midRange.shots).toBeGreaterThan(result.closeRange.shots);
+        expect(result.mgConfig.minFalloff).toBeGreaterThanOrEqual(0.45);
+        expect(result.mgConfig.minFalloff).toBeLessThanOrEqual(0.8);
+        expect(result.mgConfig.lockoutThreshold).toBeGreaterThanOrEqual(90);
+        expect(result.mgConfig.lockoutSeconds).toBeGreaterThanOrEqual(0.7);
     });
 
     test('T89b: Hunt-Pickups limitieren Raketenflut und filtern punitive Debuffs', async ({ page }) => {

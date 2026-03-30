@@ -57,9 +57,9 @@ Hinweis fuer Abschluss-Evidence:
   - [x] 69.1.1 Round-/Combat-Metriken fuer `itemUse.mode`, `itemType`, `mgHits`, `rocketHits`, `shieldAbsorb`, `hpDamage` granular erfassen und im Telemetrie-Payload durchreichen. (abgeschlossen: 2026-03-30; evidence: Round-End-Telemetriepfad erweitert in `RoundMetricsStore`/`MatchFlowUiController`/`MenuTelemetryStore` inkl. `T20ke`)
   - [x] 69.1.2 KPI-Baseline fuer Fight/Hunt dokumentieren (TTK, Pickrate, Hitrate, Kill-Share, Shield-Uptime) und als Vergleichswert fuer Folgephasen fixieren. (abgeschlossen: 2026-03-30; evidence: `docs/qa/V69_Fight_Hunt_KPI_Baseline_2026-03-30.md`)
 
-- [ ] 69.2 MG-Tuning und Trefferfenster
-  - [ ] 69.2.1 Default-/Preset-Werte fuer `mgTrailAimRadius` und angrenzende MG-Parameter fuer Fight/Hunt harmonisieren; UI- und Runtime-Defaults konsistent halten.
-  - [ ] 69.2.2 MG-Falloff/Overheat/Lockout gegen Zielkorridor validieren und Tests fuer Midrange-TTK + Trail-Hit-Fairness erweitern.
+- [x] 69.2 MG-Tuning und Trefferfenster (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5381 PW_RUN_TAG=v69-2-core PW_OUTPUT_DIR=test-results/v69-2-core npx playwright test tests/core.spec.js --grep "T20x0"` + `TEST_PORT=5382 PW_RUN_TAG=v69-2-physics PW_OUTPUT_DIR=test-results/v69-2-physics npx playwright test tests/physics-hunt.spec.js --grep "T64|T89a|T89i"` -> `test-results/v69-2-core`, `test-results/v69-2-physics`)
+  - [x] 69.2.1 Default-/Preset-Werte fuer `mgTrailAimRadius` und angrenzende MG-Parameter fuer Fight/Hunt harmonisieren; UI- und Runtime-Defaults konsistent halten. (abgeschlossen: 2026-03-30; evidence: `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/core/config/SettingsRuntimeContract.js`, `src/ui/UIManager.js`, `index.html`, `docs/prozess/Standardeinstellungen.md`)
+  - [x] 69.2.2 MG-Falloff/Overheat/Lockout gegen Zielkorridor validieren und Tests fuer Midrange-TTK + Trail-Hit-Fairness erweitern. (abgeschlossen: 2026-03-30; evidence: `tests/physics-hunt.spec.js` (`T64`, `T89a`, `T89i`) + Physics-Run `test-results/v69-2-physics`)
 
 - [ ] 69.3 Rocket-Tiers und Spawn-Oekonomie
   - [ ] 69.3.1 Legacy-Rocket-Pickup-Typen (`ROCKET_STRONG` etc.) per Alias/Migration auf aktive Tier-Typen normalisieren.

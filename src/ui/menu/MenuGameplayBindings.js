@@ -1,4 +1,5 @@
 import { CONFIG } from '../../core/Config.js';
+import { SETTINGS_LIMITS } from '../../core/config/SettingsRuntimeContract.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
 import { EDITOR_VIEW_PATHS } from '../../shared/contracts/EditorPathContract.js';
@@ -25,6 +26,8 @@ export function setupMenuGameplayBindings(ctx) {
     const keys = ctx.settingsChangeKeys;
     const bind = ctx.bind;
     const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
+    const mgTrailAimLimits = SETTINGS_LIMITS.gameplay.mgTrailAimRadius;
+    const fightMgDamageLimits = SETTINGS_LIMITS.gameplay.fightMgDamage;
     const ensureRecordingSettings = () => {
         if (!settings.recording || typeof settings.recording !== 'object') {
             settings.recording = createDefaultRecordingCaptureSettings();
@@ -291,7 +294,11 @@ export function setupMenuGameplayBindings(ctx) {
 
     if (ui.mgTrailAimSlider) {
         bind(ui.mgTrailAimSlider, 'input', () => {
-            settings.gameplay.mgTrailAimRadius = clamp(parseFloat(ui.mgTrailAimSlider.value), 0.2, 6.0);
+            settings.gameplay.mgTrailAimRadius = clamp(
+                parseFloat(ui.mgTrailAimSlider.value),
+                mgTrailAimLimits.min,
+                mgTrailAimLimits.max
+            );
             queueInputSettingsChanged([keys.GAMEPLAY_MG_TRAIL_AIM_RADIUS]);
         });
     }
@@ -305,7 +312,11 @@ export function setupMenuGameplayBindings(ctx) {
     if (ui.fightMgDamageSlider) {
         bind(ui.fightMgDamageSlider, 'input', () => {
             if (!isFightModePathActive()) return;
-            settings.gameplay.fightMgDamage = clamp(parseFloat(ui.fightMgDamageSlider.value), 4, 20);
+            settings.gameplay.fightMgDamage = clamp(
+                parseFloat(ui.fightMgDamageSlider.value),
+                fightMgDamageLimits.min,
+                fightMgDamageLimits.max
+            );
             queueInputSettingsChanged([keys.GAMEPLAY_FIGHT_MG_DAMAGE]);
         });
     }

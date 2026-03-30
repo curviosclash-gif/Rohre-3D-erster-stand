@@ -1,6 +1,6 @@
 # CuviosClash - Standardeinstellungen
 
-Dokumentation aller Standard-Spieleinstellungen (Stand: 2026-03-15).
+Dokumentation aller Standard-Spieleinstellungen (Stand: 2026-03-30).
 Diese Werte werden verwendet, wenn keine gespeicherten Einstellungen im Browser vorhanden sind
 oder wenn die Settings-Version sich aendert (aktuell: Version 2).
 
@@ -52,7 +52,7 @@ oder wenn die Settings-Version sich aendert (aktuell: Version 2).
 | Item-Menge               | 10    | 1    | 20    |
 | Schussgeschwindigkeit    | 1.25s | 0.1  | 2.0   |
 | Lock-On Radius           | 11 Grad | 5  | 45    |
-| MG Trail-Zielsuchradius  | 3.00  | 0.2  | 3.0   |
+| MG Trail-Zielsuchradius  | 0.78  | 0.2  | 6.0   |
 | Schattenqualitaet        | Hoch (3) | 0 (Aus) | 3 (Hoch) |
 
 ---

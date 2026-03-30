@@ -6,6 +6,8 @@ import { createDefaultCameraPerspectiveSettings } from '../../shared/contracts/C
 export const MENU_DEFAULT_EDITOR_SCHEMA_VERSION = 'menu-default-editor.v1';
 export const MENU_DEFAULT_EVENT_PLAYLIST_ID = 'fun_rotation';
 export const MENU_FIXED_PRESET_CREATED_AT = '2026-03-05T00:00:00.000Z';
+const DEFAULT_MG_TRAIL_AIM_RADIUS = Number(HUNT_CONFIG?.MG?.TRAIL_HIT_RADIUS) || 0.78;
+const DEFAULT_FIGHT_MG_DAMAGE = Number(HUNT_CONFIG?.MG?.DAMAGE) || 7.75;
 
 function deepFreeze(value) {
     if (!value || typeof value !== 'object' || Object.isFrozen(value)) return value;
@@ -57,9 +59,9 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             itemAmount: 8,
             fireRate: 0.45,
             lockOnAngle: 11,
-            mgTrailAimRadius: 3.0,
+            mgTrailAimRadius: DEFAULT_MG_TRAIL_AIM_RADIUS,
             fightPlayerHp: HUNT_CONFIG.PLAYER_MAX_HP,
-            fightMgDamage: HUNT_CONFIG.MG.DAMAGE,
+            fightMgDamage: DEFAULT_FIGHT_MG_DAMAGE,
             planarMode: false,
             portalCount: 8,
             planarLevelCount: 5,
@@ -203,6 +205,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
                 'gameplay.fireRate': 0.25,
                 'gameplay.itemAmount': 14,
                 'gameplay.lockOnAngle': 18,
+                'gameplay.mgTrailAimRadius': DEFAULT_MG_TRAIL_AIM_RADIUS,
             },
         },
         {
@@ -222,6 +225,8 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
                 'gameplay.turnSensitivity': 2.4,
                 'gameplay.fireRate': 0.35,
                 'gameplay.itemAmount': 10,
+                'gameplay.mgTrailAimRadius': DEFAULT_MG_TRAIL_AIM_RADIUS,
+                'gameplay.fightMgDamage': DEFAULT_FIGHT_MG_DAMAGE,
             },
         },
         {

@@ -6,6 +6,7 @@
 // ============================================
 
 import { CONFIG } from '../core/Config.js';
+import { SETTINGS_LIMITS } from '../core/config/SettingsRuntimeContract.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
 import { isSettingsChangeKey, normalizeSettingsChangeKeys } from './SettingsChangeKeys.js';
 import { resolveSyncMethodNamesForChangeKeys } from './UISettingsSyncMap.js';
@@ -353,9 +354,10 @@ export class UIManager {
         ui.fireRateSlider.value = gp.fireRate;
         ui.fireRateLabel.textContent = gp.fireRate.toFixed(2) + 's';
         ui.lockOnSlider.value = gp.lockOnAngle;
+        const mgTrailAimDefaults = SETTINGS_LIMITS.gameplay.mgTrailAimRadius;
         const mgTrailAimRadius = Number.isFinite(Number(gp.mgTrailAimRadius))
             ? Number(gp.mgTrailAimRadius)
-            : Math.max(0.2, Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
+            : Math.max(mgTrailAimDefaults.min, Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
         if (ui.mgTrailAimSlider) ui.mgTrailAimSlider.value = mgTrailAimRadius;
         if (ui.mgTrailAimLabel) ui.mgTrailAimLabel.textContent = mgTrailAimRadius.toFixed(2);
         syncFightMenuTuningUi({ ui, settings, gameplay: gp, config: CONFIG });

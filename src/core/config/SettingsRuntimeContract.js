@@ -1,5 +1,8 @@
 import { toFiniteNumber } from '../../utils/MathOps.js';
 
+export const MG_TRAIL_AIM_RADIUS_LIMITS = Object.freeze({ min: 0.2, max: 6 });
+export const FIGHT_MG_DAMAGE_LIMITS = Object.freeze({ min: 4, max: 20 });
+
 export const SETTINGS_LIMITS = Object.freeze({
     session: Object.freeze({
         numBots: Object.freeze({ min: 0, max: 8, integer: true }),
@@ -15,9 +18,9 @@ export const SETTINGS_LIMITS = Object.freeze({
         itemAmount: Object.freeze({ min: 1, max: 20, integer: true }),
         fireRate: Object.freeze({ min: 0.1, max: 2 }),
         lockOnAngle: Object.freeze({ min: 5, max: 45, integer: true }),
-        mgTrailAimRadius: Object.freeze({ min: 0.2, max: 6 }),
+        mgTrailAimRadius: MG_TRAIL_AIM_RADIUS_LIMITS,
         fightPlayerHp: Object.freeze({ min: 80, max: 250, integer: true }),
-        fightMgDamage: Object.freeze({ min: 4, max: 20 }),
+        fightMgDamage: FIGHT_MG_DAMAGE_LIMITS,
         portalCount: Object.freeze({ min: 0, max: 20, integer: true }),
         planarLevelCount: Object.freeze({ min: 2, max: 10, integer: true }),
     }),
