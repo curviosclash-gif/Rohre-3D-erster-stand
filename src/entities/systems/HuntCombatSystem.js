@@ -47,11 +47,40 @@ export class HuntCombatSystem {
         return { ok: true, type };
     }
 
+    _isHuntCombatStrategyActive() {
+        const strategy = this.runtime?.callbacks?.getStrategy?.() || null;
+        return !!strategy?.hasMachineGun?.();
+    }
+
+    _resolveItemUseCooldownSeconds(itemType) {
+        const config = getActiveRuntimeConfig(CONFIG);
+        const huntConfig = config?.HUNT || {};
+        const defaultCooldown = Math.max(0, Number(huntConfig.ITEM_USE_COOLDOWN_SECONDS || 0));
+        const normalizedType = String(itemType || '').trim().toUpperCase();
+        if (normalizedType !== 'SHIELD') return defaultCooldown;
+        return Math.max(defaultCooldown, Number(huntConfig.SHIELD_USE_COOLDOWN_SECONDS || 0.65));
+    }
+
     useInventoryItem(player, preferredIndex = -1) {
+        const huntCombatActive = this._isHuntCombatStrategyActive();
+        const cooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
+        if (huntCombatActive && cooldownRemaining > 0.001) {
+            return {
+                ok: false,
+                reason: `Item-Cooldown: ${cooldownRemaining.toFixed(2)}s`,
+                type: null,
+                cooldownRemaining,
+            };
+        }
+
         const itemResult = this.takeInventoryItem(player, preferredIndex);
         if (!itemResult.ok) return { ok: false, reason: itemResult.reason };
         player.applyPowerup(itemResult.type);
-        return { ok: true, type: itemResult.type };
+        const nextCooldown = huntCombatActive ? this._resolveItemUseCooldownSeconds(itemResult.type) : 0;
+        if (nextCooldown > 0) {
+            player.itemUseCooldownRemaining = nextCooldown;
+        }
+        return { ok: true, type: itemResult.type, cooldownSeconds: nextCooldown };
     }
 
     shootItemProjectile(player, preferredIndex = -1) {

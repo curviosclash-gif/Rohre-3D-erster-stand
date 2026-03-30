@@ -5,6 +5,8 @@ export const HUNT_CONFIG = Object.freeze({
     PLAYER_REGEN_PER_SECOND: 2.0,
     PLAYER_REGEN_DELAY: 3.0,
     SHIELD_MAX_HP: 40,
+    ITEM_USE_COOLDOWN_SECONDS: 0.15,
+    SHIELD_USE_COOLDOWN_SECONDS: 0.65,
     COLLISION_DAMAGE: Object.freeze({
         WALL: 20,
         TRAIL: 28,

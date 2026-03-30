@@ -96,8 +96,11 @@ export class HuntModeStrategy extends GameModeContract {
             }
         }
 
+        const damageContact = absorbedByShield > 0 || remainingDamage > 0;
         if (remainingDamage > 0) {
             player.hp = Math.max(0, toSafeNumber(player.hp, player.maxHp) - remainingDamage);
+        }
+        if (damageContact) {
             player.lastDamageTimestamp = toSafeNumber(options?.nowSeconds, getNowSeconds());
         }
 

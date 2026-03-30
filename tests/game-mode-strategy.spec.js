@@ -297,6 +297,54 @@ test.describe('Game Mode Strategy (V47)', () => {
         expect(result.forcedRocket).toBe('ROCKET_WEAK');
     });
 
+    test('S14d: HuntModeStrategy behandelt Shield-Treffer als Damage-Kontakt fuer Regen-Delay', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { HuntModeStrategy } = await import('/src/modes/HuntModeStrategy.js');
+            const strategy = new HuntModeStrategy();
+            const config = {
+                HUNT: {
+                    PLAYER_MAX_HP: 100,
+                    PLAYER_REGEN_DELAY: 3,
+                    PLAYER_REGEN_PER_SECOND: 2,
+                    SHIELD_MAX_HP: 40,
+                },
+            };
+            const player = {
+                maxHp: 100,
+                hp: 80,
+                maxShieldHp: 40,
+                shieldHP: 40,
+                hasShield: true,
+                shieldHitFeedback: 0,
+                lastDamageTimestamp: -Infinity,
+            };
+
+            const damage = strategy.applyDamage(player, 10, { nowSeconds: 10 }, config);
+            const hpAfterHit = Number(player.hp || 0);
+            const lastDamageTimestamp = Number(player.lastDamageTimestamp || 0);
+
+            strategy.updateHealthRegen(player, 1, config, 11.0);
+            const hpAfterEarlyRegenTick = Number(player.hp || 0);
+
+            strategy.updateHealthRegen(player, 1, config, 13.6);
+            const hpAfterLateRegenTick = Number(player.hp || 0);
+
+            return {
+                damage,
+                hpAfterHit,
+                lastDamageTimestamp,
+                hpAfterEarlyRegenTick,
+                hpAfterLateRegenTick,
+            };
+        });
+        expect(result.damage.absorbedByShield).toBeGreaterThan(0);
+        expect(result.hpAfterHit).toBe(80);
+        expect(result.lastDamageTimestamp).toBe(10);
+        expect(result.hpAfterEarlyRegenTick).toBe(80);
+        expect(result.hpAfterLateRegenTick).toBeGreaterThan(80);
+    });
+
     test('S15: EntityManager has gameModeStrategy wired after setup', async ({ page }) => {
         await startGame(page);
         const result = await page.evaluate(() => {

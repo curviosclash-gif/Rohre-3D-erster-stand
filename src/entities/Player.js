@@ -81,6 +81,7 @@ export class Player {
         this.maxHp = 1;
         this.hp = 1;
         this.lastDamageTimestamp = -Infinity;
+        this.itemUseCooldownRemaining = 0;
         this.invertPitchBase = false;
         this.modelScale = CONFIG.PLAYER.MODEL_SCALE || 1;
         this.cockpitCamera = false;
@@ -169,6 +170,7 @@ export class Player {
         this.spawnProtectionTimer = CONFIG.PLAYER.SPAWN_PROTECTION || 0;
         this.planarAimOffset = 0;
         this.steeringLockTimer = 0;
+        this.itemUseCooldownRemaining = 0;
         resetPlayerHealth(this);
 
         const fallbackY = CONFIG.PLAYER.START_Y || 5;
@@ -216,6 +218,7 @@ export class Player {
         this.spawnProtectionTimer = Math.max(0, this.spawnProtectionTimer - dt);
         this.steeringLockTimer = Math.max(0, (this.steeringLockTimer || 0) - dt);
         this.shieldHitFeedback = Math.max(0, (this.shieldHitFeedback || 0) - dt * 3.2);
+        this.itemUseCooldownRemaining = Math.max(0, Number(this.itemUseCooldownRemaining || 0) - dt);
         const steeringLocked = this.steeringLockTimer > 0;
 
         updatePlayerHealthRegen(this, dt);

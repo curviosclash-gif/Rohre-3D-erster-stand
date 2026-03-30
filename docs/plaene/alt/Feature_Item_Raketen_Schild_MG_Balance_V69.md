@@ -65,9 +65,9 @@ Hinweis fuer Abschluss-Evidence:
   - [x] 69.3.1 Legacy-Rocket-Pickup-Typen (`ROCKET_STRONG` etc.) per Alias/Migration auf aktive Tier-Typen normalisieren. (abgeschlossen: 2026-03-30; evidence: `src/hunt/RocketPickupSystem.js` + `src/entities/Powerup.js` + `src/entities/mapSchema/MapSchemaSanitizeOps.js` + Map-Preset-Migration in `src/core/config/maps/presets/neon_abyss.js`/`src/core/config/maps/presets/crystal_ruins.js` + `T14ea`/`S14a`)
   - [x] 69.3.2 Rocket-Tier- und Non-Rocket-Spawngewichte robust machen (normalisierte Gewichte, deterministische Verteilung, Tests fuer Grenzfaelle). (abgeschlossen: 2026-03-30; evidence: `src/hunt/RocketPickupSystem.js` + `src/modes/HuntModeStrategy.js` + `S14b`/`S14c`)
 
-- [ ] 69.4 Shield- und Damage-Semantik
-  - [ ] 69.4.1 Shield-Hit-, Regen- und Damage-Timestamp-Interaktion klar definieren und konsistent in Health-/Feedback-Pfaden abbilden.
-  - [ ] 69.4.2 Item-Nutzungsfenster fuer defensive Ketten (Shield-Spam) absichern, ohne Utility-Flow fuer normale Nutzung zu zerstoeren.
+- [x] 69.4 Shield- und Damage-Semantik (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5384 PW_RUN_TAG=v69-4 PW_OUTPUT_DIR=test-results/v69-4 npx playwright test tests/game-mode-strategy.spec.js tests/physics-hunt.spec.js --grep "S14d|T89j|T89k"` -> `test-results/v69-4`)
+  - [x] 69.4.1 Shield-Hit-, Regen- und Damage-Timestamp-Interaktion klar definieren und konsistent in Health-/Feedback-Pfaden abbilden. (abgeschlossen: 2026-03-30; evidence: `src/hunt/HealthSystem.js` + `src/modes/HuntModeStrategy.js` + `S14d`/`T89k`)
+  - [x] 69.4.2 Item-Nutzungsfenster fuer defensive Ketten (Shield-Spam) absichern, ohne Utility-Flow fuer normale Nutzung zu zerstoeren. (abgeschlossen: 2026-03-30; evidence: `src/entities/systems/HuntCombatSystem.js` + `src/entities/Player.js` + `src/hunt/HuntConfig.js` + `T89j`)
 
 - [ ] 69.5 Bot-/Policy-Anpassung
   - [ ] 69.5.1 HuntBotPolicy/BotDecisionOps an neue Balance-Parameter und Item-Oekonomie anpassen (offensiv/defensiv sauber getrennt).

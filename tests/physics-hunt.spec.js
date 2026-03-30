@@ -1363,6 +1363,126 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.mgConfig.lockoutSeconds).toBeGreaterThanOrEqual(0.7);
     });
 
+    test('T89j: Hunt-Item-Nutzung blockt direkte Shield-Spam-Ketten per Cooldown ohne Itemverlust', async ({ page }) => {
+        await startHuntGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            if (!game || !entityManager || !player) {
+                return { error: 'missing-state' };
+            }
+            if (String(game?.activeGameMode || '').toUpperCase() !== 'HUNT') {
+                return { error: 'hunt-not-active' };
+            }
+
+            player.inventory = ['SHIELD', 'SHIELD'];
+            player.selectedItemIndex = 0;
+            player.hasShield = false;
+            player.shieldHP = 0;
+            player.itemUseCooldownRemaining = 0;
+
+            const firstUse = entityManager._useInventoryItem(player, 0);
+            const cooldownAfterFirst = Math.max(0, Number(player.itemUseCooldownRemaining || 0));
+            const inventoryAfterFirst = Number(player.inventory.length || 0);
+
+            const secondUse = entityManager._useInventoryItem(player, 0);
+            const inventoryAfterSecond = Number(player.inventory.length || 0);
+
+            player.itemUseCooldownRemaining = 0;
+            const thirdUse = entityManager._useInventoryItem(player, 0);
+
+            return {
+                error: null,
+                firstUseOk: !!firstUse?.ok,
+                firstCooldown: cooldownAfterFirst,
+                inventoryAfterFirst,
+                secondUseOk: !!secondUse?.ok,
+                secondReason: String(secondUse?.reason || ''),
+                inventoryAfterSecond,
+                thirdUseOk: !!thirdUse?.ok,
+                finalInventory: Number(player.inventory.length || 0),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.firstUseOk).toBeTruthy();
+        expect(result.firstCooldown).toBeGreaterThanOrEqual(0.6);
+        expect(result.inventoryAfterFirst).toBe(1);
+        expect(result.secondUseOk).toBeFalsy();
+        expect(result.secondReason).toContain('Item-Cooldown');
+        expect(result.inventoryAfterSecond).toBe(1);
+        expect(result.thirdUseOk).toBeTruthy();
+        expect(result.finalInventory).toBe(0);
+    });
+
+    test('T89k: Shield-Treffer setzen Regen-Timestamp und blocken fruehe HP-Regeneration', async ({ page }) => {
+        await startHuntGameWithBots(page, 1);
+        const result = await page.evaluate(async () => {
+            const { updatePlayerHealthRegen } = await import('/src/hunt/HealthSystem.js');
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const shooter = entityManager?.players?.[0];
+            const target = entityManager?.players?.find((entry, index) => index !== 0 && entry?.alive);
+            if (!game || !entityManager || !shooter || !target) {
+                return { error: 'missing-state' };
+            }
+
+            shooter.position.set(0, 50, 0);
+            shooter.setLookAtWorld?.(0, 50, -120);
+            shooter.spawnProtectionTimer = 0;
+            target.position.set(0, 50, -16);
+            target.setLookAtWorld?.(0, 50, -120);
+            target.spawnProtectionTimer = 0;
+            target.alive = true;
+            target.maxHp = Math.max(100, Number(target.maxHp) || 100);
+            target.hp = 70;
+            target.maxShieldHp = Math.max(40, Number(target.maxShieldHp) || 40);
+            target.hasShield = true;
+            target.shieldHP = target.maxShieldHp;
+            target.lastDamageTimestamp = -Infinity;
+
+            shooter.shootCooldown = 0;
+            if (entityManager._overheatGunSystem?._overheatByPlayer) {
+                entityManager._overheatGunSystem._overheatByPlayer[shooter.index] = 0;
+            }
+            if (entityManager._overheatGunSystem?._lockoutByPlayer) {
+                entityManager._overheatGunSystem._lockoutByPlayer[shooter.index] = 0;
+            }
+
+            const shot = entityManager._shootHuntGun(shooter);
+            const hpAfterHit = Number(target.hp || 0);
+            const shieldAfterHit = Number(target.shieldHP || 0);
+            const timestampAfterHit = Number(target.lastDamageTimestamp || 0);
+
+            updatePlayerHealthRegen(target, 1.0, game.config, timestampAfterHit + 1.0);
+            const hpAfterEarlyRegen = Number(target.hp || 0);
+
+            updatePlayerHealthRegen(target, 1.0, game.config, timestampAfterHit + 3.6);
+            const hpAfterLateRegen = Number(target.hp || 0);
+
+            return {
+                error: null,
+                shotOk: !!shot?.ok,
+                hit: !!shot?.hit,
+                hpAfterHit,
+                shieldAfterHit,
+                timestampAfterHit,
+                hpAfterEarlyRegen,
+                hpAfterLateRegen,
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.shotOk).toBeTruthy();
+        expect(result.hit).toBeTruthy();
+        expect(result.hpAfterHit).toBe(70);
+        expect(result.shieldAfterHit).toBeLessThan(40);
+        expect(result.timestampAfterHit).toBeGreaterThan(0);
+        expect(result.hpAfterEarlyRegen).toBe(70);
+        expect(result.hpAfterLateRegen).toBeGreaterThan(70);
+    });
+
     test('T89b: Hunt-Pickups limitieren Raketenflut und filtern punitive Debuffs', async ({ page }) => {
         await startHuntGame(page);
         const result = await page.evaluate(() => {
