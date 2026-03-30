@@ -1,4 +1,4 @@
-# Fehlerbericht: Workspace-Cleanup Verifikation Blockiert (geloest)
+# Fehlerbericht: Workspace-Cleanup Verifikation Blockiert
 
 ## Aufgabe/Kontext
 
@@ -8,63 +8,76 @@
 
 ## Fehlerbild
 
-- Beobachtung: der Cleanup selbst lief sicher, aber die Vollverifikation konnte nicht komplett abgeschlossen werden
+- Beobachtung: der Cleanup selbst lief sicher, aber die Vollverifikation war erst geloest und ist nach erneuten Gate-Reruns wieder blockiert
 - Erwartetes Verhalten: `npm run build` und optional `npm run test:core` laufen als Safety-Gates gruen
 - Tatsaechliches Verhalten:
-  - `npm run build` scheitert vor Vite im bestehenden Architektur-Gate
-  - ein aktiver fremder Playwright-Lock blockiert eine saubere, stoerungsfreie `test:core`-Ausfuehrung waehrend des Tasks
+  - der fruehere Architektur-Gate-Blocker ist geloest; `npm run build` laeuft inzwischen gruen
+  - frische Playwright-Reruns fuer `test:core` und `tests/editor-vehicle.spec.js` brechen derzeit in `tests/playwright.global-setup.js` waehrend des Modul-Warmups mit `fetch failed` ab und haengen anschliessend bis zum Tool-Timeout
 
 ## Reproduktion
 
 1. `npm run cleanup:workspace`
-2. `npm run cleanup:workspace:apply`
+2. `npm run check:root:runtime`
 3. `npm run build`
-4. Optionaler Lock-Check: `Get-Content .playwright-suite.lock`
+4. `$env:TEST_PORT='5339'; $env:PW_RUN_TAG='v71-core-close'; $env:PW_OUTPUT_DIR='test-results/v71-core-close'; npm run test:core`
+5. `$env:TEST_PORT='5341'; $env:PW_RUN_TAG='v71-core-close-r2'; $env:PW_OUTPUT_DIR='test-results/v71-core-close-r2'; node scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js --timeout=240000 --reporter=line`
+6. `$env:TEST_PORT='5342'; $env:PW_RUN_TAG='v71-editor-vehicle-close'; $env:PW_OUTPUT_DIR='test-results/v71-editor-vehicle-close'; node scripts/verify-lock.mjs --playwright -- npx playwright test tests/editor-vehicle.spec.js --timeout=240000 --reporter=line`
 
 ## Betroffene Dateien/Komponenten
 
 - `scripts/workspace-cleanup.mjs`
 - `package.json`
 - `README.md`
-- `src/ui/menu/MenuGameplayBindings.js`
-- `src/ui/UIManager.js`
-- `src/core/config/SettingsRuntimeContract.js`
+- `tests/playwright.global-setup.js`
+- `test-results/v71-core-close/playwright-startup-diagnostics.json`
+- `test-results/v71-core-close-r2/playwright-startup-diagnostics.json`
+- `test-results/v71-editor-vehicle-close/playwright-startup-diagnostics.json`
 - `.playwright-suite.lock`
 
 ## Bereits getestete Ansaetze
 
 - Ansatz: Cleanup nur auf konservativen Low-Risk-Scope begrenzen und aktive Artefakte per Lock/Tracking-Pruefung schuetzen
 - Ergebnis: PASS, der Runner loescht keine versionierten oder aktiven Playwright-Ziele
-- Ansatz: Root-Guard und Doku-Gates separat pruefen
-- Ergebnis: `npm run check:root:runtime`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` PASS
+- Ansatz: Root-Guard, Pfad-Guards und Build separat pruefen
+- Ergebnis: `npm run cleanup:workspace`, `npm run check:editor:path-drift`, `npm run check:root:runtime`, `npm run build` PASS
 - Ansatz: Vollstaendiger Build
-- Ergebnis: FAIL im vorhandenen Architektur-Gate `ui -> core`
-- Ansatz: `test:core` trotz aktivem Lock starten
-- Ergebnis: bewusst nicht ausgefuehrt, um den laufenden User-Playwright-Run nicht zu beeinflussen
+- Ergebnis: PASS
+- Ansatz: `test:core` auf frischen Ports (`5339`, `5341`) erneut starten
+- Ergebnis: FAIL/HANG; nur `playwright-startup-diagnostics.json` wird geschrieben, danach Tool-Timeout
+- Ansatz: direkt betroffene Vehicle-/Editor-Spec auf frischem Port (`5342`) erneut starten
+- Ergebnis: FAIL/HANG; identisches Muster mit Warmup-Fehlern vor der eigentlichen Spec
 
 ## Evidence
 
 - Logs:
-  - `Architecture boundary guard failed.`
-  - `ui -> core import @ src/ui/menu/MenuGameplayBindings.js:2`
-  - `ui -> core import @ src/ui/UIManager.js:9`
-  - `.playwright-suite.lock` zeigte aktiven Run `runTag=v69-99-t10f-only-r2`, `outputDir=test-results/v69-99-t10f-only-r2`
+  - `Root runtime invariant guard passed.`
+  - `Editor/game-area path drift guard passed.`
+  - `build` PASS
+  - `test-results/v71-core-close/playwright-startup-diagnostics.json` enthaelt `message: "fetch failed"` fuer `/src/core/runtime/MenuRuntimePresetConfigService.js`
+  - `test-results/v71-core-close-r2/playwright-startup-diagnostics.json` enthaelt `failedCount: 26`
+  - `test-results/v71-editor-vehicle-close/playwright-startup-diagnostics.json` enthaelt `failedCount: 12`
+  - `.playwright-suite.lock` zeigte nach dem Timeout nur noch tote PIDs (`9968`, `9128`) aus den abgebrochenen Reruns
 - Screenshots/Artefakte:
   - `tmp/workspace-cleanup-report.json`
 - Relevante Commits:
-  - wird im Task-Commit referenziert
+  - `9035863`
+  - `4feab0e`
 
-## Aufloesung
+## Verlauf
 
-- Status: geloest am 2026-03-30
-- Ergebnis:
+- Status:
+  - zwischenzeitlich geloest am 2026-03-30
+  - erneut offen seit den Gate-Reruns am 2026-03-30
+- Zwischenstand:
   - `npm run build` PASS
   - `TEST_PORT=5335 PW_RUN_TAG=v71-core-rerun PW_OUTPUT_DIR=test-results/v71-core-rerun node scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js --timeout=240000 --reporter=line` -> `127 passed`, `4 skipped`
-  - `npm run cleanup:workspace` liefert jetzt einen erweiterten Dry-Run mit `protectionSources`, Root-Temp-Logs und konservativer `tmp/`-Retention
+  - `TEST_PORT=5337 PW_RUN_TAG=v71-editor-vehicle-rerun PW_OUTPUT_DIR=test-results/v71-editor-vehicle-rerun node scripts/verify-lock.mjs --playwright -- npx playwright test tests/editor-vehicle.spec.js --timeout=240000 --reporter=line` -> `6 passed`
+  - frische Reruns `v71-core-close`, `v71-core-close-r2`, `v71-editor-vehicle-close` sind aktuell nicht stabil abschliessbar
 - Root-Cause-Stand:
-  - Der fruehere Build-Blocker ist im aktuellen Repo-Stand nicht mehr reproduzierbar
-  - Der verwaiste fruehere `test:core`-Versuch war ein Tool-Timeout, kein reproduzierbarer Runner-Defekt
+  - Kein Hinweis auf 404s oder auf einen kaputten V71-Pfadvertrag
+  - Der aktuelle Blocker sitzt in der Playwright-Global-Setup-/Warmup-Schiene und ist wahrscheinlich infra- oder flake-getrieben
 
 ## Naechster Schritt
 
-- Fehlerbericht geschlossen; verbleibender Scope liegt in V71.3 bis V71.99
+- `tests/playwright.global-setup.js` bzw. den Dev-Server-Warmup fuer die haengenden Reruns untersuchen oder die Gates in sauberem Prozesszustand erneut ausfuehren
+- Bis dahin bleibt V71 bei 71.99 offen; die Fachphasen 71.3 bis 71.5 sind umgesetzt

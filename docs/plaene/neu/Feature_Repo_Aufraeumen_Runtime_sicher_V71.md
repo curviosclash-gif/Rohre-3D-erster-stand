@@ -1,7 +1,7 @@
 # Feature Repo-Aufraeumen Runtime-sicher V71
 
 Stand: 2026-03-30
-Status: In Arbeit
+Status: In Arbeit (71.3-71.5 abgeschlossen; 71.99 durch Playwright-Warmup-Blocker offen)
 Owner: Codex
 
 <!-- LOCK: frei -->
@@ -82,10 +82,10 @@ Vor jeder physischen Bereinigung gelten diese Grenzen:
 
 ## Definition of Done (DoD)
 
-- [ ] DoD.1 Ein Dry-Run-Bericht klassifiziert jeden Aufraeum-Kandidaten als `delete`, `archive` oder `protect` inklusive Risikostufe.
-- [ ] DoD.2 Sofort sichere Artefakte (`.codex_tmp/`, `dist/`, `playwright-report/`, `test-results*/`, Root-/Dev-Temp-Logs und freigegebene `tmp/`-Artefakte) lassen sich ueber einen reproduzierbaren Cleanup-Pfad entfernen, ohne aktive Locks/Runs zu zerstoeren.
-- [ ] DoD.3 Historische oder langfristige Ordner (`backups/`, `phase2_2026-03-02/`, `output/`, alte `videos/`) haben eine klare Archiv-/Retention-Regel statt ad-hoc-Loeschung.
-- [ ] DoD.4 `prototypes/` bleibt bis zur abgeschlossenen Contract-Migration funktionsfaehig; kein Cleanup-Schritt kappt Vehicle-Lab- oder Runtime-Importe.
+- [x] DoD.1 Ein Dry-Run-Bericht klassifiziert jeden Aufraeum-Kandidaten als `delete`, `archive` oder `protect` inklusive Risikostufe. (abgeschlossen: 2026-03-30; evidence: `npm run cleanup:workspace` -> `tmp/workspace-cleanup-report.json`)
+- [x] DoD.2 Sofort sichere Artefakte (`.codex_tmp/`, `dist/`, `playwright-report/`, `test-results*/`, Root-/Dev-Temp-Logs und freigegebene `tmp/`-Artefakte) lassen sich ueber einen reproduzierbaren Cleanup-Pfad entfernen, ohne aktive Locks/Runs zu zerstoeren. (abgeschlossen: 2026-03-30; evidence: `npm run logs:clean -- --dry-run && npm run cleanup:workspace` -> `tmp/workspace-cleanup-report.json`)
+- [x] DoD.3 Historische oder langfristige Ordner (`backups/`, `phase2_2026-03-02/`, `output/`, alte `videos/`) haben eine klare Archiv-/Retention-Regel statt ad-hoc-Loeschung. (abgeschlossen: 2026-03-30; evidence: `git show --stat 4feab0e && npm run cleanup:workspace` -> `commit 4feab0e`)
+- [x] DoD.4 `prototypes/` bleibt bis zur abgeschlossenen Contract-Migration funktionsfaehig; kein Cleanup-Schritt kappt Vehicle-Lab- oder Runtime-Importe. (abgeschlossen: 2026-03-30; evidence: `npm run check:editor:path-drift && npm run check:root:runtime` -> `commit 4feab0e`)
 - [ ] DoD.5 `npm run check:root:runtime`, `npm run build`, `npm run test:core`, die direkt betroffenen Editor-/Vehicle-Checks sowie `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen.
 
 ## Evidenzformat
@@ -108,23 +108,27 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 ### 71.3 Archivierungsfaehige Langzeitordner ordnen
 
-- [ ] 71.3.1 `phase2_2026-03-02/` und `backups/` auf Null-Referenzen pruefen und anschliessend in einen expliziten Archivpfad mit kurzer Manifest-/README-Notiz verschieben statt im Root liegen zu lassen.
-- [ ] 71.3.2 Fuer `output/` und `videos/` eine Retention-Regel definieren: aktive oder juengste Runs bleiben lokal, aeltere Artefakte werden datiert archiviert; der Contract `videos` als Download-/Recorder-Ziel bleibt unveraendert.
+- [x] 71.3.1 `phase2_2026-03-02/` und `backups/` auf Null-Referenzen pruefen und anschliessend in einen expliziten Archivpfad mit kurzer Manifest-/README-Notiz verschieben statt im Root liegen zu lassen. (abgeschlossen: 2026-03-30; evidence: `rg -n --glob "!docs/archive/workspace/**" --glob "!docs/plaene/**" --glob "!docs/archive/**" "phase2_2026-03-02|backups/" . && git show --stat 4feab0e` -> `commit 4feab0e`)
+- [x] 71.3.2 Fuer `output/` und `videos/` eine Retention-Regel definieren: aktive oder juengste Runs bleiben lokal, aeltere Artefakte werden datiert archiviert; der Contract `videos` als Download-/Recorder-Ziel bleibt unveraendert. (abgeschlossen: 2026-03-30; evidence: `npm run cleanup:workspace` -> `tmp/workspace-cleanup-report.json`)
 
 ### 71.4 Legacy-Pfade entkoppeln, bevor tiefer aufgeraeumt wird
 
-- [ ] 71.4.1 Direkte Runtime-/Test-Kopplungen auf `prototypes/vehicle-lab/**` ueber einen migrationssicheren Pfad oder Contract abstrahieren, damit `prototypes/` spaeter ohne Seiteneffekt verschoben werden kann.
-- [ ] 71.4.2 Editor-/Vehicle-Tests und Root-Guards so nachziehen, dass ein kuenftiger Archiv- oder `dev/prototypes/`-Move reproduzierbar pruefbar ist und nicht nur auf manuelle Spotchecks vertraut.
+- [x] 71.4.1 Direkte Runtime-/Test-Kopplungen auf `prototypes/vehicle-lab/**` ueber einen migrationssicheren Pfad oder Contract abstrahieren, damit `prototypes/` spaeter ohne Seiteneffekt verschoben werden kann. (abgeschlossen: 2026-03-30; evidence: `git show --stat 4feab0e` -> `commit 4feab0e`)
+- [x] 71.4.2 Editor-/Vehicle-Tests und Root-Guards so nachziehen, dass ein kuenftiger Archiv- oder `dev/prototypes/`-Move reproduzierbar pruefbar ist und nicht nur auf manuelle Spotchecks vertraut. (abgeschlossen: 2026-03-30; evidence: `npm run check:editor:path-drift && npm run check:root:runtime && TEST_PORT=5337 PW_RUN_TAG=v71-editor-vehicle-rerun PW_OUTPUT_DIR=test-results/v71-editor-vehicle-rerun node scripts/verify-lock.mjs --playwright -- npx playwright test tests/editor-vehicle.spec.js --timeout=240000 --reporter=line` -> `test-results/v71-editor-vehicle-rerun`)
 
 ### 71.5 Dokumentation und Bedienpfad
 
-- [ ] 71.5.1 README-/Workflow-Hinweise fuer den neuen Cleanup-Ablauf dokumentieren: Dry-Run zuerst, Apply nur fuer freigegebene Kategorien, keine Loeschung waehrend laufender Dev-/Test-/Training-Prozesse.
-- [ ] 71.5.2 Die Kategorien `delete`, `archive`, `protect` mit Beispielpfaden dokumentieren, damit kuenftige Aufraeumrunden denselben Vertrag nutzen und nicht erneut Root-Runtime-Pfade angreifen.
+- [x] 71.5.1 README-/Workflow-Hinweise fuer den neuen Cleanup-Ablauf dokumentieren: Dry-Run zuerst, Apply nur fuer freigegebene Kategorien, keine Loeschung waehrend laufender Dev-/Test-/Training-Prozesse. (abgeschlossen: 2026-03-30; evidence: `rg -n "cleanup:workspace|nicht waehrend laufender Dev-, Test- oder Trainingsprozesse" README.md` -> `README.md`)
+- [x] 71.5.2 Die Kategorien `delete`, `archive`, `protect` mit Beispielpfaden dokumentieren, damit kuenftige Aufraeumrunden denselben Vertrag nutzen und nicht erneut Root-Runtime-Pfade angreifen. (abgeschlossen: 2026-03-30; evidence: `rg -n "delete|archive|protect|output/|videos/" README.md docs/archive/workspace/README.md` -> `README.md`)
 
 ### 71.99 Integrations- und Abschluss-Gate
 
 - [ ] 71.99.1 `npm run check:root:runtime`, `npm run build` und `TEST_PORT=<port> PW_RUN_TAG=v71-core PW_OUTPUT_DIR=test-results/v71-core npm run test:core` sind fuer den Cleanup-Scope gruen.
 - [ ] 71.99.2 Falls `prototypes/`, Editor-Pfade oder Vehicle-Lab betroffen sind, laufen die direkt betroffenen Editor-/Vehicle-Checks ebenfalls gruen; zusaetzlich sind `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` abgeschlossen.
+
+Blocker-Hinweis 2026-03-30:
+
+- Frische Playwright-Reruns auf `v71-core-close`, `v71-core-close-r2` und `v71-editor-vehicle-close` brechen aktuell in `tests/playwright.global-setup.js` mit Warmup-`fetch failed`/Hangs ab und werden im Fehlerbericht `docs/Fehlerberichte/2026-03-30_workspace-cleanup-verification-blockers.md` nachgehalten.
 
 ## Verifikationsstrategie
 

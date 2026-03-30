@@ -28,6 +28,8 @@ npm run docs:check
 `cleanup:workspace` erzeugt zuerst einen Dry-Run-Bericht unter `tmp/workspace-cleanup-report.json`.
 Der Bericht listet `protectionSources` sowie jede Fundstelle als `delete`, `archive` oder `protect`.
 `cleanup:workspace:apply` entfernt nur konservativ freigegebene Artefakte und schuetzt aktive Playwright-/Dev-Spuren, getrackte `tmp/`-Inhalte und `tmp/test-latest-index.lock`.
+`cleanup:workspace:apply` nicht waehrend laufender Dev-, Test- oder Trainingsprozesse ausfuehren.
+Beispiele: `delete` fuer `dist/` oder `playwright-report/`, `archive` fuer aeltere Inhalte aus `output/` und `videos/`, `protect` fuer Root-Runtime-Pfade und aktive Locks.
 
 ## Einstieg fuer AI und Dev
 
