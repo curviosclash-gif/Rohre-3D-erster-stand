@@ -1,6 +1,6 @@
 # Manuelle Testcheckliste Spiel
 
-Stand: 2026-03-27
+Stand: 2026-03-30
 
 Ziel: moeglichst vollstaendige manuelle Regression fuer die aktuell sichtbaren und spielbaren Funktionen von CuviosClash.
 
@@ -324,3 +324,13 @@ Hinweise:
 - [ ] Ein kompletter Multiplayer-Run
 - [ ] Ein Recording-Check mit `F9`
 - [ ] Ein Expert-/Developer-Check
+
+## 26. V69 Fight/Hunt Combat-Fokus (2026-03-30)
+
+- [ ] Fight-MG-Midrange-Duell wirkt fair (kein Instant-Melt, nachvollziehbarer Damage-Output).
+- [ ] Rocket-Tiers spawnen auf `neon_abyss`/`crystal_ruins` ohne Legacy-Typfehler (`ROCKET_STRONG` -> `ROCKET_HEAVY`).
+- [ ] Shield-Absorb blockiert fruehe HP-Regeneration im direkten Folgefenster.
+- [ ] Shield-Mehrfachnutzung wird ueber Item-Cooldown gebremst, ohne normale Utility-Nutzung zu brechen.
+- [ ] Hunt-Bot-Entscheidungen zeigen Retreat bei kritischer Vitalitaet und offensiven Rocket-Einsatz im Distanzfenster.
+- [ ] Round-End-Telemetrie zeigt `itemUse.byMode`, `itemUse.byType`, `mgHits`, `rocketHits`, `shieldAbsorb`, `hpDamage`.
+- [ ] Laufdokumentation fuer diesen Fokusblock liegt unter `docs/qa/V69_Fight_Hunt_Balancing_Auswertung_2026-03-30.md`.

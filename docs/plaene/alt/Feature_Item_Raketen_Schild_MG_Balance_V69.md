@@ -73,9 +73,9 @@ Hinweis fuer Abschluss-Evidence:
   - [x] 69.5.1 HuntBotPolicy/BotDecisionOps an neue Balance-Parameter und Item-Oekonomie anpassen (offensiv/defensiv sauber getrennt). (abgeschlossen: 2026-03-30; evidence: `src/hunt/HuntBotPolicy.js` + `src/entities/ai/BotDecisionOps.js` + `T78d`/`T78f`)
   - [x] 69.5.2 HuntBridgePolicy-Entscheidungsregeln fuer MG/Rocket/Retreat mit den neuen KPI-Zielen synchronisieren. (abgeschlossen: 2026-03-30; evidence: `src/entities/ai/HuntBridgePolicy.js` + `T78e`)
 
-- [ ] 69.6 Verifikation und Rollout
-  - [ ] 69.6.1 Tests erweitern: MG-Window, Rocket-Alias/Verteilung, Shield-Regen-Interaktion, Telemetrie-Schema-Regression.
-  - [ ] 69.6.2 Manuelle QA fuer Fight/Hunt-Combat-Checks aktualisieren und kurze Balancing-Auswertung als Evidence dokumentieren.
+- [x] 69.6 Verifikation und Rollout (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5387 PW_RUN_TAG=v69-6-matrix PW_OUTPUT_DIR=test-results/v69-6-matrix npx playwright test tests/core.spec.js tests/game-mode-strategy.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js --grep "T20ke|T14ea|S14a|S14b|S14d|T89a|T89k|T77|T78d|T78e|T78f"` -> `test-results/v69-6-matrix`)
+  - [x] 69.6.1 Tests erweitern: MG-Window, Rocket-Alias/Verteilung, Shield-Regen-Interaktion, Telemetrie-Schema-Regression. (abgeschlossen: 2026-03-30; evidence: `T20ke`, `T14ea`, `S14a`, `S14b`, `S14d`, `T89a`, `T89k`, `T77`, `T78d`, `T78e`, `T78f`)
+  - [x] 69.6.2 Manuelle QA fuer Fight/Hunt-Combat-Checks aktualisieren und kurze Balancing-Auswertung als Evidence dokumentieren. (abgeschlossen: 2026-03-30; evidence: `docs/qa/Manuelle_Testcheckliste_Spiel.md` Abschnitt 26 + `docs/qa/V69_Fight_Hunt_Balancing_Auswertung_2026-03-30.md`)
 
 - [ ] 69.99 Integrations- und Abschluss-Gate
   - [ ] 69.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run build` sind fuer den Scope gruen.
