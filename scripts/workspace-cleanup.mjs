@@ -1,9 +1,13 @@
-import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { execFile } from 'node:child_process';
 import path from 'node:path';
 import process from 'node:process';
 import { promisify } from 'node:util';
 import { collectRootRuntimeProtectionSources } from './root-runtime-protection.mjs';
+import {
+    RECORDING_ARCHIVE_DIRECTORY,
+    RECORDING_DOWNLOAD_DIRECTORY,
+} from '../src/shared/contracts/RecordingCaptureContract.js';
 
 const execFileAsync = promisify(execFile);
 
@@ -14,12 +18,29 @@ const reportPath = path.resolve(
     cwd,
     String(process.env.WORKSPACE_CLEAN_REPORT || 'tmp/workspace-cleanup-report.json').trim()
 );
+const archiveRoot = path.resolve(
+    cwd,
+    String(process.env.WORKSPACE_ARCHIVE_ROOT || 'tmp/workspace-archive').trim()
+);
 const activeMinutes = Math.max(
     1,
     Number.parseInt(process.env.WORKSPACE_CLEAN_ACTIVE_MINUTES || '30', 10) || 30
 );
 const activeThresholdMs = activeMinutes * 60 * 1000;
+const outputRetentionDays = Math.max(
+    1,
+    Number.parseInt(process.env.WORKSPACE_CLEAN_OUTPUT_RETENTION_DAYS || '14', 10) || 14
+);
+const videoRetentionDays = Math.max(
+    1,
+    Number.parseInt(process.env.WORKSPACE_CLEAN_VIDEO_RETENTION_DAYS || '14', 10) || 14
+);
+const retainLatestRuns = Math.max(
+    1,
+    Number.parseInt(process.env.WORKSPACE_CLEAN_RETAIN_LATEST || '2', 10) || 2
+);
 const now = Date.now();
+const dayMs = 24 * 60 * 60 * 1000;
 
 const ROOT_LOG_PATTERNS = Object.freeze([
     /^tmp-dev-\d+\.(out|err)\.log$/i,
@@ -78,17 +99,20 @@ const ARCHIVE_ROOTS = Object.freeze([
     {
         name: 'backups',
         risk: 'low',
-        reason: 'Versionierter Altstand; nur archivieren, nicht blind loeschen.',
+        reason: 'Historischer Root-Ordner; bei Bedarf nach docs/archive/workspace/root-history/backups-legacy verschieben.',
+        archivePath: 'docs/archive/workspace/root-history/backups-legacy',
     },
     {
         name: 'output',
-        risk: 'medium',
-        reason: 'Kann Trainings- und Operator-Artefakte enthalten; nur per Retention-Regel archivieren.',
+        risk: 'low',
+        reason: 'Output-Container bleibt lokal; einzelne alte Runs werden per Retention-Regel nach tmp/workspace-archive/output verschoben.',
+        action: 'protect',
     },
     {
         name: 'phase2_2026-03-02',
         risk: 'low',
-        reason: 'Versionierter Historienordner; vor Move Referenzen pruefen.',
+        reason: 'Versionierter Historienordner; bei Bedarf nach docs/archive/workspace/root-history/phase2_2026-03-02 verschieben.',
+        archivePath: 'docs/archive/workspace/root-history/phase2_2026-03-02',
     },
 ]);
 
@@ -109,9 +133,9 @@ const PROTECTED_ROOTS = Object.freeze([
         reason: 'Enthaelt Locks, Diagnoseartefakte und lokale Evidence; nur selektive Unterpfade bereinigen.',
     },
     {
-        name: 'videos',
+        name: RECORDING_DOWNLOAD_DIRECTORY,
         risk: 'medium',
-        reason: 'Ordnername ist aktiver Recording-Contract und bleibt bestehen.',
+        reason: 'Ordnername ist aktiver Recording-Contract und bleibt bestehen; alte Clips werden per Retention-Regel nach tmp/workspace-archive/videos verschoben.',
     },
 ]);
 
@@ -123,7 +147,12 @@ function createItem({
     reason,
     sizeBytes = null,
     mtimeMs = null,
+    archivePath = null,
+    retention = null,
 }) {
+    const normalizedArchivePath = archivePath
+        ? path.relative(cwd, path.resolve(String(archivePath))).replace(/\\/g, '/')
+        : null;
     return {
         path: relativePath.replace(/\\/g, '/'),
         type,
@@ -132,6 +161,8 @@ function createItem({
         reason,
         sizeBytes,
         mtimeIso: Number.isFinite(mtimeMs) ? new Date(mtimeMs).toISOString() : null,
+        archivePath: normalizedArchivePath,
+        retention,
     };
 }
 
@@ -199,6 +230,10 @@ function matchesPattern(patterns, filename) {
 
 function isRecentlyTouched(fileStat) {
     return now - Number(fileStat.mtimeMs || 0) <= activeThresholdMs;
+}
+
+function isWithinDays(fileStat, days) {
+    return now - Number(fileStat.mtimeMs || 0) <= (days * dayMs);
 }
 
 async function collectRootEntries() {
@@ -316,6 +351,77 @@ async function collectTmpRetentionItems() {
     }
 }
 
+async function collectRetentionArchiveItems(rootName, options = {}) {
+    const targetDirectory = path.resolve(cwd, rootName);
+    try {
+        const entries = await readdir(targetDirectory, { withFileTypes: true });
+        const childItems = [];
+        for (const entry of entries) {
+            if (entry.name === '.gitkeep') {
+                const gitkeepPath = path.relative(cwd, path.resolve(targetDirectory, entry.name));
+                const gitkeepStat = await stat(path.resolve(targetDirectory, entry.name));
+                childItems.push(createItem({
+                    path: gitkeepPath,
+                    type: 'file',
+                    action: 'protect',
+                    risk: 'low',
+                    reason: `${rootName}-Container bleibt ueber .gitkeep bestehen.`,
+                    sizeBytes: Number(gitkeepStat.size || 0),
+                    mtimeMs: Number(gitkeepStat.mtimeMs || 0),
+                }));
+                continue;
+            }
+
+            const targetPath = path.resolve(targetDirectory, entry.name);
+            const targetStat = await stat(targetPath);
+            childItems.push({
+                entry,
+                stat: targetStat,
+                relativePath: path.relative(cwd, targetPath).replace(/\\/g, '/'),
+            });
+        }
+
+        const sortedByFreshness = childItems
+            .filter((item) => item?.stat)
+            .sort((left, right) => Number(right.stat.mtimeMs || 0) - Number(left.stat.mtimeMs || 0));
+        const retainedPaths = new Set(
+            sortedByFreshness.slice(0, retainLatestRuns).map((item) => item.relativePath)
+        );
+        const items = [];
+
+        for (const item of childItems) {
+            if (item.action) {
+                items.push(item);
+                continue;
+            }
+
+            const isFresh = retainedPaths.has(item.relativePath) || isWithinDays(item.stat, options.retentionDays || 14);
+            items.push(createItem({
+                path: item.relativePath,
+                type: item.entry.isDirectory() ? 'dir' : 'file',
+                action: isFresh ? 'protect' : 'archive',
+                risk: isFresh ? 'low' : 'medium',
+                reason: isFresh
+                    ? `${rootName}-Artefakt bleibt lokal (neuste ${retainLatestRuns} Eintraege oder juenger als ${options.retentionDays} Tage).`
+                    : `${rootName}-Artefakt faellt unter die Retention-Regel und soll archiviert werden.`,
+                sizeBytes: Number(item.stat.size || 0),
+                mtimeMs: Number(item.stat.mtimeMs || 0),
+                archivePath: isFresh
+                    ? null
+                    : path.join(options.archiveRoot || 'tmp/workspace-archive', rootName, path.basename(item.relativePath)),
+                retention: {
+                    retentionDays: options.retentionDays || 14,
+                    retainLatest: retainLatestRuns,
+                },
+            }));
+        }
+
+        return items;
+    } catch {
+        return [];
+    }
+}
+
 async function collectInventory() {
     const items = [];
     const activeLock = await readActivePlaywrightLock();
@@ -328,11 +434,12 @@ async function collectInventory() {
         items.push(createItem({
             path: root.name,
             type: targetStat.isDirectory() ? 'dir' : 'file',
-            action: 'archive',
+            action: root.action || 'archive',
             risk: root.risk,
             reason: root.reason,
             sizeBytes: Number(targetStat.size || 0),
             mtimeMs: Number(targetStat.mtimeMs || 0),
+            archivePath: root.archivePath || null,
         }));
     }
 
@@ -424,6 +531,16 @@ async function collectInventory() {
     items.push(...devLogItems);
     const tmpRetentionItems = await collectTmpRetentionItems();
     items.push(...tmpRetentionItems);
+    const outputRetentionItems = await collectRetentionArchiveItems('output', {
+        retentionDays: outputRetentionDays,
+        archiveRoot,
+    });
+    items.push(...outputRetentionItems);
+    const videoRetentionItems = await collectRetentionArchiveItems(RECORDING_DOWNLOAD_DIRECTORY, {
+        retentionDays: videoRetentionDays,
+        archiveRoot: path.resolve(cwd, path.dirname(RECORDING_ARCHIVE_DIRECTORY)),
+    });
+    items.push(...videoRetentionItems);
 
     await protectTrackedDeleteTargets(items);
     items.sort((left, right) => left.path.localeCompare(right.path));
@@ -472,6 +589,29 @@ async function writeReport(report) {
     await writeFile(reportPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
 }
 
+async function applyArchives(items) {
+    const results = [];
+    for (const item of items) {
+        if (item.action !== 'archive' || !item.archivePath) continue;
+        const sourcePath = path.resolve(cwd, item.path);
+        const targetPath = path.resolve(cwd, item.archivePath);
+        try {
+            await mkdir(path.dirname(targetPath), { recursive: true });
+            await rm(targetPath, { recursive: true, force: true });
+            await rename(sourcePath, targetPath);
+            results.push({ path: item.path, archivePath: item.archivePath, ok: true });
+        } catch (error) {
+            results.push({
+                path: item.path,
+                archivePath: item.archivePath,
+                ok: false,
+                error: error?.message || String(error),
+            });
+        }
+    }
+    return results;
+}
+
 async function applyDeletes(items) {
     const results = [];
     for (const item of items) {
@@ -502,10 +642,12 @@ async function main() {
         generatedAt: new Date(now).toISOString(),
         mode: applyMode ? 'apply' : 'dry-run',
         activeMinutes,
+        archiveRoot: path.relative(cwd, archiveRoot).replace(/\\/g, '/'),
         activePlaywrightLock: activeLock,
         protectionSources,
         summary,
         items,
+        archiveResults: [],
         applyResults: [],
     };
 
@@ -521,11 +663,15 @@ async function main() {
     }
 
     if (applyMode) {
+        report.archiveResults = await applyArchives(items);
         report.applyResults = await applyDeletes(items);
+        const archiveFailed = report.archiveResults.filter((entry) => !entry.ok);
         const failed = report.applyResults.filter((entry) => !entry.ok);
+        process.stdout.write(`[cleanup:workspace] archived=${report.archiveResults.length - archiveFailed.length}\n`);
+        process.stdout.write(`[cleanup:workspace] archive_failed=${archiveFailed.length}\n`);
         process.stdout.write(`[cleanup:workspace] applied=${report.applyResults.length - failed.length}\n`);
         process.stdout.write(`[cleanup:workspace] failed=${failed.length}\n`);
-        if (failed.length > 0) {
+        if (failed.length > 0 || archiveFailed.length > 0) {
             process.exitCode = 1;
         }
     }

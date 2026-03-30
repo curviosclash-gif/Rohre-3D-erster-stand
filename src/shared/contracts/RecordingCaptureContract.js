@@ -5,6 +5,7 @@ export const RECORDING_CAPTURE_PROFILE = Object.freeze({
 });
 
 export const RECORDING_DOWNLOAD_DIRECTORY = 'videos';
+export const RECORDING_ARCHIVE_DIRECTORY = 'tmp/workspace-archive/videos';
 
 export const RECORDING_HUD_MODE = Object.freeze({
     CLEAN: 'clean',

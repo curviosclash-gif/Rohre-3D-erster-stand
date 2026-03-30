@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 import * as THREE from 'three';
 
 import { EditorAssetLoader } from '../editor/js/EditorAssetLoader.js';
-import { ModularVehicleMesh } from '../prototypes/vehicle-lab/src/ModularVehicleMesh.js';
 import { EDITOR_VIEW_PATHS } from '../src/shared/contracts/EditorPathContract.js';
+import { ModularVehicleMesh } from '../src/shared/vehicle-lab/ModularVehicleMeshBridge.js';
 
 function createTestAssetObject() {
     const group = new THREE.Group();

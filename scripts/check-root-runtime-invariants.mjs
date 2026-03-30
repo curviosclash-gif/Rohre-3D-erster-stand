@@ -1,5 +1,6 @@
 import process from 'node:process';
 import {
+    REQUIRED_EDITOR_VIEW_FILES,
     REQUIRED_DATA_DIRECTORIES,
     REQUIRED_ROOT_FILES,
     assertEditorStartScriptContainsEditorPath,
@@ -26,9 +27,19 @@ if (missingDataDirectories.length > 0) {
     process.exit(1);
 }
 
+const missingEditorViewFiles = collectMissingPaths(REPO_ROOT, REQUIRED_EDITOR_VIEW_FILES);
+if (missingEditorViewFiles.length > 0) {
+    console.error('Root runtime invariant guard failed (missing required editor view files):');
+    for (const missingView of missingEditorViewFiles) {
+        console.error(`- ${missingView}`);
+    }
+    process.exit(1);
+}
+
 assertEditorStartScriptContainsEditorPath(REPO_ROOT, 'start_editor.bat');
 assertEditorStartScriptContainsEditorPath(REPO_ROOT, 'start_editor_local.bat');
 
 console.log('Root runtime invariant guard passed.');
 console.log(`Required root files: ${REQUIRED_ROOT_FILES.length}`);
 console.log(`Required data directories: ${REQUIRED_DATA_DIRECTORIES.length}`);
+console.log(`Required editor view files: ${REQUIRED_EDITOR_VIEW_FILES.length}`);

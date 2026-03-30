@@ -17,6 +17,11 @@ export const REQUIRED_DATA_DIRECTORIES = Object.freeze([
     'data/maps',
     'data/vehicles',
 ]);
+export const REQUIRED_EDITOR_VIEW_FILES = Object.freeze(
+    Object.values(EDITOR_VIEW_PATHS)
+        .map((relativePath) => String(relativePath || '').replace(/^\/+/, ''))
+        .filter(Boolean)
+);
 
 export const REQUIRED_EDITOR_MARKER = '/editor/map-editor-3d.html';
 export const ROOT_START_SCRIPT_PATTERN = /^start_.*\.bat$/i;
@@ -93,6 +98,15 @@ export function collectRootRuntimeProtectionSources(repoRoot) {
             category: 'runtime-data',
             source: 'check-root-runtime',
             reason: 'Runtime-Datenpfad fuer Maps oder Vehicles.',
+        });
+    }
+
+    for (const relativePath of REQUIRED_EDITOR_VIEW_FILES) {
+        addProtectionSource(sourceMap, {
+            path: relativePath,
+            category: 'editor-view-file',
+            source: 'EDITOR_VIEW_PATHS',
+            reason: 'Editor- oder Vehicle-Lab-Datei muss am Contract-Pfad vorhanden bleiben.',
         });
     }
 

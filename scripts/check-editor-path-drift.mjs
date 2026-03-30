@@ -10,6 +10,7 @@ import {
 
 const REPO_ROOT = process.cwd();
 const CONTRACT_FILE = 'src/shared/contracts/EditorPathContract.js';
+const VEHICLE_LAB_BRIDGE_FILE = 'src/shared/vehicle-lab/ModularVehicleMeshBridge.js';
 const SCAN_DIRECTORIES = Object.freeze([
     'src',
     'editor',
@@ -119,6 +120,13 @@ const RULES = Object.freeze([
         literal: EDITOR_DATA_PATHS.GENERATED_VEHICLE_CONFIGS_MODULE,
         allowedFiles: new Set([
             CONTRACT_FILE,
+        ]),
+    },
+    {
+        label: 'vehicle lab mesh module path',
+        literal: 'prototypes/vehicle-lab/src/ModularVehicleMesh.js',
+        allowedFiles: new Set([
+            VEHICLE_LAB_BRIDGE_FILE,
         ]),
     },
 ]);

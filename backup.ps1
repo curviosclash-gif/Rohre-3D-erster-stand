@@ -13,7 +13,7 @@ $files = @(
     "js/main.js"
 )
 
-$backupDir = "backups/$timestamp"
+$backupDir = "tmp/manual-backups/$timestamp"
 New-Item -ItemType Directory -Path $backupDir -Force | Out-Null
 
 foreach ($file in $files) {

@@ -14,7 +14,6 @@ const legacyFileCeilings = LEGACY_MAX_LINES;
 export default [
     {
         ignores: [
-            'backups/**',
             'data/**',
             'dist/**',
             'node_modules/**',

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ModularVehicleMesh } from '../../prototypes/vehicle-lab/src/ModularVehicleMesh.js';
+import { ModularVehicleMesh } from '../shared/vehicle-lab/ModularVehicleMeshBridge.js';
 
 function cloneVehicleConfig(config) {
     try {
