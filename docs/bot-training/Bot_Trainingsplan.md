@@ -1,6 +1,6 @@
 ﻿# Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-03-28
+Stand: 2026-03-31
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -43,14 +43,19 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 | BT20 | BT10 Baseline-Laufdaten + BT15 Zyklenplan | hard | ja | BT10-Baseline vorhanden; BT15 Zielkorridor in 15.1/15.2.1 dokumentiert |
 | BT30 | 20.99 | hard | nein | startet erst nach Survival-Policy-Phase |
 | BT40 | 30.99 | hard | nein | Eval/Gate-Haertung nach Curriculum/Hyperparameter |
+| BT73 | 40.99 | hard | nein | Deep-Survival-/Intent-/Resume-Folgeblock baut auf den haerteten BT20-BT40-Gates auf |
+| BT73 | Fehlerbericht `2026-03-28_training_resume-command-timeout.md` | hard | nein | `trainer-checkpoint-load`/Preview-/Publish-Pfad muss vor Abschluss des Blocks belastbar sein |
+| BT73 | V69.99 | soft | ja | Fight/Hunt-Combat-Baseline aus V69 liefert die aktuelle Survival-/Item-Grundlage |
+| BT73 | V72 | soft | nein | Portal-/Gate-/Item-Vertraege aus V72 muessen fuer finale Bot-Semantik synchronisiert werden |
 
 ## Datei-Ownership (Bot-Training)
 
 | Pfadmuster | Block / Stream | Status | Hinweis |
 | --- | --- | --- | --- |
-| `scripts/training-*.mjs`, `scripts/bot-validation-*.mjs` | BT10-BT40 | offen | Orchestrierung, Eval, Gate, Validation |
-| `src/entities/ai/training/**`, `trainer/**` | BT20-BT30 | offen | Runner/Bridge/Trainer-Verhalten |
-| `src/state/training/**` | BT20-BT40 | offen | Gate-, KPI- und Reward-Logik |
+| `scripts/training-*.mjs`, `scripts/bot-validation-*.mjs` | BT10-BT40, BT73 | offen | Orchestrierung, Eval, Gate, Validation |
+| `src/entities/ai/training/**`, `trainer/**` | BT20-BT30, BT73 | offen | Runner/Bridge/Trainer-Verhalten |
+| `src/state/training/**` | BT20-BT40, BT73 | offen | Gate-, KPI- und Reward-Logik |
+| `src/entities/ai/**`, `src/hunt/HuntBotPolicy.js`, `src/state/validation/**`, `tests/physics-policy.spec.js`, `tests/training-*.mjs`, `docs/referenz/ai_architecture_context.md`, `docs/bot-training/Bot_Trainings_Roadmap.md` | BT73 | offen | Deep-Survival-, Intent-, Resume- und Operator-Haertung fuer Runtime + Training |
 | `tests/trainer-*.mjs`, `tests/training-*.mjs` | BT10-BT40 | shared | Nur trainingsnahe Tests |
 | `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_12h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md` | BT10-BT40 | shared | Masterplan + Detailplan |
 | `data/training/**`, `output/training/**` | BT10 | shared | Laufartefakte, Logs, Serien |
@@ -66,6 +71,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 | Bot-Codex | BT20 | 2026-03-28 | active | 2026-03-28 |
 | Bot-B | BT30 | 2026-03-22 | frei | - |
 | Bot-C | BT40 | 2026-03-22 | frei | - |
+| - | BT73 | - | frei | Intake 2026-03-31 abgeschlossen; Claim nach BT20-/BT30-/BT40-Abstimmung |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -394,6 +400,87 @@ Plan-Datei: `docs/bot-training/Bot_Trainingsplan.md`
 | False-positive gates bei sporadischen KPI-Ausreissern | mittel | QA/RL | rolling window + min-run-count | gate flip-flops |
 | Restore-Pfad bricht bei latest pointer | hoch | Trainer | checkpoint fallback + smoke resume tests | training cannot resume |
 | Regressionstests zu langsam fuer Ops | mittel | QA | fast subset + nightly full suite | Ops delays |
+
+---
+
+## Block BT73: Deep-Survival-, Intent- und Resume-Haertung fuer Runtime, Training und Operatorpfade
+
+Plan-Datei: `docs/plaene/alt/Feature_Bot_Tiefenverbesserung_Survival_Entscheidung_Operator_V73.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: 40.99 -->
+
+Scope:
+
+- Runtime-Bot ueber Safety-, Intent-, Recovery- und Weltmodell-Semantik tiefer auf Survival-First ausrichten, ohne den Runtime-V1-Bridge-Vertrag still zu brechen.
+- Eval-, Gate-, Resume- und Operatorpfade so haerten, dass Survival-Fortschritt reproduzierbar ueber feste Vergleichsmatrizen statt ueber Einzelruns beurteilt wird.
+- Gameplay-Semantik aus V69 und V72 fuer Items, Shield, Portale und Gates als First-Class-Signal in Runtime, Training, QA und Release-Pfade uebernehmen.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 73.1 bis 73.7 und 73.99 sind abgeschlossen.
+- [ ] DoD.2 Runtime-Bot nutzt explizite Safety-, Intent- und Recovery-Logik statt nur reaktive Einzelheuristiken; Classic/Hunt teilen einen klar dokumentierten Kern.
+- [ ] DoD.3 Training und Reward-Shaping verbessern Survival auf einer festen Seed-/Mode-Matrix reproduzierbar und ohne Forced-/Timeout-Runden oder Reward-Hacking.
+- [ ] DoD.4 Eval-/Validation-Reports liefern Survival-Metriken, Todesursachen, Szenarioklassen, Resume-Gesundheit und Decision-Trace-Evidence pro Kandidatenlauf.
+- [ ] DoD.5 Resume-, Preview-Validate- und Publish-Pfade laufen ohne Sonderworkaround stabil; Artefakte und Run-Manifeste sind vollstaendig und reproduzierbar.
+- [ ] DoD.6 Trainingsnahe Tests, `bot:validate`, `training:eval`, `training:gate`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind gruen.
+
+### 73.1 Ground Truth, Failure-Taxonomie und Vergleichsbasis
+
+- [ ] 73.1.1 `bot:validate`, Eval und Recorder um Failure-Codes, Todesursachen, Exit-Qualitaet, Resume-Status und Szenarioklassen erweitern, damit Regressionen nicht mehr nur als Gesamtzahl sichtbar sind.
+- [ ] 73.1.2 Decision-Trace-Artefakte fuer Hochrisiko-Momente einfuehren (letzte Sensoren, Intent, Action-Veto, Reward-Zerlegung), damit schlechte Bot-Entscheidungen reproduzierbar analysiert werden koennen.
+- [ ] 73.1.3 Eine feste Vergleichsmatrix aus Maps, Seeds, Modi und Baseline-Stamps definieren, damit BT10/BT11/BT12/BT20 und Folgefenster mit denselben Bedingungen verglichen werden.
+
+### 73.2 Sensorik und internes Weltmodell vertiefen
+
+- [ ] 73.2.1 Threat-Horizon-, Dead-End-, Freiraum-, Gegnerdruck- und Exit-Signale in `BotSensingOps`/`BotThreatOps` zentralisieren, damit der Bot nicht erst am Kollisionspunkt reagiert.
+- [ ] 73.2.2 Ein kleines internes Gedaechtnis fuer letzte Gefahr, letzte Recovery-Aktion, Portal-/Gate-Nutzung und Fehlschlaege einfuehren, ohne den Runtime-V1-Contract zu brechen.
+- [ ] 73.2.3 Items, Portale, Gates, Shield und Modus-Sonderregeln als explizite Beobachtungs- und Policy-Semantik verdrahten, damit V69/V72-Aenderungen nicht als Seiteneffekt in die KI tropfen.
+
+### 73.3 Entscheidungsarchitektur in Safety-, Intent- und Recovery-Layer aufteilen
+
+- [ ] 73.3.1 Einen klaren Safety-Veto-Layer vor der finalen Action-Ausgabe verankern, der Kollision, Low-HP-Risiko, Sackgassen und riskante Item-/Portal-Aktionen deterministisch blocken kann.
+- [ ] 73.3.2 Einen Intent-Layer fuer `survive`, `reposition`, `engage`, `disengage`, `recover`, `use-item`, `take-portal`, `take-gate` einfuehren, damit Entscheidungen nicht nur aus losen Prioritaetslisten entstehen.
+- [ ] 73.3.3 Recovery-/Stuck-Verhalten als expliziten Zustandsautomaten mit Eintritts- und Exit-Kriterien modellieren, statt Steckenbleiben nur post hoc zu zaehlen.
+
+### 73.4 Reward-Shaping, Curriculum und Replay auf Survival-First ausrichten
+
+- [ ] 73.4.1 Reward-Zerlegung in Survival, sichere Flaechenkontrolle, gelungene Gefahren-Exits und schadensbezogene Rewards nur bei netto ueberlebensfoerderlichem Verhalten aufspalten.
+- [ ] 73.4.2 Curriculum-Stufen von einfach zu voller 4-Mode-Matrix mit Promotion-/Rollback-Regeln an echte Survival- und Stability-KPIs koppeln statt nur an Steps oder Reward-Summen.
+- [ ] 73.4.3 Priorisierte Replay-/Scenario-Samples fuer near-death, death-leading, low-HP-combat, Portal-/Gate-Entscheidungen und Item-Fehlgebrauch einfuehren.
+
+### 73.5 Eval-, Gate- und Operator-Pfade haerten
+
+- [ ] 73.5.1 `bot:validate` und `training:eval` um harte Guardrails fuer `averageBotSurvival != null`, Forced-/Timeout-Rates, Death-Cause-Verteilung und per-Szenario-Failures erweitern.
+- [ ] 73.5.2 `training:gate` auf Vergleich gegen den letzten stabilen Referenzlauf plus Rolling-Window-Regeln ausrichten, damit einmalige Glueckslaeufe nicht promoted werden.
+- [ ] 73.5.3 Einen einheitlichen Validate-Pfad fuer Preview, Publish und Operatorlauf bauen, damit Abschluss-Evidence nicht mehr von instabilen Dev-Server- oder Port-Konstellationen abhaengt.
+
+### 73.6 Resume-, Bridge- und Reproduzierbarkeitsluecken schliessen
+
+- [ ] 73.6.1 Den `trainer-checkpoint-load`-/`trainer-checkpoint-load-latest`-Antwortpfad zwischen `training-run`, `WebSocketTrainerBridge` und `TrainerServer` instrumentieren, testen und reparieren.
+- [ ] 73.6.2 Run-Manifeste fuer Resume-Quelle, Modell-/Config-Hash, Gate-Schwellen, Validate-Argumente und Szenario-Matrix standardisieren, damit spaetere KPI-Vergleiche belastbar bleiben.
+- [ ] 73.6.3 Eine deterministische A/B-Lane fuer Baseline vs. Kandidat mit festen Seeds, identischem Modus-Mix und publishbarer Evidence etablieren.
+
+### 73.7 Rollout, Fallback und Doku-Sync
+
+- [ ] 73.7.1 Die tieferen KI-Aenderungen hinter klaren Tuning-/Strategy-Schaltern ausrollen, damit `rule-based`, `auto`, Bridge- und Fallback-Pfade kontrolliert verglichen und im Notfall sofort zurueckgenommen werden koennen.
+- [ ] 73.7.2 Architektur-, Trainings-, Release- und QA-Dokumentation auf denselben Intent-, Failure- und Gate-Vertrag aktualisieren, damit Runtime, Training und Abnahme denselben Wissensstand teilen.
+
+### 73.99 Integrations- und Abschluss-Gate
+
+- [ ] 73.99.1 Feste Vergleichslaeufe gegen die Baseline sind gruen: kein Resume-Workaround mehr, keine Forced-/Timeout-Runden, `averageBotSurvival` mindestens auf BT11-Stabilniveau und Trend in Richtung Roadmap-Ziel.
+- [ ] 73.99.2 Trainingsnahe Tests, `bot:validate`, `training:eval`, `training:gate`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind abgeschlossen; verbleibende Gameplay-/Bridge-Restpunkte sind dokumentiert, bevor `73.99` schliesst.
+
+### Risiko-Register BT73
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Mehr Sensorik und Intent-Logik verlangsamt die Runtime-KI spuerbar | hoch | Runtime AI | Hotpaths in `*Ops.js` halten, Feature-Bundles messen und schwere Debug-Evidence auf Eval/Training begrenzen | Bot-Framezeit oder Tick-Latenz steigt deutlich |
+| Ein zu harter Safety-Layer macht die Policy passiv und blockiert Lernen | hoch | RL | Safety zuerst nur fuer klar katastrophale Aktionen als Veto nutzen und ueber A/B-Lane kalibrieren | Survival verbessert sich nicht, obwohl Fehler sinken |
+| Reward-Shaping optimiert auf Proxy-Werte statt auf echtes Ueberleben | hoch | RL | Rewards immer gegen `averageBotSurvival`, Death-Causes und feste Seed-/Mode-Matrix spiegeln | Hoher Reward bei schlechter Survival-Metrik |
+| Resume-/Bridge-Fixes destabilisieren den Trainingsbetrieb kurzfristig | hoch | Trainer | Smoke-Tests fuer `checkpoint-load`, `latest`, Preview-Validate und Publish-Lane vor Langlaeufen verpflichtend machen | Training kann nicht deterministisch fortgesetzt werden |
+| V72-Veraenderungen an Item-/Portal-/Gate-Vertraegen brechen Bot-Heuristiken | mittel | Gameplay + AI | Gemeinsame Capability-/Semantik-Quelle definieren und Cross-Plan-Abhaengigkeiten vor Merge pruefen | Bots reagieren falsch auf neue Items oder Portale |
+| Mehr Failure-Codes und Decision-Trace-Artefakte ueberladen Reports und Operatorpfade | mittel | QA/Ops | Kompakte Summary plus gezielte Drilldown-Artefakte statt unstrukturierter Log-Flut | Reports wachsen, aber Entscheidungen werden nicht klarer |
 
 ---
 
