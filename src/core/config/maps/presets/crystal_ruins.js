@@ -150,7 +150,7 @@ export const CRYSTAL_RUINS_MAP = {
             { id: 'cr_thick_bridge', type: 'item_coin', pickupType: 'THICK', x: 25, y: 27, z: 0, weight: 1.0 },
             { id: 'cr_shield_bridge', type: 'item_shield', pickupType: 'SHIELD', x: 0, y: 27, z: -25, weight: 1.1 },
             // Obere Ebene Items
-            { id: 'cr_rocket_top', type: 'item_rocket', pickupType: 'ROCKET_STRONG', x: 0, y: 52, z: 0, weight: 0.7 },
+            { id: 'cr_rocket_top', type: 'item_rocket', pickupType: 'ROCKET_HEAVY', x: 0, y: 52, z: 0, weight: 0.7 },
             { id: 'cr_speed_tower', type: 'item_battery', pickupType: 'SPEED_UP', x: 55, y: 44, z: 55, weight: 1.6 },
         ],
         aircraft: [

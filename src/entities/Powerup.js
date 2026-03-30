@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import { CONFIG } from '../core/Config.js';
 import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { PowerupModelFactory } from './PowerupModelFactory.js';
+import { normalizeRocketPickupType } from '../hunt/RocketPickupSystem.js';
 
 const AUTHORED_ITEM_TYPE_ALIASES = Object.freeze({
     item_battery: 'SPEED_UP',
@@ -32,7 +33,9 @@ function resolveAuthoredPickupType(anchor, huntModeActive) {
         AUTHORED_ITEM_TYPE_ALIASES[String(anchor.model || '').trim().toLowerCase()],
     ];
     for (const candidate of candidates) {
-        const normalizedType = String(candidate || '').trim().toUpperCase();
+        const normalizedType = normalizeRocketPickupType(candidate, {
+            fallback: String(candidate || '').trim().toUpperCase(),
+        });
         if (!normalizedType) continue;
         if (isTypeAllowedForMode(normalizedType, huntModeActive)) {
             return normalizedType;

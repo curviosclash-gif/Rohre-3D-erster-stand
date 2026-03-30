@@ -207,6 +207,96 @@ test.describe('Game Mode Strategy (V47)', () => {
         expect(result.hasShield).toBe(true);
     });
 
+    test('S14a: RocketPickupSystem normalisiert Legacy-Rocket-Typen auf aktive Tiers', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const {
+                normalizeRocketPickupType,
+                isRocketTierType,
+            } = await import('/src/hunt/RocketPickupSystem.js');
+            const strong = normalizeRocketPickupType('ROCKET_STRONG');
+            const weak = normalizeRocketPickupType('rocket');
+            return {
+                strong,
+                weak,
+                strongIsTier: isRocketTierType(strong),
+                weakIsTier: isRocketTierType(weak),
+            };
+        });
+        expect(result.strong).toBe('ROCKET_HEAVY');
+        expect(result.weak).toBe('ROCKET_WEAK');
+        expect(result.strongIsTier).toBeTruthy();
+        expect(result.weakIsTier).toBeTruthy();
+    });
+
+    test('S14b: RocketPickupSystem waehlt bei null Gewichten stabilen Fallback und respektiert Allowlist', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { pickWeightedRocketTierType } = await import('/src/hunt/RocketPickupSystem.js');
+            const fallback = pickWeightedRocketTierType({
+                allowedTypes: ['ROCKET_HEAVY', 'ROCKET_MEGA'],
+                tiersConfig: {
+                    WEAK: { spawnChance: 0 },
+                    MEDIUM: { spawnChance: 0 },
+                    HEAVY: { spawnChance: 0 },
+                    MEGA: { spawnChance: 0 },
+                },
+                random: () => 0.97,
+            });
+            const weighted = pickWeightedRocketTierType({
+                allowedTypes: ['ROCKET_HEAVY', 'ROCKET_MEGA'],
+                tiersConfig: {
+                    HEAVY: { spawnChance: 0.2 },
+                    MEGA: { spawnChance: 0.8 },
+                },
+                random: () => 0.9,
+            });
+            return { fallback, weighted };
+        });
+        expect(result.fallback).toBe('ROCKET_HEAVY');
+        expect(result.weighted).toBe('ROCKET_MEGA');
+    });
+
+    test('S14c: HuntModeStrategy resolveSpawnType bleibt robust bei invaliden Non-Rocket-Gewichten', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { HuntModeStrategy } = await import('/src/modes/HuntModeStrategy.js');
+            const strategy = new HuntModeStrategy();
+            const nonRocketFallback = strategy.resolveSpawnType(
+                ['SHIELD', 'SPEED_UP', 'ROCKET_WEAK'],
+                {
+                    HUNT: {
+                        ROCKET_PICKUP_SPAWN_CHANCE: 0,
+                        PICKUP_WEIGHTS: {
+                            SHIELD: 0,
+                            SPEED_UP: -4,
+                        },
+                    },
+                }
+            );
+            const forcedRocket = strategy.resolveSpawnType(
+                ['SPEED_UP', 'ROCKET_WEAK'],
+                {
+                    HUNT: {
+                        ROCKET_PICKUP_SPAWN_CHANCE: 1,
+                        PICKUP_WEIGHTS: {
+                            SPEED_UP: 10,
+                        },
+                        ROCKET_TIERS: {
+                            WEAK: { spawnChance: 0 },
+                            MEDIUM: { spawnChance: 0 },
+                            HEAVY: { spawnChance: 0 },
+                            MEGA: { spawnChance: 0 },
+                        },
+                    },
+                }
+            );
+            return { nonRocketFallback, forcedRocket };
+        });
+        expect(result.nonRocketFallback).toBe('SHIELD');
+        expect(result.forcedRocket).toBe('ROCKET_WEAK');
+    });
+
     test('S15: EntityManager has gameModeStrategy wired after setup', async ({ page }) => {
         await startGame(page);
         const result = await page.evaluate(() => {

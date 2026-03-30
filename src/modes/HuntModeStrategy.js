@@ -25,17 +25,32 @@ function resolveConfig(config) {
 }
 
 function pickWeightedType(typeEntries = []) {
-    let totalWeight = 0;
+    const weighted = [];
     for (const entry of typeEntries) {
-        totalWeight += Math.max(0, Number(entry?.weight) || 0);
+        const type = String(entry?.type || '').trim().toUpperCase();
+        if (!type) continue;
+        const rawWeight = Number(entry?.weight);
+        weighted.push({
+            type,
+            weight: Number.isFinite(rawWeight) ? Math.max(0, rawWeight) : 0,
+        });
     }
-    if (totalWeight <= 0) return null;
-    let roll = Math.random() * totalWeight;
-    for (const entry of typeEntries) {
-        roll -= Math.max(0, Number(entry?.weight) || 0);
+    if (weighted.length === 0) return null;
+
+    let totalWeight = 0;
+    for (const entry of weighted) {
+        totalWeight += entry.weight;
+    }
+    if (totalWeight <= 0) {
+        return weighted[0].type;
+    }
+
+    let roll = Math.max(0, Math.min(0.999999, Number(Math.random()) || 0)) * totalWeight;
+    for (const entry of weighted) {
+        roll -= entry.weight;
         if (roll <= 0) return entry.type;
     }
-    return typeEntries[typeEntries.length - 1]?.type || null;
+    return weighted[weighted.length - 1]?.type || null;
 }
 
 export class HuntModeStrategy extends GameModeContract {
@@ -244,28 +259,35 @@ export class HuntModeStrategy extends GameModeContract {
 
     resolveSpawnType(spawnableTypes, config) {
         const activeConfig = resolveConfig(config);
-        const rocketSpawnChance = Math.max(0, Number(activeConfig?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0));
+        const rocketSpawnChance = Math.max(0, Math.min(1, Number(activeConfig?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0)));
         const huntWeights = activeConfig?.HUNT?.PICKUP_WEIGHTS || {};
+        const normalizedSpawnableTypes = Array.isArray(spawnableTypes)
+            ? spawnableTypes.map((type) => String(type || '').trim().toUpperCase()).filter((type) => !!type)
+            : [];
 
-        const nonRocketTypes = spawnableTypes.filter((t) => !isRocketTierType(t));
+        const nonRocketTypes = normalizedSpawnableTypes.filter((type) => !isRocketTierType(type));
         const weightedNonRocketTypes = nonRocketTypes
-            .map((typeKey) => ({ type: typeKey, weight: Number(huntWeights?.[typeKey] ?? 1) }))
-            .filter((entry) => entry.weight > 0);
+            .map((typeKey) => ({
+                type: typeKey,
+                weight: Number.isFinite(Number(huntWeights?.[typeKey]))
+                    ? Math.max(0, Number(huntWeights?.[typeKey]))
+                    : 1,
+            }));
 
         if (Math.random() < rocketSpawnChance) {
-            const weightedRocketType = pickWeightedRocketTierType();
-            if (spawnableTypes.includes(weightedRocketType) || isRocketTierType(weightedRocketType)) {
+            const weightedRocketType = pickWeightedRocketTierType({ allowedTypes: normalizedSpawnableTypes });
+            if (weightedRocketType && (normalizedSpawnableTypes.includes(weightedRocketType) || isRocketTierType(weightedRocketType))) {
                 return weightedRocketType;
             }
         }
 
         if (weightedNonRocketTypes.length > 0) {
-            return pickWeightedType(weightedNonRocketTypes) || weightedNonRocketTypes[0].type;
+            return pickWeightedType(weightedNonRocketTypes) || nonRocketTypes[0];
         }
         if (nonRocketTypes.length > 0) {
-            return nonRocketTypes[Math.floor(Math.random() * nonRocketTypes.length)];
+            return nonRocketTypes[0];
         }
-        return spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
+        return normalizedSpawnableTypes[0] || null;
     }
 
     // --- Features ---

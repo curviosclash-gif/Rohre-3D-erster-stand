@@ -61,9 +61,9 @@ Hinweis fuer Abschluss-Evidence:
   - [x] 69.2.1 Default-/Preset-Werte fuer `mgTrailAimRadius` und angrenzende MG-Parameter fuer Fight/Hunt harmonisieren; UI- und Runtime-Defaults konsistent halten. (abgeschlossen: 2026-03-30; evidence: `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/core/config/SettingsRuntimeContract.js`, `src/ui/UIManager.js`, `index.html`, `docs/prozess/Standardeinstellungen.md`)
   - [x] 69.2.2 MG-Falloff/Overheat/Lockout gegen Zielkorridor validieren und Tests fuer Midrange-TTK + Trail-Hit-Fairness erweitern. (abgeschlossen: 2026-03-30; evidence: `tests/physics-hunt.spec.js` (`T64`, `T89a`, `T89i`) + Physics-Run `test-results/v69-2-physics`)
 
-- [ ] 69.3 Rocket-Tiers und Spawn-Oekonomie
-  - [ ] 69.3.1 Legacy-Rocket-Pickup-Typen (`ROCKET_STRONG` etc.) per Alias/Migration auf aktive Tier-Typen normalisieren.
-  - [ ] 69.3.2 Rocket-Tier- und Non-Rocket-Spawngewichte robust machen (normalisierte Gewichte, deterministische Verteilung, Tests fuer Grenzfaelle).
+- [x] 69.3 Rocket-Tiers und Spawn-Oekonomie (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5383 PW_RUN_TAG=v69-3 PW_OUTPUT_DIR=test-results/v69-3 npx playwright test tests/core.spec.js tests/game-mode-strategy.spec.js --grep "T14ea|S14a|S14b|S14c"` -> `test-results/v69-3`)
+  - [x] 69.3.1 Legacy-Rocket-Pickup-Typen (`ROCKET_STRONG` etc.) per Alias/Migration auf aktive Tier-Typen normalisieren. (abgeschlossen: 2026-03-30; evidence: `src/hunt/RocketPickupSystem.js` + `src/entities/Powerup.js` + `src/entities/mapSchema/MapSchemaSanitizeOps.js` + Map-Preset-Migration in `src/core/config/maps/presets/neon_abyss.js`/`src/core/config/maps/presets/crystal_ruins.js` + `T14ea`/`S14a`)
+  - [x] 69.3.2 Rocket-Tier- und Non-Rocket-Spawngewichte robust machen (normalisierte Gewichte, deterministische Verteilung, Tests fuer Grenzfaelle). (abgeschlossen: 2026-03-30; evidence: `src/hunt/RocketPickupSystem.js` + `src/modes/HuntModeStrategy.js` + `S14b`/`S14c`)
 
 - [ ] 69.4 Shield- und Damage-Semantik
   - [ ] 69.4.1 Shield-Hit-, Regen- und Damage-Timestamp-Interaktion klar definieren und konsistent in Health-/Feedback-Pfaden abbilden.

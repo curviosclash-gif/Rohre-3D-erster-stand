@@ -7,8 +7,31 @@ const TIER_BY_ITEM = Object.freeze({
     ROCKET_MEGA: 'MEGA',
 });
 
+const LEGACY_ROCKET_TYPE_ALIASES = Object.freeze({
+    ROCKET: 'ROCKET_WEAK',
+    ROCKET_BASIC: 'ROCKET_WEAK',
+    ROCKET_LIGHT: 'ROCKET_WEAK',
+    ROCKET_STRONG: 'ROCKET_HEAVY',
+    ROCKET_POWER: 'ROCKET_HEAVY',
+    ROCKET_ULTRA: 'ROCKET_MEGA',
+});
+
+const ROCKET_WEIGHT_ORDER = Object.freeze([
+    Object.freeze({ type: 'ROCKET_WEAK', tier: 'WEAK', fallbackWeight: 0.45 }),
+    Object.freeze({ type: 'ROCKET_MEDIUM', tier: 'MEDIUM', fallbackWeight: 0.30 }),
+    Object.freeze({ type: 'ROCKET_HEAVY', tier: 'HEAVY', fallbackWeight: 0.18 }),
+    Object.freeze({ type: 'ROCKET_MEGA', tier: 'MEGA', fallbackWeight: 0.07 }),
+]);
+
+export function normalizeRocketPickupType(type, { fallback = '' } = {}) {
+    const normalized = String(type || '').trim().toUpperCase();
+    if (!normalized) return String(fallback || '').trim().toUpperCase();
+    return LEGACY_ROCKET_TYPE_ALIASES[normalized] || normalized;
+}
+
 export function isRocketTierType(type) {
-    return Object.prototype.hasOwnProperty.call(TIER_BY_ITEM, String(type || '').toUpperCase());
+    const normalized = normalizeRocketPickupType(type);
+    return Object.prototype.hasOwnProperty.call(TIER_BY_ITEM, normalized);
 }
 
 export function getRocketTierTypes() {
@@ -16,7 +39,7 @@ export function getRocketTierTypes() {
 }
 
 export function resolveRocketTierDamage(type) {
-    const normalized = String(type || '').toUpperCase();
+    const normalized = normalizeRocketPickupType(type);
     const tier = TIER_BY_ITEM[normalized];
     const tierConfig = CONFIG?.HUNT?.ROCKET_TIERS?.[tier];
     if (tierConfig && Number.isFinite(Number(tierConfig.damage))) {
@@ -28,7 +51,7 @@ export function resolveRocketTierDamage(type) {
 }
 
 export function resolveRocketTrailBlastMeters(type) {
-    const normalized = String(type || '').toUpperCase();
+    const normalized = normalizeRocketPickupType(type);
     const tier = TIER_BY_ITEM[normalized];
     const tierConfig = CONFIG?.HUNT?.ROCKET_TIERS?.[tier];
     return Math.max(0, Number(tierConfig?.trailBlastMeters) || 0);
@@ -39,24 +62,59 @@ export function resolveRocketTrailBlastRadiusSegments(type) {
     return 0;
 }
 
-export function pickWeightedRocketTierType() {
-    const tiers = CONFIG?.HUNT?.ROCKET_TIERS || {};
-    const weighted = [
-        { type: 'ROCKET_WEAK', weight: Number(tiers.WEAK?.spawnChance || 0.45) },
-        { type: 'ROCKET_MEDIUM', weight: Number(tiers.MEDIUM?.spawnChance || 0.30) },
-        { type: 'ROCKET_HEAVY', weight: Number(tiers.HEAVY?.spawnChance || 0.18) },
-        { type: 'ROCKET_MEGA', weight: Number(tiers.MEGA?.spawnChance || 0.07) },
-    ];
-    const total = weighted.reduce((sum, entry) => sum + Math.max(0, entry.weight), 0);
-    if (total <= 0) return 'ROCKET_WEAK';
+export function resolveRocketTierSpawnWeights({ allowedTypes = null, tiersConfig = null } = {}) {
+    const tiers = tiersConfig || CONFIG?.HUNT?.ROCKET_TIERS || {};
+    const allowedSet = Array.isArray(allowedTypes) && allowedTypes.length > 0
+        ? new Set(
+            allowedTypes
+                .map((type) => normalizeRocketPickupType(type))
+                .filter((type) => isRocketTierType(type))
+        )
+        : null;
 
-    const roll = Math.random() * total;
+    const weighted = [];
+    for (const entry of ROCKET_WEIGHT_ORDER) {
+        if (allowedSet && !allowedSet.has(entry.type)) continue;
+        const rawWeight = Number(tiers?.[entry.tier]?.spawnChance ?? entry.fallbackWeight);
+        weighted.push({
+            type: entry.type,
+            weight: Number.isFinite(rawWeight) ? Math.max(0, rawWeight) : 0,
+        });
+    }
+    if (weighted.length === 0) return [];
+
+    const total = weighted.reduce((sum, entry) => sum + entry.weight, 0);
+    if (total <= 0) {
+        return weighted.map((entry, index) => ({
+            type: entry.type,
+            normalizedWeight: index === 0 ? 1 : 0,
+            rawWeight: entry.weight,
+        }));
+    }
+
+    return weighted.map((entry) => ({
+        type: entry.type,
+        normalizedWeight: entry.weight / total,
+        rawWeight: entry.weight,
+    }));
+}
+
+export function pickWeightedRocketTierType(options = {}) {
+    const random = typeof options?.random === 'function' ? options.random : Math.random;
+    const weighted = resolveRocketTierSpawnWeights({
+        allowedTypes: options?.allowedTypes || null,
+        tiersConfig: options?.tiersConfig || null,
+    });
+    if (weighted.length === 0) return null;
+
+    const randomValue = Number.isFinite(Number(random())) ? Number(random()) : 0;
+    const roll = Math.max(0, Math.min(0.999999, randomValue));
     let acc = 0;
     for (const entry of weighted) {
-        acc += Math.max(0, entry.weight);
+        acc += entry.normalizedWeight;
         if (roll <= acc) {
             return entry.type;
         }
     }
-    return 'ROCKET_MEGA';
+    return weighted[0].type;
 }

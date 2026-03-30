@@ -580,6 +580,32 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(roundtrip.tunnels).toHaveLength(1);
     });
 
+    test('T14ea: Editor-Import/Export normalisiert Legacy-Rocket-PickupType auf aktive Tier-Namen', async () => {
+        const manager = createMockEditorManager();
+        const sourceDocument = {
+            arenaSize: { width: 280, height: 110, depth: 280 },
+            items: [
+                {
+                    id: 'legacy_rocket_anchor',
+                    type: 'item_rocket',
+                    model: 'item_rocket',
+                    pickupType: 'ROCKET_STRONG',
+                    weight: 1.1,
+                    x: 24,
+                    y: 16,
+                    z: -18,
+                },
+            ],
+        };
+
+        importFromJSON(manager, JSON.stringify(sourceDocument));
+        const exported = generateJSONExport(manager, sourceDocument.arenaSize);
+        const roundtrip = parseMapJSON(exported).map;
+        const pickupType = String(roundtrip?.items?.[0]?.pickupType || '');
+
+        expect(pickupType).toBe('ROCKET_HEAVY');
+    });
+
     test('T14f: Parcours-Rift erzwingt Reihenfolge und beendet Match mit Objective-Overlay', async ({ page }) => {
         await loadGame(page);
         await openCustomSubmenu(page);

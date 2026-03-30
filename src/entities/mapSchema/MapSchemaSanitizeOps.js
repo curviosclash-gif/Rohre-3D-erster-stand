@@ -1,4 +1,5 @@
 import { DEFAULT_ARENA_SIZE, MAP_SCHEMA_VERSION } from './MapSchemaConstants.js';
+import { normalizeRocketPickupType } from '../../hunt/RocketPickupSystem.js';
 
 export function asFiniteNumber(value, fallback = 0) {
     const parsed = Number(value);
@@ -270,7 +271,10 @@ export function sanitizeItem(raw) {
         weight: asPositiveNumber(source.weight, 1, 0.01),
     }, source.id);
     withOptionalStringField(result, 'model', source.model);
-    withOptionalStringField(result, 'pickupType', source.pickupType);
+    const normalizedPickupType = normalizeRocketPickupType(source.pickupType, {
+        fallback: typeof source.pickupType === 'string' ? source.pickupType : '',
+    });
+    withOptionalStringField(result, 'pickupType', normalizedPickupType);
     return result;
 }
 

@@ -127,7 +127,7 @@ export const NEON_ABYSS_MAP = {
             { id: 'abyss_shield_bridge', type: 'item_shield', pickupType: 'SHIELD', x: 40, y: 24, z: 0, weight: 1.0 },
             { id: 'abyss_ghost_cage', type: 'item_coin', pickupType: 'GHOST', x: 20, y: 37, z: 20, weight: 1.3 },
             { id: 'abyss_thick_cage', type: 'item_coin', pickupType: 'THICK', x: -20, y: 37, z: -20, weight: 1.0 },
-            { id: 'abyss_rocket_crown', type: 'item_rocket', pickupType: 'ROCKET_STRONG', x: 0, y: 70, z: 0, weight: 0.8 },
+            { id: 'abyss_rocket_crown', type: 'item_rocket', pickupType: 'ROCKET_HEAVY', x: 0, y: 70, z: 0, weight: 0.8 },
             { id: 'abyss_speed_crown', type: 'item_battery', pickupType: 'SPEED_UP', x: 30, y: 68, z: 0, weight: 1.5 },
         ],
         aircraft: [
@@ -144,4 +144,3 @@ export const NEON_ABYSS_MAP = {
         ],
     },
 };
-
