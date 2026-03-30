@@ -80,7 +80,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/MatchFlowUiController.js`, `src/core/GameRuntimeFacade.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/shared/contracts/ArcadeRewardContract.js`, `src/ui/menu/MenuTextCatalog.js`, `style.css`, `tests/core.spec.js` | V68 | abgeschlossen | abgeschlossen 2026-03-29; 68.1-68.4 inkl. Intermission-/Post-Run-Loop und Replay-Fallback abgeschlossen |
 | `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/ui/arcade/VehicleManagerCatalog.js`, `src/ui/arcade/vehicle-manager/**`, `src/ui/menu/MenuPreviewCatalog.js`, `src/entities/vehicle-registry.js`, `style.css`, `tests/core.spec.js` | V66 | abgeschlossen | abgeschlossen 2026-03-30; 66.1-66.5 + 66.99 inkl. 3D-Preview, Filter/Loadout, Drift-Regression und Gate-Verifikation |
-| `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | geplant | Item-/Rocket-/Shield-/MG-Balance und Telemetrie-Konsolidierung fuer Fight/Hunt |
+| `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | aktiv | Bot-Codex arbeitet an 69.1 (Telemetrie + KPI-Baseline) |
 | `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | abgeschlossen | abgeschlossen 2026-03-29; Settings-/Preset-Drift-Fix inkl. Migration-/Autosave-Haertung und T70-Regressionstests |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -99,7 +99,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V66 | 2026-03-30 | closed | abgeschlossen 2026-03-30 (66.1-66.5 + 66.99 inkl. test:core/test:stress/build/docs-gates) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (68.1-68.4 + 68.99 inkl. test:core/test:stress/build/docs-gates) |
-| - | V69 | - | frei | Balance-Plan angelegt; Start nach expliziter Priorisierung |
+| Bot-Codex | V69 | 2026-03-30 | in-bearbeitung | 69.1 Telemetrie + KPI-Baseline |
 | Bot-Codex | V70 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -928,7 +928,7 @@ Scope:
 
 Plan-Datei: `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-30 -->
 <!-- DEPENDS-ON: V63.99 -->
 
 Scope:
