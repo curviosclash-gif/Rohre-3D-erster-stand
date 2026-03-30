@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-29 (V60, V61, V65, V67, V68 und V70 abgeschlossen; V66 Vehicle-Manager-Plan aktiv; V69 Balance-Plan fuer Item/Raketen/Schild/MG aktiv)
+Stand: 2026-03-30 (V60, V61, V65, V66, V67, V68 und V70 abgeschlossen; V69 Balance-Plan fuer Item/Raketen/Schild/MG aktiv)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/prozess/Backlog.md`.
@@ -79,7 +79,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `editor/map-editor-3d.html`, `editor/js/**`, `tests/editor-map-ui.spec.js`, `tests/core.spec.js` | V65 | abgeschlossen | V65 abgeschlossen (Bottom-Dock, Build-Katalog, Vorschaukarten, Auswahlfluss, Verifikation 65.99) |
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/MatchFlowUiController.js`, `src/core/GameRuntimeFacade.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/shared/contracts/ArcadeRewardContract.js`, `src/ui/menu/MenuTextCatalog.js`, `style.css`, `tests/core.spec.js` | V68 | abgeschlossen | abgeschlossen 2026-03-29; 68.1-68.4 inkl. Intermission-/Post-Run-Loop und Replay-Fallback abgeschlossen |
-| `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/VehicleManagerCatalog.js`, `src/ui/menu/MenuPreviewCatalog.js`, `src/entities/vehicle-registry.js`, `tests/core.spec.js` | V66 | aktiv | 66.1 abgeschlossen; 66.2/66.3 Vorbereitung laeuft |
+| `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/ui/arcade/VehicleManagerCatalog.js`, `src/ui/arcade/vehicle-manager/**`, `src/ui/menu/MenuPreviewCatalog.js`, `src/entities/vehicle-registry.js`, `style.css`, `tests/core.spec.js` | V66 | abgeschlossen | abgeschlossen 2026-03-30; 66.1-66.5 + 66.99 inkl. 3D-Preview, Filter/Loadout, Drift-Regression und Gate-Verifikation |
 | `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | geplant | Item-/Rocket-/Shield-/MG-Balance und Telemetrie-Konsolidierung fuer Fight/Hunt |
 | `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | abgeschlossen | abgeschlossen 2026-03-29; Settings-/Preset-Drift-Fix inkl. Migration-/Autosave-Haertung und T70-Regressionstests |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
@@ -96,7 +96,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V63 | 2026-03-27 | closed | abgeschlossen 2026-03-27 (alle Tasks + DoD komplett) |
 | - | V64 | - | frei | Scope noch nicht definiert |
 | Bot-Codex | V65 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (65.1-65.5 + 65.99 inklusive Smoke-Evidence) |
-| Bot-Codex | V66 | 2026-03-30 | active | 66.1 abgeschlossen; naechster Schritt 66.2/66.3 |
+| Bot-Codex | V66 | 2026-03-30 | closed | abgeschlossen 2026-03-30 (66.1-66.5 + 66.99 inkl. test:core/test:stress/build/docs-gates) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (68.1-68.4 + 68.99 inkl. test:core/test:stress/build/docs-gates) |
 | - | V69 | - | frei | Balance-Plan angelegt; Start nach expliziter Priorisierung |
@@ -120,18 +120,18 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ## Parallelisierungs-Empfehlung (Stand: 2026-03-29, aktualisiert)
 
-V60, V61, V67, V68 und V70 sind abgeschlossen. Aktive Planung liegt auf V66 und V69.
+V60, V61, V66, V67, V68 und V70 sind abgeschlossen. Aktive Planung liegt auf V69.
 
 | Spur | Bloecke | Hinweis |
 | --- | --- | --- |
-| A | **V66** | Vehicle-Manager-UX (3D-Preview, Kategorien, Upgrade-Flows) |
+| A | **V66** | abgeschlossen 2026-03-30 (3D-Preview, Kategorien, Upgrade-/Loadout-Flow) |
 | B | **V67** | abgeschlossen 2026-03-29 (inkl. 67.4.5 Characterization) |
 | C | **V68** | abgeschlossen 2026-03-29 (Intermission-/Post-Run-/Replay-Follow-up umgesetzt) |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
 | E | **V69** | Item-/Rocket-/Shield-/MG-Balance fuer Fight/Hunt (Telemetry + Tuning) |
 | F | **V70** | abgeschlossen 2026-03-29 (Drift-Fix, Migration-/Autosave-Haertung, T70-Testabdeckung) |
 
-Empfehlung: 2 Agents parallel auf A + E; Spur D nach Scope-Definition.
+Empfehlung: Fokus auf Spur E; Spur D nach Scope-Definition.
 
 ---
 
@@ -148,7 +148,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/bot-training/Bot_Trainingsplan.md` g
 | V61 | Arcade-Modus Gameplay-Verbesserungen | `docs/Umsetzungsplan.md` | hoch | gross | P1 | abgeschlossen; HUD-/Intermission-/Replay-Rest in V68 ueberfuehrt | Abgeschlossen |
 | V62 | Cinematic-Camera Funktionale Verbesserungen | `docs/Umsetzungsplan.md` | mittel | klein | P2 | abgeschlossen (`62.99.1` gruener Build/Core-Gate, inklusive Gate-Unblocker fuer Vehicle-/Recording-Startpfade) | Abgeschlossen |
 | V65 | Map-Editor UX Refit mit horizontaler Build-Leiste | `docs/plaene/alt/Feature_Map_Editor_UX_V65.md` | hoch | mittel | P2 | abgeschlossen (`65.99.2` inkl. Smoke-Evidence) | Abgeschlossen |
-| V66 | Vehicle-Manager UX - 3D-Vorschau, Kategorien und Upgrade-Visualisierung | `docs/plaene/alt/Feature_Vehicle_Manager_V66.md` | hoch | mittel | P2 | 66.1 abgeschlossen; 66.2/66.3 starten | In Arbeit |
+| V66 | Vehicle-Manager UX - 3D-Vorschau, Kategorien und Upgrade-Visualisierung | `docs/plaene/alt/Feature_Vehicle_Manager_V66.md` | hoch | mittel | P2 | abgeschlossen (66.1-66.5 + 66.99; Drei-Zonen-Manager, 3D-Preview, Drift-Regression und Docs-Gates verifiziert) | Abgeschlossen |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (68.1-68.4 + 68.99; HUD/Intermission/Post-Run/Replay-Fallback verifiziert) | Abgeschlossen |
 | V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | Plan liegt vor; Telemetrie-Baseline und Parameter-Harmonisierung starten | Geplant |
@@ -734,7 +734,7 @@ Scope:
 
 Plan-Datei: `docs/plaene/alt/Feature_Vehicle_Manager_V66.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-30 -->
+<!-- LOCK: frei -->
 
 Scope:
 
@@ -744,10 +744,10 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 66.1 bis 66.5 und 66.99 sind abgeschlossen.
-- [ ] DoD.2 Alle registrierten Fahrzeuge (inkl. Custom-Fahrzeuge aus Vehicle-Lab) sind ueber den neuen Katalog mit Kategorien, Filter und Suche erreichbar.
-- [ ] DoD.3 3D-Vorschau zeigt das gewaehlte Fahrzeug in Spielerfarbe und ist per Maus drehbar; Upgrade-Slots sind visuell erkennbar.
-- [ ] DoD.4 `npm run test:core` deckt Fahrzeugliste, Kategorie-Wechsel, 3D-Preview und Upgrade-Interaktion ab; bestehende Arcade-Tests bleiben gruen.
+- [x] DoD.1 Alle Phasen 66.1 bis 66.5 und 66.99 sind abgeschlossen. (abgeschlossen: 2026-03-30; evidence: 66.1-66.5 + 66.99 auf `[x]`, Code-Commit `c280b5d` + Plan-Abschluss-Commit)
+- [x] DoD.2 Alle registrierten Fahrzeuge (inkl. Custom-Fahrzeuge aus Vehicle-Lab) sind ueber den neuen Katalog mit Kategorien, Filter und Suche erreichbar. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5367 PW_RUN_TAG=v66-core-final PW_OUTPUT_DIR=test-results/v66-core-final npm run test:core` (T66a) -> `test-results/v66-core-final`, commit `c280b5d`)
+- [x] DoD.3 3D-Vorschau zeigt das gewaehlte Fahrzeug in Spielerfarbe und ist per Maus drehbar; Upgrade-Slots sind visuell erkennbar. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5367 PW_RUN_TAG=v66-core-final PW_OUTPUT_DIR=test-results/v66-core-final npm run test:core` (T66a) + Screenshot -> `test-results/v66-vehicle-manager-panel.png`, commit `c280b5d`)
+- [x] DoD.4 `npm run test:core` deckt Fahrzeugliste, Kategorie-Wechsel, 3D-Preview und Upgrade-Interaktion ab; bestehende Arcade-Tests bleiben gruen. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5367 PW_RUN_TAG=v66-core-final PW_OUTPUT_DIR=test-results/v66-core-final npm run test:core` -> `test-results/v66-core-final`, commit `c280b5d`)
 
 ### 66.1 Katalog- und Interaktionskonzept
 
@@ -756,34 +756,34 @@ Scope:
 
 ### 66.2 UI-Architektur und State-Management (parallel zu 66.3)
 
-- [ ] 66.2.1 `ArcadeVehicleManager.js` von flachem Grid auf Drei-Zonen-Layout umbauen (Fahrzeugliste, 3D-Preview, Detail-Panel).
-- [ ] 66.2.2 Auswahl-, Filter- und Favoritenzustand in dedizierte Module auslagern.
-- [ ] 66.2.3 Suchfeld und Filter-Chips implementieren: Freitext-Suche, Kategorie-/Hitbox-/Level-Filter.
-- [ ] 66.2.4 Auswahl-Contract haerten: Vehicle-Auswahl aus dem Arcade-Manager muss `settings.vehicles.PLAYER_1` und Start-/Snapshot-Pfade synchron halten (kein Drift zwischen UI-Auswahl und Match-Spawn).
+- [x] 66.2.1 `ArcadeVehicleManager.js` von flachem Grid auf Drei-Zonen-Layout umbauen (Fahrzeugliste, 3D-Preview, Detail-Panel). (abgeschlossen: 2026-03-30; evidence: Drei-Zonen-Layout + Panel-Refactor in `src/ui/arcade/ArcadeVehicleManager.js`/`style.css` -> commit `c280b5d`)
+- [x] 66.2.2 Auswahl-, Filter- und Favoritenzustand in dedizierte Module auslagern. (abgeschlossen: 2026-03-30; evidence: `src/ui/arcade/vehicle-manager/VehicleManagerSelectionState.js` + `VehicleManagerUiPrimitives.js` -> commit `c280b5d`)
+- [x] 66.2.3 Suchfeld und Filter-Chips implementieren: Freitext-Suche, Kategorie-/Hitbox-/Level-Filter. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5367 PW_RUN_TAG=v66-core-final PW_OUTPUT_DIR=test-results/v66-core-final npm run test:core` (T66a Filterpfade) -> `test-results/v66-core-final`, commit `c280b5d`)
+- [x] 66.2.4 Auswahl-Contract haerten: Vehicle-Auswahl aus dem Arcade-Manager muss `settings.vehicles.PLAYER_1` und Start-/Snapshot-Pfade synchron halten (kein Drift zwischen UI-Auswahl und Match-Spawn). (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5367 PW_RUN_TAG=v66-core-final PW_OUTPUT_DIR=test-results/v66-core-final npm run test:core` (T66b) -> `test-results/v66-core-final`, commit `c280b5d`)
 
 ### 66.3 3D-Preview und Upgrade-Visualisierung (parallel zu 66.2)
 
-- [ ] 66.3.1 Mini-Three.js-Renderer fuer die zentrale Preview: Orbit Controls, Spielerfarbe, Hintergrund.
-- [ ] 66.3.2 Fahrzeug-Mesh ueber `createVehicleMesh()` laden und bei Auswahl-Wechsel austauschen; Fallback bei Ladefehler.
-- [ ] 66.3.3 Upgrade-Slots als interaktive Overlay-Punkte auf dem 3D-Modell; Klick oeffnet Tier-Auswahl.
+- [x] 66.3.1 Mini-Three.js-Renderer fuer die zentrale Preview: Orbit Controls, Spielerfarbe, Hintergrund. (abgeschlossen: 2026-03-30; evidence: `src/ui/arcade/vehicle-manager/VehicleManagerPreview3d.js` mit OrbitControls/Renderer + `TEST_PORT=5367 ... npm run test:core` (T66a) -> `test-results/v66-core-final`, commit `c280b5d`)
+- [x] 66.3.2 Fahrzeug-Mesh ueber `createVehicleMesh()` laden und bei Auswahl-Wechsel austauschen; Fallback bei Ladefehler. (abgeschlossen: 2026-03-30; evidence: `VehicleManagerPreview3d.setVehicle()` nutzt `createVehicleMesh()` inkl. Fallback-Pfad -> commit `c280b5d`)
+- [x] 66.3.3 Upgrade-Slots als interaktive Overlay-Punkte auf dem 3D-Modell; Klick oeffnet Tier-Auswahl. (abgeschlossen: 2026-03-30; evidence: Slot-Overlay-Dots + Upgrade-Callbacks in Preview/Manager + T66a -> `test-results/v66-core-final`, commit `c280b5d`)
 
 ### 66.4 Bedienfluss, Vergleich und Loadouts (nach 66.2 + 66.3)
 
-- [ ] 66.4.1 Ein-Klick-Auswahl, Favoriten-Toggle, zuletzt genutzte Fahrzeuge und Badge-System.
-- [ ] 66.4.2 Vergleichsmodus: zwei Fahrzeuge nebeneinander mit Stats-Balken.
-- [ ] 66.4.3 Loadout-Presets: Upgrade-Konfigurationen speichern/laden/wechseln.
-- [ ] 66.4.4 Tastatur-/Mausfluss: Kategorien wechseln, Fahrzeuge durchlaufen, Shortcuts.
+- [x] 66.4.1 Ein-Klick-Auswahl, Favoriten-Toggle, zuletzt genutzte Fahrzeuge und Badge-System. (abgeschlossen: 2026-03-30; evidence: Auswahl/Favoriten/Recents/Badges in `ArcadeVehicleManager.js` + T66a -> `test-results/v66-core-final`, commit `c280b5d`)
+- [x] 66.4.2 Vergleichsmodus: zwei Fahrzeuge nebeneinander mit Stats-Balken. (abgeschlossen: 2026-03-30; evidence: Compare-Panel mit Stats-Bars in `ArcadeVehicleManager.js`/`style.css` -> commit `c280b5d`)
+- [x] 66.4.3 Loadout-Presets: Upgrade-Konfigurationen speichern/laden/wechseln. (abgeschlossen: 2026-03-30; evidence: `VehicleManagerLoadoutPresets.js` + T66a Preset-Save/Load -> `test-results/v66-core-final`, commit `c280b5d`)
+- [x] 66.4.4 Tastatur-/Mausfluss: Kategorien wechseln, Fahrzeuge durchlaufen, Shortcuts. (abgeschlossen: 2026-03-30; evidence: Keyboard/Wheel-Shortcuts in `ArcadeVehicleManager.js` + T66a/T66b -> `test-results/v66-core-final`, commit `c280b5d`)
 
 ### 66.5 Verifikation und visuelle Abnahme
 
-- [ ] 66.5.1 Playwright-Abdeckung fuer Fahrzeugliste, Kategorie-Wechsel, 3D-Preview, Upgrade-Interaktion und Auswahl-Persistenz.
-- [ ] 66.5.2 Visuelle Evidence: Screenshot des Vehicle-Managers plus manuelle Smoke-Probe fuer Auswahl ' Spielstart.
-- [ ] 66.5.3 Regressionstest fuer Vehicle-Selection-Drift: im Arcade-Flow gewaehltes Fahrzeug wird in `settings.vehicles.PLAYER_1`, Run-Snapshot und Match-Spawn konsistent uebernommen.
+- [x] 66.5.1 Playwright-Abdeckung fuer Fahrzeugliste, Kategorie-Wechsel, 3D-Preview, Upgrade-Interaktion und Auswahl-Persistenz. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5367 PW_RUN_TAG=v66-core-final PW_OUTPUT_DIR=test-results/v66-core-final npm run test:core` (T66a/T66b) -> `test-results/v66-core-final`, commit `c280b5d`)
+- [x] 66.5.2 Visuelle Evidence: Screenshot des Vehicle-Managers plus manuelle Smoke-Probe fuer Auswahl ' Spielstart. (abgeschlossen: 2026-03-30; evidence: Screenshot `test-results/v66-vehicle-manager-panel.png` + Start-Smoke via `T14f`/`T66b` in `v66-core-final` -> `test-results/v66-core-final`, commit `c280b5d`)
+- [x] 66.5.3 Regressionstest fuer Vehicle-Selection-Drift: im Arcade-Flow gewaehltes Fahrzeug wird in `settings.vehicles.PLAYER_1`, Run-Snapshot und Match-Spawn konsistent uebernommen. (abgeschlossen: 2026-03-30; evidence: `T66b` in `tests/core.spec.js` via `TEST_PORT=5367 ... npm run test:core` -> `test-results/v66-core-final`, commit `c280b5d`)
 
 ### 66.99 Integrations- und Abschluss-Gate
 
-- [ ] 66.99.1 `npm run test:core` sowie Vehicle-Manager-UI-Checks und `npm run build` sind fuer den Scope gruen.
-- [ ] 66.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen.
+- [x] 66.99.1 `npm run test:core` sowie Vehicle-Manager-UI-Checks und `npm run build` sind fuer den Scope gruen. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5367 PW_RUN_TAG=v66-core-final PW_OUTPUT_DIR=test-results/v66-core-final npm run test:core` + `TEST_PORT=5368 PW_RUN_TAG=v66-stress-final PW_OUTPUT_DIR=test-results/v66-stress-final npm run test:stress` + `npm run build` -> `test-results/v66-core-final`, `test-results/v66-stress-final`, commit `c280b5d`)
+- [x] 66.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Backlog-Abgleich sind abgeschlossen. (abgeschlossen: 2026-03-30; evidence: `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` + Plan-Status/Lock/Ownership aktualisiert -> Plan-Abschluss-Commit)
 
 ### Risiko-Register V66
 
@@ -1072,15 +1072,15 @@ Scope:
 
 ## Weekly Review (KW 13/2026)
 
-Stand: 2026-03-29
+Stand: 2026-03-30
 
-- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65, V67, V68, V70.
-- Blockiert: Kein harter Blocker im Masterplan; aktive Schwerpunkte liegen auf V66 und V69.
+- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65, V66, V67, V68, V70.
+- Blockiert: Kein harter Blocker im Masterplan; aktiver Schwerpunkt liegt auf V69.
 - Naechste 3 Ziele:
-  1. V66 starten: Vehicle-Manager UX mit 3D-Preview und Filter-/Loadout-Flows.
-  2. V69 starten: Fight/Hunt Combat-Balance fuer Item/Raketen/Schild/MG.
-  3. V64 konkretisieren: Desktop/Electron-Scope und Priorisierung klaeren.
-- Plan-Bereinigung (2026-03-29): V68 und V70 abgeschlossen; aktive In-Bearbeitung-Spuren liegen auf V66 und V69.
+  1. V69 starten: Fight/Hunt Combat-Balance fuer Item/Raketen/Schild/MG.
+  2. V64 konkretisieren: Desktop/Electron-Scope und Priorisierung klaeren.
+  3. Backlog-Triage fuer naechsten P2-Block nach V69-Abstimmung.
+- Plan-Bereinigung (2026-03-30): V66 abgeschlossen; aktive In-Bearbeitung-Spuren liegen auf V69.
 
 ## Dokumentations-Hook
 
