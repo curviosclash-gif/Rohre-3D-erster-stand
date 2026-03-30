@@ -14,7 +14,9 @@ npm run dev
 
 ```bash
 npm run build
+npm run dev
 npm run dev:logged
+npm run dev:raw
 npm run logs:clean
 npm run test:core
 npm run docs:sync
