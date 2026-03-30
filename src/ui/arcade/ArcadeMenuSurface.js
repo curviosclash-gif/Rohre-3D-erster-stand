@@ -259,6 +259,11 @@ export function setupArcadeMenuSurface(ctx = {}) {
     const level3Body = document.querySelector('#submenu-game .level3-body');
     if (!level3Body) return;
 
+    if (ui.__arcadeVehicleManager && typeof ui.__arcadeVehicleManager.dispose === 'function') {
+        ui.__arcadeVehicleManager.dispose();
+        ui.__arcadeVehicleManager = null;
+    }
+
     const existing = document.getElementById('arcade-inline-surface');
     if (existing?.parentElement) {
         existing.parentElement.removeChild(existing);
@@ -283,6 +288,7 @@ export function setupArcadeMenuSurface(ctx = {}) {
         bind,
         settingsManager: ctx.settingsManager || null,
     });
+    ui.__arcadeVehicleManager = vehicleManager || null;
     if (vehicleManager?.container) {
         const slot = document.getElementById('arcade-vehicle-manager-slot');
         if (slot) slot.appendChild(vehicleManager.container);

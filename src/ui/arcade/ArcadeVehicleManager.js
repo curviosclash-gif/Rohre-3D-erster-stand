@@ -1,6 +1,4 @@
-// ─── Arcade Vehicle Manager UI: Ship Selection, Loadout, Upgrades ───
-
-import { resolveMenuCatalogText } from '../menu/MenuTextCatalog.js';
+﻿import { resolveMenuCatalogText } from '../menu/MenuTextCatalog.js';
 import {
     loadVehicleProfiles,
     saveVehicleProfiles,
@@ -8,211 +6,546 @@ import {
     applyUpgrade,
     xpToNextLevel,
 } from '../../state/arcade/ArcadeVehicleProfile.js';
-import {
-    UPGRADE_TIERS,
-    getUpgradeCost,
-    canUpgrade,
-} from '../../entities/arcade/ArcadeBlueprintSchema.js';
+import { getUpgradeCost } from '../../entities/arcade/ArcadeBlueprintSchema.js';
 import {
     getVehicleManagerInteractionRules,
     listVehicleManagerCatalogEntries,
     resolveVehicleManagerCatalogEntry,
 } from './VehicleManagerCatalog.js';
+import { createVehicleManagerSelectionState } from './vehicle-manager/VehicleManagerSelectionState.js';
+import { createVehicleManagerLoadoutPresetStore } from './vehicle-manager/VehicleManagerLoadoutPresets.js';
+import { createVehicleManagerPreview3d } from './vehicle-manager/VehicleManagerPreview3d.js';
+import {
+    UPGRADE_SLOT_DISPLAY,
+    HITBOX_LABELS,
+    LEVEL_LABELS,
+    createUiNode as el,
+    normalizeVehicleValue as norm,
+    nextVehicleTier as nextTier,
+    toVehicleLevelBand as toBand,
+    resolvePlayerColor as playerColor,
+    collectCardBadges as cardBadges,
+    buildStatRows as statRows,
+    calcBarWidth as barWidth,
+    renderVehicleQuickRow,
+    refreshVehiclePresetSelect,
+} from './vehicle-manager/VehicleManagerUiPrimitives.js';
 
 function t(textId, fallback) {
     return resolveMenuCatalogText(textId, fallback);
 }
 
-function createElement(tag, className, textContent = '') {
-    const element = document.createElement(tag);
-    if (className) element.className = className;
-    if (textContent) element.textContent = textContent;
-    return element;
-}
-
-const UPGRADE_SLOT_DISPLAY = [
-    { key: 'core', label: 'Core' },
-    { key: 'nose', label: 'Nose' },
-    { key: 'wing_left', label: 'Wing L' },
-    { key: 'wing_right', label: 'Wing R' },
-    { key: 'engine_left', label: 'Engine L' },
-    { key: 'engine_right', label: 'Engine R' },
-    { key: 'utility', label: 'Utility' },
-];
-
-function getNextTier(currentTier) {
-    if (!currentTier || currentTier === 'T1') return 'T2';
-    if (currentTier === 'T2') return 'T3';
-    return null;
-}
-
 export function setupArcadeVehicleManager(ctx = {}) {
     const ui = ctx.ui || {};
-    const settings = ctx.settings || {};
+    const settings = ctx.settings && typeof ctx.settings === 'object' ? ctx.settings : {};
     const emit = typeof ctx.emit === 'function' ? ctx.emit : null;
     const eventTypes = ctx.eventTypes || {};
     const bind = typeof ctx.bind === 'function' ? ctx.bind : null;
     const store = ctx.settingsManager?.store || null;
+    if (!bind) return null;
 
-    if (!bind) return;
+    settings.vehicles = settings.vehicles && typeof settings.vehicles === 'object'
+        ? settings.vehicles
+        : { PLAYER_1: 'ship5', PLAYER_2: 'ship5' };
 
-    // ─── Build DOM ───
-
-    const container = createElement('section', 'arcade-surface-card arcade-vehicle-manager');
-    container.id = 'arcade-vehicle-manager';
-    container.appendChild(createElement('h3', 'arcade-surface-card-title', t('menu.arcade.vehicle.title', 'Vehicle Manager')));
-    const interactionRules = getVehicleManagerInteractionRules();
-    container.dataset.vehiclePreviewMode = String(interactionRules?.preview?.mode || 'interactive-3d');
-    container.dataset.vehicleBreakpointStacked = String(interactionRules?.responsiveBreakpoints?.stackedPanelMaxWidth || 1000);
-    container.dataset.vehicleBreakpointCompact = String(interactionRules?.responsiveBreakpoints?.compactListMaxWidth || 700);
-
-    // Ship selector grid
-    const shipGrid = createElement('div', 'arcade-vehicle-grid');
+    const rules = getVehicleManagerInteractionRules();
     const catalogEntries = listVehicleManagerCatalogEntries();
-    const catalogByVehicleId = new Map(catalogEntries.map((entry) => [entry.vehicleId, entry]));
-    const vehicleIds = catalogEntries.map((entry) => entry.vehicleId);
-    const shipButtons = [];
+    if (!catalogEntries.length) return null;
+    const byVehicleId = new Map(catalogEntries.map((entry) => [entry.vehicleId, entry]));
 
-    for (let i = 0; i < catalogEntries.length; i += 1) {
-        const vehicleEntry = catalogEntries[i];
-        const btn = createElement('button', 'arcade-vehicle-card', vehicleEntry.label);
-        btn.type = 'button';
-        btn.dataset.vehicleId = vehicleEntry.vehicleId;
-        btn.dataset.vehicleCategory = vehicleEntry.kategorie;
-        btn.dataset.vehicleHitbox = vehicleEntry.hitboxKlasse;
-        btn.dataset.vehiclePreviewToken = vehicleEntry.previewToken;
-        btn.title = `${vehicleEntry.label} | ${vehicleEntry.kategorie} | ${vehicleEntry.kurzbeschreibung}`;
-        shipGrid.appendChild(btn);
-        shipButtons.push(btn);
-    }
-    container.appendChild(shipGrid);
+    const selection = createVehicleManagerSelectionState({ settings, catalogEntries });
+    const presetStore = createVehicleManagerLoadoutPresetStore({ store });
+    let profiles = loadVehicleProfiles(store);
 
-    // Profile display
-    const profileDisplay = createElement('div', 'arcade-vehicle-profile');
-    const vehicleMetaLine = createElement('p', 'arcade-vehicle-meta');
-    profileDisplay.appendChild(vehicleMetaLine);
-    const levelLine = createElement('p', 'arcade-vehicle-level', 'Level 1 | XP 0/100');
-    profileDisplay.appendChild(levelLine);
-    const xpBar = createElement('div', 'arcade-vehicle-xp-bar');
-    const xpFill = createElement('div', 'arcade-vehicle-xp-fill');
+    const container = el('section', 'arcade-surface-card arcade-vehicle-manager');
+    container.id = 'arcade-vehicle-manager';
+    container.tabIndex = 0;
+    container.dataset.vehiclePreviewMode = String(rules?.preview?.mode || 'interactive-3d');
+    container.dataset.vehicleBreakpointStacked = String(rules?.responsiveBreakpoints?.stackedPanelMaxWidth || 1000);
+    container.dataset.vehicleBreakpointCompact = String(rules?.responsiveBreakpoints?.compactListMaxWidth || 700);
+    container.appendChild(el('h3', 'arcade-surface-card-title', t('menu.arcade.vehicle.title', 'Vehicle Manager')));
+
+    const layout = el('div', 'arcade-vehicle-layout');
+    container.appendChild(layout);
+
+    const leftPanel = el('section', 'arcade-vehicle-panel arcade-vehicle-panel-list');
+    const controls = el('div', 'arcade-vehicle-controls');
+    const search = document.createElement('input');
+    search.type = 'search';
+    search.className = 'arcade-vehicle-search';
+    search.placeholder = 'Suche nach Name oder Keyword...';
+    search.value = selection.getSearchTerm();
+    controls.appendChild(search);
+    const onlyFavBtn = el('button', 'secondary-btn arcade-vehicle-favorites-only', 'Nur Favoriten');
+    onlyFavBtn.type = 'button';
+    controls.appendChild(onlyFavBtn);
+    leftPanel.appendChild(controls);
+
+    const categoryTabs = el('div', 'arcade-vehicle-category-tabs');
+    leftPanel.appendChild(categoryTabs);
+    const hitboxChips = el('div', 'arcade-vehicle-chip-row');
+    leftPanel.appendChild(hitboxChips);
+    const levelChips = el('div', 'arcade-vehicle-chip-row');
+    leftPanel.appendChild(levelChips);
+
+    const quickRows = el('div', 'arcade-vehicle-quick-rows');
+    const favRow = el('div', 'arcade-vehicle-quick-row');
+    const recentRow = el('div', 'arcade-vehicle-quick-row');
+    quickRows.appendChild(favRow);
+    quickRows.appendChild(recentRow);
+    leftPanel.appendChild(quickRows);
+
+    const resultLine = el('p', 'menu-hint arcade-vehicle-results-line');
+    leftPanel.appendChild(resultLine);
+    const vehicleList = el('div', 'arcade-vehicle-list');
+    vehicleList.setAttribute('role', 'listbox');
+    leftPanel.appendChild(vehicleList);
+    layout.appendChild(leftPanel);
+
+    const centerPanel = el('section', 'arcade-vehicle-panel arcade-vehicle-panel-preview');
+    const previewStage = el('div', 'arcade-vehicle-preview-stage');
+    previewStage.id = 'arcade-vehicle-preview-stage';
+    const previewOverlay = el('div', 'arcade-vehicle-preview-overlay');
+    previewOverlay.id = 'arcade-vehicle-preview-overlay';
+    previewStage.appendChild(previewOverlay);
+    centerPanel.appendChild(previewStage);
+    centerPanel.appendChild(el('p', 'menu-hint arcade-vehicle-preview-hint', 'Maus ziehen: drehen | Mausrad: zoom | Slot-Punkte: Upgrade'));
+    layout.appendChild(centerPanel);
+
+    const rightPanel = el('section', 'arcade-vehicle-panel arcade-vehicle-panel-detail');
+    const detailTitle = el('p', 'arcade-vehicle-detail-title');
+    const detailMeta = el('p', 'arcade-vehicle-detail-meta');
+    const detailText = el('p', 'arcade-surface-card-value arcade-vehicle-description');
+    const detailBadges = el('div', 'arcade-vehicle-badges');
+    rightPanel.appendChild(detailTitle);
+    rightPanel.appendChild(detailMeta);
+    rightPanel.appendChild(detailText);
+    rightPanel.appendChild(detailBadges);
+
+    const profileBox = el('div', 'arcade-vehicle-profile');
+    const levelLine = el('p', 'arcade-vehicle-level', 'Level 1 | XP 0/100');
+    const xpBar = el('div', 'arcade-vehicle-xp-bar');
+    const xpFill = el('div', 'arcade-vehicle-xp-fill');
     xpBar.appendChild(xpFill);
-    profileDisplay.appendChild(xpBar);
-    container.appendChild(profileDisplay);
+    profileBox.appendChild(levelLine);
+    profileBox.appendChild(xpBar);
+    rightPanel.appendChild(profileBox);
 
-    // Slot upgrade grid
-    const slotGrid = createElement('div', 'arcade-vehicle-slots');
+    const favoriteBtn = el('button', 'secondary-btn arcade-vehicle-favorite-toggle', 'Als Favorit markieren');
+    favoriteBtn.type = 'button';
+    rightPanel.appendChild(favoriteBtn);
+
+    const comparePanel = el('section', 'arcade-vehicle-compare');
+    comparePanel.appendChild(el('h4', 'arcade-vehicle-subtitle', 'Vergleich'));
+    const compareSelect = document.createElement('select');
+    compareSelect.className = 'arcade-vehicle-compare-select';
+    comparePanel.appendChild(compareSelect);
+    const compareRows = el('div', 'arcade-vehicle-compare-rows');
+    comparePanel.appendChild(compareRows);
+    rightPanel.appendChild(comparePanel);
+
+    const slotGrid = el('div', 'arcade-vehicle-slots');
     const slotRefs = {};
-
     for (let i = 0; i < UPGRADE_SLOT_DISPLAY.length; i += 1) {
         const slot = UPGRADE_SLOT_DISPLAY[i];
-        const row = createElement('div', 'arcade-vehicle-slot-row');
-        const label = createElement('span', 'arcade-vehicle-slot-label', slot.label);
-        const tierLabel = createElement('span', 'arcade-vehicle-slot-tier', 'T1');
-        const upgradeBtn = createElement('button', 'secondary-btn arcade-vehicle-upgrade-btn', 'Upgrade');
-        upgradeBtn.type = 'button';
-        upgradeBtn.dataset.slot = slot.key;
+        const row = el('div', 'arcade-vehicle-slot-row');
+        const label = el('span', 'arcade-vehicle-slot-label', slot.label);
+        const tier = el('span', 'arcade-vehicle-slot-tier', 'T1');
+        const btn = el('button', 'secondary-btn arcade-vehicle-upgrade-btn', 'Upgrade');
+        btn.type = 'button';
+        btn.dataset.slot = slot.key;
         row.appendChild(label);
-        row.appendChild(tierLabel);
-        row.appendChild(upgradeBtn);
+        row.appendChild(tier);
+        row.appendChild(btn);
         slotGrid.appendChild(row);
-        slotRefs[slot.key] = { tierLabel, upgradeBtn };
+        slotRefs[slot.key] = { tier, btn, label: slot.label };
     }
-    container.appendChild(slotGrid);
+    rightPanel.appendChild(slotGrid);
 
-    // Save loadout hint
-    const saveHint = createElement('p', 'menu-hint', t('menu.arcade.vehicle.autosave', 'Upgrades werden automatisch gespeichert.'));
-    container.appendChild(saveHint);
+    const loadoutPanel = el('section', 'arcade-vehicle-loadout');
+    loadoutPanel.appendChild(el('h4', 'arcade-vehicle-subtitle', 'Loadout Presets'));
+    const loadoutControls = el('div', 'arcade-vehicle-loadout-controls');
+    const presetName = document.createElement('input');
+    presetName.type = 'text';
+    presetName.className = 'arcade-vehicle-preset-input';
+    presetName.placeholder = 'Preset-Name';
+    const presetSelect = document.createElement('select');
+    presetSelect.className = 'arcade-vehicle-preset-select';
+    const presetSave = el('button', 'secondary-btn arcade-vehicle-preset-save', 'Speichern');
+    presetSave.type = 'button';
+    const presetLoad = el('button', 'secondary-btn arcade-vehicle-preset-load', 'Laden');
+    presetLoad.type = 'button';
+    const presetDelete = el('button', 'secondary-btn arcade-vehicle-preset-delete', 'Loeschen');
+    presetDelete.type = 'button';
+    loadoutControls.appendChild(presetName);
+    loadoutControls.appendChild(presetSelect);
+    loadoutControls.appendChild(presetSave);
+    loadoutControls.appendChild(presetLoad);
+    loadoutControls.appendChild(presetDelete);
+    loadoutPanel.appendChild(loadoutControls);
+    rightPanel.appendChild(loadoutPanel);
 
-    // ─── State ───
+    rightPanel.appendChild(el('p', 'menu-hint arcade-vehicle-shortcuts', 'Shortcuts: <-/-> Fahrzeug | 1-5 Kategorie | F Favorit'));
+    layout.appendChild(rightPanel);
 
-    let profiles = loadVehicleProfiles(store);
-    let selectedVehicleId = String(settings?.vehicles?.PLAYER_1 || vehicleIds[0] || 'ship1');
-    if (!catalogByVehicleId.has(selectedVehicleId) && vehicleIds.length > 0) {
-        selectedVehicleId = vehicleIds[0];
-    }
+    const preview = createVehicleManagerPreview3d({ mount: previewStage, overlay: previewOverlay });
 
-    function getProfile() {
-        return getOrCreateProfile(profiles, selectedVehicleId);
-    }
+    const profileFor = (vehicleId) => {
+        const id = norm(vehicleId, 'ship5').toLowerCase();
+        const profile = getOrCreateProfile(profiles, id);
+        profiles[id] = profile;
+        return profile;
+    };
+
+    const persistProfiles = () => saveVehicleProfiles(store, profiles);
+
+    const entryFor = (vehicleId) => {
+        const id = norm(vehicleId, 'ship5').toLowerCase();
+        return byVehicleId.get(id) || resolveVehicleManagerCatalogEntry(id);
+    };
+
+    const toast = (message, tone = 'info') => {
+        if (!emit || !eventTypes.SHOW_STATUS_TOAST) return;
+        emit(eventTypes.SHOW_STATUS_TOAST, { message, tone, duration: 1200 });
+    };
+
+    const syncVehicleContract = (vehicleId) => {
+        const id = norm(vehicleId, 'ship5').toLowerCase();
+        settings.vehicles.PLAYER_1 = id;
+        if (!ui.vehicleSelectP1) return id;
+        const options = Array.from(ui.vehicleSelectP1.options || []);
+        if (!options.some((option) => String(option?.value || '') === id)) {
+            return norm(ui.vehicleSelectP1.value, id);
+        }
+        if (ui.vehicleSelectP1.value !== id) ui.vehicleSelectP1.value = id;
+        ui.vehicleSelectP1.dispatchEvent(new Event('change', { bubbles: true }));
+        settings.vehicles.PLAYER_1 = norm(ui.vehicleSelectP1.value, id);
+        return settings.vehicles.PLAYER_1;
+    };
+
+    const selectVehicle = (vehicleId, options) => { selection.setSelectedVehicleId(vehicleId, options); syncVehicleContract(vehicleId); syncDisplay(); };
+    const syncQuickRow = (containerNode, label, ids) => renderVehicleQuickRow({ containerNode, label, ids, resolveLabel: (vehicleId) => entryFor(vehicleId).label, bind, onSelect: selectVehicle });
+    const refreshPresets = (preferredPresetId = '') => {
+        const selectedVehicleId = selection.getSelectedVehicleId();
+        const presets = presetStore.listPresets(selectedVehicleId);
+        refreshVehiclePresetSelect({ presetSelect, presetLoad, presetDelete, presets, preferredPresetId });
+    };
+
+    const upgradeSlot = (slotKey) => {
+        const selectedVehicleId = selection.getSelectedVehicleId();
+        const profile = profileFor(selectedVehicleId);
+        const current = profile.upgrades?.[slotKey] || 'T1';
+        const next = nextTier(current);
+        if (!next) return;
+        const unlocked = new Set(profile.unlockedSlots || []);
+        const tierKey = `${slotKey}_${next.toLowerCase()}`;
+        const unlockedNow = unlocked.has(slotKey) || unlocked.has(tierKey);
+        if (!unlockedNow) return;
+        profiles[selectedVehicleId] = applyUpgrade(profile, slotKey, next);
+        persistProfiles();
+        toast(`${slotKey} -> ${next}`);
+        syncDisplay();
+    };
 
     function syncDisplay() {
-        const profile = getProfile();
-        const catalogEntry = catalogByVehicleId.get(selectedVehicleId)
-            || resolveVehicleManagerCatalogEntry(selectedVehicleId);
-        const xpInfo = xpToNextLevel(profile);
-        vehicleMetaLine.textContent = `${catalogEntry.label} | ${catalogEntry.kategorie} | ${catalogEntry.hitboxKlasse}`;
+        const selectedVehicleId = selection.getSelectedVehicleId();
+        const selectedEntry = entryFor(selectedVehicleId);
+        const profile = profileFor(selectedVehicleId);
+        const xp = xpToNextLevel(profile);
+        const favorites = new Set(selection.getFavorites());
+        const recents = new Set(selection.getRecents());
+        const visible = selection.getVisibleEntries(profiles);
 
-        // Level line
-        levelLine.textContent = `Level ${profile.level} | XP ${xpInfo.current}/${xpInfo.required}`;
-        xpFill.style.width = `${(xpInfo.progress * 100).toFixed(1)}%`;
+        detailTitle.textContent = selectedEntry.label;
+        detailMeta.textContent = `${selectedEntry.kategorie} | ${selectedEntry.hitboxKlasse} | Levelband ${toBand(profile.level)}`;
+        detailText.textContent = selectedEntry.kurzbeschreibung;
+        detailBadges.innerHTML = '';
+        cardBadges(selectedEntry, profile, favorites.has(selectedVehicleId), recents.has(selectedVehicleId)).forEach((badge) => {
+            detailBadges.appendChild(el('span', 'arcade-vehicle-badge', badge));
+        });
 
-        // Ship buttons
-        for (let i = 0; i < shipButtons.length; i += 1) {
-            shipButtons[i].classList.toggle('selected', shipButtons[i].dataset.vehicleId === selectedVehicleId);
+        levelLine.textContent = `Level ${profile.level} | XP ${xp.current}/${xp.required}`;
+        xpFill.style.width = `${(xp.progress * 100).toFixed(1)}%`;
+        favoriteBtn.textContent = favorites.has(selectedVehicleId) ? 'Favorit entfernen' : 'Als Favorit markieren';
+        favoriteBtn.classList.toggle('is-active', favorites.has(selectedVehicleId));
+
+        resultLine.textContent = `${visible.length} Fahrzeuge sichtbar`;
+        onlyFavBtn.classList.toggle('is-active', selection.isFavoritesOnly());
+
+        categoryTabs.querySelectorAll('button').forEach((btn) => {
+            btn.classList.toggle('is-active', String(btn.dataset.category || '') === selection.getCategory());
+        });
+        hitboxChips.querySelectorAll('button').forEach((btn) => {
+            btn.classList.toggle('is-active', String(btn.dataset.filterValue || '') === selection.getHitboxFilter());
+        });
+        levelChips.querySelectorAll('button').forEach((btn) => {
+            btn.classList.toggle('is-active', String(btn.dataset.filterValue || '') === selection.getLevelFilter());
+        });
+
+        vehicleList.innerHTML = '';
+        if (!visible.length) {
+            vehicleList.appendChild(el('p', 'menu-hint', 'Kein Fahrzeug fuer die aktuelle Filterung gefunden.'));
+        }
+        for (let i = 0; i < visible.length; i += 1) {
+            const entry = visible[i];
+            const listProfile = profileFor(entry.vehicleId);
+            const card = el('button', 'arcade-vehicle-card');
+            card.type = 'button';
+            card.dataset.vehicleId = entry.vehicleId;
+            card.dataset.vehicleCategory = entry.kategorie;
+            card.dataset.vehicleHitbox = entry.hitboxKlasse;
+            card.dataset.vehiclePreviewToken = entry.previewToken;
+            card.classList.toggle('selected', entry.vehicleId === selectedVehicleId);
+            card.classList.toggle('is-favorite', favorites.has(entry.vehicleId));
+            card.setAttribute('role', 'option');
+            card.setAttribute('aria-selected', String(entry.vehicleId === selectedVehicleId));
+
+            const header = el('div', 'arcade-vehicle-card-header');
+            header.appendChild(el('span', 'arcade-vehicle-card-title', entry.label));
+            const miniBadges = el('div', 'arcade-vehicle-card-badges');
+            cardBadges(entry, listProfile, favorites.has(entry.vehicleId), recents.has(entry.vehicleId)).forEach((badge) => {
+                miniBadges.appendChild(el('span', 'arcade-vehicle-mini-badge', badge));
+            });
+            header.appendChild(miniBadges);
+            card.appendChild(header);
+            card.appendChild(el('p', 'arcade-vehicle-card-meta', `${entry.kategorie} | ${entry.hitboxKlasse} | Lv ${listProfile.level}`));
+            bind(card, 'click', () => {
+                selectVehicle(entry.vehicleId);
+            });
+            vehicleList.appendChild(card);
         }
 
-        // Slot tiers
-        const unlockedSet = new Set(profile.unlockedSlots || []);
+        syncQuickRow(favRow, 'Favoriten', selection.getFavorites());
+        syncQuickRow(recentRow, 'Zuletzt genutzt', selection.getRecents());
+
+        compareSelect.innerHTML = '';
+        const compareOptions = catalogEntries.filter((entry) => entry.vehicleId !== selectedVehicleId);
+        if (!compareOptions.length) {
+            compareSelect.disabled = true;
+            const option = document.createElement('option');
+            option.value = selectedVehicleId;
+            option.textContent = selectedEntry.label;
+            compareSelect.appendChild(option);
+        } else {
+            compareSelect.disabled = false;
+            compareOptions.forEach((entry) => {
+                const option = document.createElement('option');
+                option.value = entry.vehicleId;
+                option.textContent = entry.label;
+                compareSelect.appendChild(option);
+            });
+            const compareId = selection.getCompareVehicleId();
+            if (!compareOptions.some((entry) => entry.vehicleId === compareId)) {
+                selection.setCompareVehicleId(compareOptions[0].vehicleId);
+            }
+            compareSelect.value = selection.getCompareVehicleId();
+        }
+
+        compareRows.innerHTML = '';
+        const compareEntry = entryFor(selection.getCompareVehicleId());
+        statRows(selectedEntry.statsSummary, compareEntry.statsSummary).forEach((metric) => {
+            const row = el('div', 'arcade-vehicle-compare-row');
+            row.appendChild(el('span', 'arcade-vehicle-compare-label', metric.label));
+            const leftShell = el('div', 'arcade-vehicle-compare-bar-shell');
+            const leftBar = el('div', 'arcade-vehicle-compare-bar arcade-vehicle-compare-bar-left');
+            leftBar.style.width = barWidth(metric.left, metric.max);
+            leftShell.appendChild(leftBar);
+            row.appendChild(leftShell);
+            row.appendChild(el('span', 'arcade-vehicle-compare-value', String(metric.left)));
+            row.appendChild(el('span', 'arcade-vehicle-compare-value', String(metric.right)));
+            const rightShell = el('div', 'arcade-vehicle-compare-bar-shell');
+            const rightBar = el('div', 'arcade-vehicle-compare-bar arcade-vehicle-compare-bar-right');
+            rightBar.style.width = barWidth(metric.right, metric.max);
+            rightShell.appendChild(rightBar);
+            row.appendChild(rightShell);
+            compareRows.appendChild(row);
+        });
+
+        refreshPresets(presetSelect.value);
+
+        const overlayStates = [];
+        const unlocked = new Set(profile.unlockedSlots || []);
         for (let i = 0; i < UPGRADE_SLOT_DISPLAY.length; i += 1) {
             const slot = UPGRADE_SLOT_DISPLAY[i];
             const ref = slotRefs[slot.key];
-            if (!ref) continue;
-
-            const currentTier = profile.upgrades?.[slot.key] || 'T1';
-            const nextTier = getNextTier(currentTier);
-            ref.tierLabel.textContent = currentTier;
-
-            if (!nextTier) {
-                ref.upgradeBtn.textContent = 'MAX';
-                ref.upgradeBtn.disabled = true;
-            } else {
-                const cost = getUpgradeCost(slot.key, nextTier);
-                const canDo = canUpgrade(slot.key, nextTier, profile.level);
-                const tierKey = `${slot.key}_${nextTier.toLowerCase()}`;
-                const slotUnlocked = unlockedSet.has(slot.key) || unlockedSet.has(tierKey);
-                ref.upgradeBtn.textContent = `→ ${nextTier} (${cost} XP)`;
-                ref.upgradeBtn.disabled = !canDo || !slotUnlocked;
+            const current = profile.upgrades?.[slot.key] || 'T1';
+            const next = nextTier(current);
+            ref.tier.textContent = current;
+            if (!next) {
+                ref.btn.textContent = 'MAX';
+                ref.btn.disabled = true;
+                overlayStates.push({ slotKey: slot.key, badge: 'MAX', disabled: true, label: ref.label, tooltip: `${ref.label} maxed` });
+                continue;
             }
+            const tierKey = `${slot.key}_${next.toLowerCase()}`;
+            const unlockedNow = unlocked.has(slot.key) || unlocked.has(tierKey);
+            const allowed = unlockedNow;
+            const cost = getUpgradeCost(slot.key, next);
+            ref.btn.textContent = `${next} (${cost} XP)`;
+            ref.btn.disabled = !allowed;
+            overlayStates.push({
+                slotKey: slot.key,
+                badge: current,
+                disabled: !allowed,
+                label: ref.label,
+                tooltip: unlockedNow ? `${ref.label} -> ${next} (${cost} XP)` : `${ref.label} noch nicht freigeschaltet`,
+            });
         }
+
+        preview.setVehicle(selectedVehicleId, playerColor(settings));
+        preview.setSlotStates(overlayStates, (slotKey) => upgradeSlot(slotKey));
+        container.dataset.previewStatus = preview.getStatus();
     }
 
-    // ─── Events ───
-
-    for (let i = 0; i < shipButtons.length; i += 1) {
-        bind(shipButtons[i], 'click', () => {
-            selectedVehicleId = shipButtons[i].dataset.vehicleId;
+    rules.categories.forEach((category) => {
+        const button = el('button', 'arcade-vehicle-tab', category.label);
+        button.type = 'button';
+        button.dataset.category = category.id;
+        bind(button, 'click', () => {
+            selection.setCategory(category.id);
             syncDisplay();
         });
-    }
+        categoryTabs.appendChild(button);
+    });
 
-    for (let i = 0; i < UPGRADE_SLOT_DISPLAY.length; i += 1) {
-        const slot = UPGRADE_SLOT_DISPLAY[i];
-        const ref = slotRefs[slot.key];
-        if (!ref) continue;
+    ['all', ...rules.filterChips.hitboxKlasse].forEach((value) => {
+        const button = el('button', 'arcade-vehicle-chip', HITBOX_LABELS[value] || value);
+        button.type = 'button';
+        button.dataset.filterValue = value;
+        bind(button, 'click', () => {
+            selection.setHitboxFilter(value);
+            syncDisplay();
+        });
+        hitboxChips.appendChild(button);
+    });
 
-        bind(ref.upgradeBtn, 'click', () => {
-            const profile = getProfile();
-            const currentTier = profile.upgrades?.[slot.key] || 'T1';
-            const nextTier = getNextTier(currentTier);
-            if (!nextTier) return;
+    ['all', ...rules.filterChips.levelBand].forEach((value) => {
+        const button = el('button', 'arcade-vehicle-chip', LEVEL_LABELS[value] || value);
+        button.type = 'button';
+        button.dataset.filterValue = value;
+        bind(button, 'click', () => {
+            selection.setLevelFilter(value);
+            syncDisplay();
+        });
+        levelChips.appendChild(button);
+    });
 
-            const updated = applyUpgrade(profile, slot.key, nextTier);
-            profiles[selectedVehicleId] = updated;
-            saveVehicleProfiles(store, profiles);
+    bind(search, 'input', () => {
+        selection.setSearchTerm(search.value);
+        syncDisplay();
+    });
 
-            if (emit && eventTypes.SHOW_STATUS_TOAST) {
-                emit(eventTypes.SHOW_STATUS_TOAST, {
-                    message: `${slot.label} upgraded to ${nextTier}`,
-                    tone: 'info',
-                    duration: 1200,
-                });
+    bind(onlyFavBtn, 'click', () => {
+        selection.setFavoritesOnly(!selection.isFavoritesOnly());
+        syncDisplay();
+    });
+
+    bind(favoriteBtn, 'click', () => {
+        selection.toggleFavorite(selection.getSelectedVehicleId());
+        syncDisplay();
+    });
+
+    bind(compareSelect, 'change', () => {
+        selection.setCompareVehicleId(compareSelect.value);
+        syncDisplay();
+    });
+
+    UPGRADE_SLOT_DISPLAY.forEach((slot) => {
+        bind(slotRefs[slot.key].btn, 'click', () => upgradeSlot(slot.key));
+    });
+
+    bind(presetSave, 'click', () => {
+        const selectedVehicleId = selection.getSelectedVehicleId();
+        const profile = profileFor(selectedVehicleId);
+        const defaultName = `${entryFor(selectedVehicleId).label} Setup`;
+        const saved = presetStore.savePreset(selectedVehicleId, norm(presetName.value, defaultName), profile.upgrades || {});
+        presetName.value = '';
+        refreshPresets(saved.presetId);
+        toast(`Preset gespeichert: ${saved.name}`);
+    });
+
+    bind(presetLoad, 'click', () => {
+        const selectedVehicleId = selection.getSelectedVehicleId();
+        const preset = presetStore.loadPreset(selectedVehicleId, presetSelect.value);
+        if (!preset) return;
+        const profile = profileFor(selectedVehicleId);
+        profiles[selectedVehicleId] = {
+            ...profile,
+            upgrades: { ...(preset.upgrades || {}) },
+            updatedAt: new Date().toISOString(),
+        };
+        persistProfiles();
+        toast(`Preset geladen: ${preset.name}`);
+        syncDisplay();
+    });
+
+    bind(presetDelete, 'click', () => {
+        const selectedVehicleId = selection.getSelectedVehicleId();
+        if (!presetStore.deletePreset(selectedVehicleId, presetSelect.value)) return;
+        refreshPresets('');
+        toast('Preset geloescht', 'warning');
+        syncDisplay();
+    });
+
+    bind(vehicleList, 'wheel', (event) => {
+        if (!event || typeof event.deltaY !== 'number') return;
+        if (Math.abs(event.deltaY) < 3) return;
+        event.preventDefault();
+        const step = event.deltaY > 0 ? 1 : -1;
+        const nextId = selection.getNextVisibleVehicleId(step, profiles);
+        selectVehicle(nextId);
+    }, { passive: false });
+
+    bind(container, 'keydown', (event) => {
+        if (!event) return;
+        const key = String(event.key || '');
+        if (key === 'ArrowRight' || key === 'ArrowLeft') {
+            event.preventDefault();
+            const nextId = selection.getNextVisibleVehicleId(key === 'ArrowRight' ? 1 : -1, profiles);
+            selectVehicle(nextId);
+            return;
+        }
+        if (key === 'ArrowUp' || key === 'ArrowDown') {
+            event.preventDefault();
+            selection.cycleCategory(key === 'ArrowDown' ? 1 : -1);
+            const visible = selection.getVisibleEntries(profiles);
+            if (visible.length && !visible.some((entry) => entry.vehicleId === selection.getSelectedVehicleId())) {
+                selection.setSelectedVehicleId(visible[0].vehicleId, { skipRecent: true });
             }
+            syncDisplay();
+            return;
+        }
+        if (key.toLowerCase() === 'f') {
+            event.preventDefault();
+            selection.toggleFavorite(selection.getSelectedVehicleId());
+            syncDisplay();
+            return;
+        }
+        if (/^[1-5]$/.test(key)) {
+            const idx = Number.parseInt(key, 10) - 1;
+            const category = rules.categories[idx];
+            if (!category) return;
+            selection.setCategory(category.id);
+            syncDisplay();
+        }
+    });
 
+    if (ui.vehicleSelectP1) {
+        bind(ui.vehicleSelectP1, 'change', () => {
+            const nextId = norm(ui.vehicleSelectP1.value).toLowerCase();
+            if (!nextId || nextId === selection.getSelectedVehicleId()) return;
+            selection.setSelectedVehicleId(nextId, { skipRecent: true });
             syncDisplay();
         });
     }
 
+    syncVehicleContract(selection.getSelectedVehicleId());
     syncDisplay();
 
-    return { container, syncDisplay, getSelectedVehicleId: () => selectedVehicleId };
+    return {
+        container,
+        syncDisplay,
+        getSelectedVehicleId: () => selection.getSelectedVehicleId(),
+        dispose: () => preview.dispose(),
+    };
 }

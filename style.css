@@ -3356,6 +3356,340 @@ input[type="range"]::-webkit-slider-thumb {
     margin-top: 0;
 }
 
+.arcade-vehicle-manager {
+    gap: 12px;
+}
+
+.arcade-vehicle-layout {
+    display: grid;
+    grid-template-columns: minmax(240px, 1.2fr) minmax(220px, 1fr) minmax(260px, 1.2fr);
+    gap: 10px;
+}
+
+.arcade-vehicle-panel {
+    display: grid;
+    gap: 8px;
+    border-radius: 10px;
+    padding: 8px;
+    border: 1px solid rgba(255, 199, 112, 0.24);
+    background: rgba(12, 10, 8, 0.34);
+    min-height: 0;
+}
+
+.arcade-vehicle-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px;
+}
+
+.arcade-vehicle-search {
+    width: 100%;
+    min-height: 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 199, 112, 0.28);
+    background: rgba(16, 14, 11, 0.72);
+    color: #ffe4bc;
+    padding: 6px 10px;
+}
+
+.arcade-vehicle-favorites-only,
+.arcade-vehicle-chip,
+.arcade-vehicle-tab {
+    min-height: 30px;
+}
+
+.arcade-vehicle-favorites-only.is-active,
+.arcade-vehicle-chip.is-active,
+.arcade-vehicle-tab.is-active {
+    border-color: rgba(255, 223, 156, 0.64);
+    box-shadow: inset 0 0 0 1px rgba(255, 223, 156, 0.34);
+    background: rgba(255, 196, 108, 0.16);
+}
+
+.arcade-vehicle-category-tabs,
+.arcade-vehicle-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.arcade-vehicle-quick-rows {
+    display: grid;
+    gap: 4px;
+}
+
+.arcade-vehicle-quick-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+
+.arcade-vehicle-quick-row-label {
+    font-size: 0.66rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #cab08a;
+}
+
+.arcade-vehicle-results-line {
+    margin: 0;
+}
+
+.arcade-vehicle-list {
+    display: grid;
+    gap: 6px;
+    max-height: 340px;
+    overflow: auto;
+    padding-right: 2px;
+}
+
+.arcade-vehicle-card {
+    width: 100%;
+    display: grid;
+    gap: 4px;
+    text-align: left;
+    padding: 8px;
+    border-radius: 9px;
+    border: 1px solid rgba(255, 199, 112, 0.22);
+    background: rgba(17, 14, 10, 0.68);
+    color: #ffe6c0;
+}
+
+.arcade-vehicle-card.selected {
+    border-color: rgba(255, 223, 156, 0.68);
+    box-shadow: 0 0 0 1px rgba(255, 223, 156, 0.34), 0 6px 14px rgba(0, 0, 0, 0.34);
+}
+
+.arcade-vehicle-card.is-favorite {
+    background: linear-gradient(180deg, rgba(46, 32, 16, 0.84), rgba(23, 18, 12, 0.74));
+}
+
+.arcade-vehicle-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.arcade-vehicle-card-title {
+    font-weight: 700;
+    font-size: 0.82rem;
+}
+
+.arcade-vehicle-card-badges,
+.arcade-vehicle-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.arcade-vehicle-mini-badge,
+.arcade-vehicle-badge {
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 206, 126, 0.4);
+    background: rgba(255, 196, 108, 0.13);
+    padding: 2px 6px;
+}
+
+.arcade-vehicle-card-meta {
+    margin: 0;
+    font-size: 0.72rem;
+    color: #d2bb95;
+}
+
+.arcade-vehicle-preview-stage {
+    position: relative;
+    min-height: 320px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 199, 112, 0.24);
+    background: radial-gradient(circle at 50% 25%, rgba(59, 82, 126, 0.24), rgba(8, 11, 20, 0.9));
+    overflow: hidden;
+}
+
+.arcade-vehicle-preview-canvas,
+.arcade-vehicle-preview-canvas-node {
+    width: 100%;
+    height: 100%;
+    min-height: 320px;
+    display: block;
+}
+
+.arcade-vehicle-preview-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.arcade-vehicle-slot-dot {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 229, 190, 0.7);
+    background: rgba(26, 35, 58, 0.86);
+    color: #ffeac7;
+    font-size: 0.63rem;
+    font-weight: 700;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+.arcade-vehicle-slot-dot.is-disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.arcade-vehicle-slot-dot.hidden {
+    display: none;
+}
+
+.arcade-vehicle-preview-status {
+    margin: 0;
+}
+
+.arcade-vehicle-preview-hint,
+.arcade-vehicle-shortcuts {
+    margin: 0;
+}
+
+.arcade-vehicle-detail-title {
+    margin: 0;
+    font-family: var(--menu-theme-heading-font);
+    font-size: 1rem;
+    color: #ffe6bd;
+}
+
+.arcade-vehicle-detail-meta {
+    margin: 0;
+    font-size: 0.74rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #d5bc94;
+}
+
+.arcade-vehicle-description {
+    margin: 0;
+}
+
+.arcade-vehicle-level {
+    margin: 0;
+}
+
+.arcade-vehicle-xp-bar {
+    height: 8px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 199, 112, 0.34);
+    background: rgba(0, 0, 0, 0.28);
+    overflow: hidden;
+}
+
+.arcade-vehicle-xp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f2ad43, #ffe3aa);
+}
+
+.arcade-vehicle-favorite-toggle.is-active {
+    border-color: rgba(255, 223, 156, 0.62);
+    background: rgba(255, 196, 108, 0.2);
+}
+
+.arcade-vehicle-subtitle {
+    margin: 0;
+    font-size: 0.73rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #d0b68e;
+}
+
+.arcade-vehicle-compare {
+    display: grid;
+    gap: 6px;
+}
+
+.arcade-vehicle-compare-select {
+    width: 100%;
+    min-height: 32px;
+    border-radius: 8px;
+}
+
+.arcade-vehicle-compare-rows {
+    display: grid;
+    gap: 6px;
+}
+
+.arcade-vehicle-compare-row {
+    display: grid;
+    grid-template-columns: 62px 1fr 24px 24px 1fr;
+    align-items: center;
+    gap: 5px;
+}
+
+.arcade-vehicle-compare-label,
+.arcade-vehicle-compare-value {
+    font-size: 0.67rem;
+    color: #dbc6a5;
+}
+
+.arcade-vehicle-compare-bar-shell {
+    width: 100%;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+}
+
+.arcade-vehicle-compare-bar {
+    height: 100%;
+}
+
+.arcade-vehicle-compare-bar-left {
+    background: linear-gradient(90deg, #58b5ff, #8ad7ff);
+}
+
+.arcade-vehicle-compare-bar-right {
+    background: linear-gradient(90deg, #ff8f59, #ffd3a1);
+}
+
+.arcade-vehicle-slots {
+    display: grid;
+    gap: 5px;
+}
+
+.arcade-vehicle-slot-row {
+    display: grid;
+    grid-template-columns: minmax(68px, 1fr) 40px auto;
+    align-items: center;
+    gap: 6px;
+}
+
+.arcade-vehicle-slot-label,
+.arcade-vehicle-slot-tier {
+    font-size: 0.72rem;
+    color: #e6d0ad;
+}
+
+.arcade-vehicle-loadout-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto auto;
+    gap: 6px;
+}
+
+.arcade-vehicle-preset-input,
+.arcade-vehicle-preset-select {
+    min-height: 32px;
+    border-radius: 8px;
+}
+
+.arcade-vehicle-shortcuts {
+    margin-top: 2px;
+}
+
 #main-menu[data-menu-local-theme="hell"] .arcade-inline-surface {
     background: linear-gradient(165deg, rgba(255, 245, 225, 0.94), rgba(248, 236, 210, 0.9));
     border-color: rgba(194, 136, 42, 0.34);
@@ -3379,6 +3713,35 @@ input[type="range"]::-webkit-slider-thumb {
     color: #8f6a3d;
 }
 
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-panel {
+    background: rgba(255, 246, 224, 0.65);
+}
+
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-card {
+    background: rgba(255, 248, 233, 0.92);
+    color: #5f4420;
+}
+
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-card-meta,
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-detail-meta,
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-slot-label,
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-slot-tier {
+    color: #7a5a2f;
+}
+
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-detail-title {
+    color: #6c4814;
+}
+
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-search {
+    background: rgba(255, 253, 246, 0.9);
+    color: #5a4020;
+}
+
+#main-menu[data-menu-local-theme="hell"] .arcade-vehicle-preview-stage {
+    background: radial-gradient(circle at 50% 25%, rgba(236, 226, 197, 0.95), rgba(231, 216, 181, 0.9));
+}
+
 @media (max-width: 560px) {
     .arcade-surface-grid {
         grid-template-columns: 1fr;
@@ -3387,5 +3750,39 @@ input[type="range"]::-webkit-slider-thumb {
     .arcade-surface-cta .start-btn {
         width: 100%;
         min-width: 0;
+    }
+}
+
+@media (max-width: 1000px) {
+    .arcade-vehicle-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .arcade-vehicle-panel-preview {
+        order: 1;
+    }
+
+    .arcade-vehicle-panel-list {
+        order: 2;
+    }
+
+    .arcade-vehicle-panel-detail {
+        order: 3;
+    }
+}
+
+@media (max-width: 700px) {
+    .arcade-vehicle-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .arcade-vehicle-loadout-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .arcade-vehicle-preview-stage,
+    .arcade-vehicle-preview-canvas,
+    .arcade-vehicle-preview-canvas-node {
+        min-height: 240px;
     }
 }

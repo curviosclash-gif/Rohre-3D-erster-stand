@@ -38,6 +38,9 @@ const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
 const MENU_DRAFTS_STORAGE_KEY = 'cuviosclash.menu-drafts.v1';
 const MENU_PRESETS_STORAGE_KEY = 'cuviosclash.menu-presets.v1';
 const CUSTOM_MAP_STORAGE_KEY = 'custom_map_test';
+const ARCADE_VEHICLE_PROFILE_STORAGE_KEY = 'cuviosclash.arcade-vehicle-profile.v1';
+const ARCADE_VEHICLE_LOADOUT_STORAGE_KEY = 'cuviosclash.arcade-vehicle-loadouts.v1';
+const ARCADE_LAST_RUN_STORAGE_KEY = 'cuviosclash.arcade.last_run.v1';
 const GENERATED_LOCAL_MAPS_MODULE_PATH = path.resolve(process.cwd(), EDITOR_DATA_PATHS.GENERATED_LOCAL_MAPS_MODULE);
 const EDITOR_MAP_DIR = path.resolve(process.cwd(), EDITOR_DATA_PATHS.MAPS_DIR);
 const EDITOR_JSON_SUFFIX = '.editor.json';
@@ -2331,6 +2334,170 @@ test.describe('T1-20: Core & Infrastruktur', () => {
 
         expect(matchState.mapKey).toBe('maze');
         expect(matchState.humanVehicleId).toBe('aircraft');
+    });
+
+    test('T66a: Vehicle-Manager deckt Filter, 3D-Preview, Upgrade-Overlay und Presets ab', async ({ page }) => {
+        await loadGame(page);
+        const vehicleIds = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('#vehicle-select-p1 option'))
+                .map((option) => String(option?.value || '').trim())
+                .filter(Boolean);
+        });
+        await page.evaluate(({ profileKey, loadoutKey, vehicleIdList }) => {
+            const nowIso = new Date().toISOString();
+            const unlockedSlots = [
+                'core',
+                'nose',
+                'wing_left',
+                'wing_right',
+                'engine_left',
+                'engine_right',
+                'utility',
+                'wing_left_t2',
+                'wing_right_t2',
+                'engine_left_t2',
+                'engine_right_t2',
+                'core_t2',
+                'nose_t2',
+                'utility_t2',
+                'core_t3',
+                'nose_t3',
+            ];
+            const profiles = {};
+            vehicleIdList.forEach((vehicleId) => {
+                profiles[vehicleId] = {
+                    schemaVersion: 'arcade-vehicle-profile.v1',
+                    vehicleId,
+                    xp: 999999,
+                    level: 30,
+                    unlockedSlots: [...unlockedSlots],
+                    upgrades: {},
+                    createdAt: nowIso,
+                    updatedAt: nowIso,
+                };
+            });
+            localStorage.setItem(profileKey, JSON.stringify(profiles));
+            localStorage.removeItem(loadoutKey);
+        }, {
+            profileKey: ARCADE_VEHICLE_PROFILE_STORAGE_KEY,
+            loadoutKey: ARCADE_VEHICLE_LOADOUT_STORAGE_KEY,
+            vehicleIdList: vehicleIds,
+        });
+
+        await page.reload();
+        await loadGameWithRetry(page);
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForSelector('#arcade-vehicle-manager', { timeout: 5000 });
+
+        const allCount = await page.locator('#arcade-vehicle-manager .arcade-vehicle-card').count();
+        expect(allCount).toBeGreaterThan(3);
+
+        await page.evaluate(() => {
+            document.querySelector('#arcade-vehicle-manager [data-category=\"jaeger\"]')?.dispatchEvent(
+                new MouseEvent('click', { bubbles: true })
+            );
+        });
+        const activeCategory = await page.evaluate(() => {
+            return String(document.querySelector('#arcade-vehicle-manager .arcade-vehicle-tab.is-active')?.getAttribute('data-category') || '');
+        });
+        expect(activeCategory).toBe('jaeger');
+        const jaegerState = await page.evaluate(() => {
+            const cards = Array.from(document.querySelectorAll('#arcade-vehicle-manager .arcade-vehicle-card'));
+            return {
+                count: cards.length,
+                categories: [...new Set(cards.map((card) => String(card.getAttribute('data-vehicle-category') || '')))],
+            };
+        });
+        expect(jaegerState.count).toBeGreaterThan(0);
+        expect(jaegerState.categories).toEqual(['jaeger']);
+
+        await page.fill('#arcade-vehicle-manager .arcade-vehicle-search', 'drone');
+        const droneCount = await page.locator('#arcade-vehicle-manager .arcade-vehicle-card').count();
+        expect(droneCount).toBeGreaterThanOrEqual(1);
+        await page.locator('#arcade-vehicle-manager .arcade-vehicle-card').first().click({ force: true });
+
+        const previewState = await page.evaluate(() => ({
+            status: String(document.getElementById('arcade-vehicle-manager')?.dataset?.previewStatus || ''),
+            hasCanvas: !!document.querySelector('#arcade-vehicle-manager .arcade-vehicle-preview-canvas-node'),
+            hasOverlayDots: document.querySelectorAll('#arcade-vehicle-manager .arcade-vehicle-slot-dot').length,
+        }));
+        expect(previewState.status).toBe('ready');
+        expect(previewState.hasCanvas).toBeTruthy();
+        expect(previewState.hasOverlayDots).toBeGreaterThanOrEqual(3);
+
+        const tiersBefore = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('#arcade-vehicle-manager .arcade-vehicle-slot-tier'))
+                .map((node) => String(node.textContent || ''));
+        });
+        const clickedOverlay = await page.evaluate(() => {
+            const button = document.querySelector('#arcade-vehicle-manager .arcade-vehicle-slot-dot:not(.is-disabled):not(.hidden)');
+            if (!button) return false;
+            button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            return true;
+        });
+        if (!clickedOverlay) {
+            await page.locator('#arcade-vehicle-manager .arcade-vehicle-upgrade-btn:not([disabled])').first().click({ force: true });
+        }
+        await page.waitForTimeout(120);
+        const tiersAfter = await page.evaluate(() => {
+            return Array.from(document.querySelectorAll('#arcade-vehicle-manager .arcade-vehicle-slot-tier'))
+                .map((node) => String(node.textContent || ''));
+        });
+        expect(tiersAfter.join('|')).not.toBe(tiersBefore.join('|'));
+
+        await page.fill('#arcade-vehicle-manager .arcade-vehicle-preset-input', 'QA Slot Preset');
+        await page.locator('#arcade-vehicle-manager .arcade-vehicle-preset-save').click({ force: true });
+        const presetCount = await page.locator('#arcade-vehicle-manager .arcade-vehicle-preset-select option').count();
+        expect(presetCount).toBeGreaterThan(0);
+
+        await page.screenshot({ path: 'test-results/v66-vehicle-manager-panel.png', fullPage: true });
+        await returnToMenu(page);
+    });
+
+    test('T66b: Vehicle-Selection bleibt zwischen Arcade-Manager, Settings, Snapshot und Spawn konsistent', async ({ page }) => {
+        await loadGame(page);
+        await page.evaluate((lastRunKey) => localStorage.removeItem(lastRunKey), ARCADE_LAST_RUN_STORAGE_KEY);
+
+        await openCustomSubmenu(page);
+        await page.click('#submenu-custom:not(.hidden) [data-mode-path="arcade"]');
+        await page.waitForSelector('#arcade-vehicle-manager', { timeout: 5000 });
+
+        const selectedVehicleId = await page.evaluate(() => {
+            const cards = Array.from(document.querySelectorAll('#arcade-vehicle-manager .arcade-vehicle-card'));
+            const preferred = cards.find((node) => node.getAttribute('data-vehicle-id') === 'drone')
+                || cards.find((node) => node.getAttribute('data-vehicle-id') === 'aircraft')
+                || cards[0];
+            if (!preferred) return '';
+            preferred.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+            return String(preferred.getAttribute('data-vehicle-id') || '');
+        });
+        expect(selectedVehicleId).not.toBe('');
+        await expect(page.locator('#vehicle-select-p1')).toHaveValue(selectedVehicleId);
+
+        await page.evaluate(() => {
+            document.getElementById('btn-arcade-start-inline')?.click();
+        });
+        await page.waitForFunction(() => {
+            const game = window.GAME_INSTANCE;
+            return game?.state === 'PLAYING' && (game?.entityManager?.humanPlayers?.length || 0) > 0;
+        }, null, { timeout: 60000 });
+
+        const runtimeState = await page.evaluate((lastRunKey) => {
+            const game = window.GAME_INSTANCE;
+            const snapshot = JSON.parse(localStorage.getItem(lastRunKey) || '{}');
+            return {
+                selectedVehicleId: String(document.getElementById('vehicle-select-p1')?.value || ''),
+                settingsVehicleId: String(game?.settings?.vehicles?.PLAYER_1 || ''),
+                snapshotVehicleId: String(snapshot?.vehicleId || ''),
+                humanVehicleId: String(game?.entityManager?.humanPlayers?.[0]?.vehicleId || ''),
+            };
+        }, ARCADE_LAST_RUN_STORAGE_KEY);
+
+        expect(runtimeState.settingsVehicleId).toBe(runtimeState.selectedVehicleId);
+        expect(runtimeState.snapshotVehicleId).toBe(runtimeState.selectedVehicleId);
+        expect(runtimeState.humanVehicleId).toBe(runtimeState.selectedVehicleId);
+        await returnToMenu(page);
     });
 
     test('T20kc: Round-End-Overlay zeigt vertiefte Round- und Match-Stats an', async ({ page }) => {
