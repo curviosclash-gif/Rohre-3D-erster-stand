@@ -1,6 +1,6 @@
 ﻿# Umsetzungsplan (Aktiver Master)
 
-Stand: 2026-03-30 (V60, V61, V65, V66, V67, V68 und V70 abgeschlossen; V69 Balance-Plan fuer Item/Raketen/Schild/MG aktiv)
+Stand: 2026-03-30 (V60, V61, V65, V66, V67, V68, V69 und V70 abgeschlossen; V64 bleibt offen)
 
 Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit.
 Inaktive/zurueckgestellte Eintraege: `docs/prozess/Backlog.md`.
@@ -80,7 +80,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | `src/network/LANSessionAdapter.js`, `src/network/OnlineSessionAdapter.js`, `src/network/PeerConnectionManager.js`, `src/network/DataChannelManager.js`, `src/network/StateReconciler.js`, `src/network/LatencyMonitor.js`, `server/lan-signaling.js`, `tests/network-adapter.spec.js` | V67 | abgeschlossen | abgeschlossen 2026-03-29; ICE-Fix, Retry/Backoff, Reconciler-Erweiterung, Ghost-Cleanup und erweiterte Netzwerk-Tests umgesetzt |
 | `src/core/arcade/ArcadeRunRuntime.js`, `src/ui/arcade/ArcadeMissionHUD.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/modes/ArcadeModeStrategy.js`, `src/state/arcade/ArcadeScoreOps.js`, `src/state/arcade/ArcadeRunState.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/MatchFlowUiController.js`, `src/core/GameRuntimeFacade.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/shared/contracts/ArcadeRewardContract.js`, `src/ui/menu/MenuTextCatalog.js`, `style.css`, `tests/core.spec.js` | V68 | abgeschlossen | abgeschlossen 2026-03-29; 68.1-68.4 inkl. Intermission-/Post-Run-Loop und Replay-Fallback abgeschlossen |
 | `src/ui/arcade/ArcadeVehicleManager.js`, `src/ui/arcade/ArcadeMenuSurface.js`, `src/ui/arcade/VehicleManagerCatalog.js`, `src/ui/arcade/vehicle-manager/**`, `src/ui/menu/MenuPreviewCatalog.js`, `src/entities/vehicle-registry.js`, `style.css`, `tests/core.spec.js` | V66 | abgeschlossen | abgeschlossen 2026-03-30; 66.1-66.5 + 66.99 inkl. 3D-Preview, Filter/Loadout, Drift-Regression und Gate-Verifikation |
-| `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | aktiv | 69.1 und 69.2 abgeschlossen (Telemetrie + MG-Tuning), 69.3 als naechste Phase |
+| `src/hunt/**`, `src/entities/systems/HuntCombatSystem.js`, `src/entities/systems/projectile/**`, `src/entities/Powerup.js`, `src/modes/HuntModeStrategy.js`, `src/state/recorder/RoundMetricsStore.js`, `src/ui/MatchFlowUiController.js`, `src/ui/menu/MenuDefaultsEditorConfig.js`, `src/ui/menu/MenuGameplayBindings.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/core.spec.js` | V69 | abgeschlossen | 69.1-69.6 + 69.99 abgeschlossen (2026-03-30) |
 | `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/RuntimeSettingsChangeOrchestrator.js`, `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuCompatibilityRules.js`, `src/core/settings/SettingsSanitizerOps.js`, `src/ui/SettingsStore.js`, `src/ui/menu/MenuDraftStore.js`, `tests/core.spec.js` | V70 | abgeschlossen | abgeschlossen 2026-03-29; Settings-/Preset-Drift-Fix inkl. Migration-/Autosave-Haertung und T70-Regressionstests |
 | `docs/**`, `tests/**`, `scripts/validate-umsetzungsplan.mjs` | Shared | shared | Append-only oder eigener Abschnitt |
 
@@ -99,7 +99,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V66 | 2026-03-30 | closed | abgeschlossen 2026-03-30 (66.1-66.5 + 66.99 inkl. test:core/test:stress/build/docs-gates) |
 | Bot-Codex | V67 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (67.1-67.4 + 67.99 inkl. test:core/build/network-suite) |
 | Bot-Codex | V68 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (68.1-68.4 + 68.99 inkl. test:core/test:stress/build/docs-gates) |
-| Bot-Codex | V69 | 2026-03-30 | in-bearbeitung | 69.3 Rocket-Tiers und Spawn-Oekonomie |
+| Bot-Codex | V69 | 2026-03-30 | closed | abgeschlossen 2026-03-30 (69.1-69.6 + 69.99 inkl. test/core+hunt+policy/build/docs-gates) |
 | Bot-Codex | V70 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
@@ -118,9 +118,9 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 
 ---
 
-## Parallelisierungs-Empfehlung (Stand: 2026-03-29, aktualisiert)
+## Parallelisierungs-Empfehlung (Stand: 2026-03-30, aktualisiert)
 
-V60, V61, V66, V67, V68 und V70 sind abgeschlossen. Aktive Planung liegt auf V69.
+V60, V61, V66, V67, V68, V69 und V70 sind abgeschlossen. Aktive Planung startet nach V64-Scope-Definition.
 
 | Spur | Bloecke | Hinweis |
 | --- | --- | --- |
@@ -128,10 +128,10 @@ V60, V61, V66, V67, V68 und V70 sind abgeschlossen. Aktive Planung liegt auf V69
 | B | **V67** | abgeschlossen 2026-03-29 (inkl. 67.4.5 Characterization) |
 | C | **V68** | abgeschlossen 2026-03-29 (Intermission-/Post-Run-/Replay-Follow-up umgesetzt) |
 | D | **V64** | Desktop/Electron, komplett isoliert; Scope noch undefiniert |
-| E | **V69** | Item-/Rocket-/Shield-/MG-Balance fuer Fight/Hunt (Telemetry + Tuning) |
+| E | **V69** | abgeschlossen 2026-03-30 (Telemetry + Tuning + Integrations-Gate) |
 | F | **V70** | abgeschlossen 2026-03-29 (Drift-Fix, Migration-/Autosave-Haertung, T70-Testabdeckung) |
 
-Empfehlung: Fokus auf Spur E; Spur D nach Scope-Definition.
+Empfehlung: Fokus auf Spur D (V64-Scope) und anschliessende P2-Triage.
 
 ---
 
@@ -151,7 +151,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/bot-training/Bot_Trainingsplan.md` g
 | V66 | Vehicle-Manager UX - 3D-Vorschau, Kategorien und Upgrade-Visualisierung | `docs/plaene/alt/Feature_Vehicle_Manager_V66.md` | hoch | mittel | P2 | abgeschlossen (66.1-66.5 + 66.99; Drei-Zonen-Manager, 3D-Preview, Drift-Regression und Docs-Gates verifiziert) | Abgeschlossen |
 | V67 | Multiplayer-Netzwerk-Haertung: ICE, Retry, Reconciler | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (`67.99.2` inkl. Characterization 67.4.5 und Netzwerk-Haertung) | Abgeschlossen |
 | V68 | Arcade UX/Intermission/Replay Follow-up | `docs/Umsetzungsplan.md` | hoch | mittel | P2 | abgeschlossen (68.1-68.4 + 68.99; HUD/Intermission/Post-Run/Replay-Fallback verifiziert) | Abgeschlossen |
-| V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | 69.1-69.2 abgeschlossen; naechster Fokus 69.3 Rocket-Tiers/Spawn-Oekonomie | In Arbeit |
+| V69 | Fight/Hunt Combat-Balance: Item, Raketen, Schild, MG | `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md` | hoch | mittel | P2 | abgeschlossen (69.1-69.6 + 69.99 inkl. Gates) | Abgeschlossen |
 | V70 | Settings-/Preset-Stabilisierung gegen unbeabsichtigte Voreinstellungs-Aenderungen | `docs/Umsetzungsplan.md` | hoch | mittel | P1 | abgeschlossen (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) | Abgeschlossen |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) sowie abgeschlossene Bloecke (V53-V57, V59, V63, V65, V67) sind in `docs/prozess/Backlog.md` bzw. `docs/archive/plans/completed/` dokumentiert.
@@ -928,7 +928,7 @@ Scope:
 
 Plan-Datei: `docs/plaene/alt/Feature_Item_Raketen_Schild_MG_Balance_V69.md`
 
-<!-- LOCK: Bot-Codex seit 2026-03-30 -->
+<!-- LOCK: frei -->
 <!-- DEPENDS-ON: V63.99 -->
 
 Scope:
@@ -939,11 +939,11 @@ Scope:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Phasen 69.1 bis 69.6 und 69.99 sind abgeschlossen.
-- [ ] DoD.2 Telemetrie differenziert Item-Nutzung und Combat-Impact mindestens nach `mode`, `itemType`, `hpDamage`, `shieldAbsorb`.
-- [ ] DoD.3 MG-, Rocket- und Shield-Tuning ist per Tests und kurzer QA-Dokumentation gegen definierte KPI-Zielkorridore validiert.
-- [ ] DoD.4 Legacy-Map-/Pickup-Typen sind auf aktive Rocket-Tiers normalisiert oder mit stabiler Alias-Strategie abgesichert.
-- [ ] DoD.5 `npm run build`, `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS.
+- [x] DoD.1 Alle Phasen 69.1 bis 69.6 und 69.99 sind abgeschlossen. (abgeschlossen: 2026-03-30; evidence: 69.1-69.6 + 69.99 im Block auf `[x]`)
+- [x] DoD.2 Telemetrie differenziert Item-Nutzung und Combat-Impact mindestens nach `mode`, `itemType`, `hpDamage`, `shieldAbsorb`. (abgeschlossen: 2026-03-30; evidence: `docs/qa/V69_Fight_Hunt_KPI_Baseline_2026-03-30.md` + `docs/qa/V69_Fight_Hunt_Balancing_Auswertung_2026-03-30.md`)
+- [x] DoD.3 MG-, Rocket- und Shield-Tuning ist per Tests und kurzer QA-Dokumentation gegen definierte KPI-Zielkorridore validiert. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5387 PW_RUN_TAG=v69-6-matrix PW_OUTPUT_DIR=test-results/v69-6-matrix npx playwright test tests/core.spec.js tests/game-mode-strategy.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js --grep "T20ke|T14ea|S14a|S14b|S14d|T89a|T89k|T77|T78d|T78e|T78f"` -> `test-results/v69-6-matrix`)
+- [x] DoD.4 Legacy-Map-/Pickup-Typen sind auf aktive Rocket-Tiers normalisiert oder mit stabiler Alias-Strategie abgesichert. (abgeschlossen: 2026-03-30; evidence: `src/hunt/RocketPickupSystem.js` + `src/entities/Powerup.js` + `src/entities/mapSchema/MapSchemaSanitizeOps.js` + `T14ea`/`S14a`)
+- [x] DoD.5 `npm run build`, `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind PASS. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5419 PW_RUN_TAG=v69-99-core-r3-final PW_OUTPUT_DIR=test-results/v69-99-core-r3-final npm run test:core` + `TEST_PORT=5420 PW_RUN_TAG=v69-99-physics-hunt-r3-final PW_OUTPUT_DIR=test-results/v69-99-physics-hunt-r3-final npm run test:physics:hunt` + `TEST_PORT=5421 PW_RUN_TAG=v69-99-physics-policy-r4-final PW_OUTPUT_DIR=test-results/v69-99-physics-policy-r4-final npm run test:physics:policy` + `npm run build` + `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` -> PASS)
 
 ### 69.1 Balance-Telemetrie und KPI-Baseline
 
@@ -957,28 +957,28 @@ Scope:
 
 ### 69.3 Rocket-Tiers und Spawn-Oekonomie
 
-- [ ] 69.3.1 Legacy-Rocket-Pickup-Typen (`ROCKET_STRONG` etc.) per Alias/Migration auf aktive Tier-Typen normalisieren.
-- [ ] 69.3.2 Rocket-/Non-Rocket-Spawngewichte robust machen (normalisierte Gewichte, deterministische Verteilung, Regressionstests fuer Grenzfaelle).
+- [x] 69.3.1 Legacy-Rocket-Pickup-Typen (`ROCKET_STRONG` etc.) per Alias/Migration auf aktive Tier-Typen normalisieren. (abgeschlossen: 2026-03-30; evidence: `src/hunt/RocketPickupSystem.js` + `src/entities/Powerup.js` + `src/entities/mapSchema/MapSchemaSanitizeOps.js` + `src/core/config/maps/presets/neon_abyss.js` + `src/core/config/maps/presets/crystal_ruins.js` + `T14ea`/`S14a`)
+- [x] 69.3.2 Rocket-/Non-Rocket-Spawngewichte robust machen (normalisierte Gewichte, deterministische Verteilung, Regressionstests fuer Grenzfaelle). (abgeschlossen: 2026-03-30; evidence: `src/hunt/RocketPickupSystem.js` + `src/modes/HuntModeStrategy.js` + `S14b`/`S14c`)
 
 ### 69.4 Shield- und Damage-Semantik
 
-- [ ] 69.4.1 Shield-Hit-, Regen- und Damage-Timestamp-Interaktion klar definieren und konsistent in Health-/Feedback-Pfaden umsetzen.
-- [ ] 69.4.2 Item-Nutzungsfenster fuer defensive Ketten (Shield-Spam) absichern, ohne Utility-Flow fuer normale Nutzung zu verlieren.
+- [x] 69.4.1 Shield-Hit-, Regen- und Damage-Timestamp-Interaktion klar definieren und konsistent in Health-/Feedback-Pfaden umsetzen. (abgeschlossen: 2026-03-30; evidence: `src/hunt/HealthSystem.js` + `src/modes/HuntModeStrategy.js` + `S14d`/`T89k`)
+- [x] 69.4.2 Item-Nutzungsfenster fuer defensive Ketten (Shield-Spam) absichern, ohne Utility-Flow fuer normale Nutzung zu verlieren. (abgeschlossen: 2026-03-30; evidence: `src/entities/systems/HuntCombatSystem.js` + `src/entities/Player.js` + `src/hunt/HuntConfig.js` + `T89j`)
 
 ### 69.5 Bot-/Policy-Anpassung
 
-- [ ] 69.5.1 HuntBotPolicy/BotDecisionOps an neue Balance-Parameter und Item-Oekonomie anpassen (offensiv/defensiv konsistent).
-- [ ] 69.5.2 HuntBridgePolicy-Entscheidungsregeln fuer MG/Rocket/Retreat mit den neuen KPI-Zielen synchronisieren.
+- [x] 69.5.1 HuntBotPolicy/BotDecisionOps an neue Balance-Parameter und Item-Oekonomie anpassen (offensiv/defensiv konsistent). (abgeschlossen: 2026-03-30; evidence: `src/hunt/HuntBotPolicy.js` + `src/entities/ai/BotDecisionOps.js` + `tests/physics-policy.spec.js` (`T78d`, `T78f`))
+- [x] 69.5.2 HuntBridgePolicy-Entscheidungsregeln fuer MG/Rocket/Retreat mit den neuen KPI-Zielen synchronisieren. (abgeschlossen: 2026-03-30; evidence: `src/entities/ai/HuntBridgePolicy.js` + `tests/physics-policy.spec.js` (`T78e`))
 
 ### 69.6 Verifikation und Rollout
 
-- [ ] 69.6.1 Tests erweitern: MG-Window, Rocket-Alias/Verteilung, Shield-Regen-Interaktion, Telemetrie-Schema-Regression.
-- [ ] 69.6.2 Manuelle Fight/Hunt-QA aktualisieren und kurze Balancing-Auswertung als Evidence dokumentieren.
+- [x] 69.6.1 Tests erweitern: MG-Window, Rocket-Alias/Verteilung, Shield-Regen-Interaktion, Telemetrie-Schema-Regression. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5387 PW_RUN_TAG=v69-6-matrix PW_OUTPUT_DIR=test-results/v69-6-matrix npx playwright test tests/core.spec.js tests/game-mode-strategy.spec.js tests/physics-hunt.spec.js tests/physics-policy.spec.js --grep "T20ke|T14ea|S14a|S14b|S14d|T89a|T89k|T77|T78d|T78e|T78f"` -> `test-results/v69-6-matrix`)
+- [x] 69.6.2 Manuelle Fight/Hunt-QA aktualisieren und kurze Balancing-Auswertung als Evidence dokumentieren. (abgeschlossen: 2026-03-30; evidence: `docs/qa/Manuelle_Testcheckliste_Spiel.md` Abschnitt 26 + `docs/qa/V69_Fight_Hunt_Balancing_Auswertung_2026-03-30.md`)
 
 ### 69.99 Integrations- und Abschluss-Gate
 
-- [ ] 69.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run build` sind fuer den Scope gruen.
-- [ ] 69.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Pipeline-Abgleich sind abgeschlossen.
+- [x] 69.99.1 `npm run test:core`, `npm run test:physics:hunt`, `npm run test:physics:policy`, `npm run build` sind fuer den Scope gruen. (abgeschlossen: 2026-03-30; evidence: `TEST_PORT=5419 PW_RUN_TAG=v69-99-core-r3-final PW_OUTPUT_DIR=test-results/v69-99-core-r3-final npm run test:core` + `TEST_PORT=5420 PW_RUN_TAG=v69-99-physics-hunt-r3-final PW_OUTPUT_DIR=test-results/v69-99-physics-hunt-r3-final npm run test:physics:hunt` + `TEST_PORT=5421 PW_RUN_TAG=v69-99-physics-policy-r4-final PW_OUTPUT_DIR=test-results/v69-99-physics-policy-r4-final npm run test:physics:policy` + `npm run build` -> PASS)
+- [x] 69.99.2 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sowie Lock-/Ownership-/Pipeline-Abgleich sind abgeschlossen. (abgeschlossen: 2026-03-30; evidence: `npm run plan:check` + `npm run docs:sync` + `npm run docs:check` -> PASS; V69 Lock/Ownership/Pipeline in `docs/Umsetzungsplan.md` auf abgeschlossen/frei aktualisiert)
 
 ### Risiko-Register V69
 
@@ -1074,13 +1074,13 @@ Scope:
 
 Stand: 2026-03-30
 
-- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65, V66, V67, V68, V70.
-- Blockiert: Kein harter Blocker im Masterplan; aktiver Schwerpunkt liegt auf V69.
+- Abgeschlossen diese Woche: V52-V57 (archiviert), V59, V60, V61, V62, V63, V65, V66, V67, V68, V69, V70.
+- Blockiert: Kein harter Blocker im Masterplan; kein aktiver Block offen.
 - Naechste 3 Ziele:
-  1. V69 starten: Fight/Hunt Combat-Balance fuer Item/Raketen/Schild/MG.
-  2. V64 konkretisieren: Desktop/Electron-Scope und Priorisierung klaeren.
-  3. Backlog-Triage fuer naechsten P2-Block nach V69-Abstimmung.
-- Plan-Bereinigung (2026-03-30): V66 abgeschlossen; aktive In-Bearbeitung-Spuren liegen auf V69.
+  1. V64 konkretisieren: Desktop/Electron-Scope und Priorisierung klaeren.
+  2. Backlog-Triage fuer den naechsten P2-Block nach V69-Abschluss.
+  3. V69-KPI-Monitoring im QA-Report gegen Baseline nachhalten.
+- Plan-Bereinigung (2026-03-30): V69 abgeschlossen und Lock freigegeben.
 
 ## Dokumentations-Hook
 
