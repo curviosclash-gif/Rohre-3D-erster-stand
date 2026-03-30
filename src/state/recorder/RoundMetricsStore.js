@@ -1,3 +1,61 @@
+const ITEM_USE_MODES = Object.freeze(['use', 'shoot', 'mg', 'other']);
+
+function createItemUseModeCounts() {
+    return {
+        use: 0,
+        shoot: 0,
+        mg: 0,
+        other: 0,
+    };
+}
+
+function normalizeItemUseMode(value) {
+    const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    return ITEM_USE_MODES.includes(normalized) ? normalized : 'other';
+}
+
+function normalizeItemUseType(value) {
+    const normalized = typeof value === 'string' ? value.trim().toUpperCase() : '';
+    return normalized || 'UNKNOWN';
+}
+
+function parseItemUseEventData(value) {
+    const raw = typeof value === 'string' ? value.trim() : '';
+    if (!raw) return { mode: 'other', type: 'UNKNOWN' };
+
+    const keyValuePairs = {};
+    const keyValuePattern = /([a-zA-Z0-9_]+)=([^\s]+)/g;
+    let match = keyValuePattern.exec(raw);
+    while (match) {
+        keyValuePairs[String(match[1] || '').trim().toLowerCase()] = String(match[2] || '').trim();
+        match = keyValuePattern.exec(raw);
+    }
+
+    if (Object.keys(keyValuePairs).length === 0) {
+        return {
+            mode: 'other',
+            type: normalizeItemUseType(raw),
+        };
+    }
+
+    return {
+        mode: normalizeItemUseMode(keyValuePairs.mode),
+        type: normalizeItemUseType(keyValuePairs.type),
+    };
+}
+
+function resolveDamageSplit(damageResult = {}) {
+    const applied = Math.max(0, Number(damageResult?.applied) || 0);
+    const absorbedByShield = Math.max(0, Number(damageResult?.absorbedByShield) || 0);
+    const hpApplied = Math.max(0, Number(damageResult?.hpApplied) || (applied - absorbedByShield));
+    return { hpApplied, absorbedByShield };
+}
+
+function isRocketType(value) {
+    const normalized = typeof value === 'string' ? value.trim().toUpperCase() : '';
+    return normalized.startsWith('ROCKET_');
+}
+
 function createRoundSummary() {
     return {
         roundId: 0,
@@ -13,6 +71,12 @@ function createRoundSummary() {
         bounceWallEvents: 0,
         bounceTrailEvents: 0,
         itemUseEvents: 0,
+        itemUseModeCounts: createItemUseModeCounts(),
+        itemUseTypeCounts: {},
+        mgHits: 0,
+        rocketHits: 0,
+        shieldAbsorb: 0,
+        hpDamage: 0,
         stuckPerMinute: 0,
         parcoursCompleted: false,
         parcoursRouteId: '',
@@ -32,6 +96,12 @@ function createAggregateSummary() {
         totalBounceWallEvents: 0,
         totalBounceTrailEvents: 0,
         totalItemUseEvents: 0,
+        totalItemUseModeCounts: createItemUseModeCounts(),
+        totalItemUseTypeCounts: {},
+        totalMgHits: 0,
+        totalRocketHits: 0,
+        totalShieldAbsorb: 0,
+        totalHpDamage: 0,
         botWins: 0,
         parcoursCompletions: 0,
         totalParcoursCompletionTimeMs: 0,
@@ -72,6 +142,12 @@ export class RoundMetricsStore {
         this._roundBounceWallEvents = 0;
         this._roundBounceTrailEvents = 0;
         this._roundItemUseEvents = 0;
+        this._roundItemUseModeCounts = createItemUseModeCounts();
+        this._roundItemUseTypeCounts = {};
+        this._roundMgHits = 0;
+        this._roundRocketHits = 0;
+        this._roundShieldAbsorb = 0;
+        this._roundHpDamage = 0;
         for (let i = 0; i < this.maxTrackedPlayers; i++) {
             this.playerSpawnTime[i] = -1;
             this.playerDeathTime[i] = -1;
@@ -103,11 +179,37 @@ export class RoundMetricsStore {
         }
     }
 
-    registerEventType(type) {
+    registerEventType(type, data = '') {
         if (type === 'STUCK') this._roundStuckEvents++;
         if (type === 'BOUNCE_WALL') this._roundBounceWallEvents++;
         if (type === 'BOUNCE_TRAIL') this._roundBounceTrailEvents++;
-        if (type === 'ITEM_USE') this._roundItemUseEvents++;
+        if (type === 'ITEM_USE') {
+            this._roundItemUseEvents++;
+            const itemUse = parseItemUseEventData(data);
+            const modeKey = normalizeItemUseMode(itemUse.mode);
+            this._roundItemUseModeCounts[modeKey] += 1;
+            const typeKey = normalizeItemUseType(itemUse.type);
+            this._roundItemUseTypeCounts[typeKey] = (this._roundItemUseTypeCounts[typeKey] || 0) + 1;
+        }
+    }
+
+    registerDamageEvent(event = null) {
+        if (!event || typeof event !== 'object') return;
+        const damageSplit = resolveDamageSplit(event?.damageResult);
+        const totalDamage = damageSplit.hpApplied + damageSplit.absorbedByShield;
+        if (totalDamage <= 0) return;
+
+        this._roundHpDamage += damageSplit.hpApplied;
+        this._roundShieldAbsorb += damageSplit.absorbedByShield;
+
+        const cause = typeof event?.cause === 'string' ? event.cause.trim().toUpperCase() : '';
+        const projectileType = typeof event?.projectileType === 'string' ? event.projectileType.trim().toUpperCase() : '';
+        if (cause === 'MG_BULLET') {
+            this._roundMgHits += 1;
+        }
+        if (isRocketType(cause) || isRocketType(projectileType)) {
+            this._roundRocketHits += 1;
+        }
     }
 
     markPlayerSpawn(player) {
@@ -181,6 +283,12 @@ export class RoundMetricsStore {
         round.bounceWallEvents = this._roundBounceWallEvents;
         round.bounceTrailEvents = this._roundBounceTrailEvents;
         round.itemUseEvents = this._roundItemUseEvents;
+        round.itemUseModeCounts = { ...this._roundItemUseModeCounts };
+        round.itemUseTypeCounts = { ...this._roundItemUseTypeCounts };
+        round.mgHits = this._roundMgHits;
+        round.rocketHits = this._roundRocketHits;
+        round.shieldAbsorb = this._roundShieldAbsorb;
+        round.hpDamage = this._roundHpDamage;
         round.stuckPerMinute = roundDuration > 0 ? this._roundStuckEvents / (roundDuration / 60) : 0;
         round.parcoursCompleted = parcoursCompleted;
         round.parcoursRouteId = parcoursRouteId;
@@ -199,6 +307,17 @@ export class RoundMetricsStore {
         this._aggregate.totalBounceWallEvents += this._roundBounceWallEvents;
         this._aggregate.totalBounceTrailEvents += this._roundBounceTrailEvents;
         this._aggregate.totalItemUseEvents += this._roundItemUseEvents;
+        for (const mode of ITEM_USE_MODES) {
+            this._aggregate.totalItemUseModeCounts[mode] += Math.max(0, Number(this._roundItemUseModeCounts[mode]) || 0);
+        }
+        for (const [itemType, useCount] of Object.entries(this._roundItemUseTypeCounts)) {
+            this._aggregate.totalItemUseTypeCounts[itemType] = (this._aggregate.totalItemUseTypeCounts[itemType] || 0)
+                + Math.max(0, Number(useCount) || 0);
+        }
+        this._aggregate.totalMgHits += this._roundMgHits;
+        this._aggregate.totalRocketHits += this._roundRocketHits;
+        this._aggregate.totalShieldAbsorb += this._roundShieldAbsorb;
+        this._aggregate.totalHpDamage += this._roundHpDamage;
         if (winner?.isBot) this._aggregate.botWins += 1;
         if (parcoursCompleted) {
             this._aggregate.parcoursCompletions += 1;
@@ -219,6 +338,12 @@ export class RoundMetricsStore {
             bounceWallEvents: round.bounceWallEvents,
             bounceTrailEvents: round.bounceTrailEvents,
             itemUseEvents: round.itemUseEvents,
+            itemUseModeCounts: { ...round.itemUseModeCounts },
+            itemUseTypeCounts: { ...round.itemUseTypeCounts },
+            mgHits: round.mgHits,
+            rocketHits: round.rocketHits,
+            shieldAbsorb: round.shieldAbsorb,
+            hpDamage: round.hpDamage,
             stuckPerMinute: round.stuckPerMinute,
             parcoursCompleted: round.parcoursCompleted,
             parcoursRouteId: round.parcoursRouteId,
@@ -247,6 +372,17 @@ export class RoundMetricsStore {
             bounceWallPerRound: rounds > 0 ? this._aggregate.totalBounceWallEvents / rounds : 0,
             bounceTrailPerRound: rounds > 0 ? this._aggregate.totalBounceTrailEvents / rounds : 0,
             itemUsePerRound: rounds > 0 ? this._aggregate.totalItemUseEvents / rounds : 0,
+            itemUseModePerRound: {
+                use: rounds > 0 ? this._aggregate.totalItemUseModeCounts.use / rounds : 0,
+                shoot: rounds > 0 ? this._aggregate.totalItemUseModeCounts.shoot / rounds : 0,
+                mg: rounds > 0 ? this._aggregate.totalItemUseModeCounts.mg / rounds : 0,
+                other: rounds > 0 ? this._aggregate.totalItemUseModeCounts.other / rounds : 0,
+            },
+            itemUseTypeTotals: { ...this._aggregate.totalItemUseTypeCounts },
+            mgHitsPerRound: rounds > 0 ? this._aggregate.totalMgHits / rounds : 0,
+            rocketHitsPerRound: rounds > 0 ? this._aggregate.totalRocketHits / rounds : 0,
+            hpDamagePerRound: rounds > 0 ? this._aggregate.totalHpDamage / rounds : 0,
+            shieldAbsorbPerRound: rounds > 0 ? this._aggregate.totalShieldAbsorb / rounds : 0,
             parcoursCompletionRate: rounds > 0 ? this._aggregate.parcoursCompletions / rounds : 0,
             averageParcoursCompletionTimeMs: this._aggregate.parcoursCompletions > 0
                 ? this._aggregate.totalParcoursCompletionTimeMs / this._aggregate.parcoursCompletions
@@ -287,6 +423,12 @@ export class RoundMetricsStore {
                 bounceWallEvents: round.bounceWallEvents,
                 bounceTrailEvents: round.bounceTrailEvents,
                 itemUseEvents: round.itemUseEvents,
+                itemUseModeCounts: { ...round.itemUseModeCounts },
+                itemUseTypeCounts: { ...round.itemUseTypeCounts },
+                mgHits: round.mgHits,
+                rocketHits: round.rocketHits,
+                shieldAbsorb: round.shieldAbsorb,
+                hpDamage: round.hpDamage,
                 stuckPerMinute: round.stuckPerMinute,
                 parcoursCompleted: round.parcoursCompleted,
                 parcoursRouteId: round.parcoursRouteId,

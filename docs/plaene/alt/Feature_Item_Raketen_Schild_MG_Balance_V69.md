@@ -53,9 +53,9 @@ Hinweis fuer Abschluss-Evidence:
 - Jeder spaeter auf `[x]` gesetzte Punkt nutzt das Format:
   `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 
-- [ ] 69.1 Balance-Telemetrie und KPI-Baseline
-  - [ ] 69.1.1 Round-/Combat-Metriken fuer `itemUse.mode`, `itemType`, `mgHits`, `rocketHits`, `shieldAbsorb`, `hpDamage` granular erfassen und im Telemetrie-Payload durchreichen.
-  - [ ] 69.1.2 KPI-Baseline fuer Fight/Hunt dokumentieren (TTK, Pickrate, Hitrate, Kill-Share, Shield-Uptime) und als Vergleichswert fuer Folgephasen fixieren.
+- [x] 69.1 Balance-Telemetrie und KPI-Baseline (abgeschlossen: 2026-03-30; evidence: `npm run test:fast` + `TEST_PORT=5371 PW_RUN_TAG=v69-telemetry PW_OUTPUT_DIR=test-results/v69-telemetry node dev/scripts/verify-lock.mjs --playwright -- npx playwright test tests/core.spec.js --grep "T20ke"` -> `test-results/v69-telemetry`)
+  - [x] 69.1.1 Round-/Combat-Metriken fuer `itemUse.mode`, `itemType`, `mgHits`, `rocketHits`, `shieldAbsorb`, `hpDamage` granular erfassen und im Telemetrie-Payload durchreichen. (abgeschlossen: 2026-03-30; evidence: Round-End-Telemetriepfad erweitert in `RoundMetricsStore`/`MatchFlowUiController`/`MenuTelemetryStore` inkl. `T20ke`)
+  - [x] 69.1.2 KPI-Baseline fuer Fight/Hunt dokumentieren (TTK, Pickrate, Hitrate, Kill-Share, Shield-Uptime) und als Vergleichswert fuer Folgephasen fixieren. (abgeschlossen: 2026-03-30; evidence: `docs/qa/V69_Fight_Hunt_KPI_Baseline_2026-03-30.md`)
 
 - [ ] 69.2 MG-Tuning und Trefferfenster
   - [ ] 69.2.1 Default-/Preset-Werte fuer `mgTrailAimRadius` und angrenzende MG-Parameter fuer Fight/Hunt harmonisieren; UI- und Runtime-Defaults konsistent halten.

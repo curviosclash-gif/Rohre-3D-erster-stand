@@ -44,6 +44,37 @@ function sanitizeString(value, fallback = '') {
     return typeof value === 'string' && value.trim() ? value.trim() : fallback;
 }
 
+function normalizeItemUseModeCounts(source = null) {
+    const modeSource = source && typeof source === 'object' ? source : {};
+    return {
+        use: toNonNegativeInt(modeSource.use, 0),
+        shoot: toNonNegativeInt(modeSource.shoot, 0),
+        mg: toNonNegativeInt(modeSource.mg, 0),
+        other: toNonNegativeInt(modeSource.other, 0),
+    };
+}
+
+function normalizeItemUseTypeCounts(source = null) {
+    const typeSource = source && typeof source === 'object' ? source : {};
+    const normalized = {};
+    Object.entries(typeSource).forEach(([key, value]) => {
+        const itemType = sanitizeString(String(key || '').toUpperCase(), '');
+        if (!itemType) return;
+        normalized[itemType] = toNonNegativeInt(value, 0);
+    });
+    return normalized;
+}
+
+function mergeItemUseTypeCounts(target, source) {
+    if (!target || typeof target !== 'object') return;
+    if (!source || typeof source !== 'object') return;
+    Object.entries(source).forEach(([itemType, count]) => {
+        const key = sanitizeString(String(itemType || '').toUpperCase(), '');
+        if (!key) return;
+        target[key] = (target[key] || 0) + toNonNegativeInt(count, 0);
+    });
+}
+
 function normalizeEntry(source) {
     const s = source && typeof source === 'object' ? source : {};
     return {
@@ -57,6 +88,12 @@ function normalizeEntry(source) {
         duration: toNonNegativeNumber(s.duration),
         selfCollisions: toNonNegativeInt(s.selfCollisions),
         itemUses: toNonNegativeInt(s.itemUses),
+        itemUseByMode: normalizeItemUseModeCounts(s.itemUseByMode || s.itemUse?.byMode),
+        itemUseByType: normalizeItemUseTypeCounts(s.itemUseByType || s.itemUse?.byType),
+        mgHits: toNonNegativeInt(s.mgHits, 0),
+        rocketHits: toNonNegativeInt(s.rocketHits, 0),
+        shieldAbsorb: toNonNegativeNumber(s.shieldAbsorb, 0),
+        hpDamage: toNonNegativeNumber(s.hpDamage, 0),
         stuckEvents: toNonNegativeInt(s.stuckEvents),
         parcoursCompleted: s.parcoursCompleted === true,
         parcoursRouteId: sanitizeString(s.parcoursRouteId, ''),
@@ -233,6 +270,12 @@ export class TelemetryHistoryStore {
         let botWins = 0;
         let totalSelfCollisions = 0;
         let totalItemUses = 0;
+        const totalItemUseByMode = normalizeItemUseModeCounts();
+        const totalItemUseByType = {};
+        let totalMgHits = 0;
+        let totalRocketHits = 0;
+        let totalShieldAbsorb = 0;
+        let totalHpDamage = 0;
         let totalStuckEvents = 0;
         let parcoursCompletions = 0;
         let totalParcoursCompletionTimeMs = 0;
@@ -244,6 +287,16 @@ export class TelemetryHistoryStore {
             totalDuration += toNonNegativeNumber(r.duration);
             totalSelfCollisions += toNonNegativeInt(r.selfCollisions);
             totalItemUses += toNonNegativeInt(r.itemUses);
+            const itemUseByMode = normalizeItemUseModeCounts(r.itemUseByMode);
+            totalItemUseByMode.use += itemUseByMode.use;
+            totalItemUseByMode.shoot += itemUseByMode.shoot;
+            totalItemUseByMode.mg += itemUseByMode.mg;
+            totalItemUseByMode.other += itemUseByMode.other;
+            mergeItemUseTypeCounts(totalItemUseByType, normalizeItemUseTypeCounts(r.itemUseByType));
+            totalMgHits += toNonNegativeInt(r.mgHits, 0);
+            totalRocketHits += toNonNegativeInt(r.rocketHits, 0);
+            totalShieldAbsorb += toNonNegativeNumber(r.shieldAbsorb, 0);
+            totalHpDamage += toNonNegativeNumber(r.hpDamage, 0);
             totalStuckEvents += toNonNegativeInt(r.stuckEvents);
             if (r.parcoursCompleted === true) {
                 parcoursCompletions += 1;
@@ -269,6 +322,17 @@ export class TelemetryHistoryStore {
             averageDuration: rounds > 0 ? totalDuration / rounds : 0,
             selfCollisionsPerRound: rounds > 0 ? totalSelfCollisions / rounds : 0,
             itemUsesPerRound: rounds > 0 ? totalItemUses / rounds : 0,
+            itemUseModePerRound: {
+                use: rounds > 0 ? totalItemUseByMode.use / rounds : 0,
+                shoot: rounds > 0 ? totalItemUseByMode.shoot / rounds : 0,
+                mg: rounds > 0 ? totalItemUseByMode.mg / rounds : 0,
+                other: rounds > 0 ? totalItemUseByMode.other / rounds : 0,
+            },
+            itemUseTypeTotals: { ...totalItemUseByType },
+            mgHitsPerRound: rounds > 0 ? totalMgHits / rounds : 0,
+            rocketHitsPerRound: rounds > 0 ? totalRocketHits / rounds : 0,
+            shieldAbsorbPerRound: rounds > 0 ? totalShieldAbsorb / rounds : 0,
+            hpDamagePerRound: rounds > 0 ? totalHpDamage / rounds : 0,
             stuckEventsPerRound: rounds > 0 ? totalStuckEvents / rounds : 0,
             parcoursCompletions,
             parcoursCompletionRate: rounds > 0 ? parcoursCompletions / rounds : 0,
@@ -297,6 +361,12 @@ export class TelemetryHistoryStore {
             averageDuration: 0,
             selfCollisionsPerRound: 0,
             itemUsesPerRound: 0,
+            itemUseModePerRound: normalizeItemUseModeCounts(),
+            itemUseTypeTotals: {},
+            mgHitsPerRound: 0,
+            rocketHitsPerRound: 0,
+            shieldAbsorbPerRound: 0,
+            hpDamagePerRound: 0,
             stuckEventsPerRound: 0,
             parcoursCompletions: 0,
             parcoursCompletionRate: 0,

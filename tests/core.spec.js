@@ -2612,20 +2612,51 @@ test.describe('T1-20: Core & Infrastruktur', () => {
             players[0].score = 0;
             players[1].score = 0;
             game.recorder.startRound(players);
-            game.recorder.logEvent('ITEM_USE', players[0].index, 'rocket');
+            game.recorder.logEvent('ITEM_USE', players[0].index, 'mode=shoot type=ROCKET_WEAK');
+            game.recorder.logEvent('ITEM_USE', players[0].index, 'mode=mg type=MG');
             game.recorder.logEvent('STUCK', players[1].index, 'wall');
             game.recorder.markPlayerDeath(players[1], 'TRAIL_SELF');
+            game.recorder.recordDamageEvent({
+                cause: 'MG_BULLET',
+                damageResult: {
+                    applied: 9,
+                    absorbedByShield: 0,
+                    hpApplied: 9,
+                },
+            });
+            game.recorder.recordDamageEvent({
+                cause: 'ROCKET_WEAK',
+                projectileType: 'ROCKET_WEAK',
+                damageResult: {
+                    applied: 20,
+                    absorbedByShield: 5,
+                    hpApplied: 15,
+                },
+            });
             game.recorder.roundStartTime = now - simulatedDurationMs;
             game.matchFlowUiController.onRoundEnd(players[0]);
 
             return {
                 error: '',
                 balanceRounds: Number(game.settings?.localSettings?.telemetryState?.balance?.rounds || 0),
+                telemetryBalance: game.settings?.localSettings?.telemetryState?.balance || null,
+                telemetryRecentRound: game.settings?.localSettings?.telemetryState?.recentRounds?.[0] || null,
             };
         });
 
         expect(telemetryProbe.error || '').toBe('');
         expect(telemetryProbe.balanceRounds).toBeGreaterThanOrEqual(1);
+        expect(Number(telemetryProbe.telemetryBalance?.mgHitsPerRound || 0)).toBeGreaterThanOrEqual(1);
+        expect(Number(telemetryProbe.telemetryBalance?.rocketHitsPerRound || 0)).toBeGreaterThanOrEqual(1);
+        expect(Number(telemetryProbe.telemetryBalance?.hpDamagePerRound || 0)).toBeGreaterThan(0);
+        expect(Number(telemetryProbe.telemetryBalance?.shieldAbsorbPerRound || 0)).toBeGreaterThan(0);
+        expect(Number(telemetryProbe.telemetryRecentRound?.itemUseByMode?.shoot || 0)).toBe(1);
+        expect(Number(telemetryProbe.telemetryRecentRound?.itemUseByMode?.mg || 0)).toBe(1);
+        expect(Number(telemetryProbe.telemetryRecentRound?.itemUseByType?.ROCKET_WEAK || 0)).toBe(1);
+        expect(Number(telemetryProbe.telemetryRecentRound?.mgHits || 0)).toBe(1);
+        expect(Number(telemetryProbe.telemetryRecentRound?.rocketHits || 0)).toBe(1);
+        expect(Number(telemetryProbe.telemetryRecentRound?.hpDamage || 0)).toBeGreaterThan(0);
+        expect(Number(telemetryProbe.telemetryRecentRound?.shieldAbsorb || 0)).toBeGreaterThan(0);
 
         await returnToMenu(page);
         await openDeveloperSubmenu(page);
@@ -2652,6 +2683,10 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(dashboardState.cardIds).toEqual(expect.arrayContaining(['overview', 'balance', 'maps', 'modes', 'recent']));
         expect(Number(dashboardState.telemetry?.balance?.rounds || 0)).toBe(1);
         expect(Number(dashboardState.telemetry?.balance?.humanWins || 0)).toBe(1);
+        expect(Number(dashboardState.telemetry?.balance?.mgHitsPerRound || 0)).toBeGreaterThanOrEqual(1);
+        expect(Number(dashboardState.telemetry?.balance?.rocketHitsPerRound || 0)).toBeGreaterThanOrEqual(1);
+        expect(Number(dashboardState.telemetry?.balance?.hpDamagePerRound || 0)).toBeGreaterThan(0);
+        expect(Number(dashboardState.telemetry?.balance?.shieldAbsorbPerRound || 0)).toBeGreaterThan(0);
         expect(dashboardState.telemetry?.topMaps?.[0]?.key).toBe('standard');
         expect(dashboardState.overviewRounds).toBe('1');
         expect(dashboardState.balanceDuration).not.toBe('0.00s');

@@ -131,7 +131,7 @@ export class RoundRecorder {
     logEvent(type, playerIndex, data = '') {
         if (!this._enabled) return;
         this._eventStore.append(type, playerIndex, data);
-        this._metricsStore.registerEventType(type);
+        this._metricsStore.registerEventType(type, data);
     }
 
     markPlayerSpawn(player) {
@@ -142,6 +142,11 @@ export class RoundRecorder {
     markPlayerDeath(player, cause = '') {
         if (!this._enabled) return;
         this._metricsStore.markPlayerDeath(player, cause);
+    }
+
+    recordDamageEvent(event = null) {
+        if (!this._enabled) return;
+        this._metricsStore.registerDamageEvent(event);
     }
 
     finalizeRound(winner, players = [], options = {}) {

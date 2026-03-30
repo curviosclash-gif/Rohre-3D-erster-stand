@@ -487,6 +487,25 @@ export class MatchFlowUiController {
             || null;
         if (!roundMetrics) return null;
 
+        const itemUseModeSource = roundMetrics.itemUseModeCounts && typeof roundMetrics.itemUseModeCounts === 'object'
+            ? roundMetrics.itemUseModeCounts
+            : {};
+        const itemUseByMode = {
+            use: Math.max(0, Number(itemUseModeSource.use) || 0),
+            shoot: Math.max(0, Number(itemUseModeSource.shoot) || 0),
+            mg: Math.max(0, Number(itemUseModeSource.mg) || 0),
+            other: Math.max(0, Number(itemUseModeSource.other) || 0),
+        };
+        const itemUseTypeSource = roundMetrics.itemUseTypeCounts && typeof roundMetrics.itemUseTypeCounts === 'object'
+            ? roundMetrics.itemUseTypeCounts
+            : {};
+        const itemUseByType = {};
+        Object.entries(itemUseTypeSource).forEach(([itemType, count]) => {
+            const normalizedType = String(itemType || '').trim().toUpperCase();
+            if (!normalizedType) return;
+            itemUseByType[normalizedType] = Math.max(0, Number(count) || 0);
+        });
+
         return {
             mapKey: normalizeTelemetryString(game?.arena?.currentMapKey || game?.mapKey, 'standard'),
             mode: normalizeTelemetryString(game?.activeGameMode || game?.runtimeConfig?.session?.activeGameMode, 'classic').toLowerCase(),
@@ -499,6 +518,15 @@ export class MatchFlowUiController {
             duration: Math.max(0, Number(roundMetrics.duration) || 0),
             selfCollisions: Math.max(0, Number(roundMetrics.selfCollisions) || 0),
             itemUses: Math.max(0, Number(roundMetrics.itemUseEvents) || 0),
+            itemUse: {
+                total: Math.max(0, Number(roundMetrics.itemUseEvents) || 0),
+                byMode: itemUseByMode,
+                byType: itemUseByType,
+            },
+            mgHits: Math.max(0, Number(roundMetrics.mgHits) || 0),
+            rocketHits: Math.max(0, Number(roundMetrics.rocketHits) || 0),
+            shieldAbsorb: Math.max(0, Number(roundMetrics.shieldAbsorb) || 0),
+            hpDamage: Math.max(0, Number(roundMetrics.hpDamage) || 0),
             stuckEvents: Math.max(0, Number(roundMetrics.stuckEvents) || 0),
             parcoursCompleted: roundMetrics.parcoursCompleted === true,
             parcoursRouteId: normalizeTelemetryString(roundMetrics.parcoursRouteId, ''),

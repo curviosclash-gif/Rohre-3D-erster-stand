@@ -32,6 +32,37 @@ function toNonNegativeNumber(value, fallback = 0) {
     return Math.max(0, parsed);
 }
 
+function normalizeItemUseModeCounts(source = null) {
+    const modeSource = source && typeof source === 'object' ? source : {};
+    return {
+        use: toNonNegativeInt(modeSource.use, 0),
+        shoot: toNonNegativeInt(modeSource.shoot, 0),
+        mg: toNonNegativeInt(modeSource.mg, 0),
+        other: toNonNegativeInt(modeSource.other, 0),
+    };
+}
+
+function normalizeItemUseTypeCounts(source = null) {
+    const typeSource = source && typeof source === 'object' ? source : {};
+    const normalized = {};
+    Object.entries(typeSource).forEach(([key, value]) => {
+        const itemType = sanitizeBucketKey(String(key || '').toUpperCase(), '');
+        if (!itemType) return;
+        normalized[itemType] = toNonNegativeInt(value, 0);
+    });
+    return normalized;
+}
+
+function mergeItemUseTypeCounts(target, source) {
+    if (!target || typeof target !== 'object') return;
+    if (!source || typeof source !== 'object') return;
+    Object.entries(source).forEach(([itemType, count]) => {
+        const key = sanitizeBucketKey(String(itemType || '').toUpperCase(), '');
+        if (!key) return;
+        target[key] = (target[key] || 0) + toNonNegativeInt(count, 0);
+    });
+}
+
 function createDefaultBucket() {
     return {
         rounds: 0,
@@ -42,6 +73,12 @@ function createDefaultBucket() {
         totalSelfCollisions: 0,
         totalItemUses: 0,
         totalStuckEvents: 0,
+        totalMgHits: 0,
+        totalRocketHits: 0,
+        totalShieldAbsorb: 0,
+        totalHpDamage: 0,
+        totalItemUseModeCounts: normalizeItemUseModeCounts(),
+        totalItemUseTypeCounts: {},
         parcoursCompletions: 0,
         totalParcoursCompletionTimeMs: 0,
         lastSeenAt: '',
@@ -63,6 +100,12 @@ function normalizeBucketCollection(source) {
             totalSelfCollisions: toNonNegativeInt(bucket.totalSelfCollisions, 0),
             totalItemUses: toNonNegativeInt(bucket.totalItemUses, 0),
             totalStuckEvents: toNonNegativeInt(bucket.totalStuckEvents, 0),
+            totalMgHits: toNonNegativeInt(bucket.totalMgHits, 0),
+            totalRocketHits: toNonNegativeInt(bucket.totalRocketHits, 0),
+            totalShieldAbsorb: toNonNegativeNumber(bucket.totalShieldAbsorb, 0),
+            totalHpDamage: toNonNegativeNumber(bucket.totalHpDamage, 0),
+            totalItemUseModeCounts: normalizeItemUseModeCounts(bucket.totalItemUseModeCounts),
+            totalItemUseTypeCounts: normalizeItemUseTypeCounts(bucket.totalItemUseTypeCounts),
             parcoursCompletions: toNonNegativeInt(bucket.parcoursCompletions, 0),
             totalParcoursCompletionTimeMs: toNonNegativeNumber(bucket.totalParcoursCompletionTimeMs, 0),
             lastSeenAt: typeof bucket.lastSeenAt === 'string' ? bucket.lastSeenAt : '',
@@ -81,6 +124,12 @@ function createDefaultBalanceSummary() {
         totalSelfCollisions: 0,
         totalItemUses: 0,
         totalStuckEvents: 0,
+        totalMgHits: 0,
+        totalRocketHits: 0,
+        totalShieldAbsorb: 0,
+        totalHpDamage: 0,
+        totalItemUseModeCounts: normalizeItemUseModeCounts(),
+        totalItemUseTypeCounts: {},
         parcoursCompletions: 0,
         totalParcoursCompletionTimeMs: 0,
         maps: {},
@@ -99,6 +148,12 @@ function normalizeBalanceSummary(source) {
         totalSelfCollisions: toNonNegativeInt(summary.totalSelfCollisions, 0),
         totalItemUses: toNonNegativeInt(summary.totalItemUses, 0),
         totalStuckEvents: toNonNegativeInt(summary.totalStuckEvents, 0),
+        totalMgHits: toNonNegativeInt(summary.totalMgHits, 0),
+        totalRocketHits: toNonNegativeInt(summary.totalRocketHits, 0),
+        totalShieldAbsorb: toNonNegativeNumber(summary.totalShieldAbsorb, 0),
+        totalHpDamage: toNonNegativeNumber(summary.totalHpDamage, 0),
+        totalItemUseModeCounts: normalizeItemUseModeCounts(summary.totalItemUseModeCounts),
+        totalItemUseTypeCounts: normalizeItemUseTypeCounts(summary.totalItemUseTypeCounts),
         parcoursCompletions: toNonNegativeInt(summary.parcoursCompletions, 0),
         totalParcoursCompletionTimeMs: toNonNegativeNumber(summary.totalParcoursCompletionTimeMs, 0),
         maps: normalizeBucketCollection(summary.maps),
@@ -120,6 +175,12 @@ function normalizeRecentRoundEntry(entry) {
         duration: toNonNegativeNumber(source.duration, 0),
         selfCollisions: toNonNegativeInt(source.selfCollisions, 0),
         itemUses: toNonNegativeInt(source.itemUses, 0),
+        itemUseByMode: normalizeItemUseModeCounts(source.itemUseByMode || source.itemUse?.byMode),
+        itemUseByType: normalizeItemUseTypeCounts(source.itemUseByType || source.itemUse?.byType),
+        mgHits: toNonNegativeInt(source.mgHits, 0),
+        rocketHits: toNonNegativeInt(source.rocketHits, 0),
+        shieldAbsorb: toNonNegativeNumber(source.shieldAbsorb, 0),
+        hpDamage: toNonNegativeNumber(source.hpDamage, 0),
         stuckEvents: toNonNegativeInt(source.stuckEvents, 0),
         parcoursCompleted: source.parcoursCompleted === true,
         parcoursRouteId: sanitizeBucketKey(source.parcoursRouteId, ''),
@@ -183,6 +244,8 @@ export class MenuTelemetryStore extends PersistentStore {
                 ...createDefaultBucket(),
                 ...existing,
             };
+            collection[bucketKey].totalItemUseModeCounts = normalizeItemUseModeCounts(collection[bucketKey].totalItemUseModeCounts);
+            collection[bucketKey].totalItemUseTypeCounts = normalizeItemUseTypeCounts(collection[bucketKey].totalItemUseTypeCounts);
             return collection[bucketKey];
         }
         collection[bucketKey] = createDefaultBucket();
@@ -198,6 +261,12 @@ export class MenuTelemetryStore extends PersistentStore {
         const duration = toNonNegativeNumber(source.duration, 0);
         const selfCollisions = toNonNegativeInt(source.selfCollisions, 0);
         const itemUses = toNonNegativeInt(source.itemUses, 0);
+        const itemUseByMode = normalizeItemUseModeCounts(source.itemUse?.byMode || source.itemUseByMode);
+        const itemUseByType = normalizeItemUseTypeCounts(source.itemUse?.byType || source.itemUseByType);
+        const mgHits = toNonNegativeInt(source.mgHits, 0);
+        const rocketHits = toNonNegativeInt(source.rocketHits, 0);
+        const shieldAbsorb = toNonNegativeNumber(source.shieldAbsorb, 0);
+        const hpDamage = toNonNegativeNumber(source.hpDamage, 0);
         const stuckEvents = toNonNegativeInt(source.stuckEvents, 0);
         const reason = sanitizeBucketKey(source.reason, 'ELIMINATION');
         const parcoursCompleted = source.parcoursCompleted === true;
@@ -208,6 +277,15 @@ export class MenuTelemetryStore extends PersistentStore {
         summary.totalDuration += duration;
         summary.totalSelfCollisions += selfCollisions;
         summary.totalItemUses += itemUses;
+        summary.totalItemUseModeCounts.use += itemUseByMode.use;
+        summary.totalItemUseModeCounts.shoot += itemUseByMode.shoot;
+        summary.totalItemUseModeCounts.mg += itemUseByMode.mg;
+        summary.totalItemUseModeCounts.other += itemUseByMode.other;
+        mergeItemUseTypeCounts(summary.totalItemUseTypeCounts, itemUseByType);
+        summary.totalMgHits += mgHits;
+        summary.totalRocketHits += rocketHits;
+        summary.totalShieldAbsorb += shieldAbsorb;
+        summary.totalHpDamage += hpDamage;
         summary.totalStuckEvents += stuckEvents;
         if (parcoursCompleted) {
             summary.parcoursCompletions += 1;
@@ -221,6 +299,15 @@ export class MenuTelemetryStore extends PersistentStore {
         mapBucket.totalDuration += duration;
         mapBucket.totalSelfCollisions += selfCollisions;
         mapBucket.totalItemUses += itemUses;
+        mapBucket.totalItemUseModeCounts.use += itemUseByMode.use;
+        mapBucket.totalItemUseModeCounts.shoot += itemUseByMode.shoot;
+        mapBucket.totalItemUseModeCounts.mg += itemUseByMode.mg;
+        mapBucket.totalItemUseModeCounts.other += itemUseByMode.other;
+        mergeItemUseTypeCounts(mapBucket.totalItemUseTypeCounts, itemUseByType);
+        mapBucket.totalMgHits += mgHits;
+        mapBucket.totalRocketHits += rocketHits;
+        mapBucket.totalShieldAbsorb += shieldAbsorb;
+        mapBucket.totalHpDamage += hpDamage;
         mapBucket.totalStuckEvents += stuckEvents;
         if (parcoursCompleted) {
             mapBucket.parcoursCompletions += 1;
@@ -235,6 +322,15 @@ export class MenuTelemetryStore extends PersistentStore {
         modeBucket.totalDuration += duration;
         modeBucket.totalSelfCollisions += selfCollisions;
         modeBucket.totalItemUses += itemUses;
+        modeBucket.totalItemUseModeCounts.use += itemUseByMode.use;
+        modeBucket.totalItemUseModeCounts.shoot += itemUseByMode.shoot;
+        modeBucket.totalItemUseModeCounts.mg += itemUseByMode.mg;
+        modeBucket.totalItemUseModeCounts.other += itemUseByMode.other;
+        mergeItemUseTypeCounts(modeBucket.totalItemUseTypeCounts, itemUseByType);
+        modeBucket.totalMgHits += mgHits;
+        modeBucket.totalRocketHits += rocketHits;
+        modeBucket.totalShieldAbsorb += shieldAbsorb;
+        modeBucket.totalHpDamage += hpDamage;
         modeBucket.totalStuckEvents += stuckEvents;
         if (parcoursCompleted) {
             modeBucket.parcoursCompletions += 1;
@@ -256,6 +352,12 @@ export class MenuTelemetryStore extends PersistentStore {
             duration,
             selfCollisions,
             itemUses,
+            itemUseByMode,
+            itemUseByType,
+            mgHits,
+            rocketHits,
+            shieldAbsorb,
+            hpDamage,
             stuckEvents,
             parcoursCompleted,
             parcoursRouteId,

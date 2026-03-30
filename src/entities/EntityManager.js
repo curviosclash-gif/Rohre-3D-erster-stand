@@ -264,6 +264,7 @@ export class EntityManager {
     _notifyPlayerFeedback(player, message) { this._eventBus.emitPlayerFeedback(player, message); }
 
     _emitHuntDamageEvent(event) {
+        this.recorder?.recordDamageEvent?.(event || null);
         if (this.gameModeStrategy?.hasDamageEvents()) {
             this._huntScoring.registerDamage(event?.sourcePlayer, event?.target, event?.damageResult);
         }
