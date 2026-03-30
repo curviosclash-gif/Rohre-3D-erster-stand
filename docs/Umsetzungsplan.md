@@ -110,7 +110,7 @@ Alle abgeschlossenen oder abgeloesten Plaene liegen unter `docs/archive/plans/`.
 | Bot-Codex | V69 | 2026-03-30 | closed | abgeschlossen 2026-03-30 (69.1-69.6 + 69.99 inkl. test/core+hunt+policy/build/docs-gates) |
 | Bot-Codex | V70 | 2026-03-29 | closed | abgeschlossen 2026-03-29 (70.1-70.4 + 70.99 inkl. test:core/test:stress/build/docs-gates) |
 | - | V72 | - | frei | Intake 2026-03-31 abgeschlossen; Claim fuer 72.1 Capability-/Portal-/Gate-Vertrag offen |
-| - | V74 | - | frei | Intake 2026-03-31 abgeschlossen; Claim fuer 74.1 Runtime-Bundle und Port-Schnitt offen |
+| Bot-Codex | V74 | 2026-03-31 | claimed | 74.1 Runtime-Bundle und Port-Schnitt |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -1142,7 +1142,7 @@ Scope:
 
 Plan-Datei: `docs/plaene/alt/Feature_Architektur_Runtime_Entkopplung_V74.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-31 -->
 <!-- DEPENDS-ON: V58.99 -->
 
 Scope:
