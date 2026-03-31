@@ -1,10 +1,10 @@
 # Feature Architektur-Runtime-Entkopplung V74
 
 Stand: 2026-03-31
-Status: Geplant
+Status: In Arbeit (74.1-74.2 abgeschlossen; 74.99 wegen Playwright-Global-Setup-Probe-Timeouts offen)
 Owner: Codex
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-31 -->
 
 ## Ziel
 
@@ -98,18 +98,18 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 ### 74.1 Runtime-Komposition und `game`-Mutation zurueckdruecken
 
-- [ ] 74.1.1 Die in `GameBootstrap` erzeugten Runtime-Komponenten in ein explizites Bootstrap-/Runtime-Bundle ueberfuehren, damit `main.js` nicht mehr Dutzende lose Properties als impliziten API-Surface verwaltet.
-- [ ] 74.1.2 `GameRuntimeFacade.applySettingsToRuntime()` und angrenzende Setup-Pfade so schneiden, dass abgeleitete Runtime-Werte (`runtimeConfig`, Session-Daten, aktive Controller) in klaren Stores/Ports landen statt breit auf dem Root-Objekt zu verstreuen.
-- [ ] 74.1.3 Bestehende Backward-Compat-Wrapper in `Game` inventarisieren und in `keep`, `replace-by-port` oder `remove-after-migration` klassifizieren, damit weitere Refactors nicht an stillen Aliasen haengen.
-- [ ] 74.1.4 Den globalen `CONFIG`-/`ActiveRuntimeConfigStore`-Pfad inventarisieren und fuer den Lifecycle explizit machen: klare Set-/Clear-Semantik, dokumentierter Uebergangsadapter und keine stillen Match-Reste zwischen Tests, Matches oder `Game`-Instanzen.
+- [x] 74.1.1 Die in `GameBootstrap` erzeugten Runtime-Komponenten in ein explizites Bootstrap-/Runtime-Bundle ueberfuehren, damit `main.js` nicht mehr Dutzende lose Properties als impliziten API-Surface verwaltet. (abgeschlossen: 2026-03-31; evidence: git show --stat 39fa705 -> commit 39fa705)
+- [x] 74.1.2 `GameRuntimeFacade.applySettingsToRuntime()` und angrenzende Setup-Pfade so schneiden, dass abgeleitete Runtime-Werte (`runtimeConfig`, Session-Daten, aktive Controller) in klaren Stores/Ports landen statt breit auf dem Root-Objekt zu verstreuen. (abgeschlossen: 2026-03-31; evidence: git show --stat 39fa705 -> commit 39fa705)
+- [x] 74.1.3 Bestehende Backward-Compat-Wrapper in `Game` inventarisieren und in `keep`, `replace-by-port` oder `remove-after-migration` klassifizieren, damit weitere Refactors nicht an stillen Aliasen haengen. (abgeschlossen: 2026-03-31; evidence: git show --stat 39fa705 -> commit 39fa705)
+- [x] 74.1.4 Den globalen `CONFIG`-/`ActiveRuntimeConfigStore`-Pfad inventarisieren und fuer den Lifecycle explizit machen: klare Set-/Clear-Semantik, dokumentierter Uebergangsadapter und keine stillen Match-Reste zwischen Tests, Matches oder `Game`-Instanzen. (abgeschlossen: 2026-03-31; evidence: git show --stat 39fa705 -> commit 39fa705)
 
 ### 74.2 Core/UI-Orchestrierungszyklus aufloesen
 
-- [ ] 74.2.1 Einen expliziten Match-Lifecycle-Port zwischen Runtime-Core und UI definieren, sodass `GameRuntimeFacade` keine UI-Controller direkt antreibt und `MatchFlowUiController` keine privaten Facade-Interna `_initSession`, `_waitForAllPlayersLoaded`, `_teardownSession` oder `_startArcadeRunIfEnabled` mehr aufruft.
-- [ ] 74.2.2 Start-, Round-, Pause- und Return-to-Menu-Flows in klar getrennte Verantwortlichkeiten schneiden: UI steuert Darstellung und Nutzereingaben, Runtime-Core steuert Session-/Arcade-/Netzwerk-Lifecycle.
-- [ ] 74.2.3 Direkte Privatmethodenaufrufe aus Bootstrap in UI-Controller (`_setupPauseOverlayListeners`) durch explizite Public-Ports oder Initializer ersetzen, damit Bootstrap nur noch definierte Vertraege nutzt.
-- [ ] 74.2.4 Die vorhandene Port-Schicht (`GameRuntimePorts`) auf echte Richtungstreue pruefen und Rueckgriffe auf `game`, `matchFlowUiController` oder `sessionOrchestrator` aus den Ports entfernen; Ports sollen Vertragsanbieter sein, keine getarnten Alias-Weiterleitungen.
-- [ ] 74.2.5 Einen einzigen oeffentlichen Return-to-Menu-Entry-Point definieren und alle Round-End-, Pause-, Fehler- und Hotkey-Pfade darauf konsolidieren, damit Arcade-Reset, Match-Prewarm, Input-Cleanup und Session-Teardown nicht auseinanderlaufen.
+- [x] 74.2.1 Einen expliziten Match-Lifecycle-Port zwischen Runtime-Core und UI definieren, sodass `GameRuntimeFacade` keine UI-Controller direkt antreibt und `MatchFlowUiController` keine privaten Facade-Interna `_initSession`, `_waitForAllPlayersLoaded`, `_teardownSession` oder `_startArcadeRunIfEnabled` mehr aufruft. (abgeschlossen: 2026-03-31; evidence: git show --stat f25a4db -> commit f25a4db)
+- [x] 74.2.2 Start-, Round-, Pause- und Return-to-Menu-Flows in klar getrennte Verantwortlichkeiten schneiden: UI steuert Darstellung und Nutzereingaben, Runtime-Core steuert Session-/Arcade-/Netzwerk-Lifecycle. (abgeschlossen: 2026-03-31; evidence: npm run build -> commit f25a4db)
+- [x] 74.2.3 Direkte Privatmethodenaufrufe aus Bootstrap in UI-Controller (`_setupPauseOverlayListeners`) durch explizite Public-Ports oder Initializer ersetzen, damit Bootstrap nur noch definierte Vertraege nutzt. (abgeschlossen: 2026-03-31; evidence: git show --stat f25a4db -> commit f25a4db)
+- [x] 74.2.4 Die vorhandene Port-Schicht (`GameRuntimePorts`) auf echte Richtungstreue pruefen und Rueckgriffe auf `game`, `matchFlowUiController` oder `sessionOrchestrator` aus den Ports entfernen; Ports sollen Vertragsanbieter sein, keine getarnten Alias-Weiterleitungen. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:boundaries -> commit f25a4db)
+- [x] 74.2.5 Einen einzigen oeffentlichen Return-to-Menu-Entry-Point definieren und alle Round-End-, Pause-, Fehler- und Hotkey-Pfade darauf konsolidieren, damit Arcade-Reset, Match-Prewarm, Input-Cleanup und Session-Teardown nicht auseinanderlaufen. (abgeschlossen: 2026-03-31; evidence: npm run build -> commit f25a4db)
 
 ### 74.3 Match-Session-Lifecycle und Stale-Cleanup haerten
 
@@ -138,6 +138,12 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 - [ ] 74.99.1 `npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:architecture:metrics` und die direkt betroffenen Runtime-Tests/Smokes sind fuer den Scope gruen.
 - [ ] 74.99.2 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind abgeschlossen; verbleibende Rest-Hotspots ausserhalb des Block-Scopes sind dokumentiert, bevor `74.99` geschlossen wird.
+
+Gate-Status 2026-03-31:
+
+- Architektur- und Build-Gates sind gruen (`npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:eslint:touched-strict`, `npm run build`).
+- Automatisierte Browser-Verifikation bleibt offen: `node scripts/verify-lock.mjs --playwright -- npx playwright test tests/runtime-facade.spec.js --reporter=line` lief mit `TEST_PORT=5348` in ein Tool-Timeout; `test-results/v74-runtime-facade-spec/playwright-startup-diagnostics.json` zeigt weiter `probe-timeout` und `fetch failed` in `tests/playwright.global-setup.js`.
+- Der kurzfristige Parser-Blocker durch BOM in `scripts/validate-umsetzungsplan.mjs` ist im Scope-Fix `f25a4db` behoben; verbleibend ist der Browser-Prewarm-/Global-Setup-Blocker. Siehe `docs/Fehlerberichte/2026-03-31_v74-playwright-browser-prewarm-timeout.md`.
 
 ## Verifikationsstrategie
 
