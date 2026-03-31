@@ -80,19 +80,28 @@ Remove-Item Env:BOT_RUNNER_TOTAL_TIMEOUT -ErrorAction SilentlyContinue
 
 ## Aktiver Lauf (Operator-Status)
 
-- Start: `2026-03-28 00:08:41` (Europe/Berlin)
-- SeriesStamp: `BT20_SURV_20260328T000841`
-- Log: `output/training/BT20_SURV_20260328T000841-10h.log`
-- PID (cmd wrapper): `12424`
+- Start: `2026-03-31 04:32:52` (Europe/Berlin)
+- SeriesStamp: `BT20_SURV_20260331T043252`
+- Trainer-Server:
+  - Port: `8876`
+  - Log: `output/training/BT20_SURV_20260331T043252-trainer-server.log`
+  - PID: `11580`
+- Loop:
+  - Log: `output/training/BT20_SURV_20260331T043252-10h.log`
+  - PID: `11492`
+- Laufparameter:
+  - `classic-3d, classic-2d, hunt-3d, hunt-2d`
+  - Seeds `11,23,37,41,53`
+  - `episodes=8`, `max-steps=260`, `runner-profile=learn`
+  - `bridge-max-pending-acks=1024`, `bridge-backpressure-threshold=768`, `trainer-command-timeout-ms=150`
 - Warm-up Evidence:
-  - `data/training/runs/BT20_SURV_20260328T000841-r01/run.json`
-  - `data/training/runs/BT20_SURV_20260328T000841-r01/trainer.json`
-  - `data/training/runs/BT20_SURV_20260328T000841-r01/eval.json`
-  - `data/training/runs/BT20_SURV_20260328T000841-r01/gate.json`
+  - `data/training/runs/BT20_SURV_20260331T043252-r01/run.json`
+  - `data/training/runs/BT20_SURV_20260331T043252-r02/eval.json`
+  - `data/training/runs/BT20_SURV_20260331T043252-r02/gate.json`
+  - `data/training/runs/latest.json`
 - Resume-Evidence:
-  - `resumeSource=data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json`
-  - `checkpointLoads=1`
-  - `optimizerSteps=1588329` und `envSteps=10979007` nach Run `r01`
+  - Startup-Resume ueber separaten Trainer-Server: `resumeSource=data/training/models/BT11_FIGHT_20260324T014853-r4042/checkpoint.json`
+  - Fruehe Trainer-Metriken nach `r02`: `replaySize=763`, `optimizerSteps=127`, `epsilon=0.9637575`
 - Aktueller Hinweis:
-  - Der nachgelagerte `trainer-checkpoint-load` Command timed out weiterhin im Bridge-Pfad (`commandResponses=0`), der Startup-Resume im Trainer-Server greift aber nachweislich. Details stehen in `docs/Fehlerberichte/2026-03-28_training_resume-command-timeout.md`.
-  - 2026-03-31: Trainer-seitiger Safety-Layer und Survival-First Reward-Shaping sind implementiert; der naechste BT20-A/B-Lauf soll die neuen Collision-/Threat-Guards sowie die Wall/Trail/Opponent-Risk-Penalties gegen BT10/BT11 erneut auswerten. Evidence: `node --test tests/trainer-v36-action-safety.test.mjs tests/training-reward-survival.test.mjs`
+  - Der bekannte `trainer-checkpoint-load` Reply-Pfad timed out weiterhin (`commandResponses=0`); deshalb laeuft der 10h-Loop ueber externen Startup-Resume-Server mit `resume-strict=false` im Run-Command und `resume-strict=true` beim Server-Start. Details stehen in `docs/Fehlerberichte/2026-03-28_training_resume-command-timeout.md`.
+  - Frueher Gate-Stand ist gruen (`BT20_SURV_20260331T043252-r02/gate.json`); `botValidationAverageBotSurvival` ist in den ersten Eval-Artefakten noch `null`, daher 2h-Checkpoint-Validate wie im Plan nachziehen.
