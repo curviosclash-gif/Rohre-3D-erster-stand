@@ -50,7 +50,7 @@ Abgeschlossene Blockarchive liegen unter `docs/plaene/alt/`; aeltere Masterplaen
 | --- | --- | --- | --- | --- |
 | - | V64 | - | frei | Scope noch nicht definiert |
 | - | V72 | - | frei | Claim fuer 72.1 Capability-/Portal-/Gate-Vertrag offen |
-| - | V74 | - | frei | Claim fuer 74.1 Runtime-Bundle und Port-Schnitt offen |
+| Bot-Codex | V74 | 2026-03-31 | claimed | 74.2 Core/UI-Orchestrierungszyklus aufloesen |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -83,7 +83,7 @@ Hinweis: Bot-Training-Backlog wird in `docs/bot-training/Bot_Trainingsplan.md` g
 | ID | Titel | Plan-Datei | Impact | Aufwand | Prioritaet | Naechster Schritt | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V72 | Gameplay-Powerups, Portale und Gates - Vertragsklarheit und Sichtbarkeit | `docs/plaene/alt/Feature_Gameplay_Powerups_Portale_Gates_V72.md` | hoch | gross | P1 | Claim fuer 72.1 Capability-Matrix und Portal-/Gate-Vertrag offen | Geplant |
-| V74 | Architektur-Runtime-Entkopplung | `docs/plaene/alt/Feature_Architektur_Runtime_Entkopplung_V74.md` | sehr hoch | gross | P1 | Claim fuer 74.1 Runtime-Bundle und Entkopplungsport offen | Geplant |
+| V74 | Architektur-Runtime-Entkopplung | `docs/plaene/alt/Feature_Architektur_Runtime_Entkopplung_V74.md` | sehr hoch | gross | P1 | 74.2 Core/UI-Orchestrierungszyklus aufloesen | In Bearbeitung |
 
 Weitere inaktive Eintraege (V39, V40, V42, V43, V2, V26.3c, V29b, N2, N8, T1) liegen in `docs/prozess/Backlog.md`. Abgeschlossene Blockdefinitionen V58-V70 sind nach `docs/plaene/alt/` ausgelagert.
 
@@ -172,7 +172,7 @@ Scope:
 
 Plan-Datei: `docs/plaene/alt/Feature_Architektur_Runtime_Entkopplung_V74.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-03-31 -->
 <!-- DEPENDS-ON: V58.99 -->
 
 Scope:
