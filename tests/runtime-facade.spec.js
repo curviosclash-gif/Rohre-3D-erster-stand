@@ -59,6 +59,28 @@ test.describe('V59-59.7.2: GameRuntimeFacade', () => {
         expect(snapshot.runtimeConfigAdapter?.ownerScope).toBe('runtimeBundle');
     });
 
+    test('Runtime bundle exposes lifecycle and UI orchestration ports', async ({ page }) => {
+        await loadGame(page);
+        const snapshot = await page.evaluate(() => {
+            const g = window.GAME_INSTANCE;
+            const ports = g?.runtimeBundle?.ports || null;
+            return {
+                hasLifecyclePort: typeof ports?.lifecyclePort?.returnToMenu === 'function'
+                    && typeof ports?.lifecyclePort?.initializeSession === 'function',
+                hasMatchUiPort: typeof ports?.matchUiPort?.startMatch === 'function'
+                    && typeof ports?.matchUiPort?.applyReturnToMenuUi === 'function'
+                    && typeof ports?.matchUiPort?.setupPauseOverlayListeners === 'function',
+                hasRuntimeFacadeComponent: g?.runtimeBundle?.components?.runtimeFacade === g?.runtimeFacade,
+                hasSessionOrchestratorComponent: !!g?.runtimeBundle?.components?.matchSessionOrchestrator,
+            };
+        });
+
+        expect(snapshot.hasLifecyclePort).toBe(true);
+        expect(snapshot.hasMatchUiPort).toBe(true);
+        expect(snapshot.hasRuntimeFacadeComponent).toBe(true);
+        expect(snapshot.hasSessionOrchestratorComponent).toBe(true);
+    });
+
     test('Owned runtime config store clears on dispose only for the owning bundle', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

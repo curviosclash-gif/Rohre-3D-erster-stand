@@ -5543,7 +5543,7 @@ test.describe('T1-20: Core & Infrastruktur', () => {
                 runtimeFacade: {
                     isNetworkSession: () => false,
                     isHost: () => true,
-                    _teardownSession() { },
+                    teardownRuntimeSession() { },
                 },
                 hudRuntimeSystem: { clearNetworkScoreboard() { } },
                 _showMainNav() { },
@@ -5642,7 +5642,88 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.afterRebind.keyCaptureCalls).toBe(2);
     });
 
-    test('T20ae2: RuntimeSessionLifecycle puffert fruehe stateUpdate-Pakete und wartet als Client auf Host-Startsignal', async ({ page }) => {
+    test('T20ae2: PauseOverlayController delegiert Return-to-Menu an den Lifecycle-Port', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { PauseOverlayController } = await import('/src/ui/PauseOverlayController.js');
+
+            const makeButton = () => document.createElement('button');
+            const makeCheckbox = () => {
+                const input = document.createElement('input');
+                input.type = 'checkbox';
+                return input;
+            };
+
+            let lifecycleReturnCalls = 0;
+            let sessionTeardownCalls = 0;
+            let runtimeTeardownCalls = 0;
+
+            const game = {
+                state: 'PAUSED',
+                ui: {
+                    pauseOverlay: document.createElement('div'),
+                    pauseResumeButton: makeButton(),
+                    pauseSettingsButton: makeButton(),
+                    pauseSettingsBackButton: makeButton(),
+                    pauseMenuButton: makeButton(),
+                    pauseSettingsPanel: document.createElement('div'),
+                    pauseKeybindP1: document.createElement('div'),
+                    pauseKeybindP2: document.createElement('div'),
+                    pauseAutoRollToggle: makeCheckbox(),
+                    pauseInvertP1: makeCheckbox(),
+                    pauseInvertP2: makeCheckbox(),
+                },
+                settings: {
+                    autoRoll: false,
+                    invertPitch: { PLAYER_1: false, PLAYER_2: false },
+                },
+                entityManager: { players: [] },
+                keybindEditorController: { renderPauseEditor() { } },
+                gameLoop: { requestDeltaReset() { } },
+                runtimeFacade: {
+                    isNetworkSession: () => false,
+                    isHost: () => true,
+                    teardownRuntimeSession() { runtimeTeardownCalls += 1; },
+                },
+            };
+
+            const controller = new PauseOverlayController({
+                matchFlowUiController: {
+                    game,
+                    returnToMenu() {
+                        throw new Error('matchFlow fallback should not run while lifecyclePort exists');
+                    },
+                },
+                game,
+                ports: {
+                    lifecyclePort: {
+                        returnToMenu() {
+                            lifecycleReturnCalls += 1;
+                        },
+                    },
+                    sessionPort: {
+                        teardownMatchSession() {
+                            sessionTeardownCalls += 1;
+                        },
+                    },
+                },
+            });
+
+            controller.returnToMenuFromPause();
+
+            return {
+                lifecycleReturnCalls,
+                sessionTeardownCalls,
+                runtimeTeardownCalls,
+            };
+        });
+
+        expect(result.lifecycleReturnCalls).toBe(1);
+        expect(result.sessionTeardownCalls).toBe(0);
+        expect(result.runtimeTeardownCalls).toBe(0);
+    });
+
+    test('T20ae3: RuntimeSessionLifecycle puffert fruehe stateUpdate-Pakete und wartet als Client auf Host-Startsignal', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const lifecycleModule = await import('/src/core/runtime/RuntimeSessionLifecycleService.js');

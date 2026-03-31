@@ -257,6 +257,8 @@ export class GameRuntimeFacade {
         });
     }
 
+    startArcadeRunIfEnabled() { return this._startArcadeRunIfEnabled(); }
+
     _resetArcadeRunState() {
         this.arcadeRunRuntime.resetRunState({ preserveRecords: true });
     }
@@ -327,10 +329,7 @@ export class GameRuntimeFacade {
             this._applyAuthoritativeMultiplayerMatchSettings(command.settingsSnapshot);
         }
         game.uiManager?.clearStartValidationError?.();
-        const startResult = game.matchFlowUiController?.startMatch?.();
-        if (startResult !== false) {
-            this._startArcadeRunIfEnabled();
-        }
+        const startResult = this.ports?.matchUiPort?.startMatch?.();
         return startResult !== false;
     }
 
@@ -715,6 +714,8 @@ export class GameRuntimeFacade {
         return initRuntimeSession(this);
     }
 
+    initializeSession() { return this._initSession(); }
+
     /**
      * Host: broadcasts state snapshots at 10/s to all connected clients.
      */
@@ -741,9 +742,13 @@ export class GameRuntimeFacade {
         return waitForRuntimePlayersLoaded(this);
     }
 
+    waitForAllPlayersLoaded() { return this._waitForAllPlayersLoaded(); }
+
     _teardownSession() {
         teardownRuntimeSession(this);
     }
+
+    teardownRuntimeSession() { this._teardownSession(); }
 
     /** Returns true if the current session is a network (LAN/Online) session. */
     isNetworkSession() {
@@ -793,21 +798,22 @@ export class GameRuntimeFacade {
             }
             return true;
         }
-        const startResult = this.game?.matchFlowUiController?.startMatch?.();
-        if (startResult !== false) {
-            this._startArcadeRunIfEnabled();
-        }
+        const startResult = this.ports?.matchUiPort?.startMatch?.();
         return startResult !== false;
     }
 
-    restartRound() {
-        this.game?.matchFlowUiController?.startRound?.();
-    }
+    restartRound() { this.ports?.matchUiPort?.startRound?.(); }
 
-    returnToMenu() {
-        this.game?.matchFlowUiController?.returnToMenu?.();
+    returnToMenu(options = {}) {
+        this.ports?.sessionPort?.clearLastRoundGhost?.();
+        this.ports?.sessionPort?.teardownMatchSession?.({ reason: options?.reason || 'return_to_menu' });
+        this.teardownRuntimeSession();
+        this.ports?.inputPort?.clearPlayerSources?.();
+        this.game?.hudRuntimeSystem?.clearNetworkScoreboard?.();
+        this.ports?.matchUiPort?.applyReturnToMenuUi?.(options);
         this._resetArcadeRunState();
         this.scheduleMatchPrewarm();
+        return true;
     }
 
     syncP2HudVisibility() {
@@ -817,7 +823,7 @@ export class GameRuntimeFacade {
 
     dispose() {
         this._clearMatchPrewarmTimer();
-        this._teardownSession();
+        this.teardownRuntimeSession();
         this.game?.menuController?.dispose?.();
         this.game?.menuMultiplayerBridge?.dispose?.();
         if (this.game) {

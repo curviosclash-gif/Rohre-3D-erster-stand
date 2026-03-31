@@ -56,7 +56,7 @@ export class MatchFlowUiController {
     constructor(deps = {}) {
         this.game = deps.game || null;
         this.ports = deps.ports || null;
-        this.sessionOrchestrator = new MatchLifecycleSessionOrchestrator(this.game);
+        this.sessionOrchestrator = deps.sessionOrchestrator || new MatchLifecycleSessionOrchestrator(this.game);
         this.feedbackAdapter = new MatchFeedbackAdapter({
             showToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone),
             logger: console,
@@ -545,7 +545,11 @@ export class MatchFlowUiController {
     }
 
     _completeStartedMatch(initializedMatch) {
-        this.game?.runtimeFacade?._startArcadeRunIfEnabled?.();
+        if (this.ports?.lifecyclePort?.startArcadeRunIfEnabled) {
+            this.ports.lifecyclePort.startArcadeRunIfEnabled();
+        } else {
+            this.game?.runtimeFacade?.startArcadeRunIfEnabled?.();
+        }
         this.sessionOrchestrator.bindHuntEventHandlers({
             onHuntFeedEvent: (entry) => this._pushHuntFeedEntry(entry),
             onHuntDamageEvent: (event) => this._handleHuntDamageEvent(event),
@@ -558,7 +562,7 @@ export class MatchFlowUiController {
     _handleStartMatchFailure(error) {
         logger.error('startMatch failed:', error);
         this.game?._showStatusToast?.('Map-Start fehlgeschlagen. Fallback oder Menue wird geladen.', 2600, 'error');
-        this.returnToMenu();
+        this.returnToMenu({ reason: 'match_start_failure', trigger: 'match_start_failure' });
         return false;
     }
 
@@ -600,7 +604,9 @@ export class MatchFlowUiController {
         }
 
         // Initialize session adapter (Local/LAN/Online)
-        const sessionInitPromise = game.runtimeFacade?._initSession?.();
+        const sessionInitPromise = this.ports?.lifecyclePort?.initializeSession
+            ? this.ports.lifecyclePort.initializeSession()
+            : game.runtimeFacade?.initializeSession?.();
 
         const createMatch = () => {
             const initializedMatch = this.sessionOrchestrator.createMatchSession({
@@ -620,7 +626,9 @@ export class MatchFlowUiController {
         };
 
         const completeWithLoadGate = (resolvedMatch) => {
-            const loadGate = game.runtimeFacade?._waitForAllPlayersLoaded?.();
+            const loadGate = this.ports?.lifecyclePort?.waitForAllPlayersLoaded
+                ? this.ports.lifecyclePort.waitForAllPlayersLoaded()
+                : game.runtimeFacade?.waitForAllPlayersLoaded?.();
             if (isPromiseLike(loadGate)) {
                 return Promise.resolve(loadGate).then(() => this._completeStartedMatch(resolvedMatch));
             }
@@ -753,20 +761,43 @@ export class MatchFlowUiController {
         game.state = roundEndTransition.nextState;
     }
 
-    returnToMenu() {
+    applyReturnToMenuUi(options = {}) {
         const game = this.game;
         const returnTransition = deriveReturnToMenuTransition();
-        this.applyLifecycleTransition(returnTransition);
-        game.entityManager?.clearLastRoundGhost?.();
         this._clearArcadeOverlayPanel();
-        this.sessionOrchestrator.teardownMatchSession();
-        game.runtimeFacade?._teardownSession?.();
+        this.applyLifecycleTransition(returnTransition);
+        this.applyMatchUiState(returnTransition.uiState);
+        this.resetCrosshairUi();
+        if (options?.showMenuPanel === false) {
+            return returnTransition;
+        }
+        const panelId = String(options?.panelId || 'submenu-game').trim() || 'submenu-game';
+        const trigger = String(options?.trigger || options?.reason || 'return_to_menu').trim() || 'return_to_menu';
+        if (this.ports?.uiFeedbackPort?.showMenuPanel) {
+            this.ports.uiFeedbackPort.showMenuPanel(panelId, { trigger });
+        } else {
+            game._showMainNav?.();
+        }
+        if (this.ports?.uiFeedbackPort?.syncAll) {
+            this.ports.uiFeedbackPort.syncAll();
+        } else {
+            game.uiManager?.syncAll?.();
+        }
+        return returnTransition;
+    }
+
+    returnToMenu(options = {}) {
+        if (this.ports?.lifecyclePort?.returnToMenu) {
+            return this.ports.lifecyclePort.returnToMenu(options);
+        }
+        const game = this.game;
+        game.entityManager?.clearLastRoundGhost?.();
+        this.sessionOrchestrator.teardownMatchSession({ reason: options?.reason || 'return_to_menu' });
+        game.runtimeFacade?.teardownRuntimeSession?.();
         game.input?.clearPlayerSources?.();
         game.hudRuntimeSystem?.clearNetworkScoreboard?.();
-        this.applyMatchUiState(returnTransition.uiState);
-        game._showMainNav();
-        this.resetCrosshairUi();
-        game.uiManager.syncAll();
+        this.applyReturnToMenuUi(options);
+        return true;
     }
 
     /**
@@ -800,7 +831,7 @@ export class MatchFlowUiController {
         this.pauseOverlayController.returnToMenuFromPause();
     }
 
-    _setupPauseOverlayListeners() {
+    setupPauseOverlayListeners() {
         this.pauseOverlayController.setupListeners();
     }
 

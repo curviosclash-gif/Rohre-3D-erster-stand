@@ -13,6 +13,7 @@ import { createRuntimePorts } from '../shared/runtime/GameRuntimePorts.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { CONFIG } from './Config.js';
 import { RECORDING_DOWNLOAD_DIRECTORY } from '../shared/contracts/RecordingCaptureContract.js';
+import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
 import {
     attachGameRuntimeBundle,
     createGameRuntimeBundle,
@@ -127,6 +128,7 @@ export function bootstrapGameRuntime(game, options = {}) {
 
     runtimeBundle.components.hudP1 = new HUD('p1-fighter-hud', 0);
     runtimeBundle.components.hudP2 = new HUD('p2-fighter-hud', 1);
+    runtimeBundle.components.matchSessionOrchestrator = new MatchLifecycleSessionOrchestrator(game);
     runtimeBundle.components.huntHud = new HuntHUD({
         runtime: game,
         refs: createHuntHudDomRefs(document),
@@ -136,7 +138,11 @@ export function bootstrapGameRuntime(game, options = {}) {
     runtimeBundle.components.screenShake = new ScreenShake(renderer);
     runtimeBundle.components.hudRuntimeSystem = new HudRuntimeSystem({ game, ports: runtimePorts });
     runtimeBundle.components.crosshairSystem = new CrosshairSystem({ game, ports: runtimePorts });
-    runtimeBundle.components.matchFlowUiController = new MatchFlowUiController({ game, ports: runtimePorts });
+    runtimeBundle.components.matchFlowUiController = new MatchFlowUiController({
+        game,
+        ports: runtimePorts,
+        sessionOrchestrator: runtimeBundle.components.matchSessionOrchestrator,
+    });
     runtimeBundle.components.runtimeDiagnosticsSystem = new RuntimeDiagnosticsSystem(game);
     runtimeBundle.components.keybindEditorController = new KeybindEditorController(game);
     runtimeBundle.components.planarAimAssistSystem = new PlanarAimAssistSystem(game);
@@ -154,7 +160,7 @@ export function bootstrapGameRuntime(game, options = {}) {
         }
     );
 
-    runtimeBundle.components.matchFlowUiController._setupPauseOverlayListeners();
+    runtimePorts.matchUiPort?.setupPauseOverlayListeners?.();
     runtimeBundle.state._navButtons = [];
     runtimeBundle.state._menuButtonByPanel = new Map();
     runtimeBundle.state._activeSubmenu = null;

@@ -12,6 +12,14 @@ function getRuntimeComponents(game) {
     return getRuntimeBundle(game)?.components || null;
 }
 
+function getRuntimeComponent(game, key) {
+    return getRuntimeComponents(game)?.[key] || null;
+}
+
+function getRuntimeFacade(game) {
+    return getRuntimeComponent(game, 'runtimeFacade') || game?.runtimeFacade || null;
+}
+
 export function createSettingsPort(game) {
     return {
         getSettings: () => game?.settings || null,
@@ -78,12 +86,12 @@ export function createSessionPort(game) {
             const entityManager = getRuntimeState(game)?.entityManager || game?.entityManager || null;
             entityManager?.clearLastRoundGhost?.();
         },
-        teardownMatchSession() {
-            const matchFlowUiController = getRuntimeComponents(game)?.matchFlowUiController || game?.matchFlowUiController || null;
-            matchFlowUiController?.sessionOrchestrator?.teardownMatchSession?.();
+        teardownMatchSession(options = undefined) {
+            const matchSessionOrchestrator = getRuntimeComponent(game, 'matchSessionOrchestrator');
+            matchSessionOrchestrator?.teardownMatchSession?.(options);
         },
         requestDeltaReset(reason) {
-            const gameLoop = getRuntimeComponents(game)?.gameLoop || game?.gameLoop || null;
+            const gameLoop = getRuntimeComponent(game, 'gameLoop') || game?.gameLoop || null;
             gameLoop?.requestDeltaReset?.(reason);
         },
     };
@@ -107,11 +115,51 @@ export function createRenderPort(game) {
 export function createInputPort(game) {
     return {
         clearJustPressed() {
-            getRuntimeComponents(game)?.input?.clearJustPressed?.();
+            getRuntimeComponent(game, 'input')?.clearJustPressed?.();
         },
         startKeyCapture(playerKey, action) {
-            const keybindEditorController = getRuntimeComponents(game)?.keybindEditorController || game?.keybindEditorController || null;
+            const keybindEditorController = getRuntimeComponent(game, 'keybindEditorController') || game?.keybindEditorController || null;
             keybindEditorController?.startKeyCapture?.(playerKey, action);
+        },
+        clearPlayerSources() {
+            getRuntimeComponent(game, 'input')?.clearPlayerSources?.();
+        },
+    };
+}
+
+export function createLifecyclePort(game) {
+    return {
+        initializeSession() {
+            return getRuntimeFacade(game)?.initializeSession?.();
+        },
+        waitForAllPlayersLoaded() {
+            return getRuntimeFacade(game)?.waitForAllPlayersLoaded?.();
+        },
+        teardownRuntimeSession() {
+            return getRuntimeFacade(game)?.teardownRuntimeSession?.();
+        },
+        startArcadeRunIfEnabled() {
+            return getRuntimeFacade(game)?.startArcadeRunIfEnabled?.();
+        },
+        returnToMenu(options = undefined) {
+            return getRuntimeFacade(game)?.returnToMenu?.(options);
+        },
+    };
+}
+
+export function createMatchUiPort(game) {
+    return {
+        startMatch() {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.startMatch?.();
+        },
+        startRound() {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.startRound?.();
+        },
+        applyReturnToMenuUi(options = undefined) {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.applyReturnToMenuUi?.(options);
+        },
+        setupPauseOverlayListeners() {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.setupPauseOverlayListeners?.();
         },
     };
 }
@@ -122,12 +170,16 @@ export function createRuntimePorts(game) {
     const sessionPort = createSessionPort(game);
     const renderPort = createRenderPort(game);
     const inputPort = createInputPort(game);
+    const lifecyclePort = createLifecyclePort(game);
+    const matchUiPort = createMatchUiPort(game);
     return {
         settingsPort,
         uiFeedbackPort,
         sessionPort,
         renderPort,
         inputPort,
+        lifecyclePort,
+        matchUiPort,
         dispose: noop,
     };
 }

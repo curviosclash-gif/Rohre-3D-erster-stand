@@ -71,6 +71,9 @@ export class Game {
             showStatusToast: (message, durationMs, tone) => this._showStatusToast(message, durationMs, tone),
         });
         this.runtimeFacade = new GameRuntimeFacade({ game: this, ports: runtimeBundle?.ports || this.runtimePorts, runtimeBundle });
+        if (runtimeBundle?.components) {
+            runtimeBundle.components.runtimeFacade = this.runtimeFacade;
+        }
         this.debugApi = new GameDebugApi(this);
 
         // Debug Recorder
@@ -526,7 +529,7 @@ export class Game {
 
         this.keyCapture = null;
         this.gameLoop?.stop?.();
-        this.matchFlowUiController?.sessionOrchestrator?.teardownMatchSession?.();
+        this.runtimeBundle?.components?.matchSessionOrchestrator?.teardownMatchSession?.({ reason: 'game_dispose' });
         this.matchFlowUiController?.dispose?.();
         this.runtimeFacade?.dispose?.();
         this.huntHud?.dispose?.();

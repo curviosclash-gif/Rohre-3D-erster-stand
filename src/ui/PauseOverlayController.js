@@ -1,7 +1,6 @@
 import {
     derivePauseTransition,
     deriveResumeTransition,
-    deriveReturnToMenuTransition,
 } from '../state/MatchLifecycleStateTransitions.js';
 
 export class PauseOverlayController {
@@ -180,25 +179,22 @@ export class PauseOverlayController {
 
     returnToMenuFromPause() {
         const controller = this.matchFlowUiController;
-        const game = this.game;
-        const returnTransition = deriveReturnToMenuTransition();
         this._hideSettings();
         this.hideHostPausedOverlay();
         this._restorePauseButtonLabels();
-        controller.applyLifecycleTransition(returnTransition);
-        this.ports?.sessionPort?.clearLastRoundGhost?.();
-        this.ports?.sessionPort?.teardownMatchSession?.();
-        game.runtimeFacade?._teardownSession?.();
-        game.hudRuntimeSystem?.clearNetworkScoreboard?.();
-        controller.applyMatchUiState(returnTransition.uiState);
-        controller.resetCrosshairUi();
-
-        if (this.ports?.uiFeedbackPort?.showMenuPanel) {
-            this.ports.uiFeedbackPort.showMenuPanel('submenu-game', { trigger: 'pause_menu_return' });
-        } else {
-            game._showMainNav();
+        if (this.ports?.lifecyclePort?.returnToMenu) {
+            this.ports.lifecyclePort.returnToMenu({
+                panelId: 'submenu-game',
+                reason: 'pause_menu_return',
+                trigger: 'pause_menu_return',
+            });
+            return;
         }
-        this.ports?.uiFeedbackPort?.syncAll?.();
+        controller.returnToMenu({
+            panelId: 'submenu-game',
+            reason: 'pause_menu_return',
+            trigger: 'pause_menu_return',
+        });
     }
 
     _restorePauseButtonLabels() {

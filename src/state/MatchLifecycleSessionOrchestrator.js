@@ -136,10 +136,13 @@ export class MatchLifecycleSessionOrchestrator {
         }
     }
 
-    teardownMatchSession() {
+    teardownMatchSession(options = undefined) {
         const game = this.runtime;
         if (!game) return;
-        this._endLifecycleSession('return_to_menu');
+        const reason = typeof options === 'string'
+            ? options
+            : (options?.reason || 'return_to_menu');
+        this._endLifecycleSession(reason);
         disposeMatchSessionSystems(game.renderer, game.matchSessionRuntimeBridge.getCurrentMatchSessionRefs());
         game.matchSessionRuntimeBridge.clearMatchSessionRefs();
         this.notifyMenuOpened();
