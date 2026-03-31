@@ -4,19 +4,24 @@
 //
 // Expected reward ranges per step (with default weights):
 //   baseStep:     0        (constant)
-//   survival:     0..0.1   (per step — 10x for longer survival)
+//   survival:     0..0.12  (per step - baseline survival reward)
+//   survivalPressureBonus: 0..0.06  (per step - extra reward when surviving under pressure)
 //   kill:         0..1     (rare, 0-1 per step)
-//   crash:       -5..0     (rare — 5x penalty to discourage crashing)
+//   crash:       -6..0     (rare - explicit death penalty)
 //   stuck:       -0.35..0  (rare)
 //   itemPickup:   0..0.08  (0-1 per step)
 //   itemUse:      0..0.03  (0-1 per step)
 //   damageDealt:  0..~0.5  (0-25 damage units typical)
-//   damageTaken: -3..0     (0-20 damage units typical — 6x penalty)
+//   damageTaken: -3..0     (0-20 damage units typical - 6x penalty)
+//   wallRisk:    -0.08..0  (continuous near-wall penalty)
+//   trailRisk:   -0.12..0  (continuous trail-pressure penalty)
+//   opponentRisk:-0.08..0  (continuous close-opponent penalty)
+//   lowHealthThreat: -0.2..0 (extra penalty when fragile under pressure)
 //   win:          0..1.5   (terminal only)
 //   loss:        -1.5..0   (terminal only)
 //
-// Typical per-step range: ~[-8.5, +3.0]
-// Terminal step range:    ~[-9.5, +4.5]
+// Typical per-step range: ~[-9.0, +3.2]
+// Terminal step range:    ~[-10.0, +4.5]
 // Trainer clamps rewards to [-rewardClamp, +rewardClamp] (default +-10)
 // ============================================
 
@@ -26,14 +31,19 @@ const REWARD_PRECISION = 1_000_000;
 
 export const DEFAULT_TRAINING_REWARD_WEIGHTS = Object.freeze({
     baseStep: 0,
-    survival: 0.1,
+    survival: 0.12,
+    survivalPressureBonus: 0.06,
     kill: 1,
-    crash: -5,
+    crash: -6,
     stuck: -0.35,
     itemPickup: 0.08,
     itemUse: 0.03,
     damageDealt: 0.02,
     damageTaken: -0.15,
+    wallRisk: -0.08,
+    trailRisk: -0.12,
+    opponentRisk: -0.08,
+    lowHealthThreat: -0.2,
     win: 1.5,
     loss: -1.5,
 });
@@ -47,6 +57,21 @@ function toCount(value) {
     const numeric = Number(value);
     if (!Number.isFinite(numeric)) return 0;
     return Math.max(0, Math.trunc(numeric));
+}
+
+function clamp01(value, fallback = 0) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return fallback;
+    if (numeric <= 0) return 0;
+    if (numeric >= 1) return 1;
+    return numeric;
+}
+
+function resolveRiskValue(source, key) {
+    if (source && typeof source === 'object' && Object.prototype.hasOwnProperty.call(source, key)) {
+        return clamp01(source[key], 0);
+    }
+    return 0;
 }
 
 function resolveWeightMap(input = {}) {
@@ -89,11 +114,31 @@ export function calculateReward(signals = {}, options = {}) {
     const damageDealt = Math.max(0, toFiniteNumber(signals.damageDealt, 0));
     const damageTaken = Math.max(0, toFiniteNumber(signals.damageTaken, 0));
     const survived = signals.survival !== false;
+    const healthRatio = clamp01(signals.healthRatio, 1);
+    const pressureLevel = clamp01(signals.pressureLevel, 0);
+    const riskProximity = signals.riskProximity && typeof signals.riskProximity === 'object'
+        ? signals.riskProximity
+        : null;
+    const wallRisk = clamp01(signals.wallRisk ?? resolveRiskValue(riskProximity, 'wall'), 0);
+    const trailRisk = clamp01(signals.trailRisk ?? resolveRiskValue(riskProximity, 'trail'), 0);
+    const opponentRisk = clamp01(signals.opponentRisk ?? resolveRiskValue(riskProximity, 'opponent'), 0);
+    const projectileThreat = clamp01(signals.projectileThreat, 0);
+    const riskPressure = clamp01(
+        Math.max(pressureLevel, wallRisk, trailRisk, opponentRisk, projectileThreat),
+        0
+    );
+    const survivalPressureScale = survived
+        ? riskPressure * (0.55 + (1 - healthRatio) * 0.45)
+        : 0;
+    const lowHealthThreatScale = healthRatio < 0.5
+        ? riskPressure * ((0.5 - healthRatio) / 0.5)
+        : 0;
     const { won, lost } = resolveTerminalWinLoss(signals, episodeSnapshot);
 
     const components = {
         baseStep: roundReward(weights.baseStep),
         survival: roundReward(survived ? weights.survival : 0),
+        survivalPressureBonus: roundReward(survivalPressureScale * weights.survivalPressureBonus),
         kill: roundReward(killCount * weights.kill),
         crash: roundReward(crashCount * weights.crash),
         stuck: roundReward(stuckCount * weights.stuck),
@@ -101,6 +146,10 @@ export function calculateReward(signals = {}, options = {}) {
         itemUse: roundReward(itemUseCount * weights.itemUse),
         damageDealt: roundReward(damageDealt * weights.damageDealt),
         damageTaken: roundReward(damageTaken * weights.damageTaken),
+        wallRisk: roundReward(wallRisk * weights.wallRisk),
+        trailRisk: roundReward(trailRisk * weights.trailRisk),
+        opponentRisk: roundReward(opponentRisk * weights.opponentRisk),
+        lowHealthThreat: roundReward(lowHealthThreatScale * weights.lowHealthThreat),
         win: roundReward(won ? weights.win : 0),
         loss: roundReward(lost ? weights.loss : 0),
         external: roundReward(toFiniteNumber(signals.bonusReward, 0)),
@@ -124,7 +173,8 @@ export const CURRICULUM_STAGES = Object.freeze([
         weightOverrides: {
             kill: 0, crash: -3, stuck: -0.5, itemPickup: 0, itemUse: 0,
             damageDealt: 0, damageTaken: 0, win: 0, loss: 0,
-            survival: 0.2, baseStep: 0.001,
+            survival: 0.22, survivalPressureBonus: 0.1, baseStep: 0.001,
+            wallRisk: -0.14, trailRisk: -0.18, opponentRisk: -0.06, lowHealthThreat: -0.28,
         },
     },
     {
@@ -133,7 +183,8 @@ export const CURRICULUM_STAGES = Object.freeze([
         description: 'Navigation + shooting',
         weightOverrides: {
             itemPickup: 0, itemUse: 0,
-            survival: 0.12, baseStep: 0,
+            survival: 0.14, survivalPressureBonus: 0.07, baseStep: 0,
+            wallRisk: -0.1, trailRisk: -0.14, opponentRisk: -0.08, lowHealthThreat: -0.24,
         },
     },
     {

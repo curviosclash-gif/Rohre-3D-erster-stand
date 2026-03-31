@@ -1,3 +1,19 @@
+import {
+    HEALTH_RATIO,
+    LOCAL_OPENNESS_RATIO,
+    PRESSURE_LEVEL,
+    PROJECTILE_THREAT,
+    SHIELD_RATIO,
+    TARGET_ALIGNMENT,
+    TARGET_DISTANCE_RATIO,
+    TARGET_IN_FRONT,
+    WALL_DISTANCE_DOWN,
+    WALL_DISTANCE_FRONT,
+    WALL_DISTANCE_LEFT,
+    WALL_DISTANCE_RIGHT,
+    WALL_DISTANCE_UP,
+} from '../../src/entities/ai/observation/ObservationSchemaV1.js';
+
 const ACTION_TEMPLATE = Object.freeze({
     yawLeft: false,
     yawRight: false,
@@ -32,11 +48,198 @@ function resolvePlanarMode(input = {}, fallback = false) {
     return !!fallback;
 }
 
+function clamp01(value, fallback = 0) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return fallback;
+    if (numeric <= 0) return 0;
+    if (numeric >= 1) return 1;
+    return numeric;
+}
+
+function resolveObservationMetric(observation, index, fallback = 0) {
+    if (!Array.isArray(observation)) return fallback;
+    return clamp01(observation[index], fallback);
+}
+
+function resolveTargetAlignment(observation) {
+    if (!Array.isArray(observation)) return 0;
+    const numeric = Number(observation[TARGET_ALIGNMENT]);
+    if (!Number.isFinite(numeric)) return 0;
+    if (numeric <= -1) return -1;
+    if (numeric >= 1) return 1;
+    return numeric;
+}
+
+function resolvePlayerRatio(player = null, currentKey, maxKey, observationFallback) {
+    const current = Number(player?.[currentKey]);
+    const max = Number(player?.[maxKey]);
+    if (Number.isFinite(current) && Number.isFinite(max) && max > 0) {
+        return clamp01(current / max, observationFallback);
+    }
+    return observationFallback;
+}
+
 function deterministicParity(seed, stepIndex) {
     const safeSeed = Number.isInteger(seed) ? seed : 0;
     const safeStep = Number.isInteger(stepIndex) ? stepIndex : 0;
     const mixed = (safeSeed * 1103515245 + safeStep * 12345) >>> 0;
     return mixed % 2;
+}
+
+function hasSteeringIntent(action = null) {
+    if (!action || typeof action !== 'object') return false;
+    return !!(
+        action.yawLeft
+        || action.yawRight
+        || action.pitchUp
+        || action.pitchDown
+    );
+}
+
+function createSafetyProfile(observation, options = {}) {
+    const player = options?.player && typeof options.player === 'object'
+        ? options.player
+        : null;
+    const healthRatio = resolvePlayerRatio(
+        player,
+        'hp',
+        'maxHp',
+        resolveObservationMetric(observation, HEALTH_RATIO, 1)
+    );
+    const shieldRatio = resolvePlayerRatio(
+        player,
+        'shieldHp',
+        'maxShieldHp',
+        resolveObservationMetric(observation, SHIELD_RATIO, 0)
+    );
+    const vitalityRatio = clamp01(healthRatio * 0.78 + shieldRatio * 0.22, healthRatio);
+    const wallFront = resolveObservationMetric(observation, WALL_DISTANCE_FRONT, 1);
+    const wallLeft = resolveObservationMetric(observation, WALL_DISTANCE_LEFT, 1);
+    const wallRight = resolveObservationMetric(observation, WALL_DISTANCE_RIGHT, 1);
+    const wallUp = resolveObservationMetric(observation, WALL_DISTANCE_UP, 1);
+    const wallDown = resolveObservationMetric(observation, WALL_DISTANCE_DOWN, 1);
+    const pressureLevel = resolveObservationMetric(observation, PRESSURE_LEVEL, 0);
+    const openness = resolveObservationMetric(observation, LOCAL_OPENNESS_RATIO, 1);
+    const projectileThreat = resolveObservationMetric(observation, PROJECTILE_THREAT, 0) >= 0.5;
+    const targetDistanceRatio = resolveObservationMetric(observation, TARGET_DISTANCE_RATIO, 1);
+    const targetInFront = resolveObservationMetric(observation, TARGET_IN_FRONT, 0) >= 0.5;
+    const targetAlignment = resolveTargetAlignment(observation);
+    const collisionRisk = Math.max(
+        1 - wallFront,
+        pressureLevel * 0.92,
+        projectileThreat ? 0.95 : 0,
+        Math.max(0, 0.4 - openness) * 1.6
+    );
+    return {
+        healthRatio,
+        shieldRatio,
+        vitalityRatio,
+        wallFront,
+        wallLeft,
+        wallRight,
+        wallUp,
+        wallDown,
+        pressureLevel,
+        openness,
+        projectileThreat,
+        targetDistanceRatio,
+        targetInFront,
+        targetAlignment,
+        collisionRisk: clamp01(collisionRisk, 0),
+    };
+}
+
+function resolvePreferredYaw(profile, seed, stepIndex) {
+    const sideDelta = profile.wallRight - profile.wallLeft;
+    if (Math.abs(sideDelta) > 0.03) {
+        return sideDelta > 0 ? 1 : -1;
+    }
+    return deterministicParity(seed, stepIndex) === 0 ? -1 : 1;
+}
+
+function resolvePreferredPitch(profile, planarMode, seed, stepIndex) {
+    if (planarMode) return 0;
+    const verticalDelta = profile.wallUp - profile.wallDown;
+    if (Math.abs(verticalDelta) > 0.04) {
+        return verticalDelta > 0 ? 1 : -1;
+    }
+    return deterministicParity(seed + 17, stepIndex + 5) === 0 ? -1 : 1;
+}
+
+function clearCombatIntent(action) {
+    action.boost = false;
+    action.shootMG = false;
+    action.shootItem = false;
+    action.shootItemIndex = -1;
+}
+
+function setEvasionSteering(action, yawDirection, pitchDirection, planarMode) {
+    action.yawLeft = yawDirection < 0;
+    action.yawRight = yawDirection > 0;
+    if (planarMode) {
+        action.pitchUp = false;
+        action.pitchDown = false;
+        return;
+    }
+    action.pitchUp = pitchDirection > 0;
+    action.pitchDown = pitchDirection < 0;
+}
+
+export function applyObservationSafetyLayer(action, observation, options = {}) {
+    const sanitized = sanitizeTrainerAction(action, options);
+    if (!Array.isArray(observation) || observation.length === 0) {
+        return sanitized;
+    }
+
+    const planarMode = resolvePlanarMode(options, false);
+    const seed = Number.isInteger(options.seed) ? options.seed : 0;
+    const stepIndex = Number.isInteger(options.stepIndex) ? options.stepIndex : 0;
+    const profile = createSafetyProfile(observation, options);
+    const lowVitality = profile.vitalityRatio <= 0.38;
+    const highThreat = profile.pressureLevel >= 0.72 || profile.projectileThreat || profile.collisionRisk >= 0.74;
+    const forceEvasion = (
+        profile.wallFront <= 0.22
+        || profile.projectileThreat
+        || profile.collisionRisk >= 0.82
+        || (profile.wallFront <= 0.3 && profile.pressureLevel >= 0.66)
+        || (lowVitality && profile.wallFront <= 0.34)
+    );
+    const lockRiskyActions = (
+        forceEvasion
+        || (lowVitality && highThreat)
+        || (profile.healthRatio <= 0.28 && profile.pressureLevel >= 0.55)
+    );
+
+    if (lockRiskyActions) {
+        clearCombatIntent(sanitized);
+    }
+
+    if (!forceEvasion) {
+        if (lockRiskyActions && profile.pressureLevel >= 0.86) {
+            sanitized.useItem = -1;
+        }
+        return sanitized;
+    }
+
+    const yawDirection = resolvePreferredYaw(profile, seed, stepIndex);
+    const pitchDirection = resolvePreferredPitch(profile, planarMode, seed, stepIndex);
+    const alreadySteeringSafeYaw = (
+        (yawDirection < 0 && sanitized.yawLeft && !sanitized.yawRight)
+        || (yawDirection > 0 && sanitized.yawRight && !sanitized.yawLeft)
+    );
+    const safePitchActive = planarMode || (
+        (pitchDirection < 0 && sanitized.pitchDown && !sanitized.pitchUp)
+        || (pitchDirection > 0 && sanitized.pitchUp && !sanitized.pitchDown)
+    );
+
+    if (!hasSteeringIntent(sanitized) || !alreadySteeringSafeYaw || !safePitchActive) {
+        setEvasionSteering(sanitized, yawDirection, pitchDirection, planarMode);
+    }
+
+    if (profile.pressureLevel >= 0.9) {
+        sanitized.useItem = -1;
+    }
+    return sanitized;
 }
 
 export function sanitizeTrainerAction(action, options = {}) {
@@ -87,13 +290,28 @@ export function inferActionFromObservation(observation, options = {}) {
     const stepIndex = Number.isInteger(options.stepIndex) ? options.stepIndex : 0;
     const seed = Number.isInteger(options.seed) ? options.seed : 0;
 
-    const aimHint = Number(vector[9]) || 0;
-    const forwardClearance = Number(vector[0]) || 0;
-    const threatHint = Number(vector[6]) || 0;
+    const aimHint = resolveTargetAlignment(vector);
+    const forwardClearance = resolveObservationMetric(vector, WALL_DISTANCE_FRONT, 1);
+    const leftClearance = resolveObservationMetric(vector, WALL_DISTANCE_LEFT, 1);
+    const rightClearance = resolveObservationMetric(vector, WALL_DISTANCE_RIGHT, 1);
+    const threatHint = Math.max(
+        resolveObservationMetric(vector, PRESSURE_LEVEL, 0),
+        resolveObservationMetric(vector, PROJECTILE_THREAT, 0)
+    );
+    const targetDistanceRatio = resolveObservationMetric(vector, TARGET_DISTANCE_RATIO, 1);
+    const targetInFront = resolveObservationMetric(vector, TARGET_IN_FRONT, 0) >= 0.5;
+    const openness = resolveObservationMetric(vector, LOCAL_OPENNESS_RATIO, 1);
 
-    let yawLeft = aimHint < -0.05;
-    let yawRight = aimHint > 0.05;
-    if (!yawLeft && !yawRight) {
+    let yawLeft = false;
+    let yawRight = false;
+    if (forwardClearance <= 0.32 || threatHint >= 0.7) {
+        yawRight = rightClearance >= leftClearance;
+        yawLeft = !yawRight;
+    } else if (aimHint < -0.05) {
+        yawLeft = true;
+    } else if (aimHint > 0.05) {
+        yawRight = true;
+    } else {
         const parity = deterministicParity(seed, stepIndex);
         yawLeft = parity === 0;
         yawRight = parity === 1;
@@ -106,15 +324,15 @@ export function inferActionFromObservation(observation, options = {}) {
         pitchDown: false,
         rollLeft: false,
         rollRight: false,
-        boost: forwardClearance > 0.65 && ((stepIndex % 9) === 0),
-        shootMG: Math.abs(aimHint) < 0.2 && forwardClearance > 0.15,
-        shootItem: threatHint > 0.85 && ((stepIndex % 23) === 0),
+        boost: forwardClearance > 0.68 && openness > 0.52 && threatHint < 0.52 && ((stepIndex % 9) === 0),
+        shootMG: targetInFront && Math.abs(aimHint) < 0.2 && forwardClearance > 0.18 && threatHint < 0.72,
+        shootItem: targetInFront && targetDistanceRatio <= 0.4 && threatHint < 0.62 && ((stepIndex % 23) === 0),
         shootItemIndex: 0,
         useItem: -1,
         dropItem: false,
         nextItem: false,
     };
-    return sanitizeTrainerAction(action, options);
+    return applyObservationSafetyLayer(action, observation, options);
 }
 
 export function createNeutralAction(options = {}) {

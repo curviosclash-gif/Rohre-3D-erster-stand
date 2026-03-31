@@ -2,7 +2,23 @@
 // TrainingAutomationRunner.js - deterministic batch orchestration for training automation V33
 // ============================================
 
-import { OBSERVATION_LENGTH_V1 } from '../observation/ObservationSchemaV1.js';
+import {
+    HEALTH_RATIO,
+    LOCAL_OPENNESS_RATIO,
+    OBSERVATION_LENGTH_V1,
+    PLANAR_MODE_ACTIVE,
+    PRESSURE_LEVEL,
+    PROJECTILE_THREAT,
+    SPEED_RATIO,
+    TARGET_ALIGNMENT,
+    TARGET_DISTANCE_RATIO,
+    TARGET_IN_FRONT,
+    WALL_DISTANCE_DOWN,
+    WALL_DISTANCE_FRONT,
+    WALL_DISTANCE_LEFT,
+    WALL_DISTANCE_RIGHT,
+    WALL_DISTANCE_UP,
+} from '../observation/ObservationSchemaV1.js';
 import { TrainingTransportFacade } from './TrainingTransportFacade.js';
 import { encodeModeId } from '../../../shared/contracts/EntityModeContract.js';
 import { clamp01 } from '../../../utils/MathOps.js';
@@ -21,6 +37,14 @@ function nowMs() {
 
 function roundMetric(value) {
     return Math.round(Number(value || 0) * 1_000_000) / 1_000_000;
+}
+
+function clampSigned(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return 0;
+    if (numeric <= -1) return -1;
+    if (numeric >= 1) return 1;
+    return numeric;
 }
 
 function toBoundedInt(value, fallback, minValue = 0, maxValue = Number.MAX_SAFE_INTEGER) {
@@ -57,9 +81,49 @@ function createDeterministicObservation(context) {
         const shaped = (context.rng() * 0.7) + (stepRatio * 0.3);
         values[i] = clamp01(shaped);
     }
-    values[0] = clamp01(0.25 + (context.rng() * 0.6));
-    values[1] = clamp01(0.15 + (context.rng() * 0.8));
-    values[17] = context.planarMode ? 1 : 0;
+
+    const frontClearance = clamp01(0.18 + (context.rng() * 0.62) - stepRatio * 0.18);
+    const leftClearance = clamp01(0.22 + (context.rng() * 0.68));
+    const rightClearance = clamp01(0.22 + (context.rng() * 0.68));
+    const upClearance = context.planarMode
+        ? 0
+        : clamp01(0.24 + (context.rng() * 0.64));
+    const downClearance = context.planarMode
+        ? 0
+        : clamp01(0.24 + (context.rng() * 0.64));
+    const openness = clamp01(
+        context.planarMode
+            ? (frontClearance + leftClearance + rightClearance) / 3
+            : (frontClearance + leftClearance + rightClearance + upClearance + downClearance) / 5
+    );
+    const healthRatio = clamp01(0.2 + (context.rng() * 0.7) - stepRatio * 0.12);
+    const targetDistanceRatio = clamp01(context.rng());
+    const targetAlignment = clampSigned((context.rng() * 2) - 1);
+    const targetInFront = targetAlignment >= 0.1 && targetDistanceRatio <= 0.82;
+    const projectileThreat = frontClearance < 0.32 && context.rng() > 0.58;
+    const pressureLevel = clamp01(
+        Math.max(
+            1 - frontClearance,
+            projectileThreat ? 0.88 : 0,
+            Math.max(0, 0.45 - openness) * 1.5,
+            targetInFront ? (1 - targetDistanceRatio) * 0.45 : 0
+        )
+    );
+
+    values[SPEED_RATIO] = clamp01(0.25 + (context.rng() * 0.6));
+    values[HEALTH_RATIO] = healthRatio;
+    values[WALL_DISTANCE_FRONT] = frontClearance;
+    values[WALL_DISTANCE_LEFT] = leftClearance;
+    values[WALL_DISTANCE_RIGHT] = rightClearance;
+    values[WALL_DISTANCE_UP] = upClearance;
+    values[WALL_DISTANCE_DOWN] = downClearance;
+    values[TARGET_DISTANCE_RATIO] = targetDistanceRatio;
+    values[TARGET_ALIGNMENT] = targetAlignment;
+    values[TARGET_IN_FRONT] = targetInFront ? 1 : 0;
+    values[PRESSURE_LEVEL] = pressureLevel;
+    values[PROJECTILE_THREAT] = projectileThreat ? 1 : 0;
+    values[LOCAL_OPENNESS_RATIO] = openness;
+    values[PLANAR_MODE_ACTIVE] = context.planarMode ? 1 : 0;
     values[18] = modeId;
     values[19] = clamp01(context.seed % 97 / 96);
     return values;
@@ -117,6 +181,16 @@ function buildDeterministicRewardSignals(context) {
     const won = context.done && context.terminalReason === 'match-win';
     const lost = context.done && !won;
     const crashed = context.done && context.terminalReason === 'player-dead';
+    const observation = Array.isArray(context.observation) ? context.observation : [];
+    const wallRisk = clamp01(1 - (Number(observation[WALL_DISTANCE_FRONT]) || 0));
+    const pressureLevel = clamp01(observation[PRESSURE_LEVEL]);
+    const openness = clamp01(observation[LOCAL_OPENNESS_RATIO], 1);
+    const trailRisk = clamp01(Math.max(0, pressureLevel * 0.9 - openness * 0.22));
+    const targetInFront = Number(observation[TARGET_IN_FRONT]) >= 0.5;
+    const targetDistanceRatio = clamp01(observation[TARGET_DISTANCE_RATIO], 1);
+    const opponentRisk = clamp01(targetInFront ? 1 - targetDistanceRatio : pressureLevel * 0.25);
+    const healthRatio = clamp01(observation[HEALTH_RATIO], 1);
+    const projectileThreat = Number(observation[PROJECTILE_THREAT]) >= 0.5 ? 1 : 0;
     return {
         survival: !lost,
         kills: won ? 1 : 0,
@@ -124,6 +198,17 @@ function buildDeterministicRewardSignals(context) {
         itemUses: context.action?.shootItem ? 1 : 0,
         damageDealt: Math.floor(context.rng() * 7),
         damageTaken: Math.floor(context.rng() * 5),
+        healthRatio,
+        pressureLevel,
+        projectileThreat,
+        wallRisk,
+        trailRisk,
+        opponentRisk,
+        riskProximity: {
+            wall: wallRisk,
+            trail: trailRisk,
+            opponent: opponentRisk,
+        },
         won,
         lost,
     };
@@ -339,11 +424,20 @@ export class TrainingAutomationRunner {
                 runnerProfile: config.runnerProfile,
                 injectInvalidActions: config.injectInvalidActions,
             });
+            const observation = createDeterministicObservation({
+                rng,
+                stepIndex,
+                maxSteps: config.maxSteps,
+                mode: modeConfig.mode,
+                planarMode: modeConfig.planarMode,
+                seed,
+            });
             const rewardSignals = buildDeterministicRewardSignals({
                 rng,
                 done,
                 terminalReason,
                 action,
+                observation,
             });
             const packet = transport.step({
                 mode: modeConfig.mode,
@@ -351,14 +445,7 @@ export class TrainingAutomationRunner {
                 seed,
                 maxSteps: config.maxSteps,
                 inventoryLength,
-                observation: createDeterministicObservation({
-                    rng,
-                    stepIndex,
-                    maxSteps: config.maxSteps,
-                    mode: modeConfig.mode,
-                    planarMode: modeConfig.planarMode,
-                    seed,
-                }),
+                observation,
                 action,
                 rewardSignals,
                 done,

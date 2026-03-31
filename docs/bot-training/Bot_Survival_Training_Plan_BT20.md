@@ -95,3 +95,4 @@ Remove-Item Env:BOT_RUNNER_TOTAL_TIMEOUT -ErrorAction SilentlyContinue
   - `optimizerSteps=1588329` und `envSteps=10979007` nach Run `r01`
 - Aktueller Hinweis:
   - Der nachgelagerte `trainer-checkpoint-load` Command timed out weiterhin im Bridge-Pfad (`commandResponses=0`), der Startup-Resume im Trainer-Server greift aber nachweislich. Details stehen in `docs/Fehlerberichte/2026-03-28_training_resume-command-timeout.md`.
+  - 2026-03-31: Trainer-seitiger Safety-Layer und Survival-First Reward-Shaping sind implementiert; der naechste BT20-A/B-Lauf soll die neuen Collision-/Threat-Guards sowie die Wall/Trail/Opponent-Risk-Penalties gegen BT10/BT11 erneut auswerten. Evidence: `node --test tests/trainer-v36-action-safety.test.mjs tests/training-reward-survival.test.mjs`

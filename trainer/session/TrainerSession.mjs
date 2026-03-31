@@ -8,7 +8,10 @@ import {
     TRAINER_MESSAGE_TYPES,
     TRAINER_RESPONSE_TYPES,
 } from '../config/TrainerRuntimeContract.mjs';
-import { inferActionFromObservation } from './ActionSanitizer.mjs';
+import {
+    applyObservationSafetyLayer,
+    inferActionFromObservation,
+} from './ActionSanitizer.mjs';
 import { DqnTrainer } from '../model/DqnTrainer.mjs';
 import { validateDqnCheckpointPayload } from '../model/CheckpointValidation.mjs';
 import { resolveLatestCheckpointPayloadSync } from '../artifacts/TrainerArtifactStore.mjs';
@@ -272,8 +275,17 @@ export class TrainerSession {
                 planarMode,
                 domainId,
                 maxItemIndex: this.config.maxItemIndex,
+                player: payload?.player || null,
             });
         }
+        action = applyObservationSafetyLayer(action, observation, {
+            seed: this.config.sessionSeed,
+            stepIndex: this._state.stepIndex,
+            planarMode,
+            domainId,
+            maxItemIndex: this.config.maxItemIndex,
+            player: payload?.player || null,
+        });
         return {
             id,
             ok: true,
