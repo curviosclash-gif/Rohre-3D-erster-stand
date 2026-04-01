@@ -17,6 +17,14 @@ function normalizeModeValue(mode) {
     return MODE_ALIASES[normalized] || 'classic';
 }
 
+function normalizeDomainModeValue(mode) {
+    if (typeof mode !== 'string') return 'classic';
+    const normalized = mode.trim().toLowerCase();
+    if (!normalized) return 'classic';
+    if (normalized === 'fight') return 'fight';
+    return MODE_ALIASES[normalized] || 'classic';
+}
+
 function normalizeControlProfileId(value, mode, dimension) {
     if (typeof value === 'string' && value.trim()) {
         return value.trim().toLowerCase();
@@ -33,6 +41,7 @@ export function deriveTrainingDomain(input = {}) {
         ? input
         : { mode: input };
     const mode = normalizeModeValue(payload.mode);
+    const domainMode = normalizeDomainModeValue(payload.mode);
     const planarMode = !!payload.planarMode;
     const dimension = planarMode ? '2d' : '3d';
     const controlProfileId = normalizeControlProfileId(
@@ -46,7 +55,7 @@ export function deriveTrainingDomain(input = {}) {
         mode,
         planarMode,
         dimension,
-        domainId: `${mode}-${dimension}`,
+        domainId: `${domainMode}-${dimension}`,
         controlProfileId,
     };
 
