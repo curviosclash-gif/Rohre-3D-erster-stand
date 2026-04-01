@@ -57,6 +57,7 @@ const runTag = isolatedEnv.runTag;
 const outputDir = isolatedEnv.outputDir;
 const htmlReportDir = String(process.env.PW_HTML_REPORT_DIR || `playwright-report/${runTag}`);
 const workers = isolatedEnv.workers;
+const useGlobalWarmup = process.env.PW_PREWARM !== '0';
 const traceMode = process.env.PW_TRACE === '1'
     ? 'retain-on-failure'
     : (isCI ? 'retain-on-failure' : 'off');
@@ -72,8 +73,8 @@ export default defineConfig({
     retries: 1,
     workers,
     outputDir,
-    globalSetup: './tests/playwright.global-setup.js',
-    globalTeardown: './tests/playwright.global-teardown.js',
+    globalSetup: useGlobalWarmup ? './tests/playwright.global-setup.js' : undefined,
+    globalTeardown: useGlobalWarmup ? './tests/playwright.global-teardown.js' : undefined,
     reporter: reporters,
     use: {
         baseURL: `http://${TEST_HOST}:${TEST_PORT}`,

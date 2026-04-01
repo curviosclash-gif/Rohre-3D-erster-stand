@@ -1,7 +1,7 @@
 # Feature Testlandschaft Umbau V78
 
 Stand: 2026-04-01
-Status: Entwurf
+Status: Umgesetzt
 Owner: Codex
 
 <!-- LOCK: frei -->
@@ -69,14 +69,14 @@ Die Testlandschaft von Curvios Clash wird in eine klarere und guenstigere Testpy
 
 ## Definition of Done (DoD)
 
-- [ ] DoD.1 Die Testlandschaft ist in klar benannte Klassen aufgeteilt: `guard`, `node-contract`, `playwright-smoke`, `playwright-targeted`, `heavy-special`.
-- [ ] DoD.2 `tests/core.spec.js` ist auf einen kleinen Default-Smoke reduziert; reine Vertrags-, Import-, Policy- und State-Checks sind in schnellere Tests ausgelagert.
-- [ ] DoD.3 Logiklastige Suites wie Audio-, Game-Mode-, Training- und aehnliche Vertragspruefungen nutzen standardmaessig `node:test` oder gleich leichte Headless-Pfade statt kompletten Browser-Load.
-- [ ] DoD.4 `package.json`, CI und `.agents/test_mapping.md` zeigen auf den billigsten sinnvollen Verifikationspfad; schwere Suites werden nicht mehr als stiller Default ausgefuehrt.
-- [ ] DoD.5 Browser-/Demo-Smokes pruefen nur noch die fuer Web wirklich relevanten Pfade; Desktop bleibt Source of Truth fuer volle Feature-Abdeckung.
-- [ ] DoD.6 Temporaere Diagnostik- oder Einmalsuites sind als solche markiert, archiviert oder aus dem Default-Pfad entfernt.
-- [ ] DoD.7 Der Umbau dokumentiert einen Rollout- und Rueckfallpfad, falls Coverage-Luecken oder instabile Flanken sichtbar werden.
-- [ ] DoD.8 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind fuer den Planstand gruen.
+- [x] DoD.1 Die Testlandschaft ist in klar benannte Klassen aufgeteilt: `guard`, `node-contract`, `playwright-smoke`, `playwright-targeted`, `heavy-special`. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`)
+- [x] DoD.2 `tests/core.spec.js` ist auf einen kleinen Default-Smoke reduziert; reine Vertrags-, Import-, Policy- und State-Checks sind in schnellere Tests ausgelagert. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/core.spec.js`, `tests/core-targeted.spec.js`)
+- [x] DoD.3 Logiklastige Suites wie Audio-, Game-Mode-, Training- und aehnliche Vertragspruefungen nutzen standardmaessig `node:test` oder gleich leichte Headless-Pfade statt kompletten Browser-Load. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/*.contract.test.mjs`)
+- [x] DoD.4 `package.json`, CI und `.agents/test_mapping.md` zeigen auf den billigsten sinnvollen Verifikationspfad; schwere Suites werden nicht mehr als stiller Default ausgefuehrt. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.github/workflows/ci.yml`, `.agents/test_mapping.md`)
+- [x] DoD.5 Browser-/Demo-Smokes pruefen nur noch die fuer Web wirklich relevanten Pfade; Desktop bleibt Source of Truth fuer volle Feature-Abdeckung. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/core.spec.js`)
+- [x] DoD.6 Temporaere Diagnostik- oder Einmalsuites sind als solche markiert, archiviert oder aus dem Default-Pfad entfernt. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`)
+- [x] DoD.7 Der Umbau dokumentiert einen Rollout- und Rueckfallpfad, falls Coverage-Luecken oder instabile Flanken sichtbar werden. (abgeschlossen: 2026-04-01; evidence: manual review -> `docs/qa/Teststrategie_Testpyramide.md`)
+- [x] DoD.8 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind fuer den Planstand gruen. (abgeschlossen: 2026-04-01; evidence: `npm run plan:check` -> pass, `npm run docs:sync` -> updated=0, `npm run docs:check` -> pass)
 
 ## Evidenzformat
 
@@ -88,51 +88,51 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 ### 78.1 Bestand inventarisieren und wirtschaftlich klassifizieren
 
-- [ ] 78.1.1 Alle bestehenden Testdateien, Skripte und CI-Einstiege in Klassen einordnen: `default`, `targeted`, `block-end`, `diagnostic`, `legacy`.
-- [ ] 78.1.2 Pro Suite den echten Nutzentyp festhalten: `Produkt-Smoke`, `Vertrag`, `State/Policy`, `Performance`, `GPU`, `Netzwerk`, `Editor`, `Training`, `Diagnostik`.
-- [ ] 78.1.3 Kandidaten markieren, die derzeit durch Playwright laufen, fachlich aber ohne Browser testbar sind.
+- [x] 78.1.1 Alle bestehenden Testdateien, Skripte und CI-Einstiege in Klassen einordnen: `default`, `targeted`, `block-end`, `diagnostic`, `legacy`. (abgeschlossen: 2026-04-01; evidence: manual review -> `.agents/test_mapping.md`, `package.json`)
+- [x] 78.1.2 Pro Suite den echten Nutzentyp festhalten: `Produkt-Smoke`, `Vertrag`, `State/Policy`, `Performance`, `GPU`, `Netzwerk`, `Editor`, `Training`, `Diagnostik`. (abgeschlossen: 2026-04-01; evidence: manual review -> `.agents/test_mapping.md`, `docs/qa/Teststrategie_Testpyramide.md`)
+- [x] 78.1.3 Kandidaten markieren, die derzeit durch Playwright laufen, fachlich aber ohne Browser testbar sind. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/audio.contract.test.mjs`, `tests/game-mode-strategy.contract.test.mjs`, `tests/training-environment.contract.test.mjs`, `tests/training-automation-core.contract.test.mjs`)
 
 ### 78.2 Zielstruktur fuer Dateischnitt, Namen und Ausfuehrung festlegen
 
-- [ ] 78.2.1 Eine verbindliche Zielstruktur fuer schnelle `node:test`-Dateien und kleine Playwright-Smokes definieren, damit neue Tests nicht erneut in `core.spec.js` oder andere Sammelbecken laufen.
-- [ ] 78.2.2 Regeln fuer Testnamen, Laufklassen und Auswahlpfade in `package.json` entwerfen, inklusive klarer Trennung zwischen `immer`, `gezielt`, `nur Abschluss-Gate`.
-- [ ] 78.2.3 Festlegen, welche Browser-/Demo-Flows dauerhaft als minimale Web-Smokes bestehen bleiben und welche Vollversionspfade nur fuer Desktop relevant sind.
+- [x] 78.2.1 Eine verbindliche Zielstruktur fuer schnelle `node:test`-Dateien und kleine Playwright-Smokes definieren, damit neue Tests nicht erneut in `core.spec.js` oder andere Sammelbecken laufen. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/*.contract.test.mjs`, `tests/core.spec.js`, `tests/core-targeted.spec.js`)
+- [x] 78.2.2 Regeln fuer Testnamen, Laufklassen und Auswahlpfade in `package.json` entwerfen, inklusive klarer Trennung zwischen `immer`, `gezielt`, `nur Abschluss-Gate`. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`)
+- [x] 78.2.3 Festlegen, welche Browser-/Demo-Flows dauerhaft als minimale Web-Smokes bestehen bleiben und welche Vollversionspfade nur fuer Desktop relevant sind. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/core.spec.js`, `docs/qa/Teststrategie_Testpyramide.md`)
 
 ### 78.3 Reine Logik- und Vertragstests aus dem Browser herausziehen
 
-- [ ] 78.3.1 Logiklastige Teile aus `tests/game-mode-strategy.spec.js`, `tests/audio.spec.js`, `tests/training-environment.spec.js` und `tests/training-automation-core.spec.js` in schnelle `node:test`- oder gleich leichte Headless-Tests ueberfuehren.
-- [ ] 78.3.2 Nur die wirklich browserabhaengigen Restfaelle als kleine Playwright-Slices behalten, zum Beispiel echte DOM-, Canvas- oder Browser-API-Abhaengigkeiten.
-- [ ] 78.3.3 Falls noetig minimale Test-Seams in `src/**` planen, die Importierbarkeit und Determinismus verbessern, ohne Produktpfade aufzublaehen.
+- [x] 78.3.1 Logiklastige Teile aus `tests/game-mode-strategy.spec.js`, `tests/audio.spec.js`, `tests/training-environment.spec.js` und `tests/training-automation-core.spec.js` in schnelle `node:test`- oder gleich leichte Headless-Tests ueberfuehren. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/audio.contract.test.mjs`, `tests/game-mode-strategy.contract.test.mjs`, `tests/training-environment.contract.test.mjs`, `tests/training-automation-core.contract.test.mjs`)
+- [x] 78.3.2 Nur die wirklich browserabhaengigen Restfaelle als kleine Playwright-Slices behalten, zum Beispiel echte DOM-, Canvas- oder Browser-API-Abhaengigkeiten. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/core.spec.js`, `tests/training-automation.spec.js`)
+- [x] 78.3.3 Falls noetig minimale Test-Seams in `src/**` planen, die Importierbarkeit und Determinismus verbessern, ohne Produktpfade aufzublaehen. (abgeschlossen: 2026-04-01; evidence: manual review -> keine zusaetzlichen `src/**`-Seams noetig)
 
 ### 78.4 Playwright auf echte Smokes und Integrationsslices zuschneiden
 
-- [ ] 78.4.1 `tests/core.spec.js` in einen kleinen Default-Smoke und separate gezielte Integrations- oder Regressionsslices aufteilen.
-- [ ] 78.4.2 GPU-, Stress-, Recorder-, Netzwerk-, Editor- und historische Regressionssuites auf explizite Einsatzbedingungen reduzieren, statt sie implizit im Grundrauschen zu fuehren.
-- [ ] 78.4.3 Global-Setup, Helfer und Modul-Warmup darauf pruefen, wo Overhead fuer kleine Smokes reduziert oder lokalisiert werden kann.
+- [x] 78.4.1 `tests/core.spec.js` in einen kleinen Default-Smoke und separate gezielte Integrations- oder Regressionsslices aufteilen. (abgeschlossen: 2026-04-01; evidence: manual review -> `tests/core.spec.js`, `tests/core-targeted.spec.js`)
+- [x] 78.4.2 GPU-, Stress-, Recorder-, Netzwerk-, Editor- und historische Regressionssuites auf explizite Einsatzbedingungen reduzieren, statt sie implizit im Grundrauschen zu fuehren. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`)
+- [x] 78.4.3 Global-Setup, Helfer und Modul-Warmup darauf pruefen, wo Overhead fuer kleine Smokes reduziert oder lokalisiert werden kann. (abgeschlossen: 2026-04-01; evidence: manual review -> `playwright.config.js`, `scripts/run-playwright-smoke.mjs`)
 
 ### 78.5 Skripte, Test-Mapping und CI verdrahten
 
-- [ ] 78.5.1 `package.json` so schneiden, dass `fast`, `contract`, `smoke`, `targeted`, `heavy` und gegebenenfalls `diagnostic` als klare Einstiegspunkte existieren.
-- [ ] 78.5.2 `.agents/test_mapping.md` auf `billigster sinnvoller Test zuerst` umstellen, mit Node-Tests als Default fuer Logikpfade und Playwright nur fuer echte Runtime-/UI-Fragen.
-- [ ] 78.5.3 `.github/workflows/ci.yml` auf einen kleinen Pflichtpfad aus Guards plus schneller Vertrags-/Smoke-Schicht umbauen; schwere Suiten bleiben bewusst selektiv.
+- [x] 78.5.1 `package.json` so schneiden, dass `fast`, `contract`, `smoke`, `targeted`, `heavy` und gegebenenfalls `diagnostic` als klare Einstiegspunkte existieren. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`)
+- [x] 78.5.2 `.agents/test_mapping.md` auf `billigster sinnvoller Test zuerst` umstellen, mit Node-Tests als Default fuer Logikpfade und Playwright nur fuer echte Runtime-/UI-Fragen. (abgeschlossen: 2026-04-01; evidence: manual review -> `.agents/test_mapping.md`)
+- [x] 78.5.3 `.github/workflows/ci.yml` auf einen kleinen Pflichtpfad aus Guards plus schneller Vertrags-/Smoke-Schicht umbauen; schwere Suiten bleiben bewusst selektiv. (abgeschlossen: 2026-04-01; evidence: manual review -> `.github/workflows/ci.yml`)
 
 ### 78.6 Spezialfaelle, Altlasten und Diagnostik sauber abgrenzen
 
-- [ ] 78.6.1 Temporaere oder einmalspezifische Dateien wie `tests/tmp-shorts-diagnostic.spec.js` als Diagnostik markieren, verschieben oder aus dem regulaeren Pfad entfernen.
-- [ ] 78.6.2 Historische Einzelregressionen wie `tests/v28-regression.spec.js` auf Nutzen, Aktualitaet und passende Trigger pruefen, damit sie nicht unnoetig den Default-Pfad vergroessern.
-- [ ] 78.6.3 Fuer Training-, Multiplayer- und Recorder-Suiten festlegen, welche davon produktionskritische Gate-Tests sind und welche nur bei gezielten Eingriffen Sinn ergeben.
+- [x] 78.6.1 Temporaere oder einmalspezifische Dateien wie `tests/tmp-shorts-diagnostic.spec.js` als Diagnostik markieren, verschieben oder aus dem regulaeren Pfad entfernen. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`)
+- [x] 78.6.2 Historische Einzelregressionen wie `tests/v28-regression.spec.js` auf Nutzen, Aktualitaet und passende Trigger pruefen, damit sie nicht unnoetig den Default-Pfad vergroessern. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`)
+- [x] 78.6.3 Fuer Training-, Multiplayer- und Recorder-Suiten festlegen, welche davon produktionskritische Gate-Tests sind und welche nur bei gezielten Eingriffen Sinn ergeben. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`, `docs/qa/Teststrategie_Testpyramide.md`)
 
 ### 78.7 Rollout, Dokumentation und Rueckfallpfad absichern
 
-- [ ] 78.7.1 Eine kurze Repo-Teststrategie dokumentieren: Wann laufen Guards, wann `node:test`, wann Playwright-Smoke, wann schwere Spezialpfade.
-- [ ] 78.7.2 Einen zweistufigen Rollout planen, damit der Umbau zuerst die teuersten Low-Value-Tests verschiebt und erst danach die tiefen Sammelsuiten zerlegt.
-- [ ] 78.7.3 Einen Rueckfallpfad dokumentieren, falls eine ausgelagerte Suite wichtige Integrationssignale verliert oder in der Praxis doch Browserabhaengigkeiten zeigt.
+- [x] 78.7.1 Eine kurze Repo-Teststrategie dokumentieren: Wann laufen Guards, wann `node:test`, wann Playwright-Smoke, wann schwere Spezialpfade. (abgeschlossen: 2026-04-01; evidence: manual review -> `docs/qa/Teststrategie_Testpyramide.md`)
+- [x] 78.7.2 Einen zweistufigen Rollout planen, damit der Umbau zuerst die teuersten Low-Value-Tests verschiebt und erst danach die tiefen Sammelsuiten zerlegt. (abgeschlossen: 2026-04-01; evidence: manual review -> `docs/qa/Teststrategie_Testpyramide.md`)
+- [x] 78.7.3 Einen Rueckfallpfad dokumentieren, falls eine ausgelagerte Suite wichtige Integrationssignale verliert oder in der Praxis doch Browserabhaengigkeiten zeigt. (abgeschlossen: 2026-04-01; evidence: manual review -> `docs/qa/Teststrategie_Testpyramide.md`)
 
 ### 78.99 Integrations- und Abschluss-Gate
 
-- [ ] 78.99.1 Der geplante Testklassen-Schnitt ist dokumentiert, die Datei-/Script-Ziele sind benannt und Ownership-Konflikte fuer `src/**`-Seams sind vor Umsetzung sichtbar.
-- [ ] 78.99.2 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind vorbereitet beziehungsweise fuer die Planaufnahme nachweisbar.
-- [ ] 78.99.3 Die manuelle Intake-Notiz fuer `docs/Umsetzungsplan.md` enthaelt Block-ID, Abhaengigkeiten, Scope und die Kernentscheidung `Node zuerst, Playwright gezielt`.
+- [x] 78.99.1 Der geplante Testklassen-Schnitt ist dokumentiert, die Datei-/Script-Ziele sind benannt und Ownership-Konflikte fuer `src/**`-Seams sind vor Umsetzung sichtbar. (abgeschlossen: 2026-04-01; evidence: manual review -> `package.json`, `.agents/test_mapping.md`, `docs/qa/Teststrategie_Testpyramide.md`)
+- [x] 78.99.2 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind vorbereitet beziehungsweise fuer die Planaufnahme nachweisbar. (abgeschlossen: 2026-04-01; evidence: `npm run plan:check` -> pass, `npm run docs:sync` -> updated=0, `npm run docs:check` -> pass)
+- [x] 78.99.3 Die manuelle Intake-Notiz fuer `docs/Umsetzungsplan.md` enthaelt Block-ID, Abhaengigkeiten, Scope und die Kernentscheidung `Node zuerst, Playwright gezielt`. (abgeschlossen: 2026-04-01; evidence: manual review -> `docs/plaene/neu/Feature_Testlandschaft_Umbau_V78.md`)
 
 ## Risiko-Register V78
 
