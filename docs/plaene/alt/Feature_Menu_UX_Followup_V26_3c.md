@@ -11,7 +11,7 @@ Parallel arbeitet ein anderer Agent an der Restrukturierung des Masterplans; des
 
 ## Ziel
 
-Das Spielmenue soll im aktiven Spielstart-Pfad deutlich schneller, klarer und kompakter werden, ohne die bestehenden Runtime-Vertraege, Developer-Funktionen oder Testpfade unnÃ¶tig aufzubrechen.
+Das Spielmenue soll im aktiven Spielstart-Pfad deutlich schneller, klarer und kompakter werden, ohne die bestehenden Runtime-Vertraege, Developer-Funktionen oder Testpfade unnoetig aufzubrechen.
 
 Konkret:
 
@@ -58,7 +58,7 @@ Risiko: mittel
 3. Die Moduswahl auf Ebene 2 darf den Nutzer direkt in Ebene 3 fuehren; ein expliziter Weiter-Pfad bleibt nur, wenn er fuer A11y/Teststabilitaet noetig ist.
 4. Ebene 3 bekommt eine sticky Startleiste mit kompakter Zusammenfassung und prominentem `Starten`.
 5. Lange Formularbereiche in Ebene 3 werden in klar benannte, einklappbare Sektionen gegliedert.
-6. Ebene 4 bleibt funktional dieselbe DomÃ¤ne, wird aber als sektioniertes Sheet gebaut: Desktop als rechte Detailflaeche, mobil als Vollflaechen-Ansicht ohne horizontales Scrollen.
+6. Ebene 4 bleibt funktional dieselbe Domaene, wird aber als sektioniertes Sheet gebaut: Desktop als rechte Detailflaeche, mobil als Vollflaechen-Ansicht ohne horizontales Scrollen.
 7. Release-Texte im Spielerpfad verlieren interne Begriffe wie `fixed`, `owner`, `Ebene 4 oeffnen`, sofern diese nicht explizit Developer-only sind.
 8. Text-IDs bleiben stabil; geaendert wird primaer Inhalt und visuelle Komposition, nicht der Override-Mechanismus.
 9. Preview-Verbesserungen nutzen bestehende Katalogdaten und benoetigen keine neue Asset-Pipeline.

@@ -110,7 +110,7 @@ async function writeUtf8(relPath, content) {
 }
 
 function collectLegacyPathFindings(filesToScan, contentByFile) {
-  const legacyPattern = /js\/main\.js|js\/modules\//;
+  const legacyPattern = /(^|[\s`"'(])(?:js\/main\.js|js\/modules\/)/;
   const findings = [];
 
   for (const file of filesToScan) {

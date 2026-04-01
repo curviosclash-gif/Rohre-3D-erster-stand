@@ -83,7 +83,7 @@ Sortierregeln:
 - `editor/js/ui/EditorToolPaletteControls.js` oder Nachfolger-Modul
 - `editor/js/ui/EditorUiViews.js`
 - `editor/js/ui/EditorCanvasInteractionControls.js`
-- `editor/js/EditorBuildCatalog.js` (neu â€” zentrale Katalog-Metadaten)
+- `editor/js/EditorBuildCatalog.js` (neu - zentrale Katalog-Metadaten)
 - `editor/js/EditorMapManager.js`
 - `tests/core.spec.js`
 - `tests/editor-map-ui.spec.js` (neu)
@@ -133,7 +133,7 @@ Sortierregeln:
 
 ### Copy/Paste von Map-Bereichen
 
-- Rahmen-Auswahl â†’ Ctrl+C kopiert alle enthaltenen Objekte relativ zueinander.
+- Rahmen-Auswahl -> Ctrl+C kopiert alle enthaltenen Objekte relativ zueinander.
 - Ctrl+V fuegt die Gruppe an der Mausposition ein. Ermoeglicht schnelles Bauen symmetrischer Strukturen.
 
 ### Shortcut-Cheatsheet
@@ -143,7 +143,7 @@ Sortierregeln:
 
 ### Sichtbare Undo-Historie
 
-- Aufklappbare Liste im Inspector (letzte 10â€“20 Aktionen) mit Kurzbeschreibung (z.B. "Block platziert bei [3,2,1]").
+- Aufklappbare Liste im Inspector (letzte 10-20 Aktionen) mit Kurzbeschreibung (z.B. "Block platziert bei [3,2,1]").
 - Klick auf einen Eintrag springt direkt zu diesem Zustand zurueck (batch-undo).
 
 ### Objekt-Eigenschaften Inline-Edit
@@ -163,7 +163,7 @@ Sortierregeln:
 
 ### Map-Fragment Export/Import
 
-- Rahmen-Auswahl â†’ "Als Snippet speichern" exportiert die Auswahl als eigenstaendige JSON-Datei.
+- Rahmen-Auswahl -> "Als Snippet speichern" exportiert die Auswahl als eigenstaendige JSON-Datei.
 - "Snippet einfuegen" laedt ein gespeichertes Fragment und platziert es an der Mausposition.
 - Baut ueber Zeit eine wiederverwendbare Baustein-Bibliothek auf.
 
@@ -201,11 +201,11 @@ Drag-from-Dock-to-Scene ist explizit **out-of-scope fuer V65**. Der Platzierungs
 
 ## Akzeptanzkriterien
 
-- Ein Objekt kann in max. 2 Klicks platziert werden (Kategorie-Tab â†’ Karte klicken â†’ Click-to-Place).
+- Ein Objekt kann in max. 2 Klicks platziert werden (Kategorie-Tab -> Karte klicken -> Click-to-Place).
 - Alle bestehenden Map-Dateien laden und speichern korrekt nach dem Umbau (kein Datenverlust).
 - Jede statische Kategorie zeigt mindestens ihre Kernobjekte mit lesbarem Namen und waehlbarem Zustand.
 - Die Suchleiste findet jedes Katalog-Objekt ueber Name oder Keyword innerhalb von 2 Tastenschlaegen.
-- `currentTool/subType`-Contract bleibt identisch â€” bestehende Serializer-Tests laufen ohne Anpassung.
+- `currentTool/subType`-Contract bleibt identisch - bestehende Serializer-Tests laufen ohne Anpassung.
 - Kein visueller Regression in Inspector-Funktionen (Save, Playtest, Properties, Undo/Redo).
 
 ## MVP-Schnitt (Fallback bei Scope-Ueberschreitung)
@@ -213,7 +213,7 @@ Drag-from-Dock-to-Scene ist explizit **out-of-scope fuer V65**. Der Platzierungs
 Falls 65.2 oder 65.3 groesser werden als geplant, ist folgende Minimalversion shippbar:
 
 1. Dock mit Kategorie-Tabs und Text-only-Karten (ohne Previews/Thumbnails).
-2. Katalog-Metadaten vollstaendig, aber `previewToken` wird ignoriert â€” nur Label + Badge.
+2. Katalog-Metadaten vollstaendig, aber `previewToken` wird ignoriert - nur Label + Badge.
 3. Suchfeld und Favoriten koennen auf einen Folge-Block verschoben werden.
 4. Kontextmenue auf platzierte Objekte ist optional und kann entfallen.
 
@@ -243,11 +243,10 @@ Der erste funktionsfaehige Slice fuer V65 ist umgesetzt:
 
 ## Phasenplan
 
-Abhaengigkeiten: 65.1 muss abgeschlossen sein, bevor 65.2â€“65.4 starten. 65.2 und 65.3 koennen parallel bearbeitet werden. 65.4 setzt 65.2 + 65.3 voraus. 65.5 laeuft nach 65.4.
+Abhaengigkeiten: 65.1 muss abgeschlossen sein, bevor 65.2-65.4 starten. 65.2 und 65.3 koennen parallel bearbeitet werden. 65.4 setzt 65.2 + 65.3 voraus. 65.5 laeuft nach 65.4.
 
 ```
-65.1 â”€â”€â”¬â”€â”€ 65.2 â”€â”€â”
-       â””â”€â”€ 65.3 â”€â”€â”´â”€â”€ 65.4 â”€â”€ 65.5 â”€â”€ 65.99
+65.1 -> {65.2, 65.3} -> 65.4 -> 65.5 -> 65.99
 ```
 
 - [x] 65.1 Katalog- und Interaktionskonzept festziehen (abgeschlossen: 2026-03-29; evidence: commit `87cb45d`)
@@ -301,5 +300,5 @@ Beispiel:
 - Doppelte Bedienorte verwirren Nutzer, wenn alte und neue Auswahl parallel bestehen bleiben.
   - Mitigation: alte Submenu-Selektoren nach Uebergang entfernen oder eindeutig nur noch als interne Fallbacks halten.
 - UX-Bruch fuer bestehende Editor-Nutzer: gewohnte Workflows funktionieren nicht mehr.
-  - Mitigation: beim ersten Oeffnen nach dem Umbau einen kurzen Tooltip-Hinweis auf die neue Build-Leiste anzeigen. Kein dauerhafter "Classic Mode" â€” das wuerde die Wartungslast verdoppeln.
+- Mitigation: beim ersten Oeffnen nach dem Umbau einen kurzen Tooltip-Hinweis auf die neue Build-Leiste anzeigen. Kein dauerhafter "Classic Mode" - das wuerde die Wartungslast verdoppeln.
 

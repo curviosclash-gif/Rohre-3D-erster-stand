@@ -3,7 +3,7 @@
 Stand: 2026-03-27 (aktualisiert nach Codebase-Analyse)
 Status: Entwurf
 Owner: Codex
-Ziel-Release-Fenster: KW22 2026 (Ende Mai) â€” verbindlich nach Phase-2-Scope-Freeze
+Ziel-Release-Fenster: KW22 2026 (Ende Mai) - verbindlich nach Phase-2-Scope-Freeze
 
 ## Ziel
 
@@ -51,10 +51,10 @@ Der groesste Engpass ist aktuell nicht fehlender Feature-Umfang, sondern:
 - `npm audit` zeigt 5 Vulnerabilities (2x HIGH: Rollup Path Traversal, Flatted Prototype Pollution).
 - CI-Pipeline (`.github/workflows/ci.yml`) fuehrt nur `test:core` aus, nicht `test:physics`, `test:stress`, `test:gpu`.
 - Manuelle QA-Checkliste (`docs/qa/Manuelle_Testcheckliste_Spiel.md`) hat 0 von ~130 Punkten abgehakt.
-- Kein Loading Screen / Splash Screen â€” Nutzer sieht bei langsamem Laden nichts.
+- Kein Loading Screen / Splash Screen - Nutzer sieht bei langsamem Laden nichts.
 - Kein Musik-/Soundtrack-System, keine Volume-Slider, keine Audio-Persistenz.
-- Source Maps fuer Production-Builds fehlen â€” Crash-Stacks nach Release unlesbar.
-- `localStorage` ist einziger Persistenz-Layer â€” Private Browsing oder Cache-Clearing loescht alle Spielerdaten.
+- Source Maps fuer Production-Builds fehlen - Crash-Stacks nach Release unlesbar.
+- `localStorage` ist einziger Persistenz-Layer - Private Browsing oder Cache-Clearing loescht alle Spielerdaten.
 - Kein `LICENSE`-File im Root, keine Privacy Policy, keine Terms of Service.
 - Training-/Developer-UI-Code (20 KB Chunk) wird im Production-Build ausgeliefert.
 - Bot-Qualitaet (Steckenbleiben, Balancing, Verhalten) ist kein explizites QA-Kriterium.
@@ -63,7 +63,7 @@ Der groesste Engpass ist aktuell nicht fehlender Feature-Umfang, sondern:
 ### Offene aktive Release-Themen aus dem Masterplan
 
 - V58: Persistenz-/Store-Konsolidierung, Recording-End-to-End-Smoke, Dead-Code-/Ownership-Cleanup.
-- V60: Architektur-/Totcode-Konsolidierung, dormante Multiplayer-Pfade, Session-Typ-Mapping, Doppel-Orchestrierung â€” blockiert auf V58.99.
+- V60: Architektur-/Totcode-Konsolidierung, dormante Multiplayer-Pfade, Session-Typ-Mapping, Doppel-Orchestrierung - blockiert auf V58.99.
 - V61: Arcade-Loop ist nur teilweise fertig; mehrere Kernmechaniken und UX-Schichten sind offen.
 - V62: visueller Kamera-Smoke ist erledigt; finales Gate haengt noch an DoD.2 (`npm run test:core`, T7 Start/HUD sichtbar).
 
@@ -179,7 +179,7 @@ Risiko:
 Auswirkung:
 
 - Der erste Eindruck wirkt unfertiger als das Spiel technisch ist.
-- Musik ist fuer Spieler ein starkes Qualitaetssignal â€” fehlt sie komplett, wirkt das Spiel wie ein Tech-Demo.
+- Musik ist fuer Spieler ein starkes Qualitaetssignal - fehlt sie komplett, wirkt das Spiel wie ein Tech-Demo.
 - Post-Release-Debugging wird massiv erschwert.
 
 ### 8. V60 ist releasekritisch, aber nicht ausreichend adressiert
@@ -229,7 +229,7 @@ Auswirkung:
 
 - QA kann nicht gezielt testen, weil die Zielmatrix fehlt.
 - Store-Text und System-Requirements koennen nicht geschrieben werden.
-- Safari/WebKit hat haeufig WebGL- und WebAudio-Eigenheiten â€” ohne Test ist das ein blindes Risiko.
+- Safari/WebKit hat haeufig WebGL- und WebAudio-Eigenheiten - ohne Test ist das ein blindes Risiko.
 
 ### 12. localStorage als einziger Persistenz-Layer
 
@@ -276,13 +276,13 @@ Auswirkung:
 
 Risiko:
 
-- Bots sind fuer Singleplayer-Erstnutzer das primaere "GegenÃ¼ber".
+- Bots sind fuer Singleplayer-Erstnutzer das primaere "Gegenueber".
 - Die manuelle QA-Checkliste prueft keine Bot-Qualitaet (Steckenbleiben, unfaires Verhalten, Schwierigkeitsgrad).
 - `bot:validate` existiert als Script, wird aber in keinem Sprint als Abnahme-Kriterium referenziert.
 
 Auswirkung:
 
-- Wenn Bots dumm wirken oder steckenbleiben, fuehlt sich das Spiel unfertig an â€” unabhaengig von der technischen Qualitaet.
+- Wenn Bots dumm wirken oder steckenbleiben, fuehlt sich das Spiel unfertig an - unabhaengig von der technischen Qualitaet.
 
 ### 16. Kapazitaets-/Ressourcenplanung fehlt
 
@@ -306,10 +306,10 @@ Vor dem Release muss definiert und getestet werden:
 | --- | --- | --- | --- |
 | Browser | Chrome 120+, Edge 120+ | Firefox 120+, Safari 17+ | IE, alte Mobile-Browser |
 | OS | Windows 10+, macOS 13+ | Linux (Ubuntu 22.04+) | ChromeOS, aeltere OS |
-| GPU | WebGL 2.0 faehig | â€” | Nur Software-Rendering |
+| GPU | WebGL 2.0 faehig | - | Nur Software-Rendering |
 | Bildschirm | 1280x720 bis 2560x1440 | 4K, ultrawide | <720p |
-| Eingabe | Tastatur + Maus | Gamepad, Touch | â€” |
-| Electron | Windows NSIS | macOS DMG, Linux AppImage | â€” |
+| Eingabe | Tastatur + Maus | Gamepad, Touch | - |
+| Electron | Windows NSIS | macOS DMG, Linux AppImage | - |
 
 Hinweis: Safari/WebKit hat haeufig WebGL- und WebAudio-Eigenheiten. Falls Safari Tier 1 werden soll,
 muss das explizit in Sprint 3 QA aufgenommen werden.
@@ -348,11 +348,11 @@ muss das explizit in Sprint 3 QA aufgenommen werden.
 
 ### Bewusst nicht in 1.0 (Won't-do)
 
-- Accessibility (Screen-Reader, Farbenblind-Modi, anpassbare Textgroessen) â€” Post-launch oder 1.1
-- Vollstaendige i18n-Infrastruktur mit Sprachwechsel-UI â€” Post-launch
-- Spatial Audio / 3D-Sound-Positionierung â€” Post-launch
-- Cloud-Save oder Server-seitige Persistenz â€” Post-launch
-- Safari Tier-1-Support (falls nicht explizit priorisiert) â€” Post-launch
+- Accessibility (Screen-Reader, Farbenblind-Modi, anpassbare Textgroessen) - Post-launch oder 1.1
+- Vollstaendige i18n-Infrastruktur mit Sprachwechsel-UI - Post-launch
+- Spatial Audio / 3D-Sound-Positionierung - Post-launch
+- Cloud-Save oder Server-seitige Persistenz - Post-launch
+- Safari Tier-1-Support (falls nicht explizit priorisiert) - Post-launch
 
 ### Post-launch
 
@@ -425,7 +425,7 @@ Jeder Sprint hat ein eigenes Gate mit klaren Abnahme-Kriterien und einer Eskalat
 
 ### Sprint 1: Technische Stabilitaet (KW14-15 / 31. Maerz - 11. April)
 
-Motto: "Nichts Neues bauen â€” erst das Fundament reparieren."
+Motto: "Nichts Neues bauen - erst das Fundament reparieren."
 
 #### Sprint-Ziel
 
@@ -479,7 +479,7 @@ Motto: "Entscheidungen treffen, Kernmodi fertig machen, Erstkontakt verbessern."
 Der 1.0-Scope ist verbindlich fixiert. Alle Kernmodi fuehlen sich spielerisch fertig an.
 Der erste Eindruck fuer neue Spieler ist deutlich verbessert.
 
-#### Woche 3 (KW16: 14. - 18. April) â€” Scope-Freeze
+#### Woche 3 (KW16: 14. - 18. April) - Scope-Freeze
 
 | Prio | Aufgabe | Abnahme-Kriterium |
 | --- | --- | --- |
@@ -531,7 +531,7 @@ Motto: "Von 'sollte gehen' zu 'ist nachweislich geprueft'."
 Die manuelle QA-Checkliste ist fuer alle 1.0-Pfade abgearbeitet. Ein externer Playtest
 hat reales Feedback geliefert. Alle Blocker sind identifiziert und priorisiert.
 
-#### Woche 5 (KW18: 28. April - 2. Mai) â€” Manuelle QA, Teil 1
+#### Woche 5 (KW18: 28. April - 2. Mai) - Manuelle QA, Teil 1
 
 | Prio | Aufgabe | Abnahme-Kriterium |
 | --- | --- | --- |
@@ -543,15 +543,15 @@ hat reales Feedback geliefert. Alle Blocker sind identifiziert und priorisiert.
 | P1 | Persistenz, Recording, Return-to-Menu, Reset-Flows gezielt pruefen | Ergebnisse dokumentiert |
 | P1 | Blocker-Triage: gefundene Bugs in `Blocker / Major / Minor / Cosmetic` trennen | Bug-Liste existiert mit Severity |
 
-#### Woche 6 (KW19: 5. - 9. Mai) â€” Manuelle QA, Teil 2 + Browser-Tests
+#### Woche 6 (KW19: 5. - 9. Mai) - Manuelle QA, Teil 2 + Browser-Tests
 
 | Prio | Aufgabe | Abnahme-Kriterium |
 | --- | --- | --- |
 | P0 | QA: Parcours, Arcade, HUD, Kamera, Aufnahme (Sektionen 14-17) | Alle Checks `[x]` oder `[!]` |
-| P0 | QA: Eingaben, Gamepad, Touch (Sektionen 18-20) â€” nur falls im 1.0-Scope | Alle Checks `[x]` oder `[!]` oder `[-]` |
-| P0 | QA: Multiplayer, Expert/Developer (Sektionen 21-23) â€” nur falls im 1.0-Scope | Alle Checks `[x]` oder `[!]` oder `[-]` |
+| P0 | QA: Eingaben, Gamepad, Touch (Sektionen 18-20) - nur falls im 1.0-Scope | Alle Checks `[x]` oder `[!]` oder `[-]` |
+| P0 | QA: Multiplayer, Expert/Developer (Sektionen 21-23) - nur falls im 1.0-Scope | Alle Checks `[x]` oder `[!]` oder `[-]` |
 | P1 | Tier-1-Browser-Tests: Chrome + Edge auf Kern-Flows (Boot, Match, Settings) | PASS auf beiden Browsern dokumentiert |
-| P1 | Tier-2-Browser-Tests: Firefox, ggf. Safari â€” falls priorisiert | Ergebnisse dokumentiert, Known Issues erfasst |
+| P1 | Tier-2-Browser-Tests: Firefox, ggf. Safari - falls priorisiert | Ergebnisse dokumentiert, Known Issues erfasst |
 | P1 | Bot-Qualitaets-Check: `npm run bot:validate` + manuelle Bot-Beobachtung | 0 Stuck-Events, kein sichtbar dummes Verhalten |
 | P1 | Blocker-Fixes aus QA umsetzen | Alle Blocker geschlossen oder als Known-Issue dokumentiert |
 | P2 | localStorage-Warnung / Export-Hinweis fuer Spieler pruefen | Hinweis im Menu oder in Known Issues dokumentiert |
@@ -584,12 +584,12 @@ Motto: "Nur noch stabilisieren, verpacken, ausliefern."
 Der Release Candidate ist gebaut, getestet und praesentierbar. Am Ende steht eine
 Go/No-Go-Entscheidung auf Basis harter Kriterien.
 
-#### Woche 7 (KW20: 12. - 16. Mai) â€” RC + Playtest
+#### Woche 7 (KW20: 12. - 16. Mai) - RC + Playtest
 
 | Prio | Aufgabe | Abnahme-Kriterium |
 | --- | --- | --- |
 | P0 | RC bauen: `v1.0.0-rc.1` taggen, `package.json` Version setzen | Tag existiert, Build laeuft sauber |
-| P0 | Nur noch Blocker und Major-Bugs bearbeiten â€” kein neuer Feature-Code | Commit-History zeigt nur Fixes |
+| P0 | Nur noch Blocker und Major-Bugs bearbeiten - kein neuer Feature-Code | Commit-History zeigt nur Fixes |
 | P0 | Externer kleiner Playtest (3-5 neue Spieler) auf RC-Build | Feedback-Protokoll mit Verstaendlichkeit, Frustpunkte, Abbruchstellen |
 | P1 | Changelog aus Commit-History generieren | `CHANGELOG.md` oder Release-Notes existieren |
 | P1 | Known-Issues-Liste finalisieren | Datei `docs/Known_Issues_1.0.md` existiert, ist oeffentlich kommunizierbar |
@@ -600,7 +600,7 @@ Go/No-Go-Entscheidung auf Basis harter Kriterien.
 | P2 | Falls Crash-Reporting: Sentry o.ae. einrichten | Fehler werden remote erfasst |
 | P2 | Kritische Playtest-Findings als Blocker-Fixes umsetzen | Blocker aus Playtest geschlossen |
 
-#### Woche 8 (KW21: 19. - 23. Mai) â€” Finaler QA-Durchlauf & Go/No-Go
+#### Woche 8 (KW21: 19. - 23. Mai) - Finaler QA-Durchlauf & Go/No-Go
 
 | Prio | Aufgabe | Abnahme-Kriterium |
 | --- | --- | --- |
@@ -645,14 +645,14 @@ Go/No-Go-Entscheidung auf Basis harter Kriterien.
 ```
 Sprint 1 (KW14-15)     Sprint 2 (KW16-17)     Sprint 3 (KW18-19)     Sprint 4 (KW20-21)
 Stabilitaet             Scope & Produkt        QA & Browser-Tests     RC & Launch
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+--------------------    --------------------   --------------------   --------------------
 test:core Fix           Scope-Freeze           Manuelle QA 130+       RC bauen
 npm audit fix           Arcade/MP/Desktop      Browser-Kompat.        Externer Playtest
 CI erweitern            Entscheidungen         Bot-Qualitaet          Known Issues
 V58 abschliessen        Loading Screen         Blocker-Triage         Trailer/Store-Text
 Source Maps + LICENSE   Kernmodi pruefen       Blocker-Fixes          Privacy Policy
 Bot-Validate            Privacy-Entwurf        Known-Issues-Start     Go/No-Go
-â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+--------------------    --------------------   --------------------   --------------------
 Gate: Tests stabil      Gate: Scope fixiert    Gate: QA bestanden     Gate: Release-Kriterien
 ```
 
@@ -743,7 +743,7 @@ Vor Release sollten echte neue Spieler getestet werden mit Fokus auf:
 Vor dem Release wird eine `docs/Known_Issues_1.0.md` erstellt mit folgendem Format:
 
 ```
-# Known Issues â€” CuviosClash 1.0
+# Known Issues - CuviosClash 1.0
 
 ## Bekannte Einschraenkungen
 
@@ -826,7 +826,7 @@ Dieses Template muss in Sprint 2 mit realen Werten gefuellt werden:
 | --- | --- | --- | --- | --- |
 | Sprint 1 | ? | ? | ? | test:core Fix ist P0, alles andere wartet |
 | Sprint 2 | ? | ? | ? | Scope-Entscheidungen brauchen Entscheider-Verfuegbarkeit |
-| Sprint 3 | ? | ? | ? | QA ist zeitintensiv â€” reicht die Kapazitaet fuer 130+ Checks? |
+| Sprint 3 | ? | ? | ? | QA ist zeitintensiv - reicht die Kapazitaet fuer 130+ Checks? |
 | Sprint 4 | ? | ? | ? | Playtest braucht externe Tester-Organisation |
 
 Hinweis: Falls nur 1 Person verfuegbar ist, sollte Sprint 3 auf 3 Wochen gestreckt oder
