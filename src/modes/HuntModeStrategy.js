@@ -19,8 +19,35 @@ function getNowSeconds() {
     return Date.now() * 0.001;
 }
 
+const ENTITY_RUNTIME_CONFIG_SECTION_KEYS = Object.freeze([
+    'PLAYER',
+    'GAMEPLAY',
+    'TRAIL',
+    'POWERUP',
+    'PROJECTILE',
+    'HOMING',
+    'HUNT',
+    'BOT',
+    'PORTAL',
+    'ARENA',
+    'COLORS',
+    'MAPS',
+    'runtimeConfig',
+]);
+
+function isDirectEntityRuntimeConfig(value) {
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+    return ENTITY_RUNTIME_CONFIG_SECTION_KEYS.some((key) => Object.prototype.hasOwnProperty.call(value, key));
+}
+
 function resolveConfig(config, fallbackConfig = null) {
-    return resolveEntityRuntimeConfig(config || fallbackConfig || null);
+    if (isDirectEntityRuntimeConfig(config)) {
+        return config;
+    }
+    const fallback = isDirectEntityRuntimeConfig(fallbackConfig)
+        ? fallbackConfig
+        : resolveEntityRuntimeConfig(fallbackConfig || null);
+    return resolveEntityRuntimeConfig(config || null, fallback);
 }
 
 function pickWeightedType(typeEntries = []) {
@@ -283,7 +310,10 @@ export class HuntModeStrategy extends GameModeContract {
             }));
 
         if (Math.random() < rocketSpawnChance) {
-            const weightedRocketType = pickWeightedRocketTierType({ allowedTypes: normalizedSpawnableTypes });
+            const weightedRocketType = pickWeightedRocketTierType({
+                allowedTypes: normalizedSpawnableTypes,
+                tiersConfig: activeConfig?.HUNT?.ROCKET_TIERS || null,
+            });
             if (weightedRocketType && (normalizedSpawnableTypes.includes(weightedRocketType) || isRocketTierType(weightedRocketType))) {
                 return weightedRocketType;
             }
