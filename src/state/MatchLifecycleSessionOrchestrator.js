@@ -6,7 +6,22 @@ import {
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
+    SESSION_FINALIZE_TRIGGERS,
 } from '../shared/contracts/MatchLifecycleContract.js';
+
+export const MATCH_SESSION_PORT_METHODS = Object.freeze([
+    'getLifecycleState',
+    'notifyLifecycleEvent',
+    'prepareInitializedMatchSession',
+    'wireInitializedMatchRuntime',
+    'applyInitializedMatchSession',
+    'getCurrentMatchSessionRefs',
+    'clearMatchSessionRefs',
+    'disposePreparedMatchSession',
+    'disposeCurrentMatchSession',
+    'settleRecorder',
+    'resetRoundRuntime',
+]);
 
 function createLegacyOrchestratorDeps(runtime) {
     const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
@@ -85,6 +100,13 @@ export class MatchLifecycleSessionOrchestrator {
         this.deps = runtimeOrDeps?.prepareInitializedMatchSession
             ? runtimeOrDeps
             : createLegacyOrchestratorDeps(runtime);
+        if (this.deps && typeof this.deps === 'object') {
+            for (const method of MATCH_SESSION_PORT_METHODS) {
+                if (typeof this.deps[method] !== 'function') {
+                    console?.warn?.(`[MatchLifecycleSessionOrchestrator] deps missing: ${method}`);
+                }
+            }
+        }
         this._lifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
         this._sessionSequence = 0;
         this._activeSessionId = null;
@@ -130,7 +152,7 @@ export class MatchLifecycleSessionOrchestrator {
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
-    async _disposePreparedMatch(initializedMatch, reason = 'stale_session_init') {
+    async _disposePreparedMatch(initializedMatch, reason = SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT) {
         if (!initializedMatch) return;
         try {
             await Promise.resolve(this.deps?.disposePreparedMatchSession?.(initializedMatch, {
@@ -144,7 +166,7 @@ export class MatchLifecycleSessionOrchestrator {
 
     async _applyInitializedMatch(initializedMatch, expectedSessionId, lifecycleHandlers = {}) {
         if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
-            await this._disposePreparedMatch(initializedMatch, 'stale_session_init');
+            await this._disposePreparedMatch(initializedMatch, SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT);
             return null;
         }
 
@@ -152,11 +174,16 @@ export class MatchLifecycleSessionOrchestrator {
             this.deps?.wireInitializedMatchRuntime?.(initializedMatch, lifecycleHandlers) || initializedMatch
         );
         if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
-            await this._disposePreparedMatch(wiredMatch, 'stale_session_init');
+            await this._disposePreparedMatch(wiredMatch, SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT);
             return null;
         }
 
-        this.deps?.applyInitializedMatchSession?.(wiredMatch);
+        try {
+            this.deps?.applyInitializedMatchSession?.(wiredMatch);
+        } catch (applyError) {
+            await this._disposePreparedMatch(wiredMatch, SESSION_FINALIZE_TRIGGERS.APPLY_FAILED);
+            throw applyError;
+        }
         const lifecycleState = this.deps?.getLifecycleState?.() || {};
         this._startLifecycleSession({
             mapKey: wiredMatch?.session?.effectiveMapKey || lifecycleState.mapKey || null,
@@ -172,7 +199,9 @@ export class MatchLifecycleSessionOrchestrator {
             throw new Error('MatchLifecycleSessionOrchestrator requires runtime context');
         }
         if (this._activeSessionId) {
-            this._endLifecycleSession('new_match_session');
+            this._endLifecycleSession(SESSION_FINALIZE_TRIGGERS.NEW_MATCH_SESSION);
+            this.deps?.disposeCurrentMatchSession?.({ reason: SESSION_FINALIZE_TRIGGERS.NEW_MATCH_SESSION });
+            this.deps?.clearMatchSessionRefs?.();
         }
 
         this._sessionSequence += 1;
@@ -197,6 +226,7 @@ export class MatchLifecycleSessionOrchestrator {
                 if (this._activeSessionId === provisionalId) {
                     this._activeSessionId = null;
                 }
+                this.deps?.clearMatchSessionRefs?.();
                 throw error;
             })
             .finally(() => {
@@ -216,6 +246,11 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     resetRoundRuntime() {
+        this.deps?.resetRoundRuntime?.();
+    }
+
+    finalizeRound() {
+        this.deps?.settleRecorder?.({ type: SESSION_FINALIZE_TRIGGERS.ROUND_FINALIZE });
         this.deps?.resetRoundRuntime?.();
     }
 
