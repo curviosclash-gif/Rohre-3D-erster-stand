@@ -24,6 +24,7 @@ import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './Playte
 import { RECORDING_CAPTURE_PROFILE, RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
 import { RECORDER_ENGINE } from './recording/MediaRecorderSupport.js';
 import { clearGameRuntimeState } from './runtime/GameRuntimeBundle.js';
+import { ensureInteractiveMatchRuntime } from './InteractiveMatchRuntimeGuard.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -56,6 +57,7 @@ export class Game {
         this._hudTimer = 0;
         this._renderAlpha = 1;
         this._renderDelta = 1 / 60;
+        this._missingInteractiveMatchRuntimeReported = false;
         this.runtimePerfProfiler = new RuntimePerfProfiler({
             spikeThresholdMs: 30,
         });
@@ -469,15 +471,17 @@ export class Game {
     update(dt) {
         this.runtimeDiagnosticsSystem.update(dt);
         this._handleGlobalInputHotkeys();
+        const requiresInteractiveMatchRuntime = this.state === GAME_STATE_IDS.PLAYING || this.state === GAME_STATE_IDS.PAUSED;
+        const hasInteractiveMatchRuntime = !requiresInteractiveMatchRuntime || ensureInteractiveMatchRuntime(this);
 
         // Debug Recording
-        if (this.state === GAME_STATE_IDS.PLAYING && this.entityManager && this.recorder?.shouldCaptureFrames?.()) {
+        if (this.state === GAME_STATE_IDS.PLAYING && hasInteractiveMatchRuntime && this.entityManager && this.recorder?.shouldCaptureFrames?.()) {
             this.recorder.recordFrame(this.entityManager.players);
         }
 
-        if (this.state === GAME_STATE_IDS.PLAYING) {
+        if (this.state === GAME_STATE_IDS.PLAYING && hasInteractiveMatchRuntime) {
             this._updatePlayingState(dt);
-        } else if (this.state === GAME_STATE_IDS.PAUSED) {
+        } else if (this.state === GAME_STATE_IDS.PAUSED && hasInteractiveMatchRuntime) {
             this._updatePausedState(dt);
         } else if (this.state === GAME_STATE_IDS.ROUND_END) {
             this._updateRoundEndState(dt);
