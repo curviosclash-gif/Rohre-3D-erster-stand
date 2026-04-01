@@ -3,15 +3,14 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
-import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
+import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
 const UNIT_CYLINDER_GEOMETRY = new THREE.CylinderGeometry(1, 1, 1, 4);
 const UP_AXIS = new THREE.Vector3(0, 1, 0);
 const DUMMY = new THREE.Object3D();
 
-function getTrailSegmentHp() {
-    const configured = Number(getActiveRuntimeConfig(CONFIG)?.HUNT?.TRAIL_SEGMENT_HP);
+function getTrailSegmentHp(entityManager = null) {
+    const configured = Number(resolveEntityRuntimeConfig(entityManager)?.HUNT?.TRAIL_SEGMENT_HP);
     if (!Number.isFinite(configured) || configured <= 0) {
         return 3;
     }
@@ -20,7 +19,7 @@ function getTrailSegmentHp() {
 
 export class Trail {
     constructor(renderer, color, playerIndex, entityManager = null) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(entityManager);
         this.renderer = renderer;
         this.color = color;
         this.playerIndex = playerIndex;
@@ -79,7 +78,7 @@ export class Trail {
     }
 
     resetWidth() {
-        this.width = getActiveRuntimeConfig(CONFIG).TRAIL.WIDTH;
+        this.width = resolveEntityRuntimeConfig(this.entityManager).TRAIL.WIDTH;
     }
 
     forceGap(duration = 0.5) {
@@ -89,7 +88,7 @@ export class Trail {
     }
 
     update(dt, position, direction) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.entityManager);
         if (this.inGap) {
             this.gapTimer -= dt;
             if (this.gapTimer <= 0) {
@@ -165,7 +164,7 @@ export class Trail {
         this._dirty = true;
 
         // Register in global grid
-        const segmentHp = getTrailSegmentHp();
+        const segmentHp = getTrailSegmentHp(this.entityManager);
         if (this.trailSpatialIndex) {
             this.segmentRefs[this.writeIndex] = this.trailSpatialIndex.registerTrailSegment(this.playerIndex, this.writeIndex, {
                 midX,

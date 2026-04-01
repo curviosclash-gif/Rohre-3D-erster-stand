@@ -1,14 +1,13 @@
-import { CONFIG } from '../core/Config.js';
-import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { grantShield } from './HealthSystem.js';
+import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
 function getLabel(player) {
     if (!player) return 'Spieler';
     return player.isBot ? `Bot ${player.index + 1}` : `P${player.index + 1}`;
 }
 
-function getRespawnConfig() {
-    return getActiveRuntimeConfig(CONFIG)?.HUNT?.RESPAWN || {};
+function getRespawnConfig(runtimeContext = null) {
+    return resolveEntityRuntimeConfig(runtimeContext)?.HUNT?.RESPAWN || {};
 }
 
 function resetRespawnInventory(player, respawnConfig) {
@@ -30,7 +29,7 @@ function applyRespawnRecovery(player, respawnConfig) {
 
     const recoveryShieldHp = Math.max(0, Number(respawnConfig?.RECOVERY_SHIELD_HP || 0));
     if (recoveryShieldHp > 0) {
-        grantShield(player);
+        grantShield(player, player?.entityRuntimeConfig || null);
         player.shieldHP = Math.min(player.maxShieldHp || recoveryShieldHp, recoveryShieldHp);
     }
 }
@@ -52,7 +51,7 @@ export class RespawnSystem {
 
     onPlayerDied(player) {
         if (!this.isEnabled() || !player) return false;
-        const delaySeconds = Math.max(0.1, Number(getRespawnConfig()?.DELAY_SECONDS || 3));
+        const delaySeconds = Math.max(0.1, Number(getRespawnConfig(this.runtime)?.DELAY_SECONDS || 3));
         this.pendingByPlayer.set(player.index, {
             player,
             remaining: delaySeconds,
@@ -91,9 +90,9 @@ export class RespawnSystem {
             pending.remaining -= safeDt;
             if (pending.remaining > 0) continue;
 
-            const respawnConfig = getRespawnConfig();
-            const activeConfig = getActiveRuntimeConfig(CONFIG);
-            const planarSpawnLevel = activeConfig.GAMEPLAY.PLANAR_MODE && this.runtime?.spawn?.getPlanarSpawnLevel
+            const respawnConfig = getRespawnConfig(this.runtime);
+            const entityRuntimeConfig = resolveEntityRuntimeConfig(this.runtime);
+            const planarSpawnLevel = entityRuntimeConfig.GAMEPLAY.PLANAR_MODE && this.runtime?.spawn?.getPlanarSpawnLevel
                 ? this.runtime.spawn.getPlanarSpawnLevel()
                 : null;
             const minEnemyDistance = Math.max(12, Number(respawnConfig?.MIN_ENEMY_DISTANCE || 18));

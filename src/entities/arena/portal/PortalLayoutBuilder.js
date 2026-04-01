@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import { CONFIG } from '../../../core/Config.js';
-import { getActiveRuntimeConfig } from '../../../core/runtime/ActiveRuntimeConfigStore.js';
 import {
     createPortalGateVisualRegistry,
     createBoostPortalMesh,
@@ -14,6 +12,7 @@ import {
     resolvePlanarElevatorPair,
     resolvePortalPosition,
 } from '../PortalPlacementOps.js';
+import { resolveEntityRuntimeConfig } from '../../../shared/contracts/EntityRuntimeConfig.js';
 
 function asFiniteNumber(value, defaultValue = 0) {
     const num = Number(value);
@@ -141,7 +140,7 @@ export class PortalLayoutBuilder {
     }
 
     _buildPortals(map, scale) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         this.arena.portals = [];
         this._portalMeshCompactMode = false;
         if (!this.arena.portalsEnabled) return;
@@ -176,7 +175,7 @@ export class PortalLayoutBuilder {
     }
 
     _createPortalFromDef(def, scale) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         if (!def || !Array.isArray(def.a) || !Array.isArray(def.b)) return;
         const ax = Number(def.a[0]);
         const ay = Number(def.a[1]);
@@ -193,7 +192,7 @@ export class PortalLayoutBuilder {
     }
 
     _buildFixedDynamicPortals(pairCount) {
-        if (getActiveRuntimeConfig(CONFIG).GAMEPLAY.PLANAR_MODE) {
+        if (resolveEntityRuntimeConfig(this.arena).GAMEPLAY.PLANAR_MODE) {
             this._buildFixedPlanarPortals(pairCount);
         } else {
             this._buildFixed3DPortals(pairCount);
@@ -201,7 +200,7 @@ export class PortalLayoutBuilder {
     }
 
     _buildFixed3DPortals(pairCount) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         const colors = [0x00ffcc, 0xff00cc, 0xffff00, 0x00ccff, 0xff8844, 0x66ff44];
         const slots = getMapPortalSlots3D(this.arena.currentMapKey);
         if (slots.length < 2) return;
@@ -222,7 +221,7 @@ export class PortalLayoutBuilder {
     }
 
     _buildFixedPlanarPortals(pairCount) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         const colors = [0x00ffcc, 0xff00cc, 0xffff00, 0x00ccff, 0xff8844, 0x66ff44];
         const anchors = getMapPlanarAnchors(this.arena.currentMapKey);
         const levels = this.getPortalLevels();
@@ -271,7 +270,7 @@ export class PortalLayoutBuilder {
     }
 
     getPortalLevelsFallback() {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         const b = this.arena.bounds;
         const height = b.maxY - b.minY;
         if (height <= 0) return [b.minY + 3];
@@ -286,7 +285,7 @@ export class PortalLayoutBuilder {
     }
 
     getPortalLevels() {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         const b = this.arena.bounds;
         const height = b.maxY - b.minY;
         if (height <= 0) return this.getPortalLevelsFallback();

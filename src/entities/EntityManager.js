@@ -2,16 +2,14 @@
 // EntityManager.js - manages players, collisions and item projectiles
 // ============================================
 
-import { CONFIG } from '../core/Config.js';
-import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { BotPolicyRegistry } from './ai/BotPolicyRegistry.js';
 import { DEFAULT_BOT_POLICY_TYPE } from './ai/BotPolicyTypes.js';
 import { createBotRuntimeContext } from './ai/BotRuntimeContextFactory.js';
 import { assembleEntityRuntime } from './runtime/EntityRuntimeAssembler.js';
-import { isHuntHealthActive } from '../hunt/HealthSystem.js';
 import { emitHuntDamageFeedback } from '../hunt/HuntDamageFeedback.js';
 import { createGameModeStrategy } from '../modes/GameModeRegistry.js';
 import { LastRoundGhostSystem } from './LastRoundGhostSystem.js';
+import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -51,10 +49,11 @@ function bindRuntimePorts(owner, runtime) {
 
 export class EntityManager {
     static deriveSelfTrailSkipRecentSegments(player) {
-        const updateInterval = Math.max(0.01, Number(CONFIG.TRAIL?.UPDATE_INTERVAL) || 0.07);
-        const speed = Math.max(1, Number(player?.speed) || Number(player?.baseSpeed) || Number(CONFIG.PLAYER?.SPEED) || 18);
-        const hitboxRadius = Math.max(0.4, Number(player?.hitboxRadius) || Number(CONFIG.PLAYER?.HITBOX_RADIUS) || 0.8);
-        const trailRadius = Math.max(0.05, (Number(player?.trail?.width) || Number(CONFIG.TRAIL?.WIDTH) || 0.6) * 0.5);
+        const entityRuntimeConfig = resolveEntityRuntimeConfig(player?.entityManager || player);
+        const updateInterval = Math.max(0.01, Number(entityRuntimeConfig.TRAIL?.UPDATE_INTERVAL) || 0.07);
+        const speed = Math.max(1, Number(player?.speed) || Number(player?.baseSpeed) || Number(entityRuntimeConfig.PLAYER?.SPEED) || 18);
+        const hitboxRadius = Math.max(0.4, Number(player?.hitboxRadius) || Number(entityRuntimeConfig.PLAYER?.HITBOX_RADIUS) || 0.8);
+        const trailRadius = Math.max(0.05, (Number(player?.trail?.width) || Number(entityRuntimeConfig.TRAIL?.WIDTH) || 0.6) * 0.5);
 
         let bodyLengthEstimate = hitboxRadius * 2.5;
         const box = player?.hitboxBox;
@@ -73,7 +72,7 @@ export class EntityManager {
         return clampInt(Math.ceil(graceDistance / estimatedSegmentSpacing) + 1, 5, 12);
     }
 
-    constructor(renderer, arena, powerupManager, particles, audio, recorder, runtimeProfiler = null) {
+    constructor(renderer, arena, powerupManager, particles, audio, recorder, runtimeProfiler = null, options = {}) {
         this.renderer = renderer;
         this.arena = arena;
         this.powerupManager = powerupManager;
@@ -90,7 +89,10 @@ export class EntityManager {
         this.onPlayerFeedback = null;
         this.onHuntFeedEvent = null;
         this.onHuntDamageEvent = null;
-        this.botDifficulty = CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL';
+        this.entityRuntimeConfig = resolveEntityRuntimeConfig(options?.entityRuntimeConfig || arena || null);
+        this.botDifficulty = this.entityRuntimeConfig.BOT?.ACTIVE_DIFFICULTY
+            || this.entityRuntimeConfig.BOT?.DEFAULT_DIFFICULTY
+            || 'NORMAL';
         this.runtime = assembleEntityRuntime(this);
         bindRuntimePorts(this, this.runtime);
         this._lastRoundGhostSystem = new LastRoundGhostSystem(renderer);
@@ -98,9 +100,11 @@ export class EntityManager {
         this.botPolicyRegistry = new BotPolicyRegistry();
         this.botPolicyType = DEFAULT_BOT_POLICY_TYPE;
         this.botBridgeEnabled = false;
-        this.activeGameMode = getActiveRuntimeConfig(CONFIG)?.HUNT?.ACTIVE_MODE || 'classic';
-        this.huntEnabled = isHuntHealthActive();
-        this.gameModeStrategy = createGameModeStrategy(this.activeGameMode);
+        this.activeGameMode = String(this.entityRuntimeConfig.HUNT?.ACTIVE_MODE || 'CLASSIC').trim().toUpperCase();
+        this.huntEnabled = this.entityRuntimeConfig.HUNT?.ENABLED !== false && this.activeGameMode === 'HUNT';
+        this.gameModeStrategy = createGameModeStrategy(this.activeGameMode, {
+            entityRuntimeConfig: this.entityRuntimeConfig,
+        });
         if (this.powerupManager) {
             this.powerupManager.getStrategy = () => this.gameModeStrategy;
         }
@@ -162,7 +166,7 @@ export class EntityManager {
         const bounds = this.arena?.bounds || null;
         const fallback = bounds
             ? (bounds.minY + bounds.maxY) * 0.5
-            : (CONFIG.PLAYER.START_Y || 5);
+            : (this.entityRuntimeConfig.PLAYER?.START_Y || 5);
 
         const hasPortals = Array.isArray(this.arena?.portals) && this.arena.portals.length > 0;
         if (!hasPortals) {

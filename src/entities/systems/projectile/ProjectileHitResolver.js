@@ -1,8 +1,8 @@
 import { HUNT_CONFIG } from '../../../hunt/HuntConfig.js';
-import { getActiveRuntimeConfig } from '../../../core/runtime/ActiveRuntimeConfigStore.js';
 import { isHuntHealthActive } from '../../../hunt/HealthSystem.js';
 import { isRocketTierType, resolveRocketTierDamage } from '../../../hunt/RocketPickupSystem.js';
 import { applyTrailDamageFromProjectile } from '../../../hunt/DestructibleTrail.js';
+import { resolveEntityRuntimeConfig } from '../../../shared/contracts/EntityRuntimeConfig.js';
 
 export class ProjectileHitResolver {
     constructor(system) {
@@ -11,7 +11,7 @@ export class ProjectileHitResolver {
     }
 
     _applyRocketExplosion(projectile, players, directHitTarget) {
-        const rocketConfig = getActiveRuntimeConfig(HUNT_CONFIG)?.ROCKET || HUNT_CONFIG.ROCKET;
+        const rocketConfig = resolveEntityRuntimeConfig(this.system)?.HUNT?.ROCKET || HUNT_CONFIG.ROCKET;
         const explosionRadius = Math.max(1, Number(rocketConfig?.EXPLOSION_RADIUS || 25));
         const explosionDamageFalloff = Math.max(0, Math.min(1, Number(rocketConfig?.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
         const baseDamage = resolveRocketTierDamage(projectile.type);
@@ -97,7 +97,7 @@ export class ProjectileHitResolver {
 
             if (!hit) continue;
 
-            const huntRocketHit = isHuntHealthActive() && isRocketTierType(projectile.type);
+            const huntRocketHit = isHuntHealthActive(resolveEntityRuntimeConfig(this.system)) && isRocketTierType(projectile.type);
             if (huntRocketHit) {
                 const damage = resolveRocketTierDamage(projectile.type);
                 const damageResult = target.takeDamage(damage);

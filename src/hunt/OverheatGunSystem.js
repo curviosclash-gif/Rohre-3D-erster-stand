@@ -1,12 +1,11 @@
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
-import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { MGOverheatState } from './mg/MGOverheatState.js';
 import { MGHitResolver } from './mg/MGHitResolver.js';
 import { MGTracerFx } from './mg/MGTracerFx.js';
+import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
-function getMgConfig() {
-    return getActiveRuntimeConfig(CONFIG)?.HUNT?.MG || CONFIG?.HUNT?.MG || {};
+function getMgConfig(source = null) {
+    return resolveEntityRuntimeConfig(source)?.HUNT?.MG || {};
 }
 
 function createLegacyRuntimeContext(entityManager) {
@@ -65,7 +64,7 @@ export class OverheatGunSystem {
     }
 
     update(dt) {
-        const mg = getMgConfig();
+        const mg = getMgConfig(this.runtimeContext || this.entityManager);
         const players = this.entityManager?.players || [];
         this._state.update(players, dt, mg);
         this._tracerFx.update(dt);
@@ -104,7 +103,7 @@ export class OverheatGunSystem {
             return { ok: false, reason: 'Hunt-Modus inaktiv', type: 'MG_BULLET' };
         }
 
-        const mg = getMgConfig();
+        const mg = getMgConfig(this.runtimeContext || this.entityManager);
         const shotCooldown = Math.max(0.01, Number(mg.COOLDOWN || 0.08));
         if ((player.shootCooldown || 0) > 0) {
             return { ok: false, reason: `Schuss bereit in ${player.shootCooldown.toFixed(1)}s`, type: 'MG_BULLET' };

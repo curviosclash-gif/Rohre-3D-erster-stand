@@ -4,16 +4,13 @@ import { CONFIG, CONFIG_BASE } from './Config.js';
 const logger = createLogger('GameRuntimeFacade');
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
-import {
-    MENU_CONTROLLER_EVENT_CONTRACT_VERSION,
-} from '../shared/contracts/MenuControllerContract.js';
+import { MENU_CONTROLLER_EVENT_CONTRACT_VERSION } from '../shared/contracts/MenuControllerContract.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
 import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
+import { resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
-import {
-    applyRuntimeSettingsState,
-} from './runtime/GameRuntimeBundle.js';
+import { applyRuntimeSettingsState } from './runtime/GameRuntimeBundle.js';
 import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
 import { ReplayRecorder } from './replay/ReplayRecorder.js';
 import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
@@ -25,10 +22,7 @@ import {
     resolveMenuAccessContext,
     SETTINGS_CHANGE_KEYS,
 } from '../composition/core-ui/CoreUiMenuPorts.js';
-import {
-    MATCH_SETTING_CHANGE_KEY_SET,
-    START_VALIDATION_RELEVANT_KEY_SET,
-} from './runtime/GameRuntimeSettingsKeySets.js';
+import { MATCH_SETTING_CHANGE_KEY_SET, START_VALIDATION_RELEVANT_KEY_SET } from './runtime/GameRuntimeSettingsKeySets.js';
 import {
     initRuntimeSession,
     setupRuntimeClientStateReceiver,
@@ -55,9 +49,7 @@ import {
     handleMultiplayerReadyToggleAction,
     invalidateMultiplayerReadyIfHostChangedSettings,
 } from './runtime/MenuRuntimeMultiplayerService.js';
-import {
-    orchestrateRuntimeSettingsChanged,
-} from './runtime/RuntimeSettingsChangeOrchestrator.js';
+import { orchestrateRuntimeSettingsChanged } from './runtime/RuntimeSettingsChangeOrchestrator.js';
 import {
     handleDeveloperTrainingAutoStepAction,
     handleDeveloperTrainingRunBatchAction,
@@ -156,6 +148,7 @@ export class GameRuntimeFacade {
                 renderer: game.renderer,
                 settings: game.settings,
                 runtimeConfig,
+                baseConfig: game.config || CONFIG_BASE,
                 requestedMapKey: runtimeConfig?.session?.mapKey || game.mapKey,
             })).catch((error) => {
                 logger.warn('Match prewarm skipped:', error);
@@ -335,8 +328,7 @@ export class GameRuntimeFacade {
 
     _syncMultiplayerRuntimeContext(changedKeys = null) {
         const game = this.game;
-        const sessionType = String(game?.settings?.localSettings?.sessionType || 'single').toLowerCase();
-        if (sessionType !== 'multiplayer') return;
+        if (!resolveRuntimeSessionContract(game?.settings?.localSettings).usesMenuStorageBridge) return;
 
         const accessContext = this._resolveMenuAccessContext();
         this.menuMultiplayerBridge?.syncActorIdentity?.(accessContext?.actorId);
@@ -762,10 +754,8 @@ export class GameRuntimeFacade {
 
     startMatch() {
         this._clearMatchPrewarmTimer();
-        const telemetryPayload = {
-            sessionType: this.game?.settings?.localSettings?.sessionType || 'single',
-            modePath: this.game?.settings?.localSettings?.modePath || 'normal',
-        };
+        const sessionContract = resolveRuntimeSessionContract(this.game?.settings?.localSettings);
+        const telemetryPayload = { sessionType: sessionContract.sessionType, multiplayerTransport: sessionContract.multiplayerTransport, modePath: this.game?.settings?.localSettings?.modePath || 'normal' };
         this._recordMenuTelemetry('start_attempt', telemetryPayload);
         const validationIssue = this._resolveStartValidationIssue();
         if (validationIssue) {
@@ -779,7 +769,7 @@ export class GameRuntimeFacade {
             return false;
         }
         this.game?.uiManager?.clearStartValidationError?.();
-        if (String(this.game?.settings?.localSettings?.sessionType || 'single').toLowerCase() === 'multiplayer') {
+        if (sessionContract.usesMenuStorageBridge) {
             const startResult = this.menuMultiplayerBridge?.requestMatchStart?.({
                 settingsSnapshot: this._captureMultiplayerMatchSettings(),
             });
@@ -806,12 +796,23 @@ export class GameRuntimeFacade {
 
     returnToMenu(options = {}) {
         this.ports?.sessionPort?.clearLastRoundGhost?.();
-        this.ports?.sessionPort?.teardownMatchSession?.({ reason: options?.reason || 'return_to_menu' });
+        let teardownResult = null;
+        try {
+            teardownResult = this.ports?.sessionPort?.teardownMatchSession?.({ reason: options?.reason || 'return_to_menu' });
+        } catch (error) {
+            logger.error('returnToMenu teardown failed:', error);
+        }
         this.teardownRuntimeSession();
         this.ports?.inputPort?.clearPlayerSources?.();
         this.game?.hudRuntimeSystem?.clearNetworkScoreboard?.();
         this.ports?.matchUiPort?.applyReturnToMenuUi?.(options);
         this._resetArcadeRunState();
+        if (teardownResult && typeof teardownResult.then === 'function') {
+            return Promise.resolve(teardownResult).then(() => true).catch((error) => {
+                logger.error('returnToMenu teardown failed:', error);
+                return false;
+            }).finally(() => { this.scheduleMatchPrewarm(); });
+        }
         this.scheduleMatchPrewarm();
         return true;
     }

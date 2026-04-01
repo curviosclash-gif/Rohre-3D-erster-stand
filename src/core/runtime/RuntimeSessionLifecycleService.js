@@ -3,6 +3,10 @@
 // ============================================
 
 import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
+import {
+    RUNTIME_SESSION_TYPES,
+    resolveRuntimeSessionContract,
+} from '../../shared/contracts/RuntimeSessionContract.js';
 import { LocalSessionAdapter } from '../session/LocalSessionAdapter.js';
 import { createGameStateSnapshot } from '../GameStateSnapshot.js';
 
@@ -15,18 +19,25 @@ const ARENA_LOADED_TIMEOUT_PER_REMOTE_PLAYER_MS = 5_000;
 const ARENA_LOADED_SIGNAL_TYPE = 'arena_loaded';
 const ARENA_START_SIGNAL_TYPE = 'arena_start';
 
-export async function createRuntimeSessionAdapter(sessionType) {
-    const normalizedSessionType = String(sessionType || 'single').trim().toLowerCase();
-    if (normalizedSessionType === 'lan') {
+function resolveSessionContract(sessionSource = null) {
+    if (typeof sessionSource === 'string') {
+        return resolveRuntimeSessionContract({ sessionType: sessionSource });
+    }
+    return resolveRuntimeSessionContract(sessionSource);
+}
+
+export async function createRuntimeSessionAdapter(sessionSource) {
+    const sessionContract = resolveSessionContract(sessionSource);
+    if (sessionContract.adapterSessionType === RUNTIME_SESSION_TYPES.LAN) {
         const { LANSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/LANSessionAdapter.js');
         return new LANSessionAdapter();
     }
-    if (normalizedSessionType === 'online') {
+    if (sessionContract.adapterSessionType === RUNTIME_SESSION_TYPES.ONLINE) {
         const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/OnlineSessionAdapter.js');
         return new OnlineSessionAdapter();
     }
-    if (normalizedSessionType === 'multiplayer') {
-        // Storage-Bridge coordination: no real-time network adapter in this mode.
+    if (sessionContract.usesMenuStorageBridge) {
+        // Storage-Bridge coordination is a menu-only transport contract, not a real runtime network adapter.
         return new LocalSessionAdapter();
     }
     return new LocalSessionAdapter();
@@ -34,19 +45,20 @@ export async function createRuntimeSessionAdapter(sessionType) {
 
 export async function initRuntimeSession(facade) {
     const game = facade?.game;
-    const sessionType = String(game?.runtimeConfig?.session?.sessionType || 'single').toLowerCase();
+    const sessionContract = resolveSessionContract(game?.runtimeConfig?.session);
 
     teardownRuntimeSession(facade);
-    facade.session = await createRuntimeSessionAdapter(sessionType);
+    facade._runtimeSessionContract = sessionContract;
+    facade.session = await createRuntimeSessionAdapter(sessionContract);
 
     const numHumans = game?.runtimeConfig?.session?.numHumans || 1;
     await facade.session.connect({ numHumans });
 
-    if (facade.session.isHost && (sessionType === 'lan' || sessionType === 'online')) {
+    if (facade.session.isHost && sessionContract.isNetworkSession) {
         startRuntimeStateBroadcast(facade);
     }
 
-    if (!facade.session.isHost && (sessionType === 'lan' || sessionType === 'online')) {
+    if (!facade.session.isHost && sessionContract.isNetworkSession) {
         setupRuntimeClientStateReceiver(facade);
     }
 }
@@ -249,6 +261,9 @@ export function teardownRuntimeSession(facade) {
     if (facade?.session) {
         facade.session.dispose();
         facade.session = null;
+    }
+    if (facade) {
+        facade._runtimeSessionContract = null;
     }
     facade?._stateReconciler?.reset?.();
     facade?._resetArcadeRunState?.();

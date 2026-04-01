@@ -1,5 +1,4 @@
-import { CONFIG } from '../core/Config.js';
-import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
+import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
 function toPositiveNumber(value, fallback) {
     const numeric = Number(value);
@@ -79,7 +78,7 @@ function commitHuntTargetingTelemetry(telemetry, metrics, result, durationMs) {
 }
 
 export function resolveHuntTargetingHotpathSettings(options = {}) {
-    const targetingConfig = getActiveRuntimeConfig(CONFIG)?.HUNT?.TARGETING || {};
+    const targetingConfig = resolveEntityRuntimeConfig(options?.entityRuntimeConfig || options?.runtimeContext || options?.runtime)?.HUNT?.TARGETING || {};
     const optimizedScanEnabled = options.optimizedTrailScan == null
         ? targetingConfig.OPTIMIZED_SCAN_ENABLED !== false
         : options.optimizedTrailScan !== false;

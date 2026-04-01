@@ -39,6 +39,7 @@ export class Player {
         this.index = index;
         this.color = color;
         this.isBot = isBot;
+        this.entityRuntimeConfig = options?.entityRuntimeConfig || options?.entityManager?.entityRuntimeConfig || null;
         this.alive = true;
         this.score = 0;
 

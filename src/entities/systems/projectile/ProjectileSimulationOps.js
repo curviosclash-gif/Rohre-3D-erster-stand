@@ -1,6 +1,4 @@
 import * as THREE from 'three';
-import { CONFIG } from '../../../core/Config.js';
-import { getActiveRuntimeConfig } from '../../../core/runtime/ActiveRuntimeConfigStore.js';
 import {
     createHuntTargetingScratch,
     createHuntTargetingTelemetry,
@@ -8,6 +6,7 @@ import {
     resolveHuntLineTarget,
     resolveHuntTargetPosition,
 } from '../../../hunt/HuntTargetingOps.js';
+import { resolveEntityRuntimeConfig } from '../../../shared/contracts/EntityRuntimeConfig.js';
 
 function resolveRocketRuntime(config) {
     const rocket = config?.HUNT?.ROCKET || {};
@@ -51,7 +50,7 @@ export class ProjectileSimulationOps {
     }
 
     acquireHomingTarget(projectile, players, trailSpatialIndex = null) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.system);
         const rocketRuntime = resolveRocketRuntime(config);
         if (!projectile || !Array.isArray(players) || players.length === 0) return null;
 
@@ -135,7 +134,7 @@ export class ProjectileSimulationOps {
     }
 
     bounceProjectileOnFoam(projectile, collisionInfo) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.system);
         const rocketRuntime = resolveRocketRuntime(config);
         if (!projectile || !collisionInfo?.normal) return false;
 
@@ -172,7 +171,7 @@ export class ProjectileSimulationOps {
     }
 
     stepProjectile(projectile, index, dt, arena, players, trailSpatialIndex, time) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.system);
         const rocketRuntime = resolveRocketRuntime(config);
         projectile.foamBounceCooldown = Math.max(0, (projectile.foamBounceCooldown || 0) - dt);
 
@@ -232,7 +231,7 @@ export class ProjectileSimulationOps {
                 const speed = this._tmpVec2.length();
                 const turnRate = Math.max(
                     rocketRuntime.homingMinTurnRate,
-                    Number(projectile.homingTurnRate || config?.HOMING?.TURN_RATE || CONFIG?.HOMING?.TURN_RATE)
+                    Number(projectile.homingTurnRate || config?.HOMING?.TURN_RATE)
                 );
                 this._tmpVec2.normalize().lerp(this._tmpVec, Math.min(turnRate * dt, 1.0)).normalize();
                 projectile.velocity.copy(this._tmpVec2.multiplyScalar(speed));
@@ -255,7 +254,7 @@ export class ProjectileSimulationOps {
             arenaCollision = { hit: true, kind: 'wall', normal: null };
         }
 
-        const projectileExpired = projectile.ttl <= 0 || projectile.traveled >= (config?.PROJECTILE?.MAX_DISTANCE || CONFIG?.PROJECTILE?.MAX_DISTANCE || Infinity);
+        const projectileExpired = projectile.ttl <= 0 || projectile.traveled >= (config?.PROJECTILE?.MAX_DISTANCE || Infinity);
         const projectileHitArena = !!arenaCollision?.hit;
         const arenaKind = String(arenaCollision?.kind || 'wall').toLowerCase();
         const bouncedOnFoam = projectileHitArena && arenaKind === 'foam'

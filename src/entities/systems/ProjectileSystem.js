@@ -3,11 +3,10 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
-import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import { ProjectileStatePool } from './projectile/ProjectileStatePool.js';
 import { ProjectileSimulationOps } from './projectile/ProjectileSimulationOps.js';
 import { ProjectileHitResolver } from './projectile/ProjectileHitResolver.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 
 function getNowMilliseconds() {
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
@@ -43,6 +42,7 @@ export class ProjectileSystem {
         this.onProjectileDamage = typeof options.onProjectileDamage === 'function' ? options.onProjectileDamage : (() => { });
         this.onTrailSegmentHit = typeof options.onTrailSegmentHit === 'function' ? options.onTrailSegmentHit : (() => { });
         this.runtimeProfiler = options.runtimeProfiler || null;
+        this.entityRuntimeConfig = resolveEntityRuntimeConfig(options.entityRuntimeConfig || null);
 
         this.projectiles = [];
         this._projectileAssets = new Map();
@@ -58,7 +58,7 @@ export class ProjectileSystem {
     }
 
     shootItemProjectile(player, preferredIndex = -1) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = this.entityRuntimeConfig;
         const rocketConfig = config?.HUNT?.ROCKET || {};
         const targetingConfig = config?.HUNT?.TARGETING || {};
         const homingMinTurnRate = Math.max(0.000001, Number(rocketConfig.HOMING_MIN_TURN_RATE) || 0.1);

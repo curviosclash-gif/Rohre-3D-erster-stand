@@ -28,6 +28,7 @@ export function createEntityRuntimeSupport(owner) {
     let eventBus = null;
     const projectileSystem = new ProjectileSystem({
         renderer: owner.renderer,
+        entityRuntimeConfig: owner.entityRuntimeConfig,
         getArena: () => owner.arena,
         getPlayers: () => owner.players,
         getStrategy: () => owner.gameModeStrategy || null,
@@ -164,6 +165,7 @@ export function createEntityRuntimeSupport(owner) {
             audio: owner.audio,
             recorder: owner.recorder,
             runtimeProfiler: owner.runtimeProfiler || null,
+            entityRuntimeConfig: owner.entityRuntimeConfig,
         },
         callbacks: {
             getStrategy: () => owner.gameModeStrategy || null,

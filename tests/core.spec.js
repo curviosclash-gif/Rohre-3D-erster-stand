@@ -4976,6 +4976,194 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.secondSampleCount).toBe(result.firstSampleCount);
     });
 
+    test('T20aj1a: Recorder behaelt reale Dauer trotz Backlog-Trim bei langen Render-Luecken', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            let now = 0;
+            const recorder = new MediaRecorderSystem({
+                canvas: { width: 320, height: 180 },
+                autoDownload: false,
+                captureFps: 30,
+                globalScope: {},
+            });
+            recorder._perfNow = () => now;
+            recorder._isRecording = true;
+            recorder._activeRecorderEngine = 'mediarecorder-native';
+            recorder._mediaRecorderSupportsRequestFrame = true;
+            recorder._mediaRecorderVideoTrack = {
+                requestFrame() { },
+            };
+
+            const renderDeltasMs = [1000, 1000, 1000, 1000];
+            for (let i = 0; i < renderDeltasMs.length; i++) {
+                now += renderDeltasMs[i];
+                recorder.captureRenderedFrame(renderDeltasMs[i] / 1000);
+            }
+
+            return {
+                captureTimestampUs: recorder._captureTimestampUs,
+                encodedFrames: recorder._captureEncodedFrames,
+                diagnostics: recorder.getRecordingDiagnostics(),
+            };
+        });
+
+        expect(result.encodedFrames).toBeGreaterThanOrEqual(3);
+        expect(result.captureTimestampUs).toBeGreaterThanOrEqual(2_900_000);
+        expect(result.diagnostics.frameIntervalStats?.mean || 0).toBeGreaterThan(900);
+    });
+
+    test('T20aj1b: Cinematic-WebCodecs nutzt Capture-Aufloesung statt festem 720p-Downscale', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const captureCanvas = { width: 1920, height: 1080 };
+            const recorder = new MediaRecorderSystem({
+                canvas: captureCanvas,
+                autoDownload: false,
+                captureSourceResolver: () => captureCanvas,
+                recordingCaptureSettings: {
+                    profile: 'cinematic_mp4',
+                    hudMode: 'clean',
+                },
+                globalScope: {},
+            });
+
+            const dimensions = recorder._resolveRecordingDimensions();
+            const bitrate = recorder._resolveRecordingBitrate(dimensions.width, dimensions.height);
+            recorder.dispose();
+            return {
+                dimensions,
+                bitrate,
+            };
+        });
+
+        expect(result.dimensions).toEqual({ width: 1920, height: 1080 });
+        expect(result.bitrate).toBe(16_000_000);
+    });
+
+    test('T20aj1c: Cinematic-Recording behaelt volle Capture-Aufloesung auch unter Lastregelung', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const captureCanvas = { width: 1920, height: 1080 };
+            const recorder = new MediaRecorderSystem({
+                canvas: captureCanvas,
+                autoDownload: false,
+                captureSourceResolver: () => captureCanvas,
+                recordingCaptureSettings: {
+                    profile: 'cinematic_mp4',
+                    hudMode: 'clean',
+                },
+                globalScope: {},
+            });
+            recorder._isRecording = true;
+            recorder._activeRecorderEngine = 'webcodecs-native';
+            recorder._captureLevelIndex = 5;
+            const diagnostics = recorder.getRecordingDiagnostics();
+            recorder.dispose();
+            return diagnostics;
+        });
+
+        expect(result.captureLevel).toBe(5);
+        expect(result.captureResolutionScale).toBe(1);
+        expect(result.captureSourceWidth).toBe(1920);
+        expect(result.captureSourceHeight).toBe(1080);
+    });
+
+    test('T20aj1d: Cinematic-Capture orientiert sich an der sichtbaren Viewport-Groesse statt am gedrosselten Backbuffer', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { RecordingCapturePipeline } = await import('/src/core/renderer/RecordingCapturePipeline.js');
+            const sourceCanvas = document.createElement('canvas');
+            sourceCanvas.width = 640;
+            sourceCanvas.height = 360;
+            sourceCanvas.style.width = '1280px';
+            sourceCanvas.style.height = '720px';
+            sourceCanvas.style.position = 'fixed';
+            sourceCanvas.style.left = '-9999px';
+            sourceCanvas.style.top = '0';
+            document.body.appendChild(sourceCanvas);
+
+            const pipeline = new RecordingCapturePipeline({
+                sourceCanvas,
+                sourceRenderer: null,
+                scene: null,
+            });
+            pipeline.setSettings({
+                profile: 'cinematic_mp4',
+                hudMode: 'clean',
+            });
+            const captureCanvas = pipeline.getCaptureCanvas();
+            const snapshot = {
+                sourceWidth: sourceCanvas.width,
+                sourceHeight: sourceCanvas.height,
+                clientWidth: sourceCanvas.clientWidth,
+                clientHeight: sourceCanvas.clientHeight,
+                captureWidth: captureCanvas?.width || 0,
+                captureHeight: captureCanvas?.height || 0,
+            };
+            pipeline.dispose();
+            sourceCanvas.remove();
+            return snapshot;
+        });
+
+        expect(result.sourceWidth).toBe(640);
+        expect(result.sourceHeight).toBe(360);
+        expect(result.clientWidth).toBe(1280);
+        expect(result.clientHeight).toBe(720);
+        expect(result.captureWidth).toBe(1280);
+        expect(result.captureHeight).toBe(720);
+    });
+
+    test('T20aj1e: Cinematic-Orbit-Shots weichen vor Arena-Kollisionen zurueck', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { RecordingOrbitCameraDirector } = await import('/src/core/renderer/camera/RecordingOrbitCameraDirector.js');
+            const game = window.GAME_INSTANCE;
+            const baseCamera = game?.renderer?.cameras?.[0] || null;
+            const Vector3 = baseCamera?.position?.constructor || null;
+            if (!baseCamera?.clone || !Vector3) {
+                return null;
+            }
+
+            const camera = baseCamera.clone();
+            camera.position.set(0, 0, 0);
+            camera.fov = 75;
+            const director = new RecordingOrbitCameraDirector();
+            const playerPosition = new Vector3(0, 0, 0);
+            const playerDirection = new Vector3(0, 0, -1);
+            const arena = {
+                bounds: {
+                    min: new Vector3(-50, -50, -50),
+                    max: new Vector3(50, 50, 50),
+                },
+                checkCollision(position, radius = 0) {
+                    return position.z >= (3 - radius);
+                },
+            };
+
+            director.apply({
+                playerIndex: 0,
+                camera,
+                fallbackTarget: { lookAt: new Vector3(0, 0, -6) },
+                playerPosition,
+                playerDirection,
+                dt: 1,
+                arena,
+                slotStyle: 'cinematic',
+                baseFov: 75,
+            });
+
+            return {
+                z: Number(camera.position.z || 0),
+            };
+        });
+
+        expect(result).not.toBeNull();
+        expect(result.z).toBeLessThan(3.1);
+    });
+
     test('T20aj2: Recorder priorisiert unter harter Last Downscale vor FPS-Kollaps', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
@@ -5226,6 +5414,116 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.mirroredTrack).toBeTruthy();
         expect(result.requestFrameSupported).toBeTruthy();
         expect(result.stopped).toBeTruthy();
+    });
+
+    test('T20aj4a: Recorder settleRecording teilt Pending-Stop mit Dispose und orphaned keinen Stop-Promise', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const sourceCanvas = document.createElement('canvas');
+            sourceCanvas.width = 320;
+            sourceCanvas.height = 180;
+
+            const fakeTrack = {
+                requestFrame() { },
+                stop() { },
+            };
+            const fakeStream = {
+                getVideoTracks() {
+                    return [fakeTrack];
+                },
+                getTracks() {
+                    return [fakeTrack];
+                },
+            };
+            const originalCaptureStream = HTMLCanvasElement.prototype.captureStream;
+
+            class FakeMediaRecorder {
+                static lastInstance = null;
+                static isTypeSupported() {
+                    return true;
+                }
+                constructor(stream, options = undefined) {
+                    this.stream = stream;
+                    this.options = options;
+                    this.state = 'inactive';
+                    this.ondataavailable = null;
+                    this.onerror = null;
+                    this.onstop = null;
+                    this.requestDataCalls = 0;
+                    this.stopCalls = 0;
+                    FakeMediaRecorder.lastInstance = this;
+                }
+                start() {
+                    this.state = 'recording';
+                }
+                requestData() {
+                    this.requestDataCalls += 1;
+                    const mimeType = this.options?.mimeType || 'video/webm';
+                    this.ondataavailable?.({
+                        data: new Blob([new Uint8Array([4, 5, 6])], { type: mimeType }),
+                    });
+                }
+                stop() {
+                    this.stopCalls += 1;
+                    this.state = 'inactive';
+                    Promise.resolve().then(() => {
+                        this.onstop?.();
+                    });
+                }
+            }
+
+            HTMLCanvasElement.prototype.captureStream = function captureStreamStub() {
+                return fakeStream;
+            };
+
+            try {
+                const recorder = new MediaRecorderSystem({
+                    canvas: sourceCanvas,
+                    autoDownload: false,
+                    captureFps: 30,
+                    globalScope: { MediaRecorder: FakeMediaRecorder },
+                    capabilityProbe: () => ({
+                        canCapture: true,
+                        hasRecorder: true,
+                        canRecord: true,
+                        selectedMimeType: 'video/webm;codecs=vp9',
+                        recorderEngine: 'mediarecorder-native',
+                        supportReason: 'native-mediarecorder',
+                    }),
+                });
+
+                const started = await recorder.startRecording({ type: 'settle-test' });
+                const stopPromise = recorder.stopRecording({ type: 'settle-stop' });
+                const settlePromise = recorder.settleRecording({ type: 'settle-recording' });
+                recorder.dispose();
+
+                const [stopped, settled] = await Promise.all([stopPromise, settlePromise]);
+                await new Promise((resolve) => setTimeout(resolve, 0));
+
+                return {
+                    started: !!started?.started,
+                    stopStopped: !!stopped?.stopped,
+                    settleStopped: !!settled?.stopped,
+                    sameStopReason: stopped?.reason === settled?.reason,
+                    stopCalls: Number(FakeMediaRecorder.lastInstance?.stopCalls || 0),
+                    requestDataCalls: Number(FakeMediaRecorder.lastInstance?.requestDataCalls || 0),
+                    pendingStopCleared: recorder._pendingStop === null,
+                    stillRecording: recorder.isRecording(),
+                };
+            } finally {
+                HTMLCanvasElement.prototype.captureStream = originalCaptureStream;
+            }
+        });
+
+        expect(result.started).toBeTruthy();
+        expect(result.stopStopped).toBeTruthy();
+        expect(result.settleStopped).toBeTruthy();
+        expect(result.sameStopReason).toBeTruthy();
+        expect(result.stopCalls).toBe(1);
+        expect(result.requestDataCalls).toBe(1);
+        expect(result.pendingStopCleared).toBeTruthy();
+        expect(result.stillRecording).toBeFalsy();
     });
 
     test('T20aj5: WebCodecs-Stop finalisiert Partial-Buffer wenn flush haengt', async ({ page }) => {
@@ -5862,6 +6160,66 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.reconcileCalls).toBeGreaterThanOrEqual(2);
     });
 
+    test('T20ae4: MatchStartValidation scoped Lobby-Regeln nur auf Menu-Storage-Bridge', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            const { resolveMatchStartValidationIssue } = await import('/src/core/runtime/MatchStartValidationService.js');
+
+            const baseSettings = JSON.parse(JSON.stringify(game?.settings || {}));
+            baseSettings.mapKey = String(baseSettings.mapKey || 'standard');
+            baseSettings.gameMode = 'CLASSIC';
+            baseSettings.localSettings = {
+                ...(baseSettings.localSettings || {}),
+                modePath: 'normal',
+                themeMode: 'dunkel',
+            };
+            baseSettings.vehicles = {
+                ...(baseSettings.vehicles || {}),
+                PLAYER_1: baseSettings?.vehicles?.PLAYER_1 || 'ship5',
+            };
+
+            const storageBridgeSettings = {
+                ...baseSettings,
+                localSettings: {
+                    ...baseSettings.localSettings,
+                    sessionType: 'multiplayer',
+                    multiplayerTransport: 'storage-bridge',
+                },
+            };
+            const lanSettings = {
+                ...baseSettings,
+                localSettings: {
+                    ...baseSettings.localSettings,
+                    sessionType: 'lan',
+                    multiplayerTransport: 'lan',
+                },
+            };
+
+            const maps = game?.config?.MAPS || { standard: { key: 'standard' } };
+            const storageBridgeIssue = resolveMatchStartValidationIssue({
+                settings: storageBridgeSettings,
+                maps,
+                classicModeType: 'CLASSIC',
+                huntModeType: 'HUNT',
+            });
+            const lanIssue = resolveMatchStartValidationIssue({
+                settings: lanSettings,
+                maps,
+                classicModeType: 'CLASSIC',
+                huntModeType: 'HUNT',
+            });
+
+            return {
+                storageBridgeField: storageBridgeIssue?.fieldKey || null,
+                lanField: lanIssue?.fieldKey || null,
+            };
+        });
+
+        expect(result.storageBridgeField).toBe('multiplayer');
+        expect(result.lanField).not.toBe('multiplayer');
+    });
+
     test('T20ae3: TelemetryHistoryStore wiederholt temporaere DB-Fehler und oeffnet Verbindung neu', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
@@ -6200,5 +6558,122 @@ test.describe('V56: Code-Audit Remediation Regressions', () => {
         if (result.skip) { test.skip(); return; }
         expect(result.ok).toBeTruthy();
         expect(result.disposed).toBeTruthy();
+    });
+});
+
+// ---------------------------------------------------------------------------
+// V74 Regression Tests - Runtime-Entkopplung
+// ---------------------------------------------------------------------------
+test.describe('V74: Runtime-Decoupling Regressions', () => {
+    test('V74.3 Stale async session init disposes replaced prepared match before apply', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MatchLifecycleSessionOrchestrator } = await import('/src/state/MatchLifecycleSessionOrchestrator.js');
+
+            let resolveFirstInit = null;
+            let prepareCalls = 0;
+            let currentSession = null;
+            const disposed = [];
+            const applied = [];
+            const wired = [];
+            const firstInit = new Promise((resolve) => {
+                resolveFirstInit = resolve;
+            });
+
+            const deps = {
+                getLifecycleState: () => ({
+                    mapKey: 'standard',
+                    numHumans: 1,
+                    numBots: 0,
+                    winsNeeded: 3,
+                    activeGameMode: 'CLASSIC',
+                }),
+                notifyLifecycleEvent() { },
+                prepareInitializedMatchSession: () => {
+                    prepareCalls += 1;
+                    if (prepareCalls === 1) {
+                        return firstInit;
+                    }
+                    return Promise.resolve({
+                        session: {
+                            id: 'second-session',
+                            effectiveMapKey: 'standard',
+                            numHumans: 1,
+                            numBots: 0,
+                            winsNeeded: 3,
+                        },
+                    });
+                },
+                wireInitializedMatchRuntime: (initializedMatch) => {
+                    wired.push(initializedMatch?.session?.id || null);
+                    return {
+                        ...initializedMatch,
+                        runtime: { id: `runtime-${initializedMatch?.session?.id || 'unknown'}` },
+                    };
+                },
+                applyInitializedMatchSession: (initializedMatch) => {
+                    const sessionId = initializedMatch?.session?.id || null;
+                    applied.push(sessionId);
+                    currentSession = {
+                        entityManager: { players: [], getHumanPlayers() { return []; } },
+                        powerupManager: { clear() { } },
+                        sessionId,
+                    };
+                },
+                getCurrentMatchSessionRefs: () => currentSession,
+                clearMatchSessionRefs: () => {
+                    currentSession = null;
+                },
+                disposePreparedMatchSession: (initializedMatch, options = {}) => {
+                    disposed.push({
+                        id: initializedMatch?.session?.id || null,
+                        reason: options.reason || null,
+                        clearScene: options.clearScene === true,
+                    });
+                },
+                disposeCurrentMatchSession() { },
+                settleRecorder() {
+                    return null;
+                },
+                resetRoundRuntime() { },
+            };
+
+            const orchestrator = new MatchLifecycleSessionOrchestrator(deps);
+            const firstPromise = orchestrator.createMatchSession({});
+            const secondPromise = orchestrator.createMatchSession({});
+
+            resolveFirstInit({
+                session: {
+                    id: 'first-session',
+                    effectiveMapKey: 'standard',
+                    numHumans: 1,
+                    numBots: 0,
+                    winsNeeded: 3,
+                },
+            });
+
+            const [firstResult, secondResult] = await Promise.all([firstPromise, secondPromise]);
+            return {
+                prepareCalls,
+                wired,
+                applied,
+                disposed,
+                firstResultIsNull: firstResult === null,
+                secondResultId: secondResult?.session?.id || null,
+                activeSessionId: orchestrator._activeSessionId,
+            };
+        });
+
+        expect(result.prepareCalls).toBe(2);
+        expect(result.wired).toEqual(['second-session']);
+        expect(result.applied).toEqual(['second-session']);
+        expect(result.disposed).toEqual([{
+            id: 'first-session',
+            reason: 'stale_session_init',
+            clearScene: true,
+        }]);
+        expect(result.firstResultIsNull).toBeTruthy();
+        expect(result.secondResultId).toBe('second-session');
+        expect(typeof result.activeSessionId).toBe('string');
     });
 });

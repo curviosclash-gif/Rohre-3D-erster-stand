@@ -2,12 +2,10 @@
 // BotRuntimeContextFactory.js - centralized runtime context for bot policies
 // ============================================
 
-import { CONFIG } from '../../core/Config.js';
-import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
-import { isHuntHealthActive } from '../../hunt/HealthSystem.js';
 import { GAME_MODE_TYPES, normalizeGameMode } from '../../hunt/HuntMode.js';
 import { createObservationContext } from './observation/ObservationSystem.js';
 import { OBSERVATION_LENGTH_V1 } from './observation/ObservationSchemaV1.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 
 const RUNTIME_CONTEXT_BY_PLAYER = new WeakMap();
 const CONTROL_PROFILE_VERSION = 'cp-v35';
@@ -15,15 +13,16 @@ const LEGACY_CONTROL_PROFILE_VERSION = 'legacy-v1';
 const ANY_PROFILE_TOKENS = new Set(['*', 'any', 'multi', 'multi-profile', 'multi-profile-training']);
 
 function resolveRuntimeMode(entityManager) {
+    const entityRuntimeConfig = resolveEntityRuntimeConfig(entityManager);
     const requestedMode = entityManager?.activeGameMode
         || entityManager?.runtimeConfig?.session?.activeGameMode
-        || getActiveRuntimeConfig(CONFIG)?.HUNT?.ACTIVE_MODE
+        || entityRuntimeConfig?.HUNT?.ACTIVE_MODE
         || GAME_MODE_TYPES.CLASSIC;
     const normalized = normalizeGameMode(requestedMode, GAME_MODE_TYPES.CLASSIC);
     if (normalized === GAME_MODE_TYPES.HUNT) {
         return GAME_MODE_TYPES.HUNT;
     }
-    return isHuntHealthActive() ? GAME_MODE_TYPES.HUNT : GAME_MODE_TYPES.CLASSIC;
+    return entityManager?.huntEnabled ? GAME_MODE_TYPES.HUNT : GAME_MODE_TYPES.CLASSIC;
 }
 
 function toPositiveNumber(value, fallback) {
@@ -106,18 +105,19 @@ function hasConfiguredProfileMatch(botConfig, rampControlProfileId) {
 }
 
 function resolveControlDynamics(entityManager, player) {
+    const entityRuntimeConfig = resolveEntityRuntimeConfig(entityManager);
     const runtimePlayerConfig = entityManager?.runtimeConfig?.player || null;
     const speed = toPositiveNumber(
         player?.baseSpeed ?? player?.speed,
-        toPositiveNumber(runtimePlayerConfig?.speed, toPositiveNumber(CONFIG?.PLAYER?.SPEED, 18))
+        toPositiveNumber(runtimePlayerConfig?.speed, toPositiveNumber(entityRuntimeConfig?.PLAYER?.SPEED, 18))
     );
     const turnSpeed = toPositiveNumber(
         player?.turnSpeed,
-        toPositiveNumber(runtimePlayerConfig?.turnSpeed, toPositiveNumber(CONFIG?.PLAYER?.TURN_SPEED, 2.2))
+        toPositiveNumber(runtimePlayerConfig?.turnSpeed, toPositiveNumber(entityRuntimeConfig?.PLAYER?.TURN_SPEED, 2.2))
     );
     const rollSpeed = toPositiveNumber(
         player?.rollSpeed,
-        toPositiveNumber(CONFIG?.PLAYER?.ROLL_SPEED, 2.0)
+        toPositiveNumber(entityRuntimeConfig?.PLAYER?.ROLL_SPEED, 2.0)
     );
     const rampAttackRate = toPositiveNumber(
         player?.controlRampRates?.attack ?? player?.controller?.rampAttackRate,
@@ -191,10 +191,11 @@ function resolveCachedRuntimeContext(player) {
 }
 
 export function createBotRuntimeContext(entityManager, player, dt = 0, options = {}) {
+    const entityRuntimeConfig = resolveEntityRuntimeConfig(entityManager);
     const mode = resolveRuntimeMode(entityManager);
     const players = Array.isArray(entityManager?.players) ? entityManager.players : [];
     const projectiles = Array.isArray(entityManager?.projectiles) ? entityManager.projectiles : [];
-    const planarMode = !!(entityManager?.runtimeConfig?.gameplay?.planarMode ?? CONFIG?.GAMEPLAY?.PLANAR_MODE);
+    const planarMode = !!(entityManager?.runtimeConfig?.gameplay?.planarMode ?? entityRuntimeConfig?.GAMEPLAY?.PLANAR_MODE);
     const includeObservationContext = options?.includeObservationContext !== false;
     const runtimeContext = resolveCachedRuntimeContext(player);
     const rules = runtimeContext.rules || (runtimeContext.rules = {
@@ -250,7 +251,7 @@ export function createBotRuntimeContext(entityManager, player, dt = 0, options =
     runtimeContext.mode = mode;
 
     rules.planarMode = planarMode;
-    rules.huntEnabled = mode === GAME_MODE_TYPES.HUNT || isHuntHealthActive();
+    rules.huntEnabled = entityManager?.huntEnabled === true || mode === GAME_MODE_TYPES.HUNT;
     rules.portalsEnabled = !!entityManager?.arena?.portalsEnabled;
     rules.controlProfileId = activeControlProfileId;
     rules.controlProfileMatch = controlProfileMatch;

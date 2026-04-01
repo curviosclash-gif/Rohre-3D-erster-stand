@@ -4,6 +4,10 @@
 
 import { MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
+import {
+    MULTIPLAYER_TRANSPORTS,
+    RUNTIME_SESSION_TYPES,
+} from '../../shared/contracts/RuntimeSessionContract.js';
 import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
 
 function deepClone(value) {
@@ -20,9 +24,9 @@ function ensureMultiplayerSessionType(game) {
     if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
         game.settings.localSettings = {};
     }
-    game.settings.localSettings.sessionType = 'multiplayer';
+    game.settings.localSettings.sessionType = RUNTIME_SESSION_TYPES.MULTIPLAYER;
     if (!game.settings.localSettings.multiplayerTransport) {
-        game.settings.localSettings.multiplayerTransport = 'storage-bridge';
+        game.settings.localSettings.multiplayerTransport = MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
     }
 }
 
@@ -85,10 +89,10 @@ export function createMultiplayerMatchSettingsSnapshot(settings = {}) {
         matchSettings: settings?.matchSettings ? { ...settings.matchSettings } : {},
         playerLoadout: settings?.playerLoadout ? { ...settings.playerLoadout } : {},
         localSettings: {
-            sessionType: 'multiplayer',
+            sessionType: RUNTIME_SESSION_TYPES.MULTIPLAYER,
             // 'storage-bridge' = localStorage + BroadcastChannel (in-browser only, no real network sync).
             // Future values: 'lan' (LANSessionAdapter), 'online' (OnlineSessionAdapter).
-            multiplayerTransport: 'storage-bridge',
+            multiplayerTransport: MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE,
             modePath: settings?.localSettings?.modePath || 'normal',
         },
     });
@@ -153,8 +157,9 @@ export function applyMultiplayerMatchSettingsSnapshot(targetSettings, snapshot =
         ...targetSettings.playerLoadout,
         ...(snapshot.playerLoadout && typeof snapshot.playerLoadout === 'object' ? snapshot.playerLoadout : {}),
     };
-    targetSettings.localSettings.sessionType = 'multiplayer';
-    targetSettings.localSettings.multiplayerTransport = snapshot?.localSettings?.multiplayerTransport || 'storage-bridge';
+    targetSettings.localSettings.sessionType = RUNTIME_SESSION_TYPES.MULTIPLAYER;
+    targetSettings.localSettings.multiplayerTransport = snapshot?.localSettings?.multiplayerTransport
+        || MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
     if (typeof snapshot?.localSettings?.modePath === 'string' && snapshot.localSettings.modePath.trim()) {
         targetSettings.localSettings.modePath = snapshot.localSettings.modePath.trim();
     }

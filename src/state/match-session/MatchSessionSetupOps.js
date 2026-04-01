@@ -5,6 +5,9 @@ export function disposeMatchSessionSystems(renderer, currentSession, options = {
     if (currentSession?.powerupManager) {
         currentSession.powerupManager.dispose();
     }
+    if (currentSession?.arena?.dispose) {
+        currentSession.arena.dispose();
+    }
     if (currentSession?.particles?.dispose) {
         currentSession.particles.dispose();
     }
@@ -29,7 +32,7 @@ export function buildHumanConfigs(settings, runtimeConfig = null) {
     ];
 }
 
-export function buildEntityManagerSetupOptions(settings, runtimeConfig = null) {
+export function buildEntityManagerSetupOptions(settings, runtimeConfig = null, entityRuntimeConfig = null) {
     const runtimeBotConfig = runtimeConfig?.bot || null;
     const setupPlanarMode = runtimeConfig?.gameplay?.planarMode ?? settings?.gameplay?.planarMode;
     return {
@@ -39,6 +42,7 @@ export function buildEntityManagerSetupOptions(settings, runtimeConfig = null) {
         activeGameMode: runtimeConfig?.session?.activeGameMode || settings?.gameMode || null,
         planarMode: typeof setupPlanarMode === 'boolean' ? setupPlanarMode : undefined,
         runtimeConfig,
+        entityRuntimeConfig,
         humanConfigs: buildHumanConfigs(settings, runtimeConfig),
     };
 }

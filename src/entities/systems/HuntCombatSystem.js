@@ -9,13 +9,12 @@
 // - Hotpath guardrail: reuse runtime temp vectors and avoid per-call allocations
 
 import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
-import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import {
     createHuntTargetingScratch,
     createHuntTargetingTelemetry,
     resolveHuntLineTarget,
 } from '../../hunt/HuntTargetingOps.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 
 export class HuntCombatSystem {
     constructor(runtimeContext) {
@@ -53,7 +52,7 @@ export class HuntCombatSystem {
     }
 
     _resolveItemUseCooldownSeconds(itemType) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.runtime);
         const huntConfig = config?.HUNT || {};
         const defaultCooldown = Math.max(0, Number(huntConfig.ITEM_USE_COOLDOWN_SECONDS || 0));
         const normalizedType = String(itemType || '').trim().toUpperCase();
@@ -95,7 +94,7 @@ export class HuntCombatSystem {
 
     _resolveClassicLockOn(player, tmpDir, tmpVec) {
         const runtime = this.runtime;
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(runtime);
         const maxAngle = (config.HOMING.LOCK_ON_ANGLE * Math.PI) / 180;
         const maxRangeSq = config.HOMING.MAX_LOCK_RANGE * config.HOMING.MAX_LOCK_RANGE;
         let bestTarget = null;
@@ -118,7 +117,7 @@ export class HuntCombatSystem {
     }
 
     checkLockOn(player) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.runtime);
         const runtime = this.runtime;
         if (!runtime || !player) return null;
 

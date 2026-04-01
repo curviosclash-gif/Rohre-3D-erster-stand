@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-03-31
+Stand: 2026-04-01
 Modus: sync
 Gate: PASS
 
@@ -22,4 +22,4 @@ Gate: PASS
 - docs/release/Releaseplan_Spiel_2026.md: Zeilen 6, 54, 56, 57, 66, 182, 232, 279, 285, 309, 311, 312, 351, 352, 353, 354, 355, 428, 482, 534, 546, 551, 552, 554, 587, 592, 603, 746, 829
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-03-31).
+- Dokumentation aktuell (geprueft am 2026-04-01).

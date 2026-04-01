@@ -2,6 +2,7 @@ import {
     derivePauseTransition,
     deriveResumeTransition,
 } from '../state/MatchLifecycleStateTransitions.js';
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 
 export class PauseOverlayController {
     constructor(deps = {}) {
@@ -51,39 +52,39 @@ export class PauseOverlayController {
         if (!this._boundHandlers) {
             this._boundHandlers = {
                 onPauseResumeClick: () => {
-                    if (game.state === 'PAUSED') {
+                    if (game.state === GAME_STATE_IDS.PAUSED) {
                         this.resumeFromPause();
                     }
                 },
                 onPauseSettingsClick: () => {
-                    if (game.state === 'PAUSED') {
+                    if (game.state === GAME_STATE_IDS.PAUSED) {
                         this._showSettings();
                     }
                 },
                 onPauseSettingsBackClick: () => {
-                    if (game.state === 'PAUSED') {
+                    if (game.state === GAME_STATE_IDS.PAUSED) {
                         this._hideSettings();
                     }
                 },
                 onPauseMenuClick: () => {
-                    if (game.state === 'PAUSED') {
+                    if (game.state === GAME_STATE_IDS.PAUSED) {
                         this.returnToMenuFromPause();
                     }
                 },
                 onPauseKeybindP1Click: (event) => this._handleKeybindClick(event, 'PLAYER_1'),
                 onPauseKeybindP2Click: (event) => this._handleKeybindClick(event, 'PLAYER_2'),
                 onAutoRollChange: () => {
-                    if (game.state !== 'PAUSED') return;
+                    if (game.state !== GAME_STATE_IDS.PAUSED) return;
                     const checked = !!game.ui.pauseAutoRollToggle?.checked;
                     this.ports?.settingsPort?.applyAutoRoll?.(checked);
                 },
                 onInvertP1Change: () => {
-                    if (game.state !== 'PAUSED') return;
+                    if (game.state !== GAME_STATE_IDS.PAUSED) return;
                     const checked = !!game.ui.pauseInvertP1?.checked;
                     this._applyInvertPitch(0, 'PLAYER_1', checked);
                 },
                 onInvertP2Change: () => {
-                    if (game.state !== 'PAUSED') return;
+                    if (game.state !== GAME_STATE_IDS.PAUSED) return;
                     const checked = !!game.ui.pauseInvertP2?.checked;
                     this._applyInvertPitch(1, 'PLAYER_2', checked);
                 },
@@ -209,7 +210,7 @@ export class PauseOverlayController {
 
     _handleKeybindClick(event, playerKey) {
         const game = this.game;
-        if (game.state !== 'PAUSED') return;
+        if (game.state !== GAME_STATE_IDS.PAUSED) return;
         const button = event?.target?.closest?.('button.keybind-btn');
         if (!button) return;
         this.ports?.inputPort?.startKeyCapture?.(playerKey, button.dataset.action);

@@ -1,5 +1,4 @@
-import { CONFIG } from '../../core/Config.js';
-import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 
 const MIN_HITBOX_RADIUS = 0.2;
 const HITBOX_HEIGHT_FACTOR = 0.7;
@@ -37,12 +36,12 @@ function clampAxisInput(value) {
     return numeric;
 }
 
-function resolveBoostCapacity() {
-    return Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1);
+function resolveBoostCapacity(player) {
+    return Math.max(0.001, Number(resolveEntityRuntimeConfig(player)?.PLAYER?.BOOST_DURATION) || 1);
 }
 
-function resolveBoostRechargeTime() {
-    return Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_COOLDOWN) || 1);
+function resolveBoostRechargeTime(player) {
+    return Math.max(0.001, Number(resolveEntityRuntimeConfig(player)?.PLAYER?.BOOST_COOLDOWN) || 1);
 }
 
 function syncBoostUiState(player, maxCharge, rechargeRate) {
@@ -52,8 +51,8 @@ function syncBoostUiState(player, maxCharge, rechargeRate) {
 }
 
 function updateBoostState(player, dt, controlState = null) {
-    const maxCharge = resolveBoostCapacity();
-    const rechargeTime = resolveBoostRechargeTime();
+    const maxCharge = resolveBoostCapacity(player);
+    const rechargeTime = resolveBoostRechargeTime(player);
     const rechargeRate = maxCharge / rechargeTime;
     const minActivationCharge = Math.max(0.05, maxCharge * 0.02);
     const boostHeld = !!controlState?.boost;
@@ -93,7 +92,7 @@ function updateBoostState(player, dt, controlState = null) {
 
 export function initializePlayerHitbox(player, radius) {
     if (!player?.hitboxBox) return;
-    const fallbackRadius = Math.max(MIN_HITBOX_RADIUS, Number(radius) || Number(CONFIG.PLAYER.HITBOX_RADIUS) || 0.8);
+    const fallbackRadius = Math.max(MIN_HITBOX_RADIUS, Number(radius) || Number(resolveEntityRuntimeConfig(player).PLAYER.HITBOX_RADIUS) || 0.8);
     applyFallbackHitbox(player, fallbackRadius);
     updateHitboxDerivedState(player);
 }
@@ -102,7 +101,7 @@ export function syncPlayerHitboxFromVehicleMesh(player, mesh = null) {
     if (!player?.hitboxBox) return null;
 
     const targetMesh = mesh || player.vehicleMesh;
-    const fallbackRadius = Math.max(MIN_HITBOX_RADIUS, Number(player.hitboxRadius) || Number(CONFIG.PLAYER.HITBOX_RADIUS) || 0.8);
+    const fallbackRadius = Math.max(MIN_HITBOX_RADIUS, Number(player.hitboxRadius) || Number(resolveEntityRuntimeConfig(player).PLAYER.HITBOX_RADIUS) || 0.8);
 
     if (!targetMesh) {
         applyFallbackHitbox(player, fallbackRadius);
@@ -131,7 +130,7 @@ export function syncPlayerHitboxFromVehicleMesh(player, mesh = null) {
 }
 
 export function updatePlayerMotion(player, dt, controlState = null, motionOptions = null) {
-    const config = getActiveRuntimeConfig(CONFIG);
+    const config = resolveEntityRuntimeConfig(player);
     const resolvedTurnSpeed = Number(player?.turnSpeed) || Number(config.PLAYER.TURN_SPEED) || 0;
     const resolvedRollSpeed = Number(player?.rollSpeed) || Number(config.PLAYER.ROLL_SPEED) || 0;
     // 61.4.1: tight_turns modifier reduces turn rate

@@ -15,6 +15,11 @@ import {
     createDefaultCameraPerspectiveSettings,
     normalizeCameraPerspectiveSettings,
 } from '../shared/contracts/CameraPerspectiveContract.js';
+import {
+    MULTIPLAYER_TRANSPORTS,
+    RUNTIME_SESSION_TYPES,
+    resolveRuntimeSessionContract,
+} from '../shared/contracts/RuntimeSessionContract.js';
 import { cloneJsonValue } from '../shared/utils/JsonClone.js';
 
 function toNumber(value, fallback) {
@@ -124,10 +129,22 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
         ? source.cameraPerspective
         : createDefaultCameraPerspectiveSettings();
 
-    const sessionType = normalizeSessionType(source?.localSettings?.sessionType || (source.mode === '2p' ? 'splitscreen' : 'single'));
+    const requestedSessionType = normalizeSessionType(
+        source?.localSettings?.sessionType || (source.mode === '2p' ? 'splitscreen' : 'single')
+    );
+    const sessionContract = resolveRuntimeSessionContract({
+        sessionType: requestedSessionType,
+        multiplayerTransport: source?.localSettings?.multiplayerTransport,
+    });
+    const sessionType = sessionContract.sessionType;
+    const multiplayerTransport = sessionType === RUNTIME_SESSION_TYPES.LAN
+        ? MULTIPLAYER_TRANSPORTS.LAN
+        : (sessionType === RUNTIME_SESSION_TYPES.ONLINE
+            ? MULTIPLAYER_TRANSPORTS.ONLINE
+            : sessionContract.multiplayerTransport);
     const modePath = String(source?.localSettings?.modePath || 'normal').trim().toLowerCase();
     const arcadeEnabled = modePath === 'arcade';
-    const networkEnabled = sessionType === 'lan' || sessionType === 'online';
+    const networkEnabled = sessionContract.isNetworkSession;
     const mode = sessionType === 'splitscreen' ? '2p' : '1p';
     const numHumans = networkEnabled ? 1 : (mode === '2p' ? 2 : 1);
     const huntFeatureEnabled = baseConfig?.HUNT?.ENABLED !== false;
@@ -156,6 +173,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
     const runtimeConfig = {
         session: {
             sessionType,
+            multiplayerTransport,
             mode,
             modePath,
             numHumans,

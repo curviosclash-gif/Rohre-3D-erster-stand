@@ -5,6 +5,7 @@ import {
     deriveReturnToMenuUiState,
     deriveRoundStartUiState,
 } from '../ui/MatchUiStateOps.js';
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 
 function createHuntStateReset() {
     return {
@@ -27,7 +28,7 @@ export function deriveMatchStartTransition({ numHumans } = {}) {
 
 export function deriveRoundStartTransition() {
     return {
-        state: 'PLAYING',
+        state: GAME_STATE_IDS.PLAYING,
         roundPause: 0,
         hudTimer: 0,
         uiState: deriveRoundStartUiState(),
@@ -37,7 +38,7 @@ export function deriveRoundStartTransition() {
 
 export function deriveReturnToMenuTransition() {
     return {
-        state: 'MENU',
+        state: GAME_STATE_IDS.MENU,
         roundPause: null,
         hudTimer: null,
         uiState: deriveReturnToMenuUiState(),
@@ -47,7 +48,7 @@ export function deriveReturnToMenuTransition() {
 
 export function derivePauseTransition() {
     return {
-        state: 'PAUSED',
+        state: GAME_STATE_IDS.PAUSED,
         roundPause: null,
         hudTimer: null,
         uiState: derivePauseUiState(),
@@ -57,7 +58,7 @@ export function derivePauseTransition() {
 
 export function deriveResumeTransition() {
     return {
-        state: 'PLAYING',
+        state: GAME_STATE_IDS.PLAYING,
         roundPause: null,
         hudTimer: null,
         uiState: deriveResumeUiState(),

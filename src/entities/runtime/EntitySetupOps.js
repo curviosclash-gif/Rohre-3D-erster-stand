@@ -1,4 +1,3 @@
-import { CONFIG } from '../../core/Config.js';
 import { Player } from '../Player.js';
 import {
     normalizeBotPolicyType,
@@ -6,6 +5,7 @@ import {
 } from '../ai/BotPolicyTypes.js';
 import { getVehicleIds, isValidVehicleId } from '../vehicle-registry.js';
 import { createGameModeStrategy } from '../../modes/GameModeRegistry.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 
 function normalizeActiveMode(mode) {
     return String(mode || '').trim().toLowerCase();
@@ -50,22 +50,29 @@ export class EntitySetupOps {
         const owner = this.entityManager;
         if (!owner) return;
         owner.runtimeConfig = options.runtimeConfig || null;
+        owner.entityRuntimeConfig = resolveEntityRuntimeConfig(options.entityRuntimeConfig || owner.entityRuntimeConfig || owner);
         owner.activeGameMode = options.activeGameMode
             || owner.runtimeConfig?.session?.activeGameMode
+            || owner.entityRuntimeConfig?.HUNT?.ACTIVE_MODE
             || owner.activeGameMode
-            || 'classic';
+            || 'CLASSIC';
+        owner.activeGameMode = String(owner.activeGameMode || 'CLASSIC').trim().toUpperCase();
         const activeModeLower = String(owner.activeGameMode || '').toLowerCase();
         const setupPlanarMode = typeof options.planarMode === 'boolean'
             ? options.planarMode
-            : owner.runtimeConfig?.gameplay?.planarMode;
+            : owner.entityRuntimeConfig?.GAMEPLAY?.PLANAR_MODE;
         const runtimePolicyStrategy = String(owner.runtimeConfig?.bot?.policyStrategy || '').trim().toLowerCase();
         const strategyForcesBridge = runtimePolicyStrategy === 'bridge';
         const setupBridgeEnabled = typeof options.bridgeEnabled === 'boolean'
             ? options.bridgeEnabled
             : (strategyForcesBridge || !!owner.runtimeConfig?.bot?.trainerBridgeEnabled);
-        owner.huntEnabled = activeModeLower === 'hunt';
-        owner.gameModeStrategy = createGameModeStrategy(owner.activeGameMode);
-        owner.botDifficulty = options.botDifficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || owner.botDifficulty;
+        owner.huntEnabled = activeModeLower === 'hunt' && owner.entityRuntimeConfig?.HUNT?.ENABLED !== false;
+        owner.gameModeStrategy = createGameModeStrategy(owner.activeGameMode, {
+            entityRuntimeConfig: owner.entityRuntimeConfig,
+        });
+        owner.botDifficulty = options.botDifficulty
+            || owner.entityRuntimeConfig?.BOT?.ACTIVE_DIFFICULTY
+            || owner.botDifficulty;
         owner.botBridgeEnabled = setupBridgeEnabled;
         owner.botPolicyType = resolveConfiguredBotPolicyType({
             requestedPolicyType: options.botPolicyType,
@@ -77,8 +84,9 @@ export class EntitySetupOps {
     }
 
     resolveSetupPlayerContext(options = {}) {
+        const entityRuntimeConfig = resolveEntityRuntimeConfig(options.entityRuntimeConfig || this.entityManager?.entityRuntimeConfig || null);
         const availableVehicleIds = getVehicleIds();
-        const defaultVehicleId = String(CONFIG.PLAYER.DEFAULT_VEHICLE_ID || availableVehicleIds[0] || 'aircraft');
+        const defaultVehicleId = String(entityRuntimeConfig.PLAYER?.DEFAULT_VEHICLE_ID || availableVehicleIds[0] || 'aircraft');
         const normalizeVehicleId = (value) => {
             const candidate = String(value || '').trim();
             if (isValidVehicleId(candidate)) {
@@ -92,7 +100,9 @@ export class EntitySetupOps {
         const botVehicleIds = botVehicleSource.map((id) => normalizeVehicleId(id));
         return {
             humanConfigs: Array.isArray(options.humanConfigs) ? options.humanConfigs : [],
-            modelScale: typeof options.modelScale === 'number' ? options.modelScale : (CONFIG.PLAYER.MODEL_SCALE || 1),
+            modelScale: typeof options.modelScale === 'number'
+                ? options.modelScale
+                : (entityRuntimeConfig.PLAYER?.MODEL_SCALE || 1),
             defaultVehicleId,
             normalizeVehicleId,
             botVehicleIds,
@@ -109,12 +119,16 @@ export class EntitySetupOps {
     setupHumanPlayers(numHumans, setupContext) {
         const owner = this.entityManager;
         if (!owner) return;
-        const humanColors = [CONFIG.COLORS.PLAYER_1, CONFIG.COLORS.PLAYER_2];
+        const humanColors = [
+            owner.entityRuntimeConfig?.COLORS?.PLAYER_1,
+            owner.entityRuntimeConfig?.COLORS?.PLAYER_2,
+        ];
         for (let i = 0; i < numHumans; i++) {
             const playerVehicleId = setupContext.normalizeVehicleId(setupContext.humanConfigs[i]?.vehicleId);
             const player = new Player(owner.renderer, i, humanColors[i], false, {
                 vehicleId: playerVehicleId,
                 entityManager: owner,
+                entityRuntimeConfig: owner.entityRuntimeConfig,
             });
             player.setControlOptions({
                 invertPitch: !!setupContext.humanConfigs[i]?.invertPitch,
@@ -129,14 +143,18 @@ export class EntitySetupOps {
     setupBotPlayers(numHumans, numBots, setupContext) {
         const owner = this.entityManager;
         if (!owner) return;
+        const botColors = Array.isArray(owner.entityRuntimeConfig?.COLORS?.BOT_COLORS)
+            ? owner.entityRuntimeConfig.COLORS.BOT_COLORS
+            : [0xff8a65];
         for (let i = 0; i < numBots; i++) {
-            const color = CONFIG.COLORS.BOT_COLORS[i % CONFIG.COLORS.BOT_COLORS.length];
+            const color = botColors[i % botColors.length];
             const botVehicleId = setupContext.botVehicleIds.length > 0
                 ? setupContext.botVehicleIds[i % setupContext.botVehicleIds.length]
                 : setupContext.defaultVehicleId;
             const player = new Player(owner.renderer, numHumans + i, color, true, {
                 vehicleId: botVehicleId,
                 entityManager: owner,
+                entityRuntimeConfig: owner.entityRuntimeConfig,
             });
             player.setControlOptions({ modelScale: setupContext.modelScale, invertPitch: false });
             const ai = owner.botPolicyRegistry.create(owner.botPolicyType, {

@@ -3,10 +3,9 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
-import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { PowerupModelFactory } from './PowerupModelFactory.js';
 import { normalizeRocketPickupType } from '../hunt/RocketPickupSystem.js';
+import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
 const AUTHORED_ITEM_TYPE_ALIASES = Object.freeze({
     item_battery: 'SPEED_UP',
@@ -15,16 +14,16 @@ const AUTHORED_ITEM_TYPE_ALIASES = Object.freeze({
     item_shield: 'SHIELD',
 });
 
-function isTypeAllowedForMode(type, huntModeActive) {
+function isTypeAllowedForMode(type, huntModeActive, entityRuntimeConfig) {
     const normalizedType = String(type || '').trim().toUpperCase();
-    const entry = getActiveRuntimeConfig(CONFIG)?.POWERUP?.TYPES?.[normalizedType];
+    const entry = entityRuntimeConfig?.POWERUP?.TYPES?.[normalizedType];
     if (!entry) return false;
     if (entry.huntOnly && !huntModeActive) return false;
     if (entry.classicOnly && huntModeActive) return false;
     return true;
 }
 
-function resolveAuthoredPickupType(anchor, huntModeActive) {
+function resolveAuthoredPickupType(anchor, huntModeActive, entityRuntimeConfig) {
     if (!anchor || typeof anchor !== 'object') return null;
     const candidates = [
         anchor.pickupType,
@@ -37,7 +36,7 @@ function resolveAuthoredPickupType(anchor, huntModeActive) {
             fallback: String(candidate || '').trim().toUpperCase(),
         });
         if (!normalizedType) continue;
-        if (isTypeAllowedForMode(normalizedType, huntModeActive)) {
+        if (isTypeAllowedForMode(normalizedType, huntModeActive, entityRuntimeConfig)) {
             return normalizedType;
         }
     }
@@ -58,11 +57,12 @@ function buildAnchorKey(anchor, index = 0) {
 }
 
 export class PowerupManager {
-    constructor(renderer, arena, runtimeConfig = null) {
-        const config = getActiveRuntimeConfig(CONFIG);
+    constructor(renderer, arena, entityRuntimeConfig = null) {
+        const config = resolveEntityRuntimeConfig(entityRuntimeConfig || arena);
         this.renderer = renderer;
         this.arena = arena;
-        this.runtimeConfig = runtimeConfig;
+        this.entityRuntimeConfig = config;
+        this.runtimeConfig = config?.runtimeConfig || null;
         this.getStrategy = null;
         this.items = []; // { mesh, type, box }
         this.spawnTimer = 0;
@@ -79,7 +79,7 @@ export class PowerupManager {
     }
 
     update(dt) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = this.entityRuntimeConfig;
         this.spawnTimer += dt;
 
         // Neue Items spawnen
@@ -112,7 +112,7 @@ export class PowerupManager {
     }
 
     _spawnRandom() {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = this.entityRuntimeConfig;
         const strategy = typeof this.getStrategy === 'function' ? this.getStrategy() : null;
         const huntModeActive = strategy?.modeType === 'HUNT';
         const spawnableTypes = strategy
@@ -131,7 +131,7 @@ export class PowerupManager {
             return;
         }
 
-        let type = resolveAuthoredPickupType(authoredAnchor?.anchor, huntModeActive) || null;
+        let type = resolveAuthoredPickupType(authoredAnchor?.anchor, huntModeActive, config) || null;
         if (strategy && huntModeActive) {
             type = strategy.resolveSpawnType(spawnableTypes, config) || type;
         }
@@ -139,7 +139,7 @@ export class PowerupManager {
             type = spawnableTypes[Math.floor(Math.random() * spawnableTypes.length)];
         }
         if (authoredAnchor?.anchor) {
-            const fixedType = resolveAuthoredPickupType(authoredAnchor.anchor, huntModeActive);
+            const fixedType = resolveAuthoredPickupType(authoredAnchor.anchor, huntModeActive, config);
             if (fixedType) {
                 type = fixedType;
             }
@@ -222,7 +222,7 @@ export class PowerupManager {
     /** Prueft ob ein Spieler ein Item einsammelt */
     checkPickup(playerPosition, radius) {
         this._pickupSphere.center.copy(playerPosition);
-        this._pickupSphere.radius = radius + getActiveRuntimeConfig(CONFIG).POWERUP.PICKUP_RADIUS;
+        this._pickupSphere.radius = radius + this.entityRuntimeConfig.POWERUP.PICKUP_RADIUS;
 
         for (let i = this.items.length - 1; i >= 0; i--) {
             if (this.items[i].box.intersectsSphere(this._pickupSphere)) {

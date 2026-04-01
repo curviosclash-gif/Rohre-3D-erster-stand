@@ -2,6 +2,7 @@ import { Arena } from '../entities/Arena.js';
 import { EntityManager } from '../entities/EntityManager.js';
 import { PowerupManager } from '../entities/Powerup.js';
 import { ParticleSystem } from '../entities/Particles.js';
+import { createEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 import {
     buildArenaSessionKey,
     resolveMatchMap,
@@ -40,6 +41,7 @@ export async function prewarmMatchArenaSession({
     renderer,
     settings,
     runtimeConfig = null,
+    baseConfig = null,
     requestedMapKey,
 } = {}) {
     if (!renderer) return null;
@@ -87,6 +89,7 @@ export async function prewarmMatchArenaSession({
         const arena = new Arena(renderer);
         arena.portalsEnabled = !!portalsEnabled;
         arena.runtimeConfig = runtimeConfig;
+        arena.entityRuntimeConfig = createEntityRuntimeConfig(runtimeConfig, baseConfig);
         bindArenaRuntimeMap(arena, mapResolution, effectiveMapKey);
         const arenaBuildResult = await arena.build(effectiveMapKey, {
             includeAuthoredAircraft: false,
@@ -121,6 +124,7 @@ export function createMatchSession({
     runtimeProfiler = null,
     settings,
     runtimeConfig = null,
+    baseConfig = null,
     requestedMapKey,
     currentSession = null,
 }) {
@@ -135,6 +139,7 @@ export function createMatchSession({
     const numHumans = Math.max(1, toSafeInt(runtimeConfig?.session?.numHumans, fallbackHumans));
     const numBots = Math.max(0, toSafeInt(runtimeConfig?.session?.numBots, fallbackBots));
     const winsNeeded = Math.max(1, toSafeInt(runtimeConfig?.session?.winsNeeded, fallbackWinsNeeded));
+    const entityRuntimeConfig = createEntityRuntimeConfig(runtimeConfig, baseConfig);
 
     const finalizeSession = (prewarmedArenaSession = null) => {
         const canPreservePrewarmedScene = !!prewarmedArenaSession
@@ -151,10 +156,11 @@ export function createMatchSession({
         const arena = reusablePrewarmedArenaSession?.arena || new Arena(renderer);
         arena.portalsEnabled = !!portalsEnabled;
         arena.runtimeConfig = runtimeConfig;
+        arena.entityRuntimeConfig = entityRuntimeConfig;
         bindArenaRuntimeMap(arena, mapResolution, effectiveMapKey);
 
         const buildSessionPayload = (arenaBuildResult = reusablePrewarmedArenaSession?.arenaBuildResult || null) => {
-            const powerupManager = new PowerupManager(renderer, arena, runtimeConfig);
+            const powerupManager = new PowerupManager(renderer, arena, entityRuntimeConfig);
             const entityManager = new EntityManager(
                 renderer,
                 arena,
@@ -162,10 +168,15 @@ export function createMatchSession({
                 particles,
                 audio,
                 recorder,
-                runtimeProfiler
+                runtimeProfiler,
+                { entityRuntimeConfig }
             );
 
-            entityManager.setup(numHumans, numBots, buildEntityManagerSetupOptions(settings, runtimeConfig));
+            entityManager.setup(
+                numHumans,
+                numBots,
+                buildEntityManagerSetupOptions(settings, runtimeConfig, entityRuntimeConfig)
+            );
 
             return {
                 particles,
@@ -244,6 +255,7 @@ export function initializeMatchSession({
     runtimeProfiler = null,
     settings,
     runtimeConfig = null,
+    baseConfig = null,
     requestedMapKey,
     currentSession = null,
     onPlayerFeedback = null,
@@ -251,26 +263,50 @@ export function initializeMatchSession({
     onRoundEnd = null,
     resetScores = true,
 }) {
-    const finalizeInitializedMatch = (session) => {
-        const runtime = wireMatchSessionRuntime({
-            renderer,
-            entityManager: session.entityManager,
-            numHumans: session.numHumans,
-            onPlayerFeedback,
-            onPlayerDied,
-            onRoundEnd,
-            resetScores,
-        });
+    const preparedMatch = prepareInitializedMatchSession({
+        renderer,
+        audio,
+        recorder,
+        runtimeProfiler,
+        settings,
+        runtimeConfig,
+        baseConfig,
+        requestedMapKey,
+        currentSession,
+    });
+    const finalizeInitializedMatch = (initializedMatch) => wireInitializedMatchRuntime({
+        renderer,
+        initializedMatch,
+        onPlayerFeedback,
+        onPlayerDied,
+        onRoundEnd,
+        resetScores,
+    });
+    if (isPromiseLike(preparedMatch)) {
+        return Promise.resolve(preparedMatch).then(finalizeInitializedMatch);
+    }
+    return finalizeInitializedMatch(preparedMatch);
+}
 
+export function prepareInitializedMatchSession({
+    renderer,
+    audio,
+    recorder,
+    runtimeProfiler = null,
+    settings,
+    runtimeConfig = null,
+    baseConfig = null,
+    requestedMapKey,
+    currentSession = null,
+}) {
+    const finalizePreparedMatch = (session) => {
         const feedbackPlan = deriveMapResolutionFeedbackPlan({
             mapResolution: session.mapResolution,
             portalsEnabled: runtimeConfig?.session?.portalsEnabled ?? !!settings?.portalsEnabled,
             arenaBuildResult: session.arenaBuildResult,
         });
-
         return {
             session,
-            runtime,
             feedbackPlan,
         };
     };
@@ -282,11 +318,39 @@ export function initializeMatchSession({
         runtimeProfiler,
         settings,
         runtimeConfig,
+        baseConfig,
         requestedMapKey,
         currentSession,
     });
     if (isPromiseLike(session)) {
-        return Promise.resolve(session).then((resolvedSession) => finalizeInitializedMatch(resolvedSession));
+        return Promise.resolve(session).then(finalizePreparedMatch);
     }
-    return finalizeInitializedMatch(session);
+    return finalizePreparedMatch(session);
+}
+
+export function wireInitializedMatchRuntime({
+    renderer,
+    initializedMatch,
+    onPlayerFeedback = null,
+    onPlayerDied = null,
+    onRoundEnd = null,
+    resetScores = true,
+}) {
+    const session = initializedMatch?.session;
+    if (!renderer || !session?.entityManager) {
+        throw new Error('wireInitializedMatchRuntime requires renderer and initialized match session');
+    }
+    const runtime = wireMatchSessionRuntime({
+        renderer,
+        entityManager: session.entityManager,
+        numHumans: session.numHumans,
+        onPlayerFeedback,
+        onPlayerDied,
+        onRoundEnd,
+        resetScores,
+    });
+    return {
+        ...initializedMatch,
+        runtime,
+    };
 }

@@ -29,6 +29,11 @@ function toPositiveEven(value, fallback) {
     return Math.max(2, safe - (safe % 2));
 }
 
+function toPositiveFloor(value, fallback = 0) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) && numeric > 0 ? Math.floor(numeric) : fallback;
+}
+
 function toRatio(value, fallback) {
     const numeric = Number(value);
     return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
@@ -503,6 +508,10 @@ export class RecordingCapturePipeline {
             const sizes = this._resolveShortsCaptureSize();
             return this._ensureCaptureCanvas(sizes.width, sizes.height) || this.sourceCanvas;
         }
+        if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+            const sizes = this._resolveCinematicCaptureSize();
+            return this._ensureCaptureCanvas(sizes.width, sizes.height) || this.sourceCanvas;
+        }
         // Always use a dedicated 2D capture canvas during recording so that
         // content is preserved regardless of the WebGL preserveDrawingBuffer flag.
         return this._ensureCaptureCanvas(this.sourceCanvas?.width, this.sourceCanvas?.height) || this.sourceCanvas;
@@ -546,7 +555,7 @@ export class RecordingCapturePipeline {
             try {
                 this._cinematicRenderer = new THREE.WebGLRenderer({
                     canvas: this._cinematicCanvas,
-                    antialias: false,
+                    antialias: true,
                     alpha: false,
                     preserveDrawingBuffer: true,
                 });
@@ -577,15 +586,27 @@ export class RecordingCapturePipeline {
         return this._cinematicRenderer;
     }
 
-    _prepareCinematicSurface({ entityManager, renderAlpha, renderDelta }) {
-        // Cap to 1920×1080 to stay within AVC Level 4.2 limits and ensure even dimensions.
-        const rawWidth = toPositiveEven(this.sourceCanvas?.width, 2);
-        const rawHeight = toPositiveEven(this.sourceCanvas?.height, 2);
+    _resolveCinematicCaptureSize() {
+        // Use the visible viewport as baseline so cinematic export does not
+        // inherit a throttled live backbuffer size.
+        const sourceWidth = toPositiveFloor(this.sourceCanvas?.width, 0);
+        const sourceHeight = toPositiveFloor(this.sourceCanvas?.height, 0);
+        const clientWidth = toPositiveFloor(this.sourceCanvas?.clientWidth, 0);
+        const clientHeight = toPositiveFloor(this.sourceCanvas?.clientHeight, 0);
+        const rawWidth = toPositiveEven(Math.max(sourceWidth, clientWidth), 2);
+        const rawHeight = toPositiveEven(Math.max(sourceHeight, clientHeight), 2);
         const maxW = 1920;
         const maxH = 1080;
         const scale = Math.min(1, maxW / Math.max(1, rawWidth), maxH / Math.max(1, rawHeight));
-        const width = toPositiveEven(Math.floor(rawWidth * scale), 2);
-        const height = toPositiveEven(Math.floor(rawHeight * scale), 2);
+        return {
+            width: toPositiveEven(Math.floor(rawWidth * scale), 2),
+            height: toPositiveEven(Math.floor(rawHeight * scale), 2),
+        };
+    }
+
+    _prepareCinematicSurface({ entityManager, renderAlpha, renderDelta }) {
+        // Cap to 1920×1080 to stay within AVC Level 4.2 limits and ensure even dimensions.
+        const { width, height } = this._resolveCinematicCaptureSize();
         const cinRenderer = this._ensureCinematicRenderer(width, height);
         const captureCanvas = this._ensureCaptureCanvas(width, height);
         const captureCtx = this._captureCtx;
@@ -660,6 +681,10 @@ export class RecordingCapturePipeline {
         cinRenderer.getContext()?.flush?.();
 
         captureCtx.clearRect(0, 0, width, height);
+        captureCtx.imageSmoothingEnabled = true;
+        if ('imageSmoothingQuality' in captureCtx) {
+            captureCtx.imageSmoothingQuality = 'high';
+        }
         captureCtx.drawImage(this._cinematicCanvas, 0, 0, width, height);
 
         this._storeMeta({

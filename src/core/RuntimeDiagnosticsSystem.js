@@ -1,3 +1,5 @@
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
+
 const FPS_TRACKER_WINDOW = 60;
 
 function formatMs(value) {
@@ -62,6 +64,7 @@ export class RuntimeDiagnosticsSystem {
         if (event.code !== 'KeyO') return;
 
         if (!game.stats) {
+            // Intentional runtime-debug adapter: stats overlay stays in core and is not part of gameplay UI.
             game.stats = document.createElement('div');
             game.stats.style.cssText = 'position:fixed;top:10px;left:10px;color:#0f0;font:13px/1.5 monospace;z-index:1000;pointer-events:none;background:rgba(0,0,0,0.6);padding:8px 12px;border-radius:6px;min-width:200px;white-space:pre-wrap;';
             document.body.appendChild(game.stats);
@@ -114,7 +117,7 @@ export class RuntimeDiagnosticsSystem {
         game._adaptiveTimer = (game._adaptiveTimer || 0) + dt;
         if (game._adaptiveTimer >= 3.0) {
             game._adaptiveTimer = 0;
-            if (game._fpsTracker.avg < 30 && !game.isLowQuality && game.state === 'PLAYING') {
+            if (game._fpsTracker.avg < 30 && !game.isLowQuality && game.state === GAME_STATE_IDS.PLAYING) {
                 game.isLowQuality = true;
                 game.renderer.setQuality('LOW');
                 game._showStatusToast('Grafik automatisch reduziert');

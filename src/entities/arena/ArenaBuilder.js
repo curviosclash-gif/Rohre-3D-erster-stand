@@ -1,8 +1,7 @@
 import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
-import { getActiveRuntimeConfig } from '../../core/runtime/ActiveRuntimeConfigStore.js';
 import { ArenaGeometryCompilePipeline } from './ArenaGeometryCompilePipeline.js';
 import { createArenaBuildSignature, createArenaMapFingerprint, getArenaMaterialBundle } from './ArenaBuildResourceCache.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 
 function asPositiveScale(value, fallback = 1) {
     const scale = Number(value);
@@ -16,7 +15,7 @@ export class ArenaBuilder {
     }
 
     build(mapKey, { previousBuildSignature = null } = {}) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         const mapResolution = this._resolveMapDefinition(mapKey);
         this.arena.currentMapKey = mapResolution.currentMapKey;
 
@@ -95,7 +94,7 @@ export class ArenaBuilder {
     }
 
     _resolveMapDefinition(mapKey) {
-        const config = getActiveRuntimeConfig(CONFIG);
+        const config = resolveEntityRuntimeConfig(this.arena);
         const runtimeMapKey = typeof this.arena.runtimeMapKey === 'string'
             ? this.arena.runtimeMapKey
             : null;
@@ -140,10 +139,11 @@ export class ArenaBuilder {
     }
 
     _resolveMaterialBundle({ sx, sy, sz }) {
-        const checkerWorldSize = Math.max(1, CONFIG.ARENA.CHECKER_WORLD_SIZE || 18);
+        const config = resolveEntityRuntimeConfig(this.arena);
+        const checkerWorldSize = Math.max(1, config.ARENA.CHECKER_WORLD_SIZE || 18);
         return getArenaMaterialBundle({
-            checkerLightColor: CONFIG.ARENA.CHECKER_LIGHT_COLOR,
-            checkerDarkColor: CONFIG.ARENA.CHECKER_DARK_COLOR,
+            checkerLightColor: config.ARENA.CHECKER_LIGHT_COLOR,
+            checkerDarkColor: config.ARENA.CHECKER_DARK_COLOR,
             checkerWorldSize,
             sx,
             sy,

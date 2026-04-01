@@ -2,10 +2,9 @@
 // HuntModeStrategy.js - Hunt mode (HP system, MG, rockets, respawn)
 // ============================================
 
-import { CONFIG } from '../core/Config.js';
-import { getActiveRuntimeConfig } from '../core/runtime/ActiveRuntimeConfigStore.js';
 import { isRocketTierType, pickWeightedRocketTierType, resolveRocketTierDamage } from '../hunt/RocketPickupSystem.js';
 import { GameModeContract } from './GameModeContract.js';
+import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
 function toSafeNumber(value, fallback) {
     const parsed = Number(value);
@@ -19,9 +18,8 @@ function getNowSeconds() {
     return Date.now() * 0.001;
 }
 
-function resolveConfig(config) {
-    if (!config || config === CONFIG) return getActiveRuntimeConfig(CONFIG);
-    return config;
+function resolveConfig(config, fallbackConfig = null) {
+    return resolveEntityRuntimeConfig(config || fallbackConfig || null);
 }
 
 function pickWeightedType(typeEntries = []) {
@@ -54,12 +52,17 @@ function pickWeightedType(typeEntries = []) {
 }
 
 export class HuntModeStrategy extends GameModeContract {
+    constructor(options = {}) {
+        super();
+        this.entityRuntimeConfig = resolveEntityRuntimeConfig(options?.entityRuntimeConfig || null);
+    }
+
     get modeType() { return 'HUNT'; }
 
     // --- Health & Damage ---
     resetPlayerHealth(player, config) {
         if (!player) return null;
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config || player, this.entityRuntimeConfig);
         const maxHp = Math.max(1, toSafeNumber(activeConfig?.HUNT?.PLAYER_MAX_HP, 100));
         const maxShieldHp = Math.max(1, toSafeNumber(activeConfig?.HUNT?.SHIELD_MAX_HP, 40));
         player.maxHp = maxHp;
@@ -73,7 +76,7 @@ export class HuntModeStrategy extends GameModeContract {
 
     applyDamage(player, amount, options, config) {
         if (!player) return { applied: 0, absorbedByShield: 0, remainingHp: 0, isDead: true };
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config || player, this.entityRuntimeConfig);
         const requestedDamage = Math.max(0, toSafeNumber(amount, 0));
         if (requestedDamage <= 0) {
             return { applied: 0, absorbedByShield: 0, remainingHp: Math.max(0, toSafeNumber(player.hp, 0)), isDead: toSafeNumber(player.hp, 0) <= 0 };
@@ -109,7 +112,7 @@ export class HuntModeStrategy extends GameModeContract {
 
     applyHealing(player, amount, config) {
         if (!player) return { healed: 0, hp: 0 };
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config || player, this.entityRuntimeConfig);
         const healing = Math.max(0, toSafeNumber(amount, 0));
         if (healing <= 0) return { healed: 0, hp: toSafeNumber(player.hp, 0) };
         const maxHp = Math.max(1, toSafeNumber(player.maxHp, toSafeNumber(activeConfig?.HUNT?.PLAYER_MAX_HP, 100)));
@@ -119,7 +122,7 @@ export class HuntModeStrategy extends GameModeContract {
     }
 
     resolveCollisionDamage(cause, config) {
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config, this.entityRuntimeConfig);
         const table = activeConfig?.HUNT?.COLLISION_DAMAGE || {};
         const key = String(cause || '').toUpperCase();
         if (key === 'TRAIL' || key === 'TRAIL_SELF' || key === 'TRAIL_OTHER') {
@@ -133,7 +136,7 @@ export class HuntModeStrategy extends GameModeContract {
 
     grantShield(player, config) {
         if (!player) return 0;
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config || player, this.entityRuntimeConfig);
         player.hasShield = true;
         player.maxShieldHp = Math.max(1, toSafeNumber(activeConfig?.HUNT?.SHIELD_MAX_HP, 40));
         player.shieldHP = player.maxShieldHp;
@@ -143,7 +146,7 @@ export class HuntModeStrategy extends GameModeContract {
 
     updateHealthRegen(player, dt, config, nowSeconds) {
         if (!player) return;
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config || player, this.entityRuntimeConfig);
         if (player.hp <= 0) return;
         const maxHp = Math.max(1, toSafeNumber(player.maxHp, toSafeNumber(activeConfig?.HUNT?.PLAYER_MAX_HP, 100)));
         if (player.hp >= maxHp) return;
@@ -198,7 +201,7 @@ export class HuntModeStrategy extends GameModeContract {
     // --- Projectiles ---
     resolveRocketProjectileParams(type, config) {
         if (!isRocketTierType(type)) return null;
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config, this.entityRuntimeConfig);
         const rocketConfig = activeConfig?.HUNT?.ROCKET || {};
         const normalized = String(type || '').toUpperCase();
 
@@ -228,7 +231,7 @@ export class HuntModeStrategy extends GameModeContract {
     }
 
     _applyRocketExplosion(projectile, players, directHitTarget, system) {
-        const rocketConfig = CONFIG?.HUNT?.ROCKET || {};
+        const rocketConfig = resolveConfig(null, this.entityRuntimeConfig)?.HUNT?.ROCKET || {};
         const explosionRadius = Math.max(1, Number(rocketConfig.EXPLOSION_RADIUS || 25));
         const explosionDamageFalloff = Math.max(0, Math.min(1, Number(rocketConfig.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
         const baseDamage = resolveRocketTierDamage(projectile.type);
@@ -247,7 +250,7 @@ export class HuntModeStrategy extends GameModeContract {
 
     // --- Spawning ---
     isRespawnEnabled(config) {
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config, this.entityRuntimeConfig);
         return !!activeConfig?.HUNT?.RESPAWN_ENABLED;
     }
 
@@ -261,7 +264,7 @@ export class HuntModeStrategy extends GameModeContract {
     }
 
     resolveSpawnType(spawnableTypes, config) {
-        const activeConfig = resolveConfig(config);
+        const activeConfig = resolveConfig(config, this.entityRuntimeConfig);
         const rocketSpawnChance = Math.max(0, Math.min(1, Number(activeConfig?.HUNT?.ROCKET_PICKUP_SPAWN_CHANCE || 0)));
         const huntWeights = activeConfig?.HUNT?.PICKUP_WEIGHTS || {};
         const normalizedSpawnableTypes = Array.isArray(spawnableTypes)

@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-03-31
+Stand: 2026-04-01
 
 ## 1. Architekturparadigma
 
@@ -13,16 +13,20 @@ Stand: 2026-03-31
 ### 2.1 Core (`src/core`)
 
 - `main.js`: App-Orchestrierung, Match-Lifecycle, Runtime-State-Anwendung
+- `GameRuntimeFacade.js`: oeffentliche Runtime-/Menue-/Session-Fassade; einziger Return-to-Menu-Entry-Point fuer Core/UI
 - `PlayingStateSystem.js`: kapselt den PLAYING-Updateablauf als eigenes System
-- `RuntimeDiagnosticsSystem.js`: Runtime-Monitoring/FPS/Quality-Delegation aus `main.js`
+- `RuntimeDiagnosticsSystem.js`: expliziter Runtime-Debug-Adapter fuer FPS/Quality/Stats-Overlay
 - `Config.js`: zentrale Spielkonfiguration
-- `GameLoop.js`: Update-/Render-Takt
+- `RuntimeConfig.js`: baut `runtimeConfig` inkl. Session-/Transport-Vertrag und Kompatibilitaets-Snapshot
+- `GameLoop.js`: Update-/Render-Takt; delegiert fatale Runtime-Overlays an `RuntimeErrorOverlay.js`
+- `RuntimeErrorOverlay.js`: fataler Fehler-Overlay-Adapter fuer Runtime-/Bootstrap-Fehler
 - `Renderer.js`: Render-Fassade mit Subsystemen (`renderer/CameraRigSystem.js`, `RenderViewportSystem.js`, `SceneRootManager.js`, `RenderQualityController.js`)
 - `InputManager.js`, `Audio.js`, `three-disposal.js`
 
 ### 2.2 State (`src/state`)
 
-- `MatchSessionFactory.js`: Match-Initialisierung und Session-Assembly
+- `MatchSessionFactory.js`: Match-Initialisierung und Session-Assembly; trennt `prepareInitializedMatchSession(...)` von `wireInitializedMatchRuntime(...)`
+- `MatchLifecycleSessionOrchestrator.js`: kleiner Lifecycle-Port fuer Session-Init, Stale-Disposal, Recorder-Settlement und Match-Teardown
 - `RoundStateController.js` + `RoundStateControllerOps.js`: Tick-/Transition-Entscheidungen
 - `RoundStateOps.js`: Pure Round/Match-End-Ableitung
 - `RoundEndCoordinator.js`, `RoundRecorder.js` (Store-Fassade auf `recorder/RoundEventStore.js`, `RoundMetricsStore.js`, `RoundSnapshotStore.js`)
@@ -31,8 +35,8 @@ Stand: 2026-03-31
 
 ### 2.3 Entities (`src/entities`)
 
-- `Arena.js`: Bounds/Kollisionen, Fast-Collision-Pfade
-- `EntityManager.js`: Runtime-Orchestrierung auf Basis von `runtime/EntityRuntimeAssembler.js`
+- `Arena.js`: Bounds/Kollisionen, Fast-Collision-Pfade; dispose-faehig fuer stale oder ersetzte Session-Initialisierungen
+- `EntityManager.js`: Runtime-Orchestrierung auf Basis von `runtime/EntityRuntimeAssembler.js` und explizitem `EntityRuntimeConfig`-Vertrag
 - `systems/ProjectileSystem.js`, `systems/TrailSpatialIndex.js`: modulare Projectile-/Trail-Hotpaths
 - `systems/trails/TrailSegmentRegistry.js`, `TrailCollisionQuery.js`, `TrailCollisionDebugTelemetry.js`: Trail-Registry/Query/Debug intern getrennt
 - `systems/PlayerInputSystem.js`: Human/Bot-Input-Aufloesung
@@ -51,7 +55,7 @@ Stand: 2026-03-31
 
 - `UIManager.js`: Menues, selektive Settings-Sync (`syncByChangeKeys`), Menu-Context und Status-Toast
 - `HUD.js`, `HuntHUD.js`: Ingame-Overlay
-- `MatchFlowUiController.js`, `KeybindEditorController.js`: UI-Flow/Settings-Controller-Splits aus `main.js`
+- `MatchFlowUiController.js`, `PauseOverlayController.js`, `KeybindEditorController.js`: UI-Flow/Settings-Controller-Splits; Match-/Pause-Exit nur ueber `lifecyclePort`/`matchUiPort`
 - `UISettingsSyncMap.js`: Zuordnung `changedKey -> UI-Sync-Teilfunktion`
 - `SettingsChangeKeys.js`, `SettingsChangeSetOps.js`: stabiler Key-Vertrag und Set-Operationen fuer Event-Coalescing
 - `MenuController.js`: emittiert typisierte `SETTINGS_CHANGED`-Payloads und coalesct `input`-Storms pro Frame
@@ -65,13 +69,32 @@ Stand: 2026-03-31
 - `ScreenShake.js`: Hunt-Feedback
 - `RespawnSystem.js`, `HuntScoring.js`: Respawn + erweitertes Hunt-Scoring
 
-## 3. State-Namen (aktuell)
+## 3. State-IDs (`GAME_STATE_IDS`)
 
+- Quelle: `src/shared/contracts/GameStateIds.js`
+- Menue: `MENU`
 - Laufender Spielzustand: `PLAYING`
+- Pause: `PAUSED`
 - Rundenende: `ROUND_END`
 - Matchende: `MATCH_END`
 
-## 4. Entwicklungsregeln
+## 4. Runtime-Vertraege (V74)
+
+- Session-Vertrag:
+  - `RuntimeConfig.session` fuehrt `sessionType` und `multiplayerTransport` explizit.
+  - `sessionType='multiplayer'` + `multiplayerTransport='storage-bridge'` ist Menue-Koordination, kein echter Runtime-Netzwerkadapter.
+  - Die Match-Runtime loest diesen Sonderfall bewusst auf `LocalSessionAdapter` auf; nur `lan|online` gelten als echte Network-Sessions.
+- Lifecycle-Vertrag:
+  - `GameRuntimeFacade.returnToMenu(...)` ist der oeffentliche Exit fuer Pause-, Round-End-, Fehler- und Hotkey-Pfade.
+  - `MatchLifecycleSessionOrchestrator` serialisiert asynchrone Session-Initialisierung, disposed stale Resultate aktiv und settled Recorder-/Teardown-Pfade deterministisch.
+- Entity-Runtime-Vertrag:
+  - `MatchSessionFactory` erzeugt pro Match ein `entityRuntimeConfig` und reicht es an `EntityManager`, Trail-, Powerup-, Projectile-, Portal- und Hunt-Pfade durch.
+  - `ActiveRuntimeConfigStore` ist fuer den migrierten Scope kein Standard-Einstieg mehr, sondern nur ein explizit verbleibender Uebergangsadapter ausserhalb der bereits umgestellten Hotpaths.
+- Debug-/Overlay-Vertrag:
+  - `GameLoop` nutzt `RuntimeErrorOverlay` fuer fatale Fehler.
+  - `RuntimeDiagnosticsSystem` bleibt als bewusst markierter Runtime-Debug-Adapter fuer das optionale Stats-Overlay bestehen.
+
+## 5. Entwicklungsregeln
 
 1. `*Ops.js` als pure Logik behandeln (keine versteckten Side Effects).
 2. Keine Magic Numbers statt `Config`.
@@ -79,12 +102,12 @@ Stand: 2026-03-31
 4. Kollision/Trail/Bot-Hotpaths auf Performance und geringe Allocation optimieren.
 5. Bot-KI nur ueber Policy-Schnittstelle anbinden; keine direkte Runtime-Kopplung von `EntityManager` auf konkrete KI-Klassen.
 
-## 5. Verifikation
+## 6. Verifikation
 
 - Testauswahl ueber `.agents/test_mapping.md`
 - Danach immer Doku-/Prozess-Check ueber `npm run docs:sync` und `npm run docs:check`
 
-## 6. Bot-Bridge Vertrag V1 (eingefroren am 2026-03-03)
+## 7. Bot-Bridge Vertrag V1 (eingefroren am 2026-03-03)
 
 - Observation:
   - `schemaVersion`: `v1`
@@ -104,7 +127,7 @@ Stand: 2026-03-31
 - V1 Nicht-Ziele:
   - keine History-Frames, keine Reward-/Telemetriefelder im Runtime-Vektor, keine verpflichtende Netzwerk-Bridge.
 
-## 7. Runtime-Policy-Auswahl (Stand 2026-03-10)
+## 8. Runtime-Policy-Auswahl (Stand 2026-03-10)
 
 - `SettingsManager` fuehrt `botPolicyStrategy` mit Default `auto`.
 - `RuntimeConfig` normalisiert Strategie (`rule-based|bridge|auto`) und loest bei `auto` deterministisch `bot.policyType` aus `gameMode + planarMode`.

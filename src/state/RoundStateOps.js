@@ -2,6 +2,8 @@
 // RoundStateOps.js - pure round/match end decision helpers
 // ============================================
 
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
+
 function ensureArray(players) {
     return Array.isArray(players) ? players : [];
 }
@@ -52,7 +54,7 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
                 ? ` (${formatDurationMs(parcours.completionTimeMs)})`
                 : '';
             return {
-                state: 'MATCH_END',
+                state: GAME_STATE_IDS.MATCH_END,
                 canWinMatch,
                 requiredWins,
                 matchWinner,
@@ -63,7 +65,7 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
             };
         }
         return {
-            state: 'MATCH_END',
+            state: GAME_STATE_IDS.MATCH_END,
             canWinMatch,
             requiredWins,
             matchWinner,
@@ -81,7 +83,7 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
                 ? ` (${formatDurationMs(parcours.completionTimeMs)})`
                 : '';
             return {
-                state: 'ROUND_END',
+                state: GAME_STATE_IDS.ROUND_END,
                 canWinMatch,
                 requiredWins,
                 matchWinner: null,
@@ -92,7 +94,7 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
             };
         }
         return {
-            state: 'ROUND_END',
+            state: GAME_STATE_IDS.ROUND_END,
             canWinMatch,
             requiredWins,
             matchWinner: null,
@@ -104,7 +106,7 @@ export function deriveRoundEndOutcome(players, inputs = {}) {
     }
 
     return {
-        state: 'ROUND_END',
+        state: GAME_STATE_IDS.ROUND_END,
         canWinMatch,
         requiredWins,
         matchWinner: null,

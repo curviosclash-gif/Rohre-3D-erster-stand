@@ -299,6 +299,21 @@ export class MediaRecorderSystem {
         const level = this._getCaptureLevel();
         return Math.max(1, this.captureFps * level.fpsScale);
     }
+    _resolveCaptureResolutionScale(level = null) {
+        if (this.recordingCaptureSettings?.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+            return 1;
+        }
+        return Math.max(0.2, Math.min(1, toFiniteNumber(level?.resolutionScale, 1)));
+    }
+    _advanceCaptureTimelineMs(deltaMs) {
+        const safeDeltaMs = Math.max(0, toFiniteNumber(deltaMs, 0));
+        if (!(safeDeltaMs > 0)) {
+            return 0;
+        }
+        const deltaUs = Math.max(1, Math.round(safeDeltaMs * 1000));
+        this._captureTimestampUs += deltaUs;
+        return deltaUs;
+    }
     _ensureCaptureSurface(scale = 1) {
         const sourceCanvas = this._getCaptureCanvas();
         if (!sourceCanvas) return null;
@@ -338,6 +353,9 @@ export class MediaRecorderSystem {
         this._captureCanvasWidth = targetWidth;
         this._captureCanvasHeight = targetHeight;
         this._captureCanvasCtx.imageSmoothingEnabled = true;
+        if ('imageSmoothingQuality' in this._captureCanvasCtx) {
+            this._captureCanvasCtx.imageSmoothingQuality = 'high';
+        }
         this._captureCanvasCtx.clearRect(0, 0, targetWidth, targetHeight);
         this._captureCanvasCtx.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
         return this._captureCanvas;
@@ -367,6 +385,9 @@ export class MediaRecorderSystem {
         this._captureCanvasWidth = targetWidth;
         this._captureCanvasHeight = targetHeight;
         this._captureCanvasCtx.imageSmoothingEnabled = true;
+        if ('imageSmoothingQuality' in this._captureCanvasCtx) {
+            this._captureCanvasCtx.imageSmoothingQuality = 'high';
+        }
         this._captureCanvasCtx.clearRect(0, 0, targetWidth, targetHeight);
         this._captureCanvasCtx.drawImage(sourceCanvas, 0, 0, targetWidth, targetHeight);
         return this._captureCanvas;
@@ -495,6 +516,7 @@ export class MediaRecorderSystem {
         const droppedFrames = Math.max(1, Math.floor(overflowMs / safeStepIntervalMs));
         this._captureAccumulatorMs = retainedAccumulatorMs;
         this._captureDroppedFrames += droppedFrames;
+        this._advanceCaptureTimelineMs(overflowMs);
         return droppedFrames;
     }
     _captureWebCodecsFrame(stepIntervalMs) {
@@ -513,13 +535,13 @@ export class MediaRecorderSystem {
         }
         const encodeQueueSize = toPositiveInt(this._videoEncoder.encodeQueueSize, 0, 0, 10_000);
         this._updateCaptureLoadLevel(encodeQueueSize);
-        this._captureTimestampUs += Math.max(1, Math.round(stepIntervalMs * 1000));
+        this._advanceCaptureTimelineMs(stepIntervalMs);
         if (encodeQueueSize >= ENCODE_QUEUE_DROP_LIMIT) {
             this._captureDroppedFrames += 1;
             return;
         }
         const level = this._getCaptureLevel();
-        const frameSource = this._ensureCaptureSurface(level.resolutionScale);
+        const frameSource = this._ensureCaptureSurface(this._resolveCaptureResolutionScale(level));
         if (!frameSource) {
             this._captureDroppedFrames += 1;
             return;
@@ -542,12 +564,12 @@ export class MediaRecorderSystem {
     }
     _captureMediaRecorderFrame(stepIntervalMs) {
         if (!this._isRecording || this._activeRecorderEngine !== RECORDER_ENGINE.NATIVE_MEDIARECORDER) return;
-        this._captureTimestampUs += Math.max(1, Math.round(stepIntervalMs * 1000));
+        this._advanceCaptureTimelineMs(stepIntervalMs);
         const encodeStart = this._perfNow();
         try {
             if (this._mediaRecorderUsesCaptureCanvas) {
                 const level = this._getCaptureLevel();
-                this._ensureMediaRecorderCaptureSurface(level.resolutionScale);
+                this._ensureMediaRecorderCaptureSurface(this._resolveCaptureResolutionScale(level));
             }
             if (this._mediaRecorderSupportsRequestFrame && this._mediaRecorderVideoTrack?.requestFrame) {
                 this._mediaRecorderVideoTrack.requestFrame();
@@ -586,7 +608,9 @@ export class MediaRecorderSystem {
         if (!(deltaMs > 0)) {
             deltaMs = Math.max(1, Math.round(toFiniteNumber(renderDelta, 1 / 60) * 1000));
         }
+        const unclampedDeltaMs = deltaMs;
         deltaMs = Math.min(250, deltaMs);
+        this._advanceCaptureTimelineMs(Math.max(0, unclampedDeltaMs - deltaMs));
         this._captureAccumulatorMs += deltaMs;
         let syntheticQueueSize = 0;
         if (this._activeRecorderEngine === RECORDER_ENGINE.NATIVE_MEDIARECORDER) {
@@ -603,8 +627,11 @@ export class MediaRecorderSystem {
             && !this._mediaRecorderSupportsRequestFrame
             && syntheticQueueSize >= ENCODE_QUEUE_DROP_LIMIT
         ) {
-            this._captureAccumulatorMs = Math.min(this._captureAccumulatorMs, stepIntervalMs);
+            const retainedAccumulatorMs = Math.min(this._captureAccumulatorMs, stepIntervalMs);
+            const discardedAccumulatorMs = Math.max(0, this._captureAccumulatorMs - retainedAccumulatorMs);
+            this._captureAccumulatorMs = retainedAccumulatorMs;
             this._captureDroppedFrames += 1;
+            this._advanceCaptureTimelineMs(discardedAccumulatorMs);
             return;
         }
         let captureSteps = 0;
@@ -632,7 +659,7 @@ export class MediaRecorderSystem {
             hudMode: this.recordingCaptureSettings?.hudMode || null,
             captureFps: this.captureFps,
             effectiveCaptureFps: this._resolveEffectiveCaptureFps(),
-            captureResolutionScale: level.resolutionScale,
+            captureResolutionScale: this._resolveCaptureResolutionScale(level),
             captureLevel: this._captureLevelIndex,
             captureSourceWidth: Math.max(0, Math.floor(toFiniteNumber(sourceCanvas?.width, 0))),
             captureSourceHeight: Math.max(0, Math.floor(toFiniteNumber(sourceCanvas?.height, 0))),
@@ -745,30 +772,44 @@ export class MediaRecorderSystem {
     }
     _resolveRecordingDimensions(scale = 1) {
         const profile = this.recordingCaptureSettings?.profile;
-        // Cinematic recordings use a fixed 1280x720 (HD) target that is
-        // universally supported by H.264 hardware & software encoders.
-        // This avoids issues with unusual canvas sizes (e.g. ultra-wide
-        // viewports when DevTools are open).
-        if (profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
-            return { width: 1280, height: 720 };
-        }
         const sourceCanvas = this._getCaptureCanvas();
         const rawWidth = Number(sourceCanvas?.width || 0);
         const rawHeight = Number(sourceCanvas?.height || 0);
         const resolutionScale = Math.max(0.2, Math.min(1, toFiniteNumber(scale, 1)));
         let width = Math.max(16, Math.floor(rawWidth * resolutionScale));
         let height = Math.max(16, Math.floor(rawHeight * resolutionScale));
-        // H.264 macroblock alignment: round to nearest multiple of 16.
-        width = Math.round(width / 16) * 16 || 16;
-        height = Math.round(height / 16) * 16 || 16;
+        if (profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+            width = Math.max(16, width) & ~1;
+            height = Math.max(16, height) & ~1;
+        } else {
+            // H.264 macroblock alignment: round to nearest multiple of 16.
+            width = Math.round(width / 16) * 16 || 16;
+            height = Math.round(height / 16) * 16 || 16;
+        }
         // Clamp extreme aspect ratios (>3:1) — some encoders reject these.
         const MAX_ASPECT = 3;
         if (width > height * MAX_ASPECT) {
-            width = (Math.round((height * MAX_ASPECT) / 16) * 16) || 16;
+            width = profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4
+                ? (Math.max(16, Math.floor(height * MAX_ASPECT)) & ~1)
+                : ((Math.round((height * MAX_ASPECT) / 16) * 16) || 16);
         } else if (height > width * MAX_ASPECT) {
-            height = (Math.round((width * MAX_ASPECT) / 16) * 16) || 16;
+            height = profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4
+                ? (Math.max(16, Math.floor(width * MAX_ASPECT)) & ~1)
+                : ((Math.round((width * MAX_ASPECT) / 16) * 16) || 16);
         }
         return { width, height };
+    }
+    _resolveRecordingBitrate(width, height) {
+        const pixelCount = Math.max(1, toPositiveInt(width, 1) * toPositiveInt(height, 1));
+        if (this.recordingCaptureSettings?.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
+            if (pixelCount >= (1920 * 1080)) {
+                return 16_000_000;
+            }
+            if (pixelCount >= (1280 * 720)) {
+                return 12_000_000;
+            }
+        }
+        return 8_000_000;
     }
     _buildWebCodecsEncoderConfig(width, height, candidate) {
         const codec = typeof candidate === 'object' ? candidate.codec : candidate;
@@ -778,7 +819,7 @@ export class MediaRecorderSystem {
             width,
             height,
             hardwareAcceleration: 'prefer-hardware',
-            bitrate: 8000000,
+            bitrate: this._resolveRecordingBitrate(width, height),
             framerate: this.captureFps,
         };
         // AVC-specific: annex-b format needed for mp4-muxer
@@ -789,13 +830,14 @@ export class MediaRecorderSystem {
     }
     async _startWithWebCodecs(trigger, support) {
         const { width, height } = this._resolveRecordingDimensions();
+        const bitrate = this._resolveRecordingBitrate(width, height);
         const strategy = new WebCodecsRecorderEngine({
             logger: this.logger,
             globalScope: this._globalScope,
             width,
             height,
             frameRate: this.captureFps,
-            bitrate: 8_000_000,
+            bitrate,
         });
         const initializeResult = await strategy.initialize();
         if (!initializeResult?.ok) {
@@ -837,6 +879,7 @@ export class MediaRecorderSystem {
         if (!sourceCanvas || typeof sourceCanvas.captureStream !== 'function') {
             return this._buildStartResult(false, 'missing-capture-stream', { support });
         }
+        const { width, height } = this._resolveRecordingDimensions();
         // WebCodecs can report MP4 support while MediaRecorder still needs a WebM fallback.
         const preferredMediaRecorderMimeType = fallbackFromReason
             ? (support?.mediaRecorderMimeType || '')
@@ -847,7 +890,8 @@ export class MediaRecorderSystem {
         ) || DEFAULT_FALLBACK_MIME_TYPE;
         this._captureLevelIndex = Math.min(2, CAPTURE_LOAD_LEVELS.length - 1);
         const level = this._getCaptureLevel();
-        const captureStreamSource = this._ensureMediaRecorderCaptureSurface(level.resolutionScale);
+        const captureResolutionScale = this._resolveCaptureResolutionScale(level);
+        const captureStreamSource = this._ensureMediaRecorderCaptureSurface(captureResolutionScale);
         const streamSourceCanvas = captureStreamSource && typeof captureStreamSource.captureStream === 'function'
             ? captureStreamSource
             : sourceCanvas;
@@ -858,7 +902,7 @@ export class MediaRecorderSystem {
             canvas: streamSourceCanvas,
             mimeType: selectedMimeType,
             captureFps: this.captureFps,
-            videoBitsPerSecond: 15_000_000,
+            videoBitsPerSecond: this._resolveRecordingBitrate(width, height),
         });
         const initializeResult = await strategy.initialize();
         if (!initializeResult?.ok) {
@@ -879,7 +923,7 @@ export class MediaRecorderSystem {
             });
         }
         this._setActiveRecorderStrategy(strategy);
-        this._startMediaRecorderPump(level.resolutionScale);
+        this._startMediaRecorderPump(captureResolutionScale);
         this._isRecording = true;
         this._activeRecorderEngine = RECORDER_ENGINE.NATIVE_MEDIARECORDER;
         this._activeMimeType = initializeResult?.mimeType || selectedMimeType || DEFAULT_FALLBACK_MIME_TYPE;
@@ -1075,6 +1119,15 @@ export class MediaRecorderSystem {
         }
         return pendingStop;
     }
+    async settleRecording(trigger = null) {
+        if (this._pendingStop) {
+            return this._pendingStop;
+        }
+        if (this._isRecording) {
+            return this.stopRecording(trigger || { type: 'settle_recording' });
+        }
+        return this._buildStopResult(false, 'not_recording');
+    }
     _buildFilename(activeRecording, endedAtMs, mimeType) {
         const startedAt = activeRecording?.startedAt || endedAtMs;
         const mode = sanitizeFileToken(activeRecording?.trigger?.context?.activeGameMode, 'classic');
@@ -1240,24 +1293,17 @@ export class MediaRecorderSystem {
                 }
             }
         }
-        this._muxer = null;
-        this._videoEncoder = null;
-        this._encoderWidth = 0;
-        this._encoderHeight = 0;
-        this._mediaRecorder = null;
-        this._mediaRecorderChunks = null;
-        this._mediaRecorderStream = null;
-        this._mediaRecorderVideoTrack = null;
+        this._muxer = this._videoEncoder = null;
+        this._encoderWidth = this._encoderHeight = 0;
+        this._mediaRecorder = this._mediaRecorderChunks = null;
+        this._mediaRecorderStream = this._mediaRecorderVideoTrack = null;
         this._mediaRecorderSupportsRequestFrame = false;
         this._mediaRecorderUsesCaptureCanvas = false;
         this._mediaRecorderPumpResolutionScale = 1;
-        this._activeRecorderStrategy = null;
-        this._activeRecording = null;
+        this._activeRecorderStrategy = this._activeRecording = null;
         this._frameCount = 0;
-        this._captureCanvas = null;
-        this._captureCanvasCtx = null;
-        this._captureCanvasWidth = 0;
-        this._captureCanvasHeight = 0;
+        this._captureCanvas = this._captureCanvasCtx = null;
+        this._captureCanvasWidth = this._captureCanvasHeight = 0;
         this._resolvedCaptureCanvas = null;
         this._resetWebCodecsCaptureState();
         this._activeMimeType = DEFAULT_MIME_TYPE;
@@ -1265,12 +1311,18 @@ export class MediaRecorderSystem {
         this._notifyRecordingStateChange(false);
     }
     dispose() {
+        if (this._pendingStop || this._isRecording) this.settleRecording({ type: 'dispose' }).catch(() => {
+            this._cleanupRuntimeRecorder();
+            this._pendingStop = null;
+        });
         if (this._lastExport?.objectUrl) {
             URL.revokeObjectURL(this._lastExport.objectUrl);
         }
         this._lastExport = null;
         this._lifecycleEvents.length = 0;
-        this._cleanupRuntimeRecorder();
-        this._pendingStop = null;
+        if (!this._pendingStop && !this._isRecording) {
+            this._cleanupRuntimeRecorder();
+            this._pendingStop = null;
+        }
     }
 }

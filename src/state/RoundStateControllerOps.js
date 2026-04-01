@@ -2,6 +2,11 @@
 // RoundStateControllerOps.js - pure controller tick/transition helpers
 // ============================================
 
+import {
+    GAME_STATE_IDS,
+    normalizeGameStateId,
+} from '../shared/contracts/GameStateIds.js';
+
 function normalizeDt(value) {
     return Math.max(0, Number(value) || 0);
 }
@@ -19,7 +24,7 @@ export function deriveRoundEndControllerTransition(roundEndOutcome, options = {}
     const defaultRoundPause = normalizePause(options.defaultRoundPause, 3);
     return {
         roundPause: defaultRoundPause,
-        nextState: String(roundEndOutcome?.state || 'ROUND_END'),
+        nextState: normalizeGameStateId(roundEndOutcome?.state, GAME_STATE_IDS.ROUND_END),
         overlayMessageText: String(roundEndOutcome?.messageText || ''),
         overlayMessageSub: String(roundEndOutcome?.messageSub || ''),
     };

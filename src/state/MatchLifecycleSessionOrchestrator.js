@@ -1,32 +1,106 @@
-import { initializeMatchSession, disposeMatchSessionSystems } from './MatchSessionFactory.js';
+import {
+    disposeMatchSessionSystems,
+    prepareInitializedMatchSession,
+    wireInitializedMatchRuntime,
+} from './MatchSessionFactory.js';
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
 
-function isPromiseLike(value) {
-    return !!value && typeof value.then === 'function';
+function createLegacyOrchestratorDeps(runtime) {
+    const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
+    const getRecorder = () => runtime?.mediaRecorderSystem || runtime?.recorder || null;
+    return {
+        getLifecycleState: () => ({
+            mapKey: runtime?.mapKey || null,
+            numHumans: Number(runtime?.numHumans) || 0,
+            numBots: Number(runtime?.numBots) || 0,
+            winsNeeded: Number(runtime?.winsNeeded) || 0,
+            activeGameMode: runtime?.activeGameMode || null,
+        }),
+        notifyLifecycleEvent: (type, context) => getRecorder()?.notifyLifecycleEvent?.(type, context),
+        prepareInitializedMatchSession: (handlers = {}) => prepareInitializedMatchSession({
+            renderer: runtime?.renderer,
+            audio: runtime?.audio,
+            recorder: runtime?.recorder,
+            runtimeProfiler: runtime?.runtimePerfProfiler,
+            settings: runtime?.settings,
+            runtimeConfig: runtime?.runtimeConfig,
+            baseConfig: runtime?.config || null,
+            requestedMapKey: runtime?.mapKey,
+            currentSession: getCurrentMatchSessionRefs(),
+            ...handlers,
+        }),
+        wireInitializedMatchRuntime: (initializedMatch, handlers = {}) => wireInitializedMatchRuntime({
+            renderer: runtime?.renderer,
+            initializedMatch,
+            ...handlers,
+        }),
+        applyInitializedMatchSession: (initializedMatch) => runtime?.matchSessionRuntimeBridge?.applyInitializedMatchSession?.(initializedMatch),
+        getCurrentMatchSessionRefs,
+        clearMatchSessionRefs: () => runtime?.matchSessionRuntimeBridge?.clearMatchSessionRefs?.(),
+        disposePreparedMatchSession: (initializedMatch, options = {}) => {
+            if (!initializedMatch?.session) return;
+            disposeMatchSessionSystems(runtime?.renderer, initializedMatch.session, options);
+        },
+        disposeCurrentMatchSession: (options = {}) => {
+            const currentSession = getCurrentMatchSessionRefs();
+            if (!currentSession) return;
+            disposeMatchSessionSystems(runtime?.renderer, currentSession, options);
+        },
+        settleRecorder: (trigger = null) => {
+            const recorder = getRecorder();
+            if (recorder?.settleRecording) {
+                return recorder.settleRecording(trigger);
+            }
+            return null;
+        },
+        resetRoundRuntime: () => {
+            const currentSession = getCurrentMatchSessionRefs();
+            const entityManager = currentSession?.entityManager || null;
+            const powerupManager = currentSession?.powerupManager || null;
+            if (!entityManager || !powerupManager) return;
+
+            for (const player of entityManager.players) {
+                player.trail.clear();
+            }
+            powerupManager.clear();
+
+            runtime?.recorder?.startRound?.(entityManager.players);
+            entityManager.spawnAll();
+            runtime?.runtimeFacade?.arcadeRunRuntime?.applyPendingIntermissionEffects?.({
+                players: entityManager.players,
+            });
+            for (const player of entityManager.getHumanPlayers()) {
+                player.planarAimOffset = 0;
+            }
+        },
+    };
 }
 
 export class MatchLifecycleSessionOrchestrator {
     constructor(runtimeOrDeps = null) {
         const runtime = runtimeOrDeps?.runtime || runtimeOrDeps;
-        this.runtime = runtime || null;
+        this.deps = runtimeOrDeps?.prepareInitializedMatchSession
+            ? runtimeOrDeps
+            : createLegacyOrchestratorDeps(runtime);
         this._lifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
         this._sessionSequence = 0;
         this._activeSessionId = null;
+        this._pendingSessionInit = null;
     }
 
     _buildLifecycleContext(extra = null) {
-        const game = this.runtime;
+        const lifecycleState = this.deps?.getLifecycleState?.() || {};
         const context = {
             contractVersion: this._lifecycleContractVersion,
             sessionId: this._activeSessionId,
-            mapKey: game?.mapKey || null,
-            numHumans: Number(game?.numHumans) || 0,
-            numBots: Number(game?.numBots) || 0,
-            winsNeeded: Number(game?.winsNeeded) || 0,
-            activeGameMode: game?.activeGameMode || null,
+            mapKey: lifecycleState.mapKey || null,
+            numHumans: Number(lifecycleState.numHumans) || 0,
+            numBots: Number(lifecycleState.numBots) || 0,
+            winsNeeded: Number(lifecycleState.winsNeeded) || 0,
+            activeGameMode: lifecycleState.activeGameMode || null,
         };
         if (extra && typeof extra === 'object') {
             Object.assign(context, extra);
@@ -35,14 +109,10 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     _emitLifecycleEvent(type, extra = null) {
-        const game = this.runtime;
-        if (!game?.mediaRecorderSystem?.notifyLifecycleEvent) return;
-        game.mediaRecorderSystem.notifyLifecycleEvent(type, this._buildLifecycleContext(extra));
+        this.deps?.notifyLifecycleEvent?.(type, this._buildLifecycleContext(extra));
     }
 
     _startLifecycleSession(extra = null) {
-        // Session ID is now assigned in createMatchSession() before async work.
-        // If called without a prior provisional ID (legacy path), assign one now.
         if (!this._activeSessionId) {
             this._sessionSequence += 1;
             this._activeSessionId = `match-${this._sessionSequence}`;
@@ -60,91 +130,110 @@ export class MatchLifecycleSessionOrchestrator {
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
-    _applyInitializedMatch(initializedMatch, expectedSessionId) {
-        // Session-ID guard: reject stale async results from a superseded createMatchSession() call
-        if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
-            return initializedMatch;
+    async _disposePreparedMatch(initializedMatch, reason = 'stale_session_init') {
+        if (!initializedMatch) return;
+        try {
+            await Promise.resolve(this.deps?.disposePreparedMatchSession?.(initializedMatch, {
+                reason,
+                clearScene: true,
+            }));
+        } catch {
+            // Best-effort cleanup for discarded async init results.
         }
-        const game = this.runtime;
-        game.matchSessionRuntimeBridge.applyInitializedMatchSession(initializedMatch);
+    }
+
+    async _applyInitializedMatch(initializedMatch, expectedSessionId, lifecycleHandlers = {}) {
+        if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
+            await this._disposePreparedMatch(initializedMatch, 'stale_session_init');
+            return null;
+        }
+
+        const wiredMatch = await Promise.resolve(
+            this.deps?.wireInitializedMatchRuntime?.(initializedMatch, lifecycleHandlers) || initializedMatch
+        );
+        if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
+            await this._disposePreparedMatch(wiredMatch, 'stale_session_init');
+            return null;
+        }
+
+        this.deps?.applyInitializedMatchSession?.(wiredMatch);
+        const lifecycleState = this.deps?.getLifecycleState?.() || {};
         this._startLifecycleSession({
-            mapKey: initializedMatch?.session?.effectiveMapKey || game.mapKey || null,
-            numHumans: initializedMatch?.session?.numHumans || game.numHumans || 0,
-            numBots: initializedMatch?.session?.numBots || game.numBots || 0,
-            winsNeeded: initializedMatch?.session?.winsNeeded || game.winsNeeded || 0,
+            mapKey: wiredMatch?.session?.effectiveMapKey || lifecycleState.mapKey || null,
+            numHumans: wiredMatch?.session?.numHumans || lifecycleState.numHumans || 0,
+            numBots: wiredMatch?.session?.numBots || lifecycleState.numBots || 0,
+            winsNeeded: wiredMatch?.session?.winsNeeded || lifecycleState.winsNeeded || 0,
         });
-        return initializedMatch;
+        return wiredMatch;
     }
 
     createMatchSession({ onPlayerFeedback, onPlayerDied, onRoundEnd } = {}) {
-        const game = this.runtime;
-        if (!game) {
+        if (!this.deps?.prepareInitializedMatchSession) {
             throw new Error('MatchLifecycleSessionOrchestrator requires runtime context');
         }
         if (this._activeSessionId) {
             this._endLifecycleSession('new_match_session');
         }
 
-        // Stamp a provisional session ID before any async work so that
-        // a concurrent createMatchSession() call will invalidate this one.
         this._sessionSequence += 1;
         const provisionalId = `match-${this._sessionSequence}`;
         this._activeSessionId = provisionalId;
-
-        const initializedMatch = initializeMatchSession({
-            renderer: game.renderer,
-            audio: game.audio,
-            recorder: game.recorder,
-            runtimeProfiler: game.runtimePerfProfiler,
-            settings: game.settings,
-            runtimeConfig: game.runtimeConfig,
-            requestedMapKey: game.mapKey,
-            currentSession: game.matchSessionRuntimeBridge.getCurrentMatchSessionRefs(),
+        const lifecycleHandlers = {
             onPlayerFeedback,
             onPlayerDied,
             onRoundEnd,
-        });
-        if (isPromiseLike(initializedMatch)) {
-            return Promise.resolve(initializedMatch).then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch, provisionalId));
-        }
-        return this._applyInitializedMatch(initializedMatch, provisionalId);
+        };
+
+        const runPendingInit = () => Promise.resolve(
+            this.deps.prepareInitializedMatchSession(lifecycleHandlers)
+        ).then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch, provisionalId, lifecycleHandlers));
+
+        const queuedInit = this._pendingSessionInit
+            ? Promise.resolve(this._pendingSessionInit).catch(() => null).then(runPendingInit)
+            : runPendingInit();
+
+        const trackedInit = Promise.resolve(queuedInit)
+            .catch((error) => {
+                if (this._activeSessionId === provisionalId) {
+                    this._activeSessionId = null;
+                }
+                throw error;
+            })
+            .finally(() => {
+                if (this._pendingSessionInit === trackedInit) {
+                    this._pendingSessionInit = null;
+                }
+            });
+        this._pendingSessionInit = trackedInit;
+        return trackedInit;
     }
 
     bindHuntEventHandlers({ onHuntFeedEvent, onHuntDamageEvent } = {}) {
-        const game = this.runtime;
-        if (!game?.entityManager) return;
-        game.entityManager.onHuntFeedEvent = typeof onHuntFeedEvent === 'function' ? onHuntFeedEvent : null;
-        game.entityManager.onHuntDamageEvent = typeof onHuntDamageEvent === 'function' ? onHuntDamageEvent : null;
+        const entityManager = this.deps?.getCurrentMatchSessionRefs?.()?.entityManager || null;
+        if (!entityManager) return;
+        entityManager.onHuntFeedEvent = typeof onHuntFeedEvent === 'function' ? onHuntFeedEvent : null;
+        entityManager.onHuntDamageEvent = typeof onHuntDamageEvent === 'function' ? onHuntDamageEvent : null;
     }
 
     resetRoundRuntime() {
-        const game = this.runtime;
-        if (!game?.entityManager || !game?.powerupManager) return;
-
-        for (const player of game.entityManager.players) {
-            player.trail.clear();
-        }
-        game.powerupManager.clear();
-
-        game.recorder.startRound(game.entityManager.players);
-        game.entityManager.spawnAll();
-        game.runtimeFacade?.arcadeRunRuntime?.applyPendingIntermissionEffects?.({
-            players: game.entityManager.players,
-        });
-        for (const player of game.entityManager.getHumanPlayers()) {
-            player.planarAimOffset = 0;
-        }
+        this.deps?.resetRoundRuntime?.();
     }
 
-    teardownMatchSession(options = undefined) {
-        const game = this.runtime;
-        if (!game) return;
+    async teardownMatchSession(options = undefined) {
         const reason = typeof options === 'string'
             ? options
             : (options?.reason || 'return_to_menu');
         this._endLifecycleSession(reason);
-        disposeMatchSessionSystems(game.renderer, game.matchSessionRuntimeBridge.getCurrentMatchSessionRefs());
-        game.matchSessionRuntimeBridge.clearMatchSessionRefs();
+        this._activeSessionId = null;
+        if (this._pendingSessionInit) {
+            await Promise.resolve(this._pendingSessionInit).catch(() => null);
+        }
+        await Promise.resolve(this.deps?.settleRecorder?.({
+            type: 'session_teardown',
+            context: { reason },
+        }));
+        this.deps?.disposeCurrentMatchSession?.();
+        this.deps?.clearMatchSessionRefs?.();
         this.notifyMenuOpened();
     }
 }

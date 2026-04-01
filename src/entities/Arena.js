@@ -287,4 +287,50 @@ export class Arena {
             entry?.mesh?.tick?.(dt);
         }
     }
+
+    dispose() {
+        const removeObject = (object3d) => {
+            if (!object3d) return;
+            this.renderer?.removeFromScene?.(object3d);
+            disposeObject3DResources(object3d);
+        };
+
+        removeObject(this._floorMesh);
+        removeObject(this._mergedWallMesh);
+        removeObject(this._mergedObstacleMesh);
+        removeObject(this._mergedFoamMesh);
+        removeObject(this._mergedObstacleEdges);
+        removeObject(this._mergedFoamEdges);
+        removeObject(this.particles);
+
+        this._floorMesh = null;
+        this._mergedWallMesh = null;
+        this._mergedObstacleMesh = null;
+        this._mergedFoamMesh = null;
+        this._mergedObstacleEdges = null;
+        this._mergedFoamEdges = null;
+        this.particles = null;
+
+        this._clearLoadedGlbScene();
+        this._clearAuthoredAircraftDecorations();
+
+        for (const portal of this.portals || []) {
+            if (portal?.meshA) portal.meshA.visible = false;
+            if (portal?.meshB) portal.meshB.visible = false;
+        }
+        for (const gate of this.specialGates || []) {
+            if (gate?.mesh) gate.mesh.visible = false;
+        }
+        for (const exitPortal of this.exitPortals || []) {
+            if (exitPortal?.mesh) exitPortal.mesh.visible = false;
+        }
+
+        this.portals = [];
+        this.specialGates = [];
+        this.exitPortals = [];
+        this.obstacles = [];
+        this.currentMapDefinition = null;
+        this.runtimeMapDefinition = null;
+        this._lastBuildSignature = null;
+    }
 }

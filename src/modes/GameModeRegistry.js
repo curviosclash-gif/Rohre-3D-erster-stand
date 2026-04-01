@@ -9,14 +9,14 @@ import { ArcadeModeStrategy } from './ArcadeModeStrategy.js';
 
 const FACTORIES = {
     [GAME_MODE_TYPES.CLASSIC]: () => new ClassicModeStrategy(),
-    [GAME_MODE_TYPES.HUNT]: () => new HuntModeStrategy(),
+    [GAME_MODE_TYPES.HUNT]: (options = {}) => new HuntModeStrategy(options),
     [GAME_MODE_TYPES.ARCADE]: () => new ArcadeModeStrategy(),
 };
 
-export function createGameModeStrategy(modeType) {
+export function createGameModeStrategy(modeType, options = {}) {
     const normalized = String(modeType || '').trim().toUpperCase();
     const factory = FACTORIES[normalized] || FACTORIES[GAME_MODE_TYPES.CLASSIC];
-    return factory();
+    return factory(options);
 }
 
 export function registerGameModeStrategy(modeType, factoryFn) {

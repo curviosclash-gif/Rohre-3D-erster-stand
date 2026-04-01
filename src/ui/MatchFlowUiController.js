@@ -16,6 +16,10 @@ import {
     deriveReturnToMenuTransition,
     deriveRoundStartTransition,
 } from '../state/MatchLifecycleStateTransitions.js';
+import {
+    GAME_STATE_IDS,
+    normalizeGameStateId,
+} from '../shared/contracts/GameStateIds.js';
 
 function isPromiseLike(value) {
     return !!value && typeof value.then === 'function';
@@ -297,11 +301,11 @@ export class MatchFlowUiController {
             return;
         }
         const runtimeState = game?.runtimeFacade?.arcadeRunRuntime?.getMenuSurfaceState?.();
-        const state = String(game?.state || '').toUpperCase();
-        if (state === 'ROUND_END' && this._renderArcadeIntermissionPanel(runtimeState)) {
+        const state = normalizeGameStateId(game?.state, GAME_STATE_IDS.MENU);
+        if (state === GAME_STATE_IDS.ROUND_END && this._renderArcadeIntermissionPanel(runtimeState)) {
             return;
         }
-        if (state === 'MATCH_END' && this._renderArcadePostRunPanel(runtimeState)) {
+        if (state === GAME_STATE_IDS.MATCH_END && this._renderArcadePostRunPanel(runtimeState)) {
             return;
         }
         this._clearArcadeOverlayPanel();
@@ -364,7 +368,7 @@ export class MatchFlowUiController {
         if (!transition) return;
 
         if (typeof transition.state === 'string' && transition.state.length > 0) {
-            game.state = transition.state;
+            game.state = normalizeGameStateId(transition.state, game?.state || GAME_STATE_IDS.MENU);
         }
         if (typeof transition.roundPause === 'number') {
             game.roundPause = transition.roundPause;
@@ -509,7 +513,7 @@ export class MatchFlowUiController {
         return {
             mapKey: normalizeTelemetryString(game?.arena?.currentMapKey || game?.mapKey, 'standard'),
             mode: normalizeTelemetryString(game?.activeGameMode || game?.runtimeConfig?.session?.activeGameMode, 'classic').toLowerCase(),
-            state: normalizeTelemetryString(roundEndPlan?.outcome?.state, 'ROUND_END'),
+            state: normalizeGameStateId(roundEndPlan?.outcome?.state, GAME_STATE_IDS.ROUND_END),
             reason: normalizeTelemetryString(roundEndPlan?.outcome?.reason, 'ELIMINATION'),
             winnerType: roundMetrics.winnerIndex < 0
                 ? 'draw'
@@ -539,7 +543,7 @@ export class MatchFlowUiController {
         const telemetryPayload = this._buildRoundEndTelemetryPayload(roundEndPlan);
         if (!telemetryPayload) return;
         this.game?.runtimeFacade?.recordRoundEndTelemetry?.(telemetryPayload);
-        if (telemetryPayload.state === 'MATCH_END') {
+        if (telemetryPayload.state === GAME_STATE_IDS.MATCH_END) {
             this.game?.runtimeFacade?.recordMatchEndTelemetry?.(telemetryPayload);
         }
     }
@@ -694,7 +698,7 @@ export class MatchFlowUiController {
 
     onRoundEnd(winner, outcome = null) {
         const game = this.game;
-        game.state = 'ROUND_END';
+        game.state = GAME_STATE_IDS.ROUND_END;
         game.roundPause = 3.0;
 
         const roundEndPlan = coordinateRoundEnd(this.buildRoundEndCoordinatorRequest(winner, outcome));
@@ -758,7 +762,7 @@ export class MatchFlowUiController {
         const game = this.game;
         if (!roundEndTransition) return;
         game.roundPause = roundEndTransition.roundPause;
-        game.state = roundEndTransition.nextState;
+        game.state = normalizeGameStateId(roundEndTransition.nextState, GAME_STATE_IDS.ROUND_END);
     }
 
     applyReturnToMenuUi(options = {}) {

@@ -1,7 +1,7 @@
 # Feature Architektur-Runtime-Entkopplung V74
 
 Stand: 2026-03-31
-Status: In Arbeit (74.1-74.2 abgeschlossen; 74.99 wegen Playwright-Global-Setup-Probe-Timeouts offen)
+Status: In Arbeit (74.1-74.5 abgeschlossen; 74.99.1 wegen Playwright-Harness-/Global-Setup-Timeouts offen)
 Owner: Codex
 
 <!-- LOCK: Bot-Codex seit 2026-03-31 -->
@@ -77,15 +77,15 @@ Die verbleibenden Architektur-Leaks zwischen `Game`, `GameRuntimeFacade`, `Match
 
 ## Definition of Done (DoD)
 
-- [ ] DoD.1 `GameBootstrap`, `GameRuntimeFacade` und `MatchSessionRuntimeBridge` erzeugen und verdrahten Runtime-Abhaengigkeiten ueber explizite Bundles/Ports statt ueber breit verteilte `game.*`-Mutation als Default-Muster.
-- [ ] DoD.2 `ActiveRuntimeConfigStore` ist entweder klar als Uebergangsadapter isoliert oder aus den betroffenen Entity-/Hunt-/Arena-Pfaden herausgedraengt; Match-Lifecycle und Tests koennen Runtime-Konfiguration deterministisch ohne globalen Restzustand setzen und zuruecksetzen.
-- [ ] DoD.3 Der Match-Start-/Pause-/Return-Pfad zwischen Core und UI hat einen klaren Richtungssinn; `MatchFlowUiController` und `PauseOverlayController` rufen keine privaten Session-/Arcade-/Teardown-Interna der Facade mehr direkt auf, und Return-to-Menu laeuft ueber genau einen oeffentlichen Exit-Pfad.
-- [ ] DoD.4 `MatchLifecycleSessionOrchestrator` arbeitet gegen einen kleinen Session-Lifecycle-Port; verworfene oder ersetzte Initialisierungen sowie Recorder-/Session-Stopps werden deterministisch aufgeraeumt.
-- [ ] DoD.5 `EntityManager` und direkt benachbarte Entity-Runtime-Pfade lesen Modus-/Runtime-Informationen nicht mehr aus `src/core/**`-Globals oder dem `CONFIG`-Proxy, sondern aus expliziten Setup-/Contract-Parametern.
-- [ ] DoD.6 Der Vertragsbruch zwischen Menue-`multiplayer`, Storage-Bridge und echter Match-Runtime ist aufgeloest oder explizit umbenannt/dokumentiert; State-IDs laufen konsistent ueber `GAME_STATE_IDS`, und Core-DOM-/Error-Overlays sind sauber in Runtime-/UI-Grenzen eingeordnet.
-- [ ] DoD.7 Architektur-Guards und Metriken bilden die neue Baseline ab und lassen keine neuen Legacy-Ausnahmen fuer `ui -> core`, `entities -> core`, `constructor(game)`, globale Runtime-Stores oder private Cross-Layer-Ports entstehen.
+- [x] DoD.1 `GameBootstrap`, `GameRuntimeFacade` und `MatchSessionRuntimeBridge` erzeugen und verdrahten Runtime-Abhaengigkeiten ueber explizite Bundles/Ports statt ueber breit verteilte `game.*`-Mutation als Default-Muster. (abgeschlossen: 2026-03-31; evidence: npm run build -> passed)
+- [x] DoD.2 `ActiveRuntimeConfigStore` ist entweder klar als Uebergangsadapter isoliert oder aus den betroffenen Entity-/Hunt-/Arena-Pfaden herausgedraengt; Match-Lifecycle und Tests koennen Runtime-Konfiguration deterministisch ohne globalen Restzustand setzen und zuruecksetzen. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:metrics -> entities -> core legacy edge budget 22/22)
+- [x] DoD.3 Der Match-Start-/Pause-/Return-Pfad zwischen Core und UI hat einen klaren Richtungssinn; `MatchFlowUiController` und `PauseOverlayController` rufen keine privaten Session-/Arcade-/Teardown-Interna der Facade mehr direkt auf, und Return-to-Menu laeuft ueber genau einen oeffentlichen Exit-Pfad. (abgeschlossen: 2026-03-31; evidence: npm run build -> passed)
+- [x] DoD.4 `MatchLifecycleSessionOrchestrator` arbeitet gegen einen kleinen Session-Lifecycle-Port; verworfene oder ersetzte Initialisierungen sowie Recorder-/Session-Stopps werden deterministisch aufgeraeumt. (abgeschlossen: 2026-03-31; evidence: tests/core.spec.js -> V74 stale-init regression added)
+- [x] DoD.5 `EntityManager` und direkt benachbarte Entity-Runtime-Pfade lesen Modus-/Runtime-Informationen nicht mehr aus `src/core/**`-Globals oder dem `CONFIG`-Proxy, sondern aus expliziten Setup-/Contract-Parametern. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:metrics -> entities -> core legacy edge budget 22/22)
+- [x] DoD.6 Der Vertragsbruch zwischen Menue-`multiplayer`, Storage-Bridge und echter Match-Runtime ist aufgeloest oder explizit umbenannt/dokumentiert; State-IDs laufen konsistent ueber `GAME_STATE_IDS`, und Core-DOM-/Error-Overlays sind sauber in Runtime-/UI-Grenzen eingeordnet. (abgeschlossen: 2026-03-31; evidence: docs/referenz/ai_architecture_context.md -> updated)
+- [x] DoD.7 Architektur-Guards und Metriken bilden die neue Baseline ab und lassen keine neuen Legacy-Ausnahmen fuer `ui -> core`, `entities -> core`, `constructor(game)`, globale Runtime-Stores oder private Cross-Layer-Ports entstehen. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:boundaries -> passed)
 - [ ] DoD.8 Match-, Multiplayer-, Arcade-, Recorder- und Pause-Lifecycle bleiben funktional stabil; relevante Regressionen fuer Start, Return-to-Menu, Session-Wechsel, Recorder-Stop und Storage-Bridge-Sonderfaelle sind durch Tests oder Smokes abgesichert.
-- [ ] DoD.9 `docs/referenz/ai_architecture_context.md` und der externe Plan dokumentieren die neuen Verantwortungsgrenzen, Runtime-Vertraege und benannten Rest-Adapter nachvollziehbar.
+- [x] DoD.9 `docs/referenz/ai_architecture_context.md` und der externe Plan dokumentieren die neuen Verantwortungsgrenzen, Runtime-Vertraege und benannten Rest-Adapter nachvollziehbar. (abgeschlossen: 2026-03-31; evidence: npm run docs:check -> passed)
 - [ ] DoD.10 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und die direkt betroffenen Runtime-/Architektur-Checks sind gruen.
 
 ## Evidenzformat
@@ -113,36 +113,36 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 ### 74.3 Match-Session-Lifecycle und Stale-Cleanup haerten
 
-- [ ] 74.3.1 `MatchLifecycleSessionOrchestrator` von einem Vollzugriff auf `runtime/game` auf ein kleines Dependency-Objekt oder Session-Port umstellen, das nur die fuer Match-Initialisierung, Round-Reset und Teardown notwendigen Operationen enthaelt.
-- [ ] 74.3.2 Den Session-ID-Guard so erweitern, dass verworfene `initializeMatchSession()`-Ergebnisse aktiv disposed werden und keine Arena-, Entity-, Particle- oder Camera-Reste im Renderer oder Runtime-Bridge-Zustand verbleiben.
-- [ ] 74.3.3 Fuer Matchstart, Abbruch waehrend Async-Init, Multiplayer-Load-Gate und Return-to-Menu deterministische Cleanup- und Error-Pfade definieren, damit Lifecycle-Races nicht mehr nur durch `_startMatchPromise` maskiert werden.
-- [ ] 74.3.4 `MediaRecorderSystem` in den Lifecycle einschliessen: offene `stopRecording()`-/Finalize-Promises muessen bei Dispose, Session-Abbruch oder Return-to-Menu deterministisch abgeschlossen werden, statt in orphaned Pending-States zu enden.
+- [x] 74.3.1 `MatchLifecycleSessionOrchestrator` von einem Vollzugriff auf `runtime/game` auf ein kleines Dependency-Objekt oder Session-Port umstellen, das nur die fuer Match-Initialisierung, Round-Reset und Teardown notwendigen Operationen enthaelt. (abgeschlossen: 2026-03-31; evidence: npm run build -> passed)
+- [x] 74.3.2 Den Session-ID-Guard so erweitern, dass verworfene `initializeMatchSession()`-Ergebnisse aktiv disposed werden und keine Arena-, Entity-, Particle- oder Camera-Reste im Renderer oder Runtime-Bridge-Zustand verbleiben. (abgeschlossen: 2026-03-31; evidence: tests/core.spec.js -> V74 stale-init regression added)
+- [x] 74.3.3 Fuer Matchstart, Abbruch waehrend Async-Init, Multiplayer-Load-Gate und Return-to-Menu deterministische Cleanup- und Error-Pfade definieren, damit Lifecycle-Races nicht mehr nur durch `_startMatchPromise` maskiert werden. (abgeschlossen: 2026-03-31; evidence: npm run build -> passed)
+- [x] 74.3.4 `MediaRecorderSystem` in den Lifecycle einschliessen: offene `stopRecording()`-/Finalize-Promises muessen bei Dispose, Session-Abbruch oder Return-to-Menu deterministisch abgeschlossen werden, statt in orphaned Pending-States zu enden. (abgeschlossen: 2026-03-31; evidence: tests/core.spec.js -> T20aj4a added)
 
 ### 74.4 Entity-Runtime von Core-Globals loesen
 
-- [ ] 74.4.1 `EntityManager` so umbauen, dass Modus, Bot-Policy, Runtime-Config und aktive Strategie ausschliesslich ueber Setup-/Factory-Parameter oder dedizierte Contracts gesetzt werden und keine `src/core/**`-Imports fuer aktive Runtime-Entscheidungen mehr benoetigt werden.
-- [ ] 74.4.2 `ActiveRuntimeConfigStore`-Abhaengigkeiten in Entity-/Mode-Pfaden inventarisieren und auf lokale Runtime-Kontexte oder `shared/contracts` umstellen, damit `entities` isoliert instanziierbar und testbarer wird.
-- [ ] 74.4.3 Den Entity-Setup-Pfad in `MatchSessionFactory` und benachbarten Setup-Ops auf die neuen Contracts umstellen und dabei klar dokumentieren, welche Werte pro Match-Session, pro Round und pro Player gelten.
-- [ ] 74.4.4 Die direkten `CONFIG`-/Proxy-Leser in `Trail`, `Powerup`, Projectile-, Portal- und Hunt-Pfaden priorisieren und schrittweise auf explizite Runtime-Inputs umstellen, damit Match-spezifische Konfiguration nicht mehr als globaler Ambient-State in die Simulation einsickert.
+- [x] 74.4.1 `EntityManager` so umbauen, dass Modus, Bot-Policy, Runtime-Config und aktive Strategie ausschliesslich ueber Setup-/Factory-Parameter oder dedizierte Contracts gesetzt werden und keine `src/core/**`-Imports fuer aktive Runtime-Entscheidungen mehr benoetigt werden. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:metrics -> entities -> core legacy edge budget 22/22)
+- [x] 74.4.2 `ActiveRuntimeConfigStore`-Abhaengigkeiten in Entity-/Mode-Pfaden inventarisieren und auf lokale Runtime-Kontexte oder `shared/contracts` umstellen, damit `entities` isoliert instanziierbar und testbarer wird. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:metrics -> entities -> core legacy edge budget 22/22)
+- [x] 74.4.3 Den Entity-Setup-Pfad in `MatchSessionFactory` und benachbarten Setup-Ops auf die neuen Contracts umstellen und dabei klar dokumentieren, welche Werte pro Match-Session, pro Round und pro Player gelten. (abgeschlossen: 2026-03-31; evidence: docs/referenz/ai_architecture_context.md -> updated)
+- [x] 74.4.4 Die direkten `CONFIG`-/Proxy-Leser in `Trail`, `Powerup`, Projectile-, Portal- und Hunt-Pfaden priorisieren und schrittweise auf explizite Runtime-Inputs umstellen, damit Match-spezifische Konfiguration nicht mehr als globaler Ambient-State in die Simulation einsickert. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:metrics -> entities -> core legacy edge budget 22/22)
 
 ### 74.5 Vertragsklarheit, Guard-Ratchet, Tests und Dokumentation
 
-- [ ] 74.5.1 Den Vertragsbruch zwischen Menue-`multiplayer`, Storage-Bridge und Match-Runtime explizit aufloesen: entweder durch klares Renaming/Scoping des Storage-Bridge-Modus oder durch einen echten, zur Runtime passenden Transportvertrag.
-- [ ] 74.5.2 State-IDs und Lifecycle-Contracts vereinheitlichen: rohe String-Zustaende (`'MENU'`, `'PLAYING'`, `'ROUND_END'`, ...) durch `GAME_STATE_IDS` bzw. klare Contract-Helfer ersetzen und Drift zwischen Core, State und UI abbauen.
-- [ ] 74.5.3 Core-DOM-/Overlay-Verantwortung inventarisieren (`GameLoop`, `RuntimeDiagnosticsSystem`, Fehler-Overlay) und entscheiden, was in UI/Debug-Infrastruktur wandert und was als klar markierter Runtime-Debug-Adapter bestehen bleiben darf.
-- [ ] 74.5.4 Architektur-Reports und Boundary-/Metrics-Checks um die neue Baseline nachziehen, damit private Cross-Layer-Vertraege, `entities -> core`-Reste, globale Runtime-Store-Abhaengigkeiten oder neue `constructor(game)`-Legacy-Pfade nicht erneut still wachsen.
-- [ ] 74.5.5 Gezielte Regressionstests oder Smokes fuer Matchstart, Session-Abbruch, Return-to-Menu, Multiplayer-Load-Gate, Recorder-Stop/Dispose und Entity-Setup ohne Core-Globals ergaenzen.
-- [ ] 74.5.6 Die Architektur-Referenz, insbesondere das Zielbild fuer `Game`, `GameRuntimeFacade`, `MatchFlowUiController`, Session-Orchestrierung, Runtime-Config-Lebenszyklus und Entity-Runtime, auf den neuen Zustand aktualisieren.
+- [x] 74.5.1 Den Vertragsbruch zwischen Menue-`multiplayer`, Storage-Bridge und Match-Runtime explizit aufloesen: entweder durch klares Renaming/Scoping des Storage-Bridge-Modus oder durch einen echten, zur Runtime passenden Transportvertrag. (abgeschlossen: 2026-03-31; evidence: tests/core.spec.js -> T20ae4 added)
+- [x] 74.5.2 State-IDs und Lifecycle-Contracts vereinheitlichen: rohe String-Zustaende (`'MENU'`, `'PLAYING'`, `'ROUND_END'`, ...) durch `GAME_STATE_IDS` bzw. klare Contract-Helfer ersetzen und Drift zwischen Core, State und UI abbauen. (abgeschlossen: 2026-03-31; evidence: npm run smoke:roundstate -> passed)
+- [x] 74.5.3 Core-DOM-/Overlay-Verantwortung inventarisieren (`GameLoop`, `RuntimeDiagnosticsSystem`, Fehler-Overlay) und entscheiden, was in UI/Debug-Infrastruktur wandert und was als klar markierter Runtime-Debug-Adapter bestehen bleiben darf. (abgeschlossen: 2026-03-31; evidence: docs/referenz/ai_architecture_context.md -> updated)
+- [x] 74.5.4 Architektur-Reports und Boundary-/Metrics-Checks um die neue Baseline nachziehen, damit private Cross-Layer-Vertraege, `entities -> core`-Reste, globale Runtime-Store-Abhaengigkeiten oder neue `constructor(game)`-Legacy-Pfade nicht erneut still wachsen. (abgeschlossen: 2026-03-31; evidence: npm run check:architecture:metrics -> passed)
+- [x] 74.5.5 Gezielte Regressionstests oder Smokes fuer Matchstart, Session-Abbruch, Return-to-Menu, Multiplayer-Load-Gate, Recorder-Stop/Dispose und Entity-Setup ohne Core-Globals ergaenzen. (abgeschlossen: 2026-03-31; evidence: tests/core.spec.js -> T20aj4a/T20ae4/V74.3 added)
+- [x] 74.5.6 Die Architektur-Referenz, insbesondere das Zielbild fuer `Game`, `GameRuntimeFacade`, `MatchFlowUiController`, Session-Orchestrierung, Runtime-Config-Lebenszyklus und Entity-Runtime, auf den neuen Zustand aktualisieren. (abgeschlossen: 2026-03-31; evidence: npm run docs:check -> passed)
 
 ### 74.99 Integrations- und Abschluss-Gate
 
 - [ ] 74.99.1 `npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:architecture:metrics` und die direkt betroffenen Runtime-Tests/Smokes sind fuer den Scope gruen.
-- [ ] 74.99.2 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind abgeschlossen; verbleibende Rest-Hotspots ausserhalb des Block-Scopes sind dokumentiert, bevor `74.99` geschlossen wird.
+- [x] 74.99.2 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind abgeschlossen; verbleibende Rest-Hotspots ausserhalb des Block-Scopes sind dokumentiert, bevor `74.99` geschlossen wird. (abgeschlossen: 2026-03-31; evidence: npm run docs:check -> passed)
 
 Gate-Status 2026-03-31:
 
-- Architektur- und Build-Gates sind gruen (`npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:eslint:touched-strict`, `npm run build`).
-- Automatisierte Browser-Verifikation bleibt offen: `node scripts/verify-lock.mjs --playwright -- npx playwright test tests/runtime-facade.spec.js --reporter=line` lief mit `TEST_PORT=5348` in ein Tool-Timeout; `test-results/v74-runtime-facade-spec/playwright-startup-diagnostics.json` zeigt weiter `probe-timeout` und `fetch failed` in `tests/playwright.global-setup.js`.
+- Architektur-, Build- und Docs-Gates sind gruen (`npm run build`, `npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:architecture:metrics`, `npm run smoke:roundstate`, `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`).
+- Automatisierte Browser-Verifikation bleibt offen: `npm run test:core`, `npm run test:physics`, `npm run test:physics:core` und ein gezielter V74-Grep-Run liefen weiter nur in Tool-/Harness-Timeouts.
 - Der kurzfristige Parser-Blocker durch BOM in `scripts/validate-umsetzungsplan.mjs` ist im Scope-Fix `f25a4db` behoben; verbleibend ist der Browser-Prewarm-/Global-Setup-Blocker. Siehe `docs/Fehlerberichte/2026-03-31_v74-playwright-browser-prewarm-timeout.md`.
 
 ## Verifikationsstrategie

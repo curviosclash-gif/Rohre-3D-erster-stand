@@ -2,6 +2,7 @@
 // MatchStartValidationService.js - validates menu state before match start
 // ============================================
 import { isMapEligibleForModePath } from '../../shared/contracts/MapModeContract.js';
+import { resolveRuntimeSessionContract } from '../../shared/contracts/RuntimeSessionContract.js';
 
 export function resolveMatchStartValidationIssue({
     settings = {},
@@ -11,7 +12,8 @@ export function resolveMatchStartValidationIssue({
     huntModeType = 'HUNT',
     classicModeType = 'CLASSIC',
 } = {}) {
-    const sessionType = String(settings?.localSettings?.sessionType || 'single').toLowerCase();
+    const sessionContract = resolveRuntimeSessionContract(settings?.localSettings);
+    const sessionType = sessionContract.sessionType;
     const mapKey = String(settings?.mapKey || '').trim();
     const mapExists = mapKey === 'custom' || !!maps?.[mapKey];
     if (!mapExists) {
@@ -42,7 +44,7 @@ export function resolveMatchStartValidationIssue({
         }
     }
 
-    if (sessionType === 'multiplayer') {
+    if (sessionContract.usesMenuStorageBridge) {
         const sessionState = multiplayerSessionState && typeof multiplayerSessionState === 'object'
             ? multiplayerSessionState
             : null;

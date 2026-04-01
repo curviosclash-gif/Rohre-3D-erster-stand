@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CameraCollisionSolver } from './CameraCollisionSolver.js';
 
 function toPositiveNumber(value, fallback) {
     const numeric = Number(value);
@@ -161,6 +162,7 @@ export class RecordingOrbitCameraDirector {
         this._tmpMidpoint = new THREE.Vector3();
         this._tmpToOther = new THREE.Vector3();
         this._up = new THREE.Vector3(0, 1, 0);
+        this._collisionSolver = new CameraCollisionSolver();
     }
 
     reset() {
@@ -183,6 +185,7 @@ export class RecordingOrbitCameraDirector {
         this._fovTarget.length = 0;
         this._fovSnapBackTimer.length = 0;
         this._letterboxTimer.length = 0;
+        this._collisionSolver.reset();
     }
 
     /** Returns letterbox progress 0..1 for the given player slot. */
@@ -576,6 +579,15 @@ export class RecordingOrbitCameraDirector {
         this._updateLetterbox(playerIndex, shotType, safeDt);
 
         this._computeDesiredShotPosition(shotType, phase, playerIndex, playerPosition, cfg, otherPlayerPosition);
+        if (arena && typeof arena.checkCollision === 'function') {
+            this._collisionSolver.resolve(
+                playerIndex,
+                `recording-orbit-${slotStyle}`,
+                playerPosition,
+                this._tmpDesiredPosition,
+                arena
+            );
+        }
 
         const finitePosition = Number.isFinite(this._tmpDesiredPosition.x)
             && Number.isFinite(this._tmpDesiredPosition.y)
