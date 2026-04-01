@@ -137,21 +137,21 @@ Die folgenden Phasen bleiben als gemeinsamer Programmplan bestehen, werden fuer 
 
 ### 80.1 Benchmark-Vertrag und Champion-Baseline einfrieren
 
-- [ ] 80.1.1 Eine verbindliche Benchmark-Matrix fuer Modi, Seeds, Maps, Szenarioklassen, Gegnerprofile, Episodenbudget und Bewertungsfenster definieren, damit kuenftige Vergleiche nicht mehr zwischen Laeufen driften.
-- [ ] 80.1.2 Einen klaren Champion-Referenzstand festlegen, inklusive letzter belastbarer BT11-/BT20-Referenzen, eingefrorener Checkpoints und dokumentierter Semantikversionen fuer Portale, Gates, Items und Shield.
-- [ ] 80.1.3 Ein Benchmark-Manifest-Format und einen Runnerpfad festlegen, der jeden Kandidatenlauf mit denselben Eingaben und denselben Reportpfaden ausfuehrt.
+- [x] 80.1.1 Eine verbindliche Benchmark-Matrix fuer Modi, Seeds, Maps, Szenarioklassen, Gegnerprofile, Episodenbudget und Bewertungsfenster definieren, damit kuenftige Vergleiche nicht mehr zwischen Laeufen driften. (abgeschlossen: 2026-04-01; evidence: Benchmark-Contract + Runtime-Matrix -> `src/state/training/TrainingBenchmarkContract.js`, `src/state/validation/BotValidationMatrix.js`)
+- [x] 80.1.2 Einen klaren Champion-Referenzstand festlegen, inklusive letzter belastbarer BT11-/BT20-Referenzen, eingefrorener Checkpoints und dokumentierter Semantikversionen fuer Portale, Gates, Items und Shield. (abgeschlossen: 2026-04-01; evidence: frozen references + compare rules -> `src/state/training/TrainingBenchmarkContract.js`, `docs/bot-training/Bot_Trainings_Roadmap.md`)
+- [x] 80.1.3 Ein Benchmark-Manifest-Format und einen Runnerpfad festlegen, der jeden Kandidatenlauf mit denselben Eingaben und denselben Reportpfaden ausfuehrt. (abgeschlossen: 2026-04-01; evidence: run/eval/gate manifest/report wiring -> `scripts/training-run.mjs`, `scripts/training-eval.mjs`, `scripts/training-gate.mjs`, `scripts/training-benchmark-artifacts.mjs`)
 
 ### 80.2 Messpipeline, Failure-Taxonomie und harte Artefaktpflicht
 
-- [ ] 80.2.1 Eval, Gate, `bot:validate`, Resume-Health, Decision-Trace und Hardware-Telemetrie in einen gemeinsamen Benchmark-Report zusammenziehen, damit Survival, Stabilitaet und Durchsatz in einem Blick sichtbar sind.
-- [ ] 80.2.2 Failure-Codes fuer `player-dead`, `match-loss`, `forced-round`, `timeout-round`, `bridge-fallback`, `resume-failed`, `artifact-missing`, `validation-disabled` und weitere Kernbilder standardisieren.
-- [ ] 80.2.3 Gates so haerten, dass fehlende oder deaktivierte Reports nicht mehr als stilles `pass` durchlaufen duerfen.
+- [x] 80.2.1 Eval, Gate, `bot:validate`, Resume-Health, Decision-Trace und Hardware-Telemetrie in einen gemeinsamen Benchmark-Report zusammenziehen, damit Survival, Stabilitaet und Durchsatz in einem Blick sichtbar sind. (abgeschlossen: 2026-04-01; evidence: benchmark report + decision trace + hardware telemetry -> `scripts/training-gate.mjs`, `scripts/training-eval.mjs`, `scripts/training-run.mjs`)
+- [x] 80.2.2 Failure-Codes fuer `player-dead`, `match-loss`, `forced-round`, `timeout-round`, `bridge-fallback`, `resume-failed`, `artifact-missing`, `validation-disabled` und weitere Kernbilder standardisieren. (abgeschlossen: 2026-04-01; evidence: failure taxonomy in contract + bot-validation report -> `src/state/training/TrainingBenchmarkContract.js`, `scripts/bot-validation-runner.mjs`)
+- [x] 80.2.3 Gates so haerten, dass fehlende oder deaktivierte Reports nicht mehr als stilles `pass` durchlaufen duerfen. (abgeschlossen: 2026-04-01; evidence: hard fail on missing/disabled bot-validation + artifact audit -> `scripts/training-bot-validation-lane.mjs`, `scripts/training-gate.mjs`, `tests/training-gate.test.mjs`)
 
 ### 80.3 Kapazitaetsprofiling und Maxleistungsprofile fuer lokale Hardware
 
-- [ ] 80.3.1 Einen Engpass-Scan fuer Trainer-Server, Bridge, Serialization, Replay, Checkpoint-Export, Eval-Lane, Report-IO und Preview-/Publish-Pfade aufbauen.
-- [ ] 80.3.2 Leistungsprofile wie `quick-benchmark`, `ablation`, `overnight-high-util` und `marathon` definieren, jeweils mit konkreten Budgets fuer Workerzahl, Batch-Groesse, Replay, Sync-Intervalle, Checkpoint-Frequenz und Parallelitaet.
-- [ ] 80.3.3 Guardrails fuer Temperatur, Backpressure, Queue-Tiefen, Latency-Spikes, Resume-Haeufigkeit und Artefaktstau einbauen, damit "maximal nutzen" nicht in "unstabil kaputtfahren" endet.
+- [/] 80.3.1 Einen Engpass-Scan fuer Trainer-Server, Bridge, Serialization, Replay, Checkpoint-Export, Eval-Lane, Report-IO und Preview-/Publish-Pfade aufbauen. (stand: 2026-04-01; evidence: loop/run throughput + stage timings + hardware telemetry -> `scripts/training-loop.mjs`, `scripts/training-run.mjs`, `scripts/training-gate.mjs`; Rest: Preview-/Publish-spezifische Lane noch nicht separat instrumentiert)
+- [x] 80.3.2 Leistungsprofile wie `quick-benchmark`, `ablation`, `overnight-high-util` und `marathon` definieren, jeweils mit konkreten Budgets fuer Workerzahl, Batch-Groesse, Replay, Sync-Intervalle, Checkpoint-Frequenz und Parallelitaet. (abgeschlossen: 2026-04-01; evidence: profiles + runnable npm entries -> `src/state/training/TrainingBenchmarkContract.js`, `scripts/training-loop.mjs`, `package.json`)
+- [x] 80.3.3 Guardrails fuer Temperatur, Backpressure, Queue-Tiefen, Latency-Spikes, Resume-Haeufigkeit und Artefaktstau einbauen, damit "maximal nutzen" nicht in "unstabil kaputtfahren" endet. (abgeschlossen: 2026-04-01; evidence: guardrail evaluation in gate/report -> `src/state/training/TrainingBenchmarkContract.js`, `scripts/training-gate.mjs`; Hinweis: Temperatur ist explizit als `unavailable/observe-only` markiert, nicht still ignoriert)
 
 ### 80.4 Trainingsumgebung von synthetisch zu runtime-nah heben
 

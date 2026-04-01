@@ -23,6 +23,17 @@ Aktueller Laufstand:
 - `invalidActionRate`: `0.000000`
 - `averageBotSurvival`: `null` (noch kein frischer bot-validation Report im Run-Ordner)
 
+## Benchmark-First Freeze (BT80A Prep, 2026-04-01)
+
+- Benchmark-Contract und Leistungsprofile liegen jetzt in `src/state/training/TrainingBenchmarkContract.js`.
+- Eingefrorene Referenzen:
+  - Legacy-Baseline: `20260321T180755Z-r01`
+  - Champion: `BT11_FIGHT_20260324T014853-r4042`
+  - BT20 bleibt nur Challenger-Referenz: `BT20_SURV_20260328T000841-r728` ist ohne eingefrorenen `bot:validate`-Runreport nicht champion-faehig.
+- Pflichtartefakte fuer kuenftige Promotions: `benchmark-manifest.json`, `decision-trace.json`, `benchmark-report.json`, `bot-validation-report.json`, Resume-Health und Hardware-Telemetrie.
+- Benannte Profile fuer lokale Hardware: `quick-benchmark`, `ablation`, `overnight-high-util`, `marathon`.
+- Vergleichsregel: Promotion nur gegen denselben Benchmark-Vertrag und dasselbe Semantikfenster `pre-v72-runtime-freeze-2026-04-01`.
+
 ## Zielkorridor bis Q2-Ende
 
 | Ziel | Baseline | Q2 Ziel | Delta |
