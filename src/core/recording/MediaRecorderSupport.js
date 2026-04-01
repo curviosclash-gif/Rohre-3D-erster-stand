@@ -12,6 +12,11 @@ const MEDIA_RECORDER_MIME_CANDIDATES = Object.freeze([
     'video/webm;codecs=vp8',
     'video/webm',
 ]);
+const DESKTOP_APP_MEDIARECORDER_MIME_CANDIDATES = Object.freeze([
+    'video/webm;codecs=vp9',
+    'video/webm;codecs=vp8',
+    'video/webm',
+]);
 
 export const WEB_CODECS_CODEC_CANDIDATES = Object.freeze([
     // AVC (H.264) — best compatibility with editors (CapCut, Premiere, etc.)
@@ -54,6 +59,11 @@ export function resolveGlobalScope(explicitScope = null) {
         return globalThis;
     }
     return {};
+}
+
+export function isDesktopAppRuntime(globalScope = null) {
+    const scope = resolveGlobalScope(globalScope);
+    return scope?.curviosApp?.isApp === true || scope?.__CURVIOS_APP__ === true;
 }
 
 export function resolvePerfNow(globalScope) {
@@ -108,6 +118,18 @@ export function resolveSafeMediaRecorderMimeType(globalScope, preferredMimeType 
         return preferred;
     }
     return resolveMediaRecorderMimeType(globalScope) || '';
+}
+
+export function resolveDesktopAppMediaRecorderMimeType(globalScope) {
+    for (const mimeType of DESKTOP_APP_MEDIARECORDER_MIME_CANDIDATES) {
+        const resolved = resolveSafeMediaRecorderMimeType(globalScope, mimeType);
+        if (resolved) {
+            return resolved;
+        }
+    }
+    return resolveSafeMediaRecorderMimeType(globalScope, 'video/webm')
+        || resolveMediaRecorderMimeType(globalScope)
+        || DEFAULT_FALLBACK_MIME_TYPE;
 }
 
 export function detectNativeRecorderSupport(globalScope, canvas = null) {

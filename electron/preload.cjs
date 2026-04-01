@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('curviosApp', {
     startLanServer: () => ipcRenderer.invoke('start-lan-server'),
     stopLanServer: () => ipcRenderer.invoke('stop-lan-server'),
     saveReplay: (jsonString, defaultName) => ipcRenderer.invoke('save-replay', jsonString, defaultName),
+    saveVideo: (videoBytes, defaultName, mimeType) => ipcRenderer.invoke('save-video', videoBytes, defaultName, mimeType),
     startDiscovery: () => ipcRenderer.invoke('start-discovery'),
     stopDiscovery: () => ipcRenderer.invoke('stop-discovery'),
     getDiscoveredHosts: () => ipcRenderer.invoke('get-discovered-hosts'),

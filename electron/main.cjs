@@ -341,6 +341,35 @@ ipcMain.handle('save-replay', async (_event, jsonString, defaultName) => {
     return false;
 });
 
+ipcMain.handle('save-video', async (_event, videoBytes, defaultName, mimeType) => {
+    try {
+        const normalizedName = String(defaultName || 'recording.webm').trim() || 'recording.webm';
+        const ext = path.extname(normalizedName).toLowerCase();
+        const fallbackExt = String(mimeType || '').toLowerCase().includes('mp4') ? 'mp4' : 'webm';
+        const defaultPath = ext ? normalizedName : `${normalizedName}.${fallbackExt}`;
+        const filters = ext === '.mp4'
+            ? [{ name: 'MP4 Video', extensions: ['mp4'] }]
+            : [{ name: 'WebM Video', extensions: ['webm'] }, { name: 'MP4 Video', extensions: ['mp4'] }];
+        const result = await dialog.showSaveDialog(mainWindow, {
+            title: 'Video speichern',
+            defaultPath,
+            filters,
+        });
+
+        if (!result.canceled && result.filePath) {
+            const bytes = videoBytes instanceof Uint8Array
+                ? videoBytes
+                : new Uint8Array(videoBytes || []);
+            writeFileSync(result.filePath, Buffer.from(bytes));
+            return { saved: true, filePath: result.filePath };
+        }
+    } catch {
+        // Surface failure as a structured result for the renderer.
+    }
+
+    return { saved: false };
+});
+
 async function shutdownRuntime() {
     stopDiscoveryListener();
     await Promise.allSettled([

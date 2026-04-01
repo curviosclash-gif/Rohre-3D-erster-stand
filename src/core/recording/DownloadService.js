@@ -64,6 +64,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     }
     const safeFileName = String(fileName || '').trim();
     const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
+    const appSaveVideo = globalThis?.curviosApp?.saveVideo;
     const downloadViaBrowser = (reason, error = null) => {
         if (error) {
             logger?.warn?.(`[DownloadService] recording export fallback (${reason})`, error);
@@ -76,6 +77,24 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
             return false;
         }
     };
+    if (typeof appSaveVideo === 'function' && typeof blob.arrayBuffer === 'function') {
+        try {
+            const bytes = new Uint8Array(await blob.arrayBuffer());
+            const appResult = await appSaveVideo(bytes, browserFileName, mimeType);
+            if (appResult?.saved === true) {
+                logger?.info?.('[DownloadService] recording export saved via electron app', browserFileName);
+                return {
+                    requested: true,
+                    transport: 'app',
+                    status: 'saved_via_app',
+                    fallbackReason: null,
+                    apiStatus: null,
+                };
+            }
+        } catch (error) {
+            logger?.warn?.('[DownloadService] recording export app save failed', error);
+        }
+    }
     if (typeof fetch !== 'function') {
         const downloaded = downloadViaBrowser('fetch-unavailable');
         return {

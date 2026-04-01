@@ -15,7 +15,9 @@ import {
     DEFAULT_FALLBACK_MIME_TYPE,
     DEFAULT_MIME_TYPE,
     detectNativeRecorderSupport,
+    isDesktopAppRuntime,
     RECORDER_ENGINE,
+    resolveDesktopAppMediaRecorderMimeType,
     resolveGlobalScope,
     resolvePerfNow,
     resolveSafeMediaRecorderMimeType,
@@ -161,6 +163,20 @@ export class MediaRecorderSystem {
         }
         const nativeSupport = detectNativeRecorderSupport(this._globalScope, sourceCanvas);
         const hasRecorder = nativeSupport.hasRecorder;
+        if (isDesktopAppRuntime(this._globalScope) && nativeSupport.hasMediaRecorder) {
+            const preferredMimeType = resolveDesktopAppMediaRecorderMimeType(this._globalScope);
+            return {
+                canCapture,
+                hasRecorder,
+                hasWebCodecs: nativeSupport.hasWebCodecs,
+                hasMediaRecorder: true,
+                mediaRecorderMimeType: preferredMimeType,
+                canRecord: canCapture && hasRecorder,
+                selectedMimeType: preferredMimeType,
+                recorderEngine: RECORDER_ENGINE.NATIVE_MEDIARECORDER,
+                supportReason: canCapture ? 'desktop-prefer-mediarecorder' : 'missing-canvas',
+            };
+        }
         return {
             canCapture,
             hasRecorder,

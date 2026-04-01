@@ -5164,6 +5164,91 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(result.z).toBeLessThan(3.1);
     });
 
+    test('T20aj1f: Desktop-App bevorzugt fuer Recording MediaRecorder mit WebM statt WebCodecs-MP4', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
+            const MediaRecorderCtor = function MediaRecorder() {};
+            MediaRecorderCtor.isTypeSupported = (mimeType) => String(mimeType || '').includes('webm');
+            const recorder = new MediaRecorderSystem({
+                canvas: {
+                    width: 1280,
+                    height: 720,
+                    captureStream() {
+                        return {};
+                    },
+                },
+                autoDownload: false,
+                globalScope: {
+                    __CURVIOS_APP__: true,
+                    curviosApp: { isApp: true },
+                    VideoEncoder: class VideoEncoder {
+                        static async isConfigSupported() {
+                            return { supported: true };
+                        }
+                    },
+                    VideoFrame: class VideoFrame {},
+                    MediaRecorder: MediaRecorderCtor,
+                },
+            });
+            const support = recorder.getSupportState();
+            recorder.dispose();
+            return support;
+        });
+
+        expect(result.recorderEngine).toBe('mediarecorder-native');
+        expect(result.selectedMimeType).toContain('webm');
+        expect(result.supportReason).toBe('desktop-prefer-mediarecorder');
+    });
+
+    test('T20aj1g: Desktop-App speichert Recording-Blobs direkt ueber die App-Bridge', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { attemptAutoDownload } = await import('/src/core/recording/DownloadService.js');
+            const originalApp = globalThis.curviosApp;
+            const originalFetch = globalThis.fetch;
+            let appSaveCalls = 0;
+            globalThis.curviosApp = {
+                saveVideo: async (videoBytes, defaultName, mimeType) => {
+                    appSaveCalls += 1;
+                    return {
+                        saved: videoBytes instanceof Uint8Array
+                            && videoBytes.length === 4
+                            && defaultName === 'clip.webm'
+                            && mimeType === 'video/webm',
+                    };
+                },
+            };
+            globalThis.fetch = async () => {
+                throw new Error('fetch should not run when app save succeeds');
+            };
+
+            try {
+                const status = await attemptAutoDownload({
+                    blob: new Blob([new Uint8Array([1, 2, 3, 4])], { type: 'video/webm' }),
+                    fileName: 'recordings/clip.webm',
+                    mimeType: 'video/webm',
+                    autoDownload: true,
+                    downloadHandler: () => {
+                        throw new Error('browser download fallback should not run');
+                    },
+                    logger: null,
+                });
+                return {
+                    appSaveCalls,
+                    status,
+                };
+            } finally {
+                globalThis.curviosApp = originalApp;
+                globalThis.fetch = originalFetch;
+            }
+        });
+
+        expect(result.appSaveCalls).toBe(1);
+        expect(result.status.transport).toBe('app');
+        expect(result.status.status).toBe('saved_via_app');
+    });
+
     test('T20aj2: Recorder priorisiert unter harter Last Downscale vor FPS-Kollaps', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
