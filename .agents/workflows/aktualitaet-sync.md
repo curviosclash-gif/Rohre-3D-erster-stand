@@ -17,7 +17,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 ## 2. Resolve remaining drift
 
-- Update affected files for legacy-path findings and missing required files.
+- Update affected files for legacy-path findings, missing required files, and stale wording that treats online/browser as equal to the desktop app.
 - Re-run `npm run docs:sync` after each fix.
 
 ## 3. Validate governance + docs

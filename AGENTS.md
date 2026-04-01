@@ -19,6 +19,8 @@ This file defines repository-specific operating rules for Codex.
 - Use concise, token-efficient output by default.
 - Ask questions only when critical information is missing.
 - For non-destructive design decisions, proceed proactively with a short rationale.
+- Desktop app is the primary product target and source of truth for feature completeness.
+- Treat the online/browser version as a demo with reduced functionality unless the user explicitly requests demo-specific work.
 - Keep docs/workflows/rules in sync with code and user-confirmed test reality after each change.
 - Create and revise implementation plans only in external docs under `docs/plaene/neu/`.
 - Do not create or restructure planning content directly inside `docs/Umsetzungsplan.md`.
@@ -91,6 +93,7 @@ This file defines repository-specific operating rules for Codex.
 ## UI Changes
 
 - Do not generate full walkthrough artifacts unless requested.
+- Prioritize layout, flows, and UX for the desktop app first; online/browser UI may remain intentionally reduced for demo scope.
 - For UI changes, provide lightweight visual verification evidence when available.
 
 ## Commit Convention

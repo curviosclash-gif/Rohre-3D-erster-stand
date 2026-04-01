@@ -15,6 +15,7 @@ description: Verify docs/workflows/rules are current with an automated gate.
 - `git status --short`
 - `rg --files docs .agents scripts`
 - Identify changed runtime areas (`src/`, `tests/`, `scripts/`, `editor/`).
+- Flag docs/workflows/rules that still imply feature parity between desktop app and online demo.
 
 ## 2. Automated checks
 
@@ -33,6 +34,7 @@ description: Verify docs/workflows/rules are current with an automated gate.
 - `npm run plan:check` PASS.
 - `npm run docs:check` PASS.
 - `docs/prozess/Dokumentationsstatus.md` has current date and no blocking issues.
+- Product positioning is consistent: desktop app primary, online/browser demo secondary.
 
 ## Report
 

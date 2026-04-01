@@ -15,7 +15,7 @@ description: Prepare and publish a safe release.
 
 ## 2. Changelog
 
-- Update `CHANGELOG.md` from `git log`. Include new/changed/fixed sections.
+- Update `CHANGELOG.md` from `git log`. Include new/changed/fixed sections and call out desktop-app-relevant changes before demo-only notes.
 
 ## 3. Build + governance + freshness gates
 
@@ -23,7 +23,7 @@ description: Prepare and publish a safe release.
 - `npm run build`
 - `npm run plan:check`
 - `npm run docs:sync && npm run docs:check`
-- Ensure release notes and plan status are date-accurate.
+- Ensure release notes and plan status are date-accurate and reflect the desktop-first / online-demo product positioning.
 
 ## 4. Tag and push (see AGENTS.md section Commit Convention)
 

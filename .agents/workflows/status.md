@@ -19,6 +19,7 @@ description: Quick project status snapshot.
 ## 3. Output
 
 - Next phase, open dependencies, lock status, uncommitted changes, active branches.
+- Highlight desktop-app priorities and any intentional gaps versus the online demo.
 - List pending external plans waiting for manual intake.
 - If documentation/process drift suspected: `npm run docs:sync && npm run docs:check`.
 

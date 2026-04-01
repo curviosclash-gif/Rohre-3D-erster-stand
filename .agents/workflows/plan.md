@@ -17,9 +17,11 @@ description: Create a compact implementation plan for a new feature or extension
 ## 2. Architecture + governance check
 
 - Existing modules/interfaces/events.
+- Confirm primary target surface: desktop app first; online/browser only as demo scope unless explicitly requested otherwise.
 - Reuse vs new file decision.
 - Risk rating (low/medium/high).
 - Documentation impact list.
+- Note any intentional online-demo limitations or deferred parity work.
 - Datei-Ownership pruefen: kollidiert der Scope mit einem gelockten Block?
 - Dependencies klassifizieren (`hard`/`soft`).
 
@@ -27,6 +29,7 @@ description: Create a compact implementation plan for a new feature or extension
 
 Create `docs/plaene/neu/Feature_[Name].md` with:
 - Goal, affected files.
+- Desktop-app-first scope and any demo-only exclusions.
 - Phasen mit Pflicht-Unterphasen (jede Phase mindestens 2 Unterphasen).
 - Abschluss-Gate als `X.99`.
 - Evidence format for completed items:

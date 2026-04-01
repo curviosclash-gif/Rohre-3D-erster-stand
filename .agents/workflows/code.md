@@ -14,6 +14,7 @@ description: Implement a planned change from coding to verification and commit.
 ## 1. Scope
 
 - Define target files and expected behavior.
+- Confirm desktop app outcome first; keep online/browser parity in scope only when explicitly requested or very low-cost.
 - If scope is clear, proceed directly.
 - Ask only for critical missing constraints.
 - If unrelated worktree changes exist, do not absorb them; commit only scoped files.
@@ -21,6 +22,7 @@ description: Implement a planned change from coding to verification and commit.
 ## 2. Implement
 
 - Follow existing project patterns.
+- Prefer desktop-app UX and feature completeness over online-demo parity.
 - Avoid hardcoded config values.
 - Include cleanup/dispose for new runtime objects.
 - Do not create or rewrite planning scopes directly in `docs/Umsetzungsplan.md`; keep plan drafting in `docs/plaene/neu/`.

@@ -5,7 +5,7 @@ description: Fast path for small, scoped changes without ceremony.
 
 ## 1. Implement
 
-- Apply change directly. Follow existing patterns.
+- Apply change directly. Follow existing patterns and keep the desktop app as the primary target; online/browser scope may stay demo-limited unless requested otherwise.
 
 ## 2. Verify
 

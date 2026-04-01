@@ -18,7 +18,7 @@ description: Run full test analysis, persist results, and update prioritized act
 ## 2. Analyze deltas
 
 - Compare against previous `docs/Analysebericht.md`.
-- Document only: new issues, regressions, resolved items.
+- Document only: new issues, regressions, resolved items, and whether findings block the desktop app or only the online demo.
 
 ## 3. Update follow-up plan (external)
 
