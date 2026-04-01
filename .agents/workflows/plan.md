@@ -6,6 +6,7 @@ description: Create a compact implementation plan for a new feature or extension
 
 // turbo
 - Read `docs/Umsetzungsplan.md`.
+- Read a related `docs/plaene/aktiv/VXX.md` when extending or refreshing an active block.
 - For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and treat it as active master plan.
 - `git log -n 5 --oneline`.
 - Scan impacted modules in `src/`, `tests/`, `editor/js/`.
@@ -30,6 +31,7 @@ description: Create a compact implementation plan for a new feature or extension
 Create `docs/plaene/neu/Feature_[Name].md` with:
 - Goal, affected files.
 - Desktop-app-first scope and any demo-only exclusions.
+- A planned `plan_file` target under `docs/plaene/aktiv/VXX.md` when the draft is intended for active-master intake.
 - Phasen mit Pflicht-Unterphasen (jede Phase mindestens 2 Unterphasen).
 - Abschluss-Gate als `X.99`.
 - Evidence format for completed items:
@@ -46,7 +48,7 @@ Create `docs/plaene/neu/Feature_[Name].md` with:
 - Do not create or change planning scopes directly in `docs/bot-training/Bot_Trainingsplan.md`.
 - Keep all planning deltas in `docs/plaene/neu/Feature_[Name].md`.
 - Wait for user-managed intake into master plan.
-- After user confirms intake is complete, move plan file to `docs/plaene/alt/`.
+- After user confirms intake is complete, move the intake draft to `docs/plaene/alt/`; canonical active detail then lives in `docs/plaene/aktiv/VXX.md`.
 
 ## 5. Validate
 

@@ -24,7 +24,9 @@ This file defines repository-specific operating rules for Codex.
 - Keep docs/workflows/rules in sync with code and user-confirmed test reality after each change.
 - Create and revise implementation plans only in external docs under `docs/plaene/neu/`.
 - Do not create or restructure planning content directly inside `docs/Umsetzungsplan.md`.
-- Manual intake into `docs/Umsetzungsplan.md` and subsequent archival to `docs/plaene/alt/` is user-owned.
+- `docs/Umsetzungsplan.md` is the compact master index; canonical block details live in `docs/plaene/aktiv/VXX.md`.
+- Manual intake into `docs/Umsetzungsplan.md` and creation or refresh of canonical block files under `docs/plaene/aktiv/` is user-owned.
+- Subsequent archival or supersession of intake drafts in `docs/plaene/neu/` remains user-owned.
 - When implementation problems or blockers occur, create or update a task-scoped error report in `docs/Fehlerberichte/` before handoff or task close.
 - Bot training planning source of truth is `docs/bot-training/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
 - Future bot-training windows and KPI corridor are maintained in `docs/bot-training/Bot_Trainings_Roadmap.md` and referenced from `docs/bot-training/Bot_Trainingsplan.md`.
@@ -34,7 +36,7 @@ This file defines repository-specific operating rules for Codex.
 **Ziel: Minimaler Token-Verbrauch bei maximaler Produktivitaet.**
 
 - **Keine wiederholten Reads:** Gleiche Datei zweimal lesen = Token verschwenden. Info aus vorherigem Read verwenden.
-- **Teilweise lesen:** Nur relevante Teile von grossen Dateien lesen (z.B. Umsetzungsplan nur den relevanten Block, nicht alles).
+- **Teilweise lesen:** Nur relevante Teile von grossen Dateien lesen (z.B. erst Master-Index, dann nur die verlinkte `docs/plaene/aktiv/VXX.md` statt den ganzen Bestand).
 - **Keine grossen Kontexte:** Grosse Dateien oder Ergebnisse nicht komplett in den Kontext laden.
 - **Keine redundanten Tool-Calls:** Wenn ein Read/Search-Ergebnis schon im Kontext ist, nicht nochmal ausfuehren.
 - **Parallele Tool-Calls erzwingen:** 2+ unabhaengige Reads/Searches IMMER parallel, niemals sequenziell.
@@ -44,7 +46,7 @@ This file defines repository-specific operating rules for Codex.
 
 **Anti-Patterns:**
 - NICHT gleiche Datei mehrfach lesen
-- NICHT ganze Umsetzungsplan lesen wenn nur ein Block relevant ist
+- NICHT ganze Planlandschaft lesen wenn Master-Index plus eine Blockdatei ausreichen
 - NICHT grosse Dateien ohne Zeilenbegrenzung auslesen
 - NICHT lange Zusammenfassungen nach jeder Aktion
 - NICHT Tool-Calls wiederholen deren Ergebnis schon im Kontext ist
@@ -64,9 +66,11 @@ This file defines repository-specific operating rules for Codex.
 ## Verification Policy
 
 - Automated tests are user-owned and run only after explicit user request.
-- Use `.agents/test_mapping.md` only when the user explicitly requests a test run.
+- In master-plan work, tests, Playwright suites, smokes and similar functional verification are prepared during normal phases but are not run by default before the block Abschluss-Gate `*.99`.
+- Use `.agents/test_mapping.md` only when the user explicitly requests a test run or when assembling the final block-end verification scope.
+- Earlier-than-`*.99` test execution is an exception and should happen only on explicit user request or blocker-critical diagnosis.
 - If no mapping matches for a requested test run, recommend `npm run test:core` to the user instead of auto-running it.
-- When no tests were requested, report test status as pending/user-owned.
+- When no tests were requested, report test status as pending/user-owned and, for block work, note that functional verification remains deferred to `*.99`.
 - For phase execution via `/fix-planung`, `/code` is the single source of truth for DoD and verification checks.
 - For bot-training phase execution via `/bot-training-plan`, `/code` remains the single source of truth for implementation checks.
 - For any code/process update, run:
@@ -113,20 +117,20 @@ All workflows follow this pattern unless stated otherwise:
 
 ## Parallel Bots
 
-Multiple bots can work on different blocks in `docs/Umsetzungsplan.md` simultaneously.
+Multiple bots can work on different blocks aus dem Master-Index `docs/Umsetzungsplan.md` simultaneously.
 For bot-training-only work, use the same lock protocol in `docs/bot-training/Bot_Trainingsplan.md`.
 
 ### Lock-Protokoll
 
-- Each block has a `<!-- LOCK: frei -->` or `<!-- LOCK: Bot-X seit YYYY-MM-DD -->` header.
-- A bot claims a free block via atomic commit: `git pull --rebase` -> set lock -> `git push`. On push failure: retry.
-- A bot releases a block after completing all phases: set lock back to `frei`.
+- `docs/Umsetzungsplan.md` contains the lock table for non-training blocks.
+- A bot claims a free block by updating the matching row in `## Lock-Status`: `git pull --rebase` -> lock row setzen -> `git push`. On push failure: retry.
+- A bot releases a block after completing all phases by setting the same lock row back to `frei`.
 - Stale-lock: If lock is >24h old without commits in that block, another bot may take over after user confirmation.
-- Sub-locks: Optionally, 2 bots can work on the same block if they claim different top-level phases via `<!-- SUB-LOCK: Bot-X -->`.
+- Sub-locks stay optional and must be documented in the block file itself if ever needed.
 
 ### Datei-Ownership
 
-- `docs/Umsetzungsplan.md` contains the ownership table for non-training paths.
+- `docs/plaene/aktiv/VXX.md` contains canonical `scope_files` ownership for non-training paths.
 - `docs/bot-training/Bot_Trainingsplan.md` contains the ownership table for training paths (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs).
 - A bot must not modify files owned by another bot's block unless absolutely necessary.
 - `tests/**` and `docs/**` are shared (append-only or own sections).
@@ -138,13 +142,13 @@ For bot-training-only work, use the same lock protocol in `docs/bot-training/Bot
 
 ### Dependencies
 
-- Blocks can declare `<!-- DEPENDS-ON: VXX.Y -->`. A bot must verify dependencies are fulfilled (`[x]`) before claiming.
+- The master index row plus `## Abhaengigkeiten` define canonical dependencies for non-training blocks. A bot must verify hard dependencies before claiming.
 
 ## Phasen-Schema
 
-All master plans (`docs/Umsetzungsplan.md` and `docs/bot-training/Bot_Trainingsplan.md`) must follow this structure:
+Canonical active block files under `docs/plaene/aktiv/` and the bot-training master plan must follow this structure:
 
-- Every block contains top-level phases (for example `26.1`, `26.2`).
+- Every block file contains top-level phases (for example `26.1`, `26.2`).
 - Every phase must have at least 2 sub-phases (for example `26.1.1`, `26.1.2`).
 - Every block ends with an Abschluss-Gate phase (`*.99`).
 - Single-step items are modeled as sub-phases, never as standalone phases.

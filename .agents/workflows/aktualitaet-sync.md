@@ -6,6 +6,7 @@ description: Check and auto-update docs/workflows/rules to current repository re
 
 // turbo
 - Read `docs/Umsetzungsplan.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/Analysebericht.md`, latest `docs/tests/Testergebnisse_*.md`.
+- Sample linked files in `docs/plaene/aktiv/` when syncing active-block wording or ownership.
 - `git log -n 5 --oneline`.
 - `npm run guard:main`.
 

@@ -6,10 +6,11 @@ description: Implement a planned change from coding to verification and commit.
 
 // turbo
 - Read `docs/Umsetzungsplan.md`.
+- If a block is in scope, read the linked canonical block file in `docs/plaene/aktiv/VXX.md`.
 - For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and keep training planning there.
 - `git log -n 3 --oneline`.
 - `npm run guard:main`.
-- If available, use external plan docs in `docs/plaene/neu/*.md` or `docs/plaene/alt/*.md` for scope.
+- If helpful, use related intake/history docs in `docs/plaene/neu/*.md` or `docs/plaene/alt/*.md` as supporting context, not as canonical block detail.
 
 ## 1. Scope
 
@@ -25,7 +26,7 @@ description: Implement a planned change from coding to verification and commit.
 - Prefer desktop-app UX and feature completeness over online-demo parity.
 - Avoid hardcoded config values.
 - Include cleanup/dispose for new runtime objects.
-- Do not create or rewrite planning scopes directly in `docs/Umsetzungsplan.md`; keep plan drafting in `docs/plaene/neu/`.
+- Do not create or rewrite planning scopes directly in `docs/Umsetzungsplan.md`; keep plan drafting in `docs/plaene/neu/` and canonical active block details in `docs/plaene/aktiv/`.
 - If task scope is bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs), update phase/status only in `docs/bot-training/Bot_Trainingsplan.md`.
 
 ## 3. Self-check
@@ -33,9 +34,11 @@ description: Implement a planned change from coding to verification and commit.
 // turbo
 - `rg -n "(console\.log|TODO:|FIXME:|HACK:)" src tests`
 - No open TODOs in changed code.
+- For master-plan block work below `*.99`, update or prepare affected tests, smokes and harnesses but do not execute them by default.
 - If the user explicitly requests Playwright validation, never run multiple suites concurrently on same repo/port/output directory.
 - If the user explicitly requests parallel bot testing, each bot must use unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR`.
-- Run tests via `.agents/test_mapping.md` only after explicit user request. Without that request, leave tests unrun and note that verification stays user-owned.
+- Run tests via `.agents/test_mapping.md` only after explicit user request; for block work, prefer the concentrated execution at `*.99`.
+- Without that request, leave tests unrun and note that verification stays user-owned or deferred to the block-end gate.
 
 ## 4. Governance + doc gates
 
