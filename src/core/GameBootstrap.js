@@ -13,7 +13,10 @@ import { createRuntimePorts } from '../shared/runtime/GameRuntimePorts.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { CONFIG } from './Config.js';
 import { RECORDING_DOWNLOAD_DIRECTORY } from '../shared/contracts/RecordingCaptureContract.js';
-import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
+import {
+    createMatchSessionPort,
+    MatchLifecycleSessionOrchestrator,
+} from '../state/MatchLifecycleSessionOrchestrator.js';
 import {
     attachGameRuntimeBundle,
     createGameRuntimeBundle,
@@ -128,7 +131,9 @@ export function bootstrapGameRuntime(game, options = {}) {
 
     runtimeBundle.components.hudP1 = new HUD('p1-fighter-hud', 0);
     runtimeBundle.components.hudP2 = new HUD('p2-fighter-hud', 1);
-    runtimeBundle.components.matchSessionOrchestrator = new MatchLifecycleSessionOrchestrator(game);
+    runtimeBundle.components.matchSessionOrchestrator = new MatchLifecycleSessionOrchestrator(
+        createMatchSessionPort(game)
+    );
     runtimeBundle.components.huntHud = new HuntHUD({
         runtime: game,
         refs: createHuntHudDomRefs(document),

@@ -23,7 +23,7 @@ export const MATCH_SESSION_PORT_METHODS = Object.freeze([
     'resetRoundRuntime',
 ]);
 
-function createLegacyOrchestratorDeps(runtime) {
+export function createMatchSessionPort(runtime) {
     const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
     const getRecorder = () => runtime?.mediaRecorderSystem || runtime?.recorder || null;
     return {
@@ -99,7 +99,7 @@ export class MatchLifecycleSessionOrchestrator {
         const runtime = runtimeOrDeps?.runtime || runtimeOrDeps;
         this.deps = runtimeOrDeps?.prepareInitializedMatchSession
             ? runtimeOrDeps
-            : createLegacyOrchestratorDeps(runtime);
+            : createMatchSessionPort(runtime);
         if (this.deps && typeof this.deps === 'object') {
             for (const method of MATCH_SESSION_PORT_METHODS) {
                 if (typeof this.deps[method] !== 'function') {

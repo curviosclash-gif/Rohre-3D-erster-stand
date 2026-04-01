@@ -5,7 +5,10 @@ import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
 import { MatchFeedbackAdapter } from './MatchFeedbackAdapter.js';
 
 const logger = createLogger('MatchFlowUiController');
-import { MatchLifecycleSessionOrchestrator } from '../state/MatchLifecycleSessionOrchestrator.js';
+import {
+    createMatchSessionPort,
+    MatchLifecycleSessionOrchestrator,
+} from '../state/MatchLifecycleSessionOrchestrator.js';
 import { PauseOverlayController } from './PauseOverlayController.js';
 import { clearMessageStats, renderMessageStats } from './dom/MessageStatsDom.js';
 import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
@@ -60,7 +63,8 @@ export class MatchFlowUiController {
     constructor(deps = {}) {
         this.game = deps.game || null;
         this.ports = deps.ports || null;
-        this.sessionOrchestrator = deps.sessionOrchestrator || new MatchLifecycleSessionOrchestrator(this.game);
+        this.sessionOrchestrator = deps.sessionOrchestrator
+            || new MatchLifecycleSessionOrchestrator(createMatchSessionPort(this.game));
         this.feedbackAdapter = new MatchFeedbackAdapter({
             showToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone),
             logger: console,
