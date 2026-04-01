@@ -5,7 +5,10 @@ const logger = createLogger('GameRuntimeFacade');
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { MENU_CONTROLLER_EVENT_CONTRACT_VERSION } from '../shared/contracts/MenuControllerContract.js';
-import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
+import {
+    MATCH_LIFECYCLE_CONTRACT_VERSION,
+    SESSION_FINALIZE_TRIGGERS,
+} from '../shared/contracts/MatchLifecycleContract.js';
 import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
 import { resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
@@ -23,6 +26,7 @@ import {
     SETTINGS_CHANGE_KEYS,
 } from '../composition/core-ui/CoreUiMenuPorts.js';
 import { MATCH_SETTING_CHANGE_KEY_SET, START_VALIDATION_RELEVANT_KEY_SET } from './runtime/GameRuntimeSettingsKeySets.js';
+import { finalizeMatchFlow } from './runtime/MatchFinalizeFlowService.js';
 import {
     initRuntimeSession,
     setupRuntimeClientStateReceiver,
@@ -108,6 +112,8 @@ export class GameRuntimeFacade {
         this._onPlayerLoadedHandler = null;
         this._onArenaStartSignalHandler = null;
         this._pendingStateUpdates = [];
+        this._pendingMatchFinalize = null;
+        this._pendingMatchFinalizePlan = null;
 
         this._baseRoundStateController = this.game?.roundStateController || null;
         this._arcadeRoundStateController = null;
@@ -795,26 +801,13 @@ export class GameRuntimeFacade {
     restartRound() { this.ports?.matchUiPort?.startRound?.(); }
 
     returnToMenu(options = {}) {
-        this.ports?.sessionPort?.clearLastRoundGhost?.();
-        let teardownResult = null;
-        try {
-            teardownResult = this.ports?.sessionPort?.teardownMatchSession?.({ reason: options?.reason || 'return_to_menu' });
-        } catch (error) {
-            logger.error('returnToMenu teardown failed:', error);
-        }
-        this.teardownRuntimeSession();
-        this.ports?.inputPort?.clearPlayerSources?.();
-        this.game?.hudRuntimeSystem?.clearNetworkScoreboard?.();
-        this.ports?.matchUiPort?.applyReturnToMenuUi?.(options);
-        this._resetArcadeRunState();
-        if (teardownResult && typeof teardownResult.then === 'function') {
-            return Promise.resolve(teardownResult).then(() => true).catch((error) => {
-                logger.error('returnToMenu teardown failed:', error);
-                return false;
-            }).finally(() => { this.scheduleMatchPrewarm(); });
-        }
-        this.scheduleMatchPrewarm();
-        return true;
+        return finalizeMatchFlow(this, {
+            ...options,
+            reason: options?.reason || SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU,
+            notifyMenuOpened: true,
+            applyReturnToMenuUi: true,
+            schedulePrewarm: true,
+        }, SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU);
     }
 
     syncP2HudVisibility() {
@@ -824,7 +817,14 @@ export class GameRuntimeFacade {
 
     dispose() {
         this._clearMatchPrewarmTimer();
-        this.teardownRuntimeSession();
+        finalizeMatchFlow(this, {
+            reason: SESSION_FINALIZE_TRIGGERS.GAME_DISPOSE,
+            notifyMenuOpened: false,
+            applyReturnToMenuUi: false,
+            schedulePrewarm: false,
+        }, SESSION_FINALIZE_TRIGGERS.GAME_DISPOSE).catch((error) => {
+            logger.error('dispose finalize failed:', error);
+        });
         this.game?.menuController?.dispose?.();
         this.game?.menuMultiplayerBridge?.dispose?.();
         if (this.game) {

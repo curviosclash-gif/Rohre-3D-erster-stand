@@ -529,7 +529,6 @@ export class Game {
 
         this.keyCapture = null;
         this.gameLoop?.stop?.();
-        this.runtimeBundle?.components?.matchSessionOrchestrator?.teardownMatchSession?.({ reason: 'game_dispose' });
         this.matchFlowUiController?.dispose?.();
         this.runtimeFacade?.dispose?.();
         this.huntHud?.dispose?.();

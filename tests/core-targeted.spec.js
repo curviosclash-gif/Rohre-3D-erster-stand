@@ -7012,7 +7012,7 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
                 clearMatchSessionRefs: () => { callLog.push('clearRefs'); currentSession = null; },
                 disposePreparedMatchSession() { },
                 disposeCurrentMatchSession: (opts) => { callLog.push(`dispose:${opts?.reason || 'none'}`); },
-                settleRecorder: () => null,
+                settleRecorder: (trigger) => { callLog.push(`settle:${trigger?.type || 'none'}`); },
                 resetRoundRuntime() { },
             };
 
@@ -7023,6 +7023,7 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
             return { callLog };
         });
 
+        expect(result.callLog.indexOf('settle:new_match_session')).toBeLessThan(result.callLog.indexOf('dispose:new_match_session'));
         expect(result.callLog.indexOf('dispose:new_match_session')).toBeLessThan(result.callLog.indexOf('apply'));
         expect(result.callLog.indexOf('clearRefs')).toBeLessThan(result.callLog.indexOf('apply'));
     });
@@ -7124,5 +7125,85 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
         expect(result.refCleared).toBe(true);
         expect(result.errorCaught).toBe(true);
         expect(result.activeSessionId).toBeNull();
+    });
+
+    test('V74.3 GameRuntimeFacade suppresses menu cleanup when shutdown reuses pending finalize flow', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameRuntimeFacade } = await import('/src/core/GameRuntimeFacade.js');
+
+            const callLog = [];
+            let resolveFinalize = null;
+            const facade = new GameRuntimeFacade({
+                game: {
+                    hudRuntimeSystem: {
+                        clearNetworkScoreboard() {
+                            callLog.push('clearScoreboard');
+                        },
+                    },
+                },
+                ports: {
+                    sessionPort: {
+                        clearLastRoundGhost() {
+                            callLog.push('clearGhost');
+                        },
+                        finalizeMatchSession(options) {
+                            callLog.push(`finalize:${options?.reason || 'none'}`);
+                            return new Promise((resolve) => {
+                                resolveFinalize = () => {
+                                    callLog.push('finalizeResolved');
+                                    resolve(true);
+                                };
+                            });
+                        },
+                    },
+                    inputPort: {
+                        clearPlayerSources() {
+                            callLog.push('clearInput');
+                        },
+                    },
+                    matchUiPort: {
+                        applyReturnToMenuUi(options) {
+                            callLog.push(`applyUi:${options?.reason || 'none'}`);
+                        },
+                    },
+                },
+            });
+
+            facade.teardownRuntimeSession = () => {
+                callLog.push('teardownRuntime');
+            };
+            facade.scheduleMatchPrewarm = () => {
+                callLog.push('schedulePrewarm');
+            };
+            facade._resetArcadeRunState = () => {
+                callLog.push('resetArcade');
+            };
+
+            const returnPromise = facade.returnToMenu({ reason: 'return_to_menu' });
+            facade.dispose();
+            callLog.push('disposeRequested');
+            resolveFinalize?.();
+            const returnResult = await returnPromise;
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            return {
+                callLog,
+                returnResult,
+            };
+        });
+
+        expect(result.returnResult).toBeTruthy();
+        expect(result.callLog.filter((entry) => entry === 'finalize:return_to_menu')).toHaveLength(1);
+        expect(result.callLog).toEqual(expect.arrayContaining([
+            'clearGhost',
+            'teardownRuntime',
+            'clearInput',
+            'clearScoreboard',
+            'resetArcade',
+            'disposeRequested',
+            'finalizeResolved',
+        ]));
+        expect(result.callLog).not.toContain('applyUi:return_to_menu');
+        expect(result.callLog).not.toContain('schedulePrewarm');
     });
 });

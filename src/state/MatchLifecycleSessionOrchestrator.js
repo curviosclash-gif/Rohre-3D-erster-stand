@@ -111,6 +111,7 @@ export class MatchLifecycleSessionOrchestrator {
         this._sessionSequence = 0;
         this._activeSessionId = null;
         this._pendingSessionInit = null;
+        this._pendingFinalize = null;
     }
 
     _buildLifecycleContext(extra = null) {
@@ -150,6 +151,51 @@ export class MatchLifecycleSessionOrchestrator {
 
     notifyMenuOpened(extra = null) {
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
+    }
+
+    _buildRecorderFinalizeTrigger(reason, context = undefined) {
+        const normalizedReason = typeof reason === 'string' && reason.trim()
+            ? reason.trim()
+            : SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU;
+        const normalizedContext = context && typeof context === 'object'
+            ? { ...context }
+            : {};
+        if (!normalizedContext.reason) {
+            normalizedContext.reason = normalizedReason;
+        }
+        return {
+            type: normalizedReason,
+            context: normalizedContext,
+        };
+    }
+
+    _buildFinalizeRequest(options = undefined) {
+        const request = typeof options === 'string'
+            ? { reason: options }
+            : (options && typeof options === 'object' ? options : {});
+        const reason = typeof request.reason === 'string' && request.reason.trim()
+            ? request.reason.trim()
+            : SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU;
+        return {
+            reason,
+            awaitPendingInit: request.awaitPendingInit !== false,
+            notifyMenuOpened: request.notifyMenuOpened !== false,
+            clearScene: request.clearScene !== false,
+            recorderTrigger: request.recorderTrigger || this._buildRecorderFinalizeTrigger(
+                reason,
+                request.recorderContext
+            ),
+        };
+    }
+
+    _hasCurrentSessionRefs() {
+        const currentSession = this.deps?.getCurrentMatchSessionRefs?.();
+        return !!(
+            currentSession?.arena
+            || currentSession?.entityManager
+            || currentSession?.powerupManager
+            || currentSession?.particles
+        );
     }
 
     async _disposePreparedMatch(initializedMatch, reason = SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT) {
@@ -198,11 +244,17 @@ export class MatchLifecycleSessionOrchestrator {
         if (!this.deps?.prepareInitializedMatchSession) {
             throw new Error('MatchLifecycleSessionOrchestrator requires runtime context');
         }
-        if (this._activeSessionId) {
-            this._endLifecycleSession(SESSION_FINALIZE_TRIGGERS.NEW_MATCH_SESSION);
-            this.deps?.disposeCurrentMatchSession?.({ reason: SESSION_FINALIZE_TRIGGERS.NEW_MATCH_SESSION });
-            this.deps?.clearMatchSessionRefs?.();
-        }
+        const finalizeExistingSession = this._pendingFinalize
+            ? Promise.resolve(this._pendingFinalize).catch(() => null)
+            : (
+                this._activeSessionId || this._hasCurrentSessionRefs()
+                    ? Promise.resolve(this.finalizeMatchSession({
+                        reason: SESSION_FINALIZE_TRIGGERS.NEW_MATCH_SESSION,
+                        notifyMenuOpened: false,
+                        awaitPendingInit: false,
+                    })).catch(() => null)
+                    : null
+            );
 
         this._sessionSequence += 1;
         const provisionalId = `match-${this._sessionSequence}`;
@@ -213,9 +265,9 @@ export class MatchLifecycleSessionOrchestrator {
             onRoundEnd,
         };
 
-        const runPendingInit = () => Promise.resolve(
-            this.deps.prepareInitializedMatchSession(lifecycleHandlers)
-        ).then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch, provisionalId, lifecycleHandlers));
+        const runPendingInit = () => Promise.resolve(finalizeExistingSession)
+            .then(() => this.deps.prepareInitializedMatchSession(lifecycleHandlers))
+            .then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch, provisionalId, lifecycleHandlers));
 
         const queuedInit = this._pendingSessionInit
             ? Promise.resolve(this._pendingSessionInit).catch(() => null).then(runPendingInit)
@@ -250,25 +302,73 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     finalizeRound() {
-        this.deps?.settleRecorder?.({ type: SESSION_FINALIZE_TRIGGERS.ROUND_FINALIZE });
+        this.deps?.settleRecorder?.(this._buildRecorderFinalizeTrigger(SESSION_FINALIZE_TRIGGERS.ROUND_FINALIZE));
         this.deps?.resetRoundRuntime?.();
     }
 
-    async teardownMatchSession(options = undefined) {
-        const reason = typeof options === 'string'
-            ? options
-            : (options?.reason || 'return_to_menu');
-        this._endLifecycleSession(reason);
-        this._activeSessionId = null;
-        if (this._pendingSessionInit) {
-            await Promise.resolve(this._pendingSessionInit).catch(() => null);
+    async finalizeMatchSession(options = undefined) {
+        if (this._pendingFinalize) {
+            return this._pendingFinalize;
         }
-        await Promise.resolve(this.deps?.settleRecorder?.({
-            type: 'session_teardown',
-            context: { reason },
-        }));
-        this.deps?.disposeCurrentMatchSession?.();
-        this.deps?.clearMatchSessionRefs?.();
-        this.notifyMenuOpened();
+        const request = this._buildFinalizeRequest(options);
+        const trackedFinalize = Promise.resolve().then(async () => {
+            this._endLifecycleSession(request.reason);
+            this._activeSessionId = null;
+            if (request.awaitPendingInit && this._pendingSessionInit) {
+                await Promise.resolve(this._pendingSessionInit).catch(() => null);
+            }
+
+            let finalizeError = null;
+            try {
+                await Promise.resolve(this.deps?.settleRecorder?.(request.recorderTrigger));
+            } catch (error) {
+                finalizeError = error;
+            }
+
+            try {
+                this.deps?.disposeCurrentMatchSession?.({
+                    reason: request.reason,
+                    clearScene: request.clearScene,
+                });
+            } catch (error) {
+                if (!finalizeError) {
+                    finalizeError = error;
+                }
+            }
+
+            try {
+                this.deps?.clearMatchSessionRefs?.();
+            } catch (error) {
+                if (!finalizeError) {
+                    finalizeError = error;
+                }
+            }
+
+            if (request.notifyMenuOpened) {
+                try {
+                    this.notifyMenuOpened({ reason: request.reason });
+                } catch (error) {
+                    if (!finalizeError) {
+                        finalizeError = error;
+                    }
+                }
+            }
+
+            if (finalizeError) {
+                throw finalizeError;
+            }
+
+            return request.reason;
+        }).finally(() => {
+            if (this._pendingFinalize === trackedFinalize) {
+                this._pendingFinalize = null;
+            }
+        });
+        this._pendingFinalize = trackedFinalize;
+        return trackedFinalize;
+    }
+
+    async teardownMatchSession(options = undefined) {
+        return this.finalizeMatchSession(options);
     }
 }

@@ -86,9 +86,13 @@ export function createSessionPort(game) {
             const entityManager = getRuntimeState(game)?.entityManager || game?.entityManager || null;
             entityManager?.clearLastRoundGhost?.();
         },
-        teardownMatchSession(options = undefined) {
+        finalizeMatchSession(options = undefined) {
             const matchSessionOrchestrator = getRuntimeComponent(game, 'matchSessionOrchestrator');
-            matchSessionOrchestrator?.teardownMatchSession?.(options);
+            return matchSessionOrchestrator?.finalizeMatchSession?.(options)
+                ?? matchSessionOrchestrator?.teardownMatchSession?.(options);
+        },
+        teardownMatchSession(options = undefined) {
+            return this.finalizeMatchSession(options);
         },
         requestDeltaReset(reason) {
             const gameLoop = getRuntimeComponent(game, 'gameLoop') || game?.gameLoop || null;

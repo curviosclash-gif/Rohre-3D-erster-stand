@@ -800,12 +800,20 @@ export class MatchFlowUiController {
             return this.ports.lifecyclePort.returnToMenu(options);
         }
         const game = this.game;
+        if (game?.runtimeFacade?.returnToMenu) {
+            return game.runtimeFacade.returnToMenu(options);
+        }
         game.entityManager?.clearLastRoundGhost?.();
-        this.sessionOrchestrator.teardownMatchSession({ reason: options?.reason || 'return_to_menu' });
+        const teardownResult = this.sessionOrchestrator.finalizeMatchSession?.({
+            reason: options?.reason || 'return_to_menu',
+        }) || this.sessionOrchestrator.teardownMatchSession({ reason: options?.reason || 'return_to_menu' });
         game.runtimeFacade?.teardownRuntimeSession?.();
         game.input?.clearPlayerSources?.();
         game.hudRuntimeSystem?.clearNetworkScoreboard?.();
         this.applyReturnToMenuUi(options);
+        if (teardownResult && typeof teardownResult.then === 'function') {
+            return Promise.resolve(teardownResult).then(() => true).catch(() => false);
+        }
         return true;
     }
 
