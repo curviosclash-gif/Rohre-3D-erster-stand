@@ -1,7 +1,7 @@
 # Planentwurf Umsetzungsplan KI-Lesbarkeit
 
 Stand: 2026-04-01
-Status: Entwurf
+Status: Entwurf (ueberarbeitet)
 Owner: Codex
 
 ## Ziel
@@ -20,25 +20,18 @@ Der aktive Umsetzungsplan soll fuer KI schneller, billiger und robuster lesbar w
 
 Die Struktur wird in zwei Ebenen geteilt:
 
-1. `docs/Umsetzungsplan.md` wird zum kompakten Master-Index.
-2. Jeder aktive Block bekommt eine eigene kanonische Blockdatei mit festem Schema.
+1. `docs/Umsetzungsplan.md` wird zum kompakten Master-Index (Uebersicht, Abhaengigkeiten, Lock-Status).
+2. Jeder aktive Block bekommt eine eigene kanonische Blockdatei mit festem Schema (Details, DoD, Phasen).
 
-Empfohlene kuenftige Rollen:
+Kuenftige Rollen:
 
-- `docs/Umsetzungsplan.md`
-  - nur Uebersicht
-  - nur aktive Bloecke
-  - nur wenige, feste Spalten
-- `docs/plaene/aktiv/VXX.md`
-  - eine Datei pro aktivem Block
-  - volle Details, DoD, Risiken, Phasen, Verification
-- `docs/plaene/neu/*.md`
-  - Intake- und Aenderungsentwuerfe
-- `docs/plaene/alt/*.md`
-  - archivierte oder ersetzte Blockstaende
+- `docs/Umsetzungsplan.md` — Master-Index: eine Zeile pro Block, Abhaengigkeitstabelle, Lock-Status, Conflict-Log
+- `docs/plaene/aktiv/VXX.md` — kanonische Blockdatei: volle Details, DoD, Risiken, Phasen, Verification
+- `docs/plaene/neu/*.md` — Intake- und Aenderungsentwuerfe
+- `docs/plaene/alt/*.md` — archivierte oder ersetzte Blockstaende
 
-Hinweis:
-Dieses Zielbild aendert bewusst die heutige Regel "Masterplan ist die einzige aktive Quelle". Wenn diese Umstellung gewuenscht ist, muss die Governance spaeter passend nachgezogen werden.
+Governance-Anpassung (Pflicht in Phase 1):
+Die heutige Regel "Dieser Plan ist die einzige aktive Quelle fuer offene Arbeit" im Master muss sofort umformuliert werden zu: "Dieser Index ist die Uebersicht; die kanonische Quelle fuer Blockdetails ist die jeweilige Datei unter `docs/plaene/aktiv/`." Ohne diese Anpassung entsteht ein Widerspruch zwischen Master und Blockdateien.
 
 ## Gestaltungsprinzipien
 
@@ -50,6 +43,15 @@ Dieses Zielbild aendert bewusst die heutige Regel "Masterplan ist die einzige ak
 - Eine Phase hat genau eine ID und genau einen Ort.
 - Prosa ist erlaubt fuer Kontext, aber nicht fuer Steuerdaten.
 
+## Claude-Einbindung
+
+- `CLAUDE.md` bleibt eine Hinweis- und Workflow-Datei fuer Claude-basierte Arbeit.
+- `CLAUDE.md` verweist weiterhin explizit auf `AGENTS.md` und `.agents/rules/*` als bindende Governance.
+- Wenn der Aufgaben-Workflow auf das Zwei-Ebenen-Modell umgestellt wird, darf `CLAUDE.md` nur den Leseweg spiegeln:
+  1. `docs/Umsetzungsplan.md` fuer Uebersicht, Locks und Abhaengigkeiten
+  2. `docs/plaene/aktiv/VXX.md` fuer kanonische Blockdetails
+- `CLAUDE.md` darf dabei keine konkurrierende Aussage enthalten wie "nur der Master ist die aktive Quelle", sobald Blockdetails offiziell ausgelagert wurden.
+
 ## Soll-Struktur fuer den Master-Index
 
 `docs/Umsetzungsplan.md` soll nur diese Bereiche enthalten:
@@ -57,22 +59,27 @@ Dieses Zielbild aendert bewusst die heutige Regel "Masterplan ist die einzige ak
 1. Kurze Einleitung mit Stand und Regel-Link
 2. Tabelle `Aktive Bloecke`
 3. Optional kurze Tabelle `Blockierte Bloecke`
-4. Links auf Meta-Dateien
+4. Optional: Links auf ausgelagerte Meta-Dateien, falls ein Meta-Bereich spaeter zu gross wird
 
 Nicht mehr im Master:
 
-- volle DoD-Listen
-- volle Phasenlisten
-- volle Risiko-Register
-- lange Parallelisierungsprosa
-- ausfuehrliche Ownership-Tabellen
-- ausfuehrliche Conflict-Logs
+- volle DoD-Listen (wandern in Blockdatei)
+- volle Phasenlisten (wandern in Blockdatei)
+- volle Risiko-Register (wandern in Blockdatei)
+- lange Parallelisierungsprosa (wird durch Abhaengigkeitstabelle ersetzt)
+- ausfuehrliche Datei-Ownership-Tabelle (wandert in Blockdatei `scope_files`)
+
+Verbleiben im Master (kompakt genug):
+
+- Abhaengigkeitstabelle (ersetzt Parallelisierungsprosa)
+- Lock-Status-Tabelle (aktuell 7 Zeilen)
+- Conflict-Log (aktuell 1-2 Eintraege, append-only; Aufraeum-Regel siehe unten)
 
 Empfohlene Spalten fuer `Aktive Bloecke`:
 
-| id | titel | status | prio | owner | depends_on | current_phase | next_step | plan_file |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | Produktrollen und Demo-Allowlist festziehen | `docs/plaene/aktiv/V77.md` |
+| id | titel | status | prio | owner | depends_on | current_phase | plan_file |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 
 Normregeln fuer den Master:
 
@@ -82,6 +89,7 @@ Normregeln fuer den Master:
 - `current_phase` immer als Phasen-ID
 - `plan_file` immer Pflicht
 - keine Detailerklaerung laenger als eine Zeile
+- kein `next_step` im Master — aendert sich zu oft und fuehrt zu Doppelpflege; wer den naechsten Schritt braucht, oeffnet die Blockdatei
 
 ## Soll-Struktur fuer eine Blockdatei
 
@@ -99,9 +107,7 @@ owner: none
 depends_on:
   - V74.99
 blocked_by: []
-scope_files:
-  - src/ui/menu/**
-  - src/core/runtime/**
+blocked_until: V74.99
 verification:
   - npm run plan:check
   - npm run docs:sync
@@ -114,7 +120,7 @@ updated_at: 2026-04-01
 ## Ziel
 Ein Satz.
 
-## Nicht-Ziel
+## Nicht-Ziel (Pflichtsektion)
 - Kein Browser-Host
 - Kein Editor im Demo-Pfad
 
@@ -159,9 +165,10 @@ goal: Integrations- und Abschluss-Gate
 ## Schreibregeln fuer KI-Freundlichkeit
 
 - Immer feste Heading-Namen verwenden.
-- Metadaten immer oben sammeln.
+- Metadaten immer oben im YAML-Frontmatter sammeln; lange Listen (Pfade, Risiken) gehoeren in Markdown-Sektionen, nicht ins Frontmatter.
 - IDs nie umbenennen, sobald sie im Master stehen.
 - `depends_on`, `owner`, `status`, `priority` nur mit normierten Werten fuellen.
+- `## Nicht-Ziel` ist Pflichtsektion in jeder Blockdatei — explizite Ausschluesse verhindern Scope-Creep durch KI-Agenten.
 - Keine fachkritischen Regeln in langen Saetzen verstecken, wenn sie als Liste oder Feld ausdrueckbar sind.
 - Keine doppelte Pflege von Risiken, Ownership oder Verification in mehreren Dateien.
 - Checkboxen nur fuer echte Arbeitsschritte verwenden, nicht fuer Ueberschriften.
@@ -171,10 +178,12 @@ goal: Integrations- und Abschluss-Gate
 
 Empfohlene Statuswerte:
 
-- `planned`
-- `active`
-- `blocked`
-- `done`
+- `planned` — Block ist definiert, aber noch nicht begonnen (Abhaengigkeiten koennen erfuellt oder offen sein)
+- `active` — Lock ist vergeben, Arbeit laeuft aktiv
+- `blocked` — Arbeit ist unterbrochen durch externe Abhaengigkeit oder Blocker
+- `done` — alle Phasen inkl. `*.99`-Gate abgeschlossen
+
+Abgrenzung: ein Block ohne Lock bleibt `planned`, auch wenn seine Abhaengigkeiten erfuellt sind. Erst mit Lock-Vergabe wechselt er auf `active`.
 
 Empfohlene Prioritaetswerte:
 
@@ -189,16 +198,11 @@ Empfohlene Owner-Werte:
 - `User`
 - Name des zustandigen Streams/Bots
 
-## Meta-Dateien auslagern
+## Meta-Bereiche im Master
 
-Die heute grossen Sammelbereiche sollen in eigene Dateien wandern:
+Lock-Status, Conflict-Log und Abhaengigkeiten bleiben vorerst im Master, da sie aktuell kompakt sind (je 5-15 Zeilen). Die Datei-Ownership-Tabelle wird aufgeloest — jeder Block fuehrt seine `scope_files` in der eigenen Blockdatei.
 
-- `docs/prozess/plan-locks.md`
-- `docs/prozess/plan-ownership.md`
-- `docs/prozess/plan-conflicts.md`
-- `docs/prozess/plan-dependencies.md`
-
-Der Master verlinkt diese Dateien nur noch.
+Auslagerung in eigene Dateien (z.B. `docs/prozess/plan-locks.md`) ist erst sinnvoll, wenn eine Tabelle dauerhaft ueber 30 Zeilen waechst. Dann per Refactor auslagern und im Master nur noch verlinken.
 
 ## Evidence-Format beibehalten
 
@@ -214,24 +218,27 @@ Optional spaeter noch strenger:
 
 ## Migrationspfad
 
-### Phase 1 Minimaler Gewinn ohne Governance-Bruch
+### Phase 1 Master zum Index kuerzen und Governance anpassen
 
-- `docs/Umsetzungsplan.md` stark kuerzen
-- nur aktive Bloecke als Tabelle behalten
-- pro Block auf existierende Detaildatei verlinken
-- Lock-, Ownership- und Conflict-Bereiche in eigene Meta-Dateien ziehen
+- Governance-Satz im Master sofort aendern: "einzige aktive Quelle" -> "Index; kanonische Details in Blockdateien"
+- `AGENTS.md` und relevante `.agents/rules/*` auf das Zwei-Ebenen-Modell umstellen
+- `CLAUDE.md` ausdruecklich mitziehen und weiter auf `AGENTS.md` sowie `.agents/rules/*` verweisen; im Aufgaben-Workflow nur den neuen Leseweg spiegeln, keine eigene Governance definieren
+- Master stark kuerzen: Blockdetails raus, nur Tabelle `Aktive Bloecke` mit `plan_file`-Spalte behalten
+- Abhaengigkeiten, Lock-Status und Conflict-Log bleiben im Master (kompakt genug)
+- Datei-Ownership-Tabelle aufloesen (wandert in Blockdateien als `scope_files`)
 
-### Phase 2 Kanonische Blockdateien einfuehren
+### Phase 2 Kanonische Blockdateien und Skript-Update
 
-- pro aktivem Block eine feste Detaildatei mit Normschema anlegen
-- DoD, Risiken, Phasen und Verification nur noch dort pflegen
-- Master wird reiner Index
+- pro aktivem Block eine Datei unter `docs/plaene/aktiv/VXX.md` mit Normschema anlegen
+- DoD, Risiken, Phasen, scope_files und Verification nur noch dort pflegen
+- `scripts/validate-umsetzungsplan.mjs` auf das Zwei-Ebenen-Modell erweitern: Master-Tabelle plus Blockdateien validieren
+- `npm run plan:check` muss nach Phase 2 gruen bleiben — sonst ist Phase 2 nicht abgeschlossen
 
-### Phase 3 Governance und Skripte nachziehen
+### Phase 3 Workflows und Restarbeiten
 
-- `plan_governance.md` auf das neue Zwei-Ebenen-Modell anpassen
-- `scripts/validate-umsetzungsplan.mjs` auf Master-Index plus Blockdateien erweitern
-- Workflows auf neue Pfade und Rollen umstellen
+- `.agents/workflows/*` auf neue Pfade und Lesereihenfolge umstellen
+- `plan_governance.md` formalisiert nachziehen
+- Pilotblock evaluieren und Anpassungen ins Template rueckfuehren
 
 ## Copy-Paste-Template fuer neue Bloecke
 
@@ -305,5 +312,6 @@ goal: <Integrations- und Abschluss-Gate>
 
 - Ziel-Masterplan: `docs/Umsetzungsplan.md`
 - Art: Struktur- und Governance-Entwurf, kein direkter Master-Umbau
-- Empfehlung: zuerst als Pilot mit einem Block testen, idealerweise `V77` oder `V72`
+- Empfehlung: zuerst als Pilot mit einem Block testen, idealerweise `V74` (aktiv, hat reale Phasen-/DoD-Daten)
 - Manuelle Uebernahme erforderlich
+- Naechster konkreter Schritt: Zielversion des Master-Index mit allen 7 aktiven Bloecken formulieren
