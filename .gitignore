@@ -43,3 +43,4 @@ Fotos-*.zip
 .playwright-suite.lock
 .playwright-start.lock
 .codex_tmp/
+.vs/
