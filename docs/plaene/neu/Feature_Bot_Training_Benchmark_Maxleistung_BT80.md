@@ -13,12 +13,48 @@ Das Bot-Training wird auf einen benchmark-first Ablauf umgebaut: zuerst wird ein
 ## Intake-Hinweis
 
 - Ziel-Masterplan: `docs/bot-training/Bot_Trainingsplan.md`
-- Vorgeschlagene Block-ID: `BT80`
+- Vorgeschlagene Block-Familie: `BT80A`, `BT80B`, `BT80C`
 - Geplante Plan-Datei nach Intake: `docs/bot-training/Bot_Benchmark_Maxleistung_Training_Plan_BT80.md`
-- Hard dependencies: `BT20.99` als Safety-/Reward-Baseline; haertbare Eval-/Gate-Vertraege aus `BT40`; stabilisierte Gameplay-Semantik fuer Portale, Gates, Items und Shield aus `V72`, bevor finale Vergleichsmatrizen eingefroren werden.
+- Hard dependencies: `BT20.99` als Safety-/Reward-Baseline; haertbare Eval-/Gate-Vertraege aus `BT40`; stabilisierte Gameplay-Semantik fuer Portale, Gates, Items und Shield aus `V72`, bevor finale Vergleichsmatrizen eingefroren oder produktionsnah ausgerollt werden.
 - Soft dependencies: `BT30`, `BT73` und die aktuelle BT15-Roadmap sollten nicht parallel in konkurrierende Richtungen laufen; empfohlen ist eine Zusammenfuehrung oder ein bewusstes Supersede statt Split-Scope.
 - Datei-Ownership: Hauptsaechlich `scripts/training-*.mjs`, `scripts/bot-validation-*.mjs`, `src/entities/ai/training/**`, `trainer/**`, `src/state/training/**`, `src/state/validation/**`, `src/entities/ai/**`, `tests/training-*.mjs`, `tests/trainer-*.mjs`, `docs/bot-training/**`; moegliche Cross-Block-Kollision mit `V72` in Gameplay-/Portal-/Gate-Pfaden.
 - Hinweis: Manuelle Uebernahme in `docs/bot-training/Bot_Trainingsplan.md` erforderlich.
+
+## Empfohlener Blockzuschnitt
+
+Der Gesamtplan ist bewusst nicht als ein einzelner Durchmarsch gedacht. Fuer die Umsetzung wird eine dreistufige Blockfolge empfohlen, damit erst eine harte Messbasis entsteht und erst danach die teureren Architektur- und Maximierungsarbeiten freigeschaltet werden.
+
+### Block BT80A: Benchmark, Reporting und Gate-Haertung
+
+- Ziel: Eine eingefrorene Champion-Baseline, feste Benchmark-Matrix, harte Artefaktpflicht und belastbare Messpipeline schaffen.
+- Enthaelt: `80.1`, `80.2`, `80.3`
+- Empfohlene Reihenfolge: zuerst `BT20.99` sauber schliessen oder bewusst superseden, dann `BT80A`
+- Ergebnis: Ab diesem Punkt kann jeder Kandidatenlauf reproduzierbar gegen dieselbe Wahrheit gemessen werden.
+- Ohne Abschluss von `BT80A`: keine Promotion neuer Modelle, keine Aussage ueber "wirklich besser", keine ehrliche Maxleistungs-Optimierung.
+
+### Block BT80B: Runtime-nahe Trainingsbasis und Bot-Architektur
+
+- Ziel: Die Trainingswelt naeher an die echte Runtime bringen und Observation, Memory, Action-Architektur und Hybrid-Policy fuer mehrere Sekunden Absicht aufbauen.
+- Enthaelt: `80.4`, `80.5`, `80.6`
+- Hard dependency: `BT80A.99`
+- Soft dependency: `V72` fuer finale Portal-/Gate-/Item-Semantik sollte vor der finalen Benchmark-Einfrierung dieses Blocks abgestimmt sein.
+- Ergebnis: Der Bot wird nicht mehr nur auf vereinfachte Runner-Signale und Einzel-Snapshots optimiert.
+
+### Block BT80C: Algorithmus-Ausbau, High-Util-Training und Champion-Rollout
+
+- Ziel: Auf der gehaerteten Benchmark- und Architektur-Basis Algorithmen, Ablationen und lokale Hardwareprofile bis zur maximal nutzbaren Leistung ausreizen.
+- Enthaelt: `80.7`, `80.8`, `80.9`, `80.99`
+- Hard dependency: `BT80B.99`
+- Ergebnis: Champion/Challenger-Betrieb, Promotion-/Rollback-Regeln und High-Util-Trainingsprofile werden produktionsreif.
+
+## Intake-Variante fuer den Masterplan
+
+- Variante empfohlen: drei getrennte Intake-Bloecke `BT80A`, `BT80B`, `BT80C`
+- Variante vermeiden: ein einzelner Sammelblock `BT80`, weil Benchmark, Architektur und Maximierungsbetrieb sonst gleichzeitig offen sind und Regressionen schwer zuordbar werden.
+- Empfohlene manuelle Reihenfolge:
+  - `BT80A` claimen und abschliessen
+  - `BT80B` erst nach gruenem `BT80A.99` intake-faehig machen
+  - `BT80C` erst nach gruenem `BT80B.99` intake-faehig machen
 
 ## Ausgangslage
 
@@ -97,6 +133,8 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 ## Phasenplan
 
+Die folgenden Phasen bleiben als gemeinsamer Programmplan bestehen, werden fuer die Ausfuehrung aber ueber die drei Intake-Bloecke `BT80A`, `BT80B`, `BT80C` aufgeteilt.
+
 ### 80.1 Benchmark-Vertrag und Champion-Baseline einfrieren
 
 - [ ] 80.1.1 Eine verbindliche Benchmark-Matrix fuer Modi, Seeds, Maps, Szenarioklassen, Gegnerprofile, Episodenbudget und Bewertungsfenster definieren, damit kuenftige Vergleiche nicht mehr zwischen Laeufen driften.
@@ -155,7 +193,7 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 - [ ] 80.99.1 Der finale Champion schlaegt die eingefrorene Baseline reproduzierbar auf der festen Benchmark-Matrix und zwar mit vollstaendigen Reports fuer Eval, Gate, `bot:validate`, Resume-Health und Throughput.
 - [ ] 80.99.2 High-Util-Profile sind stabil dokumentiert; ein neuer Trainingslauf kann ohne Sonderwissen gestartet, resumed, benchmarked und bei Regression sauber zurueckgerollt werden.
-- [ ] 80.99.3 Manuelle Intake-/Handoff-Notiz fuer `docs/bot-training/Bot_Trainingsplan.md` enthaelt Block-ID, Dependencies, Scope und die Kernentscheidung `benchmark first, dann maximal nutzbare Leistung`.
+- [ ] 80.99.3 Manuelle Intake-/Handoff-Notiz fuer `docs/bot-training/Bot_Trainingsplan.md` enthaelt die Blockfolge `BT80A -> BT80B -> BT80C`, Dependencies, Scope und die Kernentscheidung `benchmark first, dann maximal nutzbare Leistung`.
 
 ## Risiko-Register BT80
 
