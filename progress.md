@@ -1522,10 +1522,10 @@ Offene TODOs naechster Schritt:
   - `npm run plan:check` PASS.
   - `npm run docs:sync` PASS.
   - `npm run docs:check` PASS.
-  - Playwright-Laeufe (`npm run test:gpu -- --grep T33d`, `npm run test:core`, `npm run test:stress`, sowie lokaler `tmp.playwright.local.config.mjs`-Lauf) FAIL am Runtime-Readiness-Gate: `page.goto(... waitUntil: domcontentloaded)` timeout; Diagnostics z.B. `test-results/pid-5004-mn5fhdfp/playwright-startup-diagnostics.json`.
+  - Playwright-Laeufe (`npm run test:gpu -- --grep T33d`, `npm run test:core`, `npm run test:stress`, sowie lokaler `playwright.local.repro.config.mjs`-Lauf) FAIL am Runtime-Readiness-Gate: `page.goto(... waitUntil: domcontentloaded)` timeout; Diagnostics z.B. `test-results/pid-5004-mn5fhdfp/playwright-startup-diagnostics.json`.
   - `npm run build` FAIL wegen bestehender max-lines-Verstoesse ausserhalb dieses Kamera-MP4-Diffs (`src/core/MediaRecorderSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js` im aktuellen Worktree-Stand).
 2026-03-25 (Verifikation-Update)
-- Zusatzvalidierung ueber `tmp.playwright.local.config.mjs` bestaetigt denselben Loader-Blocker: `page.goto(..., waitUntil: domcontentloaded)` timeout bereits in `loadGame`.
+- Zusatzvalidierung ueber `playwright.local.repro.config.mjs` bestaetigt denselben Loader-Blocker: `page.goto(..., waitUntil: domcontentloaded)` timeout bereits in `loadGame`.
 - Build-Gate erneut geprueft: `npm run build` scheitert weiter an bestehenden `max-lines`-Verstoessen in fremd-geaenderten Dateien (`src/core/MediaRecorderSystem.js`, `src/ui/menu/MenuMultiplayerBridge.js`).
 - Fuer den umgesetzten Scope wurden stattdessen lokale Assertions + gezieltes ESLint auf den geaenderten Dateien erfolgreich ausgefuehrt.
 2026-03-27 (Desktop-App Diagnose: Cinematic/Flugzeugauswahl)
