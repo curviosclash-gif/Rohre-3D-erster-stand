@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { getPickupVisualDescriptor } from './PickupRegistry.js';
 
 function createStandardMaterial(color, options = {}) {
     return new THREE.MeshStandardMaterial({
@@ -51,22 +52,20 @@ export class PowerupModelFactory {
     }
 
     createModel(type, config = {}) {
-        const normalizedType = String(type || '').toUpperCase();
+        const visualDescriptor = getPickupVisualDescriptor(type);
+        const visualKind = visualDescriptor?.kind || String(type || '').toUpperCase();
         const color = Number(config.color) || 0xffffff;
 
         try {
-            if (normalizedType === 'SPEED_UP') return this._createSpeedModel(color);
-            if (normalizedType === 'SLOW_DOWN') return this._createSlowModel(color);
-            if (normalizedType === 'THICK') return this._createThickTrailModel(color);
-            if (normalizedType === 'THIN') return this._createThinTrailModel(color);
-            if (normalizedType === 'SHIELD') return this._createShieldModel(color);
-            if (normalizedType === 'SLOW_TIME') return this._createSlowTimeModel(color);
-            if (normalizedType === 'GHOST') return this._createGhostModel(color);
-            if (normalizedType === 'INVERT') return this._createInvertModel(color);
-            if (normalizedType === 'ROCKET_WEAK') return this._createRocketModel(color, 0.88);
-            if (normalizedType === 'ROCKET_MEDIUM') return this._createRocketModel(color, 1.0);
-            if (normalizedType === 'ROCKET_HEAVY') return this._createRocketModel(color, 1.14);
-            if (normalizedType === 'ROCKET_MEGA') return this._createRocketModel(color, 1.35);
+            if (visualKind === 'speed') return this._createSpeedModel(color);
+            if (visualKind === 'slow') return this._createSlowModel(color);
+            if (visualKind === 'thick') return this._createThickTrailModel(color);
+            if (visualKind === 'thin') return this._createThinTrailModel(color);
+            if (visualKind === 'shield') return this._createShieldModel(color);
+            if (visualKind === 'slow-time') return this._createSlowTimeModel(color);
+            if (visualKind === 'ghost') return this._createGhostModel(color);
+            if (visualKind === 'invert') return this._createInvertModel(color);
+            if (visualKind === 'rocket') return this._createRocketModel(color, visualDescriptor?.scale || 1);
             return this._createFallbackCube(color);
         } catch {
             return this._createFallbackCube(color);

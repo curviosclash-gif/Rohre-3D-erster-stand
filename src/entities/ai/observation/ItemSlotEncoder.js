@@ -2,34 +2,32 @@
 // ItemSlotEncoder.js - stable 20-slot item encoding for bot observations
 // ============================================
 
-export const ITEM_SLOT_COUNT = 20;
-export const ITEM_SLOT_UNKNOWN_INDEX = 19;
+import {
+    PICKUP_SLOT_COUNT,
+    PICKUP_SLOT_UNKNOWN_INDEX,
+    getPickupObservationSlotIndex,
+    getPickupTypes,
+    normalizePickupType,
+} from '../../PickupRegistry.js';
 
-export const ITEM_SLOT_BY_TYPE = Object.freeze({
-    SPEED_UP: 0,
-    SLOW_DOWN: 1,
-    THICK: 2,
-    THIN: 3,
-    SHIELD: 4,
-    SLOW_TIME: 5,
-    GHOST: 6,
-    INVERT: 7,
-    ROCKET_WEAK: 8,
-    ROCKET_MEDIUM: 9,
-    ROCKET_HEAVY: 10,
-    ROCKET_MEGA: 11,
-});
+export const ITEM_SLOT_COUNT = PICKUP_SLOT_COUNT;
+export const ITEM_SLOT_UNKNOWN_INDEX = PICKUP_SLOT_UNKNOWN_INDEX;
+
+export const ITEM_SLOT_BY_TYPE = Object.freeze(
+    getPickupTypes().reduce((acc, type) => {
+        acc[type] = getPickupObservationSlotIndex(type);
+        return acc;
+    }, {})
+);
 
 function normalizeItemType(type) {
-    return String(type || '').trim().toUpperCase();
+    return normalizePickupType(type);
 }
 
 export function resolveItemSlotIndex(itemType) {
     const normalized = normalizeItemType(itemType);
     if (!normalized) return ITEM_SLOT_UNKNOWN_INDEX;
-    return Number.isInteger(ITEM_SLOT_BY_TYPE[normalized])
-        ? ITEM_SLOT_BY_TYPE[normalized]
-        : ITEM_SLOT_UNKNOWN_INDEX;
+    return getPickupObservationSlotIndex(normalized);
 }
 
 export function clearItemSlots(target, offset = 0) {

@@ -1416,6 +1416,40 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
         expect(result.finalInventory).toBe(0);
     });
 
+    test('T89j1: Hunt-Raketen koennen nicht mehr per useItem verbrannt werden', async ({ page }) => {
+        await startHuntGame(page);
+        const result = await page.evaluate(() => {
+            const game = window.GAME_INSTANCE;
+            const entityManager = game?.entityManager;
+            const player = entityManager?.players?.[0];
+            if (!game || !entityManager || !player) {
+                return { error: 'missing-state' };
+            }
+
+            player.inventory = ['ROCKET_HEAVY', 'SHIELD'];
+            player.selectedItemIndex = 0;
+            player.itemUseCooldownRemaining = 0;
+
+            const blocked = entityManager._useInventoryItem(player, 0);
+
+            return {
+                error: null,
+                ok: !!blocked?.ok,
+                reason: String(blocked?.reason || ''),
+                type: String(blocked?.type || ''),
+                inventory: player.inventory.slice(),
+                selectedItemIndex: Number(player.selectedItemIndex || 0),
+            };
+        });
+
+        expect(result.error).toBeNull();
+        expect(result.ok).toBeFalsy();
+        expect(result.reason).toContain('nicht direkt genutzt');
+        expect(result.type).toBe('ROCKET_HEAVY');
+        expect(result.inventory).toEqual(['ROCKET_HEAVY', 'SHIELD']);
+        expect(result.selectedItemIndex).toBe(0);
+    });
+
     test('T89k: Shield-Treffer setzen Regen-Timestamp und blocken fruehe HP-Regeneration', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {

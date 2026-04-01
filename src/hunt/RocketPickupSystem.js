@@ -1,19 +1,15 @@
 import { CONFIG } from '../core/Config.js';
+import {
+    getRocketPickupTypes,
+    isRocketPickupType,
+    normalizePickupType,
+} from '../entities/PickupRegistry.js';
 
 const TIER_BY_ITEM = Object.freeze({
     ROCKET_WEAK: 'WEAK',
     ROCKET_MEDIUM: 'MEDIUM',
     ROCKET_HEAVY: 'HEAVY',
     ROCKET_MEGA: 'MEGA',
-});
-
-const LEGACY_ROCKET_TYPE_ALIASES = Object.freeze({
-    ROCKET: 'ROCKET_WEAK',
-    ROCKET_BASIC: 'ROCKET_WEAK',
-    ROCKET_LIGHT: 'ROCKET_WEAK',
-    ROCKET_STRONG: 'ROCKET_HEAVY',
-    ROCKET_POWER: 'ROCKET_HEAVY',
-    ROCKET_ULTRA: 'ROCKET_MEGA',
 });
 
 const ROCKET_WEIGHT_ORDER = Object.freeze([
@@ -24,18 +20,15 @@ const ROCKET_WEIGHT_ORDER = Object.freeze([
 ]);
 
 export function normalizeRocketPickupType(type, { fallback = '' } = {}) {
-    const normalized = String(type || '').trim().toUpperCase();
-    if (!normalized) return String(fallback || '').trim().toUpperCase();
-    return LEGACY_ROCKET_TYPE_ALIASES[normalized] || normalized;
+    return normalizePickupType(type, { fallback });
 }
 
 export function isRocketTierType(type) {
-    const normalized = normalizeRocketPickupType(type);
-    return Object.prototype.hasOwnProperty.call(TIER_BY_ITEM, normalized);
+    return isRocketPickupType(type);
 }
 
 export function getRocketTierTypes() {
-    return Object.keys(TIER_BY_ITEM);
+    return getRocketPickupTypes();
 }
 
 export function resolveRocketTierDamage(type) {

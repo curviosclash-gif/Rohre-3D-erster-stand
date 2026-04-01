@@ -14,6 +14,10 @@ import {
     createHuntTargetingTelemetry,
     resolveHuntLineTarget,
 } from '../../hunt/HuntTargetingOps.js';
+import {
+    isPickupTypeSelfUsable,
+    normalizePickupType,
+} from '../PickupRegistry.js';
 import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
 
 export class HuntCombatSystem {
@@ -27,14 +31,38 @@ export class HuntCombatSystem {
         this._targetingTelemetry = createHuntTargetingTelemetry();
     }
 
-    takeInventoryItem(player, preferredIndex = -1) {
-        if (!player.inventory || player.inventory.length === 0) {
-            return { ok: false, reason: 'Kein Item verfuegbar', type: null };
+    _resolveInventoryIndex(player, preferredIndex = -1) {
+        if (!Array.isArray(player?.inventory) || player.inventory.length === 0) {
+            return -1;
         }
-        const index = Number.isInteger(preferredIndex) && preferredIndex >= 0
-            ? Math.min(preferredIndex, player.inventory.length - 1)
-            : Math.min(player.selectedItemIndex || 0, player.inventory.length - 1);
-        const type = player.inventory[index];
+        const fallbackIndex = Number.isInteger(player?.selectedItemIndex)
+            ? Math.max(0, player.selectedItemIndex)
+            : 0;
+        const requestedIndex = Number.isInteger(preferredIndex) && preferredIndex >= 0
+            ? preferredIndex
+            : fallbackIndex;
+        return Math.min(requestedIndex, player.inventory.length - 1);
+    }
+
+    peekInventoryItem(player, preferredIndex = -1) {
+        const index = this._resolveInventoryIndex(player, preferredIndex);
+        if (index < 0) {
+            return { ok: false, reason: 'Kein Item verfuegbar', type: null, index: -1 };
+        }
+        const rawType = player.inventory[index];
+        const type = normalizePickupType(rawType, { fallback: rawType });
+        if (!type) {
+            return { ok: false, reason: 'Item ungueltig', type: null, index };
+        }
+        return { ok: true, type, index, rawType };
+    }
+
+    takeInventoryItem(player, preferredIndex = -1) {
+        const itemResult = this.peekInventoryItem(player, preferredIndex);
+        if (!itemResult.ok) {
+            return { ok: false, reason: itemResult.reason, type: null };
+        }
+        const { index, type, rawType } = itemResult;
         const lastIdx = player.inventory.length - 1;
         if (index !== lastIdx) {
             player.inventory[index] = player.inventory[lastIdx];
@@ -43,7 +71,7 @@ export class HuntCombatSystem {
         if (player.inventory.length === 0 || player.selectedItemIndex >= player.inventory.length) {
             player.selectedItemIndex = 0;
         }
-        return { ok: true, type };
+        return { ok: true, type, rawType, index };
     }
 
     _isHuntCombatStrategyActive() {
@@ -61,6 +89,9 @@ export class HuntCombatSystem {
     }
 
     useInventoryItem(player, preferredIndex = -1) {
+        const strategy = this.runtime?.callbacks?.getStrategy?.() || null;
+        const modeType = String(strategy?.modeType || 'CLASSIC').trim().toUpperCase();
+        const config = resolveEntityRuntimeConfig(this.runtime);
         const huntCombatActive = this._isHuntCombatStrategyActive();
         const cooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
         if (huntCombatActive && cooldownRemaining > 0.001) {
@@ -70,6 +101,17 @@ export class HuntCombatSystem {
                 type: null,
                 cooldownRemaining,
             };
+        }
+
+        const itemPreview = this.peekInventoryItem(player, preferredIndex);
+        if (!itemPreview.ok) {
+            return { ok: false, reason: itemPreview.reason, type: null };
+        }
+        if (!config?.POWERUP?.TYPES?.[itemPreview.type]) {
+            return { ok: false, reason: 'Item ungueltig', type: itemPreview.type };
+        }
+        if (!isPickupTypeSelfUsable(itemPreview.type, modeType)) {
+            return { ok: false, reason: 'Item kann nicht direkt genutzt werden', type: itemPreview.type };
         }
 
         const itemResult = this.takeInventoryItem(player, preferredIndex);

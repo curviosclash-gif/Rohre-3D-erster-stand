@@ -4,23 +4,17 @@
 
 import * as THREE from 'three';
 import { PowerupModelFactory } from './PowerupModelFactory.js';
-import { normalizeRocketPickupType } from '../hunt/RocketPickupSystem.js';
+import {
+    isPickupTypeAllowedForMode,
+    normalizePickupType,
+} from './PickupRegistry.js';
 import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
-const AUTHORED_ITEM_TYPE_ALIASES = Object.freeze({
-    item_battery: 'SPEED_UP',
-    item_health: 'SHIELD',
-    item_rocket: 'ROCKET_WEAK',
-    item_shield: 'SHIELD',
-});
-
 function isTypeAllowedForMode(type, huntModeActive, entityRuntimeConfig) {
-    const normalizedType = String(type || '').trim().toUpperCase();
+    const normalizedType = normalizePickupType(type);
     const entry = entityRuntimeConfig?.POWERUP?.TYPES?.[normalizedType];
     if (!entry) return false;
-    if (entry.huntOnly && !huntModeActive) return false;
-    if (entry.classicOnly && huntModeActive) return false;
-    return true;
+    return isPickupTypeAllowedForMode(normalizedType, huntModeActive ? 'HUNT' : 'CLASSIC');
 }
 
 function resolveAuthoredPickupType(anchor, huntModeActive, entityRuntimeConfig) {
@@ -28,13 +22,10 @@ function resolveAuthoredPickupType(anchor, huntModeActive, entityRuntimeConfig) 
     const candidates = [
         anchor.pickupType,
         anchor.type,
-        AUTHORED_ITEM_TYPE_ALIASES[String(anchor.type || '').trim().toLowerCase()],
-        AUTHORED_ITEM_TYPE_ALIASES[String(anchor.model || '').trim().toLowerCase()],
+        anchor.model,
     ];
     for (const candidate of candidates) {
-        const normalizedType = normalizeRocketPickupType(candidate, {
-            fallback: String(candidate || '').trim().toUpperCase(),
-        });
+        const normalizedType = normalizePickupType(candidate);
         if (!normalizedType) continue;
         if (isTypeAllowedForMode(normalizedType, huntModeActive, entityRuntimeConfig)) {
             return normalizedType;

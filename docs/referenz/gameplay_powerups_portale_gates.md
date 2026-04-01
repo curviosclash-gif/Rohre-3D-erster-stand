@@ -1,6 +1,6 @@
 # Gameplay-Referenz: Powerups, Portale und Gates
 
-Stand: 2026-03-30
+Stand: 2026-04-01
 
 ## Zweck
 
@@ -11,27 +11,27 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Items spawnen ueber den `PowerupManager`.
 - Auf Maps mit festen `items`-Ankern werden bevorzugt diese Positionen genutzt.
 - Ein eingesammeltes Item landet im Inventar des Spielers.
-- `useItem` verbraucht das Item als Selbst-Effekt.
+- `useItem` verbraucht nur self-usable Items als Selbst-Effekt.
 - `shootItem` verschiesst das Item als Projektil.
-- In Classic und Arcade uebertragen Projektil-Treffer den Item-Effekt auf das Ziel.
-- In Hunt sind Raketen echte Schadens-Projektile; normale Status-Items bleiben Selbst-Effekte.
+- Projektil-Treffer uebertragen Status-Items weiterhin auf das Ziel.
+- In Hunt sind Raketen projektil-only Schadens-Projektile und koennen nicht mehr per `useItem` verbrannt werden.
 
 ## Powerup-Typen
 
 | Typ | Selbstnutzung | Projektil | Wirkung | Modus |
 | --- | --- | --- | --- | --- |
-| `SPEED_UP` | ja | ja in Classic/Arcade | `baseSpeed * 1.6` fuer 4s | alle |
-| `SLOW_DOWN` | ja | ja in Classic/Arcade | `baseSpeed * 0.5` fuer 4s | alle |
-| `THICK` | ja | ja in Classic/Arcade | Trailbreite auf `1.8` fuer 5s | alle |
-| `THIN` | ja | ja in Classic/Arcade | Trailbreite auf `0.2` fuer 5s | alle |
-| `SHIELD` | ja | ja in Classic/Arcade | Shield aktiv; in Hunt mit `shieldHP`, sonst Schutz fuer den naechsten Treffer | alle |
-| `SLOW_TIME` | ja | ja in Classic/Arcade | setzt globale Spielzeit auf `0.4x`, solange aktiv | alle |
-| `GHOST` | ja | ja in Classic/Arcade | ignoriert Wand- und Trail-Kollisionen waehrend der Laufzeit | alle |
-| `INVERT` | ja | ja in Classic/Arcade | invertiert die Steuerung fuer 4s | alle |
-| `ROCKET_WEAK` | ja, aber praktisch fuer Schuss gedacht | ja | 10 Schaden | Hunt |
-| `ROCKET_MEDIUM` | ja, aber praktisch fuer Schuss gedacht | ja | 20 Schaden | Hunt |
-| `ROCKET_HEAVY` | ja, aber praktisch fuer Schuss gedacht | ja | 40 Schaden | Hunt |
-| `ROCKET_MEGA` | ja, aber praktisch fuer Schuss gedacht | ja | 70 Schaden | Hunt |
+| `SPEED_UP` | ja | ja | `baseSpeed * 1.6` fuer 4s | `CLASSIC`, `ARCADE`, `HUNT` |
+| `SLOW_DOWN` | ja | ja | `baseSpeed * 0.5` fuer 4s | `CLASSIC`, `ARCADE`, `HUNT` |
+| `THICK` | ja | ja | Trailbreite auf `1.8` fuer 5s | `CLASSIC`, `ARCADE`, `HUNT` |
+| `THIN` | ja | ja | Trailbreite auf `0.2` fuer 5s | `CLASSIC`, `ARCADE`, `HUNT` |
+| `SHIELD` | ja | ja | Shield aktiv; in Hunt mit `shieldHP`, sonst Schutz fuer den naechsten Treffer | `CLASSIC`, `ARCADE`, `HUNT` |
+| `SLOW_TIME` | ja | ja | setzt globale Spielzeit auf `0.4x`, solange aktiv | `CLASSIC`, `ARCADE`, `HUNT` |
+| `GHOST` | ja | ja | ignoriert Wand- und Trail-Kollisionen waehrend der Laufzeit | `CLASSIC`, `ARCADE`, `HUNT` |
+| `INVERT` | ja | ja | invertiert die Steuerung fuer 4s | `CLASSIC`, `ARCADE`, `HUNT` |
+| `ROCKET_WEAK` | nein | ja | 10 Schaden | `HUNT` |
+| `ROCKET_MEDIUM` | nein | ja | 20 Schaden | `HUNT` |
+| `ROCKET_HEAVY` | nein | ja | 40 Schaden | `HUNT` |
+| `ROCKET_MEGA` | nein | ja | 70 Schaden | `HUNT` |
 
 ## Wichtige Item-Details
 
@@ -39,6 +39,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Feldlimit gleichzeitig gespawnter Items: `10`.
 - Spawnintervall: `3.0s`.
 - Pickup-Radius: `2.5`.
+- Die Capability-Matrix ist zentral in `src/entities/PickupRegistry.js` gepflegt und steuert Typ-Normalisierung, Modusfreigabe, Visuals, Bot-Gewichte und Observation-Slots.
 - In Planar-Maps koennen freie Spawns auf `portalLevels` gelegt werden.
 - Map-Autoren koennen per `pickupType` feste Item-Typen an Anchors erzwingen.
 - `GHOST` und Spawn-Schutz ueberspringen den normalen Wand-/Trail-Kollisionspfad komplett.

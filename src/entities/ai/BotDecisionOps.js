@@ -13,6 +13,12 @@ function clamp01(value) {
     return numeric;
 }
 
+import {
+    isPickupTypeSelfUsable,
+    isPickupTypeShootable,
+    normalizePickupType,
+} from '../PickupRegistry.js';
+
 function resolveHealthRatio(player) {
     const maxHp = Number(player?.maxHp);
     const hp = Number(player?.hp);
@@ -189,8 +195,8 @@ export function decideItemUsage(bot, player, itemRules) {
 
     for (let i = 0; i < player.inventory.length; i++) {
         const type = player.inventory[i];
-        const normalizedType = String(type || '').trim().toUpperCase();
-        const rule = itemRules[type] || { self: 0, offense: 0, defensiveScale: 0, emergencyScale: 0, combatSelf: 0 };
+        const normalizedType = normalizePickupType(type, { fallback: type });
+        const rule = itemRules[normalizedType] || { self: 0, offense: 0, defensiveScale: 0, emergencyScale: 0, combatSelf: 0 };
         const shieldSaturationPenalty = normalizedType === 'SHIELD'
             ? shieldRatio * 0.65
             : 0;
@@ -206,11 +212,11 @@ export function decideItemUsage(bot, player, itemRules) {
             - shieldSaturationPenalty;
         const shootScore = rule.offense * (0.55 + aggression) * targetBonus + rocketOpportunityBonus;
 
-        if (selfScore > bestUseScore) {
+        if (isPickupTypeSelfUsable(normalizedType) && selfScore > bestUseScore) {
             bestUseScore = selfScore;
             bestUseIndex = i;
         }
-        if (shootScore > bestShootScore) {
+        if (isPickupTypeShootable(normalizedType) && shootScore > bestShootScore) {
             bestShootScore = shootScore;
             bestShootIndex = i;
         }
@@ -362,7 +368,11 @@ export function runDecision(bot, dt, player, arena, allPlayers, itemRules) {
                     let bestIdx = 0;
                     let bestOff = -Infinity;
                     for (let ii = 0; ii < player.inventory.length; ii++) {
-                        const rule = itemRules[player.inventory[ii]];
+                        const normalizedType = normalizePickupType(player.inventory[ii], {
+                            fallback: player.inventory[ii],
+                        });
+                        if (!isPickupTypeShootable(normalizedType)) continue;
+                        const rule = itemRules[normalizedType];
                         const off = rule ? rule.offense : 0;
                         if (off > bestOff) { bestOff = off; bestIdx = ii; }
                     }
