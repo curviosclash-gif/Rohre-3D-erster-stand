@@ -19,7 +19,7 @@ This file defines repository-specific operating rules for Codex.
 - Use concise, token-efficient output by default.
 - Ask questions only when critical information is missing.
 - For non-destructive design decisions, proceed proactively with a short rationale.
-- Keep docs/workflows/rules in sync with code and test reality after each change.
+- Keep docs/workflows/rules in sync with code and user-confirmed test reality after each change.
 - Create and revise implementation plans only in external docs under `docs/plaene/neu/`.
 - Do not create or restructure planning content directly inside `docs/Umsetzungsplan.md`.
 - Manual intake into `docs/Umsetzungsplan.md` and subsequent archival to `docs/plaene/alt/` is user-owned.
@@ -61,8 +61,10 @@ This file defines repository-specific operating rules for Codex.
 
 ## Verification Policy
 
-- Select tests using `.agents/test_mapping.md`.
-- If no mapping matches, run `npm run test:core` as fallback.
+- Automated tests are user-owned and run only after explicit user request.
+- Use `.agents/test_mapping.md` only when the user explicitly requests a test run.
+- If no mapping matches for a requested test run, recommend `npm run test:core` to the user instead of auto-running it.
+- When no tests were requested, report test status as pending/user-owned.
 - For phase execution via `/fix-planung`, `/code` is the single source of truth for DoD and verification checks.
 - For bot-training phase execution via `/bot-training-plan`, `/code` remains the single source of truth for implementation checks.
 - For any code/process update, run:

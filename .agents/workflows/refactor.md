@@ -9,7 +9,7 @@ description: Restructure code without changing behavior.
 ## 1. Baseline
 
 // turbo
-- Run baseline tests and store result.
+- Capture baseline behavior from existing code, docs, or user-provided test evidence. Run baseline tests only after explicit user request.
 
 ## 2. Refactor
 
@@ -19,7 +19,7 @@ description: Restructure code without changing behavior.
 ## 3. Verify
 
 // turbo
-- Re-run baseline tests. Compare and investigate regressions immediately.
+- Re-run baseline tests only after explicit user request. Otherwise document the recommended regression checks for the user.
 - If refactor touches plans/workflows/rules: `npm run plan:check`.
 - `npm run docs:sync && npm run docs:check`.
 

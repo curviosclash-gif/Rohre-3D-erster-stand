@@ -5,7 +5,7 @@ description: Prepare and publish a safe release.
 ## 0. Pre-check
 
 // turbo
-- `npm run test:core`
+- Automated release tests are user-owned. Wait for explicit user request or user-provided test evidence before counting test coverage as complete.
 - `npm audit` (no critical issues)
 - `git status` clean
 

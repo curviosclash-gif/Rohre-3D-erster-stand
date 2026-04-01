@@ -10,7 +10,7 @@ description: Measure baseline, optimize bottlenecks, and verify impact.
 ## 1. Baseline
 
 // turbo
-- Run relevant tests/benchmarks. Capture: FPS, frame time, draw calls, memory.
+- Run relevant tests/benchmarks only after explicit user request. Otherwise use existing telemetry, logs, or prior user-provided measurements.
 
 ## 2. Bottlenecks
 
@@ -23,7 +23,7 @@ description: Measure baseline, optimize bottlenecks, and verify impact.
 ## 4. Verify
 
 // turbo
-- Re-run baseline scenario. Report before/after deltas.
+- Re-run the baseline scenario only after explicit user request. Otherwise report expected impact and the benchmark command the user should run.
 
 ## 5. Commit (see AGENTS.md §Commit Convention)
 

@@ -50,11 +50,7 @@ git push
 ## 4. Execute and verify
 
 - Implement with `/code` workflow.
-- For each closed phase, run relevant training gates:
-  - `npm run training:run`
-  - `npm run training:eval`
-  - `npm run training:gate`
-  - `npm run bot:validate` when survival KPIs are affected
+- For each closed phase, run relevant training gates only after explicit user request. Otherwise record the recommended commands for the user: `npm run training:run`, `npm run training:eval`, `npm run training:gate`, `npm run bot:validate` when survival KPIs are affected.
 - For completed phase items (`[x]`), append evidence metadata:
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Keep artifact paths and KPI deltas documented in `docs/bot-training/Bot_Trainingsplan.md`.

@@ -27,7 +27,7 @@ description: Detect and remove dead code/files with safe dry-run first.
 ## 4. Execute after confirmation
 
 - Remove/archive approved items only.
-- Re-run relevant tests.
+- Re-run relevant tests only after explicit user request; otherwise list the recommended manual test command for the user.
 
 ## 5. Commit (see AGENTS.md §Commit Convention)
 

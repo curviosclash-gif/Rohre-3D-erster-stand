@@ -5,14 +5,15 @@ description: Run full test analysis, persist results, and update prioritized act
 ## 0. Context (skip for focused re-runs)
 
 // turbo
+- Use this workflow only after explicit user request for test execution/analysis or when the user provides fresh test results.
 - Read `docs/Umsetzungsplan.md` and latest `docs/Analysebericht.md`.
 
 ## 1. Execute and persist
 
 - Use `.agents/test_mapping.md` to select commands based on changed paths.
-- Always run core tests; specialized tests (GPU, physics, stress) only if relevant or at milestones.
-- Extra smoke: `npm run smoke:roundstate`, `npm run smoke:selftrail`.
-- Save to `docs/tests/Testergebnisse_YYYY-MM-DD.md` with per-test `PASS`/`FAIL`/`WARN`.
+- Run core, specialized, and smoke tests only after explicit user request.
+- Extra smoke commands, when requested: `npm run smoke:roundstate`, `npm run smoke:selftrail`.
+- Save user-provided or explicitly requested results to `docs/tests/Testergebnisse_YYYY-MM-DD.md` with per-test `PASS`/`FAIL`/`WARN`.
 
 ## 2. Analyze deltas
 

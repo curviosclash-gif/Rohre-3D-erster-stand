@@ -48,7 +48,7 @@ git push
 
 - Run `/code` workflow with `fix:` or `refactor:` prefix as fitting.
 - `/code` remains source of truth for implementation verification.
-- Parallel Playwright runs require unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR` per bot.
+- If the user explicitly requests Playwright validation, parallel runs require unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR` per bot.
 
 ## 4. Close phase
 
