@@ -44,7 +44,7 @@ export function resolveMatchStartValidationIssue({
         }
     }
 
-    if (sessionContract.usesMenuStorageBridge) {
+    if (sessionContract.sessionType === 'multiplayer') {
         const sessionState = multiplayerSessionState && typeof multiplayerSessionState === 'object'
             ? multiplayerSessionState
             : null;

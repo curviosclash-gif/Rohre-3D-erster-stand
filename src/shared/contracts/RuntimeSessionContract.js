@@ -35,7 +35,13 @@ export function resolveRuntimeSessionContract(source = null) {
         && multiplayerTransport === MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
     const adapterSessionType = usesMenuStorageBridge
         ? RUNTIME_SESSION_TYPES.SINGLE
-        : sessionType;
+        : (sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER
+            ? (multiplayerTransport === MULTIPLAYER_TRANSPORTS.LAN
+                ? RUNTIME_SESSION_TYPES.LAN
+                : (multiplayerTransport === MULTIPLAYER_TRANSPORTS.ONLINE
+                    ? RUNTIME_SESSION_TYPES.ONLINE
+                    : sessionType))
+            : sessionType);
     const runtimeTransportKind = usesMenuStorageBridge
         ? 'menu-storage-bridge'
         : adapterSessionType;

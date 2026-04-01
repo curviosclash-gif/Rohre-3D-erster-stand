@@ -2,7 +2,7 @@
 // MenuRuntimeMultiplayerService.js - multiplayer lobby/runtime helpers
 // ============================================
 
-import { MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
+import { LanMenuMultiplayerBridge, MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
 import {
     MULTIPLAYER_TRANSPORTS,
@@ -12,6 +12,13 @@ import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
 
 function deepClone(value) {
     return tryCloneJsonValue(value, null);
+}
+
+function shouldUseDesktopLanBridge(runtime = null) {
+    const runtimeGlobal = runtime && typeof runtime === 'object' && runtime.global && typeof runtime.global === 'object'
+        ? runtime.global
+        : (typeof globalThis !== 'undefined' ? globalThis : null);
+    return runtimeGlobal?.curviosApp?.isApp === true || runtimeGlobal?.__CURVIOS_APP__ === true;
 }
 
 // NOTE: 'multiplayer' is a menu-layer coordination type, not a real network transport.
@@ -25,9 +32,11 @@ function ensureMultiplayerSessionType(game) {
         game.settings.localSettings = {};
     }
     game.settings.localSettings.sessionType = RUNTIME_SESSION_TYPES.MULTIPLAYER;
-    if (!game.settings.localSettings.multiplayerTransport) {
-        game.settings.localSettings.multiplayerTransport = MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
-    }
+    const currentTransport = String(game.settings.localSettings.multiplayerTransport || '').trim().toLowerCase();
+    if (currentTransport === MULTIPLAYER_TRANSPORTS.ONLINE) return;
+    game.settings.localSettings.multiplayerTransport = shouldUseDesktopLanBridge()
+        ? MULTIPLAYER_TRANSPORTS.LAN
+        : MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
 }
 
 export function createMenuMultiplayerBridge(options = {}) {
@@ -45,13 +54,28 @@ export function createMenuMultiplayerBridge(options = {}) {
         peerId,
     } = options;
 
+    const useLanBridge = shouldUseDesktopLanBridge(runtime);
     if (existingBridge) {
         existingBridge.contractVersion = contractVersion;
         existingBridge.onEvent = typeof onEvent === 'function' ? onEvent : null;
         existingBridge.onStatus = typeof onStatus === 'function' ? onStatus : null;
         existingBridge.onStateChanged = typeof onStateChanged === 'function' ? onStateChanged : null;
         existingBridge.onMatchStart = typeof onMatchStart === 'function' ? onMatchStart : null;
-        return existingBridge;
+        if ((useLanBridge && existingBridge?.bridgeKind === 'lan') || (!useLanBridge && existingBridge?.bridgeKind !== 'lan')) {
+            return existingBridge;
+        }
+        existingBridge.dispose?.();
+    }
+
+    if (useLanBridge) {
+        return new LanMenuMultiplayerBridge({
+            contractVersion,
+            onEvent,
+            onStatus,
+            onStateChanged,
+            onMatchStart,
+            runtime,
+        });
     }
 
     return new MenuMultiplayerBridge({
@@ -92,7 +116,7 @@ export function createMultiplayerMatchSettingsSnapshot(settings = {}) {
             sessionType: RUNTIME_SESSION_TYPES.MULTIPLAYER,
             // 'storage-bridge' = localStorage + BroadcastChannel (in-browser only, no real network sync).
             // Future values: 'lan' (LANSessionAdapter), 'online' (OnlineSessionAdapter).
-            multiplayerTransport: MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE,
+            multiplayerTransport: settings?.localSettings?.multiplayerTransport || MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE,
             modePath: settings?.localSettings?.modePath || 'normal',
         },
     });
@@ -159,6 +183,7 @@ export function applyMultiplayerMatchSettingsSnapshot(targetSettings, snapshot =
     };
     targetSettings.localSettings.sessionType = RUNTIME_SESSION_TYPES.MULTIPLAYER;
     targetSettings.localSettings.multiplayerTransport = snapshot?.localSettings?.multiplayerTransport
+        || targetSettings.localSettings.multiplayerTransport
         || MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
     if (typeof snapshot?.localSettings?.modePath === 'string' && snapshot.localSettings.modePath.trim()) {
         targetSettings.localSettings.modePath = snapshot.localSettings.modePath.trim();
@@ -181,17 +206,21 @@ export function invalidateMultiplayerReadyIfHostChangedSettings({
     if (!accessContext?.isOwner) return;
 
     const invalidationResult = menuMultiplayerBridge?.invalidateReadyForAll('host_settings_changed');
-    if (!invalidationResult?.event) return;
+    if (!invalidationResult) return null;
 
-    if (game?.ui?.multiplayerReadyToggle) {
-        game.ui.multiplayerReadyToggle.checked = false;
-    }
-    onSettingsChanged?.({
-        changedKeys: [settingsChangeKeys.MULTIPLAYER_STATUS],
-    });
+    return Promise.resolve(invalidationResult).then((resolvedResult) => {
+        if (!resolvedResult?.event) return null;
+        if (game?.ui?.multiplayerReadyToggle) {
+            game.ui.multiplayerReadyToggle.checked = false;
+        }
+        onSettingsChanged?.({
+            changedKeys: [settingsChangeKeys.MULTIPLAYER_STATUS],
+        });
+        return resolvedResult;
+    }).catch(() => null);
 }
 
-export function handleMultiplayerHostAction({
+export async function handleMultiplayerHostAction({
     game,
     event,
     resolveMenuAccessContext,
@@ -201,10 +230,18 @@ export function handleMultiplayerHostAction({
 }) {
     if (!game) return null;
     const accessContext = resolveMenuAccessContext?.();
-    const result = menuMultiplayerBridge?.host({
-        actorId: accessContext?.actorId,
-        lobbyCode: String(event?.lobbyCode || '').trim(),
-    });
+    let result = null;
+    try {
+        result = await Promise.resolve(menuMultiplayerBridge?.host({
+            actorId: accessContext?.actorId,
+            lobbyCode: String(event?.lobbyCode || '').trim(),
+        }));
+    } catch (error) {
+        result = {
+            ok: false,
+            message: error instanceof Error ? error.message : 'Lobby konnte nicht erstellt werden.',
+        };
+    }
     if (!result?.ok) {
         game._showStatusToast(result?.message || 'Lobby konnte nicht erstellt werden.', 1800, 'error');
         return result;
@@ -219,7 +256,7 @@ export function handleMultiplayerHostAction({
     return result;
 }
 
-export function handleMultiplayerJoinAction({
+export async function handleMultiplayerJoinAction({
     game,
     event,
     resolveMenuAccessContext,
@@ -228,10 +265,18 @@ export function handleMultiplayerJoinAction({
 }) {
     if (!game) return null;
     const accessContext = resolveMenuAccessContext?.();
-    const result = menuMultiplayerBridge?.join({
-        actorId: accessContext?.actorId,
-        lobbyCode: String(event?.lobbyCode || '').trim(),
-    });
+    let result = null;
+    try {
+        result = await Promise.resolve(menuMultiplayerBridge?.join({
+            actorId: accessContext?.actorId,
+            lobbyCode: String(event?.lobbyCode || '').trim(),
+        }));
+    } catch (error) {
+        result = {
+            ok: false,
+            message: error instanceof Error ? error.message : 'Lobby konnte nicht beigetreten werden.',
+        };
+    }
     if (!result?.ok) {
         game._showStatusToast(result?.message || 'Lobby konnte nicht beigetreten werden.', 1800, 'error');
         return result;
@@ -245,7 +290,7 @@ export function handleMultiplayerJoinAction({
     return result;
 }
 
-export function handleMultiplayerReadyToggleAction({
+export async function handleMultiplayerReadyToggleAction({
     game,
     event,
     resolveMenuAccessContext,
@@ -253,10 +298,18 @@ export function handleMultiplayerReadyToggleAction({
     syncUiState,
 }) {
     ensureMultiplayerSessionType(game);
-    const result = menuMultiplayerBridge?.toggleReady({
-        actorId: resolveMenuAccessContext?.()?.actorId,
-        ready: !!event?.ready,
-    });
+    let result = null;
+    try {
+        result = await Promise.resolve(menuMultiplayerBridge?.toggleReady({
+            actorId: resolveMenuAccessContext?.()?.actorId,
+            ready: !!event?.ready,
+        }));
+    } catch (error) {
+        result = {
+            ok: false,
+            message: error instanceof Error ? error.message : 'Ready-Status konnte nicht gesetzt werden.',
+        };
+    }
     if (!result?.ok) {
         game?._showStatusToast?.(result?.message || 'Ready-Status konnte nicht gesetzt werden.', 1700, 'error');
         if (game?.ui?.multiplayerReadyToggle) {

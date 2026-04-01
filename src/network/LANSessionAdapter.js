@@ -39,6 +39,7 @@ export class LANSessionAdapter extends SessionAdapterBase {
             reconnectWindowMs: options.reconnectWindowMs,
             now: options.now,
         });
+        this.localPlayerId = String(options.playerId || '').trim() || this.localPlayerId;
         this._signalingUrl = options.signalingUrl || null;
         this._dataChannelManager = new DataChannelManager();
         this._peerManager = new PeerConnectionManager({
@@ -95,6 +96,11 @@ export class LANSessionAdapter extends SessionAdapterBase {
             return;
         }
 
+        const existingPlayerId = String(options.playerId || this.localPlayerId || '').trim();
+        if (existingPlayerId) {
+            await this._attachExistingClient(existingPlayerId);
+            return;
+        }
         await this._joinAsClient(options.lobbyCode);
     }
 
@@ -109,46 +115,28 @@ export class LANSessionAdapter extends SessionAdapterBase {
                 throw new Error(`Lobby join failed (${joinRes.status || 'unknown'})`);
             }
             const joinData = await joinRes.json();
-            this.localPlayerId = joinData.playerId;
-
-            // Poll for the offer from host
-            let offerData = null;
-            let offerPollDelayMs = JOIN_OFFER_INITIAL_BACKOFF_MS;
-            const offerPollingStartedAt = Number(this._now()) || 0;
-            while ((Number(this._now()) || 0) - offerPollingStartedAt < JOIN_OFFER_MAX_WAIT_MS) {
-                try {
-                    const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${this.localPlayerId}`);
-                    if (offerRes?.ok === false) {
-                        throw new Error(`Offer poll failed (${offerRes.status || 'unknown'})`);
-                    }
-                    const data = await offerRes.json();
-                    if (data.offer) {
-                        offerData = data;
-                        break;
-                    }
-                } catch (err) {
-                    logger.debug('Offer poll failed:', err);
-                }
-                await delay(offerPollDelayMs);
-                offerPollDelayMs = Math.min(JOIN_OFFER_MAX_BACKOFF_MS, offerPollDelayMs * 2);
-            }
-            if (!offerData?.offer) {
-                throw new Error('Timed out waiting for host offer');
-            }
-
-            const answer = await this._peerManager.handleOffer('host', offerData.offer);
-
-            await fetch(`${this._signalingUrl}/signaling/answer`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ playerId: this.localPlayerId, answer }),
-            }).catch((err) => { logger.warn('Answer send failed:', err); });
+            await this._attachExistingClient(joinData.playerId);
         } catch (err) {
             logger.error('Join as client failed:', err);
             throw err;
         }
+    }
 
-        // Exchange ICE candidates with host
+    async _attachExistingClient(playerId) {
+        this.localPlayerId = String(playerId || '').trim();
+        if (!this.localPlayerId) {
+            throw new Error('Client attach failed: playerId missing');
+        }
+
+        const offer = await this._waitForHostOffer(this.localPlayerId);
+        const answer = await this._peerManager.handleOffer('host', offer);
+
+        await fetch(`${this._signalingUrl}/signaling/answer`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerId: this.localPlayerId, answer }),
+        }).catch((err) => { logger.warn('Answer send failed:', err); });
+
         await this._pollIceCandidates('host', {
             playerId: this.localPlayerId,
             fromPeerId: 'host',
@@ -156,6 +144,28 @@ export class LANSessionAdapter extends SessionAdapterBase {
 
         this.isConnected = true;
         this._emit('connected', { playerId: this.localPlayerId });
+    }
+
+    async _waitForHostOffer(playerId) {
+        let offerPollDelayMs = JOIN_OFFER_INITIAL_BACKOFF_MS;
+        const offerPollingStartedAt = Number(this._now()) || 0;
+        while ((Number(this._now()) || 0) - offerPollingStartedAt < JOIN_OFFER_MAX_WAIT_MS) {
+            try {
+                const offerRes = await fetch(`${this._signalingUrl}/signaling/offer?playerId=${playerId}`);
+                if (offerRes?.ok === false) {
+                    throw new Error(`Offer poll failed (${offerRes.status || 'unknown'})`);
+                }
+                const data = await offerRes.json();
+                if (data.offer) {
+                    return data.offer;
+                }
+            } catch (err) {
+                logger.debug('Offer poll failed:', err);
+            }
+            await delay(offerPollDelayMs);
+            offerPollDelayMs = Math.min(JOIN_OFFER_MAX_BACKOFF_MS, offerPollDelayMs * 2);
+        }
+        throw new Error('Timed out waiting for host offer');
     }
 
     async _sendIceCandidate(peerId, candidate) {

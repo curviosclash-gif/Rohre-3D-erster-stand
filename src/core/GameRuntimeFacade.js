@@ -10,7 +10,7 @@ import {
     SESSION_FINALIZE_TRIGGERS,
 } from '../shared/contracts/MatchLifecycleContract.js';
 import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
-import { resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
+import { RUNTIME_SESSION_TYPES, resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { applyRuntimeSettingsState } from './runtime/GameRuntimeBundle.js';
@@ -53,6 +53,10 @@ import {
     handleMultiplayerReadyToggleAction,
     invalidateMultiplayerReadyIfHostChangedSettings,
 } from './runtime/MenuRuntimeMultiplayerService.js';
+import {
+    requestRuntimeMultiplayerMatchStart,
+    syncRuntimeMultiplayerContext,
+} from './runtime/RuntimeMultiplayerFlowService.js';
 import { orchestrateRuntimeSettingsChanged } from './runtime/RuntimeSettingsChangeOrchestrator.js';
 import {
     handleDeveloperTrainingAutoStepAction,
@@ -333,15 +337,15 @@ export class GameRuntimeFacade {
     }
 
     _syncMultiplayerRuntimeContext(changedKeys = null) {
-        const game = this.game;
-        if (!resolveRuntimeSessionContract(game?.settings?.localSettings).usesMenuStorageBridge) return;
-
-        const accessContext = this._resolveMenuAccessContext();
-        this.menuMultiplayerBridge?.syncActorIdentity?.(accessContext?.actorId);
-        if (Array.isArray(changedKeys) && changedKeys.length > 0 && this._didHostChangeMatchSettings(changedKeys)) {
-            this.menuMultiplayerBridge?.publishHostSettings?.(this._captureMultiplayerMatchSettings());
-        }
-        this._syncMultiplayerUiState();
+        syncRuntimeMultiplayerContext({
+            game: this.game,
+            changedKeys,
+            menuMultiplayerBridge: this.menuMultiplayerBridge,
+            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
+            didHostChangeMatchSettings: (nextChangedKeys) => this._didHostChangeMatchSettings(nextChangedKeys),
+            captureSettingsSnapshot: () => this._captureMultiplayerMatchSettings(),
+            syncUiState: () => this._syncMultiplayerUiState(),
+        });
     }
 
     handleMenuControllerEvent(event) {
@@ -775,24 +779,13 @@ export class GameRuntimeFacade {
             return false;
         }
         this.game?.uiManager?.clearStartValidationError?.();
-        if (sessionContract.usesMenuStorageBridge) {
-            const startResult = this.menuMultiplayerBridge?.requestMatchStart?.({
-                settingsSnapshot: this._captureMultiplayerMatchSettings(),
+        if (sessionContract.sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER) {
+            return requestRuntimeMultiplayerMatchStart({
+                game: this.game,
+                menuMultiplayerBridge: this.menuMultiplayerBridge,
+                captureSettingsSnapshot: () => this._captureMultiplayerMatchSettings(),
+                recordMenuTelemetry: (eventType, payload) => this._recordMenuTelemetry(eventType, payload),
             });
-            if (!startResult?.ok) {
-                this._recordMenuTelemetry('abort', {
-                    ...telemetryPayload,
-                    reason: 'multiplayer_start_failed',
-                    code: startResult?.code || 'unknown',
-                });
-                this.game?._showStatusToast?.(
-                    startResult?.message || 'Lobby-Start konnte nicht ausgeliefert werden.',
-                    1700,
-                    'error'
-                );
-                return false;
-            }
-            return true;
         }
         const startResult = this.ports?.matchUiPort?.startMatch?.();
         return startResult !== false;

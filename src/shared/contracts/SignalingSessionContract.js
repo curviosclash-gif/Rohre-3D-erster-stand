@@ -20,7 +20,13 @@ export const SIGNALING_EVENT_TYPES = Object.freeze({
 });
 
 export const SIGNALING_HTTP_ROUTES = Object.freeze({
+    LOBBY_CREATE: '/lobby/create',
     LOBBY_JOIN: '/lobby/join',
+    LOBBY_READY: '/lobby/ready',
+    LOBBY_LEAVE: '/lobby/leave',
+    LOBBY_ACK_PENDING: '/lobby/ack-pending',
+    LOBBY_MATCH_START: '/lobby/match-start',
+    LOBBY_INVALIDATE_READY: '/lobby/invalidate-ready',
     LOBBY_STATUS: '/lobby/status',
     SIGNALING_OFFER: '/signaling/offer',
     SIGNALING_ANSWER: '/signaling/answer',

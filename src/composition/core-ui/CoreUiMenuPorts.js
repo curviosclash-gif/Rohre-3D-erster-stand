@@ -7,6 +7,7 @@ export { getNextEventPlaylistEntry } from '../../ui/menu/EventPlaylistCatalog.js
 export { LEVEL4_SECTION_IDS } from '../../ui/menu/MenuStateContracts.js';
 export { createMenuLevel3ResetDefaults } from '../../ui/menu/MenuDefaultsEditorConfig.js';
 export { MenuMultiplayerBridge } from '../../ui/menu/MenuMultiplayerBridge.js';
+export { LanMenuMultiplayerBridge } from './LanMenuMultiplayerBridge.js';
 export {
     exportMenuConfigAsCode,
     exportMenuConfigAsJson,

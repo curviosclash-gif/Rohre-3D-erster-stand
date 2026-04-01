@@ -25,6 +25,7 @@ export class LANMatchLobby extends MatchLobby {
         this._pollingInterval = null;
         this.sessionState = createInitialLobbySessionState();
         this._localPeerId = '';
+        this._lastHandledMatchCommandId = '';
     }
 
     _applySessionState(nextState) {
@@ -38,40 +39,39 @@ export class LANMatchLobby extends MatchLobby {
     async create(options = {}) {
         this.isHost = true;
         this.settings = { ...options };
-        const createdAt = Date.now();
         this._localPeerId = 'host';
-        this._applySessionState({
-            lobbyCode: this.lobbyCode,
-            hostPeerId: this._localPeerId,
-            members: [{
-                peerId: this._localPeerId,
-                actorId: 'Host',
-                name: 'Host',
-                role: 'host',
-                ready: true,
-                joinedAt: createdAt,
-                lastSeenAt: createdAt,
-            }],
-            maxPlayers: Number(options.maxPlayers || 10),
-            updatedAt: createdAt,
-        });
-        this._startPolling();
+        this._lastHandledMatchCommandId = '';
 
-        try {
-            const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_STATUS}`);
-            const data = await res.json();
-            this._syncWithServerStatus(data);
-        } catch (err) {
-            logger.warn('Initial lobby status fetch failed (server may not be ready):', err);
+        const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_CREATE}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ maxPlayers: Number(options.maxPlayers || 10) }),
+        });
+        if (res?.ok === false) {
+            throw new Error(`Lobby create failed (${res.status || 'unknown'})`);
+        }
+        const data = await res.json();
+        this._processServerStatus(data);
+        this._startPolling();
+        if (!this.sessionState.lobbyCode) {
+            throw new Error('Lobby create failed: lobby code missing');
         }
     }
 
     async join(codeOrAddress) {
+        const joinOptions = codeOrAddress && typeof codeOrAddress === 'object'
+            ? codeOrAddress
+            : { signalingUrl: codeOrAddress };
         this.isHost = false;
-        const url = String(codeOrAddress || '').includes('://')
-            ? String(codeOrAddress)
-            : `http://${String(codeOrAddress || '')}`;
+        if (joinOptions?.lobbyCode) {
+            this.lobbyCode = String(joinOptions.lobbyCode || '').trim().toUpperCase();
+        }
+        const rawUrl = String(joinOptions?.signalingUrl || joinOptions?.address || '').trim();
+        const url = rawUrl.includes('://')
+            ? rawUrl
+            : `http://${rawUrl}`;
         this._signalingUrl = url;
+        this._lastHandledMatchCommandId = '';
 
         try {
             const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_JOIN}`, {
@@ -79,9 +79,13 @@ export class LANMatchLobby extends MatchLobby {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ lobbyCode: this.lobbyCode }),
             });
+            if (res?.ok === false) {
+                throw new Error(`Lobby join failed (${res.status || 'unknown'})`);
+            }
             const data = await res.json();
             this._localPeerId = String(data.playerId || '').trim();
-            this._syncWithServerStatus(data);
+            this._processServerStatus(data);
+            this._startPolling();
         } catch (err) {
             logger.warn('Lobby join request failed:', err);
             throw err;
@@ -112,7 +116,7 @@ export class LANMatchLobby extends MatchLobby {
             });
         };
 
-        ensureMember({ playerId: hostPeerId, name: 'Host', ready: true }, 'host');
+        ensureMember({ playerId: hostPeerId, name: 'Host', ready: status.hostReady === true }, 'host');
         for (const player of serverPlayers) {
             ensureMember(player, 'client');
         }
@@ -127,16 +131,43 @@ export class LANMatchLobby extends MatchLobby {
         });
     }
 
+    _processServerStatus(serverState = {}) {
+        const status = serverState?.sessionState && typeof serverState.sessionState === 'object'
+            ? serverState.sessionState
+            : serverState;
+        this._syncWithServerStatus(status);
+
+        const pendingMatchStart = status?.pendingMatchStart && typeof status.pendingMatchStart === 'object'
+            ? {
+                ...status.pendingMatchStart,
+                settingsSnapshot: status.pendingMatchStart.settingsSnapshot ?? null,
+            }
+            : null;
+        const commandId = String(pendingMatchStart?.commandId || '').trim();
+        if (commandId && commandId !== this._lastHandledMatchCommandId) {
+            this._lastHandledMatchCommandId = commandId;
+            this._emit('matchStart', {
+                pendingMatchStart,
+                players: this.players,
+                settings: pendingMatchStart.settingsSnapshot ?? this.settings,
+                sessionState: this.sessionState,
+            });
+        }
+    }
+
     _startPolling() {
+        if (this._pollingInterval) {
+            clearInterval(this._pollingInterval);
+        }
         this._pollingInterval = setInterval(async () => {
             try {
                 const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_STATUS}`);
                 const data = await res.json();
-                this._syncWithServerStatus(data);
+                this._processServerStatus(data);
             } catch (err) {
                 logger.debug('Lobby status poll failed:', err);
             }
-        }, 2000);
+        }, 500);
     }
 
     leave() {
@@ -146,9 +177,19 @@ export class LANMatchLobby extends MatchLobby {
         }
 
         // Notify the LAN signaling server so the player slot is freed
-        if (this._signalingUrl && this._localPeerId && !this.isHost) {
+        if (this._signalingUrl && this._localPeerId && this.isHost) {
             try {
-                fetch(`${this._signalingUrl}/lobby/leave`, {
+                fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_CREATE}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ maxPlayers: Number(this.sessionState.maxPlayers || 10) }),
+                }).catch((err) => { logger.debug('Host lobby reset failed:', err); });
+            } catch (err) {
+                logger.debug('Host lobby reset error:', err);
+            }
+        } else if (this._signalingUrl && this._localPeerId && !this.isHost) {
+            try {
+                fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_LEAVE}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ playerId: this._localPeerId }),
@@ -160,22 +201,23 @@ export class LANMatchLobby extends MatchLobby {
 
         this.players = [];
         this.sessionState = createInitialLobbySessionState();
+        this._lastHandledMatchCommandId = '';
         this._emit('closed', {});
     }
 
-    setReady(ready) {
-        const nextMembers = this.sessionState.members.map((member) => (
-            member.peerId === this._localPeerId
-                ? { ...member, ready: ready === true, lastSeenAt: Date.now() }
-                : member
-        ));
-        this._applySessionState({
-            ...this.sessionState,
-            members: nextMembers,
-            updatedAt: Date.now(),
-            revision: Number(this.sessionState.revision || 0) + 1,
+    async setReady(ready) {
+        const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_READY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerId: this._localPeerId || 'host', ready: ready === true }),
         });
+        if (res?.ok === false) {
+            throw new Error(`Lobby ready failed (${res.status || 'unknown'})`);
+        }
+        const data = await res.json();
+        this._processServerStatus(data);
         this._emit('readyChanged', { ready: ready === true, sessionState: this.sessionState });
+        return data;
     }
 
     updateSettings(settings) {
@@ -183,8 +225,41 @@ export class LANMatchLobby extends MatchLobby {
         this._emit('settingsChanged', { settings: this.settings, sessionState: this.sessionState });
     }
 
-    startMatch() {
-        this._emit('matchStart', { players: this.players, settings: this.settings, sessionState: this.sessionState });
+    async invalidateReadyForAll() {
+        const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_INVALIDATE_READY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hostPeerId: this._localPeerId || 'host' }),
+        });
+        if (res?.ok === false) {
+            throw new Error(`Lobby ready invalidation failed (${res.status || 'unknown'})`);
+        }
+        const data = await res.json();
+        this._processServerStatus(data);
+        return data;
+    }
+
+    async startMatch(options = {}) {
+        const settingsSnapshot = options?.settingsSnapshot ?? this.settings ?? null;
+        const res = await fetch(`${this._signalingUrl}${SIGNALING_HTTP_ROUTES.LOBBY_MATCH_START}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ settingsSnapshot }),
+        });
+        if (res?.ok === false) {
+            throw new Error(`Lobby match start failed (${res.status || 'unknown'})`);
+        }
+        const data = await res.json();
+        this._processServerStatus(data);
+        return data;
+    }
+
+    getLocalPeerId() {
+        return this._localPeerId;
+    }
+
+    getSignalingUrl() {
+        return this._signalingUrl;
     }
 
     dispose() {

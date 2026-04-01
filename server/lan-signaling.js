@@ -11,9 +11,10 @@ import {
 const DEFAULT_MAX_PLAYERS = 10;
 const DEFAULT_GHOST_PLAYER_TIMEOUT_MS = 60_000;
 const DEFAULT_GHOST_CLEANUP_INTERVAL_MS = 5_000;
-const LOBBY_READY_ROUTE = '/lobby/ready';
-const LOBBY_LEAVE_ROUTE = '/lobby/leave';
-const LOBBY_ACK_PENDING_ROUTE = '/lobby/ack-pending';
+
+function normalizeLobbyCode(value) {
+    return String(value || '').trim().toUpperCase();
+}
 
 function toPlayerId(value) {
     return String(value || '').trim();
@@ -61,7 +62,8 @@ function buildLobbyState(lobby) {
     return {
         lobbyCode: lobby.code,
         hostPeerId: 'host',
-        maxPlayers: DEFAULT_MAX_PLAYERS,
+        hostReady: lobby.hostReady === true,
+        maxPlayers: Number(lobby.maxPlayers || DEFAULT_MAX_PLAYERS),
         updatedAt: Date.now(),
         players: lobby.players.map((player) => ({
             peerId: player.playerId,
@@ -70,6 +72,15 @@ function buildLobbyState(lobby) {
             isHost: false,
         })),
         pendingPlayers: lobby.pendingPlayers.map((entry) => ({ playerId: entry.playerId })),
+        pendingMatchStart: lobby.pendingMatchStart
+            ? {
+                commandId: String(lobby.pendingMatchStart.commandId || '').trim(),
+                lobbyCode: String(lobby.pendingMatchStart.lobbyCode || lobby.code).trim(),
+                hostPeerId: String(lobby.pendingMatchStart.hostPeerId || 'host').trim() || 'host',
+                issuedAt: Number(lobby.pendingMatchStart.issuedAt || Date.now()),
+                settingsSnapshot: lobby.pendingMatchStart.settingsSnapshot ?? null,
+            }
+            : null,
     };
 }
 
@@ -84,12 +95,15 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
     const lobby = {
         code: generateLobbyCode(),
+        hostReady: false,
+        maxPlayers: DEFAULT_MAX_PLAYERS,
         players: [],
         pendingPlayers: [],
         offers: new Map(),
         answers: new Map(),
         // key: target playerId, value: Array<{ fromPlayerId: string, candidate: any }>
         ice: new Map(),
+        pendingMatchStart: null,
     };
 
     let nextPlayerId = 1;
@@ -162,8 +176,36 @@ export function createLANSignalingServer(port = 9090, options = {}) {
         const url = new URL(req.url, `http://localhost:${port}`);
         const path = url.pathname;
 
+        if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_CREATE) {
+            const body = await readBody(req);
+            const requestedMaxPlayers = Number(body.maxPlayers);
+            lobby.code = generateLobbyCode();
+            lobby.hostReady = false;
+            lobby.maxPlayers = Number.isFinite(requestedMaxPlayers)
+                ? Math.max(2, Math.min(DEFAULT_MAX_PLAYERS, Math.floor(requestedMaxPlayers)))
+                : DEFAULT_MAX_PLAYERS;
+            lobby.players = [];
+            lobby.pendingPlayers = [];
+            lobby.offers.clear();
+            lobby.answers.clear();
+            lobby.ice.clear();
+            lobby.pendingMatchStart = null;
+            jsonResponse(res, {
+                ok: true,
+                lobbyCode: lobby.code,
+                sessionState: buildLobbyState(lobby),
+            });
+            return;
+        }
+
         if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_JOIN) {
             cleanupGhostPlayers();
+            const body = await readBody(req);
+            const requestedLobbyCode = normalizeLobbyCode(body.lobbyCode);
+            if (requestedLobbyCode && requestedLobbyCode !== normalizeLobbyCode(lobby.code)) {
+                jsonResponse(res, { ok: false, message: 'lobby_not_found' }, 404);
+                return;
+            }
             const playerId = `player-${nextPlayerId++}`;
             const timestamp = now();
             lobby.players.push({ playerId, ready: false, joinedAt: timestamp, lastActivityAt: timestamp });
@@ -176,10 +218,15 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             return;
         }
 
-        if (req.method === 'POST' && path === LOBBY_READY_ROUTE) {
+        if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_READY) {
             const body = await readBody(req);
             const playerId = toPlayerId(body.playerId);
             const ready = body.ready === true;
+            if (playerId === 'host') {
+                lobby.hostReady = ready;
+                jsonResponse(res, { ok: true, sessionState: buildLobbyState(lobby) });
+                return;
+            }
             const player = lobby.players.find((entry) => entry.playerId === playerId);
             if (!player) {
                 jsonResponse(res, { ok: false, message: 'player_not_found' }, 404);
@@ -191,10 +238,20 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             return;
         }
 
-        if (req.method === 'POST' && path === LOBBY_LEAVE_ROUTE) {
+        if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_LEAVE) {
             const body = await readBody(req);
             const playerId = toPlayerId(body.playerId);
             removePlayer(playerId);
+            jsonResponse(res, { ok: true, sessionState: buildLobbyState(lobby) });
+            return;
+        }
+
+        if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_INVALIDATE_READY) {
+            lobby.hostReady = false;
+            lobby.players = lobby.players.map((entry) => ({
+                ...entry,
+                ready: false,
+            }));
             jsonResponse(res, { ok: true, sessionState: buildLobbyState(lobby) });
             return;
         }
@@ -214,7 +271,7 @@ export function createLANSignalingServer(port = 9090, options = {}) {
             return;
         }
 
-        if (req.method === 'POST' && path === LOBBY_ACK_PENDING_ROUTE) {
+        if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_ACK_PENDING) {
             const body = await readBody(req);
             const playerId = toPlayerId(body.playerId);
             if (playerId) {
@@ -222,6 +279,25 @@ export function createLANSignalingServer(port = 9090, options = {}) {
                 touchPlayerActivity(playerId);
             }
             jsonResponse(res, { ok: true });
+            return;
+        }
+
+        if (req.method === 'POST' && path === SIGNALING_HTTP_ROUTES.LOBBY_MATCH_START) {
+            const body = await readBody(req);
+            const timestamp = now();
+            const requestedCommandId = String(body.commandId || '').trim();
+            lobby.pendingMatchStart = {
+                commandId: requestedCommandId || `match-${timestamp}`,
+                lobbyCode: lobby.code,
+                hostPeerId: 'host',
+                issuedAt: timestamp,
+                settingsSnapshot: body?.settingsSnapshot ?? null,
+            };
+            jsonResponse(res, {
+                ok: true,
+                pendingMatchStart: lobby.pendingMatchStart,
+                sessionState: buildLobbyState(lobby),
+            });
             return;
         }
 

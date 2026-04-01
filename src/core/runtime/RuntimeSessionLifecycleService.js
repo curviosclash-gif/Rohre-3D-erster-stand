@@ -26,11 +26,11 @@ function resolveSessionContract(sessionSource = null) {
     return resolveRuntimeSessionContract(sessionSource);
 }
 
-export async function createRuntimeSessionAdapter(sessionSource) {
+export async function createRuntimeSessionAdapter(sessionSource, adapterOptions = {}) {
     const sessionContract = resolveSessionContract(sessionSource);
     if (sessionContract.adapterSessionType === RUNTIME_SESSION_TYPES.LAN) {
         const { LANSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/LANSessionAdapter.js');
-        return new LANSessionAdapter();
+        return new LANSessionAdapter(adapterOptions);
     }
     if (sessionContract.adapterSessionType === RUNTIME_SESSION_TYPES.ONLINE) {
         const { OnlineSessionAdapter } = await import(/* webpackChunkName: "net" */ '../../network/OnlineSessionAdapter.js');
@@ -43,16 +43,30 @@ export async function createRuntimeSessionAdapter(sessionSource) {
     return new LocalSessionAdapter();
 }
 
+function resolveRuntimeSessionConnectionContext(facade, sessionContract) {
+    if (sessionContract?.sessionType !== RUNTIME_SESSION_TYPES.MULTIPLAYER) {
+        return {};
+    }
+    const bridgeContext = facade?.menuMultiplayerBridge?.getConnectionContext?.();
+    return bridgeContext && typeof bridgeContext === 'object'
+        ? { ...bridgeContext }
+        : {};
+}
+
 export async function initRuntimeSession(facade) {
     const game = facade?.game;
     const sessionContract = resolveSessionContract(game?.runtimeConfig?.session);
 
     teardownRuntimeSession(facade);
     facade._runtimeSessionContract = sessionContract;
-    facade.session = await createRuntimeSessionAdapter(sessionContract);
+    const connectionContext = resolveRuntimeSessionConnectionContext(facade, sessionContract);
+    facade.session = await createRuntimeSessionAdapter(sessionContract, connectionContext);
 
     const numHumans = game?.runtimeConfig?.session?.numHumans || 1;
-    await facade.session.connect({ numHumans });
+    await facade.session.connect({
+        numHumans,
+        ...connectionContext,
+    });
 
     if (facade.session.isHost && sessionContract.isNetworkSession) {
         startRuntimeStateBroadcast(facade);
