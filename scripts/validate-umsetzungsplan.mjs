@@ -481,6 +481,7 @@ async function validateMasterIndex(planPath, content, options = {}) {
 
         if (!row.planFile) {
             violations.push({ file: planPath, line: row.line, message: `plan_file fehlt fuer ${row.id}.` });
+            violations.push({ file: planPath, line: row.line, message: 'plan_file verweist auf fehlende Datei: <leer>' });
             continue;
         }
 
