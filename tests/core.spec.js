@@ -17,8 +17,9 @@ import {
     startGameWithBots,
     unlockExpertMode,
 } from './helpers.js';
-import { parseMapJSON, stringifyMapDocument } from '../src/entities/MapSchema.js';
+import { createMapDocument, parseMapJSON, stringifyMapDocument, toArenaMapDefinition } from '../src/entities/MapSchema.js';
 import { generateJSONExport, importFromJSON } from '../editor/js/EditorMapSerializer.js';
+import { RoundMetricsStore } from '../src/state/recorder/RoundMetricsStore.js';
 import {
     getVehicleManagerInteractionRules,
     listVehicleManagerCatalogEntries,
@@ -548,6 +549,8 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(roundtrip.glbModel).toBe(sourceDocument.glbModel);
         expect(roundtrip.glbColliderMode).toBe('fallbackOnly');
         expect(roundtrip.preferAuthoredPortals).toBeTruthy();
+        expect(roundtrip.portalMode).toBe('authored');
+        expect(roundtrip.itemSpawnMode).toBe('anchor-only');
         expect(roundtrip.portalLevels).toEqual(sourceDocument.portalLevels);
         expect(roundtrip.gates).toHaveLength(1);
         expect(roundtrip.gates[0]).toMatchObject({
@@ -593,6 +596,58 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         const pickupType = String(roundtrip?.items?.[0]?.pickupType || '');
 
         expect(pickupType).toBe('ROCKET_HEAVY');
+    });
+
+    test('T14eb: Runtime-Warnungen machen Portalmodus, Spawnmodus und Legacy-Gates sichtbar', async () => {
+        const sourceDocument = {
+            arenaSize: { width: 280, height: 110, depth: 280 },
+            portalMode: 'dynamic',
+            itemSpawnMode: 'fallback-random',
+            portals: [
+                { id: 'portal_1', x: -20, y: 10, z: 0, radius: 18 },
+                { id: 'portal_2', x: 20, y: 10, z: 0, radius: 18 },
+            ],
+            gates: [
+                { id: 'gate_legacy', type: 'boost_plus', pos: [0, 12, 0] },
+            ],
+            items: [
+                { id: 'anchor_speed', type: 'item_battery', pickupType: 'SPEED_UP', x: 0, y: 8, z: 12 },
+            ],
+        };
+
+        const parsed = createMapDocument(sourceDocument);
+        const runtime = toArenaMapDefinition(parsed, { mapScale: 1, name: 'qa-map' });
+
+        expect(runtime.map.portalMode).toBe('dynamic');
+        expect(runtime.map.itemSpawnMode).toBe('fallback-random');
+        expect(runtime.map.gates[0]).toMatchObject({
+            type: 'boost',
+            legacyType: 'boost_plus',
+            warningCode: 'map.warning.gate-type',
+        });
+        expect(runtime.warnings).toEqual(expect.arrayContaining([
+            'Authored portal nodes were ignored because portalMode=dynamic.',
+            'Authored item anchors were ignored because itemSpawnMode=fallback-random.',
+            'Unknown gate type "boost_plus" normalized to "boost".',
+        ]));
+    });
+
+    test('T14ec: Recorder-Metriken behalten Gameplay-Result-Codes ueber Item-, Portal- und Gate-Events', async () => {
+        const store = new RoundMetricsStore({ timeProvider: () => 12 });
+        store.startRound([]);
+        store.registerEventType('ITEM_USE', 'mode=shoot type=ROCKET_HEAVY code=item.shoot.success ok=1');
+        store.registerEventType('ITEM_PICKUP', 'mode=pickup type=SHIELD code=item.pickup.success ok=1');
+        store.registerEventType('PORTAL_USE', 'mode=portal type=PORTAL code=portal.travel ok=1');
+        store.registerEventType('GATE_TRIGGER', 'mode=gate type=BOOST code=gate.trigger.boost ok=1');
+        store.finalizeRound(null, []);
+
+        const metrics = store.getAggregateMetrics();
+
+        expect(metrics.itemUseTypeTotals.ROCKET_HEAVY).toBe(1);
+        expect(metrics.actionResultCodeTotals['item.shoot.success']).toBe(1);
+        expect(metrics.actionResultCodeTotals['item.pickup.success']).toBe(1);
+        expect(metrics.actionResultCodeTotals['portal.travel']).toBe(1);
+        expect(metrics.actionResultCodeTotals['gate.trigger.boost']).toBe(1);
     });
 
     test('T14f: Parcours-Rift erzwingt Reihenfolge und beendet Match mit Objective-Overlay', async ({ page }) => {

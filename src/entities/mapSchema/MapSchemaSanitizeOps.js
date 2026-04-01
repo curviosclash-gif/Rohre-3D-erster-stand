@@ -1,5 +1,5 @@
 import { DEFAULT_ARENA_SIZE, MAP_SCHEMA_VERSION } from './MapSchemaConstants.js';
-import { normalizeRocketPickupType } from '../../hunt/RocketPickupSystem.js';
+import { normalizePickupType } from '../PickupRegistry.js';
 
 export function asFiniteNumber(value, fallback = 0) {
     const parsed = Number(value);
@@ -75,8 +75,31 @@ function sanitizeVectorArray(raw, fallback = [0, 0, 0]) {
 
 function normalizeGateType(value) {
     const normalized = String(value || '').trim().toLowerCase();
-    if (normalized === 'slingshot') return 'slingshot';
-    return 'boost';
+    if (normalized === 'slingshot') {
+        return { type: 'slingshot', sourceType: normalized, warningCode: null };
+    }
+    if (normalized === 'boost' || !normalized) {
+        return { type: 'boost', sourceType: normalized || 'boost', warningCode: null };
+    }
+    return { type: 'boost', sourceType: normalized, warningCode: 'map.warning.gate-type' };
+}
+
+function normalizePortalMode(value, options = {}) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'dynamic' || normalized === 'authored' || normalized === 'hybrid') {
+        return normalized;
+    }
+    if (options.legacyPreferAuthored === true) return 'authored';
+    if (options.hasAuthoredPortals === true) return 'hybrid';
+    return 'dynamic';
+}
+
+function normalizeItemSpawnMode(value, options = {}) {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized === 'anchor-only' || normalized === 'hybrid' || normalized === 'fallback-random') {
+        return normalized;
+    }
+    return options.hasAuthoredItems === true ? 'anchor-only' : 'fallback-random';
 }
 
 function normalizeGlbColliderMode(value) {
@@ -271,7 +294,7 @@ export function sanitizeItem(raw) {
         weight: asPositiveNumber(source.weight, 1, 0.01),
     }, source.id);
     withOptionalStringField(result, 'model', source.model);
-    const normalizedPickupType = normalizeRocketPickupType(source.pickupType, {
+    const normalizedPickupType = normalizePickupType(source.pickupType, {
         fallback: typeof source.pickupType === 'string' ? source.pickupType : '',
     });
     withOptionalStringField(result, 'pickupType', normalizedPickupType);
@@ -311,15 +334,15 @@ export function sanitizePortalLevels(raw) {
 
 export function sanitizeGate(raw) {
     const source = raw && typeof raw === 'object' ? raw : {};
-    const type = normalizeGateType(source.type);
+    const typeInfo = normalizeGateType(source.type);
     const fallbackPosition = [0, 0, 0];
     const pos = Array.isArray(source.pos)
         ? sanitizeVectorArray(source.pos, fallbackPosition)
         : sanitizeVectorArray([source.x, source.y, source.z], fallbackPosition);
     const result = withOptionalId({
-        type,
+        type: typeInfo.type,
         pos,
-        radius: asPositiveNumber(source.radius, type === 'boost' ? 3.25 : 2.9, 0.1),
+        radius: asPositiveNumber(source.radius, typeInfo.type === 'boost' ? 3.25 : 2.9, 0.1),
     }, source.id);
 
     if (Array.isArray(source.rot)) {
@@ -343,6 +366,13 @@ export function sanitizeGate(raw) {
         result.params = params;
     }
 
+    if (typeInfo.sourceType && typeInfo.sourceType !== typeInfo.type) {
+        result.legacyType = typeInfo.sourceType;
+    }
+    if (typeInfo.warningCode) {
+        result.warningCode = typeInfo.warningCode;
+    }
+
     return result;
 }
 
@@ -353,6 +383,8 @@ export function normalizeMapSchemaDocument(rawMap) {
 
     const arenaSize = sanitizeArenaSize(rawMap.arenaSize);
     const playerSpawnDefault = { x: -800, y: arenaSize.height * 0.55, z: 0 };
+    const portals = asArray(rawMap.portals).map((entry) => sanitizePortal(entry));
+    const items = asArray(rawMap.items).map((entry) => sanitizeItem(entry));
 
     const normalized = withOptionalStringField({
         schemaVersion: MAP_SCHEMA_VERSION,
@@ -360,14 +392,21 @@ export function normalizeMapSchemaDocument(rawMap) {
         tunnels: asArray(rawMap.tunnels).map((entry) => sanitizeTunnel(entry)),
         hardBlocks: asArray(rawMap.hardBlocks).map((entry) => sanitizeBlock(entry)),
         foamBlocks: asArray(rawMap.foamBlocks).map((entry) => sanitizeBlock(entry)),
-        portals: asArray(rawMap.portals).map((entry) => sanitizePortal(entry)),
+        portals,
         portalLevels: sanitizePortalLevels(rawMap.portalLevels),
         gates: asArray(rawMap.gates).map((entry) => sanitizeGate(entry)),
-        items: asArray(rawMap.items).map((entry) => sanitizeItem(entry)),
+        items,
         aircraft: asArray(rawMap.aircraft).map((entry) => sanitizeAircraft(entry)),
         botSpawns: asArray(rawMap.botSpawns).map((entry) => sanitizeVector3(entry, { x: 0, y: playerSpawnDefault.y, z: 0 })),
         playerSpawn: sanitizeVector3(rawMap.playerSpawn, playerSpawnDefault),
         preferAuthoredPortals: rawMap.preferAuthoredPortals === true,
+        portalMode: normalizePortalMode(rawMap.portalMode, {
+            legacyPreferAuthored: rawMap.preferAuthoredPortals === true,
+            hasAuthoredPortals: portals.length > 0,
+        }),
+        itemSpawnMode: normalizeItemSpawnMode(rawMap.itemSpawnMode, {
+            hasAuthoredItems: items.length > 0,
+        }),
     }, 'glbModel', rawMap.glbModel);
 
     const glbColliderMode = normalizeGlbColliderMode(rawMap.glbColliderMode);

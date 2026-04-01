@@ -7,6 +7,17 @@ export class SpecialGateRuntime {
         this._tmpVecGate2 = new THREE.Vector3();
     }
 
+    _syncGateVisualState(gate, timeSeconds = 0) {
+        if (!gate?.mesh) return;
+        const engaged = gate.cooldowns instanceof Map && gate.cooldowns.size > 0;
+        const scale = engaged ? 0.9 + Math.sin(timeSeconds * 7) * 0.025 : 1;
+        if (gate.mesh.scale?.setScalar) {
+            gate.mesh.scale.setScalar(scale);
+            return;
+        }
+        gate.mesh.scale?.set?.(scale, scale, scale);
+    }
+
     checkSpecialGates(position, previousPosition, radius, entityId) {
         if (!this.arena.specialGates || this.arena.specialGates.length === 0) return null;
 
@@ -66,6 +77,7 @@ export class SpecialGateRuntime {
             else if (frontRing) frontRing.rotation.z = time * 0.6;
             if (backRing?.setRotation) backRing.setRotation('z', -time * 0.9);
             else if (backRing) backRing.rotation.z = -time * 0.9;
+            this._syncGateVisualState(gate, time);
         }
     }
 }

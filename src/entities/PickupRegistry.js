@@ -81,7 +81,7 @@ export const PICKUP_REGISTRY = Object.freeze({
         shootable: true,
         offensive: false,
         projectileOnly: false,
-        allowedModes: ALL_GAME_MODES,
+        allowedModes: ['CLASSIC', 'ARCADE'],
         observationSlot: 5,
         visualKind: 'slow-time',
         botRule: { self: 0.7, offense: 0.35, defensiveScale: 0.6, emergencyScale: 0.4, combatSelf: 0.3 },

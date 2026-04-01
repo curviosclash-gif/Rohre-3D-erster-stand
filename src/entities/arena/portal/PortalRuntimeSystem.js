@@ -5,6 +5,21 @@ export class PortalRuntimeSystem {
         this.arena = arena;
     }
 
+    _syncPortalVisualState(portal, timeSeconds = 0) {
+        if (!portal) return;
+        const engaged = portal.cooldowns instanceof Map && portal.cooldowns.size > 0;
+        const scale = engaged ? 0.88 + Math.sin(timeSeconds * 6) * 0.03 : 1;
+        portal.meshA?.scale?.setScalar?.(scale);
+        portal.meshB?.scale?.setScalar?.(scale);
+    }
+
+    _syncExitPortalVisualState(exitPortal, timeSeconds = 0) {
+        if (!exitPortal?.mesh) return;
+        const engaged = exitPortal.cooldowns instanceof Map && exitPortal.cooldowns.size > 0;
+        const scale = engaged ? 1.24 + Math.sin(timeSeconds * 6) * 0.04 : 1.4;
+        exitPortal.mesh.scale?.set?.(scale, scale, scale);
+    }
+
     checkPortal(position, radius, entityId) {
         if (!this.arena.portalsEnabled) return null;
 
@@ -112,6 +127,7 @@ export class PortalRuntimeSystem {
             } else if (portal.meshB) {
                 portal.meshB.rotation.z = -time * 0.5;
             }
+            this._syncPortalVisualState(portal, time);
         }
 
         if (Array.isArray(this.arena.exitPortals)) {
@@ -122,6 +138,7 @@ export class PortalRuntimeSystem {
                 } else {
                     exitPortal.mesh.rotation.z = time * 0.8;
                 }
+                this._syncExitPortalVisualState(exitPortal, time);
             }
         }
     }

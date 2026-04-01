@@ -7,6 +7,11 @@ import { ProjectileStatePool } from './projectile/ProjectileStatePool.js';
 import { ProjectileSimulationOps } from './projectile/ProjectileSimulationOps.js';
 import { ProjectileHitResolver } from './projectile/ProjectileHitResolver.js';
 import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
+import { isPickupTypeShootable } from '../PickupRegistry.js';
+import {
+    GAMEPLAY_ACTION_RESULT_CODES,
+    buildGameplayActionResult,
+} from '../../shared/contracts/GameplayActionResultContract.js';
 
 function getNowMilliseconds() {
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
@@ -24,9 +29,20 @@ export class ProjectileSystem {
         this.getPlayers = typeof options.getPlayers === 'function'
             ? options.getPlayers
             : (() => options.players || []);
+        this.peekInventoryItem = typeof options.peekInventoryItem === 'function'
+            ? options.peekInventoryItem
+            : (() => buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_EMPTY,
+                message: 'Kein Item verfuegbar',
+            }));
         this.takeInventoryItem = typeof options.takeInventoryItem === 'function'
             ? options.takeInventoryItem
-            : (() => ({ ok: false, reason: 'Kein Item verfuegbar', type: null }));
+            : (() => buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_EMPTY,
+                message: 'Kein Item verfuegbar',
+            }));
         this.resolveLockOn = typeof options.resolveLockOn === 'function'
             ? options.resolveLockOn
             : (() => null);
@@ -70,20 +86,53 @@ export class ProjectileSystem {
             Number(rocketConfig.HOMING_FALLBACK_REACQUIRE_INTERVAL) || 0.2
         );
         if ((player.shootCooldown || 0) > 0) {
-            return { ok: false, reason: `Schuss bereit in ${player.shootCooldown.toFixed(1)}s` };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_COOLDOWN,
+                message: `Schuss bereit in ${player.shootCooldown.toFixed(1)}s`,
+            });
         }
 
-        const itemResult = this.takeInventoryItem(player, preferredIndex);
+        const strategy = this.getStrategy();
+        const modeType = String(strategy?.modeType || 'CLASSIC').trim().toUpperCase();
+        const itemPreview = this.peekInventoryItem(player, preferredIndex, 'shoot');
+        if (!itemPreview?.ok) {
+            return buildGameplayActionResult({
+                ok: false,
+                code: itemPreview?.code || GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_EMPTY,
+                message: itemPreview?.reason || 'Kein Item verfuegbar',
+                type: itemPreview?.type || null,
+            });
+        }
+        if (!isPickupTypeShootable(itemPreview.type, modeType)) {
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_FORBIDDEN,
+                message: 'Item kann nicht verschossen werden',
+                type: itemPreview.type,
+            });
+        }
+
+        const itemResult = this.takeInventoryItem(player, preferredIndex, 'shoot');
         if (!itemResult.ok) {
-            return { ok: false, reason: itemResult.reason, type: null };
+            return buildGameplayActionResult({
+                ok: false,
+                code: itemResult.code || GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_EMPTY,
+                message: itemResult.reason || 'Kein Item verfuegbar',
+                type: itemResult.type || null,
+            });
         }
 
         const type = itemResult.type;
         const power = config.POWERUP.TYPES[type];
         if (!power) {
-            return { ok: false, reason: 'Item ungueltig' };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_INVALID_TYPE,
+                message: 'Item ungueltig',
+                type,
+            });
         }
-        const strategy = this.getStrategy();
         const rocketParams = strategy?.resolveRocketProjectileParams(type, config) || null;
         const huntRocket = !!rocketParams;
         const visualScale = huntRocket ? rocketParams.visualScale : 1;
@@ -149,7 +198,12 @@ export class ProjectileSystem {
 
         player.shootCooldown = config.PROJECTILE.COOLDOWN;
         this.onShoot(player, type, projectile);
-        return { ok: true, type };
+        return buildGameplayActionResult({
+            ok: true,
+            code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_SUCCESS,
+            mode: 'shoot',
+            type,
+        });
     }
 
     _acquireProjectileState() {

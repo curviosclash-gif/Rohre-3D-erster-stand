@@ -12,6 +12,8 @@ function buildAuthoredRuntimeShowcaseMap() {
         glbModel: TEST_HANGAR_GLB_DATA_URI,
         glbColliderMode: 'fallbackOnly',
         preferAuthoredPortals: true,
+        portalMode: 'authored',
+        itemSpawnMode: 'anchor-only',
         portalLevels: [36, 78, 120],
         hardBlocks: [
             { id: 'hard_lane_a', x: -108, y: 30, z: 0, width: 18, height: 60, depth: 132 },
@@ -213,7 +215,9 @@ test.describe('Physics Core (Tests 41-60)', () => {
                 glbScenePresent: !!arena?._glbScene,
                 glbError: arena?._glbLoadError || '',
                 glbColliderMode: arena?.currentMapDefinition?.glbColliderMode || '',
+                portalMode: arena?.currentMapDefinition?.portalMode || '',
                 portalLevels: Array.isArray(arena?.currentMapDefinition?.portalLevels) ? arena.currentMapDefinition.portalLevels : [],
+                itemSpawnMode: arena?.currentMapDefinition?.itemSpawnMode || '',
                 portalCount: Array.isArray(arena?.portals) ? arena.portals.length : 0,
                 gateTypes: Array.isArray(arena?.specialGates) ? arena.specialGates.map((gate) => gate.type) : [],
                 tubeObstacleCount: Array.isArray(arena?.obstacles) ? arena.obstacles.filter((entry) => !!entry?.tube).length : 0,
@@ -234,7 +238,9 @@ test.describe('Physics Core (Tests 41-60)', () => {
         expect(probe.glbScenePresent).toBeTruthy();
         expect(probe.glbError).toBe('');
         expect(probe.glbColliderMode).toBe('fallbackOnly');
+        expect(probe.portalMode).toBe('authored');
         expect(probe.portalLevels).toEqual([12, 26, 40]);
+        expect(probe.itemSpawnMode).toBe('anchor-only');
         expect(probe.portalCount).toBe(2);
         expect(probe.gateTypes).toEqual(expect.arrayContaining(['boost', 'slingshot']));
         expect(probe.tubeObstacleCount).toBe(2);

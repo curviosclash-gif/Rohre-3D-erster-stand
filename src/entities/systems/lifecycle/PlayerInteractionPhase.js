@@ -1,5 +1,11 @@
 import { CONFIG } from '../../../core/Config.js';
 
+import {
+    GAMEPLAY_ACTION_RESULT_CODES,
+    buildGameplayActionResult,
+    encodeGameplayActionResultForLog,
+} from '../../../shared/contracts/GameplayActionResultContract.js';
+
 export class PlayerInteractionPhase {
     constructor(entityManager) {
         this.entityManager = entityManager;
@@ -17,12 +23,24 @@ export class PlayerInteractionPhase {
         if (gateResult.type === 'boost') {
             player.activateBoostPortal(gateResult.params, gateResult.forward);
             if (entityManager.audio && !player.isBot) entityManager.audio.play('POWERUP');
+            entityManager.recorder?.logEvent?.('GATE_TRIGGER', player.index, encodeGameplayActionResultForLog(buildGameplayActionResult({
+                ok: true,
+                code: GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_BOOST,
+                mode: 'gate',
+                type: gateResult.type,
+            }), { mode: 'gate', type: gateResult.type }));
             return;
         }
 
         if (gateResult.type === 'slingshot') {
             player.activateSlingshot(gateResult.params, gateResult.forward, gateResult.up);
             if (entityManager.audio && !player.isBot) entityManager.audio.play('POWERUP');
+            entityManager.recorder?.logEvent?.('GATE_TRIGGER', player.index, encodeGameplayActionResultForLog(buildGameplayActionResult({
+                ok: true,
+                code: GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_SLINGSHOT,
+                mode: 'gate',
+                type: gateResult.type,
+            }), { mode: 'gate', type: gateResult.type }));
         }
     }
 
@@ -37,13 +55,25 @@ export class PlayerInteractionPhase {
             player.trail.forceGap(0.5);
 
             if (entityManager.audio && !player.isBot) entityManager.audio.play('POWERUP');
+            entityManager.recorder?.logEvent?.('PORTAL_USE', player.index, encodeGameplayActionResultForLog(buildGameplayActionResult({
+                ok: true,
+                code: GAMEPLAY_ACTION_RESULT_CODES.PORTAL_TRAVEL,
+                mode: 'portal',
+                type: 'PORTAL',
+            }), { mode: 'portal', type: 'PORTAL' }));
         }
 
         const pickedUp = entityManager.powerupManager.checkPickup(player.position, player.hitboxRadius);
         if (!pickedUp) return;
 
-        player.addToInventory(pickedUp);
+        player.addToInventory(pickedUp.type);
         if (entityManager.audio) entityManager.audio.play('POWERUP');
         if (entityManager.particles) entityManager.particles.spawnHit(player.position, 0x00ff00);
+        entityManager.recorder?.logEvent?.('ITEM_PICKUP', player.index, encodeGameplayActionResultForLog(buildGameplayActionResult({
+            ok: true,
+            code: pickedUp.code || GAMEPLAY_ACTION_RESULT_CODES.ITEM_PICKUP_SUCCESS,
+            mode: 'pickup',
+            type: pickedUp.type,
+        }), { mode: 'pickup', type: pickedUp.type }));
     }
 }

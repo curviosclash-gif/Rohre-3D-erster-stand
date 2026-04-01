@@ -40,6 +40,12 @@ function readManagerMapMetadata(manager) {
     if (source.preferAuthoredPortals === true) {
         metadata.preferAuthoredPortals = true;
     }
+    if (typeof source.portalMode === 'string' && source.portalMode) {
+        metadata.portalMode = source.portalMode;
+    }
+    if (typeof source.itemSpawnMode === 'string' && source.itemSpawnMode) {
+        metadata.itemSpawnMode = source.itemSpawnMode;
+    }
     if (Array.isArray(source.portalLevels)) {
         metadata.portalLevels = cloneSerializable(source.portalLevels) || [];
     }
@@ -65,6 +71,12 @@ function extractMapMetadata(data) {
     }
     if (data.preferAuthoredPortals === true) {
         metadata.preferAuthoredPortals = true;
+    }
+    if (typeof data.portalMode === 'string' && data.portalMode) {
+        metadata.portalMode = data.portalMode;
+    }
+    if (typeof data.itemSpawnMode === 'string' && data.itemSpawnMode) {
+        metadata.itemSpawnMode = data.itemSpawnMode;
     }
     if (Array.isArray(data.portalLevels) && data.portalLevels.length > 0) {
         metadata.portalLevels = cloneSerializable(data.portalLevels) || [];

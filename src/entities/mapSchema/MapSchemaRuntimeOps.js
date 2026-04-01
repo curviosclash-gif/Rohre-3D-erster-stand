@@ -168,6 +168,25 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
         rotateY: Number(entry.rotateY) || 0,
     }));
 
+    const portalMode = typeof normalized.portalMode === 'string'
+        ? normalized.portalMode
+        : (normalized.preferAuthoredPortals === true ? 'authored' : 'dynamic');
+    const itemSpawnMode = typeof normalized.itemSpawnMode === 'string'
+        ? normalized.itemSpawnMode
+        : (normalized.items.length > 0 ? 'anchor-only' : 'fallback-random');
+    if (portalMode === 'authored' && portals.length === 0) {
+        warnings.push('Portal mode "authored" requested, but no complete authored portal pair is available.');
+    }
+    if (portalMode === 'dynamic' && normalized.portals.length > 0) {
+        warnings.push('Authored portal nodes were ignored because portalMode=dynamic.');
+    }
+    if (itemSpawnMode === 'anchor-only' && items.length === 0) {
+        warnings.push('Item spawn mode "anchor-only" requested, but no authored item anchors are available.');
+    }
+    if (itemSpawnMode === 'fallback-random' && items.length > 0) {
+        warnings.push('Authored item anchors were ignored because itemSpawnMode=fallback-random.');
+    }
+
     const aircraft = normalized.aircraft.map((entry) => ({
         id: entry.id,
         jetId: entry.jetId,
@@ -201,6 +220,8 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
     const gates = normalized.gates.map((gate) => ({
         id: gate.id,
         type: gate.type,
+        legacyType: typeof gate.legacyType === 'string' ? gate.legacyType : undefined,
+        warningCode: typeof gate.warningCode === 'string' ? gate.warningCode : undefined,
         pos: [
             gate.pos[0] * invScale,
             gate.pos[1] * invScale,
@@ -213,6 +234,11 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
         color: gate.color,
         params: gate.params ? { ...gate.params } : undefined,
     }));
+    for (const gate of gates) {
+        if (gate.warningCode && gate.legacyType) {
+            warnings.push(`Unknown gate type "${gate.legacyType}" normalized to "${gate.type}".`);
+        }
+    }
 
     const parcours = mapParcoursToRuntime(normalized.parcours, invScale);
 
@@ -227,7 +253,9 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
             obstacles,
             portals,
             portalLevels: normalized.portalLevels.map((level) => level * invScale),
+            portalMode,
             preferAuthoredPortals: normalized.preferAuthoredPortals === true || normalized.portals.length > 0,
+            itemSpawnMode,
             gates,
             playerSpawn,
             botSpawns,

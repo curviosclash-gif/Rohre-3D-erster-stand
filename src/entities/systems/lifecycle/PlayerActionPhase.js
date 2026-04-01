@@ -1,3 +1,5 @@
+import { encodeGameplayActionResultForLog } from '../../../shared/contracts/GameplayActionResultContract.js';
+
 export class PlayerActionPhase {
     constructor(entityManager) {
         this.entityManager = entityManager;
@@ -11,11 +13,13 @@ export class PlayerActionPhase {
 
         if (input.useItem >= 0) {
             const result = entityManager._useInventoryItem(player, input.useItem);
-            if (result.ok) {
-                if (entityManager.recorder) {
-                    entityManager.recorder.logEvent('ITEM_USE', player.index, `mode=use type=${result.type}`);
-                }
-            } else if (!player.isBot) {
+            if (entityManager.recorder && result) {
+                entityManager.recorder.logEvent('ITEM_USE', player.index, encodeGameplayActionResultForLog(result, {
+                    mode: 'use',
+                    type: result?.type,
+                }));
+            }
+            if (!result.ok && !player.isBot) {
                 entityManager._notifyPlayerFeedback(player, result.reason);
             }
         }
@@ -27,19 +31,27 @@ export class PlayerActionPhase {
             } else if (!strategy?.requiresShootItemIndex()) {
                 result = entityManager._shootItemProjectile(player, input.shootItemIndex);
             }
+            if (entityManager.recorder && result) {
+                entityManager.recorder.logEvent('ITEM_USE', player.index, encodeGameplayActionResultForLog(result, {
+                    mode: 'shoot',
+                    type: result?.type,
+                }));
+            }
             if (result && !result.ok && !player.isBot) {
                 entityManager._notifyPlayerFeedback(player, result.reason);
-            } else if (result && result.ok && entityManager.recorder) {
-                entityManager.recorder.logEvent('ITEM_USE', player.index, `mode=shoot type=${result.type}`);
             }
         }
 
         if (input.shootMG && strategy?.hasMachineGun()) {
             const result = entityManager._shootHuntGun(player);
+            if (entityManager.recorder && result) {
+                entityManager.recorder.logEvent('ITEM_USE', player.index, encodeGameplayActionResultForLog(result, {
+                    mode: 'mg',
+                    type: result?.type || 'MG_BULLET',
+                }));
+            }
             if (!result.ok && !player.isBot) {
                 entityManager._notifyPlayerFeedback(player, result.reason);
-            } else if (result.ok && entityManager.recorder) {
-                entityManager.recorder.logEvent('ITEM_USE', player.index, `mode=mg type=${result.type}`);
             }
         }
     }

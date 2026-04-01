@@ -3,6 +3,10 @@ import { MGOverheatState } from './mg/MGOverheatState.js';
 import { MGHitResolver } from './mg/MGHitResolver.js';
 import { MGTracerFx } from './mg/MGTracerFx.js';
 import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
+import {
+    GAMEPLAY_ACTION_RESULT_CODES,
+    buildGameplayActionResult,
+} from '../shared/contracts/GameplayActionResultContract.js';
 
 function getMgConfig(source = null) {
     return resolveEntityRuntimeConfig(source)?.HUNT?.MG || {};
@@ -96,23 +100,47 @@ export class OverheatGunSystem {
 
     tryFire(player) {
         if (!player || !player.alive) {
-            return { ok: false, reason: 'Spieler inaktiv', type: 'MG_BULLET' };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.MG_SHOOT_INACTIVE,
+                message: 'Spieler inaktiv',
+                mode: 'mg',
+                type: 'MG_BULLET',
+            });
         }
         const strategy = this.entityManager?.gameModeStrategy || null;
         if (!strategy?.hasMachineGun()) {
-            return { ok: false, reason: 'Hunt-Modus inaktiv', type: 'MG_BULLET' };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.MG_SHOOT_INACTIVE,
+                message: 'Hunt-Modus inaktiv',
+                mode: 'mg',
+                type: 'MG_BULLET',
+            });
         }
 
         const mg = getMgConfig(this.runtimeContext || this.entityManager);
         const shotCooldown = Math.max(0.01, Number(mg.COOLDOWN || 0.08));
         if ((player.shootCooldown || 0) > 0) {
-            return { ok: false, reason: `Schuss bereit in ${player.shootCooldown.toFixed(1)}s`, type: 'MG_BULLET' };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.MG_SHOOT_COOLDOWN,
+                message: `Schuss bereit in ${player.shootCooldown.toFixed(1)}s`,
+                mode: 'mg',
+                type: 'MG_BULLET',
+            });
         }
 
         const idx = player.index;
         const lockout = Math.max(0, Number(this._lockoutByPlayer[idx] || 0));
         if (lockout > 0) {
-            return { ok: false, reason: `MG ueberhitzt (${lockout.toFixed(1)}s)`, type: 'MG_BULLET' };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.MG_SHOOT_OVERHEATED,
+                message: `MG ueberhitzt (${lockout.toFixed(1)}s)`,
+                mode: 'mg',
+                type: 'MG_BULLET',
+            });
         }
 
         player.shootCooldown = shotCooldown;
@@ -135,8 +163,17 @@ export class OverheatGunSystem {
         }
 
         return {
-            ok: true,
-            type: 'MG_BULLET',
+            ...buildGameplayActionResult({
+                ok: true,
+                code: GAMEPLAY_ACTION_RESULT_CODES.MG_SHOOT_SUCCESS,
+                mode: 'mg',
+                type: 'MG_BULLET',
+                meta: {
+                    hit: !!hitResult.target,
+                    trailHit: !!hitResult.trail,
+                    overheat: this.getOverheatValue(idx),
+                },
+            }),
             hit: !!hitResult.target,
             trailHit: !!hitResult.trail,
             overheat: this.getOverheatValue(idx),

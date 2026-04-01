@@ -3,6 +3,7 @@
 // ============================================
 
 import { isRocketTierType, pickWeightedRocketTierType, resolveRocketTierDamage } from '../hunt/RocketPickupSystem.js';
+import { isPickupTypeAllowedForMode, normalizePickupType } from '../entities/PickupRegistry.js';
 import { GameModeContract } from './GameModeContract.js';
 import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 
@@ -256,10 +257,11 @@ export class HuntModeStrategy extends GameModeContract {
 
     filterSpawnableTypes(typeKeys, powerupTypes) {
         return typeKeys.filter((typeKey) => {
-            const entry = powerupTypes[typeKey];
+            const normalizedType = normalizePickupType(typeKey, { fallback: typeKey });
+            const entry = powerupTypes[normalizedType];
             if (!entry) return false;
             if (entry.classicOnly) return false;
-            return true;
+            return isPickupTypeAllowedForMode(normalizedType, this.modeType);
         });
     }
 

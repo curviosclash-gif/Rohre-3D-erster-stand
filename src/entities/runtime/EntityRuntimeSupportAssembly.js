@@ -32,7 +32,8 @@ export function createEntityRuntimeSupport(owner) {
         getArena: () => owner.arena,
         getPlayers: () => owner.players,
         getStrategy: () => owner.gameModeStrategy || null,
-        takeInventoryItem: (player, preferredIndex) => owner._takeInventoryItem(player, preferredIndex),
+        peekInventoryItem: (player, preferredIndex, action) => owner._peekInventoryItem(player, preferredIndex, action),
+        takeInventoryItem: (player, preferredIndex, action) => owner._takeInventoryItem(player, preferredIndex, action),
         resolveLockOn: (player) => owner._checkLockOn(player),
         getTrailSpatialIndex: () => owner._trailSpatialIndex,
         onShoot: (player, type) => {

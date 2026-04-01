@@ -196,6 +196,11 @@ export class ProjectileSimulationOps {
             this._tmpVec.copy(projectile.velocity).normalize().multiplyScalar(rocketRuntime.portalExitForwardOffset);
             projectile.position.add(this._tmpVec);
             projectile.mesh.position.copy(projectile.position);
+            projectile.target = null;
+            projectile.homingReacquireTimer = Math.max(
+                rocketRuntime.homingMinReacquireInterval,
+                Number(projectile.homingReacquireInterval || rocketRuntime.homingReacquireInterval)
+            );
         }
 
         if (projectile.huntRocket) {

@@ -9,6 +9,10 @@ import {
     normalizePickupType,
 } from './PickupRegistry.js';
 import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
+import {
+    GAMEPLAY_ACTION_RESULT_CODES,
+    buildGameplayActionResult,
+} from '../shared/contracts/GameplayActionResultContract.js';
 
 function isTypeAllowedForMode(type, huntModeActive, entityRuntimeConfig) {
     const normalizedType = normalizePickupType(type);
@@ -106,6 +110,8 @@ export class PowerupManager {
         const config = this.entityRuntimeConfig;
         const strategy = typeof this.getStrategy === 'function' ? this.getStrategy() : null;
         const huntModeActive = strategy?.modeType === 'HUNT';
+        const itemSpawnMode = String(this.arena?.currentMapDefinition?.itemSpawnMode || '').trim().toLowerCase()
+            || 'fallback-random';
         const spawnableTypes = strategy
             ? strategy.filterSpawnableTypes(this.typeKeys, config.POWERUP.TYPES)
             : this.typeKeys.filter((typeKey) => {
@@ -115,10 +121,12 @@ export class PowerupManager {
         if (spawnableTypes.length === 0) return;
 
         const authoredAnchors = this._getAvailableAuthoredAnchors();
-        const authoredAnchor = authoredAnchors.length > 0
+        const hasAnyAuthoredAnchors = (this.arena?.getAuthoredItemAnchors?.()?.length || 0) > 0;
+        const shouldUseAuthoredAnchor = itemSpawnMode !== 'fallback-random' && authoredAnchors.length > 0;
+        const authoredAnchor = shouldUseAuthoredAnchor
             ? this._pickAuthoredAnchor(authoredAnchors)
             : null;
-        if (!authoredAnchor && (this.arena?.getAuthoredItemAnchors?.()?.length || 0) > 0) {
+        if (!authoredAnchor && hasAnyAuthoredAnchors && itemSpawnMode === 'anchor-only') {
             return;
         }
 
@@ -219,7 +227,12 @@ export class PowerupManager {
             if (this.items[i].box.intersectsSphere(this._pickupSphere)) {
                 const item = this.items.splice(i, 1)[0];
                 this._disposeSpawnedItem(item);
-                return item.type;
+                return buildGameplayActionResult({
+                    ok: true,
+                    code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_PICKUP_SUCCESS,
+                    mode: 'pickup',
+                    type: item.type,
+                });
             }
         }
         return null;

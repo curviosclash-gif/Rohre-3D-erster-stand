@@ -217,8 +217,12 @@ export class EntityManager {
         return this._respawnSystem.getPendingCountForPlayers(players);
     }
 
-    _takeInventoryItem(player, preferredIndex = -1) {
-        return this._huntCombatSystem.takeInventoryItem(player, preferredIndex);
+    _takeInventoryItem(player, preferredIndex = -1, action = 'use') {
+        return this._huntCombatSystem.takeInventoryItem(player, preferredIndex, action);
+    }
+
+    _peekInventoryItem(player, preferredIndex = -1, action = 'use') {
+        return this._huntCombatSystem.peekInventoryItem(player, preferredIndex, action);
     }
 
     _useInventoryItem(player, preferredIndex = -1) {

@@ -57,6 +57,8 @@ function sanitizeLegacyRuntimeMapDocument(rawMap, warnings) {
             z: 0,
         },
         preferAuthoredPortals: false,
+        portalMode: 'dynamic',
+        itemSpawnMode: 'fallback-random',
         glbModel: typeof rawMap?.glbModel === 'string' ? rawMap.glbModel : undefined,
         glbColliderMode: typeof rawMap?.glbColliderMode === 'string' ? rawMap.glbColliderMode : undefined,
     };
@@ -94,6 +96,10 @@ export function migrateMapDocument(rawMap) {
     } else if (schemaVersion === 3) {
         warnings.push('Map schema v3 detected. Migrating to v4.');
         migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
+    }
+
+    if (typeof rawMap?.preferAuthoredPortals === 'boolean' && typeof rawMap?.portalMode !== 'string') {
+        warnings.push(`Legacy preferAuthoredPortals mapped to portalMode=${rawMap.preferAuthoredPortals ? 'authored' : 'hybrid'}.`);
     }
 
     const map = normalizeMapSchemaDocument(migrated);

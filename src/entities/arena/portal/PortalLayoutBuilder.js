@@ -126,6 +126,8 @@ export class PortalLayoutBuilder {
 
             this.arena.specialGates.push({
                 type,
+                legacyType: typeof gateDef.legacyType === 'string' ? gateDef.legacyType : undefined,
+                warningCode: typeof gateDef.warningCode === 'string' ? gateDef.warningCode : undefined,
                 pos,
                 rotation,
                 quaternion: mesh.quaternion.clone(),
@@ -145,29 +147,25 @@ export class PortalLayoutBuilder {
         this._portalMeshCompactMode = false;
         if (!this.arena.portalsEnabled) return;
 
-        const authoredPortalsPreferred = !!map?.preferAuthoredPortals
-            && Array.isArray(map?.portals)
-            && map.portals.length > 0;
-        if (authoredPortalsPreferred) {
+        const portalMode = String(map?.portalMode || '').trim().toLowerCase()
+            || (map?.preferAuthoredPortals === true ? 'authored' : 'dynamic');
+        const hasAuthoredPortals = Array.isArray(map?.portals) && map.portals.length > 0;
+        const wantsAuthoredPortals = hasAuthoredPortals && (portalMode === 'authored' || portalMode === 'hybrid');
+        if (wantsAuthoredPortals) {
             this._portalMeshCompactMode = map.portals.length >= 2;
             for (const def of map.portals) {
                 this._createPortalFromDef(def, scale);
             }
-            this._validatePortalPlacements();
-            return;
         }
 
         const pairCount = Math.max(0, Math.floor(config.GAMEPLAY.PORTAL_COUNT || 0));
-        if (pairCount > 0) {
+        if (pairCount > 0 && (portalMode === 'dynamic' || portalMode === 'hybrid')) {
             this._portalMeshCompactMode = pairCount >= 2;
-            this._buildFixedDynamicPortals(pairCount);
-            return;
-        }
-
-        if (Array.isArray(map.portals)) {
-            this._portalMeshCompactMode = map.portals.length >= 2;
-            for (const def of map.portals) {
-                this._createPortalFromDef(def, scale);
+            const remainingPairs = portalMode === 'hybrid'
+                ? Math.max(0, pairCount - this.arena.portals.length)
+                : pairCount;
+            if (remainingPairs > 0) {
+                this._buildFixedDynamicPortals(remainingPairs);
             }
         }
 

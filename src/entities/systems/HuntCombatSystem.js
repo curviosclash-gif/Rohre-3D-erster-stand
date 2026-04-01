@@ -19,6 +19,26 @@ import {
     normalizePickupType,
 } from '../PickupRegistry.js';
 import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
+import {
+    GAMEPLAY_ACTION_RESULT_CODES,
+    buildGameplayActionResult,
+} from '../../shared/contracts/GameplayActionResultContract.js';
+
+function resolveActionResultCodes(action = 'use') {
+    return action === 'shoot'
+        ? {
+            success: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_SUCCESS,
+            invalidIndex: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_INVALID_INDEX,
+            empty: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_EMPTY,
+            invalidType: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_INVALID_TYPE,
+        }
+        : {
+            success: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_SUCCESS,
+            invalidIndex: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_INVALID_INDEX,
+            empty: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_EMPTY,
+            invalidType: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_INVALID_TYPE,
+        };
+}
 
 export class HuntCombatSystem {
     constructor(runtimeContext) {
@@ -35,6 +55,9 @@ export class HuntCombatSystem {
         if (!Array.isArray(player?.inventory) || player.inventory.length === 0) {
             return -1;
         }
+        if (Number.isInteger(preferredIndex) && preferredIndex >= player.inventory.length) {
+            return -2;
+        }
         const fallbackIndex = Number.isInteger(player?.selectedItemIndex)
             ? Math.max(0, player.selectedItemIndex)
             : 0;
@@ -44,25 +67,55 @@ export class HuntCombatSystem {
         return Math.min(requestedIndex, player.inventory.length - 1);
     }
 
-    peekInventoryItem(player, preferredIndex = -1) {
+    peekInventoryItem(player, preferredIndex = -1, action = 'use') {
+        const codes = resolveActionResultCodes(action);
         const index = this._resolveInventoryIndex(player, preferredIndex);
+        if (index === -2) {
+            return buildGameplayActionResult({
+                ok: false,
+                code: codes.invalidIndex,
+                message: 'Item-Slot ungueltig',
+                type: null,
+                meta: { requestedIndex: preferredIndex },
+            });
+        }
         if (index < 0) {
-            return { ok: false, reason: 'Kein Item verfuegbar', type: null, index: -1 };
+            return buildGameplayActionResult({
+                ok: false,
+                code: codes.empty,
+                message: 'Kein Item verfuegbar',
+                type: null,
+                meta: { requestedIndex: preferredIndex },
+            });
         }
         const rawType = player.inventory[index];
         const type = normalizePickupType(rawType, { fallback: rawType });
         if (!type) {
-            return { ok: false, reason: 'Item ungueltig', type: null, index };
+            return buildGameplayActionResult({
+                ok: false,
+                code: codes.invalidType,
+                message: 'Item ungueltig',
+                type: null,
+                meta: { requestedIndex: preferredIndex, index },
+            });
         }
-        return { ok: true, type, index, rawType };
+        return buildGameplayActionResult({
+            ok: true,
+            code: codes.success,
+            type,
+            meta: { index, rawType, requestedIndex: preferredIndex },
+        });
     }
 
-    takeInventoryItem(player, preferredIndex = -1) {
-        const itemResult = this.peekInventoryItem(player, preferredIndex);
+    takeInventoryItem(player, preferredIndex = -1, action = 'use') {
+        const codes = resolveActionResultCodes(action);
+        const itemResult = this.peekInventoryItem(player, preferredIndex, action);
         if (!itemResult.ok) {
-            return { ok: false, reason: itemResult.reason, type: null };
+            return itemResult;
         }
-        const { index, type, rawType } = itemResult;
+        const index = Number(itemResult.meta?.index);
+        const type = itemResult.type;
+        const rawType = itemResult.meta?.rawType;
         const lastIdx = player.inventory.length - 1;
         if (index !== lastIdx) {
             player.inventory[index] = player.inventory[lastIdx];
@@ -71,7 +124,12 @@ export class HuntCombatSystem {
         if (player.inventory.length === 0 || player.selectedItemIndex >= player.inventory.length) {
             player.selectedItemIndex = 0;
         }
-        return { ok: true, type, rawType, index };
+        return buildGameplayActionResult({
+            ok: true,
+            code: codes.success,
+            type,
+            meta: { rawType, index },
+        });
     }
 
     _isHuntCombatStrategyActive() {
@@ -95,38 +153,58 @@ export class HuntCombatSystem {
         const huntCombatActive = this._isHuntCombatStrategyActive();
         const cooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
         if (huntCombatActive && cooldownRemaining > 0.001) {
-            return {
+            return buildGameplayActionResult({
                 ok: false,
-                reason: `Item-Cooldown: ${cooldownRemaining.toFixed(2)}s`,
-                type: null,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_COOLDOWN,
+                message: `Item-Cooldown: ${cooldownRemaining.toFixed(2)}s`,
                 cooldownRemaining,
-            };
+            });
         }
 
-        const itemPreview = this.peekInventoryItem(player, preferredIndex);
+        const itemPreview = this.peekInventoryItem(player, preferredIndex, 'use');
         if (!itemPreview.ok) {
-            return { ok: false, reason: itemPreview.reason, type: null };
+            return itemPreview;
         }
         if (!config?.POWERUP?.TYPES?.[itemPreview.type]) {
-            return { ok: false, reason: 'Item ungueltig', type: itemPreview.type };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_INVALID_TYPE,
+                message: 'Item ungueltig',
+                type: itemPreview.type,
+            });
         }
         if (!isPickupTypeSelfUsable(itemPreview.type, modeType)) {
-            return { ok: false, reason: 'Item kann nicht direkt genutzt werden', type: itemPreview.type };
+            return buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_FORBIDDEN,
+                message: 'Item kann nicht direkt genutzt werden',
+                type: itemPreview.type,
+            });
         }
 
-        const itemResult = this.takeInventoryItem(player, preferredIndex);
-        if (!itemResult.ok) return { ok: false, reason: itemResult.reason };
+        const itemResult = this.takeInventoryItem(player, preferredIndex, 'use');
+        if (!itemResult.ok) return itemResult;
         player.applyPowerup(itemResult.type);
         const nextCooldown = huntCombatActive ? this._resolveItemUseCooldownSeconds(itemResult.type) : 0;
         if (nextCooldown > 0) {
             player.itemUseCooldownRemaining = nextCooldown;
         }
-        return { ok: true, type: itemResult.type, cooldownSeconds: nextCooldown };
+        return buildGameplayActionResult({
+            ok: true,
+            code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_USE_SUCCESS,
+            type: itemResult.type,
+            mode: 'use',
+            cooldownSeconds: nextCooldown,
+        });
     }
 
     shootItemProjectile(player, preferredIndex = -1) {
         return this.runtime?.combat?.shootItemProjectile?.(player, preferredIndex)
-            || { ok: false, reason: 'ProjectileSystem fehlt' };
+            || buildGameplayActionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.ITEM_SHOOT_SYSTEM_MISSING,
+                message: 'ProjectileSystem fehlt',
+            });
     }
 
     shootHuntGun(player) {
