@@ -1,49 +1,128 @@
 import { CONFIG } from '../../core/Config.js';
 import { grantShield } from '../../hunt/HealthSystem.js';
+import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
+import { isPickupTypeAllowedForMode } from '../PickupRegistry.js';
+
+const SPEED_EFFECT_TYPES = Object.freeze(['SPEED_UP', 'SLOW_DOWN']);
+const TRAIL_EFFECT_TYPES = Object.freeze(['THICK', 'THIN']);
+
+function resolveModeType(player) {
+    const config = resolveEntityRuntimeConfig(player);
+    const enabled = config?.HUNT?.ENABLED !== false;
+    const activeMode = String(config?.HUNT?.ACTIVE_MODE || config?.HUNT?.DEFAULT_MODE || 'CLASSIC').trim().toUpperCase();
+    if (!enabled && activeMode === 'HUNT') {
+        return 'CLASSIC';
+    }
+    return activeMode || 'CLASSIC';
+}
+
+function findLatestAllowedEffect(player, effectTypes = [], modeType = 'CLASSIC') {
+    const activeEffects = Array.isArray(player?.activeEffects) ? player.activeEffects : [];
+    for (let i = activeEffects.length - 1; i >= 0; i -= 1) {
+        const effect = activeEffects[i];
+        if (!effectTypes.includes(effect?.type)) continue;
+        if (!isPickupTypeAllowedForMode(effect.type, modeType)) continue;
+        return effect;
+    }
+    return null;
+}
+
+function hasAllowedEffect(player, type, modeType = 'CLASSIC') {
+    const activeEffects = Array.isArray(player?.activeEffects) ? player.activeEffects : [];
+    for (let i = 0; i < activeEffects.length; i += 1) {
+        const effect = activeEffects[i];
+        if (effect?.type !== type) continue;
+        if (!isPickupTypeAllowedForMode(type, modeType)) continue;
+        return true;
+    }
+    return false;
+}
+
+function removeEffectAtIndex(player, index) {
+    if (!player || !Array.isArray(player.activeEffects)) return;
+    if (index < 0 || index >= player.activeEffects.length) return;
+    player.activeEffects.splice(index, 1);
+}
+
+function resetShieldState(player) {
+    player.hasShield = false;
+    player.shieldHP = 0;
+    player.shieldHitFeedback = 0;
+}
+
+export function recomputePlayerEffectState(player) {
+    if (!player) return;
+
+    const modeType = resolveModeType(player);
+    const runtimeConfig = resolveEntityRuntimeConfig(player);
+    const powerupTypes = runtimeConfig?.POWERUP?.TYPES || CONFIG.POWERUP.TYPES;
+
+    const speedEffect = findLatestAllowedEffect(player, SPEED_EFFECT_TYPES, modeType);
+    const speedMultiplier = Number(powerupTypes?.[speedEffect?.type]?.multiplier);
+    player.baseSpeed = Number.isFinite(speedMultiplier)
+        ? CONFIG.PLAYER.SPEED * speedMultiplier
+        : CONFIG.PLAYER.SPEED;
+    player.speed = player.baseSpeed;
+
+    const trailEffect = findLatestAllowedEffect(player, TRAIL_EFFECT_TYPES, modeType);
+    const trailWidth = Number(powerupTypes?.[trailEffect?.type]?.trailWidth);
+    if (player.trail) {
+        if (Number.isFinite(trailWidth) && trailWidth > 0) {
+            player.trail.setWidth(trailWidth);
+        } else {
+            player.trail.resetWidth();
+        }
+    }
+
+    player.isGhost = hasAllowedEffect(player, 'GHOST', modeType);
+    player.invertControls = hasAllowedEffect(player, 'INVERT', modeType);
+
+    const shieldEffectActive = hasAllowedEffect(player, 'SHIELD', modeType);
+    if (!shieldEffectActive) {
+        resetShieldState(player);
+    } else if (modeType !== 'HUNT' && !player.hasShield) {
+        grantShield(player, runtimeConfig);
+    }
+}
 
 export function removePlayerEffect(player, effect) {
-    if (!player || !effect) return;
-
-    switch (effect.type) {
-        case 'SPEED_UP':
-        case 'SLOW_DOWN':
-            player.baseSpeed = CONFIG.PLAYER.SPEED;
-            player.speed = player.baseSpeed;
-            break;
-        case 'THICK':
-        case 'THIN':
-            player.trail.resetWidth();
-            break;
-        case 'SHIELD':
-            player.hasShield = false;
-            player.shieldHP = 0;
-            player.shieldHitFeedback = 0;
-            break;
-        case 'GHOST':
-            player.isGhost = false;
-            break;
-        case 'INVERT':
-            player.invertControls = false;
-            break;
+    if (!player || !effect || !Array.isArray(player.activeEffects)) return;
+    const index = player.activeEffects.indexOf(effect);
+    if (index >= 0) {
+        removeEffectAtIndex(player, index);
     }
+    recomputePlayerEffectState(player);
 }
 
 export function updatePlayerEffects(player, dt) {
     if (!player) return;
 
-    for (let i = player.activeEffects.length - 1; i >= 0; i--) {
+    const modeType = resolveModeType(player);
+    for (let i = player.activeEffects.length - 1; i >= 0; i -= 1) {
         const effect = player.activeEffects[i];
-        effect.remaining -= dt;
+        if (!effect || !isPickupTypeAllowedForMode(effect.type, modeType)) {
+            removeEffectAtIndex(player, i);
+            continue;
+        }
 
-        if (effect.remaining <= 0) {
-            removePlayerEffect(player, effect);
-            const last = player.activeEffects.length - 1;
-            if (i !== last) {
-                player.activeEffects[i] = player.activeEffects[last];
+        if (effect.type === 'SHIELD') {
+            const shieldActive = !!player.hasShield && (Number(player.shieldHP) || 0) > 0;
+            if (!shieldActive) {
+                removeEffectAtIndex(player, i);
+                continue;
             }
-            player.activeEffects.length = last;
+            if (modeType === 'HUNT') {
+                continue;
+            }
+        }
+
+        effect.remaining -= dt;
+        if (effect.remaining <= 0) {
+            removeEffectAtIndex(player, i);
         }
     }
+
+    recomputePlayerEffectState(player);
 
     if (player.boostPortalTimer > 0) {
         player.boostPortalTimer -= dt;
@@ -62,41 +141,30 @@ export function updatePlayerEffects(player, dt) {
 export function applyPlayerPowerup(player, type) {
     if (!player) return;
 
-    const config = CONFIG.POWERUP.TYPES[type];
+    const runtimeConfig = resolveEntityRuntimeConfig(player);
+    const powerupTypes = runtimeConfig?.POWERUP?.TYPES || CONFIG.POWERUP.TYPES;
+    const config = powerupTypes[type];
     if (!config) return;
 
-    for (let i = player.activeEffects.length - 1; i >= 0; i--) {
-        if (player.activeEffects[i].type === type) {
-            removePlayerEffect(player, player.activeEffects[i]);
-            const last = player.activeEffects.length - 1;
-            if (i !== last) {
-                player.activeEffects[i] = player.activeEffects[last];
-            }
-            player.activeEffects.length = last;
+    const modeType = resolveModeType(player);
+    if (!isPickupTypeAllowedForMode(type, modeType)) {
+        return;
+    }
+
+    for (let i = player.activeEffects.length - 1; i >= 0; i -= 1) {
+        if (player.activeEffects[i]?.type === type) {
+            removeEffectAtIndex(player, i);
         }
     }
 
-    const nextEffect = { type, remaining: config.duration };
-    player.activeEffects.push(nextEffect);
+    player.activeEffects.push({
+        type,
+        remaining: Number.isFinite(Number(config.duration)) ? Number(config.duration) : 0,
+    });
 
-    switch (type) {
-        case 'SPEED_UP':
-        case 'SLOW_DOWN':
-            player.baseSpeed = CONFIG.PLAYER.SPEED * config.multiplier;
-            player.speed = player.baseSpeed;
-            break;
-        case 'THICK':
-        case 'THIN':
-            player.trail.setWidth(config.trailWidth);
-            break;
-        case 'SHIELD':
-            grantShield(player);
-            break;
-        case 'GHOST':
-            player.isGhost = true;
-            break;
-        case 'INVERT':
-            player.invertControls = true;
-            break;
+    if (type === 'SHIELD') {
+        grantShield(player, runtimeConfig);
     }
+
+    recomputePlayerEffectState(player);
 }

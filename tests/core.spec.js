@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { CONFIG } from '../src/core/Config.js';
 import {
     collectErrors,
     lockExpertMode,
@@ -25,6 +26,7 @@ import {
     listVehicleManagerCatalogEntries,
     resolveVehicleManagerCatalogEntry,
 } from '../src/ui/arcade/VehicleManagerCatalog.js';
+import { applyPlayerPowerup, updatePlayerEffects } from '../src/entities/player/PlayerEffectOps.js';
 
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
 const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
@@ -648,6 +650,73 @@ test.describe('T1-20: Core & Infrastruktur', () => {
         expect(metrics.actionResultCodeTotals['item.pickup.success']).toBe(1);
         expect(metrics.actionResultCodeTotals['portal.travel']).toBe(1);
         expect(metrics.actionResultCodeTotals['gate.trigger.boost']).toBe(1);
+    });
+
+    test('T14ed: Effekt-Neubewertung laesst aeltere Speed-Effekte nach Konflikten wieder greifen', async () => {
+        const player = {
+            entityRuntimeConfig: {
+                ...CONFIG,
+                HUNT: { ...CONFIG.HUNT, ACTIVE_MODE: 'CLASSIC', DEFAULT_MODE: 'CLASSIC', ENABLED: true },
+            },
+            activeEffects: [],
+            baseSpeed: CONFIG.PLAYER.SPEED,
+            speed: CONFIG.PLAYER.SPEED,
+            hasShield: false,
+            shieldHP: 0,
+            shieldHitFeedback: 0,
+            trail: {
+                width: CONFIG.TRAIL.WIDTH,
+                setWidth(value) { this.width = value; },
+                resetWidth() { this.width = CONFIG.TRAIL.WIDTH; },
+            },
+        };
+
+        applyPlayerPowerup(player, 'SPEED_UP');
+        applyPlayerPowerup(player, 'SLOW_DOWN');
+        expect(player.baseSpeed).toBeLessThan(CONFIG.PLAYER.SPEED);
+
+        const speedUp = player.activeEffects.find((entry) => entry.type === 'SPEED_UP');
+        const slowDown = player.activeEffects.find((entry) => entry.type === 'SLOW_DOWN');
+        speedUp.remaining = 99;
+        slowDown.remaining = 0.01;
+
+        updatePlayerEffects(player, 0.02);
+
+        expect(player.activeEffects.some((entry) => entry.type === 'SLOW_DOWN')).toBeFalsy();
+        expect(player.activeEffects.some((entry) => entry.type === 'SPEED_UP')).toBeTruthy();
+        expect(player.baseSpeed).toBeGreaterThan(CONFIG.PLAYER.SPEED);
+    });
+
+    test('T14ee: Hunt-Shields bleiben persistent, waehrend Legacy-SLOW_TIME im Hunt-Modus entfernt wird', async () => {
+        const player = {
+            entityRuntimeConfig: {
+                ...CONFIG,
+                HUNT: { ...CONFIG.HUNT, ACTIVE_MODE: 'HUNT', DEFAULT_MODE: 'HUNT', ENABLED: true },
+            },
+            activeEffects: [{ type: 'SLOW_TIME', remaining: 10 }],
+            baseSpeed: CONFIG.PLAYER.SPEED,
+            speed: CONFIG.PLAYER.SPEED,
+            hasShield: false,
+            shieldHP: 0,
+            maxShieldHp: 1,
+            shieldHitFeedback: 0,
+            trail: {
+                width: CONFIG.TRAIL.WIDTH,
+                setWidth(value) { this.width = value; },
+                resetWidth() { this.width = CONFIG.TRAIL.WIDTH; },
+            },
+        };
+
+        applyPlayerPowerup(player, 'SHIELD');
+        const shieldEffect = player.activeEffects.find((entry) => entry.type === 'SHIELD');
+        shieldEffect.remaining = 0.01;
+
+        updatePlayerEffects(player, 0.5);
+
+        expect(player.activeEffects.some((entry) => entry.type === 'SLOW_TIME')).toBeFalsy();
+        expect(player.activeEffects.some((entry) => entry.type === 'SHIELD')).toBeTruthy();
+        expect(player.hasShield).toBeTruthy();
+        expect(player.shieldHP).toBeGreaterThan(0);
     });
 
     test('T14f: Parcours-Rift erzwingt Reihenfolge und beendet Match mit Objective-Overlay', async ({ page }) => {

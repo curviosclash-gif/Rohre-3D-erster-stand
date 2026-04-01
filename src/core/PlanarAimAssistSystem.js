@@ -9,6 +9,7 @@
 // - Hotpath guardrail: no per-frame object creation in update methods
 
 import { CONFIG } from './Config.js';
+import { isPickupTypeAllowedForMode } from '../entities/PickupRegistry.js';
 import { clamp } from '../utils/MathOps.js';
 
 export class PlanarAimAssistSystem {
@@ -69,14 +70,22 @@ export class PlanarAimAssistSystem {
         if (!game?.entityManager || !game?.gameLoop) return;
 
         game.gameLoop.setTimeScale(1.0);
+        const strategy = game.entityManager?.gameModeStrategy || null;
+        const modeType = String(strategy?.modeType || game?.entityRuntimeConfig?.HUNT?.ACTIVE_MODE || 'CLASSIC').trim().toUpperCase();
+        if (modeType === 'HUNT') {
+            return;
+        }
+
         const players = game.entityManager.players;
+        let slowestScale = 1.0;
         for (let p = 0; p < players.length; p++) {
             const activeEffects = players[p].activeEffects;
             for (let i = 0; i < activeEffects.length; i++) {
-                if (activeEffects[i].type === 'SLOW_TIME') {
-                    game.gameLoop.setTimeScale(CONFIG.POWERUP.TYPES.SLOW_TIME.timeScale);
+                if (activeEffects[i].type === 'SLOW_TIME' && isPickupTypeAllowedForMode('SLOW_TIME', modeType)) {
+                    slowestScale = Math.min(slowestScale, Number(CONFIG.POWERUP.TYPES.SLOW_TIME.timeScale) || 1);
                 }
             }
         }
+        game.gameLoop.setTimeScale(slowestScale);
     }
 }
