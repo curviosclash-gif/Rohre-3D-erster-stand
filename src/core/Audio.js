@@ -40,9 +40,6 @@ export class AudioManager {
         this._audioInitFailed = false;
         this._debugEvents = [];
         this._maxDebugEvents = 24;
-        this._listenerAbortController = typeof AbortController === 'function'
-            ? new AbortController()
-            : null;
         this._registeredWindowListeners = [];
 
         // Throttling Logic
@@ -68,10 +65,6 @@ export class AudioManager {
     }
 
     _addWindowListener(type, listener) {
-        if (this._listenerAbortController) {
-            window.addEventListener(type, listener, { signal: this._listenerAbortController.signal });
-            return;
-        }
         window.addEventListener(type, listener);
         this._registeredWindowListeners.push({ type, listener });
     }
@@ -85,11 +78,6 @@ export class AudioManager {
     }
 
     _removeAllWindowListeners() {
-        if (this._listenerAbortController) {
-            this._listenerAbortController.abort();
-            this._listenerAbortController = null;
-            return;
-        }
         if (!this._registeredWindowListeners.length) return;
         for (const entry of this._registeredWindowListeners) {
             window.removeEventListener(entry.type, entry.listener);
