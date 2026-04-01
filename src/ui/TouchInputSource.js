@@ -3,29 +3,38 @@
 // ============================================
 
 import { PlayerInputSource } from './PlayerInputSource.js';
+import {
+    isPickupTypeSelfUsable,
+    isPickupTypeShootable,
+    normalizePickupType,
+} from '../entities/PickupRegistry.js';
 
 /**
  * Virtual joystick + touch buttons for tablet/mobile play.
  * Layout:
  *   Left side: virtual joystick (pitch/yaw/throttle)
- *   Right side: action buttons (fire, boost, next item)
+ *   Right side: action buttons (fire, use, boost, next item)
  *
  * Auto-detected via 'ontouchstart' in window.
- * Auto-show bei Touch-Gerät, Auto-hide bei Desktop (C.4).
- * Touch-Controls nur im Match sichtbar, nicht im Menü (C.4).
+ * Auto-show bei Touch-Geraet, Auto-hide bei Desktop (C.4).
+ * Touch-Controls nur im Match sichtbar, nicht im Menue (C.4).
  */
 export class TouchInputSource extends PlayerInputSource {
     constructor(options = {}) {
         super('touch');
         this._disposed = false;
+        this._game = options.game || null;
+        this._playerIndex = Number.isInteger(options.playerIndex) ? options.playerIndex : 0;
         this._joystickRadius = options.joystickRadius || 60;
         this._joystickCenter = null;
         this._joystickDelta = { x: 0, y: 0 };
         this._joystickActive = false;
         this._joystickTouchId = null;
+        this._buttonTouches = new Map();
 
         this._buttons = {
             fire: false,
+            useItem: false,
             boost: false,
             boostPressed: false,
             nextItem: false,
@@ -39,9 +48,7 @@ export class TouchInputSource extends PlayerInputSource {
         this._joystickKnobEl = null;
         this._buttonEls = {};
 
-        /** Whether the touch UI is currently shown (C.4) */
         this._uiVisible = false;
-        /** Whether we are in a match (C.4) */
         this._inMatch = false;
 
         this._touchStartHandler = (e) => this._onTouchStart(e);
@@ -53,10 +60,14 @@ export class TouchInputSource extends PlayerInputSource {
         return typeof window !== 'undefined' && 'ontouchstart' in window;
     }
 
+    bind(playerIndex) {
+        super.bind(playerIndex);
+        this._playerIndex = Number.isInteger(playerIndex) ? playerIndex : 0;
+    }
+
     createUI(container) {
         this._containerEl = container || document.getElementById('touch-controls') || document.body;
 
-        // Create joystick
         this._joystickEl = document.createElement('div');
         this._joystickEl.className = 'touch-joystick';
         this._joystickEl.style.cssText = `
@@ -75,25 +86,29 @@ export class TouchInputSource extends PlayerInputSource {
         this._joystickEl.appendChild(this._joystickKnobEl);
         this._containerEl.appendChild(this._joystickEl);
 
-        // Create buttons
         const buttonDefs = [
-            { id: 'fire', label: 'FIRE', bottom: '35%', right: '5%' },
-            { id: 'boost', label: 'BOOST', bottom: '20%', right: '5%' },
-            { id: 'shootMG', label: 'MG', bottom: '35%', right: '20%' },
+            { id: 'fire', label: 'FIRE', bottom: '36%', right: '5%', size: 62 },
+            { id: 'useItem', label: 'USE', bottom: '20%', right: '5%', size: 62 },
+            { id: 'shootMG', label: 'MG', bottom: '36%', right: '20%', size: 54 },
+            { id: 'nextItem', label: 'NEXT', bottom: '20%', right: '20%', size: 54 },
+            { id: 'boost', label: 'BOOST', bottom: '52%', right: '12%', size: 54 },
         ];
 
         for (const def of buttonDefs) {
+            const size = Number(def.size) || 60;
             const btn = document.createElement('div');
             btn.className = `touch-button touch-button-${def.id}`;
             btn.dataset.action = def.id;
+            btn.dataset.baseLabel = def.label;
             btn.textContent = def.label;
             btn.style.cssText = `
                 position: fixed; bottom: ${def.bottom}; right: ${def.right};
-                width: 60px; height: 60px; border-radius: 50%;
+                width: ${size}px; height: ${size}px; border-radius: 50%;
                 border: 2px solid rgba(255,255,255,0.4); background: rgba(0,0,0,0.3);
                 color: white; display: flex; align-items: center; justify-content: center;
                 font-size: 11px; font-weight: bold; touch-action: none;
                 user-select: none; z-index: 1000;
+                transition: opacity 120ms ease, transform 120ms ease, border-color 120ms ease;
             `;
             this._containerEl.appendChild(btn);
             this._buttonEls[def.id] = btn;
@@ -104,11 +119,9 @@ export class TouchInputSource extends PlayerInputSource {
         this._containerEl.addEventListener('touchend', this._touchEndHandler, { passive: false });
         this._containerEl.addEventListener('touchcancel', this._touchEndHandler, { passive: false });
 
-        // Initially hidden until match starts (C.4)
         this._setUIVisibility(false);
     }
 
-    /** Auto-show if touch device, auto-hide if desktop (C.4) */
     autoDetectAndShow() {
         if (TouchInputSource.isAvailable() && this._inMatch) {
             this._setUIVisibility(true);
@@ -117,19 +130,16 @@ export class TouchInputSource extends PlayerInputSource {
         }
     }
 
-    /** Called when a match starts — show touch controls on touch devices (C.4) */
     onMatchStart() {
         this._inMatch = true;
         this.autoDetectAndShow();
     }
 
-    /** Called when a match ends — hide touch controls (C.4) */
     onMatchEnd() {
         this._inMatch = false;
         this._setUIVisibility(false);
     }
 
-    /** Set visibility of all touch UI elements (C.4) */
     _setUIVisibility(visible) {
         this._uiVisible = visible;
         const display = visible ? '' : 'none';
@@ -139,7 +149,6 @@ export class TouchInputSource extends PlayerInputSource {
             if (el) el.style.display = visible ? 'flex' : 'none';
         }
 
-        // Also set the container visibility if using the #touch-controls container
         if (this._containerEl?.id === 'touch-controls') {
             this._containerEl.style.display = display;
         }
@@ -163,6 +172,7 @@ export class TouchInputSource extends PlayerInputSource {
                 const action = target?.dataset?.action;
                 if (action && action in this._buttons) {
                     this._buttons[action] = true;
+                    this._buttonTouches.set(touch.identifier, action);
                 }
             }
         }
@@ -186,13 +196,14 @@ export class TouchInputSource extends PlayerInputSource {
                 if (this._joystickKnobEl) {
                     this._joystickKnobEl.style.transform = '';
                 }
-            } else {
-                const target = document.elementFromPoint(touch.clientX, touch.clientY);
-                const action = target?.dataset?.action;
-                if (action && action in this._buttons) {
-                    this._buttons[action] = false;
-                }
+                continue;
             }
+
+            const action = this._buttonTouches.get(touch.identifier);
+            if (action && action in this._buttons) {
+                this._buttons[action] = false;
+            }
+            this._buttonTouches.delete(touch.identifier);
         }
     }
 
@@ -215,10 +226,87 @@ export class TouchInputSource extends PlayerInputSource {
         }
     }
 
+    _resolveActionState() {
+        const entityManager = this._game?.entityManager;
+        const player = entityManager?.players?.[this._playerIndex] || null;
+        const strategy = entityManager?.gameModeStrategy || null;
+        const inventory = Array.isArray(player?.inventory) ? player.inventory : [];
+        const inventoryLength = inventory.length;
+        const selectedIndex = inventoryLength > 0
+            ? Math.max(0, Math.min(Number(player?.selectedItemIndex) || 0, inventoryLength - 1))
+            : -1;
+        const rawType = selectedIndex >= 0 ? inventory[selectedIndex] : '';
+        const type = normalizePickupType(rawType, { fallback: rawType });
+        const modeType = String(strategy?.modeType || 'CLASSIC').trim().toUpperCase();
+        const canUse = !!type && isPickupTypeSelfUsable(type, modeType);
+        const canShoot = !!type && isPickupTypeShootable(type, modeType);
+        const useCooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
+        const shootCooldownRemaining = Math.max(0, Number(player?.shootCooldown || 0));
+        return {
+            type,
+            hasItem: selectedIndex >= 0,
+            canUse,
+            canShoot,
+            canUseNow: canUse && useCooldownRemaining <= 0.001,
+            canShootNow: canShoot && shootCooldownRemaining <= 0.001,
+            canCycle: inventoryLength > 1,
+            showMg: !!strategy?.hasMachineGun?.(),
+            useCooldownRemaining,
+            shootCooldownRemaining,
+        };
+    }
+
+    _setButtonVisualState(id, { enabled = true, visible = true, title = '' } = {}) {
+        const button = this._buttonEls[id];
+        if (!button) return;
+        button.style.display = visible ? 'flex' : 'none';
+        button.title = title;
+        button.dataset.enabled = enabled ? '1' : '0';
+        button.style.opacity = enabled ? '1' : '0.35';
+        button.style.transform = enabled ? 'scale(1)' : 'scale(0.96)';
+        button.style.borderColor = enabled ? 'rgba(132,226,255,0.85)' : 'rgba(255,255,255,0.18)';
+        button.style.boxShadow = enabled ? '0 0 14px rgba(0,170,255,0.18)' : 'none';
+    }
+
+    _syncActionButtons(actionState) {
+        const typeLabel = actionState?.type ? actionState.type.replace(/_/g, ' ') : 'Kein Item';
+        this._setButtonVisualState('fire', {
+            enabled: !!actionState?.canShootNow,
+            visible: true,
+            title: actionState?.canShoot
+                ? `${typeLabel}${actionState.canShootNow ? '' : ` | Shoot-CD ${actionState.shootCooldownRemaining.toFixed(1)}s`}`
+                : `${typeLabel} | Nicht verschiessbar`,
+        });
+        this._setButtonVisualState('useItem', {
+            enabled: !!actionState?.canUseNow,
+            visible: true,
+            title: actionState?.canUse
+                ? `${typeLabel}${actionState.canUseNow ? '' : ` | Use-CD ${actionState.useCooldownRemaining.toFixed(1)}s`}`
+                : `${typeLabel} | Nicht direkt nutzbar`,
+        });
+        this._setButtonVisualState('nextItem', {
+            enabled: !!actionState?.canCycle,
+            visible: true,
+            title: actionState?.canCycle ? 'Naechstes Inventar-Item' : 'Kein weiteres Inventar-Item',
+        });
+        this._setButtonVisualState('shootMG', {
+            enabled: !!actionState?.showMg,
+            visible: !!actionState?.showMg,
+            title: actionState?.showMg ? 'Maschinengewehr' : '',
+        });
+
+        if (!actionState?.canShootNow) this._buttons.fire = false;
+        if (!actionState?.canUseNow) this._buttons.useItem = false;
+        if (!actionState?.canCycle) this._buttons.nextItem = false;
+        if (!actionState?.showMg) this._buttons.shootMG = false;
+    }
+
     poll() {
         const deadzone = 0.15;
         const jx = Math.abs(this._joystickDelta.x) > deadzone ? this._joystickDelta.x : 0;
         const jy = Math.abs(this._joystickDelta.y) > deadzone ? this._joystickDelta.y : 0;
+        const actionState = this._resolveActionState();
+        this._syncActionButtons(actionState);
 
         const boostDown = this._buttons.boost;
         const boostPressed = boostDown && !this._prevBoost;
@@ -235,9 +323,9 @@ export class TouchInputSource extends PlayerInputSource {
             boostPressed,
             cameraSwitch: false,
             dropItem: false,
-            useItem: false,
-            shootItem: this._buttons.fire,
-            shootMG: this._buttons.shootMG,
+            useItem: this._buttons.useItem && !!actionState?.canUseNow,
+            shootItem: this._buttons.fire && !!actionState?.canShootNow,
+            shootMG: this._buttons.shootMG && !!actionState?.showMg,
             nextItem: this._buttons.nextItem,
         };
     }
@@ -254,6 +342,7 @@ export class TouchInputSource extends PlayerInputSource {
             if (el?.parentNode) el.parentNode.removeChild(el);
         }
         this._buttonEls = {};
+        this._buttonTouches.clear();
         this._joystickEl = null;
         this._joystickKnobEl = null;
     }

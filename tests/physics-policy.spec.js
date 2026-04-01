@@ -1676,4 +1676,83 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         expect(result.lookAhead).toBeGreaterThan(0);
     });
 
+    test('T82c: Hunt-Bot nutzt nahe Special Gates als Retreat-Anker', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const THREE = await import('three');
+            const { HuntBotPolicy } = await import('/src/hunt/HuntBotPolicy.js');
+
+            const player = {
+                id: 'hunt-bot',
+                index: 0,
+                alive: true,
+                hp: 20,
+                maxHp: 100,
+                shieldHP: 0,
+                maxShieldHp: 100,
+                inventory: [],
+                position: new THREE.Vector3(0, 0, 0),
+                getDirection(out) {
+                    return out.set(0, 0, 1);
+                },
+            };
+            const enemy = {
+                id: 'enemy',
+                index: 1,
+                alive: true,
+                hp: 100,
+                maxHp: 100,
+                shieldHP: 0,
+                maxShieldHp: 100,
+                position: new THREE.Vector3(0, 0, 18),
+            };
+            const gate = {
+                pos: new THREE.Vector3(-10, 0, 0),
+                radius: 3,
+                cooldowns: new Map(),
+            };
+            const policy = new HuntBotPolicy();
+            policy._fallbackPolicy.update = () => ({
+                yawLeft: false,
+                yawRight: false,
+                pitchUp: false,
+                pitchDown: false,
+                boost: false,
+                shootMG: true,
+                shootItem: false,
+                shootItemIndex: -1,
+            });
+            policy._fallbackPolicy.getSensorSnapshot = () => ({
+                targetYaw: 0.8,
+                targetPitch: 0,
+                pressure: 0.92,
+                projectileThreat: true,
+                targetPlayer: enemy,
+                targetInFront: true,
+                targetDistanceSq: enemy.position.lengthSq(),
+            });
+
+            const action = policy.update(1 / 60, player, {
+                arena: { specialGates: [gate] },
+                players: [player, enemy],
+                projectiles: [],
+                huntTarget: null,
+            });
+
+            return {
+                boost: !!action?.boost,
+                shootMG: !!action?.shootMG,
+                yawLeft: !!action?.yawLeft,
+                yawRight: !!action?.yawRight,
+                shootItemIndex: Number(action?.shootItemIndex ?? -1),
+            };
+        });
+
+        expect(result.boost).toBeTruthy();
+        expect(result.shootMG).toBeFalsy();
+        expect(result.yawLeft).toBeFalsy();
+        expect(result.yawRight).toBeTruthy();
+        expect(result.shootItemIndex).toBe(-1);
+    });
+
 });

@@ -67,8 +67,18 @@ function resolveSensorYawPitch(snapshot) {
     return { yaw, pitch };
 }
 
-function applyRetreatSteeringFallback(policy, input, player, enemy) {
-    policy._tmpToEnemy.subVectors(enemy.position, player.position).normalize();
+function clearSteeringInput(input) {
+    input.yawLeft = false;
+    input.yawRight = false;
+    input.pitchUp = false;
+    input.pitchDown = false;
+}
+
+function applySteeringTowardPosition(policy, input, player, targetPosition) {
+    if (!targetPosition || !player?.position) return;
+    policy._tmpGate.subVectors(targetPosition, player.position);
+    if (policy._tmpGate.lengthSq() <= 0.000001) return;
+    policy._tmpGate.normalize();
     player.getDirection(policy._tmpForward).normalize();
     policy._tmpRight.crossVectors(WORLD_UP, policy._tmpForward);
     if (policy._tmpRight.lengthSq() <= 0.000001) {
@@ -78,19 +88,23 @@ function applyRetreatSteeringFallback(policy, input, player, enemy) {
     }
     policy._tmpUp.crossVectors(policy._tmpForward, policy._tmpRight).normalize();
 
-    const yawTowardEnemy = policy._tmpRight.dot(policy._tmpToEnemy);
-    if (Math.abs(yawTowardEnemy) > 0.03) {
-        input.yawLeft = yawTowardEnemy > 0;
-        input.yawRight = yawTowardEnemy < 0;
+    const yawTowardTarget = policy._tmpRight.dot(policy._tmpGate);
+    if (Math.abs(yawTowardTarget) > 0.03) {
+        input.yawLeft = yawTowardTarget > 0;
+        input.yawRight = yawTowardTarget < 0;
     }
 
     if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
-        const pitchTowardEnemy = policy._tmpUp.dot(policy._tmpToEnemy);
-        if (Math.abs(pitchTowardEnemy) > 0.07) {
-            input.pitchUp = pitchTowardEnemy < 0;
-            input.pitchDown = pitchTowardEnemy > 0;
+        const pitchTowardTarget = policy._tmpUp.dot(policy._tmpGate);
+        if (Math.abs(pitchTowardTarget) > 0.07) {
+            input.pitchUp = pitchTowardTarget < 0;
+            input.pitchDown = pitchTowardTarget > 0;
         }
     }
+}
+
+function applyRetreatSteeringFallback(policy, input, player, enemy) {
+    applySteeringTowardPosition(policy, input, player, enemy?.position || null);
 }
 
 function applyRetreatSteeringFromSensors(input, snapshot) {
@@ -103,6 +117,35 @@ function applyRetreatSteeringFromSensors(input, snapshot) {
         input.pitchUp = steering.pitch < 0;
         input.pitchDown = steering.pitch > 0;
     }
+}
+
+function resolvePlayerCooldownKey(player) {
+    if (typeof player?.id === 'string' && player.id.trim()) return player.id;
+    if (Number.isFinite(player?.id)) return player.id;
+    if (typeof player?.entityId === 'string' && player.entityId.trim()) return player.entityId;
+    if (Number.isFinite(player?.entityId)) return player.entityId;
+    if (Number.isFinite(player?.index)) return player.index;
+    return null;
+}
+
+function findNearestReadySpecialGate(policy, player, specialGates, maxDistanceSq = Infinity) {
+    if (!player?.position || !Array.isArray(specialGates) || specialGates.length === 0) return null;
+    const cooldownKey = resolvePlayerCooldownKey(player);
+    let nearestGate = null;
+    let nearestDistSq = Infinity;
+    for (const gate of specialGates) {
+        if (!gate?.pos) continue;
+        const cooldownRemaining = gate.cooldowns instanceof Map && cooldownKey != null
+            ? Number(gate.cooldowns.get(cooldownKey) || 0)
+            : 0;
+        if (cooldownRemaining > 0.001) continue;
+        policy._tmpGate.subVectors(gate.pos, player.position);
+        const distSq = policy._tmpGate.lengthSq();
+        if (!Number.isFinite(distSq) || distSq > maxDistanceSq || distSq >= nearestDistSq) continue;
+        nearestGate = gate;
+        nearestDistSq = distSq;
+    }
+    return nearestGate ? { gate: nearestGate, distSq: nearestDistSq } : null;
 }
 
 function invokeFallbackPolicyUpdate(policy, dt, player, runtimeContext) {
@@ -133,6 +176,7 @@ export class HuntBotPolicy {
         this._tmpForward = new THREE.Vector3();
         this._tmpRight = new THREE.Vector3();
         this._tmpUp = new THREE.Vector3();
+        this._tmpGate = new THREE.Vector3();
     }
 
     update(dt, player, runtimeContext = null) {
@@ -152,6 +196,7 @@ export class HuntBotPolicy {
         const pressure = Number.isFinite(snapshot?.pressure) ? snapshot.pressure : 0;
         const projectileThreat = !!snapshot?.projectileThreat;
         const hasSharedTarget = !!huntTarget;
+        const specialGates = Array.isArray(runtimeContext?.arena?.specialGates) ? runtimeContext.arena.specialGates : [];
 
         const healthRatio = resolveHealthRatio(player);
         const shieldRatio = resolveShieldRatio(player);
@@ -198,8 +243,15 @@ export class HuntBotPolicy {
 
         const shouldRetreat = !!enemy && (vitalityRatio <= 0.34 || (vitalityRatio < 0.52 && survivalPressure > 0.76));
         if (shouldRetreat) {
+            const gateAssistRange = Math.max(24, Number(CONFIG?.HUNT?.RETREAT_GATE_RANGE || 54));
+            const readyGate = (survivalPressure > 0.8 || vitalityRatio < 0.3)
+                ? findNearestReadySpecialGate(this, player, specialGates, gateAssistRange * gateAssistRange)
+                : null;
             const hasSensorSteering = snapshot && (Math.abs(snapshot.targetYaw || 0) > 0.01 || Math.abs(snapshot.targetPitch || 0) > 0.01);
-            if (hasSensorSteering) {
+            clearSteeringInput(input);
+            if (readyGate?.gate) {
+                applySteeringTowardPosition(this, input, player, readyGate.gate.pos);
+            } else if (hasSensorSteering) {
                 applyRetreatSteeringFromSensors(input, snapshot);
             } else {
                 applyRetreatSteeringFallback(this, input, player, enemy);

@@ -5,6 +5,11 @@
 import { CONFIG } from '../core/Config.js';
 import { ArcadeMissionHUD } from './arcade/ArcadeMissionHUD.js';
 import { ArcadeScoreHUD } from './arcade/ArcadeScoreHUD.js';
+import {
+    isPickupTypeSelfUsable,
+    isPickupTypeShootable,
+    normalizePickupType,
+} from '../entities/PickupRegistry.js';
 
 function formatParcoursDurationMs(value) {
     const ms = Math.max(0, Number(value) || 0);
@@ -310,26 +315,58 @@ export class HudRuntimeSystem {
 
     _updateItemBar(container, player) {
         this._ensureItemSlots(container);
+        const inventory = Array.isArray(player?.inventory) ? player.inventory : [];
+        const inventoryLength = inventory.length;
+        const selectedIndex = inventoryLength > 0
+            ? Math.max(0, Math.min(Number(player?.selectedItemIndex) || 0, inventoryLength - 1))
+            : -1;
+        const strategy = this.game?.entityManager?.gameModeStrategy || null;
+        const modeType = String(strategy?.modeType || 'CLASSIC').trim().toUpperCase();
+        const useCooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
+        const shootCooldownRemaining = Math.max(0, Number(player?.shootCooldown || 0));
 
         for (let i = 0; i < CONFIG.POWERUP.MAX_INVENTORY; i++) {
             const slot = container.children[i];
-            const type = i < player.inventory.length ? player.inventory[i] : '';
-
-            if (slot.dataset.type === type) {
-                continue;
-            }
-
-            slot.dataset.type = type;
+            const rawType = i < inventoryLength ? inventory[i] : '';
+            const type = normalizePickupType(rawType, { fallback: rawType });
+            const config = type ? CONFIG.POWERUP.TYPES[type] : null;
+            const canUse = !!type && isPickupTypeSelfUsable(type, modeType);
+            const canShoot = !!type && isPickupTypeShootable(type, modeType);
+            const isSelected = !!type && i === selectedIndex;
+            const useOnCooldown = canUse && useCooldownRemaining > 0.001;
+            const shootOnCooldown = canShoot && shootCooldownRemaining > 0.001;
+            const hasCooldown = !!type && (useOnCooldown || shootOnCooldown);
+            const hintLabel = canUse && canShoot
+                ? 'DUAL'
+                : (canShoot ? 'SHOT' : (canUse ? 'USE' : ''));
+            const titleParts = [];
             if (type) {
-                const config = CONFIG.POWERUP.TYPES[type];
-                slot.textContent = config.icon;
-                slot.classList.add('active');
-                slot.style.borderColor = '#' + config.color.toString(16).padStart(6, '0');
-            } else {
-                slot.textContent = '';
-                slot.classList.remove('active');
-                slot.style.borderColor = '';
+                titleParts.push(type.replace(/_/g, ' '));
+                if (canUse && canShoot) titleParts.push('Use oder Shoot');
+                else if (canShoot) titleParts.push('Verschiessbar');
+                else if (canUse) titleParts.push('Direkt nutzbar');
+                else titleParts.push('Nur kontextbasiert');
+                if (useOnCooldown) titleParts.push(`Use-CD ${useCooldownRemaining.toFixed(1)}s`);
+                if (shootOnCooldown) titleParts.push(`Shoot-CD ${shootCooldownRemaining.toFixed(1)}s`);
             }
+
+            slot.dataset.type = rawType;
+            slot.dataset.pickupType = type || '';
+            slot.dataset.actionHint = hintLabel.toLowerCase();
+            slot.dataset.actionHintLabel = hintLabel;
+            slot.dataset.selected = isSelected ? '1' : '0';
+            slot.dataset.cooldown = hasCooldown ? '1' : '0';
+            slot.textContent = type ? (config?.icon || '?') : '';
+            slot.title = titleParts.join(' | ');
+            slot.classList.toggle('active', !!type);
+            slot.classList.toggle('selected', isSelected);
+            slot.classList.toggle('projectile-only', !!type && canShoot && !canUse);
+            slot.classList.toggle('use-only', !!type && canUse && !canShoot);
+            slot.classList.toggle('dual-action', !!type && canUse && canShoot);
+            slot.classList.toggle('cooldown', hasCooldown);
+            slot.style.borderColor = type && Number.isFinite(config?.color)
+                ? '#' + config.color.toString(16).padStart(6, '0')
+                : '';
         }
     }
 
@@ -340,6 +377,11 @@ export class HudRuntimeSystem {
             const slot = document.createElement('div');
             slot.className = 'item-slot';
             slot.dataset.type = '';
+            slot.dataset.pickupType = '';
+            slot.dataset.actionHint = '';
+            slot.dataset.actionHintLabel = '';
+            slot.dataset.selected = '0';
+            slot.dataset.cooldown = '0';
             container.appendChild(slot);
         }
 

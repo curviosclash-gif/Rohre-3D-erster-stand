@@ -573,6 +573,7 @@ export class MatchFlowUiController {
     _createPreferredInputSource(playerIndex, localHumanCount) {
         return createPreferredMatchInputSource({
             inputManager: this.game?.input,
+            game: this.game,
             playerIndex,
             localHumanCount,
         });
