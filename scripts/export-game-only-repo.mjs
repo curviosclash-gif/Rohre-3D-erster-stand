@@ -4,10 +4,13 @@ import process from 'node:process';
 
 const DEFAULT_OUT_DIR = '.codex_tmp/game-only-export';
 
-const COPY_ENTRIES = Object.freeze([
-    { source: 'dist', target: 'dist' },
+const OPTIONAL_DIRECTORY_ENTRIES = Object.freeze([
     { source: 'data/maps', target: 'data/maps' },
     { source: 'data/vehicles', target: 'data/vehicles' },
+]);
+
+const COPY_ENTRIES = Object.freeze([
+    { source: 'dist', target: 'dist' },
     { source: 'electron/launch.cjs', target: 'electron/launch.cjs' },
     { source: 'electron/main.cjs', target: 'electron/main.cjs' },
     { source: 'electron/preload.cjs', target: 'electron/preload.cjs' },
@@ -40,6 +43,20 @@ function copyEntry(repoRoot, outDir, { source, target }) {
     const targetPath = path.resolve(outDir, target);
     mkdirSync(path.dirname(targetPath), { recursive: true });
     cpSync(sourcePath, targetPath, { recursive: true, force: true });
+}
+
+function ensureOptionalDirectory(repoRoot, outDir, { source, target }) {
+    const sourcePath = path.resolve(repoRoot, source);
+    const targetPath = path.resolve(outDir, target);
+
+    mkdirSync(targetPath, { recursive: true });
+
+    if (existsSync(sourcePath)) {
+        cpSync(sourcePath, targetPath, { recursive: true, force: true });
+        return;
+    }
+
+    writeFileSync(path.resolve(targetPath, '.gitkeep'), '', 'utf8');
 }
 
 function writeGeneratedFiles(outDir) {
@@ -107,6 +124,10 @@ function main() {
 
     for (const entry of COPY_ENTRIES) {
         copyEntry(repoRoot, outDir, entry);
+    }
+
+    for (const entry of OPTIONAL_DIRECTORY_ENTRIES) {
+        ensureOptionalDirectory(repoRoot, outDir, entry);
     }
 
     writeGeneratedFiles(outDir);
