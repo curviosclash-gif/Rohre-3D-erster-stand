@@ -20,10 +20,13 @@ npm run dev:raw
 npm run logs:clean
 npm run cleanup:workspace
 npm run cleanup:workspace:apply
+npm run export:game-only
 npm run test:core
 npm run docs:sync
 npm run docs:check
 ```
+
+`npm run export:game-only` erzeugt unter `.codex_tmp/game-only-export/` das komplette Desktop-Spiel ohne Repo-Ballast fuer das automatische Mirror-Repo `curviosclash-gif/CurviosClash-game-only`.
 
 `cleanup:workspace` erzeugt zuerst einen Dry-Run-Bericht unter `tmp/workspace-cleanup-report.json`.
 Der Bericht listet `protectionSources` sowie jede Fundstelle als `delete`, `archive` oder `protect`.

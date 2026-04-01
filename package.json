@@ -25,6 +25,7 @@
     "build": "vite build",
     "build:web": "vite build --mode web",
     "build:app": "vite build --mode app",
+    "export:game-only": "node scripts/export-game-only-repo.mjs",
     "browser:start": "powershell -NoProfile -ExecutionPolicy Bypass -File ./server.ps1",
     "app:setup": "npm --prefix electron install",
     "app:start": "npm --prefix electron run start",

@@ -1,0 +1,71 @@
+name: Sync Game-Only Repo
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-game-only-main
+  cancel-in-progress: true
+
+jobs:
+  sync-game-only:
+    if: github.repository == 'curviosclash-gif/Rohre-3D-erster-stand'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build Desktop Runtime
+        run: npm run build:app
+
+      - name: Export Game-Only Repository
+        run: npm run export:game-only -- --out .codex_tmp/game-only-export
+
+      - name: Prepare SSH
+        shell: bash
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.GAME_ONLY_REPO_DEPLOY_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: Clone Game-Only Repository
+        run: git clone git@github.com:curviosclash-gif/CurviosClash-game-only.git .codex_tmp/game-only-target
+
+      - name: Sync Export Into Target Repository
+        shell: bash
+        run: |
+          if git -C .codex_tmp/game-only-target rev-parse --verify origin/main >/dev/null 2>&1; then
+            git -C .codex_tmp/game-only-target checkout main
+          else
+            git -C .codex_tmp/game-only-target checkout --orphan main
+          fi
+          rsync -a --delete --exclude ".git/" .codex_tmp/game-only-export/ .codex_tmp/game-only-target/
+
+      - name: Commit And Push Mirror
+        shell: bash
+        run: |
+          git -C .codex_tmp/game-only-target config user.name "github-actions[bot]"
+          git -C .codex_tmp/game-only-target config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git -C .codex_tmp/game-only-target add -A
+          if git -C .codex_tmp/game-only-target diff --cached --quiet; then
+            echo "No mirror changes detected."
+            exit 0
+          fi
+          git -C .codex_tmp/game-only-target commit -m "chore: sync from ${GITHUB_SHA}"
+          git -C .codex_tmp/game-only-target push origin main
