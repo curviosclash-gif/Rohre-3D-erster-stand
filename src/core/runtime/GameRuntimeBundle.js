@@ -260,6 +260,7 @@ export function applyMatchSessionState(bundle, matchSession) {
 export function getCurrentMatchSessionRefs(bundle) {
     const state = getGameRuntimeState(bundle);
     return {
+        arena: state?.arena || null,
         entityManager: state?.entityManager || null,
         powerupManager: state?.powerupManager || null,
         particles: state?.particles || null,

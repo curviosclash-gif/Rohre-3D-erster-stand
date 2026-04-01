@@ -147,6 +147,14 @@ export function createMatchSession({
             && !currentSession?.powerupManager
             && !currentSession?.particles;
         const reusablePrewarmedArenaSession = canPreservePrewarmedScene ? prewarmedArenaSession : null;
+        const disposeFailedSession = (session) => {
+            if (!session) return;
+            try {
+                disposeMatchSessionSystems(renderer, session, { clearScene: true });
+            } catch {
+                // Keep the original session creation error as the primary failure.
+            }
+        };
 
         disposeMatchSessionSystems(renderer, currentSession, {
             clearScene: !canPreservePrewarmedScene,
@@ -158,13 +166,26 @@ export function createMatchSession({
         arena.runtimeConfig = runtimeConfig;
         arena.entityRuntimeConfig = entityRuntimeConfig;
         bindArenaRuntimeMap(arena, mapResolution, effectiveMapKey);
+        const createdSession = {
+            particles,
+            arena,
+            powerupManager: null,
+            entityManager: null,
+            mapResolution,
+            arenaBuildResult: reusablePrewarmedArenaSession?.arenaBuildResult || null,
+            effectiveMapKey,
+            numHumans,
+            numBots,
+            winsNeeded,
+        };
 
         const buildSessionPayload = (arenaBuildResult = reusablePrewarmedArenaSession?.arenaBuildResult || null) => {
-            const powerupManager = new PowerupManager(renderer, arena, entityRuntimeConfig);
-            const entityManager = new EntityManager(
+            createdSession.arenaBuildResult = arenaBuildResult;
+            createdSession.powerupManager = new PowerupManager(renderer, arena, entityRuntimeConfig);
+            createdSession.entityManager = new EntityManager(
                 renderer,
                 arena,
-                powerupManager,
+                createdSession.powerupManager,
                 particles,
                 audio,
                 recorder,
@@ -172,36 +193,35 @@ export function createMatchSession({
                 { entityRuntimeConfig }
             );
 
-            entityManager.setup(
+            createdSession.entityManager.setup(
                 numHumans,
                 numBots,
                 buildEntityManagerSetupOptions(settings, runtimeConfig, entityRuntimeConfig)
             );
 
-            return {
-                particles,
-                arena,
-                powerupManager,
-                entityManager,
-                mapResolution,
-                arenaBuildResult,
-                effectiveMapKey,
-                numHumans,
-                numBots,
-                winsNeeded,
-            };
+            return createdSession;
         };
 
-        if (reusablePrewarmedArenaSession) {
-            arena.syncAuthoredAircraftDecorations?.();
-            return buildSessionPayload();
-        }
+        try {
+            if (reusablePrewarmedArenaSession) {
+                arena.syncAuthoredAircraftDecorations?.();
+                return buildSessionPayload();
+            }
 
-        const arenaBuildResult = arena.build(effectiveMapKey);
-        if (isPromiseLike(arenaBuildResult)) {
-            return Promise.resolve(arenaBuildResult).then((resolvedArenaBuildResult) => buildSessionPayload(resolvedArenaBuildResult));
+            const arenaBuildResult = arena.build(effectiveMapKey);
+            if (isPromiseLike(arenaBuildResult)) {
+                return Promise.resolve(arenaBuildResult)
+                    .then((resolvedArenaBuildResult) => buildSessionPayload(resolvedArenaBuildResult))
+                    .catch((error) => {
+                        disposeFailedSession(createdSession);
+                        throw error;
+                    });
+            }
+            return buildSessionPayload(arenaBuildResult);
+        } catch (error) {
+            disposeFailedSession(createdSession);
+            throw error;
         }
-        return buildSessionPayload(arenaBuildResult);
     };
 
     const activePrewarmPromise = getActivePrewarmPromiseForRenderer(renderer);

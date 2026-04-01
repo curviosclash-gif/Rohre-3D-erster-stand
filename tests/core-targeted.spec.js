@@ -6886,6 +6886,110 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
         expect(typeof result.activeSessionId).toBe('string');
     });
 
+    test('V74.3 createMatchSession disposes partial session allocations on async init failure', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createMatchSession } = await import('/src/state/MatchSessionFactory.js');
+            const { Arena } = await import('/src/entities/Arena.js');
+            const { ParticleSystem } = await import('/src/entities/Particles.js');
+
+            const callLog = [];
+            const originalBuild = Arena.prototype.build;
+            const originalArenaDispose = Arena.prototype.dispose;
+            const originalParticleDispose = ParticleSystem.prototype.dispose;
+
+            Arena.prototype.build = () => Promise.reject(new Error('arena-build-fail'));
+            Arena.prototype.dispose = function disposeArenaForTest() {
+                callLog.push('arena.dispose');
+            };
+            ParticleSystem.prototype.dispose = function disposeParticlesForTest() {
+                callLog.push('particles.dispose');
+            };
+
+            let errorMessage = null;
+            try {
+                await createMatchSession({
+                    renderer: {
+                        addToScene() { },
+                        removeFromScene() { },
+                        clearMatchScene() {
+                            callLog.push('renderer.clearMatchScene');
+                        },
+                    },
+                    audio: {},
+                    recorder: {},
+                    settings: {
+                        mode: '1p',
+                        numBots: 0,
+                        winsNeeded: 3,
+                        gameplay: {},
+                        vehicles: {},
+                        invertPitch: {},
+                        cockpitCamera: {},
+                    },
+                    runtimeConfig: null,
+                    baseConfig: null,
+                    requestedMapKey: 'standard',
+                    currentSession: null,
+                });
+            } catch (error) {
+                errorMessage = error?.message || null;
+            } finally {
+                Arena.prototype.build = originalBuild;
+                Arena.prototype.dispose = originalArenaDispose;
+                ParticleSystem.prototype.dispose = originalParticleDispose;
+            }
+
+            return { callLog, errorMessage };
+        });
+
+        expect(result.errorMessage).toBe('arena-build-fail');
+        expect(result.callLog).toEqual([
+            'arena.dispose',
+            'particles.dispose',
+            'renderer.clearMatchScene',
+        ]);
+    });
+
+    test('V74.3 current match session refs include arena for replacement disposal', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const {
+                applyMatchSessionState,
+                createGameRuntimeBundle,
+                getCurrentMatchSessionRefs,
+            } = await import('/src/core/runtime/GameRuntimeBundle.js');
+
+            const arena = { id: 'arena-ref' };
+            const entityManager = { id: 'entity-manager-ref' };
+            const powerupManager = { id: 'powerup-manager-ref' };
+            const particles = { id: 'particle-ref' };
+            const bundle = createGameRuntimeBundle();
+
+            applyMatchSessionState(bundle, {
+                arena,
+                entityManager,
+                powerupManager,
+                particles,
+            });
+
+            const refs = getCurrentMatchSessionRefs(bundle);
+            return {
+                arenaMatches: refs?.arena === arena,
+                entityMatches: refs?.entityManager === entityManager,
+                powerupMatches: refs?.powerupManager === powerupManager,
+                particleMatches: refs?.particles === particles,
+            };
+        });
+
+        expect(result).toEqual({
+            arenaMatches: true,
+            entityMatches: true,
+            powerupMatches: true,
+            particleMatches: true,
+        });
+    });
+
     test('V74.3 createMatchSession disposes current session before starting new init', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
