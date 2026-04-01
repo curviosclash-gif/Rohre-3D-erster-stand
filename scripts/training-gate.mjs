@@ -12,9 +12,22 @@ import {
     TRAINING_GATE_THRESHOLD_VERSION,
 } from '../src/state/training/TrainingGateThresholds.js';
 import {
+    evaluateBenchmarkArtifactRequirements,
+    evaluateBenchmarkProfileGuardrails,
+    resolveTrainingPerformanceProfile,
+    summarizeFailureCodes,
+} from '../src/state/training/TrainingBenchmarkContract.js';
+import {
     buildBotValidationEval,
     evaluateBotValidationDrift,
 } from './training-bot-validation-lane.mjs';
+import {
+    buildResumeHealth,
+    buildThroughputSummary,
+    createBenchmarkReport,
+    readJsonIfExists as readBenchmarkJsonIfExists,
+    writeJson as writeBenchmarkJson,
+} from './training-benchmark-artifacts.mjs';
 
 const RUNS_ROOT = path.join('data', 'training', 'runs');
 
@@ -287,6 +300,35 @@ function evaluatePlayEvalDrift(evalArtifact) {
     };
 }
 
+function mapBotValidationChecksToFailures(checks = []) {
+    const failures = [];
+    for (const check of checks) {
+        if (check?.level !== 'fail') continue;
+        if (check.metric === 'averageBotSurvival') {
+            failures.push({ code: 'player-dead', metric: check.metric, value: check.value });
+        } else if (check.metric === 'botWinRate') {
+            failures.push({ code: 'match-loss', metric: check.metric, value: check.value });
+        } else if (check.metric === 'forcedRoundRate') {
+            failures.push({ code: 'forced-round', metric: check.metric, value: check.value });
+        } else if (check.metric === 'timeoutRoundRate') {
+            failures.push({ code: 'timeout-round', metric: check.metric, value: check.value });
+        }
+    }
+    return failures;
+}
+
+function buildFailureTaxonomySummary({ artifactAudit, guardrails, botValidationGate }) {
+    const entries = [
+        ...(Array.isArray(artifactAudit?.failures) ? artifactAudit.failures : []),
+        ...(Array.isArray(guardrails?.failures) ? guardrails.failures : []),
+        ...mapBotValidationChecksToFailures(botValidationGate?.checks || []),
+    ];
+    return {
+        entries,
+        counts: summarizeFailureCodes(entries),
+    };
+}
+
 async function upsertLatestIndex(runStamp, updates = {}) {
     const latestPath = path.join(RUNS_ROOT, 'latest.json');
     const current = await readJsonIfExists(latestPath) || {};
@@ -295,11 +337,23 @@ async function upsertLatestIndex(runStamp, updates = {}) {
     const currentEvalPath = current?.artifacts?.eval?.path || current?.eval || null;
     const currentGatePath = current?.artifacts?.gate?.path || current?.gate || null;
     const currentTrainerPath = current?.artifacts?.trainer?.path || current?.trainer || null;
+    const currentBenchmarkManifestPath = current?.artifacts?.benchmarkManifest?.path || null;
+    const currentDecisionTracePath = current?.artifacts?.decisionTrace?.path || null;
+    const currentBenchmarkReportPath = current?.artifacts?.benchmarkReport?.path || null;
     const currentCheckpointPath = current?.artifacts?.checkpoint?.path || current?.checkpoint || null;
     const runPath = Object.prototype.hasOwnProperty.call(updates, 'run') ? updates.run : currentRunPath;
     const evalPath = Object.prototype.hasOwnProperty.call(updates, 'eval') ? updates.eval : currentEvalPath;
     const gatePath = Object.prototype.hasOwnProperty.call(updates, 'gate') ? updates.gate : currentGatePath;
     const trainerPath = Object.prototype.hasOwnProperty.call(updates, 'trainer') ? updates.trainer : currentTrainerPath;
+    const benchmarkManifestPath = Object.prototype.hasOwnProperty.call(updates, 'benchmarkManifest')
+        ? updates.benchmarkManifest
+        : currentBenchmarkManifestPath;
+    const decisionTracePath = Object.prototype.hasOwnProperty.call(updates, 'decisionTrace')
+        ? updates.decisionTrace
+        : currentDecisionTracePath;
+    const benchmarkReportPath = Object.prototype.hasOwnProperty.call(updates, 'benchmarkReport')
+        ? updates.benchmarkReport
+        : currentBenchmarkReportPath;
     const checkpointPath = Object.prototype.hasOwnProperty.call(updates, 'checkpoint') ? updates.checkpoint : currentCheckpointPath;
     const resumeSource = Object.prototype.hasOwnProperty.call(updates, 'resumeSource')
         ? updates.resumeSource
@@ -318,6 +372,18 @@ async function upsertLatestIndex(runStamp, updates = {}) {
                 status: trainerPath ? 'completed' : 'pending',
                 exists: !!trainerPath,
             },
+            benchmarkManifest: {
+                status: benchmarkManifestPath ? 'completed' : 'pending',
+                exists: !!benchmarkManifestPath,
+            },
+            decisionTrace: {
+                status: decisionTracePath ? 'completed' : 'pending',
+                exists: !!decisionTracePath,
+            },
+            benchmarkReport: {
+                status: benchmarkReportPath ? 'completed' : 'pending',
+                exists: !!benchmarkReportPath,
+            },
             checkpoint: {
                 status: checkpointPath ? 'completed' : 'pending',
                 exists: !!checkpointPath,
@@ -328,6 +394,9 @@ async function upsertLatestIndex(runStamp, updates = {}) {
     if (evalPath) next.artifacts.eval.path = evalPath;
     if (gatePath) next.artifacts.gate.path = gatePath;
     if (trainerPath) next.artifacts.trainer.path = trainerPath;
+    if (benchmarkManifestPath) next.artifacts.benchmarkManifest.path = benchmarkManifestPath;
+    if (decisionTracePath) next.artifacts.decisionTrace.path = decisionTracePath;
+    if (benchmarkReportPath) next.artifacts.benchmarkReport.path = benchmarkReportPath;
     if (checkpointPath) next.artifacts.checkpoint.path = checkpointPath;
     next.runDir = layout.runDir;
     await writeJson(latestPath, next);
@@ -378,6 +447,9 @@ async function main() {
     const trendWindowSize = Math.max(2, Math.min(12, Number(args.window) || 3));
     const latestBefore = writeLatest ? await readJsonIfExists(layout.latestIndexPath) : null;
     let evalArtifact = await readJson(evalPath);
+    const runArtifactPath = typeof evalArtifact?.source?.runArtifactPath === 'string' && evalArtifact.source.runArtifactPath.trim()
+        ? evalArtifact.source.runArtifactPath.trim()
+        : path.join(runDir, 'run.json');
 
     const botValidationReportPath = (
         typeof args['bot-validation-report'] === 'string' && args['bot-validation-report'].trim()
@@ -400,6 +472,19 @@ async function main() {
             exists: botValidationReport != null,
         }),
     };
+    const runArtifact = await readBenchmarkJsonIfExists(runArtifactPath);
+    const trainerArtifact = await readBenchmarkJsonIfExists(
+        runArtifact?.trainerArtifactPath
+            ? runArtifact.trainerArtifactPath
+            : layout.trainerArtifactPath
+    );
+    const benchmarkManifest = await readBenchmarkJsonIfExists(layout.benchmarkManifestPath);
+    const decisionTrace = await readBenchmarkJsonIfExists(layout.decisionTracePath);
+    const hardwareTelemetry = runArtifact?.hardwareTelemetry || trainerArtifact?.hardwareTelemetry || null;
+    const performanceProfile = resolveTrainingPerformanceProfile(
+        benchmarkManifest?.performanceProfileName || runArtifact?.performanceProfileName || '',
+        null
+    );
 
     const gateResult = evaluateTrainingGate(evalArtifact, {
         baseline: TRAINING_GATE_BASELINE_REFERENCE,
@@ -408,15 +493,50 @@ async function main() {
     const trendResult = evaluateRollingTrend(trendWindowRows);
     const playEvalResult = evaluatePlayEvalDrift(evalArtifact);
     const botValidationResult = evaluateBotValidationDrift(evalArtifact);
-    const combinedOk = gateResult.ok && trendResult.ok && playEvalResult.ok && botValidationResult.ok;
+    const artifactAudit = evaluateBenchmarkArtifactRequirements({
+        manifest: benchmarkManifest,
+        runArtifact,
+        evalArtifact,
+        trainerArtifact,
+        decisionTrace,
+    });
+    const guardrails = evaluateBenchmarkProfileGuardrails({
+        profile: performanceProfile,
+        bridgeTelemetry: evalArtifact?.bridge?.telemetry || runArtifact?.bridgeTelemetry,
+        opsKpis: evalArtifact?.metrics?.opsKpis || runArtifact?.opsKpis,
+        artifactBacklogCount: artifactAudit.failures.length,
+        resumeRequested: runArtifact?.resume?.requested,
+        resumeLoaded: runArtifact?.resume?.loaded,
+        hardwareTelemetry,
+    });
+    const failureTaxonomy = buildFailureTaxonomySummary({
+        artifactAudit,
+        guardrails,
+        botValidationGate: botValidationResult,
+    });
+    const resumeHealth = buildResumeHealth(runArtifact);
+    const throughput = runArtifact?.throughput || buildThroughputSummary({
+        elapsedMs: runArtifact?.elapsedMs,
+        totals: runArtifact?.summary?.totals,
+    });
+    const combinedOk = gateResult.ok
+        && trendResult.ok
+        && playEvalResult.ok
+        && botValidationResult.ok
+        && artifactAudit.ok
+        && guardrails.ok;
     const gateArtifact = {
         ok: combinedOk,
         status: combinedOk ? 'pass' : 'fail',
         runStamp,
         generatedAt: new Date().toISOString(),
+        contractVersion: 'v80-training-gate-v1',
         thresholdVersion: TRAINING_GATE_THRESHOLD_VERSION,
         source: {
             evalPath: toRepoPath(evalPath),
+            runPath: toRepoPath(runArtifactPath),
+            benchmarkManifestPath: benchmarkManifest ? toRepoPath(layout.benchmarkManifestPath) : null,
+            decisionTracePath: decisionTrace ? toRepoPath(layout.decisionTracePath) : null,
         },
         kpis: gateResult.kpis,
         checks: gateResult.checks,
@@ -430,10 +550,46 @@ async function main() {
         },
         playEvalGate: playEvalResult,
         botValidationGate: botValidationResult,
+        botValidationFailureTaxonomy: botValidationReport?.failureTaxonomy || null,
+        artifactAudit,
+        guardrails,
+        failureTaxonomy,
+        resumeHealth,
+        throughput,
+        hardwareTelemetry,
     };
 
     const gatePath = path.join(runDir, 'gate.json');
     await writeJson(gatePath, gateArtifact);
+    const benchmarkReport = createBenchmarkReport({
+        runStamp,
+        profile: performanceProfile,
+        manifest: benchmarkManifest,
+        source: gateArtifact.source,
+        artifacts: {
+            run: toRepoPath(runArtifactPath),
+            eval: toRepoPath(evalPath),
+            trainer: runArtifact?.trainerArtifactPath || toRepoPath(layout.trainerArtifactPath),
+            checkpoint: runArtifact?.checkpointPath || null,
+            benchmarkManifest: benchmarkManifest ? toRepoPath(layout.benchmarkManifestPath) : null,
+            decisionTrace: decisionTrace ? toRepoPath(layout.decisionTracePath) : null,
+            benchmarkReport: toRepoPath(layout.benchmarkReportPath),
+            botValidationReport: botValidationReportPath ? toRepoPath(botValidationReportPath) : null,
+        },
+        comparison: {
+            gate: gateArtifact,
+            championId: benchmarkManifest?.compareRules?.championId || null,
+            originBaselineId: benchmarkManifest?.compareRules?.originBaselineId || null,
+        },
+        throughput,
+        resumeHealth,
+        hardwareTelemetry,
+        gate: gateArtifact,
+        artifactAudit,
+        guardrails,
+        failureSummary: failureTaxonomy,
+    });
+    await writeBenchmarkJson(layout.benchmarkReportPath, benchmarkReport);
 
     let latestUpdate = null;
     let latestRestored = false;
@@ -443,6 +599,9 @@ async function main() {
                 run: latestIndex.latest?.artifacts?.run?.path || latestIndex.latest?.run || null,
                 eval: toRepoPath(evalPath),
                 gate: toRepoPath(gatePath),
+                benchmarkManifest: benchmarkManifest ? toRepoPath(layout.benchmarkManifestPath) : null,
+                decisionTrace: decisionTrace ? toRepoPath(layout.decisionTracePath) : null,
+                benchmarkReport: toRepoPath(layout.benchmarkReportPath),
             });
         } else {
             latestRestored = await restoreLatestIndex(layout, latestBefore);
@@ -454,16 +613,22 @@ async function main() {
         ...trendResult.checks.map(formatTrendLine),
         ...playEvalResult.checks.map(formatMetricLine),
         ...botValidationResult.checks.map(formatMetricLine),
+        ...artifactAudit.failures.map((entry) => `[FAIL] artifact.${entry.artifact || entry.code}: ${entry.summary}`),
+        ...guardrails.checks.map((entry) => `[INFO] guardrail.${entry.metric}: value=${entry.value} hard<=${entry.hardLimit}`),
     ];
     console.log(JSON.stringify({
         ok: combinedOk,
         status: combinedOk ? 'pass' : 'fail',
         runStamp,
         gatePath: toRepoPath(gatePath),
+        benchmarkReportPath: toRepoPath(layout.benchmarkReportPath),
         latestIndexPath: latestUpdate ? toRepoPath(latestUpdate.latestPath) : null,
         latestRestored,
         trendWindowSize,
         trendSampleCount: trendResult.sampleCount,
+        artifactFailures: artifactAudit.failures.length,
+        guardrailFailures: guardrails.failures.length,
+        failureCounts: failureTaxonomy.counts,
         report: reportLines,
     }, null, 2));
 

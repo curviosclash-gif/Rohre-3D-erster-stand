@@ -1,12 +1,8 @@
-const BOT_VALIDATION_EVAL_CONTRACT_VERSION = 'v36-bot-validation-eval-v1';
+import { TRAINING_BOT_VALIDATION_BASELINE_REFERENCE } from '../src/state/training/TrainingBenchmarkContract.js';
 
-export const BOT_VALIDATION_BASELINE_REFERENCE = Object.freeze({
-    rounds: 16,
-    botWinRate: 0.5,
-    averageBotSurvival: 31.908458,
-    forcedRoundRate: 0.5,
-    timeoutRoundRate: 0.5,
-});
+const BOT_VALIDATION_EVAL_CONTRACT_VERSION = 'v80-bot-validation-eval-v1';
+
+export const BOT_VALIDATION_BASELINE_REFERENCE = TRAINING_BOT_VALIDATION_BASELINE_REFERENCE;
 
 function toFiniteNumber(value, fallback = 0) {
     const numeric = Number(value);
@@ -131,13 +127,36 @@ export function evaluateBotValidationDrift(evalArtifact = {}) {
     const metrics = lane?.metrics;
     const baseline = lane?.baseline?.reference || BOT_VALIDATION_BASELINE_REFERENCE;
     if (!lane?.enabled || !metrics || typeof metrics !== 'object') {
+        const reportExists = lane?.source?.exists === true;
         return {
             enabled: false,
-            ok: true,
-            status: 'pass',
-            checks: [],
+            ok: false,
+            status: 'fail',
+            checks: [
+                {
+                    metric: 'botValidationReport',
+                    comparator: 'required',
+                    level: 'fail',
+                    value: reportExists ? 'disabled' : 'missing',
+                    warnThreshold: 'enabled',
+                    hardThreshold: 'enabled',
+                    baseline: 'enabled',
+                    reason: reportExists ? 'validation-disabled' : 'artifact-missing',
+                },
+            ],
             warnings: [],
-            hardFailures: [],
+            hardFailures: [
+                {
+                    metric: 'botValidationReport',
+                    comparator: 'required',
+                    level: 'fail',
+                    value: reportExists ? 'disabled' : 'missing',
+                    warnThreshold: 'enabled',
+                    hardThreshold: 'enabled',
+                    baseline: 'enabled',
+                    reason: reportExists ? 'validation-disabled' : 'artifact-missing',
+                },
+            ],
         };
     }
 

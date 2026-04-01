@@ -166,6 +166,7 @@ export async function writeTrainerArtifacts(input = {}) {
         trainer: input.trainer || null,
         bridge: input.bridge || null,
         opsKpis: input.opsKpis || null,
+        hardwareTelemetry: input.hardwareTelemetry || null,
         runSummary: input.runSummary || null,
     };
     const checkpointArtifact = {

@@ -596,6 +596,24 @@ function buildScenarioMetrics(rounds) {
     };
 }
 
+function buildFailureTaxonomy(rounds = [], runner = {}) {
+    const counts = {
+        'player-dead': 0,
+        'match-loss': 0,
+        'forced-round': Math.max(0, Number(runner?.forcedRounds || 0)),
+        'timeout-round': Math.max(0, Number(runner?.timeoutRounds || 0)),
+    };
+    for (const round of rounds) {
+        if (round?.winnerIsBot === false) {
+            counts['match-loss'] += 1;
+        }
+        if (Number(round?.botSurvivalAverage || 0) <= 0) {
+            counts['player-dead'] += 1;
+        }
+    }
+    return counts;
+}
+
 function formatPercent(value) {
     return `${(value * 100).toFixed(1)}%`;
 }
@@ -608,7 +626,7 @@ function formatNumber(value) {
     return Number(value || 0).toFixed(2);
 }
 
-function buildMarkdownReport({ generatedAt, roundsPerScenario, scenarioResults, overall }) {
+function buildMarkdownReport({ generatedAt, roundsPerScenario, scenarioResults, overall, failureTaxonomy }) {
     const lines = [];
     lines.push(`# Bot-Validation Telemetrie (${generatedAt})`);
     lines.push('');
@@ -619,6 +637,7 @@ function buildMarkdownReport({ generatedAt, roundsPerScenario, scenarioResults, 
     lines.push(`- Gesamt-Wandtreffer (Bounce Wall): ${overall.wallHits}`);
     lines.push(`- Gesamt-Durchschnitt Bot-Ueberlebenszeit: ${formatSeconds(overall.averageBotSurvival)}`);
     lines.push(`- Gesamt-Stuck/Minute: ${formatNumber(overall.stuckPerMinute)}`);
+    lines.push(`- Failure-Codes: player-dead=${failureTaxonomy?.['player-dead'] ?? 0}, match-loss=${failureTaxonomy?.['match-loss'] ?? 0}, forced-round=${failureTaxonomy?.['forced-round'] ?? 0}, timeout-round=${failureTaxonomy?.['timeout-round'] ?? 0}`);
     lines.push('');
     lines.push('| Szenario | Runden | Bot-Winrate | Stuck | Wandtreffer | Trailtreffer | Avg Survival | Stuck/Minute |');
     lines.push('|---|---:|---:|---:|---:|---:|---:|---:|');
@@ -848,6 +867,7 @@ async function run() {
                     timeoutRounds: localStats.timeoutRounds,
                     elapsedMs: scenarioDeadline.elapsedMs(),
                 },
+                failureTaxonomy: buildFailureTaxonomy(scenarioRounds, localStats),
             });
 
             log(`${scenarioLabel} done`, {
@@ -882,6 +902,7 @@ async function run() {
                 failOnForcedRound: FAIL_ON_FORCED_ROUND,
                 maxForcedRounds: MAX_FORCED_ROUNDS,
             },
+            failureTaxonomy: buildFailureTaxonomy(allRounds, runnerStats),
         };
 
         const canonicalJsonPath = 'data/bot_validation_report.json';
@@ -893,6 +914,7 @@ async function run() {
             roundsPerScenario: ROUNDS_PER_SCENARIO,
             scenarioResults,
             overall,
+            failureTaxonomy: report.failureTaxonomy,
         });
 
         const writtenPaths = [];

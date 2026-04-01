@@ -231,6 +231,9 @@ export function resolveTrainingRunArtifactLayout(stampInput = null) {
         evalArtifactPath: `${runDir}/eval.json`,
         gateArtifactPath: `${runDir}/gate.json`,
         trainerArtifactPath: `${runDir}/trainer.json`,
+        benchmarkManifestPath: `${runDir}/benchmark-manifest.json`,
+        decisionTracePath: `${runDir}/decision-trace.json`,
+        benchmarkReportPath: `${runDir}/benchmark-report.json`,
         latestBackupPath: `${runDir}/latest-before.json`,
         checkpointPath: `${modelDir}/checkpoint.json`,
         latestIndexPath: `${RUNS_ROOT_DIR}/latest.json`,
@@ -286,6 +289,21 @@ export function buildTrainingLatestIndex(input = {}) {
                 path: layout.trainerArtifactPath,
                 status: artifacts.trainer?.status || 'pending',
                 exists: artifacts.trainer?.exists === true,
+            },
+            benchmarkManifest: {
+                path: layout.benchmarkManifestPath,
+                status: artifacts.benchmarkManifest?.status || 'pending',
+                exists: artifacts.benchmarkManifest?.exists === true,
+            },
+            decisionTrace: {
+                path: layout.decisionTracePath,
+                status: artifacts.decisionTrace?.status || 'pending',
+                exists: artifacts.decisionTrace?.exists === true,
+            },
+            benchmarkReport: {
+                path: layout.benchmarkReportPath,
+                status: artifacts.benchmarkReport?.status || 'pending',
+                exists: artifacts.benchmarkReport?.exists === true,
             },
             checkpoint: {
                 path: layout.checkpointPath,

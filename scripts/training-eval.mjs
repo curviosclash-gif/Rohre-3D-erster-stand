@@ -7,30 +7,29 @@ import { WebSocketTrainerBridge } from '../src/entities/ai/training/WebSocketTra
 import { deriveTrainingGateKpis } from '../src/state/training/TrainingGateEvaluator.js';
 import { TRAINING_GATE_BASELINE_REFERENCE } from '../src/state/training/TrainingGateThresholds.js';
 import { deriveTrainingOpsKpis } from '../src/state/training/TrainingOpsKpiContractV36.js';
+import {
+    TRAINING_BENCHMARK_MATRIX_VERSION,
+    TRAINING_BENCHMARK_SEMANTIC_WINDOW,
+    TRAINING_PLAY_EVAL_BASELINE_REFERENCE,
+    getTrainingBenchmarkEvalDomains,
+    getTrainingBenchmarkEvalSeeds,
+    getTrainingBenchmarkPlayScenarios,
+} from '../src/state/training/TrainingBenchmarkContract.js';
 import { buildBotValidationEval } from './training-bot-validation-lane.mjs';
 import {
     buildTrainingLatestIndex,
     resolveTrainingRunArtifactLayout,
 } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
-
-const EVAL_SEEDS = Object.freeze([11, 23, 37, 41]);
-const EVAL_DOMAINS = Object.freeze([
-    Object.freeze({ mode: 'classic', planarMode: false, domainId: 'classic-3d' }),
-    Object.freeze({ mode: 'classic', planarMode: true, domainId: 'classic-2d' }),
-    Object.freeze({ mode: 'hunt', planarMode: false, domainId: 'hunt-3d' }),
-    Object.freeze({ mode: 'hunt', planarMode: true, domainId: 'hunt-2d' }),
-]);
+import {
+    createDecisionTraceArtifact,
+    readJsonIfExists as readBenchmarkJsonIfExists,
+    writeJson as writeBenchmarkJson,
+} from './training-benchmark-artifacts.mjs';
 const DEFAULT_RUNS_ROOT = path.join('data', 'training', 'runs');
-const PLAY_EVAL_SCENARIOS = Object.freeze([
-    Object.freeze({ scenarioId: 'play-classic-3d-a', mode: 'classic', planarMode: false, domainId: 'classic-3d', seed: 101, variant: 'done' }),
-    Object.freeze({ scenarioId: 'play-classic-2d-b', mode: 'classic', planarMode: true, domainId: 'classic-2d', seed: 202, variant: 'truncated' }),
-    Object.freeze({ scenarioId: 'play-hunt-3d-a', mode: 'hunt', planarMode: false, domainId: 'hunt-3d', seed: 303, variant: 'done' }),
-    Object.freeze({ scenarioId: 'play-hunt-2d-b', mode: 'hunt', planarMode: true, domainId: 'hunt-2d', seed: 404, variant: 'truncated' }),
-]);
-const PLAY_EVAL_BASELINE = Object.freeze({
-    scenarioReturnMean: 1.615,
-    scenarioWinRate: 0.5,
-});
+const EVAL_SEEDS = Object.freeze(getTrainingBenchmarkEvalSeeds());
+const EVAL_DOMAINS = Object.freeze(getTrainingBenchmarkEvalDomains());
+const PLAY_EVAL_SCENARIOS = Object.freeze(getTrainingBenchmarkPlayScenarios());
+const PLAY_EVAL_BASELINE = TRAINING_PLAY_EVAL_BASELINE_REFERENCE;
 
 function toRepoPath(targetPath) {
     return String(targetPath || '').split(path.sep).join('/');
@@ -142,11 +141,23 @@ async function upsertLatestIndex(runStamp, updates = {}) {
     const currentEvalPath = current?.artifacts?.eval?.path || current?.eval || null;
     const currentGatePath = current?.artifacts?.gate?.path || current?.gate || null;
     const currentTrainerPath = current?.artifacts?.trainer?.path || current?.trainer || null;
+    const currentBenchmarkManifestPath = current?.artifacts?.benchmarkManifest?.path || null;
+    const currentDecisionTracePath = current?.artifacts?.decisionTrace?.path || null;
+    const currentBenchmarkReportPath = current?.artifacts?.benchmarkReport?.path || null;
     const currentCheckpointPath = current?.artifacts?.checkpoint?.path || current?.checkpoint || null;
     const runPath = Object.prototype.hasOwnProperty.call(updates, 'run') ? updates.run : currentRunPath;
     const evalPath = Object.prototype.hasOwnProperty.call(updates, 'eval') ? updates.eval : currentEvalPath;
     const gatePath = Object.prototype.hasOwnProperty.call(updates, 'gate') ? updates.gate : currentGatePath;
     const trainerPath = Object.prototype.hasOwnProperty.call(updates, 'trainer') ? updates.trainer : currentTrainerPath;
+    const benchmarkManifestPath = Object.prototype.hasOwnProperty.call(updates, 'benchmarkManifest')
+        ? updates.benchmarkManifest
+        : currentBenchmarkManifestPath;
+    const decisionTracePath = Object.prototype.hasOwnProperty.call(updates, 'decisionTrace')
+        ? updates.decisionTrace
+        : currentDecisionTracePath;
+    const benchmarkReportPath = Object.prototype.hasOwnProperty.call(updates, 'benchmarkReport')
+        ? updates.benchmarkReport
+        : currentBenchmarkReportPath;
     const checkpointPath = Object.prototype.hasOwnProperty.call(updates, 'checkpoint') ? updates.checkpoint : currentCheckpointPath;
     const resumeSource = Object.prototype.hasOwnProperty.call(updates, 'resumeSource')
         ? updates.resumeSource
@@ -165,6 +176,18 @@ async function upsertLatestIndex(runStamp, updates = {}) {
                 status: trainerPath ? 'completed' : 'pending',
                 exists: !!trainerPath,
             },
+            benchmarkManifest: {
+                status: benchmarkManifestPath ? 'completed' : 'pending',
+                exists: !!benchmarkManifestPath,
+            },
+            decisionTrace: {
+                status: decisionTracePath ? 'completed' : 'pending',
+                exists: !!decisionTracePath,
+            },
+            benchmarkReport: {
+                status: benchmarkReportPath ? 'completed' : 'pending',
+                exists: !!benchmarkReportPath,
+            },
             checkpoint: {
                 status: checkpointPath ? 'completed' : 'pending',
                 exists: !!checkpointPath,
@@ -175,6 +198,9 @@ async function upsertLatestIndex(runStamp, updates = {}) {
     if (evalPath) next.artifacts.eval.path = evalPath;
     if (gatePath) next.artifacts.gate.path = gatePath;
     if (trainerPath) next.artifacts.trainer.path = trainerPath;
+    if (benchmarkManifestPath) next.artifacts.benchmarkManifest.path = benchmarkManifestPath;
+    if (decisionTracePath) next.artifacts.decisionTrace.path = decisionTracePath;
+    if (benchmarkReportPath) next.artifacts.benchmarkReport.path = benchmarkReportPath;
     if (checkpointPath) next.artifacts.checkpoint.path = checkpointPath;
     next.runDir = layout.runDir;
     await writeJson(latestPath, next);
@@ -241,6 +267,7 @@ function countActionMismatch(requestedAction, sanitizedAction) {
 
 function runEpisodeScenario(config) {
     const bridgeFrames = [];
+    const trace = [];
     const mockBridge = {
         enabled: true,
         submitTrainingPayload(type, payload) {
@@ -291,6 +318,17 @@ function runEpisodeScenario(config) {
         invalidActionCount += countActionMismatch(requestedAction, transition?.action);
         episodeReturn += toFiniteNumber(transition?.reward, 0);
         latestTransition = transition;
+        trace.push({
+            stepIndex,
+            requestedAction,
+            appliedAction: transition?.action || null,
+            reward: roundMetric(toFiniteNumber(transition?.reward, 0)),
+            invalidAction: countActionMismatch(requestedAction, transition?.action) > 0,
+            done: transition?.done === true,
+            truncated: transition?.truncated === true,
+            terminalReason: transition?.info?.terminalReason || null,
+            truncatedReason: transition?.info?.truncatedReason || null,
+        });
         if (transition?.done || transition?.truncated) {
             break;
         }
@@ -312,6 +350,7 @@ function runEpisodeScenario(config) {
         terminalReason: latestTransition?.info?.terminalReason || null,
         truncatedReason: latestTransition?.info?.truncatedReason || null,
         transportFrames: bridgeFrames.length,
+        trace,
     };
 }
 
@@ -689,6 +728,7 @@ async function main() {
     const writeLatest = parseBoolean(args['write-latest'], true);
     const runStampArg = typeof args.stamp === 'string' ? args.stamp.trim() : '';
     const runStamp = runStampArg || createRunStamp();
+    const layout = resolveTrainingRunArtifactLayout(runStamp);
     const runDir = path.join(DEFAULT_RUNS_ROOT, runStamp);
 
     const episodes = [];
@@ -745,14 +785,44 @@ async function main() {
         runtimeErrors,
     });
     const runArtifact = await resolveRunArtifact(runDir);
+    const benchmarkManifest = await readBenchmarkJsonIfExists(layout.benchmarkManifestPath);
     const playEval = buildPlayEvalResult();
     const botValidation = await resolveBotValidation(runDir, args);
+    const decisionTrace = createDecisionTraceArtifact({
+        runStamp,
+        playScenarios: playEval.scenarios.map((scenario) => ({
+            scenarioId: scenario.scenarioId,
+            domainId: scenario.domainId,
+            mode: scenario.mode,
+            planarMode: scenario.planarMode,
+            seed: scenario.seed,
+            variant: scenario.variant,
+            terminalReason: scenario.terminalReason,
+            truncatedReason: scenario.truncatedReason,
+            trace: scenario.trace || [],
+        })),
+        bridgeScenarios: bridgeScenarios.map((scenario) => ({
+            scenarioId: scenario.scenarioId,
+            actionReceived: scenario.actionReceived === true,
+            ackReceived: scenario.ackReceived === true,
+            failure: scenario.failure || null,
+            telemetry: scenario.telemetry || null,
+        })),
+        source: {
+            runArtifactPath: runArtifact.path ? toRepoPath(runArtifact.path) : null,
+            evalPath: toRepoPath(layout.evalArtifactPath),
+        },
+    });
+    await writeBenchmarkJson(layout.decisionTracePath, decisionTrace);
 
     const evalArtifact = {
         ok: runtimeErrors.length === 0,
         runStamp,
         generatedAt: new Date().toISOString(),
-        contractVersion: 'v33-eval-b1',
+        contractVersion: 'v80-eval-benchmark-v1',
+        benchmarkMatrixVersion: TRAINING_BENCHMARK_MATRIX_VERSION,
+        semantics: TRAINING_BENCHMARK_SEMANTIC_WINDOW,
+        performanceProfileName: benchmarkManifest?.performanceProfileName || runArtifact?.artifact?.performanceProfileName || null,
         config: {
             seeds: EVAL_SEEDS,
             domains: EVAL_DOMAINS,
@@ -763,6 +833,8 @@ async function main() {
             runArtifactImportedFromLegacy: runArtifact.importedFromLegacy,
             botValidationReportPath: botValidation.source?.reportPath || null,
             botValidationReportExists: botValidation.source?.exists === true,
+            benchmarkManifestPath: benchmarkManifest ? toRepoPath(layout.benchmarkManifestPath) : null,
+            decisionTracePath: toRepoPath(layout.decisionTracePath),
         },
         episodes,
         bridge: {
@@ -781,6 +853,10 @@ async function main() {
             botValidationAverageBotSurvival: botValidation.metrics?.averageBotSurvival ?? null,
         },
         playEval,
+        decisionTrace: {
+            path: toRepoPath(layout.decisionTracePath),
+            summary: decisionTrace.summary,
+        },
         botValidation,
         baseline: {
             reference: TRAINING_GATE_BASELINE_REFERENCE,
@@ -795,6 +871,8 @@ async function main() {
         ? await upsertLatestIndex(runStamp, {
             run: runArtifact.path ? toRepoPath(runArtifact.path) : null,
             eval: toRepoPath(evalPath),
+            benchmarkManifest: benchmarkManifest ? toRepoPath(layout.benchmarkManifestPath) : null,
+            decisionTrace: toRepoPath(layout.decisionTracePath),
         })
         : null;
 
@@ -820,6 +898,7 @@ async function main() {
             playEvalScenarioWinRate: playEval.metrics.scenarioWinRate,
             botValidationAverageBotSurvival: botValidation.metrics?.averageBotSurvival ?? null,
         },
+        decisionTracePath: toRepoPath(layout.decisionTracePath),
     }, null, 2));
 
     if (runtimeErrors.length > 0) {

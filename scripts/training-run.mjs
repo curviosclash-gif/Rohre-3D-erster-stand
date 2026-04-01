@@ -10,12 +10,21 @@ import {
     normalizeTrainingRunStamp,
     resolveTrainingRunArtifactLayout,
 } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
+import {
+    normalizeTrainingPerformanceProfileName,
+    resolveTrainingPerformanceProfile,
+} from '../src/state/training/TrainingBenchmarkContract.js';
 import { deriveTrainingOpsKpis } from '../src/state/training/TrainingOpsKpiContractV36.js';
 import {
     readJsonIfExists,
     writeTrainerArtifacts,
 } from '../trainer/artifacts/TrainerArtifactStore.mjs';
 import { validateDqnCheckpointPayload } from '../trainer/model/CheckpointValidation.mjs';
+import {
+    buildThroughputSummary,
+    captureHardwareTelemetry,
+    createBenchmarkManifest,
+} from './training-benchmark-artifacts.mjs';
 
 const DEFAULT_TRAINER_COMMAND_TIMEOUT_MS = 20_000;
 
@@ -345,6 +354,16 @@ function buildBridgeOptionsFromArgs(args) {
 async function main() {
     const args = parseArgMap(process.argv.slice(2));
     const stamp = normalizeTrainingRunStamp(args.get('stamp') || process.env.TRAINING_RUN_STAMP || null);
+    const performanceProfileName = normalizeTrainingPerformanceProfileName(
+        args.get('performance-profile') || process.env.TRAINING_PERFORMANCE_PROFILE || '',
+        null
+    );
+    const performanceProfile = resolveTrainingPerformanceProfile(performanceProfileName, null);
+    const seriesStamp = typeof args.get('series-stamp') === 'string' && args.get('series-stamp').trim()
+        ? args.get('series-stamp').trim()
+        : (typeof process.env.TRAINING_SERIES_STAMP === 'string' && process.env.TRAINING_SERIES_STAMP.trim()
+            ? process.env.TRAINING_SERIES_STAMP.trim()
+            : null);
     const quiet = parseBoolean(args.get('quiet'), false);
     const writeLatest = parseBoolean(args.get('write-latest'), true);
     const strictBridge = parseBoolean(
@@ -464,7 +483,9 @@ async function main() {
         }
     }
     const runner = new TrainingAutomationRunner({ bridge });
+    const runStartedAt = Date.now();
     const summary = runner.run(config);
+    const runElapsedMs = Math.max(0, Date.now() - runStartedAt);
     if (bridge && typeof bridge.getTelemetrySnapshot === 'function') {
         const drainTimeoutMs = parseInteger(args.get('bridge-drain-timeout-ms'), 180_000, 20, 10 * 60_000);
         bridgeTelemetry = await waitForBridgeDrain(bridge, drainTimeoutMs);
@@ -493,6 +514,16 @@ async function main() {
         }
 
         if (writeCheckpoint) {
+            const hardwareTelemetry = captureHardwareTelemetry({
+                phase: 'run',
+                profileName: performanceProfileName,
+                extra: {
+                    stamp: layout.stamp,
+                    seriesStamp,
+                    bridgeMode: config.bridgeMode,
+                    runElapsedMs,
+                },
+            });
             const written = await writeTrainerArtifacts({
                 stamp: layout.stamp,
                 generatedAt: new Date().toISOString(),
@@ -501,6 +532,7 @@ async function main() {
                 trainer: trainerStats,
                 bridge: bridgeTelemetry,
                 opsKpis,
+                hardwareTelemetry,
                 runSummary: summary,
             });
             trainerArtifactPath = written.trainerArtifactPath;
@@ -510,12 +542,30 @@ async function main() {
     if (bridge && typeof bridge.close === 'function') {
         bridge.close();
     }
+    const hardwareTelemetry = captureHardwareTelemetry({
+        phase: 'run',
+        profileName: performanceProfileName,
+        extra: {
+            stamp: layout.stamp,
+            seriesStamp,
+            bridgeMode: config.bridgeMode,
+            runElapsedMs,
+        },
+    });
+    const throughput = buildThroughputSummary({
+        elapsedMs: runElapsedMs,
+        totals: summary?.totals,
+    });
     const runArtifact = {
         contractVersion: TRAINING_AUTOMATION_RUN_CONTRACT_VERSION,
         stage: 'run',
         generatedAt: new Date().toISOString(),
         stamp: layout.stamp,
+        seriesStamp,
         runDir: layout.runDir,
+        performanceProfileName,
+        performanceProfile,
+        elapsedMs: runElapsedMs,
         summary,
         bridgeReady,
         bridgeReadyPayload,
@@ -523,8 +573,11 @@ async function main() {
         bridgeTelemetry,
         opsKpis,
         trainerStats,
+        throughput,
+        hardwareTelemetry,
         checkpointPath: checkpointPath ? toRepoPath(checkpointPath) : null,
         trainerArtifactPath: trainerArtifactPath ? toRepoPath(trainerArtifactPath) : null,
+        benchmarkManifestPath: toRepoPath(layout.benchmarkManifestPath),
         resume: {
             requested: resumeInfo.requested,
             mode: resumeInfo.mode,
@@ -537,6 +590,22 @@ async function main() {
         },
     };
     await writeJson(layout.runArtifactPath, runArtifact);
+    const benchmarkManifest = createBenchmarkManifest({
+        stamp: layout.stamp,
+        seriesStamp,
+        profileName: performanceProfileName,
+        layout,
+        source: {
+            runArtifactPath: toRepoPath(layout.runArtifactPath),
+            trainerArtifactPath: trainerArtifactPath ? toRepoPath(trainerArtifactPath) : null,
+            checkpointPath: checkpointPath ? toRepoPath(checkpointPath) : null,
+            bridgeMode: config.bridgeMode,
+            summaryConfig: summary?.config || null,
+            resumeRequested: resumeInfo.requested,
+            resumeStrict,
+        },
+    });
+    await writeJson(layout.benchmarkManifestPath, benchmarkManifest);
 
     const evalExists = await fileExists(layout.evalArtifactPath);
     const gateExists = await fileExists(layout.gateArtifactPath);
@@ -552,6 +621,9 @@ async function main() {
             eval: { exists: evalExists, status: evalExists ? 'completed' : 'pending' },
             gate: { exists: gateExists, status: gateExists ? 'completed' : 'pending' },
             trainer: { exists: trainerExists, status: trainerExists ? 'completed' : 'pending' },
+            benchmarkManifest: { exists: true, status: 'completed' },
+            decisionTrace: { exists: false, status: 'pending' },
+            benchmarkReport: { exists: false, status: 'pending' },
             checkpoint: { exists: checkpointExists, status: checkpointExists ? 'completed' : 'pending' },
         },
     });
@@ -581,7 +653,9 @@ async function main() {
         runArtifactPath: layout.runArtifactPath,
         trainerArtifactPath: trainerArtifactPath ? toRepoPath(trainerArtifactPath) : null,
         checkpointPath: checkpointPath ? toRepoPath(checkpointPath) : null,
+        benchmarkManifestPath: toRepoPath(layout.benchmarkManifestPath),
         latestIndexPath: writeLatest ? layout.latestIndexPath : null,
+        performanceProfileName,
         resume: {
             requested: resumeInfo.requested,
             mode: resumeInfo.mode,
@@ -593,6 +667,8 @@ async function main() {
         },
         bridgeTelemetry,
         opsKpis,
+        throughput,
+        hardwareTelemetry,
         trainerStats: trainerStats ? {
             sessionId: trainerStats.sessionId || null,
             replaySize: trainerStats.replay?.size ?? null,

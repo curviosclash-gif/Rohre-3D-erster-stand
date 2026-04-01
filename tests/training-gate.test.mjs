@@ -122,3 +122,50 @@ test('V36 training gate restores latest index after standalone eval+gate failure
     }
 });
 
+test('V80 training gate fails hard when bot validation report is missing', async () => {
+    const releaseLock = await acquireLatestIndexLock();
+    const stamp = `TEST_GATE_MISSING_REPORT_${Date.now()}`;
+    const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
+    try {
+        await execFileAsync(process.execPath, [
+            TRAINING_RUN_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+            '--bridge-mode', 'local',
+            '--resume-checkpoint', 'latest',
+            '--resume-strict', 'false',
+            '--episodes', '1',
+            '--seeds', '11',
+            '--modes', 'classic-3d',
+            '--max-steps', '8',
+        ]);
+        await execFileAsync(process.execPath, [
+            TRAINING_EVAL_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+        ]);
+
+        let stdout = '';
+        try {
+            await execFileAsync(process.execPath, [
+                TRAINING_GATE_SCRIPT,
+                '--stamp', stamp,
+                '--write-latest', 'true',
+            ]);
+            assert.fail('training-gate should fail when bot validation report is missing');
+        } catch (error) {
+            stdout = String(error?.stdout || '');
+        }
+
+        const result = parseLastJsonObject(stdout);
+        const latestAfter = await readFileIfExists(LATEST_INDEX_PATH);
+        assert.equal(result.ok, false);
+        assert.equal(result.latestRestored, true);
+        assert.equal(result.artifactFailures > 0, true);
+        assert.equal(latestAfter, latestBefore);
+    } finally {
+        await restoreFile(LATEST_INDEX_PATH, latestBefore);
+        await releaseLock();
+    }
+});
+

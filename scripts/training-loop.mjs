@@ -6,6 +6,14 @@ import process from 'node:process';
 
 import { resolveDevLayoutRelativePath } from './dev-layout-paths.mjs';
 import { normalizeTrainingRunStamp } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
+import {
+    normalizeTrainingPerformanceProfileName,
+    resolveTrainingPerformanceProfile,
+} from '../src/state/training/TrainingBenchmarkContract.js';
+import {
+    buildThroughputSummary,
+    captureHardwareTelemetry,
+} from './training-benchmark-artifacts.mjs';
 
 const SERIES_ROOT = 'data/training/series';
 const DEFAULT_STAGE_TIMEOUT_MS = 60 * 60_000;
@@ -90,6 +98,22 @@ function collectForwardArgs(args, key, target = key) {
     const value = args.get(key);
     if (typeof value !== 'string' || !value.trim()) return [];
     return [`--${target}`, value.trim()];
+}
+
+function appendArg(stageArgs, target, value) {
+    if (value == null) return;
+    const normalized = String(value).trim();
+    if (!normalized) return;
+    stageArgs.push(`--${target}`, normalized);
+}
+
+function resolveArgOrProfileValue(args, key, profileValue = null) {
+    const direct = args.get(key);
+    if (typeof direct === 'string' && direct.trim()) {
+        return direct.trim();
+    }
+    if (profileValue == null) return null;
+    return String(profileValue);
 }
 
 function resolveDurationBudgetMs(args) {
@@ -192,16 +216,37 @@ function runNodeScript(scriptPath, scriptArgs = [], options = {}) {
     });
 }
 
-function startTrainerServer(args) {
+function startTrainerServer(args, performanceProfile = null) {
     const host = args.get('trainer-host') || process.env.TRAINER_HOST || '127.0.0.1';
     const port = args.get('trainer-port') || process.env.TRAINER_PORT || '8765';
     const verbose = args.get('trainer-verbose') || process.env.TRAINER_VERBOSE || 'false';
-    const child = spawn(process.execPath, [
+    const trainerArgs = [
         TRAINING_SCRIPT_PATHS.TRAINER_SERVER,
         '--host', host,
         '--port', port,
         '--verbose', verbose,
-    ], {
+    ];
+    appendArg(
+        trainerArgs,
+        'replay-capacity',
+        resolveArgOrProfileValue(args, 'replay-capacity', performanceProfile?.trainer?.replayCapacity)
+    );
+    appendArg(
+        trainerArgs,
+        'model-batch-size',
+        resolveArgOrProfileValue(args, 'model-batch-size', performanceProfile?.trainer?.batchSize)
+    );
+    appendArg(
+        trainerArgs,
+        'model-replay-warmup',
+        resolveArgOrProfileValue(args, 'model-replay-warmup', performanceProfile?.trainer?.replayWarmup)
+    );
+    appendArg(
+        trainerArgs,
+        'model-target-sync',
+        resolveArgOrProfileValue(args, 'model-target-sync', performanceProfile?.trainer?.targetSyncInterval)
+    );
+    const child = spawn(process.execPath, trainerArgs, {
         stdio: 'inherit',
         shell: false,
         env: process.env,
@@ -248,7 +293,7 @@ async function stopTrainerServer(server) {
     });
 }
 
-function buildRunStageArgs(args, stamp) {
+function buildRunStageArgs(args, stamp, performanceProfile = null, performanceProfileName = null, seriesStamp = null) {
     const bridgeMode = (args.get('bridge-mode') || process.env.TRAINING_BRIDGE_MODE || 'bridge').trim();
     const resumeCheckpoint = (args.get('resume-checkpoint') || process.env.TRAINER_RESUME_CHECKPOINT || 'latest').trim();
     const bridgeUrl = args.get('bridge-url')
@@ -266,9 +311,29 @@ function buildRunStageArgs(args, stamp) {
         '--resume-checkpoint', resumeCheckpoint,
         '--resume-strict', String(resumeStrict),
     ];
+    if (seriesStamp) {
+        stageArgs.push('--series-stamp', seriesStamp);
+    }
+    if (performanceProfileName) {
+        stageArgs.push('--performance-profile', performanceProfileName);
+    }
     if (bridgeUrl) {
         stageArgs.push('--bridge-url', bridgeUrl);
     }
+    const profiledDefaults = Object.freeze({
+        episodes: performanceProfile?.run?.episodes,
+        'max-steps': performanceProfile?.run?.maxSteps,
+        'runner-profile': performanceProfile?.run?.runnerProfile,
+        'step-timeout-retries': performanceProfile?.run?.stepTimeoutRetries,
+        'timeout-step-ms': performanceProfile?.run?.timeoutStepMs,
+        'timeout-episode-ms': performanceProfile?.run?.timeoutEpisodeMs,
+        'timeout-run-ms': performanceProfile?.run?.timeoutRunMs,
+        'bridge-max-pending-acks': performanceProfile?.bridge?.maxPendingAcks,
+        'bridge-backpressure-threshold': performanceProfile?.bridge?.backpressureThreshold,
+        'bridge-drop-training-when-backlogged': performanceProfile?.bridge?.dropTrainingWhenBacklogged,
+        'write-checkpoint': true,
+        'write-latest': true,
+    });
     for (const [key, target] of [
         ['episodes', 'episodes'],
         ['seeds', 'seeds'],
@@ -298,7 +363,12 @@ function buildRunStageArgs(args, stamp) {
         ['write-latest', 'write-latest'],
         ['quiet', 'quiet'],
     ]) {
-        stageArgs.push(...collectForwardArgs(args, key, target));
+        const explicitArgs = collectForwardArgs(args, key, target);
+        if (explicitArgs.length > 0) {
+            stageArgs.push(...explicitArgs);
+            continue;
+        }
+        appendArg(stageArgs, target, profiledDefaults[key]);
     }
     return stageArgs;
 }
@@ -348,17 +418,32 @@ function buildSummary(input) {
 
 async function main() {
     const args = parseArgMap(process.argv.slice(2));
-    const durationBudgetMs = resolveDurationBudgetMs(args);
+    const performanceProfileName = normalizeTrainingPerformanceProfileName(
+        args.get('performance-profile') || process.env.TRAINING_PERFORMANCE_PROFILE || '',
+        null
+    );
+    const performanceProfile = resolveTrainingPerformanceProfile(performanceProfileName, null);
+    const durationBudgetMs = resolveDurationBudgetMs(args)
+        ?? (
+            performanceProfile?.loop?.durationHours != null
+                ? parseInteger(performanceProfile.loop.durationHours * 60 * 60_000, null, 1, 7 * 24 * 60 * 60_000)
+                : null
+        );
     const runsRequested = parseInteger(
         args.get('runs'),
-        durationBudgetMs != null ? 100_000 : 3,
+        performanceProfile?.loop?.runs ?? (durationBudgetMs != null ? 100_000 : 3),
         1,
         100_000
     );
-    const stopOnFail = parseBoolean(args.get('stop-on-fail'), true);
-    const withTrainerServer = parseBoolean(args.get('with-trainer-server'), true);
+    const stopOnFail = parseBoolean(args.get('stop-on-fail'), performanceProfile?.loop?.stopOnFail ?? true);
+    const withTrainerServer = parseBoolean(args.get('with-trainer-server'), performanceProfile?.loop?.withTrainerServer ?? true);
     const writeLatest = parseBoolean(args.get('write-latest'), true);
-    const stageTimeoutMs = parseInteger(args.get('stage-timeout-ms'), DEFAULT_STAGE_TIMEOUT_MS, 500, 24 * 60 * 60_000);
+    const stageTimeoutMs = parseInteger(
+        args.get('stage-timeout-ms'),
+        performanceProfile?.loop?.stageTimeoutMs ?? DEFAULT_STAGE_TIMEOUT_MS,
+        500,
+        24 * 60 * 60_000
+    );
     const seriesStamp = resolveSeriesStamp(args);
     const seriesDir = `${SERIES_ROOT}/${seriesStamp}`;
     const artifactPath = `${seriesDir}/loop.json`;
@@ -370,7 +455,7 @@ async function main() {
 
     try {
         if (withTrainerServer) {
-            trainerServer = startTrainerServer(args);
+            trainerServer = startTrainerServer(args, performanceProfile);
             await waitForTrainerServerReady(
                 trainerServer,
                 parseInteger(args.get('trainer-server-ready-timeout-ms'), DEFAULT_SERVER_READY_TIMEOUT_MS, 500, 120_000)
@@ -384,11 +469,19 @@ async function main() {
             }
             const runStamp = resolveRunStamp(seriesStamp, runIndex);
             const stages = [];
-            const runStageArgs = buildRunStageArgs(args, runStamp);
+            const runStageArgs = buildRunStageArgs(
+                args,
+                runStamp,
+                performanceProfile,
+                performanceProfileName,
+                seriesStamp
+            );
             const runResult = await runNodeScript(TRAINING_SCRIPT_PATHS.TRAINING_RUN, runStageArgs, {
                 timeoutMs: stageTimeoutMs,
                 env: {
                     TRAINING_RUN_STAMP: runStamp,
+                    TRAINING_SERIES_STAMP: seriesStamp,
+                    ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
                 },
             });
             stages.push({
@@ -404,6 +497,8 @@ async function main() {
                     timeoutMs: stageTimeoutMs,
                     env: {
                         TRAINING_RUN_STAMP: runStamp,
+                        TRAINING_SERIES_STAMP: seriesStamp,
+                        ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
                     },
                     }
                 );
@@ -419,6 +514,8 @@ async function main() {
                         timeoutMs: stageTimeoutMs,
                         env: {
                             TRAINING_RUN_STAMP: runStamp,
+                            TRAINING_SERIES_STAMP: seriesStamp,
+                            ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
                         },
                         }
                     );
@@ -464,11 +561,27 @@ async function main() {
         stopReason,
         runs: runResults,
     });
+    const throughput = buildThroughputSummary({
+        elapsedMs: Math.max(0, finishedAt - startedAt),
+        stages: runResults,
+        runsExecuted: summary.runsExecuted,
+    });
+    const hardwareTelemetry = captureHardwareTelemetry({
+        phase: 'loop',
+        profileName: performanceProfileName,
+        extra: {
+            seriesStamp,
+            stopReason,
+            withTrainerServer,
+        },
+    });
     const output = {
         ok: summary.runsFailed === 0,
         contractVersion: 'v36-training-loop-v1',
         generatedAt: new Date().toISOString(),
         seriesStamp,
+        performanceProfileName,
+        performanceProfile,
         withTrainerServer,
         stopOnFail,
         writeLatest,
@@ -478,6 +591,8 @@ async function main() {
         elapsedMs: Math.max(0, finishedAt - startedAt),
         runs: runResults,
         summary,
+        throughput,
+        hardwareTelemetry,
         artifactPath: toRepoPath(artifactPath),
     };
 

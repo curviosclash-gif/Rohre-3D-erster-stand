@@ -1,53 +1,4 @@
-const BOT_VALIDATION_MATRIX = Object.freeze([
-    Object.freeze({
-        id: 'V1',
-        mode: '1p',
-        bots: 2,
-        mapKey: 'standard',
-        gameMode: 'CLASSIC',
-        botPolicyStrategy: 'auto',
-        planarMode: false,
-        portalCount: 0,
-        rounds: 10,
-        expectedPolicyType: 'classic-3d',
-    }),
-    Object.freeze({
-        id: 'V2',
-        mode: '1p',
-        bots: 2,
-        mapKey: 'maze',
-        gameMode: 'CLASSIC',
-        botPolicyStrategy: 'auto',
-        planarMode: true,
-        portalCount: 0,
-        rounds: 10,
-        expectedPolicyType: 'classic-2d',
-    }),
-    Object.freeze({
-        id: 'V3',
-        mode: '1p',
-        bots: 3,
-        mapKey: 'complex',
-        gameMode: 'HUNT',
-        botPolicyStrategy: 'auto',
-        planarMode: true,
-        portalCount: 4,
-        rounds: 10,
-        expectedPolicyType: 'hunt-2d',
-    }),
-    Object.freeze({
-        id: 'V4',
-        mode: '2p',
-        bots: 2,
-        mapKey: 'standard',
-        gameMode: 'HUNT',
-        botPolicyStrategy: 'auto',
-        planarMode: false,
-        portalCount: 6,
-        rounds: 10,
-        expectedPolicyType: 'hunt-3d',
-    }),
-]);
+import { getTrainingBenchmarkBotValidationMatrix } from '../training/TrainingBenchmarkContract.js';
 
 function cloneScenario(entry) {
     const normalizedMode = String(entry.gameMode || '').trim().toUpperCase() === 'HUNT' ? 'HUNT' : 'CLASSIC';
@@ -68,7 +19,7 @@ function cloneScenario(entry) {
 }
 
 export function getBotValidationMatrix() {
-    return BOT_VALIDATION_MATRIX.map((entry) => cloneScenario(entry));
+    return getTrainingBenchmarkBotValidationMatrix().map((entry) => cloneScenario(entry));
 }
 
 export function resolveBotValidationScenario(idOrIndex = 0, matrix = null) {

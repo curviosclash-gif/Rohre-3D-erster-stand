@@ -38,6 +38,9 @@ test('TrainingAutomationContractV33 normalizes run config and artifact layout de
     assert.equal(layout.runArtifactPath, 'data/training/runs/RUN_TEST_001/run.json');
     assert.equal(layout.evalArtifactPath, 'data/training/runs/RUN_TEST_001/eval.json');
     assert.equal(layout.gateArtifactPath, 'data/training/runs/RUN_TEST_001/gate.json');
+    assert.equal(layout.benchmarkManifestPath, 'data/training/runs/RUN_TEST_001/benchmark-manifest.json');
+    assert.equal(layout.decisionTracePath, 'data/training/runs/RUN_TEST_001/decision-trace.json');
+    assert.equal(layout.benchmarkReportPath, 'data/training/runs/RUN_TEST_001/benchmark-report.json');
     assert.equal(layout.latestIndexPath, 'data/training/runs/latest.json');
 });
 
