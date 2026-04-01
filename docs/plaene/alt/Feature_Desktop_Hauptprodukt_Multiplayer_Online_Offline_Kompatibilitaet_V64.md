@@ -20,7 +20,7 @@ Die Desktop-App soll das fuehrende Produkt fuer CurviosClash werden und den verb
 - Ziel-Masterplan: `docs/Umsetzungsplan.md`
 - Vorgeschlagene Block-ID: `V64`
 - Hard dependencies:
-  - `V74` ist aktiver Runtime-/Lifecycle-Block und kollidiert mit diesem Scope in `src/core/**`, `src/ui/**`, Kompositionsports und Match-Session-Lifecycle.
+  - `V74` ist aktiver Runtime-/Lifecycle-Block und kollidiert mit diesem Scope in `src/core/**`, `src/ui/**`, Kompositionsports und Match-Session-Lifecycle. Die Leitplanken aus `docs/plaene/neu/Feature_Architektur_Runtime_Entkopplung_V74_Refresh_2026-04-01.md` fuer `main.js`, `GameRuntimeFacade`, `GameRuntimePorts` und degradierbare Desktop-Capabilities sind fuer diesen Scope verbindlich.
   - Die archivierten Netzwerk-Baselines aus `V50` und `V52` bleiben verbindliche Vertragsgrundlage fuer SessionAdapter, Lobby-State, `stateUpdate`, `playerLoaded`, Reconnect und Signaling.
 - Soft dependencies:
   - `V72` sollte mitgeprueft werden, falls Multiplayer-Haertung Gameplay-Contracts, Item-/Portal-/Gate-Sichtbarkeit oder Mode-spezifische State-Payloads beruehrt.
@@ -182,6 +182,7 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 - [ ] 64.4.1 Den eingebetteten LAN-Signaling-Host in Electron fuer Start, Stop, Portwahl, Tray-/Window-Lifecycle und Fehlerdiagnostik haerten, sodass LAN-Hosting nicht mehr nur implizites Nebenprodukt des App-Starts ist.
 - [ ] 64.4.2 Discovery, Host-IP-Aufloesung und Join-Flows fuer Desktop robust machen, inklusive nachvollziehbarer UI-Zustaende bei fehlendem Host, Port-Konflikten, stale Broadcasts oder mehreren gefundenen Hosts.
+- [ ] 64.4.3 Desktop-Fensterstart und LAN-Hoststart explizit entkoppeln: Die App muss auch ohne erfolgreichen Host-Start bedienbar bleiben und den Host nur als Capability-/Statuszustand ausweisen statt den gesamten Desktop-Bootpfad daran zu koppeln.
 
 ### 64.5 Online-Signaling und App-Konfiguration abschliessen
 
@@ -192,6 +193,7 @@ Abgeschlossene Punkte verwenden dieses Format:
 
 - [ ] 64.6.1 Session-Initialisierung, `playerLoaded`, `arena_start`, `stateUpdate`, Pause-/Resume-, Leave-/Disconnect- und Return-to-Menu-Semantik fuer `lan` und `online` auf denselben Lifecycle-Kern verdichten.
 - [ ] 64.6.2 State-Reconciliation, Round-Start-Gates und Host-Autoritaet so charakterisieren und absichern, dass Unterschiede zwischen `lan` und `online` nur transportbedingt und nicht fachlich sichtbar werden.
+- [ ] 64.6.3 Die Multiplayer-Produktisierung ausschliesslich ueber oeffentliche Lifecycle- und Capability-Ports anbinden; neue private Facade-Hooks, `game.*`-Backdoors oder implizite Storage-Bridge-Fallbacks duerfen fuer `lan`/`online` nicht erneut entstehen.
 
 ### 64.7 Offline-Kompatibilitaet explizit schuetzen
 
