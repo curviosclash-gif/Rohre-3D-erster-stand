@@ -576,6 +576,7 @@ async function main() {
             benchmarkReport: toRepoPath(layout.benchmarkReportPath),
             botValidationReport: botValidationReportPath ? toRepoPath(botValidationReportPath) : null,
         },
+        validationLane: evalArtifact?.botValidation || null,
         comparison: {
             gate: gateArtifact,
             championId: benchmarkManifest?.compareRules?.championId || null,

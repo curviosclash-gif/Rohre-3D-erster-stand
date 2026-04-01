@@ -17,6 +17,100 @@ function roundMetric(value) {
     return Math.round(toFiniteNumber(value, 0) * 1_000_000) / 1_000_000;
 }
 
+function toNullableElapsedMs(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return null;
+    return Math.max(0, Math.round(numeric));
+}
+
+function buildBotValidationCapacityScan(reportArtifact = null) {
+    const runner = reportArtifact?.runner && typeof reportArtifact.runner === 'object'
+        ? reportArtifact.runner
+        : null;
+    const diagnostics = runner?.diagnostics && typeof runner.diagnostics === 'object'
+        ? runner.diagnostics
+        : null;
+    const stageTimings = diagnostics?.stageTimingsMs && typeof diagnostics.stageTimingsMs === 'object'
+        ? diagnostics.stageTimingsMs
+        : {};
+    const reportIo = diagnostics?.reportIo && typeof diagnostics.reportIo === 'object'
+        ? diagnostics.reportIo
+        : {};
+    const preview = diagnostics?.preview && typeof diagnostics.preview === 'object'
+        ? diagnostics.preview
+        : {};
+    const publish = diagnostics?.publish && typeof diagnostics.publish === 'object'
+        ? diagnostics.publish
+        : {};
+    return {
+        available: diagnostics != null,
+        contractVersion: diagnostics?.contractVersion || null,
+        stageTimingsMs: {
+            serverProbe: toNullableElapsedMs(stageTimings.serverProbeMs),
+            previewBuild: toNullableElapsedMs(stageTimings.previewBuildMs),
+            serverStart: toNullableElapsedMs(stageTimings.serverStartMs),
+            browserLaunch: toNullableElapsedMs(stageTimings.browserLaunchMs),
+            browserContext: toNullableElapsedMs(stageTimings.browserContextMs),
+            browserPage: toNullableElapsedMs(stageTimings.browserPageMs),
+            appBootstrap: toNullableElapsedMs(stageTimings.appBootstrapMs),
+            scenarioEval: toNullableElapsedMs(stageTimings.scenarioEvalMs),
+            reportWrite: toNullableElapsedMs(stageTimings.reportWriteMs),
+            publishWrite: toNullableElapsedMs(stageTimings.publishWriteMs),
+            total: toNullableElapsedMs(stageTimings.totalMs),
+        },
+        reportIo: {
+            jsonWriteMs: toNullableElapsedMs(reportIo.jsonWriteMs),
+            markdownWriteMs: toNullableElapsedMs(reportIo.markdownWriteMs),
+            totalWriteMs: toNullableElapsedMs(reportIo.totalWriteMs),
+            totalBytes: toNonNegativeInt(reportIo.totalBytes, 0),
+            writes: Array.isArray(reportIo.writes)
+                ? reportIo.writes.map((entry) => ({
+                    label: entry?.label || null,
+                    path: entry?.path || null,
+                    elapsedMs: toNullableElapsedMs(entry?.elapsedMs),
+                    bytes: toNonNegativeInt(entry?.bytes, 0),
+                }))
+                : [],
+        },
+        preview: {
+            active: runner?.serverMode === 'preview',
+            buildRequested: runner?.previewBuildBeforeStart === true,
+            buildPerformed: preview?.buildPerformed === true
+                ? true
+                : (preview?.buildPerformed === false ? false : null),
+            serverReused: preview?.serverReused === true
+                ? true
+                : (preview?.serverReused === false ? false : null),
+            buildElapsedMs: toNullableElapsedMs(preview.buildElapsedMs),
+            serverStartElapsedMs: toNullableElapsedMs(preview.serverStartElapsedMs),
+        },
+        publish: {
+            requested: runner?.publishEvidence === true,
+            jsonWriteMs: toNullableElapsedMs(publish.jsonWriteMs),
+            markdownWriteMs: toNullableElapsedMs(publish.markdownWriteMs),
+            totalWriteMs: toNullableElapsedMs(publish.totalWriteMs),
+            totalBytes: toNonNegativeInt(publish.totalBytes, 0),
+            wroteCanonicalJson: publish.wroteCanonicalJson === true,
+            wroteCanonicalMarkdown: publish.wroteCanonicalMarkdown === true,
+            writes: Array.isArray(publish.writes)
+                ? publish.writes.map((entry) => ({
+                    label: entry?.label || null,
+                    path: entry?.path || null,
+                    elapsedMs: toNullableElapsedMs(entry?.elapsedMs),
+                    bytes: toNonNegativeInt(entry?.bytes, 0),
+                }))
+                : [],
+        },
+        bottlenecks: Array.isArray(diagnostics?.bottlenecks)
+            ? diagnostics.bottlenecks.map((entry) => ({
+                rank: toNonNegativeInt(entry?.rank, 0),
+                stage: entry?.stage || null,
+                elapsedMs: toNullableElapsedMs(entry?.elapsedMs),
+            }))
+            : [],
+    };
+}
+
 function buildDisabledResult(source = {}) {
     return {
         enabled: false,
@@ -24,6 +118,16 @@ function buildDisabledResult(source = {}) {
         source: {
             reportPath: typeof source.reportPath === 'string' ? source.reportPath : null,
             exists: source.exists === true,
+        },
+        runner: null,
+        capacityScan: {
+            available: false,
+            contractVersion: null,
+            stageTimingsMs: {},
+            reportIo: null,
+            preview: null,
+            publish: null,
+            bottlenecks: [],
         },
         metrics: null,
         baseline: {
@@ -51,6 +155,7 @@ export function buildBotValidationEval(reportArtifact = null, source = {}) {
     const timeoutRounds = toNonNegativeInt(report?.runner?.timeoutRounds, 0);
     const forcedRoundRate = rounds > 0 ? roundMetric(forcedRounds / rounds) : 0;
     const timeoutRoundRate = rounds > 0 ? roundMetric(timeoutRounds / rounds) : 0;
+    const capacityScan = buildBotValidationCapacityScan(report);
 
     return {
         enabled: true,
@@ -59,6 +164,13 @@ export function buildBotValidationEval(reportArtifact = null, source = {}) {
             reportPath: typeof source.reportPath === 'string' ? source.reportPath : null,
             exists: source.exists === true,
         },
+        runner: {
+            serverMode: typeof report?.runner?.serverMode === 'string' ? report.runner.serverMode : null,
+            publishEvidence: report?.runner?.publishEvidence === true,
+            previewBuildBeforeStart: report?.runner?.previewBuildBeforeStart === true,
+            diagnosticsAvailable: capacityScan.available === true,
+        },
+        capacityScan,
         metrics: {
             rounds,
             botWinRate,

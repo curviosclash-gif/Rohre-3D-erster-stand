@@ -72,6 +72,23 @@ async function writeFailingBotValidationReport(filePath) {
     }, null, 2)}\n`, 'utf8');
 }
 
+async function writePassingBotValidationReportWithoutDiagnostics(filePath) {
+    await writeFile(filePath, `${JSON.stringify({
+        overall: {
+            rounds: 16,
+            botWinRate: 0.75,
+            averageBotSurvival: 48,
+        },
+        runner: {
+            forcedRounds: 0,
+            timeoutRounds: 0,
+            serverMode: 'preview',
+            publishEvidence: true,
+            previewBuildBeforeStart: true,
+        },
+    }, null, 2)}\n`, 'utf8');
+}
+
 test('V36 training gate restores latest index after standalone eval+gate failure', async () => {
     const releaseLock = await acquireLatestIndexLock();
     const stamp = `TEST_GATE_RESTORE_${Date.now()}`;
@@ -164,6 +181,59 @@ test('V80 training gate fails hard when bot validation report is missing', async
         assert.equal(result.artifactFailures > 0, true);
         assert.equal(latestAfter, latestBefore);
     } finally {
+        await restoreFile(LATEST_INDEX_PATH, latestBefore);
+        await releaseLock();
+    }
+});
+
+test('V80 training gate fails hard when preview/publish diagnostics are missing from bot validation report', async () => {
+    const releaseLock = await acquireLatestIndexLock();
+    const stamp = `TEST_GATE_MISSING_DIAGNOSTICS_${Date.now()}`;
+    const reportPath = `data/training/test-bot-validation-missing-diagnostics-${stamp}.json`;
+    const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
+    try {
+        await writePassingBotValidationReportWithoutDiagnostics(reportPath);
+        await execFileAsync(process.execPath, [
+            TRAINING_RUN_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+            '--bridge-mode', 'local',
+            '--resume-checkpoint', 'latest',
+            '--resume-strict', 'false',
+            '--episodes', '1',
+            '--seeds', '11',
+            '--modes', 'classic-3d',
+            '--max-steps', '8',
+        ]);
+        await execFileAsync(process.execPath, [
+            TRAINING_EVAL_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+            '--bot-validation-report', reportPath,
+        ]);
+
+        let stdout = '';
+        try {
+            await execFileAsync(process.execPath, [
+                TRAINING_GATE_SCRIPT,
+                '--stamp', stamp,
+                '--write-latest', 'true',
+            ]);
+            assert.fail('training-gate should fail when preview/publish diagnostics are missing');
+        } catch (error) {
+            stdout = String(error?.stdout || '');
+        }
+
+        const result = parseLastJsonObject(stdout);
+        const latestAfter = await readFileIfExists(LATEST_INDEX_PATH);
+        assert.equal(result.ok, false);
+        assert.equal(result.latestRestored, true);
+        assert.equal(result.failureCounts['validation-lane-telemetry-missing'] > 0, true);
+        assert.equal(result.failureCounts['preview-lane-missing'] > 0, true);
+        assert.equal(result.failureCounts['publish-lane-missing'] > 0, true);
+        assert.equal(latestAfter, latestBefore);
+    } finally {
+        await restoreFile(reportPath, null);
         await restoreFile(LATEST_INDEX_PATH, latestBefore);
         await releaseLock();
     }

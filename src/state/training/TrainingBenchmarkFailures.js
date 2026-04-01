@@ -93,6 +93,30 @@ export const TRAINING_BENCHMARK_FAILURE_TAXONOMY = Object.freeze({
         severity: 'high',
         summary: 'Hardware-Telemetrie fehlt.',
     }),
+    'validation-lane-telemetry-missing': Object.freeze({
+        code: 'validation-lane-telemetry-missing',
+        stage: 'gate',
+        severity: 'high',
+        summary: 'Bot-Validation-Lane liefert keine belastbare Kapazitaets-/Timing-Diagnostik.',
+    }),
+    'report-io-missing': Object.freeze({
+        code: 'report-io-missing',
+        stage: 'gate',
+        severity: 'high',
+        summary: 'Report-IO-Timings oder Write-Bytes fehlen fuer bot:validate.',
+    }),
+    'preview-lane-missing': Object.freeze({
+        code: 'preview-lane-missing',
+        stage: 'gate',
+        severity: 'high',
+        summary: 'Preview-spezifische bot:validate-Diagnostik fehlt trotz Preview-Lane.',
+    }),
+    'publish-lane-missing': Object.freeze({
+        code: 'publish-lane-missing',
+        stage: 'gate',
+        severity: 'high',
+        summary: 'Publish-spezifische bot:validate-Diagnostik fehlt trotz Publish-Evidence.',
+    }),
     'latency-spike': Object.freeze({
         code: 'latency-spike',
         stage: 'gate',
@@ -153,6 +177,9 @@ export function evaluateBenchmarkArtifactRequirements(input = {}, options = {}) 
     const botValidation = evalArtifact?.botValidation && typeof evalArtifact.botValidation === 'object'
         ? evalArtifact.botValidation
         : null;
+    const botValidationCapacityScan = botValidation?.capacityScan && typeof botValidation.capacityScan === 'object'
+        ? botValidation.capacityScan
+        : null;
     const expectedSemanticWindowId = typeof options.expectedSemanticWindowId === 'string'
         ? options.expectedSemanticWindowId
         : null;
@@ -191,6 +218,72 @@ export function evaluateBenchmarkArtifactRequirements(input = {}, options = {}) 
             artifact: 'bot-validation-report',
             path: botValidation?.source?.reportPath || null,
         }));
+    } else {
+        if (!botValidationCapacityScan?.available) {
+            failures.push(buildFailure('validation-lane-telemetry-missing', {
+                artifact: 'bot-validation-report',
+                path: botValidation?.source?.reportPath || null,
+            }));
+        } else {
+            const reportIo = botValidationCapacityScan.reportIo && typeof botValidationCapacityScan.reportIo === 'object'
+                ? botValidationCapacityScan.reportIo
+                : null;
+            const stageTimings = botValidationCapacityScan.stageTimingsMs && typeof botValidationCapacityScan.stageTimingsMs === 'object'
+                ? botValidationCapacityScan.stageTimingsMs
+                : {};
+            if (
+                reportIo?.jsonWriteMs == null
+                || reportIo?.markdownWriteMs == null
+                || reportIo?.totalWriteMs == null
+                || toFiniteNumber(reportIo?.totalBytes, 0) <= 0
+            ) {
+                failures.push(buildFailure('report-io-missing', {
+                    artifact: 'bot-validation-report',
+                    path: botValidation?.source?.reportPath || null,
+                }));
+            }
+            if (
+                stageTimings.reportWrite == null
+                || stageTimings.scenarioEval == null
+                || stageTimings.total == null
+            ) {
+                failures.push(buildFailure('validation-lane-telemetry-missing', {
+                    artifact: 'bot-validation-report',
+                    path: botValidation?.source?.reportPath || null,
+                }));
+            }
+            if (botValidation?.runner?.serverMode === 'preview') {
+                const preview = botValidationCapacityScan.preview && typeof botValidationCapacityScan.preview === 'object'
+                    ? botValidationCapacityScan.preview
+                    : null;
+                if (
+                    preview?.active !== true
+                    || typeof preview?.serverReused !== 'boolean'
+                    || preview?.serverStartElapsedMs == null
+                ) {
+                    failures.push(buildFailure('preview-lane-missing', {
+                        artifact: 'bot-validation-report',
+                        path: botValidation?.source?.reportPath || null,
+                    }));
+                }
+            }
+            if (botValidation?.runner?.publishEvidence === true) {
+                const publish = botValidationCapacityScan.publish && typeof botValidationCapacityScan.publish === 'object'
+                    ? botValidationCapacityScan.publish
+                    : null;
+                if (
+                    publish?.requested !== true
+                    || publish?.jsonWriteMs == null
+                    || publish?.markdownWriteMs == null
+                    || publish?.totalWriteMs == null
+                ) {
+                    failures.push(buildFailure('publish-lane-missing', {
+                        artifact: 'bot-validation-report',
+                        path: botValidation?.source?.reportPath || null,
+                    }));
+                }
+            }
+        }
     }
     if (!runArtifact?.hardwareTelemetry && !trainerArtifact?.hardwareTelemetry) {
         failures.push(buildFailure('hardware-telemetry-missing', { artifact: 'hardware-telemetry' }));

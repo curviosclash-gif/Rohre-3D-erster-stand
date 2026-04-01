@@ -139,6 +139,133 @@ async function writeTextFile(targetPath, content) {
     await writeFile(targetPath, content, 'utf8');
 }
 
+function roundMetric(value) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) return null;
+    return Math.round(numeric * 1000) / 1000;
+}
+
+function measureSyncOperation(callback) {
+    const startedAt = Date.now();
+    const result = callback();
+    return {
+        result,
+        elapsedMs: Math.max(0, Date.now() - startedAt),
+    };
+}
+
+async function measureAsyncOperation(callback) {
+    const startedAt = Date.now();
+    const result = await callback();
+    return {
+        result,
+        elapsedMs: Math.max(0, Date.now() - startedAt),
+    };
+}
+
+function createRunnerDiagnostics() {
+    return {
+        contractVersion: 'v80-bot-validation-runtime-v1',
+        startedAt: new Date().toISOString(),
+        completedAt: null,
+        serverMode: SERVER_MODE,
+        publishEvidence: PUBLISH_EVIDENCE,
+        previewBuildBeforeStart: PREVIEW_BUILD_BEFORE_START,
+        serverAlreadyRunning: null,
+        stageTimingsMs: {
+            serverProbeMs: null,
+            previewBuildMs: null,
+            serverStartMs: null,
+            browserLaunchMs: null,
+            browserContextMs: null,
+            browserPageMs: null,
+            appBootstrapMs: null,
+            scenarioEvalMs: null,
+            reportWriteMs: null,
+            publishWriteMs: null,
+            totalMs: null,
+        },
+        preview: {
+            requested: SERVER_MODE === 'preview',
+            buildRequested: SERVER_MODE === 'preview' && PREVIEW_BUILD_BEFORE_START,
+            buildPerformed: false,
+            serverReused: null,
+            buildElapsedMs: null,
+            serverStartElapsedMs: null,
+        },
+        reportIo: {
+            jsonWriteMs: null,
+            markdownWriteMs: null,
+            totalWriteMs: null,
+            totalBytes: 0,
+            writes: [],
+        },
+        publish: {
+            requested: PUBLISH_EVIDENCE,
+            jsonWriteMs: 0,
+            markdownWriteMs: 0,
+            totalWriteMs: 0,
+            totalBytes: 0,
+            wroteCanonicalJson: false,
+            wroteCanonicalMarkdown: false,
+            writes: [],
+        },
+        bottlenecks: [],
+    };
+}
+
+async function writeMeasuredTextFile(bucket, label, targetPath, content) {
+    const startedAt = Date.now();
+    await writeTextFile(targetPath, content);
+    const elapsedMs = Math.max(0, Date.now() - startedAt);
+    const bytes = Buffer.byteLength(String(content || ''), 'utf8');
+    if (bucket && typeof bucket === 'object') {
+        bucket.totalBytes = Math.max(0, Number(bucket.totalBytes || 0)) + bytes;
+        if (Array.isArray(bucket.writes)) {
+            bucket.writes.push({
+                label,
+                path: targetPath,
+                elapsedMs,
+                bytes,
+            });
+        }
+    }
+    return {
+        elapsedMs,
+        bytes,
+    };
+}
+
+function buildRunnerBottlenecks(diagnostics) {
+    const stageTimings = diagnostics?.stageTimingsMs && typeof diagnostics.stageTimingsMs === 'object'
+        ? diagnostics.stageTimingsMs
+        : {};
+    return [
+        ['server-probe', stageTimings.serverProbeMs],
+        ['preview-build', stageTimings.previewBuildMs],
+        ['server-start', stageTimings.serverStartMs],
+        ['browser-launch', stageTimings.browserLaunchMs],
+        ['browser-context', stageTimings.browserContextMs],
+        ['browser-page', stageTimings.browserPageMs],
+        ['app-bootstrap', stageTimings.appBootstrapMs],
+        ['scenario-eval', stageTimings.scenarioEvalMs],
+        ['report-write', stageTimings.reportWriteMs],
+        ['publish-write', stageTimings.publishWriteMs],
+    ]
+        .map(([stage, elapsedMs]) => ({
+            stage,
+            elapsedMs: Number.isFinite(Number(elapsedMs)) ? Math.max(0, Number(elapsedMs)) : null,
+        }))
+        .filter((entry) => entry.elapsedMs != null)
+        .sort((left, right) => right.elapsedMs - left.elapsedMs)
+        .slice(0, 5)
+        .map((entry, index) => ({
+            rank: index + 1,
+            stage: entry.stage,
+            elapsedMs: roundMetric(entry.elapsedMs),
+        }));
+}
+
 function resolveGotoWaitUntil(value) {
     const raw = typeof value === 'string' ? value.trim().toLowerCase() : '';
     if (!raw) return 'commit';
@@ -626,7 +753,12 @@ function formatNumber(value) {
     return Number(value || 0).toFixed(2);
 }
 
-function buildMarkdownReport({ generatedAt, roundsPerScenario, scenarioResults, overall, failureTaxonomy }) {
+function formatMs(value) {
+    if (value == null) return 'n/a';
+    return `${Math.max(0, Math.round(Number(value) || 0))}ms`;
+}
+
+function buildMarkdownReport({ generatedAt, roundsPerScenario, scenarioResults, overall, failureTaxonomy, runner = null }) {
     const lines = [];
     lines.push(`# Bot-Validation Telemetrie (${generatedAt})`);
     lines.push('');
@@ -638,6 +770,24 @@ function buildMarkdownReport({ generatedAt, roundsPerScenario, scenarioResults, 
     lines.push(`- Gesamt-Durchschnitt Bot-Ueberlebenszeit: ${formatSeconds(overall.averageBotSurvival)}`);
     lines.push(`- Gesamt-Stuck/Minute: ${formatNumber(overall.stuckPerMinute)}`);
     lines.push(`- Failure-Codes: player-dead=${failureTaxonomy?.['player-dead'] ?? 0}, match-loss=${failureTaxonomy?.['match-loss'] ?? 0}, forced-round=${failureTaxonomy?.['forced-round'] ?? 0}, timeout-round=${failureTaxonomy?.['timeout-round'] ?? 0}`);
+    if (runner) {
+        lines.push(`- Runner-Modus: ${runner.serverMode || 'unbekannt'}; Publish-Evidence: ${runner.publishEvidence === true ? 'ja' : 'nein'}`);
+    }
+    const diagnostics = runner?.diagnostics && typeof runner.diagnostics === 'object'
+        ? runner.diagnostics
+        : null;
+    if (diagnostics) {
+        lines.push(`- Kapazitaets-Lane: app-bootstrap=${formatMs(diagnostics.stageTimingsMs?.appBootstrapMs)}, scenario-eval=${formatMs(diagnostics.stageTimingsMs?.scenarioEvalMs)}, report-io=${formatMs(diagnostics.reportIo?.totalWriteMs)}, publish=${formatMs(diagnostics.publish?.totalWriteMs)}`);
+        if (runner?.serverMode === 'preview') {
+            lines.push(`- Preview-Pfad: build=${formatMs(diagnostics.preview?.buildElapsedMs)}, server-start=${formatMs(diagnostics.preview?.serverStartElapsedMs)}, reused=${diagnostics.preview?.serverReused === true ? 'ja' : 'nein'}`);
+        }
+        if (Array.isArray(diagnostics.bottlenecks) && diagnostics.bottlenecks.length > 0) {
+            const bottleneckSummary = diagnostics.bottlenecks
+                .map((entry) => `${entry.stage}=${formatMs(entry.elapsedMs)}`)
+                .join(', ');
+            lines.push(`- Engpaesse: ${bottleneckSummary}`);
+        }
+    }
     lines.push('');
     lines.push('| Szenario | Runden | Bot-Winrate | Stuck | Wandtreffer | Trailtreffer | Avg Survival | Stuck/Minute |');
     lines.push('|---|---:|---:|---:|---:|---:|---:|---:|');
@@ -650,6 +800,7 @@ function buildMarkdownReport({ generatedAt, roundsPerScenario, scenarioResults, 
 }
 
 async function run() {
+    const runnerStartedAt = Date.now();
     const runDeadline = createDeadline('total-run', TOTAL_TIMEOUT_MS);
     const hardStopTimer = setTimeout(() => {
         console.error(`[bot-validation-runner] hard timeout after ${TOTAL_TIMEOUT_MS}ms - forcing exit`);
@@ -664,6 +815,7 @@ async function run() {
     let browser = null;
     let context = null;
     let page = null;
+    const diagnostics = createRunnerDiagnostics();
     try {
         log('Runner config', {
             baseUrl: BASE_URL,
@@ -691,44 +843,68 @@ async function run() {
             gotoWaitUntil: GOTO_WAIT_UNTIL,
         });
 
-        const serverAlreadyRunning = await isServerReady(BASE_URL);
+        const serverProbe = await measureAsyncOperation(() => isServerReady(BASE_URL));
+        diagnostics.stageTimingsMs.serverProbeMs = serverProbe.elapsedMs;
+        const serverAlreadyRunning = serverProbe.result;
+        diagnostics.serverAlreadyRunning = serverAlreadyRunning === true;
+        diagnostics.preview.serverReused = serverAlreadyRunning === true;
         if (!serverAlreadyRunning) {
             if (SERVER_MODE === 'preview' && PREVIEW_BUILD_BEFORE_START) {
                 log('Building app before preview server start');
-                execSync('npm run build', { stdio: 'inherit' });
+                const previewBuild = measureSyncOperation(() => execSync('npm run build', { stdio: 'inherit' }));
+                diagnostics.preview.buildPerformed = true;
+                diagnostics.preview.buildElapsedMs = previewBuild.elapsedMs;
+                diagnostics.stageTimingsMs.previewBuildMs = previewBuild.elapsedMs;
             }
             log(`Starting Vite ${SERVER_MODE} server`, { baseUrl: BASE_URL });
+            const serverStartStartedAt = Date.now();
             serverHandle = startViteServer(SERVER_MODE);
             await waitForServer(
                 BASE_URL,
                 serverHandle,
                 resolveTimeout(SERVER_READY_TIMEOUT_MS, 'server:start', [runDeadline])
             );
+            const serverStartElapsedMs = Math.max(0, Date.now() - serverStartStartedAt);
+            diagnostics.stageTimingsMs.serverStartMs = serverStartElapsedMs;
+            if (SERVER_MODE === 'preview') {
+                diagnostics.preview.serverStartElapsedMs = serverStartElapsedMs;
+            }
             log(`${SERVER_MODE} server ready`);
         } else {
+            diagnostics.stageTimingsMs.serverStartMs = 0;
+            if (SERVER_MODE === 'preview') {
+                diagnostics.preview.serverStartElapsedMs = 0;
+            }
             log('Reusing existing server', { baseUrl: BASE_URL, requestedServerMode: SERVER_MODE });
         }
 
+        const browserLaunchStartedAt = Date.now();
         browser = await withTimeout(
             () => chromium.launch({ headless: HEADLESS }),
             resolveTimeout(APP_READY_TIMEOUT_MS, 'browser:launch', [runDeadline]),
             'browser:launch'
         );
+        diagnostics.stageTimingsMs.browserLaunchMs = Math.max(0, Date.now() - browserLaunchStartedAt);
+        const browserContextStartedAt = Date.now();
         context = await withTimeout(
             () => browser.newContext(),
             resolveTimeout(APP_READY_TIMEOUT_MS, 'browser:new-context', [runDeadline]),
             'browser:new-context'
         );
+        diagnostics.stageTimingsMs.browserContextMs = Math.max(0, Date.now() - browserContextStartedAt);
+        const browserPageStartedAt = Date.now();
         page = await withTimeout(
             () => context.newPage(),
             resolveTimeout(APP_READY_TIMEOUT_MS, 'browser:new-page', [runDeadline]),
             'browser:new-page'
         );
+        diagnostics.stageTimingsMs.browserPageMs = Math.max(0, Date.now() - browserPageStartedAt);
         const appReadyTimeoutMs = resolveTimeout(APP_READY_TIMEOUT_MS, 'app:bootstrap', [runDeadline]);
         const navigationTimeoutMs = resolveTimeout(NAVIGATION_TIMEOUT_MS, 'page:navigation', [runDeadline]);
         page.setDefaultTimeout(appReadyTimeoutMs);
         page.setDefaultNavigationTimeout(navigationTimeoutMs);
 
+        const appBootstrapStartedAt = Date.now();
         await withTimeout(
             () => page.goto(BASE_URL, { waitUntil: GOTO_WAIT_UNTIL, timeout: navigationTimeoutMs }),
             navigationTimeoutMs,
@@ -739,6 +915,7 @@ async function run() {
             resolveTimeout(APP_READY_TIMEOUT_MS, 'app:game-instance', [runDeadline]),
             'app:game-instance'
         );
+        diagnostics.stageTimingsMs.appBootstrapMs = Math.max(0, Date.now() - appBootstrapStartedAt);
         await waitForGameState(
             page,
             ['MENU'],
@@ -784,6 +961,7 @@ async function run() {
             forcedRounds: 0,
             timeoutRounds: 0,
         };
+        const scenarioEvalStartedAt = Date.now();
 
         for (let i = 0; i < scenarios.length; i++) {
             const scenario = scenarios[i];
@@ -877,6 +1055,7 @@ async function run() {
                 elapsedMs: scenarioDeadline.elapsedMs(),
             });
         }
+        diagnostics.stageTimingsMs.scenarioEvalMs = Math.max(0, Date.now() - scenarioEvalStartedAt);
 
         const allRounds = await evaluatePhase(
             page,
@@ -901,6 +1080,10 @@ async function run() {
                 timeoutRounds: runnerStats.timeoutRounds,
                 failOnForcedRound: FAIL_ON_FORCED_ROUND,
                 maxForcedRounds: MAX_FORCED_ROUNDS,
+                serverMode: SERVER_MODE,
+                publishEvidence: PUBLISH_EVIDENCE,
+                previewBuildBeforeStart: PREVIEW_BUILD_BEFORE_START,
+                diagnostics,
             },
             failureTaxonomy: buildFailureTaxonomy(allRounds, runnerStats),
         };
@@ -909,28 +1092,73 @@ async function run() {
         const canonicalMdPath = `docs/tests/Testergebnisse_Phase4b_${generatedAt}.md`;
         const jsonPath = normalizeOutputPath(REPORT_JSON_OVERRIDE, 'tmp/bot-validation-report.json');
         const mdPath = normalizeOutputPath(REPORT_MD_OVERRIDE, `tmp/Testergebnisse_Phase4b_${generatedAt}.md`);
+        const reportJson = `${JSON.stringify(report, null, 2)}\n`;
         const markdownReport = buildMarkdownReport({
             generatedAt,
             roundsPerScenario: ROUNDS_PER_SCENARIO,
             scenarioResults,
             overall,
             failureTaxonomy: report.failureTaxonomy,
+            runner: report.runner,
         });
 
         const writtenPaths = [];
-        await writeTextFile(jsonPath, JSON.stringify(report, null, 2));
+        const jsonWrite = await writeMeasuredTextFile(diagnostics.reportIo, 'report-json', jsonPath, reportJson);
+        diagnostics.reportIo.jsonWriteMs = jsonWrite.elapsedMs;
         writtenPaths.push(jsonPath);
-        await writeTextFile(mdPath, markdownReport);
+        const markdownWrite = await writeMeasuredTextFile(diagnostics.reportIo, 'report-markdown', mdPath, markdownReport);
+        diagnostics.reportIo.markdownWriteMs = markdownWrite.elapsedMs;
         writtenPaths.push(mdPath);
+        diagnostics.reportIo.totalWriteMs = (diagnostics.reportIo.jsonWriteMs || 0) + (diagnostics.reportIo.markdownWriteMs || 0);
+        diagnostics.stageTimingsMs.reportWriteMs = diagnostics.reportIo.totalWriteMs;
 
         if (PUBLISH_EVIDENCE) {
             if (jsonPath !== canonicalJsonPath) {
-                await writeTextFile(canonicalJsonPath, JSON.stringify(report, null, 2));
+                const canonicalJsonWrite = await writeMeasuredTextFile(
+                    diagnostics.publish,
+                    'publish-json',
+                    canonicalJsonPath,
+                    reportJson
+                );
+                diagnostics.publish.jsonWriteMs = canonicalJsonWrite.elapsedMs;
+                diagnostics.publish.wroteCanonicalJson = true;
                 writtenPaths.push(canonicalJsonPath);
             }
             if (mdPath !== canonicalMdPath) {
-                await writeTextFile(canonicalMdPath, markdownReport);
+                const canonicalMarkdownWrite = await writeMeasuredTextFile(
+                    diagnostics.publish,
+                    'publish-markdown',
+                    canonicalMdPath,
+                    markdownReport
+                );
+                diagnostics.publish.markdownWriteMs = canonicalMarkdownWrite.elapsedMs;
+                diagnostics.publish.wroteCanonicalMarkdown = true;
                 writtenPaths.push(canonicalMdPath);
+            }
+        }
+        diagnostics.publish.totalWriteMs = (diagnostics.publish.jsonWriteMs || 0) + (diagnostics.publish.markdownWriteMs || 0);
+        diagnostics.stageTimingsMs.publishWriteMs = diagnostics.publish.totalWriteMs;
+        diagnostics.completedAt = new Date().toISOString();
+        diagnostics.stageTimingsMs.totalMs = Math.max(0, Date.now() - runnerStartedAt);
+        diagnostics.bottlenecks = buildRunnerBottlenecks(diagnostics);
+        report.runner.diagnostics = diagnostics;
+        const finalizedReportJson = `${JSON.stringify(report, null, 2)}\n`;
+        const finalizedMarkdownReport = buildMarkdownReport({
+            generatedAt,
+            roundsPerScenario: ROUNDS_PER_SCENARIO,
+            scenarioResults,
+            overall,
+            failureTaxonomy: report.failureTaxonomy,
+            runner: report.runner,
+        });
+        await writeTextFile(jsonPath, finalizedReportJson);
+        await writeTextFile(mdPath, finalizedMarkdownReport);
+        if (PUBLISH_EVIDENCE) {
+            if (jsonPath !== canonicalJsonPath) {
+                await writeTextFile(canonicalJsonPath, finalizedReportJson);
+            }
+            if (mdPath !== canonicalMdPath) {
+                await writeTextFile(canonicalMdPath, finalizedMarkdownReport);
             }
         }
 
@@ -940,6 +1168,9 @@ async function run() {
             forcedRounds: runnerStats.forcedRounds,
             timeoutRounds: runnerStats.timeoutRounds,
             forcedRoundRatio: Number(forcedRoundRatio.toFixed(3)),
+            reportWriteMs: roundMetric(diagnostics.reportIo.totalWriteMs),
+            publishWriteMs: roundMetric(diagnostics.publish.totalWriteMs),
+            slowestStage: diagnostics.bottlenecks[0] || null,
         });
 
         const policyErrors = [];
