@@ -43,6 +43,16 @@ Aktueller Laufstand:
 - Checkpoint-Contract `v36-dqn-checkpoint-v2` migriert Legacy-40er-Modelle in die runtime-nahe Eingabebreite, ohne BT11 als Champion oder BT20 als reine Challenger-Referenz anzutasten.
 - Bewusst nicht vorgezogen in BT80C: Algorithmus-Ausbau (`80.7+`), Champion/Challenger-Promotion, High-Util-/Langlaeufe und produktionsnahe Operatorlaeufe.
 
+## BT80C Repo-Hardening (2026-04-02)
+
+- Algorithmusprofile sind jetzt explizit: `champion-stable`, `challenger-balanced`, `challenger-high-util`, `ablation-no-per`.
+- Prioritized Replay wird im Trainer nicht mehr nur vorbereitet, sondern gezielt ueber Challenger-Profile aktiviert; Ablationspfade bleiben bewusst ohne PER und reference-only.
+- High-Util-Profile `overnight-high-util` und `marathon` tragen harte Thermal-Ceilings; externe Temperaturdaten koennen fuer Guardrails eingespeist werden, ohne hierfuer einen Operatorlauf zu starten.
+- `training-gate` berechnet jetzt eine explizite Promotion-Entscheidung gegen den eingefrorenen BT11-Champion: nur runtime-nahe Challenger-Lanes mit positivem Survival-Delta und `forcedRoundRate=0`, `timeoutRoundRate=0` koennen `manual-promotion-required` erreichen.
+- BT20 bleibt durch die Promotion-Policy Challenger- bzw. Referenzlauf; synthetische und Ablation-Lanes bleiben von Champion-Promotion ausgeschlossen.
+- `training-e2e` behandelt Dry-Runs mit `write-latest=false` jetzt als bewussten Skip fuer Validation-/Gate-Evidence statt als false-positive Gate-FAIL.
+- Weiter offen fuer echtes `80.99`: neue Langlauf-/Benchmark-Artefakte, manueller Promotion-Entscheid gegen BT11 und produktionsnahe High-Util-Operatorlaeufe.
+
 ## Zielkorridor bis Q2-Ende
 
 | Ziel | Baseline | Q2 Ziel | Delta |

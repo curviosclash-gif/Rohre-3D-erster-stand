@@ -72,6 +72,7 @@ Roadmap-Horizont fuer kommende Trainingsfenster: `docs/bot-training/Bot_Training
 | Bot-B | BT30 | 2026-03-22 | frei | - |
 | Bot-C | BT40 | 2026-03-22 | frei | - |
 | - | BT73 | - | frei | Intake 2026-03-31 abgeschlossen; Claim nach BT20-/BT30-/BT40-Abstimmung |
+| Bot-Codex | BT80C | 2026-04-02 | frei | 80.99 offen; 80.7-80.9 repo-technisch vorgezogen |
 
 ## Conflict-Log (Cross-Block-Aenderungen)
 
@@ -483,6 +484,62 @@ Scope:
 | Resume-/Bridge-Fixes destabilisieren den Trainingsbetrieb kurzfristig | hoch | Trainer | Smoke-Tests fuer `checkpoint-load`, `latest`, Preview-Validate und Publish-Lane vor Langlaeufen verpflichtend machen | Training kann nicht deterministisch fortgesetzt werden |
 | V72-Veraenderungen an Item-/Portal-/Gate-Vertraegen brechen Bot-Heuristiken | mittel | Gameplay + AI | Gemeinsame Capability-/Semantik-Quelle definieren und Cross-Plan-Abhaengigkeiten vor Merge pruefen | Bots reagieren falsch auf neue Items oder Portale |
 | Mehr Failure-Codes und Decision-Trace-Artefakte ueberladen Reports und Operatorpfade | mittel | QA/Ops | Kompakte Summary plus gezielte Drilldown-Artefakte statt unstrukturierter Log-Flut | Reports wachsen, aber Entscheidungen werden nicht klarer |
+
+---
+
+## Block BT80C: Algorithmus-Ausbau, High-Util-Training und Champion-Rollout
+
+Plan-Datei: `docs/plaene/neu/Feature_Bot_Training_Benchmark_Maxleistung_BT80.md`
+
+<!-- LOCK: frei -->
+<!-- DEPENDS-ON: BT80B.99 -->
+
+Scope:
+
+- BT80B-Haertung in Algorithmus-, Promotion-, Gate- und Hardwareprofilen fortziehen, ohne Temperatur-/Thermal-Guardrails weich zu machen.
+- BT11 bleibt eingefrorener Champion; BT20 bleibt Challenger-/Referenzlauf.
+- Repo-technische Haertung vorziehen, aber keine produktionsnahen Langlaeufe oder stillen Champion-Wechsel ohne frische Operator-Evidence anstossen.
+
+### Definition of Done (DoD)
+
+- [ ] DoD.1 Alle Phasen 80.7 bis 80.99 sind abgeschlossen.
+- [ ] DoD.2 Champion-/Challenger-/Ablation-Rollen sind hart verdrahtet; BT11 bleibt Champion und BT20 bleibt Referenz.
+- [ ] DoD.3 Algorithmus-, Hardware- und Rollout-Vertraege sind als reproduzierbare Repo-Konfiguration dokumentiert.
+- [ ] DoD.4 Trainingsnahe Tests sowie `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind gruen.
+
+### 80.7 Lernalgorithmus, Ablationen und Champion-Challenger-Regeln
+
+- [x] 80.7.1 Algorithmusprofile (`champion-stable`, `challenger-balanced`, `challenger-high-util`, `ablation-no-per`) definieren und bis in Trainer-/Replay-/Reward-/Exploration-Defaults verdrahten (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/trainer-v36-algorithm-profile.test.mjs` -> PASS)
+- [x] 80.7.2 Challenger-/Ablation-/Reference-only-Rollen im Benchmark-Manifest und in der manuellen Promotion-Policy verankern, inklusive BT20-Blockade gegen Champion-Promotion (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)
+
+### 80.8 Hardware-, Util- und Langlaufprofile
+
+- [x] 80.8.1 High-Util-Profile `overnight-high-util` und `marathon` mit harten Thermal-Ceilings statt reiner Beobachtung konfigurieren (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)
+- [x] 80.8.2 Hardware-Telemetrie fuer extern gelieferte Temperaturdaten auswertbar machen, ohne produktionsnahe Langlaeufe fuer diese Repo-Haertung zu starten (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-benchmark-artifacts.test.mjs` -> PASS)
+
+### 80.9 Rollout-, Promotion-, Fallback- und Gate-Haertung
+
+- [x] 80.9.1 `training-gate` um explizite Promotion-Entscheidung gegen den eingefrorenen BT11-Champion erweitern; synthetische und BT20-Referenzlaeufe bleiben geblockt (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-gate.test.mjs` -> PASS)
+- [x] 80.9.2 `training-e2e` Dry-Run-Fallback so haerten, dass `write-latest=false` Validation-/Gate-Pfade sauber skippt statt false-positive Rot zu erzeugen (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-e2e.test.mjs` -> PASS)
+
+### 80.99 Abschluss-Gate
+
+- [ ] 80.99.1 Kein Champion-Wechsel und kein High-Util-Operatorlauf ohne neue Benchmark-/Langlaufartefakte; BT11 bleibt bis zu einer echten manuellen Promotion-Entscheidung Champion.
+- [ ] 80.99.2 Abschluss-Checks, finale Doku-Synchronisierung und ehrliche Restpunkt-Dokumentation sind abgeschlossen.
+
+### Checkpoint-Log BT80C
+
+| Datum | Typ | Stamp | Zielbild | Evidence |
+| --- | --- | --- | --- | --- |
+| 2026-04-02 | Repo-Haertung | `BT80C_repo_20260402` | Algorithmusprofile, PER-Aktivierung, Thermal-Ceilings und manuelle Promotion-Policy sind ohne Langlaufstart im Repo verdrahtet | commit `37bfeb3`, `tests/trainer-v36-algorithm-profile.test.mjs`, `tests/training-benchmark-artifacts.test.mjs`, `tests/training-gate.test.mjs`, `tests/training-e2e.test.mjs` |
+
+### Risiko-Register BT80C
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Prioritized Replay oder neue Challenger-Defaults destabilisieren Resume-Ketten | hoch | Trainer | Checkpoint-Contract unveraendert halten, PER nur ueber Profile aktivieren und per Unit-Test absichern | Resume oder Replay-Stats kippen nach Profilwechsel |
+| Thermal-Ceilings bleiben folgenlos, wenn keine Temperaturquelle angeschlossen ist | mittel | Train-Ops | Externe Temperaturquelle ueber Telemetrie einspeisen; bis dahin Warning sichtbar halten und keine Marathon-Promotion freigeben | High-Util-Lauf ohne Temperaturwert |
+| Manual-Promotion wird im Alltag als automatischer Rollout missverstanden | hoch | QA/Ops | Gate-Report explizit auf `manual-promotion-required` bzw. `hold-champion` pinnen | Gruener Gate-Lauf wird als automatischer Champion-Wechsel interpretiert |
 
 ---
 
