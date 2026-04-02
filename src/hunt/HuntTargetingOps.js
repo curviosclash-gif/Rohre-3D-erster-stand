@@ -406,7 +406,7 @@ export function resolveHuntLineTarget({
 
         const hitboxRadius = Math.max(
             0.2,
-            Number(target.hitboxRadius) || Number(CONFIG?.PLAYER?.HITBOX_RADIUS) || 0.8
+            Number(target.hitboxRadius) || Number(resolveGameplayConfig(target).PLAYER?.HITBOX_RADIUS) || 0.8
         );
         const hitboxRadiusSq = hitboxRadius * hitboxRadius;
 

@@ -30,6 +30,7 @@ import {
     renderStartFieldHints,
 } from './start-setup/StartSetupValidationView.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
+import { getRuntimeMapCatalog } from '../shared/contracts/RuntimeMapCatalogContract.js';
 
 export class UIStartSyncController {
     /**
@@ -294,12 +295,13 @@ export class UIStartSyncController {
 
         if (this.ui.mapSelect) {
             const previousValue = String(settings.mapKey || this.ui.mapSelect.value || 'standard');
+            const runtimeMaps = getRuntimeMapCatalog();
             this.ui.mapSelect.innerHTML = '';
             this._mapPreviewEntries
                 .filter((entry) => {
                     const matchesSearch = !mapSearch || entry.name.toLowerCase().includes(mapSearch) || entry.key.toLowerCase().includes(mapSearch);
                     const matchesFilter = mapFilter === 'all' || entry.category === mapFilter;
-                    const mapDefinition = CONFIG?.MAPS?.[entry.key];
+                    const mapDefinition = runtimeMaps?.[entry.key];
                     const matchesModePath = isMapEligibleForModePath(mapDefinition, modePath);
                     return matchesSearch && matchesFilter && matchesModePath;
                 })

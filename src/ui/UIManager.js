@@ -337,6 +337,7 @@ export class UIManager {
     syncGameplay(settings = this.game.settings) {
         const ui = this.ui;
         const gp = settings.gameplay;
+        const runtimeConfig = resolveGameplayConfig(this.game);
         ui.speedSlider.value = gp.speed;
         ui.speedLabel.textContent = `${gp.speed} m/s`;
         ui.turnSlider.value = gp.turnSensitivity;
@@ -357,10 +358,10 @@ export class UIManager {
         const mgTrailAimDefaults = SETTINGS_LIMITS.gameplay.mgTrailAimRadius;
         const mgTrailAimRadius = Number.isFinite(Number(gp.mgTrailAimRadius))
             ? Number(gp.mgTrailAimRadius)
-            : Math.max(mgTrailAimDefaults.min, Number(CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
+            : Math.max(mgTrailAimDefaults.min, Number(runtimeConfig?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
         if (ui.mgTrailAimSlider) ui.mgTrailAimSlider.value = mgTrailAimRadius;
         if (ui.mgTrailAimLabel) ui.mgTrailAimLabel.textContent = mgTrailAimRadius.toFixed(2);
-        syncFightMenuTuningUi({ ui, settings, gameplay: gp, config: CONFIG });
+        syncFightMenuTuningUi({ ui, settings, gameplay: gp, config: runtimeConfig });
         const shadowQuality = normalizeShadowQuality(settings?.localSettings?.shadowQuality, DEFAULT_SHADOW_QUALITY);
         if (ui.shadowQualitySlider) ui.shadowQualitySlider.value = String(shadowQuality);
         if (ui.shadowQualityLabel) ui.shadowQualityLabel.textContent = resolveShadowQualityLabel(shadowQuality);

@@ -107,12 +107,13 @@ function applyRetreatManeuver(action, player, enemy) {
 function resolveHuntBridgeAction(runtimeContext, player) {
     const priorities = resolveHuntBridgePriorities(player, runtimeContext);
     const action = {};
+    const huntConfig = resolveGameplayConfig(player).HUNT;
     const survivalPressure = Math.max(
         priorities.pressureLevel,
         priorities.projectileThreat ? 0.82 : 0,
         (1 - priorities.vitalityRatio) * 0.95
     );
-    const mgRange = Math.max(12, Number(CONFIG?.HUNT?.MG?.RANGE || 95));
+    const mgRange = Math.max(12, Number(huntConfig?.MG?.RANGE || 95));
     const targetDistanceMax = Math.max(1, Number(runtimeContext?.observationContext?.targetDistanceMax || 120));
     const mgRangeRatio = clamp(mgRange / targetDistanceMax, 0, 1);
     const withinMgWindow = priorities.hasSharedTarget
