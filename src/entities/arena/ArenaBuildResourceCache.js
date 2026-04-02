@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
 const CHECKER_TEXTURE_CACHE = new Map();
+const CHECKPOINT_LABEL_TEXTURE_CACHE = new Map();
 const MATERIAL_BUNDLE_CACHE = new Map();
 
 function createCheckerTexture(lightColor, darkColor) {
@@ -37,6 +38,42 @@ function getBaseCheckerTexture(lightColor, darkColor) {
         CHECKER_TEXTURE_CACHE.set(key, createCheckerTexture(lightColor, darkColor));
     }
     return CHECKER_TEXTURE_CACHE.get(key);
+}
+
+function createCheckpointLabelTexture(label) {
+    const size = 128;
+    const canvas = document.createElement('canvas');
+    canvas.width = size;
+    canvas.height = size;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        const texture = new THREE.Texture();
+        texture.needsUpdate = true;
+        return texture;
+    }
+
+    ctx.clearRect(0, 0, size, size);
+    ctx.font = 'bold 90px Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 5;
+    ctx.strokeText(label, size / 2, size / 2);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(label, size / 2, size / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+}
+
+export function getCheckpointLabelTexture(label) {
+    const key = String(label);
+    if (!CHECKPOINT_LABEL_TEXTURE_CACHE.has(key)) {
+        CHECKPOINT_LABEL_TEXTURE_CACHE.set(key, createCheckpointLabelTexture(key));
+    }
+    return CHECKPOINT_LABEL_TEXTURE_CACHE.get(key);
 }
 
 function round2(value) {
