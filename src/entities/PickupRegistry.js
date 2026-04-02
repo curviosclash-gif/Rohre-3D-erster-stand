@@ -25,6 +25,11 @@ export const PICKUP_SLOT_UNKNOWN_INDEX = 19;
 
 export const PICKUP_REGISTRY = Object.freeze({
     SPEED_UP: createPickupDefinition({
+        name: 'Schneller',
+        color: 0x00ff66,
+        icon: '⚡',
+        duration: 4,
+        multiplier: 1.6,
         selfUsable: true,
         shootable: true,
         offensive: false,
@@ -36,6 +41,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.8, offense: 0.2, defensiveScale: 0.5, emergencyScale: 0.1, combatSelf: 0.2 },
     }),
     SLOW_DOWN: createPickupDefinition({
+        name: 'Langsamer',
+        color: 0xff3333,
+        icon: '🐢',
+        duration: 4,
+        multiplier: 0.5,
         selfUsable: true,
         shootable: true,
         offensive: true,
@@ -46,6 +56,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: -0.8, offense: 0.9, defensiveScale: 0.1, emergencyScale: 0.0, combatSelf: -0.3 },
     }),
     THICK: createPickupDefinition({
+        name: 'Dick',
+        color: 0xffcc00,
+        icon: '🧱',
+        duration: 5,
+        trailWidth: 1.8,
         selfUsable: true,
         shootable: true,
         offensive: false,
@@ -56,6 +71,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.9, offense: 0.1, defensiveScale: 0.8, emergencyScale: 0.2, combatSelf: 0.4 },
     }),
     THIN: createPickupDefinition({
+        name: 'Dünn',
+        color: 0xaa44ff,
+        icon: '✂',
+        duration: 5,
+        trailWidth: 0.2,
         selfUsable: true,
         shootable: true,
         offensive: true,
@@ -66,6 +86,10 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: -0.6, offense: 0.7, defensiveScale: 0.2, emergencyScale: 0.0, combatSelf: -0.2 },
     }),
     SHIELD: createPickupDefinition({
+        name: 'Schild',
+        color: 0x4488ff,
+        icon: '🛡',
+        duration: 3,
         selfUsable: true,
         shootable: true,
         offensive: false,
@@ -77,6 +101,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.5, offense: 0.0, defensiveScale: 1.2, emergencyScale: 2.5, combatSelf: 0.8 },
     }),
     SLOW_TIME: createPickupDefinition({
+        name: 'Zeitlupe',
+        color: 0x44ff88,
+        icon: '🕙',
+        duration: 4,
+        timeScale: 0.4,
         selfUsable: true,
         shootable: true,
         offensive: false,
@@ -87,6 +116,10 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.7, offense: 0.35, defensiveScale: 0.6, emergencyScale: 0.4, combatSelf: 0.3 },
     }),
     GHOST: createPickupDefinition({
+        name: 'Geist',
+        color: 0xff66cc,
+        icon: '👻',
+        duration: 3,
         selfUsable: true,
         shootable: true,
         offensive: false,
@@ -97,6 +130,10 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.95, offense: 0.1, defensiveScale: 1.0, emergencyScale: 2.0, combatSelf: 0.5 },
     }),
     INVERT: createPickupDefinition({
+        name: 'Invertieren',
+        color: 0xff00ff,
+        icon: '🔀',
+        duration: 4,
         selfUsable: true,
         shootable: true,
         offensive: true,
@@ -107,6 +144,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: -0.7, offense: 0.85, defensiveScale: 0.15, emergencyScale: 0.0, combatSelf: -0.4 },
     }),
     ROCKET_WEAK: createPickupDefinition({
+        name: 'Rakete S',
+        color: 0xffcc66,
+        icon: '🚀',
+        duration: 0,
+        damage: 10,
         selfUsable: false,
         shootable: true,
         offensive: true,
@@ -120,6 +162,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.06, offense: 0.45, defensiveScale: 0.02, emergencyScale: 0.05, combatSelf: 0.0 },
     }),
     ROCKET_MEDIUM: createPickupDefinition({
+        name: 'Rakete M',
+        color: 0xff8844,
+        icon: '🚀',
+        duration: 0,
+        damage: 20,
         selfUsable: false,
         shootable: true,
         offensive: true,
@@ -132,6 +179,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.06, offense: 0.5, defensiveScale: 0.02, emergencyScale: 0.05, combatSelf: 0.0 },
     }),
     ROCKET_HEAVY: createPickupDefinition({
+        name: 'Rakete L',
+        color: 0xff3344,
+        icon: '🚀',
+        duration: 0,
+        damage: 40,
         selfUsable: false,
         shootable: true,
         offensive: true,
@@ -145,6 +197,11 @@ export const PICKUP_REGISTRY = Object.freeze({
         botRule: { self: 0.06, offense: 0.56, defensiveScale: 0.02, emergencyScale: 0.06, combatSelf: 0.0 },
     }),
     ROCKET_MEGA: createPickupDefinition({
+        name: 'Rakete XL',
+        color: 0xcc11ff,
+        icon: '🚀',
+        duration: 0,
+        damage: 70,
         selfUsable: false,
         shootable: true,
         offensive: true,
@@ -255,4 +312,37 @@ export function createPickupBotRuleMap() {
         return acc;
     }, {});
     return Object.freeze(rules);
+}
+
+function createPickupTypeConfigEntry(definition) {
+    const entry = {
+        name: definition.name,
+        color: definition.color,
+        icon: definition.icon,
+        duration: Number.isFinite(Number(definition.duration)) ? Number(definition.duration) : 0,
+    };
+    if (Number.isFinite(Number(definition.multiplier))) {
+        entry.multiplier = Number(definition.multiplier);
+    }
+    if (Number.isFinite(Number(definition.trailWidth))) {
+        entry.trailWidth = Number(definition.trailWidth);
+    }
+    if (Number.isFinite(Number(definition.timeScale))) {
+        entry.timeScale = Number(definition.timeScale);
+    }
+    if (Number.isFinite(Number(definition.damage))) {
+        entry.damage = Number(definition.damage);
+    }
+    if (definition.allowedModes.length === 1 && definition.allowedModes[0] === 'HUNT') {
+        entry.huntOnly = true;
+    }
+    return Object.freeze(entry);
+}
+
+export function createPickupTypeConfigMap() {
+    const configMap = PICKUP_TYPES.reduce((acc, type) => {
+        acc[type] = createPickupTypeConfigEntry(PICKUP_REGISTRY[type]);
+        return acc;
+    }, {});
+    return Object.freeze(configMap);
 }

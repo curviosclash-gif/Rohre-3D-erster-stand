@@ -3,6 +3,7 @@
 // ============================================
 
 import { HUNT_CONFIG } from '../../hunt/HuntConfig.js';
+import { createPickupTypeConfigMap } from '../../entities/PickupRegistry.js';
 
 export const CONFIG_SECTIONS = {
     // ---- Allgemein ----
@@ -89,20 +90,7 @@ export const CONFIG_SECTIONS = {
         MAX_INVENTORY: 5,
         DURATION: 5.0,
 
-        TYPES: {
-            SPEED_UP: { name: 'Schneller', color: 0x00ff66, icon: '⚡', duration: 4, multiplier: 1.6 },
-            SLOW_DOWN: { name: 'Langsamer', color: 0xff3333, icon: '🐢', duration: 4, multiplier: 0.5 },
-            THICK: { name: 'Dick', color: 0xffcc00, icon: '🧱', duration: 5, trailWidth: 1.8 },
-            THIN: { name: 'Dünn', color: 0xaa44ff, icon: '✂', duration: 5, trailWidth: 0.2 },
-            SHIELD: { name: 'Schild', color: 0x4488ff, icon: '🛡', duration: 3 },
-            SLOW_TIME: { name: 'Zeitlupe', color: 0x44ff88, icon: '🕙', duration: 4, timeScale: 0.4 },
-            GHOST: { name: 'Geist', color: 0xff66cc, icon: '👻', duration: 3 },
-            INVERT: { name: 'Invertieren', color: 0xff00ff, icon: '🔀', duration: 4 },
-            ROCKET_WEAK: { name: 'Rakete S', color: 0xffcc66, icon: '🚀', duration: 0, damage: 10, huntOnly: true },
-            ROCKET_MEDIUM: { name: 'Rakete M', color: 0xff8844, icon: '🚀', duration: 0, damage: 20, huntOnly: true },
-            ROCKET_HEAVY: { name: 'Rakete L', color: 0xff3344, icon: '🚀', duration: 0, damage: 40, huntOnly: true },
-            ROCKET_MEGA: { name: 'Rakete XL', color: 0xcc11ff, icon: '🚀', duration: 0, damage: 70, huntOnly: true },
-        }
+        TYPES: createPickupTypeConfigMap(),
     },
 
     // ---- Bots ----
