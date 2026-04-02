@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-02 (Logikfehler korrigiert: V71-Dep hard, V76-Dep V82 ergaenzt, V76-Dep V74 hard, V83 intake uebernommen)
+Stand: 2026-04-02 (Logikfehler korrigiert: V71-Dep hard, V76-Dep V82 ergaenzt, V76-Dep V74 hard, V83/V84/V85 intake uebernommen)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -28,6 +28,8 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
 | V74 | Architektur-Runtime-Entkopplung (Refresh) | active | P1 | Bot-Codex | V58.99,V60.3 | 74.5 | `docs/plaene/aktiv/V74.md` |
 | V83 | Architektur SessionRuntime und Plattform-Capabilities | planned | P1 | frei | V74.99 | 83.1 | `docs/plaene/aktiv/V83.md` |
+| V84 | Headless MatchKernel und einheitliche GameMode-API | planned | P2 | frei | V83.99 | 84.1 | `docs/plaene/aktiv/V84.md` |
+| V85 | Persistence-, Content-Contracts und Schema-Migrationen | planned | P2 | frei | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
@@ -53,6 +55,11 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V83 | V74.99 | hard | nein | SessionRuntime-, Command/Event- und Capability-Folgeschnitt setzt die Runtime-Entkopplung aus V74 als Baseline voraus |
 | V83 | V77 Surface-Policy | soft | nein | Desktop-Vollversion und Browser-Demo sollen spaeter dieselben Capability-Grenzen nutzen; Policy kann parallel vorbereitet, aber vor 83.99 abgeglichen werden |
 | V83 | V67/V68 Abschlussstand | soft | ja | Arcade- und Multiplayer-Lifecycle aus den Altbloecken liefern den Regression-Scope fuer Runtime-Kern, Lobby-Service und Finalize-Contracts |
+| V84 | V83.99 | hard | nein | Headless MatchKernel und GameMode-API bauen auf dem SessionRuntime-, Command/Event- und Capability-Vertrag aus V83 auf |
+| V84 | V72.99 | soft | nein | Powerup-, Portal- und Gate-Vertraege sollten vor der GameMode-Vereinheitlichung stabil sein |
+| V84 | V82.99 | soft | nein | Arcade-Parcours-, XP- und Progressionsregeln liefern relevanten Scope fuer eine einheitliche GameMode-API |
+| V85 | V83.99 | hard | nein | Versionierte Persistence- und Content-Vertraege sollen erst nach stabilisiertem Runtime-, Capability- und Legacy-Sunset-Vertrag aufsetzen |
+| V85 | V84.99 | soft | nein | Headless Kernel und GameMode-API liefern spaeter den saubereren Verbrauchspfad fuer Replay-, Snapshot- und Content-Projektionen |
 | V77 | V74.99 | hard | nein | Die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` darf erst auf der stabilisierten Runtime-/Capability-Basis aus V74 verankert werden |
 | V75 | V74.99 | hard | nein | Recorder-Finalisierung muss denselben Lifecycle-/Dispose-Vertrag wie V74 nutzen; keine parallelen Sonderpfade fuer Stop, Return-to-Menu oder Shutdown |
 | V75 | V77.99 | hard | nein | Export-, Download- und Browser-Fallbacks muessen der Demo-/Vollversions-Politik aus V77 folgen |
@@ -78,6 +85,8 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | Agent-B | V72 | 2026-04-02 | active | `72.2` abgeschlossen; `72.3` Portal-/Gate-Vertraege haerten steht an |
 | Bot-Codex | V74 | 2026-03-31 | active | `74.5` Entity- und Config-Vertraege von Core loesen |
 | - | V83 | - | frei | Nach `V74.99` mit `83.1` Zielbild, Command/Event-Vertrag und SessionRuntime-Schnitt starten |
+| - | V84 | - | frei | Nach `V83.99` mit `84.1` Kernel-Zielbild, Simulationsseams und headless Vertragskatalog starten |
+| - | V85 | - | frei | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
