@@ -135,6 +135,7 @@ export class GameRuntimeCoordinator {
     finishStartup() {
         this.renderBuildInfo();
         if (this.runtime?.ui?.mainMenu) {
+            this.runtime.ui.mainMenu.dataset.shellReady = 'true';
             this.runtime.ui.mainMenu.style.visibility = '';
         }
         this.runtimeBundle?.components?.gameLoop?.start?.();

@@ -4,6 +4,11 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { spawn } from 'node:child_process';
 import { WebSocketServer } from 'ws';
+import {
+    createRendererBuildDefines,
+    createRendererShellBuildConfig,
+    createRendererShellServerConfig
+} from './dev/vite/rendererShellConfig.js';
 import { parseMapJSON, toArenaMapDefinition } from './src/entities/MapSchema.js';
 import { EDITOR_API_ROUTES, EDITOR_DATA_PATHS } from './src/shared/contracts/EditorPathContract.js';
 
@@ -13,23 +18,6 @@ const buildId = Date.now().toString(36).toUpperCase();
 const CHUNK_SIZE_WARNING_LIMIT_KB = 800;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const shouldAutoOpenDevBrowser = !process.env.PW_RUN_TAG && !process.env.CI;
-const isPlaywrightRuntime = !!process.env.PW_RUN_TAG;
-const playwrightWarmupClientFiles = isPlaywrightRuntime
-    ? [
-        './src/core/main.js',
-        './src/core/**/*.js',
-        './src/state/**/*.js',
-        './src/ui/**/*.js',
-        './src/composition/core-ui/**/*.js',
-        './src/hunt/**/*.js',
-        './src/entities/MapSchema.js',
-        './src/entities/Particles.js',
-        './src/entities/mapSchema/**/*.js',
-        './src/shared/contracts/**/*.js',
-        './src/shared/runtime/**/*.js',
-    ]
-    : [];
 
 const GENERATED_EDITOR_MAP_KEY_PREFIX = 'editor_';
 const DEFAULT_EDITOR_DISK_MAP_NAME = 'Editor Map';
@@ -1118,87 +1106,15 @@ function copyObjVehicleAssetsPlugin() {
 
 export default defineConfig({
     plugins: [editorDiskSaveApiPlugin(), latestCheckpointApiPlugin(), trainingDashboardApiPlugin(), copyObjVehicleAssetsPlugin()],
-    server: {
-        open: shouldAutoOpenDevBrowser,
-        warmup: playwrightWarmupClientFiles.length > 0
-            ? { clientFiles: playwrightWarmupClientFiles }
-            : undefined,
-    },
-    build: {
+    server: createRendererShellServerConfig(process.env),
+    build: createRendererShellBuildConfig({
+        rootDir: __dirname,
         chunkSizeWarningLimit: CHUNK_SIZE_WARNING_LIMIT_KB,
-        rollupOptions: {
-            input: {
-                app: path.resolve(__dirname, 'index.html'),
-                editorMap3d: path.resolve(__dirname, 'editor/map-editor-3d.html'),
-            },
-            output: {
-                manualChunks(id) {
-                    if (!id) return undefined;
-                    if (id.includes('node_modules/three/examples/jsm/loaders/OBJLoader.js') ||
-                        id.includes('node_modules/three/examples/jsm/loaders/MTLLoader.js')) {
-                        return 'three-loaders';
-                    }
-                    if (id.includes('node_modules/three')) {
-                        return 'three-core';
-                    }
-                    const normalizedId = id.replace(/\\/g, '/');
-                    if (normalizedId.includes('/entities/ai/training/') ||
-                        normalizedId.includes('/state/training/')) {
-                        return 'training';
-                    }
-                    if (normalizedId.includes('/state/validation/')) {
-                        return 'validation';
-                    }
-                    if (normalizedId.includes('/trainer/') && !normalizedId.includes('node_modules')) {
-                        return 'trainer';
-                    }
-                    if (normalizedId.includes('/state/recorder/')) {
-                        return 'recorder';
-                    }
-                    if (normalizedId.includes('/config/maps/MapPresetCatalog') ||
-                        normalizedId.includes('/config/maps/MapPresetCatalogBaseData') ||
-                        normalizedId.includes('/config/maps/MapPresetCatalogExpertData') ||
-                        normalizedId.includes('/config/maps/MapPresetCatalogLarge') ||
-                        normalizedId.includes('/config/maps/presets/')) {
-                        return 'map-presets';
-                    }
-                    if (normalizedId.includes('/menu/MenuTelemetryDashboard') ||
-                        normalizedId.includes('/menu/MenuTelemetryStore') ||
-                        normalizedId.includes('/state/TelemetryHistoryStore')) {
-                        return 'developer-ui';
-                    }
-                    return undefined;
-                },
-            },
-        },
-    },
-    define: createBuildDefines(),
+    }),
+    define: createRendererBuildDefines({
+        pkgVersion: pkg.version,
+        buildTime,
+        buildId,
+        env: process.env,
+    }),
 });
-
-/**
- * Build-time constants surfaced to the renderer bundle.
- *
- * Desktop/app-mode constants (grouped here so all shell-specific defines
- * live in one place and are not scattered across defineConfig):
- *   __APP_MODE__  — 'web' (join-only, canHost=false) or 'app' (Electron, canHost=true).
- *                   Set via: npm run build:web (--mode web) or npm run build:app (--mode app).
- *                   Vite loads .env.web or .env.app, which sets VITE_APP_MODE.
- *
- * Network / WebRTC constants (relevant for both modes, populated via .env.*):
- *   __SIGNALING_URL__  — WebSocket URL for online signaling (e.g. wss://myserver.com:9090)
- *   __TURN_URL__       — TURN server URL (e.g. turn:myserver.com:3478)
- *   __TURN_USERNAME__  — TURN username  (VITE_TURN_USER preferred, VITE_TURN_USERNAME legacy)
- *   __TURN_CREDENTIAL__ — TURN password
- */
-function createBuildDefines() {
-    return {
-        __APP_VERSION__: JSON.stringify(pkg.version),
-        __BUILD_TIME__: JSON.stringify(buildTime),
-        __BUILD_ID__: JSON.stringify(buildId),
-        __APP_MODE__: JSON.stringify(process.env.VITE_APP_MODE || 'web'),
-        __SIGNALING_URL__: JSON.stringify(process.env.VITE_SIGNALING_URL || ''),
-        __TURN_URL__: JSON.stringify(process.env.VITE_TURN_URL || ''),
-        __TURN_USERNAME__: JSON.stringify(process.env.VITE_TURN_USER || process.env.VITE_TURN_USERNAME || ''),
-        __TURN_CREDENTIAL__: JSON.stringify(process.env.VITE_TURN_CREDENTIAL || ''),
-    };
-}
