@@ -489,7 +489,7 @@ Scope:
 
 ## Block BT80C: Algorithmus-Ausbau, High-Util-Training und Champion-Rollout
 
-Plan-Datei: `docs/plaene/neu/Feature_Bot_Training_Benchmark_Maxleistung_BT80.md`
+Plan-Datei: `docs/plaene/alt/Feature_Bot_Training_Benchmark_Maxleistung_BT80.md`
 
 <!-- LOCK: frei -->
 <!-- DEPENDS-ON: BT80B.99 -->
