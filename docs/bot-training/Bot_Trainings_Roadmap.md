@@ -53,6 +53,14 @@ Aktueller Laufstand:
 - `training-e2e` behandelt Dry-Runs mit `write-latest=false` jetzt als bewussten Skip fuer Validation-/Gate-Evidence statt als false-positive Gate-FAIL.
 - Weiter offen fuer echtes `80.99`: neue Langlauf-/Benchmark-Artefakte, manueller Promotion-Entscheid gegen BT11 und produktionsnahe High-Util-Operatorlaeufe.
 
+## BT80C Operative Nachschaerfung (2026-04-03)
+
+- `bot:validate` ist ab jetzt operative Vorbedingung fuer jede BT80C-Kandidatenaussage; drei reproduzierbare Validation-Paesse auf fixer Matrix gehen vor neuen Algorithmus- oder High-Util-Schritten.
+- Kandidatenlaeufe folgen einer festen Leiter: `candidate-smoke -> candidate-benchmark -> operator-high-util`. Ein gruener Smoke-Lauf ersetzt keinen vollstaendigen Benchmark-Lauf.
+- Benchmark-Vergleiche bleiben nur innerhalb desselben Semantikfensters gueltig. Matchstart, Portale, Gates, Items, Shield, Observation-Schema, Action-Invarianten, Reward-Shaping und Validation-Matrix sind Benchmark-relevante Driftfelder.
+- Promotion bleibt manuell und verlangt drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters mit positivem Median-Delta statt Einzelrun-Gewinn.
+- High-Util-Profile werden erst nach dokumentierten Runbooks fuer Start, Resume, Pause, Stop, Recovery und Rollback als normaler Betrieb betrachtet.
+
 ## Zielkorridor bis Q2-Ende
 
 | Ziel | Baseline | Q2 Ziel | Delta |
@@ -126,9 +134,12 @@ Aktueller Laufstand:
 ## Promotion- und Rollback-Regeln
 
 Promotion (neues Setting wird Standard), wenn alle Punkte wahr sind:
-- 3 aufeinanderfolgende Runs mit `gate.ok=true`
+- 3 vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters mit `gate.ok=true`
+- `bot:validate` ist in allen 3 Laeufen vorhanden und nicht als `validation-disabled` / `artifact-missing` klassifiziert
+- Median-Delta in `averageBotSurvival` ist positiv gegen den eingefrorenen Champion
+- `forcedRoundRate=0` und `timeoutRoundRate=0` fuer die Promotionslane
 - `avgStepsPerEpisode` mindestens +5% gegen aktuelle Produktions-Baseline
-- `averageBotSurvival` nicht schlechter als Baseline (bei vorhandenem Report)
+- Promotion bleibt manuell; ein gruener Gate-Lauf erzeugt hoechstens `manual-promotion-required`
 
 Rollback (auf letztes stabiles Setting), wenn ein Punkt wahr ist:
 - 2 aufeinanderfolgende Runs mit `gate.ok=false`
@@ -138,14 +149,27 @@ Rollback (auf letztes stabiles Setting), wenn ein Punkt wahr ist:
 ## Standard-Zyklus pro Trainingsfenster
 
 1. Learn-Lauf:
-   - `npm run training:12h:survival`
+   - zuerst `candidate-smoke` oder `candidate-benchmark` passend zur aktuellen Hardware-/Validation-Lage
+   - produktionsnahe Langlaeufe erst nach gruener Kandidatenleiter
 2. Kontrolllauf:
    - `npm run training:12h:survival:ops`
 3. Validierung:
+   - `npm run bot:validate -- --bot-validation-report <runDir>/bot-validation-report.json`
    - `npm run training:eval -- --stamp <runStamp> --bot-validation-report <reportPath>`
    - `npm run training:gate -- --stamp <runStamp> --bot-validation-report <reportPath>`
 4. Eintrag in `docs/bot-training/Bot_Trainingsplan.md`:
    - Artefaktpfade
    - KPI-Deltas
    - Promotion/rollback Entscheidung
+
+## Benchmark-Invalidierung
+
+Ein neuer Benchmark-Freeze ist noetig, bevor Champion-/Kandidatenvergleiche wieder als promotionstauglich gelten, wenn sich eines dieser Felder aendert:
+
+- Matchstart-/Roundstart-Verhalten
+- Portal-/Gate-/Item-/Shield-Semantik
+- Observation-Schema oder Tracker-Memory
+- Action-Vocabulary oder Safety-/Intent-/Control-Invarianten
+- Reward-Shaping oder Terminal-Gruende
+- Validation-Matrix oder Pflichtreportstruktur
 
