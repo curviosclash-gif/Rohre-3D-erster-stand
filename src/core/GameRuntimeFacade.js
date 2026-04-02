@@ -1,95 +1,39 @@
 import { createLogger } from '../shared/logging/Logger.js';
-import { CONFIG, CONFIG_BASE } from './Config.js';
-
-const logger = createLogger('GameRuntimeFacade');
-import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
-import { MENU_CONTROLLER_EVENT_CONTRACT_VERSION } from '../shared/contracts/MenuControllerContract.js';
-import {
-    MATCH_LIFECYCLE_CONTRACT_VERSION,
-    SESSION_FINALIZE_TRIGGERS,
-} from '../shared/contracts/MatchLifecycleContract.js';
-import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
-import { RUNTIME_SESSION_TYPES, resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
+import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
-import { applyRuntimeSettingsState } from './runtime/GameRuntimeBundle.js';
-import { resolveMatchStartValidationIssue } from './runtime/MatchStartValidationService.js';
-import { ReplayRecorder } from './replay/ReplayRecorder.js';
-import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
-import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
-import { buildArcadeSectorPlan } from '../entities/directors/ArcadeEncounterCatalog.js';
+import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
+import { MENU_CONTROLLER_EVENT_CONTRACT_VERSION } from '../shared/contracts/MenuControllerContract.js';
+import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
 import {
     guardMenuRuntimeEvent,
     MenuController,
     resolveMenuAccessContext,
     SETTINGS_CHANGE_KEYS,
 } from '../composition/core-ui/CoreUiMenuPorts.js';
-import { MATCH_SETTING_CHANGE_KEY_SET, START_VALIDATION_RELEVANT_KEY_SET } from './runtime/GameRuntimeSettingsKeySets.js';
-import { finalizeMatchFlow } from './runtime/MatchFinalizeFlowService.js';
+import { buildArcadeSectorPlan } from '../entities/directors/ArcadeEncounterCatalog.js';
+import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
+import { CONFIG_BASE } from './Config.js';
+import { ReplayRecorder } from './replay/ReplayRecorder.js';
+import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
+import { applyRuntimeSettingsState } from './runtime/GameRuntimeBundle.js';
+import { GameRuntimeMenuActionHandler } from './runtime/GameRuntimeMenuActionHandler.js';
+import { GameRuntimeSessionHandler } from './runtime/GameRuntimeSessionHandler.js';
+import { GameRuntimeSettingsHandler } from './runtime/GameRuntimeSettingsHandler.js';
+import { createMenuEventHandlerRegistry } from './runtime/menu-handlers/CreateMenuEventHandlerRegistry.js';
 import {
-    initRuntimeSession,
+    createMenuMultiplayerBridge,
+} from './runtime/MenuRuntimeMultiplayerService.js';
+import { ProfileLifecycleController } from './runtime/ProfileLifecycleController.js';
+import { syncRuntimeMultiplayerContext } from './runtime/RuntimeMultiplayerFlowService.js';
+import {
     setupRuntimeClientStateReceiver,
     startRuntimeStateBroadcast,
     stopRuntimeStateBroadcast,
-    teardownRuntimeSession,
-    waitForRuntimePlayersLoaded,
 } from './runtime/RuntimeSessionLifecycleService.js';
-import {
-    applyMenuPresetAction,
-    deleteMenuPresetAction,
-    handleConfigExportCodeAction,
-    handleConfigExportJsonAction,
-    handleConfigImportAction,
-    saveMenuPresetAction,
-} from './runtime/MenuRuntimePresetConfigService.js';
-import {
-    applyMultiplayerMatchSettingsSnapshot,
-    createMenuMultiplayerBridge,
-    createMultiplayerMatchSettingsSnapshot,
-    didHostChangeMatchSettings,
-    handleMultiplayerHostAction,
-    handleMultiplayerJoinAction,
-    handleMultiplayerReadyToggleAction,
-    invalidateMultiplayerReadyIfHostChangedSettings,
-} from './runtime/MenuRuntimeMultiplayerService.js';
-import {
-    requestRuntimeMultiplayerMatchStart,
-    syncRuntimeMultiplayerContext,
-} from './runtime/RuntimeMultiplayerFlowService.js';
-import { orchestrateRuntimeSettingsChanged } from './runtime/RuntimeSettingsChangeOrchestrator.js';
-import {
-    handleDeveloperTrainingAutoStepAction,
-    handleDeveloperTrainingRunBatchAction,
-    handleDeveloperTrainingRunEvalAction,
-    handleDeveloperTrainingRunGateAction,
-    handleDeveloperTrainingResetAction,
-    handleDeveloperTrainingStepAction,
-} from './runtime/MenuRuntimeDeveloperTrainingService.js';
-import {
-    handleDeveloperModeToggleAction,
-    handleDeveloperThemeChangeAction,
-    handleDeveloperVisibilityChangeAction,
-    handleDeveloperFixedPresetLockToggleAction,
-    handleDeveloperActorChangeAction,
-    handleDeveloperReleasePreviewToggleAction,
-    handleDeveloperTextOverrideSetAction,
-    handleDeveloperTextOverrideClearAction,
-} from './runtime/MenuRuntimeDeveloperModeService.js';
-import {
-    SESSION_SWITCH_CHANGED_KEYS,
-    handleSessionTypeChangeAction,
-    handleModePathChangeAction,
-    handleQuickStartLastStartAction,
-    handleQuickStartEventPlaylistStartAction,
-    handleQuickStartRandomStartAction,
-    handleLevel3ResetAction,
-    handleLevel4OpenAction,
-    handleLevel4CloseAction,
-    handleLevel4ResetAction,
-} from './runtime/MenuRuntimeSessionService.js';
-import { createMenuEventHandlerRegistry } from './runtime/menu-handlers/CreateMenuEventHandlerRegistry.js';
-import { ProfileLifecycleController } from './runtime/ProfileLifecycleController.js';
+
+const logger = createLogger('GameRuntimeFacade');
 
 export class GameRuntimeFacade {
     constructor(deps = {}) {
@@ -104,6 +48,9 @@ export class GameRuntimeFacade {
         this.menuMultiplayerBridge = null;
         this._matchPrewarmTimer = null;
         this.profileLifecycleController = new ProfileLifecycleController({ game: this.game });
+        this.menuActionHandler = new GameRuntimeMenuActionHandler({ facade: this });
+        this.settingsHandler = new GameRuntimeSettingsHandler({ facade: this });
+        this.sessionHandler = new GameRuntimeSessionHandler({ facade: this, logger });
         this._menuEventHandlers = createMenuEventHandlerRegistry(this);
 
         /** @type {import('./session/SessionAdapter.js').SessionAdapter|null} */
@@ -293,7 +240,7 @@ export class GameRuntimeFacade {
     }
 
     _captureMultiplayerMatchSettings() {
-        return createMultiplayerMatchSettingsSnapshot(this.game?.settings);
+        return this.settingsHandler.captureMultiplayerMatchSettings();
     }
 
     _syncMultiplayerUiState() {
@@ -313,16 +260,7 @@ export class GameRuntimeFacade {
     }
 
     _applyAuthoritativeMultiplayerMatchSettings(snapshot) {
-        const game = this.game;
-        if (!game?.settings) return;
-        applyMultiplayerMatchSettingsSnapshot(game.settings, snapshot);
-        game.settingsManager?.applyMenuCompatibilityRules?.(
-            game.settings,
-            { accessContext: this._resolveMenuAccessContext() }
-        );
-        this.markSettingsDirty(false);
-        game.uiManager?.syncAll?.();
-        game.uiManager?.updateContext?.();
+        this.settingsHandler.applyAuthoritativeMultiplayerMatchSettings(snapshot);
     }
 
     _handleMultiplayerMatchStart(command = null) {
@@ -395,332 +333,183 @@ export class GameRuntimeFacade {
     }
 
     handleMenuPanelChanged(previousPanelId, nextPanelId, transitionMetadata = null) {
-        const fromPanelId = String(previousPanelId || '').trim();
-        const toPanelId = String(nextPanelId || '').trim();
-        const trigger = String(transitionMetadata?.trigger || '').trim();
-        if (toPanelId) return;
-        if (!fromPanelId || fromPanelId === 'submenu-custom') {
-            if (trigger === 'back_button' || trigger === 'escape') {
-                this._recordMenuTelemetry('backtrack', { fromPanelId, trigger });
-            }
-            return;
-        }
-
-        const isBacktrack = trigger === 'back_button' || trigger === 'escape';
-        if (isBacktrack) {
-            this._recordMenuTelemetry('backtrack', { fromPanelId, trigger });
-        }
-        if (fromPanelId === 'submenu-game') {
-            this._recordMenuTelemetry('abort', { fromPanelId, trigger });
-        }
+        return this.menuActionHandler.handleMenuPanelChanged(previousPanelId, nextPanelId, transitionMetadata);
     }
 
     handleSessionTypeChange(event) {
-        handleSessionTypeChangeAction(this._sessionCtx(event));
+        return this.menuActionHandler.handleSessionTypeChange(event);
     }
 
     handleModePathChange(event) {
-        handleModePathChangeAction(this._sessionCtx(event));
+        return this.menuActionHandler.handleModePathChange(event);
     }
 
     handleQuickStartLastStart() {
-        handleQuickStartLastStartAction(this._sessionCtx(null));
+        return this.menuActionHandler.handleQuickStartLastStart();
     }
 
     handleQuickStartEventPlaylistStart() {
-        handleQuickStartEventPlaylistStartAction(this._sessionCtx(null));
+        return this.menuActionHandler.handleQuickStartEventPlaylistStart();
     }
 
     handleQuickStartRandomStart() {
-        handleQuickStartRandomStartAction(this._sessionCtx(null));
+        return this.menuActionHandler.handleQuickStartRandomStart();
     }
 
     handleLevel3Reset() {
-        handleLevel3ResetAction(this._sessionCtx(null));
+        return this.menuActionHandler.handleLevel3Reset();
     }
 
     handleLevel4Open(event) {
-        handleLevel4OpenAction(this._sessionCtx(event));
+        return this.menuActionHandler.handleLevel4Open(event);
     }
 
     handleLevel4Close() {
-        handleLevel4CloseAction(this._sessionCtx(null));
+        return this.menuActionHandler.handleLevel4Close();
     }
 
     handleLevel4Reset() {
-        handleLevel4ResetAction(this._sessionCtx(null));
-    }
-
-    _sessionCtx(event) {
-        return {
-            game: this.game,
-            event,
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            recordMenuTelemetry: (type, payload) => this._recordMenuTelemetry(type, payload),
-            startMatch: () => this.startMatch(),
-            markSettingsDirty: (dirty) => this.markSettingsDirty(dirty),
-        };
+        return this.menuActionHandler.handleLevel4Reset();
     }
 
     handleConfigExportCode() {
-        handleConfigExportCodeAction(this.game);
+        return this.menuActionHandler.handleConfigExportCode();
     }
 
     handleConfigExportJson() {
-        handleConfigExportJsonAction(this.game);
+        return this.menuActionHandler.handleConfigExportJson();
     }
 
     handleConfigImport(event) {
-        handleConfigImportAction({
-            game: this.game,
-            inputValue: String(event?.inputValue || this.game?.ui?.configShareInput?.value || ''),
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            sessionSwitchChangedKeys: SESSION_SWITCH_CHANGED_KEYS,
-        });
+        return this.menuActionHandler.handleConfigImport(event);
     }
 
     applyMenuPreset(event) {
-        const presetId = String(event?.presetId || '').trim();
-        applyMenuPresetAction({
-            game: this.game,
-            presetId,
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
-        });
+        return this.menuActionHandler.applyMenuPreset(event);
     }
 
     saveMenuPreset(event, kind) {
-        saveMenuPresetAction({
-            game: this.game,
-            kind,
-            presetName: String(event?.name || '').trim(),
-            sourcePresetId: String(event?.sourcePresetId || '').trim(),
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
-        });
+        return this.menuActionHandler.saveMenuPreset(event, kind);
     }
 
     deleteMenuPreset(event) {
-        deleteMenuPresetAction({
-            game: this.game,
-            presetId: String(event?.presetId || '').trim(),
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
-        });
+        return this.menuActionHandler.deleteMenuPreset(event);
     }
 
     _didHostChangeMatchSettings(changedKeys) {
-        return didHostChangeMatchSettings(changedKeys, MATCH_SETTING_CHANGE_KEY_SET);
+        return this.settingsHandler.didHostChangeMatchSettings(changedKeys);
     }
 
     _invalidateMultiplayerReadyIfHostChangedSettings(changedKeys) {
-        invalidateMultiplayerReadyIfHostChangedSettings({
-            changedKeys,
-            matchSettingChangeKeySet: MATCH_SETTING_CHANGE_KEY_SET,
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            menuMultiplayerBridge: this.menuMultiplayerBridge,
-            game: this.game,
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            settingsChangeKeys: SETTINGS_CHANGE_KEYS,
-        });
+        return this.settingsHandler.invalidateMultiplayerReadyIfHostChangedSettings(changedKeys);
     }
 
     handleMultiplayerHost(event) {
-        handleMultiplayerHostAction({
-            game: this.game,
-            event,
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            menuMultiplayerBridge: this.menuMultiplayerBridge,
-            syncUiState: () => this._syncMultiplayerUiState(),
-            captureSettingsSnapshot: () => this._captureMultiplayerMatchSettings(),
-        });
+        return this.menuActionHandler.handleMultiplayerHost(event);
     }
 
     handleMultiplayerJoin(event) {
-        handleMultiplayerJoinAction({
-            game: this.game,
-            event,
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            menuMultiplayerBridge: this.menuMultiplayerBridge,
-            syncUiState: () => this._syncMultiplayerUiState(),
-        });
+        return this.menuActionHandler.handleMultiplayerJoin(event);
     }
 
     handleMultiplayerReadyToggle(event) {
-        handleMultiplayerReadyToggleAction({
-            game: this.game,
-            event,
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            menuMultiplayerBridge: this.menuMultiplayerBridge,
-            syncUiState: () => this._syncMultiplayerUiState(),
-        });
+        return this.menuActionHandler.handleMultiplayerReadyToggle(event);
     }
 
     handleDeveloperModeToggle(event) {
-        handleDeveloperModeToggleAction(this._devModeCtx(event));
+        return this.menuActionHandler.handleDeveloperModeToggle(event);
     }
 
     handleDeveloperThemeChange(event) {
-        handleDeveloperThemeChangeAction(this._devModeCtx(event));
+        return this.menuActionHandler.handleDeveloperThemeChange(event);
     }
 
     handleDeveloperVisibilityChange(event) {
-        handleDeveloperVisibilityChangeAction(this._devModeCtx(event));
+        return this.menuActionHandler.handleDeveloperVisibilityChange(event);
     }
 
     handleDeveloperFixedPresetLockToggle(event) {
-        handleDeveloperFixedPresetLockToggleAction(this._devModeCtx(event));
+        return this.menuActionHandler.handleDeveloperFixedPresetLockToggle(event);
     }
 
     handleDeveloperActorChange(event) {
-        handleDeveloperActorChangeAction(this._devModeCtx(event));
+        return this.menuActionHandler.handleDeveloperActorChange(event);
     }
 
     handleDeveloperReleasePreviewToggle(event) {
-        handleDeveloperReleasePreviewToggleAction(this._devModeCtx(event));
+        return this.menuActionHandler.handleDeveloperReleasePreviewToggle(event);
     }
 
     handleDeveloperTextOverrideSet(event) {
-        handleDeveloperTextOverrideSetAction(this._devModeCtx(event));
+        return this.menuActionHandler.handleDeveloperTextOverrideSet(event);
     }
 
     handleDeveloperTextOverrideClear(event) {
-        handleDeveloperTextOverrideClearAction(this._devModeCtx(event));
-    }
-
-    _devModeCtx(event) {
-        return {
-            game: this.game,
-            event,
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            onSettingsChanged: (payload) => this.onSettingsChanged(payload),
-            SETTINGS_CHANGE_KEYS,
-        };
+        return this.menuActionHandler.handleDeveloperTextOverrideClear(event);
     }
 
     handleDeveloperTrainingReset(event) {
-        handleDeveloperTrainingResetAction({
-            game: this.game,
-            event,
-        });
+        return this.menuActionHandler.handleDeveloperTrainingReset(event);
     }
 
     handleDeveloperTrainingStep(event) {
-        handleDeveloperTrainingStepAction({
-            game: this.game,
-            event,
-        });
+        return this.menuActionHandler.handleDeveloperTrainingStep(event);
     }
 
     handleDeveloperTrainingAutoStep(event) {
-        handleDeveloperTrainingAutoStepAction({
-            game: this.game,
-            event,
-        });
+        return this.menuActionHandler.handleDeveloperTrainingAutoStep(event);
     }
 
     handleDeveloperTrainingRunBatch(event) {
-        handleDeveloperTrainingRunBatchAction({
-            game: this.game,
-            event,
-        });
+        return this.menuActionHandler.handleDeveloperTrainingRunBatch(event);
     }
 
     handleDeveloperTrainingRunEval(event) {
-        handleDeveloperTrainingRunEvalAction({
-            game: this.game,
-            event,
-        });
+        return this.menuActionHandler.handleDeveloperTrainingRunEval(event);
     }
 
     handleDeveloperTrainingRunGate(event) {
-        handleDeveloperTrainingRunGateAction({
-            game: this.game,
-            event,
-        });
+        return this.menuActionHandler.handleDeveloperTrainingRunGate(event);
     }
 
     startKeyCapture(event) {
-        this.game?.keybindEditorController?.startKeyCapture?.(event?.player, event?.action);
+        return this.menuActionHandler.startKeyCapture(event);
     }
 
     resetKeys() {
-        const game = this.game;
-        game.settings.controls = game.settingsManager.cloneDefaultControls();
-        this.onSettingsChanged();
-        game._showStatusToast('Standard-Tasten wiederhergestellt');
+        return this.menuActionHandler.resetKeys();
     }
 
     saveKeys() {
-        this.game?._saveSettings?.();
-        this.game?._showStatusToast?.('Einstellungen gespeichert');
+        return this.menuActionHandler.saveKeys();
     }
 
     showStatusToast(event) {
-        this.game?._showStatusToast?.(event?.message, event?.duration, event?.tone);
+        return this.menuActionHandler.showStatusToast(event);
     }
 
     _resolveStartValidationIssue() {
-        return resolveMatchStartValidationIssue({
-            settings: this.game?.settings,
-            ui: this.game?.ui,
-            multiplayerSessionState: this.menuMultiplayerBridge?.getSessionState?.(),
-            maps: CONFIG?.MAPS,
-            huntModeType: GAME_MODE_TYPES.HUNT,
-        });
+        return this.settingsHandler.resolveStartValidationIssue();
     }
 
     onSettingsChanged(event = null) {
-        const changedKeys = orchestrateRuntimeSettingsChanged({
-            game: this.game,
-            event,
-            resolveMenuAccessContext: () => this._resolveMenuAccessContext(),
-            startValidationRelevantKeySet: START_VALIDATION_RELEVANT_KEY_SET,
-            invalidateMultiplayerReadyIfHostChangedSettings: (changedKeys) => this._invalidateMultiplayerReadyIfHostChangedSettings(changedKeys),
-            markSettingsDirty: (isDirty) => this.markSettingsDirty(isDirty),
-            updateSaveButtonState: () => this.updateSaveButtonState(),
-            scheduleMatchPrewarm: () => this.scheduleMatchPrewarm(),
-        });
-        this.applySettingsToRuntime({ schedulePrewarm: false });
-        this._syncMultiplayerRuntimeContext(changedKeys);
-        return changedKeys;
+        return this.settingsHandler.onSettingsChanged(event);
     }
 
     markSettingsDirty(isDirty) {
-        const game = this.game;
-        game.settingsDirty = !!isDirty;
-        this.updateSaveButtonState();
+        return this.settingsHandler.markSettingsDirty(isDirty);
     }
 
     updateSaveButtonState() {
-        const game = this.game;
-        if (!game.ui?.saveKeysButton) return;
-        game.ui.saveKeysButton.classList.toggle('unsaved', game.settingsDirty);
-        game.ui.saveKeysButton.textContent = game.settingsDirty
-            ? 'Einstellungen explizit speichern *'
-            : 'Einstellungen explizit speichern';
-        game.uiManager?.updateContext();
+        return this.settingsHandler.updateSaveButtonState();
     }
 
-    // ---- SessionAdapter lifecycle ----
-
-    /**
-     * Creates and connects the appropriate SessionAdapter based on runtimeConfig.sessionType.
-     * Called at the beginning of a match.
-     */
     async _initSession() {
-        return initRuntimeSession(this);
+        return this.sessionHandler.initializeSession();
     }
 
     initializeSession() { return this._initSession(); }
 
-    /**
-     * Host: broadcasts state snapshots at 10/s to all connected clients.
-     */
     _startStateBroadcast() {
         startRuntimeStateBroadcast(this);
     }
@@ -729,100 +518,47 @@ export class GameRuntimeFacade {
         stopRuntimeStateBroadcast(this);
     }
 
-    /**
-     * Client: listens for authoritative state from the host and feeds it to StateReconciler.
-     */
     _setupClientStateReceiver() {
         setupRuntimeClientStateReceiver(this);
     }
 
-    /**
-     * Arena-Load-Gate: waits for all peers to signal "loaded" before tick 0.
-     * For LocalSessionAdapter this resolves immediately.
-     */
     async _waitForAllPlayersLoaded() {
-        return waitForRuntimePlayersLoaded(this);
+        return this.sessionHandler.waitForAllPlayersLoaded();
     }
 
     waitForAllPlayersLoaded() { return this._waitForAllPlayersLoaded(); }
 
     _teardownSession() {
-        teardownRuntimeSession(this);
+        return this.sessionHandler.teardownRuntimeSession();
     }
 
     teardownRuntimeSession() { this._teardownSession(); }
 
-    /** Returns true if the current session is a network (LAN/Online) session. */
     isNetworkSession() {
-        return !!this.game?.runtimeConfig?.session?.networkEnabled;
+        return this.sessionHandler.isNetworkSession();
     }
 
-    /** Returns true if the local client is the host of the session. */
     isHost() {
-        return this.session?.isHost ?? true;
+        return this.sessionHandler.isHost();
     }
 
     startMatch() {
-        this._clearMatchPrewarmTimer();
-        const sessionContract = resolveRuntimeSessionContract(this.game?.settings?.localSettings);
-        const telemetryPayload = { sessionType: sessionContract.sessionType, multiplayerTransport: sessionContract.multiplayerTransport, modePath: this.game?.settings?.localSettings?.modePath || 'normal' };
-        this._recordMenuTelemetry('start_attempt', telemetryPayload);
-        const validationIssue = this._resolveStartValidationIssue();
-        if (validationIssue) {
-            this.game?.uiManager?.showStartValidationError?.(validationIssue, { focusField: true });
-            this._recordMenuTelemetry('abort', {
-                ...telemetryPayload,
-                reason: 'start_validation_failed',
-                fieldKey: validationIssue.fieldKey,
-            });
-            this.game?._showStatusToast?.(validationIssue.message, 1700, 'error');
-            return false;
-        }
-        this.game?.uiManager?.clearStartValidationError?.();
-        if (sessionContract.sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER) {
-            return requestRuntimeMultiplayerMatchStart({
-                game: this.game,
-                menuMultiplayerBridge: this.menuMultiplayerBridge,
-                captureSettingsSnapshot: () => this._captureMultiplayerMatchSettings(),
-                recordMenuTelemetry: (eventType, payload) => this._recordMenuTelemetry(eventType, payload),
-            });
-        }
-        const startResult = this.ports?.matchUiPort?.startMatch?.();
-        return startResult !== false;
+        return this.sessionHandler.startMatch();
     }
 
-    restartRound() { this.ports?.matchUiPort?.startRound?.(); }
+    restartRound() {
+        return this.sessionHandler.restartRound();
+    }
 
     returnToMenu(options = {}) {
-        return finalizeMatchFlow(this, {
-            ...options,
-            reason: options?.reason || SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU,
-            notifyMenuOpened: true,
-            applyReturnToMenuUi: true,
-            schedulePrewarm: true,
-        }, SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU);
+        return this.sessionHandler.returnToMenu(options);
     }
 
     syncP2HudVisibility() {
-        const game = this.game;
-        game.ui?.p2Hud?.classList?.toggle('hidden', game.numHumans !== 2);
+        return this.sessionHandler.syncP2HudVisibility();
     }
 
     dispose() {
-        this._clearMatchPrewarmTimer();
-        finalizeMatchFlow(this, {
-            reason: SESSION_FINALIZE_TRIGGERS.GAME_DISPOSE,
-            notifyMenuOpened: false,
-            applyReturnToMenuUi: false,
-            schedulePrewarm: false,
-        }, SESSION_FINALIZE_TRIGGERS.GAME_DISPOSE).catch((error) => {
-            logger.error('dispose finalize failed:', error);
-        });
-        this.game?.menuController?.dispose?.();
-        this.game?.menuMultiplayerBridge?.dispose?.();
-        if (this.game) {
-            this.game.menuController = null;
-            this.game.menuMultiplayerBridge = null;
-        }
+        return this.sessionHandler.dispose();
     }
 }

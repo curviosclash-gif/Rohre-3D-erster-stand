@@ -1,69 +1,63 @@
-# Fehlerbericht: V74 Runtime-Coordinator Verifikation durch Fremdaenderungen blockiert
+# Fehlerbericht: V74 Verifikation durch fremde Planinkonsistenzen blockiert
 
 ## Aufgabe/Kontext
 
-- Task: `74.4.2` aus `V74 Architektur-Runtime-Entkopplung (Refresh)` umsetzen
-- Ziel: `main.js` und `GameRuntimePorts` ausduennen und Lifecycle-/Startup-Flows in einen dedizierten Coordinator schneiden
+- Task: `74.4.3` aus `V74 Architektur-Runtime-Entkopplung (Refresh)` umsetzen
+- Ziel: `GameRuntimeFacade` entlang kleinerer Handler fuer Menu-Aktionen, Settings/Multiplayer-State und Session-/Finalize-Flows entlasten
 - Datum: 2026-04-02
 
 ## Fehlerbild
 
-- Beobachtung: Die eigentliche V74-Refaktorierung laesst sich lokal verifizieren, aber die repoweiten Pflicht-Gates schlagen an bereits vorhandenen fachfremden Aenderungen fehl
-- Erwartetes Verhalten: `npm run plan:check`, `npm run docs:check` und `npm run build` laufen nach der V74-Aenderung erfolgreich durch
+- Beobachtung: Die eigentliche V74-Refaktorierung ist lokal verifiziert, aber die repoweiten Plan-/Doku-Gates bleiben an bereits vorhandenen V81/V82-Planinkonsistenzen haengen
+- Erwartetes Verhalten: `npm run plan:check` und `npm run docs:check` laufen nach Abschluss von `74.4.3` erfolgreich durch
 - Tatsaechliches Verhalten:
-  - `npm run plan:check` failt an einem bereits vorhandenen `V81`-Planstand
+  - `npm run plan:check` failt an bereits vorhandenen `V81`/`V82`-Eintraegen ausserhalb des V74-Scope
   - `npm run docs:check` failt nur deshalb, weil es intern erneut `npm run plan:check` ausfuehrt
-  - `npm run build` failt im `prebuild`-Schritt an einer fremd geaenderten Training-Datei ausserhalb des V74-Scopes
 
 ## Reproduktion
 
-1. V74-Refaktorierung fuer `74.4.2` in `src/core/**` und `src/shared/runtime/**` umsetzen
+1. V74-Refaktorierung fuer `74.4.3` in `src/core/**`, `src/core/runtime/**` und `docs/plaene/aktiv/V74.md` umsetzen
 2. `npm run plan:check` ausfuehren
 3. `npm run docs:check` ausfuehren
-4. `npm run build` ausfuehren
 
 ## Betroffene Dateien/Komponenten
 
 - `docs/Umsetzungsplan.md`
+- `docs/plaene/neu/Feature_Arcade_Parcours_Progression_V82.md`
 - `docs/plaene/neu/Feature_Developer_Tuning_Console_V81.md`
-- `src/state/training/TrainingBenchmarkContract.js`
 - `npm run plan:check`
 - `npm run docs:check`
-- `npm run build`
 
 ## Bereits getestete Ansaetze
 
-- Ansatz: `npm run check:architecture:boundaries`
+- Ansatz: `npm exec eslint -- src/core/GameRuntimeFacade.js src/core/runtime/GameRuntimeMenuActionHandler.js src/core/runtime/GameRuntimeSettingsHandler.js src/core/runtime/GameRuntimeSessionHandler.js`
 - Ergebnis: PASS
-- Ansatz: `npm run check:architecture:metrics`
+- Ansatz: `npm run docs:sync`
 - Ergebnis: PASS
-- Ansatz: `npm exec eslint -- src/core/main.js src/shared/runtime/GameRuntimePorts.js src/core/runtime/GameRuntimeCoordinator.js`
-- Ergebnis: PASS
-- Ansatz: `npm exec vite build`
+- Ansatz: `npm run build`
 - Ergebnis: PASS
 - Ansatz: `npm run plan:check`
-- Ergebnis: FAIL an vorhandenem `V81`-Plan-/Dateinamenkonflikt
+- Ergebnis: FAIL an vorhandenem `V81`/`V82`-Plan-/Dateinamenkonflikt
 - Ansatz: `npm run docs:check`
 - Ergebnis: FAIL nur wegen nachgelagertem `plan:check`
-- Ansatz: `npm run build`
-- Ergebnis: FAIL im `prebuild` an `src/state/training/TrainingBenchmarkContract.js` (`max-lines`)
 
 ## Evidence
 
 - Logs:
-  - `docs/Umsetzungsplan.md:34 plan_file fuer V81 muss unter docs/plaene/aktiv/ liegen.`
+  - `docs/Umsetzungsplan.md:34 plan_file fuer V82 muss unter docs/plaene/aktiv/ liegen.`
+  - `docs/plaene/neu/Feature_Arcade_Parcours_Progression_V82.md:1 Dateiname "Feature_Arcade_Parcours_Progression_V82.md" passt nicht zur Block-ID "V82".`
+  - `docs/Umsetzungsplan.md:35 plan_file fuer V81 muss unter docs/plaene/aktiv/ liegen.`
   - `docs/plaene/neu/Feature_Developer_Tuning_Console_V81.md:1 Dateiname "Feature_Developer_Tuning_Console_V81.md" passt nicht zur Block-ID "V81".`
-  - `src/state/training/TrainingBenchmarkContract.js 528:1 error File has too many lines (535). Maximum allowed is 500`
 - Screenshots/Artefakte:
-  - kein separates Artefakt; Vite-Kompilation lief lokal mit `npm exec vite build` erfolgreich durch
+  - kein separates Artefakt; die lokalen Runtime-/Build-Gates liefen erfolgreich durch
 - Relevante Commits:
   - wird im V74-Task-Commit referenziert
 
 ## Aktueller Stand
 
-- Status: V74-Implementierung fuer `74.4.2` ist umgesetzt; repoweite Plan-/Build-Gates bleiben fachfremd blockiert
-- Root-Cause-Stand: Die Blocker stammen aus bereits vorhandenen Aenderungen in Plan-/Training-Dateien ausserhalb des V74-Scope, nicht aus dem neuen Runtime-Coordinator-Schnitt
+- Status: V74-Implementierung fuer `74.4.3` ist umgesetzt; `74.4` ist im Blockfile abgeschlossen; repoweite Plan-/Doku-Gates bleiben fachfremd blockiert
+- Root-Cause-Stand: Die Blocker stammen aus bereits vorhandenen Plan-/Dateinameninkonsistenzen in `V81`/`V82`, nicht aus dem Runtime-Facade-Schnitt
 
 ## Naechster Schritt
 
-- `V81`-Planinkonsistenz und den Training-`max-lines`-Verstoss separat bereinigen; danach `npm run plan:check`, `npm run docs:check` und `npm run build` erneut ausfuehren
+- `V81`- und `V82`-Planinkonsistenzen bereinigen; danach `npm run plan:check` und `npm run docs:check` erneut ausfuehren
