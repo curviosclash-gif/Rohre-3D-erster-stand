@@ -1,7 +1,7 @@
 # Feature: Headless MatchKernel und einheitliche GameMode-API nach V83 (V84)
 
 Stand: 2026-04-02
-Status: Entwurf
+Status: Archivierter Intake-Entwurf
 Owner: Bot-Codex
 Risiko: hoch
 plan_file: `docs/plaene/aktiv/V84.md`

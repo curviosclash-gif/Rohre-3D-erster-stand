@@ -1,7 +1,7 @@
 # Feature: Persistence-, Content-Contracts und Schema-Migrationen nach V83 (V85)
 
 Stand: 2026-04-02
-Status: Entwurf
+Status: Archivierter Intake-Entwurf
 Owner: Bot-Codex
 Risiko: hoch
 plan_file: `docs/plaene/aktiv/V85.md`
