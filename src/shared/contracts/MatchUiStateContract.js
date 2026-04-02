@@ -1,5 +1,5 @@
 // ============================================
-// MatchUiStateOps.js - pure match UI state helpers
+// MatchUiStateContract.js - shared match UI state derivations
 // ============================================
 
 export function deriveMatchStartUiState(inputs = {}) {

@@ -4,7 +4,7 @@ import {
     deriveResumeUiState,
     deriveReturnToMenuUiState,
     deriveRoundStartUiState,
-} from '../ui/MatchUiStateOps.js';
+} from '../shared/contracts/MatchUiStateContract.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 
 function createHuntStateReset() {

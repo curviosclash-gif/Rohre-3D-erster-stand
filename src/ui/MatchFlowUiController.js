@@ -12,7 +12,7 @@ import {
 import { PauseOverlayController } from './PauseOverlayController.js';
 import { clearMessageStats, renderMessageStats } from './dom/MessageStatsDom.js';
 import { resolveArenaMapSelection } from '../entities/CustomMapLoader.js';
-import { deriveMatchLoadingUiState } from './MatchUiStateOps.js';
+import { deriveMatchLoadingUiState } from '../shared/contracts/MatchUiStateContract.js';
 import { createPreferredMatchInputSource } from './MatchInputSourceResolver.js';
 import {
     deriveMatchStartTransition,

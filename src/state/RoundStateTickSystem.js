@@ -2,7 +2,7 @@
 // RoundStateTickSystem.js - round/match-end tick orchestration
 // ============================================
 
-import { deriveRoundEndCountdownUiState } from '../ui/MatchUiStateOps.js';
+import { deriveRoundEndCountdownUiState } from '../shared/contracts/MatchUiStateContract.js';
 
 export class RoundStateTickSystem {
     constructor(deps = {}) {

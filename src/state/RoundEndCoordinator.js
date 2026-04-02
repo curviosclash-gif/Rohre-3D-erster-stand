@@ -2,7 +2,7 @@
 // RoundEndCoordinator.js - round-end side effects + controller plan orchestration
 // ============================================
 
-import { deriveRoundEndOverlayUiState } from '../ui/MatchUiStateOps.js';
+import { deriveRoundEndOverlayUiState } from '../shared/contracts/MatchUiStateContract.js';
 import { buildPostMatchStatsSummary } from './PostMatchStatsAggregator.js';
 
 function getSafeLogger(logger) {
