@@ -1172,28 +1172,33 @@ export default defineConfig({
             },
         },
     },
-    define: {
+    define: createBuildDefines(),
+});
+
+/**
+ * Build-time constants surfaced to the renderer bundle.
+ *
+ * Desktop/app-mode constants (grouped here so all shell-specific defines
+ * live in one place and are not scattered across defineConfig):
+ *   __APP_MODE__  — 'web' (join-only, canHost=false) or 'app' (Electron, canHost=true).
+ *                   Set via: npm run build:web (--mode web) or npm run build:app (--mode app).
+ *                   Vite loads .env.web or .env.app, which sets VITE_APP_MODE.
+ *
+ * Network / WebRTC constants (relevant for both modes, populated via .env.*):
+ *   __SIGNALING_URL__  — WebSocket URL for online signaling (e.g. wss://myserver.com:9090)
+ *   __TURN_URL__       — TURN server URL (e.g. turn:myserver.com:3478)
+ *   __TURN_USERNAME__  — TURN username  (VITE_TURN_USER preferred, VITE_TURN_USERNAME legacy)
+ *   __TURN_CREDENTIAL__ — TURN password
+ */
+function createBuildDefines() {
+    return {
         __APP_VERSION__: JSON.stringify(pkg.version),
         __BUILD_TIME__: JSON.stringify(buildTime),
         __BUILD_ID__: JSON.stringify(buildId),
-        /**
-         * APP_MODE: 'web' (join-only, canHost=false) or 'app' (Electron, canHost=true) (C.3).
-         * Set via: npm run build:web (--mode web) or npm run build:app (--mode app).
-         * Vite loads .env.web or .env.app respectively, setting VITE_APP_MODE.
-         */
         __APP_MODE__: JSON.stringify(process.env.VITE_APP_MODE || 'web'),
-
-        /**
-         * Network / WebRTC configuration.
-         * VITE_SIGNALING_URL: WebSocket URL for online signaling (e.g. wss://myserver.com:9090)
-         * VITE_TURN_URL:        TURN server URL   (e.g. turn:myserver.com:3478)
-         * VITE_TURN_USER:       TURN username (preferred)
-         * VITE_TURN_USERNAME:   TURN username (legacy alias)
-         * VITE_TURN_CREDENTIAL: TURN credential/password
-         */
         __SIGNALING_URL__: JSON.stringify(process.env.VITE_SIGNALING_URL || ''),
         __TURN_URL__: JSON.stringify(process.env.VITE_TURN_URL || ''),
         __TURN_USERNAME__: JSON.stringify(process.env.VITE_TURN_USER || process.env.VITE_TURN_USERNAME || ''),
         __TURN_CREDENTIAL__: JSON.stringify(process.env.VITE_TURN_CREDENTIAL || ''),
-    },
-});
+    };
+}

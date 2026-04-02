@@ -173,6 +173,12 @@ body {
     display: none !important;
 }
 
+/* Capability-gated elements: apply .cap-unavailable via JS when a required
+   desktop capability (data-requires-cap="host"|"save"|"discovery") is absent. */
+[data-requires-cap].cap-unavailable {
+    display: none !important;
+}
+
 /* ============================================
    MAIN MENU
    ============================================ */
