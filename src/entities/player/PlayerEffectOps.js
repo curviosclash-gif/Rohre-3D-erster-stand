@@ -1,10 +1,11 @@
 import { CONFIG } from '../../core/Config.js';
 import { grantShield } from '../../hunt/HealthSystem.js';
 import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
-import { isPickupTypeAllowedForMode } from '../PickupRegistry.js';
+import { isPickupTypeAllowedForMode, getPickupDefinition } from '../PickupRegistry.js';
 
 const SPEED_EFFECT_TYPES = Object.freeze(['SPEED_UP', 'SLOW_DOWN']);
 const TRAIL_EFFECT_TYPES = Object.freeze(['THICK', 'THIN']);
+const GLOBAL_TIME_EFFECT_TYPES = Object.freeze(['SLOW_TIME']);
 
 function resolveModeType(player) {
     const config = resolveEntityRuntimeConfig(player);
@@ -76,6 +77,11 @@ export function recomputePlayerEffectState(player) {
 
     player.isGhost = hasAllowedEffect(player, 'GHOST', modeType);
     player.invertControls = hasAllowedEffect(player, 'INVERT', modeType);
+
+    const slowTimeEffect = findLatestAllowedEffect(player, GLOBAL_TIME_EFFECT_TYPES, modeType);
+    const slowTimeDef = slowTimeEffect ? getPickupDefinition(slowTimeEffect.type) : null;
+    player.hasSlowTime = !!slowTimeEffect;
+    player.slowTimeScale = Number.isFinite(slowTimeDef?.timeScale) ? slowTimeDef.timeScale : 1;
 
     const shieldEffectActive = hasAllowedEffect(player, 'SHIELD', modeType);
     if (!shieldEffectActive) {

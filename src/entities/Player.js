@@ -78,6 +78,8 @@ export class Player {
         this.maxShieldHp = 1;
         this.shieldHitFeedback = 0;
         this.isGhost = false;
+        this.hasSlowTime = false;
+        this.slowTimeScale = 1;
         this.invertControls = false;
         this.maxHp = 1;
         this.hp = 1;
@@ -167,6 +169,8 @@ export class Player {
         this.activeEffects = [];
         this.hasShield = false;
         this.isGhost = false;
+        this.hasSlowTime = false;
+        this.slowTimeScale = 1;
         this.invertControls = false;
         this.spawnProtectionTimer = CONFIG.PLAYER.SPAWN_PROTECTION || 0;
         this.planarAimOffset = 0;
