@@ -6,37 +6,6 @@ function pair(left, right) {
     return /** @type {[string, string]} */ ([left, right]);
 }
 
-const uiConfigImportSources = [
-    'src/ui/CrosshairSystem.js',
-    'src/ui/HUD.js',
-    'src/ui/HudRuntimeSystem.js',
-    'src/ui/menu/MenuGameplayBindings.js',
-    'src/ui/UIManager.js',
-    'src/ui/UIStartSyncController.js',
-];
-
-const entityConfigImportSources = [
-    'src/entities/ai/BotDecisionOps.js',
-    'src/entities/ai/BotProbeOps.js',
-    'src/entities/ai/BotRecoveryOps.js',
-    'src/entities/ai/BotSensingOps.js',
-    'src/entities/ai/BotThreatOps.js',
-    'src/entities/ai/HuntBridgePolicy.js',
-    'src/entities/arena/ArenaGeometryCompilePipeline.js',
-    'src/entities/arena/portal/PortalRuntimeSystem.js',
-    'src/entities/arena/PortalGateMeshFactory.js',
-    'src/entities/Bot.js',
-    'src/entities/Particles.js',
-    'src/entities/player/PlayerController.js',
-    'src/entities/player/PlayerEffectOps.js',
-    'src/entities/player/PlayerInventoryOps.js',
-    'src/entities/player/PlayerView.js',
-    'src/entities/Player.js',
-    'src/entities/runtime/EntitySpawnOps.js',
-    'src/entities/systems/CollisionResponseSystem.js',
-    'src/entities/systems/lifecycle/PlayerInteractionPhase.js',
-];
-
 const entityRuntimeConfigStoreSources = [
 ];
 
@@ -46,23 +15,8 @@ const entityThreeDisposalSources = [
     'src/entities/player/PlayerView.js',
 ];
 
-const stateConfigImportSources = [];
-
 /** @type {[string, string][]} */
-const legacyStateToUiImportEntries = [
-    pair(
-        createEdgeKey('src/state/MatchLifecycleStateTransitions.js', 'src/ui/MatchUiStateOps.js'),
-        'Lifecycle transitions still derive UI visibility payloads while state/ui contracts are being reduced incrementally.'
-    ),
-    pair(
-        createEdgeKey('src/state/RoundEndCoordinator.js', 'src/ui/MatchUiStateOps.js'),
-        'Round-end coordinator still reuses shared match UI state derivation helpers during the transition to dedicated ports.'
-    ),
-    pair(
-        createEdgeKey('src/state/RoundStateTickSystem.js', 'src/ui/MatchUiStateOps.js'),
-        'Round tick state still consumes shared match UI state derivation helpers until reducer ownership is finalized.'
-    ),
-];
+const legacyStateToUiImportEntries = [];
 
 /** @type {[string, string][]} */
 const legacyUiToStateImportEntries = [
@@ -135,10 +89,6 @@ export const LEGACY_DOM_ACCESS_ALLOWLIST = new Map([
 
 /** @type {[string, string][]} */
 const legacyUiToCoreImportEntries = [
-    ...uiConfigImportSources.map((fromFile) => pair(
-        createEdgeKey(fromFile, 'src/core/Config.js'),
-        'Legacy config-backed UI projection until shared runtime catalogs replace direct core config reads.'
-    )),
     pair(
         createEdgeKey('src/ui/KeybindEditorController.js', 'src/core/SettingsManager.js'),
         'Keybind editor still relies on SettingsManager cloning helpers while the settings port transition is incremental.'
@@ -147,10 +97,6 @@ const legacyUiToCoreImportEntries = [
 
 /** @type {[string, string][]} */
 const legacyEntitiesToCoreImportEntries = [
-    ...entityConfigImportSources.map((fromFile) => pair(
-        createEdgeKey(fromFile, 'src/core/Config.js'),
-        'Legacy runtime entities still read default config until the remaining config readers move behind explicit runtime contracts.'
-    )),
     ...entityRuntimeConfigStoreSources.map((fromFile) => pair(
         createEdgeKey(fromFile, 'src/core/runtime/ActiveRuntimeConfigStore.js'),
         'Entity runtime is allowed to resolve the active runtime config via the dedicated compatibility store during V44.'
@@ -162,12 +108,7 @@ const legacyEntitiesToCoreImportEntries = [
 ];
 
 /** @type {[string, string][]} */
-const legacyStateToCoreImportEntries = [
-    ...stateConfigImportSources.map((fromFile) => pair(
-        createEdgeKey(fromFile, 'src/core/Config.js'),
-        'Match session map setup still resolves runtime map presets from core config until shared map contracts are introduced.'
-    )),
-];
+const legacyStateToCoreImportEntries = [];
 
 export const LEGACY_UI_TO_CORE_IMPORTS = new Map(legacyUiToCoreImportEntries);
 export const LEGACY_CORE_TO_UI_IMPORTS = new Map(legacyCoreToUiImportEntries);
