@@ -56,17 +56,20 @@ export function recomputePlayerEffectState(player) {
 
     const modeType = resolveModeType(player);
     const runtimeConfig = resolveEntityRuntimeConfig(player);
-    const powerupTypes = runtimeConfig?.POWERUP?.TYPES || CONFIG.POWERUP.TYPES;
 
+    // Speed: latest-wins among SPEED_UP/SLOW_DOWN, multiplier from registry
     const speedEffect = findLatestAllowedEffect(player, SPEED_EFFECT_TYPES, modeType);
-    const speedMultiplier = Number(powerupTypes?.[speedEffect?.type]?.multiplier);
+    const speedDef = speedEffect ? getPickupDefinition(speedEffect.type) : null;
+    const speedMultiplier = Number(speedDef?.multiplier);
     player.baseSpeed = Number.isFinite(speedMultiplier)
         ? CONFIG.PLAYER.SPEED * speedMultiplier
         : CONFIG.PLAYER.SPEED;
     player.speed = player.baseSpeed;
 
+    // Trail: latest-wins among THICK/THIN, trailWidth from registry
     const trailEffect = findLatestAllowedEffect(player, TRAIL_EFFECT_TYPES, modeType);
-    const trailWidth = Number(powerupTypes?.[trailEffect?.type]?.trailWidth);
+    const trailDef = trailEffect ? getPickupDefinition(trailEffect.type) : null;
+    const trailWidth = Number(trailDef?.trailWidth);
     if (player.trail) {
         if (Number.isFinite(trailWidth) && trailWidth > 0) {
             player.trail.setWidth(trailWidth);
@@ -75,14 +78,17 @@ export function recomputePlayerEffectState(player) {
         }
     }
 
+    // Boolean effects: any-active-wins, mode-filtered
     player.isGhost = hasAllowedEffect(player, 'GHOST', modeType);
     player.invertControls = hasAllowedEffect(player, 'INVERT', modeType);
 
+    // Global time: latest-wins, timeScale from registry (applied globally by PlanarAimAssistSystem)
     const slowTimeEffect = findLatestAllowedEffect(player, GLOBAL_TIME_EFFECT_TYPES, modeType);
     const slowTimeDef = slowTimeEffect ? getPickupDefinition(slowTimeEffect.type) : null;
     player.hasSlowTime = !!slowTimeEffect;
     player.slowTimeScale = Number.isFinite(slowTimeDef?.timeScale) ? slowTimeDef.timeScale : 1;
 
+    // Shield: mode-specific - in HUNT expires by HP, in CLASSIC/ARCADE by timer
     const shieldEffectActive = hasAllowedEffect(player, 'SHIELD', modeType);
     if (!shieldEffectActive) {
         resetShieldState(player);
