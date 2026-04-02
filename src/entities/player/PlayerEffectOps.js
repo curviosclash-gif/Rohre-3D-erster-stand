@@ -118,6 +118,9 @@ export function updatePlayerEffects(player, dt) {
         }
 
         if (effect.type === 'SHIELD') {
+            // Shield contract per mode:
+            //   HUNT:          HP-based expiry only (no timer), shield removed when shieldHP <= 0
+            //   CLASSIC/ARCADE: timer-based expiry (duration from registry), shields block trail collision
             const shieldActive = !!player.hasShield && (Number(player.shieldHP) || 0) > 0;
             if (!shieldActive) {
                 removeEffectAtIndex(player, i);
@@ -153,10 +156,8 @@ export function updatePlayerEffects(player, dt) {
 export function applyPlayerPowerup(player, type) {
     if (!player) return;
 
-    const runtimeConfig = resolveEntityRuntimeConfig(player);
-    const powerupTypes = runtimeConfig?.POWERUP?.TYPES || CONFIG.POWERUP.TYPES;
-    const config = powerupTypes[type];
-    if (!config) return;
+    const definition = getPickupDefinition(type);
+    if (!definition) return;
 
     const modeType = resolveModeType(player);
     if (!isPickupTypeAllowedForMode(type, modeType)) {
@@ -171,10 +172,11 @@ export function applyPlayerPowerup(player, type) {
 
     player.activeEffects.push({
         type,
-        remaining: Number.isFinite(Number(config.duration)) ? Number(config.duration) : 0,
+        remaining: Number.isFinite(definition.duration) ? definition.duration : 0,
     });
 
     if (type === 'SHIELD') {
+        const runtimeConfig = resolveEntityRuntimeConfig(player);
         grantShield(player, runtimeConfig);
     }
 
