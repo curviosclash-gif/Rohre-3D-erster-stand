@@ -1,11 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { createBenchmarkReport } from '../scripts/training-benchmark-artifacts.mjs';
+import {
+    createBenchmarkManifest,
+    createBenchmarkReport,
+} from '../scripts/training-benchmark-artifacts.mjs';
 import { buildBotValidationEval } from '../scripts/training-bot-validation-lane.mjs';
 import {
     TRAINING_BENCHMARK_MATRIX,
     TRAINING_BENCHMARK_SEMANTIC_WINDOW,
+    evaluateChampionPromotion,
     evaluateBenchmarkArtifactRequirements,
     resolveTrainingPerformanceProfile,
 } from '../src/state/training/TrainingBenchmarkContract.js';
@@ -225,6 +229,36 @@ test('V80 benchmark profile guardrails keep thermal telemetry observe-only when 
     assert.equal(guardrails.warnings.some((entry) => entry.code === 'temperature-unavailable'), true);
 });
 
+test('V80 benchmark profile guardrails fail hard when high-util thermal ceiling is exceeded', () => {
+    const guardrails = evaluateBenchmarkProfileGuardrails({
+        profile: resolveTrainingPerformanceProfile('marathon'),
+        bridgeTelemetry: {
+            latencyP95Ms: 8,
+            pendingAckCount: 0,
+            maxPendingAcks: 1536,
+            backpressureDrops: 0,
+        },
+        opsKpis: {
+            bridgeLatencyP95Ms: 8,
+            timeoutRate: 0,
+            fallbackRate: 0,
+        },
+        artifactBacklogCount: 0,
+        resumeRequested: false,
+        resumeLoaded: false,
+        hardwareTelemetry: {
+            thermal: {
+                available: true,
+                temperatureC: 86,
+                source: 'test',
+            },
+        },
+    });
+
+    assert.equal(guardrails.ok, false);
+    assert.equal(guardrails.failures.some((entry) => entry.metric === 'temperatureC'), true);
+});
+
 test('V80 benchmark artifact audit rejects promotion-eligible synthetic-only lanes', () => {
     const reportPath = 'data/training/runs/TEST_BT80B_SYNTHETIC_ONLY/bot-validation-report.json';
     const validationLane = buildBotValidationEval(createValidationReportWithDiagnostics(), {
@@ -277,4 +311,64 @@ test('V80 benchmark artifact audit rejects promotion-eligible synthetic-only lan
 
     assert.equal(artifactAudit.ok, false);
     assert.equal(artifactAudit.failures.some((entry) => entry.code === 'runtime-lane-missing'), true);
+});
+
+test('V80 champion promotion keeps BT20 challenger runs reference-only even on green gates', () => {
+    const manifest = createBenchmarkManifest({
+        stamp: 'BT20_REFERENCE_ONLY_20260402-r01',
+        profileName: 'quick-benchmark',
+        source: {
+            summaryConfig: {
+                environmentProfile: 'runtime-near',
+            },
+            algorithmProfileName: 'challenger-balanced',
+        },
+    });
+    const validationLane = buildBotValidationEval(createValidationReportWithDiagnostics(), {
+        reportPath: 'data/training/runs/BT20_REFERENCE_ONLY_20260402-r01/bot-validation-report.json',
+        exists: true,
+    });
+    const promotion = evaluateChampionPromotion({
+        manifest,
+        gateOk: true,
+        botValidationGate: { ok: true },
+        playEvalGate: { ok: true },
+        validationLane,
+    });
+
+    assert.equal(manifest.candidate.referenceOnly, true);
+    assert.equal(promotion.status, 'blocked');
+    assert.equal(promotion.eligible, false);
+    assert.equal(promotion.candidate.referenceOnly, true);
+    assert.equal(promotion.hardFailures.some((entry) => entry.metric === 'referenceOnly'), true);
+});
+
+test('V80 champion promotion marks runtime-near challengers as manual-only eligible when they beat BT11', () => {
+    const manifest = createBenchmarkManifest({
+        stamp: 'BT80C_PROMOTION_20260402-r01',
+        profileName: 'overnight-high-util',
+        source: {
+            summaryConfig: {
+                environmentProfile: 'runtime-near',
+            },
+            algorithmProfileName: 'challenger-balanced',
+        },
+    });
+    const validationLane = buildBotValidationEval(createValidationReportWithDiagnostics(), {
+        reportPath: 'data/training/runs/BT80C_PROMOTION_20260402-r01/bot-validation-report.json',
+        exists: true,
+    });
+    const promotion = evaluateChampionPromotion({
+        manifest,
+        gateOk: true,
+        botValidationGate: { ok: true },
+        playEvalGate: { ok: true },
+        validationLane,
+    });
+
+    assert.equal(manifest.candidate.role, 'challenger');
+    assert.equal(manifest.candidate.promotionEligible, true);
+    assert.equal(promotion.status, 'eligible');
+    assert.equal(promotion.eligible, true);
+    assert.equal(promotion.decision, 'manual-promotion-required');
 });

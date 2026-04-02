@@ -12,6 +12,7 @@ import {
     TRAINING_GATE_THRESHOLD_VERSION,
 } from '../src/state/training/TrainingGateThresholds.js';
 import {
+    evaluateChampionPromotion,
     evaluateBenchmarkArtifactRequirements,
     evaluateBenchmarkProfileGuardrails,
     resolveTrainingPerformanceProfile,
@@ -108,6 +109,16 @@ function formatTrendLine(check) {
     }
     const direction = check.direction === 'max' ? '>= delta' : '<= delta';
     return `[${check.level.toUpperCase()}] trend.${check.metric}: delta=${check.delta} target ${direction} warn=${check.warnDelta} hard=${check.hardDelta}`;
+}
+
+function formatPromotionLine(check) {
+    if (check.comparator === 'required') {
+        return `[${check.level.toUpperCase()}] promotion.${check.metric}: value=${check.value} expected=${check.expected}`;
+    }
+    if (check.comparator === 'min') {
+        return `[${check.level.toUpperCase()}] promotion.${check.metric}: value=${check.value} target>=${check.hardThreshold}`;
+    }
+    return `[${check.level.toUpperCase()}] promotion.${check.metric}: value=${check.value} target<=${check.hardThreshold}`;
 }
 
 function toFiniteNumber(value, fallback = 0) {
@@ -525,6 +536,14 @@ async function main() {
         && botValidationResult.ok
         && artifactAudit.ok
         && guardrails.ok;
+    const promotion = evaluateChampionPromotion({
+        manifest: benchmarkManifest,
+        runStamp,
+        validationLane: evalArtifact?.botValidation || null,
+        botValidationGate: botValidationResult,
+        playEvalGate: playEvalResult,
+        gateOk: combinedOk,
+    });
     const gateArtifact = {
         ok: combinedOk,
         status: combinedOk ? 'pass' : 'fail',
@@ -557,6 +576,9 @@ async function main() {
         resumeHealth,
         throughput,
         hardwareTelemetry,
+        rollout: {
+            promotion,
+        },
     };
 
     const gatePath = path.join(runDir, 'gate.json');
@@ -589,6 +611,9 @@ async function main() {
         artifactAudit,
         guardrails,
         failureSummary: failureTaxonomy,
+        rollout: {
+            promotion,
+        },
     });
     await writeBenchmarkJson(layout.benchmarkReportPath, benchmarkReport);
 
@@ -614,6 +639,7 @@ async function main() {
         ...trendResult.checks.map(formatTrendLine),
         ...playEvalResult.checks.map(formatMetricLine),
         ...botValidationResult.checks.map(formatMetricLine),
+        ...promotion.checks.map(formatPromotionLine),
         ...artifactAudit.failures.map((entry) => `[FAIL] artifact.${entry.artifact || entry.code}: ${entry.summary}`),
         ...guardrails.checks.map((entry) => `[INFO] guardrail.${entry.metric}: value=${entry.value} hard<=${entry.hardLimit}`),
     ];
@@ -630,6 +656,10 @@ async function main() {
         artifactFailures: artifactAudit.failures.length,
         guardrailFailures: guardrails.failures.length,
         failureCounts: failureTaxonomy.counts,
+        candidateRole: promotion.candidate?.role || benchmarkManifest?.candidate?.role || null,
+        promotionStatus: promotion.status,
+        promotionEligible: promotion.eligible,
+        referenceOnly: promotion.candidate?.referenceOnly === true,
         report: reportLines,
     }, null, 2));
 

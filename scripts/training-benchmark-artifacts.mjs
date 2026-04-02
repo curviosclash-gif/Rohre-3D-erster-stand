@@ -8,12 +8,17 @@ import {
     TRAINING_BENCHMARK_CONTRACT_VERSION,
     TRAINING_BENCHMARK_MANIFEST_VERSION,
     TRAINING_BENCHMARK_MATRIX,
+    TRAINING_PROMOTION_POLICY_VERSION,
+    TRAINING_ALGORITHM_PROFILE_VERSION,
     TRAINING_BENCHMARK_PROFILE_VERSION,
     TRAINING_BENCHMARK_REPORT_VERSION,
     TRAINING_BENCHMARK_SEMANTIC_WINDOW,
     TRAINING_DECISION_TRACE_VERSION,
     TRAINING_FROZEN_REFERENCES,
     TRAINING_HARDWARE_TELEMETRY_VERSION,
+    classifyTrainingBenchmarkCandidate,
+    normalizeTrainingAlgorithmProfileName,
+    resolveTrainingAlgorithmProfile,
     normalizeTrainingPerformanceProfileName,
     resolveTrainingPerformanceProfile,
 } from '../src/state/training/TrainingBenchmarkContract.js';
@@ -25,6 +30,41 @@ function toFiniteNumber(value, fallback = 0) {
 
 function roundMetric(value) {
     return Math.round(toFiniteNumber(value, 0) * 1_000_000) / 1_000_000;
+}
+
+function parseOptionalBoolean(value) {
+    if (typeof value === 'boolean') return value;
+    if (typeof value !== 'string') return null;
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) return null;
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+    if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+    return null;
+}
+
+function resolveThermalTelemetry(input = null) {
+    const source = input && typeof input === 'object' ? input : {};
+    const directTemperature = toFiniteNumber(source.temperatureC, NaN);
+    const envTemperature = toFiniteNumber(process.env.TRAINING_THERMAL_TEMPERATURE_C, NaN);
+    const temperatureC = Number.isFinite(directTemperature)
+        ? roundMetric(directTemperature)
+        : (Number.isFinite(envTemperature) ? roundMetric(envTemperature) : null);
+    if (temperatureC == null) {
+        return {
+            available: false,
+            temperatureC: null,
+            source: source.source || process.env.TRAINING_THERMAL_SOURCE || null,
+            throttled: parseOptionalBoolean(source.throttled ?? process.env.TRAINING_THERMAL_THROTTLED),
+            note: 'Lokale Temperaturdaten werden noch nicht automatisch ausgelesen.',
+        };
+    }
+    return {
+        available: true,
+        temperatureC,
+        source: source.source || process.env.TRAINING_THERMAL_SOURCE || 'manual',
+        throttled: parseOptionalBoolean(source.throttled ?? process.env.TRAINING_THERMAL_THROTTLED),
+        note: source.note || 'Temperaturdaten wurden extern fuer BT80C-Guardrails bereitgestellt.',
+    };
 }
 
 export function toRepoPath(targetPath) {
@@ -51,6 +91,14 @@ export function captureHardwareTelemetry({
     profileName = null,
     extra = {},
 } = {}) {
+    const telemetryExtra = extra && typeof extra === 'object' ? extra : {};
+    const thermalInput = telemetryExtra.thermal && typeof telemetryExtra.thermal === 'object'
+        ? telemetryExtra.thermal
+        : null;
+    const {
+        thermal: _ignoredThermal,
+        ...remainingExtra
+    } = telemetryExtra;
     const cpus = Array.isArray(os.cpus?.()) ? os.cpus() : [];
     const processMemory = process.memoryUsage();
     return {
@@ -81,11 +129,9 @@ export function captureHardwareTelemetry({
             uptimeSeconds: roundMetric(process.uptime?.() || 0),
         },
         thermal: {
-            available: false,
-            temperatureC: null,
-            note: 'Lokale Temperaturdaten werden noch nicht automatisch ausgelesen.',
+            ...resolveThermalTelemetry(thermalInput),
         },
-        extra,
+        extra: remainingExtra,
     };
 }
 
@@ -187,8 +233,20 @@ export function createBenchmarkManifest({
 } = {}) {
     const normalizedProfileName = normalizeTrainingPerformanceProfileName(profileName, null);
     const profile = resolveTrainingPerformanceProfile(normalizedProfileName, null);
+    const normalizedAlgorithmProfileName = normalizeTrainingAlgorithmProfileName(
+        source?.algorithmProfileName || profile?.algorithmProfileName,
+        null
+    );
+    const algorithmProfile = resolveTrainingAlgorithmProfile(normalizedAlgorithmProfileName, null);
     const environmentProfile = source?.summaryConfig?.environmentProfile || profile?.run?.environmentProfile || null;
     const runtimeNear = environmentProfile === 'runtime-near';
+    const candidate = classifyTrainingBenchmarkCandidate({
+        stamp: stamp || layout?.stamp || null,
+        seriesStamp,
+        performanceProfile: profile,
+        algorithmProfile,
+        environmentProfile,
+    });
     return {
         contractVersion: TRAINING_BENCHMARK_MANIFEST_VERSION,
         generatedAt: new Date().toISOString(),
@@ -200,14 +258,19 @@ export function createBenchmarkManifest({
         compareRules: TRAINING_BENCHMARK_COMPARE_RULES,
         references: TRAINING_FROZEN_REFERENCES,
         performanceProfileVersion: TRAINING_BENCHMARK_PROFILE_VERSION,
+        algorithmProfileVersion: TRAINING_ALGORITHM_PROFILE_VERSION,
+        promotionPolicyVersion: TRAINING_PROMOTION_POLICY_VERSION,
         performanceProfile: profile,
         performanceProfileName: normalizedProfileName,
+        algorithmProfile,
+        algorithmProfileName: normalizedAlgorithmProfileName,
         environment: {
             profile: environmentProfile,
             runtimeNear,
             syntheticLane: environmentProfile === 'synthetic-smoke',
-            promotionEligible: runtimeNear,
+            promotionEligible: candidate.promotionEligible === true,
         },
+        candidate,
         artifacts: {
             run: layout?.runArtifactPath ? toRepoPath(layout.runArtifactPath) : null,
             eval: layout?.evalArtifactPath ? toRepoPath(layout.evalArtifactPath) : null,
@@ -237,6 +300,7 @@ export function createBenchmarkReport({
     artifactAudit = null,
     guardrails = null,
     failureSummary = {},
+    rollout = null,
 } = {}) {
     return {
         contractVersion: TRAINING_BENCHMARK_REPORT_VERSION,
@@ -257,5 +321,6 @@ export function createBenchmarkReport({
         artifactAudit,
         guardrails,
         failureSummary,
+        rollout,
     };
 }

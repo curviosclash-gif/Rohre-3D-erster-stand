@@ -11,6 +11,9 @@ import {
     resolveTrainingRunArtifactLayout,
 } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
 import {
+    classifyTrainingBenchmarkCandidate,
+    normalizeTrainingAlgorithmProfileName,
+    resolveTrainingAlgorithmProfile,
     normalizeTrainingPerformanceProfileName,
     resolveTrainingPerformanceProfile,
 } from '../src/state/training/TrainingBenchmarkContract.js';
@@ -360,6 +363,14 @@ async function main() {
         null
     );
     const performanceProfile = resolveTrainingPerformanceProfile(performanceProfileName, null);
+    const algorithmProfileName = normalizeTrainingAlgorithmProfileName(
+        args.get('algorithm-profile')
+            || process.env.TRAINING_ALGORITHM_PROFILE
+            || performanceProfile?.algorithmProfileName
+            || '',
+        null
+    );
+    const algorithmProfile = resolveTrainingAlgorithmProfile(algorithmProfileName, null);
     const seriesStamp = typeof args.get('series-stamp') === 'string' && args.get('series-stamp').trim()
         ? args.get('series-stamp').trim()
         : (typeof process.env.TRAINING_SERIES_STAMP === 'string' && process.env.TRAINING_SERIES_STAMP.trim()
@@ -557,6 +568,13 @@ async function main() {
         elapsedMs: runElapsedMs,
         totals: summary?.totals,
     });
+    const candidate = classifyTrainingBenchmarkCandidate({
+        stamp: layout.stamp,
+        seriesStamp,
+        performanceProfile,
+        algorithmProfile,
+        environmentProfile: summary?.config?.environmentProfile || null,
+    });
     const runArtifact = {
         contractVersion: TRAINING_AUTOMATION_RUN_CONTRACT_VERSION,
         stage: 'run',
@@ -566,6 +584,9 @@ async function main() {
         runDir: layout.runDir,
         performanceProfileName,
         performanceProfile,
+        algorithmProfileName,
+        algorithmProfile,
+        candidate,
         elapsedMs: runElapsedMs,
         summary,
         bridgeReady,
@@ -602,6 +623,7 @@ async function main() {
             checkpointPath: checkpointPath ? toRepoPath(checkpointPath) : null,
             bridgeMode: config.bridgeMode,
             summaryConfig: summary?.config || null,
+            algorithmProfileName,
             resumeRequested: resumeInfo.requested,
             resumeStrict,
         },
@@ -657,6 +679,7 @@ async function main() {
         benchmarkManifestPath: toRepoPath(layout.benchmarkManifestPath),
         latestIndexPath: writeLatest ? layout.latestIndexPath : null,
         performanceProfileName,
+        algorithmProfileName,
         resume: {
             requested: resumeInfo.requested,
             mode: resumeInfo.mode,
@@ -670,6 +693,7 @@ async function main() {
         opsKpis,
         throughput,
         hardwareTelemetry,
+        candidate,
         trainerStats: trainerStats ? {
             sessionId: trainerStats.sessionId || null,
             replaySize: trainerStats.replay?.size ?? null,

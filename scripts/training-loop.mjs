@@ -7,6 +7,8 @@ import process from 'node:process';
 import { resolveDevLayoutRelativePath } from './dev-layout-paths.mjs';
 import { normalizeTrainingRunStamp } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
 import {
+    normalizeTrainingAlgorithmProfileName,
+    resolveTrainingAlgorithmProfile,
     normalizeTrainingPerformanceProfileName,
     resolveTrainingPerformanceProfile,
 } from '../src/state/training/TrainingBenchmarkContract.js';
@@ -216,7 +218,7 @@ function runNodeScript(scriptPath, scriptArgs = [], options = {}) {
     });
 }
 
-function startTrainerServer(args, performanceProfile = null) {
+function startTrainerServer(args, performanceProfile = null, algorithmProfileName = null) {
     const host = args.get('trainer-host') || process.env.TRAINER_HOST || '127.0.0.1';
     const port = args.get('trainer-port') || process.env.TRAINER_PORT || '8765';
     const verbose = args.get('trainer-verbose') || process.env.TRAINER_VERBOSE || 'false';
@@ -226,6 +228,7 @@ function startTrainerServer(args, performanceProfile = null) {
         '--port', port,
         '--verbose', verbose,
     ];
+    appendArg(trainerArgs, 'algorithm-profile', algorithmProfileName);
     appendArg(
         trainerArgs,
         'replay-capacity',
@@ -249,7 +252,10 @@ function startTrainerServer(args, performanceProfile = null) {
     const child = spawn(process.execPath, trainerArgs, {
         stdio: 'inherit',
         shell: false,
-        env: process.env,
+        env: {
+            ...process.env,
+            ...(algorithmProfileName ? { TRAINING_ALGORITHM_PROFILE: algorithmProfileName } : {}),
+        },
     });
     return {
         child,
@@ -293,7 +299,7 @@ async function stopTrainerServer(server) {
     });
 }
 
-function buildRunStageArgs(args, stamp, performanceProfile = null, performanceProfileName = null, seriesStamp = null) {
+function buildRunStageArgs(args, stamp, performanceProfile = null, performanceProfileName = null, seriesStamp = null, algorithmProfileName = null) {
     const bridgeMode = (args.get('bridge-mode') || process.env.TRAINING_BRIDGE_MODE || 'bridge').trim();
     const resumeCheckpoint = (args.get('resume-checkpoint') || process.env.TRAINER_RESUME_CHECKPOINT || 'latest').trim();
     const bridgeUrl = args.get('bridge-url')
@@ -316,6 +322,9 @@ function buildRunStageArgs(args, stamp, performanceProfile = null, performancePr
     }
     if (performanceProfileName) {
         stageArgs.push('--performance-profile', performanceProfileName);
+    }
+    if (algorithmProfileName) {
+        stageArgs.push('--algorithm-profile', algorithmProfileName);
     }
     if (bridgeUrl) {
         stageArgs.push('--bridge-url', bridgeUrl);
@@ -425,6 +434,14 @@ async function main() {
         null
     );
     const performanceProfile = resolveTrainingPerformanceProfile(performanceProfileName, null);
+    const algorithmProfileName = normalizeTrainingAlgorithmProfileName(
+        args.get('algorithm-profile')
+            || process.env.TRAINING_ALGORITHM_PROFILE
+            || performanceProfile?.algorithmProfileName
+            || '',
+        null
+    );
+    const algorithmProfile = resolveTrainingAlgorithmProfile(algorithmProfileName, null);
     const durationBudgetMs = resolveDurationBudgetMs(args)
         ?? (
             performanceProfile?.loop?.durationHours != null
@@ -457,7 +474,7 @@ async function main() {
 
     try {
         if (withTrainerServer) {
-            trainerServer = startTrainerServer(args, performanceProfile);
+            trainerServer = startTrainerServer(args, performanceProfile, algorithmProfileName);
             await waitForTrainerServerReady(
                 trainerServer,
                 parseInteger(args.get('trainer-server-ready-timeout-ms'), DEFAULT_SERVER_READY_TIMEOUT_MS, 500, 120_000)
@@ -476,7 +493,8 @@ async function main() {
                 runStamp,
                 performanceProfile,
                 performanceProfileName,
-                seriesStamp
+                seriesStamp,
+                algorithmProfileName
             );
             const runResult = await runNodeScript(TRAINING_SCRIPT_PATHS.TRAINING_RUN, runStageArgs, {
                 timeoutMs: stageTimeoutMs,
@@ -484,6 +502,7 @@ async function main() {
                     TRAINING_RUN_STAMP: runStamp,
                     TRAINING_SERIES_STAMP: seriesStamp,
                     ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
+                    ...(algorithmProfileName ? { TRAINING_ALGORITHM_PROFILE: algorithmProfileName } : {}),
                 },
             });
             stages.push({
@@ -501,6 +520,7 @@ async function main() {
                         TRAINING_RUN_STAMP: runStamp,
                         TRAINING_SERIES_STAMP: seriesStamp,
                         ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
+                        ...(algorithmProfileName ? { TRAINING_ALGORITHM_PROFILE: algorithmProfileName } : {}),
                     },
                     }
                 );
@@ -518,6 +538,7 @@ async function main() {
                             TRAINING_RUN_STAMP: runStamp,
                             TRAINING_SERIES_STAMP: seriesStamp,
                             ...(performanceProfileName ? { TRAINING_PERFORMANCE_PROFILE: performanceProfileName } : {}),
+                            ...(algorithmProfileName ? { TRAINING_ALGORITHM_PROFILE: algorithmProfileName } : {}),
                         },
                         }
                     );
@@ -584,6 +605,8 @@ async function main() {
         seriesStamp,
         performanceProfileName,
         performanceProfile,
+        algorithmProfileName,
+        algorithmProfile,
         withTrainerServer,
         stopOnFail,
         writeLatest,

@@ -2,6 +2,10 @@ import {
     TRAINER_CONTRACT_FREEZE_V34,
     TRAINER_FAILURE_POLICY,
 } from './TrainerRuntimeContract.mjs';
+import {
+    normalizeTrainingAlgorithmProfileName,
+    resolveTrainingAlgorithmProfile,
+} from '../../src/state/training/TrainingBenchmarkContract.js';
 import { DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH } from '../../src/entities/ai/observation/RuntimeNearObservationAdapter.js';
 
 function clampInt(value, fallback, min, max) {
@@ -95,6 +99,14 @@ export const DEFAULT_TRAINER_CONFIG = Object.freeze({
         epsilonStart: 1,
         epsilonEnd: 0.05,
         epsilonDecaySteps: 20_000,
+        rewardClamp: 10,
+    }),
+    replay: Object.freeze({
+        prioritized: false,
+        priorityAlpha: 0.6,
+        priorityBetaStart: 0.4,
+        priorityBetaEnd: 1,
+        priorityBetaAnnealSteps: 100_000,
     }),
     contractFreeze: TRAINER_CONTRACT_FREEZE_V34,
     failurePolicy: TRAINER_FAILURE_POLICY,
@@ -102,6 +114,11 @@ export const DEFAULT_TRAINER_CONFIG = Object.freeze({
 
 export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
     const args = parseArgMap(argv);
+    const algorithmProfileName = normalizeTrainingAlgorithmProfileName(
+        pickValue(args, env, 'algorithm-profile', 'TRAINING_ALGORITHM_PROFILE', null),
+        null
+    );
+    const algorithmProfile = resolveTrainingAlgorithmProfile(algorithmProfileName, null);
     const host = String(
         pickValue(args, env, 'host', 'TRAINER_HOST', DEFAULT_TRAINER_CONFIG.host)
     ).trim() || DEFAULT_TRAINER_CONFIG.host;
@@ -191,7 +208,7 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
         );
         modelHiddenLayers = modelHiddenSize > 0
             ? [modelHiddenSize]
-            : [...DEFAULT_TRAINER_CONFIG.model.hiddenLayers];
+            : [...(algorithmProfile?.model?.hiddenLayers || DEFAULT_TRAINER_CONFIG.model.hiddenLayers)];
     }
     const modelHiddenSize = modelHiddenLayers[0];
     const modelLearningRate = clampFloat(
@@ -200,9 +217,9 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             env,
             'model-lr',
             'TRAINER_MODEL_LR',
-            DEFAULT_TRAINER_CONFIG.model.learningRate
+            algorithmProfile?.model?.learningRate ?? DEFAULT_TRAINER_CONFIG.model.learningRate
         ),
-        DEFAULT_TRAINER_CONFIG.model.learningRate,
+        algorithmProfile?.model?.learningRate ?? DEFAULT_TRAINER_CONFIG.model.learningRate,
         0.000001,
         1
     );
@@ -212,9 +229,9 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             env,
             'model-gamma',
             'TRAINER_MODEL_GAMMA',
-            DEFAULT_TRAINER_CONFIG.model.gamma
+            algorithmProfile?.model?.gamma ?? DEFAULT_TRAINER_CONFIG.model.gamma
         ),
-        DEFAULT_TRAINER_CONFIG.model.gamma,
+        algorithmProfile?.model?.gamma ?? DEFAULT_TRAINER_CONFIG.model.gamma,
         0,
         1
     );
@@ -248,9 +265,9 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             env,
             'model-train-every',
             'TRAINER_MODEL_TRAIN_EVERY',
-            DEFAULT_TRAINER_CONFIG.model.trainEvery
+            algorithmProfile?.model?.trainEvery ?? DEFAULT_TRAINER_CONFIG.model.trainEvery
         ),
-        DEFAULT_TRAINER_CONFIG.model.trainEvery,
+        algorithmProfile?.model?.trainEvery ?? DEFAULT_TRAINER_CONFIG.model.trainEvery,
         1,
         10_000
     );
@@ -260,9 +277,9 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             env,
             'model-target-sync',
             'TRAINER_MODEL_TARGET_SYNC',
-            DEFAULT_TRAINER_CONFIG.model.targetSyncInterval
+            algorithmProfile?.model?.targetSyncInterval ?? DEFAULT_TRAINER_CONFIG.model.targetSyncInterval
         ),
-        DEFAULT_TRAINER_CONFIG.model.targetSyncInterval,
+        algorithmProfile?.model?.targetSyncInterval ?? DEFAULT_TRAINER_CONFIG.model.targetSyncInterval,
         1,
         1_000_000
     );
@@ -272,9 +289,9 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             env,
             'model-epsilon-start',
             'TRAINER_MODEL_EPSILON_START',
-            DEFAULT_TRAINER_CONFIG.model.epsilonStart
+            algorithmProfile?.model?.epsilonStart ?? DEFAULT_TRAINER_CONFIG.model.epsilonStart
         ),
-        DEFAULT_TRAINER_CONFIG.model.epsilonStart,
+        algorithmProfile?.model?.epsilonStart ?? DEFAULT_TRAINER_CONFIG.model.epsilonStart,
         0,
         1
     );
@@ -284,9 +301,9 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             env,
             'model-epsilon-end',
             'TRAINER_MODEL_EPSILON_END',
-            DEFAULT_TRAINER_CONFIG.model.epsilonEnd
+            algorithmProfile?.model?.epsilonEnd ?? DEFAULT_TRAINER_CONFIG.model.epsilonEnd
         ),
-        DEFAULT_TRAINER_CONFIG.model.epsilonEnd,
+        algorithmProfile?.model?.epsilonEnd ?? DEFAULT_TRAINER_CONFIG.model.epsilonEnd,
         0,
         1
     );
@@ -296,14 +313,84 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             env,
             'model-epsilon-decay-steps',
             'TRAINER_MODEL_EPSILON_DECAY_STEPS',
-            DEFAULT_TRAINER_CONFIG.model.epsilonDecaySteps
+            algorithmProfile?.model?.epsilonDecaySteps ?? DEFAULT_TRAINER_CONFIG.model.epsilonDecaySteps
         ),
-        DEFAULT_TRAINER_CONFIG.model.epsilonDecaySteps,
+        algorithmProfile?.model?.epsilonDecaySteps ?? DEFAULT_TRAINER_CONFIG.model.epsilonDecaySteps,
         1,
         10_000_000
     );
+    const modelRewardClamp = clampFloat(
+        pickValue(
+            args,
+            env,
+            'model-reward-clamp',
+            'TRAINER_MODEL_REWARD_CLAMP',
+            algorithmProfile?.model?.rewardClamp ?? DEFAULT_TRAINER_CONFIG.model.rewardClamp
+        ),
+        algorithmProfile?.model?.rewardClamp ?? DEFAULT_TRAINER_CONFIG.model.rewardClamp,
+        0.1,
+        1_000
+    );
     const modelEpsilonLo = Math.min(modelEpsilonStart, modelEpsilonEnd);
     const modelEpsilonHi = Math.max(modelEpsilonStart, modelEpsilonEnd);
+    const replayPrioritized = parseBoolean(
+        pickValue(
+            args,
+            env,
+            'replay-prioritized',
+            'TRAINER_REPLAY_PRIORITIZED',
+            algorithmProfile?.replay?.prioritized ?? DEFAULT_TRAINER_CONFIG.replay.prioritized
+        ),
+        algorithmProfile?.replay?.prioritized ?? DEFAULT_TRAINER_CONFIG.replay.prioritized
+    );
+    const replayPriorityAlpha = clampFloat(
+        pickValue(
+            args,
+            env,
+            'replay-priority-alpha',
+            'TRAINER_REPLAY_PRIORITY_ALPHA',
+            algorithmProfile?.replay?.priorityAlpha ?? DEFAULT_TRAINER_CONFIG.replay.priorityAlpha
+        ),
+        algorithmProfile?.replay?.priorityAlpha ?? DEFAULT_TRAINER_CONFIG.replay.priorityAlpha,
+        0,
+        1
+    );
+    const replayPriorityBetaStart = clampFloat(
+        pickValue(
+            args,
+            env,
+            'replay-priority-beta-start',
+            'TRAINER_REPLAY_PRIORITY_BETA_START',
+            algorithmProfile?.replay?.priorityBetaStart ?? DEFAULT_TRAINER_CONFIG.replay.priorityBetaStart
+        ),
+        algorithmProfile?.replay?.priorityBetaStart ?? DEFAULT_TRAINER_CONFIG.replay.priorityBetaStart,
+        0,
+        1
+    );
+    const replayPriorityBetaEnd = clampFloat(
+        pickValue(
+            args,
+            env,
+            'replay-priority-beta-end',
+            'TRAINER_REPLAY_PRIORITY_BETA_END',
+            algorithmProfile?.replay?.priorityBetaEnd ?? DEFAULT_TRAINER_CONFIG.replay.priorityBetaEnd
+        ),
+        algorithmProfile?.replay?.priorityBetaEnd ?? DEFAULT_TRAINER_CONFIG.replay.priorityBetaEnd,
+        0,
+        1
+    );
+    const replayPriorityBetaAnnealSteps = clampInt(
+        pickValue(
+            args,
+            env,
+            'replay-priority-beta-anneal-steps',
+            'TRAINER_REPLAY_PRIORITY_BETA_ANNEAL_STEPS',
+            algorithmProfile?.replay?.priorityBetaAnnealSteps ?? DEFAULT_TRAINER_CONFIG.replay.priorityBetaAnnealSteps
+        ),
+        algorithmProfile?.replay?.priorityBetaAnnealSteps ?? DEFAULT_TRAINER_CONFIG.replay.priorityBetaAnnealSteps,
+        1,
+        10_000_000
+    );
 
     const failurePolicy = freezeFailurePolicy({
         maxIncomingBytes: pickValue(
@@ -330,6 +417,7 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
         replayCapacity,
         maxItemIndex,
         sessionSeed,
+        algorithmProfileName,
         model: Object.freeze({
             hiddenLayers: Object.freeze([...modelHiddenLayers]),
             hiddenSize: modelHiddenSize,
@@ -342,6 +430,14 @@ export function resolveTrainerConfig({ argv = [], env = process.env } = {}) {
             epsilonStart: modelEpsilonHi,
             epsilonEnd: modelEpsilonLo,
             epsilonDecaySteps: modelEpsilonDecaySteps,
+            rewardClamp: modelRewardClamp,
+        }),
+        replay: Object.freeze({
+            prioritized: replayPrioritized,
+            priorityAlpha: replayPriorityAlpha,
+            priorityBetaStart: replayPriorityBetaStart,
+            priorityBetaEnd: replayPriorityBetaEnd,
+            priorityBetaAnnealSteps: replayPriorityBetaAnnealSteps,
         }),
         contractFreeze: TRAINER_CONTRACT_FREEZE_V34,
         failurePolicy,
@@ -371,6 +467,13 @@ export function formatTrainerServerHelp() {
         '  --model-epsilon-start <n>      Initial epsilon (default: 1.0)',
         '  --model-epsilon-end <n>        Final epsilon (default: 0.05)',
         '  --model-epsilon-decay-steps <n> Epsilon decay steps (default: 20000)',
+        '  --model-reward-clamp <n>       Reward clipping for training stability',
+        '  --algorithm-profile <id>       BT80C algorithm profile (e.g. champion-stable, challenger-balanced)',
+        '  --replay-prioritized <bool>    Enable prioritized replay explicitly',
+        '  --replay-priority-alpha <n>    PER alpha weight',
+        '  --replay-priority-beta-start <n>  PER beta start',
+        '  --replay-priority-beta-end <n>    PER beta end',
+        '  --replay-priority-beta-anneal-steps <n> PER beta anneal steps',
         '  --max-incoming-bytes <n>       Failure policy: max inbound payload bytes',
         '  --max-buffered-bytes <n>       Failure policy: max ws buffered bytes',
         '  --resume-checkpoint <token>    Optional startup resume checkpoint (path or "latest")',
@@ -380,6 +483,7 @@ export function formatTrainerServerHelp() {
         'Environment aliases:',
         '  TRAINER_HOST, TRAINER_PORT, TRAINER_VERBOSE, TRAINER_OBSERVATION_LENGTH,',
         '  TRAINER_REPLAY_CAPACITY, TRAINER_MAX_ITEM_INDEX, TRAINER_SESSION_SEED,',
+        '  TRAINING_ALGORITHM_PROFILE, TRAINER_REPLAY_PRIORITIZED, TRAINER_REPLAY_PRIORITY_*,',
         '  TRAINER_MODEL_*, TRAINER_MAX_INCOMING_BYTES, TRAINER_MAX_BUFFERED_BYTES,',
         '  TRAINER_RESUME_CHECKPOINT, TRAINER_RESUME_STRICT, TRAINER_LATEST_INDEX_PATH',
     ].join('\n');

@@ -7,8 +7,13 @@ import {
     summarizeFailureCodes,
 } from './TrainingBenchmarkFailures.js';
 import {
+    TRAINING_ALGORITHM_PROFILE_VERSION,
+    TRAINING_ALGORITHM_PROFILES,
     TRAINING_BENCHMARK_PROFILE_VERSION,
     TRAINING_PERFORMANCE_PROFILES,
+    listTrainingAlgorithmProfiles,
+    normalizeTrainingAlgorithmProfileName,
+    resolveTrainingAlgorithmProfile,
     listTrainingPerformanceProfiles,
     normalizeTrainingPerformanceProfileName,
     resolveTrainingPerformanceProfile,
@@ -18,18 +23,74 @@ function cloneEntries(entries = []) {
     return entries.map((entry) => ({ ...entry }));
 }
 
+function toFiniteNumber(value, fallback = 0) {
+    const numeric = Number(value);
+    return Number.isFinite(numeric) ? numeric : fallback;
+}
+
+function roundMetric(value) {
+    return Math.round(toFiniteNumber(value, 0) * 1_000_000) / 1_000_000;
+}
+
+function normalizeStampToken(value) {
+    return typeof value === 'string' ? value.trim().toLowerCase() : '';
+}
+
+function buildRequiredCheck(metric, actual, expected, ok, summary) {
+    return {
+        metric,
+        comparator: 'required',
+        value: actual,
+        expected,
+        level: ok ? 'pass' : 'fail',
+        summary,
+    };
+}
+
+function buildMinCheck(metric, value, hardThreshold, summary) {
+    const numericValue = roundMetric(toFiniteNumber(value, 0));
+    const numericThreshold = roundMetric(toFiniteNumber(hardThreshold, 0));
+    return {
+        metric,
+        comparator: 'min',
+        value: numericValue,
+        hardThreshold: numericThreshold,
+        level: numericValue >= numericThreshold ? 'pass' : 'fail',
+        summary,
+    };
+}
+
+function buildMaxCheck(metric, value, hardThreshold, summary) {
+    const numericValue = roundMetric(toFiniteNumber(value, 0));
+    const numericThreshold = roundMetric(toFiniteNumber(hardThreshold, 0));
+    return {
+        metric,
+        comparator: 'max',
+        value: numericValue,
+        hardThreshold: numericThreshold,
+        level: numericValue <= numericThreshold ? 'pass' : 'fail',
+        summary,
+    };
+}
+
 export const TRAINING_BENCHMARK_CONTRACT_VERSION = 'v80-benchmark-v1';
 export const TRAINING_BENCHMARK_MATRIX_VERSION = 'v80-benchmark-matrix-v1';
 export const TRAINING_BENCHMARK_MANIFEST_VERSION = 'v80-benchmark-manifest-v1';
 export const TRAINING_BENCHMARK_REPORT_VERSION = 'v80-benchmark-report-v1';
 export const TRAINING_HARDWARE_TELEMETRY_VERSION = 'v80-hardware-telemetry-v1';
 export const TRAINING_DECISION_TRACE_VERSION = 'v80-decision-trace-v1';
+export const TRAINING_PROMOTION_POLICY_VERSION = 'v80-promotion-policy-v1';
 
 export {
+    TRAINING_ALGORITHM_PROFILE_VERSION,
+    TRAINING_ALGORITHM_PROFILES,
     TRAINING_BENCHMARK_FAILURE_TAXONOMY,
     TRAINING_BENCHMARK_FAILURE_TAXONOMY_VERSION,
     TRAINING_BENCHMARK_PROFILE_VERSION,
     TRAINING_PERFORMANCE_PROFILES,
+    listTrainingAlgorithmProfiles,
+    normalizeTrainingAlgorithmProfileName,
+    resolveTrainingAlgorithmProfile,
     listTrainingPerformanceProfiles,
     normalizeTrainingPerformanceProfileName,
     resolveTrainingPerformanceProfile,
@@ -223,7 +284,19 @@ export const TRAINING_BENCHMARK_COMPARE_RULES = Object.freeze({
         'Fehlende Artefakte fuer bot:validate, Decision-Trace, Resume-Health, Hardware-Telemetrie oder Benchmark-Manifest sind harte Disqualifier.',
         'Promotion und Abschluss-Gates sind nur auf runtime-nahen Lanes zulaessig; synthetische Lanes bleiben Smoke- oder Ablation-Hilfe.',
         'BT20- und spaetere offene Laeufe bleiben Challenger-Referenzen, bis ein vollstaendiger Benchmark-Report mit denselben Artefaktpflichten eingefroren ist.',
+        'Champion-Promotion bleibt manuell; ein gruener Gate-Lauf ersetzt BT11 niemals stillschweigend.',
+        'Promotion verlangt positives Survival-Delta gegen BT11 sowie null Forced- oder Timeout-Rounds in der bot:validate-Lane.',
     ]),
+});
+
+export const TRAINING_CHAMPION_PROMOTION_POLICY = Object.freeze({
+    contractVersion: TRAINING_PROMOTION_POLICY_VERSION,
+    championId: TRAINING_FROZEN_REFERENCES.champion.id,
+    championStamp: TRAINING_FROZEN_REFERENCES.champion.stamp,
+    manualOnly: true,
+    averageBotSurvivalDelta: 0.25,
+    maxForcedRoundRate: 0,
+    maxTimeoutRoundRate: 0,
 });
 
 export const TRAINING_BENCHMARK_MATRIX = Object.freeze({
@@ -275,6 +348,211 @@ export function getTrainingBenchmarkPlayScenarios() {
 
 export function getTrainingBenchmarkBotValidationMatrix() {
     return cloneEntries(BENCHMARK_VALIDATION_SCENARIOS);
+}
+
+export function classifyTrainingBenchmarkCandidate(input = {}) {
+    const performanceProfile = input.performanceProfile && typeof input.performanceProfile === 'object'
+        ? input.performanceProfile
+        : resolveTrainingPerformanceProfile(input.performanceProfileName, null);
+    const algorithmProfile = input.algorithmProfile && typeof input.algorithmProfile === 'object'
+        ? input.algorithmProfile
+        : resolveTrainingAlgorithmProfile(
+            input.algorithmProfileName || performanceProfile?.algorithmProfileName,
+            null
+        );
+    const environmentProfile = typeof input.environmentProfile === 'string' && input.environmentProfile.trim()
+        ? input.environmentProfile.trim()
+        : (performanceProfile?.run?.environmentProfile || null);
+    const runtimeNear = environmentProfile === 'runtime-near';
+    const syntheticLane = environmentProfile === 'synthetic-smoke';
+    const stampToken = normalizeStampToken(input.stamp);
+    const seriesToken = normalizeStampToken(input.seriesStamp);
+    const championStampToken = normalizeStampToken(TRAINING_FROZEN_REFERENCES.champion.stamp);
+    const bt20Reference = stampToken.startsWith('bt20')
+        || seriesToken.startsWith('bt20')
+        || stampToken === normalizeStampToken(TRAINING_FROZEN_REFERENCES.bt20LatestCandidate.stamp);
+
+    let role = 'challenger';
+    if (stampToken === championStampToken) {
+        role = 'champion';
+    } else if (syntheticLane || algorithmProfile?.track === 'ablation' || performanceProfile?.id === 'ablation') {
+        role = 'ablation';
+    }
+
+    const referenceOnly = role === 'ablation'
+        || bt20Reference
+        || algorithmProfile?.referenceOnly === true;
+    const promotionEligible = role === 'challenger'
+        && runtimeNear
+        && syntheticLane !== true
+        && referenceOnly !== true;
+    const notes = [];
+    if (role === 'champion') {
+        notes.push('BT11 bleibt eingefrorener Champion und wird nicht automatisch ersetzt.');
+    }
+    if (role === 'ablation') {
+        notes.push('Ablation- und Synthetic-Lanes bleiben Vergleichs- oder Smoke-Lanes und nie Promotion-Kandidaten.');
+    }
+    if (bt20Reference) {
+        notes.push('BT20 bleibt Challenger- oder Referenzlauf und darf nicht in den Champion-Slot promoted werden.');
+    }
+    if (promotionEligible) {
+        notes.push('Promotion bleibt manuell und erfordert eine explizite Champion-Entscheidung trotz gruenem Gate.');
+    }
+    return Object.freeze({
+        role,
+        track: algorithmProfile?.track || null,
+        runtimeNear,
+        syntheticLane,
+        referenceOnly,
+        bt20Reference,
+        promotionEligible,
+        manualPromotionOnly: true,
+        performanceProfileName: performanceProfile?.id || null,
+        algorithmProfileName: algorithmProfile?.id || null,
+        notes: Object.freeze(notes),
+    });
+}
+
+function resolveChampionPromotionPolicy(manifest = null) {
+    const algorithmProfile = resolveTrainingAlgorithmProfile(
+        manifest?.algorithmProfileName
+            || manifest?.candidate?.algorithmProfileName
+            || manifest?.performanceProfile?.algorithmProfileName,
+        null
+    );
+    const promotionPolicy = algorithmProfile?.promotion && typeof algorithmProfile.promotion === 'object'
+        ? algorithmProfile.promotion
+        : TRAINING_CHAMPION_PROMOTION_POLICY;
+    return Object.freeze({
+        contractVersion: TRAINING_PROMOTION_POLICY_VERSION,
+        championId: TRAINING_FROZEN_REFERENCES.champion.id,
+        championStamp: TRAINING_FROZEN_REFERENCES.champion.stamp,
+        manualOnly: promotionPolicy.manualOnly !== false,
+        averageBotSurvivalDelta: roundMetric(
+            toFiniteNumber(
+                promotionPolicy.averageBotSurvivalDelta,
+                TRAINING_CHAMPION_PROMOTION_POLICY.averageBotSurvivalDelta
+            )
+        ),
+        maxForcedRoundRate: roundMetric(
+            toFiniteNumber(
+                promotionPolicy.maxForcedRoundRate,
+                TRAINING_CHAMPION_PROMOTION_POLICY.maxForcedRoundRate
+            )
+        ),
+        maxTimeoutRoundRate: roundMetric(
+            toFiniteNumber(
+                promotionPolicy.maxTimeoutRoundRate,
+                TRAINING_CHAMPION_PROMOTION_POLICY.maxTimeoutRoundRate
+            )
+        ),
+    });
+}
+
+export function evaluateChampionPromotion(input = {}) {
+    const manifest = input.manifest && typeof input.manifest === 'object' ? input.manifest : null;
+    const candidate = manifest?.candidate && typeof manifest.candidate === 'object'
+        ? manifest.candidate
+        : classifyTrainingBenchmarkCandidate({
+            stamp: input.runStamp,
+            performanceProfileName: manifest?.performanceProfileName,
+            performanceProfile: manifest?.performanceProfile,
+            algorithmProfileName: manifest?.algorithmProfileName,
+            algorithmProfile: manifest?.algorithmProfile,
+            environmentProfile: manifest?.environment?.profile,
+        });
+    const validationLane = input.validationLane && typeof input.validationLane === 'object'
+        ? input.validationLane
+        : {};
+    const validationMetrics = validationLane.metrics && typeof validationLane.metrics === 'object'
+        ? validationLane.metrics
+        : {};
+    const policy = resolveChampionPromotionPolicy(manifest);
+    const championMetrics = TRAINING_FROZEN_REFERENCES.champion.metrics;
+    const requiredSurvival = roundMetric(
+        toFiniteNumber(championMetrics.averageBotSurvival, 0) + policy.averageBotSurvivalDelta
+    );
+    const checks = [
+        buildRequiredCheck(
+            'candidateRole',
+            candidate?.role || 'unknown',
+            'challenger',
+            candidate?.role === 'challenger',
+            'Nur Challenger-Lanes koennen fuer eine Champion-Promotion vorgeschlagen werden.'
+        ),
+        buildRequiredCheck(
+            'runtimeNear',
+            candidate?.runtimeNear === true ? 'runtime-near' : 'non-runtime',
+            'runtime-near',
+            candidate?.runtimeNear === true,
+            'Promotion bleibt strikt auf runtime-nahe Lanes begrenzt.'
+        ),
+        buildRequiredCheck(
+            'referenceOnly',
+            candidate?.referenceOnly === true ? 'reference-only' : 'promotion-lane',
+            'promotion-lane',
+            candidate?.referenceOnly !== true,
+            'Referenz- oder Ablation-Lanes duerfen den Champion nicht ersetzen.'
+        ),
+        buildRequiredCheck(
+            'gateOk',
+            input.gateOk === true ? 'pass' : 'fail',
+            'pass',
+            input.gateOk === true,
+            'Nur voll gruene Gate-Laeufe koennen fuer einen Champion-Wechsel vorgeschlagen werden.'
+        ),
+        buildRequiredCheck(
+            'botValidationGate',
+            input.botValidationGate?.ok === true ? 'pass' : 'fail',
+            'pass',
+            input.botValidationGate?.ok === true,
+            'bot:validate muss gruen bleiben, sonst bleibt BT11 Champion.'
+        ),
+        buildRequiredCheck(
+            'playEvalGate',
+            input.playEvalGate?.ok === true ? 'pass' : 'fail',
+            'pass',
+            input.playEvalGate?.ok === true,
+            'Die feste Play-Eval-Matrix darf fuer Promotion nicht regressieren.'
+        ),
+        buildMinCheck(
+            'averageBotSurvival',
+            validationMetrics.averageBotSurvival,
+            requiredSurvival,
+            'Promotion verlangt ein positives Survival-Delta gegen den eingefrorenen BT11-Champion.'
+        ),
+        buildMaxCheck(
+            'forcedRoundRate',
+            validationMetrics.forcedRoundRate,
+            policy.maxForcedRoundRate,
+            'Promotion bleibt bei erzwungenen Runden hart blockiert.'
+        ),
+        buildMaxCheck(
+            'timeoutRoundRate',
+            validationMetrics.timeoutRoundRate,
+            policy.maxTimeoutRoundRate,
+            'Promotion bleibt bei Timeout-Runden hart blockiert.'
+        ),
+    ];
+    const hardFailures = checks.filter((entry) => entry.level === 'fail');
+    return {
+        contractVersion: TRAINING_PROMOTION_POLICY_VERSION,
+        status: hardFailures.length === 0 ? 'eligible' : 'blocked',
+        eligible: hardFailures.length === 0,
+        decision: hardFailures.length === 0 ? 'manual-promotion-required' : 'hold-champion',
+        manualPromotionOnly: policy.manualOnly === true,
+        champion: Object.freeze({
+            id: TRAINING_FROZEN_REFERENCES.champion.id,
+            stamp: TRAINING_FROZEN_REFERENCES.champion.stamp,
+            metrics: TRAINING_FROZEN_REFERENCES.champion.metrics,
+        }),
+        candidate,
+        policy,
+        checks,
+        hardFailures,
+        warnings: [],
+    };
 }
 
 export function evaluateBenchmarkArtifactRequirements(input = {}) {

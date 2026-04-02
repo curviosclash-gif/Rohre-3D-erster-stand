@@ -235,6 +235,9 @@ function buildRunStageArgs(args) {
         ['modes', 'modes'],
         ['max-steps', 'max-steps'],
         ['runner-profile', 'runner-profile'],
+        ['environment-profile', 'environment-profile'],
+        ['performance-profile', 'performance-profile'],
+        ['algorithm-profile', 'algorithm-profile'],
         ['inject-invalid-actions', 'inject-invalid-actions'],
         ['step-timeout-retries', 'step-timeout-retries'],
         ['timeout-step-ms', 'timeout-step-ms'],
@@ -312,9 +315,10 @@ async function main() {
     const refreshBotValidation = parseBoolean(args.get('refresh-bot-validation'), false);
     const stageTimeoutMs = parseInteger(args.get('stage-timeout-ms'), DEFAULT_STAGE_TIMEOUT_MS, 500, 24 * 60 * 60_000);
     const layout = resolveTrainingRunArtifactLayout(stamp);
-    const botValidationReportPath = (typeof args.get('bot-validation-report') === 'string' && args.get('bot-validation-report').trim())
+    const explicitBotValidationReport = typeof args.get('bot-validation-report') === 'string' && args.get('bot-validation-report').trim()
         ? args.get('bot-validation-report').trim()
-        : `${layout.runDir}/bot-validation-report.json`;
+        : null;
+    const botValidationReportPath = explicitBotValidationReport || `${layout.runDir}/bot-validation-report.json`;
     const botValidation = {
         refreshed: false,
         reportPath: botValidationReportPath.replace(/\\/g, '/'),
@@ -331,6 +335,7 @@ async function main() {
     const runStageArgs = buildRunStageArgs(args);
     let lastCompletedStage = null;
     let trainerServer = null;
+    let skipGateForMissingValidationEvidence = false;
 
     try {
         if (withTrainerServer) {
@@ -363,6 +368,16 @@ async function main() {
                     status: 'skipped',
                     exitCode: 0,
                     reason: 'bot-validation refresh skipped because write-latest false',
+                });
+                skipGateForMissingValidationEvidence = !explicitBotValidationReport;
+                continue;
+            }
+            if (stage.name === 'gate' && skipGateForMissingValidationEvidence) {
+                stageResults.push({
+                    stage: stage.name,
+                    status: 'skipped',
+                    exitCode: 0,
+                    reason: 'gate skipped because bot-validation evidence was intentionally not refreshed',
                 });
                 continue;
             }

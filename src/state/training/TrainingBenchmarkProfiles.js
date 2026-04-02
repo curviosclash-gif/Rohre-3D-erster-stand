@@ -1,10 +1,122 @@
 export const TRAINING_BENCHMARK_PROFILE_VERSION = 'v80-benchmark-profiles-v1';
+export const TRAINING_ALGORITHM_PROFILE_VERSION = 'v80-algorithm-profiles-v1';
+
+const DEFAULT_PROMOTION_POLICY = Object.freeze({
+    manualOnly: true,
+    averageBotSurvivalDelta: 0.25,
+    maxForcedRoundRate: 0,
+    maxTimeoutRoundRate: 0,
+});
+
+export const TRAINING_ALGORITHM_PROFILES = Object.freeze({
+    'champion-stable': Object.freeze({
+        id: 'champion-stable',
+        label: 'Champion stable',
+        track: 'challenger',
+        description: 'Stabiles Challenger-Profil fuer BT11-Vergleiche mit Prioritized Replay und konservativer Exploration.',
+        referenceOnly: false,
+        replay: Object.freeze({
+            prioritized: true,
+            priorityAlpha: 0.6,
+            priorityBetaStart: 0.4,
+            priorityBetaEnd: 1,
+            priorityBetaAnnealSteps: 120_000,
+        }),
+        model: Object.freeze({
+            hiddenLayers: Object.freeze([256, 128]),
+            gamma: 0.99,
+            trainEvery: 4,
+            targetSyncInterval: 500,
+            epsilonStart: 1,
+            epsilonEnd: 0.05,
+            epsilonDecaySteps: 24_000,
+            rewardClamp: 10,
+        }),
+        promotion: DEFAULT_PROMOTION_POLICY,
+    }),
+    'challenger-balanced': Object.freeze({
+        id: 'challenger-balanced',
+        label: 'Challenger balanced',
+        track: 'challenger',
+        description: 'Runtime-nahe Challenger-Lane mit aktivem PER und laengerer Exploration fuer BT80C-Kandidaten.',
+        referenceOnly: false,
+        replay: Object.freeze({
+            prioritized: true,
+            priorityAlpha: 0.7,
+            priorityBetaStart: 0.45,
+            priorityBetaEnd: 1,
+            priorityBetaAnnealSteps: 160_000,
+        }),
+        model: Object.freeze({
+            hiddenLayers: Object.freeze([256, 128]),
+            gamma: 0.992,
+            trainEvery: 4,
+            targetSyncInterval: 700,
+            epsilonStart: 1,
+            epsilonEnd: 0.03,
+            epsilonDecaySteps: 48_000,
+            rewardClamp: 12,
+        }),
+        promotion: DEFAULT_PROMOTION_POLICY,
+    }),
+    'challenger-high-util': Object.freeze({
+        id: 'challenger-high-util',
+        label: 'Challenger high util',
+        track: 'challenger',
+        description: 'Langlauf-Profil fuer hohe Auslastung mit schrittweise abnehmender Exploration und harter Promotion-Lane.',
+        referenceOnly: false,
+        replay: Object.freeze({
+            prioritized: true,
+            priorityAlpha: 0.7,
+            priorityBetaStart: 0.5,
+            priorityBetaEnd: 1,
+            priorityBetaAnnealSteps: 240_000,
+        }),
+        model: Object.freeze({
+            hiddenLayers: Object.freeze([256, 128]),
+            gamma: 0.994,
+            trainEvery: 4,
+            targetSyncInterval: 900,
+            epsilonStart: 1,
+            epsilonEnd: 0.02,
+            epsilonDecaySteps: 72_000,
+            rewardClamp: 12,
+        }),
+        promotion: DEFAULT_PROMOTION_POLICY,
+    }),
+    'ablation-no-per': Object.freeze({
+        id: 'ablation-no-per',
+        label: 'Ablation no PER',
+        track: 'ablation',
+        description: 'Gezielte Ablation ohne Prioritized Replay; bleibt strikt Referenz- oder Smoke-Lane.',
+        referenceOnly: true,
+        replay: Object.freeze({
+            prioritized: false,
+            priorityAlpha: 0.6,
+            priorityBetaStart: 0.4,
+            priorityBetaEnd: 1,
+            priorityBetaAnnealSteps: 120_000,
+        }),
+        model: Object.freeze({
+            hiddenLayers: Object.freeze([256, 128]),
+            gamma: 0.99,
+            trainEvery: 4,
+            targetSyncInterval: 500,
+            epsilonStart: 1,
+            epsilonEnd: 0.05,
+            epsilonDecaySteps: 24_000,
+            rewardClamp: 10,
+        }),
+        promotion: DEFAULT_PROMOTION_POLICY,
+    }),
+});
 
 export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
     'quick-benchmark': Object.freeze({
         id: 'quick-benchmark',
         label: 'Quick benchmark',
         description: 'Kurzlauf fuer deterministische Kandidatenpruefung mit maximaler Reproduzierbarkeit.',
+        algorithmProfileName: 'champion-stable',
         trainer: Object.freeze({
             workerCount: 1,
             replayCapacity: 50_000,
@@ -51,6 +163,7 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
         id: 'ablation',
         label: 'Ablation',
         description: 'Mittlerer Vergleichslauf fuer isolierte Einzelvariablen.',
+        algorithmProfileName: 'ablation-no-per',
         trainer: Object.freeze({
             workerCount: 1,
             replayCapacity: 75_000,
@@ -97,6 +210,7 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
         id: 'overnight-high-util',
         label: 'Overnight high util',
         description: 'Langlauf fuer hohe lokale Auslastung mit harten Resume- und Artefaktguardrails.',
+        algorithmProfileName: 'challenger-balanced',
         trainer: Object.freeze({
             workerCount: 1,
             replayCapacity: 150_000,
@@ -136,13 +250,14 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
             maxPendingAckRatio: 0.55,
             maxArtifactBacklog: 0,
             maxResumeFailures: 0,
-            temperatureC: null,
+            temperatureC: 84,
         }),
     }),
     marathon: Object.freeze({
         id: 'marathon',
         label: 'Marathon',
         description: '24h-Operatorprofil fuer maximale nutzbare Leistung ohne stillen Artefaktstau.',
+        algorithmProfileName: 'challenger-high-util',
         trainer: Object.freeze({
             workerCount: 1,
             replayCapacity: 250_000,
@@ -182,10 +297,30 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
             maxPendingAckRatio: 0.6,
             maxArtifactBacklog: 0,
             maxResumeFailures: 0,
-            temperatureC: null,
+            temperatureC: 82,
         }),
     }),
 });
+
+export function normalizeTrainingAlgorithmProfileName(value, fallback = null) {
+    const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    if (normalized && Object.prototype.hasOwnProperty.call(TRAINING_ALGORITHM_PROFILES, normalized)) {
+        return normalized;
+    }
+    return fallback;
+}
+
+export function resolveTrainingAlgorithmProfile(value, fallback = null) {
+    const profileName = normalizeTrainingAlgorithmProfileName(value, fallback);
+    if (!profileName) return null;
+    return TRAINING_ALGORITHM_PROFILES[profileName] || null;
+}
+
+export function listTrainingAlgorithmProfiles() {
+    return Object.keys(TRAINING_ALGORITHM_PROFILES)
+        .map((key) => resolveTrainingAlgorithmProfile(key))
+        .filter(Boolean);
+}
 
 export function normalizeTrainingPerformanceProfileName(value, fallback = null) {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';

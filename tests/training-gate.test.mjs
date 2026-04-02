@@ -151,6 +151,104 @@ async function writePassingBotValidationReportWithIncompletePreviewPublishEviden
     }, null, 2)}\n`, 'utf8');
 }
 
+async function writePassingBotValidationReportWithDiagnostics(filePath) {
+    await writeFile(filePath, `${JSON.stringify({
+        overall: {
+            rounds: 16,
+            botWinRate: 0.75,
+            averageBotSurvival: 48,
+        },
+        runner: {
+            forcedRounds: 0,
+            timeoutRounds: 0,
+            serverMode: 'preview',
+            publishEvidence: true,
+            previewBuildBeforeStart: true,
+            diagnostics: {
+                contractVersion: 'v80-bot-validation-runtime-v1',
+                stageTimingsMs: {
+                    serverProbeMs: 4,
+                    previewBuildMs: 42,
+                    serverStartMs: 18,
+                    browserLaunchMs: 12,
+                    browserContextMs: 5,
+                    browserPageMs: 6,
+                    appBootstrapMs: 140,
+                    scenarioEvalMs: 520,
+                    reportWriteMs: 24,
+                    publishWriteMs: 10,
+                    totalMs: 781,
+                },
+                reportIo: {
+                    jsonWriteMs: 11,
+                    markdownWriteMs: 13,
+                    totalWriteMs: 24,
+                    totalBytes: 1536,
+                    writes: [
+                        { label: 'report-json', path: 'tmp/bot-validation-report.json', elapsedMs: 11, bytes: 768 },
+                        { label: 'report-markdown', path: 'tmp/Testergebnisse.md', elapsedMs: 13, bytes: 768 },
+                    ],
+                },
+                preview: {
+                    buildPerformed: true,
+                    serverReused: false,
+                    buildElapsedMs: 42,
+                    serverStartElapsedMs: 18,
+                },
+                publish: {
+                    jsonWriteMs: 5,
+                    markdownWriteMs: 5,
+                    totalWriteMs: 10,
+                    totalBytes: 2048,
+                    wroteCanonicalJson: true,
+                    wroteCanonicalMarkdown: true,
+                    writes: [
+                        { label: 'publish-json', path: 'data/bot_validation_report.json', elapsedMs: 5, bytes: 1024 },
+                        { label: 'publish-markdown', path: 'docs/Testergebnisse.md', elapsedMs: 5, bytes: 1024 },
+                    ],
+                },
+                bottlenecks: [
+                    { rank: 1, stage: 'scenario-eval', elapsedMs: 520 },
+                    { rank: 2, stage: 'app-bootstrap', elapsedMs: 140 },
+                ],
+            },
+        },
+    }, null, 2)}\n`, 'utf8');
+}
+
+async function hydrateLocalRunArtifactsForPassingGate(stamp) {
+    const runDir = `data/training/runs/${stamp}`;
+    const modelDir = `data/training/models/${stamp}`;
+    const runArtifactPath = `${runDir}/run.json`;
+    const trainerArtifactPath = `${runDir}/trainer.json`;
+    const checkpointPath = `${modelDir}/checkpoint.json`;
+    const runArtifact = JSON.parse(await readFile(runArtifactPath, 'utf8'));
+    runArtifact.trainerArtifactPath = trainerArtifactPath.replace(/\\/g, '/');
+    runArtifact.checkpointPath = checkpointPath.replace(/\\/g, '/');
+    await mkdir(modelDir, { recursive: true });
+    await writeFile(runArtifactPath, `${JSON.stringify(runArtifact, null, 2)}\n`, 'utf8');
+    await writeFile(trainerArtifactPath, `${JSON.stringify({
+        contractVersion: 'v35-trainer-artifact-v1',
+        generatedAt: new Date().toISOString(),
+        stamp,
+        checkpointPath: checkpointPath.replace(/\\/g, '/'),
+        hardwareTelemetry: {
+            thermal: {
+                available: false,
+                temperatureC: null,
+            },
+        },
+    }, null, 2)}\n`, 'utf8');
+    await writeFile(checkpointPath, `${JSON.stringify({
+        contractVersion: 'v35-checkpoint-artifact-v1',
+        generatedAt: new Date().toISOString(),
+        stamp,
+        checkpoint: {
+            contractVersion: 'v36-dqn-checkpoint-v2',
+        },
+    }, null, 2)}\n`, 'utf8');
+}
+
 test('V36 training gate restores latest index after standalone eval+gate failure', async () => {
     const releaseLock = await acquireLatestIndexLock();
     const stamp = `TEST_GATE_RESTORE_${Date.now()}`;
@@ -344,6 +442,53 @@ test('V80 training gate fails hard when preview build evidence or canonical publ
         assert.equal(result.failureCounts['preview-lane-missing'] > 0, true);
         assert.equal(result.failureCounts['publish-lane-missing'] > 0, true);
         assert.equal(latestAfter, latestBefore);
+    } finally {
+        await restoreFile(reportPath, null);
+        await restoreFile(LATEST_INDEX_PATH, latestBefore);
+        await releaseLock();
+    }
+});
+
+test('V80 training gate reports BT20 challengers as reference-only even when rollout evidence is green', async () => {
+    const releaseLock = await acquireLatestIndexLock();
+    const stamp = `BT20_REFERENCE_ONLY_${Date.now()}`;
+    const reportPath = `data/training/test-bot-validation-pass-${stamp}.json`;
+    const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
+    try {
+        await writePassingBotValidationReportWithDiagnostics(reportPath);
+        await execFileAsync(process.execPath, [
+            TRAINING_RUN_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+            '--bridge-mode', 'local',
+            '--resume-checkpoint', 'latest',
+            '--resume-strict', 'false',
+            '--episodes', '1',
+            '--seeds', '11',
+            '--modes', 'classic-3d',
+            '--max-steps', '8',
+            '--algorithm-profile', 'challenger-balanced',
+        ]);
+        await hydrateLocalRunArtifactsForPassingGate(stamp);
+        await execFileAsync(process.execPath, [
+            TRAINING_EVAL_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+            '--bot-validation-report', reportPath,
+        ]);
+
+        const { stdout } = await execFileAsync(process.execPath, [
+            TRAINING_GATE_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+        ]);
+
+        const result = parseLastJsonObject(stdout);
+        assert.equal(result.ok, true);
+        assert.equal(result.candidateRole, 'challenger');
+        assert.equal(result.referenceOnly, true);
+        assert.equal(result.promotionStatus, 'blocked');
+        assert.equal(result.promotionEligible, false);
     } finally {
         await restoreFile(reportPath, null);
         await restoreFile(LATEST_INDEX_PATH, latestBefore);

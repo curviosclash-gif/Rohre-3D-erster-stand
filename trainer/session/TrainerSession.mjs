@@ -55,6 +55,11 @@ export class TrainerSession {
             : new ReplayBuffer({
                 capacity: this.config.replayCapacity,
                 seed: this.config.sessionSeed,
+                prioritized: this.config?.replay?.prioritized === true,
+                alpha: this.config?.replay?.priorityAlpha,
+                betaStart: this.config?.replay?.priorityBetaStart,
+                betaEnd: this.config?.replay?.priorityBetaEnd,
+                betaAnnealSteps: this.config?.replay?.priorityBetaAnnealSteps,
             });
 
         this._state = {
@@ -134,6 +139,7 @@ export class TrainerSession {
             replay: this.replayBuffer.getStats(),
             model: this._model.getSnapshot(),
             metrics: this._metrics.getSummary(),
+            algorithmProfileName: this.config.algorithmProfileName || null,
         };
     }
 
