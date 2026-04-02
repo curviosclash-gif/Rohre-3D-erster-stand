@@ -256,10 +256,19 @@ export function evaluateBenchmarkArtifactRequirements(input = {}, options = {}) 
                 const preview = botValidationCapacityScan.preview && typeof botValidationCapacityScan.preview === 'object'
                     ? botValidationCapacityScan.preview
                     : null;
+                const previewBuildRequested = preview?.buildRequested === true
+                    || botValidation?.runner?.previewBuildBeforeStart === true;
                 if (
                     preview?.active !== true
                     || typeof preview?.serverReused !== 'boolean'
                     || preview?.serverStartElapsedMs == null
+                    || (
+                        previewBuildRequested
+                        && (
+                            preview?.buildPerformed !== true
+                            || preview?.buildElapsedMs == null
+                        )
+                    )
                 ) {
                     failures.push(buildFailure('preview-lane-missing', {
                         artifact: 'bot-validation-report',
@@ -276,6 +285,11 @@ export function evaluateBenchmarkArtifactRequirements(input = {}, options = {}) 
                     || publish?.jsonWriteMs == null
                     || publish?.markdownWriteMs == null
                     || publish?.totalWriteMs == null
+                    || toFiniteNumber(publish?.totalBytes, 0) <= 0
+                    || publish?.wroteCanonicalJson !== true
+                    || publish?.wroteCanonicalMarkdown !== true
+                    || !Array.isArray(publish?.writes)
+                    || publish.writes.length < 2
                 ) {
                     failures.push(buildFailure('publish-lane-missing', {
                         artifact: 'bot-validation-report',

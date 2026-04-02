@@ -144,6 +144,63 @@ test('V80 benchmark artifact audit accepts preview/publish diagnostics and prese
     assert.equal(benchmarkReport.validationLane?.source?.reportPath, reportPath);
 });
 
+test('V80 benchmark artifact audit fails when preview build evidence or canonical publish evidence is incomplete', () => {
+    const reportPath = 'data/training/runs/TEST_BT80A_DIAGNOSTICS_INCOMPLETE/bot-validation-report.json';
+    const report = createValidationReportWithDiagnostics();
+    report.runner.diagnostics.preview.buildPerformed = false;
+    report.runner.diagnostics.preview.buildElapsedMs = null;
+    report.runner.diagnostics.publish.totalBytes = 0;
+    report.runner.diagnostics.publish.wroteCanonicalJson = false;
+    report.runner.diagnostics.publish.wroteCanonicalMarkdown = false;
+    report.runner.diagnostics.publish.writes = [];
+
+    const validationLane = buildBotValidationEval(report, {
+        reportPath,
+        exists: true,
+    });
+    const artifactAudit = evaluateBenchmarkArtifactRequirements({
+        manifest: {
+            contractVersion: 'v80-benchmark-manifest-v1',
+            semantics: { id: TRAINING_BENCHMARK_SEMANTIC_WINDOW.id },
+            benchmarkMatrix: { version: TRAINING_BENCHMARK_MATRIX.version },
+        },
+        runArtifact: {
+            checkpointPath: 'data/training/models/TEST_BT80A_DIAGNOSTICS_INCOMPLETE/checkpoint.json',
+            hardwareTelemetry: {
+                thermal: {
+                    available: false,
+                    temperatureC: null,
+                },
+            },
+            resume: {
+                requested: false,
+                loaded: false,
+            },
+        },
+        evalArtifact: {
+            botValidation: validationLane,
+            source: {
+                botValidationReportPath: reportPath,
+            },
+        },
+        trainerArtifact: {
+            hardwareTelemetry: {
+                thermal: {
+                    available: false,
+                    temperatureC: null,
+                },
+            },
+        },
+        decisionTrace: {
+            decisions: [],
+        },
+    });
+
+    assert.equal(artifactAudit.ok, false);
+    assert.equal(artifactAudit.failures.some((entry) => entry.code === 'preview-lane-missing'), true);
+    assert.equal(artifactAudit.failures.some((entry) => entry.code === 'publish-lane-missing'), true);
+});
+
 test('V80 benchmark profile guardrails keep thermal telemetry observe-only when unavailable', () => {
     const guardrails = evaluateBenchmarkProfileGuardrails({
         profile: resolveTrainingPerformanceProfile('quick-benchmark'),

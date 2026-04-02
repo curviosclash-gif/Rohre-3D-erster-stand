@@ -89,6 +89,68 @@ async function writePassingBotValidationReportWithoutDiagnostics(filePath) {
     }, null, 2)}\n`, 'utf8');
 }
 
+async function writePassingBotValidationReportWithIncompletePreviewPublishEvidence(filePath) {
+    await writeFile(filePath, `${JSON.stringify({
+        overall: {
+            rounds: 16,
+            botWinRate: 0.75,
+            averageBotSurvival: 48,
+        },
+        runner: {
+            forcedRounds: 0,
+            timeoutRounds: 0,
+            serverMode: 'preview',
+            publishEvidence: true,
+            previewBuildBeforeStart: true,
+            diagnostics: {
+                contractVersion: 'v80-bot-validation-runtime-v1',
+                stageTimingsMs: {
+                    serverProbeMs: 4,
+                    previewBuildMs: 42,
+                    serverStartMs: 18,
+                    browserLaunchMs: 12,
+                    browserContextMs: 5,
+                    browserPageMs: 6,
+                    appBootstrapMs: 140,
+                    scenarioEvalMs: 520,
+                    reportWriteMs: 24,
+                    publishWriteMs: 10,
+                    totalMs: 781,
+                },
+                reportIo: {
+                    jsonWriteMs: 11,
+                    markdownWriteMs: 13,
+                    totalWriteMs: 24,
+                    totalBytes: 1536,
+                    writes: [
+                        { label: 'report-json', path: 'tmp/bot-validation-report.json', elapsedMs: 11, bytes: 768 },
+                        { label: 'report-markdown', path: 'tmp/Testergebnisse.md', elapsedMs: 13, bytes: 768 },
+                    ],
+                },
+                preview: {
+                    buildPerformed: false,
+                    serverReused: false,
+                    buildElapsedMs: null,
+                    serverStartElapsedMs: 18,
+                },
+                publish: {
+                    jsonWriteMs: 5,
+                    markdownWriteMs: 5,
+                    totalWriteMs: 10,
+                    totalBytes: 0,
+                    wroteCanonicalJson: false,
+                    wroteCanonicalMarkdown: false,
+                    writes: [],
+                },
+                bottlenecks: [
+                    { rank: 1, stage: 'scenario-eval', elapsedMs: 520 },
+                    { rank: 2, stage: 'app-bootstrap', elapsedMs: 140 },
+                ],
+            },
+        },
+    }, null, 2)}\n`, 'utf8');
+}
+
 test('V36 training gate restores latest index after standalone eval+gate failure', async () => {
     const releaseLock = await acquireLatestIndexLock();
     const stamp = `TEST_GATE_RESTORE_${Date.now()}`;
@@ -239,3 +301,54 @@ test('V80 training gate fails hard when preview/publish diagnostics are missing 
     }
 });
 
+test('V80 training gate fails hard when preview build evidence or canonical publish evidence is incomplete', async () => {
+    const releaseLock = await acquireLatestIndexLock();
+    const stamp = `TEST_GATE_INCOMPLETE_PREVIEW_PUBLISH_${Date.now()}`;
+    const reportPath = `data/training/test-bot-validation-incomplete-preview-publish-${stamp}.json`;
+    const latestBefore = await readFileIfExists(LATEST_INDEX_PATH);
+    try {
+        await writePassingBotValidationReportWithIncompletePreviewPublishEvidence(reportPath);
+        await execFileAsync(process.execPath, [
+            TRAINING_RUN_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+            '--bridge-mode', 'local',
+            '--resume-checkpoint', 'latest',
+            '--resume-strict', 'false',
+            '--episodes', '1',
+            '--seeds', '11',
+            '--modes', 'classic-3d',
+            '--max-steps', '8',
+        ]);
+        await execFileAsync(process.execPath, [
+            TRAINING_EVAL_SCRIPT,
+            '--stamp', stamp,
+            '--write-latest', 'true',
+            '--bot-validation-report', reportPath,
+        ]);
+
+        let stdout = '';
+        try {
+            await execFileAsync(process.execPath, [
+                TRAINING_GATE_SCRIPT,
+                '--stamp', stamp,
+                '--write-latest', 'true',
+            ]);
+            assert.fail('training-gate should fail when preview build or canonical publish evidence is incomplete');
+        } catch (error) {
+            stdout = String(error?.stdout || '');
+        }
+
+        const result = parseLastJsonObject(stdout);
+        const latestAfter = await readFileIfExists(LATEST_INDEX_PATH);
+        assert.equal(result.ok, false);
+        assert.equal(result.latestRestored, true);
+        assert.equal(result.failureCounts['preview-lane-missing'] > 0, true);
+        assert.equal(result.failureCounts['publish-lane-missing'] > 0, true);
+        assert.equal(latestAfter, latestBefore);
+    } finally {
+        await restoreFile(reportPath, null);
+        await restoreFile(LATEST_INDEX_PATH, latestBefore);
+        await releaseLock();
+    }
+});
