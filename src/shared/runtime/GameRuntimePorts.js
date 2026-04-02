@@ -20,6 +20,10 @@ function getRuntimeFacade(game) {
     return getRuntimeComponent(game, 'runtimeFacade') || game?.runtimeFacade || null;
 }
 
+function getRuntimeCoordinator(game) {
+    return getRuntimeComponent(game, 'runtimeCoordinator') || game?.runtimeCoordinator || null;
+}
+
 export function createSettingsPort(game) {
     return {
         getSettings: () => game?.settings || null,
@@ -134,19 +138,24 @@ export function createInputPort(game) {
 export function createLifecyclePort(game) {
     return {
         initializeSession() {
-            return getRuntimeFacade(game)?.initializeSession?.();
+            return getRuntimeCoordinator(game)?.initializeSession?.()
+                ?? getRuntimeFacade(game)?.initializeSession?.();
         },
         waitForAllPlayersLoaded() {
-            return getRuntimeFacade(game)?.waitForAllPlayersLoaded?.();
+            return getRuntimeCoordinator(game)?.waitForAllPlayersLoaded?.()
+                ?? getRuntimeFacade(game)?.waitForAllPlayersLoaded?.();
         },
         teardownRuntimeSession() {
-            return getRuntimeFacade(game)?.teardownRuntimeSession?.();
+            return getRuntimeCoordinator(game)?.teardownRuntimeSession?.()
+                ?? getRuntimeFacade(game)?.teardownRuntimeSession?.();
         },
         startArcadeRunIfEnabled() {
-            return getRuntimeFacade(game)?.startArcadeRunIfEnabled?.();
+            return getRuntimeCoordinator(game)?.startArcadeRunIfEnabled?.()
+                ?? getRuntimeFacade(game)?.startArcadeRunIfEnabled?.();
         },
         returnToMenu(options = undefined) {
-            return getRuntimeFacade(game)?.returnToMenu?.(options);
+            return getRuntimeCoordinator(game)?.returnToMenu?.(options)
+                ?? getRuntimeFacade(game)?.returnToMenu?.(options);
         },
     };
 }

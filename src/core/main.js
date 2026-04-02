@@ -4,14 +4,12 @@
 
 import { RoundRecorder } from '../state/RoundRecorder.js';
 import { CUSTOM_MAP_KEY } from '../entities/MapSchema.js';
-import { UIManager, ProfileUiController } from '../composition/core-ui/CoreUiAppPorts.js';
+import { ProfileUiController } from '../composition/core-ui/CoreUiAppPorts.js';
 import { SettingsManager } from './SettingsManager.js';
 import { ProfileManager } from './ProfileManager.js';
 import { createRoundStateController } from '../state/RoundStateController.js';
 import { PlayingStateSystem } from './PlayingStateSystem.js';
 import { RoundStateTickSystem } from '../state/RoundStateTickSystem.js';
-import { bootstrapGameRuntime } from './GameBootstrap.js';
-import { GameRuntimeFacade } from './GameRuntimeFacade.js';
 import { GameDebugApi } from './GameDebugApi.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import {
@@ -23,8 +21,8 @@ import { initializeGameApp } from './AppInitializer.js';
 import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './PlaytestLaunchParams.js';
 import { RECORDING_CAPTURE_PROFILE, RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
 import { RECORDER_ENGINE } from './recording/MediaRecorderSupport.js';
-import { clearGameRuntimeState } from './runtime/GameRuntimeBundle.js';
 import { ensureInteractiveMatchRuntime } from './InteractiveMatchRuntimeGuard.js';
+import { GameRuntimeCoordinator } from './runtime/GameRuntimeCoordinator.js';
 
 /* global __APP_VERSION__, __BUILD_TIME__, __BUILD_ID__ */
 const APP_VERSION = typeof __APP_VERSION__ !== 'undefined' ? __APP_VERSION__ : 'dev';
@@ -64,31 +62,22 @@ export class Game {
         this.keyCapture = null;
         this._disposed = false;
         this._playtestStartTimeoutId = null;
+        this.runtimeCoordinator = new GameRuntimeCoordinator({ game: this });
         this._boundKeyCaptureHandler = (event) => this.keybindEditorController.handleKeyCapture(event);
 
-        const runtimeBundle = bootstrapGameRuntime(this, {
+        this.runtimeCoordinator.initialize({
             appVersion: APP_VERSION,
             buildId: BUILD_ID,
             buildTime: BUILD_TIME,
             showStatusToast: (message, durationMs, tone) => this._showStatusToast(message, durationMs, tone),
+            initialBindings: this.settings.controls,
         });
-        this.runtimeFacade = new GameRuntimeFacade({ game: this, ports: runtimeBundle?.ports || this.runtimePorts, runtimeBundle });
-        if (runtimeBundle?.components) {
-            runtimeBundle.components.runtimeFacade = this.runtimeFacade;
-        }
         this.debugApi = new GameDebugApi(this);
 
         // Debug Recorder
         this.recorder = new RoundRecorder();
         this._recorderFrameCaptureEnabled = this.debugApi.resolveRecorderFrameCaptureEnabledDefault();
         this.recorder.setFrameCaptureEnabled(this._recorderFrameCaptureEnabled);
-
-        this._applySettingsToRuntime();
-        this.input.setBindings(this.settings.controls);
-
-        this.uiManager = new UIManager({ game: this, ports: runtimeBundle?.ports || this.runtimePorts });
-        this.uiManager.init();
-        this.keybindEditorController.renderEditor();
 
         this.profileUiController = new ProfileUiController({
             profileManager: this.profileManager,
@@ -111,12 +100,7 @@ export class Game {
         this._setupMenuListeners();
         this._syncProfileControls();
         this._markSettingsDirty(false);
-        this._renderBuildInfo();
-        if (this.ui?.mainMenu) {
-            this.ui.mainMenu.style.visibility = '';
-        }
-
-        runtimeBundle?.components?.gameLoop?.start?.();
+        this.runtimeCoordinator.finishStartup();
 
         window.addEventListener('keydown', this._boundKeyCaptureHandler, true);
 
@@ -164,7 +148,7 @@ export class Game {
     }
 
     _renderBuildInfo() {
-        this._buildInfoClipboardText = this.buildInfoController.renderBuildInfo();
+        this.runtimeCoordinator.renderBuildInfo();
     }
 
     _loadSettings() {
@@ -179,27 +163,27 @@ export class Game {
     }
 
     _applySettingsToRuntime(options = undefined) {
-        this.runtimeFacade.applySettingsToRuntime(options);
+        this.runtimeCoordinator.applySettingsToRuntime(options);
     }
 
     _setupMenuListeners() {
-        this.runtimeFacade.setupMenuListeners();
+        this.runtimeCoordinator.setupMenuListeners();
     }
 
     _handleMenuControllerEvent(event) {
-        this.runtimeFacade.handleMenuControllerEvent(event);
+        this.runtimeCoordinator.handleMenuControllerEvent(event);
     }
 
     _onSettingsChanged(event = null) {
-        this.runtimeFacade.onSettingsChanged(event);
+        this.runtimeCoordinator.onSettingsChanged(event);
     }
 
     _markSettingsDirty(isDirty) {
-        this.runtimeFacade.markSettingsDirty(isDirty);
+        this.runtimeCoordinator.markSettingsDirty(isDirty);
     }
 
     _updateSaveButtonState() {
-        this.runtimeFacade.updateSaveButtonState();
+        this.runtimeCoordinator.updateSaveButtonState();
     }
 
     _syncProfileControls(options = null) {
@@ -423,7 +407,7 @@ export class Game {
     }
 
     startMatch() {
-        this.runtimeFacade.startMatch();
+        this.runtimeCoordinator.startMatch();
     }
 
     getBotValidationMatrix() {
@@ -496,7 +480,7 @@ export class Game {
 
     // Legacy compatibility hook retained for runtime/tests.
     _returnToMenu() {
-        this.runtimeFacade.returnToMenu();
+        this.runtimeCoordinator.returnToMenu();
     }
 
     render(alpha = this.gameLoop?.renderAlpha ?? 1, renderDelta = this.gameLoop?.renderDelta ?? this.gameLoop?.fixedStep ?? (1 / 60)) {
@@ -532,18 +516,7 @@ export class Game {
         }
 
         this.keyCapture = null;
-        this.gameLoop?.stop?.();
-        this.matchFlowUiController?.dispose?.();
-        this.runtimeFacade?.dispose?.();
-        this.huntHud?.dispose?.();
-        this.hudRuntimeSystem?.dispose?.();
-        this.uiManager?.dispose?.();
-        this.runtimeDiagnosticsSystem?.dispose?.();
-        this.mediaRecorderSystem?.dispose?.();
-        this.input?.dispose?.();
-        this.audio?.dispose?.();
-        this.renderer?.dispose?.();
-        clearGameRuntimeState(this.runtimeBundle);
+        this.runtimeCoordinator?.disposeRuntime?.();
 
         if (window.GAME_INSTANCE === this) window.GAME_INSTANCE = null;
         if (window.GAME_RUNTIME === this.runtimeFacade) window.GAME_RUNTIME = null;
