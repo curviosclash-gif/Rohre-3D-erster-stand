@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-02
+Stand: 2026-04-02 (Logikfehler korrigiert: V71-Dep hard, V76-Dep V82 ergaenzt, V76-Dep V74 hard)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -26,11 +26,13 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
-| V74 | Architektur-Runtime-Entkopplung (Refresh) | active | P1 | Bot-Codex | V58.99,V60.3 | 74.4 | `docs/plaene/aktiv/V74.md` |
+| V74 | Architektur-Runtime-Entkopplung (Refresh) | active | P1 | Bot-Codex | V58.99,V60.3 | 74.5 | `docs/plaene/aktiv/V74.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
-| V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V77.99,V64.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
+| V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
+| V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.1 | `docs/plaene/aktiv/V82.md` |
+| V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 
 ## Abhaengigkeiten
 
@@ -40,7 +42,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V64 | V50/V52 Netzwerk-Baseline | hard | ja | SessionAdapter-, Lobby-, Signaling- und `stateUpdate`-Grundvertraege bleiben verbindlich |
 | V64 | V77.99 | hard | nein | Multiplayer darf das Verkaufsversprechen `Vollversion hostet, Demo joint` erst nach verankerter Surface-Policy umsetzen |
 | V71 | V43-Strukturvertrag | hard | ja | Root-/Editor-Schutz und `EditorPathContract` bleiben bis nach 71.4 verbindlich; 71.4 ist abgeschlossen |
-| V71 | Playwright-/Warmup-Entstoerung fuer Restgate | soft | nein | `71.99` bleibt aktuell an `tests/playwright.global-setup.js` mit `fetch failed`/Warmup-Hang offen |
+| V71 | Playwright-/Warmup-Entstoerung fuer Restgate | hard | nein | `71.99` Abschluss-Gate blockiert; `tests/playwright.global-setup.js` mit `fetch failed`/Warmup-Hang offen |
 | V72 | V69.99 | hard | ja | Fight/Hunt-Item-, Rocket- und Shield-Baseline aus V69 bleibt Ausgangspunkt fuer Pickup-/Portal-/Gate-Vertraege |
 | V72 | Legacy-/Migrationspfad fuer Gate-/Portal-Validierung | hard | nein | Vor hartem Fail muessen sichtbare Warn-, Diagnose- oder Migrationspfade fuer bestehende Maps umgesetzt werden |
 | V74 | V58.99 | hard | ja | Architektur-Guard- und Budget-Baseline aus V58 bleibt die verbindliche Ausgangsbasis |
@@ -55,7 +57,13 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V76 | V71.4 | hard | ja | Vehicle-Lab- und Editor-Pfade sind seit `71.4` migrationssicher ueber Contracts/Guards abgesichert |
 | V76 | V77.99 | hard | nein | Hangar, Werkstatt und Editoren muessen die in V77 definierte Vollversions-/Demo-Rollenlogik uebernehmen |
 | V76 | V64.99 | hard | nein | Hangar-/Werkstatt-Flows starten erst nach dem festgezogenen Produktbild fuer Host/Join und Browser-Demo |
-| V76 | V74 Navigations-/Composition-Grenzen | soft | nein | Hangar darf `main.js`, `GameRuntimeFacade` oder breite Desktop-Backdoors nicht erneut aufblasen |
+| V76 | V74.99 | hard | nein | Hangar darf `main.js`, `GameRuntimeFacade` oder breite Desktop-Backdoors nicht erneut aufblasen; Navigations-/Composition-Grenzen aus V74 sind verbindlich |
+| V82 | V72.99 | hard | nein | Stabile Pickup-/Portal-/Gate-Vertraege als Basis fuer erweiterte Checkpoint-Logik und Parcours-Arcade-Vereinigung |
+| V82 | V74.99 | hard | nein | Runtime-Entkopplung muss abgeschlossen sein fuer saubere State-Komposition (XP, Leaderboard, Ghost) |
+| V76 | V82.99 | hard | nein | V76.3 Arcade-Hangar baut direkt auf V82-Contracts (XP, Upgrades, Leaderboard) auf; V82 muss vor V76.3 abgeschlossen sein |
+| V81 | V74.99 | hard | nein | Tuning Console liest/schreibt CONFIG_BASE und nutzt ActiveRuntimeConfigStore; Runtime-Entkopplung muss abgeschlossen sein |
+| V81 | V72.99 | hard | nein | Parameter-Registry muss auf stabiler Pickup-Registry und Config-Struktur aufbauen |
+| V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
 
 ## Lock-Status
 
@@ -64,10 +72,12 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | - | V64 | - | frei | Nach `V77.99` `64.1` Transportmatrix und Capability-Modell fuer `Host Vollversion / Join Demo` konkretisieren |
 | - | V71 | - | frei | `71.99` nach Warmup-Entstoerung oder belastbarem Restgate schliessen |
 | Agent-B | V72 | 2026-04-02 | active | `72.2` abgeschlossen; `72.3` Portal-/Gate-Vertraege haerten steht an |
-| Bot-Codex | V74 | 2026-03-31 | active | `74.4` Core-, UI- und State-Komposition weiter entkoppeln |
+| Bot-Codex | V74 | 2026-03-31 | active | `74.5` Entity- und Config-Vertraege von Core loesen |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
+| - | V82 | - | frei | Nach `V72.99` und `V74.99` mit `82.1` Arcade-Parcours-Vereinigung starten; liefert Daten-Contracts fuer V76.3 |
+| - | V81 | - | frei | Nach `V74.99` und `V72.99` mit `81.1` Registry und Bridge starten |
 
 ## Conflict-Log
 
