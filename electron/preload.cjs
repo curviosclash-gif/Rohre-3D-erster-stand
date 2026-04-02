@@ -4,21 +4,73 @@
 
 const { contextBridge, ipcRenderer } = require('electron');
 
-contextBridge.exposeInMainWorld('__CURVIOS_APP__', true);
+const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
+    discovery: 'preload.discovery.v1',
+    host: 'preload.host.v1',
+    save: 'preload.save.v1',
+});
 
-contextBridge.exposeInMainWorld('curviosApp', {
-    getLanServerStatus: () => ipcRenderer.invoke('get-lan-server-status'),
-    startLanServer: () => ipcRenderer.invoke('start-lan-server'),
-    stopLanServer: () => ipcRenderer.invoke('stop-lan-server'),
-    saveReplay: (jsonString, defaultName) => ipcRenderer.invoke('save-replay', jsonString, defaultName),
-    saveVideo: (videoBytes, defaultName, mimeType) => ipcRenderer.invoke('save-video', videoBytes, defaultName, mimeType),
-    startDiscovery: () => ipcRenderer.invoke('start-discovery'),
-    stopDiscovery: () => ipcRenderer.invoke('stop-discovery'),
-    getDiscoveredHosts: () => ipcRenderer.invoke('get-discovered-hosts'),
-    onDiscoveredHosts: (callback) => {
-        const handler = (_event, hosts) => callback(hosts);
-        ipcRenderer.on('discovered-hosts', handler);
-        return () => ipcRenderer.removeListener('discovered-hosts', handler);
-    },
+function createInvokeBridge(channel) {
+    return (...args) => ipcRenderer.invoke(channel, ...args);
+}
+
+function createNamedContract(contractName, contractVersion, surface) {
+    return Object.freeze({
+        contractName,
+        contractVersion,
+        ...surface,
+    });
+}
+
+function createDiscoveryContract() {
+    return createNamedContract('discovery', PRELOAD_CONTRACT_VERSIONS.discovery, {
+        start: createInvokeBridge('start-discovery'),
+        stop: createInvokeBridge('stop-discovery'),
+        listHosts: createInvokeBridge('get-discovered-hosts'),
+        subscribeHosts: (callback) => {
+            if (typeof callback !== 'function') {
+                return () => {};
+            }
+            const handler = (_event, hosts) => callback(hosts);
+            ipcRenderer.on('discovered-hosts', handler);
+            return () => ipcRenderer.removeListener('discovered-hosts', handler);
+        },
+    });
+}
+
+function createHostContract() {
+    return createNamedContract('host', PRELOAD_CONTRACT_VERSIONS.host, {
+        getStatus: createInvokeBridge('get-lan-server-status'),
+        start: createInvokeBridge('start-lan-server'),
+        stop: createInvokeBridge('stop-lan-server'),
+    });
+}
+
+function createSaveContract() {
+    return createNamedContract('save', PRELOAD_CONTRACT_VERSIONS.save, {
+        saveReplay: createInvokeBridge('save-replay'),
+        saveVideo: createInvokeBridge('save-video'),
+    });
+}
+
+const discoveryContract = createDiscoveryContract();
+const hostContract = createHostContract();
+const saveContract = createSaveContract();
+const curviosApp = Object.freeze({
+    discovery: discoveryContract,
+    host: hostContract,
+    save: saveContract,
+    getLanServerStatus: hostContract.getStatus,
+    startLanServer: hostContract.start,
+    stopLanServer: hostContract.stop,
+    saveReplay: saveContract.saveReplay,
+    saveVideo: saveContract.saveVideo,
+    startDiscovery: discoveryContract.start,
+    stopDiscovery: discoveryContract.stop,
+    getDiscoveredHosts: discoveryContract.listHosts,
+    onDiscoveredHosts: discoveryContract.subscribeHosts,
     isApp: true,
 });
+
+contextBridge.exposeInMainWorld('__CURVIOS_APP__', true);
+contextBridge.exposeInMainWorld('curviosApp', curviosApp);
