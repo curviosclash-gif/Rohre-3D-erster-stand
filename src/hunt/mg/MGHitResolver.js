@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
 import {
     createHuntTargetingScratch,
     createHuntTargetingTelemetry,
@@ -9,6 +8,7 @@ import {
     resolveHuntTargetOwnerPlayer,
     resolveTrailTargetEntry,
 } from '../HuntTargetingOps.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 import { clamp } from '../../utils/MathOps.js';
 
 function resolveDamageSplit(damageResult = {}) {
@@ -47,7 +47,7 @@ export class MGHitResolver {
     resolveHit(player, mg, outMuzzle = null, outAim = null) {
         const maxRange = Math.max(10, Number(mg.RANGE || 95));
         this.resolveAimDirection(player, this._tmpAim);
-        const muzzleOffset = Math.max(0, Number(CONFIG?.HUNT?.TARGETING?.MUZZLE_OFFSET || 2.1));
+        const muzzleOffset = Math.max(0, Number(resolveGameplayConfig(player).HUNT?.TARGETING?.MUZZLE_OFFSET || 2.1));
         this._tmpMuzzle.copy(player.position).addScaledVector(this._tmpAim, muzzleOffset);
         if (outMuzzle) outMuzzle.copy(this._tmpMuzzle);
         if (outAim) outAim.copy(this._tmpAim);
@@ -100,6 +100,7 @@ export class MGHitResolver {
 
         const entry = resolveTrailTargetEntry(trailSpatialIndex, trailHit, {
             scratch: this._targetingScratch,
+            configSource: this.runtime,
         });
         if (!entry) return;
         const fallbackDamage = Math.max(1, Number(entry.maxHp) || Number(entry.hp) || 1);

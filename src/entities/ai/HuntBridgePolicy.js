@@ -3,7 +3,6 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
 import {
     PRESSURE_LEVEL,
     PROJECTILE_THREAT,
@@ -21,6 +20,7 @@ import {
     HuntBotPolicy,
 } from '../../hunt/HuntBotPolicy.js';
 import { resolveHuntTargetOwnerPlayer } from '../../hunt/HuntTargetingOps.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 const TMP_TO_ENEMY = new THREE.Vector3();
@@ -77,6 +77,7 @@ function resolveHuntBridgePriorities(player, runtimeContext) {
 
 function applyRetreatManeuver(action, player, enemy) {
     if (!enemy || !player || typeof player.getDirection !== 'function') return;
+    const planarMode = !!resolveGameplayConfig(player).GAMEPLAY.PLANAR_MODE;
 
     TMP_TO_ENEMY.subVectors(enemy.position, player.position).normalize();
     player.getDirection(TMP_FORWARD).normalize();
@@ -94,7 +95,7 @@ function applyRetreatManeuver(action, player, enemy) {
         action.yawRight = yawTowardEnemy < 0;
     }
 
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!planarMode) {
         const pitchTowardEnemy = TMP_UP.dot(TMP_TO_ENEMY);
         if (Math.abs(pitchTowardEnemy) > 0.07) {
             action.pitchUp = pitchTowardEnemy < 0;

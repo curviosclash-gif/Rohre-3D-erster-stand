@@ -3,15 +3,16 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
 import { disposeObject3DResources } from '../core/three-disposal.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 const MAX_PARTICLES = 1000;
 const DUMMY = new THREE.Object3D();
 
 export class ParticleSystem {
-    constructor(renderer) {
+    constructor(renderer, configSource = null) {
         this.renderer = renderer;
+        this.configSource = configSource || null;
         this.count = 0;
         this._debugEvents = [];
         this._maxDebugEvents = 24;
@@ -133,7 +134,7 @@ export class ParticleSystem {
     }
 
     spawnMgImpact(position, color = null) {
-        const feedback = CONFIG?.HUNT?.FEEDBACK?.MG_IMPACT || {};
+        const feedback = resolveGameplayConfig(this.configSource).HUNT?.FEEDBACK?.MG_IMPACT || {};
         this.spawn(
             position,
             Math.max(1, Number(feedback.count) || 16),
@@ -149,7 +150,7 @@ export class ParticleSystem {
     }
 
     spawnTrailImpact(position, color = null, { destroyed = false } = {}) {
-        const feedback = CONFIG?.HUNT?.FEEDBACK?.TRAIL_IMPACT || {};
+        const feedback = resolveGameplayConfig(this.configSource).HUNT?.FEEDBACK?.TRAIL_IMPACT || {};
         const fallbackColor = destroyed ? feedback.destroyedColor : feedback.color;
         this.spawn(
             position,
@@ -166,7 +167,7 @@ export class ParticleSystem {
     }
 
     spawnShieldImpact(position, color = null, { broken = false } = {}) {
-        const feedback = CONFIG?.HUNT?.FEEDBACK?.SHIELD_IMPACT || {};
+        const feedback = resolveGameplayConfig(this.configSource).HUNT?.FEEDBACK?.SHIELD_IMPACT || {};
         const fallbackColor = broken ? feedback.breakColor : feedback.color;
         this.spawn(
             position,
@@ -183,7 +184,7 @@ export class ParticleSystem {
     }
 
     spawnRocketImpact(position, rocketType = '', color = null) {
-        const feedback = CONFIG?.HUNT?.FEEDBACK?.ROCKET_IMPACT || {};
+        const feedback = resolveGameplayConfig(this.configSource).HUNT?.FEEDBACK?.ROCKET_IMPACT || {};
         const type = String(rocketType || '').toUpperCase();
         let fallbackColor = feedback.mediumColor;
         if (type === 'ROCKET_WEAK') fallbackColor = feedback.weakColor;
@@ -205,7 +206,7 @@ export class ParticleSystem {
     }
 
     spawnTrailExplosion(points, trailColor = null) {
-        const feedback = CONFIG?.HUNT?.FEEDBACK?.TRAIL_EXPLOSION || {};
+        const feedback = resolveGameplayConfig(this.configSource).HUNT?.FEEDBACK?.TRAIL_EXPLOSION || {};
         const countPerPoint = Math.max(1, Number(feedback.countPerSegment) || 8);
         const color = Number.isFinite(Number(trailColor)) ? Number(trailColor) : Number(feedback.color) || 0x44ccff;
 

@@ -121,6 +121,8 @@ export class MenuController {
         this.dispose();
         const bindingContext = {
             ui: this.ui,
+            game: this.game,
+            configSource: this.game?.config || null,
             settings: this.settings,
             featureFlags: resolveRuntimeMenuFeatureFlags(this.settings?.menuFeatureFlags),
             eventTypes: MENU_CONTROLLER_EVENT_TYPES,

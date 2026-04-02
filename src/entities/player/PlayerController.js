@@ -1,4 +1,4 @@
-import { CONFIG } from '../../core/Config.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 function axisInput(positive, negative) {
     return (positive ? 1 : 0) - (negative ? 1 : 0);
@@ -104,7 +104,7 @@ export class PlayerController {
                 pitchTarget *= -1;
                 yawTarget *= -1;
             }
-            if (CONFIG.GAMEPLAY.PLANAR_MODE) {
+            if (resolveGameplayConfig(player).GAMEPLAY.PLANAR_MODE) {
                 pitchTarget = 0;
             }
         }

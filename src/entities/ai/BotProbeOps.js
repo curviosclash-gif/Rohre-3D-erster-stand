@@ -8,19 +8,20 @@
 // - Side effects: writes to bot temp vectors and mutable probe records
 // - Hotpath guardrail: no new vectors/arrays in sensing loop
 
-import { CONFIG } from '../../core/Config.js';
 import {
     AI_SENSOR_PROBE_POLICY,
     AI_SENSOR_TRAIL_COLLISION,
 } from './perception/AiPerceptionConfig.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 export function composeProbeDirection(bot, forward, right, up, probe) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     const yawFactor = probe.yaw * bot.profile.probeSpread;
     const pitchFactor = probe.pitch * bot.profile.probeSpread;
 
     probe.dir.copy(forward);
     if (yawFactor !== 0) probe.dir.addScaledVector(right, yawFactor);
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE && pitchFactor !== 0) probe.dir.addScaledVector(up, pitchFactor);
+    if (!planarMode && pitchFactor !== 0) probe.dir.addScaledVector(up, pitchFactor);
     probe.dir.normalize();
 }
 
@@ -61,6 +62,7 @@ export function scanProbeRay(bot, player, arena, allPlayers, direction, lookAhea
 }
 
 export function scoreProbe(bot, player, arena, allPlayers, probe, lookAhead) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     const step = bot.profile.probeStep;
 
     let probeLookAhead = lookAhead;
@@ -73,7 +75,7 @@ export function scoreProbe(bot, player, arena, allPlayers, probe, lookAhead) {
 
     scanProbeRay(bot, player, arena, allPlayers, probe.dir, probeLookAhead, step, bot._probeRayCenter);
 
-    const lateralStrength = CONFIG.GAMEPLAY.PLANAR_MODE
+    const lateralStrength = planarMode
         ? AI_SENSOR_PROBE_POLICY.planarLateralStrength
         : AI_SENSOR_PROBE_POLICY.volumeLateralStrength;
     const lateralLookAhead = probeLookAhead * AI_SENSOR_PROBE_POLICY.lateralLookAheadScale;

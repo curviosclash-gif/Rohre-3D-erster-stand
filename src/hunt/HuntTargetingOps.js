@@ -1,5 +1,5 @@
 ﻿import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 import { HUNT_TARGET_KIND } from '../shared/contracts/HuntTargetingContract.js';
 import { toFiniteNumber } from '../utils/MathOps.js';
 import {
@@ -37,8 +37,8 @@ function resolveTrailMidpoint(entry) {
     };
 }
 
-function getTrailDescriptorMaxDrift() {
-    return toPositiveNumber(CONFIG?.HUNT?.TARGETING?.TRAIL_DESCRIPTOR_MAX_DRIFT, 1.25);
+function getTrailDescriptorMaxDrift(configSource = null) {
+    return toPositiveNumber(resolveGameplayConfig(configSource).HUNT?.TARGETING?.TRAIL_DESCRIPTOR_MAX_DRIFT, 1.25);
 }
 
 export function createHuntTargetingTelemetry(reusable = null) {
@@ -144,7 +144,7 @@ export function resolveTrailTargetEntry(trailSpatialIndex, target, options = {})
 
     const point = target.point || null;
     if (!point) return null;
-    const maxPointDrift = toPositiveNumber(options.maxPointDrift, getTrailDescriptorMaxDrift());
+    const maxPointDrift = toPositiveNumber(options.maxPointDrift, getTrailDescriptorMaxDrift(options.configSource || null));
     const allowedDistance = maxPointDrift + Math.max(0, Number(entry.radius) || 0);
     if (pointToSegmentDistanceSquared(point, entry, options.scratch) > allowedDistance * allowedDistance) {
         return null;

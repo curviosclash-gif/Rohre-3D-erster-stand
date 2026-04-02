@@ -1,6 +1,6 @@
-import { CONFIG } from '../../core/Config.js';
 import { grantShield } from '../../hunt/HealthSystem.js';
 import { resolveEntityRuntimeConfig } from '../../shared/contracts/EntityRuntimeConfig.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 import { isPickupTypeAllowedForMode, getPickupDefinition } from '../PickupRegistry.js';
 
 const SPEED_EFFECT_TYPES = Object.freeze(['SPEED_UP', 'SLOW_DOWN']);
@@ -56,14 +56,15 @@ export function recomputePlayerEffectState(player) {
 
     const modeType = resolveModeType(player);
     const runtimeConfig = resolveEntityRuntimeConfig(player);
+    const playerConfig = resolveGameplayConfig(player).PLAYER;
 
     // Speed: latest-wins among SPEED_UP/SLOW_DOWN, multiplier from registry
     const speedEffect = findLatestAllowedEffect(player, SPEED_EFFECT_TYPES, modeType);
     const speedDef = speedEffect ? getPickupDefinition(speedEffect.type) : null;
     const speedMultiplier = Number(speedDef?.multiplier);
     player.baseSpeed = Number.isFinite(speedMultiplier)
-        ? CONFIG.PLAYER.SPEED * speedMultiplier
-        : CONFIG.PLAYER.SPEED;
+        ? playerConfig.SPEED * speedMultiplier
+        : playerConfig.SPEED;
     player.speed = player.baseSpeed;
 
     // Trail: latest-wins among THICK/THIN, trailWidth from registry

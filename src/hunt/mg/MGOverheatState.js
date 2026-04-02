@@ -1,8 +1,8 @@
-import { CONFIG } from '../../core/Config.js';
 import { clamp } from '../../utils/MathOps.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
-function getMgConfig() {
-    return CONFIG?.HUNT?.MG || {};
+function getMgConfig(configSource = null) {
+    return resolveGameplayConfig(configSource).HUNT?.MG || {};
 }
 
 function clearObject(target) {
@@ -12,7 +12,8 @@ function clearObject(target) {
 }
 
 export class MGOverheatState {
-    constructor() {
+    constructor(configSource = null) {
+        this.configSource = configSource || null;
         this.overheatByPlayer = {};
         this.lockoutByPlayer = {};
         this.overheatSnapshot = {};
@@ -43,7 +44,7 @@ export class MGOverheatState {
         this.setOverheatValue(key, 0);
     }
 
-    update(players, dt, mg = getMgConfig()) {
+    update(players, dt, mg = getMgConfig(this.configSource)) {
         const coolPerSecond = Math.max(0, Number(mg.COOLING_PER_SECOND || 22));
         for (const player of players || []) {
             const idx = player.index;
@@ -57,7 +58,7 @@ export class MGOverheatState {
         return Math.max(0, Number(this.overheatByPlayer[playerIndex] || 0));
     }
 
-    increaseOverheat(playerIndex, mg = getMgConfig()) {
+    increaseOverheat(playerIndex, mg = getMgConfig(this.configSource)) {
         const perShot = Math.max(0, Number(mg.OVERHEAT_PER_SHOT || 6.5));
         const threshold = Math.max(1, Number(mg.LOCKOUT_THRESHOLD || 100));
         const lockoutSeconds = Math.max(0.1, Number(mg.LOCKOUT_SECONDS || 1.2));

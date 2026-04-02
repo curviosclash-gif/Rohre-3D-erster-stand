@@ -1,5 +1,5 @@
-import { CONFIG } from '../core/Config.js';
 import { isRocketTierType, resolveRocketTrailBlastMeters } from './RocketPickupSystem.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 const DEFAULT_SELF_SKIP_RECENT = 8;
 
@@ -106,7 +106,8 @@ function collectBlastEntriesByMeters(trailSpatialIndex, impactEntry, blastMeters
 }
 
 function applyRocketTrailBlast(trailSpatialIndex, impactEntry, projectile, hit) {
-    const blastMeters = resolveRocketTrailBlastMeters(projectile?.type);
+    const huntConfig = resolveGameplayConfig(projectile?.owner).HUNT;
+    const blastMeters = resolveRocketTrailBlastMeters(projectile?.type, projectile?.owner);
     const { entries: blastEntries, totalDestroyedMeters } =
         collectBlastEntriesByMeters(trailSpatialIndex, impactEntry, blastMeters);
 
@@ -125,7 +126,7 @@ function applyRocketTrailBlast(trailSpatialIndex, impactEntry, projectile, hit) 
     // Calculate overflow: meters that would have been destroyed but trail was too short
     const overflowMeters = Math.max(0, blastMeters - totalDestroyedMeters);
     const overflowDamagePerMeter = Math.max(0,
-        Number(CONFIG?.HUNT?.ROCKET?.TRAIL_OVERFLOW_DAMAGE_PER_METER) || 2.5);
+        Number(huntConfig?.ROCKET?.TRAIL_OVERFLOW_DAMAGE_PER_METER) || 2.5);
     const overflowDamage = Math.floor(overflowMeters * overflowDamagePerMeter);
 
     return {

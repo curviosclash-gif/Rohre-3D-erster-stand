@@ -2,7 +2,6 @@
 // HudRuntimeSystem.js - HUD runtime orchestration
 // ============================================
 
-import { CONFIG } from '../core/Config.js';
 import { ArcadeMissionHUD } from './arcade/ArcadeMissionHUD.js';
 import { ArcadeScoreHUD } from './arcade/ArcadeScoreHUD.js';
 import {
@@ -10,6 +9,7 @@ import {
     isPickupTypeShootable,
     normalizePickupType,
 } from '../entities/PickupRegistry.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 function formatParcoursDurationMs(value) {
     const ms = Math.max(0, Number(value) || 0);
@@ -314,6 +314,7 @@ export class HudRuntimeSystem {
     }
 
     _updateItemBar(container, player) {
+        const powerupConfig = resolveGameplayConfig(this.game).POWERUP;
         this._ensureItemSlots(container);
         const inventory = Array.isArray(player?.inventory) ? player.inventory : [];
         const inventoryLength = inventory.length;
@@ -325,11 +326,11 @@ export class HudRuntimeSystem {
         const useCooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
         const shootCooldownRemaining = Math.max(0, Number(player?.shootCooldown || 0));
 
-        for (let i = 0; i < CONFIG.POWERUP.MAX_INVENTORY; i++) {
+        for (let i = 0; i < powerupConfig.MAX_INVENTORY; i++) {
             const slot = container.children[i];
             const rawType = i < inventoryLength ? inventory[i] : '';
             const type = normalizePickupType(rawType, { fallback: rawType });
-            const config = type ? CONFIG.POWERUP.TYPES[type] : null;
+            const config = type ? powerupConfig.TYPES?.[type] : null;
             const canUse = !!type && isPickupTypeSelfUsable(type, modeType);
             const canShoot = !!type && isPickupTypeShootable(type, modeType);
             const isSelected = !!type && i === selectedIndex;
@@ -371,7 +372,7 @@ export class HudRuntimeSystem {
     }
 
     _ensureItemSlots(container) {
-        const desired = CONFIG.POWERUP.MAX_INVENTORY;
+        const desired = resolveGameplayConfig(this.game).POWERUP.MAX_INVENTORY;
 
         while (container.children.length < desired) {
             const slot = document.createElement('div');

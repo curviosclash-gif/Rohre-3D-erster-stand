@@ -1,6 +1,6 @@
 ﻿import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
 import { disposeObject3DResources } from '../../core/three-disposal.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 import { createVehicleMesh } from '../vehicle-registry.js';
 import { syncPlayerHitboxFromVehicleMesh } from './PlayerMotionOps.js';
 
@@ -75,6 +75,7 @@ export class PlayerView {
     }
 
     createModel() {
+        const playerConfig = resolveGameplayConfig(this.player).PLAYER;
         this.group = new THREE.Group();
         this.vehicleMesh = createVehicleMesh(this.player.vehicleId, this.player.color);
         this.group.add(this.vehicleMesh);
@@ -86,9 +87,9 @@ export class PlayerView {
             this.firstPersonAnchor = this.vehicleMesh.firstPersonAnchor;
         } else {
             this.firstPersonAnchor.position.set(
-                CONFIG.PLAYER.NOSE_CAMERA_LOCAL_X || 0,
-                CONFIG.PLAYER.NOSE_CAMERA_LOCAL_Y || 0,
-                CONFIG.PLAYER.NOSE_CAMERA_LOCAL_Z || -2
+                playerConfig.NOSE_CAMERA_LOCAL_X || 0,
+                playerConfig.NOSE_CAMERA_LOCAL_Y || 0,
+                playerConfig.NOSE_CAMERA_LOCAL_Z || -2
             );
             this.group.add(this.firstPersonAnchor);
         }

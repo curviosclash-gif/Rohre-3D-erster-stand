@@ -91,7 +91,7 @@ export function bootstrapGameRuntime(game, options = {}) {
     renderer.setRecordingCaptureSettings(game.settings?.recording);
     renderer.setCameraPerspectiveSettings(game.settings?.cameraPerspective);
 
-    const initialParticles = new ParticleSystem(renderer);
+    const initialParticles = new ParticleSystem(renderer, game);
     const ui = createGameUiRefs();
     const runtimeBundle = createGameRuntimeBundle({
         state: createInitialGameRuntimeState({
@@ -129,8 +129,8 @@ export function bootstrapGameRuntime(game, options = {}) {
     runtimeBundle.ports = runtimePorts;
     runtimeBundle.components.runtimePorts = runtimePorts;
 
-    runtimeBundle.components.hudP1 = new HUD('p1-fighter-hud', 0);
-    runtimeBundle.components.hudP2 = new HUD('p2-fighter-hud', 1);
+    runtimeBundle.components.hudP1 = new HUD('p1-fighter-hud', 0, { configSource: game });
+    runtimeBundle.components.hudP2 = new HUD('p2-fighter-hud', 1, { configSource: game });
     runtimeBundle.components.matchSessionOrchestrator = new MatchLifecycleSessionOrchestrator(
         createMatchSessionPort(game)
     );

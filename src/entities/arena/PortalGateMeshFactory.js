@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 const PORTAL_GEOMETRY_CACHE = new Map();
 const PORTAL_MATERIAL_CACHE = new Map();
@@ -452,7 +452,7 @@ export function createSlingshotGateMesh(position, rotation, color, visualRegistr
 }
 
 export function createPortalMesh(position, color, direction, visualRegistry, options = {}) {
-    const ringSize = Math.max(0.01, Number(CONFIG.PORTAL.RING_SIZE) || 4);
+    const ringSize = Math.max(0.01, Number(resolveGameplayConfig(options.configSource).PORTAL.RING_SIZE) || 4);
     const compactMode = options?.compact === true;
     const ringSizeKey = ringSize.toFixed(3);
     const displayColor = resolvePortalDisplayColor(color, direction);

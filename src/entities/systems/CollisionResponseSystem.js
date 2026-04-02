@@ -8,7 +8,7 @@
 // - Side effects: mutates player quaternion/position and owner temp vectors
 // - Hotpath guardrail: no per-frame object/array allocations in response methods
 
-import { CONFIG } from '../../core/Config.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 const DEFAULT_FOAM_BOUNCE_DISTANCES = Object.freeze([4.0, 7.0, 10.0, 2.0]);
 const DEFAULT_FOAM_BOUNCE_OPTIONS = Object.freeze({
@@ -86,7 +86,7 @@ export class CollisionResponseSystem {
         owner._tmpDir.x += (Math.random() - 0.5) * randomScale;
         owner._tmpDir.y += (Math.random() - 0.5) * randomScale;
         owner._tmpDir.z += (Math.random() - 0.5) * randomScale;
-        if (CONFIG.GAMEPLAY.PLANAR_MODE) owner._tmpDir.y = 0;
+        if (resolveGameplayConfig(owner).GAMEPLAY.PLANAR_MODE) owner._tmpDir.y = 0;
 
         owner._tmpDir.normalize();
         const preRotateShove = Number.isFinite(options.preRotateShove) ? options.preRotateShove : 1;

@@ -4,7 +4,6 @@
 // Extrahiert aus UIManager.js (V38 Phase 38.3.1)
 // ============================================
 
-import { CONFIG } from '../core/Config.js';
 import { VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
 import { MENU_SESSION_TYPES } from './menu/MenuStateContracts.js';
 import {
@@ -30,6 +29,7 @@ import {
     formatStartSetupMapLabel,
     renderStartFieldHints,
 } from './start-setup/StartSetupValidationView.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 export class UIStartSyncController {
     /**
@@ -67,13 +67,14 @@ export class UIStartSyncController {
     setupMapSelect() {
         const select = this.ui.mapSelect;
         if (!select) return;
+        const maps = resolveGameplayConfig(this.game).MAPS || {};
 
         const modePath = String(this.game?.settings?.localSettings?.modePath || 'normal').toLowerCase();
         const currentValue = String(select.value || this.game.settings?.mapKey || 'standard');
-        const fallbackMapKey = resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, currentValue);
+        const fallbackMapKey = resolveModePathFallbackMapKey(maps, modePath, currentValue);
         select.innerHTML = '';
 
-        Object.entries(CONFIG.MAPS || {}).forEach(([key, mapDef]) => {
+        Object.entries(maps).forEach(([key, mapDef]) => {
             if (!isMapEligibleForModePath(mapDef, modePath)) {
                 return;
             }
@@ -86,9 +87,9 @@ export class UIStartSyncController {
             select.appendChild(opt);
         });
 
-        if (CONFIG.MAPS?.[currentValue] && isMapEligibleForModePath(CONFIG.MAPS[currentValue], modePath)) {
+        if (maps?.[currentValue] && isMapEligibleForModePath(maps[currentValue], modePath)) {
             select.value = currentValue;
-        } else if (CONFIG.MAPS?.[fallbackMapKey]) {
+        } else if (maps?.[fallbackMapKey]) {
             select.value = fallbackMapKey;
         }
     }

@@ -251,7 +251,7 @@ export class HuntModeStrategy extends GameModeContract {
     }
 
     resolveProjectileHitOnPlayer(target, projectile, players, system) {
-        const damage = resolveRocketTierDamage(projectile.type);
+        const damage = resolveRocketTierDamage(projectile.type, this.entityRuntimeConfig);
         const damageResult = target.takeDamage(damage);
         system?.onProjectilePowerup?.(target, projectile);
         system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult, projectile);
@@ -262,7 +262,7 @@ export class HuntModeStrategy extends GameModeContract {
         const rocketConfig = resolveConfig(null, this.entityRuntimeConfig)?.HUNT?.ROCKET || {};
         const explosionRadius = Math.max(1, Number(rocketConfig.EXPLOSION_RADIUS || 25));
         const explosionDamageFalloff = Math.max(0, Math.min(1, Number(rocketConfig.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
-        const baseDamage = resolveRocketTierDamage(projectile.type);
+        const baseDamage = resolveRocketTierDamage(projectile.type, this.entityRuntimeConfig);
         const damageAtCenter = baseDamage * (1 + explosionDamageFalloff);
 
         for (const target of players || []) {

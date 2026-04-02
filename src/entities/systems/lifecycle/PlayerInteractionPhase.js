@@ -1,10 +1,9 @@
-import { CONFIG } from '../../../core/Config.js';
-
 import {
     GAMEPLAY_ACTION_RESULT_CODES,
     buildGameplayActionResult,
     encodeGameplayActionResultForLog,
 } from '../../../shared/contracts/GameplayActionResultContract.js';
+import { resolveGameplayConfig } from '../../../shared/contracts/GameplayConfigContract.js';
 
 export class PlayerInteractionPhase {
     constructor(entityManager) {
@@ -51,7 +50,7 @@ export class PlayerInteractionPhase {
             player.getAimDirection(entityManager._tmpDir).normalize();
             player.position.copy(portalResult.target).addScaledVector(entityManager._tmpDir, 1.8);
 
-            if (CONFIG.GAMEPLAY.PLANAR_MODE) player.currentPlanarY = portalResult.target.y;
+            if (resolveGameplayConfig(entityManager).GAMEPLAY.PLANAR_MODE) player.currentPlanarY = portalResult.target.y;
             player.trail.forceGap(0.5);
 
             if (entityManager.audio && !player.isBot) entityManager.audio.play('POWERUP');

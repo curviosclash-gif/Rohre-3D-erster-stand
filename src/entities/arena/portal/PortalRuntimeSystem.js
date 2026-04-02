@@ -1,4 +1,4 @@
-import { CONFIG } from '../../../core/Config.js';
+import { resolveGameplayConfig } from '../../../shared/contracts/GameplayConfigContract.js';
 
 export class PortalRuntimeSystem {
     constructor(arena) {
@@ -22,8 +22,9 @@ export class PortalRuntimeSystem {
 
     checkPortal(position, radius, entityId) {
         if (!this.arena.portalsEnabled) return null;
+        const portalConfig = resolveGameplayConfig(this.arena).PORTAL;
 
-        const triggerRadius = CONFIG.PORTAL.RADIUS;
+        const triggerRadius = portalConfig.RADIUS;
         const triggerRadiusSq = (triggerRadius + radius) * (triggerRadius + radius);
 
         for (const portal of this.arena.portals) {
@@ -34,13 +35,13 @@ export class PortalRuntimeSystem {
 
             if (distASq < triggerRadiusSq) {
                 const dist = portal.posA.distanceTo(portal.posB);
-                const dynamicCooldown = Math.min(2.5, Math.max(CONFIG.PORTAL.COOLDOWN, dist / 80));
+                const dynamicCooldown = Math.min(2.5, Math.max(portalConfig.COOLDOWN, dist / 80));
                 portal.cooldowns.set(entityId, dynamicCooldown);
                 return { target: portal.posB, portal };
             }
             if (distBSq < triggerRadiusSq) {
                 const dist = portal.posA.distanceTo(portal.posB);
-                const dynamicCooldown = Math.min(2.5, Math.max(CONFIG.PORTAL.COOLDOWN, dist / 80));
+                const dynamicCooldown = Math.min(2.5, Math.max(portalConfig.COOLDOWN, dist / 80));
                 portal.cooldowns.set(entityId, dynamicCooldown);
                 return { target: portal.posA, portal };
             }
@@ -52,8 +53,9 @@ export class PortalRuntimeSystem {
     checkExitPortal(position, radius, entityId) {
         if (!this.arena.portalsEnabled) return null;
         if (!Array.isArray(this.arena.exitPortals) || this.arena.exitPortals.length === 0) return null;
+        const portalConfig = resolveGameplayConfig(this.arena).PORTAL;
 
-        const triggerRadius = CONFIG.PORTAL.RADIUS * 1.3;
+        const triggerRadius = portalConfig.RADIUS * 1.3;
         const triggerRadiusSq = (triggerRadius + radius) * (triggerRadius + radius);
 
         for (const exitPortal of this.arena.exitPortals) {

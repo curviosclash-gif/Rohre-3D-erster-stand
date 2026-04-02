@@ -3,7 +3,6 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
 import { runDecision } from './ai/BotDecisionOps.js';
 import { runAction } from './ai/BotActionOps.js';
 import { estimateEnemyPressure, estimatePointRisk, selectTarget } from './ai/BotTargetingOps.js';
@@ -11,6 +10,7 @@ import { enterRecovery, updateRecovery, updateStuckState } from './ai/BotRecover
 import { BotSensors } from './ai/BotSensors.js';
 import { BotSensorsFacade } from './ai/BotSensorsFacade.js';
 import { BOT_FALLBACK_DIFFICULTY_PROFILE, BOT_ITEM_RULES } from './ai/BotTuningConfig.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
@@ -18,6 +18,8 @@ export class BotAI {
     constructor(options = {}) {
         this.recorder = options.recorder || null;
         this.runtimeProfiler = options.runtimeProfiler || null;
+        this.entityRuntimeConfig = options.entityRuntimeConfig || null;
+        this.gameplayConfig = resolveGameplayConfig(this);
 
         this.currentInput = {
             pitchUp: false,
@@ -109,19 +111,21 @@ export class BotAI {
         this._probeRayRight = this.sensors._probeRayRight;
         this.sensePhase = 0;
 
-        this._setDifficulty(options.difficulty || CONFIG.BOT.ACTIVE_DIFFICULTY || CONFIG.BOT.DEFAULT_DIFFICULTY || 'NORMAL');
+        const botConfig = this.gameplayConfig.BOT;
+        this._setDifficulty(options.difficulty || botConfig.ACTIVE_DIFFICULTY || botConfig.DEFAULT_DIFFICULTY || 'NORMAL');
         this._checkStuckTimer = this.profile.stuckCheckInterval;
     }
 
     _setDifficulty(profileName) {
-        const profiles = CONFIG.BOT.DIFFICULTY_PROFILES || {};
+        const botConfig = this.gameplayConfig.BOT;
+        const profiles = botConfig.DIFFICULTY_PROFILES || {};
         const upper = typeof profileName === 'string' ? profileName.toUpperCase() : 'NORMAL';
         this._profileName = profiles[upper] ? upper : 'NORMAL';
         this.profile = {
             ...BOT_FALLBACK_DIFFICULTY_PROFILE,
-            reactionTime: CONFIG.BOT.REACTION_TIME || BOT_FALLBACK_DIFFICULTY_PROFILE.reactionTime,
-            lookAhead: CONFIG.BOT.LOOK_AHEAD || BOT_FALLBACK_DIFFICULTY_PROFILE.lookAhead,
-            aggression: CONFIG.BOT.AGGRESSION || BOT_FALLBACK_DIFFICULTY_PROFILE.aggression,
+            reactionTime: botConfig.REACTION_TIME || BOT_FALLBACK_DIFFICULTY_PROFILE.reactionTime,
+            lookAhead: botConfig.LOOK_AHEAD || BOT_FALLBACK_DIFFICULTY_PROFILE.lookAhead,
+            aggression: botConfig.AGGRESSION || BOT_FALLBACK_DIFFICULTY_PROFILE.aggression,
             ...(profiles[this._profileName] || {}),
         };
     }
@@ -282,7 +286,7 @@ export class BotAI {
     }
 
     update(dt, player, arena, allPlayers, projectiles) {
-        const activeDifficulty = CONFIG.BOT.ACTIVE_DIFFICULTY || this._profileName;
+        const activeDifficulty = this.gameplayConfig.BOT.ACTIVE_DIFFICULTY || this._profileName;
         if (activeDifficulty !== this._profileName) {
             this._setDifficulty(activeDifficulty);
         }

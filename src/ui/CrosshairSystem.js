@@ -3,8 +3,8 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
 import { clamp } from '../utils/MathOps.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 export class CrosshairSystem {
     constructor(deps = {}) {
@@ -117,14 +117,15 @@ export class CrosshairSystem {
     updateCrosshairs() {
         const game = this.game;
         if (!game.entityManager) return;
+        const gameplayConfig = resolveGameplayConfig(game);
 
         const p1 = game.entityManager.players[0];
         const p2 = game.entityManager.players[1];
-        const planarMode = !!CONFIG.GAMEPLAY.PLANAR_MODE;
+        const planarMode = !!gameplayConfig.GAMEPLAY.PLANAR_MODE;
         const shouldShowScreenCrosshair = (player) => {
             if (!player) return false;
             if (planarMode) return true;
-            const camMode = CONFIG.CAMERA.MODES[player.cameraMode] || 'THIRD_PERSON';
+            const camMode = gameplayConfig.CAMERA?.MODES?.[player.cameraMode] || 'THIRD_PERSON';
             return camMode !== 'FIRST_PERSON';
         };
 

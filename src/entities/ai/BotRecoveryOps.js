@@ -2,14 +2,15 @@
 // BotRecoveryOps.js - recovery and stuck operations for BotAI
 // ============================================
 
-import { CONFIG } from '../../core/Config.js';
 import { estimateEnemyPressure } from './BotTargetingOps.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 function selectRecoveryManeuver(bot, player, arena, allPlayers) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     player.getDirection(bot._tmpForward).normalize();
     bot._buildBasis(bot._tmpForward);
 
-    const candidates = CONFIG.GAMEPLAY.PLANAR_MODE
+    const candidates = planarMode
         ? [
             { yaw: -1, pitch: 0, weight: 0.02 },
             { yaw: 1, pitch: 0, weight: 0.02 },
@@ -34,7 +35,7 @@ function selectRecoveryManeuver(bot, player, arena, allPlayers) {
     for (let i = 0; i < candidates.length; i++) {
         const candidate = candidates[i];
         bot._tmpVec.copy(bot._tmpForward).addScaledVector(bot._tmpRight, candidate.yaw * 0.95);
-        if (!CONFIG.GAMEPLAY.PLANAR_MODE && candidate.pitch !== 0) {
+        if (!planarMode && candidate.pitch !== 0) {
             bot._tmpVec.addScaledVector(bot._tmpUp, candidate.pitch * 0.75);
         }
         bot._tmpVec.normalize();
@@ -67,7 +68,7 @@ function selectRecoveryManeuver(bot, player, arena, allPlayers) {
             score -= awayDot * 0.65;
         }
 
-        if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+        if (!planarMode) {
             const margin = 7;
             const projectedY = player.position.y + bot._tmpVec.y * 9;
             if (projectedY < arena.bounds.minY + margin || projectedY > arena.bounds.maxY - margin) {
@@ -85,6 +86,7 @@ function selectRecoveryManeuver(bot, player, arena, allPlayers) {
 }
 
 function shouldBoostRecovery(bot, player, arena, allPlayers) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     if (bot._recentBouncePressure > 1.2) return false;
     if (bot._bounceStreak >= 3) return false;
     const recoveryBoostRiskCeiling = Number.isFinite(Number(bot.profile?.recoveryBoostRiskCeiling))
@@ -96,7 +98,7 @@ function shouldBoostRecovery(bot, player, arena, allPlayers) {
     bot._buildBasis(bot._tmpForward);
     bot._tmpVec.copy(bot._tmpForward);
     bot._tmpVec.addScaledVector(bot._tmpRight, bot.state.recoveryYaw * 0.22);
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!planarMode) {
         bot._tmpVec.addScaledVector(bot._tmpUp, bot.state.recoveryPitch * 0.2);
     }
     bot._tmpVec.normalize();
@@ -112,6 +114,7 @@ function shouldBoostRecovery(bot, player, arena, allPlayers) {
 }
 
 export function enterRecovery(bot, player, arena, allPlayers, reason) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     bot.state.recoveryActive = true;
     bot.state.recoveryTimer = bot.profile.recoveryDuration;
     bot.state.recoveryCooldown = bot.profile.recoveryCooldown;
@@ -120,7 +123,7 @@ export function enterRecovery(bot, player, arena, allPlayers, reason) {
 
     const maneuver = selectRecoveryManeuver(bot, player, arena, allPlayers);
     let selectedYaw = maneuver?.yaw || (Math.random() > 0.5 ? 1 : -1);
-    bot.state.recoveryPitch = CONFIG.GAMEPLAY.PLANAR_MODE ? 0 : (maneuver?.pitch || 0);
+    bot.state.recoveryPitch = planarMode ? 0 : (maneuver?.pitch || 0);
 
     if (bot._recoveryChainTimer > 0 && bot._lastRecoveryReason === reason) {
         bot._recoveryChainCount = Math.min(6, bot._recoveryChainCount + 1);
@@ -141,7 +144,7 @@ export function enterRecovery(bot, player, arena, allPlayers, reason) {
         bot.state.recoveryCooldown *= 0.8;
     }
 
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!planarMode) {
         const margin = 8;
         if (player.position.y < arena.bounds.minY + margin) bot.state.recoveryPitch = 1;
         else if (player.position.y > arena.bounds.maxY - margin) bot.state.recoveryPitch = -1;
@@ -200,6 +203,7 @@ export function updateStuckState(bot, player, arena, allPlayers) {
 }
 
 export function updateRecovery(bot, dt, player, arena, allPlayers) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     bot.state.recoveryTimer -= dt;
     if (bot.state.recoveryTimer <= 0) {
         bot.state.recoveryActive = false;
@@ -215,7 +219,7 @@ export function updateRecovery(bot, dt, player, arena, allPlayers) {
         (bot.sense.forwardRisk > 0.78 || bot._recentBouncePressure > 2.1 || bot._bounceStreak >= 3);
     if (stuckInsideRecovery) {
         bot.state.recoveryYaw = bot.state.recoveryYaw !== 0 ? -bot.state.recoveryYaw : (Math.random() > 0.5 ? 1 : -1);
-        bot.state.recoveryPitch = CONFIG.GAMEPLAY.PLANAR_MODE ? 0 : -bot.state.recoveryPitch;
+        bot.state.recoveryPitch = planarMode ? 0 : -bot.state.recoveryPitch;
         bot.state.recoverySwitchUsed = true;
         if (bot.recorder) {
             bot.recorder.logEvent('RECOVERY_SWITCH', player.index, `yaw=${bot.state.recoveryYaw} pitch=${bot.state.recoveryPitch}`);
@@ -227,7 +231,7 @@ export function updateRecovery(bot, dt, player, arena, allPlayers) {
     if (bot.state.recoveryYaw > 0) bot.currentInput.yawRight = true;
     else if (bot.state.recoveryYaw < 0) bot.currentInput.yawLeft = true;
 
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!planarMode) {
         if (bot.state.recoveryPitch > 0) bot.currentInput.pitchUp = true;
         else if (bot.state.recoveryPitch < 0) bot.currentInput.pitchDown = true;
     }

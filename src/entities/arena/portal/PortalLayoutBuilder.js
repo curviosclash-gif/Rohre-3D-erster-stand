@@ -66,7 +66,10 @@ export class PortalLayoutBuilder {
         const color = Number.isFinite(def.color) ? def.color : 0x00ff88;
         const activateOnClear = def.activateOnClear !== false;
 
-        const mesh = createPortalMesh(pos, color, 'NEUTRAL', this._visualRegistry, { compact: false });
+        const mesh = createPortalMesh(pos, color, 'NEUTRAL', this._visualRegistry, {
+            compact: false,
+            configSource: this.arena,
+        });
         if (mesh) {
             mesh.scale.set(1.4, 1.4, 1.4);
             mesh.visible = !activateOnClear;
@@ -325,7 +328,9 @@ export class PortalLayoutBuilder {
     }
 
     _addPortalInstance(posA, posB, color, dirA = 'NEUTRAL', dirB = 'NEUTRAL') {
-        const portalMeshOptions = this._portalMeshCompactMode ? { compact: true } : undefined;
+        const portalMeshOptions = this._portalMeshCompactMode
+            ? { compact: true, configSource: this.arena }
+            : { configSource: this.arena };
         const meshA = createPortalMesh(posA, color, dirA, this._visualRegistry, portalMeshOptions);
         const meshB = createPortalMesh(posB, color, dirB, this._visualRegistry, portalMeshOptions);
         this.arena.portals.push({

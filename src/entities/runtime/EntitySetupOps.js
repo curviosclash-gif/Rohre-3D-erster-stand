@@ -162,6 +162,7 @@ export class EntitySetupOps {
                 recorder: owner.recorder,
                 runtimeConfig: owner.runtimeConfig,
                 runtimeProfiler: owner.runtimeProfiler,
+                entityRuntimeConfig: owner.entityRuntimeConfig,
                 bridgeEnabled: owner.botBridgeEnabled,
                 activeGameMode: owner.activeGameMode,
             });

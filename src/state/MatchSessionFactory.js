@@ -160,7 +160,7 @@ export function createMatchSession({
             clearScene: !canPreservePrewarmedScene,
         });
 
-        const particles = new ParticleSystem(renderer);
+        const particles = new ParticleSystem(renderer, entityRuntimeConfig);
         const arena = reusablePrewarmedArenaSession?.arena || new Arena(renderer);
         arena.portalsEnabled = !!portalsEnabled;
         arena.runtimeConfig = runtimeConfig;

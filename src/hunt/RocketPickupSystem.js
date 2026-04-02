@@ -1,9 +1,9 @@
-import { CONFIG } from '../core/Config.js';
 import {
     getRocketPickupTypes,
     isRocketPickupType,
     normalizePickupType,
 } from '../entities/PickupRegistry.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 const TIER_BY_ITEM = Object.freeze({
     ROCKET_WEAK: 'WEAK',
@@ -31,22 +31,24 @@ export function getRocketTierTypes() {
     return getRocketPickupTypes();
 }
 
-export function resolveRocketTierDamage(type) {
+export function resolveRocketTierDamage(type, configSource = null) {
+    const gameplayConfig = resolveGameplayConfig(configSource);
     const normalized = normalizeRocketPickupType(type);
     const tier = TIER_BY_ITEM[normalized];
-    const tierConfig = CONFIG?.HUNT?.ROCKET_TIERS?.[tier];
+    const tierConfig = gameplayConfig.HUNT?.ROCKET_TIERS?.[tier];
     if (tierConfig && Number.isFinite(Number(tierConfig.damage))) {
         return Math.max(1, Number(tierConfig.damage));
     }
 
-    const fallback = CONFIG?.POWERUP?.TYPES?.[normalized]?.damage;
+    const fallback = gameplayConfig.POWERUP?.TYPES?.[normalized]?.damage;
     return Math.max(1, Number(fallback || 10));
 }
 
-export function resolveRocketTrailBlastMeters(type) {
+export function resolveRocketTrailBlastMeters(type, configSource = null) {
+    const gameplayConfig = resolveGameplayConfig(configSource);
     const normalized = normalizeRocketPickupType(type);
     const tier = TIER_BY_ITEM[normalized];
-    const tierConfig = CONFIG?.HUNT?.ROCKET_TIERS?.[tier];
+    const tierConfig = gameplayConfig.HUNT?.ROCKET_TIERS?.[tier];
     return Math.max(0, Number(tierConfig?.trailBlastMeters) || 0);
 }
 
@@ -55,8 +57,8 @@ export function resolveRocketTrailBlastRadiusSegments(type) {
     return 0;
 }
 
-export function resolveRocketTierSpawnWeights({ allowedTypes = null, tiersConfig = null } = {}) {
-    const tiers = tiersConfig || CONFIG?.HUNT?.ROCKET_TIERS || {};
+export function resolveRocketTierSpawnWeights({ allowedTypes = null, tiersConfig = null, configSource = null } = {}) {
+    const tiers = tiersConfig || resolveGameplayConfig(configSource).HUNT?.ROCKET_TIERS || {};
     const allowedSet = Array.isArray(allowedTypes) && allowedTypes.length > 0
         ? new Set(
             allowedTypes
@@ -97,6 +99,7 @@ export function pickWeightedRocketTierType(options = {}) {
     const weighted = resolveRocketTierSpawnWeights({
         allowedTypes: options?.allowedTypes || null,
         tiersConfig: options?.tiersConfig || null,
+        configSource: options?.configSource || null,
     });
     if (weighted.length === 0) return null;
 

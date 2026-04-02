@@ -9,13 +9,14 @@
 // - Hotpath guardrail: no per-frame allocations in sensing logic
 
 import * as THREE from 'three';
-import { CONFIG } from '../../core/Config.js';
 import { computeProjectileThreatFlag } from './perception/EnvironmentSamplingOps.js';
 import { AI_SENSOR_THREAT_POLICY } from './perception/AiPerceptionConfig.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
 export function senseProjectiles(bot, player, projectiles) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     bot.sense.projectileThreat = false;
     bot.sense.projectileEvadeYaw = 0;
     bot.sense.projectileEvadePitch = 0;
@@ -65,7 +66,7 @@ export function senseProjectiles(bot, player, projectiles) {
             const side = bot._tmpRight.dot(bot._tmpVec3);
             evadeYaw = side > 0 ? -1 : 1;
 
-            if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+            if (!planarMode) {
                 const verticalApproach = bot._tmpVec.y;
                 evadePitch = verticalApproach > AI_SENSOR_THREAT_POLICY.projectileVerticalEvadeThreshold
                     ? -1
@@ -83,7 +84,7 @@ export function senseProjectiles(bot, player, projectiles) {
 
 export function senseHeight(bot, player, arena) {
     bot.sense.heightBias = 0;
-    if (CONFIG.GAMEPLAY.PLANAR_MODE) return;
+    if (resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE) return;
 
     const bias = bot.profile.heightBias || 0;
     if (bias <= 0) return;
@@ -99,6 +100,7 @@ export function senseHeight(bot, player, arena) {
 }
 
 export function senseBotSpacing(bot, player, allPlayers) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     bot.sense.botRepulsionYaw = 0;
     bot.sense.botRepulsionPitch = 0;
 
@@ -129,12 +131,13 @@ export function senseBotSpacing(bot, player, allPlayers) {
     if (Math.abs(repulseX) > AI_SENSOR_THREAT_POLICY.spacingRepulsionDeadzone) {
         bot.sense.botRepulsionYaw = repulseX > 0 ? 1 : -1;
     }
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE && Math.abs(repulseY) > AI_SENSOR_THREAT_POLICY.spacingRepulsionDeadzone) {
+    if (!planarMode && Math.abs(repulseY) > AI_SENSOR_THREAT_POLICY.spacingRepulsionDeadzone) {
         bot.sense.botRepulsionPitch = repulseY > 0 ? 1 : -1;
     }
 }
 
 export function evaluatePursuit(bot, player) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     bot.sense.pursuitActive = false;
     bot.sense.pursuitYaw = 0;
     bot.sense.pursuitPitch = 0;
@@ -161,7 +164,7 @@ export function evaluatePursuit(bot, player) {
     bot.sense.pursuitActive = true;
     bot.sense.pursuitAimDot = aimDot;
     bot.sense.pursuitYaw = Math.abs(yawSignal) > AI_SENSOR_THREAT_POLICY.pursuitYawDeadzone ? (yawSignal > 0 ? 1 : -1) : 0;
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!planarMode) {
         bot.sense.pursuitPitch = Math.abs(pitchSignal) > AI_SENSOR_THREAT_POLICY.pursuitPitchDeadzone ? (pitchSignal > 0 ? 1 : -1) : 0;
     }
 }

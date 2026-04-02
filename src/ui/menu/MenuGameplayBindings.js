@@ -1,4 +1,3 @@
-import { CONFIG } from '../../core/Config.js';
 import { SETTINGS_LIMITS } from '../../shared/contracts/SettingsRuntimeContract.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
@@ -15,6 +14,7 @@ import {
 } from '../../shared/contracts/CameraPerspectiveContract.js';
 import { clamp } from '../../utils/MathOps.js';
 import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;
@@ -25,7 +25,8 @@ export function setupMenuGameplayBindings(ctx) {
     const eventTypes = ctx.eventTypes;
     const keys = ctx.settingsChangeKeys;
     const bind = ctx.bind;
-    const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
+    const gameplayConfig = resolveGameplayConfig({ config: ctx.configSource || null });
+    const huntFeatureEnabled = gameplayConfig.HUNT?.ENABLED !== false;
     const mgTrailAimLimits = SETTINGS_LIMITS.gameplay.mgTrailAimRadius;
     const fightMgDamageLimits = SETTINGS_LIMITS.gameplay.fightMgDamage;
     const ensureRecordingSettings = () => {
@@ -177,7 +178,7 @@ export function setupMenuGameplayBindings(ctx) {
         const hasUiOption = Array.isArray(ui.mapSelect?.options)
             ? ui.mapSelect.options.some((option) => String(option?.value || '') === selectedMapKey)
             : false;
-        settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || hasUiOption || CONFIG.MAPS[selectedMapKey])
+        settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || hasUiOption || gameplayConfig.MAPS[selectedMapKey])
             ? selectedMapKey
             : 'standard';
         emitSettingsChangedImmediate([keys.MAP_KEY]);

@@ -1,4 +1,4 @@
-import { CONFIG } from '../../core/Config.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 export class EntitySpawnOps {
     constructor(entityManager) {
@@ -21,7 +21,7 @@ export class EntitySpawnOps {
 
     createSpawnContext() {
         const owner = this.entityManager;
-        const isPlanar = !!CONFIG.GAMEPLAY.PLANAR_MODE;
+        const isPlanar = !!resolveGameplayConfig(owner).GAMEPLAY.PLANAR_MODE;
         return {
             planarSpawnLevel: isPlanar && owner ? owner._getPlanarSpawnLevel() : null,
         };

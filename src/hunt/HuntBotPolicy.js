@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
 import { isRocketTierType } from './RocketPickupSystem.js';
 import { RuleBasedBotPolicy } from '../entities/ai/RuleBasedBotPolicy.js';
 import { BOT_POLICY_TYPES } from '../entities/ai/BotPolicyTypes.js';
 import { resolveHuntTargetOwnerPlayer } from './HuntTargetingOps.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
 
@@ -76,6 +76,7 @@ function clearSteeringInput(input) {
 
 function applySteeringTowardPosition(policy, input, player, targetPosition) {
     if (!targetPosition || !player?.position) return;
+    const planarMode = !!resolveGameplayConfig(player).GAMEPLAY.PLANAR_MODE;
     policy._tmpGate.subVectors(targetPosition, player.position);
     if (policy._tmpGate.lengthSq() <= 0.000001) return;
     policy._tmpGate.normalize();
@@ -94,7 +95,7 @@ function applySteeringTowardPosition(policy, input, player, targetPosition) {
         input.yawRight = yawTowardTarget < 0;
     }
 
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!planarMode) {
         const pitchTowardTarget = policy._tmpUp.dot(policy._tmpGate);
         if (Math.abs(pitchTowardTarget) > 0.07) {
             input.pitchUp = pitchTowardTarget < 0;
@@ -107,13 +108,14 @@ function applyRetreatSteeringFallback(policy, input, player, enemy) {
     applySteeringTowardPosition(policy, input, player, enemy?.position || null);
 }
 
-function applyRetreatSteeringFromSensors(input, snapshot) {
+function applyRetreatSteeringFromSensors(input, snapshot, player) {
+    const planarMode = !!resolveGameplayConfig(player).GAMEPLAY.PLANAR_MODE;
     const steering = resolveSensorYawPitch(snapshot);
     if (Math.abs(steering.yaw) > 0.01) {
         input.yawLeft = steering.yaw > 0;
         input.yawRight = steering.yaw < 0;
     }
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE && Math.abs(steering.pitch) > 0.01) {
+    if (!planarMode && Math.abs(steering.pitch) > 0.01) {
         input.pitchUp = steering.pitch < 0;
         input.pitchDown = steering.pitch > 0;
     }
@@ -182,6 +184,7 @@ export class HuntBotPolicy {
     update(dt, player, runtimeContext = null) {
         const input = invokeFallbackPolicyUpdate(this, dt, player, runtimeContext);
         if (!player || !player.alive) return input;
+        const huntConfig = resolveGameplayConfig(player).HUNT;
 
         const allPlayers = Array.isArray(runtimeContext?.players) ? runtimeContext.players : [];
         const snapshot = resolveSensorSnapshot(this);
@@ -210,7 +213,7 @@ export class HuntBotPolicy {
             projectileThreat ? 0.82 : 0,
             (1 - vitalityRatio) * 0.95
         );
-        const mgRange = Math.max(12, Number(CONFIG?.HUNT?.MG?.RANGE || 95));
+        const mgRange = Math.max(12, Number(huntConfig?.MG?.RANGE || 95));
         const mgRangeSq = mgRange * mgRange;
         input.shootMG = false;
 
@@ -243,7 +246,7 @@ export class HuntBotPolicy {
 
         const shouldRetreat = !!enemy && (vitalityRatio <= 0.34 || (vitalityRatio < 0.52 && survivalPressure > 0.76));
         if (shouldRetreat) {
-            const gateAssistRange = Math.max(24, Number(CONFIG?.HUNT?.RETREAT_GATE_RANGE || 54));
+            const gateAssistRange = Math.max(24, Number(huntConfig?.RETREAT_GATE_RANGE || 54));
             const readyGate = (survivalPressure > 0.8 || vitalityRatio < 0.3)
                 ? findNearestReadySpecialGate(this, player, specialGates, gateAssistRange * gateAssistRange)
                 : null;
@@ -252,7 +255,7 @@ export class HuntBotPolicy {
             if (readyGate?.gate) {
                 applySteeringTowardPosition(this, input, player, readyGate.gate.pos);
             } else if (hasSensorSteering) {
-                applyRetreatSteeringFromSensors(input, snapshot);
+                applyRetreatSteeringFromSensors(input, snapshot, player);
             } else {
                 applyRetreatSteeringFallback(this, input, player, enemy);
             }

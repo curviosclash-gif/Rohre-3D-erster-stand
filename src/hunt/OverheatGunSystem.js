@@ -47,7 +47,7 @@ export class OverheatGunSystem {
             || entityManager?.getRuntimeContext?.()
             || createLegacyRuntimeContext(entityManager);
 
-        this._state = new MGOverheatState();
+        this._state = new MGOverheatState(this.runtimeContext || entityManager);
         this._hitResolver = new MGHitResolver(this.runtimeContext);
         this._tracerFx = new MGTracerFx(entityManager);
 

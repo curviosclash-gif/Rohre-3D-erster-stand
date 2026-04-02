@@ -122,6 +122,27 @@ export const GAMEPLAY_CONFIG_DEFAULTS = Object.freeze({
     }),
 });
 
+function resolveGameplayConfigCarrier(source) {
+    if (!source || typeof source !== 'object') return null;
+    return source.config
+        || source.runtime?.config
+        || null;
+}
+
+function resolveEntityRuntimeCarrier(source) {
+    if (!source || typeof source !== 'object') return null;
+    return source.entityRuntimeConfig
+        || source.services?.entityRuntimeConfig
+        || source.runtime?.services?.entityRuntimeConfig
+        || source.entityManager?.entityRuntimeConfig
+        || source.arena?.entityRuntimeConfig
+        || source.runtimeContext?.services?.entityRuntimeConfig
+        || source.owner?.entityRuntimeConfig
+        || source.game?.entityManager?.entityRuntimeConfig
+        || source.runtime?.entityManager?.entityRuntimeConfig
+        || null;
+}
+
 // ---- Config resolution helpers ----
 
 /**
@@ -148,11 +169,13 @@ export function getGameplayConfigSection(source, sectionKey) {
         return source[sectionKey];
     }
 
+    const configCarrier = resolveGameplayConfigCarrier(source);
+    if (configCarrier?.[sectionKey] && typeof configCarrier[sectionKey] === 'object') {
+        return configCarrier[sectionKey];
+    }
+
     // EntityRuntimeConfig shapes
-    const erc = source.entityRuntimeConfig
-        || source.services?.entityRuntimeConfig
-        || source.runtimeContext?.services?.entityRuntimeConfig
-        || null;
+    const erc = resolveEntityRuntimeCarrier(source);
     if (erc && typeof erc === 'object' && erc[sectionKey] && typeof erc[sectionKey] === 'object') {
         return erc[sectionKey];
     }
@@ -169,7 +192,7 @@ export function getGameplayConfigSection(source, sectionKey) {
  */
 export function resolveGameplayConfig(source) {
     const config = {};
-    for (const key of Object.keys(GAMEPLAY_CONFIG_DEFAULTS)) {
+    for (const key of Object.values(CONFIG_SECTIONS)) {
         config[key] = getGameplayConfigSection(source, key);
     }
     return config;
@@ -186,10 +209,12 @@ export function getGameplayMapCatalog(source) {
 
     if (source.MAPS && typeof source.MAPS === 'object') return source.MAPS;
 
-    const erc = source.entityRuntimeConfig
-        || source.services?.entityRuntimeConfig
-        || source.runtimeContext?.services?.entityRuntimeConfig
-        || null;
+    const configCarrier = resolveGameplayConfigCarrier(source);
+    if (configCarrier?.MAPS && typeof configCarrier.MAPS === 'object') {
+        return configCarrier.MAPS;
+    }
+
+    const erc = resolveEntityRuntimeCarrier(source);
     if (erc && typeof erc === 'object' && erc.MAPS && typeof erc.MAPS === 'object') {
         return erc.MAPS;
     }

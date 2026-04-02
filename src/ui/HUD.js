@@ -2,12 +2,13 @@
    HUD.js - Fighter Jet Head-Up Display
    ============================================ */
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 export class HUD {
-    constructor(elementId, playerIndex) {
+    constructor(elementId, playerIndex, options = {}) {
         this.container = document.getElementById(elementId);
         this.playerIndex = playerIndex;
+        this.configSource = options?.configSource || null;
 
         // Elements
         this.horizon = this.container.querySelector('.hud-horizon');
@@ -144,10 +145,14 @@ export class HUD {
             this.setVisibility(false);
             return;
         }
+        const gameplayConfig = resolveGameplayConfig({
+            config: this.configSource,
+            entityRuntimeConfig: player?.entityRuntimeConfig || null,
+        });
 
         // --- Boost Bar Update (immer sichtbar) ---
         if (this.boostFill) {
-            const boostCapacity = Math.max(0.001, Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1);
+            const boostCapacity = Math.max(0.001, Number(gameplayConfig.PLAYER?.BOOST_DURATION) || 1);
             const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
             const pct = (boostCharge / boostCapacity) * 100;
             const isRecharging = !player?.manualBoostActive && boostCharge < (boostCapacity - 0.001);
@@ -169,7 +174,7 @@ export class HUD {
         }
 
         // Only show fighter flight instruments in FIRST_PERSON
-        const camMode = CONFIG.CAMERA.MODES[player.cameraMode];
+        const camMode = gameplayConfig.CAMERA?.MODES?.[player.cameraMode];
         if (camMode !== 'FIRST_PERSON') {
             this.setVisibility(false);
             return;
@@ -185,7 +190,7 @@ export class HUD {
         const pitchDeg = THREE.MathUtils.radToDeg(this._euler.x);
         const yawDeg = THREE.MathUtils.radToDeg(this._euler.y); // Heading
         const rollDeg = THREE.MathUtils.radToDeg(this._euler.z);
-        const planarMode = !!CONFIG.GAMEPLAY.PLANAR_MODE;
+        const planarMode = !!gameplayConfig.GAMEPLAY.PLANAR_MODE;
 
         // Stabilized horizon: no roll rotation
         this._setStyle(this.horizon, 'transform', 'translate(-50%, -50%)');

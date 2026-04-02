@@ -14,7 +14,7 @@ export class ProjectileHitResolver {
         const rocketConfig = resolveEntityRuntimeConfig(this.system)?.HUNT?.ROCKET || HUNT_CONFIG.ROCKET;
         const explosionRadius = Math.max(1, Number(rocketConfig?.EXPLOSION_RADIUS || 25));
         const explosionDamageFalloff = Math.max(0, Math.min(1, Number(rocketConfig?.EXPLOSION_DAMAGE_FALLOFF || 0.5)));
-        const baseDamage = resolveRocketTierDamage(projectile.type);
+        const baseDamage = resolveRocketTierDamage(projectile.type, this.system);
         const damageAtCenter = baseDamage * (1 + explosionDamageFalloff);
 
         for (const target of players || []) {
@@ -99,7 +99,7 @@ export class ProjectileHitResolver {
 
             const huntRocketHit = isHuntHealthActive(resolveEntityRuntimeConfig(this.system)) && isRocketTierType(projectile.type);
             if (huntRocketHit) {
-                const damage = resolveRocketTierDamage(projectile.type);
+                const damage = resolveRocketTierDamage(projectile.type, this.system);
                 const damageResult = target.takeDamage(damage);
                 this.system?.onProjectilePowerup?.(target, projectile);
                 this.system?.onProjectileDamage?.(target, projectile.owner, projectile.type, damageResult, projectile);

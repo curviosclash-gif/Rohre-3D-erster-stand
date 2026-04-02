@@ -5,7 +5,6 @@
 //                       sowie dev-text-catalog und disposer-Infrastruktur.
 // ============================================
 
-import { CONFIG } from '../core/Config.js';
 import { SETTINGS_LIMITS } from '../shared/contracts/SettingsRuntimeContract.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
 import { isSettingsChangeKey, normalizeSettingsChangeKeys } from './SettingsChangeKeys.js';
@@ -35,6 +34,7 @@ import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 export class UIManager {
     constructor(deps = {}) {
@@ -239,7 +239,7 @@ export class UIManager {
 
     syncSessionState(settings = this.game.settings) {
         const ui = this.ui;
-        const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
+        const huntFeatureEnabled = resolveGameplayConfig(this.game).HUNT?.ENABLED !== false;
         const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
         const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
         if (Array.isArray(ui.sessionButtons)) {
@@ -284,7 +284,7 @@ export class UIManager {
             ui.vehicleP2Container.classList.toggle('hidden', effectiveMode !== '2p');
         }
 
-        const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
+        const huntFeatureEnabled = resolveGameplayConfig(this.game).HUNT?.ENABLED !== false;
         const resolvedGameMode = resolveActiveGameMode(settings.gameMode, huntFeatureEnabled);
         const huntRespawnEnabled = resolvedGameMode === GAME_MODE_TYPES.HUNT
             ? !!settings?.hunt?.respawnEnabled

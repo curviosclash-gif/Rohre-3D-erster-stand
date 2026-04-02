@@ -2,7 +2,6 @@
 // BotSensingOps.js - sensing operations for BotAI
 // ============================================
 
-import { CONFIG } from '../../core/Config.js';
 import {
     AI_SENSOR_SCAN_POLICY,
 } from './perception/AiPerceptionConfig.js';
@@ -11,8 +10,10 @@ import {
     computeTightSpacePressure,
 } from './perception/AiPerceptionPrimitives.js';
 import { estimateEnemyPressure, selectTarget } from './BotTargetingOps.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     const mapBehavior = bot.mapBehavior(arena);
     bot.sense.mapCaution = mapBehavior.caution;
     bot.sense.mapPortalBias = mapBehavior.portalBias;
@@ -50,7 +51,7 @@ export function senseEnvironment(bot, player, arena, allPlayers, _projectiles) {
         const probe = bot._probes[i];
         const isVertical = Math.abs(probe.pitch) > AI_SENSOR_SCAN_POLICY.planarPitchEpsilon;
 
-        if (CONFIG.GAMEPLAY.PLANAR_MODE && isVertical) {
+    if (planarMode && isVertical) {
             continue;
         }
 

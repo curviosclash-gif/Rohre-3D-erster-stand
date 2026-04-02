@@ -1,9 +1,9 @@
-import { CONFIG } from '../../core/Config.js';
 import {
     isPickupTypeSelfUsable,
     normalizePickupType,
     getPickupDefinition,
 } from '../PickupRegistry.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 import {
     GAMEPLAY_ACTION_RESULT_CODES,
     buildGameplayActionResult,
@@ -15,7 +15,7 @@ export function addPlayerInventoryItem(player, type) {
     if (!normalized || !getPickupDefinition(normalized)) {
         return false;
     }
-    if (player.inventory.length < CONFIG.POWERUP.MAX_INVENTORY) {
+    if (player.inventory.length < resolveGameplayConfig(player).POWERUP.MAX_INVENTORY) {
         player.inventory.push(normalized);
         return true;
     }

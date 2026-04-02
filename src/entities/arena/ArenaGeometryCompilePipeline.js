@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { CONFIG } from '../../core/Config.js';
 import { createBoxWithTunnel } from '../TunnelGeometry.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 function asPositiveNumber(value, defaultValue = 1) {
     const num = Number(value);
@@ -66,7 +66,7 @@ export class ArenaGeometryCompilePipeline {
     }
 
     compileWallStage({ sx, sy, sz, scale }) {
-        const t = CONFIG.ARENA.WALL_THICKNESS * scale;
+        const t = resolveGameplayConfig(this.arena).ARENA.WALL_THICKNESS * scale;
         const halfX = sx / 2;
         const halfY = sy / 2;
         const halfZ = sz / 2;

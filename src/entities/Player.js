@@ -3,8 +3,8 @@
 // ============================================
 
 import * as THREE from 'three';
-import { CONFIG } from '../core/Config.js';
 import { Trail } from './Trail.js';
+import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 import { isValidVehicleId, VEHICLE_DEFINITIONS } from './vehicle-registry.js';
 import {
     applyDamage,
@@ -40,17 +40,19 @@ export class Player {
         this.color = color;
         this.isBot = isBot;
         this.entityRuntimeConfig = options?.entityRuntimeConfig || options?.entityManager?.entityRuntimeConfig || null;
+        this.gameplayConfig = resolveGameplayConfig(this);
         this.alive = true;
         this.score = 0;
+        const playerConfig = this.gameplayConfig.PLAYER;
 
         // Physics
         this.position = new THREE.Vector3();
         this.velocity = new THREE.Vector3(0, 0, -1);
         this.quaternion = new THREE.Quaternion();
-        this.speed = CONFIG.PLAYER.SPEED;
-        this.baseSpeed = CONFIG.PLAYER.SPEED;
-        this.turnSpeed = CONFIG.PLAYER.TURN_SPEED;
-        this.rollSpeed = CONFIG.PLAYER.ROLL_SPEED;
+        this.speed = playerConfig.SPEED;
+        this.baseSpeed = playerConfig.SPEED;
+        this.turnSpeed = playerConfig.TURN_SPEED;
+        this.rollSpeed = playerConfig.ROLL_SPEED;
 
         // Reused temp objects
         this._tmpEuler = new THREE.Euler(0, 0, 0, 'YXZ');
@@ -63,7 +65,7 @@ export class Player {
         this._tmpMat = new THREE.Matrix4();
 
         // Boost
-        this.boostCharge = CONFIG.PLAYER.BOOST_DURATION;
+        this.boostCharge = playerConfig.BOOST_DURATION;
         this.boostTimer = this.boostCharge;
         this.boostCooldown = 0;
         this.manualBoostActive = false;
@@ -86,7 +88,7 @@ export class Player {
         this.lastDamageTimestamp = -Infinity;
         this.itemUseCooldownRemaining = 0;
         this.invertPitchBase = false;
-        this.modelScale = CONFIG.PLAYER.MODEL_SCALE || 1;
+        this.modelScale = playerConfig.MODEL_SCALE || 1;
         this.cockpitCamera = false;
         this.spawnProtectionTimer = 0;
         this.planarAimOffset = 0;
@@ -117,10 +119,10 @@ export class Player {
         const requestedVehicleId = String(options?.vehicleId || '').trim();
         this.vehicleId = isValidVehicleId(requestedVehicleId)
             ? requestedVehicleId
-            : String(CONFIG.PLAYER.DEFAULT_VEHICLE_ID || 'ship5');
+            : String(playerConfig.DEFAULT_VEHICLE_ID || 'ship5');
 
         const vehicleDef = VEHICLE_DEFINITIONS.find((v) => v.id === this.vehicleId) || VEHICLE_DEFINITIONS[0];
-        this.hitboxRadius = (vehicleDef.hitbox?.radius || CONFIG.PLAYER.HITBOX_RADIUS || 0.8) * this.modelScale;
+        this.hitboxRadius = (vehicleDef.hitbox?.radius || playerConfig.HITBOX_RADIUS || 0.8) * this.modelScale;
 
         // Hitbox state
         this.hitboxBox = new THREE.Box3();
@@ -158,10 +160,12 @@ export class Player {
     }
 
     spawn(position, startDirection = null) {
+        const playerConfig = this.gameplayConfig.PLAYER;
+        const gameplaySection = this.gameplayConfig.GAMEPLAY;
         this.position.copy(position);
         this.alive = true;
         this.speed = this.baseSpeed;
-        this.boostCharge = CONFIG.PLAYER.BOOST_DURATION;
+        this.boostCharge = playerConfig.BOOST_DURATION;
         this.boostTimer = this.boostCharge;
         this.boostCooldown = 0;
         this.manualBoostActive = false;
@@ -172,15 +176,15 @@ export class Player {
         this.hasSlowTime = false;
         this.slowTimeScale = 1;
         this.invertControls = false;
-        this.spawnProtectionTimer = CONFIG.PLAYER.SPAWN_PROTECTION || 0;
+        this.spawnProtectionTimer = playerConfig.SPAWN_PROTECTION || 0;
         this.planarAimOffset = 0;
         this.steeringLockTimer = 0;
         this.itemUseCooldownRemaining = 0;
         resetPlayerHealth(this);
 
-        const fallbackY = CONFIG.PLAYER.START_Y || 5;
+        const fallbackY = playerConfig.START_Y || 5;
         const spawnY = Number.isFinite(position?.y) ? position.y : fallbackY;
-        this.currentPlanarY = CONFIG.GAMEPLAY.PLANAR_MODE ? spawnY : fallbackY;
+        this.currentPlanarY = gameplaySection.PLANAR_MODE ? spawnY : fallbackY;
         this.controller?.resetAxisState?.();
 
         this.trail.clear();
@@ -345,11 +349,12 @@ export class Player {
     }
 
     _shouldAutoResetRenderInterpolation() {
+        const playerConfig = this.gameplayConfig.PLAYER;
         const speed = Math.max(
             1,
-            Number(this.speed) || Number(this.baseSpeed) || Number(CONFIG.PLAYER.SPEED) || 18
+            Number(this.speed) || Number(this.baseSpeed) || Number(playerConfig.SPEED) || 18
         );
-        const radius = Math.max(0.2, Number(this.hitboxRadius) || Number(CONFIG.PLAYER.HITBOX_RADIUS) || 0.8);
+        const radius = Math.max(0.2, Number(this.hitboxRadius) || Number(playerConfig.HITBOX_RADIUS) || 0.8);
         const maxInterpolatedDistance = Math.max(radius * 3.5, speed * 0.5);
         if (this._renderPrevPosition.distanceToSquared(this.position) > maxInterpolatedDistance * maxInterpolatedDistance) {
             return true;
@@ -418,10 +423,11 @@ export class Player {
     }
 
     getAimDirection(out = null) {
+        const gameplaySection = this.gameplayConfig.GAMEPLAY;
         const target = out || new THREE.Vector3();
         this.getDirection(target).normalize();
 
-        if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+        if (!gameplaySection.PLANAR_MODE) {
             return target;
         }
 
@@ -438,7 +444,7 @@ export class Player {
         }
         this._tmpAimUp.crossVectors(target, this._tmpAimRight).normalize();
 
-        const angleRad = THREE.MathUtils.degToRad(CONFIG.PROJECTILE.PLANAR_AIM_MAX_ANGLE_DEG) * aimOffset;
+        const angleRad = THREE.MathUtils.degToRad(this.gameplayConfig.PROJECTILE.PLANAR_AIM_MAX_ANGLE_DEG) * aimOffset;
         const cosA = Math.cos(angleRad);
         const sinA = Math.sin(angleRad);
         target.multiplyScalar(cosA).addScaledVector(this._tmpAimUp, sinA).normalize();

@@ -2,8 +2,8 @@
 // BotDecisionOps.js - decision operations for BotAI
 // ============================================
 
-import { CONFIG } from '../../core/Config.js';
 import { enterRecovery, updateRecovery } from './BotRecoveryOps.js';
+import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 
 function clamp01(value) {
     const numeric = Number(value);
@@ -58,6 +58,7 @@ function resolveSurvivalPressure(bot, player) {
 
 export function applyPortalSteering(bot, player) {
     if (!bot.state.portalIntentActive || !bot._portalTarget) return false;
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
 
     bot._tmpVec.subVectors(bot._portalTarget, player.position);
     const distSq = bot._tmpVec.lengthSq();
@@ -76,7 +77,7 @@ export function applyPortalSteering(bot, player) {
     const pitchSignal = bot._tmpUp.dot(bot._tmpVec);
 
     bot._decision.yaw = Math.abs(yawSignal) > 0.08 ? (yawSignal > 0 ? 1 : -1) : 0;
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE) {
+    if (!planarMode) {
         bot._decision.pitch = Math.abs(pitchSignal) > 0.08 ? (pitchSignal > 0 ? 1 : -1) : 0;
     }
 
@@ -88,6 +89,7 @@ export function applyPortalSteering(bot, player) {
 }
 
 export function decideSteering(bot, player) {
+    const planarMode = !!resolveGameplayConfig(bot).GAMEPLAY.PLANAR_MODE;
     const best = bot.sense.bestProbe;
     if (!best) {
         bot._decision.yaw = Math.random() > 0.5 ? 1 : -1;
@@ -107,18 +109,18 @@ export function decideSteering(bot, player) {
         ? Math.max(-1, Math.min(1, yawSignal * 1.8))
         : 0;
     let desiredPitch = 0;
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE && Math.abs(pitchSignal) > 0.08) {
+    if (!planarMode && Math.abs(pitchSignal) > 0.08) {
         desiredPitch = Math.max(-1, Math.min(1, pitchSignal * 1.6));
     }
 
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE && desiredPitch === 0 && Math.abs(bot.sense.heightBias) > 0.15) {
+    if (!planarMode && desiredPitch === 0 && Math.abs(bot.sense.heightBias) > 0.15) {
         desiredPitch = bot.sense.heightBias > 0 ? 1 : -1;
     }
 
     if (desiredYaw === 0 && bot.sense.botRepulsionYaw !== 0) {
         desiredYaw = bot.sense.botRepulsionYaw;
     }
-    if (!CONFIG.GAMEPLAY.PLANAR_MODE && desiredPitch === 0 && bot.sense.botRepulsionPitch !== 0) {
+    if (!planarMode && desiredPitch === 0 && bot.sense.botRepulsionPitch !== 0) {
         desiredPitch = bot.sense.botRepulsionPitch;
     }
 
