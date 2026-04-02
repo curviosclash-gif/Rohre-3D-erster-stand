@@ -77,6 +77,38 @@ Nach `V74` die Runtime-Architektur einen Schritt grundsaetzlicher verbessern:
 - soft dependencies: Architekturabgleich mit `V77`, `V81`, `V82`; Folgeverbrauch durch `V64`
 - Hinweis: `Manuelle Uebernahme erforderlich`
 
+## Umsetzungsplan-Intake-Vorschlag
+
+### Vorschlag fuer `## Aktive Bloecke`
+
+```md
+| V83 | Architektur SessionRuntime und Plattform-Capabilities | planned | P1 | frei | V74.99 | 83.1 | `docs/plaene/aktiv/V83.md` |
+```
+
+### Vorschlag fuer `## Abhaengigkeiten`
+
+```md
+| V83 | V74.99 | hard | nein | SessionRuntime-, Command/Event- und Capability-Folgeschnitt setzt die Runtime-Entkopplung aus V74 als Baseline voraus |
+| V83 | V77 Surface-Policy | soft | nein | Desktop-Vollversion und Browser-Demo sollen spaeter dieselben Capability-Grenzen nutzen; Policy kann parallel vorbereitet, aber vor 83.99 abgeglichen werden |
+| V83 | V67/V68 Abschlussstand | soft | ja | Arcade- und Multiplayer-Lifecycle aus den Altbloecken liefern den Regression-Scope fuer Runtime-Kern, Lobby-Service und Finalize-Contracts |
+```
+
+### Vorschlag fuer `## Lock-Status`
+
+```md
+| - | V83 | - | frei | Nach `V74.99` mit `83.1` Zielbild, Command/Event-Vertrag und SessionRuntime-Schnitt starten |
+```
+
+### Empfohlene Folgeanpassungen nach Intake
+
+Diese Punkte sind kein Pflichtteil der ersten Intake-Uebernahme, passen aber mittelfristig gut zum Master-Index:
+
+- `V64`: zusaetzlich `V83.99` als hard dependency pruefen, sobald Host/Join auf Application-Commands und Plattform-Capabilities umgestellt werden soll.
+- `V75`: zusaetzlich `V83.99` als hard dependency pruefen, falls Recorder-Start/Stop/Export auf denselben Runtime-Kern und Capability-Vertrag gehoben werden soll.
+- `V81`: zusaetzlich `V83.99` als hard dependency pruefen, falls die Tuning-Console nicht mehr ueber breite Runtime-/Config-Backdoors laufen soll.
+- `V76`: `V83.99` mindestens als soft dependency pruefen, wenn Hangar-/Werkstatt-Flows auf dieselben Session-/Capability-Grenzen aufsetzen sollen.
+- `V82`: nur dann `V83.99` als soft dependency nachziehen, wenn XP-/Ghost-/Leaderboard-State auf denselben Runtime-Projektionsvertrag gezogen wird.
+
 ## Evidence-Format
 
 Abgeschlossene Checkboxen im spaeteren aktiven Block immer mit:
