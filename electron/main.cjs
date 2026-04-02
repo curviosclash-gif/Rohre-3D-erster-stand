@@ -226,6 +226,11 @@ async function createWindow() {
     });
 }
 
+async function startDesktopShell() {
+    await createWindow();
+    createTray();
+}
+
 const DISCOVERY_RATE_LIMIT_MS = 500;
 const DISCOVERY_RATE_LIMIT_MAX_SOURCES = 64;
 const discoveryRateMap = new Map();
@@ -388,9 +393,7 @@ app.whenReady().then(async () => {
         return;
     }
     try {
-        await startSignalingServer();
-        await createWindow();
-        createTray();
+        await startDesktopShell();
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Unbekannter Startfehler';
         dialog.showErrorBox('CurviosClash Startfehler', message);
