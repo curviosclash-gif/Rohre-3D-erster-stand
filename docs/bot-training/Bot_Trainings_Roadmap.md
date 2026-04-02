@@ -35,6 +35,14 @@ Aktueller Laufstand:
 - `bot:validate` pinnt jetzt Preview-/Publish-/Report-IO-Diagnostik im Report; fehlende Lane-Telemetrie failt im Benchmark-Gate hart statt als stiller Rest zu bleiben.
 - Vergleichsregel: Promotion nur gegen denselben Benchmark-Vertrag und dasselbe Semantikfenster `pre-v72-runtime-freeze-2026-04-01`.
 
+## BT80B Runtime-Nahe Basis (repo-technisch, 2026-04-02)
+
+- Runtime-nahe Trainingsbasis ist jetzt repo-seitig verdrahtet: `runtime-near` ist das Standard-Environment fuer Benchmark-/Trainingsprofile; `synthetic-smoke` bleibt nur Smoke-/Ablation-Lane.
+- Observation-V2 (`64` Features) fuehrt Threat-Horizon, Dead-End-Risiko, Exit-Qualitaet, Gegnerdruck, Recovery-/Portal-/Gate-/Item-/Shield-Kontext sowie temporale Trends und Tracker-Memory ein.
+- Trainer-, Runtime- und Local-Inference-Pfade teilen jetzt dieselbe Hybrid-Architektur aus `Safety`, `Intent` und `Control`; riskante Portal-/Item-/Combat-Aktionen werden unter hartem Veto deterministisch neutralisiert.
+- Checkpoint-Contract `v36-dqn-checkpoint-v2` migriert Legacy-40er-Modelle in die runtime-nahe Eingabebreite, ohne BT11 als Champion oder BT20 als reine Challenger-Referenz anzutasten.
+- Bewusst nicht vorgezogen in BT80C: Algorithmus-Ausbau (`80.7+`), Champion/Challenger-Promotion, High-Util-/Langlaeufe und produktionsnahe Operatorlaeufe.
+
 ## Zielkorridor bis Q2-Ende
 
 | Ziel | Baseline | Q2 Ziel | Delta |

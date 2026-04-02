@@ -155,21 +155,21 @@ Die folgenden Phasen bleiben als gemeinsamer Programmplan bestehen, werden fuer 
 
 ### 80.4 Trainingsumgebung von synthetisch zu runtime-nah heben
 
-- [ ] 80.4.1 Den aktuellen deterministischen Trainingsrunner gegen die echte Runtime-Semantik kartieren und die groessten Abweichungen fuer Targeting, Kollision, Gegnerdruck, Portale, Gates, Items und Shield dokumentieren.
-- [ ] 80.4.2 Einen runtime-nahen Benchmark- und Trainingspfad aufbauen, der echte oder aus echten Laeufen abgeleitete Zustandsfolgen, Reward-Signale und Todesursachen nutzt.
-- [ ] 80.4.3 Synthetische Lanes nur noch als schnelle Vorpruefung, Smoke oder Ablation-Hilfe behalten; Promotion und Abschluss duerfen nur auf runtime-nahen Benchmarks basieren.
+- [x] 80.4.1 Den aktuellen deterministischen Trainingsrunner gegen die echte Runtime-Semantik kartieren und die groessten Abweichungen fuer Targeting, Kollision, Gegnerdruck, Portale, Gates, Items und Shield dokumentieren. (abgeschlossen: 2026-04-02; evidence: `docs/referenz/ai_architecture_context.md`, `docs/bot-training/Bot_Trainings_Roadmap.md`)
+- [x] 80.4.2 Einen runtime-nahen Benchmark- und Trainingspfad aufbauen, der echte oder aus echten Laeufen abgeleitete Zustandsfolgen, Reward-Signale und Todesursachen nutzt. (abgeschlossen: 2026-04-02; evidence: `src/entities/ai/training/TrainingAutomationRunner.js`, `src/entities/ai/training/DeterministicTrainingStepRunner.js`, `src/entities/ai/training/TrainerPayloadAdapter.js`, `node --test tests/training-environment.contract.test.mjs tests/training-automation-core.contract.test.mjs` -> PASS)
+- [x] 80.4.3 Synthetische Lanes nur noch als schnelle Vorpruefung, Smoke oder Ablation-Hilfe behalten; Promotion und Abschluss duerfen nur auf runtime-nahen Benchmarks basieren. (abgeschlossen: 2026-04-02; evidence: `src/state/training/TrainingBenchmarkContract.js`, `src/state/training/TrainingBenchmarkFailures.js`, `scripts/training-benchmark-artifacts.mjs`, `node --test tests/training-benchmark-artifacts.test.mjs tests/training-gate.test.mjs` -> PASS)
 
 ### 80.5 Observationen, Temporalitaet und Gedaechtnis erweitern
 
-- [ ] 80.5.1 Observation-V2 fuer Threat-Horizon, Dead-End-Risiko, Exit-Qualitaet, Gegnerdruck, letzte Recovery-Aktion, Portal-/Gate-Kontext, Item-Wert und Shield-Lage entwerfen.
-- [ ] 80.5.2 Frame-Stack oder rekurrente Memory-Komponente einfuehren, damit der Bot nicht nur auf einen einzelnen 40er Snapshot reagiert, sondern mehrere Sekunden Verlauf nutzen kann.
-- [ ] 80.5.3 Checkpoint-, Resume- und Runtime-Migrationspfade fuer neue Observation-/Modelldimensionen sauber versionieren, damit Benchmarkvergleiche und Resume nicht implodieren.
+- [x] 80.5.1 Observation-V2 fuer Threat-Horizon, Dead-End-Risiko, Exit-Qualitaet, Gegnerdruck, letzte Recovery-Aktion, Portal-/Gate-Kontext, Item-Wert und Shield-Lage entwerfen. (abgeschlossen: 2026-04-02; evidence: `src/entities/ai/observation/ObservationSchemaV2.js`, `src/entities/ai/observation/RuntimeNearObservationAdapter.js`, `node --test tests/training-runtime-near-architecture.test.mjs tests/training-environment.contract.test.mjs` -> PASS)
+- [x] 80.5.2 Frame-Stack oder rekurrente Memory-Komponente einfuehren, damit der Bot nicht nur auf einen einzelnen 40er Snapshot reagiert, sondern mehrere Sekunden Verlauf nutzen kann. (abgeschlossen: 2026-04-02; evidence: `src/entities/ai/observation/RuntimeNearObservationAdapter.js`, `trainer/session/TrainerSession.mjs`, `src/entities/ai/ObservationBridgePolicyHelpers.js`, `node --test tests/training-runtime-near-architecture.test.mjs tests/training-environment.contract.test.mjs` -> PASS)
+- [x] 80.5.3 Checkpoint-, Resume- und Runtime-Migrationspfade fuer neue Observation-/Modelldimensionen sauber versionieren, damit Benchmarkvergleiche und Resume nicht implodieren. (abgeschlossen: 2026-04-02; evidence: `trainer/model/DqnTrainer.mjs`, `trainer/model/CheckpointValidation.mjs`, `src/entities/ai/inference/LocalDqnInference.js`, `node --test tests/trainer-v35-model.test.mjs` -> PASS)
 
 ### 80.6 Action- und Entscheidungsarchitektur hybridisieren
 
-- [ ] 80.6.1 Die Entscheidung in mindestens `Safety`, `Intent` und `Control` aufteilen, damit der gelernte Teil stark werden darf, ohne elementare Selbstzerstoerung wieder freizugeben.
-- [ ] 80.6.2 Den Action-Space von starren Templates zu einer feineren Struktur weiterentwickeln, zum Beispiel Intent-Klassen fuer `evade`, `chase`, `portal`, `item-use`, `combat` plus kontrolliertere Ausfuehrung.
-- [ ] 80.6.3 Harte Invarianten definieren wie "keine riskante Item-/Portal-Aktion bei aktivem Safety-Veto", damit der Produktionsbot auch unter Last reproduzierbar bleibt.
+- [x] 80.6.1 Die Entscheidung in mindestens `Safety`, `Intent` und `Control` aufteilen, damit der gelernte Teil stark werden darf, ohne elementare Selbstzerstoerung wieder freizugeben. (abgeschlossen: 2026-04-02; evidence: `src/entities/ai/hybrid/HybridDecisionArchitecture.js`, `trainer/session/ActionSanitizer.mjs`, `trainer/session/TrainerSession.mjs`, `node --test tests/trainer-v36-action-safety.test.mjs tests/training-runtime-near-architecture.test.mjs` -> PASS)
+- [x] 80.6.2 Den Action-Space von starren Templates zu einer feineren Struktur weiterentwickeln, zum Beispiel Intent-Klassen fuer `evade`, `chase`, `portal`, `item-use`, `combat` plus kontrolliertere Ausfuehrung. (abgeschlossen: 2026-04-02; evidence: `trainer/model/ActionVocabulary.mjs`, `src/entities/ai/inference/CheckpointActionVocabulary.js`, `src/entities/ai/ObservationBridgePolicyHelpers.js`, `node --test tests/trainer-v35-model.test.mjs tests/trainer-v36-action-safety.test.mjs` -> PASS)
+- [x] 80.6.3 Harte Invarianten definieren wie "keine riskante Item-/Portal-Aktion bei aktivem Safety-Veto", damit der Produktionsbot auch unter Last reproduzierbar bleibt. (abgeschlossen: 2026-04-02; evidence: `src/entities/ai/hybrid/HybridDecisionArchitecture.js`, `src/entities/ai/training/DeterministicTrainingStepRunner.js`, `node --test tests/trainer-v36-action-safety.test.mjs tests/training-runtime-near-architecture.test.mjs` -> PASS)
 
 ### 80.7 Lernalgorithmus, Ablationen und Champion/Challenger-Modell
 

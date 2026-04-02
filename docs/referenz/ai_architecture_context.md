@@ -46,6 +46,8 @@ Stand: 2026-04-02
 - `ai/RuleBasedBotPolicy.js`: Default-Policy-Adapter auf `Bot.js`
 - `hunt/HuntBotPolicy.js`: Hunt-spezifische Bot-Policy (MG/Rocket/HP-Verhalten)
 - `ai/BotSensingOps.js`, `ai/BotDecisionOps.js`, `ai/BotActionOps.js`: modulare KI-Ops
+- `ai/observation/ObservationSchemaV2.js`, `ai/observation/RuntimeNearObservationAdapter.js`: runtime-nahe Observation-V2 mit Threat-/Exit-/Portal-/Gate-/Item-/Shield-/Memory-Signalen ueber dem eingefrorenen V1-Basissnapshot
+- `ai/hybrid/HybridDecisionArchitecture.js`: gemeinsamer `Safety`-/`Intent`-/`Control`-Resolver fuer Runtime-, Inference- und Trainer-Pfade
 - `ai/training/TrainingContractV1.js`, `DeterministicTrainingStepRunner.js`, `TrainerPayloadAdapter.js`, `TrainingTransportFacade.js`, `WebSocketTrainerBridge.js`: additive Trainings-/Transport-Schicht ohne Breaking Change am Bot-Bridge-V1-Vertrag
 - `Player.js`, `Bot.js`, `Trail.js`, `Powerup.js`, `Particles.js`
 - `vehicle-registry.js` + Fahrzeug-Mesh-Module
@@ -127,7 +129,23 @@ Stand: 2026-04-02
 - V1 Nicht-Ziele:
   - keine History-Frames, keine Reward-/Telemetriefelder im Runtime-Vektor, keine verpflichtende Netzwerk-Bridge.
 
-## 8. Runtime-Policy-Auswahl (Stand 2026-03-10)
+## 8. BT80B Runtime-Nahe Trainings- und Inference-Schicht (Stand 2026-04-02)
+
+- Observation-V2:
+  - `ObservationSchemaV2.js` erweitert den eingefrorenen V1-Snapshot von `40` auf `64` Features.
+  - `RuntimeNearObservationAdapter.js` liftet V1-Observationen in runtime-nahe Kontexte mit Threat-Horizon, Dead-End-Risiko, Exit-Qualitaet, Gegnerdruck, Recovery-, Portal-, Gate-, Item- und Shield-Signalen.
+  - `RuntimeNearObservationTracker` fuehrt temporale Trends und ein kleines Memory fuer Druck, Clearance, letzte Recovery und Intent-Prioren.
+- Gemeinsame Entscheidungsarchitektur:
+  - `HybridDecisionArchitecture.js` trennt `Safety`, `Intent` und `Control`.
+  - Portal-, Item- und Combat-Aktionen laufen nur noch, wenn die harten Invarianten das zulassen; sonst wird deterministisch auf `evade`/`recover` korrigiert.
+- Checkpoint-/Inference-Vertrag:
+  - `DqnTrainer.mjs` exportiert jetzt `v36-dqn-checkpoint-v2` mit Observation-Schema `v2-runtime-near` und Action-Architektur-Version.
+  - Legacy-Checkpoints mit `40` Eingangsfeatures werden fuer Resume/Inference in die neue Eingabebreite migriert, statt still zu brechen.
+- Scope-Grenze:
+  - BT80B haertet die Laufzeitnahe und Entscheidungsarchitektur.
+  - Algorithmus-Ausbau, Champion/Challenger-Rollout und High-Util-Laufprofile bleiben explizit BT80C.
+
+## 9. Runtime-Policy-Auswahl (Stand 2026-03-10)
 
 - `SettingsManager` fuehrt `botPolicyStrategy` mit Default `auto`.
 - `RuntimeConfig` normalisiert Strategie (`rule-based|bridge|auto`) und loest bei `auto` deterministisch `bot.policyType` aus `gameMode + planarMode`.
