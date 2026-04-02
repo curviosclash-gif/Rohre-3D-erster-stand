@@ -13,6 +13,9 @@ function cloneSection(baseConfig, sectionName, fallback = {}) {
     return cloneObject(section, fallback);
 }
 
+// Entity-level defaults differ from game-level GAMEPLAY_CONFIG_DEFAULTS:
+// entities use conservative/safe fallbacks (lower speeds, no gaps, etc.)
+// so that entities spawned without a full config are still functional.
 export const DEFAULT_ENTITY_RUNTIME_CONFIG = Object.freeze({
     PLAYER: Object.freeze({
         SPEED: 18,
