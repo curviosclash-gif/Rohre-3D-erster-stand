@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-01
+Stand: 2026-04-02
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -26,7 +26,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
-| V74 | Architektur-Runtime-Entkopplung (Refresh) | active | P1 | Bot-Codex | V58.99,V60.3 | 74.3 | `docs/plaene/aktiv/V74.md` |
+| V74 | Architektur-Runtime-Entkopplung (Refresh) | active | P1 | Bot-Codex | V58.99,V60.3 | 74.4 | `docs/plaene/aktiv/V74.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
@@ -64,7 +64,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | - | V64 | - | frei | Nach `V77.99` `64.1` Transportmatrix und Capability-Modell fuer `Host Vollversion / Join Demo` konkretisieren |
 | - | V71 | - | frei | `71.99` nach Warmup-Entstoerung oder belastbarem Restgate schliessen |
 | Agent-B | V72 | 2026-04-02 | active | `72.2` abgeschlossen; `72.3` Portal-/Gate-Vertraege haerten steht an |
-| Bot-Codex | V74 | 2026-03-31 | active | `74.3` Match-Session-Lifecycle und Recorder-Finalisierung haerten |
+| Bot-Codex | V74 | 2026-03-31 | active | `74.4` Core-, UI- und State-Komposition weiter entkoppeln |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
