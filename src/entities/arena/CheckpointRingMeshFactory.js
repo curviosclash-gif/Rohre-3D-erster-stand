@@ -15,6 +15,7 @@ let sharedLabelGeometry = null;
 function getRingGeometry() {
     if (!sharedRingGeometry) {
         sharedRingGeometry = new THREE.TorusGeometry(RING_RADIUS, RING_TUBE, 12, 56);
+        sharedRingGeometry.userData.__sharedNoDispose = true;
     }
     return sharedRingGeometry;
 }
@@ -22,6 +23,7 @@ function getRingGeometry() {
 function getFinishGeometry() {
     if (!sharedFinishGeometry) {
         sharedFinishGeometry = new THREE.TorusGeometry(RING_RADIUS, FINISH_TUBE, 12, 56);
+        sharedFinishGeometry.userData.__sharedNoDispose = true;
     }
     return sharedFinishGeometry;
 }
@@ -29,6 +31,7 @@ function getFinishGeometry() {
 function getLabelGeometry() {
     if (!sharedLabelGeometry) {
         sharedLabelGeometry = new THREE.PlaneGeometry(LABEL_SIZE, LABEL_SIZE);
+        sharedLabelGeometry.userData.__sharedNoDispose = true;
     }
     return sharedLabelGeometry;
 }
@@ -77,7 +80,7 @@ export function createCheckpointRingMesh(position, rotation, number, renderer) {
     const material = createRingMaterial(CHECKPOINT_COLOR);
     const group = buildRingGroup(position, rotation, getRingGeometry(), material, number);
     group.userData.checkpointNumber = number;
-    renderer.addToScene(group);
+    renderer?.addToScene?.(group);
     return group;
 }
 
@@ -88,6 +91,6 @@ export function createFinishRingMesh(position, rotation, renderer) {
     material.metalness = 0.75;
     const group = buildRingGroup(position, rotation, getFinishGeometry(), material, 'F');
     group.userData.isFinish = true;
-    renderer.addToScene(group);
+    renderer?.addToScene?.(group);
     return group;
 }

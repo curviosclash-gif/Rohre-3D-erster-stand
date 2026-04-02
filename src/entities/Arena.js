@@ -324,10 +324,17 @@ export class Arena {
         for (const exitPortal of this.exitPortals || []) {
             if (exitPortal?.mesh) exitPortal.mesh.visible = false;
         }
+        for (const cpRing of this.checkpointRings || []) {
+            if (cpRing?.mesh) {
+                cpRing.mesh.visible = false;
+                removeObject(cpRing.mesh);
+            }
+        }
 
         this.portals = [];
         this.specialGates = [];
         this.exitPortals = [];
+        this.checkpointRings = [];
         this.obstacles = [];
         this.currentMapDefinition = null;
         this.runtimeMapDefinition = null;

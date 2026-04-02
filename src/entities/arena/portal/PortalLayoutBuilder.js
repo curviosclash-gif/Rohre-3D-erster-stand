@@ -6,6 +6,11 @@ import {
     createSlingshotGateMesh,
 } from '../PortalGateMeshFactory.js';
 import {
+    createCheckpointRingMesh,
+    createFinishRingMesh,
+} from '../CheckpointRingMeshFactory.js';
+import { buildRouteFromParcours } from '../../systems/ParcoursProgressUtils.js';
+import {
     getMapPlanarAnchors,
     getMapPortalSlots3D,
     portalPositionFromSlot,
@@ -30,14 +35,21 @@ export class PortalLayoutBuilder {
         this._tmpVec = new THREE.Vector3();
         this._portalMeshCompactMode = false;
         this._visualRegistry = null;
+        this._checkpointRingSpinEnabled = true;
     }
 
     build(map, scale) {
         this._mapDefinition = map || null;
         this._visualRegistry = createPortalGateVisualRegistry(this.arena.renderer);
+        this._checkpointRingSpinEnabled = true;
         this._buildPortals(map, scale);
         this._buildSpecialGates(map, scale);
         this._buildExitPortals(map, scale);
+        this._buildCheckpointRings(map, scale);
+    }
+
+    get checkpointRingSpinEnabled() {
+        return this._checkpointRingSpinEnabled;
     }
 
     _buildExitPortals(map, scale) {
@@ -69,6 +81,81 @@ export class PortalLayoutBuilder {
             activateOnClear,
             cooldowns: new Map(),
         });
+    }
+
+    _buildCheckpointRings(map, scale) {
+        this.arena.checkpointRings = [];
+        if (!map?.parcours) return;
+        const route = buildRouteFromParcours(map.parcours);
+        if (!route) return;
+        this._checkpointRingSpinEnabled = route.rules.animateCheckpoints !== false;
+
+        const seenCanonical = new Set();
+        for (const cp of route.checkpoints) {
+            const canonicalId = cp.aliasOf || cp.id;
+            if (seenCanonical.has(canonicalId)) continue;
+            seenCanonical.add(canonicalId);
+
+            const pos = new THREE.Vector3(
+                asFiniteNumber(cp.pos[0]) * scale,
+                asFiniteNumber(cp.pos[1]) * scale,
+                asFiniteNumber(cp.pos[2]) * scale
+            );
+
+            let rotation = null;
+            if (cp.forward) {
+                const target = new THREE.Vector3(
+                    pos.x + cp.forward[0],
+                    pos.y + cp.forward[1],
+                    pos.z + cp.forward[2]
+                );
+                const tmpMatrix = new THREE.Matrix4().lookAt(pos, target, new THREE.Vector3(0, 1, 0));
+                const quat = new THREE.Quaternion().setFromRotationMatrix(tmpMatrix);
+                rotation = new THREE.Euler().setFromQuaternion(quat);
+            }
+
+            const number = cp.routeIndex + 1;
+            const mesh = createCheckpointRingMesh(pos, rotation, number, this.arena.renderer);
+            if (!mesh) continue;
+
+            this.arena.checkpointRings.push({
+                routeIndex: cp.routeIndex,
+                checkpointId: cp.id,
+                pos,
+                mesh,
+            });
+        }
+
+        if (route.finish) {
+            const fPos = new THREE.Vector3(
+                asFiniteNumber(route.finish.pos[0]) * scale,
+                asFiniteNumber(route.finish.pos[1]) * scale,
+                asFiniteNumber(route.finish.pos[2]) * scale
+            );
+
+            let fRotation = null;
+            if (route.finish.forward) {
+                const target = new THREE.Vector3(
+                    fPos.x + route.finish.forward[0],
+                    fPos.y + route.finish.forward[1],
+                    fPos.z + route.finish.forward[2]
+                );
+                const tmpMatrix = new THREE.Matrix4().lookAt(fPos, target, new THREE.Vector3(0, 1, 0));
+                const quat = new THREE.Quaternion().setFromRotationMatrix(tmpMatrix);
+                fRotation = new THREE.Euler().setFromQuaternion(quat);
+            }
+
+            const mesh = createFinishRingMesh(fPos, fRotation, this.arena.renderer);
+            if (mesh) {
+                this.arena.checkpointRings.push({
+                    routeIndex: -1,
+                    checkpointId: route.finish.id,
+                    pos: fPos,
+                    mesh,
+                    isFinish: true,
+                });
+            }
+        }
     }
 
     _buildSpecialGates(map, scale) {

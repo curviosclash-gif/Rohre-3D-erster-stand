@@ -70,6 +70,7 @@ export function buildRouteFromParcours(parcoursRaw) {
         winnerByParcoursComplete: rawRules.winnerByParcoursComplete !== false,
         wrongOrderCooldownMs: Math.max(0, Math.trunc(toFiniteNumber(rawRules.wrongOrderCooldownMs, 650))),
         errorIndicatorMs: Math.max(0, Math.trunc(toFiniteNumber(rawRules.errorIndicatorMs, 1400))),
+        animateCheckpoints: rawRules.animateCheckpoints !== false,
     };
 
     const rawCheckpoints = Array.isArray(parcoursRaw.checkpoints) ? parcoursRaw.checkpoints : [];
