@@ -2,6 +2,8 @@ import { normalizeObservationVector } from '../session/ObservationNormalizer.mjs
 import { DqnMlpNetwork } from './DqnMlpNetwork.mjs';
 import { ActionVocabulary } from './ActionVocabulary.mjs';
 import { SeededRng } from './SeededRng.mjs';
+import { OBSERVATION_LENGTH_V2, OBSERVATION_SCHEMA_VERSION_V2 } from '../../src/entities/ai/observation/ObservationSchemaV2.js';
+import { HYBRID_DECISION_ARCHITECTURE_VERSION } from '../../src/entities/ai/hybrid/HybridDecisionArchitecture.js';
 
 function clampInt(value, fallback, min, max) {
     const numeric = Number(value);
@@ -42,14 +44,105 @@ function resolveHiddenLayers(modelOptions) {
     return [single];
 }
 
+export const CHECKPOINT_CONTRACT_V36 = 'v36-dqn-checkpoint-v2';
 export const CHECKPOINT_CONTRACT_V35 = 'v35-dqn-checkpoint-v1';
 export const CHECKPOINT_CONTRACT_V34 = 'v34-dqn-checkpoint-v1';
 
+function resolveCheckpointObservationLength(checkpoint) {
+    const direct = clampInt(checkpoint?.observationLength, 0, 0, 10_000);
+    if (direct > 0) {
+        return direct;
+    }
+    const layerInputSize = clampInt(
+        checkpoint?.online?.layers?.[0]?.inputSize ?? checkpoint?.online?.inputSize,
+        0,
+        0,
+        10_000
+    );
+    return layerInputSize;
+}
+
+function cloneNetworkState(state) {
+    return state && typeof state === 'object'
+        ? JSON.parse(JSON.stringify(state))
+        : null;
+}
+
+function migrateNetworkStateInputSize(networkState, targetInputSize) {
+    const cloned = cloneNetworkState(networkState);
+    if (!cloned || targetInputSize <= 0) {
+        return null;
+    }
+
+    if (Array.isArray(cloned.layers) && cloned.layers.length > 0) {
+        const firstLayer = cloned.layers[0];
+        const oldInputSize = clampInt(firstLayer?.inputSize, 0, 0, 10_000);
+        const outputSize = clampInt(firstLayer?.outputSize, 0, 0, 10_000);
+        if (oldInputSize <= 0 || outputSize <= 0 || !Array.isArray(firstLayer?.weights)) {
+            return null;
+        }
+        const migratedWeights = new Array(targetInputSize * outputSize).fill(0);
+        const copyInputs = Math.min(oldInputSize, targetInputSize);
+        for (let inputIndex = 0; inputIndex < copyInputs; inputIndex += 1) {
+            for (let outputIndex = 0; outputIndex < outputSize; outputIndex += 1) {
+                migratedWeights[inputIndex * outputSize + outputIndex] =
+                    toFinite(firstLayer.weights[inputIndex * outputSize + outputIndex], 0);
+            }
+        }
+        firstLayer.inputSize = targetInputSize;
+        firstLayer.weights = migratedWeights;
+        cloned.inputSize = targetInputSize;
+        return cloned;
+    }
+
+    const oldInputSize = clampInt(cloned?.inputSize, 0, 0, 10_000);
+    const hiddenSize = clampInt(cloned?.hiddenSize, 0, 0, 10_000);
+    if (oldInputSize <= 0 || hiddenSize <= 0 || !Array.isArray(cloned?.weightsInputHidden)) {
+        return null;
+    }
+    const migratedWeights = new Array(targetInputSize * hiddenSize).fill(0);
+    const copyInputs = Math.min(oldInputSize, targetInputSize);
+    for (let inputIndex = 0; inputIndex < copyInputs; inputIndex += 1) {
+        for (let hiddenIndex = 0; hiddenIndex < hiddenSize; hiddenIndex += 1) {
+            migratedWeights[inputIndex * hiddenSize + hiddenIndex] =
+                toFinite(cloned.weightsInputHidden[inputIndex * hiddenSize + hiddenIndex], 0);
+        }
+    }
+    cloned.inputSize = targetInputSize;
+    cloned.weightsInputHidden = migratedWeights;
+    return cloned;
+}
+
+function migrateCheckpointObservationLength(checkpoint, targetInputSize) {
+    const cloned = cloneNetworkState(checkpoint);
+    if (!cloned) {
+        return null;
+    }
+    const migratedOnline = migrateNetworkStateInputSize(cloned.online, targetInputSize);
+    const migratedTarget = migrateNetworkStateInputSize(cloned.target, targetInputSize);
+    if (!migratedOnline || !migratedTarget) {
+        return null;
+    }
+    cloned.online = migratedOnline;
+    cloned.target = migratedTarget;
+    cloned.observationLength = targetInputSize;
+    cloned.observationSchemaVersion = OBSERVATION_SCHEMA_VERSION_V2;
+    cloned.migration = {
+        sourceObservationLength: resolveCheckpointObservationLength(checkpoint),
+        targetObservationLength: targetInputSize,
+    };
+    return cloned;
+}
+
 export class DqnTrainer {
     constructor(options = {}) {
-        this.observationLength = clampInt(options.observationLength, 40, 1, 4096);
+        this.observationLength = clampInt(options.observationLength, OBSERVATION_LENGTH_V2, 1, 4096);
         this.maxItemIndex = clampInt(options.maxItemIndex, 2, 0, 8);
         this.seed = clampInt(options.seed, 13_337, 1, 2_147_483_647);
+        this.observationSchemaVersion = typeof options.observationSchemaVersion === 'string' && options.observationSchemaVersion.trim()
+            ? options.observationSchemaVersion.trim()
+            : OBSERVATION_SCHEMA_VERSION_V2;
+        this.actionArchitectureVersion = HYBRID_DECISION_ARCHITECTURE_VERSION;
 
         const hiddenLayers = resolveHiddenLayers(options?.model);
 
@@ -152,12 +245,19 @@ export class DqnTrainer {
         }
 
         this.lastActionIndex = actionIndex;
+        const decoded = typeof this.actionVocabulary.decodeWithMetadata === 'function'
+            ? this.actionVocabulary.decodeWithMetadata(actionIndex, context)
+            : {
+                action: this.actionVocabulary.decode(actionIndex, context),
+                metadata: null,
+            };
         return {
-            action: this.actionVocabulary.decode(actionIndex, context),
+            action: decoded.action,
             actionIndex,
             epsilon,
             policy,
             qValue: toFinite(qValues[actionIndex], 0),
+            actionMetadata: decoded.metadata,
         };
     }
 
@@ -283,16 +383,18 @@ export class DqnTrainer {
 
     exportCheckpoint() {
         return {
-            contractVersion: CHECKPOINT_CONTRACT_V35,
+            contractVersion: CHECKPOINT_CONTRACT_V36,
             seed: this.seed,
             envSteps: this.envSteps,
             optimizerSteps: this.optimizerSteps,
             lastLoss: this.lastLoss,
             lastTargetSyncAt: this.lastTargetSyncAt,
             observationLength: this.observationLength,
+            observationSchemaVersion: this.observationSchemaVersion,
             maxItemIndex: this.maxItemIndex,
             planarMode: this.planarMode,
             actionCount: this.actionVocabulary.size,
+            actionArchitectureVersion: this.actionArchitectureVersion,
             hyper: { ...this.hyper },
             online: this.onlineNetwork.exportState(),
             target: this.targetNetwork.exportState(),
@@ -304,20 +406,35 @@ export class DqnTrainer {
             return { ok: false, error: 'checkpoint-missing' };
         }
         const version = checkpoint.contractVersion;
-        if (version !== CHECKPOINT_CONTRACT_V35 && version !== CHECKPOINT_CONTRACT_V34) {
+        if (version !== CHECKPOINT_CONTRACT_V36 && version !== CHECKPOINT_CONTRACT_V35 && version !== CHECKPOINT_CONTRACT_V34) {
             return { ok: false, error: 'checkpoint-contract-version-mismatch', details: {
-                expected: [CHECKPOINT_CONTRACT_V35, CHECKPOINT_CONTRACT_V34],
+                expected: [CHECKPOINT_CONTRACT_V36, CHECKPOINT_CONTRACT_V35, CHECKPOINT_CONTRACT_V34],
                 actual: version || null,
             }};
         }
         const strict = options.strict !== false;
         const expectedActionCount = this.actionVocabulary.size;
-        const checkpointObsLength = clampInt(checkpoint.observationLength, 0, 0, 10_000);
+        const checkpointObsLength = resolveCheckpointObservationLength(checkpoint);
         const checkpointActionCount = clampInt(
             checkpoint.online?.outputSize ?? checkpoint.online?.layers?.[checkpoint.online?.layers?.length - 1]?.outputSize ?? checkpoint.target?.outputSize,
             0, 0, 10_000
         );
+        let checkpointPayload = checkpoint;
         if (checkpointObsLength && checkpointObsLength !== this.observationLength) {
+            const canMigrateObservationLength = (
+                checkpointObsLength > 0
+                && checkpointObsLength < this.observationLength
+                && checkpointActionCount === expectedActionCount
+            );
+            if (canMigrateObservationLength) {
+                const migratedCheckpoint = migrateCheckpointObservationLength(checkpoint, this.observationLength);
+                if (migratedCheckpoint) {
+                    checkpointPayload = migratedCheckpoint;
+                }
+            }
+        }
+        const effectiveCheckpointObsLength = resolveCheckpointObservationLength(checkpointPayload);
+        if (effectiveCheckpointObsLength && effectiveCheckpointObsLength !== this.observationLength) {
             const msg = `observation-length-mismatch: checkpoint=${checkpointObsLength} runtime=${this.observationLength}`;
             if (strict) return { ok: false, error: msg };
             console.warn(`[DqnTrainer] ${msg} (non-strict, continuing)`);
@@ -327,15 +444,22 @@ export class DqnTrainer {
             if (strict) return { ok: false, error: msg };
             console.warn(`[DqnTrainer] ${msg} (non-strict, continuing)`);
         }
-        const importedOnline = this.onlineNetwork.importState(checkpoint.online);
-        const importedTarget = this.targetNetwork.importState(checkpoint.target);
+        const importedOnline = this.onlineNetwork.importState(checkpointPayload.online);
+        const importedTarget = this.targetNetwork.importState(checkpointPayload.target);
         if (!importedOnline || !importedTarget) {
             return { ok: false, error: 'network-state-import-failed' };
         }
-        this.envSteps = clampInt(checkpoint.envSteps, 0, 0, 1_000_000_000);
-        this.optimizerSteps = clampInt(checkpoint.optimizerSteps, 0, 0, 1_000_000_000);
-        this.lastLoss = checkpoint.lastLoss == null ? null : toFinite(checkpoint.lastLoss, 0);
-        this.lastTargetSyncAt = clampInt(checkpoint.lastTargetSyncAt, 0, 0, 1_000_000_000);
-        return { ok: true, error: null };
+        this.envSteps = clampInt(checkpointPayload.envSteps, 0, 0, 1_000_000_000);
+        this.optimizerSteps = clampInt(checkpointPayload.optimizerSteps, 0, 0, 1_000_000_000);
+        this.lastLoss = checkpointPayload.lastLoss == null ? null : toFinite(checkpointPayload.lastLoss, 0);
+        this.lastTargetSyncAt = clampInt(checkpointPayload.lastTargetSyncAt, 0, 0, 1_000_000_000);
+        this.observationSchemaVersion = typeof checkpointPayload.observationSchemaVersion === 'string' && checkpointPayload.observationSchemaVersion.trim()
+            ? checkpointPayload.observationSchemaVersion.trim()
+            : this.observationSchemaVersion;
+        return {
+            ok: true,
+            error: null,
+            migrated: checkpointPayload !== checkpoint,
+        };
     }
 }

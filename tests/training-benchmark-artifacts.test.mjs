@@ -224,3 +224,57 @@ test('V80 benchmark profile guardrails keep thermal telemetry observe-only when 
     assert.equal(guardrails.failures.length, 0);
     assert.equal(guardrails.warnings.some((entry) => entry.code === 'temperature-unavailable'), true);
 });
+
+test('V80 benchmark artifact audit rejects promotion-eligible synthetic-only lanes', () => {
+    const reportPath = 'data/training/runs/TEST_BT80B_SYNTHETIC_ONLY/bot-validation-report.json';
+    const validationLane = buildBotValidationEval(createValidationReportWithDiagnostics(), {
+        reportPath,
+        exists: true,
+    });
+    const artifactAudit = evaluateBenchmarkArtifactRequirements({
+        manifest: {
+            contractVersion: 'v80-benchmark-manifest-v1',
+            semantics: { id: TRAINING_BENCHMARK_SEMANTIC_WINDOW.id },
+            benchmarkMatrix: { version: TRAINING_BENCHMARK_MATRIX.version },
+            environment: {
+                profile: 'synthetic-smoke',
+                runtimeNear: false,
+                syntheticLane: true,
+                promotionEligible: true,
+            },
+        },
+        runArtifact: {
+            checkpointPath: 'data/training/models/TEST_BT80B_SYNTHETIC_ONLY/checkpoint.json',
+            hardwareTelemetry: {
+                thermal: {
+                    available: false,
+                    temperatureC: null,
+                },
+            },
+            resume: {
+                requested: false,
+                loaded: false,
+            },
+        },
+        evalArtifact: {
+            botValidation: validationLane,
+            source: {
+                botValidationReportPath: reportPath,
+            },
+        },
+        trainerArtifact: {
+            hardwareTelemetry: {
+                thermal: {
+                    available: false,
+                    temperatureC: null,
+                },
+            },
+        },
+        decisionTrace: {
+            decisions: [],
+        },
+    });
+
+    assert.equal(artifactAudit.ok, false);
+    assert.equal(artifactAudit.failures.some((entry) => entry.code === 'runtime-lane-missing'), true);
+});

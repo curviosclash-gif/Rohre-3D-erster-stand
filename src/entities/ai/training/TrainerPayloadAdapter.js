@@ -3,9 +3,10 @@
 // ============================================
 
 import {
-    OBSERVATION_LENGTH_V1,
-    OBSERVATION_SCHEMA_VERSION,
-} from '../observation/ObservationSchemaV1.js';
+    DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH,
+    liftObservationWithRuntimeNearContext,
+} from '../observation/RuntimeNearObservationAdapter.js';
+import { OBSERVATION_SCHEMA_VERSION_V2 } from '../observation/ObservationSchemaV2.js';
 import { deriveTrainingDomain } from '../../../state/training/TrainingDomain.js';
 import { TRAINING_CONTRACT_VERSION } from '../../../shared/contracts/TrainingRuntimeContract.js';
 import { toFiniteNumber } from '../../../utils/MathOps.js';
@@ -70,6 +71,12 @@ export function buildTrainerRuntimeObservationPayload(runtimeContext = {}, playe
         controlProfileId,
     });
 
+    const lifted = liftObservationWithRuntimeNearContext(runtimeContext?.observation, {
+        expectedLength: DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH,
+        environmentProfile: runtimeContext?.environmentProfile || runtimeContext?.trainingEnvironmentProfile || undefined,
+        metadata: runtimeContext?.observationContext,
+        player,
+    });
     return {
         mode: rawMode,
         planarMode,
@@ -77,9 +84,10 @@ export function buildTrainerRuntimeObservationPayload(runtimeContext = {}, playe
         domainId: domain.domainId,
         domainVersion: domain.version,
         dt: toFiniteNumber(runtimeContext?.dt, 0),
-        observationSchemaVersion: OBSERVATION_SCHEMA_VERSION,
-        observationLength: OBSERVATION_LENGTH_V1,
-        observation: cloneObservation(runtimeContext?.observation),
+        observationSchemaVersion: OBSERVATION_SCHEMA_VERSION_V2,
+        observationLength: DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH,
+        observation: cloneObservation(lifted.observation),
+        observationContext: lifted.details,
         player: buildPlayerPayload(player),
     };
 }
@@ -96,10 +104,23 @@ export function buildTrainerTransitionPayload(transition = {}, options = {}) {
         controlProfileId: domainSource?.controlProfileId ?? options.controlProfileId,
     });
 
+    const metadata = info.metadata && typeof info.metadata === 'object'
+        ? info.metadata
+        : {};
+    const lifted = liftObservationWithRuntimeNearContext(transition.observation, {
+        expectedLength: DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH,
+        environmentProfile: metadata.environmentProfile
+            || options?.environmentProfile
+            || undefined,
+        metadata,
+        intent: metadata?.hybridDecision?.intent?.applied
+            || metadata?.hybridDecision?.intent?.requested
+            || null,
+    });
     return {
         contractVersion: TRAINING_CONTRACT_VERSION,
-        observationSchemaVersion: OBSERVATION_SCHEMA_VERSION,
-        observationLength: OBSERVATION_LENGTH_V1,
+        observationSchemaVersion: OBSERVATION_SCHEMA_VERSION_V2,
+        observationLength: DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH,
         operation: typeof transition.operation === 'string' ? transition.operation : 'step',
         episodeId: typeof transition.episodeId === 'string' ? transition.episodeId : null,
         episodeIndex: Number.isInteger(transition.episodeIndex) ? transition.episodeIndex : 0,
@@ -107,7 +128,7 @@ export function buildTrainerTransitionPayload(transition = {}, options = {}) {
         reward: toFiniteNumber(transition.reward, 0),
         done: !!transition.done,
         truncated: !!transition.truncated,
-        observation: cloneObservation(transition.observation),
+        observation: cloneObservation(lifted.observation),
         action: transition.action && typeof transition.action === 'object'
             ? { ...transition.action }
             : null,
@@ -120,6 +141,10 @@ export function buildTrainerTransitionPayload(transition = {}, options = {}) {
                 : null,
             match: info.match && typeof info.match === 'object'
                 ? { ...info.match }
+                : null,
+            observationContext: lifted.details,
+            hybridDecision: metadata.hybridDecision && typeof metadata.hybridDecision === 'object'
+                ? { ...metadata.hybridDecision }
                 : null,
         },
     };

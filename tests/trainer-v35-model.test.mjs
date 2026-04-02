@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { DqnMlpNetwork } from '../trainer/model/DqnMlpNetwork.mjs';
-import { DqnTrainer, CHECKPOINT_CONTRACT_V35, CHECKPOINT_CONTRACT_V34 } from '../trainer/model/DqnTrainer.mjs';
+import { DqnTrainer, CHECKPOINT_CONTRACT_V36, CHECKPOINT_CONTRACT_V35, CHECKPOINT_CONTRACT_V34 } from '../trainer/model/DqnTrainer.mjs';
 import { LocalDqnInference } from '../src/entities/ai/inference/LocalDqnInference.js';
 import { validateDqnCheckpointPayload } from '../trainer/model/CheckpointValidation.mjs';
+import { OBSERVATION_LENGTH_V2 } from '../src/entities/ai/observation/ObservationSchemaV2.js';
 
 test('v35 multi-layer network forward pass produces correct dimensions', () => {
     const net = new DqnMlpNetwork({
@@ -52,9 +53,9 @@ test('v35 checkpoint export/import round-trip preserves weights', () => {
     assert.notDeepEqual(after, before);
 });
 
-test('v35 DqnTrainer exports v35 contract and imports it back', () => {
+test('v36 DqnTrainer exports v36 contract and imports it back', () => {
     const trainer = new DqnTrainer({
-        observationLength: 10,
+        observationLength: OBSERVATION_LENGTH_V2,
         maxItemIndex: 2,
         seed: 7,
         model: {
@@ -70,13 +71,13 @@ test('v35 DqnTrainer exports v35 contract and imports it back', () => {
         },
     });
     const checkpoint = trainer.exportCheckpoint();
-    assert.equal(checkpoint.contractVersion, CHECKPOINT_CONTRACT_V35);
+    assert.equal(checkpoint.contractVersion, CHECKPOINT_CONTRACT_V36);
     assert.equal(Array.isArray(checkpoint.online.layers), true);
     assert.equal(checkpoint.online.layers.length, 3);
 
     // Import into fresh trainer with same architecture
     const trainer2 = new DqnTrainer({
-        observationLength: 10,
+        observationLength: OBSERVATION_LENGTH_V2,
         maxItemIndex: 2,
         seed: 99,
         model: { hiddenLayers: [32, 16] },
@@ -85,7 +86,7 @@ test('v35 DqnTrainer exports v35 contract and imports it back', () => {
     assert.equal(result.ok, true);
 
     // Both should produce identical predictions
-    const obs = new Array(10).fill(0.5);
+    const obs = new Array(OBSERVATION_LENGTH_V2).fill(0.5);
     const pred1 = trainer.onlineNetwork.predict(obs);
     const pred2 = trainer2.onlineNetwork.predict(obs);
     assert.deepEqual(pred1, pred2);
@@ -160,7 +161,7 @@ test('v35 checkpoint validation accepts v35 and v34 contracts', () => {
     });
     const checkpoint = trainer.exportCheckpoint();
 
-    // v35 should validate
+    // v36 should validate
     const v35Result = validateDqnCheckpointPayload(checkpoint);
     assert.equal(v35Result.ok, true);
 
@@ -190,7 +191,7 @@ test('v35 checkpoint validation accepts v35 and v34 contracts', () => {
     assert.equal(v34Result.ok, true);
 });
 
-test('v35 LocalDqnInference loads multi-layer checkpoint', () => {
+test('v36 LocalDqnInference loads multi-layer checkpoint', () => {
     const trainer = new DqnTrainer({
         observationLength: 10,
         maxItemIndex: 2,
@@ -214,6 +215,30 @@ test('v35 LocalDqnInference loads multi-layer checkpoint', () => {
     // Should match the trainer's online network
     const trainerQ = trainer.onlineNetwork.predict(obs);
     assert.deepEqual(qValues, trainerQ);
+});
+
+test('v36 trainer migrates v35 checkpoint with legacy observation length into runtime-near input size', () => {
+    const legacyTrainer = new DqnTrainer({
+        observationLength: 40,
+        maxItemIndex: 2,
+        seed: 13,
+        model: { hiddenLayers: [16] },
+    });
+    const legacyCheckpoint = legacyTrainer.exportCheckpoint();
+    legacyCheckpoint.contractVersion = CHECKPOINT_CONTRACT_V35;
+    legacyCheckpoint.observationLength = 40;
+
+    const runtimeNearTrainer = new DqnTrainer({
+        observationLength: OBSERVATION_LENGTH_V2,
+        maxItemIndex: 2,
+        seed: 14,
+        model: { hiddenLayers: [16] },
+    });
+    const result = runtimeNearTrainer.importCheckpoint(legacyCheckpoint);
+
+    assert.equal(result.ok, true);
+    assert.equal(result.migrated, true);
+    assert.equal(runtimeNearTrainer.observationLength, OBSERVATION_LENGTH_V2);
 });
 
 test('v35 multi-layer network copyFrom works correctly', () => {

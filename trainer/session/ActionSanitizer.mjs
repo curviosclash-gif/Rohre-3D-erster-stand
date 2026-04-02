@@ -13,6 +13,7 @@ import {
     WALL_DISTANCE_RIGHT,
     WALL_DISTANCE_UP,
 } from '../../src/entities/ai/observation/ObservationSchemaV1.js';
+import { resolveHybridDecision } from '../../src/entities/ai/hybrid/HybridDecisionArchitecture.js';
 
 const ACTION_TEMPLATE = Object.freeze({
     yawLeft: false,
@@ -186,60 +187,23 @@ function setEvasionSteering(action, yawDirection, pitchDirection, planarMode) {
 }
 
 export function applyObservationSafetyLayer(action, observation, options = {}) {
+    return resolveHybridTrainerDecision(action, observation, options).action;
+}
+
+export function resolveHybridTrainerDecision(action, observation, options = {}) {
     const sanitized = sanitizeTrainerAction(action, options);
-    if (!Array.isArray(observation) || observation.length === 0) {
-        return sanitized;
-    }
-
-    const planarMode = resolvePlanarMode(options, false);
-    const seed = Number.isInteger(options.seed) ? options.seed : 0;
-    const stepIndex = Number.isInteger(options.stepIndex) ? options.stepIndex : 0;
-    const profile = createSafetyProfile(observation, options);
-    const lowVitality = profile.vitalityRatio <= 0.38;
-    const highThreat = profile.pressureLevel >= 0.72 || profile.projectileThreat || profile.collisionRisk >= 0.74;
-    const forceEvasion = (
-        profile.wallFront <= 0.22
-        || profile.projectileThreat
-        || profile.collisionRisk >= 0.82
-        || (profile.wallFront <= 0.3 && profile.pressureLevel >= 0.66)
-        || (lowVitality && profile.wallFront <= 0.34)
-    );
-    const lockRiskyActions = (
-        forceEvasion
-        || (lowVitality && highThreat)
-        || (profile.healthRatio <= 0.28 && profile.pressureLevel >= 0.55)
-    );
-
-    if (lockRiskyActions) {
-        clearCombatIntent(sanitized);
-    }
-
-    if (!forceEvasion) {
-        if (lockRiskyActions && profile.pressureLevel >= 0.86) {
-            sanitized.useItem = -1;
-        }
-        return sanitized;
-    }
-
-    const yawDirection = resolvePreferredYaw(profile, seed, stepIndex);
-    const pitchDirection = resolvePreferredPitch(profile, planarMode, seed, stepIndex);
-    const alreadySteeringSafeYaw = (
-        (yawDirection < 0 && sanitized.yawLeft && !sanitized.yawRight)
-        || (yawDirection > 0 && sanitized.yawRight && !sanitized.yawLeft)
-    );
-    const safePitchActive = planarMode || (
-        (pitchDirection < 0 && sanitized.pitchDown && !sanitized.pitchUp)
-        || (pitchDirection > 0 && sanitized.pitchUp && !sanitized.pitchDown)
-    );
-
-    if (!hasSteeringIntent(sanitized) || !alreadySteeringSafeYaw || !safePitchActive) {
-        setEvasionSteering(sanitized, yawDirection, pitchDirection, planarMode);
-    }
-
-    if (profile.pressureLevel >= 0.9) {
-        sanitized.useItem = -1;
-    }
-    return sanitized;
+    const hybrid = resolveHybridDecision(sanitized, {
+        observation,
+        observationDetails: options.observationDetails || null,
+        actionMetadata: options.actionMetadata || null,
+        intent: options.intent || null,
+        planarMode: resolvePlanarMode(options, false),
+        player: options.player || null,
+    });
+    return {
+        ...hybrid,
+        action: sanitizeTrainerAction(hybrid.action, options),
+    };
 }
 
 export function sanitizeTrainerAction(action, options = {}) {

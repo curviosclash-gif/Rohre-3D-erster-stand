@@ -1,3 +1,5 @@
+import { HYBRID_INTENT_TYPES } from '../hybrid/HybridDecisionArchitecture.js';
+
 const CHECKPOINT_ACTION_TEMPLATE = Object.freeze({
     yawLeft: false,
     yawRight: false,
@@ -19,6 +21,13 @@ function createCheckpointAction(overrides = {}) {
         ...CHECKPOINT_ACTION_TEMPLATE,
         ...overrides,
     };
+}
+
+function createCheckpointTemplate(intent, action) {
+    return Object.freeze({
+        intent,
+        action: createCheckpointAction(action),
+    });
 }
 
 function toCheckpointActionCount(checkpoint = {}) {
@@ -51,32 +60,32 @@ export function createCheckpointActionVocabulary(checkpoint = {}) {
         : 0;
     const checkpointPlanarMode = checkpoint?.planarMode === true;
     const templates = [
-        createCheckpointAction(),
-        createCheckpointAction({ yawLeft: true }),
-        createCheckpointAction({ yawRight: true }),
-        createCheckpointAction({ yawLeft: true, boost: true }),
-        createCheckpointAction({ yawRight: true, boost: true }),
-        createCheckpointAction({ boost: true }),
-        createCheckpointAction({ shootMG: true }),
-        createCheckpointAction({ yawLeft: true, shootMG: true }),
-        createCheckpointAction({ yawRight: true, shootMG: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.STABILIZE, {}),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.EVADE, { yawLeft: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.EVADE, { yawRight: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.CHASE, { yawLeft: true, boost: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.CHASE, { yawRight: true, boost: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.CHASE, { boost: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.COMBAT, { shootMG: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.COMBAT, { yawLeft: true, shootMG: true }),
+        createCheckpointTemplate(HYBRID_INTENT_TYPES.COMBAT, { yawRight: true, shootMG: true }),
     ];
 
     if (!checkpointPlanarMode) {
-        templates.push(createCheckpointAction({ pitchUp: true }));
-        templates.push(createCheckpointAction({ pitchDown: true }));
-        templates.push(createCheckpointAction({ pitchUp: true, boost: true }));
-        templates.push(createCheckpointAction({ pitchDown: true, boost: true }));
+        templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.EVADE, { pitchUp: true }));
+        templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.EVADE, { pitchDown: true }));
+        templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.CHASE, { pitchUp: true, boost: true }));
+        templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.CHASE, { pitchDown: true, boost: true }));
     }
 
     for (let i = 0; i <= maxItemIndex; i += 1) {
-        templates.push(createCheckpointAction({ shootItem: true, shootItemIndex: i }));
+        templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.COMBAT, { shootItem: true, shootItemIndex: i }));
     }
     for (let i = 0; i <= maxItemIndex; i += 1) {
-        templates.push(createCheckpointAction({ useItem: i }));
+        templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.ITEM_USE, { useItem: i }));
     }
-    templates.push(createCheckpointAction({ nextItem: true }));
-    templates.push(createCheckpointAction({ dropItem: true }));
+    templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.ITEM_USE, { nextItem: true }));
+    templates.push(createCheckpointTemplate(HYBRID_INTENT_TYPES.ITEM_USE, { dropItem: true }));
 
     const actionCount = toCheckpointActionCount(checkpoint);
     if (actionCount > 0 && actionCount !== templates.length) {
@@ -84,7 +93,7 @@ export function createCheckpointActionVocabulary(checkpoint = {}) {
     }
 
     return {
-        decode(index, context = {}) {
+        decodeWithMetadata(index, context = {}) {
             const normalizedIndex = Number.isInteger(index)
                 ? Math.max(0, Math.min(templates.length - 1, index))
                 : 0;
@@ -92,16 +101,25 @@ export function createCheckpointActionVocabulary(checkpoint = {}) {
             const planarMode = typeof context?.planarMode === 'boolean'
                 ? context.planarMode
                 : checkpointPlanarMode;
-            if (!planarMode) {
-                return { ...template };
-            }
+            const action = !planarMode
+                ? { ...template.action }
+                : {
+                    ...template.action,
+                    pitchUp: false,
+                    pitchDown: false,
+                    rollLeft: false,
+                    rollRight: false,
+                };
             return {
-                ...template,
-                pitchUp: false,
-                pitchDown: false,
-                rollLeft: false,
-                rollRight: false,
+                action,
+                metadata: {
+                    intent: template.intent,
+                    templateIndex: normalizedIndex,
+                },
             };
+        },
+        decode(index, context = {}) {
+            return this.decodeWithMetadata(index, context).action;
         },
     };
 }

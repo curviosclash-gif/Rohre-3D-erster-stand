@@ -2,6 +2,7 @@ import {
     TRAINER_CONTRACT_FREEZE_V34,
     TRAINER_FAILURE_POLICY,
 } from './TrainerRuntimeContract.mjs';
+import { DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH } from '../../src/entities/ai/observation/RuntimeNearObservationAdapter.js';
 
 function clampInt(value, fallback, min, max) {
     const parsed = Number.parseInt(String(value ?? ''), 10);
@@ -78,7 +79,7 @@ export const DEFAULT_TRAINER_CONFIG = Object.freeze({
     host: '127.0.0.1',
     port: 8765,
     verbose: true,
-    observationLength: 40,
+    observationLength: DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH,
     replayCapacity: 50_000,
     maxItemIndex: 2,
     sessionSeed: 13_337,
@@ -355,7 +356,7 @@ export function formatTrainerServerHelp() {
         '  --host <host>                  WebSocket host (default: 127.0.0.1)',
         '  --port <port>                  WebSocket port (default: 8765, use 0 for auto)',
         '  --verbose <true|false>         Enable trainer logs (default: true)',
-        '  --observation-length <n>       Normalized observation vector length (default: 40)',
+        `  --observation-length <n>       Normalized observation vector length (default: ${DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH})`,
         '  --replay-capacity <n>          Replay capacity (default: 20000)',
         '  --max-item-index <n>           Max action item slot index (default: 2)',
         '  --seed <n>                     Session RNG seed (default: 13337)',

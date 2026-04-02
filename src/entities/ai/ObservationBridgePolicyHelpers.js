@@ -1,3 +1,6 @@
+import { resolveHybridDecision } from './hybrid/HybridDecisionArchitecture.js';
+import { DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH } from './observation/RuntimeNearObservationAdapter.js';
+
 export function isRuntimeContextPayload(value) {
     return !!(
         value
@@ -150,8 +153,27 @@ export function resolveLocalInferenceAction(policy, runtimeContext) {
     if (!policy?._localInference || !policy._localInference.loaded) {
         return null;
     }
-    const observation = runtimeContext?.observation;
-    if (!Array.isArray(observation)) return null;
+    const rawObservation = runtimeContext?.observation;
+    if (!Array.isArray(rawObservation)) return null;
+    const expectedLength = Math.max(
+        1,
+        Number(policy?._localInference?.inputSize || DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH)
+    );
+    const adaptedObservation = policy?._observationTracker && typeof policy._observationTracker.lift === 'function'
+        ? policy._observationTracker.lift(rawObservation, {
+            expectedLength,
+            stepIndex: Number.isInteger(runtimeContext?.stepIndex) ? runtimeContext.stepIndex : 0,
+            environmentProfile: runtimeContext?.observationContext?.environmentProfile
+                || runtimeContext?.environmentProfile
+                || undefined,
+            metadata: runtimeContext?.observationContext || runtimeContext?.metadata || null,
+            player: runtimeContext?.player || null,
+        })
+        : {
+            observation: rawObservation,
+            details: runtimeContext?.observationContext || null,
+        };
+    const observation = adaptedObservation.observation;
     if (policy._localInferenceVocabulary && typeof policy._localInferenceVocabulary.decode === 'function') {
         const decodeContext = {
             planarMode: runtimeContext?.rules?.planarMode,
@@ -172,13 +194,38 @@ export function resolveLocalInferenceAction(policy, runtimeContext) {
                 .map((entry) => entry.index);
 
             if (rankedIndices.length > 0) {
-                const primaryAction = policy._localInferenceVocabulary.decode(rankedIndices[0], decodeContext);
+                const primaryDecoded = typeof policy._localInferenceVocabulary.decodeWithMetadata === 'function'
+                    ? policy._localInferenceVocabulary.decodeWithMetadata(rankedIndices[0], decodeContext)
+                    : {
+                        action: policy._localInferenceVocabulary.decode(rankedIndices[0], decodeContext),
+                        metadata: null,
+                    };
+                const primaryHybrid = resolveHybridDecision(primaryDecoded.action, {
+                    observation,
+                    observationDetails: adaptedObservation.details,
+                    actionMetadata: primaryDecoded.metadata,
+                    planarMode: decodeContext.planarMode,
+                    player: runtimeContext?.player || null,
+                });
+                const primaryAction = primaryHybrid.action;
                 if (!isPassiveForwardIntent(primaryAction)) {
                     return primaryAction;
                 }
 
                 for (let i = 1; i < rankedIndices.length; i += 1) {
-                    const candidateAction = policy._localInferenceVocabulary.decode(rankedIndices[i], decodeContext);
+                    const candidateDecoded = typeof policy._localInferenceVocabulary.decodeWithMetadata === 'function'
+                        ? policy._localInferenceVocabulary.decodeWithMetadata(rankedIndices[i], decodeContext)
+                        : {
+                            action: policy._localInferenceVocabulary.decode(rankedIndices[i], decodeContext),
+                            metadata: null,
+                        };
+                    const candidateAction = resolveHybridDecision(candidateDecoded.action, {
+                        observation,
+                        observationDetails: adaptedObservation.details,
+                        actionMetadata: candidateDecoded.metadata,
+                        planarMode: decodeContext.planarMode,
+                        player: runtimeContext?.player || null,
+                    }).action;
                     if (!hasSteeringIntent(candidateAction)) continue;
                     policy._warn(
                         'local inference selected passive forward action; using next best steering action',
@@ -193,7 +240,19 @@ export function resolveLocalInferenceAction(policy, runtimeContext) {
         }
 
         const { actionIndex } = policy._localInference.selectBestAction(observation);
-        return policy._localInferenceVocabulary.decode(actionIndex, decodeContext);
+        const decoded = typeof policy._localInferenceVocabulary.decodeWithMetadata === 'function'
+            ? policy._localInferenceVocabulary.decodeWithMetadata(actionIndex, decodeContext)
+            : {
+                action: policy._localInferenceVocabulary.decode(actionIndex, decodeContext),
+                metadata: null,
+            };
+        return resolveHybridDecision(decoded.action, {
+            observation,
+            observationDetails: adaptedObservation.details,
+            actionMetadata: decoded.metadata,
+            planarMode: decodeContext.planarMode,
+            player: runtimeContext?.player || null,
+        }).action;
     }
     return null;
 }

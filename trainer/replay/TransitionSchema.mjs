@@ -1,5 +1,6 @@
 import { normalizeObservationVector } from '../session/ObservationNormalizer.mjs';
 import { sanitizeTrainerAction } from '../session/ActionSanitizer.mjs';
+import { liftObservationWithRuntimeNearContext } from '../../src/entities/ai/observation/RuntimeNearObservationAdapter.js';
 
 function toFinite(value, fallback = 0) {
     const numeric = Number(value);
@@ -60,6 +61,22 @@ export function validateTrainingFramePayload(payload, options = {}) {
     }
 
     const domain = resolveDomain(payload, options.sessionState || {});
+    const liftOptions = {
+        expectedLength: observationLength,
+        stepIndex: toNonNegativeInt(payload.stepIndex, toNonNegativeInt(options.sessionState?.stepIndex, 0)),
+        environmentProfile: payload?.info?.metadata?.environmentProfile
+            || payload?.environmentProfile
+            || undefined,
+        metadata: payload?.info?.metadata,
+        intent: payload?.info?.hybridDecision?.intent?.applied
+            || payload?.info?.hybridDecision?.intent?.requested
+            || null,
+        player: options.player || null,
+    };
+    const lifted = options.observationTracker && typeof options.observationTracker.lift === 'function'
+        ? options.observationTracker.lift(payload.observation, liftOptions)
+        : liftObservationWithRuntimeNearContext(payload.observation, liftOptions);
+
     const frame = {
         operation: typeof payload.operation === 'string' && payload.operation.trim()
             ? payload.operation.trim()
@@ -73,7 +90,7 @@ export function validateTrainingFramePayload(payload, options = {}) {
         reward: toFinite(payload.reward, 0),
         done: payload.done === true,
         truncated: payload.truncated === true,
-        observation: normalizeObservationVector(payload.observation, {
+        observation: normalizeObservationVector(lifted.observation, {
             length: observationLength,
         }),
         action: sanitizeTrainerAction(payload.action, {
@@ -84,6 +101,7 @@ export function validateTrainingFramePayload(payload, options = {}) {
         info: {
             ...((payload.info && typeof payload.info === 'object') ? payload.info : {}),
             domain,
+            observationContext: lifted.details,
         },
     };
 

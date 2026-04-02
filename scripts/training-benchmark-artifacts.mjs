@@ -187,6 +187,8 @@ export function createBenchmarkManifest({
 } = {}) {
     const normalizedProfileName = normalizeTrainingPerformanceProfileName(profileName, null);
     const profile = resolveTrainingPerformanceProfile(normalizedProfileName, null);
+    const environmentProfile = source?.summaryConfig?.environmentProfile || profile?.run?.environmentProfile || null;
+    const runtimeNear = environmentProfile === 'runtime-near';
     return {
         contractVersion: TRAINING_BENCHMARK_MANIFEST_VERSION,
         generatedAt: new Date().toISOString(),
@@ -200,6 +202,12 @@ export function createBenchmarkManifest({
         performanceProfileVersion: TRAINING_BENCHMARK_PROFILE_VERSION,
         performanceProfile: profile,
         performanceProfileName: normalizedProfileName,
+        environment: {
+            profile: environmentProfile,
+            runtimeNear,
+            syntheticLane: environmentProfile === 'synthetic-smoke',
+            promotionEligible: runtimeNear,
+        },
         artifacts: {
             run: layout?.runArtifactPath ? toRepoPath(layout.runArtifactPath) : null,
             eval: layout?.evalArtifactPath ? toRepoPath(layout.evalArtifactPath) : null,

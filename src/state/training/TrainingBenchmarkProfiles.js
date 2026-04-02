@@ -16,6 +16,7 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
         }),
         run: Object.freeze({
             runnerProfile: 'ops',
+            environmentProfile: 'runtime-near',
             episodes: 2,
             maxSteps: 120,
             stepTimeoutRetries: 0,
@@ -61,6 +62,7 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
         }),
         run: Object.freeze({
             runnerProfile: 'learn',
+            environmentProfile: 'synthetic-smoke',
             episodes: 4,
             maxSteps: 180,
             stepTimeoutRetries: 1,
@@ -106,6 +108,7 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
         }),
         run: Object.freeze({
             runnerProfile: 'learn',
+            environmentProfile: 'runtime-near',
             episodes: 8,
             maxSteps: 240,
             stepTimeoutRetries: 1,
@@ -151,6 +154,7 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
         }),
         run: Object.freeze({
             runnerProfile: 'learn',
+            environmentProfile: 'runtime-near',
             episodes: 8,
             maxSteps: 320,
             stepTimeoutRetries: 1,

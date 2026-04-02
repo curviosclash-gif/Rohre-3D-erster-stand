@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { OBSERVATION_LENGTH_V1 } from '../src/entities/ai/observation/ObservationSchemaV1.js';
+import { OBSERVATION_LENGTH_V2, OBSERVATION_SCHEMA_VERSION_V2 } from '../src/entities/ai/observation/ObservationSchemaV2.js';
 import { DeterministicTrainingStepRunner } from '../src/entities/ai/training/DeterministicTrainingStepRunner.js';
 import { WebSocketTrainerBridge } from '../src/entities/ai/training/WebSocketTrainerBridge.js';
 import { buildTrainerRuntimeObservationPayload, buildTrainerTransitionPayload } from '../src/entities/ai/training/TrainerPayloadAdapter.js';
@@ -36,19 +37,21 @@ test('DeterministicTrainingStepRunner keeps additive reset/step contract stable'
     });
 
     assert.equal(reset.operation, 'reset');
-    assert.equal(reset.observation.length, 40);
+    assert.equal(reset.observation.length, OBSERVATION_LENGTH_V2);
     assert.equal(reset.reward, 0);
     assert.equal(reset.done, false);
     assert.equal(reset.truncated, false);
     assert.equal(reset.info?.domain?.domainId, 'hunt-2d');
     assert.ok(typeof reset.info?.domain?.controlProfileId === 'string' && reset.info.domain.controlProfileId.length > 0);
     assert.equal(step.operation, 'step');
-    assert.equal(Boolean(step.action?.shootItem), true);
-    assert.equal(Number(step.action?.shootItemIndex), 1);
+    assert.equal(Boolean(step.action?.shootItem), false);
+    assert.equal(Number(step.action?.shootItemIndex), -1);
     assert.ok(Number(step.reward) > 0);
     assert.equal(Boolean(step.done), false);
     assert.equal(Boolean(step.truncated), false);
-    assert.equal(step.info?.observationSchemaVersion, 'v1');
+    assert.equal(step.info?.observationSchemaVersion, OBSERVATION_SCHEMA_VERSION_V2);
+    assert.equal(step.info?.metadata?.observationContext?.runtimeNear, true);
+    assert.equal(step.info?.metadata?.hybridDecision?.intent?.applied != null, true);
     assert.ok(typeof step.info?.domain?.controlProfileId === 'string' && step.info.domain.controlProfileId.length > 0);
 });
 

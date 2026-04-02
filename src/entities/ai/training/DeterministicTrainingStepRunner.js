@@ -3,6 +3,8 @@
 // ============================================
 
 import { createNeutralBotAction, sanitizeBotAction } from '../actions/BotActionContract.js';
+import { resolveHybridDecision } from '../hybrid/HybridDecisionArchitecture.js';
+import { RuntimeNearObservationTracker } from '../observation/RuntimeNearObservationAdapter.js';
 import { EpisodeController } from '../../../state/training/EpisodeController.js';
 import { RewardCalculator } from '../../../state/training/RewardCalculator.js';
 import {
@@ -36,6 +38,7 @@ export class DeterministicTrainingStepRunner {
             : new RewardCalculator(options.reward || {});
         this._actionScratch = createNeutralBotAction({});
         this._lastTransition = null;
+        this._observationTracker = new RuntimeNearObservationTracker();
     }
 
     getEpisodeSnapshot() {
@@ -47,10 +50,24 @@ export class DeterministicTrainingStepRunner {
     }
 
     reset(input = {}) {
+        this._observationTracker.reset();
         const episode = this.episodeController.reset(input);
+        const liftedObservation = this._observationTracker.lift(input.observation, {
+            environmentProfile: input?.metadata?.environmentProfile,
+            metadata: input?.metadata,
+            stepIndex: 0,
+            player: input?.player || null,
+        });
         const transition = buildTrainingResetContract({
             ...input,
             episode,
+            observation: liftedObservation.observation,
+            observationSchemaVersion: liftedObservation.details.schemaVersion,
+            observationLength: liftedObservation.observation.length,
+            metadata: {
+                ...(input.metadata && typeof input.metadata === 'object' ? input.metadata : {}),
+                observationContext: liftedObservation.details,
+            },
         });
         this._lastTransition = transition;
         return transition;
@@ -74,14 +91,40 @@ export class DeterministicTrainingStepRunner {
             },
             this._actionScratch
         );
+        const liftedObservation = this._observationTracker.lift(input.observation, {
+            environmentProfile: input?.metadata?.environmentProfile,
+            metadata: input?.metadata,
+            stepIndex: currentEpisode?.stepIndex ?? input.stepIndex ?? 0,
+            player: input?.player || null,
+        });
+        const hybridDecision = resolveHybridDecision(sanitizedAction, {
+            observation: liftedObservation.observation,
+            observationDetails: liftedObservation.details,
+            intent: input?.metadata?.intent || null,
+            planarMode: input?.planarMode === true,
+            player: input?.player || null,
+        });
         const episode = this.episodeController.step(input);
         const rewardResult = this.rewardCalculator.compute(input.rewardSignals || {}, episode);
         const transition = buildTrainingStepContract({
             ...input,
             episode,
-            action: { ...sanitizedAction },
+            observation: liftedObservation.observation,
+            observationSchemaVersion: liftedObservation.details.schemaVersion,
+            observationLength: liftedObservation.observation.length,
+            action: { ...hybridDecision.action },
             reward: rewardResult.total,
             rewardBreakdown: rewardResult.components,
+            metadata: {
+                ...(input.metadata && typeof input.metadata === 'object' ? input.metadata : {}),
+                observationContext: liftedObservation.details,
+                hybridDecision: {
+                    contractVersion: 'v80-hybrid-decision-trace-v1',
+                    intent: hybridDecision.intent,
+                    safety: hybridDecision.safety,
+                    control: hybridDecision.control,
+                },
+            },
         });
         this._lastTransition = transition;
         return transition;

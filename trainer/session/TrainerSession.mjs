@@ -9,13 +9,14 @@ import {
     TRAINER_RESPONSE_TYPES,
 } from '../config/TrainerRuntimeContract.mjs';
 import {
-    applyObservationSafetyLayer,
     inferActionFromObservation,
+    resolveHybridTrainerDecision,
 } from './ActionSanitizer.mjs';
 import { DqnTrainer } from '../model/DqnTrainer.mjs';
 import { validateDqnCheckpointPayload } from '../model/CheckpointValidation.mjs';
 import { resolveLatestCheckpointPayloadSync } from '../artifacts/TrainerArtifactStore.mjs';
 import { MetricsLogger } from '../server/MetricsLogger.mjs';
+import { RuntimeNearObservationTracker } from '../../src/entities/ai/observation/RuntimeNearObservationAdapter.js';
 
 function toText(raw) {
     if (typeof raw === 'string') return raw;
@@ -85,6 +86,8 @@ export class TrainerSession {
         this._episodeStepAccum = 0;
         this._episodeLossAccum = 0;
         this._episodeLossCount = 0;
+        this._trainingObservationTracker = new RuntimeNearObservationTracker();
+        this._actionObservationTracker = new RuntimeNearObservationTracker();
 
         this._model = new DqnTrainer({
             observationLength: this.config.observationLength,
@@ -246,6 +249,7 @@ export class TrainerSession {
             observationLength: this.config.observationLength,
             maxItemIndex: this.config.maxItemIndex,
             sessionState: this._state,
+            observationTracker: this._trainingObservationTracker,
         });
     }
 
@@ -253,8 +257,19 @@ export class TrainerSession {
         this._stats.actionRequests += 1;
         const domainId = typeof payload?.domainId === 'string' ? payload.domainId : this._state.domainId;
         const planarMode = payload?.planarMode === true || (typeof domainId === 'string' && domainId.endsWith('-2d'));
-        const observation = Array.isArray(payload?.observation) ? payload.observation : this._state.lastObservation;
-        let action = null;
+        const rawObservation = Array.isArray(payload?.observation) ? payload.observation : this._state.lastObservation;
+        const adaptedObservation = this._actionObservationTracker.lift(rawObservation, {
+            expectedLength: this.config.observationLength,
+            stepIndex: this._state.stepIndex,
+            environmentProfile: payload?.observationContext?.environmentProfile
+                || payload?.environmentProfile
+                || undefined,
+            metadata: payload?.observationContext || payload?.metadata || null,
+            player: payload?.player || null,
+        });
+        const observation = adaptedObservation.observation;
+        let proposedAction = null;
+        let actionMetadata = null;
         let actionIndex = 0;
         let epsilon = null;
         let policy = 'fallback';
@@ -263,43 +278,53 @@ export class TrainerSession {
                 planarMode,
                 domainId,
             });
-            action = inferred.action;
+            proposedAction = inferred.action;
+            actionMetadata = inferred.actionMetadata || null;
             actionIndex = inferred.actionIndex;
             epsilon = inferred.epsilon;
             policy = inferred.policy;
             this._stats.modelInferences += 1;
         } catch {
-            action = inferActionFromObservation(observation, {
+            proposedAction = inferActionFromObservation(observation, {
                 seed: this.config.sessionSeed,
                 stepIndex: this._state.stepIndex,
                 planarMode,
                 domainId,
                 maxItemIndex: this.config.maxItemIndex,
                 player: payload?.player || null,
+                observationDetails: adaptedObservation.details,
             });
         }
-        action = applyObservationSafetyLayer(action, observation, {
+        const hybrid = resolveHybridTrainerDecision(proposedAction, observation, {
             seed: this.config.sessionSeed,
             stepIndex: this._state.stepIndex,
             planarMode,
             domainId,
             maxItemIndex: this.config.maxItemIndex,
             player: payload?.player || null,
+            observationDetails: adaptedObservation.details,
+            actionMetadata,
         });
         return {
             id,
             ok: true,
             type: TRAINER_RESPONSE_TYPES.ACTION_RESPONSE,
-            action,
+            action: hybrid.action,
             actionIndex,
             epsilon,
             policy,
+            intent: hybrid.intent,
+            safety: hybrid.safety,
+            control: hybrid.control,
+            observationContext: adaptedObservation.details,
             sessionId: this.sessionId,
         };
     }
 
     _handleTrainingReset(id, payload) {
         this._stats.trainingResets += 1;
+        this._trainingObservationTracker.reset();
+        this._actionObservationTracker.reset();
         const validated = this._resolveFrame(payload, 'reset');
         if (!validated.ok || !validated.frame) {
             return this._buildErrorEnvelope(id, TRAINER_FAILURE_CODES.INVALID_TRANSITION, {

@@ -16,6 +16,7 @@ function toError(code, details = null) {
 }
 
 const SUPPORTED_VERSIONS = new Set([
+    'v36-dqn-checkpoint-v2',
     'v35-dqn-checkpoint-v1',
     'v34-dqn-checkpoint-v1',
 ]);
@@ -64,8 +65,9 @@ export function validateDqnCheckpointPayload(raw) {
         return toError('checkpoint-network-state-missing');
     }
 
-    const isV35 = checkpoint.contractVersion === 'v35-dqn-checkpoint-v1';
-    if (isV35) {
+    const isLayeredFormat = checkpoint.contractVersion === 'v36-dqn-checkpoint-v2'
+        || checkpoint.contractVersion === 'v35-dqn-checkpoint-v1';
+    if (isLayeredFormat) {
         // v35: validate layers[] structure
         if (!validateV35NetworkState(checkpoint.online) || !validateV35NetworkState(checkpoint.target)) {
             // Fall back to v34 flat fields (v35 exports both for compat)

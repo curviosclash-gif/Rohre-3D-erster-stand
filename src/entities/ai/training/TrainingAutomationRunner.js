@@ -27,6 +27,12 @@ import {
     buildTrainingKpiSnapshot,
     normalizeTrainingRunConfig,
 } from './TrainingAutomationContractV33.js';
+import {
+    buildLearnProfileAction,
+    buildSyntheticPlayerState,
+    resolveEnvironmentStepMetadata,
+    toBoundedInt,
+} from './TrainingAutomationRuntimeNearSupport.js';
 
 function nowMs() {
     if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
@@ -45,12 +51,6 @@ function clampSigned(value) {
     if (numeric <= -1) return -1;
     if (numeric >= 1) return 1;
     return numeric;
-}
-
-function toBoundedInt(value, fallback, minValue = 0, maxValue = Number.MAX_SAFE_INTEGER) {
-    const numeric = Number(value);
-    if (!Number.isFinite(numeric)) return fallback;
-    return Math.max(minValue, Math.min(maxValue, Math.trunc(numeric)));
 }
 
 function hashStringToUint32(input) {
@@ -134,26 +134,6 @@ function resolveTerminalReason(rng) {
     if (bucket === 0) return 'match-win';
     if (bucket === 1) return 'match-loss';
     return 'player-dead';
-}
-
-function buildLearnProfileAction(context) {
-    const inventoryLength = Math.max(1, toBoundedInt(context.inventoryLength, 1, 1, 20));
-    const yawSample = context.rng();
-    const yawLeft = yawSample >= 0.52;
-    const yawRight = !yawLeft && yawSample < 0.18;
-    const shootItem = context.rng() > 0.86;
-    const itemIndex = shootItem
-        ? Math.floor(context.rng() * inventoryLength)
-        : -1;
-    return {
-        yawLeft,
-        yawRight,
-        boost: context.rng() > 0.58,
-        shootMG: context.mode === 'hunt' && context.rng() > 0.7,
-        shootItem,
-        shootItemIndex: itemIndex,
-        useItem: shootItem ? itemIndex : -1,
-    };
 }
 
 function buildDeterministicAction(context) {
@@ -380,24 +360,39 @@ export class TrainingAutomationRunner {
             )
         );
 
+        const resetObservation = createDeterministicObservation({
+            rng,
+            stepIndex: 0,
+            maxSteps: config.maxSteps,
+            mode: modeConfig.mode,
+            planarMode: modeConfig.planarMode,
+            seed,
+        });
+        const resetMetadata = resolveEnvironmentStepMetadata({
+            observation: resetObservation,
+            environmentProfile: config.environmentProfile,
+            mode: modeConfig.mode,
+            seed,
+            stepIndex: 0,
+        });
         const resetPacket = transport.reset({
             mode: modeConfig.mode,
             planarMode: modeConfig.planarMode,
             maxSteps: config.maxSteps,
             seed,
-            observation: createDeterministicObservation({
-                rng,
-                stepIndex: 0,
-                maxSteps: config.maxSteps,
-                mode: modeConfig.mode,
-                planarMode: modeConfig.planarMode,
-                seed,
-            }),
+            observation: resetObservation,
+            player: buildSyntheticPlayerState(
+                resetObservation,
+                {
+                    inventoryLength,
+                }
+            ),
             metadata: {
                 runSeed: seed,
                 modeIndex,
                 seedIndex,
                 episodeInSeed,
+                ...resetMetadata,
             },
         });
 
@@ -432,6 +427,13 @@ export class TrainingAutomationRunner {
                 planarMode: modeConfig.planarMode,
                 seed,
             });
+            const metadata = resolveEnvironmentStepMetadata({
+                observation,
+                environmentProfile: config.environmentProfile,
+                mode: modeConfig.mode,
+                seed,
+                stepIndex,
+            });
             const rewardSignals = buildDeterministicRewardSignals({
                 rng,
                 done,
@@ -446,6 +448,9 @@ export class TrainingAutomationRunner {
                 maxSteps: config.maxSteps,
                 inventoryLength,
                 observation,
+                player: buildSyntheticPlayerState(observation, {
+                    inventoryLength,
+                }),
                 action,
                 rewardSignals,
                 done,
@@ -456,6 +461,7 @@ export class TrainingAutomationRunner {
                     seedIndex,
                     episodeInSeed,
                     episodeOrdinal,
+                    ...metadata,
                 },
                 onInvalidAction() {
                     invalidInStep = true;

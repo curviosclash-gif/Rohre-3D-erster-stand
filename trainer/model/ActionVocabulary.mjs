@@ -1,4 +1,5 @@
 import { sanitizeTrainerAction } from '../session/ActionSanitizer.mjs';
+import { HYBRID_INTENT_TYPES } from '../../src/entities/ai/hybrid/HybridDecisionArchitecture.js';
 
 function createTemplateAction(overrides = {}) {
     return {
@@ -17,6 +18,13 @@ function createTemplateAction(overrides = {}) {
         nextItem: false,
         ...overrides,
     };
+}
+
+function createTemplate(intent, action) {
+    return Object.freeze({
+        intent,
+        action: createTemplateAction(action),
+    });
 }
 
 function actionDistance(leftAction, rightAction) {
@@ -67,30 +75,30 @@ export class ActionVocabulary {
 
     _buildTemplates() {
         const templates = [
-            createTemplateAction(),
-            createTemplateAction({ yawLeft: true }),
-            createTemplateAction({ yawRight: true }),
-            createTemplateAction({ yawLeft: true, boost: true }),
-            createTemplateAction({ yawRight: true, boost: true }),
-            createTemplateAction({ boost: true }),
-            createTemplateAction({ shootMG: true }),
-            createTemplateAction({ yawLeft: true, shootMG: true }),
-            createTemplateAction({ yawRight: true, shootMG: true }),
+            createTemplate(HYBRID_INTENT_TYPES.STABILIZE, {}),
+            createTemplate(HYBRID_INTENT_TYPES.EVADE, { yawLeft: true }),
+            createTemplate(HYBRID_INTENT_TYPES.EVADE, { yawRight: true }),
+            createTemplate(HYBRID_INTENT_TYPES.CHASE, { yawLeft: true, boost: true }),
+            createTemplate(HYBRID_INTENT_TYPES.CHASE, { yawRight: true, boost: true }),
+            createTemplate(HYBRID_INTENT_TYPES.CHASE, { boost: true }),
+            createTemplate(HYBRID_INTENT_TYPES.COMBAT, { shootMG: true }),
+            createTemplate(HYBRID_INTENT_TYPES.COMBAT, { yawLeft: true, shootMG: true }),
+            createTemplate(HYBRID_INTENT_TYPES.COMBAT, { yawRight: true, shootMG: true }),
         ];
         if (!this.planarMode) {
-            templates.push(createTemplateAction({ pitchUp: true }));
-            templates.push(createTemplateAction({ pitchDown: true }));
-            templates.push(createTemplateAction({ pitchUp: true, boost: true }));
-            templates.push(createTemplateAction({ pitchDown: true, boost: true }));
+            templates.push(createTemplate(HYBRID_INTENT_TYPES.EVADE, { pitchUp: true }));
+            templates.push(createTemplate(HYBRID_INTENT_TYPES.EVADE, { pitchDown: true }));
+            templates.push(createTemplate(HYBRID_INTENT_TYPES.CHASE, { pitchUp: true, boost: true }));
+            templates.push(createTemplate(HYBRID_INTENT_TYPES.CHASE, { pitchDown: true, boost: true }));
         }
         for (let i = 0; i <= this.maxItemIndex; i++) {
-            templates.push(createTemplateAction({ shootItem: true, shootItemIndex: i }));
+            templates.push(createTemplate(HYBRID_INTENT_TYPES.COMBAT, { shootItem: true, shootItemIndex: i }));
         }
         for (let i = 0; i <= this.maxItemIndex; i++) {
-            templates.push(createTemplateAction({ useItem: i }));
+            templates.push(createTemplate(HYBRID_INTENT_TYPES.ITEM_USE, { useItem: i }));
         }
-        templates.push(createTemplateAction({ nextItem: true }));
-        templates.push(createTemplateAction({ dropItem: true }));
+        templates.push(createTemplate(HYBRID_INTENT_TYPES.ITEM_USE, { nextItem: true }));
+        templates.push(createTemplate(HYBRID_INTENT_TYPES.ITEM_USE, { dropItem: true }));
         return templates;
     }
 
@@ -98,16 +106,27 @@ export class ActionVocabulary {
         return this._templates.length;
     }
 
-    decode(index, context = {}) {
+    decodeWithMetadata(index, context = {}) {
         const normalizedIndex = Number.isInteger(index)
             ? Math.max(0, Math.min(this._templates.length - 1, index))
             : 0;
-        const template = this._templates[normalizedIndex];
-        return sanitizeTrainerAction(template, {
+        const template = this._templates[normalizedIndex] || this._templates[0];
+        const action = sanitizeTrainerAction(template.action, {
             maxItemIndex: this.maxItemIndex,
             planarMode: context.planarMode,
             domainId: context.domainId,
         });
+        return {
+            action,
+            metadata: {
+                intent: template.intent,
+                templateIndex: normalizedIndex,
+            },
+        };
+    }
+
+    decode(index, context = {}) {
+        return this.decodeWithMetadata(index, context).action;
     }
 
     encode(action, context = {}) {
@@ -120,7 +139,7 @@ export class ActionVocabulary {
         let bestIndex = 0;
         let bestDistance = Number.POSITIVE_INFINITY;
         for (let i = 0; i < this._templates.length; i++) {
-            const candidate = this.decode(i, context);
+            const candidate = this.decodeWithMetadata(i, context).action;
             const distance = actionDistance(target, candidate);
             if (distance < bestDistance) {
                 bestDistance = distance;

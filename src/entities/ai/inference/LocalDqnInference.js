@@ -117,7 +117,11 @@ export class LocalDqnInference {
             return { ok: false, error: 'checkpoint-missing' };
         }
         const version = checkpoint.contractVersion;
-        if (version !== 'v35-dqn-checkpoint-v1' && version !== 'v34-dqn-checkpoint-v1') {
+        if (
+            version !== 'v36-dqn-checkpoint-v2'
+            && version !== 'v35-dqn-checkpoint-v1'
+            && version !== 'v34-dqn-checkpoint-v1'
+        ) {
             return { ok: false, error: 'contract-version-mismatch' };
         }
         const networkState = checkpoint.online;
@@ -149,6 +153,8 @@ export class LocalDqnInference {
             planarMode: checkpoint.planarMode === true,
             actionCount: Number(checkpoint.actionCount) || this._outputSize,
             hiddenLayers: this._layers.slice(0, -1).map(l => l.outputSize),
+            observationSchemaVersion: checkpoint.observationSchemaVersion || null,
+            actionArchitectureVersion: checkpoint.actionArchitectureVersion || null,
         };
         this._loaded = true;
         return { ok: true, error: null };

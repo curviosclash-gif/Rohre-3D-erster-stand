@@ -3,9 +3,9 @@
 // ============================================
 
 import {
-    OBSERVATION_LENGTH_V1,
-    OBSERVATION_SCHEMA_VERSION,
-} from '../observation/ObservationSchemaV1.js';
+    OBSERVATION_LENGTH_V2,
+    OBSERVATION_SCHEMA_VERSION_V2,
+} from '../observation/ObservationSchemaV2.js';
 import { deriveTrainingDomain } from '../../../state/training/TrainingDomain.js';
 import { TRAINING_CONTRACT_VERSION as TRAINING_CONTRACT_VERSION_SHARED } from '../../../shared/contracts/TrainingRuntimeContract.js';
 import { toFiniteNumber } from '../../../utils/MathOps.js';
@@ -21,12 +21,13 @@ function toPositiveInt(value, fallback = 0) {
 }
 
 function normalizeObservation(observation) {
-    const target = new Array(OBSERVATION_LENGTH_V1).fill(0);
+    const targetLength = OBSERVATION_LENGTH_V2;
+    const target = new Array(targetLength).fill(0);
     if (!observation || typeof observation.length !== 'number') {
         return target;
     }
 
-    const limit = Math.min(OBSERVATION_LENGTH_V1, Math.max(0, Math.trunc(observation.length)));
+    const limit = Math.min(targetLength, Math.max(0, Math.trunc(observation.length)));
     for (let i = 0; i < limit; i++) {
         target[i] = toFiniteNumber(observation[i], 0);
     }
@@ -59,9 +60,13 @@ function resolveDomain(input = {}) {
 
 function buildInfoPayload(input = {}) {
     const domain = resolveDomain(input);
+    const observationSchemaVersion = typeof input.observationSchemaVersion === 'string' && input.observationSchemaVersion.trim()
+        ? input.observationSchemaVersion.trim()
+        : OBSERVATION_SCHEMA_VERSION_V2;
+    const observationLength = toPositiveInt(input.observationLength, OBSERVATION_LENGTH_V2);
     return {
-        observationSchemaVersion: OBSERVATION_SCHEMA_VERSION,
-        observationLength: OBSERVATION_LENGTH_V1,
+        observationSchemaVersion,
+        observationLength,
         domain,
         match: {
             matchId: typeof input.matchId === 'string' ? input.matchId : null,

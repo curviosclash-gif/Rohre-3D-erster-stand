@@ -4,6 +4,11 @@
 
 import { deriveTrainingDomain } from '../../../state/training/TrainingDomain.js';
 import { toFiniteNumber } from '../../../utils/MathOps.js';
+import {
+    DEFAULT_TRAINING_ENVIRONMENT_PROFILE,
+    normalizeTrainingEnvironmentProfile,
+    TRAINING_ENVIRONMENT_PROFILES,
+} from '../observation/RuntimeNearObservationAdapter.js';
 
 export const TRAINING_AUTOMATION_RUN_CONTRACT_VERSION = 'v33-run-v1';
 export const TRAINING_AUTOMATION_KPI_CONTRACT_VERSION = 'v33-kpi-v1';
@@ -12,6 +17,7 @@ export const TRAINING_AUTOMATION_ARTIFACT_LAYOUT_VERSION = 'v33-artifact-v1';
 export const TRAINING_AUTOMATION_STAGE_ORDER = Object.freeze(['run', 'eval', 'gate']);
 export const TRAINING_AUTOMATION_BRIDGE_MODES = Object.freeze(['local', 'bridge']);
 export const TRAINING_AUTOMATION_RUNNER_PROFILES = Object.freeze(['ops', 'learn']);
+export const TRAINING_AUTOMATION_ENVIRONMENT_PROFILES = TRAINING_ENVIRONMENT_PROFILES;
 
 const DEFAULT_EPISODES = 3;
 const DEFAULT_SEEDS = Object.freeze([3, 7, 11]);
@@ -21,6 +27,7 @@ const DEFAULT_MODES = Object.freeze([
 ]);
 const DEFAULT_MAX_STEPS = 180;
 const DEFAULT_RUNNER_PROFILE = 'ops';
+const DEFAULT_ENVIRONMENT_PROFILE = DEFAULT_TRAINING_ENVIRONMENT_PROFILE;
 const DEFAULT_TIMEOUTS = Object.freeze({
     stepMs: 75,
     episodeMs: 20_000,
@@ -156,6 +163,13 @@ function normalizeRunnerProfile(input) {
     return DEFAULT_RUNNER_PROFILE;
 }
 
+function resolveDefaultEnvironmentProfile(runnerProfile) {
+    if (runnerProfile === 'ops' || runnerProfile === 'learn') {
+        return DEFAULT_ENVIRONMENT_PROFILE;
+    }
+    return 'synthetic-smoke';
+}
+
 function parseOptionalBoolean(value) {
     if (typeof value === 'boolean') return value;
     if (typeof value !== 'string') return null;
@@ -178,6 +192,10 @@ export function normalizeTrainingRunConfig(input = {}) {
     const episodes = toBoundedInt(input.episodes, DEFAULT_EPISODES, 1, 100_000);
     const maxSteps = toBoundedInt(input.maxSteps, DEFAULT_MAX_STEPS, 1, 1_000_000);
     const runnerProfile = normalizeRunnerProfile(input.runnerProfile);
+    const environmentProfile = normalizeTrainingEnvironmentProfile(
+        input.environmentProfile,
+        resolveDefaultEnvironmentProfile(runnerProfile)
+    );
     const injectInvalidActions = parseOptionalBoolean(input.injectInvalidActions);
     const normalizedStepTimeoutRetries = toBoundedInt(input.stepTimeoutRetries, NaN, 0, 10);
     return {
@@ -190,12 +208,13 @@ export function normalizeTrainingRunConfig(input = {}) {
         maxSteps,
         bridgeMode: normalizeBridgeMode(input.bridgeMode),
         runnerProfile,
+        environmentProfile,
         injectInvalidActions: injectInvalidActions == null
-            ? runnerProfile !== 'learn'
+            ? environmentProfile === 'synthetic-smoke'
             : injectInvalidActions,
         stepTimeoutRetries: Number.isFinite(normalizedStepTimeoutRetries)
             ? normalizedStepTimeoutRetries
-            : (runnerProfile === 'learn' ? 1 : 0),
+            : (environmentProfile === 'runtime-near' ? 1 : 0),
         timeouts: normalizeTimeouts(input.timeouts || {}),
     };
 }

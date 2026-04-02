@@ -31,6 +31,7 @@ test('TrainingAutomationContractV33 normalizes run config and artifact layout de
     assert.deepEqual(config.modes.map((entry) => entry.domainId), ['classic-3d', 'hunt-2d']);
     assert.equal(config.maxSteps, 12);
     assert.equal(config.bridgeMode, 'local');
+    assert.equal(config.environmentProfile, 'runtime-near');
     assert.equal(config.timeouts.stepMs, 50);
     assert.equal(config.timeouts.episodeMs, 3000);
     assert.equal(config.timeouts.runMs, 9000);
@@ -51,6 +52,7 @@ test('TrainingAutomationRunner produces deterministic seeds, episodes and KPIs',
         modes: ['classic-3d', 'hunt-2d'],
         maxSteps: 9,
         bridgeMode: 'local',
+        environmentProfile: 'runtime-near',
         timeouts: {
             stepMs: 100,
             episodeMs: 5000,
@@ -97,6 +99,8 @@ test('TrainingAutomationRunner reuses the transport facade and aggregates metric
         modes: ['classic-3d'],
         maxSteps: 7,
         bridgeMode: 'local',
+        environmentProfile: 'synthetic-smoke',
+        injectInvalidActions: true,
         timeouts: {
             stepMs: 100,
             episodeMs: 5000,

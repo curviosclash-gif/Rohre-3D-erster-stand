@@ -150,9 +150,11 @@ test('V36 trainer action safety layer keeps aggressive actions when corridor and
     assert.equal(response.action.yawLeft, false);
     assert.equal(response.action.boost, true);
     assert.equal(response.action.shootMG, true);
-    assert.equal(response.action.shootItem, true);
-    assert.equal(response.action.shootItemIndex, 2);
-    assert.equal(response.action.useItem, 2);
+    assert.equal(response.action.shootItem, false);
+    assert.equal(response.action.shootItemIndex, -1);
+    assert.equal(response.action.useItem, -1);
+    assert.equal(response.intent?.applied, 'combat');
+    assert.equal(response.control?.itemAllowed, false);
 });
 
 test('V36 trainer fallback heuristic uses wall clearance instead of stale indices', () => {

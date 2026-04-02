@@ -11,6 +11,7 @@ import { buildTrainerRuntimeObservationPayload } from './training/TrainerPayload
 import { WebSocketTrainerBridge } from './training/WebSocketTrainerBridge.js';
 import { LocalDqnInference } from './inference/LocalDqnInference.js';
 import { createCheckpointActionVocabulary } from './inference/CheckpointActionVocabulary.js';
+import { RuntimeNearObservationTracker } from './observation/RuntimeNearObservationAdapter.js';
 import {
     createRuntimeContextFromLegacyArgs,
     hasSteeringIntent,
@@ -45,6 +46,7 @@ export class ObservationBridgePolicy {
         this._neutralAction = createNeutralBotAction({});
         this._localInference = null;
         this._localInferenceVocabulary = null;
+        this._observationTracker = new RuntimeNearObservationTracker();
         this._trainerBridge = null;
         this._trainerBridgeOptions = null;
         this._trainerBridgeInitPromise = null;

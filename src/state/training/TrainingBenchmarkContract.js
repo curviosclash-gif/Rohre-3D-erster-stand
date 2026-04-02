@@ -221,6 +221,7 @@ export const TRAINING_BENCHMARK_COMPARE_RULES = Object.freeze({
         'Promotion vergleicht immer gegen den eingefrorenen Champion und nur zusaetzlich gegen die BT10-Ursprungsbaseline.',
         'Kandidaten mit anderer Semantikfenster-ID oder anderer Benchmark-Matrix-Version sind nicht vergleichbar und failen hart.',
         'Fehlende Artefakte fuer bot:validate, Decision-Trace, Resume-Health, Hardware-Telemetrie oder Benchmark-Manifest sind harte Disqualifier.',
+        'Promotion und Abschluss-Gates sind nur auf runtime-nahen Lanes zulaessig; synthetische Lanes bleiben Smoke- oder Ablation-Hilfe.',
         'BT20- und spaetere offene Laeufe bleiben Challenger-Referenzen, bis ein vollstaendiger Benchmark-Report mit denselben Artefaktpflichten eingefroren ist.',
     ]),
 });

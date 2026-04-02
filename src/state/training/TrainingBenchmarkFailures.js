@@ -147,6 +147,12 @@ export const TRAINING_BENCHMARK_FAILURE_TAXONOMY = Object.freeze({
         severity: 'high',
         summary: 'Benchmark-Matrix stimmt nicht mit dem eingefrorenen Vertrag ueberein.',
     }),
+    'runtime-lane-missing': Object.freeze({
+        code: 'runtime-lane-missing',
+        stage: 'gate',
+        severity: 'high',
+        summary: 'Promotion oder Benchmark laufen nur auf einer synthetischen Lane statt runtime-nah.',
+    }),
     'temperature-unavailable': Object.freeze({
         code: 'temperature-unavailable',
         stage: 'gate',
@@ -188,6 +194,9 @@ export function evaluateBenchmarkArtifactRequirements(input = {}, options = {}) 
         : null;
     const semanticWindowId = manifest?.semantics?.id || null;
     const matrixVersion = manifest?.benchmarkMatrix?.version || null;
+    const environmentProfile = manifest?.environment?.profile || null;
+    const runtimeNear = manifest?.environment?.runtimeNear === true;
+    const promotionEligible = manifest?.environment?.promotionEligible === true;
 
     if (!runArtifact) {
         failures.push(buildFailure('artifact-missing', { artifact: 'run' }));
@@ -319,6 +328,12 @@ export function evaluateBenchmarkArtifactRequirements(input = {}, options = {}) 
         failures.push(buildFailure('benchmark-matrix-mismatch', {
             expected: expectedMatrixVersion,
             actual: matrixVersion,
+        }));
+    }
+    if (promotionEligible && !runtimeNear) {
+        failures.push(buildFailure('runtime-lane-missing', {
+            expected: 'runtime-near',
+            actual: environmentProfile,
         }));
     }
 

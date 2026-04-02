@@ -294,6 +294,7 @@ function buildRawConfigFromArgs(args) {
         modes: typeof modes === 'string' && modes.trim() ? modes : undefined,
         maxSteps: parseInteger(args.get('max-steps'), 180, 1, 1_000_000),
         bridgeMode: args.get('bridge-mode') || 'local',
+        environmentProfile: args.get('environment-profile') || undefined,
         runnerProfile: runnerProfile || undefined,
         injectInvalidActions: injectInvalidActions == null ? undefined : injectInvalidActions,
         stepTimeoutRetries: stepTimeoutRetries == null ? undefined : stepTimeoutRetries,
