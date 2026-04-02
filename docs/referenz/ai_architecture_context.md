@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-04-02
+Stand: 2026-04-03
 
 ## 1. Architekturparadigma
 
@@ -13,7 +13,9 @@ Stand: 2026-04-02
 ### 2.1 Core (`src/core`)
 
 - `main.js`: App-Orchestrierung, Match-Lifecycle, Runtime-State-Anwendung
+- `GameBootstrap.js`: baut `runtimeBundle`, verbindet Renderer/UI/Systeme und erzeugt ueber `shared/runtime/GameRuntimePorts.js` die schmale Port-Schicht zwischen Runtime und UI
 - `GameRuntimeFacade.js`: oeffentliche Runtime-/Menue-/Session-Fassade; einziger Return-to-Menu-Entry-Point fuer Core/UI
+- `runtime/GameRuntimeSessionHandler.js`, `runtime/MatchFinalizeFlowService.js`: kapseln Session-Init/Teardown/Return-to-Menu als oeffentliche Lifecycle-Adapter; trennen UI-Rueckbau von Session-Finalisierung
 - `PlayingStateSystem.js`: kapselt den PLAYING-Updateablauf als eigenes System
 - `RuntimeDiagnosticsSystem.js`: expliziter Runtime-Debug-Adapter fuer FPS/Quality/Stats-Overlay
 - `Config.js`: zentrale Spielkonfiguration
@@ -71,6 +73,12 @@ Stand: 2026-04-02
 - `ScreenShake.js`: Hunt-Feedback
 - `RespawnSystem.js`, `HuntScoring.js`: Respawn + erweitertes Hunt-Scoring
 
+### 2.6 Desktop Shell / Build
+
+- `electron/main.cjs`: besitzt BrowserWindow-, Tray-, Static-Server-, LAN-Host-, Discovery- und Save-Lifecycle; keine Match-/UI-Domaenenlogik
+- `electron/preload.cjs`: einzige Renderer-Bridge; exponiert kleine, eingefrorene Capability-Vertraege (`discovery`, `host`, `save`) ueber `window.curviosApp` und `__CURVIOS_APP__`
+- `dev/vite/rendererShellConfig.js`, `vite.config.js`: kapseln Renderer-Einstiegspunkte, Warmup- und Chunking-Sonderfaelle; Plattform-/Build-Komposition bleibt ausserhalb der eigentlichen Runtime-Domaene
+
 ## 3. State-IDs (`GAME_STATE_IDS`)
 
 - Quelle: `src/shared/contracts/GameStateIds.js`
@@ -82,16 +90,28 @@ Stand: 2026-04-02
 
 ## 4. Runtime-Vertraege (V74)
 
+- Desktop-Shell-Vertrag:
+  - Electron Main besitzt Fenster-, IPC- und Datei-/LAN-Faehigkeiten; Renderer-Code greift nicht direkt auf `ipcRenderer`, Node oder BrowserWindow-Lifecycle zu.
+  - `preload.cjs` exponiert nur benannte Capability-Vertraege (`discovery`, `host`, `save`) plus Legacy-Aliasse auf `curviosApp`; fehlende Desktop-Shell muss im Browser-Demo-Scope degradierbar bleiben.
+  - Desktop-Erkennung laeuft bewusst ueber `curviosApp.isApp` bzw. `__CURVIOS_APP__` (z. B. fuer Recorder-Praeferenzen), nicht ueber verstreute Electron-Sonderabfragen in Runtime- oder UI-Modulen.
 - Session-Vertrag:
   - `RuntimeConfig.session` fuehrt `sessionType` und `multiplayerTransport` explizit.
   - `sessionType='multiplayer'` + `multiplayerTransport='storage-bridge'` ist Menue-Koordination, kein echter Runtime-Netzwerkadapter.
-  - Die Match-Runtime loest diesen Sonderfall bewusst auf `LocalSessionAdapter` auf; nur `lan|online` gelten als echte Network-Sessions.
+  - `RuntimeSessionContract` normalisiert diesen Sonderfall bewusst auf `adapterSessionType='single'` bzw. `runtimeTransportKind='menu-storage-bridge'`; nur `lan|online` gelten als echte Network-Sessions.
 - Lifecycle-Vertrag:
-  - `GameRuntimeFacade.returnToMenu(...)` ist der oeffentliche Exit fuer Pause-, Round-End-, Fehler- und Hotkey-Pfade.
-  - `MatchLifecycleSessionOrchestrator` serialisiert asynchrone Session-Initialisierung, disposed stale Resultate aktiv und settled Recorder-/Teardown-Pfade deterministisch.
+  - `shared/runtime/GameRuntimePorts.js` stellt mit `lifecyclePort`, `matchUiPort`, `sessionPort`, `settingsPort`, `renderPort` und `inputPort` die schmalen Imperative-Schnittstellen zwischen Runtime, UI und Session-Services bereit.
+  - `GameRuntimeFacade.returnToMenu(...)` bleibt der oeffentliche Exit fuer Pause-, Round-End-, Fehler- und Hotkey-Pfade, delegiert aber an `GameRuntimeSessionHandler` und `MatchFinalizeFlowService`.
+  - `MatchFinalizeFlowService` trennt UI-Rueckbau (`matchUiPort.applyReturnToMenuUi`) von Session-Finalisierung (`sessionPort.finalizeMatchSession`) und merged konkurrierende Finalize-Requests kontrolliert.
+  - `MatchLifecycleSessionOrchestrator` serialisiert asynchrone Session-Initialisierung, disposed stale Resultate aktiv, settled Recorder-/Teardown-Pfade deterministisch und emittiert `menu_opened` nur ueber den definierten Lifecycle-Vertrag.
+  - `MatchFlowUiController`, `PauseOverlayController` und `RoundStateTickSystem` verlassen Matches ausschliesslich ueber `lifecyclePort`/`matchUiPort`, nicht ueber ad-hoc Disposals oder direkte Session-Manipulation.
 - Entity-Runtime-Vertrag:
   - `MatchSessionFactory` erzeugt pro Match ein `entityRuntimeConfig` und reicht es an `EntityManager`, Trail-, Powerup-, Projectile-, Portal- und Hunt-Pfade durch.
   - `ActiveRuntimeConfigStore` ist fuer den migrierten Scope kein Standard-Einstieg mehr, sondern nur ein explizit verbleibender Uebergangsadapter ausserhalb der bereits umgestellten Hotpaths.
+- Shared-Contract-Vertrag:
+  - `src/shared/contracts/**` ist die autoritative, seiteneffektfreie Schicht fuer versionierte Konstanten, Normalizer und abgeleitete Payloads; Core, UI, Network und Recorder konsumieren diese Vertraege, ohne ihre Semantik lokal neu zu definieren.
+  - `MatchLifecycleContract`, `MenuControllerContract`, `GameStateIds` und `MatchUiStateContract` definieren die gemeinsamen Lifecycle-, Menuevent-, State- und UI-Oberflaechenbegriffe fuer Menue, Matchflow und Recorder-Telemetrie.
+  - `RuntimeSessionContract` und `MultiplayerSessionContract` trennen Menue-Sessions, Runtime-Adapter-Typen und Netzwerk-Nachrichten sauber; Session-/Netzwerkpfade entscheiden ueber diese Vertraege statt ueber rohe Settings oder Message-Shapes.
+  - `RecordingCaptureContract` bleibt die gemeinsame Capture-/Export-Basis fuer Renderer, Recorder-System und Desktop-Save-Shell; Plattformdetails wie MIME-Praeferenzen bleiben in den Runtime-/Shell-Adaptern.
 - Debug-/Overlay-Vertrag:
   - `GameLoop` nutzt `RuntimeErrorOverlay` fuer fatale Fehler.
   - `RuntimeDiagnosticsSystem` bleibt als bewusst markierter Runtime-Debug-Adapter fuer das optionale Stats-Overlay bestehen.
