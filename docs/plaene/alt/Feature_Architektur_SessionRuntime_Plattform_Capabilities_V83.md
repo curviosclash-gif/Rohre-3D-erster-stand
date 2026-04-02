@@ -1,7 +1,7 @@
 # Feature: Architektur SessionRuntime und Plattform-Capabilities nach V74 (V83)
 
 Stand: 2026-04-02
-Status: Entwurf
+Status: Archivierter Intake-Entwurf
 Owner: Bot-Codex
 Risiko: hoch
 plan_file: `docs/plaene/aktiv/V83.md`
