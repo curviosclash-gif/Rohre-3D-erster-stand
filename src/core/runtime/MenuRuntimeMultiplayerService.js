@@ -2,9 +2,17 @@
 // MenuRuntimeMultiplayerService.js - multiplayer lobby/runtime helpers
 // ============================================
 
-import { LanMenuMultiplayerBridge, MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
+import {
+    createMenuLobbyService,
+    matchesMenuLobbyServiceTransport,
+    resolveMenuLobbyServiceTransport,
+} from '../../application/session-runtime/MenuLobbyServiceFactory.js';
 import { isElectronPreloadRuntime } from '../../platform/electron/ElectronPlatformBridge.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
+import {
+    isNetworkLobbyServiceTransport,
+    normalizeLobbyServiceTransport,
+} from '../../shared/contracts/LobbyServiceContract.js';
 import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
 import {
     MULTIPLAYER_TRANSPORTS,
@@ -34,12 +42,17 @@ function shouldUseDesktopLanBridge(runtime = null) {
 // lobby coordination within the same browser. At match start, each tab runs a
 // LocalSessionAdapter independently — no real-time state sync occurs across tabs.
 // Future transport types ('lan', 'online') are plumbed via localSettings.multiplayerTransport.
-function ensureMultiplayerSessionType(game) {
+function ensureMultiplayerSessionType(game, menuLobbyService = null) {
     if (!game?.settings || typeof game.settings !== 'object') return;
     if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
         game.settings.localSettings = {};
     }
     game.settings.localSettings.sessionType = RUNTIME_SESSION_TYPES.MULTIPLAYER;
+    const activeTransport = normalizeLobbyServiceTransport(menuLobbyService, '');
+    if (activeTransport) {
+        game.settings.localSettings.multiplayerTransport = activeTransport;
+        return;
+    }
     const currentTransport = String(game.settings.localSettings.multiplayerTransport || '').trim().toLowerCase();
     if (currentTransport === MULTIPLAYER_TRANSPORTS.ONLINE) return;
     game.settings.localSettings.multiplayerTransport = shouldUseDesktopLanBridge()
@@ -48,7 +61,7 @@ function ensureMultiplayerSessionType(game) {
 }
 
 function observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, action, lobbyCode = '') {
-    if (!runtimeSource || menuMultiplayerBridge?.bridgeKind === 'lan') {
+    if (!runtimeSource || isNetworkLobbyServiceTransport(menuMultiplayerBridge)) {
         return;
     }
     recordSessionRuntimeEvent(runtimeSource, {
@@ -56,7 +69,7 @@ function observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, action,
         source: 'menu_runtime_multiplayer_service',
         payload: {
             capabilityId: action === 'host' ? 'host' : 'discovery',
-            providerKind: 'menu-storage-bridge',
+            providerKind: normalizeString(menuMultiplayerBridge?.serviceDescriptor?.providerKind, 'menu-storage-bridge'),
             reason: 'desktop_capability_unavailable',
             action: normalizeString(action, 'unknown'),
             lobbyCode: normalizeString(lobbyCode, ''),
@@ -79,31 +92,25 @@ export function createMenuMultiplayerBridge(options = {}) {
         peerId,
     } = options;
 
-    const useLanBridge = shouldUseDesktopLanBridge(runtime);
+    const resolvedTransport = resolveMenuLobbyServiceTransport({
+        runtime,
+        transport: options.transport,
+        serviceFactories: options.serviceFactories,
+    });
     if (existingBridge) {
         existingBridge.contractVersion = contractVersion;
         existingBridge.onEvent = typeof onEvent === 'function' ? onEvent : null;
         existingBridge.onStatus = typeof onStatus === 'function' ? onStatus : null;
         existingBridge.onStateChanged = typeof onStateChanged === 'function' ? onStateChanged : null;
         existingBridge.onMatchStart = typeof onMatchStart === 'function' ? onMatchStart : null;
-        if ((useLanBridge && existingBridge?.bridgeKind === 'lan') || (!useLanBridge && existingBridge?.bridgeKind !== 'lan')) {
+        if (matchesMenuLobbyServiceTransport(existingBridge, resolvedTransport)) {
             return existingBridge;
         }
         existingBridge.dispose?.();
     }
 
-    if (useLanBridge) {
-        return new LanMenuMultiplayerBridge({
-            contractVersion,
-            onEvent,
-            onStatus,
-            onStateChanged,
-            onMatchStart,
-            runtime,
-        });
-    }
-
-    return new MenuMultiplayerBridge({
+    return createMenuLobbyService({
+        transport: resolvedTransport,
         contractVersion,
         onEvent,
         onStatus,
@@ -274,7 +281,7 @@ export async function handleMultiplayerHostAction({
         return result;
     }
 
-    ensureMultiplayerSessionType(game);
+    ensureMultiplayerSessionType(game, menuMultiplayerBridge);
     if (game.ui?.multiplayerLobbyCodeInput) {
         game.ui.multiplayerLobbyCodeInput.value = result.lobbyCode || '';
     }
@@ -311,7 +318,7 @@ export async function handleMultiplayerJoinAction({
         return result;
     }
 
-    ensureMultiplayerSessionType(game);
+    ensureMultiplayerSessionType(game, menuMultiplayerBridge);
     if (game.ui?.multiplayerLobbyCodeInput) {
         game.ui.multiplayerLobbyCodeInput.value = result.lobbyCode || '';
     }
@@ -326,7 +333,7 @@ export async function handleMultiplayerReadyToggleAction({
     menuMultiplayerBridge,
     syncUiState,
 }) {
-    ensureMultiplayerSessionType(game);
+    ensureMultiplayerSessionType(game, menuMultiplayerBridge);
     let result = null;
     try {
         result = await Promise.resolve(menuMultiplayerBridge?.toggleReady({
