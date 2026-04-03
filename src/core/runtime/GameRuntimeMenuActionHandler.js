@@ -8,8 +8,6 @@ import {
     deleteMenuPresetAction,
 } from './MenuRuntimePresetConfigService.js';
 import {
-    handleMultiplayerHostAction,
-    handleMultiplayerJoinAction,
     handleMultiplayerReadyToggleAction,
 } from './MenuRuntimeMultiplayerService.js';
 import {
@@ -156,23 +154,14 @@ export class GameRuntimeMenuActionHandler {
     }
 
     handleMultiplayerHost(event) {
-        handleMultiplayerHostAction({
-            game: this._facade?.game,
-            event,
-            resolveMenuAccessContext: () => this._facade?._resolveMenuAccessContext?.(),
-            menuMultiplayerBridge: this._facade?.menuMultiplayerBridge,
-            syncUiState: () => this._facade?._syncMultiplayerUiState?.(),
-            captureSettingsSnapshot: () => this._facade?._captureMultiplayerMatchSettings?.(),
+        return this._facade?.hostLobby?.({
+            lobbyCode: String(event?.lobbyCode || '').trim(),
         });
     }
 
     handleMultiplayerJoin(event) {
-        handleMultiplayerJoinAction({
-            game: this._facade?.game,
-            event,
-            resolveMenuAccessContext: () => this._facade?._resolveMenuAccessContext?.(),
-            menuMultiplayerBridge: this._facade?.menuMultiplayerBridge,
-            syncUiState: () => this._facade?._syncMultiplayerUiState?.(),
+        return this._facade?.joinLobby?.({
+            lobbyCode: String(event?.lobbyCode || '').trim(),
         });
     }
 

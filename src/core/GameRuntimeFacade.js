@@ -1,10 +1,13 @@
 import { createLogger } from '../shared/logging/Logger.js';
+import { SessionRuntimeCommandExecutor } from '../application/session-runtime/SessionRuntimeCommandExecutor.js';
 import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
 import { MENU_CONTROLLER_EVENT_CONTRACT_VERSION } from '../shared/contracts/MenuControllerContract.js';
+import { createApplySettingsCommand, createFinalizeMatchCommand, createHostLobbyCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
+import { createInitializeSessionCommand, createJoinLobbyCommand, createReturnToMenuCommand, createStartMatchCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
 import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
 import {
     guardMenuRuntimeEvent,
@@ -54,6 +57,7 @@ export class GameRuntimeFacade {
         this.menuActionHandler = new GameRuntimeMenuActionHandler({ facade: this });
         this.settingsHandler = new GameRuntimeSettingsHandler({ facade: this });
         this.sessionHandler = new GameRuntimeSessionHandler({ facade: this, logger });
+        this.sessionRuntimeCommandExecutor = new SessionRuntimeCommandExecutor({ facade: this });
         this._menuEventHandlers = createMenuEventHandlerRegistry(this);
 
         /** @type {import('./session/SessionAdapter.js').SessionAdapter|null} */
@@ -127,7 +131,9 @@ export class GameRuntimeFacade {
         }, 50);
     }
 
-    applySettingsToRuntime(options = {}) {
+    executeSessionRuntimeCommand(command = null) { return this.sessionRuntimeCommandExecutor.execute(command); }
+
+    _applySettingsToRuntimeInternal(options = {}) {
         const game = this.game;
         const runtimeBundle = this.getRuntimeBundle();
         const runtimeState = this.getRuntimeState();
@@ -165,6 +171,8 @@ export class GameRuntimeFacade {
             this.scheduleMatchPrewarm();
         }
     }
+
+    applySettingsToRuntime(options = {}) { return this.executeSessionRuntimeCommand(createApplySettingsCommand(options)); }
 
     _activateArcadeRoundController() {
         const runtimeState = this.getRuntimeState();
@@ -277,14 +285,7 @@ export class GameRuntimeFacade {
     }
 
     _handleMultiplayerMatchStart(command = null) {
-        const game = this.game;
-        if (!game || game.state !== GAME_STATE_IDS.MENU) return false;
-        if (command?.settingsSnapshot) {
-            this._applyAuthoritativeMultiplayerMatchSettings(command.settingsSnapshot);
-        }
-        this.getUiManager()?.clearStartValidationError?.();
-        const startResult = this.getPorts()?.matchUiPort?.startMatch?.();
-        return startResult !== false;
+        return this.startMatch({ commandId: command?.commandId, hostPeerId: command?.hostPeerId, issuedAt: command?.issuedAt, lobbyCode: command?.lobbyCode, settingsSnapshot: command?.settingsSnapshot, source: 'menu_multiplayer_bridge' });
     }
 
     _syncMultiplayerRuntimeContext(changedKeys = null) {
@@ -482,8 +483,8 @@ export class GameRuntimeFacade {
     onSettingsChanged(event = null) { return this.settingsHandler.onSettingsChanged(event); }
     markSettingsDirty(isDirty) { return this.settingsHandler.markSettingsDirty(isDirty); }
     updateSaveButtonState() { return this.settingsHandler.updateSaveButtonState(); }
-    async _initSession() { return this.sessionHandler.initializeSession(); }
-    initializeSession() { return this._initSession(); }
+    async _initSession(options = undefined) { return this.executeSessionRuntimeCommand(createInitializeSessionCommand(options)); }
+    initializeSession(options = undefined) { return this._initSession(options); }
     _startStateBroadcast() { startRuntimeStateBroadcast(this); }
     _stopStateBroadcast() { stopRuntimeStateBroadcast(this); }
     _setupClientStateReceiver() { setupRuntimeClientStateReceiver(this); }
@@ -493,9 +494,12 @@ export class GameRuntimeFacade {
     teardownRuntimeSession() { this._teardownSession(); }
     isNetworkSession() { return this.sessionHandler.isNetworkSession(); }
     isHost() { return this.sessionHandler.isHost(); }
-    startMatch() { return this.sessionHandler.startMatch(); }
+    startMatch(options = undefined) { return this.executeSessionRuntimeCommand(createStartMatchCommand(options)); }
     restartRound() { return this.sessionHandler.restartRound(); }
-    returnToMenu(options = {}) { return this.sessionHandler.returnToMenu(options); }
+    returnToMenu(options = {}) { return this.executeSessionRuntimeCommand(createReturnToMenuCommand(options)); }
+    finalizeMatch(options = {}) { return this.executeSessionRuntimeCommand(createFinalizeMatchCommand(options)); }
+    hostLobby(options = {}) { return this.executeSessionRuntimeCommand(createHostLobbyCommand(options)); }
+    joinLobby(options = {}) { return this.executeSessionRuntimeCommand(createJoinLobbyCommand(options)); }
     syncP2HudVisibility() { return this.sessionHandler.syncP2HudVisibility(); }
     dispose() { return this.sessionHandler.dispose(); }
 }

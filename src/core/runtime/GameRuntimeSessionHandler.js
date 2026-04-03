@@ -1,6 +1,5 @@
 import { SESSION_FINALIZE_TRIGGERS } from '../../shared/contracts/MatchLifecycleContract.js';
 import { RUNTIME_SESSION_TYPES, resolveRuntimeSessionContract } from '../../shared/contracts/RuntimeSessionContract.js';
-import { finalizeMatchFlow } from './MatchFinalizeFlowService.js';
 import { requestRuntimeMultiplayerMatchStart } from './RuntimeMultiplayerFlowService.js';
 import {
     initRuntimeSession,
@@ -14,7 +13,7 @@ export class GameRuntimeSessionHandler {
         this._logger = logger;
     }
 
-    async initializeSession() {
+    async initializeSession(_options = undefined) {
         return initRuntimeSession(this._facade);
     }
 
@@ -34,7 +33,7 @@ export class GameRuntimeSessionHandler {
         return this._facade?.session?.isHost ?? true;
     }
 
-    startMatch() {
+    startMatch(_options = undefined) {
         const facade = this._facade;
         facade?._clearMatchPrewarmTimer?.();
         const sessionContract = resolveRuntimeSessionContract(facade?.game?.settings?.localSettings);
@@ -74,7 +73,7 @@ export class GameRuntimeSessionHandler {
     }
 
     returnToMenu(options = {}) {
-        return finalizeMatchFlow(this._facade, {
+        return this._facade?.finalizeMatch?.({
             ...options,
             reason: options?.reason || SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU,
             notifyMenuOpened: true,
@@ -91,12 +90,12 @@ export class GameRuntimeSessionHandler {
     dispose() {
         const facade = this._facade;
         facade?._clearMatchPrewarmTimer?.();
-        finalizeMatchFlow(facade, {
+        Promise.resolve(facade?.finalizeMatch?.({
             reason: SESSION_FINALIZE_TRIGGERS.GAME_DISPOSE,
             notifyMenuOpened: false,
             applyReturnToMenuUi: false,
             schedulePrewarm: false,
-        }, SESSION_FINALIZE_TRIGGERS.GAME_DISPOSE).catch((error) => {
+        })).catch((error) => {
             this._logger?.error?.('dispose finalize failed:', error);
         });
         facade?.game?.menuController?.dispose?.();
