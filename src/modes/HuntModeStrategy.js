@@ -87,6 +87,48 @@ export class HuntModeStrategy extends GameModeContract {
 
     get modeType() { return 'HUNT'; }
 
+    // --- Lifecycle (V84 / 84.3.2) ---
+    bootstrap(_context) { /* no mode-specific init required */ }
+    cleanup(_context) { /* no mode-specific teardown required */ }
+
+    computeRoundResult(players, context) {
+        const alivePlayers = (players || []).filter((p) => p && p.alive);
+        // Hunt: last alive wins; if multiple alive, pick by highest HP.
+        let winner = null;
+        if (alivePlayers.length === 1) {
+            winner = alivePlayers[0].playerIndex ?? null;
+        } else if (alivePlayers.length > 1) {
+            let maxHp = -Infinity;
+            for (const p of alivePlayers) {
+                const hp = toSafeNumber(p.hp, 0);
+                if (hp > maxHp) { maxHp = hp; winner = p.playerIndex ?? null; }
+            }
+        }
+        const scores = {};
+        for (const p of (players || [])) {
+            if (p && p.playerIndex != null) {
+                scores[p.playerIndex] = { kills: p.kills ?? 0, hp: toSafeNumber(p.hp, 0) };
+            }
+        }
+        return { modeType: this.modeType, winner, scores, roundIndex: context?.roundIndex ?? 0 };
+    }
+
+    computeMatchResult(players, roundResults, context) {
+        void players; void context;
+        const wins = {};
+        for (const r of (roundResults || [])) {
+            if (r?.winner != null) {
+                wins[r.winner] = (wins[r.winner] || 0) + 1;
+            }
+        }
+        let winnerIndex = null;
+        let maxWins = 0;
+        for (const [idx, count] of Object.entries(wins)) {
+            if (count > maxWins) { maxWins = count; winnerIndex = Number(idx); }
+        }
+        return { modeType: this.modeType, winnerIndex, roundResults: roundResults || [] };
+    }
+
     // --- Health & Damage ---
     resetPlayerHealth(player, config) {
         if (!player) return null;
