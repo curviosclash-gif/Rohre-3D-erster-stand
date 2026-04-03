@@ -142,6 +142,69 @@ Stand: 2026-04-03
   - `GameLoop` nutzt `RuntimeErrorOverlay` fuer fatale Fehler.
   - `RuntimeDiagnosticsSystem` bleibt als bewusst markierter Runtime-Debug-Adapter fuer das optionale Stats-Overlay bestehen.
 
+### 4.4 Kleiner Vertragskatalog fuer V83
+
+- Kanonische Heimat fuer die folgenden Vertragsfamilien bleibt `src/shared/contracts/**`. Zielanker fuer die spaetere Umsetzung sind `SessionRuntimeCommandContract.js`, `SessionRuntimeEventContract.js`, `SessionRuntimeSnapshotContract.js` und `PlatformCapabilityContract.js`; bis zu ihrer Einfuehrung ist dieser Abschnitt die Referenz fuer IDs, Pflichtfelder und Ownership.
+- Gemeinsame Regeln:
+  - Commands sind imperative Intents in `snake_case` und laufen ausschliesslich von UI, Shell oder Legacy-Adaptern in Richtung Application-Layer bzw. `SessionRuntime`.
+  - Events sind eingetretene Fakten in `snake_case`; sie informieren UI, Observability und Uebergangsadapter, mutieren aber keinen Zustand direkt.
+  - Snapshots sind read-only Projektionen mit mindestens `contractVersion`, `sessionId` und `updatedAt`; sie ersetzen direkte Reads auf `game`, `runtimeBundle` oder Plattformobjekte.
+  - Capabilities sind benannte Availability-/Invoke-Vertraege; rohe Electron-, Browser- oder Storage-Objekte verlassen die Plattformschicht nicht.
+
+#### 4.4.1 Runtime-Commands
+
+| Command-ID | Primaerer Ausloeser | Minimaler Payload-Kern | Erwartetes Ergebnis |
+| --- | --- | --- | --- |
+| `initialize_session` | `GameRuntimeCoordinator`, Matchstart-/Lobby-Flow | `sessionType`, `multiplayerTransport`, `source` | `session_initialized` oder `session_init_failed`, danach `session_runtime_snapshot` |
+| `start_match` | Menue- und Quickstart-Flows | `sessionId`, `modeId`, `mapId`, `participantConfigRef` | `match_started`, `match_flow_snapshot` |
+| `pause_match` | Pause-Overlay, Shell-Hotkeys | `sessionId`, `reason` | `match_paused`, `match_flow_snapshot` |
+| `resume_match` | Pause-Overlay | `sessionId`, `reason` | `match_resumed`, `match_flow_snapshot` |
+| `apply_settings` | Settings-/Profile-Flow | `sessionId`, `settingsPatch`, `origin` | `settings_applied`, `session_runtime_snapshot` |
+| `finalize_match` | Finalize-Flow, Fehlerpfade, Runtime-State-Machine | `sessionId`, `trigger`, `reason` | `match_finalizing`, `match_finalized` |
+| `return_to_menu` | Pause-, Round-End-, Error- und Shell-Pfade | `sessionId`, `trigger`, `preserveLobby` | `match_finalizing`, `menu_opened` |
+| `host_lobby` | Menue-Multiplayer-Bridge | `sessionId`, `lobbyConfig`, `capabilityId` | `lobby_session_changed`, `platform_capability_snapshot` |
+| `join_lobby` | Menue-Multiplayer-Bridge | `sessionId`, `joinTarget`, `capabilityId` | `lobby_session_changed` oder `session_init_failed` |
+
+#### 4.4.2 Runtime-Events
+
+| Event-ID | Emittiert von | Bedeutung | Mindestpayload |
+| --- | --- | --- | --- |
+| `session_initialized` | Application-Layer / `SessionRuntime` | Session wurde erfolgreich aufgebaut und besitzt gueltige Runtime-Handles | `sessionId`, `sessionType`, `runtimeTransportKind` |
+| `session_init_failed` | Application-Layer / `SessionRuntime` | Session-Initialisierung ist fehlgeschlagen oder wurde stale verworfen | `sessionId`, `reason`, `source` |
+| `match_started` | Runtime-Lifecycle | Match ist spielbereit gestartet; bestehende V74-ID bleibt erhalten | `sessionId`, `matchId`, `modeId` |
+| `match_paused` | Runtime-State-Machine | Runtime ist in einen pausierten Zustand gewechselt | `sessionId`, `reason`, `state` |
+| `match_resumed` | Runtime-State-Machine | Runtime hat den pausierten Zustand verlassen | `sessionId`, `reason`, `state` |
+| `settings_applied` | Application-Layer | Runtime-relevante Settings wurden uebernommen | `sessionId`, `changedKeys`, `origin` |
+| `match_ended` | Match-/Round-Logik | Fachliches Matchende wurde erkannt; bestehende V74-ID bleibt erhalten | `sessionId`, `matchId`, `winnerId` |
+| `match_finalizing` | Finalize-Flow | Finalize-/Return-to-Menu-Pfad laeuft und blockiert konkurrierende Exits | `sessionId`, `trigger`, `finalizeState` |
+| `match_finalized` | Finalize-Flow | Runtime- und Session-Ressourcen sind final bereinigt | `sessionId`, `trigger`, `finalizeState` |
+| `menu_opened` | Lifecycle-Orchestrierung | Menue wurde ueber den offiziellen Exit-Pfad wieder geoeffnet | `sessionId`, `trigger`, `targetView` |
+| `lobby_session_changed` | Lobby-Service / Plattformadapter | Host-/Join-/Ready-/Discovery-Status der Menue-Session hat sich geaendert | `sessionId`, `lobbyState`, `transportKind` |
+| `capability_fallback_used` | Plattformschicht / Application-Layer | Desktop-spezifische Faehigkeit ist degradierend oder mit Fallback benutzt worden | `sessionId`, `capabilityId`, `providerKind`, `reason` |
+
+#### 4.4.3 Session-Snapshots
+
+| Snapshot-ID | Besitzer | Kernfelder | Primaere Konsumenten |
+| --- | --- | --- | --- |
+| `session_runtime_snapshot` | `SessionRuntime` | `contractVersion`, `sessionId`, `matchId`, `lifecycleState`, `finalizeState`, `sessionType`, `runtimeTransportKind`, `isNetworkSession` | Application-Layer, Legacy-Facade, Observability |
+| `match_flow_snapshot` | Application-Layer ueber `SessionRuntime` | `contractVersion`, `sessionId`, `gameStateId`, `uiStateId`, `roundStateId`, `isPaused`, `canReturnToMenu`, `pendingFinalizeTrigger` | `MatchFlowUiController`, `PauseOverlayController`, Menue-Glue |
+| `lobby_session_snapshot` | Lobby-Service | `contractVersion`, `sessionId`, `lobbyState`, `role`, `participantCount`, `discoveryState`, `transportKind` | Menue-Multiplayer-Bridges, Shell-Statusanzeigen |
+| `platform_capability_snapshot` | Plattformschicht | `contractVersion`, `sessionId`, Capability-Descriptoren fuer `discovery`, `host`, `save`, `recording` | Application-Layer, UI-Gating, Diagnostics |
+
+#### 4.4.4 Plattform-Capabilities
+
+| Capability-ID | Zweck | Pflichtfelder des Descriptors | Vertragsregel |
+| --- | --- | --- | --- |
+| `discovery` | Sitzungen, Peers oder Hosts sichtbar machen | `available`, `providerKind`, `degradedReason`, `supportsSubscribe` | UI und Menue lesen nur Availability/Snapshot; konkrete Discovery-Calls laufen ueber Application-Commands |
+| `host` | Hosting/Lobby-Besitz fuer Desktop-/LAN-Pfade | `available`, `providerKind`, `degradedReason`, `supportsSessionOwnership` | Browser-Demo darf sauber degradieren; Menue-Storage-Bridge gilt nicht als vollwertiger Runtime-Host |
+| `save` | Datei-, Export- und Persistenzpfade | `available`, `providerKind`, `degradedReason`, `supportsBinaryExport` | Save-Details bleiben in Plattformadaptern; UI bekommt nur Capability-Status und Ergebnis-Events |
+| `recording` | Capture-, Encode- und Export-Flows | `available`, `providerKind`, `degradedReason`, `supportsCapture` | Desktop bleibt Source of Truth; Browser-Fallbacks muessen explizit als degradiert markiert werden |
+
+- Brueckenregel fuer die Migration:
+  - Bestehende `MatchLifecycleContract`-IDs wie `match_started`, `match_ended` und `menu_opened` bleiben fuer V83 erhalten und werden spaeter vom Runtime-Event-Vertrag referenziert statt fruehzeitig umbenannt.
+  - `GameRuntimeFacade` und `shared/runtime/GameRuntimePorts.js` duerfen diese Contracts in `83.2` und `83.3` noch tunneln, sind aber nicht Eigentuemer der IDs oder Payload-Shapes.
+  - `platform_capability_snapshot` ist die einzige freigegebene UI-Sicht auf `discovery`, `host`, `save` und `recording`; UI-Code liest weder `window.curviosApp` noch rohe Preload-Objekte direkt.
+
 ## 5. Entwicklungsregeln
 
 1. `*Ops.js` als pure Logik behandeln (keine versteckten Side Effects).
