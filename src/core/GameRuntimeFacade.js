@@ -17,7 +17,11 @@ import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
 import { CONFIG_BASE } from './Config.js';
 import { ReplayRecorder } from './replay/ReplayRecorder.js';
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
-import { applyRuntimeSettingsState } from './runtime/GameRuntimeBundle.js';
+import {
+    applyRuntimeSettingsState,
+    getSessionRuntimeHandle,
+    getSessionRuntimeState,
+} from './runtime/GameRuntimeBundle.js';
 import { GameRuntimeMenuActionHandler } from './runtime/GameRuntimeMenuActionHandler.js';
 import { GameRuntimeSessionHandler } from './runtime/GameRuntimeSessionHandler.js';
 import { GameRuntimeSettingsHandler } from './runtime/GameRuntimeSettingsHandler.js';
@@ -38,7 +42,6 @@ const logger = createLogger('GameRuntimeFacade');
 export class GameRuntimeFacade {
     constructor(deps = {}) {
         this.game = deps.game || null;
-        this.ports = deps.ports || null;
         this.runtimeBundle = deps.runtimeBundle || this.game?.runtimeBundle || null;
         this.runtimeClock = createRuntimeClock({
             runtime: deps.runtimeClockRuntime || null,
@@ -66,7 +69,9 @@ export class GameRuntimeFacade {
         this._pendingMatchFinalize = null;
         this._pendingMatchFinalizePlan = null;
 
-        this._baseRoundStateController = this.game?.roundStateController || null;
+        this._baseRoundStateController = this.getRuntimeState()?.roundStateController
+            || this.game?.roundStateController
+            || null;
         this._arcadeRoundStateController = null;
         this._arcadeReplayRecorder = new ReplayRecorder();
         this.arcadeRunRuntime = new ArcadeRunRuntime({
@@ -77,13 +82,20 @@ export class GameRuntimeFacade {
         });
 
         const withArcadeStrategy = (handler) => {
-            const strategy = this.game?.entityManager?.gameModeStrategy;
+            const strategy = this.getRuntimeState()?.entityManager?.gameModeStrategy
+                || this.game?.entityManager?.gameModeStrategy;
             if (strategy) handler(strategy);
         };
         this.arcadeRunRuntime.setModifierChangedHandler((modifierId) => withArcadeStrategy((strategy) => strategy.setActiveModifier?.(modifierId)));
         this.arcadeRunRuntime.setVehicleUpgradesHandler((bonuses) => withArcadeStrategy((strategy) => strategy.applyVehicleUpgrades?.(bonuses)));
         this.arcadeRunRuntime.setSuddenDeathEnteredHandler(() => withArcadeStrategy((strategy) => strategy.enterSuddenDeath?.()));
     }
+
+    getRuntimeBundle() { return this.runtimeBundle || this.game?.runtimeBundle || null; }
+    getRuntimeState() { return getSessionRuntimeState(this.getRuntimeBundle() || this.game); }
+    getRuntimeHandle(key) { return getSessionRuntimeHandle(this.getRuntimeBundle() || this.game, key); }
+    getPorts() { return this.getRuntimeHandle('runtimePorts'); }
+    getUiManager() { return this.getRuntimeHandle('uiManager') || this.game?.uiManager || null; }
 
     _clearMatchPrewarmTimer() {
         if (!this._matchPrewarmTimer) return;
@@ -92,21 +104,23 @@ export class GameRuntimeFacade {
     }
     scheduleMatchPrewarm() {
         const game = this.game;
-        if (!game?.renderer || !game?.settingsManager) return;
+        const renderer = this.getRuntimeHandle('renderer');
+        if (!renderer || !game?.settingsManager) return;
         if (game.state !== GAME_STATE_IDS.MENU) return;
-        if (game.entityManager) return;
+        if (this.getRuntimeState()?.entityManager) return;
         this._clearMatchPrewarmTimer();
         this._matchPrewarmTimer = setTimeout(() => {
             this._matchPrewarmTimer = null;
+            const runtimeState = this.getRuntimeState();
             if (game.state !== GAME_STATE_IDS.MENU) return;
-            if (game.entityManager) return;
+            if (runtimeState?.entityManager) return;
             const runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
             Promise.resolve(prewarmMatchArenaSession({
-                renderer: game.renderer,
+                renderer,
                 settings: game.settings,
                 runtimeConfig,
-                baseConfig: game.config || CONFIG_BASE,
-                requestedMapKey: runtimeConfig?.session?.mapKey || game.mapKey,
+                baseConfig: runtimeState?.config || game.config || CONFIG_BASE,
+                requestedMapKey: runtimeConfig?.session?.mapKey || runtimeState?.mapKey || game.mapKey,
             })).catch((error) => {
                 logger.warn('Match prewarm skipped:', error);
             });
@@ -115,17 +129,22 @@ export class GameRuntimeFacade {
 
     applySettingsToRuntime(options = {}) {
         const game = this.game;
+        const runtimeBundle = this.getRuntimeBundle();
+        const runtimeState = this.getRuntimeState();
+        const renderer = this.getRuntimeHandle('renderer');
+        const mediaRecorderSystem = this.getRuntimeHandle('mediaRecorderSystem');
+        const input = this.getRuntimeHandle('input');
         if (!game?.settingsManager) return;
         const schedulePrewarm = options?.schedulePrewarm !== false;
         const runtimeConfig = game.settingsManager.createRuntimeConfig(game.settings);
         const compatibilityConfig = applyRuntimeConfigCompatibility(runtimeConfig, CONFIG_BASE);
 
-        game.renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
-        game.renderer?.setRecordingCaptureSettings?.(runtimeConfig?.recording);
-        game.renderer?.setCameraPerspectiveSettings?.(runtimeConfig?.cameraPerspective);
-        game.mediaRecorderSystem?.setRecordingCaptureSettings?.(runtimeConfig?.recording);
+        renderer?.setShadowQuality?.(game.settings?.localSettings?.shadowQuality);
+        renderer?.setRecordingCaptureSettings?.(runtimeConfig?.recording);
+        renderer?.setCameraPerspectiveSettings?.(runtimeConfig?.cameraPerspective);
+        mediaRecorderSystem?.setRecordingCaptureSettings?.(runtimeConfig?.recording);
 
-        applyRuntimeSettingsState(this.runtimeBundle || game.runtimeBundle, {
+        applyRuntimeSettingsState(runtimeBundle, {
             runtimeConfig,
             config: compatibilityConfig,
             session: {
@@ -137,14 +156,10 @@ export class GameRuntimeFacade {
             },
         });
 
-        if (game.arena && game.arena.toggleBeams) {
-            game.arena.toggleBeams(runtimeConfig.gameplay.portalBeams);
-        }
-        if (game.entityManager && game.entityManager.setBotDifficulty) {
-            game.entityManager.setBotDifficulty(runtimeConfig.bot.activeDifficulty);
-        }
+        runtimeState?.arena?.toggleBeams?.(runtimeConfig.gameplay.portalBeams);
+        runtimeState?.entityManager?.setBotDifficulty?.(runtimeConfig.bot.activeDifficulty);
 
-        game.input?.setBindings?.(runtimeConfig.controls);
+        input?.setBindings?.(runtimeConfig.controls);
         this._syncArcadeRuntimeConfig();
         if (schedulePrewarm) {
             this.scheduleMatchPrewarm();
@@ -152,10 +167,10 @@ export class GameRuntimeFacade {
     }
 
     _activateArcadeRoundController() {
-        const game = this.game;
-        if (!game?.roundStateController) return;
+        const runtimeState = this.getRuntimeState();
+        if (!runtimeState?.roundStateController) return;
         if (!this._baseRoundStateController) {
-            this._baseRoundStateController = game.roundStateController;
+            this._baseRoundStateController = runtimeState.roundStateController;
         }
         if (!this._arcadeRoundStateController) {
             this._arcadeRoundStateController = createArcadeRoundStateController({
@@ -163,22 +178,19 @@ export class GameRuntimeFacade {
                 arcadeRuntime: this.arcadeRunRuntime,
             });
         }
-        game.roundStateController = this._arcadeRoundStateController;
+        runtimeState.roundStateController = this._arcadeRoundStateController;
     }
 
     _deactivateArcadeRoundController() {
-        const game = this.game;
-        if (!game) return;
-        if (this._baseRoundStateController) {
-            game.roundStateController = this._baseRoundStateController;
-        }
+        const runtimeState = this.getRuntimeState();
+        if (runtimeState && this._baseRoundStateController) runtimeState.roundStateController = this._baseRoundStateController;
     }
 
     _syncArcadeRuntimeConfig() {
-        const game = this.game;
-        if (!game?.runtimeConfig) return;
-        this.arcadeRunRuntime.configure(game.runtimeConfig);
-        if (game.runtimeConfig?.arcade?.enabled) {
+        const runtimeConfig = this.getRuntimeState()?.runtimeConfig || null;
+        if (!runtimeConfig) return;
+        this.arcadeRunRuntime.configure(runtimeConfig);
+        if (runtimeConfig?.arcade?.enabled) {
             this._activateArcadeRoundController();
             return;
         }
@@ -187,21 +199,22 @@ export class GameRuntimeFacade {
     }
 
     _startArcadeRunIfEnabled() {
-        const game = this.game;
-        if (!game?.runtimeConfig?.arcade?.enabled) return null;
-        const strategy = game?.entityManager?.gameModeStrategy || null;
+        const runtimeState = this.getRuntimeState();
+        const runtimeConfig = runtimeState?.runtimeConfig || null;
+        if (!runtimeConfig?.arcade?.enabled) return null;
+        const strategy = runtimeState?.entityManager?.gameModeStrategy || null;
         this.arcadeRunRuntime.setStrategy(strategy);
         const existing = this.arcadeRunRuntime.getStateSnapshot?.();
         if (existing && String(existing.phase || '').toLowerCase() !== 'finished') return existing;
         const encounterPlan = buildArcadeSectorPlan({
-            seed: game.runtimeConfig?.arcade?.seed,
-            sectorCount: game.runtimeConfig?.arcade?.sectorCount,
-            difficulty: game.runtimeConfig?.bot?.activeDifficulty || game.runtimeConfig?.bot?.difficulty || 'normal',
+            seed: runtimeConfig?.arcade?.seed,
+            sectorCount: runtimeConfig?.arcade?.sectorCount,
+            difficulty: runtimeConfig?.bot?.activeDifficulty || runtimeConfig?.bot?.difficulty || 'normal',
         });
         return this.arcadeRunRuntime.startRun({
-            entityManager: game.entityManager,
-            roundStateController: game.roundStateController,
-            playerCount: Math.max(1, Number(game.numHumans) || 1),
+            entityManager: runtimeState?.entityManager || null,
+            roundStateController: runtimeState?.roundStateController || null,
+            playerCount: Math.max(1, Number(runtimeState?.numHumans) || 1),
             encounterPlan,
             strategy,
         });
@@ -209,34 +222,33 @@ export class GameRuntimeFacade {
 
     startArcadeRunIfEnabled() { return this._startArcadeRunIfEnabled(); }
 
-    _resetArcadeRunState() {
-        this.arcadeRunRuntime.resetRunState({ preserveRecords: true });
-    }
-    getArcadeRunState() {
-        return this.arcadeRunRuntime.getStateSnapshot();
-    }
+    _resetArcadeRunState() { this.arcadeRunRuntime.resetRunState({ preserveRecords: true }); }
+    getArcadeRunState() { return this.arcadeRunRuntime.getStateSnapshot(); }
 
     setupMenuListeners() {
         const game = this.game;
-        game.menuMultiplayerBridge = createMenuMultiplayerBridge({
-            existingBridge: game.menuMultiplayerBridge,
+        const runtimeState = this.getRuntimeState();
+        const ui = this.getRuntimeHandle('ui');
+        if (!game || !runtimeState || !ui) return;
+        runtimeState.menuMultiplayerBridge = createMenuMultiplayerBridge({
+            existingBridge: runtimeState.menuMultiplayerBridge,
             contractVersion: game?.menuLifecycleContractVersion || MATCH_LIFECYCLE_CONTRACT_VERSION,
             onEvent: (lifecycleEvent) => game._handleMenuLifecycleEvent?.(lifecycleEvent),
             onStatus: null,
             onStateChanged: (sessionState) => this._handleMultiplayerSessionStateChanged(sessionState),
             onMatchStart: (command) => this._handleMultiplayerMatchStart(command),
         });
-        this.menuMultiplayerBridge = game.menuMultiplayerBridge;
+        this.menuMultiplayerBridge = runtimeState.menuMultiplayerBridge;
         this.menuMultiplayerBridge?.syncActorIdentity?.(this._resolveMenuAccessContext()?.actorId);
         this._handleMultiplayerSessionStateChanged(this.menuMultiplayerBridge?.getSessionState?.());
-        game.menuController?.dispose?.();
+        runtimeState.menuController?.dispose?.();
 
-        game.menuController = new MenuController({
-            ui: game.ui,
+        runtimeState.menuController = new MenuController({
+            ui,
             settings: game.settings,
             onEvent: (event) => this.handleMenuControllerEvent(event),
         });
-        game.menuController.setupListeners();
+        runtimeState.menuController.setupListeners();
     }
 
     _captureMultiplayerMatchSettings() {
@@ -245,16 +257,17 @@ export class GameRuntimeFacade {
 
     _syncMultiplayerUiState() {
         const game = this.game;
-        game?.uiManager?.syncStartSetupState?.(game.settings);
-        game?.uiManager?.syncMultiplayerState?.(game.settings);
-        game?.uiManager?.updateContext?.();
+        const uiManager = this.getUiManager();
+        uiManager?.syncStartSetupState?.(game?.settings);
+        uiManager?.syncMultiplayerState?.(game?.settings);
+        uiManager?.updateContext?.();
     }
 
     _handleMultiplayerSessionStateChanged(sessionState = null) {
-        const game = this.game;
-        if (!game?.ui) return;
-        if (sessionState?.joined && game.ui.multiplayerLobbyCodeInput) {
-            game.ui.multiplayerLobbyCodeInput.value = String(sessionState.lobbyCode || '');
+        const ui = this.getRuntimeHandle('ui');
+        if (!ui) return;
+        if (sessionState?.joined && ui.multiplayerLobbyCodeInput) {
+            ui.multiplayerLobbyCodeInput.value = String(sessionState.lobbyCode || '');
         }
         this._syncMultiplayerUiState();
     }
@@ -269,8 +282,8 @@ export class GameRuntimeFacade {
         if (command?.settingsSnapshot) {
             this._applyAuthoritativeMultiplayerMatchSettings(command.settingsSnapshot);
         }
-        game.uiManager?.clearStartValidationError?.();
-        const startResult = this.ports?.matchUiPort?.startMatch?.();
+        this.getUiManager()?.clearStartValidationError?.();
+        const startResult = this.getPorts()?.matchUiPort?.startMatch?.();
         return startResult !== false;
     }
 
@@ -311,12 +324,13 @@ export class GameRuntimeFacade {
 
     _recordMenuTelemetry(eventType, payload = null) {
         const game = this.game;
+        const uiManager = this.getUiManager();
         const telemetrySnapshot = game?.settingsManager?.recordMenuTelemetry?.(game.settings, eventType, payload);
-        if (game?.uiManager && typeof game.uiManager.syncDeveloperState === 'function') {
-            if (typeof game.uiManager.syncByChangeKeys === 'function') {
-                game.uiManager.syncByChangeKeys([SETTINGS_CHANGE_KEYS.MENU_TELEMETRY]);
+        if (uiManager && typeof uiManager.syncDeveloperState === 'function') {
+            if (typeof uiManager.syncByChangeKeys === 'function') {
+                uiManager.syncByChangeKeys([SETTINGS_CHANGE_KEYS.MENU_TELEMETRY]);
             } else {
-                game.uiManager.syncDeveloperState(game.settings);
+                uiManager.syncDeveloperState(game.settings);
             }
         }
         return telemetrySnapshot;
@@ -456,109 +470,32 @@ export class GameRuntimeFacade {
         return this.menuActionHandler.handleDeveloperTrainingStep(event);
     }
 
-    handleDeveloperTrainingAutoStep(event) {
-        return this.menuActionHandler.handleDeveloperTrainingAutoStep(event);
-    }
-
-    handleDeveloperTrainingRunBatch(event) {
-        return this.menuActionHandler.handleDeveloperTrainingRunBatch(event);
-    }
-
-    handleDeveloperTrainingRunEval(event) {
-        return this.menuActionHandler.handleDeveloperTrainingRunEval(event);
-    }
-
-    handleDeveloperTrainingRunGate(event) {
-        return this.menuActionHandler.handleDeveloperTrainingRunGate(event);
-    }
-
-    startKeyCapture(event) {
-        return this.menuActionHandler.startKeyCapture(event);
-    }
-
-    resetKeys() {
-        return this.menuActionHandler.resetKeys();
-    }
-
-    saveKeys() {
-        return this.menuActionHandler.saveKeys();
-    }
-
-    showStatusToast(event) {
-        return this.menuActionHandler.showStatusToast(event);
-    }
-
-    _resolveStartValidationIssue() {
-        return this.settingsHandler.resolveStartValidationIssue();
-    }
-
-    onSettingsChanged(event = null) {
-        return this.settingsHandler.onSettingsChanged(event);
-    }
-
-    markSettingsDirty(isDirty) {
-        return this.settingsHandler.markSettingsDirty(isDirty);
-    }
-
-    updateSaveButtonState() {
-        return this.settingsHandler.updateSaveButtonState();
-    }
-
-    async _initSession() {
-        return this.sessionHandler.initializeSession();
-    }
-
+    handleDeveloperTrainingAutoStep(event) { return this.menuActionHandler.handleDeveloperTrainingAutoStep(event); }
+    handleDeveloperTrainingRunBatch(event) { return this.menuActionHandler.handleDeveloperTrainingRunBatch(event); }
+    handleDeveloperTrainingRunEval(event) { return this.menuActionHandler.handleDeveloperTrainingRunEval(event); }
+    handleDeveloperTrainingRunGate(event) { return this.menuActionHandler.handleDeveloperTrainingRunGate(event); }
+    startKeyCapture(event) { return this.menuActionHandler.startKeyCapture(event); }
+    resetKeys() { return this.menuActionHandler.resetKeys(); }
+    saveKeys() { return this.menuActionHandler.saveKeys(); }
+    showStatusToast(event) { return this.menuActionHandler.showStatusToast(event); }
+    _resolveStartValidationIssue() { return this.settingsHandler.resolveStartValidationIssue(); }
+    onSettingsChanged(event = null) { return this.settingsHandler.onSettingsChanged(event); }
+    markSettingsDirty(isDirty) { return this.settingsHandler.markSettingsDirty(isDirty); }
+    updateSaveButtonState() { return this.settingsHandler.updateSaveButtonState(); }
+    async _initSession() { return this.sessionHandler.initializeSession(); }
     initializeSession() { return this._initSession(); }
-
-    _startStateBroadcast() {
-        startRuntimeStateBroadcast(this);
-    }
-
-    _stopStateBroadcast() {
-        stopRuntimeStateBroadcast(this);
-    }
-
-    _setupClientStateReceiver() {
-        setupRuntimeClientStateReceiver(this);
-    }
-
-    async _waitForAllPlayersLoaded() {
-        return this.sessionHandler.waitForAllPlayersLoaded();
-    }
-
+    _startStateBroadcast() { startRuntimeStateBroadcast(this); }
+    _stopStateBroadcast() { stopRuntimeStateBroadcast(this); }
+    _setupClientStateReceiver() { setupRuntimeClientStateReceiver(this); }
+    async _waitForAllPlayersLoaded() { return this.sessionHandler.waitForAllPlayersLoaded(); }
     waitForAllPlayersLoaded() { return this._waitForAllPlayersLoaded(); }
-
-    _teardownSession() {
-        return this.sessionHandler.teardownRuntimeSession();
-    }
-
+    _teardownSession() { return this.sessionHandler.teardownRuntimeSession(); }
     teardownRuntimeSession() { this._teardownSession(); }
-
-    isNetworkSession() {
-        return this.sessionHandler.isNetworkSession();
-    }
-
-    isHost() {
-        return this.sessionHandler.isHost();
-    }
-
-    startMatch() {
-        return this.sessionHandler.startMatch();
-    }
-
-    restartRound() {
-        return this.sessionHandler.restartRound();
-    }
-
-    returnToMenu(options = {}) {
-        return this.sessionHandler.returnToMenu(options);
-    }
-
-    syncP2HudVisibility() {
-        return this.sessionHandler.syncP2HudVisibility();
-    }
-
-    dispose() {
-        return this.sessionHandler.dispose();
-    }
+    isNetworkSession() { return this.sessionHandler.isNetworkSession(); }
+    isHost() { return this.sessionHandler.isHost(); }
+    startMatch() { return this.sessionHandler.startMatch(); }
+    restartRound() { return this.sessionHandler.restartRound(); }
+    returnToMenu(options = {}) { return this.sessionHandler.returnToMenu(options); }
+    syncP2HudVisibility() { return this.sessionHandler.syncP2HudVisibility(); }
+    dispose() { return this.sessionHandler.dispose(); }
 }

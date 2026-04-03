@@ -21,6 +21,8 @@ import {
     attachGameRuntimeBundle,
     createGameRuntimeBundle,
     createInitialGameRuntimeState,
+    getSessionRuntimeState,
+    setSessionRuntimeHandle,
 } from './runtime/GameRuntimeBundle.js';
 import {
     CrosshairSystem,
@@ -128,70 +130,69 @@ export function bootstrapGameRuntime(game, options = {}) {
         },
     });
     attachGameRuntimeBundle(game, runtimeBundle);
+    const runtimeState = getSessionRuntimeState(runtimeBundle) || runtimeBundle.state;
+    const registerRuntimeHandle = (key, value) => setSessionRuntimeHandle(runtimeBundle, key, value);
 
     const runtimePorts = createRuntimePorts(game);
     runtimeBundle.ports = runtimePorts;
-    runtimeBundle.components.runtimePorts = runtimePorts;
-
-    runtimeBundle.components.hudP1 = new HUD('p1-fighter-hud', 0, { configSource: game });
-    runtimeBundle.components.hudP2 = new HUD('p2-fighter-hud', 1, { configSource: game });
-    runtimeBundle.components.matchSessionOrchestrator = new MatchLifecycleSessionOrchestrator(
-        createMatchSessionPort(game)
-    );
-    runtimeBundle.components.huntHud = new HuntHUD({
+    registerRuntimeHandle('hudP1', new HUD('p1-fighter-hud', 0, { configSource: game }));
+    registerRuntimeHandle('hudP2', new HUD('p2-fighter-hud', 1, { configSource: game }));
+    const matchSessionOrchestrator = new MatchLifecycleSessionOrchestrator(createMatchSessionPort(game));
+    registerRuntimeHandle('matchSessionOrchestrator', matchSessionOrchestrator);
+    registerRuntimeHandle('huntHud', new HuntHUD({
         runtime: game,
         refs: createHuntHudDomRefs(document),
         isHuntActive: (runtime) => runtime.activeGameMode === GAME_MODE_TYPES.HUNT && runtime.state !== 'MENU',
         getBoostCapacity: () => Number(game.config?.PLAYER?.BOOST_DURATION) || 1,
-    });
-    runtimeBundle.components.screenShake = new ScreenShake(renderer);
-    runtimeBundle.components.hudRuntimeSystem = new HudRuntimeSystem({ game, ports: runtimePorts });
-    runtimeBundle.components.crosshairSystem = new CrosshairSystem({ game, ports: runtimePorts });
-    runtimeBundle.components.matchFlowUiController = new MatchFlowUiController({
+    }));
+    registerRuntimeHandle('screenShake', new ScreenShake(renderer));
+    registerRuntimeHandle('hudRuntimeSystem', new HudRuntimeSystem({ game, ports: runtimePorts }));
+    registerRuntimeHandle('crosshairSystem', new CrosshairSystem({ game, ports: runtimePorts }));
+    registerRuntimeHandle('matchFlowUiController', new MatchFlowUiController({
         game,
         ports: runtimePorts,
-        sessionOrchestrator: runtimeBundle.components.matchSessionOrchestrator,
-    });
-    runtimeBundle.components.runtimeDiagnosticsSystem = new RuntimeDiagnosticsSystem(game);
-    runtimeBundle.components.keybindEditorController = new KeybindEditorController(game);
-    runtimeBundle.components.planarAimAssistSystem = new PlanarAimAssistSystem(game);
-    runtimeBundle.components.matchSessionRuntimeBridge = new MatchSessionRuntimeBridge({
+        sessionOrchestrator: matchSessionOrchestrator,
+    }));
+    registerRuntimeHandle('runtimeDiagnosticsSystem', new RuntimeDiagnosticsSystem(game));
+    registerRuntimeHandle('keybindEditorController', new KeybindEditorController(game));
+    registerRuntimeHandle('planarAimAssistSystem', new PlanarAimAssistSystem(game));
+    registerRuntimeHandle('matchSessionRuntimeBridge', new MatchSessionRuntimeBridge({
         game,
         ports: runtimePorts,
         runtimeBundle,
-    });
+    }));
 
-    runtimeBundle.components.gameLoop = new GameLoop(
+    registerRuntimeHandle('gameLoop', new GameLoop(
         (dt) => game.update(dt),
         (renderAlpha, renderDelta) => game.render(renderAlpha, renderDelta),
         {
             runtimePerfProfiler: game.runtimePerfProfiler,
         }
-    );
+    ));
 
     runtimePorts.matchUiPort?.setupPauseOverlayListeners?.();
-    runtimeBundle.state._navButtons = [];
-    runtimeBundle.state._menuButtonByPanel = new Map();
-    runtimeBundle.state._activeSubmenu = null;
-    runtimeBundle.state._lastMenuTrigger = null;
-    runtimeBundle.state._buildInfoClipboardText = '';
+    runtimeState._navButtons = [];
+    runtimeState._menuButtonByPanel = new Map();
+    runtimeState._activeSubmenu = null;
+    runtimeState._lastMenuTrigger = null;
+    runtimeState._buildInfoClipboardText = '';
 
     const showStatusToast = typeof options.showStatusToast === 'function'
         ? options.showStatusToast
         : (message, durationMs, tone) => game?._showStatusToast?.(message, durationMs, tone);
 
-    runtimeBundle.components.buildInfoController = new BuildInfoController({
+    registerRuntimeHandle('buildInfoController', new BuildInfoController({
         ui,
         showStatusToast,
         appVersion: options.appVersion,
         buildId: options.buildId,
         buildTime: options.buildTime,
-    });
-    runtimeBundle.components.menuExpertLoginRuntime = new MenuExpertLoginRuntime({
+    }));
+    registerRuntimeHandle('menuExpertLoginRuntime', new MenuExpertLoginRuntime({
         settings: game.settings,
         ui,
         showStatusToast,
-    });
+    }));
 
     // F9 cinematic recording is handled exclusively via main.js _toggleRecordingFromGlobalHotkey()
     // to avoid double-trigger with InputManager's justPressed cache.

@@ -357,8 +357,34 @@ export function getSessionRuntime(source) {
     return source.runtimeBundle?.sessionRuntime || null;
 }
 
-export function getGameRuntimeState(bundle) {
-    return bundle?.state || null;
+export function getSessionRuntimeState(source) {
+    const sessionRuntime = getSessionRuntime(source);
+    return sessionRuntime?.state || null;
+}
+
+export function getSessionRuntimeHandles(source) {
+    const sessionRuntime = getSessionRuntime(source);
+    return sessionRuntime?.handles || null;
+}
+
+export function getSessionRuntimeHandle(source, key) {
+    if (!key) return null;
+    const runtimeHandles = getSessionRuntimeHandles(source);
+    return runtimeHandles?.[key] || null;
+}
+
+export function setSessionRuntimeHandle(source, key, value) {
+    if (!key) return null;
+    const runtimeHandles = getSessionRuntimeHandles(source);
+    if (!runtimeHandles || typeof runtimeHandles !== 'object') {
+        return null;
+    }
+    runtimeHandles[key] = value ?? null;
+    return runtimeHandles[key];
+}
+
+export function getGameRuntimeState(source) {
+    return getSessionRuntimeState(source) || source?.state || null;
 }
 
 export function applyRuntimeSettingsState(bundle, {

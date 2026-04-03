@@ -63,7 +63,7 @@ export class Game {
         this._disposed = false;
         this._playtestStartTimeoutId = null;
         this.runtimeCoordinator = new GameRuntimeCoordinator({ game: this });
-        this._boundKeyCaptureHandler = (event) => this.keybindEditorController.handleKeyCapture(event);
+        this._boundKeyCaptureHandler = (event) => this.runtimeCoordinator?.getRuntimeHandle?.('keybindEditorController')?.handleKeyCapture?.(event);
 
         this.runtimeCoordinator.initialize({
             appVersion: APP_VERSION,
@@ -82,8 +82,8 @@ export class Game {
         this.profileUiController = new ProfileUiController({
             profileManager: this.profileManager,
             settingsManager: this.settingsManager,
-            getUi: () => this.ui,
-            getUiManager: () => this.uiManager,
+            getUi: () => this.runtimeCoordinator?.getRuntimeHandle?.('ui') || this.ui,
+            getUiManager: () => this.runtimeCoordinator?.getUiManager?.() || this.uiManager,
             getSettings: () => this.settings,
             setSettings: (s) => { this.settings = s; },
             showStatusToast: (msg, ms, tone) => this._showStatusToast(msg, ms, tone),
@@ -142,9 +142,7 @@ export class Game {
     }
 
     _showMainNav() {
-        if (this.uiManager) {
-            this.uiManager.showMainNav();
-        }
+        this.runtimeCoordinator?.getUiManager?.()?.showMainNav?.();
     }
 
     _renderBuildInfo() {
@@ -227,8 +225,9 @@ export class Game {
     }
 
     _showStatusToast(message, durationMs = 1200, tone = 'info') {
-        if (!this.uiManager || typeof this.uiManager.showToast !== 'function') return;
-        this.uiManager.showToast(message, durationMs, tone);
+        const uiManager = this.runtimeCoordinator?.getUiManager?.();
+        if (!uiManager || typeof uiManager.showToast !== 'function') return;
+        uiManager.showToast(message, durationMs, tone);
     }
 
     _toggleCinematicCameraFromGlobalHotkey() {
@@ -519,7 +518,8 @@ export class Game {
         this.runtimeCoordinator?.disposeRuntime?.();
 
         if (window.GAME_INSTANCE === this) window.GAME_INSTANCE = null;
-        if (window.GAME_RUNTIME === this.runtimeFacade) window.GAME_RUNTIME = null;
+        const runtimeFacade = this.runtimeCoordinator?.getRuntimeFacade?.();
+        if (window.GAME_RUNTIME === runtimeFacade) window.GAME_RUNTIME = null;
         if (window.GAME_DEBUG === this.debugApi) window.GAME_DEBUG = null;
     }
 

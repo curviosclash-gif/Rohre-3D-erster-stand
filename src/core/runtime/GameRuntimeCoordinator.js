@@ -1,7 +1,12 @@
 import { UIManager } from '../../composition/core-ui/CoreUiAppPorts.js';
 import { bootstrapGameRuntime } from '../GameBootstrap.js';
 import { GameRuntimeFacade } from '../GameRuntimeFacade.js';
-import { clearGameRuntimeState } from './GameRuntimeBundle.js';
+import {
+    clearGameRuntimeState,
+    getSessionRuntimeHandle,
+    getSessionRuntimeState,
+    setSessionRuntimeHandle,
+} from './GameRuntimeBundle.js';
 
 export class GameRuntimeCoordinator {
     constructor({ game } = {}) {
@@ -29,53 +34,57 @@ export class GameRuntimeCoordinator {
             showStatusToast,
         });
         this.runtimeBundle = runtimeBundle || null;
-        if (runtimeBundle?.components) {
-            runtimeBundle.components.runtimeCoordinator = this;
-        }
+        setSessionRuntimeHandle(runtimeBundle, 'runtimeCoordinator', this);
 
         const runtimeFacade = new GameRuntimeFacade({
             game,
-            ports: this.getPorts(),
             runtimeBundle,
         });
         this.runtimeFacade = runtimeFacade;
-        if (game) {
-            game.runtimeFacade = runtimeFacade;
-        }
-        if (runtimeBundle?.components) {
-            runtimeBundle.components.runtimeFacade = runtimeFacade;
-        }
+        setSessionRuntimeHandle(runtimeBundle, 'runtimeFacade', runtimeFacade);
 
         const uiManager = new UIManager({
             game,
             ports: this.getPorts(),
         });
         this.uiManager = uiManager;
-        if (game) {
-            game.uiManager = uiManager;
-        }
+        setSessionRuntimeHandle(runtimeBundle, 'uiManager', uiManager);
         uiManager.init();
-        game?.keybindEditorController?.renderEditor?.();
+        this.getRuntimeHandle('keybindEditorController')?.renderEditor?.();
 
         runtimeFacade.applySettingsToRuntime();
-        game?.input?.setBindings?.(initialBindings);
+        this.getRuntimeHandle('input')?.setBindings?.(initialBindings);
 
         return runtimeBundle;
     }
 
+    getRuntimeState() {
+        return getSessionRuntimeState(this.runtimeBundle || this.runtime);
+    }
+
+    getRuntimeHandle(key) {
+        return getSessionRuntimeHandle(this.runtimeBundle || this.runtime, key);
+    }
+
     getPorts() {
-        return this.runtimeBundle?.ports || this.runtime?.runtimePorts || null;
+        return this.getRuntimeHandle('runtimePorts')
+            || this.runtimeBundle?.ports
+            || this.runtime?.runtimePorts
+            || null;
     }
 
     getRuntimeFacade() {
         return this.runtimeFacade
-            || this.runtimeBundle?.components?.runtimeFacade
+            || this.getRuntimeHandle('runtimeFacade')
             || this.runtime?.runtimeFacade
             || null;
     }
 
     getUiManager() {
-        return this.uiManager || this.runtime?.uiManager || null;
+        return this.uiManager
+            || this.getRuntimeHandle('uiManager')
+            || this.runtime?.uiManager
+            || null;
     }
 
     applySettingsToRuntime(options = undefined) {
@@ -127,33 +136,38 @@ export class GameRuntimeCoordinator {
     }
 
     renderBuildInfo() {
-        const rendered = this.runtime?.buildInfoController?.renderBuildInfo?.();
-        this.runtime._buildInfoClipboardText = typeof rendered === 'string' ? rendered : '';
-        return this.runtime._buildInfoClipboardText;
+        const rendered = this.getRuntimeHandle('buildInfoController')?.renderBuildInfo?.();
+        const clipboardText = typeof rendered === 'string' ? rendered : '';
+        const runtimeState = this.getRuntimeState();
+        if (runtimeState) {
+            runtimeState._buildInfoClipboardText = clipboardText;
+        }
+        return clipboardText;
     }
 
     finishStartup() {
         this.renderBuildInfo();
-        if (this.runtime?.ui?.mainMenu) {
-            this.runtime.ui.mainMenu.dataset.shellReady = 'true';
-            this.runtime.ui.mainMenu.style.visibility = '';
+        const ui = this.getRuntimeHandle('ui');
+        if (ui?.mainMenu) {
+            ui.mainMenu.dataset.shellReady = 'true';
+            ui.mainMenu.style.visibility = '';
         }
-        this.runtimeBundle?.components?.gameLoop?.start?.();
+        this.getRuntimeHandle('gameLoop')?.start?.();
     }
 
     disposeRuntime() {
         const game = this.runtime;
-        game?.gameLoop?.stop?.();
-        game?.matchFlowUiController?.dispose?.();
+        this.getRuntimeHandle('gameLoop')?.stop?.();
+        this.getRuntimeHandle('matchFlowUiController')?.dispose?.();
         this.getRuntimeFacade()?.dispose?.();
-        game?.huntHud?.dispose?.();
-        game?.hudRuntimeSystem?.dispose?.();
+        this.getRuntimeHandle('huntHud')?.dispose?.();
+        this.getRuntimeHandle('hudRuntimeSystem')?.dispose?.();
         this.getUiManager()?.dispose?.();
-        game?.runtimeDiagnosticsSystem?.dispose?.();
-        game?.mediaRecorderSystem?.dispose?.();
-        game?.input?.dispose?.();
-        game?.audio?.dispose?.();
-        game?.renderer?.dispose?.();
+        this.getRuntimeHandle('runtimeDiagnosticsSystem')?.dispose?.();
+        this.getRuntimeHandle('mediaRecorderSystem')?.dispose?.();
+        this.getRuntimeHandle('input')?.dispose?.();
+        this.getRuntimeHandle('audio')?.dispose?.();
+        this.getRuntimeHandle('renderer')?.dispose?.();
         clearGameRuntimeState(this.runtimeBundle || game?.runtimeBundle);
     }
 }
