@@ -141,8 +141,9 @@ export class SessionRuntimeCommandExecutor {
     _executeStartMatch(options = undefined) {
         const facade = this._facade;
         const game = facade?.game;
-        if (!game || game.state !== GAME_STATE_IDS.MENU) return false;
+        if (!game) return false;
         if (options?.settingsSnapshot) {
+            if (game.state !== GAME_STATE_IDS.MENU) return false;
             facade?._applyAuthoritativeMultiplayerMatchSettings?.(options.settingsSnapshot);
             facade?.getUiManager?.()?.clearStartValidationError?.();
             const startResult = facade?.getPorts?.()?.matchUiPort?.applyStartMatchProjection?.();

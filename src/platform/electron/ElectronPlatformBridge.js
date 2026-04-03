@@ -72,7 +72,7 @@ function createElectronCapabilityDescriptor(capabilityId, descriptor, fallback =
         ...fallback,
         ...source,
         contractVersion: normalizeString(source.contractVersion, normalizeString(fallback.contractVersion, '')),
-        providerKind: normalizeString(fallback.providerKind, normalizeString(source.providerKind, 'unavailable')),
+        providerKind: normalizeString(source.providerKind, normalizeString(fallback.providerKind, 'unavailable')),
         degradedReason: normalizeString(source.degradedReason, normalizeString(fallback.degradedReason, '')),
     }));
 }
