@@ -88,7 +88,7 @@ Stand: 2026-04-04
 - Rundenende: `ROUND_END`
 - Matchende: `MATCH_END`
 
-## 4. Runtime-Vertraege (V74/V83)
+## 4. Runtime-Vertraege (V74/V83/V84)
 
 ### 4.1 Zielgrenzen fuer V83
 
@@ -219,6 +219,35 @@ Stand: 2026-04-04
 | `MenuMultiplayerBridge-/LanMenuMultiplayerBridge-Uebergang` (`src/core/runtime/MenuRuntimeMultiplayerService.js`, `src/ui/menu/MenuMultiplayerBridge.js`, `src/composition/core-ui/LanMenuMultiplayerBridge.js`, `src/core/GameRuntimeFacade.js`) | `GameRuntimeFacade.setupMenuListeners()` haelt `game.menuMultiplayerBridge`; `MenuRuntimeMultiplayerService` schaltet zwischen browsernaher Storage-Bridge und Desktop-LAN-Bridge um. Das ist aktuell ein Menue-/Transport-Uebergangsadapter statt eines klaren Lobby-Services. | Application-besessener `LobbyService` hinter `host_lobby`/`join_lobby` und `lobby_session_snapshot`; die Storage-Bridge bleibt nur noch als explizit degradierter Browser-Demo-Adapter hinter demselben Vertrag, und Produkt-/Provider-/Lobby-Defaults lesen denselben Registry-Vertrag. | Sobald kein produktiver Code mehr `game.menuMultiplayerBridge` liest/schreibt, UI keinen Bridge-Typ direkt instanziiert und die Transportwahl ausschliesslich ueber Capability-Registry + Lobby-Service erfolgt. |
 | `curviosApp-/__CURVIOS_APP__-Preload-Aliasse` (`electron/preload.cjs`, `src/ui/menu/MenuRuntimeFeatureFlags.js`, `src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js`, `src/ui/menu/multiplayer/MenuMultiplayerHostIpResolver.js`, `src/composition/core-ui/LanMenuMultiplayerBridge.js`, `src/core/recording/DownloadService.js`, `src/core/replay/ReplayRecorder.js`) | `electron/preload.cjs` exponiert benannte Contracts, aber auch Legacy-Aliasfunktionen und das globale App-Flag; Renderer- und Runtime-Module lesen diese Globals direkt fuer Discovery, Host, Save, Replay und Feature-Gating. | `PlatformCapabilityContract` + dedizierte Adapter unter `src/platform/**`; Renderer bekommt nur Capability-Descriptoren, Invoke-Funktionen und Fallback-Status ueber Application-/Platform-Layer. | Sobald `curviosApp`/`__CURVIOS_APP__` ausserhalb der dedizierten Plattformadapter nicht mehr referenziert werden und Browser-/Desktop-Unterschiede nur noch ueber Capability-Snapshots sichtbar sind. |
 | `ActiveRuntimeConfigStore-Adapter` (`src/core/runtime/GameRuntimeBundle.js`, `src/core/Config.js`, `src/core/settings/SettingsSanitizerOps.js`) | `runtimeBundle.metadata.runtimeConfigAdapter` markiert `ActiveRuntimeConfigStore` bereits als Transition-Adapter; einzelne Config-/Settings-Pfade lesen weiterhin den globalen aktiven Runtime-Config-Slot. | `SessionRuntime` wird alleiniger Besitzer des Runtime-Config-Snapshots; Config-/Settings-Consumer erhalten explizite Runtime-/Settings-Projektionen per Injection oder Snapshot. | Sobald `getActiveRuntimeConfig` ausserhalb explizit markierter Uebergangsadapter nicht mehr verwendet wird und `runtimeBundle.metadata.runtimeConfigAdapter` entfernt werden kann. |
+
+### 4.6 Zielgrenzen fuer V84
+
+| Schicht | Besitz / Verantwortung | Direkte Partner | Kein direkter Zugriff |
+| --- | --- | --- | --- |
+| `SessionRuntime` (aussere Runtime-/Lifecycle-Schicht aus V83) | besitzt Session-Lifecycle, Match-Bootstrap, Adapterkomposition, Match-/UI-/Capability-Projektionen und ist der einzige Einstiegspunkt fuer interaktive sowie headless Kernel-Laeufe | Application-Commands, `MatchKernel`, Plattformadapter, read-only Projektionen fuer UI und Renderer | Three-/Canvas-/DOM-Details, Renderer-Scenegraph als Source of Truth, fachliche Matchregeln im UI oder in Plattformadaptern verstecken |
+| `MatchKernel` (Zielschicht ab V84) | kapselt deterministischen Tick-, Round-, Match- und GameMode-Ablauf; besitzt Match-State, Regelanwendung, Spawn-/Score-/Cleanup-Entscheidungen und emittiert nur headless-faehige Snapshots/Domain-Events | `SessionRuntime`, GameMode-API, Clock-/Input-/Seed-/Snapshot-Ports | DOM, `window`, `document`, Three.js, Electron-/Storage-/LAN-Capabilities, direkte HUD-/Menue-Controller |
+| Renderer (`src/core/Renderer.js` plus Subsysteme) | setzt freigegebene Projektionen in Szene, Kameras, Effekte und Capture-Pipelines um; besitzt nur visuelle Ressourcen und Render-Timing | read-only Runtime-/Kernel-Projektionen, dedizierte Renderadapter, Session-Bootstrap waehrend der Migration | Matchregeln, Score-/Round-Entscheidungen, Session-Lifecycle-Besitz, Plattform-Invokes |
+| UI (`src/ui/**`) | erfasst Spieler- und Menue-Intents, zeigt Match-/Session-/Capability-Projektionen an und haelt Overlay-/Menuezustand | Application-/SessionRuntime-Commands, read-only Snapshots/Events, benannte UI-Ports | direkte Mutation von Entity-/Arena-/Kernel-State, Renderer-/Platform-Interna, Match-Start-/Finalize-Logik als eigener Besitzer |
+| Plattformadapter (`src/platform/**`, `electron/preload.cjs`, Browser-Fallbacks) | kapseln Save-, Discovery-, Host-, Recording- und Shell-Capabilities samt Availability, Invoke und Degradation | Application-Layer, `SessionRuntime`, Shared Contracts | Matchregeln, Tickablauf, Renderer-Scenegraph, UI-State als Source of Truth |
+
+- Flussregel:
+  - UI- und Shell-Intents laufen nur nach innen: `UI/Plattform -> SessionRuntime -> MatchKernel`.
+  - Match-/Simulationsdaten laufen nur nach aussen: `MatchKernel -> SessionRuntime/Application -> UI/Renderer`.
+  - Headless-Laeufe ersetzen Renderer/UI/Plattformadapter, booten aber denselben `MatchKernel` und dieselbe GameMode-API.
+
+### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
+
+| Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
+| --- | --- | --- |
+| `src/state/MatchSessionFactory.js` | erstellt Arena, `EntityManager`, `PowerupManager`, `ParticleSystem` und kombiniert Session-Aufbau noch direkt mit `renderer`-, Audio- und Recorder-Abhaengigkeiten | Session-Aufbau in einen headless-faehigen `MatchKernel` plus interaktive Adapter aufteilen; Renderer-/Audio-/Recorder-Wiring darf nur ausserhalb des Kernels passieren |
+| `src/core/MatchSessionRuntimeBridge.js` | schreibt initialisierte Match-Referenzen direkt in `game`/`runtimeBundle` und koppelt Lifecycle-Ref-Management an die interaktive Runtime-Surface | als schmaler Uebergangsadapter nur noch Kernel-Handle und Projektionen an `SessionRuntime` binden; keine breite Match-Session-Ownership im `game` |
+| `src/core/PlayingStateSystem.js` | mischt Pause-Intent, Simulations-Tick, Arena-/Powerup-/Particle-Update, HUD-Sync und Snapshot-Capture ueber das breite `game`-Objekt | auf einen Runtime-Adapter reduzieren, der Input/Zeit in den `MatchKernel` leitet und danach nur Projektionen an HUD/Renderer weiterreicht |
+| `src/entities/EntityManager.js` | traegt heute Renderer-, Audio-, Recorder- und GameMode-Strategie-Bezug in derselben Runtime-Instanz | GameMode-/Tick-/Round-Logik hinter den Kernel- und GameMode-Vertrag ziehen; Render-, Audio- und Recording-Effekte nur ueber explizite Adapter einspeisen |
+| `src/core/Renderer.js` | bleibt bewusst Window-/Canvas-/Three-spezifisch und darf deshalb kein Kernel-Besitzer werden | ausschliesslich visuelle Projektion und Capture; Match-/Mode-/Session-Entscheidungen bleiben ausserhalb |
+
+- Migrationsleitplanke fuer V84:
+  - Neue Features duerfen keine zusaetzlichen Direktzugriffe von UI, Renderer oder Plattformadaptern auf `EntityManager`, `Arena`, `PowerupManager` oder `game.state` einfuehren.
+  - `SessionRuntime` bleibt Besitzer der interaktiven Runtime-Komposition; `MatchKernel` wird nicht zum neuen Service-Locator fuer Renderer-, UI- oder Plattformobjekte.
 
 ## 5. Entwicklungsregeln
 
