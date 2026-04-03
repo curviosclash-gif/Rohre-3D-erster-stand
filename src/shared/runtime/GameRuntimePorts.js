@@ -1,6 +1,7 @@
 import { GAME_STATE_IDS } from '../contracts/GameStateIds.js';
 import {
     createMatchFlowSnapshot,
+    createRuntimeObservabilitySnapshot,
     createSessionRuntimeSnapshot,
 } from '../contracts/SessionRuntimeSnapshotContract.js';
 
@@ -74,6 +75,33 @@ function buildMatchFlowProjection(game) {
         lifecycleState: sessionSnapshot.lifecycleState,
         finalizeState: sessionSnapshot.finalizeState,
         updatedAt: sessionSnapshot.updatedAt,
+    });
+}
+
+function buildRuntimeObservabilityProjection(game) {
+    const sessionRuntime = getSessionRuntime(game);
+    const lifecycle = sessionRuntime?.lifecycle || {};
+    const finalize = sessionRuntime?.finalize || {};
+    const observability = sessionRuntime?.observability || {};
+    const recentEvents = Array.isArray(observability.events)
+        ? observability.events.slice(-40)
+        : [];
+    const updatedAt = Math.max(
+        Number(lifecycle.updatedAt) || 0,
+        Number(finalize.updatedAt) || 0,
+        Number(observability.updatedAt) || 0
+    );
+    return createRuntimeObservabilitySnapshot({
+        sessionId: sessionRuntime?.session?.activeSessionId || null,
+        lifecycleState: lifecycle.status || 'unknown',
+        finalizeState: finalize.status || 'idle',
+        pendingSessionInit: !!lifecycle.pendingSessionInit,
+        pendingFinalize: !!finalize.pendingOperation,
+        lastSequence: Number(observability.sequence) || 0,
+        lastEventType: observability.lastEventType || '',
+        eventCount: Array.isArray(observability.events) ? observability.events.length : 0,
+        updatedAt,
+        recentEvents,
     });
 }
 
@@ -254,6 +282,9 @@ export function createRuntimeProjectionPort(game) {
         },
         getMatchFlowSnapshot() {
             return buildMatchFlowProjection(game);
+        },
+        getRuntimeObservabilitySnapshot() {
+            return buildRuntimeObservabilityProjection(game);
         },
     };
 }

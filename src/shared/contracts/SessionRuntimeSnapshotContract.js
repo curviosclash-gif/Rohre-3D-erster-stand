@@ -1,5 +1,8 @@
+import { normalizeSessionRuntimeEvent } from './SessionRuntimeEventContract.js';
+
 export const SESSION_RUNTIME_SNAPSHOT_CONTRACT_VERSION = 'session-runtime-snapshot.v1';
 export const MATCH_FLOW_SNAPSHOT_CONTRACT_VERSION = 'match-flow-snapshot.v1';
+export const RUNTIME_OBSERVABILITY_SNAPSHOT_CONTRACT_VERSION = 'runtime-observability-snapshot.v1';
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -14,6 +17,11 @@ function normalizeNullableString(value) {
 function normalizeTimestamp(value) {
     const timestamp = Number(value);
     return Number.isFinite(timestamp) ? Math.max(0, Math.floor(timestamp)) : 0;
+}
+
+function normalizeNonNegativeInt(value) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? Math.max(0, Math.floor(parsed)) : 0;
 }
 
 export function createSessionRuntimeSnapshot(payload = {}) {
@@ -50,5 +58,27 @@ export function createMatchFlowSnapshot(payload = {}) {
         lifecycleState: normalizeString(source.lifecycleState, 'unknown'),
         finalizeState: normalizeString(source.finalizeState, 'idle'),
         updatedAt: normalizeTimestamp(source.updatedAt),
+    };
+}
+
+export function createRuntimeObservabilitySnapshot(payload = {}) {
+    const source = /** @type {any} */ (payload && typeof payload === 'object' ? payload : {});
+    const recentEvents = Array.isArray(source.recentEvents)
+        ? source.recentEvents
+            .map((event) => normalizeSessionRuntimeEvent(event))
+            .filter(Boolean)
+        : [];
+    return {
+        contractVersion: RUNTIME_OBSERVABILITY_SNAPSHOT_CONTRACT_VERSION,
+        sessionId: normalizeNullableString(source.sessionId),
+        lifecycleState: normalizeString(source.lifecycleState, 'unknown'),
+        finalizeState: normalizeString(source.finalizeState, 'idle'),
+        pendingSessionInit: source.pendingSessionInit === true,
+        pendingFinalize: source.pendingFinalize === true,
+        lastSequence: normalizeNonNegativeInt(source.lastSequence),
+        lastEventType: normalizeString(source.lastEventType, ''),
+        eventCount: normalizeNonNegativeInt(source.eventCount || recentEvents.length),
+        updatedAt: normalizeTimestamp(source.updatedAt),
+        recentEvents,
     };
 }

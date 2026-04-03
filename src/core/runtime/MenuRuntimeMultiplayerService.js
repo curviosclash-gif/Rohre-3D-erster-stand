@@ -4,14 +4,21 @@
 
 import { LanMenuMultiplayerBridge, MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
+import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
 import {
     MULTIPLAYER_TRANSPORTS,
     RUNTIME_SESSION_TYPES,
 } from '../../shared/contracts/RuntimeSessionContract.js';
+import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
 import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
 
 function deepClone(value) {
     return tryCloneJsonValue(value, null);
+}
+
+function normalizeString(value, fallback = '') {
+    const normalized = typeof value === 'string' ? value.trim() : '';
+    return normalized || fallback;
 }
 
 function shouldUseDesktopLanBridge(runtime = null) {
@@ -37,6 +44,23 @@ function ensureMultiplayerSessionType(game) {
     game.settings.localSettings.multiplayerTransport = shouldUseDesktopLanBridge()
         ? MULTIPLAYER_TRANSPORTS.LAN
         : MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
+}
+
+function observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, action, lobbyCode = '') {
+    if (!runtimeSource || menuMultiplayerBridge?.bridgeKind === 'lan') {
+        return;
+    }
+    recordSessionRuntimeEvent(runtimeSource, {
+        type: SESSION_RUNTIME_EVENT_TYPES.CAPABILITY_FALLBACK_USED,
+        source: 'menu_runtime_multiplayer_service',
+        payload: {
+            capabilityId: action === 'host' ? 'host' : 'discovery',
+            providerKind: 'menu-storage-bridge',
+            reason: 'desktop_capability_unavailable',
+            action: normalizeString(action, 'unknown'),
+            lobbyCode: normalizeString(lobbyCode, ''),
+        },
+    });
 }
 
 export function createMenuMultiplayerBridge(options = {}) {
@@ -227,9 +251,11 @@ export async function handleMultiplayerHostAction({
     menuMultiplayerBridge,
     syncUiState,
     captureSettingsSnapshot,
+    runtimeSource,
 }) {
     if (!game) return null;
     const accessContext = resolveMenuAccessContext?.();
+    observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, 'host', event?.lobbyCode);
     let result = null;
     try {
         result = await Promise.resolve(menuMultiplayerBridge?.host({
@@ -262,9 +288,11 @@ export async function handleMultiplayerJoinAction({
     resolveMenuAccessContext,
     menuMultiplayerBridge,
     syncUiState,
+    runtimeSource,
 }) {
     if (!game) return null;
     const accessContext = resolveMenuAccessContext?.();
+    observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, 'join', event?.lobbyCode);
     let result = null;
     try {
         result = await Promise.resolve(menuMultiplayerBridge?.join({

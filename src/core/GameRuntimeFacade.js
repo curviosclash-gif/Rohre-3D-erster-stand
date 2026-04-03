@@ -33,6 +33,7 @@ import {
     createMenuMultiplayerBridge,
 } from './runtime/MenuRuntimeMultiplayerService.js';
 import { ProfileLifecycleController } from './runtime/ProfileLifecycleController.js';
+import { observeLobbySessionStateChange } from './runtime/RuntimeLobbySessionObservability.js';
 import { syncRuntimeMultiplayerContext } from './runtime/RuntimeMultiplayerFlowService.js';
 import {
     setupRuntimeClientStateReceiver,
@@ -72,6 +73,7 @@ export class GameRuntimeFacade {
         this._pendingStateUpdates = [];
         this._pendingMatchFinalize = null;
         this._pendingMatchFinalizePlan = null;
+        this._lastObservedMultiplayerSessionState = null;
 
         this._baseRoundStateController = this.getRuntimeState()?.roundStateController
             || this.game?.roundStateController
@@ -273,11 +275,15 @@ export class GameRuntimeFacade {
 
     _handleMultiplayerSessionStateChanged(sessionState = null) {
         const ui = this.getRuntimeHandle('ui');
-        if (!ui) return;
-        if (sessionState?.joined && ui.multiplayerLobbyCodeInput) {
+        if (sessionState?.joined && ui?.multiplayerLobbyCodeInput) {
             ui.multiplayerLobbyCodeInput.value = String(sessionState.lobbyCode || '');
         }
         this._syncMultiplayerUiState();
+        this._lastObservedMultiplayerSessionState = observeLobbySessionStateChange(
+            this.getRuntimeBundle() || this.game,
+            this._lastObservedMultiplayerSessionState,
+            sessionState
+        );
     }
 
     _applyAuthoritativeMultiplayerMatchSettings(snapshot) {

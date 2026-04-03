@@ -1,9 +1,4 @@
 import {
-    disposeMatchSessionSystems,
-    prepareInitializedMatchSession,
-    wireInitializedMatchRuntime,
-} from './MatchSessionFactory.js';
-import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
     MATCH_LIFECYCLE_EVENT_TYPES,
     SESSION_FINALIZE_TRIGGERS,
@@ -14,6 +9,15 @@ import {
     ensureSessionRuntimeLifecycleState,
     SESSION_RUNTIME_STATES,
 } from '../shared/contracts/SessionRuntimeStateMachine.js';
+import { SESSION_RUNTIME_EVENT_TYPES } from '../shared/contracts/SessionRuntimeEventContract.js';
+import { createMatchSessionPort } from './MatchLifecycleSessionPort.js';
+import {
+    createFallbackSessionRuntimeState,
+    readRuntimeStatePath,
+    writeRuntimeStatePath,
+} from './MatchLifecycleSessionRuntimeState.js';
+
+export { createMatchSessionPort } from './MatchLifecycleSessionPort.js';
 
 export const MATCH_SESSION_PORT_METHODS = Object.freeze([
     'getSessionRuntimeState',
@@ -36,142 +40,6 @@ function hasActiveMatchSessionRefs(currentSession) {
         || currentSession?.entityManager
         || currentSession?.powerupManager
     );
-}
-
-function createFallbackSessionRuntimeState() {
-    return {
-        session: {
-            sequence: 0,
-            activeSessionId: null,
-        },
-        finalize: {
-            status: 'idle',
-            pendingOperation: null,
-            lastReason: null,
-            lastTrigger: null,
-            lastCompletedReason: null,
-            updatedAt: Date.now(),
-        },
-        lifecycle: {
-            gameStateId: GAME_STATE_IDS.MENU,
-            disposed: false,
-            pendingSessionInit: null,
-            status: SESSION_RUNTIME_STATES.MENU,
-            updatedAt: Date.now(),
-        },
-    };
-}
-
-function readRuntimeStatePath(source, path = []) {
-    let cursor = source;
-    for (const segment of path) {
-        if (!cursor || typeof cursor !== 'object') {
-            return undefined;
-        }
-        cursor = cursor[segment];
-    }
-    return cursor;
-}
-
-function writeRuntimeStatePath(source, path = [], value) {
-    if (!source || typeof source !== 'object' || !Array.isArray(path) || path.length === 0) {
-        return;
-    }
-    let cursor = source;
-    for (let index = 0; index < path.length - 1; index += 1) {
-        const segment = path[index];
-        if (!cursor[segment] || typeof cursor[segment] !== 'object') {
-            cursor[segment] = {};
-        }
-        cursor = cursor[segment];
-    }
-    cursor[path[path.length - 1]] = value;
-}
-
-function resolveSessionRuntimeState(runtime) {
-    if (!runtime || typeof runtime !== 'object') {
-        return null;
-    }
-    return runtime.sessionRuntime || runtime.runtimeBundle?.sessionRuntime || null;
-}
-
-export function createMatchSessionPort(runtime) {
-    const sessionRuntime = resolveSessionRuntimeState(runtime);
-    const runtimeHandles = sessionRuntime?.handles || null;
-    const sessionSettings = sessionRuntime?.session?.settings || null;
-    const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
-    const getRecorder = () => runtimeHandles?.mediaRecorderSystem || runtime?.mediaRecorderSystem || runtime?.recorder || null;
-    return {
-        getSessionRuntimeState: () => sessionRuntime,
-        getLifecycleState: () => ({
-            sessionId: sessionRuntime?.session?.activeSessionId || null,
-            mapKey: sessionSettings?.mapKey || runtime?.mapKey || null,
-            numHumans: Number(sessionSettings?.numHumans ?? runtime?.numHumans) || 0,
-            numBots: Number(sessionSettings?.numBots ?? runtime?.numBots) || 0,
-            winsNeeded: Number(sessionSettings?.winsNeeded ?? runtime?.winsNeeded) || 0,
-            activeGameMode: sessionSettings?.activeGameMode || runtime?.activeGameMode || null,
-            gameStateId: sessionRuntime?.lifecycle?.gameStateId || runtime?.state || null,
-            lifecycleStatus: sessionRuntime?.lifecycle?.status || null,
-            finalizeStatus: sessionRuntime?.finalize?.status || null,
-        }),
-        notifyLifecycleEvent: (type, context) => getRecorder()?.notifyLifecycleEvent?.(type, context),
-        prepareInitializedMatchSession: (handlers = {}) => prepareInitializedMatchSession({
-            renderer: runtimeHandles?.renderer || runtime?.renderer,
-            audio: runtimeHandles?.audio || runtime?.audio,
-            recorder: runtime?.recorder,
-            runtimeProfiler: runtime?.runtimePerfProfiler,
-            settings: runtime?.settings,
-            runtimeConfig: runtime?.runtimeConfig,
-            baseConfig: runtime?.config || null,
-            requestedMapKey: sessionSettings?.mapKey || runtime?.mapKey,
-            currentSession: getCurrentMatchSessionRefs(),
-            ...handlers,
-        }),
-        wireInitializedMatchRuntime: (initializedMatch, handlers = {}) => wireInitializedMatchRuntime({
-            renderer: runtimeHandles?.renderer || runtime?.renderer,
-            initializedMatch,
-            ...handlers,
-        }),
-        applyInitializedMatchSession: (initializedMatch) => runtime?.matchSessionRuntimeBridge?.applyInitializedMatchSession?.(initializedMatch),
-        getCurrentMatchSessionRefs,
-        clearMatchSessionRefs: () => runtime?.matchSessionRuntimeBridge?.clearMatchSessionRefs?.(),
-        disposePreparedMatchSession: (initializedMatch, options = {}) => {
-            if (!initializedMatch?.session) return;
-            disposeMatchSessionSystems(runtime?.renderer, initializedMatch.session, options);
-        },
-        disposeCurrentMatchSession: (options = {}) => {
-            const currentSession = getCurrentMatchSessionRefs();
-            if (!currentSession) return;
-            disposeMatchSessionSystems(runtime?.renderer, currentSession, options);
-        },
-        settleRecorder: (trigger = null) => {
-            const recorder = getRecorder();
-            if (recorder?.settleRecording) {
-                return recorder.settleRecording(trigger);
-            }
-            return null;
-        },
-        resetRoundRuntime: () => {
-            const currentSession = getCurrentMatchSessionRefs();
-            const entityManager = currentSession?.entityManager || null;
-            const powerupManager = currentSession?.powerupManager || null;
-            if (!entityManager || !powerupManager) return;
-
-            for (const player of entityManager.players) {
-                player.trail.clear();
-            }
-            powerupManager.clear();
-
-            runtime?.recorder?.startRound?.(entityManager.players);
-            entityManager.spawnAll();
-            runtime?.runtimeFacade?.arcadeRunRuntime?.applyPendingIntermissionEffects?.({
-                players: entityManager.players,
-            });
-            for (const player of entityManager.getHumanPlayers()) {
-                player.planarAimOffset = 0;
-            }
-        },
-    };
 }
 
 export class MatchLifecycleSessionOrchestrator {
@@ -211,11 +79,29 @@ export class MatchLifecycleSessionOrchestrator {
         });
     }
 
+    _recordRuntimeEvent(type, payload = null, extra = null, source = 'match_lifecycle_session_orchestrator') {
+        this.deps?.recordRuntimeEvent?.(
+            type,
+            payload,
+            source,
+            extra && typeof extra === 'object' ? extra : null
+        );
+    }
+
     _setLifecycleStatus(status, options = undefined) {
         if (!this._sessionRuntimeState?.lifecycle || typeof status !== 'string' || !status.trim()) {
-            return;
+            return null;
         }
-        applySessionRuntimeLifecycleTransition(this._sessionRuntimeState, status, options);
+        const transition = applySessionRuntimeLifecycleTransition(this._sessionRuntimeState, status, options);
+        if (transition?.changed) {
+            this._recordRuntimeEvent(SESSION_RUNTIME_EVENT_TYPES.STATE_TRANSITIONED, {
+                previousState: transition.currentState,
+                nextState: transition.nextState,
+                gameStateId: transition.lifecycle?.gameStateId || '',
+                disposed: transition.lifecycle?.disposed === true,
+            });
+        }
+        return transition;
     }
 
     _setFinalizeStatus(status, extra = null) {
@@ -260,6 +146,20 @@ export class MatchLifecycleSessionOrchestrator {
             lastReason: null,
             lastTrigger: null,
         });
+        this._recordRuntimeEvent(
+            SESSION_RUNTIME_EVENT_TYPES.SESSION_INITIALIZED,
+            {
+                previousSessionId: extra?.previousSessionId || null,
+                mapKey: extra?.mapKey || null,
+                numHumans: Number(extra?.numHumans) || 0,
+                numBots: Number(extra?.numBots) || 0,
+                winsNeeded: Number(extra?.winsNeeded) || 0,
+                activeGameMode: extra?.activeGameMode || null,
+            },
+            {
+                sessionId: this._activeSessionId,
+            }
+        );
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MATCH_STARTED, extra);
     }
 
@@ -274,6 +174,10 @@ export class MatchLifecycleSessionOrchestrator {
             this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
             { gameStateId: GAME_STATE_IDS.MENU }
         );
+        this._recordRuntimeEvent(SESSION_RUNTIME_EVENT_TYPES.MENU_OPENED, {
+            reason: extra?.reason || '',
+            targetView: 'main_menu',
+        });
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
@@ -332,8 +236,18 @@ export class MatchLifecycleSessionOrchestrator {
         }
     }
 
-    async _applyInitializedMatch(initializedMatch, expectedSessionId, lifecycleHandlers = {}) {
+    async _applyInitializedMatch(initializedMatch, expectedSessionId, lifecycleHandlers = {}, previousSessionId = null) {
         if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
+            this._recordRuntimeEvent(
+                SESSION_RUNTIME_EVENT_TYPES.SESSION_INIT_FAILED,
+                {
+                    reason: SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT,
+                    previousSessionId,
+                },
+                {
+                    sessionId: expectedSessionId,
+                }
+            );
             await this._disposePreparedMatch(initializedMatch, SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT);
             return null;
         }
@@ -342,6 +256,16 @@ export class MatchLifecycleSessionOrchestrator {
             this.deps?.wireInitializedMatchRuntime?.(initializedMatch, lifecycleHandlers) || initializedMatch
         );
         if (expectedSessionId && this._activeSessionId !== expectedSessionId) {
+            this._recordRuntimeEvent(
+                SESSION_RUNTIME_EVENT_TYPES.SESSION_INIT_FAILED,
+                {
+                    reason: SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT,
+                    previousSessionId,
+                },
+                {
+                    sessionId: expectedSessionId,
+                }
+            );
             await this._disposePreparedMatch(wiredMatch, SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT);
             return null;
         }
@@ -354,6 +278,7 @@ export class MatchLifecycleSessionOrchestrator {
         }
         const lifecycleState = this.deps?.getLifecycleState?.() || {};
         this._startLifecycleSession({
+            previousSessionId,
             mapKey: wiredMatch?.session?.effectiveMapKey || lifecycleState.mapKey || null,
             numHumans: wiredMatch?.session?.numHumans || lifecycleState.numHumans || 0,
             numBots: wiredMatch?.session?.numBots || lifecycleState.numBots || 0,
@@ -378,6 +303,7 @@ export class MatchLifecycleSessionOrchestrator {
                     : null
             );
 
+        const previousSessionId = this._activeSessionId;
         this._sessionSequence += 1;
         const provisionalId = `match-${this._sessionSequence}`;
         this._activeSessionId = provisionalId;
@@ -394,7 +320,12 @@ export class MatchLifecycleSessionOrchestrator {
 
         const runPendingInit = () => Promise.resolve(finalizeExistingSession)
             .then(() => this.deps.prepareInitializedMatchSession(lifecycleHandlers))
-            .then((resolvedMatch) => this._applyInitializedMatch(resolvedMatch, provisionalId, lifecycleHandlers));
+            .then((resolvedMatch) => this._applyInitializedMatch(
+                resolvedMatch,
+                provisionalId,
+                lifecycleHandlers,
+                previousSessionId
+            ));
 
         const queuedInit = this._pendingSessionInit
             ? Promise.resolve(this._pendingSessionInit).catch(() => null).then(runPendingInit)
@@ -409,6 +340,16 @@ export class MatchLifecycleSessionOrchestrator {
                 this._setLifecycleStatus(
                     this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
                     { gameStateId: GAME_STATE_IDS.MENU }
+                );
+                this._recordRuntimeEvent(
+                    SESSION_RUNTIME_EVENT_TYPES.SESSION_INIT_FAILED,
+                    {
+                        reason: error instanceof Error ? error.message : 'session_init_failed',
+                        previousSessionId,
+                    },
+                    {
+                        sessionId: provisionalId,
+                    }
                 );
                 throw error;
             })
@@ -442,6 +383,7 @@ export class MatchLifecycleSessionOrchestrator {
             return this._pendingFinalize;
         }
         const request = this._buildFinalizeRequest(options);
+        const finalizedSessionId = this._activeSessionId;
         this._setFinalizeStatus('finalizing', {
             lastReason: request.reason,
             lastTrigger: request.recorderTrigger?.type || request.reason,
@@ -503,9 +445,30 @@ export class MatchLifecycleSessionOrchestrator {
                     { gameStateId: GAME_STATE_IDS.MENU }
                 );
             }
+            this._recordRuntimeEvent(
+                SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZED,
+                {
+                    reason: request.reason,
+                    notifyMenuOpened: request.notifyMenuOpened === true,
+                    clearScene: request.clearScene === true,
+                },
+                {
+                    sessionId: finalizedSessionId,
+                }
+            );
             return request.reason;
         }).catch((error) => {
             this._setFinalizeStatus('error');
+            this._recordRuntimeEvent(
+                SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZE_FAILED,
+                {
+                    reason: request.reason,
+                    errorMessage: error instanceof Error ? error.message : 'match_finalize_failed',
+                },
+                {
+                    sessionId: finalizedSessionId,
+                }
+            );
             throw error;
         }).finally(() => {
             if (this._pendingFinalize === trackedFinalize) {

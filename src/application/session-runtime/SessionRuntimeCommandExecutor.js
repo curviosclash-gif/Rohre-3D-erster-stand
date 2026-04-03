@@ -4,11 +4,44 @@ import {
     normalizeSessionRuntimeCommand,
     SESSION_RUNTIME_COMMAND_TYPES,
 } from '../../shared/contracts/SessionRuntimeCommandContract.js';
+import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
+import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
 import { finalizeMatchFlow } from '../../core/runtime/MatchFinalizeFlowService.js';
 import {
     handleMultiplayerHostAction,
     handleMultiplayerJoinAction,
 } from '../../core/runtime/MenuRuntimeMultiplayerService.js';
+
+function normalizeString(value, fallback = '') {
+    const normalized = typeof value === 'string' ? value.trim() : '';
+    return normalized || fallback;
+}
+
+function summarizeCommandPayload(command = null) {
+    const payload = command?.payload && typeof command.payload === 'object'
+        ? command.payload
+        : {};
+    return {
+        commandType: normalizeString(command?.type, ''),
+        commandSource: normalizeString(payload.source, 'runtime_api'),
+        reason: normalizeString(payload.reason, ''),
+        trigger: normalizeString(payload.trigger, ''),
+        lobbyCode: normalizeString(payload.lobbyCode, ''),
+        preserveLobby: payload.preserveLobby === true,
+        hasSettingsSnapshot: !!payload.settingsSnapshot,
+        notifyMenuOpened: payload.notifyMenuOpened !== false,
+    };
+}
+
+function summarizeCommandResult(result) {
+    if (result && typeof result === 'object' && typeof result.ok === 'boolean') {
+        return result.ok ? 'ok' : 'error';
+    }
+    if (result === true) return 'true';
+    if (result === false) return 'false';
+    if (result == null) return 'empty';
+    return typeof result;
+}
 
 export class SessionRuntimeCommandExecutor {
     constructor({ facade = null } = {}) {
@@ -18,29 +51,83 @@ export class SessionRuntimeCommandExecutor {
     execute(command = null) {
         const normalizedCommand = normalizeSessionRuntimeCommand(command);
         if (!normalizedCommand) return undefined;
-
-        switch (normalizedCommand.type) {
+        this._recordCommandObservation(normalizedCommand, 'received');
+        let result;
+        try {
+            switch (normalizedCommand.type) {
         case SESSION_RUNTIME_COMMAND_TYPES.APPLY_SETTINGS:
-            return this._executeApplySettings(normalizedCommand.payload);
+                result = this._executeApplySettings(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.INITIALIZE_SESSION:
-            return this._executeInitializeSession(normalizedCommand.payload);
+                result = this._executeInitializeSession(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.START_MATCH:
-            return this._executeStartMatch(normalizedCommand.payload);
+                result = this._executeStartMatch(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.PAUSE_MATCH:
-            return this._executePauseMatch(normalizedCommand.payload);
+                result = this._executePauseMatch(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.RESUME_MATCH:
-            return this._executeResumeMatch(normalizedCommand.payload);
+                result = this._executeResumeMatch(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.RETURN_TO_MENU:
-            return this._executeReturnToMenu(normalizedCommand.payload);
+                result = this._executeReturnToMenu(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.FINALIZE_MATCH:
-            return this._executeFinalizeMatch(normalizedCommand.payload);
+                result = this._executeFinalizeMatch(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.HOST_LOBBY:
-            return this._executeHostLobby(normalizedCommand.payload);
+                result = this._executeHostLobby(normalizedCommand.payload);
+                break;
         case SESSION_RUNTIME_COMMAND_TYPES.JOIN_LOBBY:
-            return this._executeJoinLobby(normalizedCommand.payload);
+                result = this._executeJoinLobby(normalizedCommand.payload);
+                break;
         default:
-            return undefined;
+                result = undefined;
+            }
+        } catch (error) {
+            this._recordCommandObservation(normalizedCommand, 'failed', {
+                resultStatus: 'threw',
+                errorMessage: error instanceof Error ? error.message : 'command execution failed',
+            });
+            throw error;
         }
+        return this._trackCommandResult(normalizedCommand, result);
+    }
+
+    _recordCommandObservation(command, phase, extra = null) {
+        recordSessionRuntimeEvent(this._facade?.getRuntimeBundle?.() || this._facade?.game, {
+            type: SESSION_RUNTIME_EVENT_TYPES.COMMAND_OBSERVED,
+            source: 'session_runtime_command_executor',
+            payload: {
+                phase: normalizeString(phase, 'received'),
+                ...summarizeCommandPayload(command),
+                ...(extra && typeof extra === 'object' ? extra : {}),
+            },
+        });
+    }
+
+    _trackCommandResult(command, result) {
+        if (result && typeof result.then === 'function') {
+            return Promise.resolve(result)
+                .then((resolvedResult) => {
+                    this._recordCommandObservation(command, 'completed', {
+                        resultStatus: summarizeCommandResult(resolvedResult),
+                    });
+                    return resolvedResult;
+                })
+                .catch((error) => {
+                    this._recordCommandObservation(command, 'failed', {
+                        resultStatus: 'rejected',
+                        errorMessage: error instanceof Error ? error.message : 'command promise rejected',
+                    });
+                    throw error;
+                });
+        }
+        this._recordCommandObservation(command, 'completed', {
+            resultStatus: summarizeCommandResult(result),
+        });
+        return result;
     }
 
     _executeApplySettings(options = undefined) {
@@ -94,6 +181,7 @@ export class SessionRuntimeCommandExecutor {
             menuMultiplayerBridge: facade?.menuMultiplayerBridge,
             syncUiState: () => facade?._syncMultiplayerUiState?.(),
             captureSettingsSnapshot: () => facade?._captureMultiplayerMatchSettings?.(),
+            runtimeSource: facade?.getRuntimeBundle?.() || facade?.game,
         });
     }
 
@@ -107,6 +195,7 @@ export class SessionRuntimeCommandExecutor {
             resolveMenuAccessContext: () => facade?._resolveMenuAccessContext?.(),
             menuMultiplayerBridge: facade?.menuMultiplayerBridge,
             syncUiState: () => facade?._syncMultiplayerUiState?.(),
+            runtimeSource: facade?.getRuntimeBundle?.() || facade?.game,
         });
     }
 }

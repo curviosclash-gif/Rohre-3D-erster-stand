@@ -1,5 +1,7 @@
 import { createLogger } from '../../shared/logging/Logger.js';
 import { SESSION_FINALIZE_TRIGGERS } from '../../shared/contracts/MatchLifecycleContract.js';
+import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
+import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
 
 const logger = createLogger('MatchFinalizeFlowService');
 
@@ -45,6 +47,22 @@ function mergeFinalizeMatchFlowPlan(currentPlan, nextPlan) {
     };
 }
 
+function observeFinalizeFlow(facade, phase, plan, extra = null) {
+    recordSessionRuntimeEvent(facade?.getRuntimeBundle?.() || facade?.game, {
+        type: SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZING,
+        source: 'match_finalize_flow_service',
+        payload: {
+            phase,
+            reason: plan?.reason || '',
+            trigger: plan?.sessionOptions?.reason || plan?.reason || '',
+            applyReturnToMenuUi: plan?.applyReturnToMenuUi === true,
+            schedulePrewarm: plan?.schedulePrewarm === true,
+            notifyMenuOpened: plan?.notifyMenuOpened === true,
+            ...(extra && typeof extra === 'object' ? extra : {}),
+        },
+    });
+}
+
 export function finalizeMatchFlow(facade, options = undefined, fallbackReason = SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU) {
     const requestedPlan = buildFinalizeMatchFlowPlan(options, fallbackReason);
     if (facade?._pendingMatchFinalize) {
@@ -52,10 +70,14 @@ export function finalizeMatchFlow(facade, options = undefined, fallbackReason = 
             facade._pendingMatchFinalizePlan,
             requestedPlan
         );
+        observeFinalizeFlow(facade, 'merged', facade._pendingMatchFinalizePlan, {
+            pending: true,
+        });
         return facade._pendingMatchFinalize;
     }
 
     facade._pendingMatchFinalizePlan = requestedPlan;
+    observeFinalizeFlow(facade, 'requested', requestedPlan);
     if (requestedPlan.clearLastRoundGhost) {
         facade?.ports?.sessionPort?.clearLastRoundGhost?.();
     }

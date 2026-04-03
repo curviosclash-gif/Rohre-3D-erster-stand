@@ -7,6 +7,13 @@ import {
     syncSessionRuntimeLifecycleDisposed,
     syncSessionRuntimeLifecycleWithGameState,
 } from '../../shared/contracts/SessionRuntimeStateMachine.js';
+import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
+import {
+    createDefaultSessionRuntimeObservabilityState,
+    ensureSessionRuntimeObservabilityState,
+    recordSessionRuntimeEvent,
+    resolveSessionRuntime,
+} from '../../shared/runtime/SessionRuntimeObservability.js';
 import {
     clearActiveRuntimeConfig,
     setActiveRuntimeConfig,
@@ -186,6 +193,7 @@ function createSessionRuntimeCore({ state, components, ports = null, lifecycle =
             status: deriveInitialLifecycleStatus(lifecycle),
             updatedAt: Date.now(),
         },
+        observability: createDefaultSessionRuntimeObservabilityState(),
     };
 }
 
@@ -253,17 +261,41 @@ function getRuntimeStatusCursor(bundle, path = []) {
 
 function setRuntimeStatusValue(bundle, path, value) {
     if (Array.isArray(path) && path.length === 2 && path[0] === 'lifecycle' && path[1] === 'gameStateId') {
-        syncSessionRuntimeLifecycleWithGameState(bundle?.sessionRuntime, value);
+        const transition = syncSessionRuntimeLifecycleWithGameState(bundle?.sessionRuntime, value);
+        recordLifecycleTransitionObservation(bundle, transition, 'runtime_bundle_game_state_sync', {
+            requestedGameStateId: value,
+        });
         return;
     }
     if (Array.isArray(path) && path.length === 2 && path[0] === 'lifecycle' && path[1] === 'disposed') {
-        syncSessionRuntimeLifecycleDisposed(bundle?.sessionRuntime, value === true);
+        const transition = syncSessionRuntimeLifecycleDisposed(bundle?.sessionRuntime, value === true);
+        recordLifecycleTransitionObservation(bundle, transition, 'runtime_bundle_dispose_sync', {
+            disposed: value === true,
+        });
         return;
     }
     if (!Array.isArray(path) || path.length === 0) return;
     const parent = getRuntimeStatusCursor(bundle, path.slice(0, -1));
     if (!parent || typeof parent !== 'object') return;
     parent[path[path.length - 1]] = value;
+}
+
+function recordLifecycleTransitionObservation(source, transition, sourceId, extra = null) {
+    if (!transition?.changed) {
+        return transition;
+    }
+    recordSessionRuntimeEvent(source, {
+        type: SESSION_RUNTIME_EVENT_TYPES.STATE_TRANSITIONED,
+        source: sourceId,
+        payload: {
+            previousState: transition.currentState,
+            nextState: transition.nextState,
+            gameStateId: transition.lifecycle?.gameStateId || '',
+            disposed: transition.lifecycle?.disposed === true,
+            ...(extra && typeof extra === 'object' ? extra : {}),
+        },
+    });
+    return transition;
 }
 
 function adoptExistingRuntimeStatusValue(game, bundle, spec) {
@@ -369,9 +401,7 @@ export function attachGameRuntimeBundle(game, bundle) {
 }
 
 export function getSessionRuntime(source) {
-    if (!source) return null;
-    if (source.sessionRuntime) return source.sessionRuntime;
-    return source.runtimeBundle?.sessionRuntime || null;
+    return resolveSessionRuntime(source);
 }
 
 export function getSessionRuntimeState(source) {
@@ -490,6 +520,7 @@ export function clearGameRuntimeState(bundle, initialOverrides = undefined) {
     const sessionRuntime = getSessionRuntime(bundle);
     if (sessionRuntime) {
         ensureSessionRuntimeLifecycleState(sessionRuntime);
+        ensureSessionRuntimeObservabilityState(sessionRuntime);
         sessionRuntime.session.activeSessionId = null;
         sessionRuntime.session.sequence = 0;
         sessionRuntime.lifecycle.pendingSessionInit = null;
