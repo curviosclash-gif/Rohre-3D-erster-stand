@@ -1,4 +1,4 @@
-import { isElectronPreloadRuntime } from '../../platform/electron/ElectronPlatformBridge.js';
+import { resolveDefaultLobbyTransport } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
     LOBBY_SERVICE_TRANSPORTS,
     matchesLobbyServiceTransport,
@@ -15,9 +15,9 @@ function resolveRuntimeGlobal(runtime = null) {
 }
 
 function resolveDefaultTransport(runtime = null) {
-    return isElectronPreloadRuntime(resolveRuntimeGlobal(runtime))
-        ? LOBBY_SERVICE_TRANSPORTS.LAN
-        : LOBBY_SERVICE_TRANSPORTS.STORAGE_BRIDGE;
+    return resolveDefaultLobbyTransport({
+        runtimeGlobal: resolveRuntimeGlobal(runtime),
+    });
 }
 
 function resolveCustomFactory(serviceFactories = null, transport = '') {

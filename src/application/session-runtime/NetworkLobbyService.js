@@ -36,7 +36,7 @@ export class NetworkLobbyService {
         this.contractVersion = normalizeString(options.contractVersion, 'lifecycle.v1');
         this.serviceDescriptor = createLobbyServiceDescriptor({
             transport: this.transport,
-            providerKind: normalizeString(options.providerKind, `menu-${this.transport}`),
+            providerKind: normalizeString(options.providerKind, ''),
             lifecycleContractVersion: this.contractVersion,
             supportsConnectionContext: true,
             supportsDiscovery: options.supportsDiscovery !== false,
@@ -461,7 +461,6 @@ export class LanLobbyService extends NetworkLobbyService {
         super({
             ...options,
             transport: LOBBY_SERVICE_TRANSPORTS.LAN,
-            providerKind: normalizeString(options.providerKind, 'menu-lan-lobby'),
             supportsDiscovery: true,
             createLobby: typeof options.createLobby === 'function'
                 ? options.createLobby

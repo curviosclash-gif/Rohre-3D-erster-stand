@@ -3,6 +3,11 @@ import {
     createPlatformCapabilitySnapshot,
     PLATFORM_CAPABILITY_IDS,
 } from '../../shared/contracts/PlatformCapabilityContract.js';
+import {
+    PLATFORM_RUNTIME_KINDS,
+    resolveCapabilityProviderKind,
+    resolvePlatformRuntimeKind,
+} from '../../shared/contracts/PlatformCapabilityRegistry.js';
 
 const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     discovery: 'preload.discovery.v1',
@@ -67,14 +72,13 @@ function createElectronCapabilityDescriptor(capabilityId, descriptor, fallback =
         ...fallback,
         ...source,
         contractVersion: normalizeString(source.contractVersion, normalizeString(fallback.contractVersion, '')),
-        providerKind: normalizeString(source.providerKind, normalizeString(fallback.providerKind, 'unavailable')),
+        providerKind: normalizeString(fallback.providerKind, normalizeString(source.providerKind, 'unavailable')),
         degradedReason: normalizeString(source.degradedReason, normalizeString(fallback.degradedReason, '')),
     }));
 }
 
 export function isElectronPreloadRuntime(runtimeGlobal = globalThis) {
-    const { globalRef, appRuntime } = resolveAppRuntime(runtimeGlobal);
-    return appRuntime?.isApp === true || globalRef?.__CURVIOS_APP__ === true;
+    return resolvePlatformRuntimeKind({ runtimeGlobal }) === PLATFORM_RUNTIME_KINDS.ELECTRON;
 }
 
 export function createElectronPreloadDiscoveryAdapter(runtimeGlobal = globalThis) {
@@ -89,7 +93,10 @@ export function createElectronPreloadDiscoveryAdapter(runtimeGlobal = globalThis
         resolveNamedCapability(appRuntime, 'discovery'),
         {
             available: !!(startDiscovery && stopDiscovery && onDiscoveredHosts),
-            providerKind: isElectronPreloadRuntime(runtimeGlobal) ? 'electron-ipc' : 'browser-demo',
+            providerKind: resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.DISCOVERY, {
+                runtimeGlobal,
+                available: !!(startDiscovery && stopDiscovery && onDiscoveredHosts),
+            }),
             contractVersion: discoveryContract?.contractVersion || PRELOAD_CONTRACT_VERSIONS.discovery,
             degradedReason: isElectronPreloadRuntime(runtimeGlobal) ? 'discovery_unavailable' : 'desktop_shell_unavailable',
             supportsSubscribe: !!onDiscoveredHosts,
@@ -123,7 +130,10 @@ export function createElectronPreloadHostAdapter(runtimeGlobal = globalThis) {
         resolveNamedCapability(appRuntime, 'host'),
         {
             available: !!(getLanServerStatus && startLanServer && stopLanServer),
-            providerKind: isElectronPreloadRuntime(runtimeGlobal) ? 'electron-ipc' : 'browser-demo',
+            providerKind: resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.HOST, {
+                runtimeGlobal,
+                available: !!(getLanServerStatus && startLanServer && stopLanServer),
+            }),
             contractVersion: hostContract?.contractVersion || PRELOAD_CONTRACT_VERSIONS.host,
             degradedReason: isElectronPreloadRuntime(runtimeGlobal) ? 'host_unavailable' : 'desktop_shell_unavailable',
             supportsSessionOwnership: true,
@@ -154,7 +164,10 @@ export function createElectronPreloadSaveAdapter(runtimeGlobal = globalThis) {
         resolveNamedCapability(appRuntime, 'save'),
         {
             available: !!(saveReplay || saveVideo),
-            providerKind: isElectronPreloadRuntime(runtimeGlobal) ? 'electron-ipc' : 'browser-demo',
+            providerKind: resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.SAVE, {
+                runtimeGlobal,
+                available: !!(saveReplay || saveVideo),
+            }),
             contractVersion: saveContract?.contractVersion || PRELOAD_CONTRACT_VERSIONS.save,
             degradedReason: isElectronPreloadRuntime(runtimeGlobal) ? 'save_unavailable' : 'desktop_shell_unavailable',
             supportsBinaryExport: !!saveVideo,
@@ -180,7 +193,10 @@ export function createElectronPreloadRecordingAdapter(runtimeGlobal = globalThis
         explicitCapability,
         {
             available: recordingContract?.supportsCapture === true || isElectronPreloadRuntime(runtimeGlobal),
-            providerKind: isElectronPreloadRuntime(runtimeGlobal) ? 'electron-renderer' : 'browser-demo',
+            providerKind: resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.RECORDING, {
+                runtimeGlobal,
+                available: recordingContract?.supportsCapture === true || isElectronPreloadRuntime(runtimeGlobal),
+            }),
             contractVersion: recordingContract?.contractVersion || PRELOAD_CONTRACT_VERSIONS.recording,
             degradedReason: isElectronPreloadRuntime(runtimeGlobal) ? 'recording_unavailable' : 'desktop_shell_unavailable',
             supportsCapture: recordingContract?.supportsCapture === true
@@ -204,7 +220,7 @@ export function getElectronPlatformCapabilitySnapshot(runtimeGlobal = globalThis
     const recordingAdapter = createElectronPreloadRecordingAdapter(runtimeGlobal);
 
     return createPlatformCapabilitySnapshot({
-        runtimeKind: isElectronPreloadRuntime(runtimeGlobal) ? 'electron' : 'web',
+        runtimeKind: resolvePlatformRuntimeKind({ runtimeGlobal }),
         discovery: discoveryAdapter.capability,
         host: hostAdapter.capability,
         save: saveAdapter.capability,

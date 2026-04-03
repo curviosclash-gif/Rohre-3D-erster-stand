@@ -71,7 +71,7 @@ export class StorageLobbyService {
         this.contractVersion = normalizeString(options.contractVersion, MENU_LIFECYCLE_EVENT_CONTRACT_VERSION);
         this.serviceDescriptor = createLobbyServiceDescriptor({
             transport: this.transport,
-            providerKind: 'menu-storage-bridge',
+            providerKind: normalizeString(options.providerKind, ''),
             lifecycleContractVersion: this.contractVersion,
         });
         this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : null;

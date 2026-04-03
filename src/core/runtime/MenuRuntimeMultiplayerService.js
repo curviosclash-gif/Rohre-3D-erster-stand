@@ -7,8 +7,11 @@ import {
     matchesMenuLobbyServiceTransport,
     resolveMenuLobbyServiceTransport,
 } from '../../application/session-runtime/MenuLobbyServiceFactory.js';
-import { isElectronPreloadRuntime } from '../../platform/electron/ElectronPlatformBridge.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
+import {
+    resolveDefaultLobbyTransport,
+    resolveLobbyProviderKind,
+} from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
     isNetworkLobbyServiceTransport,
     normalizeLobbyServiceTransport,
@@ -30,13 +33,6 @@ function normalizeString(value, fallback = '') {
     return normalized || fallback;
 }
 
-function shouldUseDesktopLanBridge(runtime = null) {
-    const runtimeGlobal = runtime && typeof runtime === 'object' && runtime.global && typeof runtime.global === 'object'
-        ? runtime.global
-        : (typeof globalThis !== 'undefined' ? globalThis : null);
-    return isElectronPreloadRuntime(runtimeGlobal);
-}
-
 // NOTE: 'multiplayer' is a menu-layer coordination type, not a real network transport.
 // The current implementation uses a Storage-Bridge (localStorage + BroadcastChannel) for
 // lobby coordination within the same browser. At match start, each tab runs a
@@ -55,21 +51,25 @@ function ensureMultiplayerSessionType(game, menuLobbyService = null) {
     }
     const currentTransport = String(game.settings.localSettings.multiplayerTransport || '').trim().toLowerCase();
     if (currentTransport === MULTIPLAYER_TRANSPORTS.ONLINE) return;
-    game.settings.localSettings.multiplayerTransport = shouldUseDesktopLanBridge()
-        ? MULTIPLAYER_TRANSPORTS.LAN
-        : MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
+    game.settings.localSettings.multiplayerTransport = resolveDefaultLobbyTransport({
+        runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+    });
 }
 
 function observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, action, lobbyCode = '') {
     if (!runtimeSource || isNetworkLobbyServiceTransport(menuMultiplayerBridge)) {
         return;
     }
+    const transport = normalizeLobbyServiceTransport(menuMultiplayerBridge, MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE);
     recordSessionRuntimeEvent(runtimeSource, {
         type: SESSION_RUNTIME_EVENT_TYPES.CAPABILITY_FALLBACK_USED,
         source: 'menu_runtime_multiplayer_service',
         payload: {
             capabilityId: action === 'host' ? 'host' : 'discovery',
-            providerKind: normalizeString(menuMultiplayerBridge?.serviceDescriptor?.providerKind, 'menu-storage-bridge'),
+            providerKind: normalizeString(
+                menuMultiplayerBridge?.serviceDescriptor?.providerKind,
+                resolveLobbyProviderKind(transport)
+            ),
             reason: 'desktop_capability_unavailable',
             action: normalizeString(action, 'unknown'),
             lobbyCode: normalizeString(lobbyCode, ''),

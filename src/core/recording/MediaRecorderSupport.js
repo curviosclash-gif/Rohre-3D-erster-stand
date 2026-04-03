@@ -7,6 +7,11 @@ import {
     createElectronPreloadRecordingAdapter,
     isElectronPreloadRuntime,
 } from '../../platform/electron/ElectronPlatformBridge.js';
+import { PLATFORM_CAPABILITY_IDS } from '../../shared/contracts/PlatformCapabilityContract.js';
+import {
+    isDesktopProductSurface,
+    resolveCapabilityProviderKind,
+} from '../../shared/contracts/PlatformCapabilityRegistry.js';
 
 export const DEFAULT_MIME_TYPE = 'video/mp4';
 export const DEFAULT_FALLBACK_MIME_TYPE = 'video/webm';
@@ -69,7 +74,9 @@ export function resolveGlobalScope(explicitScope = null) {
 
 export function isDesktopAppRuntime(globalScope = null) {
     const scope = resolveGlobalScope(globalScope);
-    return isElectronPreloadRuntime(scope);
+    return isDesktopProductSurface({
+        runtimeGlobal: scope,
+    });
 }
 
 export function resolvePerfNow(globalScope) {
@@ -163,7 +170,10 @@ export function createPlatformRecordingCapabilityAdapter(globalScope = null, can
     return createBrowserRecordingAdapter({
         available: nativeSupport.hasRecorder,
         supportsCapture: nativeSupport.hasRecorder,
-        providerKind: nativeSupport.hasRecorder ? 'browser-native' : 'browser-demo',
+        providerKind: resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.RECORDING, {
+            runtimeGlobal: scope,
+            available: nativeSupport.hasRecorder,
+        }),
         degradedReason: nativeSupport.hasRecorder ? '' : nativeSupport.supportReason,
         support: nativeSupport,
     });

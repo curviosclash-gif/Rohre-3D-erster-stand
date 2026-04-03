@@ -2,8 +2,15 @@ import {
     createPlatformCapabilityDescriptor,
     PLATFORM_CAPABILITY_IDS,
 } from '../../shared/contracts/PlatformCapabilityContract.js';
+import {
+    PLATFORM_PRODUCT_SURFACE_IDS,
+    resolveCapabilityProviderKind,
+} from '../../shared/contracts/PlatformCapabilityRegistry.js';
 
 const NOOP = () => {};
+const BROWSER_DEMO_PROVIDER_OPTIONS = Object.freeze({
+    productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+});
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -45,7 +52,10 @@ async function invokeSaveImpl(saveImpl, args, defaultSaved = true) {
 export function createBrowserDiscoveryAdapter() {
     const capability = createBrowserCapability(PLATFORM_CAPABILITY_IDS.DISCOVERY, {
         available: false,
-        providerKind: 'browser-demo',
+        providerKind: resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.DISCOVERY, {
+            ...BROWSER_DEMO_PROVIDER_OPTIONS,
+            available: false,
+        }),
         contractVersion: 'browser.discovery.v1',
         degradedReason: 'desktop_only',
         supportsSubscribe: false,
@@ -66,7 +76,10 @@ export function createBrowserDiscoveryAdapter() {
 export function createBrowserHostAdapter() {
     const capability = createBrowserCapability(PLATFORM_CAPABILITY_IDS.HOST, {
         available: false,
-        providerKind: 'browser-demo',
+        providerKind: resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.HOST, {
+            ...BROWSER_DEMO_PROVIDER_OPTIONS,
+            available: false,
+        }),
         contractVersion: 'browser.host.v1',
         degradedReason: 'desktop_only',
         supportsSessionOwnership: false,
@@ -96,7 +109,10 @@ export function createBrowserSaveAdapter(options = {}) {
     const available = !!(saveReplayImpl || saveVideoImpl);
     const capability = createBrowserCapability(PLATFORM_CAPABILITY_IDS.SAVE, {
         available,
-        providerKind: normalizeString(options.providerKind, available ? 'browser-download' : 'browser-demo'),
+        providerKind: normalizeString(options.providerKind, resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.SAVE, {
+            ...BROWSER_DEMO_PROVIDER_OPTIONS,
+            available,
+        })),
         contractVersion: normalizeString(options.contractVersion, 'browser.save.v1'),
         degradedReason: normalizeString(options.degradedReason, available ? '' : 'save_unavailable'),
         supportsBinaryExport: typeof saveVideoImpl === 'function',
@@ -116,7 +132,10 @@ export function createBrowserRecordingAdapter(options = {}) {
     const available = options.available === true;
     const capability = createBrowserCapability(PLATFORM_CAPABILITY_IDS.RECORDING, {
         available,
-        providerKind: normalizeString(options.providerKind, available ? 'browser-native' : 'browser-demo'),
+        providerKind: normalizeString(options.providerKind, resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.RECORDING, {
+            ...BROWSER_DEMO_PROVIDER_OPTIONS,
+            available,
+        })),
         contractVersion: normalizeString(options.contractVersion, 'browser.recording.v1'),
         degradedReason: normalizeString(options.degradedReason, available ? '' : 'recording_unavailable'),
         supportsCapture: options.supportsCapture === true || available,

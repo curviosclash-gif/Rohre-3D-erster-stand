@@ -1,4 +1,5 @@
 import { MULTIPLAYER_TRANSPORTS } from './RuntimeSessionContract.js';
+import { resolveLobbyProviderKind } from './PlatformCapabilityRegistry.js';
 
 export const LOBBY_SERVICE_CONTRACT_VERSION = 'lobby-service.v1';
 
@@ -52,7 +53,7 @@ export function createLobbyServiceDescriptor(source = {}) {
         transport,
         providerKind: normalizeString(
             source.providerKind,
-            transport === LOBBY_SERVICE_TRANSPORTS.STORAGE_BRIDGE ? 'menu-storage-bridge' : `menu-${transport}`
+            resolveLobbyProviderKind(transport)
         ),
         lifecycleContractVersion: normalizeString(source.lifecycleContractVersion, ''),
         supportsConnectionContext: source.supportsConnectionContext === true || isNetworkLobbyServiceTransport(transport),
