@@ -1,4 +1,9 @@
 import { LANMatchLobby } from '../../network/LANMatchLobby.js';
+import {
+    createElectronDiscoveryIntentBridge,
+    createElectronHostIntentBridge,
+    getElectronPlatformCapabilitySnapshot,
+} from '../../platform/electron/ElectronPlatformBridge.js';
 import { buildMenuLifecycleEventPayload } from '../../ui/menu/MenuStateContracts.js';
 import { resolveGlobalObject, toCallable } from '../../ui/menu/multiplayer/MenuMultiplayerBridgeRuntime.js';
 import { createMenuMultiplayerDiscoveryPort } from '../../ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js';
@@ -140,6 +145,8 @@ export class LanMenuMultiplayerBridge {
         this.onMatchStart = typeof options.onMatchStart === 'function' ? options.onMatchStart : null;
         this._runtimeGlobal = runtimeGlobal;
         this._runtime = options.runtime && typeof options.runtime === 'object' ? options.runtime : {};
+        this._platformCapabilities = getElectronPlatformCapabilitySnapshot(runtimeGlobal);
+        this._hostIntentBridge = createElectronHostIntentBridge(runtimeGlobal);
         this._events = [];
         this._actorId = '';
         this._signalingUrl = '';
@@ -148,7 +155,7 @@ export class LanMenuMultiplayerBridge {
         this._sessionState = createIdleSessionState();
         this._discoveryPort = createMenuMultiplayerDiscoveryPort({
             runtime: this._runtime,
-            discoveryRuntime: runtimeGlobal?.curviosApp,
+            discoveryRuntime: createElectronDiscoveryIntentBridge(runtimeGlobal),
         });
     }
 
@@ -211,18 +218,22 @@ export class LanMenuMultiplayerBridge {
     }
 
     async _resolveHostSignalingUrl() {
-        const appRuntime = this._runtimeGlobal?.curviosApp;
-        const getLanServerStatus = toCallable(appRuntime?.getLanServerStatus, null);
-        const startLanServer = toCallable(appRuntime?.startLanServer, null);
-        const status = getLanServerStatus ? await getLanServerStatus.call(appRuntime) : null;
+        const hostCapabilities = this._platformCapabilities?.host || null;
+        const hostBridge = this._hostIntentBridge;
+        const getLanServerStatus = toCallable(hostBridge?.getLanServerStatus || hostBridge?.getStatus, null);
+        const startLanServer = toCallable(hostBridge?.startLanServer || hostBridge?.start, null);
+        const status = getLanServerStatus ? await getLanServerStatus.call(hostBridge) : null;
         if (status?.running && status?.port) {
             return `http://localhost:${status.port}`;
         }
         if (startLanServer) {
-            const started = await startLanServer.call(appRuntime);
+            const started = await startLanServer.call(hostBridge);
             if (started?.running && started?.port) {
                 return `http://localhost:${started.port}`;
             }
+        }
+        if (hostCapabilities?.available !== true) {
+            return 'http://localhost:9090';
         }
         return 'http://localhost:9090';
     }

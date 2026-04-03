@@ -6,8 +6,8 @@ import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
 import { MENU_CONTROLLER_EVENT_CONTRACT_VERSION } from '../shared/contracts/MenuControllerContract.js';
-import { createApplySettingsCommand, createFinalizeMatchCommand, createHostLobbyCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
-import { createInitializeSessionCommand, createJoinLobbyCommand, createReturnToMenuCommand, createStartMatchCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
+import { createApplySettingsCommand, createFinalizeMatchCommand, createHostLobbyCommand, createInitializeSessionCommand, createJoinLobbyCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
+import { createPauseMatchCommand, createResumeMatchCommand, createReturnToMenuCommand, createStartMatchCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
 import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
 import {
     guardMenuRuntimeEvent,
@@ -495,6 +495,8 @@ export class GameRuntimeFacade {
     isNetworkSession() { return this.sessionHandler.isNetworkSession(); }
     isHost() { return this.sessionHandler.isHost(); }
     startMatch(options = undefined) { return this.executeSessionRuntimeCommand(createStartMatchCommand(options)); }
+    pauseMatch(options = undefined) { return this.executeSessionRuntimeCommand(createPauseMatchCommand(options)); }
+    resumeMatch(options = undefined) { return this.executeSessionRuntimeCommand(createResumeMatchCommand(options)); }
     restartRound() { return this.sessionHandler.restartRound(); }
     returnToMenu(options = {}) { return this.executeSessionRuntimeCommand(createReturnToMenuCommand(options)); }
     finalizeMatch(options = {}) { return this.executeSessionRuntimeCommand(createFinalizeMatchCommand(options)); }

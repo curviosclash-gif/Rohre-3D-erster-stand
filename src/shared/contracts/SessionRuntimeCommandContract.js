@@ -4,6 +4,8 @@ export const SESSION_RUNTIME_COMMAND_TYPES = Object.freeze({
     APPLY_SETTINGS: 'apply_settings',
     INITIALIZE_SESSION: 'initialize_session',
     START_MATCH: 'start_match',
+    PAUSE_MATCH: 'pause_match',
+    RESUME_MATCH: 'resume_match',
     RETURN_TO_MENU: 'return_to_menu',
     FINALIZE_MATCH: 'finalize_match',
     HOST_LOBBY: 'host_lobby',
@@ -55,6 +57,14 @@ export function createInitializeSessionCommand(options = undefined) {
 
 export function createStartMatchCommand(options = undefined) {
     return createSessionRuntimeCommand(SESSION_RUNTIME_COMMAND_TYPES.START_MATCH, options);
+}
+
+export function createPauseMatchCommand(options = undefined) {
+    return createSessionRuntimeCommand(SESSION_RUNTIME_COMMAND_TYPES.PAUSE_MATCH, options);
+}
+
+export function createResumeMatchCommand(options = undefined) {
+    return createSessionRuntimeCommand(SESSION_RUNTIME_COMMAND_TYPES.RESUME_MATCH, options);
 }
 
 export function createReturnToMenuCommand(options = undefined) {

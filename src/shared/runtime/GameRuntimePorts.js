@@ -1,7 +1,17 @@
+import { GAME_STATE_IDS } from '../contracts/GameStateIds.js';
+import {
+    createMatchFlowSnapshot,
+    createSessionRuntimeSnapshot,
+} from '../contracts/SessionRuntimeSnapshotContract.js';
+
 function noop() {}
 
 function getRuntimeBundle(game) {
     return game?.runtimeBundle || null;
+}
+
+function getSessionRuntime(game) {
+    return getRuntimeBundle(game)?.sessionRuntime || game?.sessionRuntime || null;
 }
 
 function getRuntimeState(game) {
@@ -22,6 +32,57 @@ function getRuntimeFacade(game) {
 
 function getRuntimeCoordinator(game) {
     return getRuntimeComponent(game, 'runtimeCoordinator') || game?.runtimeCoordinator || null;
+}
+
+function buildSessionRuntimeProjection(game) {
+    const sessionRuntime = getSessionRuntime(game);
+    const lifecycle = sessionRuntime?.lifecycle || {};
+    const finalize = sessionRuntime?.finalize || {};
+    const session = sessionRuntime?.session || {};
+    const facade = getRuntimeFacade(game);
+    const updatedAt = Math.max(
+        Number(lifecycle.updatedAt) || 0,
+        Number(finalize.updatedAt) || 0
+    );
+
+    return createSessionRuntimeSnapshot({
+        sessionId: session.activeSessionId || null,
+        lifecycleState: lifecycle.status || 'unknown',
+        finalizeState: finalize.status || 'idle',
+        gameStateId: lifecycle.gameStateId || game?.state || '',
+        isNetworkSession: facade?.isNetworkSession?.() === true,
+        isHost: facade?.isHost?.() !== false,
+        pendingSessionInit: !!lifecycle.pendingSessionInit,
+        pendingFinalizeTrigger: finalize.lastTrigger || '',
+        updatedAt,
+    });
+}
+
+function buildMatchFlowProjection(game) {
+    const sessionSnapshot = buildSessionRuntimeProjection(game);
+    const gameStateId = sessionSnapshot.gameStateId || game?.state || GAME_STATE_IDS.MENU;
+    return createMatchFlowSnapshot({
+        sessionId: sessionSnapshot.sessionId,
+        gameStateId,
+        uiStateId: gameStateId,
+        roundStateId: gameStateId === GAME_STATE_IDS.ROUND_END ? GAME_STATE_IDS.ROUND_END : '',
+        isPaused: gameStateId === GAME_STATE_IDS.PAUSED,
+        canReturnToMenu: gameStateId !== GAME_STATE_IDS.MENU && sessionSnapshot.finalizeState !== 'finalizing',
+        pendingFinalizeTrigger: sessionSnapshot.pendingFinalizeTrigger,
+        isNetworkSession: sessionSnapshot.isNetworkSession,
+        isHost: sessionSnapshot.isHost,
+        lifecycleState: sessionSnapshot.lifecycleState,
+        finalizeState: sessionSnapshot.finalizeState,
+        updatedAt: sessionSnapshot.updatedAt,
+    });
+}
+
+function callRuntimeIntent(game, methodName, options = undefined) {
+    const coordinator = getRuntimeCoordinator(game);
+    if (typeof coordinator?.[methodName] === 'function') {
+        return coordinator[methodName](options);
+    }
+    return getRuntimeFacade(game)?.[methodName]?.(options);
 }
 
 export function createSettingsPort(game) {
@@ -160,10 +221,59 @@ export function createLifecyclePort(game) {
     };
 }
 
+export function createRuntimeIntentPort(game) {
+    return {
+        startMatch(options = undefined) {
+            return callRuntimeIntent(game, 'startMatch', options);
+        },
+        pauseMatch(options = undefined) {
+            return callRuntimeIntent(game, 'pauseMatch', options);
+        },
+        resumeMatch(options = undefined) {
+            return callRuntimeIntent(game, 'resumeMatch', options);
+        },
+        returnToMenu(options = undefined) {
+            return callRuntimeIntent(game, 'returnToMenu', options);
+        },
+        finalizeMatch(options = undefined) {
+            return callRuntimeIntent(game, 'finalizeMatch', options);
+        },
+        hostLobby(options = undefined) {
+            return callRuntimeIntent(game, 'hostLobby', options);
+        },
+        joinLobby(options = undefined) {
+            return callRuntimeIntent(game, 'joinLobby', options);
+        },
+    };
+}
+
+export function createRuntimeProjectionPort(game) {
+    return {
+        getSessionRuntimeSnapshot() {
+            return buildSessionRuntimeProjection(game);
+        },
+        getMatchFlowSnapshot() {
+            return buildMatchFlowProjection(game);
+        },
+    };
+}
+
 export function createMatchUiPort(game) {
     return {
+        applyStartMatchProjection() {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.applyStartMatchProjection?.();
+        },
         startMatch() {
-            return getRuntimeComponent(game, 'matchFlowUiController')?.startMatch?.();
+            return getRuntimeComponent(game, 'matchFlowUiController')?.applyStartMatchProjection?.();
+        },
+        applyPauseMatchProjection() {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.applyPauseProjection?.();
+        },
+        applyResumeMatchProjection() {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.applyResumeProjection?.();
+        },
+        applyDisconnectConfirmationProjection() {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.applyDisconnectConfirmationProjection?.();
         },
         startRound() {
             return getRuntimeComponent(game, 'matchFlowUiController')?.startRound?.();
@@ -184,6 +294,8 @@ export function createRuntimePorts(game) {
     const renderPort = createRenderPort(game);
     const inputPort = createInputPort(game);
     const lifecyclePort = createLifecyclePort(game);
+    const runtimeIntentPort = createRuntimeIntentPort(game);
+    const runtimeProjectionPort = createRuntimeProjectionPort(game);
     const matchUiPort = createMatchUiPort(game);
     return {
         settingsPort,
@@ -192,6 +304,8 @@ export function createRuntimePorts(game) {
         renderPort,
         inputPort,
         lifecyclePort,
+        runtimeIntentPort,
+        runtimeProjectionPort,
         matchUiPort,
         dispose: noop,
     };

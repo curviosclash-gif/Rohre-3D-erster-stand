@@ -64,8 +64,23 @@ export class GameRuntimeSessionHandler {
                 recordMenuTelemetry: (eventType, payload) => facade?._recordMenuTelemetry?.(eventType, payload),
             });
         }
-        const startResult = facade?.ports?.matchUiPort?.startMatch?.();
+        const startResult = facade?.ports?.matchUiPort?.applyStartMatchProjection?.();
         return startResult !== false;
+    }
+
+    pauseMatch() {
+        const facade = this._facade;
+        if (this.isNetworkSession() && !this.isHost()) {
+            facade?.ports?.matchUiPort?.applyDisconnectConfirmationProjection?.();
+            return false;
+        }
+        facade?.ports?.matchUiPort?.applyPauseMatchProjection?.();
+        return true;
+    }
+
+    resumeMatch() {
+        this._facade?.ports?.matchUiPort?.applyResumeMatchProjection?.();
+        return true;
     }
 
     restartRound() {

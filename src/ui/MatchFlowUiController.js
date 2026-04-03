@@ -661,7 +661,7 @@ export class MatchFlowUiController {
         return completeWithLoadGate(initializedMatch);
     }
 
-    startMatch() {
+    applyStartMatchProjection() {
         if (this._startMatchPromise) return this._startMatchPromise;
         try {
             const startResult = this._startMatchInternal();
@@ -677,6 +677,13 @@ export class MatchFlowUiController {
         } catch (error) {
             return this._handleStartMatchFailure(error);
         }
+    }
+
+    startMatch(options = undefined) {
+        if (this.ports?.runtimeIntentPort?.startMatch) {
+            return this.ports.runtimeIntentPort.startMatch(options);
+        }
+        return this.applyStartMatchProjection();
     }
 
     startRound() {
@@ -796,25 +803,13 @@ export class MatchFlowUiController {
     }
 
     returnToMenu(options = {}) {
+        if (this.ports?.runtimeIntentPort?.returnToMenu) {
+            return this.ports.runtimeIntentPort.returnToMenu(options);
+        }
         if (this.ports?.lifecyclePort?.returnToMenu) {
             return this.ports.lifecyclePort.returnToMenu(options);
         }
-        const game = this.game;
-        if (game?.runtimeFacade?.returnToMenu) {
-            return game.runtimeFacade.returnToMenu(options);
-        }
-        game.entityManager?.clearLastRoundGhost?.();
-        const teardownResult = this.sessionOrchestrator.finalizeMatchSession?.({
-            reason: options?.reason || 'return_to_menu',
-        }) || this.sessionOrchestrator.teardownMatchSession({ reason: options?.reason || 'return_to_menu' });
-        game.runtimeFacade?.teardownRuntimeSession?.();
-        game.input?.clearPlayerSources?.();
-        game.hudRuntimeSystem?.clearNetworkScoreboard?.();
-        this.applyReturnToMenuUi(options);
-        if (teardownResult && typeof teardownResult.then === 'function') {
-            return Promise.resolve(teardownResult).then(() => true).catch(() => false);
-        }
-        return true;
+        return this.applyReturnToMenuUi(options);
     }
 
     /**
@@ -832,11 +827,6 @@ export class MatchFlowUiController {
     }
 
     pause() {
-        // In network matches only the host can pause; clients get disconnect confirmation
-        if (this._isNetworkMatch() && !this._isHost()) {
-            this.pauseOverlayController.showDisconnectConfirmation();
-            return;
-        }
         this.pauseOverlayController.pause();
     }
 
@@ -846,6 +836,18 @@ export class MatchFlowUiController {
 
     returnToMenuFromPause() {
         this.pauseOverlayController.returnToMenuFromPause();
+    }
+
+    applyPauseProjection() {
+        return this.pauseOverlayController.applyPauseProjection();
+    }
+
+    applyResumeProjection() {
+        return this.pauseOverlayController.applyResumeProjection();
+    }
+
+    applyDisconnectConfirmationProjection() {
+        return this.pauseOverlayController.applyDisconnectConfirmationProjection();
     }
 
     setupPauseOverlayListeners() {

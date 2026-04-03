@@ -1,7 +1,6 @@
 import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
 import { SESSION_FINALIZE_TRIGGERS } from '../../shared/contracts/MatchLifecycleContract.js';
 import {
-    createFinalizeMatchCommand,
     normalizeSessionRuntimeCommand,
     SESSION_RUNTIME_COMMAND_TYPES,
 } from '../../shared/contracts/SessionRuntimeCommandContract.js';
@@ -27,6 +26,10 @@ export class SessionRuntimeCommandExecutor {
             return this._executeInitializeSession(normalizedCommand.payload);
         case SESSION_RUNTIME_COMMAND_TYPES.START_MATCH:
             return this._executeStartMatch(normalizedCommand.payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.PAUSE_MATCH:
+            return this._executePauseMatch(normalizedCommand.payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.RESUME_MATCH:
+            return this._executeResumeMatch(normalizedCommand.payload);
         case SESSION_RUNTIME_COMMAND_TYPES.RETURN_TO_MENU:
             return this._executeReturnToMenu(normalizedCommand.payload);
         case SESSION_RUNTIME_COMMAND_TYPES.FINALIZE_MATCH:
@@ -55,10 +58,18 @@ export class SessionRuntimeCommandExecutor {
             if (!game || game.state !== GAME_STATE_IDS.MENU) return false;
             facade?._applyAuthoritativeMultiplayerMatchSettings?.(options.settingsSnapshot);
             facade?.getUiManager?.()?.clearStartValidationError?.();
-            const startResult = facade?.getPorts?.()?.matchUiPort?.startMatch?.();
+            const startResult = facade?.getPorts?.()?.matchUiPort?.applyStartMatchProjection?.();
             return startResult !== false;
         }
         return facade?.sessionHandler?.startMatch?.(options);
+    }
+
+    _executePauseMatch(options = undefined) {
+        return this._facade?.sessionHandler?.pauseMatch?.(options);
+    }
+
+    _executeResumeMatch(options = undefined) {
+        return this._facade?.sessionHandler?.resumeMatch?.(options);
     }
 
     _executeReturnToMenu(options = undefined) {

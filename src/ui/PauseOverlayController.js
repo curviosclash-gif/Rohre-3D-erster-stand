@@ -2,7 +2,6 @@ import {
     derivePauseTransition,
     deriveResumeTransition,
 } from '../state/MatchLifecycleStateTransitions.js';
-import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 
 export class PauseOverlayController {
     constructor(deps = {}) {
@@ -15,14 +14,20 @@ export class PauseOverlayController {
         this._boundHandlers = null;
     }
 
-    /** Returns true if this is a network match. */
-    _isNetworkMatch() {
-        return !!this.game?.runtimeFacade?.isNetworkSession?.();
+    _getMatchFlowSnapshot() {
+        return this.ports?.runtimeProjectionPort?.getMatchFlowSnapshot?.() || null;
     }
 
-    /** Returns true if the local player is the host. */
+    _getSessionRuntimeSnapshot() {
+        return this.ports?.runtimeProjectionPort?.getSessionRuntimeSnapshot?.() || null;
+    }
+
+    _isPauseActive() {
+        return this._getMatchFlowSnapshot()?.isPaused === true;
+    }
+
     _isHost() {
-        return this.game?.runtimeFacade?.isHost?.() ?? true;
+        return this._getSessionRuntimeSnapshot()?.isHost !== false;
     }
 
     _addManagedListener(target, type, handler) {
@@ -52,39 +57,39 @@ export class PauseOverlayController {
         if (!this._boundHandlers) {
             this._boundHandlers = {
                 onPauseResumeClick: () => {
-                    if (game.state === GAME_STATE_IDS.PAUSED) {
+                    if (this._isPauseActive()) {
                         this.resumeFromPause();
                     }
                 },
                 onPauseSettingsClick: () => {
-                    if (game.state === GAME_STATE_IDS.PAUSED) {
+                    if (this._isPauseActive()) {
                         this._showSettings();
                     }
                 },
                 onPauseSettingsBackClick: () => {
-                    if (game.state === GAME_STATE_IDS.PAUSED) {
+                    if (this._isPauseActive()) {
                         this._hideSettings();
                     }
                 },
                 onPauseMenuClick: () => {
-                    if (game.state === GAME_STATE_IDS.PAUSED) {
+                    if (this._isPauseActive()) {
                         this.returnToMenuFromPause();
                     }
                 },
                 onPauseKeybindP1Click: (event) => this._handleKeybindClick(event, 'PLAYER_1'),
                 onPauseKeybindP2Click: (event) => this._handleKeybindClick(event, 'PLAYER_2'),
                 onAutoRollChange: () => {
-                    if (game.state !== GAME_STATE_IDS.PAUSED) return;
+                    if (!this._isPauseActive()) return;
                     const checked = !!game.ui.pauseAutoRollToggle?.checked;
                     this.ports?.settingsPort?.applyAutoRoll?.(checked);
                 },
                 onInvertP1Change: () => {
-                    if (game.state !== GAME_STATE_IDS.PAUSED) return;
+                    if (!this._isPauseActive()) return;
                     const checked = !!game.ui.pauseInvertP1?.checked;
                     this._applyInvertPitch(0, 'PLAYER_1', checked);
                 },
                 onInvertP2Change: () => {
-                    if (game.state !== GAME_STATE_IDS.PAUSED) return;
+                    if (!this._isPauseActive()) return;
                     const checked = !!game.ui.pauseInvertP2?.checked;
                     this._applyInvertPitch(1, 'PLAYER_2', checked);
                 },
@@ -103,15 +108,21 @@ export class PauseOverlayController {
     }
 
     pause() {
-        // Network: only host may pause
-        if (this._isNetworkMatch() && !this._isHost()) return;
+        if (this.ports?.runtimeIntentPort?.pauseMatch) {
+            return this.ports.runtimeIntentPort.pauseMatch();
+        }
+        return this.applyPauseProjection();
+    }
 
+    applyPauseProjection() {
         const controller = this.matchFlowUiController;
         const pauseTransition = derivePauseTransition();
+        this._restorePauseButtonLabels();
         controller.applyLifecycleTransition(pauseTransition);
         controller.applyMatchUiState(pauseTransition.uiState);
         this.ports?.inputPort?.clearJustPressed?.();
         this._hideSettings();
+        return true;
     }
 
     /**
@@ -146,7 +157,7 @@ export class PauseOverlayController {
     /**
      * ESC on a network client: show disconnect confirmation instead of pause.
      */
-    showDisconnectConfirmation() {
+    applyDisconnectConfirmationProjection() {
         const game = this.game;
         if (!game?.ui?.pauseOverlay) return;
         const pauseTransition = derivePauseTransition();
@@ -161,13 +172,22 @@ export class PauseOverlayController {
             game.ui.pauseResumeButton.textContent = 'Weiter spielen';
         }
         this._hideSettings();
+        return true;
+    }
+
+    showDisconnectConfirmation() {
+        return this.applyDisconnectConfirmationProjection();
     }
 
     resumeFromPause() {
-        if (this._isNetworkMatch() && !this._isHost()) {
-            // Client was shown disconnect confirmation - just resume
-            this._restorePauseButtonLabels();
+        if (this.ports?.runtimeIntentPort?.resumeMatch) {
+            return this.ports.runtimeIntentPort.resumeMatch();
         }
+        return this.applyResumeProjection();
+    }
+
+    applyResumeProjection() {
+        this._restorePauseButtonLabels();
         this.hideHostPausedOverlay();
 
         const controller = this.matchFlowUiController;
@@ -176,13 +196,21 @@ export class PauseOverlayController {
         controller.applyLifecycleTransition(resumeTransition);
         controller.applyMatchUiState(resumeTransition.uiState);
         this.game.gameLoop.requestDeltaReset?.('pause-resume');
+        return true;
     }
 
     returnToMenuFromPause() {
-        const controller = this.matchFlowUiController;
         this._hideSettings();
         this.hideHostPausedOverlay();
         this._restorePauseButtonLabels();
+        if (this.ports?.runtimeIntentPort?.returnToMenu) {
+            this.ports.runtimeIntentPort.returnToMenu({
+                panelId: 'submenu-game',
+                reason: 'pause_menu_return',
+                trigger: 'pause_menu_return',
+            });
+            return;
+        }
         if (this.ports?.lifecyclePort?.returnToMenu) {
             this.ports.lifecyclePort.returnToMenu({
                 panelId: 'submenu-game',
@@ -191,7 +219,7 @@ export class PauseOverlayController {
             });
             return;
         }
-        controller.returnToMenu({
+        this.matchFlowUiController.applyReturnToMenuUi({
             panelId: 'submenu-game',
             reason: 'pause_menu_return',
             trigger: 'pause_menu_return',
@@ -209,8 +237,7 @@ export class PauseOverlayController {
     }
 
     _handleKeybindClick(event, playerKey) {
-        const game = this.game;
-        if (game.state !== GAME_STATE_IDS.PAUSED) return;
+        if (!this._isPauseActive()) return;
         const button = event?.target?.closest?.('button.keybind-btn');
         if (!button) return;
         this.ports?.inputPort?.startKeyCapture?.(playerKey, button.dataset.action);

@@ -127,12 +127,32 @@ export class GameRuntimeCoordinator {
         return this.getRuntimeFacade()?.startArcadeRunIfEnabled?.();
     }
 
-    startMatch() {
-        return this.getRuntimeFacade()?.startMatch?.();
+    startMatch(options = undefined) {
+        return this.getRuntimeFacade()?.startMatch?.(options);
+    }
+
+    pauseMatch(options = undefined) {
+        return this.getRuntimeFacade()?.pauseMatch?.(options);
+    }
+
+    resumeMatch(options = undefined) {
+        return this.getRuntimeFacade()?.resumeMatch?.(options);
     }
 
     returnToMenu(options = undefined) {
         return this.getRuntimeFacade()?.returnToMenu?.(options);
+    }
+
+    finalizeMatch(options = undefined) {
+        return this.getRuntimeFacade()?.finalizeMatch?.(options);
+    }
+
+    hostLobby(options = undefined) {
+        return this.getRuntimeFacade()?.hostLobby?.(options);
+    }
+
+    joinLobby(options = undefined) {
+        return this.getRuntimeFacade()?.joinLobby?.(options);
     }
 
     renderBuildInfo() {

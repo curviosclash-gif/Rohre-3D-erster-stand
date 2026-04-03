@@ -1,3 +1,4 @@
+import { isDesktopPlatformRuntime } from '../../platform/electron/ElectronPlatformBridge.js';
 import { createMenuFeatureFlags } from './MenuStateContracts.js';
 
 /* global __APP_MODE__ */
@@ -8,7 +9,7 @@ export function isDesktopAppRuntime(runtimeGlobal = globalThis) {
         return true;
     }
 
-    return runtimeGlobal?.curviosApp?.isApp === true || runtimeGlobal?.__CURVIOS_APP__ === true;
+    return isDesktopPlatformRuntime(runtimeGlobal);
 }
 
 export function resolveRuntimeMenuFeatureFlags(sourceFlags = null, runtimeGlobal = globalThis) {

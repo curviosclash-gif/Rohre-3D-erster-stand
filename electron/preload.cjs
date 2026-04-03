@@ -9,6 +9,7 @@ const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     host: 'preload.host.v1',
     save: 'preload.save.v1',
 });
+const PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION = 'platform-capability-snapshot.v1';
 
 function createInvokeBridge(channel) {
     return (...args) => ipcRenderer.invoke(channel, ...args);
@@ -19,6 +20,20 @@ function createNamedContract(contractName, contractVersion, surface) {
         contractName,
         contractVersion,
         ...surface,
+    });
+}
+
+function createCapabilityDescriptor(capabilityId, contractVersion, providerKind, available, extra) {
+    return Object.freeze({
+        capabilityId,
+        available: available === true,
+        providerKind,
+        contractVersion,
+        degradedReason: '',
+        supportsSubscribe: extra?.supportsSubscribe === true,
+        supportsSessionOwnership: extra?.supportsSessionOwnership === true,
+        supportsBinaryExport: extra?.supportsBinaryExport === true,
+        supportsCapture: extra?.supportsCapture === true,
     });
 }
 
@@ -56,7 +71,28 @@ function createSaveContract() {
 const discoveryContract = createDiscoveryContract();
 const hostContract = createHostContract();
 const saveContract = createSaveContract();
+const platformContracts = Object.freeze({
+    discovery: discoveryContract,
+    host: hostContract,
+    save: saveContract,
+});
+const platformCapabilities = Object.freeze({
+    contractVersion: PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION,
+    runtimeKind: 'electron',
+    discovery: createCapabilityDescriptor('discovery', discoveryContract.contractVersion, 'electron-ipc', true, {
+        supportsSubscribe: true,
+    }),
+    host: createCapabilityDescriptor('host', hostContract.contractVersion, 'electron-ipc', true, {
+        supportsSessionOwnership: true,
+    }),
+    save: createCapabilityDescriptor('save', saveContract.contractVersion, 'electron-ipc', true, {
+        supportsBinaryExport: true,
+    }),
+    recording: createCapabilityDescriptor('recording', '', 'electron-ipc', false, {}),
+});
 const curviosApp = Object.freeze({
+    contracts: platformContracts,
+    capabilities: platformCapabilities,
     discovery: discoveryContract,
     host: hostContract,
     save: saveContract,
