@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import * as THREE from 'three';
 import { createLogger } from '../shared/logging/Logger.js';
 import { coordinateRoundEnd } from '../state/RoundEndCoordinator.js';
@@ -23,6 +22,7 @@ import {
     GAME_STATE_IDS,
     normalizeGameStateId,
 } from '../shared/contracts/GameStateIds.js';
+import { createMatchFlowUiControllerPort } from '../shared/runtime/UiControllerRuntimePorts.js';
 
 function isPromiseLike(value) {
     return !!value && typeof value.then === 'function';
@@ -61,8 +61,8 @@ function resolveRoundTelemetryWinnerLabel(players, roundMetrics) {
 
 export class MatchFlowUiController {
     constructor(deps = {}) {
-        this.game = deps.game || null;
-        this.ports = deps.ports || null;
+        this.runtime = deps.runtime || deps.game || null;
+        this.runtimePort = deps.runtimePort || createMatchFlowUiControllerPort(deps.ports || null);
         this.sessionOrchestrator = deps.sessionOrchestrator
             || new MatchLifecycleSessionOrchestrator(createMatchSessionPort(this.game));
         this.feedbackAdapter = new MatchFeedbackAdapter({
@@ -76,12 +76,16 @@ export class MatchFlowUiController {
         this._startMatchPromise = null;
         this.pauseOverlayController = new PauseOverlayController({
             matchFlowUiController: this,
-            game: this.game,
-            ports: this.ports,
+            runtime: this.game,
+            ports: deps.ports || null,
         });
         this._arcadeOverlayPanel = null;
         this._arcadeXpAnimFrame = 0;
         this._arcadeXpAnimToken = 0;
+    }
+
+    get game() {
+        return this.runtime;
     }
 
     _resolveMessageStatsContainer() {
@@ -347,8 +351,8 @@ export class MatchFlowUiController {
         }
 
         if (typeof uiState?.splitScreenEnabled === 'boolean') {
-            if (this.ports?.renderPort?.setSplitScreen) {
-                this.ports.renderPort.setSplitScreen(uiState.splitScreenEnabled);
+            if (this.runtimePort?.setSplitScreen) {
+                this.runtimePort.setSplitScreen(uiState.splitScreenEnabled);
             } else {
                 game.renderer.setSplitScreen(uiState.splitScreenEnabled);
             }
@@ -553,8 +557,8 @@ export class MatchFlowUiController {
     }
 
     _completeStartedMatch(initializedMatch) {
-        if (this.ports?.lifecyclePort?.startArcadeRunIfEnabled) {
-            this.ports.lifecyclePort.startArcadeRunIfEnabled();
+        if (this.runtimePort?.startArcadeRunIfEnabled) {
+            this.runtimePort.startArcadeRunIfEnabled();
         } else {
             this.game?.runtimeFacade?.startArcadeRunIfEnabled?.();
         }
@@ -613,8 +617,8 @@ export class MatchFlowUiController {
         }
 
         // Initialize session adapter (Local/LAN/Online)
-        const sessionInitPromise = this.ports?.lifecyclePort?.initializeSession
-            ? this.ports.lifecyclePort.initializeSession()
+        const sessionInitPromise = this.runtimePort?.initializeSession
+            ? this.runtimePort.initializeSession()
             : game.runtimeFacade?.initializeSession?.();
 
         const createMatch = () => {
@@ -635,8 +639,8 @@ export class MatchFlowUiController {
         };
 
         const completeWithLoadGate = (resolvedMatch) => {
-            const loadGate = this.ports?.lifecyclePort?.waitForAllPlayersLoaded
-                ? this.ports.lifecyclePort.waitForAllPlayersLoaded()
+            const loadGate = this.runtimePort?.waitForAllPlayersLoaded
+                ? this.runtimePort.waitForAllPlayersLoaded()
                 : game.runtimeFacade?.waitForAllPlayersLoaded?.();
             if (isPromiseLike(loadGate)) {
                 return Promise.resolve(loadGate).then(() => this._completeStartedMatch(resolvedMatch));
@@ -680,8 +684,8 @@ export class MatchFlowUiController {
     }
 
     startMatch(options = undefined) {
-        if (this.ports?.runtimeIntentPort?.startMatch) {
-            return this.ports.runtimeIntentPort.startMatch(options);
+        if (this.runtimePort?.startMatch) {
+            return this.runtimePort.startMatch(options);
         }
         return this.applyStartMatchProjection();
     }
@@ -789,13 +793,13 @@ export class MatchFlowUiController {
         }
         const panelId = String(options?.panelId || 'submenu-game').trim() || 'submenu-game';
         const trigger = String(options?.trigger || options?.reason || 'return_to_menu').trim() || 'return_to_menu';
-        if (this.ports?.uiFeedbackPort?.showMenuPanel) {
-            this.ports.uiFeedbackPort.showMenuPanel(panelId, { trigger });
+        if (this.runtimePort?.showMenuPanel) {
+            this.runtimePort.showMenuPanel(panelId, { trigger });
         } else {
             game._showMainNav?.();
         }
-        if (this.ports?.uiFeedbackPort?.syncAll) {
-            this.ports.uiFeedbackPort.syncAll();
+        if (this.runtimePort?.syncUi) {
+            this.runtimePort.syncUi();
         } else {
             game.uiManager?.syncAll?.();
         }
@@ -803,11 +807,8 @@ export class MatchFlowUiController {
     }
 
     returnToMenu(options = {}) {
-        if (this.ports?.runtimeIntentPort?.returnToMenu) {
-            return this.ports.runtimeIntentPort.returnToMenu(options);
-        }
-        if (this.ports?.lifecyclePort?.returnToMenu) {
-            return this.ports.lifecyclePort.returnToMenu(options);
+        if (this.runtimePort?.returnToMenu) {
+            return this.runtimePort.returnToMenu(options);
         }
         return this.applyReturnToMenuUi(options);
     }

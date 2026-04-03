@@ -9,8 +9,8 @@ import {
 } from './GameRuntimeBundle.js';
 
 export class GameRuntimeCoordinator {
-    constructor({ game } = {}) {
-        this.runtime = game || null;
+    constructor({ runtime } = {}) {
+        this.runtime = runtime || null;
         this.runtimeBundle = null;
         this.runtimeFacade = null;
         this.uiManager = null;
@@ -37,7 +37,7 @@ export class GameRuntimeCoordinator {
         setSessionRuntimeHandle(runtimeBundle, 'runtimeCoordinator', this);
 
         const runtimeFacade = new GameRuntimeFacade({
-            game,
+            runtime: game,
             runtimeBundle,
         });
         this.runtimeFacade = runtimeFacade;

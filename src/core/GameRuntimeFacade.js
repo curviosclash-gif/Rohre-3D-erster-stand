@@ -45,8 +45,8 @@ const logger = createLogger('GameRuntimeFacade');
 
 export class GameRuntimeFacade {
     constructor(deps = {}) {
-        this.game = deps.game || null;
-        this.runtimeBundle = deps.runtimeBundle || this.game?.runtimeBundle || null;
+        this.runtime = deps.runtime || deps.game || null;
+        this.runtimeBundle = deps.runtimeBundle || this.runtime?.runtimeBundle || null;
         this.runtimeClock = createRuntimeClock({
             runtime: deps.runtimeClockRuntime || null,
             nowMs: deps.nowMs,
@@ -97,6 +97,7 @@ export class GameRuntimeFacade {
         this.arcadeRunRuntime.setSuddenDeathEnteredHandler(() => withArcadeStrategy((strategy) => strategy.enterSuddenDeath?.()));
     }
 
+    get game() { return this.runtime; }
     getRuntimeBundle() { return this.runtimeBundle || this.game?.runtimeBundle || null; }
     getRuntimeState() { return getSessionRuntimeState(this.getRuntimeBundle() || this.game); }
     getRuntimeHandle(key) { return getSessionRuntimeHandle(this.getRuntimeBundle() || this.game, key); }

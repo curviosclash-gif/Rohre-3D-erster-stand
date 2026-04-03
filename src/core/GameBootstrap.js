@@ -149,7 +149,7 @@ export function bootstrapGameRuntime(game, options = {}) {
     registerRuntimeHandle('hudRuntimeSystem', new HudRuntimeSystem({ game, ports: runtimePorts }));
     registerRuntimeHandle('crosshairSystem', new CrosshairSystem({ game, ports: runtimePorts }));
     registerRuntimeHandle('matchFlowUiController', new MatchFlowUiController({
-        game,
+        runtime: game,
         ports: runtimePorts,
         sessionOrchestrator: matchSessionOrchestrator,
     }));

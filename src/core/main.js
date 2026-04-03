@@ -62,7 +62,7 @@ export class Game {
         this.keyCapture = null;
         this._disposed = false;
         this._playtestStartTimeoutId = null;
-        this.runtimeCoordinator = new GameRuntimeCoordinator({ game: this });
+        this.runtimeCoordinator = new GameRuntimeCoordinator({ runtime: this });
         this._boundKeyCaptureHandler = (event) => this.runtimeCoordinator?.getRuntimeHandle?.('keybindEditorController')?.handleKeyCapture?.(event);
 
         this.runtimeCoordinator.initialize({

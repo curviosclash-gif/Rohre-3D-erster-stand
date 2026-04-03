@@ -2,24 +2,29 @@ import {
     derivePauseTransition,
     deriveResumeTransition,
 } from '../state/MatchLifecycleStateTransitions.js';
+import { createPauseOverlayControllerPort } from '../shared/runtime/UiControllerRuntimePorts.js';
 
 export class PauseOverlayController {
     constructor(deps = {}) {
         this.matchFlowUiController = deps.matchFlowUiController;
-        this.game = deps.game || this.matchFlowUiController?.game || null;
-        this.ports = deps.ports || null;
+        this.runtime = deps.runtime || deps.game || this.matchFlowUiController?.game || null;
+        this.runtimePort = deps.runtimePort || createPauseOverlayControllerPort(deps.ports || null);
         this._listenersInitialized = false;
         this._hostPausedOverlay = null;
         this._managedListeners = [];
         this._boundHandlers = null;
     }
 
+    get game() {
+        return this.runtime;
+    }
+
     _getMatchFlowSnapshot() {
-        return this.ports?.runtimeProjectionPort?.getMatchFlowSnapshot?.() || null;
+        return this.runtimePort?.getMatchFlowSnapshot?.() || null;
     }
 
     _getSessionRuntimeSnapshot() {
-        return this.ports?.runtimeProjectionPort?.getSessionRuntimeSnapshot?.() || null;
+        return this.runtimePort?.getSessionRuntimeSnapshot?.() || null;
     }
 
     _isPauseActive() {
@@ -81,7 +86,7 @@ export class PauseOverlayController {
                 onAutoRollChange: () => {
                     if (!this._isPauseActive()) return;
                     const checked = !!game.ui.pauseAutoRollToggle?.checked;
-                    this.ports?.settingsPort?.applyAutoRoll?.(checked);
+                    this.runtimePort?.applyAutoRoll?.(checked);
                 },
                 onInvertP1Change: () => {
                     if (!this._isPauseActive()) return;
@@ -108,8 +113,8 @@ export class PauseOverlayController {
     }
 
     pause() {
-        if (this.ports?.runtimeIntentPort?.pauseMatch) {
-            return this.ports.runtimeIntentPort.pauseMatch();
+        if (this.runtimePort?.pauseMatch) {
+            return this.runtimePort.pauseMatch();
         }
         return this.applyPauseProjection();
     }
@@ -120,7 +125,7 @@ export class PauseOverlayController {
         this._restorePauseButtonLabels();
         controller.applyLifecycleTransition(pauseTransition);
         controller.applyMatchUiState(pauseTransition.uiState);
-        this.ports?.inputPort?.clearJustPressed?.();
+        this.runtimePort?.clearJustPressed?.();
         this._hideSettings();
         return true;
     }
@@ -180,8 +185,8 @@ export class PauseOverlayController {
     }
 
     resumeFromPause() {
-        if (this.ports?.runtimeIntentPort?.resumeMatch) {
-            return this.ports.runtimeIntentPort.resumeMatch();
+        if (this.runtimePort?.resumeMatch) {
+            return this.runtimePort.resumeMatch();
         }
         return this.applyResumeProjection();
     }
@@ -203,16 +208,8 @@ export class PauseOverlayController {
         this._hideSettings();
         this.hideHostPausedOverlay();
         this._restorePauseButtonLabels();
-        if (this.ports?.runtimeIntentPort?.returnToMenu) {
-            this.ports.runtimeIntentPort.returnToMenu({
-                panelId: 'submenu-game',
-                reason: 'pause_menu_return',
-                trigger: 'pause_menu_return',
-            });
-            return;
-        }
-        if (this.ports?.lifecyclePort?.returnToMenu) {
-            this.ports.lifecyclePort.returnToMenu({
+        if (this.runtimePort?.returnToMenu) {
+            this.runtimePort.returnToMenu({
                 panelId: 'submenu-game',
                 reason: 'pause_menu_return',
                 trigger: 'pause_menu_return',
@@ -240,13 +237,13 @@ export class PauseOverlayController {
         if (!this._isPauseActive()) return;
         const button = event?.target?.closest?.('button.keybind-btn');
         if (!button) return;
-        this.ports?.inputPort?.startKeyCapture?.(playerKey, button.dataset.action);
+        this.runtimePort?.startKeyCapture?.(playerKey, button.dataset.action);
     }
 
     _applyInvertPitch(playerIndex, playerKey, checked) {
         const game = this.game;
-        if (this.ports?.actionDispatcher) {
-            this.ports.actionDispatcher.dispatch({
+        if (this.runtimePort?.dispatchAction) {
+            this.runtimePort.dispatchAction({
                 type: 'settings.invertPitch',
                 payload: { playerIndex, playerKey, value: checked },
             });
