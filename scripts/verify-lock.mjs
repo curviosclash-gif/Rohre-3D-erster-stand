@@ -124,13 +124,75 @@ function resolvePlaywrightIsolationEnv(env = process.env) {
     };
 }
 
+function escapeRegex(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function toCrossPlatformPlaywrightFilter(value) {
+    const stringValue = String(value || '');
+    if (!/^[A-Za-z0-9_.\-\\/]+\.spec\.[cm]?[jt]sx?$/.test(stringValue)) {
+        return stringValue;
+    }
+    const normalizedSegments = stringValue
+        .split(/[\\/]+/)
+        .filter(Boolean)
+        .map((segment) => escapeRegex(segment));
+    if (normalizedSegments.length === 0) {
+        return stringValue;
+    }
+    return `${normalizedSegments.join('[\\\\/]')}$`;
+}
+
+function normalizePlaywrightCommandArgs(rawCommand, args) {
+    const normalizedCommand = String(rawCommand || '').toLowerCase();
+    const normalizedArgs = args.slice();
+    let firstFilterIndex = -1;
+
+    if (normalizedCommand === 'playwright' && String(normalizedArgs[0] || '').toLowerCase() === 'test') {
+        firstFilterIndex = 1;
+    } else if (
+        normalizedCommand === 'npx'
+        && String(normalizedArgs[0] || '').toLowerCase() === 'playwright'
+        && String(normalizedArgs[1] || '').toLowerCase() === 'test'
+    ) {
+        firstFilterIndex = 2;
+    }
+
+    if (firstFilterIndex === -1) {
+        return normalizedArgs;
+    }
+
+    for (let index = firstFilterIndex; index < normalizedArgs.length; index += 1) {
+        const value = String(normalizedArgs[index] || '');
+        if (value.startsWith('-')) break;
+        normalizedArgs[index] = toCrossPlatformPlaywrightFilter(value);
+    }
+
+    return normalizedArgs;
+}
+
 function resolveCommand(commandArgs) {
     const [rawCommand, ...args] = commandArgs;
     if (!rawCommand) {
         throw new Error('[verify-lock] Missing command after --playwright');
     }
 
+    const normalizedArgs = normalizePlaywrightCommandArgs(rawCommand, args);
     const normalized = String(rawCommand).toLowerCase();
+    const isDirectPlaywright = normalized === 'playwright';
+    const isNpxPlaywright = normalized === 'npx' && String(normalizedArgs[0] || '').toLowerCase() === 'playwright';
+
+    if (isDirectPlaywright || isNpxPlaywright) {
+        const playwrightArgs = isDirectPlaywright
+            ? normalizedArgs
+            : normalizedArgs.slice(1);
+        return {
+            command: process.execPath,
+            args: [path.resolve('node_modules', '@playwright', 'test', 'cli.js'), ...playwrightArgs],
+            shell: false,
+        };
+    }
+
     const useCmdShell = process.platform === 'win32'
         && (normalized === 'npx' || normalized === 'npm' || normalized === 'playwright');
 
@@ -143,7 +205,7 @@ function resolveCommand(commandArgs) {
             }
             return `"${stringValue.replace(/"/g, '""')}"`;
         };
-        const commandLine = [rawCommand, ...args].map((entry) => quoteCmdArg(entry)).join(' ');
+        const commandLine = [rawCommand, ...normalizedArgs].map((entry) => quoteCmdArg(entry)).join(' ');
         return {
             command: process.env.ComSpec || 'cmd.exe',
             args: ['/d', '/s', '/c', commandLine],
@@ -153,7 +215,7 @@ function resolveCommand(commandArgs) {
 
     return {
         command: rawCommand,
-        args,
+        args: normalizedArgs,
         shell: false,
     };
 }

@@ -67,6 +67,7 @@ const reporters = process.env.PW_HTML_REPORT === '1' || isCI
 
 export default defineConfig({
     testDir: './tests',
+    testMatch: ['**/*.spec.js'],
     timeout: 60_000,
     fullyParallel: false,
     forbidOnly: isCI,
