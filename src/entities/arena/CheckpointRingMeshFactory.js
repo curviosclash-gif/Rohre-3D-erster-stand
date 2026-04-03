@@ -7,6 +7,9 @@ const RING_RADIUS = 12;
 const RING_TUBE = 0.2;
 const FINISH_TUBE = 0.35;
 const LABEL_SIZE = 8;
+const MIN_RING_SCALE = 0.26;
+const MIN_LABEL_SCALE = 0.65;
+const MAX_LABEL_SCALE = 1.15;
 
 let sharedRingGeometry = null;
 let sharedFinishGeometry = null;
@@ -56,7 +59,11 @@ function createLabelMaterial(label) {
     });
 }
 
-function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label) {
+function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+}
+
+function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label, visualRadius = RING_RADIUS) {
     const group = new THREE.Group();
     group.position.copy(position);
     if (rotation) {
@@ -65,10 +72,13 @@ function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label) {
 
     const ringMesh = new THREE.Mesh(ringGeometry, ringMaterial);
     ringMesh.frustumCulled = false;
+    const ringScale = Math.max(MIN_RING_SCALE, Number(visualRadius) / RING_RADIUS || 1);
+    ringMesh.scale.setScalar(ringScale);
     group.add(ringMesh);
 
     const labelMesh = new THREE.Mesh(getLabelGeometry(), createLabelMaterial(label));
     labelMesh.frustumCulled = false;
+    labelMesh.scale.setScalar(clamp(ringScale * 1.8, MIN_LABEL_SCALE, MAX_LABEL_SCALE));
     group.add(labelMesh);
 
     group.userData.ringMesh = ringMesh;
@@ -76,20 +86,20 @@ function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label) {
     return group;
 }
 
-export function createCheckpointRingMesh(position, rotation, number, renderer) {
+export function createCheckpointRingMesh(position, rotation, number, renderer, visualRadius = RING_RADIUS) {
     const material = createRingMaterial(CHECKPOINT_COLOR);
-    const group = buildRingGroup(position, rotation, getRingGeometry(), material, number);
+    const group = buildRingGroup(position, rotation, getRingGeometry(), material, number, visualRadius);
     group.userData.checkpointNumber = number;
     renderer?.addToScene?.(group);
     return group;
 }
 
-export function createFinishRingMesh(position, rotation, renderer) {
+export function createFinishRingMesh(position, rotation, renderer, visualRadius = RING_RADIUS) {
     const material = createRingMaterial(CHECKPOINT_FINISH_COLOR);
     material.emissiveIntensity = 1.0;
     material.roughness = 0.2;
     material.metalness = 0.75;
-    const group = buildRingGroup(position, rotation, getFinishGeometry(), material, 'F');
+    const group = buildRingGroup(position, rotation, getFinishGeometry(), material, 'F', visualRadius);
     group.userData.isFinish = true;
     renderer?.addToScene?.(group);
     return group;

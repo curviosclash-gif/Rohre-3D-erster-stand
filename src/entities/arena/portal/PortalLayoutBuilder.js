@@ -93,12 +93,7 @@ export class PortalLayoutBuilder {
         if (!route) return;
         this._checkpointRingSpinEnabled = route.rules.animateCheckpoints !== false;
 
-        const seenCanonical = new Set();
         for (const cp of route.checkpoints) {
-            const canonicalId = cp.aliasOf || cp.id;
-            if (seenCanonical.has(canonicalId)) continue;
-            seenCanonical.add(canonicalId);
-
             const pos = new THREE.Vector3(
                 asFiniteNumber(cp.pos[0]) * scale,
                 asFiniteNumber(cp.pos[1]) * scale,
@@ -118,7 +113,8 @@ export class PortalLayoutBuilder {
             }
 
             const number = cp.routeIndex + 1;
-            const mesh = createCheckpointRingMesh(pos, rotation, number, this.arena.renderer);
+            const visualRadius = Math.max(3.2, asPositiveNumber(cp.radius, 4.2) * 0.75) * scale;
+            const mesh = createCheckpointRingMesh(pos, rotation, number, this.arena.renderer, visualRadius);
             if (!mesh) continue;
 
             this.arena.checkpointRings.push({
@@ -148,7 +144,8 @@ export class PortalLayoutBuilder {
                 fRotation = new THREE.Euler().setFromQuaternion(quat);
             }
 
-            const mesh = createFinishRingMesh(fPos, fRotation, this.arena.renderer);
+            const finishVisualRadius = Math.max(4.2, asPositiveNumber(route.finish.radius, 5.5) * 0.75) * scale;
+            const mesh = createFinishRingMesh(fPos, fRotation, this.arena.renderer, finishVisualRadius);
             if (mesh) {
                 this.arena.checkpointRings.push({
                     routeIndex: -1,
