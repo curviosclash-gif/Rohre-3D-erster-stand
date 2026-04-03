@@ -1,4 +1,5 @@
 import { GAME_MODE_TYPES } from '../../hunt/HuntMode.js';
+import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
 import {
     clearActiveRuntimeConfig,
     setActiveRuntimeConfig,
@@ -6,6 +7,15 @@ import {
 
 const BUNDLE_TARGET_COMPONENTS = 'components';
 const BUNDLE_TARGET_STATE = 'state';
+const MATCH_SESSION_REF_KEYS = Object.freeze(['arena', 'entityManager', 'powerupManager', 'particles']);
+const MATCH_SESSION_SETTINGS_KEYS = Object.freeze([
+    'mapKey',
+    'numHumans',
+    'numBots',
+    'winsNeeded',
+    'activeGameMode',
+    'roundStateController',
+]);
 
 const LEGACY_ALIAS_MIGRATION = Object.freeze({
     KEEP: 'keep',
@@ -19,7 +29,10 @@ export const GAME_RUNTIME_LEGACY_ALIAS_SPECS = Object.freeze([
     { key: 'input', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
     { key: 'audio', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.KEEP },
     { key: 'ui', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.KEEP },
+    { key: 'uiManager', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
     { key: 'runtimePorts', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.KEEP },
+    { key: 'runtimeCoordinator', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
+    { key: 'runtimeFacade', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
     { key: 'hudP1', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
     { key: 'hudP2', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
     { key: 'huntHud', target: BUNDLE_TARGET_COMPONENTS, migration: LEGACY_ALIAS_MIGRATION.REPLACE_BY_PORT },
@@ -79,6 +92,11 @@ export const GAME_RUNTIME_LEGACY_WRAPPER_SPECS = Object.freeze([
     { key: '_returnToMenu', target: 'runtimeFacade.returnToMenu', migration: LEGACY_ALIAS_MIGRATION.KEEP },
 ]);
 
+const GAME_RUNTIME_STATUS_SPECS = Object.freeze([
+    { key: 'state', path: ['lifecycle', 'gameStateId'], defaultValue: GAME_STATE_IDS.MENU },
+    { key: '_disposed', path: ['lifecycle', 'disposed'], defaultValue: false },
+]);
+
 function createDefaultRuntimeState() {
     return {
         config: null,
@@ -100,6 +118,66 @@ function createDefaultRuntimeState() {
         _activeSubmenu: null,
         _lastMenuTrigger: null,
         _buildInfoClipboardText: '',
+    };
+}
+
+function createSharedPropertyView(source, keys) {
+    const view = {};
+    for (const key of keys) {
+        Object.defineProperty(view, key, {
+            configurable: true,
+            enumerable: true,
+            get() {
+                return source?.[key];
+            },
+            set(value) {
+                if (source && typeof source === 'object') {
+                    source[key] = value;
+                }
+            },
+        });
+    }
+    return view;
+}
+
+function deriveInitialLifecycleStatus({ gameStateId = GAME_STATE_IDS.MENU, disposed = false, status = undefined } = {}) {
+    if (typeof status === 'string' && status.trim()) {
+        return status.trim();
+    }
+    if (disposed) {
+        return 'disposed';
+    }
+    return gameStateId === GAME_STATE_IDS.MENU ? 'menu' : 'active';
+}
+
+function createSessionRuntimeCore({ state, components, ports = null, lifecycle = {} } = {}) {
+    const runtimeHandles = components || {};
+    runtimeHandles.runtimePorts = ports || runtimeHandles.runtimePorts || null;
+    return {
+        contractVersion: 'session-runtime-core.v1',
+        state,
+        handles: runtimeHandles,
+        session: {
+            refs: createSharedPropertyView(state, MATCH_SESSION_REF_KEYS),
+            settings: createSharedPropertyView(state, MATCH_SESSION_SETTINGS_KEYS),
+            sequence: 0,
+            activeSessionId: null,
+        },
+        finalize: {
+            status: 'idle',
+            pendingOperation: null,
+            lastReason: null,
+            lastTrigger: null,
+            lastCompletedReason: null,
+            updatedAt: Date.now(),
+        },
+        lifecycle: {
+            gameStateId: lifecycle.gameStateId ?? GAME_STATE_IDS.MENU,
+            disposed: !!lifecycle.disposed,
+            pendingSessionInit: null,
+            status: deriveInitialLifecycleStatus(lifecycle),
+            updatedAt: Date.now(),
+        },
     };
 }
 
@@ -154,6 +232,51 @@ function cloneLegacyWrapperInventory() {
     return GAME_RUNTIME_LEGACY_WRAPPER_SPECS.map((spec) => Object.freeze({ ...spec }));
 }
 
+function getRuntimeStatusCursor(bundle, path = []) {
+    let cursor = bundle?.sessionRuntime || null;
+    for (const segment of path) {
+        if (!cursor || typeof cursor !== 'object') {
+            return null;
+        }
+        cursor = cursor[segment];
+    }
+    return cursor;
+}
+
+function setRuntimeStatusValue(bundle, path, value) {
+    if (!Array.isArray(path) || path.length === 0) return;
+    const parent = getRuntimeStatusCursor(bundle, path.slice(0, -1));
+    if (!parent || typeof parent !== 'object') return;
+    parent[path[path.length - 1]] = value;
+}
+
+function adoptExistingRuntimeStatusValue(game, bundle, spec) {
+    const descriptor = Object.getOwnPropertyDescriptor(game, spec.key);
+    if (!descriptor) return;
+    if ('get' in descriptor || 'set' in descriptor) return;
+    if (descriptor.value === undefined) return;
+    setRuntimeStatusValue(bundle, spec.path, descriptor.value);
+}
+
+function defineRuntimeStatusAccessor(game, bundle, spec) {
+    const descriptor = Object.getOwnPropertyDescriptor(game, spec.key);
+    if (descriptor?.configurable === false) {
+        return;
+    }
+
+    delete game[spec.key];
+    Object.defineProperty(game, spec.key, {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return getRuntimeStatusCursor(bundle, spec.path) ?? spec.defaultValue;
+        },
+        set(value) {
+            setRuntimeStatusValue(bundle, spec.path, value);
+        },
+    });
+}
+
 export function createInitialGameRuntimeState(initialState = {}) {
     return {
         ...createDefaultRuntimeState(),
@@ -161,11 +284,19 @@ export function createInitialGameRuntimeState(initialState = {}) {
     };
 }
 
-export function createGameRuntimeBundle({ state = {}, components = {}, ports = null } = {}) {
-    return {
-        state: createInitialGameRuntimeState(state),
-        components: { ...components, runtimePorts: ports || components.runtimePorts || null },
-        ports: ports || null,
+export function createGameRuntimeBundle({ state = {}, components = {}, ports = null, lifecycle = {} } = {}) {
+    const runtimeState = createInitialGameRuntimeState(state);
+    const runtimeComponents = { ...components, runtimePorts: ports || components.runtimePorts || null };
+    const sessionRuntime = createSessionRuntimeCore({
+        state: runtimeState,
+        components: runtimeComponents,
+        ports,
+        lifecycle,
+    });
+    const bundle = {
+        state: runtimeState,
+        components: runtimeComponents,
+        sessionRuntime,
         metadata: Object.freeze({
             legacyAliases: Object.freeze(cloneLegacyAliasInventory()),
             legacyWrappers: Object.freeze(cloneLegacyWrapperInventory()),
@@ -177,6 +308,19 @@ export function createGameRuntimeBundle({ state = {}, components = {}, ports = n
             }),
         }),
     };
+
+    Object.defineProperty(bundle, 'ports', {
+        configurable: true,
+        enumerable: true,
+        get() {
+            return runtimeComponents.runtimePorts || null;
+        },
+        set(value) {
+            runtimeComponents.runtimePorts = value || null;
+        },
+    });
+
+    return bundle;
 }
 
 export function attachGameRuntimeBundle(game, bundle) {
@@ -188,13 +332,29 @@ export function attachGameRuntimeBundle(game, bundle) {
         writable: true,
         value: bundle,
     });
+    Object.defineProperty(game, 'sessionRuntime', {
+        configurable: true,
+        enumerable: false,
+        writable: true,
+        value: bundle.sessionRuntime,
+    });
 
     for (const spec of GAME_RUNTIME_LEGACY_ALIAS_SPECS) {
         adoptExistingAliasValue(game, bundle, spec);
         defineAliasAccessor(game, bundle, spec);
     }
+    for (const spec of GAME_RUNTIME_STATUS_SPECS) {
+        adoptExistingRuntimeStatusValue(game, bundle, spec);
+        defineRuntimeStatusAccessor(game, bundle, spec);
+    }
 
     return bundle;
+}
+
+export function getSessionRuntime(source) {
+    if (!source) return null;
+    if (source.sessionRuntime) return source.sessionRuntime;
+    return source.runtimeBundle?.sessionRuntime || null;
 }
 
 export function getGameRuntimeState(bundle) {
@@ -284,5 +444,22 @@ export function clearGameRuntimeState(bundle, initialOverrides = undefined) {
 
     Object.assign(state, createInitialGameRuntimeState(initialOverrides));
     clearActiveRuntimeConfig({ owner: bundle });
+    const sessionRuntime = getSessionRuntime(bundle);
+    if (sessionRuntime) {
+        sessionRuntime.session.activeSessionId = null;
+        sessionRuntime.session.sequence = 0;
+        sessionRuntime.lifecycle.pendingSessionInit = null;
+        sessionRuntime.finalize.pendingOperation = null;
+        sessionRuntime.finalize.status = 'idle';
+        sessionRuntime.finalize.lastReason = null;
+        sessionRuntime.finalize.lastTrigger = null;
+        sessionRuntime.finalize.lastCompletedReason = null;
+        sessionRuntime.finalize.updatedAt = Date.now();
+        sessionRuntime.lifecycle.status = deriveInitialLifecycleStatus({
+            gameStateId: sessionRuntime.lifecycle.gameStateId,
+            disposed: sessionRuntime.lifecycle.disposed,
+        });
+        sessionRuntime.lifecycle.updatedAt = Date.now();
+    }
     return state;
 }

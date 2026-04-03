@@ -10,6 +10,7 @@ import {
 } from '../shared/contracts/MatchLifecycleContract.js';
 
 export const MATCH_SESSION_PORT_METHODS = Object.freeze([
+    'getSessionRuntimeState',
     'getLifecycleState',
     'notifyLifecycleEvent',
     'prepareInitializedMatchSession',
@@ -31,32 +32,97 @@ function hasActiveMatchSessionRefs(currentSession) {
     );
 }
 
-export function createMatchSessionPort(runtime) {
-    const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
-    const getRecorder = () => runtime?.mediaRecorderSystem || runtime?.recorder || null;
+function createFallbackSessionRuntimeState() {
     return {
+        session: {
+            sequence: 0,
+            activeSessionId: null,
+        },
+        finalize: {
+            status: 'idle',
+            pendingOperation: null,
+            lastReason: null,
+            lastTrigger: null,
+            lastCompletedReason: null,
+            updatedAt: Date.now(),
+        },
+        lifecycle: {
+            gameStateId: null,
+            disposed: false,
+            pendingSessionInit: null,
+            status: 'idle',
+            updatedAt: Date.now(),
+        },
+    };
+}
+
+function readRuntimeStatePath(source, path = []) {
+    let cursor = source;
+    for (const segment of path) {
+        if (!cursor || typeof cursor !== 'object') {
+            return undefined;
+        }
+        cursor = cursor[segment];
+    }
+    return cursor;
+}
+
+function writeRuntimeStatePath(source, path = [], value) {
+    if (!source || typeof source !== 'object' || !Array.isArray(path) || path.length === 0) {
+        return;
+    }
+    let cursor = source;
+    for (let index = 0; index < path.length - 1; index += 1) {
+        const segment = path[index];
+        if (!cursor[segment] || typeof cursor[segment] !== 'object') {
+            cursor[segment] = {};
+        }
+        cursor = cursor[segment];
+    }
+    cursor[path[path.length - 1]] = value;
+}
+
+function resolveSessionRuntimeState(runtime) {
+    if (!runtime || typeof runtime !== 'object') {
+        return null;
+    }
+    return runtime.sessionRuntime || runtime.runtimeBundle?.sessionRuntime || null;
+}
+
+export function createMatchSessionPort(runtime) {
+    const sessionRuntime = resolveSessionRuntimeState(runtime);
+    const runtimeHandles = sessionRuntime?.handles || null;
+    const sessionSettings = sessionRuntime?.session?.settings || null;
+    const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
+    const getRecorder = () => runtimeHandles?.mediaRecorderSystem || runtime?.mediaRecorderSystem || runtime?.recorder || null;
+    return {
+        getSessionRuntimeState: () => sessionRuntime,
         getLifecycleState: () => ({
-            mapKey: runtime?.mapKey || null,
-            numHumans: Number(runtime?.numHumans) || 0,
-            numBots: Number(runtime?.numBots) || 0,
-            winsNeeded: Number(runtime?.winsNeeded) || 0,
-            activeGameMode: runtime?.activeGameMode || null,
+            sessionId: sessionRuntime?.session?.activeSessionId || null,
+            mapKey: sessionSettings?.mapKey || runtime?.mapKey || null,
+            numHumans: Number(sessionSettings?.numHumans ?? runtime?.numHumans) || 0,
+            numBots: Number(sessionSettings?.numBots ?? runtime?.numBots) || 0,
+            winsNeeded: Number(sessionSettings?.winsNeeded ?? runtime?.winsNeeded) || 0,
+            activeGameMode: sessionSettings?.activeGameMode || runtime?.activeGameMode || null,
+            gameStateId: sessionRuntime?.lifecycle?.gameStateId || runtime?.state || null,
+            lifecycleStatus: sessionRuntime?.lifecycle?.status || null,
+            finalizeStatus: sessionRuntime?.finalize?.status || null,
         }),
         notifyLifecycleEvent: (type, context) => getRecorder()?.notifyLifecycleEvent?.(type, context),
         prepareInitializedMatchSession: (handlers = {}) => prepareInitializedMatchSession({
-            renderer: runtime?.renderer,
-            audio: runtime?.audio,
+            renderer: runtimeHandles?.renderer || runtime?.renderer,
+            audio: runtimeHandles?.audio || runtime?.audio,
             recorder: runtime?.recorder,
             runtimeProfiler: runtime?.runtimePerfProfiler,
             settings: runtime?.settings,
             runtimeConfig: runtime?.runtimeConfig,
             baseConfig: runtime?.config || null,
-            requestedMapKey: runtime?.mapKey,
+            requestedMapKey: sessionSettings?.mapKey || runtime?.mapKey,
             currentSession: getCurrentMatchSessionRefs(),
             ...handlers,
         }),
         wireInitializedMatchRuntime: (initializedMatch, handlers = {}) => wireInitializedMatchRuntime({
-            renderer: runtime?.renderer,
+            renderer: runtimeHandles?.renderer || runtime?.renderer,
             initializedMatch,
             ...handlers,
         }),
@@ -116,10 +182,48 @@ export class MatchLifecycleSessionOrchestrator {
             }
         }
         this._lifecycleContractVersion = MATCH_LIFECYCLE_CONTRACT_VERSION;
-        this._sessionSequence = 0;
-        this._activeSessionId = null;
-        this._pendingSessionInit = null;
-        this._pendingFinalize = null;
+        this._sessionRuntimeState = this.deps?.getSessionRuntimeState?.() || createFallbackSessionRuntimeState();
+        this._bindRuntimeField('_sessionSequence', ['session', 'sequence'], 0);
+        this._bindRuntimeField('_activeSessionId', ['session', 'activeSessionId'], null);
+        this._bindRuntimeField('_pendingSessionInit', ['lifecycle', 'pendingSessionInit'], null);
+        this._bindRuntimeField('_pendingFinalize', ['finalize', 'pendingOperation'], null);
+        if (!this._sessionRuntimeState?.finalize?.status) {
+            this._sessionRuntimeState.finalize.status = 'idle';
+        }
+        if (!this._sessionRuntimeState?.lifecycle?.status) {
+            this._sessionRuntimeState.lifecycle.status = 'idle';
+        }
+    }
+
+    _bindRuntimeField(fieldName, path, defaultValue) {
+        if (readRuntimeStatePath(this._sessionRuntimeState, path) === undefined) {
+            writeRuntimeStatePath(this._sessionRuntimeState, path, defaultValue);
+        }
+        Object.defineProperty(this, fieldName, {
+            configurable: true,
+            enumerable: false,
+            get: () => readRuntimeStatePath(this._sessionRuntimeState, path),
+            set: (value) => writeRuntimeStatePath(this._sessionRuntimeState, path, value),
+        });
+    }
+
+    _setLifecycleStatus(status) {
+        if (!this._sessionRuntimeState?.lifecycle || typeof status !== 'string' || !status.trim()) {
+            return;
+        }
+        this._sessionRuntimeState.lifecycle.status = status;
+        this._sessionRuntimeState.lifecycle.updatedAt = Date.now();
+    }
+
+    _setFinalizeStatus(status, extra = null) {
+        if (!this._sessionRuntimeState?.finalize || typeof status !== 'string' || !status.trim()) {
+            return;
+        }
+        this._sessionRuntimeState.finalize.status = status;
+        if (extra && typeof extra === 'object') {
+            Object.assign(this._sessionRuntimeState.finalize, extra);
+        }
+        this._sessionRuntimeState.finalize.updatedAt = Date.now();
     }
 
     _buildLifecycleContext(extra = null) {
@@ -148,6 +252,11 @@ export class MatchLifecycleSessionOrchestrator {
             this._sessionSequence += 1;
             this._activeSessionId = `match-${this._sessionSequence}`;
         }
+        this._setLifecycleStatus('playing');
+        this._setFinalizeStatus('idle', {
+            lastReason: null,
+            lastTrigger: null,
+        });
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MATCH_STARTED, extra);
     }
 
@@ -158,6 +267,7 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     notifyMenuOpened(extra = null) {
+        this._setLifecycleStatus(this._sessionRuntimeState?.lifecycle?.disposed ? 'disposed' : 'menu');
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
@@ -265,6 +375,11 @@ export class MatchLifecycleSessionOrchestrator {
         this._sessionSequence += 1;
         const provisionalId = `match-${this._sessionSequence}`;
         this._activeSessionId = provisionalId;
+        this._setLifecycleStatus('starting');
+        this._setFinalizeStatus('idle', {
+            lastReason: null,
+            lastTrigger: null,
+        });
         const lifecycleHandlers = {
             onPlayerFeedback,
             onPlayerDied,
@@ -285,6 +400,7 @@ export class MatchLifecycleSessionOrchestrator {
                     this._activeSessionId = null;
                 }
                 this.deps?.clearMatchSessionRefs?.();
+                this._setLifecycleStatus(this._sessionRuntimeState?.lifecycle?.disposed ? 'disposed' : 'menu');
                 throw error;
             })
             .finally(() => {
@@ -317,6 +433,11 @@ export class MatchLifecycleSessionOrchestrator {
             return this._pendingFinalize;
         }
         const request = this._buildFinalizeRequest(options);
+        this._setFinalizeStatus('finalizing', {
+            lastReason: request.reason,
+            lastTrigger: request.recorderTrigger?.type || request.reason,
+        });
+        this._setLifecycleStatus('finalizing');
         const trackedFinalize = Promise.resolve().then(async () => {
             this._endLifecycleSession(request.reason);
             this._activeSessionId = null;
@@ -364,7 +485,16 @@ export class MatchLifecycleSessionOrchestrator {
                 throw finalizeError;
             }
 
+            this._setFinalizeStatus('finalized', {
+                lastCompletedReason: request.reason,
+            });
+            if (!request.notifyMenuOpened) {
+                this._setLifecycleStatus(this._sessionRuntimeState?.lifecycle?.disposed ? 'disposed' : 'idle');
+            }
             return request.reason;
+        }).catch((error) => {
+            this._setFinalizeStatus('error');
+            throw error;
         }).finally(() => {
             if (this._pendingFinalize === trackedFinalize) {
                 this._pendingFinalize = null;

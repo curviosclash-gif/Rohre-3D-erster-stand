@@ -122,6 +122,10 @@ export function bootstrapGameRuntime(game, options = {}) {
             audio: new AudioManager(),
             ui,
         },
+        lifecycle: {
+            gameStateId: game.state,
+            disposed: !!game._disposed,
+        },
     });
     attachGameRuntimeBundle(game, runtimeBundle);
 
