@@ -10,6 +10,23 @@ export class PlayingStateSystem {
         this._lastOverheatSnapshotVersion = -1;
         this._simSnapshot = null;
         this._simSnapshotTick = 0;
+        // V84: optional MatchKernelInteractiveAdapter; when set, simulation tick
+        // is driven through the kernel instead of direct game.* calls.
+        this._kernelAdapter = null;
+    }
+
+    /**
+     * setKernelAdapter – attach a MatchKernelInteractiveAdapter for kernel-driven ticks.
+     * Pass null to revert to the legacy direct-call path.
+     *
+     * @param {import('./MatchKernelInteractiveAdapter.js').MatchKernelInteractiveAdapter|null} adapter
+     */
+    setKernelAdapter(adapter) {
+        this._kernelAdapter = adapter || null;
+    }
+
+    getKernelAdapter() {
+        return this._kernelAdapter;
     }
 
     _syncHuntOverheatSnapshot() {
@@ -48,11 +65,20 @@ export class PlayingStateSystem {
         }
 
         game._updatePlanarAimAssist(dt);
-        game.entityManager.update(dt, game.input, renderFrameId);
-        this._syncHuntOverheatSnapshot();
-        game.powerupManager.update(dt);
-        game.particles.update(dt);
-        game.arena.update(dt);
+
+        // V84: drive simulation through MatchKernel when an adapter is present;
+        // fall back to direct calls for backwards compatibility during migration.
+        if (this._kernelAdapter) {
+            this._kernelAdapter.tick(dt, renderFrameId);
+            this._syncHuntOverheatSnapshot();
+        } else {
+            game.entityManager.update(dt, game.input, renderFrameId);
+            this._syncHuntOverheatSnapshot();
+            game.powerupManager.update(dt);
+            game.particles.update(dt);
+            game.arena.update(dt);
+        }
+
         game.hudRuntimeSystem.updatePlayingHudTick(dt);
         game._applyPlayingTimeScaleFromEffects();
 
