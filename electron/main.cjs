@@ -83,7 +83,7 @@ function stopBroadcast() {
 function startBroadcast(resolveState) {
     stopBroadcast();
     broadcastSocket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
-    broadcastSocket.on('error', () => {});
+    broadcastSocket.on('error', (err) => { console.error('[broadcast] UDP socket error:', err.message); });
     broadcastSocket.bind(0, () => {
         if (!broadcastSocket) return;
         broadcastSocket.setBroadcast(true);
@@ -264,7 +264,7 @@ function isDiscoveryRateLimited(sourceKey) {
 function startDiscoveryListener() {
     stopDiscoveryListener();
     discoverySocket = dgram.createSocket({ type: 'udp4', reuseAddr: true });
-    discoverySocket.on('error', () => {});
+    discoverySocket.on('error', (err) => { console.error('[discovery] UDP socket error:', err.message); });
     discoverySocket.on('message', (msgBuf, rinfo) => {
         try {
             const sourceKey = `${rinfo.address}:${rinfo.port}`;
