@@ -235,6 +235,28 @@ Stand: 2026-04-04
   - Match-/Simulationsdaten laufen nur nach aussen: `MatchKernel -> SessionRuntime/Application -> UI/Renderer`.
   - Headless-Laeufe ersetzen Renderer/UI/Plattformadapter, booten aber denselben `MatchKernel` und dieselbe GameMode-API.
 
+### 4.6.1 Tick-, Clock-, Seed-, Input- und Snapshot-Vertraege fuer V84
+
+- `src/shared/contracts/MatchKernelRuntimeContract.js` ist der gemeinsame Vertragskatalog fuer `interactive` und `headless`.
+- `src/shared/contracts/RuntimeClockContract.js`, `src/shared/contracts/RuntimeRngContract.js` und `src/shared/contracts/SessionRuntimeSnapshotContract.js` bleiben Basiskontrakte; der Kernelvertrag komponiert sie nur fuer V84.
+- `src/core/GameLoop.js` bleibt im interaktiven Pfad Besitzer von Browser-`rAF`, Delta-Reset und Render-Interpolation, darf aber nur normalisierte Tick-Huellen nach innen geben.
+- `src/core/DeveloperTrainingController.js` sowie spaetere Replay-, Netzwerk- und Testadapter liefern dieselben Seed- und Input-Huellen fuer headless Laeufe.
+
+| Vertrag | Besitzer | Pflichtfelder | Interaktive Quelle | Headless-Quelle |
+| --- | --- | --- | --- | --- |
+| `run_profile` | `SessionRuntime` / Startadapter | `surface`, `tickDriver`, `clockMode`, `fixedStepSeconds`, `inputSource`, `snapshotTarget`, `deterministic` | Browser-Session ueber `GameLoop.js` | Trainings-, Replay-, Netzwerk- oder CLI-Runner |
+| `clock_port` | Startadapter | `clock`, `clockMode`, `fixedStepSeconds`, `monotonic`, `wallClockOwnedByDriver` | `createRuntimeClock()` ueber `performance.now()` und `Date.now()` | synthetische oder testgesteuerte Uhr |
+| `tick_envelope` | Treiber pro Lauf | `tickIndex`, `fixedStepSeconds`, `elapsedSeconds`, `wallClockMs`, `highResTimestampMs`, `timeScale`, `reset`, `resetReason` | Browser-`rAF` nach Jitter-Glattung und Reset-Normalisierung | manueller Step-Loop oder Replay-Framecursor |
+| `seed_envelope` | Match- und Round-Bootstrap | `matchSeed`, `roundSeed`, `tickSeed`, `streamId`, `deterministic` | Settings-/Session-Boot plus Runtime-Seed fuer dieselbe Matchkonfiguration | Trainings-, Replay- oder Harness-Szenario |
+| `input_frame` | Inputadapter | `tickIndex`, `sequence`, `capturedAtMs`, `inputSource`, `players[]`, `commands[]`, `deterministic` | `PlayerInputSource`-, UI- und Netzwerkadapter vor dem Tick | gepufferte Replay-, Training- oder Testaktionen |
+| `snapshot_envelope` | `MatchKernel` / `SessionRuntime` | `snapshotTarget`, `tickIndex`, `sequence`, `capturedAtMs`, `sessionRuntimeSnapshot`, `gameStateSnapshot`, `simStateSnapshot`, `runtimeProjection`, `checksum` | HUD-/Renderer-/Recorder-Projektionen und Transport-Snapshots | Checkpoints, Observability und Rollback-nahe Diagnostik |
+
+- Invarianten:
+  - `fixedStepSeconds` bleibt waehrend eines Matches konstant; variable Browser-Delta-Werte werden vor dem Kernel auf `tick_envelope` normalisiert.
+  - `wallClockMs` und `highResTimestampMs` sind Diagnostik- und Observability-Felder. Deterministische Matchentscheidungen duerfen nur `tickIndex`, `fixedStepSeconds`, Seeds und Input-Frames auswerten.
+  - `input_frame` muss vor jedem Tick vollstaendig vorliegen; der Kernel liest weder `window`, `document`, `game.input` noch direkte `PlayerInputSource`-Instanzen.
+  - `snapshot_envelope` bleibt serialisierbar. `sessionRuntimeSnapshot` deckt Ownership und Lifecycle ab, `gameStateSnapshot` Transport und Replay, `simStateSnapshot` Checkpoint- und Rollback-nahe Analyse und `runtimeProjection` Renderer- und UI-Leser.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
