@@ -6,6 +6,7 @@ import {
     createHeadlessInputAdapter,
     createHeadlessMatchKernel,
 } from './MatchKernel.js';
+import { createMatchKernelConsumerRegistry } from './MatchKernelConsumerAdapters.js';
 import {
     createMatchSession,
     disposeMatchSessionSystems,
@@ -92,12 +93,19 @@ function resolveHeadlessSimPorts(session = null) {
     };
 }
 
-function createHeadlessRuntimeHandle(session, renderer, kernel) {
+function createHeadlessRuntimeHandle(session, renderer, kernel, consumers) {
     return {
         contractVersion: MATCH_KERNEL_HEADLESS_RUNTIME_CONTRACT_VERSION,
         renderer,
         session,
         kernel,
+        consumers,
+        getConsumerAdapter(consumerId) {
+            return consumers?.getAdapter?.(consumerId) || null;
+        },
+        getConsumerDescriptors() {
+            return consumers?.getDescriptors?.() || null;
+        },
         step(inputFrame = null, tickOptions = {}) {
             const tickEnvelope = createMatchKernelTickEnvelope({
                 ...(tickOptions && typeof tickOptions === 'object' ? tickOptions : {}),
@@ -111,6 +119,9 @@ function createHeadlessRuntimeHandle(session, renderer, kernel) {
         },
         updateSimPorts(nextSession = session) {
             kernel.updateSimPorts(resolveHeadlessSimPorts(nextSession));
+            consumers?.replay?.updateSimPortsFromSession?.(nextSession);
+            consumers?.training?.updateSimPortsFromSession?.(nextSession);
+            consumers?.network?.updateSimPortsFromSession?.(nextSession);
         },
         signalRoundEnd(options = {}) {
             kernel.signalRoundEnd(options);
@@ -137,6 +148,7 @@ function createHeadlessRuntimeHandle(session, renderer, kernel) {
                     clearScene: options?.clearScene !== false,
                 });
             } finally {
+                consumers?.dispose?.();
                 kernel.dispose();
                 renderer?.dispose?.();
             }
@@ -184,7 +196,16 @@ export function createHeadlessMatchKernelRuntime({
             simPorts: resolveHeadlessSimPorts(resolvedSession),
         });
         kernel.boot({ roundIndex });
-        return createHeadlessRuntimeHandle(resolvedSession, renderer, kernel);
+        const consumers = createMatchKernelConsumerRegistry({
+            kernel,
+            allowKernelTick: true,
+            sessionProvider: () => resolvedSession,
+            profile: {
+                matchId: resolvedSession?.effectiveMapKey || requestedMapKey || null,
+                modeId: resolvedSession?.entityManager?.activeGameMode || null,
+            },
+        });
+        return createHeadlessRuntimeHandle(resolvedSession, renderer, kernel, consumers);
     };
 
     if (isPromiseLike(session)) {

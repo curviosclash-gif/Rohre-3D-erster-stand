@@ -12,9 +12,13 @@
 //   - Pause/Escape intent is handled by PlayingStateSystem before calling this adapter.
 
 import {
-    createMatchKernelTickEnvelope,
     MATCH_KERNEL_SURFACES,
 } from '../shared/contracts/MatchKernelRuntimeContract.js';
+import {
+    MATCH_KERNEL_CONSUMER_IDS,
+    createMatchKernelConsumerAdapter,
+} from '../state/MatchKernelConsumerAdapters.js';
+import { createGameStateSnapshot } from './GameStateSnapshot.js';
 
 export const MATCH_KERNEL_INTERACTIVE_ADAPTER_CONTRACT_VERSION =
     'match-kernel-interactive-adapter.v1';
@@ -33,9 +37,26 @@ export class MatchKernelInteractiveAdapter {
     constructor({ game = null, kernel = null } = {}) {
         this._game = game;
         this._kernel = kernel;
+        this._runtimeAdapter = createMatchKernelConsumerAdapter({
+            consumerId: MATCH_KERNEL_CONSUMER_IDS.INTERACTIVE,
+            kernel,
+            sessionProvider: () => this._game?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null,
+            sessionRuntimeProvider: () => this._game?.runtimeBundle?.sessionRuntime || this._game?.sessionRuntime || null,
+            gameStateSnapshotProvider: () => {
+                const session = this._game?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
+                if (!session?.entityManager) return null;
+                const roundState = this._game?.runtimeBundle?.state?.roundStateController || this._game?.roundStateController || null;
+                return createGameStateSnapshot(session.entityManager, roundState);
+            },
+        });
     }
 
     get kernel() { return this._kernel; }
+    get profile() { return this._runtimeAdapter?.profile || null; }
+    getDescriptor() { return this._runtimeAdapter?.getDescriptor?.() || null; }
+    createInputFrame(payload = {}) { return this._runtimeAdapter?.createInputFrame?.(payload) || null; }
+    createSeedEnvelope(payload = {}) { return this._runtimeAdapter?.createSeedEnvelope?.(payload) || null; }
+    createSnapshotEnvelope(payload = {}) { return this._runtimeAdapter?.createSnapshotEnvelope?.(payload) || null; }
 
     /**
      * tick – drive one MatchKernel tick from the interactive game loop.
@@ -50,8 +71,7 @@ export class MatchKernelInteractiveAdapter {
             return null;
         }
 
-        const tickEnvelope = createMatchKernelTickEnvelope({
-            tickIndex: this._kernel.tickIndex,
+        const tickEnvelope = this._runtimeAdapter.createTickEnvelope({
             fixedStepSeconds: dt,
             frameId: renderFrameId,
             surface: MATCH_KERNEL_SURFACES.INTERACTIVE,
@@ -69,6 +89,8 @@ export class MatchKernelInteractiveAdapter {
      * dispose – release references.
      */
     dispose() {
+        this._runtimeAdapter?.dispose?.();
+        this._runtimeAdapter = null;
         this._game = null;
         this._kernel = null;
     }

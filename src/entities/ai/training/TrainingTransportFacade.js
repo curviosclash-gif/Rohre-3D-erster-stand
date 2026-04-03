@@ -4,6 +4,7 @@
 
 import { DeterministicTrainingStepRunner } from './DeterministicTrainingStepRunner.js';
 import { buildTrainerTransitionPayload } from './TrainerPayloadAdapter.js';
+import { createMatchKernelTrainingPayload } from '../../../state/MatchKernelConsumerAdapters.js';
 
 function canSubmitViaBridge(bridge) {
     if (!bridge || typeof bridge !== 'object') return false;
@@ -18,6 +19,9 @@ export class TrainingTransportFacade {
         this.stepRunner = options.stepRunner || new DeterministicTrainingStepRunner(options);
         this.bridge = options.bridge || null;
         this._latestPacket = null;
+        this._kernelProfile = options.kernelProfile && typeof options.kernelProfile === 'object'
+            ? { ...options.kernelProfile }
+            : null;
     }
 
     setBridge(bridge) {
@@ -39,15 +43,23 @@ export class TrainingTransportFacade {
     }
 
     _emit(type, transition, input) {
+        const kernelRuntime = createMatchKernelTrainingPayload({
+            type,
+            transition,
+            input,
+            profile: this._kernelProfile,
+        });
         const payload = buildTrainerTransitionPayload(transition, {
             mode: transition?.info?.domain?.mode || input?.mode,
             planarMode: transition?.info?.domain?.planarMode ?? input?.planarMode,
             controlProfileId: transition?.info?.domain?.controlProfileId ?? input?.controlProfileId,
+            kernelRuntime,
         });
         const delivered = this._submit(type, payload);
         const packet = {
             type,
             delivered,
+            kernelRuntime,
             payload,
             transition,
         };

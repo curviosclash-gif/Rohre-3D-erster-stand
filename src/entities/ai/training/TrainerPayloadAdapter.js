@@ -92,6 +92,24 @@ export function buildTrainerRuntimeObservationPayload(runtimeContext = {}, playe
     };
 }
 
+function cloneSerializable(value) {
+    if (value === null || value === undefined) return null;
+    if (Array.isArray(value)) {
+        return value.map((entry) => cloneSerializable(entry));
+    }
+    if (typeof value !== 'object') {
+        return value;
+    }
+    const clone = {};
+    for (const [key, entry] of Object.entries(value)) {
+        if (entry === undefined || typeof entry === 'function') {
+            continue;
+        }
+        clone[key] = cloneSerializable(entry);
+    }
+    return clone;
+}
+
 export function buildTrainerTransitionPayload(transition = {}, options = {}) {
     const info = transition?.info && typeof transition.info === 'object'
         ? transition.info
@@ -147,6 +165,9 @@ export function buildTrainerTransitionPayload(transition = {}, options = {}) {
                 ? { ...metadata.hybridDecision }
                 : null,
         },
+        kernelRuntime: options.kernelRuntime && typeof options.kernelRuntime === 'object'
+            ? cloneSerializable(options.kernelRuntime)
+            : null,
     };
 }
 

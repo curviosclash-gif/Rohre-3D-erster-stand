@@ -18,6 +18,7 @@ export function createMatchSessionPort(runtime) {
     const sessionSettings = sessionRuntime?.session?.settings || null;
     const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
     const getCurrentMatchKernel = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchKernel?.() || null;
+    const getCurrentMatchKernelConsumers = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchKernelConsumers?.() || null;
     const getRecorder = () => runtimeHandles?.mediaRecorderSystem || runtime?.mediaRecorderSystem || runtime?.recorder || null;
     return {
         getSessionRuntimeState: () => sessionRuntime,
@@ -59,6 +60,8 @@ export function createMatchSessionPort(runtime) {
         applyInitializedMatchSession: (initializedMatch) => runtime?.matchSessionRuntimeBridge?.applyInitializedMatchSession?.(initializedMatch),
         getCurrentMatchSessionRefs,
         clearMatchSessionRefs: () => runtime?.matchSessionRuntimeBridge?.clearMatchSessionRefs?.(),
+        getCurrentMatchKernelConsumers,
+        getCurrentMatchKernelConsumer: (consumerId) => getCurrentMatchKernelConsumers()?.getAdapter?.(consumerId) || null,
         disposePreparedMatchSession: (initializedMatch, options = {}) => {
             if (!initializedMatch?.session) return;
             initializedMatch?.kernelAdapter?.dispose?.();

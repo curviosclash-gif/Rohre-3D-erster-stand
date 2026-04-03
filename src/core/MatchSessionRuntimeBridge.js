@@ -15,9 +15,12 @@ import {
     setSessionRuntimeHandle,
 } from './runtime/GameRuntimeBundle.js';
 import { createMatchKernelInteractiveAdapter } from './MatchKernelInteractiveAdapter.js';
+import { createGameStateSnapshot } from './GameStateSnapshot.js';
+import { createMatchKernelConsumerRegistry } from '../state/MatchKernelConsumerAdapters.js';
 
 const MATCH_KERNEL_HANDLE_KEY = 'matchKernel';
 const MATCH_KERNEL_ADAPTER_HANDLE_KEY = 'matchKernelAdapter';
+const MATCH_KERNEL_CONSUMERS_HANDLE_KEY = 'matchKernelConsumers';
 
 export class MatchSessionRuntimeBridge {
     constructor(deps = {}) {
@@ -47,12 +50,19 @@ export class MatchSessionRuntimeBridge {
         this._setRuntimeHandle(MATCH_KERNEL_HANDLE_KEY, null);
     }
 
+    _disposeKernelConsumers() {
+        const kernelConsumers = this.getCurrentMatchKernelConsumers();
+        kernelConsumers?.dispose?.();
+        this._setRuntimeHandle(MATCH_KERNEL_CONSUMERS_HANDLE_KEY, null);
+    }
+
     applyInitializedMatchSession(initializedMatch) {
         const matchSession = initializedMatch?.session;
         if (!this.game || !matchSession) return;
         applyMatchSessionState(this.runtimeBundle || this.game.runtimeBundle, matchSession);
 
         this._disposeKernelAdapter();
+        this._disposeKernelConsumers();
         this._disposeMatchKernel();
 
         const matchKernel = initializedMatch?.kernel || null;
@@ -64,6 +74,24 @@ export class MatchSessionRuntimeBridge {
         });
         this._setRuntimeHandle(MATCH_KERNEL_ADAPTER_HANDLE_KEY, kernelAdapter);
         this.game?.playingStateSystem?.setKernelAdapter?.(kernelAdapter);
+        const kernelConsumers = createMatchKernelConsumerRegistry({
+            kernel: matchKernel,
+            allowKernelTick: false,
+            sessionProvider: () => getCurrentMatchSessionRefs(this.runtimeBundle || this.game?.runtimeBundle),
+            sessionRuntimeProvider: () => this.runtimeBundle?.sessionRuntime || this.game?.sessionRuntime || null,
+            gameStateSnapshotProvider: () => {
+                const session = getCurrentMatchSessionRefs(this.runtimeBundle || this.game?.runtimeBundle);
+                if (!session?.entityManager) return null;
+                const roundState = this.runtimeBundle?.state?.roundStateController || this.game?.roundStateController || null;
+                return createGameStateSnapshot(session.entityManager, roundState);
+            },
+            profile: {
+                matchId: matchSession?.effectiveMapKey || matchKernel?.profile?.matchId || null,
+                modeId: matchSession?.entityManager?.activeGameMode || matchKernel?.profile?.modeId || null,
+                sessionId: this.runtimeBundle?.sessionRuntime?.session?.activeSessionId || this.game?.sessionRuntime?.session?.activeSessionId || null,
+            },
+        });
+        this._setRuntimeHandle(MATCH_KERNEL_CONSUMERS_HANDLE_KEY, kernelConsumers);
     }
 
     getCurrentMatchSessionRefs() {
@@ -78,9 +106,18 @@ export class MatchSessionRuntimeBridge {
         return this._getRuntimeHandle(MATCH_KERNEL_ADAPTER_HANDLE_KEY) || null;
     }
 
+    getCurrentMatchKernelConsumers() {
+        return this._getRuntimeHandle(MATCH_KERNEL_CONSUMERS_HANDLE_KEY) || null;
+    }
+
+    getCurrentMatchKernelConsumer(consumerId) {
+        return this.getCurrentMatchKernelConsumers()?.getAdapter?.(consumerId) || null;
+    }
+
     clearMatchSessionRefs() {
         if (!this.game) return;
         this._disposeKernelAdapter();
+        this._disposeKernelConsumers();
         this._disposeMatchKernel();
         clearMatchSessionState(this.runtimeBundle || this.game.runtimeBundle);
     }
