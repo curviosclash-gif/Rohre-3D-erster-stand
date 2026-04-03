@@ -526,7 +526,7 @@ Scope:
 
 - [x] 80.9.1 `training-gate` um explizite Promotion-Entscheidung gegen den eingefrorenen BT11-Champion erweitern; synthetische und BT20-Referenzlaeufe bleiben geblockt (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-gate.test.mjs` -> PASS)
 - [x] 80.9.2 `training-e2e` Dry-Run-Fallback so haerten, dass `write-latest=false` Validation-/Gate-Pfade sauber skippt statt false-positive Rot zu erzeugen (abgeschlossen: 2026-04-02; evidence: commit `37bfeb3`, `node --test tests/training-e2e.test.mjs` -> PASS)
-- [ ] 80.9.3 `bot:validate` als harte Vorbedingung fuer BT80C-Kandidatenevidence stabilisieren; drei reproduzierbare Validation-Paesse auf fixer Matrix verlangen
+- [ ] 80.9.3 `bot:validate` als harte Vorbedingung fuer BT80C-Kandidatenevidence stabilisieren; drei reproduzierbare Validation-Paesse auf fixer Matrix verlangen. Stand 2026-04-03: Trainingsscope-Analyse abgeschlossen, aber der operative Fix liegt im normalen Matchstart-/Session-Scope; `preview` reproduziert `Missing interactive match runtime`, `dev` bootet fuer den Runner nicht stabil bis `GAME_INSTANCE`. Neuer Ueberlauf-Plan: `docs/plaene/neu/BT80C_Runtime_Startpfad_Validation_Ueberlauf_2026-04-03.md` (manuelle Uebernahme in `docs/Umsetzungsplan.md` bleibt user-owned).
 - [ ] 80.9.4 Benchmark-Reports um eindeutige Urteils- und Ursachenklassen (`promote/hold/rollback/diagnose`; `harness/runtime/algorithm/throughput/artifact`) schaerfen
 - [ ] 80.9.5 Benchmark-Invalidierung bei Gameplay-/Observation-/Action-/Reward-/Validation-Semantikdrift explizit dokumentieren und im Prozess verankern
 
@@ -541,6 +541,7 @@ Scope:
 | --- | --- | --- | --- | --- |
 | 2026-04-02 | Repo-Haertung | `BT80C_repo_20260402` | Algorithmusprofile, PER-Aktivierung, Thermal-Ceilings und manuelle Promotion-Policy sind ohne Langlaufstart im Repo verdrahtet | commit `37bfeb3`, `tests/trainer-v36-algorithm-profile.test.mjs`, `tests/training-benchmark-artifacts.test.mjs`, `tests/training-gate.test.mjs`, `tests/training-e2e.test.mjs` |
 | 2026-04-03 | Plan-Nachschaerfung | `BT80C_plan_20260403` | Validation-Harness, Kandidatenleiter, Semantik-Freeze und Drei-Run-Promotionsregel sind vor weiteren BT80C-Operatorlaeufen priorisiert | `docs/plaene/neu/BT80C_Validierungs_und_Promotionshaertung_2026-04-03.md`, `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Trainings_Roadmap.md` |
+| 2026-04-03 | 80.9.3 Scope-Analyse | `BT80C_80_9_3_scope_20260403` | Validation-Harness laesst sich im Trainingsscope nicht endgueltig reparieren, weil `startMatch()` im normalen Runtime-Startpfad auf `Missing interactive match runtime` faellt; BT80C braucht dafuer erst einen separaten Spielscope-Block | `docs/plaene/neu/BT80C_Runtime_Startpfad_Validation_Ueberlauf_2026-04-03.md`, `docs/Fehlerberichte/2026-04-02_bt80c-candidate-run-validation-blockers.md` |
 
 ### Risiko-Register BT80C
 
@@ -549,7 +550,7 @@ Scope:
 | Prioritized Replay oder neue Challenger-Defaults destabilisieren Resume-Ketten | hoch | Trainer | Checkpoint-Contract unveraendert halten, PER nur ueber Profile aktivieren und per Unit-Test absichern | Resume oder Replay-Stats kippen nach Profilwechsel |
 | Thermal-Ceilings bleiben folgenlos, wenn keine Temperaturquelle angeschlossen ist | mittel | Train-Ops | Externe Temperaturquelle ueber Telemetrie einspeisen; bis dahin Warning sichtbar halten und keine Marathon-Promotion freigeben | High-Util-Lauf ohne Temperaturwert |
 | Manual-Promotion wird im Alltag als automatischer Rollout missverstanden | hoch | QA/Ops | Gate-Report explizit auf `manual-promotion-required` bzw. `hold-champion` pinnen | Gruener Gate-Lauf wird als automatischer Champion-Wechsel interpretiert |
-| Validation-Harness bleibt vor Matchstart in `MENU` haengen und blockiert vollstaendige BT80C-Evidence | hoch | QA/Ops | Validation-Pfad vor neuen Kandidatenlaeufen stabilisieren; drei reproduzierbare Paesse als Vorbedingung setzen | fehlender `bot-validation-report.json` oder `wait-playing`-Timeout |
+| Validation-Harness bleibt wegen normalem Matchstart-/Session-Defekt blockiert und blockiert vollstaendige BT80C-Evidence | hoch | QA/Ops + Runtime | Runtime-Startpfad zuerst ueber separaten Spielscope-Block reparieren; erst danach Runner-Haertung und Drei-Pass-Vorbedingung in BT80C fortsetzen | fehlender `bot-validation-report.json`, `Missing interactive match runtime` oder `wait-playing`-Timeout |
 | Stille Gameplay-/Observation-/Action-/Reward-Aenderungen machen Champion- und Kandidatenvergleiche ungueltig | hoch | Planung + Runtime | Semantik-Freeze dokumentieren; bei Drift neuen Benchmark-Freeze verlangen | alter Champion schlaegt/neuer Kandidat verliert nur wegen geaenderter Semantik |
 
 ---

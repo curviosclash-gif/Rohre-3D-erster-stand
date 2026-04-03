@@ -51,14 +51,26 @@
 - Relevante Commits:
   - noch keiner; aktueller Stand ist Diagnose/Evidence ohne Codefix
 
+## Analyse 2026-04-03
+
+- Der Default-Runner auf `dev` ist im aktuellen Worktree zusaetzlich instabil: sowohl headed als auch headless wartet `bot:validate` mit `app:game-instance` 180000ms vergeblich auf `GAME_INSTANCE`.
+- Direkte HTTP-Probes auf `http://127.0.0.1:<port>/@vite/client` und `http://127.0.0.1:<port>/src/core/main.js` liefern zwar `200`, brauchen lokal aber jeweils ca. 12s; der Dev-Transformpfad ist fuer den Validation-Runner damit kein belastbarer BT80C-Fixpunkt.
+- Der eigentliche Alt-Blocker bleibt dennoch reproduzierbar: `node dev/scripts/bot-validation-runner.mjs --server-mode preview --headless true --bot-validation-report tmp/bt80c-debug-report-preview.json` bootet sauber und endet wieder in `phase=scenario=V1(1/1) round=1/1:wait-playing`, Diagnose `state="MENU"`, `players=[]`.
+- Eine isolierte Preview-Probe mit `applyBotValidationScenario(0)` und anschliessendem `startMatch()` zeigt keinen Start-Validierungsfehler, loggt aber waehrend des kurzen `PLAYING`-Uebergangs `"[Game] Missing interactive match runtime"` und faellt danach ueber `submenu-game` nach `MENU` zurueck.
+- Damit liegt der operative Fix nicht mehr im Trainings-Harness allein, sondern im normalen Matchstart-/Session-Aufbau (`src/ui/MatchFlowUiController.js`, `src/core/InteractiveMatchRuntimeGuard.js`, `src/core/runtime/GameRuntimeSessionHandler.js`, `src/state/MatchLifecycleSessionOrchestrator.js`, `src/state/MatchSessionFactory.js`, `src/core/runtime/RuntimeSessionLifecycleService.js`).
+- Neuer Ueberlauf-Plan fuer den notwendigen Spielscope-Block: `docs/plaene/neu/BT80C_Runtime_Startpfad_Validation_Ueberlauf_2026-04-03.md`.
+
 ## Aktueller Stand
 
 - Status: BT80C-Kandidatenlauf technisch anstossbar; Abschluss weiterhin blockiert
 - Root-Cause-Stand:
   - `training-run` / Bridge / Resume sind im kleinen Pfad funktionsfaehig.
   - Der volle `quick-benchmark` ist fuer diese Maschine in der aktuellen Form zu schwer fuer den konfigurierten Stage-Timeout.
-  - Der eigentliche Abschlussblocker fuer BT80C ist aktuell `bot:validate`: Die Validation-Runtime startet die Szene, kommt aber nicht aus `MENU` in `PLAYING`, sodass der Pflichtreport komplett fehlt.
+  - `bot:validate` bleibt der Abschlussblocker fuer BT80C, aber die aktuelle Analyse zeigt jetzt einen Scope-Ueberlauf: der Runner kann den Runtime-Start nur bis zu dem Punkt reproduzieren, an dem der normale Matchstart-/Session-Pfad `Missing interactive match runtime` produziert und wieder nach `MENU` faellt.
+  - Solange dieser normale Spielscope-Defekt offen ist, kann `80.9.3` im Trainingsscope weder sauber implementiert noch mit drei reproduzierbaren Validation-Paessen abgeschlossen werden.
 
 ## Naechster Schritt
 
-- `scripts/bot-validation-runner.mjs` bzw. den Runtime-Startpfad fuer Szenario `V1` instrumentieren und fixen, damit der Validation-Lauf reproduzierbar den Matchstart erreicht; danach den BT80C-Kandidatenlauf erneut mit voller `bot:validate`-Lane und frischem Gate fahren.
+- Zuerst den neuen Ueberlauf-Plan `docs/plaene/neu/BT80C_Runtime_Startpfad_Validation_Ueberlauf_2026-04-03.md` manuell in den normalen Umsetzungsplan uebernehmen; `docs/Umsetzungsplan.md` bleibt dabei user-owned.
+- Danach den normalen Matchstart-/Session-Pfad im vorgeschlagenen Spielscope-Block reparieren.
+- Erst nach diesem Runtime-Fix zu BT80C `80.9.3` zurueckkehren und die eigentliche Harness-Haertung samt Drei-Pass-Vorbedingung abschliessen.
