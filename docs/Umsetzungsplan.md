@@ -27,7 +27,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
 | V74 | Architektur-Runtime-Entkopplung (Refresh) | done | P1 | frei | V58.99,V60.3 | 74.99 | `docs/plaene/aktiv/V74.md` |
-| V83 | Architektur SessionRuntime und Plattform-Capabilities | planned | P1 | frei | V74.99 | 83.1 | `docs/plaene/aktiv/V83.md` |
+| V83 | Architektur SessionRuntime und Plattform-Capabilities | active | P1 | Bot-Codex | V74.99 | 83.1 | `docs/plaene/aktiv/V83.md` |
 | V84 | Headless MatchKernel und einheitliche GameMode-API | planned | P2 | frei | V83.99 | 84.1 | `docs/plaene/aktiv/V84.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | planned | P2 | frei | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
@@ -84,7 +84,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | - | V71 | - | frei | `71.99` nach Warmup-Entstoerung oder belastbarem Restgate schliessen |
 | Agent-B | V72 | 2026-04-02 | active | `72.2` abgeschlossen; `72.3` Portal-/Gate-Vertraege haerten steht an |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
-| - | V83 | - | frei | Nach `V74.99` mit `83.1` Zielbild, Command/Event-Vertrag und SessionRuntime-Schnitt starten |
+| Bot-Codex | V83 | 2026-04-03 | active | `83.1` laeuft; `83.1.1` Zielgrenzen zwischen Runtime, Application, UI und Plattform dokumentieren |
 | - | V84 | - | frei | Nach `V83.99` mit `84.1` Kernel-Zielbild, Simulationsseams und headless Vertragskatalog starten |
 | - | V85 | - | frei | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
