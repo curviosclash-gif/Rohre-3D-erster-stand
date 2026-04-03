@@ -8,6 +8,12 @@ import {
     MATCH_LIFECYCLE_EVENT_TYPES,
     SESSION_FINALIZE_TRIGGERS,
 } from '../shared/contracts/MatchLifecycleContract.js';
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
+import {
+    applySessionRuntimeLifecycleTransition,
+    ensureSessionRuntimeLifecycleState,
+    SESSION_RUNTIME_STATES,
+} from '../shared/contracts/SessionRuntimeStateMachine.js';
 
 export const MATCH_SESSION_PORT_METHODS = Object.freeze([
     'getSessionRuntimeState',
@@ -47,10 +53,10 @@ function createFallbackSessionRuntimeState() {
             updatedAt: Date.now(),
         },
         lifecycle: {
-            gameStateId: null,
+            gameStateId: GAME_STATE_IDS.MENU,
             disposed: false,
             pendingSessionInit: null,
-            status: 'idle',
+            status: SESSION_RUNTIME_STATES.MENU,
             updatedAt: Date.now(),
         },
     };
@@ -187,11 +193,9 @@ export class MatchLifecycleSessionOrchestrator {
         this._bindRuntimeField('_activeSessionId', ['session', 'activeSessionId'], null);
         this._bindRuntimeField('_pendingSessionInit', ['lifecycle', 'pendingSessionInit'], null);
         this._bindRuntimeField('_pendingFinalize', ['finalize', 'pendingOperation'], null);
+        ensureSessionRuntimeLifecycleState(this._sessionRuntimeState);
         if (!this._sessionRuntimeState?.finalize?.status) {
             this._sessionRuntimeState.finalize.status = 'idle';
-        }
-        if (!this._sessionRuntimeState?.lifecycle?.status) {
-            this._sessionRuntimeState.lifecycle.status = 'idle';
         }
     }
 
@@ -207,12 +211,11 @@ export class MatchLifecycleSessionOrchestrator {
         });
     }
 
-    _setLifecycleStatus(status) {
+    _setLifecycleStatus(status, options = undefined) {
         if (!this._sessionRuntimeState?.lifecycle || typeof status !== 'string' || !status.trim()) {
             return;
         }
-        this._sessionRuntimeState.lifecycle.status = status;
-        this._sessionRuntimeState.lifecycle.updatedAt = Date.now();
+        applySessionRuntimeLifecycleTransition(this._sessionRuntimeState, status, options);
     }
 
     _setFinalizeStatus(status, extra = null) {
@@ -252,7 +255,7 @@ export class MatchLifecycleSessionOrchestrator {
             this._sessionSequence += 1;
             this._activeSessionId = `match-${this._sessionSequence}`;
         }
-        this._setLifecycleStatus('playing');
+        this._setLifecycleStatus(SESSION_RUNTIME_STATES.PLAYING);
         this._setFinalizeStatus('idle', {
             lastReason: null,
             lastTrigger: null,
@@ -267,7 +270,10 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     notifyMenuOpened(extra = null) {
-        this._setLifecycleStatus(this._sessionRuntimeState?.lifecycle?.disposed ? 'disposed' : 'menu');
+        this._setLifecycleStatus(
+            this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
+            { gameStateId: GAME_STATE_IDS.MENU }
+        );
         this._emitLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.MENU_OPENED, extra);
     }
 
@@ -375,7 +381,7 @@ export class MatchLifecycleSessionOrchestrator {
         this._sessionSequence += 1;
         const provisionalId = `match-${this._sessionSequence}`;
         this._activeSessionId = provisionalId;
-        this._setLifecycleStatus('starting');
+        this._setLifecycleStatus(SESSION_RUNTIME_STATES.STARTING);
         this._setFinalizeStatus('idle', {
             lastReason: null,
             lastTrigger: null,
@@ -400,7 +406,10 @@ export class MatchLifecycleSessionOrchestrator {
                     this._activeSessionId = null;
                 }
                 this.deps?.clearMatchSessionRefs?.();
-                this._setLifecycleStatus(this._sessionRuntimeState?.lifecycle?.disposed ? 'disposed' : 'menu');
+                this._setLifecycleStatus(
+                    this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
+                    { gameStateId: GAME_STATE_IDS.MENU }
+                );
                 throw error;
             })
             .finally(() => {
@@ -437,7 +446,7 @@ export class MatchLifecycleSessionOrchestrator {
             lastReason: request.reason,
             lastTrigger: request.recorderTrigger?.type || request.reason,
         });
-        this._setLifecycleStatus('finalizing');
+        this._setLifecycleStatus(SESSION_RUNTIME_STATES.FINALIZING);
         const trackedFinalize = Promise.resolve().then(async () => {
             this._endLifecycleSession(request.reason);
             this._activeSessionId = null;
@@ -489,7 +498,10 @@ export class MatchLifecycleSessionOrchestrator {
                 lastCompletedReason: request.reason,
             });
             if (!request.notifyMenuOpened) {
-                this._setLifecycleStatus(this._sessionRuntimeState?.lifecycle?.disposed ? 'disposed' : 'idle');
+                this._setLifecycleStatus(
+                    this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
+                    { gameStateId: GAME_STATE_IDS.MENU }
+                );
             }
             return request.reason;
         }).catch((error) => {

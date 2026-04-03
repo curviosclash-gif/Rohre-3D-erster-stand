@@ -1,6 +1,13 @@
 import { GAME_MODE_TYPES } from '../../hunt/HuntMode.js';
 import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
 import {
+    deriveSessionRuntimeStateFromGameStateId,
+    ensureSessionRuntimeLifecycleState,
+    SESSION_RUNTIME_STATE_MACHINE_VERSION,
+    syncSessionRuntimeLifecycleDisposed,
+    syncSessionRuntimeLifecycleWithGameState,
+} from '../../shared/contracts/SessionRuntimeStateMachine.js';
+import {
     clearActiveRuntimeConfig,
     setActiveRuntimeConfig,
 } from './ActiveRuntimeConfigStore.js';
@@ -141,13 +148,13 @@ function createSharedPropertyView(source, keys) {
 }
 
 function deriveInitialLifecycleStatus({ gameStateId = GAME_STATE_IDS.MENU, disposed = false, status = undefined } = {}) {
-    if (typeof status === 'string' && status.trim()) {
-        return status.trim();
-    }
     if (disposed) {
         return 'disposed';
     }
-    return gameStateId === GAME_STATE_IDS.MENU ? 'menu' : 'active';
+    return deriveSessionRuntimeStateFromGameStateId(
+        gameStateId,
+        typeof status === 'string' && status.trim() ? status.trim() : 'menu'
+    );
 }
 
 function createSessionRuntimeCore({ state, components, ports = null, lifecycle = {} } = {}) {
@@ -175,6 +182,7 @@ function createSessionRuntimeCore({ state, components, ports = null, lifecycle =
             gameStateId: lifecycle.gameStateId ?? GAME_STATE_IDS.MENU,
             disposed: !!lifecycle.disposed,
             pendingSessionInit: null,
+            machineVersion: SESSION_RUNTIME_STATE_MACHINE_VERSION,
             status: deriveInitialLifecycleStatus(lifecycle),
             updatedAt: Date.now(),
         },
@@ -244,6 +252,14 @@ function getRuntimeStatusCursor(bundle, path = []) {
 }
 
 function setRuntimeStatusValue(bundle, path, value) {
+    if (Array.isArray(path) && path.length === 2 && path[0] === 'lifecycle' && path[1] === 'gameStateId') {
+        syncSessionRuntimeLifecycleWithGameState(bundle?.sessionRuntime, value);
+        return;
+    }
+    if (Array.isArray(path) && path.length === 2 && path[0] === 'lifecycle' && path[1] === 'disposed') {
+        syncSessionRuntimeLifecycleDisposed(bundle?.sessionRuntime, value === true);
+        return;
+    }
     if (!Array.isArray(path) || path.length === 0) return;
     const parent = getRuntimeStatusCursor(bundle, path.slice(0, -1));
     if (!parent || typeof parent !== 'object') return;
@@ -293,6 +309,7 @@ export function createGameRuntimeBundle({ state = {}, components = {}, ports = n
         ports,
         lifecycle,
     });
+    ensureSessionRuntimeLifecycleState(sessionRuntime);
     const bundle = {
         state: runtimeState,
         components: runtimeComponents,
@@ -472,6 +489,7 @@ export function clearGameRuntimeState(bundle, initialOverrides = undefined) {
     clearActiveRuntimeConfig({ owner: bundle });
     const sessionRuntime = getSessionRuntime(bundle);
     if (sessionRuntime) {
+        ensureSessionRuntimeLifecycleState(sessionRuntime);
         sessionRuntime.session.activeSessionId = null;
         sessionRuntime.session.sequence = 0;
         sessionRuntime.lifecycle.pendingSessionInit = null;
