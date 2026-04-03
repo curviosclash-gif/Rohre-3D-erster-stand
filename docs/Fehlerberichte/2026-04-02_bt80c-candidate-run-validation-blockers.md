@@ -95,7 +95,18 @@
   - `tmp/bt80c-cli-smoke.json`: CLI-Surface fuer den Runner greift wie erwartet; `preview-build=false`, `scenarioCount=1`, `rounds=1`, kuerzeres Matchbudget wird korrekt uebernommen.
 - Damit ist der normale Spielscope nach dem Runtime-Fix nicht erneut betroffen. Der verbleibende Blocker liegt jetzt enger im BT80C-Harness selbst: Die feste Validation-Matrix, insbesondere `V1`, liefert auch mit groesserem Aktivbudget keinen natuerlichen Rundenabschluss.
 
+## Update 2026-04-03 Classic-3D Probe
+
+- Zwei lokale Preview-Proben gegen denselben Validation-Pfad zeigen, dass das Problem nicht auf `V1`/`standard` allein begrenzt ist:
+  - Probe A (`classic-3d` nah an V1): `standard` 3D 2 Bots, `maze` 3D 2 Bots und `maze` 3D 3 Bots bleiben jeweils nach ca. 45s in `PLAYING`; `roundsRecorded=0`, alle Spieler `alive`.
+  - Probe B (aggressivere BT-nahe Varianten): `standard` 3D mit 6 Portalen sowie `complex` 3D mit 3 Bots und 4 Portalen bleiben ebenfalls nach ca. 40s in `PLAYING`; `roundsRecorded=0`, alle Spieler `alive`.
+- Die Spieler bewegen sich in diesen Proben weiter, der Runner haengt also nicht auf einem statischen oder pausierten Zustand. Der Restblocker ist enger: `classic-3d` liefert im aktuellen Validation-/Preview-Pfad keinen verlaesslichen natuerlichen Abschluss, selbst wenn Map/Bot-/Portal-Parameter innerhalb des BT-Scope variiert werden.
+- Zusaetzliche Repo-Evidence: `scripts/bot-benchmark-baseline.mjs` dokumentiert fuer die Validation-Lane bereits `seedMode: "none"` bzw. `No explicit RNG seed hook available`. Fuer eine wirklich feste Matrix fehlt damit ein deterministischer Seed-/Starthebel auf Runtime-/Session-Ebene.
+- Konsequenz: Ein sauberer Fix liegt voraussichtlich nicht mehr rein im BT-Harness. Entweder braucht die Validation-Lane eine normale Runtime-/Session-Oberflaeche fuer deterministische Seed-/Startbedingungen, oder die Produkt-/Gameplay-Semantik fuer natuerliche `classic-3d`-Abschluesse muss bewusst angepasst werden.
+- Neuer Intake-Entwurf fuer den Scope-Ueberlauf: `docs/plaene/neu/BT80C_Classic3D_Validation_Natural_End_Overlap_2026-04-03.md`.
+
 ## Naechster Schritt
 
-- BT80C `80.9.3` im Bot-Training-Scope weiter an der Validation-Matrix-/Round-End-Semantik bearbeiten.
-- Kein neuer normaler Umsetzungsplan-Block noetig, solange keine weitere Runtime-/Gameplay-Datei ausserhalb des Trainings-/Runner-/Validation-Scope angefasst werden muss.
+- BT80C `80.9.3` im Bot-Trainingsplan offen halten und den BT-Scope nicht weiter ueberspannen.
+- Den Intake-Entwurf `docs/plaene/neu/BT80C_Classic3D_Validation_Natural_End_Overlap_2026-04-03.md` fuer einen moeglichen normalen Folgeblock nutzen.
+- Vor Aenderungen an normaler Runtime-/Session-/Gameplay-Oberflaeche ausdrueckliche User-Freigabe einholen; `docs/Umsetzungsplan.md` bleibt dabei user-owned.
