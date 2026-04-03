@@ -16,11 +16,15 @@ import {
     MATCH_KERNEL_SURFACES,
     MATCH_KERNEL_TICK_DRIVERS,
 } from '../shared/contracts/MatchKernelRuntimeContract.js';
+import {
+    deriveMatchEndTickStep,
+    deriveRoundEndTickStep,
+} from './RoundStateControllerOps.js';
 
 export const MATCH_KERNEL_LIFECYCLE_CONTRACT_VERSION = 'match-kernel-lifecycle.v1';
 
 const VALID_BOOT_LIFECYCLES = new Set(['idle']);
-const VALID_TICK_LIFECYCLES = new Set(['running']);
+const VALID_TICK_LIFECYCLES = new Set(['running', 'round_end', 'match_end']);
 
 function resolveSimPorts(ports) {
     if (!ports || typeof ports !== 'object') return {};
@@ -35,6 +39,21 @@ function resolveSimPorts(ports) {
 function normalizeRoundIndex(value) {
     const numeric = Number(value);
     return Number.isFinite(numeric) && numeric >= 0 ? Math.floor(numeric) : 0;
+}
+
+function normalizeRoundPause(value, fallback = 0) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+        return fallback;
+    }
+    return Math.max(0, numeric);
+}
+
+function readPressedInput(inputAdapter, key) {
+    if (!inputAdapter || typeof inputAdapter.wasPressed !== 'function') {
+        return false;
+    }
+    return inputAdapter.wasPressed(key) === true;
 }
 
 /**
@@ -79,19 +98,21 @@ export class MatchKernel {
         this._lifecycle = 'idle';
         this._tickIndex = 0;
         this._roundIndex = 0;
+        this._roundPause = 0;
     }
 
     get lifecycle() { return this._lifecycle; }
     get tickIndex() { return this._tickIndex; }
     get roundIndex() { return this._roundIndex; }
+    get roundPause() { return this._roundPause; }
     get profile() { return this._profile; }
     get surface() { return this._profile?.surface ?? MATCH_KERNEL_SURFACES.INTERACTIVE; }
 
     /**
      * boot – transition from idle to running.
-     * @param {{ roundIndex?: number }} options
+     * @param {{ roundIndex?: number, roundPause?: number }} options
      */
-    boot({ roundIndex = 0 } = {}) {
+    boot({ roundIndex = 0, roundPause = 0 } = {}) {
         if (!VALID_BOOT_LIFECYCLES.has(this._lifecycle)) {
             throw new Error(
                 `MatchKernel.boot: invalid lifecycle "${this._lifecycle}"; expected one of [${[...VALID_BOOT_LIFECYCLES].join(', ')}]`
@@ -100,6 +121,57 @@ export class MatchKernel {
         this._lifecycle = 'running';
         this._tickIndex = 0;
         this._roundIndex = normalizeRoundIndex(roundIndex);
+        this._roundPause = normalizeRoundPause(roundPause, 0);
+    }
+
+    _createTickResult(dt, extra = null) {
+        this._tickIndex += 1;
+        return {
+            contractVersion: MATCH_KERNEL_LIFECYCLE_CONTRACT_VERSION,
+            tickIndex: this._tickIndex,
+            lifecycle: this._lifecycle,
+            surface: this.surface,
+            fixedStepSeconds: dt,
+            ...(extra && typeof extra === 'object' ? extra : {}),
+        };
+    }
+
+    _tickRunning(dt, inputAdapter, frameId) {
+        const { entityManager, powerupManager, particles, arena } = this._simPorts;
+
+        if (entityManager) entityManager.update(dt, inputAdapter, frameId);
+        if (powerupManager) powerupManager.update(dt);
+        if (particles) particles.update(dt);
+        if (arena) arena.update(dt);
+
+        return this._createTickResult(dt);
+    }
+
+    _tickRoundEnd(dt, inputAdapter) {
+        const tickStep = deriveRoundEndTickStep({
+            dt,
+            roundPause: this._roundPause,
+            enterPressed: readPressedInput(inputAdapter, 'Enter'),
+            escapePressed: readPressedInput(inputAdapter, 'Escape'),
+        });
+        this._roundPause = normalizeRoundPause(tickStep?.nextRoundPause, this._roundPause);
+        return this._createTickResult(dt, {
+            action: tickStep?.action || 'WAIT',
+            nextRoundPause: this._roundPause,
+            shouldUpdateCameras: tickStep?.shouldUpdateCameras === true,
+            countdownMessageSub: tickStep?.countdownMessageSub || null,
+        });
+    }
+
+    _tickMatchEnd(dt, inputAdapter) {
+        const tickStep = deriveMatchEndTickStep({
+            enterPressed: readPressedInput(inputAdapter, 'Enter'),
+            escapePressed: readPressedInput(inputAdapter, 'Escape'),
+        });
+        return this._createTickResult(dt, {
+            action: tickStep?.action || 'WAIT',
+            shouldUpdateCameras: tickStep?.shouldUpdateCameras === true,
+        });
     }
 
     /**
@@ -118,23 +190,13 @@ export class MatchKernel {
         const frameId = (tickEnvelope && Number.isFinite(tickEnvelope.frameId))
             ? tickEnvelope.frameId
             : this._tickIndex;
-
-        const { entityManager, powerupManager, particles, arena } = this._simPorts;
-
-        if (entityManager) entityManager.update(dt, inputAdapter, frameId);
-        if (powerupManager) powerupManager.update(dt);
-        if (particles) particles.update(dt);
-        if (arena) arena.update(dt);
-
-        this._tickIndex++;
-
-        return {
-            contractVersion: MATCH_KERNEL_LIFECYCLE_CONTRACT_VERSION,
-            tickIndex: this._tickIndex,
-            lifecycle: this._lifecycle,
-            surface: this.surface,
-            fixedStepSeconds: dt,
-        };
+        if (this._lifecycle === 'round_end') {
+            return this._tickRoundEnd(dt, inputAdapter);
+        }
+        if (this._lifecycle === 'match_end') {
+            return this._tickMatchEnd(dt, inputAdapter);
+        }
+        return this._tickRunning(dt, inputAdapter, frameId);
     }
 
     /**
@@ -142,9 +204,10 @@ export class MatchKernel {
      * The caller (PlayingStateSystem / headless runner) is responsible for
      * deciding when to call this based on RoundStateController output.
      */
-    signalRoundEnd() {
+    signalRoundEnd({ roundPause = 3 } = {}) {
         if (this._lifecycle === 'running') {
             this._lifecycle = 'round_end';
+            this._roundPause = normalizeRoundPause(roundPause, 3);
         }
     }
 
@@ -154,6 +217,7 @@ export class MatchKernel {
     signalMatchEnd() {
         if (this._lifecycle === 'running' || this._lifecycle === 'round_end') {
             this._lifecycle = 'match_end';
+            this._roundPause = 0;
         }
     }
 
@@ -166,6 +230,7 @@ export class MatchKernel {
             this._lifecycle = 'running';
             this._roundIndex++;
             this._tickIndex = 0;
+            this._roundPause = 0;
         }
     }
 
@@ -183,6 +248,7 @@ export class MatchKernel {
         this._lifecycle = 'disposed';
         this._simPorts = {};
         this._profile = null;
+        this._roundPause = 0;
     }
 }
 

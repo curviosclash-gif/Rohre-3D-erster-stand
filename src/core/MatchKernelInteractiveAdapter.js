@@ -8,7 +8,7 @@
 // - Invariants:
 //   - This adapter bridges PlayingStateSystem and the MatchKernel.
 //   - It reads game.input (live interactive source) and passes it to the kernel.
-//   - It does NOT own round/match-end logic; callers read kernel.lifecycle after tick.
+//   - It can drive running, round-end and match-end kernel ticks.
 //   - Pause/Escape intent is handled by PlayingStateSystem before calling this adapter.
 
 import {
@@ -45,7 +45,10 @@ export class MatchKernelInteractiveAdapter {
      * @returns {object|null} MatchKernel tick result or null if not running.
      */
     tick(dt, renderFrameId = 0) {
-        if (!this._kernel || this._kernel.lifecycle !== 'running') return null;
+        if (!this._kernel) return null;
+        if (this._kernel.lifecycle === 'idle' || this._kernel.lifecycle === 'disposed') {
+            return null;
+        }
 
         const tickEnvelope = createMatchKernelTickEnvelope({
             tickIndex: this._kernel.tickIndex,

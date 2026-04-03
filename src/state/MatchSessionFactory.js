@@ -3,11 +3,14 @@ import { EntityManager } from '../entities/EntityManager.js';
 import { PowerupManager } from '../entities/Powerup.js';
 import { ParticleSystem } from '../entities/Particles.js';
 import { createEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
+import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
+import { createInteractiveMatchKernelRunProfile } from '../shared/contracts/MatchKernelRuntimeContract.js';
 import {
     buildArenaSessionKey,
     resolveMatchMap,
     toSafeInt,
 } from './match-session/MatchSessionMapOps.js';
+import { createInteractiveMatchKernel } from './MatchKernel.js';
 import {
     buildEntityManagerSetupOptions,
     disposeMatchSessionSystems,
@@ -360,17 +363,45 @@ export function wireInitializedMatchRuntime({
     if (!renderer || !session?.entityManager) {
         throw new Error('wireInitializedMatchRuntime requires renderer and initialized match session');
     }
-    const runtime = wireMatchSessionRuntime({
-        renderer,
-        entityManager: session.entityManager,
-        numHumans: session.numHumans,
-        onPlayerFeedback,
-        onPlayerDied,
-        onRoundEnd,
-        resetScores,
+    const kernel = createInteractiveMatchKernel({
+        profile: createInteractiveMatchKernelRunProfile({
+            matchId: session.effectiveMapKey || null,
+            modeId: session.entityManager?.activeGameMode || null,
+        }),
+        simPorts: {
+            entityManager: session.entityManager,
+            powerupManager: session.powerupManager,
+            particles: session.particles,
+            arena: session.arena,
+        },
     });
-    return {
-        ...initializedMatch,
-        runtime,
-    };
+    try {
+        kernel.boot({ roundIndex: 0 });
+        const runtime = wireMatchSessionRuntime({
+            renderer,
+            entityManager: session.entityManager,
+            numHumans: session.numHumans,
+            onPlayerFeedback,
+            onPlayerDied,
+            onRoundEnd: (winner, outcome = null) => {
+                if (outcome?.state === GAME_STATE_IDS.MATCH_END) {
+                    kernel.signalMatchEnd();
+                } else {
+                    kernel.signalRoundEnd({ roundPause: 3 });
+                }
+                if (typeof onRoundEnd === 'function') {
+                    onRoundEnd(winner, outcome);
+                }
+            },
+            resetScores,
+        });
+        return {
+            ...initializedMatch,
+            runtime,
+            kernel,
+        };
+    } catch (error) {
+        kernel.dispose();
+        throw error;
+    }
 }

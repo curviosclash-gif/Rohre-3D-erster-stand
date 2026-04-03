@@ -17,6 +17,7 @@ export function createMatchSessionPort(runtime) {
     const runtimeHandles = sessionRuntime?.handles || null;
     const sessionSettings = sessionRuntime?.session?.settings || null;
     const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
+    const getCurrentMatchKernel = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchKernel?.() || null;
     const getRecorder = () => runtimeHandles?.mediaRecorderSystem || runtime?.mediaRecorderSystem || runtime?.recorder || null;
     return {
         getSessionRuntimeState: () => sessionRuntime,
@@ -60,6 +61,8 @@ export function createMatchSessionPort(runtime) {
         clearMatchSessionRefs: () => runtime?.matchSessionRuntimeBridge?.clearMatchSessionRefs?.(),
         disposePreparedMatchSession: (initializedMatch, options = {}) => {
             if (!initializedMatch?.session) return;
+            initializedMatch?.kernelAdapter?.dispose?.();
+            initializedMatch?.kernel?.dispose?.();
             disposeMatchSessionSystems(runtime?.renderer, initializedMatch.session, options);
         },
         disposeCurrentMatchSession: (options = {}) => {
@@ -93,6 +96,7 @@ export function createMatchSessionPort(runtime) {
             for (const player of entityManager.getHumanPlayers()) {
                 player.planarAimOffset = 0;
             }
+            getCurrentMatchKernel()?.signalRoundRestart?.();
         },
     };
 }

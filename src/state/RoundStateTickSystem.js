@@ -9,6 +9,22 @@ export class RoundStateTickSystem {
         this.game = deps.game || null;
     }
 
+    _getKernelAdapter() {
+        return this.game?.playingStateSystem?.getKernelAdapter?.()
+            || this.game?.matchSessionRuntimeBridge?.getCurrentMatchKernelAdapter?.()
+            || null;
+    }
+
+    _tickKernelRoundState(dt, expectedLifecycle) {
+        const kernelAdapter = this._getKernelAdapter();
+        const kernel = kernelAdapter?.kernel || null;
+        if (!kernelAdapter || !kernel || kernel.lifecycle !== expectedLifecycle) {
+            return null;
+        }
+        const renderFrameId = this.game?.gameLoop?.renderFrameId || 0;
+        return kernelAdapter.tick(dt, renderFrameId);
+    }
+
     _executeRoundStateTickAction(action) {
         const game = this.game;
         if (action === 'RETURN_TO_MENU') {
@@ -46,11 +62,13 @@ export class RoundStateTickSystem {
     }
 
     _deriveRoundEndTickStep(dt) {
-        return this.game.roundStateController.deriveRoundEndTick(this._readRoundEndTickInputs(dt));
+        return this._tickKernelRoundState(dt, 'round_end')
+            || this.game.roundStateController.deriveRoundEndTick(this._readRoundEndTickInputs(dt));
     }
 
     _deriveMatchEndTickStep() {
-        return this.game.roundStateController.deriveMatchEndTick(this._readMatchEndTickInputs());
+        return this._tickKernelRoundState(0, 'match_end')
+            || this.game.roundStateController.deriveMatchEndTick(this._readMatchEndTickInputs());
     }
 
     _applyRoundEndTickUi(roundEndTick) {
