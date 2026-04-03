@@ -93,6 +93,35 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | - | V82 | - | frei | Nach `V72.99` und `V74.99` mit `82.1` Arcade-Parcours-Vereinigung starten; liefert Daten-Contracts fuer V76.3 |
 | - | V81 | - | frei | Nach `V74.99` und `V72.99` mit `81.1` Registry und Bridge starten |
 
+## Aufgeschobene Fixes (Code-Review 2026-04-03)
+
+Identifiziert durch 24h-Commit-Review. Sofort-Fixes (P3, P5, P13) sind bereits committed.
+Die folgenden Punkte werden nach Abschluss des jeweiligen Blocks adressiert.
+
+### Nach V83-Abschluss (betrifft scope_files von V83)
+
+| ID | Datei(en) | Problem | Schwere |
+| --- | --- | --- | --- |
+| P1 | `MatchLifecycleSessionOrchestrator.js` | Race Condition: gleichzeitige `createMatchSession()`-Aufrufe koennen duplizierte Session-IDs erzeugen | kritisch |
+| P2 | `MatchFlowUiController.js` | Race Condition: `applyStartMatchProjection()` Guard gegen Doppelklick ist nicht atomar | kritisch |
+| P4 | `GameRuntimeSessionHandler.js` | Fire-and-forget Promise bei Game-Dispose; Finalize-Fehler hinterlassen inkonsistenten Zustand | kritisch |
+| P8 | `SessionRuntimeCommandExecutor.js` | Doppelter Settings-Pfad (APPLY_SETTINGS vs. START_MATCH-Snapshot) kann inkonsistenten State erzeugen | hoch |
+| P9 | `PauseOverlayController.js` | TOCTOU: Pause-State wird gelesen aber kann sich vor Resume-Ausfuehrung aendern | hoch |
+| P10 | `ElectronPlatformBridge.js` | `createIntent()` gibt null zurueck, aber Adapter meldet `available: true` | hoch |
+| P11 | `MatchLifecycleSessionOrchestrator.js` | Error-State geht nach Finalize-Fehler verloren (`_pendingFinalize` wird auf null gesetzt) | mittel |
+| P15 | `SessionRuntimeCommandExecutor.js` | Async-Command-Fehler werden re-thrown ohne Garantie, dass Caller `.catch()` hat | mittel |
+| P16 | `SessionRuntimeStateMachine.js` | Transition FINALIZING-MENU erlaubt Ressourcen-Cleanup zu umgehen | mittel |
+
+### Nach V83 oder eigenstaendig (nicht in V83 scope_files)
+
+| ID | Datei(en) | Problem | Schwere |
+| --- | --- | --- | --- |
+| P6 | `PortalLayoutBuilder.js` | Portal-Slot-Modulo erzeugt identische Positionen bei `slots.length < 8` | hoch |
+| P7 | `vulkan_odyssey.js` | Precision-Plattformen (4x2 Einheiten) vermutlich unspielbar | hoch |
+| P12 | `CheckpointRingMeshFactory.js` | Material-Leak: jeder Checkpoint bekommt neues Material ohne Disposal | mittel |
+| P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()` | mittel |
+| P20 | `SessionRuntimeObservability.js` | Ineffizientes Array-Splicing statt `.slice(-LIMIT)` | niedrig |
+
 ## Conflict-Log
 
 | Datum | Agent | Fremder Block/Stream | Datei | Grund | Loesung | Status |
