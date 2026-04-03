@@ -88,7 +88,33 @@ Stand: 2026-04-03
 - Rundenende: `ROUND_END`
 - Matchende: `MATCH_END`
 
-## 4. Runtime-Vertraege (V74)
+## 4. Runtime-Vertraege (V74/V83)
+
+### 4.1 Zielgrenzen fuer V83
+
+| Schicht | Besitz / Verantwortung | Direkte Partner | Kein direkter Zugriff |
+| --- | --- | --- | --- |
+| `Game` (`src/core/main.js`) | App-Lifetime, Bootstrap, Shutdown, globale Browser-Wiring und Shell-Glue fuer Settings/Profile | `GameRuntimeCoordinator`, Shell-Adapter, read-only Runtime-Projektionen | Session-/Match-/Finalize-State als Source of Truth, rohe Plattform-Capabilities, UI-Use-Cases |
+| `SessionRuntime` (Zielschicht ab V83) | einzige Source of Truth fuer Session-, Match-, Finalize-, Lifecycle- und Runtime-Referenzzustand | Application-Layer, Shared Contracts, fachliche Runtime-Services | DOM, `window.curviosApp`, `ipcRenderer`, direkte UI-Controller |
+| Application-Layer (`src/application/**`; aktuell noch Zielbereich) | Commands, Events, Session-Snapshots/Projektionen und Use-Case-Orchestrierung inkl. Capability-Komposition | `SessionRuntime`, Plattform-Capabilities, `src/shared/contracts/**` | direkte DOM-Manipulation, breite `game`-Mutation, rohe `runtimeBundle`-Rueckgriffe |
+| UI (`src/ui/**`, `src/composition/core-ui/**`) | Rendering, Overlay-/Menue-State, Intent-Erfassung und Anzeige von Runtime-Projektionen | Application-Layer, read-only Snapshots/Events, benannte UI-Ports | `game.state`/`runtimeBundle.state` mutieren, Electron-/Storage-/LAN-Zugriffe |
+| Plattform-Capabilities (`electron/main.cjs`, `electron/preload.cjs`, spaeter `src/platform/**`) | Host/Discovery/Save/Recording/Fallbacks, Availability-/Invoke-Vertraege und Desktop-vs-Browser-Degradation | Application-Layer, Shared Contracts, Desktop-Shell | Matchregeln, Session-Besitz, UI-Projektionen |
+
+- `src/shared/contracts/**` bleibt die seiteneffektfreie Vertragsschicht fuer IDs, Payloads, Snapshots, Capability-Descriptoren und Contract-Versionen.
+- Unter `src/application/**` und `src/platform/**` existieren aktuell noch keine tragenden Module; `83.1.1` fixiert deshalb zuerst Ownership und Zielgrenzen, die konkrete Schichtbildung folgt in `83.1.2` und `83.2+`.
+- Uebergangsrolle aktueller Adapter:
+  - `GameRuntimeCoordinator` bleibt Shell-/Kompositionsadapter zwischen `Game` und spaeterem Application-/Runtime-Kern.
+  - `GameRuntimeFacade` bleibt nur ein Legacy-kompatibler Forwarding-Adapter fuer bestehende Menue-/Lifecycle-Aufrufer; neue Fachlogik soll dort nicht endgueltig landen.
+  - `GameRuntimePorts` bleiben Migrationsnaehte fuer kleine UI-/Render-/Input-Ports und sind nicht der finale Commands-/Events-/Capabilities-Vertrag.
+
+### 4.2 Aktuelle Mehrfach-Ownerships, die V83 abbauen muss
+
+- `game`, `runtimeBundle.state` und `GameRuntimeFacade` teilen sich noch Besitz an Session-, Runtime- und Finalize-nahem Zustand.
+- `GameRuntimeCoordinator`, `GameRuntimeFacade` und `GameRuntimePorts` ueberlappen sich derzeit bei Lifecycle-, Settings- und Menue-Entry-Points.
+- `MatchFlowUiController` und `PauseOverlayController` konsumieren noch gemischt `game`, `runtimeFacade` und Ports statt ausschliesslich Application-Commands plus Snapshots.
+- Desktop-Capabilities sind in `preload.cjs` bereits benannt, werden aber noch nicht zentral ueber einen Application-/Platform-Vertrag konsumiert.
+
+### 4.3 Aktuelle Runtime-Vertraege aus V74
 
 - Desktop-Shell-Vertrag:
   - Electron Main besitzt Fenster-, IPC- und Datei-/LAN-Faehigkeiten; Renderer-Code greift nicht direkt auf `ipcRenderer`, Node oder BrowserWindow-Lifecycle zu.
