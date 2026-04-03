@@ -25,12 +25,19 @@ import {
 import { createMatchFlowUiControllerPort } from '../shared/runtime/UiControllerRuntimePorts.js';
 import {
     createRoundEndRecorderAdapter,
+    getMatchSessionAccessSnapshot,
     getArcadeMenuSurfaceState,
     getLastRoundGhostClip,
     getLastRoundRecordingMetrics,
+    initializeMatchSession,
+    recordMatchEndTelemetry,
+    recordRoundEndTelemetry,
     requestArcadeReplayPlayback,
     selectArcadeIntermissionChoice,
     selectArcadeReward,
+    startArcadeRunIfEnabled,
+    syncMatchP2HudVisibility,
+    waitForMatchPlayersLoaded,
 } from './MatchFlowTransitionHotspots.js';
 
 function isPromiseLike(value) {
@@ -370,7 +377,7 @@ export class MatchFlowUiController {
             if (game.ui.p2Hud) {
                 game.ui.p2Hud.classList.toggle('hidden', !uiState.p2HudVisible);
             } else {
-                game.runtimeFacade.syncP2HudVisibility();
+                syncMatchP2HudVisibility(this.runtimePort, game, uiState.p2HudVisible);
             }
         }
         this._syncArcadeOverlayPanel();
@@ -557,26 +564,14 @@ export class MatchFlowUiController {
     _recordRoundEndTelemetry(roundEndPlan) {
         const telemetryPayload = this._buildRoundEndTelemetryPayload(roundEndPlan);
         if (!telemetryPayload) return;
-        if (this.runtimePort?.recordRoundEndTelemetry) {
-            this.runtimePort.recordRoundEndTelemetry(telemetryPayload);
-        } else {
-            this.game?.runtimeFacade?.recordRoundEndTelemetry?.(telemetryPayload);
-        }
+        recordRoundEndTelemetry(this.runtimePort, this.game, telemetryPayload);
         if (telemetryPayload.state === GAME_STATE_IDS.MATCH_END) {
-            if (this.runtimePort?.recordMatchEndTelemetry) {
-                this.runtimePort.recordMatchEndTelemetry(telemetryPayload);
-            } else {
-                this.game?.runtimeFacade?.recordMatchEndTelemetry?.(telemetryPayload);
-            }
+            recordMatchEndTelemetry(this.runtimePort, this.game, telemetryPayload);
         }
     }
 
     _completeStartedMatch(initializedMatch) {
-        if (this.runtimePort?.startArcadeRunIfEnabled) {
-            this.runtimePort.startArcadeRunIfEnabled();
-        } else {
-            this.game?.runtimeFacade?.startArcadeRunIfEnabled?.();
-        }
+        startArcadeRunIfEnabled(this.runtimePort, this.game);
         this.sessionOrchestrator.bindHuntEventHandlers({
             onHuntFeedEvent: (entry) => this._pushHuntFeedEntry(entry),
             onHuntDamageEvent: (event) => this._handleHuntDamageEvent(event),
@@ -632,9 +627,7 @@ export class MatchFlowUiController {
         }
 
         // Initialize session adapter (Local/LAN/Online)
-        const sessionInitPromise = this.runtimePort?.initializeSession
-            ? this.runtimePort.initializeSession()
-            : game.runtimeFacade?.initializeSession?.();
+        const sessionInitPromise = initializeMatchSession(this.runtimePort, game);
 
         const createMatch = () => {
             const initializedMatch = this.sessionOrchestrator.createMatchSession({
@@ -654,9 +647,7 @@ export class MatchFlowUiController {
         };
 
         const completeWithLoadGate = (resolvedMatch) => {
-            const loadGate = this.runtimePort?.waitForAllPlayersLoaded
-                ? this.runtimePort.waitForAllPlayersLoaded()
-                : game.runtimeFacade?.waitForAllPlayersLoaded?.();
+            const loadGate = waitForMatchPlayersLoaded(this.runtimePort, game);
             if (isPromiseLike(loadGate)) {
                 return Promise.resolve(loadGate).then(() => this._completeStartedMatch(resolvedMatch));
             }
@@ -832,14 +823,14 @@ export class MatchFlowUiController {
      * Returns true if the current match is a network session.
      */
     _isNetworkMatch() {
-        return !!this.game?.runtimeFacade?.isNetworkSession?.();
+        return getMatchSessionAccessSnapshot(this.runtimePort, this.game)?.isNetworkSession === true;
     }
 
     /**
      * Returns true if the local client is the host.
      */
     _isHost() {
-        return this.game?.runtimeFacade?.isHost?.() ?? true;
+        return getMatchSessionAccessSnapshot(this.runtimePort, this.game)?.isHost !== false;
     }
     pause() { this.pauseOverlayController.pause(); }
     resumeFromPause() { this.pauseOverlayController.resumeFromPause(); }

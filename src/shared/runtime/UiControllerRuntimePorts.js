@@ -53,6 +53,9 @@ export function createMatchFlowUiControllerPort(ports = null) {
     if (typeof recordingPort?.recordMatchEndTelemetry === 'function') {
         controllerPort.recordMatchEndTelemetry = (payload = null) => recordingPort.recordMatchEndTelemetry(payload);
     }
+    if (typeof runtimeProjectionPort?.getSessionRuntimeSnapshot === 'function') {
+        controllerPort.getSessionRuntimeSnapshot = () => runtimeProjectionPort.getSessionRuntimeSnapshot();
+    }
     if (typeof runtimeIntentPort?.startMatch === 'function') {
         controllerPort.startMatch = (options = undefined) => runtimeIntentPort.startMatch(options);
     }
@@ -63,6 +66,9 @@ export function createMatchFlowUiControllerPort(ports = null) {
     }
     if (typeof uiFeedbackPort?.showMenuPanel === 'function') {
         controllerPort.showMenuPanel = (panelId, options = undefined) => uiFeedbackPort.showMenuPanel(panelId, options);
+    }
+    if (typeof uiFeedbackPort?.toggleP2Hud === 'function') {
+        controllerPort.toggleP2Hud = (isVisible) => uiFeedbackPort.toggleP2Hud(isVisible);
     }
     if (typeof uiFeedbackPort?.syncAll === 'function') {
         controllerPort.syncUi = () => uiFeedbackPort.syncAll();

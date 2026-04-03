@@ -327,7 +327,7 @@ export function createRuntimePorts(game) {
     const inputPort = createInputPort(game);
     const lifecyclePort = createLifecyclePort(game);
     const arcadePort = createArcadePort({ getRuntimeCoordinator: () => getRuntimeCoordinator(game), getRuntimeFacade: () => getRuntimeFacade(game) });
-    const recordingPort = createRecordingPort({ game, getRuntimeCoordinator: () => getRuntimeCoordinator(game), getRuntimeFacade: () => getRuntimeFacade(game) });
+    const recordingPort = createRecordingPort({ getRuntimeCoordinator: () => getRuntimeCoordinator(game), getRuntimeFacade: () => getRuntimeFacade(game) });
     const runtimeIntentPort = createRuntimeIntentPort(game);
     const runtimeProjectionPort = createRuntimeProjectionPort(game);
     const matchUiPort = createMatchUiPort(game);

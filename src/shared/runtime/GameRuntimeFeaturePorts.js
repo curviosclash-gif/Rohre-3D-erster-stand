@@ -19,7 +19,7 @@ export function createArcadePort({ getRuntimeCoordinator, getRuntimeFacade }) {
     };
 }
 
-export function createRecordingPort({ game, getRuntimeCoordinator, getRuntimeFacade }) {
+export function createRecordingPort({ getRuntimeCoordinator, getRuntimeFacade }) {
     return {
         toggleCinematicRecordingFromHotkey() {
             return getRuntimeCoordinator()?.toggleCinematicRecordingFromHotkey?.()
@@ -27,30 +27,25 @@ export function createRecordingPort({ game, getRuntimeCoordinator, getRuntimeFac
         },
         finalizeRound(winner, players, options = undefined) {
             return getRuntimeCoordinator()?.finalizeRoundRecording?.(winner, players, options)
-                ?? getRuntimeFacade()?.finalizeRoundRecording?.(winner, players, options)
-                ?? game?.recorder?.finalizeRound?.(winner, players, options);
+                ?? getRuntimeFacade()?.finalizeRoundRecording?.(winner, players, options);
         },
         dump() {
             return getRuntimeCoordinator()?.dumpRoundRecording?.()
-                ?? getRuntimeFacade()?.dumpRoundRecording?.()
-                ?? game?.recorder?.dump?.();
+                ?? getRuntimeFacade()?.dumpRoundRecording?.();
         },
         getLastRoundMetrics() {
             return getRuntimeCoordinator()?.getLastRoundRecordingMetrics?.()
                 ?? getRuntimeFacade()?.getLastRoundRecordingMetrics?.()
-                ?? game?.recorder?.getLastRoundMetrics?.()
                 ?? null;
         },
         getAggregateMetrics() {
             return getRuntimeCoordinator()?.getAggregateRecordingMetrics?.()
                 ?? getRuntimeFacade()?.getAggregateRecordingMetrics?.()
-                ?? game?.recorder?.getAggregateMetrics?.()
                 ?? null;
         },
         getLastRoundGhostClip(players, options = undefined) {
             return getRuntimeCoordinator()?.getLastRoundGhostClip?.(players, options)
                 ?? getRuntimeFacade()?.getLastRoundGhostClip?.(players, options)
-                ?? game?.recorder?.getLastRoundGhostClip?.(players, options)
                 ?? null;
         },
         recordRoundEndTelemetry(payload = null) {
