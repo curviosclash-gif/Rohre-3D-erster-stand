@@ -1,3 +1,8 @@
+import { createBrowserHostAdapter } from '../../../platform/browser/BrowserPlatformAdapters.js';
+import {
+    createElectronPreloadHostAdapter,
+    isElectronPreloadRuntime,
+} from '../../../platform/electron/ElectronPlatformBridge.js';
 import { resolveGlobalObject, toCallable } from './MenuMultiplayerBridgeRuntime.js';
 
 function normalizeIp(value) {
@@ -72,7 +77,9 @@ export function createMenuMultiplayerHostIpResolver(options = {}) {
     const runtimeGlobal = resolveGlobalObject(options.runtime);
     const discoveryRuntime = options.discoveryRuntime && typeof options.discoveryRuntime === 'object'
         ? options.discoveryRuntime
-        : runtimeGlobal?.curviosApp;
+        : (isElectronPreloadRuntime(runtimeGlobal)
+            ? createElectronPreloadHostAdapter(runtimeGlobal)
+            : createBrowserHostAdapter());
     const customResolveHostIp = toCallable(options.resolveHostIp, null);
 
     let cachedPromise = null;

@@ -1,3 +1,8 @@
+import { createBrowserDiscoveryAdapter } from '../../../platform/browser/BrowserPlatformAdapters.js';
+import {
+    createElectronPreloadDiscoveryAdapter,
+    isElectronPreloadRuntime,
+} from '../../../platform/electron/ElectronPlatformBridge.js';
 import { resolveGlobalObject, toCallable } from './MenuMultiplayerBridgeRuntime.js';
 
 const NOOP_UNSUBSCRIBE = () => {};
@@ -10,7 +15,9 @@ export function createMenuMultiplayerDiscoveryPort(options = {}) {
     const runtimeGlobal = resolveGlobalObject(options.runtime);
     const discoveryRuntime = options.discoveryRuntime && typeof options.discoveryRuntime === 'object'
         ? options.discoveryRuntime
-        : runtimeGlobal?.curviosApp;
+        : (isElectronPreloadRuntime(runtimeGlobal)
+            ? createElectronPreloadDiscoveryAdapter(runtimeGlobal)
+            : createBrowserDiscoveryAdapter());
 
     const startDiscovery = toCallable(discoveryRuntime?.startDiscovery, null);
     const stopDiscovery = toCallable(discoveryRuntime?.stopDiscovery, null);

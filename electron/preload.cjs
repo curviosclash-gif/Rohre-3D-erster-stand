@@ -8,6 +8,7 @@ const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     discovery: 'preload.discovery.v1',
     host: 'preload.host.v1',
     save: 'preload.save.v1',
+    recording: 'preload.recording.v1',
 });
 const PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION = 'platform-capability-snapshot.v1';
 
@@ -68,13 +69,21 @@ function createSaveContract() {
     });
 }
 
+function createRecordingContract() {
+    return createNamedContract('recording', PRELOAD_CONTRACT_VERSIONS.recording, {
+        supportsCapture: true,
+    });
+}
+
 const discoveryContract = createDiscoveryContract();
 const hostContract = createHostContract();
 const saveContract = createSaveContract();
+const recordingContract = createRecordingContract();
 const platformContracts = Object.freeze({
     discovery: discoveryContract,
     host: hostContract,
     save: saveContract,
+    recording: recordingContract,
 });
 const platformCapabilities = Object.freeze({
     contractVersion: PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION,
@@ -88,7 +97,9 @@ const platformCapabilities = Object.freeze({
     save: createCapabilityDescriptor('save', saveContract.contractVersion, 'electron-ipc', true, {
         supportsBinaryExport: true,
     }),
-    recording: createCapabilityDescriptor('recording', '', 'electron-ipc', false, {}),
+    recording: createCapabilityDescriptor('recording', recordingContract.contractVersion, 'electron-renderer', true, {
+        supportsCapture: true,
+    }),
 });
 const curviosApp = Object.freeze({
     contracts: platformContracts,
@@ -96,6 +107,7 @@ const curviosApp = Object.freeze({
     discovery: discoveryContract,
     host: hostContract,
     save: saveContract,
+    recording: recordingContract,
     getLanServerStatus: hostContract.getStatus,
     startLanServer: hostContract.start,
     stopLanServer: hostContract.stop,

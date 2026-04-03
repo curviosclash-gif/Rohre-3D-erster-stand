@@ -3,6 +3,7 @@
 // ============================================
 
 import { LanMenuMultiplayerBridge, MenuMultiplayerBridge } from '../../composition/core-ui/CoreUiMenuPorts.js';
+import { isElectronPreloadRuntime } from '../../platform/electron/ElectronPlatformBridge.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
 import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
 import {
@@ -25,7 +26,7 @@ function shouldUseDesktopLanBridge(runtime = null) {
     const runtimeGlobal = runtime && typeof runtime === 'object' && runtime.global && typeof runtime.global === 'object'
         ? runtime.global
         : (typeof globalThis !== 'undefined' ? globalThis : null);
-    return runtimeGlobal?.curviosApp?.isApp === true || runtimeGlobal?.__CURVIOS_APP__ === true;
+    return isElectronPreloadRuntime(runtimeGlobal);
 }
 
 // NOTE: 'multiplayer' is a menu-layer coordination type, not a real network transport.

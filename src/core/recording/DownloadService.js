@@ -1,4 +1,6 @@
 import { EDITOR_API_ROUTES } from '../../shared/contracts/EditorPathContract.js';
+import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
+import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
 
 /**
  * Triggers a browser anchor-click download for the given Blob.
@@ -64,23 +66,34 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     }
     const safeFileName = String(fileName || '').trim();
     const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
-    const appSaveVideo = globalThis?.curviosApp?.saveVideo;
-    const downloadViaBrowser = (reason, error = null) => {
+    const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
+    const browserSaveAdapter = createBrowserSaveAdapter({
+        saveVideo: (payload, downloadFileName, resolvedMimeType) => {
+            const blobPayload = payload instanceof Blob
+                ? payload
+                : new Blob([payload], { type: resolvedMimeType || mimeType || 'application/octet-stream' });
+            downloadHandler({ blob: blobPayload, fileName: downloadFileName, mimeType: resolvedMimeType || mimeType });
+            return {
+                saved: true,
+                transport: 'download',
+            };
+        },
+    });
+    const downloadViaBrowser = async (reason, error = null) => {
         if (error) {
             logger?.warn?.(`[DownloadService] recording export fallback (${reason})`, error);
         }
-        try {
-            downloadHandler({ blob, fileName: browserFileName, mimeType });
+        const result = await browserSaveAdapter.saveVideo(blob, browserFileName, mimeType);
+        if (result?.saved === true) {
             return true;
-        } catch (downloadError) {
-            logger?.warn?.('[DownloadService] recording export browser download failed', downloadError);
-            return false;
         }
+        logger?.warn?.('[DownloadService] recording export browser download failed', result?.error || null);
+        return false;
     };
-    if (typeof appSaveVideo === 'function' && typeof blob.arrayBuffer === 'function') {
+    if (desktopSaveAdapter.isAvailable() && typeof desktopSaveAdapter.saveVideo === 'function' && typeof blob.arrayBuffer === 'function') {
         try {
             const bytes = new Uint8Array(await blob.arrayBuffer());
-            const appResult = await appSaveVideo(bytes, browserFileName, mimeType);
+            const appResult = await desktopSaveAdapter.saveVideo(bytes, browserFileName, mimeType);
             if (appResult?.saved === true) {
                 logger?.info?.('[DownloadService] recording export saved via electron app', browserFileName);
                 return {
@@ -96,7 +109,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
         }
     }
     if (typeof fetch !== 'function') {
-        const downloaded = downloadViaBrowser('fetch-unavailable');
+        const downloaded = await downloadViaBrowser('fetch-unavailable');
         return {
             requested: true,
             transport: downloaded ? 'download' : 'download-failed',
@@ -123,7 +136,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
         }
         const apiStatus = Number(response?.status) || 0;
         const apiError = new Error(`http_${apiStatus || 'unknown'}`);
-        const downloaded = downloadViaBrowser('api-failed', apiError);
+        const downloaded = await downloadViaBrowser('api-failed', apiError);
         return {
             requested: true,
             transport: downloaded ? 'api-fallback-download' : 'api-fallback-download-failed',
@@ -132,7 +145,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
             apiStatus: apiStatus || null,
         };
     } catch (error) {
-        const downloaded = downloadViaBrowser('api-throw', error);
+        const downloaded = await downloadViaBrowser('api-throw', error);
         return {
             requested: true,
             transport: downloaded ? 'download' : 'download-failed',

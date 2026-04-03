@@ -3,6 +3,8 @@
 // ============================================
 
 import { createGameStateSnapshot } from '../GameStateSnapshot.js';
+import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
+import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
 
 /**
  * Records a match as { initialState, actions[] } for deterministic playback.
@@ -107,16 +109,28 @@ export class ReplayRecorder {
     async persistReplay(downloadFn) {
         const json = this.exportReplayJSON();
         const filename = `replay-${this._matchId || Date.now()}.json`;
+        const runtimeGlobal = typeof window !== 'undefined' ? window : globalThis;
+        const desktopSaveAdapter = createElectronPreloadSaveAdapter(runtimeGlobal);
 
         // App mode: Electron IPC
-        if (typeof window !== 'undefined' && window.curviosApp?.saveReplay) {
-            return window.curviosApp.saveReplay(json, filename);
+        if (desktopSaveAdapter.isAvailable() && typeof desktopSaveAdapter.saveReplay === 'function') {
+            const result = await desktopSaveAdapter.saveReplay(json, filename);
+            return result?.saved === true || result === true;
         }
 
         // Web mode: use provided download function (from UI layer)
-        if (downloadFn) {
-            downloadFn(json, filename);
-            return true;
+        const browserSaveAdapter = createBrowserSaveAdapter({
+            saveReplay: (payload, fileName) => {
+                if (typeof downloadFn !== 'function') {
+                    return { saved: false };
+                }
+                downloadFn(payload, fileName);
+                return { saved: true };
+            },
+        });
+        if (browserSaveAdapter.isAvailable()) {
+            const result = await browserSaveAdapter.saveReplay(json, filename);
+            return result?.saved === true;
         }
 
         return false;

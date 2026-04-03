@@ -2,6 +2,12 @@
 // MediaRecorderSupport.js - shared recorder support helpers/config
 // ============================================
 
+import { createBrowserRecordingAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
+import {
+    createElectronPreloadRecordingAdapter,
+    isElectronPreloadRuntime,
+} from '../../platform/electron/ElectronPlatformBridge.js';
+
 export const DEFAULT_MIME_TYPE = 'video/mp4';
 export const DEFAULT_FALLBACK_MIME_TYPE = 'video/webm';
 const MEDIA_RECORDER_MIME_CANDIDATES = Object.freeze([
@@ -63,7 +69,7 @@ export function resolveGlobalScope(explicitScope = null) {
 
 export function isDesktopAppRuntime(globalScope = null) {
     const scope = resolveGlobalScope(globalScope);
-    return scope?.curviosApp?.isApp === true || scope?.__CURVIOS_APP__ === true;
+    return isElectronPreloadRuntime(scope);
 }
 
 export function resolvePerfNow(globalScope) {
@@ -130,6 +136,37 @@ export function resolveDesktopAppMediaRecorderMimeType(globalScope) {
     return resolveSafeMediaRecorderMimeType(globalScope, 'video/webm')
         || resolveMediaRecorderMimeType(globalScope)
         || DEFAULT_FALLBACK_MIME_TYPE;
+}
+
+export function createPlatformRecordingCapabilityAdapter(globalScope = null, canvas = null) {
+    const scope = resolveGlobalScope(globalScope);
+    const nativeSupport = detectNativeRecorderSupport(scope, canvas);
+
+    if (isElectronPreloadRuntime(scope)) {
+        const electronAdapter = createElectronPreloadRecordingAdapter(scope);
+        const available = electronAdapter.isAvailable() && nativeSupport.hasRecorder;
+        return Object.freeze({
+            ...electronAdapter,
+            capability: {
+                ...electronAdapter.capability,
+                available,
+                degradedReason: available
+                    ? ''
+                    : (electronAdapter.capability.degradedReason || nativeSupport.supportReason),
+                supportsCapture: nativeSupport.hasRecorder,
+            },
+            support: nativeSupport,
+            isAvailable: () => available,
+        });
+    }
+
+    return createBrowserRecordingAdapter({
+        available: nativeSupport.hasRecorder,
+        supportsCapture: nativeSupport.hasRecorder,
+        providerKind: nativeSupport.hasRecorder ? 'browser-native' : 'browser-demo',
+        degradedReason: nativeSupport.hasRecorder ? '' : nativeSupport.supportReason,
+        support: nativeSupport,
+    });
 }
 
 export function detectNativeRecorderSupport(globalScope, canvas = null) {

@@ -12,6 +12,7 @@ import {
 } from './recording/DownloadService.js';
 import { toFiniteNumber } from '../utils/MathOps.js';
 import {
+    createPlatformRecordingCapabilityAdapter,
     DEFAULT_FALLBACK_MIME_TYPE,
     DEFAULT_MIME_TYPE,
     detectNativeRecorderSupport,
@@ -161,7 +162,8 @@ export class MediaRecorderSystem {
                 supportReason: String(customSupport.supportReason || (canRecord ? 'capability-probe' : 'probe-disabled')),
             };
         }
-        const nativeSupport = detectNativeRecorderSupport(this._globalScope, sourceCanvas);
+        const recordingAdapter = createPlatformRecordingCapabilityAdapter(this._globalScope, sourceCanvas);
+        const nativeSupport = recordingAdapter.support || detectNativeRecorderSupport(this._globalScope, sourceCanvas);
         const hasRecorder = nativeSupport.hasRecorder;
         if (isDesktopAppRuntime(this._globalScope) && nativeSupport.hasMediaRecorder) {
             const preferredMimeType = resolveDesktopAppMediaRecorderMimeType(this._globalScope);
@@ -175,6 +177,7 @@ export class MediaRecorderSystem {
                 selectedMimeType: preferredMimeType,
                 recorderEngine: RECORDER_ENGINE.NATIVE_MEDIARECORDER,
                 supportReason: canCapture ? 'desktop-prefer-mediarecorder' : 'missing-canvas',
+                capability: recordingAdapter.capability,
             };
         }
         return {
@@ -187,6 +190,7 @@ export class MediaRecorderSystem {
             selectedMimeType: nativeSupport.selectedMimeType,
             recorderEngine: nativeSupport.recorderEngine,
             supportReason: canCapture ? nativeSupport.supportReason : 'missing-canvas',
+            capability: recordingAdapter.capability,
         };
     }
     getSupportState() {
