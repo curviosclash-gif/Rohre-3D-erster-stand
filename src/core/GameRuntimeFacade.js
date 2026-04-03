@@ -33,6 +33,14 @@ import {
     createMenuMultiplayerBridge,
 } from './runtime/MenuRuntimeMultiplayerService.js';
 import { ProfileLifecycleController } from './runtime/ProfileLifecycleController.js';
+import {
+    dumpRoundRecording,
+    finalizeRoundRecording,
+    getAggregateRecordingMetrics,
+    getLastRoundGhostClip,
+    getLastRoundRecordingMetrics,
+    toggleCinematicRecordingFromHotkey,
+} from './runtime/GameRuntimeRecordingSupport.js';
 import { observeLobbySessionStateChange } from './runtime/RuntimeLobbySessionObservability.js';
 import { syncRuntimeMultiplayerContext } from './runtime/RuntimeMultiplayerFlowService.js';
 import {
@@ -176,6 +184,7 @@ export class GameRuntimeFacade {
     }
 
     applySettingsToRuntime(options = {}) { return this.executeSessionRuntimeCommand(createApplySettingsCommand(options)); }
+    toggleCinematicRecordingFromHotkey() { return toggleCinematicRecordingFromHotkey({ game: this.game, getRuntimeHandle: (key) => this.getRuntimeHandle(key), showStatusToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone) }); }
 
     _activateArcadeRoundController() {
         const runtimeState = this.getRuntimeState();
@@ -235,6 +244,10 @@ export class GameRuntimeFacade {
 
     _resetArcadeRunState() { this.arcadeRunRuntime.resetRunState({ preserveRecords: true }); }
     getArcadeRunState() { return this.arcadeRunRuntime.getStateSnapshot(); }
+    getArcadeMenuSurfaceState() { return this.arcadeRunRuntime.getMenuSurfaceState?.() || null; }
+    selectArcadeIntermissionChoice(choiceId) { return this.arcadeRunRuntime.selectIntermissionChoice?.(choiceId); }
+    selectArcadeReward(rewardId) { return this.arcadeRunRuntime.selectReward?.(rewardId); }
+    requestArcadeReplayPlayback() { return this.arcadeRunRuntime.requestReplayPlayback?.(); }
 
     setupMenuListeners() {
         const game = this.game;
@@ -344,6 +357,12 @@ export class GameRuntimeFacade {
         return telemetrySnapshot;
     }
 
+    finalizeRoundRecording(winner, players, options = undefined) { return finalizeRoundRecording(this.game, winner, players, options); }
+    dumpRoundRecording() { return dumpRoundRecording(this.game); }
+    getLastRoundRecordingMetrics() { return getLastRoundRecordingMetrics(this.game); }
+    getAggregateRecordingMetrics() { return getAggregateRecordingMetrics(this.game); }
+    getLastRoundGhostClip(players, options = undefined) { return getLastRoundGhostClip(this.game, players, options); }
+
     recordRoundEndTelemetry(payload = null) {
         this.arcadeRunRuntime.handleRoundEndTelemetry(payload);
         return this._recordMenuTelemetry('round_end', payload);
@@ -410,74 +429,23 @@ export class GameRuntimeFacade {
         return this.menuActionHandler.applyMenuPreset(event);
     }
 
-    saveMenuPreset(event, kind) {
-        return this.menuActionHandler.saveMenuPreset(event, kind);
-    }
-
-    deleteMenuPreset(event) {
-        return this.menuActionHandler.deleteMenuPreset(event);
-    }
-
-    _didHostChangeMatchSettings(changedKeys) {
-        return this.settingsHandler.didHostChangeMatchSettings(changedKeys);
-    }
-
-    _invalidateMultiplayerReadyIfHostChangedSettings(changedKeys) {
-        return this.settingsHandler.invalidateMultiplayerReadyIfHostChangedSettings(changedKeys);
-    }
-
-    handleMultiplayerHost(event) {
-        return this.menuActionHandler.handleMultiplayerHost(event);
-    }
-
-    handleMultiplayerJoin(event) {
-        return this.menuActionHandler.handleMultiplayerJoin(event);
-    }
-
-    handleMultiplayerReadyToggle(event) {
-        return this.menuActionHandler.handleMultiplayerReadyToggle(event);
-    }
-
-    handleDeveloperModeToggle(event) {
-        return this.menuActionHandler.handleDeveloperModeToggle(event);
-    }
-
-    handleDeveloperThemeChange(event) {
-        return this.menuActionHandler.handleDeveloperThemeChange(event);
-    }
-
-    handleDeveloperVisibilityChange(event) {
-        return this.menuActionHandler.handleDeveloperVisibilityChange(event);
-    }
-
-    handleDeveloperFixedPresetLockToggle(event) {
-        return this.menuActionHandler.handleDeveloperFixedPresetLockToggle(event);
-    }
-
-    handleDeveloperActorChange(event) {
-        return this.menuActionHandler.handleDeveloperActorChange(event);
-    }
-
-    handleDeveloperReleasePreviewToggle(event) {
-        return this.menuActionHandler.handleDeveloperReleasePreviewToggle(event);
-    }
-
-    handleDeveloperTextOverrideSet(event) {
-        return this.menuActionHandler.handleDeveloperTextOverrideSet(event);
-    }
-
-    handleDeveloperTextOverrideClear(event) {
-        return this.menuActionHandler.handleDeveloperTextOverrideClear(event);
-    }
-
-    handleDeveloperTrainingReset(event) {
-        return this.menuActionHandler.handleDeveloperTrainingReset(event);
-    }
-
-    handleDeveloperTrainingStep(event) {
-        return this.menuActionHandler.handleDeveloperTrainingStep(event);
-    }
-
+    saveMenuPreset(event, kind) { return this.menuActionHandler.saveMenuPreset(event, kind); }
+    deleteMenuPreset(event) { return this.menuActionHandler.deleteMenuPreset(event); }
+    _didHostChangeMatchSettings(changedKeys) { return this.settingsHandler.didHostChangeMatchSettings(changedKeys); }
+    _invalidateMultiplayerReadyIfHostChangedSettings(changedKeys) { return this.settingsHandler.invalidateMultiplayerReadyIfHostChangedSettings(changedKeys); }
+    handleMultiplayerHost(event) { return this.menuActionHandler.handleMultiplayerHost(event); }
+    handleMultiplayerJoin(event) { return this.menuActionHandler.handleMultiplayerJoin(event); }
+    handleMultiplayerReadyToggle(event) { return this.menuActionHandler.handleMultiplayerReadyToggle(event); }
+    handleDeveloperModeToggle(event) { return this.menuActionHandler.handleDeveloperModeToggle(event); }
+    handleDeveloperThemeChange(event) { return this.menuActionHandler.handleDeveloperThemeChange(event); }
+    handleDeveloperVisibilityChange(event) { return this.menuActionHandler.handleDeveloperVisibilityChange(event); }
+    handleDeveloperFixedPresetLockToggle(event) { return this.menuActionHandler.handleDeveloperFixedPresetLockToggle(event); }
+    handleDeveloperActorChange(event) { return this.menuActionHandler.handleDeveloperActorChange(event); }
+    handleDeveloperReleasePreviewToggle(event) { return this.menuActionHandler.handleDeveloperReleasePreviewToggle(event); }
+    handleDeveloperTextOverrideSet(event) { return this.menuActionHandler.handleDeveloperTextOverrideSet(event); }
+    handleDeveloperTextOverrideClear(event) { return this.menuActionHandler.handleDeveloperTextOverrideClear(event); }
+    handleDeveloperTrainingReset(event) { return this.menuActionHandler.handleDeveloperTrainingReset(event); }
+    handleDeveloperTrainingStep(event) { return this.menuActionHandler.handleDeveloperTrainingStep(event); }
     handleDeveloperTrainingAutoStep(event) { return this.menuActionHandler.handleDeveloperTrainingAutoStep(event); }
     handleDeveloperTrainingRunBatch(event) { return this.menuActionHandler.handleDeveloperTrainingRunBatch(event); }
     handleDeveloperTrainingRunEval(event) { return this.menuActionHandler.handleDeveloperTrainingRunEval(event); }

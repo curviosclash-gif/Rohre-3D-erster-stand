@@ -4,6 +4,7 @@ import {
     createRuntimeObservabilitySnapshot,
     createSessionRuntimeSnapshot,
 } from '../contracts/SessionRuntimeSnapshotContract.js';
+import { createArcadePort, createRecordingPort } from './GameRuntimeFeaturePorts.js';
 
 function noop() {}
 
@@ -325,6 +326,8 @@ export function createRuntimePorts(game) {
     const renderPort = createRenderPort(game);
     const inputPort = createInputPort(game);
     const lifecyclePort = createLifecyclePort(game);
+    const arcadePort = createArcadePort({ getRuntimeCoordinator: () => getRuntimeCoordinator(game), getRuntimeFacade: () => getRuntimeFacade(game) });
+    const recordingPort = createRecordingPort({ game, getRuntimeCoordinator: () => getRuntimeCoordinator(game), getRuntimeFacade: () => getRuntimeFacade(game) });
     const runtimeIntentPort = createRuntimeIntentPort(game);
     const runtimeProjectionPort = createRuntimeProjectionPort(game);
     const matchUiPort = createMatchUiPort(game);
@@ -335,6 +338,8 @@ export function createRuntimePorts(game) {
         renderPort,
         inputPort,
         lifecyclePort,
+        arcadePort,
+        recordingPort,
         runtimeIntentPort,
         runtimeProjectionPort,
         matchUiPort,

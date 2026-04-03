@@ -1,6 +1,8 @@
 export function createMatchFlowUiControllerPort(ports = null) {
     const renderPort = ports?.renderPort || null;
     const lifecyclePort = ports?.lifecyclePort || null;
+    const arcadePort = ports?.arcadePort || null;
+    const recordingPort = ports?.recordingPort || null;
     const runtimeIntentPort = ports?.runtimeIntentPort || null;
     const uiFeedbackPort = ports?.uiFeedbackPort || null;
     const controllerPort = {};
@@ -16,6 +18,40 @@ export function createMatchFlowUiControllerPort(ports = null) {
     }
     if (typeof lifecyclePort?.startArcadeRunIfEnabled === 'function') {
         controllerPort.startArcadeRunIfEnabled = () => lifecyclePort.startArcadeRunIfEnabled();
+    }
+    if (typeof arcadePort?.getMenuSurfaceState === 'function') {
+        controllerPort.getArcadeMenuSurfaceState = () => arcadePort.getMenuSurfaceState();
+    }
+    if (typeof arcadePort?.selectIntermissionChoice === 'function') {
+        controllerPort.selectArcadeIntermissionChoice = (choiceId) => arcadePort.selectIntermissionChoice(choiceId);
+    }
+    if (typeof arcadePort?.selectReward === 'function') {
+        controllerPort.selectArcadeReward = (rewardId) => arcadePort.selectReward(rewardId);
+    }
+    if (typeof arcadePort?.requestReplayPlayback === 'function') {
+        controllerPort.requestArcadeReplayPlayback = () => arcadePort.requestReplayPlayback();
+    }
+    // Transition adapters keep recorder/arcade follow-up work behind narrow UI seams.
+    if (typeof recordingPort?.finalizeRound === 'function') {
+        controllerPort.finalizeRoundRecording = (winner, players, options = undefined) => recordingPort.finalizeRound(winner, players, options);
+    }
+    if (typeof recordingPort?.dump === 'function') {
+        controllerPort.dumpRoundRecording = () => recordingPort.dump();
+    }
+    if (typeof recordingPort?.getLastRoundMetrics === 'function') {
+        controllerPort.getLastRoundRecordingMetrics = () => recordingPort.getLastRoundMetrics();
+    }
+    if (typeof recordingPort?.getAggregateMetrics === 'function') {
+        controllerPort.getAggregateRecordingMetrics = () => recordingPort.getAggregateMetrics();
+    }
+    if (typeof recordingPort?.getLastRoundGhostClip === 'function') {
+        controllerPort.getLastRoundGhostClip = (players, options = undefined) => recordingPort.getLastRoundGhostClip(players, options);
+    }
+    if (typeof recordingPort?.recordRoundEndTelemetry === 'function') {
+        controllerPort.recordRoundEndTelemetry = (payload = null) => recordingPort.recordRoundEndTelemetry(payload);
+    }
+    if (typeof recordingPort?.recordMatchEndTelemetry === 'function') {
+        controllerPort.recordMatchEndTelemetry = (payload = null) => recordingPort.recordMatchEndTelemetry(payload);
     }
     if (typeof runtimeIntentPort?.startMatch === 'function') {
         controllerPort.startMatch = (options = undefined) => runtimeIntentPort.startMatch(options);

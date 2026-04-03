@@ -127,6 +127,54 @@ export class GameRuntimeCoordinator {
         return this.getRuntimeFacade()?.startArcadeRunIfEnabled?.();
     }
 
+    getArcadeMenuSurfaceState() {
+        return this.getRuntimeFacade()?.getArcadeMenuSurfaceState?.();
+    }
+
+    selectArcadeIntermissionChoice(choiceId) {
+        return this.getRuntimeFacade()?.selectArcadeIntermissionChoice?.(choiceId);
+    }
+
+    selectArcadeReward(rewardId) {
+        return this.getRuntimeFacade()?.selectArcadeReward?.(rewardId);
+    }
+
+    requestArcadeReplayPlayback() {
+        return this.getRuntimeFacade()?.requestArcadeReplayPlayback?.();
+    }
+
+    toggleCinematicRecordingFromHotkey() {
+        return this.getRuntimeFacade()?.toggleCinematicRecordingFromHotkey?.();
+    }
+
+    finalizeRoundRecording(winner, players, options = undefined) {
+        return this.getRuntimeFacade()?.finalizeRoundRecording?.(winner, players, options);
+    }
+
+    dumpRoundRecording() {
+        return this.getRuntimeFacade()?.dumpRoundRecording?.();
+    }
+
+    getLastRoundRecordingMetrics() {
+        return this.getRuntimeFacade()?.getLastRoundRecordingMetrics?.();
+    }
+
+    getAggregateRecordingMetrics() {
+        return this.getRuntimeFacade()?.getAggregateRecordingMetrics?.();
+    }
+
+    getLastRoundGhostClip(players, options = undefined) {
+        return this.getRuntimeFacade()?.getLastRoundGhostClip?.(players, options);
+    }
+
+    recordRoundEndTelemetry(payload = null) {
+        return this.getRuntimeFacade()?.recordRoundEndTelemetry?.(payload);
+    }
+
+    recordMatchEndTelemetry(payload = null) {
+        return this.getRuntimeFacade()?.recordMatchEndTelemetry?.(payload);
+    }
+
     startMatch(options = undefined) {
         return this.getRuntimeFacade()?.startMatch?.(options);
     }

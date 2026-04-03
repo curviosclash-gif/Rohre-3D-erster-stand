@@ -14,13 +14,11 @@ import { GameDebugApi } from './GameDebugApi.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import {
     MATCH_LIFECYCLE_CONTRACT_VERSION,
-    MATCH_LIFECYCLE_EVENT_TYPES,
 } from '../shared/contracts/MatchLifecycleContract.js';
 import { RuntimePerfProfiler } from './perf/RuntimePerfProfiler.js';
 import { initializeGameApp } from './AppInitializer.js';
 import { isPlaytestLaunchRequested, readPlaytestLaunchBoolParam } from './PlaytestLaunchParams.js';
-import { RECORDING_CAPTURE_PROFILE, RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
-import { RECORDER_ENGINE } from './recording/MediaRecorderSupport.js';
+import { RECORDING_HUD_MODE } from '../shared/contracts/RecordingCaptureContract.js';
 import { ensureInteractiveMatchRuntime } from './InteractiveMatchRuntimeGuard.js';
 import { GameRuntimeCoordinator } from './runtime/GameRuntimeCoordinator.js';
 
@@ -247,79 +245,13 @@ export class Game {
     }
 
     _toggleRecordingFromGlobalHotkey() {
-        const recorder = this.mediaRecorderSystem;
-        if (!recorder || typeof recorder.notifyLifecycleEvent !== 'function') {
-            return;
-        }
-
-        const support = recorder.getSupportState?.() || null;
-        if (support && support.canRecord === false) {
-            this._showStatusToast('Videoaufnahme nicht verfuegbar', 1600, 'error');
-            return;
-        }
-
-        const supportsDirectRecording = typeof recorder.startRecording === 'function'
-            && typeof recorder.stopRecording === 'function';
-        if (!supportsDirectRecording) {
-            recorder.notifyLifecycleEvent(MATCH_LIFECYCLE_EVENT_TYPES.RECORDING_REQUESTED, {
-                command: 'toggle',
-            });
-            return;
-        }
-
-        const wasRecording = !!recorder.isRecording?.();
-        const isCinematicRecording = wasRecording
-            && recorder.getRecordingCaptureSettings?.()?.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4;
+        return this.runtimeCoordinator?.toggleCinematicRecordingFromHotkey?.();
 
         // Case 1: Cinematic recording is active → stop it
-        if (isCinematicRecording) {
-            this._showStatusToast('Cinematic-Aufnahme: wird gespeichert...', 1200, 'info');
-            recorder.stopRecording({ type: 'cinematic_manual_stop' }).then((result) => {
-                if (result?.stopped) {
-                    const sizeMB = ((result.sizeBytes || 0) / (1024 * 1024)).toFixed(1);
-                    const ext = (result.mimeType || '').includes('mp4') ? 'MP4' : 'WebM';
-                    this._showStatusToast(`Cinematic ${ext} gespeichert (${sizeMB} MB)`, 2500, 'success');
-                } else {
-                    this._showStatusToast('Cinematic-Aufnahme: Speichern fehlgeschlagen', 2000, 'error');
-                }
-            }).catch(() => {
-                this._showStatusToast('Cinematic-Aufnahme: Fehler beim Stoppen', 2000, 'error');
-            });
-            return;
-        }
 
         // Case 2: Non-cinematic (auto) recording is running → silently stop, then start cinematic
-        if (wasRecording) {
-            recorder.stopRecording({ type: 'cinematic_switch_stop' }).catch(() => {}).then(() => {
-                this._startCinematicRecording(recorder);
-            });
-            return;
-        }
 
         // Case 3: Nothing recording → start cinematic
-        this._startCinematicRecording(recorder);
-    }
-
-    async _startCinematicRecording(recorder) {
-        recorder.setRecordingCaptureSettings?.({
-            profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
-        });
-        this.renderer?.setRecordingCaptureSettings?.({
-            profile: RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4,
-        });
-        // Force a synchronous render frame to initialize the cinematic capture canvas
-        // with the right dimensions before the WebCodecs encoder is created.
-        if (typeof this.render === 'function') {
-            this.render();
-        }
-        const result = await recorder.startRecording({ type: 'cinematic_manual_start' });
-        if (result?.started) {
-            const engine = result?.recorderEngine || 'unknown';
-            const format = engine === RECORDER_ENGINE.NATIVE_WEBCODECS ? 'MP4' : 'WebM';
-            this._showStatusToast(`Cinematic-Aufnahme: gestartet als ${format} (F9 zum Stoppen)`, 1800, 'success');
-        } else {
-            this._showStatusToast(`Cinematic-Aufnahme: Start fehlgeschlagen (${result?.reason || 'unknown'})`, 2500, 'error');
-        }
     }
 
     _handleGlobalInputHotkeys() {

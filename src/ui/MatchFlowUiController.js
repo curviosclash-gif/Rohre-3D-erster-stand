@@ -23,6 +23,15 @@ import {
     normalizeGameStateId,
 } from '../shared/contracts/GameStateIds.js';
 import { createMatchFlowUiControllerPort } from '../shared/runtime/UiControllerRuntimePorts.js';
+import {
+    createRoundEndRecorderAdapter,
+    getArcadeMenuSurfaceState,
+    getLastRoundGhostClip,
+    getLastRoundRecordingMetrics,
+    requestArcadeReplayPlayback,
+    selectArcadeIntermissionChoice,
+    selectArcadeReward,
+} from './MatchFlowTransitionHotspots.js';
 
 function isPromiseLike(value) {
     return !!value && typeof value.then === 'function';
@@ -211,8 +220,8 @@ export class MatchFlowUiController {
             button.addEventListener('click', () => {
                 const choiceId = String(button.getAttribute('data-arcade-choice-id') || '').trim();
                 if (!choiceId) return;
-                this.game?.runtimeFacade?.arcadeRunRuntime?.selectIntermissionChoice?.(choiceId);
-                const nextState = this.game?.runtimeFacade?.arcadeRunRuntime?.getMenuSurfaceState?.();
+                selectArcadeIntermissionChoice(this.runtimePort, this.game, choiceId);
+                const nextState = getArcadeMenuSurfaceState(this.runtimePort, this.game);
                 this._renderArcadeIntermissionPanel(nextState);
             });
         });
@@ -220,8 +229,8 @@ export class MatchFlowUiController {
             button.addEventListener('click', () => {
                 const rewardId = String(button.getAttribute('data-arcade-reward-id') || '').trim();
                 if (!rewardId) return;
-                this.game?.runtimeFacade?.arcadeRunRuntime?.selectReward?.(rewardId);
-                const nextState = this.game?.runtimeFacade?.arcadeRunRuntime?.getMenuSurfaceState?.();
+                selectArcadeReward(this.runtimePort, this.game, rewardId);
+                const nextState = getArcadeMenuSurfaceState(this.runtimePort, this.game);
                 this._renderArcadeIntermissionPanel(nextState);
             });
         });
@@ -282,7 +291,7 @@ export class MatchFlowUiController {
         const replayButton = panel.querySelector('#btn-arcade-overlay-replay');
         if (replayButton) {
             replayButton.addEventListener('click', () => {
-                const result = this.game?.runtimeFacade?.arcadeRunRuntime?.requestReplayPlayback?.();
+                const result = requestArcadeReplayPlayback(this.runtimePort, this.game);
                 const code = String(result?.code || 'replay_unknown');
                 const tone = code === 'replay_player_unavailable' ? 'warning' : 'info';
                 const message = code === 'replay_player_unavailable'
@@ -308,7 +317,7 @@ export class MatchFlowUiController {
             this._clearArcadeOverlayPanel();
             return;
         }
-        const runtimeState = game?.runtimeFacade?.arcadeRunRuntime?.getMenuSurfaceState?.();
+        const runtimeState = getArcadeMenuSurfaceState(this.runtimePort, this.game);
         const state = normalizeGameStateId(game?.state, GAME_STATE_IDS.MENU);
         if (state === GAME_STATE_IDS.ROUND_END && this._renderArcadeIntermissionPanel(runtimeState)) {
             return;
@@ -494,9 +503,7 @@ export class MatchFlowUiController {
 
     _buildRoundEndTelemetryPayload(roundEndPlan) {
         const game = this.game;
-        const roundMetrics = roundEndPlan?.recording?.roundMetrics
-            || game?.recorder?.getLastRoundMetrics?.()
-            || null;
+        const roundMetrics = getLastRoundRecordingMetrics(this.runtimePort, game, roundEndPlan);
         if (!roundMetrics) return null;
 
         const itemUseModeSource = roundMetrics.itemUseModeCounts && typeof roundMetrics.itemUseModeCounts === 'object'
@@ -550,9 +557,17 @@ export class MatchFlowUiController {
     _recordRoundEndTelemetry(roundEndPlan) {
         const telemetryPayload = this._buildRoundEndTelemetryPayload(roundEndPlan);
         if (!telemetryPayload) return;
-        this.game?.runtimeFacade?.recordRoundEndTelemetry?.(telemetryPayload);
+        if (this.runtimePort?.recordRoundEndTelemetry) {
+            this.runtimePort.recordRoundEndTelemetry(telemetryPayload);
+        } else {
+            this.game?.runtimeFacade?.recordRoundEndTelemetry?.(telemetryPayload);
+        }
         if (telemetryPayload.state === GAME_STATE_IDS.MATCH_END) {
-            this.game?.runtimeFacade?.recordMatchEndTelemetry?.(telemetryPayload);
+            if (this.runtimePort?.recordMatchEndTelemetry) {
+                this.runtimePort.recordMatchEndTelemetry(telemetryPayload);
+            } else {
+                this.game?.runtimeFacade?.recordMatchEndTelemetry?.(telemetryPayload);
+            }
         }
     }
 
@@ -718,7 +733,7 @@ export class MatchFlowUiController {
         game.roundPause = 3.0;
 
         const roundEndPlan = coordinateRoundEnd(this.buildRoundEndCoordinatorRequest(winner, outcome));
-        const ghostClip = game.recorder?.getLastRoundGhostClip?.(game.entityManager?.players, {
+        const ghostClip = getLastRoundGhostClip(this.runtimePort, game, {
             displayDuration: game.roundPause,
         });
         const huntSummary = game.entityManager?.getHuntScoreboardSummary
@@ -742,7 +757,7 @@ export class MatchFlowUiController {
         const game = this.game;
         const normalizedOutcome = outcome && typeof outcome === 'object' ? outcome : {};
         return {
-            recorder: game.recorder,
+            recorder: createRoundEndRecorderAdapter(this.runtimePort, game),
             winner,
             players: game.entityManager ? game.entityManager.players : [],
             roundStateController: game.roundStateController,
@@ -826,35 +841,13 @@ export class MatchFlowUiController {
     _isHost() {
         return this.game?.runtimeFacade?.isHost?.() ?? true;
     }
-
-    pause() {
-        this.pauseOverlayController.pause();
-    }
-
-    resumeFromPause() {
-        this.pauseOverlayController.resumeFromPause();
-    }
-
-    returnToMenuFromPause() {
-        this.pauseOverlayController.returnToMenuFromPause();
-    }
-
-    applyPauseProjection() {
-        return this.pauseOverlayController.applyPauseProjection();
-    }
-
-    applyResumeProjection() {
-        return this.pauseOverlayController.applyResumeProjection();
-    }
-
-    applyDisconnectConfirmationProjection() {
-        return this.pauseOverlayController.applyDisconnectConfirmationProjection();
-    }
-
-    setupPauseOverlayListeners() {
-        this.pauseOverlayController.setupListeners();
-    }
-
+    pause() { this.pauseOverlayController.pause(); }
+    resumeFromPause() { this.pauseOverlayController.resumeFromPause(); }
+    returnToMenuFromPause() { this.pauseOverlayController.returnToMenuFromPause(); }
+    applyPauseProjection() { return this.pauseOverlayController.applyPauseProjection(); }
+    applyResumeProjection() { return this.pauseOverlayController.applyResumeProjection(); }
+    applyDisconnectConfirmationProjection() { return this.pauseOverlayController.applyDisconnectConfirmationProjection(); }
+    setupPauseOverlayListeners() { this.pauseOverlayController.setupListeners(); }
     dispose() {
         this._clearArcadeOverlayPanel();
         this.pauseOverlayController?.dispose?.();
