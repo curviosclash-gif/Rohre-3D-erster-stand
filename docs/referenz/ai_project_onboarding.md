@@ -1,6 +1,6 @@
 # AI Project Onboarding (Aktiv)
 
-Stand: 2026-04-03
+Stand: 2026-04-04
 
 Diese Datei ist der aktuelle Einstieg fuer KI-Assistenz in diesem Repository.
 
