@@ -141,6 +141,16 @@ export const TRAINING_PERFORMANCE_PROFILES = Object.freeze({
             backpressureThreshold: 192,
             dropTrainingWhenBacklogged: true,
         }),
+        botValidation: Object.freeze({
+            serverMode: 'preview',
+            headless: true,
+            previewBuild: false,
+            scenarioCount: 4,
+            rounds: 4,
+            playingTimeoutMs: 30_000,
+            totalTimeoutMs: 22 * 60_000,
+            stageTimeoutMs: 25 * 60_000,
+        }),
         loop: Object.freeze({
             runs: 1,
             durationHours: null,

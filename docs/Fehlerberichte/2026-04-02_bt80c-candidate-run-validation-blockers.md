@@ -84,3 +84,18 @@
   - `node dev/scripts/bot-validation-runner.mjs` mit `BOT_RUNNER_SERVER_MODE=preview`, `BOT_RUNNER_SCENARIO_COUNT=1`, `BOT_RUNNER_ROUNDS=1`, `BOT_RUNNER_PLAYING_TIMEOUT=30000` und `BOT_RUNNER_MATCH_TIMEOUT=60000` schreibt `tmp/bt80c-repro-report.json`; der Runner sieht jetzt `state="PLAYING"` mit drei Spielern statt `MENU`/`players=[]`.
 - Offener Restpunkt:
   - Der minimierte Validation-Lauf endet noch mit `forced-round`/`timeout-round`, weil die Runde innerhalb des aktuellen Harness-Budgets nicht natuerlich zu `ROUND_END` oder `MATCH_END` kommt. Das ist kein normaler Matchstart-/Session-Defekt mehr, sondern wieder BT80C-/Trainingsscope-Arbeit fuer `80.9.3`.
+
+## Update 2026-04-03 BT-Scope Follow-up
+
+- `scripts/bot-validation-runner.mjs` akzeptiert jetzt explizite CLI-Overrides fuer Szenariozahl, Rundenzahl, Timeouts und `preview-build`; der Default fuer `total-timeout` reserviert zusaetzlich Budget, wenn ein Preview-Prebuild wirklich angefordert wird.
+- `scripts/training-e2e.mjs` kann BT-Validation-Parameter pro Stage weiterreichen; das `quick-benchmark`-Profil in `src/state/training/TrainingBenchmarkProfiles.js` schaltet fuer die Validation-Lane `preview-build=false` und ein laengeres Stage-/Total-Budget frei, damit die Lane nicht mehr am bisherigen 8-Minuten-Stage-Cutoff oder am Prebuild-Overhead scheitert.
+- Neue BT-Evidence zeigt, dass reine Budget-Erhoehung den Restblocker nicht loest:
+  - `tmp/bt80c-debug-report-90s-nobuild.json`: `preview-build=false`, `scenarioCount=1`, `rounds=1`, `matchTimeout=90000` -> weiterhin `forced-round`/`timeout-round`.
+  - `tmp/bt80c-debug-report-150s-nobuild.json`: `preview-build=false`, `scenarioCount=1`, `rounds=1`, `matchTimeout=150000` -> weiterhin `PLAYING`, alle drei Spieler `alive`, `roundsRecorded=0`, anschliessend erzwungenes Round-End.
+  - `tmp/bt80c-cli-smoke.json`: CLI-Surface fuer den Runner greift wie erwartet; `preview-build=false`, `scenarioCount=1`, `rounds=1`, kuerzeres Matchbudget wird korrekt uebernommen.
+- Damit ist der normale Spielscope nach dem Runtime-Fix nicht erneut betroffen. Der verbleibende Blocker liegt jetzt enger im BT80C-Harness selbst: Die feste Validation-Matrix, insbesondere `V1`, liefert auch mit groesserem Aktivbudget keinen natuerlichen Rundenabschluss.
+
+## Naechster Schritt
+
+- BT80C `80.9.3` im Bot-Training-Scope weiter an der Validation-Matrix-/Round-End-Semantik bearbeiten.
+- Kein neuer normaler Umsetzungsplan-Block noetig, solange keine weitere Runtime-/Gameplay-Datei ausserhalb des Trainings-/Runner-/Validation-Scope angefasst werden muss.

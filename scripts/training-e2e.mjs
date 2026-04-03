@@ -10,6 +10,10 @@ import {
     normalizeTrainingRunStamp,
     resolveTrainingRunArtifactLayout,
 } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
+import {
+    normalizeTrainingPerformanceProfileName,
+    resolveTrainingPerformanceProfile,
+} from '../src/state/training/TrainingBenchmarkProfiles.js';
 
 const DEFAULT_STAGE_TIMEOUT_MS = 8 * 60_000;
 const DEFAULT_SERVER_READY_TIMEOUT_MS = 30_000;
@@ -85,6 +89,28 @@ function collectForwardArgs(args, key, target = key) {
     const value = args.get(key);
     if (typeof value !== 'string' || !value.trim()) return [];
     return [`--${target}`, value.trim()];
+}
+
+function appendArg(targetArgs, key, value) {
+    if (value == null) return;
+    if (typeof value === 'string' && !value.trim()) return;
+    targetArgs.push(`--${key}`, String(value));
+}
+
+function getBotValidationProfile(performanceProfile) {
+    return performanceProfile?.botValidation && typeof performanceProfile.botValidation === 'object'
+        ? performanceProfile.botValidation
+        : null;
+}
+
+function resolveBotValidationStageTimeoutMs(args, stageTimeoutMs, performanceProfile) {
+    const profile = getBotValidationProfile(performanceProfile);
+    return parseInteger(
+        args.get('bot-validation-stage-timeout-ms'),
+        profile?.stageTimeoutMs ?? stageTimeoutMs,
+        500,
+        24 * 60 * 60_000
+    );
 }
 
 function sleep(ms) {
@@ -287,6 +313,39 @@ function buildStageForwardArgs(args, botValidationReportPath) {
     ];
 }
 
+function buildBotValidationStageArgs(args, botValidationReportPath, performanceProfile) {
+    const stageArgs = buildStageForwardArgs(args, botValidationReportPath);
+    const profile = getBotValidationProfile(performanceProfile);
+    for (const [sourceKey, targetKey, profileValue] of [
+        ['bot-validation-server-mode', 'server-mode', profile?.serverMode],
+        ['bot-validation-headless', 'headless', profile?.headless],
+        ['bot-validation-preview-build', 'preview-build', profile?.previewBuild],
+        ['bot-validation-scenario-count', 'scenario-count', profile?.scenarioCount],
+        ['bot-validation-rounds', 'rounds', profile?.rounds],
+        ['bot-validation-fail-on-forced-round', 'fail-on-forced-round', profile?.failOnForcedRound],
+        ['bot-validation-max-forced-rounds', 'max-forced-rounds', profile?.maxForcedRounds],
+        ['bot-validation-server-timeout', 'server-timeout', profile?.serverTimeoutMs],
+        ['bot-validation-boot-timeout', 'boot-timeout', profile?.bootTimeoutMs],
+        ['bot-validation-nav-timeout', 'nav-timeout', profile?.navTimeoutMs],
+        ['bot-validation-playing-timeout', 'playing-timeout', profile?.playingTimeoutMs],
+        ['bot-validation-match-timeout', 'match-timeout', profile?.matchTimeoutMs],
+        ['bot-validation-force-timeout', 'force-timeout', profile?.forceTimeoutMs],
+        ['bot-validation-menu-timeout', 'menu-timeout', profile?.menuTimeoutMs],
+        ['bot-validation-scenario-timeout', 'scenario-timeout', profile?.scenarioTimeoutMs],
+        ['bot-validation-total-timeout', 'total-timeout', profile?.totalTimeoutMs],
+        ['bot-validation-goto-wait-until', 'goto-wait-until', profile?.gotoWaitUntil],
+        ['bot-validation-publish-evidence', 'publish-evidence', profile?.publishEvidence],
+    ]) {
+        const explicitArgs = collectForwardArgs(args, sourceKey, targetKey);
+        if (explicitArgs.length > 0) {
+            stageArgs.push(...explicitArgs);
+            continue;
+        }
+        appendArg(stageArgs, targetKey, profileValue);
+    }
+    return stageArgs;
+}
+
 async function restoreLatestIndex(layout, fallbackLatest = null) {
     const backup = await readJsonIfExists(layout.latestBackupPath);
     if (backup && typeof backup === 'object') {
@@ -308,6 +367,11 @@ async function restoreLatestIndex(layout, fallbackLatest = null) {
 
 async function main() {
     const args = parseArgMap(process.argv.slice(2));
+    const performanceProfileName = normalizeTrainingPerformanceProfileName(
+        args.get('performance-profile') || process.env.TRAINING_PERFORMANCE_PROFILE || '',
+        null
+    );
+    const performanceProfile = resolveTrainingPerformanceProfile(performanceProfileName, null);
     const stamp = normalizeTrainingRunStamp(args.get('stamp') || process.env.TRAINING_RUN_STAMP || null);
     const strictMissing = parseBoolean(args.get('strict'), parseBoolean(process.env.TRAINING_E2E_STRICT, false));
     const withTrainerServer = parseBoolean(args.get('with-trainer-server'), true);
@@ -383,8 +447,15 @@ async function main() {
             }
             const stageArgs = stage.name === 'run'
                 ? runStageArgs
-                : buildStageForwardArgs(args, botValidationReportPath);
-            let stageResult = await runStage(stage, stamp, stageArgs, { timeoutMs: stageTimeoutMs });
+                : (
+                    stage.name === 'bot-validation'
+                        ? buildBotValidationStageArgs(args, botValidationReportPath, performanceProfile)
+                        : buildStageForwardArgs(args, botValidationReportPath)
+                );
+            const currentStageTimeoutMs = stage.name === 'bot-validation'
+                ? resolveBotValidationStageTimeoutMs(args, stageTimeoutMs, performanceProfile)
+                : stageTimeoutMs;
+            let stageResult = await runStage(stage, stamp, stageArgs, { timeoutMs: currentStageTimeoutMs });
             if (stage.name === 'bot-validation' && stageResult.status === 'completed') {
                 const reportExists = await fileExists(botValidationReportPath);
                 if (!reportExists) {

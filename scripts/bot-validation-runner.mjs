@@ -7,56 +7,41 @@ import { chromium } from '@playwright/test';
 
 const CLI_ARGS = parseArgMap(process.argv.slice(2));
 const HOST = '127.0.0.1';
-const PORT = parseIntEnv('BOT_RUNNER_PORT', 4273, 1024);
+const PORT = parseIntegerOption(CLI_ARGS, ['port'], 'BOT_RUNNER_PORT', 4273, 1024);
 const BASE_URL = `http://${HOST}:${PORT}`;
-const FORCE_KILL_PORT = parseBoolEnv('BOT_RUNNER_FORCE_KILL_PORT', true);
-const DEFAULT_SCENARIO_COUNT = parseIntEnv('BOT_RUNNER_SCENARIO_COUNT', 4, 1);
-const ROUNDS_PER_SCENARIO = parseIntEnv('BOT_RUNNER_ROUNDS', 4, 1);
-const FAIL_ON_FORCED_ROUND = parseBoolEnv('BOT_RUNNER_FAIL_ON_FORCED_ROUND', false);
-const MAX_FORCED_ROUNDS = parseIntEnv('BOT_RUNNER_MAX_FORCED_ROUNDS', Number.MAX_SAFE_INTEGER, 0);
-
-const SERVER_READY_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_SERVER_TIMEOUT', 45000, 5000);
-const APP_READY_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_BOOT_TIMEOUT', 180000, 5000);
-const NAVIGATION_TIMEOUT_MS = parseIntEnv(
-    'BOT_RUNNER_NAV_TIMEOUT',
-    Math.max(APP_READY_TIMEOUT_MS, 60000),
-    5000
+const FORCE_KILL_PORT = parseBoolRunnerOption(CLI_ARGS, ['force-kill-port'], 'BOT_RUNNER_FORCE_KILL_PORT', true);
+const DEFAULT_SCENARIO_COUNT = parseIntegerOption(CLI_ARGS, ['scenario-count'], 'BOT_RUNNER_SCENARIO_COUNT', 4, 1);
+const ROUNDS_PER_SCENARIO = parseIntegerOption(CLI_ARGS, ['rounds'], 'BOT_RUNNER_ROUNDS', 4, 1);
+const FAIL_ON_FORCED_ROUND = parseBoolRunnerOption(
+    CLI_ARGS,
+    ['fail-on-forced-round'],
+    'BOT_RUNNER_FAIL_ON_FORCED_ROUND',
+    false
 );
-const ROUND_START_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_PLAYING_TIMEOUT', 10000, 1000);
-const ROUND_ACTIVE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_MATCH_TIMEOUT', 50000, 10000);
-const ROUND_FORCE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_FORCE_TIMEOUT', 12000, 1000);
-const MENU_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_MENU_TIMEOUT', 12000, 1000);
-const EVAL_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_EVAL_TIMEOUT', 10000, 1000);
-const CLEANUP_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_CLEANUP_TIMEOUT', 12000, 1000);
-const SERVER_STOP_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_SERVER_STOP_TIMEOUT', 8000, 1000);
-const SERVER_PROBE_TIMEOUT_MS = parseIntEnv('BOT_RUNNER_PROBE_TIMEOUT', 10000, 500);
-const SCENARIO_TIMEOUT_MS = parseIntEnv(
-    'BOT_RUNNER_SCENARIO_TIMEOUT',
-    Math.max(
-        45000,
-        ROUNDS_PER_SCENARIO * (ROUND_START_TIMEOUT_MS + ROUND_ACTIVE_TIMEOUT_MS + MENU_TIMEOUT_MS + 4000)
-    ),
-    10000
-);
-const TOTAL_TIMEOUT_MS = parseIntEnv(
-    'BOT_RUNNER_TOTAL_TIMEOUT',
-    Math.max(180000, DEFAULT_SCENARIO_COUNT * SCENARIO_TIMEOUT_MS + 60000),
-    60000
+const MAX_FORCED_ROUNDS = parseIntegerOption(
+    CLI_ARGS,
+    ['max-forced-rounds'],
+    'BOT_RUNNER_MAX_FORCED_ROUNDS',
+    Number.MAX_SAFE_INTEGER,
+    0
 );
 const SERVER_MODE = resolveServerMode(
     resolveFirstValue(CLI_ARGS, ['server-mode'], process.env.BOT_RUNNER_SERVER_MODE)
 );
-const HEADLESS = parseBoolOption(
-    resolveFirstValue(CLI_ARGS, ['headless'], process.env.BOT_RUNNER_HEADLESS),
-    false
-);
-const PREVIEW_BUILD_BEFORE_START = parseBoolOption(
-    resolveFirstValue(CLI_ARGS, ['preview-build'], process.env.BOT_RUNNER_PREVIEW_BUILD),
+const HEADLESS = parseBoolRunnerOption(CLI_ARGS, ['headless'], 'BOT_RUNNER_HEADLESS', false);
+const PREVIEW_BUILD_BEFORE_START = parseBoolRunnerOption(
+    CLI_ARGS,
+    ['preview-build'],
+    'BOT_RUNNER_PREVIEW_BUILD',
     true
 );
-const GOTO_WAIT_UNTIL = resolveGotoWaitUntil(process.env.BOT_RUNNER_GOTO_WAIT_UNTIL);
-const PUBLISH_EVIDENCE = parseBoolOption(
-    resolveFirstValue(CLI_ARGS, ['publish-evidence'], process.env.BOT_RUNNER_PUBLISH_EVIDENCE),
+const GOTO_WAIT_UNTIL = resolveGotoWaitUntil(
+    resolveFirstValue(CLI_ARGS, ['goto-wait-until'], process.env.BOT_RUNNER_GOTO_WAIT_UNTIL)
+);
+const PUBLISH_EVIDENCE = parseBoolRunnerOption(
+    CLI_ARGS,
+    ['publish-evidence'],
+    'BOT_RUNNER_PUBLISH_EVIDENCE',
     false
 );
 const REPORT_JSON_OVERRIDE = resolveFirstValue(
@@ -65,6 +50,106 @@ const REPORT_JSON_OVERRIDE = resolveFirstValue(
     process.env.BOT_RUNNER_REPORT_JSON
 );
 const REPORT_MD_OVERRIDE = resolveFirstValue(CLI_ARGS, ['report-md'], process.env.BOT_RUNNER_REPORT_MD);
+
+const SERVER_READY_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['server-timeout'],
+    'BOT_RUNNER_SERVER_TIMEOUT',
+    45000,
+    5000
+);
+const APP_READY_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['boot-timeout'],
+    'BOT_RUNNER_BOOT_TIMEOUT',
+    180000,
+    5000
+);
+const NAVIGATION_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['nav-timeout'],
+    'BOT_RUNNER_NAV_TIMEOUT',
+    Math.max(APP_READY_TIMEOUT_MS, 60000),
+    5000
+);
+const ROUND_START_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['playing-timeout'],
+    'BOT_RUNNER_PLAYING_TIMEOUT',
+    10000,
+    1000
+);
+const ROUND_ACTIVE_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['match-timeout'],
+    'BOT_RUNNER_MATCH_TIMEOUT',
+    50000,
+    10000
+);
+const ROUND_FORCE_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['force-timeout'],
+    'BOT_RUNNER_FORCE_TIMEOUT',
+    12000,
+    1000
+);
+const MENU_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['menu-timeout'],
+    'BOT_RUNNER_MENU_TIMEOUT',
+    12000,
+    1000
+);
+const EVAL_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['eval-timeout'],
+    'BOT_RUNNER_EVAL_TIMEOUT',
+    10000,
+    1000
+);
+const CLEANUP_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['cleanup-timeout'],
+    'BOT_RUNNER_CLEANUP_TIMEOUT',
+    12000,
+    1000
+);
+const SERVER_STOP_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['server-stop-timeout'],
+    'BOT_RUNNER_SERVER_STOP_TIMEOUT',
+    8000,
+    1000
+);
+const SERVER_PROBE_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['probe-timeout'],
+    'BOT_RUNNER_PROBE_TIMEOUT',
+    10000,
+    500
+);
+const SCENARIO_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['scenario-timeout'],
+    'BOT_RUNNER_SCENARIO_TIMEOUT',
+    Math.max(
+        45000,
+        ROUNDS_PER_SCENARIO * (ROUND_START_TIMEOUT_MS + ROUND_ACTIVE_TIMEOUT_MS + MENU_TIMEOUT_MS + 4000)
+    ),
+    10000
+);
+const TOTAL_TIMEOUT_MS = parseIntegerOption(
+    CLI_ARGS,
+    ['total-timeout'],
+    'BOT_RUNNER_TOTAL_TIMEOUT',
+    Math.max(
+        180000,
+        DEFAULT_SCENARIO_COUNT * SCENARIO_TIMEOUT_MS
+            + 60000
+            + resolvePreviewBuildBudgetMs(SERVER_MODE, PREVIEW_BUILD_BEFORE_START)
+    ),
+    60000
+);
 
 function parseArgMap(argv) {
     const result = new Map();
@@ -127,6 +212,19 @@ function parseBoolEnv(name, fallback = false) {
     if (!raw) return fallback;
     const normalized = String(raw).trim().toLowerCase();
     return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
+}
+
+function parseBoolRunnerOption(argMap, keys = [], envKey = '', fallback = false) {
+    const raw = resolveFirstValue(argMap, keys, process.env[envKey]);
+    return parseBoolOption(raw, fallback);
+}
+
+function parseIntegerOption(argMap, keys = [], envKey = '', fallback, minValue = 1, maxValue = Number.MAX_SAFE_INTEGER) {
+    const raw = resolveFirstValue(argMap, keys, process.env[envKey]);
+    if (!raw) return fallback;
+    const parsed = Number.parseInt(raw, 10);
+    if (!Number.isFinite(parsed)) return fallback;
+    return Math.max(minValue, Math.min(maxValue, parsed));
 }
 
 function normalizeOutputPath(rawValue, fallback) {
@@ -279,6 +377,11 @@ function resolveServerMode(value) {
     const raw = typeof value === 'string' ? value.trim().toLowerCase() : '';
     if (raw === 'preview') return 'preview';
     return 'dev';
+}
+
+function resolvePreviewBuildBudgetMs(serverMode, previewBuildBeforeStart) {
+    if (serverMode !== 'preview' || previewBuildBeforeStart !== true) return 0;
+    return 180000;
 }
 
 function log(message, payload) {
