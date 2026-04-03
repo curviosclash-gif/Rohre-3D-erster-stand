@@ -27,8 +27,8 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
 | V74 | Architektur-Runtime-Entkopplung (Refresh) | done | P1 | frei | V58.99,V60.3 | 74.99 | `docs/plaene/aktiv/V74.md` |
-| V83 | Architektur SessionRuntime und Plattform-Capabilities | active | P1 | Bot-Codex | V74.99 | 83.1 | `docs/plaene/aktiv/V83.md` |
-| V84 | Headless MatchKernel und einheitliche GameMode-API | planned | P2 | frei | V83.99 | 84.1 | `docs/plaene/aktiv/V84.md` |
+| V83 | Architektur SessionRuntime und Plattform-Capabilities | done | P1 | frei | V74.99 | 83.99 | `docs/plaene/aktiv/V83.md` |
+| V84 | Headless MatchKernel und einheitliche GameMode-API | active | P2 | frei | V83.99 | 84.3 | `docs/plaene/aktiv/V84.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | planned | P2 | frei | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
@@ -84,8 +84,8 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | - | V71 | - | frei | `71.99` nach Warmup-Entstoerung oder belastbarem Restgate schliessen |
 | Agent-B | V72 | 2026-04-02 | active | `72.2` abgeschlossen; `72.3` Portal-/Gate-Vertraege haerten steht an |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
-| Bot-Codex | V83 | 2026-04-03 | active | `83.1` laeuft; `83.1.1` Zielgrenzen zwischen Runtime, Application, UI und Plattform dokumentieren |
-| - | V84 | - | frei | Nach `V83.99` mit `84.1` Kernel-Zielbild, Simulationsseams und headless Vertragskatalog starten |
+| - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
+| - | V84 | 2026-04-04 | active | `84.2` abgeschlossen; `MatchKernel` + `MatchKernelInteractiveAdapter` eingefuehrt; `84.3` GameMode-API steht an |
 | - | V85 | - | frei | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
