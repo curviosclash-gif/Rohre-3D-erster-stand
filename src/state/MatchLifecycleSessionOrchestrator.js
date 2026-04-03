@@ -23,6 +23,14 @@ export const MATCH_SESSION_PORT_METHODS = Object.freeze([
     'resetRoundRuntime',
 ]);
 
+function hasActiveMatchSessionRefs(currentSession) {
+    return !!(
+        currentSession?.arena
+        || currentSession?.entityManager
+        || currentSession?.powerupManager
+    );
+}
+
 export function createMatchSessionPort(runtime) {
     const getCurrentMatchSessionRefs = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchSessionRefs?.() || null;
     const getRecorder = () => runtime?.mediaRecorderSystem || runtime?.recorder || null;
@@ -190,12 +198,10 @@ export class MatchLifecycleSessionOrchestrator {
 
     _hasCurrentSessionRefs() {
         const currentSession = this.deps?.getCurrentMatchSessionRefs?.();
-        return !!(
-            currentSession?.arena
-            || currentSession?.entityManager
-            || currentSession?.powerupManager
-            || currentSession?.particles
-        );
+        // Menu bootstrap keeps a standalone particle system alive before the first
+        // real match session exists. Particles alone must not trigger stale-session
+        // finalization for a new match start.
+        return hasActiveMatchSessionRefs(currentSession);
     }
 
     async _disposePreparedMatch(initializedMatch, reason = SESSION_FINALIZE_TRIGGERS.STALE_SESSION_INIT) {

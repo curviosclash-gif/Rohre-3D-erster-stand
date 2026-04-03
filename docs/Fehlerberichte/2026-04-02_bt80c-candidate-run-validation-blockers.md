@@ -74,3 +74,13 @@
 - Zuerst den neuen Ueberlauf-Plan `docs/plaene/neu/BT80C_Runtime_Startpfad_Validation_Ueberlauf_2026-04-03.md` manuell in den normalen Umsetzungsplan uebernehmen; `docs/Umsetzungsplan.md` bleibt dabei user-owned.
 - Danach den normalen Matchstart-/Session-Pfad im vorgeschlagenen Spielscope-Block reparieren.
 - Erst nach diesem Runtime-Fix zu BT80C `80.9.3` zurueckkehren und die eigentliche Harness-Haertung samt Drei-Pass-Vorbedingung abschliessen.
+
+## Update 2026-04-03 Runtime-Fix
+
+- Der Spielscope-Fix liegt in `src/state/MatchLifecycleSessionOrchestrator.js`: Ein bootstrap-weites Menu-`particles` wurde bisher als aktive Match-Session fehlinterpretiert und loeste vor dem ersten echten Matchstart eine asynchrone Finalisierung aus. Dadurch wurde die frisch initialisierte Session als `stale` verworfen, `startRound()` lief ohne `arena`/`entityManager`/`powerupManager`, und der Guard fiel mit `Missing interactive match runtime` nach `MENU` zurueck.
+- Nach der Haertung zaehlen fuer `_hasCurrentSessionRefs()` nur noch echte Match-Refs (`arena`, `entityManager`, `powerupManager`), nicht mehr ein isoliertes Bootstrap-`particles`.
+- Repo-Evidence fuer den reparierten Runtime-Startpfad:
+  - `node scripts/perf-lifecycle-measure.mjs` mit `PERF_LIFECYCLE_SERVER_MODE=preview` und `PERF_LIFECYCLE_PLAYING_TIMEOUT=60000` schreibt `tmp/perf_phase28_5_lifecycle_trend.json` und misst wieder einen erfolgreichen Lifecycle (`match_started -> match_ended -> menu_opened`, `startMatchLatencyMs=10677`).
+  - `node dev/scripts/bot-validation-runner.mjs` mit `BOT_RUNNER_SERVER_MODE=preview`, `BOT_RUNNER_SCENARIO_COUNT=1`, `BOT_RUNNER_ROUNDS=1`, `BOT_RUNNER_PLAYING_TIMEOUT=30000` und `BOT_RUNNER_MATCH_TIMEOUT=60000` schreibt `tmp/bt80c-repro-report.json`; der Runner sieht jetzt `state="PLAYING"` mit drei Spielern statt `MENU`/`players=[]`.
+- Offener Restpunkt:
+  - Der minimierte Validation-Lauf endet noch mit `forced-round`/`timeout-round`, weil die Runde innerhalb des aktuellen Harness-Budgets nicht natuerlich zu `ROUND_END` oder `MATCH_END` kommt. Das ist kein normaler Matchstart-/Session-Defekt mehr, sondern wieder BT80C-/Trainingsscope-Arbeit fuer `80.9.3`.

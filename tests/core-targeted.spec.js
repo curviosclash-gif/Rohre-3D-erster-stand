@@ -7028,6 +7028,58 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
         expect(result.callLog.indexOf('clearRefs')).toBeLessThan(result.callLog.indexOf('apply'));
     });
 
+    test('V83.2 particles-only bootstrap refs do not trigger stale session finalization on first start', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MatchLifecycleSessionOrchestrator } = await import('/src/state/MatchLifecycleSessionOrchestrator.js');
+
+            const callLog = [];
+            let currentSession = { particles: { id: 'bootstrap-particles' } };
+            const nextSession = {
+                id: 'fresh-session',
+                effectiveMapKey: 'std',
+                numHumans: 1,
+                numBots: 0,
+                winsNeeded: 3,
+                arena: { id: 'arena' },
+                entityManager: { id: 'entity-manager' },
+                powerupManager: { id: 'powerups' },
+                particles: { id: 'match-particles' },
+            };
+            const deps = {
+                getLifecycleState: () => ({ mapKey: 'std', numHumans: 1, numBots: 0, winsNeeded: 3, activeGameMode: 'CLASSIC' }),
+                notifyLifecycleEvent() { },
+                prepareInitializedMatchSession: () => Promise.resolve({
+                    session: nextSession,
+                }),
+                wireInitializedMatchRuntime: (m) => ({ ...m, runtime: {} }),
+                applyInitializedMatchSession: (m) => {
+                    callLog.push('apply');
+                    currentSession = m?.session || null;
+                },
+                getCurrentMatchSessionRefs: () => currentSession,
+                clearMatchSessionRefs: () => {
+                    callLog.push('clearRefs');
+                    currentSession = null;
+                },
+                disposePreparedMatchSession() { },
+                disposeCurrentMatchSession: (opts) => { callLog.push(`dispose:${opts?.reason || 'none'}`); },
+                settleRecorder: (trigger) => { callLog.push(`settle:${trigger?.type || 'none'}`); },
+                resetRoundRuntime() { },
+            };
+
+            const orchestrator = new MatchLifecycleSessionOrchestrator(deps);
+            await orchestrator.createMatchSession({});
+            return {
+                callLog,
+                currentSessionId: currentSession?.id || null,
+            };
+        });
+
+        expect(result.callLog).toEqual(['apply']);
+        expect(result.currentSessionId).toBe('fresh-session');
+    });
+
     test('V74.3 finalizeRound settles recorder then resets round', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
