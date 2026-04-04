@@ -485,8 +485,11 @@ async function validateMasterIndex(planPath, content, options = {}) {
             continue;
         }
 
-        if (!row.planFile.startsWith('docs/plaene/aktiv/')) {
-            violations.push({ file: planPath, line: row.line, message: `plan_file fuer ${row.id} muss unter docs/plaene/aktiv/ liegen.` });
+        const allowedPrefixes = row.status === 'done'
+            ? ['docs/plaene/aktiv/', 'docs/plaene/alt/']
+            : ['docs/plaene/aktiv/'];
+        if (!allowedPrefixes.some((prefix) => row.planFile.startsWith(prefix))) {
+            violations.push({ file: planPath, line: row.line, message: `plan_file fuer ${row.id} muss unter ${allowedPrefixes.join(' oder ')} liegen.` });
         }
 
         if (!(await fileExistsImpl(row.planFile))) {

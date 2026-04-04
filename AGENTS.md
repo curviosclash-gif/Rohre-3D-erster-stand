@@ -1,156 +1,41 @@
 ﻿# AGENTS.md
 
-This file defines repository-specific operating rules for Codex.
+Repository-wide operating rules for all agents.
 
-## Scope
+## Scope & Rule Sources
 
-- Applies to the full repository.
-- If this file conflicts with higher-priority system/developer instructions, higher-priority instructions win.
-
-## Rule Sources
-
-- Global rules folder: `.agents/rules/`
-- Workflow folder: `.agents/workflows/`
-- Test mapping: `.agents/test_mapping.md`
+- Applies to the full repository. Higher-priority system/developer instructions win on conflict.
+- Rules: `.agents/rules/` | Workflows: `.agents/workflows/` | Test mapping: `.agents/test_mapping.md`
 
 ## Default Behavior
 
-- Always apply rules from `.agents/rules/` first.
-- Use concise, token-efficient output by default.
-- Ask questions only when critical information is missing.
-- For non-destructive design decisions, proceed proactively with a short rationale.
-- Desktop app is the primary product target and source of truth for feature completeness.
-- Treat the online/browser version as a demo with reduced functionality unless the user explicitly requests demo-specific work.
-- Keep docs/workflows/rules in sync with code and user-confirmed test reality after each change.
-- Create and revise implementation plans only in external docs under `docs/plaene/neu/`.
-- Do not create or restructure planning content directly inside `docs/Umsetzungsplan.md`.
-- `docs/Umsetzungsplan.md` is the compact master index; canonical block details live in `docs/plaene/aktiv/VXX.md`.
-- Manual intake into `docs/Umsetzungsplan.md` and creation or refresh of canonical block files under `docs/plaene/aktiv/` is user-owned.
-- Subsequent archival or supersession of intake drafts in `docs/plaene/neu/` remains user-owned.
-- When implementation problems or blockers occur, create or update a task-scoped error report in `docs/Fehlerberichte/` before handoff or task close.
-- Bot training planning source of truth is `docs/bot-training/Bot_Trainingsplan.md` (not `docs/Umsetzungsplan.md`).
-- Future bot-training windows and KPI corridor are maintained in `docs/bot-training/Bot_Trainings_Roadmap.md` and referenced from `docs/bot-training/Bot_Trainingsplan.md`.
-
-## Token-Effizienz (KRITISCH!)
-
-**Ziel: Minimaler Token-Verbrauch bei maximaler Produktivitaet.**
-
-- **Keine wiederholten Reads:** Gleiche Datei zweimal lesen = Token verschwenden. Info aus vorherigem Read verwenden.
-- **Teilweise lesen:** Nur relevante Teile von grossen Dateien lesen (z.B. erst Master-Index, dann nur die verlinkte `docs/plaene/aktiv/VXX.md` statt den ganzen Bestand).
-- **Keine grossen Kontexte:** Grosse Dateien oder Ergebnisse nicht komplett in den Kontext laden.
-- **Keine redundanten Tool-Calls:** Wenn ein Read/Search-Ergebnis schon im Kontext ist, nicht nochmal ausfuehren.
-- **Parallele Tool-Calls erzwingen:** 2+ unabhaengige Reads/Searches IMMER parallel, niemals sequenziell.
-- **Antworten kurz halten:** Keine langen Zusammenfassungen nach Aktionen. Der User sieht den Diff.
-- **Kein Plan-Mode fuer kleine Tasks:** Nur bei 5+ betroffenen Dateien planen. Kleine Fixes direkt umsetzen.
-- **Agent-Explore sparsam:** Default `quick` oder `medium` Tiefe. Nur `very thorough` wenn der User explizit tiefe Suche anfordert.
-
-**Anti-Patterns:**
-- NICHT gleiche Datei mehrfach lesen
-- NICHT ganze Planlandschaft lesen wenn Master-Index plus eine Blockdatei ausreichen
-- NICHT grosse Dateien ohne Zeilenbegrenzung auslesen
-- NICHT lange Zusammenfassungen nach jeder Aktion
-- NICHT Tool-Calls wiederholen deren Ergebnis schon im Kontext ist
-- NICHT mehrere Agents sequenziell starten (parallel nutzen)
+- Apply rules from `.agents/rules/` first. Use concise, token-efficient output.
+- Proceed proactively on non-destructive decisions with short rationale.
+- Keep docs/workflows/rules in sync with code after each change.
+- `docs/Umsetzungsplan.md` is the compact master index; block details live in `docs/plaene/aktiv/VXX.md`.
+- Plan drafts: `docs/plaene/neu/`. Intake into master index is user-owned.
+- Bot-training source of truth: `docs/bot-training/Bot_Trainingsplan.md`.
 
 ## Workflow Selection
 
-- Feature planning: use `.agents/workflows/plan.md`
-- Feature implementation: use `.agents/workflows/code.md`
-- Bug fixing: use `.agents/workflows/bugfix.md`
-- Phase execution from master plan: use `.agents/workflows/fix-planung.md`
-- Bot training planning/execution: use `.agents/workflows/bot-training-plan.md`
-- Documentation/process freshness check: use `.agents/workflows/aktualitaet-check.md`
-- Documentation/process freshness sync: use `.agents/workflows/aktualitaet-sync.md`
-- Cleanup/refactor/release/status/rollback: use matching workflow in `.agents/workflows/`
+| Task | Workflow |
+|---|---|
+| Feature planning | `.agents/workflows/plan.md` |
+| Feature implementation | `.agents/workflows/code.md` |
+| Bug fixing | `.agents/workflows/bugfix.md` |
+| Phase execution | `.agents/workflows/fix-planung.md` |
+| Bot training | `.agents/workflows/bot-training-plan.md` |
+| Freshness check/sync | `.agents/workflows/aktualitaet-check.md` / `aktualitaet-sync.md` |
+| Cleanup/refactor/release | matching workflow in `.agents/workflows/` |
 
 ## Verification Policy
 
-- Automated tests are user-owned and run only after explicit user request.
-- In master-plan work, tests, Playwright suites, smokes and similar functional verification are prepared during normal phases but are not run by default before the block Abschluss-Gate `*.99`.
-- Use `.agents/test_mapping.md` only when the user explicitly requests a test run or when assembling the final block-end verification scope.
-- Earlier-than-`*.99` test execution is an exception and should happen only on explicit user request or blocker-critical diagnosis.
-- If no mapping matches for a requested test run, recommend `npm run test:core` to the user instead of auto-running it.
-- When no tests were requested, report test status as pending/user-owned and, for block work, note that functional verification remains deferred to `*.99`.
-- For phase execution via `/fix-planung`, `/code` is the single source of truth for DoD and verification checks.
-- For bot-training phase execution via `/bot-training-plan`, `/code` remains the single source of truth for implementation checks.
-- For any code/process update, run:
-  - `npm run plan:check`
-  - `npm run docs:sync`
-  - `npm run docs:check`
-
-## Git Safety
-
-- Never use destructive git operations without explicit user approval.
-- `main` is the default working branch; run `npm run guard:main` before commits/pushes (hooks enforce this too).
-- Non-main work needs explicit user approval and temporary `ALLOW_NON_MAIN=1` for that scoped command.
-- Use scoped staging (`git add [scoped-files]`) and verify scope via `git diff --name-only` before push. Niemals `git add .` oder `git add -A`.
-- **Niemals `git stash` verwenden.** Keine Ausnahmen. Stash hat wiederholt zu Datenverlust und doppelter Arbeit gefuehrt.
-- Fremde uncommittete Aenderungen ignorieren - nicht stashen, nicht committen, nicht verwerfen. Sie gehoeren einem anderen Agent.
-- **Zwingende Regel nach jeder Aenderung:** Jede abgeschlossene Aenderung sofort per scoped Commit sichern (kein Sammeln von Aenderungen).
-- Sofort committen nach jeder abgeschlossenen Teilaenderung, nicht Aenderungen ansammeln.
-- Commit-Preflight ist Pflicht: Vor neuem Task oder Kontextwechsel muessen eigene offene Aenderungen bereits per scoped Commit gesichert sein.
-- **Umsetzungsplan immer als eigener Commit** - `docs/Umsetzungsplan.md` nie zusammen mit Code-Aenderungen committen. Immer separater Commit am Ende: `chore(Umsetzungsplan): ...`.
-- Keep `.husky/.bypass` local-only and untracked.
-- Create a local recovery tag via `npm run snapshot:tag` before push on `main`.
-- Keep commits atomic and use `git commit --amend` for immediate small corrections in the same task.
-
-## UI Changes
-
-- Do not generate full walkthrough artifacts unless requested.
-- Prioritize layout, flows, and UX for the desktop app first; online/browser UI may remain intentionally reduced for demo scope.
-- For UI changes, provide lightweight visual verification evidence when available.
-
-## Commit Convention
-
-All workflows follow this pattern unless stated otherwise:
-
-1. Stage only scoped files: `git add [scoped-files]`
-2. Verify scope: `git diff --name-only`
-3. Commit: `git commit -m "[type]: [short reason]"` - type matches workflow intent (`feat`, `fix`, `refactor`, `perf`, `chore`, `release`, `docs`)
-4. Push only after scope confirmation. In parallel-agent scenarios, never stage unrelated files.
-5. For immediate small corrections in the same task, use `git commit --amend`.
+- Tests are user-owned — run only on explicit request or at block gate `*.99`.
+- Use `.agents/test_mapping.md` only when user requests test run or at `*.99` gate.
+- For phase execution, `/code` is the single source of truth for DoD and verification.
+- Closure gates: `npm run plan:check` → `npm run docs:sync` → `npm run docs:check`.
 
 ## Turbo Default
 
-- Read-only commands (`git log`, `git status`, `rg`, `npm run docs:check`) are safe to auto-run (`// turbo`).
+- Read-only commands (`git log`, `git status`, `rg`, `npm run docs:check`) are safe to auto-run.
 - Workflows marked `// turbo-all` auto-run every `run_command` step.
-
-## Parallel Bots
-
-Multiple bots can work on different blocks aus dem Master-Index `docs/Umsetzungsplan.md` simultaneously.
-For bot-training-only work, use the same lock protocol in `docs/bot-training/Bot_Trainingsplan.md`.
-
-### Lock-Protokoll
-
-- `docs/Umsetzungsplan.md` contains the lock table for non-training blocks.
-- A bot claims a free block by updating the matching row in `## Lock-Status`: `git pull --rebase` -> lock row setzen -> `git push`. On push failure: retry.
-- A bot releases a block after completing all phases by setting the same lock row back to `frei`.
-- Stale-lock: If lock is >24h old without commits in that block, another bot may take over after user confirmation.
-- Sub-locks stay optional and must be documented in the block file itself if ever needed.
-
-### Datei-Ownership
-
-- `docs/plaene/aktiv/VXX.md` contains canonical `scope_files` ownership for non-training paths.
-- `docs/bot-training/Bot_Trainingsplan.md` contains the ownership table for training paths (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs).
-- A bot must not modify files owned by another bot's block unless absolutely necessary.
-- `tests/**` and `docs/**` are shared (append-only or own sections).
-
-### Conflict-Log
-
-- Any cross-block file change must be logged in the matching master plan's `Conflict-Log` section before commit.
-- Format: date, bot, foreign block, file, reason, risk rating.
-
-### Dependencies
-
-- The master index row plus `## Abhaengigkeiten` define canonical dependencies for non-training blocks. A bot must verify hard dependencies before claiming.
-
-## Phasen-Schema
-
-Canonical active block files under `docs/plaene/aktiv/` and the bot-training master plan must follow this structure:
-
-- Every block file contains top-level phases (for example `26.1`, `26.2`).
-- Every phase must have at least 2 sub-phases (for example `26.1.1`, `26.1.2`).
-- Every block ends with an Abschluss-Gate phase (`*.99`).
-- Single-step items are modeled as sub-phases, never as standalone phases.
-- A completed checkbox (`[x]`) must carry evidence metadata in the agreed format.
-
