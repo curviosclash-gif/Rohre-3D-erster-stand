@@ -257,6 +257,14 @@ Stand: 2026-04-04
   - `input_frame` muss vor jedem Tick vollstaendig vorliegen; der Kernel liest weder `window`, `document`, `game.input` noch direkte `PlayerInputSource`-Instanzen.
   - `snapshot_envelope` bleibt serialisierbar. `sessionRuntimeSnapshot` deckt Ownership und Lifecycle ab, `gameStateSnapshot` Transport und Replay, `simStateSnapshot` Checkpoint- und Rollback-nahe Analyse und `runtimeProjection` Renderer- und UI-Leser.
 
+### 4.6.2 Folgeverbrauch fuer Replay, Training und Netzwerk
+
+| Verbrauchspfad | V84-Baseline | Zulaessige Kernel-Inputs/-Outputs | Verankerung fuer Folgearbeit |
+| --- | --- | --- | --- |
+| Replay / Recording / Ghosts | `MatchKernelReplayAdapter` konsumiert denselben `MatchKernel` wie interactive/headless und liest serialisierbare `snapshot_envelope`-Pakete statt Entity- oder Renderer-Interna. | Replay-Leser und Recorder duerfen `run_profile`, `seed_envelope`, `input_frame` und `snapshot_envelope` weiterreichen; Persistenz oder Playback arbeitet auf `gameStateSnapshot`, `simStateSnapshot` und freigegebenen Projektionen. | `V85` versioniert Replay-/Snapshot-Artefakte und Migrationspfade; `V82.4` bleibt fuer kompakte Ghost-Replays auf dieselbe Snapshot-Basis beschraenkt. |
+| Training / Validate / Benchmark | `MatchKernelTrainingAdapter`, `TrainerPayloadAdapter` und `TrainingTransportFacade` bilden den gemeinsamen Kopf fuer Preview-, Resume-, Eval- und spaetere CLI-Laeufe. | Trainings- und Validate-Lanes booten ueber denselben `run_profile`-, `clock_port`-, `seed_envelope`-, `input_frame`- und `snapshot_envelope`-Vertrag; Reward-, Eval- und Resume-Evidence liest serialisierbare Artefakte statt interaktive Sonderhooks. | `BT73` und `BT80C` haerten ihre festen Matrizen, Replay-Priorisierung und Kandidaten-Validation auf diesem Kernelpfad; neue Trainings-Harnesses duplizieren keinen separaten Matchstart ausserhalb von `SessionRuntime` plus Adapter. |
+| Netzwerk / Host-Autoritaet | Kuenftige LAN-/Online-Adapter bleiben ausserhalb des `MatchKernel`; `SessionRuntime` besitzt Transport, Lifecycle, Capability-Gates und uebersetzt Netzwerknachrichten in Kernel-kompatible Huellen. | Host-/Client-Pfade duerfen nur normalisierte `input_frame`-Sequenzen nach innen geben und serialisierbare `snapshot_envelope`-/`gameStateSnapshot`-Daten nach aussen spiegeln. | `V64` baut Matchstart, Reconciliation und Disconnect auf demselben Kernelvertrag auf; Transportcode greift weder direkt auf Renderer noch auf UI- oder Entity-Interna zu. |
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
