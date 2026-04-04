@@ -208,6 +208,8 @@ export class MatchKernel {
         if (this._lifecycle === 'running') {
             this._lifecycle = 'round_end';
             this._roundPause = normalizeRoundPause(roundPause, 3);
+        } else if (typeof console !== 'undefined') {
+            console.debug(`[MatchKernel] signalRoundEnd ignored (lifecycle=${this._lifecycle})`);
         }
     }
 
@@ -218,6 +220,8 @@ export class MatchKernel {
         if (this._lifecycle === 'running' || this._lifecycle === 'round_end') {
             this._lifecycle = 'match_end';
             this._roundPause = 0;
+        } else if (typeof console !== 'undefined') {
+            console.debug(`[MatchKernel] signalMatchEnd ignored (lifecycle=${this._lifecycle})`);
         }
     }
 

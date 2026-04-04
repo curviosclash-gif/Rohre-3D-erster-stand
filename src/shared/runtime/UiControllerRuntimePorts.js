@@ -4,6 +4,7 @@ export function createMatchFlowUiControllerPort(ports = null) {
     const arcadePort = ports?.arcadePort || null;
     const recordingPort = ports?.recordingPort || null;
     const runtimeIntentPort = ports?.runtimeIntentPort || null;
+    const runtimeProjectionPort = ports?.runtimeProjectionPort || null;
     const uiFeedbackPort = ports?.uiFeedbackPort || null;
     const controllerPort = {};
 

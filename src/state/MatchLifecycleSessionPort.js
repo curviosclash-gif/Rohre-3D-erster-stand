@@ -87,7 +87,7 @@ export function createMatchSessionPort(runtime) {
             if (!entityManager || !powerupManager) return;
 
             for (const player of entityManager.players) {
-                player.trail.clear();
+                player?.trail?.clear?.();
             }
             powerupManager.clear();
 

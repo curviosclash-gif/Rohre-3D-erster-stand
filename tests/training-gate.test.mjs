@@ -34,7 +34,11 @@ function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function acquireLatestIndexLock(timeoutMs = 10000) {
+async function forceCleanStaleLock() {
+    await rm(LATEST_LOCK_PATH, { recursive: true, force: true });
+}
+
+async function acquireLatestIndexLock(timeoutMs = 30000) {
     const startedAt = Date.now();
     while ((Date.now() - startedAt) < timeoutMs) {
         try {
@@ -49,6 +53,9 @@ async function acquireLatestIndexLock(timeoutMs = 10000) {
     }
     throw new Error(`latest-index lock timeout after ${timeoutMs}ms`);
 }
+
+// Clean up stale lock from any previous crashed test run.
+await forceCleanStaleLock();
 
 function parseLastJsonObject(stdout) {
     const source = String(stdout || '');

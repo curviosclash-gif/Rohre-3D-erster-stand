@@ -53,9 +53,10 @@ export function toggleCinematicRecordingFromHotkey({ game, getRuntimeHandle, sho
         return true;
     }
     if (wasRecording) {
-        recorder.stopRecording({ type: 'cinematic_switch_stop' }).catch(() => {}).then(() => {
-            startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder });
-        });
+        recorder.stopRecording({ type: 'cinematic_switch_stop' }).then(
+            () => startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder }),
+            () => startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder }),
+        );
         return true;
     }
     startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder });

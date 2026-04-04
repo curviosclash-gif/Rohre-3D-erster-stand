@@ -52,8 +52,7 @@ import {
     toTimestamp,
 } from './StorageLobbyServiceSupport.js';
 export const MENU_MULTIPLAYER_EVENT_TYPES = LOBBY_SERVICE_EVENT_TYPES;
-const MULTIPLAYER_CHANNEL_NAME = 'cuviosclash.multiplayer.v1'; const MATCH_START_MAX_AGE_MS = 12000;
-const MATCH_START_CLEAR_DELAY_MS = 2500;
+const MULTIPLAYER_CHANNEL_NAME = 'cuviosclash.multiplayer.v1'; const MATCH_START_MAX_AGE_MS = 12000; const MATCH_START_CLEAR_DELAY_MS = 2500;
 export class StorageLobbyService {
     constructor(options = {}) {
         const runtime = options.runtime && typeof options.runtime === 'object' ? options.runtime : {};
@@ -521,6 +520,8 @@ export class StorageLobbyService {
     getSnapshot() {
         return deepClone(this._sessionSnapshot);
     }
+
+    getConnectionContext() { return { isHost: this._sessionState.isHost === true, playerId: this._peerId, lobbyCode: this._activeLobbyCode, transport: this.transport }; }
 
     getEvents() {
         return this._events.slice();

@@ -59,10 +59,11 @@ export class HudRuntimeSystem {
         if (Number.isInteger(projection?.localPlayerIndex)) {
             return projection.localPlayerIndex;
         }
-        return this.game?.runtimeFacade?.session?.localPlayerId
-            ? (this.game.runtimeFacade.session.getPlayers?.() || [])
-                .findIndex((p) => p.id === this.game.runtimeFacade.session.localPlayerId)
-            : 0;
+        const session = this.game?.runtimeFacade?.session;
+        const localPlayerId = session?.localPlayerId;
+        if (!localPlayerId) return 0;
+        const players = session?.getPlayers?.() || [];
+        return players.findIndex((p) => p.id === localPlayerId);
     }
 
     /**
