@@ -4,12 +4,60 @@ const CHECKER_TEXTURE_CACHE = new Map();
 const CHECKPOINT_LABEL_TEXTURE_CACHE = new Map();
 const MATERIAL_BUNDLE_CACHE = new Map();
 
-function createCheckerTexture(lightColor, darkColor) {
-    const size = 128;
-    const half = size / 2;
+function canCreateCanvasElement() {
+    return typeof document !== 'undefined' && typeof document.createElement === 'function';
+}
+
+function createCanvasSurface(size) {
+    if (!canCreateCanvasElement()) {
+        return null;
+    }
+
     const canvas = document.createElement('canvas');
     canvas.width = size;
     canvas.height = size;
+    return canvas;
+}
+
+function hexColorToRgba(color) {
+    const safeColor = Number(color) >>> 0;
+    return [
+        (safeColor >> 16) & 0xff,
+        (safeColor >> 8) & 0xff,
+        safeColor & 0xff,
+        0xff,
+    ];
+}
+
+function createEmptyTexture() {
+    const texture = new THREE.Texture();
+    texture.needsUpdate = true;
+    return texture;
+}
+
+function createHeadlessCheckerTexture(lightColor, darkColor) {
+    const light = hexColorToRgba(lightColor);
+    const dark = hexColorToRgba(darkColor);
+    const texture = new THREE.DataTexture(new Uint8Array([
+        ...light, ...dark,
+        ...dark, ...light,
+    ]), 2, 2, THREE.RGBAFormat);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.magFilter = THREE.NearestFilter;
+    texture.minFilter = THREE.NearestFilter;
+    texture.generateMipmaps = false;
+    texture.needsUpdate = true;
+    return texture;
+}
+
+function createCheckerTexture(lightColor, darkColor) {
+    const size = 128;
+    const half = size / 2;
+    const canvas = createCanvasSurface(size);
+    if (!canvas) {
+        return createHeadlessCheckerTexture(lightColor, darkColor);
+    }
 
     const ctx = canvas.getContext('2d');
     const light = `#${lightColor.toString(16).padStart(6, '0')}`;
@@ -42,15 +90,14 @@ function getBaseCheckerTexture(lightColor, darkColor) {
 
 function createCheckpointLabelTexture(label) {
     const size = 128;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
+    const canvas = createCanvasSurface(size);
+    if (!canvas) {
+        return createEmptyTexture();
+    }
 
     const ctx = canvas.getContext('2d');
     if (!ctx) {
-        const texture = new THREE.Texture();
-        texture.needsUpdate = true;
-        return texture;
+        return createEmptyTexture();
     }
 
     ctx.clearRect(0, 0, size, size);
