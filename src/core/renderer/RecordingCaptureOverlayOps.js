@@ -26,7 +26,7 @@ function drawHudSegment({
     ctx.fillStyle = titleColor;
     ctx.font = `${Math.max(14, Math.floor(height * 0.054))}px "Segoe UI", sans-serif`;
     ctx.fillText(
-        labelText || `P${(Number(player?.index) || 0) + 1}`,
+        labelText || `P${(Number(player?.playerIndex ?? player?.index) || 0) + 1}`,
         x + padding + 10,
         y + padding + Math.max(20, Math.floor(height * 0.09))
     );
@@ -42,7 +42,7 @@ function drawHudSegment({
     const hpMax = Math.max(0.01, Number(player?.maxHp) || 1);
     const hpRatio = Math.max(0, Math.min(1, hpCurrent / hpMax));
     const boostCurrent = Math.max(0, Number(player?.boostCharge) || Number(player?.boostTimer) || 0);
-    const boostMax = Math.max(0.01, Number(boostDuration) || 1);
+    const boostMax = Math.max(0.01, Number(player?.boostCapacity) || Number(boostDuration) || 1);
     const boostRatio = Math.max(0, Math.min(1, boostCurrent / boostMax));
 
     const barWidth = panelWidth - 20;
@@ -117,7 +117,7 @@ export function storeCaptureMeta(baseMeta, segments) {
         ...baseMeta,
         segments: (segments || []).map((segment) => ({
             label: segment.label,
-            playerIndex: Number(segment?.player?.index ?? segment?.playerIndex ?? -1),
+            playerIndex: Number(segment?.player?.playerIndex ?? segment?.player?.index ?? segment?.playerIndex ?? -1),
             x: Math.floor(segment.x),
             y: Math.floor(segment.y),
             width: Math.floor(segment.width),

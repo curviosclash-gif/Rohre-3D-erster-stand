@@ -331,7 +331,90 @@ export class EntityManager {
         }
     }
 
-    updateCameras(dt, renderAlpha = 1, useRenderedTransforms = false) {
+    updateCameras(dt, renderAlpha = 1, useRenderedTransforms = false, renderProjection = null) {
+        const projectedPlayers = Array.isArray(renderProjection?.players)
+            ? renderProjection.players.filter((player) => player && player.isBot !== true)
+            : null;
+        if (projectedPlayers && projectedPlayers.length > 0) {
+            const hasMultipleHumans = projectedPlayers.length > 1;
+            for (const projectedPlayer of projectedPlayers) {
+                const playerIndex = Number.isInteger(projectedPlayer?.playerIndex)
+                    ? projectedPlayer.playerIndex
+                    : -1;
+                if (playerIndex < 0 || playerIndex >= this.renderer.cameras.length) continue;
+
+                const mode = this.renderer.getCameraMode(playerIndex);
+                this._tmpCamRenderPos.set(
+                    Number(projectedPlayer?.position?.x) || 0,
+                    Number(projectedPlayer?.position?.y) || 0,
+                    Number(projectedPlayer?.position?.z) || 0
+                );
+                this._tmpCamRenderQuat.set(
+                    Number(projectedPlayer?.quaternion?.x) || 0,
+                    Number(projectedPlayer?.quaternion?.y) || 0,
+                    Number(projectedPlayer?.quaternion?.z) || 0,
+                    Number.isFinite(Number(projectedPlayer?.quaternion?.w))
+                        ? Number(projectedPlayer?.quaternion?.w)
+                        : 1
+                );
+
+                const dir = projectedPlayer?.alive !== false
+                    ? this._tmpDir2.set(
+                        Number(projectedPlayer?.direction?.x) || 0,
+                        Number(projectedPlayer?.direction?.y) || 0,
+                        Number(projectedPlayer?.direction?.z) || 0
+                    )
+                    : this._tmpDir2.set(0, 0, -1);
+                if (dir.lengthSq() <= 0.000001) {
+                    dir.set(0, 0, -1);
+                } else {
+                    dir.normalize();
+                }
+
+                const firstPersonAnchor = mode === 'FIRST_PERSON'
+                    ? this._tmpCamAnchor.set(
+                        Number(projectedPlayer?.firstPersonAnchor?.x) || 0,
+                        Number(projectedPlayer?.firstPersonAnchor?.y) || 0,
+                        Number(projectedPlayer?.firstPersonAnchor?.z) || 0
+                    )
+                    : null;
+                let otherPlayerPosition = null;
+                if (hasMultipleHumans) {
+                    const otherPlayer = projectedPlayers.find((entry) => entry && entry.playerIndex !== playerIndex) || null;
+                    if (otherPlayer?.position) {
+                        otherPlayerPosition = this._tmpVec2.set(
+                            Number(otherPlayer.position.x) || 0,
+                            Number(otherPlayer.position.y) || 0,
+                            Number(otherPlayer.position.z) || 0
+                        );
+                    }
+                }
+
+                this.renderer.updateCamera(
+                    playerIndex,
+                    this._tmpCamRenderPos,
+                    dir,
+                    dt,
+                    this._tmpCamRenderQuat,
+                    projectedPlayer?.cockpitCamera === true,
+                    projectedPlayer?.isBoosting === true,
+                    this.arena,
+                    firstPersonAnchor,
+                    {
+                        playerState: {
+                            hp: Number(projectedPlayer?.hp) || 0,
+                            maxHp: Number(projectedPlayer?.maxHp) || 1,
+                            score: Number(projectedPlayer?.score) || 0,
+                            speed: Number(projectedPlayer?.speed) || 0,
+                            isBoosting: projectedPlayer?.isBoosting === true,
+                        },
+                        otherPlayerPosition,
+                    }
+                );
+            }
+            return;
+        }
+
         const hasMultipleHumans = Array.isArray(this.humanPlayers) && this.humanPlayers.length > 1;
         for (const player of this.players) {
             if (!player.isBot && player.index < this.renderer.cameras.length) {

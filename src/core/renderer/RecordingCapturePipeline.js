@@ -39,6 +39,34 @@ function toRatio(value, fallback) {
     return Number.isFinite(numeric) && numeric > 0 ? numeric : fallback;
 }
 
+function applyProjectionVector3(target, source, fallbackX = 0, fallbackY = 0, fallbackZ = 0) {
+    if (!target) return null;
+    const x = Number(source?.x);
+    const y = Number(source?.y);
+    const z = Number(source?.z);
+    target.set(
+        Number.isFinite(x) ? x : fallbackX,
+        Number.isFinite(y) ? y : fallbackY,
+        Number.isFinite(z) ? z : fallbackZ
+    );
+    return target;
+}
+
+function applyProjectionQuaternion(target, source) {
+    if (!target) return null;
+    const x = Number(source?.x);
+    const y = Number(source?.y);
+    const z = Number(source?.z);
+    const w = Number(source?.w);
+    target.set(
+        Number.isFinite(x) ? x : 0,
+        Number.isFinite(y) ? y : 0,
+        Number.isFinite(z) ? z : 0,
+        Number.isFinite(w) ? w : 1
+    );
+    return target;
+}
+
 function createCanvasClone(sourceCanvas, width, height) {
     let canvasClone = null;
     if (sourceCanvas && typeof sourceCanvas.cloneNode === 'function') {
@@ -89,7 +117,6 @@ export class RecordingCapturePipeline {
         this._tmpDirection = new THREE.Vector3();
         this._tmpColor = new THREE.Color();
         this._tmpOtherPosition = new THREE.Vector3();
-        this._tmpOtherQuaternion = new THREE.Quaternion();
         this._lastMeta = null;
     }
 
@@ -133,11 +160,11 @@ export class RecordingCapturePipeline {
         return cloneJsonValue(this._lastMeta);
     }
 
-    _resolveRecordingPlayers(entityManager) {
-        const players = Array.isArray(entityManager?.players)
-            ? entityManager.players.filter((player) => player && player.isBot !== true)
+    _resolveRecordingPlayers(renderProjection) {
+        const players = Array.isArray(renderProjection?.players)
+            ? renderProjection.players.filter((player) => player && player.isBot !== true)
             : [];
-        players.sort((left, right) => (left.index || 0) - (right.index || 0));
+        players.sort((left, right) => (left.playerIndex || 0) - (right.playerIndex || 0));
         return players;
     }
 
@@ -265,13 +292,19 @@ export class RecordingCapturePipeline {
         return Math.max(0, Number(renderDelta) || 0) * scaled;
     }
 
-    _updateShortsCamera({ slotIndex, player, otherPlayer, renderAlpha, renderDelta, arena }) {
+    _updateShortsCamera({ slotIndex, player, otherPlayer, renderDelta, arena }) {
         if (!player) return false;
         this._shortsCameraRig.cameraModes[slotIndex] = 0;
         const slotStyle = this._resolveShortsSlotStyle();
         const useRecordingOrbit = typeof slotStyle === 'string' && slotStyle.length > 0;
-        player.resolveRenderTransform(renderAlpha, this._tmpPosition, this._tmpQuaternion);
-        this._tmpDirection.set(0, 0, -1).applyQuaternion(this._tmpQuaternion);
+        applyProjectionVector3(this._tmpPosition, player?.position);
+        applyProjectionQuaternion(this._tmpQuaternion, player?.quaternion);
+        applyProjectionVector3(this._tmpDirection, player?.direction, 0, 0, -1);
+        if (this._tmpDirection.lengthSq() <= 0.000001) {
+            this._tmpDirection.set(0, 0, -1);
+        } else {
+            this._tmpDirection.normalize();
+        }
         this._shortsCameraRig.updateCamera(
             slotIndex,
             this._tmpPosition,
@@ -279,18 +312,15 @@ export class RecordingCapturePipeline {
             renderDelta,
             this._tmpQuaternion,
             false,
-            player.isBoosting === true,
+            player?.isBoosting === true,
             arena,
             null
         );
 
         // Resolve other player's position for duel-focus detection.
         let otherPos = null;
-        if (otherPlayer && typeof otherPlayer.resolveRenderTransform === 'function') {
-            const tmpOther = this._tmpOtherPosition;
-            const tmpOtherQ = this._tmpOtherQuaternion;
-            otherPlayer.resolveRenderTransform(renderAlpha, tmpOther, tmpOtherQ);
-            otherPos = tmpOther;
+        if (otherPlayer?.position) {
+            otherPos = applyProjectionVector3(this._tmpOtherPosition, otherPlayer.position);
         }
 
         const camera = this._shortsCameraRig.cameras[slotIndex];
@@ -310,11 +340,11 @@ export class RecordingCapturePipeline {
             arena,
             slotStyle,
             playerState: {
-                hp: Number(player.hp) || 0,
-                maxHp: Number(player.maxHp) || 1,
-                score: Number(player.score) || 0,
-                speed: Number(player.speed) || 0,
-                isBoosting: player.isBoosting === true,
+                hp: Number(player?.hp) || 0,
+                maxHp: Number(player?.maxHp) || 1,
+                score: Number(player?.score) || 0,
+                speed: Number(player?.speed) || 0,
+                isBoosting: player?.isBoosting === true,
             },
             otherPlayerPosition: otherPos,
             baseFov,
@@ -326,7 +356,7 @@ export class RecordingCapturePipeline {
         this._lastMeta = storeCaptureMeta(baseMeta, segments);
     }
 
-    _prepareStandardSurface({ entityManager, splitScreen }) {
+    _prepareStandardSurface({ renderProjection, splitScreen }) {
         const targetCanvas = this._ensureCaptureCanvas(this.sourceCanvas?.width, this.sourceCanvas?.height);
         const ctx = this._captureCtx;
         if (!targetCanvas || !ctx || !this.sourceCanvas) return;
@@ -336,7 +366,7 @@ export class RecordingCapturePipeline {
         ctx.clearRect(0, 0, width, height);
         ctx.drawImage(this.sourceCanvas, 0, 0, width, height);
 
-        const players = this._resolveRecordingPlayers(entityManager);
+        const players = this._resolveRecordingPlayers(renderProjection);
         if (players.length === 0) {
             this._storeMeta({
                 profile: RECORDING_CAPTURE_PROFILE.STANDARD,
@@ -349,8 +379,8 @@ export class RecordingCapturePipeline {
             return;
         }
 
-        const player1 = players.find((entry) => entry.index === 0) || players[0];
-        const player2 = players.find((entry) => entry.index === 1) || players[1] || null;
+        const player1 = players.find((entry) => entry.playerIndex === 0) || players[0];
+        const player2 = players.find((entry) => entry.playerIndex === 1) || players[1] || null;
         const segments = [];
         if (splitScreen && player2) {
             const halfWidth = Math.floor(width * 0.5);
@@ -367,7 +397,6 @@ export class RecordingCapturePipeline {
                 height,
                 segments,
                 tmpColor: this._tmpColor,
-                boostDuration: Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1,
             });
         }
 
@@ -403,11 +432,11 @@ export class RecordingCapturePipeline {
         return true;
     }
 
-    _prepareShortsSurface({ entityManager, renderAlpha, renderDelta, splitScreen }) {
+    _prepareShortsSurface({ renderProjection, renderDelta, splitScreen, arena = null }) {
         const sizes = this._resolveShortsCaptureSize();
         const halfHeight = Math.floor(sizes.height / 2);
         const viewAspect = toRatio(sizes.width / Math.max(1, halfHeight), 1);
-        const players = this._resolveRecordingPlayers(entityManager);
+        const players = this._resolveRecordingPlayers(renderProjection);
 
         if (players.length === 0) {
             // No human players — render scene with a static fallback camera
@@ -437,24 +466,22 @@ export class RecordingCapturePipeline {
             return;
         }
 
-        const player1 = players.find((entry) => entry.index === 0) || players[0];
-        const player2 = players.find((entry) => entry.index === 1) || players[1] || player1;
+        const player1 = players.find((entry) => entry.playerIndex === 0) || players[0];
+        const player2 = players.find((entry) => entry.playerIndex === 1) || players[1] || player1;
         this._ensureShortsCameraCount(2, viewAspect);
         this._updateShortsCamera({
             slotIndex: 0,
             player: player1,
             otherPlayer: player2 !== player1 ? player2 : null,
-            renderAlpha,
             renderDelta,
-            arena: entityManager?.arena || null,
+            arena,
         });
         this._updateShortsCamera({
             slotIndex: 1,
             player: player2,
             otherPlayer: player2 !== player1 ? player1 : null,
-            renderAlpha,
             renderDelta,
-            arena: entityManager?.arena || null,
+            arena,
         });
 
         const cameras = this._shortsCameraRig.cameras;
@@ -480,7 +507,6 @@ export class RecordingCapturePipeline {
                 height: sizes.height,
                 segments,
                 tmpColor: this._tmpColor,
-                boostDuration: Number(CONFIG?.PLAYER?.BOOST_DURATION) || 1,
             });
         }
         // Letterbox bars are drawn on every shot transition, regardless of HUD mode.
@@ -519,8 +545,8 @@ export class RecordingCapturePipeline {
 
     prepareFrame({
         recordingActive = false,
-        entityManager = null,
-        renderAlpha = 1,
+        renderProjection = null,
+        arena = null,
         renderDelta = 1 / 60,
         splitScreen = false,
     } = {}) {
@@ -529,17 +555,17 @@ export class RecordingCapturePipeline {
             this.setActive(true);
         }
         if (this._settings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT) {
-            this._prepareShortsSurface({ entityManager, renderAlpha, renderDelta, splitScreen });
+            this._prepareShortsSurface({ renderProjection, renderDelta, splitScreen, arena });
             return;
         }
         if (this._settings.profile === RECORDING_CAPTURE_PROFILE.CINEMATIC_MP4) {
-            this._prepareCinematicSurface({ entityManager, renderAlpha, renderDelta });
+            this._prepareCinematicSurface({ renderProjection, renderDelta, arena });
             return;
         }
         // Always copy the WebGL source canvas to a preserved 2D capture canvas.
         // Without this, preserveDrawingBuffer:false on the main renderer can
         // cause black frames on some browsers/drivers (notably Windows + ANGLE).
-        this._prepareStandardSurface({ entityManager, splitScreen });
+        this._prepareStandardSurface({ renderProjection, splitScreen });
     }
 
 
@@ -604,7 +630,7 @@ export class RecordingCapturePipeline {
         };
     }
 
-    _prepareCinematicSurface({ entityManager, renderAlpha, renderDelta }) {
+    _prepareCinematicSurface({ renderProjection, renderDelta, arena = null }) {
         // Cap to 1920×1080 to stay within AVC Level 4.2 limits and ensure even dimensions.
         const { width, height } = this._resolveCinematicCaptureSize();
         const cinRenderer = this._ensureCinematicRenderer(width, height);
@@ -618,7 +644,7 @@ export class RecordingCapturePipeline {
             return;
         }
 
-        const players = this._resolveRecordingPlayers(entityManager);
+        const players = this._resolveRecordingPlayers(renderProjection);
         const player = players[0] || null;
         const otherPlayer = players[1] || null;
 
@@ -632,9 +658,15 @@ export class RecordingCapturePipeline {
         camera.updateProjectionMatrix();
         this._cinematicCameraRig.cameraModes[0] = 0;
 
-        if (player && typeof player.resolveRenderTransform === 'function') {
-            player.resolveRenderTransform(renderAlpha, this._tmpPosition, this._tmpQuaternion);
-            this._tmpDirection.set(0, 0, -1).applyQuaternion(this._tmpQuaternion);
+        if (player) {
+            applyProjectionVector3(this._tmpPosition, player?.position);
+            applyProjectionQuaternion(this._tmpQuaternion, player?.quaternion);
+            applyProjectionVector3(this._tmpDirection, player?.direction, 0, 0, -1);
+            if (this._tmpDirection.lengthSq() <= 0.000001) {
+                this._tmpDirection.set(0, 0, -1);
+            } else {
+                this._tmpDirection.normalize();
+            }
 
             this._cinematicCameraRig.updateCamera(
                 0,
@@ -643,17 +675,14 @@ export class RecordingCapturePipeline {
                 renderDelta,
                 this._tmpQuaternion,
                 false,
-                player.isBoosting === true,
-                entityManager?.arena || null,
+                player?.isBoosting === true,
+                arena,
                 null
             );
 
             let otherPos = null;
-            if (otherPlayer && typeof otherPlayer.resolveRenderTransform === 'function') {
-                const tmpOther = this._tmpOtherPosition;
-                const tmpOtherQ = this._tmpOtherQuaternion;
-                otherPlayer.resolveRenderTransform(renderAlpha, tmpOther, tmpOtherQ);
-                otherPos = tmpOther;
+            if (otherPlayer?.position) {
+                otherPos = applyProjectionVector3(this._tmpOtherPosition, otherPlayer.position);
             }
 
             this._cinematicOrbitDirector.apply({
@@ -663,14 +692,14 @@ export class RecordingCapturePipeline {
                 playerPosition: this._tmpPosition,
                 playerDirection: this._tmpDirection,
                 dt: Math.max(0, Number(renderDelta) || 0),
-                arena: entityManager?.arena || null,
+                arena,
                 slotStyle: SLOT_STYLE.CINEMATIC,
                 playerState: {
-                    hp: Number(player.hp) || 0,
-                    maxHp: Number(player.maxHp) || 1,
-                    score: Number(player.score) || 0,
-                    speed: Number(player.speed) || 0,
-                    isBoosting: player.isBoosting === true,
+                    hp: Number(player?.hp) || 0,
+                    maxHp: Number(player?.maxHp) || 1,
+                    score: Number(player?.score) || 0,
+                    speed: Number(player?.speed) || 0,
+                    isBoosting: player?.isBoosting === true,
                 },
                 otherPlayerPosition: otherPos,
                 baseFov: camera.fov || CONFIG.CAMERA.FOV,

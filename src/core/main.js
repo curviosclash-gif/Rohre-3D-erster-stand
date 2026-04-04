@@ -419,15 +419,18 @@ export class Game {
         const numericRenderDelta = Number(renderDelta);
         this._renderAlpha = Number.isFinite(numericAlpha) ? Math.max(0, Math.min(1, numericAlpha)) : 1;
         this._renderDelta = Number.isFinite(numericRenderDelta) ? Math.max(0, Math.min(0.05, numericRenderDelta)) : (1 / 60);
+        let matchRenderProjection = null;
 
         if (this.state === GAME_STATE_IDS.PLAYING || this.state === GAME_STATE_IDS.PAUSED) {
             this.playingStateSystem.render(this._renderAlpha, this._renderDelta);
+            matchRenderProjection = this.playingStateSystem.getMatchRenderProjection();
         }
         const renderStart = this.runtimePerfProfiler?.startSample?.();
         this.renderer.render();
         this.renderer.prepareRecordingCaptureFrame({
             recordingActive: this.mediaRecorderSystem?.isRecording?.() === true,
-            entityManager: this.entityManager,
+            renderProjection: matchRenderProjection,
+            arena: this.arena,
             renderAlpha: this._renderAlpha,
             renderDelta: this._renderDelta,
             splitScreen: this.renderer?.splitScreen === true,

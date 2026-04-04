@@ -10,6 +10,7 @@ export class PlayingStateSystem {
         this._lastOverheatSnapshotVersion = -1;
         this._simSnapshot = null;
         this._simSnapshotTick = 0;
+        this._matchRenderProjection = null;
         // V84: optional MatchKernelInteractiveAdapter; when set, simulation tick
         // is driven through the kernel instead of direct game.* calls.
         this._kernelAdapter = null;
@@ -112,9 +113,16 @@ export class PlayingStateSystem {
         return this._simSnapshot;
     }
 
+    getMatchRenderProjection() {
+        return this._matchRenderProjection;
+    }
+
     render(alpha = 1, renderDelta = null) {
         const game = this.game;
-        if (!game?.entityManager) return;
+        if (!game?.entityManager) {
+            this._matchRenderProjection = null;
+            return;
+        }
 
         const numericAlpha = Number(alpha);
         const renderAlpha = Number.isFinite(numericAlpha) ? Math.max(0, Math.min(1, numericAlpha)) : 1;
@@ -132,8 +140,11 @@ export class PlayingStateSystem {
         });
 
         game.entityManager.renderInterpolatedTransforms(renderAlpha);
+        this._matchRenderProjection = game?.runtimeBundle?.ports?.runtimeProjectionPort?.getMatchRenderProjection?.({
+            renderAlpha,
+        }) || null;
         const cameraStart = game.runtimePerfProfiler?.startSample?.();
-        game.entityManager.updateCameras(cameraDt, renderAlpha, true);
+        game.entityManager.updateCameras(cameraDt, renderAlpha, true, this._matchRenderProjection);
         game.runtimePerfProfiler?.endSample?.('camera', cameraStart);
         game.crosshairSystem.updateCrosshairs();
     }
