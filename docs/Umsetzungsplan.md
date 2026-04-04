@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-04 (V84 84.5.2 Folgeverbrauch fuer Replay/Training/Netzwerk verankert; V84 steht vor 84.99)
+Stand: 2026-04-04 (V84 84.99.1 Architektur-/Governance-Gates plus Headless-Smoke gruen; 84.99.2 Dokumentationsabschluss offen)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -85,7 +85,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | Agent-B | V72 | 2026-04-02 | active | `72.2` abgeschlossen; `72.3` Portal-/Gate-Vertraege haerten steht an |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
 | - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
-| - | V84 | 2026-04-04 | active | `84.5` abgeschlossen; Architekturkontext sowie Replay-/Training-/Netzwerk-Folgehinweise sind verankert; `84.99` Abschluss-Gate steht an |
+| - | V84 | 2026-04-04 | active | `84.99.1` gruensicher; `84.99.2` dokumentiert als naechste offene Subphase Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
 | - | V85 | - | frei | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
