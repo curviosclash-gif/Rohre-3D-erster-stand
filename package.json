@@ -56,6 +56,7 @@
     "smoke:selftrail": "npm run build && node scripts/self-trail-debug-smoke.mjs",
     "smoke:roundstate": "node scripts/round-state-controller-smoke.mjs",
     "smoke:arcade": "node scripts/arcade-run-smoke.mjs",
+    "smoke:headless-kernel": "node scripts/headless-match-kernel-smoke.mjs",
     "bot:validate": "node dev/scripts/bot-validation-runner.mjs",
     "bot:validate:publish": "node dev/scripts/bot-validation-runner.mjs --publish-evidence true",
     "benchmark:baseline": "node scripts/bot-benchmark-baseline.mjs",
