@@ -9,6 +9,10 @@ export class HUD {
         this.container = document.getElementById(elementId);
         this.playerIndex = playerIndex;
         this.configSource = options?.configSource || null;
+        this.ports = options?.ports || null;
+        this._getCamera = typeof options?.getCamera === 'function'
+            ? options.getCamera
+            : () => null;
 
         // Elements
         this.horizon = this.container.querySelector('.hud-horizon');
@@ -38,6 +42,9 @@ export class HUD {
         // Temp vectors/objects
         this._vec = new THREE.Vector3();
         this._euler = new THREE.Euler();
+        this._quat = new THREE.Quaternion();
+        this._playerPosition = new THREE.Vector3();
+        this._targetPosition = new THREE.Vector3();
     }
 
     _setStyle(element, property, value) {
@@ -63,15 +70,14 @@ export class HUD {
     }
 
     _createPitchLadder() {
-        // Create lines for -90 to +90 degrees
-        for (let i = -18; i <= 18; i++) { // Every 5 degrees
-            if (i === 0) continue; // Skip 0 (horizon)
+        for (let i = -18; i <= 18; i++) {
+            if (i === 0) continue;
             const deg = i * 5;
             const line = document.createElement('div');
             line.className = 'pitch-line';
             line.dataset.deg = deg;
-            line.style.top = `${-deg * 8}px`; // 8px per degree
-            line.style.width = `${120 - Math.abs(deg) * 0.5}px`; // Narrower at poles
+            line.style.top = `${-deg * 8}px`;
+            line.style.width = `${120 - Math.abs(deg) * 0.5}px`;
             if (deg < 0) {
                 line.style.borderTopStyle = 'dashed';
             }
@@ -80,16 +86,14 @@ export class HUD {
     }
 
     _createTapeScales() {
-        // Simple lines for speed/alt
-        this._fillScale(this.speedScale, 0, 100, 10, 'px', 20); // 20px step
-        this._fillScale(this.altScale, 0, 200, 10, 'px', 20);
+        this._fillScale(this.speedScale, 0, 100, 10, 20);
+        this._fillScale(this.altScale, 0, 200, 10, 20);
 
-        // Compass for heading: N, E, S, W
         const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
         for (let i = 0; i <= 360; i += 15) {
             const tick = document.createElement('div');
             tick.style.position = 'absolute';
-            tick.style.left = `${i * 4}px`; // 4px per degree
+            tick.style.left = `${i * 4}px`;
             tick.style.height = i % 90 === 0 ? '10px' : '5px';
             tick.style.borderLeft = '1px solid #0f0';
             tick.style.bottom = '0';
@@ -107,7 +111,7 @@ export class HUD {
         }
     }
 
-    _fillScale(container, min, max, step, unit, pxPerStep) {
+    _fillScale(container, min, max, step, pxPerStep) {
         for (let v = min; v <= max; v += step) {
             const tick = document.createElement('div');
             tick.style.position = 'absolute';
@@ -140,29 +144,42 @@ export class HUD {
         }
     }
 
-    update(player, dt, entityManager) {
+    update(player, _dt, context = {}) {
         if (!player || !player.alive) {
             this.setVisibility(false);
             return;
         }
-        const gameplayConfig = resolveGameplayConfig({
+
+        const fallbackGameplayConfig = resolveGameplayConfig({
             config: this.configSource,
             entityRuntimeConfig: player?.entityRuntimeConfig || null,
         });
+        const boostCapacity = Math.max(
+            0.001,
+            Number(player?.boostCapacity) || Number(fallbackGameplayConfig.PLAYER?.BOOST_DURATION) || 1
+        );
+        const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
+        const isBoostRecharging = typeof player?.boostRecharging === 'boolean'
+            ? player.boostRecharging
+            : (!player?.manualBoostActive && boostCharge < (boostCapacity - 0.001));
+        const planarMode = typeof player?.planarMode === 'boolean'
+            ? player.planarMode
+            : fallbackGameplayConfig.GAMEPLAY?.PLANAR_MODE === true;
+        const cameraModeId = String(
+            player?.cameraModeId
+            || fallbackGameplayConfig.CAMERA?.MODES?.[player?.cameraMode]
+            || 'THIRD_PERSON'
+        ).trim() || 'THIRD_PERSON';
 
-        // --- Boost Bar Update (immer sichtbar) ---
         if (this.boostFill) {
-            const boostCapacity = Math.max(0.001, Number(gameplayConfig.PLAYER?.BOOST_DURATION) || 1);
-            const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
             const pct = (boostCharge / boostCapacity) * 100;
-            const isRecharging = !player?.manualBoostActive && boostCharge < (boostCapacity - 0.001);
             this._setStyle(this.boostFill, 'width', `${pct.toFixed(1)}%`);
-            this._setClassFlag(this.boostFill, 'cooldown', isRecharging);
+            this._setClassFlag(this.boostFill, 'cooldown', isBoostRecharging);
         }
 
         if (this.lifeBar && this.lifeFill) {
-            const maxHp = Math.max(1, Number(player.maxHp) || 1);
-            const hp = Math.max(0, Number(player.hp) || 0);
+            const maxHp = Math.max(1, Number(player?.maxHp) || 1);
+            const hp = Math.max(0, Number(player?.hp) || 0);
             const showLifeBar = maxHp > 1;
             this._setClassFlag(this.lifeBar, 'hidden', !showLifeBar);
             if (showLifeBar) {
@@ -173,113 +190,91 @@ export class HUD {
             }
         }
 
-        // Only show fighter flight instruments in FIRST_PERSON
-        const camMode = gameplayConfig.CAMERA?.MODES?.[player.cameraMode];
-        if (camMode !== 'FIRST_PERSON') {
+        if (cameraModeId !== 'FIRST_PERSON') {
             this.setVisibility(false);
             return;
         }
 
         this.setVisibility(true);
 
-
-        // 1. Attitude (Pitch + Heading)
-        // Horizon stays stabilized instead of rolling with camera.
-        // Three.js Euler Order YXZ means: Y=Yaw, X=Pitch, Z=Roll
-        this._euler.setFromQuaternion(player.quaternion, 'YXZ');
+        this._quat.set(
+            Number(player?.quaternion?.x) || 0,
+            Number(player?.quaternion?.y) || 0,
+            Number(player?.quaternion?.z) || 0,
+            Number(player?.quaternion?.w) || 1
+        );
+        this._euler.setFromQuaternion(this._quat, 'YXZ');
         const pitchDeg = THREE.MathUtils.radToDeg(this._euler.x);
-        const yawDeg = THREE.MathUtils.radToDeg(this._euler.y); // Heading
+        const yawDeg = THREE.MathUtils.radToDeg(this._euler.y);
         const rollDeg = THREE.MathUtils.radToDeg(this._euler.z);
-        const planarMode = !!gameplayConfig.GAMEPLAY.PLANAR_MODE;
 
-        // Stabilized horizon: no roll rotation
         this._setStyle(this.horizon, 'transform', 'translate(-50%, -50%)');
-
-        // Move Pitch Ladder
-        // 8px per degree pitch, without roll coupling
         this._setStyle(this.pitchLadder, 'transform', `translate(-50%, -50%) translateY(${pitchDeg * 8}px)`);
 
-        // Bank indicator: rotating line + angle in center
         if (this.bankLine) {
             this._setStyle(this.bankLine, 'transform', `translate(-50%, -50%) rotate(${rollDeg}deg)`);
         }
         if (this.bankAngle) {
             const rollInt = Math.round(rollDeg);
             const sign = rollInt > 0 ? '+' : '';
-            this._setText(this.bankAngle, `${sign}${rollInt}°`);
+            this._setText(this.bankAngle, `${sign}${rollInt} deg`);
         }
 
-        // In non-planar mode the HUD crosshair replaces the DOM crosshair.
         if (this.centerCrosshair) {
             this._setClassFlag(this.centerCrosshair, 'hidden', planarMode);
         }
 
-        // 2. Speed & Alt
-        const speed = Math.round(player.speed * 10); // Scale up a bit
-        const alt = Math.round(player.position.y);
+        const speed = Math.round((Number(player?.speed) || 0) * 10);
+        const alt = Math.round(Number(player?.position?.y) || 0);
 
         this._setText(this.speedValue, String(speed));
         this._setText(this.altValue, String(alt));
-
-        // Move Scales (center current value)
-        // Using pixel steps defined in creation
-        this._setStyle(this.speedScale, 'transform', `translateY(0) translateY(${speed * 2}px)`); // 2px per unit (20px per 10 units)
+        this._setStyle(this.speedScale, 'transform', `translateY(0) translateY(${speed * 2}px)`);
         this._setStyle(this.altScale, 'transform', `translateY(0) translateY(${alt * 2}px)`);
 
-        // 3. Heading
         let heading = -yawDeg;
         if (heading < 0) heading += 360;
         heading = heading % 360;
         const headingInt = Math.round(heading);
 
         this._setText(this.headingValue, headingInt.toString().padStart(3, '0'));
-        // 4px per degree, centered at 50% (offset 360/2 * 4 ?)
-        // Simply shift: -heading * 4px
-        // But we want 0 (North) centered.
-        // Let's just shift text track.
         this._setStyle(this.headingScale, 'transform', `translateX(-50%) translateX(${-heading * 4}px)`);
 
-        // 4. Lock-On Reticle
-        const target = entityManager.getLockOnTarget(player.index);
-        if (target && target.alive) {
-            // Project 3D pos to 2D screen
-            // We need camera! Passed via context? 
-            // Better: We just simulate it or get screen pos if we have camera access.
-            // Since this class doesn't have direct camera access easily without re-architecture,
-            // we will fetch camera from renderer if available.
-
-            // Access Renderer instance via global or pass it?
-            // Passing via update args is best.
-            // NOTE: For now assuming centered lock if strict angle, but proper projection is needed.
-            // Let's grab camera from renderer properly.
-
+        const lockTarget = context?.lockTarget || null;
+        if (lockTarget && lockTarget.alive) {
             this._setClassFlag(this.lockReticle, 'hidden', false);
-            const dist = Math.round(player.position.distanceTo(target.position));
+            this._playerPosition.set(
+                Number(player?.position?.x) || 0,
+                Number(player?.position?.y) || 0,
+                Number(player?.position?.z) || 0,
+            );
+            this._targetPosition.set(
+                Number(lockTarget?.position?.x) || 0,
+                Number(lockTarget?.position?.y) || 0,
+                Number(lockTarget?.position?.z) || 0,
+            );
+            const dist = Math.round(this._playerPosition.distanceTo(this._targetPosition));
             this._setText(this.lockDist, `${dist}m`);
 
-            // Getting screen position requires camera matrix
-            // This is tricky without reference.
-            // Let's assume we can get it from renderer.
-            const camera = entityManager.renderer.cameras[player.index];
+            const camera = typeof context?.getCamera === 'function'
+                ? context.getCamera(this.playerIndex)
+                : this._getCamera(this.playerIndex);
             if (camera) {
-                this._vec.copy(target.position);
-                this._vec.project(camera); // -1 to 1
+                this._vec.copy(this._targetPosition);
+                this._vec.project(camera);
 
-                const x = (this._vec.x * .5 + .5) * this.container.clientWidth;
-                const y = (-(this._vec.y * .5) + .5) * this.container.clientHeight;
+                const x = (this._vec.x * 0.5 + 0.5) * this.container.clientWidth;
+                const y = (-(this._vec.y * 0.5) + 0.5) * this.container.clientHeight;
 
-                // Check if behind
                 if (this._vec.z < 1) {
                     this._setStyle(this.lockReticle, 'left', `${x}px`);
                     this._setStyle(this.lockReticle, 'top', `${y}px`);
                 } else {
-                    this._setClassFlag(this.lockReticle, 'hidden', true); // Behind camera
+                    this._setClassFlag(this.lockReticle, 'hidden', true);
                 }
             }
-
         } else {
             this._setClassFlag(this.lockReticle, 'hidden', true);
         }
-
     }
 }

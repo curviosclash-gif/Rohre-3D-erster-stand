@@ -5,6 +5,7 @@ import {
     createSessionRuntimeSnapshot,
 } from '../contracts/SessionRuntimeSnapshotContract.js';
 import { createArcadePort, createRecordingPort } from './GameRuntimeFeaturePorts.js';
+import { buildMatchRuntimeProjection as buildMatchRuntimeProjectionSnapshot } from './MatchRuntimeProjectionBuilder.js';
 
 function noop() {}
 
@@ -283,6 +284,9 @@ export function createRuntimeProjectionPort(game) {
         },
         getMatchFlowSnapshot() {
             return buildMatchFlowProjection(game);
+        },
+        getMatchRuntimeProjection() {
+            return buildMatchRuntimeProjectionSnapshot({ game, runtimeState: getRuntimeState(game), facade: getRuntimeFacade(game), sessionRuntime: getSessionRuntime(game) });
         },
         getRuntimeObservabilitySnapshot() {
             return buildRuntimeObservabilityProjection(game);

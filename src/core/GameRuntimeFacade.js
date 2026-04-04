@@ -245,6 +245,13 @@ export class GameRuntimeFacade {
     _resetArcadeRunState() { this.arcadeRunRuntime.resetRunState({ preserveRecords: true }); }
     getArcadeRunState() { return this.arcadeRunRuntime.getStateSnapshot(); }
     getArcadeMenuSurfaceState() { return this.arcadeRunRuntime.getMenuSurfaceState?.() || null; }
+    tickArcadeSuddenDeath(dt = 0) {
+        const hudState = this.arcadeRunRuntime.getHudState?.();
+        if (!hudState || String(hudState.phase || '') !== 'sudden_death') return null;
+        const strategy = this.getRuntimeState()?.entityManager?.gameModeStrategy || this.game?.entityManager?.gameModeStrategy || null;
+        if (typeof strategy?.tickSuddenDeath !== 'function') return null;
+        return strategy.tickSuddenDeath(Math.max(0, Number(dt) || 0));
+    }
     selectArcadeIntermissionChoice(choiceId) { return this.arcadeRunRuntime.selectIntermissionChoice?.(choiceId); }
     selectArcadeReward(rewardId) { return this.arcadeRunRuntime.selectReward?.(rewardId); }
     requestArcadeReplayPlayback() { return this.arcadeRunRuntime.requestReplayPlayback?.(); }

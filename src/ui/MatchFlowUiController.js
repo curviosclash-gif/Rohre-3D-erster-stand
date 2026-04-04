@@ -98,6 +98,7 @@ export class MatchFlowUiController {
         this._arcadeOverlayPanel = null;
         this._arcadeXpAnimFrame = 0;
         this._arcadeXpAnimToken = 0;
+        this._huntDamageIndicatorSequence = 0;
     }
 
     get game() {
@@ -106,6 +107,10 @@ export class MatchFlowUiController {
 
     _resolveMessageStatsContainer() {
         return this.game?.ui?.messageStats || null;
+    }
+
+    _getMatchRuntimeProjection() {
+        return this.runtimePort?.getMatchRuntimeProjection?.() || null;
     }
 
     _clearMessageStatsUi() {
@@ -317,10 +322,10 @@ export class MatchFlowUiController {
 
     _syncArcadeOverlayPanel() {
         const game = this.game;
-        const modePath = String(game?.settings?.localSettings?.modePath || '').trim().toLowerCase();
-        const arcadeEnabled = game?.runtimeConfig?.arcade?.enabled === true;
+        const runtimeProjection = this._getMatchRuntimeProjection();
+        const arcadeActive = String(runtimeProjection?.modeId || '').toUpperCase() === 'ARCADE';
         const overlayVisible = !!game?.ui?.messageOverlay && !game.ui.messageOverlay.classList.contains('hidden');
-        if (!arcadeEnabled || modePath !== 'arcade' || !overlayVisible) {
+        if (!arcadeActive || !overlayVisible) {
             this._clearArcadeOverlayPanel();
             return;
         }
@@ -473,10 +478,14 @@ export class MatchFlowUiController {
         if (damageValue <= 0) return;
 
         const intensity = THREE.MathUtils.clamp(0.2 + damageValue / 60, 0.2, 1.0);
+        const durationSeconds = THREE.MathUtils.clamp(0.35 + intensity * 0.55, 0.35, 0.95);
+        this._huntDamageIndicatorSequence += 1;
         const nextIndicator = {
             angleDeg: this._resolveDamageIndicatorAngle(target, event),
             intensity,
-            ttl: THREE.MathUtils.clamp(0.35 + intensity * 0.55, 0.35, 0.95),
+            expiresAtMs: Date.now() + Math.round(durationSeconds * 1000),
+            remainingMs: Math.round(durationSeconds * 1000),
+            sequence: this._huntDamageIndicatorSequence,
         };
         if (!game.huntState.damageIndicatorsByPlayer || typeof game.huntState.damageIndicatorsByPlayer !== 'object') {
             game.huntState.damageIndicatorsByPlayer = {};
@@ -727,9 +736,7 @@ export class MatchFlowUiController {
         const ghostClip = getLastRoundGhostClip(this.runtimePort, game, {
             displayDuration: game.roundPause,
         });
-        const huntSummary = game.entityManager?.getHuntScoreboardSummary
-            ? game.entityManager.getHuntScoreboardSummary(4)
-            : '';
+        const huntSummary = this._getMatchRuntimeProjection()?.hunt?.scoreboardSummary || '';
         if (huntSummary) {
             if (!roundEndPlan.uiState) roundEndPlan.uiState = {};
             const baseText = String(roundEndPlan.uiState.messageText || '').trim();

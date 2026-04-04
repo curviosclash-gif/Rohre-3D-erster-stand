@@ -21,7 +21,7 @@ function normalizeConstructorOptions(input) {
     if (!input || typeof input !== 'object') {
         return { runtime: null };
     }
-    const optionKeys = ['runtime', 'refs', 'isHuntActive', 'getBoostCapacity', 'documentRef', 'game'];
+    const optionKeys = ['runtime', 'ports', 'refs', 'isHuntActive', 'getBoostCapacity', 'documentRef', 'game'];
     const isOptionsObject = optionKeys.some((key) => Object.prototype.hasOwnProperty.call(input, key));
     if (isOptionsObject) {
         return input;
@@ -46,6 +46,7 @@ export class HuntHUD {
         const refs = options.refs ?? createHuntHudDomRefs(options.documentRef);
 
         this.runtime = options.runtime ?? options.game ?? null;
+        this.ports = options.ports || null;
         this.root = refs.root ?? null;
         this.p1ShieldFill = refs.p1ShieldFill ?? null;
         this.p1ShieldText = refs.p1ShieldText ?? null;
@@ -83,6 +84,10 @@ export class HuntHUD {
             : () => DEFAULT_BOOST_CAPACITY;
     }
 
+    _getMatchRuntimeProjection() {
+        return this.ports?.runtimeProjectionPort?.getMatchRuntimeProjection?.() || null;
+    }
+
     _resolveUiHotpathInterval(key, fallback) {
         const configured = Number(this.runtime?.runtimeConfig?.uiHotpath?.[key]);
         if (Number.isFinite(configured) && configured > 0) {
@@ -107,10 +112,14 @@ export class HuntHUD {
         this._indicatorTickTimer = 0;
         this.damageIndicatorP1?.classList.add('hidden');
         this.damageIndicatorP2?.classList.add('hidden');
-        for (const c of this._panelCache) {
-            c.shieldW = null; c.shieldTxt = null;
-            c.boostW = null; c.boostCooldown = null; c.boostTxt = null;
-            c.overheatW = null; c.overheatTxt = null;
+        for (const cache of this._panelCache) {
+            cache.shieldW = null;
+            cache.shieldTxt = null;
+            cache.boostW = null;
+            cache.boostCooldown = null;
+            cache.boostTxt = null;
+            cache.overheatW = null;
+            cache.overheatTxt = null;
         }
         this._indicatorP2Visible = null;
     }
@@ -118,9 +127,17 @@ export class HuntHUD {
     update(dt) {
         if (!this.root || !this.runtime) return;
 
-        const runtime = this.runtime;
-        const huntActive = this._isHuntActive(runtime);
-        const humans = runtime.entityManager ? runtime.entityManager.getHumanPlayers() : [];
+        const projection = this._getMatchRuntimeProjection();
+        const huntProjection = projection?.hunt || null;
+        const projectedHumans = Array.isArray(projection?.players)
+            ? projection.players.filter((player) => player?.isBot !== true)
+            : null;
+        const humans = projectedHumans
+            || (this.runtime.entityManager ? this.runtime.entityManager.getHumanPlayers() : []);
+        const huntActive = huntProjection
+            ? huntProjection.active === true
+            : this._isHuntActive(this.runtime);
+
         this.root.classList.toggle('hidden', !huntActive);
         if (!huntActive) {
             if (this._wasHuntActive) {
@@ -148,7 +165,7 @@ export class HuntHUD {
                 boostText: this.p1BoostText,
                 overheatFill: this.p1OverheatFill,
                 overheatText: this.p1OverheatText,
-            }, this._panelCache[0]);
+            }, this._panelCache[0], huntProjection);
             if (this.p2Panel) {
                 const p2Visible = humans.length > 1;
                 this.p2Panel.classList.toggle('hidden', !p2Visible);
@@ -160,22 +177,22 @@ export class HuntHUD {
                         boostText: this.p2BoostText,
                         overheatFill: this.p2OverheatFill,
                         overheatText: this.p2OverheatText,
-                    }, this._panelCache[1]);
+                    }, this._panelCache[1], huntProjection);
                 }
             }
         }
 
         if (this._consumeTick('_killFeedTickTimer', dt, killFeedInterval) > 0) {
-            this._updateKillFeed();
+            this._updateKillFeed(huntProjection);
         }
 
         const indicatorElapsed = this._consumeTick('_indicatorTickTimer', dt, indicatorInterval);
         if (indicatorElapsed > 0) {
-            this._updateDamageIndicators(indicatorElapsed, humans);
+            this._updateDamageIndicators(indicatorElapsed, humans, huntProjection);
         }
     }
 
-    _updatePlayerPanel(player, refs, cache = null) {
+    _updatePlayerPanel(player, refs, cache = null, huntProjection = null) {
         const shield = Math.max(0, Number(player?.shieldHP) || 0);
         const maxShield = Math.max(1, Number(player?.maxShieldHp) || 1);
         const shieldRatio = shield / maxShield;
@@ -190,11 +207,16 @@ export class HuntHUD {
             if (cache) cache.shieldTxt = shieldTxt;
         }
 
-        const resolvedBoostCapacity = Number(this._getBoostCapacity(player, this.runtime));
-        const boostCapacity = Math.max(MIN_BOOST_CAPACITY, Number.isFinite(resolvedBoostCapacity) ? resolvedBoostCapacity : DEFAULT_BOOST_CAPACITY);
+        const resolvedBoostCapacity = Number(player?.boostCapacity) || Number(this._getBoostCapacity(player, this.runtime));
+        const boostCapacity = Math.max(
+            MIN_BOOST_CAPACITY,
+            Number.isFinite(resolvedBoostCapacity) ? resolvedBoostCapacity : DEFAULT_BOOST_CAPACITY
+        );
         const boostCharge = Math.max(0, Math.min(boostCapacity, Number(player?.boostCharge) || 0));
         const boostRatio = clamp01(boostCharge / boostCapacity);
-        const isBoostCooldown = !player?.manualBoostActive && boostCharge < (boostCapacity - MIN_BOOST_CAPACITY);
+        const isBoostCooldown = typeof player?.boostRecharging === 'boolean'
+            ? player.boostRecharging
+            : (!player?.manualBoostActive && boostCharge < (boostCapacity - MIN_BOOST_CAPACITY));
         const boostW = toPercent(boostRatio);
         if (refs.boostFill) {
             if (boostW !== cache?.boostW) {
@@ -212,7 +234,10 @@ export class HuntHUD {
             if (cache) cache.boostTxt = boostTxt;
         }
 
-        const overheatValue = Number(this.runtime?.huntState?.overheatByPlayer?.[player?.index] || 0);
+        const overheatValue = Math.max(
+            0,
+            Number(huntProjection?.overheatByPlayer?.[player?.playerIndex ?? player?.index] || this.runtime?.huntState?.overheatByPlayer?.[player?.index] || 0)
+        );
         const overheatRatio = clamp01(overheatValue / OVERHEAT_CAP);
         const overheatW = toPercent(overheatRatio);
         const overheatTxt = `${Math.round(overheatValue)}%`;
@@ -238,13 +263,13 @@ export class HuntHUD {
         }
     }
 
-    _updateKillFeed() {
+    _updateKillFeed(huntProjection = null) {
         if (!this.killFeedList) return;
         this._ensureKillFeedSlots();
 
-        const entries = Array.isArray(this.runtime?.huntState?.killFeed)
-            ? this.runtime.huntState.killFeed
-            : [];
+        const entries = Array.isArray(huntProjection?.killFeed)
+            ? huntProjection.killFeed
+            : (Array.isArray(this.runtime?.huntState?.killFeed) ? this.runtime.huntState.killFeed : []);
 
         const slotCount = this._killFeedSlots.length;
         for (let i = 0; i < slotCount; i += 1) {
@@ -262,8 +287,8 @@ export class HuntHUD {
         }
     }
 
-    _resolveDamageIndicatorState(playerIndex, allowLegacyFallback = false) {
-        const byPlayer = this.runtime?.huntState?.damageIndicatorsByPlayer;
+    _resolveDamageIndicatorState(playerIndex, huntProjection = null, allowLegacyFallback = false) {
+        const byPlayer = huntProjection?.damageIndicatorsByPlayer;
         if (Number.isInteger(playerIndex) && byPlayer && typeof byPlayer === 'object') {
             const indicatorByPlayer = byPlayer[playerIndex];
             if (indicatorByPlayer) {
@@ -271,18 +296,25 @@ export class HuntHUD {
             }
         }
         if (!allowLegacyFallback) return null;
-        return this.runtime?.huntState?.damageIndicator || null;
+        return huntProjection?.damageIndicator || this.runtime?.huntState?.damageIndicator || null;
     }
 
     _updateDamageIndicatorElement(element, indicator, dt) {
         if (!element) return;
-        if (!indicator || indicator.ttl <= 0) {
+        if (!indicator) {
             element.classList.add('hidden');
             return;
         }
 
-        indicator.ttl = Math.max(0, indicator.ttl - dt);
-        if (indicator.ttl <= 0) {
+        let remainingMs = Number(indicator.remainingMs);
+        if (!Number.isFinite(remainingMs)) {
+            const legacyTtl = Number(indicator.ttl);
+            if (Number.isFinite(legacyTtl)) {
+                indicator.ttl = Math.max(0, legacyTtl - dt);
+                remainingMs = indicator.ttl * 1000;
+            }
+        }
+        if (!(remainingMs > 0)) {
             element.classList.add('hidden');
             return;
         }
@@ -294,7 +326,7 @@ export class HuntHUD {
         element.style.transform = `translate(-50%, -50%) rotate(${angle.toFixed(1)}deg)`;
     }
 
-    _updateDamageIndicators(dt, humans = []) {
+    _updateDamageIndicators(dt, humans = [], huntProjection = null) {
         const p1 = humans[0] || null;
         const p2Visible = humans.length > 1;
         if (p2Visible !== this._indicatorP2Visible) {
@@ -306,7 +338,7 @@ export class HuntHUD {
             }
             this._indicatorP2Visible = p2Visible;
         }
-        const p1Indicator = this._resolveDamageIndicatorState(p1?.index, true);
+        const p1Indicator = this._resolveDamageIndicatorState(p1?.playerIndex ?? p1?.index, huntProjection, true);
         this._updateDamageIndicatorElement(this.damageIndicatorP1, p1Indicator, dt);
 
         if (!p2Visible) {
@@ -314,7 +346,7 @@ export class HuntHUD {
             return;
         }
         const p2 = humans[1] || null;
-        const p2Indicator = this._resolveDamageIndicatorState(p2?.index, false);
+        const p2Indicator = this._resolveDamageIndicatorState(p2?.playerIndex ?? p2?.index, huntProjection, false);
         this._updateDamageIndicatorElement(this.damageIndicatorP2, p2Indicator, dt);
     }
 
@@ -329,5 +361,6 @@ export class HuntHUD {
         this._killFeedCachedTexts.fill('');
         this._wasHuntActive = false;
         this.runtime = null;
+        this.ports = null;
     }
 }

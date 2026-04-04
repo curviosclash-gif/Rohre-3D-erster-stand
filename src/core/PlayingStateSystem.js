@@ -79,6 +79,7 @@ export class PlayingStateSystem {
             game.arena.update(dt);
         }
 
+        game.runtimeFacade?.tickArcadeSuddenDeath?.(dt);
         game.hudRuntimeSystem.updatePlayingHudTick(dt);
         game._applyPlayingTimeScaleFromEffects();
 

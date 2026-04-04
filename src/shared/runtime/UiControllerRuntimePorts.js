@@ -56,6 +56,9 @@ export function createMatchFlowUiControllerPort(ports = null) {
     if (typeof runtimeProjectionPort?.getSessionRuntimeSnapshot === 'function') {
         controllerPort.getSessionRuntimeSnapshot = () => runtimeProjectionPort.getSessionRuntimeSnapshot();
     }
+    if (typeof runtimeProjectionPort?.getMatchRuntimeProjection === 'function') {
+        controllerPort.getMatchRuntimeProjection = () => runtimeProjectionPort.getMatchRuntimeProjection();
+    }
     if (typeof runtimeIntentPort?.startMatch === 'function') {
         controllerPort.startMatch = (options = undefined) => runtimeIntentPort.startMatch(options);
     }

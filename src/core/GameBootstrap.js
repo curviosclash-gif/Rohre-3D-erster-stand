@@ -135,12 +135,19 @@ export function bootstrapGameRuntime(game, options = {}) {
 
     const runtimePorts = createRuntimePorts(game);
     runtimeBundle.ports = runtimePorts;
-    registerRuntimeHandle('hudP1', new HUD('p1-fighter-hud', 0, { configSource: game }));
-    registerRuntimeHandle('hudP2', new HUD('p2-fighter-hud', 1, { configSource: game }));
+    registerRuntimeHandle('hudP1', new HUD('p1-fighter-hud', 0, {
+        ports: runtimePorts,
+        getCamera: (playerIndex) => renderer?.cameras?.[playerIndex] || null,
+    }));
+    registerRuntimeHandle('hudP2', new HUD('p2-fighter-hud', 1, {
+        ports: runtimePorts,
+        getCamera: (playerIndex) => renderer?.cameras?.[playerIndex] || null,
+    }));
     const matchSessionOrchestrator = new MatchLifecycleSessionOrchestrator(createMatchSessionPort(game));
     registerRuntimeHandle('matchSessionOrchestrator', matchSessionOrchestrator);
     registerRuntimeHandle('huntHud', new HuntHUD({
         runtime: game,
+        ports: runtimePorts,
         refs: createHuntHudDomRefs(document),
         isHuntActive: (runtime) => runtime.activeGameMode === GAME_MODE_TYPES.HUNT && runtime.state !== 'MENU',
         getBoostCapacity: () => Number(game.config?.PLAYER?.BOOST_DURATION) || 1,

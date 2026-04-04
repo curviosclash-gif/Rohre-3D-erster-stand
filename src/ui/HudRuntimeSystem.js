@@ -33,10 +33,32 @@ export class HudRuntimeSystem {
         this._lastArcadeSectorIndex = 0;
     }
 
+    _getMatchRuntimeProjection() {
+        return this.ports?.runtimeProjectionPort?.getMatchRuntimeProjection?.() || null;
+    }
+
+    _findProjectedPlayer(projection, playerIndex) {
+        if (!Array.isArray(projection?.players)) return null;
+        return projection.players.find((player) => player?.playerIndex === playerIndex) || null;
+    }
+
+    _findProjectedSessionPlayer(projection, playerIndex) {
+        if (!Array.isArray(projection?.sessionPlayers)) return null;
+        return projection.sessionPlayers.find((player) => player?.playerIndex === playerIndex) || null;
+    }
+
+    _findProjectedLockTarget(projection, playerIndex) {
+        if (!Array.isArray(projection?.lockTargets)) return null;
+        return projection.lockTargets.find((entry) => entry?.playerIndex === playerIndex) || null;
+    }
+
     /**
      * Returns the local player index (0 for host / single-player).
      */
-    _getLocalPlayerIndex() {
+    _getLocalPlayerIndex(projection = null) {
+        if (Number.isInteger(projection?.localPlayerIndex)) {
+            return projection.localPlayerIndex;
+        }
         return this.game?.runtimeFacade?.session?.localPlayerId
             ? (this.game.runtimeFacade.session.getPlayers?.() || [])
                 .findIndex((p) => p.id === this.game.runtimeFacade.session.localPlayerId)
@@ -46,36 +68,41 @@ export class HudRuntimeSystem {
     /**
      * Returns true if this is a network session.
      */
-    _isNetworkSession() {
+    _isNetworkSession(projection = null) {
+        if (typeof projection?.isNetworkSession === 'boolean') {
+            return projection.isNetworkSession;
+        }
         return !!this.game?.runtimeConfig?.session?.networkEnabled;
     }
 
-    updateScoreHud() {
+    updateScoreHud(projection = null) {
         const game = this.game;
+        const runtimeProjection = projection || this._getMatchRuntimeProjection();
 
         // Network mode: update N-player scoreboard
-        if (this._isNetworkSession()) {
-            this._updateNetworkScoreboard();
+        if (this._isNetworkSession(runtimeProjection)) {
+            this._updateNetworkScoreboard(runtimeProjection);
             // Still update local player's item bar
-            const localIdx = Math.max(0, this._getLocalPlayerIndex());
-            const localPlayer = game.entityManager?.players?.[localIdx];
+            const localIdx = Math.max(0, this._getLocalPlayerIndex(runtimeProjection));
+            const localPlayer = this._findProjectedPlayer(runtimeProjection, localIdx)
+                || game.entityManager?.players?.[localIdx];
             if (localPlayer && game.ui.p1Items) {
-                this._updateItemBar(game.ui.p1Items, localPlayer);
+                this._updateItemBar(game.ui.p1Items, localPlayer, runtimeProjection);
             }
             return;
         }
 
         // Original local scoreboard logic
-        const humans = game.entityManager?.getHumanPlayers
-            ? game.entityManager.getHumanPlayers()
-            : [];
+        const humans = Array.isArray(runtimeProjection?.players)
+            ? runtimeProjection.players.filter((player) => player?.isBot !== true)
+            : (game.entityManager?.getHumanPlayers ? game.entityManager.getHumanPlayers() : []);
 
         if (humans.length > 0) {
             const p1Score = String(humans[0].score);
             if (game.ui.p1Score.textContent !== p1Score) {
                 game.ui.p1Score.textContent = p1Score;
             }
-            this._updateItemBar(game.ui.p1Items, humans[0]);
+            this._updateItemBar(game.ui.p1Items, humans[0], runtimeProjection);
         }
 
         if (humans.length > 1) {
@@ -83,7 +110,7 @@ export class HudRuntimeSystem {
             if (game.ui.p2Score.textContent !== p2Score) {
                 game.ui.p2Score.textContent = p2Score;
             }
-            this._updateItemBar(game.ui.p2Items, humans[1]);
+            this._updateItemBar(game.ui.p2Items, humans[1], runtimeProjection);
         }
     }
 
@@ -91,9 +118,9 @@ export class HudRuntimeSystem {
      * Renders a dynamic N-player scoreboard for network sessions (up to 10 players).
      * Shows all players with score and ping indicator.
      */
-    _updateNetworkScoreboard() {
+    _updateNetworkScoreboard(projection = null) {
         const game = this.game;
-        const players = game.entityManager?.players;
+        const players = Array.isArray(projection?.players) ? projection.players : game.entityManager?.players;
         if (!players || players.length === 0) return;
 
         const container = this._ensureScoreboardContainer();
@@ -110,8 +137,9 @@ export class HudRuntimeSystem {
             container.removeChild(container.lastChild);
         }
 
-        const session = game.runtimeFacade?.session;
-        const sessionPlayers = session?.getPlayers?.() || [];
+        const sessionPlayers = Array.isArray(projection?.sessionPlayers)
+            ? projection.sessionPlayers
+            : (game.runtimeFacade?.session?.getPlayers?.() || []);
 
         for (let i = 0; i < players.length; i++) {
             const p = players[i];
@@ -127,8 +155,10 @@ export class HudRuntimeSystem {
             if (scoreEl.textContent !== scoreStr) scoreEl.textContent = scoreStr;
 
             // Ping from session peer data (if available)
-            const peer = sessionPlayers.find((sp) => sp.index === p.index);
-            const pingMs = peer?.ping ?? (p.isBot ? 0 : -1);
+            const playerIndex = p?.playerIndex ?? p?.index ?? i;
+            const peer = this._findProjectedSessionPlayer(projection, playerIndex)
+                || sessionPlayers.find((sp) => (sp?.playerIndex ?? sp?.index) === playerIndex);
+            const pingMs = peer?.pingMs ?? peer?.ping ?? (p.isBot ? 0 : -1);
             const pingLabel = pingMs >= 0 ? `${pingMs}ms` : '';
             if (pingEl.textContent !== pingLabel) pingEl.textContent = pingLabel;
         }
@@ -203,17 +233,15 @@ export class HudRuntimeSystem {
         this._lastArcadeSectorIndex = 0;
     }
 
-    _updateArcadeHud(dt = 0) {
+    _updateArcadeHud(projection = null) {
         const game = this.game;
-        const arcadeEnabled = game?.runtimeConfig?.arcade?.enabled === true;
-        const modePath = String(game?.settings?.localSettings?.modePath || '').trim().toLowerCase();
-        if (!arcadeEnabled || modePath !== 'arcade') {
+        const hudState = projection?.arcade || null;
+        const arcadeActive = String(projection?.modeId || '').toUpperCase() === 'ARCADE';
+        if (!arcadeActive || !hudState) {
             this._hideArcadeHud();
             return;
         }
 
-        const arcadeRuntime = game?.runtimeFacade?.arcadeRunRuntime;
-        const hudState = arcadeRuntime?.getHudState?.();
         if (!hudState || hudState.phase === 'finished') {
             this._hideArcadeHud();
             return;
@@ -226,12 +254,6 @@ export class HudRuntimeSystem {
 
         const nowMs = Math.max(0, Number(hudState.nowMs) || Date.now());
         const suddenDeathActive = String(hudState.phase || '') === 'sudden_death';
-        if (suddenDeathActive) {
-            const strategy = game?.entityManager?.gameModeStrategy;
-            if (strategy && typeof strategy.tickSuddenDeath === 'function') {
-                strategy.tickSuddenDeath(Math.max(0, Number(dt) || 0));
-            }
-        }
         this._arcadeSuddenDeathOverlay?.classList?.toggle('hidden', !suddenDeathActive);
 
         const sectorIndex = Math.max(0, Math.floor(Number(hudState.sectorIndex) || 0));
@@ -266,15 +288,19 @@ export class HudRuntimeSystem {
         }
     }
 
-    _updateParcoursHud() {
+    _updateParcoursHud(projection = null) {
         const game = this.game;
         const ui = game?.ui;
-        if (!ui?.parcoursHud || !game?.entityManager) return;
+        if (!ui?.parcoursHud) return;
 
-        const localPlayerIndex = this._isNetworkSession()
-            ? Math.max(0, this._getLocalPlayerIndex())
-            : 0;
-        const hudState = game.entityManager.getParcoursHudState(localPlayerIndex);
+        const hudState = projection?.parcours
+            || (game?.entityManager
+                ? game.entityManager.getParcoursHudState(
+                    this._isNetworkSession(projection)
+                        ? Math.max(0, this._getLocalPlayerIndex(projection))
+                        : 0
+                )
+                : null);
         if (!hudState?.enabled) {
             this._setParcoursHudVisible(false);
             this._clearParcoursHud();
@@ -313,7 +339,7 @@ export class HudRuntimeSystem {
         }
     }
 
-    _updateItemBar(container, player) {
+    _updateItemBar(container, player, projection = null) {
         const powerupConfig = resolveGameplayConfig(this.game).POWERUP;
         this._ensureItemSlots(container);
         const inventory = Array.isArray(player?.inventory) ? player.inventory : [];
@@ -321,8 +347,7 @@ export class HudRuntimeSystem {
         const selectedIndex = inventoryLength > 0
             ? Math.max(0, Math.min(Number(player?.selectedItemIndex) || 0, inventoryLength - 1))
             : -1;
-        const strategy = this.game?.entityManager?.gameModeStrategy || null;
-        const modeType = String(strategy?.modeType || 'CLASSIC').trim().toUpperCase();
+        const modeType = String(projection?.modeId || 'CLASSIC').trim().toUpperCase();
         const useCooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
         const shootCooldownRemaining = Math.max(0, Number(player?.shootCooldown || 0));
 
@@ -430,41 +455,55 @@ export class HudRuntimeSystem {
     updatePlayingHudTick(dt) {
         const game = this.game;
         if (!game.entityManager) return;
-        this._updateParcoursHud();
+        const projection = this._getMatchRuntimeProjection();
+        this._updateParcoursHud(projection);
 
         // Score/Inventory laufen auf eigener, konservativer Tick-Frequenz.
         const scoreHudInterval = this._resolveScoreHudInterval();
         game._hudTimer += dt;
         if (game._hudTimer >= scoreHudInterval) {
             game._hudTimer %= scoreHudInterval;
-            this.updateScoreHud();
+            this.updateScoreHud(projection);
         }
 
         const fighterHudInterval = this._resolveFighterHudInterval();
         const fighterElapsed = this._consumeInterval('_fighterHudTimer', dt, fighterHudInterval);
         if (fighterElapsed > 0) {
-            this._updateArcadeHud(fighterElapsed);
+            this._updateArcadeHud(projection);
         }
 
         // FIGHTER HUD UPDATE
-        const localHumans = game.numHumans || 1;
-        const networkSession = this._isNetworkSession();
+        const localHumans = Math.max(1, Number(projection?.localHumanCount || game.numHumans) || 1);
+        const networkSession = this._isNetworkSession(projection);
         // In network mode only 1 local player — no P2 HUD
         this._setHudP2Visibility(!networkSession && localHumans >= 2);
         if (fighterElapsed <= 0) return;
 
         if (networkSession) {
             // Show only the local player's fighter HUD
-            const localIdx = Math.max(0, this._getLocalPlayerIndex());
-            const localPlayer = game.entityManager.players[localIdx];
-            if (localPlayer) game.hudP1.update(localPlayer, fighterElapsed, game.entityManager);
+            const localIdx = Math.max(0, this._getLocalPlayerIndex(projection));
+            const localPlayer = this._findProjectedPlayer(projection, localIdx)
+                || game.entityManager.players[localIdx];
+            if (localPlayer) {
+                game.hudP1.update(localPlayer, fighterElapsed, {
+                    lockTarget: this._findProjectedLockTarget(projection, localIdx),
+                });
+            }
         } else {
-            const p1 = game.entityManager.players[0];
-            if (p1) game.hudP1.update(p1, fighterElapsed, game.entityManager);
+            const p1 = this._findProjectedPlayer(projection, 0) || game.entityManager.players[0];
+            if (p1) {
+                game.hudP1.update(p1, fighterElapsed, {
+                    lockTarget: this._findProjectedLockTarget(projection, 0),
+                });
+            }
 
             if (localHumans >= 2) {
-                const p2 = game.entityManager.players[1];
-                if (p2) game.hudP2.update(p2, fighterElapsed, game.entityManager);
+                const p2 = this._findProjectedPlayer(projection, 1) || game.entityManager.players[1];
+                if (p2) {
+                    game.hudP2.update(p2, fighterElapsed, {
+                        lockTarget: this._findProjectedLockTarget(projection, 1),
+                    });
+                }
             }
         }
     }
