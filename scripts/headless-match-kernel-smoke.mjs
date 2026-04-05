@@ -24,7 +24,7 @@ function createSmokeSettings() {
             sessionType: 'single',
         },
         mode: '1p',
-        mapKey: 'arena3',
+        mapKey: 'standard',
         gameMode: 'CLASSIC',
         numBots: 1,
         winsNeeded: 3,
@@ -136,7 +136,14 @@ async function main() {
     console.log(JSON.stringify({ ok: true, summary }, null, 2));
 }
 
+const SMOKE_TIMEOUT_MS = 15000;
+const safetyTimer = setTimeout(() => {
+    console.error('[headless-smoke] timeout after ' + SMOKE_TIMEOUT_MS + 'ms — forcing exit');
+    process.exit(2);
+}, SMOKE_TIMEOUT_MS);
+safetyTimer.unref?.();
+
 main().catch((error) => {
     console.error(error?.stack || String(error));
-    process.exitCode = 1;
+    process.exit(1);
 });

@@ -149,7 +149,8 @@ export class HudRuntimeSystem {
             const scoreEl = row.children[1];
             const pingEl = row.children[2];
 
-            const label = p.isBot ? `Bot ${p.index + 1}` : `P${p.index + 1}`;
+            const idx = p.playerIndex ?? p.index ?? i;
+            const label = p.isBot ? `Bot ${idx + 1}` : `P${idx + 1}`;
             if (nameEl.textContent !== label) nameEl.textContent = label;
 
             const scoreStr = String(p.score ?? 0);

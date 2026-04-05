@@ -105,7 +105,7 @@ export class CrosshairSystem {
         this._tmpAimDir.set(
             Number(player?.aimDirection?.x) || 0,
             Number(player?.aimDirection?.y) || 0,
-            Number(player?.aimDirection?.z) || -1
+            Number.isFinite(Number(player?.aimDirection?.z)) ? Number(player.aimDirection.z) : -1
         );
         if (this._tmpAimDir.lengthSq() <= 0.000001) {
             this._tmpAimDir.set(0, 0, -1);

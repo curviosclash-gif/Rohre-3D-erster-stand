@@ -54,7 +54,7 @@ function copyPlayerRenderTransform(player, renderAlpha = 1) {
             Number(player?.quaternion?.x) || 0,
             Number(player?.quaternion?.y) || 0,
             Number(player?.quaternion?.z) || 0,
-            Number(player?.quaternion?.w) || 1
+            Number.isFinite(Number(player?.quaternion?.w)) ? Number(player.quaternion.w) : 1
         );
     }
     TMP_RENDER_DIRECTION.set(0, 0, -1).applyQuaternion(TMP_RENDER_QUATERNION);

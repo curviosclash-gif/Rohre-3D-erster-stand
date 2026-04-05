@@ -205,7 +205,7 @@ export class MatchKernel {
      * deciding when to call this based on RoundStateController output.
      */
     signalRoundEnd({ roundPause = 3 } = {}) {
-        if (this._lifecycle === 'running') {
+        if (this._lifecycle === 'running' || this._lifecycle === 'round_end') {
             this._lifecycle = 'round_end';
             this._roundPause = normalizeRoundPause(roundPause, 3);
         } else if (typeof console !== 'undefined') {
@@ -235,6 +235,8 @@ export class MatchKernel {
             this._roundIndex++;
             this._tickIndex = 0;
             this._roundPause = 0;
+        } else if (typeof console !== 'undefined') {
+            console.debug(`[MatchKernel] signalRoundRestart ignored (lifecycle=${this._lifecycle})`);
         }
     }
 

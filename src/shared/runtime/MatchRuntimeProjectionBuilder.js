@@ -14,11 +14,12 @@ function toVector3Projection(value = null) {
 }
 
 function toQuaternionProjection(value = null) {
+    const w = Number(value?.w);
     return {
         x: Number(value?.x) || 0,
         y: Number(value?.y) || 0,
         z: Number(value?.z) || 0,
-        w: Number(value?.w) || 1,
+        w: Number.isFinite(w) ? w : 1,
     };
 }
 
