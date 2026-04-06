@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-04 (V84 84.99.1 Architektur-/Governance-Gates plus Headless-Smoke gruen; 84.99.2 Dokumentationsabschluss offen)
+Stand: 2026-04-06 (V84 84.99.2 Dokumentationsabschluss abgeschlossen; V87 87.3.1 Command-/Snapshot-Semantik angeglichen; V72 bleibt in 72.3 aktiv)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -28,8 +28,10 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
 | V74 | Architektur-Runtime-Entkopplung (Refresh) | done | P1 | frei | V58.99,V60.3 | 74.99 | `docs/plaene/alt/V74.md` |
 | V83 | Architektur SessionRuntime und Plattform-Capabilities | done | P1 | frei | V74.99 | 83.99 | `docs/plaene/alt/V83.md` |
-| V84 | Headless MatchKernel und einheitliche GameMode-API | active | P2 | frei | V83.99 | 84.99 | `docs/plaene/aktiv/V84.md` |
+| V84 | Headless MatchKernel und einheitliche GameMode-API | done | P2 | frei | V83.99 | 84.99 | `docs/plaene/aktiv/V84.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | planned | P2 | frei | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
+| V87 | Runtime-Hardening-Followup | active | P2 | Bot-Codex | V83.99 | 87.3 | `docs/plaene/aktiv/V87.md` |
+| V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
@@ -55,11 +57,15 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V83 | V74.99 | hard | ja | SessionRuntime-, Command/Event- und Capability-Folgeschnitt setzt die Runtime-Entkopplung aus V74 als Baseline voraus |
 | V83 | V77 Surface-Policy | soft | nein | Desktop-Vollversion und Browser-Demo sollen spaeter dieselben Capability-Grenzen nutzen; Policy kann parallel vorbereitet, aber vor 83.99 abgeglichen werden |
 | V83 | V67/V68 Abschlussstand | soft | ja | Arcade- und Multiplayer-Lifecycle aus den Altbloecken liefern den Regression-Scope fuer Runtime-Kern, Lobby-Service und Finalize-Contracts |
-| V84 | V83.99 | hard | nein | Headless MatchKernel und GameMode-API bauen auf dem SessionRuntime-, Command/Event- und Capability-Vertrag aus V83 auf |
+| V84 | V83.99 | hard | ja | Headless MatchKernel und GameMode-API bauen auf dem SessionRuntime-, Command/Event- und Capability-Vertrag aus V83 auf |
 | V84 | V72.99 | soft | nein | Powerup-, Portal- und Gate-Vertraege sollten vor der GameMode-Vereinheitlichung stabil sein |
 | V84 | V82.99 | soft | nein | Arcade-Parcours-, XP- und Progressionsregeln liefern relevanten Scope fuer eine einheitliche GameMode-API |
-| V85 | V83.99 | hard | nein | Versionierte Persistence- und Content-Vertraege sollen erst nach stabilisiertem Runtime-, Capability- und Legacy-Sunset-Vertrag aufsetzen |
-| V85 | V84.99 | soft | nein | Headless Kernel und GameMode-API liefern spaeter den saubereren Verbrauchspfad fuer Replay-, Snapshot- und Content-Projektionen |
+| V85 | V83.99 | hard | ja | Versionierte Persistence- und Content-Vertraege sollen erst nach stabilisiertem Runtime-, Capability- und Legacy-Sunset-Vertrag aufsetzen |
+| V85 | V84.99 | soft | ja | Headless Kernel und GameMode-API liefern spaeter den saubereren Verbrauchspfad fuer Replay-, Snapshot- und Content-Projektionen |
+| V87 | V83.99 | hard | ja | Runtime-Hardening-Follow-up setzt den SessionRuntime-, Command/Event- und Capability-Kern aus V83 als Baseline voraus |
+| V87 | V84.99 | soft | ja | Dokumentierter Headless-Boot- und Projektionsvertrag aus V84 soll mit den gehaerteten Runtime-Pfaden abgeglichen werden |
+| V86 | V72.99 | hard | nein | Editor- und Authoring-Vertraege sollen auf stabilen Pickup-, Portal-, Gate- und Spawn-Warnpfaden aus V72 aufsetzen |
+| V86 | V85.99 | soft | nein | Descriptor-, Preset- und Template-Leseweg soll spaeter denselben Content-Vertrag wie V85 nutzen |
 | V77 | V74.99 | hard | ja | Die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` darf erst auf der stabilisierten Runtime-/Capability-Basis aus V74 verankert werden |
 | V75 | V74.99 | hard | ja | Recorder-Finalisierung muss denselben Lifecycle-/Dispose-Vertrag wie V74 nutzen; keine parallelen Sonderpfade fuer Stop, Return-to-Menu oder Shutdown |
 | V75 | V77.99 | hard | nein | Export-, Download- und Browser-Fallbacks muessen der Demo-/Vollversions-Politik aus V77 folgen |
@@ -85,34 +91,68 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | Agent-B | V72 | 2026-04-02 | active | `72.2` abgeschlossen; `72.3` Portal-/Gate-Vertraege haerten steht an |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
 | - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
-| - | V84 | 2026-04-04 | active | `84.99.1` gruensicher; `84.99.2` dokumentiert als naechste offene Subphase Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
+| - | V84 | 2026-04-04 | closed | Abgeschlossen 2026-04-05: `84.99.2` dokumentiert Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
 | - | V85 | - | frei | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
+| Bot-Codex | V87 | 2026-04-05 | active | `87.3.1` schliesst `P8`/`P15` mit gemeinsamem Settings-Apply-Pfad plus Async-Command-Result-Vertrag; als naechstes `87.3.2` Capability-Semantik angleichen |
+| - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
 | - | V82 | - | frei | Nach `V72.99` und `V74.99` mit `82.1` Arcade-Parcours-Vereinigung starten; liefert Daten-Contracts fuer V76.3 |
 | - | V81 | - | frei | Nach `V74.99` und `V72.99` mit `81.1` Registry und Bridge starten |
 
+## Empfohlene Reihenfolge
+
+Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengigkeiten bleiben verbindlich; soft dependencies und Produktreihenfolge entscheiden die Priorisierung innerhalb der moeglichen Starts.
+
+### Sofort laufende oder naechste Abschluesse
+
+1. `V72` bis `72.99` weiterziehen, weil Pickup-, Portal-, Gate- und Spawn-Vertraege mehrere Folgeblocks freischalten.
+2. `V87` als naechsten freien Architekturblock starten, damit offene Runtime-Rennen nicht in V85, V64 oder V75 weitergetragen werden.
+3. `V71.99` opportunistisch schliessen, sobald der Playwright-/Warmup-Blocker belastbar entschaerft oder sauber blockerfest dokumentiert ist.
+
+### Hauptpfad Architektur und Produkt
+
+1. `V87` vor `V85`, weil offene Runtime-Rennen und Capability-Haertung nicht in Persistence-, Multiplayer- oder Recorder-Folgearbeit mitgeschleppt werden sollen.
+2. `V85` vor breiterem Authoring- und Content-Ausbau, damit Presets, Templates, Replay- und Content-Descriptoren einen gemeinsamen Vertragsrahmen bekommen.
+3. `V77` vor `V64`, damit die Produkt- und Surface-Policy `Desktop Vollversion / Browser Demo` vor Multiplayer-Produktisierung feststeht.
+4. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
+
+### Parallelpfad Gameplay und Authoring
+
+1. `V82` kann nach `V72.99` und `V74.99` anlaufen und ist der empfohlene erste Gameplay-Folgeblock, weil er Daten- und Progressionsvertraege fuer `V76` liefert.
+2. `V86` folgt nach `V72.99` bevorzugt hinter `V85`, damit Editor-, Template- und Preset-Lesewege moeglichst direkt auf denselben Content-Vertrag aufsetzen.
+3. `V76` folgt nach `V64.99`, `V77.99` und `V82.99`, weil Hangar-/Werkstatt-Flows sowohl Produktrollen als auch Arcade-Datenvertraege voraussetzen.
+4. `V81` bleibt nach `V72.99` und `V74.99` moeglich, ist aber bewusst nachrangig gegenueber Produkt-, Runtime- und Progressionsarbeit.
+
+### Kurzform
+
+`V72.99 -> V87 -> V85 -> V77 -> V64 -> V75`
+
+Parallel nach `V72.99` moeglich: `V82 -> V86 -> V76`; `V81` zuletzt oder opportunistisch.
+
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
 Identifiziert durch 24h-Commit-Review. Sofort-Fixes (P3, P5, P13) sind bereits committed.
+Abgleich 2026-04-05: `V87 87.1.1` ist dokumentiert. `P1` ist im aktuellen Code-Stand bereits ueber `provisionalId` plus `_pendingSessionInit` guardiert; `P2`, `P4`, `P8`, `P9`, `P10`, `P11`, `P15`, `P16` und `P20` bleiben offene V87-Arbeit.
+`V87 87.1.2` ordnet fuer diese offenen Punkte Zielmodul, Besitzerpfad und Sunset-Kriterium; die kanonische Matrix lebt in `docs/plaene/aktiv/V87.md` und gespiegelt in `docs/referenz/ai_architecture_context.md`.
+`V87 87.2.1` haertet jetzt den Start-/Finalize-Determinismus: `MatchLifecycleSessionOrchestrator` merged Pending-Finalizes und blockiert ueberholte Neustarts, `GameRuntimeSessionHandler` besitzt den autoritativen Start-Inflight-Guard und `SessionRuntimeCommandExecutor.START_MATCH` nutzt keinen separaten Snapshot-Bypass mehr.
+Abgleich 2026-04-06: `V87 87.2.2` schliesst `P4` und `P11`; Finalize-Fehler bleiben jetzt ueber Snapshot-/Guard-State sichtbar, `dispose()` wartet den Finalize-Abschluss ab und fehlgeschlagene Return-to-Menu-Finalizes triggern kein neues Prewarm mehr.
+Abgleich 2026-04-06 (spaet): `V87 87.3.1` schliesst `P8` und `P15`; `APPLY_SETTINGS` sowie `START_MATCH(settingsSnapshot)` nutzen jetzt denselben `RuntimeCommandSettingsService`, `MatchFlowUiController` fuehrt keinen zweiten Settings-Apply mehr aus und async Command-Caller koennen ueber `executeSessionRuntimeCommandResult()` einen settlebaren Fehlervertrag konsumieren. Offene V87-Arbeit bleiben `P2`, `P9`, `P10`, `P16` und `P20`.
 Die folgenden Punkte werden nach Abschluss des jeweiligen Blocks adressiert.
 
-### Nach V83-Abschluss (betrifft scope_files von V83)
+### Im Runtime-Hardening-Follow-up V87 zu adressieren (betrifft scope_files von V83/V87)
 
 | ID | Datei(en) | Problem | Schwere |
 | --- | --- | --- | --- |
 | P1 | `MatchLifecycleSessionOrchestrator.js` | Race Condition: gleichzeitige `createMatchSession()`-Aufrufe koennen duplizierte Session-IDs erzeugen | kritisch |
 | P2 | `MatchFlowUiController.js` | Race Condition: `applyStartMatchProjection()` Guard gegen Doppelklick ist nicht atomar | kritisch |
-| P4 | `GameRuntimeSessionHandler.js` | Fire-and-forget Promise bei Game-Dispose; Finalize-Fehler hinterlassen inkonsistenten Zustand | kritisch |
-| P8 | `SessionRuntimeCommandExecutor.js` | Doppelter Settings-Pfad (APPLY_SETTINGS vs. START_MATCH-Snapshot) kann inkonsistenten State erzeugen | hoch |
 | P9 | `PauseOverlayController.js` | TOCTOU: Pause-State wird gelesen aber kann sich vor Resume-Ausfuehrung aendern | hoch |
 | P10 | `ElectronPlatformBridge.js` | `createIntent()` gibt null zurueck, aber Adapter meldet `available: true` | hoch |
-| P11 | `MatchLifecycleSessionOrchestrator.js` | Error-State geht nach Finalize-Fehler verloren (`_pendingFinalize` wird auf null gesetzt) | mittel |
-| P15 | `SessionRuntimeCommandExecutor.js` | Async-Command-Fehler werden re-thrown ohne Garantie, dass Caller `.catch()` hat | mittel |
 | P16 | `SessionRuntimeStateMachine.js` | Transition FINALIZING-MENU erlaubt Ressourcen-Cleanup zu umgehen | mittel |
+| P20 | `SessionRuntimeObservability.js` | Ineffizientes Array-Splicing statt `.slice(-LIMIT)` | niedrig |
 
-### Nach V83 oder eigenstaendig (nicht in V83 scope_files)
+### In Folgeblocks oder eigenstaendig (nicht in V83/V87 scope_files)
 
 | ID | Datei(en) | Problem | Schwere |
 | --- | --- | --- | --- |
@@ -120,7 +160,6 @@ Die folgenden Punkte werden nach Abschluss des jeweiligen Blocks adressiert.
 | P7 | `vulkan_odyssey.js` | Precision-Plattformen (4x2 Einheiten) vermutlich unspielbar | hoch |
 | P12 | `CheckpointRingMeshFactory.js` | Material-Leak: jeder Checkpoint bekommt neues Material ohne Disposal | mittel |
 | P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()` | mittel |
-| P20 | `SessionRuntimeObservability.js` | Ineffizientes Array-Splicing statt `.slice(-LIMIT)` | niedrig |
 
 ## Conflict-Log
 
