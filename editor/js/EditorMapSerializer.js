@@ -104,6 +104,8 @@ export function generateJSONExport(manager, arenaSize) {
         playerSpawn: { x: -800, y: arenaSize.height * 0.55, z: 0 },
     });
 
+    const editorCheckpoints = [];
+
     manager.core.objectsContainer.children.forEach((obj) => {
         const u = obj.userData || {};
         const p = obj.position;
@@ -185,7 +187,44 @@ export function generateJSONExport(manager, arenaSize) {
                 payload.tunnels.push(tunnelEntry);
             }
         }
+        else if (u.type === 'checkpoint') {
+            editorCheckpoints.push({
+                id: u.id,
+                type: u.subType || 'gate',
+                pos: [p.x, p.y, p.z],
+                radius: u.cpRadius || 5.5,
+                forward: u.cpForward || [1, 0, 0],
+                ...(u.aliasOf ? { aliasOf: u.aliasOf } : {})
+            });
+        }
     });
+
+    // Build parcours block from placed checkpoints
+    if (editorCheckpoints.length > 0) {
+        const finishCp = editorCheckpoints.find((cp) => cp.type === 'finish');
+        const routeCps = editorCheckpoints.filter((cp) => cp.type !== 'finish');
+
+        payload.parcours = {
+            enabled: true,
+            routeId: 'editor_route_v1',
+            rules: {
+                ordered: true,
+                resetOnDeath: true,
+                resetToLastValid: false,
+                maxSegmentTimeMs: 20000,
+                cooldownMs: 450,
+                wrongOrderCooldownMs: 650,
+                errorIndicatorMs: 1400,
+                allowLaneAliases: true,
+                winnerByParcoursComplete: true,
+                animateCheckpoints: true,
+            },
+            checkpoints: routeCps,
+            ...(finishCp ? { finish: finishCp } : {})
+        };
+    } else if (payload.parcours) {
+        // Preserve existing parcours metadata if no checkpoints were placed
+    }
 
     return JSON.stringify(payload, null, 2);
 }
@@ -278,6 +317,28 @@ export function importFromJSON(manager, jsonString, options = {}) {
                         radius: t.radius
                     }, { updateUi: false });
                 });
+            }
+
+            // Import parcours checkpoints as editor objects
+            if (data.parcours && data.parcours.checkpoints) {
+                data.parcours.checkpoints.forEach((cp) => {
+                    const [cx, cy, cz] = cp.pos || [0, 0, 0];
+                    manager.createMesh('checkpoint', cp.type || 'gate', cx, cy, cz, 0, {
+                        id: cp.id,
+                        cpRadius: cp.radius || 5.5,
+                        cpForward: cp.forward || [1, 0, 0],
+                        ...(cp.aliasOf ? { aliasOf: cp.aliasOf } : {})
+                    }, { updateUi: false });
+                });
+                if (data.parcours.finish) {
+                    const fin = data.parcours.finish;
+                    const [fx, fy, fz] = fin.pos || [0, 0, 0];
+                    manager.createMesh('checkpoint', 'finish', fx, fy, fz, 0, {
+                        id: fin.id,
+                        cpRadius: fin.radius || 7.0,
+                        cpForward: fin.forward || [1, 0, 0]
+                    }, { updateUi: false });
+                }
             }
 
             manager.queueSceneUiRefresh({ tunnelVisuals: true });

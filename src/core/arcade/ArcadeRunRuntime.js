@@ -861,6 +861,19 @@ export class ArcadeRunRuntime {
         return this.getStateSnapshot();
     }
 
+    handleMatchEndTelemetry(payload = null) {
+        if (!this._enabled || !this._state || !payload || typeof payload !== 'object') {
+            return this.getStateSnapshot();
+        }
+
+        const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
+        const payloadState = String(payload.state || '').trim().toUpperCase();
+        if (payloadState === 'MATCH_END' || this._state.phase === ARCADE_RUN_PHASES.FINISHED) {
+            this._finalizeRun(nowMs);
+        }
+        return this.getStateSnapshot();
+    }
+
     _recordSectorHistoryEntry(payload, nowMs = Date.now()) {
         if (!this._state) return;
         const lastSectorSummary = this._state.lastSectorSummary;

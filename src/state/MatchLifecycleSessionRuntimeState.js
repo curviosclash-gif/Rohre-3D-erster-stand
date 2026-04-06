@@ -13,6 +13,7 @@ export function createFallbackSessionRuntimeState() {
             lastReason: null,
             lastTrigger: null,
             lastCompletedReason: null,
+            errorMessage: null,
             updatedAt: Date.now(),
         },
         lifecycle: {

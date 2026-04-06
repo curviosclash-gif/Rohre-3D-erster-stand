@@ -183,6 +183,7 @@ function createSessionRuntimeCore({ state, components, ports = null, lifecycle =
             lastReason: null,
             lastTrigger: null,
             lastCompletedReason: null,
+            errorMessage: null,
             updatedAt: Date.now(),
         },
         lifecycle: {
@@ -529,6 +530,7 @@ export function clearGameRuntimeState(bundle, initialOverrides = undefined) {
         sessionRuntime.finalize.lastReason = null;
         sessionRuntime.finalize.lastTrigger = null;
         sessionRuntime.finalize.lastCompletedReason = null;
+        sessionRuntime.finalize.errorMessage = null;
         sessionRuntime.finalize.updatedAt = Date.now();
         sessionRuntime.lifecycle.status = deriveInitialLifecycleStatus({
             gameStateId: sessionRuntime.lifecycle.gameStateId,

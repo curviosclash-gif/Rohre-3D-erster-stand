@@ -110,6 +110,7 @@ export class GameRuntimeFacade {
     getRuntimeState() { return getSessionRuntimeState(this.getRuntimeBundle() || this.game); }
     getRuntimeHandle(key) { return getSessionRuntimeHandle(this.getRuntimeBundle() || this.game, key); }
     getPorts() { return this.getRuntimeHandle('runtimePorts'); }
+    get ports() { return this.getPorts(); }
     getUiManager() { return this.getRuntimeHandle('uiManager') || this.game?.uiManager || null; }
 
     _clearMatchPrewarmTimer() {
@@ -143,6 +144,7 @@ export class GameRuntimeFacade {
     }
 
     executeSessionRuntimeCommand(command = null) { return this.sessionRuntimeCommandExecutor.execute(command); }
+    executeSessionRuntimeCommandResult(command = null) { return this.sessionRuntimeCommandExecutor.executeResult(command); }
 
     _applySettingsToRuntimeInternal(options = {}) {
         const game = this.game;
@@ -376,7 +378,7 @@ export class GameRuntimeFacade {
     }
 
     recordMatchEndTelemetry(payload = null) {
-        this.arcadeRunRuntime.handleRoundEndTelemetry(payload);
+        this.arcadeRunRuntime.handleMatchEndTelemetry(payload);
         return this._recordMenuTelemetry('match_end', payload);
     }
 

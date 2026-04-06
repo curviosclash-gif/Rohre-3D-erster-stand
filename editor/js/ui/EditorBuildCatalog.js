@@ -22,6 +22,12 @@ const CATEGORY_META = Object.freeze({
         label: 'Flugobjekte',
         accentColor: '#34d399',
         description: 'Schiffe und Flugzeuge fuer Deko oder Ziele.'
+    }),
+    parcours: Object.freeze({
+        id: 'parcours',
+        label: 'Parcours',
+        accentColor: '#a78bfa',
+        description: 'Checkpoints, Gates und Finish fuer Parcours-Routen.'
     })
 });
 
@@ -68,7 +74,8 @@ export const EDITOR_BUILD_CATEGORIES = Object.freeze([
     CATEGORY_META.build,
     CATEGORY_META.flow,
     CATEGORY_META.pickups,
-    CATEGORY_META.aircraft
+    CATEGORY_META.aircraft,
+    CATEGORY_META.parcours
 ]);
 
 export const EDITOR_BUILD_ITEMS = Object.freeze([
@@ -661,6 +668,100 @@ export const EDITOR_BUILD_ITEMS = Object.freeze([
         previewToken: 'aircraft-pinnace',
         sortOrder: 140,
         keywords: ['aircraft', 'pinnace']
+    }),
+    createBuildEntry({
+        id: 'parcours-checkpoint-entry',
+        tool: 'checkpoint',
+        subType: 'entry',
+        categoryId: 'parcours',
+        label: 'Start (Entry)',
+        description: 'Einstiegs-Checkpoint am Anfang der Route.',
+        previewGlyph: 'EN',
+        previewToken: 'checkpoint-entry',
+        sortOrder: 10,
+        keywords: ['checkpoint', 'entry', 'start', 'parcours'],
+        badge: 'Start',
+        isFeatured: true,
+        isDefault: true
+    }),
+    createBuildEntry({
+        id: 'parcours-checkpoint-gate',
+        tool: 'checkpoint',
+        subType: 'gate',
+        categoryId: 'parcours',
+        label: 'Gate',
+        description: 'Standard-Checkpoint entlang der Route.',
+        previewGlyph: 'GT',
+        previewToken: 'checkpoint-gate',
+        sortOrder: 20,
+        keywords: ['checkpoint', 'gate', 'parcours'],
+        badge: 'Standard',
+        isFeatured: true
+    }),
+    createBuildEntry({
+        id: 'parcours-checkpoint-tunnel',
+        tool: 'checkpoint',
+        subType: 'tunnel',
+        categoryId: 'parcours',
+        label: 'Tunnel-CP',
+        description: 'Checkpoint innerhalb eines Tunnels.',
+        previewGlyph: 'TN',
+        previewToken: 'checkpoint-tunnel',
+        sortOrder: 30,
+        keywords: ['checkpoint', 'tunnel', 'parcours'],
+        isFeatured: true
+    }),
+    createBuildEntry({
+        id: 'parcours-checkpoint-split',
+        tool: 'checkpoint',
+        subType: 'split',
+        categoryId: 'parcours',
+        label: 'Split (Lane)',
+        description: 'Wegverzweigung – aliasOf fuer Alternativrouten.',
+        previewGlyph: 'SP',
+        previewToken: 'checkpoint-split',
+        sortOrder: 40,
+        keywords: ['checkpoint', 'split', 'lane', 'parcours'],
+        badge: 'Verzweigung',
+        isFeatured: true
+    }),
+    createBuildEntry({
+        id: 'parcours-checkpoint-precision',
+        tool: 'checkpoint',
+        subType: 'precision',
+        categoryId: 'parcours',
+        label: 'Praezision',
+        description: 'Enger Checkpoint fuer Praezisions-Abschnitte.',
+        previewGlyph: 'PR',
+        previewToken: 'checkpoint-precision',
+        sortOrder: 50,
+        keywords: ['checkpoint', 'precision', 'parcours']
+    }),
+    createBuildEntry({
+        id: 'parcours-checkpoint-finish-pre',
+        tool: 'checkpoint',
+        subType: 'finish_pre',
+        categoryId: 'parcours',
+        label: 'Vor-Finish',
+        description: 'Letzter Checkpoint vor dem Ziel.',
+        previewGlyph: 'VF',
+        previewToken: 'checkpoint-finish-pre',
+        sortOrder: 60,
+        keywords: ['checkpoint', 'finish', 'pre', 'parcours']
+    }),
+    createBuildEntry({
+        id: 'parcours-checkpoint-finish',
+        tool: 'checkpoint',
+        subType: 'finish',
+        categoryId: 'parcours',
+        label: 'Finish (Ziel)',
+        description: 'Zielpunkt der Parcours-Route.',
+        previewGlyph: 'FI',
+        previewToken: 'checkpoint-finish',
+        sortOrder: 70,
+        keywords: ['checkpoint', 'finish', 'ziel', 'parcours'],
+        badge: 'Ziel',
+        isFeatured: true
     })
 ].sort((left, right) => left.sortOrder - right.sortOrder || left.label.localeCompare(right.label)));
 

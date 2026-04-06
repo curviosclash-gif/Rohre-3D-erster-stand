@@ -53,10 +53,17 @@ export function toggleCinematicRecordingFromHotkey({ game, getRuntimeHandle, sho
         return true;
     }
     if (wasRecording) {
-        recorder.stopRecording({ type: 'cinematic_switch_stop' }).then(
-            () => startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder }),
-            () => startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder }),
-        );
+        recorder.stopRecording({ type: 'cinematic_switch_stop' })
+            .then((result) => {
+                if (result?.stopped === false) {
+                    showStatusToast('Cinematic-Aufnahme: Fehler beim Wechseln', 2000, 'error');
+                    return result;
+                }
+                return startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder });
+            })
+            .catch(() => {
+                showStatusToast('Cinematic-Aufnahme: Fehler beim Stoppen', 2000, 'error');
+            });
         return true;
     }
     startCinematicRecording({ game, getRuntimeHandle, showStatusToast, recorder });

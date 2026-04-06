@@ -1,5 +1,6 @@
 import { DEFAULT_SHADOW_QUALITY, normalizeShadowQuality } from '../../shared/contracts/ShadowQualityContract.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../../shared/contracts/MatchLifecycleContract.js';
+import { MULTIPLAYER_TRANSPORTS } from '../../shared/contracts/RuntimeSessionContract.js';
 import {
     createMenuEventPlaylistStateDefaults,
     createMenuLocalSettingsDefaults,
@@ -46,6 +47,7 @@ export const MENU_MODE_PATHS = Object.freeze({
 const VALID_DEVELOPER_ACCESS_MODE_SET = new Set(Object.values(MENU_DEVELOPER_ACCESS_MODES));
 const VALID_SESSION_TYPE_SET = new Set(Object.values(MENU_SESSION_TYPES));
 const VALID_MODE_PATH_SET = new Set(Object.values(MENU_MODE_PATHS));
+const VALID_MULTIPLAYER_TRANSPORT_SET = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
 export const LEVEL4_SECTION_IDS = Object.freeze({
     CONTROLS: 'controls',
     GAMEPLAY: 'gameplay',
@@ -65,12 +67,34 @@ function normalizeString(value, fallback) {
 
 function normalizeSessionType(value, fallback = MENU_SESSION_TYPES.SINGLE) {
     const requested = normalizeString(value, fallback).toLowerCase();
+    if (requested === MENU_SESSION_TYPES.LAN) {
+        return MENU_SESSION_TYPES.MULTIPLAYER;
+    }
+    if (requested === MENU_SESSION_TYPES.ONLINE) {
+        return MENU_SESSION_TYPES.MULTIPLAYER;
+    }
     return VALID_SESSION_TYPE_SET.has(requested) ? requested : fallback;
 }
 
 function normalizeModePath(value, fallback = MENU_MODE_PATHS.NORMAL) {
     const requested = normalizeString(value, fallback).toLowerCase();
     return VALID_MODE_PATH_SET.has(requested) ? requested : fallback;
+}
+
+function deriveLegacyMultiplayerTransport(sessionType) {
+    const normalizedSessionType = normalizeString(sessionType, '').toLowerCase();
+    if (normalizedSessionType === MENU_SESSION_TYPES.LAN) {
+        return MULTIPLAYER_TRANSPORTS.LAN;
+    }
+    if (normalizedSessionType === MENU_SESSION_TYPES.ONLINE) {
+        return MULTIPLAYER_TRANSPORTS.ONLINE;
+    }
+    return '';
+}
+
+function normalizeMultiplayerTransport(value, fallback = '') {
+    const requested = normalizeString(value, fallback).toLowerCase();
+    return VALID_MULTIPLAYER_TRANSPORT_SET.has(requested) ? requested : fallback;
 }
 
 function cloneObject(value, fallback = {}) {
@@ -121,7 +145,12 @@ function normalizeLocalSettingsState(localSettings = null) {
     const developerModeVisibility = VALID_DEVELOPER_ACCESS_MODE_SET.has(requestedAccessMode)
         ? requestedAccessMode
         : defaults.developerModeVisibility;
-    const sessionType = normalizeSessionType(source.sessionType, defaults.sessionType);
+    const rawSessionType = normalizeString(source.sessionType, defaults.sessionType);
+    const sessionType = normalizeSessionType(rawSessionType, defaults.sessionType);
+    const legacyMultiplayerTransport = deriveLegacyMultiplayerTransport(rawSessionType);
+    const multiplayerTransport = sessionType === MENU_SESSION_TYPES.MULTIPLAYER
+        ? normalizeMultiplayerTransport(source.multiplayerTransport, legacyMultiplayerTransport)
+        : '';
     const modePath = normalizeModePath(source.modePath, defaults.modePath);
     const startSetup = cloneObject(source.startSetup, createMenuStartSetupDefaults());
     const toolsState = cloneObject(source.toolsState, createMenuToolsStateDefaults());
@@ -143,6 +172,7 @@ function normalizeLocalSettingsState(localSettings = null) {
         fixedPresetId: normalizeString(source.fixedPresetId, defaults.fixedPresetId),
         fixedPresetLockEnabled: normalizeBoolean(source.fixedPresetLockEnabled, defaults.fixedPresetLockEnabled),
         sessionType,
+        multiplayerTransport,
         modePath,
         themeMode: normalizeString(source.themeMode, defaults.themeMode).toLowerCase() === 'hell' ? 'hell' : 'dunkel',
         shadowQuality: normalizeShadowQuality(source.shadowQuality, defaults.shadowQuality || DEFAULT_SHADOW_QUALITY),

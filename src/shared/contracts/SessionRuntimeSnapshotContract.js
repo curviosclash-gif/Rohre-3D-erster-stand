@@ -38,6 +38,7 @@ export function createSessionRuntimeSnapshot(payload = {}) {
         isHost: source.isHost !== false,
         pendingSessionInit: source.pendingSessionInit === true,
         pendingFinalizeTrigger: normalizeString(source.pendingFinalizeTrigger, ''),
+        finalizeErrorMessage: normalizeString(source.finalizeErrorMessage, ''),
         updatedAt: normalizeTimestamp(source.updatedAt),
     };
 }
@@ -53,6 +54,7 @@ export function createMatchFlowSnapshot(payload = {}) {
         isPaused: source.isPaused === true,
         canReturnToMenu: source.canReturnToMenu !== false,
         pendingFinalizeTrigger: normalizeString(source.pendingFinalizeTrigger, ''),
+        finalizeErrorMessage: normalizeString(source.finalizeErrorMessage, ''),
         isNetworkSession: source.isNetworkSession === true,
         isHost: source.isHost !== false,
         lifecycleState: normalizeString(source.lifecycleState, 'unknown'),
@@ -75,6 +77,7 @@ export function createRuntimeObservabilitySnapshot(payload = {}) {
         finalizeState: normalizeString(source.finalizeState, 'idle'),
         pendingSessionInit: source.pendingSessionInit === true,
         pendingFinalize: source.pendingFinalize === true,
+        finalizeErrorMessage: normalizeString(source.finalizeErrorMessage, ''),
         lastSequence: normalizeNonNegativeInt(source.lastSequence),
         lastEventType: normalizeString(source.lastEventType, ''),
         eventCount: normalizeNonNegativeInt(source.eventCount || recentEvents.length),

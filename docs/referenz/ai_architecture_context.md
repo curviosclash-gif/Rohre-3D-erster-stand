@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-04-04
+Stand: 2026-04-06
 
 ## 1. Architekturparadigma
 
@@ -264,6 +264,63 @@ Stand: 2026-04-04
 | Replay / Recording / Ghosts | `MatchKernelReplayAdapter` konsumiert denselben `MatchKernel` wie interactive/headless und liest serialisierbare `snapshot_envelope`-Pakete statt Entity- oder Renderer-Interna. | Replay-Leser und Recorder duerfen `run_profile`, `seed_envelope`, `input_frame` und `snapshot_envelope` weiterreichen; Persistenz oder Playback arbeitet auf `gameStateSnapshot`, `simStateSnapshot` und freigegebenen Projektionen. | `V85` versioniert Replay-/Snapshot-Artefakte und Migrationspfade; `V82.4` bleibt fuer kompakte Ghost-Replays auf dieselbe Snapshot-Basis beschraenkt. |
 | Training / Validate / Benchmark | `MatchKernelTrainingAdapter`, `TrainerPayloadAdapter` und `TrainingTransportFacade` bilden den gemeinsamen Kopf fuer Preview-, Resume-, Eval- und spaetere CLI-Laeufe. | Trainings- und Validate-Lanes booten ueber denselben `run_profile`-, `clock_port`-, `seed_envelope`-, `input_frame`- und `snapshot_envelope`-Vertrag; Reward-, Eval- und Resume-Evidence liest serialisierbare Artefakte statt interaktive Sonderhooks. | `BT73` und `BT80C` haerten ihre festen Matrizen, Replay-Priorisierung und Kandidaten-Validation auf diesem Kernelpfad; neue Trainings-Harnesses duplizieren keinen separaten Matchstart ausserhalb von `SessionRuntime` plus Adapter. |
 | Netzwerk / Host-Autoritaet | Kuenftige LAN-/Online-Adapter bleiben ausserhalb des `MatchKernel`; `SessionRuntime` besitzt Transport, Lifecycle, Capability-Gates und uebersetzt Netzwerknachrichten in Kernel-kompatible Huellen. | Host-/Client-Pfade duerfen nur normalisierte `input_frame`-Sequenzen nach innen geben und serialisierbare `snapshot_envelope`-/`gameStateSnapshot`-Daten nach aussen spiegeln. | `V64` baut Matchstart, Reconciliation und Disconnect auf demselben Kernelvertrag auf; Transportcode greift weder direkt auf Renderer noch auf UI- oder Entity-Interna zu. |
+
+### 4.6.3 Headless-Boot, GameMode-API und Runtime-Projektionsvertrag
+
+| Schnitt | Einstiegspunkt / Besitzer | Verbindlicher Ablauf | Freigegebene Outputs fuer Folgearbeit |
+| --- | --- | --- | --- |
+| Interaktiver Matchstart | `SessionRuntimeCommandExecutor`, `GameRuntimeSessionHandler`, `RuntimeCommandSettingsService` plus `GameRuntimeFacade` | `START_MATCH` laeuft seit `V87 87.2.1/87.3.1` immer ueber `sessionHandler.startMatch()`: derselbe Inflight-Guard wartet nicht-terminale Pending-Finalizes ab, routed `settingsSnapshot` und regulaeres `APPLY_SETTINGS` ueber denselben `RuntimeCommandSettingsService`-Pfad und loest erst danach `matchUiPort.applyStartMatchProjection()` aus. Async-Caller koennen ueber `executeSessionRuntimeCommandResult()` einen expliziten `{ ok, resultStatus, errorMessage }`-Vertrag konsumieren; der rohe `execute()`-Pfad bleibt kompatibel, bindet Rejections aber intern an einen Catch. | `matchUiPort`, `sessionHandler`, `executeSessionRuntimeCommandResult()`, `getPorts()`; Folgeblocks haengen neue Startlogik an Runtime-Commands statt an direkte `game`- oder UI-Zugriffe. |
+| Interaktive Kernel-Bindung | `MatchSessionRuntimeBridge.applyInitializedMatchSession()` | Nach erfolgreichem Session-Boot werden `matchKernel`, `matchKernelAdapter` und `matchKernelConsumers` als Runtime-Handles gesetzt. `playingStateSystem` bekommt nur den interaktiven Adapter; Replay-, Training- und Netzwerk-Leser laufen ueber dieselbe Consumer-Registry. | `getCurrentMatchKernel()`, `getCurrentMatchKernelConsumer()`, `getCurrentMatchKernelConsumers().getDescriptors()` als lesbare Vertragskante fuer Debug-, Replay- und Folgeadapter. |
+| Headless-Boot | `createHeadlessMatchKernelRuntime()` | Headless-Laeufe erzeugen Session und Kernel ueber `createHeadlessMatchKernelRunProfile()`, booten denselben `MatchKernel` und geben nur `step()`, `signalRoundEnd()`, `signalMatchEnd()`, `restartRound()` und `dispose()` frei. Der headless Renderer bleibt Stub; UI-, DOM- und Plattformobjekte gehoeren nicht in diesen Pfad. | `getConsumerAdapter()` und `getConsumerDescriptors()` liefern denselben Consumer-Vertrag wie interaktive Laeufe; Headless darf im Gegensatz zur interaktiven Runtime den Kernel direkt ticken. |
+
+| GameMode-Hook | Vertrag | Zweck | Guardrail fuer Folgearbeit |
+| --- | --- | --- | --- |
+| `bootstrap(context)` | `GameModeContract` | initialisiert modus-spezifischen State nach Kernel-Boot und vor dem ersten produktiven Tick | kein DOM, kein UI-Controller, keine Renderer- oder Plattform-Objekte im Hook-Kontext |
+| `computeRoundResult(players, context)` | `GameModeContract` | erzeugt die serialisierbare Round-Zusammenfassung fuer Kernel-/SessionRuntime-Ausgabe | Ergebnis bleibt Plain Object; keine versteckten Side Effects fuer HUD, Recorder oder Transport |
+| `computeMatchResult(players, roundResults, context)` | `GameModeContract` | verdichtet Round-Ergebnisse zum Match-Ergebnis fuer Runtime-, Replay- und Persistenzpfade | Sieger-, Score- und Summary-Logik bleibt am Modusvertrag statt in UI- oder Port-Sonderfaellen |
+| `cleanup(context)` | `GameModeContract` | gibt modus-spezifischen State vor Kernel-Dispose frei | Cleanup laeuft vor Adapter-/Renderer-Dispose und ist der einzige zulaessige Exit-Hook auf Modusebene |
+
+| Snapshot-/Projektionspfad | Besitzer | Erwarteter Payload | Leser |
+| --- | --- | --- | --- |
+| `interactive` Consumer | `MatchKernelConsumerRegistry` | `snapshotTarget = projection`, optional `runtimeProjection`, kein direkter Kernel-Tick im interaktiven Runtime-Besitz | HUD, Match-UI, Renderports und Recorder-Overlays lesen Projektionen ueber Runtime-Ports statt ueber `EntityManager` |
+| `replay` Consumer | `MatchKernelConsumerRegistry` | `snapshotTarget = checkpoint`, serialisierbare Session-/GameState-Snapshots fuer Playback und Ghosts | Replay- und Persistenzpfade aus `V85` oder `V82` |
+| `training` Consumer | `MatchKernelConsumerRegistry` | `snapshotTarget = observability`, deterministische Input-/Snapshot-Huellen fuer Reward, Eval und Benchmark | Trainings- und Validate-Pipelines |
+| `network` Consumer | `MatchKernelConsumerRegistry` | `snapshotTarget = transport`, serialisierbare Payloads fuer kuenftige Host-/Client-Projektion | `V64` Transport, Reconciliation und Disconnect-Handling |
+
+- Runtime-Projektionsregel:
+  - `buildMatchRuntimeProjection()` ist der einzige freigegebene Builder fuer HUD-, MatchFlow- und andere UI-nahe Runtime-Zusammenfassungen.
+  - UI-Controller lesen diese Daten ausschliesslich ueber `GameRuntimePorts.matchUiPort.getMatchRuntimeProjection()` oder weitergereichte UI-Ports.
+  - Folgeblocks erweitern Projektionen und Snapshot-Envelopes ueber Contracts und Consumer-Deskriptoren, nicht ueber neue Direktzugriffe auf `game`, `EntityManager`, `Arena` oder Modusinstanzen.
+
+### 4.6.4 Runtime-Hardening-Inventar fuer V87
+
+| V87-Stream | Review-Punkte nach Abgleich 2026-04-05 | Aktuelle Besitzerpfade | Geplanter Zielpfad |
+| --- | --- | --- | --- |
+| Lifecycle und Finalize | `P4` und `P11` sind seit `87.2.2` gehaertet; `P1` ist im Ist-Stand bereits guardiert und bleibt nur als dokumentierter Review-Hinweis bestehen | `MatchLifecycleSessionOrchestrator`, `GameRuntimeSessionHandler`, angrenzend `GameRuntimeFacade` fuer Return-/Dispose-Wiring | `87.2.1` und `87.2.2` sind abgeschlossen: Start-/Session-/Finalize-Rennen, error-gelatchte Snapshots, awaitbares Dispose und Prewarm-Suppression fuer fehlgeschlagene Return-Pfade stehen; naechster offener Zielpfad ist `87.3.x` |
+| Commands und Capabilities | `P8` und `P15` sind seit `87.3.1` gehaertet; `P10` bleibt offen | `SessionRuntimeCommandExecutor`, `RuntimeCommandSettingsService`, `GameRuntimeFacade`, `ElectronPlatformBridge`, Command-/Capability-Ports an der Runtime-Fassade | `87.3.1` ist abgeschlossen: Settings-/Snapshot-Semantik und Async-Command-Errors sind vereinheitlicht; `87.3.2` bleibt fuer wahrheitsgetreue Capability-Verfuegbarkeit und Fallback-Vertraege offen |
+| UI-, Pause- und State-Uebergaenge | `P2`, `P9`, `P16`, `P20` | `MatchFlowUiController`, `PauseOverlayController`, `SessionRuntimeStateMachine`, `SessionRuntimeObservability` | `87.4.1` fuer atomare UI-/Pause-Intents, `87.4.2` fuer FINALIZING-/MENU-Regeln und bounded Observability |
+
+#### 4.6.4.1 Ownership- und Sunset-Matrix (V87 87.1.2)
+
+| Review-Punkt | Zielmodul | Besitzerpfad | Sunset-Kriterium |
+| --- | --- | --- | --- |
+| `P2` | Atomarer Start-Match-Intent-Guard um `applyStartMatchProjection()` | `src/ui/MatchFlowUiController.js` | Doppelte `applyStartMatchProjection()`-Aufrufe teilen sich denselben Inflight-Guard vor `_startMatchInternal()`; kein zweiter Startpfad kann zwischen Guard-Check und Promise-Assignment durchrutschen. |
+| `P4` | Dispose-/Finalize-Handshake fuer `GameRuntimeSessionHandler.dispose()` | `src/core/runtime/GameRuntimeSessionHandler.js` | `dispose()` gibt einen beobachtbaren oder awaitbaren Finalize-Abschluss zurueck und raeumt Menu-Refs erst nach terminalem Finalize-Result oder explizit gelatchtem Fehlerzustand ab. |
+| `P8` | Autoritativer Settings-Snapshot fuer `START_MATCH` und `APPLY_SETTINGS` | `src/application/session-runtime/SessionRuntimeCommandExecutor.js` | Matchstart und Settings-Aenderungen nutzen denselben autoritativen Apply-Pfad; `START_MATCH(settingsSnapshot)` mutiert Runtime-Settings nicht mehr implizit an einem zweiten Ort. |
+| `P9` | Pause-Intent-Revalidierung fuer Resume und Return-to-Menu | `src/ui/PauseOverlayController.js` | Resume- und Return-Intents pruefen den aktuellen Pause-/Lifecycle-Snapshot direkt vor Ausfuehrung erneut und ignorieren stale Mehrfachklicks deterministisch. |
+| `P10` | Wahrheitsgetreuer Capability-Descriptor pro Electron-Adapter | `src/platform/electron/ElectronPlatformBridge.js` | `available`, Intent-Funktionen und `degradedReason` werden aus derselben Invoke-Basis abgeleitet; kein Descriptor darf `available: true` melden, wenn der zugehoerige Intent `null` ist. |
+| `P11` | Finalize-Fehlerlatch in `finalizeMatchSession()` | `src/state/MatchLifecycleSessionOrchestrator.js` | Ein Finalize-Fehler bleibt ueber Snapshot, Event oder Guard sichtbar, bis ein definierter Reset folgt; `_pendingFinalize` oder ein Nachfolger-Guard verschwindet nicht mehr lautlos im `finally`. |
+| `P15` | Command-Result-/Catch-Vertrag fuer asynchrone Runtime-Commands | `src/application/session-runtime/SessionRuntimeCommandExecutor.js` | Jeder Promise-basierte Command endet in einem explizit konsumierbaren Success-/Error-Vertrag; nach Observability-Logging bleiben keine ungebundenen Rejections an UI- oder Facade-Callsites uebrig. |
+| `P16` | FINALIZING-Transition-Guard im State-Machine-Contract | `src/shared/contracts/SessionRuntimeStateMachine.js` | Direkte `FINALIZING -> MENU`-Rueckgaenge sind nur noch ueber einen expliziten `match_finalized`/`menu_opened`-Abschluss erlaubt oder komplett verboten; Cleanup kann nicht per Lifecycle-Sprung umgangen werden. |
+| `P20` | Bounded Event-History im Observability-Store | `src/shared/runtime/SessionRuntimeObservability.js` | Die Event-History bleibt auf `SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT` begrenzt, ohne per `splice()` auf jedem Append den Hotpath mutierend zu trimmen. |
+
+- Review-Delta 2026-04-05 bis 2026-04-06:
+  - `MatchLifecycleSessionOrchestrator.createMatchSession()` vergibt Session-IDs vor dem asynchronen Match-Boot und serialisiert Folge-Initialisierungen ueber `_pendingSessionInit`; deshalb ist `P1` aktuell kein akuter Blocker mehr.
+  - Die kanonische Einzelfall-Zuordnung mit Datei-/Commit-Evidence lebt in `docs/plaene/aktiv/V87.md` unter `87.1.1`; die punktgenaue Ownership-/Sunset-Ableitung fuer die Folgephasen ist in `87.1.2` und in `4.6.4.1` gespiegelt.
+  - `V87 87.2.1` merged konkurrierende Pending-Finalizes in `MatchLifecycleSessionOrchestrator`, promoted ueberholende `return_to_menu`-/Shutdown-Gruende ueber interne `new_match_session`-Finalizes und blockiert wartende Starts deterministisch, wenn deren Vorbereitungs-Finalize durch einen staerkeren Exit ueberholt wurde.
+  - `GameRuntimeSessionHandler.startMatch()` ist jetzt der autoritative Start-Inflight-Guard fuer normale und Snapshot-basierte Starts; `SessionRuntimeCommandExecutor.START_MATCH` fuehrt keinen zweiten Snapshot-Bypass mehr, sondern delegiert denselben Vertrag.
+  - `V87 87.2.2` latcht `finalize.errorMessage` in Session-Runtime-Snapshots, blockiert Folgepfade ueber den sichtbaren Error-State, macht `dispose()` awaitbar und unterdrueckt `scheduleMatchPrewarm()` nach fehlgeschlagenem Session-Finalize.
+  - `V87 87.3.1` fuehrt `RuntimeCommandSettingsService` als gemeinsamen Apply-Pfad fuer `APPLY_SETTINGS` und `START_MATCH(settingsSnapshot)` ein, entfernt den zweiten Settings-Apply aus `MatchFlowUiController` und ergaenzt `executeSessionRuntimeCommandResult()` plus intern gebundene Rejection-Catches fuer Promise-basierte Commands.
 
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 

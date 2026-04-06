@@ -624,7 +624,6 @@ export class MatchFlowUiController {
     _startMatchInternal() {
         const game = this.game;
         game.keyCapture = null;
-        game._applySettingsToRuntime({ schedulePrewarm: false });
         this._configureInputSourcesForMatch();
 
         const matchStartTransition = deriveMatchStartTransition({ numHumans: game.numHumans });

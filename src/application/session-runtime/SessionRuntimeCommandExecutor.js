@@ -1,4 +1,3 @@
-import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
 import { SESSION_FINALIZE_TRIGGERS } from '../../shared/contracts/MatchLifecycleContract.js';
 import {
     normalizeSessionRuntimeCommand,
@@ -11,6 +10,7 @@ import {
     handleMultiplayerHostAction,
     handleMultiplayerJoinAction,
 } from '../../core/runtime/MenuRuntimeMultiplayerService.js';
+import { applyCommandRuntimeSettings } from '../../core/runtime/RuntimeCommandSettingsService.js';
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -43,6 +43,25 @@ function summarizeCommandResult(result) {
     return typeof result;
 }
 
+function isPromiseLike(value) {
+    return !!value && typeof value.then === 'function';
+}
+
+function createSettledCommandResult(command, { ok = false, value = undefined, error = null, resultStatus = '' } = {}) {
+    return {
+        ok: ok === true,
+        ...summarizeCommandPayload(command),
+        resultStatus: normalizeString(
+            resultStatus,
+            ok ? summarizeCommandResult(value) : 'error'
+        ),
+        value,
+        errorMessage: error instanceof Error
+            ? error.message
+            : normalizeString(error, ok ? '' : 'command execution failed'),
+    };
+}
+
 export class SessionRuntimeCommandExecutor {
     constructor({ facade = null } = {}) {
         this._facade = facade || null;
@@ -54,45 +73,56 @@ export class SessionRuntimeCommandExecutor {
         this._recordCommandObservation(normalizedCommand, 'received');
         let result;
         try {
-            switch (normalizedCommand.type) {
-        case SESSION_RUNTIME_COMMAND_TYPES.APPLY_SETTINGS:
-                result = this._executeApplySettings(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.INITIALIZE_SESSION:
-                result = this._executeInitializeSession(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.START_MATCH:
-                result = this._executeStartMatch(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.PAUSE_MATCH:
-                result = this._executePauseMatch(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.RESUME_MATCH:
-                result = this._executeResumeMatch(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.RETURN_TO_MENU:
-                result = this._executeReturnToMenu(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.FINALIZE_MATCH:
-                result = this._executeFinalizeMatch(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.HOST_LOBBY:
-                result = this._executeHostLobby(normalizedCommand.payload);
-                break;
-        case SESSION_RUNTIME_COMMAND_TYPES.JOIN_LOBBY:
-                result = this._executeJoinLobby(normalizedCommand.payload);
-                break;
-        default:
-                result = undefined;
-            }
+            result = this._dispatchCommand(normalizedCommand);
         } catch (error) {
-            this._recordCommandObservation(normalizedCommand, 'failed', {
-                resultStatus: 'threw',
-                errorMessage: error instanceof Error ? error.message : 'command execution failed',
-            });
+            this._recordCommandFailure(normalizedCommand, 'threw', error, 'command execution failed');
             throw error;
         }
         return this._trackCommandResult(normalizedCommand, result);
+    }
+
+    executeResult(command = null) {
+        const normalizedCommand = normalizeSessionRuntimeCommand(command);
+        if (!normalizedCommand) return Promise.resolve(undefined);
+        this._recordCommandObservation(normalizedCommand, 'received');
+        let result;
+        try {
+            result = this._dispatchCommand(normalizedCommand);
+        } catch (error) {
+            this._recordCommandFailure(normalizedCommand, 'threw', error, 'command execution failed');
+            return Promise.resolve(createSettledCommandResult(normalizedCommand, {
+                ok: false,
+                error,
+                resultStatus: 'threw',
+            }));
+        }
+        return this._trackSettledCommandResult(normalizedCommand, result);
+    }
+
+    _dispatchCommand(command) {
+        const payload = command?.payload;
+        switch (command.type) {
+        case SESSION_RUNTIME_COMMAND_TYPES.APPLY_SETTINGS:
+            return this._executeApplySettings(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.INITIALIZE_SESSION:
+            return this._executeInitializeSession(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.START_MATCH:
+            return this._executeStartMatch(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.PAUSE_MATCH:
+            return this._executePauseMatch(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.RESUME_MATCH:
+            return this._executeResumeMatch(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.RETURN_TO_MENU:
+            return this._executeReturnToMenu(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.FINALIZE_MATCH:
+            return this._executeFinalizeMatch(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.HOST_LOBBY:
+            return this._executeHostLobby(payload);
+        case SESSION_RUNTIME_COMMAND_TYPES.JOIN_LOBBY:
+            return this._executeJoinLobby(payload);
+        default:
+            return undefined;
+        }
     }
 
     _recordCommandObservation(command, phase, extra = null) {
@@ -107,9 +137,16 @@ export class SessionRuntimeCommandExecutor {
         });
     }
 
+    _recordCommandFailure(command, resultStatus, error, fallbackMessage) {
+        this._recordCommandObservation(command, 'failed', {
+            resultStatus: normalizeString(resultStatus, 'error'),
+            errorMessage: error instanceof Error ? error.message : normalizeString(fallbackMessage, 'command execution failed'),
+        });
+    }
+
     _trackCommandResult(command, result) {
-        if (result && typeof result.then === 'function') {
-            return Promise.resolve(result)
+        if (isPromiseLike(result)) {
+            const trackedPromise = Promise.resolve(result)
                 .then((resolvedResult) => {
                     this._recordCommandObservation(command, 'completed', {
                         resultStatus: summarizeCommandResult(resolvedResult),
@@ -117,12 +154,11 @@ export class SessionRuntimeCommandExecutor {
                     return resolvedResult;
                 })
                 .catch((error) => {
-                    this._recordCommandObservation(command, 'failed', {
-                        resultStatus: 'rejected',
-                        errorMessage: error instanceof Error ? error.message : 'command promise rejected',
-                    });
+                    this._recordCommandFailure(command, 'rejected', error, 'command promise rejected');
                     throw error;
                 });
+            trackedPromise.catch(() => {});
+            return trackedPromise;
         }
         this._recordCommandObservation(command, 'completed', {
             resultStatus: summarizeCommandResult(result),
@@ -130,8 +166,42 @@ export class SessionRuntimeCommandExecutor {
         return result;
     }
 
+    _trackSettledCommandResult(command, result) {
+        if (isPromiseLike(result)) {
+            return Promise.resolve(result)
+                .then((resolvedResult) => {
+                    const resultStatus = summarizeCommandResult(resolvedResult);
+                    this._recordCommandObservation(command, 'completed', {
+                        resultStatus,
+                    });
+                    return createSettledCommandResult(command, {
+                        ok: true,
+                        value: resolvedResult,
+                        resultStatus,
+                    });
+                })
+                .catch((error) => {
+                    this._recordCommandFailure(command, 'rejected', error, 'command promise rejected');
+                    return createSettledCommandResult(command, {
+                        ok: false,
+                        error,
+                        resultStatus: 'rejected',
+                    });
+                });
+        }
+        const resultStatus = summarizeCommandResult(result);
+        this._recordCommandObservation(command, 'completed', {
+            resultStatus,
+        });
+        return Promise.resolve(createSettledCommandResult(command, {
+            ok: true,
+            value: result,
+            resultStatus,
+        }));
+    }
+
     _executeApplySettings(options = undefined) {
-        return this._facade?._applySettingsToRuntimeInternal?.(options);
+        return applyCommandRuntimeSettings(this._facade, options);
     }
 
     _executeInitializeSession(options = undefined) {
@@ -139,17 +209,8 @@ export class SessionRuntimeCommandExecutor {
     }
 
     _executeStartMatch(options = undefined) {
-        const facade = this._facade;
-        const game = facade?.game;
-        if (!game) return false;
-        if (options?.settingsSnapshot) {
-            if (game.state !== GAME_STATE_IDS.MENU) return false;
-            facade?._applyAuthoritativeMultiplayerMatchSettings?.(options.settingsSnapshot);
-            facade?.getUiManager?.()?.clearStartValidationError?.();
-            const startResult = facade?.getPorts?.()?.matchUiPort?.applyStartMatchProjection?.();
-            return startResult !== false;
-        }
-        return facade?.sessionHandler?.startMatch?.(options);
+        if (!this._facade?.game) return false;
+        return this._facade?.sessionHandler?.startMatch?.(options);
     }
 
     _executePauseMatch(options = undefined) {

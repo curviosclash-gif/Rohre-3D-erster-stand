@@ -292,11 +292,13 @@ export function createMatchKernelConsumerRegistry(options = {}) {
     });
     const registry = {
         contractVersion: MATCH_KERNEL_CONSUMER_REGISTRY_CONTRACT_VERSION,
+        interactive: buildAdapter(MATCH_KERNEL_CONSUMER_IDS.INTERACTIVE),
         replay: buildAdapter(MATCH_KERNEL_CONSUMER_IDS.REPLAY),
         training: buildAdapter(MATCH_KERNEL_CONSUMER_IDS.TRAINING),
         network: buildAdapter(MATCH_KERNEL_CONSUMER_IDS.NETWORK),
         getAdapter(consumerId) {
             const normalized = resolveConsumerId(consumerId);
+            if (normalized === MATCH_KERNEL_CONSUMER_IDS.INTERACTIVE) return this.interactive;
             if (normalized === MATCH_KERNEL_CONSUMER_IDS.REPLAY) return this.replay;
             if (normalized === MATCH_KERNEL_CONSUMER_IDS.TRAINING) return this.training;
             if (normalized === MATCH_KERNEL_CONSUMER_IDS.NETWORK) return this.network;
@@ -307,12 +309,14 @@ export function createMatchKernelConsumerRegistry(options = {}) {
         },
         getDescriptors() {
             return {
+                interactive: this.interactive?.getDescriptor?.() || null,
                 replay: this.replay?.getDescriptor?.() || null,
                 training: this.training?.getDescriptor?.() || null,
                 network: this.network?.getDescriptor?.() || null,
             };
         },
         dispose() {
+            this.interactive?.dispose?.();
             this.replay?.dispose?.();
             this.training?.dispose?.();
             this.network?.dispose?.();

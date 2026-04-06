@@ -20,6 +20,9 @@ function normalizeString(value, fallback = '') {
 
 export function normalizeSessionType(value, fallback = MENU_SESSION_TYPES.SINGLE) {
     const requested = normalizeString(value, fallback);
+    if (requested === MENU_SESSION_TYPES.LAN || requested === MENU_SESSION_TYPES.ONLINE) {
+        return MENU_SESSION_TYPES.MULTIPLAYER;
+    }
     return VALID_SESSION_TYPE_SET.has(requested) ? requested : fallback;
 }
 
@@ -41,6 +44,7 @@ function createSessionDraftSnapshot(settings, sessionType) {
 
     return {
         sessionType: normalizeSessionType(sessionType, localSettings.sessionType || defaults.sessionType || MENU_SESSION_TYPES.SINGLE),
+        multiplayerTransport: normalizeString(localSettings.multiplayerTransport, ''),
         mode: resolveModeFromSessionType(sessionType),
         modePath: normalizeString(localSettings.modePath, defaults.modePath),
         themeMode: normalizeString(localSettings.themeMode, defaults.themeMode),
@@ -92,6 +96,14 @@ function applySnapshotToSettings(settings, snapshot) {
         settings.localSettings = {};
     }
     settings.localSettings.sessionType = normalizeSessionType(snapshot.sessionType, settings.localSettings.sessionType);
+    if (settings.localSettings.sessionType === MENU_SESSION_TYPES.MULTIPLAYER) {
+        settings.localSettings.multiplayerTransport = normalizeString(
+            snapshot.multiplayerTransport,
+            settings.localSettings.multiplayerTransport || ''
+        );
+    } else {
+        settings.localSettings.multiplayerTransport = '';
+    }
     settings.localSettings.modePath = normalizeString(snapshot.modePath, settings.localSettings.modePath || defaults.modePath);
     settings.localSettings.themeMode = normalizeString(snapshot.themeMode, settings.localSettings.themeMode || defaults.themeMode);
     return true;

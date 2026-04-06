@@ -27,6 +27,12 @@ const BASE_MAP_KEYS = [
     'parcours_rift',
     'neon_abyss',
     'crystal_ruins',
+    'vulkan_odyssey',
+    'frozen_helix',
+    'neon_circuit',
+    'sky_islands',
+    'abyssal_descent',
+    'magma_maze',
 ];
 
 export const MAP_PRESETS_BASE = Object.freeze(

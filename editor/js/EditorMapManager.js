@@ -58,7 +58,9 @@ export class EditorMapManager {
             playerSpawn: new THREE.MeshLambertMaterial({ color: 0xeab308 }),
             botSpawn: new THREE.MeshLambertMaterial({ color: 0xef4444 }),
             item_fallback: new THREE.MeshLambertMaterial({ color: 0x64748b }),
-            aircraft_fallback: new THREE.MeshLambertMaterial({ color: 0xc084fc })
+            aircraft_fallback: new THREE.MeshLambertMaterial({ color: 0xc084fc }),
+            checkpoint: new THREE.MeshLambertMaterial({ color: 0xaaff00, transparent: true, opacity: 0.7 }),
+            checkpoint_finish: new THREE.MeshLambertMaterial({ color: 0xffd700, transparent: true, opacity: 0.7 })
         };
     }
 

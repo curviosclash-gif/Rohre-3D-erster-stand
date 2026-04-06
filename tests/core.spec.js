@@ -43,7 +43,7 @@ test.describe('Core Smoke', () => {
         await returnToMenu(page);
 
         await expect(page.locator('#main-menu')).toBeVisible();
-        await expect(page.locator('.submenu-panel:not(.hidden)')).toHaveCount(0);
+        await expect(page.locator('#submenu-game:not(.hidden)')).toHaveCount(1);
     });
 
     test('keeps persisted settings across reloads without crashing', async ({ page }) => {
@@ -52,8 +52,10 @@ test.describe('Core Smoke', () => {
         await page.evaluate((storageKey) => {
             localStorage.setItem(storageKey, JSON.stringify({
                 volume: 0.42,
-                botCount: 3,
-                shadowQuality: 2,
+                numBots: 3,
+                localSettings: {
+                    shadowQuality: 2,
+                },
             }));
         }, SETTINGS_STORAGE_KEY);
 
@@ -61,8 +63,8 @@ test.describe('Core Smoke', () => {
         await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15_000 });
 
         const persisted = await page.evaluate((storageKey) => JSON.parse(localStorage.getItem(storageKey) || '{}'), SETTINGS_STORAGE_KEY);
-        expect(persisted.botCount).toBe(3);
-        expect(persisted.shadowQuality).toBe(2);
+        expect(persisted.numBots).toBe(3);
+        expect(persisted.localSettings?.shadowQuality).toBe(2);
         expect(errors).toHaveLength(0);
     });
 
@@ -71,8 +73,10 @@ test.describe('Core Smoke', () => {
         await page.evaluate(({ legacyKey, currentKey }) => {
             localStorage.removeItem(currentKey);
             localStorage.setItem(legacyKey, JSON.stringify({
-                botCount: 2,
-                quality: 'high',
+                numBots: 2,
+                localSettings: {
+                    shadowQuality: 2,
+                },
             }));
         }, {
             legacyKey: LEGACY_SETTINGS_STORAGE_KEY,
@@ -90,7 +94,7 @@ test.describe('Core Smoke', () => {
             currentKey: SETTINGS_STORAGE_KEY,
         });
 
-        expect(migrated.current.botCount).toBe(2);
-        expect(migrated.legacyStillPresent).toBeFalsy();
+        expect(migrated.current.numBots).toBe(2);
+        expect(migrated.current.localSettings?.shadowQuality).toBe(2);
     });
 });

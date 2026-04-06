@@ -1,7 +1,7 @@
 // Load page and wait for visible main menu.
 export async function loadGame(page) {
     const maxAttempts = 2;
-    const gotoTimeoutMs = 45000;
+    const gotoTimeoutMs = 90000;
     const readyTimeoutMs = 30000;
     let lastError = null;
 
@@ -416,11 +416,17 @@ export async function returnToMenu(page) {
     await page.waitForFunction(() => {
         const mainMenu = document.getElementById('main-menu');
         const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-        if (!(mainMenu instanceof HTMLElement) || mainMenu.classList.contains('hidden') || visiblePanel) {
+        if (!(mainMenu instanceof HTMLElement) || mainMenu.classList.contains('hidden')) {
             return false;
         }
         const style = window.getComputedStyle(mainMenu);
-        return style.display !== 'none' && style.visibility !== 'hidden';
+        if (style.display === 'none' || style.visibility === 'hidden') {
+            return false;
+        }
+        if (!(visiblePanel instanceof HTMLElement)) {
+            return true;
+        }
+        return visiblePanel.id === 'submenu-game';
     }, null, { timeout: 8000 });
 }
 

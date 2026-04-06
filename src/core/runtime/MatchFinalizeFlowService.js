@@ -115,6 +115,9 @@ export function finalizeMatchFlow(facade, options = undefined, fallbackReason = 
         })
         .then((sessionFinalizeOk) => {
             const activePlan = facade?._pendingMatchFinalizePlan || requestedPlan;
+            if (sessionFinalizeOk === false) {
+                return false;
+            }
             try {
                 if (activePlan.schedulePrewarm) {
                     facade?.scheduleMatchPrewarm?.();

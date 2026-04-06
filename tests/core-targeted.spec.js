@@ -7179,6 +7179,541 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
         expect(result.activeSessionId).toBeNull();
     });
 
+    test('V87.2 createMatchSession aborts when a new-match finalize is overtaken by return-to-menu', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MatchLifecycleSessionOrchestrator } = await import('/src/state/MatchLifecycleSessionOrchestrator.js');
+
+            let resolveFinalize = null;
+            let prepareCalls = 0;
+            const lifecycleEvents = [];
+            let currentSession = {
+                arena: { id: 'arena' },
+                entityManager: { players: [], getHumanPlayers() { return []; } },
+                powerupManager: { clear() { } },
+            };
+            const deps = {
+                getLifecycleState: () => ({ mapKey: 'std', numHumans: 1, numBots: 0, winsNeeded: 3, activeGameMode: 'CLASSIC' }),
+                notifyLifecycleEvent(type, context) {
+                    lifecycleEvents.push({ type, reason: context?.reason || null });
+                },
+                prepareInitializedMatchSession: () => {
+                    prepareCalls += 1;
+                    return Promise.resolve({
+                        session: { id: 'should-not-start', effectiveMapKey: 'std', numHumans: 1, numBots: 0, winsNeeded: 3 },
+                    });
+                },
+                wireInitializedMatchRuntime: (m) => ({ ...m, runtime: {} }),
+                applyInitializedMatchSession() { },
+                getCurrentMatchSessionRefs: () => currentSession,
+                clearMatchSessionRefs: () => { currentSession = null; },
+                disposePreparedMatchSession() { },
+                disposeCurrentMatchSession: () => { currentSession = null; },
+                settleRecorder: () => new Promise((resolve) => {
+                    resolveFinalize = () => resolve(true);
+                }),
+                resetRoundRuntime() { },
+            };
+
+            const orchestrator = new MatchLifecycleSessionOrchestrator(deps);
+            const startPromise = orchestrator.createMatchSession({});
+            const mergedFinalizePromise = orchestrator.finalizeMatchSession({
+                reason: 'return_to_menu',
+                notifyMenuOpened: true,
+            });
+            resolveFinalize();
+
+            let startError = null;
+            try {
+                await startPromise;
+            } catch (error) {
+                startError = error?.message || null;
+            }
+            const mergedReason = await mergedFinalizePromise;
+            return {
+                startError,
+                mergedReason,
+                prepareCalls,
+                lifecycleEvents,
+                finalizeState: orchestrator._sessionRuntimeState?.finalize?.status || null,
+            };
+        });
+
+        expect(result.startError).toBe('match_start_blocked:return_to_menu');
+        expect(result.mergedReason).toBe('return_to_menu');
+        expect(result.prepareCalls).toBe(0);
+        expect(result.finalizeState).toBe('finalized');
+        expect(result.lifecycleEvents.some((entry) => entry.type === 'menu_opened' && entry.reason === 'return_to_menu')).toBe(true);
+    });
+
+    test('V87.2 GameRuntimeSessionHandler waits for pending finalize and deduplicates concurrent starts', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameRuntimeSessionHandler } = await import('/src/core/runtime/GameRuntimeSessionHandler.js');
+            const { GAME_STATE_IDS } = await import('/src/shared/contracts/GameStateIds.js');
+
+            let startCalls = 0;
+            let resolveFinalize = null;
+            let resolveStart = null;
+            const callLog = [];
+            const facade = {
+                game: {
+                    state: GAME_STATE_IDS.MENU,
+                    settings: {
+                        localSettings: {
+                            sessionType: 'single',
+                            modePath: 'normal',
+                        },
+                    },
+                    uiManager: {
+                        showStartValidationError() { },
+                        clearStartValidationError() {
+                            callLog.push('clearValidation');
+                        },
+                    },
+                },
+                _pendingMatchFinalizePlan: {
+                    reason: 'return_to_menu',
+                },
+                _clearMatchPrewarmTimer() {
+                    callLog.push('clearPrewarm');
+                },
+                _recordMenuTelemetry(type, payload = {}) {
+                    callLog.push(`${type}:${payload.reason || ''}`);
+                },
+                _resolveStartValidationIssue() {
+                    return null;
+                },
+                _applyAuthoritativeMultiplayerMatchSettings(snapshot) {
+                    callLog.push(`applySnapshot:${snapshot?.lobbyCode || ''}`);
+                },
+                _applySettingsToRuntimeInternal(options) {
+                    callLog.push(`applyRuntime:${options?.schedulePrewarm !== false}`);
+                },
+                getUiManager() {
+                    return this.game.uiManager;
+                },
+                getPorts() {
+                    return {
+                        runtimeProjectionPort: {
+                            getSessionRuntimeSnapshot: () => ({
+                                lifecycleState: 'menu',
+                                finalizeState: this._pendingMatchFinalize ? 'finalizing' : 'idle',
+                                pendingFinalizeTrigger: this._pendingMatchFinalizePlan?.reason || '',
+                            }),
+                        },
+                        matchUiPort: {
+                            applyStartMatchProjection: () => {
+                                startCalls += 1;
+                                callLog.push('applyStart');
+                                return new Promise((resolve) => {
+                                    resolveStart = () => resolve(true);
+                                });
+                            },
+                        },
+                    };
+                },
+            };
+            facade._pendingMatchFinalize = new Promise((resolve) => {
+                resolveFinalize = () => {
+                    facade._pendingMatchFinalize = null;
+                    facade._pendingMatchFinalizePlan = null;
+                    resolve(true);
+                };
+            });
+
+            const handler = new GameRuntimeSessionHandler({ facade, logger: console });
+            const firstPromise = handler.startMatch({ settingsSnapshot: { lobbyCode: 'ABCD' } });
+            const secondPromise = handler.startMatch();
+            const samePromise = firstPromise === secondPromise;
+            const startCallsBeforeFinalize = startCalls;
+            resolveFinalize();
+            await Promise.resolve();
+            const startCallsAfterFinalize = startCalls;
+            resolveStart();
+            const [firstResult, secondResult] = await Promise.all([firstPromise, secondPromise]);
+
+            return {
+                samePromise,
+                startCallsBeforeFinalize,
+                startCallsAfterFinalize,
+                startCalls,
+                firstResult,
+                secondResult,
+                callLog,
+            };
+        });
+
+        expect(result.samePromise).toBe(true);
+        expect(result.startCallsBeforeFinalize).toBe(0);
+        expect(result.startCallsAfterFinalize).toBe(1);
+        expect(result.startCalls).toBe(1);
+        expect(result.firstResult).toBe(true);
+        expect(result.secondResult).toBe(true);
+        expect(result.callLog).toContain('applySnapshot:ABCD');
+        expect(result.callLog).toContain('applyRuntime:false');
+        expect(result.callLog.filter((entry) => entry === 'applyStart')).toHaveLength(1);
+    });
+
+    test('V87.2 finalize errors stay latched in runtime snapshots until reset', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MatchLifecycleSessionOrchestrator } = await import('/src/state/MatchLifecycleSessionOrchestrator.js');
+            const { createFallbackSessionRuntimeState } = await import('/src/state/MatchLifecycleSessionRuntimeState.js');
+            const { createRuntimeProjectionPort } = await import('/src/shared/runtime/GameRuntimePorts.js');
+            const { GAME_STATE_IDS } = await import('/src/shared/contracts/GameStateIds.js');
+
+            const sessionRuntime = createFallbackSessionRuntimeState();
+            sessionRuntime.session.activeSessionId = 'match-1';
+            sessionRuntime.lifecycle.status = 'playing';
+            sessionRuntime.lifecycle.gameStateId = GAME_STATE_IDS.PAUSED;
+
+            let currentSession = {
+                arena: { id: 'arena' },
+                entityManager: { players: [], getHumanPlayers() { return []; } },
+                powerupManager: { clear() { } },
+            };
+            const orchestrator = new MatchLifecycleSessionOrchestrator({
+                getSessionRuntimeState: () => sessionRuntime,
+                getLifecycleState: () => ({ mapKey: 'std', numHumans: 1, numBots: 0, winsNeeded: 3, activeGameMode: 'CLASSIC' }),
+                notifyLifecycleEvent() { },
+                prepareInitializedMatchSession() {
+                    return Promise.resolve({ session: { id: 'unused' } });
+                },
+                wireInitializedMatchRuntime: (match) => match,
+                applyInitializedMatchSession() { },
+                getCurrentMatchSessionRefs: () => currentSession,
+                clearMatchSessionRefs: () => {
+                    currentSession = null;
+                },
+                disposePreparedMatchSession() { },
+                disposeCurrentMatchSession() {
+                    currentSession = null;
+                },
+                settleRecorder() {
+                    throw new Error('recorder-boom');
+                },
+                resetRoundRuntime() { },
+            });
+
+            let finalizeError = null;
+            try {
+                await orchestrator.finalizeMatchSession({
+                    reason: 'return_to_menu',
+                    notifyMenuOpened: false,
+                });
+            } catch (error) {
+                finalizeError = error?.message || null;
+            }
+
+            const runtimeProjectionPort = createRuntimeProjectionPort({
+                sessionRuntime,
+                state: GAME_STATE_IDS.PAUSED,
+            });
+
+            return {
+                finalizeError,
+                finalizeState: sessionRuntime.finalize.status || null,
+                finalizeErrorMessage: sessionRuntime.finalize.errorMessage || null,
+                pendingFinalize: !!sessionRuntime.finalize.pendingOperation,
+                sessionSnapshot: runtimeProjectionPort.getSessionRuntimeSnapshot(),
+                matchFlowSnapshot: runtimeProjectionPort.getMatchFlowSnapshot(),
+            };
+        });
+
+        expect(result.finalizeError).toBe('recorder-boom');
+        expect(result.finalizeState).toBe('error');
+        expect(result.finalizeErrorMessage).toBe('recorder-boom');
+        expect(result.pendingFinalize).toBe(false);
+        expect(result.sessionSnapshot.finalizeErrorMessage).toBe('recorder-boom');
+        expect(result.sessionSnapshot.pendingFinalizeTrigger).toBe('return_to_menu');
+        expect(result.matchFlowSnapshot.finalizeErrorMessage).toBe('recorder-boom');
+        expect(result.matchFlowSnapshot.canReturnToMenu).toBe(false);
+    });
+
+    test('V87.2 GameRuntimeSessionHandler dispose waits for finalize before clearing menu refs', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameRuntimeSessionHandler } = await import('/src/core/runtime/GameRuntimeSessionHandler.js');
+
+            let finalizeState = 'finalizing';
+            let resolveFinalize = null;
+            const callLog = [];
+            const facade = {
+                game: {
+                    menuController: {
+                        dispose() {
+                            callLog.push('disposeMenuController');
+                        },
+                    },
+                    menuMultiplayerBridge: {
+                        dispose() {
+                            callLog.push('disposeMenuBridge');
+                        },
+                    },
+                },
+                _clearMatchPrewarmTimer() {
+                    callLog.push('clearPrewarm');
+                },
+                finalizeMatch(options) {
+                    callLog.push(`finalize:${options?.reason || 'none'}`);
+                    return new Promise((resolve) => {
+                        resolveFinalize = (value = false) => {
+                            finalizeState = value === false ? 'error' : 'finalized';
+                            resolve(value);
+                        };
+                    });
+                },
+                getPorts() {
+                    return {
+                        runtimeProjectionPort: {
+                            getSessionRuntimeSnapshot: () => ({
+                                lifecycleState: finalizeState === 'finalized' ? 'menu' : 'playing',
+                                finalizeState,
+                                finalizeErrorMessage: finalizeState === 'error' ? 'dispose-finalize-failed' : '',
+                            }),
+                        },
+                    };
+                },
+            };
+
+            const handler = new GameRuntimeSessionHandler({ facade, logger: console });
+            const firstPromise = handler.dispose();
+            const secondPromise = handler.dispose();
+            const samePromise = firstPromise === secondPromise;
+            const callLogBeforeFinalize = [...callLog];
+            resolveFinalize(false);
+            const [firstResult, secondResult] = await Promise.all([firstPromise, secondPromise]);
+
+            return {
+                samePromise,
+                callLogBeforeFinalize,
+                callLog,
+                firstResult,
+                secondResult,
+                menuControllerCleared: facade.game.menuController === null,
+                menuBridgeCleared: facade.game.menuMultiplayerBridge === null,
+            };
+        });
+
+        expect(result.samePromise).toBe(true);
+        expect(result.callLogBeforeFinalize).toEqual([
+            'clearPrewarm',
+            'finalize:game_dispose',
+        ]);
+        expect(result.callLogBeforeFinalize).not.toContain('disposeMenuController');
+        expect(result.callLogBeforeFinalize).not.toContain('disposeMenuBridge');
+        expect(result.callLog.filter((entry) => entry === 'disposeMenuController')).toHaveLength(1);
+        expect(result.callLog.filter((entry) => entry === 'disposeMenuBridge')).toHaveLength(1);
+        expect(result.firstResult).toBe(false);
+        expect(result.secondResult).toBe(false);
+        expect(result.menuControllerCleared).toBe(true);
+        expect(result.menuBridgeCleared).toBe(true);
+    });
+
+    test('V87.2 finalizeMatchFlow skips prewarm after a failed session finalize', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { finalizeMatchFlow } = await import('/src/core/runtime/MatchFinalizeFlowService.js');
+
+            const callLog = [];
+            const finalizeResult = await finalizeMatchFlow({
+                ports: {
+                    sessionPort: {
+                        finalizeMatchSession() {
+                            callLog.push('sessionFinalize');
+                            return Promise.reject(new Error('finalize-boom'));
+                        },
+                    },
+                },
+                scheduleMatchPrewarm() {
+                    callLog.push('schedulePrewarm');
+                },
+            }, {
+                reason: 'return_to_menu',
+            }, 'return_to_menu');
+
+            return {
+                finalizeResult,
+                callLog,
+            };
+        });
+
+        expect(result.finalizeResult).toBe(false);
+        expect(result.callLog).toContain('sessionFinalize');
+        expect(result.callLog).not.toContain('schedulePrewarm');
+    });
+
+    test('V87.3 SessionRuntimeCommandExecutor routes APPLY_SETTINGS and START_MATCH snapshots through one runtime settings apply path', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameRuntimeSessionHandler } = await import('/src/core/runtime/GameRuntimeSessionHandler.js');
+            const { SessionRuntimeCommandExecutor } = await import('/src/application/session-runtime/SessionRuntimeCommandExecutor.js');
+            const {
+                createApplySettingsCommand,
+                createStartMatchCommand,
+            } = await import('/src/shared/contracts/SessionRuntimeCommandContract.js');
+            const { GAME_STATE_IDS } = await import('/src/shared/contracts/GameStateIds.js');
+
+            const callLog = [];
+            const facade = {
+                game: {
+                    state: GAME_STATE_IDS.MENU,
+                    settings: {
+                        localSettings: {
+                            sessionType: 'single',
+                            modePath: 'normal',
+                        },
+                    },
+                    uiManager: {
+                        showStartValidationError() { },
+                        clearStartValidationError() {
+                            callLog.push('clearValidation');
+                        },
+                    },
+                },
+                _clearMatchPrewarmTimer() {
+                    callLog.push('clearPrewarm');
+                },
+                _recordMenuTelemetry(type, payload = {}) {
+                    callLog.push(`${type}:${payload.reason || ''}`);
+                },
+                _resolveStartValidationIssue() {
+                    return null;
+                },
+                _applyAuthoritativeMultiplayerMatchSettings(snapshot) {
+                    callLog.push(`applySnapshot:${snapshot?.mapKey || ''}`);
+                },
+                _applySettingsToRuntimeInternal(options = {}) {
+                    callLog.push(`applyRuntime:${options.schedulePrewarm !== false}`);
+                    return {
+                        schedulePrewarm: options.schedulePrewarm !== false,
+                    };
+                },
+                getUiManager() {
+                    return this.game.uiManager;
+                },
+                getPorts() {
+                    return {
+                        runtimeProjectionPort: {
+                            getSessionRuntimeSnapshot: () => ({
+                                lifecycleState: 'menu',
+                                finalizeState: 'idle',
+                                pendingFinalizeTrigger: '',
+                            }),
+                        },
+                        matchUiPort: {
+                            applyStartMatchProjection: () => {
+                                callLog.push('applyStart');
+                                return true;
+                            },
+                        },
+                    };
+                },
+            };
+            facade.sessionHandler = new GameRuntimeSessionHandler({ facade, logger: console });
+
+            const executor = new SessionRuntimeCommandExecutor({ facade });
+            const applyResult = executor.execute(createApplySettingsCommand({
+                schedulePrewarm: false,
+                source: 'settings_menu',
+            }));
+            const startResult = executor.execute(createStartMatchCommand({
+                source: 'menu_multiplayer_bridge',
+                settingsSnapshot: {
+                    mapKey: 'maze',
+                },
+            }));
+
+            return {
+                applyResult,
+                startResult,
+                callLog,
+            };
+        });
+
+        expect(result.applyResult?.schedulePrewarm).toBe(false);
+        expect(result.startResult).toBe(true);
+        expect(result.callLog.filter((entry) => entry === 'applyRuntime:false')).toHaveLength(2);
+        expect(result.callLog).toEqual(expect.arrayContaining([
+            'applySnapshot:maze',
+            'clearPrewarm',
+            'clearValidation',
+            'applyStart',
+        ]));
+    });
+
+    test('V87.3 SessionRuntimeCommandExecutor exposes settled async errors without unhandled rejections', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { SessionRuntimeCommandExecutor } = await import('/src/application/session-runtime/SessionRuntimeCommandExecutor.js');
+            const { createStartMatchCommand } = await import('/src/shared/contracts/SessionRuntimeCommandContract.js');
+            const { createFallbackSessionRuntimeState } = await import('/src/state/MatchLifecycleSessionRuntimeState.js');
+
+            const sessionRuntime = createFallbackSessionRuntimeState();
+            const runtimeBundle = { sessionRuntime };
+            const unhandled = [];
+            const onUnhandled = (event) => {
+                unhandled.push(event.reason?.message || String(event.reason || 'unknown'));
+                event.preventDefault();
+            };
+            window.addEventListener('unhandledrejection', onUnhandled);
+
+            const executor = new SessionRuntimeCommandExecutor({
+                facade: {
+                    game: {},
+                    getRuntimeBundle() {
+                        return runtimeBundle;
+                    },
+                    sessionHandler: {
+                        startMatch() {
+                            return Promise.reject(new Error('command-boom'));
+                        },
+                    },
+                },
+            });
+
+            const rawPromise = executor.execute(createStartMatchCommand({ source: 'raw_start' }));
+            await Promise.resolve();
+            await new Promise((resolve) => setTimeout(resolve, 0));
+
+            let rawErrorMessage = null;
+            try {
+                await rawPromise;
+            } catch (error) {
+                rawErrorMessage = error?.message || null;
+            }
+
+            const settledResult = await executor.executeResult(createStartMatchCommand({ source: 'settled_start' }));
+            await Promise.resolve();
+            await new Promise((resolve) => setTimeout(resolve, 0));
+            window.removeEventListener('unhandledrejection', onUnhandled);
+
+            const failedEvents = Array.isArray(sessionRuntime.observability?.events)
+                ? sessionRuntime.observability.events.filter((event) => (
+                    event.type === 'runtime_command_observed'
+                    && event.payload?.phase === 'failed'
+                ))
+                : [];
+
+            return {
+                rawErrorMessage,
+                settledResult,
+                unhandled,
+                failedEvents,
+            };
+        });
+
+        expect(result.rawErrorMessage).toBe('command-boom');
+        expect(result.unhandled).toEqual([]);
+        expect(result.settledResult.ok).toBe(false);
+        expect(result.settledResult.commandType).toBe('start_match');
+        expect(result.settledResult.resultStatus).toBe('rejected');
+        expect(result.settledResult.errorMessage).toBe('command-boom');
+        expect(result.failedEvents.length).toBeGreaterThanOrEqual(2);
+        expect(result.failedEvents.every((event) => event.payload?.resultStatus === 'rejected')).toBe(true);
+    });
+
     test('V74.3 GameRuntimeFacade suppresses menu cleanup when shutdown reuses pending finalize flow', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

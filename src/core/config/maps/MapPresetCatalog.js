@@ -6,6 +6,12 @@ import { PARCOURS_MAPS } from './presets/parcours_maps.js';
 import { EXPERT_MAPS } from './presets/expert_maps.js';
 import { NEON_ABYSS_MAP } from './presets/neon_abyss.js';
 import { CRYSTAL_RUINS_MAP } from './presets/crystal_ruins.js';
+import { VULKAN_ODYSSEY_MAP } from './presets/vulkan_odyssey.js';
+import { FROZEN_HELIX_MAP } from './presets/frozen_helix.js';
+import { NEON_CIRCUIT_MAP } from './presets/neon_circuit.js';
+import { SKY_ISLANDS_MAP } from './presets/sky_islands.js';
+import { ABYSSAL_DESCENT_MAP } from './presets/abyssal_descent.js';
+import { MAGMA_MAZE_MAP } from './presets/magma_maze.js';
 
 export const MAP_PRESET_CATALOG = {
     ...(STANDARD_MAPS || {}),
@@ -16,4 +22,10 @@ export const MAP_PRESET_CATALOG = {
     ...(EXPERT_MAPS || {}),
     ...(NEON_ABYSS_MAP || {}),
     ...(CRYSTAL_RUINS_MAP || {}),
+    ...(VULKAN_ODYSSEY_MAP || {}),
+    ...(FROZEN_HELIX_MAP || {}),
+    ...(NEON_CIRCUIT_MAP || {}),
+    ...(SKY_ISLANDS_MAP || {}),
+    ...(ABYSSAL_DESCENT_MAP || {}),
+    ...(MAGMA_MAZE_MAP || {}),
 };

@@ -58,6 +58,7 @@ function buildSessionRuntimeProjection(game) {
         isHost: facade?.isHost?.() !== false,
         pendingSessionInit: !!lifecycle.pendingSessionInit,
         pendingFinalizeTrigger: finalize.lastTrigger || '',
+        finalizeErrorMessage: finalize.errorMessage || '',
         updatedAt,
     });
 }
@@ -71,8 +72,11 @@ function buildMatchFlowProjection(game) {
         uiStateId: gameStateId,
         roundStateId: gameStateId === GAME_STATE_IDS.ROUND_END ? GAME_STATE_IDS.ROUND_END : '',
         isPaused: gameStateId === GAME_STATE_IDS.PAUSED,
-        canReturnToMenu: gameStateId !== GAME_STATE_IDS.MENU && sessionSnapshot.finalizeState !== 'finalizing',
+        canReturnToMenu: gameStateId !== GAME_STATE_IDS.MENU
+            && sessionSnapshot.finalizeState !== 'finalizing'
+            && sessionSnapshot.finalizeState !== 'error',
         pendingFinalizeTrigger: sessionSnapshot.pendingFinalizeTrigger,
+        finalizeErrorMessage: sessionSnapshot.finalizeErrorMessage,
         isNetworkSession: sessionSnapshot.isNetworkSession,
         isHost: sessionSnapshot.isHost,
         lifecycleState: sessionSnapshot.lifecycleState,
@@ -100,6 +104,7 @@ function buildRuntimeObservabilityProjection(game) {
         finalizeState: finalize.status || 'idle',
         pendingSessionInit: !!lifecycle.pendingSessionInit,
         pendingFinalize: !!finalize.pendingOperation,
+        finalizeErrorMessage: finalize.errorMessage || '',
         lastSequence: Number(observability.sequence) || 0,
         lastEventType: observability.lastEventType || '',
         eventCount: Array.isArray(observability.events) ? observability.events.length : 0,

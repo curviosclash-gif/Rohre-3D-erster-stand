@@ -10,6 +10,10 @@ import {
     SESSION_RUNTIME_STATES,
 } from '../shared/contracts/SessionRuntimeStateMachine.js';
 import { SESSION_RUNTIME_EVENT_TYPES } from '../shared/contracts/SessionRuntimeEventContract.js';
+import {
+    hasActiveMatchSessionRefs,
+    mergeFinalizeRequest,
+} from './MatchLifecycleFinalizeRequest.js';
 import { createMatchSessionPort } from './MatchLifecycleSessionPort.js';
 import {
     createFallbackSessionRuntimeState,
@@ -34,14 +38,6 @@ export const MATCH_SESSION_PORT_METHODS = Object.freeze([
     'resetRoundRuntime',
 ]);
 
-function hasActiveMatchSessionRefs(currentSession) {
-    return !!(
-        currentSession?.arena
-        || currentSession?.entityManager
-        || currentSession?.powerupManager
-    );
-}
-
 export class MatchLifecycleSessionOrchestrator {
     constructor(runtimeOrDeps = null) {
         const runtime = runtimeOrDeps?.runtime || runtimeOrDeps;
@@ -61,6 +57,7 @@ export class MatchLifecycleSessionOrchestrator {
         this._bindRuntimeField('_activeSessionId', ['session', 'activeSessionId'], null);
         this._bindRuntimeField('_pendingSessionInit', ['lifecycle', 'pendingSessionInit'], null);
         this._bindRuntimeField('_pendingFinalize', ['finalize', 'pendingOperation'], null);
+        this._pendingFinalizePlan = null;
         ensureSessionRuntimeLifecycleState(this._sessionRuntimeState);
         if (!this._sessionRuntimeState?.finalize?.status) {
             this._sessionRuntimeState.finalize.status = 'idle';
@@ -109,6 +106,12 @@ export class MatchLifecycleSessionOrchestrator {
             return;
         }
         this._sessionRuntimeState.finalize.status = status;
+        if (
+            status !== 'error'
+            && (!extra || typeof extra !== 'object' || !Object.prototype.hasOwnProperty.call(extra, 'errorMessage'))
+        ) {
+            this._sessionRuntimeState.finalize.errorMessage = null;
+        }
         if (extra && typeof extra === 'object') {
             Object.assign(this._sessionRuntimeState.finalize, extra);
         }
@@ -145,6 +148,7 @@ export class MatchLifecycleSessionOrchestrator {
         this._setFinalizeStatus('idle', {
             lastReason: null,
             lastTrigger: null,
+            errorMessage: null,
         });
         this._recordRuntimeEvent(
             SESSION_RUNTIME_EVENT_TYPES.SESSION_INITIALIZED,
@@ -287,19 +291,39 @@ export class MatchLifecycleSessionOrchestrator {
         return wiredMatch;
     }
 
+    _assertCanStartAfterFinalize(shouldStartAfterFinalize) {
+        if (!shouldStartAfterFinalize) {
+            return;
+        }
+        const completedReason = typeof this._sessionRuntimeState?.finalize?.lastCompletedReason === 'string'
+            ? this._sessionRuntimeState.finalize.lastCompletedReason.trim()
+            : '';
+        if (!completedReason || completedReason === SESSION_FINALIZE_TRIGGERS.NEW_MATCH_SESSION) {
+            return;
+        }
+        const startBlockedError = new Error(`match_start_blocked:${completedReason}`);
+        startBlockedError.code = 'MATCH_START_BLOCKED';
+        throw startBlockedError;
+    }
+
     createMatchSession({ onPlayerFeedback, onPlayerDied, onRoundEnd } = {}) {
         if (!this.deps?.prepareInitializedMatchSession) {
             throw new Error('MatchLifecycleSessionOrchestrator requires runtime context');
         }
+        const shouldStartAfterFinalize = !!(
+            this._pendingFinalize
+            || this._activeSessionId
+            || this._hasCurrentSessionRefs()
+        );
         const finalizeExistingSession = this._pendingFinalize
-            ? Promise.resolve(this._pendingFinalize).catch(() => null)
+            ? Promise.resolve(this._pendingFinalize)
             : (
                 this._activeSessionId || this._hasCurrentSessionRefs()
                     ? Promise.resolve(this.finalizeMatchSession({
                         reason: SESSION_FINALIZE_TRIGGERS.NEW_MATCH_SESSION,
                         notifyMenuOpened: false,
                         awaitPendingInit: false,
-                    })).catch(() => null)
+                    }))
                     : null
             );
 
@@ -311,6 +335,7 @@ export class MatchLifecycleSessionOrchestrator {
         this._setFinalizeStatus('idle', {
             lastReason: null,
             lastTrigger: null,
+            errorMessage: null,
         });
         const lifecycleHandlers = {
             onPlayerFeedback,
@@ -319,7 +344,10 @@ export class MatchLifecycleSessionOrchestrator {
         };
 
         const runPendingInit = () => Promise.resolve(finalizeExistingSession)
-            .then(() => this.deps.prepareInitializedMatchSession(lifecycleHandlers))
+            .then(() => {
+                this._assertCanStartAfterFinalize(shouldStartAfterFinalize);
+                return this.deps.prepareInitializedMatchSession(lifecycleHandlers);
+            })
             .then((resolvedMatch) => this._applyInitializedMatch(
                 resolvedMatch,
                 provisionalId,
@@ -379,34 +407,44 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     async finalizeMatchSession(options = undefined) {
+        const request = this._buildFinalizeRequest(options);
         if (this._pendingFinalize) {
+            this._pendingFinalizePlan = mergeFinalizeRequest(this._pendingFinalizePlan, request);
+            this._setFinalizeStatus('finalizing', {
+                lastReason: this._pendingFinalizePlan?.reason || request.reason,
+                lastTrigger: this._pendingFinalizePlan?.recorderTrigger?.type || request.recorderTrigger?.type || request.reason,
+            });
             return this._pendingFinalize;
         }
-        const request = this._buildFinalizeRequest(options);
+        this._pendingFinalizePlan = request;
         const finalizedSessionId = this._activeSessionId;
         this._setFinalizeStatus('finalizing', {
             lastReason: request.reason,
             lastTrigger: request.recorderTrigger?.type || request.reason,
         });
         this._setLifecycleStatus(SESSION_RUNTIME_STATES.FINALIZING);
+        const resolveActiveRequest = () => this._pendingFinalizePlan || request;
         const trackedFinalize = Promise.resolve().then(async () => {
-            this._endLifecycleSession(request.reason);
+            let activeRequest = resolveActiveRequest();
+            this._endLifecycleSession(activeRequest.reason);
             this._activeSessionId = null;
-            if (request.awaitPendingInit && this._pendingSessionInit) {
+            if (activeRequest.awaitPendingInit && this._pendingSessionInit) {
                 await Promise.resolve(this._pendingSessionInit).catch(() => null);
             }
 
             let finalizeError = null;
             try {
-                await Promise.resolve(this.deps?.settleRecorder?.(request.recorderTrigger));
+                activeRequest = resolveActiveRequest();
+                await Promise.resolve(this.deps?.settleRecorder?.(activeRequest.recorderTrigger));
             } catch (error) {
                 finalizeError = error;
             }
 
             try {
+                activeRequest = resolveActiveRequest();
                 this.deps?.disposeCurrentMatchSession?.({
-                    reason: request.reason,
-                    clearScene: request.clearScene,
+                    reason: activeRequest.reason,
+                    clearScene: activeRequest.clearScene,
                 });
             } catch (error) {
                 if (!finalizeError) {
@@ -422,9 +460,10 @@ export class MatchLifecycleSessionOrchestrator {
                 }
             }
 
-            if (request.notifyMenuOpened) {
+            activeRequest = resolveActiveRequest();
+            if (activeRequest.notifyMenuOpened) {
                 try {
-                    this.notifyMenuOpened({ reason: request.reason });
+                    this.notifyMenuOpened({ reason: activeRequest.reason });
                 } catch (error) {
                     if (!finalizeError) {
                         finalizeError = error;
@@ -436,10 +475,13 @@ export class MatchLifecycleSessionOrchestrator {
                 throw finalizeError;
             }
 
+            activeRequest = resolveActiveRequest();
             this._setFinalizeStatus('finalized', {
-                lastCompletedReason: request.reason,
+                lastReason: activeRequest.reason,
+                lastTrigger: activeRequest.recorderTrigger?.type || activeRequest.reason,
+                lastCompletedReason: activeRequest.reason,
             });
-            if (!request.notifyMenuOpened) {
+            if (!activeRequest.notifyMenuOpened) {
                 this._setLifecycleStatus(
                     this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
                     { gameStateId: GAME_STATE_IDS.MENU }
@@ -448,21 +490,26 @@ export class MatchLifecycleSessionOrchestrator {
             this._recordRuntimeEvent(
                 SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZED,
                 {
-                    reason: request.reason,
-                    notifyMenuOpened: request.notifyMenuOpened === true,
-                    clearScene: request.clearScene === true,
+                    reason: activeRequest.reason,
+                    notifyMenuOpened: activeRequest.notifyMenuOpened === true,
+                    clearScene: activeRequest.clearScene === true,
                 },
                 {
                     sessionId: finalizedSessionId,
                 }
             );
-            return request.reason;
+            return activeRequest.reason;
         }).catch((error) => {
-            this._setFinalizeStatus('error');
+            const failedRequest = resolveActiveRequest();
+            this._setFinalizeStatus('error', {
+                lastReason: failedRequest.reason,
+                lastTrigger: failedRequest.recorderTrigger?.type || failedRequest.reason,
+                errorMessage: error instanceof Error ? error.message : 'match_finalize_failed',
+            });
             this._recordRuntimeEvent(
                 SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZE_FAILED,
                 {
-                    reason: request.reason,
+                    reason: failedRequest.reason,
                     errorMessage: error instanceof Error ? error.message : 'match_finalize_failed',
                 },
                 {
@@ -473,6 +520,7 @@ export class MatchLifecycleSessionOrchestrator {
         }).finally(() => {
             if (this._pendingFinalize === trackedFinalize) {
                 this._pendingFinalize = null;
+                this._pendingFinalizePlan = null;
             }
         });
         this._pendingFinalize = trackedFinalize;
