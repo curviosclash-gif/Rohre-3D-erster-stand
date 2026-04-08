@@ -1,4 +1,4 @@
 import process from 'node:process';
 import { runPlaywrightProfile } from './playwright-run-profile.mjs';
 
-runPlaywrightProfile('preview-smoke', process.argv.slice(2));
+runPlaywrightProfile('dev-runtime', process.argv.slice(2));

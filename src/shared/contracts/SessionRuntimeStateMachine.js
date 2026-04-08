@@ -1,6 +1,7 @@
 import { GAME_STATE_IDS, normalizeGameStateId } from './GameStateIds.js';
+import { SESSION_RUNTIME_EVENT_TYPES } from './SessionRuntimeEventContract.js';
 
-export const SESSION_RUNTIME_STATE_MACHINE_VERSION = 'session-runtime-state-machine.v1';
+export const SESSION_RUNTIME_STATE_MACHINE_VERSION = 'session-runtime-state-machine.v2';
 
 export const SESSION_RUNTIME_STATES = Object.freeze({
     MENU: 'menu',
@@ -71,7 +72,6 @@ const ALLOWED_SESSION_RUNTIME_TRANSITIONS = Object.freeze({
         SESSION_RUNTIME_STATES.DISPOSED,
     ]),
     [SESSION_RUNTIME_STATES.FINALIZING]: Object.freeze([
-        SESSION_RUNTIME_STATES.MENU,
         SESSION_RUNTIME_STATES.FINALIZING,
         SESSION_RUNTIME_STATES.DISPOSED,
     ]),
@@ -79,6 +79,32 @@ const ALLOWED_SESSION_RUNTIME_TRANSITIONS = Object.freeze({
         SESSION_RUNTIME_STATES.DISPOSED,
     ]),
 });
+
+const FINALIZING_MENU_COMPLETION_EVENT_TYPE_SET = new Set([
+    SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZED,
+    SESSION_RUNTIME_EVENT_TYPES.MENU_OPENED,
+]);
+
+function normalizeSessionRuntimeCompletionEventType(value) {
+    return typeof value === 'string' ? value.trim().toLowerCase() : '';
+}
+
+function isFinalizingMenuTransition(currentState, nextState) {
+    return currentState === SESSION_RUNTIME_STATES.FINALIZING
+        && nextState === SESSION_RUNTIME_STATES.MENU;
+}
+
+function canCompleteFinalizingMenuTransition(sessionRuntime, currentState, nextState, options = undefined) {
+    if (!isFinalizingMenuTransition(currentState, nextState)) {
+        return false;
+    }
+    const completionEventType = normalizeSessionRuntimeCompletionEventType(options?.completionEventType);
+    const finalizeStatus = typeof sessionRuntime?.finalize?.status === 'string'
+        ? sessionRuntime.finalize.status.trim().toLowerCase()
+        : '';
+    return finalizeStatus === 'finalized'
+        && FINALIZING_MENU_COMPLETION_EVENT_TYPE_SET.has(completionEventType);
+}
 
 export function normalizeSessionRuntimeState(value, fallback = SESSION_RUNTIME_STATES.MENU) {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
@@ -129,8 +155,28 @@ export function applySessionRuntimeLifecycleTransition(sessionRuntime, nextState
     const requestedNextState = normalizeSessionRuntimeState(nextState, currentState);
     const shouldDispose = lifecycle.disposed || requestedNextState === SESSION_RUNTIME_STATES.DISPOSED || options?.disposed === true;
     const normalizedNextState = shouldDispose ? SESSION_RUNTIME_STATES.DISPOSED : requestedNextState;
+    const allowFinalizeCompletion = canCompleteFinalizingMenuTransition(
+        sessionRuntime,
+        currentState,
+        normalizedNextState,
+        options
+    );
 
-    if (!shouldDispose && options?.allowFromAny !== true && !canTransitionSessionRuntimeState(currentState, normalizedNextState)) {
+    if (!shouldDispose && isFinalizingMenuTransition(currentState, normalizedNextState) && !allowFinalizeCompletion) {
+        return {
+            changed: false,
+            currentState,
+            nextState: currentState,
+            lifecycle,
+        };
+    }
+
+    if (
+        !shouldDispose
+        && options?.allowFromAny !== true
+        && !allowFinalizeCompletion
+        && !canTransitionSessionRuntimeState(currentState, normalizedNextState)
+    ) {
         return {
             changed: false,
             currentState,

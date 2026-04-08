@@ -3,6 +3,12 @@ import {
     deriveResumeTransition,
 } from '../state/MatchLifecycleStateTransitions.js';
 import { createPauseOverlayControllerPort } from '../shared/runtime/UiControllerRuntimePorts.js';
+import {
+    applyResumeProjectionIntent,
+    isPauseOverlayActive,
+    resumeFromPauseIntent,
+    returnToMenuFromPauseIntent,
+} from './PauseOverlayIntentActions.js';
 
 export class PauseOverlayController {
     constructor(deps = {}) {
@@ -28,7 +34,7 @@ export class PauseOverlayController {
     }
 
     _isPauseActive() {
-        return this._getMatchFlowSnapshot()?.isPaused === true;
+        return isPauseOverlayActive(this._getMatchFlowSnapshot(), this.game?.state);
     }
 
     _isHost() {
@@ -62,9 +68,7 @@ export class PauseOverlayController {
         if (!this._boundHandlers) {
             this._boundHandlers = {
                 onPauseResumeClick: () => {
-                    if (this._isPauseActive()) {
-                        this.resumeFromPause();
-                    }
+                    this.resumeFromPause();
                 },
                 onPauseSettingsClick: () => {
                     if (this._isPauseActive()) {
@@ -77,9 +81,7 @@ export class PauseOverlayController {
                     }
                 },
                 onPauseMenuClick: () => {
-                    if (this._isPauseActive()) {
-                        this.returnToMenuFromPause();
-                    }
+                    this.returnToMenuFromPause();
                 },
                 onPauseKeybindP1Click: (event) => this._handleKeybindClick(event, 'PLAYER_1'),
                 onPauseKeybindP2Click: (event) => this._handleKeybindClick(event, 'PLAYER_2'),
@@ -184,43 +186,20 @@ export class PauseOverlayController {
         return this.applyDisconnectConfirmationProjection();
     }
 
-    resumeFromPause() {
-        if (this.runtimePort?.resumeMatch) {
-            return this.runtimePort.resumeMatch();
-        }
-        return this.applyResumeProjection();
+    createResumeTransition() {
+        return deriveResumeTransition();
     }
 
-    applyResumeProjection() {
-        this._restorePauseButtonLabels();
-        this.hideHostPausedOverlay();
+    resumeFromPause() {
+        return resumeFromPauseIntent(this);
+    }
 
-        const controller = this.matchFlowUiController;
-        const resumeTransition = deriveResumeTransition();
-        this._hideSettings();
-        controller.applyLifecycleTransition(resumeTransition);
-        controller.applyMatchUiState(resumeTransition.uiState);
-        this.game.gameLoop.requestDeltaReset?.('pause-resume');
-        return true;
+    applyResumeProjection(options = undefined) {
+        return applyResumeProjectionIntent(this, options);
     }
 
     returnToMenuFromPause() {
-        this._hideSettings();
-        this.hideHostPausedOverlay();
-        this._restorePauseButtonLabels();
-        if (this.runtimePort?.returnToMenu) {
-            this.runtimePort.returnToMenu({
-                panelId: 'submenu-game',
-                reason: 'pause_menu_return',
-                trigger: 'pause_menu_return',
-            });
-            return;
-        }
-        this.matchFlowUiController.applyReturnToMenuUi({
-            panelId: 'submenu-game',
-            reason: 'pause_menu_return',
-            trigger: 'pause_menu_return',
-        });
+        return returnToMenuFromPauseIntent(this);
     }
 
     _restorePauseButtonLabels() {
@@ -284,7 +263,12 @@ export class PauseOverlayController {
 
     _hideSettings() {
         const game = this.game;
-        game.keyCapture = null;
+        if (game) {
+            game.keyCapture = null;
+        }
+        if (!game?.ui) {
+            return;
+        }
         if (game.ui.pauseSettingsPanel) {
             game.ui.pauseSettingsPanel.classList.add('hidden');
         }

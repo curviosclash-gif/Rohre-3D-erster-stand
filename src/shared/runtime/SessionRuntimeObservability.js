@@ -28,6 +28,19 @@ export function createDefaultSessionRuntimeObservabilityState() {
     };
 }
 
+function trimSessionRuntimeObservabilityEvents(events) {
+    return Array.isArray(events)
+        ? events.slice(-SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT)
+        : [];
+}
+
+function appendSessionRuntimeObservabilityEvent(events, event) {
+    const nextEvents = trimSessionRuntimeObservabilityEvents(events).concat(event);
+    return nextEvents.length > SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT
+        ? nextEvents.slice(-SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT)
+        : nextEvents;
+}
+
 export function ensureSessionRuntimeObservabilityState(source) {
     const sessionRuntime = resolveSessionRuntime(source);
     if (!sessionRuntime || typeof sessionRuntime !== 'object') {
@@ -40,9 +53,7 @@ export function ensureSessionRuntimeObservabilityState(source) {
     observability.sequence = Number.isFinite(observability.sequence)
         ? Math.max(0, Math.floor(observability.sequence))
         : 0;
-    observability.events = Array.isArray(observability.events)
-        ? observability.events.slice(-SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT)
-        : [];
+    observability.events = trimSessionRuntimeObservabilityEvents(observability.events);
     observability.lastEventType = typeof observability.lastEventType === 'string'
         ? observability.lastEventType.trim()
         : '';
@@ -76,9 +87,6 @@ export function recordSessionRuntimeEvent(source, event = null) {
     observability.sequence = runtimeEvent.sequence;
     observability.lastEventType = runtimeEvent.type;
     observability.updatedAt = runtimeEvent.timestampMs;
-    observability.events.push(runtimeEvent);
-    if (observability.events.length > SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT) {
-        observability.events.splice(0, observability.events.length - SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT);
-    }
+    observability.events = appendSessionRuntimeObservabilityEvent(observability.events, runtimeEvent);
     return runtimeEvent;
 }

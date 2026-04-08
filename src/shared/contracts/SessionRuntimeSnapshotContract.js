@@ -52,7 +52,7 @@ export function createMatchFlowSnapshot(payload = {}) {
         uiStateId: normalizeString(source.uiStateId, ''),
         roundStateId: normalizeString(source.roundStateId, ''),
         isPaused: source.isPaused === true,
-        canReturnToMenu: source.canReturnToMenu !== false,
+        canReturnToMenu: source.canReturnToMenu === true,
         pendingFinalizeTrigger: normalizeString(source.pendingFinalizeTrigger, ''),
         finalizeErrorMessage: normalizeString(source.finalizeErrorMessage, ''),
         isNetworkSession: source.isNetworkSession === true,

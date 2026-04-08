@@ -20,6 +20,7 @@ import {
     readRuntimeStatePath,
     writeRuntimeStatePath,
 } from './MatchLifecycleSessionRuntimeState.js';
+import { completeSessionRuntimeMenuLifecycle } from './MatchLifecycleSessionTransitionSupport.js';
 
 export { createMatchSessionPort } from './MatchLifecycleSessionPort.js';
 
@@ -174,9 +175,10 @@ export class MatchLifecycleSessionOrchestrator {
     }
 
     notifyMenuOpened(extra = null) {
-        this._setLifecycleStatus(
-            this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
-            { gameStateId: GAME_STATE_IDS.MENU }
+        completeSessionRuntimeMenuLifecycle(
+            this._sessionRuntimeState,
+            this._setLifecycleStatus.bind(this),
+            SESSION_RUNTIME_EVENT_TYPES.MENU_OPENED
         );
         this._recordRuntimeEvent(SESSION_RUNTIME_EVENT_TYPES.MENU_OPENED, {
             reason: extra?.reason || '',
@@ -424,10 +426,12 @@ export class MatchLifecycleSessionOrchestrator {
         });
         this._setLifecycleStatus(SESSION_RUNTIME_STATES.FINALIZING);
         const resolveActiveRequest = () => this._pendingFinalizePlan || request;
-        const trackedFinalize = Promise.resolve().then(async () => {
+        const trackedFinalize = (async () => {
             let activeRequest = resolveActiveRequest();
             this._endLifecycleSession(activeRequest.reason);
-            this._activeSessionId = null;
+            if (this._activeSessionId === finalizedSessionId) {
+                this._activeSessionId = null;
+            }
             if (activeRequest.awaitPendingInit && this._pendingSessionInit) {
                 await Promise.resolve(this._pendingSessionInit).catch(() => null);
             }
@@ -460,17 +464,6 @@ export class MatchLifecycleSessionOrchestrator {
                 }
             }
 
-            activeRequest = resolveActiveRequest();
-            if (activeRequest.notifyMenuOpened) {
-                try {
-                    this.notifyMenuOpened({ reason: activeRequest.reason });
-                } catch (error) {
-                    if (!finalizeError) {
-                        finalizeError = error;
-                    }
-                }
-            }
-
             if (finalizeError) {
                 throw finalizeError;
             }
@@ -481,12 +474,6 @@ export class MatchLifecycleSessionOrchestrator {
                 lastTrigger: activeRequest.recorderTrigger?.type || activeRequest.reason,
                 lastCompletedReason: activeRequest.reason,
             });
-            if (!activeRequest.notifyMenuOpened) {
-                this._setLifecycleStatus(
-                    this._sessionRuntimeState?.lifecycle?.disposed ? SESSION_RUNTIME_STATES.DISPOSED : SESSION_RUNTIME_STATES.MENU,
-                    { gameStateId: GAME_STATE_IDS.MENU }
-                );
-            }
             this._recordRuntimeEvent(
                 SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZED,
                 {
@@ -498,8 +485,17 @@ export class MatchLifecycleSessionOrchestrator {
                     sessionId: finalizedSessionId,
                 }
             );
+            if (activeRequest.notifyMenuOpened) {
+                this.notifyMenuOpened({ reason: activeRequest.reason });
+            } else {
+                completeSessionRuntimeMenuLifecycle(
+                    this._sessionRuntimeState,
+                    this._setLifecycleStatus.bind(this),
+                    SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZED
+                );
+            }
             return activeRequest.reason;
-        }).catch((error) => {
+        })().catch((error) => {
             const failedRequest = resolveActiveRequest();
             this._setFinalizeStatus('error', {
                 lastReason: failedRequest.reason,

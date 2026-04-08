@@ -23,6 +23,7 @@ import {
     normalizeGameStateId,
 } from '../shared/contracts/GameStateIds.js';
 import { createMatchFlowUiControllerPort } from '../shared/runtime/UiControllerRuntimePorts.js';
+import { executeAtomicUiIntent } from '../shared/runtime/UiIntentAtomicity.js';
 import {
     createRoundEndRecorderAdapter,
     getMatchSessionAccessSnapshot,
@@ -680,21 +681,19 @@ export class MatchFlowUiController {
     }
 
     applyStartMatchProjection() {
-        if (this._startMatchPromise) return this._startMatchPromise;
-        try {
-            const startResult = this._startMatchInternal();
-            if (isPromiseLike(startResult)) {
-                this._startMatchPromise = Promise.resolve(startResult)
-                    .catch((error) => this._handleStartMatchFailure(error))
-                    .finally(() => {
-                        this._startMatchPromise = null;
-                    });
-                return this._startMatchPromise;
-            }
-            return startResult;
-        } catch (error) {
-            return this._handleStartMatchFailure(error);
-        }
+        return executeAtomicUiIntent({
+            currentPromise: this._startMatchPromise,
+            assignPendingPromise: (promise) => {
+                this._startMatchPromise = promise;
+            },
+            clearPendingPromise: (promise) => {
+                if (this._startMatchPromise === promise) {
+                    this._startMatchPromise = null;
+                }
+            },
+            execute: () => this._startMatchInternal(),
+            handleError: (error) => this._handleStartMatchFailure(error),
+        });
     }
 
     startMatch(options = undefined) {
@@ -842,7 +841,7 @@ export class MatchFlowUiController {
     resumeFromPause() { this.pauseOverlayController.resumeFromPause(); }
     returnToMenuFromPause() { this.pauseOverlayController.returnToMenuFromPause(); }
     applyPauseProjection() { return this.pauseOverlayController.applyPauseProjection(); }
-    applyResumeProjection() { return this.pauseOverlayController.applyResumeProjection(); }
+    applyResumeProjection(options = undefined) { return this.pauseOverlayController.applyResumeProjection(options); }
     applyDisconnectConfirmationProjection() { return this.pauseOverlayController.applyDisconnectConfirmationProjection(); }
     setupPauseOverlayListeners() { this.pauseOverlayController.setupListeners(); }
     dispose() {

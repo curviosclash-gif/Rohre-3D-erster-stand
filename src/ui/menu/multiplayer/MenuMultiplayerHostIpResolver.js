@@ -57,6 +57,17 @@ function resolveLocalIpWithWebRtc({ runtimeGlobal, timeoutMs = 2000 } = {}) {
 
 async function resolveFromDiscoveryEndpoint(options) {
     const { runtimeGlobal, discoveryRuntime } = options;
+    if (typeof discoveryRuntime?.isAvailable === 'function' && discoveryRuntime.isAvailable() !== true) {
+        return null;
+    }
+    if (
+        (!discoveryRuntime?.isAvailable || typeof discoveryRuntime.isAvailable !== 'function')
+        && discoveryRuntime?.capability
+        && typeof discoveryRuntime.capability === 'object'
+        && discoveryRuntime.capability.available !== true
+    ) {
+        return null;
+    }
     const fetchImpl = toCallable(options.fetch, runtimeGlobal?.fetch);
     const getLanServerStatus = toCallable(discoveryRuntime?.getLanServerStatus, null);
     if (!fetchImpl || !getLanServerStatus) return null;

@@ -1,7 +1,16 @@
 // @ts-check
 import { defineConfig, devices } from '@playwright/test';
+import {
+    applyPlaywrightRunProfileEnv,
+    PLAYWRIGHT_DEFAULT_RUN_PROFILE,
+    resolvePlaywrightRunProfile,
+} from './scripts/playwright-run-profile.mjs';
 
 const isCI = !!process.env.CI;
+const runProfile = applyPlaywrightRunProfileEnv(
+    process.env,
+    process.env.PW_RUN_PROFILE || PLAYWRIGHT_DEFAULT_RUN_PROFILE
+);
 
 function toPositiveInt(rawValue, fallback, min = 1, max = 65_535) {
     const numeric = Number.parseInt(String(rawValue || ''), 10);
@@ -27,8 +36,9 @@ function sanitizeRunTag(value) {
     return normalized || `pid-${process.pid}`;
 }
 
-function resolveIsolatedPlaywrightEnv() {
-    const runTag = sanitizeRunTag(process.env.PW_RUN_TAG || `pid-${process.pid}-${Date.now().toString(36)}`);
+function resolveIsolatedPlaywrightEnv(profile) {
+    const fallbackRunTag = `${profile.name}-pid-${process.pid}-${Date.now().toString(36)}`;
+    const runTag = sanitizeRunTag(process.env.PW_RUN_TAG || fallbackRunTag);
     const defaultPortBase = toPositiveInt(process.env.PW_BASE_PORT, 5173, 1024, 60_000);
     const defaultPortSpan = toPositiveInt(process.env.PW_PORT_SPAN, 400, 10, 4000);
     const defaultPort = defaultPortBase + (hashRunTag(runTag) % defaultPortSpan);
@@ -49,18 +59,29 @@ function resolveIsolatedPlaywrightEnv() {
     };
 }
 
-const isolatedEnv = resolveIsolatedPlaywrightEnv();
+const isolatedEnv = resolveIsolatedPlaywrightEnv(runProfile);
 const TEST_PORT = isolatedEnv.testPort;
 const TEST_HOST = String(process.env.TEST_HOST || '127.0.0.1');
 process.env.TEST_HOST = TEST_HOST;
+const serverMode = resolvePlaywrightRunProfile(runProfile.name).serverMode;
 const runTag = isolatedEnv.runTag;
 const outputDir = isolatedEnv.outputDir;
 const htmlReportDir = String(process.env.PW_HTML_REPORT_DIR || `playwright-report/${runTag}`);
 const workers = isolatedEnv.workers;
-const useGlobalWarmup = process.env.PW_PREWARM !== '0';
+const serverLogBase = `tmp-vite-${runTag}`;
+process.env.PW_SERVER_LOG_OUT = String(process.env.PW_SERVER_LOG_OUT || `${serverLogBase}.out.log`);
+process.env.PW_SERVER_LOG_ERR = String(process.env.PW_SERVER_LOG_ERR || `${serverLogBase}.err.log`);
+process.env.PW_SERVER_LOG_PATHS = String(
+    process.env.PW_SERVER_LOG_PATHS
+    || `${process.env.PW_SERVER_LOG_OUT};${process.env.PW_SERVER_LOG_ERR}`
+);
+const useGlobalWarmup = runProfile.useGlobalWarmup;
 const traceMode = process.env.PW_TRACE === '1'
     ? 'retain-on-failure'
     : (isCI ? 'retain-on-failure' : 'off');
+const webServerCommand = serverMode === 'dev'
+    ? `npx vite --host ${TEST_HOST} --port ${TEST_PORT} --strictPort`
+    : `node scripts/playwright-preview-server.mjs --host ${TEST_HOST} --port ${TEST_PORT}`;
 const reporters = process.env.PW_HTML_REPORT === '1' || isCI
     ? [['list'], ['html', { open: 'never', outputFolder: htmlReportDir }]]
     : [['list']];
@@ -69,6 +90,10 @@ export default defineConfig({
     testDir: './tests',
     testMatch: ['**/*.spec.js'],
     timeout: 60_000,
+    metadata: {
+        runProfile: runProfile.name,
+        serverMode,
+    },
     fullyParallel: false,
     forbidOnly: isCI,
     retries: 1,
@@ -83,14 +108,14 @@ export default defineConfig({
     },
     projects: [
         {
-            name: 'chromium',
+            name: runProfile.projectName,
             use: { ...devices['Desktop Chrome'] },
         },
     ],
     webServer: {
-        command: `npx vite --host ${TEST_HOST} --port ${TEST_PORT} --strictPort`,
+        command: webServerCommand,
         url: `http://${TEST_HOST}:${TEST_PORT}`,
-        timeout: 30_000,
+        timeout: 300_000,
         reuseExistingServer: !isCI && process.env.PW_REUSE_SERVER === '1',
     },
 });

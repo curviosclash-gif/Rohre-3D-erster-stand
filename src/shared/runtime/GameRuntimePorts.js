@@ -314,8 +314,8 @@ export function createMatchUiPort(game) {
         applyPauseMatchProjection() {
             return getRuntimeComponent(game, 'matchFlowUiController')?.applyPauseProjection?.();
         },
-        applyResumeMatchProjection() {
-            return getRuntimeComponent(game, 'matchFlowUiController')?.applyResumeProjection?.();
+        applyResumeMatchProjection(options = undefined) {
+            return getRuntimeComponent(game, 'matchFlowUiController')?.applyResumeProjection?.(options);
         },
         applyDisconnectConfirmationProjection() {
             return getRuntimeComponent(game, 'matchFlowUiController')?.applyDisconnectConfirmationProjection?.();

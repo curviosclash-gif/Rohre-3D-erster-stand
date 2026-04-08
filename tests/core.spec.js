@@ -96,5 +96,6 @@ test.describe('Core Smoke', () => {
 
         expect(migrated.current.numBots).toBe(2);
         expect(migrated.current.localSettings?.shadowQuality).toBe(2);
+        expect(migrated.legacyStillPresent).toBe(false);
     });
 });

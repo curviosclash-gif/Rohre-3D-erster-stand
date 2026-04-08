@@ -93,9 +93,6 @@ export function finalizeMatchFlow(facade, options = undefined, fallbackReason = 
     if (requestedPlan.resetArcadeRunState) {
         facade?._resetArcadeRunState?.();
     }
-    if (requestedPlan.applyReturnToMenuUi) {
-        facade?.ports?.matchUiPort?.applyReturnToMenuUi?.(requestedPlan.uiOptions);
-    }
 
     const sessionFinalizePromise = (() => {
         try {
@@ -119,6 +116,9 @@ export function finalizeMatchFlow(facade, options = undefined, fallbackReason = 
                 return false;
             }
             try {
+                if (activePlan.applyReturnToMenuUi) {
+                    facade?.ports?.matchUiPort?.applyReturnToMenuUi?.(activePlan.uiOptions);
+                }
                 if (activePlan.schedulePrewarm) {
                     facade?.scheduleMatchPrewarm?.();
                 }

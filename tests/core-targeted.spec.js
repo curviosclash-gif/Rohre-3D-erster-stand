@@ -7618,22 +7618,27 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
                 schedulePrewarm: false,
                 source: 'settings_menu',
             }));
-            const startResult = executor.execute(createStartMatchCommand({
+            const rawStartResult = executor.execute(createStartMatchCommand({
                 source: 'menu_multiplayer_bridge',
                 settingsSnapshot: {
                     mapKey: 'maze',
                 },
             }));
+            const startResult = rawStartResult && typeof rawStartResult.then === 'function'
+                ? await rawStartResult
+                : rawStartResult;
 
             return {
                 applyResult,
                 startResult,
+                startResultIsPromise: !!(rawStartResult && typeof rawStartResult.then === 'function'),
                 callLog,
             };
         });
 
         expect(result.applyResult?.schedulePrewarm).toBe(false);
         expect(result.startResult).toBe(true);
+        expect(result.startResultIsPromise).toBe(true);
         expect(result.callLog.filter((entry) => entry === 'applyRuntime:false')).toHaveLength(2);
         expect(result.callLog).toEqual(expect.arrayContaining([
             'applySnapshot:maze',
@@ -7712,6 +7717,948 @@ test.describe('V74: Runtime-Decoupling Regressions', () => {
         expect(result.settledResult.errorMessage).toBe('command-boom');
         expect(result.failedEvents.length).toBeGreaterThanOrEqual(2);
         expect(result.failedEvents.every((event) => event.payload?.resultStatus === 'rejected')).toBe(true);
+    });
+
+    test('V87.3 SessionRuntimeCommandExecutor returns explicit invalid-command results for settled callers', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { SessionRuntimeCommandExecutor } = await import('/src/application/session-runtime/SessionRuntimeCommandExecutor.js');
+            const { createFallbackSessionRuntimeState } = await import('/src/state/MatchLifecycleSessionRuntimeState.js');
+
+            const sessionRuntime = createFallbackSessionRuntimeState();
+            const runtimeBundle = { sessionRuntime };
+            const executor = new SessionRuntimeCommandExecutor({
+                facade: {
+                    game: {},
+                    getRuntimeBundle() {
+                        return runtimeBundle;
+                    },
+                },
+            });
+
+            const rawResult = executor.execute({
+                type: 'not_a_real_command',
+                payload: { source: 'manual_probe' },
+            });
+            const settledResult = await executor.executeResult({
+                type: 'not_a_real_command',
+                payload: { source: 'manual_probe' },
+            });
+
+            const failedEvents = Array.isArray(sessionRuntime.observability?.events)
+                ? sessionRuntime.observability.events.filter((event) => (
+                    event.type === 'runtime_command_observed'
+                    && event.payload?.phase === 'failed'
+                    && event.payload?.resultStatus === 'invalid_command'
+                ))
+                : [];
+
+            return {
+                rawWasUndefined: rawResult === undefined,
+                settledResult,
+                failedEvents,
+            };
+        });
+
+        expect(result.rawWasUndefined).toBe(true);
+        expect(result.settledResult.ok).toBe(false);
+        expect(result.settledResult.commandType).toBe('not_a_real_command');
+        expect(result.settledResult.commandSource).toBe('manual_probe');
+        expect(result.settledResult.resultStatus).toBe('invalid_command');
+        expect(result.settledResult.errorMessage).toBe('invalid session runtime command');
+        expect(result.failedEvents.length).toBeGreaterThanOrEqual(2);
+    });
+
+    test('V87.3 Electron discovery adapter suppresses stale capability availability without intents', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createElectronPreloadDiscoveryAdapter } = await import('/src/platform/electron/ElectronPlatformBridge.js');
+
+            const runtimeGlobal = {
+                __CURVIOS_APP__: true,
+                curviosApp: {
+                    isApp: true,
+                    contracts: {
+                        discovery: {
+                            contractVersion: 'preload.discovery.test',
+                        },
+                    },
+                    capabilities: {
+                        discovery: {
+                            available: true,
+                            providerKind: 'electron-ipc',
+                            supportsSubscribe: true,
+                        },
+                    },
+                },
+            };
+
+            const adapter = createElectronPreloadDiscoveryAdapter(runtimeGlobal);
+            return {
+                available: adapter.capability.available,
+                isAvailable: adapter.isAvailable(),
+                startDiscoveryIsNull: adapter.startDiscovery === null,
+                getDiscoveredHostsIsNull: adapter.getDiscoveredHosts === null,
+                onDiscoveredHostsIsNull: adapter.onDiscoveredHosts === null,
+                degradedReason: adapter.capability.degradedReason,
+                supportsSubscribe: adapter.capability.supportsSubscribe,
+            };
+        });
+
+        expect(result.available).toBe(false);
+        expect(result.isAvailable).toBe(false);
+        expect(result.startDiscoveryIsNull).toBe(true);
+        expect(result.getDiscoveredHostsIsNull).toBe(true);
+        expect(result.onDiscoveredHostsIsNull).toBe(true);
+        expect(result.degradedReason).toBe('discovery_unavailable');
+        expect(result.supportsSubscribe).toBe(false);
+    });
+
+    test('V87.3 Browser discovery port stays unavailable when desktop fallbacks are absent', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createMenuMultiplayerDiscoveryPort } = await import('/src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js');
+
+            const port = createMenuMultiplayerDiscoveryPort({
+                runtime: { global: {} },
+            });
+
+            return {
+                available: port.isAvailable(),
+                hosts: await Promise.resolve(port.getHosts()),
+                unsubscribeType: typeof port.subscribe(() => {}),
+            };
+        });
+
+        expect(result.available).toBe(false);
+        expect(result.hosts).toEqual([]);
+        expect(result.unsubscribeType).toBe('function');
+    });
+
+    test('V87.3 Browser platform adapters expose null intents while capability availability stays false', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const {
+                createBrowserDiscoveryAdapter,
+                createBrowserHostAdapter,
+            } = await import('/src/platform/browser/BrowserPlatformAdapters.js');
+
+            const discovery = createBrowserDiscoveryAdapter();
+            const host = createBrowserHostAdapter();
+
+            return {
+                discoveryAvailable: discovery.isAvailable(),
+                discoveryCapabilityAvailable: discovery.capability.available,
+                startDiscoveryIsNull: discovery.startDiscovery === null,
+                stopDiscoveryIsNull: discovery.stopDiscovery === null,
+                getDiscoveredHostsIsNull: discovery.getDiscoveredHosts === null,
+                onDiscoveredHostsIsNull: discovery.onDiscoveredHosts === null,
+                hostAvailable: host.isAvailable(),
+                hostCapabilityAvailable: host.capability.available,
+                getLanServerStatusIsNull: host.getLanServerStatus === null,
+                startLanServerIsNull: host.startLanServer === null,
+                stopLanServerIsNull: host.stopLanServer === null,
+            };
+        });
+
+        expect(result.discoveryAvailable).toBe(false);
+        expect(result.discoveryCapabilityAvailable).toBe(false);
+        expect(result.startDiscoveryIsNull).toBe(true);
+        expect(result.stopDiscoveryIsNull).toBe(true);
+        expect(result.getDiscoveredHostsIsNull).toBe(true);
+        expect(result.onDiscoveredHostsIsNull).toBe(true);
+        expect(result.hostAvailable).toBe(false);
+        expect(result.hostCapabilityAvailable).toBe(false);
+        expect(result.getLanServerStatusIsNull).toBe(true);
+        expect(result.startLanServerIsNull).toBe(true);
+        expect(result.stopLanServerIsNull).toBe(true);
+    });
+
+    test('V87.99 StoragePlatform surfaces partial legacy migrations when legacy-key removal fails', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { StoragePlatform } = await import('/src/state/storage/StoragePlatform.js');
+
+            const memory = new Map();
+            memory.set('legacy.settings', JSON.stringify({
+                numBots: 2,
+                localSettings: {
+                    shadowQuality: 2,
+                },
+            }));
+
+            const warnings = [];
+            const migrationEvents = [];
+            const originalWarn = console.warn;
+            console.warn = (...args) => {
+                warnings.push(args.map((entry) => String(entry)).join(' '));
+            };
+
+            try {
+                const storage = {
+                    getItem(key) {
+                        return memory.has(key) ? memory.get(key) : null;
+                    },
+                    setItem(key, value) {
+                        memory.set(key, String(value));
+                    },
+                    removeItem() {
+                        throw new Error('remove_blocked');
+                    },
+                };
+
+                const platform = new StoragePlatform({
+                    storage,
+                    onMigrationResult(resultEntry) {
+                        migrationEvents.push(resultEntry);
+                    },
+                });
+                const parsed = platform.readJson('current.settings', ['legacy.settings'], null);
+                const migrationResult = platform.getLastMigrationResult('current.settings');
+
+                return {
+                    parsed,
+                    currentRaw: memory.get('current.settings') || null,
+                    legacyRaw: memory.get('legacy.settings') || null,
+                    migrationResult,
+                    migrationEventCount: migrationEvents.length,
+                    warningCount: warnings.length,
+                    warningText: warnings[0] || '',
+                };
+            } finally {
+                console.warn = originalWarn;
+            }
+        });
+
+        expect(result.parsed?.numBots).toBe(2);
+        expect(result.currentRaw).not.toBeNull();
+        expect(result.legacyRaw).not.toBeNull();
+        expect(result.migrationResult?.attempted).toBe(true);
+        expect(result.migrationResult?.migrated).toBe(false);
+        expect(result.migrationResult?.ok).toBe(false);
+        expect(result.migrationResult?.writeOk).toBe(true);
+        expect(result.migrationResult?.removeOk).toBe(false);
+        expect(result.migrationResult?.status).toBe('remove_failed');
+        expect(result.migrationResult?.reason).toBe('remove_blocked');
+        expect(result.migrationEventCount).toBe(1);
+        expect(result.warningCount).toBe(1);
+        expect(result.warningText).toContain('Legacy storage migration incomplete');
+    });
+
+    test('V87.3 Electron save adapter clears fallback degradedReason when invoke basis is available', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createElectronPreloadSaveAdapter } = await import('/src/platform/electron/ElectronPlatformBridge.js');
+
+            const runtimeGlobal = {
+                __CURVIOS_APP__: true,
+                curviosApp: {
+                    isApp: true,
+                    saveReplay: async () => ({ saved: true }),
+                    capabilities: {
+                        save: {
+                            available: true,
+                            providerKind: 'electron-ipc',
+                        },
+                    },
+                },
+            };
+
+            const adapter = createElectronPreloadSaveAdapter(runtimeGlobal);
+            return {
+                available: adapter.capability.available,
+                isAvailable: adapter.isAvailable(),
+                degradedReason: adapter.capability.degradedReason,
+                saveReplayIsFunction: typeof adapter.saveReplay === 'function',
+                saveVideoIsNull: adapter.saveVideo === null,
+                supportsBinaryExport: adapter.capability.supportsBinaryExport,
+            };
+        });
+
+        expect(result.available).toBe(true);
+        expect(result.isAvailable).toBe(true);
+        expect(result.degradedReason).toBe('');
+        expect(result.saveReplayIsFunction).toBe(true);
+        expect(result.saveVideoIsNull).toBe(true);
+        expect(result.supportsBinaryExport).toBe(false);
+    });
+
+    test('V87.4 MatchFlowUiController assigns the start inflight guard before reentrant start work', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MatchFlowUiController } = await import('/src/ui/MatchFlowUiController.js');
+
+            const game = {
+                state: 'MENU',
+                ui: {},
+                input: null,
+                runtimeConfig: {
+                    session: {
+                        numHumans: 1,
+                    },
+                },
+            };
+            const controller = new MatchFlowUiController({
+                game,
+                ports: {},
+            });
+
+            let startCalls = 0;
+            let nestedPromise = null;
+            let resolveStart = null;
+            controller._handleStartMatchFailure = () => false;
+            controller._startMatchInternal = () => {
+                startCalls += 1;
+                if (!nestedPromise) {
+                    nestedPromise = controller.applyStartMatchProjection();
+                }
+                return new Promise((resolve) => {
+                    resolveStart = () => resolve('started');
+                });
+            };
+
+            const firstPromise = controller.applyStartMatchProjection();
+            const samePromise = firstPromise === nestedPromise;
+            resolveStart();
+            const [firstResult, nestedResult] = await Promise.all([firstPromise, nestedPromise]);
+
+            return {
+                samePromise,
+                startCalls,
+                firstResult,
+                nestedResult,
+                pendingAfterSettle: controller._startMatchPromise !== null,
+            };
+        });
+
+        expect(result.samePromise).toBe(true);
+        expect(result.startCalls).toBe(1);
+        expect(result.firstResult).toBe('started');
+        expect(result.nestedResult).toBe('started');
+        expect(result.pendingAfterSettle).toBe(false);
+    });
+
+    test('V87.4 executeAtomicUiIntent rejects async failures when no error handler is provided', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { executeAtomicUiIntent } = await import('/src/shared/runtime/UiIntentAtomicity.js');
+
+            let pendingPromise = null;
+            try {
+                await executeAtomicUiIntent({
+                    currentPromise: pendingPromise,
+                    assignPendingPromise: (promise) => {
+                        pendingPromise = promise;
+                    },
+                    clearPendingPromise: (promise) => {
+                        if (pendingPromise === promise) {
+                            pendingPromise = null;
+                        }
+                    },
+                    execute: () => Promise.reject(new Error('atomic_rejection')),
+                });
+                return {
+                    resolved: true,
+                    pendingAfterSettle: pendingPromise !== null,
+                };
+            } catch (error) {
+                return {
+                    resolved: false,
+                    errorMessage: error?.message || '',
+                    pendingAfterSettle: pendingPromise !== null,
+                };
+            }
+        });
+
+        expect(result.resolved).toBe(false);
+        expect(result.errorMessage).toBe('atomic_rejection');
+        expect(result.pendingAfterSettle).toBe(false);
+    });
+
+    test('V87.4 GameRuntimeSessionHandler returns a fresh promise after a settled synchronous start', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameRuntimeSessionHandler } = await import('/src/core/runtime/GameRuntimeSessionHandler.js');
+
+            const handler = new GameRuntimeSessionHandler({ facade: {}, logger: console });
+            let startCalls = 0;
+            handler._startMatchAfterGuards = () => {
+                startCalls += 1;
+                return true;
+            };
+
+            const firstPromise = handler.startMatch();
+            let nextPromise = null;
+            const secondResultPromise = firstPromise.then(() => {
+                nextPromise = handler.startMatch();
+                return nextPromise;
+            });
+            const firstResult = await firstPromise;
+            const secondResult = await secondResultPromise;
+
+            return {
+                firstIsPromise: !!firstPromise && typeof firstPromise.then === 'function',
+                samePromiseAfterSettle: firstPromise === nextPromise,
+                firstResult,
+                secondResult,
+                startCalls,
+            };
+        });
+
+        expect(result.firstIsPromise).toBe(true);
+        expect(result.samePromiseAfterSettle).toBe(false);
+        expect(result.firstResult).toBe(true);
+        expect(result.secondResult).toBe(true);
+        expect(result.startCalls).toBe(2);
+    });
+
+    test('V87.4 GameRuntimeSessionHandler allows a retry after a rejected finalize leaves an error snapshot behind', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GameRuntimeSessionHandler } = await import('/src/core/runtime/GameRuntimeSessionHandler.js');
+
+            let currentSnapshot = {
+                lifecycleState: 'menu',
+                finalizeState: 'idle',
+            };
+            const rejectedFinalize = Promise.reject(new Error('finalize_barrier_failed'));
+            rejectedFinalize.catch(() => {});
+
+            const facade = {
+                _pendingMatchFinalize: rejectedFinalize,
+                _pendingMatchFinalizePlan: {
+                    reason: 'return_to_menu',
+                },
+                getPorts() {
+                    return {
+                        runtimeProjectionPort: {
+                            getSessionRuntimeSnapshot() {
+                                return { ...currentSnapshot };
+                            },
+                        },
+                    };
+                },
+            };
+
+            const handler = new GameRuntimeSessionHandler({ facade, logger: console });
+            const firstResult = await handler._awaitPendingFinalizeForStart({ source: 'test' });
+            currentSnapshot = {
+                lifecycleState: 'menu',
+                finalizeState: 'error',
+            };
+            const retryResult = handler._awaitPendingFinalizeForStart({ source: 'test' });
+
+            return {
+                firstResult,
+                retryResult,
+                pendingFinalizeCleared: facade._pendingMatchFinalize === null,
+                pendingFinalizePlanCleared: facade._pendingMatchFinalizePlan === null,
+            };
+        });
+
+        expect(result.firstResult).toBe(false);
+        expect(result.retryResult).toBe(true);
+        expect(result.pendingFinalizeCleared).toBe(true);
+        expect(result.pendingFinalizePlanCleared).toBe(true);
+    });
+
+    test('V87.4 return-to-menu pause intents stay blocked when canReturnToMenu is missing from snapshots', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createMatchFlowSnapshot } = await import('/src/shared/contracts/SessionRuntimeSnapshotContract.js');
+            const {
+                canExecutePauseOverlayIntent,
+                createPauseOverlayIntentLease,
+                PAUSE_OVERLAY_INTENT_TYPES,
+            } = await import('/src/shared/runtime/UiIntentAtomicity.js');
+
+            const snapshot = createMatchFlowSnapshot({
+                sessionId: 'session-1',
+                isPaused: true,
+                lifecycleState: 'playing',
+                finalizeState: 'idle',
+                updatedAt: 3,
+            });
+            const lease = createPauseOverlayIntentLease(
+                snapshot,
+                PAUSE_OVERLAY_INTENT_TYPES.RETURN_TO_MENU
+            );
+
+            return {
+                snapshotCanReturnToMenu: snapshot.canReturnToMenu,
+                leaseIsNull: lease === null,
+                canExecute: canExecutePauseOverlayIntent(
+                    snapshot,
+                    null,
+                    PAUSE_OVERLAY_INTENT_TYPES.RETURN_TO_MENU
+                ),
+            };
+        });
+
+        expect(result.snapshotCanReturnToMenu).toBe(false);
+        expect(result.leaseIsNull).toBe(true);
+        expect(result.canExecute).toBe(false);
+    });
+
+    test('V87.4 PauseOverlayController and GameRuntimeSessionHandler reject stale pause intent leases for resume and return-to-menu', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { PauseOverlayController } = await import('/src/ui/PauseOverlayController.js');
+            const { GameRuntimeSessionHandler } = await import('/src/core/runtime/GameRuntimeSessionHandler.js');
+            const { GAME_STATE_IDS } = await import('/src/shared/contracts/GameStateIds.js');
+
+            const game = {
+                state: GAME_STATE_IDS.PAUSED,
+                ui: {
+                    pauseOverlay: document.createElement('div'),
+                    pauseResumeButton: document.createElement('button'),
+                    pauseSettingsButton: document.createElement('button'),
+                    pauseSettingsBackButton: document.createElement('button'),
+                    pauseMenuButton: document.createElement('button'),
+                    pauseSettingsPanel: document.createElement('div'),
+                    pauseKeybindP1: document.createElement('div'),
+                    pauseKeybindP2: document.createElement('div'),
+                    pauseAutoRollToggle: document.createElement('input'),
+                    pauseInvertP1: document.createElement('input'),
+                    pauseInvertP2: document.createElement('input'),
+                },
+                settings: {
+                    autoRoll: false,
+                    invertPitch: { PLAYER_1: false, PLAYER_2: false },
+                },
+                gameLoop: {
+                    requestDeltaReset() { },
+                },
+            };
+
+            let currentSnapshot = {
+                sessionId: 'session-1',
+                isPaused: true,
+                canReturnToMenu: true,
+                lifecycleState: 'playing',
+                finalizeState: 'idle',
+                updatedAt: 1,
+            };
+            const seenResumeLeases = [];
+            const seenReturnLeases = [];
+            let resumeProjectionCalls = 0;
+            let finalizeCalls = 0;
+
+            const facade = {
+                finalizeMatch(options = {}) {
+                    finalizeCalls += 1;
+                    return options;
+                },
+                getPorts() {
+                    return {
+                        runtimeProjectionPort: {
+                            getMatchFlowSnapshot: () => ({ ...currentSnapshot }),
+                        },
+                        matchUiPort: {
+                            applyResumeMatchProjection() {
+                                resumeProjectionCalls += 1;
+                                currentSnapshot = {
+                                    ...currentSnapshot,
+                                    isPaused: false,
+                                    lifecycleState: 'playing',
+                                    updatedAt: currentSnapshot.updatedAt + 1,
+                                };
+                                game.state = GAME_STATE_IDS.PLAYING;
+                                return true;
+                            },
+                        },
+                    };
+                },
+            };
+
+            const handler = new GameRuntimeSessionHandler({ facade, logger: console });
+            const controller = new PauseOverlayController({
+                matchFlowUiController: {
+                    game,
+                    applyLifecycleTransition() { },
+                    applyMatchUiState() { },
+                    applyReturnToMenuUi() {
+                        throw new Error('fallback return UI should stay behind runtime intent path');
+                    },
+                },
+                game,
+                ports: {
+                    runtimeProjectionPort: {
+                        getMatchFlowSnapshot: () => ({ ...currentSnapshot }),
+                        getSessionRuntimeSnapshot: () => ({ isHost: true }),
+                    },
+                    runtimeIntentPort: {
+                        resumeMatch(options = undefined) {
+                            seenResumeLeases.push(options?.pauseLease || null);
+                            currentSnapshot = {
+                                ...currentSnapshot,
+                                isPaused: false,
+                                lifecycleState: 'playing',
+                                updatedAt: currentSnapshot.updatedAt + 1,
+                            };
+                            game.state = GAME_STATE_IDS.PLAYING;
+                            return handler.resumeMatch(options);
+                        },
+                        returnToMenu(options = undefined) {
+                            seenReturnLeases.push(options?.pauseLease || null);
+                            currentSnapshot = {
+                                ...currentSnapshot,
+                                canReturnToMenu: false,
+                                finalizeState: 'finalizing',
+                                updatedAt: currentSnapshot.updatedAt + 1,
+                            };
+                            return handler.returnToMenu(options);
+                        },
+                    },
+                },
+            });
+
+            const staleResumeResult = controller.resumeFromPause();
+            currentSnapshot = {
+                sessionId: 'session-1',
+                isPaused: true,
+                canReturnToMenu: true,
+                lifecycleState: 'playing',
+                finalizeState: 'idle',
+                updatedAt: 10,
+            };
+            game.state = GAME_STATE_IDS.PAUSED;
+            const staleReturnResult = controller.returnToMenuFromPause();
+
+            return {
+                staleResumeResult,
+                staleReturnResult,
+                seenResumeLeaseUpdatedAt: Number(seenResumeLeases[0]?.updatedAt || 0),
+                seenReturnLeaseUpdatedAt: Number(seenReturnLeases[0]?.updatedAt || 0),
+                seenResumeLeasePaused: seenResumeLeases[0]?.isPaused === true,
+                seenReturnLeaseCanReturn: seenReturnLeases[0]?.canReturnToMenu === true,
+                resumeProjectionCalls,
+                finalizeCalls,
+            };
+        });
+
+        expect(result.staleResumeResult).toBe(false);
+        expect(result.staleReturnResult).toBe(false);
+        expect(result.seenResumeLeaseUpdatedAt).toBe(1);
+        expect(result.seenReturnLeaseUpdatedAt).toBe(10);
+        expect(result.seenResumeLeasePaused).toBe(true);
+        expect(result.seenReturnLeaseCanReturn).toBe(true);
+        expect(result.resumeProjectionCalls).toBe(0);
+        expect(result.finalizeCalls).toBe(0);
+    });
+
+    test('V87.4 return-to-menu pause intents avoid UI side effects when the runtime path rejects them', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { GAME_STATE_IDS } = await import('/src/shared/contracts/GameStateIds.js');
+            const { returnToMenuFromPauseIntent } = await import('/src/ui/PauseOverlayIntentActions.js');
+
+            let hideSettingsCalls = 0;
+            let hideHostOverlayCalls = 0;
+            let restoreLabelsCalls = 0;
+            const snapshot = {
+                sessionId: 'session-1',
+                isPaused: true,
+                canReturnToMenu: true,
+                lifecycleState: 'playing',
+                finalizeState: 'idle',
+                updatedAt: 1,
+            };
+
+            const resultValue = returnToMenuFromPauseIntent({
+                game: { state: GAME_STATE_IDS.PAUSED },
+                runtimePort: {
+                    returnToMenu() {
+                        return false;
+                    },
+                },
+                _getMatchFlowSnapshot() {
+                    return { ...snapshot };
+                },
+                _hideSettings() {
+                    hideSettingsCalls += 1;
+                },
+                hideHostPausedOverlay() {
+                    hideHostOverlayCalls += 1;
+                },
+                _restorePauseButtonLabels() {
+                    restoreLabelsCalls += 1;
+                },
+            });
+
+            return {
+                resultValue,
+                hideSettingsCalls,
+                hideHostOverlayCalls,
+                restoreLabelsCalls,
+            };
+        });
+
+        expect(result.resultValue).toBe(false);
+        expect(result.hideSettingsCalls).toBe(0);
+        expect(result.hideHostOverlayCalls).toBe(0);
+        expect(result.restoreLabelsCalls).toBe(0);
+    });
+
+    test('V87.4 authored map presets keep portal, gate and parcours contracts aligned', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MAP_PRESET_CATALOG } = await import('/src/core/config/maps/MapPresetCatalog.js');
+            const { toArenaMapDefinition } = await import('/src/entities/mapSchema/MapSchemaRuntimeOps.js');
+
+            const presetKeys = ['abyssal_descent', 'neon_circuit', 'sky_islands'];
+            return presetKeys.map((presetKey) => {
+                const runtime = toArenaMapDefinition(MAP_PRESET_CATALOG[presetKey], { name: presetKey });
+                const checkpoints = runtime.map.parcours?.checkpoints || [];
+                const baseCheckpoints = checkpoints.filter((entry) => !entry?.aliasOf);
+                const checkpointIdSequence = baseCheckpoints.map((entry) => entry?.id || '');
+                const hasSequentialCheckpointIds = checkpointIdSequence.every((id, index) => id === `CP${String(index + 1).padStart(2, '0')}`);
+                const invalidAliasCount = checkpoints.filter((entry) => entry?.aliasOf && !checkpointIdSequence.includes(entry.aliasOf)).length;
+                const invalidPortalCount = (runtime.map.portals || []).filter((portal) => {
+                    const posA = Array.isArray(portal?.a) ? portal.a : [];
+                    const posB = Array.isArray(portal?.b) ? portal.b : [];
+                    const allFinite = [...posA, ...posB].every((value) => Number.isFinite(value));
+                    const distinctEndpoints = posA.length === 3
+                        && posB.length === 3
+                        && posA.some((value, index) => value !== posB[index]);
+                    return !allFinite || !distinctEndpoints;
+                }).length;
+                const invalidGateCount = (runtime.map.gates || []).filter((gate) => {
+                    const forward = Array.isArray(gate?.forward) ? gate.forward : [];
+                    const pos = Array.isArray(gate?.pos) ? gate.pos : [];
+                    const params = gate?.params && typeof gate.params === 'object' ? Object.values(gate.params) : [];
+                    return !gate?.id
+                        || pos.length !== 3
+                        || !pos.every((value) => Number.isFinite(value))
+                        || forward.length !== 3
+                        || !forward.every((value) => Number.isFinite(value))
+                        || params.length === 0
+                        || !params.every((value) => typeof value !== 'number' || Number.isFinite(value));
+                }).length;
+
+                return {
+                    presetKey,
+                    warningCount: runtime.warnings.length,
+                    portalCount: runtime.map.portals.length,
+                    gateCount: runtime.map.gates.length,
+                    hasSequentialCheckpointIds,
+                    invalidAliasCount,
+                    invalidPortalCount,
+                    invalidGateCount,
+                    finishId: runtime.map.parcours?.finish?.id || '',
+                };
+            });
+        });
+
+        for (const preset of result) {
+            expect(preset.warningCount).toBe(0);
+            expect(preset.portalCount).toBeGreaterThan(0);
+            expect(preset.gateCount).toBeGreaterThan(0);
+            expect(preset.hasSequentialCheckpointIds).toBe(true);
+            expect(preset.invalidAliasCount).toBe(0);
+            expect(preset.invalidPortalCount).toBe(0);
+            expect(preset.invalidGateCount).toBe(0);
+            expect(preset.finishId).toBe('FINISH');
+        }
+    });
+
+    test('V87.4 SessionRuntimeStateMachine blocks FINALIZING -> MENU until finalize completion is explicit', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createFallbackSessionRuntimeState } = await import('/src/state/MatchLifecycleSessionRuntimeState.js');
+            const {
+                applySessionRuntimeLifecycleTransition,
+                syncSessionRuntimeLifecycleWithGameState,
+                SESSION_RUNTIME_STATES,
+            } = await import('/src/shared/contracts/SessionRuntimeStateMachine.js');
+            const { SESSION_RUNTIME_EVENT_TYPES } = await import('/src/shared/contracts/SessionRuntimeEventContract.js');
+            const { GAME_STATE_IDS } = await import('/src/shared/contracts/GameStateIds.js');
+
+            const sessionRuntime = createFallbackSessionRuntimeState();
+            sessionRuntime.lifecycle.status = SESSION_RUNTIME_STATES.FINALIZING;
+            sessionRuntime.lifecycle.gameStateId = GAME_STATE_IDS.PLAYING;
+            sessionRuntime.finalize.status = 'finalizing';
+
+            const blockedGameStateSync = syncSessionRuntimeLifecycleWithGameState(sessionRuntime, GAME_STATE_IDS.MENU);
+            const blockedExplicitMenu = applySessionRuntimeLifecycleTransition(sessionRuntime, SESSION_RUNTIME_STATES.MENU, {
+                gameStateId: GAME_STATE_IDS.MENU,
+                completionEventType: SESSION_RUNTIME_EVENT_TYPES.MENU_OPENED,
+            });
+
+            sessionRuntime.finalize.status = 'finalized';
+            const completedTransition = applySessionRuntimeLifecycleTransition(sessionRuntime, SESSION_RUNTIME_STATES.MENU, {
+                gameStateId: GAME_STATE_IDS.MENU,
+                completionEventType: SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZED,
+            });
+
+            return {
+                blockedGameStateChanged: blockedGameStateSync?.changed === true,
+                blockedGameStateNextState: blockedGameStateSync?.nextState || null,
+                blockedExplicitChanged: blockedExplicitMenu?.changed === true,
+                blockedExplicitNextState: blockedExplicitMenu?.nextState || null,
+                completedChanged: completedTransition?.changed === true,
+                completedNextState: completedTransition?.nextState || null,
+                lifecycleState: sessionRuntime.lifecycle.status || null,
+                gameStateId: sessionRuntime.lifecycle.gameStateId || null,
+            };
+        });
+
+        expect(result.blockedGameStateChanged).toBe(false);
+        expect(result.blockedGameStateNextState).toBe('finalizing');
+        expect(result.blockedExplicitChanged).toBe(false);
+        expect(result.blockedExplicitNextState).toBe('finalizing');
+        expect(result.completedChanged).toBe(true);
+        expect(result.completedNextState).toBe('menu');
+        expect(result.lifecycleState).toBe('menu');
+        expect(result.gameStateId).toBe('MENU');
+    });
+
+    test('V87.4 MatchLifecycleSessionOrchestrator keeps cleanup in FINALIZING until match_finalized is recorded', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { MatchLifecycleSessionOrchestrator } = await import('/src/state/MatchLifecycleSessionOrchestrator.js');
+            const { createFallbackSessionRuntimeState } = await import('/src/state/MatchLifecycleSessionRuntimeState.js');
+            const { GAME_STATE_IDS } = await import('/src/shared/contracts/GameStateIds.js');
+            const { SESSION_RUNTIME_STATES } = await import('/src/shared/contracts/SessionRuntimeStateMachine.js');
+            const { recordSessionRuntimeEvent } = await import('/src/shared/runtime/SessionRuntimeObservability.js');
+
+            const sessionRuntime = createFallbackSessionRuntimeState();
+            sessionRuntime.session.sequence = 1;
+            sessionRuntime.session.activeSessionId = 'match-1';
+            sessionRuntime.lifecycle.status = SESSION_RUNTIME_STATES.PLAYING;
+            sessionRuntime.lifecycle.gameStateId = GAME_STATE_IDS.PLAYING;
+
+            const cleanupSnapshots = [];
+            const lifecycleEvents = [];
+            const orchestrator = new MatchLifecycleSessionOrchestrator({
+                getSessionRuntimeState() {
+                    return sessionRuntime;
+                },
+                getLifecycleState() {
+                    return {};
+                },
+                notifyLifecycleEvent(type, payload = {}) {
+                    lifecycleEvents.push({
+                        type,
+                        reason: payload?.reason || '',
+                    });
+                },
+                recordRuntimeEvent(type, payload, source, extra) {
+                    recordSessionRuntimeEvent(sessionRuntime, {
+                        type,
+                        payload,
+                        source,
+                        ...extra,
+                    });
+                },
+                getCurrentMatchSessionRefs() {
+                    return null;
+                },
+                clearMatchSessionRefs() {
+                    cleanupSnapshots.push({
+                        phase: 'clear',
+                        lifecycleState: sessionRuntime.lifecycle.status,
+                        finalizeState: sessionRuntime.finalize.status,
+                    });
+                },
+                disposeCurrentMatchSession() {
+                    cleanupSnapshots.push({
+                        phase: 'dispose',
+                        lifecycleState: sessionRuntime.lifecycle.status,
+                        finalizeState: sessionRuntime.finalize.status,
+                    });
+                },
+                settleRecorder() {
+                    cleanupSnapshots.push({
+                        phase: 'settle',
+                        lifecycleState: sessionRuntime.lifecycle.status,
+                        finalizeState: sessionRuntime.finalize.status,
+                    });
+                },
+                resetRoundRuntime() { },
+                prepareInitializedMatchSession() {
+                    return null;
+                },
+                wireInitializedMatchRuntime(initializedMatch) {
+                    return initializedMatch;
+                },
+                applyInitializedMatchSession() { },
+                disposePreparedMatchSession() { },
+            });
+
+            await orchestrator.finalizeMatchSession({
+                reason: 'return_to_menu',
+                notifyMenuOpened: true,
+            });
+
+            const eventTypes = Array.isArray(sessionRuntime.observability?.events)
+                ? sessionRuntime.observability.events.map((event) => event.type)
+                : [];
+
+            return {
+                cleanupSnapshots,
+                eventTypes,
+                finalizedIndex: eventTypes.indexOf('match_finalized'),
+                menuOpenedIndex: eventTypes.indexOf('menu_opened'),
+                finalLifecycleState: sessionRuntime.lifecycle.status || null,
+                finalFinalizeState: sessionRuntime.finalize.status || null,
+                lifecycleEvents,
+            };
+        });
+
+        expect(result.cleanupSnapshots).toHaveLength(3);
+        expect(result.cleanupSnapshots.every((entry) => entry.lifecycleState === 'finalizing')).toBe(true);
+        expect(result.cleanupSnapshots.every((entry) => entry.finalizeState === 'finalizing')).toBe(true);
+        expect(result.finalizedIndex).toBeGreaterThanOrEqual(0);
+        expect(result.menuOpenedIndex).toBeGreaterThan(result.finalizedIndex);
+        expect(result.finalLifecycleState).toBe('menu');
+        expect(result.finalFinalizeState).toBe('finalized');
+        expect(result.lifecycleEvents.some((entry) => entry.type === 'menu_opened' && entry.reason === 'return_to_menu')).toBe(true);
+    });
+
+    test('V87.4 SessionRuntimeObservability keeps a bounded event history via copy-based trimming', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const { createFallbackSessionRuntimeState } = await import('/src/state/MatchLifecycleSessionRuntimeState.js');
+            const {
+                recordSessionRuntimeEvent,
+                SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT,
+            } = await import('/src/shared/runtime/SessionRuntimeObservability.js');
+            const { SESSION_RUNTIME_EVENT_TYPES } = await import('/src/shared/contracts/SessionRuntimeEventContract.js');
+
+            const sessionRuntime = createFallbackSessionRuntimeState();
+            const totalEvents = SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT + 5;
+            const identityChanges = [];
+            let previousEvents = sessionRuntime.observability.events;
+
+            for (let index = 1; index <= totalEvents; index += 1) {
+                recordSessionRuntimeEvent(sessionRuntime, {
+                    type: SESSION_RUNTIME_EVENT_TYPES.COMMAND_OBSERVED,
+                    payload: { index },
+                });
+                identityChanges.push(previousEvents !== sessionRuntime.observability.events);
+                previousEvents = sessionRuntime.observability.events;
+            }
+
+            const events = sessionRuntime.observability.events;
+            return {
+                limit: SESSION_RUNTIME_OBSERVABILITY_HISTORY_LIMIT,
+                totalEvents,
+                length: events.length,
+                firstSequence: events[0]?.sequence || 0,
+                lastSequence: events[events.length - 1]?.sequence || 0,
+                firstPayloadIndex: events[0]?.payload?.index || 0,
+                lastPayloadIndex: events[events.length - 1]?.payload?.index || 0,
+                allNewArrays: identityChanges.every(Boolean),
+            };
+        });
+
+        expect(result.length).toBe(result.limit);
+        expect(result.firstSequence).toBe(result.totalEvents - result.limit + 1);
+        expect(result.lastSequence).toBe(result.totalEvents);
+        expect(result.firstPayloadIndex).toBe(result.totalEvents - result.limit + 1);
+        expect(result.lastPayloadIndex).toBe(result.totalEvents);
+        expect(result.allNewArrays).toBe(true);
     });
 
     test('V74.3 GameRuntimeFacade suppresses menu cleanup when shutdown reuses pending finalize flow', async ({ page }) => {

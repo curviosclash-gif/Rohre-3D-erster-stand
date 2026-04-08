@@ -1,13 +1,98 @@
+async function probeServerReadiness(page) {
+    try {
+        const response = await page.context().request.get('/', {
+            failOnStatusCode: false,
+            timeout: 5000,
+        });
+        return {
+            ok: response.ok(),
+            status: response.status(),
+        };
+    } catch (error) {
+        return {
+            ok: false,
+            status: 0,
+            error: String(error?.message || 'request_failed'),
+        };
+    }
+}
+
+async function captureAppBootSnapshot(page) {
+    if (page.isClosed()) {
+        return {
+            pageClosed: true,
+            appBootState: 'page_closed',
+        };
+    }
+    try {
+        return await page.evaluate(() => {
+            const menu = document.getElementById('main-menu');
+            const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+            const errorOverlay = document.getElementById('runtime-error-overlay');
+            const mainMenuVisible = (() => {
+                if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                const style = window.getComputedStyle(menu);
+                return style.display !== 'none' && style.visibility !== 'hidden';
+            })();
+            const errorOverlayVisible = (() => {
+                if (!(errorOverlay instanceof HTMLElement) || errorOverlay.classList.contains('hidden')) return false;
+                const style = window.getComputedStyle(errorOverlay);
+                return style.display !== 'none' && style.visibility !== 'hidden';
+            })();
+            const runtimeReady = !!globalThis?.GAME_INSTANCE;
+            return {
+                locationHref: String(window.location.href || ''),
+                documentReadyState: String(document.readyState || ''),
+                mainMenuVisible,
+                runtimeReady,
+                visiblePanelId: visiblePanel instanceof HTMLElement ? visiblePanel.id : null,
+                errorOverlayVisible,
+                errorOverlayText: errorOverlayVisible
+                    ? String(errorOverlay?.textContent || '').slice(0, 400)
+                    : '',
+                appBootState: runtimeReady
+                    ? 'runtime_ready'
+                    : (errorOverlayVisible
+                        ? 'runtime_error_overlay'
+                        : (mainMenuVisible ? 'menu_shell_ready' : 'booting')),
+            };
+        });
+    } catch (error) {
+        return {
+            pageClosed: false,
+            appBootState: 'snapshot_unavailable',
+            snapshotError: String(error?.message || 'snapshot_failed'),
+        };
+    }
+}
+
+async function collectLoadGameDiagnostics(page, stage) {
+    const [serverProbe, appBoot] = await Promise.all([
+        probeServerReadiness(page),
+        captureAppBootSnapshot(page),
+    ]);
+    return {
+        stage,
+        runProfile: String(process.env.PW_RUN_PROFILE || 'preview-smoke').trim() || 'preview-smoke',
+        serverProbe,
+        appBoot,
+    };
+}
+
 // Load page and wait for visible main menu.
 export async function loadGame(page) {
     const maxAttempts = 2;
-    const gotoTimeoutMs = 90000;
+    const gotoTimeoutMs = 45000;
     const readyTimeoutMs = 30000;
     let lastError = null;
+    let lastStage = 'idle';
+    let lastDiagnostics = null;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
         try {
+            lastStage = 'goto';
             await page.goto('/', { waitUntil: 'commit', timeout: gotoTimeoutMs });
+            lastStage = 'shell_ready';
             await page.waitForFunction(() => {
                 const menu = document.getElementById('main-menu');
                 const runtimeReady = !!globalThis?.GAME_INSTANCE;
@@ -33,9 +118,11 @@ export async function loadGame(page) {
             });
 
             if (!state.runtimeReady) {
+                lastStage = 'runtime_ready';
                 await page.waitForFunction(() => !!globalThis?.GAME_INSTANCE, null, { timeout: readyTimeoutMs });
             }
 
+            lastStage = 'return_to_menu_probe';
             const shouldReturnToMenu = state.runtimeReady
                 ? (!state.menuVisible || state.visiblePanelId)
                 : await page.evaluate(() => {
@@ -51,11 +138,13 @@ export async function loadGame(page) {
                 });
 
             if (shouldReturnToMenu) {
+                lastStage = 'return_to_menu';
                 await page.evaluate(() => {
                     globalThis?.GAME_INSTANCE?._returnToMenu?.();
                 });
             }
 
+            lastStage = 'menu_idle';
             await page.waitForFunction(() => {
                 const menu = document.getElementById('main-menu');
                 const menuVisible = (() => {
@@ -70,6 +159,7 @@ export async function loadGame(page) {
             return;
         } catch (error) {
             lastError = error;
+            lastDiagnostics = await collectLoadGameDiagnostics(page, lastStage);
             const message = String(error?.message || '');
             if (page.isClosed() || message.includes('Target page, context or browser has been closed')) {
                 throw error;
@@ -82,7 +172,12 @@ export async function loadGame(page) {
     }
 
     const message = lastError instanceof Error ? lastError.message : String(lastError || 'unknown');
-    throw new Error(`loadGame failed after ${maxAttempts} attempts: ${message}`);
+    const diagnosticsText = lastDiagnostics ? ` diagnostics=${JSON.stringify(lastDiagnostics)}` : '';
+    const runProfile = String(process.env.PW_RUN_PROFILE || 'preview-smoke').trim() || 'preview-smoke';
+    throw new Error(
+        `loadGame failed after ${maxAttempts} attempts in runProfile "${runProfile}" ` +
+        `at stage "${lastStage}": ${message}${diagnosticsText}`
+    );
 }
 
 export async function selectSessionType(page, sessionType = 'single') {

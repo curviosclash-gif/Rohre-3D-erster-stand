@@ -159,9 +159,11 @@ export function createMatchSession({
             }
         };
 
-        disposeMatchSessionSystems(renderer, currentSession, {
-            clearScene: !canPreservePrewarmedScene,
-        });
+        if (currentSession) {
+            disposeMatchSessionSystems(renderer, currentSession, {
+                clearScene: !canPreservePrewarmedScene,
+            });
+        }
 
         const particles = new ParticleSystem(renderer, entityRuntimeConfig);
         const arena = reusablePrewarmedArenaSession?.arena || new Arena(renderer);

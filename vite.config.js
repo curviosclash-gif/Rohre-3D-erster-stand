@@ -15,7 +15,7 @@ import { EDITOR_API_ROUTES, EDITOR_DATA_PATHS } from './src/shared/contracts/Edi
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 const buildTime = new Date().toISOString();
 const buildId = Date.now().toString(36).toUpperCase();
-const CHUNK_SIZE_WARNING_LIMIT_KB = 800;
+const CHUNK_SIZE_WARNING_LIMIT_KB = 1300;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

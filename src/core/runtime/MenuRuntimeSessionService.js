@@ -186,7 +186,7 @@ export function handleQuickStartLastStartAction(ctx) {
     startMatch();
 }
 
-export function handleQuickStartEventPlaylistStartAction(ctx) {
+export async function handleQuickStartEventPlaylistStartAction(ctx) {
     const { game, onSettingsChanged, resolveMenuAccessContext, recordMenuTelemetry, startMatch } = ctx;
     const playlistStep = getNextEventPlaylistEntry(game?.settings?.localSettings?.eventPlaylistState);
     const presetId = String(playlistStep?.entry?.presetId || '').trim();
@@ -220,7 +220,12 @@ export function handleQuickStartEventPlaylistStartAction(ctx) {
     onSettingsChanged({ changedKeys: Array.from(new Set(changedKeys)) });
 
     const presetName = String(playlistStep?.preset?.name || presetId).trim() || presetId;
-    const started = startMatch();
+    let started = false;
+    try {
+        started = await Promise.resolve(startMatch());
+    } catch {
+        started = false;
+    }
     if (started) {
         recordMenuTelemetry('quickstart', {
             variant: 'event_playlist',

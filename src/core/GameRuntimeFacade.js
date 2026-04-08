@@ -60,6 +60,7 @@ export class GameRuntimeFacade {
             nowMs: deps.nowMs,
             nowHighRes: deps.nowHighRes,
         });
+        this._explicitPorts = deps.ports || null;
         this.menuMultiplayerBridge = null;
         this._matchPrewarmTimer = null;
         this.profileLifecycleController = new ProfileLifecycleController({ game: this.game });
@@ -109,7 +110,7 @@ export class GameRuntimeFacade {
     getRuntimeBundle() { return this.runtimeBundle || this.game?.runtimeBundle || null; }
     getRuntimeState() { return getSessionRuntimeState(this.getRuntimeBundle() || this.game); }
     getRuntimeHandle(key) { return getSessionRuntimeHandle(this.getRuntimeBundle() || this.game, key); }
-    getPorts() { return this.getRuntimeHandle('runtimePorts'); }
+    getPorts() { return this.getRuntimeHandle('runtimePorts') || this._explicitPorts || null; }
     get ports() { return this.getPorts(); }
     getUiManager() { return this.getRuntimeHandle('uiManager') || this.game?.uiManager || null; }
 

@@ -1,6 +1,13 @@
 import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
 import { SESSION_FINALIZE_TRIGGERS } from '../../shared/contracts/MatchLifecycleContract.js';
 import { RUNTIME_SESSION_TYPES, resolveRuntimeSessionContract } from '../../shared/contracts/RuntimeSessionContract.js';
+import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
+import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
+import {
+    canExecutePauseOverlayIntent,
+    createDeferred,
+    PAUSE_OVERLAY_INTENT_TYPES,
+} from '../../shared/runtime/UiIntentAtomicity.js';
 import { applyCommandRuntimeSettings } from './RuntimeCommandSettingsService.js';
 import { requestRuntimeMultiplayerMatchStart } from './RuntimeMultiplayerFlowService.js';
 import {
@@ -19,23 +26,24 @@ const TERMINAL_DISPOSE_FINALIZE_STATES = new Set([
     'error',
 ]);
 
-function createDeferred() {
-    let resolve = null;
-    let reject = null;
-    const promise = new Promise((nextResolve, nextReject) => {
-        resolve = nextResolve;
-        reject = nextReject;
-    });
-    promise.catch(() => {});
-    return { promise, resolve, reject };
-}
-
 export class GameRuntimeSessionHandler {
     constructor({ facade = null, logger = console } = {}) {
         this._facade = facade || null;
         this._logger = logger;
         this._pendingStartMatch = null;
         this._pendingDispose = null;
+    }
+
+    _getPorts() {
+        return this._facade?.getPorts?.() || this._facade?.ports || null;
+    }
+
+    _getMatchFlowSnapshot() {
+        return this._getPorts()?.runtimeProjectionPort?.getMatchFlowSnapshot?.() || null;
+    }
+
+    _canExecutePauseIntent(intentType, pauseLease = null) {
+        return canExecutePauseOverlayIntent(this._getMatchFlowSnapshot(), pauseLease, intentType);
     }
 
     async initializeSession(_options = undefined) {
@@ -74,10 +82,39 @@ export class GameRuntimeSessionHandler {
         });
     }
 
-    _awaitPendingFinalizeForStart(telemetryPayload) {
+    _getRuntimeEventSource() {
+        return this._facade?.getRuntimeBundle?.() || this._facade?.game || null;
+    }
+
+    _clearPendingFinalize(pendingFinalize = null) {
+        if (!pendingFinalize || this._facade?._pendingMatchFinalize !== pendingFinalize) {
+            return;
+        }
+        this._facade._pendingMatchFinalize = null;
+        this._facade._pendingMatchFinalizePlan = null;
+    }
+
+    _recordStartBarrierFinalizeFailure(pendingReason, error) {
+        recordSessionRuntimeEvent(this._getRuntimeEventSource(), {
+            type: SESSION_RUNTIME_EVENT_TYPES.MATCH_FINALIZE_FAILED,
+            source: 'game_runtime_session_handler',
+            payload: {
+                phase: 'start_barrier',
+                reason: pendingReason || SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU,
+                errorMessage: error instanceof Error ? error.message : 'pending_finalize_rejected',
+            },
+        });
+    }
+
+    _awaitPendingFinalizeForStart(telemetryPayload, continueAfterBarrier = null) {
         const facade = this._facade;
+        const proceed = () => (
+            typeof continueAfterBarrier === 'function'
+                ? continueAfterBarrier()
+                : true
+        );
         const sessionSnapshot = this._getSessionRuntimeSnapshot();
-        if (sessionSnapshot?.lifecycleState === 'disposed' || sessionSnapshot?.finalizeState === 'error') {
+        if (sessionSnapshot?.lifecycleState === 'disposed') {
             this._recordBlockedStart(telemetryPayload, 'start_blocked_by_runtime_state', {
                 lifecycleState: sessionSnapshot?.lifecycleState || '',
                 finalizeState: sessionSnapshot?.finalizeState || '',
@@ -87,7 +124,7 @@ export class GameRuntimeSessionHandler {
         const pendingFinalize = facade?._pendingMatchFinalize;
         const pendingReason = String(facade?._pendingMatchFinalizePlan?.reason || sessionSnapshot?.pendingFinalizeTrigger || '').trim();
         if (!pendingFinalize) {
-            return true;
+            return proceed();
         }
         if (this._isTerminalStartBarrier(pendingReason)) {
             this._recordBlockedStart(telemetryPayload, 'start_blocked_by_terminal_finalize', {
@@ -100,19 +137,22 @@ export class GameRuntimeSessionHandler {
                 const nextSnapshot = this._getSessionRuntimeSnapshot();
                 if (finalizeResult === false || nextSnapshot?.finalizeState === 'error' || nextSnapshot?.lifecycleState === 'disposed') {
                     this._recordBlockedStart(telemetryPayload, 'start_blocked_after_finalize_wait', {
-                        pendingFinalizeReason: pendingReason,
+                    pendingFinalizeReason: pendingReason,
                         finalizeResult: finalizeResult === false ? 'false' : 'ok',
                         lifecycleState: nextSnapshot?.lifecycleState || '',
                         finalizeState: nextSnapshot?.finalizeState || '',
                     });
                     return false;
                 }
-                return true;
+                return proceed();
             })
             .catch((error) => {
                 this._logger?.error?.('startMatch finalize barrier failed:', error);
+                this._clearPendingFinalize(pendingFinalize);
+                this._recordStartBarrierFinalizeFailure(pendingReason, error);
                 this._recordBlockedStart(telemetryPayload, 'start_blocked_after_finalize_rejection', {
                     pendingFinalizeReason: pendingReason,
+                    errorMessage: error instanceof Error ? error.message : 'pending_finalize_rejected',
                 });
                 return false;
             });
@@ -136,7 +176,6 @@ export class GameRuntimeSessionHandler {
                 modePath: game?.settings?.localSettings?.modePath || 'normal',
             };
         };
-        const startBarrier = this._awaitPendingFinalizeForStart(buildTelemetryPayload());
         const runStartAttempt = () => {
             applyCommandRuntimeSettings(facade, {
                 ...(options && typeof options === 'object' ? options : {}),
@@ -165,12 +204,12 @@ export class GameRuntimeSessionHandler {
                 });
             }
             const startResult = facade?.getPorts?.()?.matchUiPort?.applyStartMatchProjection?.();
+            if (startResult && typeof startResult.then === 'function') {
+                return Promise.resolve(startResult).then((resolvedResult) => resolvedResult !== false);
+            }
             return startResult !== false;
         };
-        if (startBarrier && typeof startBarrier.then === 'function') {
-            return Promise.resolve(startBarrier).then((canStart) => (canStart ? runStartAttempt() : false));
-        }
-        return startBarrier === false ? false : runStartAttempt();
+        return this._awaitPendingFinalizeForStart(buildTelemetryPayload(), runStartAttempt);
     }
 
     startMatch(options = undefined) {
@@ -179,35 +218,26 @@ export class GameRuntimeSessionHandler {
         }
         const deferred = createDeferred();
         this._pendingStartMatch = deferred.promise;
+        const clearPending = () => {
+            if (this._pendingStartMatch === deferred.promise) {
+                this._pendingStartMatch = null;
+            }
+        };
         try {
-            const startResult = this._startMatchAfterGuards(options);
-            if (startResult && typeof startResult.then === 'function') {
-                Promise.resolve(startResult)
-                    .then((resolvedResult) => {
-                        deferred.resolve(resolvedResult);
-                    })
-                    .catch((error) => {
-                        deferred.reject(error);
-                    })
-                    .finally(() => {
-                        if (this._pendingStartMatch === deferred.promise) {
-                            this._pendingStartMatch = null;
-                        }
-                    });
-                return deferred.promise;
-            }
-            deferred.resolve(startResult);
-            if (this._pendingStartMatch === deferred.promise) {
-                this._pendingStartMatch = null;
-            }
-            return startResult;
+            Promise.resolve(this._startMatchAfterGuards(options))
+                .then((resolvedResult) => {
+                    clearPending();
+                    deferred.resolve(resolvedResult);
+                })
+                .catch((error) => {
+                    clearPending();
+                    deferred.reject(error);
+                });
         } catch (error) {
+            clearPending();
             deferred.reject(error);
-            if (this._pendingStartMatch === deferred.promise) {
-                this._pendingStartMatch = null;
-            }
-            throw error;
         }
+        return deferred.promise;
     }
 
     pauseMatch() {
@@ -220,8 +250,14 @@ export class GameRuntimeSessionHandler {
         return true;
     }
 
-    resumeMatch() {
-        this._facade?.ports?.matchUiPort?.applyResumeMatchProjection?.();
+    resumeMatch(options = undefined) {
+        if (!this._canExecutePauseIntent(
+            PAUSE_OVERLAY_INTENT_TYPES.RESUME_MATCH,
+            options?.pauseLease || null
+        )) {
+            return false;
+        }
+        this._getPorts()?.matchUiPort?.applyResumeMatchProjection?.(options);
         return true;
     }
 
@@ -230,6 +266,12 @@ export class GameRuntimeSessionHandler {
     }
 
     returnToMenu(options = {}) {
+        if (options?.pauseLease && !this._canExecutePauseIntent(
+            PAUSE_OVERLAY_INTENT_TYPES.RETURN_TO_MENU,
+            options.pauseLease
+        )) {
+            return false;
+        }
         return this._facade?.finalizeMatch?.({
             ...options,
             reason: options?.reason || SESSION_FINALIZE_TRIGGERS.RETURN_TO_MENU,
@@ -266,34 +308,33 @@ export class GameRuntimeSessionHandler {
         }
         const facade = this._facade;
         facade?._clearMatchPrewarmTimer?.();
-        const trackedDispose = Promise.resolve()
-            .then(() => {
+        const trackedDispose = (async () => {
+            let finalizeResult = false;
+            try {
                 if (typeof facade?.finalizeMatch !== 'function') {
                     return false;
                 }
-                return facade.finalizeMatch({
+                finalizeResult = await facade.finalizeMatch({
                     reason: SESSION_FINALIZE_TRIGGERS.GAME_DISPOSE,
                     notifyMenuOpened: false,
                     applyReturnToMenuUi: false,
                     schedulePrewarm: false,
                 });
-            })
-            .catch((error) => {
+            } catch (error) {
                 this._logger?.error?.('dispose finalize failed:', error);
-                return false;
-            })
-            .then((finalizeResult) => {
-                const sessionSnapshot = this._getSessionRuntimeSnapshot();
-                if (sessionSnapshot && !this._isDisposeFinalizeTerminal(sessionSnapshot)) {
-                    this._logger?.warn?.('dispose settled without terminal runtime state', {
-                        lifecycleState: sessionSnapshot.lifecycleState || '',
-                        finalizeState: sessionSnapshot.finalizeState || '',
-                        finalizeErrorMessage: sessionSnapshot.finalizeErrorMessage || '',
-                    });
-                }
-                this._disposeMenuRefs();
-                return finalizeResult !== false;
-            })
+                finalizeResult = false;
+            }
+            const sessionSnapshot = this._getSessionRuntimeSnapshot();
+            if (sessionSnapshot && !this._isDisposeFinalizeTerminal(sessionSnapshot)) {
+                this._logger?.warn?.('dispose settled without terminal runtime state', {
+                    lifecycleState: sessionSnapshot.lifecycleState || '',
+                    finalizeState: sessionSnapshot.finalizeState || '',
+                    finalizeErrorMessage: sessionSnapshot.finalizeErrorMessage || '',
+                });
+            }
+            this._disposeMenuRefs();
+            return finalizeResult !== false;
+        })()
             .finally(() => {
                 if (this._pendingDispose === trackedDispose) {
                     this._pendingDispose = null;

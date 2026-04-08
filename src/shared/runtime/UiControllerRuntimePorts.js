@@ -100,7 +100,7 @@ export function createPauseOverlayControllerPort(ports = null) {
         controllerPort.pauseMatch = () => runtimeIntentPort.pauseMatch();
     }
     if (typeof runtimeIntentPort?.resumeMatch === 'function') {
-        controllerPort.resumeMatch = () => runtimeIntentPort.resumeMatch();
+        controllerPort.resumeMatch = (options = undefined) => runtimeIntentPort.resumeMatch(options);
     }
     if (typeof runtimeIntentPort?.returnToMenu === 'function') {
         controllerPort.returnToMenu = (options = undefined) => runtimeIntentPort.returnToMenu(options);

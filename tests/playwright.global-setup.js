@@ -1,6 +1,10 @@
 import { mkdir, open, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from '@playwright/test';
+import {
+    PLAYWRIGHT_DEFAULT_RUN_PROFILE,
+    resolvePlaywrightRunProfile,
+} from '../scripts/playwright-run-profile.mjs';
 
 const STARTUP_DIAGNOSTICS_FILE = 'playwright-startup-diagnostics.json';
 const STARTUP_PROBE_MAX_ATTEMPTS = 6;
@@ -9,6 +13,7 @@ const STARTUP_PROBE_RETRY_DELAY_MS = 1_200;
 const PREWARM_MAX_ATTEMPTS = 1;
 const PREWARM_GOTO_TIMEOUT_MS = 30_000;
 const PREWARM_MENU_TIMEOUT_MS = 180_000;
+const PREWARM_RUNTIME_TIMEOUT_MS = 10_000;
 const PREWARM_RETRY_DELAY_MS = 2_000;
 const STARTUP_LOG_SNIPPET_FILES = 4;
 const STARTUP_LOG_SNIPPET_LINES = 60;
@@ -195,6 +200,55 @@ async function fetchWithTimeout(url, timeoutMs) {
     }
 }
 
+async function captureAppBootSnapshot(page) {
+    try {
+        return await page.evaluate(() => {
+            const menu = document.getElementById('main-menu');
+            const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+            const errorOverlay = document.getElementById('runtime-error-overlay');
+            const mainMenuVisible = (() => {
+                if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+                const style = window.getComputedStyle(menu);
+                return style.display !== 'none' && style.visibility !== 'hidden';
+            })();
+            const errorOverlayVisible = (() => {
+                if (!(errorOverlay instanceof HTMLElement) || errorOverlay.classList.contains('hidden')) return false;
+                const style = window.getComputedStyle(errorOverlay);
+                return style.display !== 'none' && style.visibility !== 'hidden';
+            })();
+            const runtimeReady = !!globalThis?.GAME_INSTANCE;
+            return {
+                mainMenuVisible,
+                runtimeReady,
+                visiblePanelId: visiblePanel instanceof HTMLElement ? visiblePanel.id : null,
+                errorOverlayVisible,
+                errorOverlayText: errorOverlayVisible
+                    ? String(errorOverlay?.textContent || '').slice(0, 400)
+                    : '',
+                documentReadyState: String(document.readyState || ''),
+                locationHref: String(window.location.href || ''),
+                appBootState: runtimeReady
+                    ? 'runtime_ready'
+                    : (errorOverlayVisible
+                        ? 'runtime_error_overlay'
+                        : (mainMenuVisible ? 'menu_shell_ready' : 'booting')),
+            };
+        });
+    } catch (error) {
+        return {
+            mainMenuVisible: false,
+            runtimeReady: false,
+            visiblePanelId: null,
+            errorOverlayVisible: false,
+            errorOverlayText: '',
+            documentReadyState: 'unavailable',
+            locationHref: '',
+            appBootState: 'snapshot_unavailable',
+            snapshotError: serializeError(error),
+        };
+    }
+}
+
 async function runClientModuleWarmup(baseUrl) {
     const origin = new URL(baseUrl).origin;
     const queue = MODULE_WARMUP_REQUEST_PATHS.map((requestPath) => new URL(requestPath, origin).toString());
@@ -298,6 +352,7 @@ async function runBrowserPrewarm(url, options = {}) {
     const maxAttempts = toPositiveInt(options.maxAttempts, PREWARM_MAX_ATTEMPTS, 1, 5);
     const gotoTimeoutMs = toPositiveInt(options.gotoTimeoutMs, PREWARM_GOTO_TIMEOUT_MS, 1_000, 600_000);
     const menuTimeoutMs = toPositiveInt(options.menuTimeoutMs, PREWARM_MENU_TIMEOUT_MS, 1_000, 600_000);
+    const runtimeTimeoutMs = toPositiveInt(options.runtimeTimeoutMs, PREWARM_RUNTIME_TIMEOUT_MS, 500, 600_000);
     const retryDelayMs = toPositiveInt(options.retryDelayMs, PREWARM_RETRY_DELAY_MS, 100, 30_000);
     const waitUntil = String(options.waitUntil || 'commit');
     const supportedWaitStates = new Set(['commit', 'domcontentloaded', 'load', 'networkidle']);
@@ -318,8 +373,12 @@ async function runBrowserPrewarm(url, options = {}) {
             console: [],
             pageErrors: [],
             gotoCompleted: false,
+            shellReady: false,
             runtimeReady: false,
             mainMenuVisible: false,
+            errorOverlayVisible: false,
+            appBootState: 'booting',
+            readinessSnapshot: null,
             error: null,
             durationMs: 0,
         };
@@ -350,19 +409,18 @@ async function runBrowserPrewarm(url, options = {}) {
                 const runtimeReady = !!globalThis?.GAME_INSTANCE;
                 return mainMenuVisible || runtimeReady;
             }, null, { timeout: menuTimeoutMs });
-            const readinessSnapshot = await page.evaluate(() => {
-                const menu = document.getElementById('main-menu');
-                return {
-                    mainMenuVisible: (() => {
-                        if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                        const style = window.getComputedStyle(menu);
-                        return style.display !== 'none' && style.visibility !== 'hidden';
-                    })(),
-                    runtimeReady: !!globalThis?.GAME_INSTANCE,
-                };
-            });
+            try {
+                await page.waitForFunction(() => !!globalThis?.GAME_INSTANCE, null, { timeout: runtimeTimeoutMs });
+            } catch {
+                // Record the boot phase even if the runtime never reaches its final ready state.
+            }
+            const readinessSnapshot = await captureAppBootSnapshot(page);
+            browserAttempt.readinessSnapshot = readinessSnapshot;
             browserAttempt.mainMenuVisible = readinessSnapshot.mainMenuVisible === true;
+            browserAttempt.shellReady = readinessSnapshot.mainMenuVisible === true;
             browserAttempt.runtimeReady = readinessSnapshot.runtimeReady === true;
+            browserAttempt.errorOverlayVisible = readinessSnapshot.errorOverlayVisible === true;
+            browserAttempt.appBootState = String(readinessSnapshot.appBootState || 'booting');
             browserAttempt.durationMs = Math.max(0, Date.now() - startedAt);
             attempts.push(browserAttempt);
             await browser.close();
@@ -371,10 +429,13 @@ async function runBrowserPrewarm(url, options = {}) {
                 attempts,
                 retries: Math.max(0, attempts.length - 1),
                 ready: true,
+                shellReady: browserAttempt.shellReady,
+                appReady: browserAttempt.runtimeReady,
                 config: {
                     maxAttempts,
                     gotoTimeoutMs,
                     menuTimeoutMs,
+                    runtimeTimeoutMs,
                     retryDelayMs,
                     waitUntil: waitState,
                 },
@@ -382,6 +443,16 @@ async function runBrowserPrewarm(url, options = {}) {
             };
         } catch (error) {
             lastError = error;
+            try {
+                browserAttempt.readinessSnapshot = await captureAppBootSnapshot(page);
+                browserAttempt.mainMenuVisible = browserAttempt.readinessSnapshot.mainMenuVisible === true;
+                browserAttempt.shellReady = browserAttempt.readinessSnapshot.mainMenuVisible === true;
+                browserAttempt.runtimeReady = browserAttempt.readinessSnapshot.runtimeReady === true;
+                browserAttempt.errorOverlayVisible = browserAttempt.readinessSnapshot.errorOverlayVisible === true;
+                browserAttempt.appBootState = String(browserAttempt.readinessSnapshot.appBootState || 'booting');
+            } catch {
+                // Keep the original readiness error if the fallback snapshot also fails.
+            }
             browserAttempt.error = serializeError(error);
             browserAttempt.durationMs = Math.max(0, Date.now() - startedAt);
             attempts.push(browserAttempt);
@@ -401,6 +472,7 @@ async function runBrowserPrewarm(url, options = {}) {
             maxAttempts,
             gotoTimeoutMs,
             menuTimeoutMs,
+            runtimeTimeoutMs,
             retryDelayMs,
             waitUntil: waitState,
         },
@@ -418,18 +490,20 @@ async function collectServerLogSnippets(baseDir) {
         candidates.push({ path: resolvedPath, explicit: true });
     }
 
-    try {
-        const entries = await readdir(baseDir, { withFileTypes: true });
-        for (const entry of entries) {
-            if (!entry.isFile()) continue;
-            if (!/^tmp-vite-.*\.(out|err)\.log$/i.test(entry.name)) continue;
-            candidates.push({
-                path: path.resolve(baseDir, entry.name),
-                explicit: false,
-            });
+    if (explicitPaths.length === 0) {
+        try {
+            const entries = await readdir(baseDir, { withFileTypes: true });
+            for (const entry of entries) {
+                if (!entry.isFile()) continue;
+                if (!/^tmp-vite-.*\.(out|err)\.log$/i.test(entry.name)) continue;
+                candidates.push({
+                    path: path.resolve(baseDir, entry.name),
+                    explicit: false,
+                });
+            }
+        } catch {
+            return snippets;
         }
-    } catch {
-        return snippets;
     }
 
     const uniqueCandidatePaths = Array.from(new Set(candidates.map((entry) => entry.path)));
@@ -476,15 +550,21 @@ async function writeStartupDiagnostics(baseDir, outputDir, diagnostics) {
 }
 
 export default async function globalSetup() {
+    const runProfile = resolvePlaywrightRunProfile(
+        process.env.PW_RUN_PROFILE || PLAYWRIGHT_DEFAULT_RUN_PROFILE
+    );
     const runTag = String(process.env.PW_RUN_TAG || `pid-${process.pid}`).trim();
     const testHost = String(process.env.TEST_HOST || '127.0.0.1').trim() || '127.0.0.1';
     const testPort = String(process.env.TEST_PORT || '').trim();
     const outputDir = String(process.env.PW_OUTPUT_DIR || '').trim();
     const workers = toPositiveInt(process.env.PW_WORKERS, 1, 1, 32);
+    const serverMode = runProfile.serverMode;
+    const moduleWarmupEnabled = runProfile.moduleWarmupEnabled && process.env.PW_MODULE_WARMUP !== '0';
     const strictPrewarm = process.env.PW_STRICT_PREWARM === '1';
     const prewarmMaxAttempts = toPositiveInt(process.env.PW_PREWARM_MAX_ATTEMPTS, PREWARM_MAX_ATTEMPTS, 1, 5);
     const prewarmGotoTimeoutMs = toPositiveInt(process.env.PW_PREWARM_GOTO_TIMEOUT_MS, PREWARM_GOTO_TIMEOUT_MS, 1_000, 600_000);
     const prewarmMenuTimeoutMs = toPositiveInt(process.env.PW_PREWARM_MENU_TIMEOUT_MS, PREWARM_MENU_TIMEOUT_MS, 1_000, 600_000);
+    const prewarmRuntimeTimeoutMs = toPositiveInt(process.env.PW_PREWARM_RUNTIME_TIMEOUT_MS, PREWARM_RUNTIME_TIMEOUT_MS, 500, 600_000);
     const prewarmRetryDelayMs = toPositiveInt(process.env.PW_PREWARM_RETRY_DELAY_MS, PREWARM_RETRY_DELAY_MS, 100, 30_000);
     const prewarmWaitUntilCandidate = String(process.env.PW_PREWARM_WAIT_UNTIL || 'commit');
     const prewarmWaitUntil = (
@@ -506,6 +586,7 @@ export default async function globalSetup() {
 
     const baseDir = process.cwd();
     const diagnostics = {
+        runProfile: runProfile.name,
         runTag,
         testHost,
         testPort,
@@ -522,12 +603,18 @@ export default async function globalSetup() {
         },
         readiness: {
             url: `http://${testHost}:${testPort}/`,
+            runProfile: runProfile.name,
+            serverMode,
             strictPrewarm,
             moduleWarmup: null,
+            serverReady: false,
+            shellReady: false,
+            appReady: false,
             prewarmConfig: {
                 maxAttempts: prewarmMaxAttempts,
                 gotoTimeoutMs: prewarmGotoTimeoutMs,
                 menuTimeoutMs: prewarmMenuTimeoutMs,
+                runtimeTimeoutMs: prewarmRuntimeTimeoutMs,
                 retryDelayMs: prewarmRetryDelayMs,
                 waitUntil: prewarmWaitUntil,
             },
@@ -588,19 +675,28 @@ export default async function globalSetup() {
 
                 const readinessUrl = `http://${testHost}:${testPort}/`;
                 diagnostics.readiness.httpProbe = await runHttpReadinessProbe(readinessUrl);
-                diagnostics.readiness.moduleWarmup = await runClientModuleWarmup(readinessUrl);
+                diagnostics.readiness.moduleWarmup = moduleWarmupEnabled
+                    ? await runClientModuleWarmup(readinessUrl)
+                    : {
+                        skipped: true,
+                        reason: serverMode === 'preview' ? 'preview_server' : 'disabled_by_env',
+                    };
                 diagnostics.readiness.browserPrewarm = await runBrowserPrewarm(readinessUrl, {
                     maxAttempts: prewarmMaxAttempts,
                     gotoTimeoutMs: prewarmGotoTimeoutMs,
                     menuTimeoutMs: prewarmMenuTimeoutMs,
+                    runtimeTimeoutMs: prewarmRuntimeTimeoutMs,
                     retryDelayMs: prewarmRetryDelayMs,
                     waitUntil: prewarmWaitUntil,
                 });
+                diagnostics.readiness.serverReady = diagnostics.readiness.httpProbe?.ready === true;
+                diagnostics.readiness.shellReady = diagnostics.readiness.browserPrewarm?.shellReady === true;
+                diagnostics.readiness.appReady = diagnostics.readiness.browserPrewarm?.appReady === true;
                 diagnostics.readiness.ready = (
-                    diagnostics.readiness.httpProbe?.ready === true
+                    diagnostics.readiness.serverReady
                     && (
                         !strictPrewarm
-                        || diagnostics.readiness.browserPrewarm?.ready === true
+                        || diagnostics.readiness.appReady
                     )
                 );
 
@@ -609,8 +705,14 @@ export default async function globalSetup() {
                 console.log(`[PlaywrightIsolation] startup diagnostics: ${diagnosticsPath}`);
                 if (!diagnostics.readiness.browserPrewarm?.ready) {
                     console.warn(
-                        `[PlaywrightIsolation] prewarm probe failed after retries; ` +
+                        `[PlaywrightIsolation] browser shell probe failed after retries; ` +
                         `continuing because strict prewarm is ${strictPrewarm ? 'enabled' : 'disabled'}`
+                    );
+                } else if (!diagnostics.readiness.appReady) {
+                    console.warn(
+                        `[PlaywrightIsolation] app boot probe reached only "` +
+                        `${String(diagnostics.readiness.browserPrewarm?.attempts?.slice(-1)[0]?.appBootState || 'unknown')}` +
+                        `"; continuing because strict prewarm is ${strictPrewarm ? 'enabled' : 'disabled'}`
                     );
                 }
 

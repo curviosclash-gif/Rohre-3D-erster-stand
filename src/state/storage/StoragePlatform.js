@@ -17,6 +17,11 @@ function parseJson(rawValue, fallbackValue = null) {
     }
 }
 
+function normalizeKey(value) {
+    const normalized = typeof value === 'string' ? value.trim() : '';
+    return normalized;
+}
+
 export class StoragePlatform {
     constructor(options = {}) {
         this.driver = options.driver || createDefaultStorageDriver(options);
@@ -24,6 +29,10 @@ export class StoragePlatform {
         this.onQuotaExceeded = typeof options.onQuotaExceeded === 'function'
             ? options.onQuotaExceeded
             : null;
+        this.onMigrationResult = typeof options.onMigrationResult === 'function'
+            ? options.onMigrationResult
+            : null;
+        this._migrationResults = new Map();
     }
 
     readRaw(primaryKey, legacyKeys = []) {
@@ -33,7 +42,8 @@ export class StoragePlatform {
     readJson(primaryKey, legacyKeys = [], fallbackValue = null) {
         const resolved = this.readRaw(primaryKey, legacyKeys);
         if (!resolved) return fallbackValue;
-        this.migrationRegistry.migrate(primaryKey, resolved);
+        const migrationResult = this.migrationRegistry.migrate(primaryKey, resolved);
+        this._storeMigrationResult(primaryKey, migrationResult);
         return parseJson(resolved.raw, fallbackValue);
     }
 
@@ -59,6 +69,39 @@ export class StoragePlatform {
 
     remove(key) {
         return this.driver.remove(key);
+    }
+
+    getLastMigrationResult(primaryKey) {
+        const normalizedPrimaryKey = normalizeKey(primaryKey);
+        if (!normalizedPrimaryKey) return null;
+        return this._migrationResults.get(normalizedPrimaryKey) || null;
+    }
+
+    _storeMigrationResult(primaryKey, result) {
+        const normalizedPrimaryKey = normalizeKey(primaryKey);
+        if (!normalizedPrimaryKey || !result || typeof result !== 'object') {
+            return null;
+        }
+        this._migrationResults.set(normalizedPrimaryKey, result);
+        if (this.onMigrationResult) {
+            try {
+                this.onMigrationResult(result);
+            } catch {
+                // Keep storage reads resilient even if observability hooks throw.
+            }
+        }
+        if (
+            result.attempted === true
+            && result.ok !== true
+            && typeof console !== 'undefined'
+            && typeof console.warn === 'function'
+        ) {
+            console.warn(
+                `[StoragePlatform] Legacy storage migration incomplete for "${normalizedPrimaryKey}" ` +
+                `(status=${String(result.status || 'unknown')} reason=${String(result.reason || 'unknown')})`
+            );
+        }
+        return result;
     }
 }
 

@@ -25,6 +25,12 @@ export function createMenuMultiplayerDiscoveryPort(options = {}) {
     const onDiscoveredHosts = toCallable(discoveryRuntime?.onDiscoveredHosts, null);
 
     function isAvailable() {
+        if (typeof discoveryRuntime?.isAvailable === 'function') {
+            return discoveryRuntime.isAvailable() === true;
+        }
+        if (discoveryRuntime?.capability && typeof discoveryRuntime.capability === 'object') {
+            return discoveryRuntime.capability.available === true;
+        }
         return !!(startDiscovery && stopDiscovery && onDiscoveredHosts);
     }
 

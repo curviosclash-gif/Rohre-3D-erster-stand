@@ -3,6 +3,21 @@ function normalizeKey(value) {
     return normalized;
 }
 
+function createStorageMigrationResult(source = {}) {
+    const payload = source && typeof source === 'object' ? source : {};
+    return Object.freeze({
+        primaryKey: normalizeKey(payload.primaryKey),
+        sourceKey: normalizeKey(payload.sourceKey),
+        attempted: payload.attempted === true,
+        migrated: payload.migrated === true,
+        ok: payload.ok === true,
+        writeOk: payload.writeOk === true,
+        removeOk: payload.removeOk === true,
+        status: normalizeKey(payload.status) || 'idle',
+        reason: normalizeKey(payload.reason) || 'ok',
+    });
+}
+
 export class StorageMigrationRegistry {
     constructor(options = {}) {
         this.driver = options.driver || null;
@@ -32,9 +47,49 @@ export class StorageMigrationRegistry {
 
     migrate(primaryKey, resolvedEntry) {
         const normalizedPrimaryKey = normalizeKey(primaryKey);
-        if (!normalizedPrimaryKey || !resolvedEntry || !this.driver) return false;
-        if (resolvedEntry.key === normalizedPrimaryKey) return false;
+        const sourceKey = normalizeKey(resolvedEntry?.key);
+        if (!normalizedPrimaryKey || !resolvedEntry || !this.driver) {
+            return createStorageMigrationResult({
+                primaryKey: normalizedPrimaryKey,
+                sourceKey,
+                status: 'idle',
+                reason: 'missing_migration_context',
+                ok: true,
+            });
+        }
+        if (sourceKey === normalizedPrimaryKey) {
+            return createStorageMigrationResult({
+                primaryKey: normalizedPrimaryKey,
+                sourceKey,
+                status: 'current_key',
+                reason: 'already_current',
+                ok: true,
+            });
+        }
         const write = this.driver.writeRaw(normalizedPrimaryKey, resolvedEntry.raw);
-        return write.ok;
+        if (!write.ok) {
+            return createStorageMigrationResult({
+                primaryKey: normalizedPrimaryKey,
+                sourceKey,
+                attempted: true,
+                status: 'write_failed',
+                reason: write.reason,
+                writeOk: false,
+                removeOk: false,
+                ok: false,
+            });
+        }
+        const remove = this.driver.remove(resolvedEntry.key);
+        return createStorageMigrationResult({
+            primaryKey: normalizedPrimaryKey,
+            sourceKey,
+            attempted: true,
+            migrated: remove.ok,
+            writeOk: true,
+            removeOk: remove.ok,
+            status: remove.ok ? 'migrated' : 'remove_failed',
+            reason: remove.reason,
+            ok: remove.ok,
+        });
     }
 }

@@ -283,6 +283,20 @@ export function sanitizePortal(raw) {
     }, source.id), 'model', source.model);
 }
 
+function sanitizePortalList(rawPortals) {
+    const portals = [];
+    for (const entry of asArray(rawPortals)) {
+        if (Array.isArray(entry?.a) && Array.isArray(entry?.b)) {
+            const radius = asPositiveNumber(entry.radius, 80, 1);
+            portals.push(sanitizePortal({ x: entry.a[0], y: entry.a[1], z: entry.a[2], radius }));
+            portals.push(sanitizePortal({ x: entry.b[0], y: entry.b[1], z: entry.b[2], radius }));
+            continue;
+        }
+        portals.push(sanitizePortal(entry));
+    }
+    return portals;
+}
+
 export function sanitizeItem(raw) {
     const source = raw && typeof raw === 'object' ? raw : {};
     const result = withOptionalId({
@@ -383,7 +397,7 @@ export function normalizeMapSchemaDocument(rawMap) {
 
     const arenaSize = sanitizeArenaSize(rawMap.arenaSize);
     const playerSpawnDefault = { x: -800, y: arenaSize.height * 0.55, z: 0 };
-    const portals = asArray(rawMap.portals).map((entry) => sanitizePortal(entry));
+    const portals = sanitizePortalList(rawMap.portals);
     const items = asArray(rawMap.items).map((entry) => sanitizeItem(entry));
 
     const normalized = withOptionalStringField({

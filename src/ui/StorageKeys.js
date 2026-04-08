@@ -48,19 +48,75 @@ export function readFirstAvailableStorageValue(storage, primaryKey, legacyKeys =
 }
 
 export function migrateStorageValue(storage, primaryKey, resolvedEntry) {
-    if (!storage || typeof storage.setItem !== 'function') {
-        return false;
+    if (!storage || typeof storage.setItem !== 'function' || typeof storage.removeItem !== 'function') {
+        return {
+            primaryKey: String(primaryKey || '').trim(),
+            sourceKey: String(resolvedEntry?.key || '').trim(),
+            attempted: false,
+            migrated: false,
+            ok: true,
+            writeOk: false,
+            removeOk: false,
+            status: 'idle',
+            reason: 'missing_migration_context',
+        };
     }
 
     const key = String(primaryKey || '').trim();
     if (!key || !resolvedEntry || resolvedEntry.key === key) {
-        return false;
+        return {
+            primaryKey: key,
+            sourceKey: String(resolvedEntry?.key || '').trim(),
+            attempted: false,
+            migrated: false,
+            ok: true,
+            writeOk: false,
+            removeOk: false,
+            status: key && resolvedEntry?.key === key ? 'current_key' : 'idle',
+            reason: key && resolvedEntry?.key === key ? 'already_current' : 'missing_migration_context',
+        };
     }
 
     try {
         storage.setItem(key, resolvedEntry.raw);
-        return true;
-    } catch {
-        return false;
+    } catch (error) {
+        return {
+            primaryKey: key,
+            sourceKey: String(resolvedEntry?.key || '').trim(),
+            attempted: true,
+            migrated: false,
+            ok: false,
+            writeOk: false,
+            removeOk: false,
+            status: 'write_failed',
+            reason: String(error?.message || 'write_failed'),
+        };
+    }
+
+    try {
+        storage.removeItem(resolvedEntry.key);
+        return {
+            primaryKey: key,
+            sourceKey: String(resolvedEntry?.key || '').trim(),
+            attempted: true,
+            migrated: true,
+            ok: true,
+            writeOk: true,
+            removeOk: true,
+            status: 'migrated',
+            reason: 'ok',
+        };
+    } catch (error) {
+        return {
+            primaryKey: key,
+            sourceKey: String(resolvedEntry?.key || '').trim(),
+            attempted: true,
+            migrated: false,
+            ok: false,
+            writeOk: true,
+            removeOk: false,
+            status: 'remove_failed',
+            reason: String(error?.message || 'remove_failed'),
+        };
     }
 }

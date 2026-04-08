@@ -1,6 +1,6 @@
 ﻿# Architektur (Aktiver Einstieg)
 
-Stand: 2026-04-06
+Stand: 2026-04-08
 
 Dieses Dokument ist der aktive Einstiegspfad fuer die Architektur.
 Die detaillierte historische Langfassung liegt unter:

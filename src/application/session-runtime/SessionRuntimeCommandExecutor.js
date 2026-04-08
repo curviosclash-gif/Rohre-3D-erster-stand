@@ -12,9 +12,21 @@ import {
 } from '../../core/runtime/MenuRuntimeMultiplayerService.js';
 import { applyCommandRuntimeSettings } from '../../core/runtime/RuntimeCommandSettingsService.js';
 
+const INVALID_COMMAND_ERROR_MESSAGE = 'invalid session runtime command';
+
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
     return normalized || fallback;
+}
+
+function createObservedCommandInput(command = null, fallbackType = 'invalid_command') {
+    const payload = command?.payload && typeof command.payload === 'object' && !Array.isArray(command.payload)
+        ? { ...command.payload }
+        : {};
+    return {
+        type: normalizeString(command?.type, fallbackType),
+        payload,
+    };
 }
 
 function summarizeCommandPayload(command = null) {
@@ -69,7 +81,17 @@ export class SessionRuntimeCommandExecutor {
 
     execute(command = null) {
         const normalizedCommand = normalizeSessionRuntimeCommand(command);
-        if (!normalizedCommand) return undefined;
+        if (!normalizedCommand) {
+            const invalidCommand = createObservedCommandInput(command);
+            this._recordCommandObservation(invalidCommand, 'received');
+            this._recordCommandFailure(
+                invalidCommand,
+                'invalid_command',
+                INVALID_COMMAND_ERROR_MESSAGE,
+                INVALID_COMMAND_ERROR_MESSAGE
+            );
+            return undefined;
+        }
         this._recordCommandObservation(normalizedCommand, 'received');
         let result;
         try {
@@ -83,7 +105,21 @@ export class SessionRuntimeCommandExecutor {
 
     executeResult(command = null) {
         const normalizedCommand = normalizeSessionRuntimeCommand(command);
-        if (!normalizedCommand) return Promise.resolve(undefined);
+        if (!normalizedCommand) {
+            const invalidCommand = createObservedCommandInput(command);
+            this._recordCommandObservation(invalidCommand, 'received');
+            this._recordCommandFailure(
+                invalidCommand,
+                'invalid_command',
+                INVALID_COMMAND_ERROR_MESSAGE,
+                INVALID_COMMAND_ERROR_MESSAGE
+            );
+            return Promise.resolve(createSettledCommandResult(invalidCommand, {
+                ok: false,
+                error: INVALID_COMMAND_ERROR_MESSAGE,
+                resultStatus: 'invalid_command',
+            }));
+        }
         this._recordCommandObservation(normalizedCommand, 'received');
         let result;
         try {
