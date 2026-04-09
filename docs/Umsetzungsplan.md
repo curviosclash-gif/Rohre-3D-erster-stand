@@ -38,7 +38,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | planned | P2 | frei | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
 | V87 | Runtime-Hardening-Followup | active | P2 | Bot-Codex | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
-| V88 | Testarchitektur und Verifikationsvertraege | planned | P2 | frei | V87.99 | 88.3 | `docs/plaene/aktiv/V88.md` |
+| V88 | Testarchitektur und Verifikationsvertraege | planned | P2 | frei | V87.99 | 88.4 | `docs/plaene/aktiv/V88.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
