@@ -104,7 +104,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | - | V84 | 2026-04-04 | closed | Abgeschlossen 2026-04-05: `84.99.2` dokumentiert Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
 | - | V85 | - | frei | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
 | Bot-Codex | V87 | 2026-04-05 | active | Frischer Voll-Lauf vom 2026-04-08 schneidet `test:targeted` auf 23 FAIL neu; offen bleiben die Produktionscluster `physics-core`/`physics-hunt`/`physics-policy`, waehrend `core-targeted` im Voll-Lauf nur noch `page.goto`-/Harness-Signale (`T1`, `V56.1`) liefert |
-| Bot-Codex | V88 | 2026-04-09 | active | `88.3.1` Browser-Suites entlang ihrer Vertragscluster schneiden und fuer gezielte Reruns vorbereiten |
+| - | V88 | - | frei | Nach `88.3.1` als naechsten Schritt `88.3.2` fuer Suite-Selektion, Tags und kleinere Fail-Kaskaden ziehen |
 | - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
