@@ -11,7 +11,7 @@ Use this table to choose the cheapest meaningful verification path for block-end
 - `playwright-browser-contract`: `npm run test:playwright:browser-contract -- <spec-or-grep>`
 - `heavy-special`: `npm run test:contract:targeted`, `npm run smoke:selftrail`, `npm run smoke:roundstate`, `npm run smoke:arcade`, `npm run test:editor-ui`
 
-- `playwright-dev-runtime` deckt die breiten Runtime-Slices `tests/core-targeted.spec.js`, `tests/physics-core.spec.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/arcade-blueprint.spec.js` und `tests/bot-targeting.spec.js`.
+- `playwright-dev-runtime` deckt die breiten Runtime-Slices `tests/core-targeted.spec.js`, `tests/core-targeted-platform.spec.js`, `tests/core-targeted-surface.spec.js`, `tests/core-targeted-runtime.spec.js`, `tests/core-targeted-regressions.spec.js`, `tests/physics-core.spec.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/arcade-blueprint.spec.js` und `tests/bot-targeting.spec.js`.
 - `playwright-browser-contract` deckt die fokussierten Browser-/Surface-Vertraege `tests/network-adapter.spec.js`, `tests/recording.spec.js`, `tests/training-automation.spec.js` und `tests/editor-vehicle.spec.js`.
 
 ## Einsatzregel
@@ -46,6 +46,10 @@ Use this table to choose the cheapest meaningful verification path for block-end
 - `tests/*.contract.test.mjs` -> `npm run test:contract`
 - `tests/core.spec.js` -> `npm run test:playwright:preview-smoke`
 - `tests/core-targeted.spec.js` -> `npm run test:playwright:dev-runtime`
+- `tests/core-targeted-platform.spec.js` -> `npm run test:playwright:dev-runtime`
+- `tests/core-targeted-surface.spec.js` -> `npm run test:playwright:dev-runtime`
+- `tests/core-targeted-runtime.spec.js` -> `npm run test:playwright:dev-runtime`
+- `tests/core-targeted-regressions.spec.js` -> `npm run test:playwright:dev-runtime`
 - `tests/physics-*.spec.js` -> `npm run test:physics`
 - `tests/network-adapter.spec.js` -> `npm run test:playwright:browser-contract -- tests/network-adapter.spec.js`
 - `tests/recording.spec.js` -> `npm run test:playwright:browser-contract -- tests/recording.spec.js`

@@ -22,14 +22,14 @@
   - `npm run smoke:roundstate` PASS
   - `npm run test:smoke` PASS (`TEST_PORT=5561`, `PW_RUN_TAG=v87-smoke-20260407`, `PW_OUTPUT_DIR=test-results/v87-smoke-20260407`)
 - Der alte Browser-/Harness-Startblocker ist entkoppelt:
-  - `test:targeted` laeuft im engeren `dev-runtime`-Aggregat (`tests/core-targeted.spec.js`, `tests/physics-core.spec.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/arcade-blueprint.spec.js`, `tests/bot-targeting.spec.js`) und bricht nicht mehr am Preview-/Probe-Startpfad fest
+  - `test:targeted` laeuft im engeren `dev-runtime`-Aggregat (`tests/core-targeted.spec.js`, `tests/core-targeted-platform.spec.js`, `tests/core-targeted-surface.spec.js`, `tests/core-targeted-runtime.spec.js`, `tests/core-targeted-regressions.spec.js`, `tests/physics-core.spec.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/arcade-blueprint.spec.js`, `tests/bot-targeting.spec.js`) und bricht nicht mehr am Preview-/Probe-Startpfad fest
   - `test-results/v87-targeted-dev-20260408/playwright-startup-diagnostics.json` meldet `serverReady=true`, `shellReady=true`, `ready=true`; `appReady` bleibt dabei `false`, `appBootState=menu_shell_ready`, weil `strictPrewarm=false` den Lauf bereits auf Shell-Readiness freigibt
   - `tmp-v87-targeted-dev-20260408.log` enthaelt kein `fetch failed`/`probe-timeout`, sondern nur den Hinweis `app boot probe reached only "menu_shell_ready"; continuing because strict prewarm is disabled`
 - Fuer `test:targeted` wurde der Serververtrag gesplittet:
   - Smoke bleibt auf Preview, weil dort kein Browser-Source-Import benoetigt wird
   - Targeted nutzt wieder den Vite-Dev-Server, weil mehrere Tests im Browserkontext `import('/src/...')` ausfuehren und im Preview-Modus reproduzierbar mit `Failed to fetch dynamically imported module` brechen
   - Ab `V88 88.1.1` ist dieser Split als expliziter Run-Profile-Vertrag benannt: `preview-smoke` fuer den Preview-Pfad, `dev-runtime` fuer den Dev-Server-Pfad; fokussierte browsernahe Vertrags-Reruns koennen zusaetzlich ueber `browser-contract` mit expliziter Selektion laufen
-  - Einordnung ab 2026-04-08 (`V88 88.1.2`): Der aktuelle `dev-runtime`-/`test:targeted`-Vertrag umfasst nur noch breite Runtime-Slices (`core-targeted`, `physics-*`, `arcade-blueprint`, `bot-targeting`); `tests/network-adapter.spec.js`, `tests/recording.spec.js`, `tests/training-automation.spec.js` und `tests/editor-vehicle.spec.js` laufen seither bewusst nur noch ueber `browser-contract` mit expliziter Selektion
+  - Einordnung ab 2026-04-09 (`V88 88.3.1`): Der aktuelle `dev-runtime`-/`test:targeted`-Vertrag umfasst nur noch breite Runtime-Slices (`core-targeted` Shell/Platform/Surface/Runtime/Regressions, `physics-*`, `arcade-blueprint`, `bot-targeting`); `tests/network-adapter.spec.js`, `tests/recording.spec.js`, `tests/training-automation.spec.js` und `tests/editor-vehicle.spec.js` laufen bewusst weiter nur ueber `browser-contract` mit expliziter Selektion
 - Der verbleibende Blocker ist jetzt inhaltlich:
   - `TEST_PORT=5588 PW_RUN_TAG=v87-targeted-dev-20260408 PW_OUTPUT_DIR=test-results/v87-targeted-dev-20260408 npm run test:targeted` endet nach 28.3 Minuten mit `105 passed`, `35 failed`, `1 flaky`, `3 skipped`, `124 did not run`
   - geschnittene Fail-Cluster im engeren `dev-runtime`-Vertrag:
@@ -39,10 +39,10 @@
   - angrenzender Nebenrest ausserhalb der drei Hauptcluster:
     - `physics-core`: 2 Fails (`T43b`, `T45c`)
   - dazu kommt weiterhin ein sporadischer Browser-Flake:
-    - `tests/core-targeted.spec.js:158` (`T1: Seite laedt ohne JS-Fehler`) kann den ersten `page.goto`-Versuch noch mit `Timeout 45000ms exceeded` verlieren; Retry gruenteils erfolgreich
+    - `tests/core-targeted.spec.js` (`T1: Seite laedt ohne JS-Fehler`) kann den ersten `page.goto`-Versuch noch mit `Timeout 45000ms exceeded` verlieren; Retry gruenteils erfolgreich
   - der naechste frische Voll-Lauf nach geschlossenem `core-targeted`-Rest schneidet den Stand weiter zusammen:
     - `TEST_PORT=5593 PW_RUN_TAG=v87-targeted-dev-rerun-20260408 PW_OUTPUT_DIR=test-results/v87-targeted-dev-rerun-20260408 npm run test:targeted` endet nach 56.0 Minuten mit `104 passed`, `23 failed`, `1 flaky`, `2 skipped`, `138 did not run`
-    - `core-targeted` liefert darin keine Produktionsfails mehr; stattdessen faellt `tests/core-targeted.spec.js:158` (`T1`) direkt als `page.goto`-Harness-Fail aus, `tests/core-targeted.spec.js:6720` (`V56.1`) bleibt `page.goto`-flaky und der bekannte `T14`-Slice wird dadurch im Voll-Lauf gar nicht erst wieder erreicht
+    - `core-targeted` liefert darin keine Produktionsfails mehr; stattdessen faellt `tests/core-targeted.spec.js` (`T1`) direkt als `page.goto`-Harness-Fail aus, `tests/core-targeted-regressions.spec.js` (`V56.1`) bleibt `page.goto`-flaky und der bekannte `T14`-Slice wird dadurch im Voll-Lauf gar nicht erst wieder erreicht
     - verbleibende Produktionscluster im neuen Schnitt:
       - `physics-core`: 2 Fails (`T43b`, `T45c`)
       - `physics-hunt`: 16 Fails (`T62a`, `T62`, `T63`, `T84`, `T85`, `T88`, `T89`, `T89d`, `T89e`, `T89a`, `T89i`, `T89j`, `T89j1`, `T89k`, `T89b`, `T89c`)
@@ -60,6 +60,11 @@
 ## Betroffene Komponenten
 
 - `tests/core-targeted.spec.js`
+- `tests/core-targeted-platform.spec.js`
+- `tests/core-targeted-surface.spec.js`
+- `tests/core-targeted-runtime.spec.js`
+- `tests/core-targeted-regressions.spec.js`
+- `tests/core-targeted.shared.js`
 - `tests/physics-core.spec.js`
 - `tests/physics-hunt.spec.js`
 - `tests/physics-policy.spec.js`
@@ -94,7 +99,7 @@
 - Logs:
   - `tmp-v87-targeted-dev-rerun-20260408.log` -> `23 failed / 1 flaky / 2 skipped / 138 did not run / 104 passed (56.0m)`; kein `fetch failed`/`probe-timeout`
   - `test-results/v87-targeted-dev-rerun-20260408/playwright-startup-diagnostics.json` -> `serverReady=true`, `shellReady=true`, `ready=true`, `appReady=false`, `appBootState=menu_shell_ready`
-  - `tests/core-targeted.spec.js:158`, `:6720` -> `page.goto`-/Harness-Signale im frischen Voll-Lauf; kein `core-targeted`-Produktionsfail mehr explizit gelistet
+  - `tests/core-targeted.spec.js` (`T1`) und `tests/core-targeted-regressions.spec.js` (`V56.1`) -> `page.goto`-/Harness-Signale im frischen Voll-Lauf; kein `core-targeted`-Produktionsfail mehr explizit gelistet
   - `tests/physics-core.spec.js:170`, `:353` -> authored-runtime-/boost-nahe Assertion-Fails
   - `tests/physics-hunt.spec.js:74`, `:545`, `:1520` -> Combat-/Trail-/Pickup-Regressions
   - `tests/physics-policy.spec.js:594`, `:1249`, `:1361` -> Policy-/Observation-/Steering-Regressions
@@ -117,7 +122,7 @@
   - Harness-Seite: der engere `dev-runtime`-Vertrag ist reproduzierbar; der Lauf erreicht die Suite ohne `fetch failed`-/`probe-timeout`-Abbruch
   - Readiness-Nuance: Prewarm endet aktuell nur bei `menu_shell_ready`; `appReady=false` ist unter `strictPrewarm=false` toleriert, aber nicht mehr der dominierende Blocker
   - Produkt-/Regression-Seite: der frische Voll-Lauf schneidet nur noch echte Produktionsfails in `physics-core`, `physics-hunt` und `physics-policy`; `core-targeted` liefert dort keine Produktionsfail-Liste mehr
-  - Teilstand 2026-04-08 (`87.99.3` Restabschluss + Vollrerun): der verbleibende V87-nahe `core-targeted`-Produktionsrest ist fachlich geschlossen. Im neuen Voll-Lauf ueberdecken `tests/core-targeted.spec.js:158` (`T1`) und `:6720` (`V56.1`) den Slice als `page.goto`-/Harness-Flakes; der bekannte `T14`-Pfad wurde dadurch im Voll-Lauf nicht erneut erreicht. Die belastbare Baseline liegt jetzt bei `23 FAIL` (`physics-core=2`, `physics-hunt=16`, `physics-policy=4`)
+  - Teilstand 2026-04-08 (`87.99.3` Restabschluss + Vollrerun): der verbleibende V87-nahe `core-targeted`-Produktionsrest ist fachlich geschlossen. Im neuen Voll-Lauf ueberdecken `tests/core-targeted.spec.js` (`T1`) und `tests/core-targeted-regressions.spec.js` (`V56.1`) den Slice als `page.goto`-/Harness-Flakes; der bekannte `T14`-Pfad wurde dadurch im Voll-Lauf nicht erneut erreicht. Die belastbare Baseline liegt jetzt bei `23 FAIL` (`physics-core=2`, `physics-hunt=16`, `physics-policy=4`)
 - V87 ist technisch weitgehend abgearbeitet; offen bleibt das gruene Abschlussgate, weil `test:targeted` als Gesamtlauf noch nicht gruen ist
 
 ## Naechster Schritt
