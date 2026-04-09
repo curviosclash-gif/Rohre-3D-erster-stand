@@ -7,6 +7,8 @@ import {
 } from '../scripts/playwright-run-profile.mjs';
 import {
     captureAppBootSnapshot,
+    createPlaywrightReadinessContract,
+    formatPlaywrightReadinessContract,
     isServerProbeReady,
     probeServerReadiness,
     summarizeAppReadiness,
@@ -162,6 +164,41 @@ function normalizeLockPayload(parsed) {
     };
 }
 
+function toServerProbeSnapshot(probeResult, fallbackUrl) {
+    const lastAttempt = probeResult?.lastAttempt;
+    return {
+        ok: lastAttempt?.ok === true,
+        status: Number(lastAttempt?.status) || 0,
+        error: lastAttempt?.error ? String(lastAttempt.error?.message || lastAttempt.error) : null,
+        url: String(lastAttempt?.url || fallbackUrl || '/'),
+        domHintSeen: lastAttempt?.domHintSeen === true,
+    };
+}
+
+function applyGlobalReadinessContract(readiness, runProfileName, error = null) {
+    if (!readiness || typeof readiness !== 'object') return null;
+    const browserAttempts = Array.isArray(readiness?.browserPrewarm?.attempts)
+        ? readiness.browserPrewarm.attempts
+        : [];
+    const lastBrowserAttempt = browserAttempts[browserAttempts.length - 1] || null;
+    const contract = lastBrowserAttempt?.readinessContract || createPlaywrightReadinessContract({
+        stage: lastBrowserAttempt?.stage || (readiness.httpProbe ? 'startup_probe' : 'idle'),
+        runProfile: runProfileName,
+        requireDomHint: true,
+        serverProbe: toServerProbeSnapshot(readiness.httpProbe, readiness.url),
+        appBootSnapshot: lastBrowserAttempt?.readinessSnapshot || null,
+        error: error
+            || lastBrowserAttempt?.error
+            || readiness?.browserPrewarm?.lastError
+            || readiness?.httpProbe?.lastAttempt?.error
+            || null,
+    });
+    readiness.contract = contract;
+    readiness.failureClass = contract.failureClass;
+    readiness.failureReason = contract.failureReason;
+    return contract;
+}
+
 async function readLockFile(lockPath) {
     try {
         const raw = await readFile(lockPath, 'utf8');
@@ -298,6 +335,10 @@ async function runBrowserPrewarm(url, options = {}) {
     const runtimeTimeoutMs = toPositiveInt(options.runtimeTimeoutMs, PREWARM_RUNTIME_TIMEOUT_MS, 500, 600_000);
     const retryDelayMs = toPositiveInt(options.retryDelayMs, PREWARM_RETRY_DELAY_MS, 100, 30_000);
     const waitUntil = String(options.waitUntil || 'commit');
+    const runProfileName = String(options.runProfile || PLAYWRIGHT_DEFAULT_RUN_PROFILE);
+    const serverProbeSnapshot = options.serverProbe && typeof options.serverProbe === 'object'
+        ? options.serverProbe
+        : toServerProbeSnapshot(null, url);
     const supportedWaitStates = new Set(['commit', 'domcontentloaded', 'load', 'networkidle']);
     const waitState = supportedWaitStates.has(waitUntil) ? waitUntil : 'commit';
     const attempts = [];
@@ -313,6 +354,7 @@ async function runBrowserPrewarm(url, options = {}) {
             waitUntil: waitState,
             gotoTimeoutMs,
             menuTimeoutMs,
+            stage: 'goto',
             console: [],
             pageErrors: [],
             gotoCompleted: false,
@@ -322,6 +364,9 @@ async function runBrowserPrewarm(url, options = {}) {
             errorOverlayVisible: false,
             appBootState: 'booting',
             readinessSnapshot: null,
+            readinessContract: null,
+            failureClass: null,
+            failureReason: null,
             error: null,
             durationMs: 0,
         };
@@ -343,12 +388,15 @@ async function runBrowserPrewarm(url, options = {}) {
 
             await page.goto(url, { waitUntil: waitState, timeout: gotoTimeoutMs });
             browserAttempt.gotoCompleted = true;
+            browserAttempt.stage = 'shell_ready';
             await waitForShellOrRuntimeReady(page, menuTimeoutMs);
             try {
+                browserAttempt.stage = 'runtime_ready';
                 await waitForRuntimeReady(page, runtimeTimeoutMs);
             } catch {
                 // Record the boot phase even if the runtime never reaches its final ready state.
             }
+            browserAttempt.stage = 'browser_prewarm';
             const readinessSnapshot = await captureAppBootSnapshot(page);
             const appReadiness = summarizeAppReadiness(readinessSnapshot);
             browserAttempt.readinessSnapshot = readinessSnapshot;
@@ -357,9 +405,19 @@ async function runBrowserPrewarm(url, options = {}) {
             browserAttempt.runtimeReady = appReadiness.appReady;
             browserAttempt.errorOverlayVisible = readinessSnapshot.errorOverlayVisible === true;
             browserAttempt.appBootState = appReadiness.appBootState;
+            browserAttempt.readinessContract = createPlaywrightReadinessContract({
+                stage: browserAttempt.stage,
+                runProfile: runProfileName,
+                requireDomHint: true,
+                serverProbe: serverProbeSnapshot,
+                appBootSnapshot: readinessSnapshot,
+            });
+            browserAttempt.failureClass = browserAttempt.readinessContract.failureClass;
+            browserAttempt.failureReason = browserAttempt.readinessContract.failureReason;
             browserAttempt.durationMs = Math.max(0, Date.now() - startedAt);
             attempts.push(browserAttempt);
             await browser.close();
+            const readinessContract = browserAttempt.readinessContract;
             return {
                 url,
                 attempts,
@@ -375,6 +433,9 @@ async function runBrowserPrewarm(url, options = {}) {
                     retryDelayMs,
                     waitUntil: waitState,
                 },
+                readinessContract,
+                failureClass: readinessContract?.failureClass || null,
+                failureReason: readinessContract?.failureReason || null,
                 lastError: null,
             };
         } catch (error) {
@@ -390,6 +451,16 @@ async function runBrowserPrewarm(url, options = {}) {
             } catch {
                 // Keep the original readiness error if the fallback snapshot also fails.
             }
+            browserAttempt.readinessContract = createPlaywrightReadinessContract({
+                stage: browserAttempt.stage,
+                runProfile: runProfileName,
+                requireDomHint: true,
+                serverProbe: serverProbeSnapshot,
+                appBootSnapshot: browserAttempt.readinessSnapshot,
+                error,
+            });
+            browserAttempt.failureClass = browserAttempt.readinessContract.failureClass;
+            browserAttempt.failureReason = browserAttempt.readinessContract.failureReason;
             browserAttempt.error = serializeError(error);
             browserAttempt.durationMs = Math.max(0, Date.now() - startedAt);
             attempts.push(browserAttempt);
@@ -400,6 +471,14 @@ async function runBrowserPrewarm(url, options = {}) {
         }
     }
 
+    const readinessContract = attempts[attempts.length - 1]?.readinessContract || createPlaywrightReadinessContract({
+        stage: 'browser_prewarm',
+        runProfile: runProfileName,
+        requireDomHint: true,
+        serverProbe: serverProbeSnapshot,
+        appBootSnapshot: null,
+        error: lastError,
+    });
     return {
         url,
         attempts,
@@ -413,6 +492,9 @@ async function runBrowserPrewarm(url, options = {}) {
             retryDelayMs,
             waitUntil: waitState,
         },
+        readinessContract,
+        failureClass: readinessContract.failureClass,
+        failureReason: readinessContract.failureReason,
         lastError: serializeError(lastError),
     };
 }
@@ -557,6 +639,9 @@ export default async function globalSetup() {
             },
             httpProbe: null,
             browserPrewarm: null,
+            contract: null,
+            failureClass: null,
+            failureReason: null,
             ready: false,
         },
         serverLogs: [],
@@ -612,6 +697,7 @@ export default async function globalSetup() {
 
                 const readinessUrl = `http://${testHost}:${testPort}/`;
                 diagnostics.readiness.httpProbe = await runHttpReadinessProbe(readinessUrl);
+                const serverProbeSnapshot = toServerProbeSnapshot(diagnostics.readiness.httpProbe, readinessUrl);
                 diagnostics.readiness.moduleWarmup = moduleWarmupEnabled
                     ? await runClientModuleWarmup(readinessUrl)
                     : {
@@ -625,6 +711,8 @@ export default async function globalSetup() {
                     runtimeTimeoutMs: prewarmRuntimeTimeoutMs,
                     retryDelayMs: prewarmRetryDelayMs,
                     waitUntil: prewarmWaitUntil,
+                    runProfile: runProfile.name,
+                    serverProbe: serverProbeSnapshot,
                 });
                 diagnostics.readiness.serverReady = diagnostics.readiness.httpProbe?.ready === true;
                 diagnostics.readiness.shellReady = diagnostics.readiness.browserPrewarm?.shellReady === true;
@@ -636,10 +724,17 @@ export default async function globalSetup() {
                         || diagnostics.readiness.appReady
                     )
                 );
+                const readinessContract = applyGlobalReadinessContract(diagnostics.readiness, runProfile.name);
 
                 diagnostics.serverLogs = await collectServerLogSnippets(baseDir);
                 diagnosticsPath = await writeStartupDiagnostics(baseDir, outputDir, diagnostics);
                 console.log(`[PlaywrightIsolation] startup diagnostics: ${diagnosticsPath}`);
+                if (readinessContract?.failureClass) {
+                    console.warn(
+                        `[PlaywrightIsolation] readiness classification: ` +
+                        `${formatPlaywrightReadinessContract(readinessContract)}`
+                    );
+                }
                 if (!diagnostics.readiness.browserPrewarm?.ready) {
                     console.warn(
                         `[PlaywrightIsolation] browser shell probe failed after retries; ` +
@@ -656,6 +751,7 @@ export default async function globalSetup() {
                 if (!diagnostics.readiness.ready) {
                     throw new Error(
                         '[PlaywrightIsolation] Runtime readiness probe failed after retries. ' +
+                        `${formatPlaywrightReadinessContract(readinessContract)} ` +
                         `diagnostics=${diagnosticsPath}`
                     );
                 }
@@ -695,6 +791,7 @@ export default async function globalSetup() {
             `blocking=${JSON.stringify(blockingLock || {})}`
         );
     } catch (error) {
+        applyGlobalReadinessContract(diagnostics.readiness, runProfile.name, error);
         diagnostics.error = serializeError(error);
         if (!Array.isArray(diagnostics.serverLogs) || diagnostics.serverLogs.length === 0) {
             diagnostics.serverLogs = await collectServerLogSnippets(baseDir);
@@ -702,8 +799,11 @@ export default async function globalSetup() {
         if (!diagnosticsPath) {
             diagnosticsPath = await writeStartupDiagnostics(baseDir, outputDir, diagnostics);
         }
+        const readinessSummary = diagnostics.readiness.contract
+            ? ` ${formatPlaywrightReadinessContract(diagnostics.readiness.contract)}`
+            : '';
         throw new Error(
-            `[PlaywrightIsolation] global setup failed. diagnostics=${diagnosticsPath} ` +
+            `[PlaywrightIsolation] global setup failed.${readinessSummary} diagnostics=${diagnosticsPath} ` +
             `reason=${error?.message || 'unknown'}`
         );
     }

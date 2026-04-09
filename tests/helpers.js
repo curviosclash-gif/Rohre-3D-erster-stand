@@ -1,5 +1,6 @@
 import {
     collectPlaywrightStageDiagnostics,
+    formatPlaywrightReadinessContract,
     waitForRuntimeReady,
     waitForShellOrRuntimeReady,
 } from './playwright-readiness.js';
@@ -77,12 +78,14 @@ export async function loadGame(page) {
             return;
         } catch (error) {
             lastError = error;
-            lastDiagnostics = await collectPlaywrightStageDiagnostics(page, lastStage);
+            lastDiagnostics = await collectPlaywrightStageDiagnostics(page, lastStage, {
+                error,
+                expectDomHint: true,
+                requireDomHint: true,
+            });
             const message = String(error?.message || '');
-            if (page.isClosed() || message.includes('Target page, context or browser has been closed')) {
-                throw error;
-            }
-            if (attempt >= maxAttempts) {
+            const isClosedFlake = page.isClosed() || message.includes('Target page, context or browser has been closed');
+            if (attempt >= maxAttempts || isClosedFlake) {
                 break;
             }
             await page.waitForTimeout(250 * attempt);
@@ -92,9 +95,10 @@ export async function loadGame(page) {
     const message = lastError instanceof Error ? lastError.message : String(lastError || 'unknown');
     const diagnosticsText = lastDiagnostics ? ` diagnostics=${JSON.stringify(lastDiagnostics)}` : '';
     const runProfile = String(process.env.PW_RUN_PROFILE || 'preview-smoke').trim() || 'preview-smoke';
+    const readinessSummary = lastDiagnostics ? ` ${formatPlaywrightReadinessContract(lastDiagnostics)}` : '';
     throw new Error(
         `loadGame failed after ${maxAttempts} attempts in runProfile "${runProfile}" ` +
-        `at stage "${lastStage}": ${message}${diagnosticsText}`
+        `at stage "${lastStage}"${readinessSummary}: ${message}${diagnosticsText}`
     );
 }
 
