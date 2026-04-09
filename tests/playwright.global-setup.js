@@ -5,6 +5,14 @@ import {
     PLAYWRIGHT_DEFAULT_RUN_PROFILE,
     resolvePlaywrightRunProfile,
 } from '../scripts/playwright-run-profile.mjs';
+import {
+    captureAppBootSnapshot,
+    isServerProbeReady,
+    probeServerReadiness,
+    summarizeAppReadiness,
+    waitForRuntimeReady,
+    waitForShellOrRuntimeReady,
+} from './playwright-readiness.js';
 
 const STARTUP_DIAGNOSTICS_FILE = 'playwright-startup-diagnostics.json';
 const STARTUP_PROBE_MAX_ATTEMPTS = 6;
@@ -183,72 +191,6 @@ function isProcessAlive(pid) {
     }
 }
 
-async function fetchWithTimeout(url, timeoutMs) {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(new Error('probe-timeout')), timeoutMs);
-    try {
-        return await fetch(url, {
-            method: 'GET',
-            cache: 'no-store',
-            signal: controller.signal,
-            headers: {
-                'cache-control': 'no-store',
-            },
-        });
-    } finally {
-        clearTimeout(timer);
-    }
-}
-
-async function captureAppBootSnapshot(page) {
-    try {
-        return await page.evaluate(() => {
-            const menu = document.getElementById('main-menu');
-            const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-            const errorOverlay = document.getElementById('runtime-error-overlay');
-            const mainMenuVisible = (() => {
-                if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                const style = window.getComputedStyle(menu);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            })();
-            const errorOverlayVisible = (() => {
-                if (!(errorOverlay instanceof HTMLElement) || errorOverlay.classList.contains('hidden')) return false;
-                const style = window.getComputedStyle(errorOverlay);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            })();
-            const runtimeReady = !!globalThis?.GAME_INSTANCE;
-            return {
-                mainMenuVisible,
-                runtimeReady,
-                visiblePanelId: visiblePanel instanceof HTMLElement ? visiblePanel.id : null,
-                errorOverlayVisible,
-                errorOverlayText: errorOverlayVisible
-                    ? String(errorOverlay?.textContent || '').slice(0, 400)
-                    : '',
-                documentReadyState: String(document.readyState || ''),
-                locationHref: String(window.location.href || ''),
-                appBootState: runtimeReady
-                    ? 'runtime_ready'
-                    : (errorOverlayVisible
-                        ? 'runtime_error_overlay'
-                        : (mainMenuVisible ? 'menu_shell_ready' : 'booting')),
-            };
-        });
-    } catch (error) {
-        return {
-            mainMenuVisible: false,
-            runtimeReady: false,
-            visiblePanelId: null,
-            errorOverlayVisible: false,
-            errorOverlayText: '',
-            documentReadyState: 'unavailable',
-            locationHref: '',
-            appBootState: 'snapshot_unavailable',
-            snapshotError: serializeError(error),
-        };
-    }
-}
-
 async function runClientModuleWarmup(baseUrl) {
     const origin = new URL(baseUrl).origin;
     const queue = MODULE_WARMUP_REQUEST_PATHS.map((requestPath) => new URL(requestPath, origin).toString());
@@ -269,10 +211,12 @@ async function runClientModuleWarmup(baseUrl) {
                 durationMs: 0,
             };
             try {
-                const response = await fetchWithTimeout(url, MODULE_WARMUP_REQUEST_TIMEOUT_MS);
+                const response = await probeServerReadiness(url, {
+                    timeoutMs: MODULE_WARMUP_REQUEST_TIMEOUT_MS,
+                });
                 attempt.status = Number(response?.status) || 0;
                 attempt.ok = response?.ok === true;
-                await response.text();
+                attempt.error = response?.error || null;
             } catch (error) {
                 attempt.error = serializeError(error);
             } finally {
@@ -313,18 +257,17 @@ async function runHttpReadinessProbe(url) {
             durationMs: 0,
         };
         try {
-            const response = await fetchWithTimeout(url, STARTUP_PROBE_TIMEOUT_MS);
+            const response = await probeServerReadiness(url, {
+                timeoutMs: STARTUP_PROBE_TIMEOUT_MS,
+                expectDomHint: true,
+            });
             probeAttempt.status = Number(response?.status) || 0;
             probeAttempt.ok = response?.ok === true;
-            const html = await response.text();
-            probeAttempt.domHintSeen = (
-                html.includes('id="main-menu"')
-                || html.includes("id='main-menu'")
-                || html.includes('#main-menu')
-            );
+            probeAttempt.domHintSeen = response?.domHintSeen === true;
+            probeAttempt.error = response?.error || null;
             probeAttempt.durationMs = Math.max(0, Date.now() - startedAt);
             attempts.push(probeAttempt);
-            if (probeAttempt.ok && probeAttempt.domHintSeen) {
+            if (isServerProbeReady(response, { requireDomHint: true })) {
                 ready = true;
                 break;
             }
@@ -383,8 +326,9 @@ async function runBrowserPrewarm(url, options = {}) {
             durationMs: 0,
         };
         const browser = await chromium.launch();
+        let page = null;
         try {
-            const page = await browser.newPage();
+            page = await browser.newPage();
             page.on('console', (msg) => {
                 const type = String(msg?.type?.() || '').trim().toLowerCase();
                 if (type !== 'error' && type !== 'warning') return;
@@ -399,28 +343,20 @@ async function runBrowserPrewarm(url, options = {}) {
 
             await page.goto(url, { waitUntil: waitState, timeout: gotoTimeoutMs });
             browserAttempt.gotoCompleted = true;
-            await page.waitForFunction(() => {
-                const menu = document.getElementById('main-menu');
-                const mainMenuVisible = (() => {
-                    if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                    const style = window.getComputedStyle(menu);
-                    return style.display !== 'none' && style.visibility !== 'hidden';
-                })();
-                const runtimeReady = !!globalThis?.GAME_INSTANCE;
-                return mainMenuVisible || runtimeReady;
-            }, null, { timeout: menuTimeoutMs });
+            await waitForShellOrRuntimeReady(page, menuTimeoutMs);
             try {
-                await page.waitForFunction(() => !!globalThis?.GAME_INSTANCE, null, { timeout: runtimeTimeoutMs });
+                await waitForRuntimeReady(page, runtimeTimeoutMs);
             } catch {
                 // Record the boot phase even if the runtime never reaches its final ready state.
             }
             const readinessSnapshot = await captureAppBootSnapshot(page);
+            const appReadiness = summarizeAppReadiness(readinessSnapshot);
             browserAttempt.readinessSnapshot = readinessSnapshot;
             browserAttempt.mainMenuVisible = readinessSnapshot.mainMenuVisible === true;
-            browserAttempt.shellReady = readinessSnapshot.mainMenuVisible === true;
-            browserAttempt.runtimeReady = readinessSnapshot.runtimeReady === true;
+            browserAttempt.shellReady = appReadiness.shellReady;
+            browserAttempt.runtimeReady = appReadiness.appReady;
             browserAttempt.errorOverlayVisible = readinessSnapshot.errorOverlayVisible === true;
-            browserAttempt.appBootState = String(readinessSnapshot.appBootState || 'booting');
+            browserAttempt.appBootState = appReadiness.appBootState;
             browserAttempt.durationMs = Math.max(0, Date.now() - startedAt);
             attempts.push(browserAttempt);
             await browser.close();
@@ -445,11 +381,12 @@ async function runBrowserPrewarm(url, options = {}) {
             lastError = error;
             try {
                 browserAttempt.readinessSnapshot = await captureAppBootSnapshot(page);
+                const appReadiness = summarizeAppReadiness(browserAttempt.readinessSnapshot);
                 browserAttempt.mainMenuVisible = browserAttempt.readinessSnapshot.mainMenuVisible === true;
-                browserAttempt.shellReady = browserAttempt.readinessSnapshot.mainMenuVisible === true;
-                browserAttempt.runtimeReady = browserAttempt.readinessSnapshot.runtimeReady === true;
+                browserAttempt.shellReady = appReadiness.shellReady;
+                browserAttempt.runtimeReady = appReadiness.appReady;
                 browserAttempt.errorOverlayVisible = browserAttempt.readinessSnapshot.errorOverlayVisible === true;
-                browserAttempt.appBootState = String(browserAttempt.readinessSnapshot.appBootState || 'booting');
+                browserAttempt.appBootState = appReadiness.appBootState;
             } catch {
                 // Keep the original readiness error if the fallback snapshot also fails.
             }

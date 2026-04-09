@@ -1,83 +1,8 @@
-async function probeServerReadiness(page) {
-    try {
-        const response = await page.context().request.get('/', {
-            failOnStatusCode: false,
-            timeout: 5000,
-        });
-        return {
-            ok: response.ok(),
-            status: response.status(),
-        };
-    } catch (error) {
-        return {
-            ok: false,
-            status: 0,
-            error: String(error?.message || 'request_failed'),
-        };
-    }
-}
-
-async function captureAppBootSnapshot(page) {
-    if (page.isClosed()) {
-        return {
-            pageClosed: true,
-            appBootState: 'page_closed',
-        };
-    }
-    try {
-        return await page.evaluate(() => {
-            const menu = document.getElementById('main-menu');
-            const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-            const errorOverlay = document.getElementById('runtime-error-overlay');
-            const mainMenuVisible = (() => {
-                if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                const style = window.getComputedStyle(menu);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            })();
-            const errorOverlayVisible = (() => {
-                if (!(errorOverlay instanceof HTMLElement) || errorOverlay.classList.contains('hidden')) return false;
-                const style = window.getComputedStyle(errorOverlay);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            })();
-            const runtimeReady = !!globalThis?.GAME_INSTANCE;
-            return {
-                locationHref: String(window.location.href || ''),
-                documentReadyState: String(document.readyState || ''),
-                mainMenuVisible,
-                runtimeReady,
-                visiblePanelId: visiblePanel instanceof HTMLElement ? visiblePanel.id : null,
-                errorOverlayVisible,
-                errorOverlayText: errorOverlayVisible
-                    ? String(errorOverlay?.textContent || '').slice(0, 400)
-                    : '',
-                appBootState: runtimeReady
-                    ? 'runtime_ready'
-                    : (errorOverlayVisible
-                        ? 'runtime_error_overlay'
-                        : (mainMenuVisible ? 'menu_shell_ready' : 'booting')),
-            };
-        });
-    } catch (error) {
-        return {
-            pageClosed: false,
-            appBootState: 'snapshot_unavailable',
-            snapshotError: String(error?.message || 'snapshot_failed'),
-        };
-    }
-}
-
-async function collectLoadGameDiagnostics(page, stage) {
-    const [serverProbe, appBoot] = await Promise.all([
-        probeServerReadiness(page),
-        captureAppBootSnapshot(page),
-    ]);
-    return {
-        stage,
-        runProfile: String(process.env.PW_RUN_PROFILE || 'preview-smoke').trim() || 'preview-smoke',
-        serverProbe,
-        appBoot,
-    };
-}
+import {
+    collectPlaywrightStageDiagnostics,
+    waitForRuntimeReady,
+    waitForShellOrRuntimeReady,
+} from './playwright-readiness.js';
 
 // Load page and wait for visible main menu.
 export async function loadGame(page) {
@@ -93,14 +18,7 @@ export async function loadGame(page) {
             lastStage = 'goto';
             await page.goto('/', { waitUntil: 'commit', timeout: gotoTimeoutMs });
             lastStage = 'shell_ready';
-            await page.waitForFunction(() => {
-                const menu = document.getElementById('main-menu');
-                const runtimeReady = !!globalThis?.GAME_INSTANCE;
-                if (runtimeReady) return true;
-                if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                const style = window.getComputedStyle(menu);
-                return style.display !== 'none' && style.visibility !== 'hidden';
-            }, null, { timeout: readyTimeoutMs });
+            await waitForShellOrRuntimeReady(page, readyTimeoutMs);
 
             const state = await page.evaluate(() => {
                 const menu = document.getElementById('main-menu');
@@ -119,7 +37,7 @@ export async function loadGame(page) {
 
             if (!state.runtimeReady) {
                 lastStage = 'runtime_ready';
-                await page.waitForFunction(() => !!globalThis?.GAME_INSTANCE, null, { timeout: readyTimeoutMs });
+                await waitForRuntimeReady(page, readyTimeoutMs);
             }
 
             lastStage = 'return_to_menu_probe';
@@ -159,7 +77,7 @@ export async function loadGame(page) {
             return;
         } catch (error) {
             lastError = error;
-            lastDiagnostics = await collectLoadGameDiagnostics(page, lastStage);
+            lastDiagnostics = await collectPlaywrightStageDiagnostics(page, lastStage);
             const message = String(error?.message || '');
             if (page.isClosed() || message.includes('Target page, context or browser has been closed')) {
                 throw error;
