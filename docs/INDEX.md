@@ -1,4 +1,4 @@
-# Dokumentationsindex (Aktiv)
+﻿# Dokumentationsindex (Aktiv)
 
 Stand: 2026-03-30
 
@@ -27,4 +27,4 @@ Stand: 2026-03-30
 ## Historie
 
 - Archivierte Inhalte liegen in `docs/archive/`.
-- Das Root-Dokument `walkthrough.md` ist historisch und nicht bindend.
+- Historische Root-Dokumente aus der Aufraeumrunde 2026-04-10 liegen in `docs/archive/workspace/root-history/root-cleanup-2026-04-10/`.

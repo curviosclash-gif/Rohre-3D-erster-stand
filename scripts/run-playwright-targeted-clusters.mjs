@@ -1,6 +1,8 @@
 import { spawn } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
+import { resolvePlaywrightFailureTaxonomy } from '../tests/playwright-readiness.js';
 
 const DEV_RUNTIME_CLUSTERS = Object.freeze([
     { id: 'core-shell', specs: ['tests/core-targeted.spec.js'] },
@@ -14,6 +16,7 @@ const DEV_RUNTIME_CLUSTERS = Object.freeze([
     { id: 'arcade-blueprint', specs: ['tests/arcade-blueprint.spec.js'] },
     { id: 'bot-targeting', specs: ['tests/bot-targeting.spec.js'] },
 ]);
+const PLAYWRIGHT_STARTUP_DIAGNOSTICS_FILE = 'playwright-startup-diagnostics.json';
 
 const CLUSTER_INDEX = new Map();
 for (const cluster of DEV_RUNTIME_CLUSTERS) {
@@ -150,11 +153,12 @@ function buildClusterEnv(cluster, index) {
 function runCluster(cluster, playwrightArgs, index, total) {
     return new Promise((resolve) => {
         const clusterArgs = [path.resolve('scripts', 'run-playwright-targeted.mjs'), ...cluster.specs, ...playwrightArgs];
+        const clusterEnv = buildClusterEnv(cluster, index);
         console.log(`[playwright:dev-runtime] (${index + 1}/${total}) ${cluster.id} -> ${cluster.specs.join(', ')}`);
 
         const child = spawn(process.execPath, clusterArgs, {
             stdio: 'inherit',
-            env: buildClusterEnv(cluster, index),
+            env: clusterEnv,
             windowsHide: true,
         });
 
@@ -163,9 +167,70 @@ function runCluster(cluster, playwrightArgs, index, total) {
                 cluster,
                 code: code ?? 1,
                 signal: signal || null,
+                outputDir: clusterEnv.PW_OUTPUT_DIR,
             });
         });
     });
+}
+
+function toClusterContractDiagnostics(rawDiagnostics) {
+    if (!rawDiagnostics || typeof rawDiagnostics !== 'object') return null;
+    const directContract = rawDiagnostics?.readiness?.contract;
+    if (directContract && typeof directContract === 'object') {
+        return directContract;
+    }
+    const browserAttempts = Array.isArray(rawDiagnostics?.readiness?.browserPrewarm?.attempts)
+        ? rawDiagnostics.readiness.browserPrewarm.attempts
+        : [];
+    return browserAttempts[browserAttempts.length - 1]?.readinessContract || null;
+}
+
+function collectServerLogPaths(rawDiagnostics) {
+    if (!Array.isArray(rawDiagnostics?.serverLogs)) return [];
+    const uniquePaths = new Set();
+    for (const logEntry of rawDiagnostics.serverLogs) {
+        const relativePath = String(logEntry?.path || '').trim();
+        if (!relativePath) continue;
+        uniquePaths.add(path.resolve(relativePath));
+    }
+    return [...uniquePaths];
+}
+
+async function classifyClusterFailure(result) {
+    const diagnosticsPath = path.resolve(result.outputDir || '', PLAYWRIGHT_STARTUP_DIAGNOSTICS_FILE);
+    let diagnostics = null;
+    try {
+        diagnostics = JSON.parse(await readFile(diagnosticsPath, 'utf8'));
+    } catch {
+        diagnostics = null;
+    }
+
+    const contract = toClusterContractDiagnostics(diagnostics);
+    const failureClass = resolvePlaywrightFailureTaxonomy({
+        runProfile: 'dev-runtime',
+        stage: contract?.stage || 'idle',
+        failureReason: contract?.failureReason || '',
+        error: contract?.errorMessage || diagnostics?.error || null,
+        pageClosed: contract?.appBoot?.pageClosed === true,
+        serverReady: contract?.serverReady === true,
+        shellReady: contract?.shellReady === true,
+        appReady: contract?.appReady === true,
+    }) || 'runtime-regression';
+    const diagnosticsOutputDir = String(diagnostics?.outputDir || '').trim();
+    const outputDir = diagnosticsOutputDir
+        ? path.resolve(diagnosticsOutputDir)
+        : path.resolve(result.outputDir || '');
+
+    return {
+        clusterId: result.cluster.id,
+        failureClass,
+        failureReason: String(contract?.failureReason || 'playwright_exit_non_zero'),
+        runProfile: String(diagnostics?.runProfile || 'dev-runtime'),
+        runTag: String(diagnostics?.runTag || ''),
+        outputDir,
+        diagnosticsPath: diagnostics ? diagnosticsPath : null,
+        serverLogPaths: collectServerLogPaths(diagnostics),
+    };
 }
 
 async function main() {
@@ -194,12 +259,52 @@ async function main() {
             return;
         }
         if (result.code !== 0) {
-            failures.push(result.cluster.id);
+            const classifiedFailure = await classifyClusterFailure(result);
+            failures.push(classifiedFailure);
+            console.error(
+                `[playwright:dev-runtime] ${classifiedFailure.clusterId} classified as ` +
+                `${classifiedFailure.failureClass} (${classifiedFailure.failureReason})`
+            );
+            console.error(
+                `[playwright:dev-runtime] artifact contract: ` +
+                `mode=${classifiedFailure.runProfile} ` +
+                `runTag=${classifiedFailure.runTag || 'n/a'} ` +
+                `output=${classifiedFailure.outputDir || 'n/a'}`
+            );
+            if (classifiedFailure.diagnosticsPath) {
+                console.error(`[playwright:dev-runtime] diagnostics: ${classifiedFailure.diagnosticsPath}`);
+            }
+            for (const serverLogPath of classifiedFailure.serverLogPaths) {
+                console.error(`[playwright:dev-runtime] server-log: ${serverLogPath}`);
+            }
         }
     }
 
     if (failures.length > 0) {
-        console.error(`[playwright:dev-runtime] failing clusters: ${failures.join(', ')}`);
+        const bucketMap = new Map();
+        for (const failure of failures) {
+            if (!bucketMap.has(failure.failureClass)) {
+                bucketMap.set(failure.failureClass, []);
+            }
+            bucketMap.get(failure.failureClass).push(failure.clusterId);
+        }
+        console.error(
+            `[playwright:dev-runtime] failing clusters: ${failures.map((failure) => (
+                `${failure.clusterId}:${failure.failureClass}`
+            )).join(', ')}`
+        );
+        for (const [failureClass, clusterIds] of bucketMap.entries()) {
+            console.error(`[playwright:dev-runtime] failure-taxonomy ${failureClass}: ${clusterIds.join(', ')}`);
+        }
+        for (const failure of failures) {
+            console.error(
+                `[playwright:dev-runtime] ${failure.clusterId} artifacts: ` +
+                `mode=${failure.runProfile} ` +
+                `runTag=${failure.runTag || 'n/a'} ` +
+                `diagnostics=${failure.diagnosticsPath || 'n/a'} ` +
+                `output=${failure.outputDir || 'n/a'}`
+            );
+        }
         process.exit(1);
     }
 }

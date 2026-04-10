@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-04-09
+Stand: 2026-04-10
 
 ## 1. Architekturparadigma
 
@@ -359,6 +359,8 @@ Stand: 2026-04-09
 ## 6. Verifikation
 
 - Testauswahl ueber `.agents/test_mapping.md`
+- `dev-runtime`-Reruns laufen bevorzugt ueber `node scripts/run-playwright-targeted-clusters.mjs <cluster-id...>`; pro Cluster bleiben `PW_RUN_TAG`, `PW_OUTPUT_DIR`, `playwright-startup-diagnostics.json` und `tmp-vite-*.log` als Artefaktvertrag erhalten.
+- Failure-Klassifikation fuer Playwright folgt zentral `startup|readiness|contract|runtime-regression|flake` (`tests/playwright-readiness.js` + Cluster-Runner-Ausgabe).
 - Danach immer Doku-/Prozess-Check ueber `npm run docs:sync` und `npm run docs:check`
 
 ## 7. Bot-Bridge Vertrag V1 (eingefroren am 2026-03-03)

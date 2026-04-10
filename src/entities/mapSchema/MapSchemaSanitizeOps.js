@@ -73,6 +73,13 @@ function sanitizeVectorArray(raw, fallback = [0, 0, 0]) {
     ];
 }
 
+function pushSanitizeWarning(warnings, message) {
+    if (!Array.isArray(warnings) || typeof message !== 'string' || message.length === 0) {
+        return;
+    }
+    warnings.push(message);
+}
+
 function normalizeGateType(value) {
     const normalized = String(value || '').trim().toLowerCase();
     if (normalized === 'slingshot') {
@@ -85,9 +92,22 @@ function normalizeGateType(value) {
 }
 
 function normalizePortalMode(value, options = {}) {
-    const normalized = String(value || '').trim().toLowerCase();
+    const rawValue = typeof value === 'string'
+        ? value.trim()
+        : (value === null || value === undefined ? '' : String(value).trim());
+    const normalized = rawValue.toLowerCase();
     if (normalized === 'dynamic' || normalized === 'authored' || normalized === 'hybrid') {
         return normalized;
+    }
+    const fallback = options.legacyPreferAuthored === true
+        ? 'authored'
+        : (options.hasAuthoredPortals === true ? 'hybrid' : 'dynamic');
+    if (rawValue.length > 0) {
+        pushSanitizeWarning(
+            options.warnings,
+            `Unsupported portalMode "${rawValue}" normalized to "${fallback}".`
+        );
+        return fallback;
     }
     if (options.legacyPreferAuthored === true) return 'authored';
     if (options.hasAuthoredPortals === true) return 'hybrid';
@@ -95,11 +115,22 @@ function normalizePortalMode(value, options = {}) {
 }
 
 function normalizeItemSpawnMode(value, options = {}) {
-    const normalized = String(value || '').trim().toLowerCase();
+    const rawValue = typeof value === 'string'
+        ? value.trim()
+        : (value === null || value === undefined ? '' : String(value).trim());
+    const normalized = rawValue.toLowerCase();
     if (normalized === 'anchor-only' || normalized === 'hybrid' || normalized === 'fallback-random') {
         return normalized;
     }
-    return options.hasAuthoredItems === true ? 'anchor-only' : 'fallback-random';
+    const fallback = options.hasAuthoredItems === true ? 'anchor-only' : 'fallback-random';
+    if (rawValue.length > 0) {
+        pushSanitizeWarning(
+            options.warnings,
+            `Unsupported itemSpawnMode "${rawValue}" normalized to "${fallback}".`
+        );
+        return fallback;
+    }
+    return fallback;
 }
 
 function normalizeGlbColliderMode(value) {
@@ -283,17 +314,43 @@ export function sanitizePortal(raw) {
     }, source.id), 'model', source.model);
 }
 
-function sanitizePortalList(rawPortals) {
+function sanitizePortalList(rawPortals, options = {}) {
     const portals = [];
-    for (const entry of asArray(rawPortals)) {
+    const warnings = Array.isArray(options.warnings) ? options.warnings : null;
+    asArray(rawPortals).forEach((entry, index) => {
+        if (!entry || typeof entry !== 'object') {
+            pushSanitizeWarning(warnings, `Portal entry ${index + 1} was ignored because it is not an object.`);
+            return;
+        }
+
+        const hasLegacyPairShape = Object.prototype.hasOwnProperty.call(entry, 'a')
+            || Object.prototype.hasOwnProperty.call(entry, 'b');
         if (Array.isArray(entry?.a) && Array.isArray(entry?.b)) {
             const radius = asPositiveNumber(entry.radius, 80, 1);
             portals.push(sanitizePortal({ x: entry.a[0], y: entry.a[1], z: entry.a[2], radius }));
             portals.push(sanitizePortal({ x: entry.b[0], y: entry.b[1], z: entry.b[2], radius }));
-            continue;
+            return;
+        }
+        if (hasLegacyPairShape) {
+            pushSanitizeWarning(
+                warnings,
+                `Portal pair ${index + 1} was ignored because both "a" and "b" vectors are required.`
+            );
+            return;
+        }
+
+        const hasPosition = Number.isFinite(Number(entry.x))
+            || Number.isFinite(Number(entry.y))
+            || Number.isFinite(Number(entry.z));
+        if (!hasPosition) {
+            pushSanitizeWarning(
+                warnings,
+                `Portal entry ${index + 1} was ignored because it has no numeric position.`
+            );
+            return;
         }
         portals.push(sanitizePortal(entry));
-    }
+    });
     return portals;
 }
 
@@ -390,14 +447,43 @@ export function sanitizeGate(raw) {
     return result;
 }
 
-export function normalizeMapSchemaDocument(rawMap) {
+function sanitizeGateList(rawGates, options = {}) {
+    const gates = [];
+    const warnings = Array.isArray(options.warnings) ? options.warnings : null;
+
+    asArray(rawGates).forEach((entry, index) => {
+        if (!entry || typeof entry !== 'object') {
+            pushSanitizeWarning(warnings, `Gate entry ${index + 1} was ignored because it is not an object.`);
+            return;
+        }
+
+        const hasPosArray = Array.isArray(entry.pos) && entry.pos.length >= 3;
+        const hasVectorCoordinates = Number.isFinite(Number(entry.x))
+            || Number.isFinite(Number(entry.y))
+            || Number.isFinite(Number(entry.z));
+        if (!hasPosArray && !hasVectorCoordinates) {
+            pushSanitizeWarning(
+                warnings,
+                `Gate entry ${index + 1} was ignored because it has no numeric position.`
+            );
+            return;
+        }
+
+        gates.push(sanitizeGate(entry));
+    });
+
+    return gates;
+}
+
+export function normalizeMapSchemaDocument(rawMap, options = {}) {
     if (!rawMap || typeof rawMap !== 'object') {
         throw new Error('Map root must be an object.');
     }
 
     const arenaSize = sanitizeArenaSize(rawMap.arenaSize);
     const playerSpawnDefault = { x: -800, y: arenaSize.height * 0.55, z: 0 };
-    const portals = sanitizePortalList(rawMap.portals);
+    const warnings = Array.isArray(options.warnings) ? options.warnings : null;
+    const portals = sanitizePortalList(rawMap.portals, { warnings });
     const items = asArray(rawMap.items).map((entry) => sanitizeItem(entry));
 
     const normalized = withOptionalStringField({
@@ -408,7 +494,7 @@ export function normalizeMapSchemaDocument(rawMap) {
         foamBlocks: asArray(rawMap.foamBlocks).map((entry) => sanitizeBlock(entry)),
         portals,
         portalLevels: sanitizePortalLevels(rawMap.portalLevels),
-        gates: asArray(rawMap.gates).map((entry) => sanitizeGate(entry)),
+        gates: sanitizeGateList(rawMap.gates, { warnings }),
         items,
         aircraft: asArray(rawMap.aircraft).map((entry) => sanitizeAircraft(entry)),
         botSpawns: asArray(rawMap.botSpawns).map((entry) => sanitizeVector3(entry, { x: 0, y: playerSpawnDefault.y, z: 0 })),
@@ -417,9 +503,11 @@ export function normalizeMapSchemaDocument(rawMap) {
         portalMode: normalizePortalMode(rawMap.portalMode, {
             legacyPreferAuthored: rawMap.preferAuthoredPortals === true,
             hasAuthoredPortals: portals.length > 0,
+            warnings,
         }),
         itemSpawnMode: normalizeItemSpawnMode(rawMap.itemSpawnMode, {
             hasAuthoredItems: items.length > 0,
+            warnings,
         }),
     }, 'glbModel', rawMap.glbModel);
 

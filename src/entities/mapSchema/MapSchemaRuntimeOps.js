@@ -70,10 +70,10 @@ function mapParcoursToRuntime(parcours, invScale) {
 }
 
 export function toArenaMapDefinition(mapDocument, options = {}) {
-    const normalized = createMapDocument(mapDocument);
     const mapScale = asPositiveNumber(options.mapScale, 1, 0.0001);
     const invScale = 1 / mapScale;
     const warnings = [];
+    const normalized = createMapDocument(mapDocument, { warnings });
 
     const obstacles = [];
     const pushBlockAsObstacle = (block, kind = 'hard') => {

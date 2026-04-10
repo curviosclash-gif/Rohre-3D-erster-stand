@@ -1,4 +1,4 @@
-# Test Mapping
+﻿# Test Mapping
 
 Use this table to choose the cheapest meaningful verification path for block-end `*.99` runs.
 
@@ -13,6 +13,7 @@ Use this table to choose the cheapest meaningful verification path for block-end
 
 - `playwright-dev-runtime` deckt die breiten Runtime-Slices `tests/core-targeted.spec.js`, `tests/core-targeted-platform.spec.js`, `tests/core-targeted-surface.spec.js`, `tests/core-targeted-runtime.spec.js`, `tests/core-targeted-regressions.spec.js`, `tests/physics-core.spec.js`, `tests/physics-hunt.spec.js`, `tests/physics-policy.spec.js`, `tests/arcade-blueprint.spec.js` und `tests/bot-targeting.spec.js`.
 - `playwright-browser-contract` deckt die fokussierten Browser-/Surface-Vertraege `tests/network-adapter.spec.js`, `tests/recording.spec.js`, `tests/training-automation.spec.js` und `tests/editor-vehicle.spec.js`.
+- `node-contract` deckt zusaetzlich browserunabhaengige Menu-Multiplayer-/Capability-/Storage-Vertraege in `tests/menu-multiplayer-bridge.contract.test.mjs` und `tests/platform-capabilities.contract.test.mjs`.
 
 ## Einsatzregel
 
@@ -27,6 +28,11 @@ Use this table to choose the cheapest meaningful verification path for block-end
 ## Path -> Command
 
 - `src/core/config/**` -> `npm run test:contract`
+- `src/ui/menu/MenuMultiplayerBridge.js` -> `npm run test:contract`
+- `src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js` -> `npm run test:contract`
+- `src/platform/browser/BrowserPlatformAdapters.js` -> `npm run test:contract`
+- `src/platform/electron/ElectronPlatformBridge.js` -> `npm run test:contract`
+- `src/state/storage/StoragePlatform.js` -> `npm run test:contract`
 - `src/entities/ai/training/**` -> `npm run test:contract` then `npm run test:playwright:browser-contract -- tests/training-automation.spec.js`
 - `src/entities/ai/**` -> `npm run test:contract`
 - `src/entities/player/**` -> `npm run test:contract`
@@ -55,6 +61,8 @@ Use this table to choose the cheapest meaningful verification path for block-end
 - `tests/recording.spec.js` -> `npm run test:playwright:browser-contract -- tests/recording.spec.js`
 - `tests/training-automation.spec.js` -> `npm run test:playwright:browser-contract -- tests/training-automation.spec.js`
 - `tests/editor-vehicle.spec.js` -> `npm run test:playwright:browser-contract -- tests/editor-vehicle.spec.js`
+- `tests/menu-multiplayer-bridge.contract.test.mjs` -> `npm run test:contract`
+- `tests/platform-capabilities.contract.test.mjs` -> `npm run test:contract`
 - `tests/gpu.spec.js` -> `npm run test:heavy`
 - `tests/stress.spec.js` -> `npm run test:heavy`
 - `tests/v28-regression.spec.js` -> `npm run test:heavy`

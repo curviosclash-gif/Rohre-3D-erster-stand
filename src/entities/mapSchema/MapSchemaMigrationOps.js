@@ -102,7 +102,7 @@ export function migrateMapDocument(rawMap) {
         warnings.push(`Legacy preferAuthoredPortals mapped to portalMode=${rawMap.preferAuthoredPortals ? 'authored' : 'hybrid'}.`);
     }
 
-    const map = normalizeMapSchemaDocument(migrated);
+    const map = normalizeMapSchemaDocument(migrated, { warnings });
     return {
         map,
         warnings,
@@ -122,14 +122,14 @@ export function parseMapJSON(jsonText) {
     return migrateMapDocument(parsed);
 }
 
-export function createMapDocument(data = {}) {
+export function createMapDocument(data = {}, options = {}) {
     const normalized = normalizeMapSchemaDocument({
         schemaVersion: MAP_SCHEMA_VERSION,
         ...data,
-    });
+    }, options);
     return normalized;
 }
 
-export function stringifyMapDocument(data = {}, indent = 2) {
-    return JSON.stringify(createMapDocument(data), null, indent);
+export function stringifyMapDocument(data = {}, indent = 2, options = {}) {
+    return JSON.stringify(createMapDocument(data, options), null, indent);
 }

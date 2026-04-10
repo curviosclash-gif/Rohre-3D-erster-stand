@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+﻿#!/usr/bin/env node
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
@@ -9,7 +9,7 @@ const writeMode = args.has('--write') || !checkOnly;
 
 const ACTIVE_SCAN_ROOTS = ['.agents', 'docs'];
 const EXCLUDED_PREFIXES = ['docs/archive'];
-const EXTRA_ACTIVE_FILES = ['AGENTS.md', 'walkthrough.md', 'README.md', 'CLAUDE.md'];
+const EXTRA_ACTIVE_FILES = ['AGENTS.md', 'README.md', 'CLAUDE.md'];
 
 const STAMPED_FILES = [
   'docs/referenz/ai_project_onboarding.md',

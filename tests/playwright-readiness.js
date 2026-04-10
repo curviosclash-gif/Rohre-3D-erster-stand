@@ -18,6 +18,10 @@ const PLAYWRIGHT_FLAKE_REASON_PATTERNS = [
     ['navigation_aborted', /net::ERR_ABORTED/i],
     ['page_crashed', /page crashed/i],
 ];
+const RUN_PROFILE_FAILURE_FALLBACKS = Object.freeze({
+    'browser-contract': 'contract',
+    'dev-runtime': 'runtime-regression',
+});
 
 function hasMainMenuDomHint(html) {
     const source = String(html || '');
@@ -103,6 +107,36 @@ function resolveFailureReason(stage, serverReady, shellReady, appReady, appBootS
     return error ? 'transient_playwright_error' : null;
 }
 
+export function resolvePlaywrightFailureTaxonomy(options = {}) {
+    const runProfile = resolveRunProfile(options.runProfile);
+    const stage = normalizeStage(options.stage);
+    const failureReason = String(options.failureReason || '').trim();
+    const pageClosed = options.pageClosed === true;
+    const flakeReason = findPlaywrightFlakeReason(options.error);
+    const hasError = options.error != null;
+    const serverReady = options.serverReady === true;
+    const shellReady = options.shellReady === true;
+    const appReady = options.appReady === true;
+
+    if (pageClosed || flakeReason || failureReason === 'page_closed') {
+        return 'flake';
+    }
+    if (!failureReason && !hasError) {
+        return null;
+    }
+    if (!serverReady || STARTUP_FAILURE_STAGES.has(stage)) {
+        return 'startup';
+    }
+    if (!shellReady || !appReady || READINESS_FAILURE_STAGES.has(stage)) {
+        return 'readiness';
+    }
+    const fallbackClass = RUN_PROFILE_FAILURE_FALLBACKS[runProfile];
+    if (fallbackClass) {
+        return fallbackClass;
+    }
+    return 'readiness';
+}
+
 export function summarizeAppReadiness(appBootSnapshot) {
     return {
         shellReady: appBootSnapshot?.mainMenuVisible === true,
@@ -147,13 +181,16 @@ export function createPlaywrightReadinessContract(options = {}) {
         options.error,
         appBoot.pageClosed === true
     );
-    const failureClass = failureReason
-        ? (
-            findPlaywrightFlakeReason(options.error) || appBoot.pageClosed === true
-                ? 'flake'
-                : ((!serverReady || STARTUP_FAILURE_STAGES.has(stage)) ? 'startup' : 'readiness')
-        )
-        : null;
+    const failureClass = resolvePlaywrightFailureTaxonomy({
+        runProfile,
+        stage,
+        failureReason,
+        error: options.error,
+        pageClosed: appBoot.pageClosed === true,
+        serverReady,
+        shellReady,
+        appReady,
+    });
 
     return {
         stage,

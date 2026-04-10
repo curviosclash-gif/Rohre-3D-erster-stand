@@ -30,6 +30,7 @@
   - Targeted nutzt wieder den Vite-Dev-Server, weil mehrere Tests im Browserkontext `import('/src/...')` ausfuehren und im Preview-Modus reproduzierbar mit `Failed to fetch dynamically imported module` brechen
   - Ab `V88 88.1.1` ist dieser Split als expliziter Run-Profile-Vertrag benannt: `preview-smoke` fuer den Preview-Pfad, `dev-runtime` fuer den Dev-Server-Pfad; fokussierte browsernahe Vertrags-Reruns koennen zusaetzlich ueber `browser-contract` mit expliziter Selektion laufen
   - Einordnung ab 2026-04-09 (`V88 88.3.1`): Der aktuelle `dev-runtime`-/`test:targeted`-Vertrag umfasst nur noch breite Runtime-Slices (`core-targeted` Shell/Platform/Surface/Runtime/Regressions, `physics-*`, `arcade-blueprint`, `bot-targeting`); `tests/network-adapter.spec.js`, `tests/recording.spec.js`, `tests/training-automation.spec.js` und `tests/editor-vehicle.spec.js` laufen bewusst weiter nur ueber `browser-contract` mit expliziter Selektion
+  - Abgleich 2026-04-10 (`V88 88.5.2`): `scripts/run-playwright-targeted-clusters.mjs` emittiert fuer fehlgeschlagene Cluster jetzt denselben Artefaktvertrag (`mode`, `runTag`, `output`, `diagnostics`, `server-log`) und gruppiert die roten Cluster zusaetzlich ueber `failure-taxonomy <klasse>: <cluster-ids>`
 - Der verbleibende Blocker ist jetzt inhaltlich:
   - `TEST_PORT=5588 PW_RUN_TAG=v87-targeted-dev-20260408 PW_OUTPUT_DIR=test-results/v87-targeted-dev-20260408 npm run test:targeted` endet nach 28.3 Minuten mit `105 passed`, `35 failed`, `1 flaky`, `3 skipped`, `124 did not run`
   - geschnittene Fail-Cluster im engeren `dev-runtime`-Vertrag:
@@ -50,12 +51,12 @@
 
 ## Reproduktion
 
-1. `TEST_PORT=5593 PW_RUN_TAG=v87-targeted-dev-rerun-20260408 PW_OUTPUT_DIR=test-results/v87-targeted-dev-rerun-20260408 npm run test:targeted`
-2. Artefakte pruefen:
-   - `tmp-v87-targeted-dev-rerun-20260408.log`
-   - `test-results/v87-targeted-dev-rerun-20260408/playwright-startup-diagnostics.json`
-   - `test-results/v87-targeted-dev-rerun-20260408/.last-run.json`
-   - `test-results/v87-targeted-dev-rerun-20260408/`
+1. `TEST_PORT=5593 PW_RUN_TAG=v87-targeted-dev-latest PW_OUTPUT_DIR=test-results/v87-targeted-dev-latest node scripts/run-playwright-targeted-clusters.mjs physics-core physics-policy physics-hunt --timeout=240000`
+2. Artefakte pruefen (pro Cluster):
+   - `test-results/v87-targeted-dev-latest/<cluster>/playwright-startup-diagnostics.json`
+   - `test-results/v87-targeted-dev-latest/<cluster>/.last-run.json`
+   - `test-results/v87-targeted-dev-latest/<cluster>/`
+   - `tmp-vite-v87-targeted-dev-latest-<cluster>.out.log` und `tmp-vite-v87-targeted-dev-latest-<cluster>.err.log`
 
 ## Betroffene Komponenten
 
@@ -96,6 +97,12 @@
 
 ## Evidence
 
+- Aktueller Artefaktvertrag (`V88 88.5.2`, Cluster-Runner):
+  - Fehlerzeile pro Cluster: `clusterId`, `failureClass`, `failureReason`
+  - Artefaktzeile pro Cluster: `mode=<runProfile> runTag=<PW_RUN_TAG>-<cluster> output=<PW_OUTPUT_DIR>/<cluster>`
+  - Diagnostikpfad: `<PW_OUTPUT_DIR>/<cluster>/playwright-startup-diagnostics.json`
+  - Server-Log-Pfade: `tmp-vite-<PW_RUN_TAG>-<cluster>.out.log` und `tmp-vite-<PW_RUN_TAG>-<cluster>.err.log`
+  - Aggregat: `failure-taxonomy startup|readiness|contract|runtime-regression|flake: <cluster-ids>`
 - Logs:
   - `tmp-v87-targeted-dev-rerun-20260408.log` -> `23 failed / 1 flaky / 2 skipped / 138 did not run / 104 passed (56.0m)`; kein `fetch failed`/`probe-timeout`
   - `test-results/v87-targeted-dev-rerun-20260408/playwright-startup-diagnostics.json` -> `serverReady=true`, `shellReady=true`, `ready=true`, `appReady=false`, `appBootState=menu_shell_ready`

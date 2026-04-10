@@ -58,6 +58,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Spieler landen am Zielportal plus kleinem Vorwaerts-Offset.
 - Im Planar-Mode wird beim Teleport auch die aktive Ebene (`currentPlanarY`) auf die Zielhoehe gesetzt.
 - Projektile behalten ihre Flugrichtung, werden am Ausgang leicht nach vorne versetzt und verlieren nach dem Teleport ihr bisheriges Homing-Ziel bis zur erneuten Erfassung.
+- Portal-Parsing normalisiert unvollstaendige Legacy-Paare nicht mehr still auf Ursprungspunkte; ungueltige oder positionslose Eintraege werden verworfen und als Warnung gemeldet.
 
 ## Exit-Portale
 
@@ -83,6 +84,7 @@ Weitere Gate-Details:
 - `boost` liest typischerweise `duration`, `forwardImpulse` und optional `bonusSpeed`.
 - `slingshot` liest typischerweise `duration`, `forwardImpulse` und `liftImpulse`.
 - Unbekannte Gate-Typen laufen ueber einen sichtbaren Legacy-/Warnpfad; Runtime-Diagnostik behaelt `legacyType` und `warningCode`.
+- Gate-Parsing verwirft nicht-objektfoermige oder positionslose Gate-Eintraege mit sichtbaren Warnungen statt stiller `0/0/0`-Normalisierung.
 - Hunt-Bots koennen nahe, bereite Special Gates unter hohem Survival-Druck als Retreat-Anker priorisieren.
 
 ## Map-seitige Steuerung
@@ -90,10 +92,12 @@ Weitere Gate-Details:
 Maps koennen folgende Felder verwenden:
 
 - `portalMode`: `dynamic` oder `authored`; authored Portal-Knoten werden in `dynamic` bewusst ignoriert und als Runtime-Warnung gespiegelt.
+- Ungueltige `portalMode`-Werte werden deterministisch auf `dynamic`/`authored`/`hybrid` normalisiert und als Warnhinweis protokolliert.
 - `portals`: feste Portal-Paare.
 - `preferAuthoredPortals`: feste Portal-Paare gegenueber dynamischen Runtime-Portalen bevorzugen.
 - `portalLevels`: feste Hoehen fuer Planar-Portal-/Item-Layouts.
 - `itemSpawnMode`: `anchor-only`, `hybrid` oder `fallback-random`; authored Anker werden in `fallback-random` bewusst ignoriert und als Runtime-Warnung gespiegelt.
+- Ungueltige `itemSpawnMode`-Werte werden deterministisch auf `anchor-only`/`fallback-random` normalisiert und als Warnhinweis protokolliert.
 - `gates`: `boost`- oder `slingshot`-Definitionen.
 - `items`: feste Pickup-Anker mit optionalem `pickupType`.
 - `exitPortal`: einzelnes Exit-Portal mit optionaler spaeter Aktivierung.

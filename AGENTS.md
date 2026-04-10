@@ -39,3 +39,9 @@ Repository-wide operating rules for all agents.
 
 - Read-only commands (`git log`, `git status`, `rg`, `npm run docs:check`) are safe to auto-run.
 - Workflows marked `// turbo-all` auto-run every `run_command` step.
+
+## Safety Guard (Destructive Git Forbidden)
+
+- Do **not** run `git reset --hard`, `git clean -fd`, `git clean -fdx`, or equivalent destructive cleanup commands in this repo.
+- If cleanup is requested, use non-destructive steps first (`git status`, scoped restore, archive/move unwanted files) and preserve user work.
+- If a destructive operation is truly unavoidable, stop and request an explicit backup-and-confirmation plan from the user first.
