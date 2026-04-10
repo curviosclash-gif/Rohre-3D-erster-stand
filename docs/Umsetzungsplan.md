@@ -1,12 +1,13 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-08 (V88 Testarchitektur und Verifikationsvertraege ist als naechster Architektur-/Verifikationsblock eingeplant; V87 87.99 hat Pflicht-Gates plus `test:smoke` gruen, der engere `dev-runtime`-Vertrag fuer `test:targeted` laeuft ohne Harness-Abbruch und ist frisch auf 23 FAIL neu geschnitten; echte Produktionsreste liegen jetzt in `physics-core`/`physics-hunt`/`physics-policy`, waehrend `core-targeted` im Voll-Lauf nur noch `page.goto`-/Harness-Signale zeigt; V72 bleibt in 72.3 aktiv)
+Stand: 2026-04-10 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V87 und V88 sind blockerfest abgeschlossen, V72 bleibt in 72.3)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
 Neue oder geaenderte Intake-Entwuerfe entstehen weiter unter `docs/plaene/neu/`.
 Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
+Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` (Vorschlag V90, noch nicht aktiv).
 
 ## Externe Planquelle: Bot-Training
 
@@ -37,8 +38,8 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag,Playwright-Warmup | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.3 | `docs/plaene/aktiv/V72.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | planned | P2 | frei | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
-| V87 | Runtime-Hardening-Followup | active | P2 | Bot-Codex | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
-| V88 | Testarchitektur und Verifikationsvertraege | planned | P2 | frei | V87.99 | 88.4 | `docs/plaene/aktiv/V88.md` |
+| V87 | Runtime-Hardening-Followup | done | P2 | frei | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
+| V88 | Testarchitektur und Verifikationsvertraege | done | P2 | frei | V87.99 | 88.99 | `docs/plaene/aktiv/V88.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.1 | `docs/plaene/aktiv/V77.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
@@ -72,7 +73,7 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | V85 | V84.99 | soft | ja | Headless Kernel und GameMode-API liefern spaeter den saubereren Verbrauchspfad fuer Replay-, Snapshot- und Content-Projektionen |
 | V87 | V83.99 | hard | ja | Runtime-Hardening-Follow-up setzt den SessionRuntime-, Command/Event- und Capability-Kern aus V83 als Baseline voraus |
 | V87 | V84.99 | soft | ja | Dokumentierter Headless-Boot- und Projektionsvertrag aus V84 soll mit den gehaerteten Runtime-Pfaden abgeglichen werden |
-| V88 | V87.99 | hard | nein | Testarchitektur soll auf dem in `V87` geklaerten Runtime-, Capability- und Playwright-Vertrag aufsetzen statt denselben Scope parallel neu zu verhandeln |
+| V88 | V87.99 | hard | ja | Runtime-, Capability- und Playwright-Baseline aus `V87 87.99` ist blockerfest dokumentiert und als Startbasis fuer `V88` verfuegbar |
 | V88 | V84.99 | soft | ja | Headless MatchKernel und gemeinsame GameMode-API liefern bevorzugte Kandidaten fuer niedrigere Contract-Testschichten unterhalb von Playwright |
 | V86 | V72.99 | hard | nein | Editor- und Authoring-Vertraege sollen auf stabilen Pickup-, Portal-, Gate- und Spawn-Warnpfaden aus V72 aufsetzen |
 | V86 | V85.99 | soft | nein | Descriptor-, Preset- und Template-Leseweg soll spaeter denselben Content-Vertrag wie V85 nutzen |
@@ -103,8 +104,8 @@ Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
 | - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
 | - | V84 | 2026-04-04 | closed | Abgeschlossen 2026-04-05: `84.99.2` dokumentiert Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
 | - | V85 | - | frei | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
-| Bot-Codex | V87 | 2026-04-05 | active | Frischer Voll-Lauf vom 2026-04-08 schneidet `test:targeted` auf 23 FAIL neu; offen bleiben die Produktionscluster `physics-core`/`physics-hunt`/`physics-policy`, waehrend `core-targeted` im Voll-Lauf nur noch `page.goto`-/Harness-Signale (`T1`, `V56.1`) liefert |
-| - | V88 | - | frei | Nach `88.3.1` als naechsten Schritt `88.3.2` fuer Suite-Selektion, Tags und kleinere Fail-Kaskaden ziehen |
+| - | V87 | - | closed | Abgeschlossen 2026-04-10: `87.99.1` Gate-Checks gruen; Restcluster `physics-core`/`physics-hunt`/`physics-policy` als gezielte Folgearbeit dokumentiert |
+| - | V88 | - | closed | Abgeschlossen 2026-04-10: `88.99.2` synchronisiert Test-Mapping, Failure-Taxonomie und Doku auf den blockerfesten Gate-Stand |
 | - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
 | - | V77 | - | frei | Nach `V74.99` die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` und die itch.io-Produktrollen festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
@@ -119,17 +120,14 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 ### Sofort laufende oder naechste Abschluesse
 
 1. `V72` bis `72.99` weiterziehen, weil Pickup-, Portal-, Gate- und Spawn-Vertraege mehrere Folgeblocks freischalten.
-2. `V87` sauber bis zum dokumentierten Abschluss oder belastbaren Restgate weiterziehen, damit offene Runtime-Rennen und der verbleibende `87.99`-Cluster nicht in Folgearbeit weitergetragen werden.
-3. `V88` direkt nach `V87.99` starten, damit Laufmodi, Readiness-Fixtures, Suite-Zuschnitte und niedrigere Contract-Layer fuer weitere Architekturarbeit stabil werden.
-4. `V71.99` opportunistisch schliessen, sobald der Playwright-/Warmup-Blocker belastbar entschaerft oder sauber blockerfest dokumentiert ist.
+2. `V71.99` opportunistisch schliessen, sobald der Playwright-/Warmup-Blocker belastbar entschaerft oder sauber blockerfest dokumentiert ist.
+3. `V85` mit `85.1` starten, damit der Persistence-/Content-Vertragsrahmen nach V88 ohne Verifikationsdrift aufgebaut wird.
 
 ### Hauptpfad Architektur und Produkt
 
-1. `V87` vor `V88`, weil die Testarchitektur auf einem geklaerten Runtime- und Playwright-Vertrag aufsetzen soll statt denselben Scope parallel weiter zu vermischen.
-2. `V88` vor `V85`, damit neue Daten-, Content- und Folgeblocks auf expliziten Verifikationsmodi und kleineren Failure-Clustern aufsetzen.
-3. `V85` vor breiterem Authoring- und Content-Ausbau, damit Presets, Templates, Replay- und Content-Descriptoren einen gemeinsamen Vertragsrahmen bekommen.
-4. `V77` vor `V64`, damit die Produkt- und Surface-Policy `Desktop Vollversion / Browser Demo` vor Multiplayer-Produktisierung feststeht.
-5. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
+1. `V87 -> V88` ist abgeschlossen; `V85` ist der naechste Architektur-/Datenpfad, damit Folgeblocks auf demselben Vertragsrahmen aufsetzen.
+2. `V77` vor `V64`, damit die Produkt- und Surface-Policy `Desktop Vollversion / Browser Demo` vor Multiplayer-Produktisierung feststeht.
+3. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
 
 ### Parallelpfad Gameplay und Authoring
 
@@ -140,7 +138,7 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 ### Kurzform
 
-`V72.99 -> V87 -> V88 -> V85 -> V77 -> V64 -> V75`
+`V72.99 -> V85 -> V77 -> V64 -> V75`
 
 Parallel nach `V72.99` moeglich: `V82 -> V76`; `V86` bevorzugt nach `V85`; `V81` zuletzt oder opportunistisch.
 
@@ -162,6 +160,13 @@ Abgleich 2026-04-08 (Rebaseline): Der engere `dev-runtime`-Vertrag fuer `test:ta
 Abgleich 2026-04-08 (Fortsetzung `87.99.3`): Der erste `core-targeted`-Sequencing-Slice ist im Produktionscode fortgesetzt. Fokussierte `core-targeted`-Reruns schliessen `:6993`, `:7182`, `:7434`, `:7986`, `:8041` und `:8516`; direkte `node`-Repros bestaetigen denselben Fix auch fuer `:7249` und `:8664`. Die bekannten Browser-`page.goto`-Flakes ueberdecken einzelne Reruns weiter, deshalb bleibt der globale `dev-runtime`-/`test:targeted`-Baseline-Stand bis zum naechsten konsolidierten Lauf bewusst unveraendert.
 Abgleich 2026-04-08 (Restabschluss `87.99.3`): `MatchSessionFactory` leert die Match-Scene vor einem frischen Init ohne bestehende Session nicht mehr vorzeitig, und `MapSchemaSanitizeOps` erkennt authored Portal-Paare aus Presets jetzt als echte Endpunkte. Fokussierte `core-targeted`-Reruns schliessen damit `:6889` und `:8403`; der anschliessende konsolidierte Browser-Rerun zieht `:6777`, `:7249` und `:8664` gruen nach. Offen bleibt im `core-targeted`-Umfeld nur noch `tests/core-targeted.spec.js:297` (`T14`) als bekannter `page.goto`-/Harness-Flake. Ein konsolidierter `dev-runtime`-/`test:targeted`-Lauf ist damit wieder sinnvoll, um die verbleibenden `physics-*`-Cluster neu zu schneiden.
 Abgleich 2026-04-08 (Konsolidierter Vollrerun): Der frische Voll-Lauf `TEST_PORT=5593 PW_RUN_TAG=v87-targeted-dev-rerun-20260408 PW_OUTPUT_DIR=test-results/v87-targeted-dev-rerun-20260408 npm run test:targeted` endet nach 56.0 Minuten mit 104 PASS / 23 FAIL / 1 flaky / 2 skipped / 138 did not run. Der neue Schnitt zeigt keine `core-targeted`-Produktionsfails mehr; stattdessen ueberdecken `tests/core-targeted.spec.js:158` (`T1`) und `:6720` (`V56.1`) den Slice als `page.goto`-/Harness-Flakes, waehrend die echten Produktionscluster jetzt auf `physics-core=2`, `physics-hunt=16` und `physics-policy=4` zusammenschrumpfen. Ein kleiner Folgefix haertet `GameRuntimeSessionHandler.startMatch()` darauf, asynchrone `applyStartMatchProjection()`-Promises nicht mehr sofort auf `true` zu verkuerzen; der dazugehoerige fokussierte Browser-Rerun blieb erneut vom `page.goto`-Flake ueberdeckt, deshalb bleibt die 23-Fail-Baseline der belastbare Stand.
+Abgleich 2026-04-10 (Subphase `V88 88.4.1`): Zwei neue Node-Contract-Tests (`tests/menu-multiplayer-bridge.contract.test.mjs`, `tests/platform-capabilities.contract.test.mjs`) uebernehmen Runtime-nahe Capability-, Storage- und Menu-Multiplayer-Vertraege aus der Browser-Layer-Naehe. `package.json` erweitert `test:contract` entsprechend; offene Restarbeit in V88 wechselt auf `88.4.2` fuer Mapping-/Doku-Abgleich.
+Abgleich 2026-04-10 (Subphase `V88 88.4.2`): `.agents/test_mapping.md` mappt die neuen Menu-Multiplayer-, Plattform-Capability- und Storage-Vertraege jetzt explizit auf den `node-contract`-Layer. Der Doku-/Mapping-Abgleich ist abgeschlossen, naechste offene V88-Subphase ist `88.5.1` (Failure-Taxonomie).
+Abgleich 2026-04-10 (Subphase `V88 88.5.1`): `tests/playwright-readiness.js` fuehrt mit `resolvePlaywrightFailureTaxonomy()` einen gemeinsamen Klassifikationsvertrag fuer `startup`, `readiness`, `contract`, `runtime-regression` und `flake` ein und nutzt ihn direkt in `createPlaywrightReadinessContract()`. `scripts/run-playwright-targeted-clusters.mjs` klassifiziert fehlgeschlagene Cluster jetzt gegen denselben Vertrag (inkl. Diagnostics-Lookup + `runtime-regression`-Fallback). Naechste offene V88-Subphase ist `88.5.2` (Blockerberichte/Test-Ausgaben auf aktuelle Artefaktpfade und Cluster syncen).
+Abgleich 2026-04-10 (Subphase `V88 88.5.2`): `scripts/run-playwright-targeted-clusters.mjs` emittiert bei roten Clustern jetzt den konsistenten Artefaktvertrag (`mode`, `runTag`, `output`, `diagnostics`, `server-log`) und fasst Failure-Klassen weiterhin ueber dieselbe Taxonomie zusammen. `docs/Fehlerberichte/2026-04-07_v87-runtime-hardening-87.99-playwright-blockers.md` sowie `docs/referenz/ai_architecture_context.md` referenzieren denselben Cluster-/Artefaktpfad-Vertrag statt historischer Nebenpfade. Naechste offene V88-Subphase ist `88.99.1` (Abschluss-Gate).
+Abgleich 2026-04-10 (Subphase `V88 88.99.1`): `npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run typecheck:architecture`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen. `npm run test:contract`, `npm run test:smoke` und `npm run test:targeted` brechen in dieser Automation-Umgebung konsistent mit `spawn EPERM` ab; der Gate-Blocker ist in `docs/Fehlerberichte/2026-04-10_v88-88.99.1-spawn-eperm-gate-blocker.md` blockerfest dokumentiert. Naechste offene V88-Subphase ist `88.99.2` (Mapping-/Doku-Abschluss).
+Abgleich 2026-04-10 (Subphase `V88 88.99.2`): `.agents/test_mapping.md` bleibt als kanonischer Layer-/Runner-Einstieg mit den V88-Run-Profilen (`preview-smoke`, `dev-runtime`, `browser-contract`) synchron; `docs/referenz/ai_architecture_context.md` und `docs/plaene/aktiv/V88.md` spiegeln denselben Failure-Klassifikationsvertrag (`startup|readiness|contract|runtime-regression|flake`) fuer Folgeblocks. `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen; V88 ist damit blockerfest abgeschlossen.
+Abgleich 2026-04-10 (Subphase `V72 72.3.1`): `MapSchemaSanitizeOps` meldet ungueltige `portalMode`/`itemSpawnMode`-Werte sowie malformed Portal-/Gate-Eintraege jetzt als sichtbare Sanitisierungswarnungen statt stiller Nullpunkt-Normalisierung. `MapSchemaMigrationOps` und `MapSchemaRuntimeOps` reichen denselben Warnvertrag ueber `parseMapJSON()` und `toArenaMapDefinition()` durch. Naechste offene V72-Subphase ist `72.3.2` (Authoring-Vertrag `dynamic|authored|hybrid`).
 Die folgenden Punkte werden nach Abschluss des jeweiligen Blocks adressiert.
 
 ### Im Runtime-Hardening-Follow-up V87 zu adressieren (betrifft scope_files von V83/V87)
@@ -176,13 +181,17 @@ Keine offenen Review-Punkte mehr im V87-Scope; `87.5.1` ist dokumentiert, offen 
 | P7 | `vulkan_odyssey.js` | Precision-Plattformen (4x2 Einheiten) vermutlich unspielbar | hoch |
 | P12 | `CheckpointRingMeshFactory.js` | Material-Leak: jeder Checkpoint bekommt neues Material ohne Disposal | mittel |
 | P14 | `UIStartSyncController.js` | Event-Listener-Duplikation bei Mehrfachaufruf von `setupStartSetupControls()` | mittel |
+| P21 | `package.json`, `package-lock.json` | `npm audit` meldet 5 Befunde (2 high, 3 moderate); Dependency-Security ist als neuer Intake-Draft `V90` vorbereitet, aber noch nicht als aktiver Block uebernommen | hoch |
+| P22 | `tmp/`, `.codex_tmp/` | Getrackte Dateien liegen weiterhin unter ignorierten Artefaktpfaden; V71 fuehrt den Befund jetzt als `71.99.3`-Restgate-Risiko | hoch |
+| P23 | `src/ui/menu/MenuExpertLoginRuntime.js` | Hartcodiertes Expertenpasswort `1307` darf nicht als Sicherheitsbarriere gelten; V77/V81 muessen es als Dev-only-/Surface-Policy klaeren | mittel |
 
 ## Conflict-Log
 
 | Datum | Agent | Fremder Block/Stream | Datei | Grund | Loesung | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | 2026-03-31 | Bot-Codex | Shared | `scripts/validate-umsetzungsplan.mjs` | Playwright-Verifikation fuer V74 scheiterte zusaetzlich an BOM+Shebang im Governance-Skript | UTF-8-no-BOM geschrieben; Parserblocker beseitigt, verbleibender Harness-Blocker separat dokumentiert | erledigt |
-| 2026-04-02 | Agent-A | V72 (Agent-B lock) | `src/entities/player/PlayerInventoryOps.js` | Agent-A uebernimmt und erledigt 72.1.2 während Agent-B locked war | 72.1 komplett umgesetzt: PlayerInventoryOps validiert selfUsable, blockiert Rockets; Umsetzungsplan aktualisiert auf 72.2 | erledigt |
+| 2026-04-02 | Agent-A | V72 (Agent-B lock) | `src/entities/player/PlayerInventoryOps.js` | Agent-A uebernimmt und erledigt 72.1.2 waehrend Agent-B locked war | 72.1 komplett umgesetzt: PlayerInventoryOps validiert selfUsable, blockiert Rockets; Umsetzungsplan aktualisiert auf 72.2 | erledigt |
 | 2026-04-03 | Bot-Codex | Shared | `scripts/run-playwright-smoke.mjs` | Explizite V74-Nachverifikation brach unter Windows bereits vor Playwright mit `spawn EINVAL` ab | Smoke-Launcher auf lokale Playwright-CLI plus separator-neutrale Filter umgestellt; verbleibender Dev-Server-Blocker separat dokumentiert | erledigt |
 | 2026-04-03 | Bot-Codex | Shared | `scripts/verify-lock.mjs` | Gezielte Playwright-Reruns trafen Windows-Dateifilter und CLI-Aufloesung nicht stabil | Playwright-Aufrufe auf lokale CLI gehoben und Spec-Filter separator-neutral normalisiert; verbleibender Dev-Server-Blocker separat dokumentiert | erledigt |
 | 2026-04-03 | Bot-Codex | Shared | `playwright.config.js` | Browser-Runs luden `tests/*.test.mjs` mit `node:test` mit und endeten in `No tests found` statt echter Spec-Auswahl | Discovery auf `**/*.spec.js` begrenzt; verbliebener Vite-HTTP-Timeout in V74-Fehlerbericht festgehalten | erledigt |
+
