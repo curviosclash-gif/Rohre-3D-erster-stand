@@ -25,6 +25,7 @@ import {
     generateJSONExport,
     importFromJSON,
     RoundMetricsStore,
+    createMatchRuntimeProjection,
     getVehicleManagerInteractionRules,
     listVehicleManagerCatalogEntries,
     resolveVehicleManagerCatalogEntry,
@@ -567,6 +568,14 @@ test.describe('T1-20: Core & Infrastruktur - Shell & Setup', () => {
         const runtime = toArenaMapDefinition(parsed, { mapScale: 1, name: 'qa-map' });
 
         expect(runtime.map.portalMode).toBe('dynamic');
+        expect(runtime.map.portalAuthoring).toMatchObject({
+            mode: 'dynamic',
+            authoredNodeCount: 2,
+            authoredPairCount: 1,
+            hasDanglingPortalNode: false,
+            usesAuthoredPortals: false,
+            usesDynamicPortals: true,
+        });
         expect(runtime.map.itemSpawnMode).toBe('fallback-random');
         expect(runtime.map.gates[0]).toMatchObject({
             type: 'boost',
@@ -578,6 +587,73 @@ test.describe('T1-20: Core & Infrastruktur - Shell & Setup', () => {
             'Authored item anchors were ignored because itemSpawnMode=fallback-random.',
             'Unknown gate type "boost_plus" normalized to "boost".',
         ]));
+    });
+
+    test('T14eb1: Portal-Authoring-Vertrag meldet dangling authored nodes im Hybrid-Modus sichtbar', async () => {
+        const sourceDocument = {
+            arenaSize: { width: 280, height: 110, depth: 280 },
+            portalMode: 'hybrid',
+            portals: [
+                { id: 'portal_1', x: -20, y: 10, z: 0, radius: 18 },
+                { id: 'portal_2', x: 20, y: 10, z: 0, radius: 18 },
+                { id: 'portal_3', x: 90, y: 10, z: 0, radius: 18 },
+            ],
+        };
+
+        const parsed = createMapDocument(sourceDocument);
+        const runtime = toArenaMapDefinition(parsed, { mapScale: 1, name: 'qa-map-hybrid' });
+
+        expect(runtime.map.portalMode).toBe('hybrid');
+        expect(runtime.map.portalAuthoring).toMatchObject({
+            mode: 'hybrid',
+            authoredNodeCount: 3,
+            authoredPairCount: 1,
+            hasDanglingPortalNode: true,
+            usesAuthoredPortals: true,
+            usesDynamicPortals: true,
+        });
+        expect(runtime.warnings).toEqual(expect.arrayContaining([
+            'Authored portal contract requires complete A/B pairs; a trailing portal node was ignored.',
+        ]));
+    });
+
+    test('T14eb2: Match-Runtime-Projektion normalisiert Traversal-Signale fuer Cooldown, Inaktivstatus und Post-Portal-Fenster', async () => {
+        const projection = createMatchRuntimeProjection({
+            players: [{
+                playerIndex: 0,
+                traversal: {
+                    portalsEnabled: false,
+                    portalCooldownRemaining: 1.4,
+                    gateCooldownRemaining: 0.75,
+                    gateCount: 3,
+                    exitPortal: {
+                        totalCount: 2,
+                        activeCount: 1,
+                        inactiveCount: 1,
+                    },
+                    exitPortalCooldownRemaining: 0.25,
+                    postPortalActive: true,
+                    postPortalRemainingSeconds: 0.4,
+                    lastPortalTravelAtMs: 123456,
+                },
+            }],
+        });
+
+        expect(projection.players[0].traversal).toMatchObject({
+            portalsEnabled: false,
+            portalCooldownRemaining: 1.4,
+            gateCooldownRemaining: 0.75,
+            gateCount: 3,
+            exitPortal: {
+                totalCount: 2,
+                activeCount: 1,
+                inactiveCount: 1,
+            },
+            exitPortalCooldownRemaining: 0.25,
+            postPortalActive: true,
+            postPortalRemainingSeconds: 0.4,
+            lastPortalTravelAtMs: 123456,
+        });
     });
 
     test('T14ec: Recorder-Metriken behalten Gameplay-Result-Codes ueber Item-, Portal- und Gate-Events', async () => {

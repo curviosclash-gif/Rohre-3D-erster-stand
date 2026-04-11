@@ -27,6 +27,7 @@ import {
     resolveVehicleManagerCatalogEntry,
 } from '../src/ui/arcade/VehicleManagerCatalog.js';
 import { applyPlayerPowerup, updatePlayerEffects } from '../src/entities/player/PlayerEffectOps.js';
+import { createMatchRuntimeProjection } from '../src/shared/contracts/MatchRuntimeProjectionContract.js';
 
 const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
 const SETTINGS_PROFILES_STORAGE_KEY = 'cuviosclash.settings-profiles.v1';
@@ -130,6 +131,7 @@ export {
     resolveVehicleManagerCatalogEntry,
     applyPlayerPowerup,
     updatePlayerEffects,
+    createMatchRuntimeProjection,
     SETTINGS_STORAGE_KEY,
     SETTINGS_PROFILES_STORAGE_KEY,
     LEGACY_SETTINGS_STORAGE_KEY,
