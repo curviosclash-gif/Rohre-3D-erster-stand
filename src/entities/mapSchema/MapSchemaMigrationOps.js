@@ -99,7 +99,9 @@ export function migrateMapDocument(rawMap) {
     }
 
     if (typeof rawMap?.preferAuthoredPortals === 'boolean' && typeof rawMap?.portalMode !== 'string') {
-        warnings.push(`Legacy preferAuthoredPortals mapped to portalMode=${rawMap.preferAuthoredPortals ? 'authored' : 'hybrid'}.`);
+        warnings.push(
+            'Legacy preferAuthoredPortals detected without explicit portalMode; normalized via dynamic/authored/hybrid contract.'
+        );
     }
 
     const map = normalizeMapSchemaDocument(migrated, { warnings });

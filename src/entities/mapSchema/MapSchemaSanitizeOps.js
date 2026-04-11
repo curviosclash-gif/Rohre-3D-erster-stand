@@ -96,12 +96,13 @@ function normalizePortalMode(value, options = {}) {
         ? value.trim()
         : (value === null || value === undefined ? '' : String(value).trim());
     const normalized = rawValue.toLowerCase();
+    const hasAuthoredPortalPairs = options.hasAuthoredPortalPairs === true || options.hasAuthoredPortals === true;
     if (normalized === 'dynamic' || normalized === 'authored' || normalized === 'hybrid') {
         return normalized;
     }
     const fallback = options.legacyPreferAuthored === true
         ? 'authored'
-        : (options.hasAuthoredPortals === true ? 'hybrid' : 'dynamic');
+        : (hasAuthoredPortalPairs ? 'hybrid' : 'dynamic');
     if (rawValue.length > 0) {
         pushSanitizeWarning(
             options.warnings,
@@ -110,7 +111,7 @@ function normalizePortalMode(value, options = {}) {
         return fallback;
     }
     if (options.legacyPreferAuthored === true) return 'authored';
-    if (options.hasAuthoredPortals === true) return 'hybrid';
+    if (hasAuthoredPortalPairs) return 'hybrid';
     return 'dynamic';
 }
 
@@ -502,7 +503,7 @@ export function normalizeMapSchemaDocument(rawMap, options = {}) {
         preferAuthoredPortals: rawMap.preferAuthoredPortals === true,
         portalMode: normalizePortalMode(rawMap.portalMode, {
             legacyPreferAuthored: rawMap.preferAuthoredPortals === true,
-            hasAuthoredPortals: portals.length > 0,
+            hasAuthoredPortalPairs: Math.floor(portals.length / 2) > 0,
             warnings,
         }),
         itemSpawnMode: normalizeItemSpawnMode(rawMap.itemSpawnMode, {

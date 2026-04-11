@@ -51,6 +51,24 @@ function buildAnchorKey(anchor, index = 0) {
     ].join(':');
 }
 
+function resolveItemSpawnAuthoringContract(mapDefinition) {
+    const rawMode = String(mapDefinition?.itemSpawnMode || '').trim().toLowerCase();
+    const contract = mapDefinition?.itemSpawnAuthoring;
+    const mode = String(contract?.mode || rawMode || 'fallback-random').trim().toLowerCase();
+    const isKnownMode = mode === 'anchor-only' || mode === 'hybrid' || mode === 'fallback-random';
+    const normalizedMode = isKnownMode ? mode : 'fallback-random';
+    const requiresAuthoredAnchor = contract?.requiresAuthoredAnchor === true || normalizedMode === 'anchor-only';
+    const usesRandomFallback = typeof contract?.usesRandomFallback === 'boolean'
+        ? contract.usesRandomFallback
+        : (normalizedMode === 'fallback-random' || normalizedMode === 'hybrid');
+
+    return {
+        mode: normalizedMode,
+        requiresAuthoredAnchor,
+        usesRandomFallback,
+    };
+}
+
 export class PowerupManager {
     constructor(renderer, arena, entityRuntimeConfig = null) {
         const config = resolveEntityRuntimeConfig(entityRuntimeConfig || arena);
@@ -110,8 +128,7 @@ export class PowerupManager {
         const config = this.entityRuntimeConfig;
         const strategy = typeof this.getStrategy === 'function' ? this.getStrategy() : null;
         const huntModeActive = strategy?.modeType === 'HUNT';
-        const itemSpawnMode = String(this.arena?.currentMapDefinition?.itemSpawnMode || '').trim().toLowerCase()
-            || 'fallback-random';
+        const itemSpawnAuthoring = resolveItemSpawnAuthoringContract(this.arena?.currentMapDefinition);
         const spawnableTypes = strategy
             ? strategy.filterSpawnableTypes(this.typeKeys, config.POWERUP.TYPES)
             : this.typeKeys.filter((typeKey) => {
@@ -121,12 +138,14 @@ export class PowerupManager {
         if (spawnableTypes.length === 0) return;
 
         const authoredAnchors = this._getAvailableAuthoredAnchors();
-        const hasAnyAuthoredAnchors = (this.arena?.getAuthoredItemAnchors?.()?.length || 0) > 0;
-        const shouldUseAuthoredAnchor = itemSpawnMode !== 'fallback-random' && authoredAnchors.length > 0;
+        const shouldUseAuthoredAnchor = itemSpawnAuthoring.mode !== 'fallback-random' && authoredAnchors.length > 0;
         const authoredAnchor = shouldUseAuthoredAnchor
             ? this._pickAuthoredAnchor(authoredAnchors)
             : null;
-        if (!authoredAnchor && hasAnyAuthoredAnchors && itemSpawnMode === 'anchor-only') {
+        if (!authoredAnchor && itemSpawnAuthoring.requiresAuthoredAnchor) {
+            return;
+        }
+        if (!authoredAnchor && itemSpawnAuthoring.usesRandomFallback !== true) {
             return;
         }
 

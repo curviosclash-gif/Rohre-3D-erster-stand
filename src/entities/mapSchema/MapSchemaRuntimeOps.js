@@ -69,6 +69,42 @@ function mapParcoursToRuntime(parcours, invScale) {
     };
 }
 
+function buildPortalAuthoringContract(portalMode, authoredPortalNodeCount, authoredPortalPairCount) {
+    const mode = typeof portalMode === 'string' ? portalMode : 'dynamic';
+    const nodeCount = Math.max(0, Math.trunc(Number(authoredPortalNodeCount) || 0));
+    const pairCount = Math.max(0, Math.trunc(Number(authoredPortalPairCount) || 0));
+    const hasDanglingPortalNode = (nodeCount % 2) !== 0;
+    const usesAuthoredPortals = pairCount > 0 && (mode === 'authored' || mode === 'hybrid');
+    const usesDynamicPortals = mode === 'dynamic' || mode === 'hybrid';
+
+    return {
+        mode,
+        authoredNodeCount: nodeCount,
+        authoredPairCount: pairCount,
+        hasDanglingPortalNode,
+        usesAuthoredPortals,
+        usesDynamicPortals,
+    };
+}
+
+function buildItemSpawnAuthoringContract(itemSpawnMode, authoredAnchorCount) {
+    const mode = typeof itemSpawnMode === 'string' ? itemSpawnMode : 'fallback-random';
+    const anchorCount = Math.max(0, Math.trunc(Number(authoredAnchorCount) || 0));
+    const requiresAuthoredAnchor = mode === 'anchor-only';
+    const usesAuthoredAnchors = anchorCount > 0 && (requiresAuthoredAnchor || mode === 'hybrid');
+    const usesRandomFallback = mode === 'fallback-random' || mode === 'hybrid';
+    const disablesSpawnWithoutAnchor = requiresAuthoredAnchor && anchorCount === 0;
+
+    return {
+        mode,
+        authoredAnchorCount: anchorCount,
+        requiresAuthoredAnchor,
+        usesAuthoredAnchors,
+        usesRandomFallback,
+        disablesSpawnWithoutAnchor,
+    };
+}
+
 export function toArenaMapDefinition(mapDocument, options = {}) {
     const mapScale = asPositiveNumber(options.mapScale, 1, 0.0001);
     const invScale = 1 / mapScale;
@@ -144,7 +180,6 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
         const entryA = normalized.portals[i];
         const entryB = normalized.portals[i + 1];
         if (!entryA || !entryB) {
-            warnings.push('Odd number of portal nodes found; the last portal node was ignored.');
             break;
         }
 
@@ -171,19 +206,30 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
     const portalMode = typeof normalized.portalMode === 'string'
         ? normalized.portalMode
         : (normalized.preferAuthoredPortals === true ? 'authored' : 'dynamic');
+    const portalAuthoring = buildPortalAuthoringContract(portalMode, normalized.portals.length, portals.length);
     const itemSpawnMode = typeof normalized.itemSpawnMode === 'string'
         ? normalized.itemSpawnMode
         : (normalized.items.length > 0 ? 'anchor-only' : 'fallback-random');
-    if (portalMode === 'authored' && portals.length === 0) {
-        warnings.push('Portal mode "authored" requested, but no complete authored portal pair is available.');
+    const itemSpawnAuthoring = buildItemSpawnAuthoringContract(itemSpawnMode, items.length);
+    if (portalAuthoring.hasDanglingPortalNode) {
+        warnings.push('Authored portal contract requires complete A/B pairs; a trailing portal node was ignored.');
     }
-    if (portalMode === 'dynamic' && normalized.portals.length > 0) {
+    if (portalMode === 'authored' && portalAuthoring.authoredPairCount === 0) {
+        warnings.push('Portal mode "authored" requires at least one complete authored portal pair; dynamic fallback remains disabled.');
+    }
+    if (portalMode === 'hybrid' && portalAuthoring.authoredPairCount === 0) {
+        warnings.push('Portal mode "hybrid" has no complete authored portal pair; runtime falls back to dynamic-only placement.');
+    }
+    if (portalMode === 'dynamic' && portalAuthoring.authoredNodeCount > 0) {
         warnings.push('Authored portal nodes were ignored because portalMode=dynamic.');
     }
-    if (itemSpawnMode === 'anchor-only' && items.length === 0) {
-        warnings.push('Item spawn mode "anchor-only" requested, but no authored item anchors are available.');
+    if (itemSpawnAuthoring.mode === 'anchor-only' && itemSpawnAuthoring.authoredAnchorCount === 0) {
+        warnings.push('Item spawn mode "anchor-only" requested, but no authored item anchors are available; runtime keeps random fallback disabled.');
     }
-    if (itemSpawnMode === 'fallback-random' && items.length > 0) {
+    if (itemSpawnAuthoring.mode === 'hybrid' && itemSpawnAuthoring.authoredAnchorCount === 0) {
+        warnings.push('Item spawn mode "hybrid" has no authored item anchors; runtime falls back to random-only placement.');
+    }
+    if (itemSpawnAuthoring.mode === 'fallback-random' && itemSpawnAuthoring.authoredAnchorCount > 0) {
         warnings.push('Authored item anchors were ignored because itemSpawnMode=fallback-random.');
     }
 
@@ -254,8 +300,10 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
             portals,
             portalLevels: normalized.portalLevels.map((level) => level * invScale),
             portalMode,
-            preferAuthoredPortals: normalized.preferAuthoredPortals === true || normalized.portals.length > 0,
+            portalAuthoring,
+            preferAuthoredPortals: normalized.preferAuthoredPortals === true || portalAuthoring.authoredPairCount > 0,
             itemSpawnMode,
+            itemSpawnAuthoring,
             gates,
             playerSpawn,
             botSpawns,
