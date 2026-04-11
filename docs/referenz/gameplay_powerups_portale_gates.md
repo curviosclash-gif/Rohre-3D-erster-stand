@@ -1,6 +1,6 @@
 # Gameplay-Referenz: Powerups, Portale und Gates
 
-Stand: 2026-04-01
+Stand: 2026-04-10
 
 ## Zweck
 
@@ -10,6 +10,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 
 - Items spawnen ueber den `PowerupManager`.
 - Auf Maps mit festen `items`-Ankern oder explizitem `itemSpawnMode` entscheidet die Runtime zwischen `anchor-only`, `hybrid` und `fallback-random`.
+- `toArenaMapDefinition()` liefert dafuer den maschinenlesbaren Spawn-Vertrag unter `map.itemSpawnAuthoring`.
 - Ein eingesammeltes Item landet im Inventar des Spielers.
 - `useItem` verbraucht nur self-usable Items als Selbst-Effekt; verbotene Nutzungen bleiben im Inventar und liefern stabile Result-Codes.
 - `shootItem` verschiesst das Item als Projektil.
@@ -58,6 +59,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Spieler landen am Zielportal plus kleinem Vorwaerts-Offset.
 - Im Planar-Mode wird beim Teleport auch die aktive Ebene (`currentPlanarY`) auf die Zielhoehe gesetzt.
 - Projektile behalten ihre Flugrichtung, werden am Ausgang leicht nach vorne versetzt und verlieren nach dem Teleport ihr bisheriges Homing-Ziel bis zur erneuten Erfassung.
+- `matchRuntimeProjection.players[*].traversal` zeigt den Runtime-Signalvertrag fuer Portal-/Gate-Interaktionen: `portalCooldownRemaining`, `gateCooldownRemaining`, Exit-Portal-Aktivstatus (`exitPortal.totalCount|activeCount|inactiveCount`) sowie Post-Portal-Fenster (`postPortalActive`, `postPortalRemainingSeconds`, `lastPortalTravelAtMs`).
 - Portal-Parsing normalisiert unvollstaendige Legacy-Paare nicht mehr still auf Ursprungspunkte; ungueltige oder positionslose Eintraege werden verworfen und als Warnung gemeldet.
 
 ## Exit-Portale
@@ -91,13 +93,20 @@ Weitere Gate-Details:
 
 Maps koennen folgende Felder verwenden:
 
-- `portalMode`: `dynamic` oder `authored`; authored Portal-Knoten werden in `dynamic` bewusst ignoriert und als Runtime-Warnung gespiegelt.
-- Ungueltige `portalMode`-Werte werden deterministisch auf `dynamic`/`authored`/`hybrid` normalisiert und als Warnhinweis protokolliert.
+- `portalMode`: `dynamic`, `authored` oder `hybrid`.
+- `dynamic` ignoriert authored Portal-Knoten bewusst und meldet dies als Runtime-Warnung.
+- `authored` verlangt mindestens ein vollstaendiges A/B-Portalpaar; ohne Paar bleibt Dynamic-Fallback bewusst deaktiviert und wird als Warnung ausgewiesen.
+- `hybrid` kombiniert authored Paare mit dynamischen Restslots; wenn kein authored Paar vorliegt, faellt die Runtime sichtbar auf dynamic-only zurueck.
+- Ungerade authored Portal-Knoten werden nicht still normalisiert: Der letzte Knoten wird verworfen und als Authoring-Vertragswarnung gemeldet.
+- `toArenaMapDefinition()` liefert den maschinenlesbaren Portalvertrag unter `map.portalAuthoring` (`mode`, `authoredNodeCount`, `authoredPairCount`, `usesAuthoredPortals`, `usesDynamicPortals`, `hasDanglingPortalNode`).
 - `portals`: feste Portal-Paare.
 - `preferAuthoredPortals`: feste Portal-Paare gegenueber dynamischen Runtime-Portalen bevorzugen.
 - `portalLevels`: feste Hoehen fuer Planar-Portal-/Item-Layouts.
 - `itemSpawnMode`: `anchor-only`, `hybrid` oder `fallback-random`; authored Anker werden in `fallback-random` bewusst ignoriert und als Runtime-Warnung gespiegelt.
 - Ungueltige `itemSpawnMode`-Werte werden deterministisch auf `anchor-only`/`fallback-random` normalisiert und als Warnhinweis protokolliert.
+- `anchor-only` deaktiviert Random-Fallback strikt: ohne verfuegbare authored Anchors entstehen keine neuen Item-Spawns.
+- `hybrid` nutzt bevorzugt authored Anchors und faellt ohne Anchor sichtbar auf Random-Spawn zurueck.
+- `toArenaMapDefinition()` liefert den Spawnvertrag unter `map.itemSpawnAuthoring` (`mode`, `authoredAnchorCount`, `requiresAuthoredAnchor`, `usesAuthoredAnchors`, `usesRandomFallback`, `disablesSpawnWithoutAnchor`).
 - `gates`: `boost`- oder `slingshot`-Definitionen.
 - `items`: feste Pickup-Anker mit optionalem `pickupType`.
 - `exitPortal`: einzelnes Exit-Portal mit optionaler spaeter Aktivierung.
