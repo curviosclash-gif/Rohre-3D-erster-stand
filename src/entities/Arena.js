@@ -236,6 +236,10 @@ export class Arena {
         return this._portalGateSystem.checkSpecialGates(position, previousPosition, radius, entityId);
     }
 
+    getTraversalSignalForEntity(entityId) {
+        return this._portalGateSystem.getTraversalSignalForEntity(entityId);
+    }
+
     checkCollision(position, radius) {
         return this.checkCollisionFast(position, radius);
     }

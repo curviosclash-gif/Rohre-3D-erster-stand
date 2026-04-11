@@ -25,6 +25,22 @@ export class PortalGateSystem {
         return this.specialGateRuntime.checkSpecialGates(position, previousPosition, radius, entityId);
     }
 
+    getTraversalSignalForEntity(entityId) {
+        const portalSignal = this.portalRuntime.getEntityPortalRuntimeSignal(entityId);
+        const gateSignal = this.specialGateRuntime.getEntityGateRuntimeSignal(entityId);
+        return {
+            portalsEnabled: portalSignal.portalsEnabled,
+            portalCooldownRemaining: portalSignal.portalCooldownRemaining,
+            gateCooldownRemaining: gateSignal.gateCooldownRemaining,
+            gateCount: gateSignal.gateCount,
+            exitPortal: portalSignal.exitPortal,
+            exitPortalCooldownRemaining: portalSignal.exitPortalCooldownRemaining,
+            postPortalActive: portalSignal.postPortalActive,
+            postPortalRemainingSeconds: portalSignal.postPortalRemainingSeconds,
+            lastPortalTravelAtMs: portalSignal.lastPortalTravelAtMs,
+        };
+    }
+
     getPortalLevelsFallback() {
         return this.layoutBuilder.getPortalLevelsFallback();
     }

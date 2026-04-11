@@ -18,15 +18,46 @@ export class SpecialGateRuntime {
         gate.mesh.scale?.set?.(scale, scale, scale);
     }
 
+    _normalizeEntityKey(entityId) {
+        if (entityId === null || entityId === undefined) return '';
+        return String(entityId).trim();
+    }
+
+    _resolveEntityCooldown(cooldownMap, entityId) {
+        if (!(cooldownMap instanceof Map)) return 0;
+
+        const directRemaining = Number(cooldownMap.get(entityId) || 0);
+        if (directRemaining > 0) return directRemaining;
+
+        const normalizedKey = this._normalizeEntityKey(entityId);
+        if (!normalizedKey) return 0;
+
+        const normalizedRemaining = Number(cooldownMap.get(normalizedKey) || 0);
+        if (normalizedRemaining > 0) return normalizedRemaining;
+
+        const numericKey = Number(normalizedKey);
+        if (Number.isFinite(numericKey)) {
+            const numericRemaining = Number(cooldownMap.get(numericKey) || 0);
+            if (numericRemaining > 0) return numericRemaining;
+        }
+
+        return 0;
+    }
+
     checkSpecialGates(position, previousPosition, radius, entityId) {
         if (!this.arena.specialGates || this.arena.specialGates.length === 0) return null;
+        let blockedCooldownRemaining = 0;
 
         for (const gate of this.arena.specialGates) {
-            if (gate.cooldowns.has(entityId) && gate.cooldowns.get(entityId) > 0) continue;
-
             const distSq = position.distanceToSquared(gate.pos);
             const checkDist = gate.radius + radius;
             if (distSq > checkDist * checkDist) continue;
+
+            const cooldownRemaining = this._resolveEntityCooldown(gate.cooldowns, entityId);
+            if (cooldownRemaining > 0) {
+                blockedCooldownRemaining = Math.max(blockedCooldownRemaining, cooldownRemaining);
+                continue;
+            }
 
             this._tmpVecGate1.subVectors(previousPosition, gate.pos);
             this._tmpVecGate2.subVectors(position, gate.pos);
@@ -37,8 +68,21 @@ export class SpecialGateRuntime {
             if (dotPrev <= 0 && dotCurr > 0) {
                 const dynamicCooldown = gate.params.cooldown || 4.0;
                 gate.cooldowns.set(entityId, dynamicCooldown);
-                return { type: gate.type, forward: gate.forward, up: gate.up, params: gate.params };
+                return {
+                    type: gate.type,
+                    forward: gate.forward,
+                    up: gate.up,
+                    params: gate.params,
+                    cooldownSeconds: dynamicCooldown,
+                };
             }
+        }
+
+        if (blockedCooldownRemaining > 0) {
+            return {
+                blockedReason: 'cooldown',
+                cooldownRemaining: blockedCooldownRemaining,
+            };
         }
 
         return null;
@@ -79,5 +123,27 @@ export class SpecialGateRuntime {
             else if (backRing) backRing.rotation.z = -time * 0.9;
             this._syncGateVisualState(gate, time);
         }
+    }
+
+    getEntityGateRuntimeSignal(entityId) {
+        if (!Array.isArray(this.arena.specialGates) || this.arena.specialGates.length === 0) {
+            return {
+                gateCount: 0,
+                gateCooldownRemaining: 0,
+            };
+        }
+
+        let gateCooldownRemaining = 0;
+        for (const gate of this.arena.specialGates) {
+            const remaining = this._resolveEntityCooldown(gate?.cooldowns, entityId);
+            if (remaining > gateCooldownRemaining) {
+                gateCooldownRemaining = remaining;
+            }
+        }
+
+        return {
+            gateCount: this.arena.specialGates.length,
+            gateCooldownRemaining,
+        };
     }
 }

@@ -48,7 +48,14 @@ function buildSessionPlayersProjection(facade, sessionPlayers = resolveSessionPl
     }));
 }
 
-function buildPlayerHudProjection({ runtimeState, game, player }) {
+function buildTraversalProjection(entityManager, playerIndex) {
+    if (!entityManager?.arena?.getTraversalSignalForEntity) {
+        return null;
+    }
+    return entityManager.arena.getTraversalSignalForEntity(playerIndex);
+}
+
+function buildPlayerHudProjection({ runtimeState, game, entityManager, player }) {
     if (!player) return null;
     const gameplayConfig = resolveGameplayConfig({
         config: runtimeState?.config || game?.config || null,
@@ -83,6 +90,7 @@ function buildPlayerHudProjection({ runtimeState, game, player }) {
         shootCooldown: Math.max(0, Number(player?.shootCooldown) || 0),
         planarMode: gameplayConfig?.GAMEPLAY?.PLANAR_MODE === true,
         cameraModeId: String(cameraModeId || 'THIRD_PERSON'),
+        traversal: buildTraversalProjection(entityManager, player?.index),
     };
 }
 
@@ -108,7 +116,7 @@ export function buildMatchRuntimeProjection({ game, runtimeState, facade, sessio
     const localPlayerIndex = resolveLocalPlayerIndex(facade, sessionPlayers);
     const players = Array.isArray(entityManager?.players)
         ? entityManager.players
-            .map((player) => buildPlayerHudProjection({ runtimeState, game, player }))
+            .map((player) => buildPlayerHudProjection({ runtimeState, game, entityManager, player }))
             .filter(Boolean)
         : [];
     const lockTargets = players

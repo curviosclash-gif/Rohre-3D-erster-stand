@@ -104,6 +104,33 @@ function createDamageIndicatorProjection(value = null, nowMs = 0) {
     };
 }
 
+function createExitPortalTraversalProjection(value = null) {
+    const source = value && typeof value === 'object' ? value : {};
+    const totalCount = normalizeNonNegativeInt(source.totalCount, 0);
+    const activeCount = Math.min(totalCount, normalizeNonNegativeInt(source.activeCount, 0));
+    const inactiveCount = Math.max(0, totalCount - activeCount);
+    return {
+        totalCount,
+        activeCount,
+        inactiveCount,
+    };
+}
+
+function createTraversalProjection(value = null) {
+    const source = value && typeof value === 'object' ? value : {};
+    return {
+        portalsEnabled: source.portalsEnabled !== false,
+        portalCooldownRemaining: Math.max(0, normalizeNumber(source.portalCooldownRemaining, 0)),
+        gateCooldownRemaining: Math.max(0, normalizeNumber(source.gateCooldownRemaining, 0)),
+        gateCount: normalizeNonNegativeInt(source.gateCount, 0),
+        exitPortal: createExitPortalTraversalProjection(source.exitPortal),
+        exitPortalCooldownRemaining: Math.max(0, normalizeNumber(source.exitPortalCooldownRemaining, 0)),
+        postPortalActive: source.postPortalActive === true,
+        postPortalRemainingSeconds: Math.max(0, normalizeNumber(source.postPortalRemainingSeconds, 0)),
+        lastPortalTravelAtMs: Math.max(0, normalizeInt(source.lastPortalTravelAtMs, 0)),
+    };
+}
+
 function createPlayerProjection(value = null) {
     if (!value || typeof value !== 'object') return null;
     return {
@@ -128,6 +155,7 @@ function createPlayerProjection(value = null) {
         shootCooldown: Math.max(0, normalizeNumber(value.shootCooldown, 0)),
         planarMode: value.planarMode === true,
         cameraModeId: normalizeString(value.cameraModeId, 'THIRD_PERSON'),
+        traversal: createTraversalProjection(value.traversal),
     };
 }
 
