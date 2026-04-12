@@ -1,10 +1,12 @@
-# Feature: Legacy-Runtime-Surface-Sunset und Ownership-Ratchet (V89)
+# Feature: Legacy-Runtime-Surface-Sunset und Ownership-Ratchet (V91)
 
 Stand: 2026-04-08
 Status: Entwurf
 Owner: Codex
 Risiko: hoch
-plan_file: `docs/plaene/aktiv/V89.md`
+plan_file: `docs/plaene/aktiv/V91.md`
+
+Hinweis: Dieser Intake-Draft war zuvor als `V89` vorbereitet und wurde am 2026-04-12 auf `V91` umnummeriert, weil `V89` inzwischen als aktiver Block fuer die Desktop-first-Testarchitektur vergeben ist.
 
 ## Ziel
 
@@ -63,10 +65,11 @@ Die nach `V74`, `V83`, `V84` und `V87` bewusst verbliebenen Legacy-Runtime-Surfa
 ## Intake-Hinweis fuer den User
 
 - Ziel-Masterplan: `docs/Umsetzungsplan.md`
-- vorgeschlagene Block-ID: `V89`
-- vorgeschlagene kanonische Blockdatei: `docs/plaene/aktiv/V89.md`
+- vorgeschlagene Block-ID: `V91`
+- vorgeschlagene kanonische Blockdatei: `docs/plaene/aktiv/V91.md`
 - hard dependencies: `V87.99`
 - soft dependencies: `V84.99`, `V88.99`
+- Abgrenzung: `V89` ist bereits als aktiver Block fuer Desktop-first-Testarchitektur und Desktop-Verifikation belegt.
 - Hinweis: `Manuelle Uebernahme erforderlich`
 
 ## Evidence-Format
@@ -77,35 +80,35 @@ Abgeschlossene Checkboxen im spaeteren aktiven Block immer mit:
 
 ## Phasenplan
 
-### 89.1 Legacy-Surface-Inventar und Sunset-Zielbild fixieren
+### 91.1 Legacy-Surface-Inventar und Sunset-Zielbild fixieren
 
-- [ ] 89.1.1 Alle produktiven Aufrufer auf `game.runtimeBundle`, `game.runtimeFacade`, `window.GAME_RUNTIME`, `curviosApp`-Aliasse und breite `GameRuntimePorts`-Fallbacks gegen aktuelle Dateien und Verantwortlichkeiten abgleichen.
-- [ ] 89.1.2 Fuer jede Legacy-Surface den Zielpfad ueber Command, Snapshot, Capability oder Config-Injection festlegen und den Sunset-Status in der Referenzdoku aktualisieren.
+- [ ] 91.1.1 Alle produktiven Aufrufer auf `game.runtimeBundle`, `game.runtimeFacade`, `window.GAME_RUNTIME`, `curviosApp`-Aliasse und breite `GameRuntimePorts`-Fallbacks gegen aktuelle Dateien und Verantwortlichkeiten abgleichen.
+- [ ] 91.1.2 Fuer jede Legacy-Surface den Zielpfad ueber Command, Snapshot, Capability oder Config-Injection festlegen und den Sunset-Status in der Referenzdoku aktualisieren.
 
-### 89.2 RuntimeFacade- und Port-Sammelflaechen reduzieren
+### 91.2 RuntimeFacade- und Port-Sammelflaechen reduzieren
 
-- [ ] 89.2.1 `GameRuntimeFacade` und `GameRuntimeCoordinator` auf explizite Legacy-Forwarding- oder Diagnostics-Rollen reduzieren, sodass neue Fachlogik dort nicht mehr landet.
-- [ ] 89.2.2 `GameRuntimePorts` fuer den migrierten Scope von breiten Fallbacks auf `game`, `runtimeFacade` und `runtimeCoordinator` befreien oder diese Fallbacks klar als Rest-Adapter isolieren.
+- [ ] 91.2.1 `GameRuntimeFacade` und `GameRuntimeCoordinator` auf explizite Legacy-Forwarding- oder Diagnostics-Rollen reduzieren, sodass neue Fachlogik dort nicht mehr landet.
+- [ ] 91.2.2 `GameRuntimePorts` fuer den migrierten Scope von breiten Fallbacks auf `game`, `runtimeFacade` und `runtimeCoordinator` befreien oder diese Fallbacks klar als Rest-Adapter isolieren.
 
-### 89.3 UI- und State-Reach-Throughs abbauen
+### 91.3 UI- und State-Reach-Throughs abbauen
 
-- [ ] 89.3.1 UI- und State-Controller wie `RoundStateTickSystem`, `HudRuntimeSystem` und angrenzende Menue-Glue-Pfade auf `match_flow_snapshot`, `session_runtime_snapshot`, `lobby_session_snapshot` und `platform_capability_snapshot` ziehen.
-- [ ] 89.3.2 Globale Debug- oder Shell-Surfaces wie `window.GAME_RUNTIME` und direkte `runtimeFacade`-Reads im produktiven Pfad entfernen oder auf explizite Dev-Diagnostics begrenzen.
+- [ ] 91.3.1 UI- und State-Controller wie `RoundStateTickSystem`, `HudRuntimeSystem` und angrenzende Menue-Glue-Pfade auf `match_flow_snapshot`, `session_runtime_snapshot`, `lobby_session_snapshot` und `platform_capability_snapshot` ziehen.
+- [ ] 91.3.2 Globale Debug- oder Shell-Surfaces wie `window.GAME_RUNTIME` und direkte `runtimeFacade`-Reads im produktiven Pfad entfernen oder auf explizite Dev-Diagnostics begrenzen.
 
-### 89.4 Runtime-Config-Ownership geradeziehen
+### 91.4 Runtime-Config-Ownership geradeziehen
 
-- [ ] 89.4.1 `Config.js`, `SettingsSanitizerOps.js` und verwandte Consumer von `ActiveRuntimeConfigStore` auf einen expliziten Runtime-Config- oder Settings-Snapshot-Vertrag umstellen.
-- [ ] 89.4.2 `runtimeConfigAdapter`-Restspuren und verbleibende globale Active-Runtime-Config-Slots soweit abbauen, dass `V81` und `V85` keinen impliziten Global-State mehr voraussetzen.
+- [ ] 91.4.1 `Config.js`, `SettingsSanitizerOps.js` und verwandte Consumer von `ActiveRuntimeConfigStore` auf einen expliziten Runtime-Config- oder Settings-Snapshot-Vertrag umstellen.
+- [ ] 91.4.2 `runtimeConfigAdapter`-Restspuren und verbleibende globale Active-Runtime-Config-Slots soweit abbauen, dass `V81` und `V85` keinen impliziten Global-State mehr voraussetzen.
 
-### 89.5 Ratchet, Doku und Folgeverbrauch absichern
+### 91.5 Ratchet, Doku und Folgeverbrauch absichern
 
-- [ ] 89.5.1 Architektur-Checks oder Reports so erweitern, dass neue `runtimeFacade`-, `window.GAME_RUNTIME`-, `game.runtimeBundle`- oder `curviosApp`-Bypaesse im migrierten Scope frueh auffallen.
-- [ ] 89.5.2 Referenzdoku und Folgeblock-Leitplanken fuer `V64`, `V81`, `V85` und `V88` auf denselben Sunset- und Ownership-Stand spiegeln.
+- [ ] 91.5.1 Architektur-Checks oder Reports so erweitern, dass neue `runtimeFacade`-, `window.GAME_RUNTIME`-, `game.runtimeBundle`- oder `curviosApp`-Bypaesse im migrierten Scope frueh auffallen.
+- [ ] 91.5.2 Referenzdoku und Folgeblock-Leitplanken fuer `V64`, `V81`, `V85` und `V88` auf denselben Sunset- und Ownership-Stand spiegeln.
 
-### 89.99 Abschluss-Gate
+### 91.99 Abschluss-Gate
 
-- [ ] 89.99.1 `npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind fuer den betroffenen Scope gruensicher.
-- [ ] 89.99.2 Verbleibende Legacy-Surfaces sind fuer den migrierten Scope entfernt, klar als Rest-Adapter markiert oder blockerfest dokumentiert; neue Runtime-Backdoors wurden nicht eingefuehrt.
+- [ ] 91.99.1 `npm run architecture:report`, `npm run check:architecture:boundaries`, `npm run check:architecture:ratchet`, `npm run typecheck:architecture`, `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind fuer den betroffenen Scope gruensicher.
+- [ ] 91.99.2 Verbleibende Legacy-Surfaces sind fuer den migrierten Scope entfernt, klar als Rest-Adapter markiert oder blockerfest dokumentiert; neue Runtime-Backdoors wurden nicht eingefuehrt.
 
 ## Risiken
 

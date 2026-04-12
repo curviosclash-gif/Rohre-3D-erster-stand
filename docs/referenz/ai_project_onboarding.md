@@ -1,6 +1,6 @@
 # AI Project Onboarding (Aktiv)
 
-Stand: 2026-04-12
+Stand: 2026-04-13
 
 Diese Datei ist der aktuelle Einstieg fuer KI-Assistenz in diesem Repository.
 
@@ -32,5 +32,5 @@ Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/` (u. a. `docs/
 
 1. Scope aus User-Anfrage, `docs/INDEX.md` und `docs/Umsetzungsplan.md` ableiten.
 2. Betroffene Module in `src/` und `tests/` identifizieren.
-3. Aendern, dann Tests gemaess `.agents/test_mapping.md` ausfuehren.
+3. Aendern, dann den leichtesten passenden Testlayer aus `.agents/test_mapping.md` waehlen: `node-contract` fuer reine Vertraege/Logik, `desktop-smoke` fuer Desktop-Hauptpfade, `desktop-e2e` nur fuer produktnahe Integrationen, `browser-compat` nur fuer Browser-Demo/Web-API-Scope und `heavy-diagnostic` nicht als Default.
 4. Doku-/Prozess-Aktualitaet mit `npm run docs:sync` und `npm run docs:check` pruefen.
