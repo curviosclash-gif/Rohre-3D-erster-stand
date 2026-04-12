@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-11 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V87 und V88 sind blockerfest abgeschlossen, V72 steht nach 72.4.2 in 72.5)
+Stand: 2026-04-11 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V87 und V88 sind blockerfest abgeschlossen, V72 steht nach 72.4.2 in 72.5; V85 steht nach 85.1.1 in 85.1.2)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -37,7 +37,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag,Playwright-Warmup | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.5 | `docs/plaene/aktiv/V72.md` |
-| V85 | Persistence-, Content-Contracts und Schema-Migrationen | planned | P2 | frei | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
+| V85 | Persistence-, Content-Contracts und Schema-Migrationen | active | P2 | Agent-Codex | V83.99 | 85.1 | `docs/plaene/aktiv/V85.md` |
 | V87 | Runtime-Hardening-Followup | done | P2 | frei | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
 | V88 | Testarchitektur und Verifikationsvertraege | done | P2 | frei | V87.99 | 88.99 | `docs/plaene/aktiv/V88.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
@@ -103,7 +103,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
 | - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
 | - | V84 | 2026-04-04 | closed | Abgeschlossen 2026-04-05: `84.99.2` dokumentiert Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
-| Agent-Codex | V85 | 2026-04-12 | active | Nach `V83.99` mit `85.1` Dateninventar, Versionsmatrix und Migrationsrahmen starten |
+| Agent-Codex | V85 | 2026-04-12 | active | `85.1.1` abgeschlossen; als naechstes `85.1.2` Versionsmatrix fuer Settings/Profile/Presets/Replay/Arcade/Map-Descriptoren festziehen |
 | - | V87 | - | closed | Abgeschlossen 2026-04-10: `87.99.1` Gate-Checks gruen; Restcluster `physics-core`/`physics-hunt`/`physics-policy` als gezielte Folgearbeit dokumentiert |
 | - | V88 | - | closed | Abgeschlossen 2026-04-10: `88.99.2` synchronisiert Test-Mapping, Failure-Taxonomie und Doku auf den blockerfesten Gate-Stand |
 | - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
@@ -171,6 +171,7 @@ Abgleich 2026-04-10 (Subphase `V72 72.3.2`): `MapSchemaRuntimeOps` fuehrt mit `m
 Abgleich 2026-04-10 (Subphase `V72 72.3.3`): `PortalRuntimeSystem` und `SpecialGateRuntime` liefern pro Entity lesbare Traversal-Signale fuer Portal-/Gate-Cooldowns, Exit-Portal-Inaktivstatus und Post-Portal-Fenster. `PortalGateSystem`, `Arena` sowie `MatchRuntimeProjectionBuilder` reichen den Vertrag als `players[*].traversal` in die Runtime-Projektion durch; `MatchRuntimeProjectionContract` normalisiert dieselben Felder stabil (`portalsEnabled`, Cooldowns, Exit-Portal-Zaehlung, `postPortal*`). `docs/referenz/gameplay_powerups_portale_gates.md` dokumentiert den Signalpfad. Naechste offene V72-Subphase ist `72.4.1` (Spawn-Vertrag authored Item-Anker).
 Abgleich 2026-04-10 (Subphase `V72 72.4.1`): `MapSchemaRuntimeOps` modelliert authored Item-Spawns jetzt explizit ueber `map.itemSpawnAuthoring` (`mode`, `authoredAnchorCount`, `requiresAuthoredAnchor`, `usesAuthoredAnchors`, `usesRandomFallback`, `disablesSpawnWithoutAnchor`) und meldet `anchor-only`/`hybrid`-Grenzfaelle sichtbar als Warnpfad. `PowerupManager` konsumiert denselben Vertrag und verhindert fuer `anchor-only` den bisher impliziten Random-Fallback, wenn keine authored Anchors verfuegbar sind. `docs/referenz/gameplay_powerups_portale_gates.md` dokumentiert den Spawn-Vertrag; naechste offene V72-Subphase ist `72.4.2` (Map-/Editor-Validierung fuer Spawn- und Gate-Felder).
 Abgleich 2026-04-11 (Subphase `V72 72.4.2`): `MapSchemaSanitizeOps` validiert ungueltige authored `pickupType`-Werte jetzt sichtbar und faellt deterministisch auf `type`/`model` zurueck; unbekannte Gate-Typen werden bereits im Schema-Warnpfad statt erst spaeter im Runtime-Port gemeldet. `EditorMapSerializer` und `EditorSessionControls` spiegeln denselben Warnvertrag fuer Export, Disk-Save, Import und Playtest sichtbar in den Editor-Flow. `tests/core-targeted.spec.js` deckt den fruehen Editor-Export-Warnpfad ab; naechste offene V72-Subphase ist `72.5.1` (gezielte Regressionstests).
+Abgleich 2026-04-12 (Subphase `V85 85.1.1`): Persistierte Artefakte, Import/Export-Pfade und schema-lose JSON-Stellen fuer Settings/Profile/Menu-Stores, Arcade-Records, Replay sowie Map-/Editor-JSON sind inventarisiert; `editor/templates/**` ist im aktuellen Repo-Stand nicht vorhanden und als Scope-Luecke markiert. Naechste offene V85-Subphase ist `85.1.2` (Versionsmatrix).
 Die folgenden Punkte werden nach Abschluss des jeweiligen Blocks adressiert.
 
 ### Im Runtime-Hardening-Follow-up V87 zu adressieren (betrifft scope_files von V83/V87)
