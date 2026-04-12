@@ -5,6 +5,53 @@ import {
     waitForShellOrRuntimeReady,
 } from './playwright-readiness.js';
 
+async function readMenuRuntimeState(page) {
+    return page.evaluate(() => {
+        const menu = document.getElementById('main-menu');
+        const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+        const menuVisible = (() => {
+            if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+            const style = window.getComputedStyle(menu);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        })();
+        return {
+            menuVisible,
+            runtimeReady: !!globalThis?.GAME_INSTANCE,
+            visiblePanelId: visiblePanel ? visiblePanel.id : null,
+        };
+    });
+}
+
+export async function waitForMenuIdle(page, timeoutMs = 30000) {
+    await page.waitForFunction(() => {
+        const menu = document.getElementById('main-menu');
+        const menuVisible = (() => {
+            if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
+            const style = window.getComputedStyle(menu);
+            return style.display !== 'none' && style.visibility !== 'hidden';
+        })();
+        const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
+        return menuVisible && !visiblePanel;
+    }, null, { timeout: timeoutMs });
+}
+
+export async function waitForLoadedGame(page, timeoutMs = 30000) {
+    await waitForShellOrRuntimeReady(page, timeoutMs);
+    const state = await readMenuRuntimeState(page);
+
+    if (!state.runtimeReady) {
+        await waitForRuntimeReady(page, timeoutMs);
+    }
+
+    if (!state.menuVisible || state.visiblePanelId) {
+        await page.evaluate(() => {
+            globalThis?.GAME_INSTANCE?._returnToMenu?.();
+        });
+    }
+
+    await waitForMenuIdle(page, timeoutMs);
+}
+
 // Load page and wait for visible main menu.
 export async function loadGame(page) {
     const maxAttempts = 2;
@@ -19,61 +66,7 @@ export async function loadGame(page) {
             lastStage = 'goto';
             await page.goto('/', { waitUntil: 'commit', timeout: gotoTimeoutMs });
             lastStage = 'shell_ready';
-            await waitForShellOrRuntimeReady(page, readyTimeoutMs);
-
-            const state = await page.evaluate(() => {
-                const menu = document.getElementById('main-menu');
-                const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-                const menuVisible = (() => {
-                    if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                    const style = window.getComputedStyle(menu);
-                    return style.display !== 'none' && style.visibility !== 'hidden';
-                })();
-                return {
-                    menuVisible,
-                    runtimeReady: !!globalThis?.GAME_INSTANCE,
-                    visiblePanelId: visiblePanel ? visiblePanel.id : null,
-                };
-            });
-
-            if (!state.runtimeReady) {
-                lastStage = 'runtime_ready';
-                await waitForRuntimeReady(page, readyTimeoutMs);
-            }
-
-            lastStage = 'return_to_menu_probe';
-            const shouldReturnToMenu = state.runtimeReady
-                ? (!state.menuVisible || state.visiblePanelId)
-                : await page.evaluate(() => {
-                    const menu = document.getElementById('main-menu');
-                    const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-                    const runtimeReady = !!globalThis?.GAME_INSTANCE;
-                    const menuVisible = (() => {
-                        if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                        const style = window.getComputedStyle(menu);
-                        return style.display !== 'none' && style.visibility !== 'hidden';
-                    })();
-                    return runtimeReady && (!menuVisible || !!visiblePanel);
-                });
-
-            if (shouldReturnToMenu) {
-                lastStage = 'return_to_menu';
-                await page.evaluate(() => {
-                    globalThis?.GAME_INSTANCE?._returnToMenu?.();
-                });
-            }
-
-            lastStage = 'menu_idle';
-            await page.waitForFunction(() => {
-                const menu = document.getElementById('main-menu');
-                const menuVisible = (() => {
-                    if (!(menu instanceof HTMLElement) || menu.classList.contains('hidden')) return false;
-                    const style = window.getComputedStyle(menu);
-                    return style.display !== 'none' && style.visibility !== 'hidden';
-                })();
-                const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-                return menuVisible && !visiblePanel;
-            }, null, { timeout: readyTimeoutMs });
+            await waitForLoadedGame(page, readyTimeoutMs);
 
             return;
         } catch (error) {
@@ -322,9 +315,8 @@ async function triggerMatchStart(page) {
     }
 }
 
-// Start game with default configuration.
-export async function startGame(page) {
-    await loadGame(page);
+export async function startGameFromMenu(page) {
+    await waitForLoadedGame(page);
     await openGameSubmenu(page);
     await triggerMatchStart(page);
     await page.waitForFunction(() => {
@@ -335,6 +327,12 @@ export async function startGame(page) {
             && g?.entityManager?.players?.length > 0
         );
     }, null, { timeout: 60000 });
+}
+
+// Start game with default configuration.
+export async function startGame(page) {
+    await loadGame(page);
+    await startGameFromMenu(page);
 }
 
 // Start game with N bots.

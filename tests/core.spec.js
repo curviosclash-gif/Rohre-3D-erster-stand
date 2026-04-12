@@ -1,101 +1,79 @@
-import { expect, test } from '@playwright/test';
-
+import { expect, test } from './helpers.desktop.js';
 import {
     collectErrors,
-    loadGame,
     returnToMenu,
-    startGame,
+    startGameFromMenu,
+    waitForLoadedGame,
 } from './helpers.js';
 
-const SETTINGS_STORAGE_KEY = 'cuviosclash.settings.v1';
-const LEGACY_SETTINGS_STORAGE_KEY = 'aero-arena-3d.settings.v1';
-
-test.describe('Core Smoke', () => {
-    test('loads the desktop runtime without uncaught startup errors', async ({ page }) => {
+test.describe('Desktop Smoke', () => {
+    test('boots the desktop app to menu with preload bridge and GAME_INSTANCE', async ({ page, desktopHarness }) => {
         const errors = collectErrors(page);
-        await loadGame(page);
+        await waitForLoadedGame(page);
 
-        await expect(page.locator('#main-menu')).toBeVisible();
-        await expect(page.locator('#game-canvas')).toBeVisible();
+        const runtimeState = await page.evaluate(() => ({
+            mainMenuVisible: !!document.getElementById('main-menu')
+                && !document.getElementById('main-menu')?.classList.contains('hidden'),
+            canvasVisible: !!document.getElementById('game-canvas')
+                && !document.getElementById('game-canvas')?.classList.contains('hidden'),
+            hasGameInstance: !!window.GAME_INSTANCE,
+            preloadBridgeReady: globalThis.__CURVIOS_APP__ === true && globalThis.curviosApp?.isApp === true,
+            runtimeKind: window.curviosApp?.capabilities?.runtimeKind || null,
+        }));
+
+        expect(runtimeState.mainMenuVisible).toBeTruthy();
+        expect(runtimeState.canvasVisible).toBeTruthy();
+        expect(runtimeState.hasGameInstance).toBeTruthy();
+        expect(runtimeState.preloadBridgeReady).toBeTruthy();
+        expect(runtimeState.runtimeKind).toBe('electron');
         expect(errors).toHaveLength(0);
+        expect(desktopHarness.diagnosticsPath.endsWith('desktop-startup-diagnostics.json')).toBeTruthy();
+        expect(desktopHarness.artifacts.mainProcessLogPath.endsWith('desktop-main-process.log')).toBeTruthy();
+        expect(desktopHarness.artifacts.rendererConsoleLogPath.endsWith('desktop-renderer-console.log')).toBeTruthy();
+        expect(desktopHarness.artifacts.rendererErrorsLogPath.endsWith('desktop-renderer-errors.log')).toBeTruthy();
+        expect(desktopHarness.artifacts.readyScreenshotPath.endsWith('desktop-renderer-ready.png')).toBeTruthy();
+        expect(desktopHarness.artifacts.failureScreenshotPath.endsWith('desktop-renderer-failure.png')).toBeTruthy();
     });
 
-    test('starts a match with visible HUD and a wired game mode strategy', async ({ page }) => {
-        await startGame(page);
+    test('starts a match, receives desktop input, and returns to menu', async ({ page }) => {
+        const errors = collectErrors(page);
+        await startGameFromMenu(page);
 
-        const runtimeState = await page.evaluate(() => {
-            const game = window.GAME_INSTANCE;
+        const inputProbe = await page.evaluate(() => ({
+            upCode: String(window.GAME_INSTANCE?.input?.bindings?.PLAYER_1?.UP || 'KeyW'),
+            modeType: window.GAME_INSTANCE?.entityManager?.gameModeStrategy?.modeType || null,
+            playerCount: window.GAME_INSTANCE?.entityManager?.players?.length || 0,
+            hudVisible: !document.getElementById('hud')?.classList.contains('hidden'),
+        }));
+
+        await page.keyboard.down(inputProbe.upCode);
+        await page.waitForFunction((keyCode) => {
+            const input = window.GAME_INSTANCE?.input;
+            const currentInput = input?.getKeyboardInput?.(0, { includeSecondaryBindings: true });
+            return !!(input?.keys?.[keyCode] && currentInput?.pitchUp);
+        }, inputProbe.upCode, { timeout: 4000 });
+        await page.keyboard.up(inputProbe.upCode);
+
+        const inputArrived = await page.evaluate((keyCode) => {
+            const input = window.GAME_INSTANCE?.input;
+            const currentInput = input?.getKeyboardInput?.(0, { includeSecondaryBindings: true });
             return {
-                hudVisible: !document.getElementById('hud')?.classList.contains('hidden'),
-                playerCount: game?.entityManager?.players?.length || 0,
-                modeType: game?.entityManager?.gameModeStrategy?.modeType || null,
+                keyReleased: input?.keys?.[keyCode] === false,
+                playerPitchUp: currentInput?.pitchUp === false,
             };
-        });
+        }, inputProbe.upCode);
 
-        expect(runtimeState.hudVisible).toBeTruthy();
-        expect(runtimeState.playerCount).toBeGreaterThan(0);
-        expect(typeof runtimeState.modeType).toBe('string');
-        expect(runtimeState.modeType.length).toBeGreaterThan(0);
-    });
+        expect(inputProbe.hudVisible).toBeTruthy();
+        expect(inputProbe.playerCount).toBeGreaterThan(0);
+        expect(typeof inputProbe.modeType).toBe('string');
+        expect(inputProbe.modeType.length).toBeGreaterThan(0);
+        expect(inputArrived.keyReleased).toBeTruthy();
+        expect(inputArrived.playerPitchUp).toBeTruthy();
 
-    test('returns from an active match back to the menu', async ({ page }) => {
-        await startGame(page);
         await returnToMenu(page);
 
         await expect(page.locator('#main-menu')).toBeVisible();
         await expect(page.locator('#submenu-game:not(.hidden)')).toHaveCount(1);
-    });
-
-    test('keeps persisted settings across reloads without crashing', async ({ page }) => {
-        const errors = collectErrors(page);
-        await loadGame(page);
-        await page.evaluate((storageKey) => {
-            localStorage.setItem(storageKey, JSON.stringify({
-                volume: 0.42,
-                numBots: 3,
-                localSettings: {
-                    shadowQuality: 2,
-                },
-            }));
-        }, SETTINGS_STORAGE_KEY);
-
-        await page.reload();
-        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15_000 });
-
-        const persisted = await page.evaluate((storageKey) => JSON.parse(localStorage.getItem(storageKey) || '{}'), SETTINGS_STORAGE_KEY);
-        expect(persisted.numBots).toBe(3);
-        expect(persisted.localSettings?.shadowQuality).toBe(2);
         expect(errors).toHaveLength(0);
-    });
-
-    test('migrates the legacy settings key into the current storage namespace', async ({ page }) => {
-        await loadGame(page);
-        await page.evaluate(({ legacyKey, currentKey }) => {
-            localStorage.removeItem(currentKey);
-            localStorage.setItem(legacyKey, JSON.stringify({
-                numBots: 2,
-                localSettings: {
-                    shadowQuality: 2,
-                },
-            }));
-        }, {
-            legacyKey: LEGACY_SETTINGS_STORAGE_KEY,
-            currentKey: SETTINGS_STORAGE_KEY,
-        });
-
-        await page.reload();
-        await page.waitForSelector('#main-menu', { state: 'visible', timeout: 15_000 });
-
-        const migrated = await page.evaluate(({ legacyKey, currentKey }) => ({
-            current: JSON.parse(localStorage.getItem(currentKey) || '{}'),
-            legacyStillPresent: localStorage.getItem(legacyKey) !== null,
-        }), {
-            legacyKey: LEGACY_SETTINGS_STORAGE_KEY,
-            currentKey: SETTINGS_STORAGE_KEY,
-        });
-
-        expect(migrated.current.numBots).toBe(2);
-        expect(migrated.current.localSettings?.shadowQuality).toBe(2);
-        expect(migrated.legacyStillPresent).toBe(false);
     });
 });

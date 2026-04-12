@@ -52,6 +52,7 @@ const DYNAMIC_ACTION_RATE_THRESHOLD = 0.18;
 const OBSERVATION_PHASE_SLOTS = 4;
 const OBSERVATION_MAX_REBUILDS_PER_FRAME = 2;
 const OBSERVATION_MAX_REUSE_FRAMES = 4;
+const OBSERVATION_SYNTHETIC_FRAME_MIN_INTERVAL_MS = 8;
 
 function readFiniteRate(raw, fallback = NaN) {
     const numeric = Number(raw);
@@ -91,6 +92,8 @@ export class PlayerInputSystem {
         this._observationPhaseSlots = OBSERVATION_PHASE_SLOTS;
         this._observationMaxRebuildsPerFrame = OBSERVATION_MAX_REBUILDS_PER_FRAME;
         this._observationMaxReuseFrames = OBSERVATION_MAX_REUSE_FRAMES;
+        this._observationLastAdvanceAtMs = 0;
+        this._managedFrameActive = false;
         // Reusable sanitize options object to avoid per-frame allocation
         this._sharedSanitizeOptions = {
             inventoryLength: 0,
@@ -99,8 +102,18 @@ export class PlayerInputSystem {
     }
 
     beginFrame() {
+        this._managedFrameActive = true;
+        this._advanceObservationFrame();
+    }
+
+    endFrame() {
+        this._managedFrameActive = false;
+    }
+
+    _advanceObservationFrame() {
         this._observationFrameId += 1;
         this._observationRebuildsThisFrame = 0;
+        this._observationLastAdvanceAtMs = nowMs();
         this._syncObservationScheduleConfig();
         // Purge stale warning entries every 256 frames to prevent unbounded Map growth
         if ((this._observationFrameId & 0xFF) === 0) {
@@ -127,6 +140,8 @@ export class PlayerInputSystem {
         this._observationMetaByIndex.clear();
         this._observationFrameId = 0;
         this._observationRebuildsThisFrame = 0;
+        this._observationLastAdvanceAtMs = 0;
+        this._managedFrameActive = false;
     }
 
     _syncObservationScheduleConfig() {
@@ -254,6 +269,20 @@ export class PlayerInputSystem {
             return cachedObservation;
         }
         return this._resolveObservationTarget(runtimeContext);
+    }
+
+    _ensureObservationFrameProgress() {
+        if (this._managedFrameActive) {
+            return;
+        }
+        const elapsedMs = nowMs() - this._observationLastAdvanceAtMs;
+        if (
+            this._observationFrameId <= 0
+            || !Number.isFinite(elapsedMs)
+            || elapsedMs >= OBSERVATION_SYNTHETIC_FRAME_MIN_INTERVAL_MS
+        ) {
+            this._advanceObservationFrame();
+        }
     }
 
     _recordBotSensingSample(runtimeProfiler, player, policyType, startMs) {
@@ -446,6 +475,9 @@ export class PlayerInputSystem {
                 const needsObservation = this._policyNeedsObservation(botAI);
                 const runtimeProfiler = entityManager?.runtimeProfiler || null;
                 const botSensingStart = needsObservation ? runtimeProfiler?.startSample?.() : NaN;
+                if (needsObservation) {
+                    this._ensureObservationFrameProgress();
+                }
                 const runtimeContext = this._resolveRuntimeContext(player, dt, entityManager, {
                     includeObservationContext: needsObservation,
                 });

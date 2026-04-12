@@ -26,6 +26,33 @@ const TERMINAL_DISPOSE_FINALIZE_STATES = new Set([
     'error',
 ]);
 
+function blurFocusedTextInput(docRef = globalThis?.document) {
+    const activeElement = docRef?.activeElement;
+    if (!activeElement || typeof activeElement.blur !== 'function') {
+        return false;
+    }
+
+    const tagName = String(activeElement.tagName || '').toUpperCase();
+    const inputType = String(activeElement.getAttribute?.('type') || 'text').toLowerCase();
+    const isTextInput = tagName === 'TEXTAREA'
+        || (tagName === 'INPUT' && (
+            inputType === 'text'
+            || inputType === 'search'
+            || inputType === 'url'
+            || inputType === 'email'
+            || inputType === 'number'
+            || inputType === 'password'
+        ))
+        || activeElement.isContentEditable === true;
+
+    if (!isTextInput) {
+        return false;
+    }
+
+    activeElement.blur();
+    return true;
+}
+
 export class GameRuntimeSessionHandler {
     constructor({ facade = null, logger = console } = {}) {
         this._facade = facade || null;
@@ -195,6 +222,7 @@ export class GameRuntimeSessionHandler {
             }
 
             facade?.getUiManager?.()?.clearStartValidationError?.();
+            blurFocusedTextInput(globalThis?.document);
             if (sessionContract.sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER) {
                 return requestRuntimeMultiplayerMatchStart({
                     game: facade?.game,
