@@ -7,6 +7,7 @@ import {
 } from '../src/entities/ai/training/TrainingAutomationContractV33.js';
 import { TrainingAutomationRunner } from '../src/entities/ai/training/TrainingAutomationRunner.js';
 import { TrainingTransportFacade } from '../src/entities/ai/training/TrainingTransportFacade.js';
+import { evaluateTrainingGate } from '../src/state/training/TrainingGateEvaluator.js';
 
 test('TrainingAutomationContractV33 normalizes run config and artifact layout deterministically', () => {
     const config = normalizeTrainingRunConfig({
@@ -116,4 +117,50 @@ test('TrainingAutomationRunner reuses the transport facade and aggregates metric
     assert.ok(run.kpis.invalidActionRate > 0);
     assert.ok(Number.isFinite(run.kpis.episodeReturnMean));
     assert.equal(run.kpis.runtimeErrorCount, 0);
+});
+
+test('T96: TrainingGateEvaluator liefert pass/fail inkl. KPI-Checks und Drift-Warnungen', () => {
+    const passingEval = {
+        episodes: [
+            { episodeReturn: 1.7, done: true, truncated: false, invalidActionCount: 0, actionCount: 5, steps: 5 },
+            { episodeReturn: 1.6, done: true, truncated: false, invalidActionCount: 1, actionCount: 5, steps: 5 },
+            { episodeReturn: 1.5, done: false, truncated: true, invalidActionCount: 1, actionCount: 5, steps: 5 },
+            { episodeReturn: 1.4, done: false, truncated: true, invalidActionCount: 0, actionCount: 5, steps: 5 },
+        ],
+        bridgeTelemetry: {
+            requestsSent: 8,
+            responsesReceived: 7,
+            retries: 1,
+            timeouts: 1,
+            fallbacks: 1,
+            latencyP95Ms: 6,
+        },
+        runtimeErrors: [],
+    };
+    const failingEval = {
+        episodes: [
+            { episodeReturn: 0.02, done: false, truncated: true, invalidActionCount: 5, actionCount: 5, steps: 5 },
+            { episodeReturn: 0.01, done: false, truncated: true, invalidActionCount: 5, actionCount: 5, steps: 5 },
+        ],
+        bridgeTelemetry: {
+            requestsSent: 4,
+            responsesReceived: 0,
+            retries: 2,
+            timeouts: 4,
+            fallbacks: 4,
+            latencyP95Ms: 120,
+        },
+        runtimeErrors: [{ message: 'runtime failure' }],
+    };
+
+    const pass = evaluateTrainingGate(passingEval);
+    const fail = evaluateTrainingGate(failingEval);
+
+    assert.equal(pass.ok, true);
+    assert.ok(pass.warnings.length >= 0);
+    assert.ok(pass.checks.length >= 6);
+    assert.equal(pass.checks.some((entry) => entry.metric === 'runtimeErrorCount'), true);
+    assert.equal(fail.ok, false);
+    assert.ok(fail.hardFailures.length >= 1);
+    assert.equal(fail.hardFailures.some((entry) => entry.metric === 'runtimeErrorCount'), true);
 });

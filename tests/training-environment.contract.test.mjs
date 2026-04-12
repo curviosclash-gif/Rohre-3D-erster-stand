@@ -250,3 +250,111 @@ test('Trainer payload adapter and WebSocketTrainerBridge transport additive trai
         globalThis.WebSocket = originalWebSocket;
     }
 });
+
+test('T97: WebSocketTrainerBridge erfasst Retry/Timeout/Fallback-Telemetrie deterministisch', async () => {
+    const originalWebSocket = globalThis.WebSocket;
+    let actionRequestCount = 0;
+
+    class MockWebSocket {
+        static CONNECTING = 0;
+        static OPEN = 1;
+        static CLOSING = 2;
+        static CLOSED = 3;
+
+        constructor() {
+            this.readyState = MockWebSocket.OPEN;
+            this._listeners = new Map();
+            setTimeout(() => this._emit('open', {}), 0);
+        }
+
+        addEventListener(type, handler) {
+            const handlers = this._listeners.get(type) || [];
+            handlers.push(handler);
+            this._listeners.set(type, handlers);
+        }
+
+        removeEventListener(type, handler) {
+            const handlers = this._listeners.get(type) || [];
+            this._listeners.set(type, handlers.filter((entry) => entry !== handler));
+        }
+
+        _emit(type, payload) {
+            const handlers = this._listeners.get(type) || [];
+            for (const handler of handlers) {
+                handler(payload);
+            }
+        }
+
+        send(raw) {
+            const envelope = JSON.parse(raw);
+            if (envelope.type !== 'bot-action-request') {
+                return;
+            }
+            actionRequestCount += 1;
+            const sequence = actionRequestCount;
+            setTimeout(() => {
+                this._emit('message', {
+                    data: JSON.stringify({
+                        id: envelope.id,
+                        action: {
+                            yawRight: true,
+                            requestTick: Number(envelope?.payload?.tick || 0),
+                            requestSequence: sequence,
+                        },
+                    }),
+                });
+            }, sequence === 1 ? 10 : 2);
+        }
+
+        close() {
+            this.readyState = MockWebSocket.CLOSED;
+            this._emit('close', {});
+        }
+    }
+
+    globalThis.WebSocket = MockWebSocket;
+    try {
+        const bridge = new WebSocketTrainerBridge({
+            enabled: true,
+            timeoutMs: 12,
+            maxRetries: 0,
+            retryDelayMs: 0,
+            url: 'ws://127.0.0.1:8765',
+            maxPendingAcks: 4,
+            backpressureThreshold: 2,
+            dropTrainingPayloadWhenBacklogged: true,
+        });
+        bridge.submitObservation({ tick: 1 });
+        bridge.submitObservation({ tick: 2 });
+        bridge.submitObservation({ tick: 3 });
+        await new Promise((resolve) => setTimeout(resolve, 20));
+
+        bridge.submitTrainingStep({ frame: 1 });
+        bridge.submitTrainingStep({ frame: 2 });
+        bridge.submitTrainingStep({ frame: 3 });
+        bridge.submitTrainingStep({ frame: 4 });
+
+        const action = bridge.consumeLatestAction();
+        if (!action) {
+            bridge.recordFallback('test-no-action');
+        }
+        bridge.recordFallback('test-manual-fallback');
+        const failure = bridge.consumeFailure();
+        const telemetry = bridge.getTelemetrySnapshot();
+        bridge.close();
+
+        assert.equal(Boolean(action?.yawRight), true);
+        assert.equal(Number(action?.requestTick || 0), 3);
+        assert.equal(failure, null);
+        assert.ok(Number(telemetry.requestsSent || 0) >= 2);
+        assert.ok(Number(telemetry.responsesReceived || 0) >= 2);
+        assert.equal(Number(telemetry.retries || 0), 0);
+        assert.equal(Number(telemetry.timeouts || 0), 0);
+        assert.ok(Number(telemetry.fallbacks || 0) >= 1);
+        assert.ok(Number(telemetry.actionDrops || 0) >= 1);
+        assert.ok(Number(telemetry.actionSendSkipped || 0) >= 2);
+        assert.ok(Number(telemetry.backpressureDrops || 0) >= 1);
+    } finally {
+        globalThis.WebSocket = originalWebSocket;
+    }
+});
