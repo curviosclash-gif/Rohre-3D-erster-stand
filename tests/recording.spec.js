@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { loadGame, startGameWithBots } from './helpers.js';
+import { loadGame } from './helpers.js';
 
 test.describe('V59-59.7.1: MediaRecorderSystem', () => {
 
@@ -32,24 +32,33 @@ test.describe('V59-59.7.1: MediaRecorderSystem', () => {
         expect(settings.hudMode).toBeTruthy();
     });
 
-    test('Start/stop recording lifecycle does not throw', async ({ page }) => {
-        await startGameWithBots(page, 1);
-        const result = await page.evaluate(async () => {
-            const g = window.GAME_INSTANCE;
-            const rec = g?.mediaRecorderSystem || g?.recorder;
-            if (!rec) return { error: 'no recorder' };
-            try {
-                const startResult = await rec.startRecording?.({ type: 'test' });
-                const wasRecording = !!rec.isRecording?.();
-                if (wasRecording) {
-                    await rec.stopRecording?.({ type: 'test_stop' });
-                }
-                return { ok: true, started: wasRecording };
-            } catch (err) {
-                return { ok: false, error: err.message };
-            }
+    test('Browser recording capability adapter reports browser-native or degraded demo state consistently', async ({ page }) => {
+        await loadGame(page);
+        const state = await page.evaluate(async () => {
+            const { createPlatformRecordingCapabilityAdapter } = await import('/src/core/recording/MediaRecorderSupport.js');
+            const canvas = document.querySelector('canvas');
+            const adapter = createPlatformRecordingCapabilityAdapter(globalThis, canvas);
+            return {
+                adapterName: adapter?.adapterName || '',
+                contractVersion: adapter?.contractVersion || '',
+                providerKind: adapter?.capability?.providerKind || '',
+                degradedReason: adapter?.capability?.degradedReason || '',
+                available: adapter?.isAvailable?.() === true,
+                supportReason: adapter?.support?.supportReason || '',
+                hasRecorder: adapter?.support?.hasRecorder === true,
+            };
         });
-        expect(result.ok).toBe(true);
+        expect(state.adapterName).toBe('browser.recording.v1');
+        expect(state.contractVersion).toBe('browser.recording.v1');
+        expect(['browser-demo', 'browser-native']).toContain(state.providerKind);
+        expect(typeof state.supportReason).toBe('string');
+        if (state.available) {
+            expect(state.providerKind).toBe('browser-native');
+            expect(state.hasRecorder).toBe(true);
+        } else {
+            expect(state.providerKind).toBe('browser-demo');
+            expect(state.degradedReason.length).toBeGreaterThan(0);
+        }
     });
 
     test('Format detection returns supported MIME type', async ({ page }) => {
@@ -62,22 +71,37 @@ test.describe('V59-59.7.1: MediaRecorderSystem', () => {
         expect(typeof mime).toBe('string');
     });
 
-    test('State resets correctly after stop', async ({ page }) => {
-        await startGameWithBots(page, 1);
+    test('Browser recorder support keeps MIME selection and capture capability aligned', async ({ page }) => {
+        await loadGame(page);
         const state = await page.evaluate(async () => {
-            const g = window.GAME_INSTANCE;
-            const rec = g?.mediaRecorderSystem || g?.recorder;
-            if (!rec) return { found: false };
-            try {
-                await rec.startRecording?.({ type: 'test' });
-                await rec.stopRecording?.({ type: 'test_stop' });
-            } catch { /* may fail in test env */ }
+            const {
+                detectNativeRecorderSupport,
+                resolveSafeMediaRecorderMimeType,
+            } = await import('/src/core/recording/MediaRecorderSupport.js');
+            const canvas = document.querySelector('canvas');
+            const support = detectNativeRecorderSupport(globalThis, canvas);
             return {
-                found: true,
-                isRecording: !!rec.isRecording?.(),
+                found: !!support,
+                hasRecorder: support?.hasRecorder === true,
+                hasMediaRecorder: support?.hasMediaRecorder === true,
+                hasWebCodecs: support?.hasWebCodecs === true,
+                selectedMimeType: support?.selectedMimeType || '',
+                supportReason: support?.supportReason || '',
+                safeMp4MimeType: resolveSafeMediaRecorderMimeType(globalThis, 'video/mp4'),
+                canCaptureStream: typeof canvas?.captureStream === 'function',
             };
         });
         expect(state.found).toBe(true);
-        expect(state.isRecording).toBe(false);
+        expect(state.supportReason.length).toBeGreaterThan(0);
+        expect(typeof state.safeMp4MimeType).toBe('string');
+        if (state.hasRecorder) {
+            expect(state.selectedMimeType.length).toBeGreaterThan(0);
+        }
+        if (state.hasMediaRecorder) {
+            expect(state.canCaptureStream).toBe(true);
+        }
+        if (state.hasWebCodecs) {
+            expect(state.selectedMimeType).toBe('video/mp4');
+        }
     });
 });

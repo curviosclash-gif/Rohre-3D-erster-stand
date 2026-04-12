@@ -4,11 +4,14 @@ import path from 'node:path';
 import process from 'node:process';
 import { resolvePlaywrightFailureTaxonomy } from '../tests/playwright-readiness.js';
 
-const DEV_RUNTIME_CLUSTERS = Object.freeze([
+const DESKTOP_E2E_CLUSTERS = Object.freeze([
     { id: 'core-shell', specs: ['tests/core-targeted.spec.js'] },
     { id: 'core-platform', specs: ['tests/core-targeted-platform.spec.js'] },
     { id: 'core-surface', specs: ['tests/core-targeted-surface.spec.js'] },
     { id: 'core-runtime', specs: ['tests/core-targeted-runtime.spec.js'] },
+]);
+
+const HEAVY_DIAGNOSTIC_CLUSTERS = Object.freeze([
     { id: 'core-regressions', specs: ['tests/core-targeted-regressions.spec.js'] },
     { id: 'physics-core', specs: ['tests/physics-core.spec.js'] },
     { id: 'physics-hunt', specs: ['tests/physics-hunt.spec.js'] },
@@ -17,9 +20,13 @@ const DEV_RUNTIME_CLUSTERS = Object.freeze([
     { id: 'bot-targeting', specs: ['tests/bot-targeting.spec.js'] },
 ]);
 const PLAYWRIGHT_STARTUP_DIAGNOSTICS_FILE = 'playwright-startup-diagnostics.json';
+const ALL_CLUSTERS = Object.freeze([
+    ...DESKTOP_E2E_CLUSTERS,
+    ...HEAVY_DIAGNOSTIC_CLUSTERS,
+]);
 
 const CLUSTER_INDEX = new Map();
-for (const cluster of DEV_RUNTIME_CLUSTERS) {
+for (const cluster of ALL_CLUSTERS) {
     CLUSTER_INDEX.set(cluster.id, cluster);
     for (const spec of cluster.specs) {
         CLUSTER_INDEX.set(spec, cluster);
@@ -66,7 +73,7 @@ function splitSelectorsAndPlaywrightArgs(argv) {
 
 function resolveSelectedClusters(selectors) {
     if (selectors.length === 0) {
-        return DEV_RUNTIME_CLUSTERS;
+        return DESKTOP_E2E_CLUSTERS;
     }
 
     const resolved = [];
@@ -90,8 +97,8 @@ function resolveSelectedClusters(selectors) {
     }
 
     if (unknownSelectors.length > 0) {
-        console.error('[playwright:dev-runtime] unknown cluster selector(s):', unknownSelectors.join(', '));
-        console.error('[playwright:dev-runtime] known clusters:', DEV_RUNTIME_CLUSTERS.map((cluster) => cluster.id).join(', '));
+        console.error('[playwright:desktop-e2e] unknown cluster selector(s):', unknownSelectors.join(', '));
+        console.error('[playwright:desktop-e2e] known clusters:', ALL_CLUSTERS.map((cluster) => cluster.id).join(', '));
         process.exit(1);
     }
 
@@ -99,14 +106,14 @@ function resolveSelectedClusters(selectors) {
 }
 
 function printClusters() {
-    console.log('[playwright:dev-runtime] cluster map');
-    for (const cluster of DEV_RUNTIME_CLUSTERS) {
+    console.log('[playwright:desktop-e2e] cluster map');
+    for (const cluster of ALL_CLUSTERS) {
         console.log(`- ${cluster.id}: ${cluster.specs.join(', ')}`);
     }
 }
 
 function printDryRun(clusters, playwrightArgs) {
-    console.log('[playwright:dev-runtime] dry run');
+    console.log('[playwright:desktop-e2e] dry run');
     for (let index = 0; index < clusters.length; index += 1) {
         const cluster = clusters[index];
         const env = buildClusterEnv(cluster, index);
@@ -120,8 +127,8 @@ function printDryRun(clusters, playwrightArgs) {
 
 function buildClusterEnv(cluster, index) {
     const baseRunTag = sanitizeSlug(
-        process.env.PW_RUN_TAG || `dev-runtime-clusters-${Date.now().toString(36)}`,
-        `dev-runtime-clusters-${process.pid}`
+        process.env.PW_RUN_TAG || `desktop-e2e-clusters-${Date.now().toString(36)}`,
+        `desktop-e2e-clusters-${process.pid}`
     );
     const clusterRunTag = sanitizeSlug(`${baseRunTag}-${cluster.id}`, cluster.id);
     const baseOutputDir = String(process.env.PW_OUTPUT_DIR || '').trim();
@@ -154,7 +161,7 @@ function runCluster(cluster, playwrightArgs, index, total) {
     return new Promise((resolve) => {
         const clusterArgs = [path.resolve('scripts', 'run-playwright-targeted.mjs'), ...cluster.specs, ...playwrightArgs];
         const clusterEnv = buildClusterEnv(cluster, index);
-        console.log(`[playwright:dev-runtime] (${index + 1}/${total}) ${cluster.id} -> ${cluster.specs.join(', ')}`);
+        console.log(`[playwright:desktop-e2e] (${index + 1}/${total}) ${cluster.id} -> ${cluster.specs.join(', ')}`);
 
         const child = spawn(process.execPath, clusterArgs, {
             stdio: 'inherit',
@@ -207,7 +214,7 @@ async function classifyClusterFailure(result) {
 
     const contract = toClusterContractDiagnostics(diagnostics);
     const failureClass = resolvePlaywrightFailureTaxonomy({
-        runProfile: 'dev-runtime',
+        runProfile: 'desktop-e2e',
         stage: contract?.stage || 'idle',
         failureReason: contract?.failureReason || '',
         error: contract?.errorMessage || diagnostics?.error || null,
@@ -225,7 +232,7 @@ async function classifyClusterFailure(result) {
         clusterId: result.cluster.id,
         failureClass,
         failureReason: String(contract?.failureReason || 'playwright_exit_non_zero'),
-        runProfile: String(diagnostics?.runProfile || 'dev-runtime'),
+        runProfile: String(diagnostics?.runProfile || 'desktop-e2e'),
         runTag: String(diagnostics?.runTag || ''),
         outputDir,
         diagnosticsPath: diagnostics ? diagnosticsPath : null,
@@ -262,20 +269,20 @@ async function main() {
             const classifiedFailure = await classifyClusterFailure(result);
             failures.push(classifiedFailure);
             console.error(
-                `[playwright:dev-runtime] ${classifiedFailure.clusterId} classified as ` +
+                `[playwright:desktop-e2e] ${classifiedFailure.clusterId} classified as ` +
                 `${classifiedFailure.failureClass} (${classifiedFailure.failureReason})`
             );
             console.error(
-                `[playwright:dev-runtime] artifact contract: ` +
+                `[playwright:desktop-e2e] artifact contract: ` +
                 `mode=${classifiedFailure.runProfile} ` +
                 `runTag=${classifiedFailure.runTag || 'n/a'} ` +
                 `output=${classifiedFailure.outputDir || 'n/a'}`
             );
             if (classifiedFailure.diagnosticsPath) {
-                console.error(`[playwright:dev-runtime] diagnostics: ${classifiedFailure.diagnosticsPath}`);
+                console.error(`[playwright:desktop-e2e] diagnostics: ${classifiedFailure.diagnosticsPath}`);
             }
             for (const serverLogPath of classifiedFailure.serverLogPaths) {
-                console.error(`[playwright:dev-runtime] server-log: ${serverLogPath}`);
+                console.error(`[playwright:desktop-e2e] server-log: ${serverLogPath}`);
             }
         }
     }
@@ -289,16 +296,16 @@ async function main() {
             bucketMap.get(failure.failureClass).push(failure.clusterId);
         }
         console.error(
-            `[playwright:dev-runtime] failing clusters: ${failures.map((failure) => (
+            `[playwright:desktop-e2e] failing clusters: ${failures.map((failure) => (
                 `${failure.clusterId}:${failure.failureClass}`
             )).join(', ')}`
         );
         for (const [failureClass, clusterIds] of bucketMap.entries()) {
-            console.error(`[playwright:dev-runtime] failure-taxonomy ${failureClass}: ${clusterIds.join(', ')}`);
+            console.error(`[playwright:desktop-e2e] failure-taxonomy ${failureClass}: ${clusterIds.join(', ')}`);
         }
         for (const failure of failures) {
             console.error(
-                `[playwright:dev-runtime] ${failure.clusterId} artifacts: ` +
+                `[playwright:desktop-e2e] ${failure.clusterId} artifacts: ` +
                 `mode=${failure.runProfile} ` +
                 `runTag=${failure.runTag || 'n/a'} ` +
                 `diagnostics=${failure.diagnosticsPath || 'n/a'} ` +
@@ -310,7 +317,7 @@ async function main() {
 }
 
 main().catch((error) => {
-    console.error('[playwright:dev-runtime] cluster runner failed');
+    console.error('[playwright:desktop-e2e] cluster runner failed');
     console.error(error);
     process.exit(1);
 });

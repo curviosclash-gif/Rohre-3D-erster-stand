@@ -1,5 +1,10 @@
 const DEFAULT_SERVER_PROBE_TIMEOUT_MS = 5_000;
-const DEFAULT_RUN_PROFILE = 'preview-smoke';
+const DEFAULT_RUN_PROFILE = 'desktop-smoke';
+const RUN_PROFILE_ALIASES = Object.freeze({
+    'preview-smoke': 'desktop-smoke',
+    'dev-runtime': 'desktop-e2e',
+    'browser-contract': 'browser-compat',
+});
 const DEFAULT_SERVER_PROBE_PATH = '/';
 const STARTUP_FAILURE_STAGES = new Set(['idle', 'goto', 'startup_probe', 'http_probe']);
 const READINESS_FAILURE_STAGES = new Set([
@@ -19,8 +24,8 @@ const PLAYWRIGHT_FLAKE_REASON_PATTERNS = [
     ['page_crashed', /page crashed/i],
 ];
 const RUN_PROFILE_FAILURE_FALLBACKS = Object.freeze({
-    'browser-contract': 'contract',
-    'dev-runtime': 'runtime-regression',
+    'browser-compat': 'contract',
+    'desktop-e2e': 'runtime-regression',
 });
 
 function hasMainMenuDomHint(html) {
@@ -33,8 +38,8 @@ function hasMainMenuDomHint(html) {
 }
 
 function resolveRunProfile(rawValue = process.env.PW_RUN_PROFILE) {
-    const normalized = String(rawValue || '').trim();
-    return normalized || DEFAULT_RUN_PROFILE;
+    const normalized = String(rawValue || '').trim().toLowerCase();
+    return RUN_PROFILE_ALIASES[normalized] || normalized || DEFAULT_RUN_PROFILE;
 }
 
 function toProbeErrorMessage(error) {

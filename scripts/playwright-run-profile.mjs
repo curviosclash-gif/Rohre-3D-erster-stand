@@ -2,26 +2,32 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import process from 'node:process';
 
-export const PLAYWRIGHT_DEFAULT_RUN_PROFILE = 'preview-smoke';
+export const PLAYWRIGHT_DEFAULT_RUN_PROFILE = 'desktop-smoke';
+
+const PLAYWRIGHT_RUN_PROFILE_ALIASES = Object.freeze({
+    'preview-smoke': 'desktop-smoke',
+    'dev-runtime': 'desktop-e2e',
+    'browser-contract': 'browser-compat',
+});
 
 export const PLAYWRIGHT_RUN_PROFILES = Object.freeze({
-    'preview-smoke': Object.freeze({
-        name: 'preview-smoke',
-        projectName: 'preview-smoke',
+    'desktop-smoke': Object.freeze({
+        name: 'desktop-smoke',
+        projectName: 'desktop-smoke',
         serverMode: 'preview',
         useGlobalWarmup: false,
         moduleWarmupEnabled: false,
     }),
-    'dev-runtime': Object.freeze({
-        name: 'dev-runtime',
-        projectName: 'dev-runtime',
+    'desktop-e2e': Object.freeze({
+        name: 'desktop-e2e',
+        projectName: 'desktop-e2e',
         serverMode: 'dev',
         useGlobalWarmup: true,
         moduleWarmupEnabled: false,
     }),
-    'browser-contract': Object.freeze({
-        name: 'browser-contract',
-        projectName: 'browser-contract',
+    'browser-compat': Object.freeze({
+        name: 'browser-compat',
+        projectName: 'browser-compat',
         serverMode: 'dev',
         useGlobalWarmup: true,
         moduleWarmupEnabled: false,
@@ -79,8 +85,9 @@ function hasExplicitBrowserContractSelection(argv) {
 
 export function resolvePlaywrightRunProfile(rawValue, fallbackName = PLAYWRIGHT_DEFAULT_RUN_PROFILE) {
     const normalized = String(rawValue || '').trim().toLowerCase();
-    if (normalized && PLAYWRIGHT_RUN_PROFILES[normalized]) {
-        return PLAYWRIGHT_RUN_PROFILES[normalized];
+    const canonicalName = PLAYWRIGHT_RUN_PROFILE_ALIASES[normalized] || normalized;
+    if (canonicalName && PLAYWRIGHT_RUN_PROFILES[canonicalName]) {
+        return PLAYWRIGHT_RUN_PROFILES[canonicalName];
     }
     return PLAYWRIGHT_RUN_PROFILES[fallbackName] || PLAYWRIGHT_RUN_PROFILES[PLAYWRIGHT_DEFAULT_RUN_PROFILE];
 }

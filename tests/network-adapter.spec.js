@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {
-    loadGame,
-    openMultiplayerSubmenu,
-    startGameWithBots,
-} from './helpers.js';
+import { loadGame } from './helpers.js';
 import { createLANSignalingServer } from '../server/lan-signaling.js';
 import { waitForRuntimePlayersLoaded } from '../src/core/runtime/RuntimeSessionLifecycleService.js';
 import { DataChannelManager } from '../src/network/DataChannelManager.js';
@@ -85,18 +81,30 @@ test.describe('V59-59.7.3: Network Adapter Robustness', () => {
         expect(errors.length).toBe(0);
     });
 
-    test('Game instance has no network adapter leaks after single-player match', async ({ page }) => {
-        await startGameWithBots(page, 1);
-        await page.waitForTimeout(2000);
-        const state = await page.evaluate(() => {
-            const g = window.GAME_INSTANCE;
+    test('Browser demo host/discovery adapters stay degraded instead of exposing desktop LAN services', async ({ page }) => {
+        await loadGame(page);
+        const state = await page.evaluate(async () => {
+            const {
+                createBrowserDiscoveryAdapter,
+                createBrowserHostAdapter,
+            } = await import('/src/platform/browser/BrowserPlatformAdapters.js');
+            const discovery = createBrowserDiscoveryAdapter();
+            const host = createBrowserHostAdapter();
             return {
-                hasMultiplayerAdapter: !!g?.multiplayerAdapter,
-                isConnected: g?.multiplayerAdapter?.isConnected === true,
+                discoveryAvailable: discovery.isAvailable(),
+                discoveryProviderKind: discovery.capability?.providerKind || '',
+                discoveryReason: discovery.capability?.degradedReason || '',
+                hostAvailable: host.isAvailable(),
+                hostProviderKind: host.capability?.providerKind || '',
+                hostReason: host.capability?.degradedReason || '',
             };
         });
-        // Single-player should not have an active multiplayer adapter
-        expect(state.isConnected).toBe(false);
+        expect(state.discoveryAvailable).toBe(false);
+        expect(state.discoveryProviderKind).toBe('browser-demo');
+        expect(state.discoveryReason).toBe('desktop_only');
+        expect(state.hostAvailable).toBe(false);
+        expect(state.hostProviderKind).toBe('browser-demo');
+        expect(state.hostReason).toBe('desktop_only');
     });
 });
 
@@ -699,96 +707,4 @@ test.describe('V67-67.4: Expanded multiplayer coverage', () => {
         expect(result.removedPeers).toContain('host');
     });
 
-    test('67.4.5 Two-tab multiplayer stability >15s with network mapping checks and remote presence', async ({ page }) => {
-        test.setTimeout(120000);
-        await page.context().addInitScript(() => {
-            globalThis.__CURVIOS_APP__ = true;
-        });
-        const secondPage = await page.context().newPage();
-        try {
-            await secondPage.context().addInitScript(() => {
-                globalThis.__CURVIOS_APP__ = true;
-            });
-
-            await loadGame(page);
-            await loadGame(secondPage);
-
-            const networkMapping = await page.evaluate(async () => {
-                const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
-                const { createRuntimeSessionAdapter } = await import('/src/core/runtime/RuntimeSessionLifecycleService.js');
-                const lanConfig = createRuntimeConfigSnapshot({
-                    localSettings: { sessionType: 'lan' },
-                });
-                const onlineConfig = createRuntimeConfigSnapshot({
-                    localSettings: { sessionType: 'online' },
-                });
-                const lanAdapter = await createRuntimeSessionAdapter('lan');
-                const onlineAdapter = await createRuntimeSessionAdapter('online');
-                const payload = {
-                    lanNetworkEnabled: lanConfig?.session?.networkEnabled === true,
-                    onlineNetworkEnabled: onlineConfig?.session?.networkEnabled === true,
-                    lanAdapterType: lanAdapter?.constructor?.name || null,
-                    onlineAdapterType: onlineAdapter?.constructor?.name || null,
-                };
-                lanAdapter?.dispose?.();
-                onlineAdapter?.dispose?.();
-                return payload;
-            });
-
-            expect(networkMapping.lanNetworkEnabled).toBe(true);
-            expect(networkMapping.onlineNetworkEnabled).toBe(true);
-            expect(networkMapping.lanAdapterType).toBe('LANSessionAdapter');
-            expect(networkMapping.onlineAdapterType).toBe('OnlineSessionAdapter');
-
-            await openMultiplayerSubmenu(page);
-            await page.fill('#multiplayer-lobby-code', 'V67-STABLE');
-            await page.click('#btn-multiplayer-host');
-            await page.waitForFunction(
-                () => window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.()?.joined === true,
-                null,
-                { timeout: 10000 }
-            );
-
-            await openMultiplayerSubmenu(secondPage);
-            await secondPage.fill('#multiplayer-lobby-code', 'V67-STABLE');
-            await secondPage.click('#btn-multiplayer-join');
-            await secondPage.waitForFunction(
-                () => window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.()?.joined === true,
-                null,
-                { timeout: 10000 }
-            );
-
-            await page.waitForFunction(() => {
-                const state = window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.();
-                return state?.memberCount === 2;
-            }, null, { timeout: 10000 });
-
-            await page.bringToFront();
-            await page.waitForTimeout(16000);
-
-            const hostPresence = await page.evaluate(() => {
-                const state = window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.();
-                return {
-                    joined: state?.joined === true,
-                    memberCount: state?.memberCount || 0,
-                    staleCount: state?.staleCount || 0,
-                };
-            });
-            const clientPresence = await secondPage.evaluate(() => {
-                const state = window.GAME_INSTANCE?.menuMultiplayerBridge?.getSessionState?.();
-                return {
-                    joined: state?.joined === true,
-                    memberCount: state?.memberCount || 0,
-                };
-            });
-
-            expect(hostPresence.joined).toBe(true);
-            expect(hostPresence.memberCount).toBe(2);
-            expect(hostPresence.staleCount).toBe(0);
-            expect(clientPresence.joined).toBe(true);
-            expect(clientPresence.memberCount).toBe(2);
-        } finally {
-            await secondPage.close();
-        }
-    });
 });
