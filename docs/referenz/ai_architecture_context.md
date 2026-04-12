@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-04-12
+Stand: 2026-04-13
 
 ## 1. Architekturparadigma
 
@@ -334,6 +334,25 @@ Stand: 2026-04-12
 - Observability bleibt bounded und copy-based im Shared-Store. Folgeblocks konsumieren Runtime-Snapshots oder Runtime-Events statt lokaler unbounded Histories, `splice()`-basierter Shadow-Queues oder aehnlicher Debug-Backdoors.
 - Desktop-/Browser-Unterschiede bleiben capability-getrieben: Host-, Discovery-, Save- und Recording-Logik liest `platform_capability_snapshot` oder benannte Adapter-Contracts und fuehrt keine neuen `game.*`, `runtimeFacade.*`, `curviosApp`- oder privaten Shell-Bypaesse ein.
 
+### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
+
+- Feldkonvention:
+  - Persistierte Store-Payloads verwenden `schemaVersion`.
+  - Import-/Export-, Transfer- und Snapshot-Huellen verwenden `contractVersion`; bestehende Replay-Huellen mit `version` werden im V85-Migrationsrahmen als kompatible Alt-Schreibweise behandelt.
+  - Runtime-, Editor- und Template-Kataloge verwenden kuenftig `descriptorVersion`.
+  - Authored Maps bleiben die bewusste Ausnahme und fuehren weiter das numerische `schemaVersion` aus `MAP_SCHEMA_VERSION`.
+- Vertragsgrenzen:
+  - Store-Key-Suffixe wie `*.v1` markieren primaer die Persistenzfamilie, nicht automatisch die fachliche Payload-Version.
+  - Replay-/Recording-Pakete bleiben nur der aeussere Transport-Umschlag; verschachtelte `snapshot_envelope`-, `gameStateSnapshot`-, `simStateSnapshot`- und `runtimeProjection`-Familien behalten ihre eigene Contract-Ownership aus dem MatchKernel-/Consumer-Pfad.
+  - Runtime-Map-Presets, Editor-Build-Kataloge und kuenftige Templates werden als ein gemeinsamer Content-Familienbaum behandelt; schema-lose JS-Objekte sind dort nur Migrationsquelle, nicht Zielvertrag.
+
+| Familie | Autoritatives Versionssignal | Architekturregel fuer Folgearbeit |
+| --- | --- | --- |
+| Settings, Menu-Stores, Arcade-Progress | `schemaVersion` im Payload; bei Settings zusaetzlich inneres `settingsVersion` | Additive Felder laufen ueber Payload-Migrationen; Key-Rollover erst bei echtem Store-Schnitt. |
+| Profil- und kuenftige Meta-Transfers | `contractVersion` plus expliziter `artifactType`/Exporttyp | Unbekannte Zukunftsversionen werden nicht still geschluckt; Legacy-Fallbacks brauchen einen dokumentierten Sunset. |
+| Replay und Snapshot-Verbrauch | aeusserer Replay-Contract plus innere Snapshot-Vertraege | Keine ad-hoc Replay-Sondershapes ausserhalb von `snapshot_envelope`/Projektionen. |
+| Content-Registries fuer Maps, Build-Katalog, Templates | `descriptorVersion` | Runtime, Editor und Import/Export lesen spaeter denselben Descriptor-Vertrag statt separater Sonderlisten. |
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
@@ -359,8 +378,11 @@ Stand: 2026-04-12
 ## 6. Verifikation
 
 - Testauswahl ueber `.agents/test_mapping.md`
-- `dev-runtime`-Reruns laufen bevorzugt ueber `node scripts/run-playwright-targeted-clusters.mjs <cluster-id...>`; pro Cluster bleiben `PW_RUN_TAG`, `PW_OUTPUT_DIR`, `playwright-startup-diagnostics.json` und `tmp-vite-*.log` als Artefaktvertrag erhalten.
-- Failure-Klassifikation fuer Playwright folgt zentral `startup|readiness|contract|runtime-regression|flake` (`tests/playwright-readiness.js` + Cluster-Runner-Ausgabe).
+- Neue Feature-Arbeit waehlt immer den leichtesten passenden Layer: `node-contract` vor `desktop-smoke`, `desktop-e2e` nur fuer produktnahe Integrationen ueber den Smoke-Kern hinaus, `browser-compat` nur fuer Browser-Demo/Web-API-/Fallback-Scope und `heavy-diagnostic` nur fuer bestehende schwere Cluster oder Diagnosebedarf.
+- `desktop-smoke` ist das primaere Produktsignal fuer die Desktop-App; es deckt App-Boot, Menu, Matchstart, Input-Ankunft und Return-to-Menu ueber die echte Electron-Shell ab.
+- `desktop-e2e`-Reruns laufen bevorzugt ueber `node scripts/run-playwright-targeted-clusters.mjs <cluster-id...>`; standardmaessig bleiben nur `core-shell`, `core-platform`, `core-surface` und `core-runtime` im produktnahen Hauptpfad, waehrend `core-regressions` und `physics-*` bewusst `heavy-diagnostic` bleiben.
+- `browser-compat` wird nur mit expliziter Spec- oder `--grep`-Selektion gefahren und bleibt auf Browser-Demo-, Web-API-, Editor- und degradierte Web-Fallback-Pfade beschraenkt.
+- Failure-Klassifikation trennt jetzt Browser und Desktop: Browser-Readiness nutzt weiter `startup|readiness|contract|runtime-regression|flake` (`tests/playwright-readiness.js`), Desktop-Laeufe klassifizieren ueber `desktop-startup|desktop-readiness|desktop-runtime-regression|desktop-flake` in `desktop-startup-diagnostics.json`.
 - Danach immer Doku-/Prozess-Check ueber `npm run docs:sync` und `npm run docs:check`
 
 ## 7. Bot-Bridge Vertrag V1 (eingefroren am 2026-03-03)
