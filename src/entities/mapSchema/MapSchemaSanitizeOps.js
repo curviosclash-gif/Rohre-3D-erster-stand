@@ -1,5 +1,5 @@
 import { DEFAULT_ARENA_SIZE, MAP_SCHEMA_VERSION } from './MapSchemaConstants.js';
-import { normalizePickupType } from '../PickupRegistry.js';
+import { getPickupDefinition, normalizePickupType } from '../PickupRegistry.js';
 
 export function asFiniteNumber(value, fallback = 0) {
     const parsed = Number(value);
@@ -355,8 +355,10 @@ function sanitizePortalList(rawPortals, options = {}) {
     return portals;
 }
 
-export function sanitizeItem(raw) {
+export function sanitizeItem(raw, options = {}) {
     const source = raw && typeof raw === 'object' ? raw : {};
+    const warnings = Array.isArray(options.warnings) ? options.warnings : null;
+    const itemLabel = sanitizeOptionalId(source.id) || `#${Math.max(1, Math.trunc(Number(options.index) || 0) + 1)}`;
     const result = withOptionalId({
         type: String(source.type || 'item_crystal'),
         x: asFiniteNumber(source.x, 0),
@@ -369,7 +371,16 @@ export function sanitizeItem(raw) {
     const normalizedPickupType = normalizePickupType(source.pickupType, {
         fallback: typeof source.pickupType === 'string' ? source.pickupType : '',
     });
-    withOptionalStringField(result, 'pickupType', normalizedPickupType);
+    if (normalizedPickupType) {
+        if (getPickupDefinition(normalizedPickupType)) {
+            withOptionalStringField(result, 'pickupType', normalizedPickupType);
+        } else {
+            pushSanitizeWarning(
+                warnings,
+                `Item anchor ${itemLabel} uses unsupported pickupType "${normalizedPickupType}"; runtime falls back to item type/model.`
+            );
+        }
+    }
     return result;
 }
 
@@ -404,8 +415,9 @@ export function sanitizePortalLevels(raw) {
     return uniqueLevels;
 }
 
-export function sanitizeGate(raw) {
+export function sanitizeGate(raw, options = {}) {
     const source = raw && typeof raw === 'object' ? raw : {};
+    const warnings = Array.isArray(options.warnings) ? options.warnings : null;
     const typeInfo = normalizeGateType(source.type);
     const fallbackPosition = [0, 0, 0];
     const pos = Array.isArray(source.pos)
@@ -443,6 +455,7 @@ export function sanitizeGate(raw) {
     }
     if (typeInfo.warningCode) {
         result.warningCode = typeInfo.warningCode;
+        pushSanitizeWarning(warnings, `Unknown gate type "${typeInfo.sourceType}" normalized to "${typeInfo.type}".`);
     }
 
     return result;
@@ -470,7 +483,7 @@ function sanitizeGateList(rawGates, options = {}) {
             return;
         }
 
-        gates.push(sanitizeGate(entry));
+        gates.push(sanitizeGate(entry, { warnings }));
     });
 
     return gates;
@@ -485,7 +498,7 @@ export function normalizeMapSchemaDocument(rawMap, options = {}) {
     const playerSpawnDefault = { x: -800, y: arenaSize.height * 0.55, z: 0 };
     const warnings = Array.isArray(options.warnings) ? options.warnings : null;
     const portals = sanitizePortalList(rawMap.portals, { warnings });
-    const items = asArray(rawMap.items).map((entry) => sanitizeItem(entry));
+    const items = asArray(rawMap.items).map((entry, index) => sanitizeItem(entry, { warnings, index }));
 
     const normalized = withOptionalStringField({
         schemaVersion: MAP_SCHEMA_VERSION,

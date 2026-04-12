@@ -547,6 +547,39 @@ test.describe('T1-20: Core & Infrastruktur - Shell & Setup', () => {
         expect(pickupType).toBe('ROCKET_HEAVY');
     });
 
+    test('T14ea1: Editor-Export meldet invalides pickupType, Gate-Typ und Spawn-Metadaten frueh sichtbar', async () => {
+        const manager = createMockEditorManager();
+        manager.mapDocumentMeta = {
+            portalMode: 'scripted',
+            itemSpawnMode: 'anchors',
+            gates: [
+                { id: 'gate_legacy', type: 'boost_plus', pos: [0, 12, 0] },
+            ],
+        };
+        manager.createMesh('item', 'item_battery', 0, 14, 0, 0, {
+            id: 'anchor_invalid',
+            pickupType: 'LASER_BEAM',
+        });
+
+        const exported = generateJSONExport(manager, { width: 280, height: 110, depth: 280 });
+        const roundtrip = parseMapJSON(exported).map;
+
+        expect(manager.lastSchemaWarnings).toEqual(expect.arrayContaining([
+            'Unsupported portalMode "scripted" normalized to "dynamic".',
+            'Unsupported itemSpawnMode "anchors" normalized to "anchor-only".',
+            'Unknown gate type "boost_plus" normalized to "boost".',
+            'Item anchor anchor_invalid uses unsupported pickupType "LASER_BEAM"; runtime falls back to item type/model.',
+        ]));
+        expect(roundtrip.portalMode).toBe('dynamic');
+        expect(roundtrip.itemSpawnMode).toBe('anchor-only');
+        expect(roundtrip.gates[0]).toMatchObject({
+            type: 'boost',
+            legacyType: 'boost_plus',
+            warningCode: 'map.warning.gate-type',
+        });
+        expect(roundtrip.items[0]?.pickupType).toBeUndefined();
+    });
+
     test('T14eb: Runtime-Warnungen machen Portalmodus, Spawnmodus und Legacy-Gates sichtbar', async () => {
         const sourceDocument = {
             arenaSize: { width: 280, height: 110, depth: 280 },

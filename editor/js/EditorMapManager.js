@@ -20,6 +20,7 @@ export class EditorMapManager {
         this._pendingHudRefresh = false;
         this._pendingTunnelVisualRefresh = false;
         this.mapDocumentMeta = {};
+        this.lastSchemaWarnings = [];
 
         this.setCallbacks(options?.callbacks || options);
         this.setupPrimitives();
@@ -268,6 +269,7 @@ export class EditorMapManager {
         this.withSceneMutation(() => {
             this.callbacks.onBeforeManagedObjectsCleared?.();
             this.mapDocumentMeta = {};
+            this.lastSchemaWarnings = [];
 
             const objects = [...this.core.objectsContainer.children];
             for (const object of objects) {

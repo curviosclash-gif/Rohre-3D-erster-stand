@@ -90,8 +90,26 @@ function extractMapMetadata(data) {
     return metadata;
 }
 
+function dedupeWarnings(warnings) {
+    const result = [];
+    const seen = new Set();
+    for (const warning of Array.isArray(warnings) ? warnings : []) {
+        if (typeof warning !== 'string') continue;
+        const normalized = warning.trim();
+        if (!normalized || seen.has(normalized)) continue;
+        seen.add(normalized);
+        result.push(normalized);
+    }
+    return result;
+}
+
+function storeSchemaWarnings(manager, warnings) {
+    if (!manager || typeof manager !== 'object') return;
+    manager.lastSchemaWarnings = dedupeWarnings(warnings);
+}
+
 export function generateJSONExport(manager, arenaSize) {
-    const payload = createMapDocument({
+    const payload = {
         ...readManagerMapMetadata(manager),
         arenaSize,
         tunnels: [],
@@ -102,7 +120,7 @@ export function generateJSONExport(manager, arenaSize) {
         items: [],
         aircraft: [],
         playerSpawn: { x: -800, y: arenaSize.height * 0.55, z: 0 },
-    });
+    };
 
     const editorCheckpoints = [];
 
@@ -226,7 +244,10 @@ export function generateJSONExport(manager, arenaSize) {
         // Preserve existing parcours metadata if no checkpoints were placed
     }
 
-    return JSON.stringify(payload, null, 2);
+    const warnings = [];
+    const normalizedPayload = createMapDocument(payload, { warnings });
+    storeSchemaWarnings(manager, warnings);
+    return JSON.stringify(normalizedPayload, null, 2);
 }
 
 export function importFromJSON(manager, jsonString, options = {}) {
@@ -246,6 +267,7 @@ export function importFromJSON(manager, jsonString, options = {}) {
         }
 
         manager.clearAllObjects();
+        storeSchemaWarnings(manager, parsed.warnings);
         manager.mapDocumentMeta = extractMapMetadata(data);
 
         manager.withSceneMutation(() => {
@@ -343,8 +365,14 @@ export function importFromJSON(manager, jsonString, options = {}) {
 
             manager.queueSceneUiRefresh({ tunnelVisuals: true });
         });
+        return {
+            map: data,
+            warnings: dedupeWarnings(parsed.warnings),
+        };
     } catch (e) {
+        storeSchemaWarnings(manager, []);
         console.error('[EditorMapManager] Map import failed:', e);
         alert(`Map Import Error: ${e.message}`);
+        return null;
     }
 }

@@ -5,6 +5,25 @@ import { getJsonEditorText, setJsonEditorText } from './EditorFormState.js';
 const LAST_DISK_MAP_NAME_STORAGE_KEY = 'editor_last_disk_map_name';
 const DEFAULT_DISK_MAP_NAME = 'Editor Map';
 
+function dedupeWarnings(warnings) {
+    const result = [];
+    const seen = new Set();
+    for (const warning of Array.isArray(warnings) ? warnings : []) {
+        if (typeof warning !== 'string') continue;
+        const normalized = warning.trim();
+        if (!normalized || seen.has(normalized)) continue;
+        seen.add(normalized);
+        result.push(normalized);
+    }
+    return result;
+}
+
+function formatWarningsMessage(title, warnings) {
+    const uniqueWarnings = dedupeWarnings(warnings);
+    if (uniqueWarnings.length === 0) return '';
+    return `${title}\n- ${uniqueWarnings.join('\n- ')}`;
+}
+
 function promptForDiskMapName() {
     let defaultName = DEFAULT_DISK_MAP_NAME;
     try {
@@ -40,16 +59,22 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     if (!editor) return;
     const dom = editor.dom;
 
-    const generateCurrentMapJson = () => editor.mapManager.generateJSONExport(editor.getArenaSizeForExport());
+    const generateCurrentMapJson = () => {
+        const jsonText = editor.mapManager.generateJSONExport(editor.getArenaSizeForExport());
+        return {
+            jsonText,
+            warnings: dedupeWarnings(editor.mapManager?.lastSchemaWarnings),
+        };
+    };
 
     const saveCurrentMapToGameStorage = () => {
-        const jsonText = generateCurrentMapJson();
+        const { jsonText, warnings } = generateCurrentMapJson();
         localStorage.setItem(CUSTOM_MAP_STORAGE_KEY, jsonText);
-        return jsonText;
+        return { jsonText, warnings };
     };
 
     const saveCurrentMapToDisk = async (mapName) => {
-        const jsonText = generateCurrentMapJson();
+        const { jsonText, warnings: exportWarnings } = generateCurrentMapJson();
         const response = await fetch(EDITOR_API_ROUTES.SAVE_MAP_DISK, {
             method: 'POST',
             headers: {
@@ -72,11 +97,20 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
             throw new Error(payload?.error || `HTTP ${response.status} while saving map to disk.`);
         }
 
-        return { jsonText, payload };
+        return {
+            jsonText,
+            payload,
+            warnings: dedupeWarnings([...(exportWarnings || []), ...(payload?.warnings || [])]),
+        };
     };
 
     dom.btnExport?.addEventListener("click", () => {
-        setJsonEditorText(editor, generateCurrentMapJson());
+        const { jsonText, warnings } = generateCurrentMapJson();
+        setJsonEditorText(editor, jsonText);
+        const warningMessage = formatWarningsMessage('Map exportiert mit Hinweisen:', warnings);
+        if (warningMessage) {
+            alert(warningMessage);
+        }
     });
 
     dom.btnSaveToGame?.addEventListener("click", async () => {
@@ -93,11 +127,11 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
         }
 
         try {
-            const { jsonText, payload } = await saveCurrentMapToDisk(requestedMapName);
+            const { jsonText, payload, warnings } = await saveCurrentMapToDisk(requestedMapName);
             setJsonEditorText(editor, jsonText);
 
-            const warnings = Array.isArray(payload.warnings) && payload.warnings.length > 0
-                ? `\nHinweise: ${payload.warnings.join(' | ')}`
+            const warningSuffix = warnings.length > 0
+                ? `\nHinweise: ${warnings.join(' | ')}`
                 : '';
             const saveMode = payload.overwritten ? 'aktualisiert' : 'neu gespeichert';
 
@@ -108,7 +142,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
                 `Runtime-Datei: ${payload.runtimeMapPath}\n` +
                 `Registry: ${payload.generatedModulePath}\n` +
                 `Spielseite neu laden, damit der Eintrag sichtbar ist.` +
-                warnings
+                warningSuffix
             );
         } catch (error) {
             alert(
@@ -119,11 +153,20 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     });
 
     dom.btnPlaytest?.addEventListener("click", () => {
+        let warnings = [];
         try {
-            saveCurrentMapToGameStorage();
+            ({ warnings } = saveCurrentMapToGameStorage());
         } catch (error) {
             alert(`Playtest konnte nicht gespeichert werden: ${error.message}`);
             return;
+        }
+
+        const warningMessage = formatWarningsMessage(
+            'Playtest startet mit normalisierten Map-Hinweisen:',
+            warnings
+        );
+        if (warningMessage) {
+            alert(warningMessage);
         }
 
         const playtestMode = String(dom.selPlaytestMode?.value || '3d').toLowerCase();
@@ -156,6 +199,14 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
                 }
             });
         });
+
+        const warningMessage = formatWarningsMessage(
+            'Map importiert mit Hinweisen:',
+            editor.mapManager?.lastSchemaWarnings
+        );
+        if (warningMessage) {
+            alert(warningMessage);
+        }
     });
 
     dom.btnNew?.addEventListener("click", () => {

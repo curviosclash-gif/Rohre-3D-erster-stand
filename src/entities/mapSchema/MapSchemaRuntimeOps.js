@@ -280,12 +280,6 @@ export function toArenaMapDefinition(mapDocument, options = {}) {
         color: gate.color,
         params: gate.params ? { ...gate.params } : undefined,
     }));
-    for (const gate of gates) {
-        if (gate.warningCode && gate.legacyType) {
-            warnings.push(`Unknown gate type "${gate.legacyType}" normalized to "${gate.type}".`);
-        }
-    }
-
     const parcours = mapParcoursToRuntime(normalized.parcours, invScale);
 
     return {

@@ -54,6 +54,7 @@ function buildLegacyRuntimeCustomMap(obstacles = [], options = {}) {
 function createMockEditorManager() {
     return {
         mapDocumentMeta: {},
+        lastSchemaWarnings: [],
         core: {
             objectsContainer: {
                 children: [],
@@ -62,6 +63,7 @@ function createMockEditorManager() {
         clearAllObjects() {
             this.core.objectsContainer.children = [];
             this.mapDocumentMeta = {};
+            this.lastSchemaWarnings = [];
         },
         withSceneMutation(fn) {
             return fn();

@@ -1,6 +1,6 @@
 # Gameplay-Referenz: Powerups, Portale und Gates
 
-Stand: 2026-04-10
+Stand: 2026-04-11
 
 ## Zweck
 
@@ -104,11 +104,12 @@ Maps koennen folgende Felder verwenden:
 - `portalLevels`: feste Hoehen fuer Planar-Portal-/Item-Layouts.
 - `itemSpawnMode`: `anchor-only`, `hybrid` oder `fallback-random`; authored Anker werden in `fallback-random` bewusst ignoriert und als Runtime-Warnung gespiegelt.
 - Ungueltige `itemSpawnMode`-Werte werden deterministisch auf `anchor-only`/`fallback-random` normalisiert und als Warnhinweis protokolliert.
+- Editor-Export, Disk-Save, Import und Playtest zeigen dieselben Schema-Hinweise jetzt bereits vor dem Runtime-Load sichtbar an.
 - `anchor-only` deaktiviert Random-Fallback strikt: ohne verfuegbare authored Anchors entstehen keine neuen Item-Spawns.
 - `hybrid` nutzt bevorzugt authored Anchors und faellt ohne Anchor sichtbar auf Random-Spawn zurueck.
 - `toArenaMapDefinition()` liefert den Spawnvertrag unter `map.itemSpawnAuthoring` (`mode`, `authoredAnchorCount`, `requiresAuthoredAnchor`, `usesAuthoredAnchors`, `usesRandomFallback`, `disablesSpawnWithoutAnchor`).
 - `gates`: `boost`- oder `slingshot`-Definitionen.
-- `items`: feste Pickup-Anker mit optionalem `pickupType`.
+- `items`: feste Pickup-Anker mit optionalem `pickupType`; ungueltige Typen werden beim Schema-Export sichtbar gemeldet und fallen deterministisch auf `type`/`model` zurueck.
 - `exitPortal`: einzelnes Exit-Portal mit optionaler spaeter Aktivierung.
 
 ## Relevante Runtime-Module
