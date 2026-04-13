@@ -383,6 +383,14 @@ Stand: 2026-04-13
 - `CustomMapLoader` plus `CustomMapSelectionResolver` validieren bekannte Runtime-Map-Keys und Fallback (`standard` bevorzugt) ueber denselben Runtime-Descriptor-Satz, sodass Import-/Selection-Fallbacks und Runtime-Katalog denselben Keyraum erzwingen.
 - `ArcadeMissionState` und `vehicle-registry` lesen zulaessige Missions- bzw. Vehicle-IDs aus den Descriptor-Registries statt aus lokalen Objekt-Keylisten, wodurch Folgearbeit auf derselben Vertragskante erweitert werden kann.
 
+#### 4.6.5.5 Import-/Capability-Grenzen fuer Datei, Browser, Desktop, Editor und Templates haerten (`V85 85.4.1`)
+
+- Menu-Config-Transfer fuehrt jetzt einen expliziten Envelope `menu-config-share.v1` (`contractVersion`, `payload`, `exportedAt`) ein; Imports ohne Envelope bleiben als Legacy-Fallback lesbar, waehrend unbekannte Zukunftsversionen bewusst rejected werden.
+- Editor-Disk-API (`/api/editor/*`) arbeitet jetzt auf einem gemeinsamen Datei-/Import-Vertrag `editor-disk-io.v1`: Renderer sendet die Contract-Version bei Save-Requests, API validiert sie bei expliziter Angabe und liefert dieselbe Contract-Version in Antworten zurueck.
+- Browserseitige Custom-Map-Imports liefern einen expliziten Capability-Descriptor `custom-map-storage-capability.v1` (`providerKind`, `available`, `degradedReason`) statt impliziter Nullpfade bei fehlender Storage-Verfuegbarkeit.
+- Desktop-Recording-Exports pruefen die Contract-Version des Electron-Save-Adapters vor App-Save-Versuchen; ungueltige oder unbekannte Adapter-Vertraege werden nicht implizit genutzt und fallen sauber auf Browser-Download/API-Fallback zurueck.
+- Template-Pfade bleiben ueber den Descriptorvertrag explizit sichtbar: `resolveEditorTemplateImportCapability()` liefert fuer den weiterhin fehlenden Pfad `editor/templates/**` einen expliziten `available=false`-Status mit `degradedReason` statt stiller Ignorierung.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |

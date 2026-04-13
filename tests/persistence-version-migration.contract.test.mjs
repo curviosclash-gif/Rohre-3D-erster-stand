@@ -4,6 +4,11 @@ import test from 'node:test';
 import { REPLAY_EXPORT_CONTRACT_VERSION, ReplayRecorder } from '../src/core/replay/ReplayRecorder.js';
 import { MAP_SCHEMA_VERSION } from '../src/entities/mapSchema/MapSchemaConstants.js';
 import { migrateMapDocument } from '../src/entities/mapSchema/MapSchemaMigrationOps.js';
+import {
+    CUSTOM_MAP_STORAGE_CAPABILITY_CONTRACT_VERSION,
+    loadCustomMapFromStorage,
+    resolveCustomMapStorageCapability,
+} from '../src/entities/CustomMapLoader.js';
 import { loadVehicleProfiles } from '../src/state/arcade/ArcadeVehicleProfile.js';
 import {
     ARTIFACT_VERSION_DECISIONS,
@@ -12,6 +17,11 @@ import {
 import { SettingsStore } from '../src/ui/SettingsStore.js';
 import { createVehicleManagerLoadoutPresetStore } from '../src/ui/arcade/vehicle-manager/VehicleManagerLoadoutPresets.js';
 import { MenuDraftStore } from '../src/ui/menu/MenuDraftStore.js';
+import {
+    exportMenuConfigAsJson,
+    importMenuConfigFromInput,
+    MENU_CONFIG_SHARE_CONTRACT_VERSION,
+} from '../src/ui/menu/MenuConfigShareOps.js';
 import { MenuTelemetryStore } from '../src/ui/menu/MenuTelemetryStore.js';
 import { MenuTextOverrideStore } from '../src/ui/menu/MenuTextOverrideStore.js';
 import { parseProfileImport } from '../src/ui/ProfileTransferOps.js';
@@ -135,6 +145,37 @@ test('V85.2 replay exports include contractVersion and legacy version alias', ()
     assert.equal(replay.version, REPLAY_EXPORT_CONTRACT_VERSION);
 });
 
+test('V85.4 menu config share import/export validates contractVersion with legacy fallback', () => {
+    const exportedPayload = JSON.parse(exportMenuConfigAsJson({
+        mapKey: 'arena_simple',
+        numBots: 2,
+        localSettings: { sessionType: 'solo' },
+    }));
+    assert.equal(exportedPayload.contractVersion, MENU_CONFIG_SHARE_CONTRACT_VERSION);
+    assert.ok(exportedPayload.payload && typeof exportedPayload.payload === 'object');
+
+    const settings = {};
+    const importResult = importMenuConfigFromInput(settings, JSON.stringify(exportedPayload));
+    assert.equal(importResult.success, true);
+    assert.equal(importResult.usedLegacyFallback, false);
+    assert.equal(settings.mapKey, 'arena_simple');
+
+    const legacyResult = importMenuConfigFromInput(settings, JSON.stringify({
+        mapKey: 'arena_legacy',
+        numBots: 1,
+    }));
+    assert.equal(legacyResult.success, true);
+    assert.equal(legacyResult.usedLegacyFallback, true);
+    assert.equal(settings.mapKey, 'arena_legacy');
+
+    const rejectResult = importMenuConfigFromInput(settings, JSON.stringify({
+        contractVersion: 'menu-config-share.v9',
+        payload: { mapKey: 'arena_reject' },
+    }));
+    assert.equal(rejectResult.success, false);
+    assert.equal(rejectResult.reason, 'unsupported_contract_version');
+});
+
 test('V85.2 settings profiles migrate legacy arrays into schema envelope', () => {
     const platform = createMemoryStoragePlatform({
         'cuviosclash.settings-profiles.v1': [
@@ -237,4 +278,23 @@ test('V85.2 arcade persistence drops rejected future schemas and rewrites legacy
     const presets = loadoutPresetStore.listPresets('ship5');
     assert.equal(presets.length, 1);
     assert.equal(loadoutStore.saved?.schemaVersion, 'arcade-vehicle-loadouts.v1');
+});
+
+test('V85.4 custom-map import exposes explicit browser storage capability contract', () => {
+    const capability = resolveCustomMapStorageCapability();
+    assert.equal(capability.contractVersion, CUSTOM_MAP_STORAGE_CAPABILITY_CONTRACT_VERSION);
+    assert.equal(typeof capability.available, 'boolean');
+    if (capability.available) {
+        assert.equal(capability.degradedReason, '');
+    } else {
+        assert.equal(capability.degradedReason, 'storage_unavailable');
+    }
+
+    const result = loadCustomMapFromStorage();
+    assert.equal(result.capability?.contractVersion, CUSTOM_MAP_STORAGE_CAPABILITY_CONTRACT_VERSION);
+    if (result.ok) {
+        assert.equal(result.capability?.available, true);
+    } else {
+        assert.equal(typeof result.error, 'string');
+    }
 });

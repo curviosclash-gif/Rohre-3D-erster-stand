@@ -20,9 +20,24 @@ import { createLogger } from '../shared/logging/Logger.js';
 const LEGACY_EDITOR_PLAYTEST_SCALE = 35;
 const LEGACY_EDITOR_LARGE_DIM_THRESHOLD = 500;
 const logger = createLogger('CustomMapLoader');
+export const CUSTOM_MAP_STORAGE_CAPABILITY_CONTRACT_VERSION = 'custom-map-storage-capability.v1';
+export const CUSTOM_MAP_STORAGE_PROVIDER_KIND = 'browser-local-storage';
 
 function getStorage(storageOverride) {
     return resolveLocalStorage(storageOverride);
+}
+
+export function resolveCustomMapStorageCapability(storageOverride) {
+    const storage = getStorage(storageOverride);
+    const available = !!storage
+        && typeof storage.getItem === 'function'
+        && typeof storage.setItem === 'function';
+    return Object.freeze({
+        contractVersion: CUSTOM_MAP_STORAGE_CAPABILITY_CONTRACT_VERSION,
+        providerKind: CUSTOM_MAP_STORAGE_PROVIDER_KIND,
+        available,
+        degradedReason: available ? '' : 'storage_unavailable',
+    });
 }
 
 function getRuntimeScale() {
@@ -58,12 +73,14 @@ function getCustomMapConversionScale(mapDocument) {
 }
 
 export function loadCustomMapFromStorage(storageOverride) {
+    const capability = resolveCustomMapStorageCapability(storageOverride);
     const storage = getStorage(storageOverride);
-    if (!storage) {
+    if (!capability.available || !storage) {
         return {
             ok: false,
-            error: 'localStorage is not available.',
+            error: 'localStorage is not available for custom-map import.',
             warnings: [],
+            capability,
         };
     }
 
@@ -75,6 +92,7 @@ export function loadCustomMapFromStorage(storageOverride) {
             ok: false,
             error: `Unable to read localStorage key "${CUSTOM_MAP_STORAGE_KEY}": ${error.message}`,
             warnings: [],
+            capability,
         };
     }
 
@@ -83,6 +101,7 @@ export function loadCustomMapFromStorage(storageOverride) {
             ok: false,
             error: `No custom map found in localStorage key "${CUSTOM_MAP_STORAGE_KEY}".`,
             warnings: [],
+            capability,
         };
     }
 
@@ -102,6 +121,7 @@ export function loadCustomMapFromStorage(storageOverride) {
                 ...(conversionScale.warning ? [conversionScale.warning] : []),
                 ...converted.warnings,
             ],
+            capability,
         };
     } catch (error) {
         logger.error('Error parsing custom map:', error);
@@ -109,6 +129,7 @@ export function loadCustomMapFromStorage(storageOverride) {
             ok: false,
             error: error.message || 'Unknown custom map parsing error.',
             warnings: [],
+            capability,
         };
     }
 }

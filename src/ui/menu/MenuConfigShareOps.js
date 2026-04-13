@@ -1,4 +1,9 @@
 import { createMenuConfigSharePayloadDefaults } from './MenuDefaultsEditorConfig.js';
+import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
+
+export const MENU_CONFIG_SHARE_CONTRACT_VERSION = 'menu-config-share.v1';
+const MENU_CONFIG_SHARE_VERSION_FIELDS = Object.freeze(['contractVersion']);
+const MENU_CONFIG_SHARE_SUPPORTED_VERSIONS = Object.freeze([MENU_CONFIG_SHARE_CONTRACT_VERSION]);
 
 function deepClone(value) {
     return JSON.parse(JSON.stringify(value));
@@ -71,11 +76,19 @@ function applySharePayload(settings, payload) {
 }
 
 export function exportMenuConfigAsJson(settings) {
-    return JSON.stringify(createSharePayload(settings), null, 2);
+    return JSON.stringify({
+        contractVersion: MENU_CONFIG_SHARE_CONTRACT_VERSION,
+        exportedAt: Date.now(),
+        payload: createSharePayload(settings),
+    }, null, 2);
 }
 
 export function exportMenuConfigAsCode(settings) {
-    const json = JSON.stringify(createSharePayload(settings));
+    const json = JSON.stringify({
+        contractVersion: MENU_CONFIG_SHARE_CONTRACT_VERSION,
+        exportedAt: Date.now(),
+        payload: createSharePayload(settings),
+    });
     try {
         return btoa(unescape(encodeURIComponent(json)));
     } catch {
@@ -103,11 +116,40 @@ export function importMenuConfigFromInput(settings, inputValue) {
         return { success: false, reason: 'invalid_payload' };
     }
 
-    const applied = applySharePayload(settings, payload);
+    const versionState = resolveArtifactVersionState(payload, {
+        artifactType: 'menu-config-share',
+        versionFields: MENU_CONFIG_SHARE_VERSION_FIELDS,
+        supportedVersions: MENU_CONFIG_SHARE_SUPPORTED_VERSIONS,
+        currentVersion: MENU_CONFIG_SHARE_CONTRACT_VERSION,
+        allowMissingVersion: true,
+    });
+    const hasExplicitContractVersion = Object.prototype.hasOwnProperty.call(payload, 'contractVersion');
+    if ((versionState.shouldReject || versionState.resolvedVersion === null) && hasExplicitContractVersion) {
+        return {
+            success: false,
+            reason: 'unsupported_contract_version',
+            error: 'Config-Import verwendet eine ungueltige contractVersion.',
+        };
+    }
+
+    const sourcePayload = versionState.hasVersionField
+        ? payload.payload
+        : payload;
+    if (!sourcePayload || typeof sourcePayload !== 'object' || Array.isArray(sourcePayload)) {
+        return {
+            success: false,
+            reason: 'invalid_payload_shape',
+            error: 'Config-Import-Huelle ist unvollstaendig (payload fehlt).',
+        };
+    }
+
+    const applied = applySharePayload(settings, sourcePayload);
     return {
         success: applied,
         reason: applied ? 'imported' : 'apply_failed',
-        payload,
+        payload: sourcePayload,
+        contractVersion: versionState.hasVersionField ? MENU_CONFIG_SHARE_CONTRACT_VERSION : null,
+        usedLegacyFallback: !versionState.hasVersionField,
     };
 }
 

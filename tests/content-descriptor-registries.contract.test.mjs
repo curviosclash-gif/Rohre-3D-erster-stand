@@ -17,6 +17,7 @@ import {
     getEditorBuildCatalogDescriptor,
     getEditorBuildEntriesForCategory,
     getEditorTemplateRegistryDescriptor,
+    resolveEditorTemplateImportCapability,
 } from '../editor/js/ui/EditorBuildCatalog.js';
 import {
     getArcadeMissionRegistryDescriptor,
@@ -59,6 +60,10 @@ test('V85.3 content descriptors expose shared registry envelopes', () => {
     assertRegistryEnvelope(editorTemplateRegistry, CONTENT_DESCRIPTOR_TYPES.EDITOR_TEMPLATES);
     assert.equal(editorTemplateRegistry.status, 'missing');
     assert.equal(editorTemplateRegistry.entryCount, 0);
+    const templateCapability = resolveEditorTemplateImportCapability(editorTemplateRegistry);
+    assert.equal(templateCapability.available, false);
+    assert.equal(templateCapability.degradedReason, 'templates_path_not_present');
+    assert.equal(templateCapability.descriptorVersion, CONTENT_DESCRIPTOR_VERSION);
 
     const missionRegistry = getArcadeMissionRegistryDescriptor();
     assertRegistryEnvelope(missionRegistry, CONTENT_DESCRIPTOR_TYPES.ARCADE_MISSIONS);

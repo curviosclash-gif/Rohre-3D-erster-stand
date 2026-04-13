@@ -3,6 +3,8 @@ export const EDITOR_VIEW_PATHS = Object.freeze({
     VEHICLE_LAB: '/prototypes/vehicle-lab/index.html',
 });
 
+export const EDITOR_DISK_IO_CONTRACT_VERSION = 'editor-disk-io.v1';
+
 export const EDITOR_API_ROUTES = Object.freeze({
     SAVE_MAP_DISK: '/api/editor/save-map-disk',
     SAVE_VEHICLE_DISK: '/api/editor/save-vehicle-disk',

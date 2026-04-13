@@ -1,9 +1,15 @@
 import { CUSTOM_MAP_STORAGE_KEY } from '../../../src/entities/MapSchema.js';
-import { EDITOR_API_ROUTES } from '../../../src/shared/contracts/EditorPathContract.js';
+import {
+    EDITOR_API_ROUTES,
+    EDITOR_DISK_IO_CONTRACT_VERSION,
+} from '../../../src/shared/contracts/EditorPathContract.js';
+import { resolveArtifactVersionState } from '../../../src/shared/contracts/ArtifactVersionMigrationContract.js';
 import { getJsonEditorText, setJsonEditorText } from './EditorFormState.js';
 
 const LAST_DISK_MAP_NAME_STORAGE_KEY = 'editor_last_disk_map_name';
 const DEFAULT_DISK_MAP_NAME = 'Editor Map';
+const EDITOR_DISK_IO_VERSION_FIELDS = Object.freeze(['contractVersion']);
+const EDITOR_DISK_IO_SUPPORTED_VERSIONS = Object.freeze([EDITOR_DISK_IO_CONTRACT_VERSION]);
 
 function dedupeWarnings(warnings) {
     const result = [];
@@ -55,6 +61,34 @@ function promptForDiskMapName() {
     return name;
 }
 
+function hasExplicitContractVersion(payload) {
+    return !!payload
+        && typeof payload === 'object'
+        && Object.prototype.hasOwnProperty.call(payload, 'contractVersion');
+}
+
+function resolveEditorDiskIoVersionState(payload, allowMissingVersion = true) {
+    return resolveArtifactVersionState(payload && typeof payload === 'object' ? payload : {}, {
+        artifactType: 'editor-disk-io',
+        versionFields: EDITOR_DISK_IO_VERSION_FIELDS,
+        supportedVersions: EDITOR_DISK_IO_SUPPORTED_VERSIONS,
+        currentVersion: EDITOR_DISK_IO_CONTRACT_VERSION,
+        allowMissingVersion,
+    });
+}
+
+function resolveEditorDiskSaveCapability(runtimeGlobal = globalThis) {
+    const globalRef = runtimeGlobal && typeof runtimeGlobal === 'object' ? runtimeGlobal : globalThis;
+    const fetchImpl = typeof globalRef.fetch === 'function'
+        ? globalRef.fetch.bind(globalRef)
+        : (typeof fetch === 'function' ? fetch : null);
+    return {
+        available: typeof fetchImpl === 'function',
+        fetchImpl,
+        reason: typeof fetchImpl === 'function' ? '' : 'fetch_unavailable',
+    };
+}
+
 export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     if (!editor) return;
     const dom = editor.dom;
@@ -74,13 +108,18 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     };
 
     const saveCurrentMapToDisk = async (mapName) => {
+        const diskCapability = resolveEditorDiskSaveCapability(window);
+        if (!diskCapability.available) {
+            throw new Error('Editor-Disk-Import/Export ist in dieser Umgebung nicht verfuegbar (fetch fehlt).');
+        }
         const { jsonText, warnings: exportWarnings } = generateCurrentMapJson();
-        const response = await fetch(EDITOR_API_ROUTES.SAVE_MAP_DISK, {
+        const response = await diskCapability.fetchImpl(EDITOR_API_ROUTES.SAVE_MAP_DISK, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                contractVersion: EDITOR_DISK_IO_CONTRACT_VERSION,
                 jsonText,
                 mapName
             })
@@ -91,6 +130,14 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
             payload = await response.json();
         } catch {
             payload = null;
+        }
+
+        const responseVersionState = resolveEditorDiskIoVersionState(payload, true);
+        if (hasExplicitContractVersion(payload) && (
+            responseVersionState.shouldReject
+            || responseVersionState.resolvedVersion === null
+        )) {
+            throw new Error('Editor-Disk-Import/Export antwortet mit ungueltiger contractVersion.');
         }
 
         if (!response.ok || !payload?.ok) {

@@ -1,6 +1,32 @@
 import { EDITOR_API_ROUTES } from '../../shared/contracts/EditorPathContract.js';
+import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
+
+const DESKTOP_SAVE_VERSION_FIELDS = Object.freeze(['contractVersion']);
+const DESKTOP_SAVE_SUPPORTED_VERSIONS = Object.freeze(['preload.save.v1']);
+const DESKTOP_SAVE_CURRENT_VERSION = 'preload.save.v1';
+
+function resolveDesktopSaveContractState(adapter) {
+    return resolveArtifactVersionState(adapter && typeof adapter === 'object' ? adapter : {}, {
+        artifactType: 'desktop-save-adapter',
+        versionFields: DESKTOP_SAVE_VERSION_FIELDS,
+        supportedVersions: DESKTOP_SAVE_SUPPORTED_VERSIONS,
+        currentVersion: DESKTOP_SAVE_CURRENT_VERSION,
+        allowMissingVersion: true,
+    });
+}
+
+function isSupportedDesktopSaveAdapterContract(adapter) {
+    const versionState = resolveDesktopSaveContractState(adapter);
+    const hasExplicitContractVersion = !!adapter
+        && typeof adapter === 'object'
+        && Object.prototype.hasOwnProperty.call(adapter, 'contractVersion');
+    if (!hasExplicitContractVersion) {
+        return true;
+    }
+    return !versionState.shouldReject && versionState.resolvedVersion !== null;
+}
 
 /**
  * Triggers a browser anchor-click download for the given Blob.
@@ -67,6 +93,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     const safeFileName = String(fileName || '').trim();
     const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
     const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
+    const desktopSaveAdapterVersionSupported = isSupportedDesktopSaveAdapterContract(desktopSaveAdapter);
     const browserSaveAdapter = createBrowserSaveAdapter({
         saveVideo: (payload, downloadFileName, resolvedMimeType) => {
             const blobPayload = payload instanceof Blob
@@ -90,7 +117,15 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
         logger?.warn?.('[DownloadService] recording export browser download failed', result?.error || null);
         return false;
     };
-    if (desktopSaveAdapter.isAvailable() && typeof desktopSaveAdapter.saveVideo === 'function' && typeof blob.arrayBuffer === 'function') {
+    if (desktopSaveAdapter.isAvailable() && !desktopSaveAdapterVersionSupported) {
+        logger?.warn?.('[DownloadService] recording export desktop save skipped due to unsupported adapter contractVersion', desktopSaveAdapter?.contractVersion || null);
+    }
+    if (
+        desktopSaveAdapterVersionSupported
+        && desktopSaveAdapter.isAvailable()
+        && typeof desktopSaveAdapter.saveVideo === 'function'
+        && typeof blob.arrayBuffer === 'function'
+    ) {
         try {
             const bytes = new Uint8Array(await blob.arrayBuffer());
             const appResult = await desktopSaveAdapter.saveVideo(bytes, browserFileName, mimeType);

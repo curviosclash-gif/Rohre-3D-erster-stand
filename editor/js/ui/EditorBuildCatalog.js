@@ -808,6 +808,7 @@ function createEditorBuildCatalogDescriptorValue() {
 
 const EDITOR_BUILD_CATALOG_DESCRIPTOR = createEditorBuildCatalogDescriptorValue();
 const BUILD_ITEM_MAP = new Map(EDITOR_BUILD_CATALOG_DESCRIPTOR.entries.map((entry) => [entry.id, entry]));
+export const EDITOR_TEMPLATE_IMPORT_CAPABILITY_CONTRACT_VERSION = 'editor-template-import-capability.v1';
 
 function cloneDescriptorEntry(entry) {
     if (!entry || typeof entry !== 'object') return null;
@@ -872,5 +873,26 @@ export function getEditorTemplateRegistryDescriptor() {
         metadata: {
             reason: 'templates_path_not_present',
         },
+    });
+}
+
+export function resolveEditorTemplateImportCapability(descriptor = null) {
+    const templateDescriptor = descriptor && typeof descriptor === 'object'
+        ? descriptor
+        : getEditorTemplateRegistryDescriptor();
+    const entryCount = Number(templateDescriptor?.entryCount) || 0;
+    const status = String(templateDescriptor?.status || '').trim() || 'unknown';
+    const available = status === 'ready' && entryCount > 0;
+    const degradedReason = available
+        ? ''
+        : (status === 'missing' ? 'templates_path_not_present' : `templates_${status}`);
+    return Object.freeze({
+        contractVersion: EDITOR_TEMPLATE_IMPORT_CAPABILITY_CONTRACT_VERSION,
+        descriptorVersion: String(templateDescriptor?.descriptorVersion || ''),
+        source: String(templateDescriptor?.source || 'editor/templates/**'),
+        status,
+        entryCount,
+        available,
+        degradedReason,
     });
 }

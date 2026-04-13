@@ -10,7 +10,12 @@ import {
     createRendererShellServerConfig
 } from './dev/vite/rendererShellConfig.js';
 import { parseMapJSON, toArenaMapDefinition } from './src/entities/MapSchema.js';
-import { EDITOR_API_ROUTES, EDITOR_DATA_PATHS } from './src/shared/contracts/EditorPathContract.js';
+import {
+    EDITOR_API_ROUTES,
+    EDITOR_DATA_PATHS,
+    EDITOR_DISK_IO_CONTRACT_VERSION,
+} from './src/shared/contracts/EditorPathContract.js';
+import { resolveArtifactVersionState } from './src/shared/contracts/ArtifactVersionMigrationContract.js';
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'));
 const buildTime = new Date().toISOString();
@@ -38,6 +43,31 @@ const VEHICLE_CONFIG_DIR = path.resolve(__dirname, EDITOR_DATA_PATHS.VEHICLES_DI
 const GENERATED_VEHICLE_CONFIGS_MODULE_PATH = path.resolve(__dirname, EDITOR_DATA_PATHS.GENERATED_VEHICLE_CONFIGS_MODULE);
 const VEHICLE_CONFIG_SUFFIX = '.vehicle.json';
 const DEFAULT_GENERATED_VEHICLE_HITBOX_RADIUS = 1.2;
+const EDITOR_DISK_IO_VERSION_FIELDS = Object.freeze(['contractVersion']);
+const EDITOR_DISK_IO_SUPPORTED_VERSIONS = Object.freeze([EDITOR_DISK_IO_CONTRACT_VERSION]);
+
+function hasExplicitContractVersion(payload) {
+    return !!payload
+        && typeof payload === 'object'
+        && Object.prototype.hasOwnProperty.call(payload, 'contractVersion');
+}
+
+function resolveEditorDiskIoVersionState(payload, allowMissingVersion = true) {
+    return resolveArtifactVersionState(payload && typeof payload === 'object' ? payload : {}, {
+        artifactType: 'editor-disk-io',
+        versionFields: EDITOR_DISK_IO_VERSION_FIELDS,
+        supportedVersions: EDITOR_DISK_IO_SUPPORTED_VERSIONS,
+        currentVersion: EDITOR_DISK_IO_CONTRACT_VERSION,
+        allowMissingVersion,
+    });
+}
+
+function withEditorDiskIoContract(payload = {}) {
+    return {
+        contractVersion: EDITOR_DISK_IO_CONTRACT_VERSION,
+        ...payload,
+    };
+}
 const OBJ_VEHICLE_ASSET_SOURCE_DIR = path.resolve(__dirname, 'assets', 'models', 'jets', 'cc0', 'spaceship_pack', 'dist', 'obj_mtl');
 const OBJ_VEHICLE_ASSET_OUTPUT_SEGMENTS = ['assets', 'models', 'jets', 'cc0', 'spaceship_pack', 'dist', 'obj_mtl'];
 
@@ -508,7 +538,7 @@ function editorDiskSaveApiPlugin() {
                 if (isVideoSave) {
                     const fileNameHeader = req.headers['x-file-name'];
                     if (!fileNameHeader) {
-                        createJsonResponse(res, 400, { ok: false, error: 'x-file-name header required' });
+                        createJsonResponse(res, 400, withEditorDiskIoContract({ ok: false, error: 'x-file-name header required' }));
                         return;
                     }
                     const safeName = String(fileNameHeader).replace(/[^a-zA-Z0-9.\-_/]/g, '');
@@ -521,12 +551,12 @@ function editorDiskSaveApiPlugin() {
 
                     const buffer = await readVideoBody(req);
                     writeFileSync(outPath, buffer);
-                    createJsonResponse(res, 200, { ok: true, file: safeName });
+                    createJsonResponse(res, 200, withEditorDiskIoContract({ ok: true, file: safeName }));
                     return;
                 }
                 if (isVehicleList) {
                     createJsonResponse(res, 200, {
-                        ok: true,
+                        ...withEditorDiskIoContract({ ok: true }),
                         vehicles: listSavedVehicleConfigs(),
                     });
                     return;
@@ -535,11 +565,11 @@ function editorDiskSaveApiPlugin() {
                     const urlObj = new URL(req.url || '', 'http://localhost');
                     const vehicleId = String(urlObj.searchParams.get('vehicleId') || '').trim();
                     if (!vehicleId) {
-                        createJsonResponse(res, 400, { ok: false, error: 'vehicleId is required.' });
+                        createJsonResponse(res, 400, withEditorDiskIoContract({ ok: false, error: 'vehicleId is required.' }));
                         return;
                     }
                     createJsonResponse(res, 200, {
-                        ok: true,
+                        ...withEditorDiskIoContract({ ok: true }),
                         ...getVehicleConfigFromDisk({ vehicleId })
                     });
                     return;
@@ -547,13 +577,24 @@ function editorDiskSaveApiPlugin() {
 
                 const rawBody = await readRequestBody(req);
                 const body = JSON.parse(rawBody || '{}');
+                const requestVersionState = resolveEditorDiskIoVersionState(body, true);
+                if (hasExplicitContractVersion(body) && (
+                    requestVersionState.shouldReject
+                    || requestVersionState.resolvedVersion === null
+                )) {
+                    createJsonResponse(res, 400, withEditorDiskIoContract({
+                        ok: false,
+                        error: 'Unsupported editor disk contractVersion.',
+                    }));
+                    return;
+                }
                 const jsonText = typeof body?.jsonText === 'string' ? body.jsonText : '';
                 const mapName = typeof body?.mapName === 'string' ? body.mapName : '';
                 const vehicleName = typeof body?.vehicleName === 'string' ? body.vehicleName : '';
                 const vehicleId = typeof body?.vehicleId === 'string' ? body.vehicleId.trim() : '';
 
                 if ((isMapSave || isVehicleSave) && !jsonText.trim()) {
-                    createJsonResponse(res, 400, { ok: false, error: 'jsonText is required.' });
+                    createJsonResponse(res, 400, withEditorDiskIoContract({ ok: false, error: 'jsonText is required.' }));
                     return;
                 }
 
@@ -564,10 +605,10 @@ function editorDiskSaveApiPlugin() {
                         : isVehicleRename
                             ? renameVehicleConfigOnDisk({ vehicleId, vehicleName })
                             : deleteVehicleConfigFromDisk({ vehicleId });
-                createJsonResponse(res, 200, { ok: true, ...result });
+                createJsonResponse(res, 200, withEditorDiskIoContract({ ok: true, ...result }));
             } catch (error) {
                 createJsonResponse(res, 500, {
-                    ok: false,
+                    ...withEditorDiskIoContract({ ok: false }),
                     error: error?.message || 'Unknown disk save error.',
                 });
             }
