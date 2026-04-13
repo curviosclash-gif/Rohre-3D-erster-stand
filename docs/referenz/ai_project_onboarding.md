@@ -27,6 +27,7 @@ Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/` (u. a. `docs/
 - Three.js-Cleanup ueber `src/core/three-disposal.js` und saubere `dispose()`-Pfade.
 - Keine unnoetigen Allokationen in Hot Paths (`update`, Kollision, Bot-Sensing).
 - State-Namen in Runtime/Doku konsistent halten (`PLAYING`, `ROUND_END`, `MATCH_END`).
+- Fuer Persistenz-, Import- und Content-Scope immer den kanonischen V85-Leseweg nehmen: Store-/Transferfamilien ueber ihre Shared Contracts/Stores, Editor-/Template-/Runtime-Kataloge ueber `EditorBuildCatalog` bzw. die Descriptor-/Capability-Helfer statt ueber rohes JSON oder direkte `localStorage`-Reads.
 
 ## 4. Task-Start Checkliste
 
@@ -34,3 +35,4 @@ Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/` (u. a. `docs/
 2. Betroffene Module in `src/` und `tests/` identifizieren.
 3. Aendern, dann den leichtesten passenden Testlayer aus `.agents/test_mapping.md` waehlen: `node-contract` fuer reine Vertraege/Logik, `desktop-smoke` fuer Desktop-Hauptpfade, `desktop-e2e` nur fuer produktnahe Integrationen, `browser-compat` nur fuer Browser-Demo/Web-API-Scope und `heavy-diagnostic` nicht als Default.
 4. Doku-/Prozess-Aktualitaet mit `npm run docs:sync` und `npm run docs:check` pruefen.
+5. Bei Folgearbeit an `V85`/`V86`: erst pruefen, ob `contractVersion`/`schemaVersion`/`descriptorVersion` und vorhandene Capability-Helfer den Leseweg bereits definieren, bevor neue Reader oder UI-Sonderpfade entstehen.

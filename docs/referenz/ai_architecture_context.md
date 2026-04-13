@@ -413,6 +413,13 @@ Stand: 2026-04-13
 | Desktop-Save-Adapter (`preload.save.v1`) | Missing `contractVersion` aktuell kompatibel, explizit ungueltige Versionen rejecten. | Nach verbindlicher Preload-Contract-Auslieferung Missing-Version als inkompatibel behandeln. |
 | Map-Schema-Migration (`MAP_SCHEMA_VERSION`) | Legacy/schema v1-v3 Upgrade bleibt aktiv, Zukunftsversionen rejecten. | Nur nach dokumentiertem Authoring-Sunset fuer Alt-Maps weiter verengen; keine neuen Legacy-Sondershapes. |
 
+#### 4.6.5.8 Folgeverbrauch und Folgeblocks auf denselben Leseweg halten (`V85 85.5.2`)
+
+- Profil-Transfer bleibt bis zum Sunset ein strukturierter Envelope-Verbraucher: `ProfileTransferOps`, `ProfileManager` und `ProfileUiController` transportieren Legacy-Fallback nicht nur fachlich, sondern auch sichtbar ueber `reason`, `message`, `tone`, `warnings`, `usedLegacyFallback` und `migration`. Folgearbeit an UI-, Tooling- oder Doku-Pfaden benutzt diesen Vertrag statt freier Importtexte.
+- UI-nahe Arcade-Consumer lesen Persistenz nicht roh aus `localStorage`, wenn fuer dieselbe Familie bereits ein V85-Store-/Migrationspfad existiert. Beispiel: `ArcadeMenuSurface` liest Vehicle-Mastery ueber `SettingsStore.loadJsonRecord()` plus `ArcadeVehicleProfileContract` (`readArcadeVehicleProfileRecord()` / `getArcadeVehicleProfileRecord()`), statt ueber ad-hoc JSON-Parsing.
+- Editor-/Authoring-Folgearbeit (`V86`) baut auf denselben Content-Signalen auf, die `V85` bereits exponiert: `EditorBuildCatalog` bleibt der gemeinsame Descriptor-Leseweg (`descriptorVersion`, Entry-Count), `resolveEditorTemplateImportCapability()` der kanonische Template-Capability-Vertrag, und `editor/js/main.js` haelt diese Informationen im Editor-Runtime-Snapshot fuer Tools und spaetere Checks sichtbar.
+- Neue Folgeblocks duerfen fuer Persistenz-, Import-, Template- und Descriptor-Scope keine parallelen Lesewege aufziehen, wenn ein autoritativer Shared-Contract oder Store-Adapter bereits existiert. Die Standardfrage ist: "welcher V85-Reader ist fuer diese Familie schon kanonisch?", nicht "welches JSON koennen wir hier schnell selbst parsen?".
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
