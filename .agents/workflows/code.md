@@ -53,6 +53,7 @@ description: Implement a planned change from coding to verification and commit.
 ## 5. Commit (see AGENTS.md section Commit Convention)
 
 - `npm run guard:main`
+- On Windows before staging: `npm run git:acl:heal`
 - `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`
 - Verify scope: `git diff --name-only`.
 - Before push on `main`: `npm run snapshot:tag`.

@@ -32,12 +32,29 @@ if (-not (Test-Path -LiteralPath $path)) {
     exit 0
 }
 $acl = Get-Acl -LiteralPath $path
-$denyRules = @(
+$allDenyRules = @(
     $acl.Access | Where-Object {
-        $_.IdentityReference.Value -eq $sid -and
         $_.AccessControlType -eq [System.Security.AccessControl.AccessControlType]::Deny
     }
 )
+function Is-WriteDenyRule($rule) {
+    $rightsText = [string]$rule.FileSystemRights
+    return $rightsText -match 'Write|Create|Modify|Delete|ChangePermissions|TakeOwnership|FullControl'
+}
+$denyRulesBySid = @(
+    $allDenyRules | Where-Object {
+        $_.IdentityReference.Value -eq $sid -and (Is-WriteDenyRule $_)
+    }
+)
+$denyRulesHeuristic = @(
+    $allDenyRules | Where-Object {
+        $identity = $_.IdentityReference.Value
+        $isWellKnownAdmin = $identity -eq 'NT AUTHORITY\\SYSTEM' -or $identity -eq 'BUILTIN\\Administrators'
+        $looksLikeUserSid = $identity -like 'S-1-5-21-*'
+        (-not $isWellKnownAdmin) -and $looksLikeUserSid -and (Is-WriteDenyRule $_)
+    }
+)
+$denyRules = @($denyRulesBySid + $denyRulesHeuristic | Select-Object -Unique)
 if ($denyRules.Count -eq 0) {
     Write-Output 'ok:no_explicit_deny'
     exit 0
@@ -49,14 +66,16 @@ Set-Acl -LiteralPath $path -AclObject $acl
 $afterAcl = Get-Acl -LiteralPath $path
 $remaining = @(
     $afterAcl.Access | Where-Object {
-        $_.IdentityReference.Value -eq $sid -and
-        $_.AccessControlType -eq [System.Security.AccessControl.AccessControlType]::Deny
+        $_.AccessControlType -eq [System.Security.AccessControl.AccessControlType]::Deny -and (
+            $_.IdentityReference.Value -eq $sid -or $_.IdentityReference.Value -like 'S-1-5-21-*'
+        ) -and (Is-WriteDenyRule $_)
     }
 ).Count
 if ($remaining -gt 0) {
     throw "deny_sid_still_present:$remaining"
 }
-Write-Output ('ok:removed_deny_rules=' + $denyRules.Count)
+$removedIdentities = @($denyRules | ForEach-Object { $_.IdentityReference.Value } | Select-Object -Unique)
+Write-Output ('ok:removed_deny_rules=' + $denyRules.Count + ';identities=' + ($removedIdentities -join ','))
 `;
 
     return spawnSync(
