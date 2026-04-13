@@ -367,6 +367,14 @@ Stand: 2026-04-13
 - Zukunftsschemata werden nicht still akzeptiert: `ArcadeVehicleProfile` verwirft ungueltige Zukunftseintraege beim Laden und persistiert den bereinigten Bestand erneut.
 - Profil-Import rejectet zusaetzlich explizit gesetzte, aber ungueltige `contractVersion`; dadurch kann ein fehlerhafter Envelope nicht mehr als Legacy-Missing-Version durchrutschen.
 
+#### 4.6.5.3 Content-Descriptor-Registries verankern (`V85 85.3.1`)
+
+- `src/shared/contracts/ContentDescriptorContract.js` ist der gemeinsame Descriptor-Rahmen fuer Content-Familien (`content-descriptor.v1`) mit einheitlichem Envelope (`descriptorType`, `source`, `status`, `entries`, `metadata`).
+- Runtime-Map-Presets laufen ueber `getRuntimeMapPresetRegistryDescriptor()` aus `RuntimeMapCatalogContract`; dadurch bleiben `runtime-config.MAPS` und abgeleitete Map-Features (Portale, Gates, Missionen, Items, GLB, Parcours) in einem stabilen Registry-Leseweg.
+- Der editornahe Build-Katalog exportiert denselben Envelope (`getEditorBuildCatalogDescriptor()`), waehrend `getEditorTemplateRegistryDescriptor()` den aktuell fehlenden Pfad `editor/templates/**` explizit als `status: missing` markiert statt implizit zu ignorieren.
+- Mission-, Reward- und Modifier-Kataloge liefern descriptorbasierte Registry-Ausgaben ueber ihre Shared Contracts; `vehicle-registry.js` spiegelt dasselbe Muster fuer Fahrzeugkataloge.
+- Arcade-Sektorpools und Runtime-Map-Keyspace bleiben synchron: `expert_gauntlet` ist als expliziter Expert-Preset-Key verankert, sodass Descriptor-Registries und Arcade-Map-Pools denselben Satz gueltiger IDs verwenden.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |

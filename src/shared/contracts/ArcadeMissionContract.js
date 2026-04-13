@@ -2,6 +2,11 @@
 // Layer: Shared (UI & State can both depend on this)
 // Purpose: Decouple UI (ArcadeMissionHUD) from State (ArcadeMissionState) via shared contracts
 
+import {
+    CONTENT_DESCRIPTOR_TYPES,
+    createContentRegistryDescriptor,
+} from './ContentDescriptorContract.js';
+
 export const MISSION_TYPES = Object.freeze({
     KILL_COUNT: Object.freeze({
         id: 'KILL_COUNT',
@@ -97,6 +102,27 @@ export function formatMissionProgress(mission) {
     const typeDef = MISSION_TYPES[mission.type];
     if (!typeDef) return '';
     return typeDef.format(mission.progress || {});
+}
+
+export function listArcadeMissionDescriptors() {
+    return Object.values(MISSION_TYPES)
+        .map((typeDef) => ({
+            id: typeDef.id,
+            label: typeDef.label,
+            icon: typeDef.icon,
+            defaultParams: typeDef.defaultParams && typeof typeDef.defaultParams === 'object'
+                ? { ...typeDef.defaultParams }
+                : {},
+        }))
+        .sort((left, right) => left.id.localeCompare(right.id, 'en', { sensitivity: 'base' }));
+}
+
+export function getArcadeMissionRegistryDescriptor() {
+    return createContentRegistryDescriptor({
+        descriptorType: CONTENT_DESCRIPTOR_TYPES.ARCADE_MISSIONS,
+        source: 'src/shared/contracts/ArcadeMissionContract.js',
+        entries: listArcadeMissionDescriptors(),
+    });
 }
 
 export default {

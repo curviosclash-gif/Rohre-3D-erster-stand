@@ -4,6 +4,10 @@ import {
     CONFIG_SECTIONS,
     GAMEPLAY_CONFIG_DEFAULTS,
 } from './GameplayConfigContract.js';
+import {
+    CONTENT_DESCRIPTOR_TYPES,
+    createContentRegistryDescriptor,
+} from './ContentDescriptorContract.js';
 
 let _configSource = null;
 
@@ -22,6 +26,23 @@ function normalizeMapCatalog(maps) {
         return {};
     }
     return maps;
+}
+
+function toBoolean(value) {
+    return value === true;
+}
+
+function toCount(value) {
+    return Array.isArray(value) ? value.length : 0;
+}
+
+function toSizeLabel(value) {
+    if (!Array.isArray(value) || value.length < 3) return '';
+    const width = Number(value[0]);
+    const height = Number(value[1]);
+    const depth = Number(value[2]);
+    if (!Number.isFinite(width) || !Number.isFinite(height) || !Number.isFinite(depth)) return '';
+    return `${width}x${height}x${depth}`;
 }
 
 export function getRuntimeMapCatalog(overrideMaps = null) {
@@ -58,4 +79,36 @@ export function getRuntimeMapScale(fallback = 1) {
         return fallback;
     }
     return scale;
+}
+
+export function listRuntimeMapPresetDescriptors(overrideMaps = null) {
+    const maps = getRuntimeMapCatalog(overrideMaps);
+    return Object.entries(maps)
+        .map(([mapKey, mapDef]) => {
+            const source = mapDef && typeof mapDef === 'object' ? mapDef : {};
+            return {
+                id: String(mapKey || '').trim() || 'unknown-map',
+                name: typeof source.name === 'string' ? source.name : String(mapKey || '').trim() || 'Unknown Map',
+                sizeLabel: toSizeLabel(source.size),
+                hasPortals: toCount(source.portals) > 0,
+                hasGates: toCount(source.gates) > 0,
+                hasMissions: toCount(source.missions) > 0,
+                hasItems: toCount(source.items) > 0,
+                hasAircraft: toCount(source.aircraft) > 0,
+                hasParcours: toBoolean(source.parcours?.enabled),
+                hasGlbModel: typeof source.glbModel === 'string' && source.glbModel.length > 0,
+            };
+        })
+        .sort((left, right) => left.id.localeCompare(right.id, 'en', { sensitivity: 'base' }));
+}
+
+export function getRuntimeMapPresetRegistryDescriptor(overrideMaps = null) {
+    return createContentRegistryDescriptor({
+        descriptorType: CONTENT_DESCRIPTOR_TYPES.RUNTIME_MAP_PRESETS,
+        source: 'runtime-config.MAPS',
+        entries: listRuntimeMapPresetDescriptors(overrideMaps),
+        metadata: {
+            mapScale: getRuntimeMapScale(1),
+        },
+    });
 }

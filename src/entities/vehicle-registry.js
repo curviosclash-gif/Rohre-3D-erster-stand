@@ -7,6 +7,10 @@ import { OrbMesh } from './orb-mesh.js';
 import { OBJVehicleMesh } from './obj-vehicle-mesh.js';
 import { RuntimeModularVehicleMesh } from './runtime-modular-vehicle-mesh.js';
 import { GENERATED_VEHICLE_CONFIGS } from './GeneratedVehicleConfigs.js';
+import {
+    CONTENT_DESCRIPTOR_TYPES,
+    createContentRegistryDescriptor,
+} from '../shared/contracts/ContentDescriptorContract.js';
 
 const BASE_VEHICLE_DEFINITIONS = [
     { id: 'ship5', label: 'Star-Cruiser (Ship 5)', MeshClass: OBJVehicleMesh, isObj: true, hitbox: { radius: 1.2 } },
@@ -66,4 +70,22 @@ export function createVehicleMesh(vehicleId, color) {
         return new selected.MeshClass(color, selected.id);
     }
     return new selected.MeshClass(color);
+}
+
+export function listVehicleDescriptors() {
+    return VEHICLE_DEFINITIONS.map((entry) => ({
+        id: entry.id,
+        label: entry.label,
+        hitboxRadius: Number(entry?.hitbox?.radius) || 1.1,
+        isGeneratedModular: entry.isGeneratedModular === true,
+        usesObjMesh: entry.isObj === true,
+    }));
+}
+
+export function getVehicleRegistryDescriptor() {
+    return createContentRegistryDescriptor({
+        descriptorType: CONTENT_DESCRIPTOR_TYPES.VEHICLES,
+        source: 'src/entities/vehicle-registry.js',
+        entries: listVehicleDescriptors(),
+    });
 }

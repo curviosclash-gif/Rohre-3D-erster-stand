@@ -5,6 +5,10 @@
 import { MAP_PRESET_CATALOG_LARGE_DATA } from './MapPresetCatalogLarge.js';
 
 export const MAP_PRESET_CATALOG_EXPERT_DATA = {
+    expert_gauntlet: {
+        ...MAP_PRESET_CATALOG_LARGE_DATA.die_festung,
+        name: 'Expert Gauntlet',
+    },
     mega_maze: {
         name: 'Mega-Labyrinth',
         size: [100, 35, 100],

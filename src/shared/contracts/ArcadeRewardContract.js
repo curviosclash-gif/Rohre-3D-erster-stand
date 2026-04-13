@@ -1,3 +1,8 @@
+import {
+    CONTENT_DESCRIPTOR_TYPES,
+    createContentRegistryDescriptor,
+} from './ContentDescriptorContract.js';
+
 const ARCADE_REWARD_META = Object.freeze({
     run_speed_t1: Object.freeze({
         id: 'run_speed_t1',
@@ -39,3 +44,20 @@ export function listArcadeRewardMeta() {
     return Object.values(ARCADE_REWARD_META);
 }
 
+export function listArcadeRewardDescriptors() {
+    return Object.values(ARCADE_REWARD_META)
+        .map((entry) => ({
+            id: entry.id,
+            label: entry.label,
+            effectText: entry.effectText,
+        }))
+        .sort((left, right) => left.id.localeCompare(right.id, 'en', { sensitivity: 'base' }));
+}
+
+export function getArcadeRewardRegistryDescriptor() {
+    return createContentRegistryDescriptor({
+        descriptorType: CONTENT_DESCRIPTOR_TYPES.ARCADE_REWARDS,
+        source: 'src/shared/contracts/ArcadeRewardContract.js',
+        entries: listArcadeRewardDescriptors(),
+    });
+}

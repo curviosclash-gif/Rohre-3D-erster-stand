@@ -1,3 +1,8 @@
+import {
+    CONTENT_DESCRIPTOR_TYPES,
+    createContentRegistryDescriptor,
+} from './ContentDescriptorContract.js';
+
 const ARCADE_MODIFIER_META = Object.freeze({
     tight_turns: Object.freeze({
         id: 'tight_turns',
@@ -34,3 +39,21 @@ export function resolveArcadeModifierMeta(modifierId) {
     return ARCADE_MODIFIER_META[normalizedId] || null;
 }
 
+export function listArcadeModifierDescriptors() {
+    return Object.values(ARCADE_MODIFIER_META)
+        .map((entry) => ({
+            id: entry.id,
+            label: entry.label,
+            icon: entry.icon,
+            effectText: entry.effectText,
+        }))
+        .sort((left, right) => left.id.localeCompare(right.id, 'en', { sensitivity: 'base' }));
+}
+
+export function getArcadeModifierRegistryDescriptor() {
+    return createContentRegistryDescriptor({
+        descriptorType: CONTENT_DESCRIPTOR_TYPES.ARCADE_MODIFIERS,
+        source: 'src/shared/contracts/ArcadeModifierContract.js',
+        entries: listArcadeModifierDescriptors(),
+    });
+}

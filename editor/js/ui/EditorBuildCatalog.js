@@ -1,3 +1,8 @@
+import {
+    CONTENT_DESCRIPTOR_TYPES,
+    createContentRegistryDescriptor,
+} from '../../../src/shared/contracts/ContentDescriptorContract.js';
+
 const CATEGORY_META = Object.freeze({
     build: Object.freeze({
         id: 'build',
@@ -795,4 +800,45 @@ export function findEditorBuildEntryByToolAndSubtype(tool, subType = null) {
 export function getEditorBuildDefaultEntry(categoryId = 'build') {
     const categoryItems = getEditorBuildEntriesForCategory(categoryId);
     return categoryItems.find((entry) => entry.isDefault) || categoryItems[0] || EDITOR_BUILD_ITEMS[0] || null;
+}
+
+export function listEditorBuildDescriptorEntries() {
+    return EDITOR_BUILD_ITEMS.map((entry) => ({
+        id: entry.id,
+        tool: entry.tool,
+        subType: entry.subType ?? '',
+        categoryId: entry.categoryId,
+        label: entry.label,
+        description: entry.description,
+        sortOrder: entry.sortOrder,
+        keywords: Array.isArray(entry.keywords) ? [...entry.keywords] : [],
+        isFeatured: entry.isFeatured === true,
+        isDefault: entry.isDefault === true,
+    }));
+}
+
+export function getEditorBuildCatalogDescriptor() {
+    return createContentRegistryDescriptor({
+        descriptorType: CONTENT_DESCRIPTOR_TYPES.EDITOR_BUILD_CATALOG,
+        source: 'editor/js/ui/EditorBuildCatalog.js',
+        entries: listEditorBuildDescriptorEntries(),
+        metadata: {
+            categories: EDITOR_BUILD_CATEGORIES.map((entry) => ({
+                id: entry.id,
+                label: entry.label,
+            })),
+        },
+    });
+}
+
+export function getEditorTemplateRegistryDescriptor() {
+    return createContentRegistryDescriptor({
+        descriptorType: CONTENT_DESCRIPTOR_TYPES.EDITOR_TEMPLATES,
+        source: 'editor/templates/**',
+        status: 'missing',
+        entries: [],
+        metadata: {
+            reason: 'templates_path_not_present',
+        },
+    });
 }
