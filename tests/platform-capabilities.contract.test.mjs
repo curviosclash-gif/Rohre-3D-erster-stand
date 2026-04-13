@@ -9,6 +9,17 @@ import {
     createElectronPreloadDiscoveryAdapter,
     createElectronPreloadSaveAdapter,
 } from '../src/platform/electron/ElectronPlatformBridge.js';
+import {
+    PLATFORM_CAPABILITY_IDS,
+} from '../src/shared/contracts/PlatformCapabilityContract.js';
+import {
+    PLATFORM_PRODUCT_SURFACE_IDS,
+    PLATFORM_PROVIDER_KINDS,
+    PLATFORM_SURFACE_MULTIPLAYER_ROLES,
+    PLATFORM_SURFACE_POLICY_MODES,
+    resolveCapabilityProviderKind,
+    resolveSurfacePolicy,
+} from '../src/shared/contracts/PlatformCapabilityRegistry.js';
 import { StoragePlatform } from '../src/state/storage/StoragePlatform.js';
 import { createMenuMultiplayerDiscoveryPort } from '../src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js';
 
@@ -67,6 +78,33 @@ test('V87.3 Browser platform adapters expose null intents while capability avail
     assert.equal(host.getLanServerStatus, null);
     assert.equal(host.startLanServer, null);
     assert.equal(host.stopLanServer, null);
+});
+
+test('V77.2.1 surface policy contract keeps desktop default-full and browser default-deny', () => {
+    const desktopPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopPolicy.defaultAccessMode, PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL);
+    assert.equal(desktopPolicy.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN);
+    assert.equal(desktopPolicy.requiresCuratedMaps, false);
+    assert.ok(desktopPolicy.allowedGameModes.includes('Arcade'));
+
+    assert.equal(browserPolicy.defaultAccessMode, PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY);
+    assert.equal(browserPolicy.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY);
+    assert.equal(browserPolicy.requiresCuratedMaps, true);
+    assert.ok(browserPolicy.allowedGameModes.includes('Parcours'));
+});
+
+test('V77.2.1 browser host provider resolves unavailable when host capability is disabled', () => {
+    const providerKind = resolveCapabilityProviderKind(PLATFORM_CAPABILITY_IDS.HOST, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        available: false,
+    });
+    assert.equal(providerKind, PLATFORM_PROVIDER_KINDS.UNAVAILABLE);
 });
 
 test('V87.99 StoragePlatform surfaces partial legacy migrations when legacy-key removal fails', () => {

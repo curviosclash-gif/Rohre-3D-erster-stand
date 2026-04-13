@@ -372,6 +372,13 @@ Stand: 2026-04-13
 - Browser-Join-Grenzen verwenden bevorzugt `Join only`; freie Umschreibungen gelten nicht als eigener Vertragsbegriff.
 - Produktisch denylistete Demo-Funktionen erscheinen als `Nicht verfuegbar` oder `Nur Desktop`, nicht als Sicherheitsbarriere, versteckter Unlock oder stilles Vollversionsversprechen.
 
+#### 4.6.4.6 Zentraler Surface-Policy-Vertrag (`V77 77.2.1`)
+
+- `src/shared/contracts/PlatformCapabilityRegistry.js` fuehrt pro Produktrolle einen expliziten `surfacePolicy`-Block (`defaultAccessMode`, `multiplayerRole`, `allowedGameModes`, `requiresCuratedMaps`) und exportiert den konsumierbaren Resolver `resolveSurfacePolicy()`.
+- `desktop-app` bleibt im Vertrag `default-full` mit Rolle `host-and-join`; `browser-demo` bleibt `default-deny` mit Rolle `join-only` und kuratiertem Map-/Mode-Scope.
+- Browser-`HOST` wird jetzt auch im Registry-Providervertrag explizit auf `PLATFORM_PROVIDER_KINDS.UNAVAILABLE` aufgeloest, sobald die Capability nicht verfuegbar ist; der zuvor nur dokumentierte `Nicht verfuegbar`-Pfad ist damit technisch und dokumentarisch deckungsgleich.
+- `tests/platform-capabilities.contract.test.mjs` prueft den Surface-Policy-Resolver sowie die Browser-`HOST`-Aufloesung, damit Folgearbeit denselben Vertragskern nutzt statt neue Ad-hoc-Flags einzufuehren.
+
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 
 - Feldkonvention:

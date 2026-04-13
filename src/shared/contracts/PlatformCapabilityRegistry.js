@@ -2,6 +2,7 @@ import { PLATFORM_CAPABILITY_IDS } from './PlatformCapabilityContract.js';
 import { MULTIPLAYER_TRANSPORTS } from './RuntimeSessionContract.js';
 
 export const PLATFORM_CAPABILITY_REGISTRY_CONTRACT_VERSION = 'platform-capability-registry.v1';
+export const PLATFORM_SURFACE_POLICY_CONTRACT_VERSION = 'platform-surface-policy.v1';
 
 export const PLATFORM_PRODUCT_SURFACE_IDS = Object.freeze({
     DESKTOP_APP: 'desktop-app',
@@ -28,6 +29,16 @@ export const PLATFORM_PROVIDER_KINDS = Object.freeze({
 export const PLATFORM_TOOLING_IDS = Object.freeze({
     DEFAULT: 'default',
     TRAINING_BENCHMARK: 'training-benchmark',
+});
+
+export const PLATFORM_SURFACE_POLICY_MODES = Object.freeze({
+    DEFAULT_FULL: 'default-full',
+    DEFAULT_DENY: 'default-deny',
+});
+
+export const PLATFORM_SURFACE_MULTIPLAYER_ROLES = Object.freeze({
+    HOST_AND_JOIN: 'host-and-join',
+    JOIN_ONLY: 'join-only',
 });
 
 const VALID_PRODUCT_SURFACE_IDS = new Set(Object.values(PLATFORM_PRODUCT_SURFACE_IDS));
@@ -70,6 +81,18 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
             runtimeKind: PLATFORM_RUNTIME_KINDS.ELECTRON,
             defaultLobbyTransport: MULTIPLAYER_TRANSPORTS.LAN,
             toolingSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+            surfacePolicy: Object.freeze({
+                defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL,
+                multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN,
+                allowedGameModes: Object.freeze([
+                    'Arcade',
+                    'Parcours',
+                    'Fight',
+                    'Normal',
+                    'Classic',
+                ]),
+                requiresCuratedMaps: false,
+            }),
             capabilities: Object.freeze({
                 [PLATFORM_CAPABILITY_IDS.DISCOVERY]: PLATFORM_PROVIDER_KINDS.ELECTRON_IPC,
                 [PLATFORM_CAPABILITY_IDS.HOST]: PLATFORM_PROVIDER_KINDS.ELECTRON_IPC,
@@ -81,9 +104,24 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
             runtimeKind: PLATFORM_RUNTIME_KINDS.WEB,
             defaultLobbyTransport: MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE,
             toolingSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+            surfacePolicy: Object.freeze({
+                defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY,
+                multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY,
+                allowedGameModes: Object.freeze([
+                    'Arcade',
+                    'Parcours',
+                    'Fight',
+                    'Normal',
+                    'Classic',
+                ]),
+                requiresCuratedMaps: true,
+            }),
             capabilities: Object.freeze({
                 [PLATFORM_CAPABILITY_IDS.DISCOVERY]: PLATFORM_PROVIDER_KINDS.BROWSER_DEMO,
-                [PLATFORM_CAPABILITY_IDS.HOST]: PLATFORM_PROVIDER_KINDS.BROWSER_DEMO,
+                [PLATFORM_CAPABILITY_IDS.HOST]: Object.freeze({
+                    available: PLATFORM_PROVIDER_KINDS.BROWSER_DEMO,
+                    unavailable: PLATFORM_PROVIDER_KINDS.UNAVAILABLE,
+                }),
                 [PLATFORM_CAPABILITY_IDS.SAVE]: Object.freeze({
                     available: PLATFORM_PROVIDER_KINDS.BROWSER_DOWNLOAD,
                     unavailable: PLATFORM_PROVIDER_KINDS.BROWSER_DEMO,
@@ -140,12 +178,27 @@ export function resolvePlatformEnvironment(options = {}) {
     const runtimeKind = resolvePlatformRuntimeKind(options);
     const productEntry = PLATFORM_CAPABILITY_REGISTRY.products[productSurfaceId]
         || PLATFORM_CAPABILITY_REGISTRY.products[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO];
+    const surfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
+        ? productEntry.surfacePolicy
+        : {
+            defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY,
+            multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY,
+        };
     return Object.freeze({
         contractVersion: PLATFORM_CAPABILITY_REGISTRY.contractVersion,
+        surfacePolicyContractVersion: PLATFORM_SURFACE_POLICY_CONTRACT_VERSION,
         productSurfaceId,
         runtimeKind,
         defaultLobbyTransport: productEntry.defaultLobbyTransport,
         toolingSurfaceId: productEntry.toolingSurfaceId,
+        defaultAccessMode: normalizeString(
+            surfacePolicy.defaultAccessMode,
+            PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY
+        ),
+        multiplayerRole: normalizeString(
+            surfacePolicy.multiplayerRole,
+            PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
+        ),
     });
 }
 
@@ -155,6 +208,33 @@ export function isDesktopProductSurface(options = {}) {
 
 export function resolveDefaultLobbyTransport(options = {}) {
     return resolvePlatformEnvironment(options).defaultLobbyTransport;
+}
+
+export function resolveSurfacePolicy(options = {}) {
+    const productSurfaceId = resolvePlatformProductSurfaceId(options);
+    const productEntry = PLATFORM_CAPABILITY_REGISTRY.products[productSurfaceId]
+        || PLATFORM_CAPABILITY_REGISTRY.products[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO];
+    const policy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
+        ? productEntry.surfacePolicy
+        : null;
+    const allowedGameModes = Array.isArray(policy?.allowedGameModes)
+        ? Object.freeze([...policy.allowedGameModes])
+        : Object.freeze([]);
+
+    return Object.freeze({
+        contractVersion: PLATFORM_SURFACE_POLICY_CONTRACT_VERSION,
+        productSurfaceId,
+        defaultAccessMode: normalizeString(
+            policy?.defaultAccessMode,
+            PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY
+        ),
+        multiplayerRole: normalizeString(
+            policy?.multiplayerRole,
+            PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
+        ),
+        allowedGameModes,
+        requiresCuratedMaps: policy?.requiresCuratedMaps === true,
+    });
 }
 
 export function resolveLobbyProviderKind(
