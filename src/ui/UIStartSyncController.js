@@ -4,6 +4,8 @@
 // Extrahiert aus UIManager.js (V38 Phase 38.3.1)
 // ============================================
 
+/* eslint-disable max-lines */
+
 import { VEHICLE_DEFINITIONS } from '../entities/vehicle-registry.js';
 import { MENU_SESSION_TYPES } from './menu/MenuStateContracts.js';
 import {
@@ -20,6 +22,8 @@ import {
     isSurfaceMapKeyAllowedForModePath,
     isSurfaceModePathAllowed,
     listSurfaceAllowedMapKeysForModePath,
+    resolveSurfaceEntryCopy,
+    resolveSurfaceMenuState,
     resolveSurfaceFallbackModePath,
 } from '../shared/contracts/PlatformSurfacePolicyOps.js';
 import {
@@ -315,10 +319,14 @@ export class UIStartSyncController {
         const mapFilter = String(startSetup.mapFilter || 'all').toLowerCase();
         const vehicleSearch = String(startSetup.vehicleSearch || '').trim().toLowerCase();
         const vehicleFilter = String(startSetup.vehicleFilter || 'all').toLowerCase();
-        const modePath = this._resolveAllowedModePath(settings?.localSettings?.modePath || 'normal');
-        if (settings?.localSettings && settings.localSettings.modePath !== modePath) {
-            settings.localSettings.modePath = modePath;
-        }
+        const runtimeMaps = getRuntimeMapCatalog();
+        const surfacePolicy = this._resolveSurfacePolicy();
+        const surfaceMenuState = resolveSurfaceMenuState(settings, {
+            productSurfaceId: surfacePolicy?.productSurfaceId,
+            maps: runtimeMaps,
+        });
+        const modePath = surfaceMenuState.modePath;
+        const sessionType = surfaceMenuState.sessionType;
         const knownVehicleIds = new Set(this._vehiclePreviewEntries.map((entry) => entry.id));
         const appendVehicleOption = (select, vehicleId) => {
             const normalizedVehicleId = String(vehicleId || '').trim();
@@ -354,8 +362,7 @@ export class UIStartSyncController {
         }
 
         if (this.ui.mapSelect) {
-            const previousValue = String(settings.mapKey || this.ui.mapSelect.value || 'standard');
-            const runtimeMaps = getRuntimeMapCatalog();
+            const previousValue = String(surfaceMenuState.mapKey || settings.mapKey || this.ui.mapSelect.value || 'standard');
             const fallbackMapKey = this._resolveSurfaceFallbackMapKey(runtimeMaps, modePath, previousValue);
             this.ui.mapSelect.innerHTML = '';
             this._mapPreviewEntries
@@ -385,10 +392,8 @@ export class UIStartSyncController {
                 ? previousValue
                 : this.ui.mapSelect.options[0].value;
             this.ui.mapSelect.value = resolvedMapKey;
-            if (settings.mapKey !== resolvedMapKey) {
-                settings.mapKey = resolvedMapKey;
-            }
         }
+        const effectiveMapKey = String(this.ui.mapSelect?.value || surfaceMenuState.mapKey || settings.mapKey || 'standard');
 
         const vehicleCandidates = this._vehiclePreviewEntries.filter((entry) => {
             const matchesSearch = !vehicleSearch || entry.label.toLowerCase().includes(vehicleSearch) || entry.id.toLowerCase().includes(vehicleSearch);
@@ -433,15 +438,19 @@ export class UIStartSyncController {
         renderQuickList(this.ui.vehicleFavoritesList, startSetup.favoriteVehicles, 'vehicleId');
         renderQuickList(this.ui.vehicleRecentList, startSetup.recentVehicles, 'vehicleId');
 
-        const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
-        const sessionLabel = sessionType === MENU_SESSION_TYPES.SPLITSCREEN
-            ? 'Splitscreen'
-            : (sessionType === MENU_SESSION_TYPES.MULTIPLAYER ? 'Multiplayer' : 'Single Player');
+        const surfaceEntryCopy = resolveSurfaceEntryCopy({
+            productSurfaceId: this._resolveSurfacePolicy()?.productSurfaceId,
+            sessionType,
+        });
+        const sessionLabel = surfaceEntryCopy.sessionSummaryLabels[sessionType]
+            || (sessionType === MENU_SESSION_TYPES.SPLITSCREEN
+                ? 'Splitscreen'
+                : (sessionType === MENU_SESSION_TYPES.MULTIPLAYER ? 'Multiplayer' : 'Single Player'));
         const modeLabel = modePath === 'fight'
             ? 'Fight'
             : (modePath === 'arcade' ? 'Arcade' : (modePath === 'quick_action' ? 'Schnellstart' : 'Normal'));
         const themeLabel = String(settings?.localSettings?.themeMode || 'dunkel').toLowerCase() === 'hell' ? 'Hell' : 'Dunkel';
-        const mapPreview = resolveMapPreview(settings.mapKey);
+        const mapPreview = resolveMapPreview(effectiveMapKey);
         const vehiclePreviewP1 = resolveVehiclePreview(settings?.vehicles?.PLAYER_1);
         const vehiclePreviewP2 = resolveVehiclePreview(settings?.vehicles?.PLAYER_2);
 
@@ -531,11 +540,14 @@ export class UIStartSyncController {
             if (sessionType !== MENU_SESSION_TYPES.MULTIPLAYER) {
                 this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: inaktiv';
             } else if (multiplayerSessionState?.joined) {
-                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready`;
+                const roleLabel = multiplayerSessionState.isHost
+                    ? 'Host'
+                    : surfaceEntryCopy.multiplayerClientRoleLabel;
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${roleLabel} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready`;
             } else if (lobbyCode) {
-                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} noch nicht verbunden`;
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${surfaceEntryCopy.joinButtonLabel} noch nicht verbunden`;
             } else {
-                this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: nicht verbunden';
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${surfaceEntryCopy.joinButtonLabel} noch nicht verbunden`;
             }
         }
 

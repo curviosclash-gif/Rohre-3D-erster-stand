@@ -1988,6 +1988,87 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(result.lanField).not.toBe('multiplayer');
     });
 
+    test('T20ae5: Browser-Demo Validation markiert Multiplayer als Join-only statt Host-CTA', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            const { resolveMatchStartValidationIssue } = await import('/src/core/runtime/MatchStartValidationService.js');
+
+            const browserDemoSettings = JSON.parse(JSON.stringify(game?.settings || {}));
+            browserDemoSettings.mapKey = String(browserDemoSettings.mapKey || 'standard');
+            browserDemoSettings.gameMode = 'CLASSIC';
+            browserDemoSettings.localSettings = {
+                ...(browserDemoSettings.localSettings || {}),
+                sessionType: 'multiplayer',
+                multiplayerTransport: 'storage-bridge',
+                modePath: 'normal',
+                themeMode: 'dunkel',
+            };
+            browserDemoSettings.vehicles = {
+                ...(browserDemoSettings.vehicles || {}),
+                PLAYER_1: browserDemoSettings?.vehicles?.PLAYER_1 || 'ship5',
+            };
+
+            const issue = resolveMatchStartValidationIssue({
+                settings: browserDemoSettings,
+                maps: game?.config?.MAPS || { standard: { key: 'standard' } },
+                classicModeType: 'CLASSIC',
+                huntModeType: 'HUNT',
+                productSurfaceId: 'browser-demo',
+            });
+
+            return {
+                message: issue?.message || '',
+                fieldMessage: issue?.fieldMessage || '',
+            };
+        });
+
+        expect(result.message).toContain('Desktop-Lobby');
+        expect(result.fieldMessage).toContain('Join only');
+    });
+
+    test('T20ae6: Browser-Demo Startpfad migriert Surface-Fallbacks explizit statt sie im UI-Sync zu speichern', async ({ page }) => {
+        await loadGame(page);
+        const result = await page.evaluate(async () => {
+            const game = window.GAME_INSTANCE;
+            const facade = game?.runtimeCoordinator?.getRuntimeFacade?.();
+            if (!game?.settings || !facade?.settingsHandler?.applySurfacePolicyStartDefaults) {
+                return null;
+            }
+
+            game.settings.mapKey = 'custom';
+            game.settings.localSettings = {
+                ...(game.settings.localSettings || {}),
+                sessionType: 'splitscreen',
+                modePath: 'quick_action',
+            };
+            const before = {
+                sessionType: game.settings.localSettings.sessionType,
+                modePath: game.settings.localSettings.modePath,
+                mapKey: game.settings.mapKey,
+            };
+            const migration = facade.settingsHandler.applySurfacePolicyStartDefaults();
+
+            return {
+                before,
+                after: {
+                    sessionType: game.settings.localSettings.sessionType,
+                    modePath: game.settings.localSettings.modePath,
+                    mapKey: game.settings.mapKey,
+                },
+                changedKeys: migration?.changedKeys || [],
+            };
+        });
+
+        expect(result.before.sessionType).toBe('splitscreen');
+        expect(result.before.modePath).toBe('quick_action');
+        expect(result.before.mapKey).toBe('custom');
+        expect(result.after.sessionType).toBe('single');
+        expect(result.after.modePath).toBe('normal');
+        expect(result.after.mapKey).toBe('standard');
+        expect(result.changedKeys).toEqual(expect.arrayContaining(['sessionType', 'modePath', 'mapKey']));
+    });
+
     test('T20ae3: TelemetryHistoryStore wiederholt temporaere DB-Fehler und oeffnet Verbindung neu', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {

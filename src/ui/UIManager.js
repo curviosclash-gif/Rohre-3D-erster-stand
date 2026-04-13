@@ -33,6 +33,7 @@ import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
 import { syncMenuSurfacePolicyUi } from './menu/MenuSurfacePolicyUiSync.js';
+import { resolveSurfaceEntryCopy, resolveSurfaceMenuState } from '../shared/contracts/PlatformSurfacePolicyOps.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
@@ -241,8 +242,9 @@ export class UIManager {
     syncSessionState(settings = this.game.settings) {
         const ui = this.ui;
         const huntFeatureEnabled = resolveGameplayConfig(this.game).HUNT?.ENABLED !== false;
-        const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
-        const { modePath } = syncMenuSurfacePolicyUi({
+        const surfaceMenuState = resolveSurfaceMenuState(settings, { productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId });
+        const sessionType = surfaceMenuState.sessionType;
+        syncMenuSurfacePolicyUi({
             ui,
             settings,
             sessionType,
@@ -260,7 +262,7 @@ export class UIManager {
 
     syncModes(settings = this.game.settings) {
         const ui = this.ui;
-        const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
+        const sessionType = resolveSurfaceMenuState(settings, { productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId }).sessionType;
         const effectiveMode = sessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
 
         if (Array.isArray(ui.modeButtons)) {
@@ -427,24 +429,28 @@ export class UIManager {
 
     syncMultiplayerState(settings = this.game.settings) {
         if (!this.ui.multiplayerStatus) return;
-        const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
+        const sessionType = resolveSurfaceMenuState(settings, { productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId }).sessionType;
+        const surfaceEntryCopy = resolveSurfaceEntryCopy({ productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId, sessionType });
         const sessionState = this.game?.menuMultiplayerBridge?.getSessionState?.() || null;
         const activePresetId = String(settings?.matchSettings?.activePresetId || '');
         const presetText = activePresetId ? ` | Preset: ${activePresetId}` : '';
         if (sessionType !== MENU_SESSION_TYPES.MULTIPLAYER) {
-            this.ui.multiplayerStatus.textContent = `Lobby inaktiv${presetText}`;
-            if (this.ui.startButton) { this.ui.startButton.disabled = false; this.ui.startButton.title = ''; }
-            return;
-        }
-        if (!sessionState?.joined) {
-            this.ui.multiplayerStatus.textContent = `Lobby offline | Rolle: nicht verbunden${presetText}`;
+            this.ui.multiplayerStatus.textContent = `${surfaceEntryCopy.multiplayerInactiveStatus}${presetText}`;
             if (this.ui.startButton) {
                 this.ui.startButton.disabled = false;
-                this.ui.startButton.title = 'Lobby hosten oder joinen, bevor gestartet wird.';
+                this.ui.startButton.title = surfaceEntryCopy.startButtonTitle || '';
             }
             return;
         }
-        const role = sessionState.isHost ? 'Host' : 'Client';
+        if (!sessionState?.joined) {
+            this.ui.multiplayerStatus.textContent = `${surfaceEntryCopy.multiplayerDisconnectedStatus}${presetText}`;
+            if (this.ui.startButton) {
+                this.ui.startButton.disabled = false;
+                this.ui.startButton.title = surfaceEntryCopy.multiplayerJoinWaitTitle;
+            }
+            return;
+        }
+        const role = sessionState.isHost ? 'Host' : surfaceEntryCopy.multiplayerClientRoleLabel;
         const startStatus = sessionState.canStart
             ? 'Start bereit'
             : (sessionState.isHost ? 'Warte auf Ready' : 'Warte auf Host');
@@ -455,7 +461,7 @@ export class UIManager {
                 ? ''
                 : (sessionState.isHost
                     ? 'Alle Teilnehmer muessen Ready sein und mindestens 2 Spieler verbunden sein.'
-                    : 'Nur der Host kann das Match starten.');
+                    : surfaceEntryCopy.multiplayerClientStartTitle);
         }
     }
 

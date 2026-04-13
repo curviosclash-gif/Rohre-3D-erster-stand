@@ -21,9 +21,12 @@ import {
     isSurfaceMapKeyAllowedForModePath,
     isSurfaceModePathAllowed,
     isSurfaceQuickStartActionAllowed,
+    isSurfaceSessionTypeAllowed,
     listSurfaceAllowedMapKeysForModePath,
+    resolveSurfaceEntryCopy,
     resolveSurfaceBlockedFeatureFeedback,
     resolveSurfaceFallbackModePath,
+    resolveSurfaceFallbackSessionType,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
@@ -106,17 +109,33 @@ export function handleSessionTypeChangeAction(ctx) {
     const { game, event, onSettingsChanged } = ctx;
     const requestedSessionType = String(event?.sessionType || '').trim().toLowerCase();
     if (!requestedSessionType) return;
+    const requestedAllowed = isSurfaceSessionTypeAllowed(requestedSessionType);
+    const targetSessionType = requestedAllowed
+        ? requestedSessionType
+        : resolveSurfaceFallbackSessionType();
 
-    const result = game.settingsManager.switchSessionType(game.settings, requestedSessionType);
+    const result = game.settingsManager.switchSessionType(game.settings, targetSessionType);
     if (!result.success) {
         game._showStatusToast('Session-Typ konnte nicht gewechselt werden.', 1700, 'error');
         return;
     }
 
     onSettingsChanged({ changedKeys: SESSION_SWITCH_CHANGED_KEYS });
-    const label = result.targetSessionType === 'splitscreen'
-        ? 'Splitscreen'
-        : (result.targetSessionType === 'multiplayer' ? 'Multiplayer' : 'Single Player');
+    const surfaceEntryCopy = resolveSurfaceEntryCopy({
+        sessionType: result.targetSessionType,
+    });
+    const label = surfaceEntryCopy.sessionLabels[result.targetSessionType]
+        || (result.targetSessionType === 'splitscreen'
+            ? 'Splitscreen'
+            : (result.targetSessionType === 'multiplayer' ? 'Multiplayer' : 'Single Player'));
+    if (!requestedAllowed && requestedSessionType !== targetSessionType) {
+        const blockedLabel = requestedSessionType === 'splitscreen'
+            ? 'Splitscreen'
+            : 'Dieser Einstieg';
+        const feedback = resolveSurfaceBlockedFeatureFeedback(blockedLabel);
+        game._showStatusToast(`${feedback.message} ${label} wurde gesetzt.`, 1700, feedback.tone);
+        return;
+    }
     game._showStatusToast(
         result.loadedDraft ? `Session gewechselt: ${label} (Draft geladen)` : `Session gewechselt: ${label}`,
         1200,

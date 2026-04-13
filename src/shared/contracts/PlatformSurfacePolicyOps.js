@@ -2,12 +2,17 @@ import {
     PLATFORM_CAPABILITY_IDS,
 } from './PlatformCapabilityContract.js';
 import {
+    isMapEligibleForModePath,
+    resolveModePathFallbackMapKey,
+} from './MapModeContract.js';
+import {
     PLATFORM_PRODUCT_SURFACE_IDS,
     PLATFORM_SURFACE_MENU_MODE_PATHS,
     PLATFORM_SURFACE_POLICY_MODES,
     PLATFORM_SURFACE_QUICK_START_ACTION_IDS,
     PLATFORM_SURFACE_SESSION_TYPES,
     resolveSurfaceCapabilityAccess,
+    resolveSurfaceDeveloperAccess,
     resolveSurfacePolicy,
 } from './PlatformCapabilityRegistry.js';
 
@@ -17,6 +22,20 @@ const VALID_SURFACE_SESSION_TYPES = new Set(Object.values(PLATFORM_SURFACE_SESSI
 const SURFACE_POLICY_BLOCKED_REASON = 'surface_policy_blocked';
 const SURFACE_POLICY_BLOCKED_TONE = 'warning';
 const SURFACE_POLICY_BLOCKED_DURATION_MS = 1600;
+export const PLATFORM_SURFACE_FEATURE_IDS = Object.freeze({
+    REPLAY_EXPORT: 'replay-export',
+    VIDEO_EXPORT: 'video-export',
+    FILE_IO: 'file-io',
+    DIAGNOSTICS: 'diagnostics',
+    TOOLING: 'tooling',
+});
+export const PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS = Object.freeze({
+    DESKTOP_ONLY: 'desktop-only',
+    DEMO_SAFE: 'demo-safe',
+    LEGACY: 'legacy',
+    FUTURE_OPT_IN: 'future opt-in',
+});
+const VALID_SURFACE_FEATURE_IDS = new Set(Object.values(PLATFORM_SURFACE_FEATURE_IDS));
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -36,6 +55,11 @@ function normalizeSurfaceSessionType(value, fallback = '') {
 function normalizeSurfaceQuickStartActionId(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_SURFACE_QUICK_START_ACTION_IDS.has(normalized) ? normalized : fallback;
+}
+
+function normalizeSurfaceFeatureId(value, fallback = '') {
+    const normalized = normalizeString(value, '').toLowerCase();
+    return VALID_SURFACE_FEATURE_IDS.has(normalized) ? normalized : fallback;
 }
 
 export function listSurfaceAllowedSessionTypes(options = {}) {
@@ -65,8 +89,171 @@ export function isSurfaceSessionTypeAllowed(sessionType, options = {}) {
     return listSurfaceAllowedSessionTypes(options).includes(normalizedSessionType);
 }
 
+export function resolveSurfaceMenuState(settings = {}, options = {}) {
+    const policy = resolveSurfacePolicy(options);
+    const productSurfaceId = policy.productSurfaceId;
+    const localSettings = settings?.localSettings && typeof settings.localSettings === 'object'
+        ? settings.localSettings
+        : {};
+    const requestedSessionType = normalizeSurfaceSessionType(
+        localSettings.sessionType,
+        PLATFORM_SURFACE_SESSION_TYPES.SINGLE
+    );
+    const sessionType = isSurfaceSessionTypeAllowed(requestedSessionType, { productSurfaceId })
+        ? requestedSessionType
+        : resolveSurfaceFallbackSessionType({ productSurfaceId });
+
+    const requestedModePath = normalizeSurfaceMenuModePath(
+        localSettings.modePath,
+        PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL
+    );
+    const modePath = isSurfaceModePathAllowed(requestedModePath, { productSurfaceId })
+        ? requestedModePath
+        : resolveSurfaceFallbackModePath({ productSurfaceId });
+
+    const maps = options?.maps && typeof options.maps === 'object' ? options.maps : null;
+    const requestedMapKey = normalizeString(settings?.mapKey, '');
+    const requestedMapDefinition = requestedMapKey && maps ? maps[requestedMapKey] : null;
+    const requestedMapAllowed = requestedMapKey
+        && !!requestedMapDefinition
+        && isMapEligibleForModePath(requestedMapDefinition, modePath)
+        && isSurfaceMapKeyAllowedForModePath(requestedMapKey, modePath, { productSurfaceId });
+    const surfaceAllowedMapKeys = listSurfaceAllowedMapKeysForModePath(modePath, { productSurfaceId });
+    const fallbackMapKey = maps
+        ? (
+            surfaceAllowedMapKeys
+                .find((mapKey) => maps?.[mapKey] && isMapEligibleForModePath(maps[mapKey], modePath))
+            || (
+                resolveSurfacePolicy({ productSurfaceId }).requiresCuratedMaps === true
+                    ? normalizeString(surfaceAllowedMapKeys[0], '')
+                    : resolveModePathFallbackMapKey(maps, modePath, requestedMapKey || 'standard')
+            )
+        )
+        : requestedMapKey;
+    const mapKey = requestedMapAllowed ? requestedMapKey : fallbackMapKey;
+
+    return Object.freeze({
+        productSurfaceId,
+        requestedSessionType,
+        sessionType,
+        sessionTypeChanged: sessionType !== requestedSessionType,
+        requestedModePath,
+        modePath,
+        modePathChanged: modePath !== requestedModePath,
+        requestedMapKey,
+        mapKey,
+        mapKeyChanged: !!mapKey && mapKey !== requestedMapKey,
+    });
+}
+
+export function applySurfaceMenuState(settings = {}, options = {}) {
+    const source = settings && typeof settings === 'object' ? settings : null;
+    const resolvedState = resolveSurfaceMenuState(source || {}, options);
+    if (!source) {
+        return Object.freeze({
+            ...resolvedState,
+            changed: false,
+            changedKeys: Object.freeze([]),
+        });
+    }
+    if (!source.localSettings || typeof source.localSettings !== 'object') {
+        source.localSettings = {};
+    }
+
+    const changedKeys = new Set();
+    if (source.localSettings.sessionType !== resolvedState.sessionType) {
+        source.localSettings.sessionType = resolvedState.sessionType;
+        changedKeys.add('sessionType');
+    }
+    if (source.localSettings.modePath !== resolvedState.modePath) {
+        source.localSettings.modePath = resolvedState.modePath;
+        changedKeys.add('modePath');
+    }
+    if (resolvedState.mapKey && source.mapKey !== resolvedState.mapKey) {
+        source.mapKey = resolvedState.mapKey;
+        changedKeys.add('mapKey');
+    }
+
+    return Object.freeze({
+        ...resolvedState,
+        changed: changedKeys.size > 0,
+        changedKeys: Object.freeze(Array.from(changedKeys)),
+    });
+}
+
 export function resolveSurfaceFallbackModePath(options = {}) {
     return resolveSurfacePolicy(options).defaultModePath;
+}
+
+export function resolveSurfaceFeatureClassification(featureId, options = {}) {
+    const policy = resolveSurfacePolicy(options);
+    const developerAccess = resolveSurfaceDeveloperAccess({
+        productSurfaceId: policy.productSurfaceId,
+    });
+    const normalizedFeatureId = normalizeSurfaceFeatureId(featureId, '');
+    const isBrowserDemo = policy.productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO;
+    const classificationByFeatureId = Object.freeze({
+        [PLATFORM_SURFACE_FEATURE_IDS.REPLAY_EXPORT]: Object.freeze({
+            featureId: PLATFORM_SURFACE_FEATURE_IDS.REPLAY_EXPORT,
+            productSurfaceId: policy.productSurfaceId,
+            classification: isBrowserDemo
+                ? PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DEMO_SAFE
+                : PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY,
+            rationale: isBrowserDemo
+                ? 'Replay-JSON ist in der Demo als begrenzter Browser-Download zulaessig.'
+                : 'Replay-Export bleibt der primaere Desktop-Vollversionspfad.',
+        }),
+        [PLATFORM_SURFACE_FEATURE_IDS.VIDEO_EXPORT]: Object.freeze({
+            featureId: PLATFORM_SURFACE_FEATURE_IDS.VIDEO_EXPORT,
+            productSurfaceId: policy.productSurfaceId,
+            classification: isBrowserDemo
+                ? PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN
+                : PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY,
+            rationale: isBrowserDemo
+                ? 'Video-Export bleibt in der Demo ein optionaler, bewusst degradierter Zukunftspfad.'
+                : 'Video-Export ist Teil des Desktop-Produkts und kein Browser-Paritaetsversprechen.',
+        }),
+        [PLATFORM_SURFACE_FEATURE_IDS.FILE_IO]: Object.freeze({
+            featureId: PLATFORM_SURFACE_FEATURE_IDS.FILE_IO,
+            productSurfaceId: policy.productSurfaceId,
+            classification: PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY,
+            rationale: 'Dateioperationen bleiben an Desktop-Shell-Capabilities gebunden.',
+        }),
+        [PLATFORM_SURFACE_FEATURE_IDS.DIAGNOSTICS]: Object.freeze({
+            featureId: PLATFORM_SURFACE_FEATURE_IDS.DIAGNOSTICS,
+            productSurfaceId: policy.productSurfaceId,
+            classification: isBrowserDemo
+                ? PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN
+                : PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY,
+            rationale: isBrowserDemo
+                ? 'Demo-Diagnostics sind nur als expliziter Opt-in erlaubt, nicht als Standardfeature.'
+                : 'Desktop-Diagnostics gehoeren zum Vollversions- und Supportpfad.',
+        }),
+        [PLATFORM_SURFACE_FEATURE_IDS.TOOLING]: Object.freeze({
+            featureId: PLATFORM_SURFACE_FEATURE_IDS.TOOLING,
+            productSurfaceId: policy.productSurfaceId,
+            classification: developerAccess.available === true
+                ? PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.LEGACY
+                : PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN,
+            rationale: developerAccess.available === true
+                ? 'Tooling bleibt lokaler Dev-/Diagnosezugang und zaehlt nicht zum Produktversprechen.'
+                : 'Tooling ist fuer diese Surface aktuell nicht freigegeben.',
+        }),
+    });
+    if (!normalizedFeatureId) {
+        return Object.freeze({
+            featureId: '',
+            productSurfaceId: policy.productSurfaceId,
+            classification: PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN,
+            rationale: 'Unbekannte Surface-Features starten als expliziter Zukunfts-Opt-in.',
+        });
+    }
+    return classificationByFeatureId[normalizedFeatureId] || Object.freeze({
+        featureId: normalizedFeatureId,
+        productSurfaceId: policy.productSurfaceId,
+        classification: PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN,
+        rationale: 'Unklassifiziertes Feature bleibt bis zur Freigabe als Zukunfts-Opt-in markiert.',
+    });
 }
 
 export function isSurfaceModePathAllowed(modePath, options = {}) {

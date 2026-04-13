@@ -7,6 +7,11 @@ import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatform
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
 import { PLATFORM_CAPABILITY_IDS } from '../../shared/contracts/PlatformCapabilityContract.js';
 import { resolveSurfaceCapabilityAccess } from '../../shared/contracts/PlatformCapabilityRegistry.js';
+import {
+    PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS,
+    PLATFORM_SURFACE_FEATURE_IDS,
+    resolveSurfaceFeatureClassification,
+} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 
 export const REPLAY_EXPORT_CONTRACT_VERSION = 'replay.v1';
 
@@ -118,6 +123,10 @@ export class ReplayRecorder {
         const saveSurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
             runtimeGlobal,
         });
+        const replayFeatureClassification = resolveSurfaceFeatureClassification(
+            PLATFORM_SURFACE_FEATURE_IDS.REPLAY_EXPORT,
+            { runtimeGlobal }
+        );
         const desktopSaveAdapter = createElectronPreloadSaveAdapter(runtimeGlobal);
 
         // App mode: Electron IPC
@@ -129,6 +138,7 @@ export class ReplayRecorder {
         // Web mode: use provided download function (from UI layer)
         const browserSaveAdapter = createBrowserSaveAdapter({
             saveReplay: saveSurfaceCapability.available === true
+                && replayFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DEMO_SAFE
                 ? (payload, fileName) => {
                     if (typeof downloadFn !== 'function') {
                         return { saved: false };

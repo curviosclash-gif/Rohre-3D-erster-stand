@@ -1,6 +1,6 @@
 # AI Architecture Context (Aktiv)
 
-Stand: 2026-04-13
+Stand: 2026-04-14
 
 ## 1. Architekturparadigma
 
@@ -398,6 +398,40 @@ Stand: 2026-04-13
 - `src/core/runtime/MenuRuntimeSessionService.js` nutzt denselben Resolver fuer gesperrte Mode- und Quickstart-Aktionen (`Direktstart`, `Event-Playlist`, `Random-Start`), statt getrennte Ad-hoc-Texte zu pflegen.
 - `src/core/runtime/MenuRuntimePresetConfigService.js` nutzt denselben Resolver fuer gesperrte Preset-Aktionen; Preset- und Quickstart-Pfade bleiben damit textlich und tonal deckungsgleich.
 - `tests/platform-capabilities.contract.test.mjs` verifiziert den gemeinsamen Feedback-Vertrag fuer Browser-Demo und Desktop-Surface, damit Folgearbeit neue Sperrpfade auf denselben UX-Standard zieht.
+
+#### 4.6.4.10 Explizite Einstiegsschnitte fuer Showcase, Join-only und Desktop-Host (`V77 77.3.3`)
+
+- `src/shared/contracts/PlatformCapabilityRegistry.js` erweitert den Surface-Vertrag um `allowedSessionTypes`: `desktop-app` fuehrt `single`, `multiplayer` und `splitscreen`, `browser-demo` bleibt bewusst auf `single` plus `multiplayer`.
+- `src/shared/contracts/PlatformSurfacePolicyOps.js` fuehrt mit `resolveSurfaceEntryCopy()` den kleinen UI-Vertrag fuer Einstiege zusammen: Session-Labels, Start-CTA, Lobby-Titel, Host-/Join-Buttons, Status-Texte und Placeholder lesen denselben Surface-Schnitt statt verstreuter Demo-Sondertexte.
+- `browser-demo` kommuniziert denselben Einstieg jetzt explizit als kuratierten `Showcase`-Pfad fuer Offline-Solo und als `Join only` fuer Multiplayer; `Host` bleibt sichtbar als `Nur Desktop`, nicht als versteckter, degradiert-paritaetischer Browser-Host.
+- `src/ui/menu/MenuSurfacePolicyUiSync.js`, `src/ui/UIManager.js` und `src/ui/UIStartSyncController.js` konsumieren denselben Einstiegstextvertrag produktiv. Session-Umschalter, Summary, Start-Button und Lobby-UI bleiben damit zwischen Browser und Desktop deckungsgleich zum Shared Surface-Contract.
+- `src/core/runtime/MenuRuntimeSessionService.js` faellt disallowte Session-Einstiege sichtbar auf den Surface-Fallback zurueck, und `src/core/runtime/MatchStartValidationService.js` benennt Browser-Multiplayer explizit als Desktop-Host-Join-Pfad statt als generischen Host-/Join-CTA.
+- `tests/platform-capabilities.contract.test.mjs` und `tests/core-targeted-runtime.spec.js` pruefen denselben Einstiegsschnitt fuer Folgearbeit, damit spaetere Surface-Features keine neuen Ad-hoc-Labels oder impliziten Browser-Host-Hinweise einfuehren.
+
+#### 4.6.4.11 Surface-Transportmatrix als V64-Vorvertrag (`V77 77.4.1`)
+
+- `src/shared/contracts/PlatformCapabilityRegistry.js` fuehrt fuer `desktop-app` und `browser-demo` jetzt explizite Multiplayer-Transportfelder im `surfacePolicy`: `defaultMultiplayerTransport`, `allowedMultiplayerTransports`, `hostMultiplayerTransports`, `joinMultiplayerTransports` und `legacyMultiplayerTransports`.
+- `desktop-app` bleibt produktisch auf echten V64-Transporten `lan` und spaeter `online`; der gemeinsame Default bleibt `lan`, und Host oder Join duerfen auf beiden Pfaden liegen.
+- `browser-demo` koppelt denselben Transportvertrag bewusst an die Produktrolle `join only`: Produktisch freigegeben bleibt nur `lan` als Join-Pfad zu einer Desktop-Lobby; `storage-bridge` ist nur noch als expliziter Legacy-Eintrag dokumentiert und nicht mehr der implizite Surface-Default.
+- `resolveDefaultLobbyTransport()` und `MenuRuntimeMultiplayerService` lesen diese Matrix produktiv fuer neue Multiplayer-Defaults und Snapshot-Fallbacks, damit V64-Folgearbeit nicht erneut ueber einen browserinternen Behelfsweg startet, wenn fachlich echter Multiplayer gemeint ist.
+- `docs/plaene/aktiv/V64.md` referenziert denselben Vorvertrag jetzt explizit; Produkt-, Session- und Transportarbeit in `V64` baut auf dieser Surface-Matrix auf, statt eine parallele Host-/Join-/Transport-Terminologie einzufuehren.
+
+#### 4.6.4.12 Expliziter Surface-Migrationspfad statt UI-Seiteneffekten (`V77 77.4.4`)
+
+- `src/shared/contracts/PlatformSurfacePolicyOps.js` fuehrt mit `resolveSurfaceMenuState()` einen reinen Resolver fuer Demo-Fallbacks ein: `sessionType`, `modePath` und kuratierte `mapKey`-Defaults werden zentral berechnet, ohne dabei Settings zu mutieren.
+- `applySurfaceMenuState()` bleibt derselbe Resolver als expliziter Runtime-Mutationspfad. Folgearbeit darf Surface-Fallbacks damit nur bewusst im Runtime- oder Session-Start anwenden, nicht mehr nebenbei im UI-Sync.
+- `src/ui/menu/MenuSurfacePolicyUiSync.js`, `src/ui/UIManager.js` und `src/ui/UIStartSyncController.js` lesen diese Surface-Matrix jetzt ausschliesslich fuer Labels, Button-Sichtbarkeit, Summary, Lobbytexte und kuratierte Select-Optionen. Versteckte Nutzerpraeferenz-Mutationen ueber `sync*`-Methoden sind dort nicht mehr zulaessig.
+- `src/core/runtime/GameRuntimeSettingsHandler.js` fuehrt `applySurfacePolicyStartDefaults()` als expliziten Session-Start-Pfad ein. Vor Matchstart werden unzulaessige Browser-Demo-Zustaende wie `splitscreen`, `quick_action` oder nicht kuratierte Maps bewusst auf erlaubte Surface-Werte migriert und anschliessend ueber die bestehenden Compatibility-Regeln nachgezogen.
+- `src/core/runtime/GameRuntimeSessionHandler.js` ruft diesen Pfad direkt vor Telemetrie und Start-Validierung auf, sodass Matchstart, Runtime-Snapshot und UI denselben effektiven Surface-Zustand lesen.
+- `tests/platform-capabilities.contract.test.mjs` und `tests/core-targeted-runtime.spec.js` pruefen sowohl den reinen Resolver als auch den expliziten Startpfad, damit spaetere Surface-Arbeit keine stillen UI-Nebenwirkungen zurueckschiebt.
+
+#### 4.6.4.13 Surface-Klassen fuer Export-, Datei- und Tooling-Pfade (`V77 77.5.1`)
+
+- `src/shared/contracts/PlatformSurfacePolicyOps.js` fuehrt mit `PLATFORM_SURFACE_FEATURE_IDS`, `PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS` und `resolveSurfaceFeatureClassification()` den zentralen Klassifizierungsvertrag fuer Replay, Video-Export, Dateioperationen, Diagnostics und Tooling ein.
+- Der Vertrag trennt produktive und degradierte Surface-Pfade explizit: `replay-export` ist in `browser-demo` `demo-safe`, `video-export`/`diagnostics` bleiben dort `future opt-in`, `file-io` bleibt `desktop-only`, und Tooling bleibt als lokaler Dev-/Diagnosepfad unter `legacy`.
+- `src/core/replay/ReplayRecorder.js` konsumiert die Replay-Klassifizierung direkt und erlaubt Browser-Persistenz nur ueber den expliziten `demo-safe`-Pfad, statt impliziter Save-Availability-Paritaet.
+- `src/core/recording/DownloadService.js` haengt die Video-Klassifizierung als `surfaceClassification` in den strukturierten Export-Status und markiert degradierten Browser-/Datei-Fallback ueber explizite Warnungen.
+- `tests/platform-capabilities.contract.test.mjs` haelt die Klassifizierungs-Matrix als Contract fest und schuetzt den Browser-Demo-Fallback zusaetzlich gegen nicht-kuratierte Map-Ausweichpfade.
 
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 

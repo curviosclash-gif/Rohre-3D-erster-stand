@@ -2,7 +2,9 @@ import { PLATFORM_SURFACE_QUICK_START_ACTION_IDS } from '../../shared/contracts/
 import {
     isSurfaceModePathAllowed,
     isSurfaceQuickStartActionAllowed,
-    resolveSurfaceFallbackModePath,
+    isSurfaceSessionTypeAllowed,
+    resolveSurfaceMenuState,
+    resolveSurfaceEntryCopy,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 
 export function syncMenuSurfacePolicyUi({
@@ -12,22 +14,41 @@ export function syncMenuSurfacePolicyUi({
     surfacePolicy = null,
     huntFeatureEnabled = true,
 }) {
-    let modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
-    if (surfacePolicy && !isSurfaceModePathAllowed(modePath, {
-        productSurfaceId: surfacePolicy.productSurfaceId,
-    })) {
-        modePath = resolveSurfaceFallbackModePath({
+    const surfaceMenuState = surfacePolicy
+        ? resolveSurfaceMenuState(settings, {
             productSurfaceId: surfacePolicy.productSurfaceId,
-        });
-        if (settings?.localSettings) {
-            settings.localSettings.modePath = modePath;
-        }
-    }
+        })
+        : null;
+    const modePath = surfaceMenuState?.modePath || String(settings?.localSettings?.modePath || 'normal').toLowerCase();
+    const resolvedSessionType = surfaceMenuState?.sessionType || String(sessionType || 'single').toLowerCase();
+
+    const surfaceEntryCopy = surfacePolicy
+        ? resolveSurfaceEntryCopy({
+            productSurfaceId: surfacePolicy.productSurfaceId,
+            sessionType: resolvedSessionType,
+        })
+        : null;
 
     if (Array.isArray(ui.sessionButtons)) {
         ui.sessionButtons.forEach((button) => {
             const buttonSessionType = String(button?.dataset?.sessionType || '').trim().toLowerCase();
-            const isActive = buttonSessionType === sessionType;
+            const surfaceAllowed = !surfacePolicy || isSurfaceSessionTypeAllowed(buttonSessionType, {
+                productSurfaceId: surfacePolicy.productSurfaceId,
+            });
+            const labelNode = button?.querySelector?.('.nav-btn-label') || button;
+            if (labelNode && !button.dataset.surfaceDefaultLabel) {
+                button.dataset.surfaceDefaultLabel = String(labelNode.textContent || '').trim();
+            }
+            if (labelNode) {
+                labelNode.textContent = surfaceEntryCopy?.sessionLabels?.[buttonSessionType]
+                    || button.dataset.surfaceDefaultLabel
+                    || String(labelNode.textContent || '').trim();
+            }
+            button.classList.toggle('hidden', !surfaceAllowed);
+            button.setAttribute('aria-hidden', String(!surfaceAllowed));
+            button.disabled = !surfaceAllowed;
+            button.title = surfaceEntryCopy?.sessionDescriptions?.[buttonSessionType] || '';
+            const isActive = buttonSessionType === resolvedSessionType;
             button.classList.toggle('active', isActive);
             button.setAttribute('aria-pressed', String(isActive));
         });
@@ -73,5 +94,37 @@ export function syncMenuSurfacePolicyUi({
         quickStartSection.setAttribute('aria-hidden', String(visibleQuickStartCount === 0));
     }
 
-    return { modePath };
+    if (ui.startButton) {
+        ui.startButton.textContent = surfaceEntryCopy?.startButtonLabel || 'Starten';
+        ui.startButton.title = surfaceEntryCopy?.startButtonTitle || '';
+    }
+
+    if (ui.multiplayerInlineState) {
+        const titleNode = ui.multiplayerInlineState.querySelector('.section-title');
+        const copyNode = ui.multiplayerInlineState.querySelector('.menu-accordion-copy');
+        if (titleNode) {
+            titleNode.textContent = surfaceEntryCopy?.multiplayerTitle || 'Lobby & Bereitschaft';
+        }
+        if (copyNode) {
+            copyNode.textContent = surfaceEntryCopy?.multiplayerSubtitle || 'Session-Code, echte Lobby-Verbindung und Ready-Status.';
+        }
+    }
+    if (ui.multiplayerLobbyCodeInput) {
+        ui.multiplayerLobbyCodeInput.placeholder = surfaceEntryCopy?.lobbyCodePlaceholder || 'z. B. TEST-1234';
+    }
+    if (ui.multiplayerHostButton) {
+        ui.multiplayerHostButton.textContent = surfaceEntryCopy?.hostButtonLabel || 'Host';
+        ui.multiplayerHostButton.title = surfaceEntryCopy?.hostButtonTitle || '';
+        ui.multiplayerHostButton.disabled = surfaceEntryCopy?.hostActionAvailable === false;
+    }
+    if (ui.multiplayerJoinButton) {
+        ui.multiplayerJoinButton.textContent = surfaceEntryCopy?.joinButtonLabel || 'Join';
+        ui.multiplayerJoinButton.title = surfaceEntryCopy?.joinButtonTitle || '';
+    }
+
+    return {
+        modePath,
+        sessionType: resolvedSessionType,
+        surfaceEntryCopy,
+    };
 }

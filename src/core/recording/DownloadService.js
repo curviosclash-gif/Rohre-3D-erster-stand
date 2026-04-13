@@ -2,6 +2,11 @@ import { EDITOR_API_ROUTES } from '../../shared/contracts/EditorPathContract.js'
 import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 import { PLATFORM_CAPABILITY_IDS } from '../../shared/contracts/PlatformCapabilityContract.js';
 import { resolveSurfaceCapabilityAccess } from '../../shared/contracts/PlatformCapabilityRegistry.js';
+import {
+    PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS,
+    PLATFORM_SURFACE_FEATURE_IDS,
+    resolveSurfaceFeatureClassification,
+} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
 
@@ -29,6 +34,7 @@ function createDownloadStatus({
     apiStatus = null,
     message = '',
     warnings = [],
+    surfaceClassification = '',
 }) {
     return {
         requested: requested === true,
@@ -38,6 +44,7 @@ function createDownloadStatus({
         apiStatus: Number.isFinite(Number(apiStatus)) ? Number(apiStatus) : null,
         message: String(message || '').trim(),
         warnings: dedupeWarnings(warnings),
+        surfaceClassification: String(surfaceClassification || '').trim(),
     };
 }
 
@@ -115,12 +122,17 @@ export function buildDownloadFileName(downloadDirectoryName, fileName) {
  * @returns {Promise<{requested: boolean, transport: string, status: string, fallbackReason: string|null, apiStatus: number|null}>}
  */
 export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownload, downloadHandler, logger }) {
+    const videoFeatureClassification = resolveSurfaceFeatureClassification(
+        PLATFORM_SURFACE_FEATURE_IDS.VIDEO_EXPORT,
+        { runtimeGlobal: globalThis }
+    );
     if (!autoDownload || !blob || blob.size <= 0) {
         return createDownloadStatus({
             requested: false,
             transport: 'disabled',
             status: 'not_requested',
             message: 'Recording-Export wurde nicht angefordert.',
+            surfaceClassification: videoFeatureClassification.classification,
         });
     }
     const safeFileName = String(fileName || '').trim();
@@ -128,6 +140,10 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     const saveSurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
         runtimeGlobal: globalThis,
     });
+    const fileIoFeatureClassification = resolveSurfaceFeatureClassification(
+        PLATFORM_SURFACE_FEATURE_IDS.FILE_IO,
+        { runtimeGlobal: globalThis }
+    );
     const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
     const desktopSaveAdapterVersionSupported = isSupportedDesktopSaveAdapterContract(desktopSaveAdapter);
     const browserSaveAdapter = createBrowserSaveAdapter({
@@ -145,6 +161,12 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
             : null,
     });
     const statusWarnings = [];
+    if (videoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN) {
+        statusWarnings.push('Video-Export ist fuer diese Surface als future opt-in klassifiziert; Browser-Fallback bleibt ein degradiertes Zusatzangebot.');
+    }
+    if (fileIoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY && !desktopSaveAdapter.isAvailable()) {
+        statusWarnings.push('Dateioperationen bleiben desktop-only; ohne Desktop-Speicheradapter wird ein degradiertes Fallback genutzt.');
+    }
     const downloadViaBrowser = async (reason, error = null) => {
         if (saveSurfaceCapability.available !== true) {
             return false;
@@ -180,6 +202,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
                     status: 'saved_via_app',
                     message: 'Recording wurde direkt ueber die Desktop-App gespeichert.',
                     warnings: statusWarnings,
+                    surfaceClassification: videoFeatureClassification.classification,
                 });
             }
         } catch (error) {
@@ -198,6 +221,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
                 ? 'Recording wurde als Browser-Download gespeichert, weil keine Disk-API verfuegbar ist.'
                 : 'Recording konnte ohne Disk-API auch nicht als Browser-Download gespeichert werden.',
             warnings: [...statusWarnings, 'Disk-API ist in dieser Umgebung nicht verfuegbar.'],
+            surfaceClassification: videoFeatureClassification.classification,
         });
     }
     try {
@@ -215,6 +239,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
                 apiStatus: Number(response.status) || 200,
                 message: 'Recording wurde ueber die lokale Disk-API gespeichert.',
                 warnings: statusWarnings,
+                surfaceClassification: videoFeatureClassification.classification,
             });
         }
         const apiStatus = Number(response?.status) || 0;
@@ -230,6 +255,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
                 ? 'Recording wurde als Browser-Download gespeichert, weil die Disk-API fehlgeschlagen ist.'
                 : 'Recording konnte nach fehlgeschlagener Disk-API auch nicht als Browser-Download gespeichert werden.',
             warnings: [...statusWarnings, `Disk-API-Fehler: HTTP ${apiStatus || 'unknown'}.`],
+            surfaceClassification: videoFeatureClassification.classification,
         });
     } catch (error) {
         const downloaded = await downloadViaBrowser('api-throw', error);
@@ -242,6 +268,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
                 ? 'Recording wurde als Browser-Download gespeichert, weil die Disk-API nicht erreichbar war.'
                 : 'Recording konnte weder ueber die Disk-API noch als Browser-Download gespeichert werden.',
             warnings: [...statusWarnings, 'Disk-API war nicht erreichbar.'],
+            surfaceClassification: videoFeatureClassification.classification,
         });
     }
 }

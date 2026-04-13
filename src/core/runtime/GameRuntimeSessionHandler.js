@@ -208,6 +208,7 @@ export class GameRuntimeSessionHandler {
                 ...(options && typeof options === 'object' ? options : {}),
                 schedulePrewarm: false,
             });
+            facade?.settingsHandler?.applySurfacePolicyStartDefaults?.();
             const sessionContract = resolveRuntimeSessionContract(game?.settings?.localSettings);
             const telemetryPayload = buildTelemetryPayload();
             facade?._recordMenuTelemetry?.('start_attempt', telemetryPayload);

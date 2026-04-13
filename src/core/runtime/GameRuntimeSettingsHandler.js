@@ -3,6 +3,7 @@ import { SETTINGS_CHANGE_KEYS } from '../../composition/core-ui/CoreUiMenuPorts.
 import { CONFIG } from '../Config.js';
 import { MATCH_SETTING_CHANGE_KEY_SET, START_VALIDATION_RELEVANT_KEY_SET } from './GameRuntimeSettingsKeySets.js';
 import { resolveMatchStartValidationIssue } from './MatchStartValidationService.js';
+import { applySurfaceMenuState } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import {
     applyMultiplayerMatchSettingsSnapshot,
     createMultiplayerMatchSettingsSnapshot,
@@ -56,7 +57,52 @@ export class GameRuntimeSettingsHandler {
             multiplayerSessionState: this._facade?.menuMultiplayerBridge?.getSessionState?.(),
             maps: CONFIG?.MAPS,
             huntModeType: GAME_MODE_TYPES.HUNT,
+            productSurfaceId: this._facade?.game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || '',
         });
+    }
+
+    applySurfacePolicyStartDefaults() {
+        const game = this._facade?.game;
+        if (!game?.settings) return null;
+
+        const migration = applySurfaceMenuState(game.settings, {
+            productSurfaceId: game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || '',
+            maps: CONFIG?.MAPS,
+        });
+        if (!migration?.changed) {
+            return migration;
+        }
+
+        const surfaceChangedKeys = migration.changedKeys.map((key) => (
+            key === 'sessionType'
+                ? SETTINGS_CHANGE_KEYS.SESSION_TYPE
+                : (key === 'modePath'
+                    ? SETTINGS_CHANGE_KEYS.MODE_PATH
+                    : SETTINGS_CHANGE_KEYS.MAP_KEY)
+        ));
+        const compatibilityResult = game.settingsManager?.applyMenuCompatibilityRules?.(
+            game.settings,
+            {
+                accessContext: this._facade?._resolveMenuAccessContext?.(),
+                changedKeys: surfaceChangedKeys,
+            }
+        );
+        const changedKeys = Array.from(new Set([
+            ...surfaceChangedKeys,
+            ...(Array.isArray(compatibilityResult?.changedKeys) ? compatibilityResult.changedKeys : []),
+        ]));
+
+        this._facade?.applySettingsToRuntime?.({ schedulePrewarm: false });
+        this._facade?._syncMultiplayerRuntimeContext?.(changedKeys);
+        game.uiManager?.syncByChangeKeys?.(changedKeys);
+        game.uiManager?.updateContext?.();
+        this.invalidateMultiplayerReadyIfHostChangedSettings(changedKeys);
+        this.updateSaveButtonState();
+
+        return {
+            ...migration,
+            changedKeys,
+        };
     }
 
     onSettingsChanged(event = null) {

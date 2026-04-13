@@ -38,13 +38,18 @@ import {
     normalizeLobbyServiceTransport,
 } from '../src/shared/contracts/LobbyServiceContract.js';
 import {
+    applySurfaceMenuState,
     isSurfacePresetAllowed,
     isSurfaceQuickStartActionAllowed,
     isSurfaceSessionTypeAllowed,
+    PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS,
+    PLATFORM_SURFACE_FEATURE_IDS,
     listSurfaceAllowedMapKeysForModePath,
     listSurfaceAllowedSessionTypes,
     resolveSurfaceBlockedFeatureFeedback,
     resolveSurfaceEntryCopy,
+    resolveSurfaceFeatureClassification,
+    resolveSurfaceMenuState,
     resolveSurfaceMultiplayerGateAccess,
 } from '../src/shared/contracts/PlatformSurfacePolicyOps.js';
 import { StoragePlatform } from '../src/state/storage/StoragePlatform.js';
@@ -210,6 +215,108 @@ test('V77.3.3 surface entry copy cuts showcase, join-only and splitscreen access
     assert.match(browserEntryCopy.multiplayerSubtitle, /hostet aber nicht/);
     assert.equal(desktopEntryCopy.hostButtonLabel, 'Host');
     assert.equal(desktopEntryCopy.sessionSummaryLabels.single, 'Single Player');
+});
+
+test('V77.4.4 surface menu state resolves browser-demo fallbacks without mutating settings in the UI layer', () => {
+    const rawSettings = {
+        mapKey: 'custom',
+        localSettings: {
+            sessionType: 'splitscreen',
+            modePath: 'quick_action',
+        },
+    };
+
+    const resolved = resolveSurfaceMenuState(rawSettings, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        maps: {
+            standard: { key: 'standard' },
+            maze: { key: 'maze' },
+            parcours_rift: { key: 'parcours_rift', parcours: { enabled: true } },
+        },
+    });
+
+    assert.equal(resolved.sessionType, 'single');
+    assert.equal(resolved.modePath, 'normal');
+    assert.equal(resolved.mapKey, 'standard');
+    assert.equal(rawSettings.localSettings.sessionType, 'splitscreen');
+    assert.equal(rawSettings.localSettings.modePath, 'quick_action');
+    assert.equal(rawSettings.mapKey, 'custom');
+});
+
+test('V77.4.4 explicit surface menu migration applies browser-demo fallbacks only on the runtime start path', () => {
+    const settings = {
+        mapKey: 'custom',
+        localSettings: {
+            sessionType: 'splitscreen',
+            modePath: 'quick_action',
+        },
+    };
+
+    const migration = applySurfaceMenuState(settings, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        maps: {
+            standard: { key: 'standard' },
+            maze: { key: 'maze' },
+            parcours_rift: { key: 'parcours_rift', parcours: { enabled: true } },
+        },
+    });
+
+    assert.equal(migration.changed, true);
+    assert.deepEqual(migration.changedKeys, ['sessionType', 'modePath', 'mapKey']);
+    assert.equal(settings.localSettings.sessionType, 'single');
+    assert.equal(settings.localSettings.modePath, 'normal');
+    assert.equal(settings.mapKey, 'standard');
+});
+
+test('V77.4.4 curated fallback never resolves to a non-curated map key when browser demo maps are incomplete', () => {
+    const rawSettings = {
+        mapKey: 'custom',
+        localSettings: {
+            sessionType: 'single',
+            modePath: 'normal',
+        },
+    };
+    const resolved = resolveSurfaceMenuState(rawSettings, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        maps: {
+            custom: { key: 'custom' },
+            parcours_rift: { key: 'parcours_rift', parcours: { enabled: true } },
+        },
+    });
+
+    assert.equal(resolved.mapKey, 'standard');
+});
+
+test('V77.5.1 surface feature classification marks replay and video paths per product surface', () => {
+    const browserReplay = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.REPLAY_EXPORT, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const browserVideo = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.VIDEO_EXPORT, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const desktopVideo = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.VIDEO_EXPORT, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+
+    assert.equal(browserReplay.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DEMO_SAFE);
+    assert.equal(browserVideo.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN);
+    assert.equal(desktopVideo.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
+});
+
+test('V77.5.1 surface feature classification keeps file IO desktop-only and tooling legacy', () => {
+    const browserFileIo = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.FILE_IO, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const desktopFileIo = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.FILE_IO, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserTooling = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.TOOLING, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(browserFileIo.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
+    assert.equal(desktopFileIo.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
+    assert.equal(browserTooling.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.LEGACY);
 });
 
 test('V77.2.1 browser host provider resolves unavailable when host capability is disabled', () => {
