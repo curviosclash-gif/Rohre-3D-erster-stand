@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-13 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 steht nach 72.5.3 in 72.6.1; V77 hat `77.3.2` abgeschlossen und fuehrt gesperrte Demo-Aktionen jetzt ueber denselben UX-Feedback-Vertrag, bevor `77.3.3` Host-/Join-/Showcase-Einstiege explizit schneidet.)
+Stand: 2026-04-13 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 steht nach 72.5.3 in 72.6.1; V77 hat `77.4.1` abgeschlossen und koppelt den V64-Transportvertrag jetzt ueber dieselbe Surface-Transportmatrix an `desktop-app`/`browser-demo`, bevor `77.4.2` Legacy-Altpfade wie `storage-bridge` als Nicht-Standard haerter absichert. V91 ist als Architektur-Ratchet nach `V77.99` eingeplant, damit Folgeblocks Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Contract-Tests gegen dieselbe Baseline lesen.)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -42,7 +42,8 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V88 | Testarchitektur und Verifikationsvertraege | done | P2 | frei | V87.99 | 88.99 | `docs/plaene/aktiv/V88.md` |
 | V89 | Desktop-first Testarchitektur und Desktop-Verifikation | done | P1 | frei | V74.99,V88.99 | 89.99 | `docs/plaene/aktiv/V89.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
-| V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.3 | `docs/plaene/aktiv/V77.md` |
+| V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.4 | `docs/plaene/aktiv/V77.md` |
+| V91 | Architektur-Ratchet und Legacy-Surface-Sunset | planned | P2 | frei | V87.99,V77.99 | 91.1 | `docs/plaene/aktiv/V91.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
@@ -79,6 +80,10 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V89 | V74.99 | hard | ja | Desktop-first-Tests duerfen keine `main.js`-/Runtime-Backdoors neu aufziehen; Runtime-/Capability-Grenzen aus V74 bleiben verbindlich |
 | V89 | V88.99 | hard | ja | Die neue Desktop-Testpyramide baut auf der in V88 dokumentierten Failure-Taxonomie, dem Test-Mapping und den bestehenden Verifikationsvertraegen auf |
 | V89 | V77.99 | soft | nein | Die Surface-Policy `Desktop Vollversion / Browser Demo` sollte in die finale Gate- und Browser-Compat-Rolle einfliessen, blockiert den Desktop-Smoke-Aufbau aber nicht |
+| V91 | V87.99 | hard | ja | Architektur-Ratchet und Legacy-Surface-Sunset bauen auf dem gehaerteten Runtime-, Lifecycle- und Capability-Kern aus V87 auf |
+| V91 | V77.99 | hard | nein | Guard-Matrix und Surface-nahe Sunset-Regeln sollen auf der verbindlichen `desktop-app`-/`browser-demo`-Policy aufsetzen statt parallel neue Produktbegriffe einzufuehren |
+| V91 | V89.99 | soft | ja | Desktop-first-Tests und `node-contract` liefern die bevorzugten kleinen Verifikationspfade fuer neue Architektur-Ratchets |
+| V64 | V91.99 | soft | nein | Multiplayer-Produktisierung sollte denselben Legacy-Sunset- und Guard-Ratchet konsumieren, bevor neue Runtime-Surfaces wachsen |
 | V86 | V72.99 | hard | nein | Editor- und Authoring-Vertraege sollen auf stabilen Pickup-, Portal-, Gate- und Spawn-Warnpfaden aus V72 aufsetzen |
 | V86 | V85.99 | soft | ja | Descriptor-, Preset- und Template-Leseweg konsumiert den in V85 finalisierten Content-Vertrag jetzt als Baseline |
 | V77 | V74.99 | hard | ja | Die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` darf erst auf der stabilisierten Runtime-/Capability-Basis aus V74 verankert werden |
@@ -96,6 +101,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V81 | V74.99 | hard | ja | Tuning Console liest/schreibt CONFIG_BASE und nutzt ActiveRuntimeConfigStore; Runtime-Entkopplung muss abgeschlossen sein |
 | V81 | V72.99 | hard | nein | Parameter-Registry muss auf stabiler Pickup-Registry und Config-Struktur aufbauen |
 | V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
+| V81 | V91.99 | hard | nein | Developer-Tuning soll Runtime-Config-Ownership nicht ueber alte Global-Slots vertiefen, sondern auf dem in V91 geharteten Contract aufsetzen |
 
 ## Lock-Status
 
@@ -112,7 +118,8 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | - | V88 | - | closed | Abgeschlossen 2026-04-10: `88.99.2` synchronisiert Test-Mapping, Failure-Taxonomie und Doku auf den blockerfesten Gate-Stand |
 | - | V89 | - | closed | Abgeschlossen 2026-04-12: `89.99.2` synchronisiert Browser-/Desktop-/Contract-Layer widerspruchsfrei; `desktop-smoke` bleibt gruen, `node-contract`-Restfehler `T97` blockerfest dokumentiert |
 | - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
-| - | V77 | - | frei | `77.3.2` abgeschlossen; `77.3.3` schneidet als naechstes Host-/Join-/Offline-/Showcase-Einstiege explizit pro Surface |
+| - | V77 | - | frei | `77.4.1` abgeschlossen; `77.4.2` markiert als naechstes `storage-bridge` und aehnliche Altpfade explizit als Nicht-Standard |
+| - | V91 | - | frei | Nach `V77.99` Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Ratchets fuer Folgeblocks `V64`, `V81` und `V86` festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
 | - | V82 | - | frei | Nach `V72.99` und `V74.99` mit `82.1` Arcade-Parcours-Vereinigung starten; liefert Daten-Contracts fuer V76.3 |
@@ -132,8 +139,9 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 1. `V87 -> V88 -> V89` ist abgeschlossen; kuenftige Blocks laufen damit auf desktop-first-Gates statt browser-first-Harness.
 2. `V85` ist abgeschlossen; Folgeblocks nutzen denselben Daten-/Persistenzrahmen jetzt als verpflichtende Baseline statt als offenen Ausbaupfad.
-3. `V77` vor `V64`, damit die Produkt- und Surface-Policy `Desktop Vollversion / Browser Demo` vor Multiplayer-Produktisierung feststeht.
-4. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
+3. `V77` vor `V91`, damit Surface-Policy und Produktrollen vor dem haerteren Guard- und Sunset-Ratchet verbindlich sind.
+4. `V91` vor `V64` und `V81`, damit Multiplayer-Produktisierung und Developer-Tuning keine neuen Runtime- oder Config-Backdoors auf alte Surfaces bauen.
+5. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
 
 ### Parallelpfad Gameplay und Authoring
 
@@ -144,9 +152,9 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 ### Kurzform
 
-`V72.99 -> V77 -> V64 -> V75`
+`V72.99 -> V77 -> V91 -> V64 -> V75`
 
-Parallel nach `V72.99` moeglich: `V82 -> V76`; `V86` nutzt den abgeschlossenen V85-Vertragsrahmen als Baseline; `V81` zuletzt oder opportunistisch. Die desktop-first-Hauptgates aus `V89` sind jetzt die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
+Parallel nach `V72.99` moeglich: `V82 -> V76`; `V86` nutzt den abgeschlossenen V85-Vertragsrahmen als Baseline und sollte bei Runtime-/Capability-Verbrauch denselben V91-Ratchet lesen; `V81` nach `V91` oder spaetestens mit denselben Guard-Leitplanken. Die desktop-first-Hauptgates aus `V89` sind jetzt die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
 
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
@@ -175,6 +183,8 @@ Abgleich 2026-04-10 (Subphase `V88 88.99.2`): `.agents/test_mapping.md` bleibt a
 Abgleich 2026-04-13 (Subphase `V77 77.2.1`): Recheck von `77.1.3` zeigte eine Luecke zwischen Terminologie-Vertrag und Registry-Semantik: Browser-`HOST` war nur dokumentarisch als `Nicht verfuegbar` normiert. `src/shared/contracts/PlatformCapabilityRegistry.js` fuehrt jetzt pro Produktrolle einen expliziten `surfacePolicy`-Block (`defaultAccessMode`, `multiplayerRole`, `allowedGameModes`, `requiresCuratedMaps`) plus Resolver `resolveSurfacePolicy()` ein und mappt deaktiviertes Browser-`HOST` auf `PLATFORM_PROVIDER_KINDS.UNAVAILABLE`. `tests/platform-capabilities.contract.test.mjs` deckt den neuen Surface-Policy-Vertrag und die Browser-`HOST`-Aufloesung ab; `docs/plaene/aktiv/V77.md` sowie `docs/referenz/ai_architecture_context.md` sind darauf synchronisiert. Naechste offene V77-Subphase ist `77.2.2` (Ad-hoc-Pruefungen in Menue-/Recording-/Replay-/Discovery-Pfaden auf den zentralen Vertrag abbilden).
 Abgleich 2026-04-13 (Subphase `V77 77.2.3`): Recheck von `77.2.2` zeigte eine Vertragsluecke bei der impliziten Availability-Aufloesung: Browser-`HOST` konnte ohne explizites Disabled-Flag als verfuegbar durchrutschen. `PlatformCapabilityRegistry` fuehrt fuer Browser-`HOST` jetzt `enabled: false` ein, trennt explizite Capability-Mappings von Policy-Fallbacks und zieht die Surface-Default-Regel zentral fest (`desktop-app => default-full`, `browser-demo => default-deny`, inkl. `resolvedByDefaultPolicy` fuer unbekannte Capabilities). `tests/platform-capabilities.contract.test.mjs` deckt den Recheck-Fix sowie die neue Default-Regel ab; Menue-, Discovery-, Recording- und Replay-Verbrauch bleiben auf `resolveSurfaceCapabilityAccess()` synchronisiert. Naechste offene V77-Subphase ist `77.2.4` (Dev-only-Schalter/Expertenlogin in denselben Surface-Vertrag ziehen).
 Abgleich 2026-04-13 (Subphase `V77 77.3.2`): Recheck von `77.3.1` zeigte keine neue Allowlist-Luecke, aber inkonsistente UX fuer gesperrte Demo-Aktionen. `src/shared/contracts/PlatformSurfacePolicyOps.js` fuehrt mit `resolveSurfaceBlockedFeatureFeedback()` jetzt einen gemeinsamen Feedback-Vertrag (`surface_policy_blocked`, `warning`, `1600ms`, surface-spezifische Meldung) ein; `MenuRuntimeSessionService` und `MenuRuntimePresetConfigService` lesen denselben Resolver fuer blockierte Mode-/Quickstart-/Preset-Aktionen. `tests/platform-capabilities.contract.test.mjs` deckt den Vertrag ab; naechste offene V77-Subphase ist `77.3.3` (Host-/Join-/Offline-/Showcase-Einstiege pro Surface explizit schneiden).
+Abgleich 2026-04-13 (Subphase `V77 77.3.3`): Recheck von `77.3.2` zeigte keinen neuen Allowlist-Fehler, aber noch ungeschnittene Einstiege fuer Session-Umschalter, Start-CTA und Lobby-Status. `PlatformCapabilityRegistry` und `PlatformSurfacePolicyOps` fuehren deshalb jetzt `allowedSessionTypes` sowie denselben Einstiegstextvertrag fuer `Showcase`, `Join only` und `Nur Desktop`; `MenuSurfacePolicyUiSync`, `UIManager` und `UIStartSyncController` spiegeln denselben Schnitt in Session-Buttons, Start-Button, Summary und Lobby-UI. `MenuRuntimeSessionService` faellt disallowte Session-Einstiege sichtbar auf den Surface-Fallback zurueck, `MatchStartValidationService` benennt Browser-Multiplayer jetzt explizit als Desktop-Host-Join-Pfad, und `tests/platform-capabilities.contract.test.mjs` plus `tests/core-targeted-runtime.spec.js` sind auf denselben Vertrag vorbereitet. Naechste offene V77-Subphase ist `77.4.1` (V64-Transportvertrag an die neue Surface-Politik koppeln).
+Abgleich 2026-04-13 (Subphase `V77 77.4.1`): Recheck von `77.3.3` zeigte keinen neuen CTA-Widerspruch, aber der V64-nahe Transportdefault war noch nicht an dieselbe Surface-Policy gebunden. `PlatformCapabilityRegistry` exportiert jetzt die kleine Surface-Transportmatrix (`defaultMultiplayerTransport`, `allowed`/`host`/`join`/`legacy` transports) fuer `desktop-app` und `browser-demo`; `resolveDefaultLobbyTransport()` sowie `MenuRuntimeMultiplayerService` lesen denselben Vertrag fuer Bridge-Defaults und Snapshot-Fallbacks. `docs/plaene/aktiv/V64.md` und `docs/referenz/ai_architecture_context.md` spiegeln denselben Vorvertrag: Desktop bleibt bei echten `lan|online`-Flows, Browser-Demo fuehrt Multiplayer nur noch als expliziten `join-only`-Pfad ueber `lan`, waehrend `storage-bridge` nur als Legacy-Pfad sichtbar bleibt. Naechste offene V77-Subphase ist `77.4.2` (Altpfade wie `storage-bridge` explizit als Nicht-Standard haerten).
 Abgleich 2026-04-10 (Subphase `V72 72.3.1`): `MapSchemaSanitizeOps` meldet ungueltige `portalMode`/`itemSpawnMode`-Werte sowie malformed Portal-/Gate-Eintraege jetzt als sichtbare Sanitisierungswarnungen statt stiller Nullpunkt-Normalisierung. `MapSchemaMigrationOps` und `MapSchemaRuntimeOps` reichen denselben Warnvertrag ueber `parseMapJSON()` und `toArenaMapDefinition()` durch. Naechste offene V72-Subphase ist `72.3.2` (Authoring-Vertrag `dynamic|authored|hybrid`).
 Abgleich 2026-04-10 (Subphase `V72 72.3.2`): `MapSchemaRuntimeOps` fuehrt mit `map.portalAuthoring` einen expliziten Authoring-Vertrag fuer `dynamic|authored|hybrid` ein (`mode`, Paar-/Knotenzaehlung, `usesAuthoredPortals`, `usesDynamicPortals`, `hasDanglingPortalNode`). Fehlende oder unvollstaendige authored Portalpaare laufen jetzt ueber klare Warnpfade statt impliziter Interpretation (`authored` ohne Paar bleibt bewusst ohne Dynamic-Fallback; `hybrid` ohne Paar faellt sichtbar auf dynamic-only zurueck). `MapSchemaSanitizeOps` normalisiert den Legacy-Fallback dabei anhand vollstaendiger Portalpaare statt einzelner Knoten. Naechste offene V72-Subphase ist `72.3.3` (Cooldown-, Inaktiv- und Post-Portal-Signale).
 Abgleich 2026-04-10 (Subphase `V72 72.3.3`): `PortalRuntimeSystem` und `SpecialGateRuntime` liefern pro Entity lesbare Traversal-Signale fuer Portal-/Gate-Cooldowns, Exit-Portal-Inaktivstatus und Post-Portal-Fenster. `PortalGateSystem`, `Arena` sowie `MatchRuntimeProjectionBuilder` reichen den Vertrag als `players[*].traversal` in die Runtime-Projektion durch; `MatchRuntimeProjectionContract` normalisiert dieselben Felder stabil (`portalsEnabled`, Cooldowns, Exit-Portal-Zaehlung, `postPortal*`). `docs/referenz/gameplay_powerups_portale_gates.md` dokumentiert den Signalpfad. Naechste offene V72-Subphase ist `72.4.1` (Spawn-Vertrag authored Item-Anker).
@@ -222,6 +232,14 @@ Keine offenen Review-Punkte mehr im V87-Scope; `87.5.1` ist dokumentiert, offen 
 | P21 | `package.json`, `package-lock.json` | `npm audit` meldet 5 Befunde (2 high, 3 moderate); Dependency-Security ist als neuer Intake-Draft `V90` vorbereitet, aber noch nicht als aktiver Block uebernommen | hoch |
 | P22 | `tmp/`, `.codex_tmp/` | Getrackte Dateien liegen weiterhin unter ignorierten Artefaktpfaden; V71 fuehrt den Befund jetzt als `71.99.3`-Restgate-Risiko | hoch |
 | P23 | `src/ui/menu/MenuExpertLoginRuntime.js` | Hartcodiertes Expertenpasswort `1307` darf nicht als Sicherheitsbarriere gelten; V77/V81 muessen es als Dev-only-/Surface-Policy klaeren | mittel |
+| P24 | `tests/playwright.global-setup.js`, `dev/scripts/verify-lock.mjs`, `scripts/run-playwright-*.mjs` | `spawn EPERM` blockiert weiter `test:contract`, `test:smoke` und `test:targeted`; blockerfest dokumentiert, aber als eigene Root-Cause- oder Fallback-Arbeit weiter offen | hoch |
+| P25 | `scripts/run-playwright-targeted-clusters.mjs` | Cluster laufen sequentiell und ohne abgestufte Degradation; isolierte Clusterfehler kosten unverhaeltnismaessig viel Laufzeit und Aussagekraft | mittel |
+| P26 | `tests/core-targeted.shared.js` | Test-Barrel exportiert sehr breit; Abhaengigkeiten zwischen `core-targeted`-Specs bleiben opak und aenderungsanfällig | mittel |
+| P27 | `docs/plaene/aktiv/*.md`, `docs/Umsetzungsplan.md` | Evidence-Strings sind teils laenger als der eigentliche Arbeitsnachweis; Governance bleibt nachvollziehbar, aber die Lesbarkeit der Plaene sinkt | niedrig |
+| P28 | `src/shared/contracts/MatchRuntimeProjectionContract.js` | 8 neue Traversal-Felder hinzugefuegt ohne Versions-Bump (`match-runtime-projection.v1` unveraendert); Alt-Consumer erhalten neue Felder als `undefined` ohne Unterscheidung ob fehlendes Feld oder aelterer Producer | mittel |
+| P29 | `src/core/recording/DownloadService.js` | Fehlender Null-Guard fuer `downloadHandler` vor Browser-Adapter-Aufruf (Zeile 139); inkonsistente Warning-Akkumulation zwischen `api-throw`- und `api-failed`-Branches | mittel |
+| P30 | `src/shared/contracts/ArcadeMissionContract.js` | `getArcadeMissionRegistryDescriptor()` wird nur in Tests aufgerufen, nicht zur Laufzeit; API-Surface klaeren (behalten als Debug-/Introspection-API oder entfernen) | niedrig |
+| P31 | `tests/content-descriptor-registries.contract.test.mjs`, `tests/platform-capabilities.contract.test.mjs` | Keine Immutability-Tests fuer `Object.freeze()`-gesicherte Content-Descriptor-Registries und Surface-Policy-Objekte; Freeze-Verletzungen wuerden unbemerkt durchgehen | niedrig |
 
 ## Conflict-Log
 
