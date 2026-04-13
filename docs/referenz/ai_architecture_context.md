@@ -358,6 +358,20 @@ Stand: 2026-04-13
 - Alles, was fuer `browser-demo` nicht explizit in der Matrix freigegeben ist, bleibt denylisted.
 - `V64`, `V75` und `V76` konsumieren dieselbe Matrix fuer Host-/Join-, Save-/Export-, Recording- und Editor-Entscheide, statt neue Surface-Begriffe einzufuehren.
 
+#### 4.6.4.5 Terminologie-Normierung fuer UI- und Doku-Sprache (`V77 77.1.3`)
+
+| Begriff fuer UI und Doku | Kanonische Zuordnung | Normierte Verwendung |
+| --- | --- | --- |
+| `Demo` | `PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO` (`browser-demo`) | `Demo` bleibt das kurze UI-Label fuer die kostenlose Web-Oberflaeche. In Architektur- und Folgeblock-Doku steht bei der ersten Nennung immer `browser-demo`; `Demo` ist danach nur Kurzform derselben Surface. |
+| `Nur Desktop` | `PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP` (`desktop-app`) | `Nur Desktop` ist die nutzernahe UI-Bezeichnung fuer Vollversions-Features. In Plan- und Architekturtexten beschreibt dieselbe Grenze `desktop-only` bzw. `desktop-app only`; gemeint ist immer die autoritative Vollversions-Surface und kein allgemeiner Plattform-Hinweis. |
+| `Join only` | `browser-demo` ohne `PLATFORM_CAPABILITY_IDS.HOST` | `Join only` ist die feste Rollenbezeichnung fuer Demo-Multiplayer: Beitritt darf explizit erlaubt sein, Host-Besitz, Lobby-Erstellung und Session-Ownership bleiben ausgeschlossen. |
+| `Host` | `PLATFORM_CAPABILITY_IDS.HOST` und Session-Besitz | `Host` bezeichnet nur Hosting, Lobby-Erstellung und die autoritative Multiplayer-Rolle. Der Begriff ersetzt nicht `discovery` oder `join`, und `browser-demo` fuehrt `Host` nicht als Produktversprechen, solange keine spaetere Freigabe das explizit aendert. |
+| `Nicht verfuegbar` | `available: false` und bevorzugt `PLATFORM_PROVIDER_KINDS.UNAVAILABLE` | `Nicht verfuegbar` ist die kanonische Aussage fuer aktuell nicht nutzbare Surface-Funktionen. Wo der Capability-Layer es bereits ausdrueckt, spiegelt die Doku denselben Zustand ueber `available: false` und `PLATFORM_PROVIDER_KINDS.UNAVAILABLE`; dieselbe Semantik gilt bis `V77 77.2` auch fuer Browser-Host-Hinweise, selbst wenn die aktuelle Registry den Provider-Kind dort noch nicht explizit als `unavailable` modelliert. |
+
+- Surface-Doku nennt zuerst `desktop-app` oder `browser-demo` und leitet daraus UI-Labels wie `Demo` oder `Nur Desktop` ab.
+- Browser-Join-Grenzen verwenden bevorzugt `Join only`; freie Umschreibungen gelten nicht als eigener Vertragsbegriff.
+- Produktisch denylistete Demo-Funktionen erscheinen als `Nicht verfuegbar` oder `Nur Desktop`, nicht als Sicherheitsbarriere, versteckter Unlock oder stilles Vollversionsversprechen.
+
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 
 - Feldkonvention:
