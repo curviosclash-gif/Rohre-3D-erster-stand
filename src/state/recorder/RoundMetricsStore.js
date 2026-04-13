@@ -2,6 +2,7 @@ import { parseGameplayActionResultLog } from '../../shared/contracts/GameplayAct
 
 const ITEM_USE_MODES = Object.freeze(['use', 'shoot', 'mg', 'other']);
 const GAMEPLAY_RESULT_EVENTS = Object.freeze(['ITEM_USE', 'ITEM_PICKUP', 'PORTAL_USE', 'GATE_TRIGGER']);
+const FAILED_ITEM_ACTION_CODE_PREFIXES = Object.freeze(['item.use.', 'item.shoot.', 'mg.shoot.']);
 
 function createItemUseModeCounts() {
     return {
@@ -36,6 +37,17 @@ function createCodeCounts() {
     return {};
 }
 
+function normalizeActionCode(value) {
+    const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    return normalized || 'unknown';
+}
+
+function isFailedItemActionCode(code) {
+    if (!code || code === 'unknown') return false;
+    if (!FAILED_ITEM_ACTION_CODE_PREFIXES.some((prefix) => code.startsWith(prefix))) return false;
+    return !code.endsWith('.success');
+}
+
 function resolveDamageSplit(damageResult = {}) {
     const applied = Math.max(0, Number(damageResult?.applied) || 0);
     const absorbedByShield = Math.max(0, Number(damageResult?.absorbedByShield) || 0);
@@ -66,6 +78,9 @@ function createRoundSummary() {
         itemUseModeCounts: createItemUseModeCounts(),
         itemUseTypeCounts: {},
         actionResultCodeCounts: {},
+        failedItemActions: 0,
+        failedItemActionModeCounts: createItemUseModeCounts(),
+        failedItemActionCodeCounts: {},
         mgHits: 0,
         rocketHits: 0,
         shieldAbsorb: 0,
@@ -92,6 +107,9 @@ function createAggregateSummary() {
         totalItemUseModeCounts: createItemUseModeCounts(),
         totalItemUseTypeCounts: {},
         totalActionResultCodeCounts: {},
+        totalFailedItemActions: 0,
+        totalFailedItemActionModeCounts: createItemUseModeCounts(),
+        totalFailedItemActionCodeCounts: {},
         totalMgHits: 0,
         totalRocketHits: 0,
         totalShieldAbsorb: 0,
@@ -139,6 +157,9 @@ export class RoundMetricsStore {
         this._roundItemUseModeCounts = createItemUseModeCounts();
         this._roundItemUseTypeCounts = {};
         this._roundActionResultCodeCounts = createCodeCounts();
+        this._roundFailedItemActions = 0;
+        this._roundFailedItemActionModeCounts = createItemUseModeCounts();
+        this._roundFailedItemActionCodeCounts = createCodeCounts();
         this._roundMgHits = 0;
         this._roundRocketHits = 0;
         this._roundShieldAbsorb = 0;
@@ -175,21 +196,29 @@ export class RoundMetricsStore {
     }
 
     registerEventType(type, data = '') {
+        const isItemUseEvent = type === 'ITEM_USE';
+        let parsedItemUse = null;
         if (type === 'STUCK') this._roundStuckEvents++;
         if (type === 'BOUNCE_WALL') this._roundBounceWallEvents++;
         if (type === 'BOUNCE_TRAIL') this._roundBounceTrailEvents++;
         if (GAMEPLAY_RESULT_EVENTS.includes(type)) {
-            const parsed = parseItemUseEventData(data);
-            const codeKey = typeof parsed.code === 'string' && parsed.code ? parsed.code : 'unknown';
+            parsedItemUse = parseItemUseEventData(data);
+            const codeKey = normalizeActionCode(parsedItemUse.code);
             this._roundActionResultCodeCounts[codeKey] = (this._roundActionResultCodeCounts[codeKey] || 0) + 1;
         }
-        if (type === 'ITEM_USE') {
+        if (isItemUseEvent) {
             this._roundItemUseEvents++;
-            const itemUse = parseItemUseEventData(data);
+            const itemUse = parsedItemUse || parseItemUseEventData(data);
             const modeKey = normalizeItemUseMode(itemUse.mode);
             this._roundItemUseModeCounts[modeKey] += 1;
             const typeKey = normalizeItemUseType(itemUse.type);
             this._roundItemUseTypeCounts[typeKey] = (this._roundItemUseTypeCounts[typeKey] || 0) + 1;
+            const codeKey = normalizeActionCode(itemUse.code);
+            if (isFailedItemActionCode(codeKey)) {
+                this._roundFailedItemActions += 1;
+                this._roundFailedItemActionModeCounts[modeKey] += 1;
+                this._roundFailedItemActionCodeCounts[codeKey] = (this._roundFailedItemActionCodeCounts[codeKey] || 0) + 1;
+            }
         }
     }
 
@@ -286,6 +315,9 @@ export class RoundMetricsStore {
         round.itemUseModeCounts = { ...this._roundItemUseModeCounts };
         round.itemUseTypeCounts = { ...this._roundItemUseTypeCounts };
         round.actionResultCodeCounts = { ...this._roundActionResultCodeCounts };
+        round.failedItemActions = this._roundFailedItemActions;
+        round.failedItemActionModeCounts = { ...this._roundFailedItemActionModeCounts };
+        round.failedItemActionCodeCounts = { ...this._roundFailedItemActionCodeCounts };
         round.mgHits = this._roundMgHits;
         round.rocketHits = this._roundRocketHits;
         round.shieldAbsorb = this._roundShieldAbsorb;
@@ -319,6 +351,14 @@ export class RoundMetricsStore {
             this._aggregate.totalActionResultCodeCounts[code] = (this._aggregate.totalActionResultCodeCounts[code] || 0)
                 + Math.max(0, Number(useCount) || 0);
         }
+        this._aggregate.totalFailedItemActions += this._roundFailedItemActions;
+        for (const mode of ITEM_USE_MODES) {
+            this._aggregate.totalFailedItemActionModeCounts[mode] += Math.max(0, Number(this._roundFailedItemActionModeCounts[mode]) || 0);
+        }
+        for (const [code, useCount] of Object.entries(this._roundFailedItemActionCodeCounts)) {
+            this._aggregate.totalFailedItemActionCodeCounts[code] = (this._aggregate.totalFailedItemActionCodeCounts[code] || 0)
+                + Math.max(0, Number(useCount) || 0);
+        }
         this._aggregate.totalMgHits += this._roundMgHits;
         this._aggregate.totalRocketHits += this._roundRocketHits;
         this._aggregate.totalShieldAbsorb += this._roundShieldAbsorb;
@@ -346,6 +386,9 @@ export class RoundMetricsStore {
             itemUseModeCounts: { ...round.itemUseModeCounts },
             itemUseTypeCounts: { ...round.itemUseTypeCounts },
             actionResultCodeCounts: { ...round.actionResultCodeCounts },
+            failedItemActions: round.failedItemActions,
+            failedItemActionModeCounts: { ...round.failedItemActionModeCounts },
+            failedItemActionCodeCounts: { ...round.failedItemActionCodeCounts },
             mgHits: round.mgHits,
             rocketHits: round.rocketHits,
             shieldAbsorb: round.shieldAbsorb,
@@ -378,6 +421,10 @@ export class RoundMetricsStore {
             bounceWallPerRound: rounds > 0 ? this._aggregate.totalBounceWallEvents / rounds : 0,
             bounceTrailPerRound: rounds > 0 ? this._aggregate.totalBounceTrailEvents / rounds : 0,
             itemUsePerRound: rounds > 0 ? this._aggregate.totalItemUseEvents / rounds : 0,
+            failedItemActionsPerRound: rounds > 0 ? this._aggregate.totalFailedItemActions / rounds : 0,
+            itemUseFailureRate: this._aggregate.totalItemUseEvents > 0
+                ? this._aggregate.totalFailedItemActions / this._aggregate.totalItemUseEvents
+                : 0,
             itemUseModePerRound: {
                 use: rounds > 0 ? this._aggregate.totalItemUseModeCounts.use / rounds : 0,
                 shoot: rounds > 0 ? this._aggregate.totalItemUseModeCounts.shoot / rounds : 0,
@@ -386,6 +433,13 @@ export class RoundMetricsStore {
             },
             itemUseTypeTotals: { ...this._aggregate.totalItemUseTypeCounts },
             actionResultCodeTotals: { ...this._aggregate.totalActionResultCodeCounts },
+            failedItemActionModePerRound: {
+                use: rounds > 0 ? this._aggregate.totalFailedItemActionModeCounts.use / rounds : 0,
+                shoot: rounds > 0 ? this._aggregate.totalFailedItemActionModeCounts.shoot / rounds : 0,
+                mg: rounds > 0 ? this._aggregate.totalFailedItemActionModeCounts.mg / rounds : 0,
+                other: rounds > 0 ? this._aggregate.totalFailedItemActionModeCounts.other / rounds : 0,
+            },
+            failedItemActionCodeTotals: { ...this._aggregate.totalFailedItemActionCodeCounts },
             mgHitsPerRound: rounds > 0 ? this._aggregate.totalMgHits / rounds : 0,
             rocketHitsPerRound: rounds > 0 ? this._aggregate.totalRocketHits / rounds : 0,
             hpDamagePerRound: rounds > 0 ? this._aggregate.totalHpDamage / rounds : 0,
@@ -433,6 +487,9 @@ export class RoundMetricsStore {
                 itemUseModeCounts: { ...round.itemUseModeCounts },
                 itemUseTypeCounts: { ...round.itemUseTypeCounts },
                 actionResultCodeCounts: { ...round.actionResultCodeCounts },
+                failedItemActions: round.failedItemActions,
+                failedItemActionModeCounts: { ...round.failedItemActionModeCounts },
+                failedItemActionCodeCounts: { ...round.failedItemActionCodeCounts },
                 mgHits: round.mgHits,
                 rocketHits: round.rocketHits,
                 shieldAbsorb: round.shieldAbsorb,

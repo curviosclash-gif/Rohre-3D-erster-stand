@@ -11,6 +11,7 @@ import {
 import { createMapDocument } from '../src/entities/MapSchema.js';
 import { ClassicModeStrategy } from '../src/modes/ClassicModeStrategy.js';
 import { HuntModeStrategy } from '../src/modes/HuntModeStrategy.js';
+import { RoundMetricsStore } from '../src/state/recorder/RoundMetricsStore.js';
 
 test('Pickup capability matrix keeps rocket and utility contracts mode-safe', () => {
     const rocketTypes = getRocketPickupTypes();
@@ -96,4 +97,38 @@ test('Shield semantics stay deterministic across classic and hunt strategies', (
     assert.equal(huntPlayer.shieldHP, 0);
     assert.equal(huntPlayer.hasShield, false);
     assert.equal(huntPlayer.lastDamageTimestamp, 9);
+});
+
+test('Round recorder diagnostics keep failed item actions analyzable by mode and code', () => {
+    const metrics = new RoundMetricsStore({ timeProvider: () => 12 });
+    metrics.startRound([]);
+    metrics.registerEventType('ITEM_USE', 'mode=use type=SHIELD code=item.use.forbidden ok=0');
+    metrics.registerEventType('ITEM_USE', 'mode=shoot type=ROCKET_WEAK code=item.shoot.cooldown ok=0');
+    metrics.registerEventType('ITEM_USE', 'mode=shoot type=ROCKET_WEAK code=item.shoot.success ok=1');
+    metrics.registerEventType('ITEM_USE', 'mode=mg type=MG_BULLET code=mg.shoot.overheated ok=0');
+    metrics.registerEventType('ITEM_USE', 'mode=other type=UNKNOWN code=unknown ok=0');
+    metrics.finalizeRound(null, []);
+
+    const lastRound = metrics.getLastRoundMetrics();
+    assert.equal(lastRound.itemUseEvents, 5);
+    assert.equal(lastRound.failedItemActions, 3);
+    assert.deepEqual(lastRound.failedItemActionModeCounts, {
+        use: 1,
+        shoot: 1,
+        mg: 1,
+        other: 0,
+    });
+    assert.equal(lastRound.failedItemActionCodeCounts['item.use.forbidden'], 1);
+    assert.equal(lastRound.failedItemActionCodeCounts['item.shoot.cooldown'], 1);
+    assert.equal(lastRound.failedItemActionCodeCounts['mg.shoot.overheated'], 1);
+
+    const aggregate = metrics.getAggregateMetrics();
+    assert.equal(aggregate.failedItemActionsPerRound, 3);
+    assert.equal(aggregate.itemUseFailureRate, 0.6);
+    assert.equal(aggregate.failedItemActionModePerRound.use, 1);
+    assert.equal(aggregate.failedItemActionModePerRound.shoot, 1);
+    assert.equal(aggregate.failedItemActionModePerRound.mg, 1);
+    assert.equal(aggregate.failedItemActionCodeTotals['item.use.forbidden'], 1);
+    assert.equal(aggregate.failedItemActionCodeTotals['item.shoot.cooldown'], 1);
+    assert.equal(aggregate.failedItemActionCodeTotals['mg.shoot.overheated'], 1);
 });

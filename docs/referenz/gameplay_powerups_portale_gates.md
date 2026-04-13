@@ -1,6 +1,6 @@
 # Gameplay-Referenz: Powerups, Portale und Gates
 
-Stand: 2026-04-11
+Stand: 2026-04-13
 
 ## Zweck
 
@@ -47,6 +47,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - `GHOST` und Spawn-Schutz ueberspringen den normalen Wand-/Trail-Kollisionspfad komplett.
 - In Hunt haben Item-Selbstnutzungen einen Cooldown; fuer `SHIELD` gilt ein eigener Mindest-Cooldown.
 - Recorder und Diagnostik aggregieren stabile Action-Result-Codes wie `item.pickup.success`, `item.use.cooldown`, `item.shoot.success`, `portal.travel` oder `gate.trigger.boost` in `actionResultCodeTotals`.
+- Fehlgeschlagene Item-Aktionen sind im Recorder jetzt explizit auswertbar: `failedItemActions`, `failedItemActionModeCounts` (`use|shoot|mg|other`) und `failedItemActionCodeCounts` liefern pro Runde und aggregiert denselben Code-Vertrag wie die Runtime (`item.use.*`, `item.shoot.*`, `mg.shoot.*`).
 
 ## Normale Portale
 
