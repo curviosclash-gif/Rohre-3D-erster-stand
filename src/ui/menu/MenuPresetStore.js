@@ -6,6 +6,7 @@ import {
 } from '../StorageKeys.js';
 import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
 import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
+import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 
 const MENU_PRESET_STORAGE_KEY = STORAGE_KEYS.menuPresets;
 const MENU_PRESET_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
@@ -90,10 +91,25 @@ export class MenuPresetStore extends PersistentStore {
         try {
             const parsed = this.readJsonRecord(null);
             if (!parsed || typeof parsed !== 'object') return [];
-            const presets = Array.isArray(parsed?.presets) ? parsed.presets : [];
-            return presets
+            const versionState = resolveArtifactVersionState(parsed, {
+                artifactType: 'menu-preset-store',
+                versionFields: ['schemaVersion'],
+                supportedVersions: [MENU_PRESET_STORAGE_SCHEMA_VERSION],
+                currentVersion: MENU_PRESET_STORAGE_SCHEMA_VERSION,
+                allowMissingVersion: true,
+            });
+            if (versionState.shouldReject) return [];
+            const rawPresets = versionState.hasVersionField
+                ? parsed?.presets
+                : (Array.isArray(parsed) ? parsed : parsed?.presets);
+            const presets = Array.isArray(rawPresets) ? rawPresets : [];
+            const normalized = presets
                 .map((preset) => ensurePresetMetadataContract(preset))
                 .filter(Boolean);
+            if (versionState.shouldFallback || versionState.shouldUpgrade) {
+                this._savePersistedPresets(normalized);
+            }
+            return normalized;
         } catch {
             return [];
         }

@@ -6,6 +6,8 @@ import { createGameStateSnapshot } from '../GameStateSnapshot.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
 
+export const REPLAY_EXPORT_CONTRACT_VERSION = 'replay.v1';
+
 /**
  * Records a match as { initialState, actions[] } for deterministic playback.
  * Actions include all player inputs with frame timestamps.
@@ -71,7 +73,8 @@ export class ReplayRecorder {
 
     getReplay() {
         return {
-            version: 'replay.v1',
+            contractVersion: REPLAY_EXPORT_CONTRACT_VERSION,
+            version: REPLAY_EXPORT_CONTRACT_VERSION,
             matchId: this._matchId,
             playerCount: this._playerCount,
             startTime: this._startTime,

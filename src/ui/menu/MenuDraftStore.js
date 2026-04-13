@@ -6,6 +6,7 @@ import {
 } from '../StorageKeys.js';
 import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
 import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
+import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 
 const MENU_DRAFT_STORAGE_KEY = STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuDrafts;
@@ -130,10 +131,33 @@ export class MenuDraftStore extends PersistentStore {
             if (!parsed || typeof parsed !== 'object') {
                 return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
             }
-            return {
+            const versionState = resolveArtifactVersionState(parsed, {
+                artifactType: 'menu-draft-store',
+                versionFields: ['schemaVersion'],
+                supportedVersions: [MENU_DRAFT_STORAGE_SCHEMA_VERSION],
+                currentVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION,
+                allowMissingVersion: true,
+            });
+            if (versionState.shouldReject) {
+                return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
+            }
+            const rawDrafts = versionState.hasVersionField
+                ? parsed?.drafts
+                : (
+                    parsed?.drafts
+                    && typeof parsed.drafts === 'object'
+                    && !Array.isArray(parsed.drafts)
+                        ? parsed.drafts
+                        : parsed
+                );
+            const normalized = {
                 schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION,
-                drafts: parsed?.drafts && typeof parsed.drafts === 'object' ? parsed.drafts : {},
+                drafts: rawDrafts && typeof rawDrafts === 'object' && !Array.isArray(rawDrafts) ? rawDrafts : {},
             };
+            if (versionState.shouldFallback || versionState.shouldUpgrade) {
+                this._saveStore(normalized);
+            }
+            return normalized;
         } catch {
             return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
         }

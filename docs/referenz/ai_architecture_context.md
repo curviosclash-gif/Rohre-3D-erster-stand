@@ -353,6 +353,20 @@ Stand: 2026-04-13
 | Replay und Snapshot-Verbrauch | aeusserer Replay-Contract plus innere Snapshot-Vertraege | Keine ad-hoc Replay-Sondershapes ausserhalb von `snapshot_envelope`/Projektionen. |
 | Content-Registries fuer Maps, Build-Katalog, Templates | `descriptorVersion` | Runtime, Editor und Import/Export lesen spaeter denselben Descriptor-Vertrag statt separater Sonderlisten. |
 
+#### 4.6.5.1 Kleiner Migrationsrahmen (`V85 85.2.1`)
+
+- `src/shared/contracts/ArtifactVersionMigrationContract.js` ist der gemeinsame Minimalvertrag fuer Load-/Upgrade-/Fallback-/Reject-Entscheide. Der Resolver liefert pro Artefakt genau eine Entscheidung: `current`, `upgrade`, `fallback` oder `reject`.
+- Profile-Transfer (`src/ui/ProfileTransferOps.js`) rejectet unbekannte `contractVersion` explizit; huellenlose Legacy-Profile bleiben als bewusst dokumentierter Fallback erhalten.
+- Map-Migration (`src/entities/mapSchema/MapSchemaMigrationOps.js`) klassifiziert `schemaVersion` jetzt ueber denselben Resolver: Legacy/fehlende Versionen laufen ueber Fallback, bekannte Altversionen ueber Upgrade, Zukunftsversionen ueber harten Reject.
+- Replay-Export (`src/core/replay/ReplayRecorder.js`) schreibt parallel `contractVersion` und die Legacy-Schreibweise `version` (`replay.v1`), damit kuenftige Import-/Migrationspfade additive Umstellung ohne Shape-Bruch fahren koennen.
+
+#### 4.6.5.2 Store- und Preset-Verbrauch auf gemeinsamen Resolver ziehen (`V85 85.2.2`)
+
+- Settings-/Menu-/Arcade-Store-Lesewege (`SettingsStore`, `MenuPresetStore`, `MenuDraftStore`, `MenuTextOverrideStore`, `MenuTelemetryStore`, `ArcadeVehicleProfile`, `VehicleManagerLoadoutPresets`) klassifizieren Persistenzdaten jetzt konsistent ueber `resolveArtifactVersionState()` statt impliziter Shape-Checks.
+- Schema-lose oder Legacy-Payloads bleiben lesbar, werden aber beim Laden auf den kanonischen Envelope zurueckgeschrieben (`settings-profiles.v1`, `menu-draft-store.v1`, `menu-text-overrides.v1`, `menu-telemetry.v1`, `arcade-vehicle-loadouts.v1`), damit Folgefeatures nur noch gegen den aktuellen Vertrag schreiben muessen.
+- Zukunftsschemata werden nicht still akzeptiert: `ArcadeVehicleProfile` verwirft ungueltige Zukunftseintraege beim Laden und persistiert den bereinigten Bestand erneut.
+- Profil-Import rejectet zusaetzlich explizit gesetzte, aber ungueltige `contractVersion`; dadurch kann ein fehlerhafter Envelope nicht mehr als Legacy-Missing-Version durchrutschen.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |

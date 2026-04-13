@@ -1,3 +1,5 @@
+import { resolveArtifactVersionState } from '../../../shared/contracts/ArtifactVersionMigrationContract.js';
+
 const VEHICLE_LOADOUT_PRESET_STORAGE_KEY = 'cuviosclash.arcade-vehicle-loadouts.v1';
 const VEHICLE_LOADOUT_PRESET_SCHEMA = 'arcade-vehicle-loadouts.v1';
 
@@ -71,15 +73,58 @@ function sanitizeStorePayload(source) {
     };
 }
 
+function resolvePersistedPayload(source) {
+    if (Array.isArray(source)) {
+        return {
+            payload: sanitizeStorePayload({ presets: source }),
+            shouldPersist: true,
+        };
+    }
+    if (!source || typeof source !== 'object') {
+        return {
+            payload: sanitizeStorePayload(null),
+            shouldPersist: false,
+        };
+    }
+    const versionState = resolveArtifactVersionState(source, {
+        artifactType: 'arcade-vehicle-loadouts',
+        versionFields: ['schemaVersion'],
+        supportedVersions: [VEHICLE_LOADOUT_PRESET_SCHEMA],
+        currentVersion: VEHICLE_LOADOUT_PRESET_SCHEMA,
+        allowMissingVersion: true,
+    });
+    if (versionState.shouldReject) {
+        return {
+            payload: sanitizeStorePayload(null),
+            shouldPersist: true,
+        };
+    }
+    const rawPayload = versionState.hasVersionField
+        ? source
+        : (Array.isArray(source?.presets) ? source : { presets: source?.presets || [] });
+    return {
+        payload: sanitizeStorePayload(rawPayload),
+        shouldPersist: versionState.shouldFallback || versionState.shouldUpgrade,
+    };
+}
+
 function loadPayload(store) {
     if (store && typeof store.loadJsonRecord === 'function') {
         const loaded = store.loadJsonRecord(VEHICLE_LOADOUT_PRESET_STORAGE_KEY, null);
-        return sanitizeStorePayload(loaded);
+        const resolved = resolvePersistedPayload(loaded);
+        if (resolved.shouldPersist && typeof store.saveJsonRecord === 'function') {
+            store.saveJsonRecord(VEHICLE_LOADOUT_PRESET_STORAGE_KEY, resolved.payload);
+        }
+        return resolved.payload;
     }
     const raw = safeReadFromLocalStorage();
     if (!raw) return sanitizeStorePayload(null);
     try {
-        return sanitizeStorePayload(JSON.parse(raw));
+        const resolved = resolvePersistedPayload(JSON.parse(raw));
+        if (resolved.shouldPersist) {
+            safeWriteToLocalStorage(JSON.stringify(resolved.payload));
+        }
+        return resolved.payload;
     } catch {
         return sanitizeStorePayload(null);
     }
@@ -180,4 +225,3 @@ export function createVehicleManagerLoadoutPresetStore({ store } = {}) {
         loadPreset,
     };
 }
-

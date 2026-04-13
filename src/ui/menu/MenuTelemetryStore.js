@@ -4,9 +4,11 @@ import {
 } from '../StorageKeys.js';
 import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
 import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
+import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 
 const MENU_TELEMETRY_STORAGE_KEY = STORAGE_KEYS.menuTelemetry;
 const MENU_TELEMETRY_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTelemetry;
+const MENU_TELEMETRY_STORAGE_SCHEMA_VERSION = 'menu-telemetry.v1';
 const MAX_EVENTS = 30;
 const MAX_RECENT_ROUNDS = 12;
 
@@ -200,6 +202,18 @@ function createDefaultState() {
     };
 }
 
+function normalizeTelemetryState(source) {
+    return {
+        ...createDefaultState(),
+        ...(source && typeof source === 'object' ? source : {}),
+        events: Array.isArray(source?.events) ? source.events : [],
+        balanceSummary: normalizeBalanceSummary(source?.balanceSummary),
+        recentRounds: Array.isArray(source?.recentRounds)
+            ? source.recentRounds.map((entry) => normalizeRecentRoundEntry(entry))
+            : [],
+    };
+}
+
 export class MenuTelemetryStore extends PersistentStore {
     constructor(options = {}) {
         super({
@@ -217,23 +231,44 @@ export class MenuTelemetryStore extends PersistentStore {
 
     _loadState() {
         try {
-            const parsed = this.readJsonRecord(createDefaultState());
-            return {
-                ...createDefaultState(),
-                ...(parsed && typeof parsed === 'object' ? parsed : {}),
-                events: Array.isArray(parsed?.events) ? parsed.events : [],
-                balanceSummary: normalizeBalanceSummary(parsed?.balanceSummary),
-                recentRounds: Array.isArray(parsed?.recentRounds)
-                    ? parsed.recentRounds.map((entry) => normalizeRecentRoundEntry(entry))
-                    : [],
-            };
+            const parsed = this.readJsonRecord(null);
+            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+                return createDefaultState();
+            }
+            const versionState = resolveArtifactVersionState(parsed, {
+                artifactType: 'menu-telemetry',
+                versionFields: ['schemaVersion'],
+                supportedVersions: [MENU_TELEMETRY_STORAGE_SCHEMA_VERSION],
+                currentVersion: MENU_TELEMETRY_STORAGE_SCHEMA_VERSION,
+                allowMissingVersion: true,
+            });
+            if (versionState.shouldReject) {
+                return createDefaultState();
+            }
+            const rawState = versionState.hasVersionField
+                ? parsed?.state
+                : (
+                    parsed?.state
+                    && typeof parsed.state === 'object'
+                    && !Array.isArray(parsed.state)
+                        ? parsed.state
+                        : parsed
+                );
+            const normalized = normalizeTelemetryState(rawState);
+            if (versionState.shouldFallback || versionState.shouldUpgrade) {
+                this._saveState(normalized);
+            }
+            return normalized;
         } catch {
             return createDefaultState();
         }
     }
 
     _saveState(state) {
-        return this.writeJsonRecord(state).ok;
+        return this.writeJsonRecord({
+            schemaVersion: MENU_TELEMETRY_STORAGE_SCHEMA_VERSION,
+            state: normalizeTelemetryState(state),
+        }).ok;
     }
 
     _resolveBucket(collection, key) {

@@ -15,11 +15,13 @@ import {
     findProfileIndexByName,
     findProfileByName,
 } from '../shared/contracts/SettingsProfileContract.js';
+import { resolveArtifactVersionState } from '../shared/contracts/ArtifactVersionMigrationContract.js';
 
 const SETTINGS_STORAGE_KEY = STORAGE_KEYS.settings;
 const SETTINGS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settings;
 const SETTINGS_PROFILES_STORAGE_KEY = STORAGE_KEYS.settingsProfiles;
 const SETTINGS_PROFILES_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.settingsProfiles;
+const SETTINGS_PROFILES_SCHEMA_VERSION = 'settings-profiles.v1';
 const MENU_PRESETS_STORAGE_KEY = STORAGE_KEYS.menuPresets;
 const MENU_PRESETS_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuPresets;
 
@@ -87,13 +89,25 @@ export class SettingsStore {
             const parsed = this.storagePlatform.readJson(
                 this.settingsProfilesStorageKey,
                 this.settingsProfilesStorageLegacyKeys,
-                []
+                null
             );
-            if (!Array.isArray(parsed)) return [];
+            if (parsed === null || parsed === undefined) return [];
+            const versionState = resolveArtifactVersionState(parsed, {
+                artifactType: 'settings-profiles',
+                versionFields: ['schemaVersion'],
+                supportedVersions: [SETTINGS_PROFILES_SCHEMA_VERSION],
+                currentVersion: SETTINGS_PROFILES_SCHEMA_VERSION,
+                allowMissingVersion: true,
+            });
+            if (versionState.shouldReject) return [];
+            const rawProfiles = versionState.hasVersionField
+                ? parsed?.profiles
+                : (Array.isArray(parsed) ? parsed : parsed?.profiles);
+            if (!Array.isArray(rawProfiles)) return [];
 
             const out = [];
             const used = new Set();
-            for (const entry of parsed) {
+            for (const entry of rawProfiles) {
                 const name = this.normalizeProfileName(entry?.name || '');
                 const key = this.getProfileNameKey(name);
                 if (!name || used.has(key)) continue;
@@ -105,7 +119,14 @@ export class SettingsStore {
                     isDefault: Boolean(entry?.isDefault),
                 });
             }
-            return normalizeProfileEntries(out);
+            const normalized = normalizeProfileEntries(out);
+            if (versionState.shouldFallback || versionState.shouldUpgrade) {
+                this.storagePlatform.writeJson(this.settingsProfilesStorageKey, {
+                    schemaVersion: SETTINGS_PROFILES_SCHEMA_VERSION,
+                    profiles: normalized,
+                });
+            }
+            return normalized;
         } catch {
             return [];
         }
@@ -114,7 +135,10 @@ export class SettingsStore {
     saveProfiles(profiles) {
         const result = this.storagePlatform.writeJson(
             this.settingsProfilesStorageKey,
-            normalizeProfileEntries(profiles)
+            {
+                schemaVersion: SETTINGS_PROFILES_SCHEMA_VERSION,
+                profiles: normalizeProfileEntries(profiles),
+            }
         );
         return result.ok;
     }

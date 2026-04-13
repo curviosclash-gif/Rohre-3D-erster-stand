@@ -1,4 +1,5 @@
 import { DEFAULT_ARENA_SIZE, MAP_SCHEMA_VERSION } from './MapSchemaConstants.js';
+import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 import {
     asArray,
     asPositiveNumber,
@@ -70,16 +71,29 @@ export function migrateMapDocument(rawMap) {
     }
 
     const warnings = [];
-    const schemaVersionRaw = rawMap.schemaVersion;
-    const hasSchemaVersion = Number.isFinite(Number(schemaVersionRaw));
-    const schemaVersion = hasSchemaVersion ? Math.trunc(Number(schemaVersionRaw)) : 0;
+    const versionState = resolveArtifactVersionState(rawMap, {
+        artifactType: 'map-schema',
+        versionFields: ['schemaVersion'],
+        supportedVersions: [1, 2, 3, MAP_SCHEMA_VERSION],
+        fallbackVersions: [0],
+        currentVersion: MAP_SCHEMA_VERSION,
+        allowMissingVersion: true,
+        coerceNumericVersions: true,
+        shouldFallbackVersion: (value) => Number.isFinite(value) && Number(value) <= 0,
+    });
+    const schemaVersion = Number.isFinite(Number(versionState.resolvedVersion))
+        ? Math.trunc(Number(versionState.resolvedVersion))
+        : 0;
 
-    if (schemaVersion > MAP_SCHEMA_VERSION) {
-        throw new Error(`Unsupported schemaVersion ${schemaVersion}. Supported: ${MAP_SCHEMA_VERSION}.`);
+    if (versionState.shouldReject) {
+        const reportedVersion = Number.isFinite(Number(versionState.resolvedVersion))
+            ? String(Math.trunc(Number(versionState.resolvedVersion)))
+            : 'unknown';
+        throw new Error(`Unsupported schemaVersion ${reportedVersion}. Supported: ${MAP_SCHEMA_VERSION}.`);
     }
 
     let migrated = rawMap;
-    if (schemaVersion <= 0) {
+    if (versionState.shouldFallback) {
         const looksLikeRuntimeMap = Array.isArray(rawMap.size) && Array.isArray(rawMap.obstacles);
         if (looksLikeRuntimeMap) {
             migrated = sanitizeLegacyRuntimeMapDocument(rawMap, warnings);
@@ -87,13 +101,13 @@ export function migrateMapDocument(rawMap) {
             warnings.push('Legacy map format detected. Migrated to schema v4.');
             migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
         }
-    } else if (schemaVersion === 1) {
+    } else if (versionState.shouldUpgrade && schemaVersion === 1) {
         warnings.push('Map schema v1 detected. Migrating to v4.');
         migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
-    } else if (schemaVersion === 2) {
+    } else if (versionState.shouldUpgrade && schemaVersion === 2) {
         warnings.push('Map schema v2 detected. Migrating to v4.');
         migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
-    } else if (schemaVersion === 3) {
+    } else if (versionState.shouldUpgrade && schemaVersion === 3) {
         warnings.push('Map schema v3 detected. Migrating to v4.');
         migrated = { ...rawMap, schemaVersion: MAP_SCHEMA_VERSION };
     }

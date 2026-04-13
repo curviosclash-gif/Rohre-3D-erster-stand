@@ -36,6 +36,10 @@ const BASE_SLOTS = Object.freeze([
 ]);
 
 import { toSafeNumber, clampInteger as clampInt } from '../../shared/utils/ArcadeUtils.js';
+import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
+
+const VEHICLE_PROFILE_VERSION_FIELDS = Object.freeze(['schemaVersion']);
+const VEHICLE_PROFILE_SUPPORTED_SCHEMAS = Object.freeze([VEHICLE_PROFILE_SCHEMA_VERSION]);
 
 function toIsoString(nowMs) {
     return new Date(Math.max(0, toSafeNumber(nowMs, Date.now()))).toISOString();
@@ -201,11 +205,60 @@ export function calculateSectorXp(telemetry) {
 
 // ─── Persistence ───
 
+function normalizePersistedVehicleProfile(vehicleId, source) {
+    const fallback = createArcadeVehicleProfile(vehicleId);
+    const candidate = source && typeof source === 'object' && !Array.isArray(source) ? source : {};
+    return {
+        ...fallback,
+        ...candidate,
+        schemaVersion: VEHICLE_PROFILE_SCHEMA_VERSION,
+        vehicleId: String(candidate.vehicleId || vehicleId),
+        unlockedSlots: Array.isArray(candidate.unlockedSlots)
+            ? candidate.unlockedSlots.slice()
+            : fallback.unlockedSlots.slice(),
+        upgrades: candidate.upgrades && typeof candidate.upgrades === 'object' && !Array.isArray(candidate.upgrades)
+            ? { ...candidate.upgrades }
+            : {},
+    };
+}
+
 export function loadVehicleProfiles(store) {
     if (!store || typeof store.loadJsonRecord !== 'function') return {};
     const raw = store.loadJsonRecord(STORAGE_KEY, {});
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return {};
-    return raw;
+    const normalizedProfiles = {};
+    let shouldPersist = false;
+    Object.entries(raw).forEach(([vehicleId, entry]) => {
+        if (!entry || typeof entry !== 'object' || Array.isArray(entry)) {
+            shouldPersist = true;
+            return;
+        }
+        const versionState = resolveArtifactVersionState(entry, {
+            artifactType: 'arcade-vehicle-profile',
+            versionFields: VEHICLE_PROFILE_VERSION_FIELDS,
+            supportedVersions: VEHICLE_PROFILE_SUPPORTED_SCHEMAS,
+            currentVersion: VEHICLE_PROFILE_SCHEMA_VERSION,
+            allowMissingVersion: true,
+        });
+        if (versionState.shouldReject) {
+            shouldPersist = true;
+            return;
+        }
+        const normalized = normalizePersistedVehicleProfile(vehicleId, entry);
+        normalizedProfiles[vehicleId] = normalized;
+        if (
+            versionState.shouldFallback
+            || versionState.shouldUpgrade
+            || String(entry.vehicleId || vehicleId) !== normalized.vehicleId
+            || entry.schemaVersion !== VEHICLE_PROFILE_SCHEMA_VERSION
+        ) {
+            shouldPersist = true;
+        }
+    });
+    if (shouldPersist && typeof store.saveJsonRecord === 'function') {
+        store.saveJsonRecord(STORAGE_KEY, normalizedProfiles);
+    }
+    return normalizedProfiles;
 }
 
 export function saveVehicleProfiles(store, profiles) {
