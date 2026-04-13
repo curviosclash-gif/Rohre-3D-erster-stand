@@ -334,6 +334,16 @@ Stand: 2026-04-13
 - Observability bleibt bounded und copy-based im Shared-Store. Folgeblocks konsumieren Runtime-Snapshots oder Runtime-Events statt lokaler unbounded Histories, `splice()`-basierter Shadow-Queues oder aehnlicher Debug-Backdoors.
 - Desktop-/Browser-Unterschiede bleiben capability-getrieben: Host-, Discovery-, Save- und Recording-Logik liest `platform_capability_snapshot` oder benannte Adapter-Contracts und fuehrt keine neuen `game.*`, `runtimeFacade.*`, `curviosApp`- oder privaten Shell-Bypaesse ein.
 
+#### 4.6.4.3 Surface-Produktvertrag fuer V77 (`V77 77.1.1`)
+
+- `src/shared/contracts/PlatformCapabilityRegistry.js` ist die kanonische ID-Schicht fuer Produktoberflaechen. `desktop-app` und `browser-demo` sind die einzigen aktuell gueltigen Produktrollen; neue Feature-Arbeit fuehrt keine Parallelbegriffe oder dritte Surface-Rolle ausserhalb dieses Registry-Vertrags ein.
+- `desktop-app` ist die bezahlte Vollversion und die autoritative Produktoberflaeche. Sie traegt den produktiven Hauptpfad fuer `single`, `splitscreen`, `lan` und spaeter `online`, inklusive Shell-, Datei-, Export-, Replay-, Editor-, Diagnostics- und Tooling-Faehigkeiten.
+- `browser-demo` ist eine kostenlose, bewusst begrenzte Web-Oberflaeche fuer Showcase, Einstieg und kuratierte Demo-Flows. Sie liest dieselben Shared Contracts und Capability-Begriffe, verspricht aber keine Vollversions-Paritaet.
+- Fuer `desktop-app` gilt produktisch `default full`: Neue Features sind dort grundsaetzlich erlaubt, solange kein expliziter Capability-, Lifecycle- oder Rollout-Vertrag sie begrenzt.
+- Fuer `browser-demo` gilt produktisch `default deny`: Sichtbarkeit, Startbarkeit und CTA-Freigaben muessen ausdruecklich ueber Surface-/Capability-Regeln, Allowlist oder degradierte Demo-Pfade freigegeben werden.
+- Host-, Editor-, Datei-, Export- und andere Shell-nahe Produktpfade bleiben primaer Vollversions-Flaechen. Browser-Fallbacks sind nur zulaessig, wenn sie echten Demo-Wert stiften und nicht als Produktiv-Paritaet oder verdeckte Vollversion gelesen werden koennen.
+- Dev- und Diagnosezugaenge sind nicht Teil des Produktversprechens: Das hartcodierte Passwort in `src/ui/menu/MenuExpertLoginRuntime.js` ist nur ein lokaler Dev-/UX-Schalter und weder Lizenz- noch Sicherheitsgrenze fuer Demo oder Vollversion.
+
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 
 - Feldkonvention:
