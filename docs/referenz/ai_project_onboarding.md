@@ -28,6 +28,7 @@ Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/` (u. a. `docs/
 - Keine unnoetigen Allokationen in Hot Paths (`update`, Kollision, Bot-Sensing).
 - State-Namen in Runtime/Doku konsistent halten (`PLAYING`, `ROUND_END`, `MATCH_END`).
 - Fuer Persistenz-, Import- und Content-Scope immer den kanonischen V85-Leseweg nehmen: Store-/Transferfamilien ueber ihre Shared Contracts/Stores, Editor-/Template-/Runtime-Kataloge ueber `EditorBuildCatalog` bzw. die Descriptor-/Capability-Helfer statt ueber rohes JSON oder direkte `localStorage`-Reads.
+- Additive Folgefeatures im V85-Scope nur ueber bestehende Versionssignale (`schemaVersion`/`contractVersion`/`descriptorVersion`) erweitern; neue Fallbacks brauchen strukturiertes Feedback und einen dokumentierten Sunset-Trigger.
 
 ## 4. Task-Start Checkliste
 

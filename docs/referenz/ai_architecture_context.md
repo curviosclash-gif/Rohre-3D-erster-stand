@@ -420,6 +420,13 @@ Stand: 2026-04-13
 - Editor-/Authoring-Folgearbeit (`V86`) baut auf denselben Content-Signalen auf, die `V85` bereits exponiert: `EditorBuildCatalog` bleibt der gemeinsame Descriptor-Leseweg (`descriptorVersion`, Entry-Count), `resolveEditorTemplateImportCapability()` der kanonische Template-Capability-Vertrag, und `editor/js/main.js` haelt diese Informationen im Editor-Runtime-Snapshot fuer Tools und spaetere Checks sichtbar.
 - Neue Folgeblocks duerfen fuer Persistenz-, Import-, Template- und Descriptor-Scope keine parallelen Lesewege aufziehen, wenn ein autoritativer Shared-Contract oder Store-Adapter bereits existiert. Die Standardfrage ist: "welcher V85-Reader ist fuer diese Familie schon kanonisch?", nicht "welches JSON koennen wir hier schnell selbst parsen?".
 
+#### 4.6.5.9 Abschlussregel fuer additive Folgefeatures (`V85 85.99.2`)
+
+- Additive Folgefeatures erweitern bestehende Vertraege zuerst ueber die vorhandenen Reader und Envelopes; Version-Bumps sind nur fuer echte Contract-Brueche zulaessig, nicht fuer rein additive Felder.
+- Neue Persistenz-/Transfer-/Descriptor-Familien brauchen vor dem ersten Writer ein explizites Versionssignal (`schemaVersion`, `contractVersion` oder `descriptorVersion`) plus benannten Reader-/Migrationspfad; keine schema-losen "temporaren" Sidecars.
+- Capability-Fallbacks bleiben bis zu ihrem Sunset sichtbar und strukturiert (`reason`, `message`, `warnings`, optional `migration`) und duerfen nicht als stiller Erfolgspfad auftreten.
+- Dokumentationskonsistenz ist Teil des Abschlusses: Plan (`V85`), Referenzkontext und Onboarding muessen denselben Versionierungs- und Verbrauchsvertrag spiegeln, bevor ein Folgeblock darauf aufsetzt.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
