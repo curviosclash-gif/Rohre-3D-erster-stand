@@ -927,6 +927,7 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(result.appSaveCalls).toBe(1);
         expect(result.status.transport).toBe('app');
         expect(result.status.status).toBe('saved_via_app');
+        expect(result.status.message).toContain('Desktop-App');
     });
 
     test('T20aj2: Recorder priorisiert unter harter Last Downscale vor FPS-Kollaps', async ({ page }) => {
@@ -1466,6 +1467,8 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(result.exportStatus?.status).toBe('saved_via_download_fallback');
         expect(result.stopResultExportStatus?.status).toBe('saved_via_download_fallback');
         expect(result.stopResultTransport).toBe('api-fallback-download');
+        expect(result.exportStatus?.message).toContain('Browser-Download');
+        expect(Array.isArray(result.exportStatus?.warnings)).toBeTruthy();
     });
 
     test('T20ae: Runtime-Dispose entfernt globale und Menue-Listener vor Reinit', async ({ page }) => {

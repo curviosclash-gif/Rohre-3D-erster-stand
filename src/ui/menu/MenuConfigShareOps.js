@@ -14,6 +14,40 @@ function sanitizeString(value, fallback = '') {
     return normalized || fallback;
 }
 
+function createImportFeedback({
+    success,
+    reason,
+    error = '',
+    warnings = [],
+    message = '',
+    tone = 'info',
+    payload = null,
+    contractVersion = null,
+    usedLegacyFallback = false,
+    migration = null,
+}) {
+    return {
+        success: success === true,
+        reason: sanitizeString(reason),
+        error: sanitizeString(error),
+        warnings: Array.isArray(warnings)
+            ? warnings.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim())
+            : [],
+        message: sanitizeString(message),
+        tone: sanitizeString(tone, success ? 'success' : 'error'),
+        payload,
+        contractVersion,
+        usedLegacyFallback: usedLegacyFallback === true,
+        migration: migration && typeof migration === 'object'
+            ? { ...migration }
+            : null,
+    };
+}
+
+function createLegacyImportWarning() {
+    return `Legacy-Config ohne contractVersion erkannt. Import wurde auf ${MENU_CONFIG_SHARE_CONTRACT_VERSION} normalisiert.`;
+}
+
 function createSharePayload(settings) {
     const source = settings && typeof settings === 'object' ? settings : {};
     const defaults = createMenuConfigSharePayloadDefaults();
@@ -98,7 +132,14 @@ export function exportMenuConfigAsCode(settings) {
 
 export function importMenuConfigFromInput(settings, inputValue) {
     const raw = sanitizeString(inputValue);
-    if (!raw) return { success: false, reason: 'empty_input' };
+    if (!raw) {
+        return createImportFeedback({
+            success: false,
+            reason: 'empty_input',
+            error: 'Config-Import ist leer.',
+            message: 'Kein Config-Export eingefuegt.',
+        });
+    }
 
     let payload = null;
     try {
@@ -113,7 +154,12 @@ export function importMenuConfigFromInput(settings, inputValue) {
     }
 
     if (!payload || typeof payload !== 'object') {
-        return { success: false, reason: 'invalid_payload' };
+        return createImportFeedback({
+            success: false,
+            reason: 'invalid_payload',
+            error: 'Config-Import enthaelt weder gueltiges JSON noch einen lesbaren Code-Export.',
+            message: 'Config-Import konnte nicht gelesen werden.',
+        });
     }
 
     const versionState = resolveArtifactVersionState(payload, {
@@ -125,31 +171,57 @@ export function importMenuConfigFromInput(settings, inputValue) {
     });
     const hasExplicitContractVersion = Object.prototype.hasOwnProperty.call(payload, 'contractVersion');
     if ((versionState.shouldReject || versionState.resolvedVersion === null) && hasExplicitContractVersion) {
-        return {
+        return createImportFeedback({
             success: false,
             reason: 'unsupported_contract_version',
-            error: 'Config-Import verwendet eine ungueltige contractVersion.',
-        };
+            error: `Config-Import verwendet eine inkompatible contractVersion. Erwartet wird ${MENU_CONFIG_SHARE_CONTRACT_VERSION}.`,
+            message: 'Config-Import stammt aus einer nicht unterstuetzten Version.',
+        });
     }
 
     const sourcePayload = versionState.hasVersionField
         ? payload.payload
         : payload;
     if (!sourcePayload || typeof sourcePayload !== 'object' || Array.isArray(sourcePayload)) {
-        return {
+        return createImportFeedback({
             success: false,
             reason: 'invalid_payload_shape',
-            error: 'Config-Import-Huelle ist unvollstaendig (payload fehlt).',
-        };
+            error: 'Config-Import-Huelle ist unvollstaendig oder veraltet (payload fehlt).',
+            message: 'Config-Import enthaelt keine nutzbaren Einstellungsdaten.',
+        });
     }
 
     const applied = applySharePayload(settings, sourcePayload);
-    return {
-        success: applied,
-        reason: applied ? 'imported' : 'apply_failed',
+    if (!applied) {
+        return createImportFeedback({
+            success: false,
+            reason: 'apply_failed',
+            error: 'Config-Import konnte nicht auf die aktuellen Menue-Einstellungen angewendet werden.',
+            message: 'Config-Import konnte nicht uebernommen werden.',
+        });
+    }
+
+    const usedLegacyFallback = !versionState.hasVersionField;
+    const warnings = usedLegacyFallback ? [createLegacyImportWarning()] : [];
+    const migration = usedLegacyFallback
+        ? {
+            applied: true,
+            type: 'legacy-envelope-fallback',
+            targetContractVersion: MENU_CONFIG_SHARE_CONTRACT_VERSION,
+        }
+        : null;
+    return createImportFeedback({
+        success: true,
+        reason: 'imported',
         payload: sourcePayload,
         contractVersion: versionState.hasVersionField ? MENU_CONFIG_SHARE_CONTRACT_VERSION : null,
-        usedLegacyFallback: !versionState.hasVersionField,
-    };
+        usedLegacyFallback,
+        warnings,
+        message: usedLegacyFallback
+            ? 'Legacy-Config importiert und auf den aktuellen Vertragsstand normalisiert.'
+            : 'Config importiert.',
+        tone: usedLegacyFallback ? 'warning' : 'success',
+        migration,
+    });
 }
 

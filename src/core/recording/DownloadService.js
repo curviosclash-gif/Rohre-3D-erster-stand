@@ -7,6 +7,38 @@ const DESKTOP_SAVE_VERSION_FIELDS = Object.freeze(['contractVersion']);
 const DESKTOP_SAVE_SUPPORTED_VERSIONS = Object.freeze(['preload.save.v1']);
 const DESKTOP_SAVE_CURRENT_VERSION = 'preload.save.v1';
 
+function dedupeWarnings(warnings) {
+    const unique = [];
+    const seen = new Set();
+    for (const warning of Array.isArray(warnings) ? warnings : []) {
+        const normalized = typeof warning === 'string' ? warning.trim() : '';
+        if (!normalized || seen.has(normalized)) continue;
+        seen.add(normalized);
+        unique.push(normalized);
+    }
+    return unique;
+}
+
+function createDownloadStatus({
+    requested,
+    transport,
+    status,
+    fallbackReason = null,
+    apiStatus = null,
+    message = '',
+    warnings = [],
+}) {
+    return {
+        requested: requested === true,
+        transport: String(transport || ''),
+        status: String(status || ''),
+        fallbackReason: fallbackReason ? String(fallbackReason) : null,
+        apiStatus: Number.isFinite(Number(apiStatus)) ? Number(apiStatus) : null,
+        message: String(message || '').trim(),
+        warnings: dedupeWarnings(warnings),
+    };
+}
+
 function resolveDesktopSaveContractState(adapter) {
     return resolveArtifactVersionState(adapter && typeof adapter === 'object' ? adapter : {}, {
         artifactType: 'desktop-save-adapter',
@@ -82,13 +114,12 @@ export function buildDownloadFileName(downloadDirectoryName, fileName) {
  */
 export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownload, downloadHandler, logger }) {
     if (!autoDownload || !blob || blob.size <= 0) {
-        return {
+        return createDownloadStatus({
             requested: false,
             transport: 'disabled',
             status: 'not_requested',
-            fallbackReason: null,
-            apiStatus: null,
-        };
+            message: 'Recording-Export wurde nicht angefordert.',
+        });
     }
     const safeFileName = String(fileName || '').trim();
     const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
@@ -106,6 +137,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
             };
         },
     });
+    const statusWarnings = [];
     const downloadViaBrowser = async (reason, error = null) => {
         if (error) {
             logger?.warn?.(`[DownloadService] recording export fallback (${reason})`, error);
@@ -119,6 +151,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     };
     if (desktopSaveAdapter.isAvailable() && !desktopSaveAdapterVersionSupported) {
         logger?.warn?.('[DownloadService] recording export desktop save skipped due to unsupported adapter contractVersion', desktopSaveAdapter?.contractVersion || null);
+        statusWarnings.push('Desktop-Speicheradapter ist veraltet oder inkompatibel; Browser-/API-Fallback wird verwendet.');
     }
     if (
         desktopSaveAdapterVersionSupported
@@ -131,27 +164,31 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
             const appResult = await desktopSaveAdapter.saveVideo(bytes, browserFileName, mimeType);
             if (appResult?.saved === true) {
                 logger?.info?.('[DownloadService] recording export saved via electron app', browserFileName);
-                return {
+                return createDownloadStatus({
                     requested: true,
                     transport: 'app',
                     status: 'saved_via_app',
-                    fallbackReason: null,
-                    apiStatus: null,
-                };
+                    message: 'Recording wurde direkt ueber die Desktop-App gespeichert.',
+                    warnings: statusWarnings,
+                });
             }
         } catch (error) {
             logger?.warn?.('[DownloadService] recording export app save failed', error);
+            statusWarnings.push('Desktop-App konnte die Aufnahme nicht direkt speichern; Dateipfad-Fallback wird versucht.');
         }
     }
     if (typeof fetch !== 'function') {
         const downloaded = await downloadViaBrowser('fetch-unavailable');
-        return {
+        return createDownloadStatus({
             requested: true,
             transport: downloaded ? 'download' : 'download-failed',
             status: downloaded ? 'saved_via_download' : 'download_failed',
             fallbackReason: 'fetch-unavailable',
-            apiStatus: null,
-        };
+            message: downloaded
+                ? 'Recording wurde als Browser-Download gespeichert, weil keine Disk-API verfuegbar ist.'
+                : 'Recording konnte ohne Disk-API auch nicht als Browser-Download gespeichert werden.',
+            warnings: [...statusWarnings, 'Disk-API ist in dieser Umgebung nicht verfuegbar.'],
+        });
     }
     try {
         const response = await fetch(EDITOR_API_ROUTES.SAVE_VIDEO_DISK, {
@@ -161,32 +198,40 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
         });
         if (response?.ok) {
             logger?.info?.('[DownloadService] recording export saved via api', safeFileName);
-            return {
+            return createDownloadStatus({
                 requested: true,
                 transport: 'api',
                 status: 'saved_via_api',
-                fallbackReason: null,
                 apiStatus: Number(response.status) || 200,
-            };
+                message: 'Recording wurde ueber die lokale Disk-API gespeichert.',
+                warnings: statusWarnings,
+            });
         }
         const apiStatus = Number(response?.status) || 0;
         const apiError = new Error(`http_${apiStatus || 'unknown'}`);
         const downloaded = await downloadViaBrowser('api-failed', apiError);
-        return {
+        return createDownloadStatus({
             requested: true,
             transport: downloaded ? 'api-fallback-download' : 'api-fallback-download-failed',
             status: downloaded ? 'saved_via_download_fallback' : 'download_fallback_failed',
             fallbackReason: 'api-failed',
             apiStatus: apiStatus || null,
-        };
+            message: downloaded
+                ? 'Recording wurde als Browser-Download gespeichert, weil die Disk-API fehlgeschlagen ist.'
+                : 'Recording konnte nach fehlgeschlagener Disk-API auch nicht als Browser-Download gespeichert werden.',
+            warnings: [...statusWarnings, `Disk-API-Fehler: HTTP ${apiStatus || 'unknown'}.`],
+        });
     } catch (error) {
         const downloaded = await downloadViaBrowser('api-throw', error);
-        return {
+        return createDownloadStatus({
             requested: true,
             transport: downloaded ? 'download' : 'download-failed',
             status: downloaded ? 'saved_via_download' : 'download_failed',
             fallbackReason: 'api-throw',
-            apiStatus: null,
-        };
+            message: downloaded
+                ? 'Recording wurde als Browser-Download gespeichert, weil die Disk-API nicht erreichbar war.'
+                : 'Recording konnte weder ueber die Disk-API noch als Browser-Download gespeichert werden.',
+            warnings: [...statusWarnings, 'Disk-API war nicht erreichbar.'],
+        });
     }
 }

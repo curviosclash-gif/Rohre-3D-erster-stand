@@ -27,6 +27,44 @@ function getStorage(storageOverride) {
     return resolveLocalStorage(storageOverride);
 }
 
+function normalizeWarnings(warnings) {
+    return Array.isArray(warnings)
+        ? warnings.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim())
+        : [];
+}
+
+function hasMigrationWarnings(warnings) {
+    return normalizeWarnings(warnings).some((entry) => /legacy|schema v\d+|migrat/i.test(entry));
+}
+
+function createCustomMapResult({
+    ok,
+    reason,
+    error = '',
+    message = '',
+    warnings = [],
+    capability,
+    details = '',
+    mapDocument = null,
+    mapDefinition = null,
+    migration = null,
+}) {
+    return {
+        ok: ok === true,
+        reason: String(reason || '').trim(),
+        error: String(error || '').trim(),
+        message: String(message || '').trim(),
+        warnings: normalizeWarnings(warnings),
+        capability,
+        details: String(details || '').trim(),
+        mapDocument,
+        mapDefinition,
+        migration: migration && typeof migration === 'object'
+            ? { ...migration }
+            : null,
+    };
+}
+
 export function resolveCustomMapStorageCapability(storageOverride) {
     const storage = getStorage(storageOverride);
     const available = !!storage
@@ -76,33 +114,37 @@ export function loadCustomMapFromStorage(storageOverride) {
     const capability = resolveCustomMapStorageCapability(storageOverride);
     const storage = getStorage(storageOverride);
     if (!capability.available || !storage) {
-        return {
+        return createCustomMapResult({
             ok: false,
-            error: 'localStorage is not available for custom-map import.',
-            warnings: [],
+            reason: 'storage_unavailable',
+            error: 'Custom-Map-Speicher ist in dieser Umgebung nicht verfuegbar.',
+            message: 'Custom-Map konnte nicht geladen werden, weil Browser-Speicher fehlt.',
             capability,
-        };
+        });
     }
 
     let rawJSON = null;
     try {
         rawJSON = storage.getItem(CUSTOM_MAP_STORAGE_KEY);
     } catch (error) {
-        return {
+        return createCustomMapResult({
             ok: false,
-            error: `Unable to read localStorage key "${CUSTOM_MAP_STORAGE_KEY}": ${error.message}`,
-            warnings: [],
+            reason: 'storage_read_failed',
+            error: 'Gespeicherte Custom-Map konnte nicht aus dem Browser-Speicher gelesen werden.',
+            message: 'Custom-Map-Speicher konnte nicht gelesen werden.',
             capability,
-        };
+            details: error?.message || '',
+        });
     }
 
     if (!rawJSON) {
-        return {
+        return createCustomMapResult({
             ok: false,
-            error: `No custom map found in localStorage key "${CUSTOM_MAP_STORAGE_KEY}".`,
-            warnings: [],
+            reason: 'missing_custom_map',
+            error: 'Keine gespeicherte Custom-Map gefunden.',
+            message: 'Keine gespeicherte Custom-Map vorhanden. Bitte zuerst aus dem Editor exportieren oder einen Playtest speichern.',
             capability,
-        };
+        });
     }
 
     try {
@@ -112,25 +154,41 @@ export function loadCustomMapFromStorage(storageOverride) {
             mapScale: conversionScale.scale,
             name: 'Custom (Editor gespeichert)',
         });
-        return {
+        const warnings = [
+            ...parsed.warnings,
+            ...(conversionScale.warning ? [conversionScale.warning] : []),
+            ...converted.warnings,
+        ];
+        const migrationApplied = hasMigrationWarnings(warnings);
+        return createCustomMapResult({
             ok: true,
+            reason: migrationApplied ? 'loaded_with_migration' : (warnings.length > 0 ? 'loaded_with_warnings' : 'loaded'),
+            message: migrationApplied
+                ? 'Custom-Map geladen und auf den aktuellen Schema-/Runtime-Stand normalisiert.'
+                : (warnings.length > 0
+                    ? 'Custom-Map geladen, aber mit Hinweisen normalisiert.'
+                    : 'Custom-Map geladen.'),
+            warnings,
+            capability,
             mapDocument: converted.mapDocument,
             mapDefinition: converted.map,
-            warnings: [
-                ...parsed.warnings,
-                ...(conversionScale.warning ? [conversionScale.warning] : []),
-                ...converted.warnings,
-            ],
-            capability,
-        };
+            migration: migrationApplied
+                ? {
+                    applied: true,
+                    targetSchemaVersion: converted.mapDocument?.schemaVersion || null,
+                }
+                : null,
+        });
     } catch (error) {
         logger.error('Error parsing custom map:', error);
-        return {
+        return createCustomMapResult({
             ok: false,
-            error: error.message || 'Unknown custom map parsing error.',
-            warnings: [],
+            reason: 'parse_failed',
+            error: 'Gespeicherte Custom-Map ist inkompatibel oder defekt.',
+            message: 'Custom-Map konnte nicht gelesen werden und faellt auf die Standard-Map zurueck.',
             capability,
-        };
+            details: error?.message || 'Unknown custom map parsing error.',
+        });
     }
 }
 
@@ -159,7 +217,11 @@ export function resolveArenaMapSelection(requestedMapKey, storageOverride) {
     });
 
     if (selection.isFallback) {
-        logger.warn(`Failed to load custom map, falling back to "${fallbackMapKey}". Error:`, selection.error);
+        logger.warn(`Failed to load custom map, falling back to "${fallbackMapKey}".`, {
+            message: selection.message,
+            error: selection.error,
+            details: selection.details || '',
+        });
     }
 
     return selection;

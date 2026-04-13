@@ -73,9 +73,12 @@ export function resolveCustomMapSelection({ requestedMapKey, maps, fallbackMapKe
             mapDefinition: customResult.mapDefinition,
             mapDocument: customResult.mapDocument,
             warnings: customResult.warnings || [],
+            message: customResult.message || '',
+            details: customResult.details || '',
             isFallback: false,
             isCustom: true,
             error: null,
+            migration: customResult.migration || null,
         };
     }
 
@@ -84,9 +87,12 @@ export function resolveCustomMapSelection({ requestedMapKey, maps, fallbackMapKe
         effectiveMapKey: fallbackMapKey,
         mapDefinition: resolveMapDefinition(maps, fallbackMapKey, fallbackMapKey),
         warnings: customResult?.warnings || [],
+        message: customResult?.message || '',
+        details: customResult?.details || '',
         isFallback: true,
         isCustom: false,
         error: customResult?.error || 'Unknown custom map parsing error.',
+        migration: customResult?.migration || null,
     };
 }
 

@@ -30,6 +30,16 @@ function formatWarningsMessage(title, warnings) {
     return `${title}\n- ${uniqueWarnings.join('\n- ')}`;
 }
 
+function hasMigrationWarnings(warnings) {
+    return dedupeWarnings(warnings).some((entry) => /legacy|schema v\d+|migrat/i.test(entry));
+}
+
+function resolveWarningsTitle(baseTitle, warnings) {
+    return hasMigrationWarnings(warnings)
+        ? baseTitle.replace('Hinweisen', 'Migrationshinweisen')
+        : baseTitle;
+}
+
 function promptForDiskMapName() {
     let defaultName = DEFAULT_DISK_MAP_NAME;
     try {
@@ -110,7 +120,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     const saveCurrentMapToDisk = async (mapName) => {
         const diskCapability = resolveEditorDiskSaveCapability(window);
         if (!diskCapability.available) {
-            throw new Error('Editor-Disk-Import/Export ist in dieser Umgebung nicht verfuegbar (fetch fehlt).');
+            throw new Error('Editor-Disk-Import/Export ist in dieser Umgebung nicht verfuegbar, weil kein Fetch-Transport bereitsteht.');
         }
         const { jsonText, warnings: exportWarnings } = generateCurrentMapJson();
         const response = await diskCapability.fetchImpl(EDITOR_API_ROUTES.SAVE_MAP_DISK, {
@@ -137,7 +147,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
             responseVersionState.shouldReject
             || responseVersionState.resolvedVersion === null
         )) {
-            throw new Error('Editor-Disk-Import/Export antwortet mit ungueltiger contractVersion.');
+            throw new Error('Editor-Disk-Import/Export antwortet mit inkompatibler contractVersion. Bitte Renderer und Dev-Server auf denselben Stand bringen.');
         }
 
         if (!response.ok || !payload?.ok) {
@@ -154,7 +164,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     dom.btnExport?.addEventListener("click", () => {
         const { jsonText, warnings } = generateCurrentMapJson();
         setJsonEditorText(editor, jsonText);
-        const warningMessage = formatWarningsMessage('Map exportiert mit Hinweisen:', warnings);
+        const warningMessage = formatWarningsMessage(resolveWarningsTitle('Map exportiert mit Hinweisen:', warnings), warnings);
         if (warningMessage) {
             alert(warningMessage);
         }
@@ -178,7 +188,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
             setJsonEditorText(editor, jsonText);
 
             const warningSuffix = warnings.length > 0
-                ? `\nHinweise: ${warnings.join(' | ')}`
+                ? `\n${hasMigrationWarnings(warnings) ? 'Migrationshinweise' : 'Hinweise'}: ${warnings.join(' | ')}`
                 : '';
             const saveMode = payload.overwritten ? 'aktualisiert' : 'neu gespeichert';
 
@@ -209,7 +219,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
         }
 
         const warningMessage = formatWarningsMessage(
-            'Playtest startet mit normalisierten Map-Hinweisen:',
+            resolveWarningsTitle('Playtest startet mit normalisierten Map-Hinweisen:', warnings),
             warnings
         );
         if (warningMessage) {
@@ -248,7 +258,7 @@ export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
         });
 
         const warningMessage = formatWarningsMessage(
-            'Map importiert mit Hinweisen:',
+            resolveWarningsTitle('Map importiert mit Hinweisen:', editor.mapManager?.lastSchemaWarnings),
             editor.mapManager?.lastSchemaWarnings
         );
         if (warningMessage) {

@@ -48,8 +48,13 @@ export function handleConfigImportAction({
     }
 
     onSettingsChanged?.({ changedKeys: sessionSwitchChangedKeys });
-    setConfigShareStatus(game.ui, 'Import erfolgreich', 'success');
-    game._showStatusToast('Config importiert', 1200, 'success');
+    const statusMessage = String(result.message || (result.usedLegacyFallback ? 'Import mit Legacy-Fallback' : 'Import erfolgreich'));
+    const statusTone = String(result.tone || (result.usedLegacyFallback ? 'warning' : 'success'));
+    setConfigShareStatus(game.ui, statusMessage, statusTone);
+    game._showStatusToast(statusMessage, result.usedLegacyFallback ? 2200 : 1200, statusTone);
+    if (Array.isArray(result.warnings) && result.warnings.length > 0) {
+        game._showStatusToast(result.warnings[0], 2800, 'warning');
+    }
 }
 
 export function applyMenuPresetAction({

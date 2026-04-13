@@ -11,13 +11,19 @@ export function deriveMapResolutionFeedbackPlan({ mapResolution, portalsEnabled,
     if (mapResolution.error) {
         consoleEntries.push({
             level: 'warn',
-            args: ['[Game] Map loading fallback:', mapResolution.error],
+            args: ['[Game] Map loading fallback:', mapResolution.error, mapResolution.details || ''],
         });
     }
     if (Array.isArray(mapResolution.warnings) && mapResolution.warnings.length > 0) {
         consoleEntries.push({
             level: 'warn',
             args: ['[Game] Map loading warnings:', mapResolution.warnings],
+        });
+    }
+    if (mapResolution.message) {
+        consoleEntries.push({
+            level: 'info',
+            args: ['[Game] Map loading message:', mapResolution.message],
         });
     }
     if (Array.isArray(arenaBuildResult?.glbLoadWarnings) && arenaBuildResult.glbLoadWarnings.length > 0) {
@@ -29,7 +35,7 @@ export function deriveMapResolutionFeedbackPlan({ mapResolution, portalsEnabled,
 
     if (mapResolution.isFallback && mapResolution.requestedMapKey === CUSTOM_MAP_KEY) {
         toasts.push({
-            message: 'Custom-Map ungueltig, Standard-Map geladen',
+            message: mapResolution.message || 'Custom-Map ungueltig, Standard-Map geladen',
             durationMs: 2600,
             tone: 'error',
         });
@@ -41,11 +47,12 @@ export function deriveMapResolutionFeedbackPlan({ mapResolution, portalsEnabled,
         });
     } else if (mapResolution.isCustom && Array.isArray(mapResolution.warnings) && mapResolution.warnings.length > 0) {
         const extraCount = Math.max(0, mapResolution.warnings.length - 1);
+        const prefix = String(mapResolution.message || '').trim();
         const suffix = extraCount > 0 ? ` (+${extraCount} Hinweis(e) in Konsole)` : '';
         toasts.push({
-            message: `Custom-Map Hinweis: ${mapResolution.warnings[0]}${suffix}`,
-            durationMs: 3600,
-            tone: 'info',
+            message: prefix || `Custom-Map Hinweis: ${mapResolution.warnings[0]}${suffix}`,
+            durationMs: mapResolution.migration ? 4200 : 3600,
+            tone: mapResolution.migration ? 'warning' : 'info',
         });
     }
     if (arenaBuildResult?.glbLoadError) {

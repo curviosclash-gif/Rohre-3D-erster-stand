@@ -158,6 +158,7 @@ test('V85.4 menu config share import/export validates contractVersion with legac
     const importResult = importMenuConfigFromInput(settings, JSON.stringify(exportedPayload));
     assert.equal(importResult.success, true);
     assert.equal(importResult.usedLegacyFallback, false);
+    assert.match(importResult.message || '', /Config importiert/i);
     assert.equal(settings.mapKey, 'arena_simple');
 
     const legacyResult = importMenuConfigFromInput(settings, JSON.stringify({
@@ -166,6 +167,9 @@ test('V85.4 menu config share import/export validates contractVersion with legac
     }));
     assert.equal(legacyResult.success, true);
     assert.equal(legacyResult.usedLegacyFallback, true);
+    assert.match(legacyResult.message || '', /Legacy-Config importiert/i);
+    assert.match(legacyResult.warnings?.[0] || '', /contractVersion/i);
+    assert.equal(legacyResult.migration?.applied, true);
     assert.equal(settings.mapKey, 'arena_legacy');
 
     const rejectResult = importMenuConfigFromInput(settings, JSON.stringify({
@@ -174,6 +178,7 @@ test('V85.4 menu config share import/export validates contractVersion with legac
     }));
     assert.equal(rejectResult.success, false);
     assert.equal(rejectResult.reason, 'unsupported_contract_version');
+    assert.match(rejectResult.error || '', /menu-config-share\.v1/i);
 });
 
 test('V85.2 settings profiles migrate legacy arrays into schema envelope', () => {
@@ -294,7 +299,9 @@ test('V85.4 custom-map import exposes explicit browser storage capability contra
     assert.equal(result.capability?.contractVersion, CUSTOM_MAP_STORAGE_CAPABILITY_CONTRACT_VERSION);
     if (result.ok) {
         assert.equal(result.capability?.available, true);
+        assert.equal(typeof result.message, 'string');
     } else {
         assert.equal(typeof result.error, 'string');
+        assert.equal(typeof result.message, 'string');
     }
 });

@@ -64,6 +64,7 @@ test('V85.3 content descriptors expose shared registry envelopes', () => {
     assert.equal(templateCapability.available, false);
     assert.equal(templateCapability.degradedReason, 'templates_path_not_present');
     assert.equal(templateCapability.descriptorVersion, CONTENT_DESCRIPTOR_VERSION);
+    assert.match(templateCapability.message || '', /editor\/templates/i);
 
     const missionRegistry = getArcadeMissionRegistryDescriptor();
     assertRegistryEnvelope(missionRegistry, CONTENT_DESCRIPTOR_TYPES.ARCADE_MISSIONS);

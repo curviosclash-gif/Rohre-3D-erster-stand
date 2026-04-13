@@ -886,6 +886,11 @@ export function resolveEditorTemplateImportCapability(descriptor = null) {
     const degradedReason = available
         ? ''
         : (status === 'missing' ? 'templates_path_not_present' : `templates_${status}`);
+    const message = available
+        ? 'Editor-Templates sind verfuegbar.'
+        : (status === 'missing'
+            ? 'Editor-Templates fehlen aktuell unter editor/templates/**; Template-Import bleibt deaktiviert.'
+            : `Editor-Templates sind derzeit nicht verfuegbar (${status}).`);
     return Object.freeze({
         contractVersion: EDITOR_TEMPLATE_IMPORT_CAPABILITY_CONTRACT_VERSION,
         descriptorVersion: String(templateDescriptor?.descriptorVersion || ''),
@@ -894,5 +899,6 @@ export function resolveEditorTemplateImportCapability(descriptor = null) {
         entryCount,
         available,
         degradedReason,
+        message,
     });
 }
