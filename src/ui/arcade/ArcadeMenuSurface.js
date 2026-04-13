@@ -1,5 +1,10 @@
 import { resolveMenuCatalogText } from '../menu/MenuTextCatalog.js';
-
+import {
+    ARCADE_VEHICLE_PROFILE_MAX_LEVEL,
+    ARCADE_VEHICLE_PROFILE_STORAGE_KEY,
+    getArcadeVehicleProfileRecord,
+    readArcadeVehicleProfileRecord,
+} from '../../shared/contracts/ArcadeVehicleProfileContract.js';
 const ARCADE_SEED_STORAGE_KEY = 'cuviosclash.arcade.seed.v1';
 const ARCADE_LAST_RUN_STORAGE_KEY = 'cuviosclash.arcade.last_run.v1';
 
@@ -103,6 +108,30 @@ function resolveRuntimeFacade() {
 function showToast(message, tone = 'info', duration = 1300) {
     if (typeof window === 'undefined') return;
     window.GAME_INSTANCE?._showStatusToast?.(message, duration, tone);
+}
+
+function resolveVehicleProfileReader() {
+    if (typeof window === 'undefined') return null;
+    return window.GAME_INSTANCE?.settingsManager?.store || null;
+}
+
+function resolveVehicleMasteryProfile(vehicleId) {
+    const fallbackProfile = { level: 1, xp: 0 };
+    const store = resolveVehicleProfileReader();
+    if (!store || typeof store.loadJsonRecord !== 'function') {
+        return fallbackProfile;
+    }
+    try {
+        const rawProfiles = store.loadJsonRecord(ARCADE_VEHICLE_PROFILE_STORAGE_KEY, {});
+        const { profiles } = readArcadeVehicleProfileRecord(rawProfiles);
+        return getArcadeVehicleProfileRecord(profiles, vehicleId);
+    } catch {
+        return fallbackProfile;
+    }
+}
+
+function resolveVehicleMasteryMaxLevel() {
+    return ARCADE_VEHICLE_PROFILE_MAX_LEVEL;
 }
 
 function buildArcadeSurface(level3Body, ui) {
@@ -327,10 +356,8 @@ export function setupArcadeMenuSurface(ctx = {}) {
             refs.replayButton.title = 'Noch kein Replay verfuegbar';
         }
 
-        const profilesRaw = safeReadLocalStorage('cuviosclash.arcade-vehicle-profile.v1');
-        const profilesMap = profilesRaw ? (() => { try { return JSON.parse(profilesRaw); } catch { return {}; } })() : {};
-        const profile = (profilesMap && typeof profilesMap === 'object' && profilesMap[vehicleId]) || { level: 1, xp: 0 };
-        const MAX_LEVEL = 30;
+        const profile = resolveVehicleMasteryProfile(vehicleId);
+        const MAX_LEVEL = resolveVehicleMasteryMaxLevel();
         const lvl = Math.max(1, Math.min(MAX_LEVEL, Number(profile.level) || 1));
         const masteryLabel = lvl >= MAX_LEVEL
             ? `${t('menu.arcade.mastery.progress.label', 'Mastery')} ${t('menu.arcade.mastery.max', 'MAX')}`

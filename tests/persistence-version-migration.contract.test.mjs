@@ -112,6 +112,10 @@ test('V85.2 profile import rejects unknown contract versions but keeps legacy fa
     }), { normalizeProfileName });
     assert.equal(legacyResult.success, true);
     assert.equal(legacyResult.profile?.name, 'Legacy Pilot');
+    assert.equal(legacyResult.usedLegacyFallback, true);
+    assert.match(legacyResult.message || '', /Legacy-Profil importiert/i);
+    assert.match(legacyResult.warnings?.[0] || '', /contractVersion/i);
+    assert.equal(legacyResult.migration?.applied, true);
 
     const invalidVersionResult = parseProfileImport(JSON.stringify({
         contractVersion: '  ',
@@ -122,6 +126,17 @@ test('V85.2 profile import rejects unknown contract versions but keeps legacy fa
     }), { normalizeProfileName });
     assert.equal(invalidVersionResult.success, false);
     assert.match(invalidVersionResult.error || '', /contractVersion/i);
+
+    const currentResult = parseProfileImport(JSON.stringify({
+        contractVersion: 'profile-export.v1',
+        profile: {
+            name: 'Pilot',
+            settings: {},
+        },
+    }), { normalizeProfileName });
+    assert.equal(currentResult.success, true);
+    assert.equal(currentResult.usedLegacyFallback, false);
+    assert.equal(currentResult.contractVersion, 'profile-export.v1');
 });
 
 test('V85.2 map migration keeps legacy fallback and rejects future schema versions', () => {

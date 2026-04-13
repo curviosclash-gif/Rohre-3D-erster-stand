@@ -7,4 +7,8 @@ export {
     setDefaultProfileByName,
     upsertProfileEntry,
 } from '../../ui/ProfileDataOps.js';
-export { exportProfileAsJson, parseProfileImport } from '../../ui/ProfileTransferOps.js';
+export {
+    exportProfileAsJson,
+    parseProfileImport,
+    PROFILE_EXPORT_CONTRACT_VERSION,
+} from '../../ui/ProfileTransferOps.js';

@@ -4,6 +4,10 @@ import {
     EDITOR_DISK_IO_CONTRACT_VERSION,
 } from '../../../src/shared/contracts/EditorPathContract.js';
 import { resolveArtifactVersionState } from '../../../src/shared/contracts/ArtifactVersionMigrationContract.js';
+import {
+    getEditorBuildCatalogDescriptor,
+    resolveEditorTemplateImportCapability,
+} from './EditorBuildCatalog.js';
 import { getJsonEditorText, setJsonEditorText } from './EditorFormState.js';
 
 const LAST_DISK_MAP_NAME_STORAGE_KEY = 'editor_last_disk_map_name';
@@ -99,9 +103,23 @@ function resolveEditorDiskSaveCapability(runtimeGlobal = globalThis) {
     };
 }
 
+function applyAuthoringContractHints(dom) {
+    if (!dom) return;
+    const buildCatalogDescriptor = getEditorBuildCatalogDescriptor();
+    const templateCapability = resolveEditorTemplateImportCapability();
+    const buildCatalogMessage = `Build-Katalog: ${String(buildCatalogDescriptor?.descriptorVersion || 'unbekannt')} mit ${Number(buildCatalogDescriptor?.entryCount) || 0} Eintraegen.`;
+    const templateMessage = String(templateCapability?.message || '');
+    const authoringHint = `${buildCatalogMessage} ${templateMessage}`.trim();
+    if (dom.btnNew) dom.btnNew.title = authoringHint;
+    if (dom.btnImport) dom.btnImport.title = `${authoringHint} Import nutzt denselben Map- und Descriptor-Vertrag.`.trim();
+    if (dom.btnSaveToGame) dom.btnSaveToGame.title = `${authoringHint} Disk-Export nutzt ${EDITOR_DISK_IO_CONTRACT_VERSION}.`.trim();
+    if (dom.btnPlaytest) dom.btnPlaytest.title = `${authoringHint} Playtest nutzt denselben Runtime-/Map-Leseweg.`.trim();
+}
+
 export function bindEditorSessionControls(editor, { syncArenaValues } = {}) {
     if (!editor) return;
     const dom = editor.dom;
+    applyAuthoringContractHints(dom);
 
     const generateCurrentMapJson = () => {
         const jsonText = editor.mapManager.generateJSONExport(editor.getArenaSizeForExport());

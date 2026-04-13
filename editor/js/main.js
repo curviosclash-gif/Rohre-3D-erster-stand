@@ -2,11 +2,17 @@ import { EditorCore } from './EditorCore.js';
 import { EditorAssetLoader } from './EditorAssetLoader.js';
 import { EditorUI } from './EditorUI.js';
 import { EditorMapManager } from './EditorMapManager.js';
+import {
+    getEditorBuildCatalogDescriptor,
+    resolveEditorTemplateImportCapability,
+} from './ui/EditorBuildCatalog.js';
 
 function buildEditorRuntimeSnapshot({ ui, mapManager, core }) {
     const activeEntry = ui?.toolDockState?.getActiveEntry?.() || null;
     const recentEntries = ui?.toolDockState?.getRecentEntries?.() || [];
     const favoriteEntries = ui?.toolDockState?.getFavoriteEntries?.() || [];
+    const buildCatalogDescriptor = getEditorBuildCatalogDescriptor();
+    const templateImportCapability = resolveEditorTemplateImportCapability();
     const assetId = activeEntry ? (
         activeEntry.tool === 'item' || activeEntry.tool === 'aircraft'
             ? activeEntry.subType
@@ -32,6 +38,16 @@ function buildEditorRuntimeSnapshot({ ui, mapManager, core }) {
         activeEntryLabel: activeEntry?.label || null,
         activeEntrySubType: activeEntry?.subType || null,
         activeEntryAssetState: activeAssetStatus?.state || null,
+        buildCatalogDescriptorVersion: String(buildCatalogDescriptor?.descriptorVersion || ''),
+        buildCatalogEntryCount: Number(buildCatalogDescriptor?.entryCount) || 0,
+        templateImportCapability: {
+            contractVersion: String(templateImportCapability?.contractVersion || ''),
+            descriptorVersion: String(templateImportCapability?.descriptorVersion || ''),
+            status: String(templateImportCapability?.status || ''),
+            available: templateImportCapability?.available === true,
+            degradedReason: String(templateImportCapability?.degradedReason || ''),
+            message: String(templateImportCapability?.message || ''),
+        },
         objectCount: Number(mapManager?.getObjectCount?.() || 0),
         recentEntryIds: recentEntries.map((entry) => entry.id),
         favoriteEntryIds: favoriteEntries.map((entry) => entry.id),
@@ -82,6 +98,8 @@ export async function initEditor() {
         const core = new EditorCore("threeCanvas");
         ui = new EditorUI(core);
         const mapManager = new EditorMapManager(core, assetLoader);
+        const buildCatalogDescriptor = getEditorBuildCatalogDescriptor();
+        const templateImportCapability = resolveEditorTemplateImportCapability();
 
         ui.setMapManager(mapManager);
         mapManager.setCallbacks({
@@ -92,6 +110,8 @@ export async function initEditor() {
         });
 
         installEditorRuntimeHooks({ core, ui, mapManager, assetLoader });
+        document.body.dataset.editorDescriptorVersion = String(buildCatalogDescriptor?.descriptorVersion || '');
+        document.body.dataset.editorTemplateStatus = String(templateImportCapability?.status || '');
         core.animate();
 
         const assetSummary = await assetLoader.loadAll();

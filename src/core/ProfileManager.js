@@ -6,6 +6,7 @@ import {
     cloneProfileEntry,
     exportProfileAsJson,
     parseProfileImport,
+    PROFILE_EXPORT_CONTRACT_VERSION,
     removeProfileByName,
     resolveActiveProfileName,
     resolveDefaultProfileName,
@@ -176,6 +177,9 @@ export class ProfileManager {
             success: true,
             name: profile.name,
             serialized: exportProfileAsJson(profile),
+            contractVersion: PROFILE_EXPORT_CONTRACT_VERSION,
+            message: `Profil exportiert (${PROFILE_EXPORT_CONTRACT_VERSION}).`,
+            tone: 'success',
         };
     }
 
@@ -227,6 +231,19 @@ export class ProfileManager {
             name: entry.name,
             serialized: exportProfileAsJson(entry),
             isDefault: entry.isDefault,
+            contractVersion: PROFILE_EXPORT_CONTRACT_VERSION,
+            usedLegacyFallback: parsed.usedLegacyFallback === true,
+            warnings: Array.isArray(parsed.warnings) ? parsed.warnings.slice() : [],
+            message: String(
+                parsed.message
+                || (parsed.usedLegacyFallback
+                    ? 'Legacy-Profil importiert und auf den aktuellen Vertragsstand normalisiert.'
+                    : 'Profil importiert.')
+            ),
+            tone: String(parsed.tone || (parsed.usedLegacyFallback ? 'warning' : 'success')),
+            migration: parsed.migration && typeof parsed.migration === 'object'
+                ? { ...parsed.migration }
+                : null,
         };
     }
 

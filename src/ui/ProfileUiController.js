@@ -198,9 +198,11 @@ export class ProfileUiController {
             ui.profileTransferInput.value = result.serialized;
         }
 
-        this.setProfileTransferStatus(`Profil exportiert: ${result.name}`, 'success');
+        const exportMessage = String(result.message || `Profil exportiert: ${result.name}`);
+        const exportTone = String(result.tone || 'success');
+        this.setProfileTransferStatus(exportMessage, exportTone);
         this.syncProfileActionState();
-        this._showStatusToast(`Profil exportiert: ${result.name}`, 1400, 'success');
+        this._showStatusToast(exportMessage, 1400, exportTone);
         return true;
     }
 
@@ -225,8 +227,16 @@ export class ProfileUiController {
         }
 
         this.syncProfileControls();
-        this.setProfileTransferStatus(`Profil importiert: ${result.name}`, 'success');
-        this._showStatusToast(`Profil importiert: ${result.name}`, 1500, 'success');
+        const importMessage = String(
+            result.message
+            || (result.usedLegacyFallback ? 'Legacy-Profil importiert und normalisiert.' : `Profil importiert: ${result.name}`)
+        );
+        const importTone = String(result.tone || (result.usedLegacyFallback ? 'warning' : 'success'));
+        this.setProfileTransferStatus(importMessage, importTone);
+        this._showStatusToast(importMessage, result.usedLegacyFallback ? 2200 : 1500, importTone);
+        if (Array.isArray(result.warnings) && result.warnings.length > 0) {
+            this._showStatusToast(result.warnings[0], 2800, 'warning');
+        }
         return true;
     }
 
