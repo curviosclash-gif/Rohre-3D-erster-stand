@@ -391,6 +391,13 @@ Stand: 2026-04-13
 - Desktop-Recording-Exports pruefen die Contract-Version des Electron-Save-Adapters vor App-Save-Versuchen; ungueltige oder unbekannte Adapter-Vertraege werden nicht implizit genutzt und fallen sauber auf Browser-Download/API-Fallback zurueck.
 - Template-Pfade bleiben ueber den Descriptorvertrag explizit sichtbar: `resolveEditorTemplateImportCapability()` liefert fuer den weiterhin fehlenden Pfad `editor/templates/**` einen expliziten `available=false`-Status mit `degradedReason` statt stiller Ignorierung.
 
+#### 4.6.5.6 Feedback-, Warn- und Migrationsmeldungen an denselben Vertraegen ausrichten (`V85 85.4.2`)
+
+- Version-, Capability- und Descriptor-Vertraege bleiben nicht auf boolesche `success/error`-Flags beschraenkt: Import-/Export-Helfer sollen zusaetzlich lesbare `message`-/`warnings`-Felder und, wenn relevant, einen expliziten `migration`-Hinweis liefern.
+- Legacy-Fallbacks duerfen nicht wie normale Erfolgspfade aussehen. Beispiel: `menu-config-share.v1`-Imports ohne Envelope bleiben lesbar, muessen aber im Consumer sichtbar als normalisierter Legacy-Import markiert werden.
+- Capability-Fallbacks muessen fuer Nutzer und Folge-Consumer denselben Sachverhalt ausdruecken wie der technische Vertrag: fehlender Browser-Storage, veralteter Desktop-Save-Adapter, unerreichbare Disk-API oder fehlender `editor/templates/**`-Pfad werden als bewusst formulierte Meldungen transportiert statt nur in Logs oder impliziten Nullpfaden zu verschwinden.
+- Match-/UI-nahe Verbraucher wie Config-Import-Status, Matchstart-Feedback fuer Custom-Maps oder spaetere Authoring-Consumer sollen dieselben strukturierten Meldungen direkt aus den Artefakt-/Capability-Helfern beziehen, statt eigene freie Text-Sonderfaelle neben dem Vertrag aufzubauen.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
