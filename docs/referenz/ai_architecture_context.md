@@ -385,6 +385,20 @@ Stand: 2026-04-13
 - `resolveSurfaceCapabilityAccess()` unterscheidet explizite Capability-Mappings von policy-basierten Fallbacks: explizite Eintraege (z. B. Browser-`SAVE`) bleiben Opt-in, deaktivierte Eintraege (z. B. Browser-`HOST` mit `enabled: false`) bleiben hart denylisted.
 - Fuer unbekannte Capabilities greift jetzt dieselbe Surface-Regel zentral: `desktop-app` erbt `default-full`, `browser-demo` erbt `default-deny`; das Ergebnis wird als `resolvedByDefaultPolicy` markiert, damit Folgearbeit Default-Freigaben gegen explizite Provider-Mappings trennen kann.
 
+#### 4.6.4.8 Dev-only-Surface-Vertrag fuer Expert-, Debug- und Trainingspfade (`V77 77.2.4`)
+
+- `src/shared/contracts/PlatformCapabilityRegistry.js` fuehrt mit `resolveSurfaceDeveloperAccess()` eine zweite, explizit produktnahe Lesekante neben den Capability-Resolvern ein. Sie beschreibt den Zugang zu lokalen Dev-/Diagnosepfaden, ohne daraus eine Feature-, Lizenz- oder Sicherheitsaussage fuer die Produktoberflaeche abzuleiten.
+- `desktop-app` fuehrt den Expert-/Developer-Zugang bewusst als lokalen Diagnosepfad ausserhalb des Vollversions-Versprechens. Auch dort gilt: Der Schalter ist kein Verkaufsargument und keine Sicherheitsgrenze, sondern nur lokaler Dev-/UX-Zugang.
+- `browser-demo` fuehrt denselben Zugang ebenfalls nur lokal-diagnostisch. Die kanonische Botschaft lautet jetzt explizit: kein Demo-Unlock, keine Lizenzgrenze, keine Sicherheitsbarriere.
+- `src/ui/menu/MenuExpertLoginRuntime.js`, `src/ui/menu/MenuAccessPolicy.js`, `src/ui/UINavigationLifecycleController.js` und `src/ui/menu/MenuDeveloperStateSync.js` konsumieren dieselbe Surface-Semantik produktiv. Expert-/Developer-/Debug-Flows lesen damit denselben Vertrag wie spaetere Dev-only-Schalter, statt freie Texte oder Surface-Sonderfaelle aufzubauen.
+
+#### 4.6.4.9 Einheitlicher UX-Pfad fuer deaktivierte Demo-Funktionen (`V77 77.3.2`)
+
+- `src/shared/contracts/PlatformSurfacePolicyOps.js` fuehrt mit `resolveSurfaceBlockedFeatureFeedback()` einen kleinen, zentralen UX-Vertrag fuer gesperrte Surface-Aktionen ein: `reason: surface_policy_blocked`, `tone: warning`, `durationMs: 1600` plus surface-spezifische Meldung (`... in dieser Demo ...` vs `... in dieser Surface ...`).
+- `src/core/runtime/MenuRuntimeSessionService.js` nutzt denselben Resolver fuer gesperrte Mode- und Quickstart-Aktionen (`Direktstart`, `Event-Playlist`, `Random-Start`), statt getrennte Ad-hoc-Texte zu pflegen.
+- `src/core/runtime/MenuRuntimePresetConfigService.js` nutzt denselben Resolver fuer gesperrte Preset-Aktionen; Preset- und Quickstart-Pfade bleiben damit textlich und tonal deckungsgleich.
+- `tests/platform-capabilities.contract.test.mjs` verifiziert den gemeinsamen Feedback-Vertrag fuer Browser-Demo und Desktop-Surface, damit Folgearbeit neue Sperrpfade auf denselben UX-Standard zieht.
+
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 
 - Feldkonvention:

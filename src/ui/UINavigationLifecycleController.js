@@ -203,9 +203,12 @@ export class UINavigationLifecycleController {
         const password = String(this.ui.expertPasswordInput?.value || '');
         const result = runtime.unlock(password);
         if (!result.success) {
-            this.manager.showToast('Passwort falsch.', 1400, 'error');
-            this.ui.expertPasswordInput?.focus?.();
-            this.ui.expertPasswordInput?.select?.();
+            const isPasswordError = result.reason === 'invalid_password';
+            this.manager.showToast(result.message || 'Passwort falsch.', 1400, isPasswordError ? 'error' : 'info');
+            if (isPasswordError) {
+                this.ui.expertPasswordInput?.focus?.();
+                this.ui.expertPasswordInput?.select?.();
+            }
             return;
         }
         runtime.focusPrimaryControl();
@@ -425,7 +428,10 @@ export class UINavigationLifecycleController {
         } else if (this.game._activeSubmenu === 'submenu-custom') {
             contextText = `${section} | ${sessionLabel} | Sofortstart oder Setup | ${dirtyState}`;
         } else if (this.game._activeSubmenu === 'submenu-expert') {
-            const expertStateLabel = this.game.menuExpertLoginRuntime?.isUnlocked?.() ? 'freigeschaltet' : 'gesperrt';
+            const expertState = this.game.menuExpertLoginRuntime?.getState?.() || null;
+            const expertStateLabel = expertState?.available === false
+                ? 'lokaler Dev-Pfad'
+                : (expertState?.unlocked ? 'freigeschaltet' : 'gesperrt');
             contextText = `${section} | Expertenstatus: ${expertStateLabel} | ${dirtyState}`;
         }
         this.ui.menuContext.textContent = contextText;

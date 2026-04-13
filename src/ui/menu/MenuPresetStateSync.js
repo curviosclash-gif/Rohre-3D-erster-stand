@@ -2,13 +2,28 @@
 // MenuPresetStateSync.js - sync helper for preset-related UI state
 // ============================================
 
-export function syncMenuPresetState({ ui, settings, settingsManager }) {
+import { isSurfacePresetAllowed } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+
+export function syncMenuPresetState({ ui, settings, settingsManager, surfacePolicy = null }) {
     if (!ui || !settings) return;
     const activePresetId = String(settings?.matchSettings?.activePresetId || '');
     const activePresetKind = String(settings?.matchSettings?.activePresetKind || '');
+    const isPresetVisible = (presetId) => {
+        const normalizedPresetId = String(presetId || '').trim();
+        if (!normalizedPresetId) {
+            return false;
+        }
+        if (!surfacePolicy) {
+            return true;
+        }
+        return isSurfacePresetAllowed(normalizedPresetId, {
+            productSurfaceId: surfacePolicy.productSurfaceId,
+        });
+    };
+    const visibleActivePresetId = isPresetVisible(activePresetId) ? activePresetId : '';
 
     if (ui.presetSelect) {
-        const presets = settingsManager?.listMenuPresets?.() || [];
+        const presets = (settingsManager?.listMenuPresets?.() || []).filter((preset) => isPresetVisible(preset?.id));
         const previousValue = String(ui.presetSelect.value || '');
         ui.presetSelect.innerHTML = '';
 
@@ -28,7 +43,7 @@ export function syncMenuPresetState({ ui, settings, settingsManager }) {
             ui.presetSelect.appendChild(option);
         });
 
-        const preferredValue = activePresetId || previousValue;
+        const preferredValue = visibleActivePresetId || previousValue;
         if (preferredValue) {
             const hasOption = Array.from(ui.presetSelect.options).some((option) => option.value === preferredValue);
             ui.presetSelect.value = hasOption ? preferredValue : '';
@@ -38,18 +53,22 @@ export function syncMenuPresetState({ ui, settings, settingsManager }) {
     if (Array.isArray(ui.quickstartPresetButtons)) {
         ui.quickstartPresetButtons.forEach((button) => {
             const buttonPresetId = String(button?.dataset?.presetId || '').trim();
-            const isActive = !!buttonPresetId && buttonPresetId === activePresetId;
+            const visible = !buttonPresetId || isPresetVisible(buttonPresetId);
+            const isActive = !!buttonPresetId && buttonPresetId === visibleActivePresetId;
+            button.classList.toggle('hidden', !visible);
+            button.setAttribute('aria-hidden', String(!visible));
+            button.disabled = !visible;
             button.classList.toggle('active', isActive);
             button.setAttribute('aria-pressed', String(isActive));
         });
     }
 
     if (ui.presetStatus) {
-        if (!activePresetId) {
+        if (!visibleActivePresetId) {
             ui.presetStatus.textContent = 'Preset: individuell';
         } else {
             const presetKindLabel = activePresetKind === 'fixed' ? 'verbindlich' : 'frei';
-            ui.presetStatus.textContent = `Preset: ${activePresetId} (${presetKindLabel})`;
+            ui.presetStatus.textContent = `Preset: ${visibleActivePresetId} (${presetKindLabel})`;
         }
     }
 }

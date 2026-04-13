@@ -7,6 +7,10 @@ import {
     exportMenuConfigAsJson,
     importMenuConfigFromInput,
 } from '../../composition/core-ui/CoreUiMenuPorts.js';
+import {
+    isSurfacePresetAllowed,
+    resolveSurfaceBlockedFeatureFeedback,
+} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 
 function setConfigShareStatus(ui, message, tone = 'info') {
     if (!ui?.configShareStatus) return;
@@ -67,6 +71,11 @@ export function applyMenuPresetAction({
     if (!game) return;
     if (!presetId) {
         game._showStatusToast('Preset fehlt.', 1500, 'error');
+        return;
+    }
+    if (!isSurfacePresetAllowed(presetId)) {
+        const feedback = resolveSurfaceBlockedFeatureFeedback('Dieses Preset');
+        game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
         return;
     }
 

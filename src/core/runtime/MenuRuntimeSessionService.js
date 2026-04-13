@@ -14,6 +14,17 @@ import {
     listEligibleMapKeysForModePath,
     resolveModePathFallbackMapKey,
 } from '../../shared/contracts/MapModeContract.js';
+import {
+    PLATFORM_SURFACE_QUICK_START_ACTION_IDS,
+} from '../../shared/contracts/PlatformCapabilityRegistry.js';
+import {
+    isSurfaceMapKeyAllowedForModePath,
+    isSurfaceModePathAllowed,
+    isSurfaceQuickStartActionAllowed,
+    listSurfaceAllowedMapKeysForModePath,
+    resolveSurfaceBlockedFeatureFeedback,
+    resolveSurfaceFallbackModePath,
+} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
@@ -120,6 +131,9 @@ export function handleModePathChangeAction(ctx) {
     let modePath = requestedModePath === 'arcade' || requestedModePath === 'fight' || requestedModePath === 'normal'
         ? requestedModePath
         : 'normal';
+    if (!isSurfaceModePathAllowed(modePath)) {
+        modePath = resolveSurfaceFallbackModePath();
+    }
     if (modePath === 'fight' && !huntFeatureEnabled) {
         modePath = 'normal';
     }
@@ -139,8 +153,11 @@ export function handleModePathChangeAction(ctx) {
     }
     const currentMapKey = String(game.settings?.mapKey || '').trim();
     const currentMapDefinition = CONFIG?.MAPS?.[currentMapKey];
-    if (!isMapEligibleForModePath(currentMapDefinition, modePath)) {
-        game.settings.mapKey = resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, currentMapKey);
+    const curatedFallbackMapKey = listSurfaceAllowedMapKeysForModePath(modePath)
+        .find((mapKey) => CONFIG?.MAPS?.[mapKey] && isMapEligibleForModePath(CONFIG.MAPS[mapKey], modePath));
+    if (!isMapEligibleForModePath(currentMapDefinition, modePath)
+        || !isSurfaceMapKeyAllowedForModePath(currentMapKey, modePath)) {
+        game.settings.mapKey = curatedFallbackMapKey || resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, currentMapKey);
         changedKeys.push(SETTINGS_CHANGE_KEYS.MAP_KEY);
     }
 
@@ -167,7 +184,10 @@ export function handleModePathChangeAction(ctx) {
     });
 
     const label = modePath === 'fight' ? 'Fight' : (modePath === 'arcade' ? 'Arcade' : 'Normal');
-    if (requestedModePath === 'fight' && !huntFeatureEnabled) {
+    if (requestedModePath && requestedModePath !== modePath && !isSurfaceModePathAllowed(requestedModePath)) {
+        const feedback = resolveSurfaceBlockedFeatureFeedback('Dieser Modus');
+        game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
+    } else if (requestedModePath === 'fight' && !huntFeatureEnabled) {
         game._showStatusToast('Fight ist deaktiviert. Normal wurde gesetzt.', 1500, 'warning');
     } else {
         game._showStatusToast(`Modus gewaehlt: ${label}`, 1200, 'info');
@@ -176,6 +196,11 @@ export function handleModePathChangeAction(ctx) {
 
 export function handleQuickStartLastStartAction(ctx) {
     const { game, onSettingsChanged, recordMenuTelemetry, startMatch } = ctx;
+    if (!isSurfaceQuickStartActionAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.LAST_SETTINGS)) {
+        const feedback = resolveSurfaceBlockedFeatureFeedback('Direktstart');
+        game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
+        return;
+    }
     game.settings.localSettings.modePath = 'quick_action';
     onSettingsChanged({ changedKeys: [SETTINGS_CHANGE_KEYS.MODE_PATH] });
     recordMenuTelemetry('quickstart', {
@@ -188,6 +213,11 @@ export function handleQuickStartLastStartAction(ctx) {
 
 export async function handleQuickStartEventPlaylistStartAction(ctx) {
     const { game, onSettingsChanged, resolveMenuAccessContext, recordMenuTelemetry, startMatch } = ctx;
+    if (!isSurfaceQuickStartActionAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.EVENT_PLAYLIST)) {
+        const feedback = resolveSurfaceBlockedFeatureFeedback('Event-Playlist');
+        game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
+        return;
+    }
     const playlistStep = getNextEventPlaylistEntry(game?.settings?.localSettings?.eventPlaylistState);
     const presetId = String(playlistStep?.entry?.presetId || '').trim();
     if (!presetId) {
@@ -251,6 +281,11 @@ export async function handleQuickStartEventPlaylistStartAction(ctx) {
 
 export function handleQuickStartRandomStartAction(ctx) {
     const { game, event, onSettingsChanged, recordMenuTelemetry, startMatch } = ctx;
+    if (!isSurfaceQuickStartActionAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.RANDOM_MAP)) {
+        const feedback = resolveSurfaceBlockedFeatureFeedback('Random-Start');
+        game._showStatusToast(feedback.message, feedback.durationMs, feedback.tone);
+        return;
+    }
     const mapKeys = listEligibleMapKeysForModePath(CONFIG?.MAPS, 'quick_action', { includeCustom: false });
     if (mapKeys.length > 0) {
         const rng = resolveQuickStartRng(game, event);

@@ -15,12 +15,23 @@ import {
 import {
     PLATFORM_PRODUCT_SURFACE_IDS,
     PLATFORM_PROVIDER_KINDS,
+    PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES,
+    PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS,
+    PLATFORM_SURFACE_MENU_MODE_PATHS,
     PLATFORM_SURFACE_MULTIPLAYER_ROLES,
     PLATFORM_SURFACE_POLICY_MODES,
+    PLATFORM_SURFACE_QUICK_START_ACTION_IDS,
     resolveCapabilityProviderKind,
     resolveSurfaceCapabilityAccess,
+    resolveSurfaceDeveloperAccess,
     resolveSurfacePolicy,
 } from '../src/shared/contracts/PlatformCapabilityRegistry.js';
+import {
+    isSurfacePresetAllowed,
+    isSurfaceQuickStartActionAllowed,
+    listSurfaceAllowedMapKeysForModePath,
+    resolveSurfaceBlockedFeatureFeedback,
+} from '../src/shared/contracts/PlatformSurfacePolicyOps.js';
 import { StoragePlatform } from '../src/state/storage/StoragePlatform.js';
 import { resolveRuntimeMenuFeatureFlags } from '../src/ui/menu/MenuRuntimeFeatureFlags.js';
 import { createMenuMultiplayerDiscoveryPort } from '../src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js';
@@ -95,11 +106,52 @@ test('V77.2.1 surface policy contract keeps desktop default-full and browser def
     assert.equal(desktopPolicy.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN);
     assert.equal(desktopPolicy.requiresCuratedMaps, false);
     assert.ok(desktopPolicy.allowedGameModes.includes('Arcade'));
+    assert.ok(desktopPolicy.allowedModePaths.includes(PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION));
 
     assert.equal(browserPolicy.defaultAccessMode, PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY);
     assert.equal(browserPolicy.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY);
     assert.equal(browserPolicy.requiresCuratedMaps, true);
     assert.ok(browserPolicy.allowedGameModes.includes('Parcours'));
+    assert.deepEqual(browserPolicy.allowedPresetIds, ['arcade', 'fight-standard', 'normal-standard']);
+    assert.deepEqual(browserPolicy.curatedMapKeysByModePath.arcade, ['parcours_rift']);
+    assert.equal(browserPolicy.allowedModePaths.includes(PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION), false);
+});
+
+test('V77.3.1 browser surface policy exposes curated map and preset allowlists while quickstart stays unavailable', () => {
+    assert.deepEqual(
+        listSurfaceAllowedMapKeysForModePath(PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL, {
+            productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        }),
+        ['standard', 'maze']
+    );
+    assert.equal(isSurfacePresetAllowed('arcade', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), true);
+    assert.equal(isSurfacePresetAllowed('competitive', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false);
+    assert.equal(isSurfaceQuickStartActionAllowed(PLATFORM_SURFACE_QUICK_START_ACTION_IDS.EVENT_PLAYLIST, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false);
+});
+
+test('V77.3.2 blocked demo actions share the same UX feedback contract', () => {
+    const blockedQuickStart = resolveSurfaceBlockedFeatureFeedback('Direktstart', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const blockedPreset = resolveSurfaceBlockedFeatureFeedback('Dieses Preset', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const blockedDesktop = resolveSurfaceBlockedFeatureFeedback('Direktstart', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+
+    assert.equal(blockedQuickStart.reason, 'surface_policy_blocked');
+    assert.equal(blockedQuickStart.tone, 'warning');
+    assert.equal(blockedQuickStart.durationMs, 1600);
+    assert.match(blockedQuickStart.message, /Direktstart ist in dieser Demo nicht verfuegbar/);
+    assert.match(blockedPreset.message, /ist in dieser Demo nicht verfuegbar/);
+    assert.match(blockedDesktop.message, /ist in dieser Surface nicht verfuegbar/);
 });
 
 test('V77.2.1 browser host provider resolves unavailable when host capability is disabled', () => {
@@ -156,6 +208,25 @@ test('V77.2.3 explicit browser save capability stays opt-in and bypasses default
     assert.equal(browserSave.available, true);
     assert.equal(browserSave.providerKind, PLATFORM_PROVIDER_KINDS.BROWSER_DOWNLOAD);
     assert.equal(browserSave.resolvedByDefaultPolicy, false);
+});
+
+test('V77.2.4 developer access contract keeps expert gates local-only instead of product promises', () => {
+    const desktopDeveloperAccess = resolveSurfaceDeveloperAccess({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserDeveloperAccess = resolveSurfaceDeveloperAccess({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopDeveloperAccess.available, true);
+    assert.equal(desktopDeveloperAccess.accessMode, PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES.LOCAL_UNLOCK);
+    assert.equal(desktopDeveloperAccess.reason, PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS.LOCAL_DEVTOOLS);
+    assert.match(desktopDeveloperAccess.message, /Produktversprechen der Vollversion/);
+
+    assert.equal(browserDeveloperAccess.available, true);
+    assert.equal(browserDeveloperAccess.accessMode, PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES.LOCAL_UNLOCK);
+    assert.equal(browserDeveloperAccess.reason, PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS.DEMO_LOCAL_DEVTOOLS);
+    assert.match(browserDeveloperAccess.message, /kein Demo-Unlock/);
 });
 
 test('V77.2.2 runtime menu feature flags read host access from surface capability contract', () => {

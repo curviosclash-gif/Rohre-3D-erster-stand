@@ -136,10 +136,13 @@ export function syncMenuDeveloperState({
     if (ui.developerHint) {
         const mode = String(localSettings.developerModeVisibility || 'owner_only');
         const ownerState = accessContext?.isOwner ? 'owner' : 'player';
-        const expertState = accessContext?.expertModeUnlocked ? 'unlocked' : 'locked';
+        const expertState = accessContext?.expertModeAvailable === false
+            ? `local_only(${String(accessContext?.expertModeReason || 'surface')})`
+            : (accessContext?.expertModeUnlocked ? 'unlocked' : 'locked');
+        const surfaceState = String(accessContext?.expertModeProductSurfaceId || 'unknown');
         const releaseStateText = releaseState?.releasePreviewEnabled
             ? 'release_preview_active'
             : (releaseState?.featureEnabled ? 'dev_enabled' : 'dev_feature_off');
-        ui.developerHint.textContent = `Developer Scope: ${mode} | Session: ${ownerState} | Expert: ${expertState} | Release: ${releaseStateText}`;
+        ui.developerHint.textContent = `Developer Scope: ${mode} | Session: ${ownerState} | Expert: ${expertState} | Surface: ${surfaceState} | Release: ${releaseStateText}`;
     }
 }

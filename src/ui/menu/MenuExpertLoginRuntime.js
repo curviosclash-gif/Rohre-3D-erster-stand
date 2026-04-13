@@ -1,8 +1,20 @@
+import { resolveSurfaceDeveloperAccess } from '../../shared/contracts/PlatformCapabilityRegistry.js';
+
 const EXPERT_PASSWORD = '1307';
 const MENU_EXPERT_STATE_KEY = Symbol('menuExpertState');
 
+/* global __APP_MODE__ */
+
 function normalizeString(value) {
     return typeof value === 'string' ? value.trim() : '';
+}
+
+function resolveExpertSurfaceAccess(runtimeGlobal = globalThis) {
+    const appMode = typeof __APP_MODE__ !== 'undefined' ? String(__APP_MODE__).trim().toLowerCase() : 'web';
+    return resolveSurfaceDeveloperAccess({
+        runtimeGlobal,
+        appMode,
+    });
 }
 
 function setElementHidden(element, hidden) {
@@ -44,10 +56,16 @@ export class MenuExpertLoginRuntime {
         this.onStateChanged = typeof options.onStateChanged === 'function'
             ? options.onStateChanged
             : null;
+        const expertSurfaceAccess = resolveExpertSurfaceAccess();
         this.state = {
             unlocked: false,
             error: '',
             lastAttemptAt: 0,
+            available: expertSurfaceAccess.available === true,
+            accessMode: String(expertSurfaceAccess.accessMode || ''),
+            reason: String(expertSurfaceAccess.reason || ''),
+            message: String(expertSurfaceAccess.message || ''),
+            productSurfaceId: String(expertSurfaceAccess.productSurfaceId || ''),
         };
         attachMenuExpertState(this.settings, this.state);
     }
@@ -66,6 +84,11 @@ export class MenuExpertLoginRuntime {
             unlocked: this.isUnlocked(),
             error: String(this.state.error || ''),
             lastAttemptAt: Number(this.state.lastAttemptAt || 0),
+            available: this.state.available === true,
+            accessMode: String(this.state.accessMode || ''),
+            reason: String(this.state.reason || ''),
+            message: String(this.state.message || ''),
+            productSurfaceId: String(this.state.productSurfaceId || ''),
         };
     }
 
@@ -76,6 +99,17 @@ export class MenuExpertLoginRuntime {
     }
 
     unlock(rawPassword = '') {
+        if (this.state.available !== true) {
+            this.state.unlocked = false;
+            this.state.error = '';
+            this.syncUi();
+            return {
+                success: false,
+                reason: 'surface_policy_blocked',
+                message: String(this.state.message || ''),
+                state: this.getState(),
+            };
+        }
         const password = normalizeString(rawPassword);
         this.state.lastAttemptAt = Date.now();
         if (password !== EXPERT_PASSWORD) {
@@ -85,6 +119,7 @@ export class MenuExpertLoginRuntime {
             return {
                 success: false,
                 reason: 'invalid_password',
+                message: String(this.state.error || ''),
                 state: this.getState(),
             };
         }
@@ -95,10 +130,11 @@ export class MenuExpertLoginRuntime {
             this.ui.expertPasswordInput.value = '';
         }
         this.syncUi();
-        this.showStatusToast('Expertenbereich freigeschaltet.', 1400, 'success');
+        this.showStatusToast('Lokaler Dev-Bereich freigeschaltet.', 1400, 'success');
         return {
             success: true,
             reason: 'unlocked',
+            message: 'Lokaler Dev-Bereich freigeschaltet.',
             state: this.getState(),
         };
     }
@@ -114,17 +150,21 @@ export class MenuExpertLoginRuntime {
         }
         this.syncUi();
         if (wasUnlocked && !silent) {
-            this.showStatusToast('Expertenbereich gesperrt.', 1400, 'info');
+            this.showStatusToast('Lokaler Dev-Bereich gesperrt.', 1400, 'info');
         }
         return {
             success: true,
             reason: 'locked',
+            message: 'Lokaler Dev-Bereich gesperrt.',
             state: this.getState(),
         };
     }
 
     focusPrimaryControl() {
         if (!this.ui) return;
+        if (this.state.available !== true) {
+            return;
+        }
         if (this.isUnlocked()) {
             this.ui.openDeveloperButton?.focus?.();
             return;
@@ -139,27 +179,43 @@ export class MenuExpertLoginRuntime {
         }
 
         const unlocked = this.isUnlocked();
-        const statusText = unlocked
-            ? 'Expertenbereich fuer diese Sitzung freigeschaltet.'
-            : (this.state.error || 'Developer, Debug und Training sind lokal gesperrt.');
+        const available = this.state.available === true;
+        const statusText = !available
+            ? String(this.state.message || 'Developer-, Debug- und Trainingspfade sind fuer diese Surface nicht verfuegbar.')
+            : (unlocked
+                ? 'Lokaler Dev-/Diagnosebereich fuer diese Sitzung freigeschaltet.'
+                : (this.state.error || String(this.state.message || 'Developer, Debug und Training sind lokal gesperrt.')));
 
         if (this.ui.openExpertButton) {
             this.ui.openExpertButton.textContent = unlocked ? 'Expert offen' : 'Expert';
             this.ui.openExpertButton.setAttribute('aria-pressed', String(unlocked));
         }
-        setElementHidden(this.ui.expertQuickLockButton, !unlocked);
-        setElementHidden(this.ui.expertLockedState, unlocked);
-        setElementHidden(this.ui.expertUnlockedState, !unlocked);
+        setElementHidden(this.ui.expertQuickLockButton, !available || !unlocked);
+        setElementHidden(this.ui.expertLockedState, unlocked || !available);
+        setElementHidden(this.ui.expertUnlockedState, !unlocked || !available);
 
         if (this.ui.expertStatus) {
             this.ui.expertStatus.textContent = statusText;
-            this.ui.expertStatus.classList.toggle('is-error', !unlocked && !!this.state.error);
+            this.ui.expertStatus.classList.toggle('is-error', available && !unlocked && !!this.state.error);
             this.ui.expertStatus.classList.toggle('is-success', unlocked);
             this.ui.expertStatus.classList.remove('hidden');
         }
 
         if (this.ui.expertPasswordInput) {
-            this.ui.expertPasswordInput.setAttribute('aria-invalid', String(!unlocked && !!this.state.error));
+            this.ui.expertPasswordInput.disabled = !available;
+            this.ui.expertPasswordInput.setAttribute('aria-invalid', String(available && !unlocked && !!this.state.error));
+        }
+        if (this.ui.expertUnlockButton) {
+            this.ui.expertUnlockButton.disabled = !available;
+        }
+        if (this.ui.expertLockButton) {
+            this.ui.expertLockButton.disabled = !available || !unlocked;
+        }
+        if (this.ui.openDeveloperButton) {
+            this.ui.openDeveloperButton.disabled = !available || !unlocked;
+        }
+        if (this.ui.openDebugButton) {
+            this.ui.openDebugButton.disabled = !available || !unlocked;
         }
 
         this._notifyStateChanged();

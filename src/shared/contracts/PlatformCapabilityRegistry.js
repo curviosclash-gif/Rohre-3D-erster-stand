@@ -36,14 +36,40 @@ export const PLATFORM_SURFACE_POLICY_MODES = Object.freeze({
     DEFAULT_DENY: 'default-deny',
 });
 
+export const PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES = Object.freeze({
+    LOCAL_UNLOCK: 'local-unlock',
+    BLOCKED: 'blocked',
+});
+
+export const PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS = Object.freeze({
+    LOCAL_DEVTOOLS: 'local-devtools',
+    DEMO_LOCAL_DEVTOOLS: 'demo-local-devtools',
+    UNAVAILABLE: 'unavailable',
+});
+
 export const PLATFORM_SURFACE_MULTIPLAYER_ROLES = Object.freeze({
     HOST_AND_JOIN: 'host-and-join',
     JOIN_ONLY: 'join-only',
 });
 
+export const PLATFORM_SURFACE_MENU_MODE_PATHS = Object.freeze({
+    QUICK_ACTION: 'quick_action',
+    ARCADE: 'arcade',
+    FIGHT: 'fight',
+    NORMAL: 'normal',
+});
+
+export const PLATFORM_SURFACE_QUICK_START_ACTION_IDS = Object.freeze({
+    LAST_SETTINGS: 'last_settings',
+    EVENT_PLAYLIST: 'event_playlist',
+    RANDOM_MAP: 'random_map',
+});
+
 const VALID_PRODUCT_SURFACE_IDS = new Set(Object.values(PLATFORM_PRODUCT_SURFACE_IDS));
 const VALID_RUNTIME_KINDS = new Set(Object.values(PLATFORM_RUNTIME_KINDS));
 const VALID_LOBBY_TRANSPORTS = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
+const VALID_SURFACE_MENU_MODE_PATHS = new Set(Object.values(PLATFORM_SURFACE_MENU_MODE_PATHS));
+const VALID_SURFACE_QUICK_START_ACTION_IDS = new Set(Object.values(PLATFORM_SURFACE_QUICK_START_ACTION_IDS));
 
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
@@ -74,6 +100,16 @@ export function normalizeLobbyProviderTransport(value, fallback = MULTIPLAYER_TR
     return VALID_LOBBY_TRANSPORTS.has(normalized) ? normalized : fallback;
 }
 
+function normalizeSurfaceMenuModePath(value, fallback = '') {
+    const normalized = normalizeString(value, '').toLowerCase();
+    return VALID_SURFACE_MENU_MODE_PATHS.has(normalized) ? normalized : fallback;
+}
+
+function normalizeSurfaceQuickStartActionId(value, fallback = '') {
+    const normalized = normalizeString(value, '').toLowerCase();
+    return VALID_SURFACE_QUICK_START_ACTION_IDS.has(normalized) ? normalized : fallback;
+}
+
 export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
     contractVersion: PLATFORM_CAPABILITY_REGISTRY_CONTRACT_VERSION,
     products: Object.freeze({
@@ -84,6 +120,7 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
             surfacePolicy: Object.freeze({
                 defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL,
                 multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN,
+                defaultModePath: PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL,
                 allowedGameModes: Object.freeze([
                     'Arcade',
                     'Parcours',
@@ -91,7 +128,22 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
                     'Normal',
                     'Classic',
                 ]),
+                allowedModePaths: Object.freeze([
+                    PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION,
+                    PLATFORM_SURFACE_MENU_MODE_PATHS.ARCADE,
+                    PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT,
+                    PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL,
+                ]),
+                allowedQuickStartActionIds: Object.freeze([]),
+                allowedPresetIds: Object.freeze([]),
+                curatedMapKeysByModePath: Object.freeze({}),
                 requiresCuratedMaps: false,
+                developerAccess: Object.freeze({
+                    available: true,
+                    accessMode: PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES.LOCAL_UNLOCK,
+                    reason: PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS.LOCAL_DEVTOOLS,
+                    message: 'Developer-, Debug- und Training-Schalter bleiben lokale Diagnosepfade und zaehlen nicht zum Produktversprechen der Vollversion.',
+                }),
             }),
             capabilities: Object.freeze({
                 [PLATFORM_CAPABILITY_IDS.DISCOVERY]: PLATFORM_PROVIDER_KINDS.ELECTRON_IPC,
@@ -107,6 +159,7 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
             surfacePolicy: Object.freeze({
                 defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY,
                 multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY,
+                defaultModePath: PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL,
                 allowedGameModes: Object.freeze([
                     'Arcade',
                     'Parcours',
@@ -114,7 +167,29 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
                     'Normal',
                     'Classic',
                 ]),
+                allowedModePaths: Object.freeze([
+                    PLATFORM_SURFACE_MENU_MODE_PATHS.ARCADE,
+                    PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT,
+                    PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL,
+                ]),
+                allowedQuickStartActionIds: Object.freeze([]),
+                allowedPresetIds: Object.freeze([
+                    'arcade',
+                    'fight-standard',
+                    'normal-standard',
+                ]),
+                curatedMapKeysByModePath: Object.freeze({
+                    [PLATFORM_SURFACE_MENU_MODE_PATHS.ARCADE]: Object.freeze(['parcours_rift']),
+                    [PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT]: Object.freeze(['standard', 'maze']),
+                    [PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL]: Object.freeze(['standard', 'maze']),
+                }),
                 requiresCuratedMaps: true,
+                developerAccess: Object.freeze({
+                    available: true,
+                    accessMode: PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES.LOCAL_UNLOCK,
+                    reason: PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS.DEMO_LOCAL_DEVTOOLS,
+                    message: 'Developer-, Debug- und Training-Schalter sind lokale Diagnosepfade und kein Demo-Unlock, keine Lizenzgrenze und keine Sicherheitsbarriere.',
+                }),
             }),
             capabilities: Object.freeze({
                 [PLATFORM_CAPABILITY_IDS.DISCOVERY]: PLATFORM_PROVIDER_KINDS.BROWSER_DEMO,
@@ -208,6 +283,72 @@ function resolveSurfaceDefaultProviderKind(productSurfaceId, defaultAccessMode) 
     return PLATFORM_PROVIDER_KINDS.UNAVAILABLE;
 }
 
+function resolveSurfaceDeveloperPolicy(surfacePolicy) {
+    return surfacePolicy?.developerAccess && typeof surfacePolicy.developerAccess === 'object'
+        ? surfacePolicy.developerAccess
+        : null;
+}
+
+function sanitizeUniqueStringArray(values, normalizer) {
+    if (!Array.isArray(values)) {
+        return Object.freeze([]);
+    }
+    const seen = new Set();
+    const sanitized = [];
+    values.forEach((value) => {
+        const normalized = normalizer(value, '');
+        if (!normalized || seen.has(normalized)) {
+            return;
+        }
+        seen.add(normalized);
+        sanitized.push(normalized);
+    });
+    return Object.freeze(sanitized);
+}
+
+function resolveSurfaceAllowedModePaths(surfacePolicy) {
+    return sanitizeUniqueStringArray(
+        surfacePolicy?.allowedModePaths,
+        normalizeSurfaceMenuModePath
+    );
+}
+
+function resolveSurfaceAllowedQuickStartActionIds(surfacePolicy) {
+    return sanitizeUniqueStringArray(
+        surfacePolicy?.allowedQuickStartActionIds,
+        normalizeSurfaceQuickStartActionId
+    );
+}
+
+function resolveSurfaceAllowedPresetIds(surfacePolicy) {
+    return sanitizeUniqueStringArray(
+        surfacePolicy?.allowedPresetIds,
+        normalizeString
+    );
+}
+
+function resolveSurfaceCuratedMapKeysByModePath(surfacePolicy) {
+    const source = surfacePolicy?.curatedMapKeysByModePath;
+    if (!source || typeof source !== 'object') {
+        return Object.freeze({});
+    }
+    const resolved = {};
+    Object.entries(source).forEach(([modePath, mapKeys]) => {
+        const normalizedModePath = normalizeSurfaceMenuModePath(modePath, '');
+        if (!normalizedModePath) {
+            return;
+        }
+        resolved[normalizedModePath] = sanitizeUniqueStringArray(mapKeys, normalizeString);
+    });
+    return Object.freeze(resolved);
+}
+
+function resolveSurfaceDefaultModePath(surfacePolicy, allowedModePaths) {
+    const fallbackModePath = allowedModePaths[0] || PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL;
+    return normalizeSurfaceMenuModePath(surfacePolicy?.defaultModePath, fallbackModePath)
+        || fallbackModePath;
+}
+
 function resolveSurfaceCapabilityConfiguredAvailability(providerSpec, fallbackAvailable = false) {
     if (providerSpec && typeof providerSpec === 'object') {
         if (Object.prototype.hasOwnProperty.call(providerSpec, 'enabled')) {
@@ -262,6 +403,10 @@ export function resolveSurfacePolicy(options = {}) {
     const policy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
         ? productEntry.surfacePolicy
         : null;
+    const allowedModePaths = resolveSurfaceAllowedModePaths(policy);
+    const allowedQuickStartActionIds = resolveSurfaceAllowedQuickStartActionIds(policy);
+    const allowedPresetIds = resolveSurfaceAllowedPresetIds(policy);
+    const curatedMapKeysByModePath = resolveSurfaceCuratedMapKeysByModePath(policy);
     const allowedGameModes = Array.isArray(policy?.allowedGameModes)
         ? Object.freeze([...policy.allowedGameModes])
         : Object.freeze([]);
@@ -274,8 +419,51 @@ export function resolveSurfacePolicy(options = {}) {
             policy?.multiplayerRole,
             PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
         ),
+        defaultModePath: resolveSurfaceDefaultModePath(policy, allowedModePaths),
         allowedGameModes,
+        allowedModePaths,
+        allowedQuickStartActionIds,
+        allowedPresetIds,
+        curatedMapKeysByModePath,
         requiresCuratedMaps: policy?.requiresCuratedMaps === true,
+    });
+}
+
+export function resolveSurfaceDeveloperAccess(options = {}) {
+    const productSurfaceId = resolvePlatformProductSurfaceId(options);
+    const productEntry = resolveProductEntry(productSurfaceId);
+    const surfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
+        ? productEntry.surfacePolicy
+        : null;
+    const developerPolicy = resolveSurfaceDeveloperPolicy(surfacePolicy);
+    const available = developerPolicy?.available !== false;
+    const accessMode = normalizeString(
+        developerPolicy?.accessMode,
+        available
+            ? PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES.LOCAL_UNLOCK
+            : PLATFORM_SURFACE_DEVELOPER_ACCESS_MODES.BLOCKED
+    );
+    const defaultReason = productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO
+        ? PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS.DEMO_LOCAL_DEVTOOLS
+        : PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS.LOCAL_DEVTOOLS;
+    const reason = normalizeString(
+        developerPolicy?.reason,
+        available ? defaultReason : PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS.UNAVAILABLE
+    );
+    const message = normalizeString(
+        developerPolicy?.message,
+        available
+            ? 'Developer-, Debug- und Training-Schalter bleiben lokale Diagnosepfade.'
+            : 'Developer-, Debug- und Training-Schalter sind fuer diese Surface nicht verfuegbar.'
+    );
+
+    return Object.freeze({
+        contractVersion: PLATFORM_SURFACE_POLICY_CONTRACT_VERSION,
+        productSurfaceId,
+        available,
+        accessMode,
+        reason,
+        message,
     });
 }
 

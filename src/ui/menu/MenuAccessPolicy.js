@@ -16,6 +16,7 @@ export const MENU_ACCESS_GUARD_REASONS = Object.freeze({
     LOCKED: 'locked',
     HIDDEN_FOR_PLAYER: 'hidden_for_player',
     EXPERT_LOGIN_REQUIRED: 'expert_login_required',
+    EXPERT_SURFACE_POLICY: 'expert_surface_policy',
     INVALID_POLICY: 'invalid_policy',
 });
 
@@ -70,6 +71,10 @@ export function resolveMenuAccessContext(settings) {
         developerModeEnabled: settings?.menuFeatureFlags?.developerModeEnabled !== false,
         releasePreviewEnabled: !!localSettings.releasePreviewEnabled,
         expertModeUnlocked: expertState?.unlocked === true,
+        expertModeAvailable: expertState?.available !== false,
+        expertModeAccessMode: normalizeString(expertState?.accessMode, ''),
+        expertModeReason: normalizeString(expertState?.reason, ''),
+        expertModeProductSurfaceId: normalizeString(expertState?.productSurfaceId, ''),
     };
 }
 
@@ -79,6 +84,9 @@ export function normalizeAccessPolicy(accessPolicy) {
 }
 
 export function resolveExpertAccessState(accessContext) {
+    if (accessContext?.expertModeAvailable === false) {
+        return { allowed: false, reason: MENU_ACCESS_GUARD_REASONS.EXPERT_SURFACE_POLICY };
+    }
     if (accessContext?.expertModeUnlocked === true) {
         return { allowed: true, reason: MENU_ACCESS_GUARD_REASONS.ALLOWED };
     }

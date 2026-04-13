@@ -32,6 +32,7 @@ import {
 import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
+import { syncMenuSurfacePolicyUi } from './menu/MenuSurfacePolicyUiSync.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
@@ -241,26 +242,13 @@ export class UIManager {
         const ui = this.ui;
         const huntFeatureEnabled = resolveGameplayConfig(this.game).HUNT?.ENABLED !== false;
         const sessionType = String(settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
-        const modePath = String(settings?.localSettings?.modePath || 'normal').toLowerCase();
-        if (Array.isArray(ui.sessionButtons)) {
-            ui.sessionButtons.forEach((button) => {
-                const buttonSessionType = String(button?.dataset?.sessionType || '').trim().toLowerCase();
-                const isActive = buttonSessionType === sessionType;
-                button.classList.toggle('active', isActive);
-                button.setAttribute('aria-pressed', String(isActive));
-            });
-        }
-        if (Array.isArray(ui.modePathButtons)) {
-            ui.modePathButtons.forEach((button) => {
-                const buttonModePath = String(button?.dataset?.modePath || '').trim().toLowerCase();
-                const isActive = buttonModePath === modePath;
-                button.classList.toggle('active', isActive);
-                button.setAttribute('aria-pressed', String(isActive));
-                const isFightPath = buttonModePath === 'fight';
-                button.disabled = isFightPath && !huntFeatureEnabled;
-                button.title = button.disabled ? 'Fight ist per Feature-Flag deaktiviert' : '';
-            });
-        }
+        const { modePath } = syncMenuSurfacePolicyUi({
+            ui,
+            settings,
+            sessionType,
+            surfacePolicy: this._runtimeFeatureFlags?.surfacePolicy || null,
+            huntFeatureEnabled,
+        });
         const themeMode = String(settings?.localSettings?.themeMode || 'dunkel').toLowerCase() === 'hell'
             ? 'hell'
             : 'dunkel';
@@ -429,7 +417,12 @@ export class UIManager {
     syncStartSetupState(settings = this.game.settings) { return this._startSync.syncStartSetupState(settings); }
 
     syncPresetState(settings = this.game.settings) {
-        syncMenuPresetState({ ui: this.ui, settings, settingsManager: this.game.settingsManager });
+        syncMenuPresetState({
+            ui: this.ui,
+            settings,
+            settingsManager: this.game.settingsManager,
+            surfacePolicy: this._runtimeFeatureFlags?.surfacePolicy || null,
+        });
     }
 
     syncMultiplayerState(settings = this.game.settings) {
