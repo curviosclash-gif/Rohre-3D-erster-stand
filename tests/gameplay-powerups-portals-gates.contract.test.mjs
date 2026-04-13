@@ -12,6 +12,7 @@ import { createMapDocument } from '../src/entities/MapSchema.js';
 import { ClassicModeStrategy } from '../src/modes/ClassicModeStrategy.js';
 import { HuntModeStrategy } from '../src/modes/HuntModeStrategy.js';
 import { RoundMetricsStore } from '../src/state/recorder/RoundMetricsStore.js';
+import { deriveMapResolutionFeedbackPlan } from '../src/state/match-session/MatchSessionFeedbackPlan.js';
 
 test('Pickup capability matrix keeps rocket and utility contracts mode-safe', () => {
     const rocketTypes = getRocketPickupTypes();
@@ -131,4 +132,27 @@ test('Round recorder diagnostics keep failed item actions analyzable by mode and
     assert.equal(aggregate.failedItemActionCodeTotals['item.use.forbidden'], 1);
     assert.equal(aggregate.failedItemActionCodeTotals['item.shoot.cooldown'], 1);
     assert.equal(aggregate.failedItemActionCodeTotals['mg.shoot.overheated'], 1);
+});
+
+test('Custom map warning toast keeps extra warning fan-out visible', () => {
+    const feedback = deriveMapResolutionFeedbackPlan({
+        mapResolution: {
+            isFallback: false,
+            isCustom: true,
+            warnings: [
+                'Unsupported portalMode "scripted" normalized to "dynamic".',
+                'Unknown gate type "boost_plus" normalized to "boost".',
+            ],
+            message: 'Custom-Map geladen, aber mit Hinweisen normalisiert.',
+            migration: null,
+        },
+        portalsEnabled: true,
+    });
+
+    assert.equal(feedback.toasts.length, 1);
+    assert.equal(feedback.toasts[0].tone, 'info');
+    assert.equal(
+        feedback.toasts[0].message,
+        'Custom-Map geladen, aber mit Hinweisen normalisiert. (+1 Hinweis(e) in Konsole)'
+    );
 });

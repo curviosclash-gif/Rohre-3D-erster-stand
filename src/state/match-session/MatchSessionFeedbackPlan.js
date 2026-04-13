@@ -49,8 +49,9 @@ export function deriveMapResolutionFeedbackPlan({ mapResolution, portalsEnabled,
         const extraCount = Math.max(0, mapResolution.warnings.length - 1);
         const prefix = String(mapResolution.message || '').trim();
         const suffix = extraCount > 0 ? ` (+${extraCount} Hinweis(e) in Konsole)` : '';
+        const baseMessage = prefix || `Custom-Map Hinweis: ${mapResolution.warnings[0]}`;
         toasts.push({
-            message: prefix || `Custom-Map Hinweis: ${mapResolution.warnings[0]}${suffix}`,
+            message: `${baseMessage}${suffix}`.trim(),
             durationMs: mapResolution.migration ? 4200 : 3600,
             tone: mapResolution.migration ? 'warning' : 'info',
         });

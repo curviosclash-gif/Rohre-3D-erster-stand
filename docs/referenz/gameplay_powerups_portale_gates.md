@@ -113,6 +113,16 @@ Maps koennen folgende Felder verwenden:
 - `items`: feste Pickup-Anker mit optionalem `pickupType`; ungueltige Typen werden beim Schema-Export sichtbar gemeldet und fallen deterministisch auf `type`/`model` zurueck.
 - `exitPortal`: einzelnes Exit-Portal mit optionaler spaeter Aktivierung.
 
+## Editor-Hinweise und Custom-Map-Warnpfad
+
+- `EditorSessionControls` zeigt fuer Export, Import, Disk-Save und Playtest dieselben deduplizierten Schema-Hinweise (`MapSchemaSanitizeOps`) und unterscheidet normale Hinweise von Migrationshinweisen.
+- Editor-Tooltips spiegeln den Authoring-Vertrag sichtbar: Build-Katalog-Descriptor (`descriptorVersion`/`entryCount`), Template-Import-Capability und `editor-disk-io.v1`.
+- `CustomMapLoader` liefert fuer Runtime-Lesen einen strukturierten Vertrag aus `reason`, `message`, `warnings`, `details`, optionaler `migration`-Markierung und der Capability `custom-map-storage-capability.v1`.
+- `MatchSessionFeedbackPlan` nutzt denselben Vertrag fuer sichtbare Laufzeitwarnungen:
+  - Fallback auf Standard-Map erzeugt Error-Toast plus Konsoleintrag.
+  - Erfolgreich geladene Custom-Maps mit Hinweisen erzeugen Info- bzw. Warning-Toast (bei Migration) und behalten den Warn-Detailpfad in der Konsole.
+  - Bei mehreren Warnungen enthaelt der Toast den Zusatz `(+N Hinweis(e) in Konsole)`, damit kein Warnfokus still verloren geht.
+
 ## Relevante Runtime-Module
 
 - `src/entities/Powerup.js`
