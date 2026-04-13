@@ -118,7 +118,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | - | V88 | - | closed | Abgeschlossen 2026-04-10: `88.99.2` synchronisiert Test-Mapping, Failure-Taxonomie und Doku auf den blockerfesten Gate-Stand |
 | - | V89 | - | closed | Abgeschlossen 2026-04-12: `89.99.2` synchronisiert Browser-/Desktop-/Contract-Layer widerspruchsfrei; `desktop-smoke` bleibt gruen, `node-contract`-Restfehler `T97` blockerfest dokumentiert |
 | - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
-| - | V77 | - | frei | `77.4.1` abgeschlossen; `77.4.2` markiert als naechstes `storage-bridge` und aehnliche Altpfade explizit als Nicht-Standard |
+| - | V77 | - | frei | `77.4.2` abgeschlossen; `77.4.3` buchstabiert als naechstes den Gruppenvertrag `Vollversion hostet, Demo joint` fuer Discovery-, Lobby- und Session-Gates aus |
 | - | V91 | - | frei | Nach `V77.99` Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Ratchets fuer Folgeblocks `V64`, `V81` und `V86` festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
