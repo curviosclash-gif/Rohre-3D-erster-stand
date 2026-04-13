@@ -13,6 +13,9 @@ import {
     resolveLobbyProviderKind,
 } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
+    resolveSurfaceMultiplayerGateAccess,
+} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import {
     isNetworkLobbyServiceTransport,
     normalizeLobbyServiceTransport,
 } from '../../shared/contracts/LobbyServiceContract.js';
@@ -269,6 +272,13 @@ export async function handleMultiplayerHostAction({
     runtimeSource,
 }) {
     if (!game) return null;
+    const hostGate = resolveSurfaceMultiplayerGateAccess('host', {
+        runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+    });
+    if (!hostGate.allowed) {
+        game._showStatusToast(hostGate.message || 'Hosting ist nicht verfuegbar.', hostGate.durationMs || 1800, 'error');
+        return { ok: false, message: hostGate.message, reason: hostGate.reason };
+    }
     const accessContext = resolveMenuAccessContext?.();
     observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, 'host', event?.lobbyCode);
     let result = null;

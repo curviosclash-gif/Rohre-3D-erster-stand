@@ -45,6 +45,7 @@ import {
     listSurfaceAllowedSessionTypes,
     resolveSurfaceBlockedFeatureFeedback,
     resolveSurfaceEntryCopy,
+    resolveSurfaceMultiplayerGateAccess,
 } from '../src/shared/contracts/PlatformSurfacePolicyOps.js';
 import { StoragePlatform } from '../src/state/storage/StoragePlatform.js';
 import { resolveRuntimeMenuFeatureFlags } from '../src/ui/menu/MenuRuntimeFeatureFlags.js';
@@ -422,6 +423,69 @@ test('V77.4.2 surface policy keeps storage-bridge only in legacyMultiplayerTrans
     assert.ok(!browserPolicy.hostMultiplayerTransports.includes('storage-bridge'));
     assert.ok(!browserPolicy.joinMultiplayerTransports.includes('storage-bridge'));
     assert.deepEqual(browserPolicy.legacyMultiplayerTransports, ['storage-bridge']);
+});
+
+test('V77.4.3 desktop host gate allows hosting while browser-demo denies it', () => {
+    const desktopHost = resolveSurfaceMultiplayerGateAccess('host', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserHost = resolveSurfaceMultiplayerGateAccess('host', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopHost.allowed, true);
+    assert.equal(desktopHost.action, 'host');
+    assert.equal(desktopHost.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN);
+    assert.equal(desktopHost.reason, '');
+
+    assert.equal(browserHost.allowed, false);
+    assert.equal(browserHost.action, 'host');
+    assert.equal(browserHost.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY);
+    assert.equal(browserHost.reason, 'surface_host_denied');
+    assert.match(browserHost.message, /Desktop-Vollversion/);
+    assert.equal(browserHost.tone, 'warning');
+    assert.ok(browserHost.durationMs > 0);
+});
+
+test('V77.4.3 both surfaces allow join while browser-demo stays join-only role', () => {
+    const desktopJoin = resolveSurfaceMultiplayerGateAccess('join', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserJoin = resolveSurfaceMultiplayerGateAccess('join', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopJoin.allowed, true);
+    assert.equal(desktopJoin.action, 'join');
+    assert.equal(desktopJoin.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN);
+
+    assert.equal(browserJoin.allowed, true);
+    assert.equal(browserJoin.action, 'join');
+    assert.equal(browserJoin.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY);
+});
+
+test('V77.4.3 both surfaces allow discovery', () => {
+    const desktopDiscover = resolveSurfaceMultiplayerGateAccess('discover', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserDiscover = resolveSurfaceMultiplayerGateAccess('discover', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopDiscover.allowed, true);
+    assert.equal(desktopDiscover.action, 'discover');
+    assert.equal(browserDiscover.allowed, true);
+    assert.equal(browserDiscover.action, 'discover');
+});
+
+test('V77.4.3 unknown multiplayer action is denied with structured feedback', () => {
+    const unknownAction = resolveSurfaceMultiplayerGateAccess('', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(unknownAction.allowed, false);
+    assert.equal(unknownAction.reason, 'surface_unknown_action');
+    assert.match(unknownAction.message, /Unbekannte Multiplayer-Aktion/);
 });
 
 test('V87.3 Electron save adapter clears fallback degradedReason when invoke basis is available', () => {

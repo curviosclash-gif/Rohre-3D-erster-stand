@@ -1,6 +1,9 @@
 // ============================================
 // MatchStartValidationService.js - validates menu state before match start
 // ============================================
+import {
+    resolveSurfaceMultiplayerGateAccess,
+} from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import { isMapEligibleForModePath } from '../../shared/contracts/MapModeContract.js';
 import { resolveRuntimeSessionContract } from '../../shared/contracts/RuntimeSessionContract.js';
 
@@ -11,6 +14,7 @@ export function resolveMatchStartValidationIssue({
     maps = {},
     huntModeType = 'HUNT',
     classicModeType = 'CLASSIC',
+    productSurfaceId = '',
 } = {}) {
     const sessionContract = resolveRuntimeSessionContract(settings?.localSettings);
     const sessionType = sessionContract.sessionType;
@@ -48,8 +52,16 @@ export function resolveMatchStartValidationIssue({
         const sessionState = multiplayerSessionState && typeof multiplayerSessionState === 'object'
             ? multiplayerSessionState
             : null;
+        const hostGate = resolveSurfaceMultiplayerGateAccess('host', { productSurfaceId });
         const lobbyCode = String(sessionState?.lobbyCode || ui?.multiplayerLobbyCodeInput?.value || '').trim();
         if (!lobbyCode || sessionState?.joined !== true) {
+            if (!hostGate.allowed) {
+                return {
+                    message: 'Start nicht moeglich: Diese Demo kann nur einer Desktop-Lobby beitreten.',
+                    fieldKey: 'multiplayer',
+                    fieldMessage: 'Lobby-Code eines Desktop-Hosts eingeben und Join only verwenden.',
+                };
+            }
             return {
                 message: 'Start nicht moeglich: Bitte eine echte Lobby hosten oder ihr beitreten.',
                 fieldKey: 'multiplayer',
@@ -57,6 +69,13 @@ export function resolveMatchStartValidationIssue({
             };
         }
         if (sessionState?.isHost !== true) {
+            if (!hostGate.allowed) {
+                return {
+                    message: 'Start nicht moeglich: Diese Demo joint nur; Matchstart erfolgt ueber den Desktop-Host.',
+                    fieldKey: 'multiplayer',
+                    fieldMessage: 'Auf den Desktop-Host warten; die Demo besitzt keinen Matchstart.',
+                };
+            }
             return {
                 message: 'Start nicht moeglich: Nur der Host darf das Match starten.',
                 fieldKey: 'multiplayer',
