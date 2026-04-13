@@ -344,6 +344,20 @@ Stand: 2026-04-13
 - Host-, Editor-, Datei-, Export- und andere Shell-nahe Produktpfade bleiben primaer Vollversions-Flaechen. Browser-Fallbacks sind nur zulaessig, wenn sie echten Demo-Wert stiften und nicht als Produktiv-Paritaet oder verdeckte Vollversion gelesen werden koennen.
 - Dev- und Diagnosezugaenge sind nicht Teil des Produktversprechens: Das hartcodierte Passwort in `src/ui/menu/MenuExpertLoginRuntime.js` ist nur ein lokaler Dev-/UX-Schalter und weder Lizenz- noch Sicherheitsgrenze fuer Demo oder Vollversion.
 
+#### 4.6.4.4 Allowlist-/Denylist-Matrix fuer `desktop-app` und `browser-demo` (`V77 77.1.2`)
+
+| Domaene | `PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP` (`desktop-app`) | `PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO` (`browser-demo`) |
+| --- | --- | --- |
+| Spiel- und Map-Scope | `default full`: produktive Hauptpfade fuer `single`, `splitscreen`, `lan`, spaeter `online`, plus voller Produkt-Katalog. | `default deny`: nur `Arcade`, ein `Parcours`-Tutorialpfad, `Fight` sowie `Normal` oder `Classic` auf kuratierter Map-Auswahl. Keine freie Map-Wahl, keine Custom-Maps, kein unkuratierter Vollversions-Katalog. |
+| Multiplayer-Rolle | `host` und `join`; `desktop-app` bleibt die autoritative Host-Oberflaeche. | `join only`; kein `host`, kein Session-Besitz, keine Lobby-Erstellung und keine Browser-Host-Paritaet. |
+| `PLATFORM_CAPABILITY_IDS.DISCOVERY` | Produktiv verfuegbar ueber `PLATFORM_PROVIDER_KINDS.ELECTRON_IPC`. | Nur fuer Demo-geeignete Discovery- und `join only`-Einstiege ueber `PLATFORM_PROVIDER_KINDS.BROWSER_DEMO`; darf keinen Host-Besitz andeuten. |
+| `PLATFORM_CAPABILITY_IDS.HOST` | Produktiv verfuegbar ueber `PLATFORM_PROVIDER_KINDS.ELECTRON_IPC`. | Produktisch denylisted. Bis `V77 77.2` gilt jeder Browser-Host-Hinweis nur als `nicht verfuegbar` oder `join only`, auch wenn die aktuelle Registry den Provider-Kind noch nicht als explizit unavailable modelliert. |
+| `PLATFORM_CAPABILITY_IDS.SAVE` / `PLATFORM_CAPABILITY_IDS.RECORDING` | Desktop-Hauptpfad ueber `PLATFORM_PROVIDER_KINDS.ELECTRON_IPC` bzw. `PLATFORM_PROVIDER_KINDS.ELECTRON_RENDERER`. | Keine produktische Save- oder Recording-Freigabe; spaetere Browser-Fallbacks sind nur als explizit degradierte Demo-Pfade ueber `PLATFORM_PROVIDER_KINDS.BROWSER_DOWNLOAD` bzw. `PLATFORM_PROVIDER_KINDS.BROWSER_NATIVE` zulaessig. |
+| Editoren, Tooling, Diagnostics, Dev-Zugaenge | Vollversions- oder lokale Dev-Flaechen; nicht als Sicherheitsgrenze kommunizieren. | Ausserhalb des Demo-Scope; `MenuExpertLoginRuntime` und aehnliche Schalter sind weder Demo-Feature noch Sicherheits- oder Lizenzbarriere. |
+
+- Alles, was fuer `browser-demo` nicht explizit in der Matrix freigegeben ist, bleibt denylisted.
+- `V64`, `V75` und `V76` konsumieren dieselbe Matrix fuer Host-/Join-, Save-/Export-, Recording- und Editor-Entscheide, statt neue Surface-Begriffe einzufuehren.
+
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 
 - Feldkonvention:
