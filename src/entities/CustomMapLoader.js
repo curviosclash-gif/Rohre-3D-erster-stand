@@ -6,6 +6,7 @@ import {
 } from './MapSchema.js';
 import {
     getRuntimeMapCatalog,
+    getRuntimeMapPresetRegistryDescriptor,
     getRuntimeMapScale,
 } from '../shared/contracts/RuntimeMapCatalogContract.js';
 import { resolveLocalStorage } from '../shared/runtime/BrowserStoragePorts.js';
@@ -114,14 +115,16 @@ export function loadCustomMapFromStorage(storageOverride) {
 
 export function resolveArenaMapSelection(requestedMapKey, storageOverride) {
     const maps = getRuntimeMapCatalog();
+    const mapDescriptors = getRuntimeMapPresetRegistryDescriptor(maps).entries;
     const mapKey = String(requestedMapKey || '');
-    const fallbackMapKey = resolveFallbackMapKey(maps);
+    const fallbackMapKey = resolveFallbackMapKey(maps, mapDescriptors);
 
     if (mapKey !== CUSTOM_MAP_KEY) {
         return resolveKnownMapSelection({
             requestedMapKey: mapKey,
             maps,
             fallbackMapKey,
+            mapDescriptors,
         });
     }
 

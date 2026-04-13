@@ -770,65 +770,97 @@ export const EDITOR_BUILD_ITEMS = Object.freeze([
     })
 ].sort((left, right) => left.sortOrder - right.sortOrder || left.label.localeCompare(right.label)));
 
-const BUILD_ITEM_MAP = new Map(EDITOR_BUILD_ITEMS.map((entry) => [entry.id, entry]));
-
-export function getEditorBuildCategories() {
-    return EDITOR_BUILD_CATEGORIES;
-}
-
-export function getEditorBuildEntriesForCategory(categoryId) {
-    return EDITOR_BUILD_ITEMS.filter((entry) => entry.categoryId === categoryId);
-}
-
-export function getEditorBuildFeaturedEntries() {
-    return EDITOR_BUILD_ITEMS.filter((entry) => entry.isFeatured);
-}
-
-export function findEditorBuildEntryById(entryId) {
-    return BUILD_ITEM_MAP.get(String(entryId || '').trim()) || null;
-}
-
-export function findEditorBuildEntryByToolAndSubtype(tool, subType = null) {
-    const normalizedTool = String(tool || '').trim();
-    const normalizedSubtype = (subType ?? '') === null ? '' : String(subType ?? '');
-    return EDITOR_BUILD_ITEMS.find((entry) => (
-        entry.tool === normalizedTool
-        && String(entry.subType ?? '') === normalizedSubtype
-    )) || null;
-}
-
-export function getEditorBuildDefaultEntry(categoryId = 'build') {
-    const categoryItems = getEditorBuildEntriesForCategory(categoryId);
-    return categoryItems.find((entry) => entry.isDefault) || categoryItems[0] || EDITOR_BUILD_ITEMS[0] || null;
-}
-
-export function listEditorBuildDescriptorEntries() {
+function createEditorBuildDescriptorEntries() {
     return EDITOR_BUILD_ITEMS.map((entry) => ({
         id: entry.id,
         tool: entry.tool,
         subType: entry.subType ?? '',
         categoryId: entry.categoryId,
+        categoryLabel: entry.categoryLabel,
+        accentColor: entry.accentColor,
         label: entry.label,
         description: entry.description,
+        previewGlyph: entry.previewGlyph,
+        previewToken: entry.previewToken,
         sortOrder: entry.sortOrder,
         keywords: Array.isArray(entry.keywords) ? [...entry.keywords] : [],
+        badge: entry.badge || '',
         isFeatured: entry.isFeatured === true,
         isDefault: entry.isDefault === true,
     }));
 }
 
-export function getEditorBuildCatalogDescriptor() {
+function createEditorBuildCatalogDescriptorValue() {
     return createContentRegistryDescriptor({
         descriptorType: CONTENT_DESCRIPTOR_TYPES.EDITOR_BUILD_CATALOG,
         source: 'editor/js/ui/EditorBuildCatalog.js',
-        entries: listEditorBuildDescriptorEntries(),
+        entries: createEditorBuildDescriptorEntries(),
         metadata: {
             categories: EDITOR_BUILD_CATEGORIES.map((entry) => ({
                 id: entry.id,
                 label: entry.label,
+                accentColor: entry.accentColor,
+                description: entry.description,
             })),
         },
     });
+}
+
+const EDITOR_BUILD_CATALOG_DESCRIPTOR = createEditorBuildCatalogDescriptorValue();
+const BUILD_ITEM_MAP = new Map(EDITOR_BUILD_CATALOG_DESCRIPTOR.entries.map((entry) => [entry.id, entry]));
+
+function cloneDescriptorEntry(entry) {
+    if (!entry || typeof entry !== 'object') return null;
+    return {
+        ...entry,
+        keywords: Array.isArray(entry.keywords) ? [...entry.keywords] : [],
+    };
+}
+
+export function getEditorBuildCategories() {
+    const categories = Array.isArray(EDITOR_BUILD_CATALOG_DESCRIPTOR.metadata?.categories)
+        ? EDITOR_BUILD_CATALOG_DESCRIPTOR.metadata.categories
+        : [];
+    return categories.map((entry) => cloneDescriptorEntry(entry));
+}
+
+export function getEditorBuildEntriesForCategory(categoryId) {
+    return EDITOR_BUILD_CATALOG_DESCRIPTOR.entries
+        .filter((entry) => entry.categoryId === categoryId)
+        .map((entry) => cloneDescriptorEntry(entry));
+}
+
+export function getEditorBuildFeaturedEntries() {
+    return EDITOR_BUILD_CATALOG_DESCRIPTOR.entries
+        .filter((entry) => entry.isFeatured === true)
+        .map((entry) => cloneDescriptorEntry(entry));
+}
+
+export function findEditorBuildEntryById(entryId) {
+    return cloneDescriptorEntry(BUILD_ITEM_MAP.get(String(entryId || '').trim()));
+}
+
+export function findEditorBuildEntryByToolAndSubtype(tool, subType = null) {
+    const normalizedTool = String(tool || '').trim();
+    const normalizedSubtype = String(subType ?? '');
+    const match = EDITOR_BUILD_CATALOG_DESCRIPTOR.entries.find((entry) => (
+        entry.tool === normalizedTool
+        && String(entry.subType ?? '') === normalizedSubtype
+    ));
+    return cloneDescriptorEntry(match);
+}
+
+export function getEditorBuildDefaultEntry(categoryId = 'build') {
+    const categoryItems = getEditorBuildEntriesForCategory(categoryId);
+    return categoryItems.find((entry) => entry.isDefault) || categoryItems[0] || findEditorBuildEntryById(EDITOR_BUILD_ITEMS[0]?.id) || null;
+}
+
+export function listEditorBuildDescriptorEntries() {
+    return EDITOR_BUILD_CATALOG_DESCRIPTOR.entries.map((entry) => cloneDescriptorEntry(entry));
+}
+
+export function getEditorBuildCatalogDescriptor() {
+    return EDITOR_BUILD_CATALOG_DESCRIPTOR;
 }
 
 export function getEditorTemplateRegistryDescriptor() {

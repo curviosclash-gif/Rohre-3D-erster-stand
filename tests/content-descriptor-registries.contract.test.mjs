@@ -7,10 +7,15 @@ import {
 } from '../src/shared/contracts/ContentDescriptorContract.js';
 import {
     getRuntimeMapPresetRegistryDescriptor,
+    listRuntimeMapPresetKeys,
+    resolveRuntimeMapPresetLabel,
 } from '../src/shared/contracts/RuntimeMapCatalogContract.js';
 import { MAP_PRESETS } from '../src/core/config/MapPresets.js';
 import {
+    findEditorBuildEntryById,
+    getEditorBuildCategories,
     getEditorBuildCatalogDescriptor,
+    getEditorBuildEntriesForCategory,
     getEditorTemplateRegistryDescriptor,
 } from '../editor/js/ui/EditorBuildCatalog.js';
 import {
@@ -28,6 +33,10 @@ import {
 import {
     ARCADE_SECTOR_CATALOG,
 } from '../src/entities/directors/ArcadeEncounterCatalog.js';
+import {
+    resolveFallbackMapKey,
+    resolveKnownMapSelection,
+} from '../src/entities/mapSchema/CustomMapSelectionResolver.js';
 
 function assertRegistryEnvelope(registry, descriptorType) {
     assert.ok(registry && typeof registry === 'object');
@@ -90,4 +99,52 @@ test('V85.3 arcade sector pools resolve against descriptor-backed registries', (
             assert.ok(rewardIds.has(rewardId), `Unknown reward descriptor in sector pool: ${rewardId}`);
         });
     });
+});
+
+test('V85.3.2 runtime/editor consumers resolve through descriptor-backed contracts', () => {
+    const runtimeMapKeys = listRuntimeMapPresetKeys(MAP_PRESETS);
+    assert.ok(runtimeMapKeys.includes('standard'));
+    assert.equal(resolveRuntimeMapPresetLabel('standard', MAP_PRESETS), MAP_PRESETS.standard.name);
+
+    const buildCategories = getEditorBuildCategories();
+    assert.ok(buildCategories.some((entry) => entry.id === 'build' && typeof entry.accentColor === 'string'));
+
+    const flowEntries = getEditorBuildEntriesForCategory('flow');
+    assert.ok(flowEntries.some((entry) => entry.id === 'flow-portal-ring'));
+    const directLookup = findEditorBuildEntryById('flow-portal-ring');
+    assert.equal(directLookup?.tool, 'portal');
+    assert.equal(directLookup?.previewGlyph, 'PR');
+});
+
+test('V85.3.2 custom-map selection prioritizes descriptor-backed map keys', () => {
+    const maps = {
+        beta: { name: 'Beta' },
+        standard: { name: 'Standard' },
+        alpha: { name: 'Alpha' },
+    };
+    const descriptorEntries = [
+        { id: 'alpha' },
+        { id: 'standard' },
+    ];
+
+    const fallbackMapKey = resolveFallbackMapKey(maps, descriptorEntries);
+    assert.equal(fallbackMapKey, 'standard');
+
+    const knownFromDescriptor = resolveKnownMapSelection({
+        requestedMapKey: 'alpha',
+        maps,
+        fallbackMapKey,
+        mapDescriptors: descriptorEntries,
+    });
+    assert.equal(knownFromDescriptor.isFallback, false);
+    assert.equal(knownFromDescriptor.effectiveMapKey, 'alpha');
+
+    const filteredOutByDescriptor = resolveKnownMapSelection({
+        requestedMapKey: 'beta',
+        maps,
+        fallbackMapKey,
+        mapDescriptors: descriptorEntries,
+    });
+    assert.equal(filteredOutByDescriptor.isFallback, true);
+    assert.equal(filteredOutByDescriptor.effectiveMapKey, 'standard');
 });

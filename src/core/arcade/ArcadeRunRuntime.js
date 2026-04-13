@@ -14,7 +14,6 @@ import {
     buildArcadeRunSummary,
     mergeArcadeRunRecords,
 } from '../../state/arcade/ArcadeScoreOps.js';
-import { MAP_PRESET_CATALOG } from '../config/maps/MapPresetCatalog.js';
 import {
     resolveMapSequence,
     getMapKeyForSector,
@@ -38,8 +37,19 @@ import {
     ARCADE_RUN_LEVELUP_REWARDS,
     ARCADE_SECTOR_MODIFIERS,
 } from '../../entities/directors/ArcadeEncounterCatalog.js';
-import { resolveArcadeModifierMeta } from '../../shared/contracts/ArcadeModifierContract.js';
-import { resolveArcadeRewardMeta } from '../../shared/contracts/ArcadeRewardContract.js';
+import {
+    getArcadeModifierRegistryDescriptor,
+    resolveArcadeModifierMeta,
+} from '../../shared/contracts/ArcadeModifierContract.js';
+import {
+    getArcadeRewardRegistryDescriptor,
+    resolveArcadeRewardMeta,
+} from '../../shared/contracts/ArcadeRewardContract.js';
+import {
+    getRuntimeMapCatalog,
+    listRuntimeMapPresetKeys,
+    resolveRuntimeMapPresetLabel,
+} from '../../shared/contracts/RuntimeMapCatalogContract.js';
 
 const ARCADE_PROFILE_STORAGE_KEY = 'cuviosclash.arcade-run-profile.v1';
 
@@ -69,7 +79,7 @@ function clampIndex(index, maxExclusive) {
 function formatMapLabel(mapKey) {
     const raw = String(mapKey || '').trim();
     if (!raw) return 'Unbekannte Map';
-    const fromCatalog = MAP_PRESET_CATALOG?.[raw]?.name;
+    const fromCatalog = resolveRuntimeMapPresetLabel(raw);
     if (typeof fromCatalog === 'string' && fromCatalog.trim().length > 0) {
         return fromCatalog.trim();
     }
@@ -261,9 +271,14 @@ export class ArcadeRunRuntime {
 
     _resolveRewardChoicesForSector(sectorIndex) {
         const sectorEntry = this._getEncounterSectorEntry(sectorIndex);
+        const rewardRegistryIds = getArcadeRewardRegistryDescriptor().entries
+            .map((entry) => String(entry.id || '').trim())
+            .filter(Boolean);
         const sourceChoices = Array.isArray(sectorEntry?.rewardChoices) && sectorEntry.rewardChoices.length > 0
             ? sectorEntry.rewardChoices
-            : ARCADE_RUN_LEVELUP_REWARDS.map((entry) => entry.id);
+            : (rewardRegistryIds.length > 0
+                ? rewardRegistryIds
+                : ARCADE_RUN_LEVELUP_REWARDS.map((entry) => entry.id));
         const deduped = [];
         const used = new Set();
         for (let i = 0; i < sourceChoices.length; i += 1) {
@@ -280,7 +295,7 @@ export class ArcadeRunRuntime {
         }
         if (deduped.length > 0) return deduped;
 
-        const fallback = ARCADE_RUN_LEVELUP_REWARDS[0];
+        const fallback = getArcadeRewardRegistryDescriptor().entries[0] || ARCADE_RUN_LEVELUP_REWARDS[0];
         const fallbackId = String(fallback?.id || 'run_speed_t1');
         const fallbackMeta = resolveArcadeRewardMeta(fallbackId);
         return [{
@@ -297,7 +312,8 @@ export class ArcadeRunRuntime {
         const encounterEntry = this._getEncounterSectorEntry(nextSectorIndex);
         const baseModifierId = String(encounterEntry?.modifierId || this._activeModifierId || '').trim();
 
-        const mapCatalogKeys = Object.keys(MAP_PRESET_CATALOG || {});
+        const runtimeMapCatalog = getRuntimeMapCatalog();
+        const mapCatalogKeys = listRuntimeMapPresetKeys(runtimeMapCatalog);
         const choices = [];
         const pushChoice = (mapKey, modifierId, source) => {
             const normalizedMapKey = String(mapKey || '').trim();
@@ -322,7 +338,9 @@ export class ArcadeRunRuntime {
         pushChoice(baseMapKey, baseModifierId, 'plan');
 
         const candidateMaps = mapCatalogKeys.filter((mapKey) => mapKey !== baseMapKey);
-        const modifierIds = ARCADE_SECTOR_MODIFIERS.map((entry) => String(entry?.id || '').trim()).filter(Boolean);
+        const modifierIds = getArcadeModifierRegistryDescriptor().entries
+            .map((entry) => String(entry.id || '').trim())
+            .filter(Boolean);
         const altTargetCount = candidateMaps.length > 0 ? 3 : 1;
         for (let i = 0; i < altTargetCount && choices.length < 3; i += 1) {
             const mapIdx = (targetIndex + i) % Math.max(1, candidateMaps.length);
@@ -663,10 +681,11 @@ export class ArcadeRunRuntime {
 
         // Resolve map sequence from encounter plan if available
         if (options.encounterPlan) {
-            const mapSequence = resolveMapSequence(options.encounterPlan, this._config.seed, MAP_PRESET_CATALOG);
+            const runtimeMapCatalog = getRuntimeMapCatalog();
+            const mapSequence = resolveMapSequence(options.encounterPlan, this._config.seed, runtimeMapCatalog);
             this._state.mapSequence = mapSequence;
             if (mapSequence.length > 0) {
-            this._state.currentMapKey = mapSequence[0];
+                this._state.currentMapKey = mapSequence[0];
             }
             // Store encounter sequence for dynamic sector scoring (V61.1)
             if (Array.isArray(options.encounterPlan.sequence)) {

@@ -53,7 +53,7 @@ export const VEHICLE_DEFINITIONS = [
 const VEHICLE_BY_ID = new Map(VEHICLE_DEFINITIONS.map((entry) => [entry.id, entry]));
 
 export function getVehicleIds() {
-    return VEHICLE_DEFINITIONS.map((entry) => entry.id);
+    return getVehicleRegistryDescriptor().entries.map((entry) => entry.id);
 }
 
 export function isValidVehicleId(vehicleId) {

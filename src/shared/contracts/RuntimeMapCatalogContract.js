@@ -102,6 +102,20 @@ export function listRuntimeMapPresetDescriptors(overrideMaps = null) {
         .sort((left, right) => left.id.localeCompare(right.id, 'en', { sensitivity: 'base' }));
 }
 
+export function listRuntimeMapPresetKeys(overrideMaps = null) {
+    return listRuntimeMapPresetDescriptors(overrideMaps).map((entry) => entry.id);
+}
+
+export function resolveRuntimeMapPresetLabel(mapKey, overrideMaps = null) {
+    const normalizedMapKey = typeof mapKey === 'string' ? mapKey.trim() : '';
+    if (!normalizedMapKey) {
+        return '';
+    }
+    const descriptor = getRuntimeMapPresetRegistryDescriptor(overrideMaps);
+    const match = descriptor.entries.find((entry) => entry.id === normalizedMapKey);
+    return typeof match?.name === 'string' ? match.name : '';
+}
+
 export function getRuntimeMapPresetRegistryDescriptor(overrideMaps = null) {
     return createContentRegistryDescriptor({
         descriptorType: CONTENT_DESCRIPTOR_TYPES.RUNTIME_MAP_PRESETS,

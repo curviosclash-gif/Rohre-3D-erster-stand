@@ -1,15 +1,24 @@
 // ─── Arcade Mission System: Types, Progress Tracking, Completion ───
 
-import { MISSION_TYPES, formatMissionProgress } from '../../shared/contracts/ArcadeMissionContract.js';
+import {
+    MISSION_TYPES,
+    formatMissionProgress,
+    listArcadeMissionDescriptors,
+} from '../../shared/contracts/ArcadeMissionContract.js';
 import { toSafeNumber, createSeededRandom } from '../../shared/utils/ArcadeUtils.js';
 
-const MISSION_TYPE_KEYS = Object.keys(MISSION_TYPES);
+const MISSION_DESCRIPTOR_TYPE_IDS = new Set(listArcadeMissionDescriptors().map((entry) => entry.id));
+
+function isKnownMissionType(typeId) {
+    const normalizedTypeId = String(typeId || '').trim();
+    return normalizedTypeId.length > 0 && MISSION_DESCRIPTOR_TYPE_IDS.has(normalizedTypeId);
+}
 
 // ─── Mission Instance ───
 
 export function createMissionInstance(typeId, params = {}) {
     const typeDef = MISSION_TYPES[typeId];
-    if (!typeDef) return null;
+    if (!typeDef || !isKnownMissionType(typeId)) return null;
     const mergedParams = { ...typeDef.defaultParams, ...params };
     return {
         id: `${typeId}-${Date.now().toString(36)}`,
@@ -145,6 +154,7 @@ export function assignSectorMissions(sectorTemplate, mapMissions, seed, sectorNu
         const templateId = String(sectorTemplate?.id || sectorTemplate || 'sector_intro');
         pool = buildGenericMissionPool(templateId);
     }
+    pool = pool.filter((entry) => isKnownMissionType(entry?.type));
 
     if (pool.length === 0) return [];
 

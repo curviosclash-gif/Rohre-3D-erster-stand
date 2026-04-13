@@ -375,6 +375,14 @@ Stand: 2026-04-13
 - Mission-, Reward- und Modifier-Kataloge liefern descriptorbasierte Registry-Ausgaben ueber ihre Shared Contracts; `vehicle-registry.js` spiegelt dasselbe Muster fuer Fahrzeugkataloge.
 - Arcade-Sektorpools und Runtime-Map-Keyspace bleiben synchron: `expert_gauntlet` ist als expliziter Expert-Preset-Key verankert, sodass Descriptor-Registries und Arcade-Map-Pools denselben Satz gueltiger IDs verwenden.
 
+#### 4.6.5.4 Descriptor-Registry-Verbrauch in Runtime/Editor/Import vereinheitlichen (`V85 85.3.2`)
+
+- `ArcadeRunRuntime` liest Runtime-Map-Keyspace und Labels jetzt ueber `RuntimeMapCatalogContract` statt ueber einen separaten `MapPresetCatalog`-Import; Intermission-/Map-Choice und Encounter-Map-Sequenzierung verwenden damit denselben Registry-Leseweg wie die Contracts.
+- Reward-/Modifier-Verbrauch im Arcade-Intermission-Pfad nutzt die Descriptor-Registries (`getArcadeRewardRegistryDescriptor()`, `getArcadeModifierRegistryDescriptor()`) als kanonische ID-Quelle; verbleibende Encounter-Score-Boni bleiben bewusst im Encounter-Katalog verankert.
+- `EditorBuildCatalog` behandelt den Descriptor-Envelope als kanonische Leseflaeche fuer Build-Getter (`get/find/list/default`); Kategorie-Metadaten (`accentColor`, Beschreibung) leben im Registry-Metadatenfeld statt in parallelen Consumer-Sonderlisten.
+- `CustomMapLoader` plus `CustomMapSelectionResolver` validieren bekannte Runtime-Map-Keys und Fallback (`standard` bevorzugt) ueber denselben Runtime-Descriptor-Satz, sodass Import-/Selection-Fallbacks und Runtime-Katalog denselben Keyraum erzwingen.
+- `ArcadeMissionState` und `vehicle-registry` lesen zulaessige Missions- bzw. Vehicle-IDs aus den Descriptor-Registries statt aus lokalen Objekt-Keylisten, wodurch Folgearbeit auf derselben Vertragskante erweitert werden kann.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
