@@ -49,8 +49,11 @@ function ensureMultiplayerSessionType(game, menuLobbyService = null) {
         game.settings.localSettings.multiplayerTransport = activeTransport;
         return;
     }
-    const currentTransport = String(game.settings.localSettings.multiplayerTransport || '').trim().toLowerCase();
-    if (currentTransport === MULTIPLAYER_TRANSPORTS.ONLINE) return;
+    const currentTransport = normalizeLobbyServiceTransport(game.settings.localSettings.multiplayerTransport, '');
+    if (currentTransport === MULTIPLAYER_TRANSPORTS.LAN || currentTransport === MULTIPLAYER_TRANSPORTS.ONLINE) {
+        game.settings.localSettings.multiplayerTransport = currentTransport;
+        return;
+    }
     game.settings.localSettings.multiplayerTransport = resolveDefaultLobbyTransport({
         runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
     });
@@ -60,7 +63,7 @@ function observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, action,
     if (!runtimeSource || isNetworkLobbyServiceTransport(menuMultiplayerBridge)) {
         return;
     }
-    const transport = normalizeLobbyServiceTransport(menuMultiplayerBridge, MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE);
+    const transport = normalizeLobbyServiceTransport(menuMultiplayerBridge, MULTIPLAYER_TRANSPORTS.LAN);
     recordSessionRuntimeEvent(runtimeSource, {
         type: SESSION_RUNTIME_EVENT_TYPES.CAPABILITY_FALLBACK_USED,
         source: 'menu_runtime_multiplayer_service',
@@ -147,8 +150,10 @@ export function createMultiplayerMatchSettingsSnapshot(settings = {}) {
         localSettings: {
             sessionType: RUNTIME_SESSION_TYPES.MULTIPLAYER,
             // 'storage-bridge' = localStorage + BroadcastChannel (in-browser only, no real network sync).
-            // Future values: 'lan' (LANSessionAdapter), 'online' (OnlineSessionAdapter).
-            multiplayerTransport: settings?.localSettings?.multiplayerTransport || MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE,
+            // Produktive Surface-Defaults kommen ueber die zentrale Surface-Policy.
+            multiplayerTransport: settings?.localSettings?.multiplayerTransport || resolveDefaultLobbyTransport({
+                runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+            }),
             modePath: settings?.localSettings?.modePath || 'normal',
         },
     });
@@ -216,7 +221,9 @@ export function applyMultiplayerMatchSettingsSnapshot(targetSettings, snapshot =
     targetSettings.localSettings.sessionType = RUNTIME_SESSION_TYPES.MULTIPLAYER;
     targetSettings.localSettings.multiplayerTransport = snapshot?.localSettings?.multiplayerTransport
         || targetSettings.localSettings.multiplayerTransport
-        || MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
+        || resolveDefaultLobbyTransport({
+            runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
+        });
     if (typeof snapshot?.localSettings?.modePath === 'string' && snapshot.localSettings.modePath.trim()) {
         targetSettings.localSettings.modePath = snapshot.localSettings.modePath.trim();
     }

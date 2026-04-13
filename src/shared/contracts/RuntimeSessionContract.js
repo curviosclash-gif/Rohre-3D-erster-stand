@@ -20,7 +20,12 @@ export function normalizeRuntimeSessionType(value, fallback = RUNTIME_SESSION_TY
     return VALID_SESSION_TYPE_SET.has(normalized) ? normalized : fallback;
 }
 
-export function normalizeMultiplayerTransport(value, fallback = MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE) {
+export function isLegacyMultiplayerTransport(value) {
+    const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    return normalized === MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
+}
+
+export function normalizeMultiplayerTransport(value, fallback = MULTIPLAYER_TRANSPORTS.LAN) {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
     return VALID_MULTIPLAYER_TRANSPORT_SET.has(normalized) ? normalized : fallback;
 }
@@ -29,7 +34,7 @@ export function resolveRuntimeSessionContract(source = null) {
     const sessionType = normalizeRuntimeSessionType(source?.sessionType, RUNTIME_SESSION_TYPES.SINGLE);
     const multiplayerTransport = normalizeMultiplayerTransport(
         source?.multiplayerTransport,
-        MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE
+        MULTIPLAYER_TRANSPORTS.LAN
     );
     const usesMenuStorageBridge = sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER
         && multiplayerTransport === MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;

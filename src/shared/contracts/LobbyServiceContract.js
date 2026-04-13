@@ -36,7 +36,7 @@ function resolveTransportCandidate(value) {
     return normalizeString(value, '');
 }
 
-export function normalizeLobbyServiceTransport(value, fallback = LOBBY_SERVICE_TRANSPORTS.STORAGE_BRIDGE) {
+export function normalizeLobbyServiceTransport(value, fallback = LOBBY_SERVICE_TRANSPORTS.LAN) {
     const normalized = resolveTransportCandidate(value).toLowerCase();
     return VALID_LOBBY_SERVICE_TRANSPORTS.has(normalized) ? normalized : fallback;
 }
@@ -47,7 +47,7 @@ export function isNetworkLobbyServiceTransport(value) {
 }
 
 export function createLobbyServiceDescriptor(source = {}) {
-    const transport = normalizeLobbyServiceTransport(source.transport, LOBBY_SERVICE_TRANSPORTS.STORAGE_BRIDGE);
+    const transport = normalizeLobbyServiceTransport(source.transport, LOBBY_SERVICE_TRANSPORTS.LAN);
     return Object.freeze({
         contractVersion: LOBBY_SERVICE_CONTRACT_VERSION,
         transport,

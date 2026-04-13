@@ -21,16 +21,30 @@ import {
     PLATFORM_SURFACE_MULTIPLAYER_ROLES,
     PLATFORM_SURFACE_POLICY_MODES,
     PLATFORM_SURFACE_QUICK_START_ACTION_IDS,
+    isLegacyLobbyTransport,
+    normalizeLobbyProviderTransport,
     resolveCapabilityProviderKind,
+    resolveDefaultLobbyTransport,
+    resolveLobbyProviderKind,
     resolveSurfaceCapabilityAccess,
     resolveSurfaceDeveloperAccess,
     resolveSurfacePolicy,
 } from '../src/shared/contracts/PlatformCapabilityRegistry.js';
 import {
+    isLegacyMultiplayerTransport,
+    normalizeMultiplayerTransport,
+} from '../src/shared/contracts/RuntimeSessionContract.js';
+import {
+    normalizeLobbyServiceTransport,
+} from '../src/shared/contracts/LobbyServiceContract.js';
+import {
     isSurfacePresetAllowed,
     isSurfaceQuickStartActionAllowed,
+    isSurfaceSessionTypeAllowed,
     listSurfaceAllowedMapKeysForModePath,
+    listSurfaceAllowedSessionTypes,
     resolveSurfaceBlockedFeatureFeedback,
+    resolveSurfaceEntryCopy,
 } from '../src/shared/contracts/PlatformSurfacePolicyOps.js';
 import { StoragePlatform } from '../src/state/storage/StoragePlatform.js';
 import { resolveRuntimeMenuFeatureFlags } from '../src/ui/menu/MenuRuntimeFeatureFlags.js';
@@ -105,16 +119,35 @@ test('V77.2.1 surface policy contract keeps desktop default-full and browser def
     assert.equal(desktopPolicy.defaultAccessMode, PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL);
     assert.equal(desktopPolicy.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN);
     assert.equal(desktopPolicy.requiresCuratedMaps, false);
+    assert.deepEqual(desktopPolicy.allowedSessionTypes, ['single', 'multiplayer', 'splitscreen']);
+    assert.equal(desktopPolicy.defaultMultiplayerTransport, 'lan');
+    assert.deepEqual(desktopPolicy.allowedMultiplayerTransports, ['lan', 'online']);
+    assert.deepEqual(desktopPolicy.hostMultiplayerTransports, ['lan', 'online']);
     assert.ok(desktopPolicy.allowedGameModes.includes('Arcade'));
     assert.ok(desktopPolicy.allowedModePaths.includes(PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION));
 
     assert.equal(browserPolicy.defaultAccessMode, PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY);
     assert.equal(browserPolicy.multiplayerRole, PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY);
     assert.equal(browserPolicy.requiresCuratedMaps, true);
+    assert.deepEqual(browserPolicy.allowedSessionTypes, ['single', 'multiplayer']);
+    assert.equal(browserPolicy.defaultMultiplayerTransport, 'lan');
+    assert.deepEqual(browserPolicy.allowedMultiplayerTransports, ['lan']);
+    assert.deepEqual(browserPolicy.hostMultiplayerTransports, []);
+    assert.deepEqual(browserPolicy.joinMultiplayerTransports, ['lan']);
+    assert.deepEqual(browserPolicy.legacyMultiplayerTransports, ['storage-bridge']);
     assert.ok(browserPolicy.allowedGameModes.includes('Parcours'));
     assert.deepEqual(browserPolicy.allowedPresetIds, ['arcade', 'fight-standard', 'normal-standard']);
     assert.deepEqual(browserPolicy.curatedMapKeysByModePath.arcade, ['parcours_rift']);
     assert.equal(browserPolicy.allowedModePaths.includes(PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION), false);
+});
+
+test('V77.4.1 default lobby transport follows the shared surface transport matrix', () => {
+    assert.equal(resolveDefaultLobbyTransport({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    }), 'lan');
+    assert.equal(resolveDefaultLobbyTransport({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), 'lan');
 });
 
 test('V77.3.1 browser surface policy exposes curated map and preset allowlists while quickstart stays unavailable', () => {
@@ -152,6 +185,30 @@ test('V77.3.2 blocked demo actions share the same UX feedback contract', () => {
     assert.match(blockedQuickStart.message, /Direktstart ist in dieser Demo nicht verfuegbar/);
     assert.match(blockedPreset.message, /ist in dieser Demo nicht verfuegbar/);
     assert.match(blockedDesktop.message, /ist in dieser Surface nicht verfuegbar/);
+});
+
+test('V77.3.3 surface entry copy cuts showcase, join-only and splitscreen access per surface', () => {
+    const desktopEntryCopy = resolveSurfaceEntryCopy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+        sessionType: 'single',
+    });
+    const browserEntryCopy = resolveSurfaceEntryCopy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        sessionType: 'single',
+    });
+
+    assert.deepEqual(listSurfaceAllowedSessionTypes({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), ['single', 'multiplayer']);
+    assert.equal(isSurfaceSessionTypeAllowed('splitscreen', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false);
+    assert.equal(browserEntryCopy.startButtonLabel, 'Showcase starten');
+    assert.equal(browserEntryCopy.hostButtonLabel, 'Nur Desktop');
+    assert.equal(browserEntryCopy.joinButtonLabel, 'Join only');
+    assert.match(browserEntryCopy.multiplayerSubtitle, /hostet aber nicht/);
+    assert.equal(desktopEntryCopy.hostButtonLabel, 'Host');
+    assert.equal(desktopEntryCopy.sessionSummaryLabels.single, 'Single Player');
 });
 
 test('V77.2.1 browser host provider resolves unavailable when host capability is disabled', () => {
@@ -308,6 +365,63 @@ test('V87.99 StoragePlatform surfaces partial legacy migrations when legacy-key 
     } finally {
         console.warn = originalWarn;
     }
+});
+
+test('V77.4.2 normalizer defaults resolve to productive LAN transport instead of legacy storage-bridge', () => {
+    assert.equal(normalizeMultiplayerTransport(''), 'lan');
+    assert.equal(normalizeMultiplayerTransport(undefined), 'lan');
+    assert.equal(normalizeMultiplayerTransport(null), 'lan');
+    assert.equal(normalizeMultiplayerTransport('storage-bridge'), 'storage-bridge');
+
+    assert.equal(normalizeLobbyProviderTransport(''), 'lan');
+    assert.equal(normalizeLobbyProviderTransport(undefined), 'lan');
+    assert.equal(normalizeLobbyProviderTransport('storage-bridge'), 'storage-bridge');
+
+    assert.equal(normalizeLobbyServiceTransport(''), 'lan');
+    assert.equal(normalizeLobbyServiceTransport(undefined), 'lan');
+    assert.equal(normalizeLobbyServiceTransport('storage-bridge'), 'storage-bridge');
+});
+
+test('V77.4.2 isLegacyMultiplayerTransport and isLegacyLobbyTransport identify storage-bridge as legacy', () => {
+    assert.equal(isLegacyMultiplayerTransport('storage-bridge'), true);
+    assert.equal(isLegacyMultiplayerTransport('lan'), false);
+    assert.equal(isLegacyMultiplayerTransport('online'), false);
+    assert.equal(isLegacyMultiplayerTransport(''), false);
+    assert.equal(isLegacyMultiplayerTransport(undefined), false);
+
+    assert.equal(isLegacyLobbyTransport('storage-bridge'), true);
+    assert.equal(isLegacyLobbyTransport('lan'), false);
+    assert.equal(isLegacyLobbyTransport('online'), false);
+    assert.equal(isLegacyLobbyTransport(''), false);
+});
+
+test('V77.4.2 resolveLobbyProviderKind defaults to LAN lobby instead of legacy storage-bridge', () => {
+    assert.equal(resolveLobbyProviderKind('lan'), PLATFORM_PROVIDER_KINDS.MENU_LAN_LOBBY);
+    assert.equal(resolveLobbyProviderKind(''), PLATFORM_PROVIDER_KINDS.MENU_LAN_LOBBY);
+    assert.equal(resolveLobbyProviderKind(undefined), PLATFORM_PROVIDER_KINDS.MENU_LAN_LOBBY);
+    assert.equal(resolveLobbyProviderKind('storage-bridge'), PLATFORM_PROVIDER_KINDS.MENU_STORAGE_BRIDGE);
+    assert.equal(resolveLobbyProviderKind('online'), PLATFORM_PROVIDER_KINDS.MENU_ONLINE_LOBBY);
+});
+
+test('V77.4.2 surface policy keeps storage-bridge only in legacyMultiplayerTransports, not in productive defaults', () => {
+    const desktopPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopPolicy.defaultMultiplayerTransport, 'lan');
+    assert.ok(!desktopPolicy.allowedMultiplayerTransports.includes('storage-bridge'));
+    assert.ok(!desktopPolicy.hostMultiplayerTransports.includes('storage-bridge'));
+    assert.ok(!desktopPolicy.joinMultiplayerTransports.includes('storage-bridge'));
+    assert.deepEqual(desktopPolicy.legacyMultiplayerTransports, ['storage-bridge']);
+
+    assert.equal(browserPolicy.defaultMultiplayerTransport, 'lan');
+    assert.ok(!browserPolicy.allowedMultiplayerTransports.includes('storage-bridge'));
+    assert.ok(!browserPolicy.hostMultiplayerTransports.includes('storage-bridge'));
+    assert.ok(!browserPolicy.joinMultiplayerTransports.includes('storage-bridge'));
+    assert.deepEqual(browserPolicy.legacyMultiplayerTransports, ['storage-bridge']);
 });
 
 test('V87.3 Electron save adapter clears fallback degradedReason when invoke basis is available', () => {

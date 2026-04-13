@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 import { PLATFORM_CAPABILITY_IDS } from './PlatformCapabilityContract.js';
 import { MULTIPLAYER_TRANSPORTS } from './RuntimeSessionContract.js';
 
@@ -47,27 +48,15 @@ export const PLATFORM_SURFACE_DEVELOPER_ACCESS_REASONS = Object.freeze({
     UNAVAILABLE: 'unavailable',
 });
 
-export const PLATFORM_SURFACE_MULTIPLAYER_ROLES = Object.freeze({
-    HOST_AND_JOIN: 'host-and-join',
-    JOIN_ONLY: 'join-only',
-});
-
-export const PLATFORM_SURFACE_MENU_MODE_PATHS = Object.freeze({
-    QUICK_ACTION: 'quick_action',
-    ARCADE: 'arcade',
-    FIGHT: 'fight',
-    NORMAL: 'normal',
-});
-
-export const PLATFORM_SURFACE_QUICK_START_ACTION_IDS = Object.freeze({
-    LAST_SETTINGS: 'last_settings',
-    EVENT_PLAYLIST: 'event_playlist',
-    RANDOM_MAP: 'random_map',
-});
+export const PLATFORM_SURFACE_MULTIPLAYER_ROLES = Object.freeze({ HOST_AND_JOIN: 'host-and-join', JOIN_ONLY: 'join-only' });
+export const PLATFORM_SURFACE_SESSION_TYPES = Object.freeze({ SINGLE: 'single', MULTIPLAYER: 'multiplayer', SPLITSCREEN: 'splitscreen' });
+export const PLATFORM_SURFACE_MENU_MODE_PATHS = Object.freeze({ QUICK_ACTION: 'quick_action', ARCADE: 'arcade', FIGHT: 'fight', NORMAL: 'normal' });
+export const PLATFORM_SURFACE_QUICK_START_ACTION_IDS = Object.freeze({ LAST_SETTINGS: 'last_settings', EVENT_PLAYLIST: 'event_playlist', RANDOM_MAP: 'random_map' });
 
 const VALID_PRODUCT_SURFACE_IDS = new Set(Object.values(PLATFORM_PRODUCT_SURFACE_IDS));
 const VALID_RUNTIME_KINDS = new Set(Object.values(PLATFORM_RUNTIME_KINDS));
 const VALID_LOBBY_TRANSPORTS = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
+const VALID_SURFACE_SESSION_TYPES = new Set(Object.values(PLATFORM_SURFACE_SESSION_TYPES));
 const VALID_SURFACE_MENU_MODE_PATHS = new Set(Object.values(PLATFORM_SURFACE_MENU_MODE_PATHS));
 const VALID_SURFACE_QUICK_START_ACTION_IDS = new Set(Object.values(PLATFORM_SURFACE_QUICK_START_ACTION_IDS));
 
@@ -95,7 +84,7 @@ export function normalizePlatformRuntimeKind(value, fallback = PLATFORM_RUNTIME_
     return VALID_RUNTIME_KINDS.has(normalized) ? normalized : fallback;
 }
 
-export function normalizeLobbyProviderTransport(value, fallback = MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE) {
+export function normalizeLobbyProviderTransport(value, fallback = MULTIPLAYER_TRANSPORTS.LAN) {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_LOBBY_TRANSPORTS.has(normalized) ? normalized : fallback;
 }
@@ -104,6 +93,8 @@ function normalizeSurfaceMenuModePath(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_SURFACE_MENU_MODE_PATHS.has(normalized) ? normalized : fallback;
 }
+
+function normalizeSurfaceSessionType(value, fallback = '') { const normalized = normalizeString(value, '').toLowerCase(); return VALID_SURFACE_SESSION_TYPES.has(normalized) ? normalized : fallback; }
 
 function normalizeSurfaceQuickStartActionId(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
@@ -121,6 +112,12 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
                 defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL,
                 multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.HOST_AND_JOIN,
                 defaultModePath: PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL,
+                allowedSessionTypes: Object.freeze([PLATFORM_SURFACE_SESSION_TYPES.SINGLE, PLATFORM_SURFACE_SESSION_TYPES.MULTIPLAYER, PLATFORM_SURFACE_SESSION_TYPES.SPLITSCREEN]),
+                defaultMultiplayerTransport: MULTIPLAYER_TRANSPORTS.LAN,
+                allowedMultiplayerTransports: Object.freeze([MULTIPLAYER_TRANSPORTS.LAN, MULTIPLAYER_TRANSPORTS.ONLINE]),
+                hostMultiplayerTransports: Object.freeze([MULTIPLAYER_TRANSPORTS.LAN, MULTIPLAYER_TRANSPORTS.ONLINE]),
+                joinMultiplayerTransports: Object.freeze([MULTIPLAYER_TRANSPORTS.LAN, MULTIPLAYER_TRANSPORTS.ONLINE]),
+                legacyMultiplayerTransports: Object.freeze([MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE]),
                 allowedGameModes: Object.freeze([
                     'Arcade',
                     'Parcours',
@@ -154,12 +151,18 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
         }),
         [PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO]: Object.freeze({
             runtimeKind: PLATFORM_RUNTIME_KINDS.WEB,
-            defaultLobbyTransport: MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE,
+            defaultLobbyTransport: MULTIPLAYER_TRANSPORTS.LAN,
             toolingSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
             surfacePolicy: Object.freeze({
                 defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY,
                 multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY,
                 defaultModePath: PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL,
+                allowedSessionTypes: Object.freeze([PLATFORM_SURFACE_SESSION_TYPES.SINGLE, PLATFORM_SURFACE_SESSION_TYPES.MULTIPLAYER]),
+                defaultMultiplayerTransport: MULTIPLAYER_TRANSPORTS.LAN,
+                allowedMultiplayerTransports: Object.freeze([MULTIPLAYER_TRANSPORTS.LAN]),
+                hostMultiplayerTransports: Object.freeze([]),
+                joinMultiplayerTransports: Object.freeze([MULTIPLAYER_TRANSPORTS.LAN]),
+                legacyMultiplayerTransports: Object.freeze([MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE]),
                 allowedGameModes: Object.freeze([
                     'Arcade',
                     'Parcours',
@@ -313,6 +316,32 @@ function resolveSurfaceAllowedModePaths(surfacePolicy) {
     );
 }
 
+function resolveSurfaceAllowedSessionTypes(surfacePolicy) { return sanitizeUniqueStringArray(surfacePolicy?.allowedSessionTypes, normalizeSurfaceSessionType); }
+
+function resolveSurfaceAllowedMultiplayerTransports(surfacePolicy) {
+    return sanitizeUniqueStringArray(
+        surfacePolicy?.allowedMultiplayerTransports,
+        normalizeLobbyProviderTransport
+    );
+}
+
+function resolveSurfaceTransportSubset(values, allowedTransports, fallbackToAllowed = false) {
+    if (!Array.isArray(values)) {
+        return fallbackToAllowed === true
+            ? Object.freeze([...allowedTransports])
+            : Object.freeze([]);
+    }
+    const allowedSet = new Set(allowedTransports);
+    const sanitized = sanitizeUniqueStringArray(values, normalizeLobbyProviderTransport)
+        .filter((transport) => allowedSet.has(transport));
+    return Object.freeze(sanitized);
+}
+
+function resolveSurfaceDefaultMultiplayerTransport(surfacePolicy, allowedMultiplayerTransports) {
+    const fallbackTransport = allowedMultiplayerTransports[0] || MULTIPLAYER_TRANSPORTS.LAN;
+    return normalizeLobbyProviderTransport(surfacePolicy?.defaultMultiplayerTransport, fallbackTransport);
+}
+
 function resolveSurfaceAllowedQuickStartActionIds(surfacePolicy) {
     return sanitizeUniqueStringArray(
         surfacePolicy?.allowedQuickStartActionIds,
@@ -374,12 +403,17 @@ export function resolvePlatformEnvironment(options = {}) {
             defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY,
             multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY,
         };
+    const allowedMultiplayerTransports = resolveSurfaceAllowedMultiplayerTransports(surfacePolicy);
+    const defaultMultiplayerTransport = resolveSurfaceDefaultMultiplayerTransport(
+        surfacePolicy,
+        allowedMultiplayerTransports
+    );
     return Object.freeze({
         contractVersion: PLATFORM_CAPABILITY_REGISTRY.contractVersion,
         surfacePolicyContractVersion: PLATFORM_SURFACE_POLICY_CONTRACT_VERSION,
         productSurfaceId,
         runtimeKind,
-        defaultLobbyTransport: productEntry.defaultLobbyTransport,
+        defaultLobbyTransport: defaultMultiplayerTransport,
         toolingSurfaceId: productEntry.toolingSurfaceId,
         defaultAccessMode: resolveSurfaceDefaultAccessMode(surfacePolicy),
         multiplayerRole: normalizeString(
@@ -403,6 +437,8 @@ export function resolveSurfacePolicy(options = {}) {
     const policy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
         ? productEntry.surfacePolicy
         : null;
+    const allowedSessionTypes = resolveSurfaceAllowedSessionTypes(policy);
+    const allowedMultiplayerTransports = resolveSurfaceAllowedMultiplayerTransports(policy);
     const allowedModePaths = resolveSurfaceAllowedModePaths(policy);
     const allowedQuickStartActionIds = resolveSurfaceAllowedQuickStartActionIds(policy);
     const allowedPresetIds = resolveSurfaceAllowedPresetIds(policy);
@@ -410,6 +446,24 @@ export function resolveSurfacePolicy(options = {}) {
     const allowedGameModes = Array.isArray(policy?.allowedGameModes)
         ? Object.freeze([...policy.allowedGameModes])
         : Object.freeze([]);
+    const defaultMultiplayerTransport = resolveSurfaceDefaultMultiplayerTransport(
+        policy,
+        allowedMultiplayerTransports
+    );
+    const hostMultiplayerTransports = resolveSurfaceTransportSubset(
+        policy?.hostMultiplayerTransports,
+        allowedMultiplayerTransports,
+        true
+    );
+    const joinMultiplayerTransports = resolveSurfaceTransportSubset(
+        policy?.joinMultiplayerTransports,
+        allowedMultiplayerTransports,
+        true
+    );
+    const legacyMultiplayerTransports = resolveSurfaceTransportSubset(
+        policy?.legacyMultiplayerTransports,
+        Object.values(MULTIPLAYER_TRANSPORTS)
+    );
 
     return Object.freeze({
         contractVersion: PLATFORM_SURFACE_POLICY_CONTRACT_VERSION,
@@ -419,6 +473,12 @@ export function resolveSurfacePolicy(options = {}) {
             policy?.multiplayerRole,
             PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
         ),
+        allowedSessionTypes,
+        defaultMultiplayerTransport,
+        allowedMultiplayerTransports,
+        hostMultiplayerTransports,
+        joinMultiplayerTransports,
+        legacyMultiplayerTransports,
         defaultModePath: resolveSurfaceDefaultModePath(policy, allowedModePaths),
         allowedGameModes,
         allowedModePaths,
@@ -505,19 +565,24 @@ export function resolveSurfaceCapabilityAccess(capabilityId, options = {}) {
     });
 }
 
+export function isLegacyLobbyTransport(transport) {
+    const normalized = normalizeString(transport, '').toLowerCase();
+    return normalized === MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
+}
+
 export function resolveLobbyProviderKind(
     transport,
-    fallback = PLATFORM_PROVIDER_KINDS.MENU_STORAGE_BRIDGE
+    fallback = PLATFORM_PROVIDER_KINDS.MENU_LAN_LOBBY
 ) {
     const normalizedTransport = normalizeLobbyProviderTransport(transport, fallback === ''
         ? ''
-        : MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE);
+        : MULTIPLAYER_TRANSPORTS.LAN);
     if (!normalizedTransport) {
-        return normalizeString(fallback, PLATFORM_PROVIDER_KINDS.MENU_STORAGE_BRIDGE);
+        return normalizeString(fallback, PLATFORM_PROVIDER_KINDS.MENU_LAN_LOBBY);
     }
     return normalizeString(
         PLATFORM_CAPABILITY_REGISTRY.lobbyProviders[normalizedTransport],
-        normalizeString(fallback, PLATFORM_PROVIDER_KINDS.MENU_STORAGE_BRIDGE)
+        normalizeString(fallback, PLATFORM_PROVIDER_KINDS.MENU_LAN_LOBBY)
     );
 }
 
