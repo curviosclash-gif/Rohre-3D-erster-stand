@@ -376,8 +376,14 @@ Stand: 2026-04-13
 
 - `src/shared/contracts/PlatformCapabilityRegistry.js` fuehrt pro Produktrolle einen expliziten `surfacePolicy`-Block (`defaultAccessMode`, `multiplayerRole`, `allowedGameModes`, `requiresCuratedMaps`) und exportiert den konsumierbaren Resolver `resolveSurfacePolicy()`.
 - `desktop-app` bleibt im Vertrag `default-full` mit Rolle `host-and-join`; `browser-demo` bleibt `default-deny` mit Rolle `join-only` und kuratiertem Map-/Mode-Scope.
-- Browser-`HOST` wird jetzt auch im Registry-Providervertrag explizit auf `PLATFORM_PROVIDER_KINDS.UNAVAILABLE` aufgeloest, sobald die Capability nicht verfuegbar ist; der zuvor nur dokumentierte `Nicht verfuegbar`-Pfad ist damit technisch und dokumentarisch deckungsgleich.
+- Browser-`HOST` ist im Registry-Providervertrag explizit als deaktivierter Capability-Pfad modelliert (`enabled: false`) und wird dadurch deterministisch auf `PLATFORM_PROVIDER_KINDS.UNAVAILABLE` aufgeloest; der zuvor nur dokumentierte `Nicht verfuegbar`-Pfad bleibt damit technisch und dokumentarisch deckungsgleich.
 - `tests/platform-capabilities.contract.test.mjs` prueft den Surface-Policy-Resolver sowie die Browser-`HOST`-Aufloesung, damit Folgearbeit denselben Vertragskern nutzt statt neue Ad-hoc-Flags einzufuehren.
+
+#### 4.6.4.7 Surface-Capability-Verbrauch und Default-Regel (`V77 77.2.2` / `77.2.3`)
+
+- Menue-, Discovery-, Host-IP-, Recording- und Replay-Gates lesen denselben Resolver `resolveSurfaceCapabilityAccess()` statt separater Runtime-/Umgebungspruefungen (`MenuRuntimeFeatureFlags`, `MenuMultiplayerDiscoveryPort`, `MenuMultiplayerHostIpResolver`, `DownloadService`, `ReplayRecorder`).
+- `resolveSurfaceCapabilityAccess()` unterscheidet explizite Capability-Mappings von policy-basierten Fallbacks: explizite Eintraege (z. B. Browser-`SAVE`) bleiben Opt-in, deaktivierte Eintraege (z. B. Browser-`HOST` mit `enabled: false`) bleiben hart denylisted.
+- Fuer unbekannte Capabilities greift jetzt dieselbe Surface-Regel zentral: `desktop-app` erbt `default-full`, `browser-demo` erbt `default-deny`; das Ergebnis wird als `resolvedByDefaultPolicy` markiert, damit Folgearbeit Default-Freigaben gegen explizite Provider-Mappings trennen kann.
 
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 

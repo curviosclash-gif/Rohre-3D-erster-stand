@@ -3,6 +3,8 @@ import {
     createElectronPreloadHostAdapter,
     isElectronPreloadRuntime,
 } from '../../../platform/electron/ElectronPlatformBridge.js';
+import { PLATFORM_CAPABILITY_IDS } from '../../../shared/contracts/PlatformCapabilityContract.js';
+import { resolveSurfaceCapabilityAccess } from '../../../shared/contracts/PlatformCapabilityRegistry.js';
 import { resolveGlobalObject, toCallable } from './MenuMultiplayerBridgeRuntime.js';
 
 function normalizeIp(value) {
@@ -56,7 +58,10 @@ function resolveLocalIpWithWebRtc({ runtimeGlobal, timeoutMs = 2000 } = {}) {
 }
 
 async function resolveFromDiscoveryEndpoint(options) {
-    const { runtimeGlobal, discoveryRuntime } = options;
+    const { runtimeGlobal, discoveryRuntime, hostSurfaceCapability } = options;
+    if (hostSurfaceCapability?.available !== true) {
+        return null;
+    }
     if (typeof discoveryRuntime?.isAvailable === 'function' && discoveryRuntime.isAvailable() !== true) {
         return null;
     }
@@ -86,6 +91,9 @@ async function resolveFromDiscoveryEndpoint(options) {
 
 export function createMenuMultiplayerHostIpResolver(options = {}) {
     const runtimeGlobal = resolveGlobalObject(options.runtime);
+    const hostSurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.HOST, {
+        runtimeGlobal,
+    });
     const discoveryRuntime = options.discoveryRuntime && typeof options.discoveryRuntime === 'object'
         ? options.discoveryRuntime
         : (isElectronPreloadRuntime(runtimeGlobal)
@@ -96,6 +104,9 @@ export function createMenuMultiplayerHostIpResolver(options = {}) {
     let cachedPromise = null;
 
     async function resolveHostIp() {
+        if (hostSurfaceCapability.available !== true) {
+            return 'localhost';
+        }
         if (customResolveHostIp) {
             return normalizeIp(await customResolveHostIp());
         }
@@ -103,6 +114,7 @@ export function createMenuMultiplayerHostIpResolver(options = {}) {
         const discoveryIp = await resolveFromDiscoveryEndpoint({
             runtimeGlobal,
             discoveryRuntime,
+            hostSurfaceCapability,
             fetch: options.fetch,
         });
         if (discoveryIp) return discoveryIp;

@@ -5,6 +5,8 @@
 import { createGameStateSnapshot } from '../GameStateSnapshot.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
+import { PLATFORM_CAPABILITY_IDS } from '../../shared/contracts/PlatformCapabilityContract.js';
+import { resolveSurfaceCapabilityAccess } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 
 export const REPLAY_EXPORT_CONTRACT_VERSION = 'replay.v1';
 
@@ -113,6 +115,9 @@ export class ReplayRecorder {
         const json = this.exportReplayJSON();
         const filename = `replay-${this._matchId || Date.now()}.json`;
         const runtimeGlobal = typeof window !== 'undefined' ? window : globalThis;
+        const saveSurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
+            runtimeGlobal,
+        });
         const desktopSaveAdapter = createElectronPreloadSaveAdapter(runtimeGlobal);
 
         // App mode: Electron IPC
@@ -123,13 +128,15 @@ export class ReplayRecorder {
 
         // Web mode: use provided download function (from UI layer)
         const browserSaveAdapter = createBrowserSaveAdapter({
-            saveReplay: (payload, fileName) => {
-                if (typeof downloadFn !== 'function') {
-                    return { saved: false };
+            saveReplay: saveSurfaceCapability.available === true
+                ? (payload, fileName) => {
+                    if (typeof downloadFn !== 'function') {
+                        return { saved: false };
+                    }
+                    downloadFn(payload, fileName);
+                    return { saved: true };
                 }
-                downloadFn(payload, fileName);
-                return { saved: true };
-            },
+                : null,
         });
         if (browserSaveAdapter.isAvailable()) {
             const result = await browserSaveAdapter.saveReplay(json, filename);

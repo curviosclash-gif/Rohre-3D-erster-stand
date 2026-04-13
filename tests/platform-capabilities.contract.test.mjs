@@ -18,10 +18,13 @@ import {
     PLATFORM_SURFACE_MULTIPLAYER_ROLES,
     PLATFORM_SURFACE_POLICY_MODES,
     resolveCapabilityProviderKind,
+    resolveSurfaceCapabilityAccess,
     resolveSurfacePolicy,
 } from '../src/shared/contracts/PlatformCapabilityRegistry.js';
 import { StoragePlatform } from '../src/state/storage/StoragePlatform.js';
+import { resolveRuntimeMenuFeatureFlags } from '../src/ui/menu/MenuRuntimeFeatureFlags.js';
 import { createMenuMultiplayerDiscoveryPort } from '../src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js';
+import { createMenuMultiplayerHostIpResolver } from '../src/ui/menu/multiplayer/MenuMultiplayerHostIpResolver.js';
 
 test('V87.3 Electron discovery adapter suppresses stale capability availability without intents', () => {
     const runtimeGlobal = {
@@ -105,6 +108,79 @@ test('V77.2.1 browser host provider resolves unavailable when host capability is
         available: false,
     });
     assert.equal(providerKind, PLATFORM_PROVIDER_KINDS.UNAVAILABLE);
+});
+
+test('V77.2.2 surface capability access resolves host denylist and discovery allowlist per product surface', () => {
+    const desktopHost = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.HOST, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserHost = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.HOST, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const browserDiscovery = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.DISCOVERY, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopHost.available, true);
+    assert.equal(desktopHost.providerKind, PLATFORM_PROVIDER_KINDS.ELECTRON_IPC);
+    assert.equal(browserHost.available, false);
+    assert.equal(browserHost.providerKind, PLATFORM_PROVIDER_KINDS.UNAVAILABLE);
+    assert.equal(browserDiscovery.available, true);
+    assert.equal(browserDiscovery.providerKind, PLATFORM_PROVIDER_KINDS.BROWSER_DEMO);
+});
+
+test('V77.2.3 default access mode resolves unknown capabilities as default-full (desktop) and default-deny (browser)', () => {
+    const desktopUnknown = resolveSurfaceCapabilityAccess('future-surface-feature', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserUnknown = resolveSurfaceCapabilityAccess('future-surface-feature', {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopUnknown.defaultAccessMode, PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL);
+    assert.equal(desktopUnknown.available, true);
+    assert.equal(desktopUnknown.providerKind, PLATFORM_PROVIDER_KINDS.ELECTRON_IPC);
+    assert.equal(desktopUnknown.resolvedByDefaultPolicy, true);
+
+    assert.equal(browserUnknown.defaultAccessMode, PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY);
+    assert.equal(browserUnknown.available, false);
+    assert.equal(browserUnknown.providerKind, PLATFORM_PROVIDER_KINDS.UNAVAILABLE);
+    assert.equal(browserUnknown.resolvedByDefaultPolicy, true);
+});
+
+test('V77.2.3 explicit browser save capability stays opt-in and bypasses default deny fallback', () => {
+    const browserSave = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(browserSave.available, true);
+    assert.equal(browserSave.providerKind, PLATFORM_PROVIDER_KINDS.BROWSER_DOWNLOAD);
+    assert.equal(browserSave.resolvedByDefaultPolicy, false);
+});
+
+test('V77.2.2 runtime menu feature flags read host access from surface capability contract', () => {
+    const desktopFlags = resolveRuntimeMenuFeatureFlags(null, {
+        __CURVIOS_APP__: true,
+        curviosApp: { isApp: true },
+    });
+    const browserFlags = resolveRuntimeMenuFeatureFlags(null, {});
+
+    assert.equal(desktopFlags.canHost, true);
+    assert.equal(browserFlags.canHost, false);
+});
+
+test('V77.2.2 browser host IP resolver stays on localhost when surface policy denies hosting', async () => {
+    let customCalls = 0;
+    const resolver = createMenuMultiplayerHostIpResolver({
+        runtime: {},
+        resolveHostIp: async () => {
+            customCalls += 1;
+            return '192.168.0.10';
+        },
+    });
+
+    assert.equal(await resolver.resolve(), 'localhost');
+    assert.equal(customCalls, 0);
 });
 
 test('V87.99 StoragePlatform surfaces partial legacy migrations when legacy-key removal fails', () => {

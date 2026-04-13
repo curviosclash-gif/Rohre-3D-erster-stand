@@ -3,6 +3,8 @@ import {
     createElectronPreloadDiscoveryAdapter,
     isElectronPreloadRuntime,
 } from '../../../platform/electron/ElectronPlatformBridge.js';
+import { PLATFORM_CAPABILITY_IDS } from '../../../shared/contracts/PlatformCapabilityContract.js';
+import { resolveSurfaceCapabilityAccess } from '../../../shared/contracts/PlatformCapabilityRegistry.js';
 import { resolveGlobalObject, toCallable } from './MenuMultiplayerBridgeRuntime.js';
 
 const NOOP_UNSUBSCRIBE = () => {};
@@ -13,6 +15,9 @@ function toHostList(value) {
 
 export function createMenuMultiplayerDiscoveryPort(options = {}) {
     const runtimeGlobal = resolveGlobalObject(options.runtime);
+    const discoverySurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.DISCOVERY, {
+        runtimeGlobal,
+    });
     const discoveryRuntime = options.discoveryRuntime && typeof options.discoveryRuntime === 'object'
         ? options.discoveryRuntime
         : (isElectronPreloadRuntime(runtimeGlobal)
@@ -25,6 +30,9 @@ export function createMenuMultiplayerDiscoveryPort(options = {}) {
     const onDiscoveredHosts = toCallable(discoveryRuntime?.onDiscoveredHosts, null);
 
     function isAvailable() {
+        if (discoverySurfaceCapability.available !== true) {
+            return false;
+        }
         if (typeof discoveryRuntime?.isAvailable === 'function') {
             return discoveryRuntime.isAvailable() === true;
         }
@@ -35,6 +43,9 @@ export function createMenuMultiplayerDiscoveryPort(options = {}) {
     }
 
     function start() {
+        if (!isAvailable()) {
+            return;
+        }
         startDiscovery?.call(discoveryRuntime);
     }
 
@@ -43,6 +54,9 @@ export function createMenuMultiplayerDiscoveryPort(options = {}) {
     }
 
     async function getHosts() {
+        if (discoverySurfaceCapability.available !== true) {
+            return [];
+        }
         if (!getDiscoveredHosts) return [];
         try {
             const hosts = await getDiscoveredHosts.call(discoveryRuntime);
@@ -53,6 +67,9 @@ export function createMenuMultiplayerDiscoveryPort(options = {}) {
     }
 
     function subscribe(onHostsChanged) {
+        if (discoverySurfaceCapability.available !== true) {
+            return NOOP_UNSUBSCRIBE;
+        }
         if (!onDiscoveredHosts || typeof onHostsChanged !== 'function') {
             return NOOP_UNSUBSCRIBE;
         }

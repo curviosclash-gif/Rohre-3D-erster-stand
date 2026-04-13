@@ -1,5 +1,7 @@
 import { EDITOR_API_ROUTES } from '../../shared/contracts/EditorPathContract.js';
 import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
+import { PLATFORM_CAPABILITY_IDS } from '../../shared/contracts/PlatformCapabilityContract.js';
+import { resolveSurfaceCapabilityAccess } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
 
@@ -123,22 +125,30 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     }
     const safeFileName = String(fileName || '').trim();
     const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
+    const saveSurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
+        runtimeGlobal: globalThis,
+    });
     const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
     const desktopSaveAdapterVersionSupported = isSupportedDesktopSaveAdapterContract(desktopSaveAdapter);
     const browserSaveAdapter = createBrowserSaveAdapter({
-        saveVideo: (payload, downloadFileName, resolvedMimeType) => {
-            const blobPayload = payload instanceof Blob
-                ? payload
-                : new Blob([payload], { type: resolvedMimeType || mimeType || 'application/octet-stream' });
-            downloadHandler({ blob: blobPayload, fileName: downloadFileName, mimeType: resolvedMimeType || mimeType });
-            return {
-                saved: true,
-                transport: 'download',
-            };
-        },
+        saveVideo: saveSurfaceCapability.available === true
+            ? (payload, downloadFileName, resolvedMimeType) => {
+                const blobPayload = payload instanceof Blob
+                    ? payload
+                    : new Blob([payload], { type: resolvedMimeType || mimeType || 'application/octet-stream' });
+                downloadHandler({ blob: blobPayload, fileName: downloadFileName, mimeType: resolvedMimeType || mimeType });
+                return {
+                    saved: true,
+                    transport: 'download',
+                };
+            }
+            : null,
     });
     const statusWarnings = [];
     const downloadViaBrowser = async (reason, error = null) => {
+        if (saveSurfaceCapability.available !== true) {
+            return false;
+        }
         if (error) {
             logger?.warn?.(`[DownloadService] recording export fallback (${reason})`, error);
         }

@@ -119,6 +119,7 @@ export const PLATFORM_CAPABILITY_REGISTRY = Object.freeze({
             capabilities: Object.freeze({
                 [PLATFORM_CAPABILITY_IDS.DISCOVERY]: PLATFORM_PROVIDER_KINDS.BROWSER_DEMO,
                 [PLATFORM_CAPABILITY_IDS.HOST]: Object.freeze({
+                    enabled: false,
                     available: PLATFORM_PROVIDER_KINDS.BROWSER_DEMO,
                     unavailable: PLATFORM_PROVIDER_KINDS.UNAVAILABLE,
                 }),
@@ -173,11 +174,59 @@ export function resolvePlatformProductSurfaceId(options = {}) {
         : PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO;
 }
 
+function resolveProductEntry(productSurfaceId) {
+    return PLATFORM_CAPABILITY_REGISTRY.products[productSurfaceId]
+        || PLATFORM_CAPABILITY_REGISTRY.products[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO];
+}
+
+function resolveSurfaceCapabilitySpec(capabilityId, options = {}) {
+    const normalizedCapabilityId = normalizeString(capabilityId, '');
+    if (!normalizedCapabilityId) {
+        return null;
+    }
+    const productSurfaceId = resolvePlatformProductSurfaceId(options);
+    return resolveProductEntry(productSurfaceId)?.capabilities?.[normalizedCapabilityId] || null;
+}
+
+function resolveSurfaceDefaultAccessMode(surfacePolicy) {
+    return normalizeString(
+        surfacePolicy?.defaultAccessMode,
+        PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY
+    );
+}
+
+function resolveSurfaceDefaultProviderKind(productSurfaceId, defaultAccessMode) {
+    if (defaultAccessMode !== PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL) {
+        return PLATFORM_PROVIDER_KINDS.UNAVAILABLE;
+    }
+    if (productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP) {
+        return PLATFORM_PROVIDER_KINDS.ELECTRON_IPC;
+    }
+    if (productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO) {
+        return PLATFORM_PROVIDER_KINDS.BROWSER_DEMO;
+    }
+    return PLATFORM_PROVIDER_KINDS.UNAVAILABLE;
+}
+
+function resolveSurfaceCapabilityConfiguredAvailability(providerSpec, fallbackAvailable = false) {
+    if (providerSpec && typeof providerSpec === 'object') {
+        if (Object.prototype.hasOwnProperty.call(providerSpec, 'enabled')) {
+            return providerSpec.enabled === true;
+        }
+        return normalizeString(providerSpec.available, PLATFORM_PROVIDER_KINDS.UNAVAILABLE)
+            !== PLATFORM_PROVIDER_KINDS.UNAVAILABLE;
+    }
+    if (typeof providerSpec !== 'string') {
+        return fallbackAvailable === true;
+    }
+    return normalizeString(providerSpec, PLATFORM_PROVIDER_KINDS.UNAVAILABLE)
+        !== PLATFORM_PROVIDER_KINDS.UNAVAILABLE;
+}
+
 export function resolvePlatformEnvironment(options = {}) {
     const productSurfaceId = resolvePlatformProductSurfaceId(options);
     const runtimeKind = resolvePlatformRuntimeKind(options);
-    const productEntry = PLATFORM_CAPABILITY_REGISTRY.products[productSurfaceId]
-        || PLATFORM_CAPABILITY_REGISTRY.products[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO];
+    const productEntry = resolveProductEntry(productSurfaceId);
     const surfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
         ? productEntry.surfacePolicy
         : {
@@ -191,10 +240,7 @@ export function resolvePlatformEnvironment(options = {}) {
         runtimeKind,
         defaultLobbyTransport: productEntry.defaultLobbyTransport,
         toolingSurfaceId: productEntry.toolingSurfaceId,
-        defaultAccessMode: normalizeString(
-            surfacePolicy.defaultAccessMode,
-            PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY
-        ),
+        defaultAccessMode: resolveSurfaceDefaultAccessMode(surfacePolicy),
         multiplayerRole: normalizeString(
             surfacePolicy.multiplayerRole,
             PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
@@ -212,8 +258,7 @@ export function resolveDefaultLobbyTransport(options = {}) {
 
 export function resolveSurfacePolicy(options = {}) {
     const productSurfaceId = resolvePlatformProductSurfaceId(options);
-    const productEntry = PLATFORM_CAPABILITY_REGISTRY.products[productSurfaceId]
-        || PLATFORM_CAPABILITY_REGISTRY.products[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO];
+    const productEntry = resolveProductEntry(productSurfaceId);
     const policy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
         ? productEntry.surfacePolicy
         : null;
@@ -224,16 +269,51 @@ export function resolveSurfacePolicy(options = {}) {
     return Object.freeze({
         contractVersion: PLATFORM_SURFACE_POLICY_CONTRACT_VERSION,
         productSurfaceId,
-        defaultAccessMode: normalizeString(
-            policy?.defaultAccessMode,
-            PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY
-        ),
+        defaultAccessMode: resolveSurfaceDefaultAccessMode(policy),
         multiplayerRole: normalizeString(
             policy?.multiplayerRole,
             PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
         ),
         allowedGameModes,
         requiresCuratedMaps: policy?.requiresCuratedMaps === true,
+    });
+}
+
+export function resolveSurfaceCapabilityAccess(capabilityId, options = {}) {
+    const normalizedCapabilityId = normalizeString(capabilityId, '');
+    const hasCapabilityId = normalizedCapabilityId.length > 0;
+    const productSurfaceId = resolvePlatformProductSurfaceId(options);
+    const productEntry = resolveProductEntry(productSurfaceId);
+    const providerSpec = hasCapabilityId
+        ? resolveSurfaceCapabilitySpec(normalizedCapabilityId, { productSurfaceId })
+        : null;
+    const surfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
+        ? productEntry.surfacePolicy
+        : null;
+    const defaultAccessMode = resolveSurfaceDefaultAccessMode(surfacePolicy);
+    const usesDefaultPolicy = hasCapabilityId && providerSpec === null;
+    const configuredAvailable = resolveSurfaceCapabilityConfiguredAvailability(
+        providerSpec,
+        usesDefaultPolicy && defaultAccessMode === PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL
+    );
+    const providerKind = usesDefaultPolicy
+        ? resolveSurfaceDefaultProviderKind(productSurfaceId, defaultAccessMode)
+        : resolveCapabilityProviderKind(normalizedCapabilityId, {
+            productSurfaceId,
+            available: configuredAvailable,
+        });
+
+    return Object.freeze({
+        capabilityId: normalizedCapabilityId,
+        productSurfaceId,
+        available: configuredAvailable,
+        providerKind,
+        defaultAccessMode,
+        multiplayerRole: normalizeString(
+            surfacePolicy?.multiplayerRole,
+            PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
+        ),
+        resolvedByDefaultPolicy: usesDefaultPolicy,
     });
 }
 
@@ -256,9 +336,7 @@ export function resolveLobbyProviderKind(
 export function resolveCapabilityProviderKind(capabilityId, options = {}) {
     const normalizedCapabilityId = normalizeString(capabilityId, '');
     const productSurfaceId = resolvePlatformProductSurfaceId(options);
-    const productEntry = PLATFORM_CAPABILITY_REGISTRY.products[productSurfaceId]
-        || PLATFORM_CAPABILITY_REGISTRY.products[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO];
-    const providerSpec = productEntry.capabilities?.[normalizedCapabilityId];
+    const providerSpec = resolveSurfaceCapabilitySpec(normalizedCapabilityId, { productSurfaceId });
     if (providerSpec && typeof providerSpec === 'object') {
         return options.available === false
             ? normalizeString(providerSpec.unavailable, PLATFORM_PROVIDER_KINDS.UNAVAILABLE)
