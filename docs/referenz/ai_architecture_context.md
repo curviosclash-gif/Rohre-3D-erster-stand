@@ -398,6 +398,21 @@ Stand: 2026-04-13
 - Capability-Fallbacks muessen fuer Nutzer und Folge-Consumer denselben Sachverhalt ausdruecken wie der technische Vertrag: fehlender Browser-Storage, veralteter Desktop-Save-Adapter, unerreichbare Disk-API oder fehlender `editor/templates/**`-Pfad werden als bewusst formulierte Meldungen transportiert statt nur in Logs oder impliziten Nullpfaden zu verschwinden.
 - Match-/UI-nahe Verbraucher wie Config-Import-Status, Matchstart-Feedback fuer Custom-Maps oder spaetere Authoring-Consumer sollen dieselben strukturierten Meldungen direkt aus den Artefakt-/Capability-Helfern beziehen, statt eigene freie Text-Sonderfaelle neben dem Vertrag aufzubauen.
 
+#### 4.6.5.7 Sunset-Regeln fuer Legacy-, Shadow-Write- und Adapterpfade (`V85 85.5.1`)
+
+- V85 fuehrt keine neuen Legacy-Schreibpfade mehr ein: erstparteiliche Writer bleiben envelope-/schema-konform; Kompatibilitaet bleibt auf kontrollierte Read-/Import-Pfade beschraenkt.
+- Jeder verbleibende Fallback bekommt ein explizites Exit-Kriterium. Ohne dokumentierten Sunset-Trigger gilt der Pfad als unzulaessig fuer neue Arbeit.
+- Structured feedback bleibt verpflichtend bis zum Sunset: Legacy-/Capability-Fallbacks liefern weiter `reason`, `message`, `warnings` und optional `migration`, damit ein spaeteres Abschalten ohne stille Semantikbrueche moeglich bleibt.
+
+| Vertragsfamilie | Heutiger Uebergang | Sunset-Trigger |
+| --- | --- | --- |
+| Profile-Transfer (`profile-export.v1`) | Legacy-Import ohne `contractVersion` bleibt lesbar. | Deaktivieren, sobald UI/Tools/Doku envelope-only sind (`allowMissingVersion=false`). |
+| Replay-Export (`replay.v1`) | Shadow-Write mit `contractVersion` + Legacy-`version`. | Legacy-`version` erst entfernen, wenn alle bekannten Verbraucher `contractVersion`-only lesen. |
+| Settings-/Menu-/Arcade-Store-Migration | Legacy-Shapes werden gelesen und beim Laden auf Envelope rewritet. | Fallback nur solange externe Altbestaende erwartet sind; keine neuen Legacy-Writer. |
+| Editor-Disk-I/O (`editor-disk-io.v1`) | Missing `contractVersion` in Responses noch toleriert. | Nach durchgaengiger Renderer/API-Versionierung Missing-Version als Stand-Mismatch rejecten. |
+| Desktop-Save-Adapter (`preload.save.v1`) | Missing `contractVersion` aktuell kompatibel, explizit ungueltige Versionen rejecten. | Nach verbindlicher Preload-Contract-Auslieferung Missing-Version als inkompatibel behandeln. |
+| Map-Schema-Migration (`MAP_SCHEMA_VERSION`) | Legacy/schema v1-v3 Upgrade bleibt aktiv, Zukunftsversionen rejecten. | Nur nach dokumentiertem Authoring-Sunset fuer Alt-Maps weiter verengen; keine neuen Legacy-Sondershapes. |
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
