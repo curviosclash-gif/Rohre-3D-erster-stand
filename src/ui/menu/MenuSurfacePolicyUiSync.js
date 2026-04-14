@@ -1,11 +1,13 @@
 import { PLATFORM_SURFACE_QUICK_START_ACTION_IDS } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
+    PLATFORM_SURFACE_FEATURE_IDS,
     isSurfaceModePathAllowed,
     isSurfaceQuickStartActionAllowed,
     isSurfaceSessionTypeAllowed,
     resolveSurfaceMenuState,
     resolveSurfaceEntryCopy,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import { syncDesktopOnlyFeatureButton } from './MenuSurfaceFeatureAccess.js';
 
 export function syncMenuSurfacePolicyUi({
     ui,
@@ -121,6 +123,19 @@ export function syncMenuSurfacePolicyUi({
         ui.multiplayerJoinButton.textContent = surfaceEntryCopy?.joinButtonLabel || 'Join';
         ui.multiplayerJoinButton.title = surfaceEntryCopy?.joinButtonTitle || '';
     }
+
+    syncDesktopOnlyFeatureButton(
+        ui.openEditorButton,
+        surfacePolicy,
+        PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR,
+        '3D Map-Editor'
+    );
+    syncDesktopOnlyFeatureButton(
+        ui.openVehicleEditorButton,
+        surfacePolicy,
+        PLATFORM_SURFACE_FEATURE_IDS.VEHICLE_EDITOR,
+        'Vehicle-Editor'
+    );
 
     return {
         modePath,

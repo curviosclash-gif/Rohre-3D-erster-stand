@@ -430,8 +430,16 @@ Stand: 2026-04-14
 - `src/shared/contracts/PlatformSurfacePolicyOps.js` fuehrt mit `PLATFORM_SURFACE_FEATURE_IDS`, `PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS` und `resolveSurfaceFeatureClassification()` den zentralen Klassifizierungsvertrag fuer Replay, Video-Export, Dateioperationen, Diagnostics und Tooling ein.
 - Der Vertrag trennt produktive und degradierte Surface-Pfade explizit: `replay-export` ist in `browser-demo` `demo-safe`, `video-export`/`diagnostics` bleiben dort `future opt-in`, `file-io` bleibt `desktop-only`, und Tooling bleibt als lokaler Dev-/Diagnosepfad unter `legacy`.
 - `src/core/replay/ReplayRecorder.js` konsumiert die Replay-Klassifizierung direkt und erlaubt Browser-Persistenz nur ueber den expliziten `demo-safe`-Pfad, statt impliziter Save-Availability-Paritaet.
-- `src/core/recording/DownloadService.js` haengt die Video-Klassifizierung als `surfaceClassification` in den strukturierten Export-Status und markiert degradierten Browser-/Datei-Fallback ueber explizite Warnungen.
+- `src/core/recording/DownloadService.js` haengt die Video-Klassifizierung als `surfaceClassification` in den strukturierten Export-Status und blockiert Browser-Demo-Exports jetzt frueh ueber `surface_policy_blocked`, solange `video-export` nicht explizit `demo-safe` ist; Disk-API- und Browser-Download-Fallbacks bleiben damit ausserhalb des aktiven Demo-Korridors.
+- `map-editor` und `vehicle-editor` sind im selben Vertrag jetzt explizit `desktop-only`; `src/ui/menu/MenuSurfacePolicyUiSync.js` markiert beide Menue-Buttons in `browser-demo` sichtbar als `Nur Desktop`, und `src/ui/menu/MenuGameplayBindings.js` blockiert direkte `window.open(...)`-Starts ueber dieselbe Surface-Botschaft statt stiller Browser-Opens.
 - `tests/platform-capabilities.contract.test.mjs` haelt die Klassifizierungs-Matrix als Contract fest und schuetzt den Browser-Demo-Fallback zusaetzlich gegen nicht-kuratierte Map-Ausweichpfade.
+
+#### 4.6.4.14 Folgeblock-Spiegelvertrag fuer V64, V75 und V76 (`V77 77.6.1`)
+
+- `V64` konsumiert fuer Multiplayer denselben Surface-Layer wie V77: Produktrollen und Host-/Join-Gates kommen aus `resolveSurfacePolicy` und `resolveSurfaceMultiplayerGateAccess`; `browser-demo` bleibt `join-only`, ohne Browser-Host-Paritaet.
+- `V75` konsumiert fuer Recorder-Exports denselben Klassifizierungsvertrag: `video-export` bleibt in der Demo `future opt-in`; Browser-Fallbacks bleiben bis zu einem expliziten Demo-Mehrwert bewusst gesperrt.
+- `V76` konsumiert denselben Authoring-Vertrag: `map-editor` und `vehicle-editor` bleiben `desktop-only`; Hangar-/Werkstatt-Folgearbeit fuehrt keine browserseitigen `window.open(...)`-Paritaetspfade fuer Authoring ein.
+- Folgeblocks duerfen keine zweite Produktsprache neben `desktop-app` und `browser-demo` einfuehren; neue CTA-, Capability- und Fallback-Entscheide laufen ueber denselben Surface-Vertrag statt ueber blocklokale Sonderbegriffe.
 
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 

@@ -3,6 +3,7 @@ import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
 import { EDITOR_VIEW_PATHS } from '../../shared/contracts/EditorPathContract.js';
 import { normalizeShadowQuality } from '../../shared/contracts/ShadowQualityContract.js';
+import { PLATFORM_SURFACE_FEATURE_IDS } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import {
     createDefaultRecordingCaptureSettings,
     RECORDING_CAPTURE_PROFILE,
@@ -15,6 +16,7 @@ import {
 import { clamp } from '../../utils/MathOps.js';
 import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
 import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
+import { resolveSurfaceFeatureLaunchGuard } from './MenuSurfaceFeatureAccess.js';
 
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;
@@ -456,12 +458,30 @@ export function setupMenuGameplayBindings(ctx) {
 
     if (ui.openEditorButton) {
         bind(ui.openEditorButton, 'click', () => {
+            const featureAccess = resolveSurfaceFeatureLaunchGuard(
+                ctx.featureFlags?.surfacePolicy,
+                PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR,
+                '3D Map-Editor'
+            );
+            if (!featureAccess.allowed) {
+                emit(eventTypes.SHOW_STATUS_TOAST, featureAccess);
+                return;
+            }
             window.open(EDITOR_VIEW_PATHS.MAP_EDITOR, '_blank');
         });
     }
 
     if (ui.openVehicleEditorButton) {
         bind(ui.openVehicleEditorButton, 'click', () => {
+            const featureAccess = resolveSurfaceFeatureLaunchGuard(
+                ctx.featureFlags?.surfacePolicy,
+                PLATFORM_SURFACE_FEATURE_IDS.VEHICLE_EDITOR,
+                'Vehicle-Editor'
+            );
+            if (!featureAccess.allowed) {
+                emit(eventTypes.SHOW_STATUS_TOAST, featureAccess);
+                return;
+            }
             window.open(EDITOR_VIEW_PATHS.VEHICLE_LAB, '_blank');
         });
     }

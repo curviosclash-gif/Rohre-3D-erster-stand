@@ -1,10 +1,14 @@
 import { EDITOR_API_ROUTES } from '../../shared/contracts/EditorPathContract.js';
 import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
 import { PLATFORM_CAPABILITY_IDS } from '../../shared/contracts/PlatformCapabilityContract.js';
-import { resolveSurfaceCapabilityAccess } from '../../shared/contracts/PlatformCapabilityRegistry.js';
+import {
+    PLATFORM_PRODUCT_SURFACE_IDS,
+    resolveSurfaceCapabilityAccess,
+} from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
     PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS,
     PLATFORM_SURFACE_FEATURE_IDS,
+    resolveSurfaceBlockedFeatureFeedback,
     resolveSurfaceFeatureClassification,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
@@ -137,6 +141,26 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     }
     const safeFileName = String(fileName || '').trim();
     const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
+    const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
+    const isBrowserDemoSurface = videoFeatureClassification.productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO;
+    const browserVideoFallbackAllowed = !isBrowserDemoSurface
+        || videoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DEMO_SAFE;
+    if (!desktopSaveAdapter.isAvailable() && !browserVideoFallbackAllowed) {
+        const blockedFeatureFeedback = resolveSurfaceBlockedFeatureFeedback('Video-Export', {
+            runtimeGlobal: globalThis,
+        });
+        return createDownloadStatus({
+            requested: true,
+            transport: 'blocked',
+            status: 'surface_policy_blocked',
+            fallbackReason: 'surface-policy',
+            message: blockedFeatureFeedback.message,
+            warnings: [
+                'Video-Export bleibt fuer diese Surface ein future opt-in; Browser- und Disk-Fallbacks bleiben bis zu einem echten Demo-Mehrwert deaktiviert.',
+            ],
+            surfaceClassification: videoFeatureClassification.classification,
+        });
+    }
     const saveSurfaceCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
         runtimeGlobal: globalThis,
     });
@@ -144,10 +168,10 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
         PLATFORM_SURFACE_FEATURE_IDS.FILE_IO,
         { runtimeGlobal: globalThis }
     );
-    const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
     const desktopSaveAdapterVersionSupported = isSupportedDesktopSaveAdapterContract(desktopSaveAdapter);
     const browserSaveAdapter = createBrowserSaveAdapter({
         saveVideo: saveSurfaceCapability.available === true
+            && browserVideoFallbackAllowed
             ? (payload, downloadFileName, resolvedMimeType) => {
                 const blobPayload = payload instanceof Blob
                     ? payload
@@ -161,9 +185,6 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
             : null,
     });
     const statusWarnings = [];
-    if (videoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.FUTURE_OPT_IN) {
-        statusWarnings.push('Video-Export ist fuer diese Surface als future opt-in klassifiziert; Browser-Fallback bleibt ein degradiertes Zusatzangebot.');
-    }
     if (fileIoFeatureClassification.classification === PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY && !desktopSaveAdapter.isAvailable()) {
         statusWarnings.push('Dateioperationen bleiben desktop-only; ohne Desktop-Speicheradapter wird ein degradiertes Fallback genutzt.');
     }

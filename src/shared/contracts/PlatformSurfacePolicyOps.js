@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- central surface-policy contract is intentionally co-located */
 import {
     PLATFORM_CAPABILITY_IDS,
 } from './PlatformCapabilityContract.js';
@@ -28,6 +29,8 @@ export const PLATFORM_SURFACE_FEATURE_IDS = Object.freeze({
     FILE_IO: 'file-io',
     DIAGNOSTICS: 'diagnostics',
     TOOLING: 'tooling',
+    MAP_EDITOR: 'map-editor',
+    VEHICLE_EDITOR: 'vehicle-editor',
 });
 export const PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS = Object.freeze({
     DESKTOP_ONLY: 'desktop-only',
@@ -239,6 +242,22 @@ export function resolveSurfaceFeatureClassification(featureId, options = {}) {
                 ? 'Tooling bleibt lokaler Dev-/Diagnosezugang und zaehlt nicht zum Produktversprechen.'
                 : 'Tooling ist fuer diese Surface aktuell nicht freigegeben.',
         }),
+        [PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR]: Object.freeze({
+            featureId: PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR,
+            productSurfaceId: policy.productSurfaceId,
+            classification: PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY,
+            rationale: isBrowserDemo
+                ? 'Der Map-Editor bleibt eine Vollversions-Authoring-Funktion und ist in der Demo nicht verfuegbar.'
+                : 'Der Map-Editor gehoert zur Desktop-Vollversion und bleibt eine Authoring-Funktion.',
+        }),
+        [PLATFORM_SURFACE_FEATURE_IDS.VEHICLE_EDITOR]: Object.freeze({
+            featureId: PLATFORM_SURFACE_FEATURE_IDS.VEHICLE_EDITOR,
+            productSurfaceId: policy.productSurfaceId,
+            classification: PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY,
+            rationale: isBrowserDemo
+                ? 'Der Vehicle-Editor bleibt eine Vollversions-Funktion und ist in der Demo nicht verfuegbar.'
+                : 'Der Vehicle-Editor gehoert zur Desktop-Vollversion und bleibt eine lokale Tool-Funktion.',
+        }),
     });
     if (!normalizedFeatureId) {
         return Object.freeze({
@@ -337,11 +356,9 @@ export function resolveSurfaceBlockedFeatureFeedback(featureLabel = 'Diese Funkt
 }
 
 /**
- * Resolves the multiplayer gate access for a given action ('host', 'join', 'discover')
- * per surface. Encodes the group contract: desktop-app hosts and joins, browser-demo joins only.
- *
+ * Resolves the multiplayer gate access for a given action ('host', 'join', 'discover').
  * @param {'host'|'join'|'discover'} action
- * @param {object} options — must include productSurfaceId
+ * @param {object} options
  * @returns {{ allowed: boolean, action: string, productSurfaceId: string, multiplayerRole: string, reason: string, message: string, tone: string, durationMs: number }}
  */
 export function resolveSurfaceMultiplayerGateAccess(action, options = {}) {

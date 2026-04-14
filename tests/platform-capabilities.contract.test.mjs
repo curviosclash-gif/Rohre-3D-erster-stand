@@ -54,6 +54,7 @@ import {
 } from '../src/shared/contracts/PlatformSurfacePolicyOps.js';
 import { StoragePlatform } from '../src/state/storage/StoragePlatform.js';
 import { resolveRuntimeMenuFeatureFlags } from '../src/ui/menu/MenuRuntimeFeatureFlags.js';
+import { resolveSurfaceFeatureLaunchGuard } from '../src/ui/menu/MenuSurfaceFeatureAccess.js';
 import { createMenuMultiplayerDiscoveryPort } from '../src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js';
 import { createMenuMultiplayerHostIpResolver } from '../src/ui/menu/multiplayer/MenuMultiplayerHostIpResolver.js';
 
@@ -317,6 +318,47 @@ test('V77.5.1 surface feature classification keeps file IO desktop-only and tool
     assert.equal(browserFileIo.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
     assert.equal(desktopFileIo.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
     assert.equal(browserTooling.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.LEGACY);
+});
+
+test('V77.5.3 map and vehicle editors stay desktop-only full-version features', () => {
+    const browserMapEditor = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const desktopMapEditor = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserVehicleEditor = resolveSurfaceFeatureClassification(PLATFORM_SURFACE_FEATURE_IDS.VEHICLE_EDITOR, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(browserMapEditor.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
+    assert.equal(desktopMapEditor.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
+    assert.equal(browserVehicleEditor.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
+    assert.match(browserMapEditor.rationale, /Vollversions-Authoring-Funktion/);
+    assert.match(browserVehicleEditor.rationale, /Vollversions-Funktion/);
+});
+
+test('V77.5.3 launch guard blocks browser-demo editor entrypoints with structured feedback', () => {
+    const blockedMapEditor = resolveSurfaceFeatureLaunchGuard(
+        { productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO },
+        PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR,
+        '3D Map-Editor'
+    );
+    const allowedMapEditor = resolveSurfaceFeatureLaunchGuard(
+        { productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP },
+        PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR,
+        '3D Map-Editor'
+    );
+
+    assert.equal(blockedMapEditor.allowed, false);
+    assert.equal(blockedMapEditor.reason, 'surface_policy_blocked');
+    assert.equal(blockedMapEditor.tone, 'warning');
+    assert.equal(blockedMapEditor.durationMs, 1600);
+    assert.match(blockedMapEditor.message, /3D Map-Editor ist in dieser Demo nicht verfuegbar/);
+    assert.equal(blockedMapEditor.featureClassification?.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
+
+    assert.equal(allowedMapEditor.allowed, true);
+    assert.equal(allowedMapEditor.featureClassification?.classification, PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS.DESKTOP_ONLY);
 });
 
 test('V77.2.1 browser host provider resolves unavailable when host capability is disabled', () => {

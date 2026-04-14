@@ -1401,7 +1401,7 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
         expect(String(result.fileName || '')).not.toContain('invalid-date');
     });
 
-    test('T20ak1: Recorder-Export wartet auf API-Ergebnis und reportet Fallback-Status korrekt', async ({ page }) => {
+    test('T20ak1: Recorder-Export blockiert Browser-Demo-Fallbacks ohne echten Demo-Wert frueh', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const { MediaRecorderSystem } = await import('/src/core/MediaRecorderSystem.js');
@@ -1461,14 +1461,15 @@ test.describe('T1-20: Core & Infrastruktur - Runtime Loop, Recording & Prewarm',
             }
         });
 
-        expect(result.fetchCalls).toBeGreaterThanOrEqual(1);
-        expect(result.downloadCalls).toBe(1);
-        expect(result.elapsedUntilResolve).toBeGreaterThanOrEqual(12);
-        expect(result.exportStatus?.status).toBe('saved_via_download_fallback');
-        expect(result.stopResultExportStatus?.status).toBe('saved_via_download_fallback');
-        expect(result.stopResultTransport).toBe('api-fallback-download');
-        expect(result.exportStatus?.message).toContain('Browser-Download');
-        expect(Array.isArray(result.exportStatus?.warnings)).toBeTruthy();
+        expect(result.fetchCalls).toBe(0);
+        expect(result.downloadCalls).toBe(0);
+        expect(result.elapsedUntilResolve).toBeGreaterThanOrEqual(0);
+        expect(result.exportStatus?.status).toBe('surface_policy_blocked');
+        expect(result.stopResultExportStatus?.status).toBe('surface_policy_blocked');
+        expect(result.stopResultTransport).toBe('blocked');
+        expect(result.exportStatus?.message).toContain('Video-Export ist in dieser Demo nicht verfuegbar');
+        expect(result.exportStatus?.surfaceClassification).toBe('future opt-in');
+        expect(result.exportStatus?.warnings?.[0]).toContain('echten Demo-Mehrwert');
     });
 
     test('T20ae: Runtime-Dispose entfernt globale und Menue-Listener vor Reinit', async ({ page }) => {
