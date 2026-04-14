@@ -2,9 +2,8 @@ import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
 } from '../StorageKeys.js';
-import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
-import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
-import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
+import { PersistentStore } from '../base/PersistentStore.js';
+import { resolveStorePlatformOptions, loadVersionedRecord } from '../base/PersistentStoreLoadUtils.js';
 
 const MENU_TELEMETRY_STORAGE_KEY = STORAGE_KEYS.menuTelemetry;
 const MENU_TELEMETRY_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTelemetry;
@@ -218,50 +217,32 @@ export class MenuTelemetryStore extends PersistentStore {
     constructor(options = {}) {
         super({
             ...options,
-            storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
-                storage: options.storage ?? getDefaultBrowserStorage(),
-                onQuotaExceeded: options.onQuotaExceeded,
-            }),
-            storageKey: options.storageKey || MENU_TELEMETRY_STORAGE_KEY,
-            storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
-                ? [...options.storageLegacyKeys]
-                : [...MENU_TELEMETRY_STORAGE_LEGACY_KEYS],
+            ...resolveStorePlatformOptions(options, MENU_TELEMETRY_STORAGE_KEY, MENU_TELEMETRY_STORAGE_LEGACY_KEYS),
         });
     }
 
     _loadState() {
-        try {
-            const parsed = this.readJsonRecord(null);
-            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-                return createDefaultState();
-            }
-            const versionState = resolveArtifactVersionState(parsed, {
+        return loadVersionedRecord(
+            () => this.readJsonRecord(null),
+            {
                 artifactType: 'menu-telemetry',
-                versionFields: ['schemaVersion'],
-                supportedVersions: [MENU_TELEMETRY_STORAGE_SCHEMA_VERSION],
-                currentVersion: MENU_TELEMETRY_STORAGE_SCHEMA_VERSION,
-                allowMissingVersion: true,
-            });
-            if (versionState.shouldReject) {
-                return createDefaultState();
+                schemaVersion: MENU_TELEMETRY_STORAGE_SCHEMA_VERSION,
+                createDefault: createDefaultState,
+                transform: (parsed, versionState) => {
+                    const rawState = versionState.hasVersionField
+                        ? parsed?.state
+                        : (
+                            parsed?.state
+                            && typeof parsed.state === 'object'
+                            && !Array.isArray(parsed.state)
+                                ? parsed.state
+                                : parsed
+                        );
+                    return normalizeTelemetryState(rawState);
+                },
+                onUpgrade: (normalized) => this._saveState(normalized),
             }
-            const rawState = versionState.hasVersionField
-                ? parsed?.state
-                : (
-                    parsed?.state
-                    && typeof parsed.state === 'object'
-                    && !Array.isArray(parsed.state)
-                        ? parsed.state
-                        : parsed
-                );
-            const normalized = normalizeTelemetryState(rawState);
-            if (versionState.shouldFallback || versionState.shouldUpgrade) {
-                this._saveState(normalized);
-            }
-            return normalized;
-        } catch {
-            return createDefaultState();
-        }
+        );
     }
 
     _saveState(state) {

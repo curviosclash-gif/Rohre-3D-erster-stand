@@ -4,9 +4,8 @@ import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
 } from '../StorageKeys.js';
-import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
-import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
-import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
+import { PersistentStore } from '../base/PersistentStore.js';
+import { resolveStorePlatformOptions, loadVersionedRecord } from '../base/PersistentStoreLoadUtils.js';
 
 const MENU_DRAFT_STORAGE_KEY = STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuDrafts;
@@ -114,53 +113,35 @@ export class MenuDraftStore extends PersistentStore {
     constructor(options = {}) {
         super({
             ...options,
-            storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
-                storage: options.storage ?? getDefaultBrowserStorage(),
-                onQuotaExceeded: options.onQuotaExceeded,
-            }),
-            storageKey: options.storageKey || MENU_DRAFT_STORAGE_KEY,
-            storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
-                ? [...options.storageLegacyKeys]
-                : [...MENU_DRAFT_STORAGE_LEGACY_KEYS],
+            ...resolveStorePlatformOptions(options, MENU_DRAFT_STORAGE_KEY, MENU_DRAFT_STORAGE_LEGACY_KEYS),
         });
     }
 
     _loadStore() {
-        try {
-            const parsed = this.readJsonRecord(null);
-            if (!parsed || typeof parsed !== 'object') {
-                return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
-            }
-            const versionState = resolveArtifactVersionState(parsed, {
+        return loadVersionedRecord(
+            () => this.readJsonRecord(null),
+            {
                 artifactType: 'menu-draft-store',
-                versionFields: ['schemaVersion'],
-                supportedVersions: [MENU_DRAFT_STORAGE_SCHEMA_VERSION],
-                currentVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION,
-                allowMissingVersion: true,
-            });
-            if (versionState.shouldReject) {
-                return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
-            }
-            const rawDrafts = versionState.hasVersionField
-                ? parsed?.drafts
-                : (
-                    parsed?.drafts
-                    && typeof parsed.drafts === 'object'
-                    && !Array.isArray(parsed.drafts)
-                        ? parsed.drafts
-                        : parsed
-                );
-            const normalized = {
                 schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION,
-                drafts: rawDrafts && typeof rawDrafts === 'object' && !Array.isArray(rawDrafts) ? rawDrafts : {},
-            };
-            if (versionState.shouldFallback || versionState.shouldUpgrade) {
-                this._saveStore(normalized);
+                createDefault: () => ({ schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} }),
+                transform: (parsed, versionState) => {
+                    const rawDrafts = versionState.hasVersionField
+                        ? parsed?.drafts
+                        : (
+                            parsed?.drafts
+                            && typeof parsed.drafts === 'object'
+                            && !Array.isArray(parsed.drafts)
+                                ? parsed.drafts
+                                : parsed
+                        );
+                    return {
+                        schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION,
+                        drafts: rawDrafts && typeof rawDrafts === 'object' && !Array.isArray(rawDrafts) ? rawDrafts : {},
+                    };
+                },
+                onUpgrade: (normalized) => this._saveStore(normalized),
             }
-            return normalized;
-        } catch {
-            return { schemaVersion: MENU_DRAFT_STORAGE_SCHEMA_VERSION, drafts: {} };
-        }
+        );
     }
 
     _saveStore(store) {

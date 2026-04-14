@@ -2,9 +2,8 @@ import {
     LEGACY_STORAGE_KEYS,
     STORAGE_KEYS,
 } from '../StorageKeys.js';
-import { createDefaultStoragePlatform } from '../../state/storage/StoragePlatform.js';
-import { getDefaultBrowserStorage, PersistentStore } from '../base/PersistentStore.js';
-import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVersionMigrationContract.js';
+import { PersistentStore } from '../base/PersistentStore.js';
+import { resolveStorePlatformOptions, loadVersionedRecord } from '../base/PersistentStoreLoadUtils.js';
 
 const MENU_TEXT_OVERRIDE_STORAGE_KEY = STORAGE_KEYS.menuTextOverrides;
 const MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuTextOverrides;
@@ -35,46 +34,32 @@ export class MenuTextOverrideStore extends PersistentStore {
     constructor(options = {}) {
         super({
             ...options,
-            storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
-                storage: options.storage ?? getDefaultBrowserStorage(),
-                onQuotaExceeded: options.onQuotaExceeded,
-            }),
-            storageKey: options.storageKey || MENU_TEXT_OVERRIDE_STORAGE_KEY,
-            storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
-                ? [...options.storageLegacyKeys]
-                : [...MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS],
+            ...resolveStorePlatformOptions(options, MENU_TEXT_OVERRIDE_STORAGE_KEY, MENU_TEXT_OVERRIDE_STORAGE_LEGACY_KEYS),
         });
     }
 
     _loadRaw() {
-        try {
-            const parsed = this.readJsonRecord(null);
-            if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
-            const versionState = resolveArtifactVersionState(parsed, {
+        return loadVersionedRecord(
+            () => this.readJsonRecord(null),
+            {
                 artifactType: 'menu-text-overrides',
-                versionFields: ['schemaVersion'],
-                supportedVersions: [MENU_TEXT_OVERRIDE_STORAGE_SCHEMA_VERSION],
-                currentVersion: MENU_TEXT_OVERRIDE_STORAGE_SCHEMA_VERSION,
-                allowMissingVersion: true,
-            });
-            if (versionState.shouldReject) return {};
-            const rawOverrides = versionState.hasVersionField
-                ? parsed?.overrides
-                : (
-                    parsed?.overrides
-                    && typeof parsed.overrides === 'object'
-                    && !Array.isArray(parsed.overrides)
-                        ? parsed.overrides
-                        : parsed
-                );
-            const normalized = normalizeOverrides(rawOverrides);
-            if (versionState.shouldFallback || versionState.shouldUpgrade) {
-                this._saveRaw(normalized);
+                schemaVersion: MENU_TEXT_OVERRIDE_STORAGE_SCHEMA_VERSION,
+                createDefault: () => ({}),
+                transform: (parsed, versionState) => {
+                    const rawOverrides = versionState.hasVersionField
+                        ? parsed?.overrides
+                        : (
+                            parsed?.overrides
+                            && typeof parsed.overrides === 'object'
+                            && !Array.isArray(parsed.overrides)
+                                ? parsed.overrides
+                                : parsed
+                        );
+                    return normalizeOverrides(rawOverrides);
+                },
+                onUpgrade: (normalized) => this._saveRaw(normalized),
             }
-            return normalized;
-        } catch {
-            return {};
-        }
+        );
     }
 
     _saveRaw(rawOverrides) {

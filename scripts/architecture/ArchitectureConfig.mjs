@@ -45,20 +45,8 @@ const legacyUiToStateImportEntries = [
         'UI settings store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
     ),
     pair(
-        createEdgeKey('src/ui/menu/MenuDraftStore.js', 'src/state/storage/StoragePlatform.js'),
-        'Menu draft store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
-    ),
-    pair(
-        createEdgeKey('src/ui/menu/MenuPresetStore.js', 'src/state/storage/StoragePlatform.js'),
-        'Menu preset store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
-    ),
-    pair(
-        createEdgeKey('src/ui/menu/MenuTelemetryStore.js', 'src/state/storage/StoragePlatform.js'),
-        'Menu telemetry store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
-    ),
-    pair(
-        createEdgeKey('src/ui/menu/MenuTextOverrideStore.js', 'src/state/storage/StoragePlatform.js'),
-        'Menu text-override store still reuses shared storage platform contract pending complete command/reducer storage abstraction.'
+        createEdgeKey('src/ui/base/PersistentStoreLoadUtils.js', 'src/state/storage/StoragePlatform.js'),
+        'PersistentStoreLoadUtils centralises StoragePlatform construction for PersistentStore subclasses (V91 91.3.5: 4 per-store imports consolidated here).'
     ),
 ];
 
