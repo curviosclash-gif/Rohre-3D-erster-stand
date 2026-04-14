@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-15 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 ist abgeschlossen: `72.99` Gate gruen (2026-04-15); alle drei Pflicht-Gates und test:contract (120/120) bestanden; V82, V86 und V81 haben ihre V72.99-Abhaengigkeit jetzt erfuellt. V77 hat `77.6.1` abgeschlossen, spiegelt V64/V75/V76 jetzt explizit auf denselben Surface-Vertrag und haelt Vehicle- sowie Map-Editor weiterhin als Desktop-Vollversions-Funktionen im Menue-/Launch-Gate. V91 ist als Architektur-Ratchet nach `V77.99` eingeplant, damit Folgeblocks Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Contract-Tests gegen dieselbe Baseline lesen.)
+Stand: 2026-04-15 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V81 fuehrt den Expertenlogin als Dev-only-/Surface-Risiko (per V77 77.6.5 als lokaler Dev-only-Schalter entschieden), und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 ist abgeschlossen: `72.99` Gate gruen (2026-04-15); alle drei Pflicht-Gates und test:contract (120/120) bestanden; V82, V86 und V81 haben ihre V72.99-Abhaengigkeit jetzt erfuellt. V77 ist abgeschlossen: `77.99` Gate gruen (2026-04-15); Entscheidungsraster, Contract-Tests (36/36 gruen), Surface-Leseweg-Doku und Expert-Login-Entscheidung abgeschlossen; V91 und V64 haben ihre V77.99-Abhaengigkeit jetzt erfuellt. V91 ist als Architektur-Ratchet nach `V77.99` eingeplant, damit Folgeblocks Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Contract-Tests gegen dieselbe Baseline lesen.)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -42,7 +42,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V88 | Testarchitektur und Verifikationsvertraege | done | P2 | frei | V87.99 | 88.99 | `docs/plaene/aktiv/V88.md` |
 | V89 | Desktop-first Testarchitektur und Desktop-Verifikation | done | P1 | frei | V74.99,V88.99 | 89.99 | `docs/plaene/aktiv/V89.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
-| V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.6 | `docs/plaene/aktiv/V77.md` |
+| V77 | Desktop Vollversion Browser Demo Grenzen | done | P2 | frei | V74.99 | 77.99 | `docs/plaene/aktiv/V77.md` |
 | V91 | Architektur-Ratchet und Legacy-Surface-Sunset | planned | P2 | frei | V87.99,V77.99 | 91.1 | `docs/plaene/aktiv/V91.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
@@ -56,7 +56,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | --- | --- | --- | --- | --- |
 | V64 | V74.99 | hard | ja | Desktop-Multiplayer muss Lifecycle-, Capability- und Composition-Grenzen aus V74 uebernehmen; keine neuen `game.*`- oder private-Facade-Backdoors |
 | V64 | V50/V52 Netzwerk-Baseline | hard | ja | SessionAdapter-, Lobby-, Signaling- und `stateUpdate`-Grundvertraege bleiben verbindlich |
-| V64 | V77.99 | hard | nein | Multiplayer darf das Verkaufsversprechen `Vollversion hostet, Demo joint` erst nach verankerter Surface-Policy umsetzen |
+| V64 | V77.99 | hard | ja | Multiplayer darf das Verkaufsversprechen `Vollversion hostet, Demo joint` erst nach verankerter Surface-Policy umsetzen; V77.99 abgeschlossen 2026-04-15 |
 | V71 | V43-Strukturvertrag | hard | ja | Root-/Editor-Schutz und `EditorPathContract` bleiben bis nach 71.4 verbindlich; 71.4 ist abgeschlossen |
 | V71 | Playwright-/Warmup-Entstoerung fuer Restgate | hard | nein | `71.99` Abschluss-Gate blockiert; `tests/playwright.global-setup.js` mit `fetch failed`/Warmup-Hang offen |
 | V72 | V69.99 | hard | ja | Fight/Hunt-Item-, Rocket- und Shield-Baseline aus V69 bleibt Ausgangspunkt fuer Pickup-/Portal-/Gate-Vertraege |
@@ -79,20 +79,20 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V88 | V84.99 | soft | ja | Headless MatchKernel und gemeinsame GameMode-API liefern bevorzugte Kandidaten fuer niedrigere Contract-Testschichten unterhalb von Playwright |
 | V89 | V74.99 | hard | ja | Desktop-first-Tests duerfen keine `main.js`-/Runtime-Backdoors neu aufziehen; Runtime-/Capability-Grenzen aus V74 bleiben verbindlich |
 | V89 | V88.99 | hard | ja | Die neue Desktop-Testpyramide baut auf der in V88 dokumentierten Failure-Taxonomie, dem Test-Mapping und den bestehenden Verifikationsvertraegen auf |
-| V89 | V77.99 | soft | nein | Die Surface-Policy `Desktop Vollversion / Browser Demo` sollte in die finale Gate- und Browser-Compat-Rolle einfliessen, blockiert den Desktop-Smoke-Aufbau aber nicht |
+| V89 | V77.99 | soft | ja | Die Surface-Policy `Desktop Vollversion / Browser Demo` ist mit V77.99 verankert; V89 bleibt abgeschlossen |
 | V91 | V87.99 | hard | ja | Architektur-Ratchet und Legacy-Surface-Sunset bauen auf dem gehaerteten Runtime-, Lifecycle- und Capability-Kern aus V87 auf |
-| V91 | V77.99 | hard | nein | Guard-Matrix und Surface-nahe Sunset-Regeln sollen auf der verbindlichen `desktop-app`-/`browser-demo`-Policy aufsetzen statt parallel neue Produktbegriffe einzufuehren |
+| V91 | V77.99 | hard | ja | Guard-Matrix und Surface-nahe Sunset-Regeln sollen auf der verbindlichen `desktop-app`-/`browser-demo`-Policy aufsetzen; V77.99 abgeschlossen 2026-04-15 |
 | V91 | V89.99 | soft | ja | Desktop-first-Tests und `node-contract` liefern die bevorzugten kleinen Verifikationspfade fuer neue Architektur-Ratchets |
 | V64 | V91.99 | soft | nein | Multiplayer-Produktisierung sollte denselben Legacy-Sunset- und Guard-Ratchet konsumieren, bevor neue Runtime-Surfaces wachsen |
 | V86 | V72.99 | hard | ja | Editor- und Authoring-Vertraege sollen auf stabilen Pickup-, Portal-, Gate- und Spawn-Warnpfaden aus V72 aufsetzen |
 | V86 | V85.99 | soft | ja | Descriptor-, Preset- und Template-Leseweg konsumiert den in V85 finalisierten Content-Vertrag jetzt als Baseline |
 | V77 | V74.99 | hard | ja | Die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` darf erst auf der stabilisierten Runtime-/Capability-Basis aus V74 verankert werden |
 | V75 | V74.99 | hard | ja | Recorder-Finalisierung muss denselben Lifecycle-/Dispose-Vertrag wie V74 nutzen; keine parallelen Sonderpfade fuer Stop, Return-to-Menu oder Shutdown |
-| V75 | V77.99 | hard | nein | Export-, Download- und Browser-Fallbacks muessen der Demo-/Vollversions-Politik aus V77 folgen |
+| V75 | V77.99 | hard | ja | Export-, Download- und Browser-Fallbacks muessen der Demo-/Vollversions-Politik aus V77 folgen; V77.99 abgeschlossen 2026-04-15 |
 | V75 | V64.99 | hard | nein | Recorder-Polish folgt erst nach dem produktiven Host-/Join-Hauptpfad |
 | V75 | V72 Recorder-/Telemetry-Result-Codes | soft | nein | Nur relevant, falls Export-Diagnostik gemeinsam mit Gameplay-Result-Codes vereinheitlicht wird |
 | V76 | V71.4 | hard | ja | Vehicle-Lab- und Editor-Pfade sind seit `71.4` migrationssicher ueber Contracts/Guards abgesichert |
-| V76 | V77.99 | hard | nein | Hangar, Werkstatt und Editoren muessen die in V77 definierte Vollversions-/Demo-Rollenlogik uebernehmen |
+| V76 | V77.99 | hard | ja | Hangar, Werkstatt und Editoren muessen die in V77 definierte Vollversions-/Demo-Rollenlogik uebernehmen; V77.99 abgeschlossen 2026-04-15 |
 | V76 | V64.99 | hard | nein | Hangar-/Werkstatt-Flows starten erst nach dem festgezogenen Produktbild fuer Host/Join und Browser-Demo |
 | V76 | V74.99 | hard | ja | Hangar darf `main.js`, `GameRuntimeFacade` oder breite Desktop-Backdoors nicht erneut aufblasen; Navigations-/Composition-Grenzen aus V74 sind verbindlich |
 | V82 | V72.99 | hard | ja | Stabile Pickup-/Portal-/Gate-Vertraege als Basis fuer erweiterte Checkpoint-Logik und Parcours-Arcade-Vereinigung |
