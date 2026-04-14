@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-13 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 steht nach 72.5.3 in 72.6.1; V77 hat `77.4.1` abgeschlossen und koppelt den V64-Transportvertrag jetzt ueber dieselbe Surface-Transportmatrix an `desktop-app`/`browser-demo`, bevor `77.4.2` Legacy-Altpfade wie `storage-bridge` als Nicht-Standard haerter absichert. V91 ist als Architektur-Ratchet nach `V77.99` eingeplant, damit Folgeblocks Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Contract-Tests gegen dieselbe Baseline lesen.)
+Stand: 2026-04-14 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 steht nach 72.5.3 in 72.6.1; V77 hat `77.6.1` abgeschlossen, spiegelt V64/V75/V76 jetzt explizit auf denselben Surface-Vertrag und haelt Vehicle- sowie Map-Editor weiterhin als Desktop-Vollversions-Funktionen im Menue-/Launch-Gate. V91 ist als Architektur-Ratchet nach `V77.99` eingeplant, damit Folgeblocks Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Contract-Tests gegen dieselbe Baseline lesen.)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -36,13 +36,13 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag,Playwright-Warmup | 71.99 | `docs/plaene/aktiv/V71.md` |
-| V72 | Gameplay-Powerups, Portale und Gates | active | P1 | Agent-B | V69.99 | 72.6 | `docs/plaene/aktiv/V72.md` |
+| V72 | Gameplay-Powerups, Portale und Gates | active | P1 | frei | V69.99 | 72.6 | `docs/plaene/aktiv/V72.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | done | P2 | frei | V83.99 | 85.99 | `docs/plaene/aktiv/V85.md` |
 | V87 | Runtime-Hardening-Followup | done | P2 | frei | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
 | V88 | Testarchitektur und Verifikationsvertraege | done | P2 | frei | V87.99 | 88.99 | `docs/plaene/aktiv/V88.md` |
 | V89 | Desktop-first Testarchitektur und Desktop-Verifikation | done | P1 | frei | V74.99,V88.99 | 89.99 | `docs/plaene/aktiv/V89.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
-| V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.5 | `docs/plaene/aktiv/V77.md` |
+| V77 | Desktop Vollversion Browser Demo Grenzen | planned | P2 | frei | V74.99 | 77.6 | `docs/plaene/aktiv/V77.md` |
 | V91 | Architektur-Ratchet und Legacy-Surface-Sunset | planned | P2 | frei | V87.99,V77.99 | 91.1 | `docs/plaene/aktiv/V91.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
@@ -109,7 +109,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | --- | --- | --- | --- | --- |
 | - | V64 | - | frei | Nach `V77.99` `64.1` Transportmatrix und Capability-Modell fuer `Host Vollversion / Join Demo` konkretisieren |
 | - | V71 | - | frei | `71.99` nach Warmup-Entstoerung oder belastbarem Restgate schliessen |
-| Agent-B | V72 | 2026-04-02 | active | `72.5.3` abgeschlossen; `72.6.1` gleicht HUD-, Touch- und Action-Oberflaechen auf denselben Capability-/Cooldown-Vertrag ab |
+| - | V72 | 2026-04-14 | active | `72.6.1` abgeschlossen; naechster offener Schritt ist `72.6.2` fuer standardisierte Result-Codes auf Item-, Portal- und Gate-Interaktionen |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
 | - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
 | - | V84 | 2026-04-04 | closed | Abgeschlossen 2026-04-05: `84.99.2` dokumentiert Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
@@ -118,7 +118,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | - | V88 | - | closed | Abgeschlossen 2026-04-10: `88.99.2` synchronisiert Test-Mapping, Failure-Taxonomie und Doku auf den blockerfesten Gate-Stand |
 | - | V89 | - | closed | Abgeschlossen 2026-04-12: `89.99.2` synchronisiert Browser-/Desktop-/Contract-Layer widerspruchsfrei; `desktop-smoke` bleibt gruen, `node-contract`-Restfehler `T97` blockerfest dokumentiert |
 | - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
-| - | V77 | - | frei | `77.5.1` abgeschlossen; `77.5.2` schneidet als naechstes Browser-Fallbacks auf echten Demo-Wert zu |
+| - | V77 | - | frei | `77.6.1` abgeschlossen; `77.6.2` legt als naechstes ein leichtgewichtiges Entscheidungsraster fuer neue Features fest |
 | - | V91 | - | frei | Nach `V77.99` Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Ratchets fuer Folgeblocks `V64`, `V81` und `V86` festziehen |
 | - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
