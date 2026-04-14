@@ -140,7 +140,7 @@ export class HudRuntimeSystem {
 
         const sessionPlayers = Array.isArray(projection?.sessionPlayers)
             ? projection.sessionPlayers
-            : (game.runtimeFacade?.session?.getPlayers?.() || []);
+            : [];
 
         for (let i = 0; i < players.length; i++) {
             const p = players[i];

@@ -28,12 +28,11 @@ export class RoundStateTickSystem {
     _executeRoundStateTickAction(action) {
         const game = this.game;
         if (action === 'RETURN_TO_MENU') {
-            game.runtimeBundle?.ports?.lifecyclePort?.returnToMenu?.({ reason: 'round_state_return_to_menu' })
-                || game.runtimeFacade?.returnToMenu?.({ reason: 'round_state_return_to_menu' });
+            game.runtimeBundle?.ports?.lifecyclePort?.returnToMenu?.({ reason: 'round_state_return_to_menu' });
             return true;
         }
         if (action === 'START_ROUND') {
-            game.runtimeFacade?.restartRound?.();
+            game.runtimeBundle?.ports?.lifecyclePort?.restartRound?.();
             return true;
         }
         if (action === 'RESTART_MATCH') {

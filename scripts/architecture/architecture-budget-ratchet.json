@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-04-15",
+  "updatedAt": "2026-04-14",
   "budgets": {
     "constructorGameFiles": 8,
     "domAccessFiles": 8,
@@ -10,8 +10,8 @@
     "entitiesToCoreImportEdges": 3,
     "stateToCoreImportEdges": 0,
     "legacySurface_game_runtimeBundle_totalFiles": 2,
-    "legacySurface_game_runtimeFacade_totalFiles": 6,
+    "legacySurface_game_runtimeFacade_totalFiles": 2,
     "legacySurface_curviosApp_totalFiles": 3,
-    "legacySurface_ActiveRuntimeConfigStore_totalFiles": 4
+    "legacySurface_ActiveRuntimeConfigStore_totalFiles": 3
   }
 }

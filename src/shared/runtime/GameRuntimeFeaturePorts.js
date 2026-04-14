@@ -4,6 +4,10 @@ export function createArcadePort({ getRuntimeCoordinator, getRuntimeFacade }) {
             return getRuntimeCoordinator()?.getArcadeMenuSurfaceState?.()
                 ?? getRuntimeFacade()?.getArcadeMenuSurfaceState?.();
         },
+        tickSuddenDeath(dt) {
+            return getRuntimeCoordinator()?.tickArcadeSuddenDeath?.(dt)
+                ?? getRuntimeFacade()?.tickArcadeSuddenDeath?.(dt);
+        },
         selectIntermissionChoice(choiceId) {
             return getRuntimeCoordinator()?.selectArcadeIntermissionChoice?.(choiceId)
                 ?? getRuntimeFacade()?.selectArcadeIntermissionChoice?.(choiceId);

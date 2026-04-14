@@ -1,5 +1,4 @@
 import { CONFIG } from '../Config.js';
-import { getActiveRuntimeConfig } from '../runtime/ActiveRuntimeConfigStore.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import {
     applyMenuCompatibilityRuleSet,
@@ -31,7 +30,7 @@ import {
 } from './SettingsDomainUtils.js';
 
 function applySessionSanitization({ merged, src, defaults, migratedSessionType }) {
-    const huntFeatureEnabled = getActiveRuntimeConfig(CONFIG)?.HUNT?.ENABLED !== false;
+    const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
     merged.mode = migratedSessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
     merged.gameMode = resolveActiveGameMode(src.gameMode, huntFeatureEnabled);
 

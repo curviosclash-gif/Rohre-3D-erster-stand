@@ -270,7 +270,7 @@ export class UINavigationLifecycleController {
                     manager.settings.localSettings.toolsState.level4Open = false;
                     manager.setLevel4Open(false);
                 }
-                this.game.runtimeFacade?.handleMenuPanelChanged?.(previousPanelId, panelId || null, transitionMetadata || null);
+                this.manager.ports?.runtimeIntentPort?.handleMenuPanelChanged?.(previousPanelId, panelId || null, transitionMetadata || null);
                 this._syncMenuChromeState(panelId || null);
                 manager.updateContext();
             },

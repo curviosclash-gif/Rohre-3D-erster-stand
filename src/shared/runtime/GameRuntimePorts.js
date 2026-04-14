@@ -10,6 +10,14 @@ import { buildMatchRuntimeProjection as buildMatchRuntimeProjectionSnapshot } fr
 
 function noop() {}
 
+const RUNTIME_PORT_ADAPTER_SOURCES = Object.freeze({
+    BUNDLE_COORDINATOR: 'runtime-bundle:runtimeCoordinator',
+    BUNDLE_FACADE: 'runtime-bundle:runtimeFacade',
+    LEGACY_COORDINATOR: 'legacy-game-slot:runtimeCoordinator',
+    LEGACY_FACADE: 'legacy-game-slot:runtimeFacade',
+    UNRESOLVED: 'unresolved',
+});
+
 function getRuntimeBundle(game) {
     return game?.runtimeBundle || null;
 }
@@ -30,12 +38,69 @@ function getRuntimeComponent(game, key) {
     return getRuntimeComponents(game)?.[key] || null;
 }
 
-function getRuntimeFacade(game) {
-    return getRuntimeComponent(game, 'runtimeFacade') || game?.runtimeFacade || null;
+function getLegacyRuntimeFacade(game) {
+    return game?.runtimeFacade || null;
 }
 
-function getRuntimeCoordinator(game) {
-    return getRuntimeComponent(game, 'runtimeCoordinator') || game?.runtimeCoordinator || null;
+function getLegacyRuntimeCoordinator(game) {
+    return game?.runtimeCoordinator || null;
+}
+
+function getRuntimeFacade(game, { allowLegacyFallback = false } = {}) {
+    const facade = getRuntimeComponent(game, 'runtimeFacade');
+    if (facade) {
+        return facade;
+    }
+    return allowLegacyFallback === true
+        ? getLegacyRuntimeFacade(game)
+        : null;
+}
+
+function getRuntimeCoordinator(game, { allowLegacyFallback = false } = {}) {
+    const coordinator = getRuntimeComponent(game, 'runtimeCoordinator');
+    if (coordinator) {
+        return coordinator;
+    }
+    return allowLegacyFallback === true
+        ? getLegacyRuntimeCoordinator(game)
+        : null;
+}
+
+function resolveRuntimeIntentAdapter(game, methodName) {
+    const coordinator = getRuntimeCoordinator(game);
+    if (typeof coordinator?.[methodName] === 'function') {
+        return {
+            adapter: coordinator,
+            source: RUNTIME_PORT_ADAPTER_SOURCES.BUNDLE_COORDINATOR,
+        };
+    }
+    const facade = getRuntimeFacade(game);
+    if (typeof facade?.[methodName] === 'function') {
+        return {
+            adapter: facade,
+            source: RUNTIME_PORT_ADAPTER_SOURCES.BUNDLE_FACADE,
+        };
+    }
+
+    const legacyCoordinator = getRuntimeCoordinator(game, { allowLegacyFallback: true });
+    if (typeof legacyCoordinator?.[methodName] === 'function') {
+        return {
+            adapter: legacyCoordinator,
+            source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_COORDINATOR,
+        };
+    }
+    const legacyFacade = getRuntimeFacade(game, { allowLegacyFallback: true });
+    if (typeof legacyFacade?.[methodName] === 'function') {
+        return {
+            adapter: legacyFacade,
+            source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_FACADE,
+        };
+    }
+
+    return {
+        adapter: null,
+        source: RUNTIME_PORT_ADAPTER_SOURCES.UNRESOLVED,
+    };
 }
 
 function buildSessionRuntimeProjection(game) {
@@ -43,7 +108,7 @@ function buildSessionRuntimeProjection(game) {
     const lifecycle = sessionRuntime?.lifecycle || {};
     const finalize = sessionRuntime?.finalize || {};
     const session = sessionRuntime?.session || {};
-    const facade = getRuntimeFacade(game);
+    const facade = getRuntimeFacade(game, { allowLegacyFallback: true });
     const updatedAt = Math.max(
         Number(lifecycle.updatedAt) || 0,
         Number(finalize.updatedAt) || 0
@@ -114,11 +179,8 @@ function buildRuntimeObservabilityProjection(game) {
 }
 
 function callRuntimeIntent(game, methodName, options = undefined) {
-    const coordinator = getRuntimeCoordinator(game);
-    if (typeof coordinator?.[methodName] === 'function') {
-        return coordinator[methodName](options);
-    }
-    return getRuntimeFacade(game)?.[methodName]?.(options);
+    const resolvedAdapter = resolveRuntimeIntentAdapter(game, methodName);
+    return resolvedAdapter.adapter?.[methodName]?.(options);
 }
 
 export function createSettingsPort(game) {
@@ -235,24 +297,22 @@ export function createInputPort(game) {
 export function createLifecyclePort(game) {
     return {
         initializeSession() {
-            return getRuntimeCoordinator(game)?.initializeSession?.()
-                ?? getRuntimeFacade(game)?.initializeSession?.();
+            return callRuntimeIntent(game, 'initializeSession');
         },
         waitForAllPlayersLoaded() {
-            return getRuntimeCoordinator(game)?.waitForAllPlayersLoaded?.()
-                ?? getRuntimeFacade(game)?.waitForAllPlayersLoaded?.();
+            return callRuntimeIntent(game, 'waitForAllPlayersLoaded');
         },
         teardownRuntimeSession() {
-            return getRuntimeCoordinator(game)?.teardownRuntimeSession?.()
-                ?? getRuntimeFacade(game)?.teardownRuntimeSession?.();
+            return callRuntimeIntent(game, 'teardownRuntimeSession');
         },
         startArcadeRunIfEnabled() {
-            return getRuntimeCoordinator(game)?.startArcadeRunIfEnabled?.()
-                ?? getRuntimeFacade(game)?.startArcadeRunIfEnabled?.();
+            return callRuntimeIntent(game, 'startArcadeRunIfEnabled');
+        },
+        restartRound() {
+            return callRuntimeIntent(game, 'restartRound');
         },
         returnToMenu(options = undefined) {
-            return getRuntimeCoordinator(game)?.returnToMenu?.(options)
-                ?? getRuntimeFacade(game)?.returnToMenu?.(options);
+            return callRuntimeIntent(game, 'returnToMenu', options);
         },
     };
 }
@@ -279,6 +339,10 @@ export function createRuntimeIntentPort(game) {
         },
         joinLobby(options = undefined) {
             return callRuntimeIntent(game, 'joinLobby', options);
+        },
+        handleMenuPanelChanged(previousPanelId, nextPanelId, transitionMetadata = undefined) {
+            const { adapter } = resolveRuntimeIntentAdapter(game, 'handleMenuPanelChanged');
+            return adapter?.handleMenuPanelChanged?.(previousPanelId, nextPanelId, transitionMetadata);
         },
     };
 }
@@ -339,8 +403,14 @@ export function createRuntimePorts(game) {
     const renderPort = createRenderPort(game);
     const inputPort = createInputPort(game);
     const lifecyclePort = createLifecyclePort(game);
-    const arcadePort = createArcadePort({ getRuntimeCoordinator: () => getRuntimeCoordinator(game), getRuntimeFacade: () => getRuntimeFacade(game) });
-    const recordingPort = createRecordingPort({ getRuntimeCoordinator: () => getRuntimeCoordinator(game), getRuntimeFacade: () => getRuntimeFacade(game) });
+    const arcadePort = createArcadePort({
+        getRuntimeCoordinator: () => getRuntimeCoordinator(game, { allowLegacyFallback: true }),
+        getRuntimeFacade: () => getRuntimeFacade(game, { allowLegacyFallback: true }),
+    });
+    const recordingPort = createRecordingPort({
+        getRuntimeCoordinator: () => getRuntimeCoordinator(game, { allowLegacyFallback: true }),
+        getRuntimeFacade: () => getRuntimeFacade(game, { allowLegacyFallback: true }),
+    });
     const runtimeIntentPort = createRuntimeIntentPort(game);
     const runtimeProjectionPort = createRuntimeProjectionPort(game);
     const matchUiPort = createMatchUiPort(game);
