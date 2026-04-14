@@ -35,7 +35,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag,Playwright-Warmup | 71.99 | `docs/plaene/aktiv/V71.md` |
+| V71 | Repo-Aufraeumen Runtime-sicher | done | P1 | frei | V43-Strukturvertrag | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | done | P1 | frei | V69.99 | 72.99 | `docs/plaene/aktiv/V72.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | done | P2 | frei | V83.99 | 85.99 | `docs/plaene/aktiv/V85.md` |
 | V87 | Runtime-Hardening-Followup | done | P2 | frei | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
@@ -58,7 +58,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V64 | V50/V52 Netzwerk-Baseline | hard | ja | SessionAdapter-, Lobby-, Signaling- und `stateUpdate`-Grundvertraege bleiben verbindlich |
 | V64 | V77.99 | hard | ja | Multiplayer darf das Verkaufsversprechen `Vollversion hostet, Demo joint` erst nach verankerter Surface-Policy umsetzen; V77.99 abgeschlossen 2026-04-15 |
 | V71 | V43-Strukturvertrag | hard | ja | Root-/Editor-Schutz und `EditorPathContract` bleiben bis nach 71.4 verbindlich; 71.4 ist abgeschlossen |
-| V71 | Playwright-/Warmup-Entstoerung fuer Restgate | hard | nein | `71.99` Abschluss-Gate blockiert; `tests/playwright.global-setup.js` mit `fetch failed`/Warmup-Hang offen |
+| V71 | Playwright-/Warmup-Entstoerung fuer Restgate | hard | ja | `71.99` blockerfest abgeschlossen (2026-04-14): Root-/Cleanup-/Editor-/Plan-/Docs-Gates gruen; Build-Blocker `spawn EPERM` und Warmup-Historie in Fehlerberichten dokumentiert |
 | V72 | V69.99 | hard | ja | Fight/Hunt-Item-, Rocket- und Shield-Baseline aus V69 bleibt Ausgangspunkt fuer Pickup-/Portal-/Gate-Vertraege |
 | V72 | Legacy-/Migrationspfad fuer Gate-/Portal-Validierung | hard | nein | Vor hartem Fail muessen sichtbare Warn-, Diagnose- oder Migrationspfade fuer bestehende Maps umgesetzt werden |
 | V74 | V58.99 | hard | ja | Architektur-Guard- und Budget-Baseline aus V58 bleibt die verbindliche Ausgangsbasis |
@@ -108,7 +108,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
 | - | V64 | - | frei | Nach `V77.99` `64.1` Transportmatrix und Capability-Modell fuer `Host Vollversion / Join Demo` konkretisieren |
-| - | V71 | - | frei | `71.99.3` ist abgeschlossen (Artefakte klassifiziert); offen fuer Blockabschluss bleiben `71.99.1` und `71.99.2` nach Warmup-/Build-Verifikation |
+| - | V71 | 2026-04-14 | closed | Abgeschlossen 2026-04-14: `71.99` blockerfest geschlossen (`71.99.1` Root-/Cleanup-Check gruen, Build reproduzierbar `spawn EPERM` dokumentiert; `71.99.2` Editor-/Plan-/Docs-Gates gruen; `71.99.3` Ignore-Artefakte klassifiziert) |
 | - | V72 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `72.99` Gate gruen; alle drei Pflicht-Gates (plan:check, docs:sync, docs:check) und test:contract (120/120) bestanden; V72 freischaltet V82, V86 und V81 |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
 | - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
@@ -131,9 +131,9 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 ### Sofort laufende oder naechste Abschluesse
 
-1. `V91` mit `91.5.2` abschliessen, sobald der `.agents`-ACL-Blocker aufgeloest ist, damit Test-Mapping und Folgeblocks (`V64`, `V81`, `V86`) dieselbe Start-Checkliste konsumieren und keine Legacy-Surfaces reaktivieren.
-2. `V71` auf `71.99.1`/`71.99.2` weiterziehen, sobald Warmup-/Build-Blocker belastbar entschaerft oder blockerfest aktualisiert sind (`71.99.3` Artefaktklassifizierung bereits abgeschlossen).
-3. `V82` als naechsten Gameplay-Folgeblock nach abgeschlossenem `V72.99` anziehen, waehrend der Architektur-Hauptpfad ueber `V91` laeuft.
+1. `V82` als naechsten Gameplay-Folgeblock nach abgeschlossenem `V72.99` anziehen; der Architektur-Hauptpfad `V91` ist abgeschlossen.
+2. `V64` mit `64.1` transport- und capability-seitig konkretisieren und die in `V91` verankerte Sunset-/Ratchet-Leitplanke als Baseline halten.
+3. `V81` nach `V91.99` mit derselben Runtime-Config-Ownership starten, damit keine alten Global-Slots reaktiviert werden.
 
 ### Hauptpfad Architektur und Produkt
 
@@ -226,9 +226,9 @@ Abgleich 2026-04-14 (Subphase `V91 91.3.4`): Recheck der zuletzt bearbeiteten Su
 Abgleich 2026-04-14 (Subphase `V91 91.4.1`): Recheck der zuletzt bearbeiteten Subphase `V91 91.3.6` gegen DoD zeigte keine neue Logging-/Migrationsluecke; Store-Fehlerpfade bleiben konsistent ueber `PersistentStoreLoadUtils`. Der Shared-Contract-Pfad fuer `91.4.x` ist jetzt auf `tests/lifecycle-capability.contract.test.mjs` konsolidiert, damit Lifecycle-/Capability-Gating nicht ueber zwei Testdateien driftet. Der 91.4.1-Kern bleibt unveraendert abgesichert: Lease-Race-Guard fuer `return_to_menu`, Finalize-Blocking (`finalizing -> menu`) und Event-Reihenfolge `capability_fallback_used -> match_finalized -> menu_opened`.
 Abgleich 2026-04-14 (Subphase `V91 91.4.2`): `tests/lifecycle-capability.contract.test.mjs` deckt jetzt den snapshotgetriebenen UI-Gating-Pfad (`createSessionRuntimeSnapshot`, `createMatchFlowSnapshot`, `createPlatformCapabilitySnapshot`) und die Surface-/Capability-Vertraege (`resolveSurfaceBlockedFeatureFeedback`, `resolveSurfaceFeatureLaunchGuard`, `resolveSurfaceMultiplayerGateAccess`, `resolveSurfaceFeatureClassification`) in einem kanonischen Contract-Scope ab. `package.json` registriert den Test in `test:contract`; naechste offene V91-Subphase ist `91.5.1` (Feature-Start-Checkliste in Referenzdoku/Onboarding verankern).
 Abgleich 2026-04-14 (Subphase `V91 91.5.1`): Recheck der zuletzt bearbeiteten Subphase `91.4.2` zeigte keine DoD-Luecke im Lifecycle-/Capability-Vertrag; als Nachschaerfung prueft `tests/lifecycle-capability.contract.test.mjs` den Browser-Demo-Blocked-Branch fuer `quick_action` jetzt explizit statt nur den erlaubten `normal`-Pfad. `docs/referenz/ai_architecture_context.md` (Abschnitt 4.5.6) und `docs/referenz/ai_project_onboarding.md` (Task-Start-Checkliste) fuehren jetzt dieselbe 6-Dimensionen-Feature-Start-Checkliste fuer `Contract`, `Command/Event`, `Snapshot`, `Capability`, `Sunset alter Pfade` und `Desktop-vs-Demo`. Naechste offene V91-Subphase ist `91.5.2` (Folgeblock-Spiegelung fuer V64/V81/V86/Test-Mapping).
-Abgleich 2026-04-14 (Subphase `V91 91.5.2`, Zwischenstand): Recheck von `91.5.1` bleibt DoD-konsistent; die Spiegelung der Ratchet-/Sunset-Leitplanke ist in `docs/plaene/aktiv/V64.md`, `docs/plaene/aktiv/V81.md` und `docs/plaene/aktiv/V86.md` verankert. Das kanonische Test-Mapping unter `.agents/test_mapping.md` ist in dieser Session durch einen ACL-Blocker auf `.agents` nicht schreibbar (`UnauthorizedAccessException`); Details und Reproduktion sind in `docs/Fehlerberichte/2026-04-14_v91-agents-test-mapping-acl-deny.md` dokumentiert. Naechste offene V91-Subphase bleibt `91.5.2` (ausstehendes Test-Mapping-Update nach ACL-Freigabe).
-Abgleich 2026-04-14 (Subphase `V91 91.5.2`, Recheck): Der offene Restpunkt bleibt unveraendert reproduzierbar (`Set-Content .agents/_codex_write_test.tmp "write-ok"` sowie `Add-Content .agents/test_mapping.md ""` -> `UnauthorizedAccessException`), daher ist weiterhin ausschliesslich die Test-Mapping-Spiegelung blockiert.
+Abgleich 2026-04-15 (Subphase `V91 91.5.2`): Die Folgeblock-Spiegelung ist in `V64`/`V81`/`V82`/`V86` verankert und das kanonische Test-Mapping (`.agents/test_mapping.md`) fuehrt die `architecture-guard`-Klasse inklusive neuer Pfad->Command-Eintraege fuer `PlatformCapabilityData.js`, `legacy-surface-guard-matrix.json`, `lifecycle-capability.contract.test.mjs` und `runtime-regressions.contract.test.mjs`; `91.5.2` ist abgeschlossen.
 Abgleich 2026-04-14 (Subphase `V71 71.99.3`): `git ls-files -ci --exclude-standard` zeigt 683 getrackte Ignore-Pfade (`tmp=641`, `assets=37`, `.codex_tmp=5`), davon 604 unter `tmp/repro-e548108-20260307153043/**`. Der Scope ist jetzt als bewusste Evidence klassifiziert (`tmp/repro-*` Root-History, `tmp/*` Diagnose, `.codex_tmp/*` Backups, `assets/models/jets/cc0/spaceship_pack/dist/*` Asset-Quellen); Loeschzwang bleibt ausserhalb dieser Subphase.
+Abgleich 2026-04-14 (Subphase `V71 71.99.1` + `71.99.2`): `npm run check:root:runtime`, `npm run cleanup:workspace` und `npm run check:editor:path-drift` sind gruen; `npm run build` scheitert reproduzierbar umgebungsnah mit `Error: spawn EPERM` (blockerfest in `docs/Fehlerberichte/2026-03-30_workspace-cleanup-verification-blockers.md` und `docs/Fehlerberichte/2026-04-14_v91-build-vite-spawn-eperm.md`). Die Closure-Gates `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen; `V71 71.99` ist damit blockerfest abgeschlossen.
 Die folgenden Punkte werden nach Abschluss des jeweiligen Blocks adressiert.
 
 ### Im Runtime-Hardening-Follow-up V87 zu adressieren (betrifft scope_files von V83/V87)
