@@ -1,6 +1,6 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-15 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 hat `72.6` vollstaendig abgeschlossen: `TraversalCooldownOps` beseitigt Portal-/Gate-Cooldown-Duplikation (72.6.4) und `MatchSessionFeedbackPlan` warnt jetzt bei `anchor-only`-Spawn ohne Item-Anker (72.6.5); V72 steht jetzt in `72.99` Abschluss-Gate. V77 hat `77.6.1` abgeschlossen, spiegelt V64/V75/V76 jetzt explizit auf denselben Surface-Vertrag und haelt Vehicle- sowie Map-Editor weiterhin als Desktop-Vollversions-Funktionen im Menue-/Launch-Gate. V91 ist als Architektur-Ratchet nach `V77.99` eingeplant, damit Folgeblocks Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Contract-Tests gegen dieselbe Baseline lesen.)
+Stand: 2026-04-15 (Audit-Nachtrag: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V77/V81 fuehren den Expertenlogin als Dev-only-/Surface-Risiko, und `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` enthaelt einen Intake-Draft fuer Dependency-Security. V85, V87, V88 und V89 sind blockerfest abgeschlossen; V89 spiegelt Browser-, Desktop- und Contract-Layer jetzt widerspruchsfrei in Mapping, Referenzdoku und Gate-Reihenfolge: `desktop-smoke` bleibt das primaere Desktop-Hauptsignal, `browser-compat` der nachgelagerte Web-/Demo-Layer und `node-contract` traegt weiterhin nur den blockerfest dokumentierten Restfehler `T97`, wodurch `test:core` aktuell allein am Contract-Layer haengt. V72 ist abgeschlossen: `72.99` Gate gruen (2026-04-15); alle drei Pflicht-Gates und test:contract (120/120) bestanden; V82, V86 und V81 haben ihre V72.99-Abhaengigkeit jetzt erfuellt. V77 hat `77.6.1` abgeschlossen, spiegelt V64/V75/V76 jetzt explizit auf denselben Surface-Vertrag und haelt Vehicle- sowie Map-Editor weiterhin als Desktop-Vollversions-Funktionen im Menue-/Launch-Gate. V91 ist als Architektur-Ratchet nach `V77.99` eingeplant, damit Folgeblocks Guard-Matrix, Legacy-Surface-Sunset und kleine Lifecycle-/Capability-Contract-Tests gegen dieselbe Baseline lesen.)
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -36,7 +36,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag,Playwright-Warmup | 71.99 | `docs/plaene/aktiv/V71.md` |
-| V72 | Gameplay-Powerups, Portale und Gates | active | P1 | frei | V69.99 | 72.99 | `docs/plaene/aktiv/V72.md` |
+| V72 | Gameplay-Powerups, Portale und Gates | done | P1 | frei | V69.99 | 72.99 | `docs/plaene/aktiv/V72.md` |
 | V85 | Persistence-, Content-Contracts und Schema-Migrationen | done | P2 | frei | V83.99 | 85.99 | `docs/plaene/aktiv/V85.md` |
 | V87 | Runtime-Hardening-Followup | done | P2 | frei | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
 | V88 | Testarchitektur und Verifikationsvertraege | done | P2 | frei | V87.99 | 88.99 | `docs/plaene/aktiv/V88.md` |
@@ -84,7 +84,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V91 | V77.99 | hard | nein | Guard-Matrix und Surface-nahe Sunset-Regeln sollen auf der verbindlichen `desktop-app`-/`browser-demo`-Policy aufsetzen statt parallel neue Produktbegriffe einzufuehren |
 | V91 | V89.99 | soft | ja | Desktop-first-Tests und `node-contract` liefern die bevorzugten kleinen Verifikationspfade fuer neue Architektur-Ratchets |
 | V64 | V91.99 | soft | nein | Multiplayer-Produktisierung sollte denselben Legacy-Sunset- und Guard-Ratchet konsumieren, bevor neue Runtime-Surfaces wachsen |
-| V86 | V72.99 | hard | nein | Editor- und Authoring-Vertraege sollen auf stabilen Pickup-, Portal-, Gate- und Spawn-Warnpfaden aus V72 aufsetzen |
+| V86 | V72.99 | hard | ja | Editor- und Authoring-Vertraege sollen auf stabilen Pickup-, Portal-, Gate- und Spawn-Warnpfaden aus V72 aufsetzen |
 | V86 | V85.99 | soft | ja | Descriptor-, Preset- und Template-Leseweg konsumiert den in V85 finalisierten Content-Vertrag jetzt als Baseline |
 | V77 | V74.99 | hard | ja | Die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` darf erst auf der stabilisierten Runtime-/Capability-Basis aus V74 verankert werden |
 | V75 | V74.99 | hard | ja | Recorder-Finalisierung muss denselben Lifecycle-/Dispose-Vertrag wie V74 nutzen; keine parallelen Sonderpfade fuer Stop, Return-to-Menu oder Shutdown |
@@ -95,11 +95,11 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | V76 | V77.99 | hard | nein | Hangar, Werkstatt und Editoren muessen die in V77 definierte Vollversions-/Demo-Rollenlogik uebernehmen |
 | V76 | V64.99 | hard | nein | Hangar-/Werkstatt-Flows starten erst nach dem festgezogenen Produktbild fuer Host/Join und Browser-Demo |
 | V76 | V74.99 | hard | ja | Hangar darf `main.js`, `GameRuntimeFacade` oder breite Desktop-Backdoors nicht erneut aufblasen; Navigations-/Composition-Grenzen aus V74 sind verbindlich |
-| V82 | V72.99 | hard | nein | Stabile Pickup-/Portal-/Gate-Vertraege als Basis fuer erweiterte Checkpoint-Logik und Parcours-Arcade-Vereinigung |
+| V82 | V72.99 | hard | ja | Stabile Pickup-/Portal-/Gate-Vertraege als Basis fuer erweiterte Checkpoint-Logik und Parcours-Arcade-Vereinigung |
 | V82 | V74.99 | hard | ja | Runtime-Entkopplung muss abgeschlossen sein fuer saubere State-Komposition (XP, Leaderboard, Ghost) |
 | V76 | V82.99 | hard | nein | V76.3 Arcade-Hangar baut direkt auf V82-Contracts (XP, Upgrades, Leaderboard) auf; V82 muss vor V76.3 abgeschlossen sein |
 | V81 | V74.99 | hard | ja | Tuning Console liest/schreibt CONFIG_BASE und nutzt ActiveRuntimeConfigStore; Runtime-Entkopplung muss abgeschlossen sein |
-| V81 | V72.99 | hard | nein | Parameter-Registry muss auf stabiler Pickup-Registry und Config-Struktur aufbauen |
+| V81 | V72.99 | hard | ja | Parameter-Registry muss auf stabiler Pickup-Registry und Config-Struktur aufbauen |
 | V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
 | V81 | V91.99 | hard | nein | Developer-Tuning soll Runtime-Config-Ownership nicht ueber alte Global-Slots vertiefen, sondern auf dem in V91 geharteten Contract aufsetzen |
 
@@ -109,7 +109,7 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | --- | --- | --- | --- | --- |
 | - | V64 | - | frei | Nach `V77.99` `64.1` Transportmatrix und Capability-Modell fuer `Host Vollversion / Join Demo` konkretisieren |
 | - | V71 | - | frei | `71.99` nach Warmup-Entstoerung oder belastbarem Restgate schliessen |
-| - | V72 | 2026-04-14 | active | `72.6` vollstaendig abgeschlossen (72.6.4 TraversalCooldownOps, 72.6.5 anchor-only-Warnung); naechster Schritt ist `72.99` Abschluss-Gate: plan:check, docs:sync, docs:check |
+| - | V72 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `72.99` Gate gruen; alle drei Pflicht-Gates (plan:check, docs:sync, docs:check) und test:contract (120/120) bestanden; V72 freischaltet V82, V86 und V81 |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
 | - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
 | - | V84 | 2026-04-04 | closed | Abgeschlossen 2026-04-05: `84.99.2` dokumentiert Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
