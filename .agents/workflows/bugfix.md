@@ -2,42 +2,42 @@
 description: Diagnose a reported issue and apply a targeted fix.
 ---
 
+Policy-Verweise: `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/product_focus.md`, `.agents/rules/token_efficiency_and_tools.md`.
+
 ## 0. Capture issue
 
-- Get exact symptom, timing, reproducibility, and error text.
-- Classify impact: desktop app, online demo, or both. Default to desktop app priority unless the report is clearly demo-only.
-- Ask follow-up only if missing data blocks diagnosis.
+- Symptom, Timing, Reproduzierbarkeit, Fehlertext erfassen.
+- Impact einordnen: Desktop-App, Online-Demo oder beide (Default Desktop-Prioritaet, ausser Report ist klar demo-only).
+- Follow-up nur bei fuer Diagnose blockierender Luecke.
 
 ## 1. Analyze evidence
 
 // turbo
-- Check latest logs and error traces. Correlate timestamps and reproduce on the desktop path first unless the issue is clearly online-demo-only.
-- Extract likely failure path.
+- Aktuelle Logs und Traces pruefen; auf Desktop-Pfad reproduzieren, ausser es ist klar online-demo-only.
+- Wahrscheinlichen Failure-Pfad extrahieren.
 
 ## 2. Find root cause
 
-- Locate error pattern: `rg [pattern] src tests`.
-- Validate cause with minimal reproduction.
-- Note impacted files and side effects.
+- Fehlerpattern lokalisieren mit `Grep` (ripgrep-basiert).
+- Ursache mit minimaler Reproduktion bestaetigen.
+- Betroffene Dateien und Seiteneffekte notieren.
 
 ## 3. Fix
 
-- Apply smallest safe change for root cause.
-- Keep the fix desktop-first; do not expand scope only to preserve online-demo parity unless requested.
-- If the user explicitly requests Playwright validation, do not run multiple Playwright suites concurrently on same repo/port/output directory.
-- If concurrent bot validation is explicitly requested, assign unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR`.
-- Re-run `npm run build` when it is the smallest useful check. Focused tests via `.agents/test_mapping.md` only after explicit user request; otherwise hand the recommended test command to the user.
+- Kleinste sichere Aenderung fuer Root-Cause.
+- Desktop-first bleibt Prioritaet (siehe `product_focus.md`).
+- Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). `npm run build` nur, wenn es das kleinste sinnvolle Signal ist.
 
-## 4. Governance + docs
+## 4. Governance + Doc-Gates
 
 // turbo
-- If bugfix touches plans/workflows/rules: `npm run plan:check`.
-- `npm run docs:sync && npm run docs:check`.
+- Meta-Gate: `npm run gates:pre-commit` (ruft `plan:check` -> `docs:sync` -> `docs:check`).
 
-## 5. Commit (see AGENTS.md section Commit Convention)
+## 5. Commit
 
-- `git add [scoped-files]` -> `fix: [short reason]`
-- Verify scope: `git diff --name-only`.
+- Git-Policy: `.agents/rules/git_and_commits.md`.
+- `git add [scoped-files]` -> `fix: [short reason]`.
+- Scope pruefen: `git diff --name-only`.
 
 ## Report
 

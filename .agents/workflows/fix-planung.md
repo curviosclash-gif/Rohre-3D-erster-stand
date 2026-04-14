@@ -59,9 +59,8 @@ git push
   - `(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
 - Keep gate invariant intact (`*.99` only when prior phases are `[x]`).
 - For non-`*.99` phases, record the pending block-end verification scope instead of running mapped tests or smokes.
-- `npm run plan:check`
-- `npm run docs:sync && npm run docs:check`
-- Commit scoped updates.
+- Meta-Gate: `npm run gates:pre-commit` (ruft `plan:check` -> `docs:sync` -> `docs:check`).
+- Commit scoped updates (Git-Policy: `.agents/rules/git_and_commits.md`).
 - Before push on `main`: `npm run snapshot:tag`
 
 ## 5. Release block

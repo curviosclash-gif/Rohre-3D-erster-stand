@@ -1,65 +1,60 @@
-﻿---
+---
 description: Implement a planned change from coding to verification and commit.
 ---
 
+Policy-Verweise: `.agents/rules/planning_and_governance.md`, `.agents/rules/git_and_commits.md`, `.agents/rules/code_quality_and_debugging.md`, `.agents/rules/product_focus.md`, `.agents/rules/token_efficiency_and_tools.md`.
+
 ## 0. Context
 
-// turbo
-- Read `docs/Umsetzungsplan.md`.
-- If a block is in scope, read the linked canonical block file in `docs/plaene/aktiv/VXX.md`.
-- For bot-training scope also read `docs/bot-training/Bot_Trainingsplan.md` and keep training planning there.
+Pflicht-Reads:
+- `docs/Umsetzungsplan.md` (nur Master-Index, keine Historie).
+- Die verlinkte `docs/plaene/aktiv/VXX.md` mit Lese-Budget: Frontmatter + DoD + aktuelle + naechste Subphase.
 - `git log -n 3 --oneline`.
 - `npm run guard:main`.
-- If helpful, use related intake/history docs in `docs/plaene/neu/*.md` or `docs/plaene/alt/*.md` as supporting context, not as canonical block detail.
+
+Optional (nur bei Bedarf):
+- `docs/plaene/CHANGELOG.md` fuer Abgleich-Historie.
+- `docs/bot-training/Bot_Trainingsplan.md`, wenn Scope Bot-Training beruehrt.
+- Intake- oder Altplaene unter `docs/plaene/neu/*.md` bzw. `docs/plaene/alt/*.md` als unterstuetzender Kontext.
 
 ## 1. Scope
 
-- Define target files and expected behavior.
-- Confirm desktop app outcome first; keep online/browser parity in scope only when explicitly requested or very low-cost.
-- If scope is clear, proceed directly.
-- Ask only for critical missing constraints.
-- If unrelated worktree changes exist, do not absorb them; commit only scoped files.
+- Zielpfade und erwartetes Verhalten festlegen.
+- Desktop-App-Ergebnis priorisieren; Online/Browser-Parity nur explizit auf Wunsch oder bei geringem Aufwand.
+- Bei klarem Scope direkt weiter. Nur bei kritisch fehlender Information nachfragen.
+- Fremde uncommittete Aenderungen nicht absorbieren; nur scoped Dateien committen.
 
 ## 2. Implement
 
-- Follow existing project patterns.
-- Prefer desktop-app UX and feature completeness over online-demo parity.
-- Avoid hardcoded config values.
-- Include cleanup/dispose for new runtime objects.
-- Do not create or rewrite planning scopes directly in `docs/Umsetzungsplan.md`; keep plan drafting in `docs/plaene/neu/` and canonical active block details in `docs/plaene/aktiv/`.
-- If task scope is bot training (`scripts/training-*`, `src/entities/ai/training/**`, `trainer/**`, training tests/docs), update phase/status only in `docs/bot-training/Bot_Trainingsplan.md`.
+- Bestehende Projekt-Patterns folgen.
+- Keine hartkodierten Config-Werte.
+- Fuer neue Runtime-Objekte Cleanup/Dispose mitdenken.
+- Planentwuerfe bleiben in `docs/plaene/neu/`, aktive Bloecke in `docs/plaene/aktiv/VXX.md`.
+- Bot-Training-Scope: Status/Phase nur in `docs/bot-training/Bot_Trainingsplan.md` pflegen.
 
 ## 3. Self-check
 
 // turbo
-- `rg -n "(console\.log|TODO:|FIXME:|HACK:)" src tests`
-- No open TODOs in changed code.
-- For master-plan block work below `*.99`, update or prepare affected tests, smokes and harnesses but do not execute them by default.
-- If the user explicitly requests Playwright validation, never run multiple suites concurrently on same repo/port/output directory.
-- If the user explicitly requests parallel bot testing, each bot must use unique `TEST_PORT`, `PW_RUN_TAG`, `PW_OUTPUT_DIR`.
-- Run tests via `.agents/test_mapping.md` only after explicit user request; for block work, prefer the concentrated execution at `*.99`.
-- Without that request, leave tests unrun and note that verification stays user-owned or deferred to the block-end gate.
+- `Grep` nach offenen Markern in geaenderten Pfaden: `(console\.log|TODO:|FIXME:|HACK:)`.
+- Keine offenen TODOs in geaendertem Code.
+- Tests sind user-owned (siehe `planning_and_governance.md` -> Test Ownership). Fuer Subphasen unterhalb `*.99` Tests/Smokes vorbereiten, aber Ausfuehrung deferren.
 
-## 4. Governance + doc gates
+## 4. Governance + Doc-Gates
 
 // turbo
-- If `docs/Umsetzungsplan.md`, `docs/plaene/**/*.md`, `.agents/workflows/**` or `.agents/rules/**` changed:
-  - `npm run plan:check`
-- If `docs/bot-training/Bot_Trainingsplan.md` changed:
-  - `npm run plan:check`
-- `npm run docs:sync && npm run docs:check`
-- `npm run build`
+- Meta-Gate: `npm run gates:pre-commit` (fuehrt `plan:check` -> `docs:sync` -> `docs:check`).
+- Einzeln, falls gezieltes Diagnose-Signal noetig: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
+- `npm run build`, wenn Build-Signal relevant.
 
-## 5. Commit (see AGENTS.md section Commit Convention)
+## 5. Commit
 
-- `npm run guard:main`
-- On Windows before staging: `npm run git:acl:heal`
-- `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`
-- Verify scope: `git diff --name-only`.
-- Before push on `main`: `npm run snapshot:tag`.
-- In parallel-agent scenarios, never stage unrelated files.
+- Git-Policy: `.agents/rules/git_and_commits.md` (Scope, Commit-Granularitaet, Umsetzungsplan-Separat-Regel).
+- `npm run guard:main`.
+- Windows vor Staging: `npm run git:acl:heal`.
+- `git add [scoped-files]` -> `git commit -m "[type]: [name] - [short reason]"`.
+- Scope pruefen: `git diff --name-only`.
+- Vor Push auf `main`: `npm run snapshot:tag`.
 
 ## Report
 
 Standardformat verwenden.
-
