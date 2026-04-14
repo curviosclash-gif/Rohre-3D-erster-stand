@@ -441,6 +441,61 @@ Stand: 2026-04-14
 - `V76` konsumiert denselben Authoring-Vertrag: `map-editor` und `vehicle-editor` bleiben `desktop-only`; Hangar-/Werkstatt-Folgearbeit fuehrt keine browserseitigen `window.open(...)`-Paritaetspfade fuer Authoring ein.
 - Folgeblocks duerfen keine zweite Produktsprache neben `desktop-app` und `browser-demo` einfuehren; neue CTA-, Capability- und Fallback-Entscheide laufen ueber denselben Surface-Vertrag statt ueber blocklokale Sonderbegriffe.
 
+#### 4.6.4.15 Entscheidungsraster fuer neue Features (`V77 77.6.2`)
+
+Jedes neue Feature durchlaeuft dieselben drei Fragen, bevor es in Code oder Plan landet:
+
+**1. Ist das Feature gameplay-nah oder shell-nah?**
+- Gameplay-nah (Spielmodus, Map-Mechanic, Kollision, Powerup, HUD): Kein Feature-ID-Eintrag noetig; das Feature folgt der Mode-/Preset-Allowlist des Surface-Policy-Vertrags (`isSurfaceModePathAllowed`, `isSurfacePresetAllowed`) und braucht keinen eigenen Klassifizierungsknoten.
+- Shell-nah (Export, Datei-I/O, Editor, Diagnostics, Tooling, Recorder, externe API): Feature-ID in `PLATFORM_SURFACE_FEATURE_IDS` registrieren und `resolveSurfaceFeatureClassification()` konsumieren.
+
+**2. Wie ist das Feature fuer `browser-demo` einzustufen?**
+
+| Klassifizierung | Bedeutung | Typische Beispiele |
+| --- | --- | --- |
+| `desktop-only` | Funktion ist ausschliesslich Vollversions-Flaeche; Browser-Demo zeigt `Nur Desktop`. | Map-Editor, Vehicle-Editor, Datei-I/O, Shell-nahe Tooling-Pfade |
+| `demo-safe` | Funktion ist in der Demo ausdruecklich freigegeben, ggf. in degradierter Form. | Replay-JSON-Download (begrenzt), kuratierter Tutorial-Parcours |
+| `future opt-in` | Funktion ist noch nicht freigegeben; expliziter Opt-in-Schritt noetig, bevor sie in der Demo erscheint. | Video-Export, Demo-Diagnostics, externe Service-Integrationen |
+| `legacy` | Funktion existiert als lokaler Dev- oder Diagnosepfad, kein Produktversprechen. | Tooling-Schalter, Debug-Overlays, lokale Dev-Konsole |
+
+Faustregel: Wenn unklar, startet jede neue Shell-/Export-Funktion als `future opt-in`. Das verhindert stilles Demo-Scope-Creep, ohne den Vollversions-Pfad zu sperren.
+
+**3. Welchen Resolver nutzt der Consumer?**
+
+| Anwendungsfall | Empfohlener Resolver |
+| --- | --- |
+| Modus, Session-Typ oder Map erlaubt? | `isSurfaceModePathAllowed`, `isSurfaceSessionTypeAllowed`, `isSurfaceMapKeyAllowedForModePath` |
+| Shell-nahe Feature (Editor, Export, Diagnostics) erlaubt? | `resolveSurfaceFeatureClassification` + `resolveSurfaceFeatureLaunchGuard` |
+| Multiplayer-Rolle (Host, Join, Discovery)? | `resolveSurfaceMultiplayerGateAccess` |
+| UX-Feedback fuer gesperrte Demo-Funktion | `resolveSurfaceBlockedFeatureFeedback` |
+| Vollstaendigen Surface-Policy-Snapshot lesen | `resolveSurfacePolicy` |
+| Developer-/Diagnose-Zugang pruefen | `resolveSurfaceDeveloperAccess` |
+
+- Keiner dieser Resolver darf durch blocklokale `if (isDesktop)` / `if (isBrowser)` Pruefungen ersetzt werden; Folgearbeit liest denselben Shared-Contract-Layer.
+- Neue Feature-IDs werden in `src/shared/contracts/PlatformSurfacePolicyOps.js` unter `PLATFORM_SURFACE_FEATURE_IDS` eingetragen und mit einer Klassifizierung in `resolveSurfaceFeatureClassification()` versehen.
+- `tests/platform-capabilities.contract.test.mjs` haelt die Klassifizierungs-Matrix als Contract; neue Feature-IDs erhalten dort einen Testfall.
+
+#### 4.6.4.16 Surface-Leseweg fuer neue Feature-Arbeit (`V77 77.6.4`)
+
+Der vollstaendige Leseweg fuer neue Feature-Arbeit unter dem Surface-Policy-Vertrag:
+
+1. **Policy lesen**: `resolveSurfacePolicy({ productSurfaceId })` liefert `defaultAccessMode`, `multiplayerRole`, `allowedModePaths`, `allowedSessionTypes`, `requiresCuratedMaps` und Transportfelder. Dies ist der Ausgangspunkt fuer alle Surface-Entscheide.
+2. **Capability pruefen**: `resolveSurfaceCapabilityAccess(capabilityId, { productSurfaceId })` prueft ob eine Plattform-Capability (`HOST`, `DISCOVERY`, `SAVE`, `RECORDING`) verfuegbar ist. Unbekannte Capabilities folgen automatisch `default-full` fuer Desktop und `default-deny` fuer Browser.
+3. **Feature klassifizieren**: Shell-nahe Features (`PLATFORM_SURFACE_FEATURE_IDS`) werden ueber `resolveSurfaceFeatureClassification(featureId, { productSurfaceId })` eingestuft. Der Launch-Guard `resolveSurfaceFeatureLaunchGuard(surfacePolicy, featureId, featureLabel)` liefert `{ allowed, message, tone, durationMs }` direkt als UX-Entscheidungsgrundlage.
+4. **UX-Feedback erzeugen**: Gesperrte Aktionen melden sich ueber `resolveSurfaceBlockedFeatureFeedback(featureLabel, { productSurfaceId })` mit einheitlichem `reason: surface_policy_blocked`, `tone: warning`, `durationMs: 1600`.
+5. **Multiplayer-Rollen absichern**: `resolveSurfaceMultiplayerGateAccess(action, { productSurfaceId })` prueft `host`, `join` und `discover` gegen die Transportmatrix und die Capability-Availability.
+6. **Fallbacks und Defaults**: `resolveSurfaceFallbackModePath`, `resolveSurfaceFallbackSessionType` und `resolveSurfaceMenuState` liefern sichere Startwerte, die den Demo-Korridor einhalten.
+7. **Dev-Pfade trennen**: `resolveSurfaceDeveloperAccess({ productSurfaceId })` markiert lokale Dev-/Diagnosepfade explizit. Kein Consumer darf Dev-Zugaenge als Produktversprechen, Sicherheitsbarriere oder Demo-Unlock kommunizieren.
+
+Architekturprinzip: Alle Surface-Entscheide laufen ueber die obigen Resolver aus `PlatformCapabilityRegistry.js` und `PlatformSurfacePolicyOps.js`. Code, der stattdessen auf `__APP_MODE__`, `window.curviosApp.isApp` oder freie `env`-Flags prueft, um Surface-Logik zu steuern, stellt einen Guard-Bruch dar und ist in Folgearbeit durch den richtigen Resolver zu ersetzen.
+
+#### 4.6.4.17 Expert-Login als expliziter Dev-only-Pfad (`V77 77.6.5`)
+
+- `src/ui/menu/MenuExpertLoginRuntime.js` fuehrt `EXPERT_PASSWORD` als lokalen Dev-only-Diagnoseschluessel. Er ist kein Produktfeature, keine Lizenz- und keine Sicherheitsbarriere; er schuetzt keinen produktiven Datenpfad und ist nicht als geheimes Feature-Unlock gedacht.
+- `resolveSurfaceDeveloperAccess()` ist der kanonische Vertragspfad, der fuer beide Surfaces denselben lokalen Dev-Charakter ausdrueckt. `MenuExpertLoginRuntime` konsumiert ihn, damit die Surface-Policy die `available`-Aussage steuert, nicht der Passwort-Vergleich allein.
+- Der Expert-State (`unlocked`, `available`, `accessMode`, `reason`, `message`, `productSurfaceId`) wird im `MenuExpertLoginRuntime`-Objekt self-contained gehalten; `attachMenuExpertState(settings, state)` ist eine optionale Lookup-Bruecke fuer `MenuAccessPolicy` und andere Consumers, die den State ueber das Settings-Objekt lesen muessen.
+- Entscheidung 2026-04-15: Das hartcodierte Passwort bleibt als lokaler Dev-only-Schalter erhalten. Es wird nicht durch einen echten Authentifizierungspfad ersetzt, da es kein Sicherheits- oder Produktversprechen traegt. Folgearbeit, die den Expert-State aus Settings-Anhaengseln befreien moechte, soll `resolveMenuExpertState(settings)` durch einen direkten `MenuExpertLoginRuntime`-Handle-Zugriff ersetzen, sobald der Bootstrap-Kontext es erlaubt.
+
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 
 - Feldkonvention:

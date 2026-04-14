@@ -39,6 +39,8 @@ import {
 } from '../src/shared/contracts/LobbyServiceContract.js';
 import {
     applySurfaceMenuState,
+    isSurfaceModePathAllowed,
+    isSurfaceMapKeyAllowedForModePath,
     isSurfacePresetAllowed,
     isSurfaceQuickStartActionAllowed,
     isSurfaceSessionTypeAllowed,
@@ -48,6 +50,8 @@ import {
     listSurfaceAllowedSessionTypes,
     resolveSurfaceBlockedFeatureFeedback,
     resolveSurfaceEntryCopy,
+    resolveSurfaceFallbackModePath,
+    resolveSurfaceFallbackSessionType,
     resolveSurfaceFeatureClassification,
     resolveSurfaceMenuState,
     resolveSurfaceMultiplayerGateAccess,
@@ -659,4 +663,97 @@ test('V87.3 Electron save adapter clears fallback degradedReason when invoke bas
     assert.equal(typeof adapter.saveReplay, 'function');
     assert.equal(adapter.saveVideo, null);
     assert.equal(adapter.capability.supportsBinaryExport, false);
+});
+
+test('V77.6.3 resolveSurfaceFallbackModePath returns default mode path per surface', () => {
+    const desktopFallback = resolveSurfaceFallbackModePath({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserFallback = resolveSurfaceFallbackModePath({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+
+    assert.equal(desktopFallback, PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL);
+    assert.equal(browserFallback, PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL);
+    assert.equal(typeof desktopFallback, 'string');
+    assert.ok(desktopFallback.length > 0);
+});
+
+test('V77.6.3 isSurfaceModePathAllowed desktop allows all modes including quick_action browser denies it', () => {
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    }), true);
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.ARCADE, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    }), true);
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    }), true);
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    }), true);
+
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), true);
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.ARCADE, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), true);
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), true);
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false);
+
+    assert.equal(isSurfaceModePathAllowed('', { productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO }), false);
+    assert.equal(isSurfaceModePathAllowed('unknown-mode', { productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO }), false);
+});
+
+test('V77.6.3 isSurfaceMapKeyAllowedForModePath browser enforces curated map keys desktop allows any valid map', () => {
+    assert.equal(isSurfaceMapKeyAllowedForModePath('standard', PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), true);
+    assert.equal(isSurfaceMapKeyAllowedForModePath('maze', PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), true);
+    assert.equal(isSurfaceMapKeyAllowedForModePath('parcours_rift', PLATFORM_SURFACE_MENU_MODE_PATHS.ARCADE, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), true);
+
+    assert.equal(isSurfaceMapKeyAllowedForModePath('custom_map', PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false);
+    assert.equal(isSurfaceMapKeyAllowedForModePath('parcours_rift', PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false);
+    assert.equal(isSurfaceMapKeyAllowedForModePath('', PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false);
+
+    assert.equal(isSurfaceMapKeyAllowedForModePath('custom_map', PLATFORM_SURFACE_MENU_MODE_PATHS.NORMAL, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    }), true);
+    assert.equal(isSurfaceMapKeyAllowedForModePath('any_map', PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    }), true);
+    assert.equal(isSurfaceMapKeyAllowedForModePath('standard', PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    }), false, 'quick_action is not allowed for browser-demo, so any map key should be denied');
+});
+
+test('V77.6.3 resolveSurfaceFallbackSessionType returns first allowed session type per surface', () => {
+    const desktopFallback = resolveSurfaceFallbackSessionType({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP,
+    });
+    const browserFallback = resolveSurfaceFallbackSessionType({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+    });
+    const emptyFallback = resolveSurfaceFallbackSessionType({});
+
+    assert.equal(desktopFallback, 'single');
+    assert.equal(browserFallback, 'single');
+    assert.equal(typeof desktopFallback, 'string');
+    assert.ok(desktopFallback.length > 0);
+    assert.equal(emptyFallback, 'single');
 });
