@@ -220,6 +220,39 @@ Stand: 2026-04-14
 | `curviosApp-/__CURVIOS_APP__-Preload-Aliasse` (`electron/preload.cjs`, `src/ui/menu/MenuRuntimeFeatureFlags.js`, `src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js`, `src/ui/menu/multiplayer/MenuMultiplayerHostIpResolver.js`, `src/composition/core-ui/LanMenuMultiplayerBridge.js`, `src/core/recording/DownloadService.js`, `src/core/replay/ReplayRecorder.js`) | `electron/preload.cjs` exponiert benannte Contracts, aber auch Legacy-Aliasfunktionen und das globale App-Flag; Renderer- und Runtime-Module lesen diese Globals direkt fuer Discovery, Host, Save, Replay und Feature-Gating. | `PlatformCapabilityContract` + dedizierte Adapter unter `src/platform/**`; Renderer bekommt nur Capability-Descriptoren, Invoke-Funktionen und Fallback-Status ueber Application-/Platform-Layer. | Sobald `curviosApp`/`__CURVIOS_APP__` ausserhalb der dedizierten Plattformadapter nicht mehr referenziert werden und Browser-/Desktop-Unterschiede nur noch ueber Capability-Snapshots sichtbar sind. |
 | `ActiveRuntimeConfigStore-Adapter` (`src/core/runtime/GameRuntimeBundle.js`, `src/core/Config.js`, `src/core/settings/SettingsSanitizerOps.js`) | `runtimeBundle.metadata.runtimeConfigAdapter` markiert `ActiveRuntimeConfigStore` bereits als Transition-Adapter; einzelne Config-/Settings-Pfade lesen weiterhin den globalen aktiven Runtime-Config-Slot. | `SessionRuntime` wird alleiniger Besitzer des Runtime-Config-Snapshots; Config-/Settings-Consumer erhalten explizite Runtime-/Settings-Projektionen per Injection oder Snapshot. | Sobald `getActiveRuntimeConfig` ausserhalb explizit markierter Uebergangsadapter nicht mehr verwendet wird und `runtimeBundle.metadata.runtimeConfigAdapter` entfernt werden kann. |
 
+#### 4.5.1 Ist-Aufrufer-Snapshot (`V91 91.1.1`, 2026-04-14)
+
+| Surface | Ist-Aufrufer (produktiver Code) | Erlaubter Uebergangsadapter |
+| --- | --- | --- |
+| `game.runtimeBundle` | `src/core/MatchSessionRuntimeBridge.js`, `src/state/RoundStateTickSystem.js` | `GameRuntimeBundle` als Legacy-Container bis zur Snapshot-/Command-Migration |
+| `game.runtimeFacade` und `window.GAME_RUNTIME` | `src/core/PlayingStateSystem.js`, `src/state/RoundStateTickSystem.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/UINavigationLifecycleController.js` sowie Publish/Cleanup in `src/core/AppInitializer.js` und `src/core/main.js` | `GameRuntimeCoordinator`/`AppInitializer` als Legacy-Publish-Adapter; keine neuen Fachaufrufer |
+| `GameRuntimePorts`-Fallbacks | Port-Einstieg in `src/core/GameBootstrap.js`, interne Fallbacks in `src/shared/runtime/GameRuntimePorts.js` | `createRuntimePorts()` bleibt Uebergangsnaht; neue Features laufen ueber Commands/Snapshots |
+| `curviosApp` und `__CURVIOS_APP__` | direkte Reads in `src/entities/ai/ObservationBridgePolicy.js` und `src/shared/contracts/PlatformCapabilityRegistry.js`; Adapterzugriff in `src/platform/electron/ElectronPlatformBridge.js` | langfristig nur `src/platform/electron/**`; direkte Reads sind Migrationsschuld bis 91.3 |
+| `ActiveRuntimeConfigStore`-Globalslot | Reads in `src/core/Config.js` und `src/core/settings/SettingsSanitizerOps.js`; Adapter-Metadaten in `src/core/runtime/GameRuntimeBundle.js` | als markierter Uebergangsadapter bis Runtime-Config per Snapshot/Injection geliefert wird |
+
+#### 4.5.2 Maschinenlesbare Guard-Matrix (`V91 91.1.2`, 2026-04-14)
+
+Die vollstaendige, maschinenlesbare Guard-Matrix liegt unter `scripts/architecture/legacy-surface-guard-matrix.json`. Sie beschreibt fuer jede Legacy-Surface:
+
+- `patterns`: Regulaere Ausdrucksstring-Muster zum Erkennen von Aufrufen
+- `status`: `legacy-transition` (erlaubter Restadapter) oder `migration-debt` (explizite Migrationsschuld)
+- `forbiddenForNewWork`: ob neue Features diese Surface nutzen duerfen
+- `allowedAdapters`: exklusive Adapter-Dateien mit Schreibrecht auf diese Surface
+- `allowedCallers`: bekannte Bestandsaufrufer bis zur Migration
+- `migrationTarget`: Zielpfad (Commands/Snapshots/Capabilities)
+- `sunsetPhase`: geplante Phase fuer den Sunset
+- `sunsetCriteria`: pruefbare Bedingung fuer vollstaendigen Abbau
+
+Kurzregeln fuer neue Feature-Arbeit (konsistenter Einstieg):
+
+| Verboten fuer neue Aufrufer | Erlaubt als Zielpfad |
+| --- | --- |
+| `game.runtimeBundle` (als Fachpfad) | Commands: `initialize_session`, `start_match`, `return_to_menu` |
+| `game.runtimeFacade` (als Fachpfad) | Snapshots: `session_runtime_snapshot`, `match_flow_snapshot` |
+| `window.GAME_RUNTIME` | Capabilities: `platform_capability_snapshot` per Application-Layer |
+| `curviosApp`/`__CURVIOS_APP__` ausserhalb `src/platform/electron/**` | Plattformzugriff: nur ueber `src/platform/**`-Adapter |
+| `getActiveRuntimeConfig` ausserhalb Config/Settings-Uebergangsadapter | Runtime-Config: explizite Injection oder SessionRuntime-Snapshot |
+
 ### 4.6 Zielgrenzen fuer V84
 
 | Schicht | Besitz / Verantwortung | Direkte Partner | Kein direkter Zugriff |
