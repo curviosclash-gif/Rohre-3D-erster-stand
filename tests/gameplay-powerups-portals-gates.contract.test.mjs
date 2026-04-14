@@ -11,6 +11,10 @@ import {
 import { createMapDocument } from '../src/entities/MapSchema.js';
 import { ClassicModeStrategy } from '../src/modes/ClassicModeStrategy.js';
 import { HuntModeStrategy } from '../src/modes/HuntModeStrategy.js';
+import {
+    resolveInventoryActionAvailability,
+    resolvePickupActionAvailability,
+} from '../src/shared/contracts/GameplayActionAvailabilityContract.js';
 import { RoundMetricsStore } from '../src/state/recorder/RoundMetricsStore.js';
 import { deriveMapResolutionFeedbackPlan } from '../src/state/match-session/MatchSessionFeedbackPlan.js';
 
@@ -132,6 +136,43 @@ test('Round recorder diagnostics keep failed item actions analyzable by mode and
     assert.equal(aggregate.failedItemActionCodeTotals['item.use.forbidden'], 1);
     assert.equal(aggregate.failedItemActionCodeTotals['item.shoot.cooldown'], 1);
     assert.equal(aggregate.failedItemActionCodeTotals['mg.shoot.overheated'], 1);
+});
+
+test('Shared UI action availability keeps cooldown and capability hints aligned', () => {
+    const dualAction = resolvePickupActionAvailability({
+        type: 'shield',
+        modeType: 'hunt',
+        useCooldownRemaining: 0.35,
+        shootCooldownRemaining: 0.2,
+    });
+    assert.equal(dualAction.type, 'SHIELD');
+    assert.equal(dualAction.canUse, true);
+    assert.equal(dualAction.canShoot, true);
+    assert.equal(dualAction.canUseNow, false);
+    assert.equal(dualAction.canShootNow, false);
+    assert.equal(dualAction.useOnCooldown, true);
+    assert.equal(dualAction.shootOnCooldown, true);
+    assert.equal(dualAction.hasCooldown, true);
+    assert.equal(dualAction.actionHintLabel, 'DUAL');
+
+    const projectedInventoryState = resolveInventoryActionAvailability({
+        player: {
+            inventory: ['item_rocket', 'shield'],
+            selectedItemIndex: 0,
+            itemUseCooldownRemaining: 0.5,
+            shootCooldown: 0.4,
+        },
+        modeType: 'HUNT',
+        showMg: true,
+    });
+    assert.equal(projectedInventoryState.type, 'ROCKET_WEAK');
+    assert.equal(projectedInventoryState.hasItem, true);
+    assert.equal(projectedInventoryState.canUse, false);
+    assert.equal(projectedInventoryState.canShoot, true);
+    assert.equal(projectedInventoryState.canShootNow, false);
+    assert.equal(projectedInventoryState.canCycle, true);
+    assert.equal(projectedInventoryState.showMg, true);
+    assert.equal(projectedInventoryState.actionHintLabel, 'SHOT');
 });
 
 test('Custom map warning toast keeps extra warning fan-out visible', () => {

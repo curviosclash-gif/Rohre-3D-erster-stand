@@ -1,6 +1,6 @@
 # Gameplay-Referenz: Powerups, Portale und Gates
 
-Stand: 2026-04-13
+Stand: 2026-04-14
 
 ## Zweck
 
@@ -17,6 +17,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Projektil-Treffer uebertragen Status-Items weiterhin auf das Ziel.
 - In Hunt sind Raketen projektil-only Schadens-Projektile und koennen nicht mehr per `useItem` verbrannt werden.
 - HUD- und Touch-Oberflaechen lesen denselben Capability-Vertrag und markieren Slots bzw. Buttons als `USE`, `SHOT`, `DUAL` oder Cooldown.
+- `HudRuntimeSystem` und `TouchInputSource` konsumieren dafuer denselben Resolver `src/shared/contracts/GameplayActionAvailabilityContract.js`, der Runtime-Projection, Cooldowns und Pickup-Normalisierung auf einen gemeinsamen UI-Vertrag hebt.
 
 ## Powerup-Typen
 

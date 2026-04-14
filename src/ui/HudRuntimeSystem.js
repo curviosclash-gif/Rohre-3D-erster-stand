@@ -5,10 +5,10 @@
 import { ArcadeMissionHUD } from './arcade/ArcadeMissionHUD.js';
 import { ArcadeScoreHUD } from './arcade/ArcadeScoreHUD.js';
 import {
-    isPickupTypeSelfUsable,
-    isPickupTypeShootable,
+    getPickupDefinition,
     normalizePickupType,
 } from '../entities/PickupRegistry.js';
+import { resolvePickupActionAvailability } from '../shared/contracts/GameplayActionAvailabilityContract.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 function formatParcoursDurationMs(value) {
@@ -356,42 +356,41 @@ export class HudRuntimeSystem {
         for (let i = 0; i < powerupConfig.MAX_INVENTORY; i++) {
             const slot = container.children[i];
             const rawType = i < inventoryLength ? inventory[i] : '';
-            const type = normalizePickupType(rawType, { fallback: rawType });
-            const config = type ? powerupConfig.TYPES?.[type] : null;
-            const canUse = !!type && isPickupTypeSelfUsable(type, modeType);
-            const canShoot = !!type && isPickupTypeShootable(type, modeType);
+            const slotAction = resolvePickupActionAvailability({
+                type: rawType,
+                fallbackType: rawType,
+                modeType,
+                useCooldownRemaining,
+                shootCooldownRemaining,
+            });
+            const type = slotAction.type;
+            const config = getPickupDefinition(type) || powerupConfig.TYPES?.[type] || null;
             const isSelected = !!type && i === selectedIndex;
-            const useOnCooldown = canUse && useCooldownRemaining > 0.001;
-            const shootOnCooldown = canShoot && shootCooldownRemaining > 0.001;
-            const hasCooldown = !!type && (useOnCooldown || shootOnCooldown);
-            const hintLabel = canUse && canShoot
-                ? 'DUAL'
-                : (canShoot ? 'SHOT' : (canUse ? 'USE' : ''));
             const titleParts = [];
             if (type) {
                 titleParts.push(type.replace(/_/g, ' '));
-                if (canUse && canShoot) titleParts.push('Use oder Shoot');
-                else if (canShoot) titleParts.push('Verschiessbar');
-                else if (canUse) titleParts.push('Direkt nutzbar');
+                if (slotAction.canUse && slotAction.canShoot) titleParts.push('Use oder Shoot');
+                else if (slotAction.canShoot) titleParts.push('Verschiessbar');
+                else if (slotAction.canUse) titleParts.push('Direkt nutzbar');
                 else titleParts.push('Nur kontextbasiert');
-                if (useOnCooldown) titleParts.push(`Use-CD ${useCooldownRemaining.toFixed(1)}s`);
-                if (shootOnCooldown) titleParts.push(`Shoot-CD ${shootCooldownRemaining.toFixed(1)}s`);
+                if (slotAction.useOnCooldown) titleParts.push(`Use-CD ${slotAction.useCooldownRemaining.toFixed(1)}s`);
+                if (slotAction.shootOnCooldown) titleParts.push(`Shoot-CD ${slotAction.shootCooldownRemaining.toFixed(1)}s`);
             }
 
             slot.dataset.type = rawType;
             slot.dataset.pickupType = type || '';
-            slot.dataset.actionHint = hintLabel.toLowerCase();
-            slot.dataset.actionHintLabel = hintLabel;
+            slot.dataset.actionHint = slotAction.actionHintLabel.toLowerCase();
+            slot.dataset.actionHintLabel = slotAction.actionHintLabel;
             slot.dataset.selected = isSelected ? '1' : '0';
-            slot.dataset.cooldown = hasCooldown ? '1' : '0';
+            slot.dataset.cooldown = slotAction.hasCooldown ? '1' : '0';
             slot.textContent = type ? (config?.icon || '?') : '';
             slot.title = titleParts.join(' | ');
             slot.classList.toggle('active', !!type);
             slot.classList.toggle('selected', isSelected);
-            slot.classList.toggle('projectile-only', !!type && canShoot && !canUse);
-            slot.classList.toggle('use-only', !!type && canUse && !canShoot);
-            slot.classList.toggle('dual-action', !!type && canUse && canShoot);
-            slot.classList.toggle('cooldown', hasCooldown);
+            slot.classList.toggle('projectile-only', !!type && slotAction.canShoot && !slotAction.canUse);
+            slot.classList.toggle('use-only', !!type && slotAction.canUse && !slotAction.canShoot);
+            slot.classList.toggle('dual-action', !!type && slotAction.canUse && slotAction.canShoot);
+            slot.classList.toggle('cooldown', slotAction.hasCooldown);
             slot.style.borderColor = type && Number.isFinite(config?.color)
                 ? '#' + config.color.toString(16).padStart(6, '0')
                 : '';

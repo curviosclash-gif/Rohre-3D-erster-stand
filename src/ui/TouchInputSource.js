@@ -3,11 +3,7 @@
 // ============================================
 
 import { PlayerInputSource } from './PlayerInputSource.js';
-import {
-    isPickupTypeSelfUsable,
-    isPickupTypeShootable,
-    normalizePickupType,
-} from '../entities/PickupRegistry.js';
+import { resolveInventoryActionAvailability } from '../shared/contracts/GameplayActionAvailabilityContract.js';
 
 /**
  * Virtual joystick + touch buttons for tablet/mobile play.
@@ -158,6 +154,17 @@ export class TouchInputSource extends PlayerInputSource {
         return this._uiVisible;
     }
 
+    _getMatchRuntimeProjection() {
+        return this._game?.runtimeFacade?.getPorts?.()?.runtimeProjectionPort?.getMatchRuntimeProjection?.()
+            || this._game?.runtimeBundle?.ports?.runtimeProjectionPort?.getMatchRuntimeProjection?.()
+            || null;
+    }
+
+    _findProjectedPlayer(projection = null) {
+        if (!Array.isArray(projection?.players)) return null;
+        return projection.players.find((player) => player?.playerIndex === this._playerIndex) || null;
+    }
+
     _onTouchStart(e) {
         e.preventDefault();
         for (const touch of e.changedTouches) {
@@ -228,32 +235,16 @@ export class TouchInputSource extends PlayerInputSource {
 
     _resolveActionState() {
         const entityManager = this._game?.entityManager;
-        const player = entityManager?.players?.[this._playerIndex] || null;
+        const projection = this._getMatchRuntimeProjection();
+        const player = this._findProjectedPlayer(projection)
+            || entityManager?.players?.[this._playerIndex]
+            || null;
         const strategy = entityManager?.gameModeStrategy || null;
-        const inventory = Array.isArray(player?.inventory) ? player.inventory : [];
-        const inventoryLength = inventory.length;
-        const selectedIndex = inventoryLength > 0
-            ? Math.max(0, Math.min(Number(player?.selectedItemIndex) || 0, inventoryLength - 1))
-            : -1;
-        const rawType = selectedIndex >= 0 ? inventory[selectedIndex] : '';
-        const type = normalizePickupType(rawType, { fallback: rawType });
-        const modeType = String(strategy?.modeType || 'CLASSIC').trim().toUpperCase();
-        const canUse = !!type && isPickupTypeSelfUsable(type, modeType);
-        const canShoot = !!type && isPickupTypeShootable(type, modeType);
-        const useCooldownRemaining = Math.max(0, Number(player?.itemUseCooldownRemaining || 0));
-        const shootCooldownRemaining = Math.max(0, Number(player?.shootCooldown || 0));
-        return {
-            type,
-            hasItem: selectedIndex >= 0,
-            canUse,
-            canShoot,
-            canUseNow: canUse && useCooldownRemaining <= 0.001,
-            canShootNow: canShoot && shootCooldownRemaining <= 0.001,
-            canCycle: inventoryLength > 1,
+        return resolveInventoryActionAvailability({
+            player,
+            modeType: projection?.modeId || strategy?.modeType || 'CLASSIC',
             showMg: !!strategy?.hasMachineGun?.(),
-            useCooldownRemaining,
-            shootCooldownRemaining,
-        };
+        });
     }
 
     _setButtonVisualState(id, { enabled = true, visible = true, title = '' } = {}) {
