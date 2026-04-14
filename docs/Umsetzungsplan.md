@@ -58,61 +58,12 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 
 | Block | Depends-On | Typ | Erfuellt | Hinweis |
 | --- | --- | --- | --- | --- |
-| V64 | V74.99 | hard | ja | Desktop-Multiplayer muss Lifecycle-, Capability- und Composition-Grenzen aus V74 uebernehmen; keine neuen `game.*`- oder private-Facade-Backdoors |
-| V64 | V50/V52 Netzwerk-Baseline | hard | ja | SessionAdapter-, Lobby-, Signaling- und `stateUpdate`-Grundvertraege bleiben verbindlich |
-| V64 | V77.99 | hard | ja | Multiplayer darf das Verkaufsversprechen `Vollversion hostet, Demo joint` erst nach verankerter Surface-Policy umsetzen; V77.99 abgeschlossen 2026-04-15 |
-| V71 | V43-Strukturvertrag | hard | ja | Root-/Editor-Schutz und `EditorPathContract` bleiben bis nach 71.4 verbindlich; 71.4 ist abgeschlossen |
-| V71 | Playwright-/Warmup-Entstoerung fuer Restgate | hard | ja | `71.99` blockerfest abgeschlossen (2026-04-14): Root-/Cleanup-/Editor-/Plan-/Docs-Gates gruen; Build-Blocker `spawn EPERM` und Warmup-Historie in Fehlerberichten dokumentiert |
-| V72 | V69.99 | hard | ja | Fight/Hunt-Item-, Rocket- und Shield-Baseline aus V69 bleibt Ausgangspunkt fuer Pickup-/Portal-/Gate-Vertraege |
 | V72 | Legacy-/Migrationspfad fuer Gate-/Portal-Validierung | hard | nein | Vor hartem Fail muessen sichtbare Warn-, Diagnose- oder Migrationspfade fuer bestehende Maps umgesetzt werden |
-| V74 | V58.99 | hard | ja | Architektur-Guard- und Budget-Baseline aus V58 bleibt die verbindliche Ausgangsbasis |
-| V74 | V60.3 | hard | ja | V60.3 dokumentiert das Zielbild fuer Rest-Orchestratoren und dient als Referenz fuer die Runtime-Entkopplung |
-| V74 | V70.99 | soft | ja | Settings-/Preset-Pfade im Runtime-/Menue-Lifecycle muessen bei Refactors mitgeprueft werden |
-| V74 | V67/V68 Abschlussstand | soft | ja | Multiplayer- und Arcade-Lifecycle aus V67/V68 liefern den Regression-Scope fuer Start-/Return-Pfade |
-| V83 | V74.99 | hard | ja | SessionRuntime-, Command/Event- und Capability-Folgeschnitt setzt die Runtime-Entkopplung aus V74 als Baseline voraus |
-| V83 | V77 Surface-Policy | soft | entfallen | V83 ohne diese soft-dep abgeschlossen; Capability-Grenzen werden in V77 eigenstaendig verankert |
-| V83 | V67/V68 Abschlussstand | soft | ja | Arcade- und Multiplayer-Lifecycle aus den Altbloecken liefern den Regression-Scope fuer Runtime-Kern, Lobby-Service und Finalize-Contracts |
-| V84 | V83.99 | hard | ja | Headless MatchKernel und GameMode-API bauen auf dem SessionRuntime-, Command/Event- und Capability-Vertrag aus V83 auf |
-| V84 | V72.99 | soft | entfallen | V84 ohne diese soft-dep abgeschlossen; Powerup-/Gate-Vertraege fliessen spaeter ueber V86/V82 ein |
-| V84 | V82.99 | soft | entfallen | V84 ohne diese soft-dep abgeschlossen; Arcade-Progressionsregeln fliessen spaeter ueber V82 ein |
-| V85 | V83.99 | hard | ja | Versionierte Persistence- und Content-Vertraege sollen erst nach stabilisiertem Runtime-, Capability- und Legacy-Sunset-Vertrag aufsetzen |
-| V85 | V84.99 | soft | ja | Headless Kernel und GameMode-API liefern spaeter den saubereren Verbrauchspfad fuer Replay-, Snapshot- und Content-Projektionen |
-| V87 | V83.99 | hard | ja | Runtime-Hardening-Follow-up setzt den SessionRuntime-, Command/Event- und Capability-Kern aus V83 als Baseline voraus |
-| V87 | V84.99 | soft | ja | Dokumentierter Headless-Boot- und Projektionsvertrag aus V84 soll mit den gehaerteten Runtime-Pfaden abgeglichen werden |
-| V88 | V87.99 | hard | ja | Runtime-, Capability- und Playwright-Baseline aus `V87 87.99` ist blockerfest dokumentiert und als Startbasis fuer `V88` verfuegbar |
-| V88 | V84.99 | soft | ja | Headless MatchKernel und gemeinsame GameMode-API liefern bevorzugte Kandidaten fuer niedrigere Contract-Testschichten unterhalb von Playwright |
-| V89 | V74.99 | hard | ja | Desktop-first-Tests duerfen keine `main.js`-/Runtime-Backdoors neu aufziehen; Runtime-/Capability-Grenzen aus V74 bleiben verbindlich |
-| V89 | V88.99 | hard | ja | Die neue Desktop-Testpyramide baut auf der in V88 dokumentierten Failure-Taxonomie, dem Test-Mapping und den bestehenden Verifikationsvertraegen auf |
-| V89 | V77.99 | soft | ja | Die Surface-Policy `Desktop Vollversion / Browser Demo` ist mit V77.99 verankert; V89 bleibt abgeschlossen |
-| V91 | V87.99 | hard | ja | Architektur-Ratchet und Legacy-Surface-Sunset bauen auf dem gehaerteten Runtime-, Lifecycle- und Capability-Kern aus V87 auf |
-| V91 | V77.99 | hard | ja | Guard-Matrix und Surface-nahe Sunset-Regeln sollen auf der verbindlichen `desktop-app`-/`browser-demo`-Policy aufsetzen; V77.99 abgeschlossen 2026-04-15 |
-| V91 | V89.99 | soft | ja | Desktop-first-Tests und `node-contract` liefern die bevorzugten kleinen Verifikationspfade fuer neue Architektur-Ratchets |
-| V92 | V91.99 | hard | ja | Ownership-Folgeblock baut auf dem blockerfesten Legacy-Surface-Sunset und den Guard-Ratchets aus V91 auf |
-| V92 | V89.99 | soft | ja | Desktop-first-Gates und `node-contract` liefern die bevorzugten kleinen Verifikationspfade fuer den Ownership-Zuschnitt |
-| V92 | V77.99 | soft | ja | Surface- und Capability-Policy aus V77 bleibt die verbindliche Grenze fuer Diagnostics-, Tooling- und Browser-Demo-Verbrauch |
-| V64 | V91.99 | soft | ja | Multiplayer-Produktisierung sollte denselben Legacy-Sunset- und Guard-Ratchet konsumieren, bevor neue Runtime-Surfaces wachsen; V91.99 abgeschlossen 2026-04-15 |
-| V64 | V92.99 | soft | ja | Multiplayer-Use-Cases sollen den Ownership-Zuschnitt aus V92 konsumieren, bevor neue Runtime-, UI- oder Port-Hotspots wachsen; V92.99 abgeschlossen 2026-04-15 |
-| V86 | V72.99 | hard | ja | Editor- und Authoring-Vertraege sollen auf stabilen Pickup-, Portal-, Gate- und Spawn-Warnpfaden aus V72 aufsetzen |
-| V86 | V85.99 | soft | ja | Descriptor-, Preset- und Template-Leseweg konsumiert den in V85 finalisierten Content-Vertrag jetzt als Baseline |
-| V86 | V92.99 | soft | ja | Runtime-nahe Authoring-Integrationen sollen denselben Ownership- und Capability-Schnitt lesen statt neue Glue-Bypaesse aufzubauen; V92.99 abgeschlossen 2026-04-15 |
-| V77 | V74.99 | hard | ja | Die Surface-Leitplanke fuer `Desktop Vollversion` vs `Browser Demo` darf erst auf der stabilisierten Runtime-/Capability-Basis aus V74 verankert werden |
-| V75 | V74.99 | hard | ja | Recorder-Finalisierung muss denselben Lifecycle-/Dispose-Vertrag wie V74 nutzen; keine parallelen Sonderpfade fuer Stop, Return-to-Menu oder Shutdown |
-| V75 | V77.99 | hard | ja | Export-, Download- und Browser-Fallbacks muessen der Demo-/Vollversions-Politik aus V77 folgen; V77.99 abgeschlossen 2026-04-15 |
 | V75 | V64.99 | hard | nein | Recorder-Polish folgt erst nach dem produktiven Host-/Join-Hauptpfad |
 | V75 | V72 Recorder-/Telemetry-Result-Codes | soft | nein | Nur relevant, falls Export-Diagnostik gemeinsam mit Gameplay-Result-Codes vereinheitlicht wird |
-| V76 | V71.4 | hard | ja | Vehicle-Lab- und Editor-Pfade sind seit `71.4` migrationssicher ueber Contracts/Guards abgesichert |
-| V76 | V77.99 | hard | ja | Hangar, Werkstatt und Editoren muessen die in V77 definierte Vollversions-/Demo-Rollenlogik uebernehmen; V77.99 abgeschlossen 2026-04-15 |
 | V76 | V64.99 | hard | nein | Hangar-/Werkstatt-Flows starten erst nach dem festgezogenen Produktbild fuer Host/Join und Browser-Demo |
-| V76 | V74.99 | hard | ja | Hangar darf `main.js`, `GameRuntimeFacade` oder breite Desktop-Backdoors nicht erneut aufblasen; Navigations-/Composition-Grenzen aus V74 sind verbindlich |
-| V82 | V72.99 | hard | ja | Stabile Pickup-/Portal-/Gate-Vertraege als Basis fuer erweiterte Checkpoint-Logik und Parcours-Arcade-Vereinigung |
-| V82 | V74.99 | hard | ja | Runtime-Entkopplung muss abgeschlossen sein fuer saubere State-Komposition (XP, Leaderboard, Ghost) |
-| V82 | V92.99 | soft | ja | UI-/HUD-/Overlay-nahe Progressionsarbeit soll den Ownership-Zuschnitt aus V92 konsumieren, bevor weitere Last in `MatchFlowUiController` oder Runtime-Hotspots landet; V92.99 abgeschlossen 2026-04-15 |
 | V76 | V82.99 | hard | nein | V76.3 Arcade-Hangar baut direkt auf V82-Contracts (XP, Upgrades, Leaderboard) auf; V82 muss vor V76.3 abgeschlossen sein |
-| V81 | V74.99 | hard | ja | Tuning Console liest/schreibt CONFIG_BASE und nutzt ActiveRuntimeConfigStore; Runtime-Entkopplung muss abgeschlossen sein |
-| V81 | V72.99 | hard | ja | Parameter-Registry muss auf stabiler Pickup-Registry und Config-Struktur aufbauen |
 | V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
-| V81 | V91.99 | hard | ja | Developer-Tuning soll Runtime-Config-Ownership nicht ueber alte Global-Slots vertiefen, sondern auf dem in V91 geharteten Contract aufsetzen; V91.99 abgeschlossen 2026-04-15 |
-| V81 | V92.99 | soft | ja | Developer-Tooling soll den Ownership-Zuschnitt aus V92 konsumieren, bevor neue Runtime-Bridge-, Port- oder Global-Surface-Backdoors entstehen; V92.99 abgeschlossen 2026-04-15 |
 | V94 | V93.99 | hard | nein | Wissensgraph-Build parst Master-Index und Plan-Frontmatter; setzt die V93-Entlastung des Masters (Kopf-Fliesstext raus, Dependency-Tabelle eingedampft) und das `gates:pre-commit`-Meta-Gate aus V93.5.1 voraus |
 
 ## Lock-Status
