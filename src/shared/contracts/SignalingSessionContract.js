@@ -1,3 +1,5 @@
+export { MULTIPLAYER_SESSION_ROLES } from './RuntimeSessionContract.js';
+
 export const SIGNALING_SESSION_CONTRACT_VERSION = 'signaling-session.v1';
 
 export const SIGNALING_COMMAND_TYPES = Object.freeze({
@@ -33,6 +35,41 @@ export const SIGNALING_HTTP_ROUTES = Object.freeze({
     SIGNALING_ICE: '/signaling/ice',
     DISCOVERY_INFO: '/discovery/info',
 });
+
+/**
+ * Maps each signaling command to the session role that sends it.
+ *
+ * 'host'   — only the lobby host sends this command
+ * 'client' — only a joining client sends this command
+ * 'both'   — both host and client may send this command
+ *
+ * WebRTC topology assumed: star (one host, multiple clients).
+ * Clients send OFFER to host; host replies with ANSWER.
+ * ICE candidates are exchanged in both directions.
+ */
+export const SIGNALING_COMMAND_ROLE_MAP = Object.freeze({
+    [SIGNALING_COMMAND_TYPES.CREATE_LOBBY]: 'host',
+    [SIGNALING_COMMAND_TYPES.JOIN_LOBBY]: 'client',
+    [SIGNALING_COMMAND_TYPES.READY]: 'both',
+    [SIGNALING_COMMAND_TYPES.LEAVE]: 'both',
+    [SIGNALING_COMMAND_TYPES.OFFER]: 'client',
+    [SIGNALING_COMMAND_TYPES.ANSWER]: 'host',
+    [SIGNALING_COMMAND_TYPES.ICE]: 'both',
+});
+
+/**
+ * Returns the session role that sends a given signaling command.
+ * Returns 'both', 'host', 'client', or null if the command is unknown.
+ *
+ * @param {string} commandType
+ * @returns {'host'|'client'|'both'|null}
+ */
+export function resolveSignalingCommandRole(commandType) {
+    const normalized = typeof commandType === 'string' ? commandType.trim().toLowerCase() : '';
+    return Object.prototype.hasOwnProperty.call(SIGNALING_COMMAND_ROLE_MAP, normalized)
+        ? SIGNALING_COMMAND_ROLE_MAP[normalized]
+        : null;
+}
 
 function normalizeType(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';

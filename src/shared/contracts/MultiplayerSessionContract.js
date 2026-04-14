@@ -1,3 +1,5 @@
+export { MULTIPLAYER_SESSION_ROLES } from './RuntimeSessionContract.js';
+
 export const MULTIPLAYER_SESSION_CONTRACT_VERSION = 'multiplayer-session.v2';
 export const MULTIPLAYER_STATE_UPDATE_EVENT_SCHEMA_VERSION = 'multiplayer-state-update-event.v1';
 
@@ -72,6 +74,49 @@ export function buildMultiplayerStateUpdateEvent(rawState, options = {}) {
         messageType,
         state,
     };
+}
+
+/**
+ * Message types that the HOST peer sends with authority.
+ * Consumers use this to distinguish host-driven updates from peer-driven messages.
+ */
+export const MULTIPLAYER_HOST_AUTHORITATIVE_MESSAGE_TYPES = Object.freeze(new Set([
+    MULTIPLAYER_MESSAGE_TYPES.FULL_STATE_SYNC,
+    MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT,
+    MULTIPLAYER_MESSAGE_TYPES.HOST_LEAVING,
+    MULTIPLAYER_MESSAGE_TYPES.PLAYER_DISCONNECTED,
+    MULTIPLAYER_MESSAGE_TYPES.PLAYER_RECONNECTED,
+    MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED,
+]));
+
+/**
+ * Message types that only a CLIENT peer sends.
+ */
+export const MULTIPLAYER_CLIENT_ONLY_MESSAGE_TYPES = Object.freeze(new Set([
+    MULTIPLAYER_MESSAGE_TYPES.JOIN,
+    MULTIPLAYER_MESSAGE_TYPES.RECONNECT,
+]));
+
+/**
+ * Returns true if the message type is host-authoritative (only the host sends it).
+ * @param {string} messageType
+ * @returns {boolean}
+ */
+export function isHostAuthoritativeMessageType(messageType) {
+    return MULTIPLAYER_HOST_AUTHORITATIVE_MESSAGE_TYPES.has(
+        normalizeType(messageType)
+    );
+}
+
+/**
+ * Returns true if the message type is client-only (only a joining client sends it).
+ * @param {string} messageType
+ * @returns {boolean}
+ */
+export function isClientOnlyMessageType(messageType) {
+    return MULTIPLAYER_CLIENT_ONLY_MESSAGE_TYPES.has(
+        normalizeType(messageType)
+    );
 }
 
 export function normalizeMultiplayerStateUpdateEvent(rawEvent) {

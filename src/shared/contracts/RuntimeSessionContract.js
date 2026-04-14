@@ -12,10 +12,25 @@ export const MULTIPLAYER_TRANSPORTS = Object.freeze({
     ONLINE: 'online',
 });
 
+/**
+ * Session role in a multiplayer session.
+ * HOST: the peer that owns the lobby and drives match-start authority.
+ * CLIENT: a peer that joins an existing lobby hosted by another player.
+ *
+ * This is the canonical definition shared by MultiplayerSessionContract
+ * and SignalingSessionContract.
+ */
+export const MULTIPLAYER_SESSION_ROLES = Object.freeze({
+    HOST: 'host',
+    CLIENT: 'client',
+});
+
 /** @type {Set<string>} */
 const VALID_SESSION_TYPE_SET = new Set(Object.values(RUNTIME_SESSION_TYPES));
 /** @type {Set<string>} */
 const VALID_MULTIPLAYER_TRANSPORT_SET = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
+/** @type {Set<string>} */
+const VALID_SESSION_ROLE_SET = new Set(Object.values(MULTIPLAYER_SESSION_ROLES));
 
 /**
  * @param {unknown} value
@@ -74,4 +89,52 @@ export function resolveRuntimeSessionContract(source = null) {
 
 export function isMenuStorageBridgeSession(source = null) {
     return resolveRuntimeSessionContract(source).usesMenuStorageBridge === true;
+}
+
+/**
+ * @param {unknown} value
+ * @param {string} [fallback=MULTIPLAYER_SESSION_ROLES.CLIENT]
+ * @returns {string}
+ */
+export function normalizeMultiplayerSessionRole(value, fallback = MULTIPLAYER_SESSION_ROLES.CLIENT) {
+    const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
+    return VALID_SESSION_ROLE_SET.has(normalized) ? normalized : fallback;
+}
+
+/**
+ * Resolves transport-level host/join capabilities for a session.
+ *
+ * Returns whether the session can function as a HOST or CLIENT based solely
+ * on sessionType + multiplayerTransport. This is the transport-level gate;
+ * surface-level restrictions (desktop-app vs. browser-demo) are enforced by
+ * PlatformCapabilityRegistry / DesktopMultiplayerRoleContract.
+ *
+ * Rules:
+ *   - offline sessions (single, splitscreen): canHost=false, canJoin=false
+ *   - network sessions (lan, online): canHost=true, canJoin=true
+ *   - storage-bridge (legacy): adapterSessionType=single, isNetworkSession=false
+ *     → canHost=false, canJoin=false (legacy mechanism, not a product-facing role)
+ *
+ * @param {object|null} source
+ * @returns {{
+ *   sessionType: string,
+ *   multiplayerTransport: string,
+ *   adapterSessionType: string,
+ *   isNetworkSession: boolean,
+ *   isLegacyTransport: boolean,
+ *   canHost: boolean,
+ *   canJoin: boolean,
+ * }}
+ */
+export function resolveRuntimeSessionCapabilities(source = null) {
+    const contract = resolveRuntimeSessionContract(source);
+    return Object.freeze({
+        sessionType: contract.sessionType,
+        multiplayerTransport: contract.multiplayerTransport,
+        adapterSessionType: contract.adapterSessionType,
+        isNetworkSession: contract.isNetworkSession,
+        isLegacyTransport: contract.usesMenuStorageBridge,
+        canHost: contract.isNetworkSession,
+        canJoin: contract.isNetworkSession,
+    });
 }
