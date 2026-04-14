@@ -77,7 +77,21 @@
   - Kein Hinweis auf 404s oder auf einen kaputten V71-Pfadvertrag
   - Der aktuelle Blocker sitzt in der Playwright-Global-Setup-/Warmup-Schiene und ist wahrscheinlich infra- oder flake-getrieben
 
+## Verifikation-Nachtrag 2026-04-14 (`V71 71.99.1`)
+
+- Reproduktion in der aktuellen Session:
+  1. `npm run check:root:runtime` -> PASS
+  2. `npm run cleanup:workspace` (dry-run) -> PASS, Bericht `tmp/workspace-cleanup-report.json`
+  3. `npm run build` -> FAIL bei `vite build` mit `Error: spawn EPERM` (`failed to load config from .../vite.config.js`)
+- Zusatzcheck fuer den direkt betroffenen Prototype-/Editor-Scope:
+  - `npm run check:editor:path-drift` -> PASS
+- Doku-/Governance-Gates:
+  - `npm run plan:check` -> PASS
+  - `npm run docs:sync` -> PASS (`updated=0`)
+  - `npm run docs:check` -> PASS
+- Bewertung: Warmup-Historie bleibt dokumentiert; der aktuell reproduzierbare harte Gate-Blocker fuer `71.99.1` ist der umgebungsnahe Build-Spawn-Fehler (`spawn EPERM`), nicht ein V71-Cleanup-Vertragsbruch.
+
 ## Naechster Schritt
 
-- `tests/playwright.global-setup.js` bzw. den Dev-Server-Warmup fuer die haengenden Reruns untersuchen oder die Gates in sauberem Prozesszustand erneut ausfuehren
-- Bis dahin bleibt V71 bei 71.99 offen; die Fachphasen 71.3 bis 71.5 sind umgesetzt
+- `tests/playwright.global-setup.js` bzw. den Dev-Server-Warmup fuer die haengenden Reruns untersuchen und zusaetzlich die Spawn-Restriktion fuer `vite/esbuild` isolieren
+- Build-Gate in einer Umgebung ohne `spawn EPERM` erneut ausfuehren und den Abschlussstatus bei Bedarf nachziehen
