@@ -304,4 +304,3 @@ test('GameRuntimeFacade match end telemetry uses dedicated arcade handler', () =
         ['menu', 'match_end', payload],
     ]);
 });
-
