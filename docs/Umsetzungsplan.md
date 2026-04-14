@@ -24,28 +24,24 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 
 ## Aktive Bloecke
 
-### Abgeschlossene Bloecke (Referenz fuer Abhaengigkeiten)
+### Abgeschlossene Bloecke (aktuell referenziert)
 
-| id | titel | status | prio | owner | depends_on | current_phase | plan_file |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| V74 | Architektur-Runtime-Entkopplung (Refresh) | done | P1 | frei | V58.99,V60.3 | 74.99 | `docs/plaene/alt/V74.md` |
-| V83 | Architektur SessionRuntime und Plattform-Capabilities | done | P1 | frei | V74.99 | 83.99 | `docs/plaene/alt/V83.md` |
-| V84 | Headless MatchKernel und einheitliche GameMode-API | done | P2 | frei | V83.99 | 84.99 | `docs/plaene/alt/V84.md` |
-
-### Aktive und geplante Bloecke
+Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. Aeltere Abschluesse siehe `docs/plaene/archiv/abgeschlossene-bloecke.md`.
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V71 | Repo-Aufraeumen Runtime-sicher | done | P1 | frei | V43-Strukturvertrag | 71.99 | `docs/plaene/aktiv/V71.md` |
 | V72 | Gameplay-Powerups, Portale und Gates | done | P1 | frei | V69.99 | 72.99 | `docs/plaene/aktiv/V72.md` |
-| V85 | Persistence-, Content-Contracts und Schema-Migrationen | done | P2 | frei | V83.99 | 85.99 | `docs/plaene/aktiv/V85.md` |
-| V87 | Runtime-Hardening-Followup | done | P2 | frei | V83.99 | 87.99 | `docs/plaene/aktiv/V87.md` |
-| V88 | Testarchitektur und Verifikationsvertraege | done | P2 | frei | V87.99 | 88.99 | `docs/plaene/aktiv/V88.md` |
-| V89 | Desktop-first Testarchitektur und Desktop-Verifikation | done | P1 | frei | V74.99,V88.99 | 89.99 | `docs/plaene/aktiv/V89.md` |
-| V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
+| V74 | Architektur-Runtime-Entkopplung (Refresh) | done | P1 | frei | V58.99,V60.3 | 74.99 | `docs/plaene/alt/V74.md` |
 | V77 | Desktop Vollversion Browser Demo Grenzen | done | P2 | frei | V74.99 | 77.99 | `docs/plaene/aktiv/V77.md` |
 | V91 | Architektur-Ratchet und Legacy-Surface-Sunset | done | P2 | frei | V87.99,V77.99 | 91.99 | `docs/plaene/aktiv/V91.md` |
 | V92 | Runtime-Application-Ownership-Entkopplung und Orchestrator-Zuschnitt | done | P2 | frei | V91.99 | 92.99 | `docs/plaene/aktiv/V92.md` |
+
+### Aktive und geplante Bloecke
+
+| id | titel | status | prio | owner | depends_on | current_phase | plan_file |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.1 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
@@ -74,12 +70,6 @@ Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolch
 | - | V71 | 2026-04-14 | closed | Abgeschlossen 2026-04-14: `71.99` blockerfest geschlossen (`71.99.1` Root-/Cleanup-Check gruen, Build reproduzierbar `spawn EPERM` dokumentiert; `71.99.2` Editor-/Plan-/Docs-Gates gruen; `71.99.3` Ignore-Artefakte klassifiziert) |
 | - | V72 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `72.99` Gate gruen; alle drei Pflicht-Gates (plan:check, docs:sync, docs:check) und test:contract (120/120) bestanden; V72 freischaltet V82, V86 und V81 |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
-| - | V83 | - | closed | Abgeschlossen 2026-04-04: `83.99` Gate gruen; Folgebloecke V84/V85 mit `V83.99` koennen anlaufen |
-| - | V84 | 2026-04-04 | closed | Abgeschlossen 2026-04-05: `84.99.2` dokumentiert Headless-Boot, GameMode-API und Runtime-Projektionsvertrag fuer Folgearbeit |
-| - | V85 | 2026-04-12 | closed | Abgeschlossen 2026-04-13: `85.99.2` synchronisiert DoD, Versionsmatrix-, Migrations- und Capability-Leitplanken fuer additive Folgefeatures |
-| - | V87 | - | closed | Abgeschlossen 2026-04-10: `87.99.1` Gate-Checks gruen; Restcluster `physics-core`/`physics-hunt`/`physics-policy` als gezielte Folgearbeit dokumentiert |
-| - | V88 | - | closed | Abgeschlossen 2026-04-10: `88.99.2` synchronisiert Test-Mapping, Failure-Taxonomie und Doku auf den blockerfesten Gate-Stand |
-| - | V89 | - | closed | Abgeschlossen 2026-04-12: `89.99.2` synchronisiert Browser-/Desktop-/Contract-Layer widerspruchsfrei; `desktop-smoke` bleibt gruen, `node-contract`-Restfehler `T97` blockerfest dokumentiert |
 | - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
 | - | V77 | - | closed | Abgeschlossen 2026-04-15: `77.99` Gate gruen; Surface-Vertrag, Entscheidungsraster, Fallback-Contract-Tests und Dev-only-Expert-Policy sind konsistent verankert |
 | - | V91 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `91.99` Gate gruen; Guard-Matrix, Boundary-/Ratchet-/Metrics-Checks, PlatformCapabilityData-Split, Lifecycle-/Capability-Contract-Tests, Feature-Start-Checkliste und Governance-Spiegelung (V64/V81/V82/V86, test_mapping) abgeschlossen; V64 und V81 haben ihre V91.99-Abhaengigkeit jetzt erfuellt |
