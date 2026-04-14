@@ -47,7 +47,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Map-Autoren koennen per `pickupType` feste Item-Typen an Anchors erzwingen.
 - `GHOST` und Spawn-Schutz ueberspringen den normalen Wand-/Trail-Kollisionspfad komplett.
 - In Hunt haben Item-Selbstnutzungen einen Cooldown; fuer `SHIELD` gilt ein eigener Mindest-Cooldown.
-- Recorder und Diagnostik aggregieren stabile Action-Result-Codes wie `item.pickup.success`, `item.use.cooldown`, `item.shoot.success`, `portal.travel` oder `gate.trigger.boost` in `actionResultCodeTotals`.
+- Recorder und Diagnostik aggregieren stabile Action-Result-Codes wie `item.pickup.success`, `item.use.cooldown`, `item.shoot.success`, `portal.travel`, `portal.travel.cooldown`, `portal.exit.trigger`, `portal.exit.inactive`, `gate.trigger.boost` oder `gate.trigger.cooldown` in `actionResultCodeTotals`.
 - Fehlgeschlagene Item-Aktionen sind im Recorder jetzt explizit auswertbar: `failedItemActions`, `failedItemActionModeCounts` (`use|shoot|mg|other`) und `failedItemActionCodeCounts` liefern pro Runde und aggregiert denselben Code-Vertrag wie die Runtime (`item.use.*`, `item.shoot.*`, `mg.shoot.*`).
 
 ## Normale Portale
@@ -61,6 +61,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Spieler landen am Zielportal plus kleinem Vorwaerts-Offset.
 - Im Planar-Mode wird beim Teleport auch die aktive Ebene (`currentPlanarY`) auf die Zielhoehe gesetzt.
 - Projektile behalten ihre Flugrichtung, werden am Ausgang leicht nach vorne versetzt und verlieren nach dem Teleport ihr bisheriges Homing-Ziel bis zur erneuten Erfassung.
+- Der Runtime-Rueckgabevertrag fuer Portal-Interaktionen ist jetzt ebenfalls result-code-basiert: Erfolg liefert `portal.travel`, Cooldown-Blocker `portal.travel.cooldown`, deaktivierte Portale `portal.travel.inactive`.
 - `matchRuntimeProjection.players[*].traversal` zeigt den Runtime-Signalvertrag fuer Portal-/Gate-Interaktionen: `portalCooldownRemaining`, `gateCooldownRemaining`, Exit-Portal-Aktivstatus (`exitPortal.totalCount|activeCount|inactiveCount`) sowie Post-Portal-Fenster (`postPortalActive`, `postPortalRemainingSeconds`, `lastPortalTravelAtMs`).
 - Portal-Parsing normalisiert unvollstaendige Legacy-Paare nicht mehr still auf Ursprungspunkte; ungueltige oder positionslose Eintraege werden verworfen und als Warnung gemeldet.
 
@@ -71,6 +72,7 @@ Diese Uebersicht beschreibt die aktuell im Code vorhandenen Powerups, Portale, E
 - Maps koennen definieren, dass sie erst nach einem Clear-Zustand aktiviert werden.
 - Der Trigger-Radius ist groesser als bei normalen Portalen.
 - Bei Aktivierung werden sie sichtbar geschaltet und koennen als Ziel/Exit genutzt werden.
+- Exit-Portale liefern denselben Result-Vertrag wie andere Traversal-Pfade: `portal.exit.trigger`, `portal.exit.cooldown` und `portal.exit.inactive`.
 
 ## Spezial-Gates
 
@@ -87,9 +89,12 @@ Weitere Gate-Details:
 - Standard-Cooldown fuer Gates: `4.0s`, falls die Map nichts anderes in `params.cooldown` vorgibt.
 - `boost` liest typischerweise `duration`, `forwardImpulse` und optional `bonusSpeed`.
 - `slingshot` liest typischerweise `duration`, `forwardImpulse` und `liftImpulse`.
+- Traversal-Result-Codes sind auch fuer Spezial-Gates standardisiert: erfolgreiche Aktivierungen liefern `gate.trigger.boost` bzw. `gate.trigger.slingshot`, Cooldown-Blocker `gate.trigger.cooldown`.
 - Unbekannte Gate-Typen laufen ueber einen sichtbaren Legacy-/Warnpfad; Runtime-Diagnostik behaelt `legacyType` und `warningCode`.
 - Gate-Parsing verwirft nicht-objektfoermige oder positionslose Gate-Eintraege mit sichtbaren Warnungen statt stiller `0/0/0`-Normalisierung.
-- Hunt-Bots koennen nahe, bereite Special Gates unter hohem Survival-Druck als Retreat-Anker priorisieren.
+- Hunt-Bots und Hunt-Bridge-Fallbacks koennen nahe, bereite Special Gates unter hohem Survival-Druck als Retreat-Anker priorisieren.
+- Wenn kein bereites Special Gate verfuegbar ist, duerfen dieselben Hunt-Fallbacks auch nahe, bereite Portale als Traversal-Ausweichpfad ansteuern.
+- Hunt-spezifische Fallback-Policies ignorieren Nicht-Raketen-Items nicht mehr pauschal: defensive Self-Use-Pickups wie `SHIELD`, `GHOST`, `THICK` oder `SPEED_UP` koennen unter Druck denselben Retreat- oder Survival-Pfad stuetzen.
 
 ## Map-seitige Steuerung
 

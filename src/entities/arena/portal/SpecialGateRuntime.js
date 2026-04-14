@@ -1,4 +1,44 @@
 import * as THREE from 'three';
+import {
+    GAMEPLAY_ACTION_RESULT_CODES,
+    buildGameplayActionResult,
+} from '../../../shared/contracts/GameplayActionResultContract.js';
+import {
+    normalizeEntityKey,
+    resolveEntityCooldown,
+} from './TraversalCooldownOps.js';
+
+function resolveGateResultCode(type = '') {
+    const normalizedType = String(type || '').trim().toLowerCase();
+    if (normalizedType === 'boost') return GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_BOOST;
+    if (normalizedType === 'slingshot') return GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_SLINGSHOT;
+    return GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_UNKNOWN;
+}
+
+function buildGateInteractionResult({
+    ok = false,
+    code = '',
+    type = null,
+    message = '',
+    cooldownSeconds = null,
+    cooldownRemaining = null,
+    meta = null,
+    ...extra
+} = {}) {
+    return {
+        ...buildGameplayActionResult({
+            ok,
+            code,
+            message,
+            mode: 'gate',
+            type,
+            cooldownSeconds,
+            cooldownRemaining,
+            meta,
+        }),
+        ...extra,
+    };
+}
 
 export class SpecialGateRuntime {
     constructor(arena) {
@@ -19,29 +59,11 @@ export class SpecialGateRuntime {
     }
 
     _normalizeEntityKey(entityId) {
-        if (entityId === null || entityId === undefined) return '';
-        return String(entityId).trim();
+        return normalizeEntityKey(entityId);
     }
 
     _resolveEntityCooldown(cooldownMap, entityId) {
-        if (!(cooldownMap instanceof Map)) return 0;
-
-        const directRemaining = Number(cooldownMap.get(entityId) || 0);
-        if (directRemaining > 0) return directRemaining;
-
-        const normalizedKey = this._normalizeEntityKey(entityId);
-        if (!normalizedKey) return 0;
-
-        const normalizedRemaining = Number(cooldownMap.get(normalizedKey) || 0);
-        if (normalizedRemaining > 0) return normalizedRemaining;
-
-        const numericKey = Number(normalizedKey);
-        if (Number.isFinite(numericKey)) {
-            const numericRemaining = Number(cooldownMap.get(numericKey) || 0);
-            if (numericRemaining > 0) return numericRemaining;
-        }
-
-        return 0;
+        return resolveEntityCooldown(cooldownMap, entityId);
     }
 
     checkSpecialGates(position, previousPosition, radius, entityId) {
@@ -68,21 +90,27 @@ export class SpecialGateRuntime {
             if (dotPrev <= 0 && dotCurr > 0) {
                 const dynamicCooldown = gate.params.cooldown || 4.0;
                 gate.cooldowns.set(entityId, dynamicCooldown);
-                return {
+                return buildGateInteractionResult({
+                    ok: true,
+                    code: resolveGateResultCode(gate.type),
                     type: gate.type,
+                    message: 'Spezial-Gate aktiviert',
+                    cooldownSeconds: dynamicCooldown,
                     forward: gate.forward,
                     up: gate.up,
                     params: gate.params,
-                    cooldownSeconds: dynamicCooldown,
-                };
+                });
             }
         }
 
         if (blockedCooldownRemaining > 0) {
-            return {
+            return buildGateInteractionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_COOLDOWN,
+                message: `Gate-Cooldown: ${blockedCooldownRemaining.toFixed(2)}s`,
                 blockedReason: 'cooldown',
                 cooldownRemaining: blockedCooldownRemaining,
-            };
+            });
         }
 
         return null;

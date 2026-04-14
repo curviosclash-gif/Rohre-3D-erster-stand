@@ -1,6 +1,39 @@
 import { resolveGameplayConfig } from '../../../shared/contracts/GameplayConfigContract.js';
+import {
+    GAMEPLAY_ACTION_RESULT_CODES,
+    buildGameplayActionResult,
+} from '../../../shared/contracts/GameplayActionResultContract.js';
+import {
+    normalizeEntityKey,
+    resolveEntityCooldown,
+} from './TraversalCooldownOps.js';
 
 const POST_PORTAL_SIGNAL_SECONDS = 0.55;
+
+function buildPortalInteractionResult({
+    ok = false,
+    code = '',
+    message = '',
+    type = 'PORTAL',
+    cooldownSeconds = null,
+    cooldownRemaining = null,
+    meta = null,
+    ...extra
+} = {}) {
+    return {
+        ...buildGameplayActionResult({
+            ok,
+            code,
+            message,
+            mode: 'portal',
+            type,
+            cooldownSeconds,
+            cooldownRemaining,
+            meta,
+        }),
+        ...extra,
+    };
+}
 
 export class PortalRuntimeSystem {
     constructor(arena) {
@@ -24,29 +57,11 @@ export class PortalRuntimeSystem {
     }
 
     _normalizeEntityKey(entityId) {
-        if (entityId === null || entityId === undefined) return '';
-        return String(entityId).trim();
+        return normalizeEntityKey(entityId);
     }
 
     _resolveEntityCooldown(cooldownMap, entityId) {
-        if (!(cooldownMap instanceof Map)) return 0;
-
-        const directRemaining = Number(cooldownMap.get(entityId) || 0);
-        if (directRemaining > 0) return directRemaining;
-
-        const normalizedKey = this._normalizeEntityKey(entityId);
-        if (!normalizedKey) return 0;
-
-        const normalizedRemaining = Number(cooldownMap.get(normalizedKey) || 0);
-        if (normalizedRemaining > 0) return normalizedRemaining;
-
-        const numericKey = Number(normalizedKey);
-        if (Number.isFinite(numericKey)) {
-            const numericRemaining = Number(cooldownMap.get(numericKey) || 0);
-            if (numericRemaining > 0) return numericRemaining;
-        }
-
-        return 0;
+        return resolveEntityCooldown(cooldownMap, entityId);
     }
 
     _getMaxCooldownForEntity(entries, entityId) {
@@ -74,7 +89,13 @@ export class PortalRuntimeSystem {
 
     checkPortal(position, radius, entityId) {
         if (!this.arena.portalsEnabled) {
-            return { blockedReason: 'inactive', inactiveReason: 'portals-disabled' };
+            return buildPortalInteractionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.PORTAL_TRAVEL_INACTIVE,
+                message: 'Portale deaktiviert',
+                blockedReason: 'inactive',
+                inactiveReason: 'portals-disabled',
+            });
         }
         const portalConfig = resolveGameplayConfig(this.arena).PORTAL;
 
@@ -101,32 +122,41 @@ export class PortalRuntimeSystem {
                 const dynamicCooldown = Math.min(2.5, Math.max(portalConfig.COOLDOWN, dist / 80));
                 portal.cooldowns.set(entityId, dynamicCooldown);
                 this._markPostPortalSignal(entityId, dynamicCooldown);
-                return {
+                return buildPortalInteractionResult({
+                    ok: true,
+                    code: GAMEPLAY_ACTION_RESULT_CODES.PORTAL_TRAVEL,
+                    message: 'Portal durchquert',
+                    cooldownSeconds: dynamicCooldown,
                     target: portal.posB,
                     portal,
-                    cooldownSeconds: dynamicCooldown,
                     postPortalSeconds: POST_PORTAL_SIGNAL_SECONDS,
-                };
+                });
             }
             if (inRangeB) {
                 const dist = portal.posA.distanceTo(portal.posB);
                 const dynamicCooldown = Math.min(2.5, Math.max(portalConfig.COOLDOWN, dist / 80));
                 portal.cooldowns.set(entityId, dynamicCooldown);
                 this._markPostPortalSignal(entityId, dynamicCooldown);
-                return {
+                return buildPortalInteractionResult({
+                    ok: true,
+                    code: GAMEPLAY_ACTION_RESULT_CODES.PORTAL_TRAVEL,
+                    message: 'Portal durchquert',
+                    cooldownSeconds: dynamicCooldown,
                     target: portal.posA,
                     portal,
-                    cooldownSeconds: dynamicCooldown,
                     postPortalSeconds: POST_PORTAL_SIGNAL_SECONDS,
-                };
+                });
             }
         }
 
         if (blockedCooldownRemaining > 0) {
-            return {
+            return buildPortalInteractionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.PORTAL_TRAVEL_COOLDOWN,
+                message: `Portal-Cooldown: ${blockedCooldownRemaining.toFixed(2)}s`,
                 blockedReason: 'cooldown',
                 cooldownRemaining: blockedCooldownRemaining,
-            };
+            });
         }
 
         return null;
@@ -134,7 +164,14 @@ export class PortalRuntimeSystem {
 
     checkExitPortal(position, radius, entityId) {
         if (!this.arena.portalsEnabled) {
-            return { blockedReason: 'inactive', inactiveReason: 'portals-disabled' };
+            return buildPortalInteractionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.EXIT_PORTAL_INACTIVE,
+                message: 'Portale deaktiviert',
+                type: 'EXIT_PORTAL',
+                blockedReason: 'inactive',
+                inactiveReason: 'portals-disabled',
+            });
         }
         if (!Array.isArray(this.arena.exitPortals) || this.arena.exitPortals.length === 0) return null;
         const portalConfig = resolveGameplayConfig(this.arena).PORTAL;
@@ -160,21 +197,37 @@ export class PortalRuntimeSystem {
             }
 
             exitPortal.cooldowns.set(entityId, 3.0);
-            return { triggered: true, exitPortal, cooldownSeconds: 3.0 };
+            return buildPortalInteractionResult({
+                ok: true,
+                code: GAMEPLAY_ACTION_RESULT_CODES.EXIT_PORTAL_TRIGGER,
+                message: 'Exit-Portal aktiviert',
+                type: 'EXIT_PORTAL',
+                cooldownSeconds: 3.0,
+                triggered: true,
+                exitPortal,
+            });
         }
 
         if (blockedCooldownRemaining > 0) {
-            return {
+            return buildPortalInteractionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.EXIT_PORTAL_COOLDOWN,
+                message: `Exit-Portal-Cooldown: ${blockedCooldownRemaining.toFixed(2)}s`,
+                type: 'EXIT_PORTAL',
                 blockedReason: 'cooldown',
                 cooldownRemaining: blockedCooldownRemaining,
-            };
+            });
         }
 
         if (touchedInactiveExitPortal) {
-            return {
+            return buildPortalInteractionResult({
+                ok: false,
+                code: GAMEPLAY_ACTION_RESULT_CODES.EXIT_PORTAL_INACTIVE,
+                message: 'Exit-Portal inaktiv',
+                type: 'EXIT_PORTAL',
                 blockedReason: 'inactive',
                 inactiveReason: 'exit-portal-inactive',
-            };
+            });
         }
 
         return null;

@@ -13,10 +13,15 @@ import { BOT_POLICY_TYPES, normalizeBotPolicyType } from './BotPolicyTypes.js';
 import { ObservationBridgePolicy } from './ObservationBridgePolicy.js';
 import {
     clamp,
+    clearSteeringInput,
+    findNearestReadyPortal,
+    findNearestReadySpecialGate,
     findStrongestRocketIndex,
     getNearestEnemy,
     resolveHealthRatio,
+    resolveHuntFallbackItemAction,
     resolveShieldRatio,
+    applySteeringTowardPosition,
     HuntBotPolicy,
 } from '../../hunt/HuntBotPolicy.js';
 import { resolveHuntTargetOwnerPlayer } from '../../hunt/HuntTargetingOps.js';
@@ -27,6 +32,12 @@ const TMP_TO_ENEMY = new THREE.Vector3();
 const TMP_FORWARD = new THREE.Vector3();
 const TMP_RIGHT = new THREE.Vector3();
 const TMP_UP = new THREE.Vector3();
+const HUNT_BRIDGE_STEERING_SCRATCH = {
+    _tmpGate: TMP_TO_ENEMY,
+    _tmpForward: TMP_FORWARD,
+    _tmpRight: TMP_RIGHT,
+    _tmpUp: TMP_UP,
+};
 
 function resolveObservationValue(observation, index, fallback = 0) {
     if (!observation || typeof observation.length !== 'number') return fallback;
@@ -108,11 +119,24 @@ function resolveHuntBridgeAction(runtimeContext, player) {
     const priorities = resolveHuntBridgePriorities(player, runtimeContext);
     const action = {};
     const huntConfig = resolveGameplayConfig(player).HUNT;
+    const specialGates = Array.isArray(runtimeContext?.arena?.specialGates) ? runtimeContext.arena.specialGates : [];
     const survivalPressure = Math.max(
         priorities.pressureLevel,
         priorities.projectileThreat ? 0.82 : 0,
         (1 - priorities.vitalityRatio) * 0.95
     );
+    const fallbackItemAction = resolveHuntFallbackItemAction(player, {
+        pressureLevel: priorities.pressureLevel,
+        aggression: priorities.aggression,
+        targetInFront: priorities.targetInFront,
+        healthRatio: priorities.healthRatio,
+        shieldRatio: priorities.shieldRatio,
+        survivalPressure,
+        preferDefense: priorities.projectileThreat || survivalPressure > 0.62,
+        preferTraversal: survivalPressure > 0.72 || priorities.vitalityRatio < 0.38,
+        enemyClose: priorities.targetDistanceSq <= 22 * 22,
+        crashRisk: priorities.projectileThreat ? 1 : (priorities.pressureLevel > 0.64 ? 0.5 : 0),
+    });
     const mgRange = Math.max(12, Number(huntConfig?.MG?.RANGE || 95));
     const targetDistanceMax = Math.max(1, Number(runtimeContext?.observationContext?.targetDistanceMax || 120));
     const mgRangeRatio = clamp(mgRange / targetDistanceMax, 0, 1);
@@ -145,13 +169,39 @@ function resolveHuntBridgeAction(runtimeContext, player) {
         }
     }
 
+    if (fallbackItemAction.useItem >= 0) {
+        action.useItem = fallbackItemAction.useItem;
+    } else if (
+        priorities.rocketIndex < 0
+        && fallbackItemAction.shootItem === true
+        && fallbackItemAction.shootItemIndex >= 0
+    ) {
+        action.shootItem = true;
+        action.shootItemIndex = fallbackItemAction.shootItemIndex;
+    }
+
     if (priorities.projectileThreat || priorities.pressureLevel > 0.74) {
         action.boost = true;
     }
 
     if (priorities.vitalityRatio <= 0.34 || (priorities.vitalityRatio < 0.52 && survivalPressure > 0.76)) {
+        const gateAssistRange = Math.max(24, Number(huntConfig?.RETREAT_GATE_RANGE || 54));
+        const readyGate = (survivalPressure > 0.8 || priorities.vitalityRatio < 0.3)
+            ? findNearestReadySpecialGate(HUNT_BRIDGE_STEERING_SCRATCH, player, specialGates, gateAssistRange * gateAssistRange)
+            : null;
+        const portalAssistRange = Math.max(30, gateAssistRange * 1.25);
+        const readyPortal = readyGate?.gate
+            ? null
+            : findNearestReadyPortal(HUNT_BRIDGE_STEERING_SCRATCH, player, runtimeContext?.arena, portalAssistRange * portalAssistRange);
         action.shootMG = false;
-        applyRetreatManeuver(action, player, priorities.enemy);
+        clearSteeringInput(action);
+        if (readyGate?.gate) {
+            applySteeringTowardPosition(HUNT_BRIDGE_STEERING_SCRATCH, action, player, readyGate.gate.pos);
+        } else if (readyPortal?.entry) {
+            applySteeringTowardPosition(HUNT_BRIDGE_STEERING_SCRATCH, action, player, readyPortal.entry);
+        } else {
+            applyRetreatManeuver(action, player, priorities.enemy);
+        }
         action.boost = true;
         if (priorities.rocketIndex < 0) {
             action.shootItem = false;

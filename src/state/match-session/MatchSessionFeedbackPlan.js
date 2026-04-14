@@ -81,6 +81,21 @@ export function deriveMapResolutionFeedbackPlan({ mapResolution, portalsEnabled,
                 tone: 'error',
             });
         }
+
+        const rawItemSpawnMode = String(
+            mapResolution.mapDefinition.itemSpawnAuthoring?.mode ||
+            mapResolution.mapDefinition.itemSpawnMode || ''
+        ).trim().toLowerCase();
+        const isAnchorOnly = rawItemSpawnMode === 'anchor-only';
+        const hasNoItemAnchors = !Array.isArray(mapResolution.mapDefinition.items) ||
+            mapResolution.mapDefinition.items.length === 0;
+        if (isAnchorOnly && hasNoItemAnchors) {
+            toasts.push({
+                message: 'Spawn-Modus "anchor-only", aber keine Item-Anker in der Map — Items spawnen nicht.',
+                durationMs: 3800,
+                tone: 'warning',
+            });
+        }
     }
 
     return { consoleEntries, toasts };

@@ -2,7 +2,13 @@ import * as THREE from 'three';
 import { isRocketTierType } from './RocketPickupSystem.js';
 import { RuleBasedBotPolicy } from '../entities/ai/RuleBasedBotPolicy.js';
 import { BOT_POLICY_TYPES } from '../entities/ai/BotPolicyTypes.js';
+import { BOT_ITEM_RULES } from '../entities/ai/BotTuningConfig.js';
 import { resolveHuntTargetOwnerPlayer } from './HuntTargetingOps.js';
+import {
+    isPickupTypeSelfUsable,
+    isPickupTypeShootable,
+    normalizePickupType,
+} from '../entities/PickupRegistry.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 
 const WORLD_UP = new THREE.Vector3(0, 1, 0);
@@ -54,6 +60,107 @@ export function findStrongestRocketIndex(inventory = []) {
     return strongestIndex;
 }
 
+export function resolveHuntFallbackItemAction(player, options = {}) {
+    const inventory = Array.isArray(player?.inventory) ? player.inventory : [];
+    if (inventory.length === 0) {
+        return {
+            useItem: -1,
+            shootItem: false,
+            shootItemIndex: -1,
+            type: null,
+        };
+    }
+
+    const pressureLevel = clamp(Number(options.pressureLevel) || 0, 0, 1);
+    const aggression = clamp(Number(options.aggression) || 0, 0.12, 1.0);
+    const targetInFront = options.targetInFront === true;
+    const healthRatio = clamp(Number(options.healthRatio) || 0, 0, 1);
+    const shieldRatio = clamp(Number(options.shieldRatio) || 0, 0, 1);
+    const survivalPressure = clamp(Number(options.survivalPressure) || 0, 0, 1);
+    const preferDefense = options.preferDefense === true;
+    const preferTraversal = options.preferTraversal === true;
+    const targetBonus = targetInFront ? 1.1 : 0.5;
+    const enemyClose = options.enemyClose === true;
+    const crashRisk = clamp(Number(options.crashRisk) || 0, 0, 1);
+    const contextWeight = 0.5;
+
+    let bestUseScore = Number.NEGATIVE_INFINITY;
+    let bestUseIndex = -1;
+    let bestUseType = null;
+    let bestShootScore = Number.NEGATIVE_INFINITY;
+    let bestShootIndex = -1;
+    let bestShootType = null;
+
+    for (let i = 0; i < inventory.length; i += 1) {
+        const normalizedType = normalizePickupType(inventory[i], { fallback: inventory[i] });
+        if (!normalizedType || isRocketTierType(normalizedType)) continue;
+
+        const rule = BOT_ITEM_RULES[normalizedType] || {
+            self: 0,
+            offense: 0,
+            defensiveScale: 0,
+            emergencyScale: 0,
+            combatSelf: 0,
+        };
+        const traversalBias = preferTraversal && (normalizedType === 'SPEED_UP' || normalizedType === 'GHOST' || normalizedType === 'THICK')
+            ? 0.22
+            : 0;
+        const shieldSaturationPenalty = normalizedType === 'SHIELD'
+            ? shieldRatio * 0.65
+            : 0;
+        const selfScore = rule.self
+            + pressureLevel * rule.defensiveScale
+            + crashRisk * (rule.emergencyScale || 0) * contextWeight
+            + (enemyClose ? (rule.combatSelf || 0) * contextWeight : 0)
+            + traversalBias
+            + (preferDefense ? 0.18 : 0)
+            - shieldSaturationPenalty;
+        const shootScore = rule.offense * (0.55 + aggression) * targetBonus
+            - survivalPressure * 0.16;
+
+        if (isPickupTypeSelfUsable(normalizedType, 'HUNT') && selfScore > bestUseScore) {
+            bestUseScore = selfScore;
+            bestUseIndex = i;
+            bestUseType = normalizedType;
+        }
+        if (isPickupTypeShootable(normalizedType, 'HUNT') && shootScore > bestShootScore) {
+            bestShootScore = shootScore;
+            bestShootIndex = i;
+            bestShootType = normalizedType;
+        }
+    }
+
+    const defensiveUseThreshold = Math.max(
+        0.34,
+        0.68 - survivalPressure * 0.26 - (healthRatio < 0.45 ? 0.08 : 0) + shieldRatio * 0.12 - (preferDefense ? 0.14 : 0)
+    );
+    if (bestUseIndex >= 0 && bestUseScore > defensiveUseThreshold) {
+        return {
+            useItem: bestUseIndex,
+            shootItem: false,
+            shootItemIndex: -1,
+            type: bestUseType,
+        };
+    }
+
+    const offensiveShootThreshold = 0.48 + survivalPressure * 0.3 + (preferDefense ? 0.1 : 0);
+    if (!preferDefense && bestShootIndex >= 0 && bestShootScore > offensiveShootThreshold) {
+        return {
+            useItem: -1,
+            shootItem: true,
+            shootItemIndex: bestShootIndex,
+            type: bestShootType,
+        };
+    }
+
+    return {
+        useItem: -1,
+        shootItem: false,
+        shootItemIndex: -1,
+        type: null,
+    };
+}
+
 function resolveSensorSnapshot(policy) {
     if (typeof policy?._fallbackPolicy?.getSensorSnapshot === 'function') {
         return policy._fallbackPolicy.getSensorSnapshot();
@@ -67,14 +174,14 @@ function resolveSensorYawPitch(snapshot) {
     return { yaw, pitch };
 }
 
-function clearSteeringInput(input) {
+export function clearSteeringInput(input) {
     input.yawLeft = false;
     input.yawRight = false;
     input.pitchUp = false;
     input.pitchDown = false;
 }
 
-function applySteeringTowardPosition(policy, input, player, targetPosition) {
+export function applySteeringTowardPosition(policy, input, player, targetPosition) {
     if (!targetPosition || !player?.position) return;
     const planarMode = !!resolveGameplayConfig(player).GAMEPLAY.PLANAR_MODE;
     policy._tmpGate.subVectors(targetPosition, player.position);
@@ -121,7 +228,7 @@ function applyRetreatSteeringFromSensors(input, snapshot, player) {
     }
 }
 
-function resolvePlayerCooldownKey(player) {
+export function resolvePlayerCooldownKey(player) {
     if (typeof player?.id === 'string' && player.id.trim()) return player.id;
     if (Number.isFinite(player?.id)) return player.id;
     if (typeof player?.entityId === 'string' && player.entityId.trim()) return player.entityId;
@@ -130,7 +237,7 @@ function resolvePlayerCooldownKey(player) {
     return null;
 }
 
-function findNearestReadySpecialGate(policy, player, specialGates, maxDistanceSq = Infinity) {
+export function findNearestReadySpecialGate(policy, player, specialGates, maxDistanceSq = Infinity) {
     if (!player?.position || !Array.isArray(specialGates) || specialGates.length === 0) return null;
     const cooldownKey = resolvePlayerCooldownKey(player);
     let nearestGate = null;
@@ -148,6 +255,50 @@ function findNearestReadySpecialGate(policy, player, specialGates, maxDistanceSq
         nearestDistSq = distSq;
     }
     return nearestGate ? { gate: nearestGate, distSq: nearestDistSq } : null;
+}
+
+export function findNearestReadyPortal(policy, player, arena, maxDistanceSq = Infinity) {
+    if (!player?.position || !arena || arena.portalsEnabled !== true || !Array.isArray(arena.portals) || arena.portals.length === 0) {
+        return null;
+    }
+    const cooldownKey = resolvePlayerCooldownKey(player);
+    const forward = typeof player?.getDirection === 'function'
+        ? player.getDirection(policy._tmpForward).normalize()
+        : null;
+    let nearestEntry = null;
+    let nearestDistSq = Infinity;
+
+    for (const portal of arena.portals) {
+        if (!portal?.posA || !portal?.posB) continue;
+        const cooldownRemaining = portal.cooldowns instanceof Map && cooldownKey != null
+            ? Number(portal.cooldowns.get(cooldownKey) || 0)
+            : 0;
+        if (cooldownRemaining > 0.001) continue;
+
+        const entries = [
+            { entry: portal.posA, exit: portal.posB },
+            { entry: portal.posB, exit: portal.posA },
+        ];
+        for (const candidate of entries) {
+            policy._tmpGate.subVectors(candidate.entry, player.position);
+            const distSq = policy._tmpGate.lengthSq();
+            if (!Number.isFinite(distSq) || distSq > maxDistanceSq || distSq >= nearestDistSq) continue;
+            const alignment = forward
+                ? policy._tmpGate.normalize().dot(forward)
+                : 1;
+            if (alignment < -0.35) continue;
+            nearestEntry = {
+                portal,
+                entry: candidate.entry,
+                exit: candidate.exit,
+                distSq,
+                alignment,
+            };
+            nearestDistSq = distSq;
+        }
+    }
+
+    return nearestEntry;
 }
 
 function invokeFallbackPolicyUpdate(policy, dt, player, runtimeContext) {
@@ -213,6 +364,18 @@ export class HuntBotPolicy {
             projectileThreat ? 0.82 : 0,
             (1 - vitalityRatio) * 0.95
         );
+        const fallbackItemAction = resolveHuntFallbackItemAction(player, {
+            pressureLevel: pressure,
+            aggression,
+            targetInFront,
+            healthRatio,
+            shieldRatio,
+            survivalPressure,
+            preferDefense: projectileThreat || survivalPressure > 0.62,
+            preferTraversal: survivalPressure > 0.72 || vitalityRatio < 0.38,
+            enemyClose: distSq <= 22 * 22,
+            crashRisk: projectileThreat ? 1 : (pressure > 0.64 ? 0.5 : 0),
+        });
         const mgRange = Math.max(12, Number(huntConfig?.MG?.RANGE || 95));
         const mgRangeSq = mgRange * mgRange;
         input.shootMG = false;
@@ -244,16 +407,34 @@ export class HuntBotPolicy {
             }
         }
 
+        if (!(Number.isInteger(input.useItem) && input.useItem >= 0) && fallbackItemAction.useItem >= 0) {
+            input.useItem = fallbackItemAction.useItem;
+        } else if (
+            rocketIndex < 0
+            && input.shootItem !== true
+            && fallbackItemAction.shootItem === true
+            && fallbackItemAction.shootItemIndex >= 0
+        ) {
+            input.shootItem = true;
+            input.shootItemIndex = fallbackItemAction.shootItemIndex;
+        }
+
         const shouldRetreat = !!enemy && (vitalityRatio <= 0.34 || (vitalityRatio < 0.52 && survivalPressure > 0.76));
         if (shouldRetreat) {
             const gateAssistRange = Math.max(24, Number(huntConfig?.RETREAT_GATE_RANGE || 54));
             const readyGate = (survivalPressure > 0.8 || vitalityRatio < 0.3)
                 ? findNearestReadySpecialGate(this, player, specialGates, gateAssistRange * gateAssistRange)
                 : null;
+            const portalAssistRange = Math.max(30, gateAssistRange * 1.25);
+            const readyPortal = readyGate?.gate
+                ? null
+                : findNearestReadyPortal(this, player, runtimeContext?.arena, portalAssistRange * portalAssistRange);
             const hasSensorSteering = snapshot && (Math.abs(snapshot.targetYaw || 0) > 0.01 || Math.abs(snapshot.targetPitch || 0) > 0.01);
             clearSteeringInput(input);
             if (readyGate?.gate) {
                 applySteeringTowardPosition(this, input, player, readyGate.gate.pos);
+            } else if (readyPortal?.entry) {
+                applySteeringTowardPosition(this, input, player, readyPortal.entry);
             } else if (hasSensorSteering) {
                 applyRetreatSteeringFromSensors(input, snapshot, player);
             } else {

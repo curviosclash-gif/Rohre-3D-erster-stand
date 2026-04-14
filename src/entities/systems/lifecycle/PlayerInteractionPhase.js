@@ -17,29 +17,30 @@ export class PlayerInteractionPhase {
     runSpecialGates(player, prevPos) {
         const entityManager = this.entityManager;
         const gateResult = entityManager.arena.checkSpecialGates(player.position, prevPos, player.hitboxRadius, player.index);
-        if (!gateResult) return;
+        if (!gateResult?.ok) return;
+        const gateType = String(gateResult.type || '').trim().toLowerCase();
 
-        if (gateResult.type === 'boost') {
+        if (gateType === 'boost') {
             player.activateBoostPortal(gateResult.params, gateResult.forward);
             if (entityManager.audio && !player.isBot) entityManager.audio.play('POWERUP');
             entityManager.recorder?.logEvent?.('GATE_TRIGGER', player.index, encodeGameplayActionResultForLog(buildGameplayActionResult({
                 ok: true,
-                code: GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_BOOST,
+                code: gateResult.code || GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_BOOST,
                 mode: 'gate',
-                type: gateResult.type,
-            }), { mode: 'gate', type: gateResult.type }));
+                type: gateType,
+            }), { mode: 'gate', type: gateType }));
             return;
         }
 
-        if (gateResult.type === 'slingshot') {
+        if (gateType === 'slingshot') {
             player.activateSlingshot(gateResult.params, gateResult.forward, gateResult.up);
             if (entityManager.audio && !player.isBot) entityManager.audio.play('POWERUP');
             entityManager.recorder?.logEvent?.('GATE_TRIGGER', player.index, encodeGameplayActionResultForLog(buildGameplayActionResult({
                 ok: true,
-                code: GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_SLINGSHOT,
+                code: gateResult.code || GAMEPLAY_ACTION_RESULT_CODES.GATE_TRIGGER_SLINGSHOT,
                 mode: 'gate',
-                type: gateResult.type,
-            }), { mode: 'gate', type: gateResult.type }));
+                type: gateType,
+            }), { mode: 'gate', type: gateType }));
         }
     }
 
@@ -56,7 +57,7 @@ export class PlayerInteractionPhase {
             if (entityManager.audio && !player.isBot) entityManager.audio.play('POWERUP');
             entityManager.recorder?.logEvent?.('PORTAL_USE', player.index, encodeGameplayActionResultForLog(buildGameplayActionResult({
                 ok: true,
-                code: GAMEPLAY_ACTION_RESULT_CODES.PORTAL_TRAVEL,
+                code: portalResult.code || GAMEPLAY_ACTION_RESULT_CODES.PORTAL_TRAVEL,
                 mode: 'portal',
                 type: 'PORTAL',
             }), { mode: 'portal', type: 'PORTAL' }));
