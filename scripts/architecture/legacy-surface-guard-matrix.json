@@ -1,6 +1,6 @@
 {
-  "_comment": "Machine-readable Guard-Matrix fuer Legacy-Surfaces (V91 91.1.2). Beschreibt verbotene Globals, erlaubte Uebergangsadapter und Eigentuemer fuer den migrierten Scope.",
-  "updatedAt": "2026-04-14",
+  "_comment": "Machine-readable Guard-Matrix fuer Legacy-Surfaces (V91 91.1.2, erweitert in V92 92.5.1). Beschreibt verbotene Globals, erlaubte Uebergangsadapter und Eigentuemer fuer den migrierten Scope.",
+  "updatedAt": "2026-04-15",
   "version": "1",
   "surfaces": [
     {
@@ -23,7 +23,7 @@
     },
     {
       "id": "game.runtimeFacade",
-      "patterns": ["game\\.runtimeFacade", "window\\.GAME_RUNTIME"],
+      "patterns": ["game\\.runtimeFacade", "(?:window|runtimeWindow)\\.GAME_RUNTIME"],
       "status": "legacy-transition",
       "forbiddenForNewWork": true,
       "allowedAdapters": [
@@ -43,19 +43,41 @@
       "sunsetCriteria": "Sobald kein produktiver Code mehr game.runtimeFacade.* oder window.GAME_RUNTIME verwendet und die Fassade nur noch expliziter Legacy-Forwarder oder ganz entfernt ist"
     },
     {
-      "id": "GameRuntimePorts-fallbacks",
-      "patterns": ["GameRuntimePorts\\.js", "createRuntimePorts"],
+      "id": "window.GAME_INSTANCE",
+      "patterns": ["(?:window|runtimeWindow)\\.GAME_INSTANCE"],
       "status": "legacy-transition",
-      "forbiddenForNewWork": false,
+      "forbiddenForNewWork": true,
       "allowedAdapters": [
-        "src/shared/runtime/GameRuntimePorts.js",
-        "src/core/GameBootstrap.js"
+        "src/core/AppInitializer.js",
+        "src/core/main.js"
       ],
       "allowedCallers": [],
-      "reason": "createRuntimePorts() bleibt Uebergangsnaht; neue Feature-Arbeit soll stattdessen Commands/Snapshots nutzen; Port-Einstieg bleibt in GameBootstrap",
+      "reason": "GAME_INSTANCE bleibt nur als explizit dokumentierter Debug-/Diagnostics-Publish in AppInitializer/main erlaubt; produktive Leser im migrierten Scope sind nicht zulaessig",
+      "migrationTarget": "read-only debugRuntimeSnapshot oder vollstaendiger Publish-Stopp; produktive Consumer nutzen Commands, Snapshots oder kleine Ports",
+      "sunsetPhase": "92.3",
+      "sunsetCriteria": "Sobald GAME_INSTANCE nicht mehr produktiv gelesen wird und der verbleibende Publish nur noch als dokumentierter Diagnostics-Adapter besteht oder komplett entfernt ist"
+    },
+    {
+      "id": "GameRuntimePorts-fallbacks",
+      "patterns": [
+        "getLegacyRuntimeFacade",
+        "getLegacyRuntimeCoordinator",
+        "getRuntimeFeatureTransitionFacade",
+        "getRuntimeFeatureTransitionCoordinator",
+        "allowLegacyFallback\\s*=\\s*true"
+      ],
+      "status": "legacy-transition",
+      "forbiddenForNewWork": true,
+      "allowedAdapters": [
+        "src/shared/runtime/GameRuntimePorts.js"
+      ],
+      "allowedCallers": [
+        "src/ui/MatchFlowTransitionHotspots.js"
+      ],
+      "reason": "Explizit benannte RuntimePort-Fallback-Helfer bleiben nur im Uebergangsadapter `GameRuntimePorts` und im dokumentierten UI-Restcaller `MatchFlowTransitionHotspots` erlaubt; neue Feature-Arbeit soll stattdessen Commands, Snapshots oder kleine Ports nutzen",
       "migrationTarget": "Schmale Command-/Event-/Snapshot-Ports mit klarer Ownership; Lifecycle/Session bei SessionRuntime, UI-Projektionen im Application-Layer",
-      "sunsetPhase": "91.3",
-      "sunsetCriteria": "Sobald migrierter Scope keine Fallbacks mehr auf game/runtimeFacade/runtimeCoordinator benoetigt und GameRuntimePorts nicht mehr als Sammelport fuer neue Features importiert wird"
+      "sunsetPhase": "92.3",
+      "sunsetCriteria": "Sobald migrierter Scope keine RuntimeFacade-/RuntimeCoordinator-Fallback-Helfer in GameRuntimePorts mehr benoetigt und Feature-Ports nur noch ueber Bundle-Handles oder explizite Services laufen"
     },
     {
       "id": "curviosApp",
@@ -96,6 +118,7 @@
   ],
   "ownershipRules": {
     "forbiddenGlobals": [
+      "window.GAME_INSTANCE",
       "window.GAME_RUNTIME",
       "window.curviosApp",
       "window.__CURVIOS_APP__"
@@ -103,6 +126,8 @@
     "forbiddenInNewWork": [
       "game.runtimeBundle (als Fachpfad)",
       "game.runtimeFacade (als Fachpfad)",
+      "window.GAME_INSTANCE / window.GAME_RUNTIME (ausserhalb dokumentierter Diagnostics-Adapter)",
+      "GameRuntimePorts-Legacy-Fallback-Helfer (`getLegacyRuntime*`, `getRuntimeFeatureTransition*`, `allowLegacyFallback=true`) ausserhalb des expliziten Uebergangsadapters",
       "getActiveRuntimeConfig (ausserhalb Config/Settings-Uebergangsadapter)",
       "curviosApp/__CURVIOS_APP__ (ausserhalb src/platform/electron/**)"
     ],
