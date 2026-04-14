@@ -16,6 +16,7 @@ export function resolveStorePlatformOptions(options, defaultStorageKey, defaultL
         storagePlatform: options.storagePlatform || createDefaultStoragePlatform({
             storage: options.storage ?? getDefaultBrowserStorage(),
             onQuotaExceeded: options.onQuotaExceeded,
+            onMigrationResult: options.onMigrationResult,
         }),
         storageKey: options.storageKey || defaultStorageKey,
         storageLegacyKeys: Array.isArray(options.storageLegacyKeys)
@@ -35,9 +36,10 @@ export function resolveStorePlatformOptions(options, defaultStorageKey, defaultL
  * @param {Function} opts.createDefault - Returns a fresh default value (called on missing/rejected/error).
  * @param {Function} opts.transform - (parsed, versionState) => normalized value.
  * @param {Function} [opts.onUpgrade] - Called with the normalized value when shouldFallback/shouldUpgrade.
+ * @param {Function} [opts.onLoadError] - Called with (error, artifactType) on parse/transform failure.
  * @returns {*} Normalized value or the default on parse failure.
  */
-export function loadVersionedRecord(readRecord, { artifactType, schemaVersion, createDefault, transform, onUpgrade }) {
+export function loadVersionedRecord(readRecord, { artifactType, schemaVersion, createDefault, transform, onUpgrade, onLoadError }) {
     try {
         const parsed = readRecord();
         if (!parsed || typeof parsed !== 'object') return createDefault();
@@ -54,7 +56,12 @@ export function loadVersionedRecord(readRecord, { artifactType, schemaVersion, c
             onUpgrade(normalized);
         }
         return normalized;
-    } catch {
+    } catch (error) {
+        if (typeof onLoadError === 'function') {
+            try { onLoadError(error, artifactType); } catch { /* keep storage reads resilient */ }
+        } else if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+            console.warn(`[PersistentStore] Failed to load "${artifactType}", using defaults.`, error);
+        }
         return createDefault();
     }
 }

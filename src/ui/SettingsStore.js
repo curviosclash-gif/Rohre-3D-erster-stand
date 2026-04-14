@@ -73,8 +73,10 @@ export class SettingsStore {
                 this.storagePlatform.writeJson(this.settingsStorageKey, sanitized);
             }
             return sanitized;
-        } catch {
-            // Ignore malformed storage and fall back to defaults.
+        } catch (error) {
+            if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+                console.warn('[SettingsStore] loadSettings failed, using defaults.', error);
+            }
         }
         return this.createDefaultSettings();
     }
@@ -127,7 +129,10 @@ export class SettingsStore {
                 });
             }
             return normalized;
-        } catch {
+        } catch (error) {
+            if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+                console.warn('[SettingsStore] loadProfiles failed, using empty list.', error);
+            }
             return [];
         }
     }
@@ -153,7 +158,10 @@ export class SettingsStore {
                 fallbackValue
             );
             return parsed;
-        } catch {
+        } catch (error) {
+            if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+                console.warn(`[SettingsStore] loadJsonRecord failed for key "${key}", using fallback.`, error);
+            }
             return fallbackValue;
         }
     }

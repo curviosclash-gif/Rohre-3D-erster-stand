@@ -125,7 +125,10 @@ function loadPayload(store) {
             safeWriteToLocalStorage(JSON.stringify(resolved.payload));
         }
         return resolved.payload;
-    } catch {
+    } catch (error) {
+        if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+            console.warn('[VehicleManagerLoadoutPresets] loadPayload failed, using empty store.', error);
+        }
         return sanitizeStorePayload(null);
     }
 }
