@@ -11,9 +11,8 @@ import { isSettingsChangeKey, normalizeSettingsChangeKeys } from './SettingsChan
 import { resolveSyncMethodNamesForChangeKeys } from './UISettingsSyncMap.js';
 import { createMenuSchema } from './menu/MenuSchema.js';
 import { MenuPanelRegistry } from './menu/MenuPanelRegistry.js';
-import { resolveMenuAccessContext } from './menu/MenuAccessPolicy.js';
 import { ensureMenuContractState, MENU_SESSION_TYPES } from './menu/MenuStateContracts.js';
-import { resolveRuntimeMenuFeatureFlags } from './menu/MenuRuntimeFeatureFlags.js';
+import { resolveMenuUiSyncContext } from './menu/MenuUiSyncContext.js';
 import { MenuStateMachine, MENU_STATE_IDS } from './menu/MenuStateMachine.js';
 import { listMenuTextCatalogEntries } from './menu/MenuTextCatalog.js';
 import { MenuTextRuntime } from './menu/MenuTextRuntime.js';
@@ -33,7 +32,7 @@ import { syncMenuPresetState } from './menu/MenuPresetStateSync.js';
 import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
 import { syncMenuSurfacePolicyUi } from './menu/MenuSurfacePolicyUiSync.js';
-import { resolveSurfaceEntryCopy, resolveSurfaceMenuState } from '../shared/contracts/PlatformSurfacePolicyOps.js';
+import { resolveSurfaceEntryCopy } from '../shared/contracts/PlatformSurfacePolicyOps.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
@@ -51,8 +50,9 @@ export class UIManager {
         this._menuButtonByPanel = game?._menuButtonByPanel || new Map();
         this._lastMenuTrigger = game?._lastMenuTrigger || null;
         this._submenuPanels = [];
-        this._accessContext = resolveMenuAccessContext(this.settings);
-        this._runtimeFeatureFlags = resolveRuntimeMenuFeatureFlags(this.settings?.menuFeatureFlags);
+        this._menuUiContext = resolveMenuUiSyncContext(this.settings);
+        this._accessContext = this._menuUiContext.accessContext;
+        this._runtimeFeatureFlags = this._menuUiContext.runtimeFeatureFlags;
         this.menuSchema = game?.menuSchema && typeof game.menuSchema === 'object'
             ? game.menuSchema
             : createMenuSchema({ featureFlags: this._runtimeFeatureFlags });
@@ -169,7 +169,15 @@ export class UIManager {
             this.ui.developerTextOverrideInput.value = overrideValue;
         });
     }
-
+    _resolveMenuUiContext(settings = this.game.settings) {
+        const context = resolveMenuUiSyncContext(settings);
+        this._menuUiContext = context;
+        this._accessContext = context.accessContext;
+        this._runtimeFeatureFlags = context.runtimeFeatureFlags;
+        return context;
+    }
+    getMenuUiContext(settings = this.game.settings) { return this._resolveMenuUiContext(settings); }
+    resolveSurfacePolicy(settings = this.game.settings) { return this.getMenuUiContext(settings).surfacePolicy || null; }
     // ------------------------------------------------------------------
     // Delegations zu Sub-Controllern (public API bleibt erhalten)
     // ------------------------------------------------------------------
@@ -179,13 +187,10 @@ export class UIManager {
     setLevel4Open(isOpen)                  { return this._navLifecycle.setLevel4Open(isOpen); }
     setLevel4Section(sectionId, options)   { return this._navLifecycle.setLevel4Section(sectionId, options); }
     showToast(message, durationOrTone, tone) { return this._navLifecycle.showToast(message, durationOrTone, tone); }
-    updateContext()                        { return this._navLifecycle.updateContext(); }
+    updateContext(settings = this.game.settings) { return this._navLifecycle.updateContext(this._resolveMenuUiContext(settings)); }
 
     // Interne Methoden die von StartSyncController zurück gerufen werden
     _setStartSectionOpen(sectionId, open)  { return this._navLifecycle._setStartSectionOpen(sectionId, open); }
-    _syncDeveloperReleaseCutVisibility(settings, releaseState) {
-        return this._navLifecycle.syncDeveloperReleaseCutVisibility(settings, releaseState);
-    }
 
     // Start / Validierung
     showStartValidationError(issue, opts)  { return this._startSync.showStartValidationError(issue, opts); }
@@ -197,17 +202,18 @@ export class UIManager {
 
     syncAll() {
         const settings = this.game.settings;
-        this.syncSessionState(settings);
-        this.syncModes(settings);
+        const menuUiContext = this._resolveMenuUiContext(settings);
+        this.syncSessionState(settings, menuUiContext);
+        this.syncModes(settings, menuUiContext);
         this.syncMap(settings);
         this.syncBots(settings);
         this.syncRules(settings);
         this.syncGameplay(settings);
         this.syncVehicles(settings);
         this.syncStartSetupState(settings);
-        this.syncPresetState(settings);
-        this.syncMultiplayerState(settings);
-        this.syncDeveloperState(settings);
+        this.syncPresetState(settings, menuUiContext);
+        this.syncMultiplayerState(settings, menuUiContext);
+        this.syncDeveloperState(settings, menuUiContext);
     }
 
     syncByChangeKeys(changedKeys) {
@@ -239,16 +245,15 @@ export class UIManager {
     // Sync-Methoden (verbleiben im UIManager – einfache DOM-Syncs)
     // ------------------------------------------------------------------
 
-    syncSessionState(settings = this.game.settings) {
+    syncSessionState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         const ui = this.ui;
         const huntFeatureEnabled = resolveGameplayConfig(this.game).HUNT?.ENABLED !== false;
-        const surfaceMenuState = resolveSurfaceMenuState(settings, { productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId });
-        const sessionType = surfaceMenuState.sessionType;
+        const sessionType = menuUiContext.surfaceMenuState.sessionType;
         syncMenuSurfacePolicyUi({
             ui,
             settings,
             sessionType,
-            surfacePolicy: this._runtimeFeatureFlags?.surfacePolicy || null,
+            surfacePolicy: menuUiContext.surfacePolicy,
             huntFeatureEnabled,
         });
         const themeMode = String(settings?.localSettings?.themeMode || 'dunkel').toLowerCase() === 'hell'
@@ -260,9 +265,9 @@ export class UIManager {
         this.syncStartSetupState(settings);
     }
 
-    syncModes(settings = this.game.settings) {
+    syncModes(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         const ui = this.ui;
-        const sessionType = resolveSurfaceMenuState(settings, { productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId }).sessionType;
+        const sessionType = menuUiContext.surfaceMenuState.sessionType;
         const effectiveMode = sessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
 
         if (Array.isArray(ui.modeButtons)) {
@@ -418,19 +423,22 @@ export class UIManager {
     // Delegiert an UIStartSyncController
     syncStartSetupState(settings = this.game.settings) { return this._startSync.syncStartSetupState(settings); }
 
-    syncPresetState(settings = this.game.settings) {
+    syncPresetState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         syncMenuPresetState({
             ui: this.ui,
             settings,
             settingsManager: this.game.settingsManager,
-            surfacePolicy: this._runtimeFeatureFlags?.surfacePolicy || null,
+            surfacePolicy: menuUiContext.surfacePolicy,
         });
     }
 
-    syncMultiplayerState(settings = this.game.settings) {
+    syncMultiplayerState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
         if (!this.ui.multiplayerStatus) return;
-        const sessionType = resolveSurfaceMenuState(settings, { productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId }).sessionType;
-        const surfaceEntryCopy = resolveSurfaceEntryCopy({ productSurfaceId: this._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId, sessionType });
+        const sessionType = menuUiContext.surfaceMenuState.sessionType;
+        const surfaceEntryCopy = resolveSurfaceEntryCopy({
+            productSurfaceId: menuUiContext.surfacePolicy?.productSurfaceId,
+            sessionType,
+        });
         const sessionState = this.game?.menuMultiplayerBridge?.getSessionState?.() || null;
         const activePresetId = String(settings?.matchSettings?.activePresetId || '');
         const presetText = activePresetId ? ` | Preset: ${activePresetId}` : '';
@@ -465,16 +473,16 @@ export class UIManager {
         }
     }
 
-    syncDeveloperState(settings = this.game.settings) {
-        const releaseState = this._navLifecycle._resolveDeveloperReleaseState(settings);
+    syncDeveloperState(settings = this.game.settings, menuUiContext = this._resolveMenuUiContext(settings)) {
+        const releaseState = menuUiContext.releaseState;
+        this._navLifecycle.syncDeveloperReleaseCutVisibility(menuUiContext);
         syncMenuDeveloperState({
             ui: this.ui,
             settings,
             settingsManager: this.game.settingsManager,
-            accessContext: this._accessContext,
+            accessContext: menuUiContext.accessContext,
             menuTextRuntime: this.menuTextRuntime,
             releaseState,
-            syncReleaseCutVisibility: () => this._navLifecycle.syncDeveloperReleaseCutVisibility(settings, releaseState),
         });
     }
 

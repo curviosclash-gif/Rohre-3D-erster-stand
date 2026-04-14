@@ -10,6 +10,7 @@ import { createLifecyclePort, createRuntimeIntentPort } from '../src/shared/runt
 import { createMatchFlowUiControllerPort } from '../src/shared/runtime/UiControllerRuntimePorts.js';
 import { MatchKernel } from '../src/state/MatchKernel.js';
 import { MATCH_KERNEL_CONSUMER_IDS, createMatchKernelConsumerRegistry } from '../src/state/MatchKernelConsumerAdapters.js';
+import { resolveDeveloperReleaseState, resolveMenuUiSyncContext } from '../src/ui/menu/MenuUiSyncContext.js';
 
 test('MatchFlow UI controller port forwards runtime projections when provided', () => {
     const runtimeSnapshot = { tickIndex: 12 };
@@ -226,6 +227,55 @@ test('runtimeIntentPort.handleMenuPanelChanged delegates through intent adapter 
     assert.deepEqual(calls, [['coordinator', 'menu-main', 'submenu-game', { trigger: 'nav' }]]);
 });
 
+test('Menu UI sync context resolves access, release, and surface state via one shared resolver (91.3.4)', () => {
+    const settings = {
+        menuFeatureFlags: {
+            developerModeEnabled: false,
+        },
+        localSettings: {
+            ownerId: 'owner',
+            actorId: 'owner',
+            developerModeVisibility: 'owner_only',
+            releasePreviewEnabled: true,
+            sessionType: 'single',
+            modePath: 'normal',
+        },
+        mapKey: 'standard',
+    };
+    const menuUiContext = resolveMenuUiSyncContext(settings, { runtimeGlobal: { __CURVIOS_APP__: true } });
+
+    assert.equal(menuUiContext.surfacePolicy?.productSurfaceId, 'desktop-app');
+    assert.equal(menuUiContext.surfaceMenuState?.sessionType, 'single');
+    assert.equal(menuUiContext.surfaceMenuState?.modePath, 'normal');
+    assert.equal(menuUiContext.accessContext?.isOwner, true);
+    assert.equal(menuUiContext.releaseState?.featureEnabled, false);
+    assert.equal(menuUiContext.releaseState?.releaseCutEnabled, true);
+});
+
+test('Developer release state helper keeps release-cut contract stable (91.3.4)', () => {
+    const releaseState = resolveDeveloperReleaseState({
+        menuFeatureFlags: { developerModeEnabled: true },
+        localSettings: { releasePreviewEnabled: false },
+    });
+    const releaseCutState = resolveDeveloperReleaseState({
+        menuFeatureFlags: { developerModeEnabled: true },
+        localSettings: { releasePreviewEnabled: true },
+    });
+
+    assert.deepEqual(releaseState, {
+        featureEnabled: true,
+        releasePreviewEnabled: false,
+        developerUiHidden: false,
+        releaseCutEnabled: false,
+    });
+    assert.deepEqual(releaseCutState, {
+        featureEnabled: true,
+        releasePreviewEnabled: true,
+        developerUiHidden: false,
+        releaseCutEnabled: true,
+    });
+});
+
 test('GameRuntimeFacade match end telemetry uses dedicated arcade handler', () => {
     const payload = { state: 'MATCH_END', completedSectors: 3 };
     const calls = [];
@@ -254,3 +304,4 @@ test('GameRuntimeFacade match end telemetry uses dedicated arcade handler', () =
         ['menu', 'match_end', payload],
     ]);
 });
+

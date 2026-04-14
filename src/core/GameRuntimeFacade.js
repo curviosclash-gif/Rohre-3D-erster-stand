@@ -112,7 +112,7 @@ export class GameRuntimeFacade {
     getRuntimeHandle(key) { return getSessionRuntimeHandle(this.getRuntimeBundle() || this.game, key); }
     getPorts() { return this.getRuntimeHandle('runtimePorts') || this._explicitPorts || null; }
     get ports() { return this.getPorts(); }
-    getUiManager() { return this.getRuntimeHandle('uiManager') || this.game?.uiManager || null; }
+    getUiManager() { return this.getRuntimeHandle('uiManager') || null; }
 
     _clearMatchPrewarmTimer() {
         if (!this._matchPrewarmTimer) return;

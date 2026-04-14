@@ -253,6 +253,54 @@ Kurzregeln fuer neue Feature-Arbeit (konsistenter Einstieg):
 | `curviosApp`/`__CURVIOS_APP__` ausserhalb `src/platform/electron/**` | Plattformzugriff: nur ueber `src/platform/**`-Adapter |
 | `getActiveRuntimeConfig` ausserhalb Config/Settings-Uebergangsadapter | Runtime-Config: explizite Injection oder SessionRuntime-Snapshot |
 
+#### 4.5.3 Runtime-Adapterzuschnitt (`V91 91.3.1`, 2026-04-14)
+
+- `src/shared/runtime/GameRuntimePorts.js` liest Runtime-Intents jetzt in einer expliziten Reihenfolge: zuerst Bundle-Handles (`runtimeCoordinator`, `runtimeFacade`), danach nur noch markierte Legacy-Restadapter (`game.runtimeCoordinator`, `game.runtimeFacade`).
+- `createLifecyclePort()` konsumiert denselben Resolver und fuehrt damit keinen separaten ad-hoc-Fallback-Pfad mehr.
+- `src/core/runtime/GameRuntimeCoordinator.js` nutzt fuer Ports/Fassade/UI nur noch Runtime-Bundle-Handles; rohe Slot-Fallbacks auf `runtime.runtimePorts`, `runtime.runtimeFacade` und `runtime.uiManager` sind entfernt.
+- `src/core/GameRuntimeFacade.js` liest `uiManager` nur noch ueber den Runtime-Bundle-Handle.
+
+#### 4.5.4 UI-Kontext als expliziter Snapshot-Vertrag (`V91 91.3.4`, 2026-04-14)
+
+- `src/ui/menu/MenuUiSyncContext.js` ist die zentrale Quelle fuer Access-, Release- und Surface-Kontext im Menue (`resolveMenuUiSyncContext`, `resolveDeveloperReleaseState`).
+- `src/ui/UIManager.js` berechnet den Menue-Kontext einmal pro Sync-Zyklus und reicht ihn explizit an Session-, Mode-, Preset-, Multiplayer- und Developer-Sync weiter.
+- `src/ui/UINavigationLifecycleController.js` berechnet Access-/Release-Kontext nicht mehr selbst neu; `updateContext()` und `syncDeveloperReleaseCutVisibility()` konsumieren denselben Snapshot.
+- `src/ui/menu/MenuDeveloperStateSync.js` nutzt keinen impliziten Callback mehr, der den Release-Cut-Sync versteckt triggert; der Aufrufpfad ist jetzt explizit `UIManager -> NavigationLifecycle`.
+- `src/ui/UIStartSyncController.js` liest Surface-Policy ueber `UIManager.resolveSurfacePolicy()` statt ueber private Manager-Felder.
+
+#### 4.5.5 Lifecycle-, Finalize- und Capability-Contract-Regressionspfad (`V91 91.4.2`, 2026-04-14)
+
+- `tests/lifecycle-capability.contract.test.mjs` ist der kanonische 91.4-Testpfad; Lifecycle-/Capability-Gating ist dort konsolidiert statt parallel in mehreren Contract-Dateien.
+- Der Scope sichert `return_to_menu` ueber `UiIntentAtomicity` als Lease-Vertrag ab und blockiert Ausfuehrung explizit bei `finalizing` oder stale Snapshot-Timestamps.
+- `SessionRuntimeStateMachine` bleibt gegen den kritischen Finalize-Korridor abgesichert: `finalizing -> menu` bleibt gesperrt, bis `finalize.status === finalized` und ein Abschluss-Event (`match_finalized` oder `menu_opened`) vorliegt.
+- `SessionRuntimeEventContract` und `SessionRuntimeSnapshotContract` sichern im selben Test die Event-Klasse `capability_fallback_used` und die Reihenfolge `match_finalized -> menu_opened` im Observability-Snapshot.
+- Snapshot-/Surface-Gating fuer neue UI-Arbeit ist im gleichen Scope abgedeckt (`createSessionRuntimeSnapshot`, `createMatchFlowSnapshot`, `createPlatformCapabilitySnapshot`, `resolveSurfaceBlockedFeatureFeedback`, `resolveSurfaceFeatureLaunchGuard`, `resolveSurfaceMultiplayerGateAccess`, `resolveSurfaceFeatureClassification`).
+
+#### 4.5.6 Feature-Start-Checkliste fuer neue Produktarbeit (`V91 91.5.1`, 2026-04-14)
+
+Jede neue produktive Datei im Scope der aktiven Blocks (`V64`, `V81`, `V82`, `V86`) folgt vor dem ersten Commit denselben Architekturpfaden:
+
+| Dimension | Bevorzugter Pfad | Verbotener Legacy-Pfad |
+| --- | --- | --- |
+| **Contract** | Shared-Contract-Datei in `src/shared/contracts/` anlegen oder erweitern; Versionierung und Normalize-Utils aus `ContractNormalizeUtils.js` nutzen | Inline-Normalisierung oder -Validierung in Fach-Datei |
+| **Command/Event** | `SessionRuntimeCommandContract.js` oder `SessionRuntimeEventContract.js` als Typ-Quelle; Dispatch ueber bestehende Ports | Direktaufruf auf `game.*`- oder `runtimeFacade`-Methoden fuer neue Fachpfade |
+| **Snapshot** | `session_runtime_snapshot`, `match_flow_snapshot` oder `platform_capability_snapshot` als read-only Input | `getActiveRuntimeConfig()` oder `window.GAME_RUNTIME` als Fachpfad |
+| **Capability** | `resolveSurfaceCapabilityAccess()`, `resolveSurfacePolicy()` oder `resolveSurfaceFeatureLaunchGuard()` aus `PlatformCapabilityRegistry.js` bzw. `PlatformSurfacePolicyOps.js` | Direktlesen von `curviosApp`, `__CURVIOS_APP__` oder rohen Preload-Feldern ausserhalb `src/platform/**` |
+| **Sunset alter Pfade** | Bei jedem neuen Fachimport pruefen, ob ein Guard-Matrix-Eintrag fuer diesen Legacy-Pfad existiert; existiert er, ist nur der gelistete `allowedAdapter` erlaubt | Neue Aufrufer auf `game.runtimeBundle`, `game.runtimeFacade`, `curviosApp`/`__CURVIOS_APP__` (ausserhalb `src/platform/**`) oder `getActiveRuntimeConfig` (ausserhalb Config/Settings) einbauen |
+| **Desktop-vs-Demo** | Surface-Policy immer ueber `resolveSurfacePolicy({ productSurfaceId })` bestimmen; Desktop-only-Features mit `resolveSurfaceFeatureLaunchGuard()` schraenken | Direktvergleich auf `runtimeKind === 'electron'` oder Feature-Flags ausserhalb der Surface-Policy-Kontrakte |
+
+**Pflicht-Gates vor jedem Block-Merge:**
+
+```
+npm run check:architecture:boundaries
+npm run check:architecture:touched-strict
+npm run check:architecture:metrics
+npm run check:architecture:ratchet
+npm run plan:check
+npm run docs:sync
+npm run docs:check
+```
+
 ### 4.6 Zielgrenzen fuer V84
 
 | Schicht | Besitz / Verantwortung | Direkte Partner | Kein direkter Zugriff |

@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /**
  * PlatformCapabilityRegistry — resolver layer for platform capabilities.
  *

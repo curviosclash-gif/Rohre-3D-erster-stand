@@ -69,21 +69,18 @@ export class GameRuntimeCoordinator {
     getPorts() {
         return this.getRuntimeHandle('runtimePorts')
             || this.runtimeBundle?.ports
-            || this.runtime?.runtimePorts
             || null;
     }
 
     getRuntimeFacade() {
         return this.runtimeFacade
             || this.getRuntimeHandle('runtimeFacade')
-            || this.runtime?.runtimeFacade
             || null;
     }
 
     getUiManager() {
         return this.uiManager
             || this.getRuntimeHandle('uiManager')
-            || this.runtime?.uiManager
             || null;
     }
 

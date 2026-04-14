@@ -31,6 +31,8 @@ Use this guide to choose the cheapest meaningful verification path for new featu
 - Die kuenftige Desktop-Basis haengt direkt an `electron/launch.cjs` -> `electron/main.cjs` -> `electron/static-server.cjs` -> `electron/preload.cjs`; ihre Readiness-Stufen sind `process_started -> window_created -> renderer_loaded -> preload_bridge_ready`, ihre Failure-Klassen `desktop-startup|desktop-readiness|desktop-runtime-regression|desktop-flake`.
 - Die Trennung bleibt bewusst logisch statt vollstaendig physisch: keine Dateiumbenennung der Runner-Skripte und kein separater Heavy-Harness; die kanonische Skriptoberflaeche ist dennoch seit `V89.5.1` auf `desktop-smoke`, `desktop-e2e` und `browser-compat` umgestellt.
 
+- `V91 91.2` fuegt eine fuenfte Pruefklasse `architecture-guard` hinzu: `npm run check:architecture:boundaries`, `npm run check:architecture:touched-strict`, `npm run check:architecture:metrics` und `npm run check:architecture:ratchet`. Diese Gates blockieren neue Legacy-Surface-Reads (`game.runtimeBundle`, `game.runtimeFacade`, `window.GAME_RUNTIME`, `curviosApp`/`__CURVIOS_APP__`, `getActiveRuntimeConfig` ausserhalb Config/Settings) und ueberwachen die Ratchet-Baselines. Fuer Folgeblocks V64/V81/V82/V86 gehoert `architecture-guard` vor `node-contract` in die Gate-Reihenfolge.
+
 ## Produktsignal und Gate-Reihenfolge
 
 - Desktop ist das primaere Produktsignal: `guard` -> `contract` -> `desktop-smoke` (`npm run test:desktop:smoke`) -> erst danach gezielte `desktop-e2e`-Slices.
@@ -86,6 +88,12 @@ Use this guide to choose the cheapest meaningful verification path for new featu
 - `src/network/**` -> `npm run test:contract` then `npm run test:browser:compat -- tests/network-adapter.spec.js`
 - `src/shared/vehicle-lab/**` -> `npm run test:browser:compat -- tests/editor-vehicle.spec.js`
 - `src/shared/contracts/**` -> `npm run test:contract`
+- `src/shared/contracts/PlatformCapabilityData.js` -> `npm run test:contract`
+- `scripts/architecture/legacy-surface-guard-matrix.json` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet`
+- `scripts/architecture/*.json` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet && npm run check:architecture:metrics`
+- `scripts/architecture/ArchitectureAnalysis.mjs` -> `npm run check:architecture:boundaries && npm run check:architecture:ratchet && npm run check:architecture:metrics`
+- `tests/lifecycle-capability.contract.test.mjs` -> `npm run test:contract`
+- `tests/runtime-regressions.contract.test.mjs` -> `npm run test:contract`
 - `src/state/training/**` -> `npm run test:contract`
 - `src/state/**` -> `npm run test:contract` then `npm run smoke:roundstate`
 - `src/core/runtime/**` -> `npm run test:desktop:smoke` then `npm run test:desktop:e2e -- core-shell core-platform core-surface core-runtime`

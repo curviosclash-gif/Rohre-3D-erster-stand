@@ -243,7 +243,9 @@ export class UIStartSyncController {
     }
 
     _resolveSurfacePolicy() {
-        return this.manager?._runtimeFeatureFlags?.surfacePolicy || null;
+        return this.manager?.resolveSurfacePolicy?.(this.game?.settings)
+            || this.manager?._runtimeFeatureFlags?.surfacePolicy
+            || null;
     }
 
     _resolveAllowedModePath(requestedModePath) {

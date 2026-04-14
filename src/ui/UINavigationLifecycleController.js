@@ -8,7 +8,6 @@ import {
     evaluateMenuAccessPolicy,
     resolveDebugAccessPolicy,
     resolveDeveloperAccessPolicy,
-    resolveMenuAccessContext,
 } from './menu/MenuAccessPolicy.js';
 import { LEVEL4_SECTION_IDS, MENU_SESSION_TYPES } from './menu/MenuStateContracts.js';
 import { MenuNavigationRuntime } from './menu/MenuNavigationRuntime.js';
@@ -16,6 +15,7 @@ import { MenuStateMachine, MENU_STATE_IDS } from './menu/MenuStateMachine.js';
 import { MenuPanelRegistry } from './menu/MenuPanelRegistry.js';
 import { MenuTextRuntime } from './menu/MenuTextRuntime.js';
 import { resolveMapPreview } from './menu/MenuPreviewCatalog.js';
+import { resolveDeveloperReleaseState } from './menu/MenuUiSyncContext.js';
 
 export class UINavigationLifecycleController {
     /**
@@ -215,8 +215,14 @@ export class UINavigationLifecycleController {
     }
 
     handleExpertStateChanged() {
-        this.manager.updateContext();
-        this.manager.syncDeveloperState(this.manager.settings);
+        const menuUiContext = this.manager._resolveMenuUiContext?.(this.manager.settings) || null;
+        if (menuUiContext) {
+            this.manager.syncDeveloperState(this.manager.settings, menuUiContext);
+            this.updateContext(menuUiContext);
+        } else {
+            this.manager.updateContext();
+            this.manager.syncDeveloperState(this.manager.settings);
+        }
         if (this.game._activeSubmenu === 'submenu-expert') {
             this.game.menuExpertLoginRuntime?.focusPrimaryControl?.();
         }
@@ -304,20 +310,6 @@ export class UINavigationLifecycleController {
     // Developer-Release-Sichtbarkeit
     // ------------------------------------------------------------------
 
-    _resolveDeveloperReleaseState(settings = this.manager.settings) {
-        const localSettings = settings?.localSettings && typeof settings.localSettings === 'object'
-            ? settings.localSettings
-            : {};
-        const featureEnabled = settings?.menuFeatureFlags?.developerModeEnabled !== false;
-        const releasePreviewEnabled = !!localSettings.releasePreviewEnabled;
-        return {
-            featureEnabled,
-            releasePreviewEnabled,
-            developerUiHidden: !featureEnabled,
-            releaseCutEnabled: !featureEnabled || releasePreviewEnabled,
-        };
-    }
-
     _setElementsHidden(elements, hidden) {
         if (!Array.isArray(elements)) return;
         elements.forEach((element) => {
@@ -332,11 +324,13 @@ export class UINavigationLifecycleController {
         });
     }
 
-    syncDeveloperReleaseCutVisibility(settings = this.manager.settings, releaseState = this._resolveDeveloperReleaseState(settings)) {
+    syncDeveloperReleaseCutVisibility(menuUiContext = this.manager.getMenuUiContext?.(this.manager.settings)) {
+        const manager = this.manager;
+        const settings = menuUiContext?.settings || manager.settings;
+        const accessContext = menuUiContext?.accessContext || manager._accessContext || {};
+        const releaseState = menuUiContext?.releaseState || resolveDeveloperReleaseState(settings);
         const shouldHideDeveloperUi = releaseState.developerUiHidden;
         const shouldHideDebugHints = releaseState.releaseCutEnabled;
-        const accessContext = resolveMenuAccessContext(settings);
-        const manager = this.manager;
         const developerPanelConfig = manager.menuPanelRegistry.getPanelById('submenu-developer');
         const debugPanelConfig = manager.menuPanelRegistry.getPanelById('submenu-debug');
         const developerPolicy = developerPanelConfig?.semanticId === 'developer'
@@ -394,25 +388,38 @@ export class UINavigationLifecycleController {
     // updateContext + Hilfsmethoden
     // ------------------------------------------------------------------
 
-    updateContext() {
+    updateContext(menuUiContext = null) {
         const manager = this.manager;
         if (!this.ui.menuContext) return;
-        manager._accessContext = resolveMenuAccessContext(manager.settings);
-        manager.menuNavigationRuntime?.setAccessContext?.(manager._accessContext);
+        const resolvedContext = menuUiContext
+            || manager.getMenuUiContext?.(manager.settings)
+            || null;
+        const settings = resolvedContext?.settings || manager.settings || {};
+        const accessContext = resolvedContext?.accessContext || manager._accessContext || {};
+        manager._accessContext = accessContext;
+        manager.menuNavigationRuntime?.setAccessContext?.(accessContext);
         this._syncMenuChromeState(this.game._activeSubmenu || null);
         const section = this._getMenuSectionLabel(this.game._activeSubmenu);
         const activeProfile = this._resolveActiveProfileName();
         const dirtyState = this.game.settingsDirty ? 'ungespeicherte Aenderungen' : 'alles gespeichert';
-        const sessionType = String(manager.settings?.localSettings?.sessionType || MENU_SESSION_TYPES.SINGLE).toLowerCase();
+        const sessionType = String(
+            resolvedContext?.surfaceMenuState?.sessionType
+            || settings?.localSettings?.sessionType
+            || MENU_SESSION_TYPES.SINGLE
+        ).toLowerCase();
         const sessionLabel = sessionType === MENU_SESSION_TYPES.SPLITSCREEN
             ? 'Splitscreen'
             : (sessionType === MENU_SESSION_TYPES.MULTIPLAYER ? 'Multiplayer' : 'Single Player');
-        const modePath = String(manager.settings?.localSettings?.modePath || 'normal').toLowerCase();
+        const modePath = String(
+            resolvedContext?.surfaceMenuState?.modePath
+            || settings?.localSettings?.modePath
+            || 'normal'
+        ).toLowerCase();
         const modeLabel = modePath === 'fight'
             ? 'Fight'
             : (modePath === 'arcade' ? 'Arcade' : (modePath === 'quick_action' ? 'Schnellstart' : 'Normal'));
-        const mapLabel = resolveMapPreview(manager.settings?.mapKey).name;
-        const activeSection = this._resolveLevel4Section(manager.settings?.localSettings?.toolsState?.activeSection);
+        const mapLabel = resolveMapPreview(settings?.mapKey).name;
+        const activeSection = this._resolveLevel4Section(settings?.localSettings?.toolsState?.activeSection);
         const activeSectionLabel = {
             [LEVEL4_SECTION_IDS.CONTROLS]: 'Steuerung',
             [LEVEL4_SECTION_IDS.GAMEPLAY]: 'Gameplay',
@@ -421,7 +428,7 @@ export class UINavigationLifecycleController {
         }[activeSection] || 'Profile';
 
         let contextText = `${section} | Profil: ${activeProfile} | ${dirtyState}`;
-        if (manager.settings?.localSettings?.toolsState?.level4Open) {
+        if (settings?.localSettings?.toolsState?.level4Open) {
             contextText = `Ebene 4 | ${activeSectionLabel} | ${sessionLabel} | ${dirtyState}`;
         } else if (this.game._activeSubmenu === 'submenu-game') {
             contextText = `${section} | ${sessionLabel} | ${modeLabel} | ${mapLabel}`;

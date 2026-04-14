@@ -34,6 +34,13 @@ Hinweis: Historische Deep-Dive-Dokumente liegen in `docs/archive/` (u. a. `docs/
 
 1. Scope aus User-Anfrage, `docs/INDEX.md` und `docs/Umsetzungsplan.md` ableiten.
 2. Betroffene Module in `src/` und `tests/` identifizieren.
-3. Aendern, dann den leichtesten passenden Testlayer aus `.agents/test_mapping.md` waehlen: `node-contract` fuer reine Vertraege/Logik, `desktop-smoke` fuer Desktop-Hauptpfade, `desktop-e2e` nur fuer produktnahe Integrationen, `browser-compat` nur fuer Browser-Demo/Web-API-Scope und `heavy-diagnostic` nicht als Default.
-4. Doku-/Prozess-Aktualitaet mit `npm run docs:sync` und `npm run docs:check` pruefen.
-5. Bei Folgearbeit an `V85`/`V86`: erst pruefen, ob `contractVersion`/`schemaVersion`/`descriptorVersion` und vorhandene Capability-Helfer den Leseweg bereits definieren, bevor neue Reader oder UI-Sonderpfade entstehen.
+3. Vor dem ersten produktiven Commit den Architektur-Startcheck aus `V91 91.5.1` gegen den geplanten Diff laufen lassen:
+   - `Contract`: Shared-Contract in `src/shared/contracts/**` erweitern statt Inline-Validierung.
+   - `Command/Event`: Runtime-Dispatch ueber bestehende Ports/Contracts statt neuer `game.*`-Direktaufrufe.
+   - `Snapshot`: `session_runtime_snapshot`, `match_flow_snapshot` oder `platform_capability_snapshot` als read-only Inputs verwenden.
+   - `Capability`: `resolveSurfaceCapabilityAccess()`, `resolveSurfacePolicy()` oder `resolveSurfaceFeatureLaunchGuard()` nutzen.
+   - `Sunset alter Pfade`: keine neuen Aufrufer fuer `game.runtimeBundle`, `game.runtimeFacade`, `window.GAME_RUNTIME`, `curviosApp`/`__CURVIOS_APP__` (ausserhalb `src/platform/**`) oder `getActiveRuntimeConfig` (ausserhalb Config/Settings).
+   - `Desktop-vs-Demo`: Feature-Zugang ausschliesslich ueber Surface-Policy-Vertraege und nicht ueber Runtime-Kind-Ifs verdrahten.
+4. Aendern, dann den leichtesten passenden Testlayer aus `.agents/test_mapping.md` waehlen: `node-contract` fuer reine Vertraege/Logik, `desktop-smoke` fuer Desktop-Hauptpfade, `desktop-e2e` nur fuer produktnahe Integrationen, `browser-compat` nur fuer Browser-Demo/Web-API-Scope und `heavy-diagnostic` nicht als Default.
+5. Doku-/Prozess-Aktualitaet mit `npm run docs:sync` und `npm run docs:check` pruefen.
+6. Bei Folgearbeit an `V85`/`V86`: erst pruefen, ob `contractVersion`/`schemaVersion`/`descriptorVersion` und vorhandene Capability-Helfer den Leseweg bereits definieren, bevor neue Reader oder UI-Sonderpfade entstehen.

@@ -12,7 +12,6 @@ export function syncMenuDeveloperState({
     accessContext,
     menuTextRuntime,
     releaseState,
-    syncReleaseCutVisibility,
 }) {
     if (!ui || !settings) return;
     const localSettings = settings?.localSettings || {};
@@ -24,9 +23,6 @@ export function syncMenuDeveloperState({
         : String(localSettings.developerThemeId || 'classic-console');
 
     applyDeveloperThemeToDocument(resolvedThemeId);
-    if (typeof syncReleaseCutVisibility === 'function') {
-        syncReleaseCutVisibility();
-    }
 
     menuTextRuntime?.applyToDocument?.(document, {
         allowOverrides: true,
