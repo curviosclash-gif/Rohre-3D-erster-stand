@@ -89,3 +89,38 @@ export function getAggregateRecordingMetrics(game) {
 export function getLastRoundGhostClip(game, players, options = undefined) {
     return getRoundRecorder(game)?.getLastRoundGhostClip?.(players, options) || null;
 }
+
+export function createGameRuntimeRecordingFacadeSupport({
+    getGame = null,
+    getRuntimeHandle = null,
+    showStatusToast = null,
+} = {}) {
+    const resolveGame = typeof getGame === 'function' ? getGame : () => null;
+    const resolveRuntimeHandle = typeof getRuntimeHandle === 'function' ? getRuntimeHandle : () => null;
+    const notifyStatusToast = typeof showStatusToast === 'function' ? showStatusToast : () => undefined;
+
+    return Object.freeze({
+        toggleCinematicRecordingFromHotkey() {
+            return toggleCinematicRecordingFromHotkey({
+                game: resolveGame(),
+                getRuntimeHandle: resolveRuntimeHandle,
+                showStatusToast: notifyStatusToast,
+            });
+        },
+        finalizeRound(winner, players, options = undefined) {
+            return finalizeRoundRecording(resolveGame(), winner, players, options);
+        },
+        dump() {
+            return dumpRoundRecording(resolveGame());
+        },
+        getLastRoundMetrics() {
+            return getLastRoundRecordingMetrics(resolveGame());
+        },
+        getAggregateMetrics() {
+            return getAggregateRecordingMetrics(resolveGame());
+        },
+        getLastRoundGhostClip(players, options = undefined) {
+            return getLastRoundGhostClip(resolveGame(), players, options);
+        },
+    });
+}

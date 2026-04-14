@@ -1,4 +1,5 @@
 import { GAME_STATE_IDS } from '../contracts/GameStateIds.js';
+import { resolveRuntimeSessionContract } from '../contracts/RuntimeSessionContract.js';
 import {
     createMatchFlowSnapshot,
     createRuntimeObservabilitySnapshot,
@@ -30,6 +31,10 @@ function getRuntimeState(game) {
     return getRuntimeBundle(game)?.state || null;
 }
 
+function getMenuMultiplayerBridge(game) {
+    return getRuntimeState(game)?.menuMultiplayerBridge || game?.menuMultiplayerBridge || null;
+}
+
 function getRuntimeComponents(game) {
     return getRuntimeBundle(game)?.components || null;
 }
@@ -38,35 +43,14 @@ function getRuntimeComponent(game, key) {
     return getRuntimeComponents(game)?.[key] || null;
 }
 
-function getLegacyRuntimeFacade(game) {
-    return game?.runtimeFacade || null;
-}
+function getLegacyRuntimeFacade(game) { return game?.runtimeFacade || null; }
+function getLegacyRuntimeCoordinator(game) { return game?.runtimeCoordinator || null; }
+function getRuntimeFacade(game) { return getRuntimeComponent(game, 'runtimeFacade') || null; }
+function getRuntimeCoordinator(game) { return getRuntimeComponent(game, 'runtimeCoordinator') || null; }
+function getRuntimeFeatureTransitionFacade(game) { return getRuntimeFacade(game) || getLegacyRuntimeFacade(game); }
+function getRuntimeFeatureTransitionCoordinator(game) { return getRuntimeCoordinator(game) || getLegacyRuntimeCoordinator(game); }
 
-function getLegacyRuntimeCoordinator(game) {
-    return game?.runtimeCoordinator || null;
-}
-
-function getRuntimeFacade(game, { allowLegacyFallback = false } = {}) {
-    const facade = getRuntimeComponent(game, 'runtimeFacade');
-    if (facade) {
-        return facade;
-    }
-    return allowLegacyFallback === true
-        ? getLegacyRuntimeFacade(game)
-        : null;
-}
-
-function getRuntimeCoordinator(game, { allowLegacyFallback = false } = {}) {
-    const coordinator = getRuntimeComponent(game, 'runtimeCoordinator');
-    if (coordinator) {
-        return coordinator;
-    }
-    return allowLegacyFallback === true
-        ? getLegacyRuntimeCoordinator(game)
-        : null;
-}
-
-function resolveRuntimeIntentAdapter(game, methodName) {
+function resolveRuntimeIntentAdapter(game, methodName, { allowLegacyFallback = false } = {}) {
     const coordinator = getRuntimeCoordinator(game);
     if (typeof coordinator?.[methodName] === 'function') {
         return {
@@ -82,19 +66,21 @@ function resolveRuntimeIntentAdapter(game, methodName) {
         };
     }
 
-    const legacyCoordinator = getRuntimeCoordinator(game, { allowLegacyFallback: true });
-    if (typeof legacyCoordinator?.[methodName] === 'function') {
-        return {
-            adapter: legacyCoordinator,
-            source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_COORDINATOR,
-        };
-    }
-    const legacyFacade = getRuntimeFacade(game, { allowLegacyFallback: true });
-    if (typeof legacyFacade?.[methodName] === 'function') {
-        return {
-            adapter: legacyFacade,
-            source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_FACADE,
-        };
+    if (allowLegacyFallback === true) {
+        const legacyCoordinator = getLegacyRuntimeCoordinator(game);
+        if (typeof legacyCoordinator?.[methodName] === 'function') {
+            return {
+                adapter: legacyCoordinator,
+                source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_COORDINATOR,
+            };
+        }
+        const legacyFacade = getLegacyRuntimeFacade(game);
+        if (typeof legacyFacade?.[methodName] === 'function') {
+            return {
+                adapter: legacyFacade,
+                source: RUNTIME_PORT_ADAPTER_SOURCES.LEGACY_FACADE,
+            };
+        }
     }
 
     return {
@@ -103,12 +89,32 @@ function resolveRuntimeIntentAdapter(game, methodName) {
     };
 }
 
+function resolveSessionRuntimeAccess(game) {
+    const sessionContract = resolveRuntimeSessionContract({
+        sessionType: game?.settings?.localSettings?.sessionType,
+        multiplayerTransport: getMenuMultiplayerBridge(game)?.transport || game?.settings?.localSettings?.multiplayerTransport,
+    });
+    const facade = getRuntimeFacade(game);
+    const runtimeSession = facade?.session || game?.session || null;
+    const multiplayerSessionState = getMenuMultiplayerBridge(game)?.getSessionState?.() || null;
+    const hasJoinedMultiplayerSession = multiplayerSessionState?.joined === true;
+
+    return {
+        sessionType: sessionContract.sessionType,
+        runtimeTransportKind: sessionContract.runtimeTransportKind,
+        isNetworkSession: sessionContract.isNetworkSession,
+        isHost: typeof runtimeSession?.isHost === 'boolean'
+            ? runtimeSession.isHost
+            : (hasJoinedMultiplayerSession ? multiplayerSessionState.isHost !== false : true),
+    };
+}
+
 function buildSessionRuntimeProjection(game) {
     const sessionRuntime = getSessionRuntime(game);
     const lifecycle = sessionRuntime?.lifecycle || {};
     const finalize = sessionRuntime?.finalize || {};
     const session = sessionRuntime?.session || {};
-    const facade = getRuntimeFacade(game, { allowLegacyFallback: true });
+    const sessionAccess = resolveSessionRuntimeAccess(game);
     const updatedAt = Math.max(
         Number(lifecycle.updatedAt) || 0,
         Number(finalize.updatedAt) || 0
@@ -119,8 +125,10 @@ function buildSessionRuntimeProjection(game) {
         lifecycleState: lifecycle.status || 'unknown',
         finalizeState: finalize.status || 'idle',
         gameStateId: lifecycle.gameStateId || game?.state || '',
-        isNetworkSession: facade?.isNetworkSession?.() === true,
-        isHost: facade?.isHost?.() !== false,
+        sessionType: sessionAccess.sessionType,
+        runtimeTransportKind: sessionAccess.runtimeTransportKind,
+        isNetworkSession: sessionAccess.isNetworkSession,
+        isHost: sessionAccess.isHost,
         pendingSessionInit: !!lifecycle.pendingSessionInit,
         pendingFinalizeTrigger: finalize.lastTrigger || '',
         finalizeErrorMessage: finalize.errorMessage || '',
@@ -404,12 +412,12 @@ export function createRuntimePorts(game) {
     const inputPort = createInputPort(game);
     const lifecyclePort = createLifecyclePort(game);
     const arcadePort = createArcadePort({
-        getRuntimeCoordinator: () => getRuntimeCoordinator(game, { allowLegacyFallback: true }),
-        getRuntimeFacade: () => getRuntimeFacade(game, { allowLegacyFallback: true }),
+        getRuntimeCoordinator: () => getRuntimeFeatureTransitionCoordinator(game),
+        getRuntimeFacade: () => getRuntimeFeatureTransitionFacade(game),
     });
     const recordingPort = createRecordingPort({
-        getRuntimeCoordinator: () => getRuntimeCoordinator(game, { allowLegacyFallback: true }),
-        getRuntimeFacade: () => getRuntimeFacade(game, { allowLegacyFallback: true }),
+        getRuntimeCoordinator: () => getRuntimeFeatureTransitionCoordinator(game),
+        getRuntimeFacade: () => getRuntimeFeatureTransitionFacade(game),
     });
     const runtimeIntentPort = createRuntimeIntentPort(game);
     const runtimeProjectionPort = createRuntimeProjectionPort(game);

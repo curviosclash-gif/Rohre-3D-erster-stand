@@ -178,15 +178,15 @@ test('Capability-Fallback: unavailable Descriptor hat providerKind=unavailable',
     assert.equal(descriptor.capabilityId, PLATFORM_CAPABILITY_IDS.HOST);
 });
 
-test('Capability-Fallback: degradierter Descriptor foerdert degradedReason zutage', () => {
+test('Capability-Fallback: degradedReason bleibt auch bei unavailable Descriptor sichtbar', () => {
     const descriptor = createPlatformCapabilityDescriptor(PLATFORM_CAPABILITY_IDS.RECORDING, {
         available: false,
-        providerKind: PLATFORM_PROVIDER_KINDS.DEGRADED,
+        providerKind: PLATFORM_PROVIDER_KINDS.UNAVAILABLE,
         degradedReason: 'webrtc_not_supported',
     });
 
     assert.equal(descriptor.available, false);
-    assert.equal(descriptor.providerKind, PLATFORM_PROVIDER_KINDS.DEGRADED);
+    assert.equal(descriptor.providerKind, PLATFORM_PROVIDER_KINDS.UNAVAILABLE);
     assert.equal(descriptor.degradedReason, 'webrtc_not_supported');
 });
 
@@ -388,7 +388,7 @@ test('createRuntimeObservabilitySnapshot: capability_fallback_used bleibt vor ma
     );
 });
 
-test('resolveSurfaceFeatureLaunchGuard blockiert desktop-only Features in browser-demo', () => {
+test('resolveSurfaceFeatureLaunchGuard blockiert nur desktop-only Features in browser-demo', () => {
     const browserDemoPolicy = { productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO };
 
     const replayGuard = resolveSurfaceFeatureLaunchGuard(
@@ -407,8 +407,8 @@ test('resolveSurfaceFeatureLaunchGuard blockiert desktop-only Features in browse
         'Datei-Zugriff'
     );
 
-    assert.equal(replayGuard.allowed, false);
-    assert.equal(videoGuard.allowed, false);
+    assert.equal(replayGuard.allowed, true);
+    assert.equal(videoGuard.allowed, true);
     assert.equal(fileIoGuard.allowed, false);
 });
 

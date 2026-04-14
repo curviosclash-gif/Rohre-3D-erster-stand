@@ -24,7 +24,11 @@ export class MenuController {
      */
     constructor(options) {
         this.ui = options.ui;
+        this.game = options.game || null;
         this.settings = options.settings;
+        this.runtimeAccess = options.runtimeAccess && typeof options.runtimeAccess === 'object'
+            ? options.runtimeAccess
+            : null;
         this.onEvent = typeof options.onEvent === 'function' ? options.onEvent : null;
         this._queuedInputChangeKeys = new Set();
         this._queuedInputFlushHandle = null;
@@ -125,6 +129,7 @@ export class MenuController {
             configSource: this.game?.config || null,
             settings: this.settings,
             featureFlags: resolveRuntimeMenuFeatureFlags(this.settings?.menuFeatureFlags),
+            runtimeAccess: this.runtimeAccess,
             eventTypes: MENU_CONTROLLER_EVENT_TYPES,
             settingsChangeKeys: SETTINGS_CHANGE_KEYS,
             emit: (type, payload) => this._emit(type, payload),

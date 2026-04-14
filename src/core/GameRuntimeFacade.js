@@ -1,11 +1,10 @@
 import { createLogger } from '../shared/logging/Logger.js';
 import { SessionRuntimeCommandExecutor } from '../application/session-runtime/SessionRuntimeCommandExecutor.js';
-import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
-import { createArcadeRoundStateController } from '../state/arcade/ArcadeRoundStateController.js';
 import { prewarmMatchArenaSession } from '../state/MatchSessionFactory.js';
 import { GAME_STATE_IDS } from '../shared/contracts/GameStateIds.js';
 import { MATCH_LIFECYCLE_CONTRACT_VERSION } from '../shared/contracts/MatchLifecycleContract.js';
 import { MENU_CONTROLLER_EVENT_CONTRACT_VERSION } from '../shared/contracts/MenuControllerContract.js';
+import { GAME_MODE_TYPES } from '../hunt/HuntMode.js';
 import { createApplySettingsCommand, createFinalizeMatchCommand, createHostLobbyCommand, createInitializeSessionCommand, createJoinLobbyCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
 import { createPauseMatchCommand, createResumeMatchCommand, createReturnToMenuCommand, createStartMatchCommand } from '../shared/contracts/SessionRuntimeCommandContract.js';
 import { createRuntimeClock } from '../shared/contracts/RuntimeClockContract.js';
@@ -15,10 +14,7 @@ import {
     resolveMenuAccessContext,
     SETTINGS_CHANGE_KEYS,
 } from '../composition/core-ui/CoreUiMenuPorts.js';
-import { buildArcadeSectorPlan } from '../entities/directors/ArcadeEncounterCatalog.js';
-import { ArcadeRunRuntime } from './arcade/ArcadeRunRuntime.js';
 import { CONFIG_BASE } from './Config.js';
-import { ReplayRecorder } from './replay/ReplayRecorder.js';
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
 import {
     applyRuntimeSettingsState,
@@ -34,13 +30,9 @@ import {
 } from './runtime/MenuRuntimeMultiplayerService.js';
 import { ProfileLifecycleController } from './runtime/ProfileLifecycleController.js';
 import {
-    dumpRoundRecording,
-    finalizeRoundRecording,
-    getAggregateRecordingMetrics,
-    getLastRoundGhostClip,
-    getLastRoundRecordingMetrics,
-    toggleCinematicRecordingFromHotkey,
+    createGameRuntimeRecordingFacadeSupport,
 } from './runtime/GameRuntimeRecordingSupport.js';
+import { GameRuntimeArcadeSupport } from './runtime/GameRuntimeArcadeSupport.js';
 import { observeLobbySessionStateChange } from './runtime/RuntimeLobbySessionObservability.js';
 import { syncRuntimeMultiplayerContext } from './runtime/RuntimeMultiplayerFlowService.js';
 import {
@@ -83,30 +75,21 @@ export class GameRuntimeFacade {
         this._pendingMatchFinalize = null;
         this._pendingMatchFinalizePlan = null;
         this._lastObservedMultiplayerSessionState = null;
-
-        this._baseRoundStateController = this.getRuntimeState()?.roundStateController
-            || this.game?.roundStateController
-            || null;
-        this._arcadeRoundStateController = null;
-        this._arcadeReplayRecorder = new ReplayRecorder();
-        this.arcadeRunRuntime = new ArcadeRunRuntime({
-            settingsManager: this.game?.settingsManager || null,
-            replayRecorder: this._arcadeReplayRecorder,
-            now: this.runtimeClock.nowMs,
+        this._arcadeSupport = new GameRuntimeArcadeSupport({
+            getGame: () => this.game,
+            getRuntimeState: () => this.getRuntimeState(),
+            nowMs: this.runtimeClock.nowMs,
             logger: console,
         });
-
-        const withArcadeStrategy = (handler) => {
-            const strategy = this.getRuntimeState()?.entityManager?.gameModeStrategy
-                || this.game?.entityManager?.gameModeStrategy;
-            if (strategy) handler(strategy);
-        };
-        this.arcadeRunRuntime.setModifierChangedHandler((modifierId) => withArcadeStrategy((strategy) => strategy.setActiveModifier?.(modifierId)));
-        this.arcadeRunRuntime.setVehicleUpgradesHandler((bonuses) => withArcadeStrategy((strategy) => strategy.applyVehicleUpgrades?.(bonuses)));
-        this.arcadeRunRuntime.setSuddenDeathEnteredHandler(() => withArcadeStrategy((strategy) => strategy.enterSuddenDeath?.()));
+        this._recordingSupport = createGameRuntimeRecordingFacadeSupport({
+            getGame: () => this.game,
+            getRuntimeHandle: (key) => this.getRuntimeHandle(key),
+            showStatusToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone),
+        });
     }
 
     get game() { return this.runtime; }
+    get arcadeRunRuntime() { return this._arcadeSupport?.arcadeRunRuntime || null; }
     getRuntimeBundle() { return this.runtimeBundle || this.game?.runtimeBundle || null; }
     getRuntimeState() { return getSessionRuntimeState(this.getRuntimeBundle() || this.game); }
     getRuntimeHandle(key) { return getSessionRuntimeHandle(this.getRuntimeBundle() || this.game, key); }
@@ -187,77 +170,31 @@ export class GameRuntimeFacade {
     }
 
     applySettingsToRuntime(options = {}) { return this.executeSessionRuntimeCommand(createApplySettingsCommand(options)); }
-    toggleCinematicRecordingFromHotkey() { return toggleCinematicRecordingFromHotkey({ game: this.game, getRuntimeHandle: (key) => this.getRuntimeHandle(key), showStatusToast: (message, durationMs, tone) => this.game?._showStatusToast?.(message, durationMs, tone) }); }
-
-    _activateArcadeRoundController() {
-        const runtimeState = this.getRuntimeState();
-        if (!runtimeState?.roundStateController) return;
-        if (!this._baseRoundStateController) {
-            this._baseRoundStateController = runtimeState.roundStateController;
-        }
-        if (!this._arcadeRoundStateController) {
-            this._arcadeRoundStateController = createArcadeRoundStateController({
-                baseController: this._baseRoundStateController,
-                arcadeRuntime: this.arcadeRunRuntime,
-            });
-        }
-        runtimeState.roundStateController = this._arcadeRoundStateController;
-    }
-
-    _deactivateArcadeRoundController() {
-        const runtimeState = this.getRuntimeState();
-        if (runtimeState && this._baseRoundStateController) runtimeState.roundStateController = this._baseRoundStateController;
-    }
+    toggleCinematicRecordingFromHotkey() { return this._recordingSupport.toggleCinematicRecordingFromHotkey(); }
 
     _syncArcadeRuntimeConfig() {
-        const runtimeConfig = this.getRuntimeState()?.runtimeConfig || null;
-        if (!runtimeConfig) return;
-        this.arcadeRunRuntime.configure(runtimeConfig);
-        if (runtimeConfig?.arcade?.enabled) {
-            this._activateArcadeRoundController();
-            return;
-        }
-        this._deactivateArcadeRoundController();
-        this.arcadeRunRuntime.resetRunState({ preserveRecords: true });
+        this._arcadeSupport.syncRuntimeConfig();
     }
 
-    _startArcadeRunIfEnabled() {
-        const runtimeState = this.getRuntimeState();
-        const runtimeConfig = runtimeState?.runtimeConfig || null;
-        if (!runtimeConfig?.arcade?.enabled) return null;
-        const strategy = runtimeState?.entityManager?.gameModeStrategy || null;
-        this.arcadeRunRuntime.setStrategy(strategy);
-        const existing = this.arcadeRunRuntime.getStateSnapshot?.();
-        if (existing && String(existing.phase || '').toLowerCase() !== 'finished') return existing;
-        const encounterPlan = buildArcadeSectorPlan({
-            seed: runtimeConfig?.arcade?.seed,
-            sectorCount: runtimeConfig?.arcade?.sectorCount,
-            difficulty: runtimeConfig?.bot?.activeDifficulty || runtimeConfig?.bot?.difficulty || 'normal',
-        });
-        return this.arcadeRunRuntime.startRun({
-            entityManager: runtimeState?.entityManager || null,
-            roundStateController: runtimeState?.roundStateController || null,
-            playerCount: Math.max(1, Number(runtimeState?.numHumans) || 1),
-            encounterPlan,
-            strategy,
+    startArcadeRunIfEnabled() { return this._arcadeSupport.startRunIfEnabled(); }
+
+    _resetArcadeRunState() { this._arcadeSupport.resetRunState({ preserveRecords: true }); }
+    getArcadeRunState() { return this._arcadeSupport.getRunState(); }
+    getArcadeMenuSurfaceState() { return this._arcadeSupport.getMenuSurfaceState(); }
+    tickArcadeSuddenDeath(dt = 0) { return this._arcadeSupport.tickSuddenDeath(dt); }
+    selectArcadeIntermissionChoice(choiceId) { return this._arcadeSupport.selectIntermissionChoice(choiceId); }
+    selectArcadeReward(rewardId) { return this._arcadeSupport.selectReward(rewardId); }
+    requestArcadeReplayPlayback() { return this._arcadeSupport.requestReplayPlayback(); }
+
+    _createMenuRuntimeAccess() {
+        const game = this.game;
+        return Object.freeze({
+            getArcadeMenuSurfaceState: () => this.getArcadeMenuSurfaceState(),
+            requestArcadeReplayPlayback: () => this.requestArcadeReplayPlayback(),
+            showStatusToast: (message, duration, tone) => game?._showStatusToast?.(message, duration, tone),
+            getSettingsStore: () => game?.settingsManager?.store || null,
         });
     }
-
-    startArcadeRunIfEnabled() { return this._startArcadeRunIfEnabled(); }
-
-    _resetArcadeRunState() { this.arcadeRunRuntime.resetRunState({ preserveRecords: true }); }
-    getArcadeRunState() { return this.arcadeRunRuntime.getStateSnapshot(); }
-    getArcadeMenuSurfaceState() { return this.arcadeRunRuntime.getMenuSurfaceState?.() || null; }
-    tickArcadeSuddenDeath(dt = 0) {
-        const hudState = this.arcadeRunRuntime.getHudState?.();
-        if (!hudState || String(hudState.phase || '') !== 'sudden_death') return null;
-        const strategy = this.getRuntimeState()?.entityManager?.gameModeStrategy || this.game?.entityManager?.gameModeStrategy || null;
-        if (typeof strategy?.tickSuddenDeath !== 'function') return null;
-        return strategy.tickSuddenDeath(Math.max(0, Number(dt) || 0));
-    }
-    selectArcadeIntermissionChoice(choiceId) { return this.arcadeRunRuntime.selectIntermissionChoice?.(choiceId); }
-    selectArcadeReward(rewardId) { return this.arcadeRunRuntime.selectReward?.(rewardId); }
-    requestArcadeReplayPlayback() { return this.arcadeRunRuntime.requestReplayPlayback?.(); }
 
     setupMenuListeners() {
         const game = this.game;
@@ -279,7 +216,9 @@ export class GameRuntimeFacade {
 
         runtimeState.menuController = new MenuController({
             ui,
+            game,
             settings: game.settings,
+            runtimeAccess: this._createMenuRuntimeAccess(),
             onEvent: (event) => this.handleMenuControllerEvent(event),
         });
         runtimeState.menuController.setupListeners();
@@ -367,20 +306,22 @@ export class GameRuntimeFacade {
         return telemetrySnapshot;
     }
 
-    finalizeRoundRecording(winner, players, options = undefined) { return finalizeRoundRecording(this.game, winner, players, options); }
-    dumpRoundRecording() { return dumpRoundRecording(this.game); }
-    getLastRoundRecordingMetrics() { return getLastRoundRecordingMetrics(this.game); }
-    getAggregateRecordingMetrics() { return getAggregateRecordingMetrics(this.game); }
-    getLastRoundGhostClip(players, options = undefined) { return getLastRoundGhostClip(this.game, players, options); }
+    finalizeRoundRecording(winner, players, options = undefined) { return this._recordingSupport.finalizeRound(winner, players, options); }
+    dumpRoundRecording() { return this._recordingSupport.dump(); }
+    getLastRoundRecordingMetrics() { return this._recordingSupport.getLastRoundMetrics(); }
+    getAggregateRecordingMetrics() { return this._recordingSupport.getAggregateMetrics(); }
+    getLastRoundGhostClip(players, options = undefined) { return this._recordingSupport.getLastRoundGhostClip(players, options); }
 
     recordRoundEndTelemetry(payload = null) {
-        this.arcadeRunRuntime.handleRoundEndTelemetry(payload);
-        return this._recordMenuTelemetry('round_end', payload);
+        return this._arcadeSupport.recordRoundEndTelemetry(payload, {
+            recordMenuTelemetry: (eventType, value) => this._recordMenuTelemetry(eventType, value),
+        });
     }
 
     recordMatchEndTelemetry(payload = null) {
-        this.arcadeRunRuntime.handleMatchEndTelemetry(payload);
-        return this._recordMenuTelemetry('match_end', payload);
+        return this._arcadeSupport.recordMatchEndTelemetry(payload, {
+            recordMenuTelemetry: (eventType, value) => this._recordMenuTelemetry(eventType, value),
+        });
     }
 
     handleMenuPanelChanged(previousPanelId, nextPanelId, transitionMetadata = null) {

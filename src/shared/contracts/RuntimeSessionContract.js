@@ -12,9 +12,16 @@ export const MULTIPLAYER_TRANSPORTS = Object.freeze({
     ONLINE: 'online',
 });
 
+/** @type {Set<string>} */
 const VALID_SESSION_TYPE_SET = new Set(Object.values(RUNTIME_SESSION_TYPES));
+/** @type {Set<string>} */
 const VALID_MULTIPLAYER_TRANSPORT_SET = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback=RUNTIME_SESSION_TYPES.SINGLE]
+ * @returns {string}
+ */
 export function normalizeRuntimeSessionType(value, fallback = RUNTIME_SESSION_TYPES.SINGLE) {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
     return VALID_SESSION_TYPE_SET.has(normalized) ? normalized : fallback;
@@ -25,6 +32,11 @@ export function isLegacyMultiplayerTransport(value) {
     return normalized === MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback=MULTIPLAYER_TRANSPORTS.LAN]
+ * @returns {string}
+ */
 export function normalizeMultiplayerTransport(value, fallback = MULTIPLAYER_TRANSPORTS.LAN) {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
     return VALID_MULTIPLAYER_TRANSPORT_SET.has(normalized) ? normalized : fallback;

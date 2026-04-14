@@ -100,24 +100,23 @@ function createMetric(labelText, valueText = '-') {
     return { metric, value };
 }
 
-function resolveRuntimeFacade() {
-    if (typeof window === 'undefined') return null;
-    return window.GAME_INSTANCE?.runtimeFacade || null;
+function normalizeRuntimeAccess(runtimeAccess) {
+    return runtimeAccess && typeof runtimeAccess === 'object'
+        ? runtimeAccess
+        : null;
 }
 
-function showToast(message, tone = 'info', duration = 1300) {
-    if (typeof window === 'undefined') return;
-    window.GAME_INSTANCE?._showStatusToast?.(message, duration, tone);
+function showToast(runtimeAccess, message, tone = 'info', duration = 1300) {
+    runtimeAccess?.showStatusToast?.(message, duration, tone);
 }
 
-function resolveVehicleProfileReader() {
-    if (typeof window === 'undefined') return null;
-    return window.GAME_INSTANCE?.settingsManager?.store || null;
+function resolveVehicleProfileReader(runtimeAccess) {
+    return runtimeAccess?.getSettingsStore?.() || null;
 }
 
-function resolveVehicleMasteryProfile(vehicleId) {
+function resolveVehicleMasteryProfile(runtimeAccess, vehicleId) {
     const fallbackProfile = { level: 1, xp: 0 };
-    const store = resolveVehicleProfileReader();
+    const store = resolveVehicleProfileReader(runtimeAccess);
     if (!store || typeof store.loadJsonRecord !== 'function') {
         return fallbackProfile;
     }
@@ -276,6 +275,7 @@ export function setupArcadeMenuSurface(ctx = {}) {
     const emit = typeof ctx.emit === 'function' ? ctx.emit : null;
     const eventTypes = ctx.eventTypes && typeof ctx.eventTypes === 'object' ? ctx.eventTypes : {};
     const bind = typeof ctx.bind === 'function' ? ctx.bind : null;
+    const runtimeAccess = normalizeRuntimeAccess(ctx.runtimeAccess);
 
     if (!emit || !bind) return;
 
@@ -313,7 +313,7 @@ export function setupArcadeMenuSurface(ctx = {}) {
         const difficulty = normalizeString(settings?.botDifficulty, 'NORMAL').toUpperCase();
         const botCount = toInt(settings?.numBots, 0);
         const dailySeed = computeDailySeed();
-        const runtimeState = resolveRuntimeFacade()?.arcadeRunRuntime?.getMenuSurfaceState?.() || null;
+        const runtimeState = runtimeAccess?.getArcadeMenuSurfaceState?.() || null;
         const records = runtimeState?.records && typeof runtimeState.records === 'object' ? runtimeState.records : null;
         const replayState = runtimeState?.replay && typeof runtimeState.replay === 'object' ? runtimeState.replay : null;
         const postRunSummary = runtimeState?.postRunSummary && typeof runtimeState.postRunSummary === 'object'
@@ -356,7 +356,7 @@ export function setupArcadeMenuSurface(ctx = {}) {
             refs.replayButton.title = 'Noch kein Replay verfuegbar';
         }
 
-        const profile = resolveVehicleMasteryProfile(vehicleId);
+        const profile = resolveVehicleMasteryProfile(runtimeAccess, vehicleId);
         const MAX_LEVEL = resolveVehicleMasteryMaxLevel();
         const lvl = Math.max(1, Math.min(MAX_LEVEL, Number(profile.level) || 1));
         const masteryLabel = lvl >= MAX_LEVEL
@@ -400,17 +400,17 @@ export function setupArcadeMenuSurface(ctx = {}) {
     });
 
     bind(refs.replayButton, 'click', () => {
-        const result = resolveRuntimeFacade()?.arcadeRunRuntime?.requestReplayPlayback?.();
+        const result = runtimeAccess?.requestArcadeReplayPlayback?.();
         const code = String(result?.code || 'replay_unavailable');
         if (code === 'replay_player_unavailable') {
-            showToast(t('menu.arcade.postrun.replay.toast.ready', 'Replay-Fallback bereit.'), 'warning', 1300);
+            showToast(runtimeAccess, t('menu.arcade.postrun.replay.toast.ready', 'Replay-Fallback bereit.'), 'warning', 1300);
             return;
         }
         if (code === 'replay_disabled') {
-            showToast(t('menu.arcade.postrun.replay.toast.disabled', 'Replay ist deaktiviert.'), 'warning', 1300);
+            showToast(runtimeAccess, t('menu.arcade.postrun.replay.toast.disabled', 'Replay ist deaktiviert.'), 'warning', 1300);
             return;
         }
-        showToast(t('menu.arcade.postrun.replay.toast.empty', 'Kein Replay verfuegbar.'), 'info', 1200);
+        showToast(runtimeAccess, t('menu.arcade.postrun.replay.toast.empty', 'Kein Replay verfuegbar.'), 'info', 1200);
     });
 
     bind(refs.dailyButton, 'click', () => {
