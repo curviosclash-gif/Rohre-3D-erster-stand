@@ -29,6 +29,12 @@ description: Plan governance, bot-training governance, and blocker reporting (co
 
 ## Closure Gates
 
-- `npm run plan:check`
-- `npm run docs:sync`
-- `npm run docs:check`
+- Meta-Gate: `npm run gates:pre-commit` (fuehrt `plan:check` -> `docs:sync` -> `docs:check` in fester Reihenfolge aus).
+- Einzeln falls noetig: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
+
+## Test Ownership
+
+- Tests sind user-owned - nicht standardmaessig ausfuehren. Ausnahmen: explizite User-Anfrage oder Abschluss-Gate `*.99`.
+- Test-Auswahl und Pfade: `.agents/test_mapping.md` (nur lesen, wenn User Tests anfordert oder `*.99` laeuft).
+- Fuer Block-Subphasen unterhalb `*.99` Tests vorbereiten, aber Ausfuehrung ans Abschluss-Gate verschieben.
+- Ohne Test-Request Verifikation als user-owned oder block-end-pending markieren, nicht ungefragt laufen lassen.

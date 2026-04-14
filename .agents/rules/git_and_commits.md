@@ -5,11 +5,12 @@ description: Git safety, branch enforcement, and commit policy (consolidated)
 
 ## Git Safety
 
-- Never run destructive git commands (`git reset --hard`, `git checkout --`, force-push) without explicit user approval.
-- Prefer non-destructive alternatives: `git restore --source`, `git revert`, new commit with fix.
+- Niemals destruktive Git-Kommandos ohne explizite User-Zustimmung: `git reset --hard`, `git checkout -- <pfad>`, `git clean -fd`/`-fdx`, Force-Push.
+- Bevorzugte Alternativen: `git restore --source`, `git revert`, neuer Commit mit Fix.
 - **Niemals `git stash` verwenden.** Keine Ausnahmen.
-- Fremde uncommittete Aenderungen ignorieren — nicht stashen, committen oder verwerfen.
-- Keep `.husky/.bypass` local-only and untracked.
+- Fremde uncommittete Aenderungen ignorieren - nicht stashen, committen oder verwerfen.
+- Bei unvermeidbarem destruktivem Schritt: stoppen und User um explizite Backup-/Confirm-Freigabe bitten.
+- `.husky/.bypass` bleibt local-only und untracked.
 
 ## Branch Enforcement
 

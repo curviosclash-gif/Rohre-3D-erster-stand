@@ -1,47 +1,47 @@
-﻿# AGENTS.md
+# AGENTS.md
 
-Repository-wide operating rules for all agents.
+Orientierung fuer alle Agents. Details liegen in den verlinkten Rules und Workflows.
 
-## Scope & Rule Sources
+## Leseweg
 
-- Applies to the full repository. Higher-priority system/developer instructions win on conflict.
-- Rules: `.agents/rules/` | Workflows: `.agents/workflows/` | Test mapping: `.agents/test_mapping.md`
+1. `AGENTS.md` (diese Datei)
+2. passende Rule in `.agents/rules/`
+3. passenden Workflow in `.agents/workflows/`
+4. `docs/Umsetzungsplan.md` als kompakter Master-Index; Blockdetails in `docs/plaene/aktiv/VXX.md`
+5. Plan-Historie und Abgleich-Fliesstext in `docs/plaene/CHANGELOG.md`
 
-## Default Behavior
+## Rule-Quellen (Einzelquelle je Thema)
 
-- Apply rules from `.agents/rules/` first. Use concise, token-efficient output.
-- Proceed proactively on non-destructive decisions with short rationale.
-- Keep docs/workflows/rules in sync with code after each change.
-- `docs/Umsetzungsplan.md` is the compact master index; block details live in `docs/plaene/aktiv/VXX.md`.
-- Plan drafts: `docs/plaene/neu/`. Intake into master index is user-owned.
-- Bot-training source of truth: `docs/bot-training/Bot_Trainingsplan.md`.
+- `.agents/rules/planning_and_governance.md` - Plan- und Gate-Governance, Closure-Gates, Test-Ownership
+- `.agents/rules/git_and_commits.md` - Git-Safety, Branch-Policy, Commit-Granularitaet
+- `.agents/rules/code_quality_and_debugging.md` - Code-Qualitaet, Debugging, Performance, Lifecycle
+- `.agents/rules/token_efficiency_and_tools.md` - Token-Effizienz, Harness-Tools, Lese-Budget
+- `.agents/rules/product_focus.md` - Desktop-first Produktfokus
 
-## Workflow Selection
+Policy-Details werden nicht in AGENTS.md wiederholt. Bei Konflikt gewinnt die Rule.
 
-| Task | Workflow |
-|---|---|
-| Feature planning | `.agents/workflows/plan.md` |
-| Feature implementation | `.agents/workflows/code.md` |
-| Bug fixing | `.agents/workflows/bugfix.md` |
-| Phase execution | `.agents/workflows/fix-planung.md` |
-| Bot training | `.agents/workflows/bot-training-plan.md` |
-| Freshness check/sync | `.agents/workflows/aktualitaet-check.md` / `aktualitaet-sync.md` |
-| Cleanup/refactor/release | matching workflow in `.agents/workflows/` |
+## Workflow-Auswahl
 
-## Verification Policy
+| Aufgabe | Workflow |
+| --- | --- |
+| Feature-Planung | `.agents/workflows/plan.md` |
+| Feature-Umsetzung (Blockscope) | `.agents/workflows/code.md` |
+| Kleiner Scope, 1-2 Dateien | `.agents/workflows/quick.md` |
+| Bugfix | `.agents/workflows/bugfix.md` |
+| Phasenausfuehrung aus Master | `.agents/workflows/fix-planung.md` |
+| Bot-Training | `.agents/workflows/bot-training-plan.md` |
+| Freshness-Check/Sync | `.agents/workflows/aktualitaet-check.md` / `aktualitaet-sync.md` |
+| Cleanup/Refactor/Release | passender Workflow in `.agents/workflows/` |
 
-- Tests are user-owned — run only on explicit request or at block gate `*.99`.
-- Use `.agents/test_mapping.md` only when user requests test run or at `*.99` gate.
-- For phase execution, `/code` is the single source of truth for DoD and verification.
-- Closure gates: `npm run plan:check` → `npm run docs:sync` → `npm run docs:check`.
+## Plan-Einstieg
 
-## Turbo Default
+- `docs/Umsetzungsplan.md` ist nur der kompakte Master-Index.
+- Kanonische Blockdetails: `docs/plaene/aktiv/VXX.md` (DoD, Risiken, `scope_files`, Phasen).
+- Neue Intake-Entwuerfe: `docs/plaene/neu/`. Intake in den Master bleibt User-owned.
+- Bot-Training: `docs/bot-training/Bot_Trainingsplan.md`.
 
-- Read-only commands (`git log`, `git status`, `rg`, `npm run docs:check`) are safe to auto-run.
-- Workflows marked `// turbo-all` auto-run every `run_command` step.
+## Defaults
 
-## Safety Guard (Destructive Git Forbidden)
-
-- Do **not** run `git reset --hard`, `git clean -fd`, `git clean -fdx`, or equivalent destructive cleanup commands in this repo.
-- If cleanup is requested, use non-destructive steps first (`git status`, scoped restore, archive/move unwanted files) and preserve user work.
-- If a destructive operation is truly unavoidable, stop and request an explicit backup-and-confirmation plan from the user first.
+- Antworten kurz, ohne abschliessende Summaries (der User sieht Diff und Tool-Output).
+- Ergebnisse parallel holen, wenn unabhaengig.
+- Kein Plan-Mode fuer kleine Tasks.
