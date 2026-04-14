@@ -25,6 +25,7 @@ description: Git safety, branch enforcement, and commit policy (consolidated)
 - On Windows before staging, run `npm run git:acl:heal` once per commit cycle to clear recurring `.git/index.lock` ACL denies.
 - Stage only scoped files (`git add [files]`); verify via `git diff --name-only`. Niemals `git add .` oder `git add -A`.
 - Sofort committen nach jeder abgeschlossenen Teilaenderung — nicht Aenderungen ansammeln.
+- **Ein Commit pro Subphase** — jede `VXX.Y.Z`-Subphase landet als eigener scoped Commit; keine Cross-Subphase-Bundles.
 - Commit-Preflight: Vor neuem Task muessen eigene offene Aenderungen per scoped Commit gesichert sein.
 - **Umsetzungsplan immer als eigener Commit** — nie zusammen mit Code-Aenderungen.
 - Concise messages explaining *why*, not *what*. Types: `feat`, `fix`, `refactor`, `perf`, `chore`, `release`, `docs`.
