@@ -225,7 +225,7 @@ Stand: 2026-04-14
 | Surface | Ist-Aufrufer (produktiver Code) | Erlaubter Uebergangsadapter |
 | --- | --- | --- |
 | `game.runtimeBundle` | `src/core/MatchSessionRuntimeBridge.js`, `src/state/RoundStateTickSystem.js` | `GameRuntimeBundle` als Legacy-Container bis zur Snapshot-/Command-Migration |
-| `game.runtimeFacade` und `window.GAME_RUNTIME` | `src/core/PlayingStateSystem.js`, `src/state/RoundStateTickSystem.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/UINavigationLifecycleController.js` sowie Publish/Cleanup in `src/core/AppInitializer.js` und `src/core/main.js` | `GameRuntimeCoordinator`/`AppInitializer` als Legacy-Publish-Adapter; keine neuen Fachaufrufer |
+| `game.runtimeFacade` und `window.GAME_RUNTIME` | `src/core/PlayingStateSystem.js`, `src/state/RoundStateTickSystem.js`, `src/state/MatchLifecycleSessionPort.js`, `src/ui/HudRuntimeSystem.js`, `src/ui/TouchInputSource.js`, `src/ui/MatchFlowTransitionHotspots.js`, `src/ui/arcade/ArcadeMenuSurface.js` sowie Publish/Cleanup in `src/core/AppInitializer.js` und `src/core/main.js` | `GameRuntimeCoordinator`/`AppInitializer` als Legacy-Publish-Adapter; keine neuen Fachaufrufer |
 | `GameRuntimePorts`-Fallbacks | Port-Einstieg in `src/core/GameBootstrap.js`, interne Fallbacks in `src/shared/runtime/GameRuntimePorts.js` | `createRuntimePorts()` bleibt Uebergangsnaht; neue Features laufen ueber Commands/Snapshots |
 | `curviosApp` und `__CURVIOS_APP__` | direkte Reads in `src/entities/ai/ObservationBridgePolicy.js` und `src/shared/contracts/PlatformCapabilityRegistry.js`; Adapterzugriff in `src/platform/electron/ElectronPlatformBridge.js` | langfristig nur `src/platform/electron/**`; direkte Reads sind Migrationsschuld bis 91.3 |
 | `ActiveRuntimeConfigStore`-Globalslot | Reads in `src/core/Config.js` und `src/core/settings/SettingsSanitizerOps.js`; Adapter-Metadaten in `src/core/runtime/GameRuntimeBundle.js` | als markierter Uebergangsadapter bis Runtime-Config per Snapshot/Injection geliefert wird |
@@ -300,6 +300,23 @@ npm run plan:check
 npm run docs:sync
 npm run docs:check
 ```
+
+#### 4.5.7 Hotspot-Zielpfad-Matrix (`V92 92.1.2`, 2026-04-15)
+
+`V92` setzt auf dem `V91`-Ratchet auf und schneidet die verbliebenen Hotspots gegen denselben Vertragsraum (`SessionRuntimeCommandContract`, `SessionRuntimeSnapshotContract`, `PlatformCapabilityContract`) statt neue Paralleladapter einzuziehen.
+
+| Hotspot | Zielpfad ab `92.2+` | Explizite Ownership | Sunset-/Guard-Kriterium |
+| --- | --- | --- | --- |
+| `GameRuntimeFacade` | `SessionRuntimeCommandExecutor` delegiert nur noch auf kleine Application-Use-Cases (`start_match`, `return_to_menu`, `host_lobby`, `join_lobby`, `apply_settings`); UI liest Runtime-Status ueber Snapshots/Ports statt direkter Facade-Aufrufe | Runtime-Fachlogik liegt im Application-Layer und in dedizierten Runtime-Services; Fassade bleibt nur Legacy-Forwarder | Neue Facade-Aufrufer ausserhalb erlaubter Adapter gelten als Guard-Verstoss; bestehende Aufrufer werden pro Subphase auf Commands/Snapshots migriert |
+| `MatchFlowUiController` | Aufteilung in Controller-Port plus spezialisierte Adapter (`LifecycleIntent`, `ArcadeOverlayProjection`, `TelemetryFeedback`), konsumiert ueber `UiControllerRuntimePorts` | UI-Orchestrierung bleibt im UI-Layer; Runtime-Entscheidungen laufen ueber Command- und Snapshot-Vertraege | Keine neuen Featurezweige mehr in der Sammelklasse; neue Methoden muessen einem bestehenden Teiladapter zuordenbar sein |
+| `GameRuntimePorts` | Ports bleiben schmale Naht (`runtimeIntentPort`, `lifecyclePort`, `matchUiPort`, `runtimeProjectionPort`) ohne produktive Fallbacks auf `game.runtimeFacade`/`game.runtimeCoordinator` im migrierten Scope | Command-/Snapshot-Semantik liegt in Shared Contracts + Application-Layer, nicht in Port-Fallback-Logik | Port-Fallback-Zaehler fuer `runtimeFacade`/`runtimeCoordinator` werden als Ratchet gefuehrt und duerfen fuer neue Arbeit nicht steigen |
+| `window.GAME_RUNTIME` + `GAME_INSTANCE` | Nur noch read-only Diagnostics-Surface (expliziter `debugRuntimeSnapshot`) oder kompletter Publish-Stopp; produktive UI-/Runtime-Leser laufen ueber Ports/Snapshots | Runtime-Laufzeitbesitz liegt bei `SessionRuntime`/Application-Layer; Globals sind kein Fach-API | Guard-Matrix erlaubt nur Diagnoseadapter als Caller; produktive Reads in `src/ui/**`, `src/state/**` oder `src/core/**` schlagen als Legacy-Surface-Verstoss fehl |
+
+#### 4.5.8 Application-Command-Use-Cases (`V92 92.2.1`, 2026-04-15)
+
+- `src/application/session-runtime/SessionRuntimeCommandUseCases.js` kapselt fuer den migrierten Scope die Runtime-Commands `apply_settings`, `start_match`, `return_to_menu`, `host_lobby` und `join_lobby` als kleine Application-Services.
+- `src/application/session-runtime/SessionRuntimeCommandExecutor.js` bleibt damit schmal: Command-Normalisierung, Observability und Dispatch bleiben im Executor; die direkte Kopplung an Settings-, Session- und Multiplayer-Implementierungen liegt im Use-Case-Layer.
+- Der Vertragsraum bleibt unveraendert: keine neuen Command-IDs, keine parallelen Dispatch-Wege und keine neuen UI- oder Global-Surface-Bypaesse; `92.2.2` zieht als naechstes Observability-, Result- und Failure-Vertraege auf denselben Schnitt.
 
 ### 4.6 Zielgrenzen fuer V84
 
