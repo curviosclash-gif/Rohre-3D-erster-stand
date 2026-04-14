@@ -1,7 +1,9 @@
 ---
-trigger: "*"
 description: Token efficiency, file access, and tool usage (consolidated)
 ---
+
+<!-- Frontmatter-Feld `trigger:` entfallen ab V93 93.3.3 - Rule-Aktivierung ist nicht maschinell ausgewertet. -->
+
 
 ## Token-Effizienz (KRITISCH!)
 

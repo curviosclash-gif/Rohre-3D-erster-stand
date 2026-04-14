@@ -1,7 +1,9 @@
 ---
-trigger: "*_code_change_or_creation"
 description: Code quality, debugging, performance, and lifecycle (consolidated)
 ---
+
+<!-- Frontmatter-Feld `trigger:` entfallen ab V93 93.3.3 - Rule-Aktivierung ist nicht maschinell ausgewertet. -->
+
 
 ## Code Quality
 

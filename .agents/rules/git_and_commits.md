@@ -1,7 +1,9 @@
 ---
-trigger: "*_git_*"
 description: Git safety, branch enforcement, and commit policy (consolidated)
 ---
+
+<!-- Frontmatter-Feld `trigger:` entfallen ab V93 93.3.3 - Rule-Aktivierung ist nicht maschinell ausgewertet. -->
+
 
 ## Git Safety
 

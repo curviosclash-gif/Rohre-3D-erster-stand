@@ -1,7 +1,9 @@
 ---
-trigger: planning_or_phase_tracking_changes
 description: Plan governance, bot-training governance, and blocker reporting (consolidated)
 ---
+
+<!-- Frontmatter-Feld `trigger:` entfallen ab V93 93.3.3 - Rule-Aktivierung ist nicht maschinell ausgewertet. -->
+
 
 ## Master Plans
 
