@@ -286,7 +286,7 @@ Jede neue produktive Datei im Scope der aktiven Blocks (`V64`, `V81`, `V82`, `V8
 | **Command/Event** | `SessionRuntimeCommandContract.js` oder `SessionRuntimeEventContract.js` als Typ-Quelle; Dispatch ueber bestehende Ports | Direktaufruf auf `game.*`- oder `runtimeFacade`-Methoden fuer neue Fachpfade |
 | **Snapshot** | `session_runtime_snapshot`, `match_flow_snapshot` oder `platform_capability_snapshot` als read-only Input | `getActiveRuntimeConfig()` oder `window.GAME_RUNTIME` als Fachpfad |
 | **Capability** | `resolveSurfaceCapabilityAccess()`, `resolveSurfacePolicy()` oder `resolveSurfaceFeatureLaunchGuard()` aus `PlatformCapabilityRegistry.js` bzw. `PlatformSurfacePolicyOps.js` | Direktlesen von `curviosApp`, `__CURVIOS_APP__` oder rohen Preload-Feldern ausserhalb `src/platform/**` |
-| **Sunset alter Pfade** | Bei jedem neuen Fachimport pruefen, ob ein Guard-Matrix-Eintrag fuer diesen Legacy-Pfad existiert; existiert er, ist nur der gelistete `allowedAdapter` erlaubt | Neue Aufrufer auf `game.runtimeBundle`, `game.runtimeFacade`, `curviosApp`/`__CURVIOS_APP__` (ausserhalb `src/platform/**`) oder `getActiveRuntimeConfig` (ausserhalb Config/Settings) einbauen |
+| **Sunset alter Pfade** | Bei jedem neuen Fachimport pruefen, ob ein Guard-Matrix-Eintrag fuer diesen Legacy-Pfad existiert; existiert er, ist nur der gelistete `allowedAdapter` erlaubt. `window.GAME_RUNTIME`, `window.GAME_INSTANCE` und explizite `GameRuntimePorts`-Fallback-Helfer (`getLegacyRuntime*`, `getRuntimeFeatureTransition*`, `allowLegacyFallback=true`) bleiben ausserhalb der dokumentierten Restadapter tabu. | Neue Aufrufer auf `game.runtimeBundle`, `game.runtimeFacade`, `window.GAME_RUNTIME`, `window.GAME_INSTANCE`, `curviosApp`/`__CURVIOS_APP__` (ausserhalb `src/platform/**`), `getActiveRuntimeConfig` (ausserhalb Config/Settings) oder direkte Legacy-Fallback-Helfer aus `GameRuntimePorts` einbauen |
 | **Desktop-vs-Demo** | Surface-Policy immer ueber `resolveSurfacePolicy({ productSurfaceId })` bestimmen; Desktop-only-Features mit `resolveSurfaceFeatureLaunchGuard()` schraenken | Direktvergleich auf `runtimeKind === 'electron'` oder Feature-Flags ausserhalb der Surface-Policy-Kontrakte |
 
 **Pflicht-Gates vor jedem Block-Merge:**
@@ -315,8 +315,52 @@ npm run docs:check
 #### 4.5.8 Application-Command-Use-Cases (`V92 92.2.1`, 2026-04-15)
 
 - `src/application/session-runtime/SessionRuntimeCommandUseCases.js` kapselt fuer den migrierten Scope die Runtime-Commands `apply_settings`, `start_match`, `return_to_menu`, `host_lobby` und `join_lobby` als kleine Application-Services.
-- `src/application/session-runtime/SessionRuntimeCommandExecutor.js` bleibt damit schmal: Command-Normalisierung, Observability und Dispatch bleiben im Executor; die direkte Kopplung an Settings-, Session- und Multiplayer-Implementierungen liegt im Use-Case-Layer.
-- Der Vertragsraum bleibt unveraendert: keine neuen Command-IDs, keine parallelen Dispatch-Wege und keine neuen UI- oder Global-Surface-Bypaesse; `92.2.2` zieht als naechstes Observability-, Result- und Failure-Vertraege auf denselben Schnitt.
+- `src/application/session-runtime/SessionRuntimeCommandExecutor.js` bleibt damit schmal: Command-Normalisierung und Use-Case-Auswahl bleiben im Executor; die direkte Kopplung an Settings-, Session- und Multiplayer-Implementierungen liegt im Use-Case-Layer.
+- Der Vertragsraum bleibt unveraendert: keine neuen Command-IDs, keine parallelen Dispatch-Wege und keine neuen UI- oder Global-Surface-Bypaesse.
+
+#### 4.5.9 Command-Result- und Failure-Schnitt (`V92 92.2.2`, 2026-04-15)
+
+- `src/application/session-runtime/SessionRuntimeCommandUseCases.js` fuehrt fuer den Runtime-Command-Katalog jetzt die gemeinsame Execution-Huelle fuer `received`/`completed`/`failed`-Observability, Settled-Results und Failure-Vertraege.
+- `src/application/session-runtime/SessionRuntimeCommandExecutor.js` ist dadurch auf Command-Normalisierung plus Use-Case-Auswahl reduziert; `executeSessionRuntimeCommandResult()` fuehrt keinen zweiten Result-Pfad mehr neben dem Use-Case-Schnitt.
+- `tests/runtime-regressions.contract.test.mjs` spiegelt denselben Vertrag fuer asynchrone Rejections und `invalid_command`: die Observability-Events kommen aus dem Use-Case-Schnitt, waehrend der rohe `execute()`-Pfad kompatibel bleibt.
+
+#### 4.5.10 Port-Sunset fuer migrierten Scope (`V92 92.3.1`, 2026-04-15)
+
+- `src/shared/runtime/GameRuntimePorts.js` nutzt fuer migrierte Runtime-Intents und Lifecycle-Pfade jetzt nur noch Bundle-Handles (`runtimeCoordinator`, `runtimeFacade`). Produktive Fallbacks auf `game.runtimeCoordinator` oder `game.runtimeFacade` sind fuer `runtimeIntentPort` und `lifecyclePort` entfernt.
+- Der Session-Snapshot liest `sessionType`, `runtimeTransportKind`, `isNetworkSession` und `isHost` ueber `RuntimeSessionContract`, `game.session` und den Bundle-State statt ueber Legacy-Facade-Reads. Damit bleibt derselbe Ownership-Schnitt auch fuer UI-Gating und Flow-Snapshots erhalten.
+- Nicht migrierte Restnischen bleiben explizit benannt: Arcade- und Recording-Ports nutzen nur noch als Uebergang markierte Transition-Adapter (`getRuntimeFeatureTransitionCoordinator()` / `getRuntimeFeatureTransitionFacade()`) und sind damit klar vom produktiven Command-/Lifecycle-Scope getrennt.
+- `tests/runtime-regressions.contract.test.mjs` fuehrt den Ratchet dazu jetzt auch negativ: Legacy-only `runtimeFacade`-Pfad reicht fuer `returnToMenu()` oder `initializeSession()` nicht mehr aus, waehrend der Session-Snapshot denselben Sunset ohne Legacy-Fassade abbildet.
+
+#### 4.5.11 Global-Surface-Sunset im Menu-Consumer (`V92 92.3.2`, 2026-04-15)
+
+- `src/core/GameRuntimeFacade.js` exponiert fuer den Menuepfad einen expliziten `runtimeAccess`-Schnitt (`getArcadeMenuSurfaceState`, `requestArcadeReplayPlayback`, `showStatusToast`, `getSettingsStore`) statt impliziter Global-Reads.
+- `src/ui/MenuController.js` reicht diesen Runtime-Access kontrolliert in den Binding-Context durch; `src/ui/menu/MenuGameplayBindings.js` und `src/ui/arcade/ArcadeMenuSurface.js` konsumieren denselben Pfad.
+- `src/ui/arcade/ArcadeMenuSurface.js` liest Runtime-State, Replay-Fallback und Settings-Store dadurch nicht mehr aus `window.GAME_INSTANCE` oder `window.GAME_RUNTIME`; globale Surfaces bleiben damit auf Diagnostics-/Debug-Kompatibilitaet begrenzt statt produktivem UI-Einstieg.
+- `tests/runtime-regressions.contract.test.mjs` verankert einen einfachen Ratchet gegen direkte produktive `GAME_INSTANCE`-/`GAME_RUNTIME`-Reads in der Arcade-Surface.
+
+#### 4.5.12 MatchFlow-Controller-Split (`V92 92.4.1`, 2026-04-15)
+
+- `src/ui/MatchFlowUiController.js` bleibt die oeffentliche UI-Fassade und der bestehende Einstieg fuer `matchUiPort`, Pause-Overlay und Legacy-Call-Sites, traegt aber keine weiteren Round-End-, Overlay- oder Telemetrie-Unterpfade mehr selbst aus.
+- `src/ui/MatchFlowLifecycleController.js` besitzt jetzt die Lifecycle-Intents fuer `startRound`, `onRoundEnd`, Round-End-Plan-Anwendung und `returnToMenu`; `MatchFlowUiController` delegiert dorthin statt weitere Lifecycle-Verzweigungen in derselben Klasse anzusammeln.
+- `src/ui/MatchFlowArcadeOverlayController.js` kapselt Message-Stats sowie Arcade-Intermission-/Post-Run-Overlay-Rendering inklusive Replay-Fallback-Button und Choice-/Reward-Wahl.
+- `src/ui/MatchFlowTelemetryController.js` kapselt Hunt-Feedback, Damage-Indikatoren, Round-End-Telemetrie-Payloads und den Callback-Bindungspfad an `MatchLifecycleSessionOrchestrator`.
+- `tests/runtime-regressions.contract.test.mjs` spiegelt den Split mit kleinen Node-Contracts fuer Lifecycle-Port-Delegation und den extrahierten Hunt-Feedback-Seam; breite Desktop-/Playwright-Verifikation bleibt weiter dem spaeteren Gate ueberlassen.
+
+#### 4.5.13 Facade-Service-Split (`V92 92.4.2`, 2026-04-15)
+
+- `src/core/GameRuntimeFacade.js` behaelt die oeffentliche Legacy-Surface fuer bestehende Runtime-/Coordinator-Aufrufer, schuettet aber keine neue Arcade- oder Recording-Fachlogik mehr in dieselbe Klasse.
+- `src/core/runtime/GameRuntimeArcadeSupport.js` besitzt Arcade-Run-State, Round-State-Controller-Aktivierung, Replay-/Reward-/Intermission-Pfade, Sudden-Death-Ticks und die Round-/Match-End-Telemetrie fuer den migrierten Scope.
+- `src/core/runtime/GameRuntimeRecordingSupport.js` kapselt ueber `createGameRuntimeRecordingFacadeSupport()` den Cinematic-Recording-Hotkey, Recorder-Dump, Metrics und Ghost-Clip-Zugriff als expliziten Facade-Dienst statt als weitere Inline-Unterfluesse.
+- `src/ui/MatchFlowLifecycleTransitions.js` und `src/ui/MatchFlowRoundEndCoordinator.js` liefern die fuer `MatchFlowUiController` und `PauseOverlayController` benoetigten Lifecycle-/Round-End-Helfer als UI-Seam, damit der zuvor offene `ui -> state`-Rest nicht als neue Guard-Ausnahme bestehen bleibt.
+- `GameRuntimeFacade` bleibt dadurch Composition-/Forwarding-Seam: Menu-Runtime-Access, Settings-/Session-/Menu-Handler und Legacy-kompatible Methoden verdrahten nur noch dedizierte Services.
+- `tests/runtime-regressions.contract.test.mjs` verankert den Delegationspfad fuer Match-End-Telemetrie, sodass neue Arcade-/Recording-Unterfluesse nicht unbemerkt wieder direkt in die Facade rueckwandern.
+
+#### 4.5.14 Ratchet-Baseline fuer Folgeblocks (`V92 92.5.2`, 2026-04-15)
+
+- `scripts/architecture/legacy-surface-guard-matrix.json` und `scripts/architecture/architecture-budget-ratchet.json` sind fuer Folgearbeit jetzt die verbindliche Ownership-/Sunset-Baseline: `window.GAME_INSTANCE` bleibt auf Diagnostics-only beschraenkt, und explizite `GameRuntimePorts`-Fallback-Helfer (`getLegacyRuntime*`, `getRuntimeFeatureTransition*`, `allowLegacyFallback=true`) sind nur noch als dokumentierte Restadapter zulaessig.
+- Das eingefrorene Budget ist absichtlich klein: `window.GAME_INSTANCE` darf nur noch in `src/core/AppInitializer.js` und `src/core/main.js` auftauchen; `GameRuntimePorts`-Fallbacks sind nur noch in `src/shared/runtime/GameRuntimePorts.js` sowie dem dokumentierten Restcaller `src/ui/MatchFlowTransitionHotspots.js` erlaubt.
+- Folgeblocks `V64`, `V81`, `V82` und `V86` konsumieren deshalb denselben Ratchet vor jeder Produktarbeit: neue Multiplayer-, Tooling-, HUD-/Overlay- oder Authoring-Pfade laufen ueber Commands, Snapshots, Capability-Resolver und die schmale Port-Schnittstelle statt ueber Runtime-Globals oder direkte Fallback-Helfer.
+- `architecture-guard` ist fuer diese Bloecke nicht nur ein generisches Gate, sondern die konkrete Sperre gegen Budget-Aufweitung: neue `GAME_INSTANCE`-Reads ausserhalb der beiden Bootstrap-Dateien oder neue `GameRuntimePorts`-Fallback-Caller ausserhalb der dokumentierten Restnische gelten als Guard- und Ratchet-Verstoss.
 
 ### 4.6 Zielgrenzen fuer V84
 
