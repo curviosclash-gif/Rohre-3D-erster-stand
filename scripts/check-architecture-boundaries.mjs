@@ -64,6 +64,13 @@ const violations = [
             location: `${entry.from}:${entry.line}`,
             detail: `${entry.from} -> ${entry.to}`,
         })),
+    ...(report.findings.legacySurfaceReads || [])
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: `legacy-surface: ${entry.surfaceId}`,
+            location: `${entry.file}:${entry.line}`,
+            detail: entry.snippet,
+        })),
 ];
 
 if (violations.length === 0) {
@@ -77,6 +84,11 @@ if (violations.length === 0) {
     console.log(`state -> ui disallowed imports: ${report.scorecard.stateToUiImports.disallowedEdges}`);
     console.log(`entities -> core disallowed imports: ${report.scorecard.entitiesToCoreImports.disallowedEdges}`);
     console.log(`state -> core disallowed imports: ${report.scorecard.stateToCoreImports.disallowedEdges}`);
+    if (report.scorecard.legacySurfaces) {
+        for (const [surfaceId, data] of Object.entries(report.scorecard.legacySurfaces)) {
+            console.log(`legacy-surface ${surfaceId}: ${data.totalFiles} files (${data.disallowedFiles} disallowed)`);
+        }
+    }
     process.exit(0);
 }
 

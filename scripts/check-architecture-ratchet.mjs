@@ -8,6 +8,14 @@ const baseline = JSON.parse(
 const baselineBudgets = baseline?.budgets || {};
 const report = collectArchitectureReport(process.cwd());
 
+const legacySurfaceChecks = Object.entries(report.scorecard.legacySurfaces || {}).map(
+    ([surfaceId, data]) => ({
+        key: `legacySurface_${surfaceId.replace(/[^a-zA-Z0-9]/g, '_')}_totalFiles`,
+        label: `legacy-surface ${surfaceId} total file budget`,
+        actual: data.totalFiles,
+    })
+);
+
 const checks = [
     {
         key: 'constructorGameFiles',
@@ -49,6 +57,7 @@ const checks = [
         label: 'state -> core legacy edge budget',
         actual: report.scorecard.stateToCoreImports.totalEdges,
     },
+    ...legacySurfaceChecks,
 ];
 
 const failures = [];

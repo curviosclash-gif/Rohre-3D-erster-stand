@@ -49,9 +49,24 @@ for (const entry of report.findings.stateToCoreImports) {
     pushViolation('state -> core import', entry, entry.from, entry.line, `${entry.from} -> ${entry.to}`);
 }
 
+for (const entry of (report.findings.legacySurfaceReads || [])) {
+    if (!touchedFiles.has(entry.file)) continue;
+    if (entry.allowed !== false) continue;
+    failures.push({
+        category: `legacy-surface: ${entry.surfaceId}`,
+        location: `${entry.file}:${entry.line}`,
+        detail: entry.snippet,
+    });
+}
+
 if (failures.length === 0) {
     console.log('Architecture touched-file strict mode passed.');
     console.log(`Touched src files checked: ${touchedFiles.size}`);
+    if (report.scorecard.legacySurfaces) {
+        for (const [surfaceId, data] of Object.entries(report.scorecard.legacySurfaces)) {
+            console.log(`legacy-surface ${surfaceId}: ${data.totalFiles} files total (${data.disallowedFiles} disallowed)`);
+        }
+    }
     process.exit(0);
 }
 

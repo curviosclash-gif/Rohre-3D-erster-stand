@@ -14,6 +14,71 @@ import {
     createEdgeKey,
 } from './ArchitectureConfig.mjs';
 
+const GUARD_MATRIX_PATH = 'scripts/architecture/legacy-surface-guard-matrix.json';
+
+function loadGuardMatrix(rootDir) {
+    const matrixPath = path.join(rootDir, GUARD_MATRIX_PATH);
+    try {
+        return JSON.parse(readFileSync(matrixPath, 'utf8'));
+    } catch {
+        return null;
+    }
+}
+
+function collectLegacySurfaceFindings(filesByRelativePath, guardMatrix) {
+    if (!guardMatrix?.surfaces) return [];
+    const allFindings = [];
+    for (const surface of guardMatrix.surfaces) {
+        if (!surface.forbiddenForNewWork) continue;
+        const allowedSet = new Set([
+            ...(surface.allowedAdapters || []),
+            ...(surface.allowedCallers || []),
+        ]);
+        const combinedPattern = surface.patterns
+            .map((p) => `(?:${p})`)
+            .join('|');
+        const pattern = new RegExp(combinedPattern, 'g');
+        for (const [relativePath, text] of filesByRelativePath.entries()) {
+            if (!relativePath.startsWith('src/')) continue;
+            const matches = [...text.matchAll(pattern)];
+            if (matches.length === 0) continue;
+            const allowed = allowedSet.has(relativePath);
+            for (const match of matches) {
+                const line = countLineNumber(text, match.index || 0);
+                allFindings.push({
+                    surfaceId: surface.id,
+                    file: relativePath,
+                    line,
+                    match: match[0],
+                    snippet: readLineAt(text, line),
+                    allowed,
+                    reason: allowed ? 'listed in guard-matrix allowedAdapters or allowedCallers' : null,
+                });
+            }
+        }
+    }
+    return allFindings;
+}
+
+function summarizeLegacySurfaceScorecard(findings, guardMatrix) {
+    if (!guardMatrix?.surfaces) return {};
+    const scorecard = {};
+    for (const surface of guardMatrix.surfaces) {
+        if (!surface.forbiddenForNewWork) continue;
+        const surfaceFindings = findings.filter((f) => f.surfaceId === surface.id);
+        const filesUsing = [...new Set(surfaceFindings.map((f) => f.file))];
+        const disallowedFiles = [...new Set(
+            surfaceFindings.filter((f) => !f.allowed).map((f) => f.file)
+        )];
+        scorecard[surface.id] = {
+            totalFiles: filesUsing.length,
+            disallowedFiles: disallowedFiles.length,
+            legacyFiles: filesUsing.filter((f) => !disallowedFiles.includes(f)),
+        };
+    }
+    return scorecard;
+}
+
 const LOCAL_IMPORT_PATTERN = /import\s+(?:[\s\S]*?\s+from\s+)?['"]([^'"]+)['"]/g;
 const DYNAMIC_IMPORT_PATTERN = /import\s*\(\s*['"]([^'"]+)['"]\s*\)/g;
 const CONSTRUCTOR_GAME_PATTERN = /constructor\s*\(\s*game(?:\s*=|\s*[),])/g;
@@ -301,6 +366,8 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
     const configWrites = collectConfigWrites(filesByRelativePath);
     const domAccessesOutsideUi = collectDomAccesses(filesByRelativePath);
     const fileSizes = collectFileSizes(filesByRelativePath);
+    const guardMatrix = loadGuardMatrix(rootDir);
+    const legacySurfaceReads = collectLegacySurfaceFindings(filesByRelativePath, guardMatrix);
 
     const report = {
         generatedAt: new Date().toISOString(),
@@ -317,6 +384,7 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             stateToUiImports,
             entitiesToCoreImports,
             stateToCoreImports,
+            legacySurfaceReads,
         },
         importGraph: {
             localEdgeCount: importEdges.length,
@@ -376,6 +444,7 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             disallowedEdges: stateToCoreImports.filter((entry) => !entry.allowed).length,
             legacyEdges: summarizeEdges(stateToCoreImports.filter((entry) => entry.allowed)),
         },
+        legacySurfaces: summarizeLegacySurfaceScorecard(legacySurfaceReads, guardMatrix),
     };
 
     return report;
@@ -401,6 +470,14 @@ export function formatArchitectureReport(report) {
     lines.push(`state -> ui imports: ${report.scorecard.stateToUiImports.totalEdges} edges (${report.scorecard.stateToUiImports.disallowedEdges} disallowed)`);
     lines.push(`entities -> core imports: ${report.scorecard.entitiesToCoreImports.totalEdges} edges (${report.scorecard.entitiesToCoreImports.disallowedEdges} disallowed)`);
     lines.push(`state -> core imports: ${report.scorecard.stateToCoreImports.totalEdges} edges (${report.scorecard.stateToCoreImports.disallowedEdges} disallowed)`);
+    if (report.scorecard.legacySurfaces && Object.keys(report.scorecard.legacySurfaces).length > 0) {
+        lines.push('');
+        lines.push('Legacy-surface usage (guard-matrix, forbiddenForNewWork):');
+        for (const [surfaceId, data] of Object.entries(report.scorecard.legacySurfaces)) {
+            const status = data.disallowedFiles > 0 ? 'VIOLATION' : 'OK';
+            lines.push(`  - ${status}: ${surfaceId} = ${data.totalFiles} files (${data.disallowedFiles} disallowed)`);
+        }
+    }
     lines.push('');
     lines.push('Largest src files:');
     lines.push(formatList(report.fileSizes.largestFiles.slice(0, 8), (entry) => `${entry.file} (${entry.lines} lines)`));

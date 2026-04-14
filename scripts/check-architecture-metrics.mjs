@@ -1,6 +1,26 @@
+import { readFileSync } from 'node:fs';
 import { collectArchitectureReport, formatArchitectureReport } from './architecture/ArchitectureAnalysis.mjs';
 
 const report = collectArchitectureReport(process.cwd());
+
+let ratchetBaselines = {};
+try {
+    const ratchet = JSON.parse(readFileSync('scripts/architecture/architecture-budget-ratchet.json', 'utf8'));
+    ratchetBaselines = ratchet?.budgets || {};
+} catch {
+    // ratchet file optional for metrics display
+}
+
+const legacySurfaceChecks = Object.entries(report.scorecard.legacySurfaces || {}).map(
+    ([surfaceId, data]) => {
+        const key = `legacySurface_${surfaceId.replace(/[^a-zA-Z0-9]/g, '_')}_totalFiles`;
+        return {
+            label: `legacy-surface ${surfaceId} total files`,
+            actual: data.totalFiles,
+            max: Number.isFinite(ratchetBaselines[key]) ? ratchetBaselines[key] : data.totalFiles,
+        };
+    }
+);
 
 const checks = [
     {
@@ -48,6 +68,7 @@ const checks = [
         actual: report.scorecard.stateToCoreImports.totalEdges,
         max: report.budgets.stateToCoreImportEdges,
     },
+    ...legacySurfaceChecks,
 ];
 
 const failures = checks.filter((check) => check.actual > check.max);
