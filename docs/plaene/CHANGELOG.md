@@ -13,6 +13,11 @@ Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber je
 - Offene Risiken im Master: V71 fuehrt getrackte Ignore-Artefakte als Restgate-Risiko, V81 fuehrt den Expertenlogin als Dev-only-/Surface-Risiko (per V77 77.6.5 als lokaler Dev-only-Schalter entschieden). Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` (Vorschlag V90, noch nicht aktiv).
 - Naechste offene Subphase im aktiven Master: `64.1.1`.
 
+## Stand-Snapshot 2026-04-14 (V93 Abschluss)
+
+- V93 vollstaendig abgeschlossen (2026-04-14): Governance-Refactor fuer Agents-Einstieg. Master-Index-Einstieg (Top-60-Bytes) von 7011 auf 4472 Bytes reduziert (-36%), Gesamtdatei 294 -> 155 Zeilen. Status-Fliesstext und Abgleich-Historie in dieses Changelog ausgelagert; abgeschlossene Bloecke in `docs/plaene/archiv/abgeschlossene-bloecke.md`. AGENTS.md entpoliciert, `.agents/rules/*` und `.agents/workflows/*` entdoppelt, Rule-Trigger entfallen (V93 93.3.3). Neues Meta-Gate `npm run gates:pre-commit` (`scripts/gates-pre-commit.mjs`) fuehrt plan:check -> docs:sync -> docs:check in fester Reihenfolge mit per-Step-Exit. `.agents/rules/git_and_commits.md` verankert "ein Commit pro Subphase" zusaetzlich zur bereits vorhandenen "Umsetzungsplan-Aenderungen separater Commit"-Regel. Policy-Duplikat-Grep (`Niemals git stash`) trifft nur noch `git_and_commits.md`.
+- V94 (Wissensgraph) ist damit entsperrt.
+
 ## Abgleich-Historie (uebernommen aus `## Aufgeschobene Fixes`)
 
 Abgleich 2026-04-05: `V87 87.1.1` ist dokumentiert. `P1` ist im aktuellen Code-Stand bereits ueber `provisionalId` plus `_pendingSessionInit` guardiert; `P2`, `P4`, `P8`, `P9`, `P10`, `P11`, `P15`, `P16` und `P20` bleiben offene V87-Arbeit.

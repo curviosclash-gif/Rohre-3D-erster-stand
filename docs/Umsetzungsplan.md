@@ -47,7 +47,6 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
 | V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.1 | `docs/plaene/aktiv/V82.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
-| V93 | Agent-Governance, Token-Effizienz und Workflow-Zuschnitt | planned | P2 | frei | - | 93.1 | `docs/plaene/aktiv/V93.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
 
 ## Abhaengigkeiten
@@ -60,7 +59,6 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V76 | V64.99 | hard | nein | Hangar-/Werkstatt-Flows starten erst nach dem festgezogenen Produktbild fuer Host/Join und Browser-Demo |
 | V76 | V82.99 | hard | nein | V76.3 Arcade-Hangar baut direkt auf V82-Contracts (XP, Upgrades, Leaderboard) auf; V82 muss vor V76.3 abgeschlossen sein |
 | V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
-| V94 | V93.99 | hard | nein | Wissensgraph-Build parst Master-Index und Plan-Frontmatter; setzt die V93-Entlastung des Masters (Kopf-Fliesstext raus, Dependency-Tabelle eingedampft) und das `gates:pre-commit`-Meta-Gate aus V93.5.1 voraus |
 
 ## Lock-Status
 
@@ -78,7 +76,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
 | - | V82 | - | frei | Nach `V72.99` und `V74.99` mit `82.1` daten- und regelnah starten; UI-/HUD-/Overlay-Schnitte sollen den Ownership-Zuschnitt aus `V92` konsumieren |
 | - | V81 | - | frei | Nach `V92.99`, `V91.99`, `V74.99` und `V72.99` mit `81.1` Registry und Bridge starten |
-| - | V93 | - | frei | Governance-, Regel- und Workflow-Zuschnitt fuer Agentenarbeit synchronisieren, ohne bestehende Block-Gates aufzubrechen |
+| - | V93 | 2026-04-14 | closed | Abgeschlossen 2026-04-14: `93.99` Gate gruen; Master-Index-Einstieg -36% (7011->4472 Bytes Top-60), `gates:pre-commit` Meta-Gate produktiv, Rules/Workflows entdoppelt, keine Policy in mehrfacher Quelle |
 | - | V94 | - | frei | Nach `V93.99` Wissensgraph als generiertes JSON-Artefakt (`docs/generated/knowledge-graph.json`) plus Build-/Check-Scripts und Gate-Einhaengung als sekundaeren Query-Layer verankern |
 
 ## Empfohlene Reihenfolge
