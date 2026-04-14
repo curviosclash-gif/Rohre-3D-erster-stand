@@ -1,3 +1,5 @@
+import { normalizeText } from './ContractNormalizeUtils.js';
+
 export const CONTENT_DESCRIPTOR_VERSION = 'content-descriptor.v1';
 
 export const CONTENT_DESCRIPTOR_TYPES = Object.freeze({
@@ -9,11 +11,6 @@ export const CONTENT_DESCRIPTOR_TYPES = Object.freeze({
     ARCADE_MODIFIERS: 'arcade-modifiers',
     VEHICLES: 'vehicles',
 });
-
-function normalizeText(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 function cloneObjectShallow(value) {
     if (!value || typeof value !== 'object' || Array.isArray(value)) return {};

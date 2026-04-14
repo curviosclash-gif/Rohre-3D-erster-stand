@@ -1,3 +1,5 @@
+import { normalizeString } from './ContractNormalizeUtils.js';
+
 export const PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION = 'platform-capability-snapshot.v1';
 
 export const PLATFORM_CAPABILITY_IDS = Object.freeze({
@@ -6,11 +8,6 @@ export const PLATFORM_CAPABILITY_IDS = Object.freeze({
     SAVE: 'save',
     RECORDING: 'recording',
 });
-
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 export function createPlatformCapabilityDescriptor(capabilityId, descriptor = {}) {
     const source = descriptor && typeof descriptor === 'object' ? descriptor : {};

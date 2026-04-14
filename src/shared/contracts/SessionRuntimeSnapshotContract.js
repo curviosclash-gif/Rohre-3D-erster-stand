@@ -1,13 +1,9 @@
 import { normalizeSessionRuntimeEvent } from './SessionRuntimeEventContract.js';
+import { normalizeString } from './ContractNormalizeUtils.js';
 
 export const SESSION_RUNTIME_SNAPSHOT_CONTRACT_VERSION = 'session-runtime-snapshot.v1';
 export const MATCH_FLOW_SNAPSHOT_CONTRACT_VERSION = 'match-flow-snapshot.v1';
 export const RUNTIME_OBSERVABILITY_SNAPSHOT_CONTRACT_VERSION = 'runtime-observability-snapshot.v1';
-
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 function normalizeNullableString(value) {
     const normalized = normalizeString(value, '');

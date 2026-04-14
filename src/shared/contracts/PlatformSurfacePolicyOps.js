@@ -16,6 +16,7 @@ import {
     resolveSurfaceDeveloperAccess,
     resolveSurfacePolicy,
 } from './PlatformCapabilityRegistry.js';
+import { normalizeString } from './ContractNormalizeUtils.js';
 
 const VALID_SURFACE_MENU_MODE_PATHS = new Set(Object.values(PLATFORM_SURFACE_MENU_MODE_PATHS));
 const VALID_SURFACE_QUICK_START_ACTION_IDS = new Set(Object.values(PLATFORM_SURFACE_QUICK_START_ACTION_IDS));
@@ -39,11 +40,6 @@ export const PLATFORM_SURFACE_FEATURE_CLASSIFICATIONS = Object.freeze({
     FUTURE_OPT_IN: 'future opt-in',
 });
 const VALID_SURFACE_FEATURE_IDS = new Set(Object.values(PLATFORM_SURFACE_FEATURE_IDS));
-
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 function normalizeSurfaceMenuModePath(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();

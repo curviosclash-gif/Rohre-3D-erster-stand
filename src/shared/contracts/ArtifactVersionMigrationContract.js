@@ -1,3 +1,5 @@
+import { normalizeText } from './ContractNormalizeUtils.js';
+
 const DEFAULT_VERSION_FIELDS = Object.freeze(['schemaVersion', 'contractVersion', 'version']);
 
 export const ARTIFACT_VERSION_DECISIONS = Object.freeze({
@@ -6,10 +8,6 @@ export const ARTIFACT_VERSION_DECISIONS = Object.freeze({
     FALLBACK: 'fallback',
     REJECT: 'reject',
 });
-
-function normalizeText(value) {
-    return typeof value === 'string' ? value.trim() : '';
-}
 
 function normalizeVersionToken(value, options = {}) {
     if (Number.isFinite(value)) {

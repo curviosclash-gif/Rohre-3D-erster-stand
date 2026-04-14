@@ -1,9 +1,6 @@
-export const MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION = 'match-runtime-projection.v1';
+import { normalizeString } from './ContractNormalizeUtils.js';
 
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
+export const MATCH_RUNTIME_PROJECTION_CONTRACT_VERSION = 'match-runtime-projection.v1';
 
 function normalizeNumber(value, fallback = 0) {
     const numeric = Number(value);

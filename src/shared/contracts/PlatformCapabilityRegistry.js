@@ -48,6 +48,7 @@ import {
     PLATFORM_TOOLING_IDS,
 } from './PlatformCapabilityData.js';
 import { MULTIPLAYER_TRANSPORTS } from './RuntimeSessionContract.js';
+import { normalizeString } from './ContractNormalizeUtils.js';
 
 const VALID_PRODUCT_SURFACE_IDS = new Set(Object.values(PLATFORM_PRODUCT_SURFACE_IDS));
 const VALID_RUNTIME_KINDS = new Set(Object.values(PLATFORM_RUNTIME_KINDS));
@@ -55,11 +56,6 @@ const VALID_LOBBY_TRANSPORTS = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
 const VALID_SURFACE_SESSION_TYPES = new Set(Object.values(PLATFORM_SURFACE_SESSION_TYPES));
 const VALID_SURFACE_MENU_MODE_PATHS = new Set(Object.values(PLATFORM_SURFACE_MENU_MODE_PATHS));
 const VALID_SURFACE_QUICK_START_ACTION_IDS = new Set(Object.values(PLATFORM_SURFACE_QUICK_START_ACTION_IDS));
-
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 function resolveRuntimeGlobal(runtimeGlobal = globalThis) {
     return runtimeGlobal && typeof runtimeGlobal === 'object'

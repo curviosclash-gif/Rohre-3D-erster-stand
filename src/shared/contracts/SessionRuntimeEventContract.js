@@ -1,4 +1,5 @@
 import { tryCloneJsonValue } from '../utils/JsonClone.js';
+import { normalizeString } from './ContractNormalizeUtils.js';
 
 export const SESSION_RUNTIME_EVENT_CONTRACT_VERSION = 'session-runtime-event.v1';
 
@@ -30,11 +31,6 @@ const EVENT_CATEGORY_BY_TYPE = Object.freeze({
 
 /** @type {Set<string>} */
 const SESSION_RUNTIME_EVENT_TYPE_SET = new Set(Object.values(SESSION_RUNTIME_EVENT_TYPES));
-
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 function normalizeNullableString(value) {
     const normalized = normalizeString(value, '');

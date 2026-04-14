@@ -1,9 +1,6 @@
-const MAP_MODE_PATHS = new Set(['normal', 'arcade', 'fight', 'quick_action']);
+import { normalizeString } from './ContractNormalizeUtils.js';
 
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
+const MAP_MODE_PATHS = new Set(['normal', 'arcade', 'fight', 'quick_action']);
 
 function normalizeModePath(modePath) {
     const normalized = normalizeString(modePath, 'normal').toLowerCase();

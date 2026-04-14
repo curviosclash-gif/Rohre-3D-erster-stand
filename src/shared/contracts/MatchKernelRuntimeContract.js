@@ -1,6 +1,7 @@
 import { createRuntimeClock, RUNTIME_CLOCK_CONTRACT_VERSION } from './RuntimeClockContract.js';
 import { RUNTIME_RNG_CONTRACT_VERSION } from './RuntimeRngContract.js';
 import { createSessionRuntimeSnapshot, SESSION_RUNTIME_SNAPSHOT_CONTRACT_VERSION } from './SessionRuntimeSnapshotContract.js';
+import { normalizeString } from './ContractNormalizeUtils.js';
 
 export const MATCH_KERNEL_RUN_PROFILE_CONTRACT_VERSION = 'match-kernel-run-profile.v1';
 export const MATCH_KERNEL_CLOCK_PORT_CONTRACT_VERSION = 'match-kernel-clock-port.v1';
@@ -62,11 +63,6 @@ const VALID_TICK_DRIVER_SET = new Set(Object.values(MATCH_KERNEL_TICK_DRIVERS));
 const VALID_CLOCK_MODE_SET = new Set(Object.values(MATCH_KERNEL_CLOCK_MODES));
 const VALID_INPUT_SOURCE_SET = new Set(Object.values(MATCH_KERNEL_INPUT_SOURCES));
 const VALID_SNAPSHOT_TARGET_SET = new Set(Object.values(MATCH_KERNEL_SNAPSHOT_TARGETS));
-
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 function normalizeNullableString(value) {
     const normalized = normalizeString(value, '');

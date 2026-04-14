@@ -1,5 +1,6 @@
 import { MULTIPLAYER_TRANSPORTS } from './RuntimeSessionContract.js';
 import { resolveLobbyProviderKind } from './PlatformCapabilityRegistry.js';
+import { normalizeString } from './ContractNormalizeUtils.js';
 
 export const LOBBY_SERVICE_CONTRACT_VERSION = 'lobby-service.v1';
 
@@ -18,11 +19,6 @@ export const LOBBY_SERVICE_EVENT_TYPES = Object.freeze({
 });
 
 const VALID_LOBBY_SERVICE_TRANSPORTS = new Set(Object.values(LOBBY_SERVICE_TRANSPORTS));
-
-function normalizeString(value, fallback = '') {
-    const normalized = typeof value === 'string' ? value.trim() : '';
-    return normalized || fallback;
-}
 
 function resolveTransportCandidate(value) {
     if (value && typeof value === 'object') {
