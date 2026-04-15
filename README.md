@@ -14,6 +14,7 @@ npm run dev
 
 ```bash
 npm run build
+npm run build:app
 npm run dev
 npm run dev:logged
 npm run dev:raw
@@ -38,9 +39,15 @@ Beispiele: `delete` fuer `dist/` oder `playwright-report/`, `archive` fuer aelte
 
 1. `docs/referenz/ai_project_onboarding.md`
 2. `docs/referenz/ai_architecture_context.md`
-3. `docs/Umsetzungsplan.md`
-4. `docs/release/Releaseplan_Spiel_2026.md`
-5. `docs/INDEX.md`
+3. `docs/referenz/desktop_online_signaling.md`
+4. `docs/Umsetzungsplan.md`
+5. `docs/release/Releaseplan_Spiel_2026.md`
+6. `docs/INDEX.md`
+
+## Desktop Online Build
+
+Desktop-Online-Konfiguration fuer `npm run build:app` und `npm run app:package` liegt in `.env.app`.
+Einmalige Release- oder Dev-Abweichungen werden direkt vor dem Build per Shell-Env gesetzt; Details und die Packaging-Regeln stehen in `docs/referenz/desktop_online_signaling.md`.
 
 ## Verbindliche Regeln
 
