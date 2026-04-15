@@ -360,6 +360,8 @@ export class UIStartSyncController {
             sessionType,
             multiplayerTransport: settings?.localSettings?.multiplayerTransport,
         });
+        const isMultiplayerSession = sessionType === MENU_SESSION_TYPES.MULTIPLAYER;
+        const hasActiveLobbySession = isMultiplayerSession && multiplayerSessionState?.joined === true;
         const knownVehicleIds = new Set(this._vehiclePreviewEntries.map((entry) => entry.id));
         const appendVehicleOption = (select, vehicleId) => {
             const normalizedVehicleId = String(vehicleId || '').trim();
@@ -500,12 +502,22 @@ export class UIStartSyncController {
             }
             if (sessionType === MENU_SESSION_TYPES.MULTIPLAYER) {
                 const hasCode = String(multiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
-                const readySummary = multiplayerSessionState?.joined
-                    ? ` (${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready)`
+                const readySummary = hasActiveLobbySession
+                    ? ` | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready`
+                    : '';
+                const roleSummary = hasActiveLobbySession
+                    ? (multiplayerSessionState.isHost ? 'Host' : surfaceEntryCopy.multiplayerClientRoleLabel)
+                    : '';
+                const connectionSummary = hasActiveLobbySession
+                    ? (multiplayerSessionState.pendingMatchCommandId
+                        ? 'Startsignal gesendet'
+                        : (multiplayerSessionState.connected ? 'verbunden' : 'Warte auf Host'))
                     : '';
                 summaryBlocks.push({
                     label: 'Lobby',
-                    value: hasCode ? `${hasCode}${readySummary}` : 'nicht verbunden',
+                    value: hasCode
+                        ? [hasCode, roleSummary, connectionSummary].filter(Boolean).join(' | ') + readySummary
+                        : 'nicht verbunden',
                     muted: !hasCode,
                 });
                 summaryBlocks.push({
@@ -590,27 +602,52 @@ export class UIStartSyncController {
                 ? 'Auswahl: Online | produktive Online-Lobby wird noch angebunden'
                 : `Produktiver Transport: ${multiplayerTransportUiState.selectedTransportLabel}`;
         }
-        if (this.ui.multiplayerLobbyCodeInput && multiplayerSessionState?.joined) {
-            this.ui.multiplayerLobbyCodeInput.value = String(multiplayerSessionState.lobbyCode || '');
+        if (this.ui.multiplayerLobbyCodeInput) {
+            if (hasActiveLobbySession) {
+                this.ui.multiplayerLobbyCodeInput.value = String(multiplayerSessionState.lobbyCode || '');
+            }
+            this.ui.multiplayerLobbyCodeInput.readOnly = hasActiveLobbySession;
+            this.ui.multiplayerLobbyCodeInput.title = hasActiveLobbySession
+                ? 'Lobby-Code wird aus der aktiven Session gelesen.'
+                : '';
+        }
+        if (this.ui.multiplayerHostButton) {
+            this.ui.multiplayerHostButton.disabled = !isMultiplayerSession
+                || hasActiveLobbySession
+                || multiplayerTransportUiState.isOnlinePending
+                || surfaceEntryCopy?.hostActionAvailable === false;
+        }
+        if (this.ui.multiplayerJoinButton) {
+            this.ui.multiplayerJoinButton.disabled = !isMultiplayerSession
+                || hasActiveLobbySession
+                || multiplayerTransportUiState.isOnlinePending;
+        }
+        if (this.ui.multiplayerLeaveLobbyButton) {
+            this.ui.multiplayerLeaveLobbyButton.disabled = !hasActiveLobbySession;
         }
         if (this.ui.multiplayerReadyToggle) {
-            this.ui.multiplayerReadyToggle.disabled = sessionType !== MENU_SESSION_TYPES.MULTIPLAYER || multiplayerSessionState?.joined !== true;
-            this.ui.multiplayerReadyToggle.checked = sessionType === MENU_SESSION_TYPES.MULTIPLAYER
+            this.ui.multiplayerReadyToggle.disabled = !hasActiveLobbySession;
+            this.ui.multiplayerReadyToggle.checked = isMultiplayerSession
                 ? multiplayerSessionState?.localReady === true
                 : false;
         }
         if (this.ui.multiplayerLobbyState) {
             const lobbyCode = String(multiplayerSessionState?.lobbyCode || this.ui.multiplayerLobbyCodeInput?.value || '').trim();
-            if (sessionType !== MENU_SESSION_TYPES.MULTIPLAYER) {
+            if (!isMultiplayerSession) {
                 this.ui.multiplayerLobbyState.textContent = 'Lobbystatus: inaktiv';
-            } else if (multiplayerSessionState?.joined) {
+            } else if (hasActiveLobbySession) {
                 const roleLabel = multiplayerSessionState.isHost
                     ? 'Host'
                     : surfaceEntryCopy.multiplayerClientRoleLabel;
+                const connectionLabel = multiplayerSessionState.pendingMatchCommandId
+                    ? 'Startsignal gesendet'
+                    : (multiplayerSessionState.connected
+                        ? 'verbunden'
+                        : (multiplayerSessionState.isHost ? 'Host aktiv' : 'Warte auf Host'));
                 const transportSuffix = sessionContract.isLegacyTransport === true
                     ? ` | ${sessionContract.transportAudienceLabel}`
                     : '';
-                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${roleLabel} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready${transportSuffix}`;
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${roleLabel} | ${connectionLabel} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready${transportSuffix}`;
             } else if (sessionContract.isLegacyTransport === true) {
                 this.ui.multiplayerLobbyState.textContent = lobbyCode
                     ? `Lobbystatus: ${lobbyCode} | ${sessionContract.transportAudienceLabel}`

@@ -24,13 +24,19 @@ import {
     normalizeString,
     tryParseManualSignalingUrl,
 } from './NetworkLobbyServiceSupport.js';
+import {
+    collectMatchingDiscoveryHosts,
+    selectJoinSignalingUrlFromDiscoveredHosts,
+} from './NetworkLobbyDiscoveryResolver.js';
 
 const DISCOVERY_POLL_INTERVAL_MS = 250;
 const DISCOVERY_MAX_WAIT_MS = 3_000;
+const DISCOVERY_MAX_MATCHING_HOSTS = 8;
 
 export class NetworkLobbyService {
     constructor(options = {}) {
         const runtimeGlobal = resolveGlobalObject(options.runtime?.global || null);
+        this._runtimeGlobal = runtimeGlobal;
         this.transport = normalizeLobbyServiceTransport(options.transport, LOBBY_SERVICE_TRANSPORTS.LAN);
         this.bridgeKind = this.transport;
         this.contractVersion = normalizeString(options.contractVersion, 'lifecycle.v1');
@@ -68,6 +74,7 @@ export class NetworkLobbyService {
         this._hostSettingsSnapshot = null;
         this._lobby = null;
         this._sessionState = createIdleSessionState('', this.transport);
+        this._lastJoinDiscoveryIssue = null;
         this._discoveryPort = options.discoveryPort === null
             ? null
             : (options.discoveryPort && typeof options.discoveryPort === 'object'
@@ -107,6 +114,19 @@ export class NetworkLobbyService {
             message: normalizedMessage,
             sessionState: this.getSessionState(),
         };
+    }
+
+    _clearJoinDiscoveryIssue() {
+        this._lastJoinDiscoveryIssue = null;
+    }
+
+    _setJoinDiscoveryIssue(code, message, details = null) {
+        this._lastJoinDiscoveryIssue = {
+            code: normalizeString(code, 'lobby_not_found'),
+            message: normalizeString(message, 'Lobby nicht gefunden.'),
+            details: details && typeof details === 'object' ? deepClone(details) : null,
+        };
+        return this._lastJoinDiscoveryIssue;
     }
 
     _bindLobby(lobby) {
@@ -177,28 +197,58 @@ export class NetworkLobbyService {
 
     async _resolveDefaultJoinSignalingUrl(lobbyCode, explicitSignalingUrl = '') {
         const normalizedExplicitUrl = normalizeSignalingUrl(explicitSignalingUrl);
-        if (normalizedExplicitUrl) return normalizedExplicitUrl;
+        if (normalizedExplicitUrl) {
+            this._clearJoinDiscoveryIssue();
+            return normalizedExplicitUrl;
+        }
 
         const manualAddress = tryParseManualSignalingUrl(lobbyCode);
-        if (manualAddress) return manualAddress;
+        if (manualAddress) {
+            this._clearJoinDiscoveryIssue();
+            return manualAddress;
+        }
 
         if (!this._discoveryPort?.isAvailable?.()) {
+            this._setJoinDiscoveryIssue(
+                'discovery_unavailable',
+                `Lobby nicht gefunden: ${normalizeLobbyCode(lobbyCode, '') || 'unbekannt'}`
+            );
             return '';
         }
 
         const normalizedLobbyCode = normalizeLobbyCode(lobbyCode, '');
+        this._clearJoinDiscoveryIssue();
         this._discoveryPort.start?.();
         try {
             const deadline = Date.now() + DISCOVERY_MAX_WAIT_MS;
+            let lastIssue = null;
             while (Date.now() <= deadline) {
                 const hosts = await Promise.resolve(this._discoveryPort.getHosts?.());
-                const match = Array.isArray(hosts)
-                    ? hosts.find((host) => normalizeLobbyCode(host?.lobbyCode, '') === normalizedLobbyCode)
-                    : null;
-                if (match?.ip && match?.port) {
-                    return `http://${match.ip}:${match.port}`;
+                const matches = collectMatchingDiscoveryHosts(hosts, normalizedLobbyCode, DISCOVERY_MAX_MATCHING_HOSTS);
+                if (matches.length > 0) {
+                    const resolved = await selectJoinSignalingUrlFromDiscoveredHosts({
+                        hosts: matches,
+                        lobbyCode: normalizedLobbyCode,
+                        runtimeGlobal: this._runtimeGlobal,
+                    });
+                    if (resolved?.signalingUrl) {
+                        this._clearJoinDiscoveryIssue();
+                        return resolved.signalingUrl;
+                    }
+                    if (resolved?.issue) {
+                        lastIssue = this._setJoinDiscoveryIssue(
+                            resolved.issue.code,
+                            resolved.issue.message,
+                            resolved.issue.details
+                        );
+                    }
                 }
                 await delay(DISCOVERY_POLL_INTERVAL_MS);
+            }
+            if (lastIssue) {
+                this._lastJoinDiscoveryIssue = lastIssue;
+            } else {
+                this._setJoinDiscoveryIssue('lobby_not_found', `Lobby nicht gefunden: ${normalizedLobbyCode}`);
             }
         } finally {
             this._discoveryPort.stop?.();
@@ -217,7 +267,11 @@ export class NetworkLobbyService {
                 normalizeSignalingUrl,
                 tryParseManualSignalingUrl,
             });
-            return normalizeSignalingUrl(resolved);
+            const normalizedResolved = normalizeSignalingUrl(resolved);
+            if (normalizedResolved) {
+                this._clearJoinDiscoveryIssue();
+            }
+            return normalizedResolved;
         }
         return this._resolveDefaultJoinSignalingUrl(lobbyCode, explicitSignalingUrl);
     }
@@ -263,7 +317,11 @@ export class NetworkLobbyService {
         this._actorId = actorId;
         const signalingUrl = await this._resolveJoinSignalingUrl(requestedLobbyCode, options.signalingUrl);
         if (!signalingUrl) {
-            return this._fail(`Lobby nicht gefunden: ${requestedLobbyCode}`, 'lobby_not_found');
+            const issue = this._lastJoinDiscoveryIssue;
+            return this._fail(
+                issue?.message || `Lobby nicht gefunden: ${requestedLobbyCode}`,
+                issue?.code || 'lobby_not_found'
+            );
         }
 
         this._replaceLobby(signalingUrl);
@@ -284,6 +342,7 @@ export class NetworkLobbyService {
             mode: 'join',
             peerId: sessionState.peerId,
         });
+        this._clearJoinDiscoveryIssue();
         this._setStatus(`Lobby beigetreten: ${sessionState.lobbyCode}`);
         return {
             ok: true,

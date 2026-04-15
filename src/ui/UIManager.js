@@ -464,17 +464,18 @@ export class UIManager {
             return;
         }
         const role = sessionState.isHost ? 'Host' : surfaceEntryCopy.multiplayerClientRoleLabel;
-        const startStatus = sessionState.canStart
-            ? 'Start bereit'
-            : (sessionState.isHost ? 'Warte auf Ready' : 'Warte auf Host');
-        this.ui.multiplayerStatus.textContent = `Lobby live | Rolle: ${role} | ${sessionState.readyCount}/${sessionState.memberCount} ready | ${startStatus}${presetText}`;
+        const connectionStatus = sessionState.pendingMatchCommandId ? 'Startsignal gesendet' : (sessionState.connected ? 'verbunden' : (sessionState.isHost ? 'Host aktiv' : 'Warte auf Host'));
+        const startStatus = sessionState.pendingMatchCommandId ? 'Matchstart laeuft' : (sessionState.canStart ? 'Start bereit' : (sessionState.isHost ? 'Warte auf Ready' : 'Warte auf Host'));
+        this.ui.multiplayerStatus.textContent = `Lobby live | Rolle: ${role} | Status: ${connectionStatus} | ${sessionState.readyCount}/${sessionState.memberCount} ready | ${startStatus}${presetText}`;
         if (this.ui.startButton) {
             this.ui.startButton.disabled = false;
-            this.ui.startButton.title = sessionState.canStart
-                ? ''
-                : (sessionState.isHost
+            this.ui.startButton.title = sessionState.pendingMatchCommandId
+                ? 'Matchstart wurde bereits an die aktive Lobby gesendet.'
+                : (sessionState.canStart
+                    ? ''
+                    : (sessionState.isHost
                     ? 'Alle Teilnehmer muessen Ready sein und mindestens 2 Spieler verbunden sein.'
-                    : surfaceEntryCopy.multiplayerClientStartTitle);
+                    : surfaceEntryCopy.multiplayerClientStartTitle));
         }
     }
 

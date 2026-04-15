@@ -238,8 +238,14 @@ export class GameRuntimeFacade {
 
     _handleMultiplayerSessionStateChanged(sessionState = null) {
         const ui = this.getRuntimeHandle('ui');
-        if (sessionState?.joined && ui?.multiplayerLobbyCodeInput) {
-            ui.multiplayerLobbyCodeInput.value = String(sessionState.lobbyCode || '');
+        const previousLobbyCode = String(this._lastObservedMultiplayerSessionState?.lobbyCode || '').trim();
+        const inputValue = String(ui?.multiplayerLobbyCodeInput?.value || '').trim();
+        if (ui?.multiplayerLobbyCodeInput) {
+            if (sessionState?.joined) {
+                ui.multiplayerLobbyCodeInput.value = String(sessionState.lobbyCode || '');
+            } else if (previousLobbyCode && inputValue === previousLobbyCode) {
+                ui.multiplayerLobbyCodeInput.value = '';
+            }
         }
         this._syncMultiplayerUiState();
         this._lastObservedMultiplayerSessionState = observeLobbySessionStateChange(

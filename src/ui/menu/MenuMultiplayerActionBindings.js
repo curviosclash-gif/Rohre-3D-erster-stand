@@ -25,13 +25,15 @@ export function bindMenuMultiplayerActionButtons({
 
     if (ui.multiplayerLeaveLobbyButton) {
         bind(ui.multiplayerLeaveLobbyButton, 'click', () => {
-            emit(eventTypes.LEAVE_LOBBY);
+            emit(eventTypes.MULTIPLAYER_LEAVE_LOBBY);
         });
     }
 
-    if (ui.multiplayerReadyButton) {
-        bind(ui.multiplayerReadyButton, 'click', () => {
-            emit(eventTypes.TOGGLE_READY);
+    if (ui.multiplayerReadyToggle) {
+        bind(ui.multiplayerReadyToggle, 'change', () => {
+            emit(eventTypes.MULTIPLAYER_READY_TOGGLE, {
+                ready: ui.multiplayerReadyToggle.checked === true,
+            });
         });
     }
 
@@ -39,7 +41,7 @@ export function bindMenuMultiplayerActionButtons({
         bind(ui.multiplayerStartMatchButton, 'click', () => {
             const canHost = featureFlags?.canHost === true;
             if (!canHost) return;
-            emit(eventTypes.START_MATCH_MULTIPLAYER);
+            emit(eventTypes.START_MATCH);
         });
     }
 }

@@ -8,6 +8,7 @@ import {
     deleteMenuPresetAction,
 } from './MenuRuntimePresetConfigService.js';
 import {
+    handleMultiplayerLeaveAction,
     handleMultiplayerReadyToggleAction,
 } from './MenuRuntimeMultiplayerService.js';
 import {
@@ -162,6 +163,14 @@ export class GameRuntimeMenuActionHandler {
     handleMultiplayerJoin(event) {
         return this._facade?.joinLobby?.({
             lobbyCode: String(event?.lobbyCode || '').trim(),
+        });
+    }
+
+    handleMultiplayerLeaveLobby(event) {
+        return handleMultiplayerLeaveAction({
+            game: this._facade?.game,
+            menuMultiplayerBridge: this._facade?.menuMultiplayerBridge,
+            syncUiState: () => this._facade?._syncMultiplayerUiState?.(),
         });
     }
 

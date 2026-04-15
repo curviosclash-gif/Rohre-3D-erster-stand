@@ -79,7 +79,13 @@ async function resolveFromDiscoveryEndpoint(options) {
 
     try {
         const status = await getLanServerStatus.call(discoveryRuntime);
-        const port = Number(status?.port) > 0 ? Number(status.port) : 9090;
+        const statusHostIp = normalizeIp(status?.hostIp || status?.localIps?.[0] || '');
+        if (statusHostIp !== 'localhost') {
+            return statusHostIp;
+        }
+        const port = Number(status?.port) > 0
+            ? Number(status.port)
+            : (Number(status?.selectedPort) > 0 ? Number(status.selectedPort) : 9090);
         const response = await fetchImpl(`http://localhost:${port}/discovery/info`);
         if (!response?.ok) return null;
         const payload = await response.json();

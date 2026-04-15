@@ -86,6 +86,9 @@ function buildLobbyState(lobby) {
 
 export function createLANSignalingServer(port = 9090, options = {}) {
     const now = typeof options.now === 'function' ? options.now : () => Date.now();
+    const resolveDiagnostics = typeof options.resolveDiagnostics === 'function'
+        ? options.resolveDiagnostics
+        : null;
     const ghostPlayerTimeoutMs = Number.isFinite(Number(options.ghostPlayerTimeoutMs))
         ? Math.max(1, Math.floor(Number(options.ghostPlayerTimeoutMs)))
         : DEFAULT_GHOST_PLAYER_TIMEOUT_MS;
@@ -395,10 +398,15 @@ export function createLANSignalingServer(port = 9090, options = {}) {
 
         if (req.method === 'GET' && path === SIGNALING_HTTP_ROUTES.DISCOVERY_INFO) {
             cleanupGhostPlayers();
+            const diagnostics = resolveDiagnostics ? resolveDiagnostics() : null;
+            const hostIp = String(diagnostics?.hostIp || diagnostics?.localIps?.[0] || '').trim();
             jsonResponse(res, {
                 lobbyCode: lobby.code,
                 playerCount: lobby.players.length,
                 maxPlayers: DEFAULT_MAX_PLAYERS,
+                ip: hostIp || undefined,
+                hostIp: hostIp || undefined,
+                diagnostics,
                 sessionState: buildLobbyState(lobby),
             });
             return;

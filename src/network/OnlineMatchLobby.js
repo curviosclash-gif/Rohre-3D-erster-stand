@@ -317,6 +317,10 @@ export class OnlineMatchLobby extends MatchLobby {
         this._emit('matchStart', { players: this.players, settings: this.settings, sessionState: this.sessionState });
     }
 
+    getLocalPeerId() {
+        return String(this._playerId || '').trim();
+    }
+
     dispose() {
         this.leave();
         super.dispose();

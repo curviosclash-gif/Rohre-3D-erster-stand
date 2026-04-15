@@ -103,6 +103,51 @@ export function normalizeSignalingUrl(value) {
     return `http://${text}`;
 }
 
+export function normalizeHostPort(value, fallback = 0) {
+    const port = Number(value);
+    if (!Number.isInteger(port) || port <= 0 || port > 65535) {
+        return Number.isInteger(Number(fallback)) ? Number(fallback) : 0;
+    }
+    return port;
+}
+
+export function normalizeDiscoveryHostEntry(host, now = Date.now()) {
+    if (!host || typeof host !== 'object') return null;
+    const ip = normalizeString(host.ip, '');
+    const lobbyCode = normalizeLobbyCode(host.lobbyCode, '');
+    const port = normalizeHostPort(host.port, 0);
+    if (!ip || !lobbyCode || port <= 0) {
+        return null;
+    }
+    return {
+        ip,
+        port,
+        lobbyCode,
+        hostName: normalizeString(host.hostName, ''),
+        playerCount: Math.max(0, Math.floor(Number(host.playerCount) || 0)),
+        lastSeen: Math.max(0, Math.floor(Number(host.lastSeen) || now)),
+    };
+}
+
+export function compareDiscoveryHostEntries(left, right) {
+    const leftLastSeen = Math.max(0, Math.floor(Number(left?.lastSeen) || 0));
+    const rightLastSeen = Math.max(0, Math.floor(Number(right?.lastSeen) || 0));
+    if (leftLastSeen !== rightLastSeen) {
+        return rightLastSeen - leftLastSeen;
+    }
+    const leftLobbyCode = normalizeLobbyCode(left?.lobbyCode, '');
+    const rightLobbyCode = normalizeLobbyCode(right?.lobbyCode, '');
+    if (leftLobbyCode !== rightLobbyCode) {
+        return leftLobbyCode.localeCompare(rightLobbyCode);
+    }
+    const leftIp = normalizeString(left?.ip, '');
+    const rightIp = normalizeString(right?.ip, '');
+    if (leftIp !== rightIp) {
+        return leftIp.localeCompare(rightIp);
+    }
+    return normalizeHostPort(left?.port, 0) - normalizeHostPort(right?.port, 0);
+}
+
 export function tryParseManualSignalingUrl(rawValue) {
     const value = normalizeString(rawValue, '');
     if (!value) return '';

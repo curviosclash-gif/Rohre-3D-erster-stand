@@ -362,6 +362,31 @@ export async function handleMultiplayerJoinAction({
     return result;
 }
 
+export function handleMultiplayerLeaveAction({
+    game,
+    menuMultiplayerBridge,
+    syncUiState,
+}) {
+    if (!game) return null;
+    let result = null;
+    try {
+        result = menuMultiplayerBridge?.leave?.() || { ok: false, message: 'Keine aktive Lobby.' };
+    } catch (error) {
+        result = {
+            ok: false,
+            message: error instanceof Error ? error.message : 'Lobby konnte nicht verlassen werden.',
+        };
+    }
+    if (game?.ui?.multiplayerLobbyCodeInput) {
+        game.ui.multiplayerLobbyCodeInput.value = '';
+    }
+    syncUiState?.();
+    if (result?.previousState?.lobbyCode) {
+        game._showStatusToast?.(`Lobby verlassen: ${result.previousState.lobbyCode}`, 1500, 'info');
+    }
+    return result;
+}
+
 export async function handleMultiplayerReadyToggleAction({
     game,
     event,
