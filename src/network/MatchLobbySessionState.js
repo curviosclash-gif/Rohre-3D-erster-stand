@@ -1,3 +1,5 @@
+import { MULTIPLAYER_SESSION_ROLES } from '../shared/contracts/RuntimeSessionContract.js';
+
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
     return normalized || fallback;
@@ -13,17 +15,19 @@ function toNonNegativeInt(value, fallback = 0) {
     return Math.max(0, Math.floor(parsed));
 }
 
-export function normalizeLobbyMember(member, fallbackRole = 'client') {
+export function normalizeLobbyMember(member, fallbackRole = MULTIPLAYER_SESSION_ROLES.CLIENT) {
     const peerId = normalizeString(member?.peerId || member?.id);
     if (!peerId) return null;
-    const role = normalizeString(member?.role, fallbackRole) === 'host' ? 'host' : 'client';
+    const role = normalizeString(member?.role, fallbackRole) === MULTIPLAYER_SESSION_ROLES.HOST
+        ? MULTIPLAYER_SESSION_ROLES.HOST
+        : MULTIPLAYER_SESSION_ROLES.CLIENT;
     return {
         peerId,
         id: peerId,
-        actorId: normalizeString(member?.actorId || member?.name, role === 'host' ? 'Host' : peerId),
-        name: normalizeString(member?.name || member?.actorId, role === 'host' ? 'Host' : peerId),
+        actorId: normalizeString(member?.actorId || member?.name, role === MULTIPLAYER_SESSION_ROLES.HOST ? 'Host' : peerId),
+        name: normalizeString(member?.name || member?.actorId, role === MULTIPLAYER_SESSION_ROLES.HOST ? 'Host' : peerId),
         role,
-        isHost: role === 'host',
+        isHost: role === MULTIPLAYER_SESSION_ROLES.HOST,
         ready: normalizeBoolean(member?.ready),
         joinedAt: toNonNegativeInt(member?.joinedAt, 0),
         lastSeenAt: toNonNegativeInt(member?.lastSeenAt, 0),
@@ -38,11 +42,14 @@ export function normalizeLobbySessionState(state = {}) {
         : (Array.isArray(state?.players) ? state.players : []);
 
     const normalizedMembers = members
-        .map((member) => normalizeLobbyMember(member, member?.peerId === hostPeerId ? 'host' : 'client'))
+        .map((member) => normalizeLobbyMember(
+            member,
+            member?.peerId === hostPeerId ? MULTIPLAYER_SESSION_ROLES.HOST : MULTIPLAYER_SESSION_ROLES.CLIENT
+        ))
         .filter(Boolean)
         .map((member) => ({
             ...member,
-            role: member.peerId === hostPeerId ? 'host' : member.role,
+            role: member.peerId === hostPeerId ? MULTIPLAYER_SESSION_ROLES.HOST : member.role,
             isHost: member.peerId === hostPeerId,
         }))
         .sort((left, right) => {

@@ -65,15 +65,16 @@ export function resolveMatchStartValidationIssue({
             }
             if (legacyTransportActive) {
                 return {
-                    message: 'Start nicht moeglich: storage-bridge ist nur ein lokaler Legacy-Fallback, kein produktiver LAN-/Online-Transport.',
+                    message: `Start nicht moeglich: "${sessionContract.transportAudienceLabel}" ist kein produktiver Multiplayer-Transport.`,
                     fieldKey: 'multiplayer',
-                    fieldMessage: 'Legacy-Fallback zuerst verbinden oder fuer den produktiven Pfad auf LAN/Online wechseln.',
+                    fieldMessage: 'Produktiven Transport (LAN oder Online) waehlen und danach Lobby verbinden.',
                 };
             }
+            const transportLabel = sessionContract.transportAudienceLabel;
             return {
-                message: 'Start nicht moeglich: Bitte eine echte Lobby hosten oder ihr beitreten.',
+                message: `Start nicht moeglich: ${transportLabel}-Lobby verbinden (Host oder Join).`,
                 fieldKey: 'multiplayer',
-                fieldMessage: 'Host oder Join ausfuehren, damit eine Lobby verbunden ist.',
+                fieldMessage: `${transportLabel}: Host oder Join ausfuehren, damit eine Lobby verbunden ist.`,
             };
         }
         if (sessionState?.isHost !== true) {
