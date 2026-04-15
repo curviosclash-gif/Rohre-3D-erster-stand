@@ -12,23 +12,24 @@ import {
     MULTIPLAYER_MESSAGE_TYPES,
     normalizeMultiplayerSessionMessage,
 } from '../shared/contracts/MultiplayerSessionContract.js';
+import {
+    SIGNALING_COMMAND_TYPES,
+    SIGNALING_EVENT_TYPES,
+    createSignalingEnvelope,
+} from '../shared/contracts/SignalingSessionContract.js';
+import {
+    resolveRetryDelays,
+    delay,
+    resolveConnectTimeoutMs,
+    resolveOnlineSignalingUrl,
+    buildSocketCloseDetails,
+    createSocketLifecycleError,
+    createServerSignalingError,
+    isRetryableSignalingError,
+    toErrorPayload,
+} from './OnlineSignalingSupport.js';
 
 const logger = createLogger('OnlineSessionAdapter');
-const DEFAULT_CONNECT_RETRY_DELAYS_MS = [1000, 2000, 4000];
-
-function resolveRetryDelays(delays) {
-    if (!Array.isArray(delays) || delays.length <= 0) {
-        return [...DEFAULT_CONNECT_RETRY_DELAYS_MS];
-    }
-    return delays
-        .map((value) => Number(value))
-        .filter((value) => Number.isFinite(value) && value >= 0)
-        .map((value) => Math.floor(value));
-}
-
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 function resolveSignalingUrl(explicit) {
     if (explicit) return explicit;
@@ -85,119 +86,107 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
         });
 
         this._peerManager.on('iceCandidate', ({ peerId, candidate }) => {
-            this._sendSignaling({ type: 'ice', targetPeerId: peerId, candidate });
+            this._sendSignaling(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.ICE, { targetPeerId: peerId, candidate }));
         });
 
-        this._beforeUnloadHandler = () => {
-            this._sendLeaveMessage();
-        };
+        this._beforeUnloadHandler = () => { this._sendLeaveMessage(); };
         if (typeof window !== 'undefined') {
             window.addEventListener('beforeunload', this._beforeUnloadHandler);
         }
     }
 
     async connect(options = {}) {
-        this._signalingUrl = options.signalingUrl || this._signalingUrl;
+        this._signalingUrl = resolveOnlineSignalingUrl(options.signalingUrl, this._signalingUrl);
+        return this._runConnectLoop(() => this._connectSingleAttempt(options), options);
+    }
+
+    async reconnect(options = {}) {
+        if (options.signalingUrl) {
+            this._signalingUrl = resolveOnlineSignalingUrl(options.signalingUrl, this._signalingUrl);
+        }
+        return this._runConnectLoop(() => this._reconnectSingleAttempt(options), options);
+    }
+
+    async _runConnectLoop(singleAttemptFn, options = {}) {
         const retryDelays = resolveRetryDelays(options.connectRetryDelaysMs);
         const maxAttempts = Number.isFinite(Number(options.maxConnectAttempts))
-            ? Math.min(3, Math.max(1, Math.floor(Number(options.maxConnectAttempts))))
-            : 3;
+            ? Math.min(3, Math.max(1, Math.floor(Number(options.maxConnectAttempts)))) : 3;
         let lastError = null;
 
         for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
             try {
-                await this._connectSingleAttempt(options);
+                await singleAttemptFn();
                 return;
             } catch (err) {
                 lastError = err;
                 this._teardownSignalingSocket();
-                if (attempt >= maxAttempts) {
-                    break;
-                }
+                if (attempt >= maxAttempts || !isRetryableSignalingError(err)) break;
                 const retryDelayMs = retryDelays[Math.min(attempt - 1, retryDelays.length - 1)] || 0;
                 if (retryDelayMs > 0) {
-                    logger.debug('Signaling connect attempt failed; retrying', {
-                        attempt,
-                        maxAttempts,
-                        retryDelayMs,
-                        error: err?.message || String(err),
-                    });
+                    logger.debug('Signaling connect attempt failed; retrying', { attempt, maxAttempts, retryDelayMs });
                     await delay(retryDelayMs);
                 }
             }
         }
 
-        throw lastError || new Error('Signaling connect failed');
+        throw lastError || createSocketLifecycleError('error', { signalingUrl: this._signalingUrl });
     }
 
-    _connectSingleAttempt(options = {}) {
-        const timeoutMs = Number.isFinite(Number(options.connectTimeoutMs))
-            ? Math.max(1, Math.floor(Number(options.connectTimeoutMs)))
-            : 30_000;
+    _socketAttempt(onOpenFn, options = {}) {
+        const timeoutMs = resolveConnectTimeoutMs(options.connectTimeoutMs);
         return new Promise((resolve, reject) => {
             let settled = false;
-            const settle = (fn, arg) => {
-                if (settled) return;
-                settled = true;
-                fn(arg);
-            };
-
+            const settle = (fn, arg) => { if (settled) return; settled = true; fn(arg); };
             const timer = setTimeout(
-                () => settle(reject, new Error('Signaling connect timed out')),
+                () => settle(reject, createSocketLifecycleError('timeout', { signalingUrl: this._signalingUrl })),
                 timeoutMs
             );
-            const connectResolve = () => {
-                clearTimeout(timer);
-                settle(resolve);
-            };
-            const connectReject = (err) => {
-                clearTimeout(timer);
-                settle(reject, err);
-            };
+            const done = () => { clearTimeout(timer); settle(resolve); };
+            const fail = (err) => { clearTimeout(timer); settle(reject, err); };
 
             this._ws = new WebSocket(this._signalingUrl);
-
-            this._ws.onopen = () => {
-                if (this.isHost) {
-                    this._sendSignaling({ type: 'create_lobby', maxPlayers: options.maxPlayers || 10 });
-                } else {
-                    this._sendSignaling({ type: 'join_lobby', lobbyCode: options.lobbyCode });
-                }
-            };
-
+            this._ws.onopen = onOpenFn;
             this._ws.onmessage = (event) => {
                 let msg;
-                try {
-                    msg = JSON.parse(event.data);
-                } catch {
-                    return;
-                }
-                this._handleSignalingMessage(msg, connectResolve, connectReject);
+                try { msg = JSON.parse(event.data); } catch { return; }
+                this._handleSignalingMessage(msg, done, fail);
             };
-
-            this._ws.onerror = () => {
-                connectReject(new Error('WebSocket connection failed'));
-            };
-            this._ws.onclose = () => {
-                connectReject(new Error('WebSocket closed before connection was established'));
+            this._ws.onerror = () => fail(createSocketLifecycleError('error', { signalingUrl: this._signalingUrl }));
+            this._ws.onclose = (event) => {
+                fail(createSocketLifecycleError('close', buildSocketCloseDetails(event, this._signalingUrl)));
                 this._emit('signalingDisconnected', {});
             };
         });
     }
 
+    _connectSingleAttempt(options = {}) {
+        return this._socketAttempt(() => {
+            if (this.isHost) {
+                this._sendSignaling(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.CREATE_LOBBY, { maxPlayers: options.maxPlayers || 10 }));
+            } else {
+                this._sendSignaling(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.JOIN_LOBBY, { lobbyCode: options.lobbyCode }));
+            }
+        }, options);
+    }
+
+    _reconnectSingleAttempt(options = {}) {
+        return this._socketAttempt(() => {
+            this._sendSignaling(createSignalingEnvelope(
+                SIGNALING_COMMAND_TYPES.RESUME_CONNECTION,
+                { lobbyCode: this._lobbyCode, playerId: this.localPlayerId }
+            ));
+        }, options);
+    }
+
     _teardownSignalingSocket() {
         if (!this._ws) return;
-        try {
-            this._ws.close();
-        } catch {
-            // Best-effort cleanup between retries.
-        }
+        try { this._ws.close(); } catch { /* Best-effort cleanup between retries. */ }
         this._ws = null;
     }
 
     async _handleSignalingMessage(msg, connectResolve, connectReject) {
         switch (msg.type) {
-        case 'lobby_created':
+        case SIGNALING_EVENT_TYPES.LOBBY_CREATED:
             this._lobbyCode = msg.lobbyCode;
             this.localPlayerId = msg.playerId;
             this.isConnected = true;
@@ -206,50 +195,65 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
             if (connectResolve) connectResolve();
             break;
 
-        case 'lobby_joined':
+        case SIGNALING_EVENT_TYPES.LOBBY_JOINED:
             this.localPlayerId = msg.playerId;
             this.isConnected = true;
             this._emit('connected', { playerId: this.localPlayerId });
             if (connectResolve) connectResolve();
             break;
 
-        case 'player_joined':
+        case SIGNALING_EVENT_TYPES.CONNECTION_RESUMED:
+            this.isConnected = true;
+            this._emit('connectionResumed', { lobbyCode: msg.lobbyCode || this._lobbyCode });
+            if (connectResolve) connectResolve();
+            break;
+
+        case SIGNALING_EVENT_TYPES.PLAYER_JOINED:
             this._emit('playerJoined', { peerId: msg.peerId, name: msg.name });
             if (this.isHost) {
-                if (this._disconnectedPeers.has(msg.peerId)) {
-                    this._resolvePeerReconnect(msg.peerId);
-                }
+                if (this._disconnectedPeers.has(msg.peerId)) this._resolvePeerReconnect(msg.peerId);
                 const offer = await this._peerManager.createOffer(msg.peerId);
-                this._sendSignaling({ type: 'offer', targetPeerId: msg.peerId, offer });
+                this._sendSignaling(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.OFFER, { targetPeerId: msg.peerId, offer }));
             }
             break;
 
-        case 'offer':
+        case SIGNALING_EVENT_TYPES.PLAYER_RECONNECTED:
+            this._emit('playerReconnected', { peerId: msg.peerId });
+            if (this.isHost && msg.peerId) {
+                if (this._disconnectedPeers.has(msg.peerId)) this._resolvePeerReconnect(msg.peerId);
+                const offer = await this._peerManager.createOffer(msg.peerId);
+                this._sendSignaling(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.OFFER, { targetPeerId: msg.peerId, offer }));
+            }
+            break;
+
+        case SIGNALING_COMMAND_TYPES.OFFER:
             if (!this.isHost) {
                 this._hostPeerId = msg.fromPeerId;
                 const answer = await this._peerManager.handleOffer(msg.fromPeerId, msg.offer);
-                this._sendSignaling({ type: 'answer', targetPeerId: msg.fromPeerId, answer });
+                this._sendSignaling(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.ANSWER, { targetPeerId: msg.fromPeerId, answer }));
             }
             break;
 
-        case 'answer':
+        case SIGNALING_COMMAND_TYPES.ANSWER:
             await this._peerManager.handleAnswer(msg.fromPeerId, msg.answer);
             this._latencyMonitor.addPeer(msg.fromPeerId);
             this._emit('playerConnected', { peerId: msg.fromPeerId });
             break;
 
-        case 'ice':
+        case SIGNALING_COMMAND_TYPES.ICE:
             await this._peerManager.addIceCandidate(msg.fromPeerId, msg.candidate);
             break;
 
-        case 'player_left':
+        case SIGNALING_EVENT_TYPES.PLAYER_LEFT:
             this._registerPeerDisconnect(msg.peerId, 'signaling-left');
             break;
 
-        case 'error':
-            this._emit('error', { message: msg.message });
-            if (connectReject) connectReject(new Error(`Signaling error: ${msg.message}`));
+        case SIGNALING_EVENT_TYPES.ERROR: {
+            const err = createServerSignalingError(msg.message);
+            this._emit('error', toErrorPayload(err));
+            if (connectReject) connectReject(err);
             break;
+        }
 
         default:
             break;
@@ -302,16 +306,15 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
             if (hostPeerId) {
                 this._sendStateToPeer(
                     hostPeerId,
-                    this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.LEAVE, {
-                        playerId: this.localPlayerId,
-                    })
+                    this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.LEAVE, { playerId: this.localPlayerId })
                 );
             }
         }
-        this._sendSignaling({ type: 'leave' });
+        this._sendSignaling(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.LEAVE));
     }
 
     _sendSignaling(msg) {
+        if (!msg) return;
         if (this._ws && this._ws.readyState === WebSocket.OPEN) {
             this._ws.send(JSON.stringify(msg));
         }

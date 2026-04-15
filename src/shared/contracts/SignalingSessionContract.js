@@ -5,6 +5,7 @@ export const SIGNALING_SESSION_CONTRACT_VERSION = 'signaling-session.v1';
 export const SIGNALING_COMMAND_TYPES = Object.freeze({
     CREATE_LOBBY: 'create_lobby',
     JOIN_LOBBY: 'join_lobby',
+    RESUME_CONNECTION: 'resume_connection',
     READY: 'ready',
     LEAVE: 'leave',
     OFFER: 'offer',
@@ -15,8 +16,10 @@ export const SIGNALING_COMMAND_TYPES = Object.freeze({
 export const SIGNALING_EVENT_TYPES = Object.freeze({
     LOBBY_CREATED: 'lobby_created',
     LOBBY_JOINED: 'lobby_joined',
+    CONNECTION_RESUMED: 'connection_resumed',
     PLAYER_JOINED: 'player_joined',
     PLAYER_LEFT: 'player_left',
+    PLAYER_RECONNECTED: 'player_reconnected',
     PLAYER_READY: 'player_ready',
     ERROR: 'error',
 });
@@ -50,6 +53,7 @@ export const SIGNALING_HTTP_ROUTES = Object.freeze({
 export const SIGNALING_COMMAND_ROLE_MAP = Object.freeze({
     [SIGNALING_COMMAND_TYPES.CREATE_LOBBY]: 'host',
     [SIGNALING_COMMAND_TYPES.JOIN_LOBBY]: 'client',
+    [SIGNALING_COMMAND_TYPES.RESUME_CONNECTION]: 'both',
     [SIGNALING_COMMAND_TYPES.READY]: 'both',
     [SIGNALING_COMMAND_TYPES.LEAVE]: 'both',
     [SIGNALING_COMMAND_TYPES.OFFER]: 'client',

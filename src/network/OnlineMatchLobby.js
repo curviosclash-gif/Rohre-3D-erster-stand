@@ -12,22 +12,18 @@ import {
     SIGNALING_EVENT_TYPES,
     createSignalingEnvelope,
 } from '../shared/contracts/SignalingSessionContract.js';
-
-const DEFAULT_CONNECT_RETRY_DELAYS_MS = [1000, 2000, 4000];
-
-function resolveRetryDelays(delays) {
-    if (!Array.isArray(delays) || delays.length <= 0) {
-        return [...DEFAULT_CONNECT_RETRY_DELAYS_MS];
-    }
-    return delays
-        .map((value) => Number(value))
-        .filter((value) => Number.isFinite(value) && value >= 0)
-        .map((value) => Math.floor(value));
-}
-
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import {
+    resolveRetryDelays,
+    delay,
+    resolveConnectTimeoutMs,
+    resolveOnlineSignalingUrl,
+    buildSocketCloseDetails,
+    createSocketLifecycleError,
+    createServerSignalingError,
+    createResumeSignalingEnvelope,
+    isRetryableSignalingError,
+    toErrorPayload,
+} from './OnlineSignalingSupport.js';
 
 /**
  * Lobby for Internet play. Communicates with the self-hosted
@@ -67,9 +63,7 @@ export class OnlineMatchLobby extends MatchLobby {
     }
 
     async _makeConnectPromise(setupFn, options = {}) {
-        const timeoutMs = Number.isFinite(Number(options.connectTimeoutMs))
-            ? Math.max(1, Math.floor(Number(options.connectTimeoutMs)))
-            : 30_000;
+        const timeoutMs = resolveConnectTimeoutMs(options.connectTimeoutMs);
         const retryDelays = resolveRetryDelays(options.connectRetryDelaysMs);
         const configuredAttempts = Number.isFinite(Number(options.maxConnectAttempts))
             ? Math.max(1, Math.floor(Number(options.maxConnectAttempts)))
@@ -84,7 +78,7 @@ export class OnlineMatchLobby extends MatchLobby {
             } catch (err) {
                 lastError = err;
                 this._closeSocket();
-                if (attempt >= maxAttempts) {
+                if (attempt >= maxAttempts || !isRetryableSignalingError(err)) {
                     break;
                 }
                 const retryDelayMs = retryDelays[Math.min(attempt - 1, retryDelays.length - 1)] || 0;
@@ -94,7 +88,7 @@ export class OnlineMatchLobby extends MatchLobby {
             }
         }
 
-        throw lastError || new Error('Signaling connect failed');
+        throw lastError || createSocketLifecycleError('error', { signalingUrl: this._signalingUrl });
     }
 
     _makeConnectAttempt(setupFn, timeoutMs) {
@@ -110,7 +104,7 @@ export class OnlineMatchLobby extends MatchLobby {
             };
 
             const timer = setTimeout(
-                () => settle(reject, new Error('Signaling connect timed out')),
+                () => settle(reject, createSocketLifecycleError('timeout', { signalingUrl: this._signalingUrl })),
                 timeoutMs
             );
             const connectResolve = () => { clearTimeout(timer); settle(resolve); };
@@ -125,10 +119,10 @@ export class OnlineMatchLobby extends MatchLobby {
             setupFn(this._ws, connectResolve, connectReject, connectState);
 
             this._ws.onerror = () => {
-                connectReject(new Error('WebSocket connection failed'));
+                connectReject(createSocketLifecycleError('error', { signalingUrl: this._signalingUrl }));
             };
-            this._ws.onclose = () => {
-                connectReject(new Error('WebSocket closed before connection was established'));
+            this._ws.onclose = (event) => {
+                connectReject(createSocketLifecycleError('close', buildSocketCloseDetails(event, this._signalingUrl)));
             };
         });
     }
@@ -147,7 +141,7 @@ export class OnlineMatchLobby extends MatchLobby {
     async create(options = {}) {
         this.isHost = true;
         this.settings = { ...options };
-        this._signalingUrl = options.signalingUrl || this._signalingUrl;
+        this._signalingUrl = resolveOnlineSignalingUrl(options.signalingUrl, this._signalingUrl);
 
         return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
             ws.onopen = () => {
@@ -164,10 +158,29 @@ export class OnlineMatchLobby extends MatchLobby {
 
     async join(lobbyCode, options = {}) {
         this.isHost = false;
+        this._signalingUrl = resolveOnlineSignalingUrl(options.signalingUrl, this._signalingUrl);
 
         return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
             ws.onopen = () => {
                 this._send(createSignalingEnvelope(SIGNALING_COMMAND_TYPES.JOIN_LOBBY, { lobbyCode }));
+            };
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                this._handleMessage(msg, connectResolve, connectReject, connectState);
+            };
+        }, options);
+    }
+
+    async reconnect(options = {}) {
+        if (options.signalingUrl) {
+            this._signalingUrl = resolveOnlineSignalingUrl(options.signalingUrl, this._signalingUrl);
+        }
+        const lobbyCode = this.sessionState.lobbyCode || this.lobbyCode;
+        const playerId = this._playerId;
+
+        return this._makeConnectPromise((ws, connectResolve, connectReject, connectState) => {
+            ws.onopen = () => {
+                this._send(createResumeSignalingEnvelope({ lobbyCode, playerId }));
             };
             ws.onmessage = (event) => {
                 const msg = JSON.parse(event.data);
@@ -230,6 +243,19 @@ export class OnlineMatchLobby extends MatchLobby {
             break;
         }
 
+        case SIGNALING_EVENT_TYPES.CONNECTION_RESUMED: {
+            const now = Date.now();
+            this._applySessionState({
+                ...this.sessionState,
+                lobbyCode: msg.lobbyCode || this.sessionState.lobbyCode,
+                updatedAt: now,
+                revision: Number(this.sessionState.revision || 0) + 1,
+            });
+            this._emit('connectionResumed', { sessionState: this.sessionState });
+            if (connectResolve) connectResolve();
+            break;
+        }
+
         case SIGNALING_EVENT_TYPES.PLAYER_JOINED: {
             const now = Date.now();
             const peerId = String(msg.peerId || '').trim();
@@ -270,16 +296,23 @@ export class OnlineMatchLobby extends MatchLobby {
             this._setReadyStateFor(msg.peerId, msg.ready === true);
             break;
 
-        case SIGNALING_EVENT_TYPES.ERROR:
-            this._emit('error', { message: msg.message });
+        case SIGNALING_EVENT_TYPES.PLAYER_RECONNECTED: {
+            const peerId = String(msg.peerId || '').trim();
+            if (!peerId) break;
+            this._emit('playerReconnected', { peerId, sessionState: this.sessionState });
+            break;
+        }
+
+        case SIGNALING_EVENT_TYPES.ERROR: {
+            const err = createServerSignalingError(msg.message);
+            this._emit('error', toErrorPayload(err));
             if (connectReject) {
                 if (connectState?.rejected) break;
-                if (connectState) {
-                    connectState.rejected = true;
-                }
-                connectReject(new Error(`Signaling error: ${msg.message}`));
+                if (connectState) connectState.rejected = true;
+                connectReject(err);
             }
             break;
+        }
 
         default:
             break;
