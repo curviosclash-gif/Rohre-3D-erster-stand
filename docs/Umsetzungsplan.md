@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
 Stand: 2026-04-15. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-Naechste offene Subphase: `64.2.2` (siehe `docs/plaene/aktiv/V64.md`). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+Naechste offene Subphase: `64.3.1` (siehe `docs/plaene/aktiv/V64.md`). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -42,7 +42,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
-| V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.2 | `docs/plaene/aktiv/V64.md` |
+| V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.3 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
 | V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.1 | `docs/plaene/aktiv/V82.md` |
@@ -64,7 +64,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
-| - | V64 | - | frei | Nach `V77.99` `64.1` Transportmatrix und Capability-Modell fuer `Host Vollversion / Join Demo` konkretisieren |
+| - | V64 | - | frei | Nach `64.2` den produktiven Menuefluss auf explizites `LAN / Online` umstellen und `storage-bridge` nur noch als Legacy-Fallback fuehren |
 | - | V71 | 2026-04-14 | closed | Abgeschlossen 2026-04-14: `71.99` blockerfest geschlossen (`71.99.1` Root-/Cleanup-Check gruen, Build reproduzierbar `spawn EPERM` dokumentiert; `71.99.2` Editor-/Plan-/Docs-Gates gruen; `71.99.3` Ignore-Artefakte klassifiziert) |
 | - | V72 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `72.99` Gate gruen; alle drei Pflicht-Gates (plan:check, docs:sync, docs:check) und test:contract (120/120) bestanden; V72 freischaltet V82, V86 und V81 |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
@@ -150,4 +150,3 @@ Keine offenen Review-Punkte mehr im V87-Scope; `87.5.1` ist dokumentiert, offen 
 | 2026-04-03 | Bot-Codex | Shared | `scripts/run-playwright-smoke.mjs` | Explizite V74-Nachverifikation brach unter Windows bereits vor Playwright mit `spawn EINVAL` ab | Smoke-Launcher auf lokale Playwright-CLI plus separator-neutrale Filter umgestellt; verbleibender Dev-Server-Blocker separat dokumentiert | erledigt |
 | 2026-04-03 | Bot-Codex | Shared | `scripts/verify-lock.mjs` | Gezielte Playwright-Reruns trafen Windows-Dateifilter und CLI-Aufloesung nicht stabil | Playwright-Aufrufe auf lokale CLI gehoben und Spec-Filter separator-neutral normalisiert; verbleibender Dev-Server-Blocker separat dokumentiert | erledigt |
 | 2026-04-03 | Bot-Codex | Shared | `playwright.config.js` | Browser-Runs luden `tests/*.test.mjs` mit `node:test` mit und endeten in `No tests found` statt echter Spec-Auswahl | Discovery auf `**/*.spec.js` begrenzt; verbliebener Vite-HTTP-Timeout in V74-Fehlerbericht festgehalten | erledigt |
-
