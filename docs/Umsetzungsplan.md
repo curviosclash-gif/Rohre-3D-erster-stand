@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
 Stand: 2026-04-15. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-Naechste offene Subphase: `64.3.1` (siehe `docs/plaene/aktiv/V64.md`). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+Naechste offene Subphase: `64.3.2` (siehe `docs/plaene/aktiv/V64.md`). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -64,7 +64,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
-| - | V64 | - | frei | Nach `64.2` den produktiven Menuefluss auf explizites `LAN / Online` umstellen und `storage-bridge` nur noch als Legacy-Fallback fuehren |
+| - | V64 | - | frei | Nach `64.3.1` Start-Validierung, Ready-Logik und Fehlermeldungen auf einen transportneutralen Vertrag heben |
 | - | V71 | 2026-04-14 | closed | Abgeschlossen 2026-04-14: `71.99` blockerfest geschlossen (`71.99.1` Root-/Cleanup-Check gruen, Build reproduzierbar `spawn EPERM` dokumentiert; `71.99.2` Editor-/Plan-/Docs-Gates gruen; `71.99.3` Ignore-Artefakte klassifiziert) |
 | - | V72 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `72.99` Gate gruen; alle drei Pflicht-Gates (plan:check, docs:sync, docs:check) und test:contract (120/120) bestanden; V72 freischaltet V82, V86 und V81 |
 | - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
