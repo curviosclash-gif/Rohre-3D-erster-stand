@@ -12,6 +12,11 @@ export const MULTIPLAYER_TRANSPORTS = Object.freeze({
     ONLINE: 'online',
 });
 
+export const RUNTIME_MULTIPLAYER_TRANSPORT_PRODUCT_STATUSES = Object.freeze({
+    PRODUCTIVE: 'productive',
+    LEGACY_FALLBACK: 'legacy-fallback',
+});
+
 /**
  * Session role in a multiplayer session.
  * HOST: the peer that owns the lobby and drives match-start authority.
@@ -57,14 +62,48 @@ export function normalizeMultiplayerTransport(value, fallback = MULTIPLAYER_TRAN
     return VALID_MULTIPLAYER_TRANSPORT_SET.has(normalized) ? normalized : fallback;
 }
 
-export function resolveRuntimeSessionContract(source = null) {
-    const sessionType = normalizeRuntimeSessionType(source?.sessionType, RUNTIME_SESSION_TYPES.SINGLE);
+export function resolveRuntimeSessionTransportPolicy(source = null) {
+    const sessionSource = source && typeof source === 'object'
+        ? source
+        : { sessionType: source };
+    const sessionType = normalizeRuntimeSessionType(sessionSource?.sessionType, RUNTIME_SESSION_TYPES.SINGLE);
     const multiplayerTransport = normalizeMultiplayerTransport(
-        source?.multiplayerTransport,
+        sessionSource?.multiplayerTransport,
         MULTIPLAYER_TRANSPORTS.LAN
     );
-    const usesMenuStorageBridge = sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER
+    const isLegacyTransport = sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER
         && multiplayerTransport === MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
+    const isMultiplayerSession = sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER;
+    const transportAudienceLabel = isLegacyTransport
+        ? 'Legacy-Fallback (lokal, kein LAN/Online)'
+        : (isMultiplayerSession
+            ? (multiplayerTransport === MULTIPLAYER_TRANSPORTS.ONLINE ? 'Online' : 'LAN')
+            : 'Offline');
+
+    return Object.freeze({
+        sessionType,
+        multiplayerTransport,
+        runtimeTransportKind: isLegacyTransport
+            ? 'menu-storage-bridge'
+            : (isMultiplayerSession ? multiplayerTransport : sessionType),
+        transportProductStatus: isLegacyTransport
+            ? RUNTIME_MULTIPLAYER_TRANSPORT_PRODUCT_STATUSES.LEGACY_FALLBACK
+            : RUNTIME_MULTIPLAYER_TRANSPORT_PRODUCT_STATUSES.PRODUCTIVE,
+        isLegacyTransport,
+        isFallbackTransport: isLegacyTransport,
+        isProductiveTransport: !isLegacyTransport,
+        transportAudienceLabel,
+        transportDiagnosticLabel: isLegacyTransport
+            ? 'legacy-fallback: menu-storage-bridge (local-only)'
+            : (isMultiplayerSession ? multiplayerTransport : `offline:${sessionType}`),
+    });
+}
+
+export function resolveRuntimeSessionContract(source = null) {
+    const transportPolicy = resolveRuntimeSessionTransportPolicy(source);
+    const sessionType = transportPolicy.sessionType;
+    const multiplayerTransport = transportPolicy.multiplayerTransport;
+    const usesMenuStorageBridge = transportPolicy.isLegacyTransport;
     const adapterSessionType = usesMenuStorageBridge
         ? RUNTIME_SESSION_TYPES.SINGLE
         : (sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER
@@ -75,7 +114,7 @@ export function resolveRuntimeSessionContract(source = null) {
                     : sessionType))
             : sessionType);
     const runtimeTransportKind = usesMenuStorageBridge
-        ? 'menu-storage-bridge'
+        ? transportPolicy.runtimeTransportKind
         : adapterSessionType;
     return {
         sessionType,
@@ -83,6 +122,21 @@ export function resolveRuntimeSessionContract(source = null) {
         usesMenuStorageBridge,
         adapterSessionType,
         runtimeTransportKind,
+        transportProductStatus: usesMenuStorageBridge
+            ? transportPolicy.transportProductStatus
+            : RUNTIME_MULTIPLAYER_TRANSPORT_PRODUCT_STATUSES.PRODUCTIVE,
+        isLegacyTransport: usesMenuStorageBridge,
+        isFallbackTransport: usesMenuStorageBridge,
+        transportAudienceLabel: usesMenuStorageBridge
+            ? transportPolicy.transportAudienceLabel
+            : (sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER
+                ? transportPolicy.transportAudienceLabel
+                : 'Offline'),
+        transportDiagnosticLabel: usesMenuStorageBridge
+            ? transportPolicy.transportDiagnosticLabel
+            : (sessionType === RUNTIME_SESSION_TYPES.MULTIPLAYER
+                ? transportPolicy.transportDiagnosticLabel
+                : `offline:${sessionType}`),
         isNetworkSession: adapterSessionType === RUNTIME_SESSION_TYPES.LAN || adapterSessionType === RUNTIME_SESSION_TYPES.ONLINE,
     };
 }
@@ -122,6 +176,9 @@ export function normalizeMultiplayerSessionRole(value, fallback = MULTIPLAYER_SE
  *   adapterSessionType: string,
  *   isNetworkSession: boolean,
  *   isLegacyTransport: boolean,
+ *   isFallbackTransport: boolean,
+ *   transportProductStatus: string,
+ *   transportAudienceLabel: string,
  *   canHost: boolean,
  *   canJoin: boolean,
  * }}
@@ -134,6 +191,9 @@ export function resolveRuntimeSessionCapabilities(source = null) {
         adapterSessionType: contract.adapterSessionType,
         isNetworkSession: contract.isNetworkSession,
         isLegacyTransport: contract.usesMenuStorageBridge,
+        isFallbackTransport: contract.isFallbackTransport === true,
+        transportProductStatus: contract.transportProductStatus,
+        transportAudienceLabel: contract.transportAudienceLabel,
         canHost: contract.isNetworkSession,
         canJoin: contract.isNetworkSession,
     });

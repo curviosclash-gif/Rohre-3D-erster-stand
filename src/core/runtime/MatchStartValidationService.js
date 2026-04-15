@@ -53,6 +53,7 @@ export function resolveMatchStartValidationIssue({
             ? multiplayerSessionState
             : null;
         const hostGate = resolveSurfaceMultiplayerGateAccess('host', { productSurfaceId });
+        const legacyTransportActive = sessionContract.isLegacyTransport === true;
         const lobbyCode = String(sessionState?.lobbyCode || ui?.multiplayerLobbyCodeInput?.value || '').trim();
         if (!lobbyCode || sessionState?.joined !== true) {
             if (!hostGate.allowed) {
@@ -60,6 +61,13 @@ export function resolveMatchStartValidationIssue({
                     message: 'Start nicht moeglich: Diese Demo kann nur einer Desktop-Lobby beitreten.',
                     fieldKey: 'multiplayer',
                     fieldMessage: 'Lobby-Code eines Desktop-Hosts eingeben und Join only verwenden.',
+                };
+            }
+            if (legacyTransportActive) {
+                return {
+                    message: 'Start nicht moeglich: storage-bridge ist nur ein lokaler Legacy-Fallback, kein produktiver LAN-/Online-Transport.',
+                    fieldKey: 'multiplayer',
+                    fieldMessage: 'Legacy-Fallback zuerst verbinden oder fuer den produktiven Pfad auf LAN/Online wechseln.',
                 };
             }
             return {

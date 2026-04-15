@@ -41,6 +41,7 @@ import {
 } from './start-setup/StartSetupValidationView.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 import { getRuntimeMapCatalog } from '../shared/contracts/RuntimeMapCatalogContract.js';
+import { resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
 
 export class UIStartSyncController {
     /**
@@ -329,6 +330,10 @@ export class UIStartSyncController {
         });
         const modePath = surfaceMenuState.modePath;
         const sessionType = surfaceMenuState.sessionType;
+        const sessionContract = resolveRuntimeSessionContract({
+            sessionType,
+            multiplayerTransport: settings?.localSettings?.multiplayerTransport,
+        });
         const knownVehicleIds = new Set(this._vehiclePreviewEntries.map((entry) => entry.id));
         const appendVehicleOption = (select, vehicleId) => {
             const normalizedVehicleId = String(vehicleId || '').trim();
@@ -477,6 +482,11 @@ export class UIStartSyncController {
                     value: hasCode ? `${hasCode}${readySummary}` : 'nicht verbunden',
                     muted: !hasCode,
                 });
+                summaryBlocks.push({
+                    label: 'Transport',
+                    value: sessionContract.transportAudienceLabel,
+                    muted: sessionContract.isLegacyTransport === true,
+                });
             }
             renderSummaryBlocks(this.ui.menuSummary, summaryBlocks);
         }
@@ -545,7 +555,14 @@ export class UIStartSyncController {
                 const roleLabel = multiplayerSessionState.isHost
                     ? 'Host'
                     : surfaceEntryCopy.multiplayerClientRoleLabel;
-                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${roleLabel} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready`;
+                const transportSuffix = sessionContract.isLegacyTransport === true
+                    ? ` | ${sessionContract.transportAudienceLabel}`
+                    : '';
+                this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${roleLabel} | ${multiplayerSessionState.memberCount} Spieler | ${multiplayerSessionState.readyCount}/${multiplayerSessionState.memberCount} ready${transportSuffix}`;
+            } else if (sessionContract.isLegacyTransport === true) {
+                this.ui.multiplayerLobbyState.textContent = lobbyCode
+                    ? `Lobbystatus: ${lobbyCode} | ${sessionContract.transportAudienceLabel}`
+                    : 'Lobbystatus: Legacy-Fallback aktiv | lokaler Menu-Bridge-Pfad, kein produktives LAN/Online';
             } else if (lobbyCode) {
                 this.ui.multiplayerLobbyState.textContent = `Lobbystatus: ${lobbyCode} | ${surfaceEntryCopy.joinButtonLabel} noch nicht verbunden`;
             } else {
