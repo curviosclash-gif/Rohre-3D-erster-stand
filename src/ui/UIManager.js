@@ -33,6 +33,7 @@ import { syncMenuDeveloperState } from './menu/MenuDeveloperStateSync.js';
 import { syncFightMenuTuningUi } from './menu/FightMenuTuningSync.js';
 import { syncMenuSurfacePolicyUi } from './menu/MenuSurfacePolicyUiSync.js';
 import { resolveSurfaceEntryCopy } from '../shared/contracts/PlatformSurfacePolicyOps.js';
+import { resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessionContract.js';
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
@@ -451,7 +452,11 @@ export class UIManager {
             return;
         }
         if (!sessionState?.joined) {
-            this.ui.multiplayerStatus.textContent = `${surfaceEntryCopy.multiplayerDisconnectedStatus}${presetText}`;
+            const sessionContract = resolveRuntimeSessionContract({
+                sessionType,
+                multiplayerTransport: settings?.localSettings?.multiplayerTransport,
+            });
+            this.ui.multiplayerStatus.textContent = `${surfaceEntryCopy.multiplayerDisconnectedStatus} | Transport: ${sessionContract.transportAudienceLabel}${presetText}`;
             if (this.ui.startButton) {
                 this.ui.startButton.disabled = false;
                 this.ui.startButton.title = surfaceEntryCopy.multiplayerJoinWaitTitle;

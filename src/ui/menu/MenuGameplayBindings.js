@@ -16,8 +16,9 @@ import {
 import { clamp } from '../../utils/MathOps.js';
 import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
 import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
+import { bindMenuMultiplayerActionButtons } from './MenuMultiplayerActionBindings.js';
 import { resolveSurfaceFeatureLaunchGuard } from './MenuSurfaceFeatureAccess.js';
-
+import { bindMenuMultiplayerTransportButtons } from './MenuMultiplayerTransportBindings.js';
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;
     const settings = ctx.settings;
@@ -63,7 +64,6 @@ export function setupMenuGameplayBindings(ctx) {
         if (!settings.gameplay) settings.gameplay = {};
         settings.gameplay.planarMode = !!enabled;
         const changedKeys = [keys.GAMEPLAY_PLANAR_MODE];
-
         if (settings.gameplay.planarMode && (settings.gameplay.portalCount || 0) === 0) {
             settings.gameplay.portalCount = 4;
             changedKeys.push(keys.GAMEPLAY_PORTAL_COUNT);
@@ -71,7 +71,6 @@ export function setupMenuGameplayBindings(ctx) {
                 message: 'Ebenen-Modus: 4 Portale aktiviert',
             });
         }
-
         emitSettingsChangedImmediate(changedKeys);
     };
 
@@ -84,6 +83,16 @@ export function setupMenuGameplayBindings(ctx) {
             });
         });
     }
+
+    bindMenuMultiplayerTransportButtons({
+        ui,
+        settings,
+        bind,
+        emit,
+        emitSettingsChangedImmediate,
+        eventTypes,
+        keys,
+    });
 
     if (Array.isArray(ui.modePathButtons)) {
         ui.modePathButtons.forEach((button) => {
@@ -506,43 +515,13 @@ export function setupMenuGameplayBindings(ctx) {
         });
     }
 
-    if (ui.multiplayerHostButton) {
-        bind(ui.multiplayerHostButton, 'click', () => {
-            const canHost = ctx.featureFlags?.canHost === true;
-            if (!canHost) return;
-            emit(eventTypes.MULTIPLAYER_HOST, {
-                lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
-            });
-        });
-    }
-
-    if (ui.multiplayerJoinButton) {
-        bind(ui.multiplayerJoinButton, 'click', () => {
-            emit(eventTypes.MULTIPLAYER_JOIN, {
-                lobbyCode: String(ui.multiplayerLobbyCodeInput?.value || '').trim(),
-            });
-        });
-    }
-
-    if (ui.multiplayerLeaveLobbyButton) {
-        bind(ui.multiplayerLeaveLobbyButton, 'click', () => {
-            emit(eventTypes.LEAVE_LOBBY);
-        });
-    }
-
-    if (ui.multiplayerReadyButton) {
-        bind(ui.multiplayerReadyButton, 'click', () => {
-            emit(eventTypes.TOGGLE_READY);
-        });
-    }
-
-    if (ui.multiplayerStartMatchButton) {
-        bind(ui.multiplayerStartMatchButton, 'click', () => {
-            const canHost = ctx.featureFlags?.canHost === true;
-            if (!canHost) return;
-            emit(eventTypes.START_MATCH_MULTIPLAYER);
-        });
-    }
+    bindMenuMultiplayerActionButtons({
+        ui,
+        bind,
+        emit,
+        eventTypes,
+        featureFlags: ctx.featureFlags,
+    });
 
     setupArcadeMenuSurface(ctx);
 }

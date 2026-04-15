@@ -16,6 +16,7 @@ import {
 } from '../../shared/contracts/MapModeContract.js';
 import {
     PLATFORM_SURFACE_QUICK_START_ACTION_IDS,
+    resolveSurfacePolicy,
 } from '../../shared/contracts/PlatformCapabilityRegistry.js';
 import {
     isSurfaceMapKeyAllowedForModePath,
@@ -28,6 +29,11 @@ import {
     resolveSurfaceFallbackModePath,
     resolveSurfaceFallbackSessionType,
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
+import {
+    MULTIPLAYER_TRANSPORTS,
+    isLegacyMultiplayerTransport,
+    normalizeMultiplayerTransport,
+} from '../../shared/contracts/RuntimeSessionContract.js';
 import { createRuntimeRng } from '../../shared/contracts/RuntimeRngContract.js';
 
 const MODE_PATH_TO_PRESET_ID = Object.freeze({
@@ -105,6 +111,51 @@ function resolveQuickStartRng(game, event = null) {
     return createRuntimeRng({ seed: Number(event.seed) });
 }
 
+function resolveProductSurfaceId(game) {
+    const productSurfaceId = String(
+        game?.uiManager?._runtimeFeatureFlags?.surfacePolicy?.productSurfaceId || ''
+    ).trim().toLowerCase();
+    return productSurfaceId;
+}
+
+function resolveProductiveMultiplayerTransport(game, requestedTransport = '') {
+    const surfacePolicy = resolveSurfacePolicy({
+        productSurfaceId: resolveProductSurfaceId(game),
+    });
+    const allowedTransports = Array.isArray(surfacePolicy?.allowedMultiplayerTransports)
+        ? surfacePolicy.allowedMultiplayerTransports.filter((transport) => !isLegacyMultiplayerTransport(transport))
+        : [];
+    const candidates = [
+        normalizeMultiplayerTransport(requestedTransport, ''),
+        normalizeMultiplayerTransport(game?.settings?.localSettings?.multiplayerTransport, ''),
+        normalizeMultiplayerTransport(surfacePolicy?.defaultMultiplayerTransport, ''),
+        allowedTransports[0] || '',
+        MULTIPLAYER_TRANSPORTS.LAN,
+    ];
+    return candidates.find((transport) => allowedTransports.includes(transport))
+        || surfacePolicy?.defaultMultiplayerTransport
+        || MULTIPLAYER_TRANSPORTS.LAN;
+}
+
+function applyProductiveMultiplayerTransport(game, requestedTransport = '') {
+    if (!game?.settings) {
+        return {
+            changed: false,
+            transport: MULTIPLAYER_TRANSPORTS.LAN,
+        };
+    }
+    if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
+        game.settings.localSettings = {};
+    }
+    const nextTransport = resolveProductiveMultiplayerTransport(game, requestedTransport);
+    const previousTransport = normalizeMultiplayerTransport(game.settings.localSettings.multiplayerTransport, '');
+    game.settings.localSettings.multiplayerTransport = nextTransport;
+    return {
+        changed: previousTransport !== nextTransport,
+        transport: nextTransport,
+    };
+}
+
 export function handleSessionTypeChangeAction(ctx) {
     const { game, event, onSettingsChanged } = ctx;
     const requestedSessionType = String(event?.sessionType || '').trim().toLowerCase();
@@ -120,14 +171,28 @@ export function handleSessionTypeChangeAction(ctx) {
         return;
     }
 
-    onSettingsChanged({ changedKeys: SESSION_SWITCH_CHANGED_KEYS });
+    const changedKeys = [...SESSION_SWITCH_CHANGED_KEYS];
+    let selectedMultiplayerTransport = '';
+    if (result.targetSessionType === 'multiplayer') {
+        const transportResult = applyProductiveMultiplayerTransport(game);
+        selectedMultiplayerTransport = transportResult.transport;
+        if (transportResult.changed) {
+            changedKeys.push(SETTINGS_CHANGE_KEYS.MULTIPLAYER_TRANSPORT);
+        }
+    }
+
+    onSettingsChanged({ changedKeys: Array.from(new Set(changedKeys)) });
     const surfaceEntryCopy = resolveSurfaceEntryCopy({
+        productSurfaceId: resolveProductSurfaceId(game),
         sessionType: result.targetSessionType,
     });
     const label = surfaceEntryCopy.sessionLabels[result.targetSessionType]
         || (result.targetSessionType === 'splitscreen'
             ? 'Splitscreen'
             : (result.targetSessionType === 'multiplayer' ? 'Multiplayer' : 'Single Player'));
+    const transportLabel = selectedMultiplayerTransport === MULTIPLAYER_TRANSPORTS.ONLINE
+        ? ' | Transport: Online'
+        : (result.targetSessionType === 'multiplayer' ? ' | Transport: LAN' : '');
     if (!requestedAllowed && requestedSessionType !== targetSessionType) {
         const blockedLabel = requestedSessionType === 'splitscreen'
             ? 'Splitscreen'
@@ -137,7 +202,9 @@ export function handleSessionTypeChangeAction(ctx) {
         return;
     }
     game._showStatusToast(
-        result.loadedDraft ? `Session gewechselt: ${label} (Draft geladen)` : `Session gewechselt: ${label}`,
+        result.loadedDraft
+            ? `Session gewechselt: ${label}${transportLabel} (Draft geladen)`
+            : `Session gewechselt: ${label}${transportLabel}`,
         1200,
         'info'
     );

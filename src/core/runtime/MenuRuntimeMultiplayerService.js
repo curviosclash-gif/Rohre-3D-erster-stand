@@ -23,9 +23,12 @@ import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRunti
 import {
     MULTIPLAYER_TRANSPORTS,
     RUNTIME_SESSION_TYPES,
+    normalizeMultiplayerTransport as normalizeRuntimeMultiplayerTransport,
 } from '../../shared/contracts/RuntimeSessionContract.js';
 import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
 import { tryCloneJsonValue } from '../../shared/utils/JsonClone.js';
+
+const ONLINE_MENU_TRANSPORT_PENDING_MESSAGE = 'Online ist bereits auswaehlbar, die produktive Menu-Lobby-Anbindung folgt noch.';
 
 function deepClone(value) {
     return tryCloneJsonValue(value, null);
@@ -272,6 +275,14 @@ export async function handleMultiplayerHostAction({
     runtimeSource,
 }) {
     if (!game) return null;
+    const selectedTransport = normalizeRuntimeMultiplayerTransport(
+        game?.settings?.localSettings?.multiplayerTransport,
+        MULTIPLAYER_TRANSPORTS.LAN
+    );
+    if (selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE) {
+        game._showStatusToast(ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, 1800, 'warning');
+        return { ok: false, message: ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, reason: 'online_menu_transport_pending' };
+    }
     const hostGate = resolveSurfaceMultiplayerGateAccess('host', {
         runtimeGlobal: typeof globalThis !== 'undefined' ? globalThis : null,
     });
@@ -316,6 +327,14 @@ export async function handleMultiplayerJoinAction({
     runtimeSource,
 }) {
     if (!game) return null;
+    const selectedTransport = normalizeRuntimeMultiplayerTransport(
+        game?.settings?.localSettings?.multiplayerTransport,
+        MULTIPLAYER_TRANSPORTS.LAN
+    );
+    if (selectedTransport === MULTIPLAYER_TRANSPORTS.ONLINE) {
+        game._showStatusToast(ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, 1800, 'warning');
+        return { ok: false, message: ONLINE_MENU_TRANSPORT_PENDING_MESSAGE, reason: 'online_menu_transport_pending' };
+    }
     const accessContext = resolveMenuAccessContext?.();
     observeCapabilityFallback(runtimeSource, menuMultiplayerBridge, 'join', event?.lobbyCode);
     let result = null;

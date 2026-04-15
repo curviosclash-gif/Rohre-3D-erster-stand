@@ -266,6 +266,13 @@
                             </summary>
                             <div class="menu-accordion-body">
                                 <p id="multiplayer-lobby-state" class="menu-hint">Lobbystatus: nicht verbunden</p>
+                                <p id="multiplayer-transport-hint" class="menu-hint">Produktiver Transport: LAN</p>
+                                <div class="btn-group secondary-btn-spaced" role="group" aria-label="Multiplayer-Transport">
+                                    <button type="button" id="btn-multiplayer-transport-lan" class="secondary-btn active"
+                                        data-multiplayer-transport="lan" aria-pressed="true">LAN</button>
+                                    <button type="button" id="btn-multiplayer-transport-online" class="secondary-btn"
+                                        data-multiplayer-transport="online" aria-pressed="false">Online</button>
+                                </div>
                                 <label for="multiplayer-lobby-code">Lobby Code</label>
                                 <input type="text" id="multiplayer-lobby-code" maxlength="32" placeholder="z. B. TEST-1234">
                                 <div class="btn-group secondary-btn-spaced">

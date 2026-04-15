@@ -179,6 +179,8 @@ export function createGameUiRefs(doc = document) {
         multiplayerJoinButton: doc.getElementById('btn-multiplayer-join'),
         multiplayerReadyToggle: doc.getElementById('multiplayer-ready-toggle'),
         multiplayerStatus: doc.getElementById('multiplayer-status'),
+        multiplayerTransportHint: doc.getElementById('multiplayer-transport-hint'),
+        multiplayerTransportButtons: Array.from(doc.querySelectorAll('[data-multiplayer-transport]')),
         multiplayerLobbyCodeInput: doc.getElementById('multiplayer-lobby-code'),
         developerModeToggle: doc.getElementById('developer-mode-toggle'),
         developerThemeSelect: doc.getElementById('developer-theme-select'),
