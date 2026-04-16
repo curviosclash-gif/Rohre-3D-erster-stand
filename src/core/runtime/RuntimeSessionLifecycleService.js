@@ -9,6 +9,10 @@ import {
 } from '../../shared/contracts/RuntimeSessionContract.js';
 import { LocalSessionAdapter } from '../session/LocalSessionAdapter.js';
 import { createGameStateSnapshot } from '../GameStateSnapshot.js';
+import {
+    attachMultiplayerLifecycleKernel,
+    detachMultiplayerLifecycleKernel,
+} from './MultiplayerMatchLifecycleKernel.js';
 
 /** @type {number} Host broadcasts state snapshots at this interval (ms). */
 const STATE_BROADCAST_INTERVAL_MS = 100; // 10/s
@@ -74,6 +78,7 @@ export async function initRuntimeSession(facade) {
 
     if (!facade.session.isHost && sessionContract.isNetworkSession) {
         setupRuntimeClientStateReceiver(facade);
+        facade._lifecycleKernelHandlers = attachMultiplayerLifecycleKernel(facade, facade.session);
     }
 }
 
@@ -267,6 +272,12 @@ export function teardownRuntimeSession(facade) {
     if (facade?._onArenaStartSignalHandler && facade.session) {
         facade.session.off('remoteInput', facade._onArenaStartSignalHandler);
         facade._onArenaStartSignalHandler = null;
+    }
+    if (facade?._lifecycleKernelHandlers && facade.session) {
+        detachMultiplayerLifecycleKernel(facade.session, facade._lifecycleKernelHandlers);
+    }
+    if (facade) {
+        facade._lifecycleKernelHandlers = null;
     }
     facade?._arenaLoadedPeers?.clear?.();
     if (Array.isArray(facade?._pendingStateUpdates)) {

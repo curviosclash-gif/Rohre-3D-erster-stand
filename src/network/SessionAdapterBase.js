@@ -127,6 +127,22 @@ export class SessionAdapterBase extends SessionAdapter {
         this._emit('fullStateSyncNeeded', { peerId: normalizedPeerId });
     }
 
+    /**
+     * Host-only. Broadcasts a lifecycle signal to all connected peers.
+     * Clients react via their MultiplayerMatchLifecycleKernel handler.
+     *
+     * @param {string} signal - One of MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES
+     * @param {object|null} payload - Optional extra fields merged into the message
+     */
+    broadcastLifecycleSignal(signal, payload = null) {
+        if (!this.isHost) return;
+        const extra = payload && typeof payload === 'object' ? payload : {};
+        this._sendStateToAll(this._createStateMessage(
+            MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL,
+            { signal, ...extra }
+        ));
+    }
+
     _sendFullStateSync(peerId, stateSnapshot) {
         const normalizedPeerId = normalizePeerId(peerId);
         if (!normalizedPeerId) return;

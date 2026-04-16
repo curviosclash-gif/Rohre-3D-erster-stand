@@ -19,6 +19,15 @@ export const MULTIPLAYER_MESSAGE_TYPES = Object.freeze({
     PLAYER_DISCONNECTED: 'player_disconnected',
     PLAYER_RECONNECTED: 'player_reconnected',
     PLAYER_REMOVED: 'player_removed',
+    MATCH_LIFECYCLE_SIGNAL: 'match_lifecycle_signal',
+});
+
+/**
+ * Host-authoritative lifecycle signals carried via MATCH_LIFECYCLE_SIGNAL messages.
+ * Clients react to these by triggering the corresponding lifecycle command on their facade.
+ */
+export const MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES = Object.freeze({
+    MATCH_FINALIZED: 'match_finalized',
 });
 
 const MULTIPLAYER_MESSAGE_TYPE_SET = new Set(Object.values(MULTIPLAYER_MESSAGE_TYPES));
@@ -87,6 +96,7 @@ export const MULTIPLAYER_HOST_AUTHORITATIVE_MESSAGE_TYPES = Object.freeze(new Se
     MULTIPLAYER_MESSAGE_TYPES.PLAYER_DISCONNECTED,
     MULTIPLAYER_MESSAGE_TYPES.PLAYER_RECONNECTED,
     MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED,
+    MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL,
 ]));
 
 /**

@@ -404,6 +404,12 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
         case MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED:
             this._emit('playerRemoved', { peerId: data.peerId });
             break;
+        case MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL:
+            this._emit('matchLifecycleSignal', {
+                signal: String(data.signal || '').trim(),
+                reason: String(data.reason || '').trim(),
+            });
+            break;
         default:
             break;
         }

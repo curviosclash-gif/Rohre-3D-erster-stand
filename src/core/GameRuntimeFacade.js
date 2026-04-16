@@ -71,6 +71,7 @@ export class GameRuntimeFacade {
         this._onStateUpdateHandler = null;
         this._onPlayerLoadedHandler = null;
         this._onArenaStartSignalHandler = null;
+        this._lifecycleKernelHandlers = null;
         this._pendingStateUpdates = [];
         this._pendingMatchFinalize = null;
         this._pendingMatchFinalizePlan = null;

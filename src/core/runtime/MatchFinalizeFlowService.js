@@ -1,5 +1,6 @@
 import { createLogger } from '../../shared/logging/Logger.js';
 import { SESSION_FINALIZE_TRIGGERS } from '../../shared/contracts/MatchLifecycleContract.js';
+import { MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES } from '../../shared/contracts/MultiplayerSessionContract.js';
 import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
 import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
 
@@ -82,6 +83,20 @@ export function finalizeMatchFlow(facade, options = undefined, fallbackReason = 
         facade?.ports?.sessionPort?.clearLastRoundGhost?.();
     }
     if (requestedPlan.teardownRuntimeSession) {
+        // Host broadcasts MATCH_FINALIZED to all connected peers before tearing
+        // down the session.  Clients react via their MultiplayerMatchLifecycleKernel
+        // and trigger their own finalizing -> match_finalized -> menu_opened path.
+        const session = facade?.session;
+        if (session?.isHost && session?.isConnected) {
+            try {
+                session.broadcastLifecycleSignal?.(
+                    MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES.MATCH_FINALIZED,
+                    { reason: requestedPlan.reason }
+                );
+            } catch {
+                // Best-effort: signal delivery is not guaranteed; teardown proceeds.
+            }
+        }
         facade?.teardownRuntimeSession?.();
     }
     if (requestedPlan.clearPlayerSources) {
