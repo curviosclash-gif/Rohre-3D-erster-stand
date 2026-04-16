@@ -18,6 +18,7 @@ const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     host: 'preload.host.v1',
     save: 'preload.save.v1',
     recording: 'preload.recording.v1',
+    lifecycle: 'preload.lifecycle.v1',
 });
 
 function resolveRuntimeGlobal(runtimeGlobal = globalThis) {
@@ -258,6 +259,47 @@ export function createElectronPreloadRecordingAdapter(runtimeGlobal = globalThis
         contractVersion: capability.contractVersion,
         capability,
         isAvailable: () => capability.available === true,
+    });
+}
+
+/**
+ * Lifecycle capability adapter — wraps the shell's graceful-close handshake.
+ *
+ * When the Electron window is closed, the main process sends 'request-graceful-close'
+ * to the renderer.  The adapter surfaces this as onGracefulClose(cb) so the renderer
+ * can run its own dispose/finalize sequence and then call confirmGracefulClose() to
+ * allow the window to proceed.  All routing goes through facade.dispose() so the same
+ * finalizing -> match_finalized -> menu_opened path is used regardless of how the
+ * session ends.
+ *
+ * @param {typeof globalThis} [runtimeGlobal]
+ */
+export function createElectronPreloadLifecycleAdapter(runtimeGlobal = globalThis) {
+    const { appRuntime } = resolveAppRuntime(runtimeGlobal);
+    const lifecycleContract = resolveNamedContract(appRuntime, 'lifecycle');
+
+    const rawOnGracefulClose = lifecycleContract?.onGracefulClose;
+    const rawConfirmGracefulClose = lifecycleContract?.confirmGracefulClose;
+    const available = typeof rawOnGracefulClose === 'function'
+        && typeof rawConfirmGracefulClose === 'function';
+
+    return Object.freeze({
+        adapterName: 'electron.preload.lifecycle.v1',
+        contractVersion: lifecycleContract?.contractVersion || PRELOAD_CONTRACT_VERSIONS.lifecycle,
+        isAvailable: () => available,
+        /**
+         * Register a callback fired when the shell requests a graceful close.
+         * Returns an unsubscribe function.
+         * @param {() => void | Promise<void>} callback
+         * @returns {() => void}
+         */
+        onGracefulClose: available
+            ? (callback) => rawOnGracefulClose(callback)
+            : () => () => {},
+        /** Signal to the shell that renderer-side teardown is complete. */
+        confirmGracefulClose: available
+            ? () => rawConfirmGracefulClose()
+            : () => {},
     });
 }
 

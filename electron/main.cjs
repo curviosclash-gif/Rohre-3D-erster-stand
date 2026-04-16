@@ -18,6 +18,7 @@ let signalingStartPromise = null;
 let signalingStopPromise = null;
 
 const SIGNALING_PORTS = [9090, 9091, 9093, 9094];
+const GRACEFUL_CLOSE_TIMEOUT_MS = 3000;
 const SIGNALING_PORT_FALLBACK = 0;
 const DISCOVERY_PORT = 9092;
 const DISCOVERY_INTERVAL = 2000;
@@ -410,6 +411,39 @@ async function createWindow() {
     await mainWindow.loadURL(appServer.url);
     mainWindow.on('closed', () => {
         mainWindow = null;
+    });
+
+    // ── Graceful-close handshake ──────────────────────────────────────────────
+    // Before destroying the window, ask the renderer to run its own lifecycle
+    // teardown (facade.dispose → GAME_DISPOSE finalize → MATCH_FINALIZED signal
+    // to any connected multiplayer peers).  A GRACEFUL_CLOSE_TIMEOUT_MS timeout
+    // ensures the window always closes even if the renderer is unresponsive.
+    let gracefulCloseReady = false;
+    mainWindow.on('close', (event) => {
+        if (gracefulCloseReady) return;
+        event.preventDefault();
+
+        const finish = () => {
+            if (gracefulCloseReady) return;
+            gracefulCloseReady = true;
+            if (mainWindow && !mainWindow.isDestroyed()) {
+                mainWindow.close();
+            }
+        };
+
+        const timeoutId = setTimeout(finish, GRACEFUL_CLOSE_TIMEOUT_MS);
+        ipcMain.once('graceful-close-ready', () => {
+            clearTimeout(timeoutId);
+            finish();
+        });
+
+        try {
+            mainWindow.webContents.send('request-graceful-close');
+        } catch {
+            // Renderer already gone — proceed immediately.
+            clearTimeout(timeoutId);
+            finish();
+        }
     });
 }
 

@@ -86,6 +86,7 @@
       "forbiddenForNewWork": true,
       "allowedAdapters": [
         "src/platform/electron/ElectronPlatformBridge.js",
+        "src/platform/electron/ElectronShellLifecycleBridge.js",
         "electron/preload.cjs"
       ],
       "allowedCallers": [

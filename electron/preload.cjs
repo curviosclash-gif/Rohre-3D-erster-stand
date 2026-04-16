@@ -9,6 +9,7 @@ const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     host: 'preload.host.v1',
     save: 'preload.save.v1',
     recording: 'preload.recording.v1',
+    lifecycle: 'preload.lifecycle.v1',
 });
 const PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION = 'platform-capability-snapshot.v1';
 
@@ -75,15 +76,46 @@ function createRecordingContract() {
     });
 }
 
+/**
+ * Lifecycle capability contract — exposes the shell's graceful-close handshake.
+ *
+ * The main process sends 'request-graceful-close' before destroying the window.
+ * The renderer calls onGracefulClose(cb) to receive the notification, runs its
+ * own dispose/finalize sequence (e.g. facade.dispose()), and then calls
+ * confirmGracefulClose() to allow the window to proceed with closing.
+ */
+function createLifecycleContract() {
+    return createNamedContract('lifecycle', PRELOAD_CONTRACT_VERSIONS.lifecycle, {
+        /**
+         * Register a callback fired when the shell requests a graceful close.
+         * The callback may be async; call confirmGracefulClose() once the
+         * renderer-side lifecycle teardown is complete.
+         *
+         * @param {() => void | Promise<void>} callback
+         * @returns {() => void} unsubscribe function
+         */
+        onGracefulClose: (callback) => {
+            if (typeof callback !== 'function') return () => {};
+            const handler = () => callback();
+            ipcRenderer.on('request-graceful-close', handler);
+            return () => ipcRenderer.removeListener('request-graceful-close', handler);
+        },
+        /** Signal to the main process that the renderer is ready to be destroyed. */
+        confirmGracefulClose: () => ipcRenderer.send('graceful-close-ready'),
+    });
+}
+
 const discoveryContract = createDiscoveryContract();
 const hostContract = createHostContract();
 const saveContract = createSaveContract();
 const recordingContract = createRecordingContract();
+const lifecycleContract = createLifecycleContract();
 const platformContracts = Object.freeze({
     discovery: discoveryContract,
     host: hostContract,
     save: saveContract,
     recording: recordingContract,
+    lifecycle: lifecycleContract,
 });
 const platformCapabilities = Object.freeze({
     contractVersion: PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION,
@@ -100,6 +132,7 @@ const platformCapabilities = Object.freeze({
     recording: createCapabilityDescriptor('recording', recordingContract.contractVersion, 'electron-renderer', true, {
         supportsCapture: true,
     }),
+    lifecycle: createCapabilityDescriptor('lifecycle', lifecycleContract.contractVersion, 'electron-ipc', true),
 });
 const curviosApp = Object.freeze({
     contracts: platformContracts,
@@ -108,6 +141,7 @@ const curviosApp = Object.freeze({
     host: hostContract,
     save: saveContract,
     recording: recordingContract,
+    lifecycle: lifecycleContract,
     getLanServerStatus: hostContract.getStatus,
     startLanServer: hostContract.start,
     stopLanServer: hostContract.stop,
