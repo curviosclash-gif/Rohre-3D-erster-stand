@@ -31,3 +31,10 @@ description: Git safety, branch enforcement, and commit policy (consolidated)
 - Concise messages explaining *why*, not *what*. Types: `feat`, `fix`, `refactor`, `perf`, `chore`, `release`, `docs`.
 - For immediate small corrections in the same task, use `git commit --amend`.
 - Never use destructive history changes as default. Use `revert`/scoped restore first.
+
+## Scope & Phase Validation
+
+- Vor jedem Commit: `npm run scope:validate` empfohlen
+- Scope-Violations sind Hard-Fails (pre-commit Hook via lock-registry-merger)
+- Lock-Status wird in `docs/lock-status/` verwaltet (distributed, pro Person)
+- Phase-Sequenzierung wird von `phase:validate` unterstuetzt
