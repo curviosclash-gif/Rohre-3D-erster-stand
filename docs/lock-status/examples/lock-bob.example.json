@@ -1,0 +1,23 @@
+{
+  "person": "bob",
+  "timestamp": "2026-04-16T11:00:00Z",
+  "locks": [
+    {
+      "block_id": "V82",
+      "phase": "82.1",
+      "scope_files": [
+        "src/shared/contracts/ArcadeMissionContract.js",
+        "src/core/arcade/**"
+      ],
+      "start_date": "2026-04-16",
+      "target_completion": "2026-04-22",
+      "status": "in-progress",
+      "notes": "Arcade-Parcours XP und Progression Basis"
+    }
+  ],
+  "current_phase_evidence": {
+    "phase_id": "82.1",
+    "completed_items": [],
+    "last_commit": ""
+  }
+}

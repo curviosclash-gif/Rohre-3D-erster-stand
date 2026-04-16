@@ -1,0 +1,22 @@
+{
+  "person": "alice",
+  "timestamp": "2026-04-16T10:30:00Z",
+  "locks": [
+    {
+      "block_id": "V64",
+      "phase": "64.8.2",
+      "scope_files": [
+        "src/core/runtime/MenuRuntimeMultiplayerService.js"
+      ],
+      "start_date": "2026-04-16",
+      "target_completion": "2026-04-20",
+      "status": "in-progress",
+      "notes": "Menue-Lobby-Pfad auf echte Transporte"
+    }
+  ],
+  "current_phase_evidence": {
+    "phase_id": "64.8.2",
+    "completed_items": [],
+    "last_commit": ""
+  }
+}

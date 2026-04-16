@@ -1,0 +1,8 @@
+{
+  "generated_at": "auto",
+  "locks": [],
+  "metadata": {
+    "format_version": "1.0",
+    "expected_lock_files": ["alice.json", "bob.json"]
+  }
+}
