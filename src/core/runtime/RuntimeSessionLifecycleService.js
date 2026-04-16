@@ -17,11 +17,9 @@ import {
 /** @type {number} Host broadcasts state snapshots at this interval (ms). */
 const STATE_BROADCAST_INTERVAL_MS = 100; // 10/s
 const STATE_UPDATE_BUFFER_LIMIT = 24;
-const ARENA_START_SIGNAL_TIMEOUT_MS = 12_000;
+const ROUND_START_GATE_TIMEOUT_MS = 12_000;
 const ARENA_LOADED_BASE_TIMEOUT_MS = 10_000;
 const ARENA_LOADED_TIMEOUT_PER_REMOTE_PLAYER_MS = 5_000;
-const ARENA_LOADED_SIGNAL_TYPE = 'arena_loaded';
-const ARENA_START_SIGNAL_TYPE = 'arena_start';
 
 function resolveSessionContract(sessionSource = null) {
     if (typeof sessionSource === 'string') {
@@ -74,6 +72,7 @@ export async function initRuntimeSession(facade) {
 
     if (facade.session.isHost && sessionContract.isNetworkSession) {
         startRuntimeStateBroadcast(facade);
+        setupRuntimeHostFullStateSyncHandler(facade);
     }
 
     if (!facade.session.isHost && sessionContract.isNetworkSession) {
@@ -97,6 +96,34 @@ export function stopRuntimeStateBroadcast(facade) {
         clearInterval(facade._stateBroadcastTimer);
         facade._stateBroadcastTimer = null;
     }
+}
+
+/**
+ * Host-only.  Listens for the 'fullStateSyncNeeded' event that the session adapter
+ * emits when a peer reconnects after a disconnect.  Responds by immediately sending
+ * the current game state snapshot to the reconnected peer so it can catch up without
+ * waiting for the next scheduled broadcast tick.
+ *
+ * The reconciliation decision (which transport, which peer) is entirely made by the
+ * session adapter; this handler only reads the game state and delegates the actual
+ * send back through the adapter's sendStateToPeer() port.
+ */
+export function setupRuntimeHostFullStateSyncHandler(facade) {
+    if (!facade?.session?.isHost) return;
+    facade._onFullStateSyncNeededHandler = ({ peerId } = {}) => {
+        const normalizedPeerId = typeof peerId === 'string' ? peerId.trim() : '';
+        if (!normalizedPeerId) return;
+        const game = facade?.game;
+        if (!game?.entityManager) return;
+        try {
+            const snapshot = createGameStateSnapshot(game.entityManager, game.roundStateController);
+            facade.session?.sendStateToPeer?.(normalizedPeerId, snapshot);
+        } catch {
+            // Best-effort: the host's periodic broadcast will catch the client up on the
+            // next interval even if this on-demand sync fails.
+        }
+    };
+    facade.session.on('fullStateSyncNeeded', facade._onFullStateSyncNeededHandler);
 }
 
 export function setupRuntimeClientStateReceiver(facade) {
@@ -160,6 +187,11 @@ export async function waitForRuntimePlayersLoaded(facade) {
         facade._arenaLoadedPeers.add(localPlayerId);
     }
 
+    // ── Client path ────────────────────────────────────────────────────────────
+    // Client sends PLAYER_ARENA_LOADED (transport-level, dedicated message type)
+    // and waits for the host's ROUND_START_GATE broadcast.  The decision of
+    // *when* to allow the round to start belongs to the transport layer (the
+    // session adapter and its host-authority contract), not to domain logic.
     if (!facade.session.isHost) {
         return new Promise((resolve) => {
             let completed = false;
@@ -172,26 +204,31 @@ export async function waitForRuntimePlayersLoaded(facade) {
                     clearTimeout(timeoutId);
                     timeoutId = null;
                 }
-                if (facade._onArenaStartSignalHandler && facade.session) {
-                    facade.session.off('remoteInput', facade._onArenaStartSignalHandler);
-                    facade._onArenaStartSignalHandler = null;
+                if (facade._onRoundStartGateHandler && facade.session) {
+                    facade.session.off('roundStartGate', facade._onRoundStartGateHandler);
+                    facade._onRoundStartGateHandler = null;
                 }
                 resolve();
             };
 
-            facade._onArenaStartSignalHandler = (payload) => {
-                const inputType = String(payload?.input?.type || '').trim().toLowerCase();
-                if (inputType !== ARENA_START_SIGNAL_TYPE) return;
+            facade._onRoundStartGateHandler = () => {
+                // Host has confirmed all players are loaded; the round may begin.
                 finish();
             };
 
-            facade.session.on('remoteInput', facade._onArenaStartSignalHandler);
-            facade.session.sendInput({ type: ARENA_LOADED_SIGNAL_TYPE, playerId: localPlayerId });
+            facade.session.on('roundStartGate', facade._onRoundStartGateHandler);
+            // Notify the host that this client's arena is ready.
+            facade.session.notifyArenaLoaded?.(localPlayerId);
 
-            timeoutId = setTimeout(() => finish(), ARENA_START_SIGNAL_TIMEOUT_MS);
+            timeoutId = setTimeout(() => finish(), ROUND_START_GATE_TIMEOUT_MS);
         });
     }
 
+    // ── Host path ──────────────────────────────────────────────────────────────
+    // Host waits for all remote peers to send PLAYER_ARENA_LOADED (surfaced as
+    // 'playerLoaded' events by the adapter).  Once all peers have confirmed,
+    // the host broadcasts ROUND_START_GATE — a host-authoritative transport
+    // signal that instructs every client to begin arena simulation.
     const expectedPeerIds = new Set(
         players
             .map((player) => String(player?.peerId || player?.id || '').trim())
@@ -213,14 +250,13 @@ export async function waitForRuntimePlayersLoaded(facade) {
                 timeoutId = null;
             }
             try {
-                facade.session?.sendInput?.({
-                    type: ARENA_START_SIGNAL_TYPE,
-                    playerId: localPlayerId || 'host',
+                // Broadcast the host-authoritative ROUND_START_GATE signal to all clients.
+                facade.session?.broadcastRoundStartGate?.({
                     expectedPeerIds: Array.from(expectedPeerIds.values()),
                     timestamp: Date.now(),
                 });
             } catch {
-                // Ignore best-effort host start signaling failures.
+                // Best-effort: even if broadcast fails, local host resolves and starts.
             }
             if (facade._onPlayerLoadedHandler && facade.session) {
                 facade.session.off('playerLoaded', facade._onPlayerLoadedHandler);
@@ -269,9 +305,13 @@ export function teardownRuntimeSession(facade) {
         facade.session.off('playerLoaded', facade._onPlayerLoadedHandler);
         facade._onPlayerLoadedHandler = null;
     }
-    if (facade?._onArenaStartSignalHandler && facade.session) {
-        facade.session.off('remoteInput', facade._onArenaStartSignalHandler);
-        facade._onArenaStartSignalHandler = null;
+    if (facade?._onRoundStartGateHandler && facade.session) {
+        facade.session.off('roundStartGate', facade._onRoundStartGateHandler);
+        facade._onRoundStartGateHandler = null;
+    }
+    if (facade?._onFullStateSyncNeededHandler && facade.session) {
+        facade.session.off('fullStateSyncNeeded', facade._onFullStateSyncNeededHandler);
+        facade._onFullStateSyncNeededHandler = null;
     }
     if (facade?._lifecycleKernelHandlers && facade.session) {
         detachMultiplayerLifecycleKernel(facade.session, facade._lifecycleKernelHandlers);

@@ -20,6 +20,12 @@ export const MULTIPLAYER_MESSAGE_TYPES = Object.freeze({
     PLAYER_RECONNECTED: 'player_reconnected',
     PLAYER_REMOVED: 'player_removed',
     MATCH_LIFECYCLE_SIGNAL: 'match_lifecycle_signal',
+    // Transport-level round-start gate protocol:
+    // Client notifies host that its arena is fully loaded.
+    PLAYER_ARENA_LOADED: 'player_arena_loaded',
+    // Host broadcasts this to all peers when all players are loaded and the round may start.
+    // Only the host sends this; clients react by beginning arena simulation.
+    ROUND_START_GATE: 'round_start_gate',
 });
 
 /**
@@ -97,6 +103,9 @@ export const MULTIPLAYER_HOST_AUTHORITATIVE_MESSAGE_TYPES = Object.freeze(new Se
     MULTIPLAYER_MESSAGE_TYPES.PLAYER_RECONNECTED,
     MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED,
     MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL,
+    // ROUND_START_GATE is host-authoritative: only the host decides when all players
+    // are loaded and the round may begin.  Clients must not send this type.
+    MULTIPLAYER_MESSAGE_TYPES.ROUND_START_GATE,
 ]));
 
 /**

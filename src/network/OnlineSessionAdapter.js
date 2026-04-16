@@ -264,6 +264,11 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
         return this._hostPeerId || null;
     }
 
+    _resolveHostPeerId() {
+        // Online host is identified by the peer ID stored during signaling.
+        return this._findHostPeerId();
+    }
+
     _sendStateToAll(message, excludePeerId = null) {
         if (!message) return;
         this._dataChannelManager.sendToAll('state', message, excludePeerId);
@@ -350,10 +355,19 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
         const message = normalizeMultiplayerSessionMessage(data);
         switch (message.type) {
         case MULTIPLAYER_MESSAGE_TYPES.INPUT:
-            if (data?.inputs?.type === 'arena_loaded') {
-                this._emit('playerLoaded', { playerId: data.playerId || peerId });
-            }
             this._emit('remoteInput', { peerId, input: data.inputs, playerId: data.playerId });
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.PLAYER_ARENA_LOADED:
+            // Client signals that its arena is fully loaded.  Host collects these
+            // and fires broadcastRoundStartGate() once all players have reported in.
+            this._emit('playerLoaded', { playerId: String(data.playerId || peerId || '').trim() });
+            break;
+        case MULTIPLAYER_MESSAGE_TYPES.ROUND_START_GATE:
+            // Host signals all clients that every player is loaded and the round may start.
+            this._emit('roundStartGate', {
+                expectedPeerIds: Array.isArray(data.expectedPeerIds) ? data.expectedPeerIds : [],
+                timestamp: typeof data.timestamp === 'number' ? data.timestamp : 0,
+            });
             break;
         case MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT:
             this._emit('stateUpdate', buildMultiplayerStateUpdateEvent(data, {

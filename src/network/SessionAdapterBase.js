@@ -128,6 +128,48 @@ export class SessionAdapterBase extends SessionAdapter {
     }
 
     /**
+     * Override in concrete adapters to return the host's peer ID as known by this adapter.
+     * Returns null in the base class (no-op fallback).
+     * @returns {string|null}
+     */
+    _resolveHostPeerId() {
+        return null;
+    }
+
+    /**
+     * Client-only. Sends a PLAYER_ARENA_LOADED message to the host to signal that
+     * this peer's arena is fully initialised and ready for the round-start gate.
+     * The host collects these signals and replies with broadcastRoundStartGate()
+     * once all expected peers have reported in.
+     *
+     * @param {string} playerId - local player/peer ID to include in the message
+     */
+    notifyArenaLoaded(playerId) {
+        if (this.isHost) return;
+        const hostPeerId = this._resolveHostPeerId();
+        if (!hostPeerId) return;
+        this._sendStateToPeer(
+            hostPeerId,
+            this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.PLAYER_ARENA_LOADED, { playerId })
+        );
+    }
+
+    /**
+     * Host-only. Broadcasts ROUND_START_GATE to all connected peers, signalling
+     * that all players are loaded and the round may begin.  Clients react by
+     * resolving their waitForRuntimePlayersLoaded() promise.
+     *
+     * @param {object|null} payload - Optional extra fields (e.g. expectedPeerIds, timestamp)
+     */
+    broadcastRoundStartGate(payload = null) {
+        if (!this.isHost) return;
+        const extra = payload && typeof payload === 'object' ? payload : {};
+        this._sendStateToAll(this._createStateMessage(
+            MULTIPLAYER_MESSAGE_TYPES.ROUND_START_GATE, extra
+        ));
+    }
+
+    /**
      * Host-only. Broadcasts a lifecycle signal to all connected peers.
      * Clients react via their MultiplayerMatchLifecycleKernel handler.
      *
