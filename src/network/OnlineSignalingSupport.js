@@ -14,6 +14,7 @@ const NON_RETRYABLE_SIGNALING_ERROR_CODES = new Set([
     'signaling_endpoint_missing_host',
     'signaling_server_error',
     'signaling_payload_invalid',
+    'signaling_network_unavailable',
 ]);
 
 function normalizeString(value, fallback = '') {
@@ -175,6 +176,15 @@ export function createInvalidSignalingPayloadError(details = null, cause = null)
     return createOnlineSignalingError(
         'signaling_payload_invalid',
         'Online-Signaling hat eine ungueltige Nachricht geliefert.',
+        details,
+        cause
+    );
+}
+
+export function createNetworkUnavailableSignalingError(details = null, cause = null) {
+    return createOnlineSignalingError(
+        'signaling_network_unavailable',
+        'Online nicht erreichbar – Internetverbindung oder Signaling-Server-Adresse pruefen.',
         details,
         cause
     );

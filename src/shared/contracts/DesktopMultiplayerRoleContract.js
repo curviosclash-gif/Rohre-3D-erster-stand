@@ -149,6 +149,64 @@ export function resolveDesktopMultiplayerRoleSurface(productSurfaceId) {
     });
 }
 
+// ---------------------------------------------------------------------------
+// V64 64.7.2 — Desktop Connectivity Profile
+// Characterises which session types are valid in each connectivity state.
+// ---------------------------------------------------------------------------
+
+/**
+ * Connectivity states for the Desktop product (V64 64.7.2).
+ * Distinguishes the three relevant scenarios a Desktop user can be in.
+ */
+export const DESKTOP_CONNECTIVITY_STATES = Object.freeze({
+    /** No network adapter active; all local modes work, network modes do not. */
+    NO_NETWORK: 'no-network',
+    /** LAN available but no internet route; local modes + lan work, online does not. */
+    LOCAL_NETWORK_ONLY: 'local-network-only',
+    /** Full internet access; all session types available. */
+    INTERNET: 'internet',
+});
+
+/**
+ * Returns the connectivity profile for the Desktop product — which session
+ * types are valid in each connectivity scenario.
+ *
+ * Used by UI validation and diagnostics to produce meaningful per-transport
+ * error or hint messages without re-deriving from surface policy on every call.
+ *
+ * V64 64.7.2: Desktop without internet is a valid product state for local
+ * modes and LAN.  Online requires a reachable internet signaling endpoint.
+ *
+ * @returns {{
+ *   noNetworkSessionTypes: readonly string[],
+ *   localNetworkOnlySessionTypes: readonly string[],
+ *   internetRequiredSessionTypes: readonly string[],
+ *   onlineUnavailableHint: string,
+ *   lanOfflineHint: string,
+ * }}
+ */
+export function resolveDesktopConnectivityProfile() {
+    return Object.freeze({
+        /** Session types that work with zero network connectivity. */
+        noNetworkSessionTypes: Object.freeze([
+            RUNTIME_SESSION_TYPES.SINGLE,
+            RUNTIME_SESSION_TYPES.SPLITSCREEN,
+        ]),
+        /** Session types that work with a local network but without internet. */
+        localNetworkOnlySessionTypes: Object.freeze([
+            RUNTIME_SESSION_TYPES.MULTIPLAYER,
+        ]),
+        /** Session types that require an internet-reachable signaling endpoint. */
+        internetRequiredSessionTypes: Object.freeze([
+            RUNTIME_SESSION_TYPES.ONLINE,
+        ]),
+        /** User-facing hint shown when Online is unavailable (no internet or unreachable server). */
+        onlineUnavailableHint: 'Online nicht erreichbar: Internetverbindung und Signaling-Endpoint pruefen.',
+        /** User-facing hint shown when LAN is unavailable (no local network detected). */
+        lanOfflineHint: 'LAN nicht erreichbar: Lokale Netzwerkverbindung pruefen.',
+    });
+}
+
 /**
  * Resolves the full Host-Join-Offline matrix for all product surfaces.
  * Output: canonical matrix for V64 64.1 — one entry per PLATFORM_PRODUCT_SURFACE_IDS value.
