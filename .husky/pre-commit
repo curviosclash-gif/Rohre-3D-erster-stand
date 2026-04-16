@@ -7,6 +7,10 @@ fi
 
 npm run guard:main
 
+# NEU: Scope & Lock Validation
+echo "Validiere Phase-Scope und Lock-Status..."
+node .agents/scripts/lock-registry-merger.js --validate
+
 # Block commits that mix Umsetzungsplan with code changes.
 STAGED=$(git diff --cached --name-only)
 if echo "$STAGED" | grep -q "^docs/Umsetzungsplan\.md$"; then
