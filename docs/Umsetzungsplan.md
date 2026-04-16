@@ -62,22 +62,26 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 
 ## Lock-Status
 
+Aktive Locks werden in `docs/lock-status/` verwaltet (pro Person eine JSON-Datei).
+Siehe `docs/lock-status/README.md` fuer Anleitung und `npm run lock:status` fuer Live-Status.
+Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in `docs/lock-status/`.
+
 | Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
 | --- | --- | --- | --- | --- |
-| - | V64 | - | frei | Nach `64.4.3` `VITE_SIGNALING_URL`, TURN-Optionen, Overrides und Packaging-Dokumentation fuer Desktop definieren |
-| - | V71 | 2026-04-14 | closed | Abgeschlossen 2026-04-14: `71.99` blockerfest geschlossen (`71.99.1` Root-/Cleanup-Check gruen, Build reproduzierbar `spawn EPERM` dokumentiert; `71.99.2` Editor-/Plan-/Docs-Gates gruen; `71.99.3` Ignore-Artefakte klassifiziert) |
-| - | V72 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `72.99` Gate gruen; alle drei Pflicht-Gates (plan:check, docs:sync, docs:check) und test:contract (120/120) bestanden; V72 freischaltet V82, V86 und V81 |
-| - | V74 | - | frei | Abgeschlossen 2026-04-03: `74.99` Gate gruen, Folgebloecke mit `V74.99` koennen anlaufen |
-| - | V86 | - | frei | Nach `V72.99` Authoring-Vertrag zwischen Editor, Templates, Serializer und Runtime-Presets konkretisieren |
-| - | V77 | - | closed | Abgeschlossen 2026-04-15: `77.99` Gate gruen; Surface-Vertrag, Entscheidungsraster, Fallback-Contract-Tests und Dev-only-Expert-Policy sind konsistent verankert |
-| - | V91 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `91.99` Gate gruen; Guard-Matrix, Boundary-/Ratchet-/Metrics-Checks, PlatformCapabilityData-Split, Lifecycle-/Capability-Contract-Tests, Feature-Start-Checkliste und Governance-Spiegelung (V64/V81/V82/V86, test_mapping) abgeschlossen; V64 und V81 haben ihre V91.99-Abhaengigkeit jetzt erfuellt |
-| - | V92 | 2026-04-15 | closed | Abgeschlossen 2026-04-15: `92.99` Gate gruen; Hotspots im migrierten Scope reduziert, Restadapter explizit auf `GameRuntimePorts`-Transition-Helfer und `MatchFlowTransitionHotspots` begrenzt, globale Runtime-Surfaces nur noch Publish-/Cleanup-Diagnostics |
-| - | V75 | - | frei | Exportstrategie/Finalize-Port erst nach `V64.99` auf denselben Lifecycle- und Surface-Vertrag heben |
-| - | V76 | - | frei | Desktop-Hangar-Contract erst nach `V64.99` und unter `V77`-/`V74`-Leitplanken aufnehmen |
-| - | V82 | - | frei | Nach `V72.99` und `V74.99` mit `82.1` daten- und regelnah starten; UI-/HUD-/Overlay-Schnitte sollen den Ownership-Zuschnitt aus `V92` konsumieren |
-| - | V81 | - | frei | Nach `V92.99`, `V91.99`, `V74.99` und `V72.99` mit `81.1` Registry und Bridge starten |
-| - | V93 | 2026-04-14 | closed | Abgeschlossen 2026-04-14: `93.99` Gate gruen; Master-Index-Einstieg -36% (7011->4472 Bytes Top-60), `gates:pre-commit` Meta-Gate produktiv, Rules/Workflows entdoppelt, keine Policy in mehrfacher Quelle |
-| - | V94 | - | frei | Nach `V93.99` Wissensgraph als generiertes JSON-Artefakt (`docs/generated/knowledge-graph.json`) plus Build-/Check-Scripts und Gate-Einhaengung als sekundaeren Query-Layer verankern |
+| - | V71 | 2026-04-14 | closed | Abgeschlossen 2026-04-14 |
+| - | V72 | 2026-04-15 | closed | Abgeschlossen 2026-04-15 |
+| - | V74 | - | closed | Abgeschlossen 2026-04-03 |
+| - | V77 | - | closed | Abgeschlossen 2026-04-15 |
+| - | V91 | 2026-04-15 | closed | Abgeschlossen 2026-04-15 |
+| - | V92 | 2026-04-15 | closed | Abgeschlossen 2026-04-15 |
+| - | V93 | 2026-04-14 | closed | Abgeschlossen 2026-04-14 |
+| - | V64 | - | frei | Siehe docs/lock-status/ |
+| - | V75 | - | frei | Siehe docs/lock-status/ |
+| - | V76 | - | frei | Siehe docs/lock-status/ |
+| - | V82 | - | frei | Siehe docs/lock-status/ |
+| - | V81 | - | frei | Siehe docs/lock-status/ |
+| - | V86 | - | frei | Siehe docs/lock-status/ |
+| - | V94 | - | frei | Siehe docs/lock-status/ |
 
 ## Empfohlene Reihenfolge
 
