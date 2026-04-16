@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-15. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-Naechste offene Subphase: `64.6.2` (siehe `docs/plaene/aktiv/V64.md`). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+Stand: 2026-04-16. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
+Naechste offene Subphase: `64.6.3` (siehe `docs/plaene/aktiv/V64.md`). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
