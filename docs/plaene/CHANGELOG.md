@@ -6,6 +6,12 @@ Dieses Changelog ist die kanonische Ablage fuer Status-Fliesstext, der frueher i
 
 Eintraege werden am Ende angehaengt und sind nicht streng chronologisch, aber jeder Eintrag fuehrt ein Datum und die betroffene Subphase.
 
+## Stand-Snapshot 2026-04-17
+
+- Nachpflege zum V92-Architekturscope: `src/ui/MatchFlowTransitionHotspots.js` nutzt fuer Arcade-/Recording-/Session-Transitions nur noch Runtime-Port-Fallbacks und keinen direkten `game.runtimeFacade`-Reach-through mehr.
+- Guard-/Ratchet-Baseline ist entsprechend nachgeschaerft: `scripts/architecture/legacy-surface-guard-matrix.json` erkennt `game?.runtimeFacade` explizit, `GameRuntimePorts-fallbacks` sind nur noch in `src/shared/runtime/GameRuntimePorts.js` erlaubt, und `scripts/architecture/architecture-budget-ratchet.json` fuehrt dafuer jetzt ein 1-Datei-Budget.
+- Referenz- und Folgeblock-Leitplanken (`docs/referenz/ai_architecture_context.md`, `.agents/test_mapping.md`, `docs/plaene/aktiv/V64.md`, `V81.md`, `V82.md`, `V86.md`) spiegeln denselben Ownership-Stand.
+
 ## Stand-Snapshot 2026-04-15
 
 - Abgeschlossen: V71, V72, V74, V77, V83, V84, V85, V87, V88, V89, V91, V92. V89 spiegelt Browser-, Desktop- und Contract-Layer widerspruchsfrei; `desktop-smoke` bleibt primaeres Desktop-Hauptsignal, `browser-compat` der Web-/Demo-Layer, `node-contract` traegt weiterhin den Restfehler `T97`.
