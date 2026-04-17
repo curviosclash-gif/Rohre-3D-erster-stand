@@ -242,6 +242,7 @@ export class MatchFlowUiController {
             game: this.game,
             playerIndex,
             localHumanCount,
+            getMatchRuntimeProjection: () => this.runtimePort?.getMatchRuntimeProjection?.() || null,
         });
     }
 

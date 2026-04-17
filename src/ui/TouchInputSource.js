@@ -20,6 +20,9 @@ export class TouchInputSource extends PlayerInputSource {
         super('touch');
         this._disposed = false;
         this._game = options.game || null;
+        this._getRuntimeProjection = typeof options.getMatchRuntimeProjection === 'function'
+            ? options.getMatchRuntimeProjection
+            : null;
         this._playerIndex = Number.isInteger(options.playerIndex) ? options.playerIndex : 0;
         this._joystickRadius = options.joystickRadius || 60;
         this._joystickCenter = null;
@@ -155,9 +158,11 @@ export class TouchInputSource extends PlayerInputSource {
     }
 
     _getMatchRuntimeProjection() {
-        return this._game?.runtimeFacade?.getPorts?.()?.runtimeProjectionPort?.getMatchRuntimeProjection?.()
-            || this._game?.runtimeBundle?.ports?.runtimeProjectionPort?.getMatchRuntimeProjection?.()
-            || null;
+        const projected = this._getRuntimeProjection?.();
+        if (projected && typeof projected === 'object') {
+            return projected;
+        }
+        return this._game?.runtimePorts?.runtimeProjectionPort?.getMatchRuntimeProjection?.() || null;
     }
 
     _findProjectedPlayer(projection = null) {

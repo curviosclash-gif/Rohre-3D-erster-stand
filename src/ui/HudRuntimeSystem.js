@@ -59,11 +59,13 @@ export class HudRuntimeSystem {
         if (Number.isInteger(projection?.localPlayerIndex)) {
             return projection.localPlayerIndex;
         }
-        const session = this.game?.runtimeFacade?.session;
-        const localPlayerId = session?.localPlayerId;
-        if (!localPlayerId) return 0;
-        const players = session?.getPlayers?.() || [];
-        return players.findIndex((p) => p.id === localPlayerId);
+        const localSessionPlayer = Array.isArray(projection?.sessionPlayers)
+            ? projection.sessionPlayers.find((player) => player?.isLocal === true)
+            : null;
+        if (Number.isInteger(localSessionPlayer?.playerIndex) && localSessionPlayer.playerIndex >= 0) {
+            return localSessionPlayer.playerIndex;
+        }
+        return 0;
     }
 
     /**

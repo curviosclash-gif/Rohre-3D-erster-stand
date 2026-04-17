@@ -20,6 +20,7 @@ export function createMatchSessionPort(runtime) {
     const getCurrentMatchKernel = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchKernel?.() || null;
     const getCurrentMatchKernelConsumers = () => runtime?.matchSessionRuntimeBridge?.getCurrentMatchKernelConsumers?.() || null;
     const getRecorder = () => runtimeHandles?.mediaRecorderSystem || runtime?.mediaRecorderSystem || runtime?.recorder || null;
+    const applyPendingArcadeIntermissionEffects = (players) => runtimeHandles?.runtimePorts?.arcadePort?.applyPendingIntermissionEffects?.(players);
     return {
         getSessionRuntimeState: () => sessionRuntime,
         getLifecycleState: () => ({
@@ -93,9 +94,7 @@ export function createMatchSessionPort(runtime) {
 
             runtime?.recorder?.startRound?.(entityManager.players);
             entityManager.spawnAll();
-            runtime?.runtimeFacade?.arcadeRunRuntime?.applyPendingIntermissionEffects?.({
-                players: entityManager.players,
-            });
+            applyPendingArcadeIntermissionEffects(entityManager.players);
             for (const player of entityManager.getHumanPlayers()) {
                 player.planarAimOffset = 0;
             }

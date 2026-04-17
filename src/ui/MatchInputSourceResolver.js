@@ -106,11 +106,21 @@ function createGamepadInputSource(gamepadIndex = 0) {
     };
 }
 
-export function createPreferredMatchInputSource({ inputManager, playerIndex, localHumanCount, game = null }) {
+export function createPreferredMatchInputSource({
+    inputManager,
+    playerIndex,
+    localHumanCount,
+    game = null,
+    getMatchRuntimeProjection = null,
+}) {
     if (!inputManager) return null;
 
     if (playerIndex === 0 && TouchInputSource.isAvailable()) {
-        const touchSource = new TouchInputSource({ game, playerIndex });
+        const touchSource = new TouchInputSource({
+            game,
+            playerIndex,
+            getMatchRuntimeProjection,
+        });
         touchSource.createUI();
         touchSource.onMatchStart();
         return touchSource;

@@ -23,7 +23,11 @@
     },
     {
       "id": "game.runtimeFacade",
-      "patterns": ["game\\.runtimeFacade", "(?:window|runtimeWindow)\\.GAME_RUNTIME"],
+      "patterns": [
+        "game\\.runtimeFacade",
+        "(?:runtime|this\\.game|this\\._game)\\?*\\.runtimeFacade",
+        "(?:window|runtimeWindow)\\.GAME_RUNTIME"
+      ],
       "status": "legacy-transition",
       "forbiddenForNewWork": true,
       "allowedAdapters": [
