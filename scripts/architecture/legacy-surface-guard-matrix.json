@@ -1,6 +1,6 @@
 {
   "_comment": "Machine-readable Guard-Matrix fuer Legacy-Surfaces (V91 91.1.2, erweitert in V92 92.5.1). Beschreibt verbotene Globals, erlaubte Uebergangsadapter und Eigentuemer fuer den migrierten Scope.",
-  "updatedAt": "2026-04-15",
+  "updatedAt": "2026-04-17",
   "version": "1",
   "surfaces": [
     {
@@ -24,8 +24,7 @@
     {
       "id": "game.runtimeFacade",
       "patterns": [
-        "game\\.runtimeFacade",
-        "(?:runtime|this\\.game|this\\._game)\\?*\\.runtimeFacade",
+        "(?:game|runtime|this\\.game|this\\._game)\\?*\\.runtimeFacade",
         "(?:window|runtimeWindow)\\.GAME_RUNTIME"
       ],
       "status": "legacy-transition",
@@ -33,7 +32,8 @@
       "allowedAdapters": [
         "src/core/AppInitializer.js",
         "src/core/main.js",
-        "src/core/runtime/GameRuntimeCoordinator.js"
+        "src/core/runtime/GameRuntimeCoordinator.js",
+        "src/shared/runtime/GameRuntimePorts.js"
       ],
       "allowedCallers": [
         "src/core/PlayingStateSystem.js",
@@ -75,10 +75,8 @@
       "allowedAdapters": [
         "src/shared/runtime/GameRuntimePorts.js"
       ],
-      "allowedCallers": [
-        "src/ui/MatchFlowTransitionHotspots.js"
-      ],
-      "reason": "Explizit benannte RuntimePort-Fallback-Helfer bleiben nur im Uebergangsadapter `GameRuntimePorts` und im dokumentierten UI-Restcaller `MatchFlowTransitionHotspots` erlaubt; neue Feature-Arbeit soll stattdessen Commands, Snapshots oder kleine Ports nutzen",
+      "allowedCallers": [],
+      "reason": "Explizit benannte RuntimePort-Fallback-Helfer bleiben nur im Uebergangsadapter `GameRuntimePorts` erlaubt; neue Feature-Arbeit soll stattdessen Commands, Snapshots oder kleine Ports nutzen",
       "migrationTarget": "Schmale Command-/Event-/Snapshot-Ports mit klarer Ownership; Lifecycle/Session bei SessionRuntime, UI-Projektionen im Application-Layer",
       "sunsetPhase": "92.3",
       "sunsetCriteria": "Sobald migrierter Scope keine RuntimeFacade-/RuntimeCoordinator-Fallback-Helfer in GameRuntimePorts mehr benoetigt und Feature-Ports nur noch ueber Bundle-Handles oder explizite Services laufen"

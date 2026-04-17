@@ -1,94 +1,120 @@
-function getLegacyRuntimeFacade(game) {
-    return game?.runtimeFacade || null;
+function getRuntimePorts(game) {
+    return game?.runtimeBundle?.ports || game?.runtimePorts || null;
 }
 
-function getLegacyArcadeRuntime(game) {
-    return getLegacyRuntimeFacade(game)?.arcadeRunRuntime || null;
+function getTransitionArcadePort(game) {
+    return getRuntimePorts(game)?.arcadePort || null;
+}
+
+function getTransitionRecordingPort(game) {
+    return getRuntimePorts(game)?.recordingPort || null;
+}
+
+function getTransitionLifecyclePort(game) {
+    return getRuntimePorts(game)?.lifecyclePort || null;
+}
+
+function getTransitionUiFeedbackPort(game) {
+    return getRuntimePorts(game)?.uiFeedbackPort || null;
+}
+
+function getTransitionRuntimeProjectionPort(game) {
+    return getRuntimePorts(game)?.runtimeProjectionPort || null;
 }
 
 function getLegacyRoundRecorder(game) {
     return game?.recorder || null;
 }
 
-// Transition-only adapters keep legacy game/runtimeFacade access centralized
-// until the dedicated recorder and arcade follow-up blocks can remove them.
-function createLegacyArcadeTransitionAdapter(game) {
-    const runtimeFacade = getLegacyRuntimeFacade(game);
-    const arcadeRuntime = getLegacyArcadeRuntime(game);
+function resolveTransitionSessionSnapshot(game) {
+    const runtimeProjectionPort = getTransitionRuntimeProjectionPort(game);
+    const snapshot = runtimeProjectionPort?.getSessionRuntimeSnapshot?.();
+    if (snapshot) {
+        return snapshot;
+    }
+    const runtimeProjection = runtimeProjectionPort?.getMatchRuntimeProjection?.() || null;
+    return {
+        isNetworkSession: runtimeProjection?.isNetworkSession === true,
+        isHost: true,
+    };
+}
+
+function createTransitionArcadeAdapter(game) {
+    const arcadePort = getTransitionArcadePort(game);
     return {
         getMenuSurfaceState() {
-            return runtimeFacade?.getArcadeMenuSurfaceState?.()
-                ?? arcadeRuntime?.getMenuSurfaceState?.()
-                ?? null;
+            return arcadePort?.getMenuSurfaceState?.() ?? null;
         },
         selectIntermissionChoice(choiceId) {
-            return runtimeFacade?.selectArcadeIntermissionChoice?.(choiceId)
-                ?? arcadeRuntime?.selectIntermissionChoice?.(choiceId);
+            return arcadePort?.selectIntermissionChoice?.(choiceId);
         },
         selectReward(rewardId) {
-            return runtimeFacade?.selectArcadeReward?.(rewardId)
-                ?? arcadeRuntime?.selectReward?.(rewardId);
+            return arcadePort?.selectReward?.(rewardId);
         },
         requestReplayPlayback() {
-            return runtimeFacade?.requestArcadeReplayPlayback?.()
-                ?? arcadeRuntime?.requestReplayPlayback?.();
+            return arcadePort?.requestReplayPlayback?.();
         },
     };
 }
 
-function createLegacyRecordingTransitionAdapter(game) {
-    const runtimeFacade = getLegacyRuntimeFacade(game);
+function createTransitionRecordingAdapter(game) {
+    const recordingPort = getTransitionRecordingPort(game);
     const recorder = getLegacyRoundRecorder(game);
     return {
         finalizeRound(winner, players, options = undefined) {
-            return runtimeFacade?.finalizeRoundRecording?.(winner, players, options)
+            return recordingPort?.finalizeRound?.(winner, players, options)
                 ?? recorder?.finalizeRound?.(winner, players, options);
         },
         dump() {
-            return runtimeFacade?.dumpRoundRecording?.()
+            return recordingPort?.dump?.()
                 ?? recorder?.dump?.();
         },
         getLastRoundMetrics() {
-            return runtimeFacade?.getLastRoundRecordingMetrics?.()
+            return recordingPort?.getLastRoundMetrics?.()
                 ?? recorder?.getLastRoundMetrics?.()
                 ?? null;
         },
         getAggregateMetrics() {
-            return runtimeFacade?.getAggregateRecordingMetrics?.()
+            return recordingPort?.getAggregateMetrics?.()
                 ?? recorder?.getAggregateMetrics?.()
                 ?? null;
         },
         getLastRoundGhostClip(players, options = undefined) {
-            return runtimeFacade?.getLastRoundGhostClip?.(players, options)
+            return recordingPort?.getLastRoundGhostClip?.(players, options)
                 ?? recorder?.getLastRoundGhostClip?.(players, options)
                 ?? null;
+        },
+        recordRoundEndTelemetry(payload = null) {
+            return recordingPort?.recordRoundEndTelemetry?.(payload);
+        },
+        recordMatchEndTelemetry(payload = null) {
+            return recordingPort?.recordMatchEndTelemetry?.(payload);
         },
     };
 }
 
-function createLegacySessionTransitionAdapter(game) {
-    const runtimeFacade = getLegacyRuntimeFacade(game);
+function createTransitionSessionAdapter(game) {
+    const lifecyclePort = getTransitionLifecyclePort(game);
+    const uiFeedbackPort = getTransitionUiFeedbackPort(game);
+    const recordingAdapter = createTransitionRecordingAdapter(game);
     return {
         initializeSession() {
-            return runtimeFacade?.initializeSession?.();
+            return lifecyclePort?.initializeSession?.();
         },
         waitForAllPlayersLoaded() {
-            return runtimeFacade?.waitForAllPlayersLoaded?.();
+            return lifecyclePort?.waitForAllPlayersLoaded?.();
         },
         startArcadeRunIfEnabled() {
-            return runtimeFacade?.startArcadeRunIfEnabled?.();
+            return lifecyclePort?.startArcadeRunIfEnabled?.();
         },
         recordRoundEndTelemetry(payload = null) {
-            return runtimeFacade?.recordRoundEndTelemetry?.(payload);
+            return recordingAdapter.recordRoundEndTelemetry(payload);
         },
         recordMatchEndTelemetry(payload = null) {
-            return runtimeFacade?.recordMatchEndTelemetry?.(payload);
+            return recordingAdapter.recordMatchEndTelemetry(payload);
         },
         getSessionRuntimeSnapshot() {
-            return {
-                isNetworkSession: runtimeFacade?.isNetworkSession?.() === true,
-                isHost: runtimeFacade?.isHost?.() !== false,
-            };
+            return resolveTransitionSessionSnapshot(game);
         },
         syncP2HudVisibility(isVisible) {
             const p2Hud = game?.ui?.p2Hud;
@@ -96,41 +122,41 @@ function createLegacySessionTransitionAdapter(game) {
                 p2Hud.classList.toggle('hidden', !isVisible);
                 return;
             }
-            runtimeFacade?.syncP2HudVisibility?.();
+            uiFeedbackPort?.toggleP2Hud?.(isVisible);
         },
     };
 }
 
 export function getArcadeMenuSurfaceState(runtimePort, game) {
     return runtimePort?.getArcadeMenuSurfaceState?.()
-        ?? createLegacyArcadeTransitionAdapter(game).getMenuSurfaceState();
+        ?? createTransitionArcadeAdapter(game).getMenuSurfaceState();
 }
 
 export function selectArcadeIntermissionChoice(runtimePort, game, choiceId) {
     return runtimePort?.selectArcadeIntermissionChoice?.(choiceId)
-        ?? createLegacyArcadeTransitionAdapter(game).selectIntermissionChoice(choiceId);
+        ?? createTransitionArcadeAdapter(game).selectIntermissionChoice(choiceId);
 }
 
 export function selectArcadeReward(runtimePort, game, rewardId) {
     return runtimePort?.selectArcadeReward?.(rewardId)
-        ?? createLegacyArcadeTransitionAdapter(game).selectReward(rewardId);
+        ?? createTransitionArcadeAdapter(game).selectReward(rewardId);
 }
 
 export function requestArcadeReplayPlayback(runtimePort, game) {
     return runtimePort?.requestArcadeReplayPlayback?.()
-        ?? createLegacyArcadeTransitionAdapter(game).requestReplayPlayback();
+        ?? createTransitionArcadeAdapter(game).requestReplayPlayback();
 }
 
 export function getLastRoundRecordingMetrics(runtimePort, game, roundEndPlan) {
     return roundEndPlan?.recording?.roundMetrics
         || runtimePort?.getLastRoundRecordingMetrics?.()
-        || createLegacyRecordingTransitionAdapter(game).getLastRoundMetrics()
+        || createTransitionRecordingAdapter(game).getLastRoundMetrics()
         || null;
 }
 
 export function getLastRoundGhostClip(runtimePort, game, options = undefined) {
     return runtimePort?.getLastRoundGhostClip?.(game?.entityManager?.players, options)
-        ?? createLegacyRecordingTransitionAdapter(game).getLastRoundGhostClip(game?.entityManager?.players, options);
+        ?? createTransitionRecordingAdapter(game).getLastRoundGhostClip(game?.entityManager?.players, options);
 }
 
 export function createRoundEndRecorderAdapter(runtimePort, game) {
@@ -150,37 +176,37 @@ export function createRoundEndRecorderAdapter(runtimePort, game) {
     if (typeof runtimePort?.getLastRoundGhostClip === 'function') {
         adapter.getLastRoundGhostClip = (players, options = undefined) => runtimePort.getLastRoundGhostClip(players, options);
     }
-    return Object.keys(adapter).length > 0 ? adapter : createLegacyRecordingTransitionAdapter(game);
+    return Object.keys(adapter).length > 0 ? adapter : createTransitionRecordingAdapter(game);
 }
 
 export function initializeMatchSession(runtimePort, game) {
     return runtimePort?.initializeSession?.()
-        ?? createLegacySessionTransitionAdapter(game).initializeSession();
+        ?? createTransitionSessionAdapter(game).initializeSession();
 }
 
 export function waitForMatchPlayersLoaded(runtimePort, game) {
     return runtimePort?.waitForAllPlayersLoaded?.()
-        ?? createLegacySessionTransitionAdapter(game).waitForAllPlayersLoaded();
+        ?? createTransitionSessionAdapter(game).waitForAllPlayersLoaded();
 }
 
 export function startArcadeRunIfEnabled(runtimePort, game) {
     return runtimePort?.startArcadeRunIfEnabled?.()
-        ?? createLegacySessionTransitionAdapter(game).startArcadeRunIfEnabled();
+        ?? createTransitionSessionAdapter(game).startArcadeRunIfEnabled();
 }
 
 export function recordRoundEndTelemetry(runtimePort, game, payload = null) {
     return runtimePort?.recordRoundEndTelemetry?.(payload)
-        ?? createLegacySessionTransitionAdapter(game).recordRoundEndTelemetry(payload);
+        ?? createTransitionSessionAdapter(game).recordRoundEndTelemetry(payload);
 }
 
 export function recordMatchEndTelemetry(runtimePort, game, payload = null) {
     return runtimePort?.recordMatchEndTelemetry?.(payload)
-        ?? createLegacySessionTransitionAdapter(game).recordMatchEndTelemetry(payload);
+        ?? createTransitionSessionAdapter(game).recordMatchEndTelemetry(payload);
 }
 
 export function getMatchSessionAccessSnapshot(runtimePort, game) {
     return runtimePort?.getSessionRuntimeSnapshot?.()
-        ?? createLegacySessionTransitionAdapter(game).getSessionRuntimeSnapshot();
+        ?? createTransitionSessionAdapter(game).getSessionRuntimeSnapshot();
 }
 
 export function syncMatchP2HudVisibility(runtimePort, game, isVisible) {
@@ -188,5 +214,5 @@ export function syncMatchP2HudVisibility(runtimePort, game, isVisible) {
         runtimePort.toggleP2Hud(isVisible);
         return;
     }
-    createLegacySessionTransitionAdapter(game).syncP2HudVisibility(isVisible);
+    createTransitionSessionAdapter(game).syncP2HudVisibility(isVisible);
 }
