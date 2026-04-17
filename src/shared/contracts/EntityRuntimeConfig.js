@@ -212,6 +212,11 @@ export function createEntityRuntimeConfig(runtimeConfig = null, baseConfig = nul
 }
 
 export function resolveEntityRuntimeConfig(source, fallback = DEFAULT_ENTITY_RUNTIME_CONFIG) {
+    // If source IS already a resolved entityRuntimeConfig (has both POWERUP and PLAYER sections),
+    // return it directly instead of looking for a nested property.
+    if (source && typeof source === 'object' && 'POWERUP' in source && 'PLAYER' in source) {
+        return source;
+    }
     const candidate = source?.entityRuntimeConfig
         || source?.services?.entityRuntimeConfig
         || source?.runtime?.services?.entityRuntimeConfig
