@@ -107,15 +107,17 @@ function renderFormContent() {
     const section = SECTIONS.find((s) => s.key === state.activeSection);
     refs.sectionTitle.textContent = section ? t(section.labelKey) : state.activeSection;
 
+    const translator = createTranslator(state.language);
+    const validationErrors = state.validation?.errors || [];
     let html;
     if (state.activeSection === 'limits') {
-        html = renderLimitsSection(state.schema, state.draft, state.baseDraft, createTranslator(state.language));
+        html = renderLimitsSection(state.schema, state.draft, state.baseDraft, translator);
     } else if (state.activeSection === 'fixedPresets') {
-        html = renderPresetsSection(state.draft, state.baseDraft, createTranslator(state.language));
+        html = renderPresetsSection(state.draft, state.baseDraft, translator);
     } else if (state.activeSection === 'backups') {
-        html = renderBackupsList(state.backups, createTranslator(state.language));
+        html = renderBackupsList(state.backups, translator);
     } else {
-        html = renderSectionForm(state.activeSection, state.schema, state.draft, state.baseDraft, createTranslator(state.language));
+        html = renderSectionForm(state.activeSection, state.schema, state.draft, state.baseDraft, translator, validationErrors);
     }
 
     refs.formContent.innerHTML = html;
@@ -387,10 +389,21 @@ function bindEvents() {
     });
 }
 
+function isDraftDirty() {
+    if (!state.draft || !state.baseDraft) return false;
+    return JSON.stringify(state.draft) !== JSON.stringify(state.baseDraft);
+}
+
 function bootstrap() {
     renderStaticTexts();
     setStatus('statusReady');
     bindEvents();
+    window.addEventListener('beforeunload', (event) => {
+        if (isDraftDirty()) {
+            event.preventDefault();
+            event.returnValue = t('unsavedChangesWarning');
+        }
+    });
     void loadState().catch((err) => setStatus(`${t('statusError')}: ${err.message}`));
 }
 

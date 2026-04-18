@@ -1,4 +1,4 @@
-import { fieldLabel, categoryLabel } from './settings-studio-i18n.js';
+import { fieldLabel, categoryLabel, translateValidationError } from './settings-studio-i18n.js';
 
 function readPath(obj, path) {
     const parts = String(path || '').split('.');
@@ -48,23 +48,34 @@ function renderFieldInput(field, value, dirty) {
     return `<textarea class="field-input field-input--textarea" data-path="${esc(path)}" data-type="json" ${dirtyAttr}>${esc(jsonValue)}</textarea>`;
 }
 
-function renderFieldRow(field, draft, baseDraft, t) {
-    const value = readPath(draft, field.path);
-    const dirty = isDirty(draft, baseDraft, field.path);
-    const label = fieldLabel(field.path);
-    const input = renderFieldInput(field, value, dirty);
-    const rowClass = dirty ? 'field-row dirty' : 'field-row';
-    const resetBtn = `<button class="field-reset-btn" data-action="reset-field" data-path="${esc(field.path)}" ${dirty ? 'data-dirty="true"' : ''}>${t('buttonResetField')}</button>`;
-    return `<div class="${rowClass}"><span class="field-label" title="${esc(field.path)}">${esc(label)}</span>${input}${resetBtn}</div>`;
+function renderFieldError(fieldErrors, t) {
+    if (!fieldErrors || !fieldErrors.length) return '';
+    const messages = fieldErrors.map((e) => `<span class="field-error">${esc(translateValidationError(e, t))}</span>`).join('');
+    return `<div class="field-error-list">${messages}</div>`;
 }
 
-function renderFieldGroup(category, fields, draft, baseDraft, t) {
-    const rows = fields.map((f) => renderFieldRow(f, draft, baseDraft, t)).join('');
+function renderFieldRow(field, draft, baseDraft, t, validationErrors) {
+    const value = readPath(draft, field.path);
+    const dirty = isDirty(draft, baseDraft, field.path);
+    const fieldErrors = Array.isArray(validationErrors)
+        ? validationErrors.filter((e) => e.path === field.path)
+        : [];
+    const hasError = fieldErrors.length > 0;
+    const label = fieldLabel(field.path);
+    const input = renderFieldInput(field, value, dirty);
+    const classes = ['field-row', dirty ? 'dirty' : '', hasError ? 'has-error' : ''].filter(Boolean).join(' ');
+    const resetBtn = `<button class="field-reset-btn" data-action="reset-field" data-path="${esc(field.path)}" ${dirty ? 'data-dirty="true"' : ''}>${t('buttonResetField')}</button>`;
+    const errorHtml = renderFieldError(fieldErrors, t);
+    return `<div class="${classes}"><span class="field-label" title="${esc(field.path)}">${esc(label)}</span>${input}${resetBtn}${errorHtml}</div>`;
+}
+
+function renderFieldGroup(category, fields, draft, baseDraft, t, validationErrors) {
+    const rows = fields.map((f) => renderFieldRow(f, draft, baseDraft, t, validationErrors)).join('');
     const title = categoryLabel(category, t);
     return `<div class="field-group"><h3 class="field-group__title">${esc(title)}</h3>${rows}</div>`;
 }
 
-export function renderSectionForm(sectionKey, schema, draft, baseDraft, t) {
+export function renderSectionForm(sectionKey, schema, draft, baseDraft, t, validationErrors) {
     const fields = Array.isArray(schema?.fields)
         ? schema.fields.filter((f) => f.section === sectionKey)
         : [];
@@ -77,7 +88,7 @@ export function renderSectionForm(sectionKey, schema, draft, baseDraft, t) {
             const dirtyAttr = dirty ? 'data-dirty="true"' : '';
             return `<div class="field-group"><textarea class="field-input field-input--textarea" style="width:100%;height:300px;" data-path="${esc(sectionKey)}" data-type="json" ${dirtyAttr}>${esc(jsonStr)}</textarea></div>`;
         }
-        return '<div class="field-group"><em>Keine Felder verfuegbar.</em></div>';
+        return `<div class="field-group"><em>${esc(t('noFields'))}</em></div>`;
     }
 
     const groups = new Map();
@@ -88,7 +99,7 @@ export function renderSectionForm(sectionKey, schema, draft, baseDraft, t) {
     }
 
     return [...groups.entries()]
-        .map(([cat, catFields]) => renderFieldGroup(cat, catFields, draft, baseDraft, t))
+        .map(([cat, catFields]) => renderFieldGroup(cat, catFields, draft, baseDraft, t, validationErrors))
         .join('');
 }
 
@@ -97,7 +108,7 @@ export function renderPresetsSection(draft, baseDraft, t) {
     const basePresets = Array.isArray(baseDraft?.fixedPresets) ? baseDraft.fixedPresets : [];
 
     if (!presets.length) {
-        return '<div class="field-group"><em>Keine Presets vorhanden.</em></div>';
+        return `<div class="field-group"><em>${esc(t('noPresets'))}</em></div>`;
     }
 
     const items = presets.map((preset, idx) => {

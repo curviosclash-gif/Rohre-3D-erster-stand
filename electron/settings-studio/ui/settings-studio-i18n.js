@@ -24,7 +24,10 @@ const DICTIONARY = Object.freeze({
         sectionBackups: 'Backups & Restore',
         buttonRestore: 'Wiederherstellen',
         restoreConfirm: 'Backup wirklich wiederherstellen? Aktuelle Daten werden vorher gesichert.',
+        unsavedChangesWarning: 'Es gibt ungespeicherte Aenderungen. Seite wirklich verlassen?',
         noBackups: 'Keine Backups vorhanden.',
+        noFields: 'Keine Felder verfuegbar.',
+        noPresets: 'Keine Presets vorhanden.',
         categoryGameplay: 'Gameplay',
         categoryBotBridge: 'Bot Bridge',
         categoryHunt: 'Hunt',
@@ -40,6 +43,21 @@ const DICTIONARY = Object.freeze({
         limitsColMin: 'min',
         limitsColMax: 'max',
         limitsColStep: 'step',
+        errorSCHEMA_VERSION_MISMATCH: 'Schema-Version stimmt nicht ueberein.',
+        errorLIMIT_MIN_INVALID: 'Minimum-Grenze ist ungueltig.',
+        errorLIMIT_MAX_INVALID: 'Maximum-Grenze ist ungueltig.',
+        errorLIMIT_STEP_INVALID: 'Step-Grenze ist ungueltig.',
+        errorLIMIT_STEP_NON_POSITIVE: 'Step muss groesser als 0 sein.',
+        errorLIMIT_RANGE_INVALID: 'Minimum darf nicht groesser als Maximum sein.',
+        errorLIMIT_FIELD_UNKNOWN: 'Unbekanntes Feld fuer Limit-Override.',
+        errorFIELD_NUMBER_INVALID: 'Ungueltige Zahl.',
+        errorFIELD_NUMBER_BELOW_MIN: (min) => `Wert liegt unter dem Minimum (${min}).`,
+        errorFIELD_NUMBER_ABOVE_MAX: (max) => `Wert liegt ueber dem Maximum (${max}).`,
+        errorFIELD_NUMBER_STEP_MISALIGN: 'Wert liegt nicht auf dem Step-Raster.',
+        errorFIELD_INTEGER_REQUIRED: 'Ganze Zahl erforderlich.',
+        errorFIELD_BOOLEAN_INVALID: 'Boolean-Wert erwartet.',
+        errorFIELD_STRING_INVALID: 'Text-Wert erwartet.',
+        errorFIELD_PRESETS_INVALID: 'fixedPresets muss ein Array sein.',
     }),
     en: Object.freeze({
         title: 'CurviosClash Settings Studio',
@@ -66,7 +84,10 @@ const DICTIONARY = Object.freeze({
         sectionBackups: 'Backups & Restore',
         buttonRestore: 'Restore',
         restoreConfirm: 'Restore this backup? Current data will be backed up first.',
+        unsavedChangesWarning: 'There are unsaved changes. Leave page?',
         noBackups: 'No backups available.',
+        noFields: 'No fields available.',
+        noPresets: 'No presets available.',
         categoryGameplay: 'Gameplay',
         categoryBotBridge: 'Bot Bridge',
         categoryHunt: 'Hunt',
@@ -82,6 +103,21 @@ const DICTIONARY = Object.freeze({
         limitsColMin: 'min',
         limitsColMax: 'max',
         limitsColStep: 'step',
+        errorSCHEMA_VERSION_MISMATCH: 'Schema version mismatch.',
+        errorLIMIT_MIN_INVALID: 'Invalid minimum limit.',
+        errorLIMIT_MAX_INVALID: 'Invalid maximum limit.',
+        errorLIMIT_STEP_INVALID: 'Invalid step limit.',
+        errorLIMIT_STEP_NON_POSITIVE: 'Step must be greater than 0.',
+        errorLIMIT_RANGE_INVALID: 'Minimum must not exceed maximum.',
+        errorLIMIT_FIELD_UNKNOWN: 'Unknown field for limit override.',
+        errorFIELD_NUMBER_INVALID: 'Invalid number.',
+        errorFIELD_NUMBER_BELOW_MIN: (min) => `Value is below minimum (${min}).`,
+        errorFIELD_NUMBER_ABOVE_MAX: (max) => `Value exceeds maximum (${max}).`,
+        errorFIELD_NUMBER_STEP_MISALIGN: 'Value does not align with step grid.',
+        errorFIELD_INTEGER_REQUIRED: 'Integer required.',
+        errorFIELD_BOOLEAN_INVALID: 'Boolean value expected.',
+        errorFIELD_STRING_INVALID: 'String value expected.',
+        errorFIELD_PRESETS_INVALID: 'fixedPresets must be an array.',
     }),
 });
 
@@ -108,6 +144,21 @@ export const SECTIONS = Object.freeze([
     { key: 'limits', labelKey: 'sectionLimits' },
     { key: 'backups', labelKey: 'sectionBackups', noDirty: true },
 ]);
+
+export function translateValidationError(error, t) {
+    if (!error) return '';
+    const key = `error${error.code}`;
+    const entry = DICTIONARY.de[key] ?? null;
+    if (entry == null) return error.message || error.code || '';
+    const translated = t(key);
+    if (translated === key) return error.message || error.code || '';
+    if (typeof DICTIONARY.de[key] === 'function') {
+        const match = (error.message || '').match(/\(([^)]+)\)/);
+        const param = match ? match[1] : '';
+        return t(key, param);
+    }
+    return translated;
+}
 
 export function fieldLabel(path) {
     const parts = String(path || '').split('.');

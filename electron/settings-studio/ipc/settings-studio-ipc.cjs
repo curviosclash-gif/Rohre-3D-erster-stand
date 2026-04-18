@@ -1,6 +1,7 @@
 const schemaService = require('../services/SettingsSchemaService.cjs');
 const { SettingsOverrideFileService } = require('../services/SettingsOverrideFileService.cjs');
 const { SettingsBackupService } = require('../services/SettingsBackupService.cjs');
+const { SettingsPrefsService } = require('../services/SettingsPrefsService.cjs');
 
 const CHANNELS = Object.freeze({
     load: 'settings-studio:load',
@@ -31,12 +32,15 @@ function createValidationSnapshot(validationResult) {
 function registerSettingsStudioIpc({ ipcMain, app }) {
     const fileService = new SettingsOverrideFileService({ app });
     const backupService = new SettingsBackupService({ app });
+    const prefsService = new SettingsPrefsService({ app });
 
     ipcMain.handle(CHANNELS.load, async () => {
+        const prefs = prefsService.loadPrefs();
         const schema = await schemaService.getSchemaDescriptor();
         const fallbackDraft = await schemaService.createDraft();
         const loaded = await fileService.loadDraft({ fallbackDraft });
-        const validation = await schemaService.validateDraft(loaded.draft);
+        const draftWithPrefLang = { ...loaded.draft, language: prefs.language };
+        const validation = await schemaService.validateDraft(draftWithPrefLang);
         const backups = await backupService.listBackups({ limit: 20 });
 
         return {
@@ -142,9 +146,11 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
     });
 
     ipcMain.handle(CHANNELS.setLanguage, async (_event, language) => {
+        const normalized = normalizeLanguage(language);
+        prefsService.savePrefs({ language: normalized });
         return {
             ok: true,
-            language: normalizeLanguage(language),
+            language: normalized,
         };
     });
 
