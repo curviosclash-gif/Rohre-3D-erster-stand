@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
 Stand: 2026-04-18. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-Naechste offene Subphase: V82 `82.4` (Ghost-Replay). V82 Phase 82.3 abgeschlossen 2026-04-18. Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+Naechste offene Subphase: V82 `82.5` (Branching-Routen). V82 Phase 82.4 abgeschlossen 2026-04-18. Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -46,9 +46,10 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
-| V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.4 | `docs/plaene/aktiv/V82.md` |
+| V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.5 | `docs/plaene/aktiv/V82.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
+| V97 | Settings Studio Erklaerbarkeit, Save-Vorschau und Hardening | planned | P2 | frei | V95.99,V77.99,V92.99 | 97.1 | `docs/plaene/aktiv/V97.md` |
 
 ## Abhaengigkeiten
 
@@ -64,6 +65,11 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V95 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 ist abgeschlossen und bleibt Leitplanke fuer neue Config-Pfade |
 | V95 | V81.99 | soft | nein | UI-/IPC-Synergien mit Developer-Tuning sinnvoll, aber nicht blockierend |
 | V95 | V64.99 | soft | nein | Lifecycle-Polish kann Integrationsaufwand spaeter senken, ist aber kein Startblocker |
+| V97 | V95.99 | hard | ja | V95 liefert die Settings-Studio-Basis; V97 haertet UX, Migration und Diagnose auf diesem Pfad |
+| V97 | V77.99 | hard | ja | Surface-Policy aus V77 bleibt bindend; V97 bleibt Desktop-only |
+| V97 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 bleibt Leitplanke fuer neue Config-, Diagnose- und Migrationspfade |
+| V97 | V81.99 | soft | nein | Dev-Tuning-/Diagnose-Synergien sind sinnvoll, aber kein Startblocker |
+| V97 | V64.99 | soft | nein | Desktop-Lifecycle-Polish kann Fokus-/Dialoghaertung spaeter vereinfachen, blockiert aber nicht |
 
 ## Lock-Status
 
@@ -88,6 +94,7 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V86 | - | frei | Siehe docs/lock-status/ |
 | - | V94 | - | frei | Siehe docs/lock-status/ |
 | - | V95 | - | frei | Siehe docs/lock-status/ |
+| - | V97 | - | frei | Siehe docs/lock-status/ |
 
 ## Empfohlene Reihenfolge
 
@@ -108,6 +115,7 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 4. `V91` vor `V92`, damit Guard-Ratchet und Legacy-Surface-Sunset die Ausgangsbasis fuer Ownership-Schnitt und Orchestrator-Zuschnitt sind.
 5. `V92` vor `V64` und `V81`, damit Multiplayer-Produktisierung und Developer-Tuning keine neuen Runtime-, Port- oder Config-Backdoors auf alte Surfaces bauen.
 6. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
+7. `V97` folgt nach `V95.99` als gezielter Produkt-Hardening-Block fuer Settings Studio; Erklaer-UX, Save-Vorschau und Migrationspfade koennen parallel zu Gameplay-Folgearbeit laufen, solange Desktop-only Surface-Policy und V92-Ratchet eingehalten bleiben.
 
 ### Parallelpfad Gameplay und Authoring
 
@@ -120,7 +128,7 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 `V72.99 -> V77 -> V91 -> V92 -> V64 -> V75`
 
-Parallel nach `V72.99` moeglich: `V82` in daten- und regelnahen Phasen, spaeter `V76`; `V86` nutzt den abgeschlossenen V85-Vertragsrahmen als Baseline und sollte bei Runtime-/Capability-Verbrauch denselben V92-Ownership-Schnitt lesen; `V81` nach `V92` oder spaetestens mit denselben Guard-Leitplanken. Die desktop-first-Hauptgates aus `V89` sind jetzt die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
+Parallel nach `V72.99` moeglich: `V82` in daten- und regelnahen Phasen, spaeter `V76`; `V86` nutzt den abgeschlossenen V85-Vertragsrahmen als Baseline und sollte bei Runtime-/Capability-Verbrauch denselben V92-Ownership-Schnitt lesen; `V81` nach `V92` oder spaetestens mit denselben Guard-Leitplanken. Nach `V95.99` ist zudem `V97` als kompakter Desktop-Hardening-Block fuer Settings Studio parallel moeglich. Die desktop-first-Hauptgates aus `V89` sind jetzt die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
 
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
