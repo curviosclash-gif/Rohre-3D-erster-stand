@@ -44,6 +44,12 @@ function toSafeInt(value, fallback = 0) {
     return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+// 82.1.1: Known sector types
+export const ARCADE_SECTOR_TYPES = Object.freeze({
+    ARENA: 'sector_arena',
+    PARCOURS: 'sector_parcours',
+});
+
 export class ArcadeModeStrategy extends GameModeContract {
     constructor() {
         super();
@@ -55,6 +61,8 @@ export class ArcadeModeStrategy extends GameModeContract {
         this._sdAccumulatedSeconds = 0;
         this._sdStackedModifiers = [];
         this._sdDamageMultiplier = 1.0;
+        // 82.1.1: Current sector type (null = default arena)
+        this._sectorType = null;
     }
 
     // --- Lifecycle (V84 / 84.3.2) ---
@@ -181,6 +189,20 @@ export class ArcadeModeStrategy extends GameModeContract {
             damageMultiplier: this._sdDamageMultiplier,
             accumulatedSeconds: this._sdAccumulatedSeconds,
         };
+    }
+
+    // 82.1.1: Sector type — set by ArcadeRunRuntime when a sector begins
+    setSectorType(sectorType) {
+        this._sectorType = typeof sectorType === 'string' ? sectorType : null;
+    }
+
+    getSectorType() {
+        return this._sectorType;
+    }
+
+    /** Returns true when the current sector is a parcours time-trial (no combat). */
+    isSectorParcours() {
+        return this._sectorType === ARCADE_SECTOR_TYPES.PARCOURS;
     }
 
     // 61.4.1: Active sector modifier

@@ -7,6 +7,8 @@ export const SECTOR_MAP_POOLS = Object.freeze({
     sector_pressure: Object.freeze(['maze', 'vertical_maze', 'trench', 'neon_abyss']),
     sector_hazard: Object.freeze(['complex', 'pyramid', 'crystal_ruins']),
     sector_endurance: Object.freeze(['expert_gauntlet', 'portal_madness', 'crystal_ruins']),
+    // 82.1.1: Parcours sector — uses parcours maps exclusively
+    sector_parcours: Object.freeze(['parcours_rift']),
 });
 
 import { createSeededRandom } from '../../shared/utils/ArcadeUtils.js';

@@ -95,6 +95,19 @@ export const ARCADE_SECTOR_CATALOG = Object.freeze([
         rewardPool: ['run_combo_t1', 'run_pickup_t1', 'run_portal_t1'],
         mapPool: ['expert_gauntlet', 'portal_madness', 'crystal_ruins'],
     }),
+    // 82.1.1: Parcours sector — inserted every PARCOURS_SECTOR_INTERVAL sectors.
+    // No squad/modifier: completion is triggered by checkpoint finish, not kill/timer.
+    Object.freeze({
+        id: 'sector_parcours',
+        minSector: -1, // not selected by range lookup; inserted explicitly in buildArcadeSectorPlan
+        maxSector: -1,
+        parcoursEnabled: true,
+        squadPool: [],
+        objectivePool: ['parcours_run'],
+        modifierPool: [],
+        rewardPool: ['run_speed_t1', 'run_armor_t1', 'run_combo_t1'],
+        mapPool: ['parcours_rift'],
+    }),
 ]);
 
 import { createSeededRandom } from '../../shared/utils/ArcadeUtils.js';
@@ -121,6 +134,10 @@ function getSectorTemplate(sectorNumber) {
     )) || ARCADE_SECTOR_CATALOG[ARCADE_SECTOR_CATALOG.length - 1];
 }
 
+// 82.1.4: Parcours sectors appear every PARCOURS_SECTOR_INTERVAL positions (e.g. sector 4, 8, 12…).
+// The final sector is always a boss sector regardless of interval alignment.
+const PARCOURS_SECTOR_INTERVAL = 4;
+
 function resolveDifficultyScale(difficulty) {
     const key = String(difficulty || 'normal').toLowerCase();
     if (key === 'easy') return 0.9;
@@ -136,10 +153,35 @@ export function buildArcadeSectorPlan(options = {}) {
     );
     const randomFn = createSeededRandom(options.seed);
     const difficultyScale = resolveDifficultyScale(options.difficulty);
+    const parcoursTemplate = ARCADE_SECTOR_CATALOG.find((t) => t.id === 'sector_parcours');
     const sequence = [];
 
     for (let sectorIndex = 0; sectorIndex < sectorCount; sectorIndex += 1) {
         const sectorNumber = sectorIndex + 1;
+        // 82.1.1/82.1.4: Parcours slot every PARCOURS_SECTOR_INTERVAL — but never on the final boss sector.
+        const isBoss = sectorIndex === sectorCount - 1;
+        const isParcours = !isBoss && sectorNumber % PARCOURS_SECTOR_INTERVAL === 0;
+
+        if (isParcours && parcoursTemplate) {
+            const mapKey = pickFromPool(parcoursTemplate.mapPool, randomFn);
+            const rewardChoices = pickDistinctFromPool(parcoursTemplate.rewardPool, 2, randomFn);
+            sequence.push({
+                sectorNumber,
+                templateId: 'sector_parcours',
+                squadId: null,
+                objectiveId: 'parcours_run',
+                modifierId: null,
+                scoreBonus: 0,
+                rewardChoices,
+                pressure: 0,
+                mapKey,
+                isBoss: false,
+                bossMultiplier: 1,
+                parcoursEnabled: true,
+            });
+            continue;
+        }
+
         const template = getSectorTemplate(sectorNumber);
         const squadId = pickFromPool(template.squadPool, randomFn);
         const objectiveId = pickFromPool(template.objectivePool, randomFn);
@@ -153,7 +195,6 @@ export function buildArcadeSectorPlan(options = {}) {
         const mapKey = pickFromPool(template.mapPool || ['standard'], randomFn);
 
         // 61.5.2: Final sector is a boss sector — elite_lance, double score multiplier
-        const isBoss = sectorIndex === sectorCount - 1;
         const resolvedSquadId = isBoss ? 'elite_lance' : squadId;
         const bossPressure = isBoss
             ? Math.min(1.0, (ARCADE_SQUAD_PROFILES.elite_lance?.pressure || 0.85) * 1.2 * difficultyScale)

@@ -122,6 +122,8 @@ export class ArcadeRunRuntime {
         this._pendingIntermissionEffects = null;
         this._latestReplaySnapshot = null;
         this._strategy = options.strategy || null;
+        // 82.1.1: Current sector type ('sector_parcours' | null)
+        this._currentSectorType = null;
     }
 
     _nextRunId(nowMs = Date.now()) {
@@ -243,6 +245,27 @@ export class ArcadeRunRuntime {
     getVehicleProfile() {
         if (!this._vehicleProfiles || !this._activeVehicleId) return null;
         return getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
+    }
+
+    // 82.1.1: Whether the current sector is a parcours time-trial sector
+    isCurrentSectorParcours() {
+        return this._currentSectorType === 'sector_parcours';
+    }
+
+    _resolveSectorType(sectorIndex) {
+        const seq = this._state?.encounterSequence;
+        if (!Array.isArray(seq) || sectorIndex < 1) return null;
+        const entry = seq[sectorIndex - 1];
+        if (!entry || typeof entry !== 'object') return null;
+        return entry.parcoursEnabled === true ? 'sector_parcours' : null;
+    }
+
+    _applySectorType(sectorIndex) {
+        const sectorType = this._resolveSectorType(sectorIndex);
+        this._currentSectorType = sectorType;
+        if (this._strategy && typeof this._strategy.setSectorType === 'function') {
+            try { this._strategy.setSectorType(sectorType); } catch { /* no-op */ }
+        }
     }
 
     // 61.4.1: Active modifier for the current sector
@@ -702,6 +725,9 @@ export class ArcadeRunRuntime {
         this._activeModifierId = this._resolveModifierForSector(this._state.sectorIndex);
         this._notifyModifierChanged(this._activeModifierId);
 
+        // 82.1.1: Apply sector type (parcours vs arena)
+        this._applySectorType(this._state.sectorIndex);
+
         // Assign initial missions
         this._assignMissionsForCurrentSector();
 
@@ -781,6 +807,9 @@ export class ArcadeRunRuntime {
         this._activeModifierId = this._resolveModifierForSector(this._state.sectorIndex);
         this._notifyModifierChanged(this._activeModifierId);
 
+        // 82.1.1: Apply sector type (parcours vs arena)
+        this._applySectorType(this._state.sectorIndex);
+
         // 61.6.2: Notify when Sudden Death phase is entered
         if (this._state.phase === ARCADE_RUN_PHASES.SUDDEN_DEATH) {
             if (!this._state.suddenDeathStartedAtMs || this._state.suddenDeathStartedAtMs <= 0) {
@@ -808,6 +837,55 @@ export class ArcadeRunRuntime {
         );
         this._missionState = createSectorMissionState(missions);
         this._state.missions = this._missionState;
+    }
+
+    /**
+     * 82.1.2: Complete the current sector when triggered by parcours checkpoint-finish.
+     * Called externally (e.g. from GameRuntimeFacade) when ParcoursProgressSystem.getRoundOutcome()
+     * returns { shouldEnd: true }. The player is always considered alive at this point.
+     * @param {Object} parcoursResult - Result from ParcoursProgressSystem.getRoundOutcome()
+     * @returns {Object|null} Round end plan with intermission prepared, or null if not enabled.
+     */
+    completeParcoursSector(parcoursResult = {}) {
+        if (!this._enabled || !this._state) return null;
+        if (!this.isCurrentSectorParcours()) return null;
+
+        const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
+        this._state = completeArcadeSector(this._state, nowMs);
+        // Parcours completion: human player always continues (not finished by death)
+        this._prepareIntermission(nowMs);
+
+        const scoreTotal = Math.max(0, toSafeNumber(this._state?.score?.total, 0));
+        const sectorLabel = `${this._state.completedSectors}/${this._state.config.sectorCount}`;
+        const completionMs = Math.max(0, toSafeNumber(parcoursResult?.parcours?.completionTimeMs, 0));
+        const completionSec = completionMs > 0 ? (completionMs / 1000).toFixed(2) : '?';
+        const messageText = `Parcours abgeschlossen — ${completionSec}s | Sektor ${sectorLabel}`;
+        const messageSub = 'Intermission: naechster Sektor';
+
+        return {
+            outcome: {
+                state: 'ROUND_END',
+                canWinMatch: true,
+                requiredWins: 1,
+                matchWinner: null,
+                messageText,
+                messageSub,
+                arcade: {
+                    phase: this._state.phase,
+                    sectorIndex: this._state.sectorIndex,
+                    completedSectors: this._state.completedSectors,
+                    score: scoreTotal,
+                    intermission: this.getIntermissionState(),
+                    parcours: parcoursResult?.parcours || null,
+                },
+            },
+            transition: {
+                roundPause: Number(this._config.intermissionSeconds) || 3,
+                nextState: 'ROUND_END',
+                overlayMessageText: messageText,
+                overlayMessageSub: messageSub,
+            },
+        };
     }
 
     deriveRoundEndPlan({ players, inputs = {}, baseController } = {}) {
