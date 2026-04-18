@@ -15,10 +15,15 @@ export class ParcoursProgressSystem {
         this._playerStates = new Map();
         this._completionOrder = [];
         this._xpEventCallback = null;
+        this._leaderboardCallback = null;
     }
 
     setXpEventCallback(callback) {
         this._xpEventCallback = typeof callback === 'function' ? callback : null;
+    }
+
+    setLeaderboardCallback(callback) {
+        this._leaderboardCallback = typeof callback === 'function' ? callback : null;
     }
 
     isEnabled() {
@@ -127,6 +132,7 @@ export class ParcoursProgressSystem {
         state.cooldownByCheckpointId.clear();
         state.lastError = '';
         state.errorUntilMs = 0;
+        state.segmentSplitsMs = [];
         if (preserveCounters) {
             state.wrongOrderCount = previousWrongOrderCount;
             state.resetCount = previousResetCount;
@@ -251,10 +257,21 @@ export class ParcoursProgressSystem {
             player,
             `id=${entry.id} index=${entry.routeIndex + 1}/${this._route.totalCheckpoints}`
         );
+        const splitMs = state.startedAtMs > 0 ? Math.max(0, now - state.startedAtMs) : 0;
+        state.segmentSplitsMs.push(splitMs);
+        const checkpointIndex = state.segmentSplitsMs.length - 1;
+
         const cpXpResult = this._xpEventCallback?.('checkpoint', player.index);
         if (cpXpResult?.earned > 0) {
             this._notifyPlayer(player, `+${cpXpResult.earned} XP`);
         }
+        this._leaderboardCallback?.({
+            type: 'checkpoint',
+            playerIndex: player.index,
+            routeId: this._route.routeId,
+            checkpointIndex,
+            currentSplitMs: splitMs,
+        });
     }
 
     _registerWrongOrder(player, state, entry, now) {
@@ -326,6 +343,13 @@ export class ParcoursProgressSystem {
         if (finishXpResult?.earned > 0) {
             this._notifyPlayer(player, `+${finishXpResult.earned} XP (Parcours)`);
         }
+        this._leaderboardCallback?.({
+            type: 'finish',
+            playerIndex: player.index,
+            routeId: this._route.routeId,
+            totalTimeMs: state.completionTimeMs,
+            segmentSplitsMs: [...state.segmentSplitsMs],
+        });
     }
 
     _findTriggeredEntry(entries, player, previousPosition, now, state) {

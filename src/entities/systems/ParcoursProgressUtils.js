@@ -182,5 +182,6 @@ export function createPlayerProgressState(totalCheckpoints) {
         errorUntilMs: 0,
         lastWrongOrderAtMs: -Infinity,
         cooldownByCheckpointId: new Map(),
+        segmentSplitsMs: [],
     };
 }

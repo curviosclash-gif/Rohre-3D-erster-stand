@@ -30,6 +30,12 @@ import {
     XP_REWARD_TABLE,
 } from '../../state/arcade/ArcadeVehicleProfile.js';
 import {
+    loadLeaderboard,
+    saveLeaderboard,
+    insertLeaderboardEntry,
+    getBestEntry,
+} from '../../state/arcade/ArcadeLeaderboard.js';
+import {
     assignSectorMissions,
     createSectorMissionState,
     updateSectorMissionState,
@@ -125,6 +131,7 @@ export class ArcadeRunRuntime {
         this._strategy = options.strategy || null;
         // 82.1.1: Current sector type ('sector_parcours' | null)
         this._currentSectorType = null;
+        this._leaderboard = null;
     }
 
     _nextRunId(nowMs = Date.now()) {
@@ -152,6 +159,7 @@ export class ArcadeRunRuntime {
         this._config = nextConfig;
         this._enabled = nextConfig.enabled === true;
         this._records = this._readRecordsFromStorage();
+        this._leaderboard = loadLeaderboard(this.settingsManager?.store);
         if (!this._enabled) {
             this.resetRunState({ preserveRecords: true });
         }
@@ -586,9 +594,14 @@ export class ArcadeRunRuntime {
         if (parcoursXpGain) {
             this._state.lastParcoursXpGain = null;
         }
+        const parcoursSegmentSplit = this._state.lastParcoursSegmentSplit || null;
+        if (parcoursSegmentSplit) {
+            this._state.lastParcoursSegmentSplit = null;
+        }
         return {
             nowMs,
             parcoursXpGain,
+            parcoursSegmentSplit,
             phase: String(this._state.phase || ''),
             sectorIndex: Math.max(0, Math.floor(toSafeNumber(this._state.sectorIndex, 0))),
             completedSectors: Math.max(0, Math.floor(toSafeNumber(this._state.completedSectors, 0))),
@@ -1069,6 +1082,51 @@ export class ArcadeRunRuntime {
             };
         }
         return { earned: xpEarned, leveledUp: result.leveledUp, newLevel: result.newLevel };
+    }
+
+    applyParcoursLeaderboardEvent(data) {
+        if (!this._enabled || !data || typeof data !== 'object') return null;
+        const { type, routeId, checkpointIndex, currentSplitMs, totalTimeMs, segmentSplitsMs } = data;
+
+        if (type === 'checkpoint') {
+            if (!this._leaderboard || !routeId) return null;
+            const best = getBestEntry(this._leaderboard, routeId);
+            if (!best || !Array.isArray(best.segmentSplitsMs)) return null;
+            const bestSplitMs = best.segmentSplitsMs[checkpointIndex];
+            if (typeof bestSplitMs !== 'number') return null;
+            const deltaMs = currentSplitMs - bestSplitMs;
+            if (this._state) {
+                this._state.lastParcoursSegmentSplit = {
+                    checkpointIndex,
+                    deltaMs,
+                    isBetter: deltaMs < 0,
+                };
+            }
+            return { deltaMs, isBetter: deltaMs < 0 };
+        }
+
+        if (type === 'finish') {
+            const store = this.settingsManager?.store;
+            if (!routeId || !store) return null;
+            const vehicleId = this._activeVehicleId || '';
+            const isBestTime = (() => {
+                const best = getBestEntry(this._leaderboard, routeId);
+                return !best || totalTimeMs < best.totalTimeMs;
+            })();
+            this._leaderboard = insertLeaderboardEntry(this._leaderboard, routeId, {
+                totalTimeMs,
+                segmentSplitsMs,
+                vehicleId,
+                date: new Date().toISOString(),
+            });
+            saveLeaderboard(store, this._leaderboard);
+            if (isBestTime) {
+                this.applyParcoursXpEvent('new_best_time', data.playerIndex || 0);
+            }
+            return { inserted: true, isBestTime };
+        }
+
+        return null;
     }
 
     _applySectorXpReward(telemetryPayload) {

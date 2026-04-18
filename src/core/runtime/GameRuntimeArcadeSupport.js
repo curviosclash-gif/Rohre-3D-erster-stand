@@ -107,6 +107,11 @@ export class GameRuntimeArcadeSupport {
                 (eventType, playerIndex) => this.arcadeRunRuntime.applyParcoursXpEvent(eventType, playerIndex)
             );
         }
+        if (parcoursSystem && typeof parcoursSystem.setLeaderboardCallback === 'function') {
+            parcoursSystem.setLeaderboardCallback(
+                (data) => this.arcadeRunRuntime.applyParcoursLeaderboardEvent(data)
+            );
+        }
 
         return this.arcadeRunRuntime.startRun({
             entityManager: runtimeState?.entityManager || null,

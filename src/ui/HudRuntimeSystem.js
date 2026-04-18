@@ -33,6 +33,8 @@ export class HudRuntimeSystem {
         this._lastArcadeSectorIndex = 0;
         this._xpNotificationOverlay = null;
         this._xpNotificationHideAtMs = 0;
+        this._splitDeltaOverlay = null;
+        this._splitDeltaHideAtMs = 0;
     }
 
     _getMatchRuntimeProjection() {
@@ -232,6 +234,7 @@ export class HudRuntimeSystem {
         }
     }
 
+
     _ensureArcadeFeedbackOverlays() {
         if (!this._arcadeSuddenDeathOverlay) {
             const overlay = document.createElement('div');
@@ -285,6 +288,23 @@ export class HudRuntimeSystem {
             this._showXpNotification(`+${hudState.parcoursXpGain.earned} XP${levelUp}`, nowMs);
         }
         this._tickXpNotification(nowMs);
+        if (hudState.parcoursSegmentSplit && document?.body) {
+            const { deltaMs, isBetter } = hudState.parcoursSegmentSplit;
+            if (!this._splitDeltaOverlay) {
+                const el = document.createElement('div');
+                el.id = 'parcours-split-delta';
+                el.className = 'hidden';
+                document.body.appendChild(el);
+                this._splitDeltaOverlay = el;
+            }
+            this._splitDeltaOverlay.textContent = `${isBetter ? '-' : '+'}${(Math.abs(deltaMs) / 1000).toFixed(2)}s`;
+            this._splitDeltaOverlay.classList.remove('hidden', 'split-better', 'split-worse');
+            this._splitDeltaOverlay.classList.add(isBetter ? 'split-better' : 'split-worse');
+            this._splitDeltaHideAtMs = nowMs + 1200;
+        }
+        if (this._splitDeltaOverlay && nowMs >= this._splitDeltaHideAtMs) {
+            this._splitDeltaOverlay.classList.add('hidden');
+        }
         const suddenDeathActive = String(hudState.phase || '') === 'sudden_death';
         this._arcadeSuddenDeathOverlay?.classList?.toggle('hidden', !suddenDeathActive);
 
@@ -560,5 +580,8 @@ export class HudRuntimeSystem {
         }
         this._xpNotificationOverlay = null;
         this._xpNotificationHideAtMs = 0;
+        this._splitDeltaOverlay?.parentElement?.removeChild(this._splitDeltaOverlay);
+        this._splitDeltaOverlay = null;
+        this._splitDeltaHideAtMs = 0;
     }
 }
