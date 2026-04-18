@@ -10,6 +10,7 @@ import { emitHuntDamageFeedback } from '../hunt/HuntDamageFeedback.js';
 import { createGameModeStrategy } from '../modes/GameModeRegistry.js';
 import { LastRoundGhostSystem } from './LastRoundGhostSystem.js';
 import { resolveEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
+import { applyLiveRuntimeConfig as _applyLiveRuntimeConfig } from './EntityManagerLiveConfigOps.js';
 
 function clampInt(value, min, max) {
     return Math.max(min, Math.min(max, value));
@@ -144,6 +145,10 @@ export class EntityManager {
                 bot.ai.setDifficulty(this.botDifficulty);
             }
         }
+    }
+
+    applyLiveRuntimeConfig(entityRuntimeConfig = null, runtimeConfig = null) {
+        _applyLiveRuntimeConfig(this, entityRuntimeConfig, runtimeConfig);
     }
 
     createBotRuntimeContext(player, dt, options = {}) {
@@ -540,6 +545,4 @@ export class EntityManager {
         }
     }
 }
-
-
 

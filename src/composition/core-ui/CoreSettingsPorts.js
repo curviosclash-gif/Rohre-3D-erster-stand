@@ -12,7 +12,11 @@ export { MenuDraftStore, normalizeSessionType } from '../../ui/menu/MenuDraftSto
 export { MenuTextOverrideStore } from '../../ui/menu/MenuTextOverrideStore.js';
 export { MENU_TEXT_CATALOG } from '../../ui/menu/MenuTextCatalog.js';
 export { MenuTelemetryStore } from '../../ui/menu/MenuTelemetryStore.js';
-export { createMenuSettingsDefaults } from '../../ui/menu/MenuDefaultsEditorConfig.js';
+export {
+    createMenuSettingsDefaults,
+    createMenuDefaultsEditorConfigSnapshot,
+    MENU_DEFAULT_EDITOR_SCHEMA_VERSION,
+} from '../../ui/menu/MenuDefaultsEditorConfig.js';
 export {
     applyDeveloperThemeToDocument,
     setDeveloperActorId,

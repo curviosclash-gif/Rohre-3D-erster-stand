@@ -16,6 +16,7 @@ import {
 } from '../composition/core-ui/CoreUiMenuPorts.js';
 import { CONFIG_BASE } from './Config.js';
 import { applyRuntimeConfigCompatibility } from './RuntimeConfig.js';
+import { createEntityRuntimeConfig } from '../shared/contracts/EntityRuntimeConfig.js';
 import {
     applyRuntimeSettingsState,
     getSessionRuntimeHandle,
@@ -164,6 +165,13 @@ export class GameRuntimeFacade {
         runtimeState?.arena?.toggleBeams?.(runtimeConfig.gameplay.portalBeams);
         runtimeState?.entityManager?.setBotDifficulty?.(runtimeConfig.bot.activeDifficulty);
 
+        // Live-apply updated player tuning (speed, turnSpeed, modelScale, ...)
+        // to existing Player instances so slider changes take effect without restart.
+        if (typeof runtimeState?.entityManager?.applyLiveRuntimeConfig === 'function') {
+            const liveErc = createEntityRuntimeConfig(runtimeConfig, compatibilityConfig);
+            runtimeState.entityManager.applyLiveRuntimeConfig(liveErc, runtimeConfig);
+        }
+
         input?.setBindings?.(runtimeConfig.controls);
         this._syncArcadeRuntimeConfig();
         if (schedulePrewarm) {
@@ -187,7 +195,6 @@ export class GameRuntimeFacade {
     selectArcadeIntermissionChoice(choiceId) { return this._arcadeSupport.selectIntermissionChoice(choiceId); }
     selectArcadeReward(rewardId) { return this._arcadeSupport.selectReward(rewardId); }
     requestArcadeReplayPlayback() { return this._arcadeSupport.requestReplayPlayback(); }
-
     _createMenuRuntimeAccess() {
         const game = this.game;
         return Object.freeze({

@@ -8,7 +8,7 @@ export function registerSessionMenuEventHandlers(facade, registry) {
     registry.set(MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_EVENT_PLAYLIST_START, () => facade.handleQuickStartEventPlaylistStart());
     registry.set(MENU_CONTROLLER_EVENT_TYPES.QUICKSTART_RANDOM_START, () => facade.handleQuickStartRandomStart());
     registry.set(MENU_CONTROLLER_EVENT_TYPES.LEVEL3_RESET, () => facade.handleLevel3Reset());
-    registry.set(MENU_CONTROLLER_EVENT_TYPES.LEVEL4_OPEN, () => facade.handleLevel4Open());
+    registry.set(MENU_CONTROLLER_EVENT_TYPES.LEVEL4_OPEN, (event) => facade.handleLevel4Open(event));
     registry.set(MENU_CONTROLLER_EVENT_TYPES.LEVEL4_CLOSE, () => facade.handleLevel4Close());
     registry.set(MENU_CONTROLLER_EVENT_TYPES.LEVEL4_RESET, () => facade.handleLevel4Reset());
     registry.set(MENU_CONTROLLER_EVENT_TYPES.CONFIG_EXPORT_CODE, () => facade.handleConfigExportCode());

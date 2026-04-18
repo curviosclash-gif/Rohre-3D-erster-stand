@@ -6,6 +6,7 @@
   "description": "CurviosClash Desktop App - Host multiplayer games",
   "scripts": {
     "start": "node launch.cjs",
+    "start:settings": "node settings-studio/launch.cjs",
     "build": "electron-builder"
   },
   "build": {

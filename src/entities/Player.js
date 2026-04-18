@@ -269,6 +269,12 @@ export class Player {
         if (typeof options.cockpitCamera === 'boolean') {
             this.cockpitCamera = options.cockpitCamera;
         }
+        if (typeof options.speed === 'number' && Number.isFinite(options.speed) && options.speed > 0) {
+            this.baseSpeed = options.speed;
+            if (!this.isBoosting) {
+                this.speed = options.speed;
+            }
+        }
         if (typeof options.turnSpeed === 'number' && Number.isFinite(options.turnSpeed) && options.turnSpeed > 0) {
             this.turnSpeed = options.turnSpeed;
         }

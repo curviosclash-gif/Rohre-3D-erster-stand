@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CurviosClash Settings Studio</title>
+    <link rel="stylesheet" href="./settings-studio.css" />
+</head>
+<body>
+    <div class="layout">
+        <header class="header">
+            <h1 class="title" data-bind="title">CurviosClash Settings Studio</h1>
+            <p class="subtitle" data-bind="subtitle"></p>
+        </header>
+
+        <section class="toolbar">
+            <label data-bind="language-label" for="language">Sprache</label>
+            <select id="language" data-bind="language-select">
+                <option value="de">Deutsch</option>
+                <option value="en">English</option>
+            </select>
+
+            <button data-action="reload" type="button">Neu laden</button>
+            <button data-action="validate" type="button">Validieren</button>
+            <button data-action="save" type="button">Speichern</button>
+
+            <div class="status" data-bind="status">Bereit</div>
+        </section>
+
+        <main class="grid">
+            <article class="card">
+                <h2 class="card-title" data-bind="draft-title">Draft Uebersicht</h2>
+                <pre class="code" data-bind="draft-output"></pre>
+            </article>
+
+            <article class="card">
+                <h2 class="card-title" data-bind="limits-title">Limit-Uebersicht</h2>
+                <pre class="code" data-bind="limits-output"></pre>
+            </article>
+
+            <article class="card card--full">
+                <h2 class="card-title" data-bind="validation-title">Validierung</h2>
+                <pre class="code" data-bind="validation-output"></pre>
+            </article>
+
+            <article class="card card--full card--path">
+                <h2 class="card-title">Pfade</h2>
+                <pre class="code" data-bind="paths-output"></pre>
+            </article>
+        </main>
+    </div>
+
+    <script type="module" src="./settings-studio-app.js"></script>
+</body>
+</html>
