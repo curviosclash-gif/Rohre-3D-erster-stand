@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-16. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-Naechste offene Subphase: `64.99` (siehe `docs/plaene/aktiv/V64.md`). Phase `64.8` abgeschlossen 2026-04-17. Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+Stand: 2026-04-18. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
+Naechste offene Subphase: `95.3` (siehe `docs/plaene/aktiv/V95.md`). Block V64 abgeschlossen 2026-04-18. Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -36,29 +36,34 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V77 | Desktop Vollversion Browser Demo Grenzen | done | P2 | frei | V74.99 | 77.99 | `docs/plaene/aktiv/V77.md` |
 | V91 | Architektur-Ratchet und Legacy-Surface-Sunset | done | P2 | frei | V87.99,V77.99 | 91.99 | `docs/plaene/aktiv/V91.md` |
 | V92 | Runtime-Application-Ownership-Entkopplung und Orchestrator-Zuschnitt | done | P2 | frei | V91.99 | 92.99 | `docs/plaene/aktiv/V92.md` |
+| V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | done | P2 | frei | V74.99,V77.99 | 64.99 | `docs/plaene/aktiv/V64.md` |
 
 ### Aktive und geplante Bloecke
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
-| V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | planned | P2 | frei | V74.99,V77.99 | 64.99 | `docs/plaene/aktiv/V64.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
 | V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.1 | `docs/plaene/aktiv/V82.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
+| V95 | Settings Studio fuer Menu-Defaults | planned | P2 | frei | V77.99,V92.99 | 95.3 | `docs/plaene/aktiv/V95.md` |
 
 ## Abhaengigkeiten
 
 | Block | Depends-On | Typ | Erfuellt | Hinweis |
 | --- | --- | --- | --- | --- |
 | V72 | Legacy-/Migrationspfad fuer Gate-/Portal-Validierung | hard | nein | Vor hartem Fail muessen sichtbare Warn-, Diagnose- oder Migrationspfade fuer bestehende Maps umgesetzt werden |
-| V75 | V64.99 | hard | nein | Recorder-Polish folgt erst nach dem produktiven Host-/Join-Hauptpfad |
+| V75 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Recorder-Polish kann beginnen |
 | V75 | V72 Recorder-/Telemetry-Result-Codes | soft | nein | Nur relevant, falls Export-Diagnostik gemeinsam mit Gameplay-Result-Codes vereinheitlicht wird |
-| V76 | V64.99 | hard | nein | Hangar-/Werkstatt-Flows starten erst nach dem festgezogenen Produktbild fuer Host/Join und Browser-Demo |
+| V76 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Hangar-/Werkstatt-Flows koennen nach V82.99 beginnen |
 | V76 | V82.99 | hard | nein | V76.3 Arcade-Hangar baut direkt auf V82-Contracts (XP, Upgrades, Leaderboard) auf; V82 muss vor V76.3 abgeschlossen sein |
 | V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
+| V95 | V77.99 | hard | ja | Surface-Policy aus V77 ist abgeschlossen; Settings Studio bleibt Desktop-only |
+| V95 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 ist abgeschlossen und bleibt Leitplanke fuer neue Config-Pfade |
+| V95 | V81.99 | soft | nein | UI-/IPC-Synergien mit Developer-Tuning sinnvoll, aber nicht blockierend |
+| V95 | V64.99 | soft | nein | Lifecycle-Polish kann Integrationsaufwand spaeter senken, ist aber kein Startblocker |
 
 ## Lock-Status
 
@@ -75,13 +80,14 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V91 | 2026-04-15 | closed | Abgeschlossen 2026-04-15 |
 | - | V92 | 2026-04-15 | closed | Abgeschlossen 2026-04-15 |
 | - | V93 | 2026-04-14 | closed | Abgeschlossen 2026-04-14 |
-| - | V64 | - | frei | Siehe docs/lock-status/ |
+| - | V64 | 2026-04-18 | closed | Abgeschlossen 2026-04-18 |
 | - | V75 | - | frei | Siehe docs/lock-status/ |
 | - | V76 | - | frei | Siehe docs/lock-status/ |
 | - | V82 | - | frei | Siehe docs/lock-status/ |
 | - | V81 | - | frei | Siehe docs/lock-status/ |
 | - | V86 | - | frei | Siehe docs/lock-status/ |
 | - | V94 | - | frei | Siehe docs/lock-status/ |
+| - | V95 | - | frei | Siehe docs/lock-status/ |
 
 ## Empfohlene Reihenfolge
 
