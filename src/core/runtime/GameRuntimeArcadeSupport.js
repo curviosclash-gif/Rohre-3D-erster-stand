@@ -101,6 +101,13 @@ export class GameRuntimeArcadeSupport {
             sectorCount: runtimeConfig?.arcade?.sectorCount,
             difficulty: runtimeConfig?.bot?.activeDifficulty || runtimeConfig?.bot?.difficulty || 'normal',
         });
+        const parcoursSystem = runtimeState?.entityManager?._parcoursProgressSystem;
+        if (parcoursSystem && typeof parcoursSystem.setXpEventCallback === 'function') {
+            parcoursSystem.setXpEventCallback(
+                (eventType, playerIndex) => this.arcadeRunRuntime.applyParcoursXpEvent(eventType, playerIndex)
+            );
+        }
+
         return this.arcadeRunRuntime.startRun({
             entityManager: runtimeState?.entityManager || null,
             roundStateController: runtimeState?.roundStateController || null,

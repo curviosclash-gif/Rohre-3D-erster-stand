@@ -14,6 +14,11 @@ export class ParcoursProgressSystem {
         this._route = null;
         this._playerStates = new Map();
         this._completionOrder = [];
+        this._xpEventCallback = null;
+    }
+
+    setXpEventCallback(callback) {
+        this._xpEventCallback = typeof callback === 'function' ? callback : null;
     }
 
     isEnabled() {
@@ -246,6 +251,10 @@ export class ParcoursProgressSystem {
             player,
             `id=${entry.id} index=${entry.routeIndex + 1}/${this._route.totalCheckpoints}`
         );
+        const cpXpResult = this._xpEventCallback?.('checkpoint', player.index);
+        if (cpXpResult?.earned > 0) {
+            this._notifyPlayer(player, `+${cpXpResult.earned} XP`);
+        }
     }
 
     _registerWrongOrder(player, state, entry, now) {
@@ -313,6 +322,10 @@ export class ParcoursProgressSystem {
             player,
             `route=${this._route.routeId} timeMs=${Math.round(state.completionTimeMs)}`
         );
+        const finishXpResult = this._xpEventCallback?.('finish', player.index);
+        if (finishXpResult?.earned > 0) {
+            this._notifyPlayer(player, `+${finishXpResult.earned} XP (Parcours)`);
+        }
     }
 
     _findTriggeredEntry(entries, player, previousPosition, now, state) {

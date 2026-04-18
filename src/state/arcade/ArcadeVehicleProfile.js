@@ -38,6 +38,9 @@ export const XP_REWARD_TABLE = Object.freeze({
     allMissionsBonus: 120,
     cleanSector: 40,
     comboMultiplierCap: 3.0,
+    parcoursCheckpoint: 10,
+    parcoursFinish: 80,
+    parcoursNewBestTime: 40,
 });
 
 const BASE_SLOTS = Object.freeze([

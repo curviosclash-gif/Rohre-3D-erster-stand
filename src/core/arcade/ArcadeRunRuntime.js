@@ -27,6 +27,7 @@ import {
     addXp,
     getMasteryPerks,
     getSlotStatBonuses,
+    XP_REWARD_TABLE,
 } from '../../state/arcade/ArcadeVehicleProfile.js';
 import {
     assignSectorMissions,
@@ -581,8 +582,13 @@ export class ArcadeRunRuntime {
         const breakdown = score.breakdown && typeof score.breakdown === 'object'
             ? score.breakdown
             : {};
+        const parcoursXpGain = this._state.lastParcoursXpGain || null;
+        if (parcoursXpGain) {
+            this._state.lastParcoursXpGain = null;
+        }
         return {
             nowMs,
+            parcoursXpGain,
             phase: String(this._state.phase || ''),
             sectorIndex: Math.max(0, Math.floor(toSafeNumber(this._state.sectorIndex, 0))),
             completedSectors: Math.max(0, Math.floor(toSafeNumber(this._state.completedSectors, 0))),
@@ -846,7 +852,7 @@ export class ArcadeRunRuntime {
      * @param {Object} parcoursResult - Result from ParcoursProgressSystem.getRoundOutcome()
      * @returns {Object|null} Round end plan with intermission prepared, or null if not enabled.
      */
-    completeParcoursSector(parcoursResult = {}) {
+    completeParcoursSector(parcoursResult = {}, options = {}) {
         if (!this._enabled || !this._state) return null;
         if (!this.isCurrentSectorParcours()) return null;
 
@@ -859,6 +865,7 @@ export class ArcadeRunRuntime {
         const sectorLabel = `${this._state.completedSectors}/${this._state.config.sectorCount}`;
         const completionMs = Math.max(0, toSafeNumber(parcoursResult?.parcours?.completionTimeMs, 0));
         const completionSec = completionMs > 0 ? (completionMs / 1000).toFixed(2) : '?';
+        const requiredWins = Math.max(1, Number(options?.winsNeeded) || 1);
         const messageText = `Parcours abgeschlossen — ${completionSec}s | Sektor ${sectorLabel}`;
         const messageSub = 'Intermission: naechster Sektor';
 
@@ -866,8 +873,10 @@ export class ArcadeRunRuntime {
             outcome: {
                 state: 'ROUND_END',
                 canWinMatch: true,
-                requiredWins: 1,
+                requiredWins,
                 matchWinner: null,
+                reason: 'PARCOURS_COMPLETE',
+                parcours: parcoursResult?.parcours || null,
                 messageText,
                 messageSub,
                 arcade: {
@@ -891,6 +900,25 @@ export class ArcadeRunRuntime {
     deriveRoundEndPlan({ players, inputs = {}, baseController } = {}) {
         if (!this._enabled || !this._state || !baseController) {
             return baseController?.deriveOnRoundEndPlan?.(players, inputs) || null;
+        }
+
+        const outcomeReason = String(inputs?.reason || '').trim().toUpperCase();
+        const parcoursInput = inputs?.parcours && typeof inputs.parcours === 'object'
+            ? inputs.parcours
+            : null;
+        if (outcomeReason === 'PARCOURS_COMPLETE') {
+            const parcoursPlan = this.completeParcoursSector(
+                {
+                    reason: outcomeReason,
+                    parcours: parcoursInput,
+                },
+                {
+                    winsNeeded: inputs?.winsNeeded,
+                }
+            );
+            if (parcoursPlan) {
+                return parcoursPlan;
+            }
         }
 
         const nowMs = Math.max(0, toSafeNumber(this.now(), Date.now()));
@@ -922,6 +950,8 @@ export class ArcadeRunRuntime {
                 canWinMatch: true,
                 requiredWins: Math.max(1, Number(inputs?.winsNeeded) || 1),
                 matchWinner: null,
+                reason: outcomeReason || (finished ? 'ELIMINATION' : ''),
+                parcours: parcoursInput,
                 messageText,
                 messageSub,
                 arcade: {
@@ -1009,6 +1039,36 @@ export class ArcadeRunRuntime {
             xpEarned: Math.max(0, toSafeNumber(this._state?.lastSectorXp?.earned, 0)),
         });
         this._state.sectorHistory = existing;
+    }
+
+    applyParcoursXpEvent(eventType, playerIndex = 0) {
+        if (!this._enabled || !this._activeVehicleId || !this._vehicleProfiles) return null;
+        const xpByEvent = {
+            checkpoint: XP_REWARD_TABLE.parcoursCheckpoint,
+            finish: XP_REWARD_TABLE.parcoursFinish,
+            new_best_time: XP_REWARD_TABLE.parcoursNewBestTime,
+        };
+        const baseXp = xpByEvent[String(eventType)] || 0;
+        if (baseXp <= 0) return null;
+
+        const store = this.settingsManager?.store;
+        let profile = getOrCreateProfile(this._vehicleProfiles, this._activeVehicleId);
+        const perks = getMasteryPerks(profile.level);
+        const xpEarned = Math.max(1, Math.round(baseXp * (1 + perks.xpBonusPct / 100)));
+
+        const result = addXp(profile, xpEarned);
+        this._vehicleProfiles[this._activeVehicleId] = result.profile;
+        saveVehicleProfiles(store, this._vehicleProfiles);
+
+        if (this._state) {
+            this._state.lastParcoursXpGain = {
+                eventType: String(eventType),
+                earned: xpEarned,
+                leveledUp: result.leveledUp,
+                newLevel: result.newLevel,
+            };
+        }
+        return { earned: xpEarned, leveledUp: result.leveledUp, newLevel: result.newLevel };
     }
 
     _applySectorXpReward(telemetryPayload) {

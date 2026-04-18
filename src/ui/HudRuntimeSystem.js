@@ -31,6 +31,8 @@ export class HudRuntimeSystem {
         this._arcadeSectorTransitionOverlay = null;
         this._arcadeTransitionVisibleUntilMs = 0;
         this._lastArcadeSectorIndex = 0;
+        this._xpNotificationOverlay = null;
+        this._xpNotificationHideAtMs = 0;
     }
 
     _getMatchRuntimeProjection() {
@@ -209,6 +211,27 @@ export class HudRuntimeSystem {
         this._hideArcadeFeedbackOverlays();
     }
 
+    _showXpNotification(text, nowMs) {
+        if (!document?.body) return;
+        if (!this._xpNotificationOverlay) {
+            const el = document.createElement('div');
+            el.id = 'parcours-xp-notification';
+            el.className = 'hidden';
+            document.body.appendChild(el);
+            this._xpNotificationOverlay = el;
+        }
+        this._xpNotificationOverlay.textContent = text;
+        this._xpNotificationOverlay.classList.remove('hidden');
+        this._xpNotificationHideAtMs = Math.max(0, nowMs) + 1500;
+    }
+
+    _tickXpNotification(nowMs) {
+        if (!this._xpNotificationOverlay) return;
+        if (nowMs >= this._xpNotificationHideAtMs) {
+            this._xpNotificationOverlay.classList.add('hidden');
+        }
+    }
+
     _ensureArcadeFeedbackOverlays() {
         if (!this._arcadeSuddenDeathOverlay) {
             const overlay = document.createElement('div');
@@ -257,6 +280,11 @@ export class HudRuntimeSystem {
         this._ensureArcadeFeedbackOverlays();
 
         const nowMs = Math.max(0, Number(hudState.nowMs) || Date.now());
+        if (hudState.parcoursXpGain?.earned > 0) {
+            const levelUp = hudState.parcoursXpGain.leveledUp ? ` ↑ Lv ${hudState.parcoursXpGain.newLevel}!` : '';
+            this._showXpNotification(`+${hudState.parcoursXpGain.earned} XP${levelUp}`, nowMs);
+        }
+        this._tickXpNotification(nowMs);
         const suddenDeathActive = String(hudState.phase || '') === 'sudden_death';
         this._arcadeSuddenDeathOverlay?.classList?.toggle('hidden', !suddenDeathActive);
 
@@ -527,5 +555,10 @@ export class HudRuntimeSystem {
         this._arcadeSectorTransitionOverlay = null;
         this._arcadeTransitionVisibleUntilMs = 0;
         this._lastArcadeSectorIndex = 0;
+        if (this._xpNotificationOverlay?.parentElement) {
+            this._xpNotificationOverlay.parentElement.removeChild(this._xpNotificationOverlay);
+        }
+        this._xpNotificationOverlay = null;
+        this._xpNotificationHideAtMs = 0;
     }
 }
