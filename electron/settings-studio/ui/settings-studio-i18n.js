@@ -21,6 +21,10 @@ const DICTIONARY = Object.freeze({
         sectionConfigShare: 'Config Share',
         sectionLevel3Reset: 'Level3 Reset',
         sectionLimits: 'Grenzen (min/max/step)',
+        sectionBackups: 'Backups & Restore',
+        buttonRestore: 'Wiederherstellen',
+        restoreConfirm: 'Backup wirklich wiederherstellen? Aktuelle Daten werden vorher gesichert.',
+        noBackups: 'Keine Backups vorhanden.',
         categoryGameplay: 'Gameplay',
         categoryBotBridge: 'Bot Bridge',
         categoryHunt: 'Hunt',
@@ -59,6 +63,10 @@ const DICTIONARY = Object.freeze({
         sectionConfigShare: 'Config Share',
         sectionLevel3Reset: 'Level3 Reset',
         sectionLimits: 'Limits (min/max/step)',
+        sectionBackups: 'Backups & Restore',
+        buttonRestore: 'Restore',
+        restoreConfirm: 'Restore this backup? Current data will be backed up first.',
+        noBackups: 'No backups available.',
         categoryGameplay: 'Gameplay',
         categoryBotBridge: 'Bot Bridge',
         categoryHunt: 'Hunt',
@@ -98,6 +106,7 @@ export const SECTIONS = Object.freeze([
     { key: 'configShare', labelKey: 'sectionConfigShare' },
     { key: 'level3Reset', labelKey: 'sectionLevel3Reset' },
     { key: 'limits', labelKey: 'sectionLimits' },
+    { key: 'backups', labelKey: 'sectionBackups', noDirty: true },
 ]);
 
 export function fieldLabel(path) {

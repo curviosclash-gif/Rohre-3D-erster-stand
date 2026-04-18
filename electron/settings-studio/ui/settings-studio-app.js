@@ -13,6 +13,7 @@ const state = {
     schema: null,
     validation: null,
     paths: null,
+    backups: [],
     activeSection: 'baseSettings',
 };
 
@@ -72,11 +73,23 @@ function renderStaticTexts() {
     refs.saveBtn.textContent = t('buttonSave');
 }
 
+function renderBackupsList(backups, translator) {
+    if (!Array.isArray(backups) || !backups.length) {
+        return `<div class="field-group"><em>${translator('noBackups')}</em></div>`;
+    }
+    const rows = backups.map((b) => {
+        const name = String(b.fileName || '');
+        const date = b.createdAt ? new Date(b.createdAt).toLocaleString() : '';
+        return `<div class="field-row" style="grid-template-columns:1fr auto auto"><span class="field-label" title="${name}">${name}</span><small style="color:var(--muted)">${date}</small><button class="btn btn--ghost" style="font-size:11px;height:24px;" data-action="restore-backup" data-backup-file="${name}">${translator('buttonRestore')}</button></div>`;
+    });
+    return `<div class="field-group">${rows.join('')}</div>`;
+}
+
 function renderSidebar() {
     const items = SECTIONS.map((section) => {
         const label = t(section.labelKey);
         const active = section.key === state.activeSection ? 'active' : '';
-        const dirtyCount = state.draft && state.baseDraft
+        const dirtyCount = !section.noDirty && state.draft && state.baseDraft
             ? countSectionDirtyFields(section.key, state.schema, state.draft, state.baseDraft)
             : 0;
         const dirtyDot = dirtyCount > 0 ? '<span class="nav-dirty"></span>' : '';
@@ -99,6 +112,8 @@ function renderFormContent() {
         html = renderLimitsSection(state.schema, state.draft, state.baseDraft, createTranslator(state.language));
     } else if (state.activeSection === 'fixedPresets') {
         html = renderPresetsSection(state.draft, state.baseDraft, createTranslator(state.language));
+    } else if (state.activeSection === 'backups') {
+        html = renderBackupsList(state.backups, createTranslator(state.language));
     } else {
         html = renderSectionForm(state.activeSection, state.schema, state.draft, state.baseDraft, createTranslator(state.language));
     }
@@ -135,6 +150,7 @@ async function loadState() {
     state.schema = response?.schema || null;
     state.validation = response?.validation || null;
     state.paths = response?.paths || null;
+    state.backups = Array.isArray(response?.backups) ? response.backups : [];
     state.language = normalizeLanguage(state.draft?.language || state.language);
     refs.languageSelect.value = state.language;
     renderAll();
@@ -158,6 +174,8 @@ async function saveState() {
     if (response?.ok) {
         state.baseDraft = deepClone(state.draft);
         state.validation = response?.validation || state.validation;
+        const listResponse = await window.settingsStudioApi.listBackups({}).catch(() => null);
+        state.backups = Array.isArray(listResponse?.backups) ? listResponse.backups : state.backups;
     }
     renderAll();
     setStatus(response?.ok ? 'statusSaved' : 'statusInvalid');
@@ -313,6 +331,25 @@ function onPresetFieldChange(event) {
     }
 }
 
+async function onRestoreBackup(backupFileName) {
+    if (!backupFileName) return;
+    if (!window.confirm(t('restoreConfirm'))) return;
+    setStatus('statusLoading');
+    const response = await window.settingsStudioApi.restoreBackup(backupFileName);
+    if (response?.ok && response.draft) {
+        state.draft = deepClone(response.draft);
+        state.baseDraft = deepClone(response.draft);
+        state.validation = response?.validation || null;
+        const listResponse = await window.settingsStudioApi.listBackups({}).catch(() => null);
+        state.backups = Array.isArray(listResponse?.backups) ? listResponse.backups : state.backups;
+        renderAll();
+        setStatus('statusSaved');
+    } else {
+        state.validation = response?.validation || state.validation;
+        setStatus('statusInvalid');
+    }
+}
+
 function bindEvents() {
     refs.formContent.addEventListener('change', (event) => {
         if (event.target.dataset?.limitPath) return onLimitChange(event);
@@ -322,7 +359,11 @@ function bindEvents() {
 
     refs.formContent.addEventListener('click', (event) => {
         const btn = event.target.closest('[data-action="reset-field"]');
-        if (btn) onResetField(btn);
+        if (btn) { onResetField(btn); return; }
+        const restoreBtn = event.target.closest('[data-action="restore-backup"]');
+        if (restoreBtn) {
+            void onRestoreBackup(restoreBtn.dataset.backupFile).catch((err) => setStatus(`${t('statusError')}: ${err.message}`));
+        }
     });
 
     refs.sidebarNav.addEventListener('click', (event) => {
