@@ -8,17 +8,23 @@
     --line: #d4deee;
     --accent: #0066cc;
     --accent-soft: #d9ecff;
+    --accent-hover: #004fa3;
     --danger: #a12622;
+    --danger-soft: #fdecea;
+    --dirty: #f59e0b;
+    --dirty-soft: #fef3c7;
     --code-bg: #f3f6fb;
+    --sidebar-w: 180px;
+    --header-h: 52px;
+    --footer-h: 54px;
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
     font-family: "Segoe UI", Tahoma, sans-serif;
+    font-size: 13px;
     color: var(--text);
     background:
         radial-gradient(1200px 700px at -10% -20%, #d6ecff 0%, transparent 60%),
@@ -26,112 +32,388 @@ body {
         var(--bg);
 }
 
+/* ─── Layout ─────────────────────────────────────── */
 .layout {
     display: grid;
-    grid-template-rows: auto auto 1fr;
-    min-height: 100vh;
+    grid-template-rows: var(--header-h) 1fr var(--footer-h);
+    height: 100vh;
 }
 
+.body {
+    display: grid;
+    grid-template-columns: var(--sidebar-w) 1fr;
+    overflow: hidden;
+}
+
+/* ─── Header ─────────────────────────────────────── */
 .header {
-    padding: 20px 24px 12px;
-}
-
-.title {
-    margin: 0;
-    font-size: 28px;
-    line-height: 1.2;
-}
-
-.subtitle {
-    margin: 6px 0 0;
-    color: var(--muted);
-    font-size: 14px;
-}
-
-.toolbar {
-    margin: 0 24px 14px;
-    padding: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    border: 1px solid var(--line);
-    border-radius: 10px;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--line);
     background: var(--panel);
 }
 
-.toolbar select,
-.toolbar button {
-    height: 34px;
-    border-radius: 8px;
-    border: 1px solid var(--line);
-    background: #fff;
-    color: var(--text);
-    padding: 0 12px;
+.header__title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
 }
 
-.toolbar button {
+.header__controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.header__controls select {
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    padding: 0 8px;
+    font-size: 12px;
+}
+
+/* ─── Sidebar ─────────────────────────────────────── */
+.sidebar {
+    border-right: 1px solid var(--line);
+    background: var(--panel);
+    overflow-y: auto;
+    padding: 10px 0;
+}
+
+.nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    margin: 0;
+}
+
+.nav-btn {
+    display: block;
+    width: 100%;
+    padding: 9px 16px;
+    border: none;
+    background: none;
+    color: var(--text);
+    font-size: 13px;
+    text-align: left;
     cursor: pointer;
+    border-radius: 0;
+    transition: background 0.1s;
+    position: relative;
+}
+
+.nav-btn:hover {
+    background: var(--panel-alt);
+}
+
+.nav-btn.active {
+    background: var(--accent-soft);
+    color: var(--accent);
     font-weight: 600;
 }
 
-.toolbar button:hover {
+.nav-btn .nav-dirty {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--dirty);
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+/* ─── Form area ───────────────────────────────────── */
+.form-area {
+    display: grid;
+    grid-template-rows: auto 1fr;
+    overflow: hidden;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    border-bottom: 1px solid var(--line);
+    background: var(--panel);
+}
+
+.section-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.section-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.change-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--dirty-soft);
+    color: var(--dirty);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.form-content {
+    overflow-y: auto;
+    padding: 16px 20px;
+}
+
+/* ─── Field groups ────────────────────────────────── */
+.field-group {
+    margin-bottom: 20px;
+}
+
+.field-group__title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 0 0 8px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--line);
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 200px 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    border-radius: 6px;
+    transition: background 0.1s;
+}
+
+.field-row.dirty {
+    background: var(--dirty-soft);
+    margin: 0 -6px;
+    padding: 5px 6px;
+}
+
+.field-label {
+    font-size: 12px;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.field-input {
+    font-size: 12px;
+    height: 28px;
+    padding: 0 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--text);
+    width: 100%;
+}
+
+.field-input:focus {
+    outline: 2px solid var(--accent-soft);
     border-color: var(--accent);
-    background: var(--accent-soft);
+}
+
+.field-input.field-input--check {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    cursor: pointer;
+}
+
+.field-input.field-input--textarea {
+    height: 64px;
+    resize: vertical;
+    font-family: "Consolas", "Courier New", monospace;
+    font-size: 11px;
+}
+
+.field-reset-btn {
+    font-size: 11px;
+    padding: 2px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.field-reset-btn:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+    background: var(--danger-soft);
+}
+
+.field-reset-btn:not([data-dirty]) {
+    visibility: hidden;
+}
+
+/* ─── Limits table ────────────────────────────────── */
+.limits-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+}
+
+.limits-table th {
+    text-align: left;
+    padding: 5px 8px;
+    background: var(--panel-alt);
+    border: 1px solid var(--line);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.limits-table td {
+    padding: 4px 8px;
+    border: 1px solid var(--line);
+    vertical-align: middle;
+}
+
+.limits-table tr.dirty td {
+    background: var(--dirty-soft);
+}
+
+.limits-input {
+    width: 70px;
+    height: 24px;
+    padding: 0 6px;
+    font-size: 11px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: #fff;
+}
+
+.limits-input:focus {
+    outline: 2px solid var(--accent-soft);
+    border-color: var(--accent);
+}
+
+/* ─── Footer toolbar ──────────────────────────────── */
+.toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-top: 1px solid var(--line);
+    background: var(--panel);
+}
+
+.toolbar__actions {
+    display: flex;
+    gap: 8px;
 }
 
 .status {
-    margin-left: auto;
+    font-size: 12px;
     color: var(--muted);
-    font-size: 13px;
 }
 
-.grid {
-    display: grid;
-    gap: 14px;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 24px 24px;
-}
-
-.card {
+/* ─── Buttons ─────────────────────────────────────── */
+.btn {
+    height: 30px;
+    padding: 0 14px;
+    border-radius: 7px;
     border: 1px solid var(--line);
-    border-radius: 12px;
+    background: #fff;
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.1s, border-color 0.1s;
+}
+
+.btn:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.btn--primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.btn--primary:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    color: #fff;
+}
+
+.btn--ghost {
+    background: none;
+    border-color: transparent;
+    color: var(--muted);
+}
+
+.btn--ghost:hover {
+    background: var(--panel-alt);
+    border-color: var(--line);
+    color: var(--text);
+}
+
+/* ─── Presets ─────────────────────────────────────── */
+.preset-list {
+    display: grid;
+    gap: 10px;
+}
+
+.preset-item {
+    border: 1px solid var(--line);
+    border-radius: 8px;
     background: var(--panel);
     overflow: hidden;
 }
 
-.card-title {
-    margin: 0;
-    padding: 10px 12px;
-    font-size: 14px;
-    font-weight: 700;
+.preset-item.dirty {
+    border-color: var(--dirty);
+}
+
+.preset-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
     background: var(--panel-alt);
-    border-bottom: 1px solid var(--line);
-}
-
-.code {
-    margin: 0;
-    padding: 12px;
-    min-height: 240px;
-    max-height: 380px;
-    overflow: auto;
-    font-family: "Consolas", "Courier New", monospace;
     font-size: 12px;
-    line-height: 1.45;
-    white-space: pre-wrap;
-    background: var(--code-bg);
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    width: 100%;
+    text-align: left;
 }
 
-.card--full {
-    grid-column: 1 / -1;
+.preset-body {
+    padding: 10px 12px;
+    display: grid;
+    gap: 6px;
 }
 
-.card--path .code {
-    min-height: 80px;
-    max-height: 120px;
-}
-
-@media (max-width: 980px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
+.preset-field-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 8px;
+    align-items: center;
+    font-size: 12px;
 }
