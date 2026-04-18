@@ -896,4 +896,69 @@ test.describe('Physics Core (Tests 41-60)', () => {
         expect(fallbackSnapshot?.resetCount).toBeGreaterThan(0);
     });
 
+    test('T60d: Parcours-Branch-Route akzeptiert alternative Pfade mit gemeinsamem Merge', () => {
+        const harness = createParcoursHarness(createParcoursDefinition({
+            checkpoints: [
+                { id: 'CP01', type: 'entry', pos: [0, 0, 0], radius: 1.2, forward: [1, 0, 0] },
+                { id: 'CP02', type: 'gate', pos: [10, 0, 0], radius: 1.2, forward: [1, 0, 0], nextIds: ['CP03_TUNNEL', 'CP03_BOOST'] },
+                { id: 'CP03_TUNNEL', type: 'branch_tunnel', pos: [20, 0, -6], radius: 1.2, forward: [1, 0, 0], nextIds: ['CP04'] },
+                { id: 'CP03_BOOST', type: 'branch_boost', pos: [20, 0, 6], radius: 1.2, forward: [1, 0, 0], nextIds: ['CP04'] },
+                { id: 'CP04', type: 'gate', pos: [30, 0, 0], radius: 1.2, forward: [1, 0, 0] },
+            ],
+            finish: { id: 'FINISH', type: 'finish', pos: [40, 0, 0], radius: 1.3, forward: [1, 0, 0] },
+        }));
+        const route = harness.system.getRouteSnapshot();
+        expect(route?.totalCheckpoints).toBe(4);
+
+        const cp01 = route.checkpoints.find((entry) => entry.id === 'CP01');
+        const cp02 = route.checkpoints.find((entry) => entry.id === 'CP02');
+        const branchTunnel = route.checkpoints.find((entry) => entry.id === 'CP03_TUNNEL');
+        const branchBoost = route.checkpoints.find((entry) => entry.id === 'CP03_BOOST');
+        const cp04 = route.checkpoints.find((entry) => entry.id === 'CP04');
+
+        expect(branchTunnel?.routeIndex).toBe(2);
+        expect(branchBoost?.routeIndex).toBe(2);
+        expect(branchTunnel?.isBranchOption).toBeTruthy();
+        expect(branchBoost?.isBranchOption).toBeTruthy();
+        expect(branchTunnel?.branchParentId).toBe('CP02');
+        expect(branchBoost?.branchParentId).toBe('CP02');
+        expect(branchTunnel?.mergeCheckpointId).toBe('CP04');
+        expect(branchBoost?.mergeCheckpointId).toBe('CP04');
+        expect(route?.branches).toEqual([
+            {
+                checkpointId: 'CP02',
+                routeIndex: 1,
+                nextCheckpointIds: ['CP03_TUNNEL', 'CP03_BOOST'],
+                mergeCheckpointId: 'CP04',
+                validMerge: true,
+            },
+        ]);
+
+        harness.nowRef.value = 100;
+        expect(crossCheckpoint(harness.system, harness.player, cp01, harness.nowRef.value)?.type).toBe('checkpoint');
+
+        harness.nowRef.value = 280;
+        expect(crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value)?.type).toBe('checkpoint');
+
+        let snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(2);
+        expect(snapshot?.expectedCheckpointIds).toEqual(['CP03_TUNNEL', 'CP03_BOOST']);
+
+        harness.nowRef.value = 520;
+        expect(crossCheckpoint(harness.system, harness.player, branchBoost, harness.nowRef.value)?.type).toBe('checkpoint');
+
+        snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.nextCheckpointIndex).toBe(3);
+        expect(snapshot?.expectedCheckpointIds).toEqual(['CP04']);
+
+        harness.nowRef.value = 650;
+        expect(crossCheckpoint(harness.system, harness.player, branchTunnel, harness.nowRef.value)?.type).toBe('wrong-order');
+
+        harness.nowRef.value = 880;
+        expect(crossCheckpoint(harness.system, harness.player, cp04, harness.nowRef.value)?.type).toBe('checkpoint');
+
+        harness.nowRef.value = 1120;
+        expect(crossCheckpoint(harness.system, harness.player, route.finish, harness.nowRef.value)?.type).toBe('finish');
+    });
+
 });

@@ -128,6 +128,7 @@ export class ParcoursProgressSystem {
         const previousResetCount = state.resetCount;
         state.nextCheckpointIndex = 0;
         state.passedMask.fill(0);
+        state.stageCheckpointIds.fill('');
         state.startedAtMs = 0;
         state.lastCheckpointAtMs = 0;
         state.completed = false;
@@ -166,12 +167,15 @@ export class ParcoursProgressSystem {
 
         for (let index = fallbackNext; index < state.passedMask.length; index += 1) {
             state.passedMask[index] = 0;
+            state.stageCheckpointIds[index] = '';
         }
         state.nextCheckpointIndex = fallbackNext;
         state.completed = false;
         state.completedAtMs = 0;
         state.completionTimeMs = 0;
-        state.lastCheckpointId = fallbackNext > 0 ? (this._route.sequence[fallbackNext - 1] || '') : '';
+        state.lastCheckpointId = fallbackNext > 0
+            ? (state.stageCheckpointIds[fallbackNext - 1] || this._route.sequence[fallbackNext - 1] || '')
+            : '';
         state.lastCheckpointAtMs = fallbackNext > 0 ? now : 0;
         if (fallbackNext <= 0) {
             state.startedAtMs = 0;
@@ -251,6 +255,7 @@ export class ParcoursProgressSystem {
         state.errorUntilMs = 0;
         if (entry.routeIndex >= 0 && entry.routeIndex < state.passedMask.length) {
             state.passedMask[entry.routeIndex] = 1;
+            state.stageCheckpointIds[entry.routeIndex] = entry.id;
         }
 
         if (this._route.rules.ordered) {
@@ -455,11 +460,17 @@ export class ParcoursProgressSystem {
         const segmentElapsedMs = state.completed || segmentAnchor <= 0
             ? 0
             : Math.max(0, now - segmentAnchor);
+        const expectedEntries = !state.completed && this._route.totalCheckpoints > 0
+            ? (this._route.entriesByCheckpointIndex[
+                Math.max(0, Math.min(this._route.totalCheckpoints - 1, state.nextCheckpointIndex))
+            ] || [])
+            : [];
         return {
             routeId: this._route.routeId,
             totalCheckpoints: this._route.totalCheckpoints,
             nextCheckpointIndex: state.nextCheckpointIndex,
             passedMask: Array.from(state.passedMask),
+            expectedCheckpointIds: expectedEntries.map((entry) => entry.id),
             startedAtMs: state.startedAtMs,
             lastCheckpointAtMs: state.lastCheckpointAtMs,
             wrongOrderCount: state.wrongOrderCount,
@@ -507,10 +518,23 @@ export class ParcoursProgressSystem {
                 type: entry.type,
                 aliasOf: entry.aliasOf,
                 routeIndex: entry.routeIndex,
+                nextCheckpointIds: [...(entry.nextCheckpointIds || [])],
+                isBranchOption: entry.isBranchOption === true,
+                branchParentId: entry.branchParentId || null,
+                mergeCheckpointId: entry.mergeCheckpointId || null,
                 pos: [...entry.pos],
                 radius: entry.radius,
                 forward: entry.forward ? [...entry.forward] : null,
             })),
+            branches: Array.isArray(this._route.branches)
+                ? this._route.branches.map((entry) => ({
+                    checkpointId: entry.checkpointId,
+                    routeIndex: entry.routeIndex,
+                    nextCheckpointIds: [...(entry.nextCheckpointIds || [])],
+                    mergeCheckpointId: entry.mergeCheckpointId || null,
+                    validMerge: entry.validMerge === true,
+                }))
+                : [],
             finish: this._route.finish ? {
                 id: this._route.finish.id,
                 type: this._route.finish.type,

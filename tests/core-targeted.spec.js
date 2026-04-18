@@ -875,11 +875,11 @@ test.describe('T1-20: Core & Infrastruktur - Shell & Setup', () => {
         });
 
         expect(probe.error || '').toBe('');
-        expect(probe.hitTypes).toEqual(['checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint']);
+        expect(probe.hitTypes).toEqual(['checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint', 'checkpoint']);
         expect(probe.finishType).toBe('finish');
         expect(probe.outcomeReason).toBe('PARCOURS_COMPLETE');
         expect(['ROUND_END', 'MATCH_END']).toContain(probe.state);
-        expect(probe.parcoursProgress).toContain('CP 8/8');
+        expect(probe.parcoursProgress).toContain('CP 9/9');
         expect(probe.parcoursTimer).toContain('Finish');
         expect(probe.parcoursStatus).toContain('Parcours abgeschlossen');
         expect(probe.roundMetrics?.reason).toBe('PARCOURS_COMPLETE');

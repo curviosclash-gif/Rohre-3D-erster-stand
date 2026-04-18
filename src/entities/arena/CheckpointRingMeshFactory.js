@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { getCheckpointLabelTexture } from './ArenaBuildResourceCache.js';
 
 const CHECKPOINT_COLOR = 0xaaff00;
+export const CHECKPOINT_BRANCH_COLOR = 0x33e6ff;
 const CHECKPOINT_FINISH_COLOR = 0xffd700;
 const RING_RADIUS = 12;
 const RING_TUBE = 0.2;
@@ -39,14 +40,18 @@ function getLabelGeometry() {
     return sharedLabelGeometry;
 }
 
-function createRingMaterial(color) {
-    return new THREE.MeshStandardMaterial({
+function createRingMaterial(color, overrides = {}) {
+    const material = new THREE.MeshStandardMaterial({
         color,
         emissive: color,
         emissiveIntensity: 0.85,
         roughness: 0.25,
         metalness: 0.7,
     });
+    if (Number.isFinite(overrides.emissiveIntensity)) {
+        material.emissiveIntensity = overrides.emissiveIntensity;
+    }
+    return material;
 }
 
 function createLabelMaterial(label) {
@@ -63,7 +68,7 @@ function clamp(value, min, max) {
     return Math.min(max, Math.max(min, value));
 }
 
-function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label, visualRadius = RING_RADIUS) {
+function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label, visualRadius = RING_RADIUS, options = {}) {
     const group = new THREE.Group();
     group.position.copy(position);
     if (rotation) {
@@ -83,13 +88,34 @@ function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label, v
 
     group.userData.ringMesh = ringMesh;
     group.userData.labelMesh = labelMesh;
+    group.userData.ringVisualKind = options.visualKind || 'default';
     return group;
 }
 
-export function createCheckpointRingMesh(position, rotation, number, renderer, visualRadius = RING_RADIUS) {
-    const material = createRingMaterial(CHECKPOINT_COLOR);
-    const group = buildRingGroup(position, rotation, getRingGeometry(), material, number, visualRadius);
+export function createCheckpointRingMesh(
+    position,
+    rotation,
+    number,
+    renderer,
+    visualRadius = RING_RADIUS,
+    options = {}
+) {
+    const checkpointColor = Number.isFinite(options.color) ? options.color : CHECKPOINT_COLOR;
+    const material = createRingMaterial(checkpointColor, {
+        emissiveIntensity: Number.isFinite(options.emissiveIntensity) ? options.emissiveIntensity : 0.85,
+    });
+    const group = buildRingGroup(
+        position,
+        rotation,
+        getRingGeometry(),
+        material,
+        number,
+        visualRadius,
+        options
+    );
     group.userData.checkpointNumber = number;
+    group.userData.checkpointColor = checkpointColor;
+    group.userData.checkpointVisualKind = options.visualKind || 'default';
     renderer?.addToScene?.(group);
     return group;
 }

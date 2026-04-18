@@ -18,10 +18,18 @@ function scalePosArray(raw, invScale) {
 
 function mapParcoursCheckpoint(entry, invScale, fallbackType = 'gate') {
     if (!entry || typeof entry !== 'object') return null;
+    const nextIds = [
+        ...new Set(
+            (Array.isArray(entry.nextIds) ? entry.nextIds : [entry.nextId])
+                .map((value) => (typeof value === 'string' ? value.trim() : ''))
+                .filter(Boolean)
+        ),
+    ];
     const checkpoint = {
         id: typeof entry.id === 'string' ? entry.id : undefined,
         type: typeof entry.type === 'string' ? entry.type : fallbackType,
         aliasOf: typeof entry.aliasOf === 'string' ? entry.aliasOf : undefined,
+        nextIds: nextIds.length > 0 ? nextIds : undefined,
         pos: scalePosArray(entry.pos, invScale),
         radius: asPositiveNumber(entry.radius, 3.5, 0.1) * invScale,
         forward: Array.isArray(entry.forward) ? [

@@ -200,6 +200,16 @@ function sanitizeParcoursCheckpoint(raw, fallbackId = '') {
         checkpoint.aliasOf = aliasOf;
     }
 
+    const nextIds = [
+        ...new Set([
+            ...asArray(source.nextIds).map((entry) => sanitizeOptionalId(entry)).filter(Boolean),
+            sanitizeOptionalId(source.nextId),
+        ].filter(Boolean)),
+    ];
+    if (nextIds.length > 0) {
+        checkpoint.nextIds = nextIds;
+    }
+
     const forward = sanitizeForwardVector(source.forward);
     if (forward) {
         checkpoint.forward = forward;

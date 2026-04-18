@@ -6,6 +6,7 @@ import {
     createSlingshotGateMesh,
 } from '../PortalGateMeshFactory.js';
 import {
+    CHECKPOINT_BRANCH_COLOR,
     createCheckpointRingMesh,
     createFinishRingMesh,
 } from '../CheckpointRingMeshFactory.js';
@@ -114,7 +115,10 @@ export class PortalLayoutBuilder {
 
             const number = cp.routeIndex + 1;
             const visualRadius = Math.max(3.2, asPositiveNumber(cp.radius, 4.2) * 0.75) * scale;
-            const mesh = createCheckpointRingMesh(pos, rotation, number, this.arena.renderer, visualRadius);
+            const mesh = createCheckpointRingMesh(pos, rotation, number, this.arena.renderer, visualRadius, {
+                color: cp.isBranchOption ? CHECKPOINT_BRANCH_COLOR : undefined,
+                visualKind: cp.isBranchOption ? 'branch' : 'default',
+            });
             if (!mesh) continue;
 
             this.arena.checkpointRings.push({
@@ -122,6 +126,9 @@ export class PortalLayoutBuilder {
                 checkpointId: cp.id,
                 pos,
                 mesh,
+                isBranchOption: cp.isBranchOption === true,
+                branchParentId: cp.branchParentId || null,
+                mergeCheckpointId: cp.mergeCheckpointId || null,
             });
         }
 
