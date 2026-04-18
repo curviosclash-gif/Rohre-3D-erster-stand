@@ -10,6 +10,7 @@ const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     save: 'preload.save.v1',
     recording: 'preload.recording.v1',
     lifecycle: 'preload.lifecycle.v1',
+    settingsDefaults: 'preload.settings-defaults.v1',
 });
 const PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION = 'platform-capability-snapshot.v1';
 
@@ -23,6 +24,10 @@ function createNamedContract(contractName, contractVersion, surface) {
         contractVersion,
         ...surface,
     });
+}
+
+function deepCloneJson(value) {
+    return JSON.parse(JSON.stringify(value));
 }
 
 function createCapabilityDescriptor(capabilityId, contractVersion, providerKind, available, extra) {
@@ -105,17 +110,55 @@ function createLifecycleContract() {
     });
 }
 
+function readMenuDefaultsOverrideSnapshot() {
+    try {
+        const snapshot = ipcRenderer.sendSync('settings-defaults:read-override-sync');
+        if (snapshot && typeof snapshot === 'object') {
+            return snapshot;
+        }
+    } catch (error) {
+        return {
+            contractVersion: PRELOAD_CONTRACT_VERSIONS.settingsDefaults,
+            filePath: '',
+            exists: false,
+            loadedAt: Date.now(),
+            readError: error instanceof Error ? error.message : String(error || 'override_sync_failed'),
+            parseError: null,
+            draft: null,
+        };
+    }
+
+    return {
+        contractVersion: PRELOAD_CONTRACT_VERSIONS.settingsDefaults,
+        filePath: '',
+        exists: false,
+        loadedAt: Date.now(),
+        readError: 'override_sync_unavailable',
+        parseError: null,
+        draft: null,
+    };
+}
+
+function createSettingsDefaultsContract() {
+    const snapshot = readMenuDefaultsOverrideSnapshot();
+    return createNamedContract('settingsDefaults', PRELOAD_CONTRACT_VERSIONS.settingsDefaults, {
+        getOverrideSnapshot: () => deepCloneJson(snapshot),
+    });
+}
+
 const discoveryContract = createDiscoveryContract();
 const hostContract = createHostContract();
 const saveContract = createSaveContract();
 const recordingContract = createRecordingContract();
 const lifecycleContract = createLifecycleContract();
+const settingsDefaultsContract = createSettingsDefaultsContract();
 const platformContracts = Object.freeze({
     discovery: discoveryContract,
     host: hostContract,
     save: saveContract,
     recording: recordingContract,
     lifecycle: lifecycleContract,
+    settingsDefaults: settingsDefaultsContract,
 });
 const platformCapabilities = Object.freeze({
     contractVersion: PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION,
@@ -142,6 +185,7 @@ const curviosApp = Object.freeze({
     save: saveContract,
     recording: recordingContract,
     lifecycle: lifecycleContract,
+    settingsDefaults: settingsDefaultsContract,
     getLanServerStatus: hostContract.getStatus,
     startLanServer: hostContract.start,
     stopLanServer: hostContract.stop,

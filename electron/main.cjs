@@ -4,7 +4,7 @@
 
 const { app, BrowserWindow, ipcMain, dialog, Tray, nativeImage } = require('electron');
 const path = require('node:path');
-const { writeFileSync } = require('node:fs');
+const { readFileSync, writeFileSync } = require('node:fs');
 const dgram = require('node:dgram');
 const os = require('node:os');
 const { pathToFileURL } = require('node:url');
@@ -42,6 +42,8 @@ const signalingDiagnostics = {
 const hasSingleInstanceLock = app.requestSingleInstanceLock();
 const WINDOW_SHELL_CONTRACT_VERSION = 'electron.window-shell.v1';
 const HOST_SHELL_CONTRACT_VERSION = 'electron.lan-host-shell.v1';
+const SETTINGS_DEFAULTS_CONTRACT_VERSION = 'preload.settings-defaults.v1';
+const MENU_DEFAULTS_OVERRIDE_FILE_NAME = 'menu-defaults.override.json';
 
 if (!hasSingleInstanceLock) {
     app.quit();
@@ -492,6 +494,41 @@ function createLanHostShellCapability() {
     });
 }
 
+function readMenuDefaultsOverrideSnapshotSync() {
+    const filePath = path.join(app.getPath('userData'), MENU_DEFAULTS_OVERRIDE_FILE_NAME);
+    let exists = false;
+    let draft = null;
+    let readError = null;
+    let parseError = null;
+
+    try {
+        const raw = readFileSync(filePath, 'utf-8');
+        exists = true;
+        if (raw.trim()) {
+            try {
+                const parsed = JSON.parse(raw);
+                draft = parsed && typeof parsed === 'object' ? parsed : null;
+            } catch (error) {
+                parseError = error instanceof Error ? error.message : String(error || 'override_parse_failed');
+            }
+        }
+    } catch (error) {
+        if (error?.code !== 'ENOENT') {
+            readError = error instanceof Error ? error.message : String(error || 'override_read_failed');
+        }
+    }
+
+    return {
+        contractVersion: SETTINGS_DEFAULTS_CONTRACT_VERSION,
+        filePath,
+        exists,
+        loadedAt: Date.now(),
+        readError,
+        parseError,
+        draft,
+    };
+}
+
 const desktopWindowShellCapability = createDesktopWindowShellCapability();
 const lanHostShellCapability = createLanHostShellCapability();
 
@@ -671,6 +708,10 @@ ipcMain.handle('save-video', async (_event, videoBytes, defaultName, mimeType) =
     }
 
     return { saved: false };
+});
+
+ipcMain.on('settings-defaults:read-override-sync', (event) => {
+    event.returnValue = readMenuDefaultsOverrideSnapshotSync();
 });
 
 async function shutdownRuntime() {
