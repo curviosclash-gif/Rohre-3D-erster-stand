@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
 Stand: 2026-04-18. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-Naechste offene Subphase: `95.99` (siehe `docs/plaene/aktiv/V95.md`). Phase 95.6 abgeschlossen 2026-04-18. Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+Naechste offene Subphase: noch offen — V95 abgeschlossen 2026-04-18. Naechster aktiver Block: keiner der planmaessig bereit ist (V86, V75, V76, V82 jeweils abhaengig von offenen Bloecken). Naechster freigegebener Block: V86 (keine harten offenen Deps). Aktuelle Intake-Drafts: `docs/plaene/neu/`. Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -37,6 +37,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V91 | Architektur-Ratchet und Legacy-Surface-Sunset | done | P2 | frei | V87.99,V77.99 | 91.99 | `docs/plaene/aktiv/V91.md` |
 | V92 | Runtime-Application-Ownership-Entkopplung und Orchestrator-Zuschnitt | done | P2 | frei | V91.99 | 92.99 | `docs/plaene/aktiv/V92.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | done | P2 | frei | V74.99,V77.99 | 64.99 | `docs/plaene/aktiv/V64.md` |
+| V95 | Settings Studio fuer Menu-Defaults | done | P2 | frei | V77.99,V92.99 | 95.99 | `docs/plaene/aktiv/V95.md` |
 
 ### Aktive und geplante Bloecke
 
@@ -48,7 +49,6 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.1 | `docs/plaene/aktiv/V82.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
-| V95 | Settings Studio fuer Menu-Defaults | planned | P2 | frei | V77.99,V92.99 | 95.99 | `docs/plaene/aktiv/V95.md` |
 
 ## Abhaengigkeiten
 
