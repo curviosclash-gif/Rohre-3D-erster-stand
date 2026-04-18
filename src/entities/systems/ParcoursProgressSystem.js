@@ -16,6 +16,7 @@ export class ParcoursProgressSystem {
         this._completionOrder = [];
         this._xpEventCallback = null;
         this._leaderboardCallback = null;
+        this._ghostRecorder = null;
     }
 
     setXpEventCallback(callback) {
@@ -26,6 +27,10 @@ export class ParcoursProgressSystem {
         this._leaderboardCallback = typeof callback === 'function' ? callback : null;
     }
 
+    setGhostRecorder(recorder) {
+        this._ghostRecorder = recorder && typeof recorder.sample === 'function' ? recorder : null;
+    }
+
     isEnabled() {
         return !!this._route;
     }
@@ -34,6 +39,7 @@ export class ParcoursProgressSystem {
         this._route = null;
         this._playerStates.clear();
         this._completionOrder.length = 0;
+        this._ghostRecorder?.reset?.();
     }
 
     startRound(players = []) {
@@ -228,6 +234,16 @@ export class ParcoursProgressSystem {
         this._setCheckpointCooldown(state, entry.id, now);
         if (state.startedAtMs <= 0) {
             state.startedAtMs = now;
+            if (this._route.rules.showGhost) {
+                if (this._ghostRecorder) {
+                    this._ghostRecorder.startRecording(player.index, now);
+                }
+                this._leaderboardCallback?.({
+                    type: 'ghost_start',
+                    playerIndex: player.index,
+                    routeId: this._route.routeId,
+                });
+            }
         }
         state.lastCheckpointAtMs = now;
         state.lastCheckpointId = entry.id;
@@ -343,12 +359,16 @@ export class ParcoursProgressSystem {
         if (finishXpResult?.earned > 0) {
             this._notifyPlayer(player, `+${finishXpResult.earned} XP (Parcours)`);
         }
+        const ghostClip = this._route.rules.showGhost
+            ? (this._ghostRecorder?.stopRecording?.() || null)
+            : null;
         this._leaderboardCallback?.({
             type: 'finish',
             playerIndex: player.index,
             routeId: this._route.routeId,
             totalTimeMs: state.completionTimeMs,
             segmentSplitsMs: [...state.segmentSplitsMs],
+            ghostClip,
         });
     }
 
@@ -366,6 +386,10 @@ export class ParcoursProgressSystem {
         if (!this._route || !player?.alive || !Number.isInteger(player.index)) return null;
         const state = this._ensurePlayerState(player.index);
         if (!state || state.completed) return null;
+
+        if (state.startedAtMs > 0 && this._ghostRecorder?.isRecording) {
+            this._ghostRecorder.sample(player, now);
+        }
 
         const expectedIndex = Math.max(0, Math.min(this._route.totalCheckpoints, state.nextCheckpointIndex));
         const segmentTimeoutActive = this._route.rules.maxSegmentTimeMs > 0

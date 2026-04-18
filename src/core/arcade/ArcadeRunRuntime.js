@@ -35,6 +35,7 @@ import {
     insertLeaderboardEntry,
     getBestEntry,
 } from '../../state/arcade/ArcadeLeaderboard.js';
+import { ArcadeGhostRecorder } from '../../state/arcade/ArcadeGhostRecorder.js';
 import {
     assignSectorMissions,
     createSectorMissionState,
@@ -132,6 +133,8 @@ export class ArcadeRunRuntime {
         // 82.1.1: Current sector type ('sector_parcours' | null)
         this._currentSectorType = null;
         this._leaderboard = null;
+        this._ghostRecorder = new ArcadeGhostRecorder();
+        this._onGhostPlayback = null;
     }
 
     _nextRunId(nowMs = Date.now()) {
@@ -241,6 +244,10 @@ export class ArcadeRunRuntime {
         if (this._onSuddenDeathEntered) {
             try { this._onSuddenDeathEntered(); } catch { /* no-op */ }
         }
+    }
+
+    setGhostPlaybackHandler(handler) {
+        this._onGhostPlayback = typeof handler === 'function' ? handler : null;
     }
 
     setStrategy(strategy) {
@@ -1086,7 +1093,7 @@ export class ArcadeRunRuntime {
 
     applyParcoursLeaderboardEvent(data) {
         if (!this._enabled || !data || typeof data !== 'object') return null;
-        const { type, routeId, checkpointIndex, currentSplitMs, totalTimeMs, segmentSplitsMs } = data;
+        const { type, routeId, checkpointIndex, currentSplitMs, totalTimeMs, segmentSplitsMs, ghostClip } = data;
 
         if (type === 'checkpoint') {
             if (!this._leaderboard || !routeId) return null;
@@ -1105,6 +1112,15 @@ export class ArcadeRunRuntime {
             return { deltaMs, isBetter: deltaMs < 0 };
         }
 
+        if (type === 'ghost_start') {
+            if (!this._leaderboard || !routeId) return null;
+            const best = getBestEntry(this._leaderboard, routeId);
+            if (best?.ghostClip && this._onGhostPlayback) {
+                try { this._onGhostPlayback(best.ghostClip); } catch { /* no-op */ }
+            }
+            return null;
+        }
+
         if (type === 'finish') {
             const store = this.settingsManager?.store;
             if (!routeId || !store) return null;
@@ -1118,6 +1134,7 @@ export class ArcadeRunRuntime {
                 segmentSplitsMs,
                 vehicleId,
                 date: new Date().toISOString(),
+                ghostClip: isBestTime ? (ghostClip || null) : null,
             });
             saveLeaderboard(store, this._leaderboard);
             if (isBestTime) {

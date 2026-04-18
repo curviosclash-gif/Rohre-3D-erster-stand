@@ -112,6 +112,15 @@ export class GameRuntimeArcadeSupport {
                 (data) => this.arcadeRunRuntime.applyParcoursLeaderboardEvent(data)
             );
         }
+        if (parcoursSystem && typeof parcoursSystem.setGhostRecorder === 'function') {
+            parcoursSystem.setGhostRecorder(this.arcadeRunRuntime._ghostRecorder);
+        }
+        if (typeof this.arcadeRunRuntime.setGhostPlaybackHandler === 'function') {
+            const entityManager = runtimeState?.entityManager || null;
+            this.arcadeRunRuntime.setGhostPlaybackHandler(
+                (clip) => entityManager?.playLastRoundGhost?.(clip)
+            );
+        }
 
         return this.arcadeRunRuntime.startRun({
             entityManager: runtimeState?.entityManager || null,
