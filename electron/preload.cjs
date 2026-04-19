@@ -140,9 +140,8 @@ function readMenuDefaultsOverrideSnapshot() {
 }
 
 function createSettingsDefaultsContract() {
-    const snapshot = readMenuDefaultsOverrideSnapshot();
     return createNamedContract('settingsDefaults', PRELOAD_CONTRACT_VERSIONS.settingsDefaults, {
-        getOverrideSnapshot: () => deepCloneJson(snapshot),
+        getOverrideSnapshot: () => deepCloneJson(readMenuDefaultsOverrideSnapshot()),
     });
 }
 

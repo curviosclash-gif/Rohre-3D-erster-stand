@@ -17,7 +17,8 @@ import { createRuntimeConfigSnapshot } from './RuntimeConfig.js';
 import { TelemetryHistoryStore } from '../state/TelemetryHistoryStore.js';
 import {
     cloneDefaultControlsSnapshot,
-    createDefaultSettingsSnapshot,
+    createDefaultSettingsSnapshotForRuntime,
+    rebaseSettingsSnapshotWithRuntimeDefaults,
 } from './settings/SettingsDefaultsFacade.js';
 import { sanitizeSettingsSnapshot } from './settings/SettingsSanitizerOps.js';
 import { createSettingsSessionDraftFacade } from './settings/SettingsSessionDraftFacade.js';
@@ -78,7 +79,7 @@ export class SettingsManager {
     }
 
     createDefaultSettings() {
-        return createDefaultSettingsSnapshot();
+        return createDefaultSettingsSnapshotForRuntime();
     }
 
     cloneDefaultControls() {
@@ -90,7 +91,12 @@ export class SettingsManager {
     }
 
     loadSettings() {
-        return this.store.loadSettings();
+        const loadedSettings = this.store.loadSettings();
+        const rebasedSettings = rebaseSettingsSnapshotWithRuntimeDefaults(loadedSettings);
+        if (JSON.stringify(loadedSettings) !== JSON.stringify(rebasedSettings)) {
+            this.store.saveSettings(rebasedSettings);
+        }
+        return rebasedSettings;
     }
 
     saveSettings(settings) {

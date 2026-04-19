@@ -304,7 +304,13 @@ export function validateSettingsOverrideDraft(candidateDraft) {
             const limits = resolveEffectiveLimits(field, normalizedDraft.limitOverrides);
             if (!limits) continue;
 
-            validateLimitRule(field.path, limits, errors);
+            const hasExplicitLimitOverride = Object.prototype.hasOwnProperty.call(
+                normalizedDraft.limitOverrides,
+                field.path
+            );
+            if (!hasExplicitLimitOverride) {
+                validateLimitRule(field.path, limits, errors);
+            }
             if (Number.isFinite(limits.min) && asNumber < limits.min) {
                 errors.push(createError(
                     field.path,
@@ -399,4 +405,3 @@ export function setDraftValueByPath(draft, path, value) {
     writePathValue(source, path, value);
     return validateSettingsOverrideDraft(source);
 }
-

@@ -18,7 +18,14 @@ import {
 } from '../../shared/contracts/CameraPerspectiveContract.js';
 import { deepClone } from './SettingsDomainUtils.js';
 import { validateSettingsOverrideDraft } from './SettingsOverrideContract.js';
-import { deepMergeKnownShape, isPlainObject } from './SettingsOverrideMergeOps.js';
+import {
+    collectPrimitiveLeafPaths,
+    deepMergeKnownShape,
+    isPlainObject,
+    readPathValue,
+    writePathValue,
+} from './SettingsOverrideMergeOps.js';
+import { readSettingsOverrideDraftFromRuntime } from './SettingsRuntimeLimits.js';
 
 export function cloneDefaultControlsSnapshot() {
     const base = deepClone(CONFIG.KEYS);
@@ -41,6 +48,10 @@ export function createDefaultSettingsSnapshot() {
     return ensureMenuContractState(defaults);
 }
 
+function valuesEqual(left, right) {
+    return JSON.stringify(left) === JSON.stringify(right);
+}
+
 export function applySettingsOverrideToDefaults(baseSettings, validatedOverrideDraft) {
     if (!isPlainObject(validatedOverrideDraft) || !isPlainObject(validatedOverrideDraft.baseSettings)) {
         return baseSettings;
@@ -60,4 +71,45 @@ export function createDefaultSettingsSnapshotWithOverride(rawOverrideDraft) {
         return base;
     }
     return applySettingsOverrideToDefaults(base, result.normalizedDraft);
+}
+
+export function createDefaultSettingsSnapshotForRuntime(runtimeGlobal = globalThis) {
+    return createDefaultSettingsSnapshotWithOverride(
+        readSettingsOverrideDraftFromRuntime(runtimeGlobal)
+    );
+}
+
+export function rebaseSettingsSnapshotWithRuntimeDefaults(
+    settings,
+    runtimeGlobal = globalThis
+) {
+    const resolvedDefaults = createDefaultSettingsSnapshotForRuntime(runtimeGlobal);
+    if (!isPlainObject(settings)) {
+        return resolvedDefaults;
+    }
+
+    const rebasedSettings = deepClone(settings);
+    const codeDefaults = createDefaultSettingsSnapshot();
+    const knownPaths = collectPrimitiveLeafPaths(resolvedDefaults);
+
+    for (const path of knownPaths) {
+        const currentValue = readPathValue(rebasedSettings, path);
+        const codeDefaultValue = readPathValue(codeDefaults, path);
+        const resolvedDefaultValue = readPathValue(resolvedDefaults, path);
+
+        if (currentValue === undefined) {
+            writePathValue(rebasedSettings, path, deepClone(resolvedDefaultValue));
+            continue;
+        }
+        if (!valuesEqual(currentValue, codeDefaultValue)) {
+            continue;
+        }
+        if (valuesEqual(resolvedDefaultValue, codeDefaultValue)) {
+            continue;
+        }
+
+        writePathValue(rebasedSettings, path, deepClone(resolvedDefaultValue));
+    }
+
+    return rebasedSettings;
 }

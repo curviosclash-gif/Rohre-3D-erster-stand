@@ -4,7 +4,6 @@ import { BOT_POLICY_TYPES, resolveMatchBotPolicyType } from '../entities/ai/BotP
 import {
     clampSettingValue,
     createControlBindingsSnapshot,
-    SETTINGS_LIMITS,
 } from './config/SettingsRuntimeContract.js';
 import { normalizeSessionType } from '../composition/core-ui/CoreSettingsPorts.js';
 import {
@@ -21,6 +20,7 @@ import {
     resolveRuntimeSessionContract,
 } from '../shared/contracts/RuntimeSessionContract.js';
 import { cloneJsonValue } from '../shared/utils/JsonClone.js';
+import { createRuntimeSettingsLimitsForRuntime } from './settings/SettingsRuntimeLimits.js';
 
 function toNumber(value, fallback) {
     const parsed = Number(value);
@@ -118,6 +118,7 @@ export function resolveBotPolicyType(
 
 export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE } = {}) {
     const source = settings && typeof settings === 'object' ? settings : {};
+    const runtimeLimits = createRuntimeSettingsLimitsForRuntime();
     const gameplaySource = source.gameplay && typeof source.gameplay === 'object' ? source.gameplay : {};
     const huntSource = source.hunt && typeof source.hunt === 'object' ? source.hunt : {};
     const botBridgeSource = source.botBridge && typeof source.botBridge === 'object' ? source.botBridge : {};
@@ -179,16 +180,16 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             numHumans,
             networkEnabled,
             maxPlayers: clampSettingValue(source.maxPlayers, { min: 2, max: 10, step: 1 }, 10),
-            numBots: clampSettingValue(source.numBots, SETTINGS_LIMITS.session.numBots, 0),
-            winsNeeded: clampSettingValue(source.winsNeeded, SETTINGS_LIMITS.session.winsNeeded, 5),
+            numBots: clampSettingValue(source.numBots, runtimeLimits.session.numBots, 0),
+            winsNeeded: clampSettingValue(source.winsNeeded, runtimeLimits.session.winsNeeded, 5),
             mapKey: String(source.mapKey || 'standard'),
             portalsEnabled: !!source.portalsEnabled,
             activeGameMode,
         },
         player: {
-            speed: clampSettingValue(gameplaySource.speed, SETTINGS_LIMITS.gameplay.speed, playerDefaults.SPEED),
-            turnSpeed: clampSettingValue(gameplaySource.turnSensitivity, SETTINGS_LIMITS.gameplay.turnSensitivity, playerDefaults.TURN_SPEED),
-            modelScale: clampSettingValue(gameplaySource.planeScale, SETTINGS_LIMITS.gameplay.planeScale, playerDefaults.MODEL_SCALE),
+            speed: clampSettingValue(gameplaySource.speed, runtimeLimits.gameplay.speed, playerDefaults.SPEED),
+            turnSpeed: clampSettingValue(gameplaySource.turnSensitivity, runtimeLimits.gameplay.turnSensitivity, playerDefaults.TURN_SPEED),
+            modelScale: clampSettingValue(gameplaySource.planeScale, runtimeLimits.gameplay.planeScale, playerDefaults.MODEL_SCALE),
             autoRoll: typeof source.autoRoll === 'boolean' ? source.autoRoll : !!playerDefaults.AUTO_ROLL,
             vehicles: {
                 PLAYER_1: source?.vehicles?.PLAYER_1 || playerDefaults.DEFAULT_VEHICLE_ID || 'ship5',
@@ -197,22 +198,22 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
         },
         gameplay: {
             planarMode,
-            portalCount: clampSettingValue(gameplaySource.portalCount, SETTINGS_LIMITS.gameplay.portalCount, gameplayDefaults.PORTAL_COUNT || 0),
-            planarLevelCount: clampSettingValue(gameplaySource.planarLevelCount, SETTINGS_LIMITS.gameplay.planarLevelCount, gameplayDefaults.PLANAR_LEVEL_COUNT || 5),
+            portalCount: clampSettingValue(gameplaySource.portalCount, runtimeLimits.gameplay.portalCount, gameplayDefaults.PORTAL_COUNT || 0),
+            planarLevelCount: clampSettingValue(gameplaySource.planarLevelCount, runtimeLimits.gameplay.planarLevelCount, gameplayDefaults.PLANAR_LEVEL_COUNT || 5),
             portalBeams: false,
             planarAimInputSpeed: toNumber(gameplayDefaults.PLANAR_AIM_INPUT_SPEED, 1.5),
             planarAimReturnSpeed: toNumber(gameplayDefaults.PLANAR_AIM_RETURN_SPEED, 0.6),
         },
         trail: {
-            width: clampSettingValue(gameplaySource.trailWidth, SETTINGS_LIMITS.gameplay.trailWidth, trailDefaults.WIDTH),
-            gapDuration: clampSettingValue(gameplaySource.gapSize, SETTINGS_LIMITS.gameplay.gapSize, trailDefaults.GAP_DURATION),
-            gapChance: clampSettingValue(gameplaySource.gapFrequency, SETTINGS_LIMITS.gameplay.gapFrequency, trailDefaults.GAP_CHANCE),
+            width: clampSettingValue(gameplaySource.trailWidth, runtimeLimits.gameplay.trailWidth, trailDefaults.WIDTH),
+            gapDuration: clampSettingValue(gameplaySource.gapSize, runtimeLimits.gameplay.gapSize, trailDefaults.GAP_DURATION),
+            gapChance: clampSettingValue(gameplaySource.gapFrequency, runtimeLimits.gameplay.gapFrequency, trailDefaults.GAP_CHANCE),
         },
         powerup: {
-            maxOnField: clampSettingValue(gameplaySource.itemAmount, SETTINGS_LIMITS.gameplay.itemAmount, powerupDefaults.MAX_ON_FIELD),
+            maxOnField: clampSettingValue(gameplaySource.itemAmount, runtimeLimits.gameplay.itemAmount, powerupDefaults.MAX_ON_FIELD),
         },
         projectile: {
-            cooldown: clampSettingValue(gameplaySource.fireRate, SETTINGS_LIMITS.gameplay.fireRate, projectileDefaults.COOLDOWN),
+            cooldown: clampSettingValue(gameplaySource.fireRate, runtimeLimits.gameplay.fireRate, projectileDefaults.COOLDOWN),
         },
         bot: {
             activeDifficulty: botDifficulty,
@@ -222,33 +223,33 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
             trainerBridgeUrl: typeof botBridgeSource.url === 'string' && botBridgeSource.url.trim()
                 ? botBridgeSource.url.trim()
                 : 'ws://127.0.0.1:8765',
-            trainerBridgeTimeoutMs: clampSettingValue(botBridgeSource.timeoutMs, SETTINGS_LIMITS.botBridge.timeoutMs, 80),
-            trainerBridgeMaxRetries: clampSettingValue(botBridgeSource.maxRetries, SETTINGS_LIMITS.botBridge.maxRetries, 1),
-            trainerBridgeRetryDelayMs: clampSettingValue(botBridgeSource.retryDelayMs, SETTINGS_LIMITS.botBridge.retryDelayMs, 0),
+            trainerBridgeTimeoutMs: clampSettingValue(botBridgeSource.timeoutMs, runtimeLimits.botBridge.timeoutMs, 80),
+            trainerBridgeMaxRetries: clampSettingValue(botBridgeSource.maxRetries, runtimeLimits.botBridge.maxRetries, 1),
+            trainerBridgeRetryDelayMs: clampSettingValue(botBridgeSource.retryDelayMs, runtimeLimits.botBridge.retryDelayMs, 0),
             trainerCheckpointResumeToken: typeof botBridgeSource.resumeCheckpoint === 'string'
                 ? botBridgeSource.resumeCheckpoint.trim()
                 : '',
             trainerCheckpointResumeStrict: botBridgeSource.resumeStrict === true,
         },
         homing: {
-            lockOnAngle: clampSettingValue(gameplaySource.lockOnAngle, SETTINGS_LIMITS.gameplay.lockOnAngle, homingDefaults.LOCK_ON_ANGLE),
+            lockOnAngle: clampSettingValue(gameplaySource.lockOnAngle, runtimeLimits.gameplay.lockOnAngle, homingDefaults.LOCK_ON_ANGLE),
         },
         controls: createControlBindingsSnapshot(source.controls, controlsDefaults, { guardCombatConflicts: true }),
         huntCombat: {
             mgTrailAimRadius: clampSettingValue(
                 gameplaySource.mgTrailAimRadius,
-                SETTINGS_LIMITS.gameplay.mgTrailAimRadius,
+                runtimeLimits.gameplay.mgTrailAimRadius,
                 baseConfig?.HUNT?.MG?.TRAIL_HIT_RADIUS ?? CONFIG?.HUNT?.MG?.TRAIL_HIT_RADIUS ?? 0.78
             ),
             fightTuningEnabled: modePath === 'fight',
             fightPlayerHp: clampSettingValue(
                 gameplaySource.fightPlayerHp,
-                SETTINGS_LIMITS.gameplay.fightPlayerHp,
+                runtimeLimits.gameplay.fightPlayerHp,
                 baseConfig?.HUNT?.PLAYER_MAX_HP ?? CONFIG?.HUNT?.PLAYER_MAX_HP ?? 100
             ),
             fightMgDamage: clampSettingValue(
                 gameplaySource.fightMgDamage,
-                SETTINGS_LIMITS.gameplay.fightMgDamage,
+                runtimeLimits.gameplay.fightMgDamage,
                 baseConfig?.HUNT?.MG?.DAMAGE ?? CONFIG?.HUNT?.MG?.DAMAGE ?? 7.75
             ),
         },

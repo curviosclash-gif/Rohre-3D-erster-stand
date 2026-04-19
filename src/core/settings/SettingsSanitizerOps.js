@@ -11,7 +11,6 @@ import {
     clampSettingValue,
     normalizeControlBindings,
     normalizeGlobalControlBindings,
-    SETTINGS_LIMITS,
 } from '../config/SettingsRuntimeContract.js';
 import {
     normalizeBotPolicyStrategy,
@@ -28,8 +27,9 @@ import {
     deepClone,
     normalizeModePath,
 } from './SettingsDomainUtils.js';
+import { createRuntimeSettingsLimitsForRuntime } from './SettingsRuntimeLimits.js';
 
-function applySessionSanitization({ merged, src, defaults, migratedSessionType }) {
+function applySessionSanitization({ merged, src, defaults, migratedSessionType, runtimeLimits }) {
     const huntFeatureEnabled = CONFIG.HUNT?.ENABLED !== false;
     merged.mode = migratedSessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
     merged.gameMode = resolveActiveGameMode(src.gameMode, huntFeatureEnabled);
@@ -41,7 +41,7 @@ function applySessionSanitization({ merged, src, defaults, migratedSessionType }
 
     merged.numBots = clampSettingValue(
         src.numBots ?? defaults.numBots,
-        SETTINGS_LIMITS.session.numBots,
+        runtimeLimits.session.numBots,
         defaults.numBots
     );
     merged.botDifficulty = ['EASY', 'NORMAL', 'HARD'].includes(src.botDifficulty)
@@ -50,7 +50,7 @@ function applySessionSanitization({ merged, src, defaults, migratedSessionType }
     merged.botPolicyStrategy = normalizeBotPolicyStrategy(src.botPolicyStrategy, defaults.botPolicyStrategy);
     merged.winsNeeded = clampSettingValue(
         src.winsNeeded ?? defaults.winsNeeded,
-        SETTINGS_LIMITS.session.winsNeeded,
+        runtimeLimits.session.winsNeeded,
         defaults.winsNeeded
     );
     merged.autoRoll = typeof src.autoRoll === 'boolean' ? src.autoRoll : defaults.autoRoll;
@@ -71,82 +71,82 @@ function applySessionSanitization({ merged, src, defaults, migratedSessionType }
     }
 }
 
-function applyGameplaySanitization({ merged, src, defaults }) {
+function applyGameplaySanitization({ merged, src, defaults, runtimeLimits }) {
     merged.gameplay.speed = clampSettingValue(
         src?.gameplay?.speed ?? defaults.gameplay.speed,
-        SETTINGS_LIMITS.gameplay.speed,
+        runtimeLimits.gameplay.speed,
         defaults.gameplay.speed
     );
     merged.gameplay.turnSensitivity = clampSettingValue(
         src?.gameplay?.turnSensitivity ?? defaults.gameplay.turnSensitivity,
-        SETTINGS_LIMITS.gameplay.turnSensitivity,
+        runtimeLimits.gameplay.turnSensitivity,
         defaults.gameplay.turnSensitivity
     );
     merged.gameplay.planeScale = clampSettingValue(
         src?.gameplay?.planeScale ?? defaults.gameplay.planeScale,
-        SETTINGS_LIMITS.gameplay.planeScale,
+        runtimeLimits.gameplay.planeScale,
         defaults.gameplay.planeScale
     );
     merged.gameplay.trailWidth = clampSettingValue(
         src?.gameplay?.trailWidth ?? defaults.gameplay.trailWidth,
-        SETTINGS_LIMITS.gameplay.trailWidth,
+        runtimeLimits.gameplay.trailWidth,
         defaults.gameplay.trailWidth
     );
     merged.gameplay.gapSize = clampSettingValue(
         src?.gameplay?.gapSize ?? defaults.gameplay.gapSize,
-        SETTINGS_LIMITS.gameplay.gapSize,
+        runtimeLimits.gameplay.gapSize,
         defaults.gameplay.gapSize
     );
     merged.gameplay.gapFrequency = clampSettingValue(
         src?.gameplay?.gapFrequency ?? defaults.gameplay.gapFrequency,
-        SETTINGS_LIMITS.gameplay.gapFrequency,
+        runtimeLimits.gameplay.gapFrequency,
         defaults.gameplay.gapFrequency
     );
     merged.gameplay.itemAmount = clampSettingValue(
         src?.gameplay?.itemAmount ?? defaults.gameplay.itemAmount,
-        SETTINGS_LIMITS.gameplay.itemAmount,
+        runtimeLimits.gameplay.itemAmount,
         defaults.gameplay.itemAmount
     );
     merged.gameplay.fireRate = clampSettingValue(
         src?.gameplay?.fireRate ?? defaults.gameplay.fireRate,
-        SETTINGS_LIMITS.gameplay.fireRate,
+        runtimeLimits.gameplay.fireRate,
         defaults.gameplay.fireRate
     );
     merged.gameplay.lockOnAngle = clampSettingValue(
         src?.gameplay?.lockOnAngle ?? defaults.gameplay.lockOnAngle,
-        SETTINGS_LIMITS.gameplay.lockOnAngle,
+        runtimeLimits.gameplay.lockOnAngle,
         defaults.gameplay.lockOnAngle
     );
     merged.gameplay.mgTrailAimRadius = clampSettingValue(
         src?.gameplay?.mgTrailAimRadius ?? defaults.gameplay.mgTrailAimRadius,
-        SETTINGS_LIMITS.gameplay.mgTrailAimRadius,
+        runtimeLimits.gameplay.mgTrailAimRadius,
         defaults.gameplay.mgTrailAimRadius
     );
     merged.gameplay.fightPlayerHp = clampSettingValue(
         src?.gameplay?.fightPlayerHp ?? defaults.gameplay.fightPlayerHp,
-        SETTINGS_LIMITS.gameplay.fightPlayerHp,
+        runtimeLimits.gameplay.fightPlayerHp,
         defaults.gameplay.fightPlayerHp
     );
     merged.gameplay.fightMgDamage = clampSettingValue(
         src?.gameplay?.fightMgDamage ?? defaults.gameplay.fightMgDamage,
-        SETTINGS_LIMITS.gameplay.fightMgDamage,
+        runtimeLimits.gameplay.fightMgDamage,
         defaults.gameplay.fightMgDamage
     );
     merged.gameplay.planarMode = !!(src?.gameplay?.planarMode ?? defaults.gameplay.planarMode);
     merged.gameplay.portalCount = clampSettingValue(
         src?.gameplay?.portalCount ?? defaults.gameplay.portalCount,
-        SETTINGS_LIMITS.gameplay.portalCount,
+        runtimeLimits.gameplay.portalCount,
         defaults.gameplay.portalCount
     );
     merged.gameplay.planarLevelCount = clampSettingValue(
         src?.gameplay?.planarLevelCount ?? defaults.gameplay.planarLevelCount,
-        SETTINGS_LIMITS.gameplay.planarLevelCount,
+        runtimeLimits.gameplay.planarLevelCount,
         defaults.gameplay.planarLevelCount
     );
     merged.gameplay.portalBeams = false;
 }
 
-function applyBotBridgeSanitization({ merged, src, defaults }) {
+function applyBotBridgeSanitization({ merged, src, defaults, runtimeLimits }) {
     merged.botBridge = {
         enabled: !!(src?.botBridge?.enabled ?? defaults.botBridge.enabled),
         url: typeof src?.botBridge?.url === 'string' && src.botBridge.url.trim()
@@ -154,17 +154,17 @@ function applyBotBridgeSanitization({ merged, src, defaults }) {
             : defaults.botBridge.url,
         timeoutMs: clampSettingValue(
             src?.botBridge?.timeoutMs ?? defaults.botBridge.timeoutMs,
-            SETTINGS_LIMITS.botBridge.timeoutMs,
+            runtimeLimits.botBridge.timeoutMs,
             defaults.botBridge.timeoutMs
         ),
         maxRetries: clampSettingValue(
             src?.botBridge?.maxRetries ?? defaults.botBridge.maxRetries,
-            SETTINGS_LIMITS.botBridge.maxRetries,
+            runtimeLimits.botBridge.maxRetries,
             defaults.botBridge.maxRetries
         ),
         retryDelayMs: clampSettingValue(
             src?.botBridge?.retryDelayMs ?? defaults.botBridge.retryDelayMs,
-            SETTINGS_LIMITS.botBridge.retryDelayMs,
+            runtimeLimits.botBridge.retryDelayMs,
             defaults.botBridge.retryDelayMs
         ),
         resumeCheckpoint: typeof src?.botBridge?.resumeCheckpoint === 'string'
@@ -232,6 +232,7 @@ function migrateLegacySettingsSnapshot(src, defaults) {
 
 export function sanitizeSettingsSnapshot(saved, createDefaultSettings) {
     const defaults = createDefaultSettings();
+    const runtimeLimits = createRuntimeSettingsLimitsForRuntime();
     const rawSource = saved && typeof saved === 'object' ? saved : {};
     const src = migrateLegacySettingsSnapshot(rawSource, defaults);
 
@@ -240,9 +241,9 @@ export function sanitizeSettingsSnapshot(saved, createDefaultSettings) {
         src?.localSettings?.sessionType || (src.mode === '2p' ? MENU_SESSION_TYPES.SPLITSCREEN : MENU_SESSION_TYPES.SINGLE)
     );
 
-    applySessionSanitization({ merged, src, defaults, migratedSessionType });
-    applyGameplaySanitization({ merged, src, defaults });
-    applyBotBridgeSanitization({ merged, src, defaults });
+    applySessionSanitization({ merged, src, defaults, migratedSessionType, runtimeLimits });
+    applyGameplaySanitization({ merged, src, defaults, runtimeLimits });
+    applyBotBridgeSanitization({ merged, src, defaults, runtimeLimits });
     applyControlAndMediaSanitization({ merged, src, defaults });
     applyMenuContractPayloadSanitization({ merged, src });
 

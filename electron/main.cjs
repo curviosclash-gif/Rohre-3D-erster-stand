@@ -4,7 +4,13 @@
 
 const { app, BrowserWindow, ipcMain, dialog, Tray, nativeImage } = require('electron');
 const path = require('node:path');
-const { readFileSync, writeFileSync } = require('node:fs');
+const {
+    copyFileSync,
+    existsSync,
+    mkdirSync,
+    readFileSync,
+    writeFileSync,
+} = require('node:fs');
 const dgram = require('node:dgram');
 const os = require('node:os');
 const { pathToFileURL } = require('node:url');
@@ -39,11 +45,14 @@ const signalingDiagnostics = {
     lastStoppedAt: null,
     lastError: null,
 };
+app.setAppUserModelId('de.curviosclash.main');
 const hasSingleInstanceLock = app.requestSingleInstanceLock();
 const WINDOW_SHELL_CONTRACT_VERSION = 'electron.window-shell.v1';
 const HOST_SHELL_CONTRACT_VERSION = 'electron.lan-host-shell.v1';
 const SETTINGS_DEFAULTS_CONTRACT_VERSION = 'preload.settings-defaults.v1';
 const MENU_DEFAULTS_OVERRIDE_FILE_NAME = 'menu-defaults.override.json';
+const SHARED_USER_DATA_DIR_NAME = 'curviosclash-app';
+const LEGACY_ELECTRON_USER_DATA_DIR_NAME = 'Electron';
 
 if (!hasSingleInstanceLock) {
     app.quit();
@@ -494,8 +503,48 @@ function createLanHostShellCapability() {
     });
 }
 
+function resolveSharedMenuDefaultsOverrideFilePath() {
+    return path.join(
+        app.getPath('appData'),
+        SHARED_USER_DATA_DIR_NAME,
+        MENU_DEFAULTS_OVERRIDE_FILE_NAME
+    );
+}
+
+function listLegacyMenuDefaultsOverrideSourcePaths(targetFilePath) {
+    const candidatePaths = [
+        path.join(app.getPath('userData'), MENU_DEFAULTS_OVERRIDE_FILE_NAME),
+        path.join(
+            app.getPath('appData'),
+            LEGACY_ELECTRON_USER_DATA_DIR_NAME,
+            MENU_DEFAULTS_OVERRIDE_FILE_NAME
+        ),
+    ];
+
+    return Array.from(new Set(
+        candidatePaths.filter((candidatePath) => candidatePath && candidatePath !== targetFilePath)
+    ));
+}
+
+function migrateLegacyMenuDefaultsOverrideIfNeeded(targetFilePath) {
+    if (!targetFilePath || existsSync(targetFilePath)) {
+        return;
+    }
+
+    for (const sourceFilePath of listLegacyMenuDefaultsOverrideSourcePaths(targetFilePath)) {
+        if (!existsSync(sourceFilePath)) {
+            continue;
+        }
+
+        mkdirSync(path.dirname(targetFilePath), { recursive: true });
+        copyFileSync(sourceFilePath, targetFilePath);
+        return;
+    }
+}
+
 function readMenuDefaultsOverrideSnapshotSync() {
-    const filePath = path.join(app.getPath('userData'), MENU_DEFAULTS_OVERRIDE_FILE_NAME);
+    const filePath = resolveSharedMenuDefaultsOverrideFilePath();
+    migrateLegacyMenuDefaultsOverrideIfNeeded(filePath);
     let exists = false;
     let draft = null;
     let readError = null;

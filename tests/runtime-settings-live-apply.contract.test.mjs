@@ -1,7 +1,14 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import { ArcadeRunRuntime } from '../src/core/arcade/ArcadeRunRuntime.js';
 import { registerSessionMenuEventHandlers } from '../src/core/runtime/menu-handlers/SessionMenuEventHandlers.js';
+import { createRuntimeConfigSnapshot } from '../src/core/RuntimeConfig.js';
+import { createDefaultSettingsSnapshotForRuntime } from '../src/core/settings/SettingsDefaultsFacade.js';
+import {
+    createSettingsOverrideDraft,
+    validateSettingsOverrideDraft,
+} from '../src/core/settings/SettingsOverrideContract.js';
 import { EntityManager } from '../src/entities/EntityManager.js';
 import { MENU_CONTROLLER_EVENT_TYPES } from '../src/shared/contracts/MenuControllerContract.js';
 
@@ -156,4 +163,126 @@ test('EntityManager live runtime apply propagates updated config to runtime cach
     assert.equal(players[0].gameplayConfig?.PLAYER, nextErc.PLAYER);
     assert.equal(players[0].maxHp, 100);
     assert.equal(players[0].hp, 100);
+});
+
+test('Settings override validation reports explicit limit-rule errors only once per path/code', () => {
+    const draft = createSettingsOverrideDraft();
+    draft.limitOverrides = {
+        'baseSettings.gameplay.speed': {
+            min: 0,
+            max: 10,
+            step: -1,
+        },
+    };
+    draft.baseSettings.gameplay.speed = 15;
+
+    const result = validateSettingsOverrideDraft(draft);
+    assert.equal(result.valid, false);
+
+    const duplicateKey = result.errors.filter((entry) => (
+        entry.path === 'baseSettings.gameplay.speed'
+        && entry.code === 'LIMIT_STEP_NON_POSITIVE'
+    ));
+    assert.equal(duplicateKey.length, 1);
+    assert(result.errors.some((entry) => (
+        entry.path === 'baseSettings.gameplay.speed'
+        && entry.code === 'FIELD_NUMBER_ABOVE_MAX'
+    )));
+});
+
+test('V95 Runtime-Integration: override baseSettings merges into defaults and limitOverrides clamp runtime values', () => {
+    const previousCurviosApp = globalThis.curviosApp;
+    globalThis.curviosApp = {
+        settingsDefaults: {
+            getOverrideSnapshot: () => ({
+                draft: {
+                    schemaVersion: 'menu-defaults-override.v1',
+                    baseSettings: { gameplay: { itemAmount: 5 } },
+                    limitOverrides: {
+                        'baseSettings.gameplay.itemAmount': {
+                            min: 1,
+                            max: 5,
+                            step: 1,
+                            integer: true,
+                        },
+                    },
+                },
+            }),
+        },
+    };
+    try {
+        const defaults = createDefaultSettingsSnapshotForRuntime();
+        assert.equal(defaults.gameplay.itemAmount, 5);
+        assert.equal(defaults.__overrideSkipped, undefined);
+
+        const snapshot = createRuntimeConfigSnapshot({ gameplay: { itemAmount: 12 } });
+        assert.equal(snapshot.powerup.maxOnField, 5);
+    } finally {
+        if (previousCurviosApp === undefined) {
+            delete globalThis.curviosApp;
+        } else {
+            globalThis.curviosApp = previousCurviosApp;
+        }
+    }
+});
+
+test('V95 Runtime-Integration: missing curviosApp global leaves code-defaults untouched', () => {
+    const previousCurviosApp = globalThis.curviosApp;
+    delete globalThis.curviosApp;
+    try {
+        const defaults = createDefaultSettingsSnapshotForRuntime();
+        assert.equal(defaults.__overrideSkipped, undefined);
+        assert.equal(typeof defaults.gameplay.itemAmount, 'number');
+    } finally {
+        if (previousCurviosApp !== undefined) {
+            globalThis.curviosApp = previousCurviosApp;
+        }
+    }
+});
+
+test('Arcade deriveRoundEndPlan routes PARCOURS_COMPLETE through completeParcoursSector', () => {
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = true;
+    runtime._state = { placeholder: true };
+
+    const calls = [];
+    runtime.completeParcoursSector = (parcoursResult = {}, options = {}) => {
+        calls.push({ parcoursResult, options });
+        return {
+            outcome: {
+                state: 'ROUND_END',
+                reason: 'PARCOURS_COMPLETE',
+                parcours: parcoursResult?.parcours || null,
+                requiredWins: Math.max(1, Number(options?.winsNeeded) || 1),
+            },
+            transition: {
+                nextState: 'ROUND_END',
+                roundPause: 3,
+            },
+        };
+    };
+
+    const baseController = {
+        defaultRoundPause: 3,
+        deriveOnRoundEndPlan() {
+            return null;
+        },
+    };
+    const parcours = { completionTimeMs: 1234 };
+    const plan = runtime.deriveRoundEndPlan({
+        players: [],
+        inputs: {
+            reason: 'PARCOURS_COMPLETE',
+            parcours,
+            winsNeeded: 4,
+        },
+        baseController,
+    });
+
+    assert.equal(calls.length, 1);
+    assert.deepEqual(calls[0].parcoursResult.parcours, parcours);
+    assert.equal(calls[0].options.winsNeeded, 4);
+    assert.equal(plan?.outcome?.reason, 'PARCOURS_COMPLETE');
+    assert.equal(plan?.outcome?.requiredWins, 4);
+    assert.deepEqual(plan?.outcome?.parcours, parcours);
 });
