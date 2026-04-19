@@ -37,6 +37,16 @@ export class EntitySpawnOps {
         });
         const dir = owner._findSafeSpawnDirection(pos, player.hitboxRadius);
         player.spawn(pos, dir);
+        // 82.8.1: Apply strategy stat bonuses (HP bonus, speed upgrade) after base spawn
+        const strategy = owner.gameModeStrategy;
+        if (strategy) {
+            if (typeof strategy.resetPlayerHealth === 'function') {
+                strategy.resetPlayerHealth(player);
+            }
+            if (typeof strategy.applySpawnStatBonuses === 'function') {
+                strategy.applySpawnStatBonuses(player);
+            }
+        }
         player.shootCooldown = 0;
         owner._parcoursProgressSystem?.onPlayerSpawn?.(player, { reason: 'spawn_all' });
         if (owner.recorder) {

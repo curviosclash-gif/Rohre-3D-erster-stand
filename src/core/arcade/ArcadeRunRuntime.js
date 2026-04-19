@@ -605,10 +605,20 @@ export class ArcadeRunRuntime {
         if (parcoursSegmentSplit) {
             this._state.lastParcoursSegmentSplit = null;
         }
+        // 82.8.3: Vehicle stats for sector-start HUD flash
+        const profile = this.getVehicleProfile();
+        const profileBonuses = profile ? getSlotStatBonuses(profile.upgrades) : null;
+        const vehicleStats = {
+            level: profile?.level ?? 1,
+            speedBonusPct: Math.min(50, profileBonuses?.speedBonusPct || 0),
+            turningBonusPct: Math.min(50, profileBonuses?.turningBonusPct || 0),
+            maxHpBonus: Math.min(50, profileBonuses?.maxHpBonus || 0),
+        };
         return {
             nowMs,
             parcoursXpGain,
             parcoursSegmentSplit,
+            vehicleStats,
             phase: String(this._state.phase || ''),
             sectorIndex: Math.max(0, Math.floor(toSafeNumber(this._state.sectorIndex, 0))),
             completedSectors: Math.max(0, Math.floor(toSafeNumber(this._state.completedSectors, 0))),

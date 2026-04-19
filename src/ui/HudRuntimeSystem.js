@@ -272,7 +272,10 @@ export class HudRuntimeSystem {
         this._arcadeSuddenDeathOverlay?.classList?.toggle('hidden', !suddenDeathActive);
 
         const sectorIndex = Math.max(0, Math.floor(Number(hudState.sectorIndex) || 0));
-        if (sectorIndex > 0 && sectorIndex !== this._lastArcadeSectorIndex) {
+        const sectorChanged = sectorIndex > 0 && sectorIndex !== this._lastArcadeSectorIndex;
+        // 82.8.3: Show vehicle stats banner on sector start
+        overlay.tickStatsFlash(hudState, nowMs, sectorChanged);
+        if (sectorChanged) {
             this._arcadeTransitionVisibleUntilMs = nowMs + 1200;
             if (this._arcadeSectorTransitionOverlay) {
                 const mapKey = String(hudState.currentMapKey || '').trim() || 'unknown';

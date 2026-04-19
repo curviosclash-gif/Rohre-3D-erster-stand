@@ -32,6 +32,9 @@ const MODIFIER_EFFECTS = Object.freeze({
 
 const NULL_SLOT_BONUSES = Object.freeze({ turningBonusPct: 0, speedBonusPct: 0, maxHpBonus: 0 });
 
+// 82.8.4: Max upgrade bonus per stat (+50%)
+const UPGRADE_STAT_CAP_PCT = 50;
+
 // 61.6.2: Incoming damage increase per stacked SD modifier (10% per stack)
 const SD_DAMAGE_STACK_MULTIPLIER = 0.1;
 // 61.6.2: Seconds between each additional stacked modifier in Sudden Death
@@ -247,8 +250,8 @@ export class ArcadeModeStrategy extends GameModeContract {
     // --- Health & Damage ---
     resetPlayerHealth(player) {
         if (!player) return null;
-        // 61.8.1: T2 Core adds +15 max HP
-        const hpBonus = Math.max(0, this._slotBonuses.maxHpBonus);
+        // 61.8.1 / 82.8.4: T2 Core adds HP bonus, capped at +50% of base
+        const hpBonus = Math.min(DEFAULT_MAX_HP * (UPGRADE_STAT_CAP_PCT / 100), Math.max(0, this._slotBonuses.maxHpBonus));
         player.maxHp = DEFAULT_MAX_HP + hpBonus;
         player.hp = player.maxHp;
         player.maxShieldHp = DEFAULT_SHIELD_HP;
@@ -395,17 +398,29 @@ export class ArcadeModeStrategy extends GameModeContract {
 
     // 61.4.1: tight_turns — multiplier applied to turn rate
     // 61.6.2: Also aggregates SD stacked modifier effects
-    // 61.8.1: T2 Wing adds +10% turning on top of modifier
+    // 61.8.1: T2 Wing adds +10% turning on top of modifier; 82.8.4: capped at +50%
     getTurnRateMultiplier() {
         const fx = this._getAggregatedModifierEffects();
         const modifierMultiplier = (fx && fx.turnRateMultiplier) ? fx.turnRateMultiplier : 1.0;
-        const upgradeMultiplier = 1.0 + (this._slotBonuses.turningBonusPct / 100);
+        const cappedPct = Math.min(UPGRADE_STAT_CAP_PCT, this._slotBonuses.turningBonusPct);
+        const upgradeMultiplier = 1.0 + (cappedPct / 100);
         return modifierMultiplier * upgradeMultiplier;
     }
 
-    // 61.8.1: T2 Engine adds +8% speed
+    // 61.8.1: T2 Engine adds +8% speed; 82.8.4: capped at +50%
     getSpeedMultiplier() {
-        return 1.0 + (this._slotBonuses.speedBonusPct / 100);
+        const cappedPct = Math.min(UPGRADE_STAT_CAP_PCT, this._slotBonuses.speedBonusPct);
+        return 1.0 + (cappedPct / 100);
+    }
+
+    // 82.8.1: Apply upgrade speed bonus to player base speed at spawn
+    applySpawnStatBonuses(player) {
+        if (!player) return;
+        const speedMult = this.getSpeedMultiplier();
+        if (speedMult > 1.0) {
+            player.baseSpeed = player.baseSpeed * speedMult;
+            player.speed = player.baseSpeed;
+        }
     }
 
     // 61.4.1: portal_storm — multiplier for item/portal spawn frequency

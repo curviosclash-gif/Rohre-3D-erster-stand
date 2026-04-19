@@ -6,6 +6,8 @@ export class ParcoursOverlayController {
         this._xpNotificationHideAtMs = 0;
         this._splitDeltaOverlay = null;
         this._splitDeltaHideAtMs = 0;
+        this._statsFlashOverlay = null;
+        this._statsFlashHideAtMs = 0;
         this._minimap = null;
     }
 
@@ -60,6 +62,28 @@ export class ParcoursOverlayController {
         }
     }
 
+    // 82.8.3: Show effective stats banner for 2500ms at sector start
+    tickStatsFlash(hudState, nowMs, sectorChanged) {
+        if (!document?.body) return;
+        const stats = hudState?.vehicleStats;
+        if (sectorChanged && stats && stats.level > 1) {
+            const parts = [`Lv ${stats.level}`];
+            if (stats.speedBonusPct > 0) parts.push(`Speed +${stats.speedBonusPct}%`);
+            if (stats.turningBonusPct > 0) parts.push(`Kurve +${stats.turningBonusPct}%`);
+            if (stats.maxHpBonus > 0) parts.push(`HP +${stats.maxHpBonus}`);
+            const el = this._ensureOverlay('arcade-stats-flash', 'arcade-stats-flash hidden');
+            if (el) {
+                el.textContent = parts.join('  |  ');
+                el.classList.remove('hidden');
+                this._statsFlashOverlay = el;
+                this._statsFlashHideAtMs = Math.max(0, nowMs) + 2500;
+            }
+        }
+        if (this._statsFlashOverlay && nowMs >= this._statsFlashHideAtMs) {
+            this._statsFlashOverlay.classList.add('hidden');
+        }
+    }
+
     tickMinimap(entityManager, projection, localIdx) {
         const parcoursEnabled = projection?.parcours?.enabled === true;
         if (!parcoursEnabled) {
@@ -84,6 +108,10 @@ export class ParcoursOverlayController {
             this._splitDeltaOverlay.parentElement.removeChild(this._splitDeltaOverlay);
         }
         this._splitDeltaOverlay = null;
+        if (this._statsFlashOverlay?.parentElement) {
+            this._statsFlashOverlay.parentElement.removeChild(this._statsFlashOverlay);
+        }
+        this._statsFlashOverlay = null;
         this._minimap?.dispose?.();
         this._minimap = null;
     }
