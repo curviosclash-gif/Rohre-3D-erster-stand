@@ -1,0 +1,90 @@
+import { ParcoursMinimapRenderer } from './ParcoursMinimapRenderer.js';
+
+export class ParcoursOverlayController {
+    constructor() {
+        this._xpNotificationOverlay = null;
+        this._xpNotificationHideAtMs = 0;
+        this._splitDeltaOverlay = null;
+        this._splitDeltaHideAtMs = 0;
+        this._minimap = null;
+    }
+
+    _ensureOverlay(id, className) {
+        if (!document?.body) return null;
+        let el = document.getElementById(id);
+        if (!el) {
+            el = document.createElement('div');
+            el.id = id;
+            el.className = className || '';
+            document.body.appendChild(el);
+        }
+        return el;
+    }
+
+    tickXp(hudState, nowMs) {
+        if (!document?.body) return;
+        if (hudState?.parcoursXpGain?.earned > 0) {
+            const levelUp = hudState.parcoursXpGain.leveledUp
+                ? ` ↑ Lv ${hudState.parcoursXpGain.newLevel}!`
+                : '';
+            const text = `+${hudState.parcoursXpGain.earned} XP${levelUp}`;
+            const el = this._ensureOverlay('parcours-xp-notification', 'hidden');
+            if (el) {
+                el.textContent = text;
+                el.classList.remove('hidden');
+                this._xpNotificationOverlay = el;
+                this._xpNotificationHideAtMs = Math.max(0, nowMs) + 1500;
+            }
+        }
+        if (this._xpNotificationOverlay && nowMs >= this._xpNotificationHideAtMs) {
+            this._xpNotificationOverlay.classList.add('hidden');
+        }
+    }
+
+    tickSplitDelta(hudState, nowMs) {
+        if (!document?.body) return;
+        if (hudState?.parcoursSegmentSplit) {
+            const { deltaMs, isBetter } = hudState.parcoursSegmentSplit;
+            if (!this._splitDeltaOverlay) {
+                this._splitDeltaOverlay = this._ensureOverlay('parcours-split-delta', 'hidden');
+            }
+            if (this._splitDeltaOverlay) {
+                this._splitDeltaOverlay.textContent = `${isBetter ? '-' : '+'}${(Math.abs(deltaMs) / 1000).toFixed(2)}s`;
+                this._splitDeltaOverlay.classList.remove('hidden', 'split-better', 'split-worse');
+                this._splitDeltaOverlay.classList.add(isBetter ? 'split-better' : 'split-worse');
+                this._splitDeltaHideAtMs = nowMs + 1200;
+            }
+        }
+        if (this._splitDeltaOverlay && nowMs >= this._splitDeltaHideAtMs) {
+            this._splitDeltaOverlay.classList.add('hidden');
+        }
+    }
+
+    tickMinimap(entityManager, projection, localIdx) {
+        const parcoursEnabled = projection?.parcours?.enabled === true;
+        if (!parcoursEnabled) {
+            this._minimap?._hide?.();
+            return;
+        }
+        if (!this._minimap) this._minimap = new ParcoursMinimapRenderer();
+        const routeSnapshot = entityManager?.getParcoursRouteSnapshot?.() || null;
+        const nextCheckpointIndex = Math.max(0, Number(projection.parcours.currentCheckpoint) || 0);
+        const localPlayer = Array.isArray(projection?.players)
+            ? projection.players.find((p) => p?.playerIndex === localIdx) || null
+            : null;
+        this._minimap.update(routeSnapshot, nextCheckpointIndex, localPlayer?.position || null, localPlayer?.quaternion || null);
+    }
+
+    dispose() {
+        if (this._xpNotificationOverlay?.parentElement) {
+            this._xpNotificationOverlay.parentElement.removeChild(this._xpNotificationOverlay);
+        }
+        this._xpNotificationOverlay = null;
+        if (this._splitDeltaOverlay?.parentElement) {
+            this._splitDeltaOverlay.parentElement.removeChild(this._splitDeltaOverlay);
+        }
+        this._splitDeltaOverlay = null;
+        this._minimap?.dispose?.();
+        this._minimap = null;
+    }
+}
