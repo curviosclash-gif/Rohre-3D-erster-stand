@@ -19,9 +19,12 @@
 //   lowHealthThreat: -0.2..0 (extra penalty when fragile under pressure)
 //   win:          0..1.5   (terminal only)
 //   loss:        -1.5..0   (terminal only)
+//   checkpointReached: 0..0.5 (rare - parcours checkpoint; only when parcoursEnabled=true)
+//   parcoursCompleted: 0..2.0 (terminal only - parcours finish; only when parcoursEnabled=true)
+//   wrongOrder:  -0.3..0   (rare - wrong checkpoint order; only when parcoursEnabled=true)
 //
-// Typical per-step range: ~[-9.0, +3.2]
-// Terminal step range:    ~[-10.0, +4.5]
+// Typical per-step range: ~[-9.0, +3.2]; with parcours: ~[-9.3, +3.7]
+// Terminal step range:    ~[-10.0, +4.5]; with parcours: ~[-10.0, +6.5]
 // Trainer clamps rewards to [-rewardClamp, +rewardClamp] (default +-10)
 // ============================================
 
@@ -46,6 +49,9 @@ export const DEFAULT_TRAINING_REWARD_WEIGHTS = Object.freeze({
     lowHealthThreat: -0.2,
     win: 1.5,
     loss: -1.5,
+    checkpointReached: 0.5,
+    parcoursCompleted: 2.0,
+    wrongOrder: -0.3,
 });
 
 function roundReward(value) {
@@ -134,6 +140,14 @@ export function calculateReward(signals = {}, options = {}) {
         ? riskPressure * ((0.5 - healthRatio) / 0.5)
         : 0;
     const { won, lost } = resolveTerminalWinLoss(signals, episodeSnapshot);
+    const parcoursEnabled = signals.parcoursEnabled === true;
+    const checkpointCount = parcoursEnabled
+        ? toCount(signals.checkpointReached ?? signals.parcoursCheckpoints)
+        : 0;
+    const parcoursFinished = parcoursEnabled && signals.parcoursCompleted === true;
+    const wrongOrderCount = parcoursEnabled
+        ? toCount(signals.wrongOrderCount ?? signals.wrongOrder)
+        : 0;
 
     const components = {
         baseStep: roundReward(weights.baseStep),
@@ -152,6 +166,9 @@ export function calculateReward(signals = {}, options = {}) {
         lowHealthThreat: roundReward(lowHealthThreatScale * weights.lowHealthThreat),
         win: roundReward(won ? weights.win : 0),
         loss: roundReward(lost ? weights.loss : 0),
+        checkpointReached: roundReward(checkpointCount * weights.checkpointReached),
+        parcoursCompleted: roundReward(parcoursFinished ? weights.parcoursCompleted : 0),
+        wrongOrder: roundReward(wrongOrderCount * weights.wrongOrder),
         external: roundReward(toFiniteNumber(signals.bonusReward, 0)),
     };
     const total = sumRewardComponents(components);
