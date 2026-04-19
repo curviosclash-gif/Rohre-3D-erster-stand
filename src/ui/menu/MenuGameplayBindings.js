@@ -1,4 +1,3 @@
-import { SETTINGS_LIMITS } from '../../shared/contracts/SettingsRuntimeContract.js';
 import { CUSTOM_MAP_KEY } from '../../entities/MapSchema.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../../hunt/HuntMode.js';
 import { EDITOR_VIEW_PATHS } from '../../shared/contracts/EditorPathContract.js';
@@ -14,11 +13,10 @@ import {
     createDefaultCameraPerspectiveSettings,
 } from '../../shared/contracts/CameraPerspectiveContract.js';
 import { clamp } from '../../utils/MathOps.js';
-import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
 import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
-import { bindMenuMultiplayerActionButtons } from './MenuMultiplayerActionBindings.js';
-import { resolveSurfaceFeatureLaunchGuard } from './MenuSurfaceFeatureAccess.js';
 import { bindMenuMultiplayerTransportButtons } from './MenuMultiplayerTransportBindings.js';
+import { createRuntimeSettingsLimitsForRuntime } from '../../core/settings/SettingsRuntimeLimits.js';
+import { bindMenuExtrasButtons } from './MenuExtrasBindings.js';
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;
     const settings = ctx.settings;
@@ -30,8 +28,11 @@ export function setupMenuGameplayBindings(ctx) {
     const bind = ctx.bind;
     const gameplayConfig = resolveGameplayConfig({ config: ctx.configSource || null });
     const huntFeatureEnabled = gameplayConfig.HUNT?.ENABLED !== false;
-    const mgTrailAimLimits = SETTINGS_LIMITS.gameplay.mgTrailAimRadius;
-    const fightMgDamageLimits = SETTINGS_LIMITS.gameplay.fightMgDamage;
+    const runtimeLimits = createRuntimeSettingsLimitsForRuntime();
+    const sessionLimits = runtimeLimits.session;
+    const gameplayLimits = runtimeLimits.gameplay;
+    const mgTrailAimLimits = gameplayLimits.mgTrailAimRadius;
+    const fightMgDamageLimits = gameplayLimits.fightMgDamage;
     const ensureRecordingSettings = () => {
         if (!settings.recording || typeof settings.recording !== 'object') {
             settings.recording = createDefaultRecordingCaptureSettings();
@@ -206,7 +207,7 @@ export function setupMenuGameplayBindings(ctx) {
     }
 
     bind(ui.botSlider, 'input', () => {
-        settings.numBots = clamp(parseInt(ui.botSlider.value, 10), 0, 8);
+        settings.numBots = clamp(parseInt(ui.botSlider.value, 10), sessionLimits.numBots.min, sessionLimits.numBots.max);
         queueInputSettingsChanged([keys.BOTS_COUNT]);
     });
 
@@ -219,7 +220,7 @@ export function setupMenuGameplayBindings(ctx) {
     }
 
     bind(ui.winSlider, 'input', () => {
-        settings.winsNeeded = clamp(parseInt(ui.winSlider.value, 10), 1, 15);
+        settings.winsNeeded = clamp(parseInt(ui.winSlider.value, 10), sessionLimits.winsNeeded.min, sessionLimits.winsNeeded.max);
         queueInputSettingsChanged([keys.RULES_WINS_NEEDED]);
     });
 
@@ -260,47 +261,79 @@ export function setupMenuGameplayBindings(ctx) {
     });
 
     bind(ui.speedSlider, 'input', () => {
-        settings.gameplay.speed = clamp(parseFloat(ui.speedSlider.value), 8, 40);
+        settings.gameplay.speed = clamp(parseFloat(ui.speedSlider.value), gameplayLimits.speed.min, gameplayLimits.speed.max);
         queueInputSettingsChanged([keys.GAMEPLAY_SPEED]);
     });
 
     bind(ui.turnSlider, 'input', () => {
-        settings.gameplay.turnSensitivity = clamp(parseFloat(ui.turnSlider.value), 0.8, 5);
+        settings.gameplay.turnSensitivity = clamp(
+            parseFloat(ui.turnSlider.value),
+            gameplayLimits.turnSensitivity.min,
+            gameplayLimits.turnSensitivity.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_TURN_SENSITIVITY]);
     });
 
     bind(ui.planeSizeSlider, 'input', () => {
-        settings.gameplay.planeScale = clamp(parseFloat(ui.planeSizeSlider.value), 0.6, 2.0);
+        settings.gameplay.planeScale = clamp(
+            parseFloat(ui.planeSizeSlider.value),
+            gameplayLimits.planeScale.min,
+            gameplayLimits.planeScale.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_PLANE_SCALE]);
     });
 
     bind(ui.trailWidthSlider, 'input', () => {
-        settings.gameplay.trailWidth = clamp(parseFloat(ui.trailWidthSlider.value), 0.2, 2.5);
+        settings.gameplay.trailWidth = clamp(
+            parseFloat(ui.trailWidthSlider.value),
+            gameplayLimits.trailWidth.min,
+            gameplayLimits.trailWidth.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_TRAIL_WIDTH]);
     });
 
     bind(ui.gapSizeSlider, 'input', () => {
-        settings.gameplay.gapSize = clamp(parseFloat(ui.gapSizeSlider.value), 0.05, 1.5);
+        settings.gameplay.gapSize = clamp(
+            parseFloat(ui.gapSizeSlider.value),
+            gameplayLimits.gapSize.min,
+            gameplayLimits.gapSize.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_GAP_SIZE]);
     });
 
     bind(ui.gapFrequencySlider, 'input', () => {
-        settings.gameplay.gapFrequency = clamp(parseFloat(ui.gapFrequencySlider.value), 0, 0.25);
+        settings.gameplay.gapFrequency = clamp(
+            parseFloat(ui.gapFrequencySlider.value),
+            gameplayLimits.gapFrequency.min,
+            gameplayLimits.gapFrequency.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_GAP_FREQUENCY]);
     });
 
     bind(ui.itemAmountSlider, 'input', () => {
-        settings.gameplay.itemAmount = clamp(parseInt(ui.itemAmountSlider.value, 10), 1, 20);
+        settings.gameplay.itemAmount = clamp(
+            parseInt(ui.itemAmountSlider.value, 10),
+            gameplayLimits.itemAmount.min,
+            gameplayLimits.itemAmount.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_ITEM_AMOUNT]);
     });
 
     bind(ui.fireRateSlider, 'input', () => {
-        settings.gameplay.fireRate = clamp(parseFloat(ui.fireRateSlider.value), 0.1, 2.0);
+        settings.gameplay.fireRate = clamp(
+            parseFloat(ui.fireRateSlider.value),
+            gameplayLimits.fireRate.min,
+            gameplayLimits.fireRate.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_FIRE_RATE]);
     });
 
     bind(ui.lockOnSlider, 'input', () => {
-        settings.gameplay.lockOnAngle = clamp(parseInt(ui.lockOnSlider.value, 10), 5, 45);
+        settings.gameplay.lockOnAngle = clamp(
+            parseInt(ui.lockOnSlider.value, 10),
+            gameplayLimits.lockOnAngle.min,
+            gameplayLimits.lockOnAngle.max
+        );
         queueInputSettingsChanged([keys.GAMEPLAY_LOCK_ON_ANGLE]);
     });
 
@@ -317,7 +350,11 @@ export function setupMenuGameplayBindings(ctx) {
     if (ui.fightPlayerHpSlider) {
         bind(ui.fightPlayerHpSlider, 'input', () => {
             if (!isFightModePathActive()) return;
-            settings.gameplay.fightPlayerHp = clamp(parseInt(ui.fightPlayerHpSlider.value, 10), 80, 250);
+            settings.gameplay.fightPlayerHp = clamp(
+                parseInt(ui.fightPlayerHpSlider.value, 10),
+                gameplayLimits.fightPlayerHp.min,
+                gameplayLimits.fightPlayerHp.max
+            );
             queueInputSettingsChanged([keys.GAMEPLAY_FIGHT_PLAYER_HP]);
         });
     }
@@ -410,118 +447,5 @@ export function setupMenuGameplayBindings(ctx) {
         emit(eventTypes.START_MATCH);
     });
 
-    if (ui.level3ResetButton) {
-        bind(ui.level3ResetButton, 'click', () => {
-            emit(eventTypes.LEVEL3_RESET);
-        });
-    }
-
-    if (ui.openLevel4Button) {
-        bind(ui.openLevel4Button, 'click', () => {
-            emit(eventTypes.LEVEL4_OPEN, {
-                sectionId: String(ui.openLevel4Button?.dataset?.level4Section || '').trim(),
-            });
-        });
-    }
-
-    const legacyLevel4OpenButtons = Array.isArray(ui.legacyLevel4OpenButtons) ? ui.legacyLevel4OpenButtons : [];
-    legacyLevel4OpenButtons.forEach((button) => {
-        bind(button, 'click', () => {
-            emit(eventTypes.LEVEL4_OPEN, {
-                sectionId: String(button?.dataset?.level4Section || '').trim(),
-            });
-        });
-    });
-
-    if (ui.closeLevel4Button) {
-        bind(ui.closeLevel4Button, 'click', () => {
-            emit(eventTypes.LEVEL4_CLOSE);
-        });
-    }
-
-    if (ui.level4ResetButton) {
-        bind(ui.level4ResetButton, 'click', () => {
-            emit(eventTypes.LEVEL4_RESET);
-        });
-    }
-
-    if (ui.exportConfigCodeButton) {
-        bind(ui.exportConfigCodeButton, 'click', () => {
-            emit(eventTypes.CONFIG_EXPORT_CODE);
-        });
-    }
-
-    if (ui.exportConfigJsonButton) {
-        bind(ui.exportConfigJsonButton, 'click', () => {
-            emit(eventTypes.CONFIG_EXPORT_JSON);
-        });
-    }
-
-    if (ui.importConfigButton) {
-        bind(ui.importConfigButton, 'click', () => {
-            emit(eventTypes.CONFIG_IMPORT, {
-                inputValue: String(ui.configShareInput?.value || ''),
-            });
-        });
-    }
-
-    if (ui.openEditorButton) {
-        bind(ui.openEditorButton, 'click', () => {
-            const featureAccess = resolveSurfaceFeatureLaunchGuard(
-                ctx.featureFlags?.surfacePolicy,
-                PLATFORM_SURFACE_FEATURE_IDS.MAP_EDITOR,
-                '3D Map-Editor'
-            );
-            if (!featureAccess.allowed) {
-                emit(eventTypes.SHOW_STATUS_TOAST, featureAccess);
-                return;
-            }
-            window.open(EDITOR_VIEW_PATHS.MAP_EDITOR, '_blank');
-        });
-    }
-
-    if (ui.openVehicleEditorButton) {
-        bind(ui.openVehicleEditorButton, 'click', () => {
-            const featureAccess = resolveSurfaceFeatureLaunchGuard(
-                ctx.featureFlags?.surfacePolicy,
-                PLATFORM_SURFACE_FEATURE_IDS.VEHICLE_EDITOR,
-                'Vehicle-Editor'
-            );
-            if (!featureAccess.allowed) {
-                emit(eventTypes.SHOW_STATUS_TOAST, featureAccess);
-                return;
-            }
-            window.open(EDITOR_VIEW_PATHS.VEHICLE_LAB, '_blank');
-        });
-    }
-
-    if (ui.portalCountSlider && ui.portalCountLabel) {
-        bind(ui.portalCountSlider, 'input', (e) => {
-            const val = parseInt(e.target.value, 10);
-            ui.portalCountLabel.textContent = val;
-            if (!settings.gameplay) settings.gameplay = {};
-            settings.gameplay.portalCount = val;
-            queueInputSettingsChanged([keys.GAMEPLAY_PORTAL_COUNT]);
-        });
-    }
-
-    if (ui.planarLevelCountSlider && ui.planarLevelCountLabel) {
-        bind(ui.planarLevelCountSlider, 'input', (e) => {
-            const val = clamp(parseInt(e.target.value, 10), 2, 10);
-            ui.planarLevelCountLabel.textContent = val;
-            if (!settings.gameplay) settings.gameplay = {};
-            settings.gameplay.planarLevelCount = val;
-            queueInputSettingsChanged([keys.GAMEPLAY_PLANAR_LEVEL_COUNT]);
-        });
-    }
-
-    bindMenuMultiplayerActionButtons({
-        ui,
-        bind,
-        emit,
-        eventTypes,
-        featureFlags: ctx.featureFlags,
-    });
-
-    setupArcadeMenuSurface(ctx);
+    bindMenuExtrasButtons(ctx);
 }
