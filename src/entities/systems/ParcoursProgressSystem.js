@@ -40,6 +40,7 @@ export class ParcoursProgressSystem {
         this._playerStates.clear();
         this._completionOrder.length = 0;
         this._ghostRecorder?.reset?.();
+        this.entityManager?.arena?._portalGateSystem?.checkpointRingRuntime?.setProgressProvider?.(null);
     }
 
     startRound(players = []) {
@@ -53,6 +54,10 @@ export class ParcoursProgressSystem {
             if (!player || !Number.isInteger(player.index)) continue;
             this._playerStates.set(player.index, createPlayerProgressState(this._route.totalCheckpoints));
         }
+
+        const rt = this.entityManager?.arena?._portalGateSystem?.checkpointRingRuntime;
+        rt?.setProgressProvider?.(() => this.getPlayerProgressSnapshot(0));
+        rt?.setParticleSystem?.(this.entityManager?.particles || null);
     }
 
     _ensurePlayerState(playerIndex) {
@@ -140,13 +145,8 @@ export class ParcoursProgressSystem {
         state.lastError = '';
         state.errorUntilMs = 0;
         state.segmentSplitsMs = [];
-        if (preserveCounters) {
-            state.wrongOrderCount = previousWrongOrderCount;
-            state.resetCount = previousResetCount;
-        } else {
-            state.wrongOrderCount = 0;
-            state.resetCount = 0;
-        }
+        state.wrongOrderCount = preserveCounters ? previousWrongOrderCount : 0;
+        state.resetCount = preserveCounters ? previousResetCount : 0;
         if (countReset) {
             state.resetCount += 1;
         }

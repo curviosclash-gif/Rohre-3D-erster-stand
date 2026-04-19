@@ -4,6 +4,12 @@ import { getCheckpointLabelTexture } from './ArenaBuildResourceCache.js';
 const CHECKPOINT_COLOR = 0xaaff00;
 export const CHECKPOINT_BRANCH_COLOR = 0x33e6ff;
 const CHECKPOINT_FINISH_COLOR = 0xffd700;
+const CHECKPOINT_INACTIVE_COLOR = 0x666666;
+const CHECKPOINT_PASSED_COLOR = 0x00cc00;
+
+export const RING_STATE_INACTIVE = 'inactive';
+export const RING_STATE_NEXT = 'next';
+export const RING_STATE_PASSED = 'passed';
 const RING_RADIUS = 12;
 const RING_TUBE = 0.2;
 const FINISH_TUBE = 0.35;
@@ -90,6 +96,29 @@ function buildRingGroup(position, rotation, ringGeometry, ringMaterial, label, v
     group.userData.labelMesh = labelMesh;
     group.userData.ringVisualKind = options.visualKind || 'default';
     return group;
+}
+
+export function setCheckpointRingState(ringEntry, state) {
+    const mesh = ringEntry?.mesh;
+    if (!mesh) return;
+    const ringMesh = mesh.userData?.ringMesh;
+    if (!ringMesh?.material) return;
+
+    mesh.userData.ringState = state;
+    if (state === RING_STATE_INACTIVE) {
+        ringMesh.material.color.setHex(CHECKPOINT_INACTIVE_COLOR);
+        ringMesh.material.emissive.setHex(CHECKPOINT_INACTIVE_COLOR);
+        ringMesh.material.emissiveIntensity = 0.2;
+    } else if (state === RING_STATE_NEXT) {
+        const baseColor = mesh.userData.checkpointColor ?? CHECKPOINT_COLOR;
+        ringMesh.material.color.setHex(baseColor);
+        ringMesh.material.emissive.setHex(baseColor);
+        ringMesh.material.emissiveIntensity = 0.85;
+    } else if (state === RING_STATE_PASSED) {
+        ringMesh.material.color.setHex(CHECKPOINT_PASSED_COLOR);
+        ringMesh.material.emissive.setHex(CHECKPOINT_PASSED_COLOR);
+        ringMesh.material.emissiveIntensity = 0.45;
+    }
 }
 
 export function createCheckpointRingMesh(

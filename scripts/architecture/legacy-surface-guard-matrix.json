@@ -93,9 +93,10 @@
       ],
       "allowedCallers": [
         "src/entities/ai/ObservationBridgePolicy.js",
-        "src/shared/contracts/PlatformCapabilityRegistry.js"
+        "src/shared/contracts/PlatformCapabilityRegistry.js",
+        "src/core/settings/SettingsDefaultsFacade.js"
       ],
-      "reason": "Nur der Plattformadapter (src/platform/electron/**) ist langfristig erlaubt; direkte Reads in ObservationBridgePolicy und PlatformCapabilityRegistry sind explizite Migrationsschuld bis 91.3",
+      "reason": "Nur der Plattformadapter (src/platform/electron/**) ist langfristig erlaubt; direkte Reads in ObservationBridgePolicy und PlatformCapabilityRegistry sind explizite Migrationsschuld bis 91.3; SettingsDefaultsFacade liest curviosApp als V97-Migrationspfad fuer Legacy-Override-Lese-Compat bis V97.4 den Pfad auf PlatformCapabilityContract umschreibt",
       "migrationTarget": "PlatformCapabilityContract + dedizierte Adapter unter src/platform/**; Renderer bekommt nur Capability-Descriptoren ueber Application-/Platform-Layer",
       "sunsetPhase": "91.3",
       "sunsetCriteria": "Sobald curviosApp/__CURVIOS_APP__ ausserhalb der dedizierten Plattformadapter nicht mehr referenziert werden und Browser-/Desktop-Unterschiede nur noch ueber Capability-Snapshots sichtbar sind"
