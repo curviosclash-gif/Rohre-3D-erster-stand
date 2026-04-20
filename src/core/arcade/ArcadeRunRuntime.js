@@ -605,6 +605,10 @@ export class ArcadeRunRuntime {
         if (parcoursSegmentSplit) {
             this._state.lastParcoursSegmentSplit = null;
         }
+        const parcoursPenalty = this._state.lastParcoursPenalty || null;
+        if (parcoursPenalty) {
+            this._state.lastParcoursPenalty = null;
+        }
         // 82.8.3: Vehicle stats for sector-start HUD flash
         const profile = this.getVehicleProfile();
         const profileBonuses = profile ? getSlotStatBonuses(profile.upgrades) : null;
@@ -618,6 +622,7 @@ export class ArcadeRunRuntime {
             nowMs,
             parcoursXpGain,
             parcoursSegmentSplit,
+            parcoursPenalty,
             vehicleStats,
             phase: String(this._state.phase || ''),
             sectorIndex: Math.max(0, Math.floor(toSafeNumber(this._state.sectorIndex, 0))),
@@ -1103,7 +1108,16 @@ export class ArcadeRunRuntime {
 
     applyParcoursLeaderboardEvent(data) {
         if (!this._enabled || !data || typeof data !== 'object') return null;
-        const { type, routeId, checkpointIndex, currentSplitMs, totalTimeMs, segmentSplitsMs, ghostClip } = data;
+        const {
+            type,
+            routeId,
+            checkpointIndex,
+            currentSplitMs,
+            totalTimeMs,
+            penaltyTimeMs,
+            segmentSplitsMs,
+            ghostClip,
+        } = data;
 
         if (type === 'checkpoint') {
             if (!this._leaderboard || !routeId) return null;
@@ -1131,6 +1145,22 @@ export class ArcadeRunRuntime {
             return null;
         }
 
+        if (type === 'wrong_order') {
+            const nextPenaltyMs = Math.max(0, Math.trunc(Number(data.penaltyMs) || 0));
+            if (nextPenaltyMs <= 0) return null;
+            const nextTotalPenaltyMs = Math.max(
+                nextPenaltyMs,
+                Math.trunc(Number(data.totalPenaltyMs) || nextPenaltyMs)
+            );
+            if (this._state) {
+                this._state.lastParcoursPenalty = {
+                    penaltyMs: nextPenaltyMs,
+                    totalPenaltyMs: nextTotalPenaltyMs,
+                };
+            }
+            return { penaltyMs: nextPenaltyMs, totalPenaltyMs: nextTotalPenaltyMs };
+        }
+
         if (type === 'finish') {
             const store = this.settingsManager?.store;
             if (!routeId || !store) return null;
@@ -1141,6 +1171,7 @@ export class ArcadeRunRuntime {
             })();
             this._leaderboard = insertLeaderboardEntry(this._leaderboard, routeId, {
                 totalTimeMs,
+                penaltyTimeMs,
                 segmentSplitsMs,
                 vehicleId,
                 date: new Date().toISOString(),

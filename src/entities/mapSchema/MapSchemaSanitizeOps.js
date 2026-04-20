@@ -178,6 +178,7 @@ function sanitizeParcoursRules(raw) {
         maxSegmentTimeMs: Math.max(0, Math.trunc(asFiniteNumber(source.maxSegmentTimeMs, 0))),
         cooldownMs: Math.max(0, Math.trunc(asFiniteNumber(source.cooldownMs, 450))),
         wrongOrderCooldownMs: Math.max(0, Math.trunc(asFiniteNumber(source.wrongOrderCooldownMs, 650))),
+        wrongOrderPenaltyMs: Math.max(0, Math.trunc(asFiniteNumber(source.wrongOrderPenaltyMs, 2000))),
         errorIndicatorMs: Math.max(0, Math.trunc(asFiniteNumber(source.errorIndicatorMs, 1400))),
     };
 }

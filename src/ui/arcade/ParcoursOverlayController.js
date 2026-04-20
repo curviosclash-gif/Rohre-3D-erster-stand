@@ -6,6 +6,8 @@ export class ParcoursOverlayController {
         this._xpNotificationHideAtMs = 0;
         this._splitDeltaOverlay = null;
         this._splitDeltaHideAtMs = 0;
+        this._penaltyOverlay = null;
+        this._penaltyHideAtMs = 0;
         this._statsFlashOverlay = null;
         this._statsFlashHideAtMs = 0;
         this._minimap = null;
@@ -62,6 +64,28 @@ export class ParcoursOverlayController {
         }
     }
 
+    tickPenalty(hudState, nowMs) {
+        if (!document?.body) return;
+        const penalty = hudState?.parcoursPenalty;
+        if (penalty?.penaltyMs > 0) {
+            if (!this._penaltyOverlay) {
+                this._penaltyOverlay = this._ensureOverlay(
+                    'parcours-penalty-notification',
+                    'parcours-penalty-notification hidden'
+                );
+            }
+            if (this._penaltyOverlay) {
+                const seconds = (Math.max(0, Number(penalty.penaltyMs) || 0) / 1000).toFixed(1);
+                this._penaltyOverlay.textContent = `+${seconds}s PENALTY`;
+                this._penaltyOverlay.classList.remove('hidden');
+                this._penaltyHideAtMs = Math.max(0, nowMs) + 1400;
+            }
+        }
+        if (this._penaltyOverlay && nowMs >= this._penaltyHideAtMs) {
+            this._penaltyOverlay.classList.add('hidden');
+        }
+    }
+
     // 82.8.3: Show effective stats banner for 2500ms at sector start
     tickStatsFlash(hudState, nowMs, sectorChanged) {
         if (!document?.body) return;
@@ -108,6 +132,10 @@ export class ParcoursOverlayController {
             this._splitDeltaOverlay.parentElement.removeChild(this._splitDeltaOverlay);
         }
         this._splitDeltaOverlay = null;
+        if (this._penaltyOverlay?.parentElement) {
+            this._penaltyOverlay.parentElement.removeChild(this._penaltyOverlay);
+        }
+        this._penaltyOverlay = null;
         if (this._statsFlashOverlay?.parentElement) {
             this._statsFlashOverlay.parentElement.removeChild(this._statsFlashOverlay);
         }

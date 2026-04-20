@@ -267,6 +267,7 @@ export class HudRuntimeSystem {
         const overlay = this._ensureParcoursOverlay();
         overlay.tickXp(hudState, nowMs);
         overlay.tickSplitDelta(hudState, nowMs);
+        overlay.tickPenalty(hudState, nowMs);
         overlay.tickMinimap(this.game?.entityManager, projection, this._getLocalPlayerIndex(projection));
         const suddenDeathActive = String(hudState.phase || '') === 'sudden_death';
         this._arcadeSuddenDeathOverlay?.classList?.toggle('hidden', !suddenDeathActive);

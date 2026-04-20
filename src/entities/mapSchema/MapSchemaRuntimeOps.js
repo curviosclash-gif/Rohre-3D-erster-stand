@@ -71,6 +71,7 @@ function mapParcoursToRuntime(parcours, invScale) {
             maxSegmentTimeMs: Math.max(0, Math.trunc(Number(parcours.rules?.maxSegmentTimeMs) || 0)),
             cooldownMs: Math.max(0, Math.trunc(Number(parcours.rules?.cooldownMs) || 450)),
             wrongOrderCooldownMs: Math.max(0, Math.trunc(Number(parcours.rules?.wrongOrderCooldownMs) || 650)),
+            wrongOrderPenaltyMs: Math.max(0, Math.trunc(Number(parcours.rules?.wrongOrderPenaltyMs) || 2000)),
             errorIndicatorMs: Math.max(0, Math.trunc(Number(parcours.rules?.errorIndicatorMs) || 1400)),
         },
         finish,

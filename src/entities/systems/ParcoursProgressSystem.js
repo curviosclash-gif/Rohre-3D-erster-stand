@@ -6,6 +6,7 @@ import {
     normalizeString,
     nowMs,
 } from './ParcoursProgressUtils.js';
+import { resetParcoursProgressState, rewindParcoursProgressState } from './ParcoursProgressStateOps.js';
 
 export class ParcoursProgressSystem {
     constructor(entityManager, options = {}) {
@@ -18,23 +19,18 @@ export class ParcoursProgressSystem {
         this._leaderboardCallback = null;
         this._ghostRecorder = null;
     }
-
     setXpEventCallback(callback) {
         this._xpEventCallback = typeof callback === 'function' ? callback : null;
     }
-
     setLeaderboardCallback(callback) {
         this._leaderboardCallback = typeof callback === 'function' ? callback : null;
     }
-
     setGhostRecorder(recorder) {
         this._ghostRecorder = recorder && typeof recorder.sample === 'function' ? recorder : null;
     }
-
     isEnabled() {
         return !!this._route;
     }
-
     reset() {
         this._route = null;
         this._playerStates.clear();
@@ -42,7 +38,6 @@ export class ParcoursProgressSystem {
         this._ghostRecorder?.reset?.();
         this.entityManager?.arena?._portalGateSystem?.checkpointRingRuntime?.setProgressProvider?.(null);
     }
-
     startRound(players = []) {
         this._route = buildRouteFromParcours(this.entityManager?.arena?.currentMapDefinition?.parcours);
         this._playerStates.clear();
@@ -59,7 +54,6 @@ export class ParcoursProgressSystem {
         rt?.setProgressProvider?.(() => this.getPlayerProgressSnapshot(0));
         rt?.setParticleSystem?.(this.entityManager?.particles || null);
     }
-
     _ensurePlayerState(playerIndex) {
         if (!this._route || !Number.isInteger(playerIndex)) return null;
         if (!this._playerStates.has(playerIndex)) {
@@ -67,19 +61,16 @@ export class ParcoursProgressSystem {
         }
         return this._playerStates.get(playerIndex);
     }
-
     _setCheckpointCooldown(state, checkpointId, now) {
         if (!state || !checkpointId) return;
         state.cooldownByCheckpointId.set(checkpointId, now);
     }
-
     _isCheckpointOnCooldown(state, checkpointId, cooldownMs, now) {
         if (!state || !checkpointId || !(cooldownMs > 0)) return false;
         const lastTriggerAt = state.cooldownByCheckpointId.get(checkpointId);
         if (!Number.isFinite(lastTriggerAt)) return false;
         return (now - lastTriggerAt) < cooldownMs;
     }
-
     _isCheckpointTriggered(entry, player, previousPosition, now, state) {
         if (!entry || !player?.position || !previousPosition) return false;
         if (this._isCheckpointOnCooldown(state, entry.id, entry.cooldownMs, now)) return false;
@@ -105,90 +96,18 @@ export class ParcoursProgressSystem {
         const dotCurr = (dx * entry.forward[0]) + (dy * entry.forward[1]) + (dz * entry.forward[2]);
         return dotPrev <= 0 && dotCurr > 0;
     }
-
     _notifyPlayer(player, message) {
         if (!player || !message) return;
         this.entityManager?._notifyPlayerFeedback?.(player, message);
     }
-
     _logRecorderEvent(type, player, details = '') {
         if (!player) return;
         this.entityManager?.recorder?.logEvent?.(type, player.index, details);
     }
-
     _setErrorState(state, message, now) {
         if (!this._route || !state) return;
         state.lastError = normalizeString(message, '');
         state.errorUntilMs = Math.max(0, now + this._route.rules.errorIndicatorMs);
-    }
-
-    _resetProgressState(state, {
-        countReset = true,
-        preserveCounters = true,
-        errorMessage = '',
-        now = this.nowProvider(),
-    } = {}) {
-        if (!state) return;
-        const previousWrongOrderCount = state.wrongOrderCount;
-        const previousResetCount = state.resetCount;
-        state.nextCheckpointIndex = 0;
-        state.passedMask.fill(0);
-        state.stageCheckpointIds.fill('');
-        state.startedAtMs = 0;
-        state.lastCheckpointAtMs = 0;
-        state.completed = false;
-        state.completedAtMs = 0;
-        state.completionTimeMs = 0;
-        state.lastCheckpointId = '';
-        state.lastWrongOrderAtMs = -Infinity;
-        state.cooldownByCheckpointId.clear();
-        state.lastError = '';
-        state.errorUntilMs = 0;
-        state.segmentSplitsMs = [];
-        state.wrongOrderCount = preserveCounters ? previousWrongOrderCount : 0;
-        state.resetCount = preserveCounters ? previousResetCount : 0;
-        if (countReset) {
-            state.resetCount += 1;
-        }
-        if (errorMessage) {
-            this._setErrorState(state, errorMessage, now);
-        }
-    }
-
-    _rewindToLastValid(state, {
-        now = this.nowProvider(),
-        errorMessage = '',
-    } = {}) {
-        if (!state || !this._route) return;
-        const previousWrongOrderCount = state.wrongOrderCount;
-        const previousResetCount = state.resetCount;
-        const currentNext = Math.max(0, Math.min(this._route.totalCheckpoints, state.nextCheckpointIndex));
-        const fallbackNext = Math.max(0, currentNext - 1);
-
-        for (let index = fallbackNext; index < state.passedMask.length; index += 1) {
-            state.passedMask[index] = 0;
-            state.stageCheckpointIds[index] = '';
-        }
-        state.nextCheckpointIndex = fallbackNext;
-        state.completed = false;
-        state.completedAtMs = 0;
-        state.completionTimeMs = 0;
-        state.lastCheckpointId = fallbackNext > 0
-            ? (state.stageCheckpointIds[fallbackNext - 1] || this._route.sequence[fallbackNext - 1] || '')
-            : '';
-        state.lastCheckpointAtMs = fallbackNext > 0 ? now : 0;
-        if (fallbackNext <= 0) {
-            state.startedAtMs = 0;
-        }
-        state.lastWrongOrderAtMs = -Infinity;
-        state.cooldownByCheckpointId.clear();
-        state.lastError = '';
-        state.errorUntilMs = 0;
-        state.wrongOrderCount = previousWrongOrderCount;
-        state.resetCount = previousResetCount + 1;
-        if (errorMessage) {
-            this._setErrorState(state, errorMessage, now);
-        }
     }
 
     onPlayerSpawn(player, options = {}) {
@@ -198,10 +117,12 @@ export class ParcoursProgressSystem {
 
         const reason = normalizeString(options.reason, 'spawn');
         if (reason === 'round_start' || reason === 'match_start' || reason === 'spawn_all') {
-            this._resetProgressState(state, {
+            resetParcoursProgressState(state, {
                 countReset: false,
                 preserveCounters: false,
                 errorMessage: '',
+                now: this.nowProvider(),
+                setErrorState: this._setErrorState.bind(this),
             });
         }
     }
@@ -213,10 +134,12 @@ export class ParcoursProgressSystem {
 
         const reason = normalizeString(options.cause, 'death');
         if (this._route.rules.resetOnDeath) {
-            this._resetProgressState(state, {
+            resetParcoursProgressState(state, {
                 countReset: true,
                 preserveCounters: true,
                 errorMessage: 'Parcours-Reset nach Tod',
+                now: this.nowProvider(),
+                setErrorState: this._setErrorState.bind(this),
             });
             this._notifyPlayer(player, 'Parcours-Reset nach Respawn');
             this._logRecorderEvent('PARCOURS_RESET', player, `cause=${reason}`);
@@ -224,9 +147,10 @@ export class ParcoursProgressSystem {
         }
 
         if (this._route.rules.resetToLastValid) {
-            this._rewindToLastValid(state, {
+            rewindParcoursProgressState(state, this._route, {
                 now: this.nowProvider(),
                 errorMessage: 'Rueckfall auf letzten Checkpoint',
+                setErrorState: this._setErrorState.bind(this),
             });
             this._notifyPlayer(player, 'Parcours-Rueckfall nach Respawn');
             this._logRecorderEvent('PARCOURS_RESET', player, `cause=${reason} mode=last-valid`);
@@ -300,31 +224,48 @@ export class ParcoursProgressSystem {
         if (now - state.lastWrongOrderAtMs < this._route.rules.wrongOrderCooldownMs) return;
         state.lastWrongOrderAtMs = now;
         state.wrongOrderCount += 1;
+        const penaltyMs = Math.max(0, Math.trunc(Number(this._route.rules?.wrongOrderPenaltyMs) || 0));
+        if (penaltyMs > 0) {
+            state.penaltyTimeMs = Math.max(0, Math.trunc(Number(state.penaltyTimeMs) || 0)) + penaltyMs;
+        }
         this._setErrorState(state, 'Falsche Reihenfolge', now);
-        this._notifyPlayer(player, `Falsche Reihenfolge: ${entry.id}`);
+        if (penaltyMs > 0) {
+            this._notifyPlayer(player, `Falsche Reihenfolge: ${entry.id} (+${(penaltyMs / 1000).toFixed(1)}s Penalty)`);
+            this._leaderboardCallback?.({
+                type: 'wrong_order',
+                playerIndex: player.index,
+                routeId: this._route.routeId,
+                penaltyMs,
+                totalPenaltyMs: state.penaltyTimeMs,
+            });
+        } else {
+            this._notifyPlayer(player, `Falsche Reihenfolge: ${entry.id}`);
+        }
         this._logRecorderEvent(
             'PARCOURS_WRONG_ORDER',
             player,
-            `expected=${state.nextCheckpointIndex + 1} got=${entry.id}`
+            `expected=${state.nextCheckpointIndex + 1} got=${entry.id} penaltyMs=${penaltyMs} totalPenaltyMs=${state.penaltyTimeMs}`
         );
     }
 
     _registerSegmentTimeout(player, state, now) {
         if (this._route?.rules?.resetToLastValid) {
-            this._rewindToLastValid(state, {
+            rewindParcoursProgressState(state, this._route, {
                 now,
                 errorMessage: 'Segment-Zeit ueberschritten',
+                setErrorState: this._setErrorState.bind(this),
             });
             this._notifyPlayer(player, 'Segment-Zeitfenster verpasst (Rueckfall)');
             this._logRecorderEvent('PARCOURS_TIMEOUT', player, 'segment-timeout mode=last-valid');
             return;
         }
 
-        this._resetProgressState(state, {
+        resetParcoursProgressState(state, {
             countReset: true,
             preserveCounters: true,
             errorMessage: 'Segment-Zeit ueberschritten',
             now,
+            setErrorState: this._setErrorState.bind(this),
         });
         this._notifyPlayer(player, 'Segment-Zeitfenster verpasst');
         this._logRecorderEvent('PARCOURS_TIMEOUT', player, 'segment-timeout mode=full-reset');
@@ -334,7 +275,9 @@ export class ParcoursProgressSystem {
         if (!this._route || !state || state.completed) return;
         state.completed = true;
         state.completedAtMs = now;
-        state.completionTimeMs = Math.max(0, now - (state.startedAtMs || now));
+        const baseTimeMs = Math.max(0, now - (state.startedAtMs || now));
+        const penaltyTimeMs = Math.max(0, Math.trunc(Number(state.penaltyTimeMs) || 0));
+        state.completionTimeMs = baseTimeMs + penaltyTimeMs;
         state.nextCheckpointIndex = this._route.totalCheckpoints;
         state.lastCheckpointAtMs = now;
         state.lastError = '';
@@ -345,6 +288,7 @@ export class ParcoursProgressSystem {
                 playerIndex: player.index,
                 completedAtMs: state.completedAtMs,
                 completionTimeMs: state.completionTimeMs,
+                penaltyTimeMs,
             });
             this._completionOrder.sort((left, right) => {
                 if (left.completedAtMs !== right.completedAtMs) {
@@ -358,7 +302,7 @@ export class ParcoursProgressSystem {
         this._logRecorderEvent(
             'PARCOURS_COMPLETE',
             player,
-            `route=${this._route.routeId} timeMs=${Math.round(state.completionTimeMs)}`
+            `route=${this._route.routeId} timeMs=${Math.round(state.completionTimeMs)} penaltyMs=${penaltyTimeMs}`
         );
         const finishXpResult = this._xpEventCallback?.('finish', player.index);
         if (finishXpResult?.earned > 0) {
@@ -372,6 +316,7 @@ export class ParcoursProgressSystem {
             playerIndex: player.index,
             routeId: this._route.routeId,
             totalTimeMs: state.completionTimeMs,
+            penaltyTimeMs,
             segmentSplitsMs: [...state.segmentSplitsMs],
             ghostClip,
         });
@@ -446,6 +391,7 @@ export class ParcoursProgressSystem {
                 routeId: this._route.routeId,
                 checkpointCount: this._route.totalCheckpoints,
                 completionTimeMs: completion.completionTimeMs,
+                penaltyTimeMs: Math.max(0, Math.trunc(Number(completion.penaltyTimeMs) || 0)),
                 completedAtMs: completion.completedAtMs,
             },
         };
@@ -474,6 +420,7 @@ export class ParcoursProgressSystem {
             startedAtMs: state.startedAtMs,
             lastCheckpointAtMs: state.lastCheckpointAtMs,
             wrongOrderCount: state.wrongOrderCount,
+            penaltyTimeMs: Math.max(0, Math.trunc(Number(state.penaltyTimeMs) || 0)),
             resetCount: state.resetCount,
             completed: state.completed,
             completedAtMs: state.completedAtMs,
@@ -498,6 +445,7 @@ export class ParcoursProgressSystem {
                 : Math.max(0, Math.min(snapshot.totalCheckpoints, snapshot.nextCheckpointIndex)),
             completed: snapshot.completed,
             completionTimeMs: snapshot.completionTimeMs,
+            penaltyTimeMs: snapshot.penaltyTimeMs,
             segmentElapsedMs: snapshot.segmentElapsedMs,
             hasError: snapshot.hasError,
             errorMessage: snapshot.errorMessage,

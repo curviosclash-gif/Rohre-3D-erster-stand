@@ -76,6 +76,7 @@ function createParcoursDefinition(overrides = {}) {
             allowLaneAliases: sourceRules.allowLaneAliases !== false,
             winnerByParcoursComplete: sourceRules.winnerByParcoursComplete !== false,
             wrongOrderCooldownMs: Number.isFinite(Number(sourceRules.wrongOrderCooldownMs)) ? Number(sourceRules.wrongOrderCooldownMs) : 700,
+            wrongOrderPenaltyMs: Number.isFinite(Number(sourceRules.wrongOrderPenaltyMs)) ? Number(sourceRules.wrongOrderPenaltyMs) : 2000,
             errorIndicatorMs: Number.isFinite(Number(sourceRules.errorIndicatorMs)) ? Number(sourceRules.errorIndicatorMs) : 1000,
         },
     };
@@ -793,8 +794,10 @@ test.describe('Physics Core (Tests 41-60)', () => {
         const route = harness.system.getRouteSnapshot();
         const cp01 = route.checkpoints.find((entry) => entry.routeIndex === 0);
         const cp02 = route.checkpoints.find((entry) => entry.routeIndex === 1);
+        const cp03 = route.checkpoints.find((entry) => entry.routeIndex === 2);
         expect(cp01).toBeTruthy();
         expect(cp02).toBeTruthy();
+        expect(cp03).toBeTruthy();
 
         harness.nowRef.value = 120;
         const wrongOrderFirst = crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value);
@@ -803,6 +806,7 @@ test.describe('Physics Core (Tests 41-60)', () => {
         let snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
         expect(snapshot?.nextCheckpointIndex).toBe(0);
         expect(snapshot?.wrongOrderCount).toBe(1);
+        expect(snapshot?.penaltyTimeMs).toBe(2000);
 
         harness.nowRef.value = 300;
         const wrongOrderSpam = crossCheckpoint(harness.system, harness.player, cp02, harness.nowRef.value);
@@ -827,6 +831,17 @@ test.describe('Physics Core (Tests 41-60)', () => {
         expect(cp02SpamAfterAdvance || null).toBeNull();
         snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
         expect(snapshot?.nextCheckpointIndex).toBe(2);
+
+        harness.nowRef.value = 2400;
+        const cp03Hit = crossCheckpoint(harness.system, harness.player, cp03, harness.nowRef.value);
+        expect(cp03Hit?.type).toBe('checkpoint');
+
+        harness.nowRef.value = 2600;
+        const finishHit = crossCheckpoint(harness.system, harness.player, route.finish, harness.nowRef.value);
+        expect(finishHit?.type).toBe('finish');
+        snapshot = harness.system.getPlayerProgressSnapshot(harness.player.index, harness.nowRef.value);
+        expect(snapshot?.completionTimeMs).toBe(2800);
+        expect(snapshot?.penaltyTimeMs).toBe(2000);
     });
 
     test('T60c: Parcours Segment-Timeout und Death-Reset-Regeln greifen deterministisch', () => {

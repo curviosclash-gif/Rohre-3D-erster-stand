@@ -65,6 +65,7 @@ export const PARCOURS_MAPS = Object.freeze({
                 maxSegmentTimeMs: 18000,
                 cooldownMs: 450,
                 wrongOrderCooldownMs: 650,
+                wrongOrderPenaltyMs: 2000,
                 errorIndicatorMs: 1400,
                 allowLaneAliases: true,
                 winnerByParcoursComplete: true,

@@ -8,9 +8,17 @@ function toSafeMs(value) {
     return Number.isFinite(n) && n >= 0 ? n : 0;
 }
 
-export function createLeaderboardEntry({ totalTimeMs = 0, segmentSplitsMs = [], vehicleId = '', date = '', ghostClip = null } = {}) {
+export function createLeaderboardEntry({
+    totalTimeMs = 0,
+    penaltyTimeMs = 0,
+    segmentSplitsMs = [],
+    vehicleId = '',
+    date = '',
+    ghostClip = null,
+} = {}) {
     return {
         totalTimeMs: toSafeMs(totalTimeMs),
+        penaltyTimeMs: toSafeMs(penaltyTimeMs),
         segmentSplitsMs: Array.isArray(segmentSplitsMs) ? segmentSplitsMs.map(toSafeMs) : [],
         vehicleId: String(vehicleId || ''),
         date: typeof date === 'string' && date ? date : new Date().toISOString(),

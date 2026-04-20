@@ -286,3 +286,52 @@ test('Arcade deriveRoundEndPlan routes PARCOURS_COMPLETE through completeParcour
     assert.equal(plan?.outcome?.requiredWins, 4);
     assert.deepEqual(plan?.outcome?.parcours, parcours);
 });
+
+test('Arcade parcours wrong-order event exposes red penalty HUD payload as one-shot', () => {
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = true;
+    runtime._state = {};
+
+    const result = runtime.applyParcoursLeaderboardEvent({
+        type: 'wrong_order',
+        penaltyMs: 2000,
+        totalPenaltyMs: 4000,
+    });
+
+    assert.deepEqual(result, { penaltyMs: 2000, totalPenaltyMs: 4000 });
+    const firstHudState = runtime.getHudState();
+    assert.deepEqual(firstHudState?.parcoursPenalty, { penaltyMs: 2000, totalPenaltyMs: 4000 });
+    const secondHudState = runtime.getHudState();
+    assert.equal(secondHudState?.parcoursPenalty, null);
+});
+
+test('Arcade parcours leaderboard persists penaltyTimeMs separately from totalTimeMs', () => {
+    const writes = [];
+    const runtime = new ArcadeRunRuntime();
+    runtime._enabled = true;
+    runtime._state = {};
+    runtime._leaderboard = {};
+    runtime.settingsManager = {
+        store: {
+            saveJsonRecord(key, value) {
+                writes.push({ key, value });
+            },
+        },
+    };
+
+    const result = runtime.applyParcoursLeaderboardEvent({
+        type: 'finish',
+        playerIndex: 0,
+        routeId: 'unit_route',
+        totalTimeMs: 3210,
+        penaltyTimeMs: 2000,
+        segmentSplitsMs: [900, 1800, 2700],
+        ghostClip: null,
+    });
+
+    assert.equal(result?.inserted, true);
+    const lastWrite = writes[writes.length - 1];
+    assert.equal(lastWrite?.key, 'cuviosclash.parcours-leaderboard.v1');
+    assert.equal(lastWrite?.value?.unit_route?.[0]?.totalTimeMs, 3210);
+    assert.equal(lastWrite?.value?.unit_route?.[0]?.penaltyTimeMs, 2000);
+});

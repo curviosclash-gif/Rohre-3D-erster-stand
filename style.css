@@ -1,4 +1,4 @@
-﻿/* ============================================
+/* ============================================
    CuviosClash - Styles
    ============================================ */
 
@@ -2146,6 +2146,29 @@ input[type="range"]::-webkit-slider-thumb {
     z-index: 906;
     pointer-events: none;
     animation: arcade-transition-in 0.24s ease;
+}
+
+.parcours-penalty-notification {
+    position: fixed;
+    top: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 7px 11px;
+    border-radius: 9px;
+    border: 1px solid rgba(255, 132, 132, 0.76);
+    background: rgba(46, 8, 8, 0.9);
+    color: #ff7f7f;
+    text-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+    font-family: 'Orbitron', monospace;
+    font-size: 0.88rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    z-index: 907;
+    pointer-events: none;
+}
+
+.parcours-penalty-notification.hidden {
+    display: none !important;
 }
 
 #arcade-overlay-panel {
