@@ -64,6 +64,13 @@ const violations = [
             location: `${entry.from}:${entry.line}`,
             detail: `${entry.from} -> ${entry.to}`,
         })),
+    ...report.findings.sharedContractsToCoreImports
+        .filter((entry) => !entry.allowed)
+        .map((entry) => ({
+            category: 'shared/contracts -> core import',
+            location: `${entry.from}:${entry.line}`,
+            detail: `${entry.from} -> ${entry.to}`,
+        })),
     ...(report.findings.legacySurfaceReads || [])
         .filter((entry) => !entry.allowed)
         .map((entry) => ({
@@ -84,6 +91,7 @@ if (violations.length === 0) {
     console.log(`state -> ui disallowed imports: ${report.scorecard.stateToUiImports.disallowedEdges}`);
     console.log(`entities -> core disallowed imports: ${report.scorecard.entitiesToCoreImports.disallowedEdges}`);
     console.log(`state -> core disallowed imports: ${report.scorecard.stateToCoreImports.disallowedEdges}`);
+    console.log(`shared/contracts -> core disallowed imports: ${report.scorecard.sharedContractsToCoreImports.disallowedEdges}`);
     if (report.scorecard.legacySurfaces) {
         for (const [surfaceId, data] of Object.entries(report.scorecard.legacySurfaces)) {
             console.log(`legacy-surface ${surfaceId}: ${data.totalFiles} files (${data.disallowedFiles} disallowed)`);

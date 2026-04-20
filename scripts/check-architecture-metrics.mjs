@@ -68,6 +68,11 @@ const checks = [
         actual: report.scorecard.stateToCoreImports.totalEdges,
         max: report.budgets.stateToCoreImportEdges,
     },
+    {
+        label: 'shared/contracts -> core legacy edge budget',
+        actual: report.scorecard.sharedContractsToCoreImports.totalEdges,
+        max: report.budgets.sharedContractsToCoreImportEdges,
+    },
     ...legacySurfaceChecks,
 ];
 

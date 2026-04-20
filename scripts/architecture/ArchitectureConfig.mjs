@@ -98,6 +98,9 @@ const legacyEntitiesToCoreImportEntries = [
 /** @type {[string, string][]} */
 const legacyStateToCoreImportEntries = [];
 
+/** @type {[string, string][]} */
+const legacySharedContractsToCoreImportEntries = [];
+
 export const LEGACY_UI_TO_CORE_IMPORTS = new Map(legacyUiToCoreImportEntries);
 export const LEGACY_CORE_TO_UI_IMPORTS = new Map(legacyCoreToUiImportEntries);
 export const LEGACY_UI_TO_STATE_IMPORTS = new Map(legacyUiToStateImportEntries);
@@ -105,6 +108,7 @@ export const LEGACY_STATE_TO_UI_IMPORTS = new Map(legacyStateToUiImportEntries);
 
 export const LEGACY_ENTITIES_TO_CORE_IMPORTS = new Map(legacyEntitiesToCoreImportEntries);
 export const LEGACY_STATE_TO_CORE_IMPORTS = new Map(legacyStateToCoreImportEntries);
+export const LEGACY_SHARED_CONTRACTS_TO_CORE_IMPORTS = new Map(legacySharedContractsToCoreImportEntries);
 
 export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     configWrites: 0,
@@ -116,6 +120,7 @@ export const ARCHITECTURE_SCORECARD_TARGETS = Object.freeze({
     disallowedStateToUiImports: 0,
     disallowedEntitiesToCoreImports: 0,
     disallowedStateToCoreImports: 0,
+    disallowedSharedContractsToCoreImports: 0,
 });
 
 export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
@@ -127,4 +132,5 @@ export const ARCHITECTURE_SCORECARD_BUDGETS = Object.freeze({
     stateToUiImportEdges: LEGACY_STATE_TO_UI_IMPORTS.size,
     entitiesToCoreImportEdges: LEGACY_ENTITIES_TO_CORE_IMPORTS.size,
     stateToCoreImportEdges: LEGACY_STATE_TO_CORE_IMPORTS.size,
+    sharedContractsToCoreImportEdges: LEGACY_SHARED_CONTRACTS_TO_CORE_IMPORTS.size,
 });

@@ -7,6 +7,7 @@ import {
     LEGACY_CONSTRUCTOR_GAME_ALLOWLIST,
     LEGACY_DOM_ACCESS_ALLOWLIST,
     LEGACY_ENTITIES_TO_CORE_IMPORTS,
+    LEGACY_SHARED_CONTRACTS_TO_CORE_IMPORTS,
     LEGACY_STATE_TO_CORE_IMPORTS,
     LEGACY_STATE_TO_UI_IMPORTS,
     LEGACY_UI_TO_CORE_IMPORTS,
@@ -252,6 +253,7 @@ function classifyEdgeViolations(edges) {
     const stateToUiImports = [];
     const entitiesToCoreImports = [];
     const stateToCoreImports = [];
+    const sharedContractsToCoreImports = [];
 
     for (const edge of edges) {
         if (edge.from.startsWith('src/core/') && edge.to.startsWith('src/ui/')) {
@@ -302,6 +304,14 @@ function classifyEdgeViolations(edges) {
                 reason,
             });
         }
+        if (edge.from.startsWith('src/shared/contracts/') && edge.to.startsWith('src/core/')) {
+            const reason = LEGACY_SHARED_CONTRACTS_TO_CORE_IMPORTS.get(createEdgeKey(edge.from, edge.to)) || null;
+            sharedContractsToCoreImports.push({
+                ...edge,
+                allowed: !!reason,
+                reason,
+            });
+        }
     }
 
     return {
@@ -311,6 +321,7 @@ function classifyEdgeViolations(edges) {
         stateToUiImports,
         entitiesToCoreImports,
         stateToCoreImports,
+        sharedContractsToCoreImports,
     };
 }
 
@@ -361,6 +372,7 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
         stateToUiImports,
         entitiesToCoreImports,
         stateToCoreImports,
+        sharedContractsToCoreImports,
     } = classifyEdgeViolations(importEdges);
     const constructorGameMatches = collectConstructorGameMatches(filesByRelativePath);
     const configWrites = collectConfigWrites(filesByRelativePath);
@@ -384,6 +396,7 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             stateToUiImports,
             entitiesToCoreImports,
             stateToCoreImports,
+            sharedContractsToCoreImports,
             legacySurfaceReads,
         },
         importGraph: {
@@ -444,6 +457,11 @@ export function collectArchitectureReport(rootDir = process.cwd()) {
             disallowedEdges: stateToCoreImports.filter((entry) => !entry.allowed).length,
             legacyEdges: summarizeEdges(stateToCoreImports.filter((entry) => entry.allowed)),
         },
+        sharedContractsToCoreImports: {
+            totalEdges: sharedContractsToCoreImports.length,
+            disallowedEdges: sharedContractsToCoreImports.filter((entry) => !entry.allowed).length,
+            legacyEdges: summarizeEdges(sharedContractsToCoreImports.filter((entry) => entry.allowed)),
+        },
         legacySurfaces: summarizeLegacySurfaceScorecard(legacySurfaceReads, guardMatrix),
     };
 
@@ -470,6 +488,7 @@ export function formatArchitectureReport(report) {
     lines.push(`state -> ui imports: ${report.scorecard.stateToUiImports.totalEdges} edges (${report.scorecard.stateToUiImports.disallowedEdges} disallowed)`);
     lines.push(`entities -> core imports: ${report.scorecard.entitiesToCoreImports.totalEdges} edges (${report.scorecard.entitiesToCoreImports.disallowedEdges} disallowed)`);
     lines.push(`state -> core imports: ${report.scorecard.stateToCoreImports.totalEdges} edges (${report.scorecard.stateToCoreImports.disallowedEdges} disallowed)`);
+    lines.push(`shared/contracts -> core imports: ${report.scorecard.sharedContractsToCoreImports.totalEdges} edges (${report.scorecard.sharedContractsToCoreImports.disallowedEdges} disallowed)`);
     if (report.scorecard.legacySurfaces && Object.keys(report.scorecard.legacySurfaces).length > 0) {
         lines.push('');
         lines.push('Legacy-surface usage (guard-matrix, forbiddenForNewWork):');
