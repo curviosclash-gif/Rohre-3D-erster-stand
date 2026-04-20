@@ -15,7 +15,7 @@ import {
 import { clamp } from '../../utils/MathOps.js';
 import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigContract.js';
 import { bindMenuMultiplayerTransportButtons } from './MenuMultiplayerTransportBindings.js';
-import { createRuntimeSettingsLimitsForRuntime } from '../../core/settings/SettingsRuntimeLimits.js';
+import { createRuntimeSettingsLimitsForRuntime } from '../../shared/contracts/SettingsRuntimeLimitsContract.js';
 import { bindMenuExtrasButtons } from './MenuExtrasBindings.js';
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;

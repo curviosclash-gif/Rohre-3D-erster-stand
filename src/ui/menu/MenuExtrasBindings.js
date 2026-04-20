@@ -4,7 +4,7 @@ import { clamp } from '../../utils/MathOps.js';
 import { setupArcadeMenuSurface } from '../arcade/ArcadeMenuSurface.js';
 import { bindMenuMultiplayerActionButtons } from './MenuMultiplayerActionBindings.js';
 import { resolveSurfaceFeatureLaunchGuard } from './MenuSurfaceFeatureAccess.js';
-import { createRuntimeSettingsLimitsForRuntime } from '../../core/settings/SettingsRuntimeLimits.js';
+import { createRuntimeSettingsLimitsForRuntime } from '../../shared/contracts/SettingsRuntimeLimitsContract.js';
 
 export function bindMenuExtrasButtons(ctx) {
     const ui = ctx.ui;

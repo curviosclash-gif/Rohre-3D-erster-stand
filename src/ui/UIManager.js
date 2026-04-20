@@ -5,7 +5,7 @@
 //                       sowie dev-text-catalog und disposer-Infrastruktur.
 // ============================================
 
-import { SETTINGS_LIMITS } from '../shared/contracts/SettingsRuntimeContract.js';
+import { clampSettingValue } from '../shared/contracts/SettingsRuntimeContract.js';
 import { GAME_MODE_TYPES, resolveActiveGameMode } from '../hunt/HuntMode.js';
 import { isSettingsChangeKey, normalizeSettingsChangeKeys } from './SettingsChangeKeys.js';
 import { resolveSyncMethodNamesForChangeKeys } from './UISettingsSyncMap.js';
@@ -37,6 +37,18 @@ import { resolveRuntimeSessionContract } from '../shared/contracts/RuntimeSessio
 import { UIStartSyncController } from './UIStartSyncController.js';
 import { UINavigationLifecycleController } from './UINavigationLifecycleController.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
+import { createRuntimeSettingsLimitsForRuntime } from '../shared/contracts/SettingsRuntimeLimitsContract.js';
+function applyRangeInputLimits(input, limits) {
+    if (!input || !limits || typeof limits !== 'object') return;
+    if (Number.isFinite(Number(limits.min))) input.min = String(limits.min);
+    if (Number.isFinite(Number(limits.max))) input.max = String(limits.max);
+    if (Number.isFinite(Number(limits.step)) && Number(limits.step) > 0) input.step = String(limits.step);
+}
+function syncRangeInput(input, value, limits, fallback) {
+    if (!input) return;
+    applyRangeInputLimits(input, limits);
+    input.value = String(clampSettingValue(value, limits, fallback));
+}
 
 export class UIManager {
     constructor(deps = {}) {
@@ -74,6 +86,7 @@ export class UIManager {
         ));
         this._developerPanel = document.getElementById('submenu-developer');
         this._debugHintNodes = Array.isArray(this.ui.debugHints) ? this.ui.debugHints : [];
+        this._runtimeSettingLimits = createRuntimeSettingsLimitsForRuntime();
         this.menuTextRuntime = game?.menuTextRuntime instanceof MenuTextRuntime
             ? game.menuTextRuntime
             : new MenuTextRuntime({ overrideStore: game.settingsManager?.menuTextOverrideStore });
@@ -144,16 +157,13 @@ export class UIManager {
     _setupDeveloperTextCatalog() {
         const select = this.ui.developerTextIdSelect;
         if (!select) return;
-
         const entries = listMenuTextCatalogEntries().sort((left, right) => left.id.localeCompare(right.id, 'de'));
         const previousValue = String(select.value || '');
         select.innerHTML = '';
-
         const placeholderOption = document.createElement('option');
         placeholderOption.value = '';
         placeholderOption.textContent = 'Bitte Text-ID waehlen';
         select.appendChild(placeholderOption);
-
         entries.forEach((entry) => {
             const option = document.createElement('option');
             option.value = entry.id;
@@ -313,14 +323,14 @@ export class UIManager {
 
     syncBots(settings = this.game.settings) {
         const ui = this.ui;
-        ui.botSlider.value = settings.numBots;
+        syncRangeInput(ui.botSlider, settings.numBots, this._runtimeSettingLimits.session.numBots, settings.numBots);
         ui.botLabel.textContent = settings.numBots;
         if (ui.botDifficultySelect) ui.botDifficultySelect.value = settings.botDifficulty;
     }
 
     syncRules(settings = this.game.settings) {
         const ui = this.ui;
-        ui.winSlider.value = settings.winsNeeded;
+        syncRangeInput(ui.winSlider, settings.winsNeeded, this._runtimeSettingLimits.session.winsNeeded, settings.winsNeeded);
         ui.winLabel.textContent = settings.winsNeeded;
         ui.autoRollToggle.checked = !!settings.autoRoll;
         ui.invertP1.checked = !!settings.invertPitch.PLAYER_1;
@@ -334,29 +344,35 @@ export class UIManager {
         const ui = this.ui;
         const gp = settings.gameplay;
         const runtimeConfig = resolveGameplayConfig(this.game);
-        ui.speedSlider.value = gp.speed;
+        const runtimeLimits = this._runtimeSettingLimits;
+        syncRangeInput(ui.speedSlider, gp.speed, runtimeLimits.gameplay.speed, gp.speed);
         ui.speedLabel.textContent = `${gp.speed} m/s`;
-        ui.turnSlider.value = gp.turnSensitivity;
+        syncRangeInput(ui.turnSlider, gp.turnSensitivity, runtimeLimits.gameplay.turnSensitivity, gp.turnSensitivity);
         ui.turnLabel.textContent = gp.turnSensitivity.toFixed(1);
-        ui.planeSizeSlider.value = gp.planeScale;
+        syncRangeInput(ui.planeSizeSlider, gp.planeScale, runtimeLimits.gameplay.planeScale, gp.planeScale);
         ui.planeSizeLabel.textContent = gp.planeScale.toFixed(1);
-        ui.trailWidthSlider.value = gp.trailWidth;
+        syncRangeInput(ui.trailWidthSlider, gp.trailWidth, runtimeLimits.gameplay.trailWidth, gp.trailWidth);
         ui.trailWidthLabel.textContent = gp.trailWidth.toFixed(1);
-        ui.gapSizeSlider.value = gp.gapSize;
+        syncRangeInput(ui.gapSizeSlider, gp.gapSize, runtimeLimits.gameplay.gapSize, gp.gapSize);
         ui.gapSizeLabel.textContent = gp.gapSize.toFixed(2);
-        ui.gapFrequencySlider.value = gp.gapFrequency;
+        syncRangeInput(ui.gapFrequencySlider, gp.gapFrequency, runtimeLimits.gameplay.gapFrequency, gp.gapFrequency);
         ui.gapFrequencyLabel.textContent = (gp.gapFrequency * 100).toFixed(0) + '%';
-        ui.itemAmountSlider.value = gp.itemAmount;
+        syncRangeInput(ui.itemAmountSlider, gp.itemAmount, runtimeLimits.gameplay.itemAmount, gp.itemAmount);
         ui.itemAmountLabel.textContent = gp.itemAmount;
-        ui.fireRateSlider.value = gp.fireRate;
+        syncRangeInput(ui.fireRateSlider, gp.fireRate, runtimeLimits.gameplay.fireRate, gp.fireRate);
         ui.fireRateLabel.textContent = gp.fireRate.toFixed(2) + 's';
-        ui.lockOnSlider.value = gp.lockOnAngle;
-        const mgTrailAimDefaults = SETTINGS_LIMITS.gameplay.mgTrailAimRadius;
+        syncRangeInput(ui.lockOnSlider, gp.lockOnAngle, runtimeLimits.gameplay.lockOnAngle, gp.lockOnAngle);
         const mgTrailAimRadius = Number.isFinite(Number(gp.mgTrailAimRadius))
             ? Number(gp.mgTrailAimRadius)
-            : Math.max(mgTrailAimDefaults.min, Number(runtimeConfig?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
-        if (ui.mgTrailAimSlider) ui.mgTrailAimSlider.value = mgTrailAimRadius;
+            : Math.max(runtimeLimits.gameplay.mgTrailAimRadius.min, Number(runtimeConfig?.HUNT?.MG?.TRAIL_HIT_RADIUS) || 0.78);
+        syncRangeInput(ui.mgTrailAimSlider, mgTrailAimRadius, runtimeLimits.gameplay.mgTrailAimRadius, mgTrailAimRadius);
         if (ui.mgTrailAimLabel) ui.mgTrailAimLabel.textContent = mgTrailAimRadius.toFixed(2);
+        syncRangeInput(ui.portalCountSlider, gp.portalCount, runtimeLimits.gameplay.portalCount, gp.portalCount);
+        if (ui.portalCountLabel) ui.portalCountLabel.textContent = String(gp.portalCount);
+        syncRangeInput(ui.planarLevelCountSlider, gp.planarLevelCount, runtimeLimits.gameplay.planarLevelCount, gp.planarLevelCount);
+        if (ui.planarLevelCountLabel) ui.planarLevelCountLabel.textContent = String(gp.planarLevelCount);
+        applyRangeInputLimits(ui.fightPlayerHpSlider, runtimeLimits.gameplay.fightPlayerHp);
+        applyRangeInputLimits(ui.fightMgDamageSlider, runtimeLimits.gameplay.fightMgDamage);
         syncFightMenuTuningUi({ ui, settings, gameplay: gp, config: runtimeConfig });
         const shadowQuality = normalizeShadowQuality(settings?.localSettings?.shadowQuality, DEFAULT_SHADOW_QUALITY);
         if (ui.shadowQualitySlider) ui.shadowQualitySlider.value = String(shadowQuality);
@@ -373,12 +389,8 @@ export class UIManager {
             ui.recordingHudModeSelect.value = recordingSettings.hudMode;
         }
         if (ui.recordingProfileHint) {
-            const profileLabel = recordingSettings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT
-                ? 'YouTube Shorts'
-                : 'Standard';
-            const hudLabel = recordingSettings.hudMode === RECORDING_HUD_MODE.WITH_HUD
-                ? 'mit HUD'
-                : 'clean';
+            const profileLabel = recordingSettings.profile === RECORDING_CAPTURE_PROFILE.YOUTUBE_SHORT ? 'YouTube Shorts' : 'Standard';
+            const hudLabel = recordingSettings.hudMode === RECORDING_HUD_MODE.WITH_HUD ? 'mit HUD' : 'clean';
             ui.recordingProfileHint.textContent = `Aufnahmeprofil: ${profileLabel} - HUD: ${hudLabel}`;
         }
         const cameraPerspectiveSettings = normalizeCameraPerspectiveSettings(
@@ -392,12 +404,8 @@ export class UIManager {
             ui.normalCameraReduceMotionToggle.checked = !!cameraPerspectiveSettings.reduceMotion;
         }
         if (ui.normalCameraPerspectiveHint) {
-            let perspectiveLabel = 'Klassisch';
-            if (cameraPerspectiveSettings.normal === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT) {
-                perspectiveLabel = 'Cinematic Soft';
-            } else if (cameraPerspectiveSettings.normal === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) {
-                perspectiveLabel = 'Cinematic Action';
-            }
+            const perspectiveLabel = cameraPerspectiveSettings.normal === CAMERA_PERSPECTIVE_MODE.CINEMATIC_SOFT ? 'Cinematic Soft'
+                : cameraPerspectiveSettings.normal === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION ? 'Cinematic Action' : 'Klassisch';
             const reduceMotionLabel = cameraPerspectiveSettings.reduceMotion ? 'an' : 'aus';
             ui.normalCameraPerspectiveHint.textContent = `Video-Perspektive: ${perspectiveLabel} - beruhigt: ${reduceMotionLabel}`;
         }
