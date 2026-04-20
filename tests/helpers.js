@@ -5,6 +5,12 @@ import {
     waitForShellOrRuntimeReady,
 } from './playwright-readiness.js';
 
+function toPositiveInt(rawValue, fallback, min = 1, max = Number.MAX_SAFE_INTEGER) {
+    const numeric = Number.parseInt(String(rawValue || ''), 10);
+    if (!Number.isFinite(numeric)) return fallback;
+    return Math.max(min, Math.min(max, numeric));
+}
+
 async function readMenuRuntimeState(page) {
     return page.evaluate(() => {
         const menu = document.getElementById('main-menu');
@@ -54,19 +60,44 @@ export async function waitForLoadedGame(page, timeoutMs = 30000) {
 
 // Load page and wait for visible main menu.
 export async function loadGame(page) {
-    const maxAttempts = 2;
-    const gotoTimeoutMs = 45000;
-    const readyTimeoutMs = 30000;
+    const maxAttempts = toPositiveInt(process.env.PW_LOAD_GAME_MAX_ATTEMPTS, 2, 1, 5);
+    const gotoTimeoutMs = toPositiveInt(process.env.PW_LOAD_GAME_GOTO_TIMEOUT_MS, 60000, 1_000, 300_000);
+    const readyTimeoutMs = toPositiveInt(process.env.PW_LOAD_GAME_READY_TIMEOUT_MS, 60000, 1_000, 300_000);
+    const totalTimeoutMs = toPositiveInt(process.env.PW_LOAD_GAME_TOTAL_TIMEOUT_MS, 110000, 5_000, 600_000);
+    const retryDelayMs = toPositiveInt(process.env.PW_LOAD_GAME_RETRY_DELAY_MS, 250, 50, 10_000);
+    const gotoWaitUntilCandidate = String(process.env.PW_LOAD_GAME_WAIT_UNTIL || 'commit');
+    const supportedWaitStates = new Set(['commit', 'domcontentloaded', 'load', 'networkidle']);
+    const gotoWaitUntil = supportedWaitStates.has(gotoWaitUntilCandidate) ? gotoWaitUntilCandidate : 'commit';
     let lastError = null;
     let lastStage = 'idle';
     let lastDiagnostics = null;
+    const startedAt = Date.now();
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
         try {
+            const elapsedBeforeGoto = Date.now() - startedAt;
+            const remainingBeforeGoto = totalTimeoutMs - elapsedBeforeGoto;
+            if (remainingBeforeGoto <= 1_000) {
+                throw new Error('loadGame timeout budget exhausted before navigation');
+            }
+            const gotoBudgetMs = Math.max(
+                1_000,
+                Math.min(gotoTimeoutMs, remainingBeforeGoto - 500)
+            );
             lastStage = 'goto';
-            await page.goto('/', { waitUntil: 'commit', timeout: gotoTimeoutMs });
+            await page.goto('/', { waitUntil: gotoWaitUntil, timeout: gotoBudgetMs });
+
+            const elapsedBeforeReady = Date.now() - startedAt;
+            const remainingBeforeReady = totalTimeoutMs - elapsedBeforeReady;
+            if (remainingBeforeReady <= 1_000) {
+                throw new Error('loadGame timeout budget exhausted before readiness check');
+            }
+            const readyBudgetMs = Math.max(
+                1_000,
+                Math.min(readyTimeoutMs, remainingBeforeReady - 250)
+            );
             lastStage = 'shell_ready';
-            await waitForLoadedGame(page, readyTimeoutMs);
+            await waitForLoadedGame(page, readyBudgetMs);
 
             return;
         } catch (error) {
@@ -81,7 +112,13 @@ export async function loadGame(page) {
             if (attempt >= maxAttempts || isClosedFlake) {
                 break;
             }
-            await page.waitForTimeout(250 * attempt);
+            const elapsed = Date.now() - startedAt;
+            const remaining = totalTimeoutMs - elapsed;
+            if (remaining <= 1_000) {
+                break;
+            }
+            const retrySleepMs = Math.min(retryDelayMs * attempt, Math.max(100, remaining - 500));
+            await page.waitForTimeout(retrySleepMs);
         }
     }
 
