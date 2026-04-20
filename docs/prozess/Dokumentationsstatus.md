@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-04-18
+Stand: 2026-04-20
 Modus: sync
 Gate: PASS
 
@@ -17,7 +17,9 @@ Gate: PASS
 - Keine Legacy-Pfade gefunden.
 
 ## Encoding-Warnungen (Mojibake)
-- Keine Mojibake-Muster gefunden.
+- docs/plaene/aktiv/V72.md: Zeilen 126
+- docs/plaene/aktiv/V82.md: Zeilen 117, 118, 119, 136, 177, 178, 189, 208
+- docs/plaene/aktiv/V91.md: Zeilen 87, 132
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-04-18).
+- Dokumentation aktuell (geprueft am 2026-04-20).

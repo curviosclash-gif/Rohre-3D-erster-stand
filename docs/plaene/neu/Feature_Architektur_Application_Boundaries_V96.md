@@ -38,10 +38,15 @@ Die nach `V91` und `V92` verbleibenden Architekturspannungen systematisch abbaue
 - `src/core/runtime/MenuRuntimeMultiplayerService.js`
 - `src/core/runtime/MatchFinalizeFlowService.js`
 - `src/core/runtime/RuntimeCommandSettingsService.js`
+- `src/core/Config.js`
+- `src/core/runtime/ActiveRuntimeConfigStore.js`
+- `src/core/arcade/ArcadeRunRuntime.js`
 - `src/shared/runtime/GameRuntimePorts.js`
 - `src/state/RoundStateTickSystem.js`
 - `src/core/MatchSessionRuntimeBridge.js`
 - `src/entities/ai/ObservationBridgePolicy.js`
+- `src/shared/contracts/MatchRuntimeProjectionContract.js`
+- `src/shared/contracts/SettingsRuntimeLimitsContract.js`
 - `src/shared/contracts/PlatformCapabilityRegistry.js`
 - `src/shared/contracts/PlatformSurfacePolicyOps.js`
 - `src/platform/electron/**`
@@ -69,6 +74,8 @@ Die nach `V91` und `V92` verbleibenden Architekturspannungen systematisch abbaue
 - [ ] DoD.4 `curviosApp`-/`__CURVIOS_APP__`-Direktreads ausserhalb dedizierter Plattformadapter sind fuer den migrierten Scope entfernt oder klar als Restadapter isoliert.
 - [ ] DoD.5 Ratchet/Budget-Konfiguration deckt zusaetzlich `application -> ui` und `application -> core` ab und friert den aktuellen `ui -> state`-Iststand enger ein.
 - [ ] DoD.6 Folgeblock-Leitplanken fuer `V64`, `V81`, `V82`, `V86` spiegeln denselben Boundary- und Sunset-Stand.
+- [ ] DoD.7 Runtime-Config-, Projection- und Limits-Contracts lesen im migrierten Scope ueber explizite Session-/Bundle-/Platform-Ports; Shape-Aenderungen am `MatchRuntimeProjectionContract` besitzen Versionierung plus Migrations- oder Fallback-Regeln.
+- [ ] DoD.8 Persistenz im `ArcadeRunRuntime` ist aus XP-, Sector- und Leaderboard-Hotpaths herausgezogen oder ueber klaren Commit-/Scheduler-Vertrag isoliert.
 
 ## Intake-Hinweis fuer den User
 
@@ -135,13 +142,23 @@ output: Kleinere, klar zuordenbare Services/Controller
 - [ ] 96.6.1 `StorageLobbyService` und `NetworkLobbyService` in klar getrennte Verantwortungen schneiden (Transport, Discovery, SessionState, Event-Emission).
 - [ ] 96.6.2 `UIStartSyncController` entlang Setup/Validation/Rendering-Teilen weiter modularisieren, ohne neue `ui -> state`-Kanten aufzubauen.
 
-### 96.7 Guard- und Ratchet-Haertung
+### 96.7 Contract-, Config- und Persistenz-Hardening
+status: open
+goal: Globale Slots, Shared-Contract-Leaks und Hotpath-Persistenz gezielt abbauen
+output: Versionierte Projektionen, explizite Runtime-/Platform-Ports und entkoppelte Save-Pfade
+
+- [ ] 96.7.1 `Config.js`-, `ActiveRuntimeConfigStore.js`- und angrenzende Runtime-Config-Consumer auf bundle- oder session-lokale Injection/Adapter heben, sodass der globale Runtime-Config-Slot weiter schrumpft statt neue Leser zu sammeln.
+- [ ] 96.7.2 `MatchRuntimeProjectionContract` fuer Shape-Aenderungen versionieren und denselben Migrations-/Fallback-Vertrag fuer Producer und Consumer festziehen.
+- [ ] 96.7.3 `SettingsRuntimeLimitsContract` von direktem `curviosApp`-/Global-Read auf einen klaren Platform- oder Runtime-Port umstellen.
+- [ ] 96.7.4 Persistenz in `ArcadeRunRuntime` ueber buffered commits oder einen Save-Scheduler vom Gameplay-Hotpath trennen, damit XP-, Sector- und Leaderboard-Ereignisse keine direkten Save-Schreibpfade mehr tragen.
+
+### 96.8 Guard- und Ratchet-Haertung
 status: open
 goal: Neue Boundary-Drifts frueh blockieren
 output: Engeres Budget + zusaetzliche Layer-Checks
 
-- [ ] 96.7.1 Ratchet enger setzen (`ui -> state` auf Ist-Stand) und Budgets fuer `application -> ui` sowie `application -> core` aufnehmen.
-- [ ] 96.7.2 Architektur-Checks/Reports um diese neuen Kanten erweitern und in `check:architecture:*` sowie touched-strict integrieren.
+- [ ] 96.8.1 Ratchet enger setzen (`ui -> state` auf Ist-Stand) und Budgets fuer `application -> ui` sowie `application -> core` aufnehmen.
+- [ ] 96.8.2 Architektur-Checks/Reports um diese neuen Kanten erweitern und in `check:architecture:*` sowie touched-strict integrieren.
 
 ### 96.99 Abschluss-Gate
 status: open
