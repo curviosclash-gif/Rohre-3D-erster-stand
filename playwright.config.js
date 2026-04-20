@@ -80,7 +80,7 @@ const traceMode = process.env.PW_TRACE === '1'
     ? 'retain-on-failure'
     : (isCI ? 'retain-on-failure' : 'off');
 const webServerCommand = serverMode === 'dev'
-    ? `npx vite --host ${TEST_HOST} --port ${TEST_PORT} --strictPort`
+    ? `node node_modules/vite/bin/vite.js --host ${TEST_HOST} --port ${TEST_PORT} --strictPort --clearScreen false --logLevel error`
     : `node scripts/playwright-preview-server.mjs --host ${TEST_HOST} --port ${TEST_PORT}`;
 const reporters = process.env.PW_HTML_REPORT === '1' || isCI
     ? [['list'], ['html', { open: 'never', outputFolder: htmlReportDir }]]

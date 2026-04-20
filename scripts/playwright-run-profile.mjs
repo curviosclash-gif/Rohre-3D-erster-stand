@@ -22,7 +22,7 @@ export const PLAYWRIGHT_RUN_PROFILES = Object.freeze({
         name: 'desktop-e2e',
         projectName: 'desktop-e2e',
         serverMode: 'dev',
-        useGlobalWarmup: true,
+        useGlobalWarmup: false,
         moduleWarmupEnabled: false,
     }),
     'browser-compat': Object.freeze({
