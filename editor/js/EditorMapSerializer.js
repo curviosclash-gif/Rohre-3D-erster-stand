@@ -123,6 +123,7 @@ export function generateJSONExport(manager, arenaSize) {
     };
 
     const editorCheckpoints = [];
+    let foundPlayerSpawn = false;
 
     manager.core.objectsContainer.children.forEach((obj) => {
         const u = obj.userData || {};
@@ -165,6 +166,7 @@ export function generateJSONExport(manager, arenaSize) {
         else if (u.type === 'spawn') {
             if (u.subType === 'player') {
                 payload.playerSpawn = { id: u.id, x: p.x, y: p.y, z: p.z };
+                foundPlayerSpawn = true;
             } else {
                 payload.botSpawns.push({ id: u.id, x: p.x, y: p.y, z: p.z });
             }
@@ -245,6 +247,15 @@ export function generateJSONExport(manager, arenaSize) {
     }
 
     const warnings = [];
+    if (!foundPlayerSpawn) {
+        warnings.push('Kein Spieler-Spawn platziert — Standardposition wird verwendet.');
+    }
+    if (payload.botSpawns.length === 0) {
+        warnings.push('Keine Bot-Spawn-Punkte platziert.');
+    }
+    if (payload.parcours?.enabled && !payload.parcours?.finish) {
+        warnings.push('Parcours aktiviert, aber kein Finish-Checkpoint platziert.');
+    }
     const normalizedPayload = createMapDocument(payload, { warnings });
     storeSchemaWarnings(manager, warnings);
     return JSON.stringify(normalizedPayload, null, 2);

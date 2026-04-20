@@ -2,6 +2,10 @@ import {
     CONTENT_DESCRIPTOR_TYPES,
     createContentRegistryDescriptor,
 } from '../../../src/shared/contracts/ContentDescriptorContract.js';
+import {
+    EDITOR_OBJECT_TYPES,
+    isKnownEditorObjectType,
+} from '../../../src/shared/contracts/EditorAuthoringContract.js';
 
 const CATEGORY_META = Object.freeze({
     build: Object.freeze({
@@ -54,6 +58,9 @@ function createBuildEntry({
     const category = CATEGORY_META[categoryId];
     if (!category) {
         throw new Error(`Unknown editor build category: ${categoryId}`);
+    }
+    if (!isKnownEditorObjectType(tool)) {
+        throw new Error(`Unknown editor object type: "${tool}". Must be one of: ${Object.values(EDITOR_OBJECT_TYPES).join(', ')}`);
     }
 
     return Object.freeze({
