@@ -59,7 +59,7 @@ export function applySettingsOverrideToDefaults(baseSettings, validatedOverrideD
     return deepMergeKnownShape(baseSettings, validatedOverrideDraft.baseSettings);
 }
 
-export function createDefaultSettingsSnapshotWithOverride(rawOverrideDraft) {
+export function createDefaultSettingsSnapshotWithOverride(rawOverrideDraft, migrationInfo = null) {
     const base = createDefaultSettingsSnapshot();
     if (!isPlainObject(rawOverrideDraft)) {
         return base;
@@ -68,7 +68,21 @@ export function createDefaultSettingsSnapshotWithOverride(rawOverrideDraft) {
     if (!result.valid) {
         base.__overrideSkipped = true;
         base.__overrideSkippedReason = result.errors.map((e) => e.code).join(', ');
+        base.__overrideDiagnostics = {
+            status: 'skipped',
+            reason: 'VALIDATION_FAILED',
+            errorCodes: result.errors.map((e) => e.code),
+            details: result.errors.map((e) => e.message).join('; '),
+            migrationCode: migrationInfo?.code || null,
+        };
         return base;
+    }
+    if (migrationInfo && migrationInfo.status !== 'current') {
+        base.__overrideDiagnostics = {
+            status: 'applied_with_migration',
+            migrationCode: migrationInfo.code,
+            migrationReason: migrationInfo.reason || null,
+        };
     }
     return applySettingsOverrideToDefaults(base, result.normalizedDraft);
 }

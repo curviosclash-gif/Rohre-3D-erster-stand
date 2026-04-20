@@ -31,8 +31,16 @@ async function validateDraft(draft) {
     return contractModule.validateSettingsOverrideDraft(draft);
 }
 
+async function classifyMigration(draft) {
+    const contractModule = await loadContractModule();
+    const migration = contractModule.classifyOverrideDraftMigration(draft);
+    const migrated = contractModule.migrateOverrideDraft(draft, migration);
+    return { ...migration, migrated };
+}
+
 module.exports = {
     createDraft,
     getSchemaDescriptor,
     validateDraft,
+    classifyMigration,
 };

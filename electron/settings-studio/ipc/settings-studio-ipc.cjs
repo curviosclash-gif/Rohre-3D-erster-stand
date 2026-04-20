@@ -39,9 +39,15 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
         const schema = await schemaService.getSchemaDescriptor();
         const fallbackDraft = await schemaService.createDraft();
         const loaded = await fileService.loadDraft({ fallbackDraft });
-        const draftWithPrefLang = { ...loaded.draft, language: prefs.language };
+
+        const migration = await schemaService.classifyMigration(loaded.draft);
+        const draftToValidate = migration.status === 'fallback' ? fallbackDraft : migration.migrated;
+        const draftWithPrefLang = { ...draftToValidate, language: prefs.language };
+
         const validation = await schemaService.validateDraft(draftWithPrefLang);
-        const backups = await backupService.listBackups({ limit: 20 });
+        const backupResult = await backupService.listBackups({ limit: 20 });
+        const backups = Array.isArray(backupResult?.backups) ? backupResult.backups
+            : (Array.isArray(backupResult) ? backupResult : []);
 
         return {
             ok: true,
@@ -55,6 +61,11 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
             fileState: {
                 exists: loaded.exists,
                 loadError: loaded.error || null,
+            },
+            migration: {
+                status: migration.status,
+                code: migration.code,
+                reason: migration.reason || null,
             },
             backups,
         };
@@ -98,12 +109,15 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
     });
 
     ipcMain.handle(CHANNELS.listBackups, async (_event, options = {}) => {
-        const backups = await backupService.listBackups({
+        const result = await backupService.listBackups({
             limit: Number(options?.limit || 20),
         });
+        const backups = Array.isArray(result?.backups) ? result.backups
+            : (Array.isArray(result) ? result : []);
         return {
             ok: true,
             backups,
+            retentionInfo: result?.retentionInfo || null,
         };
     });
 

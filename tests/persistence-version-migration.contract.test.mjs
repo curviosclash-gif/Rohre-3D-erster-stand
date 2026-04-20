@@ -2,6 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { REPLAY_EXPORT_CONTRACT_VERSION, ReplayRecorder } from '../src/core/replay/ReplayRecorder.js';
+import {
+    SETTINGS_OVERRIDE_SCHEMA_VERSION as SETTINGS_V1,
+    SCHEMA_MIGRATION_CODES,
+    classifyOverrideDraftMigration,
+    migrateOverrideDraft,
+    createSettingsOverrideDraft,
+    validateSettingsOverrideDraft,
+} from '../src/core/settings/SettingsOverrideContract.js';
+import { createDefaultSettingsSnapshotWithOverride } from '../src/core/settings/SettingsDefaultsFacade.js';
 import { MAP_SCHEMA_VERSION } from '../src/entities/mapSchema/MapSchemaConstants.js';
 import { migrateMapDocument } from '../src/entities/mapSchema/MapSchemaMigrationOps.js';
 import {
@@ -298,6 +307,60 @@ test('V85.2 arcade persistence drops rejected future schemas and rewrites legacy
     const presets = loadoutPresetStore.listPresets('ship5');
     assert.equal(presets.length, 1);
     assert.equal(loadoutStore.saved?.schemaVersion, 'arcade-vehicle-loadouts.v1');
+});
+
+// ─── V97 Settings Override Migration ─────────────────
+
+test('V97 settings override v1 classifies as current and validates without errors', () => {
+    const draft = createSettingsOverrideDraft();
+    const migration = classifyOverrideDraftMigration(draft);
+    assert.equal(migration.status, 'current');
+    assert.equal(migration.code, SCHEMA_MIGRATION_CODES.CURRENT);
+    const validation = validateSettingsOverrideDraft(draft);
+    assert.equal(validation.valid, true, `expected valid: ${JSON.stringify(validation.errors)}`);
+});
+
+test('V97 settings override without schemaVersion upgrades and validates after migration', () => {
+    const rawDraft = { language: 'de', limitOverrides: {}, baseSettings: {}, localSettings: {}, level3Reset: {}, configShare: {}, fixedPresets: [] };
+    const migration = classifyOverrideDraftMigration(rawDraft);
+    assert.equal(migration.status, 'upgrade');
+    const migrated = migrateOverrideDraft(rawDraft, migration);
+    assert.equal(migrated.schemaVersion, SETTINGS_V1);
+    const validation = validateSettingsOverrideDraft(migrated);
+    assert.equal(validation.valid, true, `post-migration: ${JSON.stringify(validation.errors)}`);
+});
+
+test('V97 unknown future schema classifies as fallback', () => {
+    const migration = classifyOverrideDraftMigration({ schemaVersion: 'menu-defaults-override.v99' });
+    assert.equal(migration.status, 'fallback');
+    assert.equal(migration.code, SCHEMA_MIGRATION_CODES.FALLBACK);
+});
+
+test('V97 non-object draft classifies as reject', () => {
+    assert.equal(classifyOverrideDraftMigration(null).status, 'reject');
+    assert.equal(classifyOverrideDraftMigration('string').status, 'reject');
+    assert.equal(classifyOverrideDraftMigration(42).status, 'reject');
+});
+
+test('V97 facade applies upgrade-migrated draft and sets __overrideDiagnostics', () => {
+    const rawDraft = { language: 'de', limitOverrides: {}, baseSettings: { numBots: 2 }, localSettings: {}, level3Reset: {}, configShare: {}, fixedPresets: [] };
+    const migration = classifyOverrideDraftMigration(rawDraft);
+    const migrated = migrateOverrideDraft(rawDraft, migration);
+    const defaults = createDefaultSettingsSnapshotWithOverride(migrated, migration);
+    assert.equal(defaults.numBots, 2, 'override numBots must apply after migration');
+    assert.equal(defaults.__overrideSkipped, undefined, 'override must not be skipped');
+    if (defaults.__overrideDiagnostics) {
+        assert.equal(defaults.__overrideDiagnostics.status, 'applied_with_migration');
+    }
+});
+
+test('V97 SCHEMA_MIGRATION_CODES has CURRENT, UPGRADE, FALLBACK, REJECT', () => {
+    assert.ok(SCHEMA_MIGRATION_CODES.CURRENT);
+    assert.ok(SCHEMA_MIGRATION_CODES.UPGRADE);
+    assert.ok(SCHEMA_MIGRATION_CODES.FALLBACK);
+    assert.ok(SCHEMA_MIGRATION_CODES.REJECT);
+    const codes = new Set(Object.values(SCHEMA_MIGRATION_CODES));
+    assert.equal(codes.size, 4, 'all four codes must be unique');
 });
 
 test('V85.4 custom-map import exposes explicit browser storage capability contract', () => {

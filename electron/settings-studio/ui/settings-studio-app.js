@@ -15,14 +15,17 @@ const state = {
     paths: null,
     backups: [],
     activeSection: 'baseSettings',
+    activeInfoPath: null,
 };
 
 const refs = {
+    body: document.querySelector('[data-bind="body"]'),
     title: document.querySelector('[data-bind="title"]'),
     languageLabel: document.querySelector('[data-bind="language-label"]'),
     languageSelect: document.querySelector('[data-bind="language-select"]'),
     sidebarNav: document.querySelector('[data-bind="sidebar-nav"]'),
     sectionTitle: document.querySelector('[data-bind="section-title"]'),
+    sectionHint: document.querySelector('[data-bind="section-hint"]'),
     changeBadge: document.querySelector('[data-bind="change-count"]'),
     resetSectionBtn: document.querySelector('[data-action="reset-section"]'),
     resetAllBtn: document.querySelector('[data-action="reset-all"]'),
@@ -30,6 +33,14 @@ const refs = {
     saveBtn: document.querySelector('[data-action="save"]'),
     formContent: document.querySelector('[data-bind="form-content"]'),
     status: document.querySelector('[data-bind="status"]'),
+    infoPanel: document.querySelector('[data-bind="info-panel"]'),
+    infoPanelTitle: document.querySelector('[data-bind="info-panel-title"]'),
+    infoPanelBody: document.querySelector('[data-bind="info-panel-body"]'),
+    savePreviewModal: document.querySelector('[data-bind="save-preview-modal"]'),
+    savePreviewTitle: document.querySelector('[data-bind="save-preview-title"]'),
+    savePreviewBody: document.querySelector('[data-bind="save-preview-body"]'),
+    savePreviewCancel: document.querySelector('[data-action="cancel-save"]'),
+    savePreviewConfirm: document.querySelector('[data-action="confirm-save"]'),
 };
 
 function t(key, ...args) {
@@ -38,6 +49,10 @@ function t(key, ...args) {
 
 function setStatus(msg) {
     refs.status.textContent = typeof msg === 'string' ? msg : t(msg);
+}
+
+function publishDirtyState() {
+    window.settingsStudioApi?.setDirtyState?.(isDraftDirty());
 }
 
 function deepClone(v) {
@@ -64,6 +79,34 @@ function writePath(obj, path, value) {
     cur[parts[parts.length - 1]] = value;
 }
 
+function readValueFromTarget(target, explicitType = null) {
+    const dataType = explicitType || target?.dataset?.type || 'string';
+    if (dataType === 'boolean') {
+        return Boolean(target?.checked);
+    }
+    if (dataType === 'number') {
+        const rawValue = String(target?.value ?? '').trim();
+        if (!rawValue) return null;
+        const normalized = Number(rawValue);
+        return Number.isFinite(normalized) ? normalized : undefined;
+    }
+    if (dataType === 'json') {
+        try {
+            return JSON.parse(target.value);
+        } catch {
+            return undefined;
+        }
+    }
+    return target?.value ?? '';
+}
+
+function isDraftInputTarget(target) {
+    if (!target || typeof target !== 'object') return false;
+    if (target.dataset?.action === 'reset-field') return false;
+    const tagName = String(target.tagName || '').toUpperCase();
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' || tagName === 'SELECT';
+}
+
 function renderStaticTexts() {
     refs.title.textContent = t('title');
     refs.languageLabel.textContent = t('languageLabel');
@@ -71,6 +114,12 @@ function renderStaticTexts() {
     refs.resetAllBtn.textContent = t('buttonResetAll');
     refs.validateBtn.textContent = t('buttonValidate');
     refs.saveBtn.textContent = t('buttonSave');
+    if (refs.savePreviewCancel) refs.savePreviewCancel.textContent = t('savePreviewCancel');
+    if (refs.savePreviewConfirm) refs.savePreviewConfirm.textContent = t('savePreviewConfirm');
+    if (refs.savePreviewTitle) refs.savePreviewTitle.textContent = t('savePreviewTitle');
+    if (refs.infoPanelTitle && !state.activeInfoPath) {
+        refs.infoPanelTitle.textContent = t('infoPanelTitle');
+    }
 }
 
 function renderBackupsList(backups, translator) {
@@ -92,8 +141,9 @@ function renderSidebar() {
         const dirtyCount = !section.noDirty && state.draft && state.baseDraft
             ? countSectionDirtyFields(section.key, state.schema, state.draft, state.baseDraft)
             : 0;
-        const dirtyDot = dirtyCount > 0 ? '<span class="nav-dirty"></span>' : '';
-        return `<li class="nav-item"><button class="nav-btn ${active}" data-nav-section="${section.key}" type="button">${label}${dirtyDot}</button></li>`;
+        const dirtyDot = dirtyCount > 0 ? '<span class="nav-dirty" aria-hidden="true"></span>' : '';
+        const ariaSelected = section.key === state.activeSection ? 'true' : 'false';
+        return `<li class="nav-item" role="presentation"><button class="nav-btn ${active}" data-nav-section="${section.key}" type="button" role="tab" aria-selected="${ariaSelected}">${label}${dirtyDot}</button></li>`;
     });
     refs.sidebarNav.innerHTML = items.join('');
 }
@@ -101,11 +151,27 @@ function renderSidebar() {
 function renderFormContent() {
     if (!state.draft || !state.schema) {
         refs.formContent.textContent = '';
+        if (refs.sectionHint) refs.sectionHint.hidden = true;
         return;
     }
 
     const section = SECTIONS.find((s) => s.key === state.activeSection);
     refs.sectionTitle.textContent = section ? t(section.labelKey) : state.activeSection;
+    const hintKeyBySection = {
+        baseSettings: 'sectionHintBaseSettings',
+        configShare: 'sectionHintConfigShare',
+        limits: 'sectionHintLimits',
+    };
+    const hintKey = hintKeyBySection[state.activeSection] || '';
+    if (refs.sectionHint) {
+        if (hintKey) {
+            refs.sectionHint.textContent = t(hintKey);
+            refs.sectionHint.hidden = false;
+        } else {
+            refs.sectionHint.hidden = true;
+            refs.sectionHint.textContent = '';
+        }
+    }
 
     const translator = createTranslator(state.language);
     const validationErrors = state.validation?.errors || [];
@@ -127,6 +193,7 @@ function renderFormContent() {
 function updateChangeBadge() {
     if (!state.draft || !state.baseDraft) {
         refs.changeBadge.hidden = true;
+        publishDirtyState();
         return;
     }
     const count = countSectionDirtyFields(state.activeSection, state.schema, state.draft, state.baseDraft);
@@ -136,6 +203,7 @@ function updateChangeBadge() {
     } else {
         refs.changeBadge.hidden = true;
     }
+    publishDirtyState();
 }
 
 function renderAll() {
@@ -143,6 +211,167 @@ function renderAll() {
     renderSidebar();
     renderFormContent();
 }
+
+// ─── Info Panel ─────────────────────────────────────
+
+function esc(value) {
+    return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function resolveFieldEntry(path) {
+    if (!state.schema?.fields) return null;
+    return state.schema.fields.find((f) => f.path === path) || null;
+}
+
+function renderInfoPanelBody(field) {
+    const lang = state.language === 'en' ? 'en' : 'de';
+    const helpText = field.help?.[lang] || null;
+    const impactText = field.impact?.[lang] || null;
+    const example = field.example;
+    const unit = field.unit;
+    const defaultValue = field.defaultValue;
+    const riskLevel = field.riskLevel || 'low';
+
+    if (!helpText && !impactText && !example) {
+        return `<p class="info-panel__no-info">${t('infoPanelNoInfo')}</p>`;
+    }
+
+    const riskLabel = t(`risk${riskLevel.charAt(0).toUpperCase()}${riskLevel.slice(1)}`);
+    const riskClass = `risk-badge--${riskLevel}`;
+
+    let html = `<div class="info-panel__section"><span class="risk-badge ${riskClass}">${esc(riskLabel)}</span></div>`;
+
+    if (helpText) {
+        html += `<div class="info-panel__section"><p class="info-panel__section-label">${t('infoPanelHelp')}</p><p class="info-panel__text">${esc(helpText)}</p></div>`;
+    }
+
+    if (impactText) {
+        html += `<div class="info-panel__section"><p class="info-panel__section-label">${t('infoPanelImpact')}</p><p class="info-panel__text">${esc(impactText)}</p></div>`;
+    }
+
+    const metaRows = [];
+    if (example != null) {
+        metaRows.push(`<div class="info-panel__section"><p class="info-panel__section-label">${t('infoPanelExample')}</p><p class="info-panel__text"><span class="info-panel__example">${esc(String(example))}</span>${unit ? ` <span style="color:var(--muted)">${esc(unit)}</span>` : ''}</p></div>`);
+    }
+    if (defaultValue != null && defaultValue !== '') {
+        metaRows.push(`<div class="info-panel__section"><p class="info-panel__section-label">${t('infoPanelDefault')}</p><p class="info-panel__text"><span class="info-panel__example">${esc(String(defaultValue))}</span>${unit ? ` <span style="color:var(--muted)">${esc(unit)}</span>` : ''}</p></div>`);
+    }
+    if (unit) {
+        metaRows.push(`<div class="info-panel__section"><p class="info-panel__section-label">${t('infoPanelUnit')}</p><p class="info-panel__text">${esc(unit)}</p></div>`);
+    }
+    html += metaRows.join('');
+
+    return html;
+}
+
+function showInfoPanel(path) {
+    const field = resolveFieldEntry(path);
+    if (!field) return;
+
+    state.activeInfoPath = path;
+
+    const label = String(path.split('.').pop() || path).replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+
+    refs.infoPanelTitle.textContent = label;
+    refs.infoPanelBody.innerHTML = renderInfoPanelBody(field);
+    refs.infoPanel.hidden = false;
+    refs.body?.classList.add('info-panel-open');
+
+    const closeBtn = refs.infoPanel.querySelector('[data-action="close-info"]');
+    if (closeBtn) setTimeout(() => closeBtn.focus(), 50);
+}
+
+function closeInfoPanel() {
+    state.activeInfoPath = null;
+    refs.infoPanel.hidden = true;
+    refs.body?.classList.remove('info-panel-open');
+}
+
+// ─── Save Preview ────────────────────────────────────
+
+function collectDirtyFields() {
+    if (!state.draft || !state.baseDraft || !state.schema?.fields) return [];
+    const dirty = [];
+    for (const field of state.schema.fields) {
+        const current = readPath(state.draft, field.path);
+        const base = readPath(state.baseDraft, field.path);
+        if (JSON.stringify(current) !== JSON.stringify(base)) {
+            dirty.push({ field, current, base });
+        }
+    }
+    return dirty;
+}
+
+function formatValue(value) {
+    if (value === null || value === undefined) return '–';
+    if (typeof value === 'boolean') return value ? 'true' : 'false';
+    if (typeof value === 'object') return JSON.stringify(value);
+    return String(value);
+}
+
+function renderSavePreviewBody(dirtyFields, paths) {
+    if (!dirtyFields.length) {
+        return `<p class="preview-no-changes">${t('savePreviewNoChanges')}</p>`;
+    }
+
+    const bySection = new Map();
+    for (const entry of dirtyFields) {
+        const sec = entry.field.section || 'other';
+        if (!bySection.has(sec)) bySection.set(sec, []);
+        bySection.get(sec).push(entry);
+    }
+
+    let html = '';
+    for (const [sectionKey, entries] of bySection) {
+        const sectionLabel = t(`section${sectionKey.charAt(0).toUpperCase()}${sectionKey.slice(1)}`) || sectionKey;
+        html += `<div class="preview-section"><p class="preview-section__title">${esc(sectionLabel)}</p>`;
+        for (const { field, current, base } of entries) {
+            const label = String(field.path.split('.').pop() || field.path).replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+            const riskLevel = field.riskLevel || 'low';
+            const riskClass = riskLevel !== 'low' ? ` preview-row--risk-${riskLevel}` : '';
+            const riskBadge = riskLevel === 'high'
+                ? `<span class="risk-badge risk-badge--high" title="${t('savePreviewRiskWarning')}">${t('riskHigh')}</span>`
+                : riskLevel === 'medium'
+                    ? `<span class="risk-badge risk-badge--medium">${t('riskMedium')}</span>`
+                    : '';
+            html += `<div class="preview-row${riskClass}">
+                <span class="preview-field-name" title="${esc(field.path)}">${esc(label)}</span>
+                <span class="preview-field-change">
+                    <span class="preview-field-old">${esc(formatValue(base))}</span>
+                    <span class="preview-arrow">→</span>
+                    <span class="preview-field-new">${esc(formatValue(current))}</span>
+                </span>
+                ${riskBadge}
+            </div>`;
+        }
+        html += '</div>';
+    }
+
+    const backupNote = `<div class="preview-backup-note">${t('savePreviewBackupNote')}${paths?.backupDirectoryPath ? ` <small style="opacity:0.7">(${esc(paths.backupDirectoryPath)})</small>` : ''}</div>`;
+    html += backupNote;
+
+    return html;
+}
+
+function showSavePreview() {
+    syncRenderedFormDraft();
+    const dirtyFields = collectDirtyFields();
+
+    refs.savePreviewTitle.textContent = t('savePreviewTitle');
+    refs.savePreviewCancel.textContent = t('savePreviewCancel');
+    refs.savePreviewConfirm.textContent = t('savePreviewConfirm');
+    refs.savePreviewBody.innerHTML = renderSavePreviewBody(dirtyFields, state.paths);
+
+    refs.savePreviewModal.hidden = false;
+    setTimeout(() => refs.savePreviewConfirm?.focus(), 50);
+}
+
+function closeSavePreview() {
+    refs.savePreviewModal.hidden = true;
+    refs.saveBtn?.focus();
+}
+
+// ─── State management ────────────────────────────────
 
 async function loadState() {
     setStatus('statusLoading');
@@ -157,10 +386,18 @@ async function loadState() {
     refs.languageSelect.value = state.language;
     renderAll();
     setStatus(state.validation?.valid ? 'statusValid' : 'statusInvalid');
+
+    if (response?.migration?.status && response.migration.status !== 'current') {
+        const diagKey = response.migration.status === 'upgrade' ? 'diagMigrationUpgrade'
+            : response.migration.status === 'fallback' ? 'diagMigrationFallback'
+                : 'diagMigrationReject';
+        setStatus(t(diagKey));
+    }
 }
 
 async function validateState() {
     if (!state.draft) return;
+    syncRenderedFormDraft();
     setStatus('statusLoading');
     const response = await window.settingsStudioApi.validate(state.draft);
     state.validation = response?.validation || state.validation;
@@ -174,37 +411,36 @@ async function saveState() {
     setStatus('statusLoading');
     const response = await window.settingsStudioApi.save(state.draft);
     if (response?.ok) {
-        state.baseDraft = deepClone(state.draft);
+        const savedDraft = response?.draft ? deepClone(response.draft) : deepClone(state.draft);
+        state.draft = deepClone(savedDraft);
+        state.baseDraft = deepClone(savedDraft);
         state.validation = response?.validation || state.validation;
+        publishDirtyState();
         const listResponse = await window.settingsStudioApi.listBackups({}).catch(() => null);
-        state.backups = Array.isArray(listResponse?.backups) ? listResponse.backups : state.backups;
+        const backupsArr = Array.isArray(listResponse?.backups) ? listResponse.backups
+            : (Array.isArray(listResponse) ? listResponse : null);
+        if (backupsArr) state.backups = backupsArr;
+    } else if (response?.draft) {
+        state.draft = deepClone(response.draft);
     }
     renderAll();
     setStatus(response?.ok ? 'statusSaved' : 'statusInvalid');
 }
 
-function onFieldChange(event) {
-    const target = event.target;
+function onFieldChange(eventOrTarget, options = {}) {
+    const { updateUi = true } = options;
+    const target = eventOrTarget?.target || eventOrTarget;
+    if (!isDraftInputTarget(target)) return;
     const path = target.dataset?.path;
     if (!path || !state.draft) return;
 
-    let value;
-    const dataType = target.dataset?.type || 'string';
-
-    if (dataType === 'boolean') {
-        value = target.checked;
-    } else if (dataType === 'number') {
-        value = target.value === '' ? null : Number(target.value);
-    } else if (dataType === 'json') {
-        try { value = JSON.parse(target.value); } catch { return; }
-    } else {
-        value = target.value;
-    }
+    const value = readValueFromTarget(target);
+    if (value === undefined) return;
 
     writePath(state.draft, path, value);
 
     const row = target.closest('.field-row');
-    if (row) {
+    if (updateUi && row) {
         const isDirtyNow = JSON.stringify(readPath(state.draft, path)) !== JSON.stringify(readPath(state.baseDraft, path));
         row.classList.toggle('dirty', isDirtyNow);
         const resetBtn = row.querySelector('[data-action="reset-field"]');
@@ -215,12 +451,15 @@ function onFieldChange(event) {
         target.dataset.dirty = isDirtyNow ? 'true' : '';
     }
 
-    updateChangeBadge();
-    renderSidebar();
+    if (updateUi) {
+        updateChangeBadge();
+        renderSidebar();
+    }
 }
 
-function onLimitChange(event) {
-    const target = event.target;
+function onLimitChange(eventOrTarget, options = {}) {
+    const { updateUi = true } = options;
+    const target = eventOrTarget?.target || eventOrTarget;
     const limitPath = target.dataset?.limitPath;
     const limitKey = target.dataset?.limitKey;
     if (!limitPath || !limitKey || !state.draft) return;
@@ -228,26 +467,30 @@ function onLimitChange(event) {
     if (!state.draft.limitOverrides) state.draft.limitOverrides = {};
     if (!state.draft.limitOverrides[limitPath]) state.draft.limitOverrides[limitPath] = {};
 
-    const raw = target.value;
+    const raw = String(target.value ?? '').trim();
     if (raw === '' || raw == null) {
         delete state.draft.limitOverrides[limitPath][limitKey];
         if (!Object.keys(state.draft.limitOverrides[limitPath]).length) {
             delete state.draft.limitOverrides[limitPath];
         }
     } else {
-        state.draft.limitOverrides[limitPath][limitKey] = Number(raw);
+        const numericValue = Number(raw);
+        if (!Number.isFinite(numericValue)) return;
+        state.draft.limitOverrides[limitPath][limitKey] = numericValue;
     }
 
     const row = target.closest('tr');
-    if (row) {
+    if (updateUi && row) {
         const override = state.draft.limitOverrides?.[limitPath] || {};
         const baseOverride = state.baseDraft?.limitOverrides?.[limitPath] || {};
         const dirty = JSON.stringify(override) !== JSON.stringify(baseOverride);
         row.classList.toggle('dirty', dirty);
     }
 
-    updateChangeBadge();
-    renderSidebar();
+    if (updateUi) {
+        updateChangeBadge();
+        renderSidebar();
+    }
 }
 
 function onResetField(target) {
@@ -313,23 +556,42 @@ async function onLanguageChange(event) {
     setStatus('statusReady');
 }
 
-function onPresetFieldChange(event) {
-    const target = event.target;
+function onPresetFieldChange(eventOrTarget, options = {}) {
+    const { updateUi = true } = options;
+    const target = eventOrTarget?.target || eventOrTarget;
+    if (!isDraftInputTarget(target)) return;
     const path = target.dataset?.path;
     if (!path || !state.draft) return;
 
-    let value;
-    if (target.type === 'checkbox') value = target.checked;
-    else if (target.type === 'number') value = target.value === '' ? null : Number(target.value);
-    else value = target.value;
+    const value = readValueFromTarget(
+        target,
+        target.type === 'checkbox'
+            ? 'boolean'
+            : (target.type === 'number' ? 'number' : 'string')
+    );
+    if (value === undefined) return;
 
     const parts = path.split('.');
     const idx = parseInt(parts[1], 10);
     const key = parts[2];
     if (!isNaN(idx) && key && Array.isArray(state.draft.fixedPresets)) {
         state.draft.fixedPresets[idx][key] = value;
-        updateChangeBadge();
-        renderSidebar();
+        if (updateUi) {
+            updateChangeBadge();
+            renderSidebar();
+        }
+    }
+}
+
+function syncRenderedFormDraft() {
+    if (!state.draft) return;
+    const fieldTargets = refs.formContent.querySelectorAll('input[data-path], textarea[data-path], select[data-path]');
+    for (const target of fieldTargets) {
+        if (target.closest('.preset-body')) {
+            onPresetFieldChange(target, { updateUi: false });
+            continue;
+        }
+        onFieldChange(target, { updateUi: false });
     }
 }
 
@@ -343,7 +605,9 @@ async function onRestoreBackup(backupFileName) {
         state.baseDraft = deepClone(response.draft);
         state.validation = response?.validation || null;
         const listResponse = await window.settingsStudioApi.listBackups({}).catch(() => null);
-        state.backups = Array.isArray(listResponse?.backups) ? listResponse.backups : state.backups;
+        const backupsArr = Array.isArray(listResponse?.backups) ? listResponse.backups
+            : (Array.isArray(listResponse) ? listResponse : null);
+        if (backupsArr) state.backups = backupsArr;
         renderAll();
         setStatus('statusSaved');
     } else {
@@ -353,18 +617,47 @@ async function onRestoreBackup(backupFileName) {
 }
 
 function bindEvents() {
-    refs.formContent.addEventListener('change', (event) => {
+    const handleFormMutation = (event) => {
         if (event.target.dataset?.limitPath) return onLimitChange(event);
         if (event.target.closest('.preset-body')) return onPresetFieldChange(event);
         onFieldChange(event);
-    });
+    };
+
+    refs.formContent.addEventListener('input', handleFormMutation);
+    refs.formContent.addEventListener('change', handleFormMutation);
 
     refs.formContent.addEventListener('click', (event) => {
-        const btn = event.target.closest('[data-action="reset-field"]');
-        if (btn) { onResetField(btn); return; }
+        const resetBtn = event.target.closest('[data-action="reset-field"]');
+        if (resetBtn) { onResetField(resetBtn); return; }
+
+        const infoBtn = event.target.closest('[data-action="show-info"]');
+        if (infoBtn) {
+            const path = infoBtn.dataset?.path;
+            if (path) showInfoPanel(path);
+            return;
+        }
+
         const restoreBtn = event.target.closest('[data-action="restore-backup"]');
         if (restoreBtn) {
             void onRestoreBackup(restoreBtn.dataset.backupFile).catch((err) => setStatus(`${t('statusError')}: ${err.message}`));
+        }
+    });
+
+    // Info panel close
+    refs.infoPanel?.addEventListener('click', (event) => {
+        if (event.target.closest('[data-action="close-info"]')) closeInfoPanel();
+    });
+
+    // Escape key closes info panel or modal
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            if (!refs.savePreviewModal?.hidden) {
+                closeSavePreview();
+                return;
+            }
+            if (!refs.infoPanel?.hidden) {
+                closeInfoPanel();
+            }
         }
     });
 
@@ -381,11 +674,37 @@ function bindEvents() {
     });
 
     refs.saveBtn.addEventListener('click', () => {
+        showSavePreview();
+    });
+
+    refs.savePreviewConfirm?.addEventListener('click', () => {
+        closeSavePreview();
         void saveState().catch((err) => setStatus(`${t('statusError')}: ${err.message}`));
+    });
+
+    refs.savePreviewCancel?.addEventListener('click', () => {
+        closeSavePreview();
     });
 
     refs.languageSelect.addEventListener('change', (event) => {
         void onLanguageChange(event).catch((err) => setStatus(`${t('statusError')}: ${err.message}`));
+    });
+
+    // Trap focus inside modal when open
+    document.addEventListener('keydown', (event) => {
+        if (refs.savePreviewModal?.hidden === false && event.key === 'Tab') {
+            const focusable = refs.savePreviewModal.querySelectorAll('button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+            if (!focusable.length) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
+        }
     });
 }
 
@@ -398,12 +717,6 @@ function bootstrap() {
     renderStaticTexts();
     setStatus('statusReady');
     bindEvents();
-    window.addEventListener('beforeunload', (event) => {
-        if (isDraftDirty()) {
-            event.preventDefault();
-            event.returnValue = t('unsavedChangesWarning');
-        }
-    });
     void loadState().catch((err) => setStatus(`${t('statusError')}: ${err.message}`));
 }
 

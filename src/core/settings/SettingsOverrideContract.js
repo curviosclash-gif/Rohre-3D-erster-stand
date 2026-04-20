@@ -15,8 +15,46 @@ import {
 export const SETTINGS_OVERRIDE_SCHEMA_VERSION = 'menu-defaults-override.v1';
 export const SETTINGS_STUDIO_SCHEMA_CONTRACT_VERSION = 'settings-studio-schema.v1';
 
+export const SCHEMA_MIGRATION_CODES = Object.freeze({
+    CURRENT: 'SCHEMA_VERSION_CURRENT',
+    UPGRADE: 'SCHEMA_VERSION_UPGRADE',
+    FALLBACK: 'SCHEMA_VERSION_UNKNOWN',
+    REJECT: 'SCHEMA_VERSION_CORRUPT',
+});
+
 const DEFAULT_LANGUAGE = 'de';
 const SUPPORTED_LANGUAGES = new Set(['de', 'en']);
+
+const FIELD_HELP_METADATA = Object.freeze({
+    'baseSettings.numBots': Object.freeze({ riskLevel: 'low', unit: null, example: '3', help: { de: 'Anzahl der KI-Gegner pro Match.', en: 'Number of AI opponents per match.' }, impact: { de: 'Mehr Bots erzeugen mehr Spielaktion, erhöhen aber den Rechenaufwand.', en: 'More bots create more action, but increase CPU load.' } }),
+    'baseSettings.winsNeeded': Object.freeze({ riskLevel: 'low', unit: null, example: '3', help: { de: 'Rundensiege, die zum Matchgewinn benötigt werden.', en: 'Round wins needed to win the match.' }, impact: { de: 'Bestimmt die Matchlänge direkt.', en: 'Directly determines match length.' } }),
+    'baseSettings.gameplay.speed': Object.freeze({ riskLevel: 'medium', unit: null, example: '21', help: { de: 'Grundgeschwindigkeit der Flugzeuge.', en: 'Base flight speed of the planes.' }, impact: { de: 'Beeinflusst Schwierigkeit und Reaktionszeit stark. Extreme Werte können das Spiel unspielbar machen.', en: 'Strongly affects difficulty and reaction time. Extreme values may make the game unplayable.' } }),
+    'baseSettings.gameplay.turnSensitivity': Object.freeze({ riskLevel: 'medium', unit: null, example: '2.4', help: { de: 'Lenkempfindlichkeit der Flugzeuge.', en: 'Steering sensitivity of the planes.' }, impact: { de: 'Höhere Werte erlauben engere Kurven. Zu hohe Werte machen die Steuerung unbeherrschbar.', en: 'Higher values allow tighter turns. Too high makes control unpredictable.' } }),
+    'baseSettings.gameplay.planeScale': Object.freeze({ riskLevel: 'low', unit: null, example: '1.0', help: { de: 'Skalierung der Flugzeug-Modelle.', en: 'Scale of the plane models.' }, impact: { de: 'Rein visuell; beeinflusst keine Spielmechanik.', en: 'Visual only; does not affect gameplay mechanics.' } }),
+    'baseSettings.gameplay.trailWidth': Object.freeze({ riskLevel: 'low', unit: null, example: '0.15', help: { de: 'Breite der Kursspur jedes Flugzeugs.', en: "Width of each plane's flight trail." }, impact: { de: 'Breitere Spuren erhöhen die Kollisionswahrscheinlichkeit.', en: 'Wider trails increase collision probability.' } }),
+    'baseSettings.gameplay.gapSize': Object.freeze({ riskLevel: 'medium', unit: null, example: '0.5', help: { de: 'Größe der Lücken in der Flugspur.', en: 'Size of gaps in the flight trail.' }, impact: { de: 'Größere Lücken erlauben Durchschlüpfen durch die eigene Spur.', en: 'Larger gaps allow passing through own trail.' } }),
+    'baseSettings.gameplay.gapFrequency': Object.freeze({ riskLevel: 'low', unit: null, example: '0.05', help: { de: 'Häufigkeit der Lücken in der Flugspur.', en: 'Frequency of gaps in the flight trail.' }, impact: { de: 'Höhere Werte erzeugen mehr Lücken pro Zeiteinheit.', en: 'Higher values produce more gaps per time unit.' } }),
+    'baseSettings.gameplay.itemAmount': Object.freeze({ riskLevel: 'low', unit: null, example: '3', help: { de: 'Max. Anzahl gleichzeitiger Power-ups auf dem Spielfeld.', en: 'Max. number of simultaneous power-ups on the field.' }, impact: { de: 'Mehr Items = häufigere Power-up-Gelegenheiten.', en: 'More items = more frequent power-up opportunities.' } }),
+    'baseSettings.gameplay.fireRate': Object.freeze({ riskLevel: 'medium', unit: null, example: '0.15', help: { de: 'Schussrate der Bordkanone (Schüsse/s).', en: 'Machine gun fire rate (shots/s).' }, impact: { de: 'Höhere Werte ermöglichen schnelleres Schießen; beeinflusst Kampfbalance.', en: 'Higher values allow faster shooting; affects combat balance.' } }),
+    'baseSettings.gameplay.lockOnAngle': Object.freeze({ riskLevel: 'low', unit: '°', example: '30', help: { de: 'Winkelbereich für automatisches Zielen.', en: 'Angle range for automatic lock-on targeting.' }, impact: { de: 'Größerer Winkel erleichtert das Zielen erheblich.', en: 'Larger angle makes aiming significantly easier.' } }),
+    'baseSettings.gameplay.mgTrailAimRadius': Object.freeze({ riskLevel: 'low', unit: null, example: '0.15', help: { de: 'Trefferradius der Bordkanone auf der Spur.', en: 'Machine gun hit radius on the trail.' }, impact: { de: 'Größerer Radius = treffsicherer, aber ggf. weniger präzises Gefühl.', en: 'Larger radius = more accurate, but potentially less precise feel.' } }),
+    'baseSettings.gameplay.fightPlayerHp': Object.freeze({ riskLevel: 'medium', unit: null, example: '100', help: { de: 'Trefferpunkte der Spieler im Kampfmodus.', en: 'Player hit points in fight mode.' }, impact: { de: 'Niedrigere Werte = kürzere Kämpfe. Sehr hohe Werte verlängern Matches stark.', en: 'Lower values = shorter fights. Very high values extend matches significantly.' } }),
+    'baseSettings.gameplay.fightMgDamage': Object.freeze({ riskLevel: 'medium', unit: null, example: '10', help: { de: 'Schaden pro Bordkanonen-Treffer im Kampfmodus.', en: 'Damage per machine gun hit in fight mode.' }, impact: { de: 'Zusammen mit HP bestimmt dies die Kampfdauer. Nicht isoliert anpassen.', en: 'Together with HP determines fight duration. Do not adjust in isolation.' } }),
+    'baseSettings.gameplay.portalCount': Object.freeze({ riskLevel: 'low', unit: null, example: '3', help: { de: 'Anzahl der Portale auf der Karte.', en: 'Number of portals on the map.' }, impact: { de: 'Mehr Portale erhöhen die Bewegungsvielfalt auf dem Spielfeld.', en: 'More portals increase movement variety on the field.' } }),
+    'baseSettings.gameplay.planarLevelCount': Object.freeze({ riskLevel: 'low', unit: null, example: '5', help: { de: 'Anzahl der Ebenen im planaren Modus.', en: 'Number of levels in planar mode.' }, impact: { de: 'Bestimmt die Arena-Größe im Planar-Modus.', en: 'Determines arena size in planar mode.' } }),
+    'baseSettings.botBridge.timeoutMs': Object.freeze({ riskLevel: 'high', unit: 'ms', example: '1000', help: { de: 'Zeitlimit für KI-Entscheidungen in ms.', en: 'Timeout for AI decisions in ms.' }, impact: { de: 'Zu kurz: Bots fallen aus. Zu lang: blockiert den Spielablauf. Sorgfältig anpassen.', en: 'Too short: bots fail. Too long: blocks game flow. Adjust carefully.' } }),
+    'baseSettings.botBridge.maxRetries': Object.freeze({ riskLevel: 'medium', unit: null, example: '3', help: { de: 'Maximale Bot-Verbindungswiederholungen bei Fehlern.', en: 'Maximum bot connection retries on failure.' }, impact: { de: 'Mehr Versuche = robusterer Bot, aber langsamerer Fehlerrecovery.', en: 'More retries = more robust bot, but slower error recovery.' } }),
+    'baseSettings.botBridge.retryDelayMs': Object.freeze({ riskLevel: 'medium', unit: 'ms', example: '200', help: { de: 'Wartezeit zwischen Bot-Verbindungsversuchen.', en: 'Delay between bot connection retry attempts.' }, impact: { de: 'Längere Delays reduzieren Last, erhöhen aber Reaktionszeit.', en: 'Longer delays reduce load but increase response time.' } }),
+});
+
+function resolveFieldHelpMetadata(path) {
+    if (FIELD_HELP_METADATA[path]) return FIELD_HELP_METADATA[path];
+    if (String(path || '').startsWith('configShare.')) {
+        const mirror = path.replace(/^configShare\./, 'baseSettings.');
+        if (FIELD_HELP_METADATA[mirror]) return FIELD_HELP_METADATA[mirror];
+    }
+    return Object.freeze({ riskLevel: 'low', unit: null, example: null, help: null, impact: null });
+}
 
 const SECTION_DEFINITIONS = Object.freeze([
     { key: 'baseSettings', category: 'base' },
@@ -141,6 +179,7 @@ export function createSettingsOverrideFieldRegistry() {
             const limits = type === 'number' && DEFAULT_FIELD_LIMITS[path]
                 ? deepCloneJson(DEFAULT_FIELD_LIMITS[path])
                 : null;
+            const meta = resolveFieldHelpMetadata(path);
             entries.push({
                 path,
                 section: section.key,
@@ -149,6 +188,11 @@ export function createSettingsOverrideFieldRegistry() {
                 labelKey: `settings.field.${path}`,
                 defaultValue: deepCloneJson(value),
                 limits,
+                riskLevel: meta.riskLevel,
+                unit: meta.unit,
+                example: meta.example,
+                help: meta.help,
+                impact: meta.impact,
             });
         }
     }
@@ -156,6 +200,7 @@ export function createSettingsOverrideFieldRegistry() {
     for (const path of Object.keys(DEFAULT_FIELD_LIMITS)) {
         if (pathSet.has(path)) continue;
         pathSet.add(path);
+        const meta = resolveFieldHelpMetadata(path);
         entries.push({
             path,
             section: path.split('.')[0],
@@ -164,6 +209,11 @@ export function createSettingsOverrideFieldRegistry() {
             labelKey: `settings.field.${path}`,
             defaultValue: deriveSeedDefaultValue(path, draft),
             limits: deepCloneJson(DEFAULT_FIELD_LIMITS[path]),
+            riskLevel: meta.riskLevel,
+            unit: meta.unit,
+            example: meta.example,
+            help: meta.help,
+            impact: meta.impact,
         });
     }
 
@@ -404,4 +454,28 @@ export function setDraftValueByPath(draft, path, value) {
     const source = isPlainObject(draft) ? deepCloneJson(draft) : createSettingsOverrideDraft();
     writePathValue(source, path, value);
     return validateSettingsOverrideDraft(source);
+}
+
+export function classifyOverrideDraftMigration(rawDraft) {
+    if (!isPlainObject(rawDraft)) {
+        return { status: 'reject', code: SCHEMA_MIGRATION_CODES.REJECT, reason: 'Draft ist kein Objekt.' };
+    }
+    const schemaVersion = rawDraft.schemaVersion;
+    if (!schemaVersion || typeof schemaVersion !== 'string' || !schemaVersion.trim()) {
+        return { status: 'upgrade', code: SCHEMA_MIGRATION_CODES.UPGRADE, reason: 'Schema-Version fehlt; Upgrade auf aktuelle Version.' };
+    }
+    if (schemaVersion === SETTINGS_OVERRIDE_SCHEMA_VERSION) {
+        return { status: 'current', code: SCHEMA_MIGRATION_CODES.CURRENT, reason: null };
+    }
+    return { status: 'fallback', code: SCHEMA_MIGRATION_CODES.FALLBACK, reason: `Unbekannte Schema-Version: ${schemaVersion}. Standard-Werte werden verwendet.` };
+}
+
+export function migrateOverrideDraft(rawDraft, migration) {
+    if (!migration || migration.status === 'current') return rawDraft;
+    if (migration.status === 'upgrade') {
+        return isPlainObject(rawDraft)
+            ? { ...rawDraft, schemaVersion: SETTINGS_OVERRIDE_SCHEMA_VERSION }
+            : rawDraft;
+    }
+    return rawDraft;
 }

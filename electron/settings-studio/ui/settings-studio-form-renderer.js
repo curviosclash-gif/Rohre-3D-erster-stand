@@ -24,8 +24,22 @@ function isDirty(draft, baseDraft, path) {
     return true;
 }
 
-function renderFieldInput(field, value, dirty) {
-    const { path, type, limits } = field;
+function resolveFieldLimits(field, draft) {
+    if (!field || field.type !== 'number') return field?.limits || null;
+    const fallback = field.limits && typeof field.limits === 'object' ? field.limits : null;
+    const override = draft?.limitOverrides?.[field.path];
+    if (!override || typeof override !== 'object') {
+        return fallback;
+    }
+    return {
+        ...fallback,
+        ...override,
+    };
+}
+
+function renderFieldInput(field, value, dirty, resolvedLimits = null) {
+    const { path, type } = field;
+    const limits = resolvedLimits;
     const dirtyAttr = dirty ? 'data-dirty="true"' : '';
 
     if (type === 'boolean') {
@@ -57,16 +71,19 @@ function renderFieldError(fieldErrors, t) {
 function renderFieldRow(field, draft, baseDraft, t, validationErrors) {
     const value = readPath(draft, field.path);
     const dirty = isDirty(draft, baseDraft, field.path);
+    const resolvedLimits = resolveFieldLimits(field, draft);
     const fieldErrors = Array.isArray(validationErrors)
         ? validationErrors.filter((e) => e.path === field.path)
         : [];
     const hasError = fieldErrors.length > 0;
     const label = fieldLabel(field.path);
-    const input = renderFieldInput(field, value, dirty);
-    const classes = ['field-row', dirty ? 'dirty' : '', hasError ? 'has-error' : ''].filter(Boolean).join(' ');
-    const resetBtn = `<button class="field-reset-btn" data-action="reset-field" data-path="${esc(field.path)}" ${dirty ? 'data-dirty="true"' : ''}>${t('buttonResetField')}</button>`;
+    const input = renderFieldInput(field, value, dirty, resolvedLimits);
+    const riskClass = field.riskLevel === 'high' ? ' field-row--risk-high' : '';
+    const classes = ['field-row', dirty ? 'dirty' : '', hasError ? 'has-error' : ''].filter(Boolean).join(' ') + riskClass;
+    const resetBtn = `<button class="field-reset-btn" data-action="reset-field" data-path="${esc(field.path)}" ${dirty ? 'data-dirty="true"' : ''} aria-label="${esc(label)} zuruecksetzen">${t('buttonResetField')}</button>`;
+    const infoBtn = `<button class="field-info-btn" data-action="show-info" data-path="${esc(field.path)}" type="button" aria-label="${esc(label)} - Informationen anzeigen" tabindex="0">${t('buttonInfo')}</button>`;
     const errorHtml = renderFieldError(fieldErrors, t);
-    return `<div class="${classes}"><span class="field-label" title="${esc(field.path)}">${esc(label)}</span>${input}${resetBtn}${errorHtml}</div>`;
+    return `<div class="${classes}"><label class="field-label" title="${esc(field.path)}">${esc(label)}</label>${input}${resetBtn}${infoBtn}${errorHtml}</div>`;
 }
 
 function renderFieldGroup(category, fields, draft, baseDraft, t, validationErrors) {

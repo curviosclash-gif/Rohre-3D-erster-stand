@@ -16,6 +16,7 @@ const settingsStudioApi = Object.freeze({
     restoreBackup: (backupFileName) => invoke('settings-studio:restore-backup', backupFileName),
     getSchema: () => invoke('settings-studio:get-schema'),
     setLanguage: (language) => invoke('settings-studio:set-language', language),
+    setDirtyState: (isDirty) => ipcRenderer.send('settings-studio:set-dirty-state', isDirty === true),
 });
 
 contextBridge.exposeInMainWorld('__CURVIOS_SETTINGS_STUDIO__', true);
