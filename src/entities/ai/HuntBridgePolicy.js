@@ -45,6 +45,10 @@ function resolveObservationValue(observation, index, fallback = 0) {
     return Number.isFinite(value) ? value : fallback;
 }
 
+function hasYawCommand(action) {
+    return action?.yawLeft === true || action?.yawRight === true;
+}
+
 function resolveHuntBridgePriorities(player, runtimeContext) {
     const players = Array.isArray(runtimeContext?.players) ? runtimeContext.players : [];
     const observation = runtimeContext?.observation || null;
@@ -201,6 +205,13 @@ function resolveHuntBridgeAction(runtimeContext, player) {
             applySteeringTowardPosition(HUNT_BRIDGE_STEERING_SCRATCH, action, player, readyPortal.entry);
         } else {
             applyRetreatManeuver(action, player, priorities.enemy);
+        }
+        if (!hasYawCommand(action)) {
+            applyRetreatManeuver(action, player, priorities.enemy);
+        }
+        if (!hasYawCommand(action)) {
+            action.yawLeft = true;
+            action.yawRight = false;
         }
         action.boost = true;
         if (priorities.rocketIndex < 0) {

@@ -179,6 +179,19 @@ export function resolveLocalInferenceAction(policy, runtimeContext) {
             planarMode: runtimeContext?.rules?.planarMode,
             domainId: runtimeContext?.rules?.domainId,
         };
+        const decodeSupportsMetadata = typeof policy._localInferenceVocabulary.decodeWithMetadata === 'function';
+        const resolveDecodedAction = (decodedAction, metadata = null) => {
+            if (!decodeSupportsMetadata) {
+                return decodedAction;
+            }
+            return resolveHybridDecision(decodedAction, {
+                observation,
+                observationDetails: adaptedObservation.details,
+                actionMetadata: metadata,
+                planarMode: decodeContext.planarMode,
+                player: runtimeContext?.player || null,
+            }).action;
+        };
 
         const qValues = typeof policy._localInference.predict === 'function'
             ? policy._localInference.predict(observation)
@@ -194,38 +207,25 @@ export function resolveLocalInferenceAction(policy, runtimeContext) {
                 .map((entry) => entry.index);
 
             if (rankedIndices.length > 0) {
-                const primaryDecoded = typeof policy._localInferenceVocabulary.decodeWithMetadata === 'function'
+                const primaryDecoded = decodeSupportsMetadata
                     ? policy._localInferenceVocabulary.decodeWithMetadata(rankedIndices[0], decodeContext)
                     : {
                         action: policy._localInferenceVocabulary.decode(rankedIndices[0], decodeContext),
                         metadata: null,
                     };
-                const primaryHybrid = resolveHybridDecision(primaryDecoded.action, {
-                    observation,
-                    observationDetails: adaptedObservation.details,
-                    actionMetadata: primaryDecoded.metadata,
-                    planarMode: decodeContext.planarMode,
-                    player: runtimeContext?.player || null,
-                });
-                const primaryAction = primaryHybrid.action;
+                const primaryAction = resolveDecodedAction(primaryDecoded.action, primaryDecoded.metadata);
                 if (!isPassiveForwardIntent(primaryAction)) {
                     return primaryAction;
                 }
 
                 for (let i = 1; i < rankedIndices.length; i += 1) {
-                    const candidateDecoded = typeof policy._localInferenceVocabulary.decodeWithMetadata === 'function'
+                    const candidateDecoded = decodeSupportsMetadata
                         ? policy._localInferenceVocabulary.decodeWithMetadata(rankedIndices[i], decodeContext)
                         : {
                             action: policy._localInferenceVocabulary.decode(rankedIndices[i], decodeContext),
                             metadata: null,
                         };
-                    const candidateAction = resolveHybridDecision(candidateDecoded.action, {
-                        observation,
-                        observationDetails: adaptedObservation.details,
-                        actionMetadata: candidateDecoded.metadata,
-                        planarMode: decodeContext.planarMode,
-                        player: runtimeContext?.player || null,
-                    }).action;
+                    const candidateAction = resolveDecodedAction(candidateDecoded.action, candidateDecoded.metadata);
                     if (!hasSteeringIntent(candidateAction)) continue;
                     policy._warn(
                         'local inference selected passive forward action; using next best steering action',
@@ -240,19 +240,13 @@ export function resolveLocalInferenceAction(policy, runtimeContext) {
         }
 
         const { actionIndex } = policy._localInference.selectBestAction(observation);
-        const decoded = typeof policy._localInferenceVocabulary.decodeWithMetadata === 'function'
+        const decoded = decodeSupportsMetadata
             ? policy._localInferenceVocabulary.decodeWithMetadata(actionIndex, decodeContext)
             : {
                 action: policy._localInferenceVocabulary.decode(actionIndex, decodeContext),
                 metadata: null,
             };
-        return resolveHybridDecision(decoded.action, {
-            observation,
-            observationDetails: adaptedObservation.details,
-            actionMetadata: decoded.metadata,
-            planarMode: decodeContext.planarMode,
-            player: runtimeContext?.player || null,
-        }).action;
+        return resolveDecodedAction(decoded.action, decoded.metadata);
     }
     return null;
 }
