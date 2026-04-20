@@ -35,3 +35,9 @@ if [ -n "$BOT_MODE" ]; then
   echo "Pruefe Lock-Protokoll (Bot-Mode)..."
   node dev/scripts/verify-lock.mjs
 fi
+
+# Architecture guard for touched runtime/source files.
+if git diff --cached --name-only | grep -Eq "^(src/|scripts/architecture/|scripts/check-architecture-)"; then
+  echo "Running architecture touched-file strict guard..."
+  npm run check:architecture:touched-strict
+fi

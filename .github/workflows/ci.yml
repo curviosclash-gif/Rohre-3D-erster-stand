@@ -32,6 +32,9 @@ jobs:
     - name: Check Documentation State (AGENTS.md rules)
       run: npm run docs:check
 
+    - name: Run Architecture Guard
+      run: npm run architecture:guard
+
     - name: Run Node Contract Tests
       run: npm run test:contract
 
