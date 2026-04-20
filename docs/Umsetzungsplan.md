@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
 Stand: 2026-04-20. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). Naechste offene Bloecke: V76 (P3, abh. V82.99), V75 (P3, abh. V64.99). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). Neuer geplanter Block: V98 (P2, abh. V77.99,V97.99). Naechste offene Bloecke: V98 (P2), V76 (P3, abh. V82.99), V75 (P3, abh. V64.99). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -46,6 +46,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| V98 | Settings Studio Browser-Demo Begrenzung | planned | P2 | frei | V77.99,V97.99 | 98.1 | `docs/plaene/aktiv/V98.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.2 | `docs/plaene/aktiv/V76.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
@@ -55,7 +56,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 
 | Block | Depends-On | Typ | Erfuellt | Hinweis |
 | --- | --- | --- | --- | --- |
-| V72 | Legacy-/Migrationspfad fuer Gate-/Portal-Validierung | hard | nein | Vor hartem Fail muessen sichtbare Warn-, Diagnose- oder Migrationspfade fuer bestehende Maps umgesetzt werden |
+| V72 | Legacy-/Migrationspfad fuer Gate-/Portal-Validierung | hard | ja | In `V72` umgesetzt (sichtbare Warn-, Diagnose- und Migrationspfade); Block ist abgeschlossen |
 | V75 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Recorder-Polish kann beginnen |
 | V75 | V72 Recorder-/Telemetry-Result-Codes | soft | nein | Nur relevant, falls Export-Diagnostik gemeinsam mit Gameplay-Result-Codes vereinheitlicht wird |
 | V76 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Hangar-/Werkstatt-Flows koennen nach V82.99 beginnen |
@@ -70,6 +71,10 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V97 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 bleibt Leitplanke fuer neue Config-, Diagnose- und Migrationspfade |
 | V97 | V81.99 | soft | nein | Dev-Tuning-/Diagnose-Synergien sind sinnvoll, aber kein Startblocker |
 | V97 | V64.99 | soft | nein | Desktop-Lifecycle-Polish kann Fokus-/Dialoghaertung spaeter vereinfachen, blockiert aber nicht |
+| V98 | V77.99 | hard | ja | Surface-Policy aus V77 bleibt die bindende Baseline fuer jede Demo-Begrenzung |
+| V98 | V97.99 | hard | ja | V97 liefert die gehartete Settings-Studio-Basis fuer den neuen Demo-Grenzen-Bereich |
+| V98 | V81.99 | soft | nein | Developer-Tuning-Synergien sind sinnvoll, aber kein Startblocker |
+| V98 | V64.99 | soft | nein | Multiplayer-Rollen-/Transportkontext kann spaetere Demo-Regeln schaerfen, blockiert aber nicht |
 
 ## Lock-Status
 
@@ -95,6 +100,7 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V94 | - | frei | Siehe docs/lock-status/ |
 | - | V95 | - | frei | Siehe docs/lock-status/ |
 | - | V97 | - | frei | Siehe docs/lock-status/ |
+| - | V98 | - | frei | Siehe docs/lock-status/ |
 
 ## Empfohlene Reihenfolge
 
@@ -102,10 +108,10 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 ### Sofort laufende oder naechste Abschluesse
 
-1. `V92` als naechsten Architektur-Folgeblock nach abgeschlossenem `V91.99` anziehen, damit Application-Layer, Runtime-Ports und globale Diagnostics-Surfaces vor weiterer Produktarbeit sauber zugeschnitten werden.
-2. `V82` daten- und regelnahe Phasen nach abgeschlossenem `V72.99` anziehen; UI-/HUD-/Overlay-lastige Teile sollen den Ownership-Zuschnitt aus `V92` mitlesen.
-3. `V64` mit `64.1` erst nach `V92` produktiv transport- und capability-seitig konkretisieren, damit Multiplayer nicht erneut in Fassade, Ports oder UI-Hotspots waechst.
-4. `V81` nach `V92.99` mit derselben Runtime-Config-Ownership starten, damit keine alten Global-Slots oder neue Runtime-Bridge-Bypaesse reaktiviert werden.
+1. `V76` als aktiven Produktblock auf `76.2` weiterziehen; Hangar-/Werkstatt-Flows bleiben der laufende Hauptpfad.
+2. `V98` als naechsten P2-Block starten; hard dependencies (`V77.99`, `V97.99`) sind erfuellt.
+3. `V75` als Recorder-Stabilisierung nachgezogen bearbeiten; `V64.99` ist bereits abgeschlossen.
+4. `V81` und `V94` als nachgelagerte P3-Bloecke vorbereiten (`V81` mit V92-Ratchet, `V94` als Governance-/Query-Layer).
 
 ### Hauptpfad Architektur und Produkt
 
@@ -116,19 +122,20 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 5. `V92` vor `V64` und `V81`, damit Multiplayer-Produktisierung und Developer-Tuning keine neuen Runtime-, Port- oder Config-Backdoors auf alte Surfaces bauen.
 6. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
 7. `V97` folgt nach `V95.99` als gezielter Produkt-Hardening-Block fuer Settings Studio; Erklaer-UX, Save-Vorschau und Migrationspfade koennen parallel zu Gameplay-Folgearbeit laufen, solange Desktop-only Surface-Policy und V92-Ratchet eingehalten bleiben.
+8. `V98` folgt nach `V97.99` als Desktop-only Folgeblock fuer Browser-Demo-Begrenzung im Settings Studio; Browser bleibt read-only Consumer ueber einen expliziten Auslieferungspfad.
 
 ### Parallelpfad Gameplay und Authoring
 
-1. `V82` kann nach `V72.99` und `V74.99` anlaufen und bleibt der empfohlene erste Gameplay-Folgeblock, weil er Daten- und Progressionsvertraege fuer `V76` liefert; UI-/HUD-/Overlay-nahe Phasen lesen dabei denselben Ownership-Zuschnitt wie `V92`.
-2. `V86` folgt nach `V72.99` und nutzt die in `V85` abgeschlossene Descriptor-, Template- und Preset-Leitplanke ohne neue Parallelpfade; runtime-nahe Glue-Pfade sollen dabei denselben Ownership-Schnitt wie `V92` lesen.
-3. `V76` folgt nach `V64.99`, `V77.99` und `V82.99`, weil Hangar-/Werkstatt-Flows sowohl Produktrollen als auch Arcade-Datenvertraege voraussetzen.
-4. `V81` bleibt fachlich moeglich, ist aber bewusst hinter `V92` nachrangig, damit die Tuning-Bridge nicht erneut globale Runtime- oder Config-Backdoors aufzieht.
+1. `V76` bleibt der laufende Gameplay-Hauptpfad und nutzt die abgeschlossenen Datenvertraege aus `V82`.
+2. `V98` kann parallel als Settings-/Contract-Block laufen; Ueberschneidung mit `V76` ist fachlich gering.
+3. `V81` bleibt fachlich moeglich, ist aber hinter laufender Produktarbeit nachrangig und muss den `V92`-Ownership-Schnitt strikt halten.
+4. `V94` ist als Governance-/Tooling-Block weitgehend entkoppelt und parallelisierbar.
 
 ### Kurzform
 
-`V72.99 -> V77 -> V91 -> V92 -> V64 -> V75`
+`V76 -> V98 -> V75 -> V81 -> V94`
 
-Parallel nach `V72.99` moeglich: `V82` in daten- und regelnahen Phasen, spaeter `V76`; `V86` nutzt den abgeschlossenen V85-Vertragsrahmen als Baseline und sollte bei Runtime-/Capability-Verbrauch denselben V92-Ownership-Schnitt lesen; `V81` nach `V92` oder spaetestens mit denselben Guard-Leitplanken. Nach `V95.99` ist zudem `V97` als kompakter Desktop-Hardening-Block fuer Settings Studio parallel moeglich. Die desktop-first-Hauptgates aus `V89` sind jetzt die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
+Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V98` (Settings-Studio-Demo-Grenzen) und `V94` (Governance-/Query-Layer). `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
 
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
