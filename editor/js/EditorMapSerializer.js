@@ -261,6 +261,37 @@ export function generateJSONExport(manager, arenaSize) {
     return JSON.stringify(normalizedPayload, null, 2);
 }
 
+export function resolveMapAuthoringStatus(manager) {
+    const empty = { playerSpawnPlaced: false, botSpawnCount: 0, portalCount: 0, parcoursEnabled: false, parcourHasFinish: false, warnings: [] };
+    if (!manager?.core?.objectsContainer) return empty;
+
+    let playerSpawnPlaced = false;
+    let botSpawnCount = 0;
+    let portalCount = 0;
+    let parcourHasFinish = false;
+
+    manager.core.objectsContainer.children.forEach((obj) => {
+        const u = obj.userData || {};
+        if (u.type === 'spawn') {
+            if (u.subType === 'player') playerSpawnPlaced = true;
+            else botSpawnCount++;
+        } else if (u.type === 'portal') {
+            portalCount++;
+        } else if (u.type === 'checkpoint' && u.subType === 'finish') {
+            parcourHasFinish = true;
+        }
+    });
+
+    const parcoursEnabled = manager.mapDocumentMeta?.parcours?.enabled === true;
+    const warnings = [];
+    if (!playerSpawnPlaced) warnings.push('Kein Spieler-Spawn platziert.');
+    if (botSpawnCount === 0) warnings.push('Keine Bot-Spawn-Punkte platziert.');
+    if (parcoursEnabled && !parcourHasFinish) warnings.push('Parcours aktiviert, aber kein Finish-Checkpoint platziert.');
+    if (portalCount > 0 && portalCount % 2 !== 0) warnings.push('Ungerade Portal-Anzahl — ein Portal ist ohne Partner.');
+
+    return { playerSpawnPlaced, botSpawnCount, portalCount, parcoursEnabled, parcourHasFinish, warnings };
+}
+
 export function importFromJSON(manager, jsonString, options = {}) {
     try {
         const parsed = parseMapJSON(jsonString);

@@ -6,6 +6,7 @@ import {
     getEditorBuildCatalogDescriptor,
     resolveEditorTemplateImportCapability,
 } from './ui/EditorBuildCatalog.js';
+import { resolveMapAuthoringStatus } from './EditorMapSerializer.js';
 
 function buildEditorRuntimeSnapshot({ ui, mapManager, core }) {
     const activeEntry = ui?.toolDockState?.getActiveEntry?.() || null;
@@ -51,7 +52,8 @@ function buildEditorRuntimeSnapshot({ ui, mapManager, core }) {
         objectCount: Number(mapManager?.getObjectCount?.() || 0),
         recentEntryIds: recentEntries.map((entry) => entry.id),
         favoriteEntryIds: favoriteEntries.map((entry) => entry.id),
-        objects
+        objects,
+        authoringStatus: resolveMapAuthoringStatus(mapManager)
     };
 }
 

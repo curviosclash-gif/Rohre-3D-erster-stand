@@ -119,6 +119,27 @@ Maps koennen folgende Felder verwenden:
 - `items`: feste Pickup-Anker mit optionalem `pickupType`; ungueltige Typen werden beim Schema-Export sichtbar gemeldet und fallen deterministisch auf `type`/`model` zurueck.
 - `exitPortal`: einzelnes Exit-Portal mit optionaler spaeter Aktivierung.
 
+## Editor-Authoring-Vertrag (V86)
+
+Der `EditorAuthoringContract.js` (`src/shared/contracts/EditorAuthoringContract.js`) definiert die autoritative Grenze zwischen Content-Descriptor-Feldern und UI-Metadaten:
+
+- `EDITOR_OBJECT_TYPES`: Die acht autoritativen Platzierungstypen (`hard`, `foam`, `portal`, `spawn`, `item`, `aircraft`, `tunnel`, `checkpoint`), die uebergreifend in `EditorBuildCatalog`, `EditorMapSerializer` und `MapSchema` gelten. Neue Objekttypen werden ausschliesslich hier registriert.
+- `EDITOR_CONTENT_DESCRIPTOR_FIELDS`: `tool` und `subType` — die einzigen Felder eines Katalog-Eintrags, die der Serializer und Runtime verarbeiten.
+- `EDITOR_UI_METADATA_FIELDS`: Alle rein editor-seitigen Praesentationsfelder (Label, Glyph, Token, sortOrder, badge, isFeatured, isDefault, keywords usw.).
+- `isKnownEditorObjectType(type)`: Guard-Funktion, die `createBuildEntry` in `EditorBuildCatalog.js` nutzt, um unbekannte Typen frueh als Fehler zu melden.
+- `getEditorAuthoringDescriptor()`: Maschinenlesbarer Snapshot des Authoring-Vertrags fuer Diagnostik und Tests.
+
+Authoring-Warnungen waehrend des Exports (`EditorMapSerializer.generateJSONExport`):
+
+- Fehlender Spieler-Spawn → Standardposition wird verwendet.
+- Fehlende Bot-Spawn-Punkte → Warnhinweis.
+- Parcours aktiviert ohne Finish-Checkpoint → Warnhinweis.
+- Ungerade Portal-Anzahl → Warnhinweis (ein Portal ohne Partner).
+
+Alle Warnungen landen in `manager.lastSchemaWarnings` und werden von `EditorSessionControls` beim Export, Import, Disk-Save und Playtest als Dialog sichtbar.
+
+`resolveMapAuthoringStatus(manager)` in `EditorMapSerializer.js` gibt jederzeit (ohne vollen Export) den aktuellen Authoring-Stand zurueck: `playerSpawnPlaced`, `botSpawnCount`, `portalCount`, `parcoursEnabled`, `parcourHasFinish` sowie eine deduplizierte `warnings`-Liste. Der Editor-Runtime-Snapshot (`CURVIOS_EDITOR.getState()`) enthaelt diesen Status als `authoringStatus`.
+
 ## Editor-Hinweise und Custom-Map-Warnpfad
 
 - `EditorSessionControls` zeigt fuer Export, Import, Disk-Save und Playtest dieselben deduplizierten Schema-Hinweise (`MapSchemaSanitizeOps`) und unterscheidet normale Hinweise von Migrationshinweisen.
