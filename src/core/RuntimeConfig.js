@@ -206,6 +206,7 @@ export function createRuntimeConfigSnapshot(settings, { baseConfig = CONFIG_BASE
         },
         trail: {
             width: clampSettingValue(gameplaySource.trailWidth, runtimeLimits.gameplay.trailWidth, trailDefaults.WIDTH),
+            maxSegments: clampSettingValue(gameplaySource.trailLength, runtimeLimits.gameplay.trailLength, trailDefaults.MAX_SEGMENTS),
             gapDuration: clampSettingValue(gameplaySource.gapSize, runtimeLimits.gameplay.gapSize, trailDefaults.GAP_DURATION),
             gapChance: clampSettingValue(gameplaySource.gapFrequency, runtimeLimits.gameplay.gapFrequency, trailDefaults.GAP_CHANCE),
         },
@@ -302,6 +303,7 @@ export function applyRuntimeConfigCompatibility(runtimeConfig, targetConfig = CO
     nextConfig.GAMEPLAY.PORTAL_BEAMS = runtimeConfig.gameplay.portalBeams;
 
     nextConfig.TRAIL.WIDTH = runtimeConfig.trail.width;
+    nextConfig.TRAIL.MAX_SEGMENTS = runtimeConfig.trail.maxSegments;
     nextConfig.TRAIL.GAP_DURATION = runtimeConfig.trail.gapDuration;
     nextConfig.TRAIL.GAP_CHANCE = runtimeConfig.trail.gapChance;
 

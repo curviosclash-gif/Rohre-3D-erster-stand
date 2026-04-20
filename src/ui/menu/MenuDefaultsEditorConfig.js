@@ -54,6 +54,7 @@ const MENU_DEFAULT_EDITOR_CONFIG_VALUE = {
             turnSensitivity: 2.2,
             planeScale: 1.0,
             trailWidth: 0.6,
+            trailLength: 5000,
             gapSize: 0.3,
             gapFrequency: 0.02,
             itemAmount: 8,

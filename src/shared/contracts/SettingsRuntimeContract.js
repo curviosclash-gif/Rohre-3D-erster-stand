@@ -13,6 +13,7 @@ export const SETTINGS_LIMITS = Object.freeze({
         turnSensitivity: Object.freeze({ min: 0.8, max: 5 }),
         planeScale: Object.freeze({ min: 0.6, max: 2 }),
         trailWidth: Object.freeze({ min: 0.2, max: 2.5 }),
+        trailLength: Object.freeze({ min: 200, max: 12000, integer: true }),
         gapSize: Object.freeze({ min: 0.05, max: 1.5 }),
         gapFrequency: Object.freeze({ min: 0, max: 0.25 }),
         itemAmount: Object.freeze({ min: 1, max: 20, integer: true }),

@@ -43,6 +43,8 @@ const refs = {
     savePreviewConfirm: document.querySelector('[data-action="confirm-save"]'),
 };
 
+let infoPanelReturnFocusEl = null;
+
 function t(key, ...args) {
     return createTranslator(state.language)(key, ...args);
 }
@@ -77,6 +79,23 @@ function writePath(obj, path, value) {
         cur = cur[parts[i]];
     }
     cur[parts[parts.length - 1]] = value;
+}
+
+function toFiniteNumber(value) {
+    const normalized = Number(value);
+    return Number.isFinite(normalized) ? normalized : undefined;
+}
+
+function nearlyEqualNumbers(a, b, epsilon = 1e-9) {
+    if (a === b) return true;
+    if (!Number.isFinite(a) || !Number.isFinite(b)) return false;
+    return Math.abs(a - b) <= epsilon;
+}
+
+function resolveLimitFallback(limitPath, limitKey) {
+    const schemaFields = Array.isArray(state.schema?.fields) ? state.schema.fields : [];
+    const field = schemaFields.find((entry) => entry?.path === limitPath && entry?.type === 'number');
+    return toFiniteNumber(field?.limits?.[limitKey]);
 }
 
 function readValueFromTarget(target, explicitType = null) {
@@ -264,11 +283,16 @@ function renderInfoPanelBody(field) {
     return html;
 }
 
-function showInfoPanel(path) {
+function showInfoPanel(path, triggerElement = null) {
     const field = resolveFieldEntry(path);
     if (!field) return;
 
     state.activeInfoPath = path;
+    const selectorPath = String(path || '').replace(/"/g, '\\"');
+    const fallbackTrigger = refs.formContent?.querySelector?.(`[data-action="show-info"][data-path="${selectorPath}"]`) || null;
+    infoPanelReturnFocusEl = triggerElement && typeof triggerElement.focus === 'function'
+        ? triggerElement
+        : fallbackTrigger;
 
     const label = String(path.split('.').pop() || path).replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
 
@@ -282,23 +306,68 @@ function showInfoPanel(path) {
 }
 
 function closeInfoPanel() {
+    const returnFocusEl = infoPanelReturnFocusEl;
     state.activeInfoPath = null;
     refs.infoPanel.hidden = true;
     refs.body?.classList.remove('info-panel-open');
+    infoPanelReturnFocusEl = null;
+    if (returnFocusEl && typeof returnFocusEl.focus === 'function' && document.contains(returnFocusEl)) {
+        setTimeout(() => returnFocusEl.focus(), 0);
+    }
 }
 
 // ─── Save Preview ────────────────────────────────────
 
 function collectDirtyFields() {
-    if (!state.draft || !state.baseDraft || !state.schema?.fields) return [];
+    if (!state.draft || !state.baseDraft) return [];
     const dirty = [];
-    for (const field of state.schema.fields) {
+    const schemaFields = Array.isArray(state.schema?.fields) ? state.schema.fields : [];
+    const schemaFieldByPath = new Map(schemaFields.map((field) => [field.path, field]));
+    for (const field of schemaFields) {
         const current = readPath(state.draft, field.path);
         const base = readPath(state.baseDraft, field.path);
         if (JSON.stringify(current) !== JSON.stringify(base)) {
             dirty.push({ field, current, base });
         }
     }
+
+    const draftLimitOverrides = state.draft.limitOverrides || {};
+    const baseLimitOverrides = state.baseDraft.limitOverrides || {};
+    const limitPaths = new Set([
+        ...Object.keys(baseLimitOverrides),
+        ...Object.keys(draftLimitOverrides),
+    ]);
+    const limitKeys = ['min', 'max', 'step'];
+
+    for (const limitPath of limitPaths) {
+        const currentOverride = draftLimitOverrides[limitPath] || {};
+        const baseOverride = baseLimitOverrides[limitPath] || {};
+        const fieldMeta = schemaFieldByPath.get(limitPath) || null;
+        const baseLabel = String(limitPath.split('.').pop() || limitPath)
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, (c) => c.toUpperCase());
+
+        for (const limitKey of limitKeys) {
+            const fallback = resolveLimitFallback(limitPath, limitKey);
+            const hasCurrentOverride = Object.prototype.hasOwnProperty.call(currentOverride, limitKey);
+            const hasBaseOverride = Object.prototype.hasOwnProperty.call(baseOverride, limitKey);
+            const current = hasCurrentOverride ? currentOverride[limitKey] : fallback;
+            const base = hasBaseOverride ? baseOverride[limitKey] : fallback;
+            if (JSON.stringify(current) !== JSON.stringify(base)) {
+                dirty.push({
+                    field: {
+                        path: `${limitPath}.${limitKey}`,
+                        section: 'limits',
+                        riskLevel: fieldMeta?.riskLevel || 'low',
+                        previewLabel: `${baseLabel} (${limitKey})`,
+                    },
+                    current,
+                    base,
+                });
+            }
+        }
+    }
+
     return dirty;
 }
 
@@ -326,7 +395,8 @@ function renderSavePreviewBody(dirtyFields, paths) {
         const sectionLabel = t(`section${sectionKey.charAt(0).toUpperCase()}${sectionKey.slice(1)}`) || sectionKey;
         html += `<div class="preview-section"><p class="preview-section__title">${esc(sectionLabel)}</p>`;
         for (const { field, current, base } of entries) {
-            const label = String(field.path.split('.').pop() || field.path).replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
+            const label = field.previewLabel
+                || String(field.path.split('.').pop() || field.path).replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
             const riskLevel = field.riskLevel || 'low';
             const riskClass = riskLevel !== 'low' ? ` preview-row--risk-${riskLevel}` : '';
             const riskBadge = riskLevel === 'high'
@@ -476,7 +546,21 @@ function onLimitChange(eventOrTarget, options = {}) {
     } else {
         const numericValue = Number(raw);
         if (!Number.isFinite(numericValue)) return;
-        state.draft.limitOverrides[limitPath][limitKey] = numericValue;
+        const baseOverride = state.baseDraft?.limitOverrides?.[limitPath] || {};
+        const baseHasLimitOverride = Object.prototype.hasOwnProperty.call(baseOverride, limitKey);
+        const fallbackValue = resolveLimitFallback(limitPath, limitKey);
+        const useImplicitFallback = !baseHasLimitOverride
+            && fallbackValue !== undefined
+            && nearlyEqualNumbers(numericValue, fallbackValue);
+
+        if (useImplicitFallback) {
+            delete state.draft.limitOverrides[limitPath][limitKey];
+            if (!Object.keys(state.draft.limitOverrides[limitPath]).length) {
+                delete state.draft.limitOverrides[limitPath];
+            }
+        } else {
+            state.draft.limitOverrides[limitPath][limitKey] = numericValue;
+        }
     }
 
     const row = target.closest('tr');
@@ -551,6 +635,7 @@ async function onLanguageChange(event) {
     const nextLanguage = normalizeLanguage(event?.target?.value || 'de');
     state.language = nextLanguage;
     if (state.draft && typeof state.draft === 'object') state.draft.language = nextLanguage;
+    if (state.baseDraft && typeof state.baseDraft === 'object') state.baseDraft.language = nextLanguage;
     await window.settingsStudioApi.setLanguage(nextLanguage).catch(() => null);
     renderAll();
     setStatus('statusReady');
@@ -633,7 +718,7 @@ function bindEvents() {
         const infoBtn = event.target.closest('[data-action="show-info"]');
         if (infoBtn) {
             const path = infoBtn.dataset?.path;
-            if (path) showInfoPanel(path);
+            if (path) showInfoPanel(path, infoBtn);
             return;
         }
 

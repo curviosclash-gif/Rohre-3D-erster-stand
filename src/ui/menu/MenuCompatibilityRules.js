@@ -9,6 +9,7 @@ import {
 } from '../../shared/contracts/MapModeContract.js';
 
 export const MENU_COMPATIBILITY_CONTRACT_VERSION = 'menu-compatibility.v1';
+const CUSTOM_MAP_KEY = 'custom';
 
 const MENU_COMPATIBILITY_RULES = Object.freeze([
     { id: 'session_type_mode_sync', priority: 5 },
@@ -169,6 +170,7 @@ function applyModePathGameModeSyncRule(settings, result) {
 function applyMapKeyValidityGuardRule(settings, result) {
     const currentMapKey = normalizeString(settings?.mapKey);
     if (!currentMapKey) return;
+    if (currentMapKey === CUSTOM_MAP_KEY) return;
     const modePath = normalizeString(settings?.localSettings?.modePath || 'normal').toLowerCase();
     const maps = getRuntimeMapCatalog();
     const mapDefinition = maps?.[currentMapKey];

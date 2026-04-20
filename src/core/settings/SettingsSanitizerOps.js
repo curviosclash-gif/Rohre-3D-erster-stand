@@ -92,6 +92,11 @@ function applyGameplaySanitization({ merged, src, defaults, runtimeLimits }) {
         runtimeLimits.gameplay.trailWidth,
         defaults.gameplay.trailWidth
     );
+    merged.gameplay.trailLength = clampSettingValue(
+        src?.gameplay?.trailLength ?? defaults.gameplay.trailLength,
+        runtimeLimits.gameplay.trailLength,
+        defaults.gameplay.trailLength
+    );
     merged.gameplay.gapSize = clampSettingValue(
         src?.gameplay?.gapSize ?? defaults.gameplay.gapSize,
         runtimeLimits.gameplay.gapSize,

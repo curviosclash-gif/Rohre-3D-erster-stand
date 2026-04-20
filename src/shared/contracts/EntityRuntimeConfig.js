@@ -152,6 +152,7 @@ export function createEntityRuntimeConfig(runtimeConfig = null, baseConfig = nul
 
     if (runtimeConfig?.trail) {
         contract.TRAIL.WIDTH = toFiniteNumber(runtimeConfig.trail.width, contract.TRAIL.WIDTH);
+        contract.TRAIL.MAX_SEGMENTS = toFiniteNumber(runtimeConfig.trail.maxSegments, contract.TRAIL.MAX_SEGMENTS);
         contract.TRAIL.GAP_CHANCE = toFiniteNumber(runtimeConfig.trail.gapChance, contract.TRAIL.GAP_CHANCE);
         contract.TRAIL.GAP_DURATION = toFiniteNumber(runtimeConfig.trail.gapDuration, contract.TRAIL.GAP_DURATION);
     }

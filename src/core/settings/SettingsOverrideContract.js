@@ -26,6 +26,7 @@ const DEFAULT_LANGUAGE = 'de';
 const SUPPORTED_LANGUAGES = new Set(['de', 'en']);
 
 const FIELD_HELP_METADATA = Object.freeze({
+    'baseSettings.gameplay.trailLength': Object.freeze({ riskLevel: 'medium', unit: 'segments', example: '5000', help: { de: 'Maximale Segmentanzahl der Kursspur.', en: 'Maximum segment count of each flight trail.' }, impact: { de: 'Hoehere Werte verlaengern die Spur, erhoehen aber Speicher-, GPU- und Kollisionskosten.', en: 'Higher values make trails longer, but increase memory, GPU, and collision cost.' } }),
     'baseSettings.numBots': Object.freeze({ riskLevel: 'low', unit: null, example: '3', help: { de: 'Anzahl der KI-Gegner pro Match.', en: 'Number of AI opponents per match.' }, impact: { de: 'Mehr Bots erzeugen mehr Spielaktion, erhöhen aber den Rechenaufwand.', en: 'More bots create more action, but increase CPU load.' } }),
     'baseSettings.winsNeeded': Object.freeze({ riskLevel: 'low', unit: null, example: '3', help: { de: 'Rundensiege, die zum Matchgewinn benötigt werden.', en: 'Round wins needed to win the match.' }, impact: { de: 'Bestimmt die Matchlänge direkt.', en: 'Directly determines match length.' } }),
     'baseSettings.gameplay.speed': Object.freeze({ riskLevel: 'medium', unit: null, example: '21', help: { de: 'Grundgeschwindigkeit der Flugzeuge.', en: 'Base flight speed of the planes.' }, impact: { de: 'Beeinflusst Schwierigkeit und Reaktionszeit stark. Extreme Werte können das Spiel unspielbar machen.', en: 'Strongly affects difficulty and reaction time. Extreme values may make the game unplayable.' } }),
@@ -65,6 +66,8 @@ const SECTION_DEFINITIONS = Object.freeze([
 ]);
 
 const DEFAULT_FIELD_LIMITS = Object.freeze({
+    'baseSettings.gameplay.trailLength': Object.freeze({ ...SETTINGS_LIMITS.gameplay.trailLength, step: 100 }),
+    'configShare.gameplay.trailLength': Object.freeze({ ...SETTINGS_LIMITS.gameplay.trailLength, step: 100 }),
     'baseSettings.numBots': Object.freeze({ ...SETTINGS_LIMITS.session.numBots, step: 1 }),
     'baseSettings.winsNeeded': Object.freeze({ ...SETTINGS_LIMITS.session.winsNeeded, step: 1 }),
     'baseSettings.gameplay.speed': Object.freeze({ min: 0, max: 50, step: 0.1 }),
