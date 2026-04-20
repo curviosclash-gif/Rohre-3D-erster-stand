@@ -15,6 +15,10 @@ const dgram = require('node:dgram');
 const os = require('node:os');
 const { pathToFileURL } = require('node:url');
 const { startStaticServer } = require('./static-server.cjs');
+const {
+    configureStoragePaths,
+    initSessionDataSelfHeal,
+} = require('./session-data-runtime.cjs');
 
 let mainWindow = null;
 let tray = null;
@@ -52,10 +56,23 @@ const HOST_SHELL_CONTRACT_VERSION = 'electron.lan-host-shell.v1';
 const SETTINGS_DEFAULTS_CONTRACT_VERSION = 'preload.settings-defaults.v1';
 const MENU_DEFAULTS_OVERRIDE_FILE_NAME = 'menu-defaults.override.json';
 const SHARED_USER_DATA_DIR_NAME = 'curviosclash-app';
+const MAIN_SESSION_DATA_DIR_NAME = 'session-main';
 const LEGACY_ELECTRON_USER_DATA_DIR_NAME = 'Electron';
+let markSessionExitClean = () => {};
 
 if (!hasSingleInstanceLock) {
     app.quit();
+} else {
+    const { sessionDataPath } = configureStoragePaths({
+        app,
+        sharedUserDataDirName: SHARED_USER_DATA_DIR_NAME,
+        sessionDataDirName: MAIN_SESSION_DATA_DIR_NAME,
+    });
+    const sessionSelfHealState = initSessionDataSelfHeal({
+        sessionDataPath,
+        processLabel: 'main',
+    });
+    markSessionExitClean = sessionSelfHealState.markCleanExit;
 }
 
 async function loadLanSignalingModule() {
@@ -801,6 +818,7 @@ app.on('window-all-closed', () => {
 });
 
 app.on('before-quit', () => {
+    markSessionExitClean();
     stopDiscoveryListener();
     stopBroadcast();
 });
