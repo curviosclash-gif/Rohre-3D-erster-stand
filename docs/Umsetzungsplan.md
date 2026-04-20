@@ -47,7 +47,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
-| V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
+| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.2 | `docs/plaene/aktiv/V76.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
 
@@ -88,7 +88,7 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V93 | 2026-04-14 | closed | Abgeschlossen 2026-04-14 |
 | - | V64 | 2026-04-18 | closed | Abgeschlossen 2026-04-18 |
 | - | V75 | - | frei | Siehe docs/lock-status/ |
-| - | V76 | - | frei | Siehe docs/lock-status/ |
+| build-agent | V76 | 2026-04-20 | in-bearbeitung | Siehe docs/lock-status/ |
 | - | V82 | - | frei | Siehe docs/lock-status/ |
 | - | V81 | - | frei | Siehe docs/lock-status/ |
 | - | V86 | - | frei | Siehe docs/lock-status/ |
