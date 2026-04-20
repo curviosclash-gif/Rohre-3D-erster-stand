@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
 Stand: 2026-04-20. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-Naechste offene Subphase: V82 `82.99` (Abschluss-Gate). V82 Phase 82.10 abgeschlossen 2026-04-20. Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). Naechste offene Bloecke: V97 (P2, Abhaengigkeiten erfuellt), V86 (P2, abh. V72.99). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -38,6 +38,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V92 | Runtime-Application-Ownership-Entkopplung und Orchestrator-Zuschnitt | done | P2 | frei | V91.99 | 92.99 | `docs/plaene/aktiv/V92.md` |
 | V64 | Desktop Hauptprodukt Multiplayer Online Offline Kompatibilitaet | done | P2 | frei | V74.99,V77.99 | 64.99 | `docs/plaene/aktiv/V64.md` |
 | V95 | Settings Studio fuer Menu-Defaults | done | P2 | frei | V77.99,V92.99 | 95.99 | `docs/plaene/aktiv/V95.md` |
+| V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | done | P2 | frei | V72.99,V74.99 | 82.99 | `docs/plaene/aktiv/V82.md` |
 
 ### Aktive und geplante Bloecke
 
@@ -46,7 +47,6 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V86 | Editor- und Map-Authoring-Vertraege | planned | P2 | frei | V72.99 | 86.1 | `docs/plaene/aktiv/V86.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | planned | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.1 | `docs/plaene/aktiv/V76.md` |
-| V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | planned | P2 | frei | V72.99,V74.99 | 82.99 | `docs/plaene/aktiv/V82.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
 | V97 | Settings Studio Erklaerbarkeit, Save-Vorschau und Hardening | planned | P2 | frei | V95.99,V77.99,V92.99 | 97.1 | `docs/plaene/aktiv/V97.md` |
@@ -59,7 +59,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V75 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Recorder-Polish kann beginnen |
 | V75 | V72 Recorder-/Telemetry-Result-Codes | soft | nein | Nur relevant, falls Export-Diagnostik gemeinsam mit Gameplay-Result-Codes vereinheitlicht wird |
 | V76 | V64.99 | hard | ja | V64 abgeschlossen 2026-04-18; Hangar-/Werkstatt-Flows koennen nach V82.99 beginnen |
-| V76 | V82.99 | hard | nein | V76.3 Arcade-Hangar baut direkt auf V82-Contracts (XP, Upgrades, Leaderboard) auf; V82 muss vor V76.3 abgeschlossen sein |
+| V76 | V82.99 | hard | ja | V82 abgeschlossen 2026-04-20; V76.3 Arcade-Hangar kann jetzt auf V82-Contracts (XP, Upgrades, Leaderboard) aufbauen |
 | V81 | V77 Surface-Policy | soft | nein | Console ist Dev-Only-Feature; sollte V77-Capability-Vertrag respektieren, blockiert aber nicht |
 | V95 | V77.99 | hard | ja | Surface-Policy aus V77 ist abgeschlossen; Settings Studio bleibt Desktop-only |
 | V95 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 ist abgeschlossen und bleibt Leitplanke fuer neue Config-Pfade |
