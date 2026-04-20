@@ -166,6 +166,15 @@ function parseMasterIndexRows(lines) {
     return { rows: parsedRows, violations };
 }
 
+function findMasterHeaderNextOpenSubphase(lines) {
+    for (const line of lines) {
+        const match = line.match(/Naechste offene Subphase:[^`]*`([^`]+)`/i);
+        if (match) return match[1].trim();
+        if (/^##\s+/.test(line)) break;
+    }
+    return '';
+}
+
 function parseFrontmatter(content) {
     const lines = content.split(/\r?\n/);
     if (lines[0]?.trim() !== '---') {
@@ -446,6 +455,18 @@ async function validateMasterIndex(planPath, content, options = {}) {
     if (masterRows.rows.length === 0) {
         violations.push({ file: planPath, line: 1, message: 'Keine aktiven Blockzeilen gefunden.' });
         return violations;
+    }
+
+    const referencedNextOpenSubphase = findMasterHeaderNextOpenSubphase(lines);
+    if (referencedNextOpenSubphase) {
+        const referencedRow = masterRows.rows.find((row) => row.currentPhase === referencedNextOpenSubphase && row.status !== 'done');
+        if (!referencedRow) {
+            violations.push({
+                file: planPath,
+                line: 1,
+                message: `Stand-Kopf nennt naechste offene Subphase "${referencedNextOpenSubphase}", aber keine nicht-abgeschlossene Blockzeile fuehrt diese current_phase.`,
+            });
+        }
     }
 
     const lockStatusTable = parseLockStatusTable(lines);

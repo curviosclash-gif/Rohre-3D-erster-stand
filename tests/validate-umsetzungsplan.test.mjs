@@ -94,6 +94,47 @@ test('validatePlanContent accepts a structurally valid master index with linked 
     assert.deepEqual(violations, []);
 });
 
+test('validatePlanContent checks next-open-subphase header when block id precedes backticked phase', async () => {
+    const content = `
+Stand: 2026-04-18.
+Naechste offene Subphase: V71 \`71.98\` (Beispiel).
+
+## Aktive Bloecke
+
+| id | titel | status | prio | owner | depends_on | current_phase | plan_file |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| V71 | Repo-Aufraeumen Runtime-sicher | blocked | P1 | frei | V43-Strukturvertrag | 71.99 | \`docs/plaene/aktiv/V71.md\` |
+
+## Abhaengigkeiten
+
+| Block | Depends-On | Typ | Erfuellt | Hinweis |
+| --- | --- | --- | --- | --- |
+| V71 | V43-Strukturvertrag | hard | ja | Beispiel |
+
+## Lock-Status
+
+| Agent | Block / Stream | Start-Datum | Status | Ziel-Abschluss |
+| --- | --- | --- | --- | --- |
+| - | V71 | - | frei | Restgate |
+
+## Conflict-Log
+
+| Datum | Agent | Fremder Block/Stream | Datei | Grund | Loesung | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-04-01 | Bot-A | Shared | \`docs/Umsetzungsplan.md\` | Beispiel | Beispiel | offen |
+`.trim();
+
+    const violations = await validatePlanContent('docs/Umsetzungsplan.md', content, {
+        fileExistsImpl: async () => true,
+        readFileImpl: async () => VALID_BLOCK,
+    });
+    const messages = violations.map((violation) => violation.message);
+
+    assert(messages.some((message) => (
+        message.includes('Stand-Kopf nennt naechste offene Subphase "71.98"')
+    )));
+});
+
 test('validatePlanContent flags missing plan_file and invalid current_phase in master index', async () => {
     const content = `
 ## Aktive Bloecke
