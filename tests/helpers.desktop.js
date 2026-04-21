@@ -357,6 +357,7 @@ export const test = base.extend({
                 cwd: ELECTRON_DIR,
                 env: {
                     ...process.env,
+                    CURVIOS_ELECTRON_SHOW_WINDOW: String(process.env.CURVIOS_ELECTRON_SHOW_WINDOW || '0'),
                 },
             });
 

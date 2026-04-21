@@ -1,4 +1,10 @@
+import http from 'node:http';
+import https from 'node:https';
+import { performance } from 'node:perf_hooks';
+
 const DEFAULT_SERVER_PROBE_TIMEOUT_MS = 5_000;
+const DEFAULT_SERVER_READINESS_PROBE_TIMEOUT_MS = 30_000;
+const DEFAULT_APP_BOOT_SNAPSHOT_TIMEOUT_MS = 1_500;
 const DEFAULT_RUN_PROFILE = 'desktop-smoke';
 const RUN_PROFILE_ALIASES = Object.freeze({
     'preview-smoke': 'desktop-smoke',
@@ -44,6 +50,71 @@ function resolveRunProfile(rawValue = process.env.PW_RUN_PROFILE) {
 
 function toProbeErrorMessage(error) {
     return String(error?.message || 'request_failed');
+}
+
+async function probeHttpViaNode(url, timeoutMs, { expectDomHint } = {}) {
+    const targetUrl = new URL(url);
+    const client = targetUrl.protocol === 'https:' ? https : http;
+
+    return await new Promise((resolve) => {
+        const req = client.request(targetUrl, {
+            method: 'GET',
+            headers: {
+                'cache-control': 'no-store',
+                accept: '*/*',
+            },
+        }, (res) => {
+            const status = Number(res.statusCode || 0);
+            const ok = status >= 200 && status < 400;
+
+            if (expectDomHint) {
+                let body = '';
+                res.setEncoding('utf8');
+                res.on('data', (chunk) => {
+                    if (body.length > 120_000) return;
+                    body += chunk;
+                });
+                res.on('end', () => {
+                    resolve({
+                        ok,
+                        status,
+                        error: null,
+                        domHintSeen: hasMainMenuDomHint(body),
+                    });
+                });
+            } else {
+                res.resume();
+                res.once('end', () => {
+                    resolve({
+                        ok,
+                        status,
+                        error: null,
+                        domHintSeen: null,
+                    });
+                });
+            }
+        });
+
+        const timeout = setTimeout(() => {
+            req.destroy(new Error('probe-timeout'));
+        }, timeoutMs);
+
+        req.once('error', (error) => {
+            clearTimeout(timeout);
+            resolve({
+                ok: false,
+                status: 0,
+                error: toProbeErrorMessage(error),
+                domHintSeen: null,
+            });
+        });
+
+        req.once('close', () => {
+            clearTimeout(timeout);
+        });
+
+        req.end();
+    });
 }
 
 function toResponseOk(response) {
@@ -230,31 +301,18 @@ export async function probeServerReadiness(target, options = {}) {
         : DEFAULT_SERVER_PROBE_TIMEOUT_MS;
     const requestPath = String(options.path || DEFAULT_SERVER_PROBE_PATH);
     const expectDomHint = options.expectDomHint === true;
+    const useNodeFetch = options.useNodeFetch === true;
 
-    if (typeof target === 'string' || target instanceof URL) {
-        const url = String(target);
-        const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(new Error('probe-timeout')), timeoutMs);
+    const host = String(process.env.TEST_HOST || '127.0.0.1').trim() || '127.0.0.1';
+    const port = String(process.env.TEST_PORT || '').trim();
+    const baseUrl = port ? `http://${host}:${port}` : null;
+    const absoluteUrl = baseUrl ? `${baseUrl}${requestPath.startsWith('/') ? requestPath : `/${requestPath}`}` : null;
+
+    if (useNodeFetch || typeof target === 'string' || target instanceof URL) {
+        const url = useNodeFetch ? String(absoluteUrl || requestPath) : String(target);
         try {
-            const response = await fetch(url, {
-                method: 'GET',
-                cache: 'no-store',
-                signal: controller.signal,
-                headers: {
-                    'cache-control': 'no-store',
-                },
-            });
-            const probe = {
-                ok: toResponseOk(response),
-                status: toResponseStatus(response),
-                error: null,
-                url,
-                domHintSeen: null,
-            };
-            if (expectDomHint) {
-                probe.domHintSeen = hasMainMenuDomHint(await response.text());
-            }
-            return probe;
+            const result = await probeHttpViaNode(url, timeoutMs, { expectDomHint });
+            return { ...result, url };
         } catch (error) {
             return {
                 ok: false,
@@ -263,8 +321,6 @@ export async function probeServerReadiness(target, options = {}) {
                 url,
                 domHintSeen: null,
             };
-        } finally {
-            clearTimeout(timer);
         }
     }
 
@@ -295,15 +351,71 @@ export async function probeServerReadiness(target, options = {}) {
     }
 }
 
-export async function captureAppBootSnapshot(page) {
+export async function waitForServerReadiness(target, options = {}) {
+    const timeoutMs = Number.isFinite(options.timeoutMs)
+        ? Math.max(1, Number(options.timeoutMs))
+        : 30_000;
+    const requestPath = String(options.path || DEFAULT_SERVER_PROBE_PATH);
+    const expectDomHint = options.expectDomHint === true;
+    const requireDomHint = options.requireDomHint === true;
+    const useNodeFetch = options.useNodeFetch === true;
+    const startedAt = performance.now();
+    let lastProbe = null;
+    let delayMs = Number.isFinite(options.delayMs) ? Math.max(50, Number(options.delayMs)) : 250;
+
+    while (performance.now() - startedAt < timeoutMs) {
+        const elapsed = performance.now() - startedAt;
+        const remaining = timeoutMs - elapsed;
+        const probeTimeoutMs = Number.isFinite(options.probeTimeoutMs)
+            ? Math.max(1_000, Math.min(Number(options.probeTimeoutMs), remaining))
+            : Math.max(1_000, Math.min(DEFAULT_SERVER_READINESS_PROBE_TIMEOUT_MS, remaining));
+
+        lastProbe = await probeServerReadiness(target, {
+            path: requestPath,
+            timeoutMs: probeTimeoutMs,
+            expectDomHint,
+            useNodeFetch,
+        });
+
+        if (isServerProbeReady(lastProbe, { requireDomHint })) {
+            return lastProbe;
+        }
+
+        if (remaining <= 100) break;
+
+        const sleepMs = Math.min(delayMs, Math.max(50, remaining - 50));
+        if (typeof target?.waitForTimeout === 'function') {
+            await target.waitForTimeout(sleepMs);
+        } else {
+            await new Promise((resolve) => setTimeout(resolve, sleepMs));
+        }
+
+        delayMs = Math.min(2_000, Math.round(delayMs * 1.4));
+    }
+
+    const error = new Error(
+        `[playwright-readiness] server not ready after ${timeoutMs}ms at path "${requestPath}" ` +
+        `(lastProbe url="${String(lastProbe?.url || '')}" ok=${lastProbe?.ok === true} ` +
+        `status=${Number(lastProbe?.status || 0)} error="${String(lastProbe?.error || '')}")`
+    );
+    error.cause = lastProbe?.error ? new Error(String(lastProbe.error)) : undefined;
+    throw error;
+}
+
+export async function captureAppBootSnapshot(page, options = {}) {
     if (page.isClosed()) {
         return createFallbackSnapshot({
             pageClosed: true,
             appBootState: 'page_closed',
         });
     }
+
+    const timeoutMs = Number.isFinite(options.timeoutMs)
+        ? Math.max(1, Number(options.timeoutMs))
+        : DEFAULT_APP_BOOT_SNAPSHOT_TIMEOUT_MS;
+    const timedOut = Symbol('snapshot-timeout');
     try {
-        return await page.evaluate(() => {
+        const snapshotPromise = page.evaluate(() => {
             const menu = document.getElementById('main-menu');
             const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
             const errorOverlay = document.getElementById('runtime-error-overlay');
@@ -336,6 +448,22 @@ export async function captureAppBootSnapshot(page) {
                         : (mainMenuVisible ? 'menu_shell_ready' : 'booting')),
             };
         });
+
+        const snapshot = await Promise.race([
+            snapshotPromise,
+            page.waitForTimeout(timeoutMs).then(() => timedOut),
+        ]);
+
+        if (snapshot === timedOut) {
+            snapshotPromise.catch(() => {});
+            return createFallbackSnapshot({
+                pageClosed: false,
+                appBootState: 'snapshot_unavailable',
+                snapshotError: `snapshot-timeout:${timeoutMs}ms`,
+            });
+        }
+
+        return snapshot;
     } catch (error) {
         return createFallbackSnapshot({
             pageClosed: false,
@@ -366,8 +494,9 @@ export async function collectPlaywrightStageDiagnostics(page, stage, options = {
             path: options.path,
             timeoutMs: options.serverProbeTimeoutMs,
             expectDomHint: options.expectDomHint,
+            useNodeFetch: options.useNodeFetch,
         }),
-        captureAppBootSnapshot(page),
+        captureAppBootSnapshot(page, { timeoutMs: options.snapshotTimeoutMs }),
     ]);
     return createPlaywrightReadinessContract({
         stage,

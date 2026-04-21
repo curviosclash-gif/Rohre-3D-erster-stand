@@ -7,7 +7,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T65: Bot-Action-Contract sanitizt invalide Payloads robust', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { sanitizeBotAction } = await import('/src/entities/ai/actions/BotActionContract.js');
+            const sanitizeBotAction = window.CURVIOS_TEST_API?.sanitizeBotAction;
             const warnings = [];
             const sanitized = sanitizeBotAction({
                 yawLeft: 'true',
@@ -79,7 +79,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T67: Item-Slot-Encoding erzeugt stabiles 20-Slot-One-Hot-Array', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const mod = await import('/src/entities/ai/observation/ItemSlotEncoder.js');
+            const mod = window.CURVIOS_TEST_API?.ItemSlotEncoder;
             const encoded = new Array(mod.ITEM_SLOT_COUNT).fill(-1);
             mod.encodeItemSlots(['SPEED_UP', 'ROCKET_MEDIUM', 'UNKNOWN_ITEM', 'ROCKET_MEDIUM'], encoded);
             return {
@@ -101,7 +101,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T68: Mode-Feature-Encoding mappt classic/hunt deterministisch', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const mod = await import('/src/entities/ai/observation/ModeFeatureEncoder.js');
+            const mod = window.CURVIOS_TEST_API?.ModeFeatureEncoder;
             const classic = mod.writeModeFeatures('classic', [0, 0, 0]);
             const hunt = mod.writeModeFeatures('HUNT', [0, 0, 0]);
             const fallback = mod.writeModeFeatures('unknown-mode', [0, 0, 0]);
@@ -116,8 +116,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T69: Observation-Schema V1 hat feste Laenge und eindeutige Indizes', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
-            const semantics = await import('/src/entities/ai/observation/ObservationSemantics.js');
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
+            const semantics = window.CURVIOS_TEST_API?.ObservationSemantics;
             const indexValues = Object.values(schema.OBSERVATION_INDEX)
                 .filter((value) => Number.isInteger(value))
                 .sort((a, b) => a - b);
@@ -158,8 +158,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T70: Observation-System extrahiert normalisierte Runtime-Features', async ({ page }) => {
         await startGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
-            const observation = await import('/src/entities/ai/observation/ObservationSystem.js');
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
+            const observation = window.CURVIOS_TEST_API?.ObservationSystem;
 
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
@@ -365,8 +365,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T73: BotPolicyRegistry registriert Legacy- und Match-Bot-Typen', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { BotPolicyRegistry } = await import('/src/entities/ai/BotPolicyRegistry.js');
-            const { BOT_POLICY_TYPES } = await import('/src/entities/ai/BotPolicyTypes.js');
+            const { BotPolicyRegistry, BOT_POLICY_TYPES } = window.CURVIOS_TEST_API || {};
 
             const registry = new BotPolicyRegistry();
             const classicBridge = registry.create(BOT_POLICY_TYPES.CLASSIC_BRIDGE);
@@ -411,8 +410,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T74: BotPolicyRegistry faellt bei Fehlkonfiguration kontrolliert auf rule-based zurueck', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { BotPolicyRegistry } = await import('/src/entities/ai/BotPolicyRegistry.js');
-            const { BOT_POLICY_TYPES } = await import('/src/entities/ai/BotPolicyTypes.js');
+            const { BotPolicyRegistry, BOT_POLICY_TYPES } = window.CURVIOS_TEST_API || {};
 
             const registry = new BotPolicyRegistry();
             registry.register('broken-bridge', () => {
@@ -445,8 +443,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T75: ClassicBridgePolicy leitet Kern-Action aus Observation-Vektor ab', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { ClassicBridgePolicy } = await import('/src/entities/ai/ClassicBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const { ClassicBridgePolicy } = window.CURVIOS_TEST_API || {};
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
             const bot = {
                 index: 0,
                 inventory: ['SHIELD'],
@@ -496,8 +494,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T76: ClassicBridgePolicy routed Action-Failures kontrolliert auf RuleBased-Fallback', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { ClassicBridgePolicy } = await import('/src/entities/ai/ClassicBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const { ClassicBridgePolicy } = window.CURVIOS_TEST_API || {};
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
             const bot = {
                 index: 0,
                 inventory: [],
@@ -548,8 +546,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T77: HuntBridgePolicy setzt MG-Druck auf Basis von Observation + Gegnernaehe', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const { HuntBridgePolicy } = window.CURVIOS_TEST_API || {};
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const bot = entityManager?.players?.find((player) => player?.isBot);
@@ -594,8 +592,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T78: HuntBridgePolicy priorisiert Rocket + Boost bei niedrigem HP-Druck', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const { HuntBridgePolicy } = window.CURVIOS_TEST_API || {};
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const bot = entityManager?.players?.find((player) => player?.isBot);
@@ -641,7 +639,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T78b: HuntBotPolicy behandelt gueltige Trail-Ziele als MG-/Rocket-Freigabe auch bei negativem Sensor-Frontflag', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { HuntBotPolicy } = await import('/src/hunt/HuntBotPolicy.js');
+            const { HuntBotPolicy } = window.CURVIOS_TEST_API || {};
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const bot = entityManager?.players?.find((player) => player?.isBot);
@@ -741,8 +739,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T78c: HuntBridgePolicy priorisiert gueltige Trail-Ziele auch wenn Observation kein Frontziel meldet', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const { HuntBridgePolicy } = window.CURVIOS_TEST_API || {};
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const bot = entityManager?.players?.find((player) => player?.isBot);
@@ -836,7 +834,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T78d: HuntBotPolicy haelt MG-Druck bei niedrigem HP mit stabilem Shield aufrecht', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { HuntBotPolicy } = await import('/src/hunt/HuntBotPolicy.js');
+            const { HuntBotPolicy } = window.CURVIOS_TEST_API || {};
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const bot = entityManager?.players?.find((player) => player?.isBot);
@@ -897,8 +895,8 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T78e: HuntBridgePolicy priorisiert Retreat bei kritischer Vitalitaet und behaelt Rocket-Shot bei', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { HuntBridgePolicy } = await import('/src/entities/ai/HuntBridgePolicy.js');
-            const schema = await import('/src/entities/ai/observation/ObservationSchemaV1.js');
+            const { HuntBridgePolicy } = window.CURVIOS_TEST_API || {};
+            const schema = window.CURVIOS_TEST_API?.ObservationSchemaV1;
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const bot = entityManager?.players?.find((player) => player?.isBot);
@@ -954,7 +952,7 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T78f: BotDecisionOps trennt Shield-Selbstnutzung von Rocket-Offensivfenster ueber Shield-Ratio', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { decideItemUsage } = await import('/src/entities/ai/BotDecisionOps.js');
+            const decideItemUsage = window.CURVIOS_TEST_API?.decideItemUsage;
 
             function createBot(senseOverrides = {}) {
                 return {
@@ -1046,7 +1044,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T79: RuntimeConfig setzt Trainer-WebSocket-Flag standardmaessig auf false', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.createRuntimeConfigSnapshot) {
+                throw new Error('CURVIOS_TEST_API.createRuntimeConfigSnapshot missing');
+            }
+            const { createRuntimeConfigSnapshot } = api;
             const snapshot = createRuntimeConfigSnapshot({});
             return {
                 policyStrategy: String(snapshot?.bot?.policyStrategy || ''),
@@ -1075,7 +1077,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T79b: RuntimeConfig uebernimmt botBridge Resume- und Retry-Settings reproduzierbar', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.createRuntimeConfigSnapshot) {
+                throw new Error('CURVIOS_TEST_API.createRuntimeConfigSnapshot missing');
+            }
+            const { createRuntimeConfigSnapshot } = api;
             const snapshot = createRuntimeConfigSnapshot({
                 botBridge: {
                     enabled: true,
@@ -1110,7 +1116,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T80: ObservationBridgePolicy faellt bei Trainer-Timeout auf lokale Policy zurueck', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.ObservationBridgePolicy) {
+                throw new Error('CURVIOS_TEST_API.ObservationBridgePolicy missing');
+            }
+            const { ObservationBridgePolicy } = api;
             const originalWebSocket = globalThis.WebSocket;
             let fallbackCalls = 0;
 
@@ -1201,7 +1211,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T80b: ObservationBridgePolicy faellt bei lokaler Inference ohne Vokabular auf Fallback zurueck', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.ObservationBridgePolicy) {
+                throw new Error('CURVIOS_TEST_API.ObservationBridgePolicy missing');
+            }
+            const { ObservationBridgePolicy } = api;
             let fallbackCalls = 0;
             const fallbackPolicy = {
                 type: 'rule-based',
@@ -1249,7 +1263,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T80c: ObservationBridgePolicy injiziert Fallback-Lenkung bei lokaler No-Steer-Action', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.ObservationBridgePolicy) {
+                throw new Error('CURVIOS_TEST_API.ObservationBridgePolicy missing');
+            }
+            const { ObservationBridgePolicy } = api;
             let fallbackCalls = 0;
             const fallbackPolicy = {
                 type: 'rule-based',
@@ -1301,7 +1319,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T80d: ObservationBridgePolicy bevorzugt Steering statt lokaler boost-only Top-Action', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { ObservationBridgePolicy } = await import('/src/entities/ai/ObservationBridgePolicy.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.ObservationBridgePolicy) {
+                throw new Error('CURVIOS_TEST_API.ObservationBridgePolicy missing');
+            }
+            const { ObservationBridgePolicy } = api;
             let fallbackCalls = 0;
             const fallbackPolicy = {
                 type: 'rule-based',
@@ -1359,42 +1381,16 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     });
 
     test('T80e: Matchpfad liefert fuer Bridge-Bot ueber Zeit Steering-Inputs (kein Dauer-Geradeaus)', async ({ page }) => {
-        await loadGame(page);
+        await startGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
             const game = window.GAME_INSTANCE;
-            if (!game?.startMatch || !game?._returnToMenu || !game?._onSettingsChanged) {
+            if (!game?._returnToMenu) {
                 return { error: 'missing-game-hooks' };
             }
 
-            game.settings.mode = '1p';
-            game.settings.numBots = 1;
-            game.settings.gameMode = 'CLASSIC';
-            game.settings.botPolicyStrategy = 'auto';
-            if (!game.settings.gameplay || typeof game.settings.gameplay !== 'object') {
-                game.settings.gameplay = {};
-            }
-            if (!game.settings.localSettings || typeof game.settings.localSettings !== 'object') {
-                game.settings.localSettings = {};
-            }
-            game.settings.localSettings.modePath = 'normal';
-            game.settings.gameplay.planarMode = false;
-            game._onSettingsChanged();
-
-            const startResult = game.startMatch();
-            if (startResult && typeof startResult.then === 'function') {
-                await startResult;
-            }
-
-            const startedAt = Date.now();
-            let entityManager = game.entityManager;
-            let botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
-            let policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
-            while ((!botPlayer || !policy) && Date.now() - startedAt < 5000) {
-                await new Promise((resolve) => setTimeout(resolve, 16));
-                entityManager = game.entityManager;
-                botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
-                policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
-            }
+            const entityManager = game.entityManager;
+            const botPlayer = entityManager?.players?.find((player) => player?.isBot) || null;
+            const policy = botPlayer ? entityManager?.botByPlayer?.get(botPlayer) : null;
             if (!botPlayer || !policy || !entityManager?._playerInputSystem) {
                 game._returnToMenu();
                 return { error: 'missing-bot-policy' };
@@ -1426,7 +1422,6 @@ test.describe('Physics Policy (Tests 65-82)', () => {
                     steeringCount += 1;
                 }
                 sampleCount += 1;
-                await new Promise((resolve) => setTimeout(resolve, 16));
             }
 
             const steeringRatio = sampleCount > 0 ? steeringCount / sampleCount : 0;
@@ -1450,7 +1445,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
     test('T81: RuntimeConfig loest Bot-Policy-Strategie reproduzierbar nach Modus auf', async ({ page }) => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
-            const { createRuntimeConfigSnapshot } = await import('/src/core/RuntimeConfig.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.createRuntimeConfigSnapshot) {
+                throw new Error('CURVIOS_TEST_API.createRuntimeConfigSnapshot missing');
+            }
+            const { createRuntimeConfigSnapshot } = api;
 
             const classic3dAuto = createRuntimeConfigSnapshot({
                 gameMode: 'CLASSIC',
@@ -1680,7 +1679,11 @@ test.describe('Physics Policy (Tests 65-82)', () => {
         await loadGame(page);
         const result = await page.evaluate(async () => {
             const THREE = await import('three');
-            const { HuntBotPolicy } = await import('/src/hunt/HuntBotPolicy.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.HuntBotPolicy) {
+                throw new Error('CURVIOS_TEST_API.HuntBotPolicy missing');
+            }
+            const { HuntBotPolicy } = api;
 
             const player = {
                 id: 'hunt-bot',

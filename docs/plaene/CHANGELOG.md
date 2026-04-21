@@ -120,4 +120,4 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 
 - Master-Index synchronisiert: `V72`-Abhaengigkeitszeile auf `erfuellt=ja` gesetzt; `V76`-Aktivlock ueber `docs/lock-status/build-agent.json` und `_locks-registry.json` wieder konsistent mit dem aktiven Master-Status hergestellt.
 - Priorisierungsabschnitte (`Sofort laufende...`, `Parallelpfad...`, `Kurzform`) auf den aktuellen offenen Block-Stand aktualisiert: `V76`, `V98`, `V75`, `V81`, `V94`.
-- Kanonische Blockdateien bereinigt: in abgeschlossenen Bloecken `V64`, `V72`, `V77`, `V82`, `V86`, `V91`, `V92`, `V97` wurden offene DoD-Checkboxen in reine DoD-Bullets umgestellt; `V64`-Frontmatter auf `status: done` angeglichen.
+- Kanonische Blockdateien bereinigt: in abgeschlossenen Bloecken `V64`, `V72`, `V77`, `V82`, `V86`, `V91`, `V92`, `V97` wurden DoD-Checkboxen auf `[x]` mit Evidence-Format angeglichen; `V64`-Frontmatter auf `status: done` aktualisiert.

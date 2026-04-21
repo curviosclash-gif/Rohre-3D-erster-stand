@@ -109,7 +109,17 @@ export default defineConfig({
     projects: [
         {
             name: runProfile.projectName,
-            use: { ...devices['Desktop Chrome'] },
+            use: (() => {
+                const device = devices['Desktop Chrome'];
+                const existingArgs = Array.isArray(device?.launchOptions?.args) ? device.launchOptions.args : [];
+                return {
+                    ...device,
+                    launchOptions: {
+                        ...(device?.launchOptions || {}),
+                        args: [...existingArgs, '--no-proxy-server'],
+                    },
+                };
+            })(),
         },
     ],
     webServer: {

@@ -1,9 +1,11 @@
 import {
     collectPlaywrightStageDiagnostics,
     formatPlaywrightReadinessContract,
+    waitForServerReadiness,
     waitForRuntimeReady,
     waitForShellOrRuntimeReady,
 } from './playwright-readiness.js';
+import { performance } from 'node:perf_hooks';
 
 function toPositiveInt(rawValue, fallback, min = 1, max = Number.MAX_SAFE_INTEGER) {
     const numeric = Number.parseInt(String(rawValue || ''), 10);
@@ -37,7 +39,9 @@ export async function waitForMenuIdle(page, timeoutMs = 30000) {
             return style.display !== 'none' && style.visibility !== 'hidden';
         })();
         const visiblePanel = document.querySelector('.submenu-panel:not(.hidden)');
-        return menuVisible && !visiblePanel;
+        if (!menuVisible) return false;
+        if (!(visiblePanel instanceof HTMLElement)) return true;
+        return visiblePanel.id === 'submenu-game';
     }, null, { timeout: timeoutMs });
 }
 
@@ -62,32 +66,53 @@ export async function waitForLoadedGame(page, timeoutMs = 30000) {
 export async function loadGame(page) {
     const maxAttempts = toPositiveInt(process.env.PW_LOAD_GAME_MAX_ATTEMPTS, 2, 1, 5);
     const gotoTimeoutMs = toPositiveInt(process.env.PW_LOAD_GAME_GOTO_TIMEOUT_MS, 60000, 1_000, 300_000);
+    const serverTimeoutMs = toPositiveInt(process.env.PW_LOAD_GAME_SERVER_TIMEOUT_MS, 80000, 1_000, 300_000);
     const readyTimeoutMs = toPositiveInt(process.env.PW_LOAD_GAME_READY_TIMEOUT_MS, 60000, 1_000, 300_000);
     const totalTimeoutMs = toPositiveInt(process.env.PW_LOAD_GAME_TOTAL_TIMEOUT_MS, 110000, 5_000, 600_000);
     const retryDelayMs = toPositiveInt(process.env.PW_LOAD_GAME_RETRY_DELAY_MS, 250, 50, 10_000);
+    const snapshotTimeoutMs = toPositiveInt(process.env.PW_APP_SNAPSHOT_TIMEOUT_MS, 1500, 100, 10_000);
+    const preProbeEnabled = String(process.env.PW_LOAD_GAME_PREPROBE || '').trim() === '1';
     const gotoWaitUntilCandidate = String(process.env.PW_LOAD_GAME_WAIT_UNTIL || 'commit');
     const supportedWaitStates = new Set(['commit', 'domcontentloaded', 'load', 'networkidle']);
     const gotoWaitUntil = supportedWaitStates.has(gotoWaitUntilCandidate) ? gotoWaitUntilCandidate : 'commit';
     let lastError = null;
     let lastStage = 'idle';
     let lastDiagnostics = null;
-    const startedAt = Date.now();
+    const startedAt = performance.now();
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
         try {
-            const elapsedBeforeGoto = Date.now() - startedAt;
+            const elapsedAtStart = performance.now() - startedAt;
+            const remainingAtStart = totalTimeoutMs - elapsedAtStart;
+            if (preProbeEnabled) {
+                if (remainingAtStart <= 1_000) {
+                    throw new Error('loadGame timeout budget exhausted before server probe');
+                }
+
+                const serverBudgetMs = Math.max(1_000, Math.min(serverTimeoutMs, remainingAtStart - 2_000));
+                lastStage = 'startup_probe';
+                await waitForServerReadiness(page, {
+                    path: '/_pw/health',
+                    timeoutMs: serverBudgetMs,
+                    expectDomHint: false,
+                    requireDomHint: false,
+                    useNodeFetch: true,
+                });
+            }
+
+            const elapsedBeforeGoto = performance.now() - startedAt;
             const remainingBeforeGoto = totalTimeoutMs - elapsedBeforeGoto;
             if (remainingBeforeGoto <= 1_000) {
                 throw new Error('loadGame timeout budget exhausted before navigation');
             }
             const gotoBudgetMs = Math.max(
                 1_000,
-                Math.min(gotoTimeoutMs, remainingBeforeGoto - 500)
+                Math.min(gotoTimeoutMs, remainingBeforeGoto - 1_500)
             );
             lastStage = 'goto';
             await page.goto('/', { waitUntil: gotoWaitUntil, timeout: gotoBudgetMs });
 
-            const elapsedBeforeReady = Date.now() - startedAt;
+            const elapsedBeforeReady = performance.now() - startedAt;
             const remainingBeforeReady = totalTimeoutMs - elapsedBeforeReady;
             if (remainingBeforeReady <= 1_000) {
                 throw new Error('loadGame timeout budget exhausted before readiness check');
@@ -106,13 +131,15 @@ export async function loadGame(page) {
                 error,
                 expectDomHint: true,
                 requireDomHint: true,
+                snapshotTimeoutMs,
+                useNodeFetch: lastStage === 'startup_probe' || lastStage === 'goto',
             });
             const message = String(error?.message || '');
             const isClosedFlake = page.isClosed() || message.includes('Target page, context or browser has been closed');
             if (attempt >= maxAttempts || isClosedFlake) {
                 break;
             }
-            const elapsed = Date.now() - startedAt;
+            const elapsed = performance.now() - startedAt;
             const remaining = totalTimeoutMs - elapsed;
             if (remaining <= 1_000) {
                 break;
@@ -126,9 +153,19 @@ export async function loadGame(page) {
     const diagnosticsText = lastDiagnostics ? ` diagnostics=${JSON.stringify(lastDiagnostics)}` : '';
     const runProfile = String(process.env.PW_RUN_PROFILE || 'preview-smoke').trim() || 'preview-smoke';
     const readinessSummary = lastDiagnostics ? ` ${formatPlaywrightReadinessContract(lastDiagnostics)}` : '';
+    const budgetSummary = ` budgets=${JSON.stringify({
+        maxAttempts,
+        gotoWaitUntil,
+        gotoTimeoutMs,
+        serverTimeoutMs,
+        readyTimeoutMs,
+        totalTimeoutMs,
+        retryDelayMs,
+        snapshotTimeoutMs,
+    })}`;
     throw new Error(
         `loadGame failed after ${maxAttempts} attempts in runProfile "${runProfile}" ` +
-        `at stage "${lastStage}"${readinessSummary}: ${message}${diagnosticsText}`
+        `at stage "${lastStage}"${readinessSummary}${budgetSummary}: ${message}${diagnosticsText}`
     );
 }
 

@@ -1125,7 +1125,11 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
     test('T89e: Rocket-Trail-Blasts zerstoeren meter-basiert und staerkere Raketen zerstoeren mehr', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { applyTrailDamageFromProjectile } = await import('/src/hunt/DestructibleTrail.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.applyTrailDamageFromProjectile) {
+                throw new Error('CURVIOS_TEST_API.applyTrailDamageFromProjectile missing');
+            }
+            const { applyTrailDamageFromProjectile } = api;
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const shooter = entityManager?.players?.[0];
@@ -1453,7 +1457,11 @@ test.describe('Physics Hunt (Tests 61-64, 83-89e)', () => {
     test('T89k: Shield-Treffer setzen Regen-Timestamp und blocken fruehe HP-Regeneration', async ({ page }) => {
         await startHuntGameWithBots(page, 1);
         const result = await page.evaluate(async () => {
-            const { updatePlayerHealthRegen } = await import('/src/hunt/HealthSystem.js');
+            const api = window.CURVIOS_TEST_API;
+            if (!api?.updatePlayerHealthRegen) {
+                throw new Error('CURVIOS_TEST_API.updatePlayerHealthRegen missing');
+            }
+            const { updatePlayerHealthRegen } = api;
             const game = window.GAME_INSTANCE;
             const entityManager = game?.entityManager;
             const shooter = entityManager?.players?.[0];

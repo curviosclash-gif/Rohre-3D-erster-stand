@@ -238,6 +238,7 @@ export function handleModePathChangeAction(ctx) {
         }
     }
     const currentMapKey = String(game.settings?.mapKey || '').trim();
+    if (currentMapKey !== 'custom') {
     const currentMapDefinition = CONFIG?.MAPS?.[currentMapKey];
     const curatedFallbackMapKey = listSurfaceAllowedMapKeysForModePath(modePath)
         .find((mapKey) => CONFIG?.MAPS?.[mapKey] && isMapEligibleForModePath(CONFIG.MAPS[mapKey], modePath));
@@ -245,6 +246,7 @@ export function handleModePathChangeAction(ctx) {
         || !isSurfaceMapKeyAllowedForModePath(currentMapKey, modePath)) {
         game.settings.mapKey = curatedFallbackMapKey || resolveModePathFallbackMapKey(CONFIG?.MAPS, modePath, currentMapKey);
         changedKeys.push(SETTINGS_CHANGE_KEYS.MAP_KEY);
+    }
     }
 
     if (modePath === 'fight') {

@@ -1,0 +1,160 @@
+import {
+    HANGAR_MODES,
+    resolveHangarMode,
+    resolveHangarUserFlow,
+} from '../../shared/contracts/HangarModeContract.js';
+
+export const HANGAR_SHELL_LAYOUT_VERSION = 'hangar-shell-layout.v1';
+
+export const HANGAR_SHELL_REGION_IDS = Object.freeze({
+    HEADER: 'header',
+    VEHICLE_CATALOG: 'vehicle-catalog',
+    VEHICLE_PREVIEW: 'vehicle-preview',
+    RULES_PANEL: 'rules-panel',
+    LOADOUT_PANEL: 'loadout-panel',
+    ACTION_BAR: 'action-bar',
+    STATUS_BAR: 'status-bar',
+});
+
+const VALID_HANGAR_SHELL_REGION_ID_SET = new Set(Object.values(HANGAR_SHELL_REGION_IDS));
+
+export const HANGAR_SHELL_REGION_ORDER = Object.freeze([
+    HANGAR_SHELL_REGION_IDS.HEADER,
+    HANGAR_SHELL_REGION_IDS.VEHICLE_CATALOG,
+    HANGAR_SHELL_REGION_IDS.VEHICLE_PREVIEW,
+    HANGAR_SHELL_REGION_IDS.RULES_PANEL,
+    HANGAR_SHELL_REGION_IDS.LOADOUT_PANEL,
+    HANGAR_SHELL_REGION_IDS.ACTION_BAR,
+    HANGAR_SHELL_REGION_IDS.STATUS_BAR,
+]);
+
+export const HANGAR_SHELL_COMMON_REGIONS = Object.freeze({
+    [HANGAR_SHELL_REGION_IDS.HEADER]: Object.freeze({
+        id: HANGAR_SHELL_REGION_IDS.HEADER,
+        title: 'Hangar Header',
+        componentSlot: 'hangar-header',
+        purpose: 'Mode switch, breadcrumbs and high-level selection summary.',
+    }),
+    [HANGAR_SHELL_REGION_IDS.VEHICLE_CATALOG]: Object.freeze({
+        id: HANGAR_SHELL_REGION_IDS.VEHICLE_CATALOG,
+        title: 'Vehicle Catalog',
+        componentSlot: 'vehicle-catalog',
+        purpose: 'Browse available vehicles and loadouts for the active mode.',
+    }),
+    [HANGAR_SHELL_REGION_IDS.VEHICLE_PREVIEW]: Object.freeze({
+        id: HANGAR_SHELL_REGION_IDS.VEHICLE_PREVIEW,
+        title: 'Vehicle Preview',
+        componentSlot: 'vehicle-preview',
+        purpose: 'Shared preview card with stats, hitbox and quick compare details.',
+    }),
+    [HANGAR_SHELL_REGION_IDS.RULES_PANEL]: Object.freeze({
+        id: HANGAR_SHELL_REGION_IDS.RULES_PANEL,
+        title: 'Rules Panel',
+        componentSlot: 'rules-panel',
+        purpose: 'Shows the active contract explanations for Arcade or Fight mode.',
+    }),
+    [HANGAR_SHELL_REGION_IDS.LOADOUT_PANEL]: Object.freeze({
+        id: HANGAR_SHELL_REGION_IDS.LOADOUT_PANEL,
+        title: 'Loadout Panel',
+        componentSlot: 'loadout-panel',
+        purpose: 'Shared part-slot and module selection surface.',
+    }),
+    [HANGAR_SHELL_REGION_IDS.ACTION_BAR]: Object.freeze({
+        id: HANGAR_SHELL_REGION_IDS.ACTION_BAR,
+        title: 'Action Bar',
+        componentSlot: 'action-bar',
+        purpose: 'Shared primary actions: workshop, start match and return.',
+    }),
+    [HANGAR_SHELL_REGION_IDS.STATUS_BAR]: Object.freeze({
+        id: HANGAR_SHELL_REGION_IDS.STATUS_BAR,
+        title: 'Status Bar',
+        componentSlot: 'status-bar',
+        purpose: 'Persistent feedback row for save state, warnings and sync status.',
+    }),
+});
+
+export const HANGAR_SHELL_MODE_REGION_EXTENSIONS = Object.freeze({
+    [HANGAR_MODES.ARCADE]: Object.freeze([
+        Object.freeze({
+            id: 'arcade-progression-panel',
+            anchorRegionId: HANGAR_SHELL_REGION_IDS.RULES_PANEL,
+            insertPosition: 'after',
+            componentSlot: 'arcade-progression-panel',
+            purpose: 'XP, mastery and slot-unlock overview tied to Arcade contracts.',
+        }),
+        Object.freeze({
+            id: 'arcade-run-loop-panel',
+            anchorRegionId: HANGAR_SHELL_REGION_IDS.ACTION_BAR,
+            insertPosition: 'before',
+            componentSlot: 'arcade-run-loop-panel',
+            purpose: 'Desktop loop hints for run, workshop and hangar return.',
+        }),
+    ]),
+    [HANGAR_MODES.FIGHT]: Object.freeze([
+        Object.freeze({
+            id: 'fight-balance-panel',
+            anchorRegionId: HANGAR_SHELL_REGION_IDS.RULES_PANEL,
+            insertPosition: 'after',
+            componentSlot: 'fight-balance-panel',
+            purpose: 'Live rule explanation for hitbox class normalization and limits.',
+        }),
+        Object.freeze({
+            id: 'fight-loadout-alerts',
+            anchorRegionId: HANGAR_SHELL_REGION_IDS.STATUS_BAR,
+            insertPosition: 'before',
+            componentSlot: 'fight-loadout-alerts',
+            purpose: 'Immediate exploit and safety diagnostics for Fight builds.',
+        }),
+    ]),
+});
+
+function cloneCommonRegion(region) {
+    return {
+        id: region.id,
+        title: region.title,
+        componentSlot: region.componentSlot,
+        purpose: region.purpose,
+    };
+}
+
+function cloneModeExtension(extension) {
+    return {
+        id: extension.id,
+        anchorRegionId: extension.anchorRegionId,
+        insertPosition: extension.insertPosition,
+        componentSlot: extension.componentSlot,
+        purpose: extension.purpose,
+    };
+}
+
+export function assertHangarShellRegionId(rawRegionId) {
+    const normalized = String(rawRegionId || '').trim();
+    return VALID_HANGAR_SHELL_REGION_ID_SET.has(normalized) ? normalized : null;
+}
+
+export function listHangarShellCommonRegions() {
+    return HANGAR_SHELL_REGION_ORDER
+        .map((regionId) => HANGAR_SHELL_COMMON_REGIONS[regionId])
+        .filter(Boolean)
+        .map(cloneCommonRegion);
+}
+
+export function listHangarShellModeRegionExtensions(rawMode) {
+    const mode = resolveHangarMode(rawMode);
+    const extensions = HANGAR_SHELL_MODE_REGION_EXTENSIONS[mode] || [];
+    return extensions.map(cloneModeExtension);
+}
+
+export function resolveHangarShellLayout(rawMode) {
+    const flow = resolveHangarUserFlow(rawMode);
+    const mode = resolveHangarMode(flow.mode);
+    return Object.freeze({
+        contractVersion: HANGAR_SHELL_LAYOUT_VERSION,
+        mode,
+        dataSpace: flow.dataSpace,
+        persistenceKey: flow.persistenceKey,
+        startNavEvent: flow.startNavEvent,
+        commonRegions: listHangarShellCommonRegions(),
+        modeExtensions: listHangarShellModeRegionExtensions(mode),
+    });
+}

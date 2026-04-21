@@ -1,0 +1,1150 @@
+diff --git a/electron/main.cjs b/electron/main.cjs
+index 4e58a4a..0915427 100644
+--- a/electron/main.cjs
++++ b/electron/main.cjs
+@@ -18,6 +18,7 @@ let signalingStartPromise = null;
+ let signalingStopPromise = null;
+ 
+ const SIGNALING_PORTS = [9090, 9091, 9093, 9094];
++const GRACEFUL_CLOSE_TIMEOUT_MS = 3000;
+ const SIGNALING_PORT_FALLBACK = 0;
+ const DISCOVERY_PORT = 9092;
+ const DISCOVERY_INTERVAL = 2000;
+@@ -411,6 +412,39 @@ async function createWindow() {
+     mainWindow.on('closed', () => {
+         mainWindow = null;
+     });
++
++    // ── Graceful-close handshake ──────────────────────────────────────────────
++    // Before destroying the window, ask the renderer to run its own lifecycle
++    // teardown (facade.dispose → GAME_DISPOSE finalize → MATCH_FINALIZED signal
++    // to any connected multiplayer peers).  A GRACEFUL_CLOSE_TIMEOUT_MS timeout
++    // ensures the window always closes even if the renderer is unresponsive.
++    let gracefulCloseReady = false;
++    mainWindow.on('close', (event) => {
++        if (gracefulCloseReady) return;
++        event.preventDefault();
++
++        const finish = () => {
++            if (gracefulCloseReady) return;
++            gracefulCloseReady = true;
++            if (mainWindow && !mainWindow.isDestroyed()) {
++                mainWindow.close();
++            }
++        };
++
++        const timeoutId = setTimeout(finish, GRACEFUL_CLOSE_TIMEOUT_MS);
++        ipcMain.once('graceful-close-ready', () => {
++            clearTimeout(timeoutId);
++            finish();
++        });
++
++        try {
++            mainWindow.webContents.send('request-graceful-close');
++        } catch {
++            // Renderer already gone — proceed immediately.
++            clearTimeout(timeoutId);
++            finish();
++        }
++    });
+ }
+ 
+ function createDesktopWindowShellCapability() {
+diff --git a/electron/preload.cjs b/electron/preload.cjs
+index b326e1a..d4401f0 100644
+--- a/electron/preload.cjs
++++ b/electron/preload.cjs
+@@ -9,6 +9,7 @@ const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
+     host: 'preload.host.v1',
+     save: 'preload.save.v1',
+     recording: 'preload.recording.v1',
++    lifecycle: 'preload.lifecycle.v1',
+ });
+ const PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION = 'platform-capability-snapshot.v1';
+ 
+@@ -75,15 +76,46 @@ function createRecordingContract() {
+     });
+ }
+ 
++/**
++ * Lifecycle capability contract — exposes the shell's graceful-close handshake.
++ *
++ * The main process sends 'request-graceful-close' before destroying the window.
++ * The renderer calls onGracefulClose(cb) to receive the notification, runs its
++ * own dispose/finalize sequence (e.g. facade.dispose()), and then calls
++ * confirmGracefulClose() to allow the window to proceed with closing.
++ */
++function createLifecycleContract() {
++    return createNamedContract('lifecycle', PRELOAD_CONTRACT_VERSIONS.lifecycle, {
++        /**
++         * Register a callback fired when the shell requests a graceful close.
++         * The callback may be async; call confirmGracefulClose() once the
++         * renderer-side lifecycle teardown is complete.
++         *
++         * @param {() => void | Promise<void>} callback
++         * @returns {() => void} unsubscribe function
++         */
++        onGracefulClose: (callback) => {
++            if (typeof callback !== 'function') return () => {};
++            const handler = () => callback();
++            ipcRenderer.on('request-graceful-close', handler);
++            return () => ipcRenderer.removeListener('request-graceful-close', handler);
++        },
++        /** Signal to the main process that the renderer is ready to be destroyed. */
++        confirmGracefulClose: () => ipcRenderer.send('graceful-close-ready'),
++    });
++}
++
+ const discoveryContract = createDiscoveryContract();
+ const hostContract = createHostContract();
+ const saveContract = createSaveContract();
+ const recordingContract = createRecordingContract();
++const lifecycleContract = createLifecycleContract();
+ const platformContracts = Object.freeze({
+     discovery: discoveryContract,
+     host: hostContract,
+     save: saveContract,
+     recording: recordingContract,
++    lifecycle: lifecycleContract,
+ });
+ const platformCapabilities = Object.freeze({
+     contractVersion: PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION,
+@@ -100,6 +132,7 @@ const platformCapabilities = Object.freeze({
+     recording: createCapabilityDescriptor('recording', recordingContract.contractVersion, 'electron-renderer', true, {
+         supportsCapture: true,
+     }),
++    lifecycle: createCapabilityDescriptor('lifecycle', lifecycleContract.contractVersion, 'electron-ipc', true),
+ });
+ const curviosApp = Object.freeze({
+     contracts: platformContracts,
+@@ -108,6 +141,7 @@ const curviosApp = Object.freeze({
+     host: hostContract,
+     save: saveContract,
+     recording: recordingContract,
++    lifecycle: lifecycleContract,
+     getLanServerStatus: hostContract.getStatus,
+     startLanServer: hostContract.start,
+     stopLanServer: hostContract.stop,
+diff --git a/package.json b/package.json
+index e5d7131..48465ca 100644
+--- a/package.json
++++ b/package.json
+@@ -64,7 +64,7 @@
+     "benchmark:baseline": "node scripts/bot-benchmark-baseline.mjs",
+     "benchmark:lifecycle": "node scripts/perf-lifecycle-measure.mjs",
+     "benchmark:jitter": "node dev/scripts/verify-lock.mjs --playwright -- node scripts/perf-jitter-matrix.mjs",
+-    "test:contract": "node --test tests/audio.contract.test.mjs tests/content-descriptor-registries.contract.test.mjs tests/game-mode-strategy.contract.test.mjs tests/gameplay-powerups-portals-gates.contract.test.mjs tests/lifecycle-capability.contract.test.mjs tests/menu-multiplayer-bridge.contract.test.mjs tests/observation-bridge-policy-runtime.test.mjs tests/persistence-version-migration.contract.test.mjs tests/platform-capabilities.contract.test.mjs tests/runtime-regressions.contract.test.mjs tests/trainer-v34-bridge.test.mjs tests/trainer-v34-deterministic-smoke.test.mjs tests/trainer-v34-model.test.mjs tests/trainer-v34-replay.test.mjs tests/trainer-v34-run-fallback.test.mjs tests/trainer-v35-model.test.mjs tests/trainer-v36-action-safety.test.mjs tests/training-automation-core.contract.test.mjs tests/training-environment.contract.test.mjs tests/training-gate.test.mjs tests/training-reward-survival.test.mjs tests/validate-umsetzungsplan.test.mjs",
++    "test:contract": "node --test tests/audio.contract.test.mjs tests/content-descriptor-registries.contract.test.mjs tests/game-mode-strategy.contract.test.mjs tests/gameplay-powerups-portals-gates.contract.test.mjs tests/lifecycle-capability.contract.test.mjs tests/menu-multiplayer-bridge.contract.test.mjs tests/observation-bridge-policy-runtime.test.mjs tests/offline-session-compatibility.contract.test.mjs tests/persistence-version-migration.contract.test.mjs tests/platform-capabilities.contract.test.mjs tests/runtime-regressions.contract.test.mjs tests/trainer-v34-bridge.test.mjs tests/trainer-v34-deterministic-smoke.test.mjs tests/trainer-v34-model.test.mjs tests/trainer-v34-replay.test.mjs tests/trainer-v34-run-fallback.test.mjs tests/trainer-v35-model.test.mjs tests/trainer-v36-action-safety.test.mjs tests/training-automation-core.contract.test.mjs tests/training-environment.contract.test.mjs tests/training-gate.test.mjs tests/training-reward-survival.test.mjs tests/validate-umsetzungsplan.test.mjs",
+     "test:contract:targeted": "node --test tests/trainer-v34-loop.test.mjs tests/trainer-v34-checkpoint.integration.test.mjs tests/trainer-v34-match-resume.integration.test.mjs tests/trainer-v34-resume-latest.integration.test.mjs tests/trainer-v34-server.integration.test.mjs tests/training-e2e.test.mjs",
+     "test:playwright:desktop-smoke": "node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-smoke.mjs tests/core.spec.js --timeout=180000",
+     "test:playwright:desktop-e2e": "node dev/scripts/verify-lock.mjs --playwright -- node scripts/run-playwright-targeted-clusters.mjs --timeout=240000",
+diff --git a/src/core/AppInitializer.js b/src/core/AppInitializer.js
+index 5b50902..d2211aa 100644
+--- a/src/core/AppInitializer.js
++++ b/src/core/AppInitializer.js
+@@ -2,6 +2,7 @@
+ 
+ import { attachGlobalRuntimeErrorHandler, showRuntimeErrorOverlay } from './RuntimeErrorOverlay.js';
+ import { createLogger } from '../shared/logging/Logger.js';
++import { createElectronShellLifecycleAdapter } from '../platform/electron/ElectronShellLifecycleBridge.js';
+ 
+ const logger = createLogger('AppInitializer');
+ 
+@@ -30,6 +31,35 @@ function getRuntimeWindow() {
+     return /** @type {RuntimeWindow} */ (window);
+ }
+ 
++/**
++ * Subscribes the game instance's dispose() to the shell's graceful-close handshake.
++ * When the Electron window is closed, the shell sends 'request-graceful-close'.
++ * This bridge calls game.dispose() (which triggers facade.dispose() ->
++ * finalizeMatch(GAME_DISPOSE) -> MATCH_FINALIZED broadcast to peers) and then
++ * confirms to the shell that teardown is complete.
++ *
++ * Platform-preload access goes exclusively through the dedicated thin adapter
++ * (src/platform/electron/ElectronShellLifecycleBridge.js) to stay within the
++ * legacy-surface guard matrix.  No-op in browser environments where the
++ * lifecycle contract is absent.
++ *
++ * @param {RuntimeGameInstance} game
++ */
++function attachShellLifecycleBridge(game) {
++    const lifecycleAdapter = createElectronShellLifecycleAdapter();
++    if (!lifecycleAdapter.isAvailable()) return;
++
++    lifecycleAdapter.onGracefulClose(async () => {
++        try {
++            await game?.dispose?.();
++        } catch {
++            // Best-effort: confirm even if dispose throws so the window always closes.
++        } finally {
++            lifecycleAdapter.confirmGracefulClose();
++        }
++    });
++}
++
+ /**
+  * @param {unknown} error
+  * @returns {string}
+@@ -63,6 +93,12 @@ function mountGameInstance(createGame) {
+     runtimeWindow.GAME_INSTANCE = game;
+     runtimeWindow.GAME_RUNTIME = game.runtimeFacade;
+     runtimeWindow.GAME_DEBUG = game.debugApi;
++
++    // Wire shell-level lifecycle events (Electron graceful-close handshake) to the
++    // game's canonical dispose port so that window-close always triggers the same
++    // finalizing -> match_finalized -> menu_opened path used for in-game exits.
++    // No-op in browser environments where the lifecycle contract is absent.
++    attachShellLifecycleBridge(game);
+ }
+ 
+ /**
+diff --git a/src/core/GameRuntimeFacade.js b/src/core/GameRuntimeFacade.js
+index 45a2630..f9f15c6 100644
+--- a/src/core/GameRuntimeFacade.js
++++ b/src/core/GameRuntimeFacade.js
+@@ -70,7 +70,9 @@ export class GameRuntimeFacade {
+         this._arenaLoadedPeers = new Set();
+         this._onStateUpdateHandler = null;
+         this._onPlayerLoadedHandler = null;
+-        this._onArenaStartSignalHandler = null;
++        this._onRoundStartGateHandler = null;
++        this._onFullStateSyncNeededHandler = null;
++        this._lifecycleKernelHandlers = null;
+         this._pendingStateUpdates = [];
+         this._pendingMatchFinalize = null;
+         this._pendingMatchFinalizePlan = null;
+diff --git a/src/core/runtime/MatchFinalizeFlowService.js b/src/core/runtime/MatchFinalizeFlowService.js
+index 575b3bb..484248e 100644
+--- a/src/core/runtime/MatchFinalizeFlowService.js
++++ b/src/core/runtime/MatchFinalizeFlowService.js
+@@ -1,5 +1,6 @@
+ import { createLogger } from '../../shared/logging/Logger.js';
+ import { SESSION_FINALIZE_TRIGGERS } from '../../shared/contracts/MatchLifecycleContract.js';
++import { MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES } from '../../shared/contracts/MultiplayerSessionContract.js';
+ import { SESSION_RUNTIME_EVENT_TYPES } from '../../shared/contracts/SessionRuntimeEventContract.js';
+ import { recordSessionRuntimeEvent } from '../../shared/runtime/SessionRuntimeObservability.js';
+ 
+@@ -82,6 +83,20 @@ export function finalizeMatchFlow(facade, options = undefined, fallbackReason =
+         facade?.ports?.sessionPort?.clearLastRoundGhost?.();
+     }
+     if (requestedPlan.teardownRuntimeSession) {
++        // Host broadcasts MATCH_FINALIZED to all connected peers before tearing
++        // down the session.  Clients react via their MultiplayerMatchLifecycleKernel
++        // and trigger their own finalizing -> match_finalized -> menu_opened path.
++        const session = facade?.session;
++        if (session?.isHost && session?.isConnected) {
++            try {
++                session.broadcastLifecycleSignal?.(
++                    MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES.MATCH_FINALIZED,
++                    { reason: requestedPlan.reason }
++                );
++            } catch {
++                // Best-effort: signal delivery is not guaranteed; teardown proceeds.
++            }
++        }
+         facade?.teardownRuntimeSession?.();
+     }
+     if (requestedPlan.clearPlayerSources) {
+diff --git a/src/core/runtime/MultiplayerMatchLifecycleKernel.js b/src/core/runtime/MultiplayerMatchLifecycleKernel.js
+new file mode 100644
+index 0000000..7dfca02
+--- /dev/null
++++ b/src/core/runtime/MultiplayerMatchLifecycleKernel.js
+@@ -0,0 +1,105 @@
++// ============================================
++// MultiplayerMatchLifecycleKernel.js
++// Common lifecycle kernel for LAN and Online sessions (client-side).
++//
++// Responsibilities:
++//   - Translate network-level disconnect events into facade lifecycle commands.
++//   - React to host-issued MATCH_LIFECYCLE_SIGNAL messages by triggering
++//     the client's own returnToMenu() via the canonical command path.
++//
++// The kernel is attached only for client-side network sessions
++// (not host, not offline).  All routing goes through facade.returnToMenu()
++// so it always traverses the same finalizing -> match_finalized -> menu_opened
++// path that offline sessions use.
++// ============================================
++
++import { GAME_STATE_IDS } from '../../shared/contracts/GameStateIds.js';
++import { MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES } from '../../shared/contracts/MultiplayerSessionContract.js';
++
++/** Game states that indicate an active match (not yet in menu). */
++const MATCH_ACTIVE_GAME_STATES = new Set([
++    GAME_STATE_IDS.PLAYING,
++    GAME_STATE_IDS.PAUSED,
++    GAME_STATE_IDS.ROUND_END,
++    GAME_STATE_IDS.MATCH_END,
++]);
++
++/**
++ * Returns true if the facade is in an active match and not already finalizing.
++ * Used to guard against spurious returnToMenu() calls when already in menu.
++ *
++ * @param {object} facade
++ * @returns {boolean}
++ */
++function isInActiveMatch(facade) {
++    if (facade?._pendingMatchFinalize) return false;
++    const gameState = facade?.game?.state;
++    return typeof gameState === 'string' && MATCH_ACTIVE_GAME_STATES.has(gameState);
++}
++
++/**
++ * Calls facade.returnToMenu() with the given reason if we are still in an
++ * active match.  Errors are swallowed — the lifecycle machinery handles them.
++ *
++ * @param {object} facade
++ * @param {string} reason
++ */
++function triggerReturnToMenu(facade, reason) {
++    if (!isInActiveMatch(facade)) return;
++    try {
++        facade.returnToMenu({ reason });
++    } catch {
++        // Best-effort: lifecycle errors are handled internally by the facade.
++    }
++}
++
++/**
++ * Attaches lifecycle event handlers to a client-side network session adapter.
++ * Routes host-disconnect and host-finalized signals to the facade's returnToMenu
++ * command so that both LAN and Online sessions share the same lifecycle path.
++ *
++ * @param {object} facade - GameRuntimeFacade instance
++ * @param {import('../../core/session/SessionAdapter.js').SessionAdapter} session
++ * @returns {{ onHostDisconnected: Function, onMatchLifecycleSignal: Function } | null}
++ */
++export function attachMultiplayerLifecycleKernel(facade, session) {
++    if (!session || !facade) return null;
++
++    // Fired when the host peer disconnects (graceful HOST_LEAVING or ungraceful
++    // heartbeat-timeout / channel-close).  Clients react by returning to menu.
++    const onHostDisconnected = () => {
++        triggerReturnToMenu(facade, 'host_disconnected');
++    };
++
++    // Fired when the host broadcasts a MATCH_LIFECYCLE_SIGNAL before teardown.
++    // Clients react to the 'match_finalized' signal by initiating their own
++    // return-to-menu finalize flow.
++    const onMatchLifecycleSignal = ({ signal } = {}) => {
++        const normalizedSignal = typeof signal === 'string' ? signal.trim() : '';
++        if (normalizedSignal !== MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES.MATCH_FINALIZED) return;
++        triggerReturnToMenu(facade, 'host_match_finalized');
++    };
++
++    session.on('hostDisconnected', onHostDisconnected);
++    session.on('matchLifecycleSignal', onMatchLifecycleSignal);
++
++    return { onHostDisconnected, onMatchLifecycleSignal };
++}
++
++/**
++ * Removes lifecycle kernel handlers from the session adapter.
++ * Called by teardownRuntimeSession before session.dispose() so handlers
++ * cannot fire after teardown has already started.
++ *
++ * @param {import('../../core/session/SessionAdapter.js').SessionAdapter} session
++ * @param {{ onHostDisconnected: Function, onMatchLifecycleSignal: Function } | null} handlers
++ */
++export function detachMultiplayerLifecycleKernel(session, handlers) {
++    if (!session || !handlers) return;
++    if (typeof handlers.onHostDisconnected === 'function') {
++        session.off('hostDisconnected', handlers.onHostDisconnected);
++    }
++    if (typeof handlers.onMatchLifecycleSignal === 'function') {
++        session.off('matchLifecycleSignal', handlers.onMatchLifecycleSignal);
++    }
++}
+diff --git a/src/core/runtime/RuntimeSessionLifecycleService.js b/src/core/runtime/RuntimeSessionLifecycleService.js
+index ffeea32..23c495f 100644
+--- a/src/core/runtime/RuntimeSessionLifecycleService.js
++++ b/src/core/runtime/RuntimeSessionLifecycleService.js
+@@ -9,15 +9,17 @@ import {
+ } from '../../shared/contracts/RuntimeSessionContract.js';
+ import { LocalSessionAdapter } from '../session/LocalSessionAdapter.js';
+ import { createGameStateSnapshot } from '../GameStateSnapshot.js';
++import {
++    attachMultiplayerLifecycleKernel,
++    detachMultiplayerLifecycleKernel,
++} from './MultiplayerMatchLifecycleKernel.js';
+ 
+ /** @type {number} Host broadcasts state snapshots at this interval (ms). */
+ const STATE_BROADCAST_INTERVAL_MS = 100; // 10/s
+ const STATE_UPDATE_BUFFER_LIMIT = 24;
+-const ARENA_START_SIGNAL_TIMEOUT_MS = 12_000;
++const ROUND_START_GATE_TIMEOUT_MS = 12_000;
+ const ARENA_LOADED_BASE_TIMEOUT_MS = 10_000;
+ const ARENA_LOADED_TIMEOUT_PER_REMOTE_PLAYER_MS = 5_000;
+-const ARENA_LOADED_SIGNAL_TYPE = 'arena_loaded';
+-const ARENA_START_SIGNAL_TYPE = 'arena_start';
+ 
+ function resolveSessionContract(sessionSource = null) {
+     if (typeof sessionSource === 'string') {
+@@ -70,10 +72,12 @@ export async function initRuntimeSession(facade) {
+ 
+     if (facade.session.isHost && sessionContract.isNetworkSession) {
+         startRuntimeStateBroadcast(facade);
++        setupRuntimeHostFullStateSyncHandler(facade);
+     }
+ 
+     if (!facade.session.isHost && sessionContract.isNetworkSession) {
+         setupRuntimeClientStateReceiver(facade);
++        facade._lifecycleKernelHandlers = attachMultiplayerLifecycleKernel(facade, facade.session);
+     }
+ }
+ 
+@@ -94,6 +98,34 @@ export function stopRuntimeStateBroadcast(facade) {
+     }
+ }
+ 
++/**
++ * Host-only.  Listens for the 'fullStateSyncNeeded' event that the session adapter
++ * emits when a peer reconnects after a disconnect.  Responds by immediately sending
++ * the current game state snapshot to the reconnected peer so it can catch up without
++ * waiting for the next scheduled broadcast tick.
++ *
++ * The reconciliation decision (which transport, which peer) is entirely made by the
++ * session adapter; this handler only reads the game state and delegates the actual
++ * send back through the adapter's sendStateToPeer() port.
++ */
++export function setupRuntimeHostFullStateSyncHandler(facade) {
++    if (!facade?.session?.isHost) return;
++    facade._onFullStateSyncNeededHandler = ({ peerId } = {}) => {
++        const normalizedPeerId = typeof peerId === 'string' ? peerId.trim() : '';
++        if (!normalizedPeerId) return;
++        const game = facade?.game;
++        if (!game?.entityManager) return;
++        try {
++            const snapshot = createGameStateSnapshot(game.entityManager, game.roundStateController);
++            facade.session?.sendStateToPeer?.(normalizedPeerId, snapshot);
++        } catch {
++            // Best-effort: the host's periodic broadcast will catch the client up on the
++            // next interval even if this on-demand sync fails.
++        }
++    };
++    facade.session.on('fullStateSyncNeeded', facade._onFullStateSyncNeededHandler);
++}
++
+ export function setupRuntimeClientStateReceiver(facade) {
+     if (!facade?.session) return;
+     if (!Array.isArray(facade._pendingStateUpdates)) {
+@@ -155,6 +187,11 @@ export async function waitForRuntimePlayersLoaded(facade) {
+         facade._arenaLoadedPeers.add(localPlayerId);
+     }
+ 
++    // ── Client path ────────────────────────────────────────────────────────────
++    // Client sends PLAYER_ARENA_LOADED (transport-level, dedicated message type)
++    // and waits for the host's ROUND_START_GATE broadcast.  The decision of
++    // *when* to allow the round to start belongs to the transport layer (the
++    // session adapter and its host-authority contract), not to domain logic.
+     if (!facade.session.isHost) {
+         return new Promise((resolve) => {
+             let completed = false;
+@@ -167,26 +204,31 @@ export async function waitForRuntimePlayersLoaded(facade) {
+                     clearTimeout(timeoutId);
+                     timeoutId = null;
+                 }
+-                if (facade._onArenaStartSignalHandler && facade.session) {
+-                    facade.session.off('remoteInput', facade._onArenaStartSignalHandler);
+-                    facade._onArenaStartSignalHandler = null;
++                if (facade._onRoundStartGateHandler && facade.session) {
++                    facade.session.off('roundStartGate', facade._onRoundStartGateHandler);
++                    facade._onRoundStartGateHandler = null;
+                 }
+                 resolve();
+             };
+ 
+-            facade._onArenaStartSignalHandler = (payload) => {
+-                const inputType = String(payload?.input?.type || '').trim().toLowerCase();
+-                if (inputType !== ARENA_START_SIGNAL_TYPE) return;
++            facade._onRoundStartGateHandler = () => {
++                // Host has confirmed all players are loaded; the round may begin.
+                 finish();
+             };
+ 
+-            facade.session.on('remoteInput', facade._onArenaStartSignalHandler);
+-            facade.session.sendInput({ type: ARENA_LOADED_SIGNAL_TYPE, playerId: localPlayerId });
++            facade.session.on('roundStartGate', facade._onRoundStartGateHandler);
++            // Notify the host that this client's arena is ready.
++            facade.session.notifyArenaLoaded?.(localPlayerId);
+ 
+-            timeoutId = setTimeout(() => finish(), ARENA_START_SIGNAL_TIMEOUT_MS);
++            timeoutId = setTimeout(() => finish(), ROUND_START_GATE_TIMEOUT_MS);
+         });
+     }
+ 
++    // ── Host path ──────────────────────────────────────────────────────────────
++    // Host waits for all remote peers to send PLAYER_ARENA_LOADED (surfaced as
++    // 'playerLoaded' events by the adapter).  Once all peers have confirmed,
++    // the host broadcasts ROUND_START_GATE — a host-authoritative transport
++    // signal that instructs every client to begin arena simulation.
+     const expectedPeerIds = new Set(
+         players
+             .map((player) => String(player?.peerId || player?.id || '').trim())
+@@ -208,14 +250,13 @@ export async function waitForRuntimePlayersLoaded(facade) {
+                 timeoutId = null;
+             }
+             try {
+-                facade.session?.sendInput?.({
+-                    type: ARENA_START_SIGNAL_TYPE,
+-                    playerId: localPlayerId || 'host',
++                // Broadcast the host-authoritative ROUND_START_GATE signal to all clients.
++                facade.session?.broadcastRoundStartGate?.({
+                     expectedPeerIds: Array.from(expectedPeerIds.values()),
+                     timestamp: Date.now(),
+                 });
+             } catch {
+-                // Ignore best-effort host start signaling failures.
++                // Best-effort: even if broadcast fails, local host resolves and starts.
+             }
+             if (facade._onPlayerLoadedHandler && facade.session) {
+                 facade.session.off('playerLoaded', facade._onPlayerLoadedHandler);
+@@ -264,9 +305,19 @@ export function teardownRuntimeSession(facade) {
+         facade.session.off('playerLoaded', facade._onPlayerLoadedHandler);
+         facade._onPlayerLoadedHandler = null;
+     }
+-    if (facade?._onArenaStartSignalHandler && facade.session) {
+-        facade.session.off('remoteInput', facade._onArenaStartSignalHandler);
+-        facade._onArenaStartSignalHandler = null;
++    if (facade?._onRoundStartGateHandler && facade.session) {
++        facade.session.off('roundStartGate', facade._onRoundStartGateHandler);
++        facade._onRoundStartGateHandler = null;
++    }
++    if (facade?._onFullStateSyncNeededHandler && facade.session) {
++        facade.session.off('fullStateSyncNeeded', facade._onFullStateSyncNeededHandler);
++        facade._onFullStateSyncNeededHandler = null;
++    }
++    if (facade?._lifecycleKernelHandlers && facade.session) {
++        detachMultiplayerLifecycleKernel(facade.session, facade._lifecycleKernelHandlers);
++    }
++    if (facade) {
++        facade._lifecycleKernelHandlers = null;
+     }
+     facade?._arenaLoadedPeers?.clear?.();
+     if (Array.isArray(facade?._pendingStateUpdates)) {
+diff --git a/src/network/LANSessionAdapter.js b/src/network/LANSessionAdapter.js
+index e5f72bb..f469d8d 100644
+--- a/src/network/LANSessionAdapter.js
++++ b/src/network/LANSessionAdapter.js
+@@ -318,6 +318,11 @@ export class LANSessionAdapter extends SessionAdapterBase {
+         }
+     }
+ 
++    _resolveHostPeerId() {
++        // LAN host is always reachable under the fixed peer ID 'host'.
++        return 'host';
++    }
++
+     _sendStateToAll(message, excludePeerId = null) {
+         if (!message) return;
+         this._dataChannelManager.sendToAll('state', message, excludePeerId);
+@@ -381,11 +386,20 @@ export class LANSessionAdapter extends SessionAdapterBase {
+         const message = normalizeMultiplayerSessionMessage(data);
+         switch (message.type) {
+         case MULTIPLAYER_MESSAGE_TYPES.INPUT:
+-            if (data?.inputs?.type === 'arena_loaded') {
+-                this._emit('playerLoaded', { playerId: data.playerId || peerId });
+-            }
+             this._emit('remoteInput', { peerId, input: data.inputs, playerId: data.playerId });
+             break;
++        case MULTIPLAYER_MESSAGE_TYPES.PLAYER_ARENA_LOADED:
++            // Client signals that its arena is fully loaded.  Host collects these
++            // and fires broadcastRoundStartGate() once all players have reported in.
++            this._emit('playerLoaded', { playerId: String(data.playerId || peerId || '').trim() });
++            break;
++        case MULTIPLAYER_MESSAGE_TYPES.ROUND_START_GATE:
++            // Host signals all clients that every player is loaded and the round may start.
++            this._emit('roundStartGate', {
++                expectedPeerIds: Array.isArray(data.expectedPeerIds) ? data.expectedPeerIds : [],
++                timestamp: typeof data.timestamp === 'number' ? data.timestamp : 0,
++            });
++            break;
+         case MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT:
+             this._emit('stateUpdate', buildMultiplayerStateUpdateEvent(data, {
+                 messageType: MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT,
+@@ -435,6 +449,12 @@ export class LANSessionAdapter extends SessionAdapterBase {
+         case MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED:
+             this._emit('playerRemoved', { peerId: data.peerId });
+             break;
++        case MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL:
++            this._emit('matchLifecycleSignal', {
++                signal: String(data.signal || '').trim(),
++                reason: String(data.reason || '').trim(),
++            });
++            break;
+         default:
+             break;
+         }
+diff --git a/src/network/OnlineSessionAdapter.js b/src/network/OnlineSessionAdapter.js
+index 1951572..ebff13b 100644
+--- a/src/network/OnlineSessionAdapter.js
++++ b/src/network/OnlineSessionAdapter.js
+@@ -264,6 +264,11 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
+         return this._hostPeerId || null;
+     }
+ 
++    _resolveHostPeerId() {
++        // Online host is identified by the peer ID stored during signaling.
++        return this._findHostPeerId();
++    }
++
+     _sendStateToAll(message, excludePeerId = null) {
+         if (!message) return;
+         this._dataChannelManager.sendToAll('state', message, excludePeerId);
+@@ -350,11 +355,20 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
+         const message = normalizeMultiplayerSessionMessage(data);
+         switch (message.type) {
+         case MULTIPLAYER_MESSAGE_TYPES.INPUT:
+-            if (data?.inputs?.type === 'arena_loaded') {
+-                this._emit('playerLoaded', { playerId: data.playerId || peerId });
+-            }
+             this._emit('remoteInput', { peerId, input: data.inputs, playerId: data.playerId });
+             break;
++        case MULTIPLAYER_MESSAGE_TYPES.PLAYER_ARENA_LOADED:
++            // Client signals that its arena is fully loaded.  Host collects these
++            // and fires broadcastRoundStartGate() once all players have reported in.
++            this._emit('playerLoaded', { playerId: String(data.playerId || peerId || '').trim() });
++            break;
++        case MULTIPLAYER_MESSAGE_TYPES.ROUND_START_GATE:
++            // Host signals all clients that every player is loaded and the round may start.
++            this._emit('roundStartGate', {
++                expectedPeerIds: Array.isArray(data.expectedPeerIds) ? data.expectedPeerIds : [],
++                timestamp: typeof data.timestamp === 'number' ? data.timestamp : 0,
++            });
++            break;
+         case MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT:
+             this._emit('stateUpdate', buildMultiplayerStateUpdateEvent(data, {
+                 messageType: MULTIPLAYER_MESSAGE_TYPES.STATE_SNAPSHOT,
+@@ -404,6 +418,12 @@ export class OnlineSessionAdapter extends SessionAdapterBase {
+         case MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED:
+             this._emit('playerRemoved', { peerId: data.peerId });
+             break;
++        case MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL:
++            this._emit('matchLifecycleSignal', {
++                signal: String(data.signal || '').trim(),
++                reason: String(data.reason || '').trim(),
++            });
++            break;
+         default:
+             break;
+         }
+diff --git a/src/network/SessionAdapterBase.js b/src/network/SessionAdapterBase.js
+index 61c8156..1a4af43 100644
+--- a/src/network/SessionAdapterBase.js
++++ b/src/network/SessionAdapterBase.js
+@@ -127,6 +127,64 @@ export class SessionAdapterBase extends SessionAdapter {
+         this._emit('fullStateSyncNeeded', { peerId: normalizedPeerId });
+     }
+ 
++    /**
++     * Override in concrete adapters to return the host's peer ID as known by this adapter.
++     * Returns null in the base class (no-op fallback).
++     * @returns {string|null}
++     */
++    _resolveHostPeerId() {
++        return null;
++    }
++
++    /**
++     * Client-only. Sends a PLAYER_ARENA_LOADED message to the host to signal that
++     * this peer's arena is fully initialised and ready for the round-start gate.
++     * The host collects these signals and replies with broadcastRoundStartGate()
++     * once all expected peers have reported in.
++     *
++     * @param {string} playerId - local player/peer ID to include in the message
++     */
++    notifyArenaLoaded(playerId) {
++        if (this.isHost) return;
++        const hostPeerId = this._resolveHostPeerId();
++        if (!hostPeerId) return;
++        this._sendStateToPeer(
++            hostPeerId,
++            this._createStateMessage(MULTIPLAYER_MESSAGE_TYPES.PLAYER_ARENA_LOADED, { playerId })
++        );
++    }
++
++    /**
++     * Host-only. Broadcasts ROUND_START_GATE to all connected peers, signalling
++     * that all players are loaded and the round may begin.  Clients react by
++     * resolving their waitForRuntimePlayersLoaded() promise.
++     *
++     * @param {object|null} payload - Optional extra fields (e.g. expectedPeerIds, timestamp)
++     */
++    broadcastRoundStartGate(payload = null) {
++        if (!this.isHost) return;
++        const extra = payload && typeof payload === 'object' ? payload : {};
++        this._sendStateToAll(this._createStateMessage(
++            MULTIPLAYER_MESSAGE_TYPES.ROUND_START_GATE, extra
++        ));
++    }
++
++    /**
++     * Host-only. Broadcasts a lifecycle signal to all connected peers.
++     * Clients react via their MultiplayerMatchLifecycleKernel handler.
++     *
++     * @param {string} signal - One of MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES
++     * @param {object|null} payload - Optional extra fields merged into the message
++     */
++    broadcastLifecycleSignal(signal, payload = null) {
++        if (!this.isHost) return;
++        const extra = payload && typeof payload === 'object' ? payload : {};
++        this._sendStateToAll(this._createStateMessage(
++            MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL,
++            { signal, ...extra }
++        ));
++    }
++
+     _sendFullStateSync(peerId, stateSnapshot) {
+         const normalizedPeerId = normalizePeerId(peerId);
+         if (!normalizedPeerId) return;
+diff --git a/src/platform/electron/ElectronPlatformBridge.js b/src/platform/electron/ElectronPlatformBridge.js
+index 562dc26..2658a00 100644
+--- a/src/platform/electron/ElectronPlatformBridge.js
++++ b/src/platform/electron/ElectronPlatformBridge.js
+@@ -18,6 +18,7 @@ const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
+     host: 'preload.host.v1',
+     save: 'preload.save.v1',
+     recording: 'preload.recording.v1',
++    lifecycle: 'preload.lifecycle.v1',
+ });
+ 
+ function resolveRuntimeGlobal(runtimeGlobal = globalThis) {
+@@ -261,6 +262,47 @@ export function createElectronPreloadRecordingAdapter(runtimeGlobal = globalThis
+     });
+ }
+ 
++/**
++ * Lifecycle capability adapter — wraps the shell's graceful-close handshake.
++ *
++ * When the Electron window is closed, the main process sends 'request-graceful-close'
++ * to the renderer.  The adapter surfaces this as onGracefulClose(cb) so the renderer
++ * can run its own dispose/finalize sequence and then call confirmGracefulClose() to
++ * allow the window to proceed.  All routing goes through facade.dispose() so the same
++ * finalizing -> match_finalized -> menu_opened path is used regardless of how the
++ * session ends.
++ *
++ * @param {typeof globalThis} [runtimeGlobal]
++ */
++export function createElectronPreloadLifecycleAdapter(runtimeGlobal = globalThis) {
++    const { appRuntime } = resolveAppRuntime(runtimeGlobal);
++    const lifecycleContract = resolveNamedContract(appRuntime, 'lifecycle');
++
++    const rawOnGracefulClose = lifecycleContract?.onGracefulClose;
++    const rawConfirmGracefulClose = lifecycleContract?.confirmGracefulClose;
++    const available = typeof rawOnGracefulClose === 'function'
++        && typeof rawConfirmGracefulClose === 'function';
++
++    return Object.freeze({
++        adapterName: 'electron.preload.lifecycle.v1',
++        contractVersion: lifecycleContract?.contractVersion || PRELOAD_CONTRACT_VERSIONS.lifecycle,
++        isAvailable: () => available,
++        /**
++         * Register a callback fired when the shell requests a graceful close.
++         * Returns an unsubscribe function.
++         * @param {() => void | Promise<void>} callback
++         * @returns {() => void}
++         */
++        onGracefulClose: available
++            ? (callback) => rawOnGracefulClose(callback)
++            : () => () => {},
++        /** Signal to the shell that renderer-side teardown is complete. */
++        confirmGracefulClose: available
++            ? () => rawConfirmGracefulClose()
++            : () => {},
++    });
++}
++
+ export function getElectronPlatformCapabilitySnapshot(runtimeGlobal = globalThis) {
+     const discoveryAdapter = createElectronPreloadDiscoveryAdapter(runtimeGlobal);
+     const hostAdapter = createElectronPreloadHostAdapter(runtimeGlobal);
+diff --git a/src/platform/electron/ElectronShellLifecycleBridge.js b/src/platform/electron/ElectronShellLifecycleBridge.js
+new file mode 100644
+index 0000000..a1fccdb
+--- /dev/null
++++ b/src/platform/electron/ElectronShellLifecycleBridge.js
+@@ -0,0 +1,63 @@
++// ============================================
++// ElectronShellLifecycleBridge.js
++// Thin adapter for the Electron shell's graceful-close lifecycle contract.
++//
++// This module deliberately does NOT import the full ElectronPlatformBridge
++// to avoid pulling the platform capability chain (PlatformCapabilityContract,
++// PlatformCapabilityRegistry) into TypeScript's analysis of AppInitializer.js.
++//
++// Approved adapter for the curviosApp legacy-surface guard matrix.
++// ============================================
++
++const LIFECYCLE_CONTRACT_VERSION = 'preload.lifecycle.v1';
++
++/**
++ * Resolves the lifecycle sub-contract from the Electron preload.
++ * Returns null if not running in Electron or if the preload is absent.
++ *
++ * @param {typeof globalThis} [runtimeGlobal]
++ * @returns {{ onGracefulClose: Function, confirmGracefulClose: Function, contractVersion: string } | null}
++ */
++function resolveLifecycleContract(runtimeGlobal = globalThis) {
++    const appRuntime = runtimeGlobal?.curviosApp;
++    if (!appRuntime || typeof appRuntime !== 'object') return null;
++    const contracts = appRuntime?.contracts && typeof appRuntime.contracts === 'object'
++        ? appRuntime.contracts : null;
++    const lifecycle = contracts?.lifecycle ?? appRuntime?.lifecycle ?? null;
++    if (!lifecycle || typeof lifecycle !== 'object') return null;
++    if (typeof lifecycle.onGracefulClose !== 'function'
++        || typeof lifecycle.confirmGracefulClose !== 'function') return null;
++    return lifecycle;
++}
++
++/**
++ * Creates a thin lifecycle adapter for the shell's graceful-close handshake.
++ *
++ * When the Electron window is closed the main process sends 'request-graceful-close'.
++ * Callers subscribe via onGracefulClose(cb), run their teardown (e.g. game.dispose()),
++ * and signal completion via confirmGracefulClose().  isAvailable() returns false in
++ * browser environments where no preload lifecycle contract exists.
++ *
++ * @param {typeof globalThis} [runtimeGlobal]
++ * @returns {{
++ *   isAvailable: () => boolean,
++ *   onGracefulClose: (cb: () => void | Promise<void>) => (() => void),
++ *   confirmGracefulClose: () => void,
++ *   contractVersion: string,
++ * }}
++ */
++export function createElectronShellLifecycleAdapter(runtimeGlobal = globalThis) {
++    const lifecycle = resolveLifecycleContract(runtimeGlobal);
++    const available = lifecycle !== null;
++
++    return Object.freeze({
++        isAvailable: () => available,
++        contractVersion: lifecycle?.contractVersion || LIFECYCLE_CONTRACT_VERSION,
++        onGracefulClose: available
++            ? (callback) => lifecycle.onGracefulClose(callback)
++            : () => () => {},
++        confirmGracefulClose: available
++            ? () => lifecycle.confirmGracefulClose()
++            : () => {},
++    });
++}
+diff --git a/src/shared/contracts/MultiplayerSessionContract.js b/src/shared/contracts/MultiplayerSessionContract.js
+index 4b4b2ad..5d7c70d 100644
+--- a/src/shared/contracts/MultiplayerSessionContract.js
++++ b/src/shared/contracts/MultiplayerSessionContract.js
+@@ -19,6 +19,21 @@ export const MULTIPLAYER_MESSAGE_TYPES = Object.freeze({
+     PLAYER_DISCONNECTED: 'player_disconnected',
+     PLAYER_RECONNECTED: 'player_reconnected',
+     PLAYER_REMOVED: 'player_removed',
++    MATCH_LIFECYCLE_SIGNAL: 'match_lifecycle_signal',
++    // Transport-level round-start gate protocol:
++    // Client notifies host that its arena is fully loaded.
++    PLAYER_ARENA_LOADED: 'player_arena_loaded',
++    // Host broadcasts this to all peers when all players are loaded and the round may start.
++    // Only the host sends this; clients react by beginning arena simulation.
++    ROUND_START_GATE: 'round_start_gate',
++});
++
++/**
++ * Host-authoritative lifecycle signals carried via MATCH_LIFECYCLE_SIGNAL messages.
++ * Clients react to these by triggering the corresponding lifecycle command on their facade.
++ */
++export const MULTIPLAYER_LIFECYCLE_SIGNAL_TYPES = Object.freeze({
++    MATCH_FINALIZED: 'match_finalized',
+ });
+ 
+ const MULTIPLAYER_MESSAGE_TYPE_SET = new Set(Object.values(MULTIPLAYER_MESSAGE_TYPES));
+@@ -87,6 +102,10 @@ export const MULTIPLAYER_HOST_AUTHORITATIVE_MESSAGE_TYPES = Object.freeze(new Se
+     MULTIPLAYER_MESSAGE_TYPES.PLAYER_DISCONNECTED,
+     MULTIPLAYER_MESSAGE_TYPES.PLAYER_RECONNECTED,
+     MULTIPLAYER_MESSAGE_TYPES.PLAYER_REMOVED,
++    MULTIPLAYER_MESSAGE_TYPES.MATCH_LIFECYCLE_SIGNAL,
++    // ROUND_START_GATE is host-authoritative: only the host decides when all players
++    // are loaded and the round may begin.  Clients must not send this type.
++    MULTIPLAYER_MESSAGE_TYPES.ROUND_START_GATE,
+ ]));
+ 
+ /**
+diff --git a/tests/offline-session-compatibility.contract.test.mjs b/tests/offline-session-compatibility.contract.test.mjs
+new file mode 100644
+index 0000000..56c552e
+--- /dev/null
++++ b/tests/offline-session-compatibility.contract.test.mjs
+@@ -0,0 +1,277 @@
++/**
++ * Offline-Session-Compatibility Contract Tests (V64 64.7.1)
++ *
++ * Regression guard: `single` and `splitscreen` must remain stable and
++ * independent of the Multiplayer/LAN/Online refactors introduced in V64.
++ *
++ * Covers:
++ * - RuntimeSessionContract resolves offline types correctly
++ * - resolveRuntimeSessionCapabilities: canHost/canJoin=false for offline
++ * - DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX: offline-compatible flags stable
++ * - createRuntimeSessionAdapter: LocalSessionAdapter for single/splitscreen
++ * - MatchStartValidationService: no multiplayer gate for offline sessions
++ * - waitForRuntimePlayersLoaded: returns immediately for LocalSessionAdapter
++ */
++import assert from 'node:assert/strict';
++import test from 'node:test';
++
++import {
++    RUNTIME_SESSION_TYPES,
++    resolveRuntimeSessionContract,
++    resolveRuntimeSessionCapabilities,
++    normalizeRuntimeSessionType,
++} from '../src/shared/contracts/RuntimeSessionContract.js';
++import {
++    DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX,
++    resolveDesktopMultiplayerRoleSurface,
++} from '../src/shared/contracts/DesktopMultiplayerRoleContract.js';
++import { PLATFORM_PRODUCT_SURFACE_IDS } from '../src/shared/contracts/PlatformCapabilityData.js';
++import { createRuntimeSessionAdapter } from '../src/core/runtime/RuntimeSessionLifecycleService.js';
++import { LocalSessionAdapter } from '../src/core/session/LocalSessionAdapter.js';
++import { resolveMatchStartValidationIssue } from '../src/core/runtime/MatchStartValidationService.js';
++import { waitForRuntimePlayersLoaded } from '../src/core/runtime/RuntimeSessionLifecycleService.js';
++
++// ── 1. RuntimeSessionContract — offline resolution ──────────────────────────
++
++test('64.7.1: single resolves as offline, non-network session', () => {
++    const contract = resolveRuntimeSessionContract({ sessionType: RUNTIME_SESSION_TYPES.SINGLE });
++
++    assert.equal(contract.sessionType, 'single');
++    assert.equal(contract.adapterSessionType, 'single');
++    assert.equal(contract.isNetworkSession, false);
++    assert.equal(contract.isLegacyTransport, false);
++    assert.equal(contract.transportAudienceLabel, 'Offline');
++    assert.match(contract.transportDiagnosticLabel, /offline:single/);
++});
++
++test('64.7.1: splitscreen resolves as offline, non-network session', () => {
++    const contract = resolveRuntimeSessionContract({ sessionType: RUNTIME_SESSION_TYPES.SPLITSCREEN });
++
++    assert.equal(contract.sessionType, 'splitscreen');
++    assert.equal(contract.adapterSessionType, 'splitscreen');
++    assert.equal(contract.isNetworkSession, false);
++    assert.equal(contract.isLegacyTransport, false);
++    assert.equal(contract.transportAudienceLabel, 'Offline');
++    assert.match(contract.transportDiagnosticLabel, /offline:splitscreen/);
++});
++
++test('64.7.1: single/splitscreen are not legacy transports', () => {
++    const single = resolveRuntimeSessionContract({ sessionType: RUNTIME_SESSION_TYPES.SINGLE });
++    const splitscreen = resolveRuntimeSessionContract({ sessionType: RUNTIME_SESSION_TYPES.SPLITSCREEN });
++
++    assert.equal(single.isFallbackTransport, false);
++    assert.equal(splitscreen.isFallbackTransport, false);
++    assert.equal(single.usesMenuStorageBridge, false);
++    assert.equal(splitscreen.usesMenuStorageBridge, false);
++});
++
++test('64.7.1: normalizeRuntimeSessionType defaults to single for unknown values', () => {
++    assert.equal(normalizeRuntimeSessionType('unknown-transport'), 'single');
++    assert.equal(normalizeRuntimeSessionType(''), 'single');
++    assert.equal(normalizeRuntimeSessionType(null), 'single');
++    assert.equal(normalizeRuntimeSessionType(undefined), 'single');
++    assert.equal(normalizeRuntimeSessionType('single'), 'single');
++    assert.equal(normalizeRuntimeSessionType('splitscreen'), 'splitscreen');
++});
++
++// ── 2. resolveRuntimeSessionCapabilities — canHost/canJoin=false ─────────────
++
++test('64.7.1: single has canHost=false, canJoin=false (not a network role)', () => {
++    const caps = resolveRuntimeSessionCapabilities({ sessionType: RUNTIME_SESSION_TYPES.SINGLE });
++
++    assert.equal(caps.canHost, false);
++    assert.equal(caps.canJoin, false);
++    assert.equal(caps.isNetworkSession, false);
++});
++
++test('64.7.1: splitscreen has canHost=false, canJoin=false (not a network role)', () => {
++    const caps = resolveRuntimeSessionCapabilities({ sessionType: RUNTIME_SESSION_TYPES.SPLITSCREEN });
++
++    assert.equal(caps.canHost, false);
++    assert.equal(caps.canJoin, false);
++    assert.equal(caps.isNetworkSession, false);
++});
++
++test('64.7.1: lan/online still have canHost=true, canJoin=true (regression guard)', () => {
++    const lanCaps = resolveRuntimeSessionCapabilities({
++        sessionType: RUNTIME_SESSION_TYPES.MULTIPLAYER,
++        multiplayerTransport: 'lan',
++    });
++    const onlineCaps = resolveRuntimeSessionCapabilities({
++        sessionType: RUNTIME_SESSION_TYPES.MULTIPLAYER,
++        multiplayerTransport: 'online',
++    });
++
++    assert.equal(lanCaps.canHost, true);
++    assert.equal(lanCaps.canJoin, true);
++    assert.equal(onlineCaps.canHost, true);
++    assert.equal(onlineCaps.canJoin, true);
++});
++
++// ── 3. DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX — offline flags ──────────────
++
++test('64.7.1: compatibility matrix marks single as offline-compatible', () => {
++    const entry = DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX[RUNTIME_SESSION_TYPES.SINGLE];
++
++    assert.ok(entry, 'single entry must exist in matrix');
++    assert.equal(entry.offlineCompatible, true);
++    assert.equal(entry.multiplayerTransportRequired, null);
++    assert.equal(entry.networkRequirement, 'none');
++    assert.equal(entry.splitscreenCompatible, false);
++});
++
++test('64.7.1: compatibility matrix marks splitscreen as offline-compatible', () => {
++    const entry = DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX[RUNTIME_SESSION_TYPES.SPLITSCREEN];
++
++    assert.ok(entry, 'splitscreen entry must exist in matrix');
++    assert.equal(entry.offlineCompatible, true);
++    assert.equal(entry.multiplayerTransportRequired, null);
++    assert.equal(entry.networkRequirement, 'none');
++    assert.equal(entry.splitscreenCompatible, true);
++});
++
++test('64.7.1: compatibility matrix marks lan/online as NOT offline-compatible', () => {
++    const lan = DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX[RUNTIME_SESSION_TYPES.LAN];
++    const online = DESKTOP_MULTIPLAYER_COMPATIBILITY_MATRIX[RUNTIME_SESSION_TYPES.ONLINE];
++
++    assert.equal(lan.offlineCompatible, false);
++    assert.equal(online.offlineCompatible, false);
++});
++
++test('64.7.1: desktop surface includes single and splitscreen as offline session types', () => {
++    const desktopRole = resolveDesktopMultiplayerRoleSurface(PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP);
++
++    assert.ok(desktopRole.offlineSessionTypes.includes('single'), 'single must be in desktop offline types');
++    assert.ok(desktopRole.offlineSessionTypes.includes('splitscreen'), 'splitscreen must be in desktop offline types');
++});
++
++// ── 4. createRuntimeSessionAdapter — LocalSessionAdapter for offline ──────────
++
++test('64.7.1: createRuntimeSessionAdapter returns LocalSessionAdapter for single', async () => {
++    const adapter = await createRuntimeSessionAdapter({ sessionType: RUNTIME_SESSION_TYPES.SINGLE });
++    assert.ok(adapter instanceof LocalSessionAdapter, 'single must use LocalSessionAdapter');
++    adapter.dispose();
++});
++
++test('64.7.1: createRuntimeSessionAdapter returns LocalSessionAdapter for splitscreen', async () => {
++    const adapter = await createRuntimeSessionAdapter({ sessionType: RUNTIME_SESSION_TYPES.SPLITSCREEN });
++    assert.ok(adapter instanceof LocalSessionAdapter, 'splitscreen must use LocalSessionAdapter');
++    adapter.dispose();
++});
++
++test('64.7.1: LocalSessionAdapter connects locally without network for single (numHumans=1)', async () => {
++    const adapter = new LocalSessionAdapter();
++    await adapter.connect({ numHumans: 1 });
++    const players = adapter.getPlayers();
++
++    assert.equal(adapter.isConnected, true);
++    assert.equal(adapter.isHost, true);
++    assert.equal(players.length, 1);
++    assert.equal(players[0].isLocal, true);
++    adapter.dispose();
++});
++
++test('64.7.1: LocalSessionAdapter connects locally without network for splitscreen (numHumans=2)', async () => {
++    const adapter = new LocalSessionAdapter();
++    await adapter.connect({ numHumans: 2 });
++    const players = adapter.getPlayers();
++
++    assert.equal(adapter.isConnected, true);
++    assert.equal(players.length, 2);
++    assert.ok(players.every((p) => p.isLocal), 'all players must be local in splitscreen');
++    adapter.dispose();
++});
++
++// ── 5. MatchStartValidationService — no multiplayer gate for offline ──────────
++
++const VALID_MAPS = { standard: { key: 'standard', modePaths: ['normal'] } };
++
++test('64.7.1: single session with valid map/vehicle passes validation without multiplayer check', () => {
++    const issue = resolveMatchStartValidationIssue({
++        settings: {
++            mapKey: 'standard',
++            vehicles: { PLAYER_1: 'jet-a' },
++            localSettings: { sessionType: 'single', modePath: 'normal', themeMode: 'dunkel' },
++            gameMode: 'CLASSIC',
++        },
++        maps: VALID_MAPS,
++        productSurfaceId: 'desktop-app',
++    });
++
++    assert.equal(issue, null, 'single session with valid settings must have no validation issue');
++});
++
++test('64.7.1: splitscreen session with two vehicles passes validation without multiplayer check', () => {
++    const issue = resolveMatchStartValidationIssue({
++        settings: {
++            mapKey: 'standard',
++            vehicles: { PLAYER_1: 'jet-a', PLAYER_2: 'jet-b' },
++            localSettings: { sessionType: 'splitscreen', modePath: 'normal', themeMode: 'dunkel' },
++            gameMode: 'CLASSIC',
++        },
++        maps: VALID_MAPS,
++        productSurfaceId: 'desktop-app',
++    });
++
++    assert.equal(issue, null, 'splitscreen with both vehicles must have no validation issue');
++});
++
++test('64.7.1: splitscreen session without P2 vehicle fails with vehicle-only error, not multiplayer error', () => {
++    const issue = resolveMatchStartValidationIssue({
++        settings: {
++            mapKey: 'standard',
++            vehicles: { PLAYER_1: 'jet-a' },
++            localSettings: { sessionType: 'splitscreen', modePath: 'normal', themeMode: 'dunkel' },
++            gameMode: 'CLASSIC',
++        },
++        maps: VALID_MAPS,
++        productSurfaceId: 'desktop-app',
++    });
++
++    assert.ok(issue !== null, 'missing P2 vehicle must produce a validation issue');
++    assert.equal(issue.fieldKey, 'vehicleP2', 'error must target vehicleP2, not multiplayer');
++});
++
++test('64.7.1: single session ignores lobby/session state — no multiplayer join requirement', () => {
++    // Even with an empty multiplayer session state, single must pass if vehicles/maps are valid
++    const issue = resolveMatchStartValidationIssue({
++        settings: {
++            mapKey: 'standard',
++            vehicles: { PLAYER_1: 'jet-a' },
++            localSettings: { sessionType: 'single', modePath: 'normal', themeMode: 'dunkel' },
++            gameMode: 'CLASSIC',
++        },
++        multiplayerSessionState: { joined: false, lobbyCode: '', memberCount: 0 },
++        maps: VALID_MAPS,
++        productSurfaceId: 'desktop-app',
++    });
++
++    assert.equal(issue, null, 'single must not be blocked by empty multiplayer session state');
++});
++
++// ── 6. waitForRuntimePlayersLoaded — immediate return for LocalSessionAdapter ─
++
++test('64.7.1: waitForRuntimePlayersLoaded returns immediately when session is LocalSessionAdapter', async () => {
++    const adapter = new LocalSessionAdapter();
++    await adapter.connect({ numHumans: 1 });
++
++    const facade = { session: adapter };
++
++    // Must resolve without timeout
++    const start = Date.now();
++    await waitForRuntimePlayersLoaded(facade);
++    const elapsed = Date.now() - start;
++
++    adapter.dispose();
++    assert.ok(elapsed < 500, `waitForRuntimePlayersLoaded must resolve immediately for LocalSessionAdapter (elapsed: ${elapsed}ms)`);
++});
++
++test('64.7.1: waitForRuntimePlayersLoaded returns immediately when session is null (offline teardown guard)', async () => {
++    const facade = { session: null };
++
++    const start = Date.now();
++    await waitForRuntimePlayersLoaded(facade);
++    const elapsed = Date.now() - start;
++
++    assert.ok(elapsed < 100, 'must resolve immediately when session is null');
++});

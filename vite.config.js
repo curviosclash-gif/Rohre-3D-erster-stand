@@ -1145,8 +1145,39 @@ function copyObjVehicleAssetsPlugin() {
     };
 }
 
+function playwrightHealthApiPlugin() {
+    const HEALTH_PATH = '/_pw/health';
+
+    const registerMiddleware = (middlewares) => {
+        middlewares.use((req, res, next) => {
+            const reqPath = String(req.url || '').split('?')[0];
+            if (req.method !== 'GET' || reqPath !== HEALTH_PATH) {
+                next();
+                return;
+            }
+            createJsonResponse(res, 200, { ok: true, service: 'vite', path: HEALTH_PATH });
+        });
+    };
+
+    return {
+        name: 'playwright-health-api',
+        configureServer(server) {
+            registerMiddleware(server.middlewares);
+        },
+        configurePreviewServer(server) {
+            registerMiddleware(server.middlewares);
+        },
+    };
+}
+
 export default defineConfig({
-    plugins: [editorDiskSaveApiPlugin(), latestCheckpointApiPlugin(), trainingDashboardApiPlugin(), copyObjVehicleAssetsPlugin()],
+    plugins: [
+        playwrightHealthApiPlugin(),
+        editorDiskSaveApiPlugin(),
+        latestCheckpointApiPlugin(),
+        trainingDashboardApiPlugin(),
+        copyObjVehicleAssetsPlugin(),
+    ],
     server: createRendererShellServerConfig(process.env),
     build: createRendererShellBuildConfig({
         rootDir: __dirname,

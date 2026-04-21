@@ -5,6 +5,7 @@ import { createLogger } from '../shared/logging/Logger.js';
 import { createElectronShellLifecycleAdapter } from '../platform/electron/ElectronShellLifecycleBridge.js';
 
 const logger = createLogger('AppInitializer');
+/* global __CURVIOS_E2E__ */
 
 /**
  * @typedef {{
@@ -99,6 +100,16 @@ function mountGameInstance(createGame) {
     // finalizing -> match_finalized -> menu_opened path used for in-game exits.
     // No-op in browser environments where the lifecycle contract is absent.
     attachShellLifecycleBridge(game);
+
+    try {
+        if (typeof __CURVIOS_E2E__ !== 'undefined' && __CURVIOS_E2E__ === true) {
+            import('./TestApiBridge.js')
+                .then((mod) => mod?.attachCurviosTestApi?.(runtimeWindow))
+                .catch(() => {});
+        }
+    } catch {
+        // ignore
+    }
 }
 
 /**

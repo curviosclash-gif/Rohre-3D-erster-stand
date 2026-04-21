@@ -40,6 +40,6 @@ export function buildArenaSessionKey(mapResolution, runtimeConfig, portalsEnable
 }
 
 export function resolveMatchMap(runtimeConfig = null, requestedMapKey = null) {
-    const resolvedRequestedMapKey = runtimeConfig?.session?.mapKey || requestedMapKey;
+    const resolvedRequestedMapKey = requestedMapKey || runtimeConfig?.session?.mapKey;
     return resolveArenaMapSelection(resolvedRequestedMapKey);
 }

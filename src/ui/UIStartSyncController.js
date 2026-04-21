@@ -106,10 +106,23 @@ export class UIStartSyncController {
             select.appendChild(opt);
         });
 
+        if (this._hasStoredCustomMap()) {
+            const opt = document.createElement('option');
+            opt.value = 'custom';
+            opt.textContent = this._formatMapLabel({
+                key: 'custom',
+                name: 'Custom (lokal)',
+                hasGlbModel: true,
+            });
+            select.appendChild(opt);
+        }
+
         if (maps?.[currentValue]
             && isMapEligibleForModePath(maps[currentValue], modePath)
             && this._isSurfaceMapAllowed(currentValue, modePath)) {
             select.value = currentValue;
+        } else if (currentValue === 'custom' && this._hasStoredCustomMap()) {
+            select.value = 'custom';
         } else if (maps?.[fallbackMapKey]) {
             select.value = fallbackMapKey;
         }
@@ -234,6 +247,14 @@ export class UIStartSyncController {
 
     _formatMapLabel(entry = {}) {
         return formatStartSetupMapLabel(entry);
+    }
+
+    _hasStoredCustomMap() {
+        try {
+            return !!globalThis?.localStorage?.getItem?.('custom_map_test');
+        } catch {
+            return false;
+        }
     }
 
     _renderStartFieldHints(settings = this.game.settings, options = {}) {
@@ -415,6 +436,16 @@ export class UIStartSyncController {
                     option.textContent = this._formatMapLabel(entry);
                     this.ui.mapSelect.appendChild(option);
                 });
+            if (this._hasStoredCustomMap()) {
+                const option = document.createElement('option');
+                option.value = 'custom';
+                option.textContent = this._formatMapLabel({
+                    key: 'custom',
+                    name: 'Custom (lokal)',
+                    hasGlbModel: true,
+                });
+                this.ui.mapSelect.appendChild(option);
+            }
             if (this.ui.mapSelect.options.length === 0) {
                 const option = document.createElement('option');
                 const fallbackOptionKey = String(fallbackMapKey || previousValue || 'standard');

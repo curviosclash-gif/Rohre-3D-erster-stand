@@ -1,17 +1,10 @@
 import path from 'path';
 
 const PLAYWRIGHT_WARMUP_CLIENT_FILES = [
+    './index.html',
     './src/core/main.js',
-    './src/core/**/*.js',
-    './src/state/**/*.js',
-    './src/ui/**/*.js',
-    './src/composition/core-ui/**/*.js',
-    './src/hunt/**/*.js',
-    './src/entities/MapSchema.js',
-    './src/entities/Particles.js',
-    './src/entities/mapSchema/**/*.js',
-    './src/shared/contracts/**/*.js',
-    './src/shared/runtime/**/*.js',
+    './src/entities/ai/HuntBridgePolicy.js',
+    './src/entities/ai/ObservationBridgePolicyHelpers.js',
 ];
 
 const RENDERER_INPUT_FILES = {
@@ -20,7 +13,12 @@ const RENDERER_INPUT_FILES = {
 };
 
 function resolvePlaywrightWarmupClientFiles(env = process.env) {
-    return env?.PW_RUN_TAG ? PLAYWRIGHT_WARMUP_CLIENT_FILES : [];
+    if (!env?.PW_RUN_TAG) return [];
+    const explicit = String(env?.PW_VITE_WARMUP || '').trim();
+    if (explicit === '0') return [];
+    if (explicit === '1') return PLAYWRIGHT_WARMUP_CLIENT_FILES;
+    if (String(env?.PW_PREWARM || '').trim() !== '1') return [];
+    return PLAYWRIGHT_WARMUP_CLIENT_FILES;
 }
 
 function resolveRendererManualChunk(id) {
@@ -65,9 +63,11 @@ function resolveRendererManualChunk(id) {
 
 export function createRendererShellServerConfig(env = process.env) {
     const warmupClientFiles = resolvePlaywrightWarmupClientFiles(env);
+    const isPlaywright = !!env?.PW_RUN_TAG;
 
     return {
-        open: !env?.PW_RUN_TAG && !env?.CI,
+        open: !isPlaywright && !env?.CI,
+        hmr: isPlaywright ? false : undefined,
         warmup: warmupClientFiles.length > 0
             ? { clientFiles: warmupClientFiles }
             : undefined,
@@ -92,10 +92,12 @@ export function createRendererShellBuildConfig({ rootDir, chunkSizeWarningLimit 
 }
 
 export function createRendererBuildDefines({ pkgVersion, buildTime, buildId, env = process.env }) {
+    const isPlaywright = !!env?.PW_RUN_TAG;
     return {
         __APP_VERSION__: JSON.stringify(pkgVersion),
         __BUILD_TIME__: JSON.stringify(buildTime),
         __BUILD_ID__: JSON.stringify(buildId),
+        __CURVIOS_E2E__: JSON.stringify(isPlaywright),
         __APP_MODE__: JSON.stringify(env?.VITE_APP_MODE || 'web'),
         __SIGNALING_URL__: JSON.stringify(env?.VITE_SIGNALING_URL || ''),
         __TURN_URL__: JSON.stringify(env?.VITE_TURN_URL || ''),

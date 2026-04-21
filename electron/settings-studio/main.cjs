@@ -79,12 +79,14 @@ function createWindowShellCapability() {
                 return mainWindow;
             }
 
+            const shouldShowWindow = String(process.env.CURVIOS_ELECTRON_SHOW_WINDOW || '').trim() !== '0';
             mainWindow = new BrowserWindow({
                 width: 1280,
                 height: 860,
                 minWidth: 960,
                 minHeight: 680,
                 title: 'CurviosClash Settings Studio',
+                show: shouldShowWindow,
                 webPreferences: {
                     preload: path.resolve(__dirname, 'preload.cjs'),
                     contextIsolation: true,

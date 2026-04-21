@@ -1,11 +1,23 @@
 {
-  "generated_at": "2026-04-20T17:53:00.910Z",
+  "generated_at": "2026-04-20T19:38:49.497Z",
   "locks": [
     {
       "person": "build-agent",
       "block_id": "V76",
       "phase": "76.2",
-      "scope_files": [],
+      "scope_files": [
+        "src/ui/hangar/**",
+        "src/shared/contracts/HangarModeContract.js",
+        "src/shared/contracts/FightHangarBalanceContract.js",
+        "src/shared/contracts/ArcadeHangarRulesContract.js",
+        "src/ui/arcade/**",
+        "src/state/arcade/ArcadeVehicleProfile.js",
+        "src/entities/arcade/ArcadeBlueprintSchema.js",
+        "src/entities/vehicle-registry.js",
+        "src/entities/GeneratedVehicleConfigs.js",
+        "prototypes/vehicle-lab/**",
+        "src/ui/start-setup/**"
+      ],
       "start_date": "2026-04-20",
       "target_completion": "2026-04-27",
       "status": "in-progress",

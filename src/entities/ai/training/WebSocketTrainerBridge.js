@@ -29,6 +29,12 @@ export class WebSocketTrainerBridge {
             : 'trainer-ready';
         this.requireReadyMessage = options.requireReadyMessage !== false;
         this.maxPendingAcks = toBoundedInt(options.maxPendingAcks, 512, 1, 8192);
+        this.maxPendingActionRequests = Math.min(this.maxPendingAcks, toBoundedInt(
+            options.maxPendingActionRequests,
+            2,
+            1,
+            this.maxPendingAcks
+        ));
         this.backpressureThreshold = Math.min(this.maxPendingAcks, toBoundedInt(
             options.backpressureThreshold,
             Math.max(1, Math.floor(this.maxPendingAcks * 0.75)),
@@ -42,10 +48,11 @@ export class WebSocketTrainerBridge {
             : null;
         this._socket = null;
         this._nextRequestId = 1;
-        this._pendingRequest = null;
+        this._pendingActionRequests = new Map();
         this._pendingAcks = new Map();
         this._pendingCommands = new Map();
         this._latestQueuedActionRequest = null;
+        this._flushLatestActionScheduled = false;
         this._latestAction = null;
         this._latestResponse = null;
         this._latestFailure = null;
@@ -104,7 +111,7 @@ export class WebSocketTrainerBridge {
         }
     }
     _clearPending(options = {}) {
-        this._pendingRequest = null;
+        this._pendingActionRequests.clear();
         if (options.flushLatest !== false) {
             this._flushLatestActionRequest();
         }
@@ -117,7 +124,7 @@ export class WebSocketTrainerBridge {
     }
     _flushLatestActionRequest() {
         if (!this._latestQueuedActionRequest) return false;
-        if (!this._canSendRequest()) return false;
+        if (!this._canSendRequest({ expectsAction: true })) return false;
         const queuedPayload = this._latestQueuedActionRequest;
         this._latestQueuedActionRequest = null;
         const sent = this._submitRequest('bot-action-request', queuedPayload, {
@@ -128,6 +135,17 @@ export class WebSocketTrainerBridge {
             return false;
         }
         return true;
+    }
+    _scheduleLatestActionFlush() {
+        if (this._flushLatestActionScheduled) return;
+        this._flushLatestActionScheduled = true;
+        const schedule = typeof queueMicrotask === 'function'
+            ? queueMicrotask
+            : (callback) => Promise.resolve().then(callback);
+        schedule(() => {
+            this._flushLatestActionScheduled = false;
+            this._flushLatestActionRequest();
+        });
     }
     _attachSocketHandlers(socket) {
         this._boundOpenHandler = () => {
@@ -251,7 +269,7 @@ export class WebSocketTrainerBridge {
             this._ingestTrainingTelemetry(parsed);
             return;
         }
-        if (!this._pendingRequest || responseId !== this._pendingRequest.id) {
+        if (!this._pendingActionRequests.has(responseId)) {
             if (
                 parsed?.ok === true
                 && (responseType === 'training-step' || responseType === 'training-reset' || responseType === 'training-ack')
@@ -263,21 +281,24 @@ export class WebSocketTrainerBridge {
             }
             return;
         }
-        const pending = this._pendingRequest;
+        const pending = this._pendingActionRequests.get(responseId);
+        this._pendingActionRequests.delete(responseId);
         this._telemetry.responsesReceived += 1;
-        pushLatencySample(this._telemetry, this._now() - pending.sentAt);
-        const expectsAction = pending?.expectsAction !== false;
-        this._latestResponse = parsed;
-        this._clearPending();
-        this._ingestTrainingTelemetry(parsed);
-        if (!expectsAction) {
-            this._telemetry.ackResponses += 1;
-            return;
+        if (Number.isFinite(pending?.sentAt)) {
+            pushLatencySample(this._telemetry, this._now() - pending.sentAt);
         }
+        this._latestResponse = parsed;
+        this._ingestTrainingTelemetry(parsed);
         const actionPayload = parsed?.action ?? parsed?.payload?.action ?? null;
         if (actionPayload && typeof actionPayload === 'object') {
-            this._latestAction = actionPayload;
+            const nextTick = Number(actionPayload?.requestTick);
+            const currentTick = Number(this._latestAction?.requestTick);
+            const shouldReplace = !(Number.isFinite(nextTick) && Number.isFinite(currentTick) && nextTick < currentTick);
+            if (shouldReplace) {
+                this._latestAction = actionPayload;
+            }
             this._telemetry.actionResponses += 1;
+            this._flushLatestActionRequest();
             return;
         }
         this._recordFailure('missing-action');
@@ -390,39 +411,44 @@ export class WebSocketTrainerBridge {
         }
     }
     _handleTimeout() {
-        if (!this._pendingRequest) return;
+        if (this._pendingActionRequests.size <= 0) return;
         const now = this._now();
-        const pending = this._pendingRequest;
-        const ageMs = now - pending.sentAt;
-        if (ageMs > this.timeoutMs) {
+        for (const [requestId, pending] of this._pendingActionRequests.entries()) {
+            const sentAt = Number(pending?.sentAt);
+            if (!Number.isFinite(sentAt)) continue;
+            const ageMs = now - sentAt;
+            if (ageMs <= this.timeoutMs) continue;
             if (pending.retryCount < this.maxRetries) {
                 if (now < pending.retryAt) {
-                    return;
+                    continue;
                 }
                 this._telemetry.timeouts += 1;
                 if (this._retryPendingRequest(pending)) {
-                    return;
+                    continue;
                 }
             } else {
                 this._telemetry.timeouts += 1;
                 this._recordFailure('timeout');
-                this._clearPending();
+                this._pendingActionRequests.delete(requestId);
             }
         }
+        this._flushLatestActionRequest();
     }
-    _canSendRequest() {
+    _canSendRequest(options = {}) {
         const openState = this._resolveOpenState();
-        return (
-            this._socket
-            && this._socket.readyState === openState
-            && !this._pendingRequest
-        );
+        const expectsAction = options.expectsAction !== false;
+        if (!this._socket || this._socket.readyState !== openState) return false;
+        if (expectsAction) {
+            return this._pendingActionRequests.size < this.maxPendingActionRequests;
+        }
+        return this._pendingActionRequests.size <= 0;
     }
     _submitRequest(type, payload, options = {}) {
         if (!this.enabled) return false;
         this._ensureSocket();
         this._handleTimeout();
-        if (!this._canSendRequest()) return false;
+        const expectsAction = options.expectsAction !== false;
+        if (!this._canSendRequest({ expectsAction })) return false;
         const requestId = this._nextRequestId++;
         const envelope = createTrainerTransportEnvelope(
             type,
@@ -437,7 +463,6 @@ export class WebSocketTrainerBridge {
             this._recordFailure('serialize-failed');
             return false;
         }
-        const expectsAction = options.expectsAction !== false;
         if (!expectsAction && this.dropTrainingPayloadWhenBacklogged && this._pendingAcks.size >= this.backpressureThreshold) {
             this._telemetry.backpressureDrops += 1;
             return false;
@@ -452,14 +477,13 @@ export class WebSocketTrainerBridge {
                 this._telemetry.trainingRequests += 1;
             }
             if (expectsAction) {
-                this._pendingRequest = {
+                this._pendingActionRequests.set(requestId, {
                     id: requestId,
                     sentAt: now,
-                    expectsAction: true,
                     retryAt: now + this.timeoutMs + this.retryDelayMs,
                     retryCount: 0,
                     serialized,
-                };
+                });
                 return true;
             }
             this._pendingAcks.set(requestId, now);
@@ -475,12 +499,15 @@ export class WebSocketTrainerBridge {
         }
     }
     submitObservation(payload) {
-        const sent = this._submitRequest('bot-action-request', payload, {
-            expectsAction: true,
-        });
-        if (sent) return;
+        if (this._pendingActionRequests.size <= 0) {
+            const sent = this._submitRequest('bot-action-request', payload, {
+                expectsAction: true,
+            });
+            if (sent) return;
+        }
         this._telemetry.actionSendSkipped += 1;
         this._queueLatestActionRequest(payload);
+        this._scheduleLatestActionFlush();
     }
     submitTrainingPayload(messageType, payload) {
         const type = typeof messageType === 'string' && messageType.trim()
@@ -583,7 +610,7 @@ export class WebSocketTrainerBridge {
         this._handleTimeout();
         return cloneTelemetrySnapshot({
             ...this._telemetry,
-            pendingActionRequest: !!this._pendingRequest,
+            pendingActionRequest: this._pendingActionRequests.size > 0,
             pendingAckCount: this._pendingAcks.size,
             pendingCommandCount: this._pendingCommands.size,
         });

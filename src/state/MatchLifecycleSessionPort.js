@@ -25,7 +25,7 @@ export function createMatchSessionPort(runtime) {
         getSessionRuntimeState: () => sessionRuntime,
         getLifecycleState: () => ({
             sessionId: sessionRuntime?.session?.activeSessionId || null,
-            mapKey: sessionSettings?.mapKey || runtime?.mapKey || null,
+            mapKey: runtime?.settings?.mapKey || sessionSettings?.mapKey || runtime?.mapKey || null,
             numHumans: Number(sessionSettings?.numHumans ?? runtime?.numHumans) || 0,
             numBots: Number(sessionSettings?.numBots ?? runtime?.numBots) || 0,
             winsNeeded: Number(sessionSettings?.winsNeeded ?? runtime?.winsNeeded) || 0,
@@ -49,7 +49,7 @@ export function createMatchSessionPort(runtime) {
             settings: runtime?.settings,
             runtimeConfig: runtime?.runtimeConfig,
             baseConfig: runtime?.config || null,
-            requestedMapKey: sessionSettings?.mapKey || runtime?.mapKey,
+            requestedMapKey: runtime?.settings?.mapKey || sessionSettings?.mapKey || runtime?.mapKey,
             currentSession: getCurrentMatchSessionRefs(),
             ...handlers,
         }),

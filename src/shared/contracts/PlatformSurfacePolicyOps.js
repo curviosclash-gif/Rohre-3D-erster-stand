@@ -113,10 +113,16 @@ export function resolveSurfaceMenuState(settings = {}, options = {}) {
     const maps = options?.maps && typeof options.maps === 'object' ? options.maps : null;
     const requestedMapKey = normalizeString(settings?.mapKey, '');
     const requestedMapDefinition = requestedMapKey && maps ? maps[requestedMapKey] : null;
-    const requestedMapAllowed = requestedMapKey
-        && !!requestedMapDefinition
-        && isMapEligibleForModePath(requestedMapDefinition, modePath)
-        && isSurfaceMapKeyAllowedForModePath(requestedMapKey, modePath, { productSurfaceId });
+    const requestedMapAllowed = (
+        requestedMapKey === 'custom'
+        && policy.requiresCuratedMaps !== true
+    )
+        || (
+            requestedMapKey
+            && !!requestedMapDefinition
+            && isMapEligibleForModePath(requestedMapDefinition, modePath)
+            && isSurfaceMapKeyAllowedForModePath(requestedMapKey, modePath, { productSurfaceId })
+        );
     const surfaceAllowedMapKeys = listSurfaceAllowedMapKeysForModePath(modePath, { productSurfaceId });
     const fallbackMapKey = maps
         ? (
