@@ -8,6 +8,10 @@ import {
     getArcadeVehicleProfileRecord,
     readArcadeVehicleProfileRecord,
 } from '../../shared/contracts/ArcadeVehicleProfileContract.js';
+import {
+    ARCADE_HANGAR_SLOT_UNLOCK_GATES,
+    resolveArcadeHangarUnlockedSlots,
+} from '../../shared/contracts/ArcadeHangarRulesContract.js';
 
 const VEHICLE_PROFILE_SCHEMA_VERSION = ARCADE_VEHICLE_PROFILE_SCHEMA_VERSION;
 const STORAGE_KEY = ARCADE_VEHICLE_PROFILE_STORAGE_KEY;
@@ -18,18 +22,7 @@ export const XP_CONFIG = Object.freeze({
     MAX_LEVEL: ARCADE_VEHICLE_PROFILE_MAX_LEVEL,
 });
 
-export const SLOT_UNLOCK_LEVELS = Object.freeze({
-    utility: 5,
-    wing_left_t2: 10,
-    wing_right_t2: 10,
-    engine_left_t2: 15,
-    engine_right_t2: 15,
-    core_t2: 20,
-    nose_t2: 20,
-    utility_t2: 25,
-    core_t3: 28,
-    nose_t3: 28,
-});
+export const SLOT_UNLOCK_LEVELS = ARCADE_HANGAR_SLOT_UNLOCK_GATES;
 
 export const XP_REWARD_TABLE = Object.freeze({
     sectorComplete: 50,
@@ -42,10 +35,6 @@ export const XP_REWARD_TABLE = Object.freeze({
     parcoursFinish: 80,
     parcoursNewBestTime: 40,
 });
-
-const BASE_SLOTS = Object.freeze([
-    'core', 'nose', 'wing_left', 'wing_right', 'engine_left', 'engine_right',
-]);
 
 import { toSafeNumber, clampInteger as clampInt } from '../../shared/utils/ArcadeUtils.js';
 
@@ -126,14 +115,7 @@ export function getMasteryPerks(level) {
 // ─── Slot Unlocks ───
 
 export function getUnlockedSlots(level) {
-    const slots = [...BASE_SLOTS];
-    const entries = Object.entries(SLOT_UNLOCK_LEVELS);
-    for (let i = 0; i < entries.length; i += 1) {
-        if (level >= entries[i][1]) {
-            slots.push(entries[i][0]);
-        }
-    }
-    return slots;
+    return resolveArcadeHangarUnlockedSlots(level);
 }
 
 // ─── Profile CRUD ───
