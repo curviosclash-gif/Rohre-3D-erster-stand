@@ -17,6 +17,11 @@ import { resolveGameplayConfig } from '../../shared/contracts/GameplayConfigCont
 import { bindMenuMultiplayerTransportButtons } from './MenuMultiplayerTransportBindings.js';
 import { createRuntimeSettingsLimitsForRuntime } from '../../shared/contracts/SettingsRuntimeLimitsContract.js';
 import { bindMenuExtrasButtons } from './MenuExtrasBindings.js';
+import {
+    HANGAR_SELECTION_PLAYER_SLOTS,
+    writeHangarMapSelection,
+    writeHangarVehicleSelection,
+} from '../hangar/HangarSelectionWritebackContract.js';
 export function setupMenuGameplayBindings(ctx) {
     const ui = ctx.ui;
     const settings = ctx.settings;
@@ -174,26 +179,42 @@ export function setupMenuGameplayBindings(ctx) {
 
     if (ui.vehicleSelectP1) {
         bind(ui.vehicleSelectP1, 'change', (e) => {
-            settings.vehicles.PLAYER_1 = e.target.value;
-            emitSettingsChangedImmediate([keys.VEHICLES_PLAYER_1]);
+            const writeback = writeHangarVehicleSelection(
+                settings,
+                HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
+                e?.target?.value,
+                'ship5'
+            );
+            if (writeback.changed) {
+                emitSettingsChangedImmediate([keys.VEHICLES_PLAYER_1]);
+            }
         });
     }
     if (ui.vehicleSelectP2) {
         bind(ui.vehicleSelectP2, 'change', (e) => {
-            settings.vehicles.PLAYER_2 = e.target.value;
-            emitSettingsChangedImmediate([keys.VEHICLES_PLAYER_2]);
+            const writeback = writeHangarVehicleSelection(
+                settings,
+                HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
+                e?.target?.value,
+                'ship5'
+            );
+            if (writeback.changed) {
+                emitSettingsChangedImmediate([keys.VEHICLES_PLAYER_2]);
+            }
         });
     }
 
     bind(ui.mapSelect, 'change', (e) => {
         const selectedMapKey = String(e.target.value || '');
-        const hasUiOption = Array.isArray(ui.mapSelect?.options)
-            ? ui.mapSelect.options.some((option) => String(option?.value || '') === selectedMapKey)
-            : false;
-        settings.mapKey = (selectedMapKey === CUSTOM_MAP_KEY || hasUiOption || gameplayConfig.MAPS[selectedMapKey])
+        const hasUiOption = Array.from(ui.mapSelect?.options || [])
+            .some((option) => String(option?.value || '') === selectedMapKey);
+        const resolvedMapKey = (selectedMapKey === CUSTOM_MAP_KEY || hasUiOption || gameplayConfig.MAPS[selectedMapKey])
             ? selectedMapKey
             : 'standard';
-        emitSettingsChangedImmediate([keys.MAP_KEY]);
+        const writeback = writeHangarMapSelection(settings, resolvedMapKey, 'standard');
+        if (writeback.changed) {
+            emitSettingsChangedImmediate([keys.MAP_KEY]);
+        }
     });
 
     if (ui.themeModeSelect) {

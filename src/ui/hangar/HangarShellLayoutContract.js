@@ -3,6 +3,10 @@ import {
     resolveHangarMode,
     resolveHangarUserFlow,
 } from '../../shared/contracts/HangarModeContract.js';
+import {
+    HANGAR_SELECTION_WRITEBACK_PATHS,
+    HANGAR_SELECTION_WRITEBACK_VERSION,
+} from './HangarSelectionWritebackContract.js';
 
 export const HANGAR_SHELL_LAYOUT_VERSION = 'hangar-shell-layout.v1';
 
@@ -156,5 +160,10 @@ export function resolveHangarShellLayout(rawMode) {
         startNavEvent: flow.startNavEvent,
         commonRegions: listHangarShellCommonRegions(),
         modeExtensions: listHangarShellModeRegionExtensions(mode),
+        selectionWriteback: Object.freeze({
+            source: 'start-setup',
+            contractVersion: HANGAR_SELECTION_WRITEBACK_VERSION,
+            persistencePathMap: HANGAR_SELECTION_WRITEBACK_PATHS,
+        }),
     });
 }

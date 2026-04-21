@@ -39,6 +39,11 @@ import {
     formatStartSetupMapLabel,
     renderStartFieldHints,
 } from './start-setup/StartSetupValidationView.js';
+import {
+    HANGAR_SELECTION_PLAYER_SLOTS,
+    writeHangarMapSelection,
+    writeHangarVehicleSelection,
+} from './hangar/HangarSelectionWritebackContract.js';
 import { resolveGameplayConfig } from '../shared/contracts/GameplayConfigContract.js';
 import { getRuntimeMapCatalog } from '../shared/contracts/RuntimeMapCatalogContract.js';
 import {
@@ -174,7 +179,7 @@ export class UIStartSyncController {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
                 const selectedMapKey = String(this.ui.mapSelect.value || '').trim();
                 if (selectedMapKey) {
-                    this.game.settings.mapKey = selectedMapKey;
+                    writeHangarMapSelection(this.game.settings, selectedMapKey, selectedMapKey);
                 }
                 pushRecentEntry(currentStartSetup.recentMaps, this.ui.mapSelect.value);
             });
@@ -182,12 +187,22 @@ export class UIStartSyncController {
         if (this.ui.vehicleSelectP1) {
             listen(this.ui.vehicleSelectP1, 'change', () => {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                writeHangarVehicleSelection(
+                    this.game.settings,
+                    HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
+                    this.ui.vehicleSelectP1.value
+                );
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP1.value);
             });
         }
         if (this.ui.vehicleSelectP2) {
             listen(this.ui.vehicleSelectP2, 'change', () => {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
+                writeHangarVehicleSelection(
+                    this.game.settings,
+                    HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
+                    this.ui.vehicleSelectP2.value
+                );
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP2.value);
             });
         }
@@ -458,6 +473,7 @@ export class UIStartSyncController {
                 ? previousValue
                 : this.ui.mapSelect.options[0].value;
             this.ui.mapSelect.value = resolvedMapKey;
+            writeHangarMapSelection(settings, resolvedMapKey, resolvedMapKey);
         }
         const effectiveMapKey = String(this.ui.mapSelect?.value || surfaceMenuState.mapKey || settings.mapKey || 'standard');
 
@@ -477,6 +493,12 @@ export class UIStartSyncController {
             });
             const resolvedValue = resolveVehicleSelectValue(this.ui.vehicleSelectP1, currentValue);
             this.ui.vehicleSelectP1.value = resolvedValue;
+            writeHangarVehicleSelection(
+                settings,
+                HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
+                resolvedValue,
+                resolvedValue
+            );
         }
         if (this.ui.vehicleSelectP2) {
             const currentValue = String(settings?.vehicles?.PLAYER_2 || this.ui.vehicleSelectP2.value || '');
@@ -489,6 +511,12 @@ export class UIStartSyncController {
             });
             const resolvedValue = resolveVehicleSelectValue(this.ui.vehicleSelectP2, currentValue);
             this.ui.vehicleSelectP2.value = resolvedValue;
+            writeHangarVehicleSelection(
+                settings,
+                HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
+                resolvedValue,
+                resolvedValue
+            );
         }
 
         renderQuickList(

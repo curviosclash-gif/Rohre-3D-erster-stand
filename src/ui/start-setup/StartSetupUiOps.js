@@ -2,23 +2,21 @@
 // StartSetupUiOps.js - shared DOM/state helpers for start-setup UI
 // ============================================
 
+import { ensureHangarSelectionWritebackState } from '../hangar/HangarSelectionWritebackContract.js';
+
 export function ensureStartSetupLocalState(settings) {
-    if (!settings.localSettings || typeof settings.localSettings !== 'object') {
-        settings.localSettings = {};
-    }
-    if (!settings.localSettings.startSetup || typeof settings.localSettings.startSetup !== 'object') {
-        settings.localSettings.startSetup = {};
-    }
-    const startSetup = settings.localSettings.startSetup;
-    if (!Array.isArray(startSetup.favoriteMaps)) startSetup.favoriteMaps = [];
-    if (!Array.isArray(startSetup.recentMaps)) startSetup.recentMaps = [];
-    if (!Array.isArray(startSetup.favoriteVehicles)) startSetup.favoriteVehicles = [];
-    if (!Array.isArray(startSetup.recentVehicles)) startSetup.recentVehicles = [];
-    if (typeof startSetup.mapSearch !== 'string') startSetup.mapSearch = '';
-    if (typeof startSetup.mapFilter !== 'string') startSetup.mapFilter = 'all';
-    if (typeof startSetup.vehicleSearch !== 'string') startSetup.vehicleSearch = '';
-    if (typeof startSetup.vehicleFilter !== 'string') startSetup.vehicleFilter = 'all';
-    return startSetup;
+    const startSetup = ensureHangarSelectionWritebackState(settings);
+    if (startSetup) return startSetup;
+    return {
+        favoriteMaps: [],
+        recentMaps: [],
+        favoriteVehicles: [],
+        recentVehicles: [],
+        mapSearch: '',
+        mapFilter: 'all',
+        vehicleSearch: '',
+        vehicleFilter: 'all',
+    };
 }
 
 export function toggleFavoriteEntry(list, value, maxItems = 8) {
