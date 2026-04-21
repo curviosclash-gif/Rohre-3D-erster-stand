@@ -65,7 +65,8 @@ export function setupMenuGameplayBindings(ctx) {
         if (mode === CAMERA_PERSPECTIVE_MODE.CINEMATIC_ACTION) return 'Cinematic Action';
         return 'Klassisch';
     };
-    const isFightModePathActive = () => String(settings?.localSettings?.modePath || '').trim().toLowerCase() === 'fight';
+    const resolveCurrentHangarModePath = () => String(settings?.localSettings?.modePath || 'normal').trim().toLowerCase() || 'normal';
+    const isFightModePathActive = () => resolveCurrentHangarModePath() === 'fight';
     const applyPlanarMode = (enabled) => {
         if (!settings.gameplay) settings.gameplay = {};
         settings.gameplay.planarMode = !!enabled;
@@ -183,7 +184,8 @@ export function setupMenuGameplayBindings(ctx) {
                 settings,
                 HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
                 e?.target?.value,
-                'ship5'
+                'ship5',
+                { modePath: resolveCurrentHangarModePath() }
             );
             if (writeback.changed) {
                 emitSettingsChangedImmediate([keys.VEHICLES_PLAYER_1]);
@@ -196,7 +198,8 @@ export function setupMenuGameplayBindings(ctx) {
                 settings,
                 HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
                 e?.target?.value,
-                'ship5'
+                'ship5',
+                { modePath: resolveCurrentHangarModePath() }
             );
             if (writeback.changed) {
                 emitSettingsChangedImmediate([keys.VEHICLES_PLAYER_2]);
@@ -211,7 +214,9 @@ export function setupMenuGameplayBindings(ctx) {
         const resolvedMapKey = (selectedMapKey === CUSTOM_MAP_KEY || hasUiOption || gameplayConfig.MAPS[selectedMapKey])
             ? selectedMapKey
             : 'standard';
-        const writeback = writeHangarMapSelection(settings, resolvedMapKey, 'standard');
+        const writeback = writeHangarMapSelection(settings, resolvedMapKey, 'standard', {
+            modePath: resolveCurrentHangarModePath(),
+        });
         if (writeback.changed) {
             emitSettingsChangedImmediate([keys.MAP_KEY]);
         }

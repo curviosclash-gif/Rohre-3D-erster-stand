@@ -41,6 +41,8 @@ import {
 } from './start-setup/StartSetupValidationView.js';
 import {
     HANGAR_SELECTION_PLAYER_SLOTS,
+    readHangarMapSelection,
+    readHangarVehicleSelection,
     writeHangarMapSelection,
     writeHangarVehicleSelection,
 } from './hangar/HangarSelectionWritebackContract.js';
@@ -179,7 +181,9 @@ export class UIStartSyncController {
                 const currentStartSetup = ensureStartSetupLocalState(this.game.settings);
                 const selectedMapKey = String(this.ui.mapSelect.value || '').trim();
                 if (selectedMapKey) {
-                    writeHangarMapSelection(this.game.settings, selectedMapKey, selectedMapKey);
+                    writeHangarMapSelection(this.game.settings, selectedMapKey, selectedMapKey, {
+                        modePath: this._resolveHangarSelectionModePath(this.game.settings),
+                    });
                 }
                 pushRecentEntry(currentStartSetup.recentMaps, this.ui.mapSelect.value);
             });
@@ -190,7 +194,9 @@ export class UIStartSyncController {
                 writeHangarVehicleSelection(
                     this.game.settings,
                     HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
-                    this.ui.vehicleSelectP1.value
+                    this.ui.vehicleSelectP1.value,
+                    'ship5',
+                    { modePath: this._resolveHangarSelectionModePath(this.game.settings) }
                 );
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP1.value);
             });
@@ -201,7 +207,9 @@ export class UIStartSyncController {
                 writeHangarVehicleSelection(
                     this.game.settings,
                     HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
-                    this.ui.vehicleSelectP2.value
+                    this.ui.vehicleSelectP2.value,
+                    'ship5',
+                    { modePath: this._resolveHangarSelectionModePath(this.game.settings) }
                 );
                 pushRecentEntry(currentStartSetup.recentVehicles, this.ui.vehicleSelectP2.value);
             });
@@ -331,6 +339,10 @@ export class UIStartSyncController {
         return resolveModePathFallbackMapKey(maps, normalizedModePath, currentMapKey);
     }
 
+    _resolveHangarSelectionModePath(settings = this.game.settings) {
+        return this._resolveAllowedModePath(settings?.localSettings?.modePath || 'normal');
+    }
+
     // 64.3.1 macht die LAN-/Online-Wahl im Menu explizit; die produktive
     // Online-Lobby-Anbindung folgt erst in spaeteren V64-Phasen.
     _resolveMultiplayerTransportUiState(settings = this.game.settings) {
@@ -390,6 +402,7 @@ export class UIStartSyncController {
             maps: runtimeMaps,
         });
         const modePath = surfaceMenuState.modePath;
+        const hangarSelectionModePath = this._resolveHangarSelectionModePath(settings);
         const sessionType = surfaceMenuState.sessionType;
         const multiplayerTransportUiState = this._resolveMultiplayerTransportUiState(settings);
         const sessionContract = resolveRuntimeSessionContract({
@@ -433,7 +446,10 @@ export class UIStartSyncController {
         }
 
         if (this.ui.mapSelect) {
-            const previousValue = String(surfaceMenuState.mapKey || settings.mapKey || this.ui.mapSelect.value || 'standard');
+            const mapSelection = readHangarMapSelection(settings, 'standard', {
+                modePath: hangarSelectionModePath,
+            });
+            const previousValue = String(mapSelection.value || surfaceMenuState.mapKey || settings.mapKey || this.ui.mapSelect.value || 'standard');
             const fallbackMapKey = this._resolveSurfaceFallbackMapKey(runtimeMaps, modePath, previousValue);
             this.ui.mapSelect.innerHTML = '';
             this._mapPreviewEntries
@@ -473,7 +489,9 @@ export class UIStartSyncController {
                 ? previousValue
                 : this.ui.mapSelect.options[0].value;
             this.ui.mapSelect.value = resolvedMapKey;
-            writeHangarMapSelection(settings, resolvedMapKey, resolvedMapKey);
+            writeHangarMapSelection(settings, resolvedMapKey, resolvedMapKey, {
+                modePath: hangarSelectionModePath,
+            });
         }
         const effectiveMapKey = String(this.ui.mapSelect?.value || surfaceMenuState.mapKey || settings.mapKey || 'standard');
 
@@ -483,7 +501,13 @@ export class UIStartSyncController {
             return matchesSearch && matchesFilter;
         });
         if (this.ui.vehicleSelectP1) {
-            const currentValue = String(settings?.vehicles?.PLAYER_1 || this.ui.vehicleSelectP1.value || '');
+            const vehicleSelection = readHangarVehicleSelection(
+                settings,
+                HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
+                'ship5',
+                { modePath: hangarSelectionModePath }
+            );
+            const currentValue = String(vehicleSelection.value || this.ui.vehicleSelectP1.value || '');
             this.ui.vehicleSelectP1.innerHTML = '';
             vehicleCandidates.forEach((entry) => {
                 const option = document.createElement('option');
@@ -497,11 +521,18 @@ export class UIStartSyncController {
                 settings,
                 HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_1,
                 resolvedValue,
-                resolvedValue
+                resolvedValue,
+                { modePath: hangarSelectionModePath }
             );
         }
         if (this.ui.vehicleSelectP2) {
-            const currentValue = String(settings?.vehicles?.PLAYER_2 || this.ui.vehicleSelectP2.value || '');
+            const vehicleSelection = readHangarVehicleSelection(
+                settings,
+                HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
+                'ship5',
+                { modePath: hangarSelectionModePath }
+            );
+            const currentValue = String(vehicleSelection.value || this.ui.vehicleSelectP2.value || '');
             this.ui.vehicleSelectP2.innerHTML = '';
             vehicleCandidates.forEach((entry) => {
                 const option = document.createElement('option');
@@ -515,7 +546,8 @@ export class UIStartSyncController {
                 settings,
                 HANGAR_SELECTION_PLAYER_SLOTS.PLAYER_2,
                 resolvedValue,
-                resolvedValue
+                resolvedValue,
+                { modePath: hangarSelectionModePath }
             );
         }
 
