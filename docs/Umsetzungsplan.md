@@ -48,7 +48,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V98 | Settings Studio Browser-Demo Begrenzung | planned | P2 | frei | V77.99,V97.99 | 98.3 | `docs/plaene/aktiv/V98.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
-| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.4 | `docs/plaene/aktiv/V76.md` |
+| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.5 | `docs/plaene/aktiv/V76.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
 
