@@ -1,14 +1,14 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-20. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). Neuer geplanter Block: V98 (P2, abh. V77.99,V97.99). Naechste offene Bloecke: V98 (P2), V76 (P3, abh. V82.99), V75 (P3, abh. V64.99). Aktuelle Intake-Drafts: `docs/plaene/neu/`.
+Stand: 2026-04-22. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
+V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 wurde auf Phase 98.3 fortgeschrieben (P2, abh. V77.99,V97.99). Deep-Audit 2026-04-22 hat neue Follow-up-Pakete als P32-P40 im Backlog verankert; passende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V101).
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
 Neue oder geaenderte Intake-Entwuerfe entstehen weiter unter `docs/plaene/neu/`.
 Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
-Aktueller Intake-Draft aus dem Audit 2026-04-10: `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` (Vorschlag V90, noch nicht aktiv).
+Aktuelle Intake-Drafts aus den Audits 2026-04-10 bis 2026-04-22: `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` (Vorschlag V90), `docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` (Vorschlag V99), `docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` (Vorschlag V100), `docs/plaene/neu/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md` (Vorschlag V101); alle noch nicht aktiv.
 
 ## Externe Planquelle: Bot-Training
 
@@ -46,9 +46,9 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V98 | Settings Studio Browser-Demo Begrenzung | planned | P2 | frei | V77.99,V97.99 | 98.1 | `docs/plaene/aktiv/V98.md` |
+| V98 | Settings Studio Browser-Demo Begrenzung | planned | P2 | frei | V77.99,V97.99 | 98.3 | `docs/plaene/aktiv/V98.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
-| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.2 | `docs/plaene/aktiv/V76.md` |
+| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.4 | `docs/plaene/aktiv/V76.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
 
@@ -165,6 +165,15 @@ Keine offenen Review-Punkte mehr im V87-Scope; `V87` ist abgeschlossen und dient
 | P29 | `src/core/recording/DownloadService.js` | Fehlender Null-Guard fuer `downloadHandler` vor Browser-Adapter-Aufruf (Zeile 139); inkonsistente Warning-Akkumulation zwischen `api-throw`- und `api-failed`-Branches | mittel |
 | P30 | `src/shared/contracts/ArcadeMissionContract.js` | `getArcadeMissionRegistryDescriptor()` wird nur in Tests aufgerufen, nicht zur Laufzeit; API-Surface klaeren (behalten als Debug-/Introspection-API oder entfernen) | niedrig |
 | P31 | `tests/content-descriptor-registries.contract.test.mjs`, `tests/platform-capabilities.contract.test.mjs` | Keine Immutability-Tests fuer `Object.freeze()`-gesicherte Content-Descriptor-Registries und Surface-Policy-Objekte; Freeze-Verletzungen wuerden unbemerkt durchgehen | niedrig |
+| P32 | `server/lan-signaling.js` | `POST /lobby/join` ignoriert `maxPlayers`; Lobby kann ueber die konfigurierte Kapazitaet hinaus anwachsen (Folgeblock-Vorschlag: V99) | hoch |
+| P33 | `server/lan-signaling.js` | Mutierende LAN-Endpoints (`/lobby/ready`, `/lobby/invalidate-ready`, `/lobby/match-start`) sind nicht host-gebunden und koennen von Fremdclients getriggert werden (Folgeblock-Vorschlag: V99) | hoch |
+| P34 | `src/network/LANMatchLobby.js`, `src/network/LANSessionAdapter.js` | `setInterval(async ...)`-Polling ohne Inflight-/Abort-Guard; bei langsamen Netzpfaden drohen Request-Overlaps und Backlog (Folgeblock-Vorschlag: V99) | hoch |
+| P35 | `src/network/LANMatchLobby.js` | Host-`leave()` nutzt semantisch `POST /lobby/create` als Reset-Side-Effect statt explizitem Host-Leave-Shutdown-Pfad; Lifecycle-/Diagnosevertrag bleibt unscharf (Folgeblock-Vorschlag: V99) | mittel |
+| P36 | `src/ui/menu/testing/MenuMultiplayerPanel.js` | Discovery-Hostkarte rendert untrusted Hostdaten per `innerHTML`; LAN-Payload kann UI-Markup injizieren (Folgeblock-Vorschlag: V99) | hoch |
+| P37 | `electron/preload.cjs` | `ipcRenderer.sendSync('settings-defaults:read-override-sync')` blockiert den Renderer-Thread und erhoeht UI-Stall-Risiko bei I/O-Latenz (Folgeblock-Vorschlag: V99/V100) | mittel |
+| P38 | `src/ui/menu/MenuConfigShareOps.js` | `escape`/`unescape` in Code-Importpfad sind veraltet und fragil fuer Unicode-/Runtime-Kompatibilitaet (Folgeblock-Vorschlag: V99 oder V101) | mittel |
+| P39 | `src/shared/contracts/PlatformCapabilityRegistry.js`, `src/shared/contracts/BrowserDemoSurfacePolicyOverrideContract.js` | `npm run lint:architecture` scheitert an `max-lines`; zentrale Contract-Resolver sind zu gross und mischen Verantwortung (Folgeblock-Vorschlag: V101) | hoch |
+| P40 | `tsconfig.architecture.json`-Scope (u. a. `src/shared/contracts/*`, `src/ui/menu/*`, `src/state/*`, `src/core/*`) | `npm run typecheck:architecture` ist rot (107 Fehler: Globals, union/literal-Narrowing, `object`-Blindstellen, readonly/mutable-Mismatchs) (Folgeblock-Vorschlag: V101) | hoch |
 
 ## Conflict-Log
 
