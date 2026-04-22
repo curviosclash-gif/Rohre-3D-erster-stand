@@ -1,12 +1,14 @@
-﻿import { resolveMenuCatalogText } from '../menu/MenuTextCatalog.js';
+/* eslint-disable max-lines */
+import { resolveMenuCatalogText } from '../menu/MenuTextCatalog.js';
 import {
     loadVehicleProfiles,
     saveVehicleProfiles,
     getOrCreateProfile,
-    applyUpgrade,
+    evaluateUpgradePurchase,
+    purchaseUpgrade,
+    getSpendableUpgradeXp,
     xpToNextLevel,
 } from '../../state/arcade/ArcadeVehicleProfile.js';
-import { getUpgradeCost } from '../../entities/arcade/ArcadeBlueprintSchema.js';
 import {
     getVehicleManagerInteractionRules,
     listVehicleManagerCatalogEntries,
@@ -33,6 +35,39 @@ import {
 
 function t(textId, fallback) {
     return resolveMenuCatalogText(textId, fallback);
+}
+
+function describeUpgradeBlockReason(upgradeState) {
+    const state = upgradeState && typeof upgradeState === 'object' ? upgradeState : {};
+    const requiredLevel = Math.max(1, Number(state.requiredLevel) || 1);
+    const spendableXp = Math.max(0, Math.round(Number(state.spendableXp) || 0));
+    const cost = Math.max(0, Math.round(Number(state.cost) || 0));
+    switch (String(state.code || '')) {
+    case 'slot_locked':
+        return 'Slot noch nicht freigeschaltet';
+    case 'part_family_locked':
+        return 'Teilefamilie noch gesperrt';
+    case 'tier_locked':
+    case 'level_locked':
+        return `Tier erst ab Level ${requiredLevel}`;
+    case 'insufficient_xp':
+        return `Zu wenig Upgrade-XP (${spendableXp}/${cost})`;
+    case 'invalid_tier_sequence':
+        return 'Nur das naechste Tier ist erlaubt';
+    case 'cost_invalid':
+        return 'Upgrade-Kosten ungueltig';
+    default:
+        return 'Upgrade aktuell nicht verfuegbar';
+    }
+}
+
+function buildUpgradeTooltip(slotLabel, nextTier, upgradeState) {
+    const state = upgradeState && typeof upgradeState === 'object' ? upgradeState : {};
+    const cost = Math.max(0, Math.round(Number(state.cost) || 0));
+    if (state.ok) {
+        return `${slotLabel} -> ${nextTier} (${cost} XP)`;
+    }
+    return `${slotLabel}: ${describeUpgradeBlockReason(state)}`;
 }
 
 export function setupArcadeVehicleManager(ctx = {}) {
@@ -237,13 +272,15 @@ export function setupArcadeVehicleManager(ctx = {}) {
         const current = profile.upgrades?.[slotKey] || 'T1';
         const next = nextTier(current);
         if (!next) return;
-        const unlocked = new Set(profile.unlockedSlots || []);
-        const tierKey = `${slotKey}_${next.toLowerCase()}`;
-        const unlockedNow = unlocked.has(slotKey) || unlocked.has(tierKey);
-        if (!unlockedNow) return;
-        profiles[selectedVehicleId] = applyUpgrade(profile, slotKey, next);
+        const upgradeResult = purchaseUpgrade(profile, slotKey, next);
+        if (!upgradeResult.ok) {
+            toast(describeUpgradeBlockReason(upgradeResult), 'warning');
+            syncDisplay();
+            return;
+        }
+        profiles[selectedVehicleId] = upgradeResult.profile;
         persistProfiles();
-        toast(`${slotKey} -> ${next}`);
+        toast(`${slotKey} -> ${next} (-${upgradeResult.cost} XP)`);
         syncDisplay();
     };
 
@@ -252,6 +289,7 @@ export function setupArcadeVehicleManager(ctx = {}) {
         const selectedEntry = entryFor(selectedVehicleId);
         const profile = profileFor(selectedVehicleId);
         const xp = xpToNextLevel(profile);
+        const spendableUpgradeXp = getSpendableUpgradeXp(profile);
         const favorites = new Set(selection.getFavorites());
         const recents = new Set(selection.getRecents());
         const visible = selection.getVisibleEntries(profiles);
@@ -264,7 +302,7 @@ export function setupArcadeVehicleManager(ctx = {}) {
             detailBadges.appendChild(el('span', 'arcade-vehicle-badge', badge));
         });
 
-        levelLine.textContent = `Level ${profile.level} | XP ${xp.current}/${xp.required}`;
+        levelLine.textContent = `Level ${profile.level} | XP ${xp.current}/${xp.required} | Upgrade-XP ${spendableUpgradeXp}`;
         xpFill.style.width = `${(xp.progress * 100).toFixed(1)}%`;
         favoriteBtn.textContent = favorites.has(selectedVehicleId) ? 'Favorit entfernen' : 'Als Favorit markieren';
         favoriteBtn.classList.toggle('is-active', favorites.has(selectedVehicleId));
@@ -364,7 +402,6 @@ export function setupArcadeVehicleManager(ctx = {}) {
         refreshPresets(presetSelect.value);
 
         const overlayStates = [];
-        const unlocked = new Set(profile.unlockedSlots || []);
         for (let i = 0; i < UPGRADE_SLOT_DISPLAY.length; i += 1) {
             const slot = UPGRADE_SLOT_DISPLAY[i];
             const ref = slotRefs[slot.key];
@@ -377,10 +414,9 @@ export function setupArcadeVehicleManager(ctx = {}) {
                 overlayStates.push({ slotKey: slot.key, badge: 'MAX', disabled: true, label: ref.label, tooltip: `${ref.label} maxed` });
                 continue;
             }
-            const tierKey = `${slot.key}_${next.toLowerCase()}`;
-            const unlockedNow = unlocked.has(slot.key) || unlocked.has(tierKey);
-            const allowed = unlockedNow;
-            const cost = getUpgradeCost(slot.key, next);
+            const upgradeState = evaluateUpgradePurchase(profile, slot.key, next);
+            const allowed = upgradeState.ok;
+            const cost = Number.isFinite(upgradeState.cost) ? Math.round(upgradeState.cost) : 0;
             ref.btn.textContent = `${next} (${cost} XP)`;
             ref.btn.disabled = !allowed;
             overlayStates.push({
@@ -388,7 +424,7 @@ export function setupArcadeVehicleManager(ctx = {}) {
                 badge: current,
                 disabled: !allowed,
                 label: ref.label,
-                tooltip: unlockedNow ? `${ref.label} -> ${next} (${cost} XP)` : `${ref.label} noch nicht freigeschaltet`,
+                tooltip: buildUpgradeTooltip(ref.label, next, upgradeState),
             });
         }
 

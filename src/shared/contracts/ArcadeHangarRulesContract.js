@@ -72,6 +72,19 @@ export const ARCADE_HANGAR_TIER_UNLOCK_GATES = Object.freeze({
     T3: 20,
 });
 
+// --- Mastery Milestones ---
+// Milestones are used to expose long-term, deterministic progression checkpoints.
+
+export const ARCADE_HANGAR_MASTERY_MILESTONE_GATES = Object.freeze({
+    initiate: 1,
+    mechanic: 5,
+    tactician: 10,
+    specialist: 15,
+    architect: 20,
+    commander: 25,
+    legend: 30,
+});
+
 // --- Blueprint Limits per Level Band ---
 // Part budget, mass, power, heat, part count and hitbox allowance scale by band.
 
@@ -221,6 +234,19 @@ export function resolveArcadeHangarAllowedTiers(level) {
     return freezeList(allowed);
 }
 
+export function resolveArcadeHangarMasteryMilestones(level) {
+    const n = normalizeLevel(level);
+    const milestones = [];
+    const entries = Object.entries(ARCADE_HANGAR_MASTERY_MILESTONE_GATES);
+    for (let i = 0; i < entries.length; i += 1) {
+        const milestoneId = String(entries[i][0] || '').trim().toLowerCase();
+        const gate = Number(entries[i][1]) || 1;
+        if (!milestoneId) continue;
+        if (n >= gate) milestones.push(milestoneId);
+    }
+    return freezeList(milestones);
+}
+
 // --- Rule Resolution ---
 
 export function resolveArcadeHangarLevelBand(level) {
@@ -340,6 +366,25 @@ export function resolveArcadeHangarRulesForLevel(level) {
     });
 }
 
+export function resolveArcadeHangarProgressionSnapshot(level) {
+    const resolvedLevel = normalizeLevel(level);
+    const band = resolveArcadeHangarLevelBand(resolvedLevel);
+    const allowedPartFamilies = resolveArcadeHangarAllowedPartFamilies(resolvedLevel);
+    const allowedTiers = resolveArcadeHangarAllowedTiers(resolvedLevel);
+    const unlockedSlots = resolveArcadeHangarUnlockedSlots(resolvedLevel);
+    const masteryMilestones = resolveArcadeHangarMasteryMilestones(resolvedLevel);
+    return Object.freeze({
+        contractVersion: ARCADE_HANGAR_RULES_CONTRACT_VERSION,
+        level: resolvedLevel,
+        band: band.id,
+        bandLabel: band.label,
+        allowedPartFamilies,
+        allowedTiers,
+        unlockedSlots,
+        masteryMilestones,
+    });
+}
+
 export default {
     ARCADE_HANGAR_RULES_CONTRACT_VERSION,
     ARCADE_HANGAR_LEVEL_BANDS,
@@ -347,6 +392,7 @@ export default {
     ARCADE_HANGAR_SLOT_UNLOCK_GATES,
     ARCADE_HANGAR_PART_FAMILY_UNLOCK_GATES,
     ARCADE_HANGAR_TIER_UNLOCK_GATES,
+    ARCADE_HANGAR_MASTERY_MILESTONE_GATES,
     ARCADE_HANGAR_BLUEPRINT_LIMITS_BY_BAND,
     ARCADE_HANGAR_BUDGET_BY_BAND,
     resolveArcadeHangarLevelBand,
@@ -355,8 +401,10 @@ export default {
     resolveArcadeHangarAllowedChassis,
     resolveArcadeHangarAllowedPartFamilies,
     resolveArcadeHangarAllowedTiers,
+    resolveArcadeHangarMasteryMilestones,
     resolveArcadeHangarUnlockedSlots,
     resolveArcadeHangarPartFamily,
     validateArcadeHangarBlueprintForLevel,
     resolveArcadeHangarRulesForLevel,
+    resolveArcadeHangarProgressionSnapshot,
 };
