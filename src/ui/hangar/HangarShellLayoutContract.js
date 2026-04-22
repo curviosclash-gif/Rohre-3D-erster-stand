@@ -9,6 +9,7 @@ import {
     HANGAR_SELECTION_WRITEBACK_VERSION,
 } from './HangarSelectionWritebackContract.js';
 import { resolveHangarWorkshopModule } from './HangarWorkshopModuleContract.js';
+import { resolveHangarWorkshopPersistenceCapabilities } from './HangarWorkshopPersistenceFacade.js';
 
 export const HANGAR_SHELL_LAYOUT_VERSION = 'hangar-shell-layout.v1';
 
@@ -156,6 +157,7 @@ export function resolveHangarShellLayout(rawMode) {
     const mode = resolveHangarMode(flow.mode);
     const desktopLoop = resolveHangarDesktopLoop(mode);
     const workshopModule = resolveHangarWorkshopModule(mode);
+    const workshopPersistenceCapabilities = resolveHangarWorkshopPersistenceCapabilities(mode);
     return Object.freeze({
         contractVersion: HANGAR_SHELL_LAYOUT_VERSION,
         mode,
@@ -193,6 +195,9 @@ export function resolveHangarShellLayout(rawMode) {
                 ...workshopModule,
                 capabilities: Object.freeze({ ...(workshopModule.capabilities || {}) }),
             })
+            : null,
+        workshopPersistenceCapabilities: workshopPersistenceCapabilities
+            ? Object.freeze({ ...workshopPersistenceCapabilities })
             : null,
         selectionWriteback: Object.freeze({
             source: 'start-setup',
