@@ -1,4 +1,9 @@
 import { fieldLabel, categoryLabel, translateValidationError } from './settings-studio-i18n.js';
+import {
+    PLATFORM_CAPABILITY_REGISTRY,
+    PLATFORM_PRODUCT_SURFACE_IDS,
+} from '../../../src/shared/contracts/PlatformCapabilityData.js';
+import { PLATFORM_CAPABILITY_IDS } from '../../../src/shared/contracts/PlatformCapabilityContract.js';
 
 function readPath(obj, path) {
     const parts = String(path || '').split('.');
@@ -12,6 +17,177 @@ function readPath(obj, path) {
 
 function esc(value) {
     return String(value ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function isPlainObject(value) {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+    const prototype = Object.getPrototypeOf(value);
+    return prototype === Object.prototype || prototype === null;
+}
+
+function toUniqueStringArray(values) {
+    if (!Array.isArray(values)) {
+        return [];
+    }
+    const seen = new Set();
+    const normalized = [];
+    values.forEach((entry) => {
+        const value = String(entry ?? '').trim().toLowerCase();
+        if (!value || seen.has(value)) return;
+        seen.add(value);
+        normalized.push(value);
+    });
+    return normalized;
+}
+
+function resolveEffectiveSelection(baseValues, overrideValues) {
+    const base = toUniqueStringArray(baseValues);
+    if (!Array.isArray(overrideValues)) {
+        return base;
+    }
+    const allowed = new Set(toUniqueStringArray(overrideValues));
+    return base.filter((entry) => allowed.has(entry));
+}
+
+function formatTokenLabel(value) {
+    return String(value || '')
+        .split(/[_-]+/g)
+        .filter(Boolean)
+        .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
+        .join('');
+}
+
+function resolveEnumLabel(prefix, value, t) {
+    const key = `${prefix}${formatTokenLabel(value)}`;
+    const label = t(key);
+    return label !== key ? label : value;
+}
+
+function resolveCapabilityBaseEnabled(spec) {
+    if (isPlainObject(spec)) {
+        if (Object.prototype.hasOwnProperty.call(spec, 'enabled')) {
+            return spec.enabled === true;
+        }
+        return String(spec.available || 'unavailable').toLowerCase() !== 'unavailable';
+    }
+    return String(spec || 'unavailable').toLowerCase() !== 'unavailable';
+}
+
+function renderPolicyCheckboxRow({
+    group,
+    value,
+    checked,
+    label,
+    disabled = false,
+    modePath = '',
+}) {
+    const modeAttr = modePath ? ` data-browser-demo-mode-path="${esc(modePath)}"` : '';
+    const checkedAttr = checked ? ' checked' : '';
+    const disabledAttr = disabled ? ' disabled' : '';
+    return `<label class="browser-demo-checkbox"><input type="checkbox" data-browser-demo-group="${esc(group)}" data-browser-demo-value="${esc(value)}"${modeAttr}${checkedAttr}${disabledAttr} /><span>${esc(label)}</span></label>`;
+}
+
+function renderBrowserDemoPolicyGroup({ title, group, baseValues, selectedValues, t, labelPrefix }) {
+    const selectedSet = new Set(selectedValues);
+    const rows = baseValues.map((value) => renderPolicyCheckboxRow({
+        group,
+        value,
+        checked: selectedSet.has(value),
+        label: resolveEnumLabel(labelPrefix, value, t),
+    }));
+    return `<div class="browser-demo-group"><h4 class="browser-demo-group__title">${esc(title)}</h4><div class="browser-demo-checkbox-list">${rows.join('')}</div></div>`;
+}
+
+function renderBrowserDemoCapabilityGroup(baseCapabilities, draftCapabilityFlags, t) {
+    const capabilities = Object.values(PLATFORM_CAPABILITY_IDS);
+    const rows = capabilities.map((capabilityId) => {
+        const baseEnabled = resolveCapabilityBaseEnabled(baseCapabilities[capabilityId]);
+        const overrideEntry = isPlainObject(draftCapabilityFlags?.[capabilityId]) ? draftCapabilityFlags[capabilityId] : null;
+        const checked = baseEnabled && overrideEntry?.enabled !== false;
+        const label = t(`browserDemoCapability${formatTokenLabel(capabilityId)}`);
+        const lockText = !baseEnabled ? `<small class="browser-demo-lock-note">${esc(t('browserDemoLockedByBase'))}</small>` : '';
+        return `<label class="browser-demo-checkbox browser-demo-checkbox--capability">
+            <input type="checkbox" data-browser-demo-capability="${esc(capabilityId)}" data-browser-demo-base-enabled="${baseEnabled ? 'true' : 'false'}" ${checked ? 'checked' : ''} ${baseEnabled ? '' : 'disabled'} />
+            <span>${esc(label !== `browserDemoCapability${formatTokenLabel(capabilityId)}` ? label : capabilityId)}</span>
+            ${lockText}
+        </label>`;
+    });
+    return `<div class="browser-demo-group"><h4 class="browser-demo-group__title">${esc(t('browserDemoCapabilitySection'))}</h4><div class="browser-demo-checkbox-list">${rows.join('')}</div></div>`;
+}
+
+function renderBrowserDemoCuratedMapsGroup({
+    baseModePaths,
+    selectedModePaths,
+    baseCuratedMaps,
+    draftCuratedMaps,
+    t,
+}) {
+    const selectedModeSet = new Set(selectedModePaths);
+    const modeGroups = baseModePaths.map((modePath) => {
+        const modeLabel = resolveEnumLabel('browserDemoModePath', modePath, t);
+        const mapKeys = toUniqueStringArray(baseCuratedMaps?.[modePath]);
+        if (!mapKeys.length) {
+            return `<div class="browser-demo-group browser-demo-group--curated">
+                <h4 class="browser-demo-group__title">${esc(t('browserDemoCuratedMapsLabel', modeLabel))}</h4>
+                <p class="browser-demo-note">${esc(t('browserDemoNoCuratedMaps'))}</p>
+            </div>`;
+        }
+        const selectedMapKeys = resolveEffectiveSelection(mapKeys, draftCuratedMaps?.[modePath]);
+        const selectedSet = new Set(selectedMapKeys);
+        const modeEnabled = selectedModeSet.has(modePath);
+        const rows = mapKeys.map((mapKey) => renderPolicyCheckboxRow({
+            group: 'curatedMapKeysByModePath',
+            modePath,
+            value: mapKey,
+            checked: selectedSet.has(mapKey),
+            disabled: !modeEnabled,
+            label: mapKey,
+        }));
+        return `<div class="browser-demo-group browser-demo-group--curated">
+            <h4 class="browser-demo-group__title">${esc(t('browserDemoCuratedMapsLabel', modeLabel))}</h4>
+            <div class="browser-demo-checkbox-list">${rows.join('')}</div>
+        </div>`;
+    });
+    return `<div class="browser-demo-card">
+        <h3 class="browser-demo-card__title">${esc(t('browserDemoCuratedMapsSection'))}</h3>
+        ${modeGroups.join('')}
+    </div>`;
+}
+
+function renderBrowserDemoValidationSummary(validation, t) {
+    const errors = Array.isArray(validation?.errors) ? validation.errors : [];
+    const warnings = Array.isArray(validation?.warnings) ? validation.warnings : [];
+    if (!errors.length && !warnings.length) {
+        return '';
+    }
+
+    const errorItems = errors
+        .map((entry) => `<span class="field-error">${esc(translateValidationError(entry, t))}</span>`)
+        .join('');
+    const warningItems = warnings
+        .map((entry) => `<span class="field-error browser-demo-validation__warning">${esc(translateValidationError(entry, t))}</span>`)
+        .join('');
+
+    const errorBlock = errors.length
+        ? `<div class="browser-demo-validation__block">
+            <p class="browser-demo-validation__label">${esc(t('browserDemoValidationErrors'))}</p>
+            <div class="field-error-list">${errorItems}</div>
+        </div>`
+        : '';
+    const warningBlock = warnings.length
+        ? `<div class="browser-demo-validation__block">
+            <p class="browser-demo-validation__label">${esc(t('browserDemoValidationWarnings'))}</p>
+            <div class="field-error-list">${warningItems}</div>
+        </div>`
+        : '';
+
+    return `<div class="browser-demo-validation">
+        <p class="browser-demo-validation__title">${esc(t('browserDemoValidationTitle'))}</p>
+        ${errorBlock}
+        ${warningBlock}
+    </div>`;
 }
 
 function isDirty(draft, baseDraft, path) {
@@ -191,6 +367,105 @@ export function renderLimitsSection(schema, draft, baseDraft, t) {
     });
 
     return `<table class="limits-table"><thead><tr><th>${t('limitsColField')}</th><th>${t('limitsColDefault')}</th><th>${t('limitsColMin')}</th><th>${t('limitsColMax')}</th><th>${t('limitsColStep')}</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+}
+
+export function renderBrowserDemoPolicySection(browserDemoDraft, t, validation = null) {
+    const browserProduct = PLATFORM_CAPABILITY_REGISTRY?.products?.[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO] || {};
+    const basePolicy = isPlainObject(browserProduct.surfacePolicy) ? browserProduct.surfacePolicy : {};
+    const baseCapabilities = isPlainObject(browserProduct.capabilities) ? browserProduct.capabilities : {};
+    const draftPolicy = isPlainObject(browserDemoDraft?.policy) ? browserDemoDraft.policy : {};
+    const draftCapabilityFlags = isPlainObject(browserDemoDraft?.capabilityFlags) ? browserDemoDraft.capabilityFlags : {};
+
+    const sessionTypes = toUniqueStringArray(basePolicy.allowedSessionTypes);
+    const modePaths = toUniqueStringArray(basePolicy.allowedModePaths);
+    const presetIds = toUniqueStringArray(basePolicy.allowedPresetIds);
+    const allowedTransports = toUniqueStringArray(basePolicy.allowedMultiplayerTransports);
+    const hostTransportsBase = toUniqueStringArray(basePolicy.hostMultiplayerTransports)
+        .filter((transport) => allowedTransports.includes(transport));
+    const joinTransportsBase = toUniqueStringArray(basePolicy.joinMultiplayerTransports)
+        .filter((transport) => allowedTransports.includes(transport));
+
+    const selectedSessionTypes = resolveEffectiveSelection(sessionTypes, draftPolicy.allowedSessionTypes);
+    const selectedModePaths = resolveEffectiveSelection(modePaths, draftPolicy.allowedModePaths);
+    const selectedPresetIds = resolveEffectiveSelection(presetIds, draftPolicy.allowedPresetIds);
+    const selectedAllowedTransports = resolveEffectiveSelection(allowedTransports, draftPolicy.allowedMultiplayerTransports);
+
+    const hostBaseWithinAllowed = hostTransportsBase.filter((transport) => selectedAllowedTransports.includes(transport));
+    const joinBaseWithinAllowed = joinTransportsBase.filter((transport) => selectedAllowedTransports.includes(transport));
+    const selectedHostTransports = resolveEffectiveSelection(hostBaseWithinAllowed, draftPolicy.hostMultiplayerTransports);
+    const selectedJoinTransports = resolveEffectiveSelection(joinBaseWithinAllowed, draftPolicy.joinMultiplayerTransports);
+
+    const policyGroups = [
+        renderBrowserDemoPolicyGroup({
+            title: t('browserDemoSessionTypesLabel'),
+            group: 'allowedSessionTypes',
+            baseValues: sessionTypes,
+            selectedValues: selectedSessionTypes,
+            t,
+            labelPrefix: 'browserDemoSessionType',
+        }),
+        renderBrowserDemoPolicyGroup({
+            title: t('browserDemoModePathsLabel'),
+            group: 'allowedModePaths',
+            baseValues: modePaths,
+            selectedValues: selectedModePaths,
+            t,
+            labelPrefix: 'browserDemoModePath',
+        }),
+        renderBrowserDemoPolicyGroup({
+            title: t('browserDemoPresetIdsLabel'),
+            group: 'allowedPresetIds',
+            baseValues: presetIds,
+            selectedValues: selectedPresetIds,
+            t,
+            labelPrefix: 'browserDemoPresetId',
+        }),
+        renderBrowserDemoPolicyGroup({
+            title: t('browserDemoAllowedTransportsLabel'),
+            group: 'allowedMultiplayerTransports',
+            baseValues: allowedTransports,
+            selectedValues: selectedAllowedTransports,
+            t,
+            labelPrefix: 'browserDemoTransport',
+        }),
+        renderBrowserDemoPolicyGroup({
+            title: t('browserDemoHostTransportsLabel'),
+            group: 'hostMultiplayerTransports',
+            baseValues: hostBaseWithinAllowed,
+            selectedValues: selectedHostTransports,
+            t,
+            labelPrefix: 'browserDemoTransport',
+        }),
+        renderBrowserDemoPolicyGroup({
+            title: t('browserDemoJoinTransportsLabel'),
+            group: 'joinMultiplayerTransports',
+            baseValues: joinBaseWithinAllowed,
+            selectedValues: selectedJoinTransports,
+            t,
+            labelPrefix: 'browserDemoTransport',
+        }),
+    ];
+
+    const curatedMaps = renderBrowserDemoCuratedMapsGroup({
+        baseModePaths: modePaths,
+        selectedModePaths,
+        baseCuratedMaps: basePolicy.curatedMapKeysByModePath,
+        draftCuratedMaps: draftPolicy.curatedMapKeysByModePath,
+        t,
+    });
+    const validationSummary = renderBrowserDemoValidationSummary(validation, t);
+
+    return `<div class="browser-demo-editor">
+        <div class="browser-demo-note browser-demo-note--guardrail">${esc(t('browserDemoGuardrailNote'))}</div>
+        <div class="browser-demo-note">${esc(t('browserDemoConstraintNote'))}</div>
+        ${validationSummary}
+        <div class="browser-demo-card">
+            <h3 class="browser-demo-card__title">${esc(t('browserDemoPolicySection'))}</h3>
+            ${policyGroups.join('')}
+        </div>
+        ${renderBrowserDemoCapabilityGroup(baseCapabilities, draftCapabilityFlags, t)}
+        ${curatedMaps}
+    </div>`;
 }
 
 export function countSectionDirtyFields(sectionKey, schema, draft, baseDraft) {

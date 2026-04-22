@@ -11,7 +11,7 @@ const settingsStudioApi = Object.freeze({
     contractVersion: SETTINGS_STUDIO_PRELOAD_CONTRACT_VERSION,
     load: () => invoke('settings-studio:load'),
     validate: (draft) => invoke('settings-studio:validate', draft),
-    save: (draft) => invoke('settings-studio:save', draft),
+    save: (draft, browserDemoPolicyDraft = null) => invoke('settings-studio:save', draft, browserDemoPolicyDraft),
     listBackups: (options = {}) => invoke('settings-studio:list-backups', options),
     restoreBackup: (backupFileName) => invoke('settings-studio:restore-backup', backupFileName),
     getSchema: () => invoke('settings-studio:get-schema'),

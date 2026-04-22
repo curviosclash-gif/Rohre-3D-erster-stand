@@ -9,6 +9,7 @@ import {
     createElectronPreloadDiscoveryAdapter,
     createElectronPreloadSaveAdapter,
 } from '../src/platform/electron/ElectronPlatformBridge.js';
+import { BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION } from '../src/shared/contracts/BrowserDemoSurfacePolicyOverrideContract.js';
 import {
     PLATFORM_CAPABILITY_IDS,
 } from '../src/shared/contracts/PlatformCapabilityContract.js';
@@ -150,6 +151,103 @@ test('V77.2.1 surface policy contract keeps desktop default-full and browser def
     assert.deepEqual(browserPolicy.allowedPresetIds, ['arcade', 'fight-standard', 'normal-standard']);
     assert.deepEqual(browserPolicy.curatedMapKeysByModePath.arcade, ['parcours_rift']);
     assert.equal(browserPolicy.allowedModePaths.includes(PLATFORM_SURFACE_MENU_MODE_PATHS.QUICK_ACTION), false);
+});
+
+test('V98.2.1 resolveSurfacePolicy applies browser-demo override clamp centrally in the registry resolver', () => {
+    const browserPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        browserDemoSurfacePolicyOverrideDraft: {
+            contractVersion: BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+            policy: {
+                allowedSessionTypes: ['single', 'splitscreen'],
+                allowedModePaths: ['fight', 'quick_action'],
+                allowedPresetIds: ['fight-standard', 'future-preset'],
+                allowedMultiplayerTransports: ['online'],
+                joinMultiplayerTransports: ['online'],
+            },
+        },
+    });
+
+    assert.deepEqual(browserPolicy.allowedSessionTypes, ['single']);
+    assert.deepEqual(browserPolicy.allowedModePaths, ['fight']);
+    assert.equal(browserPolicy.defaultModePath, 'fight');
+    assert.deepEqual(browserPolicy.allowedPresetIds, ['fight-standard']);
+    assert.deepEqual(browserPolicy.allowedMultiplayerTransports, []);
+    assert.deepEqual(browserPolicy.joinMultiplayerTransports, []);
+    assert.equal(browserPolicy.browserDemoOverrideDiagnostics.status, 'applied');
+    assert.equal(browserPolicy.browserDemoOverrideDiagnostics.reasonCode, 'BROWSER_DEMO_OVERRIDE_APPLIED');
+    assert.equal(browserPolicy.browserDemoOverrideDiagnostics.source, 'options');
+});
+
+test('V98.2.2 PlatformSurfacePolicyOps consumers read the same merged browser-demo state without custom override branches', () => {
+    const overrideOptions = {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        browserDemoSurfacePolicyOverrideDraft: {
+            contractVersion: BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+            policy: {
+                allowedModePaths: ['fight'],
+                allowedMultiplayerTransports: ['online'],
+                joinMultiplayerTransports: ['online'],
+            },
+        },
+    };
+
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.FIGHT, overrideOptions), true);
+    assert.equal(isSurfaceModePathAllowed(PLATFORM_SURFACE_MENU_MODE_PATHS.ARCADE, overrideOptions), false);
+
+    const joinGate = resolveSurfaceMultiplayerGateAccess('join', overrideOptions);
+    assert.equal(joinGate.allowed, false);
+    assert.equal(joinGate.reason, 'surface_join_no_transport');
+});
+
+test('V98.2.3 resolveSurfaceCapabilityAccess narrows availability via capability flags and exposes structured diagnostics', () => {
+    const saveCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        browserDemoSurfacePolicyOverrideDraft: {
+            contractVersion: BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+            capabilityFlags: {
+                save: false,
+            },
+        },
+    });
+
+    assert.equal(saveCapability.available, false);
+    assert.equal(saveCapability.providerKind, PLATFORM_PROVIDER_KINDS.BROWSER_DEMO);
+    assert.equal(saveCapability.browserDemoOverrideDiagnostics.status, 'applied');
+    assert.equal(saveCapability.browserDemoOverrideDiagnostics.reasonCode, 'BROWSER_DEMO_OVERRIDE_APPLIED');
+    assert.equal(saveCapability.browserDemoOverrideDiagnostics.source, 'options');
+});
+
+test('V98.2.3 override diagnostics report fallback and reject reason-codes for browser-demo resolver paths', () => {
+    const fallbackPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        browserDemoSurfacePolicyOverrideDraft: {
+            contractVersion: 'browser-demo-surface-policy.v9',
+            policy: {
+                allowedModePaths: ['fight'],
+            },
+        },
+    });
+    assert.equal(fallbackPolicy.browserDemoOverrideDiagnostics.status, 'fallback');
+    assert.equal(
+        fallbackPolicy.browserDemoOverrideDiagnostics.reasonCode,
+        'BROWSER_DEMO_OVERRIDE_FALLBACK_VERSION_UNKNOWN'
+    );
+
+    const rejectedPolicy = resolveSurfacePolicy({
+        productSurfaceId: PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO,
+        browserDemoSurfacePolicyOverrideDraft: {
+            contractVersion: BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+            policy: {
+                unknownPolicyField: true,
+            },
+        },
+    });
+    assert.equal(rejectedPolicy.browserDemoOverrideDiagnostics.status, 'reject');
+    assert.equal(
+        rejectedPolicy.browserDemoOverrideDiagnostics.reasonCode,
+        'BROWSER_DEMO_OVERRIDE_VALIDATION_FAILED'
+    );
 });
 
 test('V77.4.1 default lobby transport follows the shared surface transport matrix', () => {

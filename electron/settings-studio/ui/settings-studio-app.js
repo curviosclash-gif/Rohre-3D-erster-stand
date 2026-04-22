@@ -3,13 +3,27 @@ import {
     renderSectionForm,
     renderPresetsSection,
     renderLimitsSection,
+    renderBrowserDemoPolicySection,
     countSectionDirtyFields,
 } from './settings-studio-form-renderer.js';
+import {
+    createBrowserDemoSurfacePolicyOverrideDraft,
+    mergeBrowserDemoSurfacePolicyWithOverride,
+    validateBrowserDemoSurfacePolicyOverrideDraft,
+} from '../../../src/shared/contracts/BrowserDemoSurfacePolicyOverrideContract.js';
+import {
+    PLATFORM_CAPABILITY_REGISTRY,
+    PLATFORM_PRODUCT_SURFACE_IDS,
+} from '../../../src/shared/contracts/PlatformCapabilityData.js';
+import { PLATFORM_CAPABILITY_IDS } from '../../../src/shared/contracts/PlatformCapabilityContract.js';
 
 const state = {
     language: 'de',
     draft: null,
     baseDraft: null,
+    browserDemoPolicyDraft: null,
+    browserDemoPolicyBaseDraft: null,
+    browserDemoPolicyValidation: null,
     schema: null,
     validation: null,
     paths: null,
@@ -45,6 +59,22 @@ const refs = {
 
 let infoPanelReturnFocusEl = null;
 
+const BROWSER_DEMO_POLICY_PREVIEW_FIELDS = Object.freeze([
+    { key: 'allowedSessionTypes', labelKey: 'browserDemoSessionTypesLabel', riskLevel: 'high' },
+    { key: 'allowedModePaths', labelKey: 'browserDemoModePathsLabel', riskLevel: 'high' },
+    { key: 'allowedPresetIds', labelKey: 'browserDemoPresetIdsLabel', riskLevel: 'medium' },
+    { key: 'allowedMultiplayerTransports', labelKey: 'browserDemoAllowedTransportsLabel', riskLevel: 'high' },
+    { key: 'hostMultiplayerTransports', labelKey: 'browserDemoHostTransportsLabel', riskLevel: 'medium' },
+    { key: 'joinMultiplayerTransports', labelKey: 'browserDemoJoinTransportsLabel', riskLevel: 'medium' },
+]);
+
+const BROWSER_DEMO_CAPABILITY_RISK_LEVELS = Object.freeze({
+    discovery: 'medium',
+    host: 'high',
+    save: 'high',
+    recording: 'medium',
+});
+
 function t(key, ...args) {
     return createTranslator(state.language)(key, ...args);
 }
@@ -59,6 +89,84 @@ function publishDirtyState() {
 
 function deepClone(v) {
     return JSON.parse(JSON.stringify(v));
+}
+
+function isPlainObject(value) {
+    if (!value || typeof value !== 'object') return false;
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+}
+
+function createBrowserDemoPolicySeed() {
+    return deepClone(createBrowserDemoSurfacePolicyOverrideDraft());
+}
+
+function ensureBrowserDemoPolicyDraft() {
+    if (!isPlainObject(state.browserDemoPolicyDraft)) {
+        state.browserDemoPolicyDraft = createBrowserDemoPolicySeed();
+    }
+    if (!isPlainObject(state.browserDemoPolicyDraft.policy)) {
+        state.browserDemoPolicyDraft.policy = {};
+    }
+    if (!isPlainObject(state.browserDemoPolicyDraft.capabilityFlags)) {
+        state.browserDemoPolicyDraft.capabilityFlags = {};
+    }
+    return state.browserDemoPolicyDraft;
+}
+
+function createBrowserDemoValidationSnapshot(validationResult) {
+    const result = validationResult || {};
+    return {
+        valid: result.valid === true,
+        errors: Array.isArray(result.errors) ? result.errors : [],
+        warnings: Array.isArray(result.warnings) ? result.warnings : [],
+    };
+}
+
+function formatTokenLabel(value) {
+    return String(value || '')
+        .split(/[_-]+/g)
+        .filter(Boolean)
+        .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
+        .join('');
+}
+
+function resolveBrowserDemoEnumLabel(prefix, value) {
+    const translationKey = `${prefix}${formatTokenLabel(value)}`;
+    const translated = t(translationKey);
+    return translated !== translationKey ? translated : value;
+}
+
+function resolveBrowserDemoBaseProduct() {
+    const product = PLATFORM_CAPABILITY_REGISTRY?.products?.[PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO] || {};
+    return {
+        surfacePolicy: isPlainObject(product.surfacePolicy) ? product.surfacePolicy : {},
+        capabilities: isPlainObject(product.capabilities) ? product.capabilities : {},
+    };
+}
+
+function resolveBrowserDemoMergedProjection(rawDraft) {
+    const baseProduct = resolveBrowserDemoBaseProduct();
+    return mergeBrowserDemoSurfacePolicyWithOverride(
+        baseProduct.surfacePolicy,
+        baseProduct.capabilities,
+        rawDraft
+    );
+}
+
+function validateBrowserDemoPolicyDraft() {
+    const draft = ensureBrowserDemoPolicyDraft();
+    const validation = validateBrowserDemoSurfacePolicyOverrideDraft(draft);
+    state.browserDemoPolicyDraft = deepClone(validation.normalizedDraft);
+    state.browserDemoPolicyValidation = createBrowserDemoValidationSnapshot(validation);
+    return state.browserDemoPolicyValidation;
+}
+
+function countSectionDirty(sectionKey) {
+    if (sectionKey === 'browserDemoPolicy') {
+        return JSON.stringify(state.browserDemoPolicyDraft || {}) !== JSON.stringify(state.browserDemoPolicyBaseDraft || {}) ? 1 : 0;
+    }
+    return countSectionDirtyFields(sectionKey, state.schema, state.draft, state.baseDraft);
 }
 
 function readPath(obj, path) {
@@ -158,7 +266,7 @@ function renderSidebar() {
         const label = t(section.labelKey);
         const active = section.key === state.activeSection ? 'active' : '';
         const dirtyCount = !section.noDirty && state.draft && state.baseDraft
-            ? countSectionDirtyFields(section.key, state.schema, state.draft, state.baseDraft)
+            ? countSectionDirty(section.key)
             : 0;
         const dirtyDot = dirtyCount > 0 ? '<span class="nav-dirty" aria-hidden="true"></span>' : '';
         const ariaSelected = section.key === state.activeSection ? 'true' : 'false';
@@ -180,6 +288,7 @@ function renderFormContent() {
         baseSettings: 'sectionHintBaseSettings',
         configShare: 'sectionHintConfigShare',
         limits: 'sectionHintLimits',
+        browserDemoPolicy: 'sectionHintBrowserDemoPolicy',
     };
     const hintKey = hintKeyBySection[state.activeSection] || '';
     if (refs.sectionHint) {
@@ -197,6 +306,12 @@ function renderFormContent() {
     let html;
     if (state.activeSection === 'limits') {
         html = renderLimitsSection(state.schema, state.draft, state.baseDraft, translator);
+    } else if (state.activeSection === 'browserDemoPolicy') {
+        html = renderBrowserDemoPolicySection(
+            state.browserDemoPolicyDraft,
+            translator,
+            state.browserDemoPolicyValidation
+        );
     } else if (state.activeSection === 'fixedPresets') {
         html = renderPresetsSection(state.draft, state.baseDraft, translator);
     } else if (state.activeSection === 'backups') {
@@ -206,6 +321,9 @@ function renderFormContent() {
     }
 
     refs.formContent.innerHTML = html;
+    const backupsSectionActive = state.activeSection === 'backups';
+    refs.validateBtn.disabled = backupsSectionActive;
+    refs.saveBtn.disabled = backupsSectionActive;
     updateChangeBadge();
 }
 
@@ -215,7 +333,7 @@ function updateChangeBadge() {
         publishDirtyState();
         return;
     }
-    const count = countSectionDirtyFields(state.activeSection, state.schema, state.draft, state.baseDraft);
+    const count = countSectionDirty(state.activeSection);
     if (count > 0) {
         refs.changeBadge.textContent = t('changeBadge', count);
         refs.changeBadge.hidden = false;
@@ -368,6 +486,77 @@ function collectDirtyFields() {
         }
     }
 
+    const browserDemoProjectionCurrent = resolveBrowserDemoMergedProjection(state.browserDemoPolicyDraft);
+    const browserDemoProjectionBase = resolveBrowserDemoMergedProjection(state.browserDemoPolicyBaseDraft);
+    const currentPolicy = browserDemoProjectionCurrent?.policy || {};
+    const basePolicy = browserDemoProjectionBase?.policy || {};
+
+    BROWSER_DEMO_POLICY_PREVIEW_FIELDS.forEach((meta) => {
+        const current = currentPolicy[meta.key];
+        const base = basePolicy[meta.key];
+        if (JSON.stringify(current) === JSON.stringify(base)) {
+            return;
+        }
+        dirty.push({
+            field: {
+                path: `browserDemoPolicy.policy.${meta.key}`,
+                section: 'browserDemoPolicy',
+                riskLevel: meta.riskLevel,
+                previewLabel: t(meta.labelKey),
+            },
+            current,
+            base,
+        });
+    });
+
+    const currentCurated = isPlainObject(currentPolicy.curatedMapKeysByModePath)
+        ? currentPolicy.curatedMapKeysByModePath
+        : {};
+    const baseCurated = isPlainObject(basePolicy.curatedMapKeysByModePath)
+        ? basePolicy.curatedMapKeysByModePath
+        : {};
+    const curatedModePaths = new Set([...Object.keys(baseCurated), ...Object.keys(currentCurated)]);
+    curatedModePaths.forEach((modePath) => {
+        const current = Array.isArray(currentCurated[modePath]) ? currentCurated[modePath] : [];
+        const base = Array.isArray(baseCurated[modePath]) ? baseCurated[modePath] : [];
+        if (JSON.stringify(current) === JSON.stringify(base)) {
+            return;
+        }
+        const modeLabel = resolveBrowserDemoEnumLabel('browserDemoModePath', modePath);
+        dirty.push({
+            field: {
+                path: `browserDemoPolicy.policy.curatedMapKeysByModePath.${modePath}`,
+                section: 'browserDemoPolicy',
+                riskLevel: 'medium',
+                previewLabel: t('browserDemoCuratedMapsLabel', modeLabel),
+            },
+            current,
+            base,
+        });
+    });
+
+    const currentCapabilities = browserDemoProjectionCurrent?.capabilityFlags || {};
+    const baseCapabilities = browserDemoProjectionBase?.capabilityFlags || {};
+    Object.values(PLATFORM_CAPABILITY_IDS).forEach((capabilityId) => {
+        const current = currentCapabilities[capabilityId] === true;
+        const base = baseCapabilities[capabilityId] === true;
+        if (current === base) {
+            return;
+        }
+        const labelKey = `browserDemoCapability${formatTokenLabel(capabilityId)}`;
+        const translatedLabel = t(labelKey);
+        dirty.push({
+            field: {
+                path: `browserDemoPolicy.capabilityFlags.${capabilityId}.enabled`,
+                section: 'browserDemoPolicy',
+                riskLevel: BROWSER_DEMO_CAPABILITY_RISK_LEVELS[capabilityId] || 'medium',
+                previewLabel: translatedLabel !== labelKey ? translatedLabel : capabilityId,
+            },
+            current,
+            base,
+        });
+    });
+
     return dirty;
 }
 
@@ -378,7 +567,30 @@ function formatValue(value) {
     return String(value);
 }
 
-function renderSavePreviewBody(dirtyFields, paths) {
+function renderBrowserDemoPreviewHints(entries) {
+    const highRiskCount = entries.filter((entry) => entry?.field?.riskLevel === 'high').length;
+    const mediumRiskCount = entries.filter((entry) => entry?.field?.riskLevel === 'medium').length;
+
+    if (!highRiskCount && !mediumRiskCount) {
+        return '';
+    }
+
+    const hints = [];
+    if (highRiskCount > 0) {
+        hints.push(`<li>${esc(t('browserDemoRiskHintHigh', highRiskCount))}</li>`);
+    }
+    if (mediumRiskCount > 0) {
+        hints.push(`<li>${esc(t('browserDemoRiskHintMedium', mediumRiskCount))}</li>`);
+    }
+
+    return `<div class="preview-section__hints">
+        <p class="preview-section__hint-title">${esc(t('browserDemoRiskHintTitle'))}</p>
+        <ul class="preview-section__hint-list">${hints.join('')}</ul>
+    </div>`;
+}
+
+function renderSavePreviewBody(dirtyFields, paths, options = {}) {
+    const { includeBackupNote = true } = options;
     if (!dirtyFields.length) {
         return `<p class="preview-no-changes">${t('savePreviewNoChanges')}</p>`;
     }
@@ -394,6 +606,9 @@ function renderSavePreviewBody(dirtyFields, paths) {
     for (const [sectionKey, entries] of bySection) {
         const sectionLabel = t(`section${sectionKey.charAt(0).toUpperCase()}${sectionKey.slice(1)}`) || sectionKey;
         html += `<div class="preview-section"><p class="preview-section__title">${esc(sectionLabel)}</p>`;
+        if (sectionKey === 'browserDemoPolicy') {
+            html += renderBrowserDemoPreviewHints(entries);
+        }
         for (const { field, current, base } of entries) {
             const label = field.previewLabel
                 || String(field.path.split('.').pop() || field.path).replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase());
@@ -417,8 +632,10 @@ function renderSavePreviewBody(dirtyFields, paths) {
         html += '</div>';
     }
 
-    const backupNote = `<div class="preview-backup-note">${t('savePreviewBackupNote')}${paths?.backupDirectoryPath ? ` <small style="opacity:0.7">(${esc(paths.backupDirectoryPath)})</small>` : ''}</div>`;
-    html += backupNote;
+    if (includeBackupNote) {
+        const backupNote = `<div class="preview-backup-note">${t('savePreviewBackupNote')}${paths?.backupDirectoryPath ? ` <small style="opacity:0.7">(${esc(paths.backupDirectoryPath)})</small>` : ''}</div>`;
+        html += backupNote;
+    }
 
     return html;
 }
@@ -426,11 +643,16 @@ function renderSavePreviewBody(dirtyFields, paths) {
 function showSavePreview() {
     syncRenderedFormDraft();
     const dirtyFields = collectDirtyFields();
+    const includeBackupNote = JSON.stringify(state.draft) !== JSON.stringify(state.baseDraft);
 
     refs.savePreviewTitle.textContent = t('savePreviewTitle');
     refs.savePreviewCancel.textContent = t('savePreviewCancel');
     refs.savePreviewConfirm.textContent = t('savePreviewConfirm');
-    refs.savePreviewBody.innerHTML = renderSavePreviewBody(dirtyFields, state.paths);
+    refs.savePreviewBody.innerHTML = renderSavePreviewBody(
+        dirtyFields,
+        state.paths,
+        { includeBackupNote }
+    );
 
     refs.savePreviewModal.hidden = false;
     setTimeout(() => refs.savePreviewConfirm?.focus(), 50);
@@ -452,6 +674,16 @@ async function loadState() {
     state.validation = response?.validation || null;
     state.paths = response?.paths || null;
     state.backups = Array.isArray(response?.backups) ? response.backups : [];
+
+    const loadedBrowserDemoPolicy = response?.browserDemoPolicy || null;
+    if (loadedBrowserDemoPolicy?.draft) {
+        state.browserDemoPolicyDraft = deepClone(loadedBrowserDemoPolicy.draft);
+        state.browserDemoPolicyValidation = createBrowserDemoValidationSnapshot(loadedBrowserDemoPolicy.validation);
+    } else {
+        state.browserDemoPolicyDraft = createBrowserDemoPolicySeed();
+        state.browserDemoPolicyValidation = validateBrowserDemoPolicyDraft();
+    }
+    state.browserDemoPolicyBaseDraft = deepClone(state.browserDemoPolicyDraft);
     state.language = normalizeLanguage(state.draft?.language || state.language);
     refs.languageSelect.value = state.language;
     renderAll();
@@ -468,6 +700,13 @@ async function loadState() {
 async function validateState() {
     if (!state.draft) return;
     syncRenderedFormDraft();
+    if (state.activeSection === 'browserDemoPolicy') {
+        const browserDemoValidation = validateBrowserDemoPolicyDraft();
+        renderFormContent();
+        renderSidebar();
+        setStatus(browserDemoValidation.valid ? 'statusValid' : 'statusInvalid');
+        return;
+    }
     setStatus('statusLoading');
     const response = await window.settingsStudioApi.validate(state.draft);
     state.validation = response?.validation || state.validation;
@@ -478,23 +717,56 @@ async function validateState() {
 
 async function saveState() {
     if (!state.draft) return;
+    syncRenderedFormDraft();
+
+    const mainDraftDirty = JSON.stringify(state.draft) !== JSON.stringify(state.baseDraft);
+    const browserDemoDirty = JSON.stringify(state.browserDemoPolicyDraft || {}) !== JSON.stringify(state.browserDemoPolicyBaseDraft || {});
+    if (!mainDraftDirty && !browserDemoDirty) {
+        setStatus('statusSaved');
+        return;
+    }
+
     setStatus('statusLoading');
-    const response = await window.settingsStudioApi.save(state.draft);
-    if (response?.ok) {
-        const savedDraft = response?.draft ? deepClone(response.draft) : deepClone(state.draft);
+    const apiResponse = await window.settingsStudioApi.save(state.draft, state.browserDemoPolicyDraft);
+    if (apiResponse?.ok) {
+        const savedDraft = apiResponse?.draft ? deepClone(apiResponse.draft) : deepClone(state.draft);
         state.draft = deepClone(savedDraft);
         state.baseDraft = deepClone(savedDraft);
-        state.validation = response?.validation || state.validation;
+        state.validation = apiResponse?.validation || state.validation;
+
+        const savedBrowserDemoDraft = apiResponse?.browserDemoPolicy?.draft
+            ? deepClone(apiResponse.browserDemoPolicy.draft)
+            : deepClone(state.browserDemoPolicyDraft || createBrowserDemoPolicySeed());
+        state.browserDemoPolicyDraft = savedBrowserDemoDraft;
+        state.browserDemoPolicyBaseDraft = deepClone(savedBrowserDemoDraft);
+        if (apiResponse?.browserDemoPolicy?.validation) {
+            state.browserDemoPolicyValidation = createBrowserDemoValidationSnapshot(apiResponse.browserDemoPolicy.validation);
+        }
+
         publishDirtyState();
         const listResponse = await window.settingsStudioApi.listBackups({}).catch(() => null);
         const backupsArr = Array.isArray(listResponse?.backups) ? listResponse.backups
             : (Array.isArray(listResponse) ? listResponse : null);
         if (backupsArr) state.backups = backupsArr;
-    } else if (response?.draft) {
-        state.draft = deepClone(response.draft);
+
+        renderAll();
+        const browserDemoOnlySave = browserDemoDirty && !mainDraftDirty;
+        setStatus(browserDemoOnlySave ? 'statusSavedBrowserDemoPolicy' : 'statusSaved');
+        return;
+    }
+
+    if (apiResponse?.draft) {
+        state.draft = deepClone(apiResponse.draft);
+    }
+    state.validation = apiResponse?.validation || state.validation;
+    if (apiResponse?.browserDemoPolicy?.draft) {
+        state.browserDemoPolicyDraft = deepClone(apiResponse.browserDemoPolicy.draft);
+    }
+    if (apiResponse?.browserDemoPolicy?.validation) {
+        state.browserDemoPolicyValidation = createBrowserDemoValidationSnapshot(apiResponse.browserDemoPolicy.validation);
     }
     renderAll();
-    setStatus(response?.ok ? 'statusSaved' : 'statusInvalid');
+    setStatus('statusInvalid');
 }
 
 function onFieldChange(eventOrTarget, options = {}) {
@@ -577,6 +849,145 @@ function onLimitChange(eventOrTarget, options = {}) {
     }
 }
 
+function readBrowserDemoGroupSelection(group, modePath = '') {
+    const modeSelector = modePath
+        ? `[data-browser-demo-group="${group}"][data-browser-demo-mode-path="${modePath}"]`
+        : `[data-browser-demo-group="${group}"]:not([data-browser-demo-mode-path])`;
+    const targets = Array.from(refs.formContent.querySelectorAll(modeSelector));
+    const allValues = targets.map((target) => String(target.dataset.browserDemoValue || '').trim().toLowerCase())
+        .filter(Boolean);
+    const selectedValues = targets
+        .filter((target) => target.checked)
+        .map((target) => String(target.dataset.browserDemoValue || '').trim().toLowerCase())
+        .filter(Boolean);
+    return { allValues, selectedValues };
+}
+
+function applyPolicyArrayOverride(policy, fieldName, allValues, selectedValues) {
+    const normalizedAll = Array.from(new Set((allValues || []).filter(Boolean)));
+    const normalizedSelected = Array.from(new Set((selectedValues || []).filter(Boolean)))
+        .filter((value) => normalizedAll.includes(value));
+
+    if (!normalizedAll.length || normalizedSelected.length === normalizedAll.length) {
+        delete policy[fieldName];
+        return;
+    }
+    policy[fieldName] = normalizedSelected;
+}
+
+function normalizeBrowserDemoDraftShape(draft) {
+    if (!isPlainObject(draft.policy)) draft.policy = {};
+    if (!isPlainObject(draft.capabilityFlags)) draft.capabilityFlags = {};
+    if (!isPlainObject(draft.policy.curatedMapKeysByModePath)) {
+        delete draft.policy.curatedMapKeysByModePath;
+    }
+    if (!Object.keys(draft.policy).length) {
+        draft.policy = {};
+    }
+    if (!Object.keys(draft.capabilityFlags).length) {
+        draft.capabilityFlags = {};
+    }
+}
+
+function onBrowserDemoPolicyChange(eventOrTarget, options = {}) {
+    const { updateUi = true } = options;
+    const target = eventOrTarget?.target || eventOrTarget;
+    if (!target || !state.browserDemoPolicyDraft) return;
+
+    const draft = ensureBrowserDemoPolicyDraft();
+    const policy = isPlainObject(draft.policy) ? draft.policy : (draft.policy = {});
+
+    const sessionTypeSelection = readBrowserDemoGroupSelection('allowedSessionTypes');
+    applyPolicyArrayOverride(
+        policy,
+        'allowedSessionTypes',
+        sessionTypeSelection.allValues,
+        sessionTypeSelection.selectedValues
+    );
+
+    const modePathSelection = readBrowserDemoGroupSelection('allowedModePaths');
+    applyPolicyArrayOverride(
+        policy,
+        'allowedModePaths',
+        modePathSelection.allValues,
+        modePathSelection.selectedValues
+    );
+
+    const presetSelection = readBrowserDemoGroupSelection('allowedPresetIds');
+    applyPolicyArrayOverride(
+        policy,
+        'allowedPresetIds',
+        presetSelection.allValues,
+        presetSelection.selectedValues
+    );
+
+    const allowedTransportSelection = readBrowserDemoGroupSelection('allowedMultiplayerTransports');
+    applyPolicyArrayOverride(
+        policy,
+        'allowedMultiplayerTransports',
+        allowedTransportSelection.allValues,
+        allowedTransportSelection.selectedValues
+    );
+
+    const allowedTransportSet = new Set(allowedTransportSelection.selectedValues);
+    const hostTransportSelection = readBrowserDemoGroupSelection('hostMultiplayerTransports');
+    applyPolicyArrayOverride(
+        policy,
+        'hostMultiplayerTransports',
+        hostTransportSelection.allValues.filter((value) => allowedTransportSet.has(value)),
+        hostTransportSelection.selectedValues.filter((value) => allowedTransportSet.has(value))
+    );
+
+    const joinTransportSelection = readBrowserDemoGroupSelection('joinMultiplayerTransports');
+    applyPolicyArrayOverride(
+        policy,
+        'joinMultiplayerTransports',
+        joinTransportSelection.allValues.filter((value) => allowedTransportSet.has(value)),
+        joinTransportSelection.selectedValues.filter((value) => allowedTransportSet.has(value))
+    );
+
+    const modePathSet = new Set(modePathSelection.selectedValues);
+    const curatedTargets = Array.from(refs.formContent.querySelectorAll('[data-browser-demo-group="curatedMapKeysByModePath"][data-browser-demo-mode-path]'));
+    const modePaths = Array.from(new Set(curatedTargets
+        .map((entry) => String(entry.dataset.browserDemoModePath || '').trim().toLowerCase())
+        .filter(Boolean)));
+    const curatedMapOverrides = {};
+    for (const modePath of modePaths) {
+        if (!modePathSet.has(modePath)) continue;
+        const mapSelection = readBrowserDemoGroupSelection('curatedMapKeysByModePath', modePath);
+        const normalizedAll = Array.from(new Set(mapSelection.allValues.filter(Boolean)));
+        const normalizedSelected = Array.from(new Set(mapSelection.selectedValues.filter(Boolean)))
+            .filter((value) => normalizedAll.includes(value));
+        if (!normalizedAll.length || normalizedSelected.length === normalizedAll.length) {
+            continue;
+        }
+        curatedMapOverrides[modePath] = normalizedSelected;
+    }
+    if (Object.keys(curatedMapOverrides).length) {
+        policy.curatedMapKeysByModePath = curatedMapOverrides;
+    } else {
+        delete policy.curatedMapKeysByModePath;
+    }
+
+    const capabilityFlags = {};
+    const capabilityTargets = Array.from(refs.formContent.querySelectorAll('[data-browser-demo-capability]'));
+    capabilityTargets.forEach((entry) => {
+        const capabilityId = String(entry.dataset.browserDemoCapability || '').trim().toLowerCase();
+        if (!capabilityId) return;
+        const baseEnabled = String(entry.dataset.browserDemoBaseEnabled || '').trim().toLowerCase() === 'true';
+        if (!baseEnabled || entry.checked) return;
+        capabilityFlags[capabilityId] = { enabled: false };
+    });
+    draft.capabilityFlags = capabilityFlags;
+    normalizeBrowserDemoDraftShape(draft);
+    state.browserDemoPolicyValidation = null;
+
+    if (updateUi) {
+        renderFormContent();
+        renderSidebar();
+    }
+}
+
 function onResetField(target) {
     const path = target.dataset?.path;
     if (!path || !state.draft || !state.baseDraft) return;
@@ -607,6 +1018,9 @@ function onResetSection() {
 
     if (sectionKey === 'limits') {
         state.draft.limitOverrides = deepClone(state.baseDraft.limitOverrides || {});
+    } else if (sectionKey === 'browserDemoPolicy') {
+        state.browserDemoPolicyDraft = deepClone(state.browserDemoPolicyBaseDraft || createBrowserDemoPolicySeed());
+        state.browserDemoPolicyValidation = null;
     } else if (sectionKey === 'fixedPresets') {
         state.draft.fixedPresets = deepClone(state.baseDraft.fixedPresets || []);
     } else {
@@ -622,6 +1036,8 @@ function onResetSection() {
 function onResetAll() {
     if (!state.baseDraft) return;
     state.draft = deepClone(state.baseDraft);
+    state.browserDemoPolicyDraft = deepClone(state.browserDemoPolicyBaseDraft || createBrowserDemoPolicySeed());
+    state.browserDemoPolicyValidation = null;
     renderAll();
 }
 
@@ -703,6 +1119,9 @@ async function onRestoreBackup(backupFileName) {
 
 function bindEvents() {
     const handleFormMutation = (event) => {
+        if (event.target.dataset?.browserDemoGroup || event.target.dataset?.browserDemoCapability) {
+            return onBrowserDemoPolicyChange(event);
+        }
         if (event.target.dataset?.limitPath) return onLimitChange(event);
         if (event.target.closest('.preset-body')) return onPresetFieldChange(event);
         onFieldChange(event);
@@ -795,7 +1214,9 @@ function bindEvents() {
 
 function isDraftDirty() {
     if (!state.draft || !state.baseDraft) return false;
-    return JSON.stringify(state.draft) !== JSON.stringify(state.baseDraft);
+    const mainDraftDirty = JSON.stringify(state.draft) !== JSON.stringify(state.baseDraft);
+    const browserDemoDirty = JSON.stringify(state.browserDemoPolicyDraft || {}) !== JSON.stringify(state.browserDemoPolicyBaseDraft || {});
+    return mainDraftDirty || browserDemoDirty;
 }
 
 function bootstrap() {

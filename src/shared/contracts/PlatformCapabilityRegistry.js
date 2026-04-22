@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- capability resolver stays centralized to avoid contract drift */
 /**
  * PlatformCapabilityRegistry — resolver layer for platform capabilities.
  *
@@ -48,6 +49,7 @@ import {
 } from './PlatformCapabilityData.js';
 import { MULTIPLAYER_TRANSPORTS } from './RuntimeSessionContract.js';
 import { normalizeString } from './ContractNormalizeUtils.js';
+import { mergeBrowserDemoSurfacePolicyWithOverride } from './BrowserDemoSurfacePolicyOverrideContract.js';
 
 const VALID_PRODUCT_SURFACE_IDS = new Set(Object.values(PLATFORM_PRODUCT_SURFACE_IDS));
 const VALID_RUNTIME_KINDS = new Set(Object.values(PLATFORM_RUNTIME_KINDS));
@@ -55,11 +57,251 @@ const VALID_LOBBY_TRANSPORTS = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
 const VALID_SURFACE_SESSION_TYPES = new Set(Object.values(PLATFORM_SURFACE_SESSION_TYPES));
 const VALID_SURFACE_MENU_MODE_PATHS = new Set(Object.values(PLATFORM_SURFACE_MENU_MODE_PATHS));
 const VALID_SURFACE_QUICK_START_ACTION_IDS = new Set(Object.values(PLATFORM_SURFACE_QUICK_START_ACTION_IDS));
+const BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS = Object.freeze({
+    APPLIED: 'applied',
+    SKIPPED: 'skipped',
+    FALLBACK: 'fallback',
+    REJECT: 'reject',
+});
+const BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES = Object.freeze({
+    NOT_APPLICABLE: 'BROWSER_DEMO_OVERRIDE_NOT_APPLICABLE',
+    SOURCE_UNAVAILABLE: 'BROWSER_DEMO_OVERRIDE_SOURCE_UNAVAILABLE',
+    DRAFT_MISSING: 'BROWSER_DEMO_OVERRIDE_DRAFT_MISSING',
+    DRAFT_INVALID: 'BROWSER_DEMO_OVERRIDE_DRAFT_INVALID',
+    SNAPSHOT_INVALID: 'BROWSER_DEMO_OVERRIDE_SNAPSHOT_INVALID',
+    READ_FAILED: 'BROWSER_DEMO_OVERRIDE_READ_FAILED',
+    APPLIED: 'BROWSER_DEMO_OVERRIDE_APPLIED',
+    FALLBACK_VERSION_UNKNOWN: 'BROWSER_DEMO_OVERRIDE_FALLBACK_VERSION_UNKNOWN',
+    REJECTED: 'BROWSER_DEMO_OVERRIDE_REJECTED',
+    VALIDATION_FAILED: 'BROWSER_DEMO_OVERRIDE_VALIDATION_FAILED',
+});
+const VALID_BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS = new Set(
+    Object.values(BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS)
+);
 
 function resolveRuntimeGlobal(runtimeGlobal = globalThis) {
     return runtimeGlobal && typeof runtimeGlobal === 'object'
         ? runtimeGlobal
         : (typeof globalThis !== 'undefined' ? globalThis : {});
+}
+
+function isPlainObject(value) {
+    if (!value || typeof value !== 'object') {
+        return false;
+    }
+    const proto = Object.getPrototypeOf(value);
+    return proto === Object.prototype || proto === null;
+}
+
+function normalizeBrowserDemoOverrideDiagnosticStatus(
+    value,
+    fallback = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT
+) {
+    const normalized = normalizeString(value, fallback).toLowerCase();
+    return VALID_BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.has(normalized)
+        ? normalized
+        : fallback;
+}
+
+function sanitizeDiagnosticsCodeArray(values) {
+    return sanitizeUniqueStringArray(values, normalizeString);
+}
+
+function createBrowserDemoOverrideDiagnostics({
+    status = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+    reasonCode = '',
+    reason = '',
+    source = 'none',
+    migrationCode = '',
+    errorCodes = [],
+    warningCodes = [],
+} = {}) {
+    return Object.freeze({
+        status: normalizeBrowserDemoOverrideDiagnosticStatus(status),
+        reasonCode: normalizeString(reasonCode, ''),
+        reason: normalizeString(reason, ''),
+        source: normalizeString(source, 'none'),
+        migrationCode: normalizeString(migrationCode, ''),
+        errorCodes: sanitizeDiagnosticsCodeArray(errorCodes),
+        warningCodes: sanitizeDiagnosticsCodeArray(warningCodes),
+    });
+}
+
+function resolveBrowserDemoSurfacePolicyOverrideDraft(options = {}) {
+    if (Object.prototype.hasOwnProperty.call(options, 'browserDemoSurfacePolicyOverrideDraft')) {
+        const draft = options.browserDemoSurfacePolicyOverrideDraft;
+        if (!isPlainObject(draft)) {
+            return Object.freeze({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.DRAFT_INVALID,
+                reason: 'browserDemoSurfacePolicyOverrideDraft muss ein Objekt sein.',
+                source: 'options',
+                draft: null,
+            });
+        }
+        return Object.freeze({
+            status: 'provided',
+            reasonCode: '',
+            reason: '',
+            source: 'options',
+            draft,
+        });
+    }
+
+    const runtimeGlobal = resolveRuntimeGlobal(options.runtimeGlobal);
+    const browserDemoPolicyContract = runtimeGlobal?.curviosApp?.browserDemoSurfacePolicy
+        || runtimeGlobal?.curviosApp?.contracts?.browserDemoSurfacePolicy;
+    if (!browserDemoPolicyContract || typeof browserDemoPolicyContract.getOverrideSnapshot !== 'function') {
+        return Object.freeze({
+            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SOURCE_UNAVAILABLE,
+            reason: 'Kein Browser-Demo-Override-Contract auf Runtime-Ebene verfuegbar.',
+            source: 'runtime',
+            draft: null,
+        });
+    }
+
+    let snapshot = null;
+    try {
+        snapshot = browserDemoPolicyContract.getOverrideSnapshot();
+    } catch (error) {
+        return Object.freeze({
+            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.READ_FAILED,
+            reason: error instanceof Error ? error.message : String(error || 'override_read_failed'),
+            source: 'runtime',
+            draft: null,
+        });
+    }
+
+    if (!isPlainObject(snapshot)) {
+        return Object.freeze({
+            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.SNAPSHOT_INVALID,
+            reason: 'Override-Snapshot muss ein Objekt sein.',
+            source: 'runtime',
+            draft: null,
+        });
+    }
+
+    const snapshotReadError = normalizeString(snapshot.readError, '');
+    const snapshotParseError = normalizeString(snapshot.parseError, '');
+    if (snapshotReadError || snapshotParseError) {
+        return Object.freeze({
+            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT,
+            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.READ_FAILED,
+            reason: snapshotReadError || snapshotParseError,
+            source: 'runtime',
+            draft: null,
+        });
+    }
+
+    if (!isPlainObject(snapshot.draft)) {
+        return Object.freeze({
+            status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+            reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.DRAFT_MISSING,
+            reason: 'Kein Browser-Demo-Override-Draft vorhanden.',
+            source: 'runtime',
+            draft: null,
+        });
+    }
+
+    return Object.freeze({
+        status: 'provided',
+        reasonCode: '',
+        reason: '',
+        source: 'runtime',
+        draft: snapshot.draft,
+    });
+}
+
+function mapBrowserDemoMergeDiagnostics(mergeDiagnostics, source = 'none') {
+    const status = normalizeBrowserDemoOverrideDiagnosticStatus(
+        mergeDiagnostics?.status,
+        BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT
+    );
+    const reason = normalizeString(mergeDiagnostics?.reason, '');
+    const migrationCode = normalizeString(mergeDiagnostics?.migrationCode, '');
+    let reasonCode = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.REJECTED;
+
+    if (status === BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.APPLIED) {
+        reasonCode = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.APPLIED;
+    } else if (status === BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.FALLBACK) {
+        reasonCode = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.FALLBACK_VERSION_UNKNOWN;
+    } else if (
+        status === BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT
+        && reason === 'VALIDATION_FAILED'
+    ) {
+        reasonCode = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.VALIDATION_FAILED;
+    }
+
+    return createBrowserDemoOverrideDiagnostics({
+        status,
+        reasonCode,
+        reason,
+        source,
+        migrationCode,
+        errorCodes: mergeDiagnostics?.errorCodes,
+        warningCodes: mergeDiagnostics?.warningCodes,
+    });
+}
+
+function resolveSurfacePolicySource(options = {}) {
+    const productSurfaceId = resolvePlatformProductSurfaceId(options);
+    const productEntry = resolveProductEntry(productSurfaceId);
+    const baseSurfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
+        ? productEntry.surfacePolicy
+        : null;
+    const baseCapabilities = productEntry?.capabilities && typeof productEntry.capabilities === 'object'
+        ? productEntry.capabilities
+        : {};
+
+    if (productSurfaceId !== PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO) {
+        return Object.freeze({
+            productSurfaceId,
+            productEntry,
+            surfacePolicy: baseSurfacePolicy,
+            capabilityFlags: null,
+            browserDemoOverrideDiagnostics: createBrowserDemoOverrideDiagnostics({
+                status: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
+                reasonCode: BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.NOT_APPLICABLE,
+                reason: 'Browser-Demo-Override ist nur fuer browser-demo relevant.',
+                source: 'none',
+            }),
+        });
+    }
+
+    const overrideDraftResolution = resolveBrowserDemoSurfacePolicyOverrideDraft(options);
+    if (overrideDraftResolution.status !== 'provided') {
+        return Object.freeze({
+            productSurfaceId,
+            productEntry,
+            surfacePolicy: baseSurfacePolicy,
+            capabilityFlags: null,
+            browserDemoOverrideDiagnostics: createBrowserDemoOverrideDiagnostics({
+                status: overrideDraftResolution.status,
+                reasonCode: overrideDraftResolution.reasonCode,
+                reason: overrideDraftResolution.reason,
+                source: overrideDraftResolution.source,
+            }),
+        });
+    }
+
+    const merged = mergeBrowserDemoSurfacePolicyWithOverride(
+        baseSurfacePolicy,
+        baseCapabilities,
+        overrideDraftResolution.draft
+    );
+    return Object.freeze({
+        productSurfaceId,
+        productEntry,
+        surfacePolicy: merged?.policy || baseSurfacePolicy,
+        capabilityFlags: merged?.capabilityFlags || null,
+        browserDemoOverrideDiagnostics: mapBrowserDemoMergeDiagnostics(
+            merged?.diagnostics,
+            overrideDraftResolution.source
+        ),
+    });
 }
 
 export function normalizePlatformProductSurfaceId(
@@ -261,11 +503,12 @@ export function resolvePlatformProductSurfaceId(options = {}) {
 }
 
 export function resolvePlatformEnvironment(options = {}) {
-    const productSurfaceId = resolvePlatformProductSurfaceId(options);
+    const surfacePolicySource = resolveSurfacePolicySource(options);
+    const productSurfaceId = surfacePolicySource.productSurfaceId;
     const runtimeKind = resolvePlatformRuntimeKind(options);
-    const productEntry = resolveProductEntry(productSurfaceId);
-    const surfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
-        ? productEntry.surfacePolicy
+    const productEntry = surfacePolicySource.productEntry;
+    const surfacePolicy = surfacePolicySource.surfacePolicy && typeof surfacePolicySource.surfacePolicy === 'object'
+        ? surfacePolicySource.surfacePolicy
         : {
             defaultAccessMode: PLATFORM_SURFACE_POLICY_MODES.DEFAULT_DENY,
             multiplayerRole: PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY,
@@ -287,6 +530,7 @@ export function resolvePlatformEnvironment(options = {}) {
             surfacePolicy.multiplayerRole,
             PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
         ),
+        browserDemoOverrideDiagnostics: surfacePolicySource.browserDemoOverrideDiagnostics,
     });
 }
 
@@ -299,10 +543,10 @@ export function resolveDefaultLobbyTransport(options = {}) {
 }
 
 export function resolveSurfacePolicy(options = {}) {
-    const productSurfaceId = resolvePlatformProductSurfaceId(options);
-    const productEntry = resolveProductEntry(productSurfaceId);
-    const policy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
-        ? productEntry.surfacePolicy
+    const surfacePolicySource = resolveSurfacePolicySource(options);
+    const productSurfaceId = surfacePolicySource.productSurfaceId;
+    const policy = surfacePolicySource.surfacePolicy && typeof surfacePolicySource.surfacePolicy === 'object'
+        ? surfacePolicySource.surfacePolicy
         : null;
     const allowedSessionTypes = resolveSurfaceAllowedSessionTypes(policy);
     const allowedMultiplayerTransports = resolveSurfaceAllowedMultiplayerTransports(policy);
@@ -353,14 +597,15 @@ export function resolveSurfacePolicy(options = {}) {
         allowedPresetIds,
         curatedMapKeysByModePath,
         requiresCuratedMaps: policy?.requiresCuratedMaps === true,
+        browserDemoOverrideDiagnostics: surfacePolicySource.browserDemoOverrideDiagnostics,
     });
 }
 
 export function resolveSurfaceDeveloperAccess(options = {}) {
-    const productSurfaceId = resolvePlatformProductSurfaceId(options);
-    const productEntry = resolveProductEntry(productSurfaceId);
-    const surfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
-        ? productEntry.surfacePolicy
+    const surfacePolicySource = resolveSurfacePolicySource(options);
+    const productSurfaceId = surfacePolicySource.productSurfaceId;
+    const surfacePolicy = surfacePolicySource.surfacePolicy && typeof surfacePolicySource.surfacePolicy === 'object'
+        ? surfacePolicySource.surfacePolicy
         : null;
     const developerPolicy = resolveSurfaceDeveloperPolicy(surfacePolicy);
     const available = developerPolicy?.available !== false;
@@ -391,26 +636,34 @@ export function resolveSurfaceDeveloperAccess(options = {}) {
         accessMode,
         reason,
         message,
+        browserDemoOverrideDiagnostics: surfacePolicySource.browserDemoOverrideDiagnostics,
     });
 }
 
 export function resolveSurfaceCapabilityAccess(capabilityId, options = {}) {
     const normalizedCapabilityId = normalizeString(capabilityId, '');
     const hasCapabilityId = normalizedCapabilityId.length > 0;
-    const productSurfaceId = resolvePlatformProductSurfaceId(options);
-    const productEntry = resolveProductEntry(productSurfaceId);
+    const surfacePolicySource = resolveSurfacePolicySource(options);
+    const productSurfaceId = surfacePolicySource.productSurfaceId;
+    const productEntry = surfacePolicySource.productEntry;
     const providerSpec = hasCapabilityId
         ? resolveSurfaceCapabilitySpec(normalizedCapabilityId, { productSurfaceId })
         : null;
-    const surfacePolicy = productEntry?.surfacePolicy && typeof productEntry.surfacePolicy === 'object'
-        ? productEntry.surfacePolicy
+    const surfacePolicy = surfacePolicySource.surfacePolicy && typeof surfacePolicySource.surfacePolicy === 'object'
+        ? surfacePolicySource.surfacePolicy
         : null;
     const defaultAccessMode = resolveSurfaceDefaultAccessMode(surfacePolicy);
     const usesDefaultPolicy = hasCapabilityId && providerSpec === null;
-    const configuredAvailable = resolveSurfaceCapabilityConfiguredAvailability(
+    const capabilityFlags = surfacePolicySource.capabilityFlags && typeof surfacePolicySource.capabilityFlags === 'object'
+        ? surfacePolicySource.capabilityFlags
+        : null;
+    let configuredAvailable = resolveSurfaceCapabilityConfiguredAvailability(
         providerSpec,
         usesDefaultPolicy && defaultAccessMode === PLATFORM_SURFACE_POLICY_MODES.DEFAULT_FULL
     );
+    if (capabilityFlags && Object.prototype.hasOwnProperty.call(capabilityFlags, normalizedCapabilityId)) {
+        configuredAvailable = configuredAvailable && capabilityFlags[normalizedCapabilityId] === true;
+    }
     const providerKind = usesDefaultPolicy
         ? resolveSurfaceDefaultProviderKind(productSurfaceId, defaultAccessMode)
         : resolveCapabilityProviderKind(normalizedCapabilityId, {
@@ -429,6 +682,7 @@ export function resolveSurfaceCapabilityAccess(capabilityId, options = {}) {
             PLATFORM_SURFACE_MULTIPLAYER_ROLES.JOIN_ONLY
         ),
         resolvedByDefaultPolicy: usesDefaultPolicy,
+        browserDemoOverrideDiagnostics: surfacePolicySource.browserDemoOverrideDiagnostics,
     });
 }
 

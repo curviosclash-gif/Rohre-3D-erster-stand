@@ -2,6 +2,7 @@ const schemaService = require('../services/SettingsSchemaService.cjs');
 const { SettingsOverrideFileService } = require('../services/SettingsOverrideFileService.cjs');
 const { SettingsBackupService } = require('../services/SettingsBackupService.cjs');
 const { SettingsPrefsService } = require('../services/SettingsPrefsService.cjs');
+const { SettingsBrowserDemoPolicyService } = require('../services/SettingsBrowserDemoPolicyService.cjs');
 
 const CHANNELS = Object.freeze({
     load: 'settings-studio:load',
@@ -33,6 +34,7 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
     const fileService = new SettingsOverrideFileService({ app });
     const backupService = new SettingsBackupService({ app });
     const prefsService = new SettingsPrefsService({ app });
+    const browserDemoPolicyService = new SettingsBrowserDemoPolicyService({ app });
 
     ipcMain.handle(CHANNELS.load, async () => {
         const prefs = prefsService.loadPrefs();
@@ -49,6 +51,14 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
         const backups = Array.isArray(backupResult?.backups) ? backupResult.backups
             : (Array.isArray(backupResult) ? backupResult : []);
 
+        const browserDemoFallbackDraft = await browserDemoPolicyService.createDraft();
+        const browserDemoLoaded = await browserDemoPolicyService.loadDraft({ fallbackDraft: browserDemoFallbackDraft });
+        const browserDemoMigration = await browserDemoPolicyService.classifyMigration(browserDemoLoaded.draft);
+        const browserDemoDraftToValidate = browserDemoMigration.status === 'fallback'
+            ? browserDemoFallbackDraft
+            : browserDemoMigration.migrated;
+        const browserDemoValidation = await browserDemoPolicyService.validateDraft(browserDemoDraftToValidate);
+
         return {
             ok: true,
             draft: validation.normalizedDraft,
@@ -56,6 +66,7 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
             schema,
             paths: {
                 overrideFilePath: fileService.getOverrideFilePath(),
+                browserDemoPolicyOverrideFilePath: browserDemoPolicyService.getOverrideFilePath(),
                 backupDirectoryPath: backupService.getBackupDirectoryPath(),
             },
             fileState: {
@@ -66,6 +77,19 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
                 status: migration.status,
                 code: migration.code,
                 reason: migration.reason || null,
+            },
+            browserDemoPolicy: {
+                draft: browserDemoValidation.normalizedDraft,
+                validation: createValidationSnapshot(browserDemoValidation),
+                fileState: {
+                    exists: browserDemoLoaded.exists,
+                    loadError: browserDemoLoaded.error || null,
+                },
+                migration: {
+                    status: browserDemoMigration.status,
+                    code: browserDemoMigration.code,
+                    reason: browserDemoMigration.reason || null,
+                },
             },
             backups,
         };
@@ -80,14 +104,32 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
         };
     });
 
-    ipcMain.handle(CHANNELS.save, async (_event, draft) => {
+    ipcMain.handle(CHANNELS.save, async (_event, draft, browserDemoPolicyDraft = null) => {
         const validation = await schemaService.validateDraft(draft);
         const validationSnapshot = createValidationSnapshot(validation);
-        if (!validationSnapshot.valid) {
+        const browserDemoFallbackDraft = await browserDemoPolicyService.createDraft();
+        const browserDemoInputDraft = browserDemoPolicyDraft == null ? browserDemoFallbackDraft : browserDemoPolicyDraft;
+        const browserDemoMigration = await browserDemoPolicyService.classifyMigration(browserDemoInputDraft);
+        const browserDemoDraftToValidate = browserDemoMigration.status === 'fallback'
+            ? browserDemoFallbackDraft
+            : browserDemoMigration.migrated;
+        const browserDemoValidation = await browserDemoPolicyService.validateDraft(browserDemoDraftToValidate);
+        const browserDemoValidationSnapshot = createValidationSnapshot(browserDemoValidation);
+
+        if (!validationSnapshot.valid || !browserDemoValidationSnapshot.valid) {
             return {
                 ok: false,
                 draft: validation.normalizedDraft,
                 validation: validationSnapshot,
+                browserDemoPolicy: {
+                    draft: browserDemoValidation.normalizedDraft,
+                    validation: browserDemoValidationSnapshot,
+                    migration: {
+                        status: browserDemoMigration.status,
+                        code: browserDemoMigration.code,
+                        reason: browserDemoMigration.reason || null,
+                    },
+                },
             };
         }
 
@@ -97,14 +139,33 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
             content: backupPayload,
             reason: 'pre-save',
         });
+        const existingBrowserDemoRaw = await browserDemoPolicyService.readRawFile();
+        const browserDemoBackupPayload = existingBrowserDemoRaw
+            || browserDemoPolicyService.toJsonString(browserDemoValidation.normalizedDraft);
+        const browserDemoBackup = await backupService.createBackup({
+            content: browserDemoBackupPayload,
+            reason: 'pre-save-browser-demo-policy',
+        });
 
         const saveState = await fileService.saveDraft(validation.normalizedDraft);
+        const browserDemoSaveState = await browserDemoPolicyService.saveDraft(browserDemoValidation.normalizedDraft);
         return {
             ok: true,
             draft: validation.normalizedDraft,
             validation: validationSnapshot,
             saveState,
             backup,
+            browserDemoPolicy: {
+                draft: browserDemoValidation.normalizedDraft,
+                validation: browserDemoValidationSnapshot,
+                migration: {
+                    status: browserDemoMigration.status,
+                    code: browserDemoMigration.code,
+                    reason: browserDemoMigration.reason || null,
+                },
+                saveState: browserDemoSaveState,
+                backup: browserDemoBackup,
+            },
         };
     });
 
