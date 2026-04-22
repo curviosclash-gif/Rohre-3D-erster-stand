@@ -70,6 +70,15 @@ export const FIGHT_BALANCE_DERIVATION_POLICY = Object.freeze({
     derivedStatFields: Object.freeze(Object.values(FIGHT_DERIVED_STAT_IDS)),
 });
 
+export const FIGHT_EXPLOIT_GUARD_CODES = Object.freeze({
+    OK: 'ok',
+    UNKNOWN_HITBOX_CLASS: 'unknown_hitbox_class',
+    DIRECT_OVERRIDE_BLOCKED: 'direct_override_blocked',
+    TIER_OUT_OF_RANGE: 'tier_out_of_range',
+});
+
+export const FIGHT_LIVE_RULE_EXPLANATION_VERSION = 'fight-live-rule-explanation.v1';
+
 export const FIGHT_CLASS_STAT_BANDS = Object.freeze({
     [FIGHT_HITBOX_CLASSES.compact]: Object.freeze({
         hitboxClass: FIGHT_HITBOX_CLASSES.compact,
@@ -271,6 +280,76 @@ export function validateFightBuildDerivationInput(rawInput) {
     });
 }
 
+function collectOutOfRangeTierPaths(rawInput) {
+    const input = resolveInputObject(rawInput);
+    const bounds = FIGHT_BALANCE_DERIVATION_POLICY.tierBounds;
+    const tierKeys = Object.values(FIGHT_BUILD_TIER_IDS);
+    return tierKeys
+        .map((key) => {
+            const raw = Number(input[key]);
+            if (!Number.isFinite(raw)) return null;
+            if (raw < bounds.min || raw > bounds.max) return key;
+            return null;
+        })
+        .filter(Boolean);
+}
+
+export function evaluateFightBuildExploitGuard(rawInput) {
+    const validation = validateFightBuildDerivationInput(rawInput);
+    const outOfRangeTierPaths = Object.freeze(collectOutOfRangeTierPaths(rawInput));
+    const violations = [];
+    let primaryCode = FIGHT_EXPLOIT_GUARD_CODES.OK;
+
+    if (validation.errors.some((entry) => String(entry || '').startsWith('unknown hitbox class:'))) {
+        primaryCode = FIGHT_EXPLOIT_GUARD_CODES.UNKNOWN_HITBOX_CLASS;
+        violations.push('Hitbox-Klasse ist unbekannt.');
+    }
+    if (validation.blockedDirectStatPaths.length > 0) {
+        if (primaryCode === FIGHT_EXPLOIT_GUARD_CODES.OK) primaryCode = FIGHT_EXPLOIT_GUARD_CODES.DIRECT_OVERRIDE_BLOCKED;
+        violations.push(`Direktwerte fuer Fight-Stats sind gesperrt (${validation.blockedDirectStatPaths.join(', ')}).`);
+    }
+    if (outOfRangeTierPaths.length > 0) {
+        if (primaryCode === FIGHT_EXPLOIT_GUARD_CODES.OK) primaryCode = FIGHT_EXPLOIT_GUARD_CODES.TIER_OUT_OF_RANGE;
+        violations.push(`Tier-Werte ausserhalb der erlaubten Grenzen (${outOfRangeTierPaths.join(', ')}).`);
+    }
+
+    return Object.freeze({
+        ok: primaryCode === FIGHT_EXPLOIT_GUARD_CODES.OK,
+        code: primaryCode,
+        violations: Object.freeze(violations),
+        blockedDirectStatPaths: validation.blockedDirectStatPaths,
+        outOfRangeTierPaths,
+    });
+}
+
+export function resolveFightLiveRuleExplanation(rawInput) {
+    const stats = resolveFightVehicleStats(rawInput);
+    const guard = evaluateFightBuildExploitGuard(rawInput);
+    const classLabel = FIGHT_HITBOX_CLASS_LABELS[stats.hitboxClass] || stats.hitboxClass;
+    const tiers = stats.tiers || {};
+    return Object.freeze({
+        version: FIGHT_LIVE_RULE_EXPLANATION_VERSION,
+        title: `Fight-Regeln: ${classLabel}`,
+        summary: Object.freeze([
+            'HP, Speed, Inventar-Slots und MG-Anzahl werden nur aus Klasse + Tier abgeleitet.',
+            'Freie Direktwerte fuer Kampf-Stats sind blockiert und loesen Exploit-Guards aus.',
+            'Alle Werte bleiben innerhalb der Safety-Envelopes pro Hitbox-Klasse.',
+        ]),
+        tierState: Object.freeze({
+            armorTier: tiers.armorTier ?? 0,
+            mobilityTier: tiers.mobilityTier ?? 0,
+            payloadTier: tiers.payloadTier ?? 0,
+        }),
+        derivedStats: Object.freeze({
+            hp: stats.hp,
+            speedNorm: stats.speedNorm,
+            inventorySlots: stats.inventorySlots,
+            mgCount: stats.mgCount,
+        }),
+        guard,
+    });
+}
+
 export function resolveFightVehicleStats(rawInput) {
     const input = resolveInputObject(rawInput);
     const validation = validateFightBuildDerivationInput(input);
@@ -323,6 +402,7 @@ export function resolveFightVehicleStats(rawInput) {
     return Object.freeze({
         contractVersion: FIGHT_HANGAR_BALANCE_CONTRACT_VERSION,
         policyVersion: FIGHT_BALANCE_DERIVATION_POLICY.policyVersion,
+        liveRuleExplanationVersion: FIGHT_LIVE_RULE_EXPLANATION_VERSION,
         derivedOnly: true,
         hitboxClass,
         hitboxLimits: band.hitboxLimits,
