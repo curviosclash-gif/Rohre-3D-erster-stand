@@ -48,7 +48,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | V98 | Settings Studio Browser-Demo Begrenzung | planned | P2 | frei | V77.99,V97.99 | 98.3 | `docs/plaene/aktiv/V98.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
-| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.5 | `docs/plaene/aktiv/V76.md` |
+| V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.6 | `docs/plaene/aktiv/V76.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
 | V94 | Wissensgraph als Query-Layer fuer Plaene, Scope-Files und Architektur-Surfaces | planned | P3 | frei | V93.99 | 94.1 | `docs/plaene/aktiv/V94.md` |
 
@@ -106,12 +106,18 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 
 Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengigkeiten bleiben verbindlich; soft dependencies und Produktreihenfolge entscheiden die Priorisierung innerhalb der moeglichen Starts.
 
+### Priorisierte Intake-Uebernahme (neu)
+
+1. `V101` als naechsten Intake-Prioritaetsblock uebernehmen und starten (Type-Safety/Contract-Hardening vor weiteren Runtime-Hardening-Wellen).
+2. Danach `V99` (Signaling/LAN/Connectivity-Hardening) und `V100` (Runtime-Rebuild/Remount/StartSync) nachziehen.
+
 ### Sofort laufende oder naechste Abschluesse
 
 1. `V76` als aktiven Produktblock auf `76.2` weiterziehen; Hangar-/Werkstatt-Flows bleiben der laufende Hauptpfad.
 2. `V98` als naechsten P2-Block starten; hard dependencies (`V77.99`, `V97.99`) sind erfuellt.
-3. `V75` als Recorder-Stabilisierung nachgezogen bearbeiten; `V64.99` ist bereits abgeschlossen.
-4. `V81` und `V94` als nachgelagerte P3-Bloecke vorbereiten (`V81` mit V92-Ratchet, `V94` als Governance-/Query-Layer).
+3. `V101` als naechsten technischen Qualitaetsblock einziehen (`typecheck:architecture`/Contract-Hardening), damit Folgearbeit auf stabiler Basis aufsetzt.
+4. `V75` als Recorder-Stabilisierung nachgezogen bearbeiten; `V64.99` ist bereits abgeschlossen.
+5. `V81` und `V94` als nachgelagerte P3-Bloecke vorbereiten (`V81` mit V92-Ratchet, `V94` als Governance-/Query-Layer).
 
 ### Hauptpfad Architektur und Produkt
 
@@ -133,9 +139,9 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 ### Kurzform
 
-`V76 -> V98 -> V75 -> V81 -> V94`
+`V76 -> V98 -> V101 -> V99 -> V100 -> V75 -> V81 -> V94`
 
-Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V98` (Settings-Studio-Demo-Grenzen) und `V94` (Governance-/Query-Layer). `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
+Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V98` (Settings-Studio-Demo-Grenzen) und `V94` (Governance-/Query-Layer). `V101` ist als priorisierter Qualitaetsblock direkt nach `V98` eingeordnet, bevor `V99`/`V100` tiefer in Runtime-/LAN-Hardening eingreifen. `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
 
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
