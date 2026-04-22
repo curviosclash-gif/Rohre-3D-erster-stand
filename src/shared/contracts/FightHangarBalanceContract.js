@@ -15,6 +15,20 @@ export const FIGHT_HITBOX_CLASSES = Object.freeze({
     heavy: 'heavy',
 });
 
+export const FIGHT_HITBOX_CLASS_LABELS = Object.freeze({
+    [FIGHT_HITBOX_CLASSES.compact]: 'kompakt',
+    [FIGHT_HITBOX_CLASSES.standard]: 'standard',
+    [FIGHT_HITBOX_CLASSES.heavy]: 'schwer',
+});
+
+export const FIGHT_HITBOX_CLASS_ALIASES = Object.freeze({
+    compact: FIGHT_HITBOX_CLASSES.compact,
+    kompakt: FIGHT_HITBOX_CLASSES.compact,
+    standard: FIGHT_HITBOX_CLASSES.standard,
+    heavy: FIGHT_HITBOX_CLASSES.heavy,
+    schwer: FIGHT_HITBOX_CLASSES.heavy,
+});
+
 export const FIGHT_DERIVED_STAT_IDS = Object.freeze({
     HP: 'hp',
     SPEED_NORM: 'speedNorm',
@@ -121,6 +135,7 @@ export const FIGHT_TIER_STAT_DELTAS = Object.freeze({
 });
 
 const VALID_HITBOX_CLASS_SET = new Set(Object.values(FIGHT_HITBOX_CLASSES));
+const VALID_HITBOX_ALIAS_SET = new Set(Object.keys(FIGHT_HITBOX_CLASS_ALIASES));
 const BLOCKED_DIRECT_STAT_FIELD_SET = new Set(
     FIGHT_BALANCE_DERIVATION_POLICY.disallowDirectStatPaths.map((entry) => String(entry || '').split('.').pop())
 );
@@ -184,7 +199,47 @@ function collectBlockedDirectStatPaths(node, pathPrefix = '', out = []) {
 export function resolveFightHitboxClass(rawClass) {
     const normalized = String(rawClass || '').trim().toLowerCase();
     if (VALID_HITBOX_CLASS_SET.has(normalized)) return normalized;
+    if (Object.prototype.hasOwnProperty.call(FIGHT_HITBOX_CLASS_ALIASES, normalized)) {
+        return FIGHT_HITBOX_CLASS_ALIASES[normalized];
+    }
     return FIGHT_HITBOX_CLASSES.standard;
+}
+
+export function resolveFightHitboxBalanceContract() {
+    return Object.freeze(
+        Object.values(FIGHT_HITBOX_CLASSES).map((hitboxClass) => {
+            const band = FIGHT_CLASS_STAT_BANDS[hitboxClass] || null;
+            return Object.freeze({
+                hitboxClass,
+                label: FIGHT_HITBOX_CLASS_LABELS[hitboxClass] || hitboxClass,
+                statBand: band
+                    ? Object.freeze({
+                        hp: Object.freeze({
+                            base: band.baseHp,
+                            min: band.safetyEnvelope?.hp?.min ?? band.baseHp,
+                            max: band.safetyEnvelope?.hp?.max ?? band.baseHp,
+                        }),
+                        speedNorm: Object.freeze({
+                            base: band.speedNorm,
+                            min: band.safetyEnvelope?.speedNorm?.min ?? band.speedNorm,
+                            max: band.safetyEnvelope?.speedNorm?.max ?? band.speedNorm,
+                        }),
+                        inventorySlots: Object.freeze({
+                            base: band.inventorySlots,
+                            min: band.safetyEnvelope?.inventorySlots?.min ?? band.inventorySlots,
+                            max: band.safetyEnvelope?.inventorySlots?.max ?? band.inventorySlots,
+                        }),
+                        mgCount: Object.freeze({
+                            base: band.mgCount,
+                            min: band.safetyEnvelope?.mgCount?.min ?? band.mgCount,
+                            max: band.safetyEnvelope?.mgCount?.max ?? band.mgCount,
+                        }),
+                    })
+                    : null,
+                description: band?.description || '',
+            });
+        })
+    );
 }
 
 export function resolveFightBuildTierVector(rawInput) {
@@ -194,11 +249,12 @@ export function resolveFightBuildTierVector(rawInput) {
 export function validateFightBuildDerivationInput(rawInput) {
     const input = resolveInputObject(rawInput);
     const hitboxClass = resolveFightHitboxClass(input.hitboxClass);
+    const normalizedRawHitbox = String(input.hitboxClass || '').trim().toLowerCase();
     const tiers = toTierVector(input);
     const blockedDirectStatPaths = collectBlockedDirectStatPaths(input);
     const errors = [];
 
-    if (!VALID_HITBOX_CLASS_SET.has(String(input.hitboxClass || '').trim().toLowerCase())) {
+    if (!VALID_HITBOX_CLASS_SET.has(normalizedRawHitbox) && !VALID_HITBOX_ALIAS_SET.has(normalizedRawHitbox)) {
         errors.push(`unknown hitbox class: ${String(input.hitboxClass || '')}`);
     }
     if (blockedDirectStatPaths.length > 0) {
