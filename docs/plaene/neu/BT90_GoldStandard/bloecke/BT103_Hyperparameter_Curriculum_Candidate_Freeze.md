@@ -36,6 +36,17 @@ BT103 hat drei Aufgaben:
 2. Curriculum-, Reward- und Telemetry-Paritaet gegen den bestehenden JS-authoritative Pfad haerten.
 3. Einen gefrorenen PPO-Kandidaten fuer BT104 bereitstellen.
 
+## Re-Baselining-Status
+
+BT103 bleibt ein Folgeblock hinter einer echten `BT93`-Baseline.
+Vor einem aktiven Claim muessen mindestens vorliegen:
+
+- ein stabiles Baseline-Paket aus `BT93` unter `data/training/ppo/**`
+- eine feste Lane- und Matrix-Definition aus demselben Paket
+- ein klares Downgrade-Urteil, falls `4-Env` nicht traegt
+
+Ohne diese Vorarbeit bleibt BT103 rolling draft oder endet spaeter bewusst mit `hold`, statt BT104 mit Wunschannahmen zu oeffnen.
+
 ## Nicht-Ziel
 
 - ONNX-Export
@@ -118,12 +129,17 @@ Pflichtpaket:
 Der gefrorene Kandidat ist die einzige Eingabe fuer BT104.
 Wenn BT103 mit `hold` endet und kein Freeze-Paket vorliegt, startet BT104 **nicht**.
 
+Freeze-Hartgrenze fuer Phase 5:
+
+- Das Freeze-Paket muss Lane-Budget, Vergleichsmatrix, Manifest und bekannte Restluecken explizit tragen.
+- BT103 oeffnet BT104 nur ueber genau einen gefrorenen Kandidaten; laufende Ablationen oder nachtraegliche Kandidatenwahl waehrend BT104 sind unzulaessig.
+
 ## Definition of Done
 
 - [ ] DoD.1 Mindestens 5 und hoechstens 7 klar begruendete Ablationslaeufe sind dokumentiert.
 - [ ] DoD.2 Curriculum-/Reward-/Telemetry-Paritaet bleibt gegen den JS-authoritative Pfad nachvollziehbar.
 - [ ] DoD.3 Ein gefrorener PPO-Kandidat ist als Artefaktpaket mit Manifest, Checkpoint, Normalize-Stats und Eval-Reports abgelegt.
-- [ ] DoD.4 Der Kandidat ist gegen BT102-Baseline und eine feste interne KPI-Matrix eingeordnet; der externe DQN-Vergleich bleibt BT104 vorbehalten.
+- [ ] DoD.4 Der Kandidat ist gegen BT102-Baseline und eine feste interne KPI-Matrix eingeordnet; Freeze-Paket, Lane-Budget und Matrix sind als klarer Handover fuer BT104 dokumentiert.
 - [ ] DoD.5 Keine ONNX-, Runtime- oder Produktivintegration wurde in diesen Block gezogen.
 - [ ] DoD.6 Keine produktive Runtime-/AI-Hub-Datei wurde angepasst.
 
@@ -135,6 +151,7 @@ Wenn BT103 mit `hold` endet und kein Freeze-Paket vorliegt, startet BT104 **nich
 | R103.2 | Curriculum-Paritaet ist nur scheinbar gegeben | MED | HIGH | relevante Transportfelder hart im Manifest sichern | gleiche Config, aber andere Signalverteilung | Integration |
 | R103.3 | Der Block driftet in Runtime- oder Integrationsideen zurueck | MED | HIGH | Nicht-Ziele explizit im Block fixieren | Diskussion dreht sich wieder um produktive Inference | Governance |
 | R103.4 | Viele Ablationen, aber kein klarer Kandidat | MED | MED | kleine Matrix, feste Abbruchkriterien | lauter halbplausible Ergebnisse ohne Freeze | Governance |
+| R103.5 | BT103 liefert keinen klaren Freeze-Handover und zieht BT104 als Monolithen mit | MED | HIGH | genau ein Freeze-Paket, feste Lane und Manifest als Hartgrenze | A/B-Evidence muesste Kandidatenwahl oder Matrix nachtraeglich mitklaeren |
 
 ## Phasen
 
@@ -164,6 +181,7 @@ output: Freeze-Paket unter `data/training/ppo/candidates/`
 - priorisierte Laeufe ausfuehren
 - Sieger gegen BT102 und feste interne KPI-Matrix einordnen
 - Freeze-Paket unter `data/training/ppo/candidates/` schreiben
+- Lane-Budget, Vergleichsmatrix und Restluecken explizit an `BT104` uebergeben
 
 ### 103.4 Reproduzierbarkeit und BT104-Handover
 status: open
@@ -172,6 +190,7 @@ output: Abschlussreport und Vergleichsmatrix fuer BT104
 
 - gefrorenen Kandidaten dokumentieren oder `hold` explizit als Kettenstopp ausweisen
 - Vergleichsmatrix fuer BT104 nur vorbereiten, wenn ein Freeze-Paket vorliegt
+- keinen offenen Kandidatenwechsel oder Ablationsrest in BT104 mitschieben
 - Abschlussreport schreiben
 
 ### 103.99 Abschluss-Gate

@@ -41,23 +41,44 @@ BT90_GoldStandard/
 BT90 soll aktuell **nicht** als komplette BT100-BT105-Kette in einem Zug umgesetzt werden.
 Der sinnvolle Start ist ein kontrollierter Rolling-Ansatz:
 
-- **jetzt ausfuehren:** `BT100` als Wahrheitsblock fuer Minimal-Bootstrap, Contract-PoC und genau eine 1-Worker-Headless-Lane
-- **direkt danach:** `BT101` nur als Single-Env- und Contract-Adapter-Grundpfad (`101.1` bis `101.3`)
-- **erst danach:** `BT101.4` bis `101.6` nur, wenn Single-Env stabil ist und der Folgeblock bewusst geoeffnet wird
+- **aktive Landung zuerst:** `BT90` im Bot-Trainingsplan; inhaltliche Draft-Quelle ist `BT100.1` bis `BT100.2`
+- **direkt danach:** `BT91`; inhaltliche Draft-Quelle ist `BT100.3` bis `BT100.5`
+- **erst danach:** `BT92`; inhaltliche Draft-Quelle ist `BT101.1` bis `101.3`
+- **danach erst:** `BT93`; Quelle bleibt `BT101.4` bis `101.6` plus `BT102`
 - **bewusst als rolling drafts lassen:** `BT102` bis `BT105`; diese Bloecke werden nach BT100/BT101 mit echten Throughput-, Telemetrie- und Contract-Daten nachgeschaerft
 
 Der Governance-konforme Migrationspfad in den aktiven Bot-Trainingsplan steht in `IMPLEMENTATION_README.md`.
+
+Kurzform der einzigen aktiven Startgeschichte:
+
+`BT90 -> BT91 -> BT92`
+
+Dabei traegt der aktive BT90-Wahrheitsblock bewusst nur:
+
+- Python-Minimalbootstrap
+- JS-authoritative Contract-Wahrheit
+- erlaubte PPO-Bauorte
+- read-only Runtime-Grenzen
+- Contract-/Runtime-Drift als Blocker-Regel
+
+Nicht in BT90:
+
+- Sidecar-Handshake
+- 1-Worker-Lane
+- Single-Env
+- VecEnv
+- PPO-Baseline
 
 ## Bloecke
 
 | Block | Datei | Rolle im Zweitpfad |
 | --- | --- | --- |
-| BT100 | `bloecke/BT100_Python_Bootstrap_PoC.md` | Wahrheitsblock: Minimal-Bootstrap, Bridge-V1-Sidecar und 1-Worker-Headless-Contract-PoC |
+| BT100 | `bloecke/BT100_Python_Bootstrap_PoC.md` | Draft-Sammelblock fuer die aktive Landung: `BT90 = 100.1-100.2` (Bootstrap + Contract-Wahrheit), `BT91 = 100.3-100.5` (Sidecar + 1-Worker-Lane) |
 | BT101 | `bloecke/BT101_Custom_Gymnasium_Environment.md` | Single-Env ueber bestehende Kernel-/Transport-Vertraege; Mehr-Env ist ausdruecklich Folgearbeit |
 | BT102 | `bloecke/BT102_PPO_Baseline_Training.md` | rolling draft fuer konservative PPO-Baseline nach BT100/BT101-Evidence |
 | BT103 | `bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` | rolling draft fuer Ablationen, Curriculum-Hardening und Candidate Freeze; keine Runtime-Integration |
-| BT104 | `bloecke/BT104_AB_Validation_Promotion.md` | rolling draft fuer externe A/B-Evidence gegen eingefrorenen DQN-Champion |
-| BT105 | `bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` | rolling draft fuer spaeteren Integrations-Handoff; Self-Play nur Folgebacklog |
+| BT104 | `bloecke/BT104_AB_Validation_Promotion.md` | rolling draft fuer externe A/B-Evidence mit aktiver Urteilssystematik `promote|hold|rollback|diagnose` |
+| BT105 | `bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` | rolling draft fuer spaeteren Integrations-Handoff; kein normaler Implementierungsblock |
 
 ## Prompt-System
 

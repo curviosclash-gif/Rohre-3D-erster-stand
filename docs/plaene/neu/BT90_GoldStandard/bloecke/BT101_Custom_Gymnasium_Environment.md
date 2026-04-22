@@ -73,6 +73,7 @@ Der Block endet also dann gruen, wenn:
 ## Referenzen
 
 - `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
+- `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
 - `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
 - `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md`
 - `docs/referenz/ai_architecture_context.md`
@@ -96,10 +97,11 @@ Er wird aus dem bestehenden runtime-near Payload und den dazugehoerigen Vertrags
 
 Fuer BT101 gilt diese Reihenfolge:
 
-1. `TrainerPayloadAdapter.js` und die dadurch gebauten runtime-near Payloads
-2. `TrainingContractV1.js` als Contract fuer `observationSchemaVersion` und `observationLength`
-3. `ObservationSchemaV2.js` als statische Soll-Referenz fuer den aktuellen runtime-near V2-Pfad
-4. `ObservationSchemaV1.js` nur noch als Kompatibilitaets- und Altpfad-Referenz
+1. `BT90_Contract_Authority_Snapshot_2026-04-22.md` als Freeze-, Drift- und Prioritaetsregel
+2. `TrainerPayloadAdapter.js` und die dadurch gebauten runtime-near Payloads
+3. `TrainingContractV1.js` als Contract fuer `observationSchemaVersion` und `observationLength`
+4. `ObservationSchemaV2.js` als statische Soll-Referenz fuer den aktuellen runtime-near V2-Pfad
+5. `ObservationSchemaV1.js` nur noch als Kompatibilitaets- und Altpfad-Referenz
 
 ### Drift-Regel
 

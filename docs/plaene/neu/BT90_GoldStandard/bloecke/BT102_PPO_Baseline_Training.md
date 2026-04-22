@@ -51,6 +51,22 @@ Vor einer aktiven Umsetzung oder Uebernahme muessen BT100 und BT101 zuerst liefe
 
 Bis diese Grundlage vorliegt, bleiben Step-Budgets, Eval-Takte und Env-Anzahl in BT102 ein rolling draft und muessen mit echter BT100/BT101-Evidence neu kalibriert werden.
 
+Stand 2026-04-22:
+
+- `python/` und `data/training/ppo/` sind im Repo noch nicht als reale Arbeitsbasis vorhanden.
+- BT102 bleibt deshalb ein Folge-Draft hinter `BT90` bis `BT92`; feste Timesteps, Env-Anzahl oder Eval-Takte sind bis zum echten BT92-Handover keine claimbare Zusage.
+
+## Evidence-Vorbedingungen fuer BT102
+
+Vor einer aktiven Umsetzung oder Uebernahme muessen mindestens vorliegen:
+
+- ein gruener `BT92`-Single-Env-Pfad mit Reset-/Step-Smoke und sichtbaren Pflichtfeldern
+- gemessene Boot-, Reset- und Step-Latenzen fuer den realen Headless-Pfad
+- dokumentierte Info-/Semantikfelder (`rewardBreakdown`, `terminalReason`, `truncatedReason`, `hybridDecision`, `observationSchemaVersion`, `observationLength`) oder explizite Restluecken
+- ein realer Bauort unter `python/**` und `data/training/ppo/**`
+
+Fehlt einer dieser Punkte, bleibt BT102 rolling draft und wird nicht ueber Wunschannahmen geschlossen.
+
 ## Nicht-Ziel
 
 - aggressive Hyperparameter-Suche
@@ -91,7 +107,7 @@ Jeder BT102-Referenzlauf schreibt unter `data/training/ppo/` mindestens:
 - Checkpoint
 - Normalize-Stats, falls genutzt
 - Eval-Report
-- Run-Manifest mit Seeds, Env-Anzahl, Timesteps, Versionen und Zielmatrix
+- Run-Manifest mit Seeds, Env-Anzahl, Timesteps, Versionen, Zielmatrix und dem verwendeten BT92-Evidence-Anker
 
 ## Trainings-Pipeline
 
@@ -146,9 +162,11 @@ Wenn Throughput oder Parallelitaet geringer sind als gehofft:
 
 Ein kleinerer, ehrlicher Referenzlauf ist besser als eine fiktive 4-Env-Annahme.
 
+Eine feste `300000`-/`500000`- oder `4-Env`-Zusage ohne gemessene BT92/BT93-Daten ist fuer BT102 unzulaessig.
+
 ## Definition of Done
 
-- [ ] DoD.1 `python/train.py` trainiert die BT102-Baseline fuer mindestens `300000` Env-Steps ohne Crash; `500000` bleibt Referenzziel.
+- [ ] DoD.1 `python/train.py` trainiert die BT102-Baseline fuer ein dokumentiertes, aus BT92/BT93-Evidence abgeleitetes Env-Step-Budget ohne Crash; `300000` bleibt nur Referenzziel fuer tragende Throughput-Lagen.
 - [ ] DoD.2 Checkpoints, Eval- und Manifest-Artefakte liegen reproduzierbar unter `data/training/ppo/`.
 - [ ] DoD.3 Resume-Pfad und `vecnormalize`-Persistenz sind nachgewiesen.
 - [ ] DoD.4 PPO-KPIs sind gegen eine eingefrorene DQN-Referenz explizit als Vorvergleich gegenuebergestellt.
@@ -176,13 +194,14 @@ output: Baseline-Config mit Seeds, Matrix und Manifest-Struktur
 - Artefakt- und Manifest-Struktur festlegen
 - feste Seeds und Vergleichsmatrix dokumentieren
 
-### 102.2 100k-Smoke-Run
+### 102.2 Kalibrierter Smoke-Run
 status: open
-goal: Ersten stabilen End-to-End-Trainingslauf ueber den headless Pfad nachweisen
-output: lauffaehiger Smoke-Run mit Crash-/Logging-Nachweis
+goal: Ersten stabilen End-to-End-Trainingslauf ueber den headless Pfad mit realem Budget nachweisen
+output: lauffaehiger Smoke-Run mit Crash-/Logging-Nachweis und dokumentiertem Startbudget
 
 - `python/train.py` lauffaehig machen
 - erster stabiler Lauf ueber den headless Env-Pfad
+- Startbudget aus gemessener BT92-Evidence kalibrieren
 - Crash-, Reset- und Loggingpfad pruefen
 
 ### 102.3 Checkpoint-, Resume- und Normalize-Persistenz
@@ -203,14 +222,14 @@ output: `eval.py`, eingefrorene DQN-Referenz und sauber gelabelter Vorvergleich
 - DQN-Referenz klar einfrieren
 - Vorvergleich sauber labeln und reporten
 
-### 102.5 Referenzlauf 300k-500k
+### 102.5 Evidenzbasierter Referenzlauf
 status: open
-goal: Belastbare Baseline ueber realistische Laufzeit liefern
+goal: Belastbare Baseline ueber eine realistische, gemessene Laufzeit liefern
 output: konservativer Referenzlauf mit KPI- und Throughput-Lage
 
-- konservativen Referenzlauf fahren
+- konservativen Referenzlauf mit aus BT92/BT93-Daten abgeleitetem Budget fahren
 - KPI- und Artefaktlage dokumentieren
-- Throughput und Laufzeit realistisch festhalten
+- Throughput, Env-Anzahl und Laufzeit realistisch festhalten
 
 ### 102.6 Reproduzierbarkeits-Smoketest und BT103-Handover
 status: open

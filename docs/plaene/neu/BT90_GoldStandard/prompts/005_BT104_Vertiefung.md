@@ -34,7 +34,7 @@ Der Block soll saubere externe Evidence liefern, aber keine produktive Umschaltu
 ### Phase 2: BT104 ausarbeiten oder schaerfen
 
 - definiere eine feste Vergleichsmatrix fuer PPO-Kandidat und DQN-Champion
-- halte `promote|hold|reject` als Output fest
+- halte `promote|hold|rollback|diagnose` als Output fest
 - verwende `bot:validate` nur als Zusatzsignal
 - dokumentiere methodische Vergleichsluecken offen
 
@@ -56,7 +56,7 @@ Welche methodischen oder Validierungsrisiken bleiben offen?
 
 ### C. Naechste sinnvolle Schritte
 
-Was ist der direkte Handover fuer BT105 bei `promote`, und wo stoppt die Kette bei `hold` oder `reject`?
+Was ist der direkte Handover fuer BT105 bei `promote`, und wo stoppt die Kette bei `hold`, `rollback` oder `diagnose`?
 
 ### D. Folge-Prompt
 

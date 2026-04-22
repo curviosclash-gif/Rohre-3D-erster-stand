@@ -37,7 +37,7 @@ updated_at: 2026-04-22
 BT100 ist der Eintrittsblock fuer den PPO-Zweitpfad.
 Der Block beweist nicht "PPO im Spiel", sondern nur den kleinsten belastbaren Wahrheitskern fuer einen externen Python-Sidecar ueber den bestehenden Headless- und Transportpfad.
 
-BT100 hat bewusst nur vier Aufgaben:
+BT100 buendelt bewusst vier Draft-Aufgaben:
 
 1. einen minimalen reproduzierbaren Python-Bootstrap fuer Contract-Smokes herstellen
 2. den bestehenden Training-Contract `v1` gegen reale JS-Artefakte und einen externen Python-Sidecar verifizieren
@@ -52,6 +52,24 @@ Nicht Teil von BT100:
 - fruehes Hardware-Sizing fuer BT102
 
 Diese Punkte werden bewusst nach BT101 verschoben.
+
+## Aktive Landung im Bot-Trainingsplan
+
+BT100 bleibt im Intake-Ordner ein Draft-Sammelblock.
+Die aktive Landung wird bewusst enger getrennt:
+
+- `BT90` uebernimmt aus BT100 nur `100.1` bis `100.2`: Python-Minimalbootstrap, JS-authoritative Contract-Wahrheit, erlaubte PPO-Bauorte, read-only Runtime-Grenzen und Drift-Blocker.
+- `BT91` uebernimmt erst `100.3` bis `100.5`: Python-Sidecar, Boundary-Smoke, deterministische 1-Worker-Lane und kleine Boot-/Reset-/Step-Baseline.
+- Kein aktiver `BT90`-Claim darf Handshake-, Worker-, Single-Env- oder PPO-Baseline-Scope aus `100.3` bis `100.5` vorziehen.
+
+Fuer den aktiven Zuschnitt von `BT91` gilt zusaetzlich:
+
+- genau ein deterministischer Worker
+- mindestens 100 Steps
+- nur bestehender Contract `v1` mit `trainer-ready`, `bot-action-request`, `training-reset`, `training-step` und `trainer-stats-request`
+- keine 2-Worker- oder 4-Worker-Arbeit
+- keine Mehr-Env-/VecEnv-Themen
+- keine PPO-Baseline
 
 ## Startpunkt fuer die erste Umsetzungswelle
 
@@ -80,6 +98,7 @@ Dann ist der Zuschnitt falsch und es braucht einen neuen Intake-Entscheid.
 ## Referenzen
 
 - `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
+- `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
 - `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
 - `docs/bot-training/Bot_Trainingsplan.md`
 - `docs/referenz/ai_architecture_context.md`
@@ -108,6 +127,8 @@ Fuer BT100 gelten diese Artefakte als primaere Referenz:
 - `TrainerPayloadAdapter.js`
 
 BT100 erfindet also keinen "idealen" Contract neu, sondern koppelt an das, was diese Artefakte heute tatsaechlich nachweisen.
+
+Bei Widerspruch zwischen Draft-Formulierung und aktuellem Repo-Stand gewinnt der Freeze aus `BT90_Contract_Authority_Snapshot_2026-04-22.md`; fuer die konkrete Feldsemantik bleiben die JS-Artefakte selbst authoritative.
 
 ### Vertragsrahmen
 

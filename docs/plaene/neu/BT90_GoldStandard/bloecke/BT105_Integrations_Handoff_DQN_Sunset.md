@@ -5,10 +5,11 @@ status: planned
 priority: P3
 owner: frei
 depends_on:
-  - BT104.promote_evidence
+  - BT104.promote
 blocked_by:
   - BT104 endet mit hold
-  - BT104 endet mit reject
+  - BT104 endet mit rollback
+  - BT104 endet mit diagnose
 affected_area: bot-training-ppo-handoff
 scope_files:
   - docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md
@@ -18,7 +19,7 @@ scope_files:
   - docs/plaene/neu/*.md
 verification:
   - rg -n "ObservationBridgePolicy|RuntimeConfig|BotPolicyRegistry|BotPolicyTypes|LocalDqnInference" src
-  - rg -n "BT80C 80\\.9\\.3|promote|hold|reject" docs/bot-training/Bot_Trainingsplan.md docs/plaene/neu/BT90_GoldStandard
+  - rg -n "BT80C 80\\.9\\.3|promote|hold|rollback|diagnose" docs/bot-training/Bot_Trainingsplan.md docs/plaene/neu/BT90_GoldStandard
   - npm run plan:check
   - npm run docs:sync
   - npm run docs:check
@@ -48,8 +49,14 @@ Er ist ein verdict-sensitiver Handoff-Draft fuer einen spaeteren aktiven Integra
 Das bedeutet:
 
 - BT105 wird nur als echter Integrationskandidat relevant, wenn BT104 mit `promote` endet.
-- Bei `hold` oder `reject` bleibt BT105 hoechstens Referenzmaterial fuer einen spaeteren Neuansatz.
+- Bei `hold`, `rollback` oder `diagnose` bleibt BT105 hoechstens Referenzmaterial fuer einen spaeteren Neuansatz.
 - Offene produktive Validation-Risiken duerfen in BT105 dokumentiert werden; sie erlauben aber keinen aktiven Rollout-Intake.
+
+Dokumentationscharakter:
+
+- BT105 erzeugt nur Handoff-, Guardrail- und Entscheidungsartefakte.
+- BT105 aendert keine Runtime-, Matchstart-, Policy- oder Inference-Dateien.
+- Ohne `BT104=promote`, gruene produktionsnahe Validation und expliziten User-Entscheid bleibt jeder Rollout-Intake ein No-go.
 
 ## Nicht-Ziel
 
@@ -106,6 +113,11 @@ Eine vollstaendige DQN-Ablosung ist erst zulaessig, wenn alle folgenden Bedingun
 
 Ohne diese Bedingungen bleibt DQN der produktive Champion.
 
+Stand 2026-04-22 zu `BT80C 80.9.3`:
+
+- Die produktionsnahe Validation-Lane ist weiterhin nicht gruener Bestandteil der Gesamtlage.
+- Solange die feste Matrix noch in `PLAYING` mit `roundsRecorded=0` haengen kann, bleibt BT105 ein Handoff mit offenem Integrationsrestblocker.
+
 ## Folgebacklog ausserhalb des Kernpfads
 
 Als moegliche Folgearbeit dokumentieren, aber nicht in BT105 vermischen:
@@ -117,11 +129,11 @@ Als moegliche Folgearbeit dokumentieren, aber nicht in BT105 vermischen:
 
 ## Definition of Done
 
-- [ ] DoD.1 Ein spaeterer Integrationsblock fuer PPO-Runtime-Rollout und DQN-Sunset ist sauber zugeschnitten.
+- [ ] DoD.1 Ein spaeterer Integrationsblock fuer PPO-Runtime-Rollout und DQN-Sunset ist sauber zugeschnitten und als doc-only Handoff beschrieben.
 - [ ] DoD.2 Touchpoints, Rollback-Pfade und Sunset-Reihenfolge sind dokumentiert.
 - [ ] DoD.3 Es ist explizit dokumentiert, welche heutigen BT90-No-Touch-Dateien spaeter angefasst werden duerfen und unter welchen Voraussetzungen.
 - [ ] DoD.4 Self-Play und weitere Forschung sind sauber aus dem Kernpfad ausgegliedert.
-- [ ] DoD.5 BT105 dokumentiert keine still vorweggenommene Produktivintegration und bleibt ohne `BT104=promote` ein No-go-/Restblocker-Handoff.
+- [ ] DoD.5 BT105 dokumentiert keine still vorweggenommene Produktivintegration und bleibt ohne `BT104=promote`, gruene produktionsnahe Validation und User-Entscheid ein No-go-/Restblocker-Handoff.
 
 ## Risiken
 
@@ -167,7 +179,8 @@ output: Intake-Handoff mit Restblockern und Entscheidungsbedarf
 
 - BT90-Ergebnisse fuer moegliche Uebernahme in `docs/bot-training/Bot_Trainingsplan.md` vorbereiten
 - Abhaengigkeiten, Restblocker und User-Entscheid dokumentieren
-- bei `hold` oder `reject` explizit dokumentieren, warum **kein** aktiver Integrations-Intake geoeffnet wird
+- bei `hold`, `rollback` oder `diagnose` explizit dokumentieren, warum **kein** aktiver Integrations-Intake geoeffnet wird
+- auch bei `promote` explizit dokumentieren, warum ohne gruene produktionsnahe Validation noch kein Rollout-Intake startet
 
 ### 105.99 Abschluss-Gate
 status: open

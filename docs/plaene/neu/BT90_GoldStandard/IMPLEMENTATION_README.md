@@ -25,6 +25,22 @@ Der erste reale Start soll klein und wahrheitsorientiert sein:
 3. `BT101` nur in der Minimalspur `101.1` bis `101.3` anziehen.
 4. `BT101.4` bis `BT101.6` plus `BT102` erst nach gruener Single-Env-Lage und echtem Handover oeffnen.
 
+## Contract-Freeze vor dem ersten Claim
+
+Vor jedem aktiven Claim fuer `BT90`, `BT91` oder `BT92` zuerst:
+
+1. `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md` lesen.
+2. Pruefen, ob `TrainingContractV1.js`, `TrainerPayloadAdapter.js`, `ObservationSchemaV2.js` und `BotActionContract.js` unveraendert zum Freeze-Stand sind.
+3. Pruefen, ob `TrainingDomain.js`, `RuntimeNearObservationAdapter.js`, `HybridDecisionArchitecture.js` oder `EpisodeController.js` seitdem relevante Semantik veraendert haben.
+4. Bei Drift zuerst den Snapshot neu auditieren, statt den Python-Pfad still anzupassen.
+
+Entscheidung zum Verhaeltnis mit `V101`:
+
+- `V101` ist aktuell kein harter Vorblocker fuer `BT90` oder `BT91`.
+- Fuer `BT90` bis `BT92` gilt stattdessen ein kontrollierter Dokumentations-Freeze gegen den Stand vom 2026-04-22.
+- Nach relevanten `V101`-Aenderungen an Authority- oder Adjacent-Dateien ist vor dem naechsten Claim ein Re-Audit Pflicht.
+- Fuer `BT92` ist diese frische Bestaetigung strenger als fuer `BT90` oder `BT91`, weil dort Observation-/Action-Authority und Semantik bereits direkt closure-kritisch sind.
+
 ## Vor dem lokalen Reset
 
 Wenn der naechste Schritt ist, den aktuellen lokalen Stand zu sichern und den Worktree auf den Git-Repository-Stand zurueckzubringen, dann sollte der Ablauf so aussehen:
@@ -90,7 +106,18 @@ Der erste aktive Block sollte bewusst nur den kleinsten Wahrheitskern enthalten:
 - Python-Version, venv-Pfad und Minimal-Install-Smoketest
 - JS-seitige Contract-Wahrheitsartefakte
 - explizite Feldliste fuer den bestehenden `v1`-Pfad
+- erlaubte PPO-Bauorte (`python/**`, `data/training/ppo/**`)
+- read-only Runtime-, Matchstart- und AI-Hub-Grenzen
 - Blocker-Regel fuer Contract- oder Runtime-Drift
+- Freeze-Verweis auf `BT90_Contract_Authority_Snapshot_2026-04-22.md`
+
+Bewusst nicht in den ersten aktiven BT90-Wahrheitsblock ziehen:
+
+- Sidecar-Handshake
+- 1-Worker-Lane
+- Single-Env
+- VecEnv
+- PPO-Baseline
 
 Der zweite kleine aktive Block zieht dann erst:
 
@@ -126,7 +153,7 @@ Der neue PPO-Pfad wird bewusst **ausserhalb** der produktiven Runtime aufgebaut.
 | `python/scripts/**` | nichtproduktive Train-/Eval-/Bootstrap-Orchestrierung |
 | `python/tests/**` | Python- und Contract-Tests |
 | `data/training/ppo/**` | Artefakte, Reports, Checkpoints, Kandidaten |
-| `scripts/training-headless-bridge-smoke.mjs` | optionaler Boundary-Wrapper fuer Headless-Orchestrierung |
+| `scripts/training-headless-bridge-smoke.mjs` | optionaler Boundary-Wrapper ab BT91; nicht Teil des aktiven BT90-Wahrheitsblocks |
 
 ### Read-only und ausserhalb des BT100/BT101-Bauorts
 
@@ -146,11 +173,12 @@ Der neue PPO-Pfad wird bewusst **ausserhalb** der produktiven Runtime aufgebaut.
 
 **Nach der aktuellen Nachschaerfung: ja, ausreichend klar.**
 
-BT100 definiert jetzt ausdruecklich:
+BT100 definiert jetzt als Draft-Sammelblock ausdruecklich:
 
-- dass die Implementierung **hier** startet
+- dass die aktive Landung zuerst nur `BT90 = BT100.1 bis BT100.2` fuer Bootstrap-, Contract-, Bauort- und Drift-Grenzen zieht
+- dass `BT91 = BT100.3 bis BT100.5` Sidecar-, Boundary- und 1-Worker-Scope erst als Folgeblock uebernimmt
 - dass zuerst reale Payloads und der `v1`-Contract gelesen werden
-- dass der Python-Sidecar unter `python/**` entsteht
+- dass der Python-Sidecar unter `python/**` entsteht, aber erst ab BT91 closure-relevant wird
 - dass ein Boundary-Script nur fuer Sidecar-/Headless-Smokes und nur fuer einen Worker zulaessig ist
 - dass der produktive Runtime-/AI-Hub-Pfad read-only bleibt
 

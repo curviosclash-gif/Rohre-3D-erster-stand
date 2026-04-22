@@ -11,18 +11,19 @@ BT90 ist kein aktiver Masterplan, sondern eine Planungsgrundlage unter `docs/pla
 
 1. `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
 2. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md`
-3. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
-4. `docs/bot-training/Bot_Trainingsplan.md`
-5. `docs/referenz/ai_architecture_context.md`
-6. `src/state/HeadlessMatchKernelRuntime.js`
-7. `src/core/MatchKernelTrainingAdapter.js`
-8. `src/entities/ai/training/TrainingTransportFacade.js`
-9. `src/entities/ai/training/WebSocketTrainerBridge.js`
-10. `src/entities/ai/training/TrainingContractV1.js`
-11. `src/entities/ai/training/TrainerPayloadAdapter.js`
-12. `tests/training-environment.contract.test.mjs`
-13. `scripts/training-smoke.mjs`
-14. `scripts/headless-match-kernel-smoke.mjs`
+3. `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
+4. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
+5. `docs/bot-training/Bot_Trainingsplan.md`
+6. `docs/referenz/ai_architecture_context.md`
+7. `src/state/HeadlessMatchKernelRuntime.js`
+8. `src/core/MatchKernelTrainingAdapter.js`
+9. `src/entities/ai/training/TrainingTransportFacade.js`
+10. `src/entities/ai/training/WebSocketTrainerBridge.js`
+11. `src/entities/ai/training/TrainingContractV1.js`
+12. `src/entities/ai/training/TrainerPayloadAdapter.js`
+13. `tests/training-environment.contract.test.mjs`
+14. `scripts/training-smoke.mjs`
+15. `scripts/headless-match-kernel-smoke.mjs`
 
 ### Optional bei Bedarf
 

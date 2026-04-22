@@ -39,7 +39,7 @@ Der Block soll den spaeteren Integrationspfad vorbereiten, aber nicht vorwegnehm
 - halte Rollout-, Rollback- und Sunset-Regeln fest
 - trenne Self-Play und weitere Forschung explizit in einen Folgebacklog aus
 - formuliere klar, dass die finale DQN-Ablosung einen User-Entscheid braucht
-- halte bei `hold` oder `reject` explizit fest, warum **kein** aktiver Integrations-Intake entsteht
+- halte bei `hold`, `rollback` oder `diagnose` explizit fest, warum **kein** aktiver Integrations-Intake entsteht
 
 ## LEITPLANKEN
 

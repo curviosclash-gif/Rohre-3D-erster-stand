@@ -12,18 +12,19 @@ Der Plan ist Intake unter `docs/plaene/neu/` und darf keine produktiven Runtime-
 1. `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
 2. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md`
 3. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md`
-4. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
-5. `docs/referenz/ai_architecture_context.md`
-6. `src/entities/ai/observation/ObservationSchemaV1.js`
-7. `src/entities/ai/observation/ObservationSchemaV2.js`
-8. `src/entities/ai/actions/BotActionContract.js`
-9. `src/entities/ai/training/TrainingContractV1.js`
-10. `src/entities/ai/training/TrainerPayloadAdapter.js`
-11. `src/entities/ai/training/TrainingTransportFacade.js`
-12. `src/core/MatchKernelTrainingAdapter.js`
-13. `src/state/HeadlessMatchKernelRuntime.js`
-14. `tests/training-environment.contract.test.mjs`
-15. `scripts/training-eval-smoke.mjs`
+4. `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
+5. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
+6. `docs/referenz/ai_architecture_context.md`
+7. `src/entities/ai/observation/ObservationSchemaV1.js`
+8. `src/entities/ai/observation/ObservationSchemaV2.js`
+9. `src/entities/ai/actions/BotActionContract.js`
+10. `src/entities/ai/training/TrainingContractV1.js`
+11. `src/entities/ai/training/TrainerPayloadAdapter.js`
+12. `src/entities/ai/training/TrainingTransportFacade.js`
+13. `src/core/MatchKernelTrainingAdapter.js`
+14. `src/state/HeadlessMatchKernelRuntime.js`
+15. `tests/training-environment.contract.test.mjs`
+16. `scripts/training-eval-smoke.mjs`
 
 ### Optional bei Bedarf
 

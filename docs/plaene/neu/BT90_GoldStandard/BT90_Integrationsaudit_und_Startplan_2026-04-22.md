@@ -12,7 +12,7 @@ Wichtig:
 - Dieses Dokument ist **kein** aktiver Masterplan.
 - Operative Phasen, Locks, Abschluss-Evidence und Claim-Status bleiben ausschliesslich in `docs/bot-training/Bot_Trainingsplan.md`.
 - Dieses Dokument beschreibt, **was vor einem professionellen Start zu normalisieren und wie die Startstrecke zu schneiden ist**.
-- Es fuehrt bewusst **keine** Umsetzung aus.
+- Die Erstfassung fuehrte bewusst **keine** Umsetzung aus; diese Revision dokumentiert die Ausfuehrung von Phase 1 als Contract-Freeze, von Phase 2 als BT90-Zuschnitt, von Phase 3 als BT91-Zuschnitt und von Phase 4 als BT92-Zuschnitt. Operative Claims, Locks und Abschluss-Evidence bleiben weiterhin ausschliesslich im Bot-Trainingsplan.
 
 ## Management-Urteil
 
@@ -26,9 +26,8 @@ Positiv:
 
 Negativ:
 
-- Zwischen Draft-Quelle und aktivem Bot-Trainingsplan bestehen noch Semantik- und Zuschnittsdrifts.
-- Der Start ist nicht ueber alle BT90-Dokumente hinweg einheitlich beschrieben.
-- Die fachliche Authority fuer Contracts und Schemas ist vor dem Start nicht hart genug eingefroren.
+- Der claimbare Startpfad `BT90 -> BT91 -> BT92` ist jetzt professionell zugeschnitten; offene Arbeit liegt vor allem im evidenzbasierten Re-Baselining von `BT93` bis `BT95`.
+- Der Authority-Freeze ist dokumentiert, muss aber gegen `V101`- und Adjacent-Drift kontrolliert werden.
 - Spaetere Bloecke sind teilweise wieder zu gross oder methodisch noch nicht sauber genug fuer claimbare operative Arbeit.
 
 ## Harter Befundkatalog
@@ -44,6 +43,11 @@ Folge:
 - Das ist kein kosmetischer Unterschied, sondern ein methodischer Drift im Entscheidungsmodell.
 - Vor einem professionellen Start muss diese Taxonomie vereinheitlicht werden.
 
+Status 2026-04-22 nach Phase 0:
+
+- behoben
+- BT104 und BT105 wurden auf die aktive Urteilssystematik `promote|hold|rollback|diagnose` ausgerichtet
+
 ## 2. Hoch: Es existieren zwei konkurrierende Startnarrative
 
 In Teilen des BT90-Drafts wird weiterhin suggeriert, dass `BT100` direkt als erster Umsetzungsblock startet.
@@ -54,6 +58,11 @@ Folge:
 - Teamseitig droht ein falscher Startscope.
 - Diskussionen ueber Sidecar, 1-Worker-Lane und Single-Env koennen wieder in denselben ersten Startblock zurueckrutschen.
 - Das muss vor jedem Claim textlich auf eine einzige Wahrheit reduziert werden.
+
+Status 2026-04-22 nach Phase 0:
+
+- behoben
+- README und Intake-Master fuehren die operative Landung jetzt konsistent als `BT90 -> BT91 -> BT92`
 
 ## 3. Hoch: V101 ist als moeglicher Contract- und Authority-Drift nur benannt, nicht eingefroren
 
@@ -74,6 +83,11 @@ Folge:
 
 - Der Mehr-Env-Folgepfad ist logisch beschrieben, aber dokumentarisch nicht ganz sauber geschlossen.
 - Das ist kein Sofort-Blocker fuer den Start, aber ein klarer Nachschaerfungspunkt vor BT93.
+
+Status 2026-04-22 nach Phase 0:
+
+- behoben
+- BT93 referenziert jetzt explizit `BT101.4` bis `BT101.6` plus `BT102`
 
 ## 5. Mittel: BT94 ist fuer einen sauberen operativen Block wieder zu breit
 
@@ -99,6 +113,11 @@ Folge:
 - BT95 darf spaeter nicht wie ein normaler Implementierungsblock missverstanden werden.
 - Die Rolle als Handoff-Block muss bis zum Ende explizit sichtbar bleiben.
 
+Status 2026-04-22 nach Phase 0:
+
+- behoben
+- BT95 ist im aktiven Bot-Trainingsplan jetzt zusaetzlich explizit als Handoff-/Intake-Vorbereitungsblock markiert
+
 ## 7. Hoch: Der reale Repo-Startzustand ist schwacher als die Planoptik
 
 Der Plan spricht bereits in operativen Begriffen ueber Python-Sidecar, PPO-Artefakte und Env-Pfade.
@@ -114,7 +133,7 @@ Folge:
 ### Integrationsbewertung
 
 - Governance und Planstruktur: **solide**
-- Fachliche Semantik und operative Scharfstellung: **noch nicht ausreichend**
+- Fachliche Semantik und operative Scharfstellung des Startpfads: **solide**
 - Sofortige Startfaehigkeit ohne Vorarbeit: **nicht gegeben**
 
 ### Gesamtnote
@@ -151,12 +170,149 @@ Der professionelle Start ist stattdessen:
 5. Erst danach die Single-Env-Minimalspur vorbereiten.
 6. Alles ab Mehr-Env und PPO-Baseline bewusst als Folgepfad behandeln.
 
+## Umsetzungsstand Phase 0 (2026-04-22)
+
+Phase 0 wurde mit dieser Revision dokumentarisch umgesetzt.
+
+### Ergebnis
+
+- Die einzige operative Startgeschichte lautet jetzt durchgehend `BT90 -> BT91 -> BT92`.
+- Die aktive Urteilssystematik `promote|hold|rollback|diagnose` wurde als Wahrheit fuer BT104/BT105 durchgezogen.
+- BT93 referenziert den Mehr-Env-Folgepfad jetzt explizit ueber `BT101.4` bis `BT101.6` plus `BT102`.
+- BT95 ist ueber die Live-Dokumente hinweg sichtbar als Handoff-/Intake-Vorbereitungsblock markiert.
+
+### Aenderungen dieser Revision
+
+- `docs/plaene/neu/BT90_GoldStandard/README.md` auf die aktive Landung `BT90 -> BT91 -> BT92` umgestellt.
+- `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md` auf dieselbe operative Startlogik und die aktive BT104-/BT105-Taxonomie ausgerichtet.
+- `docs/bot-training/Bot_Trainingsplan.md` fuer `BT93` und `BT95` textlich geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` auf `promote|hold|rollback|diagnose` harmonisiert.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` auf dieselbe Urteilssystematik und Handoff-Rolle geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/prompts/005_BT104_Vertiefung.md` und `006_BT105_Vertiefung.md` auf die aktive Taxonomie umgestellt.
+
+## Umsetzungsstand Phase 1 (2026-04-22)
+
+Phase 1 wurde mit dieser Revision dokumentarisch umgesetzt.
+
+### Ergebnis
+
+- Ein expliziter Authority-Freeze fuer `BT90` bis `BT92` wurde als eigenes Snapshot-Dokument festgezogen.
+- Das Authority-Viereck aus `TrainingContractV1`, `TrainerPayloadAdapter`, `ObservationSchemaV2` und `BotActionContract` ist jetzt fuer den Startpfad priorisiert und gegen historische Kontextdrift abgegrenzt.
+- `V101` wurde nicht als harter Vorblocker gesetzt, sondern als kontrolliertes Restrisiko mit klarer Re-Audit-Regel fuer Authority- und Adjacent-Dateien entschieden.
+- Der Freeze wurde in die claim-relevanten BT90-Dokumente und in den aktiven Bot-Trainingsplan verdrahtet, damit der Startpfad nicht wieder auf uneinheitlichen Textquellen basiert.
+
+### Aenderungen dieser Revision
+
+- `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md` neu angelegt.
+- `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md` um einen verpflichtenden Pre-Claim-Hook auf den Snapshot erweitert.
+- `docs/plaene/neu/BT90_GoldStandard/IMPLEMENTATION_README.md` um Contract-Freeze und `V101`-Regel erweitert.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` auf den Snapshot als Konflikt- und Freeze-Referenz ausgerichtet.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` auf dieselbe Authority-Precedence ausgerichtet.
+- `docs/bot-training/Bot_Trainingsplan.md` in `BT90` und `BT92` um Snapshot- und Re-Audit-Regeln erweitert.
+- `docs/plaene/neu/BT90_GoldStandard/prompts/001_BT100_Vertiefung.md` und `002_BT101_Vertiefung.md` um den Snapshot in der Pflicht-Lektuere erweitert.
+
+### Materielle Freeze-Entscheidung
+
+Fuer den aktuellen Stand gilt:
+
+- `TrainingContractV1.js` bleibt authoritative fuer den internen Reset-/Step-Transitionshape.
+- `TrainerPayloadAdapter.js` bleibt authoritative fuer den externen Transport- und Projektionsshape.
+- `ObservationSchemaV2.js` friert den runtime-near Zielshape auf `v2-runtime-near` und Laenge `64` ein.
+- `BotActionContract.js` friert Feldnamen, Clamping, Invalid-Handling und die Index-Semantik von `useItem`/`shootItemIndex` ein.
+- `TrainingDomain.js`, `RuntimeNearObservationAdapter.js`, `HybridDecisionArchitecture.js` und `EpisodeController.js` sind als semantiknahe Adjacent-Dateien fuer Re-Audits markiert.
+
+## Umsetzungsstand Phase 2 (2026-04-22)
+
+Phase 2 wurde mit dieser Revision dokumentarisch umgesetzt.
+
+### Ergebnis
+
+- Der aktive `BT90`-Block im Bot-Trainingsplan ist jetzt als kleinstmoeglicher Wahrheitsblock geschnitten.
+- `BT90` traegt jetzt nur Python-Minimalbootstrap, JS-authoritative Contract-Wahrheit, erlaubte PPO-Bauorte, read-only Runtime-Grenzen und die Drift-Blocker-Regel.
+- Sidecar-Handshake, 1-Worker-Lane, Single-Env, VecEnv und PPO-Baseline sind in `BT90` jetzt explizit ausgeschlossen und bleiben in `BT91` bis `BT93`.
+- Die Referenzdokumente im BT90-Ordner spiegeln die aktive Trennung jetzt deutlicher, ohne dort operative Phasen zu pflegen.
+
+### Aenderungen dieser Revision
+
+- `docs/bot-training/Bot_Trainingsplan.md` fuer `BT90` um Bauort-, Runtime-Grenzen-, Ausschluss- und Drift-Blocker-Scope geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/IMPLEMENTATION_README.md` auf denselben minimalen aktiven BT90-Wahrheitskern nachgezogen.
+- `docs/plaene/neu/BT90_GoldStandard/README.md` um die explizite BT90-Nicht-Ziehen-Liste erweitert.
+- `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md` fuer die aktive Trennung `BT90 = 100.1-100.2` vs. `BT91 = 100.3-100.5` geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` als Draft-Sammelblock mit expliziter aktiver Landung `BT90`/`BT91` markiert.
+
+## Umsetzungsstand Phase 3 (2026-04-22)
+
+Phase 3 wurde mit dieser Revision dokumentarisch umgesetzt.
+
+### Ergebnis
+
+- Der aktive `BT91`-Block im Bot-Trainingsplan ist jetzt explizit als enger Integrations- und Stabilitaetsblock zugeschnitten.
+- `BT91` traegt jetzt nur bestehenden Contract `v1`, `trainer-ready`, Lesen von `bot-action-request`, `training-reset`, `training-step`, `trainer-stats-request`, genau eine deterministische 1-Worker-Lane, mindestens 100 Steps und eine kleine Boot-/Reset-/Step-Baseline.
+- 2-Worker-, 4-Worker-, Mehr-Env-/VecEnv- und PPO-Baseline-Scope sind im aktiven `BT91` jetzt ausdruecklich ausgeschlossen.
+- Der direkte BT100-Referenzblock spiegelt denselben Zuschnitt, ohne selbst zu einem zweiten aktiven Wahrheitsraum zu werden.
+
+### Aenderungen dieser Revision
+
+- `docs/bot-training/Bot_Trainingsplan.md` fuer `BT91` um Quellzuschnitt, Snapshot-Hook und harte Ausschlussliste geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` auf denselben engen aktiven `BT91`-Zuschnitt nachgezogen.
+
+### Restlage
+
+- Keine neue Zwischenphase noetig.
+- Offener naechster Zuschnitt bleibt `BT92` als Single-Env- und Semantikblock aus Phase 4.
+
+## Umsetzungsstand Phase 4 (2026-04-22)
+
+Phase 4 wurde mit dieser Revision dokumentarisch umgesetzt.
+
+### Ergebnis
+
+- Der aktive `BT92`-Block im Bot-Trainingsplan ist jetzt als enger Single-Env- und Semantikblock zugeschnitten.
+- `BT92` traegt jetzt nur Observation-/Action-Authority, genau ein headless `gymnasium.Env`, `reset()`, `step()`, `close()` sowie die JS-authoritative Reward-, `done`-, `truncated`- und Info-Semantik.
+- `rewardBreakdown`, `terminalReason`, `truncatedReason`, `hybridDecision`, `observationSchemaVersion` und `observationLength` sind im aktiven Block explizit als sichtbare Pflichtsignale verankert.
+- Mehr-Env, VecEnv, PPO-Baseline und Parallelisierungsversprechen sind in `BT92` jetzt ausdruecklich ausgeschlossen und bleiben Folgearbeit fuer `BT93`.
+
+### Aenderungen dieser Revision
+
+- `docs/bot-training/Bot_Trainingsplan.md` fuer `BT92` um harte Ausschlussliste, praezisierten Lifecycle (`reset()`, `step()`, `close()`), sichtbare Semantikfelder und strengeren BT93-Handover geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/BT90_Integrationsaudit_und_Startplan_2026-04-22.md` auf dokumentarisch abgeschlossene Phase 4, Session E und den Phase-5-Fokus aktualisiert.
+
+### Restlage
+
+- Keine neue Zwischenphase noetig.
+- Naechster Schritt bleibt Phase 5 als Re-Baselining fuer `BT93` bis `BT95`.
+
+## Umsetzungsstand Phase 5 (2026-04-22)
+
+Phase 5 wurde mit dieser Revision dokumentarisch umgesetzt.
+
+### Ergebnis
+
+- `BT93` ist jetzt explizit an echte `BT92`-Evidence, den fehlenden heutigen Python-/PPO-Bauort und gemessene Throughput-/Latenzdaten gebunden statt an Draft-Annahmen.
+- `BT94` hat jetzt eine Claim-Grenze zwischen Freeze-Paket und externer A/B-Evidence; wenn Freeze-Artefakte, Matrix oder Lane-Budget unscharf bleiben, ist vor einem Claim Split oder Nachschaerfung Pflicht.
+- `BT95` ist jetzt noch klarer als doc-only Handoff verankert; ohne `BT104=promote`, gruene produktionsnahe Validation und User-Entscheid oeffnet kein aktiver Rollout-Intake.
+- `BT80C 80.9.3` bleibt mit der konkret benannten Restlage (`PLAYING`, `roundsRecorded=0`) sichtbar als produktionsnaher Integrationsblocker.
+
+### Aenderungen dieser Revision
+
+- `docs/bot-training/Bot_Trainingsplan.md` fuer `BT93` bis `BT95` um Evidence-Anker, Monolith-Guardrail, No-go-Regeln und den konkreten `BT80C 80.9.3`-Restblocker geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` auf realen Repo- und Evidence-Anker nachkalibriert.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` um Freeze-Hartgrenze und expliziten BT104-Handover erweitert.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` um klare Freeze-/Diagnose-Grenzen und den konkreten BT80C-Zusatzsignal-Status geschaerft.
+- `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` als doc-only Handoff mit hartem No-go ohne `promote` plus gruene produktionsnahe Validation nachgeschaerft.
+
+### Restlage
+
+- Phase 5 ist dokumentarisch geschlossen.
+- Operative Evidence fuer `BT93` bis `BT95` fehlt weiterhin bewusst; diese Bloecke bleiben rolling drafts hinter `BT90` bis `BT92`.
+- Der reale Repo-Bauort fuer Python/PPO (`python/**`, `data/training/ppo/**`) ist weiterhin nicht vorhanden und bleibt deshalb Teil der frueheren Startbloecke statt von Phase 5.
+
 ## Phasen zur Umsetzung
 
 Hinweis:
 
 - Diese Phasen sind als professionelle Leitlinie fuer die naechsten Dokumentations- und Intake-Schritte formuliert.
-- Sie sollen **noch nicht ausgefuehrt**, sondern als Arbeitsrahmen verwendet werden.
+- Phase 4 wurde mit dieser Revision dokumentarisch ausgefuehrt; Phase 5 und spaeter bleiben Arbeitsrahmen.
 
 ### Phase 0 - Governance-Normalisierung und Dokumentenklarheit
 
@@ -181,6 +337,11 @@ No-Go:
 
 - Kein BT90-Claim, solange diese Normalisierung offen ist.
 
+Status 2026-04-22:
+
+- dokumentarisch umgesetzt
+- Startlandung, Urteilssystematik, BT93-Quellverweise und BT95-Rolle sind ueber die relevanten Live-Dokumente harmonisiert
+
 ### Phase 1 - Contract-Freeze und Authority-Snapshot
 
 Ziel:
@@ -194,6 +355,12 @@ Arbeitspakete:
 - Pflichtfelder, Drift-Regeln und Blocker-Signale fuer BT90-BT92 in einem kleinen, eindeutigen Authority-Snapshot notieren.
 - Klar dokumentieren, dass Contract- oder Schema-Drift nicht still im Python-Pfad wegadaptiert werden darf.
 
+Status 2026-04-22:
+
+- dokumentarisch umgesetzt
+- Snapshot: `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
+- Entscheid zu `V101`: kontrolliertes Restrisiko mit Re-Audit-Pflicht statt harter Vorblocker
+
 Abschlusskriterien:
 
 - Die Authority-Frage ist vor dem ersten Claim beantwortet.
@@ -203,6 +370,29 @@ Abschlusskriterien:
 No-Go:
 
 - Kein professioneller Start auf "vermutlich stabilem" Contract-Stand.
+
+### Phase 1.5 - Kontrollierte Drift- und Re-Audit-Gates
+
+Ziel:
+
+Die Restrisiken sichtbar kontrollieren, die Phase 1 nicht sofort technisch aufloesen kann, ohne den Scope in `V101` oder globale Referenzpflege aufzuweiten.
+
+Offene Risiken und warum sie nicht sofort loesbar sind:
+
+| Restrisiko | Warum nicht sofort loesbar | Zwischenloesung fuer Phase 1.5 |
+| --- | --- | --- |
+| `V101` kann angrenzende Semantikdateien wie `TrainingDomain.js`, `RuntimeNearObservationAdapter.js` oder `HybridDecisionArchitecture.js` veraendern | `V101` ist ein separater, repo-weiter Hardening-Block und nicht Teil dieses BT90-Unterauftrags | Dokumentations-Freeze gegen den Stand 2026-04-22; Re-Audit vor dem naechsten `BT90`- bis `BT92`-Claim, sobald Authority- oder Adjacent-Dateien driften |
+| `docs/referenz/ai_architecture_context.md` enthaelt weiterhin eine historische Bridge-V1-Sektion, die fuer `BT90` bis `BT92` allein nicht ausreicht | Die Referenzdatei bedient auch andere aktive Trainings- und Runtime-Pfade; ein globaler Umbau waere hier Scope-Drift | Fuer `BT90` bis `BT92` gewinnt der neue Snapshot bei Feldkonflikten; ein spaeterer repo-weiter Referenzabgleich bleibt eigene Folgearbeit |
+
+Abschlusskriterien:
+
+- Offene Driftfenster sind sichtbar dokumentiert statt implizit toleriert.
+- Fuer `BT90` bis `BT92` ist klar, wann ein Re-Audit Pflicht wird.
+- `BT92` wird nicht ohne frische Bestaetigung nach relevanter `V101`-Aenderung vorbereitet.
+
+No-Go:
+
+- Kein Sidecar-, Env- oder Python-Fallback, der Drift still kapselt statt den Snapshot zu erneuern.
 
 ### Phase 2 - Intake-Vorbereitung fuer BT90
 
@@ -235,6 +425,12 @@ No-Go:
 
 - Kein "nur noch schnell" Sidecar oder Worker-Scope in BT90.
 
+Status 2026-04-22:
+
+- dokumentarisch umgesetzt
+- der aktive BT90-Block traegt jetzt nur Minimal-Bootstrap, Contract-Wahrheit, Bauort-/Read-only-Grenzen und Drift-Blocker
+- Sidecar-, 1-Worker-, Single-Env-, VecEnv- und PPO-Baseline-Scope bleiben explizit ausserhalb von BT90
+
 ### Phase 3 - Intake-Vorbereitung fuer BT91
 
 Ziel:
@@ -260,6 +456,12 @@ Abschlusskriterien:
 
 - BT91 ist ein enger Integrations- und Stabilitaetsblock.
 - Mehr-Worker- oder Throughput-Druck wird sichtbar abgewehrt.
+
+Status 2026-04-22:
+
+- dokumentarisch umgesetzt
+- `BT91` ist im aktiven Bot-Trainingsplan jetzt explizit auf Contract-`v1`-Sidecar, `trainer-ready`, bestehende Message-Typen, genau einen deterministischen Worker, mindestens 100 Steps und eine kleine Boot-/Reset-/Step-Baseline begrenzt
+- 2-/4-Worker, Mehr-Env-/VecEnv und PPO-Baseline sind dort jetzt ausdruecklich ausgeschlossen
 
 ### Phase 4 - Intake-Vorbereitung fuer BT92
 
@@ -287,6 +489,12 @@ Abschlusskriterien:
 - BT92 schliesst nur als sauberer Single-Env-Minimalblock.
 - Parallelisierung bleibt explizit ausserhalb von `BT92.99`.
 
+Status 2026-04-22:
+
+- dokumentarisch umgesetzt
+- `BT92` ist im aktiven Bot-Trainingsplan jetzt explizit auf Observation-/Action-Authority, genau ein headless Env, `reset()`/`step()`/`close()` und sichtbare JS-authoritative Semantikfelder begrenzt
+- Mehr-Env, VecEnv, PPO-Baseline und Parallelisierungsversprechen sind dort jetzt ausdruecklich ausgeschlossen
+
 ### Phase 5 - Re-Baselining fuer BT93 bis BT95
 
 Ziel:
@@ -305,6 +513,11 @@ Abschlusskriterien:
 - Kein spaeterer Block baut mehr auf Wunschannahmen aus dem Draft.
 - Jede Folgephase ist an echte Vorlaeufer-Evidence gekoppelt.
 
+Status 2026-04-22:
+
+- dokumentarisch umgesetzt
+- `BT93` bis `BT95` sind jetzt an reale Vorlaeufer-Evidence, Freeze-Handover, No-go-Regeln und den offenen `BT80C 80.9.3`-Restblocker gebunden
+
 ## Empfohlene Untersuchungsreihenfolge fuer die naechsten Sessions
 
 ### Session A - Dokumenten- und Governance-Audit
@@ -319,6 +532,10 @@ Ergebnis:
 - eindeutige Startlogik
 - bereinigte spaetere Rollendefinitionen
 
+Status 2026-04-22:
+
+- abgeschlossen
+
 ### Session B - Contract- und Authority-Audit
 
 Ziel:
@@ -331,6 +548,10 @@ Ergebnis:
 - dokumentierte Drift-Regeln
 - eindeutige Entscheidung zu `V101`
 
+Status 2026-04-22:
+
+- abgeschlossen
+
 ### Session C - BT90-Startblock final zuschneiden
 
 Ziel:
@@ -342,6 +563,10 @@ Ergebnis:
 - professionell kleiner BT90-Wahrheitsblock
 - keine versteckte Sidecar- oder Worker-Last
 
+Status 2026-04-22:
+
+- abgeschlossen
+
 ### Session D - BT91-Vorbereitung
 
 Ziel:
@@ -351,6 +576,10 @@ Phase 3 als enger Integrationsblock vorbereiten.
 Ergebnis:
 
 - deterministischer 1-Worker-Pfad als einziges Ziel
+
+Status 2026-04-22:
+
+- abgeschlossen
 
 ### Session E - BT92-Vorbereitung
 
@@ -363,24 +592,44 @@ Ergebnis:
 - klare Semantikuebernahme
 - keine voreilige Parallelisierung
 
+Status 2026-04-22:
+
+- abgeschlossen
+
+### Session F - BT93-BT95 Re-Baselining
+
+Ziel:
+
+Phase 5 dokumentarisch abschliessen.
+
+Ergebnis:
+
+- `BT93` an echte `BT92`-Evidence, Repo-Bauorte und gemessene Budgets gebunden
+- `BT94` mit Monolith-Guardrail zwischen Freeze und externer Evidence versehen
+- `BT95` als doc-only Handoff mit explizitem `BT80C 80.9.3`-Restblocker verschaerft
+
+Status 2026-04-22:
+
+- abgeschlossen
+
 ## Klare Handlungsempfehlung
 
-Wenn BT90 professionell gestartet werden soll, lautet die Reihenfolge:
+Wenn BT90 nach Phase 0 bis Phase 4 professionell weitergezogen werden soll, lautet die Reihenfolge:
 
-1. **Nicht** sofort implementieren.
-2. Zuerst Phase 0 und Phase 1 dokumentarisch sauber schliessen.
-3. Dann nur BT90 als kleinstmoeglichen Wahrheitsblock vorbereiten.
-4. Erst nach gruener BT90-Logik BT91 vorbereiten.
-5. Erst danach BT92 vorbereiten.
-6. BT93-BT95 erst auf Basis echter Evidence re-baselinen.
+1. Den Snapshot aus Phase 1 bis zum ersten Claim als bindenden Freeze behandeln.
+2. Wenn `V101` oder anderer Scope relevante Authority-/Adjacent-Dateien aendert, zuerst Phase 1 per Re-Audit erneuern.
+3. `BT91` und `BT92` auf genau diesem Zuschnitt halten und keine Mehr-Worker-, Mehr-Env-, VecEnv- oder PPO-Arbeit in die Bloecke zurueckziehen.
+4. `BT92` nur mit frischer Snapshot-Bestaetigung claimen, falls Authority- oder Adjacent-Dateien seit dem Freeze gedriftet sind.
+5. `BT93` bis `BT95` weiter nur auf Basis echter Vorlaeufer-Evidence behandeln; ohne gruene `BT90`- bis `BT92`-Artefakte bleiben sie rolling drafts.
+6. Einen spaeteren produktiven Rollout erst nach `BT104=promote`, gruener produktionsnaher Validation und explizitem User-Entscheid diskutieren.
 
 ## Abschlussurteil
 
 BT90 ist heute **kein schlechter Draft**, aber noch **kein hart professionell startklarer Ausfuehrungspfad**.
 
-Der richtige naechste Schritt ist daher nicht direkte Umsetzung, sondern:
+Der richtige naechste Schritt ist daher nicht direkte Umsetzung ausserhalb des aktiven Plans, sondern:
 
-- Normalisierung
-- Authority-Freeze
-- enger Startblock-Zuschnitt
-- erst danach operative Uebernahme in den aktiven Bot-Trainingsplan
+- Freeze halten und Restrisiken aus Phase 1.5 kontrollieren
+- die jetzt zugeschnittenen `BT91`- und `BT92`-Bloecke nicht wieder aufweiten
+- Phase 5 als evidenzbasiertes Re-Baselining fuer `BT93` bis `BT95` vorbereiten
+- erst danach weitere operative Uebernahme im aktiven Bot-Trainingsplan fortsetzen

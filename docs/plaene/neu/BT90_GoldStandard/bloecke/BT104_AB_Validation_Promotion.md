@@ -61,6 +61,11 @@ Das bedeutet:
 - wenn `bot:validate` verfuegbar ist, wird es als Zusatzsignal genutzt
 - wenn `bot:validate` weiter instabil ist, muss BT104 das offen dokumentieren und darf daraus keine stillschweigende Promotion ableiten
 
+Stand 2026-04-22:
+
+- Die feste produktionsnahe Validation-Lane aus `BT80C 80.9.3` bleibt offen; dokumentiert ist weiter, dass die Matrix in `PLAYING` mit `roundsRecorded=0` haengen kann.
+- `bot:validate` bleibt damit fuer BT104 ausdruecklich Zusatzsignal oder Restblocker, nicht methodische Hauptbasis des Urteils.
+
 ## Startvoraussetzung
 
 BT104 startet fachlich nur, wenn BT103 einen echten Kandidaten geliefert hat.
@@ -70,6 +75,11 @@ Das bedeutet:
 - unter `data/training/ppo/candidates/**` muss ein Freeze-Paket mit Manifest, Checkpoint und Eval-Report vorliegen
 
 Wenn diese Voraussetzungen fehlen, wird BT104 nicht "trotzdem mal vorbereitet", sondern bleibt bewusst blockiert.
+
+Phase-5-Hartgrenze:
+
+- BT104 konsumiert genau ein Freeze-Paket aus BT103 und oeffnet weder Ablationen noch Kandidatenwahl erneut.
+- Wenn Freeze-Paket, Lane-Budget oder Vergleichsmanifest unklar bleiben, ist das kein kleiner Rest, sondern `hold` oder `diagnose` vor aktivem Claim.
 
 ## Vergleichsmatrix
 
@@ -99,17 +109,19 @@ Sie muessen als `invalid` protokolliert und auf derselben Matrix neu gefahren od
 
 ## Bewertungsregel
 
-BT104 produziert eines von drei Urteilen:
+BT104 produziert eines von vier Urteilen:
 
 - `promote`
 - `hold`
-- `reject`
+- `rollback`
+- `diagnose`
 
 Interpretation:
 
 - `promote` heisst nur: PPO ist als naechster Integrationskandidat fachlich plausibel.
 - `hold` heisst: Evidence reicht nicht, ist methodisch zu unsauber oder der Vorteil ist zu klein.
-- `reject` heisst: PPO ist auf der festen Matrix schlechter oder methodisch nicht belastbar genug, um als Integrationskandidat weiterzulaufen.
+- `rollback` heisst: Der Kandidat ist gegen die feste Matrix sichtbar schlechter oder regressiv; die Kette faellt bewusst auf den vorherigen Freeze-/Champion-Stand zurueck.
+- `diagnose` heisst: Harness, Artefakte oder Vergleichslane sind methodisch zu instabil fuer ein ehrliches Sachurteil; zuerst Fehlerursache schliessen, nicht still werten.
 
 `promote` ist nur zulaessig, wenn:
 
@@ -122,13 +134,19 @@ Interpretation:
 
 - weniger als 3 gueltige Vergleichspaesse vorliegen
 - die Matrix methodisch nicht sauber genug ist
-- oder die KPI-Lage gemischt bleibt und keine ehrliche `promote`- oder `reject`-Aussage traegt
+- oder die KPI-Lage gemischt bleibt und keine ehrliche `promote`- oder `rollback`-Aussage traegt
 
-`reject` ist zulaessig, wenn:
+`rollback` ist zulaessig, wenn:
 
 - `averageBotSurvival` im Median schlechter ist
 - oder `invalidActionRate`, Failure-Klassen oder Crash-Stabilitaet sichtbar schlechter sind
 - oder der Kandidat methodisch nicht reproduzierbar bleibt
+
+`diagnose` ist zulaessig, wenn:
+
+- die Lane durch Harness-, Artifact- oder Matrix-Defekte kein ehrliches Sachurteil traegt
+- wiederholte Invalidierungen oder Drift nicht auf Kandidatenstaerke, sondern auf das Verfahren selbst zeigen
+- vor einer echten Wertung zuerst ein klarer Ursachen- und Reparaturpfad noetig ist
 
 Keines dieser Urteile schaltet produktiv um.
 
@@ -143,10 +161,10 @@ Keines dieser Urteile schaltet produktiv um.
 ## Definition of Done
 
 - [ ] DoD.1 PPO- und DQN-Referenzartefakte sind auf dieselbe Vergleichsmatrix eingefroren.
-- [ ] DoD.2 Externe A/B-Auswertung liefert ein klares Urteil `promote|hold|reject`.
+- [ ] DoD.2 Externe A/B-Auswertung liefert ein klares Urteil `promote|hold|rollback|diagnose`.
 - [ ] DoD.3 Es liegen mindestens 3 gueltige Vergleichspaesse vor oder die Restblockade ist explizit dokumentiert.
 - [ ] DoD.4 Falls `bot:validate` verfuegbar ist, ist eine Zusatz-Gegenprobe dokumentiert; falls nicht, ist der Restblocker offen und ehrlich dokumentiert.
-- [ ] DoD.5 Ergebnis ist verdict-sensitiv verpackt: `promote` oeffnet BT105, `hold` oder `reject` stoppen die Kette bewusst.
+- [ ] DoD.5 Ergebnis ist verdict-sensitiv verpackt: `promote` oeffnet BT105, `hold`, `rollback` oder `diagnose` stoppen die Kette bewusst; laufende Ablationen oder Kandidatenneuwahl werden nicht in BT104 mitgezogen.
 
 ## Risiken
 
@@ -183,22 +201,22 @@ goal: Produktive Validation nur als Zusatzsignal einordnen
 output: dokumentierte Gegenprobe oder sauber benannter Restblocker
 
 - falls gruener Pfad verfuegbar: Zusatz-Gegenprobe dokumentieren
-- falls nicht: Restblocker offen und sauber benennen
+- falls nicht: Restblocker offen und sauber benennen, inklusive aktueller BT80C-Ursache
 - keine falsche Umdeutung zu einem Alleingate erlauben
 
 ### 104.4 Promotions-Evidence-Paket und Handover
 status: open
 goal: Urteil, Restunsicherheit und Integrationshygiene zusammenfassen
-output: Endurteil `promote|hold|reject` mit verdict-sensitivem Handover
+output: Endurteil `promote|hold|rollback|diagnose` mit verdict-sensitivem Handover
 
-- Endurteil `promote|hold|reject` schreiben
+- Endurteil `promote|hold|rollback|diagnose` schreiben
 - Restunsicherheiten dokumentieren
 - BT105-Handover nur bei `promote` als echten Integrationskandidaten vorbereiten
 
 ### 104.99 Abschluss-Gate
 status: open
 goal: BT104 nur mit belastbarer Matrix und ehrlichem Urteil schliessen
-output: sauberes externes Evidence-Paket; `hold`/`reject` stoppen die Kette bewusst
+output: sauberes externes Evidence-Paket; `hold`/`rollback`/`diagnose` stoppen die Kette bewusst
 
 - [ ] 104.99.1 Alle Phasen 104.1 bis 104.4 sind mit Evidence dokumentiert.
 - [ ] 104.99.2 PPO und DQN sind auf einer festen Matrix ehrlich eingeordnet.

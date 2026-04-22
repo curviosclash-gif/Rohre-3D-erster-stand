@@ -49,7 +49,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 
 | Aktiver Block hier | Draft-Quelle | Rolle |
 | --- | --- | --- |
-| `BT90` | `BT100.1` bis `BT100.2` | Python-Minimalbootstrap und JS-authoritative Contract-Wahrheit |
+| `BT90` | `BT100.1` bis `BT100.2` | Python-Minimalbootstrap, JS-authoritative Contract-Wahrheit sowie Bauort- und Drift-Grenzen |
 | `BT91` | `BT100.3` bis `BT100.5` | Python-Sidecar-Handshake, Contract-Smoke und deterministische 1-Worker-Lane |
 | `BT92` | `BT101.1` bis `BT101.3` | Observation-/Action-Authority, Single-Env und JS-authoritative Semantik |
 | `BT93` | `BT101.4` bis `BT101.6` plus `BT102` | Mehr-Env-Folgepfad und konservative PPO-Baseline |
@@ -120,7 +120,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-C | BT40 | 2026-03-22 | frei | - |
 | - | BT73 | - | frei | Intake 2026-03-31 abgeschlossen; Claim nach BT20-/BT30-/BT40-Abstimmung |
 | Bot-Codex | BT80C | 2026-04-03 | active | 80.99 offen; 80.7-80.9 repo-technisch vorgezogen |
-| - | BT90 | - | frei | Intake 2026-04-22 vorbereitet; Bootstrap-/Contract-Kern |
+| - | BT90 | - | frei | Intake 2026-04-22 vorbereitet; Minimal-Bootstrap, Contract-Wahrheit, Bauort-/Drift-Grenzen |
 | - | BT91 | - | frei | wartet auf BT90.99; Sidecar-Handshake und 1-Worker-Lane |
 | - | BT92 | - | frei | wartet auf BT91.99; Single-Env-Minimalspur |
 | - | BT93 | - | frei | wartet auf BT92.99; Mehr-Env-/PPO-Baseline |
@@ -638,31 +638,61 @@ Scope:
 
 - Kleinsten reproduzierbaren Python-Bootstrap fuer den PPO-Zweitpfad festziehen.
 - JS-authoritative Contract-Wahrheitsartefakte und Pflichtfelder fuer den `v1`-Pfad dokumentieren.
-- Layer-/No-Touch-Regeln fuer produktive Runtime- und AI-Hub-Surfaces fest verankern.
+- Erlaubte PPO-Bauorte fuer den Startpfad auf `python/**` und `data/training/ppo/**` begrenzen.
+- Read-only Runtime-, Matchstart- und AI-Hub-Grenzen fuer den Startpfad fest verankern.
+- Contract- oder Runtime-Drift vor dem naechsten Claim explizit als Re-Audit-Blocker behandeln.
+
+Ausdruecklich ausserhalb von BT90:
+
+- kein Sidecar-Handshake
+- keine 1-Worker-Lane
+- kein Single-Env
+- kein VecEnv
+- keine PPO-Baseline
+
+Authority-Snapshot:
+
+- Referenz fuer `BT90` bis `BT92`: `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
+- `V101` bleibt ein kontrolliertes Drift-Risiko statt harter Vorblocker: wenn `TrainingContractV1.js`, `TrainerPayloadAdapter.js`, `ObservationSchemaV2.js`, `BotActionContract.js`, `TrainingDomain.js`, `RuntimeNearObservationAdapter.js`, `HybridDecisionArchitecture.js` oder `EpisodeController.js` seit dem Snapshot driften, ist vor dem naechsten Claim ein Re-Audit Pflicht.
+
+Erlaubte PPO-Bauorte:
+
+- `python/**`
+- `data/training/ppo/**`
+- Boundary- und Sidecar-Orchestrierung unter Root-Skripten bleibt bis `BT91` ausserhalb dieses Blocks.
+
+Read-only Runtime-Grenzen:
+
+- `src/state/HeadlessMatchKernelRuntime.js`, `src/core/MatchKernelTrainingAdapter.js`, `src/entities/ai/training/TrainingTransportFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`
+- `src/entities/ai/ObservationBridgePolicy.js`, `src/core/RuntimeConfig.js`, `src/entities/ai/BotPolicyRegistry.js`, `src/entities/ai/BotPolicyTypes.js`
+- `src/entities/ai/inference/LocalDqnInference.js`, `src/state/training/RewardCalculator.js`, `src/entities/ai/hybrid/HybridDecisionArchitecture.js`, `src/state/MatchSessionFactory.js`
+- Wenn BT90 Schreibzugriffe auf diese Surfaces, neue Message-Typen oder neue Runtime-Schalter braucht, ist das kein Restpunkt, sondern ein Blocker fuer Re-Audit und Re-Schnitt.
 
 ### Definition of Done (DoD)
 
 - [ ] DoD.1 Python-Version, venv-Pfad und CPU-first Install-Minimum sind reproduzierbar dokumentiert.
 - [ ] DoD.2 JS-Wahrheitsartefakte und Pflichtfelder fuer `TrainingContractV1`/`TrainerPayloadAdapter` sind fuer den PPO-Scope festgezogen.
 - [ ] DoD.3 Erlaubte PPO-Bauorte und read-only Runtime-Surfaces sind explizit dokumentiert.
-- [ ] DoD.4 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [ ] DoD.4 Contract-/Runtime-Drift ist als Blocker-Regel festgezogen; Sidecar-, Worker-, Env- und PPO-Baseline-Scope bleiben explizit ausserhalb von BT90.
+- [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
 ### 90.1 Python-Minimalbootstrap
 
 - [ ] 90.1.1 Python-Version, venv-Pfad und Install-Reihenfolge fuer den Minimalstack dokumentieren.
 - [ ] 90.1.2 Nur fuer Contract-Smokes noetige Dependencies pinnen; schwere PPO-Libs nicht vorschnell in den Startblock ziehen.
-- [ ] 90.1.3 Artefaktpfade unter `python/**` und `data/training/ppo/**` fuer den Startblock festlegen.
+- [ ] 90.1.3 Artefaktpfade unter `python/**` und `data/training/ppo/**` fuer den Startblock festlegen; Root-Boundary-Skripte bleiben bis BT91 ausserhalb.
 
 ### 90.2 Contract- und Layer-Wahrheit
 
 - [ ] 90.2.1 `tests/training-environment.contract.test.mjs`, `scripts/training-smoke.mjs` und `scripts/headless-match-kernel-smoke.mjs` als JS-authoritative Wahrheitsbasis auswerten.
 - [ ] 90.2.2 Pflichtfelder fuer `TrainingContractV1` und `TrainerPayloadAdapter` dokumentieren (`observationSchemaVersion`, `observationLength`, `rewardBreakdown`, `terminalReason`, `truncatedReason`, `hybridDecision` soweit transportiert).
-- [ ] 90.2.3 Read-only-Surfaces und erlaubte Bauorte fuer den PPO-Zweitpfad explizit abgrenzen; Runtime- oder Contract-Drift als Blocker markieren.
+- [ ] 90.2.3 Read-only-Surfaces und erlaubte Bauorte fuer den PPO-Zweitpfad explizit abgrenzen.
+- [ ] 90.2.4 Runtime- oder Contract-Drift als Blocker markieren; Sidecar-, Worker-, Single-Env-, VecEnv- und PPO-Baseline-Scope explizit ausserhalb von BT90 halten.
 
 ### 90.99 Abschluss-Gate
 
 - [ ] 90.99.1 Alle Phasen 90.1 bis 90.2 sind mit Evidence dokumentiert.
-- [ ] 90.99.2 Minimal-Bootstrap, Contract-Wahrheit und Layer-Grenzen sind belastbar an BT91 uebergeben.
+- [ ] 90.99.2 Minimal-Bootstrap, Contract-Wahrheit, Bauort-/Runtime-Grenzen und Drift-Blocker sind belastbar an BT91 uebergeben.
 
 ### Risiko-Register BT90
 
@@ -671,10 +701,11 @@ Scope:
 | Schwere PPO-/Torch-Abhaengigkeiten werden zu frueh in den Bootstrap gezogen | hoch | Governance | BT90 nur mit Minimalstack schliessen; volle PPO-Libs erst in Folgeblocks erzwingen | Diskussion dreht sich vor dem Contract-Smoke um CUDA/SB3/Torch |
 | Contract-Wahrheit driftet zwischen Testartefakten, Payload und Dokumentation | hoch | Integration | echte JS-Artefakte als primaere Quelle festschreiben; Mismatch als Blocker fuehren | Pflichtfelder oder Versionsangaben widersprechen sich |
 | PPO-Pfad greift frueh in produktive Runtime-Surfaces ein | hoch | Architektur | read-only-Liste und Layer-Leitplanken vor Claim festhalten | Wunsch nach Runtime-Schaltern, Bot-Typen oder Matchstart-Abkuerzungen |
+| Verdeckte Scope-Ausweitung zieht Sidecar-, Worker- oder Env-Arbeit wieder in BT90 | hoch | Planung | Ausschlussliste im Block fixieren; BT91 und BT92 getrennt claimbar halten | BT90-Diskussion fordert `trainer-ready`, 100 Steps, Single-Env oder PPO-Baseline |
 
 ---
 
-## Block BT91: Python-Sidecar und 1-Worker-Headless-Lane
+## Block BT91: Python-Sidecar und deterministische 1-Worker-Headless-Lane
 
 Quelle: `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md`, `docs/plaene/neu/BT90_GoldStandard/IMPLEMENTATION_README.md`
 
@@ -682,9 +713,25 @@ Quelle: `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md
 
 Scope:
 
-- Python-Sidecar ueber den bestehenden Bridge-V1-Vertrag anschliessen.
+- Python-Sidecar ueber den bestehenden Contract `v1` bzw. Bridge-V1-Vertrag anschliessen.
 - Deterministische 1-Worker-Headless-Lane mit mindestens 100 Steps beweisen.
-- Kleine Boot-/Reset-/Step-Baseline als Handover fuer BT92 dokumentieren.
+- Kleine Boot-/Reset-/Step-Baseline nur fuer diese Lane als Handover fuer BT92 dokumentieren.
+
+Quellzuschnitt:
+
+- `BT91` uebernimmt aus `BT100` ausschliesslich `100.3` bis `100.5`.
+- `BT92` behaelt `BT101.1` bis `BT101.3`; Mehr-Env-/VecEnv-Folgepfad aus `BT101.4` bis `BT101.6` und PPO-Baseline aus `BT102` bleiben ausserhalb.
+
+Authority-Snapshot:
+
+- `BT91` arbeitet weiter gegen `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`.
+- Wenn `TrainingContractV1.js`, `TrainerPayloadAdapter.js`, `ObservationSchemaV2.js`, `BotActionContract.js` oder die markierten Adjacent-Dateien relevant driften, ist vor dem naechsten `BT91`-Claim ein Re-Audit Pflicht.
+
+Explizit ausserhalb von BT91:
+
+- 2-Worker- oder 4-Worker-Arbeit
+- Mehr-Env- oder VecEnv-Themen
+- PPO-Baseline oder Throughput-/Skalierungsversprechen
 
 ### Definition of Done (DoD)
 
@@ -704,7 +751,7 @@ Scope:
 
 - [ ] 91.2.1 Boundary-Harness oder gleichwertiger PoC-Pfad startet genau einen Worker ausserhalb des produktiven Runtime-Pfads.
 - [ ] 91.2.2 Die Lane liefert mindestens 100 deterministische Steps ueber `HeadlessMatchKernelRuntime`, `MatchKernelTrainingAdapter` und `TrainingTransportFacade`.
-- [ ] 91.2.3 Boot-, Reset- und Step-Latenz werden fuer diese eine Lane dokumentiert; 2- und 4-Worker bleiben bewusst ausserhalb von BT91.
+- [ ] 91.2.3 Boot-, Reset- und Step-Latenz werden fuer diese eine Lane dokumentiert; 2- und 4-Worker, Mehr-Env-/VecEnv-Themen und PPO-Baseline bleiben bewusst ausserhalb von BT91.
 
 ### 91.99 Abschluss-Gate
 
@@ -730,15 +777,28 @@ Quelle: `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Enviro
 Scope:
 
 - Observation-/Action-Authority gegen die echten runtime-near Artefakte absichern.
-- Genau ein headless `gymnasium.Env` fuer `reset()`/`step()` ueber den bestehenden Pfad bauen.
+- Genau ein headless `gymnasium.Env` fuer `reset()`, `step()` und `close()` ueber den bestehenden Pfad bauen.
 - Reward-, `done`-, `truncated`- und Info-Semantik aus JS authoritative uebernehmen.
+- `rewardBreakdown`, `terminalReason`, `truncatedReason`, `hybridDecision`, `observationSchemaVersion` und `observationLength` im Single-Env-Pfad sichtbar machen.
+
+Authority-Snapshot:
+
+- BT92 arbeitet gegen denselben Freeze aus `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`.
+- Nach relevanten `V101`- oder Repo-Aenderungen an Authority- oder Adjacent-Dateien ist `92.1` vor dem Claim neu zu bestaetigen; ohne frischen Abgleich gilt das als Blocker, nicht als kleiner Restpunkt.
+
+Explizit ausserhalb von BT92:
+
+- Mehr-Env
+- VecEnv
+- PPO-Baseline
+- Parallelisierungs- oder Throughput-Versprechen
 
 ### Definition of Done (DoD)
 
 - [ ] DoD.1 Observation- und Action-Authority sind gegen `TrainerPayloadAdapter`, `TrainingContractV1`, `ObservationSchemaV2` und `BotActionContract` explizit validiert.
 - [ ] DoD.2 Ein Single-Env-Headless-Pfad laeuft stabil fuer `reset()`, `step()` und `close()`.
-- [ ] DoD.3 `reward`, `done`, `truncated`, `rewardBreakdown`, `terminalReason`, `truncatedReason` und soweit verfuegbar `hybridDecision` werden JS-authoritative durchgereicht.
-- [ ] DoD.4 Mehr-Env- und VecEnv-Themen bleiben explizit ausserhalb von BT92.99.
+- [ ] DoD.3 `reward`, `done`, `truncated`, `rewardBreakdown`, `terminalReason`, `truncatedReason`, `hybridDecision`, `observationSchemaVersion` und `observationLength` werden JS-authoritative und sichtbar durchgereicht.
+- [ ] DoD.4 Mehr-Env-, VecEnv-, PPO-Baseline- und Parallelisierungs-Themen bleiben explizit ausserhalb von BT92.99.
 - [ ] DoD.5 Keine produktive Runtime-, Matchstart- oder AI-Hub-Datei wurde angepasst.
 - [ ] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
@@ -748,16 +808,16 @@ Scope:
 - [ ] 92.1.2 `observationSchemaVersion` und `observationLength` fuer den aktuellen V2-Pfad festziehen; Drift als Blocker markieren statt still zu kapseln.
 - [ ] 92.1.3 Action-Mapping gegen `BotActionContract.js` absichern, inklusive `useItem`, Clamping und Invalid-Handling.
 
-### 92.2 Single-Env-Lifecycle und Compliance
+### 92.2 Single-Env-Lifecycle und JS-Semantik
 
-- [ ] 92.2.1 `CurviosEnv` oder gleichwertiges Env fuer genau einen Lifecycle anlegen und ueber den bestehenden Headless-Pfad verdrahten.
+- [ ] 92.2.1 `CurviosEnv` oder gleichwertiges Env fuer genau einen Lifecycle anlegen und `reset()`, `step()` sowie `close()` ueber den bestehenden Headless-Pfad verdrahten.
 - [ ] 92.2.2 `reward`, `done`, `truncated`, `rewardBreakdown`, `terminalReason`, `truncatedReason`, `hybridDecision`, `observationSchemaVersion` und `observationLength` im Env-/Info-Pfad sichtbar machen oder Restluecken explizit benennen.
-- [ ] 92.2.3 `check_env(...)` oder gleichwertige Compliance plus echter Step-Smoke laufen auf einem instanziierten Single-Env.
+- [ ] 92.2.3 `check_env(...)` oder gleichwertige Compliance plus echter Reset-/Step-Smoke laufen auf einem instanziierten Single-Env; Parallelisierung bleibt dabei bewusst ausserhalb.
 
 ### 92.99 Abschluss-Gate
 
 - [ ] 92.99.1 Alle Phasen 92.1 bis 92.2 sind mit Evidence dokumentiert.
-- [ ] 92.99.2 Observation-/Action-Authority und Single-Env-Semantik sind belastbar an BT93 uebergeben; Mehr-Env bleibt bewusst offen.
+- [ ] 92.99.2 Observation-/Action-Authority, Single-Env-Lifecycle und JS-authoritative Semantik sind belastbar an BT93 uebergeben; Mehr-Env, VecEnv, PPO-Baseline und Parallelisierung bleiben bewusst offen.
 
 ### Risiko-Register BT92
 
@@ -765,13 +825,13 @@ Scope:
 | --- | --- | --- | --- | --- |
 | Observation-, Schema- und Action-Authority driftet zwischen Payload, Schema und Sanitizer | hoch | Integration | Autoritaetsdreieck aus `TrainerPayloadAdapter`, `TrainingContractV1`, `ObservationSchemaV2` und `BotActionContract` hart pinnen | Shape-Mismatch, falsche `useItem`-Semantik oder unbekannte Length |
 | Python interpretiert Reward- oder Episode-Semantik neu statt sie nur zu adaptieren | hoch | Governance | JS als einzige fachliche Quelle festschreiben; fehlende Felder sichtbar machen | Reward-Neuberechnung oder Python-seitige `done`-/`truncated`-Logik |
-| Mehr-Env-/VecEnv-Druck zieht wieder in den Minimalblock hinein | mittel | Planung | BT93 als separaten Folgeblock sichtbar halten | Closure-Diskussion fordert schon Parallelisierung oder Throughput-Ziele |
+| Mehr-Env-/VecEnv-, PPO- oder Parallelisierungsdruck zieht wieder in den Minimalblock hinein | mittel | Planung | BT93 als separaten Folgeblock sichtbar halten und keine Throughput-Ziele in BT92 versprechen | Closure-Diskussion fordert schon Parallelisierung, PPO-Baseline oder Throughput-Ziele |
 
 ---
 
 ## Block BT93: Mehr-Env-Folgepfad und konservative PPO-Baseline
 
-Quelle: `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md`, `docs/plaene/neu/BT90_GoldStandard/IMPLEMENTATION_README.md`
+Quelle: `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md`, `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md`, `docs/plaene/neu/BT90_GoldStandard/IMPLEMENTATION_README.md`
 
 <!-- LOCK: frei -->
 
@@ -781,30 +841,41 @@ Scope:
 - Konservative PPO-Baseline mit ehrlichem Throughput-Budget und fester Vergleichsmatrix aufbauen.
 - Fruehe Parallelisierung nur artefaktbasiert und mit offenem Downgrade bewerten.
 
+Quellzuschnitt:
+
+- `BT101.4` bis `BT101.6` oeffnen explizit den Mehr-Env-/VecEnv-Folgepfad.
+- `BT102` liefert darauf aufbauend die konservative PPO-Baseline und den Benchmark-Rahmen.
+
+Repo- und Evidence-Anker 2026-04-22:
+
+- Der Python-/PPO-Bauort (`python/**`, `data/training/ppo/**`) ist im Repo noch nicht als echte Arbeitsbasis vorhanden; `BT93` bleibt bis nach `BT90` bis `BT92` dokumentarisch ein Folgeblock.
+- Ein `BT93`-Claim ist nur zulaessig, wenn `BT92` einen gruenen Single-Env-Nachweis mit Reset-/Step-Smoke, sichtbaren Semantikfeldern und gemessenen Boot-, Reset- und Step-Latenzen geliefert hat.
+- Env-Anzahl, Step-Budgets, Eval-Takte und Downgrade-Regeln werden aus echter `BT92`-Evidence abgeleitet; Draft-Zahlen sind bis zu diesem Handover nur Platzhalter.
+
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 2- und 4-Env-Orchestrierung sind ausserhalb der produktiven Runtime dokumentiert und artefaktbasiert bewertet.
+- [ ] DoD.1 Mindestens eine 2-Env-Orchestrierung ist ausserhalb der produktiven Runtime dokumentiert und artefaktbasiert bewertet; `4-Env` wird nur bei tragender Evidenz geoeffnet oder explizit als Downgrade ausgeschlossen.
 - [ ] DoD.2 Eine konservative PPO-Baseline laeuft auf einer festen Seed-/Mode-/Champion-Matrix reproduzierbar.
-- [ ] DoD.3 Throughput-, Stability- und Downgrade-Entscheid fuer 2 vs. 4 Envs sind offen dokumentiert.
+- [ ] DoD.3 Throughput-, Stability- und Downgrade-Entscheid fuer `1 -> 2 -> optional 4` Envs sind offen dokumentiert.
 - [ ] DoD.4 Vergleichsregel gegen den eingefrorenen DQN-Champion und das aktuelle Semantikfenster ist festgezogen.
 - [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
 ### 93.1 Mehr-Env-Harness und VecEnv-Folgepfad
 
-- [ ] 93.1.1 Start erst nach gruener Single-Env-Lage aus BT92; 2- bis 4-Env-Orchestrierung bleibt ausserhalb der produktiven Runtime.
-- [ ] 93.1.2 Prozesse, Ports, Timeouts, Restart-Verhalten und ehrlicher Downgrade fuer 4 Envs werden dokumentiert.
-- [ ] 93.1.3 VecEnv-/Mehr-Env-Smokes liefern reproduzierbare Daten statt nur formaler Imports oder Scheinerfolge.
+- [ ] 93.1.1 Start erst nach gruener Single-Env-Lage aus BT92 inklusive Reset-/Step-Smoke, sichtbaren Pflichtfeldern und gemessenen Boot-, Reset- und Step-Latenzen; 2- bis 4-Env-Orchestrierung bleibt ausserhalb der produktiven Runtime.
+- [ ] 93.1.2 `2-Env` ist die kleinste Mehr-Env-Lane; Prozesse, Ports, Timeouts, Restart-Verhalten und ein ehrlicher Downgrade fuer `4-Env` werden aus echter BT92-Evidence dokumentiert.
+- [ ] 93.1.3 VecEnv-/Mehr-Env-Smokes liefern reproduzierbare Daten zu Env-Anzahl, Wall-Clock-Throughput, Reset-/Timeout-Rate und Fehlerklassen statt nur formaler Imports oder Scheinerfolge.
 
 ### 93.2 Konservative PPO-Baseline und Benchmark-Disziplin
 
-- [ ] 93.2.1 DQN-Champion, Vergleichsmatrix, Semantikfenster und Pflichtreports fuer PPO-vs-DQN explizit einfrieren.
-- [ ] 93.2.2 PPO-Baseline mit konservativem Hardware-/Throughput-Budget fahren und Artefakte unter `data/training/ppo/**` pinnen.
-- [ ] 93.2.3 Ergebnis als Baseline-Handover fuer BT94 dokumentieren; fehlende 4-Env-Skalierung wird ehrlich als Restpunkt statt als implizite Freigabe behandelt.
+- [ ] 93.2.1 DQN-Champion, Vergleichsmatrix, Semantikfenster und Pflichtreports fuer PPO-vs-DQN explizit einfrieren; Bezug auf die reale `BT92`-Semantikfelder bleibt Pflicht.
+- [ ] 93.2.2 PPO-Baseline mit konservativem Hardware-/Throughput-Budget fahren, das aus den gemessenen Lane-Daten abgeleitet ist, und Artefakte unter `data/training/ppo/**` pinnen.
+- [ ] 93.2.3 Ergebnis als Baseline-Handover fuer BT94 dokumentieren; fehlende `4-Env`-Skalierung oder fehlende Freeze-Artefakte werden ehrlich als Restpunkt statt als implizite Freigabe behandelt.
 
 ### 93.99 Abschluss-Gate
 
 - [ ] 93.99.1 Alle Phasen 93.1 bis 93.2 sind mit Evidence dokumentiert.
-- [ ] 93.99.2 Es existiert mindestens eine stabile Mehr-Env-Lane fuer die konservative PPO-Baseline; 4-Env-Downgrade ist falls noetig explizit dokumentiert.
+- [ ] 93.99.2 Es existiert mindestens eine stabile Mehr-Env-Lane fuer die konservative PPO-Baseline; `4-Env` ist nur bei tragender Evidenz freigegeben, sonst explizit als Downgrade ausgeschlossen.
 
 ### Risiko-Register BT93
 
@@ -813,6 +884,7 @@ Scope:
 | Windows-/Subproc- oder Worker-Churn destabilisiert Mehr-Env-Laeufe | hoch | Train-Ops | erst 2 Envs, dann 4; Restart-/Timeout-Harness ausserhalb der Runtime halten | Worker starten oder beenden nicht deterministisch |
 | Headless-Throughput reicht nicht fuer belastbare PPO-Baselines | hoch | Performance | konservatives Budget, ehrliche Downgrades und Artefaktmessung statt Wunschannahmen | Laeufe liefern kaum nutzbare Timesteps oder kippen unter Last |
 | PPO-vs-DQN bleibt methodisch nicht apples-to-apples | hoch | QA/Ops | Champion, Matrix, Semantikfenster und Reports vorab einfrieren | Sieg/Niederlage erklaert sich nur aus anderem Scope oder anderer Semantik |
+| `BT92` liefert noch keine tragfaehige Single-Env-Evidence oder der Python-/PPO-Bauort fehlt weiter | hoch | Planung | `BT93` bis zum gruenen BT92-Handover und realem Bauort dokumentarisch geschlossen halten; Budgets erst danach festziehen | fehlende Reset-/Step-Smokes, fehlende Latenzen oder weiterhin kein `python/**`/`data/training/ppo/**` |
 
 ---
 
@@ -828,24 +900,30 @@ Scope:
 - Externe A/B-Evidence gegen den eingefrorenen DQN-Champion mit klarer Urteilssystematik.
 - Promotion-Entscheidung nur ueber Lane-, Median- und Semantikfenster-Regeln vorbereiten.
 
+Claim-Grenze vor BT94:
+
+- `BT94` ist nur claimbar, wenn `BT93` ein echtes Baseline-Paket unter `data/training/ppo/**`, eine feste Vergleichsmatrix und mindestens eine stabile Lane mit explizitem Downgrade-Urteil geliefert hat.
+- Vor dem Claim ist zu pruefen, ob Freeze-Paket und externe A/B-Lane zusammen klein genug bleiben; wenn Freeze-Artefakte, Matrix oder Lane-Budget noch unscharf sind, muss der Zuschnitt zuerst in `docs/plaene/neu/` nachgeschaerft oder gesplittet werden.
+
 ### Definition of Done (DoD)
 
 - [ ] DoD.1 Eine kleine Ablations- und Curriculum-Matrix ist gegen dieselbe PPO-Baseline reproduzierbar ausgewertet.
 - [ ] DoD.2 Genau ein Freeze-Kandidat unter `data/training/ppo/candidates/**` ist mit Manifest, Reports und Vergleichsmatrix dokumentiert.
 - [ ] DoD.3 Externe A/B-Evidence gegen den eingefrorenen DQN-Champion liefert ein klares Urteil (`promote`, `hold`, `rollback` oder `diagnose`).
-- [ ] DoD.4 Drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters bilden die Entscheidungsbasis statt eines Einzelruns.
+- [ ] DoD.4 Drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters bilden die Entscheidungsbasis statt eines Einzelruns; Freeze- und A/B-Anteil bleiben ueber ein explizites Handover getrennt.
 - [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
 ### 94.1 Ablationen, Curriculum und Freeze
 
-- [ ] 94.1.1 Kleine Ablationsmatrix fuer Hyperparameter, Curriculum oder Replay gegen dieselbe BT93-Basis fahren.
-- [ ] 94.1.2 Genau einen belastbaren Kandidaten einfrieren und mit Manifest, Report und Vergleichsmatrix dokumentieren.
+- [ ] 94.1.1 Kleine Ablationsmatrix fuer Hyperparameter, Curriculum oder Replay gegen dieselbe BT93-Basis fahren; wenn die BT93-Basis selbst noch driftet, bleibt BT94 vor Claim blockiert.
+- [ ] 94.1.2 Genau einen belastbaren Kandidaten einfrieren und mit Manifest, Report, Lane-Budget und Vergleichsmatrix dokumentieren.
 - [ ] 94.1.3 Semantikdrift gegen Runtime-, Observation-, Action-, Reward- oder Validation-Felder vor A/B-Evidence als Blocker markieren.
+- [ ] 94.1.4 Vor `94.2` pruefen, ob Freeze-Paket, Lane-Budget und Vergleichsmatrix klein genug fuer denselben Claim bleiben; sonst Split-Intake statt stiller Scope-Ausweitung.
 
 ### 94.2 Externe A/B-Evidence und Urteilsdisziplin
 
-- [ ] 94.2.1 Drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters gegen den DQN-Champion sammeln.
-- [ ] 94.2.2 Reports um klare Urteils- und Ursachenklassen (`promote`, `hold`, `rollback`, `diagnose`) sowie Lane-/Artifact-Ursachen erweitern.
+- [ ] 94.2.1 Drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters gegen den DQN-Champion sammeln; die Lane nutzt ausschliesslich den in `94.1` gefrorenen Kandidaten.
+- [ ] 94.2.2 Reports um klare Urteils- und Ursachenklassen (`promote`, `hold`, `rollback`, `diagnose`) sowie Lane-/Artifact-Ursachen erweitern; invalidierte Paesse bleiben separat sichtbar.
 - [ ] 94.2.3 Positive Evidence darf BT95 nur als Handoff oeffnen; fehlende produktionsnahe Validation aus BT80C 80.9.3 bleibt als Restblocker sichtbar.
 
 ### 94.99 Abschluss-Gate
@@ -860,6 +938,7 @@ Scope:
 | Einzelrun-Glueck wird als Promotion fehlgelesen | hoch | QA/Ops | Drei-Run-Regel, Median-Delta und feste Lane verlangen | Kandidat gewinnt nur einmal oder nur knapp |
 | Semantikdrift invalidiert Vergleich und Freeze | hoch | Planung + Runtime | Benchmark-Invalidierung explizit im Block fuehren | Gameplay-, Observation-, Action- oder Reward-Vertrag aendert sich |
 | Fehlende produktionsnahe Validation aus BT80C wird im PPO-Hype uebersehen | mittel | Governance | `BT80C 80.9.3` als offenen Restblocker im Urteil sichtbar halten | positive PPO-Evidence wird als fast fertiger Rollout gelesen |
+| Freeze-Paket und externe Evidence verschmelzen wieder zu einem offenen Monolithen | hoch | Planung | Freeze-Handover vor `94.2` erzwingen; bei unscharfem Zuschnitt Split-Intake statt Langlauf-Monolith | keine klare Grenze zwischen Kandidaten-Freeze, Lane-Budget und externer Evidence |
 
 ---
 
@@ -875,30 +954,41 @@ Scope:
 - Keine automatische DQN-Ablosung; produktive Umschaltung bleibt separater, user-entschiedener Folgepfad.
 - Restblocker zu produktionsnaher Validation, Rollback und Runtime-Guardrails explizit dokumentieren.
 
+Blocktyp:
+
+- BT95 ist ein Handoff-/Intake-Vorbereitungsblock, kein normaler Implementierungsblock.
+
+Claim- und No-Go-Regel:
+
+- `BT95` wird nur als echter Handoff-Block relevant, wenn `BT104` mit `promote` endet; ohne dieses Urteil dokumentiert der Block hoechstens, warum kein aktiver Rollout-Intake geoeffnet wird.
+- Auch bei `promote` bleibt `BT95` Doc-, Guardrail- und Entscheidungsarbeit; produktive Runtime-, Matchstart- oder AI-Hub-Dateien werden hier nicht vorbereitet oder umgeschaltet.
+- `BT80C 80.9.3` bleibt als produktionsnaher Restblocker sichtbar, solange die feste Validation-Lane weiter in `PLAYING` mit `roundsRecorded=0` haengen kann.
+
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Integrations-Handoff, Rollback-Leiter und Guardrails fuer einen spaeteren Rollout-Intake sind dokumentiert.
+- [ ] DoD.1 Integrations-Handoff, Rollback-Leiter und Guardrails fuer einen spaeteren Rollout-Intake sind als doc-only Paket dokumentiert.
 - [ ] DoD.2 Produktive Runtime-, Matchstart- und AI-Hub-Surfaces bleiben bis zu einem separaten Rollout-Block read-only.
 - [ ] DoD.3 Ein positiver PPO-Kandidat wird nicht als automatische DQN-Ablosung dargestellt; manuelle Entscheidung und Rollback bleiben Pflicht.
 - [ ] DoD.4 Offene Restblocker aus `BT80C 80.9.3` oder gleichwertiger produktiver Validation sind sichtbar dokumentiert.
-- [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [ ] DoD.5 Ein aktiver Rollout-Intake oeffnet nicht ohne `BT104=promote`, gruene produktionsnahe Validation und expliziten User-Entscheid.
+- [ ] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
 ### 95.1 Integrationspaket und Layer-Grenzen
 
-- [ ] 95.1.1 Handoff fuer einen spaeteren produktiven Rollout-Intake dokumentieren, ohne in BT95 selbst eine Runtime-Umschaltung vorzunehmen.
+- [ ] 95.1.1 Handoff fuer einen spaeteren produktiven Rollout-Intake dokumentieren, ohne in BT95 selbst eine Runtime-Umschaltung oder Vorbereitungsimplementation vorzunehmen.
 - [ ] 95.1.2 Betroffene produktive Surfaces, Guardrails und No-Touch-Grenzen fuer einen spaeteren Integrationsblock explizit benennen.
-- [ ] 95.1.3 Offene produktionsnahe Validation (`BT80C 80.9.3` oder gleichwertig) als Integrationsvoraussetzung sichtbar halten.
+- [ ] 95.1.3 Offene produktionsnahe Validation (`BT80C 80.9.3` oder gleichwertig) als Integrationsvoraussetzung sichtbar halten; solange die feste Lane rot bleibt, bleibt `BT95` ein No-go-Handoff statt Rollout-Freigabe.
 
 ### 95.2 Manual Decision, Rollback und Doku-Sync
 
 - [ ] 95.2.1 Manual-Promotion-, Rollback- und Fallback-Leiter fuer den spaeteren DQN-Sunset dokumentieren.
 - [ ] 95.2.2 Architektur-, Trainings-, Release- und QA-Dokumentation auf denselben Handoff- und Guardrail-Vertrag ausrichten.
-- [ ] 95.2.3 Klar unterscheiden, welche Punkte als Handoff abgeschlossen sind und welche erst ein spaeterer produktiver Rollout-Intake leisten darf.
+- [ ] 95.2.3 Klar unterscheiden, welche Punkte als Handoff abgeschlossen sind und welche erst ein spaeterer produktiver Rollout-Intake leisten darf; ohne `BT104=promote`, gruene produktionsnahe Validation und User-Entscheid oeffnet kein aktiver Rollout-Intake.
 
 ### 95.99 Abschluss-Gate
 
 - [ ] 95.99.1 Alle Phasen 95.1 bis 95.2 sind mit Evidence dokumentiert.
-- [ ] 95.99.2 Das Ergebnis ist ein Handoff fuer einen spaeteren Rollout-Intake, keine automatische produktive PPO-Umschaltung.
+- [ ] 95.99.2 Das Ergebnis ist ein Handoff fuer einen spaeteren Rollout-Intake, keine automatische produktive PPO-Umschaltung oder vorweggenommene Integrationsfreigabe.
 
 ### Risiko-Register BT95
 

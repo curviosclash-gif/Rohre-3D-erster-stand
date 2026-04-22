@@ -18,9 +18,10 @@ Kanonische Blockdetails leben ausschliesslich in den Dateien unter `docs/plaene/
 BT90 wird aktuell **nicht** als komplette BT100-BT105-Kette aktiviert.
 Der governance-saubere Start ist ein Rolling-Ansatz:
 
-- **jetzt implementieren:** `BT100` als Wahrheitsblock fuer Minimal-Bootstrap, Contract-PoC und genau eine 1-Worker-Headless-Lane
-- **danach:** `BT101` nur in der Minimalspur `101.1` bis `101.3` fuer Observation-/Action-Authority, Single-Env und JS-authoritative Semantik
-- **nur bei gruener Lage weiterziehen:** `BT101.4` bis `101.6` als explizite Folgespur fuer Mehr-Env-/VecEnv-Themen
+- **aktive Uebernahme zuerst:** `BT90`; inhaltliche Draft-Quelle `BT100.1` bis `BT100.2`
+- **danach:** `BT91`; inhaltliche Draft-Quelle `BT100.3` bis `BT100.5`
+- **danach:** `BT92`; inhaltliche Draft-Quelle `BT101.1` bis `101.3`
+- **nur bei gruener Lage weiterziehen:** `BT93`; Quelle `BT101.4` bis `101.6` plus `BT102`
 - **bewusst rolling drafts lassen:** `BT102` bis `BT105`; diese Bloecke werden nach BT100/BT101 auf Basis echter Evidence re-baselined
 
 Wichtig:
@@ -28,6 +29,10 @@ Wichtig:
 - BT90 bleibt bis zur User-Entscheidung ein Intake-Draft.
 - Ein aktiver Start darf nicht direkt aus diesem Ordner heraus als zweiter operativer Wahrheitsraum passieren.
 - Die spaetere Uebernahme in `docs/bot-training/Bot_Trainingsplan.md` erfolgt blockweise und user-managed; Details stehen in `docs/plaene/neu/BT90_GoldStandard/IMPLEMENTATION_README.md`.
+
+Die operative Startgeschichte lautet damit eindeutig:
+
+`BT90 -> BT91 -> BT92`
 
 ## Zielbild
 
@@ -59,6 +64,7 @@ Leit-KPIs fuer die Evidence-Phase:
    - `src/entities/ai/hybrid/HybridDecisionArchitecture.js`
    - `src/state/MatchSessionFactory.js`
 6. Eine produktive DQN-Ablosung ist erst nach gruener PPO-Evidence, separatem Integrationsblock und explizitem User-Entscheid zulaessig.
+7. Vor jedem aktiven Claim fuer `BT90` bis `BT92` gilt der Freeze aus `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`; wenn Authority- oder Adjacent-Dateien driften, ist zuerst ein Re-Audit Pflicht.
 
 ## Layer-System und Architekturgrenzen
 
@@ -123,19 +129,20 @@ Kanonische Blockdetails liegen ausschliesslich in den verlinkten Blockdateien.
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file | rolle |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| BT100 | Python-Bootstrap und Headless-Contract-PoC | planned | P1 | frei | - | 100.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` | Wahrheitsblock fuer Minimal-Bootstrap, Contract-PoC und 1-Worker-Headless-Lane |
+| BT100 | Python-Bootstrap und Headless-Contract-PoC | planned | P1 | frei | - | 100.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` | Draft-Sammelblock; aktive Landung trennt `BT90 = 100.1-100.2` von `BT91 = 100.3-100.5` |
 | BT101 | Headless Gymnasium Environment ueber bestehende Vertraege | planned | P1 | frei | BT100.99 | 101.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` | BT101.99 schliesst nur mit Single-Env; VecEnv-/Mehr-Worker bleiben Folgepfad |
 | BT102 | PPO-Baseline-Training | planned | P1 | frei | BT101.99 | 102.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` | rolling draft fuer konservative Baseline nach echter BT100/BT101-Evidence |
 | BT103 | Hyperparameter-Tuning, Curriculum-Hardening und Candidate Freeze | planned | P2 | frei | BT102.99 | 103.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` | rolling draft fuer kleine Ablationsmatrix und Freeze-Entscheid |
-| BT104 | Externe A/B-Validation und Promotions-Evidence | planned | P2 | frei | BT103 Freeze-Paket | 104.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` | rolling draft fuer verdict-sensitive externe Evidence ohne Runtime-Umschaltung |
-| BT105 | Integrations-Handoff und DQN-Sunset-Vorbereitung | planned | P3 | frei | BT104 Urteil `promote` | 105.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` | rolling draft fuer spaeteren Integrations-Handoff statt sofortigem Umsetzungsblock |
+| BT104 | Externe A/B-Validation und Promotions-Evidence | planned | P2 | frei | BT103 Freeze-Paket | 104.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` | rolling draft fuer verdict-sensitive externe Evidence mit `promote|hold|rollback|diagnose` ohne Runtime-Umschaltung |
+| BT105 | Integrations-Handoff und DQN-Sunset-Vorbereitung | planned | P3 | frei | BT104 Urteil `promote` | 105.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` | Handoff-/Intake-Vorbereitungsblock statt sofortigem Umsetzungsblock |
 
 ## Empfohlene Reihenfolge
 
-1. BT100 - Minimal-Bootstrap, Contract-PoC und 1-Worker-Headless-Lane sauber schliessen
-2. BT101 - nur `101.1` bis `101.3` als Single-Env-Minimalspur stabilisieren
-3. BT101 - `101.4` bis `101.6` nur bei gruener Minimalspur als expliziten Folgepfad oeffnen
-4. BT102 bis BT105 mit echter Evidence aus BT100/BT101 neu schaerfen und dann blockweise intaken
+1. BT90 - Minimal-Bootstrap, Contract-Wahrheit, erlaubte Bauorte und Drift-Grenzen als erster aktiver Wahrheitsblock
+2. BT91 - Sidecar-Handshake und 1-Worker-Lane als zweiter aktiver Integrationsblock
+3. BT92 - Single-Env-Minimalspur als dritter aktiver Semantikblock
+4. BT93 erst danach aus `BT101.4` bis `101.6` plus `BT102` neu schaerfen
+5. BT94 und BT95 weiter nur auf Basis echter Evidence blockweise intaken
 
 ## Beziehung zum bestehenden Bot-Trainingsplan
 
@@ -143,12 +150,13 @@ Kanonische Blockdetails liegen ausschliesslich in den verlinkten Blockdateien.
 - BT90 ist ein zweiter Pfad als Intake-Draft fuer die spaetere Uebernahme in den bestehenden Bot-Trainingsplan.
 - BT90 ersetzt die aktive Bot-Training-Governance nicht.
 - BT100-BT105 liefern Voraussetzungen fuer spaetere PPO-Integration, fuehren sie aber nicht im produktiven Spiel aus.
-- Die erste aktive Uebernahme sollte nicht die komplette BT90-Kette sein, sondern ein kleiner aktiver PPO-Startblock auf Basis von BT100 plus BT101-Single-Env-Grundpfad; Details stehen in `IMPLEMENTATION_README.md`.
+- Die erste aktive Uebernahme folgt explizit der kleineren Leiter `BT90 -> BT91 -> BT92`; die inhaltlichen Draft-Quellen dafuer stehen in `IMPLEMENTATION_README.md`.
 
 ## Dokumentations-Hook
 
 - Root-Ueberblick: `docs/plaene/neu/BT90_GoldStandard/README.md`
 - Implementierungs- und Migrationspfad: `docs/plaene/neu/BT90_GoldStandard/IMPLEMENTATION_README.md`
+- Contract-Freeze fuer `BT90` bis `BT92`: `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
 - Kanonische Blockdetails: `docs/plaene/neu/BT90_GoldStandard/bloecke/*.md`
 - Session-Risiken: `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
 - Vertiefungs-Prompts: `docs/plaene/neu/BT90_GoldStandard/prompts/*.md`
