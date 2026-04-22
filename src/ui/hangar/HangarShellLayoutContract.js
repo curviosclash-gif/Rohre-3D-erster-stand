@@ -8,7 +8,10 @@ import {
     HANGAR_SELECTION_WRITEBACK_PATHS,
     HANGAR_SELECTION_WRITEBACK_VERSION,
 } from './HangarSelectionWritebackContract.js';
-import { resolveHangarWorkshopModule } from './HangarWorkshopModuleContract.js';
+import {
+    resolveHangarWorkshopModule,
+    resolveHangarWorkshopViewSwitch,
+} from './HangarWorkshopModuleContract.js';
 import { resolveHangarWorkshopPersistenceCapabilities } from './HangarWorkshopPersistenceFacade.js';
 
 export const HANGAR_SHELL_LAYOUT_VERSION = 'hangar-shell-layout.v1';
@@ -157,6 +160,7 @@ export function resolveHangarShellLayout(rawMode) {
     const mode = resolveHangarMode(flow.mode);
     const desktopLoop = resolveHangarDesktopLoop(mode);
     const workshopModule = resolveHangarWorkshopModule(mode);
+    const workshopNavigation = resolveHangarWorkshopViewSwitch(mode);
     const workshopPersistenceCapabilities = resolveHangarWorkshopPersistenceCapabilities(mode);
     return Object.freeze({
         contractVersion: HANGAR_SHELL_LAYOUT_VERSION,
@@ -194,6 +198,12 @@ export function resolveHangarShellLayout(rawMode) {
             ? Object.freeze({
                 ...workshopModule,
                 capabilities: Object.freeze({ ...(workshopModule.capabilities || {}) }),
+            })
+            : null,
+        workshopNavigation: workshopNavigation
+            ? Object.freeze({
+                ...workshopNavigation,
+                legacyNavigation: Object.freeze({ ...(workshopNavigation.legacyNavigation || {}) }),
             })
             : null,
         workshopPersistenceCapabilities: workshopPersistenceCapabilities
