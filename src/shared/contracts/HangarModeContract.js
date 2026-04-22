@@ -13,7 +13,7 @@
  * window.open(), or bypass defined capability ports.
  */
 
-export const HANGAR_MODE_CONTRACT_VERSION = 'hangar-mode.v1';
+export const HANGAR_MODE_CONTRACT_VERSION = 'hangar-mode.v2';
 
 // ─── Hangar Modes ───
 // Arcade and Fight are strictly separate flows: different rule contracts,
@@ -55,6 +55,113 @@ export const HANGAR_NAV_EVENTS = Object.freeze({
     CLOSE_WORKSHOP: 'hangar_nav:close_workshop',
     START_MATCH: 'hangar_nav:start_match',
     RETURN_TO_MENU: 'hangar_nav:return_to_menu',
+});
+
+export const HANGAR_DESKTOP_LOOP_CONTRACT_VERSION = 'hangar-desktop-loop.v1';
+
+export const HANGAR_DESKTOP_LOOP_STEP_IDS = Object.freeze({
+    RUN: 'run',
+    HANGAR: 'hangar',
+    WORKSHOP: 'workshop',
+    RETURN: 'return',
+});
+
+const VALID_HANGAR_DESKTOP_LOOP_STEP_SET = new Set(Object.values(HANGAR_DESKTOP_LOOP_STEP_IDS));
+
+function createLoopTransition(actionId, navEvent, capabilityId, nextStepId, description) {
+    return Object.freeze({
+        actionId,
+        navEvent,
+        capabilityId,
+        nextStepId,
+        description,
+    });
+}
+
+function createLoopStep(stepId, title, description, transitions = []) {
+    return Object.freeze({
+        stepId,
+        title,
+        description,
+        transitions: Object.freeze([...(Array.isArray(transitions) ? transitions : [])]),
+    });
+}
+
+export const ARCADE_HANGAR_DESKTOP_LOOP = Object.freeze({
+    contractVersion: HANGAR_DESKTOP_LOOP_CONTRACT_VERSION,
+    mode: HANGAR_MODES.ARCADE,
+    entryStepId: HANGAR_DESKTOP_LOOP_STEP_IDS.RUN,
+    loopPath: Object.freeze([
+        HANGAR_DESKTOP_LOOP_STEP_IDS.RUN,
+        HANGAR_DESKTOP_LOOP_STEP_IDS.HANGAR,
+        HANGAR_DESKTOP_LOOP_STEP_IDS.WORKSHOP,
+        HANGAR_DESKTOP_LOOP_STEP_IDS.HANGAR,
+        HANGAR_DESKTOP_LOOP_STEP_IDS.RETURN,
+    ]),
+    steps: Object.freeze({
+        [HANGAR_DESKTOP_LOOP_STEP_IDS.RUN]: createLoopStep(
+            HANGAR_DESKTOP_LOOP_STEP_IDS.RUN,
+            'Arcade Run',
+            'Gameplay run executes in runtime and always returns to the desktop hangar surface.',
+            [
+                createLoopTransition(
+                    'run_complete_to_hangar',
+                    HANGAR_NAV_EVENTS.OPEN_ARCADE_HANGAR,
+                    HANGAR_CAPABILITY_IDS.OPEN_HANGAR,
+                    HANGAR_DESKTOP_LOOP_STEP_IDS.HANGAR,
+                    'After run end, open arcade hangar as deterministic return anchor.'
+                ),
+            ]
+        ),
+        [HANGAR_DESKTOP_LOOP_STEP_IDS.HANGAR]: createLoopStep(
+            HANGAR_DESKTOP_LOOP_STEP_IDS.HANGAR,
+            'Arcade Hangar',
+            'Primary desktop hub for progression review, loadout updates and next navigation decision.',
+            [
+                createLoopTransition(
+                    'open_workshop_from_hangar',
+                    HANGAR_NAV_EVENTS.OPEN_WORKSHOP,
+                    HANGAR_CAPABILITY_IDS.NAVIGATE_TO_WORKSHOP,
+                    HANGAR_DESKTOP_LOOP_STEP_IDS.WORKSHOP,
+                    'Open workshop via desktop capability without global navigation.'
+                ),
+                createLoopTransition(
+                    'start_next_run',
+                    HANGAR_NAV_EVENTS.START_MATCH,
+                    HANGAR_CAPABILITY_IDS.MATCH_START_FROM_HANGAR,
+                    HANGAR_DESKTOP_LOOP_STEP_IDS.RUN,
+                    'Start next run from curated hangar selection.'
+                ),
+                createLoopTransition(
+                    'return_to_menu',
+                    HANGAR_NAV_EVENTS.RETURN_TO_MENU,
+                    HANGAR_CAPABILITY_IDS.RETURN_TO_MENU,
+                    HANGAR_DESKTOP_LOOP_STEP_IDS.RETURN,
+                    'Leave arcade loop and hand control back to main desktop menu.'
+                ),
+            ]
+        ),
+        [HANGAR_DESKTOP_LOOP_STEP_IDS.WORKSHOP]: createLoopStep(
+            HANGAR_DESKTOP_LOOP_STEP_IDS.WORKSHOP,
+            'Workshop',
+            'Vehicle lab customization runs as bounded sub-surface and commits back into hangar state.',
+            [
+                createLoopTransition(
+                    'close_workshop_to_hangar',
+                    HANGAR_NAV_EVENTS.CLOSE_WORKSHOP,
+                    HANGAR_CAPABILITY_IDS.NAVIGATE_FROM_WORKSHOP,
+                    HANGAR_DESKTOP_LOOP_STEP_IDS.HANGAR,
+                    'Close workshop and return to hangar without leaving desktop flow.'
+                ),
+            ]
+        ),
+        [HANGAR_DESKTOP_LOOP_STEP_IDS.RETURN]: createLoopStep(
+            HANGAR_DESKTOP_LOOP_STEP_IDS.RETURN,
+            'Menu Return',
+            'Exit node for deterministic handoff back to the desktop menu lifecycle.',
+            []
+        ),
+    }),
 });
 
 // ─── User Flow Descriptors (76.1.2) ───
@@ -118,4 +225,37 @@ export function assertHangarCapabilityId(rawId) {
 export function assertHangarNavEvent(rawEvent) {
     const ev = String(rawEvent || '').trim();
     return new Set(Object.values(HANGAR_NAV_EVENTS)).has(ev) ? ev : null;
+}
+
+export function assertHangarDesktopLoopStepId(rawStepId) {
+    const stepId = String(rawStepId || '').trim().toLowerCase();
+    return VALID_HANGAR_DESKTOP_LOOP_STEP_SET.has(stepId) ? stepId : null;
+}
+
+export function resolveArcadeHangarDesktopLoop() {
+    const clonedSteps = Object.values(ARCADE_HANGAR_DESKTOP_LOOP.steps).map((step) => ({
+        stepId: step.stepId,
+        title: step.title,
+        description: step.description,
+        transitions: step.transitions.map((transition) => ({
+            actionId: transition.actionId,
+            navEvent: transition.navEvent,
+            capabilityId: transition.capabilityId,
+            nextStepId: transition.nextStepId,
+            description: transition.description,
+        })),
+    }));
+    return {
+        contractVersion: ARCADE_HANGAR_DESKTOP_LOOP.contractVersion,
+        mode: ARCADE_HANGAR_DESKTOP_LOOP.mode,
+        entryStepId: ARCADE_HANGAR_DESKTOP_LOOP.entryStepId,
+        loopPath: [...ARCADE_HANGAR_DESKTOP_LOOP.loopPath],
+        steps: clonedSteps,
+    };
+}
+
+export function resolveHangarDesktopLoop(rawMode) {
+    const mode = resolveHangarMode(rawMode);
+    if (mode === HANGAR_MODES.ARCADE) return resolveArcadeHangarDesktopLoop();
+    return null;
 }

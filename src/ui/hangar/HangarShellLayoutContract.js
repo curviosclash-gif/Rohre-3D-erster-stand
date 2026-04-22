@@ -1,4 +1,5 @@
 import {
+    resolveHangarDesktopLoop,
     HANGAR_MODES,
     resolveHangarMode,
     resolveHangarUserFlow,
@@ -152,6 +153,7 @@ export function listHangarShellModeRegionExtensions(rawMode) {
 export function resolveHangarShellLayout(rawMode) {
     const flow = resolveHangarUserFlow(rawMode);
     const mode = resolveHangarMode(flow.mode);
+    const desktopLoop = resolveHangarDesktopLoop(mode);
     return Object.freeze({
         contractVersion: HANGAR_SHELL_LAYOUT_VERSION,
         mode,
@@ -160,6 +162,30 @@ export function resolveHangarShellLayout(rawMode) {
         startNavEvent: flow.startNavEvent,
         commonRegions: listHangarShellCommonRegions(),
         modeExtensions: listHangarShellModeRegionExtensions(mode),
+        desktopLoop: desktopLoop
+            ? Object.freeze({
+                contractVersion: desktopLoop.contractVersion,
+                mode: desktopLoop.mode,
+                entryStepId: desktopLoop.entryStepId,
+                loopPath: Object.freeze([...(Array.isArray(desktopLoop.loopPath) ? desktopLoop.loopPath : [])]),
+                steps: Object.freeze(
+                    (Array.isArray(desktopLoop.steps) ? desktopLoop.steps : []).map((step) => Object.freeze({
+                        stepId: step.stepId,
+                        title: step.title,
+                        description: step.description,
+                        transitions: Object.freeze(
+                            (Array.isArray(step.transitions) ? step.transitions : []).map((transition) => Object.freeze({
+                                actionId: transition.actionId,
+                                navEvent: transition.navEvent,
+                                capabilityId: transition.capabilityId,
+                                nextStepId: transition.nextStepId,
+                                description: transition.description,
+                            }))
+                        ),
+                    }))
+                ),
+            })
+            : null,
         selectionWriteback: Object.freeze({
             source: 'start-setup',
             contractVersion: HANGAR_SELECTION_WRITEBACK_VERSION,
