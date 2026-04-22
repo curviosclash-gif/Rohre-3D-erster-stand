@@ -8,6 +8,8 @@ import {
     HANGAR_SELECTION_WRITEBACK_PATHS,
     HANGAR_SELECTION_WRITEBACK_VERSION,
 } from './HangarSelectionWritebackContract.js';
+import { resolveDesktopHangarEntryByMode } from './HangarDesktopEntryContract.js';
+import { resolveHangarLifecycleContract } from './HangarLifecycleContract.js';
 import {
     resolveHangarWorkshopModule,
     resolveHangarWorkshopViewSwitch,
@@ -158,6 +160,8 @@ export function listHangarShellModeRegionExtensions(rawMode) {
 export function resolveHangarShellLayout(rawMode) {
     const flow = resolveHangarUserFlow(rawMode);
     const mode = resolveHangarMode(flow.mode);
+    const desktopEntry = resolveDesktopHangarEntryByMode(mode);
+    const lifecycleContract = resolveHangarLifecycleContract(mode);
     const desktopLoop = resolveHangarDesktopLoop(mode);
     const workshopModule = resolveHangarWorkshopModule(mode);
     const workshopNavigation = resolveHangarWorkshopViewSwitch(mode);
@@ -168,6 +172,17 @@ export function resolveHangarShellLayout(rawMode) {
         dataSpace: flow.dataSpace,
         persistenceKey: flow.persistenceKey,
         startNavEvent: flow.startNavEvent,
+        desktopEntry: desktopEntry ? Object.freeze({ ...desktopEntry }) : null,
+        lifecycleContract: lifecycleContract
+            ? Object.freeze({
+                ...lifecycleContract,
+                writeback: Object.freeze({ ...(lifecycleContract.writeback || {}) }),
+                transitions: Object.freeze(
+                    (Array.isArray(lifecycleContract.transitions) ? lifecycleContract.transitions : [])
+                        .map((entry) => Object.freeze({ ...entry }))
+                ),
+            })
+            : null,
         commonRegions: listHangarShellCommonRegions(),
         modeExtensions: listHangarShellModeRegionExtensions(mode),
         desktopLoop: desktopLoop
