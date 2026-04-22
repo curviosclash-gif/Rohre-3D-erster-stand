@@ -10,6 +10,8 @@ import {
 } from './HangarSelectionWritebackContract.js';
 import { resolveDesktopHangarEntryByMode } from './HangarDesktopEntryContract.js';
 import { resolveHangarLifecycleContract } from './HangarLifecycleContract.js';
+import { listHangarVerificationTargets } from './HangarVerificationTargetContract.js';
+import { resolveArcadeVehicleManagerLegacyStatus } from './ArcadeVehicleManagerLegacyContract.js';
 import {
     resolveHangarWorkshopModule,
     resolveHangarWorkshopViewSwitch,
@@ -162,6 +164,8 @@ export function resolveHangarShellLayout(rawMode) {
     const mode = resolveHangarMode(flow.mode);
     const desktopEntry = resolveDesktopHangarEntryByMode(mode);
     const lifecycleContract = resolveHangarLifecycleContract(mode);
+    const verificationTargets = listHangarVerificationTargets();
+    const arcadeVehicleManagerLegacy = resolveArcadeVehicleManagerLegacyStatus();
     const desktopLoop = resolveHangarDesktopLoop(mode);
     const workshopModule = resolveHangarWorkshopModule(mode);
     const workshopNavigation = resolveHangarWorkshopViewSwitch(mode);
@@ -182,6 +186,12 @@ export function resolveHangarShellLayout(rawMode) {
                         .map((entry) => Object.freeze({ ...entry }))
                 ),
             })
+            : null,
+        verificationTargets: Object.freeze(
+            (Array.isArray(verificationTargets) ? verificationTargets : []).map((target) => Object.freeze({ ...target }))
+        ),
+        arcadeVehicleManagerLegacy: arcadeVehicleManagerLegacy
+            ? Object.freeze({ ...arcadeVehicleManagerLegacy })
             : null,
         commonRegions: listHangarShellCommonRegions(),
         modeExtensions: listHangarShellModeRegionExtensions(mode),
