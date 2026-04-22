@@ -1,6 +1,6 @@
-# Feature: Desktop Multiplayer Signaling- und Connectivity-Hardening (V99)
+# Feature: Desktop Multiplayer Signaling-, LAN- und Connectivity-Hardening (V99)
 
-Stand: 2026-04-20
+Stand: 2026-04-22
 Status: Entwurf
 Owner: Codex
 Risiko: hoch
@@ -10,9 +10,10 @@ plan_file: `docs/plaene/aktiv/V99.md`
 
 Die nach `V64` verbleibenden Laufzeitluecken im Desktop-Multiplayer-Failure-Handling gezielt schliessen:
 
-- Online-Signaling-Fehler sollen produktiv als strukturierte, unterscheidbare Fehlerpfade ankommen statt als generische Socket-Abbrueche oder stille Ignore-Faelle.
+- Online- und LAN-Signaling-Fehler sollen produktiv als strukturierte, unterscheidbare Fehlerpfade ankommen statt als generische Socket-Abbrueche oder stille Ignore-Faelle.
 - Disconnect-, Resume- und Host-finalized-Pfade sollen denselben robusten Lifecycle-Vertrag nutzen, inklusive asynchroner Fehlerbehandlung.
 - Connectivity-Profile aus `V64 64.7.2` sollen nicht nur Test-/Doku-Vertrag bleiben, sondern in Validation, UI-Hinweisen und Diagnosepfaden produktiv genutzt werden.
+- LAN-Lobby-Pfade sollen Kapazitaet, Host-Berechtigung, Polling-Stabilitaet und untrusted UI-Daten konsistent haerten.
 - Neue Haertung soll keine alten `runtimeFacade`-/Global-Bypaesse reaktivieren und den `V92`-Ownership-Schnitt respektieren.
 
 ## Desktop-first Scope
@@ -32,8 +33,12 @@ Die nach `V64` verbleibenden Laufzeitluecken im Desktop-Multiplayer-Failure-Hand
 - `src/network/OnlineSignalingSupport.js`
 - `src/network/OnlineMatchLobby.js`
 - `src/network/OnlineSessionAdapter.js`
+- `src/network/LANMatchLobby.js`
+- `src/network/LANSessionAdapter.js`
 - `src/network/SessionAdapterBase.js`
+- `server/lan-signaling.js`
 - `src/application/session-runtime/StorageLobbyService.js`
+- `src/application/session-runtime/NetworkLobbyServiceSupport.js`
 - `src/core/runtime/MultiplayerMatchLifecycleKernel.js`
 - `src/core/runtime/RuntimeSessionLifecycleService.js`
 - `src/shared/contracts/DesktopMultiplayerRoleContract.js`
@@ -41,6 +46,7 @@ Die nach `V64` verbleibenden Laufzeitluecken im Desktop-Multiplayer-Failure-Hand
 - `src/core/runtime/MatchStartValidationService.js`
 - `src/core/runtime/MenuRuntimeMultiplayerService.js`
 - `src/shared/contracts/PlatformSurfacePolicyOps.js`
+- `src/ui/menu/testing/MenuMultiplayerPanel.js`
 - `tests/transport-verification-matrix.contract.test.mjs`
 - `tests/desktop-multiinstance-smoke.contract.test.mjs`
 - `tests/platform-capabilities.contract.test.mjs`
@@ -54,6 +60,9 @@ Die nach `V64` verbleibenden Laufzeitluecken im Desktop-Multiplayer-Failure-Hand
 - [ ] DoD.4 Disconnect-/Resume-/Close-Pfade respektieren den `V92`-Ownership-Schnitt; keine neuen Legacy-Reads oder Global-Bypaesse entstehen.
 - [ ] DoD.5 Contract-/Smoketests decken die neuen Failure-Klassen und Guard-Pfade ab oder offene externe Blocker sind blockerfest dokumentiert.
 - [ ] DoD.6 Host-Leave- und Session-Abbruch-Pfade im `StorageLobbyService` sprechen denselben Failure-/Lifecycle-Vertrag wie Lobby und SessionAdapter; keine stillen Sonderpfade bleiben zurueck.
+- [ ] DoD.7 LAN-Join respektiert `maxPlayers`; mutierende LAN-Endpoints sind host-gebunden oder gleichwertig gegen Fremdtrigger gehaertet.
+- [ ] DoD.8 LAN-Polling in Lobby/Session ist timeout- und overlap-sicher (kein ungebremster async-Interval-Backlog).
+- [ ] DoD.9 Discovery-Hostdaten werden im UI ohne untrusted `innerHTML` dargestellt.
 
 ## Intake-Hinweis fuer den User
 
@@ -115,21 +124,30 @@ output: Sichtbare, deduplizierte Return-to-Menu-Failure-Pfade
 - [ ] 99.3.1 `MultiplayerMatchLifecycleKernel` so nachschaerfen, dass `returnToMenu()`-Promises beobachtet, Fehler geloggt und doppelte Trigger sauber unterdrueckt werden.
 - [ ] 99.3.2 `RuntimeSessionLifecycleService`, `StorageLobbyService` und angrenzende Session-Adapter gegen Disconnect-/Finalize-/Host-Leave-Rennen rechecken und nur noetige Guardrails nachziehen.
 
-### 99.4 Connectivity-Profil in Produktpfade ziehen
+### 99.4 LAN-Hardening fuer Kapazitaet, Endpoint-Rollen und Polling
+status: open
+goal: LAN-Pfade gegen Kapazitaetsdrift, Fremdtrigger und Polling-Backlog absichern
+output: Stabilere LAN-Lobby-/Session-Pfade mit klaren Rollen- und Timeout-Guards
+
+- [ ] 99.4.1 `server/lan-signaling.js`: `LOBBY_JOIN` strikt auf `maxPlayers` begrenzen; mutierende Endpoints (`ready`, `invalidate-ready`, `match-start`, `leave`) host-/player-spezifisch haerten.
+- [ ] 99.4.2 `src/network/LANMatchLobby.js` und `src/network/LANSessionAdapter.js`: Polling auf overlap-sichere Schleifen mit Timeout/Abort und sauberer Stop-Logik umstellen.
+- [ ] 99.4.3 `src/ui/menu/testing/MenuMultiplayerPanel.js`: Discovery-Karten ohne untrusted `innerHTML` rendern (textContent/Node-Aufbau, kein HTML-Injection-Pfad).
+
+### 99.5 Connectivity-Profil in Produktpfade ziehen
 status: open
 goal: `V64 64.7.2` als produktiven Read-Vertrag nutzen
 output: Validation-/UI-Hinweise lesen denselben Connectivity-Stand wie die Tests
 
-- [ ] 99.4.1 Validation- oder Menu-Pfade fuer LAN/Online auf `resolveDesktopConnectivityProfile()` oder denselben kanonischen Vertrag umstellen.
-- [ ] 99.4.2 Nutzerhinweise fuer kein Netz, nur LAN und echtes Internet klar auf denselben Diagnosevertrag heben, ohne Browser-/Demo-Grenzen aus `V77` zu verletzen.
+- [ ] 99.5.1 Validation- oder Menu-Pfade fuer LAN/Online auf `resolveDesktopConnectivityProfile()` oder denselben kanonischen Vertrag umstellen.
+- [ ] 99.5.2 Nutzerhinweise fuer kein Netz, nur LAN und echtes Internet klar auf denselben Diagnosevertrag heben, ohne Browser-/Demo-Grenzen aus `V77` zu verletzen.
 
-### 99.5 Contract- und Guard-Haertung
+### 99.6 Contract- und Guard-Haertung
 status: open
 goal: Failure-Klassen und Ownership gegen Rueckfall absichern
 output: Kleine Tests plus Doku-/Guard-Spiegelung
 
-- [ ] 99.5.1 Contract-Tests fuer Payload-Parse-Failures, Network-unavailable, Lifecycle-Reject, Host-Leave im `StorageLobbyService` und Connectivity-Hinweise ergaenzen.
-- [ ] 99.5.2 Referenzdoku auf denselben Failure- und Ownership-Leseweg spiegeln; keine neuen Legacy-Adapter ausser blockerfest dokumentierten Restnischen zulassen.
+- [ ] 99.6.1 Contract-Tests fuer Payload-Parse-Failures, Network-unavailable, Lifecycle-Reject, Host-Leave, LAN-`maxPlayers`-Gates und Polling-Timeout-Verhalten ergaenzen.
+- [ ] 99.6.2 Referenzdoku auf denselben Failure- und Ownership-Leseweg spiegeln; keine neuen Legacy-Adapter ausser blockerfest dokumentierten Restnischen zulassen.
 
 ### 99.99 Abschluss-Gate
 status: open

@@ -121,3 +121,18 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Master-Index synchronisiert: `V72`-Abhaengigkeitszeile auf `erfuellt=ja` gesetzt; `V76`-Aktivlock ueber `docs/lock-status/build-agent.json` und `_locks-registry.json` wieder konsistent mit dem aktiven Master-Status hergestellt.
 - Priorisierungsabschnitte (`Sofort laufende...`, `Parallelpfad...`, `Kurzform`) auf den aktuellen offenen Block-Stand aktualisiert: `V76`, `V98`, `V75`, `V81`, `V94`.
 - Kanonische Blockdateien bereinigt: in abgeschlossenen Bloecken `V64`, `V72`, `V77`, `V82`, `V86`, `V91`, `V92`, `V97` wurden DoD-Checkboxen auf `[x]` mit Evidence-Format angeglichen; `V64`-Frontmatter auf `status: done` aktualisiert.
+
+## Stand-Snapshot 2026-04-21 (Subphase `V98 98.2`)
+
+- `src/shared/contracts/PlatformCapabilityRegistry.js` fuehrt Browser-Demo-Override-Merge zentral im Resolver ein: `resolveSurfacePolicy()`, `resolveSurfaceCapabilityAccess()` und `resolvePlatformEnvironment()` lesen fuer `browser-demo` denselben gemergten Policy-Stand statt statischer Basisdaten.
+- Consumer bleiben unveraendert auf den Resolverpfaden: `PlatformSurfacePolicyOps` nutzt ohne Sonderzweig denselben gemergten Zustand fuer Mode-Gates und Multiplayer-Join/Host-Guardrails.
+- Strukturierte Diagnostics sind jetzt resolverweit verfuegbar (`applied`, `skipped`, `fallback`, `reject` + `reasonCode`, `migrationCode`, `errorCodes`, `warningCodes`) und decken fehlende Quellen, invaliden Draft, Future-Version-Fallback und Validation-Reject sauber ab.
+- `tests/platform-capabilities.contract.test.mjs` erweitert den Contract-Scope um `V98 98.2.1` bis `98.2.3` (Resolver-Merge, Consumer-Konsistenz, Diagnostics-/Capability-Flag-Narrowing).
+- Naechste offene V98-Subphase ist `98.3` (Settings-Studio-Sektion "Browser-Demo-Grenzen").
+
+## Stand-Snapshot 2026-04-22 (Deep-Audit Architektur + Runtime)
+
+- Architektur-Grenzen bleiben formal eingehalten (`check:architecture:boundaries` gruen, keine neuen disallowed edges), aber mehrere Legacy-Budgets laufen am aktuellen Ratchet-Limit.
+- Neue Audit-Hotspots wurden als umsetzbare Backlog-Eintraege `P32` bis `P40` in `docs/Umsetzungsplan.md` aufgenommen (LAN-Kapazitaet/Endpoint-Rollen, Polling-Backlog, UI-Injection-Pfad, Sync-IPC, Contract-Hotspots, Typecheck-Rotstand).
+- Der bestehende Intake-Entwurf `docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` wurde auf LAN-Hardening erweitert (Kapazitaets- und Rollen-Guards, Polling-Timeout/Inflight-Guards, sichere Discovery-UI-Renderpfade).
+- Neuer Intake-Entwurf `docs/plaene/neu/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md` fuehrt den Type-Safety-/Lint-Hardening-Scope fuer den roten Architektur-Typecheck und die uebergrossen Contract-Dateien.

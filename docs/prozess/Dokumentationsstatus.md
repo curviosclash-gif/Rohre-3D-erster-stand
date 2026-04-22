@@ -1,6 +1,6 @@
 # Dokumentationsstatus
 
-Stand: 2026-04-21
+Stand: 2026-04-22
 Modus: sync
 Gate: PASS
 
@@ -22,4 +22,4 @@ Gate: PASS
 - docs/plaene/aktiv/V91.md: Zeilen 87, 132
 
 ## Ergebnis
-- Dokumentation aktuell (geprueft am 2026-04-21).
+- Dokumentation aktuell (geprueft am 2026-04-22).
