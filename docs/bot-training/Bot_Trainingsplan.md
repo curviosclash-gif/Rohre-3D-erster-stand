@@ -939,7 +939,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 
 ### 93A.3 Harness-Konsolidierung (BTF-11)
 
-- [ ] 93A.3.1 Die in BTF-11 als Boundary-Ausnahme dokumentierte Duplikation des `HeadlessLaneStepRunner` zwischen `smoke.mjs` und `single-env-bridge.mjs` aufloesen.
+ - [x] 93A.3.1 Die in BTF-11 als Boundary-Ausnahme dokumentierte Duplikation des `HeadlessLaneStepRunner` zwischen `smoke.mjs` und `single-env-bridge.mjs` aufloesen. (abgeschlossen: 2026-04-24; evidence: `git show --stat --oneline 9653ef5` -> commit `9653ef5`)
 - [ ] 93A.3.2 Gemeinsame Trainingslogik konsolidieren, sobald der `2-Env` Harness in 93A.2 konkret steht.
 
 ### 93A.99 Abschluss-Gate
