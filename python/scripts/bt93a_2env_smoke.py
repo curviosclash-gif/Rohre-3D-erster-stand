@@ -8,6 +8,7 @@ import json
 import sys
 import time
 import tracemalloc
+from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -45,6 +46,31 @@ def _utc_now() -> str:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f"{json.dumps(payload, indent=2)}\n", encoding="utf-8")
+
+
+def _to_mapping(value: Any) -> dict[str, Any]:
+    return value if isinstance(value, dict) else {}
+
+
+def _sorted_counter(counter: Counter[str]) -> dict[str, int]:
+    return {key: counter[key] for key in sorted(counter)}
+
+
+def _classify_failure(error: BaseException | str | None) -> str:
+    if error is None:
+        return "unknown"
+    if isinstance(error, TimeoutError):
+        return "timeout"
+
+    message = str(error).strip()
+    lowered = message.lower()
+    if "timed out" in lowered or "timeout" in lowered:
+        return "timeout"
+    if "socket" in lowered and "closed" in lowered:
+        return "socket-closed"
+    if isinstance(error, BaseException):
+        return error.__class__.__name__
+    return message.split(":", 1)[0] or "runtime-error"
 
 
 def _build_batch_math() -> dict[str, Any]:
@@ -131,56 +157,134 @@ def build_invalid_action() -> dict[str, object]:
 
 
 def run_env(env_id: int, max_steps: int) -> dict[str, Any]:
+    seed = 930 + env_id
+    session_id = f"bt93a-2env-smoke-{env_id}"
     env = CurviosEnv(
         max_steps=max_steps,
-        default_seed=930 + env_id,
-        session_id=f"bt93a-2env-smoke-{env_id}",
+        default_seed=seed,
+        session_id=session_id,
         controller_timeout_seconds=DEFAULT_COMMAND_TIMEOUT_SECONDS,
     )
     steps_completed = 0
     failures = 0
+    reset_count = 0
+    reset_failures = 0
+    step_failures = 0
+    timeout_count = 0
+    failure_classes: Counter[str] = Counter()
+    terminal_reasons: Counter[str] = Counter()
+    truncated_reasons: Counter[str] = Counter()
+    last_error: str | None = None
     start_time = time.time()
     try:
-        env.reset(seed=930 + env_id)
+        _, reset_info = env.reset(seed=seed)
+        reset_count += 1
         action = build_invalid_action()
         terminated = False
         truncated = False
         while not (terminated or truncated) and steps_completed < max_steps:
             try:
-                _, _, terminated, truncated, _ = env.step(action)
+                _, _, terminated, truncated, info = env.step(action)
                 steps_completed += 1
+                terminal_reason = str(info.get("terminalReason") or "")
+                truncated_reason = str(info.get("truncatedReason") or "")
+                if terminal_reason:
+                    terminal_reasons[terminal_reason] += 1
+                if truncated_reason:
+                    truncated_reasons[truncated_reason] += 1
             except Exception as e:
                 failures += 1
+                step_failures += 1
+                error_class = _classify_failure(e)
+                failure_classes[error_class] += 1
+                if error_class == "timeout":
+                    timeout_count += 1
+                last_error = str(e)
                 print(f"Env {env_id} step failed: {e}")
                 break
         diagnostics = env.get_diagnostics()
     except Exception as e:
         failures += 1
+        reset_failures += 1
+        error_class = _classify_failure(e)
+        failure_classes[error_class] += 1
+        if error_class == "timeout":
+            timeout_count += 1
+        last_error = str(e)
         diagnostics = {"error": str(e)}
     finally:
         env.close()
 
     wall_clock = time.time() - start_time
+    diagnostics_map = _to_mapping(diagnostics)
+    stats = _to_mapping(diagnostics_map.get("stats"))
+    bridge_telemetry = _to_mapping(diagnostics_map.get("bridgeTelemetry"))
+    message_counts = _to_mapping(stats.get("messageCounts"))
+    contract_smoke = _to_mapping(stats.get("contractSmoke"))
+
+    timeout_count += int(bridge_telemetry.get("timeouts") or 0)
+    bridge_last_failure = bridge_telemetry.get("lastFailure")
+    if bridge_last_failure:
+        failure_classes[_classify_failure(str(bridge_last_failure))] += 1
+    contract_last_error = contract_smoke.get("lastError")
+    if contract_last_error:
+        failure_classes[_classify_failure(str(contract_last_error))] += 1
+
     return {
         "env_id": env_id,
+        "seed": seed,
+        "sessionId": session_id,
         "stepsCompleted": steps_completed,
         "failures": failures,
+        "resetCount": max(reset_count, int(message_counts.get("training-reset") or 0)),
+        "resetFailures": reset_failures,
+        "stepFailures": step_failures,
+        "timeoutCount": timeout_count,
+        "failureClasses": _sorted_counter(failure_classes),
+        "terminalReasons": _sorted_counter(terminal_reasons),
+        "truncatedReasons": _sorted_counter(truncated_reasons),
+        "lastError": last_error,
         "wall_clock_seconds": wall_clock,
-        "diagnostics": diagnostics,
+        "diagnostics": diagnostics_map,
+        "bridgeRequestsSent": int(bridge_telemetry.get("requestsSent") or 0),
+        "bridgeResponsesReceived": int(bridge_telemetry.get("responsesReceived") or 0),
+        "bridgeFailures": int(bridge_telemetry.get("failures") or 0),
+        "bridgeLatencyMeanMs": bridge_telemetry.get("latencyMeanMs"),
+        "bridgeLatencyP95Ms": bridge_telemetry.get("latencyP95Ms"),
+        "processingLatencyAverageMs": _to_mapping(stats.get("processingLatencyMs")).get("average"),
+        "validationFailures": int(contract_smoke.get("validationFailures") or 0),
+        "messageCounts": {
+            "training-reset": int(message_counts.get("training-reset") or 0),
+            "training-step": int(message_counts.get("training-step") or 0),
+            "trainer-stats-request": int(message_counts.get("trainer-stats-request") or 0),
+            "bot-action-request": int(message_counts.get("bot-action-request") or 0),
+        },
     }
 
 
 def build_smoke_artifact(results: list[dict[str, Any]], wall_clock_total: float, peak_mem: int) -> dict[str, Any]:
     total_steps = sum(result["stepsCompleted"] for result in results)
     total_failures = sum(result["failures"] for result in results)
+    total_resets = sum(result["resetCount"] for result in results)
+    total_timeouts = sum(result["timeoutCount"] for result in results)
+    total_requests = sum(result["bridgeRequestsSent"] for result in results)
+    total_validation_failures = sum(result["validationFailures"] for result in results)
     steps_per_sec = total_steps / wall_clock_total if wall_clock_total > 0 else 0.0
     failure_rate = total_failures / total_steps if total_steps > 0 else 0.0
+    timeout_rate = total_timeouts / total_requests if total_requests > 0 else 0.0
     is_downgraded = (
         steps_per_sec < ONE_WORKER_BASELINE_STEPS_PER_SEC
         or failure_rate > FAILURE_RATE_DOWNGRADE_THRESHOLD
         or wall_clock_total > (MAX_WALL_CLOCK_BUDGET_MINUTES * 60 * MAX_WALL_CLOCK_MULTIPLIER_BEFORE_DOWNGRADE)
     )
     downgrade_reason: list[str] = []
+    failure_classes: Counter[str] = Counter()
+    terminal_reasons: Counter[str] = Counter()
+    truncated_reasons: Counter[str] = Counter()
+    for result in results:
+        failure_classes.update(result["failureClasses"])
+        terminal_reasons.update(result["terminalReasons"])
+        truncated_reasons.update(result["truncatedReasons"])
     if steps_per_sec < ONE_WORKER_BASELINE_STEPS_PER_SEC:
         downgrade_reason.append("Step rate under 1-worker baseline (< 28 steps/s)")
     if failure_rate > FAILURE_RATE_DOWNGRADE_THRESHOLD:
@@ -193,17 +297,37 @@ def build_smoke_artifact(results: list[dict[str, Any]], wall_clock_total: float,
         "generatedAt": _utc_now(),
         "generatedBy": "python/scripts/bt93a_2env_smoke.py",
         "scope": {
+            "phase": "93A.2.1",
             "workerCount": WORKER_COUNT,
             "targetStepsPerEnv": TARGET_STEPS_PER_ENV,
             "totalTargetSteps": WORKER_COUNT * TARGET_STEPS_PER_ENV,
+            "multiEnv": True,
+            "vecEnv": False,
+            "laneModel": "two parallel CurviosEnv workers via ThreadPoolExecutor",
         },
         "lanePlan": build_lane_plan(),
+        "execution": {
+            "deterministicSeeds": [result["seed"] for result in sorted(results, key=lambda entry: entry["env_id"])],
+            "controllerTimeoutSeconds": DEFAULT_COMMAND_TIMEOUT_SECONDS,
+            "expectedResetPattern": "one reset per env before stepping",
+            "vecEnvNote": "BT93A measures a runtime-near multi-env lane first; no SubprocVecEnv/DummyVecEnv wrapper is introduced before measured evidence exists.",
+        },
         "performance": {
             "totalStepsCompleted": total_steps,
             "wallClockSeconds": wall_clock_total,
             "stepsPerSecond": steps_per_sec,
             "failureRate": failure_rate,
             "totalFailures": total_failures,
+        },
+        "stability": {
+            "resetCount": total_resets,
+            "resetRatePerEnv": total_resets / WORKER_COUNT if WORKER_COUNT > 0 else 0.0,
+            "timeoutCount": total_timeouts,
+            "timeoutRatePerRequest": timeout_rate,
+            "validationFailures": total_validation_failures,
+            "failureClasses": _sorted_counter(failure_classes),
+            "terminalReasons": _sorted_counter(terminal_reasons),
+            "truncatedReasons": _sorted_counter(truncated_reasons),
         },
         "memory": {
             "peakMemoryMB": peak_mem / 1024 / 1024,
@@ -224,9 +348,25 @@ def build_smoke_artifact(results: list[dict[str, Any]], wall_clock_total: float,
         "workers": [
             {
                 "envId": result["env_id"],
+                "seed": result["seed"],
+                "sessionId": result["sessionId"],
                 "stepsCompleted": result["stepsCompleted"],
+                "resetCount": result["resetCount"],
+                "timeoutCount": result["timeoutCount"],
                 "failures": result["failures"],
+                "failureClasses": result["failureClasses"],
+                "terminalReasons": result["terminalReasons"],
+                "truncatedReasons": result["truncatedReasons"],
                 "wallClockSeconds": result["wall_clock_seconds"],
+                "bridgeRequestsSent": result["bridgeRequestsSent"],
+                "bridgeResponsesReceived": result["bridgeResponsesReceived"],
+                "bridgeFailures": result["bridgeFailures"],
+                "bridgeLatencyMeanMs": result["bridgeLatencyMeanMs"],
+                "bridgeLatencyP95Ms": result["bridgeLatencyP95Ms"],
+                "processingLatencyAverageMs": result["processingLatencyAverageMs"],
+                "validationFailures": result["validationFailures"],
+                "messageCounts": result["messageCounts"],
+                "lastError": result["lastError"],
             }
             for result in sorted(results, key=lambda entry: entry["env_id"])
         ],

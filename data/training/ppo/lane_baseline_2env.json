@@ -1,0 +1,222 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-23T21:43:04Z",
+  "generatedBy": "python/scripts/bt93a_2env_smoke.py",
+  "scope": {
+    "phase": "93A.2.1",
+    "workerCount": 2,
+    "targetStepsPerEnv": 500,
+    "totalTargetSteps": 1000,
+    "multiEnv": true,
+    "vecEnv": false,
+    "laneModel": "two parallel CurviosEnv workers via ThreadPoolExecutor"
+  },
+  "lanePlan": {
+    "ok": true,
+    "generatedAt": "2026-04-23T21:43:04Z",
+    "generatedBy": "python/scripts/bt93a_2env_smoke.py --plan-only",
+    "scope": {
+      "phase": "93A.1.2",
+      "smallestClaimableLane": true,
+      "workerCount": 2,
+      "targetStepsPerEnv": 500,
+      "totalTargetSteps": 1000,
+      "ppoBaseline": false
+    },
+    "processModel": {
+      "envFactory": "CurviosEnv",
+      "controllerScript": "scripts/training-single-env-bridge.mjs",
+      "sidecarProcess": "Bt92ControlledBridgeSidecar",
+      "portStrategy": "dynamic localhost port per env via CurviosEnv._choose_local_port()",
+      "controllerTimeoutSeconds": 30.0,
+      "wallClockBudgetMinutes": 10,
+      "sessionIdPattern": "bt93a-2env-smoke-{envId}"
+    },
+    "restartBehavior": {
+      "perEnvLifecycle": "each worker owns one CurviosEnv and closes it deterministically after the lane run",
+      "rerunStrategy": "restart the affected env/controller/sidecar trio instead of reusing a failed process",
+      "fallbackLane": "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear"
+    },
+    "comparisonAnchor": {
+      "artifact": "data/training/ppo/throughput_analysis_btf08.json",
+      "realisticStepsPerSec1Worker": 28.0,
+      "maxWallClockMinutesBeforeDowngrade": 20.0
+    },
+    "fourEnvPolicy": {
+      "optionalFollowUpOnly": true,
+      "defaultStatus": "locked-until-measured-2env-evidence",
+      "minMeasured2EnvStepsPerSec": 45.0,
+      "maxMeasured2EnvFailureRate": 0.02,
+      "downgradeRule": "Without measured 2-env evidence, BT93A stays on 2-env or the sequential fallback lane."
+    },
+    "batchMath": {
+      "formula": "max_rollout_steps_total = measured_steps_per_second * target_update_window_seconds",
+      "baselineAnchorArtifact": "data/training/ppo/throughput_analysis_btf08.json",
+      "baselineMeasuredStepsPerSecond": 28.0,
+      "rule": "BT93B must replace the 1-worker anchor with measured BT93A lane evidence before pinning rollout sizes.",
+      "examples": [
+        {
+          "targetUpdateWindowSeconds": 15,
+          "maxRolloutStepsTotalAt1WorkerAnchor": 420,
+          "maxNstepsAt2Env": 210
+        },
+        {
+          "targetUpdateWindowSeconds": 30,
+          "maxRolloutStepsTotalAt1WorkerAnchor": 840,
+          "maxNstepsAt2Env": 420
+        },
+        {
+          "targetUpdateWindowSeconds": 60,
+          "maxRolloutStepsTotalAt1WorkerAnchor": 1680,
+          "maxNstepsAt2Env": 840
+        }
+      ]
+    },
+    "actionBoundary": {
+      "booleanFields": [
+        "pitchUp",
+        "pitchDown",
+        "yawLeft",
+        "yawRight",
+        "rollLeft",
+        "rollRight",
+        "boost",
+        "cameraSwitch",
+        "dropItem",
+        "shootItem",
+        "shootMG",
+        "nextItem"
+      ],
+      "indexFields": [
+        "shootItemIndex",
+        "useItem"
+      ],
+      "rawIndexSurfaceOnly": true
+    },
+    "scopeGuardrails": {
+      "allowedBuildLocations": [
+        "python/bridge/**",
+        "python/envs/**",
+        "python/scripts/**",
+        "python/tests/**",
+        "data/training/ppo/**"
+      ],
+      "readOnlyRuntimeSurfaces": [
+        "src/state/HeadlessMatchKernelRuntime.js",
+        "src/core/MatchKernelTrainingAdapter.js",
+        "src/entities/ai/training/TrainingTransportFacade.js",
+        "src/entities/ai/training/WebSocketTrainerBridge.js",
+        "src/entities/ai/ObservationBridgePolicy.js",
+        "src/core/RuntimeConfig.js",
+        "src/entities/ai/BotPolicyRegistry.js",
+        "src/entities/ai/BotPolicyTypes.js",
+        "src/entities/ai/inference/LocalDqnInference.js",
+        "src/state/training/RewardCalculator.js",
+        "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
+        "src/state/MatchSessionFactory.js"
+      ],
+      "phaseBoundary": "BT93A documents harness, timeout, throughput and failure evidence only."
+    },
+    "pendingThroughputArtifact": "data\\training\\ppo\\lane_baseline_2env.json"
+  },
+  "execution": {
+    "deterministicSeeds": [
+      930,
+      931
+    ],
+    "controllerTimeoutSeconds": 30.0,
+    "expectedResetPattern": "one reset per env before stepping",
+    "vecEnvNote": "BT93A measures a runtime-near multi-env lane first; no SubprocVecEnv/DummyVecEnv wrapper is introduced before measured evidence exists."
+  },
+  "performance": {
+    "totalStepsCompleted": 1000,
+    "wallClockSeconds": 16.5979323387146,
+    "stepsPerSecond": 60.24846827863641,
+    "failureRate": 0.0,
+    "totalFailures": 0
+  },
+  "stability": {
+    "resetCount": 2,
+    "resetRatePerEnv": 1.0,
+    "timeoutCount": 0,
+    "timeoutRatePerRequest": 0.0,
+    "validationFailures": 0,
+    "failureClasses": {},
+    "terminalReasons": {},
+    "truncatedReasons": {
+      "max-steps": 2
+    }
+  },
+  "memory": {
+    "peakMemoryMB": 1.3087100982666016,
+    "memoryLeakTracking": "tracemalloc used during smoke run",
+    "memoryStable": true
+  },
+  "downgradeCheck": {
+    "downgraded": false,
+    "reason": [],
+    "allow4Env": true,
+    "minStepsPerSecondFor4Env": 45.0,
+    "maxFailureRateFor4Env": 0.02
+  },
+  "workers": [
+    {
+      "envId": 0,
+      "seed": 930,
+      "sessionId": "bt93a-2env-smoke-0",
+      "stepsCompleted": 500,
+      "resetCount": 1,
+      "timeoutCount": 0,
+      "failures": 0,
+      "failureClasses": {},
+      "terminalReasons": {},
+      "truncatedReasons": {
+        "max-steps": 1
+      },
+      "wallClockSeconds": 16.595937252044678,
+      "bridgeRequestsSent": 1002,
+      "bridgeResponsesReceived": 1002,
+      "bridgeFailures": 0,
+      "bridgeLatencyMeanMs": 2.1640625,
+      "bridgeLatencyP95Ms": 3,
+      "processingLatencyAverageMs": 1.401,
+      "validationFailures": 0,
+      "messageCounts": {
+        "training-reset": 1,
+        "training-step": 500,
+        "trainer-stats-request": 1,
+        "bot-action-request": 500
+      },
+      "lastError": null
+    },
+    {
+      "envId": 1,
+      "seed": 931,
+      "sessionId": "bt93a-2env-smoke-1",
+      "stepsCompleted": 500,
+      "resetCount": 1,
+      "timeoutCount": 0,
+      "failures": 0,
+      "failureClasses": {},
+      "terminalReasons": {},
+      "truncatedReasons": {
+        "max-steps": 1
+      },
+      "wallClockSeconds": 16.59493923187256,
+      "bridgeRequestsSent": 1002,
+      "bridgeResponsesReceived": 1002,
+      "bridgeFailures": 0,
+      "bridgeLatencyMeanMs": 2.1953125,
+      "bridgeLatencyP95Ms": 3,
+      "processingLatencyAverageMs": 1.376,
+      "validationFailures": 0,
+      "messageCounts": {
+        "training-reset": 1,
+        "training-step": 500,
+        "trainer-stats-request": 1,
+        "bot-action-request": 500
+      },
+      "lastError": null
+    }
+  ]
+}
