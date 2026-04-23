@@ -1,0 +1,64 @@
+# BT93B conservative scaffold derived from measured BT93A 2-env evidence.
+block_id: BT93B
+phase_id: 93B.1.1
+profile_id: bt93b-conservative-scaffold-v1
+scaffold_only: true
+
+source_artifacts:
+  bt93a_handover: data/training/ppo/bt93a_handover_2env.json
+  bt93a_claim_manifest: data/training/ppo/bt93a_claim_manifest.json
+  manifest_template: data/training/ppo/run_manifest.bt93b.template.json
+
+lane:
+  env_count: 2
+  measured_steps_per_second: 58.740111449952536
+  failure_rate: 0.0
+  four_env_for_scaffold: locked
+
+seeds:
+  global_seed: 930
+  train_env_seeds:
+    - 930
+    - 931
+  eval_env_seeds:
+    - 940
+    - 941
+
+rollout:
+  target_update_window_seconds: 15
+  measured_max_rollout_steps_total: 881
+  measured_max_n_steps_per_env: 440
+  selected_n_steps_per_env: 384
+  selected_rollout_steps_total: 768
+  selected_batch_size: 128
+  n_epochs: 4
+  selection_rule: nearest lower 64-step bucket under the measured BT93A 15s rollout ceiling
+
+algorithm:
+  library: stable-baselines3
+  name: PPO
+  policy: MlpPolicy
+  device: cpu
+  gamma: 0.99
+  gae_lambda: 0.95
+  learning_rate: 0.0003
+  clip_range: 0.2
+  ent_coef: 0.01
+  vf_coef: 0.5
+  max_grad_norm: 0.5
+
+matrix:
+  matrix_id: bt93b-scaffold-smoke-matrix-v1
+  mode_id: runtime-near-headless-v1
+  scaffold_runs:
+    - fresh-smoke
+    - resume-smoke
+    - eval-smoke
+
+action_surface:
+  split_head_adapter: pending-93B.1.2
+  training_on_raw_boundary_surface: false
+
+normalization:
+  state_normalization: pending-93B.1.3
+  actor_critic_heads: pending-93B.1.3
