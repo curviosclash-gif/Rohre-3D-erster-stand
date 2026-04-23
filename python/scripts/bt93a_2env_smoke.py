@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+import ctypes
 import json
+import os
 import sys
+import threading
 import time
 import tracemalloc
 from collections import Counter
@@ -37,6 +40,28 @@ FAILURE_RATE_DOWNGRADE_THRESHOLD = 0.05
 FOUR_ENV_MIN_STEPS_PER_SEC = 45.0
 FOUR_ENV_MAX_FAILURE_RATE = 0.02
 BATCH_UPDATE_WINDOWS_SECONDS = (15, 30, 60)
+MEMORY_SAMPLE_INTERVAL_SECONDS = 0.5
+PYTHON_RSS_GROWTH_LIMIT_MB = 24.0
+TRACEMALLOC_GROWTH_LIMIT_MB = 4.0
+
+if sys.platform == "win32":
+    _DWORD = ctypes.c_ulong
+    _SIZE_T = ctypes.c_size_t
+
+    class _ProcessMemoryCountersEx(ctypes.Structure):
+        _fields_ = [
+            ("cb", _DWORD),
+            ("PageFaultCount", _DWORD),
+            ("PeakWorkingSetSize", _SIZE_T),
+            ("WorkingSetSize", _SIZE_T),
+            ("QuotaPeakPagedPoolUsage", _SIZE_T),
+            ("QuotaPagedPoolUsage", _SIZE_T),
+            ("QuotaPeakNonPagedPoolUsage", _SIZE_T),
+            ("QuotaNonPagedPoolUsage", _SIZE_T),
+            ("PagefileUsage", _SIZE_T),
+            ("PeakPagefileUsage", _SIZE_T),
+            ("PrivateUsage", _SIZE_T),
+        ]
 
 
 def _utc_now() -> str:
@@ -54,6 +79,54 @@ def _to_mapping(value: Any) -> dict[str, Any]:
 
 def _sorted_counter(counter: Counter[str]) -> dict[str, int]:
     return {key: counter[key] for key in sorted(counter)}
+
+
+def _round_mb(value: int | float | None) -> float | None:
+    if value is None:
+        return None
+    return round(float(value) / 1024 / 1024, 3)
+
+
+def _summarize_series_mb(values: list[int | float]) -> dict[str, float | None]:
+    if not values:
+        return {
+            "startMB": None,
+            "endMB": None,
+            "peakMB": None,
+            "deltaMB": None,
+        }
+    start = float(values[0])
+    end = float(values[-1])
+    peak = float(max(values))
+    return {
+        "startMB": _round_mb(start),
+        "endMB": _round_mb(end),
+        "peakMB": _round_mb(peak),
+        "deltaMB": _round_mb(end - start),
+    }
+
+
+def _read_process_memory(pid: int) -> dict[str, int] | None:
+    if pid <= 0 or sys.platform != "win32":
+        return None
+
+    desired_access = 0x0010 | 0x0400 | 0x1000
+    handle = ctypes.windll.kernel32.OpenProcess(desired_access, False, pid)
+    if not handle:
+        return None
+
+    try:
+        counters = _ProcessMemoryCountersEx()
+        counters.cb = ctypes.sizeof(_ProcessMemoryCountersEx)
+        ok = ctypes.windll.psapi.GetProcessMemoryInfo(handle, ctypes.byref(counters), counters.cb)
+        if not ok:
+            return None
+        return {
+            "rssBytes": int(counters.WorkingSetSize),
+            "privateBytes": int(counters.PrivateUsage),
+        }
+    finally:
+        ctypes.windll.kernel32.CloseHandle(handle)
 
 
 def _classify_failure(error: BaseException | str | None) -> str:
@@ -156,7 +229,216 @@ def build_invalid_action() -> dict[str, object]:
     return action
 
 
-def run_env(env_id: int, max_steps: int) -> dict[str, Any]:
+class LaneMemoryMonitor:
+    def __init__(self, worker_count: int, sample_interval_seconds: float = MEMORY_SAMPLE_INTERVAL_SECONDS) -> None:
+        self._python_pid = os.getpid()
+        self._worker_count = worker_count
+        self._sample_interval_seconds = sample_interval_seconds
+        self._progress: dict[int, int] = {env_id: 0 for env_id in range(worker_count)}
+        self._controller_pids: dict[int, int] = {}
+        self._samples: list[dict[str, Any]] = []
+        self._lock = threading.Lock()
+        self._stop_event = threading.Event()
+        self._thread: threading.Thread | None = None
+        self._started_at = 0.0
+
+    def start(self) -> None:
+        self._started_at = time.perf_counter()
+        tracemalloc.start()
+        self.capture("run-start")
+        self._thread = threading.Thread(target=self._run, name="bt93a-memory-monitor", daemon=True)
+        self._thread.start()
+
+    def _run(self) -> None:
+        while not self._stop_event.wait(self._sample_interval_seconds):
+            self.capture("interval")
+
+    def register_controller_pid(self, env_id: int, pid: int | None) -> None:
+        if pid is None:
+            return
+        with self._lock:
+            self._controller_pids[env_id] = int(pid)
+
+    def update_progress(self, env_id: int, steps_completed: int) -> None:
+        with self._lock:
+            self._progress[env_id] = int(steps_completed)
+
+    def capture(self, reason: str) -> dict[str, Any]:
+        with self._lock:
+            progress = dict(self._progress)
+            controller_pids = dict(self._controller_pids)
+
+        current_bytes, peak_bytes = tracemalloc.get_traced_memory()
+        python_memory = _read_process_memory(self._python_pid) or {}
+        controllers: dict[str, Any] = {}
+        total_controller_rss = 0
+        total_controller_private = 0
+
+        for env_id, pid in sorted(controller_pids.items()):
+            process_memory = _read_process_memory(pid)
+            controller_entry: dict[str, Any] = {
+                "pid": pid,
+                "alive": process_memory is not None,
+            }
+            if process_memory is not None:
+                controller_entry.update(process_memory)
+                total_controller_rss += int(process_memory["rssBytes"])
+                total_controller_private += int(process_memory["privateBytes"])
+            controllers[str(env_id)] = controller_entry
+
+        sample = {
+            "timestamp": _utc_now(),
+            "reason": reason,
+            "elapsedSeconds": round(time.perf_counter() - self._started_at, 3),
+            "totalCompletedSteps": sum(progress.values()),
+            "perEnvSteps": {str(key): progress[key] for key in sorted(progress)},
+            "python": {
+                "pid": self._python_pid,
+                "rssBytes": python_memory.get("rssBytes"),
+                "privateBytes": python_memory.get("privateBytes"),
+            },
+            "tracemalloc": {
+                "currentBytes": int(current_bytes),
+                "peakBytes": int(peak_bytes),
+            },
+            "controllers": {
+                "trackedEnvIds": [int(env_id) for env_id in sorted(controller_pids)],
+                "perEnv": controllers,
+                "totalRssBytes": total_controller_rss,
+                "totalPrivateBytes": total_controller_private,
+            },
+        }
+        self._samples.append(sample)
+        return sample
+
+    def finish(self) -> dict[str, Any]:
+        self.capture("run-complete")
+        self._stop_event.set()
+        if self._thread is not None:
+            self._thread.join(timeout=self._sample_interval_seconds * 4)
+        final_sample = self.capture("post-close")
+        for _ in range(4):
+            if final_sample["controllers"].get("totalRssBytes", 0) == 0:
+                break
+            time.sleep(self._sample_interval_seconds)
+            final_sample = self.capture("post-close-wait")
+        tracemalloc.stop()
+        return build_memory_summary(
+            samples=self._samples,
+            sample_interval_seconds=self._sample_interval_seconds,
+            python_pid=self._python_pid,
+            final_sample=final_sample,
+        )
+
+
+def build_memory_summary(
+    *,
+    samples: list[dict[str, Any]],
+    sample_interval_seconds: float,
+    python_pid: int,
+    final_sample: dict[str, Any],
+) -> dict[str, Any]:
+    python_rss_values = [
+        sample["python"]["rssBytes"]
+        for sample in samples
+        if sample["python"].get("rssBytes") is not None
+    ]
+    python_private_values = [
+        sample["python"]["privateBytes"]
+        for sample in samples
+        if sample["python"].get("privateBytes") is not None
+    ]
+    tracemalloc_current_values = [sample["tracemalloc"]["currentBytes"] for sample in samples]
+    tracemalloc_peak_values = [sample["tracemalloc"]["peakBytes"] for sample in samples]
+    controller_rss_active_values = [
+        sample["controllers"]["totalRssBytes"]
+        for sample in samples
+        if sample["controllers"].get("totalRssBytes", 0) > 0
+    ]
+    controller_private_active_values = [
+        sample["controllers"]["totalPrivateBytes"]
+        for sample in samples
+        if sample["controllers"].get("totalPrivateBytes", 0) > 0
+    ]
+
+    per_env_peak_rss_mb: dict[str, float] = {}
+    for sample in samples:
+        per_env = sample["controllers"].get("perEnv", {})
+        for env_id, entry in per_env.items():
+            rss_bytes = entry.get("rssBytes")
+            if rss_bytes is None:
+                continue
+            peak_mb = _round_mb(rss_bytes)
+            if peak_mb is None:
+                continue
+            current_peak = per_env_peak_rss_mb.get(env_id)
+            if current_peak is None or peak_mb > current_peak:
+                per_env_peak_rss_mb[env_id] = peak_mb
+
+    python_rss_summary = _summarize_series_mb(python_rss_values)
+    tracemalloc_current_summary = _summarize_series_mb(tracemalloc_current_values)
+    python_rss_growth_mb = python_rss_summary["deltaMB"]
+    tracemalloc_growth_mb = tracemalloc_current_summary["deltaMB"]
+
+    leak_reasons: list[str] = []
+    if python_rss_growth_mb is not None and python_rss_growth_mb > PYTHON_RSS_GROWTH_LIMIT_MB:
+        leak_reasons.append(
+            f"python RSS grew by {python_rss_growth_mb} MB (> {PYTHON_RSS_GROWTH_LIMIT_MB} MB limit)"
+        )
+    if tracemalloc_growth_mb is not None and tracemalloc_growth_mb > TRACEMALLOC_GROWTH_LIMIT_MB:
+        leak_reasons.append(
+            f"tracemalloc current grew by {tracemalloc_growth_mb} MB (> {TRACEMALLOC_GROWTH_LIMIT_MB} MB limit)"
+        )
+
+    timeline = []
+    for sample in samples:
+        timeline.append({
+            "elapsedSeconds": sample["elapsedSeconds"],
+            "reason": sample["reason"],
+            "totalCompletedSteps": sample["totalCompletedSteps"],
+            "pythonRssMB": _round_mb(sample["python"].get("rssBytes")),
+            "pythonPrivateMB": _round_mb(sample["python"].get("privateBytes")),
+            "tracemallocCurrentMB": _round_mb(sample["tracemalloc"].get("currentBytes")),
+            "tracemallocPeakMB": _round_mb(sample["tracemalloc"].get("peakBytes")),
+            "controllerTotalRssMB": _round_mb(sample["controllers"].get("totalRssBytes")),
+        })
+
+    return {
+        "adr": "PPO-ADR-003",
+        "tracking": (
+            "Python harness memory sampled via OS RSS/private bytes plus tracemalloc current/peak over the live 2-env lane."
+        ),
+        "sampleCount": len(samples),
+        "sampleIntervalSeconds": sample_interval_seconds,
+        "pythonProcess": {
+            "pid": python_pid,
+            "rssMB": python_rss_summary,
+            "privateMB": _summarize_series_mb(python_private_values),
+        },
+        "tracemalloc": {
+            "currentMB": tracemalloc_current_summary,
+            "peakMB": _round_mb(max(tracemalloc_peak_values)) if tracemalloc_peak_values else None,
+        },
+        "controllerProcesses": {
+            "trackedEnvIds": final_sample["controllers"].get("trackedEnvIds", []),
+            "rssMBDuringActiveRun": _summarize_series_mb(controller_rss_active_values),
+            "privateMBDuringActiveRun": _summarize_series_mb(controller_private_active_values),
+            "perEnvPeakRssMB": {key: per_env_peak_rss_mb[key] for key in sorted(per_env_peak_rss_mb)},
+            "finalResidualRssMB": _round_mb(final_sample["controllers"].get("totalRssBytes")),
+            "cleanupSettled": final_sample["controllers"].get("totalRssBytes", 0) <= 1024 * 1024,
+        },
+        "leakCheck": {
+            "memoryStable": not leak_reasons,
+            "status": "pass" if not leak_reasons else "review",
+            "reasons": leak_reasons,
+            "maxAllowedPythonRssGrowthMB": PYTHON_RSS_GROWTH_LIMIT_MB,
+            "maxAllowedTracemallocGrowthMB": TRACEMALLOC_GROWTH_LIMIT_MB,
+        },
+        "timeline": timeline,
+    }
+
+
+def run_env(env_id: int, max_steps: int, memory_monitor: LaneMemoryMonitor | None = None) -> dict[str, Any]:
     seed = 930 + env_id
     session_id = f"bt93a-2env-smoke-{env_id}"
     env = CurviosEnv(
@@ -176,8 +458,13 @@ def run_env(env_id: int, max_steps: int) -> dict[str, Any]:
     truncated_reasons: Counter[str] = Counter()
     last_error: str | None = None
     start_time = time.time()
+    controller_pid: int | None = None
     try:
         _, reset_info = env.reset(seed=seed)
+        controller_pid = env.controller_pid
+        if memory_monitor is not None:
+            memory_monitor.register_controller_pid(env_id, controller_pid)
+            memory_monitor.update_progress(env_id, steps_completed)
         reset_count += 1
         action = build_invalid_action()
         terminated = False
@@ -192,6 +479,10 @@ def run_env(env_id: int, max_steps: int) -> dict[str, Any]:
                     terminal_reasons[terminal_reason] += 1
                 if truncated_reason:
                     truncated_reasons[truncated_reason] += 1
+                if memory_monitor is not None and (
+                    steps_completed == 1 or steps_completed % 25 == 0 or terminated or truncated
+                ):
+                    memory_monitor.update_progress(env_id, steps_completed)
             except Exception as e:
                 failures += 1
                 step_failures += 1
@@ -214,6 +505,8 @@ def run_env(env_id: int, max_steps: int) -> dict[str, Any]:
         diagnostics = {"error": str(e)}
     finally:
         env.close()
+        if memory_monitor is not None:
+            memory_monitor.update_progress(env_id, steps_completed)
 
     wall_clock = time.time() - start_time
     diagnostics_map = _to_mapping(diagnostics)
@@ -234,6 +527,7 @@ def run_env(env_id: int, max_steps: int) -> dict[str, Any]:
         "env_id": env_id,
         "seed": seed,
         "sessionId": session_id,
+        "controllerPid": controller_pid,
         "stepsCompleted": steps_completed,
         "failures": failures,
         "resetCount": max(reset_count, int(message_counts.get("training-reset") or 0)),
@@ -262,7 +556,11 @@ def run_env(env_id: int, max_steps: int) -> dict[str, Any]:
     }
 
 
-def build_smoke_artifact(results: list[dict[str, Any]], wall_clock_total: float, peak_mem: int) -> dict[str, Any]:
+def build_smoke_artifact(
+    results: list[dict[str, Any]],
+    wall_clock_total: float,
+    memory_summary: dict[str, Any],
+) -> dict[str, Any]:
     total_steps = sum(result["stepsCompleted"] for result in results)
     total_failures = sum(result["failures"] for result in results)
     total_resets = sum(result["resetCount"] for result in results)
@@ -297,7 +595,8 @@ def build_smoke_artifact(results: list[dict[str, Any]], wall_clock_total: float,
         "generatedAt": _utc_now(),
         "generatedBy": "python/scripts/bt93a_2env_smoke.py",
         "scope": {
-            "phase": "93A.2.1",
+            "phase": "93A.2",
+            "evidencePhases": ["93A.2.1", "93A.2.2"],
             "workerCount": WORKER_COUNT,
             "targetStepsPerEnv": TARGET_STEPS_PER_ENV,
             "totalTargetSteps": WORKER_COUNT * TARGET_STEPS_PER_ENV,
@@ -329,11 +628,7 @@ def build_smoke_artifact(results: list[dict[str, Any]], wall_clock_total: float,
             "terminalReasons": _sorted_counter(terminal_reasons),
             "truncatedReasons": _sorted_counter(truncated_reasons),
         },
-        "memory": {
-            "peakMemoryMB": peak_mem / 1024 / 1024,
-            "memoryLeakTracking": "tracemalloc used during smoke run",
-            "memoryStable": True,
-        },
+        "memory": memory_summary,
         "downgradeCheck": {
             "downgraded": is_downgraded,
             "reason": downgrade_reason,
@@ -350,6 +645,7 @@ def build_smoke_artifact(results: list[dict[str, Any]], wall_clock_total: float,
                 "envId": result["env_id"],
                 "seed": result["seed"],
                 "sessionId": result["sessionId"],
+                "controllerPid": result["controllerPid"],
                 "stepsCompleted": result["stepsCompleted"],
                 "resetCount": result["resetCount"],
                 "timeoutCount": result["timeoutCount"],
@@ -390,19 +686,22 @@ def main() -> None:
         return
 
     print("Starting BT93A 2-env harness...")
-    tracemalloc.start()
     start_time = time.time()
+    memory_monitor = LaneMemoryMonitor(worker_count=WORKER_COUNT)
+    memory_monitor.start()
 
     results = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=WORKER_COUNT) as executor:
-        futures = [executor.submit(run_env, i, TARGET_STEPS_PER_ENV) for i in range(WORKER_COUNT)]
+        futures = [
+            executor.submit(run_env, i, TARGET_STEPS_PER_ENV, memory_monitor)
+            for i in range(WORKER_COUNT)
+        ]
         for future in concurrent.futures.as_completed(futures):
             results.append(future.result())
 
     wall_clock_total = time.time() - start_time
-    _, peak_mem = tracemalloc.get_traced_memory()
-    tracemalloc.stop()
-    artifact = build_smoke_artifact(results, wall_clock_total, peak_mem)
+    memory_summary = memory_monitor.finish()
+    artifact = build_smoke_artifact(results, wall_clock_total, memory_summary)
     _write_json(ARTIFACT_PATH, artifact)
 
     print(json.dumps({
@@ -410,6 +709,7 @@ def main() -> None:
         "artifact": str(ARTIFACT_PATH.relative_to(REPO_ROOT)),
         "stepsPerSecond": artifact["performance"]["stepsPerSecond"],
         "allow4Env": artifact["downgradeCheck"]["allow4Env"],
+        "memoryStable": artifact["memory"]["leakCheck"]["memoryStable"],
     }, indent=2))
 
 

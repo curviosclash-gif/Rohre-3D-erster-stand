@@ -195,6 +195,10 @@ class _ControllerProcess:
             raise RuntimeError(str(response.get("error") or f"{command} failed"))
         return response
 
+    @property
+    def pid(self) -> int:
+        return int(self._process.pid)
+
     def close(self) -> None:
         if self._process.poll() is None:
             try:
@@ -348,6 +352,12 @@ class CurviosEnv(gym.Env[np.ndarray, dict[str, Any]]):
             "lastPacket": self._last_packet,
             "lastInfo": self._last_info,
         }
+
+    @property
+    def controller_pid(self) -> int | None:
+        if self._controller is None:
+            return None
+        return self._controller.pid
 
     def close(self) -> None:
         controller = self._controller
