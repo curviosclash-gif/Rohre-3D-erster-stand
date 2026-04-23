@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T21:08:02Z",
+  "generatedAt": "2026-04-23T21:09:01Z",
   "generatedBy": "python/scripts/bt93a_2env_smoke.py --plan-only",
   "scope": {
     "phase": "93A.1.2",
@@ -35,6 +35,29 @@
     "minMeasured2EnvStepsPerSec": 45.0,
     "maxMeasured2EnvFailureRate": 0.02,
     "downgradeRule": "Without measured 2-env evidence, BT93A stays on 2-env or the sequential fallback lane."
+  },
+  "batchMath": {
+    "formula": "max_rollout_steps_total = measured_steps_per_second * target_update_window_seconds",
+    "baselineAnchorArtifact": "data/training/ppo/throughput_analysis_btf08.json",
+    "baselineMeasuredStepsPerSecond": 28.0,
+    "rule": "BT93B must replace the 1-worker anchor with measured BT93A lane evidence before pinning rollout sizes.",
+    "examples": [
+      {
+        "targetUpdateWindowSeconds": 15,
+        "maxRolloutStepsTotalAt1WorkerAnchor": 420,
+        "maxNstepsAt2Env": 210
+      },
+      {
+        "targetUpdateWindowSeconds": 30,
+        "maxRolloutStepsTotalAt1WorkerAnchor": 840,
+        "maxNstepsAt2Env": 420
+      },
+      {
+        "targetUpdateWindowSeconds": 60,
+        "maxRolloutStepsTotalAt1WorkerAnchor": 1680,
+        "maxNstepsAt2Env": 840
+      }
+    ]
   },
   "actionBoundary": {
     "booleanFields": [

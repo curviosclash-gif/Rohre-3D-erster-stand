@@ -35,6 +35,7 @@ MAX_WALL_CLOCK_MULTIPLIER_BEFORE_DOWNGRADE = 2.0
 FAILURE_RATE_DOWNGRADE_THRESHOLD = 0.05
 FOUR_ENV_MIN_STEPS_PER_SEC = 45.0
 FOUR_ENV_MAX_FAILURE_RATE = 0.02
+BATCH_UPDATE_WINDOWS_SECONDS = (15, 30, 60)
 
 
 def _utc_now() -> str:
@@ -44,6 +45,24 @@ def _utc_now() -> str:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f"{json.dumps(payload, indent=2)}\n", encoding="utf-8")
+
+
+def _build_batch_math() -> dict[str, Any]:
+    examples = []
+    for window_seconds in BATCH_UPDATE_WINDOWS_SECONDS:
+        total_rollout_steps = int(ONE_WORKER_BASELINE_STEPS_PER_SEC * window_seconds)
+        examples.append({
+            "targetUpdateWindowSeconds": window_seconds,
+            "maxRolloutStepsTotalAt1WorkerAnchor": total_rollout_steps,
+            "maxNstepsAt2Env": total_rollout_steps // WORKER_COUNT,
+        })
+    return {
+        "formula": "max_rollout_steps_total = measured_steps_per_second * target_update_window_seconds",
+        "baselineAnchorArtifact": "data/training/ppo/throughput_analysis_btf08.json",
+        "baselineMeasuredStepsPerSecond": ONE_WORKER_BASELINE_STEPS_PER_SEC,
+        "rule": "BT93B must replace the 1-worker anchor with measured BT93A lane evidence before pinning rollout sizes.",
+        "examples": examples,
+    }
 
 
 def build_lane_plan() -> dict[str, Any]:
@@ -87,6 +106,7 @@ def build_lane_plan() -> dict[str, Any]:
             "maxMeasured2EnvFailureRate": FOUR_ENV_MAX_FAILURE_RATE,
             "downgradeRule": "Without measured 2-env evidence, BT93A stays on 2-env or the sequential fallback lane.",
         },
+        "batchMath": _build_batch_math(),
         "actionBoundary": {
             "booleanFields": ACTION_BOOLEAN_FIELDS,
             "indexFields": ACTION_INDEX_FIELDS,
@@ -225,7 +245,7 @@ def main() -> None:
             "ok": True,
             "artifact": str(LANE_PLAN_PATH.relative_to(REPO_ROOT)),
             "workerCount": artifact["scope"]["workerCount"],
-            "nextPhase": "93A.1.4",
+            "nextPhase": "93A.2",
         }, indent=2))
         return
 
