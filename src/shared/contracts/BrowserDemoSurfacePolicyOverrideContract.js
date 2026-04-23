@@ -45,9 +45,13 @@ export const BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_FIELDS = Object.freeze([
 const TOP_LEVEL_FIELDS = new Set(['contractVersion', 'policy', 'capabilityFlags']);
 const POLICY_FIELD_SET = new Set(BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_FIELDS);
 const CAPABILITY_FLAG_FIELDS = new Set(['enabled']);
+/** @type {Set<string>} */
 const VALID_SESSION_TYPES = new Set(Object.values(PLATFORM_SURFACE_SESSION_TYPES));
+/** @type {Set<string>} */
 const VALID_MODE_PATHS = new Set(Object.values(PLATFORM_SURFACE_MENU_MODE_PATHS));
+/** @type {Set<string>} */
 const VALID_MULTIPLAYER_TRANSPORTS = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
+/** @type {Set<string>} */
 const VALID_CAPABILITY_IDS = new Set(Object.values(PLATFORM_CAPABILITY_IDS));
 const VERSION_PATTERN = /^browser-demo-surface-policy\.v\d+$/;
 
@@ -67,31 +71,61 @@ function createError(path, code, message) {
     });
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeSessionType(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_SESSION_TYPES.has(normalized) ? normalized : fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeModePath(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_MODE_PATHS.has(normalized) ? normalized : fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeTransport(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_MULTIPLAYER_TRANSPORTS.has(normalized) ? normalized : fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizePresetId(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return normalized || fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeMapKey(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return normalized || fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeCapabilityId(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_CAPABILITY_IDS.has(normalized) ? normalized : fallback;
@@ -637,7 +671,11 @@ export function mergeBrowserDemoSurfacePolicyWithOverride(
         });
     }
 
-    const overridePolicy = validation.normalizedDraft.policy;
+    const overridePolicy = /** @type {Record<string, any>} */ (
+        validation.normalizedDraft?.policy && typeof validation.normalizedDraft.policy === 'object'
+            ? validation.normalizedDraft.policy
+            : {}
+    );
     const mergedAllowedSessionTypes = intersectInBaseOrder(
         basePolicy.allowedSessionTypes,
         overridePolicy.allowedSessionTypes

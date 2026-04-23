@@ -1,0 +1,1400 @@
+{
+  "ok": true,
+  "generatedBy": "python/scripts/bt92_single_env_smoke.py",
+  "scope": {
+    "workerCount": 1,
+    "multiEnv": false,
+    "vecEnv": false,
+    "ppoBaseline": false,
+    "contractVersion": "v1",
+    "observationSchemaVersion": "v2-runtime-near",
+    "observationLength": 64
+  },
+  "authority": {
+    "trainerTransitionTopLevelFields": [
+      "contractVersion",
+      "observationSchemaVersion",
+      "observationLength",
+      "operation",
+      "episodeId",
+      "episodeIndex",
+      "stepIndex",
+      "reward",
+      "done",
+      "truncated",
+      "observation",
+      "action",
+      "info",
+      "kernelRuntime"
+    ],
+    "trainerTransitionInfoFields": [
+      "domain",
+      "terminalReason",
+      "truncatedReason",
+      "rewardBreakdown",
+      "match",
+      "observationContext",
+      "hybridDecision"
+    ],
+    "actionBooleanFields": [
+      "pitchUp",
+      "pitchDown",
+      "yawLeft",
+      "yawRight",
+      "rollLeft",
+      "rollRight",
+      "boost",
+      "cameraSwitch",
+      "dropItem",
+      "shootItem",
+      "shootMG",
+      "nextItem"
+    ],
+    "actionIndexFields": [
+      "shootItemIndex",
+      "useItem"
+    ],
+    "visibleEnvFields": [
+      "reward",
+      "done",
+      "truncated",
+      "rewardBreakdown",
+      "terminalReason",
+      "truncatedReason",
+      "hybridDecision",
+      "observationSchemaVersion",
+      "observationLength"
+    ]
+  },
+  "smoke": {
+    "reset": {
+      "observationLength": 64,
+      "observationSchemaVersion": "v2-runtime-near",
+      "rewardBreakdown": null,
+      "terminalReason": null,
+      "truncatedReason": null,
+      "hybridDecision": null
+    },
+    "steps": [
+      {
+        "stepIndex": 1,
+        "reward": 0.12,
+        "done": false,
+        "truncated": false,
+        "rewardBreakdownKeys": [
+          "baseStep",
+          "checkpointReached",
+          "crash",
+          "damageDealt",
+          "damageTaken",
+          "external",
+          "itemPickup",
+          "itemUse",
+          "kill",
+          "loss",
+          "lowHealthThreat",
+          "opponentRisk",
+          "parcoursCompleted",
+          "stuck",
+          "survival",
+          "survivalPressureBonus",
+          "trailRisk",
+          "wallRisk",
+          "win",
+          "wrongOrder"
+        ],
+        "terminalReason": null,
+        "truncatedReason": null,
+        "hybridDecisionKeys": [
+          "contractVersion",
+          "control",
+          "intent",
+          "safety"
+        ],
+        "action": {
+          "yawLeft": true,
+          "yawRight": false,
+          "pitchUp": true,
+          "pitchDown": false,
+          "rollLeft": false,
+          "rollRight": false,
+          "boost": false,
+          "shootMG": false,
+          "shootItem": false,
+          "shootItemIndex": -1,
+          "useItem": -1,
+          "dropItem": false,
+          "nextItem": false,
+          "cameraSwitch": false
+        },
+        "observationLength": 64
+      },
+      {
+        "stepIndex": 2,
+        "reward": 0.12,
+        "done": false,
+        "truncated": false,
+        "rewardBreakdownKeys": [
+          "baseStep",
+          "checkpointReached",
+          "crash",
+          "damageDealt",
+          "damageTaken",
+          "external",
+          "itemPickup",
+          "itemUse",
+          "kill",
+          "loss",
+          "lowHealthThreat",
+          "opponentRisk",
+          "parcoursCompleted",
+          "stuck",
+          "survival",
+          "survivalPressureBonus",
+          "trailRisk",
+          "wallRisk",
+          "win",
+          "wrongOrder"
+        ],
+        "terminalReason": null,
+        "truncatedReason": null,
+        "hybridDecisionKeys": [
+          "contractVersion",
+          "control",
+          "intent",
+          "safety"
+        ],
+        "action": {
+          "yawLeft": true,
+          "yawRight": false,
+          "pitchUp": true,
+          "pitchDown": false,
+          "rollLeft": false,
+          "rollRight": false,
+          "boost": false,
+          "shootMG": false,
+          "shootItem": false,
+          "shootItemIndex": -1,
+          "useItem": -1,
+          "dropItem": false,
+          "nextItem": false,
+          "cameraSwitch": false
+        },
+        "observationLength": 64
+      },
+      {
+        "stepIndex": 3,
+        "reward": 0.12,
+        "done": false,
+        "truncated": false,
+        "rewardBreakdownKeys": [
+          "baseStep",
+          "checkpointReached",
+          "crash",
+          "damageDealt",
+          "damageTaken",
+          "external",
+          "itemPickup",
+          "itemUse",
+          "kill",
+          "loss",
+          "lowHealthThreat",
+          "opponentRisk",
+          "parcoursCompleted",
+          "stuck",
+          "survival",
+          "survivalPressureBonus",
+          "trailRisk",
+          "wallRisk",
+          "win",
+          "wrongOrder"
+        ],
+        "terminalReason": null,
+        "truncatedReason": null,
+        "hybridDecisionKeys": [
+          "contractVersion",
+          "control",
+          "intent",
+          "safety"
+        ],
+        "action": {
+          "yawLeft": true,
+          "yawRight": false,
+          "pitchUp": true,
+          "pitchDown": false,
+          "rollLeft": false,
+          "rollRight": false,
+          "boost": false,
+          "shootMG": false,
+          "shootItem": false,
+          "shootItemIndex": -1,
+          "useItem": -1,
+          "dropItem": false,
+          "nextItem": false,
+          "cameraSwitch": false
+        },
+        "observationLength": 64
+      },
+      {
+        "stepIndex": 4,
+        "reward": 0.0,
+        "done": false,
+        "truncated": true,
+        "rewardBreakdownKeys": [
+          "baseStep",
+          "checkpointReached",
+          "crash",
+          "damageDealt",
+          "damageTaken",
+          "external",
+          "itemPickup",
+          "itemUse",
+          "kill",
+          "loss",
+          "lowHealthThreat",
+          "opponentRisk",
+          "parcoursCompleted",
+          "stuck",
+          "survival",
+          "survivalPressureBonus",
+          "trailRisk",
+          "wallRisk",
+          "win",
+          "wrongOrder"
+        ],
+        "terminalReason": null,
+        "truncatedReason": "max-steps",
+        "hybridDecisionKeys": [
+          "contractVersion",
+          "control",
+          "intent",
+          "safety"
+        ],
+        "action": {
+          "yawLeft": true,
+          "yawRight": false,
+          "pitchUp": true,
+          "pitchDown": false,
+          "rollLeft": false,
+          "rollRight": false,
+          "boost": false,
+          "shootMG": false,
+          "shootItem": false,
+          "shootItemIndex": -1,
+          "useItem": -1,
+          "dropItem": false,
+          "nextItem": false,
+          "cameraSwitch": false
+        },
+        "observationLength": 64
+      }
+    ]
+  },
+  "checkEnv": {
+    "tool": "gymnasium.utils.env_checker.check_env",
+    "passed": true
+  },
+  "diagnostics": {
+    "stats": {
+      "id": 10,
+      "ok": true,
+      "type": "trainer-stats",
+      "sessionId": "bt92-single-env-smoke-92",
+      "state": {
+        "resumeSource": null
+      },
+      "model": {
+        "optimizerSteps": 4,
+        "epsilon": 0
+      },
+      "messageCounts": {
+        "bot-action-request": 4,
+        "trainer-ready": 1,
+        "trainer-stats-request": 1,
+        "training-reset": 1,
+        "training-step": 4
+      },
+      "contractSmoke": {
+        "validationFailures": 0,
+        "firstObservation": {
+          "mode": "classic",
+          "planarMode": false,
+          "domainId": "classic-3d",
+          "controlProfileId": "legacy-v1:classic-3d",
+          "observationLength": 64,
+          "player": {
+            "index": 0,
+            "inventoryLength": 0
+          },
+          "observationContextKeys": [
+            "baseObservationLength",
+            "baseSchemaVersion",
+            "clearanceTrend",
+            "contractVersion",
+            "deadEndRisk",
+            "environmentProfile",
+            "exitQuality",
+            "gate",
+            "intentPriors",
+            "item",
+            "memory",
+            "observationLength",
+            "opponentPressure",
+            "portal",
+            "pressureTrend",
+            "recovery",
+            "recoveryAgeRatio",
+            "runtimeNear",
+            "schemaVersion",
+            "shieldBreakRisk",
+            "shieldDeficit",
+            "stepIndex",
+            "targetStability",
+            "threatHorizon"
+          ]
+        },
+        "firstReset": {
+          "episodeId": "bt92-headless-92",
+          "stepIndex": 0,
+          "done": false,
+          "truncated": false,
+          "domainId": "classic-3d",
+          "observationLength": 64,
+          "actionKeys": [],
+          "hasKernelRuntime": true,
+          "rewardBreakdownKeys": []
+        },
+        "firstStep": {
+          "episodeId": "bt92-headless-92",
+          "stepIndex": 1,
+          "done": false,
+          "truncated": false,
+          "domainId": "classic-3d",
+          "observationLength": 64,
+          "actionKeys": [
+            "boost",
+            "cameraSwitch",
+            "dropItem",
+            "nextItem",
+            "pitchDown",
+            "pitchUp",
+            "rollLeft",
+            "rollRight",
+            "shootItem",
+            "shootItemIndex",
+            "shootMG",
+            "useItem",
+            "yawLeft",
+            "yawRight"
+          ],
+          "hasKernelRuntime": true,
+          "rewardBreakdownKeys": [
+            "baseStep",
+            "checkpointReached",
+            "crash",
+            "damageDealt",
+            "damageTaken",
+            "external",
+            "itemPickup",
+            "itemUse",
+            "kill",
+            "loss",
+            "lowHealthThreat",
+            "opponentRisk",
+            "parcoursCompleted",
+            "stuck",
+            "survival",
+            "survivalPressureBonus",
+            "trailRisk",
+            "wallRisk",
+            "win",
+            "wrongOrder"
+          ]
+        },
+        "latestObservation": {
+          "mode": "classic",
+          "planarMode": false,
+          "domainId": "classic-3d",
+          "controlProfileId": "legacy-v1:classic-3d",
+          "observationLength": 64,
+          "player": {
+            "index": 0,
+            "inventoryLength": 0
+          },
+          "observationContextKeys": [
+            "baseObservationLength",
+            "baseSchemaVersion",
+            "clearanceTrend",
+            "contractVersion",
+            "deadEndRisk",
+            "environmentProfile",
+            "exitQuality",
+            "gate",
+            "intentPriors",
+            "item",
+            "memory",
+            "observationLength",
+            "opponentPressure",
+            "portal",
+            "pressureTrend",
+            "recovery",
+            "recoveryAgeRatio",
+            "runtimeNear",
+            "schemaVersion",
+            "shieldBreakRisk",
+            "shieldDeficit",
+            "stepIndex",
+            "targetStability",
+            "threatHorizon"
+          ]
+        },
+        "latestReset": {
+          "episodeId": "bt92-headless-92",
+          "stepIndex": 0,
+          "done": false,
+          "truncated": false,
+          "domainId": "classic-3d",
+          "observationLength": 64,
+          "actionKeys": [],
+          "hasKernelRuntime": true,
+          "rewardBreakdownKeys": []
+        },
+        "latestStep": {
+          "episodeId": "bt92-headless-92",
+          "stepIndex": 4,
+          "done": false,
+          "truncated": true,
+          "domainId": "classic-3d",
+          "observationLength": 64,
+          "actionKeys": [
+            "boost",
+            "cameraSwitch",
+            "dropItem",
+            "nextItem",
+            "pitchDown",
+            "pitchUp",
+            "rollLeft",
+            "rollRight",
+            "shootItem",
+            "shootItemIndex",
+            "shootMG",
+            "useItem",
+            "yawLeft",
+            "yawRight"
+          ],
+          "hasKernelRuntime": true,
+          "rewardBreakdownKeys": [
+            "baseStep",
+            "checkpointReached",
+            "crash",
+            "damageDealt",
+            "damageTaken",
+            "external",
+            "itemPickup",
+            "itemUse",
+            "kill",
+            "loss",
+            "lowHealthThreat",
+            "opponentRisk",
+            "parcoursCompleted",
+            "stuck",
+            "survival",
+            "survivalPressureBonus",
+            "trailRisk",
+            "wallRisk",
+            "win",
+            "wrongOrder"
+          ]
+        },
+        "lastError": null
+      },
+      "processingLatencyMs": {
+        "min": 0.23,
+        "max": 2.261,
+        "average": 0.57
+      }
+    },
+    "bridgeTelemetry": {
+      "requestsSent": 10,
+      "actionRequests": 4,
+      "trainingRequests": 5,
+      "commandRequests": 1,
+      "responsesReceived": 10,
+      "actionResponses": 4,
+      "ackResponses": 5,
+      "commandResponses": 1,
+      "retries": 0,
+      "timeouts": 0,
+      "failures": 0,
+      "fallbacks": 0,
+      "readyMessages": 1,
+      "latencySampleCount": 10,
+      "latencyMeanMs": 0.9,
+      "latencyP95Ms": 3,
+      "latencyMinMs": 0,
+      "latencyMaxMs": 3,
+      "lastLatencyMs": 0,
+      "learningReports": 5,
+      "learningUpdates": 0,
+      "lossSampleCount": 5,
+      "lossMean": 0,
+      "lossP95": 0,
+      "latestLoss": 0,
+      "epsilonSampleCount": 5,
+      "epsilonMean": 0,
+      "latestEpsilon": 0,
+      "replayFillSampleCount": 5,
+      "replayFillMean": 0,
+      "latestReplayFill": 0,
+      "maxOptimizerSteps": 4,
+      "maxPendingAcks": 32,
+      "backpressureThreshold": 16,
+      "backpressureDrops": 0,
+      "actionDrops": 0,
+      "actionSendSkipped": 0,
+      "ackEvictions": 0,
+      "lastFailure": null,
+      "lastFallbackReason": null,
+      "pendingActionRequest": false,
+      "pendingAckCount": 0,
+      "pendingCommandCount": 0
+    },
+    "lastPacket": {
+      "type": "training-step",
+      "delivered": true,
+      "kernelRuntime": {
+        "consumer": {
+          "contractVersion": "match-kernel-consumer-adapter.v1",
+          "consumerId": "training",
+          "allowKernelTick": false,
+          "profile": {
+            "contractVersion": "match-kernel-run-profile.v1",
+            "surface": "headless",
+            "tickDriver": "manual",
+            "clockMode": "synthetic",
+            "fixedStepSeconds": 0.016666666666666666,
+            "inputSource": "training",
+            "snapshotTarget": "observability",
+            "supportsRenderInterpolation": false,
+            "deterministic": true,
+            "sessionId": "bt92-single-env-smoke-92",
+            "matchId": "standard",
+            "modeId": "CLASSIC"
+          }
+        },
+        "seedEnvelope": {
+          "contractVersion": "match-kernel-seed-envelope.v1",
+          "surface": "headless",
+          "deterministic": true,
+          "matchSeed": 0,
+          "roundSeed": 0,
+          "tickSeed": 4,
+          "streamId": "training",
+          "rngContractVersion": "runtime-rng.v1",
+          "tags": [
+            "training-step"
+          ]
+        },
+        "inputFrame": {
+          "contractVersion": "match-kernel-input-frame.v1",
+          "surface": "headless",
+          "inputSource": "training",
+          "tickIndex": 4,
+          "sequence": 4,
+          "capturedAtMs": 4,
+          "deterministic": true,
+          "players": [
+            {
+              "playerIndex": 0,
+              "playerId": "training-agent",
+              "deviceId": null,
+              "sourceType": "training-step",
+              "actions": {
+                "pitchUp": true,
+                "pitchDown": false,
+                "yawLeft": true,
+                "yawRight": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "boost": false,
+                "boostPressed": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "useItem": false,
+                "shootItem": false,
+                "shootMG": false,
+                "nextItem": false
+              }
+            }
+          ],
+          "commands": [],
+          "tags": [
+            "training-step"
+          ]
+        }
+      },
+      "payload": {
+        "contractVersion": "v1",
+        "observationSchemaVersion": "v2-runtime-near",
+        "observationLength": 64,
+        "operation": "step",
+        "episodeId": "bt92-headless-92",
+        "episodeIndex": 1,
+        "stepIndex": 4,
+        "reward": 0,
+        "done": false,
+        "truncated": true,
+        "observation": [
+          1,
+          1,
+          0,
+          0.75,
+          1,
+          0.44999998807907104,
+          0.4000000059604645,
+          0.20000000298023224,
+          0.2210942673336319,
+          -0.7255029966366342,
+          0,
+          0.3854060637598925,
+          0,
+          0.5599999994039535,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.4048000005483628,
+          0.4400000005960465,
+          0.7648000006973743,
+          0.09635151593997313,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.1,
+          0.065,
+          1,
+          0.6619733350679409,
+          0.3854060637598925,
+          -0.25,
+          0,
+          0.4476000001430512,
+          0.30962887262331396,
+          0.4476000001430512,
+          0.2786659853609826,
+          0,
+          0.065,
+          0.20609818231253924
+        ],
+        "action": {
+          "yawLeft": true,
+          "yawRight": false,
+          "pitchUp": true,
+          "pitchDown": false,
+          "rollLeft": false,
+          "rollRight": false,
+          "boost": false,
+          "shootMG": false,
+          "shootItem": false,
+          "shootItemIndex": -1,
+          "useItem": -1,
+          "dropItem": false,
+          "nextItem": false,
+          "cameraSwitch": false
+        },
+        "info": {
+          "domain": {
+            "version": "mode-planar-control-v2",
+            "mode": "classic",
+            "planarMode": false,
+            "dimension": "3d",
+            "domainId": "classic-3d",
+            "controlProfileId": "legacy-v1:classic-3d"
+          },
+          "terminalReason": null,
+          "truncatedReason": "max-steps",
+          "rewardBreakdown": {
+            "baseStep": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "kill": 0,
+            "crash": 0,
+            "stuck": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "wallRisk": 0,
+            "trailRisk": 0,
+            "opponentRisk": 0,
+            "lowHealthThreat": 0,
+            "win": 0,
+            "loss": 0,
+            "checkpointReached": 0,
+            "parcoursCompleted": 0,
+            "wrongOrder": 0,
+            "external": 0
+          },
+          "match": {
+            "matchId": "standard",
+            "mode": "classic",
+            "planarMode": false,
+            "controlProfileId": "legacy-v1:classic-3d"
+          },
+          "observationContext": {
+            "contractVersion": "v80-runtime-near-observation-v1",
+            "schemaVersion": "v2-runtime-near",
+            "baseSchemaVersion": "v1",
+            "environmentProfile": "runtime-near",
+            "runtimeNear": true,
+            "observationLength": 64,
+            "baseObservationLength": 40,
+            "stepIndex": 0,
+            "threatHorizon": 0.4048000005483628,
+            "deadEndRisk": 0.4400000005960465,
+            "exitQuality": 0.7648000006973743,
+            "opponentPressure": 0.09635151593997313,
+            "portal": {
+              "active": false,
+              "alignment": 0,
+              "risk": 0
+            },
+            "gate": {
+              "active": false,
+              "alignment": 0,
+              "risk": 0
+            },
+            "item": {
+              "value": 0.1,
+              "urgency": 0.065
+            },
+            "recovery": {
+              "active": true,
+              "severity": 0.6
+            },
+            "recoveryAgeRatio": 0,
+            "shieldDeficit": 1,
+            "shieldBreakRisk": 0.6619733350679409,
+            "pressureTrend": 0.3854060637598925,
+            "clearanceTrend": -0.25,
+            "targetStability": 0,
+            "memory": {
+              "escapeBias": 0.4476000001430512,
+              "pursuitBias": 0.30962887262331396,
+              "lastIntent": "evade",
+              "lastRecoveryStep": 0
+            },
+            "intentPriors": {
+              "evade": 0.4476000001430512,
+              "chase": 0.2786659853609826,
+              "portal": 0,
+              "item": 0.065,
+              "combat": 0.20609818231253924
+            }
+          },
+          "hybridDecision": {
+            "contractVersion": "v80-hybrid-decision-trace-v1",
+            "intent": {
+              "requested": "evade",
+              "applied": "evade",
+              "priors": {
+                "evade": 0.4400000005960465,
+                "chase": 0.19421443084481935,
+                "portal": 0,
+                "item": 0.065,
+                "combat": 0.20609818231253924
+              }
+            },
+            "safety": {
+              "vetoActive": false,
+              "collisionRisk": 0.4766208012489174,
+              "threatHorizon": 0.4048000005483628,
+              "deadEndRisk": 0.4400000005960465,
+              "shieldBreakRisk": 0.6619733350679409,
+              "projectileThreat": false,
+              "portalVeto": false,
+              "combatVeto": false,
+              "itemVeto": false
+            },
+            "control": {
+              "steeringMode": "safety-evade",
+              "combatAllowed": false,
+              "itemAllowed": false,
+              "boostAllowed": false,
+              "targetInFront": false,
+              "exitQuality": 0.7648000006973743,
+              "portalRisk": 0,
+              "gateRisk": 0
+            }
+          }
+        },
+        "kernelRuntime": {
+          "consumer": {
+            "contractVersion": "match-kernel-consumer-adapter.v1",
+            "consumerId": "training",
+            "allowKernelTick": false,
+            "profile": {
+              "contractVersion": "match-kernel-run-profile.v1",
+              "surface": "headless",
+              "tickDriver": "manual",
+              "clockMode": "synthetic",
+              "fixedStepSeconds": 0.016666666666666666,
+              "inputSource": "training",
+              "snapshotTarget": "observability",
+              "supportsRenderInterpolation": false,
+              "deterministic": true,
+              "sessionId": "bt92-single-env-smoke-92",
+              "matchId": "standard",
+              "modeId": "CLASSIC"
+            }
+          },
+          "seedEnvelope": {
+            "contractVersion": "match-kernel-seed-envelope.v1",
+            "surface": "headless",
+            "deterministic": true,
+            "matchSeed": 0,
+            "roundSeed": 0,
+            "tickSeed": 4,
+            "streamId": "training",
+            "rngContractVersion": "runtime-rng.v1",
+            "tags": [
+              "training-step"
+            ]
+          },
+          "inputFrame": {
+            "contractVersion": "match-kernel-input-frame.v1",
+            "surface": "headless",
+            "inputSource": "training",
+            "tickIndex": 4,
+            "sequence": 4,
+            "capturedAtMs": 4,
+            "deterministic": true,
+            "players": [
+              {
+                "playerIndex": 0,
+                "playerId": "training-agent",
+                "deviceId": null,
+                "sourceType": "training-step",
+                "actions": {
+                  "pitchUp": true,
+                  "pitchDown": false,
+                  "yawLeft": true,
+                  "yawRight": false,
+                  "rollLeft": false,
+                  "rollRight": false,
+                  "boost": false,
+                  "boostPressed": false,
+                  "cameraSwitch": false,
+                  "dropItem": false,
+                  "useItem": false,
+                  "shootItem": false,
+                  "shootMG": false,
+                  "nextItem": false
+                }
+              }
+            ],
+            "commands": [],
+            "tags": [
+              "training-step"
+            ]
+          }
+        }
+      },
+      "transition": {
+        "contractVersion": "v1",
+        "operation": "step",
+        "episodeId": "bt92-headless-92",
+        "episodeIndex": 1,
+        "stepIndex": 4,
+        "observation": [
+          1,
+          1,
+          0,
+          0.75,
+          1,
+          0.44999998807907104,
+          0.4000000059604645,
+          0.20000000298023224,
+          0.2210942673336319,
+          -0.7255029966366342,
+          0,
+          0.3854060637598925,
+          0,
+          0.5599999994039535,
+          0,
+          0,
+          -1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.4048000005483628,
+          0.4400000005960465,
+          0.7648000006973743,
+          0.09635151593997313,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0.1,
+          0.065,
+          1,
+          0.6619733350679409,
+          0.12661681657343915,
+          -0.10921126639892598,
+          0,
+          0.43807515845623357,
+          0.21579381204979928,
+          0.4400000005960465,
+          0.19421443084481935,
+          0,
+          0.065,
+          0.20609818231253924
+        ],
+        "action": {
+          "yawLeft": true,
+          "yawRight": false,
+          "pitchUp": true,
+          "pitchDown": false,
+          "rollLeft": false,
+          "rollRight": false,
+          "boost": false,
+          "shootMG": false,
+          "shootItem": false,
+          "shootItemIndex": -1,
+          "useItem": -1,
+          "dropItem": false,
+          "nextItem": false,
+          "cameraSwitch": false
+        },
+        "reward": 0,
+        "done": false,
+        "truncated": true,
+        "info": {
+          "observationSchemaVersion": "v2-runtime-near",
+          "observationLength": 64,
+          "domain": {
+            "version": "mode-planar-control-v2",
+            "mode": "classic",
+            "planarMode": false,
+            "dimension": "3d",
+            "domainId": "classic-3d",
+            "controlProfileId": "legacy-v1:classic-3d"
+          },
+          "match": {
+            "matchId": "standard",
+            "mode": "classic",
+            "planarMode": false,
+            "controlProfileId": "legacy-v1:classic-3d"
+          },
+          "terminalReason": null,
+          "truncatedReason": "max-steps",
+          "rewardBreakdown": {
+            "baseStep": 0,
+            "survival": 0,
+            "survivalPressureBonus": 0,
+            "kill": 0,
+            "crash": 0,
+            "stuck": 0,
+            "itemPickup": 0,
+            "itemUse": 0,
+            "damageDealt": 0,
+            "damageTaken": 0,
+            "wallRisk": 0,
+            "trailRisk": 0,
+            "opponentRisk": 0,
+            "lowHealthThreat": 0,
+            "win": 0,
+            "loss": 0,
+            "checkpointReached": 0,
+            "parcoursCompleted": 0,
+            "wrongOrder": 0,
+            "external": 0
+          },
+          "metadata": {
+            "environmentProfile": "runtime-near",
+            "lane": {
+              "workerCount": 1,
+              "seed": 92
+            },
+            "kernel": {
+              "surface": "headless",
+              "tickIndex": 4,
+              "roundIndex": 0,
+              "lifecycle": "running",
+              "contractVersion": "match-kernel-headless-runtime.v1"
+            },
+            "tickResult": {
+              "lifecycle": "running",
+              "tickIndex": 4
+            },
+            "observationContext": {
+              "contractVersion": "v80-runtime-near-observation-v1",
+              "schemaVersion": "v2-runtime-near",
+              "baseSchemaVersion": "v1",
+              "environmentProfile": "runtime-near",
+              "runtimeNear": true,
+              "observationLength": 64,
+              "baseObservationLength": 40,
+              "stepIndex": 4,
+              "threatHorizon": 0.4048000005483628,
+              "deadEndRisk": 0.4400000005960465,
+              "exitQuality": 0.7648000006973743,
+              "opponentPressure": 0.09635151593997313,
+              "portal": {
+                "active": false,
+                "alignment": 0,
+                "risk": 0
+              },
+              "gate": {
+                "active": false,
+                "alignment": 0,
+                "risk": 0
+              },
+              "item": {
+                "value": 0.1,
+                "urgency": 0.065
+              },
+              "recovery": {
+                "active": false,
+                "severity": 0
+              },
+              "recoveryAgeRatio": 0,
+              "shieldDeficit": 1,
+              "shieldBreakRisk": 0.6619733350679409,
+              "pressureTrend": 0.12661681657343915,
+              "clearanceTrend": -0.10921126639892598,
+              "targetStability": 0,
+              "memory": {
+                "escapeBias": 0.43807515845623357,
+                "pursuitBias": 0.21579381204979928,
+                "lastIntent": "stabilize",
+                "lastRecoveryStep": null
+              },
+              "intentPriors": {
+                "evade": 0.4400000005960465,
+                "chase": 0.19421443084481935,
+                "portal": 0,
+                "item": 0.065,
+                "combat": 0.20609818231253924
+              }
+            },
+            "hybridDecision": {
+              "contractVersion": "v80-hybrid-decision-trace-v1",
+              "intent": {
+                "requested": "evade",
+                "applied": "evade",
+                "priors": {
+                  "evade": 0.4400000005960465,
+                  "chase": 0.19421443084481935,
+                  "portal": 0,
+                  "item": 0.065,
+                  "combat": 0.20609818231253924
+                }
+              },
+              "safety": {
+                "vetoActive": false,
+                "collisionRisk": 0.4766208012489174,
+                "threatHorizon": 0.4048000005483628,
+                "deadEndRisk": 0.4400000005960465,
+                "shieldBreakRisk": 0.6619733350679409,
+                "projectileThreat": false,
+                "portalVeto": false,
+                "combatVeto": false,
+                "itemVeto": false
+              },
+              "control": {
+                "steeringMode": "safety-evade",
+                "combatAllowed": false,
+                "itemAllowed": false,
+                "boostAllowed": false,
+                "targetInFront": false,
+                "exitQuality": 0.7648000006973743,
+                "portalRisk": 0,
+                "gateRisk": 0
+              }
+            }
+          }
+        }
+      }
+    },
+    "lastInfo": {
+      "contractVersion": "v1",
+      "operation": "step",
+      "episodeId": "bt92-headless-92",
+      "episodeIndex": 1,
+      "stepIndex": 4,
+      "action": {
+        "yawLeft": true,
+        "yawRight": false,
+        "pitchUp": true,
+        "pitchDown": false,
+        "rollLeft": false,
+        "rollRight": false,
+        "boost": false,
+        "shootMG": false,
+        "shootItem": false,
+        "shootItemIndex": -1,
+        "useItem": -1,
+        "dropItem": false,
+        "nextItem": false,
+        "cameraSwitch": false
+      },
+      "domain": {
+        "version": "mode-planar-control-v2",
+        "mode": "classic",
+        "planarMode": false,
+        "dimension": "3d",
+        "domainId": "classic-3d",
+        "controlProfileId": "legacy-v1:classic-3d"
+      },
+      "match": {
+        "matchId": "standard",
+        "mode": "classic",
+        "planarMode": false,
+        "controlProfileId": "legacy-v1:classic-3d"
+      },
+      "observationContext": {
+        "contractVersion": "v80-runtime-near-observation-v1",
+        "schemaVersion": "v2-runtime-near",
+        "baseSchemaVersion": "v1",
+        "environmentProfile": "runtime-near",
+        "runtimeNear": true,
+        "observationLength": 64,
+        "baseObservationLength": 40,
+        "stepIndex": 0,
+        "threatHorizon": 0.4048000005483628,
+        "deadEndRisk": 0.4400000005960465,
+        "exitQuality": 0.7648000006973743,
+        "opponentPressure": 0.09635151593997313,
+        "portal": {
+          "active": false,
+          "alignment": 0,
+          "risk": 0
+        },
+        "gate": {
+          "active": false,
+          "alignment": 0,
+          "risk": 0
+        },
+        "item": {
+          "value": 0.1,
+          "urgency": 0.065
+        },
+        "recovery": {
+          "active": true,
+          "severity": 0.6
+        },
+        "recoveryAgeRatio": 0,
+        "shieldDeficit": 1,
+        "shieldBreakRisk": 0.6619733350679409,
+        "pressureTrend": 0.3854060637598925,
+        "clearanceTrend": -0.25,
+        "targetStability": 0,
+        "memory": {
+          "escapeBias": 0.4476000001430512,
+          "pursuitBias": 0.30962887262331396,
+          "lastIntent": "evade",
+          "lastRecoveryStep": 0
+        },
+        "intentPriors": {
+          "evade": 0.4476000001430512,
+          "chase": 0.2786659853609826,
+          "portal": 0,
+          "item": 0.065,
+          "combat": 0.20609818231253924
+        }
+      },
+      "kernelRuntime": {
+        "consumer": {
+          "contractVersion": "match-kernel-consumer-adapter.v1",
+          "consumerId": "training",
+          "allowKernelTick": false,
+          "profile": {
+            "contractVersion": "match-kernel-run-profile.v1",
+            "surface": "headless",
+            "tickDriver": "manual",
+            "clockMode": "synthetic",
+            "fixedStepSeconds": 0.016666666666666666,
+            "inputSource": "training",
+            "snapshotTarget": "observability",
+            "supportsRenderInterpolation": false,
+            "deterministic": true,
+            "sessionId": "bt92-single-env-smoke-92",
+            "matchId": "standard",
+            "modeId": "CLASSIC"
+          }
+        },
+        "seedEnvelope": {
+          "contractVersion": "match-kernel-seed-envelope.v1",
+          "surface": "headless",
+          "deterministic": true,
+          "matchSeed": 0,
+          "roundSeed": 0,
+          "tickSeed": 4,
+          "streamId": "training",
+          "rngContractVersion": "runtime-rng.v1",
+          "tags": [
+            "training-step"
+          ]
+        },
+        "inputFrame": {
+          "contractVersion": "match-kernel-input-frame.v1",
+          "surface": "headless",
+          "inputSource": "training",
+          "tickIndex": 4,
+          "sequence": 4,
+          "capturedAtMs": 4,
+          "deterministic": true,
+          "players": [
+            {
+              "playerIndex": 0,
+              "playerId": "training-agent",
+              "deviceId": null,
+              "sourceType": "training-step",
+              "actions": {
+                "pitchUp": true,
+                "pitchDown": false,
+                "yawLeft": true,
+                "yawRight": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "boost": false,
+                "boostPressed": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "useItem": false,
+                "shootItem": false,
+                "shootMG": false,
+                "nextItem": false
+              }
+            }
+          ],
+          "commands": [],
+          "tags": [
+            "training-step"
+          ]
+        }
+      },
+      "rewardBreakdown": {
+        "baseStep": 0,
+        "survival": 0,
+        "survivalPressureBonus": 0,
+        "kill": 0,
+        "crash": 0,
+        "stuck": 0,
+        "itemPickup": 0,
+        "itemUse": 0,
+        "damageDealt": 0,
+        "damageTaken": 0,
+        "wallRisk": 0,
+        "trailRisk": 0,
+        "opponentRisk": 0,
+        "lowHealthThreat": 0,
+        "win": 0,
+        "loss": 0,
+        "checkpointReached": 0,
+        "parcoursCompleted": 0,
+        "wrongOrder": 0,
+        "external": 0
+      },
+      "terminalReason": null,
+      "truncatedReason": "max-steps",
+      "hybridDecision": {
+        "contractVersion": "v80-hybrid-decision-trace-v1",
+        "intent": {
+          "requested": "evade",
+          "applied": "evade",
+          "priors": {
+            "evade": 0.4400000005960465,
+            "chase": 0.19421443084481935,
+            "portal": 0,
+            "item": 0.065,
+            "combat": 0.20609818231253924
+          }
+        },
+        "safety": {
+          "vetoActive": false,
+          "collisionRisk": 0.4766208012489174,
+          "threatHorizon": 0.4048000005483628,
+          "deadEndRisk": 0.4400000005960465,
+          "shieldBreakRisk": 0.6619733350679409,
+          "projectileThreat": false,
+          "portalVeto": false,
+          "combatVeto": false,
+          "itemVeto": false
+        },
+        "control": {
+          "steeringMode": "safety-evade",
+          "combatAllowed": false,
+          "itemAllowed": false,
+          "boostAllowed": false,
+          "targetInFront": false,
+          "exitQuality": 0.7648000006973743,
+          "portalRisk": 0,
+          "gateRisk": 0
+        }
+      },
+      "observationSchemaVersion": "v2-runtime-near",
+      "observationLength": 64,
+      "visibleFields": [
+        "reward",
+        "done",
+        "truncated",
+        "rewardBreakdown",
+        "terminalReason",
+        "truncatedReason",
+        "hybridDecision",
+        "observationSchemaVersion",
+        "observationLength"
+      ],
+      "bridgeActionLatencyMs": 14.08,
+      "bridgeAckLatencyMs": 13.493
+    }
+  }
+}

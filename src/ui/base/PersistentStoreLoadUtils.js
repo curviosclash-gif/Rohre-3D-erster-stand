@@ -8,7 +8,7 @@ import { resolveArtifactVersionState } from '../../shared/contracts/ArtifactVers
  *
  * @param {object} options - Options passed to the store constructor.
  * @param {string} defaultStorageKey - Default primary storage key.
- * @param {string[]} defaultLegacyKeys - Default list of legacy storage keys for migration.
+ * @param {readonly string[]} defaultLegacyKeys - Default list of legacy storage keys for migration.
  * @returns {{ storagePlatform, storageKey, storageLegacyKeys }}
  */
 export function resolveStorePlatformOptions(options, defaultStorageKey, defaultLegacyKeys) {

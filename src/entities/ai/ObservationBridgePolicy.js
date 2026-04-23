@@ -24,6 +24,17 @@ import {
 const WARNING_COOLDOWN_BASE_MS = 2000;
 const WARNING_COOLDOWN_MAX_MS = 30000;
 
+/**
+ * @typedef {{
+ *   status: string,
+ *   resumeRequested: boolean,
+ *   resumeToken: string | null,
+ *   loaded: boolean,
+ *   error: string | null,
+ *   resumeSource: string | null,
+ * }} TrainerBridgeInitState
+ */
+
 function isDesktopAppRuntime(runtimeGlobal = globalThis) {
     return runtimeGlobal?.curviosApp?.isApp === true || runtimeGlobal?.__CURVIOS_APP__ === true;
 }
@@ -50,14 +61,14 @@ export class ObservationBridgePolicy {
         this._trainerBridge = null;
         this._trainerBridgeOptions = null;
         this._trainerBridgeInitPromise = null;
-        this._trainerBridgeInitState = Object.freeze({
+        this._trainerBridgeInitState = /** @type {Readonly<TrainerBridgeInitState>} */ (Object.freeze({
             status: 'disabled',
             resumeRequested: false,
             resumeToken: null,
             loaded: false,
             error: null,
             resumeSource: null,
-        });
+        }));
 
         const trainerBridgeOptions = resolveTrainerBridgeOptions(options);
         if (trainerBridgeOptions.enabled) {
@@ -73,14 +84,17 @@ export class ObservationBridgePolicy {
     }
 
     _setTrainerBridgeInitState(nextState = {}) {
-        this._trainerBridgeInitState = Object.freeze({
-            status: typeof nextState.status === 'string' ? nextState.status : 'disabled',
-            resumeRequested: nextState.resumeRequested === true,
-            resumeToken: typeof nextState.resumeToken === 'string' ? nextState.resumeToken : null,
-            loaded: nextState.loaded === true,
-            error: typeof nextState.error === 'string' ? nextState.error : null,
-            resumeSource: typeof nextState.resumeSource === 'string' ? nextState.resumeSource : null,
-        });
+        const source = /** @type {Record<string, any>} */ (
+            nextState && typeof nextState === 'object' ? nextState : {}
+        );
+        this._trainerBridgeInitState = /** @type {Readonly<TrainerBridgeInitState>} */ (Object.freeze({
+            status: typeof source.status === 'string' ? source.status : 'disabled',
+            resumeRequested: source.resumeRequested === true,
+            resumeToken: typeof source.resumeToken === 'string' ? source.resumeToken : null,
+            loaded: source.loaded === true,
+            error: typeof source.error === 'string' ? source.error : null,
+            resumeSource: typeof source.resumeSource === 'string' ? source.resumeSource : null,
+        }));
     }
 
     _primeTrainerBridge(trainerBridgeOptions = {}) {

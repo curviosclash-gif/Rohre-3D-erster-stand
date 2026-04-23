@@ -8,16 +8,19 @@ const EXPERT_PASSWORD = '1307';
 // The canonical expert state is owned by MenuExpertLoginRuntime and does not require this attachment.
 const MENU_EXPERT_STATE_KEY = Symbol('menuExpertState');
 
-/* global __APP_MODE__ */
-
 function normalizeString(value) {
     return typeof value === 'string' ? value.trim() : '';
 }
 
 function resolveExpertSurfaceAccess(runtimeGlobal = globalThis) {
-    const appMode = typeof __APP_MODE__ !== 'undefined' ? String(__APP_MODE__).trim().toLowerCase() : 'web';
+    const globalRef = /** @type {typeof globalThis & { __APP_MODE__?: unknown }} */ (
+        runtimeGlobal && typeof runtimeGlobal === 'object' ? runtimeGlobal : globalThis
+    );
+    const appMode = typeof globalRef.__APP_MODE__ === 'string'
+        ? globalRef.__APP_MODE__.trim().toLowerCase()
+        : 'web';
     return resolveSurfaceDeveloperAccess({
-        runtimeGlobal,
+        runtimeGlobal: globalRef,
         appMode,
     });
 }

@@ -1,0 +1,43 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-22T21:18:23.588Z",
+  "lane": {
+    "workerCount": 1,
+    "deterministic": true,
+    "seed": 91,
+    "stepsTarget": 100,
+    "stepsCompleted": 100
+  },
+  "latencyMs": {
+    "boot": 279.554,
+    "resetAck": 13.679,
+    "action": {
+      "count": 100,
+      "min": 6.684,
+      "max": 30.037,
+      "average": 14.894,
+      "median": 15.104
+    },
+    "trainingStepAck": {
+      "count": 100,
+      "min": 5.294,
+      "max": 29.417,
+      "average": 14.255,
+      "median": 14.519
+    },
+    "stats": 1.462,
+    "sidecarProcessing": {
+      "min": 0.177,
+      "max": 0.449,
+      "average": 0.257
+    }
+  },
+  "handover": {
+    "nextBlock": "BT92",
+    "notes": [
+      "exactly one headless worker lane only",
+      "100-step baseline closes via max-steps truncation",
+      "2-/4-worker, multi-env, VecEnv and PPO baseline remain outside BT91"
+    ]
+  }
+}

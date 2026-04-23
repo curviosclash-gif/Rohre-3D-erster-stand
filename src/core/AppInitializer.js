@@ -5,7 +5,6 @@ import { createLogger } from '../shared/logging/Logger.js';
 import { createElectronShellLifecycleAdapter } from '../platform/electron/ElectronShellLifecycleBridge.js';
 
 const logger = createLogger('AppInitializer');
-/* global __CURVIOS_E2E__ */
 
 /**
  * @typedef {{
@@ -20,6 +19,7 @@ const logger = createLogger('AppInitializer');
  *   GAME_INSTANCE?: RuntimeGameInstance | null,
  *   GAME_RUNTIME?: unknown,
  *   GAME_DEBUG?: unknown,
+ *   __CURVIOS_E2E__?: boolean,
  * }} RuntimeWindow
  */
 
@@ -102,7 +102,7 @@ function mountGameInstance(createGame) {
     attachShellLifecycleBridge(game);
 
     try {
-        if (typeof __CURVIOS_E2E__ !== 'undefined' && __CURVIOS_E2E__ === true) {
+        if (runtimeWindow.__CURVIOS_E2E__ === true) {
             import('./TestApiBridge.js')
                 .then((mod) => mod?.attachCurviosTestApi?.(runtimeWindow))
                 .catch(() => {});

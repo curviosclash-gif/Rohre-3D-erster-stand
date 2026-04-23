@@ -4,7 +4,9 @@ function normalizeKey(value) {
 }
 
 function createStorageMigrationResult(source = {}) {
-    const payload = source && typeof source === 'object' ? source : {};
+    const payload = /** @type {Record<string, any>} */ (
+        source && typeof source === 'object' ? source : {}
+    );
     return Object.freeze({
         primaryKey: normalizeKey(payload.primaryKey),
         sourceKey: normalizeKey(payload.sourceKey),

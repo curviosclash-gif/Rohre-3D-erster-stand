@@ -9,6 +9,9 @@ import {
 } from './MenuAccessPolicy.js';
 import { resolveMenuDeveloperTheme } from './MenuDeveloperThemeCatalog.js';
 
+/** @type {Set<string>} */
+const VALID_DEVELOPER_ACCESS_MODE_SET = new Set(Object.values(MENU_DEVELOPER_ACCESS_MODES));
+
 function normalizeString(value, fallback = '') {
     const normalized = typeof value === 'string' ? value.trim() : '';
     return normalized || fallback;
@@ -118,7 +121,7 @@ export function setDeveloperVisibilityMode(settings, mode, accessContext = null)
         return createResult(false, 'owner_required');
     }
     const requestedMode = normalizeString(mode, MENU_DEVELOPER_ACCESS_MODES.OWNER_ONLY);
-    const resolvedMode = Object.values(MENU_DEVELOPER_ACCESS_MODES).includes(requestedMode)
+    const resolvedMode = VALID_DEVELOPER_ACCESS_MODE_SET.has(requestedMode)
         ? requestedMode
         : MENU_DEVELOPER_ACCESS_MODES.OWNER_ONLY;
     settings.localSettings.developerModeVisibility = resolvedMode;

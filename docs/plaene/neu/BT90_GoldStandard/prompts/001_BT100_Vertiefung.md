@@ -5,19 +5,30 @@
 Du arbeitest an einem Intake-Draft fuer den BT90-PPO-Zweitpfad.
 BT90 ist kein aktiver Masterplan, sondern eine Planungsgrundlage unter `docs/plaene/neu/`.
 
+## VORSTART / GATE
+
+Bevor du block-spezifisch arbeitest, lies zwingend:
+
+1. `docs/plaene/neu/BT90_GoldStandard/BT90_Followup_Tracker_2026-04-23.md`
+2. `docs/plaene/neu/BT90_GoldStandard/prompts/000_BT90_Followup_Loop.md`
+
+Wenn im Tracker ein hoeher priorisierter offener oder blockierter Punkt existiert, dessen Abhaengigkeiten bereits erfuellt sind, bearbeite nicht direkt BT100 weiter.
+Arbeite stattdessen den naechsten faelligen Tracker-Punkt ab, aktualisiere Status, `Wie erledigt`, Evidence und Verweise und gib danach wieder einen `NEXT_PROMPT` im selben Standard aus.
+
 ## KONTEXT (LIES IN DIESER REIHENFOLGE)
 
 ### Pflicht-Lektuere
 
-1. `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
-2. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md`
-3. `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
-4. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
-5. `docs/bot-training/Bot_Trainingsplan.md`
-6. `docs/referenz/ai_architecture_context.md`
-7. `src/state/HeadlessMatchKernelRuntime.js`
-8. `src/core/MatchKernelTrainingAdapter.js`
-9. `src/entities/ai/training/TrainingTransportFacade.js`
+1. `docs/plaene/neu/BT90_GoldStandard/BT90_Followup_Tracker_2026-04-23.md`
+2. `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
+3. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md`
+4. `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md`
+5. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
+6. `docs/bot-training/Bot_Trainingsplan.md`
+7. `docs/referenz/ai_architecture_context.md`
+8. `src/state/HeadlessMatchKernelRuntime.js`
+9. `src/core/MatchKernelTrainingAdapter.js`
+10. `src/entities/ai/training/TrainingTransportFacade.js`
 10. `src/entities/ai/training/WebSocketTrainerBridge.js`
 11. `src/entities/ai/training/TrainingContractV1.js`
 12. `src/entities/ai/training/TrainerPayloadAdapter.js`
@@ -28,7 +39,7 @@ BT90 ist kein aktiver Masterplan, sondern eine Planungsgrundlage unter `docs/pla
 ### Optional bei Bedarf
 
 - `src/shared/contracts/TrainingRuntimeContract.js`
-- bestehende `python/**`-Dateien, falls schon vorhanden
+- bestehende `python/**`-Dateien aus dem aktuellen Worktree (vorhanden, aber ggf. noch nicht repo-versioniert)
 
 ## WAS DU TUN SOLLST
 

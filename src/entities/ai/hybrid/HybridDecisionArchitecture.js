@@ -78,6 +78,11 @@ function clampSigned(value, fallback = 0) {
     return clamp(toFiniteNumber(value, fallback), -1, 1);
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function normalizeHybridIntent(value, fallback = HYBRID_INTENT_TYPES.STABILIZE) {
     const normalized = typeof value === 'string' ? value.trim().toLowerCase() : '';
     switch (normalized) {

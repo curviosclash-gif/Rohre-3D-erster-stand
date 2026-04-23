@@ -44,9 +44,13 @@ export const MENU_MODE_PATHS = Object.freeze({
     NORMAL: 'normal',
 });
 
+/** @type {Set<string>} */
 const VALID_DEVELOPER_ACCESS_MODE_SET = new Set(Object.values(MENU_DEVELOPER_ACCESS_MODES));
+/** @type {Set<string>} */
 const VALID_SESSION_TYPE_SET = new Set(Object.values(MENU_SESSION_TYPES));
+/** @type {Set<string>} */
 const VALID_MODE_PATH_SET = new Set(Object.values(MENU_MODE_PATHS));
+/** @type {Set<string>} */
 const VALID_MULTIPLAYER_TRANSPORT_SET = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
 export const LEVEL4_SECTION_IDS = Object.freeze({
     CONTROLS: 'controls',
@@ -54,6 +58,7 @@ export const LEVEL4_SECTION_IDS = Object.freeze({
     ADVANCED_MAP: 'advanced_map',
     TOOLS: 'tools',
 });
+/** @type {Set<string>} */
 const VALID_LEVEL4_SECTION_SET = new Set(Object.values(LEVEL4_SECTION_IDS));
 
 function normalizeBoolean(value, fallback) {

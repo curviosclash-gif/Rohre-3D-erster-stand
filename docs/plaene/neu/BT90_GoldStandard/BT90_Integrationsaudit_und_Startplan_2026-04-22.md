@@ -14,6 +14,14 @@ Wichtig:
 - Dieses Dokument beschreibt, **was vor einem professionellen Start zu normalisieren und wie die Startstrecke zu schneiden ist**.
 - Die Erstfassung fuehrte bewusst **keine** Umsetzung aus; diese Revision dokumentiert die Ausfuehrung von Phase 1 als Contract-Freeze, von Phase 2 als BT90-Zuschnitt, von Phase 3 als BT91-Zuschnitt und von Phase 4 als BT92-Zuschnitt. Operative Claims, Locks und Abschluss-Evidence bleiben weiterhin ausschliesslich im Bot-Trainingsplan.
 
+Follow-up 2026-04-23:
+
+- Dieses Audit bleibt als Integrations- und Zuschnittsreferenz bestehen.
+- Die Review-Befunde nach dem spaeteren Repo-Audit liegen jetzt verbindlich in `BT90_Followup_Tracker_2026-04-23.md`.
+- Neue Folge-Loops starten ab jetzt ueber `prompts/000_BT90_Followup_Loop.md` und muessen den Tracker aktualisieren.
+- `BTF-06` hat den frueheren claimbaren Monolith `BT93` ersetzt: aktiv wird der Folgepfad jetzt als `BT93A` (Harness aus `BT101.4` bis `BT101.6`), `BT93B` (Scaffold aus `BT102.1` bis `BT102.3`) und `BT93C` (konservative Baseline aus `BT102.4` bis `BT102.6`) geschnitten.
+- Stellen unten, die noch von einem einzelnen `BT93` sprechen, sind als historische 2026-04-22-Erstbewertung zu lesen; operativ gewinnt der spaetere Split aus dem Follow-up-Tracker.
+
 ## Management-Urteil
 
 Die BT90-Integration ist formal und governance-seitig **teilweise gelungen**, aber fachlich und operativ **noch nicht reif fuer einen sofortigen professionellen Start ohne Vorarbeit**.
@@ -84,10 +92,10 @@ Folge:
 - Der Mehr-Env-Folgepfad ist logisch beschrieben, aber dokumentarisch nicht ganz sauber geschlossen.
 - Das ist kein Sofort-Blocker fuer den Start, aber ein klarer Nachschaerfungspunkt vor BT93.
 
-Status 2026-04-22 nach Phase 0:
+Status 2026-04-23 nach Follow-up `BTF-06`:
 
-- behoben
-- BT93 referenziert jetzt explizit `BT101.4` bis `BT101.6` plus `BT102`
+- behoben und weiter geschaerft
+- der fruehere Sammelblock `BT93` ist jetzt operativ in `BT93A` (`BT101.4` bis `BT101.6`), `BT93B` (`BT102.1` bis `BT102.3`) und `BT93C` (`BT102.4` bis `BT102.6`) getrennt
 
 ## 5. Mittel: BT94 ist fuer einen sauberen operativen Block wieder zu breit
 
@@ -121,7 +129,7 @@ Status 2026-04-22 nach Phase 0:
 ## 7. Hoch: Der reale Repo-Startzustand ist schwacher als die Planoptik
 
 Der Plan spricht bereits in operativen Begriffen ueber Python-Sidecar, PPO-Artefakte und Env-Pfade.
-Im aktuellen Repo ist der Python-/PPO-Bauort jedoch noch nicht als echte Arbeitsbasis vorhanden.
+Im aktuellen Repo ist der Python-/PPO-Bauort unter `python/**` und `data/training/ppo/**` zwar bereits lokal im Worktree vorhanden, aber noch nicht repo-versioniert und damit noch keine belastbare repo-getragene Arbeitsbasis.
 
 Folge:
 
@@ -218,7 +226,7 @@ Fuer den aktuellen Stand gilt:
 - `TrainingContractV1.js` bleibt authoritative fuer den internen Reset-/Step-Transitionshape.
 - `TrainerPayloadAdapter.js` bleibt authoritative fuer den externen Transport- und Projektionsshape.
 - `ObservationSchemaV2.js` friert den runtime-near Zielshape auf `v2-runtime-near` und Laenge `64` ein.
-- `BotActionContract.js` friert Feldnamen, Clamping, Invalid-Handling und die Index-Semantik von `useItem`/`shootItemIndex` ein.
+- `BotActionContract.js` friert Feldnamen, Clamping, Invalid-Handling und die Index-Semantik von `useItem`/`shootItemIndex` ein; fuer spaetere PPO-Claims bleibt diese rohe BT92-Surface nur Boundary-Wahrheit, waehrend der claimbare Folgepfad ab `BT93B` ueber `Split-Head` statt ueber reine `Action-Mask`- oder Sanitizer-Toleranz laufen muss.
 - `TrainingDomain.js`, `RuntimeNearObservationAdapter.js`, `HybridDecisionArchitecture.js` und `EpisodeController.js` sind als semantiknahe Adjacent-Dateien fuer Re-Audits markiert.
 
 ## Umsetzungsstand Phase 2 (2026-04-22)
@@ -270,6 +278,7 @@ Phase 4 wurde mit dieser Revision dokumentarisch umgesetzt.
 - Der aktive `BT92`-Block im Bot-Trainingsplan ist jetzt als enger Single-Env- und Semantikblock zugeschnitten.
 - `BT92` traegt jetzt nur Observation-/Action-Authority, genau ein headless `gymnasium.Env`, `reset()`, `step()`, `close()` sowie die JS-authoritative Reward-, `done`-, `truncated`- und Info-Semantik.
 - `rewardBreakdown`, `terminalReason`, `truncatedReason`, `hybridDecision`, `observationSchemaVersion` und `observationLength` sind im aktiven Block explizit als sichtbare Pflichtsignale verankert.
+- Die offene Action-Surface-Entscheidung ist fuer den Folgepfad festgezogen: `BT92` bleibt rohe Boundary-Semantik, der erste PPO-Scaffold muss `Split-Head` pinnen; `Action-Mask` bleibt optional, Sanitizer-Toleranz kein primaerer Lernpfad.
 - Mehr-Env, VecEnv, PPO-Baseline und Parallelisierungsversprechen sind in `BT92` jetzt ausdruecklich ausgeschlossen und bleiben Folgearbeit fuer `BT93`.
 
 ### Aenderungen dieser Revision
@@ -288,7 +297,8 @@ Phase 5 wurde mit dieser Revision dokumentarisch umgesetzt.
 
 ### Ergebnis
 
-- `BT93` ist jetzt explizit an echte `BT92`-Evidence, den fehlenden heutigen Python-/PPO-Bauort und gemessene Throughput-/Latenzdaten gebunden statt an Draft-Annahmen.
+- Der fruehere `BT93`-Pfad ist jetzt explizit an echte `BT92`-Evidence gebunden und operativ in `BT93A` (Harness), `BT93B` (Scaffold) und `BT93C` (Baseline) zerlegt; der lokal vorhandene, aber noch nicht repo-versionierte Python-/PPO-Bauort bleibt dabei offen sichtbar.
+- `BT93B` ist jetzt auch fachlich gegen die BT92-Action-Surface abgesichert: kein direkter PPO-Claim auf der rohen `257`er-Indexbreite, sondern dokumentierter `Split-Head` ueber Bool-/Intent-Felder plus Item-Indizes.
 - `BT94` hat jetzt eine Claim-Grenze zwischen Freeze-Paket und externer A/B-Evidence; wenn Freeze-Artefakte, Matrix oder Lane-Budget unscharf bleiben, ist vor einem Claim Split oder Nachschaerfung Pflicht.
 - `BT95` ist jetzt noch klarer als doc-only Handoff verankert; ohne `BT104=promote`, gruene produktionsnahe Validation und User-Entscheid oeffnet kein aktiver Rollout-Intake.
 - `BT80C 80.9.3` bleibt mit der konkret benannten Restlage (`PLAYING`, `roundsRecorded=0`) sichtbar als produktionsnaher Integrationsblocker.
@@ -305,7 +315,7 @@ Phase 5 wurde mit dieser Revision dokumentarisch umgesetzt.
 
 - Phase 5 ist dokumentarisch geschlossen.
 - Operative Evidence fuer `BT93` bis `BT95` fehlt weiterhin bewusst; diese Bloecke bleiben rolling drafts hinter `BT90` bis `BT92`.
-- Der reale Repo-Bauort fuer Python/PPO (`python/**`, `data/training/ppo/**`) ist weiterhin nicht vorhanden und bleibt deshalb Teil der frueheren Startbloecke statt von Phase 5.
+- Der reale Repo-Bauort fuer Python/PPO (`python/**`, `data/training/ppo/**`) ist im aktuellen Worktree vorhanden, bleibt laut Git-Status aber noch unversioniert; deshalb bleiben die frueheren Startbloecke fuer Repo-Wahrheit und Evidence-Haertung relevant, statt Phase 5 still als repo-getragene Basis zu behandeln.
 
 ## Phasen zur Umsetzung
 

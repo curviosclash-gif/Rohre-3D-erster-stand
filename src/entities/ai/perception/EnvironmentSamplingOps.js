@@ -82,6 +82,13 @@ export function findNearestEnemySample(
     };
 }
 
+/**
+ * @param {any} player
+ * @param {any[]} projectiles
+ * @param {number} threatRange
+ * @param {{ approachDot?: number, toTarget?: any, direction?: any }} [options]
+ * @returns {number}
+ */
 export function computeProjectileThreatFlag(
     player,
     projectiles,

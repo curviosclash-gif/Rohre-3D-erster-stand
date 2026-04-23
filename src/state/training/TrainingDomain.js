@@ -37,9 +37,11 @@ export function normalizeTrainingMode(mode) {
 }
 
 export function deriveTrainingDomain(input = {}) {
-    const payload = input && typeof input === 'object'
-        ? input
-        : { mode: input };
+    const payload = /** @type {Record<string, any>} */ (
+        input && typeof input === 'object'
+            ? input
+            : { mode: input }
+    );
     const mode = normalizeModeValue(payload.mode);
     const domainMode = normalizeDomainModeValue(payload.mode);
     const planarMode = !!payload.planarMode;

@@ -66,7 +66,7 @@ function createResolution({
     versionField,
     resolvedVersion,
     currentVersion,
-    hasVersionField,
+    hasVersionField = false,
 }) {
     return Object.freeze({
         artifactType,

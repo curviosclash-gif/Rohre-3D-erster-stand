@@ -10,7 +10,9 @@ export const PLATFORM_CAPABILITY_IDS = Object.freeze({
 });
 
 export function createPlatformCapabilityDescriptor(capabilityId, descriptor = {}) {
-    const source = descriptor && typeof descriptor === 'object' ? descriptor : {};
+    const source = /** @type {Record<string, any>} */ (
+        descriptor && typeof descriptor === 'object' ? descriptor : {}
+    );
     return {
         capabilityId: normalizeString(capabilityId, 'unknown'),
         available: source.available === true,
@@ -25,7 +27,9 @@ export function createPlatformCapabilityDescriptor(capabilityId, descriptor = {}
 }
 
 export function createPlatformCapabilitySnapshot(source = {}) {
-    const payload = source && typeof source === 'object' ? source : {};
+    const payload = /** @type {Record<string, any>} */ (
+        source && typeof source === 'object' ? source : {}
+    );
     return {
         contractVersion: PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION,
         runtimeKind: normalizeString(payload.runtimeKind, 'web'),

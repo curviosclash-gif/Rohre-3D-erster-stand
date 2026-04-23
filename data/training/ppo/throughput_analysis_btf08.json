@@ -1,0 +1,94 @@
+{
+  "_comment": "BTF-08 Throughput-Analyse – abgeleitet aus data/training/ppo/lane_baseline.json (gemessen 2026-04-22)",
+  "generatedAt": "2026-04-23",
+  "sourceArtefact": "data/training/ppo/lane_baseline.json",
+  "btfItem": "BTF-08",
+
+  "baseline_1worker": {
+    "workerCount": 1,
+    "stepsCompleted": 100,
+    "actionAvgMs": 14.894,
+    "actionMinMs": 6.684,
+    "actionMaxMs": 30.037,
+    "actionMedianMs": 15.104,
+    "trainingStepAckAvgMs": 14.255,
+    "trainingStepAckMinMs": 5.294,
+    "trainingStepAckMaxMs": 29.417,
+    "bootMs": 279.554,
+    "resetAckMs": 13.679,
+    "sidecarProcessingAvgMs": 0.257
+  },
+
+  "derived_steprate_1worker": {
+    "roundtripPerStepMs": 29.149,
+    "_note": "actionAvg + trainingStepAckAvg; bridge-intern latencyMean=0.54ms ist viel niedriger, weil ohne sidecar-overhead gemessen",
+    "maxStepsPerSec_theoretical": 34.3,
+    "_calc": "1000 / 29.149",
+    "maxStepsPerMin_theoretical": 2060,
+    "realistic_stepsPerSec": 28,
+    "_realistic_note": "overhead aus boot, reset, scheduling, Windows-subprocess-start abgezogen",
+    "realistic_stepsPerMin": 1680
+  },
+
+  "scaling_projection": {
+    "_warning": "2-Env und 4-Env sind Projekte – keine gemessenen Werte. Echte Werte kommen erst aus dem BT93A-Harness.",
+    "twoEnv_optimistic_stepsPerSec": 55,
+    "_2env_note": "wenn Prozesse gut parallelisieren; Windows/Subproc-Churn kann das halbieren",
+    "twoEnv_conservative_stepsPerSec": 30,
+    "_2env_conservative_note": "bei sequenziellem Dispatch oder instabilen Sub-Prozessen",
+    "fourEnv_optimistic_stepsPerSec": 90,
+    "_4env_note": "nur erreichbar wenn 2-Env-Harness stabil; sonst Downgrade auf 2-Env Pflicht",
+    "fourEnv_conservative_stepsPerSec": 40
+  },
+
+  "bt93a_startbudgets": {
+    "_rule": "Startbudgets IMMER aus gemessenen 1-Worker-Werten ableiten, nie aus Draft-Annahmen",
+    "twoEnv_smoke_steps": 100,
+    "_smoke_note": "100 Steps je Env fuer Stability-Check; entspricht BT91-Baseline",
+    "twoEnv_harness_steps": 500,
+    "_harness_note": "500 Steps je Env fuer Throughput-/Timeout-/Failure-Artefakt",
+    "twoEnv_max_wall_clock_budget_min": 10,
+    "_wall_note": "10 Minuten fuer 500-Step-Harness-Lauf bei 2-Env; bei Ueberschreitung: Downgrade auf sequenzielle Lane",
+    "fourEnv_requires": "nur wenn 2-Env >= 45 Steps/s gemessen und failure_rate <= 0.02",
+    "downgrade_trigger": "2-Env failure_rate > 0.05 OR wall_clock > 2x erwartet OR worker_instability"
+  },
+
+  "bt93c_budget_derivation": {
+    "_rule": "BT93C-Referenzlauf-Budget erst ableiten wenn BT93A-Harness echte Step-Rate liefert",
+    "max_practical_timesteps_1worker_per_hour": 100800,
+    "_calc": "28 Steps/s * 3600s",
+    "max_practical_timesteps_2worker_optimistic_per_hour": 198000,
+    "_calc": "55 Steps/s * 3600s",
+    "max_practical_timesteps_2worker_conservative_per_hour": 108000,
+    "recommended_referenzlauf_timesteps": "aus BT93A-Artefakt abzuleiten; kein Wert vor BT93A.99",
+    "_no_draft_numbers": "Keine 300k, 500k oder anderen Draft-Zahlen ohne BT93A-Harness-Evidence"
+  },
+
+  "failure_context": {
+    "contract_smoke_failures": 4,
+    "contract_smoke_lastFailure": "socket-closed",
+    "_note": "failures=4 aus contract_smoke.json: socket-closed beim Schliessen des Bridge-Sockets ist kein Trainings-Failure; gehoert zu BTF-09 fuer saubere Einordnung",
+    "failure_rate_1worker": 0.04,
+    "_calc": "4 failures / (202 requests + 4 failures) ~ 1.9%; oder 4/202=1.98%",
+    "_btf09_note": "BTF-09 klaert, ob socket-closed systematisch oder nur ein Teardown-Artefakt ist"
+  },
+
+  "downgrade_rules": {
+    "rule_1": "Wenn 2-Env-Harness failure_rate > 0.05, nur 1-Env-Lane fuer BT93B freigeben",
+    "rule_2": "Wenn 2-Env-Harness < 28 Steps/s (schlechter als 1-Worker-Baseline), explizit als Downgrade dokumentieren und Windows-Subproc-Strategie aendern",
+    "rule_3": "4-Env nur wenn 2-Env >= 45 Steps/s UND failure_rate <= 0.02 – sonst gesperrt",
+    "rule_4": "Alle BT93C-Budgets aus dem kleinsten tragenden Lane-Ergebnis aus BT93A ableiten; historische Draft-Annahmen (z.B. 300k Steps, 4 Envs) gelten nicht",
+    "rule_5": "Bei Windows-Prozess-Churn: sequenzielle 2-Env-Alternative als Fallback pinnen statt Harness zu verwerfen"
+  },
+
+  "claim_gates": {
+    "bt93a_claimable_if": [
+      "BT92.99 == gruen",
+      "python/scripts/bt90_freeze_check.py exitCode == 0 AND freezeOk == true",
+      "BTF-01 bis BTF-06 == [x] im Tracker",
+      "BTF-08 == [x] (dieses Artefakt vorhanden)"
+    ],
+    "bt93b_budget_must_reference": "data/training/ppo/lane_baseline_2env.json (oder gleichwertiges BT93A-Harness-Artefakt)",
+    "bt93c_budget_must_reference": "BT93A-Harness-Artefakt + BT93B-Scaffold-Artefakt"
+  }
+}

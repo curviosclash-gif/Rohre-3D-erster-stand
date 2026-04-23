@@ -1,6 +1,6 @@
 # BT90 GoldStandard - PPO-Zweitpfad
 
-Stand: 2026-04-22
+Stand: 2026-04-23
 
 BT90 ist ein Intake-Draft unter `docs/plaene/neu/`.
 Er beschreibt einen modularen PPO-Zweitpfad, der zunaechst ausserhalb des produktiven DQN-Runtime-Pfads bleibt, die bestehende Spiel- und AI-Hub-Architektur nur konsumiert und spaeter als zweiter Pfad in den bestehenden Bot-Trainingsplan uebernommen werden kann.
@@ -11,14 +11,16 @@ Wichtig:
 - `docs/Umsetzungsplan.md` bleibt nur der kompakte Master-Index fuer das Gesamtprojekt.
 - BT90 aendert in BT100-BT105 weder das Spiel noch die produktive AI-Hub-Schnittstelle.
 - PPO soll DQN spaeter vollstaendig abloesen koennen, aber erst nach gruener Evidence und separatem Integrations-Handoff.
+- Repo-Stand 2026-04-23: `python/**` und `data/training/ppo/**` sind im aktuellen Worktree bereits vorhanden; solange sie noch nicht repo-versioniert sind, duerfen Folge-Dokumente sie weder als fehlend noch als repo-versionierte Basis darstellen.
 
 ## Einstieg
 
-1. `BT_PPO_Migration_Masterplan.md`
-2. `IMPLEMENTATION_README.md`
-3. passender Block unter `bloecke/`
-4. `offene_risiken.md`
-5. bei spaeterer Uebernahme: `docs/bot-training/Bot_Trainingsplan.md`
+1. `BT90_Followup_Tracker_2026-04-23.md`
+2. `BT_PPO_Migration_Masterplan.md`
+3. `IMPLEMENTATION_README.md`
+4. passender Block unter `bloecke/`
+5. `offene_risiken.md`
+6. bei spaeterer Uebernahme: `docs/bot-training/Bot_Trainingsplan.md`
 
 Der Master ist der kompakte Index.
 Kanonische Blockdetails liegen ausschliesslich in den einzelnen Blockdateien unter `bloecke/`.
@@ -44,7 +46,9 @@ Der sinnvolle Start ist ein kontrollierter Rolling-Ansatz:
 - **aktive Landung zuerst:** `BT90` im Bot-Trainingsplan; inhaltliche Draft-Quelle ist `BT100.1` bis `BT100.2`
 - **direkt danach:** `BT91`; inhaltliche Draft-Quelle ist `BT100.3` bis `BT100.5`
 - **erst danach:** `BT92`; inhaltliche Draft-Quelle ist `BT101.1` bis `101.3`
-- **danach erst:** `BT93`; Quelle bleibt `BT101.4` bis `101.6` plus `BT102`
+- **danach erst:** `BT93A`; Quelle ist `BT101.4` bis `101.6` als Mehr-Env-/Throughput-Harness
+- **danach erst:** `BT93B`; Quelle ist `BT102.1` bis `BT102.3` als minimaler PPO-Scaffold
+- **danach erst:** `BT93C`; Quelle ist `BT102.4` bis `BT102.6` als konservative PPO-Baseline
 - **bewusst als rolling drafts lassen:** `BT102` bis `BT105`; diese Bloecke werden nach BT100/BT101 mit echten Throughput-, Telemetrie- und Contract-Daten nachgeschaerft
 
 Der Governance-konforme Migrationspfad in den aktiven Bot-Trainingsplan steht in `IMPLEMENTATION_README.md`.
@@ -75,15 +79,24 @@ Nicht in BT90:
 | --- | --- | --- |
 | BT100 | `bloecke/BT100_Python_Bootstrap_PoC.md` | Draft-Sammelblock fuer die aktive Landung: `BT90 = 100.1-100.2` (Bootstrap + Contract-Wahrheit), `BT91 = 100.3-100.5` (Sidecar + 1-Worker-Lane) |
 | BT101 | `bloecke/BT101_Custom_Gymnasium_Environment.md` | Single-Env ueber bestehende Kernel-/Transport-Vertraege; Mehr-Env ist ausdruecklich Folgearbeit |
-| BT102 | `bloecke/BT102_PPO_Baseline_Training.md` | rolling draft fuer konservative PPO-Baseline nach BT100/BT101-Evidence |
+| BT102 | `bloecke/BT102_PPO_Baseline_Training.md` | rolling draft fuer PPO-Scaffold plus konservative Baseline; aktive Landung spaeter als `BT93B`/`BT93C` |
 | BT103 | `bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` | rolling draft fuer Ablationen, Curriculum-Hardening und Candidate Freeze; keine Runtime-Integration |
 | BT104 | `bloecke/BT104_AB_Validation_Promotion.md` | rolling draft fuer externe A/B-Evidence mit aktiver Urteilssystematik `promote|hold|rollback|diagnose` |
 | BT105 | `bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` | rolling draft fuer spaeteren Integrations-Handoff; kein normaler Implementierungsblock |
 
 ## Prompt-System
 
+Verbindlicher Start fuer Follow-up-Loops ab 2026-04-23:
+
+- `000_BT90_Followup_Loop.md`
+
+Dieser Startprompt arbeitet **nicht** sofort neue PPO-Funktionalitaet ab.
+Er zieht zuerst die offenen Review-Befunde aus `BT90_Followup_Tracker_2026-04-23.md` auf Repo-, Doku-, Freeze- und Scope-Wahrheit.
+Jeder Folge-Loop muss dort Status, Wie, Evidence und Verweise aktualisieren.
+
 Die Prompts unter `prompts/` bleiben nummeriert und fortlaufend:
 
+- `000_BT90_Followup_Loop.md`
 - `001_BT100_Vertiefung.md`
 - `002_BT101_Vertiefung.md`
 - `003_BT102_Vertiefung.md`
@@ -97,6 +110,7 @@ Jeder Prompt muss denselben Zuschnitt spiegeln:
 - headless-first
 - bestehende Bridge-/Payload-Vertraege konsumieren
 - produktive Runtime- und AI-Hub-Dateien in BT100-BT105 read-only behandeln
+- Review-Befunde aus `BT90_Followup_Tracker_2026-04-23.md` zuerst schliessen, bevor neue BT93+-Scope-Arbeit gestartet wird
 
 ## Beziehung zu anderen Plaenen
 

@@ -1,0 +1,5 @@
+# BT90 minimal bootstrap only.
+# `gymnasium` belongs to the BT92 single-env path and stays out of BT90 on purpose.
+# Heavy PPO libraries stay outside this start block until BT91+ opens them explicitly.
+pytest==8.2.2
+websockets==12.0

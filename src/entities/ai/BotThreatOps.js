@@ -24,7 +24,7 @@ export function senseProjectiles(bot, player, projectiles) {
     const awareness = bot.profile.projectileAwareness || 0;
     if (awareness <= 0 || !projectiles || projectiles.length === 0) return;
     const threatDetected = computeProjectileThreatFlag(player, projectiles, AI_SENSOR_THREAT_POLICY.projectileThreatRange, {
-        approachDot: AI_SENSOR_THREAT_POLICY.projectileApproachDot,
+        approachDot: Number(AI_SENSOR_THREAT_POLICY.projectileApproachDot),
         toTarget: bot._tmpVec,
         direction: bot._tmpVec2,
     });

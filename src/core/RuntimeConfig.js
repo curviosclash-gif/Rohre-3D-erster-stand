@@ -47,6 +47,11 @@ function hashSeed(input) {
     return Math.abs(hash);
 }
 
+/**
+ * @param {Record<string, any> | null} [settings]
+ * @param {string} [activeGameMode]
+ * @returns {number}
+ */
 function resolveArcadeSeed(settings = null, activeGameMode = GAME_MODE_TYPES.CLASSIC) {
     const source = settings && typeof settings === 'object' ? settings : {};
     const explicitSeed = source?.arcade && typeof source.arcade === 'object'
@@ -75,8 +80,14 @@ export const BOT_POLICY_STRATEGIES = Object.freeze({
     BRIDGE: 'bridge',
     AUTO: 'auto',
 });
+/** @type {Set<string>} */
 const BOT_POLICY_STRATEGY_SET = new Set(Object.values(BOT_POLICY_STRATEGIES));
 
+/**
+ * @param {unknown} strategy
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function normalizeBotPolicyStrategy(strategy, fallback = BOT_POLICY_STRATEGIES.AUTO) {
     const normalizedFallback = BOT_POLICY_STRATEGY_SET.has(String(fallback || '').trim().toLowerCase())
         ? String(fallback).trim().toLowerCase()

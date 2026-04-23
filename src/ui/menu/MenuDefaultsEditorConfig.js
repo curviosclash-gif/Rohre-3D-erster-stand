@@ -309,10 +309,14 @@ export function createMenuSettingsDefaults() {
 }
 
 export function createMenuDefaultsEditorSnapshotFromSettings(settings = {}) {
-    const source = settings && typeof settings === 'object' ? settings : {};
-    const localSettings = source.localSettings && typeof source.localSettings === 'object'
-        ? source.localSettings
-        : {};
+    const source = /** @type {Record<string, any>} */ (
+        settings && typeof settings === 'object' ? settings : {}
+    );
+    const localSettings = /** @type {Record<string, any>} */ (
+        source.localSettings && typeof source.localSettings === 'object'
+            ? source.localSettings
+            : {}
+    );
 
     return {
         schemaVersion: MENU_DEFAULT_EDITOR_SCHEMA_VERSION,

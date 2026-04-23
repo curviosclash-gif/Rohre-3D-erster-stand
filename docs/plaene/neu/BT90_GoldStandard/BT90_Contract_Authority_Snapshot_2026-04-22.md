@@ -71,6 +71,16 @@ Festgezogen fuer `BT90` bis `BT92`:
 - `shootItem` ohne gueltigen `shootItemIndex` wird neutralisiert
 - Indizes werden nur in den Bereich `-1..inventoryLength-1` geklemmt
 
+### 4a. PPO-Folgepfad ueber BT92 hinaus
+
+Festgezogen fuer spaetere PPO-Claims ab `BT93B`:
+
+- `BT92` behaelt die rohe Bool-/Index-Surface aus `BotActionContract.js` 1:1 als JS-authoritative Boundary-Semantik.
+- Die feste `257`er-Indexbreite in `python/envs/curvios_env.py` ist nur Boundary-Kompatibilitaet fuer den Single-Env-Pfad, nicht die spaetere PPO-Policy-Surface.
+- Der claimbare PPO-Pfad arbeitet deshalb mit `Split-Head`: Bool-/Intent-Felder bleiben getrennt von den Index-Heads fuer `shootItemIndex` und `useItem`.
+- Eine `Action-Mask` aus aktuellem `inventoryLength` darf spaeter als Hilfssignal hinzukommen, ersetzt den `Split-Head` aber nicht.
+- Sanitizer-Clamping und -Neutralisierung bleiben reine Guardrails an der Boundary; invalides Sampling darf nicht als bewusst tolerierte Lernsemantik gelten.
+
 ## Stabilisierende Evidenz fuer den Snapshot
 
 Diese JS-Artefakte bestaetigen die oben eingefrorene Authority praktisch:
@@ -139,6 +149,23 @@ Relevanz:
 - `HybridDecisionArchitecture.js` bestimmt finale Aktionsausgabe und `hybridDecision`
 - `EpisodeController.js` bestimmt `done`, `truncated`, `terminalReason` und `truncatedReason`
 
+## Maschinenlesbarer Freeze-Check
+
+Der Freeze ist nicht mehr nur als Textregel dokumentiert.
+Der aktuelle Snapshot wird zusaetzlich ueber den Snapshot-Commit `017e8edeb548cb64a164d8dc72d1d1cb3055cc93` mechanisiert.
+
+- `python/scripts/bt90_freeze_check.py` vergleicht Authority-Viereck und Adjacent-Dateien blob-genau gegen diesen Commit.
+- Der Check schreibt ein lokales Artefakt nach `data/training/ppo/freeze_check.json`.
+- Exit-Code `0` plus `freezeOk=true` bedeutet: keine Dateidrift gegen den Freeze.
+- Exit-Code `1` oder `reAuditRequired=true` bedeutet: Re-Audit vor dem naechsten `BT90`- bis `BT92`-Claim.
+- Der Check ersetzt kein inhaltliches Snapshot-Review; er macht nur Repo-Drift maschinenlesbar sichtbar.
+
+## BT90-Evidence-Regel
+
+- Fuer BT90-Closure zu Freeze-, Contract- und Layer-Aussagen sind `python/scripts/bt90_freeze_check.py` plus `data/training/ppo/freeze_check.json` der primaere Nachweis.
+- Snapshot- und Layer-Claims duerfen zusaetzlich auf konkrete Source-Queries gegen dieses Dokument und `docs/referenz/ai_architecture_context.md` zeigen.
+- `git status` oder mutable README-Texte alleine zaehlen dafuer nicht.
+
 ## Harte Blocker-Signale
 
 Ein neuer `BT90`- bis `BT92`-Claim ist zu stoppen und erneut zu auditieren, wenn mindestens einer dieser Punkte eintritt:
@@ -146,6 +173,7 @@ Ein neuer `BT90`- bis `BT92`-Claim ist zu stoppen und erneut zu auditieren, wenn
 - `TRAINING_CONTRACT_VERSION` wechselt weg von `v1`
 - `OBSERVATION_SCHEMA_VERSION_V2` oder `OBSERVATION_LENGTH_V2` aendert sich
 - `useItem` oder `shootItemIndex` wechselt semantisch von Indexlogik auf etwas anderes
+- `BT93B` oder `BT93C` wollen direkt auf der rohen `257`er-Index-Surface statt ueber den dokumentierten `Split-Head` trainieren
 - `rewardBreakdown`, `terminalReason` oder `truncatedReason` verschwinden aus Transition oder Transport
 - `hybridDecision` oder `observationContext` wechseln still den Ort oder fallen still weg
 - fuer `BT90` oder `BT91` werden neue Message-Typen, neue Runtime-Schalter oder Schreibzugriffe auf read-only Runtime-/AI-Hub-Surfaces erforderlich
@@ -163,6 +191,7 @@ Der aktuelle Entscheid fuer den Startpfad lautet:
 - Python darf fehlende oder driftende JS-Felder nicht still kapseln oder neu interpretieren.
 - Kein stiller Fallback von `v2-runtime-near` auf einen alten V1-Snapshot.
 - Kein boolesches Umdeuten von `useItem`.
+- Kein direktes PPO-Lernen auf der rohen `257`er-Indexbreite von `CurviosEnv`; der PPO-Pfad muss die dokumentierte `Split-Head`-Projektion vor der Sanitization pinnen.
 - Keine Python-seitige Neuberechnung von Reward-, Episode- oder Domain-Semantik.
 
 Wenn einer dieser Punkte fuer den Start doch noetig wird, ist nicht "der Python-Adapter noch nicht fertig", sondern der Block falsch zugeschnitten und muss als neuer Intake-Fall zurueck in die Planung.

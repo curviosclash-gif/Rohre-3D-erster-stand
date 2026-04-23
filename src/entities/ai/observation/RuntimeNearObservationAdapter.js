@@ -99,12 +99,12 @@ function createLiftedVector(baseVector, expectedLength = OBSERVATION_LENGTH_V2) 
 }
 
 function normalizeMetadata(metadata = {}) {
-    return metadata && typeof metadata === 'object' ? metadata : {};
+    return /** @type {Record<string, any>} */ (metadata && typeof metadata === 'object' ? metadata : {});
 }
 
 function normalizeSection(metadata, key) {
     const section = metadata?.[key];
-    return section && typeof section === 'object' ? section : {};
+    return /** @type {Record<string, any>} */ (section && typeof section === 'object' ? section : {});
 }
 
 function normalizeIntent(intent, fallback = 'stabilize') {
@@ -513,7 +513,7 @@ export class RuntimeNearObservationTracker {
         this.reset(options);
     }
 
-    reset() {
+    reset(_options = null) {
         this._state = createTrackerState();
         return this.getSnapshot();
     }

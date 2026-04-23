@@ -11,6 +11,7 @@ const MENU_DRAFT_STORAGE_KEY = STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_LEGACY_KEYS = LEGACY_STORAGE_KEYS.menuDrafts;
 const MENU_DRAFT_STORAGE_SCHEMA_VERSION = 'menu-draft-store.v1';
 
+/** @type {Set<string>} */
 const VALID_SESSION_TYPE_SET = new Set(Object.values(MENU_SESSION_TYPES));
 
 function normalizeString(value, fallback = '') {

@@ -1,0 +1,367 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-22T21:18:23.588Z",
+  "scope": {
+    "workerCount": 1,
+    "stepsTarget": 100,
+    "stepsCompleted": 100,
+    "contractVersion": "v1",
+    "observationSchemaVersion": "v2-runtime-near",
+    "observationLength": 64
+  },
+  "handshake": {
+    "readyPayload": {
+      "ok": true,
+      "type": "trainer-ready",
+      "contractVersion": "v1",
+      "protocolVersion": "bt91-bridge-v1",
+      "sessionId": "bt91-headless-bridge-smoke"
+    },
+    "bootLatencyMs": 279.554,
+    "resetAckLatencyMs": 13.679,
+    "statsLatencyMs": 1.462
+  },
+  "runtime": {
+    "headlessRuntimeContractVersion": "match-kernel-headless-runtime.v1",
+    "trainingAdapterContractVersion": "match-kernel-training-adapter.v1",
+    "surface": "headless",
+    "mapKey": "standard",
+    "activeGameMode": "CLASSIC",
+    "planarMode": false
+  },
+  "sidecar": {
+    "pythonExecutable": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\.venv\\Scripts\\python.exe",
+    "messageCounts": {
+      "bot-action-request": 100,
+      "trainer-ready": 1,
+      "trainer-stats-request": 1,
+      "training-reset": 1,
+      "training-step": 100
+    },
+    "processingLatencyMs": {
+      "min": 0.177,
+      "max": 0.449,
+      "average": 0.257
+    },
+    "contractSmoke": {
+      "validationFailures": 0,
+      "firstObservation": {
+        "mode": "classic",
+        "planarMode": false,
+        "domainId": "classic-3d",
+        "controlProfileId": "legacy-v1:classic-3d",
+        "observationLength": 64,
+        "player": {
+          "index": 0,
+          "inventoryLength": 0
+        },
+        "observationContextKeys": [
+          "baseObservationLength",
+          "baseSchemaVersion",
+          "clearanceTrend",
+          "contractVersion",
+          "deadEndRisk",
+          "environmentProfile",
+          "exitQuality",
+          "gate",
+          "intentPriors",
+          "item",
+          "memory",
+          "observationLength",
+          "opponentPressure",
+          "portal",
+          "pressureTrend",
+          "recovery",
+          "recoveryAgeRatio",
+          "runtimeNear",
+          "schemaVersion",
+          "shieldBreakRisk",
+          "shieldDeficit",
+          "stepIndex",
+          "targetStability",
+          "threatHorizon"
+        ]
+      },
+      "firstReset": {
+        "episodeId": "bt91-headless-91",
+        "stepIndex": 0,
+        "done": false,
+        "truncated": false,
+        "domainId": "classic-3d",
+        "observationLength": 64,
+        "actionKeys": [],
+        "hasKernelRuntime": true,
+        "rewardBreakdownKeys": []
+      },
+      "firstStep": {
+        "episodeId": "bt91-headless-91",
+        "stepIndex": 1,
+        "done": false,
+        "truncated": false,
+        "domainId": "classic-3d",
+        "observationLength": 64,
+        "actionKeys": [
+          "boost",
+          "cameraSwitch",
+          "dropItem",
+          "nextItem",
+          "pitchDown",
+          "pitchUp",
+          "rollLeft",
+          "rollRight",
+          "shootItem",
+          "shootItemIndex",
+          "shootMG",
+          "useItem",
+          "yawLeft",
+          "yawRight"
+        ],
+        "hasKernelRuntime": true,
+        "rewardBreakdownKeys": [
+          "baseStep",
+          "checkpointReached",
+          "crash",
+          "damageDealt",
+          "damageTaken",
+          "external",
+          "itemPickup",
+          "itemUse",
+          "kill",
+          "loss",
+          "lowHealthThreat",
+          "opponentRisk",
+          "parcoursCompleted",
+          "stuck",
+          "survival",
+          "survivalPressureBonus",
+          "trailRisk",
+          "wallRisk",
+          "win",
+          "wrongOrder"
+        ]
+      },
+      "latestObservation": {
+        "mode": "classic",
+        "planarMode": false,
+        "domainId": "classic-3d",
+        "controlProfileId": "legacy-v1:classic-3d",
+        "observationLength": 64,
+        "player": {
+          "index": 0,
+          "inventoryLength": 0
+        },
+        "observationContextKeys": [
+          "baseObservationLength",
+          "baseSchemaVersion",
+          "clearanceTrend",
+          "contractVersion",
+          "deadEndRisk",
+          "environmentProfile",
+          "exitQuality",
+          "gate",
+          "intentPriors",
+          "item",
+          "memory",
+          "observationLength",
+          "opponentPressure",
+          "portal",
+          "pressureTrend",
+          "recovery",
+          "recoveryAgeRatio",
+          "runtimeNear",
+          "schemaVersion",
+          "shieldBreakRisk",
+          "shieldDeficit",
+          "stepIndex",
+          "targetStability",
+          "threatHorizon"
+        ]
+      },
+      "latestReset": {
+        "episodeId": "bt91-headless-91",
+        "stepIndex": 0,
+        "done": false,
+        "truncated": false,
+        "domainId": "classic-3d",
+        "observationLength": 64,
+        "actionKeys": [],
+        "hasKernelRuntime": true,
+        "rewardBreakdownKeys": []
+      },
+      "latestStep": {
+        "episodeId": "bt91-headless-91",
+        "stepIndex": 100,
+        "done": false,
+        "truncated": true,
+        "domainId": "classic-3d",
+        "observationLength": 64,
+        "actionKeys": [
+          "boost",
+          "cameraSwitch",
+          "dropItem",
+          "nextItem",
+          "pitchDown",
+          "pitchUp",
+          "rollLeft",
+          "rollRight",
+          "shootItem",
+          "shootItemIndex",
+          "shootMG",
+          "useItem",
+          "yawLeft",
+          "yawRight"
+        ],
+        "hasKernelRuntime": true,
+        "rewardBreakdownKeys": [
+          "baseStep",
+          "checkpointReached",
+          "crash",
+          "damageDealt",
+          "damageTaken",
+          "external",
+          "itemPickup",
+          "itemUse",
+          "kill",
+          "loss",
+          "lowHealthThreat",
+          "opponentRisk",
+          "parcoursCompleted",
+          "stuck",
+          "survival",
+          "survivalPressureBonus",
+          "trailRisk",
+          "wallRisk",
+          "win",
+          "wrongOrder"
+        ]
+      },
+      "lastError": null
+    }
+  },
+  "transport": {
+    "reset": {
+      "type": "training-reset",
+      "delivered": true,
+      "stepIndex": 0,
+      "done": false,
+      "truncated": false,
+      "reward": 0,
+      "domainId": "classic-3d",
+      "observationLength": 64
+    },
+    "finalStep": {
+      "type": "training-step",
+      "delivered": true,
+      "stepIndex": 100,
+      "done": false,
+      "truncated": true,
+      "reward": 0,
+      "domainId": "classic-3d",
+      "observationLength": 64
+    },
+    "bridgeTelemetry": {
+      "requestsSent": 202,
+      "actionRequests": 100,
+      "trainingRequests": 101,
+      "commandRequests": 1,
+      "responsesReceived": 202,
+      "actionResponses": 100,
+      "ackResponses": 101,
+      "commandResponses": 1,
+      "retries": 0,
+      "timeouts": 0,
+      "failures": 4,
+      "fallbacks": 0,
+      "readyMessages": 1,
+      "latencySampleCount": 128,
+      "latencyMeanMs": 0.5390625,
+      "latencyP95Ms": 1,
+      "latencyMinMs": 0,
+      "latencyMaxMs": 14,
+      "lastLatencyMs": 1,
+      "learningReports": 101,
+      "learningUpdates": 0,
+      "lossSampleCount": 101,
+      "lossMean": 0,
+      "lossP95": 0,
+      "latestLoss": 0,
+      "epsilonSampleCount": 101,
+      "epsilonMean": 0,
+      "latestEpsilon": 0,
+      "replayFillSampleCount": 101,
+      "replayFillMean": 0,
+      "latestReplayFill": 0,
+      "maxOptimizerSteps": 100,
+      "maxPendingAcks": 32,
+      "backpressureThreshold": 16,
+      "backpressureDrops": 0,
+      "actionDrops": 0,
+      "actionSendSkipped": 0,
+      "ackEvictions": 0,
+      "lastFailure": "socket-closed",
+      "lastFallbackReason": null,
+      "pendingActionRequest": false,
+      "pendingAckCount": 0,
+      "pendingCommandCount": 0
+    }
+  },
+  "sampleSteps": [
+    {
+      "step": 1,
+      "action": {
+        "yawLeft": true,
+        "yawRight": false,
+        "boost": true
+      },
+      "transition": {
+        "type": "training-step",
+        "delivered": true,
+        "stepIndex": 1,
+        "done": false,
+        "truncated": false,
+        "reward": 0.12,
+        "domainId": "classic-3d",
+        "observationLength": 64
+      },
+      "ackLatencyMs": 5.775
+    },
+    {
+      "step": 50,
+      "action": {
+        "yawLeft": true,
+        "yawRight": false,
+        "boost": false
+      },
+      "transition": {
+        "type": "training-step",
+        "delivered": true,
+        "stepIndex": 50,
+        "done": false,
+        "truncated": false,
+        "reward": 0.12,
+        "domainId": "classic-3d",
+        "observationLength": 64
+      },
+      "ackLatencyMs": 14.246
+    },
+    {
+      "step": 100,
+      "action": {
+        "yawLeft": true,
+        "yawRight": false,
+        "boost": false
+      },
+      "transition": {
+        "type": "training-step",
+        "delivered": true,
+        "stepIndex": 100,
+        "done": false,
+        "truncated": true,
+        "reward": 0,
+        "domainId": "classic-3d",
+        "observationLength": 64
+      },
+      "ackLatencyMs": 16.884
+    }
+  ]
+}

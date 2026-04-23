@@ -5,16 +5,27 @@
 Du vertiefst BT104 im BT90-PPO-Zweitpfad.
 Der Block soll saubere externe Evidence liefern, aber keine produktive Umschaltung vorwegnehmen.
 
+## VORSTART / GATE
+
+Bevor du block-spezifisch arbeitest, lies zwingend:
+
+1. `docs/plaene/neu/BT90_GoldStandard/BT90_Followup_Tracker_2026-04-23.md`
+2. `docs/plaene/neu/BT90_GoldStandard/prompts/000_BT90_Followup_Loop.md`
+
+Wenn im Tracker ein hoeher priorisierter offener oder blockierter Punkt existiert, dessen Abhaengigkeiten bereits erfuellt sind, bearbeite nicht direkt BT104 weiter.
+Arbeite stattdessen den naechsten faelligen Tracker-Punkt ab, aktualisiere Status, `Wie erledigt`, Evidence und Verweise und gib danach wieder einen `NEXT_PROMPT` im selben Standard aus.
+
 ## KONTEXT (LIES IN DIESER REIHENFOLGE)
 
 ### Pflicht-Lektuere
 
-1. `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
-2. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md`
-3. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md`
-4. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
-5. `docs/bot-training/Bot_Trainingsplan.md`
-6. `docs/referenz/ai_architecture_context.md`
+1. `docs/plaene/neu/BT90_GoldStandard/BT90_Followup_Tracker_2026-04-23.md`
+2. `docs/plaene/neu/BT90_GoldStandard/BT_PPO_Migration_Masterplan.md`
+3. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md`
+4. `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md`
+5. `docs/plaene/neu/BT90_GoldStandard/offene_risiken.md`
+6. `docs/bot-training/Bot_Trainingsplan.md`
+7. `docs/referenz/ai_architecture_context.md`
 
 ### Optional bei Bedarf
 

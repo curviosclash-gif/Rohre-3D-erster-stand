@@ -51,11 +51,17 @@ import { MULTIPLAYER_TRANSPORTS } from './RuntimeSessionContract.js';
 import { normalizeString } from './ContractNormalizeUtils.js';
 import { mergeBrowserDemoSurfacePolicyWithOverride } from './BrowserDemoSurfacePolicyOverrideContract.js';
 
+/** @type {Set<string>} */
 const VALID_PRODUCT_SURFACE_IDS = new Set(Object.values(PLATFORM_PRODUCT_SURFACE_IDS));
+/** @type {Set<string>} */
 const VALID_RUNTIME_KINDS = new Set(Object.values(PLATFORM_RUNTIME_KINDS));
+/** @type {Set<string>} */
 const VALID_LOBBY_TRANSPORTS = new Set(Object.values(MULTIPLAYER_TRANSPORTS));
+/** @type {Set<string>} */
 const VALID_SURFACE_SESSION_TYPES = new Set(Object.values(PLATFORM_SURFACE_SESSION_TYPES));
+/** @type {Set<string>} */
 const VALID_SURFACE_MENU_MODE_PATHS = new Set(Object.values(PLATFORM_SURFACE_MENU_MODE_PATHS));
+/** @type {Set<string>} */
 const VALID_SURFACE_QUICK_START_ACTION_IDS = new Set(Object.values(PLATFORM_SURFACE_QUICK_START_ACTION_IDS));
 const BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS = Object.freeze({
     APPLIED: 'applied',
@@ -75,6 +81,7 @@ const BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES = Object.freeze({
     REJECTED: 'BROWSER_DEMO_OVERRIDE_REJECTED',
     VALIDATION_FAILED: 'BROWSER_DEMO_OVERRIDE_VALIDATION_FAILED',
 });
+/** @type {Set<string>} */
 const VALID_BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS = new Set(
     Object.values(BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS)
 );
@@ -93,6 +100,11 @@ function isPlainObject(value) {
     return proto === Object.prototype || proto === null;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeBrowserDemoOverrideDiagnosticStatus(
     value,
     fallback = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.REJECT
@@ -107,6 +119,26 @@ function sanitizeDiagnosticsCodeArray(values) {
     return sanitizeUniqueStringArray(values, normalizeString);
 }
 
+/**
+ * @param {{
+ *   status?: string,
+ *   reasonCode?: string,
+ *   reason?: string,
+ *   source?: string,
+ *   migrationCode?: string,
+ *   errorCodes?: readonly string[],
+ *   warningCodes?: readonly string[],
+ * }} [options]
+ * @returns {Readonly<{
+ *   status: string,
+ *   reasonCode: string,
+ *   reason: string,
+ *   source: string,
+ *   migrationCode: string,
+ *   errorCodes: readonly string[],
+ *   warningCodes: readonly string[],
+ * }>}
+ */
 function createBrowserDemoOverrideDiagnostics({
     status = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.SKIPPED,
     reasonCode = '',
@@ -222,6 +254,7 @@ function mapBrowserDemoMergeDiagnostics(mergeDiagnostics, source = 'none') {
     );
     const reason = normalizeString(mergeDiagnostics?.reason, '');
     const migrationCode = normalizeString(mergeDiagnostics?.migrationCode, '');
+    /** @type {string} */
     let reasonCode = BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_REASON_CODES.REJECTED;
 
     if (status === BROWSER_DEMO_OVERRIDE_DIAGNOSTIC_STATUS.APPLIED) {
@@ -304,6 +337,11 @@ function resolveSurfacePolicySource(options = {}) {
     });
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function normalizePlatformProductSurfaceId(
     value,
     fallback = PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO
@@ -312,23 +350,48 @@ export function normalizePlatformProductSurfaceId(
     return VALID_PRODUCT_SURFACE_IDS.has(normalized) ? normalized : fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function normalizePlatformRuntimeKind(value, fallback = PLATFORM_RUNTIME_KINDS.WEB) {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_RUNTIME_KINDS.has(normalized) ? normalized : fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function normalizeLobbyProviderTransport(value, fallback = MULTIPLAYER_TRANSPORTS.LAN) {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_LOBBY_TRANSPORTS.has(normalized) ? normalized : fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeSurfaceMenuModePath(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_SURFACE_MENU_MODE_PATHS.has(normalized) ? normalized : fallback;
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeSurfaceSessionType(value, fallback = '') { const normalized = normalizeString(value, '').toLowerCase(); return VALID_SURFACE_SESSION_TYPES.has(normalized) ? normalized : fallback; }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 function normalizeSurfaceQuickStartActionId(value, fallback = '') {
     const normalized = normalizeString(value, '').toLowerCase();
     return VALID_SURFACE_QUICK_START_ACTION_IDS.has(normalized) ? normalized : fallback;
@@ -691,6 +754,11 @@ export function isLegacyLobbyTransport(transport) {
     return normalized === MULTIPLAYER_TRANSPORTS.STORAGE_BRIDGE;
 }
 
+/**
+ * @param {unknown} transport
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function resolveLobbyProviderKind(
     transport,
     fallback = PLATFORM_PROVIDER_KINDS.MENU_LAN_LOBBY
@@ -719,6 +787,11 @@ export function resolveCapabilityProviderKind(capabilityId, options = {}) {
     return normalizeString(providerSpec, PLATFORM_PROVIDER_KINDS.UNAVAILABLE);
 }
 
+/**
+ * @param {string} [toolingId]
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function resolveToolingSurfaceId(
     toolingId = PLATFORM_TOOLING_IDS.DEFAULT,
     fallback = PLATFORM_PRODUCT_SURFACE_IDS.DESKTOP_APP

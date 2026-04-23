@@ -1,10 +1,32 @@
 # BT90 Implementierungs-README
 
-Stand: 2026-04-22
+Stand: 2026-04-23
 
 Dieses Dokument beschreibt, wie BT90 governance-sauber von einem Intake-Draft zu echter Umsetzung uebergeht.
 Es ist **kein** zweiter aktiver Masterplan.
 Die einzige aktive Quelle fuer Bot-Training bleibt `docs/bot-training/Bot_Trainingsplan.md`.
+
+## Verbindlicher Follow-up-Loop ab 2026-04-23
+
+Fuer Folgearbeit nach dem Audit vom 2026-04-23 gilt:
+
+- Zentrale Review-Arbeitsliste: `BT90_Followup_Tracker_2026-04-23.md`
+- Verbindlicher Loop-Startprompt: `prompts/000_BT90_Followup_Loop.md`
+- Jeder Folgeprompt arbeitet den naechsten sinnvollen offenen Punkt aus dem Tracker ab.
+- Erledigtes wird dort mit Status, Wie, Evidence und Verweisen eingetragen.
+
+Bis ein claimbarer Folgepfad hinter `BT92` sauber uebernommen ist, gilt:
+
+- kein Claim auf den alten Monolith `BT93`
+- kein `BT93B`-/`BT93C`-Claim ohne vorgelagertes `BT93A`
+- keine echte PPO-Baseline vor gruener Harness- und Scaffold-Lage
+- kein Weiterziehen in BT94/BT95 ohne `BT93C.99`
+
+Repo-Stand 2026-04-23:
+
+- `python/**` und `data/training/ppo/**` liegen im aktuellen Worktree bereits vor.
+- Laut `git status` und `git ls-files` sind diese Pfade derzeit aber noch nicht repo-versioniert.
+- Folgearbeit referenziert sie deshalb als lokalen PPO-Bauort, nicht als fehlenden oder bereits repo-versionierten Basispfad.
 
 ## Grundregel
 
@@ -23,16 +45,26 @@ Der erste reale Start soll klein und wahrheitsorientiert sein:
 1. `BT100.1` bis `BT100.2` als kleinsten Bootstrap- und Contract-Wahrheitskern schliessen.
 2. `BT100.3` bis `BT100.5` als separaten kleinen Folgeblock fuer Sidecar-Handshake und 1-Worker-100-Step-Lane ziehen.
 3. `BT101` nur in der Minimalspur `101.1` bis `101.3` anziehen.
-4. `BT101.4` bis `BT101.6` plus `BT102` erst nach gruener Single-Env-Lage und echtem Handover oeffnen.
+4. `BT93A` erst als reinen Mehr-Env-/Throughput-Harness ueber `BT101.4` bis `BT101.6` oeffnen.
+5. `BT93B` danach nur als minimalen PPO-Scaffold ueber `BT102.1` bis `BT102.3` oeffnen.
+6. `BT93C` erst fuer die echte konservative PPO-Baseline ueber `BT102.4` bis `BT102.6` nachziehen.
+
+Nach dem Audit vom 2026-04-23 reicht diese abstrakte Leiter allein aber nicht mehr.
+Vor weiterem BT93+-Scope muss zuerst der Follow-up-Tracker abgearbeitet werden:
+
+1. Repo-Wahrheit vs. Doku-Wahrheit herstellen.
+2. Lock-/Status- und Freshness-Widersprueche beseitigen.
+3. Freeze-/Evidence-Regeln haerten.
+4. Erst danach den Folgepfad `BT93A -> BT93B -> BT93C` oeffnen.
 
 ## Contract-Freeze vor dem ersten Claim
 
 Vor jedem aktiven Claim fuer `BT90`, `BT91` oder `BT92` zuerst:
 
 1. `docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md` lesen.
-2. Pruefen, ob `TrainingContractV1.js`, `TrainerPayloadAdapter.js`, `ObservationSchemaV2.js` und `BotActionContract.js` unveraendert zum Freeze-Stand sind.
-3. Pruefen, ob `TrainingDomain.js`, `RuntimeNearObservationAdapter.js`, `HybridDecisionArchitecture.js` oder `EpisodeController.js` seitdem relevante Semantik veraendert haben.
-4. Bei Drift zuerst den Snapshot neu auditieren, statt den Python-Pfad still anzupassen.
+2. `python/scripts/bt90_freeze_check.py` ausfuehren, zum Beispiel mit `python python/scripts/bt90_freeze_check.py` oder `.\python\.venv\Scripts\python.exe python/scripts/bt90_freeze_check.py`.
+3. Das lokale Artefakt `data/training/ppo/freeze_check.json` pruefen; nur `freezeOk=true` plus Exit-Code `0` zaehlen als gruene Freeze-Bestaetigung.
+4. Wenn `reAuditRequired=true` ist oder der Check mit Exit-Code `1` endet, zuerst den Snapshot neu auditieren, statt den Python-Pfad still anzupassen.
 
 Entscheidung zum Verhaeltnis mit `V101`:
 
@@ -66,7 +98,9 @@ Die Uebernahme sollte in vier kleine aktive BT-Bloecke geschnitten werden, nicht
 | `BT90` | `BT100.1` bis `BT100.2` | Python-Bootstrap-Minimum und JS-authoritative Contract-Wahrheit |
 | `BT91` | `BT100.3` bis `BT100.5` | Python-Sidecar-Handshake, Contract-Smoke und 1-Worker-100-Step-Lane |
 | `BT92` | `BT101.1` bis `BT101.3` | Observation-/Action-Authority, Single-Env und JS-authoritative Semantik |
-| `BT93` | `BT101.4` bis `BT101.6` + `BT102` | Mehr-Env-Folgepfad und konservative PPO-Baseline |
+| `BT93A` | `BT101.4` bis `BT101.6` | Mehr-Env-/Throughput-Harness ausserhalb der produktiven Runtime |
+| `BT93B` | `BT102.1` bis `BT102.3` | minimaler PPO-Baseline-Scaffold mit Smoke-, Checkpoint- und Resume-Kette |
+| `BT93C` | `BT102.4` bis `BT102.6` | konservative PPO-Baseline, DQN-Vorvergleich und reproduzierbarer Referenzlauf |
 | `BT94` | `BT103` + `BT104` | kleine Ablationsmatrix, Candidate Freeze, externe A/B-Evidence |
 | `BT95` | `BT105` | Integrations-Handoff und spaeterer Rollout-/Sunset-Intake |
 
@@ -82,6 +116,7 @@ So bleibt der Governance-Rahmen sauber:
 - Der erste aktive Block prueft nur die kleinste riskanteste Grundannahme zuerst.
 - Sidecar-Handshake, 100-Step-Lane und Single-Env werden nicht mehr in einen einzigen Startblock gepresst.
 - Schwache Spaetbloecke blockieren den Start nicht mehr.
+- der alte Monolith `BT93` wird durch `BT93A` bis `BT93C` ersetzt, bevor `BT94` oder `BT95` ueberhaupt claimbar werden.
 - `BT102` bis `BT105` koennen nach echten Daten statt Wunschannahmen nachgeschaerft werden.
 
 ## Konkrete Intake-Regel pro Stufe
@@ -140,6 +175,14 @@ Nicht in den ersten drei kleinen aktiven Startbloecke ziehen:
 - A/B-Promotion
 - Runtime-Handoff
 
+## Action-Festlegung fuer PPO nach BT92
+
+- `BT92` friert die rohe JS-authoritative Bool-/Index-Semantik ein; `python/envs/curvios_env.py` darf dafuer weiter die feste `257`er-Indexbreite fuer `shootItemIndex` und `useItem` spiegeln.
+- Diese Rohsurface ist nicht die spaetere PPO-Policy-Surface.
+- `BT93B` muss deshalb vor jedem `train.py`-/`eval.py`-Scaffold einen `Split-Head` pinnen: Bool-/Intent-Felder getrennt von `shootItemIndex` und `useItem`.
+- Eine `Action-Mask` aus `inventoryLength` bleibt optionales Hilfssignal, kein Ersatz fuer den `Split-Head`.
+- Sanitizer-Clamping/Neutralisierung aus `BotActionContract.js` bleibt Boundary-Schutz und darf nicht als still akzeptierte Lernsemantik eingeplant werden.
+
 ## Layer-sicherer Bauort fuer den PPO-Pfad
 
 Der neue PPO-Pfad wird bewusst **ausserhalb** der produktiven Runtime aufgebaut.
@@ -190,6 +233,7 @@ Wenn BT100 fuer Handshake oder Headless-Pfad doch produktive Runtime-Aenderungen
 ## Migrationsregel fuer BT102 bis BT105
 
 `BT102` bis `BT105` bleiben absichtlich beweglich, bis BT100/BT101 echte Daten geliefert haben.
+Operativ landet `BT102` nach `BTF-06` aber nicht mehr als ein einzelner Claim, sondern als `BT93B` (`102.1` bis `102.3`) und `BT93C` (`102.4` bis `102.6`).
 
 Das heisst:
 

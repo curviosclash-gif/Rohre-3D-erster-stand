@@ -113,7 +113,8 @@ export class BotAI {
 
         const botConfig = this.gameplayConfig.BOT;
         this._setDifficulty(options.difficulty || botConfig.ACTIVE_DIFFICULTY || botConfig.DEFAULT_DIFFICULTY || 'NORMAL');
-        this._checkStuckTimer = this.profile.stuckCheckInterval;
+        const stuckCheckProfile = this.profile || BOT_FALLBACK_DIFFICULTY_PROFILE;
+        this._checkStuckTimer = stuckCheckProfile.stuckCheckInterval;
     }
 
     _setDifficulty(profileName) {

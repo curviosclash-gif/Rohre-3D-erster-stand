@@ -9,12 +9,18 @@ export const DEFAULT_CAMERA_PERSPECTIVE_SETTINGS = Object.freeze({
     reduceMotion: true,
 });
 
+/** @type {Set<string>} */
 const VALID_CAMERA_PERSPECTIVE_MODE_SET = new Set(Object.values(CAMERA_PERSPECTIVE_MODE));
 
 function normalizeString(value) {
     return typeof value === 'string' ? value.trim().toLowerCase() : '';
 }
 
+/**
+ * @param {unknown} value
+ * @param {string} [fallback]
+ * @returns {string}
+ */
 export function normalizeCameraPerspectiveMode(value, fallback = DEFAULT_CAMERA_PERSPECTIVE_SETTINGS.normal) {
     const normalizedFallback = VALID_CAMERA_PERSPECTIVE_MODE_SET.has(fallback)
         ? fallback

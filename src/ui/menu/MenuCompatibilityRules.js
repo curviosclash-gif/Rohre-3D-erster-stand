@@ -77,8 +77,9 @@ const MENU_COMPATIBILITY_RULE_TRIGGER_KEYS = Object.freeze({
     ]),
 });
 
-function normalizeString(value) {
-    return typeof value === 'string' ? value.trim() : '';
+function normalizeString(value, fallback = '') {
+    const normalized = typeof value === 'string' ? value.trim() : '';
+    return normalized || fallback;
 }
 
 function addChangedKey(result, key) {
