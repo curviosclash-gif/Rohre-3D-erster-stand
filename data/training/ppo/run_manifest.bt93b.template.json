@@ -66,7 +66,7 @@
     ]
   },
   "actionSurface": {
-    "adapterId": "pending-93B.1.2",
+    "adapterId": "bt93b-split-head-v1",
     "splitHeadRequired": true,
     "booleanFields": [
       "pitchUp",
@@ -86,8 +86,13 @@
       "shootItemIndex",
       "useItem"
     ],
+    "indexHeadStrategy": "per-field-slot-head-with--1-as-no-op",
+    "optionalMaskSource": "player.inventoryLength",
+    "optionalMaskStatus": "available-but-not-required",
     "rawBoundarySurfaceOnly": true,
-    "trainingOnRawBoundarySurface": false
+    "trainingOnRawBoundarySurface": false,
+    "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+    "note": "BT93B pins split heads before any PPO scaffold trains against the BT92 boundary surface."
   },
   "normalization": {
     "status": "pending-93B.1.3",

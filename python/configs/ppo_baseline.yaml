@@ -56,7 +56,12 @@ matrix:
     - eval-smoke
 
 action_surface:
-  split_head_adapter: pending-93B.1.2
+  adapter_id: bt93b-split-head-v1
+  split_head_required: true
+  index_head_strategy: per-field-slot-head-with--1-as-no-op
+  optional_mask_source: player.inventoryLength
+  optional_mask_status: available-but-not-required
+  boundary_sanitizer: bridge.contract_v1.sanitize_action_payload
   training_on_raw_boundary_surface: false
 
 normalization:

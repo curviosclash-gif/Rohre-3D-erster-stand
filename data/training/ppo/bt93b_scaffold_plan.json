@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T23:11:00Z",
+  "generatedAt": "2026-04-23T23:14:05Z",
   "generatedBy": "python/scripts/bt93b_prepare_scaffold.py",
   "targetPhase": "93B.1.1",
   "sourceArtifacts": {
@@ -15,6 +15,11 @@
     "failureRate": 0.0,
     "timeoutRatePerRequest": 0.0,
     "memoryStable": true
+  },
+  "actionAdapter": {
+    "adapterId": "bt93b-split-head-v1",
+    "splitHeadRequired": true,
+    "status": "pinned-for-bt93b-scaffold"
   },
   "seedPack": {
     "globalSeed": 930,
@@ -76,7 +81,6 @@
   "manifestTemplatePath": "data\\training\\ppo\\run_manifest.bt93b.template.json",
   "configPath": "python\\configs\\ppo_baseline.yaml",
   "pendingPhasePins": {
-    "actionAdapter": "93B.1.2",
     "normalizationAndHeads": "93B.1.3"
   },
   "manifestTemplate": {
@@ -147,7 +151,7 @@
       ]
     },
     "actionSurface": {
-      "adapterId": "pending-93B.1.2",
+      "adapterId": "bt93b-split-head-v1",
       "splitHeadRequired": true,
       "booleanFields": [
         "pitchUp",
@@ -167,8 +171,13 @@
         "shootItemIndex",
         "useItem"
       ],
+      "indexHeadStrategy": "per-field-slot-head-with--1-as-no-op",
+      "optionalMaskSource": "player.inventoryLength",
+      "optionalMaskStatus": "available-but-not-required",
       "rawBoundarySurfaceOnly": true,
-      "trainingOnRawBoundarySurface": false
+      "trainingOnRawBoundarySurface": false,
+      "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+      "note": "BT93B pins split heads before any PPO scaffold trains against the BT92 boundary surface."
     },
     "normalization": {
       "status": "pending-93B.1.3",
@@ -180,5 +189,5 @@
       "note": "Actor/Critic head definitions stay explicit and separate from the raw BT92 boundary surface."
     }
   },
-  "nextPhase": "93B.1.2"
+  "nextPhase": "93B.1.3"
 }

@@ -3,12 +3,17 @@
 from __future__ import annotations
 
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
 PYTHON_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = PYTHON_ROOT.parent
+if str(PYTHON_ROOT) not in sys.path:
+    sys.path.insert(0, str(PYTHON_ROOT))
+
+from bridge.split_head_action import BT93B_SPLIT_HEAD_ADAPTER_ID, build_manifest_action_surface
 
 BT93A_HANDOVER_PATH = REPO_ROOT / "data" / "training" / "ppo" / "bt93a_handover_2env.json"
 BT93A_CLAIM_MANIFEST_PATH = REPO_ROOT / "data" / "training" / "ppo" / "bt93a_claim_manifest.json"
@@ -86,7 +91,7 @@ def _build_manifest_template(
 ) -> dict[str, Any]:
     measured_lane = handover["measuredLane"]
     scaffold_contract = handover["scaffoldContract"]
-    action_boundary = claim_manifest["splitHandover"]["bt92BoundarySurface"]
+    action_surface = build_manifest_action_surface()
 
     return {
         "templateVersion": "bt93b-scaffold-v1",
@@ -128,12 +133,7 @@ def _build_manifest_template(
             "runs": _build_scaffold_matrix(int(scaffold_contract["defaultStartEnvCount"])),
         },
         "actionSurface": {
-            "adapterId": "pending-93B.1.2",
-            "splitHeadRequired": True,
-            "booleanFields": list(action_boundary["booleanFields"]),
-            "indexFields": list(action_boundary["indexFields"]),
-            "rawBoundarySurfaceOnly": bool(action_boundary["rawIndexSurfaceOnly"]),
-            "trainingOnRawBoundarySurface": False,
+            **action_surface,
         },
         "normalization": {
             "status": "pending-93B.1.3",
@@ -153,6 +153,7 @@ def build_scaffold_plan() -> dict[str, Any]:
     rollout_example = _find_rollout_example(handover, TARGET_UPDATE_WINDOW_SECONDS)
     measured_lane = handover["measuredLane"]
     scaffold_contract = handover["scaffoldContract"]
+    split_head_requirement = claim_manifest["splitHandover"]["bt93bRequirement"]
 
     env_count = int(scaffold_contract["defaultStartEnvCount"])
     max_n_steps_per_env = int(rollout_example["maxNstepsAtValidatedLane"])
@@ -162,6 +163,8 @@ def build_scaffold_plan() -> dict[str, Any]:
 
     if env_count != 2:
         raise RuntimeError(f"BT93B expects the measured BT93A start lane to stay at 2 envs, got {env_count}.")
+    if split_head_requirement.get("splitHeadRequired") is not True:
+        raise RuntimeError("BT93B claim manifest drifted: split-head is no longer marked as required.")
     if selected_rollout_steps_total > measured_rollout_steps_total:
         raise RuntimeError("Selected scaffold rollout exceeds the measured BT93A lane budget.")
     if selected_rollout_steps_total % SELECTED_BATCH_SIZE != 0:
@@ -191,6 +194,11 @@ def build_scaffold_plan() -> dict[str, Any]:
             "failureRate": float(measured_lane["failureRate"]),
             "timeoutRatePerRequest": float(measured_lane["timeoutRatePerRequest"]),
             "memoryStable": bool(measured_lane["memoryStable"]),
+        },
+        "actionAdapter": {
+            "adapterId": BT93B_SPLIT_HEAD_ADAPTER_ID,
+            "splitHeadRequired": True,
+            "status": "pinned-for-bt93b-scaffold",
         },
         "seedPack": {
             "globalSeed": GLOBAL_SEED,
@@ -224,11 +232,10 @@ def build_scaffold_plan() -> dict[str, Any]:
         "manifestTemplatePath": str(BT93B_MANIFEST_TEMPLATE_PATH.relative_to(REPO_ROOT)),
         "configPath": str(BT93B_CONFIG_PATH.relative_to(REPO_ROOT)),
         "pendingPhasePins": {
-            "actionAdapter": "93B.1.2",
             "normalizationAndHeads": "93B.1.3",
         },
         "manifestTemplate": manifest_template,
-        "nextPhase": "93B.1.2",
+        "nextPhase": "93B.1.3",
     }
     return plan
 
@@ -237,6 +244,7 @@ def render_yaml_config(plan: dict[str, Any]) -> str:
     lane = plan["laneContract"]
     budget = plan["scaffoldBudget"]
     seeds = plan["seedPack"]
+    action_adapter = plan["actionAdapter"]
     lines = [
         "# BT93B conservative scaffold derived from measured BT93A 2-env evidence.",
         "block_id: BT93B",
@@ -294,7 +302,12 @@ def render_yaml_config(plan: dict[str, Any]) -> str:
         "    - eval-smoke",
         "",
         "action_surface:",
-        "  split_head_adapter: pending-93B.1.2",
+        f"  adapter_id: {action_adapter['adapterId']}",
+        "  split_head_required: true",
+        "  index_head_strategy: per-field-slot-head-with--1-as-no-op",
+        "  optional_mask_source: player.inventoryLength",
+        "  optional_mask_status: available-but-not-required",
+        "  boundary_sanitizer: bridge.contract_v1.sanitize_action_payload",
         "  training_on_raw_boundary_surface: false",
         "",
         "normalization:",
@@ -319,6 +332,7 @@ def main() -> None:
         "envCount": plan["laneContract"]["validatedEnvCount"],
         "selectedNstepsPerEnv": plan["scaffoldBudget"]["selectedNstepsPerEnv"],
         "selectedBatchSize": plan["scaffoldBudget"]["selectedBatchSize"],
+        "actionAdapterId": plan["actionAdapter"]["adapterId"],
         "matrixRunCount": len(plan["scaffoldMatrix"]),
         "nextPhase": plan["nextPhase"],
     }, indent=2))
