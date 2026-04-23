@@ -1,0 +1,78 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-23T21:06:03Z",
+  "generatedBy": "python/scripts/bt93a_2env_smoke.py --plan-only",
+  "scope": {
+    "phase": "93A.1.2",
+    "smallestClaimableLane": true,
+    "workerCount": 2,
+    "targetStepsPerEnv": 500,
+    "totalTargetSteps": 1000,
+    "ppoBaseline": false
+  },
+  "processModel": {
+    "envFactory": "CurviosEnv",
+    "controllerScript": "scripts/training-single-env-bridge.mjs",
+    "sidecarProcess": "Bt92ControlledBridgeSidecar",
+    "portStrategy": "dynamic localhost port per env via CurviosEnv._choose_local_port()",
+    "controllerTimeoutSeconds": 30.0,
+    "wallClockBudgetMinutes": 10,
+    "sessionIdPattern": "bt93a-2env-smoke-{envId}"
+  },
+  "restartBehavior": {
+    "perEnvLifecycle": "each worker owns one CurviosEnv and closes it deterministically after the lane run",
+    "rerunStrategy": "restart the affected env/controller/sidecar trio instead of reusing a failed process",
+    "fallbackLane": "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear"
+  },
+  "comparisonAnchor": {
+    "artifact": "data/training/ppo/throughput_analysis_btf08.json",
+    "realisticStepsPerSec1Worker": 28.0,
+    "maxWallClockMinutesBeforeDowngrade": 20.0
+  },
+  "actionBoundary": {
+    "booleanFields": [
+      "pitchUp",
+      "pitchDown",
+      "yawLeft",
+      "yawRight",
+      "rollLeft",
+      "rollRight",
+      "boost",
+      "cameraSwitch",
+      "dropItem",
+      "shootItem",
+      "shootMG",
+      "nextItem"
+    ],
+    "indexFields": [
+      "shootItemIndex",
+      "useItem"
+    ],
+    "rawIndexSurfaceOnly": true
+  },
+  "scopeGuardrails": {
+    "allowedBuildLocations": [
+      "python/bridge/**",
+      "python/envs/**",
+      "python/scripts/**",
+      "python/tests/**",
+      "data/training/ppo/**"
+    ],
+    "readOnlyRuntimeSurfaces": [
+      "src/state/HeadlessMatchKernelRuntime.js",
+      "src/core/MatchKernelTrainingAdapter.js",
+      "src/entities/ai/training/TrainingTransportFacade.js",
+      "src/entities/ai/training/WebSocketTrainerBridge.js",
+      "src/entities/ai/ObservationBridgePolicy.js",
+      "src/core/RuntimeConfig.js",
+      "src/entities/ai/BotPolicyRegistry.js",
+      "src/entities/ai/BotPolicyTypes.js",
+      "src/entities/ai/inference/LocalDqnInference.js",
+      "src/state/training/RewardCalculator.js",
+      "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
+      "src/state/MatchSessionFactory.js"
+    ],
+    "phaseBoundary": "BT93A documents harness, timeout, throughput and failure evidence only."
+  },
+  "pendingThroughputArtifact": "data\\training\\ppo\\lane_baseline_2env.json"
+}
