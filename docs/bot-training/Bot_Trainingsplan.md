@@ -130,7 +130,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-Codex | BT90 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
-| Bot-Codex | BT93A | 2026-04-23 | active | 93A.3 |
+| Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
 | - | BT93B | - | frei | wartet auf BT93A.99; minimaler PPO-Scaffold vor echter Baseline |
 | - | BT93C | - | frei | wartet auf BT93B.99; konservative Baseline und Vorvergleich |
 | - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
