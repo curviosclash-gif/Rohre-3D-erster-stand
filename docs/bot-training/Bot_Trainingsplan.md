@@ -130,7 +130,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-Codex | BT90 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
-| Bot-Codex | BT93A | 2026-04-23 | active | 93A.1.1 |
+| Bot-Codex | BT93A | 2026-04-23 | active | 93A.1.2 |
 | - | BT93B | - | frei | wartet auf BT93A.99; minimaler PPO-Scaffold vor echter Baseline |
 | - | BT93C | - | frei | wartet auf BT93B.99; konservative Baseline und Vorvergleich |
 | - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
@@ -925,7 +925,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 
 ### 93A.1 Harness-Scope und Lane-Start
 
-- [ ] 93A.1.1 Start erst nach gruener BT92-Single-Env-Lage, gruener Freeze-Bestaetigung, BTF-08-gruen und explizitem Split-Handover; der Block bleibt ausserhalb jeder PPO-Baseline-Arbeit.
+- [x] 93A.1.1 Start erst nach gruener BT92-Single-Env-Lage, gruener Freeze-Bestaetigung, BTF-08-gruen und explizitem Split-Handover; der Block bleibt ausserhalb jeder PPO-Baseline-Arbeit. (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_claim_manifest.py` -> `data/training/ppo/bt93a_claim_manifest.json` (`ok=true`, `nextSubPhase=93A.1.2`))
 - [ ] 93A.1.2 `2-Env` ist die kleinste Mehr-Env-Lane; Prozesse, Ports, Timeouts, Restart-Verhalten und Boundary-Grenzen werden artefaktbasiert dokumentiert, mit dem 1-Worker-Throughput-Anker aus `data/training/ppo/throughput_analysis_btf08.json` als Vergleichsbasis.
 - [ ] 93A.1.3 `4-Env` wird nur als optionaler Folgefall mit ehrlichem Downgrade geoeffnet; formale Imports, Draft-Zahlen oder Wunschzahlen zaehlen nicht als Lane-Nachweis.
 - [ ] 93A.1.4 Mathematische Herleitung der machbaren PPO-Batch-Size aus dem gemessenen Throughput dokumentieren [siehe PPO-ADR-001].
