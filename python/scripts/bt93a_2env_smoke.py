@@ -80,6 +80,13 @@ def build_lane_plan() -> dict[str, Any]:
                 MAX_WALL_CLOCK_BUDGET_MINUTES * MAX_WALL_CLOCK_MULTIPLIER_BEFORE_DOWNGRADE
             ),
         },
+        "fourEnvPolicy": {
+            "optionalFollowUpOnly": True,
+            "defaultStatus": "locked-until-measured-2env-evidence",
+            "minMeasured2EnvStepsPerSec": FOUR_ENV_MIN_STEPS_PER_SEC,
+            "maxMeasured2EnvFailureRate": FOUR_ENV_MAX_FAILURE_RATE,
+            "downgradeRule": "Without measured 2-env evidence, BT93A stays on 2-env or the sequential fallback lane.",
+        },
         "actionBoundary": {
             "booleanFields": ACTION_BOOLEAN_FIELDS,
             "indexFields": ACTION_INDEX_FIELDS,
@@ -218,7 +225,7 @@ def main() -> None:
             "ok": True,
             "artifact": str(LANE_PLAN_PATH.relative_to(REPO_ROOT)),
             "workerCount": artifact["scope"]["workerCount"],
-            "nextPhase": "93A.1.3",
+            "nextPhase": "93A.1.4",
         }, indent=2))
         return
 

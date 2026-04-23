@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T21:06:03Z",
+  "generatedAt": "2026-04-23T21:08:02Z",
   "generatedBy": "python/scripts/bt93a_2env_smoke.py --plan-only",
   "scope": {
     "phase": "93A.1.2",
@@ -28,6 +28,13 @@
     "artifact": "data/training/ppo/throughput_analysis_btf08.json",
     "realisticStepsPerSec1Worker": 28.0,
     "maxWallClockMinutesBeforeDowngrade": 20.0
+  },
+  "fourEnvPolicy": {
+    "optionalFollowUpOnly": true,
+    "defaultStatus": "locked-until-measured-2env-evidence",
+    "minMeasured2EnvStepsPerSec": 45.0,
+    "maxMeasured2EnvFailureRate": 0.02,
+    "downgradeRule": "Without measured 2-env evidence, BT93A stays on 2-env or the sequential fallback lane."
   },
   "actionBoundary": {
     "booleanFields": [
