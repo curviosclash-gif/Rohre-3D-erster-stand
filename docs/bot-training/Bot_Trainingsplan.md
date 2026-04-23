@@ -987,7 +987,7 @@ Claim-Grenze:
 
 ### 93B.1 Baseline-Config und Run-Manifest
 
-- [ ] 93B.1.1 Konservative PPO-Config und Manifest-Struktur definieren (Seeds, Matrix, Env-Anzahl).
+- [x] 93B.1.1 Konservative PPO-Config und Manifest-Struktur definieren (Seeds, Matrix, Env-Anzahl). (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93b_prepare_scaffold.py` -> `python/configs/ppo_baseline.yaml`, `data/training/ppo/run_manifest.bt93b.template.json`, `data/training/ppo/bt93b_scaffold_plan.json` (`envCount=2`, `selectedNstepsPerEnv=384`, `selectedBatchSize=128`, `matrixRunCount=3`, `fourEnvForScaffold=locked`))
 - [ ] 93B.1.2 Run-Manifest und Action-Adapter (`Split-Head`) fuer den Scaffold explizit festziehen.
 - [ ] 93B.1.3 Explizite Integration einer State-Normalization-Pipeline (z.B. `VecNormalize`) und Definition der Actor/Critic-Heads [siehe PPO-ADR-002].
 
