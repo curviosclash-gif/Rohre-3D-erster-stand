@@ -1,0 +1,93 @@
+{
+  "ok": true,
+  "generatedBy": "python/scripts/bt93a_claim_manifest.py",
+  "claimInputs": {
+    "bt92SingleEnv": {
+      "artifact": "data\\training\\ppo\\single_env_smoke.json",
+      "ok": true,
+      "workerCount": 1,
+      "multiEnv": false,
+      "vecEnv": false,
+      "ppoBaseline": false,
+      "observationSchemaVersion": "v2-runtime-near",
+      "observationLength": 64
+    },
+    "freezeCheck": {
+      "artifact": "data\\training\\ppo\\freeze_check.json",
+      "freezeOk": true,
+      "snapshotCommit": "4a9962a6cb096f5895a451c7b1276564f3d4ffa6",
+      "reason": "All authority and adjacent files still match the BT90 snapshot commit."
+    },
+    "throughputAnchor": {
+      "artifact": "data\\training\\ppo\\throughput_analysis_btf08.json",
+      "btfItem": "BTF-08",
+      "realisticStepsPerSec1Worker": 28,
+      "twoEnvSmokeSteps": 100,
+      "twoEnvHarnessSteps": 500,
+      "twoEnvMaxWallClockBudgetMin": 10
+    }
+  },
+  "splitHandover": {
+    "bt92BoundarySurface": {
+      "booleanFields": [
+        "pitchUp",
+        "pitchDown",
+        "yawLeft",
+        "yawRight",
+        "rollLeft",
+        "rollRight",
+        "boost",
+        "cameraSwitch",
+        "dropItem",
+        "shootItem",
+        "shootMG",
+        "nextItem"
+      ],
+      "indexFields": [
+        "shootItemIndex",
+        "useItem"
+      ],
+      "rawIndexSurfaceOnly": true,
+      "note": "CurviosEnv keeps the JS-authoritative bool/index boundary for harness work only."
+    },
+    "bt93aScope": {
+      "harnessOnly": true,
+      "ppoBaseline": false,
+      "trainPy": false,
+      "evalPy": false
+    },
+    "bt93bRequirement": {
+      "splitHeadRequired": true,
+      "note": "BT93B must introduce a split-head before any PPO scaffold trains on actions."
+    }
+  },
+  "scopeGuardrails": {
+    "allowedBuildLocations": [
+      "python/bridge/**",
+      "python/envs/**",
+      "python/scripts/**",
+      "python/tests/**",
+      "data/training/ppo/**"
+    ],
+    "readOnlyRuntimeSurfaces": [
+      "src/state/HeadlessMatchKernelRuntime.js",
+      "src/core/MatchKernelTrainingAdapter.js",
+      "src/entities/ai/training/TrainingTransportFacade.js",
+      "src/entities/ai/training/WebSocketTrainerBridge.js",
+      "src/entities/ai/ObservationBridgePolicy.js",
+      "src/core/RuntimeConfig.js",
+      "src/entities/ai/BotPolicyRegistry.js",
+      "src/entities/ai/BotPolicyTypes.js",
+      "src/entities/ai/inference/LocalDqnInference.js",
+      "src/state/training/RewardCalculator.js",
+      "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
+      "src/state/MatchSessionFactory.js"
+    ],
+    "phaseBoundary": "BT93A stays on harness, throughput, timeout and failure evidence only."
+  },
+  "pendingVerification": {
+    "deferredPhase": "93A.2",
+    "deferredReason": "Multi-env smoke execution stays deferred until the throughput/failure phase."
+  },
+  "nextSubPhase": "93A.1.2"
+}
