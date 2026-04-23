@@ -932,7 +932,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 
 ### 93A.2 Throughput-, Timeout- und Failure-Artefakte
 
-- [ ] 93A.2.1 Mehr-Env-/VecEnv-Smokes liefern reproduzierbare Daten zu Env-Anzahl, Wall-Clock-Throughput, Reset-/Timeout-Rate und Failure-Klassen; Ergebnis unter `data/training/ppo/lane_baseline_2env.json` (oder gleichwertigem Artefakt).
+- [x] 93A.2.1 Mehr-Env-/VecEnv-Smokes liefern reproduzierbare Daten zu Env-Anzahl, Wall-Clock-Throughput, Reset-/Timeout-Rate und Failure-Klassen; Ergebnis unter `data/training/ppo/lane_baseline_2env.json` (oder gleichwertigem Artefakt). (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json` (`stepsPerSecond=60.24846827863641`, `resetRatePerEnv=1.0`, `timeoutRatePerRequest=0.0`, `truncatedReasons.max-steps=2`))
 - [ ] 93A.2.2 Python-seitiges Memory-Usage-Tracking implementieren und auf Memory-Leaks bei laengeren Smoke-Runs ueberpruefen [siehe PPO-ADR-003].
 - [ ] 93A.2.3 Der Handover an den PPO-Scaffold pinnt gemessene Step-Rate, zulassige Env-Anzahl und harte Downgrade-Regeln aus dem Harness-Artefakt statt aus textuellen Annahmen.
 - [ ] 93A.2.4 Offene Harness-Risiken bleiben sichtbar; fehlende `4-Env`-Tragfaehigkeit gilt als dokumentierter Restpunkt statt als stiller Erfolg; sequenzielle Fallback-Lane als Alternative pinnen wenn Subproc instabil.
