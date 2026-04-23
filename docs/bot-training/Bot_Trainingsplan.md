@@ -913,15 +913,15 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Mindestens eine artefaktbasierte `2-Env`-Lane ist ausserhalb der produktiven Runtime dokumentiert.
-- [ ] DoD.2 Wall-Clock-Throughput, Reset-/Timeout-Rate, Restart-Verhalten und Failure-Klassen sind fuer `2-Env` reproduzierbar festgehalten.
-- [ ] DoD.3 `4-Env` ist nur bei tragender Evidence freigegeben (>= 45 Steps/s bei 2-Env UND failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen.
-- [ ] DoD.4 `BT93A` oeffnet weder `python/train.py`/`python/eval.py` noch eine echte PPO-Baseline.
-- [ ] DoD.5 Der Handover-Artefakt pinnt die gemessene Step-Rate, Env-Anzahl und Downgrade-Entscheid artefaktbasiert als Pflichteingang fuer `BT93B`.
-- [ ] DoD.6 Die in BTF-11 identifizierte Code-Duplikation ist aufgeloest und die Trainingslogik konsolidiert.
-- [ ] DoD.7 Die PPO-Batch-Size Mathematik ist zwingend aus dem gemessenen Throughput herzuleiten, um realistische Update-Frequenzen nachzuweisen [siehe PPO-ADR-001].
-- [ ] DoD.8 Die Überwachung auf Memory-Leaks während der Smoke-Runs ist als hartes Kriterium integriert [siehe PPO-ADR-003].
-- [ ] DoD.9 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [x] DoD.1 Mindestens eine artefaktbasierte `2-Env`-Lane ist ausserhalb der produktiven Runtime dokumentiert. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json`, `data/training/ppo/bt93a_handover_2env.json` (`validatedEnvCount=2`, `stepsPerSecond=58.740111449952536`, `failureRate=0.0`, `memoryStable=true`))
+- [x] DoD.2 Wall-Clock-Throughput, Reset-/Timeout-Rate, Restart-Verhalten und Failure-Klassen sind fuer `2-Env` reproduzierbar festgehalten. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py --plan-only` -> `data/training/ppo/bt93a_lane_plan.json` (`restartBehavior.fallbackLaneSpec.laneType=sequential-2env-fallback`); `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json` (`wallClockSeconds=17.024142026901245`, `resetRatePerEnv=1.0`, `timeoutRatePerRequest=0.0`, `failureClasses={}`))
+- [x] DoD.3 `4-Env` ist nur bei tragender Evidence freigegeben (>= 45 Steps/s bei 2-Env UND failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/bt93a_handover_2env.json` (`stepsPerSecond=58.740111449952536`, `failureRate=0.0`, `fourEnvStatus=eligible-from-2env-thresholds-not-yet-measured`, `openHarnessRisks[0].currentState=thresholds-met-but-direct-4env-evidence-missing`))
+- [x] DoD.4 `BT93A` oeffnet weder `python/train.py`/`python/eval.py` noch eine echte PPO-Baseline. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py --plan-only` -> `data/training/ppo/bt93a_lane_plan.json` (`scope.ppoBaseline=false`, `scopeGuardrails.phaseBoundary=BT93A documents harness, timeout, throughput and failure evidence only.`))
+- [x] DoD.5 Der Handover-Artefakt pinnt die gemessene Step-Rate, Env-Anzahl und Downgrade-Entscheid artefaktbasiert als Pflichteingang fuer `BT93B`. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/bt93a_handover_2env.json` (`defaultStartEnvCount=2`, `maxValidatedEnvCount=2`, `currentDowngradeDecision=stay-on-validated-2env-lane`))
+- [x] DoD.6 Die in BTF-11 identifizierte Code-Duplikation ist aufgeloest und die Trainingslogik konsolidiert. (abgeschlossen: 2026-04-24; evidence: `git show --stat --oneline 9653ef5` -> commit `9653ef5`; `node --check scripts/training-headless-lane-runner.mjs`, `node --check scripts/training-single-env-bridge.mjs`, `node --check scripts/training-headless-bridge-smoke.mjs` -> Shared `HeadlessBoundaryController` parsebar)
+- [x] DoD.7 Die PPO-Batch-Size Mathematik ist zwingend aus dem gemessenen Throughput herzuleiten, um realistische Update-Frequenzen nachzuweisen [siehe PPO-ADR-001]. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/bt93a_handover_2env.json` (`rolloutBudgetDerivation.examples` fuer `15s`, `30s`, `60s` aus `measuredLane.stepsPerSecond`))
+- [x] DoD.8 Die Ueberwachung auf Memory-Leaks waehrend der Smoke-Runs ist als hartes Kriterium integriert [siehe PPO-ADR-003]. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json` (`memory.leakCheck.memoryStable=true`, `memory.pythonProcess.rssMB.deltaMB=4.613`, `memory.tracemalloc.currentMB.deltaMB=1.114`, `memory.controllerProcesses.cleanupSettled=true`))
+- [x] DoD.9 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS. (abgeschlossen: 2026-04-24; evidence: `npm.cmd run gates:pre-commit` -> PASS (`plan:check`, `docs:sync`, `docs:check`); `npm.cmd run build` -> PASS)
 
 ### 93A.1 Harness-Scope und Lane-Start
 
@@ -945,7 +945,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 ### 93A.99 Abschluss-Gate
 
 - [x] 93A.99.1 Alle Phasen 93A.1 bis 93A.3 sind mit Evidence dokumentiert. (abgeschlossen: 2026-04-24; evidence: `$count = (Select-String -Path docs/bot-training/Bot_Trainingsplan.md -Pattern '\[x\]\s+93A\.[123]\.\d').Count; Write-Output ('completed_phase_items=' + $count)` -> `completed_phase_items=10`)
-- [ ] 93A.99.2 Es existiert mindestens eine stabile `2-Env`-Lane mit gemessenem Throughput-Artefakt; `4-Env` ist nur bei tragender Evidenz freigegeben (Schwelle: >= 45 Steps/s, failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen.
+- [x] 93A.99.2 Es existiert mindestens eine stabile `2-Env`-Lane mit gemessenem Throughput-Artefakt; `4-Env` ist nur bei tragender Evidenz freigegeben (Schwelle: >= 45 Steps/s, failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json`, `data/training/ppo/bt93a_handover_2env.json` (`validatedEnvCount=2`, `stepsPerSecond=58.740111449952536`, `failureRate=0.0`, `fourEnvStatus=eligible-from-2env-thresholds-not-yet-measured`))
 
 ### Risiko-Register BT93A
 
