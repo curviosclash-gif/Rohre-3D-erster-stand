@@ -1,8 +1,20 @@
+import { WebSocket } from 'ws';
+
+import { createRuntimeConfigSnapshot } from '../src/core/RuntimeConfig.js';
+import {
+    createHeadlessMatchKernelRuntime,
+    MATCH_KERNEL_HEADLESS_RUNTIME_CONTRACT_VERSION,
+} from '../src/state/HeadlessMatchKernelRuntime.js';
+import {
+    createMatchKernelTrainingAdapter,
+    MATCH_KERNEL_TRAINING_ADAPTER_CONTRACT_VERSION,
+} from '../src/core/MatchKernelTrainingAdapter.js';
+import { TrainingTransportFacade } from '../src/entities/ai/training/TrainingTransportFacade.js';
+import { WebSocketTrainerBridge } from '../src/entities/ai/training/WebSocketTrainerBridge.js';
 import {
     MATCH_KERNEL_FIXED_STEP_SECONDS,
     MATCH_KERNEL_SURFACES,
 } from '../src/shared/contracts/MatchKernelRuntimeContract.js';
-import { MATCH_KERNEL_HEADLESS_RUNTIME_CONTRACT_VERSION } from '../src/state/HeadlessMatchKernelRuntime.js';
 import { buildTrainerRuntimeObservationPayload } from '../src/entities/ai/training/TrainerPayloadAdapter.js';
 import {
     buildTrainingResetContract,
@@ -19,11 +31,34 @@ const DEFAULT_ENVIRONMENT_PROFILE = 'runtime-near';
 const DEFAULT_LANE_WORKER_COUNT = 1;
 const DEFAULT_MAX_STEPS = 100;
 const DEFAULT_SEED = 91;
+const DEFAULT_PORT = 9765;
+const DEFAULT_SESSION_ID = 'bt92-single-env';
+const DEFAULT_ACTION_TIMEOUT_MS = 2_000;
+const DEFAULT_ACK_TIMEOUT_MS = 2_000;
+const DEFAULT_BRIDGE_READY_TIMEOUT_MS = 8_000;
+const DEFAULT_STATS_TIMEOUT_MS = 2_000;
+
+if (typeof globalThis.WebSocket !== 'function') {
+    globalThis.WebSocket = WebSocket;
+}
 
 function assert(condition, message) {
     if (!condition) {
         throw new Error(message);
     }
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function round(value, digits = 3) {
+    const numeric = Number(value);
+    if (!Number.isFinite(numeric)) {
+        return null;
+    }
+    const factor = 10 ** digits;
+    return Math.round(numeric * factor) / factor;
 }
 
 function createPlayerSnapshot(player) {
@@ -37,6 +72,96 @@ function createPlayerSnapshot(player) {
         inventoryLength: Array.isArray(player?.inventory) ? player.inventory.length : 0,
         alive: player?.alive !== false,
     };
+}
+
+function createSmokeSettings() {
+    return {
+        localSettings: {
+            modePath: 'normal',
+            sessionType: 'single',
+        },
+        mode: '1p',
+        mapKey: 'standard',
+        gameMode: 'CLASSIC',
+        numBots: 1,
+        winsNeeded: 3,
+        botDifficulty: 'NORMAL',
+        gameplay: {
+            planarMode: false,
+        },
+        portalsEnabled: false,
+    };
+}
+
+async function waitForLatestAction(bridge, timeoutMs = DEFAULT_ACTION_TIMEOUT_MS) {
+    const startedAt = performance.now();
+    let latestFailure = null;
+    while ((performance.now() - startedAt) < timeoutMs) {
+        const action = bridge.consumeLatestAction?.();
+        if (action && typeof action === 'object') {
+            return {
+                action,
+                latencyMs: round(performance.now() - startedAt),
+            };
+        }
+        const failure = bridge.consumeFailure?.();
+        if (failure) {
+            latestFailure = failure;
+        }
+        await sleep(5);
+    }
+    throw new Error(`timed out waiting for bot-action-response${latestFailure ? ` (${latestFailure})` : ''}`);
+}
+
+async function waitForTrainingAck(bridge, label, timeoutMs = DEFAULT_ACK_TIMEOUT_MS) {
+    const startedAt = performance.now();
+    let latestFailure = null;
+    while ((performance.now() - startedAt) < timeoutMs) {
+        const response = bridge.consumeLatestResponse?.();
+        if (response?.type === 'trainer-ready') {
+            continue;
+        }
+        if (response?.ok === true && (response?.type === 'training-ack' || response?.type === label)) {
+            return {
+                response,
+                latencyMs: round(performance.now() - startedAt),
+            };
+        }
+        if (response?.ok === false) {
+            throw new Error(`${label} rejected by sidecar: ${response.error || response.type || 'unknown-error'}`);
+        }
+        const failure = bridge.consumeFailure?.();
+        if (failure) {
+            latestFailure = failure;
+        }
+        await sleep(5);
+    }
+    throw new Error(`timed out waiting for ${label} ack${latestFailure ? ` (${latestFailure})` : ''}`);
+}
+
+function drainBridge(bridge) {
+    while (bridge.consumeLatestAction?.()) {
+        // drain
+    }
+    while (bridge.consumeLatestResponse?.()) {
+        // drain
+    }
+    while (bridge.consumeFailure?.()) {
+        // drain
+    }
+}
+
+async function waitForSidecarReady(bridge, timeoutMs = DEFAULT_BRIDGE_READY_TIMEOUT_MS) {
+    const startedAt = performance.now();
+    while ((performance.now() - startedAt) < timeoutMs) {
+        const remainingMs = Math.max(50, Math.trunc(timeoutMs - (performance.now() - startedAt)));
+        const ready = await bridge.waitForReady(Math.min(600, remainingMs));
+        if (ready === true) {
+            return true;
+        }
+        await sleep(120);
+    }
+    return false;
 }
 
 export class HeadlessLaneStepRunner {
@@ -256,5 +381,141 @@ export class HeadlessLaneStepRunner {
                 },
             },
         });
+    }
+}
+
+export class HeadlessBoundaryController {
+    constructor(options = {}) {
+        this.options = {
+            port: Number(options.port ?? DEFAULT_PORT),
+            maxSteps: Number(options.maxSteps ?? DEFAULT_MAX_STEPS),
+            seed: Number(options.seed ?? DEFAULT_SEED),
+            sessionId: String(options.sessionId || DEFAULT_SESSION_ID),
+            episodeIdPrefix: String(options.episodeIdPrefix || 'headless-lane'),
+            environmentProfile: String(options.environmentProfile || DEFAULT_ENVIRONMENT_PROFILE),
+            laneWorkerCount: Math.max(1, Number(options.laneWorkerCount ?? DEFAULT_LANE_WORKER_COUNT)),
+        };
+        this.readyPayload = null;
+        this.settings = null;
+        this.runtime = null;
+        this.runtimeConfig = null;
+        this.bridge = null;
+        this.trainingAdapter = null;
+        this.facade = null;
+        this.stepRunner = null;
+    }
+
+    async initialize() {
+        this.bridge = new WebSocketTrainerBridge({
+            enabled: true,
+            url: `ws://127.0.0.1:${this.options.port}`,
+            timeoutMs: 250,
+            maxRetries: 0,
+            retryDelayMs: 0,
+            requireReadyMessage: true,
+            maxPendingAcks: 32,
+            backpressureThreshold: 16,
+        });
+        const bridgeReady = await waitForSidecarReady(this.bridge, DEFAULT_BRIDGE_READY_TIMEOUT_MS);
+        assert(bridgeReady === true, 'sidecar ready handshake failed');
+        this.readyPayload = this.bridge.consumeLatestReadyPayload?.() || this.bridge.consumeLatestResponse?.() || null;
+
+        this.settings = createSmokeSettings();
+        this.runtimeConfig = createRuntimeConfigSnapshot(this.settings);
+        this.runtime = await Promise.resolve(createHeadlessMatchKernelRuntime({
+            settings: this.settings,
+            runtimeConfig: this.runtimeConfig,
+            requestedMapKey: this.runtimeConfig?.session?.mapKey,
+            profile: {
+                sessionId: this.options.sessionId,
+                fixedStepSeconds: MATCH_KERNEL_FIXED_STEP_SECONDS,
+                deterministic: true,
+            },
+        }));
+        this.trainingAdapter = createMatchKernelTrainingAdapter({
+            headlessRuntime: this.runtime,
+        });
+        this.stepRunner = new HeadlessLaneStepRunner({
+            runtime: this.runtime,
+            trainingAdapter: this.trainingAdapter,
+            runtimeConfig: this.runtimeConfig,
+            settings: this.settings,
+            maxSteps: this.options.maxSteps,
+            seed: this.options.seed,
+            episodeIdPrefix: this.options.episodeIdPrefix,
+            environmentProfile: this.options.environmentProfile,
+            laneWorkerCount: this.options.laneWorkerCount,
+        });
+        this.facade = new TrainingTransportFacade({
+            bridge: this.bridge,
+            stepRunner: this.stepRunner,
+            kernelProfile: this.runtime.getConsumerDescriptors?.()?.training?.profile || {
+                matchId: this.runtime.session?.effectiveMapKey || this.runtimeConfig?.session?.mapKey || 'standard',
+                modeId: this.runtime.session?.entityManager?.activeGameMode || this.runtimeConfig?.session?.activeGameMode || 'CLASSIC',
+            },
+        });
+    }
+
+    async reset() {
+        drainBridge(this.bridge);
+        const packet = this.facade.reset();
+        const ack = await waitForTrainingAck(this.bridge, 'training-reset');
+        return {
+            ok: true,
+            command: 'reset',
+            ackLatencyMs: ack.latencyMs,
+            packet,
+        };
+    }
+
+    async step() {
+        drainBridge(this.bridge);
+        this.bridge.submitObservation(this.stepRunner.buildActionRequestPayload());
+        const actionResponse = await waitForLatestAction(this.bridge);
+        const packet = this.facade.step({
+            action: actionResponse.action,
+        });
+        const ack = await waitForTrainingAck(this.bridge, 'training-step');
+        return {
+            ok: true,
+            command: 'step',
+            actionLatencyMs: actionResponse.latencyMs,
+            ackLatencyMs: ack.latencyMs,
+            resolvedAction: actionResponse.action,
+            packet,
+        };
+    }
+
+    async stats() {
+        const stats = await this.bridge.submitCommand('trainer-stats-request', {}, {
+            timeoutMs: DEFAULT_STATS_TIMEOUT_MS,
+        });
+        return {
+            ok: true,
+            command: 'stats',
+            stats,
+            bridgeTelemetry: this.bridge.getTelemetrySnapshot?.() || null,
+            runtime: {
+                headlessRuntimeContractVersion: MATCH_KERNEL_HEADLESS_RUNTIME_CONTRACT_VERSION,
+                trainingAdapterContractVersion: MATCH_KERNEL_TRAINING_ADAPTER_CONTRACT_VERSION,
+                surface: this.runtime.getConsumerDescriptors?.()?.training?.profile?.surface || MATCH_KERNEL_SURFACES.HEADLESS,
+            },
+        };
+    }
+
+    async close() {
+        this.bridge?.close?.();
+        this.trainingAdapter?.dispose?.();
+        this.bridge = null;
+        this.trainingAdapter = null;
+        this.facade = null;
+        this.stepRunner = null;
+        this.runtime = null;
+        this.runtimeConfig = null;
+        this.settings = null;
+        return {
+            ok: true,
+            command: 'close',
+        };
     }
 }
