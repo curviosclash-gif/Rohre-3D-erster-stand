@@ -1,0 +1,64 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-23T22:04:21Z",
+  "generatedBy": "python/scripts/bt93a_2env_smoke.py --handover-only",
+  "targetBlock": "BT93B",
+  "sourceArtifact": "data\\training\\ppo\\lane_baseline_2env.json",
+  "sourcePhase": "93A.2",
+  "measuredLane": {
+    "validatedEnvCount": 2,
+    "stepsPerSecond": 59.347422348627816,
+    "failureRate": 0.0,
+    "wallClockSeconds": 16.849931478500366,
+    "timeoutRatePerRequest": 0.0,
+    "memoryStable": true,
+    "totalFailures": 0
+  },
+  "scaffoldContract": {
+    "defaultStartEnvCount": 2,
+    "maxValidatedEnvCount": 2,
+    "requiredMeasuredArtifactForBt93B": "data\\training\\ppo\\lane_baseline_2env.json",
+    "requiredHandoverArtifactForBt93B": "data\\training\\ppo\\bt93a_handover_2env.json",
+    "rule": "BT93B starts on the smallest validated lane. 4-env remains optional follow-up only.",
+    "fourEnvStatus": "eligible-from-2env-thresholds-not-yet-measured"
+  },
+  "rolloutBudgetDerivation": {
+    "formula": "max_rollout_steps_total = measured_lane_steps_per_second * target_update_window_seconds",
+    "rule": "BT93B rollout sizes must come from this measured 2-env artifact, never from draft numbers.",
+    "examples": [
+      {
+        "targetUpdateWindowSeconds": 15,
+        "maxRolloutStepsTotalAtMeasuredLane": 890,
+        "maxNstepsAtValidatedLane": 445
+      },
+      {
+        "targetUpdateWindowSeconds": 30,
+        "maxRolloutStepsTotalAtMeasuredLane": 1780,
+        "maxNstepsAtValidatedLane": 890
+      },
+      {
+        "targetUpdateWindowSeconds": 60,
+        "maxRolloutStepsTotalAtMeasuredLane": 3561,
+        "maxNstepsAtValidatedLane": 1780
+      }
+    ]
+  },
+  "downgradeRules": {
+    "laneDowngradeTriggers": [
+      "measured 2-env stepsPerSecond < 28.0",
+      "failureRate > 0.05",
+      "wallClockSeconds > 1200.0",
+      "memory.leakCheck.memoryStable == false",
+      "timeoutRatePerRequest > 0 OR bridgeRequestsSent != bridgeResponsesReceived"
+    ],
+    "fourEnvUnlockCriteria": [
+      "measured 2-env stepsPerSecond >= 45.0",
+      "failureRate <= 0.02",
+      "downgradeCheck.downgraded == false",
+      "4-env remains a follow-up lane until fresh direct evidence exists"
+    ],
+    "currentDowngradeDecision": "stay-on-validated-2env-lane",
+    "sequentialFallbackLane": "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
+    "currentReasons": []
+  }
+}

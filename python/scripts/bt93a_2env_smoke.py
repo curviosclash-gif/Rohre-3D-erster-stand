@@ -31,6 +31,7 @@ from envs.curvios_env import CurviosEnv, DEFAULT_COMMAND_TIMEOUT_SECONDS  # noqa
 
 ARTIFACT_PATH = REPO_ROOT / "data" / "training" / "ppo" / "lane_baseline_2env.json"
 LANE_PLAN_PATH = REPO_ROOT / "data" / "training" / "ppo" / "bt93a_lane_plan.json"
+HANDOVER_PATH = REPO_ROOT / "data" / "training" / "ppo" / "bt93a_handover_2env.json"
 WORKER_COUNT = 2
 TARGET_STEPS_PER_ENV = 500
 ONE_WORKER_BASELINE_STEPS_PER_SEC = 28.0
@@ -71,6 +72,10 @@ def _utc_now() -> str:
 def _write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(f"{json.dumps(payload, indent=2)}\n", encoding="utf-8")
+
+
+def _read_json(path: Path) -> dict[str, Any]:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def _to_mapping(value: Any) -> dict[str, Any]:
@@ -164,6 +169,19 @@ def _build_batch_math() -> dict[str, Any]:
     }
 
 
+def _build_measured_rollout_examples(measured_steps_per_second: float, worker_count: int) -> list[dict[str, int]]:
+    examples = []
+    safe_worker_count = max(worker_count, 1)
+    for window_seconds in BATCH_UPDATE_WINDOWS_SECONDS:
+        total_rollout_steps = int(round(measured_steps_per_second * window_seconds))
+        examples.append({
+            "targetUpdateWindowSeconds": window_seconds,
+            "maxRolloutStepsTotalAtMeasuredLane": total_rollout_steps,
+            "maxNstepsAtValidatedLane": total_rollout_steps // safe_worker_count,
+        })
+    return examples
+
+
 def build_lane_plan() -> dict[str, Any]:
     return {
         "ok": True,
@@ -217,6 +235,89 @@ def build_lane_plan() -> dict[str, Any]:
             "phaseBoundary": "BT93A documents harness, timeout, throughput and failure evidence only.",
         },
         "pendingThroughputArtifact": str(ARTIFACT_PATH.relative_to(REPO_ROOT)),
+    }
+
+
+def build_bt93a_handover(
+    smoke_artifact: dict[str, Any],
+    *,
+    generated_by: str,
+) -> dict[str, Any]:
+    scope = _to_mapping(smoke_artifact.get("scope"))
+    performance = _to_mapping(smoke_artifact.get("performance"))
+    stability = _to_mapping(smoke_artifact.get("stability"))
+    downgrade_check = _to_mapping(smoke_artifact.get("downgradeCheck"))
+    memory = _to_mapping(smoke_artifact.get("memory"))
+    leak_check = _to_mapping(memory.get("leakCheck"))
+    lane_plan = _to_mapping(smoke_artifact.get("lanePlan"))
+
+    worker_count = int(scope.get("workerCount") or WORKER_COUNT)
+    steps_per_second = float(performance.get("stepsPerSecond") or 0.0)
+    failure_rate = float(performance.get("failureRate") or 0.0)
+    wall_clock_seconds = float(performance.get("wallClockSeconds") or 0.0)
+    timeout_rate_per_request = float(stability.get("timeoutRatePerRequest") or 0.0)
+    allow_four_env = bool(downgrade_check.get("allow4Env"))
+    downgraded = bool(downgrade_check.get("downgraded"))
+    memory_stable = bool(leak_check.get("memoryStable"))
+
+    downgrade_triggers = [
+        f"measured 2-env stepsPerSecond < {ONE_WORKER_BASELINE_STEPS_PER_SEC}",
+        f"failureRate > {FAILURE_RATE_DOWNGRADE_THRESHOLD}",
+        f"wallClockSeconds > {MAX_WALL_CLOCK_BUDGET_MINUTES * 60 * MAX_WALL_CLOCK_MULTIPLIER_BEFORE_DOWNGRADE}",
+        "memory.leakCheck.memoryStable == false",
+        "timeoutRatePerRequest > 0 OR bridgeRequestsSent != bridgeResponsesReceived",
+    ]
+    four_env_unlock_criteria = [
+        f"measured 2-env stepsPerSecond >= {FOUR_ENV_MIN_STEPS_PER_SEC}",
+        f"failureRate <= {FOUR_ENV_MAX_FAILURE_RATE}",
+        "downgradeCheck.downgraded == false",
+        "4-env remains a follow-up lane until fresh direct evidence exists",
+    ]
+    four_env_status = (
+        "eligible-from-2env-thresholds-not-yet-measured"
+        if allow_four_env
+        else "blocked-by-2env-thresholds"
+    )
+
+    return {
+        "ok": True,
+        "generatedAt": _utc_now(),
+        "generatedBy": generated_by,
+        "targetBlock": "BT93B",
+        "sourceArtifact": str(ARTIFACT_PATH.relative_to(REPO_ROOT)),
+        "sourcePhase": str(scope.get("phase") or "93A.2"),
+        "measuredLane": {
+            "validatedEnvCount": worker_count,
+            "stepsPerSecond": steps_per_second,
+            "failureRate": failure_rate,
+            "wallClockSeconds": wall_clock_seconds,
+            "timeoutRatePerRequest": timeout_rate_per_request,
+            "memoryStable": memory_stable,
+            "totalFailures": int(performance.get("totalFailures") or 0),
+        },
+        "scaffoldContract": {
+            "defaultStartEnvCount": worker_count,
+            "maxValidatedEnvCount": worker_count,
+            "requiredMeasuredArtifactForBt93B": str(ARTIFACT_PATH.relative_to(REPO_ROOT)),
+            "requiredHandoverArtifactForBt93B": str(HANDOVER_PATH.relative_to(REPO_ROOT)),
+            "rule": "BT93B starts on the smallest validated lane. 4-env remains optional follow-up only.",
+            "fourEnvStatus": four_env_status,
+        },
+        "rolloutBudgetDerivation": {
+            "formula": "max_rollout_steps_total = measured_lane_steps_per_second * target_update_window_seconds",
+            "rule": "BT93B rollout sizes must come from this measured 2-env artifact, never from draft numbers.",
+            "examples": _build_measured_rollout_examples(steps_per_second, worker_count),
+        },
+        "downgradeRules": {
+            "laneDowngradeTriggers": downgrade_triggers,
+            "fourEnvUnlockCriteria": four_env_unlock_criteria,
+            "currentDowngradeDecision": "stay-on-validated-2env-lane" if not downgraded else "downgrade-to-fallback",
+            "sequentialFallbackLane": (
+                _to_mapping(lane_plan.get("restartBehavior")).get("fallbackLane")
+                or "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear"
+            ),
+            "currentReasons": list(downgrade_check.get("reason") or []),
+        },
     }
 
 
@@ -590,7 +691,7 @@ def build_smoke_artifact(
     if wall_clock_total > (MAX_WALL_CLOCK_BUDGET_MINUTES * 60 * MAX_WALL_CLOCK_MULTIPLIER_BEFORE_DOWNGRADE):
         downgrade_reason.append("Wall-clock exceeded 2x the BT93A 2-env budget")
 
-    return {
+    artifact = {
         "ok": True,
         "generatedAt": _utc_now(),
         "generatedBy": "python/scripts/bt93a_2env_smoke.py",
@@ -667,12 +768,22 @@ def build_smoke_artifact(
             for result in sorted(results, key=lambda entry: entry["env_id"])
         ],
     }
+    artifact["handover"] = build_bt93a_handover(artifact, generated_by="python/scripts/bt93a_2env_smoke.py")
+    return artifact
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--plan-only", action="store_true", help="Write the BT93A 2-env lane plan without running smokes.")
+    parser.add_argument(
+        "--handover-only",
+        action="store_true",
+        help="Write the BT93A handover artifact from the measured 2-env smoke artifact.",
+    )
     args = parser.parse_args()
+
+    if args.plan_only and args.handover_only:
+        parser.error("--plan-only and --handover-only cannot be used together.")
 
     if args.plan_only:
         artifact = build_lane_plan()
@@ -682,6 +793,22 @@ def main() -> None:
             "artifact": str(LANE_PLAN_PATH.relative_to(REPO_ROOT)),
             "workerCount": artifact["scope"]["workerCount"],
             "nextPhase": "93A.2",
+        }, indent=2))
+        return
+
+    if args.handover_only:
+        smoke_artifact = _read_json(ARTIFACT_PATH)
+        handover_artifact = build_bt93a_handover(
+            smoke_artifact,
+            generated_by="python/scripts/bt93a_2env_smoke.py --handover-only",
+        )
+        _write_json(HANDOVER_PATH, handover_artifact)
+        print(json.dumps({
+            "ok": True,
+            "artifact": str(HANDOVER_PATH.relative_to(REPO_ROOT)),
+            "defaultEnvCount": handover_artifact["scaffoldContract"]["defaultStartEnvCount"],
+            "measuredStepsPerSecond": handover_artifact["measuredLane"]["stepsPerSecond"],
+            "fourEnvStatus": handover_artifact["scaffoldContract"]["fourEnvStatus"],
         }, indent=2))
         return
 
@@ -703,10 +830,12 @@ def main() -> None:
     memory_summary = memory_monitor.finish()
     artifact = build_smoke_artifact(results, wall_clock_total, memory_summary)
     _write_json(ARTIFACT_PATH, artifact)
+    _write_json(HANDOVER_PATH, artifact["handover"])
 
     print(json.dumps({
         "ok": True,
         "artifact": str(ARTIFACT_PATH.relative_to(REPO_ROOT)),
+        "handoverArtifact": str(HANDOVER_PATH.relative_to(REPO_ROOT)),
         "stepsPerSecond": artifact["performance"]["stepsPerSecond"],
         "allow4Env": artifact["downgradeCheck"]["allow4Env"],
         "memoryStable": artifact["memory"]["leakCheck"]["memoryStable"],
