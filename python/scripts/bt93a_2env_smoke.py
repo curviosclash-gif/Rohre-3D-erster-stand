@@ -182,6 +182,92 @@ def _build_measured_rollout_examples(measured_steps_per_second: float, worker_co
     return examples
 
 
+def _build_sequential_fallback_lane() -> dict[str, Any]:
+    return {
+        "laneType": "sequential-2env-fallback",
+        "status": "pinned-standby-lane",
+        "workerCount": 1,
+        "plannedEnvCount": WORKER_COUNT,
+        "targetStepsPerEnv": TARGET_STEPS_PER_ENV,
+        "totalTargetSteps": WORKER_COUNT * TARGET_STEPS_PER_ENV,
+        "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+        "executionModel": (
+            "Run the same 2-env budget sequentially, one CurviosEnv at a time, "
+            "with a fresh controller/sidecar trio per env."
+        ),
+        "preserveMeasuredScope": (
+            "Keep the validated per-env 500-step scope and do not open 4-env or PPO work."
+        ),
+        "activationTriggers": [
+            "subprocess churn or worker restart loops appear",
+            f"wallClockSeconds > {MAX_WALL_CLOCK_BUDGET_MINUTES * 60 * MAX_WALL_CLOCK_MULTIPLIER_BEFORE_DOWNGRADE}",
+            "timeoutRatePerRequest > 0",
+            "bridgeRequestsSent != bridgeResponsesReceived",
+        ],
+    }
+
+
+def _build_open_harness_risks(
+    *,
+    allow_four_env: bool,
+    downgraded: bool,
+    current_reasons: list[str] | None = None,
+) -> list[dict[str, Any]]:
+    sequential_fallback_lane = _build_sequential_fallback_lane()
+    reasons = [str(reason) for reason in (current_reasons or [])]
+    return [
+        {
+            "riskId": "four-env-direct-evidence-missing",
+            "severity": "medium",
+            "status": "open-restpoint",
+            "summary": (
+                "Measured 2-env thresholds never count as direct 4-env proof; 4-env stays optional "
+                "follow-up only until a dedicated artifact exists."
+            ),
+            "currentState": (
+                "thresholds-met-but-direct-4env-evidence-missing"
+                if allow_four_env
+                else "blocked-by-2env-thresholds"
+            ),
+            "directEvidencePresent": False,
+            "requiredEvidence": {
+                "minStepsPerSecond": FOUR_ENV_MIN_STEPS_PER_SEC,
+                "maxFailureRate": FOUR_ENV_MAX_FAILURE_RATE,
+                "artifact": "fresh direct 4-env smoke artifact",
+            },
+            "currentHandling": (
+                "BT93B stays on the measured 2-env lane; 4-env remains a documented restpoint, not a success."
+            ),
+        },
+        {
+            "riskId": "subprocess-churn-downgrades-to-sequential-fallback",
+            "severity": "high",
+            "status": "fallback-required-before-retry" if downgraded else "guarded-by-pinned-fallback",
+            "summary": (
+                "Any subprocess churn, timeout, ack mismatch or wall-clock overrun downgrades the lane "
+                "to the pinned sequential fallback before retrying parallel work."
+            ),
+            "currentReasons": reasons,
+            "fallbackLane": sequential_fallback_lane,
+            "currentHandling": (
+                "Parallel 2-env remains valid only while timeouts stay at 0 and bridge requests/responses match."
+            ),
+        },
+        {
+            "riskId": "boundary-harness-must-stay-runtime-near",
+            "severity": "medium",
+            "status": "open-restpoint",
+            "summary": (
+                "BT93A remains a harness/throughput evidence block only; PPO, reward and policy semantics "
+                "must stay outside this boundary path."
+            ),
+            "currentHandling": (
+                "BT93B and BT93C may consume measured artifacts, but must not treat harness growth as product runtime work."
+            ),
+        },
+    ]
+
+
 def build_lane_plan() -> dict[str, Any]:
     return {
         "ok": True,
@@ -207,7 +293,8 @@ def build_lane_plan() -> dict[str, Any]:
         "restartBehavior": {
             "perEnvLifecycle": "each worker owns one CurviosEnv and closes it deterministically after the lane run",
             "rerunStrategy": "restart the affected env/controller/sidecar trio instead of reusing a failed process",
-            "fallbackLane": "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
+            "fallbackLane": "switch to the pinned sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
+            "fallbackLaneSpec": _build_sequential_fallback_lane(),
         },
         "comparisonAnchor": {
             "artifact": "data/training/ppo/throughput_analysis_btf08.json",
@@ -234,6 +321,10 @@ def build_lane_plan() -> dict[str, Any]:
             "readOnlyRuntimeSurfaces": READ_ONLY_RUNTIME_SURFACES,
             "phaseBoundary": "BT93A documents harness, timeout, throughput and failure evidence only.",
         },
+        "openHarnessRisks": _build_open_harness_risks(
+            allow_four_env=False,
+            downgraded=False,
+        ),
         "pendingThroughputArtifact": str(ARTIFACT_PATH.relative_to(REPO_ROOT)),
     }
 
@@ -278,6 +369,12 @@ def build_bt93a_handover(
         if allow_four_env
         else "blocked-by-2env-thresholds"
     )
+    open_harness_risks = _build_open_harness_risks(
+        allow_four_env=allow_four_env,
+        downgraded=downgraded,
+        current_reasons=list(downgrade_check.get("reason") or []),
+    )
+    sequential_fallback_lane = _build_sequential_fallback_lane()
 
     return {
         "ok": True,
@@ -313,11 +410,16 @@ def build_bt93a_handover(
             "fourEnvUnlockCriteria": four_env_unlock_criteria,
             "currentDowngradeDecision": "stay-on-validated-2env-lane" if not downgraded else "downgrade-to-fallback",
             "sequentialFallbackLane": (
+                _to_mapping(_to_mapping(lane_plan.get("restartBehavior")).get("fallbackLaneSpec"))
+                or sequential_fallback_lane
+            ),
+            "sequentialFallbackLaneSummary": (
                 _to_mapping(lane_plan.get("restartBehavior")).get("fallbackLane")
-                or "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear"
+                or "switch to the pinned sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear"
             ),
             "currentReasons": list(downgrade_check.get("reason") or []),
         },
+        "openHarnessRisks": open_harness_risks,
     }
 
 
@@ -793,6 +895,7 @@ def main() -> None:
             "artifact": str(LANE_PLAN_PATH.relative_to(REPO_ROOT)),
             "workerCount": artifact["scope"]["workerCount"],
             "nextPhase": "93A.2",
+            "openRiskCount": len(artifact["openHarnessRisks"]),
         }, indent=2))
         return
 
@@ -809,6 +912,7 @@ def main() -> None:
             "defaultEnvCount": handover_artifact["scaffoldContract"]["defaultStartEnvCount"],
             "measuredStepsPerSecond": handover_artifact["measuredLane"]["stepsPerSecond"],
             "fourEnvStatus": handover_artifact["scaffoldContract"]["fourEnvStatus"],
+            "openRiskCount": len(handover_artifact["openHarnessRisks"]),
         }, indent=2))
         return
 
@@ -839,6 +943,7 @@ def main() -> None:
         "stepsPerSecond": artifact["performance"]["stepsPerSecond"],
         "allow4Env": artifact["downgradeCheck"]["allow4Env"],
         "memoryStable": artifact["memory"]["leakCheck"]["memoryStable"],
+        "openRiskCount": len(artifact["handover"]["openHarnessRisks"]),
     }, indent=2))
 
 

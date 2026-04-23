@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T21:09:01Z",
+  "generatedAt": "2026-04-23T22:12:03Z",
   "generatedBy": "python/scripts/bt93a_2env_smoke.py --plan-only",
   "scope": {
     "phase": "93A.1.2",
@@ -22,7 +22,24 @@
   "restartBehavior": {
     "perEnvLifecycle": "each worker owns one CurviosEnv and closes it deterministically after the lane run",
     "rerunStrategy": "restart the affected env/controller/sidecar trio instead of reusing a failed process",
-    "fallbackLane": "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear"
+    "fallbackLane": "switch to the pinned sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
+    "fallbackLaneSpec": {
+      "laneType": "sequential-2env-fallback",
+      "status": "pinned-standby-lane",
+      "workerCount": 1,
+      "plannedEnvCount": 2,
+      "targetStepsPerEnv": 500,
+      "totalTargetSteps": 1000,
+      "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+      "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+      "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+      "activationTriggers": [
+        "subprocess churn or worker restart loops appear",
+        "wallClockSeconds > 1200.0",
+        "timeoutRatePerRequest > 0",
+        "bridgeRequestsSent != bridgeResponsesReceived"
+      ]
+    }
   },
   "comparisonAnchor": {
     "artifact": "data/training/ppo/throughput_analysis_btf08.json",
@@ -104,5 +121,53 @@
     ],
     "phaseBoundary": "BT93A documents harness, timeout, throughput and failure evidence only."
   },
+  "openHarnessRisks": [
+    {
+      "riskId": "four-env-direct-evidence-missing",
+      "severity": "medium",
+      "status": "open-restpoint",
+      "summary": "Measured 2-env thresholds never count as direct 4-env proof; 4-env stays optional follow-up only until a dedicated artifact exists.",
+      "currentState": "blocked-by-2env-thresholds",
+      "directEvidencePresent": false,
+      "requiredEvidence": {
+        "minStepsPerSecond": 45.0,
+        "maxFailureRate": 0.02,
+        "artifact": "fresh direct 4-env smoke artifact"
+      },
+      "currentHandling": "BT93B stays on the measured 2-env lane; 4-env remains a documented restpoint, not a success."
+    },
+    {
+      "riskId": "subprocess-churn-downgrades-to-sequential-fallback",
+      "severity": "high",
+      "status": "guarded-by-pinned-fallback",
+      "summary": "Any subprocess churn, timeout, ack mismatch or wall-clock overrun downgrades the lane to the pinned sequential fallback before retrying parallel work.",
+      "currentReasons": [],
+      "fallbackLane": {
+        "laneType": "sequential-2env-fallback",
+        "status": "pinned-standby-lane",
+        "workerCount": 1,
+        "plannedEnvCount": 2,
+        "targetStepsPerEnv": 500,
+        "totalTargetSteps": 1000,
+        "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+        "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+        "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+        "activationTriggers": [
+          "subprocess churn or worker restart loops appear",
+          "wallClockSeconds > 1200.0",
+          "timeoutRatePerRequest > 0",
+          "bridgeRequestsSent != bridgeResponsesReceived"
+        ]
+      },
+      "currentHandling": "Parallel 2-env remains valid only while timeouts stay at 0 and bridge requests/responses match."
+    },
+    {
+      "riskId": "boundary-harness-must-stay-runtime-near",
+      "severity": "medium",
+      "status": "open-restpoint",
+      "summary": "BT93A remains a harness/throughput evidence block only; PPO, reward and policy semantics must stay outside this boundary path.",
+      "currentHandling": "BT93B and BT93C may consume measured artifacts, but must not treat harness growth as product runtime work."
+    }
+  ],
   "pendingThroughputArtifact": "data\\training\\ppo\\lane_baseline_2env.json"
 }

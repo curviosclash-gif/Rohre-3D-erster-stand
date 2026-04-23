@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T21:57:14Z",
+  "generatedAt": "2026-04-23T22:12:22Z",
   "generatedBy": "python/scripts/bt93a_2env_smoke.py",
   "scope": {
     "phase": "93A.2",
@@ -17,7 +17,7 @@
   },
   "lanePlan": {
     "ok": true,
-    "generatedAt": "2026-04-23T21:57:14Z",
+    "generatedAt": "2026-04-23T22:12:22Z",
     "generatedBy": "python/scripts/bt93a_2env_smoke.py --plan-only",
     "scope": {
       "phase": "93A.1.2",
@@ -39,7 +39,24 @@
     "restartBehavior": {
       "perEnvLifecycle": "each worker owns one CurviosEnv and closes it deterministically after the lane run",
       "rerunStrategy": "restart the affected env/controller/sidecar trio instead of reusing a failed process",
-      "fallbackLane": "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear"
+      "fallbackLane": "switch to the pinned sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
+      "fallbackLaneSpec": {
+        "laneType": "sequential-2env-fallback",
+        "status": "pinned-standby-lane",
+        "workerCount": 1,
+        "plannedEnvCount": 2,
+        "targetStepsPerEnv": 500,
+        "totalTargetSteps": 1000,
+        "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+        "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+        "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+        "activationTriggers": [
+          "subprocess churn or worker restart loops appear",
+          "wallClockSeconds > 1200.0",
+          "timeoutRatePerRequest > 0",
+          "bridgeRequestsSent != bridgeResponsesReceived"
+        ]
+      }
     },
     "comparisonAnchor": {
       "artifact": "data/training/ppo/throughput_analysis_btf08.json",
@@ -121,6 +138,54 @@
       ],
       "phaseBoundary": "BT93A documents harness, timeout, throughput and failure evidence only."
     },
+    "openHarnessRisks": [
+      {
+        "riskId": "four-env-direct-evidence-missing",
+        "severity": "medium",
+        "status": "open-restpoint",
+        "summary": "Measured 2-env thresholds never count as direct 4-env proof; 4-env stays optional follow-up only until a dedicated artifact exists.",
+        "currentState": "blocked-by-2env-thresholds",
+        "directEvidencePresent": false,
+        "requiredEvidence": {
+          "minStepsPerSecond": 45.0,
+          "maxFailureRate": 0.02,
+          "artifact": "fresh direct 4-env smoke artifact"
+        },
+        "currentHandling": "BT93B stays on the measured 2-env lane; 4-env remains a documented restpoint, not a success."
+      },
+      {
+        "riskId": "subprocess-churn-downgrades-to-sequential-fallback",
+        "severity": "high",
+        "status": "guarded-by-pinned-fallback",
+        "summary": "Any subprocess churn, timeout, ack mismatch or wall-clock overrun downgrades the lane to the pinned sequential fallback before retrying parallel work.",
+        "currentReasons": [],
+        "fallbackLane": {
+          "laneType": "sequential-2env-fallback",
+          "status": "pinned-standby-lane",
+          "workerCount": 1,
+          "plannedEnvCount": 2,
+          "targetStepsPerEnv": 500,
+          "totalTargetSteps": 1000,
+          "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+          "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+          "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+          "activationTriggers": [
+            "subprocess churn or worker restart loops appear",
+            "wallClockSeconds > 1200.0",
+            "timeoutRatePerRequest > 0",
+            "bridgeRequestsSent != bridgeResponsesReceived"
+          ]
+        },
+        "currentHandling": "Parallel 2-env remains valid only while timeouts stay at 0 and bridge requests/responses match."
+      },
+      {
+        "riskId": "boundary-harness-must-stay-runtime-near",
+        "severity": "medium",
+        "status": "open-restpoint",
+        "summary": "BT93A remains a harness/throughput evidence block only; PPO, reward and policy semantics must stay outside this boundary path.",
+        "currentHandling": "BT93B and BT93C may consume measured artifacts, but must not treat harness growth as product runtime work."
+      }
+    ],
     "pendingThroughputArtifact": "data\\training\\ppo\\lane_baseline_2env.json"
   },
   "execution": {
@@ -134,8 +199,8 @@
   },
   "performance": {
     "totalStepsCompleted": 1000,
-    "wallClockSeconds": 16.849931478500366,
-    "stepsPerSecond": 59.347422348627816,
+    "wallClockSeconds": 17.182966709136963,
+    "stepsPerSecond": 58.197167981955914,
     "failureRate": 0.0,
     "totalFailures": 0
   },
@@ -157,28 +222,28 @@
     "sampleCount": 40,
     "sampleIntervalSeconds": 0.5,
     "pythonProcess": {
-      "pid": 17628,
+      "pid": 27928,
       "rssMB": {
-        "startMB": 40.293,
-        "endMB": 45.078,
-        "peakMB": 45.293,
-        "deltaMB": 4.785
+        "startMB": 40.695,
+        "endMB": 45.312,
+        "peakMB": 45.512,
+        "deltaMB": 4.617
       },
       "privateMB": {
-        "startMB": 286.043,
-        "endMB": 290.453,
-        "peakMB": 291.023,
-        "deltaMB": 4.41
+        "startMB": 287.332,
+        "endMB": 290.82,
+        "peakMB": 291.387,
+        "deltaMB": 3.488
       }
     },
     "tracemalloc": {
       "currentMB": {
         "startMB": 0.0,
         "endMB": 1.13,
-        "peakMB": 1.306,
-        "deltaMB": 1.13
+        "peakMB": 1.299,
+        "deltaMB": 1.129
       },
-      "peakMB": 1.389
+      "peakMB": 1.39
     },
     "controllerProcesses": {
       "trackedEnvIds": [
@@ -186,22 +251,22 @@
         1
       ],
       "rssMBDuringActiveRun": {
-        "startMB": 144.625,
-        "endMB": 0.523,
-        "peakMB": 160.348,
-        "deltaMB": -144.102
+        "startMB": 150.031,
+        "endMB": 0.531,
+        "peakMB": 161.023,
+        "deltaMB": -149.5
       },
       "privateMBDuringActiveRun": {
-        "startMB": 179.969,
-        "endMB": 0.609,
-        "peakMB": 187.852,
-        "deltaMB": -179.359
+        "startMB": 182.199,
+        "endMB": 0.617,
+        "peakMB": 187.895,
+        "deltaMB": -181.582
       },
       "perEnvPeakRssMB": {
-        "0": 79.91,
-        "1": 80.539
+        "0": 80.816,
+        "1": 80.207
       },
-      "finalResidualRssMB": 0.523,
+      "finalResidualRssMB": 0.531,
       "cleanupSettled": true
     },
     "leakCheck": {
@@ -216,401 +281,401 @@
         "elapsedSeconds": 0.0,
         "reason": "run-start",
         "totalCompletedSteps": 0,
-        "pythonRssMB": 40.293,
-        "pythonPrivateMB": 286.043,
+        "pythonRssMB": 40.695,
+        "pythonPrivateMB": 287.332,
         "tracemallocCurrentMB": 0.0,
         "tracemallocPeakMB": 0.0,
         "controllerTotalRssMB": 0.0
       },
       {
-        "elapsedSeconds": 0.507,
+        "elapsedSeconds": 0.502,
         "reason": "interval",
         "totalCompletedSteps": 0,
-        "pythonRssMB": 43.555,
-        "pythonPrivateMB": 289.523,
-        "tracemallocCurrentMB": 1.101,
-        "tracemallocPeakMB": 1.189,
-        "controllerTotalRssMB": 144.625
+        "pythonRssMB": 43.629,
+        "pythonPrivateMB": 289.578,
+        "tracemallocCurrentMB": 0.981,
+        "tracemallocPeakMB": 1.01,
+        "controllerTotalRssMB": 0.0
       },
       {
-        "elapsedSeconds": 1.009,
+        "elapsedSeconds": 1.018,
         "reason": "interval",
         "totalCompletedSteps": 2,
-        "pythonRssMB": 44.301,
-        "pythonPrivateMB": 290.227,
-        "tracemallocCurrentMB": 1.178,
+        "pythonRssMB": 44.648,
+        "pythonPrivateMB": 290.566,
+        "tracemallocCurrentMB": 1.167,
         "tracemallocPeakMB": 1.261,
-        "controllerTotalRssMB": 151.398
+        "controllerTotalRssMB": 150.031
       },
       {
-        "elapsedSeconds": 1.523,
+        "elapsedSeconds": 1.519,
         "reason": "interval",
         "totalCompletedSteps": 50,
-        "pythonRssMB": 44.348,
-        "pythonPrivateMB": 290.227,
-        "tracemallocCurrentMB": 1.171,
-        "tracemallocPeakMB": 1.265,
-        "controllerTotalRssMB": 156.93
+        "pythonRssMB": 44.793,
+        "pythonPrivateMB": 290.672,
+        "tracemallocCurrentMB": 1.176,
+        "tracemallocPeakMB": 1.264,
+        "controllerTotalRssMB": 157.293
       },
       {
-        "elapsedSeconds": 2.024,
+        "elapsedSeconds": 2.033,
         "reason": "interval",
         "totalCompletedSteps": 50,
-        "pythonRssMB": 44.371,
-        "pythonPrivateMB": 290.262,
-        "tracemallocCurrentMB": 1.179,
+        "pythonRssMB": 44.863,
+        "pythonPrivateMB": 290.801,
+        "tracemallocCurrentMB": 1.175,
         "tracemallocPeakMB": 1.268,
-        "controllerTotalRssMB": 157.688
+        "controllerTotalRssMB": 157.57
       },
       {
-        "elapsedSeconds": 2.529,
+        "elapsedSeconds": 2.535,
         "reason": "interval",
         "totalCompletedSteps": 100,
-        "pythonRssMB": 44.527,
-        "pythonPrivateMB": 290.426,
-        "tracemallocCurrentMB": 1.178,
+        "pythonRssMB": 44.883,
+        "pythonPrivateMB": 290.801,
+        "tracemallocCurrentMB": 1.179,
         "tracemallocPeakMB": 1.272,
-        "controllerTotalRssMB": 157.844
+        "controllerTotalRssMB": 158.066
       },
       {
-        "elapsedSeconds": 3.046,
+        "elapsedSeconds": 3.038,
         "reason": "interval",
         "totalCompletedSteps": 150,
-        "pythonRssMB": 44.625,
-        "pythonPrivateMB": 290.496,
-        "tracemallocCurrentMB": 1.182,
-        "tracemallocPeakMB": 1.275,
-        "controllerTotalRssMB": 158.207
+        "pythonRssMB": 44.887,
+        "pythonPrivateMB": 290.801,
+        "tracemallocCurrentMB": 1.234,
+        "tracemallocPeakMB": 1.276,
+        "controllerTotalRssMB": 158.105
       },
       {
-        "elapsedSeconds": 3.558,
+        "elapsedSeconds": 3.551,
         "reason": "interval",
         "totalCompletedSteps": 150,
-        "pythonRssMB": 44.641,
-        "pythonPrivateMB": 290.496,
+        "pythonRssMB": 44.938,
+        "pythonPrivateMB": 290.836,
         "tracemallocCurrentMB": 1.192,
-        "tracemallocPeakMB": 1.28,
-        "controllerTotalRssMB": 158.125
+        "tracemallocPeakMB": 1.279,
+        "controllerTotalRssMB": 158.672
       },
       {
-        "elapsedSeconds": 4.072,
+        "elapsedSeconds": 4.052,
         "reason": "interval",
         "totalCompletedSteps": 200,
-        "pythonRssMB": 44.73,
-        "pythonPrivateMB": 290.602,
-        "tracemallocCurrentMB": 1.19,
+        "pythonRssMB": 44.953,
+        "pythonPrivateMB": 290.836,
+        "tracemallocCurrentMB": 1.196,
         "tracemallocPeakMB": 1.284,
-        "controllerTotalRssMB": 158.754
+        "controllerTotalRssMB": 158.781
       },
       {
-        "elapsedSeconds": 4.572,
+        "elapsedSeconds": 4.567,
         "reason": "interval",
-        "totalCompletedSteps": 225,
-        "pythonRssMB": 44.75,
-        "pythonPrivateMB": 290.602,
-        "tracemallocCurrentMB": 1.197,
+        "totalCompletedSteps": 200,
+        "pythonRssMB": 44.957,
+        "pythonPrivateMB": 290.836,
+        "tracemallocCurrentMB": 1.194,
         "tracemallocPeakMB": 1.287,
-        "controllerTotalRssMB": 159.543
+        "controllerTotalRssMB": 159.227
       },
       {
-        "elapsedSeconds": 5.085,
+        "elapsedSeconds": 5.067,
         "reason": "interval",
         "totalCompletedSteps": 250,
-        "pythonRssMB": 44.75,
-        "pythonPrivateMB": 290.602,
-        "tracemallocCurrentMB": 1.2,
-        "tracemallocPeakMB": 1.287,
-        "controllerTotalRssMB": 159.191
+        "pythonRssMB": 44.957,
+        "pythonPrivateMB": 290.836,
+        "tracemallocCurrentMB": 1.198,
+        "tracemallocPeakMB": 1.291,
+        "controllerTotalRssMB": 159.758
       },
       {
-        "elapsedSeconds": 5.587,
+        "elapsedSeconds": 5.568,
         "reason": "interval",
         "totalCompletedSteps": 300,
-        "pythonRssMB": 44.758,
-        "pythonPrivateMB": 290.602,
-        "tracemallocCurrentMB": 1.203,
-        "tracemallocPeakMB": 1.296,
-        "controllerTotalRssMB": 159.008
+        "pythonRssMB": 44.961,
+        "pythonPrivateMB": 290.836,
+        "tracemallocCurrentMB": 1.201,
+        "tracemallocPeakMB": 1.294,
+        "controllerTotalRssMB": 159.629
       },
       {
-        "elapsedSeconds": 6.103,
+        "elapsedSeconds": 6.069,
         "reason": "interval",
         "totalCompletedSteps": 300,
-        "pythonRssMB": 44.785,
-        "pythonPrivateMB": 290.637,
+        "pythonRssMB": 44.965,
+        "pythonPrivateMB": 290.836,
         "tracemallocCurrentMB": 1.211,
         "tracemallocPeakMB": 1.299,
-        "controllerTotalRssMB": 159.27
+        "controllerTotalRssMB": 159.594
       },
       {
-        "elapsedSeconds": 6.606,
+        "elapsedSeconds": 6.572,
         "reason": "interval",
         "totalCompletedSteps": 350,
-        "pythonRssMB": 44.809,
-        "pythonPrivateMB": 290.672,
-        "tracemallocCurrentMB": 1.215,
-        "tracemallocPeakMB": 1.304,
-        "controllerTotalRssMB": 159.754
+        "pythonRssMB": 44.973,
+        "pythonPrivateMB": 290.836,
+        "tracemallocCurrentMB": 1.261,
+        "tracemallocPeakMB": 1.303,
+        "controllerTotalRssMB": 160.375
       },
       {
-        "elapsedSeconds": 7.122,
+        "elapsedSeconds": 7.082,
         "reason": "interval",
-        "totalCompletedSteps": 400,
-        "pythonRssMB": 44.812,
-        "pythonPrivateMB": 290.672,
-        "tracemallocCurrentMB": 1.22,
-        "tracemallocPeakMB": 1.308,
-        "controllerTotalRssMB": 160.172
+        "totalCompletedSteps": 350,
+        "pythonRssMB": 44.977,
+        "pythonPrivateMB": 290.836,
+        "tracemallocCurrentMB": 1.219,
+        "tracemallocPeakMB": 1.307,
+        "controllerTotalRssMB": 160.605
       },
       {
-        "elapsedSeconds": 7.636,
+        "elapsedSeconds": 7.585,
         "reason": "interval",
         "totalCompletedSteps": 400,
-        "pythonRssMB": 44.844,
-        "pythonPrivateMB": 290.672,
+        "pythonRssMB": 44.98,
+        "pythonPrivateMB": 290.836,
         "tracemallocCurrentMB": 1.218,
-        "tracemallocPeakMB": 1.312,
-        "controllerTotalRssMB": 160.348
+        "tracemallocPeakMB": 1.311,
+        "controllerTotalRssMB": 160.574
       },
       {
-        "elapsedSeconds": 8.14,
+        "elapsedSeconds": 8.085,
         "reason": "interval",
         "totalCompletedSteps": 450,
-        "pythonRssMB": 44.871,
-        "pythonPrivateMB": 290.707,
-        "tracemallocCurrentMB": 1.234,
-        "tracemallocPeakMB": 1.316,
-        "controllerTotalRssMB": 159.828
+        "pythonRssMB": 45.027,
+        "pythonPrivateMB": 290.906,
+        "tracemallocCurrentMB": 1.221,
+        "tracemallocPeakMB": 1.314,
+        "controllerTotalRssMB": 161.023
       },
       {
-        "elapsedSeconds": 8.655,
+        "elapsedSeconds": 8.591,
         "reason": "interval",
         "totalCompletedSteps": 450,
-        "pythonRssMB": 44.883,
-        "pythonPrivateMB": 290.707,
-        "tracemallocCurrentMB": 1.232,
-        "tracemallocPeakMB": 1.32,
-        "controllerTotalRssMB": 134.613
+        "pythonRssMB": 45.043,
+        "pythonPrivateMB": 290.906,
+        "tracemallocCurrentMB": 1.228,
+        "tracemallocPeakMB": 1.319,
+        "controllerTotalRssMB": 134.828
       },
       {
-        "elapsedSeconds": 9.172,
+        "elapsedSeconds": 9.101,
         "reason": "interval",
         "totalCompletedSteps": 500,
-        "pythonRssMB": 44.898,
-        "pythonPrivateMB": 290.707,
+        "pythonRssMB": 45.043,
+        "pythonPrivateMB": 290.906,
+        "tracemallocCurrentMB": 1.232,
+        "tracemallocPeakMB": 1.319,
+        "controllerTotalRssMB": 137.594
+      },
+      {
+        "elapsedSeconds": 9.618,
+        "reason": "interval",
+        "totalCompletedSteps": 500,
+        "pythonRssMB": 45.047,
+        "pythonPrivateMB": 290.906,
+        "tracemallocCurrentMB": 1.236,
+        "tracemallocPeakMB": 1.319,
+        "controllerTotalRssMB": 137.129
+      },
+      {
+        "elapsedSeconds": 10.119,
+        "reason": "interval",
+        "totalCompletedSteps": 550,
+        "pythonRssMB": 45.051,
+        "pythonPrivateMB": 290.906,
         "tracemallocCurrentMB": 1.238,
-        "tracemallocPeakMB": 1.326,
-        "controllerTotalRssMB": 135.52
+        "tracemallocPeakMB": 1.319,
+        "controllerTotalRssMB": 137.199
       },
       {
-        "elapsedSeconds": 9.673,
-        "reason": "interval",
-        "totalCompletedSteps": 550,
-        "pythonRssMB": 44.914,
-        "pythonPrivateMB": 290.707,
-        "tracemallocCurrentMB": 1.242,
-        "tracemallocPeakMB": 1.33,
-        "controllerTotalRssMB": 137.887
-      },
-      {
-        "elapsedSeconds": 10.174,
-        "reason": "interval",
-        "totalCompletedSteps": 550,
-        "pythonRssMB": 44.98,
-        "pythonPrivateMB": 290.812,
-        "tracemallocCurrentMB": 1.246,
-        "tracemallocPeakMB": 1.334,
-        "controllerTotalRssMB": 137.375
-      },
-      {
-        "elapsedSeconds": 10.693,
+        "elapsedSeconds": 10.621,
         "reason": "interval",
         "totalCompletedSteps": 600,
-        "pythonRssMB": 44.984,
-        "pythonPrivateMB": 290.812,
-        "tracemallocCurrentMB": 1.266,
-        "tracemallocPeakMB": 1.338,
+        "pythonRssMB": 45.086,
+        "pythonPrivateMB": 290.941,
+        "tracemallocCurrentMB": 1.26,
+        "tracemallocPeakMB": 1.319,
+        "controllerTotalRssMB": 137.809
+      },
+      {
+        "elapsedSeconds": 11.136,
+        "reason": "interval",
+        "totalCompletedSteps": 600,
+        "pythonRssMB": 45.102,
+        "pythonPrivateMB": 290.941,
+        "tracemallocCurrentMB": 1.252,
+        "tracemallocPeakMB": 1.341,
+        "controllerTotalRssMB": 137.863
+      },
+      {
+        "elapsedSeconds": 11.651,
+        "reason": "interval",
+        "totalCompletedSteps": 650,
+        "pythonRssMB": 45.133,
+        "pythonPrivateMB": 290.977,
+        "tracemallocCurrentMB": 1.251,
+        "tracemallocPeakMB": 1.344,
+        "controllerTotalRssMB": 137.914
+      },
+      {
+        "elapsedSeconds": 12.151,
+        "reason": "interval",
+        "totalCompletedSteps": 675,
+        "pythonRssMB": 45.203,
+        "pythonPrivateMB": 291.047,
+        "tracemallocCurrentMB": 1.256,
+        "tracemallocPeakMB": 1.349,
+        "controllerTotalRssMB": 137.938
+      },
+      {
+        "elapsedSeconds": 12.667,
+        "reason": "interval",
+        "totalCompletedSteps": 700,
+        "pythonRssMB": 45.215,
+        "pythonPrivateMB": 291.047,
+        "tracemallocCurrentMB": 1.265,
+        "tracemallocPeakMB": 1.353,
+        "controllerTotalRssMB": 138.117
+      },
+      {
+        "elapsedSeconds": 13.183,
+        "reason": "interval",
+        "totalCompletedSteps": 750,
+        "pythonRssMB": 45.25,
+        "pythonPrivateMB": 291.082,
+        "tracemallocCurrentMB": 1.264,
+        "tracemallocPeakMB": 1.357,
         "controllerTotalRssMB": 137.5
       },
       {
-        "elapsedSeconds": 11.206,
-        "reason": "interval",
-        "totalCompletedSteps": 650,
-        "pythonRssMB": 44.988,
-        "pythonPrivateMB": 290.812,
-        "tracemallocCurrentMB": 1.254,
-        "tracemallocPeakMB": 1.342,
-        "controllerTotalRssMB": 137.512
-      },
-      {
-        "elapsedSeconds": 11.708,
-        "reason": "interval",
-        "totalCompletedSteps": 650,
-        "pythonRssMB": 45.004,
-        "pythonPrivateMB": 290.812,
-        "tracemallocCurrentMB": 1.306,
-        "tracemallocPeakMB": 1.347,
-        "controllerTotalRssMB": 137.598
-      },
-      {
-        "elapsedSeconds": 12.223,
-        "reason": "interval",
-        "totalCompletedSteps": 700,
-        "pythonRssMB": 45.008,
-        "pythonPrivateMB": 290.812,
-        "tracemallocCurrentMB": 1.257,
-        "tracemallocPeakMB": 1.35,
-        "controllerTotalRssMB": 137.613
-      },
-      {
-        "elapsedSeconds": 12.724,
-        "reason": "interval",
-        "totalCompletedSteps": 700,
-        "pythonRssMB": 45.059,
-        "pythonPrivateMB": 290.848,
-        "tracemallocCurrentMB": 1.261,
-        "tracemallocPeakMB": 1.354,
-        "controllerTotalRssMB": 137.77
-      },
-      {
-        "elapsedSeconds": 13.235,
+        "elapsedSeconds": 13.686,
         "reason": "interval",
         "totalCompletedSteps": 750,
-        "pythonRssMB": 45.117,
-        "pythonPrivateMB": 290.918,
-        "tracemallocCurrentMB": 1.266,
-        "tracemallocPeakMB": 1.359,
-        "controllerTotalRssMB": 137.785
-      },
-      {
-        "elapsedSeconds": 13.739,
-        "reason": "interval",
-        "totalCompletedSteps": 800,
-        "pythonRssMB": 45.125,
-        "pythonPrivateMB": 290.918,
-        "tracemallocCurrentMB": 1.275,
-        "tracemallocPeakMB": 1.363,
-        "controllerTotalRssMB": 137.812
-      },
-      {
-        "elapsedSeconds": 14.254,
-        "reason": "interval",
-        "totalCompletedSteps": 800,
-        "pythonRssMB": 45.129,
-        "pythonPrivateMB": 290.918,
+        "pythonRssMB": 45.281,
+        "pythonPrivateMB": 291.117,
         "tracemallocCurrentMB": 1.273,
-        "tracemallocPeakMB": 1.366,
-        "controllerTotalRssMB": 137.879
+        "tracemallocPeakMB": 1.362,
+        "controllerTotalRssMB": 137.738
       },
       {
-        "elapsedSeconds": 14.757,
+        "elapsedSeconds": 14.201,
+        "reason": "interval",
+        "totalCompletedSteps": 800,
+        "pythonRssMB": 45.285,
+        "pythonPrivateMB": 291.117,
+        "tracemallocCurrentMB": 1.277,
+        "tracemallocPeakMB": 1.365,
+        "controllerTotalRssMB": 137.859
+      },
+      {
+        "elapsedSeconds": 14.703,
         "reason": "interval",
         "totalCompletedSteps": 850,
-        "pythonRssMB": 45.172,
-        "pythonPrivateMB": 290.953,
-        "tracemallocCurrentMB": 1.284,
-        "tracemallocPeakMB": 1.372,
-        "controllerTotalRssMB": 137.988
+        "pythonRssMB": 45.312,
+        "pythonPrivateMB": 291.117,
+        "tracemallocCurrentMB": 1.28,
+        "tracemallocPeakMB": 1.369,
+        "controllerTotalRssMB": 137.98
       },
       {
-        "elapsedSeconds": 15.257,
+        "elapsedSeconds": 15.218,
+        "reason": "interval",
+        "totalCompletedSteps": 850,
+        "pythonRssMB": 45.402,
+        "pythonPrivateMB": 291.258,
+        "tracemallocCurrentMB": 1.281,
+        "tracemallocPeakMB": 1.374,
+        "controllerTotalRssMB": 138.074
+      },
+      {
+        "elapsedSeconds": 15.733,
         "reason": "interval",
         "totalCompletedSteps": 900,
-        "pythonRssMB": 45.18,
-        "pythonPrivateMB": 290.953,
-        "tracemallocCurrentMB": 1.282,
-        "tracemallocPeakMB": 1.375,
-        "controllerTotalRssMB": 138.035
+        "pythonRssMB": 45.41,
+        "pythonPrivateMB": 291.258,
+        "tracemallocCurrentMB": 1.289,
+        "tracemallocPeakMB": 1.378,
+        "controllerTotalRssMB": 137.992
       },
       {
-        "elapsedSeconds": 15.773,
+        "elapsedSeconds": 16.234,
         "reason": "interval",
         "totalCompletedSteps": 900,
-        "pythonRssMB": 45.23,
-        "pythonPrivateMB": 290.988,
-        "tracemallocCurrentMB": 1.286,
-        "tracemallocPeakMB": 1.379,
-        "controllerTotalRssMB": 137.676
+        "pythonRssMB": 45.418,
+        "pythonPrivateMB": 291.258,
+        "tracemallocCurrentMB": 1.293,
+        "tracemallocPeakMB": 1.381,
+        "controllerTotalRssMB": 138.137
       },
       {
-        "elapsedSeconds": 16.274,
+        "elapsedSeconds": 16.735,
         "reason": "interval",
         "totalCompletedSteps": 950,
-        "pythonRssMB": 45.266,
-        "pythonPrivateMB": 291.023,
-        "tracemallocCurrentMB": 1.294,
-        "tracemallocPeakMB": 1.383,
-        "controllerTotalRssMB": 137.336
+        "pythonRssMB": 45.512,
+        "pythonPrivateMB": 291.387,
+        "tracemallocCurrentMB": 1.299,
+        "tracemallocPeakMB": 1.387,
+        "controllerTotalRssMB": 138.211
       },
       {
-        "elapsedSeconds": 16.789,
-        "reason": "interval",
-        "totalCompletedSteps": 950,
-        "pythonRssMB": 45.293,
-        "pythonPrivateMB": 291.023,
-        "tracemallocCurrentMB": 1.295,
-        "tracemallocPeakMB": 1.388,
-        "controllerTotalRssMB": 137.352
-      },
-      {
-        "elapsedSeconds": 16.852,
+        "elapsedSeconds": 17.183,
         "reason": "run-complete",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.098,
-        "pythonPrivateMB": 290.5,
+        "pythonRssMB": 45.332,
+        "pythonPrivateMB": 290.867,
         "tracemallocCurrentMB": 1.126,
-        "tracemallocPeakMB": 1.389,
-        "controllerTotalRssMB": 0.523
+        "tracemallocPeakMB": 1.39,
+        "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 16.853,
+        "elapsedSeconds": 17.183,
         "reason": "post-close",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.086,
-        "pythonPrivateMB": 290.461,
+        "pythonRssMB": 45.32,
+        "pythonPrivateMB": 290.852,
         "tracemallocCurrentMB": 1.126,
-        "tracemallocPeakMB": 1.389,
-        "controllerTotalRssMB": 0.523
+        "tracemallocPeakMB": 1.39,
+        "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 17.353,
+        "elapsedSeconds": 17.683,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.078,
-        "pythonPrivateMB": 290.453,
+        "pythonRssMB": 45.312,
+        "pythonPrivateMB": 290.82,
         "tracemallocCurrentMB": 1.127,
-        "tracemallocPeakMB": 1.389,
-        "controllerTotalRssMB": 0.523
+        "tracemallocPeakMB": 1.39,
+        "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 17.854,
+        "elapsedSeconds": 18.184,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.078,
-        "pythonPrivateMB": 290.453,
+        "pythonRssMB": 45.312,
+        "pythonPrivateMB": 290.82,
         "tracemallocCurrentMB": 1.128,
-        "tracemallocPeakMB": 1.389,
-        "controllerTotalRssMB": 0.523
+        "tracemallocPeakMB": 1.39,
+        "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 18.355,
+        "elapsedSeconds": 18.684,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.078,
-        "pythonPrivateMB": 290.453,
+        "pythonRssMB": 45.312,
+        "pythonPrivateMB": 290.82,
         "tracemallocCurrentMB": 1.129,
-        "tracemallocPeakMB": 1.389,
-        "controllerTotalRssMB": 0.523
+        "tracemallocPeakMB": 1.39,
+        "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 18.855,
+        "elapsedSeconds": 19.185,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.078,
-        "pythonPrivateMB": 290.453,
+        "pythonRssMB": 45.312,
+        "pythonPrivateMB": 290.82,
         "tracemallocCurrentMB": 1.13,
-        "tracemallocPeakMB": 1.389,
-        "controllerTotalRssMB": 0.523
+        "tracemallocPeakMB": 1.39,
+        "controllerTotalRssMB": 0.531
       }
     ]
   },
@@ -626,7 +691,7 @@
       "envId": 0,
       "seed": 930,
       "sessionId": "bt93a-2env-smoke-0",
-      "controllerPid": 29384,
+      "controllerPid": 29944,
       "stepsCompleted": 500,
       "resetCount": 1,
       "timeoutCount": 0,
@@ -636,13 +701,13 @@
       "truncatedReasons": {
         "max-steps": 1
       },
-      "wallClockSeconds": 16.84693956375122,
+      "wallClockSeconds": 17.142069578170776,
       "bridgeRequestsSent": 1002,
       "bridgeResponsesReceived": 1002,
       "bridgeFailures": 0,
-      "bridgeLatencyMeanMs": 2.046875,
+      "bridgeLatencyMeanMs": 2.1796875,
       "bridgeLatencyP95Ms": 3,
-      "processingLatencyAverageMs": 1.345,
+      "processingLatencyAverageMs": 1.396,
       "validationFailures": 0,
       "messageCounts": {
         "training-reset": 1,
@@ -656,7 +721,7 @@
       "envId": 1,
       "seed": 931,
       "sessionId": "bt93a-2env-smoke-1",
-      "controllerPid": 21792,
+      "controllerPid": 20864,
       "stepsCompleted": 500,
       "resetCount": 1,
       "timeoutCount": 0,
@@ -666,13 +731,13 @@
       "truncatedReasons": {
         "max-steps": 1
       },
-      "wallClockSeconds": 16.81740427017212,
+      "wallClockSeconds": 17.174863576889038,
       "bridgeRequestsSent": 1002,
       "bridgeResponsesReceived": 1002,
       "bridgeFailures": 0,
-      "bridgeLatencyMeanMs": 2.0546875,
+      "bridgeLatencyMeanMs": 2.1796875,
       "bridgeLatencyP95Ms": 3,
-      "processingLatencyAverageMs": 1.358,
+      "processingLatencyAverageMs": 1.398,
       "validationFailures": 0,
       "messageCounts": {
         "training-reset": 1,
@@ -682,5 +747,134 @@
       },
       "lastError": null
     }
-  ]
+  ],
+  "handover": {
+    "ok": true,
+    "generatedAt": "2026-04-23T22:12:22Z",
+    "generatedBy": "python/scripts/bt93a_2env_smoke.py",
+    "targetBlock": "BT93B",
+    "sourceArtifact": "data\\training\\ppo\\lane_baseline_2env.json",
+    "sourcePhase": "93A.2",
+    "measuredLane": {
+      "validatedEnvCount": 2,
+      "stepsPerSecond": 58.197167981955914,
+      "failureRate": 0.0,
+      "wallClockSeconds": 17.182966709136963,
+      "timeoutRatePerRequest": 0.0,
+      "memoryStable": true,
+      "totalFailures": 0
+    },
+    "scaffoldContract": {
+      "defaultStartEnvCount": 2,
+      "maxValidatedEnvCount": 2,
+      "requiredMeasuredArtifactForBt93B": "data\\training\\ppo\\lane_baseline_2env.json",
+      "requiredHandoverArtifactForBt93B": "data\\training\\ppo\\bt93a_handover_2env.json",
+      "rule": "BT93B starts on the smallest validated lane. 4-env remains optional follow-up only.",
+      "fourEnvStatus": "eligible-from-2env-thresholds-not-yet-measured"
+    },
+    "rolloutBudgetDerivation": {
+      "formula": "max_rollout_steps_total = measured_lane_steps_per_second * target_update_window_seconds",
+      "rule": "BT93B rollout sizes must come from this measured 2-env artifact, never from draft numbers.",
+      "examples": [
+        {
+          "targetUpdateWindowSeconds": 15,
+          "maxRolloutStepsTotalAtMeasuredLane": 873,
+          "maxNstepsAtValidatedLane": 436
+        },
+        {
+          "targetUpdateWindowSeconds": 30,
+          "maxRolloutStepsTotalAtMeasuredLane": 1746,
+          "maxNstepsAtValidatedLane": 873
+        },
+        {
+          "targetUpdateWindowSeconds": 60,
+          "maxRolloutStepsTotalAtMeasuredLane": 3492,
+          "maxNstepsAtValidatedLane": 1746
+        }
+      ]
+    },
+    "downgradeRules": {
+      "laneDowngradeTriggers": [
+        "measured 2-env stepsPerSecond < 28.0",
+        "failureRate > 0.05",
+        "wallClockSeconds > 1200.0",
+        "memory.leakCheck.memoryStable == false",
+        "timeoutRatePerRequest > 0 OR bridgeRequestsSent != bridgeResponsesReceived"
+      ],
+      "fourEnvUnlockCriteria": [
+        "measured 2-env stepsPerSecond >= 45.0",
+        "failureRate <= 0.02",
+        "downgradeCheck.downgraded == false",
+        "4-env remains a follow-up lane until fresh direct evidence exists"
+      ],
+      "currentDowngradeDecision": "stay-on-validated-2env-lane",
+      "sequentialFallbackLane": {
+        "laneType": "sequential-2env-fallback",
+        "status": "pinned-standby-lane",
+        "workerCount": 1,
+        "plannedEnvCount": 2,
+        "targetStepsPerEnv": 500,
+        "totalTargetSteps": 1000,
+        "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+        "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+        "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+        "activationTriggers": [
+          "subprocess churn or worker restart loops appear",
+          "wallClockSeconds > 1200.0",
+          "timeoutRatePerRequest > 0",
+          "bridgeRequestsSent != bridgeResponsesReceived"
+        ]
+      },
+      "sequentialFallbackLaneSummary": "switch to the pinned sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
+      "currentReasons": []
+    },
+    "openHarnessRisks": [
+      {
+        "riskId": "four-env-direct-evidence-missing",
+        "severity": "medium",
+        "status": "open-restpoint",
+        "summary": "Measured 2-env thresholds never count as direct 4-env proof; 4-env stays optional follow-up only until a dedicated artifact exists.",
+        "currentState": "thresholds-met-but-direct-4env-evidence-missing",
+        "directEvidencePresent": false,
+        "requiredEvidence": {
+          "minStepsPerSecond": 45.0,
+          "maxFailureRate": 0.02,
+          "artifact": "fresh direct 4-env smoke artifact"
+        },
+        "currentHandling": "BT93B stays on the measured 2-env lane; 4-env remains a documented restpoint, not a success."
+      },
+      {
+        "riskId": "subprocess-churn-downgrades-to-sequential-fallback",
+        "severity": "high",
+        "status": "guarded-by-pinned-fallback",
+        "summary": "Any subprocess churn, timeout, ack mismatch or wall-clock overrun downgrades the lane to the pinned sequential fallback before retrying parallel work.",
+        "currentReasons": [],
+        "fallbackLane": {
+          "laneType": "sequential-2env-fallback",
+          "status": "pinned-standby-lane",
+          "workerCount": 1,
+          "plannedEnvCount": 2,
+          "targetStepsPerEnv": 500,
+          "totalTargetSteps": 1000,
+          "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+          "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+          "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+          "activationTriggers": [
+            "subprocess churn or worker restart loops appear",
+            "wallClockSeconds > 1200.0",
+            "timeoutRatePerRequest > 0",
+            "bridgeRequestsSent != bridgeResponsesReceived"
+          ]
+        },
+        "currentHandling": "Parallel 2-env remains valid only while timeouts stay at 0 and bridge requests/responses match."
+      },
+      {
+        "riskId": "boundary-harness-must-stay-runtime-near",
+        "severity": "medium",
+        "status": "open-restpoint",
+        "summary": "BT93A remains a harness/throughput evidence block only; PPO, reward and policy semantics must stay outside this boundary path.",
+        "currentHandling": "BT93B and BT93C may consume measured artifacts, but must not treat harness growth as product runtime work."
+      }
+    ]
+  }
 }

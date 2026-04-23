@@ -1,15 +1,15 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T22:04:21Z",
-  "generatedBy": "python/scripts/bt93a_2env_smoke.py --handover-only",
+  "generatedAt": "2026-04-23T22:12:22Z",
+  "generatedBy": "python/scripts/bt93a_2env_smoke.py",
   "targetBlock": "BT93B",
   "sourceArtifact": "data\\training\\ppo\\lane_baseline_2env.json",
   "sourcePhase": "93A.2",
   "measuredLane": {
     "validatedEnvCount": 2,
-    "stepsPerSecond": 59.347422348627816,
+    "stepsPerSecond": 58.197167981955914,
     "failureRate": 0.0,
-    "wallClockSeconds": 16.849931478500366,
+    "wallClockSeconds": 17.182966709136963,
     "timeoutRatePerRequest": 0.0,
     "memoryStable": true,
     "totalFailures": 0
@@ -28,18 +28,18 @@
     "examples": [
       {
         "targetUpdateWindowSeconds": 15,
-        "maxRolloutStepsTotalAtMeasuredLane": 890,
-        "maxNstepsAtValidatedLane": 445
+        "maxRolloutStepsTotalAtMeasuredLane": 873,
+        "maxNstepsAtValidatedLane": 436
       },
       {
         "targetUpdateWindowSeconds": 30,
-        "maxRolloutStepsTotalAtMeasuredLane": 1780,
-        "maxNstepsAtValidatedLane": 890
+        "maxRolloutStepsTotalAtMeasuredLane": 1746,
+        "maxNstepsAtValidatedLane": 873
       },
       {
         "targetUpdateWindowSeconds": 60,
-        "maxRolloutStepsTotalAtMeasuredLane": 3561,
-        "maxNstepsAtValidatedLane": 1780
+        "maxRolloutStepsTotalAtMeasuredLane": 3492,
+        "maxNstepsAtValidatedLane": 1746
       }
     ]
   },
@@ -58,7 +58,72 @@
       "4-env remains a follow-up lane until fresh direct evidence exists"
     ],
     "currentDowngradeDecision": "stay-on-validated-2env-lane",
-    "sequentialFallbackLane": "pin a sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
+    "sequentialFallbackLane": {
+      "laneType": "sequential-2env-fallback",
+      "status": "pinned-standby-lane",
+      "workerCount": 1,
+      "plannedEnvCount": 2,
+      "targetStepsPerEnv": 500,
+      "totalTargetSteps": 1000,
+      "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+      "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+      "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+      "activationTriggers": [
+        "subprocess churn or worker restart loops appear",
+        "wallClockSeconds > 1200.0",
+        "timeoutRatePerRequest > 0",
+        "bridgeRequestsSent != bridgeResponsesReceived"
+      ]
+    },
+    "sequentialFallbackLaneSummary": "switch to the pinned sequential 2-env fallback lane if subprocess churn or wall-clock overruns appear",
     "currentReasons": []
-  }
+  },
+  "openHarnessRisks": [
+    {
+      "riskId": "four-env-direct-evidence-missing",
+      "severity": "medium",
+      "status": "open-restpoint",
+      "summary": "Measured 2-env thresholds never count as direct 4-env proof; 4-env stays optional follow-up only until a dedicated artifact exists.",
+      "currentState": "thresholds-met-but-direct-4env-evidence-missing",
+      "directEvidencePresent": false,
+      "requiredEvidence": {
+        "minStepsPerSecond": 45.0,
+        "maxFailureRate": 0.02,
+        "artifact": "fresh direct 4-env smoke artifact"
+      },
+      "currentHandling": "BT93B stays on the measured 2-env lane; 4-env remains a documented restpoint, not a success."
+    },
+    {
+      "riskId": "subprocess-churn-downgrades-to-sequential-fallback",
+      "severity": "high",
+      "status": "guarded-by-pinned-fallback",
+      "summary": "Any subprocess churn, timeout, ack mismatch or wall-clock overrun downgrades the lane to the pinned sequential fallback before retrying parallel work.",
+      "currentReasons": [],
+      "fallbackLane": {
+        "laneType": "sequential-2env-fallback",
+        "status": "pinned-standby-lane",
+        "workerCount": 1,
+        "plannedEnvCount": 2,
+        "targetStepsPerEnv": 500,
+        "totalTargetSteps": 1000,
+        "sessionIdPattern": "bt93a-sequential-fallback-{envId}",
+        "executionModel": "Run the same 2-env budget sequentially, one CurviosEnv at a time, with a fresh controller/sidecar trio per env.",
+        "preserveMeasuredScope": "Keep the validated per-env 500-step scope and do not open 4-env or PPO work.",
+        "activationTriggers": [
+          "subprocess churn or worker restart loops appear",
+          "wallClockSeconds > 1200.0",
+          "timeoutRatePerRequest > 0",
+          "bridgeRequestsSent != bridgeResponsesReceived"
+        ]
+      },
+      "currentHandling": "Parallel 2-env remains valid only while timeouts stay at 0 and bridge requests/responses match."
+    },
+    {
+      "riskId": "boundary-harness-must-stay-runtime-near",
+      "severity": "medium",
+      "status": "open-restpoint",
+      "summary": "BT93A remains a harness/throughput evidence block only; PPO, reward and policy semantics must stay outside this boundary path.",
+      "currentHandling": "BT93B and BT93C may consume measured artifacts, but must not treat harness growth as product runtime work."
+    }
+  ]
 }
