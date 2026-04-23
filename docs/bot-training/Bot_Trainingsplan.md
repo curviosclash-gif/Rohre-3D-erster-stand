@@ -130,7 +130,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-Codex | BT90 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
-| Bot-Codex | BT93A | 2026-04-23 | active | 93A.1.4 |
+| Bot-Codex | BT93A | 2026-04-23 | active | 93A.2 |
 | - | BT93B | - | frei | wartet auf BT93A.99; minimaler PPO-Scaffold vor echter Baseline |
 | - | BT93C | - | frei | wartet auf BT93B.99; konservative Baseline und Vorvergleich |
 | - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
@@ -634,7 +634,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT90 | Python-Minimalbootstrap und Contract-Wahrheit | completed | P1 | V77.99,V91.99,V92.99 | 90.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` |
 | BT91 | Python-Sidecar und 1-Worker-Headless-Lane | completed | P1 | BT90.99 | 91.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` |
 | BT92 | Single-Env-Adapter und JS-authoritative Semantik | completed | P1 | BT91.99 | 92.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
-| BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | active | P2 | BT92.99 | 93A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
+| BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | active | P2 | BT92.99 | 93A.2 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
 | BT93B | Minimaler PPO-Baseline-Scaffold | planned | P2 | BT93A.99 | 93B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Konservative PPO-Baseline und Benchmark-Disziplin | planned | P2 | BT93B.99 | 93C.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93C.99 | 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
@@ -928,7 +928,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 - [x] 93A.1.1 Start erst nach gruener BT92-Single-Env-Lage, gruener Freeze-Bestaetigung, BTF-08-gruen und explizitem Split-Handover; der Block bleibt ausserhalb jeder PPO-Baseline-Arbeit. (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_claim_manifest.py` -> `data/training/ppo/bt93a_claim_manifest.json` (`ok=true`, `nextSubPhase=93A.1.2`))
 - [x] 93A.1.2 `2-Env` ist die kleinste Mehr-Env-Lane; Prozesse, Ports, Timeouts, Restart-Verhalten und Boundary-Grenzen werden artefaktbasiert dokumentiert, mit dem 1-Worker-Throughput-Anker aus `data/training/ppo/throughput_analysis_btf08.json` als Vergleichsbasis. (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py --plan-only` -> `data/training/ppo/bt93a_lane_plan.json` (`workerCount=2`, `controllerTimeoutSeconds=30.0`))
 - [x] 93A.1.3 `4-Env` wird nur als optionaler Folgefall mit ehrlichem Downgrade geoeffnet; formale Imports, Draft-Zahlen oder Wunschzahlen zaehlen nicht als Lane-Nachweis. (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py --plan-only` -> `data/training/ppo/bt93a_lane_plan.json` (`fourEnvPolicy.defaultStatus=locked-until-measured-2env-evidence`, `nextPhase=93A.1.4`))
-- [ ] 93A.1.4 Mathematische Herleitung der machbaren PPO-Batch-Size aus dem gemessenen Throughput dokumentieren [siehe PPO-ADR-001].
+- [x] 93A.1.4 Mathematische Herleitung der machbaren PPO-Batch-Size aus dem gemessenen Throughput dokumentieren [siehe PPO-ADR-001]. (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py --plan-only` -> `data/training/ppo/bt93a_lane_plan.json` (`batchMath.examples` fuer `15s`, `30s`, `60s`; `nextPhase=93A.2`))
 
 ### 93A.2 Throughput-, Timeout- und Failure-Artefakte
 
