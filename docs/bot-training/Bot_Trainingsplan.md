@@ -918,7 +918,8 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 - [ ] DoD.3 `4-Env` ist nur bei tragender Evidence freigegeben (>= 45 Steps/s bei 2-Env UND failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen.
 - [ ] DoD.4 `BT93A` oeffnet weder `python/train.py`/`python/eval.py` noch eine echte PPO-Baseline.
 - [ ] DoD.5 Der Handover-Artefakt pinnt die gemessene Step-Rate, Env-Anzahl und Downgrade-Entscheid artefaktbasiert als Pflichteingang fuer `BT93B`.
-- [ ] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [ ] DoD.6 Die in BTF-11 identifizierte Code-Duplikation ist aufgeloest und die Trainingslogik konsolidiert.
+- [ ] DoD.7 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
 ### 93A.1 Harness-Scope und Lane-Start
 
@@ -932,9 +933,14 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 - [ ] 93A.2.2 Der Handover an den PPO-Scaffold pinnt gemessene Step-Rate, zulassige Env-Anzahl und harte Downgrade-Regeln aus dem Harness-Artefakt statt aus textuellen Annahmen.
 - [ ] 93A.2.3 Offene Harness-Risiken bleiben sichtbar; fehlende `4-Env`-Tragfaehigkeit gilt als dokumentierter Restpunkt statt als stiller Erfolg; sequenzielle Fallback-Lane als Alternative pinnen wenn Subproc instabil.
 
+### 93A.3 Harness-Konsolidierung (BTF-11)
+
+- [ ] 93A.3.1 Die in BTF-11 als Boundary-Ausnahme dokumentierte Duplikation des `HeadlessLaneStepRunner` zwischen `smoke.mjs` und `single-env-bridge.mjs` aufloesen.
+- [ ] 93A.3.2 Gemeinsame Trainingslogik konsolidieren, sobald der `2-Env` Harness in 93A.2 konkret steht.
+
 ### 93A.99 Abschluss-Gate
 
-- [ ] 93A.99.1 Alle Phasen 93A.1 bis 93A.2 sind mit Evidence dokumentiert.
+- [ ] 93A.99.1 Alle Phasen 93A.1 bis 93A.3 sind mit Evidence dokumentiert.
 - [ ] 93A.99.2 Es existiert mindestens eine stabile `2-Env`-Lane mit gemessenem Throughput-Artefakt; `4-Env` ist nur bei tragender Evidenz freigegeben (Schwelle: >= 45 Steps/s, failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen.
 
 ### Risiko-Register BT93A
@@ -974,21 +980,25 @@ Claim-Grenze:
 - [ ] DoD.4 Der Block ist explizit als Scaffold gelabelt und trifft kein Champion-, Promotion- oder BT94A-Urteil.
 - [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
-### 93B.1 Train-/Eval-Grundgeruest
+### 93B.1 Baseline-Config und Run-Manifest
 
-- [ ] 93B.1.1 `python/train.py`, `python/eval.py`, Config- und Callback-Struktur werden auf das kleinste tragende `BT93A`-Budget zugeschnitten, nicht auf Draft-Wunschzahlen.
-- [ ] 93B.1.2 Run-Manifest, Seeds, Env-Anzahl, Hardware-/Budget-Anker, Freeze-/Semantik-Referenzen und der `Split-Head`-Action-Adapter werden fuer den Scaffold explizit pinnt.
-- [ ] 93B.1.3 Der Scaffold oeffnet keine produktive Runtime-Arbeit und verspricht noch keinen vollstaendigen Referenzlauf.
+- [ ] 93B.1.1 Konservative PPO-Config und Manifest-Struktur definieren (Seeds, Matrix, Env-Anzahl).
+- [ ] 93B.1.2 Run-Manifest und Action-Adapter (`Split-Head`) fuer den Scaffold explizit festziehen.
 
-### 93B.2 Smoke-, Checkpoint- und Resume-Kette
+### 93B.2 Kalibrierter Smoke-Run auf realem Budget
 
-- [ ] 93B.2.1 Ein konservativer Smoke-Run laeuft ueber den realen Headless-Pfad mit dem aus `BT93A` abgeleiteten Startbudget.
-- [ ] 93B.2.2 Checkpoint-, Eval- und Resume-Kette werden fuer diesen Scaffold artefaktbasiert nachgewiesen.
-- [ ] 93B.2.3 Output, Reports und Doku markieren den Block explizit als minimalen Scaffold statt als fertige PPO-Baseline.
+- [ ] 93B.2.1 Ersten Lauf ausfuehren mit dem Startbudget aus der gemessenen BT93A-Lane-Evidence.
+- [ ] 93B.2.2 Crash-Pfade, Hardware-Grenzen und Logging auf dem minimalen Scaffold pruefen.
+- [ ] 93B.2.3 Produktive Runtime-Surfaces bleiben unangetastet.
+
+### 93B.3 Checkpoint-, Resume- und Normalize-Persistenz
+
+- [ ] 93B.3.1 Resume-Kette sicherstellen und Stats-/Checkpoint-Dateien pruefen.
+- [ ] 93B.3.2 Artefaktkonsistenz zwischen neuem und fortgesetztem Lauf absichern.
 
 ### 93B.99 Abschluss-Gate
 
-- [ ] 93B.99.1 Alle Phasen 93B.1 bis 93B.2 sind mit Evidence dokumentiert.
+- [ ] 93B.99.1 Alle Phasen 93B.1 bis 93B.3 sind mit Evidence dokumentiert.
 - [ ] 93B.99.2 Der PPO-Scaffold ist reproduzierbar, aber noch nicht als echte konservative Baseline freigegeben.
 
 ### Risiko-Register BT93B
@@ -1026,22 +1036,26 @@ Claim-Grenze:
 - [ ] DoD.4 Ergebnis und Restpunkte sind als Baseline-Handover fuer `BT94A` dokumentiert.
 - [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
-### 93C.1 Matrix, Budget und Vorvergleich
+### 93C.1 Eval-Pipeline und DQN-Referenz-Freeze
 
-- [ ] 93C.1.1 DQN-Champion, Vergleichsmatrix, Semantikfenster und Pflichtreports fuer PPO-vs-DQN werden explizit eingefroren.
-- [ ] 93C.1.2 PPO-Budget, Env-Anzahl und Eval-Takte werden aus den gemessenen Lane- und Scaffold-Daten abgeleitet (Referenz: `data/training/ppo/throughput_analysis_btf08.json` + BT93A-Harness-Artefakt + BT93B-Scaffold-Artefakt); keine Draft-Zahlen ohne echtes Harness-Ergebnis.
-- [ ] 93C.1.3 Der Block bleibt explizit Baseline-Arbeit; Freeze-, A/B- oder Promotionslogik werden nicht hineingezogen.
+- [ ] 93C.1.1 DQN-Champion, Vergleichsmatrix und Semantikfenster explizit einfrieren.
+- [ ] 93C.1.2 PPO-Budget und Eval-Takte aus gemessenen BT93A-/BT93B-Artefakten ableiten; keine reinen Annahmen.
+- [ ] 93C.1.3 Vorvergleich methodisch sauber und explizit gekennzeichnet aufsetzen.
 
-### 93C.2 Referenzlauf und BT94A-Handover
+### 93C.2 Evidenzbasierter Referenzlauf
 
-- [ ] 93C.2.1 Ein konservativer Referenzlauf schreibt reproduzierbare Artefakte unter `data/training/ppo/**`.
-- [ ] 93C.2.2 KPI-, Throughput- und Stabilitaetslage werden gegen die feste Matrix dokumentiert; fehlende `4-Env`-Skalierung bleibt ein offener Restpunkt statt stiller Freigabe.
-- [ ] 93C.2.3 Das Ergebnis wird als klarer Handover fuer `BT94A` dokumentiert; externe A/B-Evidence bleibt bewusst ausserhalb von `BT93C`.
+- [ ] 93C.2.1 Konservativen Referenzlauf mit dem festen Budget fahren und reproduzierbare Artefakte schreiben.
+- [ ] 93C.2.2 KPI- und Throughput-Lage gegen die Matrix dokumentieren; fehlende `4-Env`-Tragfaehigkeit ehrlich dokumentieren statt ueberspringen.
+
+### 93C.3 Reproduzierbarkeits-Smoketest und BT94A-Handover
+
+- [ ] 93C.3.1 Mindestens einen Repro-Smoketest fuer die Baseline festhalten.
+- [ ] 93C.3.2 Abschlussreport schreiben und als Baseline-Handover fuer BT94A vorbereiten.
 
 ### 93C.99 Abschluss-Gate
 
-- [ ] 93C.99.1 Alle Phasen 93C.1 bis 93C.2 sind mit Evidence dokumentiert.
-- [ ] 93C.99.2 Es existiert mindestens eine stabile Lane fuer die konservative PPO-Baseline; `4-Env` ist nur bei tragender Evidenz freigegeben, sonst explizit als Downgrade ausgeschlossen.
+- [ ] 93C.99.1 Alle Phasen 93C.1 bis 93C.3 sind mit Evidence dokumentiert.
+- [ ] 93C.99.2 Es existiert eine solide Basis fuer Ablationen; `4-Env` ist nur bei tragender Evidenz freigegeben.
 
 ### Risiko-Register BT93C
 
@@ -1074,17 +1088,30 @@ Claim-Grenze vor BT94A:
 - [ ] DoD.2 Genau ein Freeze-Kandidat unter `data/training/ppo/candidates/**` ist mit Manifest, Reports und Vergleichsmatrix dokumentiert.
 - [ ] DoD.3 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
-### 94A.1 Ablationen, Curriculum und Freeze
+### 94A.1 Ablationsmatrix und Entscheidungsregeln
 
-- [ ] 94A.1.1 Kleine Ablationsmatrix fuer Hyperparameter, Curriculum oder Replay gegen dieselbe `BT93C`-Basis fahren; wenn die `BT93C`-Basis selbst noch driftet, bleibt BT94A vor Claim blockiert.
-- [ ] 94A.1.2 Genau einen belastbaren Kandidaten einfrieren und mit Manifest, Report, Lane-Budget und Vergleichsmatrix dokumentieren.
-- [ ] 94A.1.3 Semantikdrift gegen Runtime-, Observation-, Action-, Reward- oder Validation-Felder vor A/B-Evidence als Blocker markieren.
-- [ ] 94A.1.4 Vor Abschluss pruefen, ob Freeze-Paket, Lane-Budget und Vergleichsmatrix sauber fuer die A/B-Evidence (`BT94B`) vorbereitet sind.
+- [ ] 94A.1.1 5 bis 7 gezielte Laeufe mit klarer Champion-/Challenger-Logik gegen BT93C-Baseline definieren.
+- [ ] 94A.1.2 Abbruchkriterien dokumentieren (wenn BT93C noch driftet, bleibt BT94A blockiert).
+
+### 94A.2 Curriculum-, Reward- und Telemetry-Paritaet
+
+- [ ] 94A.2.1 Relevante Felder (Observation Schema, Reward Breakdown, Hybrid Decision) abgleichen.
+- [ ] 94A.2.2 Bekannte semantische Luecken oder Unterschiede zur DQN-Referenz offenlegen.
+
+### 94A.3 Kandidatenlaeufe und Freeze
+
+- [ ] 94A.3.1 Priorisierte Ablationen ausfuehren und Sieger gegen BT93C ermitteln.
+- [ ] 94A.3.2 Genau einen belastbaren Kandidaten als Artefaktpaket (Manifest, Report, Lane-Budget) unter `data/training/ppo/candidates/` einfrieren.
+
+### 94A.4 Reproduzierbarkeit und BT94B-Handover
+
+- [ ] 94A.4.1 Pruefen, ob Freeze-Paket und Vergleichsmatrix sauber fuer die externe A/B-Evidence aufbereitet sind.
+- [ ] 94A.4.2 Abschlussreport schreiben; bei fehlendem Sieger endet BT94A ehrlich mit `hold` statt stiller Weitergabe.
 
 ### 94A.99 Abschluss-Gate
 
-- [ ] 94A.99.1 Phase 94A.1 ist mit Evidence dokumentiert.
-- [ ] 94A.99.2 Ein Freeze-Kandidat liegt vor; Semantikdrift wurde nicht ueberdeckt.
+- [ ] 94A.99.1 Alle Phasen 94A.1 bis 94A.4 sind mit Evidence dokumentiert.
+- [ ] 94A.99.2 Ein Freeze-Kandidat liegt vor, oder BT94A stoppt die Kette explizit.
 
 ### Risiko-Register BT94A
 
@@ -1115,15 +1142,29 @@ Claim-Grenze vor BT94B:
 - [ ] DoD.2 Drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters bilden die Entscheidungsbasis statt eines Einzelruns.
 - [ ] DoD.3 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
-### 94B.1 Externe A/B-Evidence und Urteilsdisziplin
+### 94B.1 Vergleichsartefakte einfrieren
 
-- [ ] 94B.1.1 Drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters gegen den DQN-Champion sammeln; die Lane nutzt ausschliesslich den in `94A` gefrorenen Kandidaten.
-- [ ] 94B.1.2 Reports um klare Urteils- und Ursachenklassen (`promote`, `hold`, `rollback`, `diagnose`) sowie Lane-/Artifact-Ursachen erweitern; invalidierte Paesse bleiben separat sichtbar.
-- [ ] 94B.1.3 Positive Evidence darf BT95 nur als Handoff oeffnen; fehlende produktionsnahe Validation aus BT80C 80.9.3 bleibt als Restblocker sichtbar.
+- [ ] 94B.1.1 DQN-Champion, PPO-Freeze-Kandidat und das Vergleichsmanifest fixieren.
+- [ ] 94B.1.2 Urteilskriterien und Primaer-/Sekundaermetriken unveraenderlich festschreiben.
+
+### 94B.2 Externe A/B-Lane ausfuehren
+
+- [ ] 94B.2.1 Mindestens 3 vollstaendige Kandidatenlaeufe auf derselben festen Matrix auswerten (Medianbasiert).
+- [ ] 94B.2.2 Invalidierte Paesse separat dokumentieren und nicht still in den Median mischen.
+
+### 94B.3 `bot:validate`-Zusatzsignal oder ehrlicher Restblocker
+
+- [ ] 94B.3.1 Falls verfuegbar, eine `bot:validate`-Zusatz-Gegenprobe dokumentieren.
+- [ ] 94B.3.2 Falls noch blockiert (siehe BT80C 80.9.3), Restblocker offen benennen und nicht als Gatekeeper umdeuten.
+
+### 94B.4 Promotions-Evidence-Paket und Handover
+
+- [ ] 94B.4.1 Endurteil in die Klassen `promote`, `hold`, `rollback` oder `diagnose` einordnen.
+- [ ] 94B.4.2 Ergebnis ist verdict-sensitiv: nur `promote` oeffnet BT95.
 
 ### 94B.99 Abschluss-Gate
 
-- [ ] 94B.99.1 Phase 94B.1 ist mit Evidence dokumentiert.
+- [ ] 94B.99.1 Alle Phasen 94B.1 bis 94B.4 sind mit Evidence dokumentiert.
 - [ ] 94B.99.2 Ein klares externes Urteil liegt vor, basierend auf der 3-Run-Regel.
 
 ### Risiko-Register BT94B
@@ -1166,22 +1207,30 @@ Claim- und No-Go-Regel:
 - [ ] DoD.5 Ein aktiver Rollout-Intake oeffnet nicht ohne `BT94B=promote`, gruene produktionsnahe Validation und expliziten User-Entscheid.
 - [ ] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
-### 95.1 Integrationspaket und Layer-Grenzen
+### 95.1 Spaeteren Integrationsscope zuschneiden
 
-- [ ] 95.1.1 Handoff fuer einen spaeteren produktiven Rollout-Intake dokumentieren, ohne in BT95 selbst eine Runtime-Umschaltung oder Vorbereitungsimplementation vorzunehmen.
-- [ ] 95.1.2 Betroffene produktive Surfaces, Guardrails und No-Touch-Grenzen fuer einen spaeteren Integrationsblock explizit benennen.
-- [ ] 95.1.3 Offene produktionsnahe Validation (`BT80C 80.9.3` oder gleichwertig) als Integrationsvoraussetzung sichtbar halten; solange die feste Lane rot bleibt, bleibt `BT95` ein No-go-Handoff statt Rollout-Freigabe.
+- [ ] 95.1.1 Moegliche Touchpoints (`ObservationBridgePolicy.js`, `RuntimeConfig.js` etc.) fuer einen spaeteren Rollout-Intake benennen.
+- [ ] 95.1.2 No-Touch-Ausnahmen explizit als Grenze festhalten. Ohne Runtime-Eingriff in BT95!
 
-### 95.2 Manual Decision, Rollback und Doku-Sync
+### 95.2 Rollout-, Rollback- und Sunset-Regeln
 
-- [ ] 95.2.1 Manual-Promotion-, Rollback- und Fallback-Leiter fuer den spaeteren DQN-Sunset dokumentieren.
-- [ ] 95.2.2 Architektur-, Trainings-, Release- und QA-Dokumentation auf denselben Handoff- und Guardrail-Vertrag ausrichten.
-- [ ] 95.2.3 Klar unterscheiden, welche Punkte als Handoff abgeschlossen sind und welche erst ein spaeterer produktiver Rollout-Intake leisten darf; ohne `BT94B=promote`, gruene produktionsnahe Validation und User-Entscheid oeffnet kein aktiver Rollout-Intake.
+- [ ] 95.2.1 Rollout-Reihenfolge und DQN-Sunset-Kriterien dokumentieren.
+- [ ] 95.2.2 Rollback-Pfade bei Instabilitaet definieren und Architektur-Docs synchronisieren.
+
+### 95.3 Folgebacklog separieren
+
+- [ ] 95.3.1 Self-Play, frozen Opponent-Pools und weitere Folgeforschung explizit in den Backlog ausgliedern.
+- [ ] 95.3.2 Kernpfad von Forschungsnebenpfaden freihalten.
+
+### 95.4 Intake-Handoff vorbereiten
+
+- [ ] 95.4.1 BT90-Ergebnisse fuer den moeglichen Intake-Block vorbereiten.
+- [ ] 95.4.2 Offene produktionsnahe Validation (`BT80C 80.9.3`) und den finalen User-Entscheid als harten Restblocker fuer den Start des operativen Rollout-Blocks ausweisen.
 
 ### 95.99 Abschluss-Gate
 
-- [ ] 95.99.1 Alle Phasen 95.1 bis 95.2 sind mit Evidence dokumentiert.
-- [ ] 95.99.2 Das Ergebnis ist ein Handoff fuer einen spaeteren Rollout-Intake, keine automatische produktive PPO-Umschaltung oder vorweggenommene Integrationsfreigabe.
+- [ ] 95.99.1 Alle Phasen 95.1 bis 95.4 sind mit Evidence dokumentiert.
+- [ ] 95.99.2 Das Ergebnis ist ein doc-only Handoff fuer einen spaeteren Rollout-Intake, keine vorweggenommene Umschaltung.
 
 ### Risiko-Register BT95
 
