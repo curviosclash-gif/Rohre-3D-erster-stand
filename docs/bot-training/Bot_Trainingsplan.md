@@ -944,7 +944,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 
 ### 93A.99 Abschluss-Gate
 
-- [ ] 93A.99.1 Alle Phasen 93A.1 bis 93A.3 sind mit Evidence dokumentiert.
+- [x] 93A.99.1 Alle Phasen 93A.1 bis 93A.3 sind mit Evidence dokumentiert. (abgeschlossen: 2026-04-24; evidence: `$count = (Select-String -Path docs/bot-training/Bot_Trainingsplan.md -Pattern '\[x\]\s+93A\.[123]\.\d').Count; Write-Output ('completed_phase_items=' + $count)` -> `completed_phase_items=10`)
 - [ ] 93A.99.2 Es existiert mindestens eine stabile `2-Env`-Lane mit gemessenem Throughput-Artefakt; `4-Env` ist nur bei tragender Evidenz freigegeben (Schwelle: >= 45 Steps/s, failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen.
 
 ### Risiko-Register BT93A
