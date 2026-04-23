@@ -130,7 +130,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-Codex | BT90 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
-| - | BT93A | - | frei | BT92.99 ist erfuellt; claimbar nur mit gruener Freeze-Bestaetigung und als reiner Harness-/Throughput-Block |
+| Bot-Codex | BT93A | 2026-04-23 | active | 93A.1.1 |
 | - | BT93B | - | frei | wartet auf BT93A.99; minimaler PPO-Scaffold vor echter Baseline |
 | - | BT93C | - | frei | wartet auf BT93B.99; konservative Baseline und Vorvergleich |
 | - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
@@ -634,7 +634,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT90 | Python-Minimalbootstrap und Contract-Wahrheit | completed | P1 | V77.99,V91.99,V92.99 | 90.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` |
 | BT91 | Python-Sidecar und 1-Worker-Headless-Lane | completed | P1 | BT90.99 | 91.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` |
 | BT92 | Single-Env-Adapter und JS-authoritative Semantik | completed | P1 | BT91.99 | 92.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
-| BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | planned | P2 | BT92.99 | 93A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
+| BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | active | P2 | BT92.99 | 93A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
 | BT93B | Minimaler PPO-Baseline-Scaffold | planned | P2 | BT93A.99 | 93B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Konservative PPO-Baseline und Benchmark-Disziplin | planned | P2 | BT93B.99 | 93C.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93C.99 | 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
@@ -919,19 +919,23 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 - [ ] DoD.4 `BT93A` oeffnet weder `python/train.py`/`python/eval.py` noch eine echte PPO-Baseline.
 - [ ] DoD.5 Der Handover-Artefakt pinnt die gemessene Step-Rate, Env-Anzahl und Downgrade-Entscheid artefaktbasiert als Pflichteingang fuer `BT93B`.
 - [ ] DoD.6 Die in BTF-11 identifizierte Code-Duplikation ist aufgeloest und die Trainingslogik konsolidiert.
-- [ ] DoD.7 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [ ] DoD.7 Die PPO-Batch-Size Mathematik ist zwingend aus dem gemessenen Throughput herzuleiten, um realistische Update-Frequenzen nachzuweisen [siehe PPO-ADR-001].
+- [ ] DoD.8 Die Überwachung auf Memory-Leaks während der Smoke-Runs ist als hartes Kriterium integriert [siehe PPO-ADR-003].
+- [ ] DoD.9 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
 ### 93A.1 Harness-Scope und Lane-Start
 
 - [ ] 93A.1.1 Start erst nach gruener BT92-Single-Env-Lage, gruener Freeze-Bestaetigung, BTF-08-gruen und explizitem Split-Handover; der Block bleibt ausserhalb jeder PPO-Baseline-Arbeit.
 - [ ] 93A.1.2 `2-Env` ist die kleinste Mehr-Env-Lane; Prozesse, Ports, Timeouts, Restart-Verhalten und Boundary-Grenzen werden artefaktbasiert dokumentiert, mit dem 1-Worker-Throughput-Anker aus `data/training/ppo/throughput_analysis_btf08.json` als Vergleichsbasis.
 - [ ] 93A.1.3 `4-Env` wird nur als optionaler Folgefall mit ehrlichem Downgrade geoeffnet; formale Imports, Draft-Zahlen oder Wunschzahlen zaehlen nicht als Lane-Nachweis.
+- [ ] 93A.1.4 Mathematische Herleitung der machbaren PPO-Batch-Size aus dem gemessenen Throughput dokumentieren [siehe PPO-ADR-001].
 
 ### 93A.2 Throughput-, Timeout- und Failure-Artefakte
 
 - [ ] 93A.2.1 Mehr-Env-/VecEnv-Smokes liefern reproduzierbare Daten zu Env-Anzahl, Wall-Clock-Throughput, Reset-/Timeout-Rate und Failure-Klassen; Ergebnis unter `data/training/ppo/lane_baseline_2env.json` (oder gleichwertigem Artefakt).
-- [ ] 93A.2.2 Der Handover an den PPO-Scaffold pinnt gemessene Step-Rate, zulassige Env-Anzahl und harte Downgrade-Regeln aus dem Harness-Artefakt statt aus textuellen Annahmen.
-- [ ] 93A.2.3 Offene Harness-Risiken bleiben sichtbar; fehlende `4-Env`-Tragfaehigkeit gilt als dokumentierter Restpunkt statt als stiller Erfolg; sequenzielle Fallback-Lane als Alternative pinnen wenn Subproc instabil.
+- [ ] 93A.2.2 Python-seitiges Memory-Usage-Tracking implementieren und auf Memory-Leaks bei laengeren Smoke-Runs ueberpruefen [siehe PPO-ADR-003].
+- [ ] 93A.2.3 Der Handover an den PPO-Scaffold pinnt gemessene Step-Rate, zulassige Env-Anzahl und harte Downgrade-Regeln aus dem Harness-Artefakt statt aus textuellen Annahmen.
+- [ ] 93A.2.4 Offene Harness-Risiken bleiben sichtbar; fehlende `4-Env`-Tragfaehigkeit gilt als dokumentierter Restpunkt statt als stiller Erfolg; sequenzielle Fallback-Lane als Alternative pinnen wenn Subproc instabil.
 
 ### 93A.3 Harness-Konsolidierung (BTF-11)
 
@@ -978,12 +982,14 @@ Claim-Grenze:
 - [ ] DoD.2 Checkpoint-, Eval- und Manifest-Artefakte liegen fuer den Scaffold reproduzierbar unter `data/training/ppo/`.
 - [ ] DoD.3 Resume- und Persistenzkette funktionieren fuer den Scaffold, ohne schon eine grosse Baseline zu behaupten.
 - [ ] DoD.4 Der Block ist explizit als Scaffold gelabelt und trifft kein Champion-, Promotion- oder BT94A-Urteil.
-- [ ] DoD.5 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [ ] DoD.5 Die explizite Integration einer State-Normalization-Pipeline (z.B. `VecNormalize`) und die Definition der Actor/Critic-Heads ist als harte Pflichtvoraussetzung vor dem ersten Baseline-Scaffold eingebaut [siehe PPO-ADR-002].
+- [ ] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
 
 ### 93B.1 Baseline-Config und Run-Manifest
 
 - [ ] 93B.1.1 Konservative PPO-Config und Manifest-Struktur definieren (Seeds, Matrix, Env-Anzahl).
 - [ ] 93B.1.2 Run-Manifest und Action-Adapter (`Split-Head`) fuer den Scaffold explizit festziehen.
+- [ ] 93B.1.3 Explizite Integration einer State-Normalization-Pipeline (z.B. `VecNormalize`) und Definition der Actor/Critic-Heads [siehe PPO-ADR-002].
 
 ### 93B.2 Kalibrierter Smoke-Run auf realem Budget
 
