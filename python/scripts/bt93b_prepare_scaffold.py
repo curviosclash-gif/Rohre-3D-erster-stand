@@ -14,6 +14,12 @@ if str(PYTHON_ROOT) not in sys.path:
     sys.path.insert(0, str(PYTHON_ROOT))
 
 from bridge.split_head_action import BT93B_SPLIT_HEAD_ADAPTER_ID, build_manifest_action_surface
+from scaffold.ppo_policy_specs import (
+    BT93B_ACTOR_CRITIC_HEADS_ID,
+    BT93B_NORMALIZATION_ID,
+    build_actor_critic_head_spec,
+    build_normalization_spec,
+)
 
 BT93A_HANDOVER_PATH = REPO_ROOT / "data" / "training" / "ppo" / "bt93a_handover_2env.json"
 BT93A_CLAIM_MANIFEST_PATH = REPO_ROOT / "data" / "training" / "ppo" / "bt93a_claim_manifest.json"
@@ -92,6 +98,8 @@ def _build_manifest_template(
     measured_lane = handover["measuredLane"]
     scaffold_contract = handover["scaffoldContract"]
     action_surface = build_manifest_action_surface()
+    normalization = build_normalization_spec()
+    actor_critic_heads = build_actor_critic_head_spec()
 
     return {
         "templateVersion": "bt93b-scaffold-v1",
@@ -136,13 +144,10 @@ def _build_manifest_template(
             **action_surface,
         },
         "normalization": {
-            "status": "pending-93B.1.3",
-            "adapter": "VecNormalize-or-equivalent",
-            "note": "State normalization stays a hard prerequisite before the first baseline scaffold run.",
+            **normalization,
         },
         "actorCriticHeads": {
-            "status": "pending-93B.1.3",
-            "note": "Actor/Critic head definitions stay explicit and separate from the raw BT92 boundary surface.",
+            **actor_critic_heads,
         },
     }
 
@@ -200,6 +205,14 @@ def build_scaffold_plan() -> dict[str, Any]:
             "splitHeadRequired": True,
             "status": "pinned-for-bt93b-scaffold",
         },
+        "normalization": {
+            "normalizationId": BT93B_NORMALIZATION_ID,
+            "status": "pinned-for-bt93b-scaffold",
+        },
+        "actorCriticHeads": {
+            "headSpecId": BT93B_ACTOR_CRITIC_HEADS_ID,
+            "status": "pinned-for-bt93b-scaffold",
+        },
         "seedPack": {
             "globalSeed": GLOBAL_SEED,
             "trainEnvSeeds": list(TRAIN_ENV_SEEDS),
@@ -231,11 +244,8 @@ def build_scaffold_plan() -> dict[str, Any]:
         "scaffoldMatrix": _build_scaffold_matrix(env_count),
         "manifestTemplatePath": str(BT93B_MANIFEST_TEMPLATE_PATH.relative_to(REPO_ROOT)),
         "configPath": str(BT93B_CONFIG_PATH.relative_to(REPO_ROOT)),
-        "pendingPhasePins": {
-            "normalizationAndHeads": "93B.1.3",
-        },
         "manifestTemplate": manifest_template,
-        "nextPhase": "93B.1.3",
+        "nextPhase": "93B.2.1",
     }
     return plan
 
@@ -245,6 +255,8 @@ def render_yaml_config(plan: dict[str, Any]) -> str:
     budget = plan["scaffoldBudget"]
     seeds = plan["seedPack"]
     action_adapter = plan["actionAdapter"]
+    normalization = plan["manifestTemplate"]["normalization"]
+    actor_critic_heads = plan["manifestTemplate"]["actorCriticHeads"]
     lines = [
         "# BT93B conservative scaffold derived from measured BT93A 2-env evidence.",
         "block_id: BT93B",
@@ -311,8 +323,23 @@ def render_yaml_config(plan: dict[str, Any]) -> str:
         "  training_on_raw_boundary_surface: false",
         "",
         "normalization:",
-        "  state_normalization: pending-93B.1.3",
-        "  actor_critic_heads: pending-93B.1.3",
+        f"  normalization_id: {normalization['normalizationId']}",
+        f"  implementation: {normalization['implementation']}",
+        f"  normalize_observation: {str(normalization['normalizeObservation']).lower()}",
+        f"  normalize_reward: {str(normalization['normalizeReward']).lower()}",
+        f"  clip_observation: {normalization['clipObservation']}",
+        f"  clip_reward: {normalization['clipReward']}",
+        f"  persist_stats_with_checkpoint: {str(normalization['persistStatsWithCheckpoint']).lower()}",
+        "",
+        "actor_critic_heads:",
+        f"  head_spec_id: {actor_critic_heads['headSpecId']}",
+        f"  input_observation_length: {actor_critic_heads['inputObservationLength']}",
+        "  shared_encoder_hidden_units:",
+        *[f"    - {value}" for value in actor_critic_heads["sharedEncoder"]["hiddenUnits"]],
+        f"  shared_encoder_activation: {actor_critic_heads['sharedEncoder']['activation']}",
+        "  boolean_head_distribution: Bernoulli",
+        "  index_head_distribution: Categorical",
+        "  value_head_outputs: 1",
     ]
     return "\n".join(lines) + "\n"
 
@@ -333,6 +360,8 @@ def main() -> None:
         "selectedNstepsPerEnv": plan["scaffoldBudget"]["selectedNstepsPerEnv"],
         "selectedBatchSize": plan["scaffoldBudget"]["selectedBatchSize"],
         "actionAdapterId": plan["actionAdapter"]["adapterId"],
+        "normalizationId": plan["normalization"]["normalizationId"],
+        "headSpecId": plan["actorCriticHeads"]["headSpecId"],
         "matrixRunCount": len(plan["scaffoldMatrix"]),
         "nextPhase": plan["nextPhase"],
     }, indent=2))

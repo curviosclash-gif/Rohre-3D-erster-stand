@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T23:14:05Z",
+  "generatedAt": "2026-04-23T23:16:43Z",
   "generatedBy": "python/scripts/bt93b_prepare_scaffold.py",
   "targetPhase": "93B.1.1",
   "sourceArtifacts": {
@@ -19,6 +19,14 @@
   "actionAdapter": {
     "adapterId": "bt93b-split-head-v1",
     "splitHeadRequired": true,
+    "status": "pinned-for-bt93b-scaffold"
+  },
+  "normalization": {
+    "normalizationId": "bt93b-vecnormalize-v1",
+    "status": "pinned-for-bt93b-scaffold"
+  },
+  "actorCriticHeads": {
+    "headSpecId": "bt93b-actor-critic-v1",
     "status": "pinned-for-bt93b-scaffold"
   },
   "seedPack": {
@@ -80,9 +88,6 @@
   ],
   "manifestTemplatePath": "data\\training\\ppo\\run_manifest.bt93b.template.json",
   "configPath": "python\\configs\\ppo_baseline.yaml",
-  "pendingPhasePins": {
-    "normalizationAndHeads": "93B.1.3"
-  },
   "manifestTemplate": {
     "templateVersion": "bt93b-scaffold-v1",
     "blockId": "BT93B",
@@ -180,14 +185,70 @@
       "note": "BT93B pins split heads before any PPO scaffold trains against the BT92 boundary surface."
     },
     "normalization": {
-      "status": "pending-93B.1.3",
-      "adapter": "VecNormalize-or-equivalent",
-      "note": "State normalization stays a hard prerequisite before the first baseline scaffold run."
+      "normalizationId": "bt93b-vecnormalize-v1",
+      "implementation": "VecNormalize-or-equivalent",
+      "normalizeObservation": true,
+      "normalizeReward": false,
+      "clipObservation": 10.0,
+      "clipReward": 10.0,
+      "gamma": 0.99,
+      "training": true,
+      "persistStatsWithCheckpoint": true,
+      "statsArtifactPattern": "data/training/ppo/**/vecnormalize.pkl",
+      "note": "Observation normalization stays mandatory before the first scaffold smoke and must persist with checkpoints."
     },
     "actorCriticHeads": {
-      "status": "pending-93B.1.3",
-      "note": "Actor/Critic head definitions stay explicit and separate from the raw BT92 boundary surface."
+      "headSpecId": "bt93b-actor-critic-v1",
+      "inputObservationLength": 64,
+      "sharedEncoder": {
+        "type": "mlp",
+        "hiddenUnits": [
+          128,
+          128
+        ],
+        "activation": "tanh"
+      },
+      "policyHeads": [
+        {
+          "headId": "boolean-actions",
+          "distribution": "Bernoulli",
+          "fields": [
+            "pitchUp",
+            "pitchDown",
+            "yawLeft",
+            "yawRight",
+            "rollLeft",
+            "rollRight",
+            "boost",
+            "cameraSwitch",
+            "dropItem",
+            "shootItem",
+            "shootMG",
+            "nextItem"
+          ]
+        },
+        {
+          "headId": "shoot-item-index",
+          "distribution": "Categorical",
+          "field": "shootItemIndex",
+          "optionalMaskSource": "player.inventoryLength",
+          "noOpValue": -1
+        },
+        {
+          "headId": "use-item-index",
+          "distribution": "Categorical",
+          "field": "useItem",
+          "optionalMaskSource": "player.inventoryLength",
+          "noOpValue": -1
+        }
+      ],
+      "valueHead": {
+        "headId": "critic-value",
+        "outputs": 1
+      },
+      "rawBoundarySurfaceTraining": false,
+      "note": "Separate actor heads keep PPO off the raw BT92 boundary surface while the critic stays scalar."
     }
   },
-  "nextPhase": "93B.1.3"
+  "nextPhase": "93B.2.1"
 }
