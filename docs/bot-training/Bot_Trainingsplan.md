@@ -130,7 +130,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-Codex | BT90 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
-| Bot-Codex | BT93A | 2026-04-23 | active | 93A.2 |
+| Bot-Codex | BT93A | 2026-04-23 | active | 93A.3 |
 | - | BT93B | - | frei | wartet auf BT93A.99; minimaler PPO-Scaffold vor echter Baseline |
 | - | BT93C | - | frei | wartet auf BT93B.99; konservative Baseline und Vorvergleich |
 | - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
@@ -634,7 +634,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT90 | Python-Minimalbootstrap und Contract-Wahrheit | completed | P1 | V77.99,V91.99,V92.99 | 90.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` |
 | BT91 | Python-Sidecar und 1-Worker-Headless-Lane | completed | P1 | BT90.99 | 91.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` |
 | BT92 | Single-Env-Adapter und JS-authoritative Semantik | completed | P1 | BT91.99 | 92.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
-| BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | active | P2 | BT92.99 | 93A.2 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
+| BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | active | P2 | BT92.99 | 93A.3 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
 | BT93B | Minimaler PPO-Baseline-Scaffold | planned | P2 | BT93A.99 | 93B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Konservative PPO-Baseline und Benchmark-Disziplin | planned | P2 | BT93B.99 | 93C.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93C.99 | 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
@@ -935,7 +935,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 - [x] 93A.2.1 Mehr-Env-/VecEnv-Smokes liefern reproduzierbare Daten zu Env-Anzahl, Wall-Clock-Throughput, Reset-/Timeout-Rate und Failure-Klassen; Ergebnis unter `data/training/ppo/lane_baseline_2env.json` (oder gleichwertigem Artefakt). (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json` (`stepsPerSecond=60.24846827863641`, `resetRatePerEnv=1.0`, `timeoutRatePerRequest=0.0`, `truncatedReasons.max-steps=2`))
 - [x] 93A.2.2 Python-seitiges Memory-Usage-Tracking implementieren und auf Memory-Leaks bei laengeren Smoke-Runs ueberpruefen [siehe PPO-ADR-003]. (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json` (`memory.leakCheck.memoryStable=true`, `memory.pythonProcess.rssMB.deltaMB=4.785`, `memory.tracemalloc.currentMB.deltaMB=1.13`, `memory.controllerProcesses.cleanupSettled=true`))
 - [x] 93A.2.3 Der Handover an den PPO-Scaffold pinnt gemessene Step-Rate, zulassige Env-Anzahl und harte Downgrade-Regeln aus dem Harness-Artefakt statt aus textuellen Annahmen. (abgeschlossen: 2026-04-23; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py --handover-only` -> `data/training/ppo/bt93a_handover_2env.json` (`defaultStartEnvCount=2`, `measuredLane.stepsPerSecond=59.347422348627816`, `scaffoldContract.fourEnvStatus=eligible-from-2env-thresholds-not-yet-measured`))
-- [ ] 93A.2.4 Offene Harness-Risiken bleiben sichtbar; fehlende `4-Env`-Tragfaehigkeit gilt als dokumentierter Restpunkt statt als stiller Erfolg; sequenzielle Fallback-Lane als Alternative pinnen wenn Subproc instabil.
+- [x] 93A.2.4 Offene Harness-Risiken bleiben sichtbar; fehlende `4-Env`-Tragfaehigkeit gilt als dokumentierter Restpunkt statt als stiller Erfolg; sequenzielle Fallback-Lane als Alternative pinnen wenn Subproc instabil. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py --plan-only` -> `data/training/ppo/bt93a_lane_plan.json` (`openHarnessRisks=3`, `restartBehavior.fallbackLaneSpec.laneType=sequential-2env-fallback`); `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/bt93a_handover_2env.json` (`openHarnessRisks[0].currentState=thresholds-met-but-direct-4env-evidence-missing`, `openHarnessRisks[1].status=guarded-by-pinned-fallback`))
 
 ### 93A.3 Harness-Konsolidierung (BTF-11)
 
