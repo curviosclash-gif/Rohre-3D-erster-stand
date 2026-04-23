@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T22:12:22Z",
+  "generatedAt": "2026-04-23T22:53:47Z",
   "generatedBy": "python/scripts/bt93a_2env_smoke.py",
   "scope": {
     "phase": "93A.2",
@@ -17,7 +17,7 @@
   },
   "lanePlan": {
     "ok": true,
-    "generatedAt": "2026-04-23T22:12:22Z",
+    "generatedAt": "2026-04-23T22:53:47Z",
     "generatedBy": "python/scripts/bt93a_2env_smoke.py --plan-only",
     "scope": {
       "phase": "93A.1.2",
@@ -199,8 +199,8 @@
   },
   "performance": {
     "totalStepsCompleted": 1000,
-    "wallClockSeconds": 17.182966709136963,
-    "stepsPerSecond": 58.197167981955914,
+    "wallClockSeconds": 17.024142026901245,
+    "stepsPerSecond": 58.740111449952536,
     "failureRate": 0.0,
     "totalFailures": 0
   },
@@ -222,26 +222,26 @@
     "sampleCount": 40,
     "sampleIntervalSeconds": 0.5,
     "pythonProcess": {
-      "pid": 27928,
+      "pid": 40588,
       "rssMB": {
-        "startMB": 40.695,
-        "endMB": 45.312,
-        "peakMB": 45.512,
-        "deltaMB": 4.617
+        "startMB": 40.625,
+        "endMB": 45.234,
+        "peakMB": 45.438,
+        "deltaMB": 4.609
       },
       "privateMB": {
-        "startMB": 287.332,
-        "endMB": 290.82,
-        "peakMB": 291.387,
-        "deltaMB": 3.488
+        "startMB": 287.289,
+        "endMB": 290.75,
+        "peakMB": 291.316,
+        "deltaMB": 3.461
       }
     },
     "tracemalloc": {
       "currentMB": {
         "startMB": 0.0,
-        "endMB": 1.13,
+        "endMB": 1.124,
         "peakMB": 1.299,
-        "deltaMB": 1.129
+        "deltaMB": 1.123
       },
       "peakMB": 1.39
     },
@@ -251,20 +251,20 @@
         1
       ],
       "rssMBDuringActiveRun": {
-        "startMB": 150.031,
+        "startMB": 149.223,
         "endMB": 0.531,
-        "peakMB": 161.023,
-        "deltaMB": -149.5
+        "peakMB": 160.5,
+        "deltaMB": -148.691
       },
       "privateMBDuringActiveRun": {
-        "startMB": 182.199,
+        "startMB": 182.254,
         "endMB": 0.617,
-        "peakMB": 187.895,
-        "deltaMB": -181.582
+        "peakMB": 187.992,
+        "deltaMB": -181.637
       },
       "perEnvPeakRssMB": {
-        "0": 80.816,
-        "1": 80.207
+        "0": 80.09,
+        "1": 80.438
       },
       "finalResidualRssMB": 0.531,
       "cleanupSettled": true
@@ -281,399 +281,399 @@
         "elapsedSeconds": 0.0,
         "reason": "run-start",
         "totalCompletedSteps": 0,
-        "pythonRssMB": 40.695,
-        "pythonPrivateMB": 287.332,
+        "pythonRssMB": 40.625,
+        "pythonPrivateMB": 287.289,
         "tracemallocCurrentMB": 0.0,
         "tracemallocPeakMB": 0.0,
         "controllerTotalRssMB": 0.0
       },
       {
-        "elapsedSeconds": 0.502,
+        "elapsedSeconds": 0.511,
         "reason": "interval",
         "totalCompletedSteps": 0,
-        "pythonRssMB": 43.629,
-        "pythonPrivateMB": 289.578,
-        "tracemallocCurrentMB": 0.981,
-        "tracemallocPeakMB": 1.01,
+        "pythonRssMB": 43.352,
+        "pythonPrivateMB": 289.496,
+        "tracemallocCurrentMB": 0.721,
+        "tracemallocPeakMB": 0.733,
         "controllerTotalRssMB": 0.0
       },
       {
-        "elapsedSeconds": 1.018,
+        "elapsedSeconds": 1.025,
         "reason": "interval",
-        "totalCompletedSteps": 2,
-        "pythonRssMB": 44.648,
-        "pythonPrivateMB": 290.566,
-        "tracemallocCurrentMB": 1.167,
-        "tracemallocPeakMB": 1.261,
-        "controllerTotalRssMB": 150.031
+        "totalCompletedSteps": 0,
+        "pythonRssMB": 43.66,
+        "pythonPrivateMB": 289.766,
+        "tracemallocCurrentMB": 0.982,
+        "tracemallocPeakMB": 1.041,
+        "controllerTotalRssMB": 0.0
       },
       {
-        "elapsedSeconds": 1.519,
+        "elapsedSeconds": 1.529,
+        "reason": "interval",
+        "totalCompletedSteps": 2,
+        "pythonRssMB": 44.633,
+        "pythonPrivateMB": 290.57,
+        "tracemallocCurrentMB": 1.18,
+        "tracemallocPeakMB": 1.262,
+        "controllerTotalRssMB": 149.223
+      },
+      {
+        "elapsedSeconds": 2.038,
         "reason": "interval",
         "totalCompletedSteps": 50,
         "pythonRssMB": 44.793,
-        "pythonPrivateMB": 290.672,
-        "tracemallocCurrentMB": 1.176,
-        "tracemallocPeakMB": 1.264,
-        "controllerTotalRssMB": 157.293
+        "pythonPrivateMB": 290.828,
+        "tracemallocCurrentMB": 1.171,
+        "tracemallocPeakMB": 1.265,
+        "controllerTotalRssMB": 157.059
       },
       {
-        "elapsedSeconds": 2.033,
+        "elapsedSeconds": 2.545,
         "reason": "interval",
         "totalCompletedSteps": 50,
-        "pythonRssMB": 44.863,
-        "pythonPrivateMB": 290.801,
-        "tracemallocCurrentMB": 1.175,
-        "tracemallocPeakMB": 1.268,
-        "controllerTotalRssMB": 157.57
+        "pythonRssMB": 44.898,
+        "pythonPrivateMB": 290.93,
+        "tracemallocCurrentMB": 1.181,
+        "tracemallocPeakMB": 1.269,
+        "controllerTotalRssMB": 157.355
       },
       {
-        "elapsedSeconds": 2.535,
+        "elapsedSeconds": 3.059,
         "reason": "interval",
         "totalCompletedSteps": 100,
-        "pythonRssMB": 44.883,
-        "pythonPrivateMB": 290.801,
-        "tracemallocCurrentMB": 1.179,
-        "tracemallocPeakMB": 1.272,
-        "controllerTotalRssMB": 158.066
+        "pythonRssMB": 44.965,
+        "pythonPrivateMB": 291.0,
+        "tracemallocCurrentMB": 1.185,
+        "tracemallocPeakMB": 1.273,
+        "controllerTotalRssMB": 157.738
       },
       {
-        "elapsedSeconds": 3.038,
+        "elapsedSeconds": 3.571,
         "reason": "interval",
         "totalCompletedSteps": 150,
-        "pythonRssMB": 44.887,
-        "pythonPrivateMB": 290.801,
-        "tracemallocCurrentMB": 1.234,
+        "pythonRssMB": 45.008,
+        "pythonPrivateMB": 291.0,
+        "tracemallocCurrentMB": 1.186,
         "tracemallocPeakMB": 1.276,
-        "controllerTotalRssMB": 158.105
+        "controllerTotalRssMB": 158.098
       },
       {
-        "elapsedSeconds": 3.551,
+        "elapsedSeconds": 4.075,
         "reason": "interval",
         "totalCompletedSteps": 150,
-        "pythonRssMB": 44.938,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.192,
-        "tracemallocPeakMB": 1.279,
-        "controllerTotalRssMB": 158.672
+        "pythonRssMB": 45.008,
+        "pythonPrivateMB": 291.0,
+        "tracemallocCurrentMB": 1.188,
+        "tracemallocPeakMB": 1.281,
+        "controllerTotalRssMB": 158.633
       },
       {
-        "elapsedSeconds": 4.052,
+        "elapsedSeconds": 4.576,
         "reason": "interval",
         "totalCompletedSteps": 200,
-        "pythonRssMB": 44.953,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.196,
-        "tracemallocPeakMB": 1.284,
-        "controllerTotalRssMB": 158.781
+        "pythonRssMB": 45.082,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.197,
+        "tracemallocPeakMB": 1.285,
+        "controllerTotalRssMB": 158.832
       },
       {
-        "elapsedSeconds": 4.567,
+        "elapsedSeconds": 5.103,
         "reason": "interval",
         "totalCompletedSteps": 200,
-        "pythonRssMB": 44.957,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.194,
-        "tracemallocPeakMB": 1.287,
-        "controllerTotalRssMB": 159.227
+        "pythonRssMB": 45.086,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.199,
+        "tracemallocPeakMB": 1.289,
+        "controllerTotalRssMB": 158.996
       },
       {
-        "elapsedSeconds": 5.067,
+        "elapsedSeconds": 5.605,
         "reason": "interval",
         "totalCompletedSteps": 250,
-        "pythonRssMB": 44.957,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.198,
-        "tracemallocPeakMB": 1.291,
-        "controllerTotalRssMB": 159.758
+        "pythonRssMB": 45.086,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.2,
+        "tracemallocPeakMB": 1.293,
+        "controllerTotalRssMB": 159.297
       },
       {
-        "elapsedSeconds": 5.568,
+        "elapsedSeconds": 6.107,
         "reason": "interval",
         "totalCompletedSteps": 300,
-        "pythonRssMB": 44.961,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.201,
-        "tracemallocPeakMB": 1.294,
-        "controllerTotalRssMB": 159.629
+        "pythonRssMB": 45.109,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.204,
+        "tracemallocPeakMB": 1.297,
+        "controllerTotalRssMB": 159.125
       },
       {
-        "elapsedSeconds": 6.069,
+        "elapsedSeconds": 6.625,
         "reason": "interval",
         "totalCompletedSteps": 300,
-        "pythonRssMB": 44.965,
-        "pythonPrivateMB": 290.836,
+        "pythonRssMB": 45.113,
+        "pythonPrivateMB": 291.07,
         "tracemallocCurrentMB": 1.211,
-        "tracemallocPeakMB": 1.299,
-        "controllerTotalRssMB": 159.594
+        "tracemallocPeakMB": 1.301,
+        "controllerTotalRssMB": 159.008
       },
       {
-        "elapsedSeconds": 6.572,
+        "elapsedSeconds": 7.14,
         "reason": "interval",
         "totalCompletedSteps": 350,
-        "pythonRssMB": 44.973,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.261,
-        "tracemallocPeakMB": 1.303,
-        "controllerTotalRssMB": 160.375
+        "pythonRssMB": 45.121,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.214,
+        "tracemallocPeakMB": 1.301,
+        "controllerTotalRssMB": 160.211
       },
       {
-        "elapsedSeconds": 7.082,
-        "reason": "interval",
-        "totalCompletedSteps": 350,
-        "pythonRssMB": 44.977,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.219,
-        "tracemallocPeakMB": 1.307,
-        "controllerTotalRssMB": 160.605
-      },
-      {
-        "elapsedSeconds": 7.585,
+        "elapsedSeconds": 7.654,
         "reason": "interval",
         "totalCompletedSteps": 400,
-        "pythonRssMB": 44.98,
-        "pythonPrivateMB": 290.836,
-        "tracemallocCurrentMB": 1.218,
-        "tracemallocPeakMB": 1.311,
-        "controllerTotalRssMB": 160.574
+        "pythonRssMB": 45.125,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.217,
+        "tracemallocPeakMB": 1.301,
+        "controllerTotalRssMB": 160.199
       },
       {
-        "elapsedSeconds": 8.085,
+        "elapsedSeconds": 8.169,
         "reason": "interval",
-        "totalCompletedSteps": 450,
-        "pythonRssMB": 45.027,
-        "pythonPrivateMB": 290.906,
-        "tracemallocCurrentMB": 1.221,
+        "totalCompletedSteps": 400,
+        "pythonRssMB": 45.137,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.226,
         "tracemallocPeakMB": 1.314,
-        "controllerTotalRssMB": 161.023
+        "controllerTotalRssMB": 159.977
       },
       {
-        "elapsedSeconds": 8.591,
+        "elapsedSeconds": 8.683,
         "reason": "interval",
         "totalCompletedSteps": 450,
-        "pythonRssMB": 45.043,
-        "pythonPrivateMB": 290.906,
-        "tracemallocCurrentMB": 1.228,
-        "tracemallocPeakMB": 1.319,
-        "controllerTotalRssMB": 134.828
+        "pythonRssMB": 45.141,
+        "pythonPrivateMB": 291.07,
+        "tracemallocCurrentMB": 1.23,
+        "tracemallocPeakMB": 1.318,
+        "controllerTotalRssMB": 160.5
       },
       {
-        "elapsedSeconds": 9.101,
+        "elapsedSeconds": 9.191,
         "reason": "interval",
         "totalCompletedSteps": 500,
-        "pythonRssMB": 45.043,
-        "pythonPrivateMB": 290.906,
-        "tracemallocCurrentMB": 1.232,
-        "tracemallocPeakMB": 1.319,
-        "controllerTotalRssMB": 137.594
+        "pythonRssMB": 45.203,
+        "pythonPrivateMB": 291.141,
+        "tracemallocCurrentMB": 1.229,
+        "tracemallocPeakMB": 1.322,
+        "controllerTotalRssMB": 136.16
       },
       {
-        "elapsedSeconds": 9.618,
+        "elapsedSeconds": 9.699,
         "reason": "interval",
         "totalCompletedSteps": 500,
-        "pythonRssMB": 45.047,
-        "pythonPrivateMB": 290.906,
-        "tracemallocCurrentMB": 1.236,
-        "tracemallocPeakMB": 1.319,
-        "controllerTotalRssMB": 137.129
+        "pythonRssMB": 45.211,
+        "pythonPrivateMB": 291.141,
+        "tracemallocCurrentMB": 1.235,
+        "tracemallocPeakMB": 1.328,
+        "controllerTotalRssMB": 135.805
       },
       {
-        "elapsedSeconds": 10.119,
+        "elapsedSeconds": 10.21,
         "reason": "interval",
         "totalCompletedSteps": 550,
-        "pythonRssMB": 45.051,
-        "pythonPrivateMB": 290.906,
-        "tracemallocCurrentMB": 1.238,
-        "tracemallocPeakMB": 1.319,
-        "controllerTotalRssMB": 137.199
-      },
-      {
-        "elapsedSeconds": 10.621,
-        "reason": "interval",
-        "totalCompletedSteps": 600,
-        "pythonRssMB": 45.086,
-        "pythonPrivateMB": 290.941,
-        "tracemallocCurrentMB": 1.26,
-        "tracemallocPeakMB": 1.319,
-        "controllerTotalRssMB": 137.809
-      },
-      {
-        "elapsedSeconds": 11.136,
-        "reason": "interval",
-        "totalCompletedSteps": 600,
-        "pythonRssMB": 45.102,
-        "pythonPrivateMB": 290.941,
-        "tracemallocCurrentMB": 1.252,
-        "tracemallocPeakMB": 1.341,
-        "controllerTotalRssMB": 137.863
-      },
-      {
-        "elapsedSeconds": 11.651,
-        "reason": "interval",
-        "totalCompletedSteps": 650,
-        "pythonRssMB": 45.133,
-        "pythonPrivateMB": 290.977,
-        "tracemallocCurrentMB": 1.251,
-        "tracemallocPeakMB": 1.344,
-        "controllerTotalRssMB": 137.914
-      },
-      {
-        "elapsedSeconds": 12.151,
-        "reason": "interval",
-        "totalCompletedSteps": 675,
-        "pythonRssMB": 45.203,
-        "pythonPrivateMB": 291.047,
-        "tracemallocCurrentMB": 1.256,
-        "tracemallocPeakMB": 1.349,
-        "controllerTotalRssMB": 137.938
-      },
-      {
-        "elapsedSeconds": 12.667,
-        "reason": "interval",
-        "totalCompletedSteps": 700,
         "pythonRssMB": 45.215,
-        "pythonPrivateMB": 291.047,
-        "tracemallocCurrentMB": 1.265,
-        "tracemallocPeakMB": 1.353,
-        "controllerTotalRssMB": 138.117
+        "pythonPrivateMB": 291.141,
+        "tracemallocCurrentMB": 1.238,
+        "tracemallocPeakMB": 1.332,
+        "controllerTotalRssMB": 137.609
       },
       {
-        "elapsedSeconds": 13.183,
+        "elapsedSeconds": 10.726,
         "reason": "interval",
-        "totalCompletedSteps": 750,
-        "pythonRssMB": 45.25,
-        "pythonPrivateMB": 291.082,
-        "tracemallocCurrentMB": 1.264,
-        "tracemallocPeakMB": 1.357,
-        "controllerTotalRssMB": 137.5
-      },
-      {
-        "elapsedSeconds": 13.686,
-        "reason": "interval",
-        "totalCompletedSteps": 750,
-        "pythonRssMB": 45.281,
-        "pythonPrivateMB": 291.117,
-        "tracemallocCurrentMB": 1.273,
-        "tracemallocPeakMB": 1.362,
-        "controllerTotalRssMB": 137.738
-      },
-      {
-        "elapsedSeconds": 14.201,
-        "reason": "interval",
-        "totalCompletedSteps": 800,
-        "pythonRssMB": 45.285,
-        "pythonPrivateMB": 291.117,
-        "tracemallocCurrentMB": 1.277,
-        "tracemallocPeakMB": 1.365,
-        "controllerTotalRssMB": 137.859
-      },
-      {
-        "elapsedSeconds": 14.703,
-        "reason": "interval",
-        "totalCompletedSteps": 850,
-        "pythonRssMB": 45.312,
-        "pythonPrivateMB": 291.117,
-        "tracemallocCurrentMB": 1.28,
-        "tracemallocPeakMB": 1.369,
-        "controllerTotalRssMB": 137.98
-      },
-      {
-        "elapsedSeconds": 15.218,
-        "reason": "interval",
-        "totalCompletedSteps": 850,
-        "pythonRssMB": 45.402,
-        "pythonPrivateMB": 291.258,
-        "tracemallocCurrentMB": 1.281,
-        "tracemallocPeakMB": 1.374,
-        "controllerTotalRssMB": 138.074
-      },
-      {
-        "elapsedSeconds": 15.733,
-        "reason": "interval",
-        "totalCompletedSteps": 900,
-        "pythonRssMB": 45.41,
-        "pythonPrivateMB": 291.258,
-        "tracemallocCurrentMB": 1.289,
-        "tracemallocPeakMB": 1.378,
-        "controllerTotalRssMB": 137.992
-      },
-      {
-        "elapsedSeconds": 16.234,
-        "reason": "interval",
-        "totalCompletedSteps": 900,
-        "pythonRssMB": 45.418,
-        "pythonPrivateMB": 291.258,
-        "tracemallocCurrentMB": 1.293,
-        "tracemallocPeakMB": 1.381,
-        "controllerTotalRssMB": 138.137
-      },
-      {
-        "elapsedSeconds": 16.735,
-        "reason": "interval",
-        "totalCompletedSteps": 950,
-        "pythonRssMB": 45.512,
-        "pythonPrivateMB": 291.387,
-        "tracemallocCurrentMB": 1.299,
-        "tracemallocPeakMB": 1.387,
+        "totalCompletedSteps": 600,
+        "pythonRssMB": 45.242,
+        "pythonPrivateMB": 291.176,
+        "tracemallocCurrentMB": 1.249,
+        "tracemallocPeakMB": 1.337,
         "controllerTotalRssMB": 138.211
       },
       {
-        "elapsedSeconds": 17.183,
+        "elapsedSeconds": 11.228,
+        "reason": "interval",
+        "totalCompletedSteps": 600,
+        "pythonRssMB": 45.246,
+        "pythonPrivateMB": 291.176,
+        "tracemallocCurrentMB": 1.251,
+        "tracemallocPeakMB": 1.34,
+        "controllerTotalRssMB": 138.352
+      },
+      {
+        "elapsedSeconds": 11.74,
+        "reason": "interval",
+        "totalCompletedSteps": 650,
+        "pythonRssMB": 45.316,
+        "pythonPrivateMB": 291.246,
+        "tracemallocCurrentMB": 1.251,
+        "tracemallocPeakMB": 1.344,
+        "controllerTotalRssMB": 138.371
+      },
+      {
+        "elapsedSeconds": 12.245,
+        "reason": "interval",
+        "totalCompletedSteps": 700,
+        "pythonRssMB": 45.332,
+        "pythonPrivateMB": 291.246,
+        "tracemallocCurrentMB": 1.261,
+        "tracemallocPeakMB": 1.349,
+        "controllerTotalRssMB": 138.371
+      },
+      {
+        "elapsedSeconds": 12.758,
+        "reason": "interval",
+        "totalCompletedSteps": 700,
+        "pythonRssMB": 45.332,
+        "pythonPrivateMB": 291.246,
+        "tracemallocCurrentMB": 1.265,
+        "tracemallocPeakMB": 1.353,
+        "controllerTotalRssMB": 138.469
+      },
+      {
+        "elapsedSeconds": 13.26,
+        "reason": "interval",
+        "totalCompletedSteps": 750,
+        "pythonRssMB": 45.336,
+        "pythonPrivateMB": 291.246,
+        "tracemallocCurrentMB": 1.265,
+        "tracemallocPeakMB": 1.358,
+        "controllerTotalRssMB": 137.926
+      },
+      {
+        "elapsedSeconds": 13.774,
+        "reason": "interval",
+        "totalCompletedSteps": 750,
+        "pythonRssMB": 45.348,
+        "pythonPrivateMB": 291.246,
+        "tracemallocCurrentMB": 1.274,
+        "tracemallocPeakMB": 1.362,
+        "controllerTotalRssMB": 137.758
+      },
+      {
+        "elapsedSeconds": 14.288,
+        "reason": "interval",
+        "totalCompletedSteps": 800,
+        "pythonRssMB": 45.391,
+        "pythonPrivateMB": 291.316,
+        "tracemallocCurrentMB": 1.275,
+        "tracemallocPeakMB": 1.365,
+        "controllerTotalRssMB": 137.855
+      },
+      {
+        "elapsedSeconds": 14.795,
+        "reason": "interval",
+        "totalCompletedSteps": 850,
+        "pythonRssMB": 45.391,
+        "pythonPrivateMB": 291.316,
+        "tracemallocCurrentMB": 1.279,
+        "tracemallocPeakMB": 1.365,
+        "controllerTotalRssMB": 137.961
+      },
+      {
+        "elapsedSeconds": 15.31,
+        "reason": "interval",
+        "totalCompletedSteps": 850,
+        "pythonRssMB": 45.395,
+        "pythonPrivateMB": 291.316,
+        "tracemallocCurrentMB": 1.286,
+        "tracemallocPeakMB": 1.375,
+        "controllerTotalRssMB": 138.055
+      },
+      {
+        "elapsedSeconds": 15.824,
+        "reason": "interval",
+        "totalCompletedSteps": 900,
+        "pythonRssMB": 45.402,
+        "pythonPrivateMB": 291.316,
+        "tracemallocCurrentMB": 1.285,
+        "tracemallocPeakMB": 1.378,
+        "controllerTotalRssMB": 138.387
+      },
+      {
+        "elapsedSeconds": 16.339,
+        "reason": "interval",
+        "totalCompletedSteps": 950,
+        "pythonRssMB": 45.426,
+        "pythonPrivateMB": 291.316,
+        "tracemallocCurrentMB": 1.291,
+        "tracemallocPeakMB": 1.381,
+        "controllerTotalRssMB": 138.461
+      },
+      {
+        "elapsedSeconds": 16.841,
+        "reason": "interval",
+        "totalCompletedSteps": 950,
+        "pythonRssMB": 45.438,
+        "pythonPrivateMB": 291.316,
+        "tracemallocCurrentMB": 1.299,
+        "tracemallocPeakMB": 1.388,
+        "controllerTotalRssMB": 138.48
+      },
+      {
+        "elapsedSeconds": 17.024,
         "reason": "run-complete",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.332,
-        "pythonPrivateMB": 290.867,
-        "tracemallocCurrentMB": 1.126,
+        "pythonRssMB": 45.254,
+        "pythonPrivateMB": 290.797,
+        "tracemallocCurrentMB": 1.12,
         "tracemallocPeakMB": 1.39,
         "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 17.183,
+        "elapsedSeconds": 17.024,
         "reason": "post-close",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.32,
-        "pythonPrivateMB": 290.852,
-        "tracemallocCurrentMB": 1.126,
+        "pythonRssMB": 45.25,
+        "pythonPrivateMB": 290.781,
+        "tracemallocCurrentMB": 1.12,
         "tracemallocPeakMB": 1.39,
         "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 17.683,
+        "elapsedSeconds": 17.525,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.312,
-        "pythonPrivateMB": 290.82,
-        "tracemallocCurrentMB": 1.127,
+        "pythonRssMB": 45.234,
+        "pythonPrivateMB": 290.75,
+        "tracemallocCurrentMB": 1.121,
         "tracemallocPeakMB": 1.39,
         "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 18.184,
+        "elapsedSeconds": 18.025,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.312,
-        "pythonPrivateMB": 290.82,
-        "tracemallocCurrentMB": 1.128,
+        "pythonRssMB": 45.234,
+        "pythonPrivateMB": 290.75,
+        "tracemallocCurrentMB": 1.122,
         "tracemallocPeakMB": 1.39,
         "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 18.684,
+        "elapsedSeconds": 18.526,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.312,
-        "pythonPrivateMB": 290.82,
-        "tracemallocCurrentMB": 1.129,
+        "pythonRssMB": 45.234,
+        "pythonPrivateMB": 290.75,
+        "tracemallocCurrentMB": 1.123,
         "tracemallocPeakMB": 1.39,
         "controllerTotalRssMB": 0.531
       },
       {
-        "elapsedSeconds": 19.185,
+        "elapsedSeconds": 19.026,
         "reason": "post-close-wait",
         "totalCompletedSteps": 1000,
-        "pythonRssMB": 45.312,
-        "pythonPrivateMB": 290.82,
-        "tracemallocCurrentMB": 1.13,
+        "pythonRssMB": 45.234,
+        "pythonPrivateMB": 290.75,
+        "tracemallocCurrentMB": 1.124,
         "tracemallocPeakMB": 1.39,
         "controllerTotalRssMB": 0.531
       }
@@ -691,7 +691,7 @@
       "envId": 0,
       "seed": 930,
       "sessionId": "bt93a-2env-smoke-0",
-      "controllerPid": 29944,
+      "controllerPid": 30740,
       "stepsCompleted": 500,
       "resetCount": 1,
       "timeoutCount": 0,
@@ -701,13 +701,13 @@
       "truncatedReasons": {
         "max-steps": 1
       },
-      "wallClockSeconds": 17.142069578170776,
+      "wallClockSeconds": 17.017634391784668,
       "bridgeRequestsSent": 1002,
       "bridgeResponsesReceived": 1002,
       "bridgeFailures": 0,
-      "bridgeLatencyMeanMs": 2.1796875,
+      "bridgeLatencyMeanMs": 2.296875,
       "bridgeLatencyP95Ms": 3,
-      "processingLatencyAverageMs": 1.396,
+      "processingLatencyAverageMs": 1.472,
       "validationFailures": 0,
       "messageCounts": {
         "training-reset": 1,
@@ -721,7 +721,7 @@
       "envId": 1,
       "seed": 931,
       "sessionId": "bt93a-2env-smoke-1",
-      "controllerPid": 20864,
+      "controllerPid": 40780,
       "stepsCompleted": 500,
       "resetCount": 1,
       "timeoutCount": 0,
@@ -731,13 +731,13 @@
       "truncatedReasons": {
         "max-steps": 1
       },
-      "wallClockSeconds": 17.174863576889038,
+      "wallClockSeconds": 16.990187406539917,
       "bridgeRequestsSent": 1002,
       "bridgeResponsesReceived": 1002,
       "bridgeFailures": 0,
-      "bridgeLatencyMeanMs": 2.1796875,
+      "bridgeLatencyMeanMs": 2.296875,
       "bridgeLatencyP95Ms": 3,
-      "processingLatencyAverageMs": 1.398,
+      "processingLatencyAverageMs": 1.539,
       "validationFailures": 0,
       "messageCounts": {
         "training-reset": 1,
@@ -750,16 +750,16 @@
   ],
   "handover": {
     "ok": true,
-    "generatedAt": "2026-04-23T22:12:22Z",
+    "generatedAt": "2026-04-23T22:53:47Z",
     "generatedBy": "python/scripts/bt93a_2env_smoke.py",
     "targetBlock": "BT93B",
     "sourceArtifact": "data\\training\\ppo\\lane_baseline_2env.json",
     "sourcePhase": "93A.2",
     "measuredLane": {
       "validatedEnvCount": 2,
-      "stepsPerSecond": 58.197167981955914,
+      "stepsPerSecond": 58.740111449952536,
       "failureRate": 0.0,
-      "wallClockSeconds": 17.182966709136963,
+      "wallClockSeconds": 17.024142026901245,
       "timeoutRatePerRequest": 0.0,
       "memoryStable": true,
       "totalFailures": 0
@@ -778,18 +778,18 @@
       "examples": [
         {
           "targetUpdateWindowSeconds": 15,
-          "maxRolloutStepsTotalAtMeasuredLane": 873,
-          "maxNstepsAtValidatedLane": 436
+          "maxRolloutStepsTotalAtMeasuredLane": 881,
+          "maxNstepsAtValidatedLane": 440
         },
         {
           "targetUpdateWindowSeconds": 30,
-          "maxRolloutStepsTotalAtMeasuredLane": 1746,
-          "maxNstepsAtValidatedLane": 873
+          "maxRolloutStepsTotalAtMeasuredLane": 1762,
+          "maxNstepsAtValidatedLane": 881
         },
         {
           "targetUpdateWindowSeconds": 60,
-          "maxRolloutStepsTotalAtMeasuredLane": 3492,
-          "maxNstepsAtValidatedLane": 1746
+          "maxRolloutStepsTotalAtMeasuredLane": 3524,
+          "maxNstepsAtValidatedLane": 1762
         }
       ]
     },

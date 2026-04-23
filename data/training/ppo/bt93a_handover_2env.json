@@ -1,15 +1,15 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T22:12:22Z",
+  "generatedAt": "2026-04-23T22:53:47Z",
   "generatedBy": "python/scripts/bt93a_2env_smoke.py",
   "targetBlock": "BT93B",
   "sourceArtifact": "data\\training\\ppo\\lane_baseline_2env.json",
   "sourcePhase": "93A.2",
   "measuredLane": {
     "validatedEnvCount": 2,
-    "stepsPerSecond": 58.197167981955914,
+    "stepsPerSecond": 58.740111449952536,
     "failureRate": 0.0,
-    "wallClockSeconds": 17.182966709136963,
+    "wallClockSeconds": 17.024142026901245,
     "timeoutRatePerRequest": 0.0,
     "memoryStable": true,
     "totalFailures": 0
@@ -28,18 +28,18 @@
     "examples": [
       {
         "targetUpdateWindowSeconds": 15,
-        "maxRolloutStepsTotalAtMeasuredLane": 873,
-        "maxNstepsAtValidatedLane": 436
+        "maxRolloutStepsTotalAtMeasuredLane": 881,
+        "maxNstepsAtValidatedLane": 440
       },
       {
         "targetUpdateWindowSeconds": 30,
-        "maxRolloutStepsTotalAtMeasuredLane": 1746,
-        "maxNstepsAtValidatedLane": 873
+        "maxRolloutStepsTotalAtMeasuredLane": 1762,
+        "maxNstepsAtValidatedLane": 881
       },
       {
         "targetUpdateWindowSeconds": 60,
-        "maxRolloutStepsTotalAtMeasuredLane": 3492,
-        "maxNstepsAtValidatedLane": 1746
+        "maxRolloutStepsTotalAtMeasuredLane": 3524,
+        "maxNstepsAtValidatedLane": 1762
       }
     ]
   },
