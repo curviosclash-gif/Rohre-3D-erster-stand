@@ -1000,7 +1000,7 @@ Claim-Grenze:
 ### 93B.3 Checkpoint-, Resume- und Normalize-Persistenz
 
 - [x] 93B.3.1 Resume-Kette sicherstellen und Stats-/Checkpoint-Dateien pruefen. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/train.py --profile bt93b --run-kind resume-smoke` -> `data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/training_report.json` (`resume.validated=true`, `normalizationJsonPickleMatch=true`, `totalStepsCompleted=768`, `failureRate=0.0`), commit `e80d4a9`)
-- [ ] 93B.3.2 Artefaktkonsistenz zwischen neuem und fortgesetztem Lauf absichern.
+- [x] 93B.3.2 Artefaktkonsistenz zwischen neuem und fortgesetztem Lauf absichern. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93b_verify_artifact_consistency.py` -> `data/training/ppo/bt93b/artifact_consistency_report.json` (`ok=true`, `stableManifestMatch=true`, `resumeConsumesFreshCheckpoint=true`, `freshNormalizationJsonPickleMatch=true`, `resumeNormalizationJsonPickleMatch=true`), commit `aee6508`)
 
 ### 93B.99 Abschluss-Gate
 
