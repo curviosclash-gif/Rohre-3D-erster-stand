@@ -87,7 +87,19 @@ class ActionSurfaceProbeEnv(gym.Env[np.ndarray, dict[str, Any]]):
         return self._observation(), reward, terminated, truncated, self._info()
 
 
-def run_smoke(*, output_path: Path, train_timesteps: int, eval_steps: int) -> dict[str, Any]:
+def _noop_action(width: int) -> np.ndarray:
+    return np.zeros((width,), dtype=np.int64)
+
+
+def run_smoke(
+    *,
+    output_path: Path,
+    train_timesteps: int,
+    eval_steps: int,
+    block_id: str = "BT93C",
+    phase_id: str = "93C.2",
+    include_fallback_probes: bool = False,
+) -> dict[str, Any]:
     env = CurviosPpoActionWrapper(ActionSurfaceProbeEnv(max_steps=max(4, eval_steps)))
     observation, _ = env.reset(seed=932)
 
@@ -95,6 +107,11 @@ def run_smoke(*, output_path: Path, train_timesteps: int, eval_steps: int) -> di
     forced_raw_action[len(ACTION_BOOLEAN_FIELDS) + 0] = 256
     forced_raw_action[list(ACTION_BOOLEAN_FIELDS).index("shootItem")] = 1
     _, _, _, _, forced_info = env.step(forced_raw_action)
+    forced_noop_info: Mapping[str, Any] = {}
+    forced_invalid_fallback_info: Mapping[str, Any] = {}
+    if include_fallback_probes:
+        _, _, _, _, forced_noop_info = env.step(_noop_action(len(ACTION_BOOLEAN_FIELDS) + len(ACTION_INDEX_FIELDS)))
+        _, _, _, _, forced_invalid_fallback_info = env.step(np.array([], dtype=np.int64))
 
     model = PPO(
         "MlpPolicy",
@@ -125,18 +142,33 @@ def run_smoke(*, output_path: Path, train_timesteps: int, eval_steps: int) -> di
         "ok": True,
         "generatedAt": _utc_now(),
         "generatedBy": "python/scripts/bt93c_action_surface_smoke.py",
-        "blockId": "BT93C",
-        "phaseId": "93C.2",
+        "blockId": block_id,
+        "phaseId": phase_id,
         "surface": manifest,
         "checks": {
             "sb3CompatibleActionSpace": env.action_space.__class__.__name__ == "MultiDiscrete",
             "observationLength": int(observation.shape[0]),
             "forcedMaskTelemetryVisible": bool(forced_info.get("ppoActionSurface", {}).get("maskEvents")),
             "forcedVetoTelemetryVisible": bool(forced_info.get("ppoActionSurface", {}).get("vetoEvents")),
+            "forcedNoopFallbackTelemetryVisible": bool(forced_noop_info.get("ppoActionTelemetry", {}).get("noopCount"))
+            if include_fallback_probes
+            else None,
+            "forcedInvalidFallbackTelemetryVisible": bool(
+                forced_invalid_fallback_info.get("ppoActionSurface", {}).get("invalidReasons")
+            )
+            if include_fallback_probes
+            else None,
             "trainIterationCompleted": True,
             "evalIterationCompleted": True,
             "sameWrapperForTrainAndEval": True,
             "rawBoundarySurfaceTraining": False,
+        },
+        "fallbackProbes": {
+            "included": include_fallback_probes,
+            "noop": forced_noop_info.get("ppoActionSurface") if include_fallback_probes else None,
+            "invalidWidthFallback": forced_invalid_fallback_info.get("ppoActionSurface")
+            if include_fallback_probes
+            else None,
         },
         "train": {
             "totalTimesteps": int(train_timesteps),
@@ -165,12 +197,18 @@ def main() -> None:
     parser.add_argument("--output", default=str(DEFAULT_OUTPUT))
     parser.add_argument("--train-timesteps", type=int, default=16)
     parser.add_argument("--eval-steps", type=int, default=8)
+    parser.add_argument("--block-id", default="BT93C")
+    parser.add_argument("--phase-id", default="93C.2")
+    parser.add_argument("--include-fallback-probes", action="store_true")
     args = parser.parse_args()
 
     report = run_smoke(
         output_path=Path(args.output).resolve(),
         train_timesteps=args.train_timesteps,
         eval_steps=args.eval_steps,
+        block_id=args.block_id,
+        phase_id=args.phase_id,
+        include_fallback_probes=args.include_fallback_probes,
     )
     print(json.dumps({
         "ok": report["ok"],

@@ -1,4 +1,336 @@
 {
+  "actionSurfaceHardeningMatrix": {
+    "bt94aImpact": {
+      "blockedFindings": [
+        "F.30"
+      ],
+      "claimableAfter93E4": false,
+      "decision": "BT94A remains closed; 93E.4 separates policy-mask absence from post-decode clamp/veto load",
+      "findingStatus": {
+        "F.03": "closed",
+        "F.20": "closed",
+        "F.30": "still-blocking"
+      }
+    },
+    "classification": "bt93e-action-surface-start-diagnostics-only",
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsRolloutEvidence": false,
+    "findingDisposition": {
+      "F.03": "closed",
+      "F.20": "closed",
+      "F.30": "still-blocking"
+    },
+    "generatedAt": "2026-04-24T22:39:30Z",
+    "generatedBy": "python/scripts/bt93e_action_surface_hardening_report.py",
+    "laneMatrix": {
+      "eval": {
+        "bt94aStartImpact": "blocked",
+        "invalidAction": {
+          "count": 0,
+          "eventName": "invalidReasons",
+          "rate": 0.0
+        },
+        "noopFallback": {
+          "count": 0,
+          "eventName": "noopRate",
+          "rate": 0.0
+        },
+        "policyLevelMask": {
+          "count": null,
+          "eventName": null,
+          "mixedWithPostDecodeClamp": false,
+          "present": false,
+          "rate": null,
+          "status": "absent-in-current-sb3-multidiscrete-policy"
+        },
+        "postDecodeClamp": {
+          "count": 32,
+          "eventName": "maskEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 32,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 1.0,
+          "source": "decode_multidiscrete_action inventory clamp after policy output"
+        },
+        "safetyVeto": {
+          "count": 32,
+          "eventName": "vetoEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 32,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 1.0
+        },
+        "sanitizer": {
+          "count": 0,
+          "eventName": "sanitizerEvents",
+          "rate": 0.0,
+          "reasons": {}
+        }
+      },
+      "holdout": {
+        "bt94aStartImpact": "blocked",
+        "invalidAction": {
+          "count": 0,
+          "eventName": "invalidReasons",
+          "rate": 0.0
+        },
+        "noopFallback": {
+          "count": 0,
+          "eventName": "noopRate",
+          "rate": 0.0
+        },
+        "policyLevelMask": {
+          "count": null,
+          "eventName": null,
+          "mixedWithPostDecodeClamp": false,
+          "present": false,
+          "rate": null,
+          "status": "absent-in-current-sb3-multidiscrete-policy"
+        },
+        "postDecodeClamp": {
+          "count": 32,
+          "eventName": "maskEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 17,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 1.0,
+          "source": "decode_multidiscrete_action inventory clamp after policy output"
+        },
+        "safetyVeto": {
+          "count": 17,
+          "eventName": "vetoEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 17,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 0.53125
+        },
+        "sanitizer": {
+          "count": 0,
+          "eventName": "sanitizerEvents",
+          "rate": 0.0,
+          "reasons": {}
+        }
+      },
+      "train": {
+        "bt94aStartImpact": "blocked",
+        "invalidAction": {
+          "count": 0,
+          "eventName": "invalidReasons",
+          "rate": 0.0
+        },
+        "noopFallback": {
+          "count": 0,
+          "eventName": "noopRate",
+          "rate": 0.0
+        },
+        "policyLevelMask": {
+          "count": null,
+          "eventName": null,
+          "mixedWithPostDecodeClamp": false,
+          "present": false,
+          "rate": null,
+          "status": "absent-in-current-sb3-multidiscrete-policy"
+        },
+        "postDecodeClamp": {
+          "count": 8,
+          "eventName": "maskEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 2,
+            "shootItemIndex": 8,
+            "useItem": 8
+          },
+          "rate": 1.0,
+          "source": "decode_multidiscrete_action inventory clamp after policy output"
+        },
+        "safetyVeto": {
+          "count": 2,
+          "eventName": "vetoEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 2,
+            "shootItemIndex": 8,
+            "useItem": 8
+          },
+          "rate": 0.25
+        },
+        "sanitizer": {
+          "count": 0,
+          "eventName": "sanitizerEvents",
+          "rate": 0.0,
+          "reasons": {}
+        }
+      }
+    },
+    "phaseId": "93E.4.4",
+    "policyMaskClampContract": {
+      "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+      "fallbackSemantics": {
+        "invalidWidthFallbackVisible": true,
+        "invalidWidthProbe": {
+          "boundaryAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [
+            "action width 0 != 14"
+          ],
+          "inventoryLength": 0,
+          "maskEvents": [],
+          "rawAction": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerChangedAction": false,
+          "sanitizerEvents": [],
+          "surfaceId": "bt93c-multidiscrete-action-v1",
+          "vetoEvents": []
+        },
+        "noopFallbackVisible": true,
+        "noopProbe": {
+          "boundaryAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 2,
+          "maskEvents": [],
+          "rawAction": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerChangedAction": false,
+          "sanitizerEvents": [],
+          "surfaceId": "bt93c-multidiscrete-action-v1",
+          "vetoEvents": []
+        }
+      },
+      "gymSpace": "MultiDiscrete",
+      "indexEncoding": {
+        "maskSource": "info.match.inventoryLength from the JS-authoritative transition payload",
+        "token0": "no-op / -1",
+        "tokenN": "inventory index N-1",
+        "width": 257
+      },
+      "policyLevelMasking": {
+        "evidence": "Current SB3 policy emits MultiDiscrete heads; inventory legality is clamped after decode.",
+        "present": false,
+        "rateSource": null,
+        "status": "not-implemented-in-current-policy"
+      },
+      "postDecodeClamp": {
+        "eventName": "maskEvents",
+        "maskSource": "info.match.inventoryLength from the JS-authoritative transition payload",
+        "mixedWithPolicyMask": false,
+        "present": true
+      },
+      "rawBoundarySurfaceTraining": false,
+      "sameWrapperForTrainAndEval": true,
+      "sb3Trainable": true,
+      "surfaceId": "bt93c-multidiscrete-action-v1"
+    },
+    "sourceReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+      "role": "BT93E action-surface hardening report",
+      "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4"
+    },
+    "thresholds": {
+      "highLoadWithoutPolicyMaskBlocksBt94a": true,
+      "invalidActionRateAboveZeroBlocks": true,
+      "policyMaskAndPostDecodeClampMustNotBeMixed": true,
+      "postDecodeClampRateBlocksAtOrAbove": 0.5,
+      "safetyVetoRateBlocksAtOrAbove": 0.25,
+      "sanitizerRateAboveZeroBlocks": true
+    }
+  },
   "blockId": "BT93E",
   "bt94aBlockerCount": 5,
   "candidateFreezeAllowed": false,
