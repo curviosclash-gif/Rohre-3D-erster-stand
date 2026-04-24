@@ -11,11 +11,13 @@
 
 import { execSync } from 'child_process';
 import { readFileSync, existsSync, readdirSync } from 'fs';
+import { createRequire } from 'module';
 import { join, resolve } from 'path';
 
 const ROOT = resolve(process.cwd());
 const LOCK_DIR = join(ROOT, 'docs', 'lock-status');
 const PLANS_ACTIVE = join(ROOT, 'docs', 'plaene', 'aktiv');
+const require = createRequire(import.meta.url);
 
 // Parse CLI args
 const args = process.argv.slice(2);
@@ -43,10 +45,7 @@ function await_minimatch() {
     // Use require-style resolution via a sync check
     const modPath = join(ROOT, 'node_modules', 'minimatch', 'dist', 'cjs', 'index.js');
     if (existsSync(modPath)) {
-      // We're in ESM-context-like environment; dynamic require trick
-      const { createRequire } = await import('module');
-      const req = createRequire(import.meta.url);
-      return req('minimatch');
+      return require('minimatch');
     }
   } catch (_) {}
   return null;
