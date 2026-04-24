@@ -264,7 +264,8 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
-| Bot-Codex | BT93D | 2026-04-24 | active | `93D.3` abgeschlossen; naechster Claim `93D.4` |
+| Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
+| Bot-Codex | BT93E | 2026-04-25 | active | `93E.1` gestartet; Vollreparatur vor BT94A |
 | - | BT94A | - | frei | wartet auf BT93D.99 und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1456,7 +1457,7 @@ Quelle:
 - `data/training/ppo/bt93c/evidence_quality_matrix.json`
 - Audit-Sanierungsregister F.01-F.37
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-04-25 -->
 
 Scope:
 
