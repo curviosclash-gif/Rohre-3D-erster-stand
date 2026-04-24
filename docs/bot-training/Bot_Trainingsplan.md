@@ -1609,7 +1609,7 @@ Quelle:
 - `data/training/ppo/bt93e/action_surface_hardening_report.json`
 - `docs/Fehlerberichte/2026-04-25_bt93e-gate-refresh-diagnose-blocked.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-04-25 -->
 
 Scope:
 
@@ -1651,7 +1651,7 @@ Startkriterien fuer `BT94A.1` nach BT93F:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 BT93F erzeugt ein versioniertes Startreparatur-Paket unter `data/training/ppo/bt93f/**` mit Hypothesen, Matrix, Run-IDs, Artefaktpfaden, Modell-/Config-/Optimizer-/VecNormalize-Hashes und verbotenen Workarounds.
+- [x] DoD.1 BT93F erzeugt ein versioniertes Startreparatur-Paket unter `data/training/ppo/bt93f/**` mit Hypothesen, Matrix, Run-IDs, Artefaktpfaden, Modell-/Config-/Optimizer-/VecNormalize-Hashes und verbotenen Workarounds. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93f_start_repair_contract.py --write` -> `data\training\ppo\bt93f\start_repair_package.json` (`resultClass=start-repair-contract`, `startCriteria.modelPackageHashes` gesetzt, `scopeControl.forbiddenWorkarounds` gesetzt))
 - [ ] DoD.2 `F.05` und `F.27` sind durch neue Same-Matrix-Eval-/Holdout-Evidence nicht mehr `ppo-regression`, oder BT93F endet ehrlich mit `diagnose-blocked`.
 - [ ] DoD.3 `F.19` und `F.31` sind durch belastbare Terminal-/Death-/Failure-Evidence geschlossen oder bleiben als enger Folgeblocker sichtbar.
 - [ ] DoD.4 `F.30` ist durch echte Policy-Level-Maskierung oder ein gleichwertiges trainierbares Masking-Konzept geschlossen; Post-Decode-Clamp/Veto kaschieren keine Policy-Fehler.
@@ -1662,10 +1662,10 @@ Startkriterien fuer `BT94A.1` nach BT93F:
 
 ### 93F.1 Startreparatur-Kontrakt und Hypothesen
 
-- [ ] 93F.1.1 Ein BT93F-Startpaket schreiben: aktuelle rote Claim-Checks, Blocker `F.05/F.19/F.27/F.30/F.31/R.01`, betroffene Artefakte, Owner-Layer, erlaubte Dateien und verbotene Workarounds.
-- [ ] 93F.1.2 Reparaturhypothesen trennen: Survival/Reward, Terminal-/Death-Emission, Policy-Level-Mask, Eval-/Holdout-Statistik und Gate-Refresh duerfen nicht in einem unkontrollierten Grosslauf vermischt werden.
-- [ ] 93F.1.3 Startkriterien maschinenlesbar fixieren: Mindestepisoden, DQN-Anker, Matrix-ID, Seeds, Maps, Semantikfenster, Non-Regression-Regel, Clamp-/Veto-Schwellen und Closure-faehige Zielpfade.
-- [ ] 93F.1.4 Einen No-Go-Report aktualisieren: kein BT94A-Claim, solange `no_start_gate.json` rot bleibt; kein alter `data/bot_validation_report.json`, kein `tmp/**`, kein `latest_*` und kein Plan-Grep zaehlt als Evidence.
+- [x] 93F.1.1 Ein BT93F-Startpaket schreiben: aktuelle rote Claim-Checks, Blocker `F.05/F.19/F.27/F.30/F.31/R.01`, betroffene Artefakte, Owner-Layer, erlaubte Dateien und verbotene Workarounds. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93f_start_repair_contract.py --write` -> `data\training\ppo\bt93f\start_repair_package.json` (`currentNoStartState.redClaimChecks=4`, `blockerRegister` enthaelt `F.05/F.19/F.27/F.30/F.31/R.01`, `sourceArtifacts` gehasht))
+- [x] 93F.1.2 Reparaturhypothesen trennen: Survival/Reward, Terminal-/Death-Emission, Policy-Level-Mask, Eval-/Holdout-Statistik und Gate-Refresh duerfen nicht in einem unkontrollierten Grosslauf vermischt werden. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93f_start_repair_contract.py --write` -> `data\training\ppo\bt93f\start_repair_package.json` (`separatedRepairHypotheses` enthaelt `H1-survival-reward`, `H2-terminal-death-emission`, `H3-policy-level-mask`, `H4-eval-holdout-statistics`, `H5-gate-refresh`))
+- [x] 93F.1.3 Startkriterien maschinenlesbar fixieren: Mindestepisoden, DQN-Anker, Matrix-ID, Seeds, Maps, Semantikfenster, Non-Regression-Regel, Clamp-/Veto-Schwellen und Closure-faehige Zielpfade. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93f_start_repair_contract.py --write` -> `data\training\ppo\bt93f\start_repair_package.json` (`minimumCompletedEpisodes.eval=6`, `minimumCompletedEpisodes.holdout=4`, `dqnAnchor.baselineId=bt93c-dqn-reference-bt11-final-20260324-v1`, `matrix.matrixId=bt93c-dqn-ppo-precomparison-v1`, `actionTelemetryThresholds` gesetzt))
+- [x] 93F.1.4 Einen No-Go-Report aktualisieren: kein BT94A-Claim, solange `no_start_gate.json` rot bleibt; kein alter `data/bot_validation_report.json`, kein `tmp/**`, kein `latest_*` und kein Plan-Grep zaehlt als Evidence. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93f_start_repair_contract.py --write` -> `data\training\ppo\bt93f\no_go_report.json` (`resultClass=no-go-active`, `prohibitedEvidenceSources` enthaelt `data/bot_validation_report.json`, `tmp/**`, `latest_*`, Plan-Grep/Self-Count))
 
 ### 93F.2 Terminal-, Death- und Reward-Emission reparieren
 
