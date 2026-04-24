@@ -8,8 +8,8 @@ Wichtig:
 
 from __future__ import annotations
 
-FREEZE_DATE = "2026-04-22"
-SNAPSHOT_COMMIT = "017e8edeb548cb64a164d8dc72d1d1cb3055cc93"
+FREEZE_DATE = "2026-04-23"
+SNAPSHOT_COMMIT = "4a9962a6cb096f5895a451c7b1276564f3d4ffa6"
 SNAPSHOT_PATH = (
     "docs/plaene/neu/BT90_GoldStandard/"
     "BT90_Contract_Authority_Snapshot_2026-04-22.md"

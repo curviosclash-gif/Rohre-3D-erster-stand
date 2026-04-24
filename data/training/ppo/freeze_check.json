@@ -1,19 +1,19 @@
 {
-  "ok": false,
-  "generatedAt": "2026-04-22T23:59:39.113174Z",
+  "ok": true,
+  "generatedAt": "2026-04-23T19:37:46.652871Z",
   "generatedBy": "python/scripts/bt90_freeze_check.py",
   "snapshot": {
-    "freezeDate": "2026-04-22",
-    "snapshotCommit": "017e8edeb548cb64a164d8dc72d1d1cb3055cc93",
+    "freezeDate": "2026-04-23",
+    "snapshotCommit": "4a9962a6cb096f5895a451c7b1276564f3d4ffa6",
     "snapshotPath": "docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md",
-    "headCommit": "017e8edeb548cb64a164d8dc72d1d1cb3055cc93"
+    "headCommit": "4a9962a6cb096f5895a451c7b1276564f3d4ffa6"
   },
   "summary": {
     "checkedFiles": 8,
     "authorityFiles": 4,
     "adjacentFiles": 4,
-    "driftCount": 3,
-    "reAuditRequired": true
+    "driftCount": 0,
+    "reAuditRequired": false
   },
   "authorityFiles": [
     {
@@ -70,37 +70,37 @@
       "group": "adjacent",
       "path": "src/state/training/TrainingDomain.js",
       "existsInWorktree": true,
-      "worktreeStatus": " M",
-      "snapshotBlob": "0ae40531dd232009a7b73cdb88a37fe90df02451",
-      "headBlob": "0ae40531dd232009a7b73cdb88a37fe90df02451",
+      "worktreeStatus": "clean",
+      "snapshotBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
+      "headBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
       "currentBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
       "headMatchesSnapshot": true,
-      "matchesSnapshot": false,
-      "drift": true
+      "matchesSnapshot": true,
+      "drift": false
     },
     {
       "group": "adjacent",
       "path": "src/entities/ai/observation/RuntimeNearObservationAdapter.js",
       "existsInWorktree": true,
-      "worktreeStatus": " M",
-      "snapshotBlob": "43329e558112eec2c54163b7212b1680cb6ab01a",
-      "headBlob": "43329e558112eec2c54163b7212b1680cb6ab01a",
+      "worktreeStatus": "clean",
+      "snapshotBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
+      "headBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
       "currentBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
       "headMatchesSnapshot": true,
-      "matchesSnapshot": false,
-      "drift": true
+      "matchesSnapshot": true,
+      "drift": false
     },
     {
       "group": "adjacent",
       "path": "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
       "existsInWorktree": true,
       "worktreeStatus": "clean",
-      "snapshotBlob": "8411b0ebbc8505270b9cc07701ea7ec9463f4ef7",
-      "headBlob": "8411b0ebbc8505270b9cc07701ea7ec9463f4ef7",
+      "snapshotBlob": "661de8862292b274e94051f286ae1953964efa92",
+      "headBlob": "661de8862292b274e94051f286ae1953964efa92",
       "currentBlob": "661de8862292b274e94051f286ae1953964efa92",
       "headMatchesSnapshot": true,
-      "matchesSnapshot": false,
-      "drift": true
+      "matchesSnapshot": true,
+      "drift": false
     },
     {
       "group": "adjacent",
@@ -115,14 +115,10 @@
       "drift": false
     }
   ],
-  "driftPaths": [
-    "src/state/training/TrainingDomain.js",
-    "src/entities/ai/observation/RuntimeNearObservationAdapter.js",
-    "src/entities/ai/hybrid/HybridDecisionArchitecture.js"
-  ],
+  "driftPaths": [],
   "result": {
-    "freezeOk": false,
-    "reAuditRequired": true,
-    "reason": "3 file(s) drifted from the BT90 snapshot commit; re-audit is required before the next BT90-BT92 claim."
+    "freezeOk": true,
+    "reAuditRequired": false,
+    "reason": "All authority and adjacent files still match the BT90 snapshot commit."
   }
 }
