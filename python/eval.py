@@ -27,7 +27,14 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.profile == "bt93c":
-        if args.run_kind not in {"eval-smoke", "diagnostics-eval", "pilot-eval", "baseline-eval", "holdout-eval"}:
+        if args.run_kind not in {
+            "eval-smoke",
+            "diagnostics-eval",
+            "pilot-eval",
+            "baseline-eval",
+            "baseline-repro-eval",
+            "holdout-eval",
+        }:
             raise SystemExit(f"unsupported BT93C eval run kind: {args.run_kind}")
         from scripts.bt93c_learner_smoke import run_eval_from_cli as run_bt93c_eval_from_cli
 
@@ -38,6 +45,7 @@ def main() -> None:
                 "diagnostics-eval": "93C.4.2",
                 "pilot-eval": "93C.5.2",
                 "baseline-eval": "93C.5.3",
+                "baseline-repro-eval": "93C.7.1",
                 "holdout-eval": "93C.6.2",
             }.get(args.run_kind, "93C.3.4"),
             config_path=args.config,

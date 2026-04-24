@@ -936,7 +936,14 @@ def run_eval_from_cli(
     eval_steps: int | None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
-    if run_kind not in {"eval-smoke", "diagnostics-eval", "pilot-eval", "baseline-eval", "holdout-eval"}:
+    if run_kind not in {
+        "eval-smoke",
+        "diagnostics-eval",
+        "pilot-eval",
+        "baseline-eval",
+        "baseline-repro-eval",
+        "holdout-eval",
+    }:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
     gate_inputs = _validate_gate_inputs(config)
@@ -1077,6 +1084,7 @@ def run_eval_from_cli(
             "diagnostics-eval": "latest_diagnostics_eval.json",
             "pilot-eval": "latest_pilot_eval.json",
             "baseline-eval": "latest_baseline_eval.json",
+            "baseline-repro-eval": "latest_baseline_repro_eval.json",
             "holdout-eval": "latest_holdout_eval.json",
         }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)

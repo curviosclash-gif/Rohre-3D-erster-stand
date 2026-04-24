@@ -1,0 +1,149 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T18:52:40Z",
+  "generatedBy": "python/scripts/bt93c_handover_report.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.7",
+  "claim": "93C-Handover",
+  "gitSha": "1d15e3f8f6d8aca85da679f06048749b9e3e03fa",
+  "resultClass": "diagnose",
+  "phaseCoverage": {
+    "93C.7.1": true,
+    "93C.7.2": true,
+    "93C.7.3": true,
+    "93C.7.4": true
+  },
+  "doDCoverage": {
+    "DoD.5": true,
+    "DoD.7": true,
+    "DoD.9": true,
+    "DoD.12": true,
+    "DoD.10": false
+  },
+  "reproducibility": {
+    "ok": true,
+    "runId": "20260424T185232Z-baseline-repro-eval",
+    "runKind": "baseline-repro-eval",
+    "command": "python\\.venv\\Scripts\\python.exe python\\eval.py --profile bt93c --run-kind baseline-repro-eval --phase-id 93C.7.1 --config python\\configs\\ppo_bt93c_baseline.json --checkpoint data\\training\\ppo\\bt93c\\runs\\20260424T180033Z-baseline-train\\artifact_manifest.json",
+    "baselineEvalReport": "data/training/ppo/bt93c/runs/20260424T180054Z-baseline-eval/eval_report.json",
+    "reproEvalReport": "data/training/ppo/bt93c/runs/20260424T185232Z-baseline-repro-eval/eval_report.json",
+    "baselineMetrics": {
+      "avgStepsPerEpisode": 16.0,
+      "averageBotSurvival": 16.0,
+      "runtimeErrorCount": 0,
+      "invalidActionRate": 0.0,
+      "sanitizerRate": 0.0,
+      "vetoRate": 0.84375,
+      "maskRate": 1.0,
+      "terminalReasonCounts": {},
+      "truncatedReasonCounts": {
+        "max-steps": 2
+      },
+      "deathCauseCounts": {}
+    },
+    "reproMetrics": {
+      "avgStepsPerEpisode": 16.0,
+      "averageBotSurvival": 16.0,
+      "runtimeErrorCount": 0,
+      "invalidActionRate": 0.0,
+      "sanitizerRate": 0.0,
+      "vetoRate": 0.5,
+      "maskRate": 1.0,
+      "terminalReasonCounts": {},
+      "truncatedReasonCounts": {
+        "max-steps": 2
+      },
+      "deathCauseCounts": {}
+    },
+    "tolerance": {
+      "avgStepsPerEpisodeAbs": 1e-06,
+      "averageBotSurvivalAbs": 1e-06,
+      "rewardTotalAbs": 1e-06
+    },
+    "deltas": {
+      "avgStepsPerEpisodeAbs": 0.0,
+      "averageBotSurvivalAbs": 0.0,
+      "rewardTotalAbs": 0.0
+    },
+    "interpretation": "same-config deterministic KPI repro"
+  },
+  "modelPackage": {
+    "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+    "runId": "20260424T180033Z-baseline-train",
+    "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+    "vecnormalizeSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
+    "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+    "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+    "gitSha": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+    "truePpoModelPackage": true,
+    "scaffoldOnly": false
+  },
+  "v101FollowUp": {
+    "resultClass": "no-ppo-contract-drift",
+    "driftPaths": [],
+    "freezeCheck": {
+      "path": "data/training/ppo/freeze_check.json",
+      "freezeOk": true,
+      "reAuditRequired": false,
+      "driftCount": 0,
+      "headCommit": "7b12c3960ff14cccd5663984b6f3eed9666fb3cb"
+    }
+  },
+  "bt94aHandover": {
+    "ready": false,
+    "gate": "closed-diagnose-ppo-regression",
+    "reason": "BT93C has a real model package and repro evidence, but the pre-comparison is ppo-regression and keeps BT94A closed.",
+    "precomparisonResult": "ppo-regression",
+    "ppoValidateStatus": "ppo-validate-missing",
+    "rolloutAllowed": false,
+    "promotionAllowed": false
+  },
+  "remainingGates": {
+    "bt94a": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.30",
+      "F.31"
+    ],
+    "bt94bPpoValidate": "BT94B.3 remains mandatory before any promote verdict",
+    "runtimeRollout": "outside BT93C; no JS inference, strategy flag, registry, rollback, or latency proof here"
+  },
+  "evidenceQualityMatrix": {
+    "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+    "sha256": "2955f99595c57e1463271a7b6cc8e141e94cf9f16f4645b3975a2f715305fd22"
+  },
+  "guardrails": {
+    "runtimeSurfacesTouched": [],
+    "productiveRuntimeChanged": false,
+    "fourEnvAllowed": false,
+    "isPromotionEvidence": false,
+    "isRolloutSignal": false
+  },
+  "worktreeRuntimeSurfaceStatus": {
+    "src/entities/ai/training/TrainingContractV1.js": "clean",
+    "src/entities/ai/training/TrainerPayloadAdapter.js": "clean",
+    "src/entities/ai/observation/ObservationSchemaV2.js": "clean",
+    "src/entities/ai/actions/BotActionContract.js": "clean",
+    "src/state/training/TrainingDomain.js": "clean",
+    "src/entities/ai/ObservationBridgePolicy.js": "clean",
+    "src/entities/ai/observation/RuntimeNearObservationAdapter.js": "clean",
+    "src/entities/ai/hybrid/HybridDecisionArchitecture.js": "clean",
+    "src/core/RuntimeConfig.js": "clean",
+    "src/state/training/RewardCalculator.js": "clean"
+  },
+  "sourceArtifacts": {
+    "baselineReport": {
+      "path": "data/training/ppo/bt93c/baseline_report.json",
+      "sha256": "3bdd65b5490de6e83df3779c7dba32f05a9aec1bf20b4a5d3d5d774642a29617"
+    },
+    "precomparisonReport": {
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "sha256": "bf0f90f0dcc9ba01104c6531c1f7fd52193d99086c738c8446e4ef230b5e56dd"
+    },
+    "diagnosticsReport": {
+      "path": "data/training/ppo/bt93c/diagnostics_report.json",
+      "sha256": "661d4cd8508a6bcbf3d8decd282491a8bc2899710b5298fd26b70be5cbf42ea2"
+    }
+  }
+}
