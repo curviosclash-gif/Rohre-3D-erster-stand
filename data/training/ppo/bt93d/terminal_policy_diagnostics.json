@@ -1,0 +1,750 @@
+{
+  "blockId": "BT93D",
+  "bt94aImpact": {
+    "blockedFindings": [
+      "F.19",
+      "F.30",
+      "F.31",
+      "reward-safety-episode-shortening"
+    ],
+    "claimableAfter93D3": false,
+    "decision": "BT94A remains closed until 93D.4 propagates these still-blocking findings",
+    "findingStatus": {
+      "F.19": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "commands": {
+    "report": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93d_terminal_policy_diagnostics.py --write-report"
+  },
+  "generatedAt": "2026-04-24T20:40:49Z",
+  "generatedBy": "python/scripts/bt93d_terminal_policy_diagnostics.py",
+  "gitSha": "aa9cddb6bcf1c541703345100c4dc14f45de0b9f",
+  "guardrails": {
+    "allowedSidecarPaths": [
+      "python/**",
+      "data/training/ppo/bt93d/**",
+      "data/training/ppo/bt93c/**",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md"
+    ],
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "lanes": {
+    "eval": {
+      "lane": "eval",
+      "laneVerdict": {
+        "bt94aStartImpact": "blocked",
+        "highPostDecodeClampOrVetoLoad": true,
+        "reasons": [
+          "max-steps-only with empty terminal/death matrix",
+          "survival distribution is max-steps dominated with no natural terminal/death evidence",
+          "positive reward coexists with DQN survival regression",
+          "policy-level mask is absent; post-decode mask/veto load is high"
+        ]
+      },
+      "policyMaskClampTelemetry": {
+        "compactExamples": [
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": [
+              "shootItem-without-index"
+            ]
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": [
+              "shootItem-without-index"
+            ]
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": [
+              "shootItem-without-index"
+            ]
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": [
+              "shootItem-without-index"
+            ]
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          }
+        ],
+        "fieldCounts": {
+          "shootItem-without-index": 28,
+          "shootItemIndex": 32,
+          "useItem": 32
+        },
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 32,
+        "maskRate": 1.0,
+        "noopCount": 0,
+        "noopRate": 0.0,
+        "policyMaskRate": null,
+        "postDecodeClampRate": 1.0,
+        "safetyVetoRate": 0.875,
+        "sampleCount": 2,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 32,
+        "vetoCount": 28,
+        "vetoRate": 0.875
+      },
+      "report": "data/training/ppo/bt93d/runs/20260424T202525Z-baseline-repro-eval/eval_report.json",
+      "rewardSafetyEpisodeShortening": {
+        "blockReason": "positive reward coexists with DQN survival regression",
+        "blocksBt94a": true,
+        "episodeShorteningCheck": {
+          "avgStepsPerCompletedEpisode": 16.0,
+          "baselineComparable": true,
+          "completedEpisodeLengths": [
+            16,
+            16
+          ],
+          "doneCount": 2,
+          "maxStepsPerEpisode": 16
+        },
+        "positiveRewardWhileSurvivalRegresses": true,
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.1125,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 3.6,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownVisible": true,
+        "rewardMean": 0.1125,
+        "rewardTotal": 3.6,
+        "safetyOverruleCounts": {
+          "combatVeto": 23,
+          "intent-request-applied-mismatch": 23,
+          "vetoActive": 23
+        },
+        "source": "diagnostics.rewardSafetyDiagnostics",
+        "survivalRewardShare": 1.0
+      },
+      "role": "BT93D baseline repro eval",
+      "runId": "20260424T202525Z-baseline-repro-eval",
+      "runKind": "baseline-repro-eval",
+      "survivalDistribution": {
+        "averageBotSurvival": 16.0,
+        "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+        "avgStepsPerEpisode": 16.0,
+        "blockReason": "survival distribution is max-steps dominated with no natural terminal/death evidence",
+        "blocksBt94a": true,
+        "completedEpisodeCount": 2,
+        "completedEpisodeLengths": [
+          16.0,
+          16.0
+        ],
+        "completedEpisodeStats": {
+          "count": 2,
+          "max": 16.0,
+          "mean": 16.0,
+          "median": 16.0,
+          "min": 16.0,
+          "stdev": 0.0
+        },
+        "episodeLengthDistributionVisible": true,
+        "maxStepsDominated": true,
+        "source": "diagnostics.survivalKpis + rewardHackingSignals.episodeShorteningCheck"
+      },
+      "terminalDeathFailureMatrix": {
+        "blockReason": "max-steps-only with empty terminal/death matrix",
+        "blocksBt94a": true,
+        "crash": 0,
+        "deathCauseCounts": {},
+        "emptyDeathCauseCounts": true,
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "maxStepsOnly": true,
+        "naturalTerminal": 0,
+        "observabilityStatus": "visible",
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "source": "diagnostics.failureSemantics",
+        "teardownFailure": 0,
+        "terminalDeathMatrixVisible": true,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      }
+    },
+    "holdout": {
+      "lane": "holdout",
+      "laneVerdict": {
+        "bt94aStartImpact": "blocked",
+        "highPostDecodeClampOrVetoLoad": true,
+        "reasons": [
+          "max-steps-only with empty terminal/death matrix",
+          "survival distribution is max-steps dominated with no natural terminal/death evidence",
+          "positive reward coexists with DQN survival regression",
+          "policy-level mask is absent; post-decode mask/veto load is high"
+        ]
+      },
+      "policyMaskClampTelemetry": {
+        "compactExamples": [
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          }
+        ],
+        "fieldCounts": {
+          "shootItem-without-index": 10,
+          "shootItemIndex": 32,
+          "useItem": 32
+        },
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 32,
+        "maskRate": 1.0,
+        "noopCount": 0,
+        "noopRate": 0.0,
+        "policyMaskRate": null,
+        "postDecodeClampRate": 1.0,
+        "safetyVetoRate": 0.3125,
+        "sampleCount": 2,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 32,
+        "vetoCount": 10,
+        "vetoRate": 0.3125
+      },
+      "report": "data/training/ppo/bt93d/runs/20260424T202552Z-holdout-eval/eval_report.json",
+      "rewardSafetyEpisodeShortening": {
+        "blockReason": "positive reward coexists with DQN survival regression",
+        "blocksBt94a": true,
+        "episodeShorteningCheck": {
+          "avgStepsPerCompletedEpisode": 16.0,
+          "baselineComparable": true,
+          "completedEpisodeLengths": [
+            16,
+            16
+          ],
+          "doneCount": 2,
+          "maxStepsPerEpisode": 16
+        },
+        "positiveRewardWhileSurvivalRegresses": true,
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.1125,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 3.6,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownVisible": true,
+        "rewardMean": 0.1125,
+        "rewardTotal": 3.6,
+        "safetyOverruleCounts": {
+          "combatVeto": 7,
+          "intent-request-applied-mismatch": 7,
+          "vetoActive": 7
+        },
+        "source": "diagnostics.rewardSafetyDiagnostics",
+        "survivalRewardShare": 1.0
+      },
+      "role": "BT93D holdout eval",
+      "runId": "20260424T202552Z-holdout-eval",
+      "runKind": "holdout-eval",
+      "survivalDistribution": {
+        "averageBotSurvival": 16.0,
+        "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+        "avgStepsPerEpisode": 16.0,
+        "blockReason": "survival distribution is max-steps dominated with no natural terminal/death evidence",
+        "blocksBt94a": true,
+        "completedEpisodeCount": 2,
+        "completedEpisodeLengths": [
+          16.0,
+          16.0
+        ],
+        "completedEpisodeStats": {
+          "count": 2,
+          "max": 16.0,
+          "mean": 16.0,
+          "median": 16.0,
+          "min": 16.0,
+          "stdev": 0.0
+        },
+        "episodeLengthDistributionVisible": true,
+        "maxStepsDominated": true,
+        "source": "diagnostics.survivalKpis + rewardHackingSignals.episodeShorteningCheck"
+      },
+      "terminalDeathFailureMatrix": {
+        "blockReason": "max-steps-only with empty terminal/death matrix",
+        "blocksBt94a": true,
+        "crash": 0,
+        "deathCauseCounts": {},
+        "emptyDeathCauseCounts": true,
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "maxStepsOnly": true,
+        "naturalTerminal": 0,
+        "observabilityStatus": "visible",
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "source": "diagnostics.failureSemantics",
+        "teardownFailure": 0,
+        "terminalDeathMatrixVisible": true,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      }
+    },
+    "train": {
+      "lane": "train",
+      "laneVerdict": {
+        "bt94aStartImpact": "blocked",
+        "highPostDecodeClampOrVetoLoad": true,
+        "reasons": [
+          "terminal/death/failure classes are not emitted in this lane artifact",
+          "training report has action telemetry but no episode terminal distribution",
+          "reward breakdown is not emitted in this lane artifact",
+          "policy-level mask is absent; post-decode mask/veto load is high"
+        ]
+      },
+      "policyMaskClampTelemetry": {
+        "compactExamples": [
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": [
+              "shootItem-without-index"
+            ]
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": []
+          },
+          {
+            "invalidReasons": [],
+            "inventoryLength": 0,
+            "maskEvents": [
+              "shootItemIndex",
+              "useItem"
+            ],
+            "sanitizerEvents": [],
+            "vetoEvents": [
+              "shootItem-without-index"
+            ]
+          }
+        ],
+        "fieldCounts": {
+          "shootItem-without-index": 65,
+          "shootItemIndex": 128,
+          "useItem": 128
+        },
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 128,
+        "maskRate": 1.0,
+        "noopCount": 0,
+        "noopRate": 0.0,
+        "policyMaskRate": null,
+        "postDecodeClampRate": 1.0,
+        "safetyVetoRate": 0.507812,
+        "sampleCount": 2,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "sanitizerReasons": {},
+        "totalActions": 128,
+        "vetoCount": 65,
+        "vetoRate": 0.507812
+      },
+      "report": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/training_report.json",
+      "rewardSafetyEpisodeShortening": {
+        "blockReason": "reward breakdown is not emitted in this lane artifact",
+        "blocksBt94a": true,
+        "episodeShorteningCheck": {},
+        "positiveRewardWhileSurvivalRegresses": null,
+        "rewardBreakdownMeanPerStep": {},
+        "rewardBreakdownTotals": {},
+        "rewardBreakdownVisible": false,
+        "rewardMean": null,
+        "rewardTotal": null,
+        "safetyOverruleCounts": {
+          "postDecodeSafetyVetoCount": 65
+        },
+        "source": "learning.telemetry-only"
+      },
+      "role": "BT93C baseline train package reused as BT93D train-side evidence",
+      "runId": "20260424T180033Z-baseline-train",
+      "runKind": "baseline-train",
+      "survivalDistribution": {
+        "averageBotSurvival": null,
+        "avgStepsPerEpisode": null,
+        "blockReason": "training report has action telemetry but no episode terminal distribution",
+        "blocksBt94a": true,
+        "completedEpisodeCount": null,
+        "completedEpisodeLengths": [],
+        "completedEpisodeStats": {
+          "count": 0,
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "stdev": null
+        },
+        "episodeLengthDistributionVisible": false,
+        "maxStepsDominated": null,
+        "source": "not-emitted-by-training-report"
+      },
+      "terminalDeathFailureMatrix": {
+        "blockReason": "terminal/death/failure classes are not emitted in this lane artifact",
+        "blocksBt94a": true,
+        "crash": null,
+        "deathCauseCounts": {},
+        "emptyDeathCauseCounts": true,
+        "forcedRound": null,
+        "maxSteps": null,
+        "maxStepsOnly": null,
+        "naturalTerminal": null,
+        "observabilityStatus": "missing-in-training-report",
+        "runtimeErrorCount": null,
+        "socketClose": null,
+        "source": "missing",
+        "teardownFailure": null,
+        "terminalDeathMatrixVisible": false,
+        "terminalReasonCounts": {},
+        "timeout": null,
+        "truncatedReasonCounts": {}
+      }
+    }
+  },
+  "minimumStartStatistics": {
+    "abortCriteriaRelevantTo93D3": [
+      "reward rises while averageBotSurvival or avgStepsPerEpisode regresses",
+      "terminal/death matrix remains max-steps-only",
+      "mask/veto/clamp load hides policy invalid-action burden"
+    ],
+    "matrixId": "bt93d-survival-repair-minimum-v1",
+    "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+    "requiredStatistics": [
+      "avgStepsPerEpisode",
+      "averageBotSurvival",
+      "medianCompletedEpisodeLength",
+      "stdevCompletedEpisodeLength",
+      "runtimeErrorCount",
+      "failureClasses",
+      "terminalReasonCounts",
+      "deathCauseCounts",
+      "invalidActionRate",
+      "maskRate",
+      "vetoRate",
+      "sanitizerRate"
+    ]
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93D.3.1": true,
+    "93D.3.2": true,
+    "93D.3.3": true,
+    "93D.3.4": true
+  },
+  "phaseId": "93D.3",
+  "policyMaskContract": {
+    "gymSpace": "MultiDiscrete",
+    "policyLevelMasking": {
+      "evidence": "SB3 action space is MultiDiscrete; current maskEvents are emitted after decode from the boundary action surface.",
+      "present": false
+    },
+    "postDecodeClampTelemetry": {
+      "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+      "maskSource": "info.match.inventoryLength from the JS-authoritative transition payload",
+      "present": true,
+      "reportedEvents": [
+        "maskEvents",
+        "vetoEvents",
+        "sanitizerEvents",
+        "invalidReasons",
+        "noopRate"
+      ]
+    },
+    "rawBoundarySurfaceTraining": false,
+    "surfaceId": "bt93c-multidiscrete-action-v1"
+  },
+  "resultClass": "diagnose-blocked",
+  "sourceArtifacts": {
+    "baselineReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/baseline_report.json",
+      "role": "BT93C baseline report",
+      "sha256": "3bdd65b5490de6e83df3779c7dba32f05a9aec1bf20b4a5d3d5d774642a29617"
+    },
+    "bt93dEvalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93d/latest_baseline_repro_eval.json",
+      "role": "BT93D eval pointer",
+      "sha256": "f116da869a38d5bb913fa7d70dd35bbb4a6e1849a069ea7050778a2308ed507d"
+    },
+    "bt93dEvalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/runs/20260424T202525Z-baseline-repro-eval/eval_report.json",
+      "role": "BT93D baseline repro eval report",
+      "sha256": "f68d0101dfb0df64d5e1cf17f4d9d674f4f21f08b45dabfe09313e2073fd23e2"
+    },
+    "bt93dHoldoutPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93d/latest_holdout_eval.json",
+      "role": "BT93D holdout pointer",
+      "sha256": "99e213bd5f5784cd77d4b7dece78522b44cbca2dce3788aa1bd6fee81803c95e"
+    },
+    "bt93dHoldoutReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/runs/20260424T202552Z-holdout-eval/eval_report.json",
+      "role": "BT93D holdout eval report",
+      "sha256": "eac30f2bd5fb2c3e7a00648248e98dff10cc9633afe0f2d0656deed440def490"
+    },
+    "minimumStartStatistics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "role": "BT93D minimum start statistics",
+      "sha256": "73053320a7b2982bb7de583f44d5c062857e7b8935919d05116e03a470dc317c"
+    },
+    "repairManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/repair_manifest.json",
+      "role": "BT93D repair manifest",
+      "sha256": "89bc30fe0010235ee7df1ecdbfd1fe592389ca23995f4d7ca29eec3adc017201"
+    },
+    "survivalRegressionReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/survival_regression_report.json",
+      "role": "BT93D survival regression report",
+      "sha256": "019bb8333a3e8c748fbad09e10d119c496a5595657b29fc57e97f65864a5b508"
+    },
+    "trainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/training_report.json",
+      "role": "BT93C baseline train report used for train-side diagnostics",
+      "sha256": "7e2e118c7be7d6a1ba1757f57b6a595c01453e4b547c2d4bd4d058f4847613e6"
+    }
+  }
+}
