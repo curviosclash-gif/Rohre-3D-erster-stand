@@ -27,13 +27,17 @@ def main() -> None:
     args = parser.parse_args()
 
     if args.profile == "bt93c":
-        if args.run_kind not in {"eval-smoke", "diagnostics-eval"}:
+        if args.run_kind not in {"eval-smoke", "diagnostics-eval", "pilot-eval"}:
             raise SystemExit(f"unsupported BT93C eval run kind: {args.run_kind}")
         from scripts.bt93c_learner_smoke import run_eval_from_cli as run_bt93c_eval_from_cli
 
         run_bt93c_eval_from_cli(
             run_kind=args.run_kind,
-            phase_id=args.phase_id or ("93C.4.2" if args.run_kind == "diagnostics-eval" else "93C.3.4"),
+            phase_id=args.phase_id
+            or {
+                "diagnostics-eval": "93C.4.2",
+                "pilot-eval": "93C.5.2",
+            }.get(args.run_kind, "93C.3.4"),
             config_path=args.config,
             artifact_root=args.artifact_root,
             eval_steps=args.eval_steps,
