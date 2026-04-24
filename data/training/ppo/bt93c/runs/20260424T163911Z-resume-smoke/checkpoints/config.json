@@ -1,0 +1,80 @@
+{
+  "configVersion": "bt93c-ppo-learner-smoke-v1",
+  "blockId": "BT93C",
+  "phaseId": "93C.3",
+  "profileId": "bt93c-real-ppo-learner-smoke-v1",
+  "claim": "93C-Learner",
+  "scope": "real PPO optimizer smoke only; no pilot, baseline, promotion, or runtime integration",
+  "env": {
+    "modeId": "runtime-near-headless-v1",
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "maxStepsPerEpisode": 4,
+    "controllerTimeoutSeconds": 30,
+    "trainSeeds": [
+      930,
+      931
+    ],
+    "evalSeeds": [
+      940,
+      941
+    ],
+    "holdoutSeeds": [
+      950,
+      951
+    ],
+    "holdoutStatus": "reserved-for-93C.6; not consumed by 93C.3"
+  },
+  "rollout": {
+    "learnerTimesteps": 8,
+    "resumeTimesteps": 8,
+    "evalSteps": 4,
+    "nStepsPerEnv": 4,
+    "batchSize": 4,
+    "nEpochs": 1,
+    "sourceBudgetArtifact": "data/training/ppo/bt93c/start_manifest.json",
+    "budgetNote": "BT93C.3 intentionally uses the smallest runtime-near optimizer update smoke below pilot/baseline scale."
+  },
+  "algorithm": {
+    "library": "stable-baselines3",
+    "name": "PPO",
+    "policy": "MlpPolicy",
+    "device": "cpu",
+    "gamma": 0.99,
+    "gaeLambda": 0.95,
+    "learningRate": 0.0003,
+    "clipRange": 0.2,
+    "entCoef": 0.01,
+    "vfCoef": 0.5,
+    "maxGradNorm": 0.5
+  },
+  "policy": {
+    "netArch": [
+      64,
+      64
+    ],
+    "activation": "tanh",
+    "actorCriticHeadsRequired": true
+  },
+  "normalization": {
+    "implementation": "stable_baselines3.common.vec_env.VecNormalize",
+    "normalizeObservation": true,
+    "normalizeReward": false,
+    "clipObservation": 10.0,
+    "persistStatsWithCheckpoint": true
+  },
+  "artifacts": {
+    "root": "data/training/ppo/bt93c",
+    "requirements": "python/requirements-ppo.txt",
+    "dependencyLockReport": "data/training/ppo/bt93c/dependency_lock_report.json",
+    "cleanEnvReport": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+    "actionSurfaceReport": "data/training/ppo/bt93c/action_surface_smoke.json",
+    "startManifest": "data/training/ppo/bt93c/start_manifest.json"
+  },
+  "guardrails": {
+    "baselineRunsStarted": false,
+    "pilotRunsStarted": false,
+    "promotionAllowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}
