@@ -1,6 +1,6 @@
 # Bot Trainingsplan (Aktiver Master)
 
-Stand: 2026-04-23
+Stand: 2026-04-24
 
 Dieser Plan ist die einzige aktive Quelle fuer Bot-Training.
 Allgemeine Architektur-/Gameplay-Arbeit bleibt in `docs/Umsetzungsplan.md`.
@@ -89,8 +89,8 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | BT91 | BT90.99 | hard | ja | Sidecar-Handshake, Contract-Smoke und 1-Worker-Lane sind lokal im aktuellen Worktree dokumentiert; die BT91-Artefakte sind noch nicht repo-versioniert |
 | BT92 | BT91.99 | hard | ja | gruene BT91-Evidence liefert Sidecar-/100-Step-Handover fuer die Single-Env-Minimalspur |
 | BT93A | BT92.99 | hard | ja | BT92.99 ist gruen; claimbar ist jetzt nur der Harness-/Throughput-Block, und nur mit gruener Freeze-Bestaetigung |
-| BT93B | BT93A.99 | hard | nein | PPO-Scaffold oeffnet erst nach artefaktbasiertem Harness-/Throughput-Handover aus BT93A |
-| BT93C | BT93B.99 | hard | nein | Die konservative PPO-Baseline oeffnet erst nach gruener Scaffold-, Smoke- und Resume-Kette aus BT93B |
+| BT93B | BT93A.99 | hard | ja | PPO-Scaffold wurde nach artefaktbasiertem Harness-/Throughput-Handover aus BT93A abgeschlossen |
+| BT93C | BT93B.99 | hard | ja | Die konservative PPO-Baseline ist nach gruener Scaffold-, Smoke- und Resume-Kette aus BT93B claimbar |
 | BT94A | BT93C.99 | hard | nein | Candidate-Freeze und Ablationen brauchen eine echte reproduzierbare PPO-Baseline |
 | BT94B | BT94A.99 | hard | nein | Externe A/B-Evidence braucht einen eingefrorenen Kandidaten |
 | BT94B | BT80C 80.9.3 | soft | nein | gruene produktionsnahe Validation verbessert Vergleichbarkeit, ist aber kein Startblocker fuer externe Evidence |
@@ -131,8 +131,8 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-Codex | BT91 | 2026-04-22 | frei | 2026-04-22 (abgeschlossen) |
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
 | Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
-| Bot-Codex | BT93B | 2026-04-24 | active | 93B.1.1 |
-| - | BT93C | - | frei | wartet auf BT93B.99; konservative Baseline und Vorvergleich |
+| Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
+| - | BT93C | - | frei | claimbar nach BT93B.99; konservative Baseline und Vorvergleich |
 | - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -635,7 +635,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT91 | Python-Sidecar und 1-Worker-Headless-Lane | completed | P1 | BT90.99 | 91.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT100_Python_Bootstrap_PoC.md` |
 | BT92 | Single-Env-Adapter und JS-authoritative Semantik | completed | P1 | BT91.99 | 92.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
 | BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | active | P2 | BT92.99 | 93A.3 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
-| BT93B | Minimaler PPO-Baseline-Scaffold | planned | P2 | BT93A.99 | 93B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
+| BT93B | Minimaler PPO-Baseline-Scaffold | completed | P2 | BT93A.99 | 93B.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Konservative PPO-Baseline und Benchmark-Disziplin | planned | P2 | BT93B.99 | 93C.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93C.99 | 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
@@ -978,12 +978,12 @@ Claim-Grenze:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 `python/train.py`, `python/eval.py`, Config-/Callback-Pfade und Manifest-Struktur laufen fuer einen minimalen Smoke-Run.
-- [ ] DoD.2 Checkpoint-, Eval- und Manifest-Artefakte liegen fuer den Scaffold reproduzierbar unter `data/training/ppo/`.
-- [ ] DoD.3 Resume- und Persistenzkette funktionieren fuer den Scaffold, ohne schon eine grosse Baseline zu behaupten.
-- [ ] DoD.4 Der Block ist explizit als Scaffold gelabelt und trifft kein Champion-, Promotion- oder BT94A-Urteil.
-- [ ] DoD.5 Die explizite Integration einer State-Normalization-Pipeline (z.B. `VecNormalize`) und die Definition der Actor/Critic-Heads ist als harte Pflichtvoraussetzung vor dem ersten Baseline-Scaffold eingebaut [siehe PPO-ADR-002].
-- [ ] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [x] DoD.1 `python/train.py`, `python/eval.py`, Config-/Callback-Pfade und Manifest-Struktur laufen fuer einen minimalen Smoke-Run. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/train.py --profile bt93b --run-kind fresh-smoke` -> `data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/training_report.json` (`ok=true`, `totalStepsCompleted=768`); `python\.venv\Scripts\python.exe python/scripts/bt93b_verify_artifact_consistency.py` -> `data/training/ppo/bt93b/artifact_consistency_report.json` (`ok=true`))
+- [x] DoD.2 Checkpoint-, Eval- und Manifest-Artefakte liegen fuer den Scaffold reproduzierbar unter `data/training/ppo/`. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93b_verify_artifact_consistency.py` -> `data/training/ppo/bt93b/artifact_consistency_report.json` (`stableManifestMatch=true`, `budgetMatch=true`, `eventStreamsClosed=true`))
+- [x] DoD.3 Resume- und Persistenzkette funktionieren fuer den Scaffold, ohne schon eine grosse Baseline zu behaupten. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93b_verify_artifact_consistency.py` -> `data/training/ppo/bt93b/artifact_consistency_report.json` (`resumeConsumesFreshCheckpoint=true`, `freshNormalizationJsonPickleMatch=true`, `resumeNormalizationJsonPickleMatch=true`))
+- [x] DoD.4 Der Block ist explizit als Scaffold gelabelt und trifft kein Champion-, Promotion- oder BT94A-Urteil. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93b_verify_artifact_consistency.py` -> `data/training/ppo/bt93b/artifact_consistency_report.json` (`scaffoldOnly=true`, `promotionAllowed=false`, `bt94aGate=closed`, `noPromotionClaim=true`))
+- [x] DoD.5 Die explizite Integration einer State-Normalization-Pipeline (z.B. `VecNormalize`) und die Definition der Actor/Critic-Heads ist als harte Pflichtvoraussetzung vor dem ersten Baseline-Scaffold eingebaut [siehe PPO-ADR-002]. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93b_prepare_scaffold.py` -> `python/configs/ppo_baseline.yaml`, `data/training/ppo/run_manifest.bt93b.template.json`, `data/training/ppo/bt93b_scaffold_plan.json` (`normalizationId=bt93b-vecnormalize-v1`, `headSpecId=bt93b-actor-critic-v1`))
+- [x] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS. (abgeschlossen: 2026-04-24; evidence: `npm.cmd run gates:pre-commit` -> PASS (`plan:check`, `docs:sync`, `docs:check`); `npm.cmd run build` -> PASS)
 
 ### 93B.1 Baseline-Config und Run-Manifest
 
@@ -1004,8 +1004,8 @@ Claim-Grenze:
 
 ### 93B.99 Abschluss-Gate
 
-- [ ] 93B.99.1 Alle Phasen 93B.1 bis 93B.3 sind mit Evidence dokumentiert.
-- [ ] 93B.99.2 Der PPO-Scaffold ist reproduzierbar, aber noch nicht als echte konservative Baseline freigegeben.
+- [x] 93B.99.1 Alle Phasen 93B.1 bis 93B.3 sind mit Evidence dokumentiert. (abgeschlossen: 2026-04-24; evidence: `Select-String -Path docs/bot-training/Bot_Trainingsplan.md -Pattern '93B\.(1|2|3)\.'` -> alle 8 Teilphasen `[x]` mit Evidence; `npm.cmd run plan:check` -> PASS)
+- [x] 93B.99.2 Der PPO-Scaffold ist reproduzierbar, aber noch nicht als echte konservative Baseline freigegeben. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93b_verify_artifact_consistency.py` -> `data/training/ppo/bt93b/artifact_consistency_report.json` (`ok=true`, `stableManifestMatch=true`, `resumeConsumesFreshCheckpoint=true`, `scaffoldOnly=true`, `promotionAllowed=false`, `bt94aGate=closed`); `npm.cmd run build` -> PASS)
 
 ### Risiko-Register BT93B
 
