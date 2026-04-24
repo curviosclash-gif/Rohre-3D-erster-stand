@@ -1,0 +1,96 @@
+{
+  "configVersion": "bt93c-ppo-pilot-v1",
+  "blockId": "BT93C",
+  "phaseId": "93C.5",
+  "profileId": "bt93c-real-ppo-pilot-v1",
+  "claim": "93C-Pilot",
+  "scope": "small pilot only; no baseline, promotion, 4-env, or runtime integration",
+  "env": {
+    "modeId": "runtime-near-headless-v1",
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "maxStepsPerEpisode": 8,
+    "controllerTimeoutSeconds": 30,
+    "trainSeeds": [
+      932,
+      933
+    ],
+    "evalSeeds": [
+      942,
+      943
+    ],
+    "holdoutSeeds": [
+      950,
+      951
+    ],
+    "holdoutStatus": "reserved-for-93C.6; not consumed by 93C.5 pilot"
+  },
+  "rollout": {
+    "pilotTimesteps": 64,
+    "evalSteps": 8,
+    "nStepsPerEnv": 16,
+    "batchSize": 8,
+    "nEpochs": 1,
+    "sourceBudgetArtifacts": [
+      "data/training/ppo/bt93c/start_manifest.json",
+      "data/training/ppo/bt93c/diagnostics_report.json"
+    ],
+    "budgetRule": "smallest pilot above learner smoke: 2 envs, 2 PPO updates, under the 15s measured throughput window; no 4-env escalation"
+  },
+  "algorithm": {
+    "library": "stable-baselines3",
+    "name": "PPO",
+    "policy": "MlpPolicy",
+    "device": "cpu",
+    "gamma": 0.99,
+    "gaeLambda": 0.95,
+    "learningRate": 0.0003,
+    "clipRange": 0.2,
+    "entCoef": 0.01,
+    "vfCoef": 0.5,
+    "maxGradNorm": 0.5
+  },
+  "policy": {
+    "netArch": [
+      64,
+      64
+    ],
+    "activation": "tanh",
+    "actorCriticHeadsRequired": true
+  },
+  "normalization": {
+    "implementation": "stable_baselines3.common.vec_env.VecNormalize",
+    "normalizeObservation": true,
+    "normalizeReward": false,
+    "clipObservation": 10.0,
+    "persistStatsWithCheckpoint": true
+  },
+  "diagnostics": {
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "minEntropy": 0.01,
+      "maxValueLoss": 100.0,
+      "maxGradNorm": 0.5,
+      "minExplainedVariance": -1.0
+    },
+    "classification": "BT93C.5 pilot only; no baseline, promotion, or runtime rollout signal"
+  },
+  "artifacts": {
+    "root": "data/training/ppo/bt93c",
+    "requirements": "python/requirements-ppo.txt",
+    "dependencyLockReport": "data/training/ppo/bt93c/dependency_lock_report.json",
+    "cleanEnvReport": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+    "actionSurfaceReport": "data/training/ppo/bt93c/action_surface_smoke.json",
+    "startManifest": "data/training/ppo/bt93c/start_manifest.json",
+    "ladderManifest": "data/training/ppo/bt93c/pilot_ladder_manifest.json",
+    "pilotReport": "data/training/ppo/bt93c/pilot_report.json"
+  },
+  "guardrails": {
+    "baselineRunsStarted": false,
+    "pilotRunsStarted": true,
+    "promotionAllowed": false,
+    "fourEnvAllowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}
