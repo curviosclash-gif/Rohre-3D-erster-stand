@@ -1,0 +1,41 @@
+"""BT93B scaffold eval entrypoint."""
+
+from __future__ import annotations
+
+import argparse
+import sys
+from pathlib import Path
+
+PYTHON_ROOT = Path(__file__).resolve().parent
+if str(PYTHON_ROOT) not in sys.path:
+    sys.path.insert(0, str(PYTHON_ROOT))
+
+from scaffold.bt93b_runner import DEFAULT_ARTIFACT_ROOT, latest_checkpoint_path, run_from_cli
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--profile", default="bt93b", choices=["bt93b"])
+    parser.add_argument("--run-kind", default="eval-smoke", choices=["eval-smoke"])
+    parser.add_argument("--phase-id", default="93B.3.1")
+    parser.add_argument("--manifest-template", default=None)
+    parser.add_argument("--artifact-root", default=None)
+    parser.add_argument("--target-steps-per-env", type=int, default=64)
+    parser.add_argument("--checkpoint", default=None)
+    args = parser.parse_args()
+
+    artifact_root = Path(args.artifact_root).resolve() if args.artifact_root else DEFAULT_ARTIFACT_ROOT
+    checkpoint = args.checkpoint or str(latest_checkpoint_path(artifact_root))
+    run_from_cli(
+        run_kind=args.run_kind,
+        phase_id=args.phase_id,
+        manifest_template=args.manifest_template,
+        artifact_root=args.artifact_root,
+        target_steps_per_env=args.target_steps_per_env,
+        checkpoint=checkpoint,
+    )
+
+
+if __name__ == "__main__":
+    main()
+

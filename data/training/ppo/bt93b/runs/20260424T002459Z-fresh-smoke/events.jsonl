@@ -1,0 +1,16 @@
+{"ts":"2026-04-24T00:24:59Z","event":"run-start","runId":"20260424T002459Z-fresh-smoke","runKind":"fresh-smoke","targetStepsPerEnv":384}
+{"ts":"2026-04-24T00:24:59Z","event":"env-reset","envIndex":0,"seed":930,"runKind":"fresh-smoke"}
+{"ts":"2026-04-24T00:24:59Z","event":"env-reset","envIndex":1,"seed":931,"runKind":"fresh-smoke"}
+{"ts":"2026-04-24T00:25:02Z","event":"env-progress","envIndex":0,"completedSteps":64,"targetSteps":384}
+{"ts":"2026-04-24T00:25:02Z","event":"env-progress","envIndex":1,"completedSteps":64,"targetSteps":384}
+{"ts":"2026-04-24T00:25:04Z","event":"env-progress","envIndex":1,"completedSteps":128,"targetSteps":384}
+{"ts":"2026-04-24T00:25:04Z","event":"env-progress","envIndex":0,"completedSteps":128,"targetSteps":384}
+{"ts":"2026-04-24T00:25:06Z","event":"env-progress","envIndex":1,"completedSteps":192,"targetSteps":384}
+{"ts":"2026-04-24T00:25:06Z","event":"env-progress","envIndex":0,"completedSteps":192,"targetSteps":384}
+{"ts":"2026-04-24T00:25:08Z","event":"env-progress","envIndex":0,"completedSteps":256,"targetSteps":384}
+{"ts":"2026-04-24T00:25:08Z","event":"env-progress","envIndex":1,"completedSteps":256,"targetSteps":384}
+{"ts":"2026-04-24T00:25:10Z","event":"env-progress","envIndex":1,"completedSteps":320,"targetSteps":384}
+{"ts":"2026-04-24T00:25:10Z","event":"env-progress","envIndex":0,"completedSteps":320,"targetSteps":384}
+{"ts":"2026-04-24T00:25:12Z","event":"env-progress","envIndex":1,"completedSteps":384,"targetSteps":384}
+{"ts":"2026-04-24T00:25:12Z","event":"env-progress","envIndex":0,"completedSteps":384,"targetSteps":384}
+{"ts":"2026-04-24T00:25:12Z","event":"run-finish","runId":"20260424T002459Z-fresh-smoke","ok":true,"totalSteps":768}

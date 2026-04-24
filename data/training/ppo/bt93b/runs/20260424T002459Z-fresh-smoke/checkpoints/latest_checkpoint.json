@@ -1,0 +1,44 @@
+{
+  "checkpointVersion": "bt93b-scaffold-checkpoint-v1",
+  "checkpointId": "20260424T002459Z-fresh-smoke-latest",
+  "runId": "20260424T002459Z-fresh-smoke",
+  "runKind": "fresh-smoke",
+  "phaseId": "93B.2.1",
+  "scaffoldOnly": true,
+  "promotionAllowed": false,
+  "bt94aGate": "closed",
+  "completedSteps": 768,
+  "targetSteps": 768,
+  "policySurface": {
+    "adapterId": "bt93b-split-head-v1",
+    "splitHeadRequired": true,
+    "booleanFields": [
+      "pitchUp",
+      "pitchDown",
+      "yawLeft",
+      "yawRight",
+      "rollLeft",
+      "rollRight",
+      "boost",
+      "cameraSwitch",
+      "dropItem",
+      "shootItem",
+      "shootMG",
+      "nextItem"
+    ],
+    "indexFields": [
+      "shootItemIndex",
+      "useItem"
+    ],
+    "indexHeadStrategy": "per-field-slot-head-with--1-as-no-op",
+    "optionalMaskSource": "player.inventoryLength",
+    "optionalMaskStatus": "available-but-not-required",
+    "rawBoundarySurfaceOnly": true,
+    "trainingOnRawBoundarySurface": false,
+    "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+    "note": "BT93B pins split heads before any PPO scaffold trains against the BT92 boundary surface."
+  },
+  "normalizationStats": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.pkl",
+  "normalizationStatsJson": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.json",
+  "note": "Scaffold-only split-head smoke; no PPO optimizer update and no baseline claim."
+}

@@ -1,0 +1,8 @@
+{
+  "runId": "20260424T002459Z-fresh-smoke",
+  "runKind": "fresh-smoke",
+  "ok": true,
+  "report": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/training_report.json",
+  "checkpoint": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/latest_checkpoint.json",
+  "runDir": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke"
+}
