@@ -1335,7 +1335,7 @@ Quelle:
 - `python/scripts/bt94a_gate_check.py`
 - Audit-Sanierungsregister F.05, F.19, F.27, F.30, F.31
 
-<!-- LOCK: Bot-Codex seit 2026-04-24 -->
+<!-- LOCK: frei -->
 
 Scope:
 
