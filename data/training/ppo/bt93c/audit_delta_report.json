@@ -1,0 +1,126 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T15:35:31.756992Z",
+  "generatedBy": "python/scripts/bt93c_audit_delta.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.1.1",
+  "claim": "93C-Audit-Delta",
+  "inputs": {
+    "plan": "docs/bot-training/Bot_Trainingsplan.md",
+    "ppoReadme": "data/training/ppo/README.md",
+    "bt90RiskRegister": "docs/plaene/neu/BT90_GoldStandard/offene_risiken.md",
+    "auditReadiness": "data/training/ppo/bt93c/audit_readiness_report.json",
+    "startManifest": "data/training/ppo/bt93c/start_manifest.json",
+    "bt93bConsistency": "data/training/ppo/bt93b/artifact_consistency_report.json",
+    "baselineSourceManifest": "data/training/ppo/bt93c/baseline_source_manifest.json"
+  },
+  "git": {
+    "headCommit": "3fb11d17a36d8985f25121e292819c9e068c2780",
+    "scopedStatusBeforeWrite": [
+      {
+        "status": "M ",
+        "path": "data/training/ppo/README.md"
+      },
+      {
+        "status": " M",
+        "path": "docs/bot-training/Bot_Trainingsplan.md"
+      },
+      {
+        "status": "??",
+        "path": "data/training/ppo/bt93c/audit_delta_report.json"
+      },
+      {
+        "status": "??",
+        "path": "data/training/ppo/bt93c/baseline_source_manifest.json"
+      },
+      {
+        "status": "??",
+        "path": "python/scripts/bt93c_audit_delta.py"
+      }
+    ],
+    "ignoredCurrentClaimOutputs": [
+      "data/training/ppo/bt93c/audit_delta_report.json",
+      "data/training/ppo/bt93c/baseline_source_manifest.json"
+    ]
+  },
+  "checks": {
+    "freshFreezeStillGreen": {
+      "freezeOk": true,
+      "reAuditRequired": false,
+      "driftCount": 0
+    },
+    "staleUntrackedHints": {
+      "untrackedPpoArtifacts": [],
+      "readmeMarkers": [],
+      "readmeStatus": "current"
+    },
+    "tmpOnlyEvidence": [],
+    "selfCountEvidence": [],
+    "scaffoldBaselineClassification": {
+      "bt93bScaffoldOnly": true,
+      "bt93bPromotionAllowed": false,
+      "bt93bGate": "closed",
+      "labels": {
+        "bt93b": "scaffold",
+        "bt93cBeforeLearner": "no PPO baseline",
+        "dataBotValidationReport": "legacy DQN validation report; not PPO candidate evidence",
+        "throughputArtifacts": "lane budget evidence only; not survival evidence"
+      }
+    },
+    "riskDrift": {
+      "ok": true,
+      "source": "docs/plaene/neu/BT90_GoldStandard/offene_risiken.md",
+      "mapping": {
+        "S001": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "F.02",
+          "anchorPresentInActivePlan": true
+        },
+        "S008": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "F.08",
+          "anchorPresentInActivePlan": true
+        },
+        "S009": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "F.12",
+          "anchorPresentInActivePlan": true
+        },
+        "S010": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "F.20",
+          "anchorPresentInActivePlan": true
+        },
+        "S011": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "F.06",
+          "anchorPresentInActivePlan": true
+        },
+        "S012": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "F.15",
+          "anchorPresentInActivePlan": true
+        },
+        "S013": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "F.15",
+          "anchorPresentInActivePlan": true
+        },
+        "S014": {
+          "presentInDraftRegister": true,
+          "activePlanAnchor": "D.05",
+          "anchorPresentInActivePlan": true
+        }
+      }
+    },
+    "baselineAmbiguity": {
+      "resolvedBy": "data/training/ppo/bt93c/baseline_source_manifest.json",
+      "legacyBotValidationReportGeneratedAt": "2026-03-27",
+      "roadmapContainsQ2Baseline": true,
+      "baselineSourceOk": true
+    }
+  },
+  "resultClass": "go",
+  "nextGate": "93C.1.2/93C.1.3 dependency and clean-env lock",
+  "trainingRunsStarted": false
+}
