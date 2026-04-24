@@ -1,0 +1,120 @@
+# Feature: Security-, Runtime- und Contract-Hardening aus Deep-Code-Audit (V102)
+
+Stand: 2026-04-24
+Status: Entwurf
+Owner: Codex
+Risiko: hoch
+plan_file: `docs/plaene/aktiv/V102.md`
+
+## Ziel
+
+Die sicherheits- und stabilitaetskritischen Deep-Audit-Befunde als klaren Hardening-Block umsetzen:
+
+- Write-Path-Hardening fuer Editor-/Video-Disk-API (Traversal-Schutz, klare Zielroot).
+- XSS-Hardening fuer untrusted UI-Datenpfade (`innerHTML` zu sicheren DOM-Updates).
+- Blockierende Sync-I/O in Runtime-Vertraegen abbauen (kein sync XHR, kein sync IPC im heissen Pfad).
+- LAN-Signaling-Requestpfade gegen Payload- und Endpoint-Missbrauch haerten.
+- Guardrails fuer monolithische Hotspots, Typ-/Lint-Abdeckung und Repo-Hygiene in umsetzbare Folgearbeit schneiden.
+
+## Desktop-first Scope
+
+- Primaerziel bleibt die Desktop-App als Hauptprodukt.
+- Browser-/Demo-Auswirkungen bleiben auf Shared-Contracts und bestehende Surface-Resolver begrenzt.
+- Kein Browser-first-Paritaetsausbau.
+
+## Nicht-Ziel
+
+- Kein neuer Produkt-Featureblock.
+- Kein Full-Rewrite von `vite.config.js` oder kompletter Multiplayer-Neuaufbau.
+- Kein Aufweichen der bestehenden `V91`/`V92` Guard- und Legacy-Surface-Leitplanken.
+
+## Betroffene Dateien und Bereiche
+
+- `vite.config.js`
+- `src/ui/menu/testing/MenuMultiplayerPanel.js`
+- `src/ui/start-setup/StartSetupUiOps.js`
+- `src/ui/MatchFlowArcadeOverlayController.js`
+- `src/shared/contracts/PlatformCapabilityRegistry.js`
+- `electron/preload.cjs`
+- `src/shared/contracts/SettingsRuntimeLimitsContract.js`
+- `server/lan-signaling.js`
+- `eslint.config.js`
+- `tsconfig.architecture.json`
+- `tests/platform-capabilities.contract.test.mjs`
+- `tests/core-targeted-platform.spec.js`
+- `tests/runtime-regressions.contract.test.mjs`
+- `docs/referenz/ai_architecture_context.md`
+
+## Definition of Done
+
+- [ ] DoD.1 Video-Disk-Save-Pfad ist traversal-sicher (`allowed-root` + canonical-path check).
+- [ ] DoD.2 Untrusted UI-Daten werden in den betroffenen Menue-/Overlay-Pfaden nicht mehr per `innerHTML` gerendert.
+- [ ] DoD.3 Browser-Demo-Override-Resolver blockiert den Renderer nicht mehr ueber synchrones XHR.
+- [ ] DoD.4 Settings-Defaults-Read-Pfad benoetigt keinen synchronen IPC-Call im Renderer-Hotpath.
+- [ ] DoD.5 LAN-Signaling liest Request-Bodies mit festen Size-Limits und klaren Fehlerpfaden.
+- [ ] DoD.6 Architektur-/Plan-/Docs-Gates bleiben gruen; neue Tests fuer die gehaerteten Sicherheits- und Contract-Pfade sind vorhanden oder blockerfest dokumentiert.
+
+## Intake-Hinweis fuer den User
+
+- Ziel-Masterplan: `docs/Umsetzungsplan.md`
+- vorgeschlagene Block-ID: `V102`
+- vorgeschlagene kanonische Blockdatei: `docs/plaene/aktiv/V102.md`
+- hard dependencies: `V99.99`, `V100.99`
+- soft dependencies: `V75.99`, `V101.99`
+- Hinweis: `Manuelle Uebernahme erforderlich`
+
+## Evidence-Format
+
+Abgeschlossene Checkboxen im spaeteren aktiven Block immer mit:
+
+`(abgeschlossen: YYYY-MM-DD; evidence: <command> -> <result file|commit>)`
+
+## Phasenplan
+
+### 102.1 Security-Hotfixes fuer Write- und Renderpfade
+status: open
+goal: direkte Angriffsoberflaechen in API und UI schliessen
+output: traversal-sicherer Disk-Write und XSS-sichere UI-Renderer
+
+- [ ] 102.1.1 `vite.config.js` Video-Save-Endpoint auf erlaubte Root begrenzen (`safeName`, canonical path guard, reject ausserhalb root).
+- [ ] 102.1.2 `MenuMultiplayerPanel`, `StartSetupUiOps` und `MatchFlowArcadeOverlayController` von untrusted `innerHTML` auf sichere DOM-Updates umstellen.
+
+### 102.2 Contract-I/O Entblockung
+status: open
+goal: sync-I/O im Runtime-Vertragslayer beseitigen
+output: async-faehige Resolver-/Defaults-Pfade mit identischer Semantik
+
+- [ ] 102.2.1 `PlatformCapabilityRegistry` Build-Artefakt-Lesepfad ohne synchrones XHR aufloesen (lazy async cache oder bootstrap-injizierter Snapshot).
+- [ ] 102.2.2 `preload`/Settings-Defaults-Read so umstellen, dass kein `sendSync` im rendererseitigen Verbrauchspfad notwendig ist.
+
+### 102.3 LAN-Endpoint- und Payload-Hardening
+status: open
+goal: LAN-Signaling gegen missbrauchbare Requests absichern
+output: begrenzte Requestgroessen und robuste Fehlerantworten
+
+- [ ] 102.3.1 `server/lan-signaling.js` Request-Body-Limits und parse-feste Fehlerpfade einfuehren.
+- [ ] 102.3.2 Endpoint-Rollen-/Mutationsschutz mit bestehendem `V99`-Scope abgleichen, ohne parallelen Vertragszweig zu bauen.
+
+### 102.4 Guardrails fuer Hotspots, Tooling und Repo-Hygiene
+status: open
+goal: Wiedereintritt derselben Schulden verhindern
+output: ratcheted Regeln fuer Komplexitaet, Checks und Hygiene-Follow-up
+
+- [ ] 102.4.1 `eslint`/Architektur-Checks fuer Security-/Hotspot-Regressionen schaerfen (z. B. no-untrusted-innerhtml-Regelpfad oder gleichwertiger Guard).
+- [ ] 102.4.2 Repo-Hygiene-Follow-up (`tmp`-/Archiv-Bloat) als klaren Retention-/Enttracking-Plan dokumentieren und in bestehende Cleanup-Streams einhaengen.
+
+### 102.99 Abschluss-Gate
+status: open
+goal: Hardening reproduzierbar abschliessen
+output: gruene Security-/Contract-/Docs-Nachweise
+
+- [ ] 102.99.1 Relevante Contract-/Targeted-Tests fuer Security-/Contract-Pfade sind gruen oder blockerfest dokumentiert.
+- [ ] 102.99.2 `npm run plan:check`, `npm run docs:sync` und `npm run docs:check` sind gruen.
+- [ ] 102.99.3 Keine neuen disallowed architecture edges oder Legacy-Surface-Budgetausweitungen im geaenderten Scope.
+
+## Risiken
+
+- R1 | hoch | Security-Hotfixes auf Renderpfaden koennen UI-Verhalten regressiv veraendern, wenn Event-Bindings am DOM-Neuaufbau nicht sauber mitgezogen werden.
+- R2 | hoch | Async-Umstellung bisher synchroner Contract-Lesewege kann Startup-Reihenfolgen oder Fallback-Semantik brechen.
+- R3 | mittel | LAN-Hardening kollidiert mit laufendem `V99`-Scope, wenn Endpoint-Rollen nicht auf denselben Vertrag konsolidiert werden.
+- R4 | mittel | Ohne nachgezogene Guardrails driften `innerHTML`- und Sync-I/O-Muster erneut in neue Module.
