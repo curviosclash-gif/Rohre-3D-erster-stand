@@ -138,6 +138,10 @@ def _is_baseline_run(run_kind: str) -> bool:
     return run_kind.startswith("baseline-")
 
 
+def _is_holdout_run(run_kind: str) -> bool:
+    return run_kind.startswith("holdout-")
+
+
 def _number(value: Any) -> float | None:
     if value is None:
         return None
@@ -376,7 +380,7 @@ def _collect_eval_diagnostics(
         if "crash" in str(key).lower()
     )
     training_learning = dict((training_report or {}).get("learning") or {})
-    is_baseline = _is_baseline_run(run_kind)
+    is_baseline = _is_baseline_run(run_kind) or _is_holdout_run(run_kind)
     average_survival_reason = None
     if not is_baseline:
         average_survival_reason = (
@@ -433,9 +437,14 @@ def _collect_eval_diagnostics(
                 "appliedIntentCounts": _counter_dict(intent_applied),
                 "note": "Intent-/Recovery-Luecken bleiben Bewertungsrestschuld; Survival allein entscheidet nicht.",
             },
-            "bt80cProductionValidation": {
-                "status": "blocked-by-BT80C-80.9.3",
+            "ppoValidateLane": {
+                "status": "missing-until-BT94B.3",
                 "rolloutOrPromoteAllowed": False,
+                "replacesLegacyBotValidate": True,
+            },
+            "bt80cLegacyValidation": {
+                "status": "historical-context-only",
+                "replacesPpoValidate": False,
             },
             "jsInferenceIntegration": {
                 "status": "not-in-BT93C-scope",
@@ -927,7 +936,7 @@ def run_eval_from_cli(
     eval_steps: int | None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
-    if run_kind not in {"eval-smoke", "diagnostics-eval", "pilot-eval", "baseline-eval"}:
+    if run_kind not in {"eval-smoke", "diagnostics-eval", "pilot-eval", "baseline-eval", "holdout-eval"}:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
     gate_inputs = _validate_gate_inputs(config)
@@ -937,7 +946,8 @@ def run_eval_from_cli(
     run_dir = artifact_root_path / "runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
     env_cfg = config["env"]
-    seeds = [int(seed) for seed in env_cfg["evalSeeds"][: int(env_cfg["evalEnvCount"])]]
+    seed_key = "holdoutSeeds" if run_kind == "holdout-eval" else "evalSeeds"
+    seeds = [int(seed) for seed in env_cfg[seed_key][: int(env_cfg["evalEnvCount"])]]
     steps = int(eval_steps or config["rollout"]["evalSteps"])
 
     vec_env: VecNormalize | None = None
@@ -1067,6 +1077,7 @@ def run_eval_from_cli(
             "diagnostics-eval": "latest_diagnostics_eval.json",
             "pilot-eval": "latest_pilot_eval.json",
             "baseline-eval": "latest_baseline_eval.json",
+            "holdout-eval": "latest_holdout_eval.json",
         }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({
