@@ -20,14 +20,14 @@
   },
   "bt94aHandover": {
     "ready": false,
-    "gate": "closed-diagnose-blocked-by-bt93d",
-    "reason": "BT93D propagated still-blocking F.05/F.19/F.27/F.30/F.31 evidence; BT94A remains closed.",
+    "gate": "closed-diagnose-blocked-by-bt93e",
+    "reason": "BT93E still has red start evidence; BT94A remains closed.",
     "precomparisonResult": "ppo-regression",
     "ppoValidateStatus": "ppo-validate-missing",
     "rolloutAllowed": false,
     "promotionAllowed": false
   },
-  "claim": "93D-BT94A-Startfreigabe-Paket",
+  "claim": "BT93E-BT94A-Gate-Refresh",
   "doDCoverage": {
     "DoD.10": false,
     "DoD.12": true,
@@ -37,11 +37,11 @@
   },
   "evidenceQualityMatrix": {
     "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-    "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c"
+    "sha256": "dce7495f9b7c30099eca8e6a67df712b57f5633212718e585f818453164f2e70"
   },
-  "generatedAt": "2026-04-24T21:42:47Z",
-  "generatedBy": "python/scripts/bt93d_start_gate_package.py",
-  "gitSha": "79739fa494a82c98c34bd89616bb54f0d66cf504",
+  "generatedAt": "2026-04-24T22:51:05Z",
+  "generatedBy": "python/scripts/bt93e_gate_refresh_handover.py",
+  "gitSha": "ee55a42a59be3a715e02485aa4caf7a08d8577e7",
   "guardrails": {
     "candidateRun": false,
     "fourEnvAllowed": false,
@@ -69,17 +69,18 @@
     "93C.7.3": true,
     "93C.7.4": true
   },
-  "phaseId": "93D.4.1",
+  "phaseId": "93E.5.1",
   "remainingGates": {
     "bt94a": [
       "F.05",
       "F.19",
       "F.27",
       "F.30",
-      "F.31"
+      "F.31",
+      "R.01"
     ],
     "bt94bPpoValidate": "BT94B.3 remains mandatory before any promote verdict",
-    "runtimeRollout": "outside BT93D; no JS inference, strategy flag, registry, rollback, or latency proof here"
+    "runtimeRollout": "outside BT93E; no JS inference, strategy flag, registry, rollback, or latency proof here"
   },
   "reproducibility": {
     "baselineEvalReport": "data/training/ppo/bt93c/runs/20260424T180054Z-baseline-eval/eval_report.json",
@@ -158,14 +159,38 @@
     },
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-      "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c",
-      "role": "BT93D-refreshed evidence matrix",
+      "sha256": "dce7495f9b7c30099eca8e6a67df712b57f5633212718e585f818453164f2e70",
+      "role": "BT93E-refreshed evidence matrix",
       "closureCapable": true
     },
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621",
-      "role": "BT93D-refreshed precomparison",
+      "sha256": "e08ada1f41716e2262e436afdd9d48edaddbbe8000d63ad0d69e736729057135",
+      "role": "BT93E-refreshed precomparison",
+      "closureCapable": true
+    },
+    "bt93eSurvivalRepair": {
+      "path": "data/training/ppo/bt93e/survival_repair_report.json",
+      "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57",
+      "role": "BT93E survival repair",
+      "closureCapable": true
+    },
+    "bt93eTerminalRewardFailure": {
+      "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+      "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706",
+      "role": "BT93E terminal/reward/failure diagnostics",
+      "closureCapable": true
+    },
+    "bt93eActionSurfaceHardening": {
+      "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+      "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4",
+      "role": "BT93E action-surface hardening",
+      "closureCapable": true
+    },
+    "bt93eFollowupGateReport": {
+      "path": "data/training/ppo/bt93e/followup_gate_report.json",
+      "sha256": "0a7987f1a9d394acb05f64d36d97af9df2476ad4e7cec6ff6b696cdd87002123",
+      "role": "BT93E followup gate report",
       "closureCapable": true
     }
   },
@@ -191,5 +216,24 @@
     "src/entities/ai/training/TrainingContractV1.js": "clean",
     "src/state/training/RewardCalculator.js": "clean",
     "src/state/training/TrainingDomain.js": "clean"
+  },
+  "bt93ePhaseCoverage": {
+    "93E.5.1": true,
+    "93E.5.2": "pending bt94a_gate_check.py --write-report",
+    "93E.5.3": true,
+    "93E.5.4": false
+  },
+  "bt93eHandoverGate": {
+    "phaseId": "93E.5.1",
+    "resultClass": "diagnose-blocked",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.27": "still-blocking",
+      "F.19": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    },
+    "rewardSafetyEpisodeShortening": "still-blocking",
+    "noBt94aCheckboxClosed": true
   }
 }

@@ -5,32 +5,32 @@
     "bt94aBlockerCount": 5,
     "bt94aBlockers": [
       {
-        "evidence": "BT93D fresh eval/holdout reproduces survival regression (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
-        "gate": "93D.4/BT94A",
+        "evidence": "BT93E same-matrix eval/holdout keeps Survival-First blocked (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
+        "gate": "93E.5/BT94A",
         "id": "F.05"
       },
       {
-        "evidence": "BT93D terminal/death matrix remains max-steps-only or incomplete.",
-        "gate": "93D.4/BT94A",
+        "evidence": "BT93E terminal/death matrix remains insufficient for BT94A start.",
+        "gate": "93E.5/BT94A",
         "id": "F.19"
       },
       {
-        "evidence": "BT93D comparison remains ppo-regression.",
-        "gate": "93D.4/BT94A",
+        "evidence": "BT93E comparison remains ppo-regression.",
+        "gate": "93E.5/BT94A",
         "id": "F.27"
       },
       {
-        "evidence": "BT93D policy-level masking is absent and post-decode clamp/veto load remains high.",
-        "gate": "93D.4/BT94A",
+        "evidence": "BT93E policy-level masking remains absent while post-decode clamp/veto load blocks start.",
+        "gate": "93E.5/BT94A",
         "id": "F.30"
       },
       {
-        "evidence": "BT93D natural terminal/death evidence remains weak.",
-        "gate": "93D.4/BT94A",
+        "evidence": "BT93E natural terminal/death evidence remains weak.",
+        "gate": "93E.5/BT94A",
         "id": "F.31"
       }
     ],
-    "handoverGate": "closed-diagnose-blocked-by-bt93d",
+    "handoverGate": "closed-diagnose-blocked-by-bt93e",
     "handoverReady": false,
     "handoverResultClass": "diagnose",
     "matrixId": "bt93c-dqn-ppo-precomparison-v1",
@@ -50,7 +50,8 @@
       "F.19",
       "F.27",
       "F.30",
-      "F.31"
+      "F.31",
+      "R.01"
     ],
     "semanticWindow": "runtime-near-headless-v1"
   },
@@ -67,7 +68,7 @@
     {
       "blocksStart": true,
       "id": "handover_gate_ready",
-      "observed": "closed-diagnose-blocked-by-bt93d",
+      "observed": "closed-diagnose-blocked-by-bt93e",
       "ok": false,
       "required": "ready=true"
     },
@@ -87,9 +88,9 @@
     }
   ],
   "claimable": false,
-  "generatedAt": "2026-04-24T22:10:12Z",
+  "generatedAt": "2026-04-24T22:51:08Z",
   "generatedBy": "python/scripts/bt94a_gate_check.py",
-  "gitSha": "9729cd9ee83883d3dc8ab6ef6dd97d97b11e1302",
+  "gitSha": "ee55a42a59be3a715e02485aa4caf7a08d8577e7",
   "matrixDefinitionAllowed": false,
   "nextGate": {
     "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",
@@ -110,7 +111,7 @@
       "BT94B handover",
       "promotion or rollout signal"
     ],
-    "reason": "BT93D propagated still-blocking F.05/F.19/F.27/F.30/F.31 evidence; BT94A remains closed.",
+    "reason": "BT93E still has red start evidence; BT94A remains closed.",
     "status": "BT94A remains closed before 94A.1"
   },
   "ok": true,
@@ -119,15 +120,15 @@
   "sourceArtifacts": {
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-      "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c"
+      "sha256": "dce7495f9b7c30099eca8e6a67df712b57f5633212718e585f818453164f2e70"
     },
     "handoverReport": {
       "path": "data/training/ppo/bt93c/handover_report.json",
-      "sha256": "d18ab47e09edc4fc0d591cc8281f6d046ad821323661d2b4c5dfef84ae15df64"
+      "sha256": "927f924d9d1d128c28639db20fbf67ce021b9b9094878c6cdf7b0a098a449130"
     },
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621"
+      "sha256": "e08ada1f41716e2262e436afdd9d48edaddbbe8000d63ad0d69e736729057135"
     }
   }
 }

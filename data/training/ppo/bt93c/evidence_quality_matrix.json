@@ -32,10 +32,12 @@
       "blocksBt94a": true,
       "bt93dDisposition": "still-blocking",
       "bt93dSourceArtifact": "data/training/ppo/bt93d/survival_regression_report.json",
-      "evidence": "BT93D fresh eval/holdout reproduces survival regression (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
-      "gate": "93D.4/BT94A",
+      "evidence": "BT93E same-matrix eval/holdout keeps Survival-First blocked (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
+      "gate": "93E.5/BT94A",
       "id": "F.05",
-      "status": "bt94a-blocker"
+      "status": "bt94a-blocker",
+      "bt93eDisposition": "still-blocking",
+      "bt93eSourceArtifact": "data/training/ppo/bt93e/survival_repair_report.json"
     },
     {
       "blocksBt94a": false,
@@ -132,10 +134,12 @@
       "blocksBt94a": true,
       "bt93dDisposition": "still-blocking",
       "bt93dSourceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
-      "evidence": "BT93D terminal/death matrix remains max-steps-only or incomplete.",
-      "gate": "93D.4/BT94A",
+      "evidence": "BT93E terminal/death matrix remains insufficient for BT94A start.",
+      "gate": "93E.5/BT94A",
       "id": "F.19",
-      "status": "bt94a-blocker"
+      "status": "bt94a-blocker",
+      "bt93eDisposition": "still-blocking",
+      "bt93eSourceArtifact": "data/training/ppo/bt93e/terminal_reward_failure_report.json"
     },
     {
       "blocksBt94a": false,
@@ -190,10 +194,12 @@
       "blocksBt94a": true,
       "bt93dDisposition": "still-blocking",
       "bt93dSourceArtifact": "data/training/ppo/bt93d/survival_regression_report.json",
-      "evidence": "BT93D comparison remains ppo-regression.",
-      "gate": "93D.4/BT94A",
+      "evidence": "BT93E comparison remains ppo-regression.",
+      "gate": "93E.5/BT94A",
       "id": "F.27",
-      "status": "bt94a-blocker"
+      "status": "bt94a-blocker",
+      "bt93eDisposition": "still-blocking",
+      "bt93eSourceArtifact": "data/training/ppo/bt93e/survival_repair_report.json"
     },
     {
       "blocksBt94a": false,
@@ -213,19 +219,23 @@
       "blocksBt94a": true,
       "bt93dDisposition": "still-blocking",
       "bt93dSourceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
-      "evidence": "BT93D policy-level masking is absent and post-decode clamp/veto load remains high.",
-      "gate": "93D.4/BT94A",
+      "evidence": "BT93E policy-level masking remains absent while post-decode clamp/veto load blocks start.",
+      "gate": "93E.5/BT94A",
       "id": "F.30",
-      "status": "bt94a-blocker"
+      "status": "bt94a-blocker",
+      "bt93eDisposition": "still-blocking",
+      "bt93eSourceArtifact": "data/training/ppo/bt93e/action_surface_hardening_report.json"
     },
     {
       "blocksBt94a": true,
       "bt93dDisposition": "still-blocking",
       "bt93dSourceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
-      "evidence": "BT93D natural terminal/death evidence remains weak.",
-      "gate": "93D.4/BT94A",
+      "evidence": "BT93E natural terminal/death evidence remains weak.",
+      "gate": "93E.5/BT94A",
       "id": "F.31",
-      "status": "bt94a-blocker"
+      "status": "bt94a-blocker",
+      "bt93eDisposition": "still-blocking",
+      "bt93eSourceArtifact": "data/training/ppo/bt93e/terminal_reward_failure_report.json"
     },
     {
       "blocksBt94a": false,
@@ -298,10 +308,10 @@
     "F.30",
     "F.31"
   ],
-  "generatedAt": "2026-04-24T21:42:47Z",
-  "generatedBy": "python/scripts/bt93d_start_gate_package.py",
+  "generatedAt": "2026-04-24T22:51:05Z",
+  "generatedBy": "python/scripts/bt93e_gate_refresh_handover.py",
   "ok": true,
-  "phaseId": "93D.4.1",
+  "phaseId": "93E.5.1",
   "riskRegisterAlignment": [
     {
       "disposition": "blocked by ppo-regression result and promotionAllowed=false",
@@ -345,8 +355,32 @@
     },
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621",
-      "role": "BT93D-refreshed precomparison",
+      "sha256": "e08ada1f41716e2262e436afdd9d48edaddbbe8000d63ad0d69e736729057135",
+      "role": "BT93E-refreshed precomparison",
+      "closureCapable": true
+    },
+    "bt93eSurvivalRepair": {
+      "path": "data/training/ppo/bt93e/survival_repair_report.json",
+      "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57",
+      "role": "BT93E survival repair",
+      "closureCapable": true
+    },
+    "bt93eTerminalRewardFailure": {
+      "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+      "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706",
+      "role": "BT93E terminal/reward/failure diagnostics",
+      "closureCapable": true
+    },
+    "bt93eActionSurfaceHardening": {
+      "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+      "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4",
+      "role": "BT93E action-surface hardening",
+      "closureCapable": true
+    },
+    "bt93eFindingRegister": {
+      "path": "data/training/ppo/bt93e/finding_register.json",
+      "sha256": "cc9f4987e4ac3846a699d3ca6f304b94f4404ade8c70ea00423baa010b74fa8e",
+      "role": "BT93E finding register",
       "closureCapable": true
     }
   },
@@ -361,5 +395,16 @@
     "source": "data/training/ppo/bt93c/audit_delta_report.json",
     "tmpOnlyEvidence": null,
     "untrackedPpoArtifacts": null
+  },
+  "bt93eRefresh": {
+    "phaseId": "93E.5.1",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.27": "still-blocking",
+      "F.19": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    },
+    "allTrackedFindingsExplicit": true
   }
 }

@@ -571,5 +571,99 @@
       },
       "tooSmallEpisodeCountsBlockStart": true
     }
+  },
+  "gateRefreshHandover": {
+    "generatedAt": "2026-04-24T22:51:12Z",
+    "generatedBy": "python/scripts/bt93e_gate_refresh_handover.py",
+    "phaseId": "93E.5",
+    "resultClass": "diagnose-blocked",
+    "phaseCoverage": {
+      "93E.5.1": true,
+      "93E.5.2": true,
+      "93E.5.3": true,
+      "93E.5.4": false
+    },
+    "bt94aStartStatus": {
+      "claimable": false,
+      "candidateRunsAllowed": false,
+      "matrixDefinitionAllowed": false,
+      "candidateFreezeAllowed": false,
+      "resultClass": "blocked-no-start",
+      "handoverReady": false,
+      "handoverGate": "closed-diagnose-blocked-by-bt93e",
+      "precomparisonResultClass": "ppo-regression",
+      "bt94aBlockerCount": 5,
+      "status": "BT94A remains closed before 94A.1"
+    },
+    "diagnoseBlocked": {
+      "active": true,
+      "redChecks": [
+        {
+          "blocksStart": true,
+          "id": "bt93c_result_allows_bt94a",
+          "observed": "diagnose",
+          "ok": false,
+          "required": "not diagnose"
+        },
+        {
+          "blocksStart": true,
+          "id": "handover_gate_ready",
+          "observed": "closed-diagnose-blocked-by-bt93e",
+          "ok": false,
+          "required": "ready=true"
+        },
+        {
+          "blocksStart": true,
+          "id": "precomparison_not_regression",
+          "observed": "ppo-regression",
+          "ok": false,
+          "required": "not ppo-regression"
+        },
+        {
+          "blocksStart": true,
+          "id": "no_open_bt94a_audit_blockers",
+          "observed": 5,
+          "ok": false,
+          "required": 0
+        }
+      ],
+      "remainingBt94aGates": [
+        "F.05",
+        "F.19",
+        "F.27",
+        "F.30",
+        "F.31",
+        "R.01"
+      ],
+      "findingRegisterSummary": {
+        "bt94aBlockerCount": 5,
+        "closed": 21,
+        "not-start-blocking-carried": 12,
+        "redClaimChecks": 4,
+        "still-blocking": 17,
+        "total": 50
+      },
+      "startMatrixResultClass": "blocked-no-start",
+      "nextRepairOrReplanStep": "BT93E ended diagnose-blocked. A follow-up repair/replan must close or explicitly downgate the remaining start blockers before BT94A.1 can be claimed.",
+      "noBt94aCheckboxClosed": true
+    },
+    "bt94aReady": {
+      "active": false,
+      "candidateFreezeAllowed": false,
+      "ppoValidateRestDebt": "BT94B.3 remains mandatory before promote",
+      "rolloutRestDebt": "BT95/separate rollout remains mandatory before runtime activation"
+    },
+    "sourcePackage": {
+      "path": "data/training/ppo/bt93e/handover_package.json",
+      "sha256": "506176397ef4b8bd8f8ec7ee8df1d7cddc674923ed44541f01ecbd3f9d428dc9",
+      "role": "BT93E handover package",
+      "closureCapable": true
+    },
+    "diagnoseBlockedErrorReport": {
+      "path": "docs/Fehlerberichte/2026-04-25_bt93e-gate-refresh-diagnose-blocked.md",
+      "sha256": "c70c6b046c88f370d07448ac37f61d25a14b28c9a1b28752c4c85f29ff19d8e7",
+      "role": "BT93E diagnose-blocked error report",
+      "closureCapable": true
+    }
   }
 }

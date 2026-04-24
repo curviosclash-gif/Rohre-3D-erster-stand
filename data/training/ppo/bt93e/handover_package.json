@@ -1,0 +1,182 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T22:51:12Z",
+  "generatedBy": "python/scripts/bt93e_gate_refresh_handover.py",
+  "blockId": "BT93E",
+  "phaseId": "93E.5",
+  "gitSha": "ee55a42a59be3a715e02485aa4caf7a08d8577e7",
+  "resultClass": "diagnose-blocked",
+  "phaseCoverage": {
+    "93E.5.1": true,
+    "93E.5.2": true,
+    "93E.5.3": true,
+    "93E.5.4": false
+  },
+  "bt94aStartStatus": {
+    "claimable": false,
+    "candidateRunsAllowed": false,
+    "matrixDefinitionAllowed": false,
+    "candidateFreezeAllowed": false,
+    "resultClass": "blocked-no-start",
+    "handoverReady": false,
+    "handoverGate": "closed-diagnose-blocked-by-bt93e",
+    "precomparisonResultClass": "ppo-regression",
+    "bt94aBlockerCount": 5,
+    "status": "BT94A remains closed before 94A.1"
+  },
+  "diagnoseBlocked": {
+    "active": true,
+    "redChecks": [
+      {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93e",
+        "ok": false,
+        "required": "ready=true"
+      },
+      {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 5,
+        "ok": false,
+        "required": 0
+      }
+    ],
+    "remainingBt94aGates": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.30",
+      "F.31",
+      "R.01"
+    ],
+    "findingRegisterSummary": {
+      "bt94aBlockerCount": 5,
+      "closed": 21,
+      "not-start-blocking-carried": 12,
+      "redClaimChecks": 4,
+      "still-blocking": 17,
+      "total": 50
+    },
+    "startMatrixResultClass": "blocked-no-start",
+    "nextRepairOrReplanStep": "BT93E ended diagnose-blocked. A follow-up repair/replan must close or explicitly downgate the remaining start blockers before BT94A.1 can be claimed.",
+    "noBt94aCheckboxClosed": true
+  },
+  "bt94aReady": {
+    "active": false,
+    "candidateFreezeAllowed": false,
+    "ppoValidateRestDebt": "BT94B.3 remains mandatory before promote",
+    "rolloutRestDebt": "BT95/separate rollout remains mandatory before runtime activation"
+  },
+  "artifactRefresh": {
+    "precomparisonResultClass": "ppo-regression",
+    "handoverResultClass": "diagnose",
+    "handoverGate": "closed-diagnose-blocked-by-bt93e",
+    "bt94aBlockerCount": 5,
+    "survivalRepairResultClass": "diagnose-blocked",
+    "terminalRewardFailureResultClass": "diagnose-blocked",
+    "actionSurfaceResultClass": "diagnose-blocked"
+  },
+  "sourceArtifacts": {
+    "precomparisonReport": {
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "sha256": "e08ada1f41716e2262e436afdd9d48edaddbbe8000d63ad0d69e736729057135",
+      "role": "BT93E-refreshed precomparison",
+      "closureCapable": true
+    },
+    "handoverReport": {
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "sha256": "927f924d9d1d128c28639db20fbf67ce021b9b9094878c6cdf7b0a098a449130",
+      "role": "BT93E-refreshed handover",
+      "closureCapable": true
+    },
+    "evidenceQualityMatrix": {
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "sha256": "dce7495f9b7c30099eca8e6a67df712b57f5633212718e585f818453164f2e70",
+      "role": "BT93E-refreshed evidence matrix",
+      "closureCapable": true
+    },
+    "bt94aGate": {
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "sha256": "921f4cb8bc4c8f30a6f31c311e96ee8ed7065ede38befd408f098eb77cb79381",
+      "role": "BT94A gate check",
+      "closureCapable": true
+    },
+    "bt93eSurvivalRepair": {
+      "path": "data/training/ppo/bt93e/survival_repair_report.json",
+      "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57",
+      "role": "BT93E survival repair",
+      "closureCapable": true
+    },
+    "bt93eTerminalRewardFailure": {
+      "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+      "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706",
+      "role": "BT93E terminal/reward/failure diagnostics",
+      "closureCapable": true
+    },
+    "bt93eActionSurfaceHardening": {
+      "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+      "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4",
+      "role": "BT93E action-surface hardening",
+      "closureCapable": true
+    },
+    "bt93eFindingRegister": {
+      "path": "data/training/ppo/bt93e/finding_register.json",
+      "sha256": "cc9f4987e4ac3846a699d3ca6f304b94f4404ade8c70ea00423baa010b74fa8e",
+      "role": "BT93E finding register",
+      "closureCapable": true
+    },
+    "bt93eStartMatrix": {
+      "path": "data/training/ppo/bt93e/start_matrix.json",
+      "sha256": "b11ad2fef223b993b7851bda319c1b2d1e86bc7e949c49e29fad62df5ab934a3",
+      "role": "BT93E start matrix",
+      "closureCapable": true
+    },
+    "bt93eFollowupGateReport": {
+      "path": "data/training/ppo/bt93e/followup_gate_report.json",
+      "sha256": "0a7987f1a9d394acb05f64d36d97af9df2476ad4e7cec6ff6b696cdd87002123",
+      "role": "BT93E followup gate report",
+      "closureCapable": true
+    },
+    "diagnoseBlockedErrorReport": {
+      "path": "docs/Fehlerberichte/2026-04-25_bt93e-gate-refresh-diagnose-blocked.md",
+      "sha256": "c70c6b046c88f370d07448ac37f61d25a14b28c9a1b28752c4c85f29ff19d8e7",
+      "role": "BT93E diagnose-blocked error report",
+      "closureCapable": true
+    }
+  },
+  "commands": {
+    "refreshReports": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93e_gate_refresh_handover.py --write-upstream-reports",
+    "gateCheck": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt94a_gate_check.py --write-report",
+    "package": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93e_gate_refresh_handover.py --write-package --write-error-report --update-start-matrix"
+  },
+  "guardrails": {
+    "productiveRuntimeChanged": false,
+    "runtimeSurfacesTouched": [],
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "forbiddenWork": [
+      "BT94A candidate runs inside BT93E",
+      "freeze candidate creation inside BT93E",
+      "BT94B handover inside BT93E",
+      "promotion or rollout signal",
+      "JS inference, strategy flag, registry, rollback, or latency claim"
+    ]
+  }
+}
