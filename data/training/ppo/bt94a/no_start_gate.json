@@ -1,0 +1,133 @@
+{
+  "blockId": "BT94A",
+  "bt93cState": {
+    "baselineId": "bt93c-ppo-baseline-publish-v1",
+    "bt94aBlockerCount": 5,
+    "bt94aBlockers": [
+      {
+        "evidence": "PPO survival regresses against the DQN anchor",
+        "gate": "93C.6/94B.2",
+        "id": "F.05"
+      },
+      {
+        "evidence": "episodes are still max-step dominated with empty death classes",
+        "gate": "94B.2/94B.3",
+        "id": "F.19"
+      },
+      {
+        "evidence": "PPO result is classified as regression versus DQN",
+        "gate": "93C.6/93C.7",
+        "id": "F.27"
+      },
+      {
+        "evidence": "post-decode clamp/mask load must not become a freeze candidate",
+        "gate": "94A/94B.2",
+        "id": "F.30"
+      },
+      {
+        "evidence": "natural terminal/death matrix remains weak",
+        "gate": "94B.2/94B.3",
+        "id": "F.31"
+      }
+    ],
+    "handoverGate": "closed-diagnose-ppo-regression",
+    "handoverReady": false,
+    "handoverResultClass": "diagnose",
+    "matrixId": "bt93c-dqn-ppo-precomparison-v1",
+    "modelPackage": {
+      "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+      "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+      "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+      "runId": "20260424T180033Z-baseline-train",
+      "scaffoldOnly": false,
+      "truePpoModelPackage": true,
+      "vecnormalizeSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c"
+    },
+    "precomparisonResultClass": "ppo-regression",
+    "remainingBt94aGates": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.30",
+      "F.31"
+    ],
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "candidateFreezeAllowed": false,
+  "candidateRunsAllowed": false,
+  "claimChecks": [
+    {
+      "blocksStart": true,
+      "id": "bt93c_result_allows_bt94a",
+      "observed": "diagnose",
+      "ok": false,
+      "required": "not diagnose"
+    },
+    {
+      "blocksStart": true,
+      "id": "handover_gate_ready",
+      "observed": "closed-diagnose-ppo-regression",
+      "ok": false,
+      "required": "ready=true"
+    },
+    {
+      "blocksStart": true,
+      "id": "precomparison_not_regression",
+      "observed": "ppo-regression",
+      "ok": false,
+      "required": "not ppo-regression"
+    },
+    {
+      "blocksStart": true,
+      "id": "no_open_bt94a_audit_blockers",
+      "observed": 5,
+      "ok": false,
+      "required": 0
+    }
+  ],
+  "claimable": false,
+  "generatedAt": "2026-04-24T19:13:54Z",
+  "generatedBy": "python/scripts/bt94a_gate_check.py",
+  "gitSha": "4f672baad5d72eaa76b620838c5f6a38b11a724a",
+  "matrixDefinitionAllowed": false,
+  "nextGate": {
+    "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",
+    "requiredBefore94A1": [
+      "BT93C handover result must not be diagnose",
+      "PPO must not be classified as ppo-regression against the DQN anchor",
+      "F.05/F.19/F.27/F.30/F.31 must be closed or explicitly downgraded with evidence"
+    ]
+  },
+  "noStartDecision": {
+    "allowedWork": [
+      "record gate status",
+      "carry blockers into plan/evidence"
+    ],
+    "forbiddenWork": [
+      "candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promotion or rollout signal"
+    ],
+    "reason": "BT93C has a real model package and repro evidence, but the pre-comparison is ppo-regression and keeps BT94A closed.",
+    "status": "BT94A remains closed before 94A.1"
+  },
+  "ok": true,
+  "phaseId": "94A.1",
+  "resultClass": "blocked-no-start",
+  "sourceArtifacts": {
+    "evidenceQualityMatrix": {
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "sha256": "2955f99595c57e1463271a7b6cc8e141e94cf9f16f4645b3975a2f715305fd22"
+    },
+    "handoverReport": {
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "sha256": "d38f5813b92b86b9941ee4668db6a546ee7cfea5389b69bb17611cd7954a12a3"
+    },
+    "precomparisonReport": {
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "sha256": "bf0f90f0dcc9ba01104c6531c1f7fd52193d99086c738c8446e4ef230b5e56dd"
+    }
+  }
+}
