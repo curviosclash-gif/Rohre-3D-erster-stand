@@ -1,0 +1,69 @@
+{
+  "abortCriteria": [
+    "runtimeErrorCount > 0",
+    "precomparison resultClass remains ppo-regression",
+    "handover resultClass remains diagnose",
+    "bt94aHandover.ready is not true",
+    "reward rises while averageBotSurvival or avgStepsPerEpisode regresses",
+    "holdout regresses below the non-inferiority threshold",
+    "terminal/death matrix remains max-steps-only",
+    "mask/veto/clamp load hides policy invalid-action burden",
+    "any JS inference, runtime strategy flag, registry, rollback, latency, matchstart, or AI-Hub surface changes appear"
+  ],
+  "blockId": "BT93D",
+  "bt94aStartNonInferiority": {
+    "averageBotSurvivalDeltaPctMinimum": -10.0,
+    "avgStepsPerEpisodeDeltaPctMinimum": -10.0,
+    "dqnAverageBotSurvival": 37.376986,
+    "dqnAvgStepsPerEpisode": 117.525,
+    "holdoutAverageBotSurvivalDeltaPctMinimum": -10.0,
+    "minimumAverageBotSurvival": 33.639287,
+    "minimumAvgStepsPerEpisode": 105.7725,
+    "promotionPlus30PctRemainsBt94BOnly": true
+  },
+  "generatedAt": "2026-04-24T20:27:57Z",
+  "generatedBy": "python/scripts/bt93d_survival_regression_report.py",
+  "holdoutRule": {
+    "holdoutReportedSeparately": true,
+    "holdoutSeedsMustNotBeOptimizedOn": true,
+    "holdoutShareMinimum": 0.25
+  },
+  "maps": [
+    "standard",
+    "maze"
+  ],
+  "matrixId": "bt93d-survival-repair-minimum-v1",
+  "minimumEpisodes": {
+    "evalCompletedEpisodes": 6,
+    "holdoutCompletedEpisodes": 4,
+    "rationale": "BT93C/BT93D two-episode checks remain diagnostic; the next start needs median/spread visibility."
+  },
+  "ok": true,
+  "phaseId": "93D.2.4",
+  "requiredStatistics": [
+    "avgStepsPerEpisode",
+    "averageBotSurvival",
+    "medianCompletedEpisodeLength",
+    "stdevCompletedEpisodeLength",
+    "runtimeErrorCount",
+    "failureClasses",
+    "terminalReasonCounts",
+    "deathCauseCounts",
+    "invalidActionRate",
+    "maskRate",
+    "vetoRate",
+    "sanitizerRate"
+  ],
+  "seeds": {
+    "eval": [
+      944,
+      945
+    ],
+    "holdout": [
+      950,
+      951
+    ]
+  },
+  "semanticWindow": "runtime-near-headless-v1",
+  "sourceMatrixId": "bt93c-dqn-ppo-precomparison-v1"
+}

@@ -264,7 +264,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
-| Bot-Codex | BT93D | 2026-04-24 | active | `93D.2` in Arbeit; BT94A-Startfreigabe |
+| Bot-Codex | BT93D | 2026-04-24 | active | `93D.2` abgeschlossen; naechster Claim `93D.3` |
 | - | BT94A | - | frei | wartet auf BT93D.99 und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1403,10 +1403,10 @@ Claim-Grenze fuer BT93D:
 
 ### 93D.2 Survival-Regression schliessen (F.05/F.27)
 
-- [ ] 93D.2.1 DQN/PPO-Vergleich auf derselben Matrix reproduzieren und Survival-/Steps-Deltas gegen den DQN-Anker offenlegen; alte `data/bot_validation_report.json`-Werte bleiben ausgeschlossen.
-- [ ] 93D.2.2 Einen kleinen BT93D-Reparatur-/Diagnose-Learnerlauf ausfuehren oder ehrlich blockieren; der Lauf darf nicht als BT94A-Kandidat, Freeze oder Promotion gelabelt werden.
-- [ ] 93D.2.3 Neue Eval-/Holdout-Reports muessen mindestens `precomparison != ppo-regression`, `handover result != diagnose` und eine belastbare Begruendung fuer `bt94aHandover.ready=true` liefern; andernfalls bleibt BT94A geschlossen.
-- [ ] 93D.2.4 Mindeststatistik fuer den naechsten Start fixieren: Episodenzahl, Seeds, Modi, Maps, Holdout-Anteil, Median/Streuung, Non-Inferiority- oder Zielschwelle und Abbruchkriterien; +30% bleibt Promotionsziel fuer BT94B, nicht stilles BT94A-Startkriterium.
+- [x] 93D.2.1 DQN/PPO-Vergleich auf derselben Matrix reproduzieren und Survival-/Steps-Deltas gegen den DQN-Anker offenlegen; alte `data/bot_validation_report.json`-Werte bleiben ausgeschlossen. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93d_survival_regression_report.py --write-report` -> `data/training/ppo/bt93d/survival_regression_report.json` (`resultClass=survival-regression-reproduced`, `avgStepsPerEpisodePct=-86.385875`, `averageBotSurvivalPct=-57.19291`, `oldReportsExcluded` gesetzt))
+- [x] 93D.2.2 Einen kleinen BT93D-Reparatur-/Diagnose-Learnerlauf ausfuehren oder ehrlich blockieren; der Lauf darf nicht als BT94A-Kandidat, Freeze oder Promotion gelabelt werden. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93d_survival_regression_report.py --write-report` -> `data/training/ppo/bt93d/survival_regression_report.json` (`repairLearnerRun.status=blocked`, `candidateRun=false`, `freezeCandidate=false`, `promotionClaim=false`))
+- [x] 93D.2.3 Neue Eval-/Holdout-Reports muessen mindestens `precomparison != ppo-regression`, `handover result != diagnose` und eine belastbare Begruendung fuer `bt94aHandover.ready=true` liefern; andernfalls bleibt BT94A geschlossen. (abgeschlossen: 2026-04-24; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\eval.py --profile bt93c --run-kind baseline-repro-eval --phase-id 93D.2.3 --config python\configs\ppo_bt93c_baseline.json --artifact-root data\training\ppo\bt93d --checkpoint data\training\ppo\bt93c\runs\20260424T180033Z-baseline-train\artifact_manifest.json --eval-steps 16` + `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\eval.py --profile bt93c --run-kind holdout-eval --phase-id 93D.2.3 --config python\configs\ppo_bt93c_baseline.json --artifact-root data\training\ppo\bt93d --checkpoint data\training\ppo\bt93c\runs\20260424T180033Z-baseline-train\artifact_manifest.json --eval-steps 16` -> `data/training/ppo/bt93d/runs/20260424T202525Z-baseline-repro-eval/eval_report.json`, `data/training/ppo/bt93d/runs/20260424T202552Z-holdout-eval/eval_report.json`, `data/training/ppo/bt93d/survival_regression_report.json` (`bt94aStartAllowedAfter93D2=false`))
+- [x] 93D.2.4 Mindeststatistik fuer den naechsten Start fixieren: Episodenzahl, Seeds, Modi, Maps, Holdout-Anteil, Median/Streuung, Non-Inferiority- oder Zielschwelle und Abbruchkriterien; +30% bleibt Promotionsziel fuer BT94B, nicht stilles BT94A-Startkriterium. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93d_survival_regression_report.py --write-report` -> `data/training/ppo/bt93d/minimum_start_statistics.json` (`matrixId=bt93d-survival-repair-minimum-v1`, `evalCompletedEpisodes=6`, `holdoutCompletedEpisodes=4`, `promotionPlus30PctRemainsBt94BOnly=true`))
 
 ### 93D.3 Terminal-, Death- und Policy-Mask-Diagnostik schliessen (F.19/F.30/F.31)
 
