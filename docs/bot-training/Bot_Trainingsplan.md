@@ -264,7 +264,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
-| - | BT93D | - | frei | Zwischenphase fuer BT94A-Startfreigabe; erster Claim `93D.1` |
+| Bot-Codex | BT93D | 2026-04-24 | active | `93D.2` in Arbeit; BT94A-Startfreigabe |
 | - | BT94A | - | frei | wartet auf BT93D.99 und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1335,7 +1335,7 @@ Quelle:
 - `python/scripts/bt94a_gate_check.py`
 - Audit-Sanierungsregister F.05, F.19, F.27, F.30, F.31
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-04-24 -->
 
 Scope:
 
