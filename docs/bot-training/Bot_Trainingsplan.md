@@ -265,7 +265,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
-| Bot-Codex | BT93E | 2026-04-25 | active | `93E.1` gestartet; Vollreparatur vor BT94A |
+| Bot-Codex | BT93E | 2026-04-25 | active | `93E.5` abgeschlossen; `diagnose-blocked`, `93E.99` offen |
 | - | BT94A | - | frei | wartet auf BT93D.99 und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1570,10 +1570,10 @@ Vollstaendiges Befundsinventar fuer BT93E:
 
 ### 93E.5 Gate-Refresh, Handover und Folgegrenzen
 
-- [ ] 93E.5.1 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` aus BT93E-Artefakten neu schreiben.
-- [ ] 93E.5.2 `bt94a_gate_check.py --write-report` erneut ausfuehren; BT94A darf nur bei `resultClass=claimable`, `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true` und `summary.bt94a-blocker=0` starten.
-- [ ] 93E.5.3 Falls der Gate-Check rot bleibt, BT93E endet mit `diagnose-blocked` plus Fehlerbericht/Folgegate; keine `94A.*`-Checkbox, kein Kandidatenlauf, kein Freeze und kein BT94B-Handover.
-- [ ] 93E.5.4 Falls der Gate-Check gruen ist, BT93E endet mit `BT94A-ready`; `candidateFreezeAllowed=false` bleibt bis `94A.3` korrekt, und PPO-Validate/Rollout-Restschuld bleibt fuer BT94B/BT95 sichtbar.
+- [x] 93E.5.1 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` aus BT93E-Artefakten neu schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93e_gate_refresh_handover.py --write-upstream-reports` + `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` -> `data\training\ppo\bt93c\precomparison_report.json`, `data\training\ppo\bt93c\handover_report.json`, `data\training\ppo\bt93c\evidence_quality_matrix.json`, `data\training\ppo\bt94a\no_start_gate.json` (`generatedBy=python/scripts/bt93e_gate_refresh_handover.py`, Gate `generatedBy=python/scripts/bt94a_gate_check.py`, commit `651641b`))
+- [x] 93E.5.2 `bt94a_gate_check.py --write-report` erneut ausfuehren; BT94A darf nur bei `resultClass=claimable`, `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true` und `summary.bt94a-blocker=0` starten. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` -> `data\training\ppo\bt94a\no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `candidateFreezeAllowed=false`, `bt93cState.bt94aBlockerCount=5`, commit `651641b`))
+- [x] 93E.5.3 Falls der Gate-Check rot bleibt, BT93E endet mit `diagnose-blocked` plus Fehlerbericht/Folgegate; keine `94A.*`-Checkbox, kein Kandidatenlauf, kein Freeze und kein BT94B-Handover. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93e_gate_refresh_handover.py --write-package --write-error-report --update-start-matrix` -> `data\training\ppo\bt93e\handover_package.json` (`resultClass=diagnose-blocked`, `phaseCoverage.93E.5.3=true`, `diagnoseBlocked.noBt94aCheckboxClosed=true`), `docs\Fehlerberichte\2026-04-25_bt93e-gate-refresh-diagnose-blocked.md`, commit `651641b`)
+- [x] 93E.5.4 Falls der Gate-Check gruen ist, BT93E endet mit `BT94A-ready`; `candidateFreezeAllowed=false` bleibt bis `94A.3` korrekt, und PPO-Validate/Rollout-Restschuld bleibt fuer BT94B/BT95 sichtbar. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93e_gate_refresh_handover.py --write-package --write-error-report --update-start-matrix` -> `data\training\ppo\bt93e\handover_package.json` (`resultClass=diagnose-blocked`, `phaseCoverage.93E.5.4=false`, `bt94aReady.active=false`, `bt94aReady.candidateFreezeAllowed=false`, PPO-Validate/Rollout-Restschuld bleibt Folgepfad, commit `651641b`))
 
 ### 93E.99 Abschluss-Gate
 
