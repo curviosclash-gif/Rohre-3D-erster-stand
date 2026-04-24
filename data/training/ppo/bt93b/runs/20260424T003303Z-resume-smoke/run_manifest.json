@@ -1,0 +1,188 @@
+{
+  "templateVersion": "bt93b-scaffold-v1",
+  "blockId": "BT93B",
+  "phaseId": "93B.3.1",
+  "profileId": "bt93b-conservative-scaffold-v1",
+  "scaffoldOnly": true,
+  "promotionAllowed": false,
+  "bt94aGate": "closed",
+  "sourceArtifacts": {
+    "bt93aHandover": "data\\training\\ppo\\bt93a_handover_2env.json",
+    "bt93aClaimManifest": "data\\training\\ppo\\bt93a_claim_manifest.json"
+  },
+  "lane": {
+    "envCount": 2,
+    "maxValidatedEnvCount": 2,
+    "measuredStepsPerSecond": 58.740111449952536,
+    "fourEnvStatus": "locked-for-bt93b-scaffold",
+    "fourEnvReason": "BT93B starts on the smallest validated lane even when BT93A thresholds would allow a follow-up measurement."
+  },
+  "seedPack": {
+    "globalSeed": 930,
+    "trainEnvSeeds": [
+      930,
+      931
+    ],
+    "evalEnvSeeds": [
+      940,
+      941
+    ]
+  },
+  "rollout": {
+    "targetUpdateWindowSeconds": 15,
+    "measuredMaxRolloutStepsTotal": 881,
+    "measuredMaxNstepsPerEnv": 440,
+    "selectedNstepsPerEnv": 384,
+    "selectedRolloutStepsTotal": 768,
+    "selectedBatchSize": 128,
+    "nEpochs": 4,
+    "selectionRule": "round down the measured per-env budget to the nearest 64-step bucket for conservative scaffold mini-batches"
+  },
+  "matrix": {
+    "matrixId": "bt93b-scaffold-smoke-matrix-v1",
+    "modeId": "runtime-near-headless-v1",
+    "runs": [
+      {
+        "kind": "fresh-smoke",
+        "label": "bt93b-fresh-smoke-v1",
+        "envCount": 2,
+        "resumeMode": "fresh",
+        "purpose": "minimal end-to-end scaffold smoke on the measured 2-env lane"
+      },
+      {
+        "kind": "resume-smoke",
+        "label": "bt93b-resume-smoke-v1",
+        "envCount": 2,
+        "resumeMode": "resume-latest-checkpoint",
+        "purpose": "checkpoint/resume smoke without claiming a larger baseline"
+      },
+      {
+        "kind": "eval-smoke",
+        "label": "bt93b-eval-smoke-v1",
+        "envCount": 2,
+        "resumeMode": "manifest-driven-eval",
+        "purpose": "manifest/eval smoke for scaffold artifacts only"
+      }
+    ]
+  },
+  "actionSurface": {
+    "adapterId": "bt93b-split-head-v1",
+    "splitHeadRequired": true,
+    "booleanFields": [
+      "pitchUp",
+      "pitchDown",
+      "yawLeft",
+      "yawRight",
+      "rollLeft",
+      "rollRight",
+      "boost",
+      "cameraSwitch",
+      "dropItem",
+      "shootItem",
+      "shootMG",
+      "nextItem"
+    ],
+    "indexFields": [
+      "shootItemIndex",
+      "useItem"
+    ],
+    "indexHeadStrategy": "per-field-slot-head-with--1-as-no-op",
+    "optionalMaskSource": "player.inventoryLength",
+    "optionalMaskStatus": "available-but-not-required",
+    "rawBoundarySurfaceOnly": true,
+    "trainingOnRawBoundarySurface": false,
+    "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+    "note": "BT93B pins split heads before any PPO scaffold trains against the BT92 boundary surface."
+  },
+  "normalization": {
+    "normalizationId": "bt93b-vecnormalize-v1",
+    "implementation": "VecNormalize-or-equivalent",
+    "normalizeObservation": true,
+    "normalizeReward": false,
+    "clipObservation": 10.0,
+    "clipReward": 10.0,
+    "gamma": 0.99,
+    "training": true,
+    "persistStatsWithCheckpoint": true,
+    "statsArtifactPattern": "data/training/ppo/**/vecnormalize.pkl",
+    "note": "Observation normalization stays mandatory before the first scaffold smoke and must persist with checkpoints."
+  },
+  "actorCriticHeads": {
+    "headSpecId": "bt93b-actor-critic-v1",
+    "inputObservationLength": 64,
+    "sharedEncoder": {
+      "type": "mlp",
+      "hiddenUnits": [
+        128,
+        128
+      ],
+      "activation": "tanh"
+    },
+    "policyHeads": [
+      {
+        "headId": "boolean-actions",
+        "distribution": "Bernoulli",
+        "fields": [
+          "pitchUp",
+          "pitchDown",
+          "yawLeft",
+          "yawRight",
+          "rollLeft",
+          "rollRight",
+          "boost",
+          "cameraSwitch",
+          "dropItem",
+          "shootItem",
+          "shootMG",
+          "nextItem"
+        ]
+      },
+      {
+        "headId": "shoot-item-index",
+        "distribution": "Categorical",
+        "field": "shootItemIndex",
+        "optionalMaskSource": "player.inventoryLength",
+        "noOpValue": -1
+      },
+      {
+        "headId": "use-item-index",
+        "distribution": "Categorical",
+        "field": "useItem",
+        "optionalMaskSource": "player.inventoryLength",
+        "noOpValue": -1
+      }
+    ],
+    "valueHead": {
+      "headId": "critic-value",
+      "outputs": 1
+    },
+    "rawBoundarySurfaceTraining": false,
+    "note": "Separate actor heads keep PPO off the raw BT92 boundary surface while the critic stays scalar."
+  },
+  "runId": "20260424T003303Z-resume-smoke",
+  "runKind": "resume-smoke",
+  "artifactRoot": "data/training/ppo/bt93b",
+  "runDir": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke",
+  "checkpointInput": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/latest_checkpoint.json",
+  "resumeInput": {
+    "ok": true,
+    "checkpoint": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/latest_checkpoint.json",
+    "checkpointId": "20260424T002459Z-fresh-smoke-latest",
+    "sourceRunId": "20260424T002459Z-fresh-smoke",
+    "sourceRunKind": "fresh-smoke",
+    "sourcePhaseId": "93B.2.1",
+    "completedSteps": 768,
+    "targetSteps": 768,
+    "normalizationStats": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.pkl",
+    "normalizationStatsJson": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.json",
+    "normalizationCount": 770,
+    "normalizationObservationLength": 64,
+    "normalizationJsonPickleMatch": true
+  },
+  "entrypoints": {
+    "train": "python/train.py",
+    "eval": "python/eval.py",
+    "callbacks": "python/callbacks/bt93b_scaffold.py",
+    "runner": "python/scaffold/bt93b_runner.py"
+  }
+}

@@ -9,8 +9,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import json
-import shutil
-import sys
+import pickle
 import time
 import traceback
 from collections import Counter
@@ -36,6 +35,7 @@ PYTHON_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = PYTHON_ROOT.parent
 DEFAULT_TEMPLATE_PATH = REPO_ROOT / "data" / "training" / "ppo" / "run_manifest.bt93b.template.json"
 DEFAULT_ARTIFACT_ROOT = REPO_ROOT / "data" / "training" / "ppo" / "bt93b"
+CHECKPOINT_VERSION = "bt93b-scaffold-checkpoint-v1"
 
 
 @dataclass(frozen=True)
@@ -50,6 +50,24 @@ class ScaffoldRunRequest:
 
 def _read_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _is_relative_to(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
+
+
+def _resolve_repo_artifact(path_value: Any, *, field_name: str) -> Path:
+    if not isinstance(path_value, str) or not path_value.strip():
+        raise RuntimeError(f"checkpoint field is missing a repo artifact path: {field_name}")
+    candidate = Path(path_value)
+    resolved = candidate.resolve() if candidate.is_absolute() else (REPO_ROOT / candidate).resolve()
+    if not _is_relative_to(resolved, REPO_ROOT):
+        raise RuntimeError(f"checkpoint field escapes repo root: {field_name}={path_value}")
+    return resolved
 
 
 def _relative(path: Path) -> str:
@@ -91,6 +109,96 @@ def _validate_template(template: Mapping[str, Any]) -> None:
         raise RuntimeError("BT93B normalization stats must persist with checkpoints")
     if int(actor_critic_heads.get("inputObservationLength") or 0) != EXPECTED_OBSERVATION_LENGTH:
         raise RuntimeError("BT93B actor/critic head observation length drifted")
+
+
+def _validate_normalization_stats_payload(payload: Mapping[str, Any], *, source: Path) -> dict[str, Any]:
+    stats = payload.get("stats")
+    metadata = payload.get("metadata")
+    if not isinstance(stats, Mapping) or not isinstance(metadata, Mapping):
+        raise RuntimeError(f"normalization stats payload is malformed: {_relative(source)}")
+    if stats.get("normalizationId") != "bt93b-vecnormalize-v1":
+        raise RuntimeError(f"normalization stats id drifted: {_relative(source)}")
+    if stats.get("normalizeObservation") is not True or stats.get("normalizeReward") is not False:
+        raise RuntimeError(f"normalization mode drifted: {_relative(source)}")
+    observation_length = int(stats.get("observationLength") or 0)
+    if observation_length != EXPECTED_OBSERVATION_LENGTH:
+        raise RuntimeError(f"normalization observation length drifted: {observation_length}")
+    count = int(stats.get("count") or 0)
+    if count <= 0:
+        raise RuntimeError(f"normalization stats are empty: {_relative(source)}")
+    if metadata.get("scaffoldOnly") is not True:
+        raise RuntimeError(f"normalization stats are not scaffold-only: {_relative(source)}")
+    return {
+        "runId": str(metadata.get("runId") or ""),
+        "runKind": str(metadata.get("runKind") or ""),
+        "phaseId": str(metadata.get("phaseId") or ""),
+        "count": count,
+        "observationLength": observation_length,
+    }
+
+
+def _read_pickle_payload(path: Path) -> Mapping[str, Any]:
+    with path.open("rb") as handle:
+        payload = pickle.load(handle)
+    if not isinstance(payload, Mapping):
+        raise RuntimeError(f"normalization pickle payload is malformed: {_relative(path)}")
+    return payload
+
+
+def _validate_resume_checkpoint(checkpoint_path: Path) -> dict[str, Any]:
+    resolved_checkpoint = checkpoint_path.resolve()
+    if not resolved_checkpoint.exists():
+        raise FileNotFoundError(f"resume checkpoint does not exist: {resolved_checkpoint}")
+    if not _is_relative_to(resolved_checkpoint, REPO_ROOT):
+        raise RuntimeError(f"resume checkpoint must stay inside the repo: {resolved_checkpoint}")
+
+    checkpoint = _read_json(resolved_checkpoint)
+    if checkpoint.get("checkpointVersion") != CHECKPOINT_VERSION:
+        raise RuntimeError(f"unsupported BT93B checkpoint version: {checkpoint.get('checkpointVersion')}")
+    if checkpoint.get("scaffoldOnly") is not True:
+        raise RuntimeError("resume checkpoint must be scaffold-only")
+    if checkpoint.get("promotionAllowed") is not False or checkpoint.get("bt94aGate") != "closed":
+        raise RuntimeError("resume checkpoint must keep promotion and BT94A closed")
+    if int(checkpoint.get("completedSteps") or 0) <= 0:
+        raise RuntimeError("resume checkpoint has no completed steps")
+    if int(checkpoint.get("targetSteps") or 0) <= 0:
+        raise RuntimeError("resume checkpoint has no target steps")
+
+    policy_surface = checkpoint.get("policySurface")
+    if not isinstance(policy_surface, Mapping) or policy_surface.get("adapterId") != BT93B_SPLIT_HEAD_ADAPTER_ID:
+        raise RuntimeError("resume checkpoint policy surface drifted")
+
+    stats_json_path = _resolve_repo_artifact(checkpoint.get("normalizationStatsJson"), field_name="normalizationStatsJson")
+    stats_pickle_path = _resolve_repo_artifact(checkpoint.get("normalizationStats"), field_name="normalizationStats")
+    if not stats_json_path.exists():
+        raise FileNotFoundError(f"resume normalization json is missing: {stats_json_path}")
+    if not stats_pickle_path.exists():
+        raise FileNotFoundError(f"resume normalization pickle is missing: {stats_pickle_path}")
+
+    json_summary = _validate_normalization_stats_payload(_read_json(stats_json_path), source=stats_json_path)
+    pickle_summary = _validate_normalization_stats_payload(_read_pickle_payload(stats_pickle_path), source=stats_pickle_path)
+    if json_summary["count"] != pickle_summary["count"]:
+        raise RuntimeError("resume normalization json/pickle count mismatch")
+    if json_summary["runId"] and checkpoint.get("runId") and json_summary["runId"] != checkpoint.get("runId"):
+        raise RuntimeError("resume normalization stats runId does not match checkpoint")
+    if pickle_summary["runId"] and checkpoint.get("runId") and pickle_summary["runId"] != checkpoint.get("runId"):
+        raise RuntimeError("resume normalization pickle runId does not match checkpoint")
+
+    return {
+        "ok": True,
+        "checkpoint": _relative(resolved_checkpoint),
+        "checkpointId": str(checkpoint.get("checkpointId") or ""),
+        "sourceRunId": str(checkpoint.get("runId") or ""),
+        "sourceRunKind": str(checkpoint.get("runKind") or ""),
+        "sourcePhaseId": str(checkpoint.get("phaseId") or ""),
+        "completedSteps": int(checkpoint.get("completedSteps") or 0),
+        "targetSteps": int(checkpoint.get("targetSteps") or 0),
+        "normalizationStats": _relative(stats_pickle_path),
+        "normalizationStatsJson": _relative(stats_json_path),
+        "normalizationCount": json_summary["count"],
+        "normalizationObservationLength": json_summary["observationLength"],
+        "normalizationJsonPickleMatch": True,
+    }
 
 
 def _extract_inventory_length(info: Mapping[str, Any] | None) -> int:
@@ -243,6 +351,11 @@ def run_scaffold(request: ScaffoldRunRequest) -> dict[str, Any]:
     artifact_root = request.artifact_root.resolve()
     template = _read_json(template_path)
     _validate_template(template)
+    resume_input = None
+    if request.checkpoint_path is not None:
+        resume_input = _validate_resume_checkpoint(request.checkpoint_path)
+    if request.run_kind == "resume-smoke" and resume_input is None:
+        raise RuntimeError("resume-smoke requires a valid BT93B checkpoint")
 
     rollout = template["rollout"]
     lane = template["lane"]
@@ -273,6 +386,7 @@ def run_scaffold(request: ScaffoldRunRequest) -> dict[str, Any]:
         "artifactRoot": _relative(artifact_root),
         "runDir": _relative(run_dir),
         "checkpointInput": _relative(request.checkpoint_path) if request.checkpoint_path else None,
+        "resumeInput": resume_input,
         "scaffoldOnly": True,
         "promotionAllowed": False,
         "bt94aGate": "closed",
@@ -344,11 +458,12 @@ def run_scaffold(request: ScaffoldRunRequest) -> dict[str, Any]:
     combined_normalizer.write_pickle(stats_pickle_path, stats_metadata)
 
     checkpoint = {
-        "checkpointVersion": "bt93b-scaffold-checkpoint-v1",
+        "checkpointVersion": CHECKPOINT_VERSION,
         "checkpointId": f"{run_id}-latest",
         "runId": run_id,
         "runKind": request.run_kind,
         "phaseId": request.phase_id,
+        "resumedFrom": resume_input,
         "scaffoldOnly": True,
         "promotionAllowed": False,
         "bt94aGate": "closed",
@@ -442,6 +557,11 @@ def run_scaffold(request: ScaffoldRunRequest) -> dict[str, Any]:
             "crashPaths": _relative(crash_path),
             "hardwareLimits": _relative(hardware_path),
         },
+        "resume": {
+            "required": request.run_kind == "resume-smoke",
+            "validated": resume_input is not None,
+            "input": resume_input,
+        },
         "workerResults": results,
         "scopeGuardrails": {
             "readOnlyRuntimeSurfaces": list(READ_ONLY_RUNTIME_SURFACES),
@@ -490,13 +610,17 @@ def run_from_cli(
     target_steps_per_env: int | None,
     checkpoint: str | None = None,
 ) -> dict[str, Any]:
+    artifact_root_path = Path(artifact_root).resolve() if artifact_root else DEFAULT_ARTIFACT_ROOT
+    checkpoint_path = Path(checkpoint).resolve() if checkpoint else None
+    if run_kind == "resume-smoke" and checkpoint_path is None:
+        checkpoint_path = latest_checkpoint_path(artifact_root_path)
     return run_scaffold(ScaffoldRunRequest(
         run_kind=run_kind,
         phase_id=phase_id,
         manifest_template_path=Path(manifest_template).resolve() if manifest_template else DEFAULT_TEMPLATE_PATH,
-        artifact_root=Path(artifact_root).resolve() if artifact_root else DEFAULT_ARTIFACT_ROOT,
+        artifact_root=artifact_root_path,
         target_steps_per_env=target_steps_per_env,
-        checkpoint_path=Path(checkpoint).resolve() if checkpoint else None,
+        checkpoint_path=checkpoint_path,
     ))
 
 

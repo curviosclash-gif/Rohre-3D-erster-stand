@@ -22,16 +22,17 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--profile", default="bt93b", choices=["bt93b"])
     parser.add_argument("--run-kind", default="fresh-smoke", choices=["fresh-smoke", "resume-smoke"])
-    parser.add_argument("--phase-id", default="93B.2.1")
+    parser.add_argument("--phase-id", default=None)
     parser.add_argument("--manifest-template", default=None)
     parser.add_argument("--artifact-root", default=None)
     parser.add_argument("--target-steps-per-env", type=int, default=None)
     parser.add_argument("--checkpoint", default=None)
     args = parser.parse_args()
+    phase_id = args.phase_id or ("93B.3.1" if args.run_kind == "resume-smoke" else "93B.2.1")
 
     run_from_cli(
         run_kind=args.run_kind,
-        phase_id=args.phase_id,
+        phase_id=phase_id,
         manifest_template=args.manifest_template,
         artifact_root=args.artifact_root,
         target_steps_per_env=args.target_steps_per_env,
@@ -41,4 +42,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
