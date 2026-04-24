@@ -993,9 +993,9 @@ Claim-Grenze:
 
 ### 93B.2 Kalibrierter Smoke-Run auf realem Budget
 
-- [ ] 93B.2.1 Ersten Lauf ausfuehren mit dem Startbudget aus der gemessenen BT93A-Lane-Evidence.
-- [ ] 93B.2.2 Crash-Pfade, Hardware-Grenzen und Logging auf dem minimalen Scaffold pruefen.
-- [ ] 93B.2.3 Produktive Runtime-Surfaces bleiben unangetastet.
+- [x] 93B.2.1 Ersten Lauf ausfuehren mit dem Startbudget aus der gemessenen BT93A-Lane-Evidence. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/train.py --profile bt93b --run-kind fresh-smoke` -> `data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/training_report.json` (`totalStepsCompleted=768`, `stepsPerSecond=57.94994814686932`, `failureRate=0.0`), commit `9064119`)
+- [x] 93B.2.2 Crash-Pfade, Hardware-Grenzen und Logging auf dem minimalen Scaffold pruefen. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/train.py --profile bt93b --run-kind fresh-smoke` -> `data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/crash_paths.json`, `data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/hardware_limits.json`, `data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/events.jsonl` (`timeoutCount=0`, `fallbackRequired=false`), commit `9064119`)
+- [x] 93B.2.3 Produktive Runtime-Surfaces bleiben unangetastet. (abgeschlossen: 2026-04-24; evidence: `git diff --name-only 9064119^ 9064119` -> nur `python/**` und `data/training/ppo/bt93b/**`; `data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/training_report.json` (`runtimeSurfacesTouched=[]`, `productiveRuntimeChanged=false`), commit `9064119`)
 
 ### 93B.3 Checkpoint-, Resume- und Normalize-Persistenz
 
