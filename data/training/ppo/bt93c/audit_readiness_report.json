@@ -1,0 +1,171 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T14:34:09.425087Z",
+  "generatedBy": "python/scripts/bt93c_audit_readiness.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.0",
+  "claim": "93C-Audit",
+  "resultClass": "go",
+  "inputs": {
+    "plan": "docs/bot-training/Bot_Trainingsplan.md",
+    "freezeCheck": "data/training/ppo/freeze_check.json",
+    "bt93aHandover": "data/training/ppo/bt93a_handover_2env.json",
+    "bt93bScaffoldPlan": "data/training/ppo/bt93b_scaffold_plan.json",
+    "bt93bConsistency": "data/training/ppo/bt93b/artifact_consistency_report.json",
+    "startManifest": "data/training/ppo/bt93c/start_manifest.json"
+  },
+  "git": {
+    "headCommit": "e7d294f55bbeec1f3f6ee778d777a8315571f68c",
+    "scopedStatusBeforeWrite": [
+      {
+        "status": "M ",
+        "path": "ata/training/ppo/freeze_check.json"
+      },
+      {
+        "status": " M",
+        "path": "docs/bot-training/Bot_Trainingsplan.md"
+      },
+      {
+        "status": "??",
+        "path": "data/training/ppo/bt93c/audit_readiness_report.json"
+      },
+      {
+        "status": "??",
+        "path": "data/training/ppo/bt93c/start_manifest.json"
+      },
+      {
+        "status": "??",
+        "path": "python/scripts/bt93c_audit_readiness.py"
+      }
+    ]
+  },
+  "checks": {
+    "freeze": {
+      "freezeOk": true,
+      "reAuditRequired": false,
+      "driftCount": 0,
+      "driftPaths": []
+    },
+    "statusConsistency": {
+      "bt93aClosed": true,
+      "bt93bClosed": true,
+      "bt93cAuditClaimPresent": true,
+      "bt80cValidationRestblockerVisible": true
+    },
+    "lockConsistency": {
+      "rows": {
+        "BT93A": {
+          "agent": "Bot-Codex",
+          "startDate": "2026-04-23",
+          "status": "frei",
+          "target": "2026-04-24 (abgeschlossen)"
+        },
+        "BT93B": {
+          "agent": "Bot-Codex",
+          "startDate": "2026-04-24",
+          "status": "frei",
+          "target": "2026-04-24 (abgeschlossen)"
+        },
+        "BT93C": {
+          "agent": "-",
+          "startDate": "-",
+          "status": "frei",
+          "target": "93C.0 abgeschlossen; naechst 93C.1/93C.2"
+        }
+      },
+      "headers": {
+        "BT93A": "frei",
+        "BT93B": "frei",
+        "BT93C": "frei"
+      },
+      "matches": {
+        "BT93A": true,
+        "BT93B": true,
+        "BT93C": true
+      }
+    },
+    "evidenceHygiene": {
+      "untrackedPpoArtifactsBeforeWrite": [],
+      "missingEvidenceCompletedItems": [],
+      "tmpOnlyCompletedEvidence": [],
+      "selfCountGateEvidence": [],
+      "mojibakeLines": [],
+      "bt93bScaffoldOnly": true,
+      "bt93bNoPromotionClaim": true,
+      "bt93bBt94aGate": "closed"
+    },
+    "startManifest": {
+      "path": "data/training/ppo/bt93c/start_manifest.json",
+      "learnerStartSignal": {
+        "freezeOk": true,
+        "reAuditRequired": false,
+        "status": "go-after-93C.1-and-93C.2",
+        "blockedUntil": [
+          "93C.1 PPO dependency and clean-env gate",
+          "93C.2 SB3-compatible action surface gate"
+        ],
+        "noGoBefore": [
+          "no pilot or baseline before 93C.3 and 93C.4",
+          "no 4-env before direct 4-env evidence",
+          "no runtime or JS inference integration in BT93C"
+        ]
+      },
+      "dqnChampion": {
+        "championBlock": "BT11",
+        "referenceBlock": "BT20",
+        "source": "docs/bot-training/Bot_Trainingsplan.md BT80C scope and DoD.2",
+        "status": "frozen-for-comparison-planning",
+        "productionValidationRestblocker": "BT80C 80.9.3 remains open; promotion/rollout stays blocked.",
+        "comparisonUse": "Only 93C.6 may run the DQN/PPO pre-comparison on the fixed matrix."
+      },
+      "matrix": {
+        "matrixId": "bt93c-learner-smoke-start-v1",
+        "scope": "first real learner smoke only; no baseline and no promotion",
+        "envCount": 2,
+        "maxValidatedEnvCount": 2,
+        "fourEnvStatus": "locked-until-direct-4env-evidence",
+        "train": {
+          "modeId": "runtime-near-headless-v1",
+          "maps": [
+            "standard",
+            "maze"
+          ],
+          "seeds": [
+            930,
+            931
+          ]
+        },
+        "eval": {
+          "modeId": "runtime-near-headless-v1",
+          "maps": [
+            "standard",
+            "maze"
+          ],
+          "seeds": [
+            940,
+            941
+          ]
+        },
+        "holdout": {
+          "modeId": "runtime-near-headless-v1",
+          "maps": [
+            "standard",
+            "maze"
+          ],
+          "seeds": [
+            950,
+            951
+          ],
+          "status": "reserved-for-93C.6; not consumed by learner smoke"
+        }
+      }
+    }
+  },
+  "nextClaim": "93C-Env",
+  "nextPhase": "93C.1",
+  "notes": [
+    "93C.0 does not start PPO training.",
+    "BT93B remains scaffold-only and cannot justify a baseline or BT94A handover.",
+    "BT80C 80.9.3 remains a production-like validation restblocker for promotion and rollout."
+  ]
+}

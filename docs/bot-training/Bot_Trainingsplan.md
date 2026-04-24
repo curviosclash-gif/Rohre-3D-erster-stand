@@ -57,6 +57,74 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | VecNormalize/Heads muessen real sein | Manifest-Spezifikation reicht nicht; BT93C muss Normalize-State, Optimizer-State und Actor/Critic-Head-Implementierung in Train, Eval und Resume beweisen. |
 | Startfreigabe ist klein | Naechste Arbeit ist `BT93C.0` und danach `93C.1`/`93C.2`; kein Langlauf und keine Baseline vor sauberem Freeze-, Dependency-, Action- und Matrix-Gate. |
 
+Audit-Befund-Matrix 2026-04-24:
+
+| ID | Klasse | Plananker | Konsequenz |
+| --- | --- | --- | --- |
+| A.01 | kritisch | `93C.0.3`, `93C.0.4` | Rotes Freeze-Artefakt blockiert jeden Learner-Start, bis `freezeOk=true` und Evidence-Hygiene gruen sind. |
+| A.02 | kritisch | `93C.4`, `94B.1` bis `94B.4` | PPO gilt erst als methodisch vergleichbar, wenn Safety-, Intent-, Recovery-, Reward-, Death-/Terminal- und Validation-Metriken auf gleicher Matrix liegen. |
+| A.03 | kritisch | `BT95`, spaeterer separater Rollout-Intake | Kein JS-Runtime-Inferenzpfad in BT93C-BT95; Training bleibt Sidecar, Runtime-Umschaltung bleibt verboten. |
+| A.04 | kritisch | `94B.3`, `95.4` | Offenes `BT80C 80.9.3` blockiert `promote` und jeden operativen Rollout-Intake. |
+| A.05 | kritisch | `93C.4.3`, `94A.2`, `94B.1` | Offene BT73-Intent-/Recovery-Haertung bleibt als Restschuld in PPO/DQN-Vergleichen sichtbar. |
+| A.06 | kritisch | `93C.3`, `93C.99.2` | BT93B-Scaffold zaehlt nicht als Lernfortschritt; echter PPO-Optimizer-Update ist Pflicht. |
+| A.07 | kritisch | `93C.3.1`, `93C.3.2`, `94A.3.2` | Normalize-/Optimizer-State und Actor/Critic-Heads muessen real gespeichert, geladen, gehasht und resumed werden. |
+| A.08 | kritisch | `93C.2` | SB3-trainierbare Action-Surface ist Pflicht; Sanitizer-Fallbacks duerfen keine Policy-Qualitaet simulieren. |
+| A.09 | kritisch | `93C.2.2`, `93C.4.2`, `94B.2` | Sanitizer-/Mask-/Veto-/Invalid-Action-Raten werden Gate-Metriken in Train, Eval und A/B. |
+| A.10 | kritisch | `93C.5`, `93C.99.3` | `4-Env` bleibt gesperrt, bis direkte Evidence vorliegt; 2-Env-Schwellen reichen nicht. |
+| A.11 | kritisch | `93C.3.3`, `BT95`, spaeterer Rollout-Intake | Python-Forward-Pass ist kein JS-Tick-Latenzbeweis; Latenzbudget bleibt Rollout-Blocker. |
+| A.12 | kritisch | `95.1`, `95.2`, `95.4` | Runtime-Flag, Rollback-Test, Modellregistry und Export-/Load-Vertrag werden als Rollout-Voraussetzungen dokumentiert, nicht im Training versteckt. |
+| B.01 | logik | `93C.5` | Throughput ist nur Lane-Evidence; Pilot/Baseline starten erst nach Learner- und Diagnose-Gates. |
+| B.02 | logik | `93C.0.3` | BT93A/BT93B-Handover muss gegen frisches `freezeOk=true` revalidiert werden. |
+| B.03 | logik | `93C.0.1`, `93C.0.2` | Erfuellte Upstream-Abhaengigkeiten bleiben formal, aber nicht train-ready, bis Freshness und Gate-Disziplin bereinigt sind. |
+| B.04 | logik | `94B.1.2`, `94B.2.1`, `94B.99.2` | Drei Runs sind Mindestbasis, aber Urteil braucht Episodenzahl, Streuung, Median-Delta, Holdout und Stability. |
+| B.05 | logik | `94B.3.2`, `95.4.2` | `BT80C 80.9.3` ist fuer `promote` hard; positive A/B-Evidence ohne Validation bleibt nur externer Kandidat. |
+| B.06 | logik | `93C.0.2`, `93C.3`, `93C.5` | Begriff `Baseline-Scaffold` darf nicht als Baseline verstanden werden; Reports labeln Scaffold/Pilot/Baseline hart getrennt. |
+| B.07 | logik | `93C.6`, `94B.1` | DQN-Champion und Semantikfenster werden eingefroren; Vergleich gegen historisch stabilen, aber ggf. semantisch veralteten Champion wird offengelegt. |
+| C.01 | luecke | `93C.1` | PPO-Dependency-Lock und Clean-Env-Smoke sind Pflicht vor jedem Learner. |
+| C.02 | luecke | `93C.3`, `93C.7`, `94A.3.2` | Echtes PPO-Modellpaket mit Modellhash, Confighash, Git-SHA, Optimizer- und Normalize-State wird Closure-Pflicht. |
+| C.03 | luecke | `93C.0.5`, `93C.6.1` | DQN-Champion, Semantikfenster, Seeds, Modi, Maps, Holdout und Invalidierungsregeln muessen im Startmanifest stehen. |
+| C.04 | luecke | `93C.4.1` | KL, Entropy, Clip-Fraction, Value-Loss, Grad-Norm und Collapse-Schwellen werden Report-Pflicht. |
+| C.05 | luecke | `93C.4.2`, `94A.2` | Reward-Hacking, Episode-Shortening, Death-/Terminal- und Safety-Overrule-Diagnostik werden Pflicht. |
+| C.06 | luecke | `95.1`, `95.4` | Exportformat und JS-kompatible Modellausfuehrung bleiben harte Rollout-Voraussetzung. |
+| C.07 | luecke | `95.2`, `95.4` | Warmup-, Timeout-, Fallback- und Max-Latency-Regeln muessen vor Runtime-Aktivierung dokumentiert und getestet werden. |
+| C.08 | luecke | `95.1`, `95.2` | Modellregistry koppelt Modellhash, Confighash, Normalize-State, Registry-ID und Semantikfenster. |
+| D.01 | governance | `93C.0.4` | Untracked PPO-Artefakte muessen versioniert oder eindeutig lokal markiert werden. |
+| D.02 | governance | `93C.0.4` | `tmp/`-Only-Evidence wird fuer Closure ersetzt oder als nicht closure-faehig markiert. |
+| D.03 | governance | `93C.0.4`, `DoD.10` | Offene `mojibake`-Warnungen duerfen nicht als sauberer Abschluss ignoriert werden. |
+| D.04 | governance | `93C.0.2`, `93C.0.4` | Selbstzaehlungs-Gates wie `completed_phase_items` zaehlen nicht als alleinige Closure-Evidence. |
+| D.05 | governance | `93C.0` | BT93C startet mit Plan-Wahrheit, Lock-/Header-Abgleich, Evidence-Hygiene und BTF-Statusbereinigung. |
+
+## PPO-Zielarchitektur und Arbeitszuschnitt
+
+Ziel ist eine PPO-basierte Bot-KI, die nicht nur auf Reward oder Steps gewinnt, sondern messbar besser ueberlebt, stabil bleibt und spaeter kontrolliert in die Runtime integrierbar ist.
+
+Qualitaetsdefinition fuer `fantastisch`:
+
+- Survival gewinnt reproduzierbar gegen den eingefrorenen DQN-Champion auf derselben Seed-/Mode-/Map-/Holdout-Matrix.
+- Safety bleibt sichtbar: `invalidActionRate`, Sanitizer-/Mask-/Veto-Rate, Death-/Terminal-Klassen, Crash-/Timeout-/Forced-Round-Klassen werden nicht schlechter.
+- Lernen ist echt: PPO-Optimizer-Updates, Modellpaket, Normalize-/Optimizer-State, Actor/Critic-Heads, Lernmetriken und Resume sind nachgewiesen.
+- Integration bleibt kontrolliert: Export-/Load-Vertrag, Runtime-Strategieflag, Modellregistry, Latenzbudget und Rollback werden nicht in Training versteckt, sondern als separater Rollout-Intake behandelt.
+
+Mikro-Claim-Regel:
+
+- Ein Claim loest genau eine Problemklasse und maximal zwei direkt benachbarte Subphasen.
+- Kein `pilot`, `baseline`, `ablation`, `promote` oder Runtime-Intake wird gestartet, solange das vorherige Gate nicht gruen ist.
+- Jeder Stop mit `diagnose`, `hold`, `throughput insufficient`, `freeze red` oder `validation blocked` ist ein gueltiges Ergebnis und darf nicht durch groessere Laeufe ueberdeckt werden.
+
+| Problemklasse | Kleinster naechster Claim | Gruenes Ergebnis |
+| --- | --- | --- |
+| Freeze/Hygiene | `93C.0` | `freezeOk=true`, versionierte Artefakte, keine Self-Count-/`tmp`-Only-Gates, Startmanifest vorhanden |
+| Dependency | `93C.1` | gepinnter PPO-Stack, Clean-Env-Smoke, `pip check`, Import-/Mini-Train-Smoke |
+| Action-Surface | `93C.2` | SB3-trainierbares Interface, Sanitizer-/Mask-/Veto-Telemetrie messbar |
+| Learner | `93C.3` | echter PPO-Update, Modell-, Optimizer-, Normalize-, Config- und Manifest-Artefakte |
+| Diagnostik | `93C.4` | KL/Entropy/Clip/Value/Grad-Norm plus Reward-/Death-/Terminal-/Safety-Matrix |
+| Pilot/Baseline | `93C.5` | `learner-smoke -> pilot -> baseline`, kein Sprung in Langlauf |
+| Vergleich | `93C.6` | DQN/PPO auf gleicher Matrix, Holdout separat, produktionsnahe Validation als Restblocker sichtbar |
+| Handover | `93C.7` | Repro-Lauf, Hashes, Artefaktmanifest, klares `BT94A`-Go oder `diagnose` |
+| Candidate | `BT94A` | kleine Ablationen in Batches, ein Freeze-Kandidat oder `hold` |
+| Externe Evidence | `BT94B` | medianbasiertes Urteil; `promote` nur mit Stability- und Validation-Disziplin |
+| Integration | `BT95` | doc-only Rollout-Intake, keine produktive Umschaltung ohne separaten User-Entscheid |
+
 ## BT90-Zerlegung aus dem Draft
 
 | Aktiver Block hier | Draft-Quelle | Rolle |
@@ -102,10 +170,11 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | BT92 | BT91.99 | hard | ja | gruene BT91-Evidence liefert Sidecar-/100-Step-Handover fuer die Single-Env-Minimalspur |
 | BT93A | BT92.99 | hard | ja | BT93A.99 ist abgeschlossen; Harness-/Throughput-Handover fuer BT93B/BT93C liegt artefaktbasiert vor |
 | BT93B | BT93A.99 | hard | ja | PPO-Scaffold wurde nach artefaktbasiertem Harness-/Throughput-Handover aus BT93A abgeschlossen |
-| BT93C | BT93B.99 + Audit-Haertung 2026-04-24 | hard | nein | Claimbar fuer `93C.0`; echter Learner-Start erst nach `freezeOk=true`, Evidence-Hygiene, versionierten PPO-Artefakten, DQN-Matrix und Startmanifest |
+| BT93C | BT93B.99 + Audit-Haertung 2026-04-24 | hard | ja | `93C.0` endet `go`; echter Learner-Start erst nach `93C.1`/`93C.2` mit Clean-Env, Action-Surface und Startmanifest |
 | BT94A | BT93C.99 | hard | nein | Candidate-Freeze und Ablationen brauchen ein echtes PPO-Modell mit Baseline-, Eval-, Repro- und Holdout-Evidence |
 | BT94B | BT94A.99 | hard | nein | Externe A/B-Evidence braucht einen eingefrorenen Kandidaten |
-| BT94B | BT80C 80.9.3 | soft | nein | kein Startblocker fuer externe Evidence; harter Blocker fuer `promote` als Rollout-/BT95-Handoff |
+| BT94B externe Evidence | BT80C 80.9.3 | soft | nein | kein Startblocker fuer `hold`/`diagnose`-Evidence; produktionsnahe Validation bleibt sichtbar offen |
+| BT94B `promote` | BT80C 80.9.3 oder gleichwertige produktionsnahe Validation | hard | nein | harter Blocker fuer jedes Rollout-Signal und jeden echten BT95-Handoff |
 | BT95 | BT94B Urteil `promote` | hard | nein | Integrations-Handoff ist erst nach positiver externer Evidence sinnvoll |
 | BT95 | BT80C 80.9.3 oder gleichwertiger produktiver Validation-Pfad | soft | nein | fuer BT95 als Handoff darf der Punkt offen dokumentiert bleiben; fuer spaeteren Rollout-Intake wird er hart |
 
@@ -144,7 +213,7 @@ Cross-Plan-Fit zu `docs/Umsetzungsplan.md`:
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
 | Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
-| - | BT93C | - | frei | claimbar fuer 93C.0; echter Learner erst nach Audit-Gate |
+| - | BT93C | - | frei | 93C.0 abgeschlossen; naechst 93C.1/93C.2 |
 | - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -956,7 +1025,7 @@ Throughput-Anker (BTF-08, abgeleitet aus `data/training/ppo/lane_baseline.json` 
 
 ### 93A.99 Abschluss-Gate
 
-- [x] 93A.99.1 Alle Phasen 93A.1 bis 93A.3 sind mit Evidence dokumentiert. (abgeschlossen: 2026-04-24; evidence: `$count = (Select-String -Path docs/bot-training/Bot_Trainingsplan.md -Pattern '\[x\]\s+93A\.[123]\.\d').Count; Write-Output ('completed_phase_items=' + $count)` -> `completed_phase_items=10`)
+- [x] 93A.99.1 Alle Phasen 93A.1 bis 93A.3 sind mit Evidence dokumentiert. (abgeschlossen: 2026-04-24; evidence: `npm.cmd run plan:check` -> PASS; `Get-Content -Path data\training\ppo\bt93a_handover_2env.json` -> `ok=true`, `measuredLane.stepsPerSecond=58.740111449952536`, `openHarnessRisks=3`)
 - [x] 93A.99.2 Es existiert mindestens eine stabile `2-Env`-Lane mit gemessenem Throughput-Artefakt; `4-Env` ist nur bei tragender Evidenz freigegeben (Schwelle: >= 45 Steps/s, failure_rate <= 0.02), sonst explizit als Downgrade ausgeschlossen. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python/scripts/bt93a_2env_smoke.py` -> `data/training/ppo/lane_baseline_2env.json`, `data/training/ppo/bt93a_handover_2env.json` (`validatedEnvCount=2`, `stepsPerSecond=58.740111449952536`, `failureRate=0.0`, `fourEnvStatus=eligible-from-2env-thresholds-not-yet-measured`))
 
 ### Risiko-Register BT93A
@@ -1042,12 +1111,26 @@ Scope:
 - Der Block bindet Throughput-/Downgrade-Urteile aus `BT93A`, die Scaffold-/Resume-Kette aus `BT93B`, einen echten PPO-Stack und eine methodisch eingefrorene DQN-Vergleichsmatrix zusammen.
 - Freeze, Ablationen, externe A/B-Evidence und Promotion bleiben bewusst ausserhalb.
 - Der Start dieses Blocks ist eine Sanierungs- und Readiness-Phase; echte Trainingslaeufe beginnen erst nach `93C.0` bis `93C.2`.
+- `BT93C` wird nicht als ein grosser Trainingsblock geclaimt, sondern als Mikro-Leiter mit Stop-Punkten nach jeder Problemklasse.
 
 Claim-Grenze:
 
 - `BT93C` ist nur fuer `93C.0` claimbar, solange der Plan-Freshness-Abgleich noch Widersprueche fuehrt oder die feste Seed-/Mode-/Champion-/Holdout-Matrix fuer den Vorvergleich fehlt.
 - Ohne echten PPO-Learner (`model.learn(...)` oder gleichwertige PPO-Optimizer-Updates, echter Modellcheckpoint, Optimizer-/Normalize-Persistenz) bleibt `BT93C` vor jeder Baseline-Aussage geschlossen.
 - Ein Lauf mit `scaffoldOnly=true`, `promotionAllowed=false` oder Checkpoint-Notiz `no PPO optimizer update` zaehlt nur als Scaffold-Evidence, nie als Baseline- oder Lern-Evidence.
+- Pro Claim werden maximal zwei direkt benachbarte Subphasen bearbeitet; `93C.5` darf erst nach gruener `93C.3` und `93C.4` starten.
+
+Mikro-Claim-Leiter:
+
+| Claim | Scope | Stop-Regel |
+| --- | --- | --- |
+| `93C-Audit` | `93C.0` | Stop bei rotem Freeze, unversionierter Evidence oder fehlendem Startmanifest |
+| `93C-Env` | `93C.1` bis `93C.2` | Stop bei ungepinntem Stack, Clean-Env-Fehler oder nicht trainierbarer Action-Surface |
+| `93C-Learner` | `93C.3` | Stop, wenn kein echter PPO-Update oder keine State-Persistenz beweisbar ist |
+| `93C-Diagnose` | `93C.4` | Stop bei KL-/Entropy-/Value-Collapse, Reward-Hacking oder verdeckten Veto-/Sanitizer-Raten |
+| `93C-Pilot` | `93C.5` | Stop mit `diagnose: throughput insufficient` oder `pilot unsafe`; kein Baseline-Sprung |
+| `93C-Vergleich` | `93C.6` | Stop, wenn DQN/PPO-Matrix, Holdout oder Semantikfenster nicht apples-to-apples sind |
+| `93C-Handover` | `93C.7` | Stop als `BT94A-ready` nur bei echtem Modellpaket; sonst `diagnose` |
 
 ### Harte PPO-Befunde, die der Pfad abarbeiten muss
 
@@ -1074,7 +1157,7 @@ Claim-Grenze:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Plan-Wahrheit ist vor Start bereinigt: BT93A/BT93B-Status, `freezeOk=true`, Lock-Header, `[x]`-Evidence, versionierte PPO-Artefakte und offene Restblocker widersprechen sich nicht.
+- [x] DoD.1 Plan-Wahrheit ist vor Start bereinigt: BT93A/BT93B-Status, `freezeOk=true`, Lock-Header, `[x]`-Evidence, versionierte PPO-Artefakte und offene Restblocker widersprechen sich nicht. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93c_audit_readiness.py` -> `data/training/ppo/bt93c/audit_readiness_report.json` (`ok=true`, `resultClass=go`))
 - [ ] DoD.2 Ein sauber gepinnter PPO-Dependency-Stack ist auf einem Clean-Env-Smoke reproduzierbar (`stable-baselines3`/`torch`/`gymnasium`/`numpy` plus optionales Monitoring).
 - [ ] DoD.3 Die SB3-kompatible Env-/Action-Surface ist technisch bewiesen: `spaces.Dict` wird nicht still als finales PPO-Interface vorausgesetzt; Flatten-/`MultiDiscrete`-/Masking- oder Custom-Policy-Entscheid ist implementiert und mit Sanitizer-/Mask-Raten messbar.
 - [ ] DoD.4 Ein echter PPO-Learner fuehrt Optimizer-Updates aus, speichert ein echtes Modellpaket und kann mit Modell-, Optimizer- und Normalize-State fortgesetzt werden.
@@ -1084,14 +1167,15 @@ Claim-Grenze:
 - [ ] DoD.8 Vergleichsregel gegen den eingefrorenen DQN-Champion und das aktuelle Semantikfenster ist festgezogen; Ergebnis ist explizit `Vorvergleich, keine Promotion`.
 - [ ] DoD.9 Ergebnis, Restpunkte und Baseline-Paket sind als Handover fuer `BT94A` dokumentiert.
 - [ ] DoD.10 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [ ] DoD.11 Jeder Mikro-Claim endet mit einer klaren Klasse: `go`, `hold`, `diagnose`, `throughput insufficient`, `freeze red` oder `validation blocked`.
 
 ### 93C.0 Plan-Freshness und Gate-Sanierung
 
-- [ ] 93C.0.1 Status-/Freshness-Widersprueche im PPO-Pfad bereinigen (`BT93A` abgeschlossen statt active, BTF-Status, versionierte Artefakte, aktueller Freeze-Stand).
-- [ ] 93C.0.2 Gate-Disziplin pruefen: keine `[x]`-Aussage bleibt stehen, wenn sie nur Scaffold-, README- oder veraltete Drift-Evidence traegt.
-- [ ] 93C.0.3 `bt90_freeze_check.py` neu ausfuehren und nur `freezeOk=true` als Learner-Startsignal akzeptieren; bei `reAuditRequired=true` bleibt `93C.1` blockiert.
-- [ ] 93C.0.4 Evidence-Hygiene abschliessen: Lock-Tabelle gegen Header abgleichen, untracked PPO-Artefakte versionieren oder als lokal markieren, `tmp/`-Only-Evidence ersetzen, Self-Count-Gates nicht als alleinige Closure-Evidence verwenden.
-- [ ] 93C.0.5 Startmanifest fuer den ersten echten Trainingslauf schreiben: DQN-Champion, Semantikfenster, Seed-/Mode-/Map-/Holdout-Matrix, Timesteps-Budget, Env-Anzahl, Abbruchregeln und erlaubte Artefaktpfade.
+- [x] 93C.0.1 Status-/Freshness-Widersprueche im PPO-Pfad bereinigen (`BT93A` abgeschlossen statt active, BTF-Status, versionierte Artefakte, aktueller Freeze-Stand). (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93c_audit_readiness.py` -> `data/training/ppo/bt93c/audit_readiness_report.json` (`statusConsistency.bt93aClosed=true`, `statusConsistency.bt93bClosed=true`, `bt80cValidationRestblockerVisible=true`, `resultClass=go`))
+- [x] 93C.0.2 Gate-Disziplin pruefen: keine `[x]`-Aussage bleibt stehen, wenn sie nur Scaffold-, README- oder veraltete Drift-Evidence traegt. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93c_audit_readiness.py` -> `data/training/ppo/bt93c/audit_readiness_report.json` (`missingEvidenceCompletedItems=[]`, `bt93bScaffoldOnly=true`, `bt93bNoPromotionClaim=true`, `bt93bBt94aGate=closed`))
+- [x] 93C.0.3 `bt90_freeze_check.py` neu ausfuehren und nur `freezeOk=true` als Learner-Startsignal akzeptieren; bei `reAuditRequired=true` bleibt `93C.1` blockiert. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt90_freeze_check.py` -> `data/training/ppo/freeze_check.json` (`freezeOk=true`, `reAuditRequired=false`, `driftCount=0`))
+- [x] 93C.0.4 Evidence-Hygiene abschliessen: Lock-Tabelle gegen Header abgleichen, untracked PPO-Artefakte versionieren oder als lokal markieren, `tmp/`-Only-Evidence ersetzen, Self-Count-Gates nicht als alleinige Closure-Evidence verwenden. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93c_audit_readiness.py` -> `data/training/ppo/bt93c/audit_readiness_report.json` (`lockConsistency.matches.BT93C=true`, `untrackedPpoArtifactsBeforeWrite=[]`, `tmpOnlyCompletedEvidence=[]`, `selfCountGateEvidence=[]`, `mojibakeLines=[]`))
+- [x] 93C.0.5 Startmanifest fuer den ersten echten Trainingslauf schreiben: DQN-Champion, Semantikfenster, Seed-/Mode-/Map-/Holdout-Matrix, Timesteps-Budget, Env-Anzahl, Abbruchregeln und erlaubte Artefaktpfade. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93c_audit_readiness.py` -> `data/training/ppo/bt93c/start_manifest.json` (`dqnChampion.championBlock=BT11`, `matrixId=bt93c-learner-smoke-start-v1`, `envCount=2`, `learnerSmokeRolloutStepsTotal=768`))
 
 ### 93C.1 PPO-Dependency- und Clean-Env-Gate
 
@@ -1107,21 +1191,25 @@ Claim-Grenze:
 
 - [ ] 93C.3.1 `python/train.py` oder gleichwertiger Orchestrator fuehrt echte PPO-Optimizer-Updates aus und schreibt Modell-, Optimizer-, Normalize-, Config- und Manifest-Artefakte.
 - [ ] 93C.3.2 Resume konsumiert einen echten PPO-Checkpoint und setzt Training inklusive Normalize-/Optimizer-State fort; JSON-Scaffold-Checkpoints allein reichen nicht.
+- [ ] 93C.3.3 Minimaler PPO-Forward-Pass (`batch=1`) und Modell-Reload werden im Python-Pfad gemessen; das Ergebnis zaehlt nur als Trainings-/Export-Vorbereitung, nicht als JS-Tick-Latenzbeweis.
 
 ### 93C.4 Lern-, Reward- und Safety-Diagnostik
 
 - [ ] 93C.4.1 PPO-Lernmetriken (`policy_loss`, `value_loss`, `entropy`, `approx_kl`, `clip_fraction`, `explained_variance`, `grad_norm`) im Report erfassen und Collapse-/Instabilitaets-Schwellen dokumentieren.
 - [ ] 93C.4.2 Reward-Hacking-, Episode-Shortening- und Safety-Overrule-Risiken ueber `rewardBreakdown`, Death-/Terminal-Klassen, Veto-Rate und Survival-KPIs sichtbar machen.
+- [ ] 93C.4.3 Policy-Qualitaet nicht nur ueber Survival lesen: Intent-/Recovery-Luecken aus `BT73`, produktionsnahe Validation aus `BT80C 80.9.3` und JS-Integration-Luecken als explizite Restschuld im Report fuehren.
 
 ### 93C.5 Konservative Baseline-Ladder
 
 - [ ] 93C.5.1 `learner-smoke -> pilot -> baseline` als feste Leiter definieren; Timesteps, Eval-Takte und Env-Anzahl werden aus gemessener Throughput-Evidence abgeleitet.
-- [ ] 93C.5.2 Konservativen Baseline-Lauf ausfuehren oder ehrlich mit `diagnose: throughput insufficient` stoppen; keine Draft-Zahlen wie `300000` oder `4-Env` ohne tragende Evidence.
+- [ ] 93C.5.2 Kleinen Pilot ausfuehren oder ehrlich mit `diagnose: throughput insufficient` bzw. `pilot unsafe` stoppen; Pilot ist noch keine Baseline.
+- [ ] 93C.5.3 Konservativen Baseline-Lauf nur nach gruenem Pilot ausfuehren; keine Draft-Zahlen wie `300000` oder `4-Env` ohne tragende Evidence.
 
 ### 93C.6 DQN-Vorvergleich und Holdout
 
 - [ ] 93C.6.1 DQN-Champion, Semantikfenster, Train-/Eval-/Holdout-Seeds, Modi, Maps und Invalidierungsregeln einfrieren.
 - [ ] 93C.6.2 PPO-Baseline gegen DQN auf derselben Matrix auswerten; Holdout-Ergebnis und Abweichungen zur produktionsnahen Validation separat ausweisen.
+- [ ] 93C.6.3 Vergleichsurteil als `ppo-promising`, `ppo-hold`, `ppo-diagnose` oder `ppo-regression` klassifizieren; keine Klasse oeffnet direkt einen Rollout.
 
 ### 93C.7 Reproduzierbarkeit und BT94A-Handover
 
@@ -1149,6 +1237,8 @@ Claim-Grenze:
 | Headless-Throughput reicht selbst nach Harness/Scaffold nicht fuer eine ehrliche Baseline | hoch | Performance | konservatives Budget, klare Downgrades und ehrliche Restpunkte statt Wunschannahmen | Laeufe liefern kaum nutzbare Timesteps oder kippen unter Last |
 | Overfitting auf Seeds, Maps oder Modi | hoch | QA/RL | Holdout-Seeds und Mode-/Map-Stratifizierung vor Baseline einfrieren | Eval gewinnt, Holdout verliert |
 | Eine gruene Baseline wird als Promotion oder BT94A-Freigabe missverstanden | mittel | Governance | Reports explizit als Baseline-Handover labeln | DQN-Vergleich wird intern schon als Rollout-Signal gelesen |
+| Ein Claim wird zu gross und ueberspringt Readiness-Gates | hoch | Governance/RL | Mikro-Claim-Leiter einhalten; maximal zwei benachbarte Subphasen pro Claim | Arbeit will Freeze, Learner und Baseline in einem Zug erledigen |
+| Python-Forward-Pass wird als JS-Runtime-Latenz missverstanden | hoch | Integration/Performance | 93C misst nur Trainings-/Export-Vorbereitung; JS-Tick-Budget bleibt Rollout-Intake | PPO-Modell laedt in Python, aber Runtime kann es nicht sicher ausfuehren |
 
 ---
 
@@ -1163,11 +1253,13 @@ Scope:
 - Kleine Ablationsmatrix, Curriculum-Hardening und Candidate Freeze auf Basis eines echten `BT93C`-PPO-Modellpakets.
 - Freeze und Evidence-Sammeln bleiben bewusst vor externer A/B-Urteilsfindung getrennt.
 - Jede Ablation prueft genau eine Hypothese; offene Learner-, Action-, Reward- oder Holdout-Restpunkte aus `BT93C` blockieren den Start.
+- Ablationen laufen in kleinen Batches: maximal zwei neue Kandidatenlaeufe pro Claim, danach Entscheidung `continue`, `hold` oder `diagnose`.
 
 Claim-Grenze vor BT94A:
 
 - `BT94A` ist nur claimbar, wenn `BT93C` ein echtes Baseline-Paket unter `data/training/ppo/**`, ein echtes PPO-Modell, Normalize-/Optimizer-State, Lernmetriken und eine feste Vergleichs-/Holdout-Matrix geliefert hat.
 - Wenn `BT93C` mit `diagnose`, `throughput insufficient`, Action-Surface-Blocker oder Reward-/Safety-Unklarheit endet, bleibt `BT94A` geschlossen.
+- Wenn der BT93C-Vorvergleich BT73-Intent-/Recovery-Restschuld, BT80C-Validation-Blocker oder JS-Integration-Luecken ausweist, muss BT94A diese Punkte im Freeze-Report sichtbar weiterfuehren.
 
 ### Definition of Done (DoD)
 
@@ -1177,17 +1269,20 @@ Claim-Grenze vor BT94A:
 - [ ] DoD.4 Genau ein Freeze-Kandidat unter `data/training/ppo/candidates/**` ist mit Modell, Normalize-/Optimizer-State, Manifest, Reports, Modellhash, Confighash, Lane-Budget und Vergleichsmatrix dokumentiert.
 - [ ] DoD.5 Wenn kein klarer Sieger existiert, endet BT94A mit `hold` und oeffnet BT94B nicht.
 - [ ] DoD.6 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS.
+- [ ] DoD.7 Der Freeze-Report benennt explizit alle offenen Restschulden aus BT73, BT80C, JS-Inference, Latenzbudget, Registry und Rollback.
 
 ### 94A.1 Ablationsmatrix und Entscheidungsregeln
 
 - [ ] 94A.1.1 5 bis 7 gezielte Laeufe mit klarer Champion-/Challenger-Logik gegen BT93C-Baseline definieren.
 - [ ] 94A.1.2 Parameterbereiche fuer `learning_rate`, `n_steps`, `batch_size`, `n_epochs`, `gamma`, `gae_lambda`, `clip_range`, `ent_coef`, `vf_coef`, `max_grad_norm`, `net_arch` und Masking-/Normalization-Modus festlegen.
 - [ ] 94A.1.3 Abbruchkriterien dokumentieren (BT93C driftet, KL/Entropy/Grad-Norm kippt, Sanitizer-/Veto-Rate steigt, Reward steigt bei schlechterer Survival).
+- [ ] 94A.1.4 Batch-Regel festlegen: maximal zwei Kandidatenlaeufe pro Claim, keine Matrix-Erweiterung waehrend laufender Auswertung.
 
 ### 94A.2 Curriculum-, Reward- und Telemetry-Paritaet
 
 - [ ] 94A.2.1 Relevante Felder (Observation Schema, Reward Breakdown, Hybrid Decision, terminal/truncated/death classes, Sanitizer-/Mask-/Veto-Raten) abgleichen.
 - [ ] 94A.2.2 Bekannte semantische Luecken oder Unterschiede zur DQN-Referenz und zum BT93C-Holdout offenlegen.
+- [ ] 94A.2.3 BT73-Intent-/Recovery-Restschuld und BT80C-Validation-Blocker im Freeze-Kontext ausdruecklich markieren.
 
 ### 94A.3 Kandidatenlaeufe und Freeze
 
@@ -1213,6 +1308,7 @@ Claim-Grenze vor BT94A:
 | Zu breite Matrix erzeugt Forschungsdrift | hoch | Governance | 5 bis 7 Laeufe, eine Hypothese je Lauf, harte Abbruchkriterien | neue Parameterideen werden waehrend laufender Ablation ergaenzt |
 | Kein echter Freeze trotz vielen Laeufen | hoch | Governance | `hold` als gueltiges Blockende, BT94B bleibt geschlossen | Ergebnisse sind gemischt oder nicht reproduzierbar |
 | Kandidat verliert auf Holdout | hoch | QA/RL | Holdout als Freeze-Kriterium fuehren | Eval gewinnt, Holdout oder DQN-Matrix regressiert |
+| Zu grosse Ablationsclaims verwischen Ursachen | hoch | Governance/RL | maximal zwei Kandidatenlaeufe pro Claim, danach harte Auswertung | mehrere Parameter und Seeds werden in einem Claim gemischt |
 
 ---
 
@@ -1226,7 +1322,8 @@ Scope:
 
 - Externe A/B-Evidence gegen den eingefrorenen DQN-Champion mit klarer Urteilssystematik.
 - Promotion-Entscheidung nur ueber Lane-, Median- und Semantikfenster-Regeln vorbereiten.
-- `promote` braucht mehr als drei Runs: gueltige Paesse, definierte Episodenzahl, Median-Delta, Streuung, Holdout-Lage und keine schlechtere Stability-/Invalid-Action-Lage.
+- `promote` braucht mindestens drei gueltige Paesse plus definierte Episodenzahl, Median-Delta, Streuung, Holdout-Lage und keine schlechtere Stability-/Invalid-Action-Lage; drei Runs allein reichen nicht als starkes Urteil.
+- Ohne gruene produktionsnahe Validation (`BT80C 80.9.3` oder gleichwertig) ist das beste moegliche Ergebnis ein externer Kandidat, kein operatives Rollout-Signal.
 
 Claim-Grenze vor BT94B:
 
@@ -1236,7 +1333,7 @@ Claim-Grenze vor BT94B:
 ### Definition of Done (DoD)
 
 - [ ] DoD.1 Externe A/B-Evidence gegen den eingefrorenen DQN-Champion liefert ein klares Urteil (`promote`, `hold`, `rollback` oder `diagnose`).
-- [ ] DoD.2 Drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters bilden die Entscheidungsbasis statt eines Einzelruns.
+- [ ] DoD.2 Mindestens drei vollstaendige Kandidatenlaeufe derselben Lane und desselben Semantikfensters bilden die Mindestbasis statt eines Einzelruns; Episodenzahl, Streuung und Holdout entscheiden mit.
 - [ ] DoD.3 Jeder gueltige Pass definiert Episodenzahl, Seeds, Modi, Maps, Holdout-Anteil, Invalidierungsregeln und Artefakt-/Modellhashes.
 - [ ] DoD.4 `promote` ist nur zulaessig, wenn PPO den Median von `averageBotSurvival` verbessert, `avgStepsPerEpisode` mindestens non-inferior bleibt, Holdout nicht regressiert und `invalidActionRate`, Sanitizer-/Veto-Rate, Crash-/Timeout-/Forced-Round-Klassen nicht schlechter sind.
 - [ ] DoD.5 Ohne gruene produktionsnahe Validation (`BT80C 80.9.3` oder gleichwertig) darf `promote` hoechstens als externer Kandidat markiert werden; ein Rollout-Intake bleibt blockiert.
@@ -1246,10 +1343,11 @@ Claim-Grenze vor BT94B:
 
 - [ ] 94B.1.1 DQN-Champion, PPO-Freeze-Kandidat und das Vergleichsmanifest fixieren.
 - [ ] 94B.1.2 Urteilskriterien, Episodenzahl, Mindestdelta, Non-Inferiority-Schwelle, Holdout-Regel und Primaer-/Sekundaermetriken unveraenderlich festschreiben.
+- [ ] 94B.1.3 Semantikfenster und bekannte Restschuld markieren: BT73-Intent-/Recovery, BT80C-Validation, JS-Inference, Latenzbudget, Rollback und Registry.
 
 ### 94B.2 Externe A/B-Lane ausfuehren
 
-- [ ] 94B.2.1 Mindestens 3 vollstaendige Kandidatenlaeufe auf derselben festen Matrix auswerten (Medianbasiert).
+- [ ] 94B.2.1 Mindestens 3 vollstaendige Kandidatenlaeufe auf derselben festen Matrix auswerten (medianbasiert, mit Episodenzahl, Streuung und Holdout).
 - [ ] 94B.2.2 Invalidierte Paesse separat dokumentieren und nicht still in den Median mischen; Ersatzlauf nur mit derselben Matrix.
 
 ### 94B.3 `bot:validate`-Zusatzsignal oder ehrlicher Restblocker
@@ -1290,6 +1388,7 @@ Scope:
 - Externe PPO-Evidence nur bei `BT94B=promote` plus gruener produktionsnaher Validation in ein layer-sicheres Integrationspaket fuer einen spaeteren Rollout-Intake uebersetzen.
 - Keine automatische DQN-Ablosung; produktive Umschaltung bleibt separater, user-entschiedener Folgepfad.
 - Restblocker zu produktionsnaher Validation, Inference-/Export-Pfad, Modellregistry, Feature-Flag, Rollback, Latenzbudget und Runtime-Guardrails explizit dokumentieren.
+- BT95 implementiert diese Runtime-Komponenten nicht; es erstellt nur die Intake-Checkliste fuer den separaten operativen Rollout-Block.
 
 Blocktyp:
 
@@ -1301,6 +1400,18 @@ Claim- und No-Go-Regel:
 - Wenn `BT94B=promote` ohne gruene produktionsnahe Validation endet, dokumentiert `BT95` nur einen blockierten Handoff; ein Rollout-Intake bleibt geschlossen.
 - Auch bei `promote` bleibt `BT95` Doc-, Guardrail- und Entscheidungsarbeit; produktive Runtime-, Matchstart- oder AI-Hub-Dateien werden hier nicht vorbereitet oder umgeschaltet.
 - `BT80C 80.9.3` bleibt als produktionsnaher Restblocker sichtbar, solange die feste Validation-Lane weiter in `PLAYING` mit `roundsRecorded=0` haengen kann.
+
+Rollout-Intake-Pflichtpaket:
+
+| Komponente | Pflichtnachweis vor operativer PPO-Aktivierung |
+| --- | --- |
+| Export-/Load-Vertrag | Modellformat, Normalize-State, Actor/Critic-Head-Spec, Config und Hashes lassen sich deterministisch laden. |
+| JS-Inference-Adapter | Runtime kann PPO-Aktion ohne Python-Trainingsharness konsumieren; keine neue Matchstart-Abkuerzung. |
+| Latenzbudget | Forward-Pass, Warmup, Timeout, Fallback und Max-Tick-Budget sind gemessen und gate-faehig. |
+| Strategieflag | Umschaltung laeuft ueber `BOT_STRATEGY=dqn|ppo` oder gleichwertige kontrollierte Konfiguration. |
+| Modellregistry | Registry-ID koppelt Modellhash, Confighash, Normalize-State, Semantikfenster, DQN-Champion und Rollback-Ziel. |
+| Rollback | Rueckfall auf DQN-Champion ist getestet bei Ladefehler, Latenzueberschreitung, Holdout-Regression und produktiver Validation-Regression. |
+| Produktnahe Validation | `BT80C 80.9.3` oder gleichwertige Lane terminiert reproduzierbar und liefert gueltige Runden statt `PLAYING`/`roundsRecorded=0`. |
 
 ### Definition of Done (DoD)
 
@@ -1316,11 +1427,14 @@ Claim- und No-Go-Regel:
 
 - [ ] 95.1.1 Moegliche Touchpoints (`ObservationBridgePolicy.js`, `RuntimeConfig.js`, Inference-Adapter, Export-/Load-Pfad, Modellregistry, Strategieflag, Validation-Runner) fuer einen spaeteren Rollout-Intake benennen.
 - [ ] 95.1.2 No-Touch-Ausnahmen explizit als Grenze festhalten. Ohne Runtime-Eingriff in BT95!
+- [ ] 95.1.3 Export-/Load-Vertrag fuer PPO-Artefakte als Intake-Pflicht dokumentieren: Modell, Normalize-State, Actor/Critic-Heads, Config, Hashes und Semantikfenster.
 
 ### 95.2 Rollout-, Rollback- und Sunset-Regeln
 
 - [ ] 95.2.1 Rollout-Reihenfolge, `BOT_STRATEGY=dqn|ppo`-Strategieflag, DQN-Champion-Retention und DQN-Sunset-Kriterien dokumentieren.
 - [ ] 95.2.2 Rollback-Pfade bei Instabilitaet, Modellladefehlern, Latenzueberschreitung, Holdout-Regression und produktiver Validation-Regression definieren und Architektur-Docs synchronisieren.
+- [ ] 95.2.3 PPO-Latenzbudget als separaten Runtime-Test definieren: Forward-Pass, Warmup, Timeout, Fallback und Max-Tick-Budget; Trainings-Step-Latenz zaehlt nicht.
+- [ ] 95.2.4 Modellregistry-Regel definieren: Registry-ID koppelt Modellhash, Confighash, Normalize-State, Semantikfenster, DQN-Champion-Retention und Rollback-Ziel.
 
 ### 95.3 Folgebacklog separieren
 
@@ -1331,6 +1445,7 @@ Claim- und No-Go-Regel:
 
 - [ ] 95.4.1 BT90- bis BT94B-Ergebnisse fuer den moeglichen Intake-Block vorbereiten; bei fehlendem `BT94B=promote` bleibt das Ergebnis ein No-Intake-Record.
 - [ ] 95.4.2 Offene produktionsnahe Validation (`BT80C 80.9.3` oder gleichwertig), fehlenden Rollback-Test, fehlendes Latenzbudget und den finalen User-Entscheid als harte Restblocker fuer den Start des operativen Rollout-Blocks ausweisen.
+- [ ] 95.4.3 Bei `BT94B=promote` ohne produktionsnahe Validation, JS-Inference, Registry oder Rollback entsteht nur `external-candidate`, kein `rollout-ready`.
 
 ### 95.99 Abschluss-Gate
 
@@ -1357,16 +1472,21 @@ Claim- und No-Go-Regel:
 
 | Reihenfolge | Aktion | Voraussetzung | Ergebnis |
 | --- | --- | --- | --- |
-| 1 | `BT93C` fuer `93C.0` claimen, keine Langlaeufe starten. | BT93B.99 bleibt Scaffold-only; Blockstart ist Sanierung statt Training. | Sauberes Startmanifest und klare Go/No-Go-Lage. |
-| 2 | `93C.0.3` bis `93C.0.5` abschliessen. | `bt90_freeze_check.py`, Lock-/Evidence-Abgleich, versionierte PPO-Artefakte, DQN-Matrix. | Learner-Start ist fachlich freigegeben oder ehrlich blockiert. |
-| 3 | `93C.1` Clean-Env-Gate und `93C.2` Action-Surface umsetzen. | Gepinnte PPO-Requirements, `pip check`, SB3-kompatibler Action-Wrapper. | Voraussetzungen fuer echten PPO-Learner-Smoke. |
-| 4 | Erst danach `93C.3` Learner-Smoke starten. | Normalize-/Optimizer-State, Actor/Critic-Heads, Sanitizer-/Mask-/Veto-Telemetrie bereit. | Echtes PPO-Modellpaket statt Scaffold-Checkpoint. |
+| 1 | `93C-Audit` claimen: `93C.0.1` bis `93C.0.5`, keine Trainingslaeufe. | BT93B.99 bleibt Scaffold-only; alle A-/B-/C-/D-Befunde aus der Audit-Matrix sind bekannt. | `freezeOk=true` oder Stop `freeze red`; Startmanifest, DQN-Matrix und Evidence-Hygiene sind sauber. |
+| 2 | `93C-Env` claimen: `93C.1` und `93C.2`, keine Baseline. | `93C-Audit` endet `go`. | Gepinnter PPO-Stack, Clean-Env-Smoke, SB3-trainierbare Action-Surface und Sanitizer-/Mask-/Veto-Telemetrie. |
+| 3 | `93C-Learner` claimen: `93C.3`, nur Minimal-Smoke. | `93C-Env` endet `go`. | Echter PPO-Optimizer-Update, Modellpaket, Normalize-/Optimizer-State, Actor/Critic-Heads, Resume und Python-Forward-Pass. |
+| 4 | `93C-Diagnose` claimen: `93C.4`, keine Pilot-Erweiterung. | `93C-Learner` schreibt echte Artefakte. | KL/Entropy/Clip/Value/Grad-Norm, Reward-/Death-/Terminal-/Safety-Matrix und BT73/BT80C/JS-Restschuld im Report. |
+| 5 | `93C-Pilot` claimen: `93C.5.1` bis `93C.5.2`, kleinster Lauf. | `93C-Diagnose` endet ohne Collapse, Reward-Hacking oder Safety-Regression. | `pilot go`, `pilot unsafe` oder `diagnose: throughput insufficient`; noch keine Baseline. |
+| 6 | Erst bei `pilot go`: `93C.5.3` und `93C.6` fuer konservative Baseline und DQN-Vorvergleich claimen. | Pilot gruen, feste Matrix, direkte Env-Evidence. | PPO/DQN-Vorvergleich mit Holdout; Ergebnis `ppo-promising`, `ppo-hold`, `ppo-diagnose` oder `ppo-regression`. |
+| 7 | Nur bei echtem Modellpaket und belastbarem Vorvergleich: `93C.7` Handover. | Baseline und Vergleich sind reproduzierbar. | `BT94A-ready` oder ehrliches `diagnose`; kein Rollout-Signal. |
 
 No-Go vor Bot-Training:
 
-- Kein `baseline`-, `pilot`- oder Langlauf, solange `freezeOk=true`, Clean-Env, Action-Surface und Startmanifest fehlen.
+- Kein `baseline`-, `pilot`- oder Langlauf, solange `freezeOk=true`, Clean-Env, Action-Surface und Startmanifest nicht belegt sind.
 - Kein `4-Env`, solange keine direkte 4-Env-Evidence vorliegt.
 - Keine Rollout- oder JS-Runtime-Integration vor BT95 plus separatem Rollout-Block.
+- Kein `promote`, solange `BT80C 80.9.3` oder gleichwertige produktionsnahe Validation nicht gruen ist.
+- Kein BT94A-Start, solange BT93C nur Scaffold-, Pilot- oder Diagnose-Evidence liefert.
 
 ## Backlog (priorisiert)
 

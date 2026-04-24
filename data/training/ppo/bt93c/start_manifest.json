@@ -1,0 +1,145 @@
+{
+  "manifestVersion": "bt93c-start-v1",
+  "generatedAt": "2026-04-24T14:34:09.425087Z",
+  "generatedBy": "python/scripts/bt93c_audit_readiness.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.0.5",
+  "claim": "93C-Audit",
+  "git": {
+    "headCommit": "e7d294f55bbeec1f3f6ee778d777a8315571f68c",
+    "freezeSnapshotCommit": "4a9962a6cb096f5895a451c7b1276564f3d4ffa6"
+  },
+  "learnerStartSignal": {
+    "freezeOk": true,
+    "reAuditRequired": false,
+    "status": "go-after-93C.1-and-93C.2",
+    "blockedUntil": [
+      "93C.1 PPO dependency and clean-env gate",
+      "93C.2 SB3-compatible action surface gate"
+    ],
+    "noGoBefore": [
+      "no pilot or baseline before 93C.3 and 93C.4",
+      "no 4-env before direct 4-env evidence",
+      "no runtime or JS inference integration in BT93C"
+    ]
+  },
+  "dqnChampion": {
+    "championBlock": "BT11",
+    "referenceBlock": "BT20",
+    "source": "docs/bot-training/Bot_Trainingsplan.md BT80C scope and DoD.2",
+    "status": "frozen-for-comparison-planning",
+    "productionValidationRestblocker": "BT80C 80.9.3 remains open; promotion/rollout stays blocked.",
+    "comparisonUse": "Only 93C.6 may run the DQN/PPO pre-comparison on the fixed matrix."
+  },
+  "semanticWindow": {
+    "modeId": "runtime-near-headless-v1",
+    "freezeDate": "2026-04-23",
+    "snapshotPath": "docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md",
+    "authorityFiles": [
+      "src/entities/ai/training/TrainingContractV1.js",
+      "src/entities/ai/training/TrainerPayloadAdapter.js",
+      "src/entities/ai/observation/ObservationSchemaV2.js",
+      "src/entities/ai/actions/BotActionContract.js"
+    ],
+    "adjacentFiles": [
+      "src/state/training/TrainingDomain.js",
+      "src/entities/ai/observation/RuntimeNearObservationAdapter.js",
+      "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
+      "src/state/training/EpisodeController.js"
+    ]
+  },
+  "matrix": {
+    "matrixId": "bt93c-learner-smoke-start-v1",
+    "scope": "first real learner smoke only; no baseline and no promotion",
+    "envCount": 2,
+    "maxValidatedEnvCount": 2,
+    "fourEnvStatus": "locked-until-direct-4env-evidence",
+    "train": {
+      "modeId": "runtime-near-headless-v1",
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "seeds": [
+        930,
+        931
+      ]
+    },
+    "eval": {
+      "modeId": "runtime-near-headless-v1",
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "seeds": [
+        940,
+        941
+      ]
+    },
+    "holdout": {
+      "modeId": "runtime-near-headless-v1",
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "seeds": [
+        950,
+        951
+      ],
+      "status": "reserved-for-93C.6; not consumed by learner smoke"
+    }
+  },
+  "budget": {
+    "sourceArtifact": "data/training/ppo/bt93b_scaffold_plan.json",
+    "measuredStepsPerSecond": 58.740111449952536,
+    "failureRate": 0.0,
+    "targetUpdateWindowSeconds": 15,
+    "learnerSmokeRolloutStepsTotal": 768,
+    "nStepsPerEnv": 384,
+    "batchSize": 128,
+    "selectionRule": "nearest lower 64-step bucket under the measured BT93A 15s rollout ceiling"
+  },
+  "abortRules": [
+    "freezeOk=false or reAuditRequired=true",
+    "BT93B consistency ok=false",
+    "clean env, pip check, import smoke, or mini train smoke fails",
+    "action surface cannot be trained by SB3 without sanitizer-only fallback",
+    "failureRate > 0.05 or timeoutRatePerRequest > 0",
+    "runtime, match-start, AI-Hub, or JS inference surfaces would need changes"
+  ],
+  "allowedArtifactPaths": [
+    "data/training/ppo/bt93c/**",
+    "python/configs/**",
+    "python/requirements*.txt"
+  ],
+  "readOnlyRuntimeSurfaces": [
+    "src/state/HeadlessMatchKernelRuntime.js",
+    "src/core/MatchKernelTrainingAdapter.js",
+    "src/entities/ai/training/TrainingTransportFacade.js",
+    "src/entities/ai/training/WebSocketTrainerBridge.js",
+    "src/entities/ai/ObservationBridgePolicy.js",
+    "src/core/RuntimeConfig.js",
+    "src/entities/ai/BotPolicyRegistry.js",
+    "src/entities/ai/BotPolicyTypes.js",
+    "src/entities/ai/inference/LocalDqnInference.js",
+    "src/state/training/RewardCalculator.js",
+    "src/entities/ai/hybrid/HybridDecisionArchitecture.js"
+  ],
+  "scaffoldStatus": {
+    "bt93bScaffoldOnly": true,
+    "promotionAllowed": false,
+    "bt94aGate": "closed",
+    "checks": {
+      "stableManifestMatch": true,
+      "budgetMatch": true,
+      "policySurfaceMatch": true,
+      "resumeConsumesFreshCheckpoint": true,
+      "freshNormalizationJsonPickleMatch": true,
+      "resumeNormalizationJsonPickleMatch": true,
+      "eventStreamsClosed": true,
+      "scopeGuardrailsMatch": true,
+      "runtimeSurfacesUntouched": true,
+      "noPromotionClaim": true
+    }
+  }
+}
