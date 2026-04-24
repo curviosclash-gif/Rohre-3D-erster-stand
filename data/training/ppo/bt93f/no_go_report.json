@@ -1,0 +1,83 @@
+{
+  "active": true,
+  "blockId": "BT93F",
+  "closureCapableEvidenceOnly": [
+    "versioned data/** artifacts with immutable run IDs and hashes",
+    "versioned docs/** error or handover reports",
+    "commands recorded in BT93F plan evidence"
+  ],
+  "conditionsToLift": [
+    "data/training/ppo/bt94a/no_start_gate.json resultClass=claimable",
+    "claimable=true",
+    "candidateRunsAllowed=true",
+    "matrixDefinitionAllowed=true",
+    "bt94aHandover.ready=true",
+    "precomparison_report.json.resultClass != ppo-regression",
+    "summary.bt94a-blocker=0 or bt94aBlockerCount=0",
+    "candidateFreezeAllowed remains false until 94A.3"
+  ],
+  "gateState": {
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "redClaimChecks": [
+      {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93e",
+        "ok": false,
+        "required": "ready=true"
+      },
+      {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 5,
+        "ok": false,
+        "required": 0
+      }
+    ],
+    "resultClass": "blocked-no-start"
+  },
+  "generatedAt": "2026-04-24T23:18:53Z",
+  "generatedBy": "python/scripts/bt93f_start_repair_contract.py",
+  "gitSha": "c4b2007da1b9b43a1e9b90e5714caafdb47bf5ac",
+  "ok": true,
+  "phaseId": "93F.1.4",
+  "prohibitedEvidenceSources": [
+    "data/bot_validation_report.json",
+    "tmp/**",
+    "latest_* pointers without immutable run IDs and hashes",
+    "plan-grep or self-count evidence",
+    "BT93B scaffold reports"
+  ],
+  "prohibitedResultLabels": [
+    "candidate",
+    "freeze-candidate",
+    "promote",
+    "rollout-ready",
+    "BT94B-ready"
+  ],
+  "reason": "BT94A remains closed while no_start_gate.json is red.",
+  "resultClass": "no-go-active",
+  "sourcePackage": {
+    "closureCapable": true,
+    "path": "data/training/ppo/bt93f/start_repair_package.json",
+    "role": "BT93F start repair package",
+    "sha256": "da0c571e494a42af93ea83165a160ea1109640e0e77f95275517b47b6b875e4a"
+  }
+}
