@@ -1,0 +1,141 @@
+{
+  "blockId": "BT93E",
+  "bt94aBlockerCount": 5,
+  "candidateFreezeAllowed": false,
+  "candidateRunsAllowed": false,
+  "claimChecks": [
+    {
+      "blocksStart": true,
+      "id": "bt93c_result_allows_bt94a",
+      "observed": "diagnose",
+      "ok": false,
+      "required": "not diagnose"
+    },
+    {
+      "blocksStart": true,
+      "id": "handover_gate_ready",
+      "observed": "closed-diagnose-blocked-by-bt93d",
+      "ok": false,
+      "required": "ready=true"
+    },
+    {
+      "blocksStart": true,
+      "id": "precomparison_not_regression",
+      "observed": "ppo-regression",
+      "ok": false,
+      "required": "not ppo-regression"
+    },
+    {
+      "blocksStart": true,
+      "id": "no_open_bt94a_audit_blockers",
+      "observed": 5,
+      "ok": false,
+      "required": 0
+    }
+  ],
+  "claimable": false,
+  "generatedAt": "2026-04-24T22:10:15Z",
+  "generatedBy": "python/scripts/bt93e_start_truth.py",
+  "gitSha": "9729cd9ee83883d3dc8ab6ef6dd97d97b11e1302",
+  "guardrails": {
+    "allowedSidecarPaths": [
+      "python/**",
+      "data/training/ppo/bt93d/**",
+      "data/training/ppo/bt93c/**",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md"
+    ],
+    "candidateRun": false,
+    "forbiddenWork": [
+      "BT94A candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promote or rollout-ready verdicts",
+      "JS inference, runtime strategy flag, registry, rollback, or latency activation",
+      "productive runtime, matchstart, or AI-Hub surface changes"
+    ],
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "readOnlyRuntimeSurfaces": [
+      "ObservationBridgePolicy",
+      "RuntimeConfig",
+      "BotPolicyRegistry",
+      "BotPolicyTypes",
+      "LocalDqnInference",
+      "HybridDecisionArchitecture",
+      "RewardCalculator",
+      "MatchSessionFactory"
+    ],
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "matrixDefinitionAllowed": false,
+  "noStartDecision": {
+    "allowedWork": [
+      "record gate status",
+      "carry blockers into plan/evidence"
+    ],
+    "forbiddenWork": [
+      "candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promotion or rollout signal"
+    ],
+    "reason": "BT93D propagated still-blocking F.05/F.19/F.27/F.30/F.31 evidence; BT94A remains closed.",
+    "status": "BT94A remains closed before 94A.1"
+  },
+  "ok": true,
+  "phaseId": "93E.1.2",
+  "pinnedValues": {
+    "bt94aHandoverGate": "closed-diagnose-blocked-by-bt93d",
+    "bt94aHandoverReady": false,
+    "handoverResultClass": "diagnose",
+    "precomparisonResultClass": "ppo-regression",
+    "summary.bt94a-blocker": 5,
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "redClaimChecks": [
+    {
+      "blocksStart": true,
+      "id": "bt93c_result_allows_bt94a",
+      "observed": "diagnose",
+      "ok": false,
+      "required": "not diagnose"
+    },
+    {
+      "blocksStart": true,
+      "id": "handover_gate_ready",
+      "observed": "closed-diagnose-blocked-by-bt93d",
+      "ok": false,
+      "required": "ready=true"
+    },
+    {
+      "blocksStart": true,
+      "id": "precomparison_not_regression",
+      "observed": "ppo-regression",
+      "ok": false,
+      "required": "not ppo-regression"
+    },
+    {
+      "blocksStart": true,
+      "id": "no_open_bt94a_audit_blockers",
+      "observed": 5,
+      "ok": false,
+      "required": 0
+    }
+  ],
+  "resultClass": "blocked-no-start",
+  "sourceGate": {
+    "closureCapable": true,
+    "path": "data/training/ppo/bt94a/no_start_gate.json",
+    "role": "BT94A gate report refreshed during 93E.1.2",
+    "sha256": "83fcc312dd935a24cfdf56c4b35934ac070c810bc35282d3052e21348855750e"
+  }
+}

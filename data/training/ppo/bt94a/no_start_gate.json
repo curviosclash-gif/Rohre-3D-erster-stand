@@ -87,9 +87,9 @@
     }
   ],
   "claimable": false,
-  "generatedAt": "2026-04-24T21:43:02Z",
+  "generatedAt": "2026-04-24T22:10:12Z",
   "generatedBy": "python/scripts/bt94a_gate_check.py",
-  "gitSha": "79739fa494a82c98c34bd89616bb54f0d66cf504",
+  "gitSha": "9729cd9ee83883d3dc8ab6ef6dd97d97b11e1302",
   "matrixDefinitionAllowed": false,
   "nextGate": {
     "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",

@@ -1,0 +1,327 @@
+{
+  "blockId": "BT93E",
+  "carryForwardPrerequisites": {
+    "actionSurface": {
+      "ok": true,
+      "resultClass": null,
+      "source": "data/training/ppo/bt93c/action_surface_smoke.json"
+    },
+    "baseline": {
+      "baselineEvalRunId": "20260424T180054Z-baseline-eval",
+      "baselineId": "bt93c-ppo-baseline-publish-v1",
+      "baselineRunId": "20260424T180033Z-baseline-train",
+      "holdoutEvalRunId": "20260424T184311Z-holdout-eval",
+      "ok": true,
+      "resultClass": "baseline go"
+    },
+    "baselineReport": {
+      "resultClass": "baseline go",
+      "source": "data/training/ppo/bt93c/baseline_report.json"
+    },
+    "cleanEnv": {
+      "ok": true,
+      "requirementsSha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52",
+      "source": "data/training/ppo/bt93c/clean_env_smoke_report.json"
+    },
+    "dependencyLock": {
+      "cleanEnvRequirementsSha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52",
+      "importSmokeOk": true,
+      "installRequirementsOk": true,
+      "minimalPpoTrainStartOk": true,
+      "ok": true,
+      "pipCheckOk": true,
+      "requirements": "python/requirements-ppo.txt",
+      "requirementsSha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52"
+    },
+    "dqnChampion": {
+      "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
+      "ok": true,
+      "semanticWindow": {
+        "bt93cLearner": "runtime-near-headless-v1",
+        "comparisonCaveat": "93C.6 must disclose any semantic drift before PPO/DQN comparison.",
+        "dqnChampion": "BT11 legacy DQN champion window"
+      },
+      "strictApplesToApples": false
+    },
+    "evidenceQuality": {
+      "bt94aStoppers": [
+        "F.05",
+        "F.19",
+        "F.27",
+        "F.30",
+        "F.31"
+      ],
+      "mutableLatestExcluded": true,
+      "summary": {
+        "bt94a-blocker": 5,
+        "closed": 21,
+        "follow-gated": 11
+      },
+      "tmpOnlyEvidenceExcluded": true
+    },
+    "fourEnv": {
+      "allowed": false,
+      "reason": "direct 4-env evidence is still absent and remains outside BT93E.1 start truth"
+    },
+    "holdout": {
+      "holdoutEvalRunId": "20260424T184311Z-holdout-eval",
+      "noPostOptimization": true,
+      "source": "data/training/ppo/bt93c/precomparison_report.json"
+    },
+    "minimumStatistics": {
+      "abortCriteria": [
+        "runtimeErrorCount > 0",
+        "precomparison resultClass remains ppo-regression",
+        "handover resultClass remains diagnose",
+        "bt94aHandover.ready is not true",
+        "reward rises while averageBotSurvival or avgStepsPerEpisode regresses",
+        "holdout regresses below the non-inferiority threshold",
+        "terminal/death matrix remains max-steps-only",
+        "mask/veto/clamp load hides policy invalid-action burden",
+        "any JS inference, runtime strategy flag, registry, rollback, latency, matchstart, or AI-Hub surface changes appear"
+      ],
+      "blockId": "BT93D",
+      "bt94aStartNonInferiority": {
+        "averageBotSurvivalDeltaPctMinimum": -10.0,
+        "avgStepsPerEpisodeDeltaPctMinimum": -10.0,
+        "dqnAverageBotSurvival": 37.376986,
+        "dqnAvgStepsPerEpisode": 117.525,
+        "holdoutAverageBotSurvivalDeltaPctMinimum": -10.0,
+        "minimumAverageBotSurvival": 33.639287,
+        "minimumAvgStepsPerEpisode": 105.7725,
+        "promotionPlus30PctRemainsBt94BOnly": true
+      },
+      "generatedAt": "2026-04-24T20:27:57Z",
+      "generatedBy": "python/scripts/bt93d_survival_regression_report.py",
+      "holdoutRule": {
+        "holdoutReportedSeparately": true,
+        "holdoutSeedsMustNotBeOptimizedOn": true,
+        "holdoutShareMinimum": 0.25
+      },
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "matrixId": "bt93d-survival-repair-minimum-v1",
+      "minimumEpisodes": {
+        "evalCompletedEpisodes": 6,
+        "holdoutCompletedEpisodes": 4,
+        "rationale": "BT93C/BT93D two-episode checks remain diagnostic; the next start needs median/spread visibility."
+      },
+      "ok": true,
+      "phaseId": "93D.2.4",
+      "requiredStatistics": [
+        "avgStepsPerEpisode",
+        "averageBotSurvival",
+        "medianCompletedEpisodeLength",
+        "stdevCompletedEpisodeLength",
+        "runtimeErrorCount",
+        "failureClasses",
+        "terminalReasonCounts",
+        "deathCauseCounts",
+        "invalidActionRate",
+        "maskRate",
+        "vetoRate",
+        "sanitizerRate"
+      ],
+      "seeds": {
+        "eval": [
+          944,
+          945
+        ],
+        "holdout": [
+          950,
+          951
+        ]
+      },
+      "semanticWindow": "runtime-near-headless-v1",
+      "sourceMatrixId": "bt93c-dqn-ppo-precomparison-v1"
+    },
+    "modelPackage": {
+      "config": {
+        "actualSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+        "expectedSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/config.json"
+      },
+      "model": {
+        "actualSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+        "expectedSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/model.zip"
+      },
+      "ok": true,
+      "optimizerState": {
+        "actualSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+        "expectedSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/optimizer_state.pt"
+      },
+      "runId": "20260424T180033Z-baseline-train",
+      "scaffoldOnly": false,
+      "truePpoModelPackage": true,
+      "vecnormalize": {
+        "actualSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
+        "expectedSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/vecnormalize.pkl"
+      }
+    },
+    "ppoValidateRestDebt": {
+      "mayPromote": false,
+      "nextGate": "BT94B.3",
+      "status": "ppo-validate-missing"
+    },
+    "rolloutBoundary": {
+      "nextGate": "BT95/separate rollout",
+      "productiveRuntimeChanged": false,
+      "rolloutSignal": false,
+      "runtimeSurfacesTouched": []
+    },
+    "semanticWindow": {
+      "baselineSourceLearner": "runtime-near-headless-v1",
+      "modeId": "runtime-near-headless-v1",
+      "ok": true
+    }
+  },
+  "generatedAt": "2026-04-24T22:10:16Z",
+  "generatedBy": "python/scripts/bt93e_start_truth.py",
+  "gitSha": "9729cd9ee83883d3dc8ab6ef6dd97d97b11e1302",
+  "guardrails": {
+    "allowedSidecarPaths": [
+      "python/**",
+      "data/training/ppo/bt93d/**",
+      "data/training/ppo/bt93c/**",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md"
+    ],
+    "candidateRun": false,
+    "forbiddenWork": [
+      "BT94A candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promote or rollout-ready verdicts",
+      "JS inference, runtime strategy flag, registry, rollback, or latency activation",
+      "productive runtime, matchstart, or AI-Hub surface changes"
+    ],
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "readOnlyRuntimeSurfaces": [
+      "ObservationBridgePolicy",
+      "RuntimeConfig",
+      "BotPolicyRegistry",
+      "BotPolicyTypes",
+      "LocalDqnInference",
+      "HybridDecisionArchitecture",
+      "RewardCalculator",
+      "MatchSessionFactory"
+    ],
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseId": "93E.1.3",
+  "resultClass": "carry-forward-pinned",
+  "sourceArtifacts": {
+    "bt93cActionSurface": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/action_surface_smoke.json",
+      "role": "BT93C action-surface smoke",
+      "sha256": "fa844de7cecbcc66e9027264eb631ab8d3dffbd5f15c67f100fd4bf0f646ec18"
+    },
+    "bt93cBaselineReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/baseline_report.json",
+      "role": "BT93C baseline report",
+      "sha256": "3bdd65b5490de6e83df3779c7dba32f05a9aec1bf20b4a5d3d5d774642a29617"
+    },
+    "bt93cCleanEnv": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "role": "BT93C clean-env smoke",
+      "sha256": "be560858b6be8d1c294102af487fef064d35c13831ee27cf62086f56be4fe0d4"
+    },
+    "bt93dMinimumStatistics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "role": "BT93D minimum statistics",
+      "sha256": "73053320a7b2982bb7de583f44d5c062857e7b8935919d05116e03a470dc317c"
+    },
+    "bt93dRepairManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/repair_manifest.json",
+      "role": "BT93D repair manifest",
+      "sha256": "89bc30fe0010235ee7df1ecdbfd1fe592389ca23995f4d7ca29eec3adc017201"
+    },
+    "bt93dStartGatePackage": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/start_gate_package.json",
+      "role": "BT93D start gate package",
+      "sha256": "9c0c18185c2f3ced915a733aa3f8022a08135c8e3fdd3795add762be2e93f8a2"
+    },
+    "bt93dSurvivalRegression": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/survival_regression_report.json",
+      "role": "BT93D survival regression",
+      "sha256": "019bb8333a3e8c748fbad09e10d119c496a5595657b29fc57e97f65864a5b508"
+    },
+    "bt93dTerminalPolicyDiagnostics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "role": "BT93D terminal and policy diagnostics",
+      "sha256": "632995ae2f3f4bb7fdbd4e946395387aca2a0a7e5c92422cf7dadbd3a9e17a02"
+    },
+    "bt94aGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A gate check",
+      "sha256": "83fcc312dd935a24cfdf56c4b35934ac070c810bc35282d3052e21348855750e"
+    },
+    "evidenceQualityMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "role": "BT93C/BT93D evidence matrix",
+      "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c"
+    },
+    "handoverReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "role": "BT93C/BT93D handover",
+      "sha256": "d18ab47e09edc4fc0d591cc8281f6d046ad821323661d2b4c5dfef84ae15df64"
+    },
+    "precomparisonReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "BT93C/BT93D precomparison",
+      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621"
+    }
+  },
+  "summary": {
+    "allRequiredStartValuesGreen": false,
+    "blockedPrerequisites": [
+      "bt94a_gate_report",
+      "candidate_runs_allowed",
+      "matrix_definition_allowed",
+      "handover_result",
+      "handover_gate",
+      "precomparison",
+      "audit_blockers",
+      "f05_survival_first",
+      "f19_terminal_death_diagnostics",
+      "f27_dqn_ppo_comparison",
+      "f30_mask_clamp_load",
+      "f31_natural_terminal_matrix",
+      "evidence_quality",
+      "governance_gates"
+    ],
+    "freshnessOk": {
+      "baseline": true,
+      "dependencyLock": true,
+      "dqnChampion": true,
+      "modelPackage": true,
+      "semanticWindow": true,
+      "v101": true
+    }
+  }
+}

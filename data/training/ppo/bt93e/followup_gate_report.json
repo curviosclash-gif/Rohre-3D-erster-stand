@@ -1,0 +1,365 @@
+{
+  "blockId": "BT93E",
+  "carriedOutsideBt93e": [
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "freeze allowance must stay red",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "G.04",
+      "nextGate": "94A.3",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and keep next gate 94A.3 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "94B.3"
+      ],
+      "blocker": "PPO-Validate is missing",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.06",
+      "nextGate": "BT94B.3",
+      "reproduction": "inspect 94B.3 and keep next gate BT94B.3 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93c/baseline_report.json"
+      ],
+      "blocker": "direct 4-env evidence is missing",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.07",
+      "nextGate": "94A/94B",
+      "reproduction": "inspect data/training/ppo/bt93c/baseline_report.json and keep next gate 94A/94B explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/minimum_start_statistics.json"
+      ],
+      "blocker": "three runs alone are weak",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.13",
+      "nextGate": "94B.1/94B.2",
+      "reproduction": "inspect data/training/ppo/bt93d/minimum_start_statistics.json and keep next gate 94B.1/94B.2 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "94B.3"
+      ],
+      "blocker": "legacy bot:validate is not PPO-Validate",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.14",
+      "nextGate": "BT94B.3",
+      "reproduction": "inspect 94B.3 and keep next gate BT94B.3 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "BT95/separate rollout"
+      ],
+      "blocker": "runtime handoff is missing",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.15",
+      "nextGate": "BT95",
+      "reproduction": "inspect BT95/separate rollout and keep next gate BT95 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      ],
+      "blocker": "runtime/failure classes must be mapped",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.18",
+      "nextGate": "93E.3/94B.3",
+      "reproduction": "inspect data/training/ppo/bt93d/terminal_policy_diagnostics.json and keep next gate 93E.3/94B.3 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      ],
+      "blocker": "shutdown/teardown failures are not long-run proof",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.24",
+      "nextGate": "94A/94B",
+      "reproduction": "inspect data/training/ppo/bt93d/terminal_policy_diagnostics.json and keep next gate 94A/94B explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93c/precomparison_report.json"
+      ],
+      "blocker": "internal eval survival is not PPO-Validate",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.28",
+      "nextGate": "BT94B.3",
+      "reproduction": "inspect data/training/ppo/bt93c/precomparison_report.json and keep next gate BT94B.3 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/minimum_start_statistics.json"
+      ],
+      "blocker": "small timesteps/eval steps have weak power",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.32",
+      "nextGate": "94A.1/94B.1",
+      "reproduction": "inspect data/training/ppo/bt93d/minimum_start_statistics.json and keep next gate 94A.1/94B.1 explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      ],
+      "blocker": "short smokes are not long-run stability proof",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.36",
+      "nextGate": "94A/94B",
+      "reproduction": "inspect data/training/ppo/bt93d/terminal_policy_diagnostics.json and keep next gate 94A/94B explicit",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "affectedArtifacts": [
+        "94B.3"
+      ],
+      "blocker": "PPO-Validate build location is missing",
+      "forbiddenWorkaround": "do not use this carried debt as BT94A, promotion, PPO-Validate, or rollout evidence",
+      "id": "F.37",
+      "nextGate": "BT94B.3",
+      "reproduction": "inspect 94B.3 and keep next gate BT94B.3 explicit",
+      "status": "not-start-blocking-carried"
+    }
+  ],
+  "generatedAt": "2026-04-24T22:10:16Z",
+  "generatedBy": "python/scripts/bt93e_start_truth.py",
+  "gitSha": "9729cd9ee83883d3dc8ab6ef6dd97d97b11e1302",
+  "guardrails": {
+    "allowedSidecarPaths": [
+      "python/**",
+      "data/training/ppo/bt93d/**",
+      "data/training/ppo/bt93c/**",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md"
+    ],
+    "candidateRun": false,
+    "forbiddenWork": [
+      "BT94A candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promote or rollout-ready verdicts",
+      "JS inference, runtime strategy flag, registry, rollback, or latency activation",
+      "productive runtime, matchstart, or AI-Hub surface changes"
+    ],
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "readOnlyRuntimeSurfaces": [
+      "ObservationBridgePolicy",
+      "RuntimeConfig",
+      "BotPolicyRegistry",
+      "BotPolicyTypes",
+      "LocalDqnInference",
+      "HybridDecisionArchitecture",
+      "RewardCalculator",
+      "MatchSessionFactory"
+    ],
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "openBt93eRepairScope": [
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "BT94A gate report is red",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "G.01",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "candidate run allowance is red",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "G.02",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "matrix definition allowance is red",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "G.03",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93c/handover_report.json"
+      ],
+      "blocker": "handover result is diagnose",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "G.05",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt93c/handover_report.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93c/handover_report.json"
+      ],
+      "blocker": "handover gate is closed",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "G.06",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt93c/handover_report.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93c/precomparison_report.json"
+      ],
+      "blocker": "precomparison is ppo-regression",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "G.07",
+      "nextGate": "93E.2",
+      "reproduction": "inspect data/training/ppo/bt93c/precomparison_report.json and rerun the mapped BT93E repair phase 93E.2",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93c/evidence_quality_matrix.json"
+      ],
+      "blocker": "audit blockers are open",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "G.08",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt93c/evidence_quality_matrix.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "bt93c_result_allows_bt94a is red",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "C.01",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "handover_gate_ready is red",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "C.02",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "precomparison_not_regression is red",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "C.03",
+      "nextGate": "93E.2",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and rerun the mapped BT93E repair phase 93E.2",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt94a/no_start_gate.json"
+      ],
+      "blocker": "no_open_bt94a_audit_blockers is red",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "C.04",
+      "nextGate": "93E.5",
+      "reproduction": "inspect data/training/ppo/bt94a/no_start_gate.json and rerun the mapped BT93E repair phase 93E.5",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/survival_regression_report.json"
+      ],
+      "blocker": "Survival-First is not proven; PPO regresses",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "F.05",
+      "nextGate": "93E.2",
+      "reproduction": "inspect data/training/ppo/bt93d/survival_regression_report.json and rerun the mapped BT93E repair phase 93E.2",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      ],
+      "blocker": "terminal/death diagnostics are insufficient",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "F.19",
+      "nextGate": "93E.3",
+      "reproduction": "inspect data/training/ppo/bt93d/terminal_policy_diagnostics.json and rerun the mapped BT93E repair phase 93E.3",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/survival_regression_report.json"
+      ],
+      "blocker": "DQN/PPO comparison remains ppo-regression",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "F.27",
+      "nextGate": "93E.2",
+      "reproduction": "inspect data/training/ppo/bt93d/survival_regression_report.json and rerun the mapped BT93E repair phase 93E.2",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      ],
+      "blocker": "policy-level mask missing; clamp/veto hides policy load",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "F.30",
+      "nextGate": "93E.4",
+      "reproduction": "inspect data/training/ppo/bt93d/terminal_policy_diagnostics.json and rerun the mapped BT93E repair phase 93E.4",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      ],
+      "blocker": "natural terminal matrix is weak",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "F.31",
+      "nextGate": "93E.3",
+      "reproduction": "inspect data/training/ppo/bt93d/terminal_policy_diagnostics.json and rerun the mapped BT93E repair phase 93E.3",
+      "status": "still-blocking"
+    },
+    {
+      "affectedArtifacts": [
+        "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      ],
+      "blocker": "reward rises while survival worsens",
+      "forbiddenWorkaround": "do not mark BT94A claimable from plan text, tmp output, latest pointers, or promotion wording",
+      "id": "R.01",
+      "nextGate": "93E.3",
+      "reproduction": "inspect data/training/ppo/bt93d/terminal_policy_diagnostics.json and rerun the mapped BT93E repair phase 93E.3",
+      "status": "still-blocking"
+    }
+  ],
+  "phaseId": "93E.1.4",
+  "resultClass": "followup-gates-pinned"
+}

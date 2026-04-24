@@ -1,0 +1,861 @@
+{
+  "blockId": "BT93E",
+  "entries": [
+    {
+      "evidence": "BT94A gate report is red",
+      "finding": "BT94A gate report is red",
+      "id": "G.01",
+      "nextGate": "93E.5",
+      "observed": {
+        "claimable": false,
+        "resultClass": "blocked-no-start"
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "resultClass=claimable and claimable=true",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "candidate run allowance is red",
+      "finding": "candidate run allowance is red",
+      "id": "G.02",
+      "nextGate": "93E.5",
+      "observed": {
+        "candidateRunsAllowed": false
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "candidateRunsAllowed=true, usable only in BT94A",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "matrix definition allowance is red",
+      "finding": "matrix definition allowance is red",
+      "id": "G.03",
+      "nextGate": "93E.5",
+      "observed": {
+        "matrixDefinitionAllowed": false
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "matrixDefinitionAllowed=true",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "freeze allowance must stay red",
+      "finding": "freeze allowance must stay red",
+      "id": "G.04",
+      "nextGate": "94A.3",
+      "observed": {
+        "candidateFreezeAllowed": false
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "candidateFreezeAllowed=false until 94A.3",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "handover result is diagnose",
+      "finding": "handover result is diagnose",
+      "id": "G.05",
+      "nextGate": "93E.5",
+      "observed": {
+        "handoverResultClass": "diagnose"
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/handover_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/handover_report.json",
+      "requiredBeforeBt94a1": "handover result is not diagnose or is hard follow-gated",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "handover gate is closed",
+      "finding": "handover gate is closed",
+      "id": "G.06",
+      "nextGate": "93E.5",
+      "observed": {
+        "bt94aHandoverReady": false,
+        "gate": "closed-diagnose-blocked-by-bt93d"
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/handover_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/handover_report.json",
+      "requiredBeforeBt94a1": "bt94aHandover.ready=true",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "precomparison is ppo-regression",
+      "finding": "precomparison is ppo-regression",
+      "id": "G.07",
+      "nextGate": "93E.2",
+      "observed": {
+        "precomparisonResultClass": "ppo-regression"
+      },
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/precomparison_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/precomparison_report.json",
+      "requiredBeforeBt94a1": "precomparison_report.json.resultClass != ppo-regression",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "audit blockers are open",
+      "finding": "audit blockers are open",
+      "id": "G.08",
+      "nextGate": "93E.5",
+      "observed": {
+        "bt94aBlockerCount": 5
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "summary.bt94a-blocker=0",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "bt93c_result_allows_bt94a is red",
+      "finding": "bt93c_result_allows_bt94a is red",
+      "id": "C.01",
+      "nextGate": "93E.5",
+      "observed": {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "claim check green",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "handover_gate_ready is red",
+      "finding": "handover_gate_ready is red",
+      "id": "C.02",
+      "nextGate": "93E.5",
+      "observed": {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93d",
+        "ok": false,
+        "required": "ready=true"
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "claim check green",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "precomparison_not_regression is red",
+      "finding": "precomparison_not_regression is red",
+      "id": "C.03",
+      "nextGate": "93E.2",
+      "observed": {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "claim check green",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "no_open_bt94a_audit_blockers is red",
+      "finding": "no_open_bt94a_audit_blockers is red",
+      "id": "C.04",
+      "nextGate": "93E.5",
+      "observed": {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 5,
+        "ok": false,
+        "required": 0
+      },
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt94a/no_start_gate.json",
+      "referenceArtifact": "data/training/ppo/bt94a/no_start_gate.json",
+      "requiredBeforeBt94a1": "claim check green",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "real PPO optimizer updates and model package exist",
+      "finding": "real PPO learner must not regress to scaffold-only",
+      "id": "F.01",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/handover_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/handover_report.json",
+      "requiredBeforeBt94a1": "real model package and optimizer update revalidated",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "requirements, clean env, pip check, and import smoke are versioned",
+      "finding": "dependency pins and clean env must not be ambient",
+      "id": "F.02",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "requiredBeforeBt94a1": "lock, pip check, and import smoke remain valid",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "SB3 MultiDiscrete action surface is train/eval compatible",
+      "finding": "action surface must be SB3-trainable",
+      "id": "F.03",
+      "nextGate": "93E.4",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/action_surface_smoke.json",
+      "referenceArtifact": "data/training/ppo/bt93c/action_surface_smoke.json",
+      "requiredBeforeBt94a1": "train/eval path uses real action surface",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "model, optimizer, VecNormalize, config, and hashes are persisted",
+      "finding": "normalize, optimizer state, and heads must remain real",
+      "id": "F.04",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "referenceArtifact": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "requiredBeforeBt94a1": "load/resume/hash revalidated",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "BT93D fresh eval/holdout reproduces survival regression (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
+      "finding": "Survival-First is not proven; PPO regresses",
+      "id": "F.05",
+      "nextGate": "93E.2",
+      "observed": {
+        "averageBotSurvivalPct": -57.19291,
+        "avgStepsPerEpisodePct": -86.385875,
+        "holdoutAverageBotSurvivalPct": -57.19291,
+        "resultClass": "ppo-regression"
+      },
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93d/survival_regression_report.json",
+      "referenceArtifact": "data/training/ppo/bt93d/survival_regression_report.json",
+      "requiredBeforeBt94a1": "PPO survival/steps on same matrix are not regressive or are downgated with evidence",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "PPO-Validate must be built before any promote verdict",
+      "finding": "PPO-Validate is missing",
+      "id": "F.06",
+      "nextGate": "BT94B.3",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "94B.3",
+      "referenceArtifact": "94B.3",
+      "requiredBeforeBt94a1": "visible BT94B.3 rest debt, no promote bypass",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "4-env remains locked without direct evidence",
+      "finding": "direct 4-env evidence is missing",
+      "id": "F.07",
+      "nextGate": "94A/94B",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/baseline_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/baseline_report.json",
+      "requiredBeforeBt94a1": "4-env stays locked or direct evidence exists",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "throughput is classified as budget/stability evidence only",
+      "finding": "throughput is not learning proof",
+      "id": "F.08",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "reports label throughput as lane/budget evidence only",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "fresh freeze check is green",
+      "finding": "freeze signal must be fresh",
+      "id": "F.09",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/freeze_check.json",
+      "referenceArtifact": "data/training/ppo/freeze_check.json",
+      "requiredBeforeBt94a1": "freeze/freshness artifact stays valid or is regenerated",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "stale artifact/readme contradictions were cleared",
+      "finding": "stale docs and untracked hints",
+      "id": "F.10",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "no stale/untracked start signals",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "tmp-only closure evidence was replaced or demoted",
+      "finding": "tmp is not closure-capable",
+      "id": "F.11",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "versioned evidence for all start claims",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "DQN champion, matrix, semantic window, and holdout are frozen",
+      "finding": "DQN champion, semantic window, and holdout must be fixed",
+      "id": "F.12",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/precomparison_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/precomparison_report.json",
+      "requiredBeforeBt94a1": "champion/matrix/holdout unchanged or newly versioned",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "external candidate statistics need fixed rules before runs",
+      "finding": "three runs alone are weak",
+      "id": "F.13",
+      "nextGate": "94B.1/94B.2",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "requiredBeforeBt94a1": "minimum episodes, spread, median, holdout, non-inferiority fixed",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "PPO-specific validate report is still missing",
+      "finding": "legacy bot:validate is not PPO-Validate",
+      "id": "F.14",
+      "nextGate": "BT94B.3",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "94B.3",
+      "referenceArtifact": "94B.3",
+      "requiredBeforeBt94a1": "PPO-Validate stays its own lane",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "runtime handoff remains doc-only and out of BT93C scope",
+      "finding": "runtime handoff is missing",
+      "id": "F.15",
+      "nextGate": "BT95",
+      "observed": null,
+      "ownerLayer": "architecture",
+      "reference": "BT95/separate rollout",
+      "referenceArtifact": "BT95/separate rollout",
+      "requiredBeforeBt94a1": "stays non-goal until BT95 or separate rollout",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "scaffold, pilot, baseline, and candidate terms are separated",
+      "finding": "baseline term is ambiguous",
+      "id": "F.16",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/baseline_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/baseline_report.json",
+      "requiredBeforeBt94a1": "scaffold, pilot, baseline, and candidate separated",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "eval loads a real PPO model package",
+      "finding": "eval must not be scaffold eval",
+      "id": "F.17",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/precomparison_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/precomparison_report.json",
+      "requiredBeforeBt94a1": "eval loads real model package",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "runtime classes are reported internally; PPO-Validate mapping remains",
+      "finding": "runtime/failure classes must be mapped",
+      "id": "F.18",
+      "nextGate": "93E.3/94B.3",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "requiredBeforeBt94a1": "runtimeErrorCount, crash/timeout/forced/teardown visible",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "BT93D terminal/death matrix remains max-steps-only or incomplete.",
+      "finding": "terminal/death diagnostics are insufficient",
+      "id": "F.19",
+      "nextGate": "93E.3",
+      "observed": {
+        "blockedFindings": [
+          "F.19",
+          "F.30",
+          "F.31",
+          "reward-safety-episode-shortening"
+        ],
+        "findingStatus": "still-blocking"
+      },
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "requiredBeforeBt94a1": "natural terminal/death cases and survival distribution are robust",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "sanitizer, mask, veto, and invalid rates are measured",
+      "finding": "sanitizer/mask/veto rates are gate metrics",
+      "id": "F.20",
+      "nextGate": "93E.4",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "rates are reported in train/eval/holdout",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "draft-risk drift is carried into the quality matrix",
+      "finding": "risk-register drift",
+      "id": "F.21",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "draft and active plan risks aligned",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "governance gates are not treated as learning proof",
+      "finding": "plan:check is not PPO proof",
+      "id": "F.22",
+      "nextGate": "93E.99",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "governance evidence separated from run evidence",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "closure evidence points to artifacts instead of plan self-counts",
+      "finding": "self-count evidence is weak",
+      "id": "F.23",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "concrete artifacts instead of plan grep/self-count",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "short stability smokes remain monitoring, not long-run proof",
+      "finding": "shutdown/teardown failures are not long-run proof",
+      "id": "F.24",
+      "nextGate": "94A/94B",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "requiredBeforeBt94a1": "failure classes continue, not quality proof",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "clean env reproduces the PPO dependency stack",
+      "finding": "ambient venv dependencies",
+      "id": "F.25",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "requiredBeforeBt94a1": "reproducible stack without local random deps",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "exact baseline IDs and metric sources are fixed",
+      "finding": "baseline ambiguity",
+      "id": "F.26",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/baseline_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/baseline_report.json",
+      "requiredBeforeBt94a1": "exact baseline ID with metric source",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "BT93D comparison remains ppo-regression.",
+      "finding": "DQN/PPO comparison remains ppo-regression",
+      "id": "F.27",
+      "nextGate": "93E.2",
+      "observed": {
+        "averageBotSurvivalPct": -57.19291,
+        "avgStepsPerEpisodePct": -86.385875,
+        "holdoutAverageBotSurvivalPct": -57.19291,
+        "resultClass": "ppo-regression"
+      },
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93d/survival_regression_report.json",
+      "referenceArtifact": "data/training/ppo/bt93d/survival_regression_report.json",
+      "requiredBeforeBt94a1": "regression closed, downgraded, or follow-blocked",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "internal eval survival is not PPO-Validate evidence",
+      "finding": "internal eval survival is not PPO-Validate",
+      "id": "F.28",
+      "nextGate": "BT94B.3",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93c/precomparison_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/precomparison_report.json",
+      "requiredBeforeBt94a1": "metric source separated, no validate/promotion claim",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "holdout seeds were consumed and reported",
+      "finding": "holdout was reserved/used, no post-optimization",
+      "id": "F.29",
+      "nextGate": "93E.2",
+      "observed": null,
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93c/precomparison_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/precomparison_report.json",
+      "requiredBeforeBt94a1": "holdout use and non-post-optimization reported",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "BT93D policy-level masking is absent and post-decode clamp/veto load remains high.",
+      "finding": "policy-level mask missing; clamp/veto hides policy load",
+      "id": "F.30",
+      "nextGate": "93E.4",
+      "observed": {
+        "blockedFindings": [
+          "F.19",
+          "F.30",
+          "F.31",
+          "reward-safety-episode-shortening"
+        ],
+        "findingStatus": "still-blocking"
+      },
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "requiredBeforeBt94a1": "policy-mask and post-decode clamp separated; high load blocks",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "BT93D natural terminal/death evidence remains weak.",
+      "finding": "natural terminal matrix is weak",
+      "id": "F.31",
+      "nextGate": "93E.3",
+      "observed": {
+        "blockedFindings": [
+          "F.19",
+          "F.30",
+          "F.31",
+          "reward-safety-episode-shortening"
+        ],
+        "findingStatus": "still-blocking"
+      },
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "requiredBeforeBt94a1": "death/terminal matrix is not empty and not max-steps-only",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    },
+    {
+      "evidence": "larger candidate runs need fixed sample/statistics rules",
+      "finding": "small timesteps/eval steps have weak power",
+      "id": "F.32",
+      "nextGate": "94A.1/94B.1",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "requiredBeforeBt94a1": "minimum statistics fixed and met before start",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "handover references immutable run IDs, hashes, and manifests",
+      "finding": "mutable latest pointer is not freeze evidence",
+      "id": "F.33",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/handover_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/handover_report.json",
+      "requiredBeforeBt94a1": "immutable run IDs, hashes, and manifests",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "V101 follow-up reports no PPO contract drift",
+      "finding": "V101 may have created contract drift",
+      "id": "F.34",
+      "nextGate": "93E.5",
+      "observed": null,
+      "ownerLayer": "architecture",
+      "reference": "data/training/ppo/bt93c/precomparison_report.json",
+      "referenceArtifact": "data/training/ppo/bt93c/precomparison_report.json",
+      "requiredBeforeBt94a1": "V101 follow-up is no-op or blocker",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "docs gates are separated from semantic PPO evidence",
+      "finding": "green governance gate is not PPO proof",
+      "id": "F.35",
+      "nextGate": "93E.99",
+      "observed": null,
+      "ownerLayer": "governance",
+      "reference": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "referenceArtifact": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "requiredBeforeBt94a1": "semantic run/validate evidence separated",
+      "startImpact": "no current BT94A start blocker while referenced hashes remain valid",
+      "status": "closed"
+    },
+    {
+      "evidence": "longer candidate runs must continue failure-class telemetry",
+      "finding": "short smokes are not long-run stability proof",
+      "id": "F.36",
+      "nextGate": "94A/94B",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "requiredBeforeBt94a1": "stability classes continue, no overinterpretation",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "PPO-Validate build location and schema remain a future gate",
+      "finding": "PPO-Validate build location is missing",
+      "id": "F.37",
+      "nextGate": "BT94B.3",
+      "observed": null,
+      "ownerLayer": "qa-ops",
+      "reference": "94B.3",
+      "referenceArtifact": "94B.3",
+      "requiredBeforeBt94a1": "runner/schema/target paths in BT94B.3 hard gate",
+      "startImpact": "carried as explicit rest debt; does not open BT94A and cannot be used as promotion evidence",
+      "status": "not-start-blocking-carried"
+    },
+    {
+      "evidence": "reward rises while survival worsens",
+      "finding": "reward rises while survival worsens",
+      "id": "R.01",
+      "nextGate": "93E.3",
+      "observed": {
+        "blocked": true,
+        "positiveRewardWhileSurvivalRegresses": null
+      },
+      "ownerLayer": "ppo-training",
+      "reference": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "referenceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "requiredBeforeBt94a1": "reward/safety/episode-shortening blocker closed or follow-gated",
+      "startImpact": "blocks BT94A.1 until repaired, downgated, or reclassified by versioned evidence",
+      "status": "still-blocking"
+    }
+  ],
+  "generatedAt": "2026-04-24T22:10:15Z",
+  "generatedBy": "python/scripts/bt93e_start_truth.py",
+  "gitSha": "9729cd9ee83883d3dc8ab6ef6dd97d97b11e1302",
+  "guardrails": {
+    "allowedSidecarPaths": [
+      "python/**",
+      "data/training/ppo/bt93d/**",
+      "data/training/ppo/bt93c/**",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md"
+    ],
+    "candidateRun": false,
+    "forbiddenWork": [
+      "BT94A candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promote or rollout-ready verdicts",
+      "JS inference, runtime strategy flag, registry, rollback, or latency activation",
+      "productive runtime, matchstart, or AI-Hub surface changes"
+    ],
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "readOnlyRuntimeSurfaces": [
+      "ObservationBridgePolicy",
+      "RuntimeConfig",
+      "BotPolicyRegistry",
+      "BotPolicyTypes",
+      "LocalDqnInference",
+      "HybridDecisionArchitecture",
+      "RewardCalculator",
+      "MatchSessionFactory"
+    ],
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseId": "93E.1.1",
+  "resultClass": "start-truth-pinned",
+  "sourceArtifacts": {
+    "bt93cActionSurface": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/action_surface_smoke.json",
+      "role": "BT93C action-surface smoke",
+      "sha256": "fa844de7cecbcc66e9027264eb631ab8d3dffbd5f15c67f100fd4bf0f646ec18"
+    },
+    "bt93cBaselineReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/baseline_report.json",
+      "role": "BT93C baseline report",
+      "sha256": "3bdd65b5490de6e83df3779c7dba32f05a9aec1bf20b4a5d3d5d774642a29617"
+    },
+    "bt93cCleanEnv": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "role": "BT93C clean-env smoke",
+      "sha256": "be560858b6be8d1c294102af487fef064d35c13831ee27cf62086f56be4fe0d4"
+    },
+    "bt93dMinimumStatistics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "role": "BT93D minimum statistics",
+      "sha256": "73053320a7b2982bb7de583f44d5c062857e7b8935919d05116e03a470dc317c"
+    },
+    "bt93dRepairManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/repair_manifest.json",
+      "role": "BT93D repair manifest",
+      "sha256": "89bc30fe0010235ee7df1ecdbfd1fe592389ca23995f4d7ca29eec3adc017201"
+    },
+    "bt93dStartGatePackage": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/start_gate_package.json",
+      "role": "BT93D start gate package",
+      "sha256": "9c0c18185c2f3ced915a733aa3f8022a08135c8e3fdd3795add762be2e93f8a2"
+    },
+    "bt93dSurvivalRegression": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/survival_regression_report.json",
+      "role": "BT93D survival regression",
+      "sha256": "019bb8333a3e8c748fbad09e10d119c496a5595657b29fc57e97f65864a5b508"
+    },
+    "bt93dTerminalPolicyDiagnostics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "role": "BT93D terminal and policy diagnostics",
+      "sha256": "632995ae2f3f4bb7fdbd4e946395387aca2a0a7e5c92422cf7dadbd3a9e17a02"
+    },
+    "bt94aGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A gate check",
+      "sha256": "83fcc312dd935a24cfdf56c4b35934ac070c810bc35282d3052e21348855750e"
+    },
+    "evidenceQualityMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "role": "BT93C/BT93D evidence matrix",
+      "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c"
+    },
+    "handoverReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "role": "BT93C/BT93D handover",
+      "sha256": "d18ab47e09edc4fc0d591cc8281f6d046ad821323661d2b4c5dfef84ae15df64"
+    },
+    "precomparisonReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "BT93C/BT93D precomparison",
+      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621"
+    }
+  },
+  "statusVocabulary": [
+    "closed",
+    "not-start-blocking-carried",
+    "still-blocking",
+    "invalidated-by-new-evidence"
+  ],
+  "summary": {
+    "bt94aBlockerCount": 5,
+    "closed": 21,
+    "not-start-blocking-carried": 12,
+    "redClaimChecks": 4,
+    "still-blocking": 17,
+    "total": 50
+  }
+}
