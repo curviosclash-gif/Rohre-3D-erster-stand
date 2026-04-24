@@ -1,150 +1,103 @@
 {
-  "ok": true,
-  "generatedAt": "2026-04-24T18:43:19Z",
-  "generatedBy": "python/scripts/bt93c_precomparison_report.py",
+  "artifacts": {
+    "config": "python/configs/ppo_bt93c_baseline.json",
+    "configSha256": "8699565e23f61faa71dcb53e7eac0f737bb5ba7409e62feda301c703b857d6cf",
+    "precomparisonReport": "data/training/ppo/bt93c/precomparison_report.json"
+  },
   "blockId": "BT93C",
-  "phaseId": "93C.6",
-  "claim": "93C-DQN-PPO-Precomparison-Holdout",
-  "gitSha": "7b12c3960ff14cccd5663984b6f3eed9666fb3cb",
-  "resultClass": "ppo-regression",
-  "phaseCoverage": {
-    "93C.6.1": true,
-    "93C.6.2": true,
-    "93C.6.3": true,
-    "93C.6.4": true,
-    "93C.6.5": true
+  "bt93dPhaseCoverage": {
+    "93D.4.1": true,
+    "93D.4.2": "pending bt94a_gate_check.py --write-report",
+    "93D.4.3": true,
+    "93D.4.4": "not-applicable-until-green-gate"
   },
-  "v101FollowUp": {
-    "ok": true,
-    "resultClass": "no-ppo-contract-drift",
-    "v101Plan": {
-      "path": "docs/plaene/aktiv/V101.md",
-      "closed": true,
-      "scopeIncludesTrainingSurfaces": true
-    },
-    "freezeCheck": {
-      "path": "data/training/ppo/freeze_check.json",
-      "freezeOk": true,
-      "reAuditRequired": false,
-      "driftCount": 0,
-      "headCommit": "7b12c3960ff14cccd5663984b6f3eed9666fb3cb"
-    },
-    "watchlist": [
-      {
-        "path": "src/entities/ai/training/TrainingContractV1.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "10617ce9d8484e99498d3c0814a4458e1fb00242",
-        "headBlob": "10617ce9d8484e99498d3c0814a4458e1fb00242",
-        "currentBlob": "10617ce9d8484e99498d3c0814a4458e1fb00242",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
+  "bt93dRefresh": {
+    "phaseId": "93D.4.1",
+    "resultClass": "diagnose-blocked",
+    "findingDispositions": {
+      "F.05": {
+        "disposition": "still-blocking",
+        "status": "bt94a-blocker",
+        "gate": "93D.4/BT94A",
+        "evidence": "BT93D fresh eval/holdout reproduces survival regression (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
+        "source": "data/training/ppo/bt93d/survival_regression_report.json"
       },
-      {
-        "path": "src/entities/ai/training/TrainerPayloadAdapter.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "706a7b042d4a267f799006204437948f60d98b6e",
-        "headBlob": "706a7b042d4a267f799006204437948f60d98b6e",
-        "currentBlob": "706a7b042d4a267f799006204437948f60d98b6e",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
+      "F.19": {
+        "disposition": "still-blocking",
+        "status": "bt94a-blocker",
+        "gate": "93D.4/BT94A",
+        "evidence": "BT93D terminal/death matrix remains max-steps-only or incomplete.",
+        "source": "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
       },
-      {
-        "path": "src/entities/ai/observation/ObservationSchemaV2.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "9efd9132ecce0f1ee8a44b4eba669da87f4974d4",
-        "headBlob": "9efd9132ecce0f1ee8a44b4eba669da87f4974d4",
-        "currentBlob": "9efd9132ecce0f1ee8a44b4eba669da87f4974d4",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
+      "F.27": {
+        "disposition": "still-blocking",
+        "status": "bt94a-blocker",
+        "gate": "93D.4/BT94A",
+        "evidence": "BT93D comparison remains ppo-regression.",
+        "source": "data/training/ppo/bt93d/survival_regression_report.json"
       },
-      {
-        "path": "src/entities/ai/actions/BotActionContract.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "14f39b5a3a033987410d91646ae677dd6310168d",
-        "headBlob": "14f39b5a3a033987410d91646ae677dd6310168d",
-        "currentBlob": "14f39b5a3a033987410d91646ae677dd6310168d",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
+      "F.30": {
+        "disposition": "still-blocking",
+        "status": "bt94a-blocker",
+        "gate": "93D.4/BT94A",
+        "evidence": "BT93D policy-level masking is absent and post-decode clamp/veto load remains high.",
+        "source": "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
       },
-      {
-        "path": "src/state/training/TrainingDomain.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
-        "headBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
-        "currentBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
-      },
-      {
-        "path": "src/entities/ai/ObservationBridgePolicy.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "8eff03c7308c5e32c5a4890a02ce93df590f68c7",
-        "headBlob": "8eff03c7308c5e32c5a4890a02ce93df590f68c7",
-        "currentBlob": "8eff03c7308c5e32c5a4890a02ce93df590f68c7",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
-      },
-      {
-        "path": "src/entities/ai/observation/RuntimeNearObservationAdapter.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
-        "headBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
-        "currentBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
-      },
-      {
-        "path": "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "661de8862292b274e94051f286ae1953964efa92",
-        "headBlob": "661de8862292b274e94051f286ae1953964efa92",
-        "currentBlob": "661de8862292b274e94051f286ae1953964efa92",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
-      },
-      {
-        "path": "src/core/RuntimeConfig.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "3a120a0455f57bd4b6eeed1c06b29828ddd892af",
-        "headBlob": "3a120a0455f57bd4b6eeed1c06b29828ddd892af",
-        "currentBlob": "3a120a0455f57bd4b6eeed1c06b29828ddd892af",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
-      },
-      {
-        "path": "src/state/training/RewardCalculator.js",
-        "worktreeStatus": "clean",
-        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-        "baselineBlob": "46810f39ea0e6e102884a0dcb9f7236ed05a41f0",
-        "headBlob": "46810f39ea0e6e102884a0dcb9f7236ed05a41f0",
-        "currentBlob": "46810f39ea0e6e102884a0dcb9f7236ed05a41f0",
-        "changedSinceBaselineCommit": false,
-        "worktreeDirty": false
+      "F.31": {
+        "disposition": "still-blocking",
+        "status": "bt94a-blocker",
+        "gate": "93D.4/BT94A",
+        "evidence": "BT93D natural terminal/death evidence remains weak.",
+        "source": "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
       }
-    ],
-    "driftPaths": [],
-    "conclusion": "V101 is closed and no watched PPO authority/runtime-near surface drifted since the BT93C baseline commit."
+    },
+    "terminalPolicyResultClass": "diagnose-blocked",
+    "survivalRegressionResultClass": "survival-regression-reproduced"
   },
+  "claim": "93D-BT94A-Startfreigabe-Paket",
   "comparisonMatrix": {
-    "matrixId": "bt93c-dqn-ppo-precomparison-v1",
-    "modeId": "runtime-near-headless-v1",
-    "maps": [
-      "standard",
-      "maze"
-    ],
-    "trainSeeds": [
-      934,
-      935
-    ],
+    "dqnChampion": {
+      "artifactPaths": [
+        {
+          "path": "docs/tests/Testergebnisse_Phase4b_2026-03-24.md",
+          "role": "versioned rounded bot-validation survival summary",
+          "versioned": true
+        },
+        {
+          "path": "docs/bot-training/Bot_Trainingsplan.md",
+          "role": "active plan stores exact BT11 checkpoint metrics",
+          "versioned": true
+        },
+        {
+          "path": "output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log",
+          "role": "historical command log referenced by plan; not closure evidence by itself",
+          "versioned": false
+        }
+      ],
+      "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
+      "command": "npm run training:10h -- --series-stamp BT11_FIGHT_20260324T014853 --modes hunt-3d,hunt-2d --stop-on-fail false; npm run bot:validate",
+      "date": "2026-03-24",
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "modes": {
+        "botValidateScenarios": [
+          "classic-3d",
+          "classic-2d"
+        ],
+        "trainingRun": [
+          "hunt-3d",
+          "hunt-2d"
+        ]
+      },
+      "role": "DQN champion comparison anchor, not a PPO baseline",
+      "semanticWindow": {
+        "bt93cLearner": "runtime-near-headless-v1",
+        "comparisonCaveat": "93C.6 must disclose any semantic drift before PPO/DQN comparison.",
+        "dqnChampion": "BT11 legacy DQN champion window"
+      }
+    },
     "evalSeeds": [
       944,
       945
@@ -160,125 +113,21 @@
       "PPO-Validate is required before any promote or rollout signal",
       "4-env remains locked without direct evidence"
     ],
-    "dqnChampion": {
-      "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
-      "role": "DQN champion comparison anchor, not a PPO baseline",
-      "date": "2026-03-24",
-      "command": "npm run training:10h -- --series-stamp BT11_FIGHT_20260324T014853 --modes hunt-3d,hunt-2d --stop-on-fail false; npm run bot:validate",
-      "modes": {
-        "trainingRun": [
-          "hunt-3d",
-          "hunt-2d"
-        ],
-        "botValidateScenarios": [
-          "classic-3d",
-          "classic-2d"
-        ]
-      },
-      "maps": [
-        "standard",
-        "maze"
-      ],
-      "semanticWindow": {
-        "dqnChampion": "BT11 legacy DQN champion window",
-        "bt93cLearner": "runtime-near-headless-v1",
-        "comparisonCaveat": "93C.6 must disclose any semantic drift before PPO/DQN comparison."
-      },
-      "artifactPaths": [
-        {
-          "path": "docs/tests/Testergebnisse_Phase4b_2026-03-24.md",
-          "versioned": true,
-          "role": "versioned rounded bot-validation survival summary"
-        },
-        {
-          "path": "docs/bot-training/Bot_Trainingsplan.md",
-          "versioned": true,
-          "role": "active plan stores exact BT11 checkpoint metrics"
-        },
-        {
-          "path": "output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log",
-          "versioned": false,
-          "role": "historical command log referenced by plan; not closure evidence by itself"
-        }
-      ]
-    },
+    "maps": [
+      "standard",
+      "maze"
+    ],
+    "matrixId": "bt93c-dqn-ppo-precomparison-v1",
+    "modeId": "runtime-near-headless-v1",
     "strictApplesToApples": {
+      "legacySeedStatus": "not versioned in legacy BT11 evidence; 93C.6 must freeze a reproducible apples-to-apples matrix before comparison",
       "ok": false,
-      "reason": "Legacy BT11 DQN seed evidence is not fully versioned; BT93C.6 is a conservative pre-comparison, not promotion evidence.",
-      "legacySeedStatus": "not versioned in legacy BT11 evidence; 93C.6 must freeze a reproducible apples-to-apples matrix before comparison"
-    }
-  },
-  "ppoCandidate": {
-    "baselineId": "bt93c-ppo-baseline-publish-v1",
-    "baselineRunId": "20260424T180033Z-baseline-train",
-    "baselineEvalRunId": "20260424T180054Z-baseline-eval",
-    "holdoutEvalRunId": "20260424T184311Z-holdout-eval",
-    "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
-    "vecnormalizeSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
-    "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
-    "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
-    "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
-    "promotionAllowed": false
-  },
-  "metrics": {
-    "dqnChampion": {
-      "avgStepsPerEpisode": 117.525,
-      "averageBotSurvival": 37.376986,
-      "invalidActionRate": 1.0,
-      "runtimeErrorCount": null,
-      "source": "BT11 historical DQN champion anchor"
+      "reason": "Legacy BT11 DQN seed evidence is not fully versioned; BT93C.6 is a conservative pre-comparison, not promotion evidence."
     },
-    "ppoInternalEval": {
-      "avgStepsPerEpisode": 16.0,
-      "averageBotSurvival": 16.0,
-      "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
-      "runtimeErrorCount": 0,
-      "failureClasses": {
-        "crash": 0,
-        "timeout": 0,
-        "forcedRound": 0,
-        "socketClose": 0,
-        "teardownFailure": 0,
-        "maxSteps": 2,
-        "naturalTerminal": 0
-      },
-      "invalidActionRate": 0.0,
-      "sanitizerRate": 0.0,
-      "vetoRate": 0.84375,
-      "maskRate": 1.0,
-      "rewardTotal": 3.6,
-      "stepsPerSecond": 29.933344
-    },
-    "ppoHoldout": {
-      "avgStepsPerEpisode": 16.0,
-      "averageBotSurvival": 16.0,
-      "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
-      "runtimeErrorCount": 0,
-      "failureClasses": {
-        "crash": 0,
-        "timeout": 0,
-        "forcedRound": 0,
-        "socketClose": 0,
-        "teardownFailure": 0,
-        "maxSteps": 2,
-        "naturalTerminal": 0
-      },
-      "invalidActionRate": 0.0,
-      "sanitizerRate": 0.0,
-      "vetoRate": 0.5,
-      "maskRate": 1.0,
-      "terminalReasonCounts": {},
-      "truncatedReasonCounts": {
-        "max-steps": 2
-      },
-      "deathCauseCounts": {}
-    },
-    "deltasAgainstDqn": {
-      "avgStepsPerEpisodePct": -86.385875,
-      "averageBotSurvivalPct": -57.19291,
-      "holdoutAverageBotSurvivalPct": -57.19291,
-      "targetSurvivalForPlus30Pct": 48.590082
-    }
+    "trainSeeds": [
+      934,
+      935
+    ]
   },
   "evidenceInterpretation": {
     "class": "ppo-regression",
@@ -286,12 +135,182 @@
     "isRolloutSignal": false,
     "internalEvalSurvivalIsPpoValidate": false,
     "ppoValidateStatus": "ppo-validate-missing",
-    "summary": "PPO baseline/holdout are below the DQN survival anchor; keep BT94A closed unless 93C.7 documents a diagnose-only handover."
+    "summary": "BT93D refreshed eval/holdout evidence keeps BT94A closed: Survival remains below the DQN anchor and terminal/policy diagnostics still block start."
+  },
+  "generatedAt": "2026-04-24T21:07:08Z",
+  "generatedBy": "python/scripts/bt93d_start_gate_package.py",
+  "gitSha": "4cb08206266407cc405f56fda531c7a8284b14c6",
+  "guardrails": {
+    "bt94aGate": "closed-diagnose-blocked-by-bt93d",
+    "candidateRun": false,
+    "fourEnvAllowed": false,
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "rolloutAllowed": false,
+    "runtimeSurfacesTouched": []
+  },
+  "metrics": {
+    "deltasAgainstDqn": {
+      "avgStepsPerEpisodePct": -86.385875,
+      "averageBotSurvivalPct": -57.19291,
+      "holdoutAverageBotSurvivalPct": -57.19291,
+      "targetSurvivalForPlus30Pct": 48.590082,
+      "resultClass": "ppo-regression"
+    },
+    "dqnChampion": {
+      "averageBotSurvival": 37.376986,
+      "avgStepsPerEpisode": 117.525,
+      "invalidActionRate": 1.0,
+      "runtimeErrorCount": null,
+      "source": "BT11 historical DQN champion anchor"
+    },
+    "ppoBt93dReproEval": {
+      "actionTelemetry": {
+        "fieldCounts": {
+          "shootItem-without-index": 28,
+          "shootItemIndex": 32,
+          "useItem": 32
+        },
+        "invalidActionRate": 0.0,
+        "maskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 32,
+        "vetoRate": 0.875
+      },
+      "averageBotSurvival": 16.0,
+      "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+      "avgStepsPerEpisode": 16.0,
+      "avgStepsPerEpisodeObserved": 16.0,
+      "completedEpisodeCount": 2,
+      "completedEpisodeLengths": [
+        16.0,
+        16.0
+      ],
+      "completedEpisodeStats": {
+        "count": 2,
+        "max": 16.0,
+        "mean": 16.0,
+        "median": 16.0,
+        "min": 16.0,
+        "stdev": 0.0
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "naturalTerminal": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      },
+      "report": "data/training/ppo/bt93d/runs/20260424T202525Z-baseline-repro-eval/eval_report.json",
+      "runId": "20260424T202525Z-baseline-repro-eval",
+      "runKind": "baseline-repro-eval",
+      "runtimeErrorCount": 0
+    },
+    "ppoHoldout": {
+      "actionTelemetry": {
+        "fieldCounts": {
+          "shootItem-without-index": 10,
+          "shootItemIndex": 32,
+          "useItem": 32
+        },
+        "invalidActionRate": 0.0,
+        "maskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 32,
+        "vetoRate": 0.3125
+      },
+      "averageBotSurvival": 16.0,
+      "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+      "avgStepsPerEpisode": 16.0,
+      "avgStepsPerEpisodeObserved": 16.0,
+      "completedEpisodeCount": 2,
+      "completedEpisodeLengths": [
+        16.0,
+        16.0
+      ],
+      "completedEpisodeStats": {
+        "count": 2,
+        "max": 16.0,
+        "mean": 16.0,
+        "median": 16.0,
+        "min": 16.0,
+        "stdev": 0.0
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "naturalTerminal": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      },
+      "report": "data/training/ppo/bt93d/runs/20260424T202552Z-holdout-eval/eval_report.json",
+      "runId": "20260424T202552Z-holdout-eval",
+      "runKind": "holdout-eval",
+      "runtimeErrorCount": 0
+    },
+    "ppoInternalEval": {
+      "averageBotSurvival": 16.0,
+      "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+      "avgStepsPerEpisode": 16.0,
+      "failureClasses": {
+        "crash": 0,
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "naturalTerminal": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "timeout": 0
+      },
+      "invalidActionRate": 0.0,
+      "maskRate": 1.0,
+      "rewardTotal": 3.6,
+      "runtimeErrorCount": 0,
+      "sanitizerRate": 0.0,
+      "stepsPerSecond": 29.933344,
+      "vetoRate": 0.84375
+    }
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93C.6.1": true,
+    "93C.6.2": true,
+    "93C.6.3": true,
+    "93C.6.4": true,
+    "93C.6.5": true
+  },
+  "phaseId": "93D.4.1",
+  "ppoCandidate": {
+    "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+    "baselineEvalRunId": "20260424T180054Z-baseline-eval",
+    "baselineId": "bt93c-ppo-baseline-publish-v1",
+    "baselineRunId": "20260424T180033Z-baseline-train",
+    "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+    "holdoutEvalRunId": "20260424T202552Z-holdout-eval",
+    "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+    "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+    "promotionAllowed": false,
+    "vecnormalizeSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c"
   },
   "ppoValidateHandover": {
-    "targetBlock": "BT94B.3",
-    "runnerIdea": "dedicated PPO validate runner loads candidate manifest, model, VecNormalize state, config and fixed matrix before publishing versioned evidence",
     "commandIdea": "npm run bot:validate:ppo -- --candidate-manifest <artifact_manifest.json> --matrix <comparison_manifest.json> --publish",
+    "notClosureEvidence": [
+      "tmp/**",
+      "legacy data/bot_validation_report.json without PPO candidate hash"
+    ],
     "reportSchemaMustInclude": [
       "candidateId",
       "modelSha256",
@@ -311,22 +330,14 @@
       "sanitizerRate",
       "vetoRate"
     ],
+    "runnerIdea": "dedicated PPO validate runner loads candidate manifest, model, VecNormalize state, config and fixed matrix before publishing versioned evidence",
+    "targetBlock": "BT94B.3",
     "versionedTargetPaths": [
       "data/training/ppo/validate/<candidate-id>/ppo_validate_report.json",
       "docs/bot-training/ppo-validate/<candidate-id>.md"
-    ],
-    "notClosureEvidence": [
-      "tmp/**",
-      "legacy data/bot_validation_report.json without PPO candidate hash"
     ]
   },
-  "guardrails": {
-    "runtimeSurfacesTouched": [],
-    "productiveRuntimeChanged": false,
-    "fourEnvAllowed": false,
-    "bt94aGate": "closed-until-93C.7",
-    "rolloutAllowed": false
-  },
+  "resultClass": "ppo-regression",
   "sourceReports": {
     "baselineReport": {
       "path": "data/training/ppo/bt93c/baseline_report.json",
@@ -336,19 +347,152 @@
       "path": "data/training/ppo/bt93c/baseline_source_manifest.json",
       "sha256": "dc70734b299940f803aaf135c01ac811a1df97a1ea5a79af9c7d4c151a7ca91a"
     },
-    "holdoutEval": {
-      "pointer": "data/training/ppo/bt93c/latest_holdout_eval.json",
-      "report": "data/training/ppo/bt93c/runs/20260424T184311Z-holdout-eval/eval_report.json",
-      "sha256": "705b04800d4663942bfc09714d97d86ab75d1e4f0b3d756d3468e0153c9c77a0"
+    "bt93dMinimumStartStatistics": {
+      "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "sha256": "73053320a7b2982bb7de583f44d5c062857e7b8935919d05116e03a470dc317c",
+      "role": "BT93D minimum start statistics",
+      "closureCapable": true
+    },
+    "bt93dSurvivalRegression": {
+      "path": "data/training/ppo/bt93d/survival_regression_report.json",
+      "sha256": "019bb8333a3e8c748fbad09e10d119c496a5595657b29fc57e97f65864a5b508",
+      "role": "BT93D survival regression",
+      "closureCapable": true
+    },
+    "bt93dTerminalPolicyDiagnostics": {
+      "path": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "sha256": "632995ae2f3f4bb7fdbd4e946395387aca2a0a7e5c92422cf7dadbd3a9e17a02",
+      "role": "BT93D terminal and policy diagnostics",
+      "closureCapable": true
     },
     "freezeCheck": {
       "path": "data/training/ppo/freeze_check.json",
       "sha256": "a29c5f166f07f2d6b6ac3f26934ebf96f3f9d8d24ef04c20b6057255cf03656a"
+    },
+    "holdoutEval": {
+      "pointer": "data/training/ppo/bt93d/latest_holdout_eval.json",
+      "report": "data/training/ppo/bt93d/runs/20260424T202552Z-holdout-eval/eval_report.json",
+      "sha256": "eac30f2bd5fb2c3e7a00648248e98dff10cc9633afe0f2d0656deed440def490"
     }
   },
-  "artifacts": {
-    "config": "python/configs/ppo_bt93c_baseline.json",
-    "configSha256": "8699565e23f61faa71dcb53e7eac0f737bb5ba7409e62feda301c703b857d6cf",
-    "precomparisonReport": "data/training/ppo/bt93c/precomparison_report.json"
+  "v101FollowUp": {
+    "conclusion": "V101 is closed and no watched PPO authority/runtime-near surface drifted since the BT93C baseline commit.",
+    "driftPaths": [],
+    "freezeCheck": {
+      "driftCount": 0,
+      "freezeOk": true,
+      "headCommit": "7b12c3960ff14cccd5663984b6f3eed9666fb3cb",
+      "path": "data/training/ppo/freeze_check.json",
+      "reAuditRequired": false
+    },
+    "ok": true,
+    "resultClass": "no-ppo-contract-drift",
+    "v101Plan": {
+      "closed": true,
+      "path": "docs/plaene/aktiv/V101.md",
+      "scopeIncludesTrainingSurfaces": true
+    },
+    "watchlist": [
+      {
+        "baselineBlob": "10617ce9d8484e99498d3c0814a4458e1fb00242",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "10617ce9d8484e99498d3c0814a4458e1fb00242",
+        "headBlob": "10617ce9d8484e99498d3c0814a4458e1fb00242",
+        "path": "src/entities/ai/training/TrainingContractV1.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "706a7b042d4a267f799006204437948f60d98b6e",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "706a7b042d4a267f799006204437948f60d98b6e",
+        "headBlob": "706a7b042d4a267f799006204437948f60d98b6e",
+        "path": "src/entities/ai/training/TrainerPayloadAdapter.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "9efd9132ecce0f1ee8a44b4eba669da87f4974d4",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "9efd9132ecce0f1ee8a44b4eba669da87f4974d4",
+        "headBlob": "9efd9132ecce0f1ee8a44b4eba669da87f4974d4",
+        "path": "src/entities/ai/observation/ObservationSchemaV2.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "14f39b5a3a033987410d91646ae677dd6310168d",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "14f39b5a3a033987410d91646ae677dd6310168d",
+        "headBlob": "14f39b5a3a033987410d91646ae677dd6310168d",
+        "path": "src/entities/ai/actions/BotActionContract.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
+        "headBlob": "4db69033342c6bb702276f4ed8c5c171e9dfa950",
+        "path": "src/state/training/TrainingDomain.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "8eff03c7308c5e32c5a4890a02ce93df590f68c7",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "8eff03c7308c5e32c5a4890a02ce93df590f68c7",
+        "headBlob": "8eff03c7308c5e32c5a4890a02ce93df590f68c7",
+        "path": "src/entities/ai/ObservationBridgePolicy.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
+        "headBlob": "9af609eb21201c5a69211018212e3c81965bba9e",
+        "path": "src/entities/ai/observation/RuntimeNearObservationAdapter.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "661de8862292b274e94051f286ae1953964efa92",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "661de8862292b274e94051f286ae1953964efa92",
+        "headBlob": "661de8862292b274e94051f286ae1953964efa92",
+        "path": "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "3a120a0455f57bd4b6eeed1c06b29828ddd892af",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "3a120a0455f57bd4b6eeed1c06b29828ddd892af",
+        "headBlob": "3a120a0455f57bd4b6eeed1c06b29828ddd892af",
+        "path": "src/core/RuntimeConfig.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      },
+      {
+        "baselineBlob": "46810f39ea0e6e102884a0dcb9f7236ed05a41f0",
+        "baselineCommit": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+        "changedSinceBaselineCommit": false,
+        "currentBlob": "46810f39ea0e6e102884a0dcb9f7236ed05a41f0",
+        "headBlob": "46810f39ea0e6e102884a0dcb9f7236ed05a41f0",
+        "path": "src/state/training/RewardCalculator.js",
+        "worktreeDirty": false,
+        "worktreeStatus": "clean"
+      }
+    ]
   }
 }

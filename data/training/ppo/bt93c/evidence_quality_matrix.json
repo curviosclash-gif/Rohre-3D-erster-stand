@@ -1,300 +1,296 @@
 {
-  "ok": true,
-  "generatedAt": "2026-04-24T18:52:40Z",
-  "generatedBy": "python/scripts/bt93c_handover_report.py",
-  "blockId": "BT93C",
-  "phaseId": "93C.7.3",
-  "summary": {
-    "closed": 21,
-    "bt94a-blocker": 5,
-    "follow-gated": 11
-  },
   "auditRegister": [
     {
-      "id": "F.01",
-      "status": "closed",
-      "gate": "93C.3",
+      "blocksBt94a": false,
       "evidence": "real PPO optimizer updates and model package exist",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.02",
-      "status": "closed",
-      "gate": "93C.1",
-      "evidence": "requirements, clean env, pip check, and import smoke are versioned",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.03",
-      "status": "closed",
-      "gate": "93C.2",
-      "evidence": "SB3 MultiDiscrete action surface is train/eval compatible",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.04",
-      "status": "closed",
       "gate": "93C.3",
+      "id": "F.01",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "requirements, clean env, pip check, and import smoke are versioned",
+      "gate": "93C.1",
+      "id": "F.02",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "SB3 MultiDiscrete action surface is train/eval compatible",
+      "gate": "93C.2",
+      "id": "F.03",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
       "evidence": "model, optimizer, VecNormalize, config, and hashes are persisted",
-      "blocksBt94a": false
+      "gate": "93C.3",
+      "id": "F.04",
+      "status": "closed"
     },
     {
+      "blocksBt94a": true,
+      "bt93dDisposition": "still-blocking",
+      "bt93dSourceArtifact": "data/training/ppo/bt93d/survival_regression_report.json",
+      "evidence": "BT93D fresh eval/holdout reproduces survival regression (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
+      "gate": "93D.4/BT94A",
       "id": "F.05",
-      "status": "bt94a-blocker",
-      "gate": "93C.6/94B.2",
-      "evidence": "PPO survival regresses against the DQN anchor",
-      "blocksBt94a": true
+      "status": "bt94a-blocker"
     },
     {
-      "id": "F.06",
-      "status": "follow-gated",
-      "gate": "94B.3",
+      "blocksBt94a": false,
       "evidence": "PPO-Validate must be built before any promote verdict",
-      "blocksBt94a": false
+      "gate": "94B.3",
+      "id": "F.06",
+      "status": "follow-gated"
     },
     {
-      "id": "F.07",
-      "status": "follow-gated",
-      "gate": "93C.99/94A",
+      "blocksBt94a": false,
       "evidence": "4-env remains locked without direct evidence",
-      "blocksBt94a": false
+      "gate": "93C.99/94A",
+      "id": "F.07",
+      "status": "follow-gated"
     },
     {
-      "id": "F.08",
-      "status": "closed",
-      "gate": "93C.4/93C.5",
+      "blocksBt94a": false,
       "evidence": "throughput is classified as budget/stability evidence only",
-      "blocksBt94a": false
+      "gate": "93C.4/93C.5",
+      "id": "F.08",
+      "status": "closed"
     },
     {
-      "id": "F.09",
-      "status": "closed",
-      "gate": "93C.0",
+      "blocksBt94a": false,
       "evidence": "fresh freeze check is green",
-      "blocksBt94a": false
+      "gate": "93C.0",
+      "id": "F.09",
+      "status": "closed"
     },
     {
-      "id": "F.10",
-      "status": "closed",
-      "gate": "93C.1",
+      "blocksBt94a": false,
       "evidence": "stale artifact/readme contradictions were cleared",
-      "blocksBt94a": false
+      "gate": "93C.1",
+      "id": "F.10",
+      "status": "closed"
     },
     {
-      "id": "F.11",
-      "status": "closed",
-      "gate": "93C.1",
+      "blocksBt94a": false,
       "evidence": "tmp-only closure evidence was replaced or demoted",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.12",
-      "status": "closed",
-      "gate": "93C.6",
-      "evidence": "DQN champion, matrix, semantic window, and holdout are frozen",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.13",
-      "status": "follow-gated",
-      "gate": "94B.1/94B.2",
-      "evidence": "external candidate statistics need fixed rules before runs",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.14",
-      "status": "follow-gated",
-      "gate": "94B.3",
-      "evidence": "PPO-specific validate report is still missing",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.15",
-      "status": "follow-gated",
-      "gate": "BT95/separate rollout",
-      "evidence": "runtime handoff remains doc-only and out of BT93C scope",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.16",
-      "status": "closed",
-      "gate": "93C.1/93C.5",
-      "evidence": "scaffold, pilot, baseline, and candidate terms are separated",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.17",
-      "status": "closed",
-      "gate": "93C.3/93C.6",
-      "evidence": "eval loads a real PPO model package",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.18",
-      "status": "follow-gated",
-      "gate": "94B.3",
-      "evidence": "runtime classes are reported internally; PPO-Validate mapping remains",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.19",
-      "status": "bt94a-blocker",
-      "gate": "94B.2/94B.3",
-      "evidence": "episodes are still max-step dominated with empty death classes",
-      "blocksBt94a": true
-    },
-    {
-      "id": "F.20",
-      "status": "closed",
-      "gate": "93C.2/93C.4",
-      "evidence": "sanitizer, mask, veto, and invalid rates are measured",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.21",
-      "status": "closed",
-      "gate": "93C.1/93C.7",
-      "evidence": "draft-risk drift is carried into the quality matrix",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.22",
-      "status": "closed",
-      "gate": "93C.7",
-      "evidence": "governance gates are not treated as learning proof",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.23",
-      "status": "closed",
-      "gate": "93C.1/93C.7",
-      "evidence": "closure evidence points to artifacts instead of plan self-counts",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.24",
-      "status": "follow-gated",
-      "gate": "94A/94B",
-      "evidence": "short stability smokes remain monitoring, not long-run proof",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.25",
-      "status": "closed",
       "gate": "93C.1",
-      "evidence": "clean env reproduces the PPO dependency stack",
-      "blocksBt94a": false
+      "id": "F.11",
+      "status": "closed"
     },
     {
-      "id": "F.26",
-      "status": "closed",
-      "gate": "93C.1/93C.5",
-      "evidence": "exact baseline IDs and metric sources are fixed",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.27",
-      "status": "bt94a-blocker",
-      "gate": "93C.6/93C.7",
-      "evidence": "PPO result is classified as regression versus DQN",
-      "blocksBt94a": true
-    },
-    {
-      "id": "F.28",
-      "status": "follow-gated",
-      "gate": "94B.3",
-      "evidence": "internal eval survival is not PPO-Validate evidence",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.29",
-      "status": "closed",
+      "blocksBt94a": false,
+      "evidence": "DQN champion, matrix, semantic window, and holdout are frozen",
       "gate": "93C.6",
-      "evidence": "holdout seeds were consumed and reported",
-      "blocksBt94a": false
+      "id": "F.12",
+      "status": "closed"
     },
     {
-      "id": "F.30",
-      "status": "bt94a-blocker",
-      "gate": "94A/94B.2",
-      "evidence": "post-decode clamp/mask load must not become a freeze candidate",
-      "blocksBt94a": true
+      "blocksBt94a": false,
+      "evidence": "external candidate statistics need fixed rules before runs",
+      "gate": "94B.1/94B.2",
+      "id": "F.13",
+      "status": "follow-gated"
     },
     {
-      "id": "F.31",
-      "status": "bt94a-blocker",
-      "gate": "94B.2/94B.3",
-      "evidence": "natural terminal/death matrix remains weak",
-      "blocksBt94a": true
-    },
-    {
-      "id": "F.32",
-      "status": "follow-gated",
-      "gate": "94A.1/94B.1",
-      "evidence": "larger candidate runs need fixed sample/statistics rules",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.33",
-      "status": "closed",
-      "gate": "93C.7",
-      "evidence": "handover references immutable run IDs, hashes, and manifests",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.34",
-      "status": "closed",
-      "gate": "93C.6/93C.7",
-      "evidence": "V101 follow-up reports no PPO contract drift",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.35",
-      "status": "closed",
-      "gate": "93C.7",
-      "evidence": "docs gates are separated from semantic PPO evidence",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.36",
-      "status": "follow-gated",
-      "gate": "94A/94B",
-      "evidence": "longer candidate runs must continue failure-class telemetry",
-      "blocksBt94a": false
-    },
-    {
-      "id": "F.37",
-      "status": "follow-gated",
+      "blocksBt94a": false,
+      "evidence": "PPO-specific validate report is still missing",
       "gate": "94B.3",
+      "id": "F.14",
+      "status": "follow-gated"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "runtime handoff remains doc-only and out of BT93C scope",
+      "gate": "BT95/separate rollout",
+      "id": "F.15",
+      "status": "follow-gated"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "scaffold, pilot, baseline, and candidate terms are separated",
+      "gate": "93C.1/93C.5",
+      "id": "F.16",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "eval loads a real PPO model package",
+      "gate": "93C.3/93C.6",
+      "id": "F.17",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "runtime classes are reported internally; PPO-Validate mapping remains",
+      "gate": "94B.3",
+      "id": "F.18",
+      "status": "follow-gated"
+    },
+    {
+      "blocksBt94a": true,
+      "bt93dDisposition": "still-blocking",
+      "bt93dSourceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "evidence": "BT93D terminal/death matrix remains max-steps-only or incomplete.",
+      "gate": "93D.4/BT94A",
+      "id": "F.19",
+      "status": "bt94a-blocker"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "sanitizer, mask, veto, and invalid rates are measured",
+      "gate": "93C.2/93C.4",
+      "id": "F.20",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "draft-risk drift is carried into the quality matrix",
+      "gate": "93C.1/93C.7",
+      "id": "F.21",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "governance gates are not treated as learning proof",
+      "gate": "93C.7",
+      "id": "F.22",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "closure evidence points to artifacts instead of plan self-counts",
+      "gate": "93C.1/93C.7",
+      "id": "F.23",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "short stability smokes remain monitoring, not long-run proof",
+      "gate": "94A/94B",
+      "id": "F.24",
+      "status": "follow-gated"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "clean env reproduces the PPO dependency stack",
+      "gate": "93C.1",
+      "id": "F.25",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "exact baseline IDs and metric sources are fixed",
+      "gate": "93C.1/93C.5",
+      "id": "F.26",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": true,
+      "bt93dDisposition": "still-blocking",
+      "bt93dSourceArtifact": "data/training/ppo/bt93d/survival_regression_report.json",
+      "evidence": "BT93D comparison remains ppo-regression.",
+      "gate": "93D.4/BT94A",
+      "id": "F.27",
+      "status": "bt94a-blocker"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "internal eval survival is not PPO-Validate evidence",
+      "gate": "94B.3",
+      "id": "F.28",
+      "status": "follow-gated"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "holdout seeds were consumed and reported",
+      "gate": "93C.6",
+      "id": "F.29",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": true,
+      "bt93dDisposition": "still-blocking",
+      "bt93dSourceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "evidence": "BT93D policy-level masking is absent and post-decode clamp/veto load remains high.",
+      "gate": "93D.4/BT94A",
+      "id": "F.30",
+      "status": "bt94a-blocker"
+    },
+    {
+      "blocksBt94a": true,
+      "bt93dDisposition": "still-blocking",
+      "bt93dSourceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "evidence": "BT93D natural terminal/death evidence remains weak.",
+      "gate": "93D.4/BT94A",
+      "id": "F.31",
+      "status": "bt94a-blocker"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "larger candidate runs need fixed sample/statistics rules",
+      "gate": "94A.1/94B.1",
+      "id": "F.32",
+      "status": "follow-gated"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "handover references immutable run IDs, hashes, and manifests",
+      "gate": "93C.7",
+      "id": "F.33",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "V101 follow-up reports no PPO contract drift",
+      "gate": "93C.6/93C.7",
+      "id": "F.34",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "docs gates are separated from semantic PPO evidence",
+      "gate": "93C.7",
+      "id": "F.35",
+      "status": "closed"
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "longer candidate runs must continue failure-class telemetry",
+      "gate": "94A/94B",
+      "id": "F.36",
+      "status": "follow-gated"
+    },
+    {
+      "blocksBt94a": false,
       "evidence": "PPO-Validate build location and schema remain a future gate",
-      "blocksBt94a": false
+      "gate": "94B.3",
+      "id": "F.37",
+      "status": "follow-gated"
     }
   ],
-  "tmpSelfCountStaleDocState": {
-    "source": "data/training/ppo/bt93c/audit_delta_report.json",
-    "untrackedPpoArtifacts": null,
-    "tmpOnlyEvidence": null,
-    "selfCountEvidence": null,
-    "riskDrift": null
+  "blockId": "BT93C",
+  "bt93dRefresh": {
+    "phaseId": "93D.4.1",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    },
+    "allTrackedFindingsExplicit": true,
+    "diagnosticBlockers": {
+      "rewardSafetyEpisodeShortening": {
+        "disposition": "still-blocking",
+        "status": "diagnostic-blocker",
+        "gate": "93D.4/BT94A",
+        "evidence": "Positive reward still coexists with Survival regression.",
+        "source": "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      }
+    }
   },
-  "riskRegisterAlignment": [
-    {
-      "risk": "PPO baseline is misread as promotion",
-      "disposition": "blocked by ppo-regression result and promotionAllowed=false"
-    },
-    {
-      "risk": "4-env escalation without direct evidence",
-      "disposition": "fourEnvAllowed=false remains in reports"
-    },
-    {
-      "risk": "V101 drift invalidates PPO contracts",
-      "disposition": "no-ppo-contract-drift"
-    },
-    {
-      "risk": "PPO-Validate is confused with BT80C legacy validate",
-      "disposition": "BT94B.3 owns PPO-Validate; BT80C is historical context only"
-    }
-  ],
   "bt94aStoppers": [
     "F.05",
     "F.19",
@@ -302,14 +298,68 @@
     "F.30",
     "F.31"
   ],
+  "generatedAt": "2026-04-24T21:07:08Z",
+  "generatedBy": "python/scripts/bt93d_start_gate_package.py",
+  "ok": true,
+  "phaseId": "93D.4.1",
+  "riskRegisterAlignment": [
+    {
+      "disposition": "blocked by ppo-regression result and promotionAllowed=false",
+      "risk": "PPO baseline is misread as promotion"
+    },
+    {
+      "disposition": "fourEnvAllowed=false remains in reports",
+      "risk": "4-env escalation without direct evidence"
+    },
+    {
+      "disposition": "no-ppo-contract-drift",
+      "risk": "V101 drift invalidates PPO contracts"
+    },
+    {
+      "disposition": "BT94B.3 owns PPO-Validate; BT80C is historical context only",
+      "risk": "PPO-Validate is confused with BT80C legacy validate"
+    }
+  ],
   "sourceArtifacts": {
     "auditDeltaReport": {
       "path": "data/training/ppo/bt93c/audit_delta_report.json",
       "sha256": "f21ac9f52459d2322937571604a8caed58202a000f5f656734f3c14479b11d7c"
     },
+    "bt93dMinimumStartStatistics": {
+      "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "sha256": "73053320a7b2982bb7de583f44d5c062857e7b8935919d05116e03a470dc317c",
+      "role": "BT93D minimum start statistics",
+      "closureCapable": true
+    },
+    "bt93dSurvivalRegression": {
+      "path": "data/training/ppo/bt93d/survival_regression_report.json",
+      "sha256": "019bb8333a3e8c748fbad09e10d119c496a5595657b29fc57e97f65864a5b508",
+      "role": "BT93D survival regression",
+      "closureCapable": true
+    },
+    "bt93dTerminalPolicyDiagnostics": {
+      "path": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "sha256": "632995ae2f3f4bb7fdbd4e946395387aca2a0a7e5c92422cf7dadbd3a9e17a02",
+      "role": "BT93D terminal and policy diagnostics",
+      "closureCapable": true
+    },
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "bf0f90f0dcc9ba01104c6531c1f7fd52193d99086c738c8446e4ef230b5e56dd"
+      "sha256": "dfc7e09768d4f71ab99d5d10e4dba1a5dabaedc30bddcd9ba2d7190efc4d5109",
+      "role": "BT93D-refreshed precomparison",
+      "closureCapable": true
     }
+  },
+  "summary": {
+    "closed": 21,
+    "bt94a-blocker": 5,
+    "follow-gated": 11
+  },
+  "tmpSelfCountStaleDocState": {
+    "riskDrift": null,
+    "selfCountEvidence": null,
+    "source": "data/training/ppo/bt93c/audit_delta_report.json",
+    "tmpOnlyEvidence": null,
+    "untrackedPpoArtifacts": null
   }
 }

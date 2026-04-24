@@ -1,0 +1,153 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T21:07:09Z",
+  "generatedBy": "python/scripts/bt93d_start_gate_package.py",
+  "blockId": "BT93D",
+  "phaseId": "93D.4",
+  "gitSha": "4cb08206266407cc405f56fda531c7a8284b14c6",
+  "resultClass": "diagnose-blocked",
+  "phaseCoverage": {
+    "93D.4.1": true,
+    "93D.4.2": true,
+    "93D.4.3": true,
+    "93D.4.4": true
+  },
+  "bt94aStartStatus": {
+    "claimable": false,
+    "candidateRunsAllowed": false,
+    "matrixDefinitionAllowed": false,
+    "candidateFreezeAllowed": false,
+    "resultClass": "blocked-no-start",
+    "status": "BT94A remains closed before 94A.1"
+  },
+  "diagnoseBlocked": {
+    "active": true,
+    "redChecks": [
+      {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93d",
+        "ok": false,
+        "required": "ready=true"
+      },
+      {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 5,
+        "ok": false,
+        "required": 0
+      }
+    ],
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    },
+    "diagnosticBlockers": {
+      "rewardSafetyEpisodeShortening": {
+        "disposition": "still-blocking",
+        "status": "diagnostic-blocker",
+        "gate": "93D.4/BT94A",
+        "evidence": "Positive reward still coexists with Survival regression.",
+        "source": "data/training/ppo/bt93d/terminal_policy_diagnostics.json"
+      }
+    },
+    "nextReplanOrRepairStep": "User-owned replan or a follow-up PPO diagnosis repair must close or explicitly downgrade F.05/F.19/F.27/F.30/F.31 before BT94A.1 can be claimed.",
+    "noBt94aCheckboxClosed": true
+  },
+  "artifactRefresh": {
+    "precomparisonResultClass": "ppo-regression",
+    "handoverResultClass": "diagnose",
+    "handoverGate": "closed-diagnose-blocked-by-bt93d",
+    "bt94aBlockerCount": 5,
+    "survivalRegressionResultClass": "survival-regression-reproduced",
+    "terminalPolicyResultClass": "diagnose-blocked",
+    "minimumStatisticsMatrixId": "bt93d-survival-repair-minimum-v1"
+  },
+  "sourceArtifacts": {
+    "precomparisonReport": {
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "sha256": "dfc7e09768d4f71ab99d5d10e4dba1a5dabaedc30bddcd9ba2d7190efc4d5109",
+      "role": "BT93D-refreshed precomparison",
+      "closureCapable": true
+    },
+    "handoverReport": {
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "sha256": "88c1d2f0629607fd565868f69d063fccf55cec40e5f2c6495754e79451125500",
+      "role": "BT93D-refreshed handover",
+      "closureCapable": true
+    },
+    "evidenceQualityMatrix": {
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "sha256": "a21b84bb8917036410a0c76bf96dc17f28dc868a89152895d84133316d6d5549",
+      "role": "BT93D-refreshed evidence matrix",
+      "closureCapable": true
+    },
+    "bt94aGate": {
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "sha256": "543020d531131fbeb09b68a041cbf14f7ffaf827cda91eb4438ab6e1bbc4a29c",
+      "role": "BT94A gate check",
+      "closureCapable": true
+    },
+    "bt93dSurvivalRegression": {
+      "path": "data/training/ppo/bt93d/survival_regression_report.json",
+      "sha256": "019bb8333a3e8c748fbad09e10d119c496a5595657b29fc57e97f65864a5b508",
+      "role": "BT93D survival regression",
+      "closureCapable": true
+    },
+    "bt93dTerminalPolicyDiagnostics": {
+      "path": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "sha256": "632995ae2f3f4bb7fdbd4e946395387aca2a0a7e5c92422cf7dadbd3a9e17a02",
+      "role": "BT93D terminal and policy diagnostics",
+      "closureCapable": true
+    },
+    "bt93dMinimumStartStatistics": {
+      "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "sha256": "73053320a7b2982bb7de583f44d5c062857e7b8935919d05116e03a470dc317c",
+      "role": "BT93D minimum start statistics",
+      "closureCapable": true
+    },
+    "bt93dRepairManifest": {
+      "path": "data/training/ppo/bt93d/repair_manifest.json",
+      "sha256": "89bc30fe0010235ee7df1ecdbfd1fe592389ca23995f4d7ca29eec3adc017201",
+      "role": "BT93D repair manifest",
+      "closureCapable": true
+    }
+  },
+  "commands": {
+    "refreshReports": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93d_start_gate_package.py --write-upstream-reports",
+    "gateCheck": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt94a_gate_check.py --write-report",
+    "package": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93d_start_gate_package.py --write-package"
+  },
+  "guardrails": {
+    "productiveRuntimeChanged": false,
+    "runtimeSurfacesTouched": [],
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "allowedSidecarPaths": [
+      "python/**",
+      "data/training/ppo/bt93d/**",
+      "data/training/ppo/bt93c/**",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md"
+    ]
+  }
+}
