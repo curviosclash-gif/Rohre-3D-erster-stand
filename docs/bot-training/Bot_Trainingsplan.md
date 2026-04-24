@@ -264,7 +264,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
-| Bot-Codex | BT93D | 2026-04-24 | active | `93D.2` abgeschlossen; naechster Claim `93D.3` |
+| Bot-Codex | BT93D | 2026-04-24 | active | `93D.3` abgeschlossen; naechster Claim `93D.4` |
 | - | BT94A | - | frei | wartet auf BT93D.99 und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1410,10 +1410,10 @@ Claim-Grenze fuer BT93D:
 
 ### 93D.3 Terminal-, Death- und Policy-Mask-Diagnostik schliessen (F.19/F.30/F.31)
 
-- [ ] 93D.3.1 Natuerliche Terminal-, Death-Cause-, `max-steps`-, Crash-, Timeout-, Forced-Round-, Socket- und Teardown-Klassen in Train/Eval/Holdout getrennt erfassen.
-- [ ] 93D.3.2 Survival-Verteilung und Death-/Terminal-Matrix so berichten, dass leere Death-Cause-Klassen oder reine `max-steps`-Runs BT94A weiter blockieren.
-- [ ] 93D.3.3 Policy-Level-Maskierung, Post-Decode-Clamp, Sanitizer, Safety-Veto, Invalid-Action und No-Op/Fallback getrennt messen; hohe Veto-/Masklast muss Freeze-Faehigkeit blockieren oder begruendet downgraded werden.
-- [ ] 93D.3.4 RewardBreakdown, Safety-Overrules und Episode-Shortening gemeinsam auswerten; Reward-Anstieg bei schlechterer Survival bleibt Blocker.
+- [x] 93D.3.1 Natuerliche Terminal-, Death-Cause-, `max-steps`-, Crash-, Timeout-, Forced-Round-, Socket- und Teardown-Klassen in Train/Eval/Holdout getrennt erfassen. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93d_terminal_policy_diagnostics.py --write-report` -> `data/training/ppo/bt93d/terminal_policy_diagnostics.json` (`lanes.train/eval/holdout.terminalDeathFailureMatrix` getrennt, `eval.maxStepsOnly=true`, `holdout.maxStepsOnly=true`, `train.observabilityStatus=missing-in-training-report`))
+- [x] 93D.3.2 Survival-Verteilung und Death-/Terminal-Matrix so berichten, dass leere Death-Cause-Klassen oder reine `max-steps`-Runs BT94A weiter blockieren. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93d_terminal_policy_diagnostics.py --write-report` -> `data/training/ppo/bt93d/terminal_policy_diagnostics.json` (`bt94aImpact.findingStatus.F.19=still-blocking`, `F.31=still-blocking`, `eval/holdout.completedEpisodeStats.median=16.0`))
+- [x] 93D.3.3 Policy-Level-Maskierung, Post-Decode-Clamp, Sanitizer, Safety-Veto, Invalid-Action und No-Op/Fallback getrennt messen; hohe Veto-/Masklast muss Freeze-Faehigkeit blockieren oder begruendet downgraded werden. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93d_terminal_policy_diagnostics.py --write-report` -> `data/training/ppo/bt93d/terminal_policy_diagnostics.json` (`policyMaskContract.policyLevelMasking.present=false`, `postDecodeClampTelemetry.present=true`, `train.postDecodeClampRate=1.0`, `eval.vetoRate=0.875`, `bt94aImpact.findingStatus.F.30=still-blocking`))
+- [x] 93D.3.4 RewardBreakdown, Safety-Overrules und Episode-Shortening gemeinsam auswerten; Reward-Anstieg bei schlechterer Survival bleibt Blocker. (abgeschlossen: 2026-04-24; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93d_terminal_policy_diagnostics.py --write-report` -> `data/training/ppo/bt93d/terminal_policy_diagnostics.json` (`resultClass=diagnose-blocked`, `eval/holdout.positiveRewardWhileSurvivalRegresses=true`, `bt94aImpact.blockedFindings` enthaelt `reward-safety-episode-shortening`))
 
 ### 93D.4 Startfreigabe-Paket fuer BT94A
 
