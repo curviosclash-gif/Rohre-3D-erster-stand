@@ -266,7 +266,8 @@ Mikro-Claim-Regel:
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93E | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
-| - | BT94A | - | frei | wartet auf `BT93E.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
+| Bot-Codex | BT93F | 2026-04-25 | active | 93F.1 abgeschlossen; 93F.2 offen |
+| - | BT94A | - | frei | wartet auf `BT93F.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
 
