@@ -117,6 +117,8 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
 
 
 def _run_sample_class(run_kind: str) -> str:
+    if run_kind.startswith("baseline-"):
+        return "conservative-baseline-not-promotion"
     if run_kind.startswith("pilot-"):
         return "pilot-not-baseline"
     if run_kind.startswith("diagnostics-"):
@@ -130,6 +132,10 @@ def _is_diagnostic_run(run_kind: str) -> bool:
 
 def _is_pilot_run(run_kind: str) -> bool:
     return run_kind.startswith("pilot-")
+
+
+def _is_baseline_run(run_kind: str) -> bool:
+    return run_kind.startswith("baseline-")
 
 
 def _number(value: Any) -> float | None:
@@ -370,11 +376,14 @@ def _collect_eval_diagnostics(
         if "crash" in str(key).lower()
     )
     training_learning = dict((training_report or {}).get("learning") or {})
-    average_survival_reason = (
-        "BT93C.5 pilot is not the baseline/publish lane."
-        if _is_pilot_run(run_kind)
-        else "BT93C.4 diagnostic smoke is not the 93C.5 baseline/publish lane."
-    )
+    is_baseline = _is_baseline_run(run_kind)
+    average_survival_reason = None
+    if not is_baseline:
+        average_survival_reason = (
+            "BT93C.5 pilot is not the baseline/publish lane."
+            if _is_pilot_run(run_kind)
+            else "BT93C.4 diagnostic smoke is not the 93C.5 baseline/publish lane."
+        )
 
     return {
         "rewardSafetyDiagnostics": {
@@ -393,7 +402,7 @@ def _collect_eval_diagnostics(
                     "completedEpisodeLengths": list(completed_episode_lengths),
                     "avgStepsPerCompletedEpisode": completed_avg,
                     "maxStepsPerEpisode": int(max_steps_per_episode),
-                    "baselineComparable": False,
+                    "baselineComparable": is_baseline,
                 },
                 "safetyOverruleCounts": _counter_dict(safety_overrules),
             },
@@ -407,11 +416,15 @@ def _collect_eval_diagnostics(
             "envCount": int(env_count),
             "doneCount": int(done_count),
             "completedEpisodeCount": len(completed_episode_lengths),
+            "avgStepsPerEpisode": completed_avg if is_baseline else None,
             "avgStepsPerEpisodeObserved": completed_avg,
             "openEpisodeLengthsAtStop": list(open_episode_lengths),
-            "averageBotSurvival": None,
+            "averageBotSurvival": completed_avg if is_baseline else None,
             "averageBotSurvivalReason": average_survival_reason,
-            "baselineComparable": False,
+            "averageBotSurvivalSource": "BT93C runtime-near completed episode length"
+            if is_baseline
+            else None,
+            "baselineComparable": is_baseline,
         },
         "policyQualityRestDebt": {
             "bt73IntentRecovery": {
@@ -669,9 +682,9 @@ def _write_model_package(
         "truePpoModelPackage": True,
         "scaffoldOnly": False,
         "diagnosticOnly": _is_diagnostic_run(run_kind),
-        "learningQualityClaimAllowed": False,
-        "baselineRunsStarted": False,
-        "pilotRunsStarted": _is_pilot_run(run_kind),
+        "learningQualityClaimAllowed": _is_baseline_run(run_kind),
+        "baselineRunsStarted": _is_baseline_run(run_kind),
+        "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
         "promotionAllowed": False,
         "resumedFrom": _package_pointer(resumed_from) if resumed_from else None,
         "artifacts": {
@@ -700,9 +713,9 @@ def _write_model_package(
             "runtimeSurfacesTouched": [],
             "productiveRuntimeChanged": False,
             "diagnosticOnly": _is_diagnostic_run(run_kind),
-            "learningQualityClaimAllowed": False,
-            "baselineRunsStarted": False,
-            "pilotRunsStarted": _is_pilot_run(run_kind),
+            "learningQualityClaimAllowed": _is_baseline_run(run_kind),
+            "baselineRunsStarted": _is_baseline_run(run_kind),
+            "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
             "promotionAllowed": False,
         },
     }
@@ -761,7 +774,7 @@ def run_training_from_cli(
     total_timesteps: int | None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
-    if run_kind not in {"learner-smoke", "resume-smoke", "diagnostics-smoke", "pilot-train"}:
+    if run_kind not in {"learner-smoke", "resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train"}:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
     gate_inputs = _validate_gate_inputs(config)
@@ -775,7 +788,7 @@ def run_training_from_cli(
     algorithm_cfg = config["algorithm"]
     seeds = [int(seed) for seed in env_cfg["trainSeeds"][: int(env_cfg["envCount"])]]
     source_package = None
-    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train"}:
+    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train"}:
         source_package = _resolve_package(
             checkpoint,
             artifact_root_path,
@@ -786,6 +799,7 @@ def run_training_from_cli(
         "resume-smoke": "resumeTimesteps",
         "diagnostics-smoke": "diagnosticsTimesteps",
         "pilot-train": "pilotTimesteps",
+        "baseline-train": "baselineTimesteps",
     }[run_kind]
     timesteps = int(total_timesteps or rollout_cfg.get(timestep_key) or rollout_cfg["resumeTimesteps"])
 
@@ -834,7 +848,8 @@ def run_training_from_cli(
             "wallClockSeconds": round(elapsed, 6),
             "stepsPerSecond": round(float(model.num_timesteps) / elapsed, 6) if elapsed > 0 else 0.0,
             "diagnosticOnly": _is_diagnostic_run(run_kind),
-            "learningQualityClaimAllowed": False,
+            "learningQualityClaimAllowed": _is_baseline_run(run_kind),
+            "baselineComparable": _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
             "telemetry": _telemetry(vec_env),
             "trainingCommand": " ".join(sys.argv),
@@ -869,8 +884,8 @@ def run_training_from_cli(
             "optimizer": manifest["optimizer"],
             "gateInputs": gate_inputs,
             "guardrails": manifest["guardrails"],
-            "baselineRunsStarted": False,
-            "pilotRunsStarted": _is_pilot_run(run_kind),
+            "baselineRunsStarted": _is_baseline_run(run_kind),
+            "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
             "promotionAllowed": False,
         }
         report_path = run_dir / "training_report.json"
@@ -912,7 +927,7 @@ def run_eval_from_cli(
     eval_steps: int | None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
-    if run_kind not in {"eval-smoke", "diagnostics-eval", "pilot-eval"}:
+    if run_kind not in {"eval-smoke", "diagnostics-eval", "pilot-eval", "baseline-eval"}:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
     gate_inputs = _validate_gate_inputs(config)
@@ -1032,10 +1047,10 @@ def run_eval_from_cli(
                 "readOnlyRuntimeSurfaces": list(READ_ONLY_RUNTIME_SURFACES),
                 "runtimeSurfacesTouched": [],
                 "productiveRuntimeChanged": False,
-                "baselineRunsStarted": False,
-                "pilotRunsStarted": _is_pilot_run(run_kind),
+                "baselineRunsStarted": _is_baseline_run(run_kind),
+                "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
                 "diagnosticOnly": _is_diagnostic_run(run_kind),
-                "learningQualityClaimAllowed": False,
+                "learningQualityClaimAllowed": _is_baseline_run(run_kind),
             },
         }
         report_path = run_dir / "eval_report.json"
@@ -1051,6 +1066,7 @@ def run_eval_from_cli(
         pointer_name = {
             "diagnostics-eval": "latest_diagnostics_eval.json",
             "pilot-eval": "latest_pilot_eval.json",
+            "baseline-eval": "latest_baseline_eval.json",
         }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({

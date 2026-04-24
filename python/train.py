@@ -51,6 +51,7 @@ def main() -> None:
         "resume-smoke": "93C.3.2",
         "diagnostics-smoke": "93C.4.1",
         "pilot-train": "93C.5.2",
+        "baseline-train": "93C.5.3",
     }
     phase_id = args.phase_id or default_phase_ids.get(run_kind, "93C.3.1")
     from scripts.bt93c_learner_smoke import run_training_from_cli as run_bt93c_training_from_cli
