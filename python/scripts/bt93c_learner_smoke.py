@@ -6,6 +6,7 @@ import json
 import subprocess
 import sys
 import time
+from collections import Counter
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
@@ -110,9 +111,327 @@ def _git_sha() -> str:
 def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
     resolved = (config_path or DEFAULT_CONFIG).resolve()
     config = _read_json(resolved)
-    if config.get("blockId") != "BT93C" or config.get("phaseId") != "93C.3":
+    if config.get("blockId") != "BT93C" or config.get("phaseId") not in {"93C.3", "93C.4"}:
         raise RuntimeError(f"BT93C learner config has wrong scope: {_rel(resolved)}")
     return resolved, config
+
+
+def _number(value: Any) -> float | None:
+    if value is None:
+        return None
+    if isinstance(value, np.generic):
+        value = value.item()
+    if isinstance(value, torch.Tensor):
+        if value.numel() != 1:
+            return None
+        value = value.detach().cpu().item()
+    try:
+        result = float(value)
+    except (TypeError, ValueError):
+        return None
+    if not np.isfinite(result):
+        return None
+    return result
+
+
+def _numeric_summary(values: list[float]) -> dict[str, Any]:
+    clean_values = [float(value) for value in values if np.isfinite(value)]
+    if not clean_values:
+        return {"count": 0, "min": None, "max": None, "mean": None}
+    return {
+        "count": len(clean_values),
+        "min": round(min(clean_values), 6),
+        "max": round(max(clean_values), 6),
+        "mean": round(sum(clean_values) / len(clean_values), 6),
+    }
+
+
+def _diagnostic_thresholds(config: Mapping[str, Any]) -> dict[str, Any]:
+    configured = dict((config.get("diagnostics") or {}).get("collapseThresholds") or {})
+    return {
+        "maxApproxKl": float(configured.get("maxApproxKl", 0.2)),
+        "maxClipFraction": float(configured.get("maxClipFraction", 0.6)),
+        "minEntropy": float(configured.get("minEntropy", 0.01)),
+        "maxValueLoss": float(configured.get("maxValueLoss", 100.0)),
+        "maxGradNorm": float(configured.get("maxGradNorm", (config.get("algorithm") or {}).get("maxGradNorm", 0.5))),
+        "minExplainedVariance": float(configured.get("minExplainedVariance", -1.0)),
+    }
+
+
+def _gradient_summary(model: PPO, max_grad_norm: float) -> dict[str, Any]:
+    squared_norm = 0.0
+    max_abs = 0.0
+    tensors = 0
+    for parameter in model.policy.parameters():
+        gradient = parameter.grad
+        if gradient is None:
+            continue
+        detached = gradient.detach()
+        squared_norm += float(torch.sum(detached * detached).cpu().item())
+        max_abs = max(max_abs, float(torch.max(torch.abs(detached)).cpu().item()))
+        tensors += 1
+    global_norm = squared_norm ** 0.5
+    tolerance = max(1e-5, abs(float(max_grad_norm)) * 1e-4)
+    return {
+        "observed": tensors > 0,
+        "tensorCount": tensors,
+        "globalNorm": round(global_norm, 6),
+        "maxAbsGradient": round(max_abs, 6),
+        "configuredMaxGradNorm": float(max_grad_norm),
+        "tolerance": tolerance,
+        "withinConfiguredMaxGradNorm": bool(tensors > 0 and global_norm <= float(max_grad_norm) + tolerance),
+    }
+
+
+def _ppo_learning_metrics(model: PPO, config: Mapping[str, Any]) -> dict[str, Any]:
+    logger_values = dict(getattr(model.logger, "name_to_value", {}) or {})
+    entropy_loss = _number(logger_values.get("train/entropy_loss"))
+    entropy = -entropy_loss if entropy_loss is not None else None
+    thresholds = _diagnostic_thresholds(config)
+    metrics = {
+        "policy_loss": _number(logger_values.get("train/policy_gradient_loss")),
+        "value_loss": _number(logger_values.get("train/value_loss")),
+        "entropy": entropy,
+        "approx_kl": _number(logger_values.get("train/approx_kl")),
+        "clip_fraction": _number(logger_values.get("train/clip_fraction")),
+        "explained_variance": _number(logger_values.get("train/explained_variance")),
+        "grad_norm": _gradient_summary(model, thresholds["maxGradNorm"]),
+    }
+    status = {
+        "approxKlWithinThreshold": metrics["approx_kl"] is not None and metrics["approx_kl"] <= thresholds["maxApproxKl"],
+        "clipFractionWithinThreshold": metrics["clip_fraction"] is not None and metrics["clip_fraction"] <= thresholds["maxClipFraction"],
+        "entropyAboveMinimum": metrics["entropy"] is not None and metrics["entropy"] >= thresholds["minEntropy"],
+        "valueLossWithinThreshold": metrics["value_loss"] is not None and metrics["value_loss"] <= thresholds["maxValueLoss"],
+        "explainedVarianceAboveMinimum": (
+            metrics["explained_variance"] is not None
+            and metrics["explained_variance"] >= thresholds["minExplainedVariance"]
+        ),
+        "gradNormWithinThreshold": bool(metrics["grad_norm"]["withinConfiguredMaxGradNorm"]),
+    }
+    return {
+        "source": "stable_baselines3.PPO logger after model.learn()",
+        "sampleClass": "diagnostic-smoke-not-baseline",
+        "metrics": metrics,
+        "rawLoggerKeys": sorted(str(key) for key in logger_values.keys()),
+        "collapseThresholds": thresholds,
+        "thresholdStatus": status,
+        "collapseOrInstabilitySignal": not all(status.values()),
+    }
+
+
+def _sum_action_telemetry(reports: list[Mapping[str, Any]]) -> dict[str, Any]:
+    totals = {
+        "totalActions": 0,
+        "invalidActionCount": 0,
+        "maskCount": 0,
+        "vetoCount": 0,
+        "sanitizerCount": 0,
+        "noopCount": 0,
+    }
+    field_counts: Counter[str] = Counter()
+    sanitizer_reasons: Counter[str] = Counter()
+    for report in reports:
+        for key in totals:
+            totals[key] += int(report.get(key) or 0)
+        field_counts.update({str(key): int(value) for key, value in dict(report.get("fieldCounts") or {}).items()})
+        sanitizer_reasons.update({
+            str(key): int(value) for key, value in dict(report.get("sanitizerReasons") or {}).items()
+        })
+
+    total_actions = max(0, totals["totalActions"])
+
+    def _rate(count_key: str) -> float:
+        return round(totals[count_key] / total_actions, 6) if total_actions else 0.0
+
+    return {
+        **totals,
+        "invalidActionRate": _rate("invalidActionCount"),
+        "maskRate": _rate("maskCount"),
+        "vetoRate": _rate("vetoCount"),
+        "sanitizerRate": _rate("sanitizerCount"),
+        "noopRate": _rate("noopCount"),
+        "fieldCounts": dict(sorted(field_counts.items())),
+        "sanitizerReasons": dict(sorted(sanitizer_reasons.items())),
+    }
+
+
+def _counter_dict(counter: Counter[str]) -> dict[str, int]:
+    return dict(sorted((str(key), int(value)) for key, value in counter.items()))
+
+
+def _collect_eval_diagnostics(
+    *,
+    info_samples: list[Mapping[str, Any]],
+    telemetry_reports: list[Mapping[str, Any]],
+    reward_values: list[float],
+    done_count: int,
+    completed_episode_lengths: list[int],
+    open_episode_lengths: list[int],
+    env_count: int,
+    max_steps_per_episode: int,
+    training_report: Mapping[str, Any] | None,
+    model_reload_ms: float,
+    forward_pass_ms: float,
+) -> dict[str, Any]:
+    reward_breakdown_totals: Counter[str] = Counter()
+    terminal_reasons: Counter[str] = Counter()
+    truncated_reasons: Counter[str] = Counter()
+    death_causes: Counter[str] = Counter()
+    intent_requested: Counter[str] = Counter()
+    intent_applied: Counter[str] = Counter()
+    safety_overrules: Counter[str] = Counter()
+    action_latencies: list[float] = []
+    ack_latencies: list[float] = []
+
+    for info in info_samples:
+        reward_breakdown = info.get("rewardBreakdown")
+        if isinstance(reward_breakdown, Mapping):
+            for key, value in reward_breakdown.items():
+                number = _number(value)
+                if number is not None:
+                    reward_breakdown_totals[str(key)] += number
+        terminal_reason = info.get("terminalReason")
+        if terminal_reason:
+            reason = str(terminal_reason)
+            terminal_reasons[reason] += 1
+            lowered = reason.lower()
+            if any(token in lowered for token in ("death", "crash", "loss", "killed")):
+                death_causes[reason] += 1
+        truncated_reason = info.get("truncatedReason")
+        if truncated_reason:
+            truncated_reasons[str(truncated_reason)] += 1
+
+        hybrid_decision = info.get("hybridDecision")
+        if isinstance(hybrid_decision, Mapping):
+            intent = hybrid_decision.get("intent")
+            if isinstance(intent, Mapping):
+                requested = intent.get("requested")
+                applied = intent.get("applied")
+                if requested:
+                    intent_requested[str(requested)] += 1
+                if applied:
+                    intent_applied[str(applied)] += 1
+                if requested and applied and requested != applied:
+                    safety_overrules["intent-request-applied-mismatch"] += 1
+            safety = hybrid_decision.get("safety")
+            if isinstance(safety, Mapping):
+                for key in ("vetoActive", "portalVeto", "combatVeto", "itemVeto", "projectileThreat"):
+                    if safety.get(key) is True:
+                        safety_overrules[str(key)] += 1
+
+        action_latency = _number(info.get("bridgeActionLatencyMs"))
+        if action_latency is not None:
+            action_latencies.append(action_latency)
+        ack_latency = _number(info.get("bridgeAckLatencyMs"))
+        if ack_latency is not None:
+            ack_latencies.append(ack_latency)
+
+    observed_steps = len(reward_values)
+    reward_total = round(sum(reward_values), 6)
+    completed_avg = (
+        round(sum(completed_episode_lengths) / len(completed_episode_lengths), 6)
+        if completed_episode_lengths
+        else None
+    )
+    reward_breakdown_mean = {
+        key: round(float(value) / observed_steps, 6) if observed_steps else 0.0
+        for key, value in sorted(reward_breakdown_totals.items())
+    }
+    action_telemetry = _sum_action_telemetry(telemetry_reports)
+    truncated_max_steps = sum(
+        value for key, value in truncated_reasons.items() if "max" in str(key).lower() and "step" in str(key).lower()
+    )
+    timeout_count = sum(value for key, value in truncated_reasons.items() if "timeout" in str(key).lower())
+    forced_round_count = sum(
+        value
+        for key, value in {**terminal_reasons, **truncated_reasons}.items()
+        if "forced" in str(key).lower()
+    )
+    crash_count = sum(
+        value
+        for key, value in {**terminal_reasons, **death_causes}.items()
+        if "crash" in str(key).lower()
+    )
+    training_learning = dict((training_report or {}).get("learning") or {})
+
+    return {
+        "rewardSafetyDiagnostics": {
+            "rewardBreakdownTotals": {key: round(float(value), 6) for key, value in sorted(reward_breakdown_totals.items())},
+            "rewardBreakdownMeanPerStep": reward_breakdown_mean,
+            "rewardTotal": reward_total,
+            "rewardMean": round(reward_total / observed_steps, 6) if observed_steps else 0.0,
+            "rewardHackingSignals": {
+                "survivalRewardShare": (
+                    round(float(reward_breakdown_totals.get("survival", 0.0)) / reward_total, 6)
+                    if reward_total
+                    else None
+                ),
+                "episodeShorteningCheck": {
+                    "doneCount": int(done_count),
+                    "completedEpisodeLengths": list(completed_episode_lengths),
+                    "avgStepsPerCompletedEpisode": completed_avg,
+                    "maxStepsPerEpisode": int(max_steps_per_episode),
+                    "baselineComparable": False,
+                },
+                "safetyOverruleCounts": _counter_dict(safety_overrules),
+            },
+            "actionTelemetry": action_telemetry,
+            "terminalReasonCounts": _counter_dict(terminal_reasons),
+            "truncatedReasonCounts": _counter_dict(truncated_reasons),
+            "deathCauseCounts": _counter_dict(death_causes),
+        },
+        "survivalKpis": {
+            "observedVectorSteps": observed_steps,
+            "envCount": int(env_count),
+            "doneCount": int(done_count),
+            "completedEpisodeCount": len(completed_episode_lengths),
+            "avgStepsPerEpisodeObserved": completed_avg,
+            "openEpisodeLengthsAtStop": list(open_episode_lengths),
+            "averageBotSurvival": None,
+            "averageBotSurvivalReason": "BT93C.4 diagnostic smoke is not the 93C.5 baseline/publish lane.",
+            "baselineComparable": False,
+        },
+        "policyQualityRestDebt": {
+            "bt73IntentRecovery": {
+                "status": "open-restschuld-visible",
+                "requestedIntentCounts": _counter_dict(intent_requested),
+                "appliedIntentCounts": _counter_dict(intent_applied),
+                "note": "Intent-/Recovery-Luecken bleiben Bewertungsrestschuld; Survival allein entscheidet nicht.",
+            },
+            "bt80cProductionValidation": {
+                "status": "blocked-by-BT80C-80.9.3",
+                "rolloutOrPromoteAllowed": False,
+            },
+            "jsInferenceIntegration": {
+                "status": "not-in-BT93C-scope",
+                "runtimeSwitchAllowed": False,
+                "latencyCountsAsJsTickEvidence": False,
+            },
+        },
+        "failureSemantics": {
+            "runtimeErrorCount": 0,
+            "crash": int(crash_count),
+            "timeout": int(timeout_count),
+            "forcedRound": int(forced_round_count),
+            "socketClose": 0,
+            "teardownFailure": 0,
+            "maxSteps": int(truncated_max_steps),
+            "naturalTerminal": int(sum(terminal_reasons.values()) - sum(death_causes.values())),
+            "deathCauseCounts": _counter_dict(death_causes),
+            "terminalReasonCounts": _counter_dict(terminal_reasons),
+            "truncatedReasonCounts": _counter_dict(truncated_reasons),
+        },
+        "latencyAndThroughputBudget": {
+            "countsAsLearningProgress": False,
+            "modelReloadMs": round(model_reload_ms, 6),
+            "pythonForwardPassMs": round(forward_pass_ms, 6),
+            "bridgeActionLatencyMs": _numeric_summary(action_latencies),
+            "bridgeAckLatencyMs": _numeric_summary(ack_latencies),
+            "trainingStepsPerSecond": training_learning.get("stepsPerSecond"),
+            "trainingWallClockSeconds": training_learning.get("wallClockSeconds"),
+            "classification": "budget-and-stability-only",
+        },
+    }
 
 
 def _validate_gate_inputs(config: Mapping[str, Any]) -> dict[str, Any]:
@@ -327,6 +646,8 @@ def _write_model_package(
         "gitSha": _git_sha(),
         "truePpoModelPackage": True,
         "scaffoldOnly": False,
+        "diagnosticOnly": run_kind == "diagnostics-smoke",
+        "learningQualityClaimAllowed": False,
         "baselineRunsStarted": False,
         "pilotRunsStarted": False,
         "promotionAllowed": False,
@@ -356,6 +677,8 @@ def _write_model_package(
             "readOnlyRuntimeSurfaces": list(READ_ONLY_RUNTIME_SURFACES),
             "runtimeSurfacesTouched": [],
             "productiveRuntimeChanged": False,
+            "diagnosticOnly": run_kind == "diagnostics-smoke",
+            "learningQualityClaimAllowed": False,
         },
     }
     _write_json(manifest_path, manifest)
@@ -413,7 +736,7 @@ def run_training_from_cli(
     total_timesteps: int | None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
-    if run_kind not in {"learner-smoke", "resume-smoke"}:
+    if run_kind not in {"learner-smoke", "resume-smoke", "diagnostics-smoke"}:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
     gate_inputs = _validate_gate_inputs(config)
@@ -427,9 +750,18 @@ def run_training_from_cli(
     algorithm_cfg = config["algorithm"]
     seeds = [int(seed) for seed in env_cfg["trainSeeds"][: int(env_cfg["envCount"])]]
     source_package = None
-    if run_kind == "resume-smoke":
-        source_package = _resolve_package(checkpoint, artifact_root_path, prefer="latest_learner_smoke.json")
-    timesteps = int(total_timesteps or rollout_cfg["resumeTimesteps" if run_kind == "resume-smoke" else "learnerTimesteps"])
+    if run_kind in {"resume-smoke", "diagnostics-smoke"}:
+        source_package = _resolve_package(
+            checkpoint,
+            artifact_root_path,
+            prefer="latest_learner_smoke.json" if run_kind == "resume-smoke" else "latest_model_package.json",
+        )
+    timestep_key = {
+        "learner-smoke": "learnerTimesteps",
+        "resume-smoke": "resumeTimesteps",
+        "diagnostics-smoke": "diagnosticsTimesteps",
+    }[run_kind]
+    timesteps = int(total_timesteps or rollout_cfg.get(timestep_key) or rollout_cfg["resumeTimesteps"])
 
     vec_env: VecNormalize | None = None
     try:
@@ -466,6 +798,7 @@ def run_training_from_cli(
         model.learn(total_timesteps=timesteps, reset_num_timesteps=(run_kind == "learner-smoke"))
         elapsed = time.perf_counter() - started
         updates_after = int(getattr(model, "_n_updates", 0))
+        ppo_metrics = _ppo_learning_metrics(model, config)
         learning_report = {
             "requestedTimesteps": timesteps,
             "modelNumTimesteps": int(model.num_timesteps),
@@ -474,6 +807,9 @@ def run_training_from_cli(
             "optimizerUpdatesCompleted": updates_after > updates_before,
             "wallClockSeconds": round(elapsed, 6),
             "stepsPerSecond": round(float(model.num_timesteps) / elapsed, 6) if elapsed > 0 else 0.0,
+            "diagnosticOnly": run_kind == "diagnostics-smoke",
+            "learningQualityClaimAllowed": False,
+            "ppoLearningMetrics": ppo_metrics,
             "telemetry": _telemetry(vec_env),
             "trainingCommand": " ".join(sys.argv),
         }
@@ -540,17 +876,20 @@ def run_training_from_cli(
 
 def run_eval_from_cli(
     *,
+    run_kind: str,
     phase_id: str,
     config_path: str | None,
     artifact_root: str | None,
     eval_steps: int | None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
+    if run_kind not in {"eval-smoke", "diagnostics-eval"}:
+        raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
     gate_inputs = _validate_gate_inputs(config)
     artifact_root_path = _repo_path(artifact_root or str((config.get("artifacts") or {}).get("root") or DEFAULT_ARTIFACT_ROOT))
     source_package = _resolve_package(checkpoint, artifact_root_path)
-    run_id = _run_id("eval-smoke")
+    run_id = _run_id(run_kind)
     run_dir = artifact_root_path / "runs" / run_id
     run_dir.mkdir(parents=True, exist_ok=False)
     env_cfg = config["env"]
@@ -582,14 +921,43 @@ def run_eval_from_cli(
         rewards: list[float] = []
         done_count = 0
         info_tail: list[dict[str, Any]] = []
+        info_samples: list[dict[str, Any]] = []
+        completed_episode_lengths: list[int] = []
+        open_episode_lengths = [0 for _ in seeds]
         for _ in range(steps):
             action, _ = model.predict(obs, deterministic=True)
             obs, reward, done, infos = vec_env.step(action)
-            rewards.extend(float(entry) for entry in np.asarray(reward).reshape(-1))
+            reward_entries = [float(entry) for entry in np.asarray(reward).reshape(-1)]
+            done_entries = [bool(entry) for entry in np.asarray(done).reshape(-1)]
+            rewards.extend(reward_entries)
             done_count += int(np.count_nonzero(done))
-            for info in infos:
+            for index, info in enumerate(infos):
+                if index < len(open_episode_lengths):
+                    open_episode_lengths[index] += 1
+                    if index < len(done_entries) and done_entries[index]:
+                        completed_episode_lengths.append(open_episode_lengths[index])
+                        open_episode_lengths[index] = 0
+                info_samples.append(dict(info))
                 if len(info_tail) < 4:
                     info_tail.append(dict(info))
+        telemetry_reports = _telemetry(vec_env)
+        source_training_report = None
+        source_training_report_path = source_package.manifest_path.parent / "training_report.json"
+        if source_training_report_path.exists():
+            source_training_report = _read_json(source_training_report_path)
+        diagnostics = _collect_eval_diagnostics(
+            info_samples=info_samples,
+            telemetry_reports=telemetry_reports,
+            reward_values=rewards,
+            done_count=done_count,
+            completed_episode_lengths=completed_episode_lengths,
+            open_episode_lengths=open_episode_lengths,
+            env_count=len(seeds),
+            max_steps_per_episode=int(env_cfg["maxStepsPerEpisode"]),
+            training_report=source_training_report,
+            model_reload_ms=load_elapsed_ms,
+            forward_pass_ms=forward_elapsed_ms,
+        )
         report = {
             "ok": True,
             "generatedAt": _utc_now(),
@@ -597,7 +965,7 @@ def run_eval_from_cli(
             "blockId": "BT93C",
             "phaseId": phase_id,
             "runId": run_id,
-            "runKind": "eval-smoke",
+            "runKind": run_kind,
             "loadedRealPpoModel": True,
             "sourcePackage": _package_pointer(source_package),
             "modelReload": {
@@ -615,9 +983,10 @@ def run_eval_from_cli(
                 "rewardTotal": round(sum(rewards), 6),
                 "rewardMean": round(sum(rewards) / len(rewards), 6) if rewards else 0.0,
                 "doneCount": done_count,
-                "telemetry": _telemetry(vec_env),
+                "telemetry": telemetry_reports,
                 "infoTail": info_tail,
             },
+            "diagnostics": diagnostics,
             "artifacts": {
                 "evalReport": _rel(run_dir / "eval_report.json"),
                 "sourceArtifactManifest": _rel(source_package.manifest_path),
@@ -635,19 +1004,22 @@ def run_eval_from_cli(
                 "productiveRuntimeChanged": False,
                 "baselineRunsStarted": False,
                 "pilotRunsStarted": False,
+                "diagnosticOnly": run_kind == "diagnostics-eval",
+                "learningQualityClaimAllowed": False,
             },
         }
         report_path = run_dir / "eval_report.json"
         _write_json(report_path, report)
         pointer = {
             "runId": run_id,
-            "runKind": "eval-smoke",
+            "runKind": run_kind,
             "ok": True,
             "report": _rel(report_path),
             "sourceArtifactManifest": _rel(source_package.manifest_path),
             "sourceModel": _rel(source_package.model_path),
         }
-        _write_json(artifact_root_path / "latest_eval_smoke.json", pointer)
+        pointer_name = "latest_diagnostics_eval.json" if run_kind == "diagnostics-eval" else "latest_eval_smoke.json"
+        _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({
             "ok": True,
             "runId": run_id,

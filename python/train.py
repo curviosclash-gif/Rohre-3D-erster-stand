@@ -46,7 +46,12 @@ def main() -> None:
         return
 
     run_kind = args.run_kind or "learner-smoke"
-    phase_id = args.phase_id or ("93C.3.2" if run_kind == "resume-smoke" else "93C.3.1")
+    default_phase_ids = {
+        "learner-smoke": "93C.3.1",
+        "resume-smoke": "93C.3.2",
+        "diagnostics-smoke": "93C.4.1",
+    }
+    phase_id = args.phase_id or default_phase_ids.get(run_kind, "93C.3.1")
     from scripts.bt93c_learner_smoke import run_training_from_cli as run_bt93c_training_from_cli
 
     run_bt93c_training_from_cli(

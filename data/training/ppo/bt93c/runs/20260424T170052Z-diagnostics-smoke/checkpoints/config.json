@@ -11,9 +11,18 @@
     "evalEnvCount": 2,
     "maxStepsPerEpisode": 4,
     "controllerTimeoutSeconds": 30,
-    "trainSeeds": [930, 931],
-    "evalSeeds": [940, 941],
-    "holdoutSeeds": [950, 951],
+    "trainSeeds": [
+      930,
+      931
+    ],
+    "evalSeeds": [
+      940,
+      941
+    ],
+    "holdoutSeeds": [
+      950,
+      951
+    ],
     "holdoutStatus": "reserved-for-93C.6; not consumed by 93C.3"
   },
   "rollout": {
@@ -41,7 +50,10 @@
     "maxGradNorm": 0.5
   },
   "policy": {
-    "netArch": [64, 64],
+    "netArch": [
+      64,
+      64
+    ],
     "activation": "tanh",
     "actorCriticHeadsRequired": true
   },
