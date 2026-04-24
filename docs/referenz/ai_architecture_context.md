@@ -638,6 +638,16 @@ Architekturprinzip: Alle Surface-Entscheide laufen ueber die obigen Resolver aus
 - Der Expert-State (`unlocked`, `available`, `accessMode`, `reason`, `message`, `productSurfaceId`) wird im `MenuExpertLoginRuntime`-Objekt self-contained gehalten; `attachMenuExpertState(settings, state)` ist eine optionale Lookup-Bruecke fuer `MenuAccessPolicy` und andere Consumers, die den State ueber das Settings-Objekt lesen muessen.
 - Entscheidung 2026-04-15: Das hartcodierte Passwort bleibt als lokaler Dev-only-Schalter erhalten. Es wird nicht durch einen echten Authentifizierungspfad ersetzt, da es kein Sicherheits- oder Produktversprechen traegt. Folgearbeit, die den Expert-State aus Settings-Anhaengseln befreien moechte, soll `resolveMenuExpertState(settings)` durch einen direkten `MenuExpertLoginRuntime`-Handle-Zugriff ersetzen, sobald der Bootstrap-Kontext es erlaubt.
 
+#### 4.6.4.18 Browser-Demo-Policy-Leseweg und Guardrails (`V98 98.4.3` / `98.5.x`)
+
+- `electron/settings-studio/services/SettingsBrowserDemoPolicyService.cjs` fuehrt den dedizierten Desktop-Writer fuer Demo-Grenzen: Override-Quelle ist `browser-demo-surface-policy.override.json` unter `userData`; der Browser konsumiert nicht direkt aus dieser Datei.
+- Der read-only Auslieferungspfad ist das versionierte Build-Artefakt `data/contracts/browser-demo-surface-policy.export.v1.json` (`contractVersion: browser-demo-surface-policy-export.v1`), geschrieben durch das Settings Studio beim Speichern.
+- `src/shared/contracts/PlatformCapabilityRegistry.js` liest im Browser den Export-Snapshot nur ueber den zentralen Resolverpfad und merged ihn mit der Basis-Policy aus `PlatformCapabilityData`; Consumer bleiben auf `resolveSurfacePolicy()` und `resolveSurfaceCapabilityAccess()` ohne eigene Override-Sonderzweige.
+- Das Merge bleibt monotone Begrenzung: Override-Daten duerfen Session-/Mode-/Preset-/Transport- und Capability-Freigaben nur einschraenken, nie erweitern. Ueberhoehte oder ungueltige Felder werden geclamped oder rejected.
+- Fail-safe bleibt verpflichtend: fehlendes, korruptes oder versionsfremdes Export-Artefakt faellt deterministisch auf die Basis-Policy zurueck; der Resolver liefert strukturierte Diagnostics (`status`, `reasonCode`, `migrationCode`, `errorCodes`, `warningCodes`) fuer UI, Tests und Gate-Nachweise.
+- Der Desktop-Editor bleibt strikt desktop-only; Browser-Demo bleibt read-only Consumer derselben Shared Contracts. Ein Browser-Schreibpfad fuer Demo-Grenzen ist weiterhin ausgeschlossen.
+- Contract-Haertung: `tests/settings-studio-override.contract.test.mjs` deckt UI-/IPC-Pfade fuer Browser-Demo-Section, Save-/Validation-Fehler und Restore-Hygiene; `tests/platform-capabilities.contract.test.mjs` deckt Build-Artefakt-Lesepfad, Fallback und monotones Clamp-Merge im Runtime-Resolver.
+
 ### 4.6.5 Persistence-, Export- und Content-Versionierungsleitplanke fuer V85
 
 - Feldkonvention:

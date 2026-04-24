@@ -1,4 +1,8 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { createRequire } from 'node:module';
 import test from 'node:test';
 
 import {
@@ -13,6 +17,68 @@ import {
 } from '../src/core/settings/SettingsOverrideContract.js';
 
 import { createDefaultSettingsSnapshotWithOverride } from '../src/core/settings/SettingsDefaultsFacade.js';
+import {
+    BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+    createBrowserDemoSurfacePolicyOverrideDraft,
+} from '../src/shared/contracts/BrowserDemoSurfacePolicyOverrideContract.js';
+import { SECTIONS } from '../electron/settings-studio/ui/settings-studio-i18n.js';
+
+const require = createRequire(import.meta.url);
+const { registerSettingsStudioIpc } = require('../electron/settings-studio/ipc/settings-studio-ipc.cjs');
+const {
+    BROWSER_DEMO_POLICY_EXPORT_CONTRACT_VERSION,
+} = require('../electron/settings-studio/services/SettingsBrowserDemoPolicyService.cjs');
+
+const SETTINGS_STUDIO_CHANNELS = Object.freeze({
+    load: 'settings-studio:load',
+    save: 'settings-studio:save',
+    listBackups: 'settings-studio:list-backups',
+    restoreBackup: 'settings-studio:restore-backup',
+});
+
+function createIpcHarness() {
+    const handlers = new Map();
+    return {
+        ipcMain: {
+            handle(channel, handler) {
+                handlers.set(channel, handler);
+            },
+            removeHandler(channel) {
+                handlers.delete(channel);
+            },
+        },
+        async invoke(channel, ...args) {
+            const handler = handlers.get(channel);
+            assert.equal(typeof handler, 'function', `missing IPC handler: ${channel}`);
+            return handler({}, ...args);
+        },
+    };
+}
+
+async function createSettingsStudioTestHarness(t) {
+    const userDataPath = await fs.mkdtemp(path.join(os.tmpdir(), 'curvios-settings-studio-v98-'));
+    const harness = createIpcHarness();
+    const app = {
+        getPath(kind) {
+            assert.equal(kind, 'userData');
+            return userDataPath;
+        },
+    };
+    const unregister = registerSettingsStudioIpc({
+        ipcMain: harness.ipcMain,
+        app,
+    });
+
+    t.after(async () => {
+        unregister();
+        await fs.rm(userDataPath, { recursive: true, force: true });
+    });
+
+    return {
+        userDataPath,
+        invoke: harness.invoke,
+    };
+}
 
 // ─── 97.1 Field registry metadata ────────────────────
 
@@ -150,4 +216,141 @@ test('validateSettingsOverrideDraft accepts a fresh default draft', () => {
     const result = validateSettingsOverrideDraft(draft);
     assert.equal(result.valid, true, `validation failed: ${JSON.stringify(result.errors)}`);
     assert.equal(result.errors.length, 0);
+});
+
+test('V98.5.2 settings studio keeps browser-demo section and save-preview risk hints wired', async () => {
+    assert.equal(SECTIONS.some((entry) => entry.key === 'browserDemoPolicy'), true);
+
+    const appSource = await fs.readFile(
+        new URL('../electron/settings-studio/ui/settings-studio-app.js', import.meta.url),
+        'utf8'
+    );
+    assert.equal(appSource.includes('renderBrowserDemoPreviewHints'), true);
+    assert.equal(appSource.includes('browserDemoRiskHintTitle'), true);
+    assert.equal(appSource.includes("sectionKey === 'browserDemoPolicy'"), true);
+    assert.equal(appSource.includes('statusSavedBrowserDemoPolicy'), true);
+});
+
+test('V98.5.2 settings studio load exposes browser-demo policy draft plus dedicated override and export paths', async (t) => {
+    const harness = await createSettingsStudioTestHarness(t);
+    const response = await harness.invoke(SETTINGS_STUDIO_CHANNELS.load);
+
+    assert.equal(response.ok, true);
+    assert.equal(response.browserDemoPolicy.validation.valid, true);
+    assert.equal(
+        response.browserDemoPolicy.draft.contractVersion,
+        BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION
+    );
+    assert.match(
+        String(response.paths.browserDemoPolicyOverrideFilePath || ''),
+        /browser-demo-surface-policy\.override\.json$/u
+    );
+    assert.match(
+        String(response.paths.browserDemoPolicyExportFilePath || '').replaceAll('\\', '/'),
+        /data\/contracts\/browser-demo-surface-policy\.export\.v1\.json$/u
+    );
+});
+
+test('V98.5.2 settings studio save returns browser-demo validation errors and does not write invalid policy drafts', async (t) => {
+    const harness = await createSettingsStudioTestHarness(t);
+    const mainDraft = createSettingsOverrideDraft();
+    const invalidBrowserDemoDraft = {
+        contractVersion: BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+        policy: {
+            unknownPolicyField: true,
+        },
+    };
+
+    const saveResponse = await harness.invoke(
+        SETTINGS_STUDIO_CHANNELS.save,
+        mainDraft,
+        invalidBrowserDemoDraft
+    );
+
+    assert.equal(saveResponse.ok, false);
+    assert.equal(saveResponse.browserDemoPolicy.validation.valid, false);
+    assert.equal(saveResponse.browserDemoPolicy.migration.status, 'current');
+    assert.equal(
+        saveResponse.browserDemoPolicy.validation.errors.some((entry) => entry.code === 'POLICY_FIELD_UNKNOWN'),
+        true
+    );
+
+    await assert.rejects(
+        fs.access(path.join(harness.userDataPath, 'browser-demo-surface-policy.override.json')),
+        /ENOENT/u
+    );
+});
+
+test('V98.5.2 restore hygiene keeps browser-demo override untouched while restoring menu defaults backup', async (t) => {
+    const harness = await createSettingsStudioTestHarness(t);
+    const loadResponse = await harness.invoke(SETTINGS_STUDIO_CHANNELS.load);
+    const firstMainDraft = JSON.parse(JSON.stringify(loadResponse.draft));
+    const secondMainDraft = JSON.parse(JSON.stringify(loadResponse.draft));
+    firstMainDraft.baseSettings.gameplay.speed = 0.84;
+    secondMainDraft.baseSettings.gameplay.speed = 1.04;
+
+    const firstBrowserDraft = JSON.parse(JSON.stringify(createBrowserDemoSurfacePolicyOverrideDraft()));
+    firstBrowserDraft.policy = {
+        allowedModePaths: ['fight'],
+    };
+    firstBrowserDraft.capabilityFlags = {
+        save: { enabled: false },
+    };
+
+    const secondBrowserDraft = JSON.parse(JSON.stringify(createBrowserDemoSurfacePolicyOverrideDraft()));
+    secondBrowserDraft.policy = {
+        allowedModePaths: ['arcade'],
+        allowedSessionTypes: ['single'],
+    };
+    secondBrowserDraft.capabilityFlags = {
+        save: { enabled: false },
+        recording: { enabled: false },
+    };
+
+    const firstSave = await harness.invoke(
+        SETTINGS_STUDIO_CHANNELS.save,
+        firstMainDraft,
+        firstBrowserDraft
+    );
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    const secondSave = await harness.invoke(
+        SETTINGS_STUDIO_CHANNELS.save,
+        secondMainDraft,
+        secondBrowserDraft
+    );
+
+    assert.equal(firstSave.ok, true);
+    assert.equal(secondSave.ok, true);
+    assert.equal(
+        secondSave.browserDemoPolicy.exportState.contractVersion,
+        BROWSER_DEMO_POLICY_EXPORT_CONTRACT_VERSION
+    );
+
+    const listResponse = await harness.invoke(SETTINGS_STUDIO_CHANNELS.listBackups, { limit: 30 });
+    const backups = Array.isArray(listResponse?.backups) ? listResponse.backups : [];
+    const restoreCandidate = backups.find((entry) => /\.pre-save\.json$/u.test(String(entry.fileName || '')));
+    assert.ok(restoreCandidate, 'expected a pre-save backup for menu-defaults');
+    assert.equal(
+        backups.some((entry) => String(entry.fileName || '').includes('.pre-save-browser-demo-policy.json')),
+        true
+    );
+
+    const restoreResponse = await harness.invoke(
+        SETTINGS_STUDIO_CHANNELS.restoreBackup,
+        restoreCandidate.fileName
+    );
+    assert.equal(restoreResponse.ok, true);
+
+    const restoredMainRaw = await fs.readFile(loadResponse.paths.overrideFilePath, 'utf8');
+    const restoredMainDraft = JSON.parse(restoredMainRaw);
+    assert.deepEqual(restoredMainDraft, firstSave.draft);
+
+    const browserPolicyRaw = await fs.readFile(loadResponse.paths.browserDemoPolicyOverrideFilePath, 'utf8');
+    const browserPolicyDraft = JSON.parse(browserPolicyRaw);
+    assert.deepEqual(browserPolicyDraft, secondSave.browserDemoPolicy.draft);
+
+    const exportRaw = await fs.readFile(loadResponse.paths.browserDemoPolicyExportFilePath, 'utf8');
+    const exportArtifact = JSON.parse(exportRaw);
+    assert.equal(exportArtifact.contractVersion, BROWSER_DEMO_POLICY_EXPORT_CONTRACT_VERSION);
+    assert.deepEqual(exportArtifact.draft, secondSave.browserDemoPolicy.draft);
 });
