@@ -1,0 +1,100 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T00:44:20Z",
+  "generatedBy": "python/scripts/bt93b_verify_artifact_consistency.py",
+  "blockId": "BT93B",
+  "phaseId": "93B.3.2",
+  "scaffoldOnly": true,
+  "promotionAllowed": false,
+  "bt94aGate": "closed",
+  "freshRun": {
+    "runId": "20260424T002459Z-fresh-smoke",
+    "runKind": "fresh-smoke",
+    "phaseId": "93B.2.1",
+    "report": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/training_report.json",
+    "checkpoint": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/latest_checkpoint.json",
+    "artifacts": [
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/latest_checkpoint.json",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/crash_paths.json",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/events.jsonl",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/hardware_limits.json",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.pkl",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.json",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/run_manifest.json",
+      "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/training_report.json"
+    ],
+    "normalization": {
+      "json": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.json",
+      "pickle": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.pkl",
+      "count": 770,
+      "observationLength": 64,
+      "jsonPickleMatch": true
+    },
+    "events": {
+      "path": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/events.jsonl",
+      "lineCount": 16,
+      "firstEvent": "run-start",
+      "lastEvent": "run-finish"
+    }
+  },
+  "resumeRun": {
+    "runId": "20260424T003303Z-resume-smoke",
+    "runKind": "resume-smoke",
+    "phaseId": "93B.3.1",
+    "report": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/training_report.json",
+    "checkpoint": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints/latest_checkpoint.json",
+    "resumedFrom": {
+      "ok": true,
+      "checkpoint": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/latest_checkpoint.json",
+      "checkpointId": "20260424T002459Z-fresh-smoke-latest",
+      "sourceRunId": "20260424T002459Z-fresh-smoke",
+      "sourceRunKind": "fresh-smoke",
+      "sourcePhaseId": "93B.2.1",
+      "completedSteps": 768,
+      "targetSteps": 768,
+      "normalizationStats": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.pkl",
+      "normalizationStatsJson": "data/training/ppo/bt93b/runs/20260424T002459Z-fresh-smoke/checkpoints/vecnormalize.json",
+      "normalizationCount": 770,
+      "normalizationObservationLength": 64,
+      "normalizationJsonPickleMatch": true
+    },
+    "artifacts": [
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints/latest_checkpoint.json",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/crash_paths.json",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/events.jsonl",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/hardware_limits.json",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints/vecnormalize.pkl",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints/vecnormalize.json",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/run_manifest.json",
+      "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/training_report.json"
+    ],
+    "normalization": {
+      "json": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints/vecnormalize.json",
+      "pickle": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/checkpoints/vecnormalize.pkl",
+      "count": 770,
+      "observationLength": 64,
+      "jsonPickleMatch": true
+    },
+    "events": {
+      "path": "data/training/ppo/bt93b/runs/20260424T003303Z-resume-smoke/events.jsonl",
+      "lineCount": 16,
+      "firstEvent": "run-start",
+      "lastEvent": "run-finish"
+    }
+  },
+  "checks": {
+    "stableManifestMatch": true,
+    "budgetMatch": true,
+    "policySurfaceMatch": true,
+    "resumeConsumesFreshCheckpoint": true,
+    "freshNormalizationJsonPickleMatch": true,
+    "resumeNormalizationJsonPickleMatch": true,
+    "eventStreamsClosed": true,
+    "scopeGuardrailsMatch": true,
+    "runtimeSurfacesUntouched": true,
+    "noPromotionClaim": true
+  },
+  "failures": []
+}

@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "report": "data/training/ppo/bt93b/artifact_consistency_report.json",
+  "freshRunId": "20260424T002459Z-fresh-smoke",
+  "resumeRunId": "20260424T003303Z-resume-smoke"
+}
