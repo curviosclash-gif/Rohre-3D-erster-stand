@@ -1563,10 +1563,10 @@ Vollstaendiges Befundsinventar fuer BT93E:
 
 ### 93E.4 Policy-Mask-, Clamp-, Veto- und Action-Surface-Haertung (F.03/F.20/F.30)
 
-- [ ] 93E.4.1 Policy-Level-Maskierung, Post-Decode-Clamp, Sanitizer, Safety-Veto, Invalid-Action und No-Op/Fallback getrennt messen und im Train-/Eval-/Holdout-Pfad gleich benennen.
-- [ ] 93E.4.2 Hohe Clamp-/Veto-/Masklast als Freeze-/Startblocker behandeln oder mit neuer Evidence sauber downgaten; Sanitizer duerfen Policy-Fehler nicht verdecken.
-- [ ] 93E.4.3 Action-Surface-Smoke neu ausfuehren oder gezielt erweitern, damit SB3-Trainierbarkeit, Mask-Quelle, Index-Encoding und Fallback-Semantik belegt sind.
-- [ ] 93E.4.4 Reports aktualisieren, sodass `policy-mask` und `post-decode-clamp` nicht mehr vermischt werden.
+- [x] 93E.4.1 Policy-Level-Maskierung, Post-Decode-Clamp, Sanitizer, Safety-Veto, Invalid-Action und No-Op/Fallback getrennt messen und im Train-/Eval-/Holdout-Pfad gleich benennen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93e_action_surface_hardening_report.py --write-report --update-start-matrix` -> `data\training\ppo\bt93e\action_surface_hardening_report.json` (`phaseCoverage.93E.4.1=true`, Train/Eval/Holdout `schemaNames` getrennt, commit `87d8a5b`))
+- [x] 93E.4.2 Hohe Clamp-/Veto-/Masklast als Freeze-/Startblocker behandeln oder mit neuer Evidence sauber downgaten; Sanitizer duerfen Policy-Fehler nicht verdecken. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93e_action_surface_hardening_report.py --write-report --update-start-matrix` -> `data\training\ppo\bt93e\action_surface_hardening_report.json` (`F.30=still-blocking`, `claimableAfter93E4=false`, `highLoadWithoutPolicyMaskBlocksBt94a=true`, commit `87d8a5b`))
+- [x] 93E.4.3 Action-Surface-Smoke neu ausfuehren oder gezielt erweitern, damit SB3-Trainierbarkeit, Mask-Quelle, Index-Encoding und Fallback-Semantik belegt sind. (abgeschlossen: 2026-04-25; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\scripts\bt93c_action_surface_smoke.py --output data\training\ppo\bt93e\action_surface_smoke_93e4.json --block-id BT93E --phase-id 93E.4.3 --include-fallback-probes` -> `data\training\ppo\bt93e\action_surface_smoke_93e4.json` (`sb3CompatibleActionSpace=true`, `forcedNoopFallbackTelemetryVisible=true`, `forcedInvalidFallbackTelemetryVisible=true`, commit `87d8a5b`))
+- [x] 93E.4.4 Reports aktualisieren, sodass `policy-mask` und `post-decode-clamp` nicht mehr vermischt werden. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93e_action_surface_hardening_report.py --write-report --update-start-matrix` -> `data\training\ppo\bt93e\start_matrix.json` (`actionSurfaceHardeningMatrix.phaseId=93E.4.4`, `policyMaskAndPostDecodeClampMustNotBeMixed=true`, commit `87d8a5b`))
 
 ### 93E.5 Gate-Refresh, Handover und Folgegrenzen
 
