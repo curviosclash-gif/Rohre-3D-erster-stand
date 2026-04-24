@@ -137,9 +137,9 @@
     "ppoValidateStatus": "ppo-validate-missing",
     "summary": "BT93D refreshed eval/holdout evidence keeps BT94A closed: Survival remains below the DQN anchor and terminal/policy diagnostics still block start."
   },
-  "generatedAt": "2026-04-24T21:07:08Z",
+  "generatedAt": "2026-04-24T21:42:47Z",
   "generatedBy": "python/scripts/bt93d_start_gate_package.py",
-  "gitSha": "4cb08206266407cc405f56fda531c7a8284b14c6",
+  "gitSha": "79739fa494a82c98c34bd89616bb54f0d66cf504",
   "guardrails": {
     "bt94aGate": "closed-diagnose-blocked-by-bt93d",
     "candidateRun": false,

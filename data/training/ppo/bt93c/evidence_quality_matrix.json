@@ -298,7 +298,7 @@
     "F.30",
     "F.31"
   ],
-  "generatedAt": "2026-04-24T21:07:08Z",
+  "generatedAt": "2026-04-24T21:42:47Z",
   "generatedBy": "python/scripts/bt93d_start_gate_package.py",
   "ok": true,
   "phaseId": "93D.4.1",
@@ -345,7 +345,7 @@
     },
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "dfc7e09768d4f71ab99d5d10e4dba1a5dabaedc30bddcd9ba2d7190efc4d5109",
+      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621",
       "role": "BT93D-refreshed precomparison",
       "closureCapable": true
     }

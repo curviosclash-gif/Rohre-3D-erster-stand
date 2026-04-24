@@ -1,10 +1,10 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-24T21:07:09Z",
+  "generatedAt": "2026-04-24T21:43:12Z",
   "generatedBy": "python/scripts/bt93d_start_gate_package.py",
   "blockId": "BT93D",
   "phaseId": "93D.4",
-  "gitSha": "4cb08206266407cc405f56fda531c7a8284b14c6",
+  "gitSha": "79739fa494a82c98c34bd89616bb54f0d66cf504",
   "resultClass": "diagnose-blocked",
   "phaseCoverage": {
     "93D.4.1": true,
@@ -83,25 +83,25 @@
   "sourceArtifacts": {
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "dfc7e09768d4f71ab99d5d10e4dba1a5dabaedc30bddcd9ba2d7190efc4d5109",
+      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621",
       "role": "BT93D-refreshed precomparison",
       "closureCapable": true
     },
     "handoverReport": {
       "path": "data/training/ppo/bt93c/handover_report.json",
-      "sha256": "88c1d2f0629607fd565868f69d063fccf55cec40e5f2c6495754e79451125500",
+      "sha256": "d18ab47e09edc4fc0d591cc8281f6d046ad821323661d2b4c5dfef84ae15df64",
       "role": "BT93D-refreshed handover",
       "closureCapable": true
     },
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-      "sha256": "a21b84bb8917036410a0c76bf96dc17f28dc868a89152895d84133316d6d5549",
+      "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c",
       "role": "BT93D-refreshed evidence matrix",
       "closureCapable": true
     },
     "bt94aGate": {
       "path": "data/training/ppo/bt94a/no_start_gate.json",
-      "sha256": "543020d531131fbeb09b68a041cbf14f7ffaf827cda91eb4438ab6e1bbc4a29c",
+      "sha256": "90d5e63820b22fded0794e110371726d51bd6e68fcf51c6eca1a8aad989169ea",
       "role": "BT94A gate check",
       "closureCapable": true
     },

@@ -37,11 +37,11 @@
   },
   "evidenceQualityMatrix": {
     "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-    "sha256": "a21b84bb8917036410a0c76bf96dc17f28dc868a89152895d84133316d6d5549"
+    "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c"
   },
-  "generatedAt": "2026-04-24T21:07:08Z",
+  "generatedAt": "2026-04-24T21:42:47Z",
   "generatedBy": "python/scripts/bt93d_start_gate_package.py",
-  "gitSha": "4cb08206266407cc405f56fda531c7a8284b14c6",
+  "gitSha": "79739fa494a82c98c34bd89616bb54f0d66cf504",
   "guardrails": {
     "candidateRun": false,
     "fourEnvAllowed": false,
@@ -158,13 +158,13 @@
     },
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-      "sha256": "a21b84bb8917036410a0c76bf96dc17f28dc868a89152895d84133316d6d5549",
+      "sha256": "4dde6f85c2663c64f5df31ac07d0b9f8235069aeccb68346975d6a2d340d3d4c",
       "role": "BT93D-refreshed evidence matrix",
       "closureCapable": true
     },
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "dfc7e09768d4f71ab99d5d10e4dba1a5dabaedc30bddcd9ba2d7190efc4d5109",
+      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621",
       "role": "BT93D-refreshed precomparison",
       "closureCapable": true
     }
