@@ -110,6 +110,12 @@ Abgleich 2026-04-14 (Subphase `V71 71.99.3`): `git ls-files -ci --exclude-standa
 Abgleich 2026-04-14 (Subphase `V71 71.99.1` + `71.99.2`): `npm run check:root:runtime`, `npm run cleanup:workspace` und `npm run check:editor:path-drift` sind gruen; `npm run build` scheitert reproduzierbar umgebungsnah mit `Error: spawn EPERM` (blockerfest in `docs/Fehlerberichte/2026-03-30_workspace-cleanup-verification-blockers.md` und `docs/Fehlerberichte/2026-04-14_v91-build-vite-spawn-eperm.md`). Die Closure-Gates `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` sind gruen; `V71 71.99` ist damit blockerfest abgeschlossen.
 Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgressUtils.js` leitet Parcours-Routen jetzt aus expliziten `nextIds`-Kanten ab statt nur aus linearer Alias-Reihenfolge; Branch-Paare bekommen denselben Stage-Index, muessen fuer `validMerge=true` auf denselben Merge-Checkpoint zeigen und erscheinen im Snapshot mit `branches`, `isBranchOption`, `branchParentId` und `mergeCheckpointId`. `src/entities/mapSchema/MapSchemaSanitizeOps.js` und `src/entities/mapSchema/MapSchemaRuntimeOps.js` tragen `nextIds` fuer Editor-/Runtime-Roundtrips mit. `src/core/config/maps/presets/parcours_maps.js` erweitert `parcours_rift` um den Branch `CP04 -> {CP04A_TUNNEL, CP04B_BOOST} -> CP05`; der Smoke `node --input-type=module -` bestaetigt dafuer `totalCheckpoints=9`, `branchStageEntries=CP04A_TUNNEL|CP04B_BOOST` und `mergeCheckpointId=CP05`. `src/entities/arena/CheckpointRingMeshFactory.js` plus `src/entities/arena/portal/PortalLayoutBuilder.js` markieren Branch-Ringe zusaetzlich in Cyan. `npm run gates:pre-commit` ist gruen. `npm run build` bleibt in diesem Workspace ausserhalb des V82-Scope an einer bereits offenen Legacy-Surface-Violation in `src/core/settings/SettingsDefaultsFacade.js` blockiert; der naechste offene V82-Abschnitt ist `82.6` (Checkpoint-Zustandsfarben und Ring-Animation).
 
+## Stand-Snapshot 2026-04-24 (Deep-Code-Analyse Integration)
+
+- Deep-Code-Analyse-Befunde wurden als neue Follow-up-Punkte `P41` bis `P46` in `docs/Umsetzungsplan.md` verankert (Traversal-Hardening, XSS-Renderpfade ausserhalb Discovery, sync-I/O-Blocker, LAN-Body-Limits, Hotspot-Komplexitaet, Tooling-Abdeckung).
+- Neuer Intake-Entwurf `docs/plaene/neu/Feature_Security_Runtime_Contract_Hardening_V102.md` ist als uebernahmefaehiger Vorschlag fuer einen dedizierten Hardening-Block angelegt.
+- Priorisierte Intake-Reihenfolge im Master wurde entsprechend erweitert: `V99 -> V100 -> V102`.
+
 ## Stand-Snapshot 2026-04-20 (Intake V98)
 
 - Neuer geplanter Block `V98` ist im Master-Index aufgenommen (`docs/Umsetzungsplan.md`) und verweist kanonisch auf `docs/plaene/aktiv/V98.md`.
@@ -136,3 +142,10 @@ Abgleich 2026-04-18 (Subphase `V82 82.5`): `src/entities/systems/ParcoursProgres
 - Neue Audit-Hotspots wurden als umsetzbare Backlog-Eintraege `P32` bis `P40` in `docs/Umsetzungsplan.md` aufgenommen (LAN-Kapazitaet/Endpoint-Rollen, Polling-Backlog, UI-Injection-Pfad, Sync-IPC, Contract-Hotspots, Typecheck-Rotstand).
 - Der bestehende Intake-Entwurf `docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` wurde auf LAN-Hardening erweitert (Kapazitaets- und Rollen-Guards, Polling-Timeout/Inflight-Guards, sichere Discovery-UI-Renderpfade).
 - Neuer Intake-Entwurf `docs/plaene/neu/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md` fuehrt den Type-Safety-/Lint-Hardening-Scope fuer den roten Architektur-Typecheck und die uebergrossen Contract-Dateien.
+
+## Stand-Snapshot 2026-04-24 (Abschluss `V101 101.99`)
+
+- `V101` ist als kanonischer aktiver Block unter `docs/plaene/aktiv/V101.md` uebernommen und mit `101.99` abgeschlossen.
+- Architektur-Hardening-Gates sind gruen: `npm run typecheck:architecture`, `npm run lint:architecture`, `npm run check:architecture:boundaries`, `npm run check:architecture:metrics`.
+- Plan-/Docs-Gates sind gruen: `npm run plan:check`, `npm run docs:sync`, `npm run docs:check`.
+- Der offene P-Backlog im Master wurde auf den Restscope nach `V101` reduziert; `P39` und `P40` gelten als geschlossen.

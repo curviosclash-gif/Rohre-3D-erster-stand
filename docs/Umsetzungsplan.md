@@ -1,14 +1,14 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-22. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 wurde auf Phase 98.3 fortgeschrieben (P2, abh. V77.99,V97.99). Deep-Audit 2026-04-22 hat neue Follow-up-Pakete als P32-P40 im Backlog verankert; passende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V101).
+Stand: 2026-04-24. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
+V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 wurde auf Phase 98.99 fortgeschrieben (P2, abh. V77.99,V97.99). V101 abgeschlossen 2026-04-24 (101.99 Abschluss-Gate gruen). Deep-Audit 2026-04-22 verankerte Follow-up-Pakete als P32-P38 im Backlog; Deep-Code-Analyse 2026-04-24 ergaenzt P41-P46. Verbleibende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V102).
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
 Neue oder geaenderte Intake-Entwuerfe entstehen weiter unter `docs/plaene/neu/`.
 Archivierte oder abgeloeste Planstaende liegen unter `docs/plaene/alt/`.
 Inaktive bzw. zurueckgestellte Eintraege liegen in `docs/prozess/Backlog.md`.
-Aktuelle Intake-Drafts aus den Audits 2026-04-10 bis 2026-04-22: `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` (Vorschlag V90), `docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` (Vorschlag V99), `docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` (Vorschlag V100), `docs/plaene/neu/Feature_Architecture_TypeSafety_Contract_Hardening_V101.md` (Vorschlag V101); alle noch nicht aktiv.
+Aktuelle Intake-Drafts aus den Audits 2026-04-10 bis 2026-04-24: `docs/plaene/neu/Feature_Toolchain_Security_Dependency_Upgrade_2026-04-10.md` (Vorschlag V90), `docs/plaene/neu/Feature_Desktop_Multiplayer_Signaling_Connectivity_Hardening_V99.md` (Vorschlag V99), `docs/plaene/neu/Feature_Runtime_Rebuild_Remount_UI_StartSync_Stabilisierung_V100.md` (Vorschlag V100), `docs/plaene/neu/Feature_Security_Runtime_Contract_Hardening_V102.md` (Vorschlag V102). `V101` wurde in den aktiven Block `docs/plaene/aktiv/V101.md` uebernommen und abgeschlossen.
 
 ## Externe Planquelle: Bot-Training
 
@@ -41,6 +41,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | done | P2 | frei | V72.99,V74.99 | 82.99 | `docs/plaene/aktiv/V82.md` |
 | V97 | Settings Studio Erklaerbarkeit, Save-Vorschau und Hardening | done | P2 | frei | V95.99,V77.99,V92.99 | 97.99 | `docs/plaene/aktiv/V97.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | done | P2 | frei | V72.99 | 86.99 | `docs/plaene/aktiv/V86.md` |
+| V101 | Architecture Type-Safety und Contract-Hardening | done | P2 | frei | V98.99 | 101.99 | `docs/plaene/aktiv/V101.md` |
 
 ### Aktive und geplante Bloecke
 
@@ -75,6 +76,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V98 | V97.99 | hard | ja | V97 liefert die gehartete Settings-Studio-Basis fuer den neuen Demo-Grenzen-Bereich |
 | V98 | V81.99 | soft | nein | Developer-Tuning-Synergien sind sinnvoll, aber kein Startblocker |
 | V98 | V64.99 | soft | nein | Multiplayer-Rollen-/Transportkontext kann spaetere Demo-Regeln schaerfen, blockiert aber nicht |
+| V101 | V98.99 | hard | ja | V101 schliesst Typecheck-/Lint-/Contract-Hardening auf der V98-Resolverbasis ohne neue Guard-Verletzungen |
 
 ## Lock-Status
 
@@ -101,6 +103,7 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V95 | - | frei | Siehe docs/lock-status/ |
 | - | V97 | - | frei | Siehe docs/lock-status/ |
 | - | V98 | - | frei | Siehe docs/lock-status/ |
+| - | V101 | - | closed | Abgeschlossen 2026-04-24 |
 
 ## Empfohlene Reihenfolge
 
@@ -108,16 +111,16 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 ### Priorisierte Intake-Uebernahme (neu)
 
-1. `V101` als naechsten Intake-Prioritaetsblock uebernehmen und starten (Type-Safety/Contract-Hardening vor weiteren Runtime-Hardening-Wellen).
-2. Danach `V99` (Signaling/LAN/Connectivity-Hardening) und `V100` (Runtime-Rebuild/Remount/StartSync) nachziehen.
+1. `V99` (Signaling/LAN/Connectivity-Hardening) als naechsten Intake-Prioritaetsblock uebernehmen.
+2. Danach `V100` (Runtime-Rebuild/Remount/StartSync) nachziehen.
+3. Danach `V102` (Security-/Runtime-/Contract-Hardening aus Deep-Code-Analyse) uebernehmen.
 
 ### Sofort laufende oder naechste Abschluesse
 
 1. `V76` als aktiven Produktblock auf `76.2` weiterziehen; Hangar-/Werkstatt-Flows bleiben der laufende Hauptpfad.
-2. `V98` als naechsten P2-Block starten; hard dependencies (`V77.99`, `V97.99`) sind erfuellt.
-3. `V101` als naechsten technischen Qualitaetsblock einziehen (`typecheck:architecture`/Contract-Hardening), damit Folgearbeit auf stabiler Basis aufsetzt.
-4. `V75` als Recorder-Stabilisierung nachgezogen bearbeiten; `V64.99` ist bereits abgeschlossen.
-5. `V81` und `V94` als nachgelagerte P3-Bloecke vorbereiten (`V81` mit V92-Ratchet, `V94` als Governance-/Query-Layer).
+2. `V98` als laufenden P2-Block bis Master-Abschluss nachziehen; hard dependencies (`V77.99`, `V97.99`) sind erfuellt.
+3. `V75` als Recorder-Stabilisierung nachgezogen bearbeiten; `V64.99` ist bereits abgeschlossen.
+4. `V81` und `V94` als nachgelagerte P3-Bloecke vorbereiten (`V81` mit V92-Ratchet, `V94` als Governance-/Query-Layer).
 
 ### Hauptpfad Architektur und Produkt
 
@@ -139,14 +142,15 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 
 ### Kurzform
 
-`V76 -> V98 -> V101 -> V99 -> V100 -> V75 -> V81 -> V94`
+`V76 -> V98 -> V99 -> V100 -> V102 -> V75 -> V81 -> V94`
 
-Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V98` (Settings-Studio-Demo-Grenzen) und `V94` (Governance-/Query-Layer). `V101` ist als priorisierter Qualitaetsblock direkt nach `V98` eingeordnet, bevor `V99`/`V100` tiefer in Runtime-/LAN-Hardening eingreifen. `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
+Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V98` (Settings-Studio-Demo-Grenzen) und `V94` (Governance-/Query-Layer). `V99`, `V100` und anschliessend `V102` folgen nach dem abgeschlossenen V101-Hardening auf einer wieder gruensicheren Typecheck-/Contract-Baseline. `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
 
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
 Abgleich-Fliesstext und Stand-Snapshots liegen in `docs/plaene/CHANGELOG.md`. Dieser Abschnitt pflegt nur noch den offenen P-Backlog.
 Die folgenden Punkte werden nach Abschluss des jeweiligen Blocks adressiert.
+P39 und P40 wurden mit `V101` geschlossen und sind aus dem offenen Backlog entfernt.
 
 ### Im Runtime-Hardening-Follow-up V87 zu adressieren (betrifft scope_files von V83/V87)
 
@@ -178,8 +182,12 @@ Keine offenen Review-Punkte mehr im V87-Scope; `V87` ist abgeschlossen und dient
 | P36 | `src/ui/menu/testing/MenuMultiplayerPanel.js` | Discovery-Hostkarte rendert untrusted Hostdaten per `innerHTML`; LAN-Payload kann UI-Markup injizieren (Folgeblock-Vorschlag: V99) | hoch |
 | P37 | `electron/preload.cjs` | `ipcRenderer.sendSync('settings-defaults:read-override-sync')` blockiert den Renderer-Thread und erhoeht UI-Stall-Risiko bei I/O-Latenz (Folgeblock-Vorschlag: V99/V100) | mittel |
 | P38 | `src/ui/menu/MenuConfigShareOps.js` | `escape`/`unescape` in Code-Importpfad sind veraltet und fragil fuer Unicode-/Runtime-Kompatibilitaet (Folgeblock-Vorschlag: V99 oder V101) | mittel |
-| P39 | `src/shared/contracts/PlatformCapabilityRegistry.js`, `src/shared/contracts/BrowserDemoSurfacePolicyOverrideContract.js` | `npm run lint:architecture` scheitert an `max-lines`; zentrale Contract-Resolver sind zu gross und mischen Verantwortung (Folgeblock-Vorschlag: V101) | hoch |
-| P40 | `tsconfig.architecture.json`-Scope (u. a. `src/shared/contracts/*`, `src/ui/menu/*`, `src/state/*`, `src/core/*`) | `npm run typecheck:architecture` ist rot (107 Fehler: Globals, union/literal-Narrowing, `object`-Blindstellen, readonly/mutable-Mismatchs) (Folgeblock-Vorschlag: V101) | hoch |
+| P41 | `vite.config.js` | Editor-Video-Save akzeptiert nicht ausreichend eingeschraenkte Zielpfade; ohne kanonischen Root-Guard bleibt Traversal-/Out-of-root-Risiko (Folgeblock-Vorschlag: V102) | hoch |
+| P42 | `src/ui/start-setup/StartSetupUiOps.js`, `src/ui/MatchFlowArcadeOverlayController.js` | UI rendert benutzer-/datennahe Inhalte per `innerHTML`; XSS-Risiko ausserhalb des bereits erfassten Discovery-Pfads (Folgeblock-Vorschlag: V102) | hoch |
+| P43 | `src/shared/contracts/PlatformCapabilityRegistry.js` | Browser-Demo-Override liest Build-Artefakt per synchronem XHR; Renderer-Blockade und Startup-Stall-Risiko (Folgeblock-Vorschlag: V102) | mittel |
+| P44 | `server/lan-signaling.js` | Request-Body-Reader ohne feste Size-Limits; Memory-/DoS-Risiko bei grossen Payloads (Folgeblock-Vorschlag: V102) | hoch |
+| P45 | `src/ui/UIStartSyncController.js`, `src/ui/menu/MenuGameplayBindings.js`, `src/ui/arcade/ArcadeVehicleManager.js`, `vite.config.js` | Hohe zyklomatische/lineare Komplexitaet in Hotspots erhoeht Regressions- und Change-Risiko (Folgeblock-Vorschlag: V102) | mittel |
+| P46 | `eslint.config.js`, `tsconfig.architecture.json` | Tooling-Gates decken nur einen engen Teil der Laufzeitpfade ab; Security-/Quality-Regressionen koennen zu spaet auffallen (Folgeblock-Vorschlag: V102) | mittel |
 
 ## Conflict-Log
 
