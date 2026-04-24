@@ -265,8 +265,8 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
-| Bot-Codex | BT93E | 2026-04-25 | active | `93E.5` abgeschlossen; `diagnose-blocked`, `93E.99` offen |
-| - | BT94A | - | frei | wartet auf BT93D.99 und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
+| Bot-Codex | BT93E | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
+| - | BT94A | - | frei | wartet auf `BT93E.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
 
@@ -1457,7 +1457,7 @@ Quelle:
 - `data/training/ppo/bt93c/evidence_quality_matrix.json`
 - Audit-Sanierungsregister F.01-F.37
 
-<!-- LOCK: Bot-Codex seit 2026-04-25 -->
+<!-- LOCK: frei -->
 
 Scope:
 
@@ -1531,14 +1531,14 @@ Vollstaendiges Befundsinventar fuer BT93E:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 Alle Eintraege aus G.01-G.08, C.01-C.04, F.01-F.37 und R.01 sind in einem versionierten BT93E-Befundregister mit Status `closed`, `not-start-blocking-carried`, `still-blocking` oder `invalidated-by-new-evidence` dokumentiert.
-- [ ] DoD.2 F.05/F.19/F.27/F.30/F.31 und R.01 sind entweder mit neuer versionierter Evidence geschlossen oder bleiben als konkrete Folgeblocker sichtbar; kein impliziter Start von BT94A.
-- [ ] DoD.3 PPO/DQN-Vorvergleich, Holdout, Survival-/Steps-Deltas, Median/Streuung, Failure-Klassen, Terminal-/Death-Klassen und Mask-/Veto-/Invalid-Raten werden aus einer festen Matrix neu geschrieben oder als nicht belastbar blockierend markiert.
-- [ ] DoD.4 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json`, `no_start_gate.json` und ein neues BT93E-Handoverpaket referenzieren immutable Run-IDs, Modell-/Config-/Optimizer-/VecNormalize-Hashes und Artefaktpfade.
-- [ ] DoD.5 BT94A bleibt geschlossen, solange `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `summary.bt94a-blocker=0` nicht gleichzeitig erfuellt sind.
-- [ ] DoD.6 Keine produktive Runtime-, Matchstart-, AI-Hub-, JS-Inference-, Registry-, Rollback-, Latenzbudget- oder Strategieflag-Datei wurde fuer PPO aktiviert oder vorbereitet.
-- [ ] DoD.7 PPO-Validate, Rollout, Registry, JS-Inference, Latenzbudget und Rollback bleiben als BT94B/BT95/separater Rollout-Folgepfad sichtbar und werden nicht in BT93E vorgezogen.
-- [ ] DoD.8 `npm.cmd run plan:check`, `npm.cmd run docs:sync`, `npm.cmd run docs:check` und `npm.cmd run build` sind PASS.
+- [x] DoD.1 Alle Eintraege aus G.01-G.08, C.01-C.04, F.01-F.37 und R.01 sind in einem versionierten BT93E-Befundregister mit Status `closed`, `not-start-blocking-carried`, `still-blocking` oder `invalidated-by-new-evidence` dokumentiert. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\finding_register.json` (`total=50`, `closed=21`, `not-start-blocking-carried=12`, `still-blocking=17`))
+- [x] DoD.2 F.05/F.19/F.27/F.30/F.31 und R.01 sind entweder mit neuer versionierter Evidence geschlossen oder bleiben als konkrete Folgeblocker sichtbar; kein impliziter Start von BT94A. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\handover_package.json` (`resultClass=diagnose-blocked`, `diagnoseBlocked.remainingBt94aGates` enthaelt `F.05/F.19/F.27/F.30/F.31/R.01`, `noBt94aCheckboxClosed=true`))
+- [x] DoD.3 PPO/DQN-Vorvergleich, Holdout, Survival-/Steps-Deltas, Median/Streuung, Failure-Klassen, Terminal-/Death-Klassen und Mask-/Veto-/Invalid-Raten werden aus einer festen Matrix neu geschrieben oder als nicht belastbar blockierend markiert. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\survival_repair_report.json`, `terminal_reward_failure_report.json`, `action_surface_hardening_report.json` -> feste Matrix, `resultClass=diagnose-blocked`)
+- [x] DoD.4 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json`, `no_start_gate.json` und ein neues BT93E-Handoverpaket referenzieren immutable Run-IDs, Modell-/Config-/Optimizer-/VecNormalize-Hashes und Artefaktpfade. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\handover_package.json` (`sourceArtifacts`, `bt94aStartStatus`, Modellhashes via `no_start_gate.json`))
+- [x] DoD.5 BT94A bleibt geschlossen, solange `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `summary.bt94a-blocker=0` nicht gleichzeitig erfuellt sind. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt94a\no_start_gate.json` (`claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `bt93cState.bt94aBlockerCount=5`))
+- [x] DoD.6 Keine produktive Runtime-, Matchstart-, AI-Hub-, JS-Inference-, Registry-, Rollback-, Latenzbudget- oder Strategieflag-Datei wurde fuer PPO aktiviert oder vorbereitet. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\handover_package.json` (`guardrails.productiveRuntimeChanged=false`, `runtimeSurfacesTouched=[]`, `candidateRun=false`, `freezeCandidate=false`, `rolloutSignal=false`))
+- [x] DoD.7 PPO-Validate, Rollout, Registry, JS-Inference, Latenzbudget und Rollback bleiben als BT94B/BT95/separater Rollout-Folgepfad sichtbar und werden nicht in BT93E vorgezogen. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\handover_package.json` (`bt94aReady.ppoValidateRestDebt`, `bt94aReady.rolloutRestDebt`, `guardrails.forbiddenWork`))
+- [x] DoD.8 `npm.cmd run plan:check`, `npm.cmd run docs:sync`, `npm.cmd run docs:check` und `npm.cmd run build` sind PASS. (abgeschlossen: 2026-04-25; evidence: `npm.cmd run gates:pre-commit` -> PASS; `npm.cmd run build` -> PASS)
 
 ### 93E.1 Befundregister und Startgate-Wahrheit
 
@@ -1577,11 +1577,11 @@ Vollstaendiges Befundsinventar fuer BT93E:
 
 ### 93E.99 Abschluss-Gate
 
-- [ ] 93E.99.1 Alle Phasen 93E.1 bis 93E.5 sind mit Evidence dokumentiert.
-- [ ] 93E.99.2 Das vollstaendige Befundregister deckt G.01-G.08, C.01-C.04, F.01-F.37 und R.01 ab; kein Befund ist ohne Status oder Folgegate.
-- [ ] 93E.99.3 BT94A ist nur startfaehig, wenn `no_start_gate.json` `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true` und `summary.bt94a-blocker=0` schreibt; sonst bleibt Ergebnis `diagnose-blocked`.
-- [ ] 93E.99.4 Kein Ergebnis heisst `promote`, `rollout-ready`, `freeze-candidate` oder `BT94B-ready`; diese Begriffe bleiben BT94A/BT94B/BT95 vorbehalten.
-- [ ] 93E.99.5 `plan:check` und Doku-/Build-Gates sind Governance-Evidence, aber kein Survival-, Validate- oder Promotionsbeweis.
+- [x] 93E.99.1 Alle Phasen 93E.1 bis 93E.5 sind mit Evidence dokumentiert. (abgeschlossen: 2026-04-25; evidence: `Select-String -Path docs\bot-training\Bot_Trainingsplan.md -Pattern '^- \[x\] 93E\.' | Where-Object { $_.Line -notmatch '93E\.99' }` -> 20 abgeschlossene 93E.1-93E.5-Phaseneintraege)
+- [x] 93E.99.2 Das vollstaendige Befundregister deckt G.01-G.08, C.01-C.04, F.01-F.37 und R.01 ab; kein Befund ist ohne Status oder Folgegate. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\finding_register.json` (`total=50`, `bt94aBlockerCount=5`, alle Eintraege mit `status`/`nextGate`))
+- [x] 93E.99.3 BT94A ist nur startfaehig, wenn `no_start_gate.json` `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true` und `summary.bt94a-blocker=0` schreibt; sonst bleibt Ergebnis `diagnose-blocked`. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\handover_package.json` (`resultClass=diagnose-blocked`), `data\training\ppo\bt94a\no_start_gate.json` (`claimable=false`, `bt93cState.bt94aBlockerCount=5`))
+- [x] 93E.99.4 Kein Ergebnis heisst `promote`, `rollout-ready`, `freeze-candidate` oder `BT94B-ready`; diese Begriffe bleiben BT94A/BT94B/BT95 vorbehalten. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93e\handover_package.json` (`promotionAllowed=false`, `rolloutSignal=false`, `freezeCandidate=false`, `resultClass=diagnose-blocked`))
+- [x] 93E.99.5 `plan:check` und Doku-/Build-Gates sind Governance-Evidence, aber kein Survival-, Validate- oder Promotionsbeweis. (abgeschlossen: 2026-04-25; evidence: `npm.cmd run gates:pre-commit` -> PASS; `npm.cmd run build` -> PASS; fachliches Urteil bleibt `data\training\ppo\bt93e\handover_package.json` (`resultClass=diagnose-blocked`))
 
 ### Risiko-Register BT93E
 
