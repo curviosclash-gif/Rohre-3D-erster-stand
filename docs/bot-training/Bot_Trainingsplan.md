@@ -220,7 +220,7 @@ Mikro-Claim-Regel:
 | BT93A | BT92.99 | hard | ja | BT93A.99 ist abgeschlossen; Harness-/Throughput-Handover fuer BT93B/BT93C liegt artefaktbasiert vor |
 | BT93B | BT93A.99 | hard | ja | PPO-Scaffold wurde nach artefaktbasiertem Harness-/Throughput-Handover aus BT93A abgeschlossen |
 | BT93C | BT93B.99 + Audit-Haertung 2026-04-24 | hard | ja | `93C.0` endet `go`; echter Learner-Start erst nach `93C.1`/`93C.2` mit Clean-Env, Action-Surface und Startmanifest |
-| BT94A | BT93C.99 | hard | nein | Candidate-Freeze und Ablationen brauchen ein echtes PPO-Modell mit Baseline-, Eval-, Repro- und Holdout-Evidence |
+| BT94A | BT93C.99 | hard | nein | BT93C.99 ist formal abgeschlossen, aber `BT93C` endet `diagnose`/`ppo-regression`; `data/training/ppo/bt94a/no_start_gate.json` haelt BT94A vor `94A.1` geschlossen |
 | BT94B | BT94A.99 | hard | nein | Externe A/B-Evidence braucht einen eingefrorenen Kandidaten |
 | BT94B PPO-Validate | BT94A.99 + 94B.1/94B.2 feste Kandidatenmatrix | hard | nein | `94B.3` baut eine eigene PPO-Validate-Lane; BT80C `80.9.3` ersetzt diese Lane nicht |
 | BT94B `promote` | gruene PPO-Validate-Lane aus `94B.3` | hard | nein | harter Blocker fuer jedes Rollout-Signal und jeden echten BT95-Handoff |
@@ -262,8 +262,8 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT92 | 2026-04-23 | frei | 2026-04-23 (abgeschlossen) |
 | Bot-Codex | BT93A | 2026-04-23 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93B | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
-| - | BT93C | - | frei | 93C.7 abgeschlossen; naechst 93C.99 Abschluss-Gate |
-| - | BT94A | - | frei | wartet auf BT93C.99; Candidate Freeze und Ablationen |
+| - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
+| - | BT94A | - | frei | gesperrt vor 94A.1; evidence `data/training/ppo/bt94a/no_start_gate.json` (`claimable=false`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
 
@@ -766,8 +766,8 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT92 | Single-Env-Adapter und JS-authoritative Semantik | completed | P1 | BT91.99 | 92.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
 | BT93A | Mehr-Env-/Throughput-Harness ausserhalb der Runtime | completed | P2 | BT92.99 | 93A.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT101_Custom_Gymnasium_Environment.md` |
 | BT93B | Minimaler PPO-Baseline-Scaffold | completed | P2 | BT93A.99 | 93B.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
-| BT93C | Echter PPO-Learner und konservative Baseline | active | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
-| BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93C.99 | 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
+| BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
+| BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93C.99 | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
 
@@ -1342,6 +1342,11 @@ Claim-Grenze vor BT94A:
 - Wenn der BT93C-Vorvergleich BT73-Intent-/Recovery-Restschuld, fehlende PPO-Validate-Lane, V101-Drift oder JS-Integration-Luecken ausweist, muss BT94A diese Punkte im Freeze-Report sichtbar weiterfuehren.
 - Wenn `BT93C.7.3` offene Audit-Befunde ohne Folgegate enthaelt, startet BT94A nicht; offene Restschuld muss blockierend oder nicht-blockierend begruendet sein.
 
+Startstatus 2026-04-24:
+
+- `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` -> `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, Blocker `F.05/F.19/F.27/F.30/F.31`))
+- Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+
 ### Definition of Done (DoD)
 
 - [ ] DoD.1 Eine kleine Ablations- und Curriculum-Matrix ist gegen dieselbe echte PPO-Baseline reproduzierbar ausgewertet.
@@ -1577,6 +1582,7 @@ Rollout-Intake-Pflichtpaket:
 | 5 | `93C-Pilot` claimen: `93C.5.1` bis `93C.5.2`, kleinster Lauf. | `93C-Diagnose` endet ohne Collapse, Reward-Hacking, Failure-Regression oder Safety-Regression. | `pilot go`, `pilot unsafe` oder `diagnose: throughput insufficient`; noch keine Baseline. |
 | 6 | Erst bei `pilot go`: `93C.5.3` bis `93C.6` fuer konservative Baseline und DQN-Vorvergleich claimen. | Pilot gruen, Baseline-ID fixiert, feste Matrix, direkte Env-Evidence. | PPO/DQN-Vorvergleich mit Holdout; Ergebnis `ppo-promising`, `ppo-hold`, `ppo-diagnose` oder `ppo-regression`. |
 | 7 | Nur bei echtem Modellpaket, Evidence-Qualitaetsmatrix und belastbarem Vorvergleich: `93C.7` Handover. | Baseline und Vergleich sind reproduzierbar; F.01-F.37 sind geschlossen oder sauber folgegated. | `BT94A-ready` oder ehrliches `diagnose`; kein Rollout-Signal. |
+| 8 | `BT94A-No-Start` dokumentiert: Gate-Checker gegen BT93C-Handover ausfuehren, keine Ablationen. | `93C.7`/`93C.99` enden `diagnose` mit `ppo-regression` und offenen BT94A-Blockern. | `data/training/ppo/bt94a/no_start_gate.json` (`claimable=false`); kein freier BT93+ Trainingsclaim ohne Replan oder erneute Diagnose. |
 
 No-Go vor Bot-Training:
 
