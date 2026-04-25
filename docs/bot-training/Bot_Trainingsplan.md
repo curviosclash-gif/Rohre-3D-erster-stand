@@ -2115,10 +2115,10 @@ Vollstaendiges Befundregister nach BT93G:
 
 ### 93H.4 Gate-Refresh und Handover-Entscheidung
 
-- [ ] 93H.4.1 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` aus BT93H-Artefakten neu schreiben.
-- [ ] 93H.4.2 `bt94a_gate_check.py --write-report` erneut ausfuehren und unverfaelscht pinnen.
-- [ ] 93H.4.3 Bei rotem Gate: `diagnose-blocked` mit Fehlerbericht, Folgegate und ohne `94A.*`-Closure dokumentieren.
-- [ ] 93H.4.4 Bei gruenem Gate: `BT94A-ready` dokumentieren; Freeze bleibt bis `94A.3` verboten.
+- [x] 93H.4.1 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` aus BT93H-Artefakten neu schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_gate_refresh_handover.py --write-upstream-reports` + `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` -> `data\training\ppo\bt93c\precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json`, `data\training\ppo\bt94a\no_start_gate.json`)
+- [x] 93H.4.2 `bt94a_gate_check.py --write-report` erneut ausfuehren und unverfaelscht pinnen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` -> `data\training\ppo\bt94a\no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `bt93cState.bt94aBlockerCount=4`))
+- [x] 93H.4.3 Bei rotem Gate: `diagnose-blocked` mit Fehlerbericht, Folgegate und ohne `94A.*`-Closure dokumentieren. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_gate_refresh_handover.py --write-package --write-followup-report --write-error-report` -> `data\training\ppo\bt93h\handover_package.json` (`resultClass=diagnose-blocked`), `followup_gate_report.json`, `docs\Fehlerberichte\2026-04-25_bt93h-gate-refresh-diagnose-blocked.md`)
+- [x] 93H.4.4 Bei gruenem Gate: `BT94A-ready` dokumentieren; Freeze bleibt bis `94A.3` verboten. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93h\handover_package.json` (`phaseCoverage.93H.4.4=not-applicable-red-gate`, `bt94aReady.active=false`, `guardrails.freezeCandidate=false`))
 
 ### 93H.99 Abschluss-Gate
 

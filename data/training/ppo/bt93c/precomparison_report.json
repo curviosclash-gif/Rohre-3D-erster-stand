@@ -254,7 +254,18 @@
     "repairLadderResultClass": "diagnose-blocked",
     "resultClass": "diagnose-blocked"
   },
-  "claim": "BT93G-BT94A-Gate-Refresh",
+  "bt93hPhaseCoverage": {
+    "93H.4.1": true,
+    "93H.4.2": "pending bt94a_gate_check.py --write-report",
+    "93H.4.3": true,
+    "93H.4.4": "not-applicable-red-gate"
+  },
+  "bt93hRefresh": {
+    "phaseId": "93H.4.1",
+    "repairLadderResultClass": "diagnose-blocked",
+    "resultClass": "diagnose-blocked"
+  },
+  "claim": "BT93H-BT94A-Gate-Refresh",
   "comparisonMatrix": {
     "dqnChampion": {
       "artifactPaths": [
@@ -335,13 +346,13 @@
     "isPromotionEvidence": false,
     "isRolloutSignal": false,
     "ppoValidateStatus": "ppo-validate-missing-until-BT94B.3",
-    "summary": "BT93G refresh consumed comparable repair eval/holdout and keeps BT94A closed if any hard start rule remains red."
+    "summary": "BT93H consumed comparable-terminal-repair eval/holdout and keeps BT94A closed when hard start rules remain red."
   },
-  "generatedAt": "2026-04-25T10:33:17Z",
-  "generatedBy": "python/scripts/bt93g_gate_refresh_handover.py",
-  "gitSha": "f3e73894327e23ea2c6e767a78f6e4e1fd1f1edb",
+  "generatedAt": "2026-04-25T11:48:36Z",
+  "generatedBy": "python/scripts/bt93h_gate_refresh_handover.py",
+  "gitSha": "e579e7919aace6dbcf1f1eae7e91470ba46be97c",
   "guardrails": {
-    "bt94aGate": "closed-diagnose-blocked-by-bt93g",
+    "bt94aGate": "closed-diagnose-blocked-by-bt93h",
     "candidateRun": false,
     "fourEnvAllowed": false,
     "freezeCandidate": false,
@@ -351,9 +362,10 @@
   },
   "metrics": {
     "deltasAgainstDqn": {
-      "averageBotSurvivalPct": 84.783939,
-      "avgStepsPerEpisodePct": -41.232362,
-      "holdoutAverageBotSurvivalPct": 106.00912,
+      "evalAverageBotSurvivalPct": 138.114438,
+      "evalAvgStepsPerEpisodePct": -24.271432,
+      "holdoutAverageBotSurvivalPct": 143.465324,
+      "holdoutAvgStepsPerEpisodePct": -22.569666,
       "resultClass": "ppo-regression",
       "targetSurvivalForPlus30Pct": 48.590082
     },
@@ -972,6 +984,180 @@
       "runId": "20260425T102509Z-holdout-eval",
       "runKind": "holdout-eval"
     },
+    "ppoBt93hComparableTerminalEval": {
+      "actionTelemetry": {
+        "invalidActionRate": 0.0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 1080,
+        "vetoRate": 0.0
+      },
+      "averageBotSurvival": 89.0,
+      "averageBotSurvivalSource": "BT93H comparable terminal repair completed episode length",
+      "avgStepsPerEpisode": 89.0,
+      "completedEpisodeCount": 11,
+      "completedEpisodeLengths": [
+        34.0,
+        107.0,
+        85.0,
+        97.0,
+        89.0,
+        77.0,
+        136.0,
+        94.0,
+        64.0,
+        124.0,
+        72.0
+      ],
+      "completedEpisodeStats": {
+        "count": 11,
+        "max": 136.0,
+        "mean": 89.0,
+        "median": 89.0,
+        "min": 34.0,
+        "stdev": 26.876823
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 11
+        },
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "startCapableTerminalMatrix": false,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 11
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "phaseId": "93H.3.4",
+      "report": "data/training/ppo/bt93h/runs/20260425T114031Z-comparable-terminal-repair-eval/eval_report.json",
+      "reward": {
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 128.28,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardMean": 0.118778,
+        "rewardTotal": 128.279997,
+        "safetyOverruleCounts": {
+          "combatVeto": 90,
+          "intent-request-applied-mismatch": 98,
+          "vetoActive": 222
+        }
+      },
+      "runId": "20260425T114031Z-comparable-terminal-repair-eval",
+      "runKind": "comparable-terminal-repair-eval"
+    },
+    "ppoBt93hHoldout": {
+      "actionTelemetry": {
+        "invalidActionRate": 0.0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 720,
+        "vetoRate": 0.0
+      },
+      "averageBotSurvival": 91.0,
+      "averageBotSurvivalSource": "BT93H comparable terminal repair completed episode length",
+      "avgStepsPerEpisode": 91.0,
+      "completedEpisodeCount": 7,
+      "completedEpisodeLengths": [
+        87.0,
+        110.0,
+        110.0,
+        93.0,
+        80.0,
+        101.0,
+        56.0
+      ],
+      "completedEpisodeStats": {
+        "count": 7,
+        "max": 110.0,
+        "mean": 91.0,
+        "median": 93.0,
+        "min": 56.0,
+        "stdev": 17.67969
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 7
+        },
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "startCapableTerminalMatrix": false,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 7
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "phaseId": "93H.3.4",
+      "report": "data/training/ppo/bt93h/runs/20260425T114122Z-holdout-eval/eval_report.json",
+      "reward": {
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 85.56,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardMean": 0.118833,
+        "rewardTotal": 85.559998,
+        "safetyOverruleCounts": {
+          "combatVeto": 151,
+          "intent-request-applied-mismatch": 154,
+          "vetoActive": 246
+        }
+      },
+      "runId": "20260425T114122Z-holdout-eval",
+      "runKind": "holdout-eval"
+    },
     "ppoHoldout": {
       "actionTelemetry": {
         "fieldCounts": {
@@ -1051,15 +1237,15 @@
     "93C.6.4": true,
     "93C.6.5": true
   },
-  "phaseId": "93G.6.1",
+  "phaseId": "93H.4.1",
   "ppoCandidate": {
     "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
-    "baselineEvalRunId": "20260425T102416Z-comparable-repair-eval",
+    "baselineEvalRunId": "20260425T114031Z-comparable-terminal-repair-eval",
     "baselineId": "bt93c-ppo-baseline-publish-v1",
     "baselineRunId": "20260424T180033Z-baseline-train",
     "candidateRun": false,
     "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
-    "holdoutEvalRunId": "20260425T102509Z-holdout-eval",
+    "holdoutEvalRunId": "20260425T114122Z-holdout-eval",
     "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
     "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
     "promotionAllowed": false,
@@ -1220,6 +1406,30 @@
       "path": "data/training/ppo/bt93g/start_truth.json",
       "role": "BT93G start truth",
       "sha256": "2fd7dedea39620723ef43419b0a523d15ba8219ea44a4489860c267fad3f4009"
+    },
+    "bt93hRepairBudget": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/repair_ladder_budget.json",
+      "role": "BT93H repair budget",
+      "sha256": "e82f47581e86d4bb5b8333f30607250149ede5053644cc279f58d51bba428269"
+    },
+    "bt93hRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/repair_ladder_report.json",
+      "role": "BT93H repair ladder",
+      "sha256": "5032f14363e43a84df1399b9171b08d99ce997de97ed5f831416c87c0d4d0f2d"
+    },
+    "bt93hSurvivalGateContract": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/survival_gate_contract.json",
+      "role": "BT93H survival gate contract",
+      "sha256": "c5bc0ae27e5c80cc330ea2047daed1529fc5e95a757930ad2a611b140292e117"
+    },
+    "bt93hTerminalRootCause": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/terminal_root_cause_report.json",
+      "role": "BT93H terminal root cause",
+      "sha256": "3af647673ea2a850d539e490fb382bbb57f2b3c213eb6b85e9ab4bd2ebd55ae3"
     },
     "freezeCheck": {
       "path": "data/training/ppo/freeze_check.json",

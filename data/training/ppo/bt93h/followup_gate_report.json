@@ -1,0 +1,66 @@
+{
+  "affectedArtifacts": [
+    "data/training/ppo/bt93c/precomparison_report.json",
+    "data/training/ppo/bt93c/handover_report.json",
+    "data/training/ppo/bt93c/evidence_quality_matrix.json",
+    "data/training/ppo/bt94a/no_start_gate.json",
+    "data/training/ppo/bt93h/handover_package.json"
+  ],
+  "blockId": "BT93H",
+  "followupRequired": true,
+  "generatedAt": "2026-04-25T11:48:46Z",
+  "generatedBy": "python/scripts/bt93h_gate_refresh_handover.py",
+  "nextGate": {
+    "allowed": [
+      "user-owned replan",
+      "narrow follow-up repair for remaining BT94A start blockers",
+      "record no-start decision without opening BT94A"
+    ],
+    "forbidden": [
+      "94A.* checkbox closure while no_start_gate is red",
+      "BT94A candidate run",
+      "freeze candidate",
+      "BT94B handover",
+      "promote or rollout-ready wording"
+    ]
+  },
+  "ok": true,
+  "phaseId": "93H.4.3",
+  "redClaimChecks": [
+    {
+      "blocksStart": true,
+      "id": "bt93c_result_allows_bt94a",
+      "observed": "diagnose",
+      "ok": false,
+      "required": "not diagnose"
+    },
+    {
+      "blocksStart": true,
+      "id": "handover_gate_ready",
+      "observed": "closed-diagnose-blocked-by-bt93h",
+      "ok": false,
+      "required": "ready=true"
+    },
+    {
+      "blocksStart": true,
+      "id": "precomparison_not_regression",
+      "observed": "ppo-regression",
+      "ok": false,
+      "required": "not ppo-regression"
+    },
+    {
+      "blocksStart": true,
+      "id": "no_open_bt94a_audit_blockers",
+      "observed": 4,
+      "ok": false,
+      "required": 0
+    }
+  ],
+  "remainingBt94aGates": [
+    "F.05",
+    "F.19",
+    "F.27",
+    "F.31"
+  ],
+  "resultClass": "diagnose-blocked"
+}
