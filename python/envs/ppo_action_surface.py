@@ -17,6 +17,9 @@ PPO_ACTION_SURFACE_ID = "bt93c-multidiscrete-action-v1"
 PPO_INDEX_HEAD_SPACE_SIZE = 257
 PPO_INDEX_NOOP_TOKEN = 0
 PPO_INDEX_NOOP_VALUE = -1
+POLICY_MASK_SOURCE = "info.match.inventoryLength from the JS-authoritative transition payload"
+POLICY_MASK_CONSUMER_STATUS = "specified-but-not-consumed-by-stable-baselines3-ppo"
+INVENTORY_GATED_BOOLEAN_FIELDS = frozenset(("dropItem", "shootItem", "nextItem"))
 
 
 def _inventory_length(info: Mapping[str, Any] | None) -> int:
@@ -36,6 +39,72 @@ def _is_noop(action: Mapping[str, Any]) -> bool:
         int(action.get(key, PPO_INDEX_NOOP_VALUE)) == PPO_INDEX_NOOP_VALUE
         for key in ACTION_INDEX_FIELDS
     )
+
+
+def build_policy_level_action_mask(*, inventory_length: int) -> dict[str, Any]:
+    """Build the pre-sampling legality mask required by BT93F.
+
+    The current SB3 PPO path does not consume this mask yet. Keeping it here
+    makes the JS-authoritative source and the exact per-head legality contract
+    explicit for a mask-capable policy implementation.
+    """
+
+    try:
+        raw_inventory_length = int(inventory_length)
+    except (TypeError, ValueError):
+        raw_inventory_length = 0
+    safe_inventory_length = max(0, min(raw_inventory_length, PPO_INDEX_HEAD_SPACE_SIZE - 1))
+    boolean_masks: dict[str, list[bool]] = {}
+    for key in ACTION_BOOLEAN_FIELDS:
+        if key in INVENTORY_GATED_BOOLEAN_FIELDS and safe_inventory_length <= 0:
+            boolean_masks[key] = [True, False]
+        else:
+            boolean_masks[key] = [True, True]
+
+    index_mask = [False for _ in range(PPO_INDEX_HEAD_SPACE_SIZE)]
+    index_mask[PPO_INDEX_NOOP_TOKEN] = True
+    for token in range(1, safe_inventory_length + 1):
+        index_mask[token] = True
+
+    return {
+        "source": POLICY_MASK_SOURCE,
+        "inventoryLength": safe_inventory_length,
+        "consumerStatus": POLICY_MASK_CONSUMER_STATUS,
+        "preSamplingApplied": False,
+        "booleanFields": {key: list(mask) for key, mask in boolean_masks.items()},
+        "indexFields": {key: list(index_mask) for key in ACTION_INDEX_FIELDS},
+        "headOrder": list(ACTION_BOOLEAN_FIELDS) + list(ACTION_INDEX_FIELDS),
+    }
+
+
+def summarize_policy_level_action_mask(mask: Mapping[str, Any]) -> dict[str, Any]:
+    boolean_fields = mask.get("booleanFields") if isinstance(mask.get("booleanFields"), Mapping) else {}
+    index_fields = mask.get("indexFields") if isinstance(mask.get("indexFields"), Mapping) else {}
+    boolean_allowed = {
+        str(key): sum(1 for value in values if value)
+        for key, values in boolean_fields.items()
+        if isinstance(values, list)
+    }
+    index_allowed = {
+        str(key): sum(1 for value in values if value)
+        for key, values in index_fields.items()
+        if isinstance(values, list)
+    }
+    gated_boolean_fields = [
+        key
+        for key, count in boolean_allowed.items()
+        if key in INVENTORY_GATED_BOOLEAN_FIELDS and count == 1
+    ]
+    return {
+        "source": mask.get("source"),
+        "inventoryLength": mask.get("inventoryLength"),
+        "consumerStatus": mask.get("consumerStatus"),
+        "preSamplingApplied": bool(mask.get("preSamplingApplied")),
+        "booleanAllowedTokenCounts": boolean_allowed,
+        "indexAllowedTokenCounts": index_allowed,
+        "inventoryGatedBooleanFields": gated_boolean_fields,
+        "mixedWithPostDecodeClamp": False,
+    }
 
 
 @dataclass
@@ -104,6 +173,7 @@ def decode_multidiscrete_action(
             padded[:copy_width] = action_array[:copy_width]
         action_array = padded
 
+    policy_level_mask = build_policy_level_action_mask(inventory_length=inventory_length)
     boundary_action: dict[str, Any] = {}
     for index, key in enumerate(ACTION_BOOLEAN_FIELDS):
         raw_value = int(action_array[index])
@@ -172,6 +242,11 @@ def decode_multidiscrete_action(
         "vetoEvents": veto_events,
         "sanitizerEvents": sanitizer_events,
         "sanitizerChangedAction": sanitizer_changed,
+        "policyLevelMask": summarize_policy_level_action_mask(policy_level_mask),
+        "postDecodeClamp": {
+            "eventName": "maskEvents",
+            "mixedWithPolicyMask": False,
+        },
         "rawAction": action_array.tolist(),
         "boundaryAction": boundary_action,
         "sanitizedAction": sanitized,
@@ -232,9 +307,20 @@ def build_action_surface_manifest() -> dict[str, Any]:
             "token0": "no-op / -1",
             "tokenN": "inventory index N-1",
             "width": PPO_INDEX_HEAD_SPACE_SIZE,
-            "maskSource": "info.match.inventoryLength from the JS-authoritative transition payload",
+            "maskSource": POLICY_MASK_SOURCE,
+        },
+        "policyLevelMasking": {
+            "specified": True,
+            "preSamplingAppliedInCurrentSb3Path": False,
+            "consumerStatus": POLICY_MASK_CONSUMER_STATUS,
+            "requiredConsumer": "mask-capable PPO policy/distribution hook before action sampling",
+            "source": POLICY_MASK_SOURCE,
+            "inventoryGatedBooleanFields": sorted(INVENTORY_GATED_BOOLEAN_FIELDS),
+            "indexFieldRule": "token0 stays no-op; tokens 1..inventoryLength are legal item indices; higher tokens are masked",
+            "mixedWithPostDecodeClamp": False,
         },
         "telemetry": [
+            "policyLevelMask",
             "invalidActionRate",
             "maskRate",
             "vetoRate",

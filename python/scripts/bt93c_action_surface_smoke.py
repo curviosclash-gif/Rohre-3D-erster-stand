@@ -21,7 +21,12 @@ from stable_baselines3 import PPO
 
 from bridge.authority_snapshot import ACTION_BOOLEAN_FIELDS, ACTION_INDEX_FIELDS, READ_ONLY_RUNTIME_SURFACES
 from bridge.contract_v1 import EXPECTED_OBSERVATION_LENGTH, validate_action_payload
-from envs.ppo_action_surface import CurviosPpoActionWrapper, build_action_surface_manifest
+from envs.ppo_action_surface import (
+    CurviosPpoActionWrapper,
+    build_action_surface_manifest,
+    build_policy_level_action_mask,
+    summarize_policy_level_action_mask,
+)
 
 DEFAULT_OUTPUT = REPO_ROOT / "data" / "training" / "ppo" / "bt93c" / "action_surface_smoke.json"
 
@@ -101,7 +106,12 @@ def run_smoke(
     include_fallback_probes: bool = False,
 ) -> dict[str, Any]:
     env = CurviosPpoActionWrapper(ActionSurfaceProbeEnv(max_steps=max(4, eval_steps)))
-    observation, _ = env.reset(seed=932)
+    observation, initial_info = env.reset(seed=932)
+    initial_policy_mask = summarize_policy_level_action_mask(
+        build_policy_level_action_mask(
+            inventory_length=int((initial_info.get("match") or {}).get("inventoryLength") or 0),
+        )
+    )
 
     forced_raw_action = np.zeros(env.action_space.shape, dtype=np.int64)
     forced_raw_action[len(ACTION_BOOLEAN_FIELDS) + 0] = 256
@@ -138,6 +148,7 @@ def run_smoke(
     train_telemetry = env.get_telemetry_report()
     eval_telemetry = eval_env.get_telemetry_report()
     manifest = build_action_surface_manifest()
+    forced_policy_mask = forced_info.get("ppoActionSurface", {}).get("policyLevelMask")
     report = {
         "ok": True,
         "generatedAt": _utc_now(),
@@ -162,6 +173,25 @@ def run_smoke(
             "evalIterationCompleted": True,
             "sameWrapperForTrainAndEval": True,
             "rawBoundarySurfaceTraining": False,
+            "policyMaskSpecVisible": bool(forced_policy_mask),
+            "policyMaskSourceFromJsTransitionPayload": (
+                forced_policy_mask or {}
+            ).get("source") == manifest["policyLevelMasking"]["source"],
+            "policyMaskAppliedBeforePolicySampling": bool(
+                (forced_policy_mask or {}).get("preSamplingApplied")
+            ),
+            "postDecodeClampSeparatedFromPolicyMask": (
+                forced_info.get("ppoActionSurface", {})
+                .get("postDecodeClamp", {})
+                .get("mixedWithPolicyMask")
+                is False
+            ),
+        },
+        "policyLevelMasking": {
+            "initialProbe": initial_policy_mask,
+            "forcedProbe": forced_policy_mask,
+            "currentSb3PathConsumesMask": False,
+            "bt94aStartEvidence": False,
         },
         "fallbackProbes": {
             "included": include_fallback_probes,
