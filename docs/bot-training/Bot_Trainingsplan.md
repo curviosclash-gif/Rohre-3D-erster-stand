@@ -271,7 +271,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93E | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93F | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
-| Bot-Codex | BT93G | 2026-04-25 | active | 93G.3 abgeschlossen; 93G.4 offen |
+| Bot-Codex | BT93G | 2026-04-25 | active | 93G.4 abgeschlossen; 93G.5 offen |
 | - | BT94A | - | frei | wartet auf `BT93G.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1924,10 +1924,10 @@ Vollstaendiges Befundregister fuer BT93G-Intake:
 
 ### 93G.4 Reward- und Diagnose-Semantik
 
-- [ ] 93G.4.1 RewardBreakdown, Survival/Steps, Episode-Shortening, Safety-Overrules, Clamp-/Veto-Last und Terminal-/Death-Matrix gemeinsam bewerten.
-- [ ] 93G.4.2 Positive Reward-Aussagen bei DQN-Regression, kuenstlichem Cap, `max-steps-only`, leerer Death-Matrix oder hoher Clamp-/Veto-Last muessen `R.01` blockierend halten.
-- [ ] 93G.4.3 Reward-/Gate-Reports muessen sichtbar unterscheiden: echte Survival-Verbesserung, kuenstlich verlaengerte Max-Step-Episode, Timeout/Truncation und natuerliches Terminal.
-- [ ] 93G.4.4 Safety-Veto, Clamp und Episode-Shortening werden negativ oder blockierend in die Diagnose aufgenommen; kein Reward-Mean allein oeffnet BT94A.
+- [x] 93G.4.1 RewardBreakdown, Survival/Steps, Episode-Shortening, Safety-Overrules, Clamp-/Veto-Last und Terminal-/Death-Matrix gemeinsam bewerten. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_reward_gate_report.py --write` -> `data\training\ppo\bt93g\reward_gate_report.json` (`phaseCoverage.93G.4.1=true`, `rewardGate` verknuepft R.01, Episode-Shortening, Terminal/Death und Action-Safety))
+- [x] 93G.4.2 Positive Reward-Aussagen bei DQN-Regression, kuenstlichem Cap, `max-steps-only`, leerer Death-Matrix oder hoher Clamp-/Veto-Last muessen `R.01` blockierend halten. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_reward_gate_report.py --write` -> `data\training\ppo\bt93g\reward_gate_report.json` (`findingDisposition.R.01=still-blocking`, `positiveRewardMayOpenBt94a=false`))
+- [x] 93G.4.3 Reward-/Gate-Reports muessen sichtbar unterscheiden: echte Survival-Verbesserung, kuenstlich verlaengerte Max-Step-Episode, Timeout/Truncation und natuerliches Terminal. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_reward_gate_report.py --write` -> `data\training\ppo\bt93g\reward_gate_report.json` (`phaseCoverage.93G.4.3=true`, `gateMatrix` trennt `realSurvivalImprovement`, `artificialMaxStepEpisode`, `timeoutOrTruncation`, `naturalTerminal`))
+- [x] 93G.4.4 Safety-Veto, Clamp und Episode-Shortening werden negativ oder blockierend in die Diagnose aufgenommen; kein Reward-Mean allein oeffnet BT94A. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_reward_gate_report.py --write` -> `data\training\ppo\bt93g\reward_gate_report.json` (`phaseCoverage.93G.4.4=true`, `rewardMeanOnly.bt94aStartSignal=false`, `claimableAfter93G4=false`))
 
 ### 93G.5 Vergleichbarer Repair-Learner, Eval und Holdout
 

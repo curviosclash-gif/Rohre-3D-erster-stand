@@ -1,0 +1,141 @@
+{
+  "blockId": "BT93G",
+  "bt94aImpact": {
+    "blockedFindings": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31",
+      "R.01"
+    ],
+    "claimableAfter93G4": false,
+    "nextRequiredPhase": "93G.5 comparable repair learner/eval/holdout"
+  },
+  "evidenceLimits": {
+    "candidateRun": false,
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsSurvivalQualityEvidence": false,
+    "freezeCandidate": false
+  },
+  "findingDisposition": {
+    "F.05": "still-blocking",
+    "F.19": "still-blocking-until-93G.5",
+    "F.27": "still-blocking",
+    "F.30": "closed-for-bt93g-repair-lane",
+    "F.31": "still-blocking-until-93G.5",
+    "R.01": "still-blocking"
+  },
+  "gateMatrix": {
+    "artificialMaxStepEpisode": {
+      "bt94aStartSignal": false,
+      "classification": "hard-blocker",
+      "requires": "natural terminal/death matrix or honest diagnose-blocked outcome"
+    },
+    "naturalTerminal": {
+      "bt94aStartSignal": false,
+      "classification": "required-before-start",
+      "requires": "non-empty eval/holdout terminal/death/failure matrix"
+    },
+    "realSurvivalImprovement": {
+      "bt94aStartSignal": false,
+      "classification": "not-yet-evidenced",
+      "requires": "93G.5 comparable eval and holdout with non-regressive survival/steps"
+    },
+    "rewardMeanOnly": {
+      "bt94aStartSignal": false,
+      "classification": "never-sufficient",
+      "requires": "rewardBreakdown cross-checked against survival, steps, action safety and terminal/death matrix"
+    },
+    "timeoutOrTruncation": {
+      "bt94aStartSignal": false,
+      "classification": "diagnostic-only",
+      "requires": "separate truncatedReasonCounts and no relabeling as terminal/death quality"
+    }
+  },
+  "generatedAt": "2026-04-25T10:08:54Z",
+  "generatedBy": "python/scripts/bt93g_reward_gate_report.py",
+  "gitSha": "f8de99648bd5a2c17bff0e66f79ba2195653880b",
+  "ok": true,
+  "phaseCoverage": {
+    "93G.4.1": true,
+    "93G.4.2": true,
+    "93G.4.3": true,
+    "93G.4.4": true
+  },
+  "phaseId": "93G.4",
+  "resultClass": "reward-gates-pinned-r01-blocking",
+  "rewardGate": {
+    "R.01": {
+      "positiveRewardMayOpenBt94a": false,
+      "priorAverageBotSurvivalPct": -57.19291,
+      "priorAvgStepsPerEpisodePct": -86.385875,
+      "priorBt93fResultClass": "ppo-regression",
+      "reason": "Positive reward claims remain blocked until comparable 93G.5 eval/holdout proves survival/steps are not regressive.",
+      "status": "still-blocking"
+    },
+    "actionSafety": {
+      "invalidActionRate": 0.0,
+      "postDecodeClampRate": 0.0,
+      "probeThresholdsPass": true,
+      "safetyVetoRate": 0.0,
+      "sanitizerRate": 0.0,
+      "status": "probe-pass-still-requires-93G.5",
+      "thresholds": {
+        "invalidActionRateEq": 0.0,
+        "postDecodeClampRateLt": 0.5,
+        "safetyVetoRateLt": 0.25,
+        "sanitizerRateEq": 0.0
+      }
+    },
+    "episodeShortening": {
+      "maxStepsOnlyMayOpenBt94a": false,
+      "maxStepsPerEpisode": 180,
+      "prior16StepComparisonReclassified": true,
+      "status": "blocked-until-93G.5"
+    },
+    "terminalDeathMatrix": {
+      "emptyDeathMatrixMayOpenBt94a": false,
+      "evalHoldoutMatrixRequired": true,
+      "probeCoverage": {
+        "93G.2.1": true,
+        "93G.2.2": true,
+        "93G.2.3": true,
+        "93G.2.4": true
+      },
+      "status": "probe-wired-not-quality-evidence"
+    }
+  },
+  "sourceArtifacts": {
+    "actionMask": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/action_mask_report.json",
+      "role": "BT93G pre-sampling action mask",
+      "sha256": "7a8ac47dd6ca79b0a9ae87f5cb10a091d59958d2cf3786d08cfdbd888bf05b9a"
+    },
+    "bt93fRepairDiagnostic": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/repair_diagnostic_report.json",
+      "role": "BT93F prior reward/survival regression evidence",
+      "sha256": "8ccb7152fef248219a5a0e0a4d181ce2ddc24c0ac8c1eb6908a53991f7700a30"
+    },
+    "repairMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_matrix.json",
+      "role": "BT93G repair matrix",
+      "sha256": "eb8fe175e02e303a93ac74494e694937fde2aa25a9970d1cdbeaa59f8de611e7"
+    },
+    "startTruth": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/start_truth.json",
+      "role": "BT93G start truth",
+      "sha256": "2fd7dedea39620723ef43419b0a523d15ba8219ea44a4489860c267fad3f4009"
+    },
+    "terminalWiring": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/terminal_wiring_probe_report.json",
+      "role": "BT93G terminal wiring probes",
+      "sha256": "dd3d623e66be28b3e27e9d49fce1c92cefe67631218dda70bc9538266cdbedde"
+    }
+  }
+}
