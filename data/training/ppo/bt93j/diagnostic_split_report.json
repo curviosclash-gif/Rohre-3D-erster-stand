@@ -96,19 +96,23 @@
     },
     {
       "description": "Terminal, death, max-steps, forced-round, timeout, and runtime-failure mapping",
-      "green": false,
+      "evidence": "data/training/ppo/bt93j/terminal_semantics_report.json",
+      "green": true,
       "id": "terminal-mapping",
-      "notCausal": false,
+      "notCausal": true,
       "phase": "93J.2",
-      "status": "not-run"
+      "remainingRedInput": "real PPO eval/holdout remain player-dead-only",
+      "status": "green"
     },
     {
       "description": "Eval/holdout matrix contract, minimum episodes, seeds, maps, modes, and DQN anchor",
-      "green": false,
+      "evidence": "data/training/ppo/bt93j/matrix_contract_report.json",
+      "green": true,
       "id": "eval-matrix",
-      "notCausal": false,
+      "inputGatesGreen": false,
+      "notCausal": true,
       "phase": "93J.2",
-      "status": "not-run"
+      "status": "green"
     },
     {
       "description": "Pre-sampling mask, clamp, veto, sanitizer, invalid action, and executed action",
@@ -140,9 +144,9 @@
     "path": "data/training/ppo/bt93j/causal_chain_register.json",
     "resultClass": "causal-chain-register-pinned"
   },
-  "counterprobe": null,
-  "generatedAt": "2026-04-25T22:54:45Z",
-  "generatedBy": "python/scripts/bt93j_causal_observation.py",
+  "counterprobe": "scripted-safe eval-config controls reach non-death natural terminal while real PPO eval/holdout remain player-dead-only",
+  "generatedAt": "2026-04-25T23:11:53Z",
+  "generatedBy": "python/scripts/bt93j_terminal_matrix.py",
   "gitSha": "9043776509a61e6dbadf2f2ef27a2f108fc4bc46",
   "guardrails": {
     "bt94aCheckboxClosed": false,
@@ -159,6 +163,14 @@
     "rolloutSignal": false,
     "runtimeSurfacesTouched": []
   },
+  "matrixContract": {
+    "green": true,
+    "inputGatesGreen": false,
+    "notCausal": true,
+    "path": "data/training/ppo/bt93j/matrix_contract_report.json",
+    "resultClass": "matrix-contract-pinned-inputs-red"
+  },
+  "nextDiagnosticPhase": "93J.3",
   "noStartDecision": {
     "allowedWork": [
       "record gate status",
@@ -188,9 +200,13 @@
     "93J.1.1": true,
     "93J.1.2": true,
     "93J.1.3": true,
-    "93J.1.4": true
+    "93J.1.4": true,
+    "93J.2.1": true,
+    "93J.2.2": true,
+    "93J.2.3": true,
+    "93J.2.4": true
   },
-  "phaseId": "93J.1",
+  "phaseId": "93J.2",
   "primaryCause": null,
   "readyForRepair": false,
   "readyForTraining": false,
@@ -233,7 +249,7 @@
       "phase": "93J.4+"
     }
   ],
-  "resultClass": "diagnostic-split-observation-cleared",
+  "resultClass": "diagnostic-split-terminal-matrix-cleared-action-reward-pending",
   "sourceArtifacts": {
     "bt93cEvidenceQualityMatrix": {
       "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",
@@ -350,6 +366,13 @@
       ],
       "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
     }
+  },
+  "terminalSemantics": {
+    "green": true,
+    "notCausal": true,
+    "path": "data/training/ppo/bt93j/terminal_semantics_report.json",
+    "realEvalPlayerDeadOnly": true,
+    "resultClass": "terminal-mapping-cleared-policy-terminal-behavior-active"
   },
   "trainingGateRule": "readyForTraining remains false until every category gate is green or explicitly non-causal from versioned BT93J artifacts.",
   "workspace": {
