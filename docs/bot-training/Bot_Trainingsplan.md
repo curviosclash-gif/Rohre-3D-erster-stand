@@ -1610,7 +1610,7 @@ Quelle:
 - `data/training/ppo/bt93e/action_surface_hardening_report.json`
 - `docs/Fehlerberichte/2026-04-25_bt93e-gate-refresh-diagnose-blocked.md`
 
-<!-- LOCK: Bot-Codex seit 2026-04-25 -->
+<!-- LOCK: frei -->
 
 Scope:
 
