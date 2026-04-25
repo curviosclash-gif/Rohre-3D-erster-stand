@@ -19,7 +19,7 @@ from scaffold.bt93b_runner import run_from_cli as run_bt93b_from_cli
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", default="bt93b", choices=["bt93b", "bt93c", "bt93f", "bt93g", "bt93h"])
+    parser.add_argument("--profile", default="bt93b", choices=["bt93b", "bt93c", "bt93f", "bt93g", "bt93h", "bt93i"])
     parser.add_argument("--run-kind", default=None)
     parser.add_argument("--phase-id", default=None)
     parser.add_argument("--manifest-template", default=None)
@@ -48,6 +48,8 @@ def main() -> None:
     run_kind = args.run_kind or (
         "comparable-terminal-repair"
         if args.profile == "bt93h"
+        else "terminal-curriculum-repair"
+        if args.profile == "bt93i"
         else "comparable-repair"
         if args.profile == "bt93g"
         else "repair-diagnostic"
@@ -64,6 +66,7 @@ def main() -> None:
         "technical-smoke": "93G.5.1",
         "comparable-repair": "93G.5.3",
         "comparable-terminal-repair": "93H.3.3",
+        "terminal-curriculum-repair": "93I.3.2",
     }
     phase_id = args.phase_id or default_phase_ids.get(run_kind, "93C.3.1")
     from scripts.bt93c_learner_smoke import run_training_from_cli as run_bt93c_training_from_cli

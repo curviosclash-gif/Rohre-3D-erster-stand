@@ -1,0 +1,114 @@
+{
+  "configVersion": "bt93i-terminal-curriculum-repair-v1",
+  "blockId": "BT93I",
+  "phaseId": "93I.2",
+  "profileId": "bt93i-terminal-curriculum-steps-nonregression-v1",
+  "claim": "BT93I-Terminal-Curriculum-Steps-Repair",
+  "scope": "BT93I terminal-curriculum repair only; no candidate, freeze, promotion, baseline, PPO-Validate, or runtime integration",
+  "env": {
+    "modeId": "runtime-near-headless-v1",
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "maxStepsPerEpisode": 180,
+    "controllerTimeoutSeconds": 30,
+    "trainSeeds": [934, 935, 936, 937],
+    "evalSeeds": [944, 945, 946],
+    "holdoutSeeds": [960, 961],
+    "maps": ["standard", "maze"],
+    "holdoutStatus": "BT93I holdout remains reserved for eval only; no optimization after holdout"
+  },
+  "rollout": {
+    "terminalCurriculumSmokeTimesteps": 2048,
+    "terminalCurriculumIncrementTimesteps": 4096,
+    "terminalCurriculumMaxTimesteps": 32768,
+    "evalSteps": 2700,
+    "holdoutEvalSteps": 1440,
+    "evalMinCompletedEpisodes": 15,
+    "holdoutMinCompletedEpisodes": 8,
+    "nStepsPerEnv": 64,
+    "batchSize": 32,
+    "nEpochs": 2,
+    "wallClockLimitSeconds": 14400,
+    "timeoutBudgetSeconds": 14400,
+    "checkpointFrequencyTimesteps": 2048,
+    "evalIntervalTimesteps": 2048,
+    "extensionRule": "after a green 2048 smoke, extend only in 4096-timestep increments while early-stop checks stay green",
+    "budgetRule": "BT93I repair may run up to 32768 timesteps or 14400 seconds, whichever comes first; 4-env remains disabled"
+  },
+  "algorithm": {
+    "library": "stable-baselines3",
+    "name": "PPO",
+    "policy": "MlpPolicy",
+    "device": "cpu",
+    "gamma": 0.99,
+    "gaeLambda": 0.95,
+    "learningRate": 0.00025,
+    "clipRange": 0.2,
+    "entCoef": 0.01,
+    "vfCoef": 0.5,
+    "maxGradNorm": 0.5
+  },
+  "policy": {
+    "netArch": [64, 64],
+    "activation": "tanh",
+    "actorCriticHeadsRequired": true,
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1"
+  },
+  "normalization": {
+    "implementation": "stable_baselines3.common.vec_env.VecNormalize",
+    "normalizeObservation": true,
+    "normalizeReward": false,
+    "clipObservation": 10.0,
+    "persistStatsWithCheckpoint": true
+  },
+  "diagnostics": {
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "minEntropy": 0.01,
+      "maxValueLoss": 100.0,
+      "maxGradNorm": 0.5,
+      "minExplainedVariance": -1.0
+    },
+    "safetyThresholds": {
+      "postDecodeClampRateLt": 0.5,
+      "safetyVetoRateLt": 0.25,
+      "invalidActionRateEq": 0.0,
+      "sanitizerRateEq": 0.0
+    },
+    "earlyStopRules": [
+      "stop if runtimeErrorCount > 0",
+      "stop if eval or holdout terminal/death matrix is empty or max-steps-only",
+      "stop if avgStepsPerEpisode regresses below the DQN anchor",
+      "stop if averageBotSurvival regresses below the DQN anchor",
+      "stop if reward gain is paired with episode shortening or survival regression",
+      "stop if approx_kl, clip_fraction, entropy, value_loss, grad_norm, or explained_variance crosses collapse thresholds",
+      "stop if pre-sampling mask is missing or post-decode clamp/veto/invalid-action load exceeds safety thresholds",
+      "stop before holdout if eval does not satisfy the minimum completed-episode target",
+      "no optimization after holdout"
+    ],
+    "classification": "BT93I.2 readiness and later BT93I.3 repair only; no BT94A candidate, freeze, promotion, PPO-Validate, or runtime rollout signal"
+  },
+  "artifacts": {
+    "root": "data/training/ppo/bt93i",
+    "requirements": "python/requirements-ppo.txt",
+    "dependencyLockReport": "data/training/ppo/bt93c/dependency_lock_report.json",
+    "cleanEnvReport": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+    "startTruth": "data/training/ppo/bt93i/start_truth.json",
+    "matrixManifest": "data/training/ppo/bt93i/matrix_manifest.json",
+    "terminalProvocationReport": "data/training/ppo/bt93i/terminal_provocation_report.json",
+    "actionMaskReport": "data/training/ppo/bt93g/action_mask_report.json",
+    "rewardGateReport": "data/training/ppo/bt93g/reward_gate_report.json"
+  },
+  "guardrails": {
+    "repairOnly": true,
+    "baselineRunsStarted": false,
+    "candidateRunsAllowed": false,
+    "candidateFreezeAllowed": false,
+    "promotionAllowed": false,
+    "ppoValidateAllowed": false,
+    "fourEnvAllowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}

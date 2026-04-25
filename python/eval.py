@@ -15,7 +15,7 @@ from scaffold.bt93b_runner import DEFAULT_ARTIFACT_ROOT, latest_checkpoint_path,
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", default="bt93b", choices=["bt93b", "bt93c", "bt93f", "bt93g", "bt93h"])
+    parser.add_argument("--profile", default="bt93b", choices=["bt93b", "bt93c", "bt93f", "bt93g", "bt93h", "bt93i"])
     parser.add_argument("--run-kind", default="eval-smoke")
     parser.add_argument("--phase-id", default=None)
     parser.add_argument("--manifest-template", default=None)
@@ -23,10 +23,12 @@ def main() -> None:
     parser.add_argument("--artifact-root", default=None)
     parser.add_argument("--target-steps-per-env", type=int, default=64)
     parser.add_argument("--eval-steps", type=int, default=None)
+    parser.add_argument("--max-eval-steps", type=int, default=None)
+    parser.add_argument("--min-completed-episodes", type=int, default=None)
     parser.add_argument("--checkpoint", default=None)
     args = parser.parse_args()
 
-    if args.profile in {"bt93c", "bt93f", "bt93g", "bt93h"}:
+    if args.profile in {"bt93c", "bt93f", "bt93g", "bt93h", "bt93i"}:
         if args.run_kind not in {
             "eval-smoke",
             "diagnostics-eval",
@@ -36,6 +38,7 @@ def main() -> None:
             "holdout-eval",
             "comparable-repair-eval",
             "comparable-terminal-repair-eval",
+            "terminal-curriculum-repair-eval",
         }:
             raise SystemExit(f"unsupported PPO eval run kind: {args.run_kind}")
         from scripts.bt93c_learner_smoke import run_eval_from_cli as run_bt93c_eval_from_cli
@@ -51,10 +54,13 @@ def main() -> None:
                 "holdout-eval": "93H.3.4" if args.profile == "bt93h" else "93G.5.4" if args.profile == "bt93g" else "93F.4.2" if args.profile == "bt93f" else "93C.6.2",
                 "comparable-repair-eval": "93G.5.4",
                 "comparable-terminal-repair-eval": "93H.3.4",
+                "terminal-curriculum-repair-eval": "93I.4.1",
             }.get(args.run_kind, "93C.3.4"),
             config_path=args.config,
             artifact_root=args.artifact_root,
             eval_steps=args.eval_steps,
+            max_eval_steps=args.max_eval_steps,
+            min_completed_episodes=args.min_completed_episodes,
             checkpoint=args.checkpoint,
         )
         return

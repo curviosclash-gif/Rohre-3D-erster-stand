@@ -116,6 +116,7 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
         "BT93F": {"93F.4"},
         "BT93G": {"93G.5"},
         "BT93H": {"93H.3"},
+        "BT93I": {"93I.2"},
     }
     block_id = str(config.get("blockId") or "")
     if block_id not in allowed_scopes or config.get("phaseId") not in allowed_scopes[block_id]:
@@ -134,6 +135,10 @@ def _run_sample_class(run_kind: str) -> str:
         return "bt93h-comparable-terminal-repair-not-candidate"
     if run_kind == "comparable-terminal-repair-eval":
         return "bt93h-comparable-terminal-repair-eval-not-ppo-validate"
+    if run_kind == "terminal-curriculum-repair":
+        return "bt93i-terminal-curriculum-repair-not-candidate"
+    if run_kind == "terminal-curriculum-repair-eval":
+        return "bt93i-terminal-curriculum-repair-eval-not-ppo-validate"
     if run_kind == "repair-diagnostic":
         return "repair-diagnostic-not-candidate"
     if run_kind.startswith("baseline-"):
@@ -173,8 +178,16 @@ def _is_bt93h_comparable_eval(block_id: str, run_kind: str) -> bool:
     return block_id == "BT93H" and run_kind in {"comparable-terminal-repair-eval", "holdout-eval"}
 
 
+def _is_bt93i_comparable_eval(block_id: str, run_kind: str) -> bool:
+    return block_id == "BT93I" and run_kind in {"terminal-curriculum-repair-eval", "holdout-eval"}
+
+
 def _is_comparable_repair_eval(block_id: str, run_kind: str) -> bool:
-    return _is_bt93g_comparable_eval(block_id, run_kind) or _is_bt93h_comparable_eval(block_id, run_kind)
+    return (
+        _is_bt93g_comparable_eval(block_id, run_kind)
+        or _is_bt93h_comparable_eval(block_id, run_kind)
+        or _is_bt93i_comparable_eval(block_id, run_kind)
+    )
 
 
 def _action_surface_id(config: Mapping[str, Any]) -> str | None:
@@ -473,7 +486,9 @@ def _collect_eval_diagnostics(
             "averageBotSurvival": completed_avg if is_baseline else None,
             "averageBotSurvivalReason": average_survival_reason,
             "averageBotSurvivalSource": (
-                "BT93H comparable terminal repair completed episode length"
+                "BT93I terminal curriculum repair completed episode length"
+                if _is_bt93i_comparable_eval(block_id, run_kind)
+                else "BT93H comparable terminal repair completed episode length"
                 if _is_bt93h_comparable_eval(block_id, run_kind)
                 else "BT93G comparable repair completed episode length"
                 if _is_bt93g_comparable_eval(block_id, run_kind)
@@ -664,6 +679,68 @@ def _validate_gate_inputs(config: Mapping[str, Any]) -> dict[str, Any]:
             "dqnChampion": ((repair_matrix.get("baseline") or {}).get("dqnChampion") or {}),
         }
 
+    if block_id == "BT93I":
+        start_truth_path = _repo_path(str(artifacts.get("startTruth")))
+        matrix_manifest_path = _repo_path(str(artifacts.get("matrixManifest")))
+        terminal_report_path = _repo_path(str(artifacts.get("terminalProvocationReport")))
+        action_mask_path = _repo_path(str(artifacts.get("actionMaskReport")))
+        reward_gate_path = _repo_path(str(artifacts.get("rewardGateReport")))
+
+        start_truth = _read_json(start_truth_path)
+        matrix_manifest = _read_json(matrix_manifest_path)
+        terminal_report = _read_json(terminal_report_path)
+        action_mask = _read_json(action_mask_path)
+        reward_gate = _read_json(reward_gate_path)
+        scenario_checks = terminal_report.get("scenarioChecks") or {}
+
+        if start_truth.get("resultClass") != "start-truth-pinned":
+            raise RuntimeError("BT93I start is blocked by missing start truth")
+        if matrix_manifest.get("resultClass") != "episode-targeted-matrix-pinned":
+            raise RuntimeError("BT93I start is blocked by missing episode-counted matrix")
+        if terminal_report.get("resultClass") != "terminal-provocation-green":
+            raise RuntimeError("BT93I start is blocked by red terminal provocation")
+        if scenario_checks.get("matchEndedNonDeathNaturalTerminal") is not True:
+            raise RuntimeError("BT93I start is blocked by missing non-death natural terminal control")
+        if action_mask.get("ok") is not True or reward_gate.get("ok") is not True:
+            raise RuntimeError("BT93I start is blocked by action/reward prerequisite gates")
+        if (action_mask.get("maskSourceContract") or {}).get("preSamplingApplied") is not True:
+            raise RuntimeError("BT93I start is blocked by missing pre-sampling mask")
+
+        env = matrix_manifest.get("env") or {}
+        return {
+            "startTruth": _rel(start_truth_path),
+            "startTruthSha256": _sha256_file(start_truth_path),
+            "matrixManifest": _rel(matrix_manifest_path),
+            "matrixManifestSha256": _sha256_file(matrix_manifest_path),
+            "terminalProvocationReport": _rel(terminal_report_path),
+            "terminalProvocationReportSha256": _sha256_file(terminal_report_path),
+            "actionMaskReport": _rel(action_mask_path),
+            "actionMaskReportSha256": _sha256_file(action_mask_path),
+            "rewardGateReport": _rel(reward_gate_path),
+            "rewardGateReportSha256": _sha256_file(reward_gate_path),
+            "dependencyLockReport": _rel(dependency_report_path),
+            "dependencyLockReportSha256": _sha256_file(dependency_report_path),
+            "cleanEnvReport": _rel(clean_env_report_path),
+            "cleanEnvReportSha256": _sha256_file(clean_env_report_path),
+            "requirements": _rel(requirements_path),
+            "requirementsSha256": _sha256_file(requirements_path),
+            "freezeOk": False,
+            "reAuditRequired": False,
+            "candidateRunsAllowed": False,
+            "promotionAllowed": False,
+            "actionSurfaceId": _action_surface_id(config),
+            "cleanPython": str(clean_env_report.get("cleanPython") or ""),
+            "semanticWindow": {"modeId": env.get("modeId")},
+            "matrix": {
+                "matrixId": matrix_manifest.get("matrixId"),
+                "maps": env.get("maps"),
+                "seeds": matrix_manifest.get("seeds"),
+                "maxStepsPerEpisode": env.get("maxStepsPerEpisode"),
+                "minimumEpisodes": matrix_manifest.get("minimumEpisodes"),
+            },
+            "dqnChampion": ((matrix_manifest.get("baseline") or {}).get("dqnChampion") or {}),
+        }
+
     start_manifest_path = _repo_path(str(artifacts.get("startManifest")))
     action_surface_report_path = _repo_path(str(artifacts.get("actionSurfaceReport")))
     start_manifest = _read_json(start_manifest_path)
@@ -828,6 +905,7 @@ def _write_model_package(
     repair_evidence_allowed = (
         (block_id == "BT93G" and run_kind == "comparable-repair")
         or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
+        or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
     )
     checkpoint_dir = run_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -986,6 +1064,7 @@ def run_training_from_cli(
         "technical-smoke",
         "comparable-repair",
         "comparable-terminal-repair",
+        "terminal-curriculum-repair",
     }:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1001,7 +1080,16 @@ def run_training_from_cli(
     algorithm_cfg = config["algorithm"]
     seeds = [int(seed) for seed in env_cfg["trainSeeds"][: int(env_cfg["envCount"])]]
     source_package = None
-    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train", "repair-diagnostic", "comparable-repair", "comparable-terminal-repair"}:
+    if run_kind in {
+        "resume-smoke",
+        "diagnostics-smoke",
+        "pilot-train",
+        "baseline-train",
+        "repair-diagnostic",
+        "comparable-repair",
+        "comparable-terminal-repair",
+        "terminal-curriculum-repair",
+    }:
         prefer_pointer = {
             "resume-smoke": "latest_learner_smoke.json",
             "comparable-repair": "latest_technical_smoke.json",
@@ -1022,6 +1110,7 @@ def run_training_from_cli(
         "technical-smoke": "technicalSmokeTimesteps",
         "comparable-repair": "shortRepairTimesteps",
         "comparable-terminal-repair": "terminalRepairTimesteps",
+        "terminal-curriculum-repair": "terminalCurriculumSmokeTimesteps",
     }[run_kind]
     timesteps = int(
         total_timesteps
@@ -1079,6 +1168,7 @@ def run_training_from_cli(
             "repairEvidenceClaimAllowed": (
                 (block_id == "BT93G" and run_kind == "comparable-repair")
                 or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
+                or (block_id == "BT93I" and run_kind == "terminal-curriculum-repair")
             ),
             "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
@@ -1158,6 +1248,8 @@ def run_eval_from_cli(
     config_path: str | None,
     artifact_root: str | None,
     eval_steps: int | None,
+    max_eval_steps: int | None = None,
+    min_completed_episodes: int | None = None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
     if run_kind not in {
@@ -1169,6 +1261,7 @@ def run_eval_from_cli(
         "holdout-eval",
         "comparable-repair-eval",
         "comparable-terminal-repair-eval",
+        "terminal-curriculum-repair-eval",
     }:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1183,7 +1276,8 @@ def run_eval_from_cli(
     env_cfg = config["env"]
     seed_key = "holdoutSeeds" if run_kind == "holdout-eval" else "evalSeeds"
     seeds = [int(seed) for seed in env_cfg[seed_key][: int(env_cfg["evalEnvCount"])]]
-    steps = int(eval_steps or config["rollout"]["evalSteps"])
+    target_completed_episodes = int(min_completed_episodes or 0)
+    steps = int(max_eval_steps or eval_steps or config["rollout"]["evalSteps"])
 
     vec_env: VecNormalize | None = None
     try:
@@ -1213,9 +1307,12 @@ def run_eval_from_cli(
         info_samples: list[dict[str, Any]] = []
         completed_episode_lengths: list[int] = []
         open_episode_lengths = [0 for _ in seeds]
+        vector_steps_executed = 0
+        stop_reason = "step-limit"
         for _ in range(steps):
             action, _ = model.predict(obs, deterministic=True)
             obs, reward, done, infos = vec_env.step(action)
+            vector_steps_executed += 1
             reward_entries = [float(entry) for entry in np.asarray(reward).reshape(-1)]
             done_entries = [bool(entry) for entry in np.asarray(done).reshape(-1)]
             rewards.extend(reward_entries)
@@ -1229,6 +1326,9 @@ def run_eval_from_cli(
                 info_samples.append(dict(info))
                 if len(info_tail) < 4:
                     info_tail.append(dict(info))
+            if target_completed_episodes > 0 and len(completed_episode_lengths) >= target_completed_episodes:
+                stop_reason = "min-completed-episodes"
+                break
         telemetry_reports = _telemetry(vec_env)
         source_training_report = None
         source_training_report_path = source_package.manifest_path.parent / "training_report.json"
@@ -1270,12 +1370,26 @@ def run_eval_from_cli(
                 "countsAsJsTickLatency": False,
             },
             "eval": {
-                "steps": steps,
+                "steps": vector_steps_executed,
+                "stepLimit": steps,
                 "rewardTotal": round(sum(rewards), 6),
                 "rewardMean": round(sum(rewards) / len(rewards), 6) if rewards else 0.0,
                 "doneCount": done_count,
                 "telemetry": telemetry_reports,
                 "infoTail": info_tail,
+            },
+            "episodeTargetGate": {
+                "enabled": target_completed_episodes > 0,
+                "minCompletedEpisodes": target_completed_episodes or None,
+                "completedEpisodeCount": len(completed_episode_lengths),
+                "satisfied": (
+                    len(completed_episode_lengths) >= target_completed_episodes
+                    if target_completed_episodes > 0
+                    else None
+                ),
+                "stopReason": stop_reason,
+                "maxEvalSteps": steps,
+                "vectorStepsExecuted": vector_steps_executed,
             },
             "evalCommand": " ".join(sys.argv),
             "diagnostics": diagnostics,
@@ -1322,6 +1436,7 @@ def run_eval_from_cli(
             "holdout-eval": "latest_holdout_eval.json",
             "comparable-repair-eval": "latest_comparable_repair_eval.json",
             "comparable-terminal-repair-eval": "latest_comparable_terminal_repair_eval.json",
+            "terminal-curriculum-repair-eval": "latest_terminal_curriculum_repair_eval.json",
         }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({
@@ -1331,6 +1446,7 @@ def run_eval_from_cli(
             "sourceArtifactManifest": _rel(source_package.manifest_path),
             "forwardPassMs": report["forwardPass"]["wallClockMs"],
             "rewardTotal": report["eval"]["rewardTotal"],
+            "episodeTargetGate": report["episodeTargetGate"],
         }, indent=2))
         return report
     finally:
