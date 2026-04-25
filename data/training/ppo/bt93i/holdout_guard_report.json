@@ -1,0 +1,82 @@
+{
+  "blockId": "BT93I",
+  "commands": {
+    "repairTrain": "python\\train.py --profile bt93i --run-kind terminal-curriculum-repair --phase-id 93I.3.2 --config python\\configs\\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93h\\latest_comparable_terminal_repair.json --total-timesteps 2048",
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93i_terminal_curriculum_repair_report.py --write-holdout-guard"
+  },
+  "generatedAt": "2026-04-25T15:13:19Z",
+  "generatedBy": "python/scripts/bt93i_terminal_curriculum_repair_report.py",
+  "gitSha": "cd432aba522c9384a9d5857ac9c454909f61fe9b",
+  "guardChecks": {
+    "holdoutNotOptimizedYet": true,
+    "holdoutSeedsPinned": true,
+    "optimizerStateHashPinned": true,
+    "postHoldoutTrainingRunsEmpty": true,
+    "repairRunPinned": true
+  },
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "holdoutConsumed": false,
+  "holdoutRun": {
+    "report": null,
+    "runId": null,
+    "sourceModelSha256": null
+  },
+  "holdoutSeeds": [
+    960,
+    961
+  ],
+  "ok": true,
+  "phaseId": "93I.3.4",
+  "postHoldoutTrainingRuns": [],
+  "preHoldoutTrainingRun": {
+    "artifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+    "modelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371",
+    "optimizerStateSha256": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+    "optimizerStep": 248,
+    "report": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+    "runId": "20260425T151155Z-terminal-curriculum-repair",
+    "runKind": "terminal-curriculum-repair",
+    "vecnormalizeSha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25"
+  },
+  "resultClass": "pre-holdout-guard-pinned",
+  "rule": "After a BT93I holdout eval exists, no later optimization may use the same holdout seeds; this report must be regenerated with before/after optimizer hashes.",
+  "sourceArtifacts": {
+    "holdoutPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_holdout_eval.json",
+      "role": "BT93I holdout pointer",
+      "sha256": null,
+      "status": "missing"
+    },
+    "matrixManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_manifest.json",
+      "role": "BT93I matrix manifest",
+      "sha256": "4b159324c06d7f12a3ad8fd1b0e69dc907889bc8ab3a6c87e30f243b79a5c906"
+    },
+    "repairManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+      "role": "BT93I repair artifact manifest",
+      "sha256": "3468844a28aee30b038547b323c9360edc7ed9abe236c9bcbcec85dbeb8aa8b8"
+    },
+    "repairPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "role": "BT93I repair pointer",
+      "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be"
+    },
+    "repairTrainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "role": "BT93I repair train",
+      "sha256": "f819b7d808b1694396112a41659bd2ae15a88b8fd7d082e45b8074a51b5928da"
+    }
+  }
+}

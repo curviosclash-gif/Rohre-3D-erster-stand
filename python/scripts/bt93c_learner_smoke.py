@@ -28,6 +28,8 @@ REPO_ROOT = PYTHON_ROOT.parent
 DEFAULT_CONFIG = PYTHON_ROOT / "configs" / "ppo_bt93c_learner_smoke.json"
 DEFAULT_ARTIFACT_ROOT = REPO_ROOT / "data" / "training" / "ppo" / "bt93c"
 CHECKPOINT_VERSION = "bt93c-ppo-checkpoint-v1"
+_NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED = False
+_NUMPY_CORE_MODULE_ALIASES_INSTALLED = False
 
 
 @dataclass(frozen=True)
@@ -106,6 +108,93 @@ def _git_sha() -> str:
         check=False,
     )
     return result.stdout.strip() if result.returncode == 0 else "unknown"
+
+
+def _install_numpy_bit_generator_pickle_compat() -> None:
+    """Allow older VecNormalize pickles to carry Gym space RNG state."""
+    global _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED
+    if _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED:
+        return
+    import numpy.random._pickle as random_pickle
+
+    original_bit_generator_ctor = random_pickle.__bit_generator_ctor
+    original_generator_ctor = random_pickle.__generator_ctor
+    if getattr(original_bit_generator_ctor, "_bt93_pickle_compat", False):
+        _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED = True
+        return
+
+    class _LegacyBitGeneratorProxy:
+        def __init__(self, bit_generator_name: Any = "PCG64") -> None:
+            self.bit_generator_name = getattr(bit_generator_name, "__name__", bit_generator_name)
+            self.legacy_states: list[Any] = []
+
+        def __setstate__(self, state: Any) -> None:
+            self.legacy_states.append(state)
+
+    def _compat_ctor(bit_generator_name: Any = "MT19937") -> Any:
+        if isinstance(bit_generator_name, type) and bit_generator_name.__module__.startswith("numpy.random"):
+            return _LegacyBitGeneratorProxy(bit_generator_name)
+        return original_bit_generator_ctor(bit_generator_name)
+
+    def _compat_generator_ctor(bit_generator_name: Any = "MT19937", bit_generator_ctor: Any = None) -> Any:
+        if isinstance(bit_generator_name, _LegacyBitGeneratorProxy):
+            return np.random.Generator(np.random.PCG64())
+        if isinstance(bit_generator_name, type) and bit_generator_name.__module__.startswith("numpy.random"):
+            bit_generator_name = bit_generator_name.__name__
+        if bit_generator_ctor is not None:
+            return original_generator_ctor(bit_generator_name, bit_generator_ctor)
+        return original_generator_ctor(bit_generator_name)
+
+    _compat_ctor._bt93_pickle_compat = True  # type: ignore[attr-defined]
+    random_pickle.__bit_generator_ctor = _compat_ctor
+    random_pickle.__generator_ctor = _compat_generator_ctor
+    _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED = True
+
+
+def _install_numpy_core_module_aliases() -> None:
+    """Map NumPy 2 pickle module names back to NumPy 1.x modules."""
+    global _NUMPY_CORE_MODULE_ALIASES_INSTALLED
+    if _NUMPY_CORE_MODULE_ALIASES_INSTALLED:
+        return
+    import numpy.core as numpy_core
+    import numpy.core.multiarray as numpy_core_multiarray
+    import numpy.core.numeric as numpy_core_numeric
+
+    sys.modules.setdefault("numpy._core", numpy_core)
+    sys.modules.setdefault("numpy._core.multiarray", numpy_core_multiarray)
+    sys.modules.setdefault("numpy._core.numeric", numpy_core_numeric)
+    _NUMPY_CORE_MODULE_ALIASES_INSTALLED = True
+
+
+def _install_numpy_artifact_pickle_compat() -> None:
+    _install_numpy_core_module_aliases()
+    _install_numpy_bit_generator_pickle_compat()
+
+
+def _numpy_pickle_compat_report(vecnormalize_source: Path | None) -> dict[str, Any]:
+    return {
+        "numpyBitGeneratorClassPickleCompat": _NUMPY_BIT_GENERATOR_PICKLE_COMPAT_INSTALLED,
+        "numpyCoreModuleAliases": _NUMPY_CORE_MODULE_ALIASES_INSTALLED,
+        "reason": (
+            "legacy VecNormalize pickle may contain Gym space RNG state encoded with a NumPy BitGenerator class"
+            if vecnormalize_source is not None
+            else None
+        ),
+        "scope": "PPO model and VecNormalize artifact load only; observation/reward RMS state is loaded from the source artifact",
+    }
+
+
+def _clear_space_rng_for_vecnormalize_pickle(vec_env: VecNormalize) -> dict[str, Any]:
+    cleared: list[str] = []
+    for attr_name in ("action_space", "observation_space"):
+        space = getattr(vec_env, attr_name, None)
+        if hasattr(space, "_np_random") and getattr(space, "_np_random", None) is not None:
+            setattr(space, "_np_random", None)
+            cleared.append(attr_name)
+    return {
+        "spaceRngClearedBeforeVecNormalizeSave": cleared,
+        "normalizationRmsPreserved": True,
+    }
 
 
 def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
@@ -825,6 +914,7 @@ def _build_vec_env(
     if seeds:
         base_env.seed(int(seeds[0]))
     if vecnormalize_source is not None:
+        _install_numpy_artifact_pickle_compat()
         vec_env = VecNormalize.load(str(vecnormalize_source), base_env)
     else:
         vec_env = VecNormalize(
@@ -917,6 +1007,7 @@ def _write_model_package(
     manifest_path = run_dir / "artifact_manifest.json"
 
     _write_json(config_snapshot_path, config)
+    normalize_pickle_compat = _clear_space_rng_for_vecnormalize_pickle(vec_env)
     model.save(str(model_path))
     vec_env.save(str(vecnormalize_path))
     torch.save(
@@ -984,6 +1075,7 @@ def _write_model_package(
         "trainingCommand": " ".join(sys.argv),
         "policy": _policy_summary(model, config),
         "optimizer": _optimizer_summary(model),
+        "pickleCompatibility": normalize_pickle_compat,
         "learning": dict(learning_report),
         "guardrails": {
             "readOnlyRuntimeSurfaces": list(READ_ONLY_RUNTIME_SURFACES),
@@ -1199,6 +1291,9 @@ def run_training_from_cli(
             "truePpoOptimizerUpdate": learning_report["optimizerUpdatesCompleted"],
             "truePpoModelPackage": True,
             "resumedFrom": _package_pointer(source_package) if source_package else None,
+            "loadCompatibility": _numpy_pickle_compat_report(
+                source_package.vecnormalize_path if source_package else None
+            ),
             "learning": learning_report,
             "artifacts": manifest["artifacts"],
             "policy": manifest["policy"],
@@ -1359,6 +1454,7 @@ def run_eval_from_cli(
             "runKind": run_kind,
             "loadedRealPpoModel": True,
             "sourcePackage": _package_pointer(source_package),
+            "loadCompatibility": _numpy_pickle_compat_report(source_package.vecnormalize_path),
             "modelReload": {
                 "wallClockMs": round(load_elapsed_ms, 6),
                 "modelSha256": _sha256_file(source_package.model_path),
