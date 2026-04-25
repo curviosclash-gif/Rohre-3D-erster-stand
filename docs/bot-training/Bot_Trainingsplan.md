@@ -1982,7 +1982,7 @@ Quelle:
 - `data/training/ppo/bt94a/no_start_gate.json`
 - `docs/Fehlerberichte/2026-04-25_bt93g-gate-refresh-diagnose-blocked.md`
 
-<!-- LOCK: frei -->
+<!-- LOCK: Bot-Codex seit 2026-04-25 -->
 
 Scope:
 
