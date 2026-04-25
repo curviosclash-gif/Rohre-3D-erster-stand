@@ -1,0 +1,229 @@
+{
+  "blockId": "BT93J",
+  "blockerRelations": {
+    "F.27": {
+      "active": true,
+      "dependsOn": [
+        "F.05",
+        "F.19",
+        "F.31"
+      ],
+      "rule": "F.27 remains aggregate while F.05, F.19, or F.31 are red.",
+      "type": "aggregate"
+    }
+  },
+  "generatedAt": "2026-04-25T22:54:45Z",
+  "generatedBy": "python/scripts/bt93j_causal_observation.py",
+  "gitSha": "4a266499daf8e34ce4da584de3e7b7e789db0333",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no pilot, holdout, long-run, or fix from BT93J.1",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change"
+    ],
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93J.1.1": true,
+    "93J.1.2": true
+  },
+  "phaseId": "93J.1",
+  "resultClass": "causal-chain-register-pinned",
+  "sourceArtifacts": {
+    "bt93iMatrixGreen": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_green_report.json",
+      "role": "BT93I matrix green report",
+      "sha256": "c664bdc5f716ed7575dd02c9adf7dd7d5bd2aed92c8e6932c0f546639a43d4fc"
+    },
+    "bt93jStartTruth": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93j/start_truth.json",
+      "role": "BT93J start truth",
+      "sha256": "4828d7d15ff6118e50c1303c6147e72d1bb53bd6c8210b35b801090715dbcf4e"
+    },
+    "bt94aNoStartGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A no-start gate",
+      "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
+    }
+  },
+  "trackedFindings": {
+    "F.05": {
+      "artifact": "data/training/ppo/bt93i/matrix_green_report.json",
+      "codePath": [
+        "python/scripts/bt93i_matrix_green_report.py",
+        "python/eval.py",
+        "python/envs/curvios_env.py"
+      ],
+      "counterEvidenceRequired": [
+        "observation_integrity_report.json has a green observation gate",
+        "terminal/matrix report shows start-capable death and non-death terminal classes",
+        "raw eval step counts and matrix aggregate reproduce the same numbers",
+        "oracle/scripted policy demonstrates comparable step-count semantics"
+      ],
+      "currentRule": {
+        "dqnAvgStepsPerEpisode": 117.525,
+        "evalAverageBotSurvival": 69.133333,
+        "evalAvgStepsPerEpisode": 69.133333,
+        "evalStepsNonRegressionOk": false,
+        "holdoutAverageBotSurvival": 71.75,
+        "holdoutAvgStepsPerEpisode": 71.75,
+        "holdoutStepsNonRegressionOk": false,
+        "survivalTarget": 48.590082
+      },
+      "hypothesis": "Steps are red because terminal/matrix interpretation, observation integrity, action safety, reward/curriculum, or training horizon still distorts the PPO/DQN comparison.",
+      "sourceEvidence": "BT93I terminal-curriculum repair keeps Survival-First blocked because avgSteps regress (evalAvgStepsPerEpisodePct=-41.175637, holdoutAvgStepsPerEpisodePct=-38.94916).",
+      "status": "bt94a-blocker",
+      "successCriterion": {
+        "evalAverageBotSurvivalMin": 48.590082,
+        "evalAvgStepsPerEpisodeMin": 117.525,
+        "holdoutAverageBotSurvivalMin": 48.590082,
+        "holdoutAvgStepsPerEpisodeMin": 117.525,
+        "measurementInvalidity": false,
+        "terminalDeathMatrixStartCapable": true
+      },
+      "symptom": "Survival-First remains inconclusive: averageBotSurvival is above the DQN target while avgStepsPerEpisode is below the DQN anchor."
+    },
+    "F.19": {
+      "artifact": "data/training/ppo/bt93i/matrix_green_report.json",
+      "codePath": [
+        "python/scripts/bt93i_matrix_truth.py",
+        "python/eval.py",
+        "scripts/training-headless-lane-runner.mjs",
+        "src/state/training/EpisodeController.js"
+      ],
+      "counterEvidenceRequired": [
+        "scripted terminal provocation produces player-dead, natural terminal, max-steps, forced round, timeout, and runtime failure fields",
+        "headless and Python fields match for terminalReason, truncatedReason, deathCauseCounts, naturalTerminal, and runtimeErrorCount",
+        "real eval distinguishes mapping failure from policy behavior"
+      ],
+      "currentRule": {
+        "evalFailureClasses": {
+          "crash": 0,
+          "deathCauseCounts": {
+            "player-dead": 15
+          },
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "maxStepsOnly": false,
+          "naturalTerminal": 0,
+          "playerDeadOnly": true,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "startCapableTerminalMatrix": false,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "player-dead": 15
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "holdoutFailureClasses": {
+          "crash": 0,
+          "deathCauseCounts": {
+            "player-dead": 8
+          },
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "maxStepsOnly": false,
+          "naturalTerminal": 0,
+          "playerDeadOnly": true,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "startCapableTerminalMatrix": false,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "player-dead": 8
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "terminalDeathMatrixStartCapable": false
+      },
+      "hypothesis": "Non-death natural terminals are either unreachable in the environment, mis-mapped into Python, never reached by the policy, or misclassified by the matrix.",
+      "sourceEvidence": "BT93I eval/holdout terminal-death matrix is not start-capable (terminalDeathMatrixStartCapable=False).",
+      "status": "bt94a-blocker",
+      "successCriterion": {
+        "deathClassPresent": true,
+        "forcedRoundTimeoutRuntimeFailureSeparated": true,
+        "maxStepsSeparated": true,
+        "nonDeathNaturalTerminalPresent": true
+      },
+      "symptom": "Terminal/death diagnostics are not start-capable."
+    },
+    "F.27": {
+      "aggregate": {
+        "dependsOn": [
+          "F.05",
+          "F.19",
+          "F.31"
+        ],
+        "independentCauseAllowedOnlyIfInputsGreen": true,
+        "isAggregate": true
+      },
+      "artifact": "data/training/ppo/bt93c/precomparison_report.json",
+      "codePath": [
+        "python/scripts/bt93c_precomparison_report.py",
+        "python/scripts/bt94a_gate_check.py",
+        "python/scripts/bt93i_gate_refresh_handover.py"
+      ],
+      "counterEvidenceRequired": [
+        "F.05, F.19, and F.31 are green or non-blocking",
+        "unchanged raw reports reproduce the same comparator verdict",
+        "an independent comparator over the same raw reports either matches ppo-regression or isolates a comparator bug"
+      ],
+      "currentRule": {
+        "bt94aBlockerCount": 4,
+        "precomparisonNotRegression": false,
+        "precomparisonResultClass": "ppo-regression"
+      },
+      "hypothesis": "F.27 is currently an aggregate symptom of F.05/F.19/F.31, not an independent comparator bug unless validated raw inputs become green while ppo-regression persists.",
+      "sourceEvidence": "BT93I comparison remains ppo-regression; hard rules: eval avgStepsPerEpisode below DQN anchor; holdout avgStepsPerEpisode below DQN anchor; terminal/death matrix is not start-capable; terminal matrix is player-dead-only.",
+      "status": "bt94a-blocker",
+      "successCriterion": {
+        "bt94aClaimable": true,
+        "handoverReady": true,
+        "openBt94aBlockers": 0,
+        "precomparisonResultClassNot": "ppo-regression"
+      },
+      "symptom": "PPO/DQN precomparison remains ppo-regression."
+    },
+    "F.31": {
+      "artifact": "data/training/ppo/bt93i/matrix_green_report.json",
+      "codePath": [
+        "python/eval.py",
+        "python/scripts/bt93i_matrix_green_report.py",
+        "scripts/training-headless-lane-runner.mjs",
+        "src/state/training/EpisodeController.js"
+      ],
+      "counterEvidenceRequired": [
+        "same semantic window, seeds, maps, maxSteps, and terminal rules are used in provocation and real eval",
+        "oracle/scripted policy reaches a non-death natural terminal in the eval runner",
+        "matrix rules explain any remaining natural-terminal absence as non-blocking"
+      ],
+      "currentRule": {
+        "evalNaturalTerminal": 0,
+        "holdoutNaturalTerminal": 0,
+        "playerDeadOnlyBlocksStart": true
+      },
+      "hypothesis": "Provocation can prove the field contract, while real eval/holdout remain policy-dominated or use an insufficient matrix window/config.",
+      "sourceEvidence": "BT93I natural terminal/death evidence remains insufficient (playerDeadOnlyBlocksStart=True).",
+      "status": "bt94a-blocker",
+      "successCriterion": {
+        "orNonBlockingMatrixRule": true,
+        "realEvalNonDeathNaturalTerminal": true,
+        "realHoldoutNonDeathNaturalTerminal": true
+      },
+      "symptom": "Natural-terminal matrix is player-dead-only in real eval and holdout."
+    }
+  }
+}

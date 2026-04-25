@@ -1,0 +1,594 @@
+{
+  "blockId": "BT93J",
+  "commands": {
+    "eval": "python\\eval.py --profile bt93i --run-kind terminal-curriculum-repair-eval --phase-id 93I.4.1 --config python\\configs\\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93i\\latest_terminal_curriculum_repair.json --min-completed-episodes 15 --max-eval-steps 2700",
+    "holdout": "python\\eval.py --profile bt93i --run-kind holdout-eval --phase-id 93I.4.1 --config python\\configs\\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93i\\latest_terminal_curriculum_repair.json --min-completed-episodes 8 --max-eval-steps 1440",
+    "train": null,
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93j_causal_observation.py --write-reports"
+  },
+  "expectedContract": {
+    "dtype": "float32",
+    "normalization": {
+      "currentSha256Set": [
+        "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25"
+      ],
+      "implementation": "stable_baselines3.common.vec_env.VecNormalize",
+      "trainEvalHoldoutSameSha256": true
+    },
+    "observationLength": 64,
+    "observationSchemaVersion": "v2-runtime-near"
+  },
+  "generatedAt": "2026-04-25T22:54:45Z",
+  "generatedBy": "python/scripts/bt93j_causal_observation.py",
+  "gitSha": "4a266499daf8e34ce4da584de3e7b7e789db0333",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no pilot, holdout, long-run, or fix from BT93J.1",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change"
+    ],
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "lanes": [
+    {
+      "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+      "actionTelemetry": {
+        "invalidActionRate": null,
+        "postDecodeClampRate": null,
+        "preSamplingMaskRate": null,
+        "sanitizerRate": null
+      },
+      "contractValidationOk": true,
+      "dtype": {
+        "expected": "float32",
+        "ok": true,
+        "sourceCast": "np.asarray(..., dtype=np.float32)"
+      },
+      "laneId": "bt93i-train",
+      "order": {
+        "note": "per-index raw vector is not persisted in these reports; order is source-contract evidence",
+        "reportedVectorOrderHash": null,
+        "source": "ObservationSchemaV2.js and RuntimeNearObservationAdapter.js",
+        "stableByContract": true
+      },
+      "phaseId": "93I.3.2",
+      "pointer": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "ranges": {
+        "ok": true,
+        "rawVectorPersisted": false,
+        "sourceFiniteCoercion": "JS adapters coerce observations to finite numbers before Python contract validation",
+        "status": "contract-valid-but-no-persisted-per-index-minmax",
+        "vecNormalizeClipObservation": null
+      },
+      "report": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "role": "train",
+      "runId": "20260425T151155Z-terminal-curriculum-repair",
+      "runKind": "terminal-curriculum-repair",
+      "schema": {
+        "expectedVersion": "v2-runtime-near",
+        "note": "train reports rely on runtime contract validation; eval/holdout persist infoTail schema fields",
+        "observedVersions": [],
+        "ok": true
+      },
+      "shape": {
+        "expected": [
+          64
+        ],
+        "observedLengths": [
+          64,
+          64
+        ],
+        "ok": true,
+        "policyObservationLength": 64
+      },
+      "staleness": {
+        "episodeIdsObserved": [],
+        "infoTailCount": 0,
+        "ok": true,
+        "status": "not persisted for train report",
+        "stepIndexTail": []
+      },
+      "sync": {
+        "episodeStepFieldsPresent": true,
+        "matrix": {
+          "maps": [
+            "standard",
+            "maze"
+          ],
+          "matrixId": "bt93i-terminal-curriculum-episode-matrix-v1",
+          "maxStepsPerEpisode": 180,
+          "minimumEpisodes": {
+            "eval": 15,
+            "holdout": 8,
+            "rule": "Eval/Holdout completion is gated by completedEpisodeCount, not fixed eval-steps alone."
+          },
+          "seeds": {
+            "eval": [
+              944,
+              945,
+              946
+            ],
+            "holdout": [
+              960,
+              961
+            ],
+            "terminalProvocation": [
+              9301,
+              9302,
+              9303
+            ],
+            "train": [
+              934,
+              935,
+              936,
+              937
+            ]
+          }
+        },
+        "ok": true,
+        "runtimeErrorCount": null,
+        "terminalReasonsObserved": [],
+        "truncatedReasonsObserved": []
+      },
+      "vecNormalize": {
+        "ok": true,
+        "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/vecnormalize.pkl",
+        "present": true,
+        "readOnlyForEval": false,
+        "sha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25",
+        "sourceModelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371"
+      }
+    },
+    {
+      "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+      "actionTelemetry": {
+        "invalidActionRate": 0.0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0
+      },
+      "contractValidationOk": true,
+      "dtype": {
+        "expected": "float32",
+        "ok": true,
+        "sourceCast": "np.asarray(..., dtype=np.float32)"
+      },
+      "laneId": "bt93i-eval",
+      "order": {
+        "note": "per-index raw vector is not persisted in these reports; order is source-contract evidence",
+        "reportedVectorOrderHash": null,
+        "source": "ObservationSchemaV2.js and RuntimeNearObservationAdapter.js",
+        "stableByContract": true
+      },
+      "phaseId": "93I.4.1",
+      "pointer": "data/training/ppo/bt93i/latest_terminal_curriculum_repair_eval.json",
+      "ranges": {
+        "ok": true,
+        "rawVectorPersisted": false,
+        "sourceFiniteCoercion": "JS adapters coerce observations to finite numbers before Python contract validation",
+        "status": "contract-valid-but-no-persisted-per-index-minmax",
+        "vecNormalizeClipObservation": null
+      },
+      "report": "data/training/ppo/bt93i/runs/20260425T153044Z-terminal-curriculum-repair-eval/eval_report.json",
+      "role": "eval",
+      "runId": "20260425T153044Z-terminal-curriculum-repair-eval",
+      "runKind": "terminal-curriculum-repair-eval",
+      "schema": {
+        "expectedVersion": "v2-runtime-near",
+        "note": "train reports rely on runtime contract validation; eval/holdout persist infoTail schema fields",
+        "observedVersions": [
+          "v2-runtime-near"
+        ],
+        "ok": true
+      },
+      "shape": {
+        "expected": [
+          64
+        ],
+        "observedLengths": [
+          64
+        ],
+        "ok": true,
+        "policyObservationLength": null
+      },
+      "staleness": {
+        "episodeIdsObserved": [
+          "bt92-headless-944",
+          "bt92-headless-945"
+        ],
+        "infoTailCount": 4,
+        "ok": true,
+        "status": "no stale contract drift observed in persisted tail",
+        "stepIndexTail": [
+          1,
+          0,
+          2
+        ]
+      },
+      "sync": {
+        "episodeStepFieldsPresent": true,
+        "matrix": {
+          "maps": [
+            "standard",
+            "maze"
+          ],
+          "matrixId": "bt93i-terminal-curriculum-episode-matrix-v1",
+          "maxStepsPerEpisode": 180,
+          "minimumEpisodes": {
+            "eval": 15,
+            "holdout": 8,
+            "rule": "Eval/Holdout completion is gated by completedEpisodeCount, not fixed eval-steps alone."
+          },
+          "seeds": {
+            "eval": [
+              944,
+              945,
+              946
+            ],
+            "holdout": [
+              960,
+              961
+            ],
+            "terminalProvocation": [
+              9301,
+              9302,
+              9303
+            ],
+            "train": [
+              934,
+              935,
+              936,
+              937
+            ]
+          }
+        },
+        "ok": true,
+        "runtimeErrorCount": 0,
+        "terminalReasonsObserved": [],
+        "truncatedReasonsObserved": []
+      },
+      "vecNormalize": {
+        "ok": true,
+        "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/vecnormalize.pkl",
+        "present": true,
+        "readOnlyForEval": true,
+        "sha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25",
+        "sourceModelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371"
+      }
+    },
+    {
+      "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+      "actionTelemetry": {
+        "invalidActionRate": 0.0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0
+      },
+      "contractValidationOk": true,
+      "dtype": {
+        "expected": "float32",
+        "ok": true,
+        "sourceCast": "np.asarray(..., dtype=np.float32)"
+      },
+      "laneId": "bt93i-holdout",
+      "order": {
+        "note": "per-index raw vector is not persisted in these reports; order is source-contract evidence",
+        "reportedVectorOrderHash": null,
+        "source": "ObservationSchemaV2.js and RuntimeNearObservationAdapter.js",
+        "stableByContract": true
+      },
+      "phaseId": "93I.4.1",
+      "pointer": "data/training/ppo/bt93i/latest_holdout_eval.json",
+      "ranges": {
+        "ok": true,
+        "rawVectorPersisted": false,
+        "sourceFiniteCoercion": "JS adapters coerce observations to finite numbers before Python contract validation",
+        "status": "contract-valid-but-no-persisted-per-index-minmax",
+        "vecNormalizeClipObservation": null
+      },
+      "report": "data/training/ppo/bt93i/runs/20260425T153136Z-holdout-eval/eval_report.json",
+      "role": "holdout",
+      "runId": "20260425T153136Z-holdout-eval",
+      "runKind": "holdout-eval",
+      "schema": {
+        "expectedVersion": "v2-runtime-near",
+        "note": "train reports rely on runtime contract validation; eval/holdout persist infoTail schema fields",
+        "observedVersions": [
+          "v2-runtime-near"
+        ],
+        "ok": true
+      },
+      "shape": {
+        "expected": [
+          64
+        ],
+        "observedLengths": [
+          64
+        ],
+        "ok": true,
+        "policyObservationLength": null
+      },
+      "staleness": {
+        "episodeIdsObserved": [
+          "bt92-headless-960",
+          "bt92-headless-961"
+        ],
+        "infoTailCount": 4,
+        "ok": true,
+        "status": "no stale contract drift observed in persisted tail",
+        "stepIndexTail": [
+          1,
+          0,
+          2
+        ]
+      },
+      "sync": {
+        "episodeStepFieldsPresent": true,
+        "matrix": {
+          "maps": [
+            "standard",
+            "maze"
+          ],
+          "matrixId": "bt93i-terminal-curriculum-episode-matrix-v1",
+          "maxStepsPerEpisode": 180,
+          "minimumEpisodes": {
+            "eval": 15,
+            "holdout": 8,
+            "rule": "Eval/Holdout completion is gated by completedEpisodeCount, not fixed eval-steps alone."
+          },
+          "seeds": {
+            "eval": [
+              944,
+              945,
+              946
+            ],
+            "holdout": [
+              960,
+              961
+            ],
+            "terminalProvocation": [
+              9301,
+              9302,
+              9303
+            ],
+            "train": [
+              934,
+              935,
+              936,
+              937
+            ]
+          }
+        },
+        "ok": true,
+        "runtimeErrorCount": 0,
+        "terminalReasonsObserved": [],
+        "truncatedReasonsObserved": []
+      },
+      "vecNormalize": {
+        "ok": true,
+        "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/vecnormalize.pkl",
+        "present": true,
+        "readOnlyForEval": true,
+        "sha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25",
+        "sourceModelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371"
+      }
+    },
+    {
+      "contractValidationOk": true,
+      "dtype": {
+        "expected": "float32",
+        "ok": true
+      },
+      "laneId": "bt93i-resume",
+      "loadCompatibility": {
+        "numpyBitGeneratorClassPickleCompat": true,
+        "numpyCoreModuleAliases": true,
+        "reason": "legacy VecNormalize pickle may contain Gym space RNG state encoded with a NumPy BitGenerator class",
+        "scope": "PPO model and VecNormalize artifact load only; observation/reward RMS state is loaded from the source artifact"
+      },
+      "order": {
+        "ok": true,
+        "stableByContract": true
+      },
+      "phaseId": "93I.3.2",
+      "pointer": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "ranges": {
+        "ok": true,
+        "status": "covered by resumed VecNormalize state continuity"
+      },
+      "report": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "resumedFrom": {
+        "artifactManifest": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/artifact_manifest.json",
+        "config": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/config.json",
+        "configSha256": "a9a2016de27fa90ee93e6dab7a4268df6423c1383ce9004c23ef68d671c5d3b2",
+        "model": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/model.zip",
+        "modelSha256": "2cb11aa2f16b9bb6a51077eb52df111f843db092803917a2f62265ecc4179441",
+        "optimizerState": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/optimizer_state.pt",
+        "optimizerStateSha256": "cf72ed6a1da04173e859f5c75514561bc653b354e7846a768982358abd8fee40",
+        "runId": "20260425T113941Z-comparable-terminal-repair",
+        "vecnormalize": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/vecnormalize.pkl",
+        "vecnormalizeSha256": "bd741262d44f344e2f29cf74e908055e1028b0cafbc26d43ac0a0445cc00978d"
+      },
+      "role": "resume",
+      "runId": "20260425T151155Z-terminal-curriculum-repair",
+      "runKind": "terminal-curriculum-repair",
+      "savedVecNormalizeSha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25",
+      "schema": {
+        "expectedVersion": "v2-runtime-near",
+        "note": "resume lane proves load/save continuity, not a separate eval matrix",
+        "ok": true
+      },
+      "shape": {
+        "expected": [
+          64
+        ],
+        "ok": true,
+        "policyObservationLength": 64
+      },
+      "sourceVecNormalizeSha256": "bd741262d44f344e2f29cf74e908055e1028b0cafbc26d43ac0a0445cc00978d",
+      "staleness": {
+        "ok": true,
+        "status": "not persisted for resume report"
+      },
+      "sync": {
+        "ok": true,
+        "status": "resume source and target artifact manifests are linked"
+      },
+      "vecNormalize": {
+        "ok": true,
+        "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/vecnormalize.pkl",
+        "present": true,
+        "resumedFromSha256": "bd741262d44f344e2f29cf74e908055e1028b0cafbc26d43ac0a0445cc00978d",
+        "sha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25"
+      }
+    }
+  ],
+  "observationGate": {
+    "green": true,
+    "limitations": [
+      "Per-index raw vectors are not persisted in historical reports; range/staleness checks rely on contract validation, source finite coercion, infoTail, and VecNormalize hashes.",
+      "This report does not prove terminal/matrix, action/safety, reward/curriculum, or training root causes."
+    ],
+    "notCausal": true,
+    "readyForObservationFixOnly": false,
+    "readyForTraining": false
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93J.1.3": true,
+    "93J.1.4": true
+  },
+  "phaseId": "93J.1",
+  "resultClass": "observation-integrity-green",
+  "sourceArtifacts": {
+    "evalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair_eval.json",
+      "role": "BT93I eval pointer",
+      "sha256": "dfff5fd998e61e7c57530b3abc67a492f1eef5eb21afc110f9ddd1a7bb1e9ec6"
+    },
+    "evalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T153044Z-terminal-curriculum-repair-eval/eval_report.json",
+      "role": "BT93I eval report",
+      "sha256": "b3609beb8c20a922f297bd47a4684ca7361c7cac03aff52bc60a403512158653"
+    },
+    "holdoutPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_holdout_eval.json",
+      "role": "BT93I holdout pointer",
+      "sha256": "5abf59cd3a0aa2ec379db2079a07b068d726ce070f1080cb976bec361e55ebf6"
+    },
+    "holdoutReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T153136Z-holdout-eval/eval_report.json",
+      "role": "BT93I holdout report",
+      "sha256": "f69fed6de58f77e440f1e1240ae898bb076e0d5fe08040d8e00a2d2a718d1af4"
+    },
+    "trainPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "role": "BT93I train pointer",
+      "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be"
+    },
+    "trainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "role": "BT93I train report",
+      "sha256": "f819b7d808b1694396112a41659bd2ae15a88b8fd7d082e45b8074a51b5928da"
+    }
+  },
+  "sourceContractChecks": {
+    "checks": {
+      "actionWrapper": {
+        "dtype=np.float32": true,
+        "np.asarray(observation, dtype=np.float32)": true,
+        "shape=(EXPECTED_OBSERVATION_LENGTH,)": true
+      },
+      "contract": {
+        "EXPECTED_OBSERVATION_LENGTH = 64": true,
+        "EXPECTED_OBSERVATION_SCHEMA_VERSION = \"v2-runtime-near\"": true,
+        "_validate_observation_shape": true,
+        "observationLength drifted": true,
+        "observationSchemaVersion drifted": true,
+        "validate_transition_payload": true
+      },
+      "curviosEnv": {
+        "dtype=np.float32": true,
+        "np.asarray(payload.get(\"observation\"), dtype=np.float32)": true,
+        "shape=(EXPECTED_OBSERVATION_LENGTH,)": true,
+        "spaces.Box": true,
+        "validate_transition_payload(payload, expected_operation)": true
+      },
+      "runtimeNearAdapter": {
+        "RuntimeNearObservationTracker": true,
+        "liftObservationWithRuntimeNearContext": true,
+        "observationLength": true,
+        "schemaVersion": true
+      },
+      "trainerPayloadAdapter": {
+        "DEFAULT_RUNTIME_NEAR_OBSERVATION_LENGTH": true,
+        "OBSERVATION_SCHEMA_VERSION_V2": true,
+        "cloneObservation": true,
+        "toFiniteNumber": true
+      }
+    },
+    "ok": true,
+    "sourceArtifacts": {
+      "actionSurface": {
+        "closureCapable": true,
+        "path": "python/envs/ppo_action_surface.py",
+        "role": "PPO action wrappers",
+        "sha256": "42ea141f6d0af66616d7f794e731126abc71a07d4bab050432e5cce4abb7485f"
+      },
+      "authoritySnapshot": {
+        "closureCapable": true,
+        "path": "python/bridge/authority_snapshot.py",
+        "role": "Python authority snapshot",
+        "sha256": "c213d444cbbc23a2abfa6a54a31bb5956f1ff9c92e3b38cb539b99533906ad83"
+      },
+      "contract": {
+        "closureCapable": true,
+        "path": "python/bridge/contract_v1.py",
+        "role": "Python bridge contract",
+        "sha256": "78553c6f12d2006d3157b8219573c5e30cafa381a4f71c8ab7e4f0e1aecb91fc"
+      },
+      "curviosEnv": {
+        "closureCapable": true,
+        "path": "python/envs/curvios_env.py",
+        "role": "Python gym env",
+        "sha256": "fdec907ec011348f8697155d4edbdb1ae96113b740d5f93b0bd0d04552b69f87"
+      },
+      "learnerSmoke": {
+        "closureCapable": true,
+        "path": "python/scripts/bt93c_learner_smoke.py",
+        "role": "VecNormalize builder/load path",
+        "sha256": "c76ef333cb92cb330ff41f158737ae570988358d5d3c99d074a7e2441cb37e6c"
+      },
+      "observationSchemaV2": {
+        "closureCapable": true,
+        "path": "src/entities/ai/observation/ObservationSchemaV2.js",
+        "role": "JS observation schema",
+        "sha256": "b33298d650832a6092272ec804fc8f667e58bfa9a992843135d5a09f571db0af"
+      },
+      "runtimeNearAdapter": {
+        "closureCapable": true,
+        "path": "src/entities/ai/observation/RuntimeNearObservationAdapter.js",
+        "role": "JS runtime-near adapter",
+        "sha256": "d736b43d95fb7007481b1bfdd69dcae49d2a6d55915bb9c1229b98f585c5b8f7"
+      },
+      "trainerPayloadAdapter": {
+        "closureCapable": true,
+        "path": "src/entities/ai/training/TrainerPayloadAdapter.js",
+        "role": "JS trainer payload adapter",
+        "sha256": "d717c5ba7e56b66378252d9a018c55d93aee58b0739febc0ff8af87f7b6f86dc"
+      }
+    }
+  }
+}
