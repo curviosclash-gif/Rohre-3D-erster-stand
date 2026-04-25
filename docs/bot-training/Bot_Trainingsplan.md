@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.1` abgeschlossen; naechster Claim `93J.2`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.2` abgeschlossen; naechster Claim `93J.3`; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -784,7 +784,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
-| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.1 | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
+| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.2 | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93J.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2501,10 +2501,10 @@ Closure-Evidence je Blocker:
 
 ### 93J.2 Terminal-, Death- und Matrix-Vertrag
 
-- [ ] 93J.2.1 `terminal_semantics_report.json` fuer `player-dead`, nicht-toedliches Natural-Terminal, `max-steps`, forced round, timeout und runtime failure schreiben.
-- [ ] 93J.2.2 Headless- und Python-Eval-Felder paritaetisch pruefen: `terminalReason`, `naturalTerminal`, `deathCause`, `maxSteps`, `forcedRound`, `timeout`, `runtimeFailure`.
-- [ ] 93J.2.3 Oracle-/scripted-safe Policy gegen echte Eval-Konfiguration laufen lassen, um Policy-Verhalten von Mapping-/Matrixfehlern zu trennen.
-- [ ] 93J.2.4 `matrix_contract_report.json` schreiben: Mindestepisoden, Seeds, Maps, Modi, `maxSteps`, DQN-Anker, Semantikfenster und Regeln fuer Death, Natural-Terminal, Max-Steps und Runtime-Failures.
+- [x] 93J.2.1 `terminal_semantics_report.json` fuer `player-dead`, nicht-toedliches Natural-Terminal, `max-steps`, forced round, timeout und runtime failure schreiben. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_terminal_matrix.py --write-reports` -> `data/training/ppo/bt93j/terminal_semantics_report.json`)
+- [x] 93J.2.2 Headless- und Python-Eval-Felder paritaetisch pruefen: `terminalReason`, `naturalTerminal`, `deathCause`, `maxSteps`, `forcedRound`, `timeout`, `runtimeFailure`. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_terminal_matrix.py --write-reports` -> `data/training/ppo/bt93j/terminal_semantics_report.json`)
+- [x] 93J.2.3 Oracle-/scripted-safe Policy gegen echte Eval-Konfiguration laufen lassen, um Policy-Verhalten von Mapping-/Matrixfehlern zu trennen. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_terminal_matrix.py --write-reports` -> `data/training/ppo/bt93j/terminal_semantics_report.json`)
+- [x] 93J.2.4 `matrix_contract_report.json` schreiben: Mindestepisoden, Seeds, Maps, Modi, `maxSteps`, DQN-Anker, Semantikfenster und Regeln fuer Death, Natural-Terminal, Max-Steps und Runtime-Failures. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_terminal_matrix.py --write-reports` -> `data/training/ppo/bt93j/matrix_contract_report.json`)
 
 ### 93J.3 Action-, Safety-, Reward- und Curriculum-Diagnose
 
