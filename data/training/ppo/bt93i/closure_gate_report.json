@@ -1,0 +1,321 @@
+{
+  "blockId": "BT93I",
+  "bt93iSubphaseCoverage": {
+    "items": {
+      "93I.1.1": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2309,
+        "state": "x"
+      },
+      "93I.1.2": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2310,
+        "state": "x"
+      },
+      "93I.1.3": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2311,
+        "state": "x"
+      },
+      "93I.1.4": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2312,
+        "state": "x"
+      },
+      "93I.2.1": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2316,
+        "state": "x"
+      },
+      "93I.2.2": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2317,
+        "state": "x"
+      },
+      "93I.2.3": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2318,
+        "state": "x"
+      },
+      "93I.2.4": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2319,
+        "state": "x"
+      },
+      "93I.3.1": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2323,
+        "state": "x"
+      },
+      "93I.3.2": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2324,
+        "state": "x"
+      },
+      "93I.3.3": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2325,
+        "state": "x"
+      },
+      "93I.3.4": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2326,
+        "state": "x"
+      },
+      "93I.4.1": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2330,
+        "state": "x"
+      },
+      "93I.4.2": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2331,
+        "state": "x"
+      },
+      "93I.4.3": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2332,
+        "state": "x"
+      },
+      "93I.4.4": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2333,
+        "state": "x"
+      },
+      "93I.5.1": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2337,
+        "state": "x"
+      },
+      "93I.5.2": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2338,
+        "state": "x"
+      },
+      "93I.5.3": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2339,
+        "state": "x"
+      },
+      "93I.5.4": {
+        "complete": true,
+        "hasEvidence": true,
+        "line": 2340,
+        "state": "x"
+      }
+    },
+    "missingOrIncompleteSections": [],
+    "ok": true,
+    "sectionCounts": {
+      "93I.1": {
+        "complete": 4,
+        "total": 4,
+        "withEvidence": 4
+      },
+      "93I.2": {
+        "complete": 4,
+        "total": 4,
+        "withEvidence": 4
+      },
+      "93I.3": {
+        "complete": 4,
+        "total": 4,
+        "withEvidence": 4
+      },
+      "93I.4": {
+        "complete": 4,
+        "total": 4,
+        "withEvidence": 4
+      },
+      "93I.5": {
+        "complete": 4,
+        "total": 4,
+        "withEvidence": 4
+      }
+    }
+  },
+  "diagnoseBlocked": {
+    "active": true,
+    "bt94aStatus": "BT94A remains closed before 94A.1",
+    "followupRequired": true,
+    "remainingBt94aGates": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ]
+  },
+  "forbiddenResultCheck": {
+    "forbiddenLabels": {},
+    "guardrailFields": {
+      "handover_package.candidateRun": false,
+      "handover_package.freezeCandidate": false,
+      "handover_package.promotionAllowed": false,
+      "handover_package.rolloutSignal": false,
+      "matrix_green.freezeCandidate": false,
+      "matrix_green.promotionAllowed": false,
+      "matrix_green.rolloutSignal": false,
+      "no_start_gate.candidateFreezeAllowed": false,
+      "no_start_gate.candidateRunsAllowed": false,
+      "no_start_gate.claimable": false
+    },
+    "ok": true,
+    "resultFields": {
+      "handover_package.resultClass": "diagnose-blocked",
+      "matrix_green.matrixVerdict": "ppo-regression",
+      "matrix_green.resultClass": "diagnose-blocked",
+      "no_start_gate.noStartDecision.status": "BT94A remains closed before 94A.1",
+      "no_start_gate.resultClass": "blocked-no-start"
+    },
+    "unexpectedOpenGuardrails": {}
+  },
+  "generatedAt": "2026-04-25T19:34:18Z",
+  "generatedBy": "python/scripts/bt93i_closure_gate.py",
+  "gitSha": "7685c9a28d6d1323df9d8d6e55a704c838fbc707",
+  "governance": {
+    "closureGateCommand": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93i_closure_gate.py --write-report --governance-gate-pass",
+    "docsGatesAreNotPpoEvidence": true,
+    "preCommitGatePassed": true,
+    "requiredPreCommitGate": "npm.cmd run gates:pre-commit"
+  },
+  "guardrails": {
+    "bt94aCheckboxClosed": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "noStartGate": {
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "currentHandoverSource": {
+      "blockId": "BT93I",
+      "expected": {
+        "blockId": "BT93I",
+        "reason": "BT93I matrix_green_report.json exists and is the latest handover source.",
+        "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+      },
+      "fallbackUsed": false,
+      "fresh": true,
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "phaseId": "93I.5",
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    },
+    "matrixDefinitionAllowed": false,
+    "resultClass": "blocked-no-start"
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93I.99.1": true,
+    "93I.99.2": true,
+    "93I.99.3": true,
+    "93I.99.4": true
+  },
+  "phaseId": "93I.99",
+  "resultClass": "diagnose-blocked-closed",
+  "sourceArtifacts": {
+    "botTrainingPlan": {
+      "closureCapable": true,
+      "path": "docs/bot-training/Bot_Trainingsplan.md",
+      "role": "BT93I plan evidence",
+      "sha256": "3ada6e7b4b298d045e28bfe3f97e9fc4ef513be3c3f2a6a4885848a5450cc169"
+    },
+    "evidenceQualityMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "role": "BT93I-refreshed evidence matrix",
+      "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
+    },
+    "followupGateReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/followup_gate_report.json",
+      "role": "BT93I followup gate report",
+      "sha256": "ca66e4da3bc7033bb58c450fe44cfb178f542b442e0a1ed60a61fe94853a2bca"
+    },
+    "handoverPackage": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/handover_package.json",
+      "role": "BT93I handover package",
+      "sha256": "74610a79117b98a6b7b994674561d3ecd5eda11639a59e2a472f472f8ee4b702"
+    },
+    "matrixGreenReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_green_report.json",
+      "role": "BT93I matrix green report",
+      "sha256": "c664bdc5f716ed7575dd02c9adf7dd7d5bd2aed92c8e6932c0f546639a43d4fc"
+    },
+    "noStartGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A no-start gate",
+      "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
+    }
+  },
+  "trackedFindingVisibility": {
+    "findings": {
+      "F.05": {
+        "disposition": "still-blocking",
+        "evidenceMatrixStopper": true,
+        "followupGate": true,
+        "handoverPackage": true,
+        "noStartGate": true,
+        "source": "data/training/ppo/bt93i/matrix_green_report.json",
+        "status": "bt94a-blocker",
+        "visibleOrClosed": true
+      },
+      "F.19": {
+        "disposition": "still-blocking",
+        "evidenceMatrixStopper": true,
+        "followupGate": true,
+        "handoverPackage": true,
+        "noStartGate": true,
+        "source": "data/training/ppo/bt93i/matrix_green_report.json",
+        "status": "bt94a-blocker",
+        "visibleOrClosed": true
+      },
+      "F.27": {
+        "disposition": "still-blocking",
+        "evidenceMatrixStopper": true,
+        "followupGate": true,
+        "handoverPackage": true,
+        "noStartGate": true,
+        "source": "data/training/ppo/bt93i/matrix_green_report.json",
+        "status": "bt94a-blocker",
+        "visibleOrClosed": true
+      },
+      "F.31": {
+        "disposition": "still-blocking",
+        "evidenceMatrixStopper": true,
+        "followupGate": true,
+        "handoverPackage": true,
+        "noStartGate": true,
+        "source": "data/training/ppo/bt93i/matrix_green_report.json",
+        "status": "bt94a-blocker",
+        "visibleOrClosed": true
+      }
+    },
+    "ok": true
+  }
+}
