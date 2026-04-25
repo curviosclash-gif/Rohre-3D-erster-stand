@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.0` abgeschlossen; naechster Claim `93J.1`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.1` abgeschlossen; naechster Claim `93J.2`; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -2494,10 +2494,10 @@ Closure-Evidence je Blocker:
 
 ### 93J.1 Kausalketten und Observation-Integrity
 
-- [ ] 93J.1.1 `causal_chain_register.json` schreiben: Symptom, Regel, Artefakt, Codepfad, Hypothese, Gegenbeweis und Erfolgskriterium je F.05/F.19/F.27/F.31.
-- [ ] 93J.1.2 F.27 maschinenlesbar als Aggregat fuehren, solange F.05, F.19 oder F.31 rot sind.
-- [ ] 93J.1.3 `observation_integrity_report.json` fuer Train, Eval, Holdout und Resume schreiben: Schema, Reihenfolge, Shape, Datentypen, Ranges, Staleness, Sync und VecNormalize.
-- [ ] 93J.1.4 Bei roter Observation-Integritaet nur Observation-Fix erlauben; danach 93J.0 Trennmesser erneut ausfuehren.
+- [x] 93J.1.1 `causal_chain_register.json` schreiben: Symptom, Regel, Artefakt, Codepfad, Hypothese, Gegenbeweis und Erfolgskriterium je F.05/F.19/F.27/F.31. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_causal_observation.py --write-reports` -> `data/training/ppo/bt93j/causal_chain_register.json`)
+- [x] 93J.1.2 F.27 maschinenlesbar als Aggregat fuehren, solange F.05, F.19 oder F.31 rot sind. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_causal_observation.py --write-reports` -> `data/training/ppo/bt93j/causal_chain_register.json`)
+- [x] 93J.1.3 `observation_integrity_report.json` fuer Train, Eval, Holdout und Resume schreiben: Schema, Reihenfolge, Shape, Datentypen, Ranges, Staleness, Sync und VecNormalize. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_causal_observation.py --write-reports` -> `data/training/ppo/bt93j/observation_integrity_report.json`)
+- [x] 93J.1.4 Bei roter Observation-Integritaet nur Observation-Fix erlauben; danach 93J.0 Trennmesser erneut ausfuehren. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_causal_observation.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
 
 ### 93J.2 Terminal-, Death- und Matrix-Vertrag
 
