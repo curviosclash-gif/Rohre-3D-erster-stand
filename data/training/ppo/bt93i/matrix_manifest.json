@@ -1,0 +1,141 @@
+{
+  "baseline": {
+    "baselineId": "bt93c-ppo-baseline-publish-v1",
+    "dqnChampion": {
+      "averageBotSurvival": 37.376986,
+      "avgStepsPerEpisode": 117.525,
+      "source": "BT93H survival gate contract / BT11 historical DQN champion anchor"
+    },
+    "matrixId": "bt93c-dqn-ppo-precomparison-v1",
+    "modelPackage": {
+      "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+      "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+      "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+      "runId": "20260424T180033Z-baseline-train",
+      "scaffoldOnly": false,
+      "truePpoModelPackage": true,
+      "vecnormalizeSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c"
+    }
+  },
+  "blockId": "BT93I",
+  "comparisonUse": "BT93I repair/eval/holdout gate only; no candidate, freeze, promote, rollout, or PPO-Validate signal.",
+  "env": {
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "fourEnvAllowed": false,
+    "maps": [
+      "standard",
+      "maze"
+    ],
+    "maxStepsPerEpisode": 180,
+    "modeId": "runtime-near-headless-v1",
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "generatedAt": "2026-04-25T14:23:36Z",
+  "generatedBy": "python/scripts/bt93i_matrix_truth.py",
+  "gitSha": "c85baa9323bb1ea34e10aef913cd647f738668a0",
+  "guardrails": {
+    "allowedRunKinds": [
+      "diagnostic",
+      "terminal-provocation",
+      "episode-count-eval",
+      "terminal-curriculum-repair",
+      "terminal-curriculum-repair-eval",
+      "holdout-eval"
+    ],
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "forbiddenRunKinds": [
+      "candidate",
+      "freeze",
+      "freeze-candidate",
+      "promote",
+      "rollout-ready",
+      "BT94B-ready",
+      "baseline"
+    ],
+    "promotionAllowed": false,
+    "runtimeSurfacesTouched": []
+  },
+  "matrixChecks": {
+    "envCountPinned": true,
+    "evalMinEpisodesPinned": true,
+    "fourEnvDisabled": true,
+    "holdoutMinEpisodesPinned": true,
+    "mapsPinned": true,
+    "maxStepsPerEpisodePinned": true,
+    "seedsPinned": true,
+    "thresholdsPinned": true
+  },
+  "matrixId": "bt93i-terminal-curriculum-episode-matrix-v1",
+  "minimumEpisodes": {
+    "eval": 15,
+    "holdout": 8,
+    "rule": "Eval/Holdout completion is gated by completedEpisodeCount, not fixed eval-steps alone."
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93I.1.2": true
+  },
+  "phaseId": "93I.1",
+  "resultClass": "episode-targeted-matrix-pinned",
+  "seeds": {
+    "eval": [
+      944,
+      945,
+      946
+    ],
+    "holdout": [
+      960,
+      961
+    ],
+    "terminalProvocation": [
+      9301,
+      9302,
+      9303
+    ],
+    "train": [
+      934,
+      935,
+      936,
+      937
+    ]
+  },
+  "sourceArtifacts": {
+    "bt93hRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/repair_ladder_report.json",
+      "role": "BT93H repair ladder",
+      "sha256": "5032f14363e43a84df1399b9171b08d99ce997de97ed5f831416c87c0d4d0f2d"
+    },
+    "bt93hSurvivalContract": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/survival_gate_contract.json",
+      "role": "BT93H survival gate contract",
+      "sha256": "c5bc0ae27e5c80cc330ea2047daed1529fc5e95a757930ad2a611b140292e117"
+    },
+    "bt94aNoStartGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A red no-start gate",
+      "sha256": "0e54aafe59169c9ae36acd1640c518a9181f74127ec8ed4ee9ce31619e9b3219"
+    }
+  },
+  "targets": {
+    "averageBotSurvival": {
+      "dqnAnchor": 37.376986,
+      "evalMin": 48.590082,
+      "holdoutMin": 48.590082,
+      "plus30PctRequiredForBt94aReady": true
+    },
+    "avgStepsPerEpisode": {
+      "dqnAnchor": 117.525,
+      "evalMin": 117.525,
+      "holdoutMin": 117.525,
+      "nonRegressionRequired": true
+    },
+    "runtimeErrorCount": 0,
+    "terminalDeathMatrix": "eval and holdout each require player-dead/death class plus non-death natural terminal coverage"
+  }
+}

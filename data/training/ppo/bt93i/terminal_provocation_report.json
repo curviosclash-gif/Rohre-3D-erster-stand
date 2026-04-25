@@ -1,0 +1,319 @@
+{
+  "blockId": "BT93I",
+  "commands": {
+    "bt93hEval": "python\\eval.py --profile bt93h --run-kind comparable-terminal-repair-eval --phase-id 93H.3.4 --config python\\configs\\ppo_bt93h_comparable_terminal_repair.json --artifact-root data\\training\\ppo\\bt93h --checkpoint data\\training\\ppo\\bt93h\\latest_comparable_terminal_repair.json --eval-steps 540",
+    "bt93hHoldout": "python\\eval.py --profile bt93h --run-kind holdout-eval --phase-id 93H.3.4 --config python\\configs\\ppo_bt93h_comparable_terminal_repair.json --artifact-root data\\training\\ppo\\bt93h --checkpoint data\\training\\ppo\\bt93h\\latest_comparable_terminal_repair.json --eval-steps 360",
+    "nodeProbe": "node --input-type=module -e <bt93i embedded terminal probe>",
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93i_matrix_truth.py --write"
+  },
+  "evalMatrixStatus": {
+    "existingBt93hEvalHasDeathCause": true,
+    "existingBt93hEvalHasNonDeathNaturalTerminal": false,
+    "existingBt93hEvalStillStartBlocked": true,
+    "interpretation": "Headless non-death natural terminal control is reproducible; existing BT93H eval/holdout still lacks that class and must be repaired by later BT93I phases."
+  },
+  "generatedAt": "2026-04-25T14:23:37Z",
+  "generatedBy": "python/scripts/bt93i_matrix_truth.py",
+  "gitSha": "c85baa9323bb1ea34e10aef913cd647f738668a0",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "headlessProvocation": {
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsQualityEvidence": false,
+    "noRuntimeBypass": true,
+    "ok": true,
+    "probes": [
+      {
+        "command": "node --input-type=module -e <bt93i embedded terminal probe>",
+        "countsAsQualityEvidence": false,
+        "done": true,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {
+            "player-dead": 1
+          },
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "naturalTerminal": 0,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "player-dead": 1
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "id": "bt93i-headless-player-dead",
+        "map": "standard",
+        "maxSteps": 5,
+        "seed": 9301,
+        "stepIndex": 1,
+        "terminalReason": "player-dead",
+        "truncated": false,
+        "truncatedReason": null
+      },
+      {
+        "command": "node --input-type=module -e <bt93i embedded terminal probe>",
+        "countsAsQualityEvidence": false,
+        "done": true,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {},
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "naturalTerminal": 1,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "match-ended": 1
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "id": "bt93i-headless-round-ended",
+        "map": "maze",
+        "maxSteps": 5,
+        "seed": 9302,
+        "stepIndex": 1,
+        "terminalReason": "match-ended",
+        "truncated": false,
+        "truncatedReason": null
+      },
+      {
+        "command": "node --input-type=module -e <bt93i embedded terminal probe>",
+        "countsAsQualityEvidence": false,
+        "done": true,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {},
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "naturalTerminal": 1,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "match-ended": 1
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "id": "bt93i-headless-match-ended",
+        "map": "maze",
+        "maxSteps": 5,
+        "seed": 9302,
+        "stepIndex": 1,
+        "terminalReason": "match-ended",
+        "truncated": false,
+        "truncatedReason": null
+      },
+      {
+        "command": "node --input-type=module -e <bt93i embedded terminal probe>",
+        "countsAsQualityEvidence": false,
+        "done": false,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {},
+          "forcedRound": 0,
+          "maxSteps": 1,
+          "naturalTerminal": 0,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {},
+          "timeout": 0,
+          "truncatedReasonCounts": {
+            "max-steps": 1
+          }
+        },
+        "id": "bt93i-headless-max-steps",
+        "map": "standard",
+        "maxSteps": 2,
+        "seed": 9303,
+        "stepIndex": 2,
+        "terminalReason": null,
+        "truncated": true,
+        "truncatedReason": "max-steps"
+      }
+    ]
+  },
+  "longRunGateImpact": {
+    "longRunAllowed": false,
+    "reason": "93I.1 terminal-provocation is green; 93I.2 still must pin episode-targeted eval and early-stop readiness.",
+    "repairOrLongRunStopRequiredBy93I14": false
+  },
+  "matrixId": "bt93i-terminal-curriculum-episode-matrix-v1",
+  "ok": true,
+  "phaseCoverage": {
+    "93I.1.3": true,
+    "93I.1.4": true
+  },
+  "phaseId": "93I.1",
+  "pythonEvalFieldAudit": {
+    "lanes": [
+      {
+        "deathCauseCounts": {
+          "player-dead": 11
+        },
+        "hasDeathCause": true,
+        "hasNonDeathNaturalTerminal": false,
+        "laneId": "bt93h-raw-comparable-terminal-eval",
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "missingFields": [],
+        "naturalTerminal": 0,
+        "report": "data/training/ppo/bt93h/runs/20260425T114031Z-comparable-terminal-repair-eval/eval_report.json",
+        "requiredFieldsPresent": true,
+        "terminalReasonCounts": {
+          "player-dead": 11
+        },
+        "truncatedReasonCounts": {}
+      },
+      {
+        "deathCauseCounts": {
+          "player-dead": 7
+        },
+        "hasDeathCause": true,
+        "hasNonDeathNaturalTerminal": false,
+        "laneId": "bt93h-raw-holdout-eval",
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "missingFields": [],
+        "naturalTerminal": 0,
+        "report": "data/training/ppo/bt93h/runs/20260425T114122Z-holdout-eval/eval_report.json",
+        "requiredFieldsPresent": true,
+        "terminalReasonCounts": {
+          "player-dead": 7
+        },
+        "truncatedReasonCounts": {}
+      }
+    ],
+    "ok": true,
+    "summary": {
+      "allRequiredFieldsPresent": true,
+      "anyMaxStepsOnlyLane": false,
+      "deathCauseObserved": true,
+      "laneCount": 2,
+      "nonDeathNaturalTerminalObserved": false
+    }
+  },
+  "resultClass": "terminal-provocation-green",
+  "scenarioChecks": {
+    "matchEndedNonDeathNaturalTerminal": true,
+    "maxStepsControl": true,
+    "noRuntimeBypass": true,
+    "playerDead": true,
+    "pythonEvalFieldsPresent": true,
+    "roundEndedNonDeathNaturalTerminal": true,
+    "sourceAlignmentOk": true
+  },
+  "sourceAlignment": {
+    "checks": {
+      "curviosEnv": {
+        "info_payload.get(\"terminalReason\")": true,
+        "info_payload.get(\"truncatedReason\")": true,
+        "payload.get(\"done\")": true,
+        "payload.get(\"truncated\")": true
+      },
+      "episodeController": {
+        "TRAINING_TERMINAL_REASONS": true,
+        "TRAINING_TRUNCATION_REASONS": true,
+        "done": true,
+        "max-steps": true,
+        "terminalReason": true,
+        "truncated": true,
+        "truncatedReason": true
+      },
+      "evalDiagnostics": {
+        "deathCauseCounts": true,
+        "failureSemantics": true,
+        "maxSteps": true,
+        "naturalTerminal": true,
+        "terminalReasonCounts": true,
+        "truncatedReasonCounts": true
+      },
+      "laneRunner": {
+        "TRAINING_TERMINAL_REASONS.MATCH_ENDED": true,
+        "TRAINING_TERMINAL_REASONS.PLAYER_DEAD": true,
+        "TRAINING_TRUNCATION_REASONS.TIME_LIMIT": true,
+        "deriveHeadlessLaneEpisodeStep": true,
+        "terminalReason": true,
+        "truncatedReason": true
+      }
+    },
+    "ok": true,
+    "sourceArtifacts": {
+      "curviosEnv": {
+        "closureCapable": true,
+        "path": "python/envs/curvios_env.py",
+        "role": "Python env done/truncated extraction",
+        "sha256": "fdec907ec011348f8697155d4edbdb1ae96113b740d5f93b0bd0d04552b69f87"
+      },
+      "episodeController": {
+        "closureCapable": true,
+        "path": "src/state/training/EpisodeController.js",
+        "role": "episode lifecycle authority",
+        "sha256": "6fd88a12ea9f7d1268d0a43bd60ef2622511fe88fa611468128ca779f3bf9e7f"
+      },
+      "evalDiagnostics": {
+        "closureCapable": true,
+        "path": "python/scripts/bt93c_learner_smoke.py",
+        "role": "Python eval failureSemantics aggregation",
+        "sha256": "9e4f0ac0b47fc882a5bb58ea76c7b05dc688fb68734c891583561b3207579143"
+      },
+      "laneRunner": {
+        "closureCapable": true,
+        "path": "scripts/training-headless-lane-runner.mjs",
+        "role": "headless terminal derivation",
+        "sha256": "8b22a0bedd674751ca1298fe9ede8c9cb5894433081dee63f1e4f8a89a2bca77"
+      }
+    }
+  },
+  "sourceArtifacts": {
+    "bt93hRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/repair_ladder_report.json",
+      "role": "BT93H repair ladder",
+      "sha256": "5032f14363e43a84df1399b9171b08d99ce997de97ed5f831416c87c0d4d0f2d"
+    },
+    "bt93hTerminalRootCause": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/terminal_root_cause_report.json",
+      "role": "BT93H terminal root cause",
+      "sha256": "3af647673ea2a850d539e490fb382bbb57f2b3c213eb6b85e9ab4bd2ebd55ae3"
+    },
+    "episodeController": {
+      "closureCapable": true,
+      "path": "src/state/training/EpisodeController.js",
+      "role": "episode lifecycle authority",
+      "sha256": "6fd88a12ea9f7d1268d0a43bd60ef2622511fe88fa611468128ca779f3bf9e7f"
+    },
+    "laneRunner": {
+      "closureCapable": true,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "role": "headless lane terminal derivation",
+      "sha256": "8b22a0bedd674751ca1298fe9ede8c9cb5894433081dee63f1e4f8a89a2bca77"
+    },
+    "matrixManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_manifest.json",
+      "role": "BT93I matrix manifest",
+      "sha256": "4b159324c06d7f12a3ad8fd1b0e69dc907889bc8ab3a6c87e30f243b79a5c906"
+    }
+  },
+  "terminalRootCauseCarryForward": {
+    "coverageGap": true,
+    "fieldContractOk": true,
+    "source": "data/training/ppo/bt93h/terminal_root_cause_report.json"
+  }
+}
