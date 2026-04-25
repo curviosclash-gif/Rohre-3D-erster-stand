@@ -1,6 +1,6 @@
 # BT93H Natural-Terminal- und Survival-Reparatur (Intake-Entwurf)
 
-Status: Entwurf fuer User-Intake. Nicht aktiv, nicht claimbar, bis `docs/bot-training/Bot_Trainingsplan.md` manuell aktualisiert wurde.
+Status: In `docs/bot-training/Bot_Trainingsplan.md` als Block BT93H integriert am 2026-04-25. Operative Quelle ist ab jetzt der aktive Trainingsplan; dieser Intake bleibt Referenz.
 
 ## Ausgangslage
 
@@ -102,4 +102,3 @@ No-Go:
 | Survival-Regression wird durch Reward oder Max-Step kaschiert | hoch | Urteil basiert auf DQN-Anker, Median/Streuung, Terminal-/Death-Matrix und Failure-Klassen. |
 | BT94A wird trotz rotem Gate vorbereitet | hoch | `94A.*` bleibt unangetastet; `no_start_gate.json` ist harte Claim-Grenze. |
 | Reparaturblock wird zum neuen Kandidatenlauf | hoch | Run-Kind und Reports verbieten `candidate`, `freeze`, `promote`, `rollout-ready`. |
-
