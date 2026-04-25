@@ -1982,7 +1982,7 @@ Quelle:
 - `data/training/ppo/bt94a/no_start_gate.json`
 - `docs/Fehlerberichte/2026-04-25_bt93g-gate-refresh-diagnose-blocked.md`
 
-<!-- LOCK: Bot-Codex seit 2026-04-25 -->
+<!-- LOCK: frei -->
 
 Scope:
 
@@ -2082,14 +2082,14 @@ Vollstaendiges Befundregister nach BT93G:
 
 ### Definition of Done (DoD)
 
-- [ ] DoD.1 BT93H dokumentiert die aktuelle rote BT94A-Startlage, alle Befunde und die Claim-Grenze versioniert unter `data/training/ppo/bt93h/**`.
-- [ ] DoD.2 Terminal-/Death-Root-Cause und Provocation-Matrix zeigen echte Natural-Terminal-/Death-Cases oder erklaeren blockierend, warum sie im aktuellen Harness nicht messbar sind.
-- [ ] DoD.3 Survival-Gate-Kontrakt ist vor jedem laengeren Lauf fixiert: DQN-Anker, BT93C/BT93G-Referenz, Matrix, Seeds, Modi, Maps, Semantikfenster, Mindestepisoden, Median/Streuung, Holdout und Urteilsregeln.
-- [ ] DoD.4 Ein Repair-Lauf bis maximal 4h startet nur nach gruener `93H.1`/`93H.2`-Evidence, maschinenlesbarem Budget, Checkpoints, Eval-Intervallen und Early-Stop bei Collapse, Reward-Hacking, leerer Terminal-Matrix, Runtime-Fehlern oder erneuter Regression.
-- [ ] DoD.5 Eval und Holdout schreiben Survival-/Steps-Deltas, `averageBotSurvival`, Median, Streuung, Terminal-/Death-/Failure-Klassen, RewardBreakdown, Runtime-Fehler und Action-Telemetrie in ein versioniertes Paket.
-- [ ] DoD.6 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json`, `no_start_gate.json` und ein BT93H-Handoverpaket werden aus BT93H-Artefakten neu geschrieben.
-- [ ] DoD.7 BT93H endet entweder `BT94A-ready` mit gruenem Gate oder `diagnose-blocked` mit Fehlerbericht/Folgegate; kein Kandidatenlauf, kein Freeze, kein Promote, kein BT94B-Handover.
-- [ ] DoD.8 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS oder als Blocker dokumentiert.
+- [x] DoD.1 BT93H dokumentiert die aktuelle rote BT94A-Startlage, alle Befunde und die Claim-Grenze versioniert unter `data/training/ppo/bt93h/**`. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93h\handover_package.json` (`resultClass=diagnose-blocked`, `bt94aStartStatus.status=BT94A remains closed before 94A.1`, `diagnoseBlocked.remainingBt94aGates=[F.05,F.19,F.27,F.31]`))
+- [x] DoD.2 Terminal-/Death-Root-Cause und Provocation-Matrix zeigen echte Natural-Terminal-/Death-Cases oder erklaeren blockierend, warum sie im aktuellen Harness nicht messbar sind. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93h\terminal_root_cause_report.json` (`resultClass=terminal-root-cause-isolated`, `rootCause.naturalTerminalObserved=false`, `rootCause.driftVerdict=no-field-drift`))
+- [x] DoD.3 Survival-Gate-Kontrakt ist vor jedem laengeren Lauf fixiert: DQN-Anker, BT93C/BT93G-Referenz, Matrix, Seeds, Modi, Maps, Semantikfenster, Mindestepisoden, Median/Streuung, Holdout und Urteilsregeln. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93h\survival_gate_contract.json` (`resultClass=survival-gate-contract-pinned`, `evalMin=15`, `holdoutMin=8`, `BT94A-ready`-Regeln fixiert))
+- [x] DoD.4 Ein Repair-Lauf bis maximal 4h startet nur nach gruener `93H.1`/`93H.2`-Evidence, maschinenlesbarem Budget, Checkpoints, Eval-Intervallen und Early-Stop bei Collapse, Reward-Hacking, leerer Terminal-Matrix, Runtime-Fehlern oder erneuter Regression. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93h\repair_ladder_budget.json` und `data\training\ppo\bt93h\runs\20260425T113941Z-comparable-terminal-repair\training_report.json` (`runKind=comparable-terminal-repair`, `totalStepsCompleted=768`, `candidateRun=false`))
+- [x] DoD.5 Eval und Holdout schreiben Survival-/Steps-Deltas, `averageBotSurvival`, Median, Streuung, Terminal-/Death-/Failure-Klassen, RewardBreakdown, Runtime-Fehler und Action-Telemetrie in ein versioniertes Paket. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93h\repair_ladder_report.json` (`resultClass=diagnose-blocked`, `evalAvgStepsPerEpisodePct=-24.271432`, `holdoutAvgStepsPerEpisodePct=-22.569666`, `terminalDeathMatrixStartCapable=false`))
+- [x] DoD.6 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json`, `no_start_gate.json` und ein BT93H-Handoverpaket werden aus BT93H-Artefakten neu geschrieben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_gate_refresh_handover.py --write-upstream-reports` + `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` + `python\.venv\Scripts\python.exe python\scripts\bt93h_gate_refresh_handover.py --write-package --write-followup-report --write-error-report` -> BT93C-Reports, `no_start_gate.json`, `handover_package.json`)
+- [x] DoD.7 BT93H endet entweder `BT94A-ready` mit gruenem Gate oder `diagnose-blocked` mit Fehlerbericht/Folgegate; kein Kandidatenlauf, kein Freeze, kein Promote, kein BT94B-Handover. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93h\handover_package.json` (`resultClass=diagnose-blocked`, `guardrails.candidateRun=false`, `freezeCandidate=false`, `promotionAllowed=false`, `rolloutSignal=false`), `data\training\ppo\bt93h\followup_gate_report.json`, `docs\Fehlerberichte\2026-04-25_bt93h-gate-refresh-diagnose-blocked.md`)
+- [x] DoD.8 `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS oder als Blocker dokumentiert. (abgeschlossen: 2026-04-25; evidence: `npm.cmd run gates:pre-commit` -> PASS; `npm.cmd run build` -> PASS)
 
 ### 93H.1 Terminal-/Death-Root-Cause isolieren
 
@@ -2122,10 +2122,10 @@ Vollstaendiges Befundregister nach BT93G:
 
 ### 93H.99 Abschluss-Gate
 
-- [ ] 93H.99.1 Alle Phasen 93H.1 bis 93H.4 sind mit versionierter Evidence dokumentiert.
-- [ ] 93H.99.2 F.05/F.19/F.27/F.31 sind geschlossen, downgraded oder bleiben als konkrete Folgeblocker sichtbar.
-- [ ] 93H.99.3 BT94A startet nur bei `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0`.
-- [ ] 93H.99.4 Governance-Gates sind gruen; fachliches Urteil beruht auf Lauf-/Diagnoseartefakten, nicht auf Plancheck.
+- [x] 93H.99.1 Alle Phasen 93H.1 bis 93H.4 sind mit versionierter Evidence dokumentiert. (abgeschlossen: 2026-04-25; evidence: 93H.1-93H.4 Plan-Evidence-Zeilen geschlossen; `data\training\ppo\bt93h\handover_package.json` (`phaseCoverage.93H.4.1=true`, `93H.4.2=true`, `93H.4.3=true`, `93H.4.4=not-applicable-red-gate`))
+- [x] 93H.99.2 F.05/F.19/F.27/F.31 sind geschlossen, downgraded oder bleiben als konkrete Folgeblocker sichtbar. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93c\evidence_quality_matrix.json` (`summary.bt94a-blocker=4`, `bt94aStoppers=[F.05,F.19,F.27,F.31]`) und `data\training\ppo\bt93h\followup_gate_report.json` (`followupRequired=true`))
+- [x] 93H.99.3 BT94A startet nur bei `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0`. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt94a\no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `bt93cState.precomparisonResultClass=ppo-regression`, `bt93cState.bt94aBlockerCount=4`))
+- [x] 93H.99.4 Governance-Gates sind gruen; fachliches Urteil beruht auf Lauf-/Diagnoseartefakten, nicht auf Plancheck. (abgeschlossen: 2026-04-25; evidence: `npm.cmd run gates:pre-commit` -> PASS; `npm.cmd run build` -> PASS; fachliches Urteil bleibt `data\training\ppo\bt93h\handover_package.json` (`resultClass=diagnose-blocked`))
 
 ### Risiko-Register BT93H
 
