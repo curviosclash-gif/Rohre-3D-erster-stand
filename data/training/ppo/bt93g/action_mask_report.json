@@ -1,0 +1,620 @@
+{
+  "blockId": "BT93G",
+  "bt94aImpact": {
+    "candidateRunsAllowed": false,
+    "claimableAfter93G3": false,
+    "remainingRequiredBeforeBt94a": [
+      "93G.4 reward gate",
+      "93G.5 comparable repair train/eval/holdout",
+      "93G.6 gate refresh"
+    ]
+  },
+  "decision": {
+    "dependencyChangeRequired": false,
+    "path": "smaller-maskable-semantic-action-vocabulary",
+    "reason": "BT93G repair lane excludes inventory-indexed item actions from the policy vocabulary before sampling; item-action recovery remains follow-gated outside this repair mask.",
+    "sb3ContribRequired": false
+  },
+  "evidenceLimits": {
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsSurvivalQualityEvidence": false
+  },
+  "findingDisposition": {
+    "F.03": "closed",
+    "F.20": "closed",
+    "F.30": "closed-for-bt93g-repair-lane"
+  },
+  "generatedAt": "2026-04-25T10:05:52Z",
+  "generatedBy": "python/scripts/bt93g_action_mask_report.py",
+  "gitSha": "e904e0b68f8610cb9c9032264f9894a834311daf",
+  "maskSourceContract": {
+    "preSamplingApplied": true,
+    "preSamplingByConstruction": true,
+    "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+    "surfaceId": "bt93g-masked-semantic-action-v1"
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93G.3.1": true,
+    "93G.3.2": true,
+    "93G.3.3": true,
+    "93G.3.4": true
+  },
+  "phaseId": "93G.3",
+  "probe": {
+    "manifest": {
+      "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+      "excludedInventoryIndexedActions": [
+        "dropItem",
+        "nextItem",
+        "shootItem",
+        "shootItemIndex",
+        "useItem"
+      ],
+      "gymSpace": "Discrete",
+      "policyLevelMasking": {
+        "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+        "mixedWithPostDecodeClamp": false,
+        "preSamplingAppliedInCurrentSb3Path": true,
+        "preSamplingByConstruction": true,
+        "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+        "specified": true
+      },
+      "rawBoundarySurfaceTraining": false,
+      "sb3Trainable": true,
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg"
+      ],
+      "surfaceId": "bt93g-masked-semantic-action-v1",
+      "telemetry": [
+        "policyLevelMask",
+        "preSamplingMaskRate",
+        "postDecodeClampRate",
+        "invalidActionRate",
+        "vetoRate",
+        "sanitizerRate",
+        "noopRate"
+      ]
+    },
+    "resetInventoryLength": 0,
+    "rows": [
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 0,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "noop",
+        "token": 0,
+        "truncated": false,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 2,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "yaw-left",
+        "token": 1,
+        "truncated": false,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 0,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "yaw-right",
+        "token": 2,
+        "truncated": false,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 2,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "pitch-up",
+        "token": 3,
+        "truncated": true,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 0,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "pitch-down",
+        "token": 4,
+        "truncated": false,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 2,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "roll-left",
+        "token": 5,
+        "truncated": false,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 0,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "roll-right",
+        "token": 6,
+        "truncated": false,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 2,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "boost",
+        "token": 7,
+        "truncated": true,
+        "vetoEvents": []
+      },
+      {
+        "invalidReasons": [],
+        "inventoryLengthBeforeStep": 0,
+        "maskAllAllowed": true,
+        "maskShape": [
+          9
+        ],
+        "postDecodeClampCount": 0,
+        "preSamplingApplied": true,
+        "preSamplingByConstruction": true,
+        "sanitizerEvents": [],
+        "semanticAction": "shoot-mg",
+        "token": 8,
+        "truncated": false,
+        "vetoEvents": []
+      }
+    ],
+    "telemetry": {
+      "fieldCounts": {},
+      "invalidActionCount": 0,
+      "invalidActionRate": 0.0,
+      "maskCount": 0,
+      "maskRate": 0.0,
+      "noopCount": 1,
+      "noopRate": 0.1111111111111111,
+      "postDecodeClampCount": 0,
+      "postDecodeClampRate": 0.0,
+      "preSamplingMaskCount": 9,
+      "preSamplingMaskRate": 1.0,
+      "rawActionExamples": [
+        {
+          "decoded": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 0,
+          "maskEvents": [],
+          "raw": 0,
+          "sanitized": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "noop",
+          "vetoEvents": []
+        },
+        {
+          "decoded": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": true,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 2,
+          "maskEvents": [],
+          "raw": 1,
+          "sanitized": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": true,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "yaw-left",
+          "vetoEvents": []
+        },
+        {
+          "decoded": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": true
+          },
+          "invalidReasons": [],
+          "inventoryLength": 0,
+          "maskEvents": [],
+          "raw": 2,
+          "sanitized": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": true
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "yaw-right",
+          "vetoEvents": []
+        },
+        {
+          "decoded": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 2,
+          "maskEvents": [],
+          "raw": 3,
+          "sanitized": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": true,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-up",
+          "vetoEvents": []
+        },
+        {
+          "decoded": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 0,
+          "maskEvents": [],
+          "raw": 4,
+          "sanitized": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": true,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "pitch-down",
+          "vetoEvents": []
+        },
+        {
+          "decoded": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": true,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 2,
+          "maskEvents": [],
+          "raw": 5,
+          "sanitized": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": true,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "roll-left",
+          "vetoEvents": []
+        },
+        {
+          "decoded": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": true,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 0,
+          "maskEvents": [],
+          "raw": 6,
+          "sanitized": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": true,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "roll-right",
+          "vetoEvents": []
+        },
+        {
+          "decoded": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 2,
+          "maskEvents": [],
+          "raw": 7,
+          "sanitized": {
+            "boost": true,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerEvents": [],
+          "semanticAction": "boost",
+          "vetoEvents": []
+        }
+      ],
+      "sanitizerCount": 0,
+      "sanitizerRate": 0.0,
+      "sanitizerReasons": {},
+      "totalActions": 9,
+      "vetoCount": 0,
+      "vetoRate": 0.0
+    }
+  },
+  "resultClass": "masked-semantic-action-surface-pinned",
+  "sourceArtifacts": {
+    "actionSurface": {
+      "closureCapable": true,
+      "path": "python/envs/ppo_action_surface.py",
+      "role": "BT93G masked semantic action surface",
+      "sha256": "42ea141f6d0af66616d7f794e731126abc71a07d4bab050432e5cce4abb7485f"
+    },
+    "actionSurfaceTest": {
+      "closureCapable": true,
+      "path": "python/tests/test_ppo_action_surface.py",
+      "role": "BT93G action-surface contract tests",
+      "sha256": "053663d3e4d1183e39285c7e0f881607d7ae94573c1972c7cecab726a2e3633f"
+    },
+    "ppoRequirements": {
+      "closureCapable": true,
+      "path": "python/requirements-ppo.txt",
+      "role": "PPO dependency pins unchanged for semantic vocabulary path",
+      "sha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52"
+    }
+  },
+  "telemetrySeparation": {
+    "invalidActionRate": 0.0,
+    "noRelabeling": true,
+    "postDecodeClampMixedWithPolicyMask": false,
+    "postDecodeClampRate": 0.0,
+    "safetyVetoRate": 0.0,
+    "sanitizerRate": 0.0
+  },
+  "thresholds": {
+    "observedPass": true,
+    "postDecodeClampRateLt": 0.5,
+    "safetyVetoRateLt": 0.25,
+    "target": "near-zero"
+  }
+}

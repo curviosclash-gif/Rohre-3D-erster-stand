@@ -14,12 +14,25 @@ from bridge.authority_snapshot import ACTION_BOOLEAN_FIELDS, ACTION_INDEX_FIELDS
 from bridge.contract_v1 import EXPECTED_OBSERVATION_LENGTH, sanitize_action_payload
 
 PPO_ACTION_SURFACE_ID = "bt93c-multidiscrete-action-v1"
+PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID = "bt93g-masked-semantic-action-v1"
 PPO_INDEX_HEAD_SPACE_SIZE = 257
 PPO_INDEX_NOOP_TOKEN = 0
 PPO_INDEX_NOOP_VALUE = -1
 POLICY_MASK_SOURCE = "info.match.inventoryLength from the JS-authoritative transition payload"
 POLICY_MASK_CONSUMER_STATUS = "specified-but-not-consumed-by-stable-baselines3-ppo"
+POLICY_MASK_CONSUMED_STATUS = "consumed-before-sampling-by-masked-semantic-action-vocabulary"
 INVENTORY_GATED_BOOLEAN_FIELDS = frozenset(("dropItem", "shootItem", "nextItem"))
+MASKED_SEMANTIC_ACTIONS = (
+    ("noop", {}),
+    ("yaw-left", {"yawLeft": True}),
+    ("yaw-right", {"yawRight": True}),
+    ("pitch-up", {"pitchUp": True}),
+    ("pitch-down", {"pitchDown": True}),
+    ("roll-left", {"rollLeft": True}),
+    ("roll-right", {"rollRight": True}),
+    ("boost", {"boost": True}),
+    ("shoot-mg", {"shootMG": True}),
+)
 
 
 def _inventory_length(info: Mapping[str, Any] | None) -> int:
@@ -41,7 +54,12 @@ def _is_noop(action: Mapping[str, Any]) -> bool:
     )
 
 
-def build_policy_level_action_mask(*, inventory_length: int) -> dict[str, Any]:
+def build_policy_level_action_mask(
+    *,
+    inventory_length: int,
+    pre_sampling_applied: bool = False,
+    consumer_status: str | None = None,
+) -> dict[str, Any]:
     """Build the pre-sampling legality mask required by BT93F.
 
     The current SB3 PPO path does not consume this mask yet. Keeping it here
@@ -69,17 +87,37 @@ def build_policy_level_action_mask(*, inventory_length: int) -> dict[str, Any]:
     return {
         "source": POLICY_MASK_SOURCE,
         "inventoryLength": safe_inventory_length,
-        "consumerStatus": POLICY_MASK_CONSUMER_STATUS,
-        "preSamplingApplied": False,
+        "consumerStatus": consumer_status or POLICY_MASK_CONSUMER_STATUS,
+        "preSamplingApplied": bool(pre_sampling_applied),
         "booleanFields": {key: list(mask) for key, mask in boolean_masks.items()},
         "indexFields": {key: list(index_mask) for key in ACTION_INDEX_FIELDS},
         "headOrder": list(ACTION_BOOLEAN_FIELDS) + list(ACTION_INDEX_FIELDS),
     }
 
 
+def build_masked_semantic_action_mask(*, inventory_length: int) -> dict[str, Any]:
+    try:
+        raw_inventory_length = int(inventory_length)
+    except (TypeError, ValueError):
+        raw_inventory_length = 0
+    safe_inventory_length = max(0, raw_inventory_length)
+    return {
+        "source": POLICY_MASK_SOURCE,
+        "surfaceId": PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID,
+        "inventoryLength": safe_inventory_length,
+        "consumerStatus": POLICY_MASK_CONSUMED_STATUS,
+        "preSamplingApplied": True,
+        "semanticActions": {name: True for name, _ in MASKED_SEMANTIC_ACTIONS},
+        "headOrder": [name for name, _ in MASKED_SEMANTIC_ACTIONS],
+        "preSamplingByConstruction": True,
+        "excludedInventoryIndexedActions": sorted(INVENTORY_GATED_BOOLEAN_FIELDS | set(ACTION_INDEX_FIELDS)),
+    }
+
+
 def summarize_policy_level_action_mask(mask: Mapping[str, Any]) -> dict[str, Any]:
     boolean_fields = mask.get("booleanFields") if isinstance(mask.get("booleanFields"), Mapping) else {}
     index_fields = mask.get("indexFields") if isinstance(mask.get("indexFields"), Mapping) else {}
+    semantic_actions = mask.get("semanticActions") if isinstance(mask.get("semanticActions"), Mapping) else {}
     boolean_allowed = {
         str(key): sum(1 for value in values if value)
         for key, values in boolean_fields.items()
@@ -100,8 +138,14 @@ def summarize_policy_level_action_mask(mask: Mapping[str, Any]) -> dict[str, Any
         "inventoryLength": mask.get("inventoryLength"),
         "consumerStatus": mask.get("consumerStatus"),
         "preSamplingApplied": bool(mask.get("preSamplingApplied")),
+        "preSamplingByConstruction": bool(mask.get("preSamplingByConstruction")),
         "booleanAllowedTokenCounts": boolean_allowed,
         "indexAllowedTokenCounts": index_allowed,
+        "semanticAllowedTokenCounts": {
+            str(key): 1 if value else 0
+            for key, value in semantic_actions.items()
+        },
+        "excludedInventoryIndexedActions": list(mask.get("excludedInventoryIndexedActions") or []),
         "inventoryGatedBooleanFields": gated_boolean_fields,
         "mixedWithPostDecodeClamp": False,
     }
@@ -111,6 +155,7 @@ def summarize_policy_level_action_mask(mask: Mapping[str, Any]) -> dict[str, Any
 class PpoActionTelemetry:
     total_actions: int = 0
     invalid_action_count: int = 0
+    pre_sampling_mask_count: int = 0
     mask_count: int = 0
     veto_count: int = 0
     sanitizer_count: int = 0
@@ -128,13 +173,20 @@ class PpoActionTelemetry:
         if len(self.raw_action_examples) < 8:
             self.raw_action_examples.append(example)
 
+    def record_pre_sampling_mask(self) -> None:
+        self.pre_sampling_mask_count += 1
+
     def report(self) -> dict[str, Any]:
         return {
             "totalActions": self.total_actions,
             "invalidActionCount": self.invalid_action_count,
             "invalidActionRate": self._rate(self.invalid_action_count),
+            "preSamplingMaskCount": self.pre_sampling_mask_count,
+            "preSamplingMaskRate": self._rate(self.pre_sampling_mask_count),
             "maskCount": self.mask_count,
             "maskRate": self._rate(self.mask_count),
+            "postDecodeClampCount": self.mask_count,
+            "postDecodeClampRate": self._rate(self.mask_count),
             "vetoCount": self.veto_count,
             "vetoRate": self._rate(self.veto_count),
             "sanitizerCount": self.sanitizer_count,
@@ -151,6 +203,10 @@ def ppo_action_space() -> spaces.MultiDiscrete:
     return spaces.MultiDiscrete(
         [2 for _ in ACTION_BOOLEAN_FIELDS] + [PPO_INDEX_HEAD_SPACE_SIZE for _ in ACTION_INDEX_FIELDS]
     )
+
+
+def masked_semantic_action_space() -> spaces.Discrete:
+    return spaces.Discrete(len(MASKED_SEMANTIC_ACTIONS))
 
 
 def decode_multidiscrete_action(
@@ -254,6 +310,80 @@ def decode_multidiscrete_action(
     return sanitized, diagnostics
 
 
+def _neutral_boundary_action() -> dict[str, Any]:
+    return {
+        **{key: False for key in ACTION_BOOLEAN_FIELDS},
+        **{key: PPO_INDEX_NOOP_VALUE for key in ACTION_INDEX_FIELDS},
+    }
+
+
+def decode_masked_semantic_action(
+    raw_action: Any,
+    *,
+    inventory_length: int,
+    telemetry: PpoActionTelemetry | None = None,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    if telemetry is not None:
+        telemetry.total_actions += 1
+
+    try:
+        token = int(np.asarray(raw_action, dtype=np.int64).reshape(-1)[0])
+    except (IndexError, TypeError, ValueError):
+        token = 0
+    invalid_reasons: list[str] = []
+    if token < 0 or token >= len(MASKED_SEMANTIC_ACTIONS):
+        invalid_reasons.append(f"semantic token out of range: {token}")
+        token = 0
+
+    action_name, action_patch = MASKED_SEMANTIC_ACTIONS[token]
+    boundary_action = _neutral_boundary_action()
+    boundary_action.update(action_patch)
+    sanitized = sanitize_action_payload(boundary_action, inventory_length)
+    sanitizer_changed = sanitized != boundary_action
+    policy_level_mask = build_masked_semantic_action_mask(inventory_length=inventory_length)
+
+    if telemetry is not None:
+        telemetry.record_pre_sampling_mask()
+        if invalid_reasons:
+            telemetry.invalid_action_count += 1
+        if sanitizer_changed:
+            telemetry.sanitizer_count += 1
+        if _is_noop(sanitized):
+            telemetry.noop_count += 1
+        telemetry.record_example({
+            "raw": token,
+            "semanticAction": action_name,
+            "inventoryLength": int(inventory_length),
+            "decoded": dict(boundary_action),
+            "sanitized": dict(sanitized),
+            "invalidReasons": list(invalid_reasons),
+            "maskEvents": [],
+            "vetoEvents": [],
+            "sanitizerEvents": ["semantic-sanitizer-changed"] if sanitizer_changed else [],
+        })
+
+    diagnostics = {
+        "surfaceId": PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID,
+        "inventoryLength": int(inventory_length),
+        "semanticAction": action_name,
+        "invalidReasons": invalid_reasons,
+        "maskEvents": [],
+        "vetoEvents": [],
+        "sanitizerEvents": ["semantic-sanitizer-changed"] if sanitizer_changed else [],
+        "sanitizerChangedAction": sanitizer_changed,
+        "policyLevelMask": summarize_policy_level_action_mask(policy_level_mask),
+        "postDecodeClamp": {
+            "eventName": "maskEvents",
+            "count": 0,
+            "mixedWithPolicyMask": False,
+        },
+        "rawAction": token,
+        "boundaryAction": boundary_action,
+        "sanitizedAction": sanitized,
+    }
+    return sanitized, diagnostics
+
+
 class CurviosPpoActionWrapper(gym.Wrapper[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]):
     """Map SB3 MultiDiscrete actions to the bridge-v1 bool/index action dict."""
 
@@ -295,7 +425,90 @@ class CurviosPpoActionWrapper(gym.Wrapper[np.ndarray, np.ndarray, np.ndarray, di
         self.telemetry = PpoActionTelemetry()
 
 
-def build_action_surface_manifest() -> dict[str, Any]:
+class CurviosMaskedSemanticActionWrapper(gym.Wrapper[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]):
+    """Inventory-safe semantic action vocabulary for BT93G repair training."""
+
+    def __init__(self, env: gym.Env[np.ndarray, dict[str, Any]]) -> None:
+        super().__init__(env)
+        self.action_space = masked_semantic_action_space()
+        self.observation_space = spaces.Box(
+            low=-np.inf,
+            high=np.inf,
+            shape=(EXPECTED_OBSERVATION_LENGTH,),
+            dtype=np.float32,
+        )
+        self._last_info: Mapping[str, Any] | None = None
+        self.telemetry = PpoActionTelemetry()
+
+    def reset(self, **kwargs: Any) -> tuple[np.ndarray, dict[str, Any]]:
+        observation, info = self.env.reset(**kwargs)
+        self._last_info = info
+        return np.asarray(observation, dtype=np.float32), dict(info)
+
+    def action_masks(self) -> np.ndarray:
+        inventory_length = _inventory_length(self._last_info)
+        mask = build_masked_semantic_action_mask(inventory_length=inventory_length)
+        return np.asarray([bool(value) for value in mask["semanticActions"].values()], dtype=bool)
+
+    def step(self, action: Any) -> tuple[np.ndarray, float, bool, bool, dict[str, Any]]:
+        inventory_length = _inventory_length(self._last_info)
+        sanitized, diagnostics = decode_masked_semantic_action(
+            action,
+            inventory_length=inventory_length,
+            telemetry=self.telemetry,
+        )
+        observation, reward, terminated, truncated, info = self.env.step(sanitized)
+        enriched_info = dict(info)
+        enriched_info["ppoActionSurface"] = diagnostics
+        enriched_info["ppoActionTelemetry"] = self.telemetry.report()
+        self._last_info = enriched_info
+        return np.asarray(observation, dtype=np.float32), float(reward), bool(terminated), bool(truncated), enriched_info
+
+    def get_telemetry_report(self) -> dict[str, Any]:
+        return self.telemetry.report()
+
+    def reset_telemetry(self) -> None:
+        self.telemetry = PpoActionTelemetry()
+
+
+def make_curvios_action_wrapper(
+    env: gym.Env[np.ndarray, dict[str, Any]],
+    *,
+    surface_id: str | None = None,
+) -> gym.Wrapper[np.ndarray, np.ndarray, np.ndarray, dict[str, Any]]:
+    if surface_id == PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID:
+        return CurviosMaskedSemanticActionWrapper(env)
+    return CurviosPpoActionWrapper(env)
+
+
+def build_action_surface_manifest(surface_id: str | None = None) -> dict[str, Any]:
+    if surface_id == PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID:
+        return {
+            "surfaceId": PPO_MASKED_SEMANTIC_ACTION_SURFACE_ID,
+            "gymSpace": "Discrete",
+            "sb3Trainable": True,
+            "semanticActions": [name for name, _ in MASKED_SEMANTIC_ACTIONS],
+            "excludedInventoryIndexedActions": sorted(INVENTORY_GATED_BOOLEAN_FIELDS | set(ACTION_INDEX_FIELDS)),
+            "policyLevelMasking": {
+                "specified": True,
+                "preSamplingAppliedInCurrentSb3Path": True,
+                "consumerStatus": POLICY_MASK_CONSUMED_STATUS,
+                "source": POLICY_MASK_SOURCE,
+                "preSamplingByConstruction": True,
+                "mixedWithPostDecodeClamp": False,
+            },
+            "telemetry": [
+                "policyLevelMask",
+                "preSamplingMaskRate",
+                "postDecodeClampRate",
+                "invalidActionRate",
+                "vetoRate",
+                "sanitizerRate",
+                "noopRate",
+            ],
+            "rawBoundarySurfaceTraining": False,
+            "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+        }
     return {
         "surfaceId": PPO_ACTION_SURFACE_ID,
         "gymSpace": "MultiDiscrete",

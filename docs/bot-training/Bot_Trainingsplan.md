@@ -271,7 +271,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93E | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93F | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
-| Bot-Codex | BT93G | 2026-04-25 | active | 93G.2 abgeschlossen; 93G.3 offen |
+| Bot-Codex | BT93G | 2026-04-25 | active | 93G.3 abgeschlossen; 93G.4 offen |
 | - | BT94A | - | frei | wartet auf `BT93G.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1917,10 +1917,10 @@ Vollstaendiges Befundregister fuer BT93G-Intake:
 
 ### 93G.3 Pre-Sampling Policy-Level-Mask
 
-- [ ] 93G.3.1 Technischen Pfad entscheiden und pinnen: kleineres maskierbares semantisches Action-Vocabulary oder `sb3-contrib`/`MaskablePPO` mit reproduzierbarem Dependency-Lock und Clean-Env-Smoke.
-- [ ] 93G.3.2 Mask-Quelle aus dem JS-autoritativen Transition-Payload (`info.match.inventoryLength` oder gleichwertig) vor Policy-Sampling konsumieren; `policyLevelMask.preSamplingApplied=true` muss im Report stehen.
-- [ ] 93G.3.3 Post-Decode-Clamp, Safety-Veto, Sanitizer, Invalid-Action und No-Op/Fallback weiter getrennt reporten; kein Relabeling von Clamp/Veto als Policy-Mask.
-- [ ] 93G.3.4 Schwellen als Startgate anwenden: `postDecodeClampRate < 0.5`, `safetyVetoRate < 0.25`, Ziel nahe `0`; Ueberschreitung bleibt BT94A-Blocker.
+- [x] 93G.3.1 Technischen Pfad entscheiden und pinnen: kleineres maskierbares semantisches Action-Vocabulary oder `sb3-contrib`/`MaskablePPO` mit reproduzierbarem Dependency-Lock und Clean-Env-Smoke. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_action_mask_report.py --write` -> `data\training\ppo\bt93g\action_mask_report.json` (`decision.path=smaller-maskable-semantic-action-vocabulary`, `dependencyChangeRequired=false`, `surfaceId=bt93g-masked-semantic-action-v1`))
+- [x] 93G.3.2 Mask-Quelle aus dem JS-autoritativen Transition-Payload (`info.match.inventoryLength` oder gleichwertig) vor Policy-Sampling konsumieren; `policyLevelMask.preSamplingApplied=true` muss im Report stehen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_action_mask_report.py --write` -> `data\training\ppo\bt93g\action_mask_report.json` (`phaseCoverage.93G.3.2=true`, `maskSourceContract.preSamplingApplied=true`, `source=info.match.inventoryLength...`))
+- [x] 93G.3.3 Post-Decode-Clamp, Safety-Veto, Sanitizer, Invalid-Action und No-Op/Fallback weiter getrennt reporten; kein Relabeling von Clamp/Veto als Policy-Mask. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_action_mask_report.py --write` -> `data\training\ppo\bt93g\action_mask_report.json` (`phaseCoverage.93G.3.3=true`, `postDecodeClampMixedWithPolicyMask=false`, `noRelabeling=true`))
+- [x] 93G.3.4 Schwellen als Startgate anwenden: `postDecodeClampRate < 0.5`, `safetyVetoRate < 0.25`, Ziel nahe `0`; Ueberschreitung bleibt BT94A-Blocker. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_action_mask_report.py --write` -> `data\training\ppo\bt93g\action_mask_report.json` (`phaseCoverage.93G.3.4=true`, `postDecodeClampRate=0.0`, `safetyVetoRate=0.0`, `invalidActionRate=0.0`))
 
 ### 93G.4 Reward- und Diagnose-Semantik
 
