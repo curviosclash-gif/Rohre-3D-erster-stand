@@ -2334,10 +2334,10 @@ Befund-Register BT93I:
 
 ### 93I.5 Gate-Refresh und Handover
 
-- [ ] 93I.5.1 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` aus BT93I-Artefakten neu schreiben.
-- [ ] 93I.5.2 `bt94a_gate_check.py --write-report` ausfuehren und unverfaelscht pinnen; der Gate-Checker muss BT93I als aktuelle Handover-Quelle konsumieren und darf nicht auf BT93H-No-Start zurueckfallen, wenn BT93I-Artefakte vorhanden sind.
-- [ ] 93I.5.3 Bei rotem Gate: `diagnose-blocked` mit Fehlerbericht, Folgegate und ohne `94A.*`-Closure dokumentieren.
-- [ ] 93I.5.4 Bei gruenem Gate: `BT94A-ready` dokumentieren; Freeze bleibt bis `94A.3` verboten, PPO-Validate bleibt `BT94B.3`.
+- [x] 93I.5.1 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` aus BT93I-Artefakten neu schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_gate_refresh_handover.py --write-upstream-reports` + `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` -> `data\training\ppo\bt93c\precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json`, `data\training\ppo\bt94a\no_start_gate.json`)
+- [x] 93I.5.2 `bt94a_gate_check.py --write-report` ausfuehren und unverfaelscht pinnen; der Gate-Checker muss BT93I als aktuelle Handover-Quelle konsumieren und darf nicht auf BT93H-No-Start zurueckfallen, wenn BT93I-Artefakte vorhanden sind. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt94a_gate_check.py --write-report` -> `data\training\ppo\bt94a\no_start_gate.json` (`currentHandoverSource.blockId=BT93I`, `currentHandoverSource.fresh=true`, `claimable=false`, `bt93cState.bt94aBlockerCount=4`))
+- [x] 93I.5.3 Bei rotem Gate: `diagnose-blocked` mit Fehlerbericht, Folgegate und ohne `94A.*`-Closure dokumentieren. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_gate_refresh_handover.py --write-package --write-followup-report --write-error-report` -> `data\training\ppo\bt93i\handover_package.json` (`resultClass=diagnose-blocked`), `followup_gate_report.json`, `docs\Fehlerberichte\2026-04-25_bt93i-gate-refresh-diagnose-blocked.md`)
+- [x] 93I.5.4 Bei gruenem Gate: `BT94A-ready` dokumentieren; Freeze bleibt bis `94A.3` verboten, PPO-Validate bleibt `BT94B.3`. (abgeschlossen: 2026-04-25; evidence: `data\training\ppo\bt93i\handover_package.json` (`phaseCoverage.93I.5.4=not-applicable-red-gate`, `bt94aReady.active=false`, `guardrails.freezeCandidate=false`))
 
 ### 93I.99 Abschluss-Gate
 
