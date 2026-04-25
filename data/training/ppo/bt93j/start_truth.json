@@ -1,0 +1,297 @@
+{
+  "blockId": "BT93J",
+  "bt93iClosure": {
+    "followupRequired": true,
+    "remainingBt94aGates": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "resultClass": "diagnose-blocked-closed"
+  },
+  "bt93iMatrix": {
+    "blockedFindings": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "decision": "BT94A remains closed; BT93I.4 still violates steps and/or terminal-matrix start rules.",
+    "matrixId": "bt93i-terminal-curriculum-episode-matrix-v1",
+    "matrixVerdict": "ppo-regression",
+    "resultClass": "diagnose-blocked"
+  },
+  "bt94aNoStartGate": {
+    "bt94aBlockerCount": 4,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "handoverGate": "closed-diagnose-blocked-by-bt93i",
+    "handoverReady": false,
+    "matrixDefinitionAllowed": false,
+    "precomparisonResultClass": "ppo-regression",
+    "redClaimChecks": [
+      {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93i",
+        "ok": false,
+        "required": "ready=true"
+      },
+      {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 4,
+        "ok": false,
+        "required": 0
+      }
+    ],
+    "resultClass": "blocked-no-start"
+  },
+  "claimBoundary": {
+    "bt94aClosedBefore94A1": true,
+    "nextAllowedPhase": "93J.0",
+    "requiredBeforeAnyRepair": "diagnostic_split_report.json names one primary cause and counterprobe",
+    "requiredBeforeAnyTraining": "all diagnostic category gates are green or non-causal"
+  },
+  "evidenceQuality": {
+    "bt94aStoppers": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "summary": {
+      "bt94a-blocker": 4,
+      "closed": 22,
+      "follow-gated": 11
+    }
+  },
+  "generatedAt": "2026-04-25T22:42:40Z",
+  "generatedBy": "python/scripts/bt93j_start_truth.py",
+  "gitSha": "9043776509a61e6dbadf2f2ef27a2f108fc4bc46",
+  "guardrails": {
+    "bt94aCheckboxClosed": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "noGo": [
+      "no BT94A claim, candidate run, freeze candidate, BT94B handover, promote, or rollout-ready result",
+      "no pilot, holdout, long-run, or fix before diagnostic_split_report.json names one primary cause and counterprobe",
+      "no productive RuntimeConfig, Strategy Flag, JS inference, model registry, rollback, Matchstart, AI-Hub, bridge, or authority change",
+      "no gate downgrade from plan text, tmp output, mutable latest pointer, or governance-only command"
+    ],
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseId": "93J.0",
+  "precomparison": {
+    "baselineId": "bt93c-ppo-baseline-publish-v1",
+    "currentHandoverSource": {
+      "blockId": "BT93I",
+      "expected": {
+        "blockId": "BT93I",
+        "reason": "BT93I matrix_green_report.json exists and is the latest handover source.",
+        "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+      },
+      "fallbackUsed": false,
+      "fresh": true,
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "phaseId": "93I.5",
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+    },
+    "matrixId": "bt93c-dqn-ppo-precomparison-v1",
+    "resultClass": "ppo-regression"
+  },
+  "readyForRepair": false,
+  "readyForTraining": false,
+  "resultClass": "start-truth-pinned",
+  "scopeFiles": [
+    "data/training/ppo/bt93j/**",
+    "python/scripts/bt93j_*.py",
+    "python/configs/ppo_bt93j*.json",
+    "python/eval.py only after 93J.0-93J.4 prove diagnostic/report need",
+    "python/train.py only after green readiness; no candidate or freeze run",
+    "python/envs/**, python/callbacks/**, scripts/training-headless-lane-runner.mjs, src/state/training/** only for proven root cause"
+  ],
+  "sourceArtifacts": {
+    "bt93cEvidenceQualityMatrix": {
+      "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",
+      "closureCapable": true,
+      "generatedAt": "2026-04-25T19:23:09Z",
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "matrixIds": [],
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "phaseId": "93I.5.1",
+      "resultClass": null,
+      "role": "BT93C/BT93I evidence quality matrix",
+      "runIds": [],
+      "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
+    },
+    "bt93cPrecomparison": {
+      "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",
+      "closureCapable": true,
+      "generatedAt": "2026-04-25T19:23:09Z",
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "matrixIds": [
+        "bt93c-dqn-ppo-precomparison-v1"
+      ],
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "phaseId": "93I.5.1",
+      "resultClass": "ppo-regression",
+      "role": "BT93C/BT93I precomparison state",
+      "runIds": [
+        "20260424T202525Z-baseline-repro-eval",
+        "20260424T221840Z-baseline-repro-eval",
+        "20260424T221812Z-holdout-eval",
+        "20260425T082445Z-baseline-repro-eval",
+        "20260425T082506Z-holdout-eval",
+        "20260425T102416Z-comparable-repair-eval",
+        "20260425T102509Z-holdout-eval",
+        "20260425T114031Z-comparable-terminal-repair-eval",
+        "20260425T114122Z-holdout-eval",
+        "20260425T153136Z-holdout-eval",
+        "20260425T153044Z-terminal-curriculum-repair-eval",
+        "20260424T202552Z-holdout-eval"
+      ],
+      "sha256": "7ff00d1c24d345642e521b76a89f7746a9d5dc0748adaeaa39f51caa12bcb1fb"
+    },
+    "bt93iClosure": {
+      "artifactGitSha": "06a93afbfb490236463ded6b1d9f812080d3a073",
+      "closureCapable": true,
+      "generatedAt": "2026-04-25T19:34:18Z",
+      "generatedBy": "python/scripts/bt93i_closure_gate.py",
+      "matrixIds": [],
+      "path": "data/training/ppo/bt93i/closure_gate_report.json",
+      "phaseId": "93I.99",
+      "resultClass": "diagnose-blocked-closed",
+      "role": "BT93I closure gate and diagnose-blocked-closed state",
+      "runIds": [],
+      "sha256": "841c806a1604fd12e5d30d58da9e154d0561372417e35f8c3f5510abf7fad116"
+    },
+    "bt93iFollowupGate": {
+      "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",
+      "closureCapable": true,
+      "generatedAt": "2026-04-25T19:24:04Z",
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "matrixIds": [],
+      "path": "data/training/ppo/bt93i/followup_gate_report.json",
+      "phaseId": "93I.5.3",
+      "resultClass": "diagnose-blocked",
+      "role": "BT93I followup gate for remaining BT94A blockers",
+      "runIds": [],
+      "sha256": "ca66e4da3bc7033bb58c450fe44cfb178f542b442e0a1ed60a61fe94853a2bca"
+    },
+    "bt93iHandoverPackage": {
+      "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",
+      "closureCapable": true,
+      "generatedAt": "2026-04-25T19:24:04Z",
+      "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+      "matrixIds": [],
+      "path": "data/training/ppo/bt93i/handover_package.json",
+      "phaseId": "93I.5",
+      "resultClass": "diagnose-blocked",
+      "role": "BT93I handover and BT94A no-start handoff",
+      "runIds": [],
+      "sha256": "74610a79117b98a6b7b994674561d3ecd5eda11639a59e2a472f472f8ee4b702"
+    },
+    "bt93iMatrixGreen": {
+      "artifactGitSha": "9046f48592871ff245c1415ab80a2e7a13ddb2e3",
+      "closureCapable": true,
+      "generatedAt": "2026-04-25T15:37:04Z",
+      "generatedBy": "python/scripts/bt93i_matrix_green_report.py",
+      "matrixIds": [
+        "bt93i-terminal-curriculum-episode-matrix-v1"
+      ],
+      "path": "data/training/ppo/bt93i/matrix_green_report.json",
+      "phaseId": "93I.4",
+      "resultClass": "diagnose-blocked",
+      "role": "BT93I eval/holdout matrix verdict",
+      "runIds": [
+        "20260425T153044Z-terminal-curriculum-repair-eval",
+        "20260425T153136Z-holdout-eval"
+      ],
+      "sha256": "c664bdc5f716ed7575dd02c9adf7dd7d5bd2aed92c8e6932c0f546639a43d4fc"
+    },
+    "bt94aNoStartGate": {
+      "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",
+      "closureCapable": true,
+      "generatedAt": "2026-04-25T19:23:50Z",
+      "generatedBy": "python/scripts/bt94a_gate_check.py",
+      "matrixIds": [
+        "bt93c-dqn-ppo-precomparison-v1"
+      ],
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "phaseId": "94A.1",
+      "resultClass": "blocked-no-start",
+      "role": "BT94A no-start gate after BT93I",
+      "runIds": [
+        "20260425T151155Z-terminal-curriculum-repair"
+      ],
+      "sha256": "288018064b50e130fb0fea7ded67b7ac2b29a6c393198a9a494417d16fd37062"
+    }
+  },
+  "trackedFindings": {
+    "F.05": {
+      "evidence": "BT93I terminal-curriculum repair keeps Survival-First blocked because avgSteps regress (evalAvgStepsPerEpisodePct=-41.175637, holdoutAvgStepsPerEpisodePct=-38.94916).",
+      "gate": "93I.5/BT94A",
+      "needsCounterprobe": true,
+      "needsPrimaryCause": true,
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json",
+      "status": "bt94a-blocker"
+    },
+    "F.19": {
+      "evidence": "BT93I eval/holdout terminal-death matrix is not start-capable (terminalDeathMatrixStartCapable=False).",
+      "gate": "93I.5/BT94A",
+      "needsCounterprobe": true,
+      "needsPrimaryCause": true,
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json",
+      "status": "bt94a-blocker"
+    },
+    "F.27": {
+      "evidence": "BT93I comparison remains ppo-regression; hard rules: eval avgStepsPerEpisode below DQN anchor; holdout avgStepsPerEpisode below DQN anchor; terminal/death matrix is not start-capable; terminal matrix is player-dead-only.",
+      "gate": "93I.5/BT94A",
+      "needsCounterprobe": true,
+      "needsPrimaryCause": true,
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json",
+      "status": "bt94a-blocker"
+    },
+    "F.31": {
+      "evidence": "BT93I natural terminal/death evidence remains insufficient (playerDeadOnlyBlocksStart=True).",
+      "gate": "93I.5/BT94A",
+      "needsCounterprobe": true,
+      "needsPrimaryCause": true,
+      "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json",
+      "status": "bt94a-blocker"
+    }
+  },
+  "workspace": {
+    "dirty": true,
+    "headSha": "9043776509a61e6dbadf2f2ef27a2f108fc4bc46",
+    "statusShort": [
+      "M docs/bot-training/Bot_Trainingsplan.md",
+      " M docs/prozess/Dokumentationsstatus.md",
+      " M docs/referenz/ai_architecture_context.md",
+      " M docs/referenz/ai_project_onboarding.md",
+      " M docs/referenz/architektur_ausfuehrlich.md",
+      "?? python/scripts/bt93j_start_truth.py"
+    ]
+  }
+}

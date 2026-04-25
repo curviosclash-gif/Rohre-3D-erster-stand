@@ -196,7 +196,7 @@ Mikro-Claim-Regel:
 | Trainings-Adapter | `TrainingTransportFacade`, `TrainerPayloadAdapter` | Reset-/Step-/Reward-Vertrag nur konsumieren, nicht duplizieren |
 | Transport / AI-Hub | `WebSocketTrainerBridge`, `TrainingContractV1` | Bridge-V1 bleibt eingefroren; kein neuer produktiver Transportpfad |
 | Runtime-Bot-Auswahl | `ObservationBridgePolicy`, `RuntimeConfig`, `BotPolicyRegistry`, `BotPolicyTypes`, `LocalDqnInference` | bis BT95 read-only; keine produktive PPO-Umschaltung |
-| Reward / Safety / Intent | `RewardCalculator`, `HybridDecisionArchitecture` | produktive Semantik bleibt authoritative; BT93G/BT93H duerfen Trainings-Reward-/Diagnose-Semantik nur transparent schaerfen, PPO trainiert dagegen statt daran vorbei |
+| Reward / Safety / Intent | `RewardCalculator`, `HybridDecisionArchitecture` | produktive Semantik bleibt authoritative; BT93G-BT93J duerfen Trainings-Reward-/Diagnose-Semantik nur transparent schaerfen, PPO trainiert dagegen statt daran vorbei |
 | Neuer PPO-Bauort | `python/**`, `data/training/ppo/**`, optional `scripts/training-headless-bridge-smoke.mjs` | neue Arbeit nur ausserhalb des produktiven Runtime-Pfads |
 
 ## Abhaengigkeiten (Hard/Soft)
@@ -225,8 +225,9 @@ Mikro-Claim-Regel:
 | BT93F | BT93E.99 + `data/training/ppo/bt93e/handover_package.json` (`diagnose-blocked`) | hard | ja | Gezielte Startreparatur; bewies den No-Start erneut und pinnt `BT94A remains closed before 94A.1` |
 | BT93G | BT93F.99 + `data/training/ppo/bt93f/handover_package.json` (`diagnose-blocked`) + User-Replan 2026-04-25 | hard | ja | Masked Comparable Repair Lane: vergleichbarer Horizont, echtes Pre-Sampling-Masking, echte Terminal-/Death-/Reward-Semantik vor jedem BT94A-Claim |
 | BT93H | BT93G.99 (`diagnose-blocked`) + `data/training/ppo/bt93g/followup_gate_report.json` (`followupRequired=true`) + User-Intake 2026-04-25 | hard | ja | Natural-Terminal- und Survival-Reparatur vor BT94A; klaert F.05/F.19/F.27/F.31 ohne Kandidatenlauf oder Freeze |
-| BT93I | BT93H.99 (`diagnose-blocked`) + `data/training/ppo/bt93h/followup_gate_report.json` (`followupRequired=true`) + User-Intake 2026-04-25 | hard | ja | Terminal-Curriculum, Mindestepisoden und Steps-Non-Regression reparieren; Langlauf-Voraussetzungen herstellen, ohne Candidate/Freeze |
-| BT94A | BT93I.99 + `bt94a_gate_check.py` (`claimable=true`) | hard | nein | BT94A bleibt vor `94A.1` geschlossen, bis BT93I den Gate-Check gruen schreibt; Kandidatenlaeufe/Freeze bleiben vorher verboten |
+| BT93I | BT93H.99 (`diagnose-blocked`) + `data/training/ppo/bt93h/followup_gate_report.json` (`followupRequired=true`) + User-Intake 2026-04-25 | hard | ja | Terminal-Curriculum, Mindestepisoden und Steps-Non-Regression abgeschlossen; Ergebnis `diagnose-blocked-closed` mit offenen F.05/F.19/F.27/F.31 |
+| BT93J | BT93I.99 (`diagnose-blocked-closed`) + `data/training/ppo/bt93i/followup_gate_report.json` (`followupRequired=true`) + User-Intake 2026-04-25 | hard | ja | Root-Cause-Repair-Trennmesser fuer F.05/F.19/F.27/F.31 vor jedem weiteren Repair-, Pilot- oder Long-run |
+| BT94A | BT93J.99 + `bt94a_gate_check.py` (`claimable=true`) | hard | nein | BT94A bleibt vor `94A.1` geschlossen, bis BT93J den Gate-Check gruen schreibt; Kandidatenlaeufe/Freeze bleiben vorher verboten |
 | BT94B | BT94A.99 | hard | nein | Externe A/B-Evidence braucht einen eingefrorenen Kandidaten |
 | BT94B PPO-Validate | BT94A.99 + 94B.1/94B.2 feste Kandidatenmatrix | hard | nein | `94B.3` baut eine eigene PPO-Validate-Lane; BT80C `80.9.3` ersetzt diese Lane nicht |
 | BT94B `promote` | gruene PPO-Validate-Lane aus `94B.3` | hard | nein | harter Blocker fuer jedes Rollout-Signal und jeden echten BT95-Handoff |
@@ -245,8 +246,8 @@ Mikro-Claim-Regel:
 | `docs/bot-training/Bot_Trainingsplan.md`, `docs/bot-training/Bot_Survival_Training_Plan_12h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h.md`, `docs/bot-training/Bot_Survival_Training_Plan_10h_BT12.md` | BT10-BT40, BT73, BT80C, BT90-BT95 | shared | Masterplan + Detailplaene + PPO-Intake-Leiter |
 | `python/**`, `data/training/ppo/**` | BT90-BT95 | offen | neuer Sidecar-/PPO-Pfad ausserhalb der produktiven Runtime |
 | `python/scripts/**`, `python/tests/**`, `scripts/training-headless-bridge-smoke.mjs` | BT90-BT93A | offen | Boundary-Harness, Compliance-Smokes und nichtproduktive Mehr-Env-Orchestrierung |
-| `python/train.py`, `python/eval.py`, `python/configs/**`, `python/callbacks/**`, `python/requirements*.txt`, `python/envs/ppo_action_surface.py`, `python/scripts/bt93h_*.py`, `python/scripts/bt93i_*.py` | BT93B-BT93I | offen | PPO-Scaffold, echter PPO-Learner, Eval-, Resume-, Diagnose-, Reparatur- und maskierte Comparable-Lane ausserhalb der produktiven Runtime |
-| `scripts/training-headless-lane-runner.mjs`, `src/state/training/EpisodeController.js`, `src/state/training/RewardCalculator.js`, `tests/training-*.mjs` | BT93G-BT93I | offen | Enge Trainingssemantik fuer Natural-Terminal-/Death-/Reward-Rueckfuehrung; keine produktive Matchstart-, AI-Hub- oder Runtime-Umschaltung |
+| `python/train.py`, `python/eval.py`, `python/configs/**`, `python/callbacks/**`, `python/requirements*.txt`, `python/envs/ppo_action_surface.py`, `python/scripts/bt93h_*.py`, `python/scripts/bt93i_*.py`, `python/scripts/bt93j_*.py` | BT93B-BT93J | offen | PPO-Scaffold, echter PPO-Learner, Eval-, Resume-, Diagnose-, Reparatur- und maskierte Comparable-Lane ausserhalb der produktiven Runtime |
+| `scripts/training-headless-lane-runner.mjs`, `src/state/training/EpisodeController.js`, `src/state/training/RewardCalculator.js`, `tests/training-*.mjs` | BT93G-BT93J | offen | Enge Trainingssemantik fuer Natural-Terminal-/Death-/Reward-Rueckfuehrung; keine produktive Matchstart-, AI-Hub- oder Runtime-Umschaltung |
 | `src/state/HeadlessMatchKernelRuntime.js`, `src/core/MatchKernelTrainingAdapter.js`, `src/entities/ai/training/TrainingTransportFacade.js`, `src/entities/ai/training/WebSocketTrainerBridge.js`, `src/entities/ai/ObservationBridgePolicy.js`, `src/core/RuntimeConfig.js`, `src/entities/ai/BotPolicyRegistry.js`, `src/entities/ai/BotPolicyTypes.js`, `src/entities/ai/inference/LocalDqnInference.js`, `src/entities/ai/hybrid/HybridDecisionArchitecture.js`, `src/state/MatchSessionFactory.js` | BT90-BT95 | read-only | Layer-sicher konsumieren; keine produktive Runtime-, Matchstart- oder AI-Hub-Umschaltung |
 | `docs/plaene/neu/BT90_GoldStandard/**` | BT90-BT95 | referenz | Draft-, Audit- und Handoff-Material; keine aktiven Locks oder Evidence hier fuehren |
 | `data/training/**`, `output/training/**` | BT10 | shared | Laufartefakte, Logs, Serien |
@@ -275,8 +276,9 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93F | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93I | 2026-04-25 | in-bearbeitung | `93I.4` abgeschlossen; naechster Claim `93I.5`; kein Push vor Blockabschluss |
-| - | BT94A | - | frei | wartet auf `BT93I.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
+| Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.0` abgeschlossen; naechster Claim `93J.1`; kein Push vor Blockabschluss |
+| - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
 
@@ -781,8 +783,9 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93B | Minimaler PPO-Baseline-Scaffold | completed | P2 | BT93A.99 | 93B.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
-| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | active | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.5 | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
-| BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93I.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
+| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
+| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.1 | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
+| BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93J.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
 
@@ -2359,6 +2362,207 @@ Befund-Register BT93I:
 
 ---
 
+## Block BT93J: Root-Cause-Blocker-Repair
+
+Quelle:
+
+- User-Intake 2026-04-25: `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md`
+- `data/training/ppo/bt93i/closure_gate_report.json`
+- `data/training/ppo/bt93i/matrix_green_report.json`
+- `data/training/ppo/bt93i/handover_package.json`
+- `data/training/ppo/bt93i/followup_gate_report.json`
+- `data/training/ppo/bt94a/no_start_gate.json`
+- `data/training/ppo/bt93c/precomparison_report.json`
+- `data/training/ppo/bt93c/evidence_quality_matrix.json`
+
+<!-- LOCK: Bot-Codex in-bearbeitung -->
+
+Scope:
+
+- BT93J ist der enge Folgeblock nach `BT93I.99=diagnose-blocked-closed`; er liegt vor `94A.1` und darf BT94A nicht direkt claimen.
+- Ziel ist nicht ein weiterer blinder Repair-Lauf, sondern ein Root-Cause-Trennmesser fuer F.05/F.19/F.27/F.31: vor jedem Fix, Pilot oder Long-run muss eine Hauptursache plus Gegenprobe benannt sein.
+- BT93J darf Diagnose-, Mapping-, Observation-, Eval-/Matrix-, Action-/Safety-, Reward-/Curriculum- und Trainingsursachen innerhalb der Trainings-/Sidecar-Grenzen isolieren und minimal reparieren.
+- BT93J ist kein Candidate-, Freeze-, Promote-, Rollout- oder Runtime-Integrationsblock.
+- Produktive Runtime-, Matchstart-, AI-Hub-, Strategy-Flag-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Vertraege bleiben read-only. Jede echte Vertragsnotwendigkeit ist ein Stop-/Escalation-Befund, kein BT93J-Fix.
+
+Start-Wahrheit 2026-04-25:
+
+| Feld | Aktueller Wert | Quelle |
+| --- | --- | --- |
+| `claimable` | `false` | `data/training/ppo/bt94a/no_start_gate.json` |
+| `candidateRunsAllowed` | `false` | `data/training/ppo/bt94a/no_start_gate.json` |
+| `matrixDefinitionAllowed` | `false` | `data/training/ppo/bt94a/no_start_gate.json` |
+| `candidateFreezeAllowed` | `false` | `data/training/ppo/bt94a/no_start_gate.json` |
+| `precomparisonResultClass` | `ppo-regression` | `data/training/ppo/bt94a/no_start_gate.json`, `data/training/ppo/bt93c/precomparison_report.json` |
+| `bt94aBlockerCount` | `4` | `data/training/ppo/bt94a/no_start_gate.json` |
+| offene Gates | `F.05/F.19/F.27/F.31` | `data/training/ppo/bt94a/no_start_gate.json` |
+| BT93I Matrix-Urteil | `matrixVerdict=ppo-regression`, `resultClass=diagnose-blocked` | `data/training/ppo/bt93i/matrix_green_report.json` |
+
+BT93I-Matrix als Startbefund:
+
+| Metrik | Eval | Holdout | Ziel/Anker | Ergebnis |
+| --- | ---: | ---: | ---: | --- |
+| Run-ID | `20260425T153044Z-terminal-curriculum-repair-eval` | `20260425T153136Z-holdout-eval` | n/a | versioniert |
+| `completedEpisodeCount` | `15` | `8` | Eval `>=15`, Holdout `>=8` | Mindestepisoden erreicht |
+| `avgStepsPerEpisode` | `69.133333` | `71.75` | `>=117.525` | rot |
+| `averageBotSurvival` | `69.133333` | `71.75` | `>=48.590082` | gruen, aber nicht ausreichend |
+| Steps-Delta gegen DQN | `-41.175637%` | `-38.94916%` | `>=0%` | rot |
+| Survival-Delta gegen DQN | `+84.9623%` | `+91.963044%` | `>=+30%` | gruen, aber Terminal-Matrix blockiert |
+| Terminal-Matrix | `terminalDeathMatrixStartCapable=false` | `playerDeadOnlyBlocksStart=true` | startfaehig, nicht player-dead-only | rot |
+
+Harte Grenzen:
+
+- Kein BT94A-Claim, kein Kandidatenlauf, kein Freeze, kein Promote, kein Rollout-Signal.
+- Kein "weiter trainieren und hoffen"; Plan-/Docs-Gates zaehlen nicht als PPO-Beweis.
+- Keine Blocker-Downgrades ohne Artefakt- und Gate-Beweis.
+- Keine produktive Runtime-, Matchstart-, AI-Hub-, Strategy-, Registry-, Rollback-, Rollout-, Authority- oder Bridge-Aenderung.
+- Wenn eine Contract-Aenderung noetig erscheint: stoppen, Befundbericht schreiben, User benachrichtigen und separate user-owned Intake-/Freigabe verlangen.
+
+Primaerer Scope:
+
+- `data/training/ppo/bt93j/**`
+- `python/scripts/bt93j_*.py`
+- `python/configs/ppo_bt93j*.json`
+- `python/eval.py` nur fuer Diagnose-/Report-Erweiterungen, wenn BT93J.0 bis BT93J.4 die Notwendigkeit belegen.
+- `python/train.py` nur fuer Micro-/Pilot-/Long-run-Gates nach gruener Readiness, nicht fuer Kandidatenlaeufe.
+- `python/envs/**`, `python/callbacks/**`, `scripts/training-headless-lane-runner.mjs`, `src/state/training/EpisodeController.js`, `src/state/training/RewardCalculator.js` nur bei belegtem Observation-, Action-, Reward- oder Terminal-Root-Cause.
+- `tests/training-*.mjs`, `python/tests/**` fuer gezielte Diagnose-/Report-Smokes.
+
+Read-only/No-Go:
+
+- `docs/Umsetzungsplan.md`
+- Produktive JS-Inference-, Registry-, Strategy-Flag-, RuntimeConfig-, Matchstart-, AI-Hub-, Rollback- und Rollout-Surfaces.
+- AI-Hub-/Bridge-/Authority-Vertraege, produktive Runtime-Vertraege und alle Dateien, die operative Bot-Auswahl oder Matchstart-Semantik veraendern wuerden.
+
+Pflicht-Artefakte und Script-Vertraege:
+
+| Artefakt | Zweck |
+| --- | --- |
+| `data/training/ppo/bt93j/start_truth.json` | aktuelle Gate-Lage, Artefakt-Pinning, Scope- und No-Go-Regeln |
+| `data/training/ppo/bt93j/diagnostic_split_report.json` | Trennmesser vor jedem Fix, Repair-Lauf, Pilot oder Long-run |
+| `data/training/ppo/bt93j/causal_chain_register.json` | Symptom, Regel, Codepfad, Hypothese, Gegenbeweis und Erfolgskriterium je Blocker |
+| `data/training/ppo/bt93j/observation_integrity_report.json` | Schema-, Range-, Staleness-, Sync- und VecNormalize-Audit |
+| `data/training/ppo/bt93j/terminal_semantics_report.json` | Death-/Natural-Terminal-/Max-Steps-/Timeout-/Failure-Semantik in Headless und Python |
+| `data/training/ppo/bt93j/matrix_contract_report.json` | Eval-/Holdout-Matrix, Mindestepisoden, DQN-Anker und Klassifizierungsregeln |
+| `data/training/ppo/bt93j/action_policy_diagnostics.json` | Pre-Sampling-Action, Mask, Clamp, Veto, Sanitizer und final ausgefuehrte Action |
+| `data/training/ppo/bt93j/reward_curriculum_diagnostics.json` | Reward-Breakdown gegen Episode-Length, Death-Cause, Risk-Actions und Lernmetriken |
+| `data/training/ppo/bt93j/r*_micro_test_report.json` | minimale Repair-Runden mit Entscheidung `green`, `same-red`, `new-red` oder `inconclusive` |
+| `data/training/ppo/bt93j/pilot_readiness_report.json` | Freigabe oder Blocker fuer Pilot/Long-run |
+| `data/training/ppo/bt93j/holdout_guard_report.json` | Holdout-Seeds, Modellhash, Optimizer-Step und No-post-holdout-Optimization |
+| `data/training/ppo/bt93j/long_run_readiness_report.json` | Budget, Early-Stops, Checkpoints und rote Stop-Regeln |
+
+Befund-Register BT93J:
+
+| ID | Status | BT93J-Behandlung |
+| --- | --- | --- |
+| `F.05` | `bt94a-blocker` | Steps-Regression und Survival-First mit Root-Cause-Trennmesser klaeren; Eval/Holdout muessen `avgStepsPerEpisode >=117.525` und `averageBotSurvival >=48.590082` erreichen. |
+| `F.19` | `bt94a-blocker` | Terminal-/Death-Matrix startfaehig machen oder Root-Cause beweisen; `player-dead-only` bleibt rot. |
+| `F.27` | `bt94a-blocker` | `ppo-regression` als Aggregat aus F.05/F.19/F.31 behandeln, bis Rohinputs anderes beweisen. |
+| `F.31` | `bt94a-blocker` | Nicht-toedliche Natural-Terminal-Evidence in echter Eval/Holdout-Matrix beweisen oder mit Rohdaten nicht-blockierend begruenden. |
+| `G.01-G.08`, `C.01-C.04` | still-blocking | `no_start_gate.json` bleibt Startwahrheit; BT93J darf nur bei gruenen Artefakten refreshen. |
+| alle anderen `F.*` | closed-carried oder follow-gated | nicht neu oeffnen; bei Drift als neuer Blocker sichtbar machen. |
+
+Closure-Evidence je Blocker:
+
+| Blocker | Darf schliessen, wenn | Darf nicht schliessen, wenn |
+| --- | --- | --- |
+| `F.05` | Eval und Holdout `avgStepsPerEpisode >=117.525`, `averageBotSurvival >=48.590082`, Terminal-Matrix startfaehig, Observation/Eval-Matrix nicht invalid, Holdout-Schutz gruen. | Nur `averageBotSurvival` gruen ist, Steps rot bleiben, Terminal-Matrix `player-dead-only` ist oder Vergleichsinputs invalid sind. |
+| `F.19` | Headless und Python trennen `player-dead`, nicht-toedliches Natural-Terminal, `max-steps`, forced round, timeout und runtime failure; echte Eval/Holdout-Matrix startfaehig. | Nur Provocation gruen ist, echte Eval/Holdout aber weiterhin `player-dead-only` oder Mapping-Diff offen ist. |
+| `F.27` | `precomparison_report.resultClass != ppo-regression`, `handover.ready=true`, `no_start_gate` gruen, F.05/F.19/F.31 geschlossen oder nicht blockierend belegt. | F.05, F.19 oder F.31 rot bleiben; oder Comparator nur per Plantext umgedeutet wurde. |
+| `F.31` | Echte Eval und Holdout nicht-toedliche Natural-Terminals sehen oder Matrix-Regel mit Rohdaten beweist, dass F.31 nicht mehr BT94A-blockierend ist. | Nur `player-dead` oder nur `max-steps` sichtbar ist, oder Provocation und echte Eval unterschiedliche Semantikfenster nutzen. |
+
+### Definition of Done (DoD)
+
+- [x] DoD.1 BT93J schreibt `start_truth.json` mit aktueller Gate-Lage, Artefakt-Pinning, Scope-Files, No-Go-Regeln und Workspace-SHA. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/start_truth.json`)
+- [ ] DoD.2 Vor jedem Fix, Repair-Lauf, Pilot oder Long-run liegt ein `diagnostic_split_report.json` mit Hauptursache, Gegenprobe und `readyForRepair`/`readyForTraining` vor.
+- [ ] DoD.3 F.05/F.19/F.27/F.31 werden nur mit versionierter Diagnose-, Run-, Eval-/Holdout- oder Gate-Evidence geschlossen, downgraded oder als Folgeblocker weitergegeben.
+- [ ] DoD.4 Observation-, Terminal-/Mapping-, Eval-/Matrix-, Action-/Safety- und Reward-/Curriculum-Ursachen sind getrennt bewertet; Reparaturreihenfolge ist dokumentiert.
+- [ ] DoD.5 Jeder Repair ist minimal, adressiert genau eine primaere Hypothese und endet mit Micro-Test oder Diagnose-Reanalyse.
+- [ ] DoD.6 Pilot, Holdout und Long-run starten nur nach gruener Readiness und aktivem Holdout-Schutz; kein Candidate-, Freeze-, Promote- oder Rollout-Label wird verwendet.
+- [ ] DoD.7 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` werden nur aus BT93J-Artefakten refreshed.
+- [ ] DoD.8 BT94A oeffnet nur, wenn `no_start_gate.json` nach BT93J `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreibt.
+- [ ] DoD.9 Produktive Runtime-, Matchstart-, AI-Hub-, Strategy-Flag-, Registry-, Rollback-, Rollout-, Authority- und Bridge-Surfaces bleiben unveraendert.
+- [ ] DoD.10 Abschluss-Gates `npm run plan:check`, `npm run docs:sync`, `npm run docs:check` und `npm run build` sind PASS oder als Blocker dokumentiert; diese Gates zaehlen nicht als PPO-Beweis.
+
+### 93J.0 Start-Wahrheit und Diagnose-Trennmesser
+
+- [x] 93J.0.1 BT93I-Closure, BT93I-Matrix, BT94A-No-Start-Gate und BT93C-Precomparison in `data/training/ppo/bt93j/start_truth.json` zusammenfuehren. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/start_truth.json`)
+- [x] 93J.0.2 Gepinnte Artefakte mit Pfad, SHA-256, Run-ID, Matrix-ID, Artefakt-Git-SHA und aktueller Workspace-SHA referenzieren. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/start_truth.json`)
+- [x] 93J.0.3 `data/training/ppo/bt93j/diagnostic_split_report.json` schreiben; `readyForRepair=false`, bis mindestens eine Hauptursache plus Gegenprobe benannt ist. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
+- [x] 93J.0.4 `readyForTraining=false`, bis Observation-, Terminal-/Mapping-, Eval-/Matrix-, Action-/Safety-, Reward-/Curriculum- und Training-Gates gruen oder als nicht ursachlich belegt sind. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
+- [x] 93J.0.5 Reparaturreihenfolge pinnen: Observation, Terminal-/Mapping, Eval-/Matrix, Action-/Safety, Reward/Curriculum, Training/Pilot. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
+
+### 93J.1 Kausalketten und Observation-Integrity
+
+- [ ] 93J.1.1 `causal_chain_register.json` schreiben: Symptom, Regel, Artefakt, Codepfad, Hypothese, Gegenbeweis und Erfolgskriterium je F.05/F.19/F.27/F.31.
+- [ ] 93J.1.2 F.27 maschinenlesbar als Aggregat fuehren, solange F.05, F.19 oder F.31 rot sind.
+- [ ] 93J.1.3 `observation_integrity_report.json` fuer Train, Eval, Holdout und Resume schreiben: Schema, Reihenfolge, Shape, Datentypen, Ranges, Staleness, Sync und VecNormalize.
+- [ ] 93J.1.4 Bei roter Observation-Integritaet nur Observation-Fix erlauben; danach 93J.0 Trennmesser erneut ausfuehren.
+
+### 93J.2 Terminal-, Death- und Matrix-Vertrag
+
+- [ ] 93J.2.1 `terminal_semantics_report.json` fuer `player-dead`, nicht-toedliches Natural-Terminal, `max-steps`, forced round, timeout und runtime failure schreiben.
+- [ ] 93J.2.2 Headless- und Python-Eval-Felder paritaetisch pruefen: `terminalReason`, `naturalTerminal`, `deathCause`, `maxSteps`, `forcedRound`, `timeout`, `runtimeFailure`.
+- [ ] 93J.2.3 Oracle-/scripted-safe Policy gegen echte Eval-Konfiguration laufen lassen, um Policy-Verhalten von Mapping-/Matrixfehlern zu trennen.
+- [ ] 93J.2.4 `matrix_contract_report.json` schreiben: Mindestepisoden, Seeds, Maps, Modi, `maxSteps`, DQN-Anker, Semantikfenster und Regeln fuer Death, Natural-Terminal, Max-Steps und Runtime-Failures.
+
+### 93J.3 Action-, Safety-, Reward- und Curriculum-Diagnose
+
+- [ ] 93J.3.1 `action_policy_diagnostics.json` schreiben: Pre-Sampling-Action, Maske, Clamp, Veto, Sanitizer und final ausgefuehrte Action pro Step diffbar.
+- [ ] 93J.3.2 Readiness-Schwellen pruefen: `invalidActionRate=0`, `sanitizerRate=0`, `preSamplingMaskRate=1.0` oder gleichwertig, `postDecodeClampRate=0`, `vetoRate <0.25`.
+- [ ] 93J.3.3 `reward_curriculum_diagnostics.json` schreiben: Reward-Breakdown gegen Episode-Length, Death-Cause, Terminal-Klasse, Risk-Actions, Progress, KL, Entropy, Value-Loss und Grad-Norm.
+- [ ] 93J.3.4 Reward-Hacking oder Curriculum-Collapse blockiert Pilot/Long-run; Repair-Hebel werden definiert, aber erst nach gruener Diagnose umgesetzt.
+
+### 93J.4 Minimal-Repair und Micro-Test
+
+- [ ] 93J.4.1 R1 startet nur, wenn `diagnostic_split_report.json` genau eine primaere Hauptursache und Gegenprobe nennt.
+- [ ] 93J.4.2 R1 adressiert genau diese Ursache mit kleiner Aenderung, erwarteter Wirkung und passendem Smoke- oder Diagnose-Test.
+- [ ] 93J.4.3 `r1_micro_test_report.json` schreibt `green`, `same-red`, `new-red` oder `inconclusive`; bei rot oder unklar kein Pilot und keine Erweiterung.
+- [ ] 93J.4.4 Wenn R1 die Ursache widerlegt oder neue rote Symptome erzeugt, Kausalkette aktualisieren und 93J.0 erneut ausfuehren.
+
+### 93J.5 Iterativer Diagnose-Repair-Test-Loop und Pilot-Readiness
+
+- [ ] 93J.5.1 Weitere Runden R2/R3 nur mit neuer oder praezisierter Hypothese, aktualisiertem `diagnostic_split_report.json` und neuer Evidence starten.
+- [ ] 93J.5.2 Jede Iteration endet mit `cause-confirmed`, `cause-refuted`, `new-cause` oder `measurement-invalid`; nach drei roten Runden ohne Metrikverbesserung eskalieren.
+- [ ] 93J.5.3 `pilot_readiness_report.json` schreiben; Pilot nur bei gruener Observation, startfaehiger Terminal-Matrix, `runtimeErrorCount=0`, Action-Schwellen und Micro-Test-Trendverbesserung.
+- [ ] 93J.5.4 `readyForTraining=false` blockiert Pilot, Holdout und Long-run.
+
+### 93J.6 Pilot, Holdout-Schutz und Vergleich
+
+- [ ] 93J.6.1 Begrenzten Pilot nur mit `run-kind=bt93j-pilot-repair` oder engerem Namen ausfuehren; niemals `candidate`, `freeze`, `promote` oder `rollout-ready`.
+- [ ] 93J.6.2 `pilot_report.json` klassifiziert `green`, `same-red`, `new-red` oder `inconclusive`; bei rot oder unklar Ruecksprung zur Diagnosephase.
+- [ ] 93J.6.3 Holdout erst nach gruener Eval nutzen; `holdout_guard_report.json` nennt Run-IDs, Seeds, Modellhash, Optimizer-Step und Optimizer-State-Hash vor/nach Holdout.
+- [ ] 93J.6.4 F.05 und F.27 nur schliessen, wenn Steps-/Survival-Regeln gegen DQN erfuellt sind und F.19/F.31 nicht mehr rot sind.
+
+### 93J.7 Long-run-Readiness, laengerer Lauf und Gate-Refresh
+
+- [ ] 93J.7.1 `long_run_readiness_report.json` schreiben; Long-run nur bei gruenen F.19/F.31, Trendverbesserung fuer F.05/F.27, gruenen Diagnoseberichten und aktiven Early-Stops.
+- [ ] 93J.7.2 Laengerer Lauf bleibt Repair-Arbeit: kein Candidate, kein Freeze, kein Promote; Early-Stop bei Regression, Terminal-Matrix-Fehler, Reward-Hacking, Runtime-Fehlern, Observation-Drift oder Action-Safety-Regression.
+- [ ] 93J.7.3 Nach Lauf Eval-Refresh schreiben; Holdout nur bei gruener Eval und aktivem Holdout-Schutz.
+- [ ] 93J.7.4 Gate-Refresh aus BT93J-Artefakten schreiben: `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json`.
+
+### 93J.99 Abschluss-Gate
+
+- [ ] 93J.99.1 Alle Phasen 93J.0 bis 93J.7 sind mit versionierter Evidence dokumentiert.
+- [ ] 93J.99.2 F.05/F.19/F.27/F.31 sind geschlossen oder nachweislich nicht mehr BT94A-blockierend; andernfalls Ergebnis `diagnose-loop-required` oder `diagnose-blocked-escalation`.
+- [ ] 93J.99.3 `data/training/ppo/bt94a/no_start_gate.json` ist gruen fuer BT94A-Start oder pinnt unverfaelscht `claimable=false` mit Folgegate; keine `94A.*`-Checkbox wird bei rotem Gate geschlossen.
+- [ ] 93J.99.4 Kein Ergebnis heisst `promote`, `rollout-ready`, `freeze-candidate` oder `BT94B-ready`.
+- [ ] 93J.99.5 Governance-Gates sind gruen oder als Blocker dokumentiert; Plan-/Docs-Gates werden nicht als PPO-Beweis verwendet.
+
+### Risiko-Register BT93J
+
+| Risiko | Severity | Owner | Mitigation | Trigger |
+| --- | --- | --- | --- | --- |
+| Repair wiederholt Training ohne Root Cause | kritisch | RL/Governance | 93J.0 blockiert Repair/Training bis Hauptursache und Gegenprobe vorliegen | `readyForRepair=false`, aber Fix/Lauf wird geplant |
+| Observation-Drift verfaelscht Steps | kritisch | RL/QA | 93J.1 vor Terminal-/Reward-/Training-Fixes | Stale/null/konstante/out-of-range Werte oder VecNormalize-Drift |
+| Terminal-Provocation ersetzt echte Eval | hoch | QA/RL | 93J.2 fordert Provocation plus echte Eval/Holdout-Matrix | Provocation gruen, echte Eval `player-dead-only` |
+| F.27 wird als Einzelbug behandelt | hoch | Governance | F.27 bleibt Aggregat, bis F.05/F.19/F.31 gruen oder Comparator-Bug isoliert ist | `precomparison` wird ohne Rohinput-Beweis umgedeutet |
+| Reward-Hacking kaschiert rote Steps | hoch | RL/QA | 93J.3 korreliert Reward mit Steps, Death-Cause und Terminal-Klasse | Reward steigt, Steps/Terminal bleiben rot |
+| Holdout wird entwertet | hoch | Governance/RL | 93J.6 erzwingt No-Optimization nach Holdout | Training auf gleichen Holdout-Seeds nach Holdout |
+| Produktive Runtime wird versehentlich beruehrt | kritisch | Architektur/Governance | Scope-Files und No-Go-Liste sind Gate-Bestandteil | Matchstart-, AI-Hub-, Registry-, JS-Inference- oder Rollout-Datei wird geaendert |
+
+---
+
 ## Block BT94A: Candidate Freeze und Ablationen
 
 Quelle: `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md`
@@ -2374,17 +2578,17 @@ Scope:
 
 Claim-Grenze vor BT94A:
 
-- `BT94A` ist nur claimbar, wenn `BT93I.99` `BT94A-ready` liefert und `data/training/ppo/bt94a/no_start_gate.json` nach erneutem Gate-Check `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `summary.bt94a-blocker=0` bzw. `bt93cState.bt94aBlockerCount=0` schreibt.
-- `BT93D.99=diagnose-blocked`, `BT93E.99=diagnose-blocked`, `BT93F.99=diagnose-blocked`, `BT93G.99=diagnose-blocked` und `BT93H.99=diagnose-blocked` sind keine Startsignale mehr, sondern der Grund fuer den vorgeschalteten Reparaturblock `BT93I`.
+- `BT94A` ist nur claimbar, wenn `BT93J.99` `BT94A-ready` liefert und `data/training/ppo/bt94a/no_start_gate.json` nach erneutem Gate-Check `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `bt94aHandover.ready=true`, `precomparison != ppo-regression` und `summary.bt94a-blocker=0` bzw. `bt93cState.bt94aBlockerCount=0` schreibt.
+- `BT93D.99=diagnose-blocked`, `BT93E.99=diagnose-blocked`, `BT93F.99=diagnose-blocked`, `BT93G.99=diagnose-blocked`, `BT93H.99=diagnose-blocked` und `BT93I.99=diagnose-blocked-closed` sind keine Startsignale mehr, sondern der Grund fuer den vorgeschalteten Root-Cause-Reparaturblock `BT93J`.
 - `BT94A` ist nur claimbar, wenn `BT93C` ein echtes Baseline-Paket unter `data/training/ppo/**`, ein echtes PPO-Modell, Normalize-/Optimizer-State, Lernmetriken und eine feste Vergleichs-/Holdout-Matrix geliefert hat.
 - Wenn `BT93C` mit `diagnose`, `throughput insufficient`, Action-Surface-Blocker oder Reward-/Safety-Unklarheit endet, bleibt `BT94A` geschlossen.
-- Wenn der BT93C-/BT93D-/BT93E-/BT93F-/BT93G-/BT93H-/BT93I-Vorvergleich BT73-Intent-/Recovery-Restschuld, fehlende PPO-Validate-Lane, V101-Drift oder JS-Integration-Luecken ausweist, muss BT94A diese Punkte im Freeze-Report sichtbar weiterfuehren.
-- Wenn `BT93I.99` offene Audit-Befunde ohne Folgegate enthaelt, startet BT94A nicht; offene Restschuld muss blockierend oder nicht-blockierend begruendet sein.
+- Wenn der BT93C-/BT93D-/BT93E-/BT93F-/BT93G-/BT93H-/BT93I-/BT93J-Vorvergleich BT73-Intent-/Recovery-Restschuld, fehlende PPO-Validate-Lane, V101-Drift oder JS-Integration-Luecken ausweist, muss BT94A diese Punkte im Freeze-Report sichtbar weiterfuehren.
+- Wenn `BT93J.99` offene Audit-Befunde ohne Folgegate enthaelt, startet BT94A nicht; offene Restschuld muss blockierend oder nicht-blockierend begruendet sein.
 
 Startstatus 2026-04-25:
 
 - `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`, Blocker `F.05/F.19/F.27/F.31`))
-- Naechster erlaubter Trainingsclaim vor BT94A ist `BT93I.1`; keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+- Naechster erlaubter Trainingsclaim vor BT94A ist `BT93J.0`; keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
 
 ### Definition of Done (DoD)
 
@@ -2627,8 +2831,9 @@ Rollout-Intake-Pflichtpaket:
 | 11 | `BT93F-Startreparatur` abgeschlossen: `93F.1` bis `93F.99` enden `diagnose-blocked`; kein BT94A-Claim. | `BT93E.99=diagnose-blocked`; `no_start_gate.json` meldet `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=5`. | `data/training/ppo/bt93f/handover_package.json` und `data/training/ppo/bt94a/no_start_gate.json` pinnen `BT94A remains closed before 94A.1`; naechster Trainingsclaim braucht User-Replan oder engere Folge-Reparatur. |
 | 12 | `BT93G-Masked-Comparable-Repair` abgeschlossen: `93G.1` bis `93G.99`, keine BT94A-Kandidaten und kein Freeze. | `BT93F.99=diagnose-blocked`; Root-Causes waren Vergleichshorizont, fehlendes Pre-Sampling-Masking, Terminal-/Death-/Reward-Semantik und untertrainierter PPO. | `data/training/ppo/bt93g/handover_package.json` meldet `resultClass=diagnose-blocked`; `no_start_gate.json` bleibt rot mit `bt94aBlockerCount=4`; naechster Trainingsclaim braucht User-Replan oder engeren Folgeblock. |
 | 13 | `BT93H-Natural-Terminal-Survival-Reparatur` abgeschlossen: `93H.1` bis `93H.99`, keine BT94A-Kandidaten und kein Freeze. | `BT93G.99=diagnose-blocked`; `followup_gate_report.json` meldete `followupRequired=true`; offen waren F.05/F.19/F.27/F.31. | Ergebnis `diagnose-blocked`; `data/training/ppo/bt93h/followup_gate_report.json` meldet `followupRequired=true`, `data/training/ppo/bt94a/no_start_gate.json` bleibt `claimable=false`. |
-| 14 | `BT93I-Terminal-Curriculum-Steps-Repair` claimen: `93I.1` bis maximal `93I.2` zuerst; notwendige Runner-/Script-Reparaturen sind erlaubt, aber kein Langlauf vor gruener Readiness. | `BT93H.99=diagnose-blocked`; `followup_gate_report.json` meldet `followupRequired=true`; offen sind F.05/F.19/F.27/F.31. | Matrix-Truth, Terminal-Provocation, episode-targeted Eval/Holdout und Long-run-Readiness; Ergebnis `longRunAllowed=true` oder `diagnose-blocked`. |
-| 15 | Erst bei `BT93I.99=BT94A-ready`: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3`. |
+| 14 | `BT93I-Terminal-Curriculum-Steps-Repair` abgeschlossen: `93I.1` bis `93I.99`, keine BT94A-Kandidaten und kein Freeze. | `BT93H.99=diagnose-blocked`; `followup_gate_report.json` meldete `followupRequired=true`; offen waren F.05/F.19/F.27/F.31. | Ergebnis `diagnose-blocked-closed`; `no_start_gate.json` bleibt rot mit `bt94aBlockerCount=4`; naechster Trainingsclaim ist der engere Root-Cause-Repair `BT93J`. |
+| 15 | `BT93J-Root-Cause-Blocker-Repair` claimen: zuerst `93J.0` und `93J.1`; kein Fix, Pilot oder Long-run ohne Diagnose-Trennmesser und Gegenprobe. | `BT93I.99=diagnose-blocked-closed`; `followup_gate_report.json` meldet `followupRequired=true`; offen sind F.05/F.19/F.27/F.31. | Start-Wahrheit, Kausalkettenregister, Observation-/Terminal-/Matrix-/Action-/Reward-Trennmesser und minimaler Repair-Loop; Ergebnis `BT94A-ready`, `diagnose-loop-required` oder `diagnose-blocked-escalation`. |
+| 16 | Erst bei `BT93J.99=BT94A-ready`: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3`. |
 
 No-Go vor Bot-Training:
 
@@ -2636,8 +2841,8 @@ No-Go vor Bot-Training:
 - Kein `4-Env`, solange keine direkte 4-Env-Evidence vorliegt.
 - Keine Rollout- oder JS-Runtime-Integration vor BT95 plus separatem Rollout-Block.
 - Kein `promote`, solange die PPO-Validate-Lane aus `94B.3` nicht gruen ist; BT80C `80.9.3` ersetzt diese Evidence nicht.
-- Kein BT94A-Start, solange BT93I.99 nicht `BT94A-ready` ist und `data/training/ppo/bt94a/no_start_gate.json` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true` und `precomparison != ppo-regression` schreibt.
-- Kein BT94A-Kandidatenlauf, kein Freeze-Kandidat und kein BT94B-Handover innerhalb BT93D, BT93E, BT93F, BT93G, BT93H oder BT93I.
+- Kein BT94A-Start, solange BT93J.99 nicht `BT94A-ready` ist und `data/training/ppo/bt94a/no_start_gate.json` nicht `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true` und `precomparison != ppo-regression` schreibt.
+- Kein BT94A-Kandidatenlauf, kein Freeze-Kandidat und kein BT94B-Handover innerhalb BT93D, BT93E, BT93F, BT93G, BT93H, BT93I oder BT93J.
 - Kein alter `data/bot_validation_report.json`, kein `plan:check`, kein Throughput-Report und kein Scaffold-Artefakt darf als PPO-Survival-Beweis verwendet werden.
 
 ## Backlog (priorisiert)
