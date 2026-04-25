@@ -266,7 +266,7 @@ Mikro-Claim-Regel:
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93E | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
-| Bot-Codex | BT93F | 2026-04-25 | active | 93F.1 abgeschlossen; 93F.2 offen |
+| Bot-Codex | BT93F | 2026-04-25 | active | 93F.3 abgeschlossen; 93F.4 offen |
 | - | BT94A | - | frei | wartet auf `BT93F.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1677,10 +1677,10 @@ Startkriterien fuer `BT94A.1` nach BT93F:
 
 ### 93F.3 Policy-Level-Mask und Action-Surface reparieren
 
-- [ ] 93F.3.1 Entscheiden und implementieren, wie Policy-Level-Maskierung im SB3-Pfad trainierbar wird: bevorzugt echtes Masking vor Policy-Sampling; falls technisch nicht moeglich, enger Folgeblocker statt Startfreigabe.
-- [ ] 93F.3.2 Mask-Quelle festlegen und reporten: Inventory-Laenge und erlaubte Index-Aktionen muessen aus dem JS-autoritativen Transition-Payload kommen und in Train/Eval/Holdout gleich benannt sein.
-- [ ] 93F.3.3 Post-Decode-Clamp, Safety-Veto, Sanitizer, Invalid-Action und No-Op/Fallback getrennt messen; `policy-mask` darf nicht mit `post-decode-clamp` vermischt werden.
-- [ ] 93F.3.4 Action-Surface-Smoke erweitern: SB3-Trainierbarkeit, Mask-Quelle, Index-Encoding, Forced-Invalid, Forced-Noop, Forced-Veto und Fallback-Semantik muessen versioniert belegt sein.
+- [x] 93F.3.1 Entscheiden und implementieren, wie Policy-Level-Maskierung im SB3-Pfad trainierbar wird: bevorzugt echtes Masking vor Policy-Sampling; falls technisch nicht moeglich, enger Folgeblocker statt Startfreigabe. (abgeschlossen: 2026-04-25; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\scripts\bt93f_action_surface_repair_report.py --write-smoke --write-report` -> `data\training\ppo\bt93f\action_surface_repair_report.json` (`policyLevelMaskDecision.decision=follow-blocker`, `maskSpecified=true`, `stack.sb3ContribImportable=false`, commit `62f247c`))
+- [x] 93F.3.2 Mask-Quelle festlegen und reporten: Inventory-Laenge und erlaubte Index-Aktionen muessen aus dem JS-autoritativen Transition-Payload kommen und in Train/Eval/Holdout gleich benannt sein. (abgeschlossen: 2026-04-25; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\scripts\bt93f_action_surface_repair_report.py --write-smoke --write-report` -> `data\training\ppo\bt93f\action_surface_repair_report.json` (`maskSourceContract.source=info.match.inventoryLength from the JS-authoritative transition payload`, `sameNameInTrainEvalHoldout=true`, commit `62f247c`))
+- [x] 93F.3.3 Post-Decode-Clamp, Safety-Veto, Sanitizer, Invalid-Action und No-Op/Fallback getrennt messen; `policy-mask` darf nicht mit `post-decode-clamp` vermischt werden. (abgeschlossen: 2026-04-25; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\scripts\bt93f_action_surface_repair_report.py --write-smoke --write-report` -> `data\training\ppo\bt93f\action_surface_repair_report.json` (`telemetrySeparation.policyMaskAndPostDecodeClampMustNotBeMixed=true`, `findingDisposition.F.30=still-blocking`, commit `62f247c`))
+- [x] 93F.3.4 Action-Surface-Smoke erweitern: SB3-Trainierbarkeit, Mask-Quelle, Index-Encoding, Forced-Invalid, Forced-Noop, Forced-Veto und Fallback-Semantik muessen versioniert belegt sein. (abgeschlossen: 2026-04-25; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\scripts\bt93f_action_surface_repair_report.py --write-smoke --write-report` -> `data\training\ppo\bt93f\action_surface_smoke_93f3.json` (`sb3CompatibleActionSpace=true`, `policyMaskSourceFromJsTransitionPayload=true`, `forcedInvalidFallbackTelemetryVisible=true`, `forcedNoopFallbackTelemetryVisible=true`, `forcedVetoTelemetryVisible=true`, commit `62f247c`))
 
 ### 93F.4 Kleine Reparatur-Learner- und Same-Matrix-Eval-Lane
 
