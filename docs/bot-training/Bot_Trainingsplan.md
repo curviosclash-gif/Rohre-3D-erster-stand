@@ -275,7 +275,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93F | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93I | 2026-04-25 | in-bearbeitung | `93I.1` abgeschlossen; naechster Claim `93I.2`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93I | 2026-04-25 | in-bearbeitung | `93I.2` abgeschlossen; naechster Claim `93I.3`; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93I.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -781,7 +781,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93B | Minimaler PPO-Baseline-Scaffold | completed | P2 | BT93A.99 | 93B.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
-| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | active | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.2 | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
+| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | active | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.3 | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93I.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2313,10 +2313,10 @@ Befund-Register BT93I:
 
 ### 93I.2 Long-run-Readiness und Early-Stop
 
-- [ ] 93I.2.1 Eval-/Holdout-Runner oder Konfiguration so vorbereiten, dass Mindestepisoden, nicht nur fixe `eval-steps`, als Gate-Evidence geschrieben werden; notwendige Implementierungsarbeit an `python/eval.py`, `python/scripts/bt93i_*.py` oder trainingsnaher Headless-Lane ist in dieser Phase erlaubt.
-- [ ] 93I.2.2 Long-run-Budget pinnen: Smoke `2048`, Erweiterungsinkrement `4096`, maximal `32768` Timesteps oder `14400s`, 2-Env solange 4-Env-Evidence fehlt, Checkpoint-Frequenz, Eval-Intervalle, Seeds, Maps und `maxStepsPerEpisode`.
-- [ ] 93I.2.3 Early-Stop-Regeln fixieren: Runtime-Fehler, leere Terminal-Matrix, Steps-Regression, Reward-Hacking, Collapse-Metriken, fehlende Pre-Sampling-Mask oder hohe Clamp-/Veto-Last stoppen.
-- [ ] 93I.2.4 `data/training/ppo/bt93i/long_run_readiness_report.json` schreiben; `longRunAllowed=true` nur, wenn alle Vorbedingungen gruen sind.
+- [x] 93I.2.1 Eval-/Holdout-Runner oder Konfiguration so vorbereiten, dass Mindestepisoden, nicht nur fixe `eval-steps`, als Gate-Evidence geschrieben werden; notwendige Implementierungsarbeit an `python/eval.py`, `python/scripts/bt93i_*.py` oder trainingsnaher Headless-Lane ist in dieser Phase erlaubt. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_long_run_readiness.py --write-report` -> `data/training/ppo/bt93i/long_run_readiness_report.json`, commit `0f34d2f`)
+- [x] 93I.2.2 Long-run-Budget pinnen: Smoke `2048`, Erweiterungsinkrement `4096`, maximal `32768` Timesteps oder `14400s`, 2-Env solange 4-Env-Evidence fehlt, Checkpoint-Frequenz, Eval-Intervalle, Seeds, Maps und `maxStepsPerEpisode`. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_long_run_readiness.py --write-report` -> `data/training/ppo/bt93i/long_run_readiness_report.json`, commit `0f34d2f`)
+- [x] 93I.2.3 Early-Stop-Regeln fixieren: Runtime-Fehler, leere Terminal-Matrix, Steps-Regression, Reward-Hacking, Collapse-Metriken, fehlende Pre-Sampling-Mask oder hohe Clamp-/Veto-Last stoppen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_long_run_readiness.py --write-report` -> `data/training/ppo/bt93i/long_run_readiness_report.json`, commit `0f34d2f`)
+- [x] 93I.2.4 `data/training/ppo/bt93i/long_run_readiness_report.json` schreiben; `longRunAllowed=true` nur, wenn alle Vorbedingungen gruen sind. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_long_run_readiness.py --write-report` -> `data/training/ppo/bt93i/long_run_readiness_report.json` (`longRunAllowed=true`), commit `0f34d2f`)
 
 ### 93I.3 Terminal-Curriculum-Repair ausfuehren
 
