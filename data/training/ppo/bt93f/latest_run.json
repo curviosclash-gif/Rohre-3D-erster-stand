@@ -1,0 +1,10 @@
+{
+  "runId": "20260425T082419Z-repair-diagnostic",
+  "runKind": "repair-diagnostic",
+  "ok": true,
+  "report": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/training_report.json",
+  "artifactManifest": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/artifact_manifest.json",
+  "model": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/model.zip",
+  "vecnormalize": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/vecnormalize.pkl",
+  "optimizerState": "data/training/ppo/bt93f/runs/20260425T082419Z-repair-diagnostic/checkpoints/optimizer_state.pt"
+}

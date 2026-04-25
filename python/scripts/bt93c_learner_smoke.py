@@ -111,12 +111,19 @@ def _git_sha() -> str:
 def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
     resolved = (config_path or DEFAULT_CONFIG).resolve()
     config = _read_json(resolved)
-    if config.get("blockId") != "BT93C" or config.get("phaseId") not in {"93C.3", "93C.4", "93C.5"}:
-        raise RuntimeError(f"BT93C learner config has wrong scope: {_rel(resolved)}")
+    allowed_scopes = {
+        "BT93C": {"93C.3", "93C.4", "93C.5"},
+        "BT93F": {"93F.4"},
+    }
+    block_id = str(config.get("blockId") or "")
+    if block_id not in allowed_scopes or config.get("phaseId") not in allowed_scopes[block_id]:
+        raise RuntimeError(f"PPO learner config has wrong scope: {_rel(resolved)}")
     return resolved, config
 
 
 def _run_sample_class(run_kind: str) -> str:
+    if run_kind == "repair-diagnostic":
+        return "repair-diagnostic-not-candidate"
     if run_kind.startswith("baseline-"):
         return "conservative-baseline-not-promotion"
     if run_kind.startswith("pilot-"):
@@ -127,7 +134,7 @@ def _run_sample_class(run_kind: str) -> str:
 
 
 def _is_diagnostic_run(run_kind: str) -> bool:
-    return run_kind.startswith("diagnostics-")
+    return run_kind.startswith("diagnostics-") or run_kind == "repair-diagnostic"
 
 
 def _is_pilot_run(run_kind: str) -> bool:
@@ -642,6 +649,9 @@ def _write_model_package(
     resumed_from: ModelPackage | None,
     learning_report: Mapping[str, Any],
 ) -> tuple[ModelPackage, dict[str, Any]]:
+    block_id = str(config.get("blockId") or "BT93C")
+    baseline_claim_allowed = block_id == "BT93C" and _is_baseline_run(run_kind)
+    pilot_claim_allowed = block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind))
     checkpoint_dir = run_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     model_path = checkpoint_dir / "model.zip"
@@ -682,7 +692,7 @@ def _write_model_package(
         "manifestVersion": CHECKPOINT_VERSION,
         "generatedAt": _utc_now(),
         "generatedBy": "python/train.py",
-        "blockId": "BT93C",
+        "blockId": block_id,
         "phaseId": phase_id,
         "runId": run_id,
         "runKind": run_kind,
@@ -691,9 +701,9 @@ def _write_model_package(
         "truePpoModelPackage": True,
         "scaffoldOnly": False,
         "diagnosticOnly": _is_diagnostic_run(run_kind),
-        "learningQualityClaimAllowed": _is_baseline_run(run_kind),
-        "baselineRunsStarted": _is_baseline_run(run_kind),
-        "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
+        "learningQualityClaimAllowed": baseline_claim_allowed,
+        "baselineRunsStarted": baseline_claim_allowed,
+        "pilotRunsStarted": pilot_claim_allowed,
         "promotionAllowed": False,
         "resumedFrom": _package_pointer(resumed_from) if resumed_from else None,
         "artifacts": {
@@ -722,9 +732,9 @@ def _write_model_package(
             "runtimeSurfacesTouched": [],
             "productiveRuntimeChanged": False,
             "diagnosticOnly": _is_diagnostic_run(run_kind),
-            "learningQualityClaimAllowed": _is_baseline_run(run_kind),
-            "baselineRunsStarted": _is_baseline_run(run_kind),
-            "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
+            "learningQualityClaimAllowed": baseline_claim_allowed,
+            "baselineRunsStarted": baseline_claim_allowed,
+            "pilotRunsStarted": pilot_claim_allowed,
             "promotionAllowed": False,
         },
     }
@@ -783,9 +793,17 @@ def run_training_from_cli(
     total_timesteps: int | None,
     checkpoint: str | None,
 ) -> dict[str, Any]:
-    if run_kind not in {"learner-smoke", "resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train"}:
+    if run_kind not in {
+        "learner-smoke",
+        "resume-smoke",
+        "diagnostics-smoke",
+        "pilot-train",
+        "baseline-train",
+        "repair-diagnostic",
+    }:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
+    block_id = str(config.get("blockId") or "BT93C")
     gate_inputs = _validate_gate_inputs(config)
     artifact_root_path = _repo_path(artifact_root or str((config.get("artifacts") or {}).get("root") or DEFAULT_ARTIFACT_ROOT))
     run_id = _run_id(run_kind)
@@ -797,7 +815,7 @@ def run_training_from_cli(
     algorithm_cfg = config["algorithm"]
     seeds = [int(seed) for seed in env_cfg["trainSeeds"][: int(env_cfg["envCount"])]]
     source_package = None
-    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train"}:
+    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train", "repair-diagnostic"}:
         source_package = _resolve_package(
             checkpoint,
             artifact_root_path,
@@ -809,8 +827,14 @@ def run_training_from_cli(
         "diagnostics-smoke": "diagnosticsTimesteps",
         "pilot-train": "pilotTimesteps",
         "baseline-train": "baselineTimesteps",
+        "repair-diagnostic": "repairTimesteps",
     }[run_kind]
-    timesteps = int(total_timesteps or rollout_cfg.get(timestep_key) or rollout_cfg["resumeTimesteps"])
+    timesteps = int(
+        total_timesteps
+        or rollout_cfg.get(timestep_key)
+        or rollout_cfg.get("diagnosticsTimesteps")
+        or rollout_cfg["resumeTimesteps"]
+    )
 
     vec_env: VecNormalize | None = None
     try:
@@ -857,8 +881,8 @@ def run_training_from_cli(
             "wallClockSeconds": round(elapsed, 6),
             "stepsPerSecond": round(float(model.num_timesteps) / elapsed, 6) if elapsed > 0 else 0.0,
             "diagnosticOnly": _is_diagnostic_run(run_kind),
-            "learningQualityClaimAllowed": _is_baseline_run(run_kind),
-            "baselineComparable": _is_baseline_run(run_kind),
+            "learningQualityClaimAllowed": block_id == "BT93C" and _is_baseline_run(run_kind),
+            "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
             "telemetry": _telemetry(vec_env),
             "trainingCommand": " ".join(sys.argv),
@@ -880,7 +904,7 @@ def run_training_from_cli(
             "ok": True,
             "generatedAt": _utc_now(),
             "generatedBy": "python/train.py",
-            "blockId": "BT93C",
+            "blockId": block_id,
             "phaseId": phase_id,
             "runId": run_id,
             "runKind": run_kind,
@@ -893,8 +917,8 @@ def run_training_from_cli(
             "optimizer": manifest["optimizer"],
             "gateInputs": gate_inputs,
             "guardrails": manifest["guardrails"],
-            "baselineRunsStarted": _is_baseline_run(run_kind),
-            "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
+            "baselineRunsStarted": block_id == "BT93C" and _is_baseline_run(run_kind),
+            "pilotRunsStarted": block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind)),
             "promotionAllowed": False,
         }
         report_path = run_dir / "training_report.json"
@@ -946,6 +970,8 @@ def run_eval_from_cli(
     }:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
+    block_id = str(config.get("blockId") or "BT93C")
+    baseline_claim_allowed = block_id == "BT93C" and _is_baseline_run(run_kind)
     gate_inputs = _validate_gate_inputs(config)
     artifact_root_path = _repo_path(artifact_root or str((config.get("artifacts") or {}).get("root") or DEFAULT_ARTIFACT_ROOT))
     source_package = _resolve_package(checkpoint, artifact_root_path)
@@ -1024,7 +1050,7 @@ def run_eval_from_cli(
             "ok": True,
             "generatedAt": _utc_now(),
             "generatedBy": "python/eval.py",
-            "blockId": "BT93C",
+            "blockId": block_id,
             "phaseId": phase_id,
             "runId": run_id,
             "runKind": run_kind,
@@ -1064,10 +1090,10 @@ def run_eval_from_cli(
                 "readOnlyRuntimeSurfaces": list(READ_ONLY_RUNTIME_SURFACES),
                 "runtimeSurfacesTouched": [],
                 "productiveRuntimeChanged": False,
-                "baselineRunsStarted": _is_baseline_run(run_kind),
-                "pilotRunsStarted": _is_pilot_run(run_kind) or _is_baseline_run(run_kind),
-                "diagnosticOnly": _is_diagnostic_run(run_kind),
-                "learningQualityClaimAllowed": _is_baseline_run(run_kind),
+                "baselineRunsStarted": baseline_claim_allowed,
+                "pilotRunsStarted": block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind)),
+                "diagnosticOnly": block_id == "BT93F" or _is_diagnostic_run(run_kind),
+                "learningQualityClaimAllowed": baseline_claim_allowed,
             },
         }
         report_path = run_dir / "eval_report.json"

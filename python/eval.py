@@ -15,7 +15,7 @@ from scaffold.bt93b_runner import DEFAULT_ARTIFACT_ROOT, latest_checkpoint_path,
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--profile", default="bt93b", choices=["bt93b", "bt93c"])
+    parser.add_argument("--profile", default="bt93b", choices=["bt93b", "bt93c", "bt93f"])
     parser.add_argument("--run-kind", default="eval-smoke")
     parser.add_argument("--phase-id", default=None)
     parser.add_argument("--manifest-template", default=None)
@@ -26,7 +26,7 @@ def main() -> None:
     parser.add_argument("--checkpoint", default=None)
     args = parser.parse_args()
 
-    if args.profile == "bt93c":
+    if args.profile in {"bt93c", "bt93f"}:
         if args.run_kind not in {
             "eval-smoke",
             "diagnostics-eval",
@@ -35,7 +35,7 @@ def main() -> None:
             "baseline-repro-eval",
             "holdout-eval",
         }:
-            raise SystemExit(f"unsupported BT93C eval run kind: {args.run_kind}")
+            raise SystemExit(f"unsupported PPO eval run kind: {args.run_kind}")
         from scripts.bt93c_learner_smoke import run_eval_from_cli as run_bt93c_eval_from_cli
 
         run_bt93c_eval_from_cli(
@@ -45,8 +45,8 @@ def main() -> None:
                 "diagnostics-eval": "93C.4.2",
                 "pilot-eval": "93C.5.2",
                 "baseline-eval": "93C.5.3",
-                "baseline-repro-eval": "93C.7.1",
-                "holdout-eval": "93C.6.2",
+                "baseline-repro-eval": "93F.4.2" if args.profile == "bt93f" else "93C.7.1",
+                "holdout-eval": "93F.4.2" if args.profile == "bt93f" else "93C.6.2",
             }.get(args.run_kind, "93C.3.4"),
             config_path=args.config,
             artifact_root=args.artifact_root,
