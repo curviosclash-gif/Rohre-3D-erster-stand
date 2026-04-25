@@ -275,7 +275,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93F | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93I | 2026-04-25 | in-bearbeitung | `93I.2` abgeschlossen; naechster Claim `93I.3`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93I | 2026-04-25 | in-bearbeitung | `93I.4` abgeschlossen; naechster Claim `93I.5`; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93I.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -781,7 +781,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93B | Minimaler PPO-Baseline-Scaffold | completed | P2 | BT93A.99 | 93B.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
-| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | active | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.3 | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
+| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | active | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.5 | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93I.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2327,10 +2327,10 @@ Befund-Register BT93I:
 
 ### 93I.4 Eval-/Holdout-Matrix gruen pruefen
 
-- [ ] 93I.4.1 Eval und Holdout auf derselben BT93I-Matrix mit Mindestepisoden ausfuehren; unvollstaendige Episodenstatistik bleibt Blocker.
-- [ ] 93I.4.2 Steps-/Survival-Deltas gegen den DQN-Anker ausweisen: Eval und Holdout muessen `avgStepsPerEpisode >= 117.525` und `averageBotSurvival >= 48.590082` erreichen.
-- [ ] 93I.4.3 Terminal-/Death-Matrix muss in Eval und Holdout startfaehig sein; nur `player-dead` oder `max-steps-only` bleibt `diagnose-blocked`.
-- [ ] 93I.4.4 Ergebnis als `data/training/ppo/bt93i/matrix_green_report.json` schreiben: `BT94A-ready`, `hold`, `diagnose-blocked` oder `ppo-regression`; Startgate-Erfolg ist ausdruecklich keine Promotion und kein +30%-Steps-Qualitaetsurteil.
+- [x] 93I.4.1 Eval und Holdout auf derselben BT93I-Matrix mit Mindestepisoden ausfuehren; unvollstaendige Episodenstatistik bleibt Blocker. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\eval.py --profile bt93i --run-kind terminal-curriculum-repair-eval --phase-id 93I.4.1 --config python\configs\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\training\ppo\bt93i --checkpoint data\training\ppo\bt93i\latest_terminal_curriculum_repair.json --min-completed-episodes 15 --max-eval-steps 2700` + `python\.venv\Scripts\python.exe python\eval.py --profile bt93i --run-kind holdout-eval --phase-id 93I.4.1 --config python\configs\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\training\ppo\bt93i --checkpoint data\training\ppo\bt93i\latest_terminal_curriculum_repair.json --min-completed-episodes 8 --max-eval-steps 1440` -> `data\training\ppo\bt93i\matrix_green_report.json` (`phaseCoverage.93I.4.1=true`))
+- [x] 93I.4.2 Steps-/Survival-Deltas gegen den DQN-Anker ausweisen: Eval und Holdout muessen `avgStepsPerEpisode >= 117.525` und `averageBotSurvival >= 48.590082` erreichen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_matrix_green_report.py --write-report` -> `data\training\ppo\bt93i\matrix_green_report.json` (`comparison.deltasAgainstDqn.resultClass=ppo-regression`, `resultRules.evalStepsNonRegressionOk=false`, `resultRules.holdoutStepsNonRegressionOk=false`))
+- [x] 93I.4.3 Terminal-/Death-Matrix muss in Eval und Holdout startfaehig sein; nur `player-dead` oder `max-steps-only` bleibt `diagnose-blocked`. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_matrix_green_report.py --write-report` -> `data\training\ppo\bt93i\matrix_green_report.json` (`resultRules.terminalDeathMatrixStartCapable=false`, `resultRules.playerDeadOnlyBlocksStart=true`))
+- [x] 93I.4.4 Ergebnis als `data/training/ppo/bt93i/matrix_green_report.json` schreiben: `BT94A-ready`, `hold`, `diagnose-blocked` oder `ppo-regression`; Startgate-Erfolg ist ausdruecklich keine Promotion und kein +30%-Steps-Qualitaetsurteil. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_matrix_green_report.py --write-report` -> `data\training\ppo\bt93i\matrix_green_report.json` (`resultClass=diagnose-blocked`, `matrixVerdict=ppo-regression`, `guardrails.promotionAllowed=false`, `guardrails.rolloutSignal=false`))
 
 ### 93I.5 Gate-Refresh und Handover
 
