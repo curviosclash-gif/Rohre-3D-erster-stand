@@ -1,4 +1,10 @@
 {
+  "actionPolicyDiagnostics": {
+    "green": true,
+    "notCausal": true,
+    "path": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+    "resultClass": "action-policy-diagnostics-green"
+  },
   "blockId": "BT93J",
   "blockedFindings": {
     "F.05": {
@@ -116,19 +122,24 @@
     },
     {
       "description": "Pre-sampling mask, clamp, veto, sanitizer, invalid action, and executed action",
-      "green": false,
+      "evidence": "data/training/ppo/bt93j/action_policy_diagnostics.json",
+      "green": true,
       "id": "action-safety",
-      "notCausal": false,
+      "notCausal": true,
       "phase": "93J.3",
-      "status": "not-run"
+      "status": "green"
     },
     {
       "description": "Reward breakdown versus episode length, terminal class, risk actions, and learning metrics",
+      "evidence": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
       "green": false,
       "id": "reward-curriculum",
+      "longRunBlocked": true,
       "notCausal": false,
       "phase": "93J.3",
-      "status": "not-run"
+      "pilotBlocked": true,
+      "primaryCause": true,
+      "status": "primary-cause"
     },
     {
       "description": "Minimal repair, micro-test, pilot readiness, holdout guard, and long-run readiness",
@@ -144,9 +155,9 @@
     "path": "data/training/ppo/bt93j/causal_chain_register.json",
     "resultClass": "causal-chain-register-pinned"
   },
-  "counterprobe": "scripted-safe eval-config controls reach non-death natural terminal while real PPO eval/holdout remain player-dead-only",
-  "generatedAt": "2026-04-25T23:11:53Z",
-  "generatedBy": "python/scripts/bt93j_terminal_matrix.py",
+  "counterprobe": "93J.4 R1 micro-test must change only reward/curriculum pressure and is expected to improve terminal diversity or avgSteps trend while action telemetry remains green; otherwise the primary cause is refuted.",
+  "generatedAt": "2026-04-25T23:39:46Z",
+  "generatedBy": "python/scripts/bt93j_action_reward_diagnostics.py",
   "gitSha": "9043776509a61e6dbadf2f2ef27a2f108fc4bc46",
   "guardrails": {
     "bt94aCheckboxClosed": false,
@@ -170,7 +181,7 @@
     "path": "data/training/ppo/bt93j/matrix_contract_report.json",
     "resultClass": "matrix-contract-pinned-inputs-red"
   },
-  "nextDiagnosticPhase": "93J.3",
+  "nextDiagnosticPhase": "93J.4",
   "noStartDecision": {
     "allowedWork": [
       "record gate status",
@@ -204,12 +215,34 @@
     "93J.2.1": true,
     "93J.2.2": true,
     "93J.2.3": true,
-    "93J.2.4": true
+    "93J.2.4": true,
+    "93J.3.1": true,
+    "93J.3.2": true,
+    "93J.3.3": true,
+    "93J.3.4": true
   },
-  "phaseId": "93J.2",
-  "primaryCause": null,
-  "readyForRepair": false,
+  "phaseId": "93J.3",
+  "primaryCause": {
+    "evidence": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+    "findingIds": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "id": "reward-curriculum-survival-only-player-dead-policy",
+    "phase": "93J.3",
+    "summary": "Survival-only positive reward plus player-dead-only eval/holdout and step regression remain after observation, terminal mapping, matrix contract, action safety, and PPO learning-metric collapse checks."
+  },
+  "readyForRepair": true,
   "readyForTraining": false,
+  "repairConstraints": {
+    "bt94aClaimAllowed": false,
+    "candidateFreezeAllowed": false,
+    "longRunAllowed": false,
+    "maxPrimaryCausesAllowed": 1,
+    "pilotAllowed": false
+  },
   "repairGateRule": "readyForRepair remains false until exactly one primary cause and one counterprobe are named.",
   "repairOrder": [
     {
@@ -249,7 +282,14 @@
       "phase": "93J.4+"
     }
   ],
-  "resultClass": "diagnostic-split-terminal-matrix-cleared-action-reward-pending",
+  "resultClass": "diagnostic-split-primary-cause-reward-curriculum-ready-for-r1",
+  "rewardCurriculumDiagnostics": {
+    "green": false,
+    "notCausal": false,
+    "path": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+    "primaryCause": true,
+    "resultClass": "reward-curriculum-primary-cause-ready-for-r1"
+  },
   "sourceArtifacts": {
     "bt93cEvidenceQualityMatrix": {
       "artifactGitSha": "1e1670ab30446b9643806cd68abee6be4819ea07",
