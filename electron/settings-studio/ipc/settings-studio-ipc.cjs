@@ -67,6 +67,7 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
             paths: {
                 overrideFilePath: fileService.getOverrideFilePath(),
                 browserDemoPolicyOverrideFilePath: browserDemoPolicyService.getOverrideFilePath(),
+                browserDemoPolicyExportFilePath: browserDemoPolicyService.getExportFilePath(),
                 backupDirectoryPath: backupService.getBackupDirectoryPath(),
             },
             fileState: {
@@ -149,6 +150,21 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
 
         const saveState = await fileService.saveDraft(validation.normalizedDraft);
         const browserDemoSaveState = await browserDemoPolicyService.saveDraft(browserDemoValidation.normalizedDraft);
+        let browserDemoExportState = null;
+        try {
+            browserDemoExportState = await browserDemoPolicyService.saveExportArtifact(
+                browserDemoValidation.normalizedDraft
+            );
+        } catch (error) {
+            browserDemoExportState = {
+                path: browserDemoPolicyService.getExportFilePath(),
+                savedAt: null,
+                contractVersion: null,
+                error: error instanceof Error
+                    ? error.message
+                    : String(error || 'browser_demo_policy_export_failed'),
+            };
+        }
         return {
             ok: true,
             draft: validation.normalizedDraft,
@@ -164,6 +180,7 @@ function registerSettingsStudioIpc({ ipcMain, app }) {
                     reason: browserDemoMigration.reason || null,
                 },
                 saveState: browserDemoSaveState,
+                exportState: browserDemoExportState,
                 backup: browserDemoBackup,
             },
         };

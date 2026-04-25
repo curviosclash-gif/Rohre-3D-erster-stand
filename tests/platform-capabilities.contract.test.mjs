@@ -63,6 +63,31 @@ import { resolveSurfaceFeatureLaunchGuard } from '../src/ui/menu/MenuSurfaceFeat
 import { createMenuMultiplayerDiscoveryPort } from '../src/ui/menu/multiplayer/MenuMultiplayerDiscoveryPort.js';
 import { createMenuMultiplayerHostIpResolver } from '../src/ui/menu/multiplayer/MenuMultiplayerHostIpResolver.js';
 
+function createBrowserDemoBuildArtifactRuntimeGlobal({
+    status = 200,
+    body = '',
+} = {}) {
+    class MockXMLHttpRequest {
+        constructor() {
+            this.status = 0;
+            this.responseText = '';
+        }
+
+        open(_method, _url, _asyncFlag) {
+            // no-op: test double only needs send().
+        }
+
+        send() {
+            this.status = status;
+            this.responseText = body;
+        }
+    }
+
+    return {
+        XMLHttpRequest: MockXMLHttpRequest,
+    };
+}
+
 test('V87.3 Electron discovery adapter suppresses stale capability availability without intents', () => {
     const runtimeGlobal = {
         __CURVIOS_APP__: true,
@@ -248,6 +273,67 @@ test('V98.2.3 override diagnostics report fallback and reject reason-codes for b
         rejectedPolicy.browserDemoOverrideDiagnostics.reasonCode,
         'BROWSER_DEMO_OVERRIDE_VALIDATION_FAILED'
     );
+});
+
+test('V98.4.3 browser runtime reads build export artifact and applies monotone override clamp', () => {
+    const runtimeGlobal = createBrowserDemoBuildArtifactRuntimeGlobal({
+        body: JSON.stringify({
+            contractVersion: 'browser-demo-surface-policy-export.v1',
+            generatedAt: '2026-04-24T00:00:00.000Z',
+            source: {
+                kind: 'test',
+                overrideFilePath: 'memory://browser-demo-policy',
+            },
+            draft: {
+                contractVersion: BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+                policy: {
+                    allowedSessionTypes: ['single', 'splitscreen'],
+                    allowedModePaths: ['fight', 'quick_action'],
+                    allowedMultiplayerTransports: ['online'],
+                },
+                capabilityFlags: {
+                    save: false,
+                },
+            },
+        }),
+    });
+
+    const policy = resolveSurfacePolicy({ runtimeGlobal });
+    assert.deepEqual(policy.allowedSessionTypes, ['single']);
+    assert.deepEqual(policy.allowedModePaths, ['fight']);
+    assert.deepEqual(policy.allowedMultiplayerTransports, []);
+    assert.equal(policy.browserDemoOverrideDiagnostics.status, 'applied');
+    assert.equal(policy.browserDemoOverrideDiagnostics.reasonCode, 'BROWSER_DEMO_OVERRIDE_APPLIED');
+    assert.equal(policy.browserDemoOverrideDiagnostics.source, 'build-artifact');
+
+    const saveCapability = resolveSurfaceCapabilityAccess(PLATFORM_CAPABILITY_IDS.SAVE, {
+        runtimeGlobal,
+    });
+    assert.equal(saveCapability.available, false);
+    assert.equal(saveCapability.browserDemoOverrideDiagnostics.source, 'build-artifact');
+});
+
+test('V98.4.3 browser runtime falls back to base policy when build export artifact contract is invalid', () => {
+    const runtimeGlobal = createBrowserDemoBuildArtifactRuntimeGlobal({
+        body: JSON.stringify({
+            contractVersion: 'browser-demo-surface-policy-export.v9',
+            draft: {
+                contractVersion: BROWSER_DEMO_SURFACE_POLICY_OVERRIDE_CONTRACT_VERSION,
+                policy: {
+                    allowedModePaths: ['fight'],
+                },
+            },
+        }),
+    });
+
+    const policy = resolveSurfacePolicy({ runtimeGlobal });
+    assert.deepEqual(policy.allowedModePaths, ['arcade', 'fight', 'normal']);
+    assert.equal(policy.browserDemoOverrideDiagnostics.status, 'reject');
+    assert.equal(
+        policy.browserDemoOverrideDiagnostics.reasonCode,
+        'BROWSER_DEMO_OVERRIDE_SNAPSHOT_INVALID'
+    );
+    assert.equal(policy.browserDemoOverrideDiagnostics.source, 'build-artifact');
 });
 
 test('V77.4.1 default lobby transport follows the shared surface transport matrix', () => {
