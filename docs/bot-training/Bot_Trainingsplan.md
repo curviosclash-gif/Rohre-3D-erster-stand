@@ -2320,10 +2320,10 @@ Befund-Register BT93I:
 
 ### 93I.3 Terminal-Curriculum-Repair ausfuehren
 
-- [ ] 93I.3.1 Nur `run-kind=terminal-curriculum-repair` verwenden; nicht `candidate`, nicht `freeze`, nicht `promote`.
-- [ ] 93I.3.2 Mit Smoke `2048` starten; nur bei gruener Readiness, startfaehiger Terminal-Matrix, stabilen Zwischen-Evals und aktiven Early-Stops in `4096`-Timesteps-Inkrementen bis maximal `32768` Timesteps oder 4h erweitern.
-- [ ] 93I.3.3 Modell, Optimizer-State, VecNormalize, Config, Hashes, Lernmetriken, Action-Telemetrie und Checkpoints versioniert paketieren.
-- [ ] 93I.3.4 Nach Holdout keine weitere Optimierung auf denselben Holdout-Seeds erlauben; `data/training/ppo/bt93i/holdout_guard_report.json` muss Run-IDs, Seeds, Optimizer-Step und Optimizer-State-Hashes vor/nach Holdout ausweisen.
+- [x] 93I.3.1 Nur `run-kind=terminal-curriculum-repair` verwenden; nicht `candidate`, nicht `freeze`, nicht `promote`. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_terminal_curriculum_repair_report.py --write-holdout-guard --write-report` -> `data/training/ppo/bt93i/terminal_curriculum_repair_report.json` (`phaseCoverage.93I.3.1=true`), commit `58b7339`)
+- [x] 93I.3.2 Mit Smoke `2048` starten; nur bei gruener Readiness, startfaehiger Terminal-Matrix, stabilen Zwischen-Evals und aktiven Early-Stops in `4096`-Timesteps-Inkrementen bis maximal `32768` Timesteps oder 4h erweitern. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\train.py --profile bt93i --run-kind terminal-curriculum-repair --phase-id 93I.3.2 --config python\configs\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\training\ppo\bt93i --checkpoint data\training\ppo\bt93h\latest_comparable_terminal_repair.json --total-timesteps 2048` -> `data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json`, commit `58b7339`)
+- [x] 93I.3.3 Modell, Optimizer-State, VecNormalize, Config, Hashes, Lernmetriken, Action-Telemetrie und Checkpoints versioniert paketieren. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_terminal_curriculum_repair_report.py --write-holdout-guard --write-report` -> `data/training/ppo/bt93i/terminal_curriculum_repair_report.json` (`phaseCoverage.93I.3.3=true`), commit `58b7339`)
+- [x] 93I.3.4 Nach Holdout keine weitere Optimierung auf denselben Holdout-Seeds erlauben; `data/training/ppo/bt93i/holdout_guard_report.json` muss Run-IDs, Seeds, Optimizer-Step und Optimizer-State-Hashes vor/nach Holdout ausweisen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_terminal_curriculum_repair_report.py --write-holdout-guard --write-report` -> `data/training/ppo/bt93i/holdout_guard_report.json` (`postHoldoutTrainingRuns=[]`), commit `58b7339`)
 
 ### 93I.4 Eval-/Holdout-Matrix gruen pruefen
 
