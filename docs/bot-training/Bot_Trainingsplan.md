@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.3` abgeschlossen; naechster Claim `93J.4`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.4` abgeschlossen; naechster Claim `93J.5`; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -2477,7 +2477,7 @@ Closure-Evidence je Blocker:
 - [x] DoD.2 Vor jedem Fix, Repair-Lauf, Pilot oder Long-run liegt ein `diagnostic_split_report.json` mit Hauptursache, Gegenprobe und `readyForRepair`/`readyForTraining` vor. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
 - [ ] DoD.3 F.05/F.19/F.27/F.31 werden nur mit versionierter Diagnose-, Run-, Eval-/Holdout- oder Gate-Evidence geschlossen, downgraded oder als Folgeblocker weitergegeben.
 - [x] DoD.4 Observation-, Terminal-/Mapping-, Eval-/Matrix-, Action-/Safety- und Reward-/Curriculum-Ursachen sind getrennt bewertet; Reparaturreihenfolge ist dokumentiert. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
-- [ ] DoD.5 Jeder Repair ist minimal, adressiert genau eine primaere Hypothese und endet mit Micro-Test oder Diagnose-Reanalyse.
+- [x] DoD.5 Jeder Repair ist minimal, adressiert genau eine primaere Hypothese und endet mit Micro-Test oder Diagnose-Reanalyse. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_r1_micro_test.py --write-reports` -> `data/training/ppo/bt93j/r1_micro_test_report.json`)
 - [ ] DoD.6 Pilot, Holdout und Long-run starten nur nach gruener Readiness und aktivem Holdout-Schutz; kein Candidate-, Freeze-, Promote- oder Rollout-Label wird verwendet.
 - [ ] DoD.7 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` werden nur aus BT93J-Artefakten refreshed.
 - [ ] DoD.8 BT94A oeffnet nur, wenn `no_start_gate.json` nach BT93J `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `precomparison != ppo-regression` und `bt94aBlockerCount=0` schreibt.
@@ -2515,10 +2515,10 @@ Closure-Evidence je Blocker:
 
 ### 93J.4 Minimal-Repair und Micro-Test
 
-- [ ] 93J.4.1 R1 startet nur, wenn `diagnostic_split_report.json` genau eine primaere Hauptursache und Gegenprobe nennt.
-- [ ] 93J.4.2 R1 adressiert genau diese Ursache mit kleiner Aenderung, erwarteter Wirkung und passendem Smoke- oder Diagnose-Test.
-- [ ] 93J.4.3 `r1_micro_test_report.json` schreibt `green`, `same-red`, `new-red` oder `inconclusive`; bei rot oder unklar kein Pilot und keine Erweiterung.
-- [ ] 93J.4.4 Wenn R1 die Ursache widerlegt oder neue rote Symptome erzeugt, Kausalkette aktualisieren und 93J.0 erneut ausfuehren.
+- [x] 93J.4.1 R1 startet nur, wenn `diagnostic_split_report.json` genau eine primaere Hauptursache und Gegenprobe nennt. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_r1_micro_test.py --write-reports` -> `data/training/ppo/bt93j/r1_micro_test_report.json`)
+- [x] 93J.4.2 R1 adressiert genau diese Ursache mit kleiner Aenderung, erwarteter Wirkung und passendem Smoke- oder Diagnose-Test. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_r1_micro_test.py --write-reports` -> `data/training/ppo/bt93j/r1_micro_test_report.json`)
+- [x] 93J.4.3 `r1_micro_test_report.json` schreibt `green`, `same-red`, `new-red` oder `inconclusive`; bei rot oder unklar kein Pilot und keine Erweiterung. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_r1_micro_test.py --write-reports` -> `data/training/ppo/bt93j/r1_micro_test_report.json`)
+- [x] 93J.4.4 Wenn R1 die Ursache widerlegt oder neue rote Symptome erzeugt, Kausalkette aktualisieren und 93J.0 erneut ausfuehren. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_r1_micro_test.py --write-reports` -> `data/training/ppo/bt93j/r1_micro_test_report.json` (`resultClass=green`; keine Widerlegung/neuen roten Symptome))
 
 ### 93J.5 Iterativer Diagnose-Repair-Test-Loop und Pilot-Readiness
 
