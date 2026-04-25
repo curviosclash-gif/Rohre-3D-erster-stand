@@ -275,7 +275,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93F | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93I | 2026-04-25 | in-bearbeitung | Claim `93I.1`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93I | 2026-04-25 | in-bearbeitung | `93I.1` abgeschlossen; naechster Claim `93I.2`; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93I.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -781,7 +781,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93B | Minimaler PPO-Baseline-Scaffold | completed | P2 | BT93A.99 | 93B.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
-| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | active | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.1 | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
+| BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | active | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.2 | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93I.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2306,10 +2306,10 @@ Befund-Register BT93I:
 
 ### 93I.1 Matrix-Truth und Terminal-Provocation
 
-- [ ] 93I.1.1 BT93H-Artefakte und `no_start_gate.json` in `data/training/ppo/bt93i/start_truth.json` zusammenfuehren: rote Checks, F.05/F.19/F.27/F.31, Mindestepisodenluecke und DQN-Schwellen.
-- [ ] 93I.1.2 Eine BT93I-Matrix als `data/training/ppo/bt93i/matrix_manifest.json` definieren, die Eval/Holdout nach abgeschlossenen Episoden steuert: Eval mindestens 15, Holdout mindestens 8, Maps/Seeds/Semantikfenster fixiert, `2-Env`, `4-Env=false`, `maxStepsPerEpisode` und Zielmetriken unveraenderlich.
-- [ ] 93I.1.3 Terminal-Provocation fuer `player-dead`, `match-ended` oder gleichwertiges nicht-toedliches Natural-Terminal und `max-steps` in Headless und Python-Eval ohne Runtime-Bypass nachweisen; Ergebnis `data/training/ppo/bt93i/terminal_provocation_report.json` mit Szenario-IDs, Commands, Seeds, Maps und Field-Audit.
-- [ ] 93I.1.4 Wenn nicht-toedliche Natural-Terminals nicht reproduzierbar sind, vor jedem Repair-/Langlauf stoppen und einen Fehlerbericht/Folgegate schreiben.
+- [x] 93I.1.1 BT93H-Artefakte und `no_start_gate.json` in `data/training/ppo/bt93i/start_truth.json` zusammenfuehren: rote Checks, F.05/F.19/F.27/F.31, Mindestepisodenluecke und DQN-Schwellen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_matrix_truth.py --write` -> `data/training/ppo/bt93i/start_truth.json`, commit `9258c62`)
+- [x] 93I.1.2 Eine BT93I-Matrix als `data/training/ppo/bt93i/matrix_manifest.json` definieren, die Eval/Holdout nach abgeschlossenen Episoden steuert: Eval mindestens 15, Holdout mindestens 8, Maps/Seeds/Semantikfenster fixiert, `2-Env`, `4-Env=false`, `maxStepsPerEpisode` und Zielmetriken unveraenderlich. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_matrix_truth.py --write` -> `data/training/ppo/bt93i/matrix_manifest.json`, commit `9258c62`)
+- [x] 93I.1.3 Terminal-Provocation fuer `player-dead`, `match-ended` oder gleichwertiges nicht-toedliches Natural-Terminal und `max-steps` in Headless und Python-Eval ohne Runtime-Bypass nachweisen; Ergebnis `data/training/ppo/bt93i/terminal_provocation_report.json` mit Szenario-IDs, Commands, Seeds, Maps und Field-Audit. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_matrix_truth.py --write` -> `data/training/ppo/bt93i/terminal_provocation_report.json`, commit `9258c62`)
+- [x] 93I.1.4 Wenn nicht-toedliche Natural-Terminals nicht reproduzierbar sind, vor jedem Repair-/Langlauf stoppen und einen Fehlerbericht/Folgegate schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93i_matrix_truth.py --write` -> `data/training/ppo/bt93i/terminal_provocation_report.json` (`resultClass=terminal-provocation-green`), commit `9258c62`)
 
 ### 93I.2 Long-run-Readiness und Early-Stop
 
