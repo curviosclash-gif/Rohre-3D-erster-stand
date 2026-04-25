@@ -94,16 +94,39 @@
     "93H.4.3": true,
     "93H.4.4": "not-applicable-red-gate"
   },
+  "bt93iHandoverGate": {
+    "noBt94aCheckboxClosed": true,
+    "phaseId": "93I.5.1",
+    "resultClass": "diagnose-blocked",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "bt93iPhaseCoverage": {
+    "93I.5.1": true,
+    "93I.5.2": "pending bt94a_gate_check.py --write-report",
+    "93I.5.3": true,
+    "93I.5.4": "not-applicable-red-gate"
+  },
   "bt94aHandover": {
-    "gate": "closed-diagnose-blocked-by-bt93h",
+    "gate": "closed-diagnose-blocked-by-bt93i",
     "ppoValidateStatus": "ppo-validate-missing-until-BT94B.3",
     "precomparisonResult": "ppo-regression",
     "promotionAllowed": false,
     "ready": false,
-    "reason": "BT93H still has red start evidence; BT94A remains closed.",
+    "reason": "BT93I still has red start evidence; BT94A remains closed.",
     "rolloutAllowed": false
   },
-  "claim": "BT93H-BT94A-Gate-Refresh",
+  "claim": "BT93I-BT94A-Gate-Refresh",
+  "currentHandoverSource": {
+    "blockId": "BT93I",
+    "fallbackUsed": false,
+    "phaseId": "93I.5",
+    "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+  },
   "doDCoverage": {
     "DoD.10": false,
     "DoD.12": true,
@@ -113,11 +136,11 @@
   },
   "evidenceQualityMatrix": {
     "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-    "sha256": "53903ecaf9acfaa8b65e6a0a3e29fb3974b83bcd63e455338c9fcd8ac441171d"
+    "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
   },
-  "generatedAt": "2026-04-25T11:48:36Z",
-  "generatedBy": "python/scripts/bt93h_gate_refresh_handover.py",
-  "gitSha": "e579e7919aace6dbcf1f1eae7e91470ba46be97c",
+  "generatedAt": "2026-04-25T19:23:10Z",
+  "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+  "gitSha": "14c90ba318df3f07936beb0445f5522e6f3f8e9a",
   "guardrails": {
     "candidateRun": false,
     "fourEnvAllowed": false,
@@ -128,15 +151,18 @@
     "runtimeSurfacesTouched": []
   },
   "modelPackage": {
-    "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
-    "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
-    "gitSha": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
-    "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
-    "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
-    "runId": "20260424T180033Z-baseline-train",
+    "artifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+    "candidateRun": false,
+    "configSha256": "4d0d0d259e5e7eb97f2f6a9a54506140ea3334fd41368e32d6705674ff7abda7",
+    "freezeCandidate": false,
+    "gitSha": "cd432aba522c9384a9d5857ac9c454909f61fe9b",
+    "modelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371",
+    "optimizerStateSha256": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+    "promotionAllowed": false,
+    "runId": "20260425T151155Z-terminal-curriculum-repair",
     "scaffoldOnly": false,
     "truePpoModelPackage": true,
-    "vecnormalizeSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c"
+    "vecnormalizeSha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25"
   },
   "ok": true,
   "phaseCoverage": {
@@ -145,7 +171,7 @@
     "93C.7.3": true,
     "93C.7.4": true
   },
-  "phaseId": "93H.4.1",
+  "phaseId": "93I.5.1",
   "remainingGates": {
     "bt94a": [
       "F.05",
@@ -154,7 +180,7 @@
       "F.31"
     ],
     "bt94bPpoValidate": "BT94B.3 remains mandatory before promote",
-    "runtimeRollout": "outside BT93H; no JS inference, strategy flag, registry, rollback, or latency proof here"
+    "runtimeRollout": "outside BT93I; no JS inference, strategy flag, registry, rollback, or latency proof here"
   },
   "reproducibility": {
     "baselineEvalReport": "data/training/ppo/bt93c/runs/20260424T180054Z-baseline-eval/eval_report.json",
@@ -293,6 +319,54 @@
       "role": "BT93H repair ladder",
       "sha256": "5032f14363e43a84df1399b9171b08d99ce997de97ed5f831416c87c0d4d0f2d"
     },
+    "bt93iHoldoutGuard": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/holdout_guard_report.json",
+      "role": "BT93I holdout guard",
+      "sha256": "c8aa666ac7a6818fb47e484ea1ec0c1b7f9a014dd6210f00e4e64e07a072cfe6"
+    },
+    "bt93iLatestRepairPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "role": "BT93I latest repair pointer",
+      "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be"
+    },
+    "bt93iLongRunReadiness": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/long_run_readiness_report.json",
+      "role": "BT93I long-run readiness",
+      "sha256": "d88387fc8323057b329981fb54b03a30b4ee2189abfeb0ed66058571599057d0"
+    },
+    "bt93iMatrixGreen": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_green_report.json",
+      "role": "BT93I matrix green report",
+      "sha256": "c664bdc5f716ed7575dd02c9adf7dd7d5bd2aed92c8e6932c0f546639a43d4fc"
+    },
+    "bt93iMatrixManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_manifest.json",
+      "role": "BT93I matrix manifest",
+      "sha256": "4b159324c06d7f12a3ad8fd1b0e69dc907889bc8ab3a6c87e30f243b79a5c906"
+    },
+    "bt93iRepairReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/terminal_curriculum_repair_report.json",
+      "role": "BT93I terminal curriculum repair report",
+      "sha256": "75579bd77afa861d2ea23dd04b34c4833fc5d13e08cb4dfdfdb40857b7b6aaf9"
+    },
+    "bt93iStartTruth": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/start_truth.json",
+      "role": "BT93I start truth",
+      "sha256": "16efa0c95944b3f22c01aa4e1df69663978d77a20b9dd7a7e7555d9e13a1dc2c"
+    },
+    "bt93iTerminalProvocation": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/terminal_provocation_report.json",
+      "role": "BT93I terminal provocation",
+      "sha256": "79f57db04b1e715c0aaf9ab383934657de0d6f210e38b3ce8f7219a11191e51f"
+    },
     "diagnosticsReport": {
       "path": "data/training/ppo/bt93c/diagnostics_report.json",
       "sha256": "661d4cd8508a6bcbf3d8decd282491a8bc2899710b5298fd26b70be5cbf42ea2"
@@ -300,14 +374,14 @@
     "evidenceQualityMatrix": {
       "closureCapable": true,
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-      "role": "BT93H-refreshed evidence matrix",
-      "sha256": "deff05850039d767edd181d603d457040d6e4532cf237c3585aa5dfe0dc10cd5"
+      "role": "BT93I-refreshed evidence matrix",
+      "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
     },
     "precomparisonReport": {
       "closureCapable": true,
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "role": "BT93H-refreshed precomparison",
-      "sha256": "f341768cf3156eb6a0fa5a9b22b736a16962245b0f60dca3dfe2c3ef2e7460bb"
+      "role": "BT93I-refreshed precomparison",
+      "sha256": "7ff00d1c24d345642e521b76a89f7746a9d5dc0748adaeaa39f51caa12bcb1fb"
     }
   },
   "v101FollowUp": {

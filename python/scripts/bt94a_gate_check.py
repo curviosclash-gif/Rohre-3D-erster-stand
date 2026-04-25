@@ -1,7 +1,8 @@
 """BT94A claim gate check.
 
-This script records whether BT94A may start from the current BT93C handover.
-It does not run candidate training and does not create a freeze candidate.
+This script records whether BT94A may start from the current refreshed BT93C
+handover inputs. It does not run candidate training and does not create a
+freeze candidate.
 """
 
 from __future__ import annotations
@@ -18,6 +19,7 @@ PYTHON_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = PYTHON_ROOT.parent
 DEFAULT_BT93C_ROOT = REPO_ROOT / "data" / "training" / "ppo" / "bt93c"
 DEFAULT_OUTPUT = REPO_ROOT / "data" / "training" / "ppo" / "bt94a" / "no_start_gate.json"
+BT93I_CURRENT_SOURCE = REPO_ROOT / "data" / "training" / "ppo" / "bt93i" / "matrix_green_report.json"
 
 
 def _utc_now() -> str:
@@ -90,6 +92,62 @@ def _blocked_findings(matrix: Mapping[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def _detect_handover_source(
+    handover: Mapping[str, Any],
+    precomparison: Mapping[str, Any],
+    evidence_matrix: Mapping[str, Any],
+) -> dict[str, Any]:
+    explicit = handover.get("currentHandoverSource")
+    if isinstance(explicit, Mapping):
+        return {
+            "blockId": explicit.get("blockId"),
+            "phaseId": explicit.get("phaseId") or handover.get("phaseId"),
+            "sourceArtifact": explicit.get("sourceArtifact"),
+            "generatedBy": handover.get("generatedBy"),
+            "fallbackUsed": bool(explicit.get("fallbackUsed")),
+        }
+
+    sources = [
+        ("BT93I", "bt93iRefresh"),
+        ("BT93H", "bt93hRefresh"),
+        ("BT93G", "bt93gRefresh"),
+        ("BT93F", "bt93fRefresh"),
+        ("BT93E", "bt93eRefresh"),
+        ("BT93D", "bt93dRefresh"),
+    ]
+    generated_by = str(handover.get("generatedBy") or precomparison.get("generatedBy") or evidence_matrix.get("generatedBy") or "")
+    for block_id, field in sources:
+        if field in handover or field in precomparison or field in evidence_matrix or block_id.lower() in generated_by:
+            return {
+                "blockId": block_id,
+                "phaseId": handover.get("phaseId") or precomparison.get("phaseId"),
+                "sourceArtifact": None,
+                "generatedBy": handover.get("generatedBy"),
+                "fallbackUsed": False,
+            }
+    return {
+        "blockId": "BT93C",
+        "phaseId": handover.get("phaseId") or precomparison.get("phaseId"),
+        "sourceArtifact": None,
+        "generatedBy": handover.get("generatedBy"),
+        "fallbackUsed": True,
+    }
+
+
+def _expected_handover_source() -> dict[str, Any]:
+    if BT93I_CURRENT_SOURCE.exists():
+        return {
+            "blockId": "BT93I",
+            "reason": "BT93I matrix_green_report.json exists and is the latest handover source.",
+            "sourceArtifact": _rel(BT93I_CURRENT_SOURCE),
+        }
+    return {
+        "blockId": None,
+        "reason": "No newer repair-source artifact detected.",
+        "sourceArtifact": None,
+    }
+
+
 def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
     handover_path = bt93c_root / "handover_report.json"
     precomparison_path = bt93c_root / "precomparison_report.json"
@@ -103,8 +161,18 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
     summary = evidence_matrix.get("summary") if isinstance(evidence_matrix.get("summary"), Mapping) else {}
     bt94a_blocker_count = _summary_value(summary, "bt94a-blocker")
     blocked_findings = _blocked_findings(evidence_matrix)
+    current_source = _detect_handover_source(handover, precomparison, evidence_matrix)
+    expected_source = _expected_handover_source()
+    latest_source_ok = not expected_source["blockId"] or current_source.get("blockId") == expected_source["blockId"]
 
     checks = [
+        {
+            "id": "current_handover_source_is_latest",
+            "ok": latest_source_ok,
+            "observed": current_source.get("blockId"),
+            "required": expected_source["blockId"] or "no newer source",
+            "blocksStart": not latest_source_ok,
+        },
         {
             "id": "bt93c_result_allows_bt94a",
             "ok": handover.get("resultClass") != "diagnose",
@@ -158,6 +226,11 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
         "candidateRunsAllowed": not blocks_start,
         "matrixDefinitionAllowed": not blocks_start,
         "candidateFreezeAllowed": False,
+        "currentHandoverSource": {
+            **current_source,
+            "expected": expected_source,
+            "fresh": latest_source_ok,
+        },
         "sourceArtifacts": {
             "handoverReport": _source(handover_path),
             "precomparisonReport": _source(precomparison_path),
@@ -213,7 +286,10 @@ def build_gate_report(bt93c_root: Path) -> dict[str, Any]:
             "requiredBefore94A1": [
                 "BT93C handover result must not be diagnose",
                 "PPO must not be classified as ppo-regression against the DQN anchor",
-                "F.05/F.19/F.27/F.30/F.31 must be closed or explicitly downgraded with evidence",
+                (
+                    "Open BT94A audit blockers must be closed or explicitly downgraded with evidence: "
+                    + (", ".join(str(row.get("id")) for row in blocked_findings) or "none")
+                ),
             ],
             "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",
         },
