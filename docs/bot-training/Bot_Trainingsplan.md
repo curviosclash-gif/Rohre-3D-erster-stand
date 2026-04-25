@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.2` abgeschlossen; naechster Claim `93J.3`; kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.3` abgeschlossen; naechster Claim `93J.4`; kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -784,7 +784,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
-| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.2 | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
+| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.3 | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93J.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2474,9 +2474,9 @@ Closure-Evidence je Blocker:
 ### Definition of Done (DoD)
 
 - [x] DoD.1 BT93J schreibt `start_truth.json` mit aktueller Gate-Lage, Artefakt-Pinning, Scope-Files, No-Go-Regeln und Workspace-SHA. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_start_truth.py --write-reports` -> `data/training/ppo/bt93j/start_truth.json`)
-- [ ] DoD.2 Vor jedem Fix, Repair-Lauf, Pilot oder Long-run liegt ein `diagnostic_split_report.json` mit Hauptursache, Gegenprobe und `readyForRepair`/`readyForTraining` vor.
+- [x] DoD.2 Vor jedem Fix, Repair-Lauf, Pilot oder Long-run liegt ein `diagnostic_split_report.json` mit Hauptursache, Gegenprobe und `readyForRepair`/`readyForTraining` vor. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
 - [ ] DoD.3 F.05/F.19/F.27/F.31 werden nur mit versionierter Diagnose-, Run-, Eval-/Holdout- oder Gate-Evidence geschlossen, downgraded oder als Folgeblocker weitergegeben.
-- [ ] DoD.4 Observation-, Terminal-/Mapping-, Eval-/Matrix-, Action-/Safety- und Reward-/Curriculum-Ursachen sind getrennt bewertet; Reparaturreihenfolge ist dokumentiert.
+- [x] DoD.4 Observation-, Terminal-/Mapping-, Eval-/Matrix-, Action-/Safety- und Reward-/Curriculum-Ursachen sind getrennt bewertet; Reparaturreihenfolge ist dokumentiert. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/diagnostic_split_report.json`)
 - [ ] DoD.5 Jeder Repair ist minimal, adressiert genau eine primaere Hypothese und endet mit Micro-Test oder Diagnose-Reanalyse.
 - [ ] DoD.6 Pilot, Holdout und Long-run starten nur nach gruener Readiness und aktivem Holdout-Schutz; kein Candidate-, Freeze-, Promote- oder Rollout-Label wird verwendet.
 - [ ] DoD.7 `precomparison_report.json`, `handover_report.json`, `evidence_quality_matrix.json` und `no_start_gate.json` werden nur aus BT93J-Artefakten refreshed.
@@ -2508,10 +2508,10 @@ Closure-Evidence je Blocker:
 
 ### 93J.3 Action-, Safety-, Reward- und Curriculum-Diagnose
 
-- [ ] 93J.3.1 `action_policy_diagnostics.json` schreiben: Pre-Sampling-Action, Maske, Clamp, Veto, Sanitizer und final ausgefuehrte Action pro Step diffbar.
-- [ ] 93J.3.2 Readiness-Schwellen pruefen: `invalidActionRate=0`, `sanitizerRate=0`, `preSamplingMaskRate=1.0` oder gleichwertig, `postDecodeClampRate=0`, `vetoRate <0.25`.
-- [ ] 93J.3.3 `reward_curriculum_diagnostics.json` schreiben: Reward-Breakdown gegen Episode-Length, Death-Cause, Terminal-Klasse, Risk-Actions, Progress, KL, Entropy, Value-Loss und Grad-Norm.
-- [ ] 93J.3.4 Reward-Hacking oder Curriculum-Collapse blockiert Pilot/Long-run; Repair-Hebel werden definiert, aber erst nach gruener Diagnose umgesetzt.
+- [x] 93J.3.1 `action_policy_diagnostics.json` schreiben: Pre-Sampling-Action, Maske, Clamp, Veto, Sanitizer und final ausgefuehrte Action pro Step diffbar. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/action_policy_diagnostics.json`)
+- [x] 93J.3.2 Readiness-Schwellen pruefen: `invalidActionRate=0`, `sanitizerRate=0`, `preSamplingMaskRate=1.0` oder gleichwertig, `postDecodeClampRate=0`, `vetoRate <0.25`. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/action_policy_diagnostics.json`)
+- [x] 93J.3.3 `reward_curriculum_diagnostics.json` schreiben: Reward-Breakdown gegen Episode-Length, Death-Cause, Terminal-Klasse, Risk-Actions, Progress, KL, Entropy, Value-Loss und Grad-Norm. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/reward_curriculum_diagnostics.json`)
+- [x] 93J.3.4 Reward-Hacking oder Curriculum-Collapse blockiert Pilot/Long-run; Repair-Hebel werden definiert, aber erst nach gruener Diagnose umgesetzt. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_action_reward_diagnostics.py --write-reports` -> `data/training/ppo/bt93j/reward_curriculum_diagnostics.json`)
 
 ### 93J.4 Minimal-Repair und Micro-Test
 
@@ -2588,7 +2588,7 @@ Claim-Grenze vor BT94A:
 Startstatus 2026-04-25:
 
 - `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`, Blocker `F.05/F.19/F.27/F.31`))
-- Naechster erlaubter Trainingsclaim vor BT94A ist `BT93J.0`; keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+- Naechster erlaubter Trainingsclaim vor BT94A ist `BT93J.4`; keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
 
 ### Definition of Done (DoD)
 
