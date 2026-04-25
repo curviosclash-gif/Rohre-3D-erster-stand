@@ -1,12 +1,12 @@
 {
   "ok": true,
-  "generatedAt": "2026-04-23T19:37:46.652871Z",
+  "generatedAt": "2026-04-24T14:29:30.293985Z",
   "generatedBy": "python/scripts/bt90_freeze_check.py",
   "snapshot": {
     "freezeDate": "2026-04-23",
     "snapshotCommit": "4a9962a6cb096f5895a451c7b1276564f3d4ffa6",
     "snapshotPath": "docs/plaene/neu/BT90_GoldStandard/BT90_Contract_Authority_Snapshot_2026-04-22.md",
-    "headCommit": "4a9962a6cb096f5895a451c7b1276564f3d4ffa6"
+    "headCommit": "e7d294f55bbeec1f3f6ee778d777a8315571f68c"
   },
   "summary": {
     "checkedFiles": 8,
