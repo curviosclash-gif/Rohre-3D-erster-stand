@@ -266,7 +266,7 @@ Mikro-Claim-Regel:
 | - | BT93C | - | frei | 93C.99 abgeschlossen; BT94A-Gate geschlossen |
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93E | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
-| Bot-Codex | BT93F | 2026-04-25 | active | 93F.3 abgeschlossen; 93F.4 offen |
+| Bot-Codex | BT93F | 2026-04-25 | active | 93F.4 abgeschlossen; 93F.5 offen |
 | - | BT94A | - | frei | wartet auf `BT93F.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1684,10 +1684,10 @@ Startkriterien fuer `BT94A.1` nach BT93F:
 
 ### 93F.4 Kleine Reparatur-Learner- und Same-Matrix-Eval-Lane
 
-- [ ] 93F.4.1 Erst nach `93F.2` und `93F.3` einen kleinen, explizit gelabelten Reparatur-Learner ausfuehren; Run-Kind bleibt `repair-diagnostic`, nicht `candidate`, nicht `freeze`, nicht `promote`.
-- [ ] 93F.4.2 Eval und Holdout auf derselben Matrix neu laufen lassen: gleiche Maps, Semantikfenster, DQN-Anker, Baseline-ID, erlaubte Seeds und immutable Run-IDs; keine Matrix- oder Reward-Drift waehrend der Auswertung.
-- [ ] 93F.4.3 Mindeststatistik erreichen oder ehrlich blockieren: Eval mindestens 6 abgeschlossene Episoden, Holdout mindestens 4, inklusive Median, Streuung, Survival-/Steps-Deltas, Runtime-/Failure-Klassen und Action-Telemetrie.
-- [ ] 93F.4.4 Ergebnisregeln hart anwenden: `ppo-regression`, Reward-Hacking, leere Terminal-/Death-Matrix, hohe Clamp-/Veto-Last oder `runtimeErrorCount>0` halten BT94A geschlossen.
+- [x] 93F.4.1 Erst nach `93F.2` und `93F.3` einen kleinen, explizit gelabelten Reparatur-Learner ausfuehren; Run-Kind bleibt `repair-diagnostic`, nicht `candidate`, nicht `freeze`, nicht `promote`. (abgeschlossen: 2026-04-25; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\train.py --profile bt93f --run-kind repair-diagnostic --phase-id 93F.4.1 --config python\configs\ppo_bt93f_repair_diagnostic.json --artifact-root data\training\ppo\bt93f --checkpoint data\training\ppo\bt93c\runs\20260424T180033Z-baseline-train\artifact_manifest.json` -> `data\training\ppo\bt93f\runs\20260425T082419Z-repair-diagnostic\training_report.json` (`runKind=repair-diagnostic`, `truePpoOptimizerUpdate=true`, `candidateRun=false`, commit `95a5a7b`))
+- [x] 93F.4.2 Eval und Holdout auf derselben Matrix neu laufen lassen: gleiche Maps, Semantikfenster, DQN-Anker, Baseline-ID, erlaubte Seeds und immutable Run-IDs; keine Matrix- oder Reward-Drift waehrend der Auswertung. (abgeschlossen: 2026-04-25; evidence: `tmp\bt93c-clean-env-20260424T155919Z\Scripts\python.exe python\eval.py --profile bt93f --run-kind baseline-repro-eval/holdout-eval --phase-id 93F.4.2 --config python\configs\ppo_bt93f_repair_diagnostic.json --artifact-root data\training\ppo\bt93f --checkpoint data\training\ppo\bt93f\runs\20260425T082419Z-repair-diagnostic\artifact_manifest.json` -> `data\training\ppo\bt93f\repair_diagnostic_report.json` (`comparison.matrix.ok=true`, `evalRunId=20260425T082445Z-baseline-repro-eval`, `holdoutRunId=20260425T082506Z-holdout-eval`, commit `95a5a7b`))
+- [x] 93F.4.3 Mindeststatistik erreichen oder ehrlich blockieren: Eval mindestens 6 abgeschlossene Episoden, Holdout mindestens 4, inklusive Median, Streuung, Survival-/Steps-Deltas, Runtime-/Failure-Klassen und Action-Telemetrie. (abgeschlossen: 2026-04-25; evidence: `python python\scripts\bt93f_repair_diagnostic_report.py --write-report` -> `data\training\ppo\bt93f\repair_diagnostic_report.json` (`minimumStatisticsObserved.evalCompletedEpisodes=6`, `holdoutCompletedEpisodes=6`, `deltasAgainstDqn.resultClass=ppo-regression`, commit `95a5a7b`))
+- [x] 93F.4.4 Ergebnisregeln hart anwenden: `ppo-regression`, Reward-Hacking, leere Terminal-/Death-Matrix, hohe Clamp-/Veto-Last oder `runtimeErrorCount>0` halten BT94A geschlossen. (abgeschlossen: 2026-04-25; evidence: `python python\scripts\bt93f_repair_diagnostic_report.py --write-report` -> `data\training\ppo\bt93f\repair_diagnostic_report.json` (`resultClass=diagnose-blocked`, `bt94aImpact.blockedFindings=[F.05,F.19,F.27,F.30,F.31,R.01]`, `phaseCoverage.93F.4.4=true`, commit `95a5a7b`))
 
 ### 93F.5 Gate-Refresh und Handover-Entscheidung
 
