@@ -4,13 +4,15 @@
     "repairTrain": "python\\train.py --profile bt93i --run-kind terminal-curriculum-repair --phase-id 93I.3.2 --config python\\configs\\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93h\\latest_comparable_terminal_repair.json --total-timesteps 2048",
     "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93i_terminal_curriculum_repair_report.py --write-holdout-guard"
   },
-  "generatedAt": "2026-04-25T15:13:19Z",
+  "generatedAt": "2026-04-25T15:35:22Z",
   "generatedBy": "python/scripts/bt93i_terminal_curriculum_repair_report.py",
-  "gitSha": "cd432aba522c9384a9d5857ac9c454909f61fe9b",
+  "gitSha": "ee73aa4907348ff5991dbcc2354b93a70326c0b5",
   "guardChecks": {
-    "holdoutNotOptimizedYet": true,
+    "holdoutEvalOnly": true,
     "holdoutSeedsPinned": true,
+    "holdoutSourceModelMatchesRepair": true,
     "optimizerStateHashPinned": true,
+    "optimizerStateUnchangedByHoldout": true,
     "postHoldoutTrainingRunsEmpty": true,
     "repairRunPinned": true
   },
@@ -21,17 +23,23 @@
     "rolloutSignal": false,
     "runtimeSurfacesTouched": []
   },
-  "holdoutConsumed": false,
+  "holdoutConsumed": true,
   "holdoutRun": {
-    "report": null,
-    "runId": null,
-    "sourceModelSha256": null
+    "report": "data/training/ppo/bt93i/runs/20260425T153136Z-holdout-eval/eval_report.json",
+    "runId": "20260425T153136Z-holdout-eval",
+    "sourceModelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371",
+    "sourceOptimizerStateSha256": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef"
   },
   "holdoutSeeds": [
     960,
     961
   ],
   "ok": true,
+  "optimizerStateHashes": {
+    "afterHoldout": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+    "beforeHoldout": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+    "unchanged": true
+  },
   "phaseId": "93I.3.4",
   "postHoldoutTrainingRuns": [],
   "preHoldoutTrainingRun": {
@@ -44,15 +52,14 @@
     "runKind": "terminal-curriculum-repair",
     "vecnormalizeSha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25"
   },
-  "resultClass": "pre-holdout-guard-pinned",
+  "resultClass": "holdout-guard-green",
   "rule": "After a BT93I holdout eval exists, no later optimization may use the same holdout seeds; this report must be regenerated with before/after optimizer hashes.",
   "sourceArtifacts": {
     "holdoutPointer": {
       "closureCapable": false,
       "path": "data/training/ppo/bt93i/latest_holdout_eval.json",
       "role": "BT93I holdout pointer",
-      "sha256": null,
-      "status": "missing"
+      "sha256": "5abf59cd3a0aa2ec379db2079a07b068d726ce070f1080cb976bec361e55ebf6"
     },
     "matrixManifest": {
       "closureCapable": true,

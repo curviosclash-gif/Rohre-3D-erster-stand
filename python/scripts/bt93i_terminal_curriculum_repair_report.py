@@ -197,15 +197,34 @@ def build_holdout_guard() -> dict[str, Any]:
     holdout_report_path = _repo_path(str(holdout_pointer["report"])) if holdout_pointer else None
     holdout_report = _read_json(holdout_report_path) if holdout_report_path else None
     holdout_seeds = list(_get(matrix, "seeds", "holdout") or [])
+    holdout_run_id = str(holdout_report.get("runId") or "") if holdout_report else ""
     post_holdout_training_runs: list[dict[str, Any]] = []
+    if holdout_run_id:
+        for report_path in (BT93I_ROOT / "runs").glob("*/training_report.json"):
+            report = _read_json(report_path)
+            run_id = str(report.get("runId") or "")
+            if run_id > holdout_run_id and _get(report, "learning", "optimizerUpdatesCompleted") is True:
+                post_holdout_training_runs.append(
+                    {
+                        "runId": run_id,
+                        "runKind": report.get("runKind"),
+                        "report": _rel(report_path),
+                        "optimizerStateSha256": _get(report, "artifacts", "optimizerStateSha256"),
+                    }
+                )
     holdout_consumed = holdout_report is not None
     result_class = "holdout-guard-green" if holdout_consumed else "pre-holdout-guard-pinned"
+    pre_optimizer_hash = _get(train_report, "artifacts", "optimizerStateSha256")
+    holdout_optimizer_hash = _get(holdout_report, "sourcePackage", "optimizerStateSha256") if holdout_report else None
     guard_checks = {
         "repairRunPinned": train_report.get("runKind") == "terminal-curriculum-repair",
         "holdoutSeedsPinned": bool(holdout_seeds),
-        "optimizerStateHashPinned": bool(_get(train_report, "artifacts", "optimizerStateSha256")),
+        "optimizerStateHashPinned": bool(pre_optimizer_hash),
         "postHoldoutTrainingRunsEmpty": not post_holdout_training_runs,
-        "holdoutNotOptimizedYet": not holdout_consumed,
+        "holdoutEvalOnly": not holdout_consumed or holdout_report.get("runKind") == "holdout-eval",
+        "holdoutSourceModelMatchesRepair": not holdout_consumed
+        or _get(holdout_report, "sourcePackage", "modelSha256") == _get(train_report, "artifacts", "modelSha256"),
+        "optimizerStateUnchangedByHoldout": not holdout_consumed or holdout_optimizer_hash == pre_optimizer_hash,
     }
     return {
         "ok": all(guard_checks.values()),
@@ -232,6 +251,12 @@ def build_holdout_guard() -> dict[str, Any]:
             "runId": holdout_report.get("runId") if holdout_report else None,
             "report": _rel(holdout_report_path) if holdout_report_path else None,
             "sourceModelSha256": _get(holdout_report, "modelReload", "modelSha256") if holdout_report else None,
+            "sourceOptimizerStateSha256": holdout_optimizer_hash,
+        },
+        "optimizerStateHashes": {
+            "beforeHoldout": pre_optimizer_hash,
+            "afterHoldout": holdout_optimizer_hash if holdout_consumed else None,
+            "unchanged": guard_checks["optimizerStateUnchangedByHoldout"],
         },
         "postHoldoutTrainingRuns": post_holdout_training_runs,
         "rule": (

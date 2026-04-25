@@ -59,9 +59,9 @@
     "smokeExecuted": true,
     "wallClockLimitSeconds": 14400
   },
-  "generatedAt": "2026-04-25T15:13:19Z",
+  "generatedAt": "2026-04-25T15:35:22Z",
   "generatedBy": "python/scripts/bt93i_terminal_curriculum_repair_report.py",
-  "gitSha": "cd432aba522c9384a9d5857ac9c454909f61fe9b",
+  "gitSha": "ee73aa4907348ff5991dbcc2354b93a70326c0b5",
   "guardrails": {
     "candidateRun": false,
     "freezeCandidate": false,
@@ -71,10 +71,10 @@
     "runtimeSurfacesTouched": []
   },
   "holdoutGuard": {
-    "holdoutConsumed": false,
+    "holdoutConsumed": true,
     "path": "data/training/ppo/bt93i/holdout_guard_report.json",
     "postHoldoutTrainingRuns": [],
-    "resultClass": "pre-holdout-guard-pinned"
+    "resultClass": "holdout-guard-green"
   },
   "ok": true,
   "phaseCoverage": {
@@ -133,7 +133,7 @@
       "closureCapable": true,
       "path": "data/training/ppo/bt93i/holdout_guard_report.json",
       "role": "BT93I holdout guard",
-      "sha256": "3fa00f537a86c050e5b060808df406f9613d4e7984d08927979688362a760077"
+      "sha256": "c8aa666ac7a6818fb47e484ea1ec0c1b7f9a014dd6210f00e4e64e07a072cfe6"
     },
     "longRunReadiness": {
       "closureCapable": true,
