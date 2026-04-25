@@ -177,6 +177,31 @@ export function deriveHeadlessLaneEpisodeStep({
     };
 }
 
+function isDeathLikeTerminalReason(value) {
+    const reason = normalizeReason(value, '').toLowerCase();
+    if (!reason) return false;
+    if (reason === TRAINING_TERMINAL_REASONS.PLAYER_DEAD) return true;
+    return ['dead', 'death', 'killed', 'loss', 'crash'].some((token) => reason.includes(token));
+}
+
+export function buildHeadlessTrainingRewardSignals(episode = {}, context = {}) {
+    const done = episode?.done === true;
+    const truncated = episode?.truncated === true;
+    const terminalReason = normalizeReason(episode?.terminalReason, '');
+    const terminalReasonLower = terminalReason.toLowerCase();
+    const deathLikeTerminal = done && isDeathLikeTerminalReason(terminalReason);
+    const signals = {
+        survival: done !== true && truncated !== true,
+        lost: deathLikeTerminal || terminalReasonLower === 'match-loss',
+        won: terminalReasonLower === 'match-win',
+        crashed: terminalReasonLower.includes('crash'),
+    };
+    if (Number.isFinite(Number(context.totalEnvSteps))) {
+        signals.totalEnvSteps = Number(context.totalEnvSteps);
+    }
+    return signals;
+}
+
 async function waitForLatestAction(bridge, timeoutMs = DEFAULT_ACTION_TIMEOUT_MS) {
     const startedAt = performance.now();
     let latestFailure = null;
@@ -447,9 +472,9 @@ export class HeadlessLaneStepRunner {
             player,
             intent: null,
         });
-        const reward = this.rewardCalculator.compute({
-            survival: episode.done !== true && episode.truncated !== true,
-        }, episode);
+        const reward = this.rewardCalculator.compute(buildHeadlessTrainingRewardSignals(episode, {
+            totalEnvSteps: tickIndex + 1,
+        }), episode);
         return buildTrainingStepContract({
             mode: this.mode,
             planarMode: this.planarMode,

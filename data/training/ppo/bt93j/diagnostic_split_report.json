@@ -131,15 +131,15 @@
     },
     {
       "description": "Reward breakdown versus episode length, terminal class, risk actions, and learning metrics",
-      "evidence": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
+      "evidence": "data/training/ppo/bt93j/r1_micro_test_report.json",
       "green": false,
       "id": "reward-curriculum",
       "longRunBlocked": true,
       "notCausal": false,
-      "phase": "93J.3",
+      "phase": "93J.4",
       "pilotBlocked": true,
       "primaryCause": true,
-      "status": "primary-cause"
+      "status": "r1-micro-test-green"
     },
     {
       "description": "Minimal repair, micro-test, pilot readiness, holdout guard, and long-run readiness",
@@ -156,8 +156,8 @@
     "resultClass": "causal-chain-register-pinned"
   },
   "counterprobe": "93J.4 R1 micro-test must change only reward/curriculum pressure and is expected to improve terminal diversity or avgSteps trend while action telemetry remains green; otherwise the primary cause is refuted.",
-  "generatedAt": "2026-04-25T23:39:46Z",
-  "generatedBy": "python/scripts/bt93j_action_reward_diagnostics.py",
+  "generatedAt": "2026-04-25T23:54:34Z",
+  "generatedBy": "python/scripts/bt93j_r1_micro_test.py",
   "gitSha": "9043776509a61e6dbadf2f2ef27a2f108fc4bc46",
   "guardrails": {
     "bt94aCheckboxClosed": false,
@@ -181,7 +181,7 @@
     "path": "data/training/ppo/bt93j/matrix_contract_report.json",
     "resultClass": "matrix-contract-pinned-inputs-red"
   },
-  "nextDiagnosticPhase": "93J.4",
+  "nextDiagnosticPhase": "93J.5",
   "noStartDecision": {
     "allowedWork": [
       "record gate status",
@@ -219,9 +219,13 @@
     "93J.3.1": true,
     "93J.3.2": true,
     "93J.3.3": true,
-    "93J.3.4": true
+    "93J.3.4": true,
+    "93J.4.1": true,
+    "93J.4.2": true,
+    "93J.4.3": true,
+    "93J.4.4": true
   },
-  "phaseId": "93J.3",
+  "phaseId": "93J.4",
   "primaryCause": {
     "evidence": "data/training/ppo/bt93j/reward_curriculum_diagnostics.json",
     "findingIds": [
@@ -234,7 +238,16 @@
     "phase": "93J.3",
     "summary": "Survival-only positive reward plus player-dead-only eval/holdout and step regression remain after observation, terminal mapping, matrix contract, action safety, and PPO learning-metric collapse checks."
   },
-  "readyForRepair": true,
+  "r1MicroTest": {
+    "green": true,
+    "inconclusive": false,
+    "newRed": false,
+    "path": "data/training/ppo/bt93j/r1_micro_test_report.json",
+    "r1Id": "reward-terminal-loss-signal-r1",
+    "resultClass": "green",
+    "sameRed": false
+  },
+  "readyForRepair": false,
   "readyForTraining": false,
   "repairConstraints": {
     "bt94aClaimAllowed": false,
@@ -282,7 +295,7 @@
       "phase": "93J.4+"
     }
   ],
-  "resultClass": "diagnostic-split-primary-cause-reward-curriculum-ready-for-r1",
+  "resultClass": "diagnostic-split-r1-micro-test-green",
   "rewardCurriculumDiagnostics": {
     "green": false,
     "notCausal": false,
