@@ -1,0 +1,671 @@
+{
+  "blockId": "BT93G",
+  "bt94aStatus": {
+    "bt94aBlockerCount": 5,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "precomparisonResultClass": "ppo-regression",
+    "resultClass": "blocked-no-start"
+  },
+  "findingRegister": [
+    {
+      "blocksBt94a": true,
+      "id": "G.01",
+      "observed": {
+        "claimable": false,
+        "resultClass": "blocked-no-start"
+      },
+      "status": "still-blocking",
+      "treatment": "Pin red BT94A gate snapshot; refresh only in 93G.6."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "G.02",
+      "observed": {
+        "candidateRunsAllowed": false
+      },
+      "status": "still-blocking",
+      "treatment": "Candidate run allowance remains false; BT93G may run repair/diagnostic only."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "G.03",
+      "observed": {
+        "matrixDefinitionAllowed": false
+      },
+      "status": "still-blocking",
+      "treatment": "BT94A matrix definition remains closed; BT93G defines only repair/eval matrix."
+    },
+    {
+      "blocksBt94a": false,
+      "id": "G.04",
+      "observed": {
+        "candidateFreezeAllowed": false
+      },
+      "status": "carried",
+      "treatment": "Freeze allowance must remain false until 94A.3."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "G.05",
+      "observed": {
+        "handoverResultClass": "diagnose"
+      },
+      "status": "still-blocking",
+      "treatment": "Handover result remains diagnose until 93G.6 artifacts justify a new result."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "G.06",
+      "observed": {
+        "bt94aHandoverReady": false,
+        "gate": "closed-diagnose-blocked-by-bt93f"
+      },
+      "status": "still-blocking",
+      "treatment": "Handover gate remains closed until BT93G gate refresh."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "G.07",
+      "observed": {
+        "precomparisonResultClass": "ppo-regression"
+      },
+      "status": "still-blocking",
+      "treatment": "Precomparison regression may not be used as comparable quality evidence while horizon is invalid."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "G.08",
+      "observed": {
+        "bt94aBlockerCount": 5
+      },
+      "status": "still-blocking",
+      "treatment": "Audit blockers remain start-blocking until each has versioned BT93G evidence."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "C.01",
+      "observed": {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      "status": "still-blocking",
+      "treatment": "Claim check stays red until BT93G handover result no longer blocks."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "C.02",
+      "observed": {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93f",
+        "ok": false,
+        "required": "ready=true"
+      },
+      "status": "still-blocking",
+      "treatment": "Claim check stays red until bt94aHandover.ready=true."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "C.03",
+      "observed": {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      "status": "still-blocking",
+      "treatment": "Claim check stays red until comparable-matrix precomparison is not ppo-regression."
+    },
+    {
+      "blocksBt94a": true,
+      "id": "C.04",
+      "observed": {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 5,
+        "ok": false,
+        "required": 0
+      },
+      "status": "still-blocking",
+      "treatment": "Claim check stays red until bt94a-blocker count is zero."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "real PPO optimizer updates and model package exist",
+      "gate": "93C.3",
+      "id": "F.01",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "requirements, clean env, pip check, and import smoke are versioned",
+      "gate": "93C.1",
+      "id": "F.02",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "SB3 MultiDiscrete action surface is train/eval compatible",
+      "gate": "93C.2",
+      "id": "F.03",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "model, optimizer, VecNormalize, config, and hashes are persisted",
+      "gate": "93C.3",
+      "id": "F.04",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": true,
+      "evidence": "BT93F same-matrix eval/holdout keeps Survival-First blocked (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
+      "gate": "93F.5/BT94A",
+      "id": "F.05",
+      "source": null,
+      "status": "still-blocking / BT94A-blocker",
+      "treatment": "Repair survival/steps on comparable matrix; old bot validation and 16-step diagnostics cannot close it."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "PPO-Validate must be built before any promote verdict",
+      "gate": "94B.3",
+      "id": "F.06",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "4-env remains locked without direct evidence",
+      "gate": "93C.99/94A",
+      "id": "F.07",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "throughput is classified as budget/stability evidence only",
+      "gate": "93C.4/93C.5",
+      "id": "F.08",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "fresh freeze check is green",
+      "gate": "93C.0",
+      "id": "F.09",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "stale artifact/readme contradictions were cleared",
+      "gate": "93C.1",
+      "id": "F.10",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "tmp-only closure evidence was replaced or demoted",
+      "gate": "93C.1",
+      "id": "F.11",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "DQN champion, matrix, semantic window, and holdout are frozen",
+      "gate": "93C.6",
+      "id": "F.12",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "external candidate statistics need fixed rules before runs",
+      "gate": "94B.1/94B.2",
+      "id": "F.13",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "PPO-specific validate report is still missing",
+      "gate": "94B.3",
+      "id": "F.14",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "runtime handoff remains doc-only and out of BT93C scope",
+      "gate": "BT95/separate rollout",
+      "id": "F.15",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "scaffold, pilot, baseline, and candidate terms are separated",
+      "gate": "93C.1/93C.5",
+      "id": "F.16",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "eval loads a real PPO model package",
+      "gate": "93C.3/93C.6",
+      "id": "F.17",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "runtime classes are reported internally; PPO-Validate mapping remains",
+      "gate": "94B.3",
+      "id": "F.18",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": true,
+      "evidence": "BT93F terminal/death matrix remains max-steps-only or empty for BT94A start.",
+      "gate": "93F.5/BT94A",
+      "id": "F.19",
+      "source": null,
+      "status": "still-blocking / BT94A-blocker",
+      "treatment": "Wire natural terminal, death and truncation classes before quality judgement."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "sanitizer, mask, veto, and invalid rates are measured",
+      "gate": "93C.2/93C.4",
+      "id": "F.20",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "draft-risk drift is carried into the quality matrix",
+      "gate": "93C.1/93C.7",
+      "id": "F.21",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "governance gates are not treated as learning proof",
+      "gate": "93C.7",
+      "id": "F.22",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "closure evidence points to artifacts instead of plan self-counts",
+      "gate": "93C.1/93C.7",
+      "id": "F.23",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "short stability smokes remain monitoring, not long-run proof",
+      "gate": "94A/94B",
+      "id": "F.24",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "clean env reproduces the PPO dependency stack",
+      "gate": "93C.1",
+      "id": "F.25",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "exact baseline IDs and metric sources are fixed",
+      "gate": "93C.1/93C.5",
+      "id": "F.26",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": true,
+      "evidence": "BT93F comparison remains ppo-regression; hard rules: ppo-regression against DQN anchor; reward remains positive while survival regresses; terminal/death matrix remains max-steps-only or empty; high post-decode clamp/veto/invalid/sanitizer load; policy-level mask remains a follow-blocker.",
+      "gate": "93F.5/BT94A",
+      "id": "F.27",
+      "source": null,
+      "status": "still-blocking / BT94A-blocker",
+      "treatment": "Re-run comparison only after comparable horizon and root fixes; otherwise keep ppo-regression/blocker."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "internal eval survival is not PPO-Validate evidence",
+      "gate": "94B.3",
+      "id": "F.28",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "holdout seeds were consumed and reported",
+      "gate": "93C.6",
+      "id": "F.29",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": true,
+      "evidence": "BT93F policy-level masking remains a follow-blocker; clamp/veto load cannot open BT94A.",
+      "gate": "93F.5/BT94A",
+      "id": "F.30",
+      "source": null,
+      "status": "still-blocking / BT94A-blocker",
+      "treatment": "Implement true pre-sampling policy mask or keep BT94A blocked."
+    },
+    {
+      "blocksBt94a": true,
+      "evidence": "BT93F natural terminal/death evidence remains weak or absent in eval/holdout.",
+      "gate": "93F.5/BT94A",
+      "id": "F.31",
+      "source": null,
+      "status": "still-blocking / BT94A-blocker",
+      "treatment": "Eval/holdout terminal/death matrix must be non-empty or BT93G remains diagnose-blocked."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "larger candidate runs need fixed sample/statistics rules",
+      "gate": "94A.1/94B.1",
+      "id": "F.32",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "handover references immutable run IDs, hashes, and manifests",
+      "gate": "93C.7",
+      "id": "F.33",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "V101 follow-up reports no PPO contract drift",
+      "gate": "93C.6/93C.7",
+      "id": "F.34",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "docs gates are separated from semantic PPO evidence",
+      "gate": "93C.7",
+      "id": "F.35",
+      "source": null,
+      "status": "closed",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "longer candidate runs must continue failure-class telemetry",
+      "gate": "94A/94B",
+      "id": "F.36",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": false,
+      "evidence": "PPO-Validate build location and schema remain a future gate",
+      "gate": "94B.3",
+      "id": "F.37",
+      "source": null,
+      "status": "follow-gated",
+      "treatment": "Carry current BT93C/BT93F disposition; refresh only with BT93G artifacts."
+    },
+    {
+      "blocksBt94a": true,
+      "evidence": "Reward remains untrusted while survival/steps regress or terminal/action gates are red.",
+      "id": "R.01",
+      "status": "still-blocking / BT94A-blocker",
+      "treatment": "Reward gates must block positive reward claims when survival/steps regress or safety load is high."
+    }
+  ],
+  "findingSummary": {
+    "carried": 1,
+    "closed": 21,
+    "follow-gated": 11,
+    "still-blocking": 11,
+    "still-blocking / BT94A-blocker": 6
+  },
+  "generatedAt": "2026-04-25T09:52:30Z",
+  "generatedBy": "python/scripts/bt93g_start_sanity.py",
+  "gitSha": "da6697be01a5a732db0c3ccf073c4344fdaac019",
+  "nextAllowedWork": [
+    "93G.2 natural terminal/death/truncation wiring",
+    "93G.3 pre-sampling policy mask",
+    "93G.4 reward and diagnosis gate hardening"
+  ],
+  "ok": true,
+  "phaseId": "93G.1",
+  "priorMatrixClassification": {
+    "blockingReasons": [
+      "maxStepsPerEpisode=16 is below required 128",
+      "maxStepsPerEpisode=16 is below DQN avgStepsPerEpisode=117.525"
+    ],
+    "bt93fMatrix": {
+      "envCount": 2,
+      "evalEnvCount": 2,
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "matrixId": "bt93c-dqn-ppo-precomparison-v1",
+      "maxStepsPerEpisode": 16,
+      "seeds": {
+        "eval": [
+          944,
+          945
+        ],
+        "holdout": [
+          950,
+          951
+        ],
+        "train": [
+          934,
+          935
+        ]
+      },
+      "semanticWindow": "runtime-near-headless-v1"
+    },
+    "bt93fResultClass": "ppo-regression",
+    "bt93gClassification": "diagnose-not-comparable",
+    "dqnNonRegressionClaimAllowed": false,
+    "qualityComparisonAllowed": false,
+    "requiredReportLabelWhenNotComparable": "diagnose-not-comparable",
+    "rule": "A run with maxStepsPerEpisode below 128 must not be reported as DQN/PPO non-regression quality evidence."
+  },
+  "repairMatrix": {
+    "baseline": {
+      "baselineId": "bt93c-ppo-baseline-publish-v1",
+      "dqnChampion": {
+        "averageBotSurvival": 37.376986,
+        "avgStepsPerEpisode": 117.525,
+        "invalidActionRate": 1.0,
+        "runtimeErrorCount": null,
+        "source": "BT11 historical DQN champion anchor"
+      }
+    },
+    "blockId": "BT93G",
+    "classification": "comparable-repair-matrix",
+    "comparisonUse": "BT93G repair/eval gate only; not a BT94A candidate, freeze, promotion, or PPO-Validate lane.",
+    "env": {
+      "envCount": 2,
+      "evalEnvCount": 2,
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "maxStepsPerEpisode": 180,
+      "minComparableMaxSteps": 128,
+      "modeId": "runtime-near-headless-v1",
+      "preferredMaxStepsPerEpisode": 180
+    },
+    "holdoutRule": {
+      "holdoutMayNotOpenBt94aIf": [
+        "pre-sampling mask is missing",
+        "terminal/death matrix is empty or max-steps-only",
+        "reward is positive while survival or steps regress",
+        "runtimeErrorCount is greater than 0"
+      ],
+      "noPostHoldoutOptimization": true,
+      "status": "reserved-for-93G.5-after-root-fixes"
+    },
+    "matrixId": "bt93g-comparable-repair-matrix-v1",
+    "minimumEpisodes": {
+      "derivation": "2 maps x 3 eval seeds = 6 eval episodes; 2 maps x 2 holdout seeds = 4 holdout episodes.",
+      "eval": 6,
+      "holdout": 4
+    },
+    "phaseId": "93G.1",
+    "seeds": {
+      "eval": [
+        944,
+        945,
+        946
+      ],
+      "holdout": [
+        960,
+        961
+      ],
+      "train": [
+        934,
+        935,
+        936,
+        937
+      ]
+    }
+  },
+  "resultClass": "start-sanity-pinned",
+  "sourceArtifacts": {
+    "actionSurfaceRepairReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/action_surface_repair_report.json",
+      "role": "BT93F action/mask report",
+      "sha256": "07e01bc8a0ca551b1081caf3b283c6f62d96f4d7172c3e4978d9f1adb1e782ff"
+    },
+    "bt93cEvidenceMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "role": "BT93C/BT93F evidence quality matrix",
+      "sha256": "9386ae0737542fc6ce03bf5ea0ff3d03486de1c63a2edaa96f2641086e71a3d1"
+    },
+    "bt93cHandover": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "role": "BT93C/BT93F refreshed handover",
+      "sha256": "35ebcd28fe4789e0738bf887d2c71ef8e762d94040bdd146bd1fce1afd129197"
+    },
+    "bt93cPrecomparison": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "BT93C/BT93F refreshed precomparison",
+      "sha256": "430e4298759905b557c4ea5f92cb24966e3c4bbed499f7893ff170237a90576b"
+    },
+    "config": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93f_repair_diagnostic.json",
+      "role": "BT93F diagnostic config",
+      "sha256": "5172d913fb452772aff4889470776475351d2480583998b6ab73a7839cc297c3"
+    },
+    "controlledTerminalDeathProbes": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/controlled_terminal_death_probes.json",
+      "role": "BT93F controlled terminal/death probes",
+      "sha256": "bef0cf80881ed902b134f4a32b7f9f480b1919993bc653687d0822df307618aa"
+    },
+    "followupGateReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/followup_gate_report.json",
+      "role": "BT93F follow-up gate report",
+      "sha256": "87bc27a2b492ee793f853b3aa57d4c10e5c1f0b055c91720d623bb8cda4c3c5e"
+    },
+    "handoverPackage": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/handover_package.json",
+      "role": "BT93F handover package",
+      "sha256": "5fe614f6016e7612f293336f67b166cc3fa705428eb9166bc0b6635d12da57fb"
+    },
+    "noStartGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A red no-start gate",
+      "sha256": "26ada117aef255803caa0cf405b6b4f5a6ad0ed64118db0796b6720b4010e8d1"
+    },
+    "repairDiagnosticReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/repair_diagnostic_report.json",
+      "role": "BT93F repair diagnostic report",
+      "sha256": "8ccb7152fef248219a5a0e0a4d181ce2ddc24c0ac8c1eb6908a53991f7700a30"
+    },
+    "terminalRewardFailureReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/terminal_reward_failure_report.json",
+      "role": "BT93F terminal/reward report",
+      "sha256": "949a73fc46ed893549b7c3b1812c15902bc0d7f6f8de45ed0760d7fc5c95d211"
+    }
+  },
+  "stillForbidden": [
+    "BT94A candidate run",
+    "freeze candidate",
+    "promotion or rollout signal",
+    "PPO-Validate substitution",
+    "DQN non-regression claim from 16-step diagnostics"
+  ]
+}
