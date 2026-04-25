@@ -21,7 +21,7 @@ from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 from bridge.authority_snapshot import READ_ONLY_RUNTIME_SURFACES
 from bridge.contract_v1 import EXPECTED_OBSERVATION_LENGTH
 from envs.curvios_env import CurviosEnv, DEFAULT_COMMAND_TIMEOUT_SECONDS
-from envs.ppo_action_surface import CurviosPpoActionWrapper, build_action_surface_manifest
+from envs.ppo_action_surface import build_action_surface_manifest, make_curvios_action_wrapper
 
 PYTHON_ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = PYTHON_ROOT.parent
@@ -114,6 +114,7 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
     allowed_scopes = {
         "BT93C": {"93C.3", "93C.4", "93C.5"},
         "BT93F": {"93F.4"},
+        "BT93G": {"93G.5"},
     }
     block_id = str(config.get("blockId") or "")
     if block_id not in allowed_scopes or config.get("phaseId") not in allowed_scopes[block_id]:
@@ -122,6 +123,12 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
 
 
 def _run_sample_class(run_kind: str) -> str:
+    if run_kind == "technical-smoke":
+        return "technical-smoke-not-quality-evidence"
+    if run_kind == "comparable-repair":
+        return "bt93g-comparable-repair-not-candidate"
+    if run_kind == "comparable-repair-eval":
+        return "bt93g-comparable-repair-eval-not-ppo-validate"
     if run_kind == "repair-diagnostic":
         return "repair-diagnostic-not-candidate"
     if run_kind.startswith("baseline-"):
@@ -146,7 +153,22 @@ def _is_baseline_run(run_kind: str) -> bool:
 
 
 def _is_holdout_run(run_kind: str) -> bool:
-    return run_kind.startswith("holdout-")
+    return run_kind.startswith("holdout-") or run_kind.endswith("-holdout")
+
+
+def _is_bt93g_train_run(run_kind: str) -> bool:
+    return run_kind in {"technical-smoke", "comparable-repair"}
+
+
+def _is_bt93g_comparable_eval(block_id: str, run_kind: str) -> bool:
+    return block_id == "BT93G" and run_kind in {"comparable-repair-eval", "holdout-eval"}
+
+
+def _action_surface_id(config: Mapping[str, Any]) -> str | None:
+    env_cfg = config.get("env") if isinstance(config.get("env"), Mapping) else {}
+    policy_cfg = config.get("policy") if isinstance(config.get("policy"), Mapping) else {}
+    value = env_cfg.get("actionSurfaceId") or policy_cfg.get("actionSurfaceId")
+    return str(value) if value else None
 
 
 def _number(value: Any) -> float | None:
@@ -256,7 +278,9 @@ def _sum_action_telemetry(reports: list[Mapping[str, Any]]) -> dict[str, Any]:
     totals = {
         "totalActions": 0,
         "invalidActionCount": 0,
+        "preSamplingMaskCount": 0,
         "maskCount": 0,
+        "postDecodeClampCount": 0,
         "vetoCount": 0,
         "sanitizerCount": 0,
         "noopCount": 0,
@@ -279,7 +303,9 @@ def _sum_action_telemetry(reports: list[Mapping[str, Any]]) -> dict[str, Any]:
     return {
         **totals,
         "invalidActionRate": _rate("invalidActionCount"),
+        "preSamplingMaskRate": _rate("preSamplingMaskCount"),
         "maskRate": _rate("maskCount"),
+        "postDecodeClampRate": _rate("postDecodeClampCount"),
         "vetoRate": _rate("vetoCount"),
         "sanitizerRate": _rate("sanitizerCount"),
         "noopRate": _rate("noopCount"),
@@ -294,6 +320,7 @@ def _counter_dict(counter: Counter[str]) -> dict[str, int]:
 
 def _collect_eval_diagnostics(
     *,
+    block_id: str,
     run_kind: str,
     info_samples: list[Mapping[str, Any]],
     telemetry_reports: list[Mapping[str, Any]],
@@ -329,7 +356,7 @@ def _collect_eval_diagnostics(
             reason = str(terminal_reason)
             terminal_reasons[reason] += 1
             lowered = reason.lower()
-            if any(token in lowered for token in ("death", "crash", "loss", "killed")):
+            if any(token in lowered for token in ("death", "dead", "crash", "loss", "killed")):
                 death_causes[reason] += 1
         truncated_reason = info.get("truncatedReason")
         if truncated_reason:
@@ -387,7 +414,7 @@ def _collect_eval_diagnostics(
         if "crash" in str(key).lower()
     )
     training_learning = dict((training_report or {}).get("learning") or {})
-    is_baseline = _is_baseline_run(run_kind) or _is_holdout_run(run_kind)
+    is_baseline = _is_baseline_run(run_kind) or _is_holdout_run(run_kind) or _is_bt93g_comparable_eval(block_id, run_kind)
     average_survival_reason = None
     if not is_baseline:
         average_survival_reason = (
@@ -432,10 +459,15 @@ def _collect_eval_diagnostics(
             "openEpisodeLengthsAtStop": list(open_episode_lengths),
             "averageBotSurvival": completed_avg if is_baseline else None,
             "averageBotSurvivalReason": average_survival_reason,
-            "averageBotSurvivalSource": "BT93C runtime-near completed episode length"
-            if is_baseline
-            else None,
+            "averageBotSurvivalSource": (
+                "BT93G comparable repair completed episode length"
+                if _is_bt93g_comparable_eval(block_id, run_kind)
+                else "BT93C runtime-near completed episode length"
+                if is_baseline
+                else None
+            ),
             "baselineComparable": is_baseline,
+            "comparisonComparable": is_baseline,
         },
         "policyQualityRestDebt": {
             "bt73IntentRecovery": {
@@ -487,22 +519,85 @@ def _collect_eval_diagnostics(
 
 def _validate_gate_inputs(config: Mapping[str, Any]) -> dict[str, Any]:
     artifacts = config.get("artifacts") or {}
-    start_manifest_path = _repo_path(str(artifacts.get("startManifest")))
     dependency_report_path = _repo_path(str(artifacts.get("dependencyLockReport")))
     clean_env_report_path = _repo_path(str(artifacts.get("cleanEnvReport")))
-    action_surface_report_path = _repo_path(str(artifacts.get("actionSurfaceReport")))
     requirements_path = _repo_path(str(artifacts.get("requirements")))
 
-    start_manifest = _read_json(start_manifest_path)
     dependency_report = _read_json(dependency_report_path)
     clean_env_report = _read_json(clean_env_report_path)
+    if dependency_report.get("ok") is not True or clean_env_report.get("ok") is not True:
+        raise RuntimeError("PPO learner start is blocked by dependency or clean-env gate")
+
+    block_id = str(config.get("blockId") or "")
+    if block_id == "BT93G":
+        start_truth_path = _repo_path(str(artifacts.get("startTruth")))
+        repair_matrix_path = _repo_path(str(artifacts.get("repairMatrix")))
+        start_contract_path = _repo_path(str(artifacts.get("startContract")))
+        terminal_wiring_path = _repo_path(str(artifacts.get("terminalWiringReport")))
+        action_mask_path = _repo_path(str(artifacts.get("actionMaskReport")))
+        reward_gate_path = _repo_path(str(artifacts.get("rewardGateReport")))
+
+        start_truth = _read_json(start_truth_path)
+        repair_matrix = _read_json(repair_matrix_path)
+        start_contract = _read_json(start_contract_path)
+        terminal_wiring = _read_json(terminal_wiring_path)
+        action_mask = _read_json(action_mask_path)
+        reward_gate = _read_json(reward_gate_path)
+
+        if start_truth.get("resultClass") != "start-sanity-pinned":
+            raise RuntimeError("BT93G.5 start is blocked by missing start sanity")
+        if repair_matrix.get("classification") != "comparable-repair-matrix":
+            raise RuntimeError("BT93G.5 start is blocked by non-comparable repair matrix")
+        if int((repair_matrix.get("env") or {}).get("maxStepsPerEpisode") or 0) < 128:
+            raise RuntimeError("BT93G.5 start is blocked by maxStepsPerEpisode < 128")
+        if terminal_wiring.get("ok") is not True or action_mask.get("ok") is not True or reward_gate.get("ok") is not True:
+            raise RuntimeError("BT93G.5 start is blocked by terminal/action/reward prerequisite gates")
+        if (action_mask.get("maskSourceContract") or {}).get("preSamplingApplied") is not True:
+            raise RuntimeError("BT93G.5 start is blocked by missing pre-sampling mask")
+
+        return {
+            "startTruth": _rel(start_truth_path),
+            "startTruthSha256": _sha256_file(start_truth_path),
+            "repairMatrix": _rel(repair_matrix_path),
+            "repairMatrixSha256": _sha256_file(repair_matrix_path),
+            "startContract": _rel(start_contract_path),
+            "startContractSha256": _sha256_file(start_contract_path),
+            "terminalWiringReport": _rel(terminal_wiring_path),
+            "terminalWiringReportSha256": _sha256_file(terminal_wiring_path),
+            "actionMaskReport": _rel(action_mask_path),
+            "actionMaskReportSha256": _sha256_file(action_mask_path),
+            "rewardGateReport": _rel(reward_gate_path),
+            "rewardGateReportSha256": _sha256_file(reward_gate_path),
+            "dependencyLockReport": _rel(dependency_report_path),
+            "dependencyLockReportSha256": _sha256_file(dependency_report_path),
+            "cleanEnvReport": _rel(clean_env_report_path),
+            "cleanEnvReportSha256": _sha256_file(clean_env_report_path),
+            "requirements": _rel(requirements_path),
+            "requirementsSha256": _sha256_file(requirements_path),
+            "freezeOk": False,
+            "reAuditRequired": False,
+            "candidateRunsAllowed": False,
+            "promotionAllowed": False,
+            "actionSurfaceId": _action_surface_id(config),
+            "cleanPython": str(clean_env_report.get("cleanPython") or ""),
+            "semanticWindow": {"modeId": (repair_matrix.get("env") or {}).get("modeId")},
+            "matrix": {
+                "matrixId": repair_matrix.get("matrixId"),
+                "maps": (repair_matrix.get("env") or {}).get("maps"),
+                "seeds": repair_matrix.get("seeds"),
+                "maxStepsPerEpisode": (repair_matrix.get("env") or {}).get("maxStepsPerEpisode"),
+            },
+            "dqnChampion": ((repair_matrix.get("baseline") or {}).get("dqnChampion") or {}),
+        }
+
+    start_manifest_path = _repo_path(str(artifacts.get("startManifest")))
+    action_surface_report_path = _repo_path(str(artifacts.get("actionSurfaceReport")))
+    start_manifest = _read_json(start_manifest_path)
     action_surface_report = _read_json(action_surface_report_path)
 
     learner_signal = start_manifest.get("learnerStartSignal") or {}
     if learner_signal.get("freezeOk") is not True or learner_signal.get("reAuditRequired") is True:
         raise RuntimeError("BT93C.3 learner start is blocked by freeze/re-audit state")
-    if dependency_report.get("ok") is not True or clean_env_report.get("ok") is not True:
-        raise RuntimeError("BT93C.3 learner start is blocked by dependency or clean-env gate")
     if action_surface_report.get("ok") is not True:
         raise RuntimeError("BT93C.3 learner start is blocked by action-surface gate")
 
@@ -534,15 +629,17 @@ def _make_env_factory(
     env_index: int,
     max_steps: int,
     timeout_seconds: float,
+    action_surface_id: str | None,
 ) -> Any:
-    def _factory() -> CurviosPpoActionWrapper:
-        env = CurviosPpoActionWrapper(
+    def _factory() -> Any:
+        env = make_curvios_action_wrapper(
             CurviosEnv(
                 max_steps=max_steps,
                 default_seed=seed,
                 session_id=f"{run_id}-env{env_index}",
                 controller_timeout_seconds=timeout_seconds,
-            )
+            ),
+            surface_id=action_surface_id,
         )
         env.action_space.seed(seed)
         return env
@@ -562,6 +659,7 @@ def _build_vec_env(
     norm_cfg = config["normalization"]
     max_steps = int(env_cfg["maxStepsPerEpisode"])
     timeout_seconds = float(env_cfg.get("controllerTimeoutSeconds") or DEFAULT_COMMAND_TIMEOUT_SECONDS)
+    action_surface_id = _action_surface_id(config)
     base_env = DummyVecEnv([
         _make_env_factory(
             seed=int(seed),
@@ -569,6 +667,7 @@ def _build_vec_env(
             env_index=index,
             max_steps=max_steps,
             timeout_seconds=timeout_seconds,
+            action_surface_id=action_surface_id,
         )
         for index, seed in enumerate(seeds)
     ])
@@ -624,7 +723,7 @@ def _policy_summary(model: PPO, config: Mapping[str, Any]) -> dict[str, Any]:
         },
         "netArch": list((config.get("policy") or {}).get("netArch") or []),
         "observationLength": EXPECTED_OBSERVATION_LENGTH,
-        "actionSurface": build_action_surface_manifest(),
+        "actionSurface": build_action_surface_manifest(_action_surface_id(config)),
     }
 
 
@@ -652,6 +751,7 @@ def _write_model_package(
     block_id = str(config.get("blockId") or "BT93C")
     baseline_claim_allowed = block_id == "BT93C" and _is_baseline_run(run_kind)
     pilot_claim_allowed = block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind))
+    repair_evidence_allowed = block_id == "BT93G" and run_kind == "comparable-repair"
     checkpoint_dir = run_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     model_path = checkpoint_dir / "model.zip"
@@ -702,8 +802,11 @@ def _write_model_package(
         "scaffoldOnly": False,
         "diagnosticOnly": _is_diagnostic_run(run_kind),
         "learningQualityClaimAllowed": baseline_claim_allowed,
+        "repairEvidenceClaimAllowed": repair_evidence_allowed,
         "baselineRunsStarted": baseline_claim_allowed,
         "pilotRunsStarted": pilot_claim_allowed,
+        "candidateRun": False,
+        "freezeCandidate": False,
         "promotionAllowed": False,
         "resumedFrom": _package_pointer(resumed_from) if resumed_from else None,
         "artifacts": {
@@ -733,8 +836,11 @@ def _write_model_package(
             "productiveRuntimeChanged": False,
             "diagnosticOnly": _is_diagnostic_run(run_kind),
             "learningQualityClaimAllowed": baseline_claim_allowed,
+            "repairEvidenceClaimAllowed": repair_evidence_allowed,
             "baselineRunsStarted": baseline_claim_allowed,
             "pilotRunsStarted": pilot_claim_allowed,
+            "candidateRun": False,
+            "freezeCandidate": False,
             "promotionAllowed": False,
         },
     }
@@ -800,6 +906,8 @@ def run_training_from_cli(
         "pilot-train",
         "baseline-train",
         "repair-diagnostic",
+        "technical-smoke",
+        "comparable-repair",
     }:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -815,11 +923,15 @@ def run_training_from_cli(
     algorithm_cfg = config["algorithm"]
     seeds = [int(seed) for seed in env_cfg["trainSeeds"][: int(env_cfg["envCount"])]]
     source_package = None
-    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train", "repair-diagnostic"}:
+    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train", "repair-diagnostic", "comparable-repair"}:
+        prefer_pointer = {
+            "resume-smoke": "latest_learner_smoke.json",
+            "comparable-repair": "latest_technical_smoke.json",
+        }.get(run_kind, "latest_model_package.json")
         source_package = _resolve_package(
             checkpoint,
             artifact_root_path,
-            prefer="latest_learner_smoke.json" if run_kind == "resume-smoke" else "latest_model_package.json",
+            prefer=prefer_pointer,
         )
     timestep_key = {
         "learner-smoke": "learnerTimesteps",
@@ -828,6 +940,8 @@ def run_training_from_cli(
         "pilot-train": "pilotTimesteps",
         "baseline-train": "baselineTimesteps",
         "repair-diagnostic": "repairTimesteps",
+        "technical-smoke": "technicalSmokeTimesteps",
+        "comparable-repair": "shortRepairTimesteps",
     }[run_kind]
     timesteps = int(
         total_timesteps
@@ -882,6 +996,7 @@ def run_training_from_cli(
             "stepsPerSecond": round(float(model.num_timesteps) / elapsed, 6) if elapsed > 0 else 0.0,
             "diagnosticOnly": _is_diagnostic_run(run_kind),
             "learningQualityClaimAllowed": block_id == "BT93C" and _is_baseline_run(run_kind),
+            "repairEvidenceClaimAllowed": block_id == "BT93G" and run_kind == "comparable-repair",
             "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
             "telemetry": _telemetry(vec_env),
@@ -919,6 +1034,8 @@ def run_training_from_cli(
             "guardrails": manifest["guardrails"],
             "baselineRunsStarted": block_id == "BT93C" and _is_baseline_run(run_kind),
             "pilotRunsStarted": block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind)),
+            "candidateRun": False,
+            "freezeCandidate": False,
             "promotionAllowed": False,
         }
         report_path = run_dir / "training_report.json"
@@ -967,6 +1084,7 @@ def run_eval_from_cli(
         "baseline-eval",
         "baseline-repro-eval",
         "holdout-eval",
+        "comparable-repair-eval",
     }:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1033,6 +1151,7 @@ def run_eval_from_cli(
         if source_training_report_path.exists():
             source_training_report = _read_json(source_training_report_path)
         diagnostics = _collect_eval_diagnostics(
+            block_id=block_id,
             run_kind=run_kind,
             info_samples=info_samples,
             telemetry_reports=telemetry_reports,
@@ -1074,6 +1193,7 @@ def run_eval_from_cli(
                 "telemetry": telemetry_reports,
                 "infoTail": info_tail,
             },
+            "evalCommand": " ".join(sys.argv),
             "diagnostics": diagnostics,
             "artifacts": {
                 "evalReport": _rel(run_dir / "eval_report.json"),
@@ -1094,6 +1214,10 @@ def run_eval_from_cli(
                 "pilotRunsStarted": block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind)),
                 "diagnosticOnly": block_id == "BT93F" or _is_diagnostic_run(run_kind),
                 "learningQualityClaimAllowed": baseline_claim_allowed,
+                "repairEvidenceClaimAllowed": _is_bt93g_comparable_eval(block_id, run_kind),
+                "candidateRun": False,
+                "freezeCandidate": False,
+                "promotionAllowed": False,
             },
         }
         report_path = run_dir / "eval_report.json"
@@ -1112,6 +1236,7 @@ def run_eval_from_cli(
             "baseline-eval": "latest_baseline_eval.json",
             "baseline-repro-eval": "latest_baseline_repro_eval.json",
             "holdout-eval": "latest_holdout_eval.json",
+            "comparable-repair-eval": "latest_comparable_repair_eval.json",
         }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({

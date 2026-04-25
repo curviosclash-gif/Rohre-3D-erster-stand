@@ -1,0 +1,10 @@
+{
+  "runId": "20260425T102337Z-comparable-repair",
+  "runKind": "comparable-repair",
+  "ok": true,
+  "report": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/training_report.json",
+  "artifactManifest": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/artifact_manifest.json",
+  "model": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/model.zip",
+  "vecnormalize": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/vecnormalize.pkl",
+  "optimizerState": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/checkpoints/optimizer_state.pt"
+}
