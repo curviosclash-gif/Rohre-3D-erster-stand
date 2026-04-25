@@ -2093,10 +2093,10 @@ Vollstaendiges Befundregister nach BT93G:
 
 ### 93H.1 Terminal-/Death-Root-Cause isolieren
 
-- [ ] 93H.1.1 BT93G-Artefakte gegen Terminal-, Death-, Truncation- und Failure-Felder maschinenlesbar auditieren.
-- [ ] 93H.1.2 Eine minimale Terminal-Provocation-Matrix definieren, die natuerliche Terminal-/Death-Cases erzeugen muss, ohne Runtime-Bypass.
-- [ ] 93H.1.3 Headless- und Python-Eval-Pfade auf dieselbe Terminal-/Death-Semantik abgleichen; Drift wird Blocker, nicht Normalisierung.
-- [ ] 93H.1.4 Ergebnis als `data/training/ppo/bt93h/terminal_root_cause_report.json` schreiben.
+- [x] 93H.1.1 BT93G-Artefakte gegen Terminal-, Death-, Truncation- und Failure-Felder maschinenlesbar auditieren. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_terminal_root_cause.py --write-report` -> `data/training/ppo/bt93h/terminal_root_cause_report.json`, `phaseCoverage.93H.1.1=true`)
+- [x] 93H.1.2 Eine minimale Terminal-Provocation-Matrix definieren, die natuerliche Terminal-/Death-Cases erzeugen muss, ohne Runtime-Bypass. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_terminal_root_cause.py --write-report` -> `data/training/ppo/bt93h/terminal_root_cause_report.json`, `terminalProvocationMatrix.matrixId=bt93h-terminal-provocation-matrix-v1`)
+- [x] 93H.1.3 Headless- und Python-Eval-Pfade auf dieselbe Terminal-/Death-Semantik abgleichen; Drift wird Blocker, nicht Normalisierung. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_terminal_root_cause.py --write-report` -> `data/training/ppo/bt93h/terminal_root_cause_report.json`, `rootCause.driftVerdict=no-field-drift`)
+- [x] 93H.1.4 Ergebnis als `data/training/ppo/bt93h/terminal_root_cause_report.json` schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_terminal_root_cause.py --write-report` -> `terminal-root-cause-isolated`)
 
 ### 93H.2 Survival-Vergleichsbasis reparieren
 
