@@ -6,7 +6,8 @@ import { OBSERVATION_LENGTH_V2, OBSERVATION_SCHEMA_VERSION_V2 } from '../src/ent
 import { DeterministicTrainingStepRunner } from '../src/entities/ai/training/DeterministicTrainingStepRunner.js';
 import { WebSocketTrainerBridge } from '../src/entities/ai/training/WebSocketTrainerBridge.js';
 import { buildTrainerRuntimeObservationPayload, buildTrainerTransitionPayload } from '../src/entities/ai/training/TrainerPayloadAdapter.js';
-import { EpisodeController, TRAINING_TRUNCATION_REASONS } from '../src/state/training/EpisodeController.js';
+import { deriveHeadlessLaneEpisodeStep } from '../scripts/training-headless-lane-runner.mjs';
+import { EpisodeController, TRAINING_TERMINAL_REASONS, TRAINING_TRUNCATION_REASONS } from '../src/state/training/EpisodeController.js';
 import { RewardCalculator, sumRewardComponents } from '../src/state/training/RewardCalculator.js';
 
 test('DeterministicTrainingStepRunner keeps additive reset/step contract stable', () => {
@@ -85,6 +86,41 @@ test('EpisodeController derives done and truncated state deterministically', () 
     assert.equal(reset2.domain?.domainId, 'fight-2d');
     assert.equal(doneStep.done, true);
     assert.equal(doneStep.terminalReason, 'match-ended');
+});
+
+test('Headless lane derives episode terminal semantics from player and kernel state', () => {
+    const dead = deriveHeadlessLaneEpisodeStep({
+        player: { alive: false },
+        lifecycle: 'running',
+    });
+    const roundEnded = deriveHeadlessLaneEpisodeStep({
+        player: { alive: true },
+        lifecycle: 'round_end',
+    });
+    const matchEnded = deriveHeadlessLaneEpisodeStep({
+        player: { alive: true },
+        tickLifecycle: 'match_end',
+    });
+    const timeout = deriveHeadlessLaneEpisodeStep({
+        player: { alive: true },
+        lifecycle: 'running',
+        input: { timeout: true },
+    });
+    const running = deriveHeadlessLaneEpisodeStep({
+        player: { alive: true },
+        lifecycle: 'running',
+    });
+
+    assert.equal(dead.done, true);
+    assert.equal(dead.terminalReason, TRAINING_TERMINAL_REASONS.PLAYER_DEAD);
+    assert.equal(roundEnded.done, true);
+    assert.equal(roundEnded.terminalReason, TRAINING_TERMINAL_REASONS.MATCH_ENDED);
+    assert.equal(matchEnded.done, true);
+    assert.equal(matchEnded.terminalReason, TRAINING_TERMINAL_REASONS.MATCH_ENDED);
+    assert.equal(timeout.truncated, true);
+    assert.equal(timeout.truncatedReason, TRAINING_TRUNCATION_REASONS.TIME_LIMIT);
+    assert.equal(running.done, false);
+    assert.equal(running.truncated, false);
 });
 
 test('RewardCalculator keeps transparent additive shaping totals', () => {

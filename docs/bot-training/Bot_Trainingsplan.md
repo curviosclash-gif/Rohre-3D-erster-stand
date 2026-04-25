@@ -271,7 +271,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93D | 2026-04-24 | frei | 2026-04-24 (abgeschlossen) |
 | Bot-Codex | BT93E | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93F | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
-| Bot-Codex | BT93G | 2026-04-25 | active | 93G.1 abgeschlossen; 93G.2 offen |
+| Bot-Codex | BT93G | 2026-04-25 | active | 93G.2 abgeschlossen; 93G.3 offen |
 | - | BT94A | - | frei | wartet auf `BT93G.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -1910,10 +1910,10 @@ Vollstaendiges Befundregister fuer BT93G-Intake:
 
 ### 93G.2 Natural-Terminal-, Death- und Truncation-Wiring
 
-- [ ] 93G.2.1 In `scripts/training-headless-lane-runner.mjs` Terminal-/Truncation-Zustand aus Player-/Kernel-State ableiten: `player.alive=false -> player-dead`, Kernel `round_end`/`match_end -> match-ended`, Cap/Timeout nur als Truncation.
-- [ ] 93G.2.2 `EpisodeController.step({ done, terminalReason, truncated, truncatedReason })` mit echten Werten aufrufen; `EpisodeController.step({})` darf in der reparierten Lane nicht mehr der Default fuer Eval/Holdout sein.
-- [ ] 93G.2.3 Kontrollierte Probes fuer `player-dead`, `match-ended` und `max-steps` bauen/aktualisieren; Probes belegen Semantik, zaehlen aber nicht als Survival-Qualitaet oder Promotion.
-- [ ] 93G.2.4 Train-, Eval- und Holdout-Reports muessen `terminalReasonCounts`, `truncatedReasonCounts`, `deathCauseCounts`, `naturalTerminal`, `maxSteps`, Crash/Timeout/Forced-Round und `runtimeErrorCount` einheitlich schreiben.
+- [x] 93G.2.1 In `scripts/training-headless-lane-runner.mjs` Terminal-/Truncation-Zustand aus Player-/Kernel-State ableiten: `player.alive=false -> player-dead`, Kernel `round_end`/`match_end -> match-ended`, Cap/Timeout nur als Truncation. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_terminal_wiring_report.py --write` -> `data\training\ppo\bt93g\terminal_wiring_probe_report.json` (`phaseCoverage.93G.2.1=true`, Probes `bt93g-probe-player-dead`, `bt93g-probe-round-ended`, `bt93g-probe-match-ended`))
+- [x] 93G.2.2 `EpisodeController.step({ done, terminalReason, truncated, truncatedReason })` mit echten Werten aufrufen; `EpisodeController.step({})` darf in der reparierten Lane nicht mehr der Default fuer Eval/Holdout sein. (abgeschlossen: 2026-04-25; evidence: `node --test tests/training-environment.contract.test.mjs` -> PASS 6 (`Headless lane derives episode terminal semantics from player and kernel state`))
+- [x] 93G.2.3 Kontrollierte Probes fuer `player-dead`, `match-ended` und `max-steps` bauen/aktualisieren; Probes belegen Semantik, zaehlen aber nicht als Survival-Qualitaet oder Promotion. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_terminal_wiring_report.py --write` -> `data\training\ppo\bt93g\terminal_wiring_probe_report.json` (`phaseCoverage.93G.2.3=true`, `countsAsQualityEvidence=false`, `countsAsPromotionEvidence=false`))
+- [x] 93G.2.4 Train-, Eval- und Holdout-Reports muessen `terminalReasonCounts`, `truncatedReasonCounts`, `deathCauseCounts`, `naturalTerminal`, `maxSteps`, Crash/Timeout/Forced-Round und `runtimeErrorCount` einheitlich schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93g_terminal_wiring_report.py --write` -> `data\training\ppo\bt93g\terminal_wiring_probe_report.json` (`phaseCoverage.93G.2.4=true`, `reportingContract.requiredFields` enthaelt Terminal-/Truncation-/Death-/Runtime-Felder))
 
 ### 93G.3 Pre-Sampling Policy-Level-Mask
 
