@@ -115,6 +115,7 @@ def _load_config(config_path: Path | None) -> tuple[Path, dict[str, Any]]:
         "BT93C": {"93C.3", "93C.4", "93C.5"},
         "BT93F": {"93F.4"},
         "BT93G": {"93G.5"},
+        "BT93H": {"93H.3"},
     }
     block_id = str(config.get("blockId") or "")
     if block_id not in allowed_scopes or config.get("phaseId") not in allowed_scopes[block_id]:
@@ -129,6 +130,10 @@ def _run_sample_class(run_kind: str) -> str:
         return "bt93g-comparable-repair-not-candidate"
     if run_kind == "comparable-repair-eval":
         return "bt93g-comparable-repair-eval-not-ppo-validate"
+    if run_kind == "comparable-terminal-repair":
+        return "bt93h-comparable-terminal-repair-not-candidate"
+    if run_kind == "comparable-terminal-repair-eval":
+        return "bt93h-comparable-terminal-repair-eval-not-ppo-validate"
     if run_kind == "repair-diagnostic":
         return "repair-diagnostic-not-candidate"
     if run_kind.startswith("baseline-"):
@@ -162,6 +167,14 @@ def _is_bt93g_train_run(run_kind: str) -> bool:
 
 def _is_bt93g_comparable_eval(block_id: str, run_kind: str) -> bool:
     return block_id == "BT93G" and run_kind in {"comparable-repair-eval", "holdout-eval"}
+
+
+def _is_bt93h_comparable_eval(block_id: str, run_kind: str) -> bool:
+    return block_id == "BT93H" and run_kind in {"comparable-terminal-repair-eval", "holdout-eval"}
+
+
+def _is_comparable_repair_eval(block_id: str, run_kind: str) -> bool:
+    return _is_bt93g_comparable_eval(block_id, run_kind) or _is_bt93h_comparable_eval(block_id, run_kind)
 
 
 def _action_surface_id(config: Mapping[str, Any]) -> str | None:
@@ -414,7 +427,7 @@ def _collect_eval_diagnostics(
         if "crash" in str(key).lower()
     )
     training_learning = dict((training_report or {}).get("learning") or {})
-    is_baseline = _is_baseline_run(run_kind) or _is_holdout_run(run_kind) or _is_bt93g_comparable_eval(block_id, run_kind)
+    is_baseline = _is_baseline_run(run_kind) or _is_holdout_run(run_kind) or _is_comparable_repair_eval(block_id, run_kind)
     average_survival_reason = None
     if not is_baseline:
         average_survival_reason = (
@@ -460,7 +473,9 @@ def _collect_eval_diagnostics(
             "averageBotSurvival": completed_avg if is_baseline else None,
             "averageBotSurvivalReason": average_survival_reason,
             "averageBotSurvivalSource": (
-                "BT93G comparable repair completed episode length"
+                "BT93H comparable terminal repair completed episode length"
+                if _is_bt93h_comparable_eval(block_id, run_kind)
+                else "BT93G comparable repair completed episode length"
                 if _is_bt93g_comparable_eval(block_id, run_kind)
                 else "BT93C runtime-near completed episode length"
                 if is_baseline
@@ -564,6 +579,65 @@ def _validate_gate_inputs(config: Mapping[str, Any]) -> dict[str, Any]:
             "startContractSha256": _sha256_file(start_contract_path),
             "terminalWiringReport": _rel(terminal_wiring_path),
             "terminalWiringReportSha256": _sha256_file(terminal_wiring_path),
+            "actionMaskReport": _rel(action_mask_path),
+            "actionMaskReportSha256": _sha256_file(action_mask_path),
+            "rewardGateReport": _rel(reward_gate_path),
+            "rewardGateReportSha256": _sha256_file(reward_gate_path),
+            "dependencyLockReport": _rel(dependency_report_path),
+            "dependencyLockReportSha256": _sha256_file(dependency_report_path),
+            "cleanEnvReport": _rel(clean_env_report_path),
+            "cleanEnvReportSha256": _sha256_file(clean_env_report_path),
+            "requirements": _rel(requirements_path),
+            "requirementsSha256": _sha256_file(requirements_path),
+            "freezeOk": False,
+            "reAuditRequired": False,
+            "candidateRunsAllowed": False,
+            "promotionAllowed": False,
+            "actionSurfaceId": _action_surface_id(config),
+            "cleanPython": str(clean_env_report.get("cleanPython") or ""),
+            "semanticWindow": {"modeId": (repair_matrix.get("env") or {}).get("modeId")},
+            "matrix": {
+                "matrixId": repair_matrix.get("matrixId"),
+                "maps": (repair_matrix.get("env") or {}).get("maps"),
+                "seeds": repair_matrix.get("seeds"),
+                "maxStepsPerEpisode": (repair_matrix.get("env") or {}).get("maxStepsPerEpisode"),
+            },
+            "dqnChampion": ((repair_matrix.get("baseline") or {}).get("dqnChampion") or {}),
+        }
+
+    if block_id == "BT93H":
+        terminal_root_path = _repo_path(str(artifacts.get("terminalRootCause")))
+        survival_contract_path = _repo_path(str(artifacts.get("survivalGateContract")))
+        repair_matrix_path = _repo_path(str(artifacts.get("repairMatrix")))
+        action_mask_path = _repo_path(str(artifacts.get("actionMaskReport")))
+        reward_gate_path = _repo_path(str(artifacts.get("rewardGateReport")))
+
+        terminal_root = _read_json(terminal_root_path)
+        survival_contract = _read_json(survival_contract_path)
+        repair_matrix = _read_json(repair_matrix_path)
+        action_mask = _read_json(action_mask_path)
+        reward_gate = _read_json(reward_gate_path)
+
+        if (terminal_root.get("rootCause") or {}).get("fieldContractOk") is not True:
+            raise RuntimeError("BT93H.3 start is blocked by terminal field-contract drift")
+        if survival_contract.get("resultClass") != "survival-gate-contract-pinned":
+            raise RuntimeError("BT93H.3 start is blocked by missing survival gate contract")
+        if (survival_contract.get("executionGate") or {}).get("comparableTerminalRepairAllowed") is not True:
+            raise RuntimeError("BT93H.3 start is blocked by survival contract execution gate")
+        if repair_matrix.get("classification") != "comparable-repair-matrix":
+            raise RuntimeError("BT93H.3 start is blocked by non-comparable repair matrix")
+        if action_mask.get("ok") is not True or reward_gate.get("ok") is not True:
+            raise RuntimeError("BT93H.3 start is blocked by action/reward prerequisite gates")
+        if (action_mask.get("maskSourceContract") or {}).get("preSamplingApplied") is not True:
+            raise RuntimeError("BT93H.3 start is blocked by missing pre-sampling mask")
+
+        return {
+            "terminalRootCause": _rel(terminal_root_path),
+            "terminalRootCauseSha256": _sha256_file(terminal_root_path),
+            "survivalGateContract": _rel(survival_contract_path),
+            "survivalGateContractSha256": _sha256_file(survival_contract_path),
+            "repairMatrix": _rel(repair_matrix_path),
+            "repairMatrixSha256": _sha256_file(repair_matrix_path),
             "actionMaskReport": _rel(action_mask_path),
             "actionMaskReportSha256": _sha256_file(action_mask_path),
             "rewardGateReport": _rel(reward_gate_path),
@@ -751,7 +825,10 @@ def _write_model_package(
     block_id = str(config.get("blockId") or "BT93C")
     baseline_claim_allowed = block_id == "BT93C" and _is_baseline_run(run_kind)
     pilot_claim_allowed = block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind))
-    repair_evidence_allowed = block_id == "BT93G" and run_kind == "comparable-repair"
+    repair_evidence_allowed = (
+        (block_id == "BT93G" and run_kind == "comparable-repair")
+        or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
+    )
     checkpoint_dir = run_dir / "checkpoints"
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     model_path = checkpoint_dir / "model.zip"
@@ -908,6 +985,7 @@ def run_training_from_cli(
         "repair-diagnostic",
         "technical-smoke",
         "comparable-repair",
+        "comparable-terminal-repair",
     }:
         raise RuntimeError(f"unsupported BT93C train run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -923,10 +1001,11 @@ def run_training_from_cli(
     algorithm_cfg = config["algorithm"]
     seeds = [int(seed) for seed in env_cfg["trainSeeds"][: int(env_cfg["envCount"])]]
     source_package = None
-    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train", "repair-diagnostic", "comparable-repair"}:
+    if run_kind in {"resume-smoke", "diagnostics-smoke", "pilot-train", "baseline-train", "repair-diagnostic", "comparable-repair", "comparable-terminal-repair"}:
         prefer_pointer = {
             "resume-smoke": "latest_learner_smoke.json",
             "comparable-repair": "latest_technical_smoke.json",
+            "comparable-terminal-repair": "latest_model_package.json",
         }.get(run_kind, "latest_model_package.json")
         source_package = _resolve_package(
             checkpoint,
@@ -942,6 +1021,7 @@ def run_training_from_cli(
         "repair-diagnostic": "repairTimesteps",
         "technical-smoke": "technicalSmokeTimesteps",
         "comparable-repair": "shortRepairTimesteps",
+        "comparable-terminal-repair": "terminalRepairTimesteps",
     }[run_kind]
     timesteps = int(
         total_timesteps
@@ -996,7 +1076,10 @@ def run_training_from_cli(
             "stepsPerSecond": round(float(model.num_timesteps) / elapsed, 6) if elapsed > 0 else 0.0,
             "diagnosticOnly": _is_diagnostic_run(run_kind),
             "learningQualityClaimAllowed": block_id == "BT93C" and _is_baseline_run(run_kind),
-            "repairEvidenceClaimAllowed": block_id == "BT93G" and run_kind == "comparable-repair",
+            "repairEvidenceClaimAllowed": (
+                (block_id == "BT93G" and run_kind == "comparable-repair")
+                or (block_id == "BT93H" and run_kind == "comparable-terminal-repair")
+            ),
             "baselineComparable": block_id == "BT93C" and _is_baseline_run(run_kind),
             "ppoLearningMetrics": ppo_metrics,
             "telemetry": _telemetry(vec_env),
@@ -1085,6 +1168,7 @@ def run_eval_from_cli(
         "baseline-repro-eval",
         "holdout-eval",
         "comparable-repair-eval",
+        "comparable-terminal-repair-eval",
     }:
         raise RuntimeError(f"unsupported BT93C eval run kind: {run_kind}")
     resolved_config_path, config = _load_config(Path(config_path).resolve() if config_path else None)
@@ -1214,7 +1298,7 @@ def run_eval_from_cli(
                 "pilotRunsStarted": block_id == "BT93C" and (_is_pilot_run(run_kind) or _is_baseline_run(run_kind)),
                 "diagnosticOnly": block_id == "BT93F" or _is_diagnostic_run(run_kind),
                 "learningQualityClaimAllowed": baseline_claim_allowed,
-                "repairEvidenceClaimAllowed": _is_bt93g_comparable_eval(block_id, run_kind),
+                "repairEvidenceClaimAllowed": _is_comparable_repair_eval(block_id, run_kind),
                 "candidateRun": False,
                 "freezeCandidate": False,
                 "promotionAllowed": False,
@@ -1237,6 +1321,7 @@ def run_eval_from_cli(
             "baseline-repro-eval": "latest_baseline_repro_eval.json",
             "holdout-eval": "latest_holdout_eval.json",
             "comparable-repair-eval": "latest_comparable_repair_eval.json",
+            "comparable-terminal-repair-eval": "latest_comparable_terminal_repair_eval.json",
         }.get(run_kind, "latest_eval_smoke.json")
         _write_json(artifact_root_path / pointer_name, pointer)
         print(json.dumps({

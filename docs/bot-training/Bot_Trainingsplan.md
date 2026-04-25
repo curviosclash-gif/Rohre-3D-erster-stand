@@ -2107,11 +2107,11 @@ Vollstaendiges Befundregister nach BT93G:
 
 ### 93H.3 Comparable Terminal Repair ausfuehren
 
-- [ ] 93H.3.1 Nur `run-kind=comparable-terminal-repair` verwenden; nicht `candidate`, nicht `freeze`, nicht `promote`.
-- [ ] 93H.3.2 Pre-Sampling-Masking beibehalten und Mask-/Veto-/Invalid-Raten getrennt von Post-Decode-Clamps berichten.
-- [ ] 93H.3.3 Repair-Learner mit vorab fixiertem Budget laufen lassen; bis zu 4h nur bei gruenem `93H.1`/`93H.2` und aktivem Early-Stop.
-- [ ] 93H.3.4 Eval und Holdout auf derselben Matrix ausfuehren; Natural-Terminal-/Death-Matrix muss nicht leer sein oder der Block endet `diagnose-blocked`.
-- [ ] 93H.3.5 Ergebnis als `data/training/ppo/bt93h/repair_ladder_report.json` schreiben.
+- [x] 93H.3.1 Nur `run-kind=comparable-terminal-repair` verwenden; nicht `candidate`, nicht `freeze`, nicht `promote`. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_repair_ladder_report.py --write-report` -> `data/training/ppo/bt93h/repair_ladder_report.json`, `phaseCoverage.93H.3.1=true`)
+- [x] 93H.3.2 Pre-Sampling-Masking beibehalten und Mask-/Veto-/Invalid-Raten getrennt von Post-Decode-Clamps berichten. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_repair_ladder_report.py --write-report` -> `phaseCoverage.93H.3.2=true`, `preSamplingMaskRate=1.0`)
+- [x] 93H.3.3 Repair-Learner mit vorab fixiertem Budget laufen lassen; bis zu 4h nur bei gruenem `93H.1`/`93H.2` und aktivem Early-Stop. (abgeschlossen: 2026-04-25; evidence: `python python\train.py --profile bt93h --run-kind comparable-terminal-repair --phase-id 93H.3.3 --config python\configs\ppo_bt93h_comparable_terminal_repair.json --artifact-root data\training\ppo\bt93h --checkpoint data\training\ppo\bt93g\latest_model_package.json --total-timesteps 768` -> `data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/training_report.json`)
+- [x] 93H.3.4 Eval und Holdout auf derselben Matrix ausfuehren; Natural-Terminal-/Death-Matrix muss nicht leer sein oder der Block endet `diagnose-blocked`. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_repair_ladder_report.py --write-report` -> `resultClass=diagnose-blocked`, `terminalDeathMatrixStartCapable=false`)
+- [x] 93H.3.5 Ergebnis als `data/training/ppo/bt93h/repair_ladder_report.json` schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_repair_ladder_report.py --write-report` -> `blockedFindings=F.05,F.19,F.27,F.31`)
 
 ### 93H.4 Gate-Refresh und Handover-Entscheidung
 

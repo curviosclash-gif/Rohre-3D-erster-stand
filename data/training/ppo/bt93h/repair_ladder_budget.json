@@ -1,0 +1,74 @@
+{
+  "blockId": "BT93H",
+  "budget": {
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "checkpointFrequency": "final-model-package-per-bt93h-stage",
+    "earlyStopRules": [
+      "stop before holdout if eval has runtimeErrorCount > 0",
+      "stop before holdout if eval terminal/death matrix is not start-capable",
+      "stop before gate-refresh if avgStepsPerEpisode regresses against DQN",
+      "stop before any 4h continuation if terminal-provocation controls do not emit player-dead, match-ended and max-steps separately",
+      "no optimization after holdout"
+    ],
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "evalIntervalTimesteps": 256,
+    "evalSeeds": [
+      944,
+      945,
+      946
+    ],
+    "evalSteps": 540,
+    "holdoutEvalSteps": 360,
+    "holdoutSeeds": [
+      960,
+      961
+    ],
+    "matrixId": "bt93g-comparable-repair-matrix-v1",
+    "maxStepsPerEpisode": 180,
+    "runKind": "comparable-terminal-repair",
+    "terminalRepairTimesteps": 768,
+    "trainSeeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "wallClockLimitSeconds": 14400
+  },
+  "budgetChecks": {
+    "checks": {
+      "checkpointFrequencyPinned": true,
+      "earlyStopRulesPinned": true,
+      "evalIntervalPinned": true,
+      "evalStepsPinned": true,
+      "fourHourRunBlockedBeforeProvocation": true,
+      "holdoutEvalStepsPinned": true,
+      "matrixUnchanged": true,
+      "runKindPinned": true,
+      "terminalRepairTimestepsPinned": true,
+      "wallClockWithin4h": true
+    },
+    "ok": true
+  },
+  "generatedAt": "2026-04-25T11:38:31Z",
+  "generatedBy": "python/scripts/bt93h_repair_ladder_report.py",
+  "gitSha": "b985f9e85d1d254ef47217d875bbffffbabb128f",
+  "ok": true,
+  "phaseId": "93H.3",
+  "resultClass": "comparable-terminal-repair-budget-pinned",
+  "sourceArtifacts": {
+    "bt93hConfig": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93h_comparable_terminal_repair.json",
+      "role": "BT93H comparable terminal repair config",
+      "sha256": "11c1c3560f5a84c4169c67431b32daf968005df39e7265e7df516d7bc2de3ae6"
+    },
+    "survivalGateContract": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/survival_gate_contract.json",
+      "role": "BT93H survival gate contract",
+      "sha256": "c5bc0ae27e5c80cc330ea2047daed1529fc5e95a757930ad2a611b140292e117"
+    }
+  }
+}
