@@ -36,8 +36,10 @@
       "bt93eSourceArtifact": "data/training/ppo/bt93e/survival_repair_report.json",
       "bt93fDisposition": "still-blocking",
       "bt93fSourceArtifact": "data/training/ppo/bt93f/repair_diagnostic_report.json",
-      "evidence": "BT93F same-matrix eval/holdout keeps Survival-First blocked (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
-      "gate": "93F.5/BT94A",
+      "bt93gDisposition": "still-blocking",
+      "bt93gSourceArtifact": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "evidence": "BT93G comparable repair keeps Survival-First blocked because avgSteps regress (avgStepsPerEpisodePct=-41.232362).",
+      "gate": "93G.6/BT94A",
       "id": "F.05",
       "status": "bt94a-blocker"
     },
@@ -140,8 +142,10 @@
       "bt93eSourceArtifact": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
       "bt93fDisposition": "still-blocking",
       "bt93fSourceArtifact": "data/training/ppo/bt93f/terminal_reward_failure_report.json",
-      "evidence": "BT93F terminal/death matrix remains max-steps-only or empty for BT94A start.",
-      "gate": "93F.5/BT94A",
+      "bt93gDisposition": "still-blocking",
+      "bt93gSourceArtifact": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "evidence": "BT93G eval/holdout terminal/death matrix is still empty or not start-capable.",
+      "gate": "93G.6/BT94A",
       "id": "F.19",
       "status": "bt94a-blocker"
     },
@@ -202,8 +206,10 @@
       "bt93eSourceArtifact": "data/training/ppo/bt93e/survival_repair_report.json",
       "bt93fDisposition": "still-blocking",
       "bt93fSourceArtifact": "data/training/ppo/bt93f/repair_diagnostic_report.json",
-      "evidence": "BT93F comparison remains ppo-regression; hard rules: ppo-regression against DQN anchor; reward remains positive while survival regresses; terminal/death matrix remains max-steps-only or empty; high post-decode clamp/veto/invalid/sanitizer load; policy-level mask remains a follow-blocker.",
-      "gate": "93F.5/BT94A",
+      "bt93gDisposition": "still-blocking",
+      "bt93gSourceArtifact": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "evidence": "BT93G comparison remains ppo-regression; hard rules: ppo-regression against DQN anchor; terminal/death matrix remains max-steps-only or empty.",
+      "gate": "93G.6/BT94A",
       "id": "F.27",
       "status": "bt94a-blocker"
     },
@@ -222,17 +228,19 @@
       "status": "closed"
     },
     {
-      "blocksBt94a": true,
+      "blocksBt94a": false,
       "bt93dDisposition": "still-blocking",
       "bt93dSourceArtifact": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
       "bt93eDisposition": "still-blocking",
       "bt93eSourceArtifact": "data/training/ppo/bt93e/action_surface_hardening_report.json",
       "bt93fDisposition": "still-blocking",
       "bt93fSourceArtifact": "data/training/ppo/bt93f/action_surface_repair_report.json",
-      "evidence": "BT93F policy-level masking remains a follow-blocker; clamp/veto load cannot open BT94A.",
-      "gate": "93F.5/BT94A",
+      "bt93gDisposition": "closed-for-bt93g-repair-lane",
+      "bt93gSourceArtifact": "data/training/ppo/bt93g/action_mask_report.json",
+      "evidence": "BT93G masked semantic action surface reports preSamplingMaskRate=1.0 and zero clamp/veto load.",
+      "gate": "93G.6/BT94A",
       "id": "F.30",
-      "status": "bt94a-blocker"
+      "status": "closed"
     },
     {
       "blocksBt94a": true,
@@ -242,8 +250,10 @@
       "bt93eSourceArtifact": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
       "bt93fDisposition": "still-blocking",
       "bt93fSourceArtifact": "data/training/ppo/bt93f/terminal_reward_failure_report.json",
-      "evidence": "BT93F natural terminal/death evidence remains weak or absent in eval/holdout.",
-      "gate": "93F.5/BT94A",
+      "bt93gDisposition": "still-blocking",
+      "bt93gSourceArtifact": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "evidence": "BT93G natural terminal/death evidence remains insufficient for BT94A start.",
+      "gate": "93G.6/BT94A",
       "id": "F.31",
       "status": "bt94a-blocker"
     },
@@ -334,17 +344,28 @@
       "R.01": "still-blocking"
     }
   },
+  "bt93gRefresh": {
+    "allTrackedFindingsExplicit": true,
+    "phaseId": "93G.6.1",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "closed-for-bt93g-repair-lane",
+      "F.31": "still-blocking",
+      "R.01": "closed-for-93g-repair-eval"
+    }
+  },
   "bt94aStoppers": [
     "F.05",
     "F.19",
     "F.27",
-    "F.30",
     "F.31"
   ],
-  "generatedAt": "2026-04-25T08:36:36Z",
-  "generatedBy": "python/scripts/bt93f_gate_refresh_handover.py",
+  "generatedAt": "2026-04-25T10:33:17Z",
+  "generatedBy": "python/scripts/bt93g_gate_refresh_handover.py",
   "ok": true,
-  "phaseId": "93F.5.1",
+  "phaseId": "93G.6.1",
   "riskRegisterAlignment": [
     {
       "disposition": "blocked by ppo-regression result and promotionAllowed=false",
@@ -434,16 +455,34 @@
       "role": "BT93F terminal/reward/failure diagnostics",
       "sha256": "949a73fc46ed893549b7c3b1812c15902bc0d7f6f8de45ed0760d7fc5c95d211"
     },
+    "bt93gActionMask": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/action_mask_report.json",
+      "role": "BT93G pre-sampling mask",
+      "sha256": "7a8ac47dd6ca79b0a9ae87f5cb10a091d59958d2cf3786d08cfdbd888bf05b9a"
+    },
+    "bt93gRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "role": "BT93G repair ladder",
+      "sha256": "4b555e885d9ffefc3c725f7775930105e83569fd10d1480c40611afa45d19739"
+    },
+    "bt93gRewardGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/reward_gate_report.json",
+      "role": "BT93G reward gate",
+      "sha256": "f221e4bfb849bca314bc8873433b68b05d4debd84bbef8eee6aeb9b4c9db8f92"
+    },
     "precomparisonReport": {
       "closureCapable": true,
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "role": "BT93F-refreshed precomparison",
-      "sha256": "430e4298759905b557c4ea5f92cb24966e3c4bbed499f7893ff170237a90576b"
+      "role": "BT93G-refreshed precomparison",
+      "sha256": "d867141d2d5f4c3120d16bc4d1758d762030723d3012c8b268b7663e8c1538fa"
     }
   },
   "summary": {
-    "bt94a-blocker": 5,
-    "closed": 21,
+    "bt94a-blocker": 4,
+    "closed": 22,
     "follow-gated": 11
   },
   "tmpSelfCountStaleDocState": {

@@ -2,35 +2,30 @@
   "blockId": "BT94A",
   "bt93cState": {
     "baselineId": "bt93c-ppo-baseline-publish-v1",
-    "bt94aBlockerCount": 5,
+    "bt94aBlockerCount": 4,
     "bt94aBlockers": [
       {
-        "evidence": "BT93F same-matrix eval/holdout keeps Survival-First blocked (averageBotSurvivalPct=-57.19291, holdoutAverageBotSurvivalPct=-57.19291).",
-        "gate": "93F.5/BT94A",
+        "evidence": "BT93G comparable repair keeps Survival-First blocked because avgSteps regress (avgStepsPerEpisodePct=-41.232362).",
+        "gate": "93G.6/BT94A",
         "id": "F.05"
       },
       {
-        "evidence": "BT93F terminal/death matrix remains max-steps-only or empty for BT94A start.",
-        "gate": "93F.5/BT94A",
+        "evidence": "BT93G eval/holdout terminal/death matrix is still empty or not start-capable.",
+        "gate": "93G.6/BT94A",
         "id": "F.19"
       },
       {
-        "evidence": "BT93F comparison remains ppo-regression; hard rules: ppo-regression against DQN anchor; reward remains positive while survival regresses; terminal/death matrix remains max-steps-only or empty; high post-decode clamp/veto/invalid/sanitizer load; policy-level mask remains a follow-blocker.",
-        "gate": "93F.5/BT94A",
+        "evidence": "BT93G comparison remains ppo-regression; hard rules: ppo-regression against DQN anchor; terminal/death matrix remains max-steps-only or empty.",
+        "gate": "93G.6/BT94A",
         "id": "F.27"
       },
       {
-        "evidence": "BT93F policy-level masking remains a follow-blocker; clamp/veto load cannot open BT94A.",
-        "gate": "93F.5/BT94A",
-        "id": "F.30"
-      },
-      {
-        "evidence": "BT93F natural terminal/death evidence remains weak or absent in eval/holdout.",
-        "gate": "93F.5/BT94A",
+        "evidence": "BT93G natural terminal/death evidence remains insufficient for BT94A start.",
+        "gate": "93G.6/BT94A",
         "id": "F.31"
       }
     ],
-    "handoverGate": "closed-diagnose-blocked-by-bt93f",
+    "handoverGate": "closed-diagnose-blocked-by-bt93g",
     "handoverReady": false,
     "handoverResultClass": "diagnose",
     "matrixId": "bt93c-dqn-ppo-precomparison-v1",
@@ -49,9 +44,7 @@
       "F.05",
       "F.19",
       "F.27",
-      "F.30",
-      "F.31",
-      "R.01"
+      "F.31"
     ],
     "semanticWindow": "runtime-near-headless-v1"
   },
@@ -68,7 +61,7 @@
     {
       "blocksStart": true,
       "id": "handover_gate_ready",
-      "observed": "closed-diagnose-blocked-by-bt93f",
+      "observed": "closed-diagnose-blocked-by-bt93g",
       "ok": false,
       "required": "ready=true"
     },
@@ -82,15 +75,15 @@
     {
       "blocksStart": true,
       "id": "no_open_bt94a_audit_blockers",
-      "observed": 5,
+      "observed": 4,
       "ok": false,
       "required": 0
     }
   ],
   "claimable": false,
-  "generatedAt": "2026-04-25T08:36:40Z",
+  "generatedAt": "2026-04-25T10:33:21Z",
   "generatedBy": "python/scripts/bt94a_gate_check.py",
-  "gitSha": "72f5719b5ba6989190089b303c212914f6340482",
+  "gitSha": "f3e73894327e23ea2c6e767a78f6e4e1fd1f1edb",
   "matrixDefinitionAllowed": false,
   "nextGate": {
     "fallback": "user-owned replan or return to PPO diagnosis before candidate ablations",
@@ -111,7 +104,7 @@
       "BT94B handover",
       "promotion or rollout signal"
     ],
-    "reason": "BT93F still has red start evidence; BT94A remains closed.",
+    "reason": "BT93G still has red start evidence; BT94A remains closed.",
     "status": "BT94A remains closed before 94A.1"
   },
   "ok": true,
@@ -120,15 +113,15 @@
   "sourceArtifacts": {
     "evidenceQualityMatrix": {
       "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
-      "sha256": "9386ae0737542fc6ce03bf5ea0ff3d03486de1c63a2edaa96f2641086e71a3d1"
+      "sha256": "53903ecaf9acfaa8b65e6a0a3e29fb3974b83bcd63e455338c9fcd8ac441171d"
     },
     "handoverReport": {
       "path": "data/training/ppo/bt93c/handover_report.json",
-      "sha256": "35ebcd28fe4789e0738bf887d2c71ef8e762d94040bdd146bd1fce1afd129197"
+      "sha256": "de9b35171644b834631921bd2854907dcdc442d87bce6a9d8c1c6c35982f960d"
     },
     "precomparisonReport": {
       "path": "data/training/ppo/bt93c/precomparison_report.json",
-      "sha256": "430e4298759905b557c4ea5f92cb24966e3c4bbed499f7893ff170237a90576b"
+      "sha256": "d867141d2d5f4c3120d16bc4d1758d762030723d3012c8b268b7663e8c1538fa"
     }
   }
 }
