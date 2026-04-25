@@ -1,0 +1,413 @@
+{
+  "blockId": "BT93H",
+  "budgetAndEarlyStop": {
+    "checkpointFrequency": "final-model-package-per-ladder-stage",
+    "earlyStopRules": [
+      "stop before any next ladder stage if PPO metrics cross collapse thresholds",
+      "stop before holdout if eval has runtimeErrorCount > 0",
+      "stop before BT94A gate refresh if preSamplingMaskRate is missing or postDecodeClamp/safety-veto thresholds fail",
+      "no optimization after holdout",
+      "stop before long-run continuation if terminal-provocation controls do not emit player-dead, match-ended and max-steps separately",
+      "stop before holdout if eval terminal/death matrix is not start-capable",
+      "stop before gate-refresh if eval or holdout avgStepsPerEpisode regresses against DQN"
+    ],
+    "evalIntervalTimesteps": 256,
+    "sourceBudgetResultClass": "extended-repair-budget-pinned",
+    "timeoutBudgetSeconds": 14400,
+    "wallClockLimitSeconds": 14400
+  },
+  "commands": {
+    "report": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93h_survival_gate_contract.py --write-report"
+  },
+  "currentBt93gObservedStats": {
+    "bt93gComparableEval": {
+      "actionTelemetry": {
+        "fieldCounts": {},
+        "invalidActionRate": 0.0,
+        "maskRate": 0.0,
+        "noopRate": 0.126852,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 1080,
+        "vetoRate": 0.0
+      },
+      "averageBotSurvival": 69.066667,
+      "avgStepsPerEpisode": 69.066667,
+      "completedEpisodeCount": 15,
+      "completedEpisodeStats": {
+        "count": 15,
+        "max": 99.0,
+        "mean": 69.066667,
+        "median": 70.0,
+        "min": 26.0,
+        "stdev": 20.184042
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 15
+        },
+        "emptyDeathCauseCounts": false,
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 15
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      }
+    },
+    "bt93gHoldout": {
+      "actionTelemetry": {
+        "fieldCounts": {},
+        "invalidActionRate": 0.0,
+        "maskRate": 0.0,
+        "noopRate": 0.077778,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 720,
+        "vetoRate": 0.0
+      },
+      "averageBotSurvival": 77.0,
+      "avgStepsPerEpisode": 77.0,
+      "completedEpisodeCount": 8,
+      "completedEpisodeStats": {
+        "count": 8,
+        "max": 96.0,
+        "mean": 77.0,
+        "median": 76.5,
+        "min": 54.0,
+        "stdev": 13.856406
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 8
+        },
+        "emptyDeathCauseCounts": false,
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 8
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      }
+    }
+  },
+  "decisionRules": {
+    "BT94A-ready": {
+      "class": "gate-open-for-94A1-only",
+      "thresholds": {
+        "dqnAverageBotSurvival": 37.376986,
+        "dqnAvgStepsPerEpisode": 117.525,
+        "minEvalAverageBotSurvival": 48.590082,
+        "minEvalAvgStepsPerEpisode": 117.525,
+        "minHoldoutAverageBotSurvival": 48.590082,
+        "minHoldoutAvgStepsPerEpisode": 117.525,
+        "minStepsDeltaPct": 0.0,
+        "minSurvivalDeltaPctForBt94aReady": 30.0
+      },
+      "whenAll": [
+        "no common hard failures",
+        "eval.avgStepsPerEpisodePctAgainstDqn >= 0",
+        "holdout.avgStepsPerEpisodePctAgainstDqn >= 0",
+        "eval.averageBotSurvivalPctAgainstDqn >= 30",
+        "holdout.averageBotSurvivalPctAgainstDqn >= 30",
+        "terminal/death matrix start-capable in eval and holdout",
+        "no optimization after holdout",
+        "candidateFreezeAllowed=false",
+        "promotionAllowed=false"
+      ]
+    },
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "maxGradNorm": 0.5,
+      "maxValueLoss": 100.0,
+      "minEntropy": 0.01,
+      "minExplainedVariance": -1.0
+    },
+    "diagnose": {
+      "class": "blocking",
+      "terminalRule": "eval and holdout each need deathCauseCounts and non-death naturalTerminal>0; max-steps-only or empty terminal/death matrices are diagnose-blocked",
+      "whenAny": [
+        "runtimeErrorCount > 0",
+        "missing median/stdev/completedEpisodeLengths",
+        "episodeCount below contract minimum",
+        "field contract drift between headless and Python eval",
+        "terminal/death matrix not start-capable",
+        "postDecodeClampRate >= safety threshold",
+        "vetoRate >= safety threshold",
+        "invalidActionRate != 0",
+        "sanitizerRate != 0",
+        "rewardTotal > 0 while survival or steps regress",
+        "PPO collapse thresholds exceeded"
+      ]
+    },
+    "hold": {
+      "class": "non-promotion",
+      "whenAll": [
+        "no common hard failures",
+        "no negative eval/holdout deltas against DQN",
+        "survival +30% target is not met on eval or holdout"
+      ]
+    },
+    "ppo-regression": {
+      "class": "blocking",
+      "whenAny": [
+        "eval.avgStepsPerEpisodePctAgainstDqn < 0",
+        "holdout.avgStepsPerEpisodePctAgainstDqn < 0",
+        "eval.averageBotSurvivalPctAgainstDqn < 0",
+        "holdout.averageBotSurvivalPctAgainstDqn < 0"
+      ]
+    },
+    "safetyThresholds": {
+      "invalidActionRateEq": 0.0,
+      "postDecodeClampRateLt": 0.5,
+      "sanitizerRateEq": 0.0,
+      "vetoRateLt": 0.25
+    }
+  },
+  "evidenceLimits": {
+    "candidateRun": false,
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsRolloutEvidence": false,
+    "freezeCandidate": false
+  },
+  "executionGate": {
+    "comparableTerminalRepairAllowed": true,
+    "currentNaturalTerminalCoverageGap": true,
+    "diagnosticAndTerminalProvocationAllowed": true,
+    "fourHourRunAllowedBeforeProvocationGate": false,
+    "fourHourRunMaxSeconds": 14400,
+    "requiresBeforeLongRun": [
+      "terminal-provocation player-dead, match-ended and max-steps controls pass",
+      "survival gate contract is unchanged from this artifact",
+      "checkpoint and eval interval are pinned",
+      "early-stop rules are active"
+    ],
+    "terminalFieldContractOk": true
+  },
+  "forbiddenWork": [
+    "BT94A candidate run",
+    "freeze candidate",
+    "BT94B handover",
+    "promote",
+    "rollout-ready wording",
+    "productive Runtime, Matchstart, AI-Hub, Strategy-Flag or JS-Inference changes"
+  ],
+  "generatedAt": "2026-04-25T11:30:06Z",
+  "generatedBy": "python/scripts/bt93h_survival_gate_contract.py",
+  "gitSha": "91e5df8598058b4abadb031d9c04a7c75faf5225",
+  "guardrails": {
+    "bt94aCheckboxClosureAllowed": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "minimumStatisticsBeforeRun": {
+    "episodeCount": {
+      "evalMin": 15,
+      "holdoutMin": 8,
+      "source": "max(BT93G matrix minimum, BT93G observed completed episode count)"
+    },
+    "requiredActionTelemetry": [
+      "preSamplingMaskRate",
+      "postDecodeClampRate",
+      "invalidActionRate",
+      "sanitizerRate",
+      "vetoRate"
+    ],
+    "requiredDeltas": [
+      "eval.avgStepsPerEpisodePctAgainstDqn",
+      "eval.averageBotSurvivalPctAgainstDqn",
+      "holdout.avgStepsPerEpisodePctAgainstDqn",
+      "holdout.averageBotSurvivalPctAgainstDqn"
+    ],
+    "requiredDistributions": {
+      "completedEpisodeLengths": true,
+      "max": true,
+      "mean": true,
+      "median": true,
+      "min": true,
+      "stdev": true
+    },
+    "requiredFailureClasses": [
+      "runtimeErrorCount",
+      "crash",
+      "timeout",
+      "forcedRound",
+      "maxSteps",
+      "naturalTerminal",
+      "deathCauseCounts",
+      "terminalReasonCounts",
+      "truncatedReasonCounts"
+    ]
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93H.2.1": true,
+    "93H.2.2": true,
+    "93H.2.3": true,
+    "93H.2.4": true
+  },
+  "phaseId": "93H.2",
+  "referenceLock": {
+    "bt93cBaseline": {
+      "baselineId": "bt93c-ppo-baseline-publish-v1",
+      "metrics": {
+        "averageBotSurvival": 16.0,
+        "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+        "avgStepsPerEpisode": 16.0,
+        "failureClasses": {
+          "crash": 0,
+          "forcedRound": 0,
+          "maxSteps": 2,
+          "naturalTerminal": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "timeout": 0
+        },
+        "invalidActionRate": 0.0,
+        "maskRate": 1.0,
+        "rewardTotal": 3.6,
+        "runtimeErrorCount": 0,
+        "sanitizerRate": 0.0,
+        "stepsPerSecond": 29.933344,
+        "vetoRate": 0.84375
+      },
+      "readOnly": true,
+      "runScope": "conservative baseline, not promotion"
+    },
+    "bt93gRepair": {
+      "deltasAgainstDqn": {
+        "averageBotSurvivalPct": 84.783939,
+        "avgStepsPerEpisodePct": -41.232362,
+        "holdoutAverageBotSurvivalPct": 106.00912,
+        "resultClass": "ppo-regression"
+      },
+      "findingDisposition": {
+        "F.05": "still-blocking",
+        "F.19": "still-blocking",
+        "F.27": "still-blocking",
+        "F.30": "closed-for-bt93g-repair-lane",
+        "F.31": "still-blocking",
+        "R.01": "closed-for-93g-repair-eval"
+      },
+      "matrixId": "bt93g-comparable-repair-matrix-v1",
+      "readOnly": true,
+      "resultClass": "diagnose-blocked"
+    },
+    "dqnAnchor": {
+      "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
+      "metrics": {
+        "averageBotSurvival": 37.376986,
+        "avgStepsPerEpisode": 117.525,
+        "invalidActionRate": 1.0,
+        "runtimeErrorCount": null,
+        "source": "BT11 historical DQN champion anchor"
+      },
+      "readOnly": true,
+      "semanticWindow": {
+        "bt93cLearner": "runtime-near-headless-v1",
+        "comparisonCaveat": "93C.6 must disclose any semantic drift before PPO/DQN comparison.",
+        "dqnChampion": "BT11 legacy DQN champion window"
+      }
+    },
+    "holdoutMatrix": {
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "maxStepsPerEpisode": 180,
+      "modeId": "runtime-near-headless-v1",
+      "noPostHoldoutOptimization": true,
+      "readOnly": true,
+      "seeds": {
+        "eval": [
+          944,
+          945,
+          946
+        ],
+        "holdout": [
+          960,
+          961
+        ],
+        "train": [
+          934,
+          935,
+          936,
+          937
+        ]
+      }
+    }
+  },
+  "resultClass": "survival-gate-contract-pinned",
+  "sourceArtifacts": {
+    "bt93cBaseline": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/baseline_report.json",
+      "role": "BT93C PPO baseline",
+      "sha256": "3bdd65b5490de6e83df3779c7dba32f05a9aec1bf20b4a5d3d5d774642a29617"
+    },
+    "bt93cBaselineSource": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/baseline_source_manifest.json",
+      "role": "BT93C DQN anchor source",
+      "sha256": "dc70734b299940f803aaf135c01ac811a1df97a1ea5a79af9c7d4c151a7ca91a"
+    },
+    "bt93cPrecomparison": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "BT93C/BT93G refreshed precomparison",
+      "sha256": "d867141d2d5f4c3120d16bc4d1758d762030723d3012c8b268b7663e8c1538fa"
+    },
+    "bt93gConfig": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93g_comparable_repair.json",
+      "role": "BT93G comparable repair config",
+      "sha256": "44a722e8d1f2849107af01ffbf4298948aaf9bfa78fc85335cba7ab3a6837b5d"
+    },
+    "bt93gRepairBudget": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_ladder_budget.json",
+      "role": "BT93G repair budget",
+      "sha256": "897175ebde0f61fbb87b571ddaffd4afaae09c00e250e6852f7368bca3d84b53"
+    },
+    "bt93gRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "role": "BT93G repair ladder",
+      "sha256": "4b555e885d9ffefc3c725f7775930105e83569fd10d1480c40611afa45d19739"
+    },
+    "bt93gRepairMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_matrix.json",
+      "role": "BT93G repair matrix",
+      "sha256": "eb8fe175e02e303a93ac74494e694937fde2aa25a9970d1cdbeaa59f8de611e7"
+    },
+    "terminalRootCause": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/terminal_root_cause_report.json",
+      "role": "BT93H terminal root cause",
+      "sha256": "3af647673ea2a850d539e490fb382bbb57f2b3c213eb6b85e9ab4bd2ebd55ae3"
+    }
+  }
+}

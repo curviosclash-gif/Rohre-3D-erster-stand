@@ -2100,10 +2100,10 @@ Vollstaendiges Befundregister nach BT93G:
 
 ### 93H.2 Survival-Vergleichsbasis reparieren
 
-- [ ] 93H.2.1 DQN-Anker, BT93C-Baseline, BT93G-Repair und Holdout-Matrix unveraendert referenzieren.
-- [ ] 93H.2.2 Mindeststatistik vor Laufstart festlegen: Episodenanzahl, Median, Streuung, Survival-/Steps-Delta, Runtime-/Failure-Klassen.
-- [ ] 93H.2.3 Regeln fuer `ppo-regression`, `hold`, `diagnose` und `BT94A-ready` vor dem Lauf fixieren.
-- [ ] 93H.2.4 Ergebnis als `data/training/ppo/bt93h/survival_gate_contract.json` schreiben.
+- [x] 93H.2.1 DQN-Anker, BT93C-Baseline, BT93G-Repair und Holdout-Matrix unveraendert referenzieren. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_survival_gate_contract.py --write-report` -> `data/training/ppo/bt93h/survival_gate_contract.json`, `referenceLock.*.readOnly=true`)
+- [x] 93H.2.2 Mindeststatistik vor Laufstart festlegen: Episodenanzahl, Median, Streuung, Survival-/Steps-Delta, Runtime-/Failure-Klassen. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_survival_gate_contract.py --write-report` -> `evalMin=15`, `holdoutMin=8`)
+- [x] 93H.2.3 Regeln fuer `ppo-regression`, `hold`, `diagnose` und `BT94A-ready` vor dem Lauf fixieren. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_survival_gate_contract.py --write-report` -> `decisionRules.BT94A-ready.thresholds.minSurvivalDeltaPctForBt94aReady=30`)
+- [x] 93H.2.4 Ergebnis als `data/training/ppo/bt93h/survival_gate_contract.json` schreiben. (abgeschlossen: 2026-04-25; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93h_survival_gate_contract.py --write-report` -> `survival-gate-contract-pinned`)
 
 ### 93H.3 Comparable Terminal Repair ausfuehren
 
