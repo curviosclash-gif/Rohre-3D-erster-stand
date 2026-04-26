@@ -7,12 +7,13 @@ const { contextBridge, ipcRenderer } = require('electron');
 const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     discovery: 'preload.discovery.v1',
     host: 'preload.host.v1',
-    save: 'preload.save.v1',
+    save: 'preload.save.v2',
     recording: 'preload.recording.v1',
     lifecycle: 'preload.lifecycle.v1',
     settingsDefaults: 'preload.settings-defaults.v1',
 });
 const PLATFORM_CAPABILITY_SNAPSHOT_CONTRACT_VERSION = 'platform-capability-snapshot.v1';
+const RECORDING_VIDEO_EXPORT_REQUEST_CONTRACT_VERSION = 'recording-video-export-request.v1';
 
 function createInvokeBridge(channel) {
     return (...args) => ipcRenderer.invoke(channel, ...args);
@@ -69,9 +70,18 @@ function createHostContract() {
 }
 
 function createSaveContract() {
+    const saveRecordingVideoExport = createInvokeBridge('save-recording-video-export');
     return createNamedContract('save', PRELOAD_CONTRACT_VERSIONS.save, {
         saveReplay: createInvokeBridge('save-replay'),
-        saveVideo: createInvokeBridge('save-video'),
+        saveVideo: (videoBytes, defaultName, mimeType) => saveRecordingVideoExport({
+            contractVersion: RECORDING_VIDEO_EXPORT_REQUEST_CONTRACT_VERSION,
+            capabilityId: 'recording-video-export-save',
+            videoBytes,
+            fileName: defaultName,
+            mimeType,
+            runtimeKind: 'desktop',
+        }),
+        saveRecordingVideoExport,
     });
 }
 
@@ -190,6 +200,7 @@ const curviosApp = Object.freeze({
     stopLanServer: hostContract.stop,
     saveReplay: saveContract.saveReplay,
     saveVideo: saveContract.saveVideo,
+    saveRecordingVideoExport: saveContract.saveRecordingVideoExport,
     startDiscovery: discoveryContract.start,
     stopDiscovery: discoveryContract.stop,
     getDiscoveredHosts: discoveryContract.listHosts,

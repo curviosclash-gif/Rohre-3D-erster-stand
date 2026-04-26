@@ -13,10 +13,14 @@ import {
 } from '../../shared/contracts/PlatformSurfacePolicyOps.js';
 import { createBrowserSaveAdapter } from '../../platform/browser/BrowserPlatformAdapters.js';
 import { createElectronPreloadSaveAdapter } from '../../platform/electron/ElectronPlatformBridge.js';
+import {
+    createRecordingVideoExportRequest,
+    RECORDING_DESKTOP_SAVE_CAPABILITY_IDS,
+} from './RecordingVideoExportContract.js';
 
 const DESKTOP_SAVE_VERSION_FIELDS = Object.freeze(['contractVersion']);
-const DESKTOP_SAVE_SUPPORTED_VERSIONS = Object.freeze(['preload.save.v1']);
-const DESKTOP_SAVE_CURRENT_VERSION = 'preload.save.v1';
+const DESKTOP_SAVE_SUPPORTED_VERSIONS = Object.freeze(['preload.save.v1', 'preload.save.v2']);
+const DESKTOP_SAVE_CURRENT_VERSION = 'preload.save.v2';
 
 function dedupeWarnings(warnings) {
     const unique = [];
@@ -39,6 +43,11 @@ function createDownloadStatus({
     message = '',
     warnings = [],
     surfaceClassification = '',
+    filePath = null,
+    container = '',
+    saveCapabilityId = '',
+    saveCode = '',
+    exportMatrix = null,
 }) {
     return {
         requested: requested === true,
@@ -49,6 +58,32 @@ function createDownloadStatus({
         message: String(message || '').trim(),
         warnings: dedupeWarnings(warnings),
         surfaceClassification: String(surfaceClassification || '').trim(),
+        filePath: filePath ? String(filePath) : null,
+        container: String(container || '').trim() || null,
+        saveCapabilityId: String(saveCapabilityId || '').trim() || null,
+        saveCode: String(saveCode || '').trim() || null,
+        exportMatrix: exportMatrix && typeof exportMatrix === 'object'
+            ? { ...exportMatrix }
+            : null,
+    };
+}
+
+function resolveRecordingVideoExportInvoker(desktopSaveAdapter) {
+    if (typeof desktopSaveAdapter?.saveRecordingVideoExport === 'function') {
+        return {
+            kind: 'named',
+            invoke: desktopSaveAdapter.saveRecordingVideoExport,
+        };
+    }
+    if (typeof desktopSaveAdapter?.saveVideo === 'function') {
+        return {
+            kind: 'legacy',
+            invoke: ({ videoBytes, fileName, mimeType }) => desktopSaveAdapter.saveVideo(videoBytes, fileName, mimeType),
+        };
+    }
+    return {
+        kind: 'unavailable',
+        invoke: null,
     };
 }
 
@@ -119,13 +154,22 @@ export function buildDownloadFileName(downloadDirectoryName, fileName) {
  *   blob: Blob,
  *   fileName: string,
  *   mimeType: string,
+ *   captureProfile?: string,
  *   autoDownload: boolean,
  *   downloadHandler: function,
  *   logger: object
  * }} params
  * @returns {Promise<{requested: boolean, transport: string, status: string, fallbackReason: string|null, apiStatus: number|null}>}
  */
-export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownload, downloadHandler, logger }) {
+export async function attemptAutoDownload({
+    blob,
+    fileName,
+    mimeType,
+    captureProfile = null,
+    autoDownload,
+    downloadHandler,
+    logger,
+}) {
     const videoFeatureClassification = resolveSurfaceFeatureClassification(
         PLATFORM_SURFACE_FEATURE_IDS.VIDEO_EXPORT,
         { runtimeGlobal: globalThis }
@@ -140,7 +184,7 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
         });
     }
     const safeFileName = String(fileName || '').trim();
-    const browserFileName = safeFileName.split('/').filter(Boolean).pop() || safeFileName;
+    const browserFileName = safeFileName.replace(/\\/g, '/').split('/').filter(Boolean).pop() || safeFileName;
     const desktopSaveAdapter = createElectronPreloadSaveAdapter(globalThis);
     const isBrowserDemoSurface = videoFeatureClassification.productSurfaceId === PLATFORM_PRODUCT_SURFACE_IDS.BROWSER_DEMO;
     const browserVideoFallbackAllowed = !isBrowserDemoSurface
@@ -169,10 +213,17 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
         { runtimeGlobal: globalThis }
     );
     const desktopSaveAdapterVersionSupported = isSupportedDesktopSaveAdapterContract(desktopSaveAdapter);
+    const recordingVideoExportInvoker = resolveRecordingVideoExportInvoker(desktopSaveAdapter);
     const browserSaveAdapter = createBrowserSaveAdapter({
         saveVideo: saveSurfaceCapability.available === true
             && browserVideoFallbackAllowed
             ? (payload, downloadFileName, resolvedMimeType) => {
+                if (typeof downloadHandler !== 'function') {
+                    return {
+                        saved: false,
+                        error: new Error('download_handler_unavailable'),
+                    };
+                }
                 const blobPayload = payload instanceof Blob
                     ? payload
                     : new Blob([payload], { type: resolvedMimeType || mimeType || 'application/octet-stream' });
@@ -209,12 +260,20 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
     if (
         desktopSaveAdapterVersionSupported
         && desktopSaveAdapter.isAvailable()
-        && typeof desktopSaveAdapter.saveVideo === 'function'
+        && typeof recordingVideoExportInvoker.invoke === 'function'
         && typeof blob.arrayBuffer === 'function'
     ) {
         try {
             const bytes = new Uint8Array(await blob.arrayBuffer());
-            const appResult = await desktopSaveAdapter.saveVideo(bytes, browserFileName, mimeType);
+            const saveRequest = createRecordingVideoExportRequest({
+                runtimeKind: 'desktop',
+                fileName: safeFileName,
+                mimeType,
+                captureProfile,
+                surfaceClassification: videoFeatureClassification.classification,
+                videoBytes: bytes,
+            });
+            const appResult = await recordingVideoExportInvoker.invoke(saveRequest);
             if (appResult?.saved === true) {
                 logger?.info?.('[DownloadService] recording export saved via electron app', browserFileName);
                 return createDownloadStatus({
@@ -224,7 +283,17 @@ export async function attemptAutoDownload({ blob, fileName, mimeType, autoDownlo
                     message: 'Recording wurde direkt ueber die Desktop-App gespeichert.',
                     warnings: statusWarnings,
                     surfaceClassification: videoFeatureClassification.classification,
+                    filePath: appResult.filePath || null,
+                    container: appResult.container || saveRequest.container,
+                    saveCapabilityId: appResult.capabilityId
+                        || saveRequest.capabilityId
+                        || RECORDING_DESKTOP_SAVE_CAPABILITY_IDS.VIDEO_EXPORT_SAVE,
+                    saveCode: appResult.code || '',
+                    exportMatrix: saveRequest.exportMatrix,
                 });
+            }
+            if (appResult?.code) {
+                statusWarnings.push(`Desktop-Speicheradapter meldete ${appResult.code}.`);
             }
         } catch (error) {
             logger?.warn?.('[DownloadService] recording export app save failed', error);

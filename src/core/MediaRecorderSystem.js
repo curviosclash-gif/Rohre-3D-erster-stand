@@ -703,7 +703,9 @@ export class MediaRecorderSystem {
         return {
             fileName: this._lastExport.fileName,
             downloadFileName: this._lastExport.downloadFileName,
+            filePath: this._lastExport.filePath || null,
             mimeType: this._lastExport.mimeType,
+            container: this._lastExport.container || null,
             sizeBytes: this._lastExport.sizeBytes,
             startedAt: this._lastExport.startedAt,
             endedAt: this._lastExport.endedAt,
@@ -711,6 +713,11 @@ export class MediaRecorderSystem {
             trigger: this._lastExport.trigger,
             captureProfile: this._lastExport.captureProfile || null,
             hudMode: this._lastExport.hudMode || null,
+            saveCapabilityId: this._lastExport.saveCapabilityId || null,
+            saveCode: this._lastExport.saveCode || null,
+            exportMatrix: this._lastExport.exportMatrix
+                ? { ...this._lastExport.exportMatrix }
+                : null,
             frameIntervalStats: this._lastExport.frameIntervalStats
                 ? { ...this._lastExport.frameIntervalStats }
                 : null,
@@ -1192,11 +1199,12 @@ export class MediaRecorderSystem {
             estimatedDurationMs,
         };
     }
-    async _attemptAutoDownload(blob, fileName, mimeType) {
+    async _attemptAutoDownload(blob, { fileName, downloadFileName = fileName, mimeType, captureProfile = null } = {}) {
         return attemptAutoDownload({
             blob,
-            fileName,
+            fileName: downloadFileName || fileName,
             mimeType,
+            captureProfile,
             autoDownload: this.autoDownload,
             downloadHandler: this.downloadHandler,
             logger: this.logger,
@@ -1230,7 +1238,12 @@ export class MediaRecorderSystem {
         );
         const downloadFileName = this._buildDownloadFileName(fileName);
         const recorderDiagnostics = this.getRecordingDiagnostics();
-        const exportStatus = await this._attemptAutoDownload(safeBlob, downloadFileName || fileName, resolvedMimeType);
+        const exportStatus = await this._attemptAutoDownload(safeBlob, {
+            fileName,
+            downloadFileName,
+            mimeType: resolvedMimeType,
+            captureProfile: activeRecording?.captureProfile || this.recordingCaptureSettings?.profile || null,
+        });
         if (this._lastExport?.objectUrl) {
             URL.revokeObjectURL(this._lastExport.objectUrl);
         }
@@ -1240,7 +1253,9 @@ export class MediaRecorderSystem {
             objectUrl,
             fileName,
             downloadFileName,
+            filePath: exportStatus?.filePath || null,
             mimeType: resolvedMimeType,
+            container: exportStatus?.container || null,
             sizeBytes: safeBlob.size,
             startedAt: timing.startedAt,
             endedAt: timing.endedAt,
@@ -1248,6 +1263,11 @@ export class MediaRecorderSystem {
             trigger: activeRecording?.stopTrigger || activeRecording?.trigger || null,
             captureProfile: activeRecording?.captureProfile || this.recordingCaptureSettings?.profile || null,
             hudMode: activeRecording?.hudMode || this.recordingCaptureSettings?.hudMode || null,
+            saveCapabilityId: exportStatus?.saveCapabilityId || null,
+            saveCode: exportStatus?.saveCode || null,
+            exportMatrix: exportStatus?.exportMatrix
+                ? { ...exportStatus.exportMatrix }
+                : null,
             frameIntervalStats: frameIntervalStats
                 ? { ...frameIntervalStats }
                 : null,
@@ -1265,7 +1285,9 @@ export class MediaRecorderSystem {
         const result = this._buildStopResult(true, 'stopped', {
             fileName,
             downloadFileName,
+            filePath: exportStatus?.filePath || null,
             mimeType: resolvedMimeType,
+            container: exportStatus?.container || null,
             sizeBytes: safeBlob.size,
             exportTransport: exportStatus.transport,
             exportStatus: { ...exportStatus },
@@ -1274,6 +1296,11 @@ export class MediaRecorderSystem {
             durationMs: timing.durationMs,
             captureProfile: this._lastExport.captureProfile,
             hudMode: this._lastExport.hudMode,
+            saveCapabilityId: this._lastExport.saveCapabilityId || null,
+            saveCode: this._lastExport.saveCode || null,
+            exportMatrix: this._lastExport.exportMatrix
+                ? { ...this._lastExport.exportMatrix }
+                : null,
             frameIntervalStats: frameIntervalStats
                 ? { ...frameIntervalStats }
                 : null,

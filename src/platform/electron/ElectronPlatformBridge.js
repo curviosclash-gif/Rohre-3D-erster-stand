@@ -16,7 +16,7 @@ import {
 const PRELOAD_CONTRACT_VERSIONS = Object.freeze({
     discovery: 'preload.discovery.v1',
     host: 'preload.host.v1',
-    save: 'preload.save.v1',
+    save: 'preload.save.v2',
     recording: 'preload.recording.v1',
     lifecycle: 'preload.lifecycle.v1',
 });
@@ -198,7 +198,16 @@ export function createElectronPreloadSaveAdapter(runtimeGlobal = globalThis) {
         appRuntime,
         appRuntime?.saveVideo
     );
-    const available = resolveCapabilityAvailability([saveReplay, saveVideo], 'any');
+    const saveRecordingVideoExport = createCapabilityIntent(
+        saveContract,
+        saveContract?.saveRecordingVideoExport,
+        appRuntime,
+        appRuntime?.saveRecordingVideoExport
+    );
+    const available = resolveCapabilityAvailability(
+        [saveReplay, saveVideo, saveRecordingVideoExport],
+        'any'
+    );
     const capability = createCapabilityAdapterDescriptor(
         PLATFORM_CAPABILITY_IDS.SAVE,
         resolveNamedCapability(appRuntime, 'save'),
@@ -213,7 +222,8 @@ export function createElectronPreloadSaveAdapter(runtimeGlobal = globalThis) {
         {
             available,
             resolvedFlags: {
-                supportsBinaryExport: typeof saveVideo === 'function',
+                supportsBinaryExport: typeof saveVideo === 'function'
+                    || typeof saveRecordingVideoExport === 'function',
             },
         }
     );
@@ -225,6 +235,7 @@ export function createElectronPreloadSaveAdapter(runtimeGlobal = globalThis) {
         isAvailable: () => capability.available === true,
         saveReplay,
         saveVideo,
+        saveRecordingVideoExport,
     });
 }
 
