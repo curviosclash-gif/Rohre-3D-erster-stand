@@ -1,4 +1,17 @@
-import { MENU_TEXT_CATALOG } from '../../composition/core-ui/CoreSettingsPorts.js';
+import {
+    MENU_TEXT_CATALOG,
+    SETTINGS_CHANGE_KEYS,
+} from '../../composition/core-ui/CoreSettingsPorts.js';
+
+function withMutationChangedKeys(result, textId) {
+    return {
+        ...result,
+        changedKeys: result?.success ? [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES] : [],
+        metadata: result?.success
+            ? { textId: String(textId || '').trim() }
+            : null,
+    };
+}
 
 export function createSettingsTextOverrideFacade(options = {}) {
     const menuTextOverrideStore = options.menuTextOverrideStore;
@@ -10,17 +23,17 @@ export function createSettingsTextOverrideFacade(options = {}) {
     function setMenuTextOverride(textId, textValue) {
         const normalizedTextId = String(textId || '').trim();
         if (!normalizedTextId || !Object.prototype.hasOwnProperty.call(MENU_TEXT_CATALOG, normalizedTextId)) {
-            return { success: false, reason: 'unknown_text_id' };
+            return { success: false, reason: 'unknown_text_id', changedKeys: [], metadata: null };
         }
-        return menuTextOverrideStore.setOverride(textId, textValue);
+        return withMutationChangedKeys(menuTextOverrideStore.setOverride(textId, textValue), normalizedTextId);
     }
 
     function clearMenuTextOverride(textId) {
         const normalizedTextId = String(textId || '').trim();
         if (!normalizedTextId || !Object.prototype.hasOwnProperty.call(MENU_TEXT_CATALOG, normalizedTextId)) {
-            return { success: false, reason: 'unknown_text_id' };
+            return { success: false, reason: 'unknown_text_id', changedKeys: [], metadata: null };
         }
-        return menuTextOverrideStore.clearOverride(textId);
+        return withMutationChangedKeys(menuTextOverrideStore.clearOverride(textId), normalizedTextId);
     }
 
     return {

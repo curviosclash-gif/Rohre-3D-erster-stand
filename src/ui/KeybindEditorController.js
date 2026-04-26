@@ -1,4 +1,4 @@
-import { GLOBAL_KEY_BIND_ACTIONS, KEY_BIND_ACTIONS } from '../core/SettingsManager.js';
+import { GLOBAL_KEY_BIND_ACTIONS, KEY_BIND_ACTIONS } from './KeybindActionCatalog.js';
 
 export class KeybindEditorController {
     constructor(game) {

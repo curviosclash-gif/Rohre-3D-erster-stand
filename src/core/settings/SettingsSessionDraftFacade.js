@@ -2,7 +2,41 @@ import {
     ensureMenuContractState,
     MENU_SESSION_TYPES,
     normalizeSessionType,
+    SETTINGS_CHANGE_KEYS,
 } from '../../composition/core-ui/CoreSettingsPorts.js';
+
+const SESSION_DRAFT_CHANGED_KEYS = Object.freeze([
+    SETTINGS_CHANGE_KEYS.SESSION_TYPE,
+    SETTINGS_CHANGE_KEYS.MODE,
+    SETTINGS_CHANGE_KEYS.MODE_PATH,
+    SETTINGS_CHANGE_KEYS.MULTIPLAYER_TRANSPORT,
+    SETTINGS_CHANGE_KEYS.LOCAL_THEME_MODE,
+    SETTINGS_CHANGE_KEYS.MAP_KEY,
+    SETTINGS_CHANGE_KEYS.GAME_MODE,
+    SETTINGS_CHANGE_KEYS.BOTS_COUNT,
+    SETTINGS_CHANGE_KEYS.BOTS_DIFFICULTY,
+    SETTINGS_CHANGE_KEYS.RULES_WINS_NEEDED,
+    SETTINGS_CHANGE_KEYS.RULES_AUTO_ROLL,
+    SETTINGS_CHANGE_KEYS.RULES_PORTALS_ENABLED,
+    SETTINGS_CHANGE_KEYS.HUNT_RESPAWN_ENABLED,
+    SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_1,
+    SETTINGS_CHANGE_KEYS.VEHICLES_PLAYER_2,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_SPEED,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_TURN_SENSITIVITY,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANE_SCALE,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_TRAIL_WIDTH,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_GAP_SIZE,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_GAP_FREQUENCY,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_ITEM_AMOUNT,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_FIRE_RATE,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_LOCK_ON_ANGLE,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_MG_TRAIL_AIM_RADIUS,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_FIGHT_PLAYER_HP,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_FIGHT_MG_DAMAGE,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_MODE,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_PORTAL_COUNT,
+    SETTINGS_CHANGE_KEYS.GAMEPLAY_PLANAR_LEVEL_COUNT,
+]);
 
 export function createSettingsSessionDraftFacade(options = {}) {
     const menuDraftStore = options.menuDraftStore;
@@ -28,7 +62,15 @@ export function createSettingsSessionDraftFacade(options = {}) {
                 vehicleP2: String(settings?.vehicles?.PLAYER_2 || ''),
             };
         }
-        return result;
+        return {
+            ...result,
+            reason: result.success ? 'saved' : 'storage_failed',
+            changedKeys: [],
+            metadata: {
+                sessionType: normalizedSessionType,
+                persistedDraftState: result.success,
+            },
+        };
     }
 
     function applySessionDraft(settings, sessionType) {
@@ -41,6 +83,10 @@ export function createSettingsSessionDraftFacade(options = {}) {
         return {
             ...draftResult,
             sessionType: normalizedSessionType,
+            changedKeys: draftResult.success ? SESSION_DRAFT_CHANGED_KEYS.slice() : [],
+            metadata: {
+                sessionType: normalizedSessionType,
+            },
         };
     }
 
@@ -51,23 +97,41 @@ export function createSettingsSessionDraftFacade(options = {}) {
         if (targetSessionType === currentSessionType) {
             return {
                 success: true,
+                reason: 'unchanged',
                 changed: false,
                 targetSessionType,
                 loadedDraft: false,
+                changedKeys: [],
+                metadata: {
+                    sessionType: targetSessionType,
+                    savedCurrentDraft: false,
+                },
             };
         }
 
-        saveSessionDraft(settings, currentSessionType);
+        const saveResult = saveSessionDraft(settings, currentSessionType);
         const draftResult = applySessionDraft(settings, targetSessionType);
         settings.localSettings.sessionType = targetSessionType;
         settings.mode = targetSessionType === MENU_SESSION_TYPES.SPLITSCREEN ? '2p' : '1p';
 
         return {
             success: true,
+            reason: draftResult.success ? 'draft_applied' : 'session_type_changed_without_draft',
             changed: true,
             targetSessionType,
             loadedDraft: draftResult.success,
             draftResult,
+            changedKeys: draftResult.success
+                ? draftResult.changedKeys.slice()
+                : [
+                    SETTINGS_CHANGE_KEYS.SESSION_TYPE,
+                    SETTINGS_CHANGE_KEYS.MODE,
+                ],
+            metadata: {
+                sessionType: targetSessionType,
+                savedCurrentDraft: saveResult.success,
+            },
+            warnings: saveResult.success ? [] : ['session_draft_save_failed'],
         };
     }
 

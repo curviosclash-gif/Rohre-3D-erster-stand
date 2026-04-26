@@ -23,7 +23,9 @@ export function handleDeveloperModeToggleAction(ctx) {
         return;
     }
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED],
     });
 }
 
@@ -40,7 +42,9 @@ export function handleDeveloperThemeChangeAction(ctx) {
         return;
     }
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID],
     });
 }
 
@@ -56,7 +60,9 @@ export function handleDeveloperVisibilityChangeAction(ctx) {
         return;
     }
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_VISIBILITY_MODE],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_VISIBILITY_MODE],
     });
 }
 
@@ -72,7 +78,9 @@ export function handleDeveloperFixedPresetLockToggleAction(ctx) {
         return;
     }
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_FIXED_PRESET_LOCK],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_FIXED_PRESET_LOCK],
     });
 }
 
@@ -89,7 +97,9 @@ export function handleDeveloperActorChangeAction(ctx) {
         return;
     }
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_ACTOR_ID],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_ACTOR_ID],
     });
 }
 
@@ -106,7 +116,9 @@ export function handleDeveloperReleasePreviewToggleAction(ctx) {
         return;
     }
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_RELEASE_PREVIEW],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_RELEASE_PREVIEW],
     });
     game._showStatusToast(
         enabled
@@ -133,7 +145,9 @@ export function handleDeveloperTextOverrideSetAction(ctx) {
     }
 
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES],
     });
     game._showStatusToast('Text-Override gespeichert.', 1200, 'success');
 }
@@ -151,7 +165,9 @@ export function handleDeveloperTextOverrideClearAction(ctx) {
         return;
     }
     onSettingsChanged({
-        changedKeys: [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [SETTINGS_CHANGE_KEYS.DEVELOPER_TEXT_OVERRIDES],
     });
     game._showStatusToast('Text-Override geloescht.', 1200, 'success');
 }

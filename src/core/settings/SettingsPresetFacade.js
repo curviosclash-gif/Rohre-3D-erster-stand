@@ -4,8 +4,15 @@ import {
     createPresetMetadata,
     ensureMenuContractState,
     resolveMenuAccessContext,
+    SETTINGS_CHANGE_KEYS,
 } from '../../composition/core-ui/CoreSettingsPorts.js';
 import { normalizePresetId } from './SettingsDomainUtils.js';
+
+function mergeChangedKeys(...groups) {
+    return Array.from(new Set(groups.flatMap((group) => (
+        Array.isArray(group) ? group : []
+    ))));
+}
 
 export function createSettingsPresetFacade(options = {}) {
     const menuPresetStore = options.menuPresetStore;
@@ -20,11 +27,11 @@ export function createSettingsPresetFacade(options = {}) {
     function applyMenuPreset(settings, presetId, accessContext = null) {
         const normalizedPresetId = String(presetId || '').trim();
         if (!normalizedPresetId) {
-            return { success: false, reason: 'invalid_preset_id' };
+            return { success: false, reason: 'invalid_preset_id', changedKeys: [], metadata: null };
         }
         const preset = menuPresetStore.getPresetById(normalizedPresetId);
         if (!preset) {
-            return { success: false, reason: 'preset_not_found' };
+            return { success: false, reason: 'preset_not_found', changedKeys: [], metadata: null };
         }
 
         ensureMenuContractState(settings);
@@ -42,17 +49,31 @@ export function createSettingsPresetFacade(options = {}) {
             changedKeys: Array.isArray(result.changedKeys) ? result.changedKeys : [],
         });
         ensureMenuContractState(settings);
-        const changedKeys = Array.from(new Set([
-            ...(Array.isArray(result.changedKeys) ? result.changedKeys : []),
-            ...(Array.isArray(compatibilityResult.changedKeys) ? compatibilityResult.changedKeys : []),
-        ]));
+        const success = result.reason !== 'invalid_payload';
+        const changedKeys = success
+            ? mergeChangedKeys(
+                result.changedKeys,
+                compatibilityResult.changedKeys,
+                [
+                    SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_ID,
+                    SETTINGS_CHANGE_KEYS.PRESET_ACTIVE_KIND,
+                    SETTINGS_CHANGE_KEYS.PRESET_STATUS,
+                ]
+            )
+            : [];
 
         return {
-            success: result.reason !== 'invalid_payload',
-            preset,
             ...result,
+            success,
+            preset,
             changedKeys,
             compatibilityResult,
+            metadata: success
+                ? {
+                    presetId: preset.id,
+                    presetKind: preset?.metadata?.kind || '',
+                }
+                : null,
         };
     }
 
@@ -63,14 +84,14 @@ export function createSettingsPresetFacade(options = {}) {
             : resolveMenuAccessContext(settings);
         const kind = optionsPayload.kind === 'fixed' ? 'fixed' : 'open';
         if (kind === 'fixed' && !resolvedContext.isOwner) {
-            return { success: false, reason: 'owner_required' };
+            return { success: false, reason: 'owner_required', changedKeys: [], metadata: null };
         }
 
         const requestedName = String(optionsPayload.name || '').trim();
         const requestedId = String(optionsPayload.id || '').trim();
         const derivedId = normalizePresetId(requestedId || requestedName || `preset-${Date.now()}`);
         if (!derivedId) {
-            return { success: false, reason: 'invalid_preset_id' };
+            return { success: false, reason: 'invalid_preset_id', changedKeys: [], metadata: null };
         }
 
         const metadata = createPresetMetadata({
@@ -90,7 +111,22 @@ export function createSettingsPresetFacade(options = {}) {
             metadata,
             values: capturePresetValuesFromSettings(settings),
         };
-        return menuPresetStore.upsertPreset(preset, resolvedContext);
+        const result = menuPresetStore.upsertPreset(preset, resolvedContext);
+        return {
+            ...result,
+            changedKeys: result.success
+                ? [
+                    SETTINGS_CHANGE_KEYS.PRESET_LIST,
+                    SETTINGS_CHANGE_KEYS.PRESET_STATUS,
+                ]
+                : [],
+            metadata: result.success
+                ? {
+                    presetId: result.preset?.id || metadata.id,
+                    presetKind: kind,
+                }
+                : null,
+        };
     }
 
     function deleteMenuPreset(presetId, settings, accessContext = null) {
@@ -98,7 +134,22 @@ export function createSettingsPresetFacade(options = {}) {
         const resolvedContext = accessContext && typeof accessContext === 'object'
             ? accessContext
             : resolveMenuAccessContext(settings);
-        return menuPresetStore.deletePreset(presetId, resolvedContext);
+        const result = menuPresetStore.deletePreset(presetId, resolvedContext);
+        return {
+            ...result,
+            changedKeys: result.success
+                ? [
+                    SETTINGS_CHANGE_KEYS.PRESET_LIST,
+                    SETTINGS_CHANGE_KEYS.PRESET_STATUS,
+                ]
+                : [],
+            metadata: result.success
+                ? {
+                    presetId: result.preset?.id || String(presetId || '').trim(),
+                    presetKind: result.preset?.metadata?.kind || '',
+                }
+                : null,
+        };
     }
 
     return {

@@ -171,7 +171,9 @@ export function handleSessionTypeChangeAction(ctx) {
         return;
     }
 
-    const changedKeys = [...SESSION_SWITCH_CHANGED_KEYS];
+    const changedKeys = Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+        ? result.changedKeys.slice()
+        : [...SESSION_SWITCH_CHANGED_KEYS];
     let selectedMultiplayerTransport = '';
     if (result.targetSessionType === 'multiplayer') {
         const transportResult = applyProductiveMultiplayerTransport(game);

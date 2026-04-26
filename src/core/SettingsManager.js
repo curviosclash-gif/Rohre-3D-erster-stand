@@ -27,29 +27,13 @@ import { createSettingsDeveloperFacade } from './settings/SettingsDeveloperFacad
 import { createSettingsTextOverrideFacade } from './settings/SettingsTextOverrideFacade.js';
 import { createSettingsTelemetryFacade } from './settings/SettingsTelemetryFacade.js';
 
-export const KEY_BIND_ACTIONS = [
-    { label: 'Pitch Hoch', key: 'UP' },
-    { label: 'Pitch Runter', key: 'DOWN' },
-    { label: 'Links (Gier)', key: 'LEFT' },
-    { label: 'Rechts (Gier)', key: 'RIGHT' },
-    { label: 'Rollen Links', key: 'ROLL_LEFT' },
-    { label: 'Rollen Rechts', key: 'ROLL_RIGHT' },
-    { label: 'Boost', key: 'BOOST' },
-    { label: 'Schiessen (Item)', key: 'SHOOT' },
-    { label: 'MG Schiessen', key: 'SHOOT_MG' },
-    { label: 'Item nutzen', key: 'USE_ITEM' },
-    { label: 'Item Wechseln', key: 'NEXT_ITEM' },
-    { label: 'Kamera', key: 'CAMERA' },
-];
-
-export const GLOBAL_KEY_BIND_ACTIONS = [
-    { label: 'Cinematic Kamera (beide Spieler)', key: 'CINEMATIC_TOGGLE' },
-    { label: 'Videoaufnahme Start/Stopp', key: 'RECORDING_TOGGLE' },
-];
-
 export class SettingsManager {
-    constructor() {
+    constructor(options = {}) {
+        this.runtimeGlobal = options.runtimeGlobal || globalThis;
         this.store = new SettingsStore({
+            storagePlatform: options.storagePlatform,
+            storage: options.storage,
+            onQuotaExceeded: options.onQuotaExceeded,
             sanitizeSettings: (settings) => this.sanitizeSettings(settings),
             createDefaultSettings: () => this.createDefaultSettings(),
         });
@@ -76,10 +60,19 @@ export class SettingsManager {
             menuTelemetryStore: this.menuTelemetryStore,
             telemetryHistoryStore: this.telemetryHistoryStore,
         });
+
+        this.profileStorePort = {
+            loadProfiles: () => this.store.loadProfiles(),
+            saveProfiles: (profiles) => this.store.saveProfiles(profiles),
+            sanitizeSettings: (settings) => this.sanitizeSettings(settings),
+            normalizeProfileName: (rawName) => this.store.normalizeProfileName(rawName),
+            findProfileIndexByName: (profiles, profileName) => this.store.findProfileIndexByName(profiles, profileName),
+            findProfileByName: (profiles, profileName) => this.store.findProfileByName(profiles, profileName),
+        };
     }
 
     createDefaultSettings() {
-        return createDefaultSettingsSnapshotForRuntime();
+        return createDefaultSettingsSnapshotForRuntime(this.runtimeGlobal);
     }
 
     cloneDefaultControls() {
@@ -87,16 +80,12 @@ export class SettingsManager {
     }
 
     sanitizeSettings(saved) {
-        return sanitizeSettingsSnapshot(saved, () => this.createDefaultSettings());
+        const sanitizedSettings = sanitizeSettingsSnapshot(saved, () => this.createDefaultSettings());
+        return rebaseSettingsSnapshotWithRuntimeDefaults(sanitizedSettings, this.runtimeGlobal);
     }
 
     loadSettings() {
-        const loadedSettings = this.store.loadSettings();
-        const rebasedSettings = rebaseSettingsSnapshotWithRuntimeDefaults(loadedSettings);
-        if (JSON.stringify(loadedSettings) !== JSON.stringify(rebasedSettings)) {
-            this.store.saveSettings(rebasedSettings);
-        }
-        return rebasedSettings;
+        return this.store.loadSettings();
     }
 
     saveSettings(settings) {
@@ -186,5 +175,9 @@ export class SettingsManager {
 
     createRuntimeConfig(settings) {
         return createRuntimeConfigSnapshot(settings, { baseConfig: CONFIG });
+    }
+
+    getProfileStorePort() {
+        return this.profileStorePort;
     }
 }

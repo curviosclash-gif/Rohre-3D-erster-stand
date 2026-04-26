@@ -1,5 +1,5 @@
 import {
-    applyDeveloperThemeToDocument,
+    SETTINGS_CHANGE_KEYS,
     setDeveloperActorId,
     setDeveloperFixedPresetLock,
     setDeveloperModeEnabled,
@@ -8,32 +8,58 @@ import {
     setDeveloperVisibilityMode,
 } from '../../composition/core-ui/CoreSettingsPorts.js';
 
+function withMutationChangedKeys(result, changedKeys, metadata = null) {
+    return {
+        ...result,
+        changedKeys: result?.success ? changedKeys.slice() : [],
+        metadata: result?.success && metadata && typeof metadata === 'object'
+            ? { ...metadata }
+            : null,
+    };
+}
+
 export function createSettingsDeveloperFacade() {
     function setDeveloperMode(settings, enabled, accessContext = null) {
-        return setDeveloperModeEnabled(settings, enabled, accessContext);
+        return withMutationChangedKeys(
+            setDeveloperModeEnabled(settings, enabled, accessContext),
+            [SETTINGS_CHANGE_KEYS.DEVELOPER_MODE_ENABLED]
+        );
     }
 
     function setDeveloperThemeById(settings, themeId, accessContext = null) {
-        const result = setDeveloperTheme(settings, themeId, accessContext);
-        if (!result.success) return result;
-        applyDeveloperThemeToDocument(settings?.localSettings?.developerThemeId);
-        return result;
+        return withMutationChangedKeys(
+            setDeveloperTheme(settings, themeId, accessContext),
+            [SETTINGS_CHANGE_KEYS.DEVELOPER_THEME_ID],
+            { uiEffectOwner: 'ui' }
+        );
     }
 
     function setDeveloperFixedPresetLockState(settings, enabled, accessContext = null) {
-        return setDeveloperFixedPresetLock(settings, enabled, accessContext);
+        return withMutationChangedKeys(
+            setDeveloperFixedPresetLock(settings, enabled, accessContext),
+            [SETTINGS_CHANGE_KEYS.DEVELOPER_FIXED_PRESET_LOCK]
+        );
     }
 
     function setDeveloperActor(settings, actorId, accessContext = null) {
-        return setDeveloperActorId(settings, actorId, accessContext);
+        return withMutationChangedKeys(
+            setDeveloperActorId(settings, actorId, accessContext),
+            [SETTINGS_CHANGE_KEYS.DEVELOPER_ACTOR_ID]
+        );
     }
 
     function setDeveloperReleasePreview(settings, enabled, accessContext = null) {
-        return setDeveloperReleasePreviewEnabled(settings, enabled, accessContext);
+        return withMutationChangedKeys(
+            setDeveloperReleasePreviewEnabled(settings, enabled, accessContext),
+            [SETTINGS_CHANGE_KEYS.DEVELOPER_RELEASE_PREVIEW]
+        );
     }
 
     function setDeveloperVisibility(settings, mode, accessContext = null) {
-        return setDeveloperVisibilityMode(settings, mode, accessContext);
+        return withMutationChangedKeys(
+            setDeveloperVisibilityMode(settings, mode, accessContext),
+            [SETTINGS_CHANGE_KEYS.DEVELOPER_VISIBILITY_MODE]
+        );
     }
 
     return {

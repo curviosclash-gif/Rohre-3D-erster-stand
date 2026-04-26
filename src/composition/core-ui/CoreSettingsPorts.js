@@ -1,4 +1,5 @@
 export { SettingsStore } from '../../ui/SettingsStore.js';
+export { SETTINGS_CHANGE_KEYS } from '../../ui/SettingsChangeKeys.js';
 export { ensureMenuContractState, MENU_SESSION_TYPES } from '../../ui/menu/MenuStateContracts.js';
 export { resolveMenuAccessContext } from '../../ui/menu/MenuAccessPolicy.js';
 export {

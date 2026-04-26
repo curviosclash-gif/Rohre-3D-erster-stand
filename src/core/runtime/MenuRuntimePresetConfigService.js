@@ -85,12 +85,13 @@ export function applyMenuPresetAction({
         return;
     }
 
-    const changedKeys = Array.isArray(result.changedKeys) ? result.changedKeys.slice() : [];
-    changedKeys.push(
-        settingsChangeKeys.PRESET_ACTIVE_ID,
-        settingsChangeKeys.PRESET_ACTIVE_KIND,
-        settingsChangeKeys.PRESET_STATUS
-    );
+    const changedKeys = Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+        ? result.changedKeys.slice()
+        : [
+            settingsChangeKeys.PRESET_ACTIVE_ID,
+            settingsChangeKeys.PRESET_ACTIVE_KIND,
+            settingsChangeKeys.PRESET_STATUS,
+        ];
     onSettingsChanged?.({ changedKeys });
 
     if (result.blockedPaths?.length > 0) {
@@ -124,10 +125,12 @@ export function saveMenuPresetAction({
         return;
     }
     onSettingsChanged?.({
-        changedKeys: [
-            settingsChangeKeys.PRESET_LIST,
-            settingsChangeKeys.PRESET_STATUS,
-        ],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [
+                settingsChangeKeys.PRESET_LIST,
+                settingsChangeKeys.PRESET_STATUS,
+            ],
     });
     const label = kind === 'fixed' ? 'verbindlich' : 'frei';
     game._showStatusToast(`Preset gespeichert (${label}): ${result.preset?.name || result.preset?.id}`, 1400, 'success');
@@ -151,10 +154,12 @@ export function deleteMenuPresetAction({
         return;
     }
     onSettingsChanged?.({
-        changedKeys: [
-            settingsChangeKeys.PRESET_LIST,
-            settingsChangeKeys.PRESET_STATUS,
-        ],
+        changedKeys: Array.isArray(result.changedKeys) && result.changedKeys.length > 0
+            ? result.changedKeys
+            : [
+                settingsChangeKeys.PRESET_LIST,
+                settingsChangeKeys.PRESET_STATUS,
+            ],
     });
     game._showStatusToast(`Preset geloescht: ${presetId}`, 1200, 'success');
 }

@@ -30,7 +30,7 @@ const BUILD_ID = typeof __BUILD_ID__ !== 'undefined' ? __BUILD_ID__ : 'dev';
 export class Game {
     constructor() {
         this.settingsManager = new SettingsManager();
-        this.profileManager = new ProfileManager(this.settingsManager.store);
+        this.profileManager = new ProfileManager(this.settingsManager.getProfileStorePort());
 
         this.profileDataOps = this.profileManager.getProfileDataOps();
 

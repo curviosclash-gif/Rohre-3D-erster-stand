@@ -67,22 +67,25 @@ export class SettingsStore {
                 this.settingsStorageLegacyKeys,
                 null
             );
-            if (!saved || typeof saved !== 'object') return this.createDefaultSettings();
-            const sanitized = this.sanitizeSettings(saved);
-            if (safeJsonStringify(saved) !== safeJsonStringify(sanitized)) {
-                this.storagePlatform.writeJson(this.settingsStorageKey, sanitized);
+            const hasPersistedSnapshot = !!saved && typeof saved === 'object';
+            const canonicalSettings = hasPersistedSnapshot
+                ? this.sanitizeSettings(saved)
+                : this.sanitizeSettings(this.createDefaultSettings());
+            if (hasPersistedSnapshot && safeJsonStringify(saved) !== safeJsonStringify(canonicalSettings)) {
+                this.storagePlatform.writeJson(this.settingsStorageKey, canonicalSettings);
             }
-            return sanitized;
+            return canonicalSettings;
         } catch (error) {
             if (typeof console !== 'undefined' && typeof console.warn === 'function') {
                 console.warn('[SettingsStore] loadSettings failed, using defaults.', error);
             }
         }
-        return this.createDefaultSettings();
+        return this.sanitizeSettings(this.createDefaultSettings());
     }
 
     saveSettings(settings) {
-        const result = this.storagePlatform.writeJson(this.settingsStorageKey, settings);
+        const canonicalSettings = this.sanitizeSettings(settings);
+        const result = this.storagePlatform.writeJson(this.settingsStorageKey, canonicalSettings);
         return result.ok;
     }
 
