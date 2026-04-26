@@ -1,7 +1,7 @@
 # Umsetzungsplan (Master-Index)
 
-Stand: 2026-04-24. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
-V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 wurde auf Phase 98.99 fortgeschrieben (P2, abh. V77.99,V97.99). V101 abgeschlossen 2026-04-24 (101.99 Abschluss-Gate gruen). Deep-Audit 2026-04-22 verankerte Follow-up-Pakete als P32-P38 im Backlog; Deep-Code-Analyse 2026-04-24 ergaenzt P41-P46. Verbleibende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V102).
+Stand: 2026-04-25. Status-Fliesstext, Abgleich-Historie und abgeschlossene Block-Zusammenfassungen liegen in `docs/plaene/CHANGELOG.md`.
+V82 abgeschlossen 2026-04-20 (82.99 Abschluss-Gate gruen). V97 abgeschlossen 2026-04-20 (97.99 Abschluss-Gate gruen). V86 abgeschlossen 2026-04-20 (86.99 Abschluss-Gate gruen). V98 abgeschlossen 2026-04-24 (98.99 Abschluss-Gate gruen). V101 abgeschlossen 2026-04-24 (101.99 Abschluss-Gate gruen). `V103` wurde als geplanter P2-Block fuer nachhaltige Settings-Domain-Erweiterung auf Basis von `V92` aufgenommen. Deep-Audit 2026-04-22 verankerte Follow-up-Pakete als P32-P38 im Backlog; Deep-Code-Analyse 2026-04-24 ergaenzt P41-P46. Verbleibende Intake-Drafts liegen in `docs/plaene/neu/` (V99, V100, V102).
 
 Dieser Master ist der kompakte Index fuer aktive Arbeit.
 Kanonische Blockdetails liegen in den jeweiligen Dateien unter `docs/plaene/aktiv/`.
@@ -40,6 +40,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V95 | Settings Studio fuer Menu-Defaults | done | P2 | frei | V77.99,V92.99 | 95.99 | `docs/plaene/aktiv/V95.md` |
 | V82 | Arcade-Parcours Progression XP Flugzeug-Tuning | done | P2 | frei | V72.99,V74.99 | 82.99 | `docs/plaene/aktiv/V82.md` |
 | V97 | Settings Studio Erklaerbarkeit, Save-Vorschau und Hardening | done | P2 | frei | V95.99,V77.99,V92.99 | 97.99 | `docs/plaene/aktiv/V97.md` |
+| V98 | Settings Studio Browser-Demo Begrenzung | done | P2 | frei | V77.99,V97.99 | 98.99 | `docs/plaene/aktiv/V98.md` |
 | V86 | Editor- und Map-Authoring-Vertraege | done | P2 | frei | V72.99 | 86.99 | `docs/plaene/aktiv/V86.md` |
 | V101 | Architecture Type-Safety und Contract-Hardening | done | P2 | frei | V98.99 | 101.99 | `docs/plaene/aktiv/V101.md` |
 
@@ -47,7 +48,7 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 
 | id | titel | status | prio | owner | depends_on | current_phase | plan_file |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| V98 | Settings Studio Browser-Demo Begrenzung | planned | P2 | frei | V77.99,V97.99 | 98.99 | `docs/plaene/aktiv/V98.md` |
+| V103 | Settings-Domain Nachhaltigkeit, Mutationsvertrag und Erweiterungspfad | planned | P2 | frei | V92.99 | 103.1 | `docs/plaene/aktiv/V103.md` |
 | V75 | Cinematic Recorder Desktop WebM-MP4 Stabilisierung | planned | P3 | frei | V74.99,V77.99,V64.99 | 75.1 | `docs/plaene/aktiv/V75.md` |
 | V76 | Desktop Hangar Arcade Fight | active | P3 | frei | V71.4,V74.99,V77.99,V64.99,V82.99 | 76.99 | `docs/plaene/aktiv/V76.md` |
 | V81 | Developer Tuning Console (Steuerkonsole) | planned | P3 | frei | V74.99,V72.99,V91.99 | 81.1 | `docs/plaene/aktiv/V81.md` |
@@ -76,6 +77,8 @@ Nur Abschluesse, die von offenen Deps aktiver Bloecke noch referenziert werden. 
 | V98 | V97.99 | hard | ja | V97 liefert die gehartete Settings-Studio-Basis fuer den neuen Demo-Grenzen-Bereich |
 | V98 | V81.99 | soft | nein | Developer-Tuning-Synergien sind sinnvoll, aber kein Startblocker |
 | V98 | V64.99 | soft | nein | Multiplayer-Rollen-/Transportkontext kann spaetere Demo-Regeln schaerfen, blockiert aber nicht |
+| V103 | V92.99 | hard | ja | Ownership-/Facade-Ratchet aus V92 ist die bindende Leitplanke fuer nachhaltige Settings-Pfade und Store-/Facade-Zuschnitte |
+| V103 | V98.99 | soft | ja | V98 haertet angrenzende Settings-Studio-/Policy-Pfade; sinnvoll als Synchronisationspunkt, aber kein Startblocker fuer den Core-Settings-Zuschnitt |
 | V101 | V98.99 | hard | ja | V101 schliesst Typecheck-/Lint-/Contract-Hardening auf der V98-Resolverbasis ohne neue Guard-Verletzungen |
 
 ## Lock-Status
@@ -103,6 +106,7 @@ Diese Tabelle bleibt als Validierungs-Ankerpunkt; der operative Status liegt in 
 | - | V95 | - | frei | Siehe docs/lock-status/ |
 | - | V97 | - | frei | Siehe docs/lock-status/ |
 | - | V98 | - | frei | Siehe docs/lock-status/ |
+| - | V103 | - | frei | Siehe docs/lock-status/ |
 | - | V101 | - | closed | Abgeschlossen 2026-04-24 |
 
 ## Empfohlene Reihenfolge
@@ -118,7 +122,7 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 ### Sofort laufende oder naechste Abschluesse
 
 1. `V76` als aktiven Produktblock auf `76.2` weiterziehen; Hangar-/Werkstatt-Flows bleiben der laufende Hauptpfad.
-2. `V98` als laufenden P2-Block bis Master-Abschluss nachziehen; hard dependencies (`V77.99`, `V97.99`) sind erfuellt.
+2. `V103` als naechsten Settings-Core-Nachhaltigkeitsblock vorbereiten; `V92.99` ist erfuellt und `V98` liefert den abgeschlossenen Settings-Studio-/Policy-Synchronisationspunkt.
 3. `V75` als Recorder-Stabilisierung nachgezogen bearbeiten; `V64.99` ist bereits abgeschlossen.
 4. `V81` und `V94` als nachgelagerte P3-Bloecke vorbereiten (`V81` mit V92-Ratchet, `V94` als Governance-/Query-Layer).
 
@@ -132,19 +136,20 @@ Die Reihenfolge dient als operative Leitplanke fuer neue Starts. Harte Abhaengig
 6. `V64` vor `V75`, weil Recorder-Polish erst nach dem produktiven Desktop-Host-/Join-Hauptpfad kommen soll.
 7. `V97` folgt nach `V95.99` als gezielter Produkt-Hardening-Block fuer Settings Studio; Erklaer-UX, Save-Vorschau und Migrationspfade koennen parallel zu Gameplay-Folgearbeit laufen, solange Desktop-only Surface-Policy und V92-Ratchet eingehalten bleiben.
 8. `V98` folgt nach `V97.99` als Desktop-only Folgeblock fuer Browser-Demo-Begrenzung im Settings Studio; Browser bleibt read-only Consumer ueber einen expliziten Auslieferungspfad.
+9. `V103` folgt auf dem durch `V53`, `V92`, `V95`, `V97` und `V98` vorbereiteten Settings-Pfad als nachhaltiger Core-Settings-Block; neue Funktionen sollen danach ueber stabile Domain-/Result-Vertraege statt Manager-Aufblaehung wachsen.
 
 ### Parallelpfad Gameplay und Authoring
 
 1. `V76` bleibt der laufende Gameplay-Hauptpfad und nutzt die abgeschlossenen Datenvertraege aus `V82`.
-2. `V98` kann parallel als Settings-/Contract-Block laufen; Ueberschneidung mit `V76` ist fachlich gering.
+2. `V103` kann nach abgeschlossenem `V98` parallel zu `V76` als Settings-/Ownership-Follow-up laufen; die Ueberschneidung mit Gameplay bleibt gering.
 3. `V81` bleibt fachlich moeglich, ist aber hinter laufender Produktarbeit nachrangig und muss den `V92`-Ownership-Schnitt strikt halten.
 4. `V94` ist als Governance-/Tooling-Block weitgehend entkoppelt und parallelisierbar.
 
 ### Kurzform
 
-`V76 -> V98 -> V99 -> V100 -> V102 -> V75 -> V81 -> V94`
+`V76 -> V103 -> V99 -> V100 -> V102 -> V75 -> V81 -> V94`
 
-Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V98` (Settings-Studio-Demo-Grenzen) und `V94` (Governance-/Query-Layer). `V99`, `V100` und anschliessend `V102` folgen nach dem abgeschlossenen V101-Hardening auf einer wieder gruensicheren Typecheck-/Contract-Baseline. `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
+Parallelisierbar im aktuellen Stand: `V76` (laufend) plus `V103` (Settings-Core-Nachhaltigkeit) und `V94` (Governance-/Query-Layer). `V99`, `V100` und anschliessend `V102` folgen nach dem abgeschlossenen V101-Hardening auf einer wieder gruensicheren Typecheck-/Contract-Baseline. `V81` bleibt bewusst nachrangig und startet mit denselben Guard-Leitplanken (`V91`/`V92`), damit keine Runtime-/Config-Bypaesse reaktiviert werden. Die desktop-first-Hauptgates aus `V89` bleiben die Baseline fuer Folgearbeit am Desktop-Hauptprodukt.
 
 ## Aufgeschobene Fixes (Code-Review 2026-04-03)
 
