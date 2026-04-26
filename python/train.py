@@ -32,6 +32,9 @@ def main() -> None:
     parser.add_argument("--target-steps-per-env", type=int, default=None)
     parser.add_argument("--total-timesteps", type=int, default=None)
     parser.add_argument("--checkpoint", default=None)
+    parser.add_argument("--longrun-start-progress", type=int, default=None)
+    parser.add_argument("--longrun-capture-start-snapshot", action="store_true")
+    parser.add_argument("--longrun-prior-run-dir", action="append", default=None)
     args = parser.parse_args()
 
     if args.profile == "bt93b":
@@ -86,6 +89,9 @@ def main() -> None:
         artifact_root=args.artifact_root,
         total_timesteps=args.total_timesteps,
         checkpoint=args.checkpoint,
+        longrun_start_progress=args.longrun_start_progress,
+        longrun_capture_start_snapshot=args.longrun_capture_start_snapshot,
+        longrun_prior_run_dirs=args.longrun_prior_run_dir,
     )
 
 

@@ -1,0 +1,131 @@
+{
+  "manifestVersion": "bt93c-ppo-checkpoint-v1-bt93j-longrun-snapshot",
+  "generatedAt": "2026-04-26T17:55:04Z",
+  "generatedBy": "python/train.py::BT93JLongrunSnapshotCallback",
+  "blockId": "BT93J",
+  "phaseId": "93J.5c",
+  "runId": "20260426T175502Z-bt93j-user-owned-1m-proof-longrun",
+  "runKind": "bt93j-user-owned-1m-proof-longrun",
+  "stepLabelTimesteps": 600000,
+  "progressTimesteps": 600000,
+  "modelNumTimesteps": 604992,
+  "diagnosticOnly": true,
+  "candidateRun": false,
+  "freezeCandidate": false,
+  "promotionAllowed": false,
+  "holdoutUsed": false,
+  "bt94aGateRefresh": false,
+  "artifacts": {
+    "model": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0600000/model.zip",
+    "modelSha256": "b64c21fc76a8f58e2828eb58afd84a2cb05897acd7d115befd8dce3a4e913c53",
+    "vecnormalize": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0600000/vecnormalize.pkl",
+    "vecnormalizeSha256": "7810984321edf5b22c2b6cbea7adbf5c40de922ba2960c3364b2355842bbeeb5",
+    "optimizerState": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0600000/optimizer_state.pt",
+    "optimizerStateSha256": "d0581dd0518fccc4d590d7b56fe2b2148411872a06ba2f4658def4d9c43abbaa",
+    "config": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0600000/config.json",
+    "configSha256": "38b74ad4e6b9f3ade4fa5986d1a022acc3ccef828a052b7baa5b8ab757fe9eab",
+    "snapshotManifest": "data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/longrun_snapshots/step_0600000/snapshot_manifest.json"
+  },
+  "sourceConfig": {
+    "path": "python/configs/ppo_bt93j_reward_curriculum_proof_lane.json",
+    "sha256": "90f35f353babae5665c80806bea8d5678d9414e1e161637824127345c66d975f"
+  },
+  "policy": {
+    "policyClass": "ActorCriticPolicy",
+    "actionDistribution": "CategoricalDistribution",
+    "featuresExtractor": "FlattenExtractor",
+    "mlpExtractor": "MlpExtractor",
+    "actionNet": {
+      "class": "Linear",
+      "outFeatures": 9
+    },
+    "valueNet": {
+      "class": "Linear",
+      "outFeatures": 1
+    },
+    "netArch": [
+      64,
+      64
+    ],
+    "observationLength": 64,
+    "actionSurface": {
+      "surfaceId": "bt93g-masked-semantic-action-v1",
+      "gymSpace": "Discrete",
+      "sb3Trainable": true,
+      "semanticActions": [
+        "noop",
+        "yaw-left",
+        "yaw-right",
+        "pitch-up",
+        "pitch-down",
+        "roll-left",
+        "roll-right",
+        "boost",
+        "shoot-mg"
+      ],
+      "excludedInventoryIndexedActions": [
+        "dropItem",
+        "nextItem",
+        "shootItem",
+        "shootItemIndex",
+        "useItem"
+      ],
+      "policyLevelMasking": {
+        "specified": true,
+        "preSamplingAppliedInCurrentSb3Path": true,
+        "consumerStatus": "consumed-before-sampling-by-masked-semantic-action-vocabulary",
+        "source": "info.match.inventoryLength from the JS-authoritative transition payload",
+        "preSamplingByConstruction": true,
+        "mixedWithPostDecodeClamp": false
+      },
+      "telemetry": [
+        "policyLevelMask",
+        "preSamplingMaskRate",
+        "postDecodeClampRate",
+        "invalidActionRate",
+        "vetoRate",
+        "sanitizerRate",
+        "noopRate"
+      ],
+      "rawBoundarySurfaceTraining": false,
+      "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload"
+    }
+  },
+  "optimizer": {
+    "stateEntryCount": 12,
+    "paramGroupCount": 1,
+    "maxOptimizerStep": 37800,
+    "hasOptimizerState": true
+  },
+  "pickleCompatibility": {
+    "spaceRngClearedBeforeVecNormalizeSave": [],
+    "normalizationRmsPreserved": true
+  },
+  "guardrails": {
+    "readOnlyRuntimeSurfaces": [
+      "src/state/HeadlessMatchKernelRuntime.js",
+      "src/core/MatchKernelTrainingAdapter.js",
+      "src/entities/ai/training/TrainingTransportFacade.js",
+      "src/entities/ai/training/WebSocketTrainerBridge.js",
+      "src/entities/ai/ObservationBridgePolicy.js",
+      "src/core/RuntimeConfig.js",
+      "src/entities/ai/BotPolicyRegistry.js",
+      "src/entities/ai/BotPolicyTypes.js",
+      "src/entities/ai/inference/LocalDqnInference.js",
+      "src/state/training/RewardCalculator.js",
+      "src/entities/ai/hybrid/HybridDecisionArchitecture.js",
+      "src/state/MatchSessionFactory.js"
+    ],
+    "runtimeSurfacesTouched": [],
+    "productiveRuntimeChanged": false,
+    "diagnosticOnly": true,
+    "learningQualityClaimAllowed": false,
+    "baselineRunsStarted": false,
+    "pilotRunsStarted": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "promotionAllowed": false,
+    "holdoutUsed": false,
+    "bt94aGateRefresh": false
+  }
+}

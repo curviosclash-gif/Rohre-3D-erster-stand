@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.5b` abgeschlossen: `readyForUserOwnedLongrun=true`; naechster User-owned Folgeclaim `93J.5c` 1000000-Step-Diagnose-Longrun; kein BT94A-Claim und kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.5c` abgeschlossen: `user_owned_1m_longrun_report.json` klassifiziert `reward-still-blocking`; `93J.6` bleibt geschlossen, kein BT94A-Claim |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -2554,12 +2554,12 @@ Closure-Evidence je Blocker:
 
 ### 93J.5c User-owned 1000000-Step Proof-Longrun
 
-- [ ] 93J.5c.1 1000000-Step-Diagnose-Longrun als explizite User-owned Ausnahme starten, nur wenn `user_owned_1m_longrun_readiness_report.json` `readyForUserOwnedLongrun=true` schreibt; `run-kind=bt93j-user-owned-1m-proof-longrun`.
-- [ ] 93J.5c.2 Longrun mit exakt `totalTimesteps=1000000` ausfuehren; kein Candidate, kein Freeze, kein Promote, kein Holdout, kein BT94A-Gate-Refresh waehrend des Laufs.
-- [ ] 93J.5c.3 Checkpoints und Eval-Snapshots mindestens alle `50000` Timesteps schreiben; rote Steps/Terminal-Metriken stoppen den Lauf nicht, technische Invaliditaet schon: NaN/Inf, Runtime-Fehler, Artefaktkorruption, Observation-Drift, Action-Safety-Regression oder fehlender Checkpoint.
-- [ ] 93J.5c.4 Finale Eval ohne Holdout schreiben: Steps-Verlauf, laengste Episode, `player-dead-only`-Anteil, Natural-Terminal-Anteil, Reward-Komponenten, KL/Entropy/Clip/Value/Grad-Norm, Action-Safety und Wallclock.
-- [ ] 93J.5c.5 `user_owned_1m_longrun_report.json` klassifiziert `green-for-93J.6`, `undertraining-supported`, `reward-still-blocking`, `new-instability` oder `measurement-invalid`.
-- [ ] 93J.5c.6 Ergebnis darf nur die Entscheidung fuer 93J.6 oder eine neue Diagnose stutzen; es ist keine Promotion-, Freeze-, Rollout- oder BT94A-Start-Evidence.
+- [x] 93J.5c.1 1000000-Step-Diagnose-Longrun als explizite User-owned Ausnahme starten, nur wenn `user_owned_1m_longrun_readiness_report.json` `readyForUserOwnedLongrun=true` schreibt; `run-kind=bt93j-user-owned-1m-proof-longrun`. (abgeschlossen: 2026-04-26; evidence: `data/training/ppo/bt93j/runs/20260426T175502Z-bt93j-user-owned-1m-proof-longrun/artifact_manifest.json`, resumed continuation from interrupted 600000-step local artifact)
+- [x] 93J.5c.2 Longrun mit exakt `totalTimesteps=1000000` ausfuehren; kein Candidate, kein Freeze, kein Promote, kein Holdout, kein BT94A-Gate-Refresh waehrend des Laufs. (abgeschlossen: 2026-04-26; evidence: `data/training/ppo/bt93j/user_owned_1m_longrun_report.json` -> `requestedTimesteps=1000000`, `actualProgressTimesteps=1000000`, guardrails `holdoutUsed=false`, `candidateRun=false`, `freezeCandidate=false`, `promotionAllowed=false`, `bt94aGateRefresh=false`)
+- [x] 93J.5c.3 Checkpoints und Eval-Snapshots mindestens alle `50000` Timesteps schreiben; rote Steps/Terminal-Metriken stoppen den Lauf nicht, technische Invaliditaet schon: NaN/Inf, Runtime-Fehler, Artefaktkorruption, Observation-Drift, Action-Safety-Regression oder fehlender Checkpoint. (abgeschlossen: 2026-04-26; evidence: `user_owned_1m_longrun_report.json` -> `snapshotCadence.ok=true`, `presentSteps=20`, `missingSteps=[]`, `technicalStop.allSnapshotGatesOk=true`)
+- [x] 93J.5c.4 Finale Eval ohne Holdout schreiben: Steps-Verlauf, laengste Episode, `player-dead-only`-Anteil, Natural-Terminal-Anteil, Reward-Komponenten, KL/Entropy/Clip/Value/Grad-Norm, Action-Safety und Wallclock. (abgeschlossen: 2026-04-26; evidence: `user_owned_1m_longrun_report.json` -> final `avgStepsPerEpisodeObserved=166.866667`, `naturalTerminalCount=0`, full snapshot trend and learning metrics)
+- [x] 93J.5c.5 `user_owned_1m_longrun_report.json` klassifiziert `green-for-93J.6`, `undertraining-supported`, `reward-still-blocking`, `new-instability` oder `measurement-invalid`. (abgeschlossen: 2026-04-26; evidence: `resultClass=reward-still-blocking`)
+- [x] 93J.5c.6 Ergebnis darf nur die Entscheidung fuer 93J.6 oder eine neue Diagnose stutzen; es ist keine Promotion-, Freeze-, Rollout- oder BT94A-Start-Evidence. (abgeschlossen: 2026-04-26; evidence: `resultClass=reward-still-blocking`, `terminalDiversified=false`, `naturalTotal=0`; `93J.6` bleibt geschlossen, BT94A bleibt geschlossen)
 
 ### 93J.6 Post-Longrun-Pilot, Holdout-Schutz und Vergleich
 
@@ -2624,7 +2624,7 @@ Claim-Grenze vor BT94A:
 Startstatus 2026-04-25:
 
 - `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`, Blocker `F.05/F.19/F.27/F.31`))
-- Naechster erlaubter Diagnose-/Trainingsclaim vor BT94A ist der explizit user-owned `93J.5c 1000000-Step Proof-Longrun`, weil `93J.5b` `readyForUserOwnedLongrun=true` schreibt. `93J.6` oeffnet nur bei `green-for-93J.6` aus 93J.5c. Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+- `93J.5c 1000000-Step Proof-Longrun` ist abgeschlossen und klassifiziert `reward-still-blocking`; `93J.6` oeffnet nicht, weil `green-for-93J.6` fehlt. Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
 
 ### Definition of Done (DoD)
 
