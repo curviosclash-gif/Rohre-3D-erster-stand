@@ -1,30 +1,8 @@
 {
-  "generated_at": "2026-04-26T11:36:02.169Z",
+  "person": "codex",
+  "timestamp": "2026-04-26T11:36:02.005Z",
   "locks": [
     {
-      "person": "build-agent",
-      "block_id": "V76",
-      "phase": "76.2",
-      "scope_files": [
-        "src/ui/hangar/**",
-        "src/shared/contracts/HangarModeContract.js",
-        "src/shared/contracts/FightHangarBalanceContract.js",
-        "src/shared/contracts/ArcadeHangarRulesContract.js",
-        "src/ui/arcade/**",
-        "src/state/arcade/ArcadeVehicleProfile.js",
-        "src/entities/arcade/ArcadeBlueprintSchema.js",
-        "src/entities/vehicle-registry.js",
-        "src/entities/GeneratedVehicleConfigs.js",
-        "prototypes/vehicle-lab/**",
-        "src/ui/start-setup/**"
-      ],
-      "start_date": "2026-04-20",
-      "target_completion": "2026-04-27",
-      "status": "in-progress",
-      "notes": "Master active block sync"
-    },
-    {
-      "person": "codex",
       "block_id": "V103",
       "phase": "103.1.1",
       "scope_files": [
@@ -49,11 +27,9 @@
       "notes": "Settings mutation inventory and extension rules"
     }
   ],
-  "metadata": {
-    "format_version": "1.0",
-    "expected_lock_files": [
-      "build-agent.json",
-      "codex.json"
-    ]
+  "current_phase_evidence": {
+    "phase_id": "103.1.1",
+    "completed_items": [],
+    "last_commit": ""
   }
 }
