@@ -741,6 +741,27 @@ Architekturprinzip: Alle Surface-Entscheide laufen ueber die obigen Resolver aus
 - Capability-Fallbacks bleiben bis zu ihrem Sunset sichtbar und strukturiert (`reason`, `message`, `warnings`, optional `migration`) und duerfen nicht als stiller Erfolgspfad auftreten.
 - Dokumentationskonsistenz ist Teil des Abschlusses: Plan (`V85`), Referenzkontext und Onboarding muessen denselben Versionierungs- und Verbrauchsvertrag spiegeln, bevor ein Folgeblock darauf aufsetzt.
 
+### 4.6.6 Settings-Domain Erweiterungspfad fuer V103
+
+#### 4.6.6.1 Oeffentliche Settings-Mutationspfade und Ownership
+
+- `SettingsManager` bleibt im produktiven Menu-Scope der kanonische Orchestrator-Einstieg; die eigentliche Mutationslogik liegt in `src/core/settings/**`, waehrend Runtime-Services Toaster, `onSettingsChanged()` und andere UI-seitige Folgen besitzen.
+
+| `SettingsManager`-Methode | Produktive Call-Sites | `changedKeys`-Ownership | Seiteneffekt-Typ | Bypass-/Legacy-Markierung |
+| --- | --- | --- | --- | --- |
+| `saveSettings(settings)` | `src/core/main.js::_saveSettings()`, `src/core/runtime/MenuRuntimeSessionService.js` (Event-Playlist-Persist) | kein `changedKeys`; Persistenz bleibt ein reiner Save-Pfad | core | explizit erlaubter Persistenz-Adapter; im V103-Scope gibt es keinen produktiven `settingsManager.store`-Bypass |
+| `saveSessionDraft(settings, sessionType)` | keine produktive externe Call-Site; Leaf unter `switchSessionType()` | `SettingsSessionDraftFacade` liefert Persistenzstatus nur ueber `reason`/`metadata` | core | bleibt Hilfsmethode fuer Session-Drafts; neue Features sollen nicht direkt auf dieser Public-Methode aufsetzen |
+| `applySessionDraft(settings, sessionType)` | keine produktive externe Call-Site; Leaf unter `switchSessionType()` | `SettingsSessionDraftFacade` liefert `SESSION_DRAFT_CHANGED_KEYS` | core | bleibt Leaf-Adapter fuer bestehende Session-Draft-Logik |
+| `switchSessionType(settings, nextSessionType)` | `src/core/runtime/MenuRuntimeSessionService.js` | `SettingsSessionDraftFacade` erzeugt den Result-Vertrag; Runtime-Service forwarded `changedKeys` an `onSettingsChanged()` | runtime | kanonischer Session-Type-Einstieg; UI-Feedback bleibt ausserhalb des Core |
+| `applyMenuPreset(settings, presetId, accessContext)` | `src/core/runtime/MenuRuntimePresetConfigService.js`, `src/core/runtime/MenuRuntimeSessionService.js` (Mode-Path, Event-Playlist) | `SettingsPresetFacade` plus Compatibility-Result liefern `changedKeys`; Runtime-Service coalesct und forwarded | runtime | kanonischer Preset-Einstieg ohne direkten Store-Read im Runtime-Service |
+| `saveMenuPreset(settings, options, accessContext)` | `src/core/runtime/MenuRuntimePresetConfigService.js` | `SettingsPresetFacade` liefert `changedKeys` und Preset-Metadaten | runtime | kanonischer Schreibpfad fuer Menue-Presets |
+| `deleteMenuPreset(presetId, settings, accessContext)` | `src/core/runtime/MenuRuntimePresetConfigService.js` | `SettingsPresetFacade` liefert `changedKeys` und Preset-Metadaten | runtime | kanonischer Delete-Pfad fuer Menue-Presets |
+| `setDeveloperMode(...)`, `setDeveloperTheme(...)`, `setDeveloperFixedPresetLock(...)`, `setDeveloperActor(...)`, `setDeveloperReleasePreview(...)`, `setDeveloperVisibility(...)` | `src/core/runtime/MenuRuntimeDeveloperModeService.js` | `SettingsDeveloperFacade` liefert `changedKeys`; Runtime-Service besitzt Toaster und `onSettingsChanged()` | runtime/ui | Core veraendert nur Settings-Zustand; user-facing Seiteneffekte bleiben im Runtime-Layer |
+| `setMenuTextOverride(textId, textValue)`, `clearMenuTextOverride(textId)` | `src/core/runtime/MenuRuntimeDeveloperModeService.js` | `SettingsTextOverrideFacade` liefert `changedKeys` und `textId`-Metadaten | runtime/ui | Core schreibt nur Override-Store; UI-Statusmeldungen bleiben ausserhalb des Core |
+| `recordMenuTelemetry(settings, eventType, payload)` | `src/core/runtime/MenuRuntimeSessionService.js`, `src/core/runtime/GameRuntimeArcadeSupport.js` ueber `GameRuntimeFacade` | kein `changedKeys`; Telemetry-Sidecar hat eigenen Result-/History-Pfad | runtime | bewusst getrennt von Settings-Dirty-Semantik; kein neuer Erweiterungspfad fuer UI-Settings |
+
+- Scan 2026-04-26: In `src/core/settings/**` und `src/core/SettingsManager.js` gibt es im V103-Scope keine direkten `document`-/`window`-/DOM-Seiteneffekte. UI-nahe Keybind-Metadaten liegen bereits in `src/ui/KeybindActionCatalog.js` und werden von `src/ui/KeybindEditorController.js` konsumiert statt vom Manager bereitgestellt zu werden.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
