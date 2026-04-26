@@ -30,13 +30,15 @@ import { createSettingsTelemetryFacade } from './settings/SettingsTelemetryFacad
 export class SettingsManager {
     constructor(options = {}) {
         this.runtimeGlobal = options.runtimeGlobal || globalThis;
-        this.store = new SettingsStore({
+        this.settingsStore = new SettingsStore({
             storagePlatform: options.storagePlatform,
             storage: options.storage,
             onQuotaExceeded: options.onQuotaExceeded,
             sanitizeSettings: (settings) => this.sanitizeSettings(settings),
             createDefaultSettings: () => this.createDefaultSettings(),
         });
+        // Temporary legacy alias until remaining external consumers migrate to named ports.
+        this.store = this.settingsStore;
         this.menuPresetStore = new MenuPresetStore({
             fixedCatalog: getFixedMenuPresetCatalog(),
         });
@@ -62,12 +64,12 @@ export class SettingsManager {
         });
 
         this.profileStorePort = {
-            loadProfiles: () => this.store.loadProfiles(),
-            saveProfiles: (profiles) => this.store.saveProfiles(profiles),
+            loadProfiles: () => this.settingsStore.loadProfiles(),
+            saveProfiles: (profiles) => this.settingsStore.saveProfiles(profiles),
             sanitizeSettings: (settings) => this.sanitizeSettings(settings),
-            normalizeProfileName: (rawName) => this.store.normalizeProfileName(rawName),
-            findProfileIndexByName: (profiles, profileName) => this.store.findProfileIndexByName(profiles, profileName),
-            findProfileByName: (profiles, profileName) => this.store.findProfileByName(profiles, profileName),
+            normalizeProfileName: (rawName) => this.settingsStore.normalizeProfileName(rawName),
+            findProfileIndexByName: (profiles, profileName) => this.settingsStore.findProfileIndexByName(profiles, profileName),
+            findProfileByName: (profiles, profileName) => this.settingsStore.findProfileByName(profiles, profileName),
         };
     }
 
@@ -85,11 +87,11 @@ export class SettingsManager {
     }
 
     loadSettings() {
-        return this.store.loadSettings();
+        return this.settingsStore.loadSettings();
     }
 
     saveSettings(settings) {
-        return this.store.saveSettings(settings);
+        return this.settingsStore.saveSettings(settings);
     }
 
     listMenuPresets() {

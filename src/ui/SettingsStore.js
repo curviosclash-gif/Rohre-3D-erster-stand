@@ -60,6 +60,19 @@ export class SettingsStore {
             : [...MENU_PRESETS_STORAGE_LEGACY_KEYS];
     }
 
+    _createCanonicalSettingsPersistenceState(settings) {
+        const hasObjectInput = !!settings && typeof settings === 'object';
+        const seedSettings = hasObjectInput ? settings : this.createDefaultSettings();
+        const canonicalSettings = this.sanitizeSettings(seedSettings);
+        return {
+            hasObjectInput,
+            canonicalSettings,
+            didNormalize: hasObjectInput
+                ? safeJsonStringify(settings) !== safeJsonStringify(canonicalSettings)
+                : false,
+        };
+    }
+
     loadSettings() {
         try {
             const saved = this.storagePlatform.readJson(
@@ -67,25 +80,28 @@ export class SettingsStore {
                 this.settingsStorageLegacyKeys,
                 null
             );
-            const hasPersistedSnapshot = !!saved && typeof saved === 'object';
-            const canonicalSettings = hasPersistedSnapshot
-                ? this.sanitizeSettings(saved)
-                : this.sanitizeSettings(this.createDefaultSettings());
-            if (hasPersistedSnapshot && safeJsonStringify(saved) !== safeJsonStringify(canonicalSettings)) {
-                this.storagePlatform.writeJson(this.settingsStorageKey, canonicalSettings);
+            const persistenceState = this._createCanonicalSettingsPersistenceState(saved);
+            if (persistenceState.didNormalize) {
+                this.storagePlatform.writeJson(
+                    this.settingsStorageKey,
+                    persistenceState.canonicalSettings
+                );
             }
-            return canonicalSettings;
+            return persistenceState.canonicalSettings;
         } catch (error) {
             if (typeof console !== 'undefined' && typeof console.warn === 'function') {
                 console.warn('[SettingsStore] loadSettings failed, using defaults.', error);
             }
         }
-        return this.sanitizeSettings(this.createDefaultSettings());
+        return this._createCanonicalSettingsPersistenceState(null).canonicalSettings;
     }
 
     saveSettings(settings) {
-        const canonicalSettings = this.sanitizeSettings(settings);
-        const result = this.storagePlatform.writeJson(this.settingsStorageKey, canonicalSettings);
+        const persistenceState = this._createCanonicalSettingsPersistenceState(settings);
+        const result = this.storagePlatform.writeJson(
+            this.settingsStorageKey,
+            persistenceState.canonicalSettings
+        );
         return result.ok;
     }
 
