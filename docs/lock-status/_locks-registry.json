@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-04-26T11:39:57.127Z",
+  "generated_at": "2026-04-26T11:44:38.190Z",
   "locks": [
     {
       "person": "build-agent",
@@ -52,6 +52,31 @@
       "person": "codex",
       "block_id": "V103",
       "phase": "103.1.2",
+      "scope_files": [
+        "src/core/SettingsManager.js",
+        "src/ui/SettingsStore.js",
+        "src/core/main.js",
+        "src/core/settings/SettingsDeveloperFacade.js",
+        "src/core/settings/SettingsPresetFacade.js",
+        "src/core/settings/SettingsSessionDraftFacade.js",
+        "src/core/settings/SettingsTextOverrideFacade.js",
+        "src/core/runtime/MenuRuntimeDeveloperModeService.js",
+        "src/core/runtime/MenuRuntimePresetConfigService.js",
+        "src/core/runtime/MenuRuntimeSessionService.js",
+        "src/ui/KeybindEditorController.js",
+        "tests/runtime-settings-live-apply.contract.test.mjs",
+        "tests/settings-manager.contract.test.mjs",
+        "docs/referenz/ai_architecture_context.md"
+      ],
+      "start_date": "2026-04-26",
+      "target_completion": "2026-04-26",
+      "status": "completed",
+      "notes": ""
+    },
+    {
+      "person": "codex",
+      "block_id": "V103",
+      "phase": "103.2.1",
       "scope_files": [
         "src/core/SettingsManager.js",
         "src/ui/SettingsStore.js",
