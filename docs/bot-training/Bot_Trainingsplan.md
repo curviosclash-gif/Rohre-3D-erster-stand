@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.5` abgeschlossen; `93J.6` durch `readyForTraining=false` blockiert; kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.5a` offen; enger R2-Micro-Train-Counterprobe nach R1; kein BT94A-Claim und kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -784,7 +784,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
-| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 | 93J.5 abgeschlossen; 93J.6 blockiert | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
+| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.5a offen | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93J.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2367,6 +2367,7 @@ Befund-Register BT93I:
 Quelle:
 
 - User-Intake 2026-04-25: `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md`
+- User-Freigabe 2026-04-26: `docs/plaene/neu/BT93J_R2_Micro_Train_Counterprobe_Plananpassung_2026-04-26.md`
 - `data/training/ppo/bt93i/closure_gate_report.json`
 - `data/training/ppo/bt93i/matrix_green_report.json`
 - `data/training/ppo/bt93i/handover_package.json`
@@ -2447,6 +2448,8 @@ Pflicht-Artefakte und Script-Vertraege:
 | `data/training/ppo/bt93j/action_policy_diagnostics.json` | Pre-Sampling-Action, Mask, Clamp, Veto, Sanitizer und final ausgefuehrte Action |
 | `data/training/ppo/bt93j/reward_curriculum_diagnostics.json` | Reward-Breakdown gegen Episode-Length, Death-Cause, Risk-Actions und Lernmetriken |
 | `data/training/ppo/bt93j/r*_micro_test_report.json` | minimale Repair-Runden mit Entscheidung `green`, `same-red`, `new-red` oder `inconclusive` |
+| `data/training/ppo/bt93j/r2_micro_train_counterprobe_report.json` | enger R2-Trainings-Gegenbeweis nach R1, kein Pilot/Candidate/Holdout |
+| `data/training/ppo/bt93j/r2_eval_trend_report.json` | Eval-Trend nach R2 ohne Holdout- oder Candidate-Semantik |
 | `data/training/ppo/bt93j/pilot_readiness_report.json` | Freigabe oder Blocker fuer Pilot/Long-run |
 | `data/training/ppo/bt93j/holdout_guard_report.json` | Holdout-Seeds, Modellhash, Optimizer-Step und No-post-holdout-Optimization |
 | `data/training/ppo/bt93j/long_run_readiness_report.json` | Budget, Early-Stops, Checkpoints und rote Stop-Regeln |
@@ -2527,6 +2530,14 @@ Closure-Evidence je Blocker:
 - [x] 93J.5.3 `pilot_readiness_report.json` schreiben; Pilot nur bei gruener Observation, startfaehiger Terminal-Matrix, `runtimeErrorCount=0`, Action-Schwellen und Micro-Test-Trendverbesserung. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json` (`blockingChecks=terminal_matrix_start_capable,not_player_dead_only,micro_test_trend_improvement`))
 - [x] 93J.5.4 `readyForTraining=false` blockiert Pilot, Holdout und Long-run. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_iterative_pilot_readiness.py --write-reports` -> `data/training/ppo/bt93j/pilot_readiness_report.json`)
 
+### 93J.5a R2 Micro-Train Counterprobe
+
+- [ ] 93J.5a.1 R2 startet nur, wenn R1 `green` ist, `readyForTraining=false` aus `pilot_readiness_report.json` kommt und die Blocker exakt `terminal_matrix_start_capable`, `not_player_dead_only` und `micro_test_trend_improvement` sind.
+- [ ] 93J.5a.2 Einen begrenzten Micro-Train mit `run-kind=bt93j-r2-micro-train-counterprobe` ausfuehren; kein Candidate, kein Freeze, kein Promote, kein Holdout, kein Long-run.
+- [ ] 93J.5a.3 `r2_micro_train_counterprobe_report.json` schreiben mit Run-ID, Timesteps, Seeds, Modellhash, Config-Hash, Normalize-State-Hash, Optimizer-State-Hash, `runtimeErrorCount`, Terminal-Matrix, avgSteps-Trend, Natural-Terminal-Anteil, Reward-Breakdown und Action-Safety-Telemetrie.
+- [ ] 93J.5a.4 R2 klassifiziert `trend-green`, `same-red`, `new-red` oder `measurement-invalid`; nur `trend-green` darf `pilot_readiness_report.json` neu bewerten, alle anderen Ergebnisse blockieren `93J.6`.
+- [ ] 93J.5a.5 Holdout bleibt unbenutzt; bei `trend-green` darf nur Eval-/Pilot-Readiness, nicht BT94A oder Freeze, refreshed werden.
+
 ### 93J.6 Pilot, Holdout-Schutz und Vergleich
 
 - [ ] 93J.6.1 Begrenzten Pilot nur mit `run-kind=bt93j-pilot-repair` oder engerem Namen ausfuehren; niemals `candidate`, `freeze`, `promote` oder `rollout-ready`.
@@ -2588,7 +2599,7 @@ Claim-Grenze vor BT94A:
 Startstatus 2026-04-25:
 
 - `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`, Blocker `F.05/F.19/F.27/F.31`))
-- Naechster erlaubter Trainingsclaim vor BT94A ist `93J.6` nur bei `readyForTraining=true`; aktueller `93J.5`-Befund blockiert Pilot, Holdout und Long-run. Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+- Naechster erlaubter Trainingsclaim vor BT94A ist `93J.5a R2 Micro-Train Counterprobe`; `93J.6` oeffnet nur bei `trend-green` aus R2. Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
 
 ### Definition of Done (DoD)
 
@@ -2832,7 +2843,7 @@ Rollout-Intake-Pflichtpaket:
 | 12 | `BT93G-Masked-Comparable-Repair` abgeschlossen: `93G.1` bis `93G.99`, keine BT94A-Kandidaten und kein Freeze. | `BT93F.99=diagnose-blocked`; Root-Causes waren Vergleichshorizont, fehlendes Pre-Sampling-Masking, Terminal-/Death-/Reward-Semantik und untertrainierter PPO. | `data/training/ppo/bt93g/handover_package.json` meldet `resultClass=diagnose-blocked`; `no_start_gate.json` bleibt rot mit `bt94aBlockerCount=4`; naechster Trainingsclaim braucht User-Replan oder engeren Folgeblock. |
 | 13 | `BT93H-Natural-Terminal-Survival-Reparatur` abgeschlossen: `93H.1` bis `93H.99`, keine BT94A-Kandidaten und kein Freeze. | `BT93G.99=diagnose-blocked`; `followup_gate_report.json` meldete `followupRequired=true`; offen waren F.05/F.19/F.27/F.31. | Ergebnis `diagnose-blocked`; `data/training/ppo/bt93h/followup_gate_report.json` meldet `followupRequired=true`, `data/training/ppo/bt94a/no_start_gate.json` bleibt `claimable=false`. |
 | 14 | `BT93I-Terminal-Curriculum-Steps-Repair` abgeschlossen: `93I.1` bis `93I.99`, keine BT94A-Kandidaten und kein Freeze. | `BT93H.99=diagnose-blocked`; `followup_gate_report.json` meldete `followupRequired=true`; offen waren F.05/F.19/F.27/F.31. | Ergebnis `diagnose-blocked-closed`; `no_start_gate.json` bleibt rot mit `bt94aBlockerCount=4`; naechster Trainingsclaim ist der engere Root-Cause-Repair `BT93J`. |
-| 15 | `BT93J-Root-Cause-Blocker-Repair` claimen: zuerst `93J.0` und `93J.1`; kein Fix, Pilot oder Long-run ohne Diagnose-Trennmesser und Gegenprobe. | `BT93I.99=diagnose-blocked-closed`; `followup_gate_report.json` meldet `followupRequired=true`; offen sind F.05/F.19/F.27/F.31. | Start-Wahrheit, Kausalkettenregister, Observation-/Terminal-/Matrix-/Action-/Reward-Trennmesser und minimaler Repair-Loop; Ergebnis `BT94A-ready`, `diagnose-loop-required` oder `diagnose-blocked-escalation`. |
+| 15 | `BT93J-Root-Cause-Blocker-Repair` fortsetzen: nach `93J.5` zuerst `93J.5a R2 Micro-Train Counterprobe`; `93J.6` nur bei `trend-green`. | `BT93I.99=diagnose-blocked-closed`; `followup_gate_report.json` meldet `followupRequired=true`; offen sind F.05/F.19/F.27/F.31; R1 ist `green`, aber `readyForTraining=false`. | R2-Micro-Train beweist oder widerlegt, ob der R1-Reward-Signal-Fix gegen `player-dead-only` und Steps-Regression wirkt; Ergebnis `trend-green`, `same-red`, `new-red` oder `measurement-invalid`. |
 | 16 | Erst bei `BT93J.99=BT94A-ready`: `94A.1` claimen. | `no_start_gate.json` meldet `claimable=true`, `candidateRunsAllowed=true`, `matrixDefinitionAllowed=true`, `summary.bt94a-blocker=0` bzw. `bt94aBlockerCount=0`, `bt94aHandover.ready=true`, `precomparison != ppo-regression`. | Ablationsmatrix und Entscheidungsregeln fuer BT94A; weiterhin kein Freeze vor `94A.3`. |
 
 No-Go vor Bot-Training:
