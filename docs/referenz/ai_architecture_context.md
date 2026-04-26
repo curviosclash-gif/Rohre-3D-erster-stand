@@ -762,6 +762,16 @@ Architekturprinzip: Alle Surface-Entscheide laufen ueber die obigen Resolver aus
 
 - Scan 2026-04-26: In `src/core/settings/**` und `src/core/SettingsManager.js` gibt es im V103-Scope keine direkten `document`-/`window`-/DOM-Seiteneffekte. UI-nahe Keybind-Metadaten liegen bereits in `src/ui/KeybindActionCatalog.js` und werden von `src/ui/KeybindEditorController.js` konsumiert statt vom Manager bereitgestellt zu werden.
 
+#### 4.6.6.2 Erweiterungsregeln fuer neue Settings-Funktionen
+
+- Neue Settings-Funktionalitaet beginnt in `src/core/settings/**` oder in einem schmalen, benannten Settings-Port. `SettingsManager` darf neue Faehigkeiten nur verdrahten und als Orchestrator-Fassade exponieren, nicht als neue Heimat fuer freie Domain-Logik oder UI-Metadaten wachsen.
+- Jeder neue mutierende Einstieg liefert denselben Grundvertrag wie die bestehenden Facades: `success`, `reason`, `changedKeys` sowie optional `metadata` und `warnings`. Runtime-Services leiten `changedKeys` weiter, statt eigene Listen fuer denselben Mutationspfad nachzubauen.
+- `SettingsStore` ist kein frei konsumierbarer Querschnittsspeicher. Produktive Aufrufer nutzen entweder bestehende Ports wie `getProfileStorePort()` oder einen explizit benannten neuen Port/Fassade; neue direkte Reads oder Writes ueber `settingsManager.store` gelten im Produktpfad als Bypass.
+- Core-Facades in `src/core/settings/**` und `SettingsManager` bleiben DOM-frei. `document`, `window`, `innerHTML`, Toaster, Button-Status und andere UI-Seiteneffekte gehoeren in Runtime-/UI-Adapter wie `src/core/runtime/**` oder `src/ui/**`.
+- UI-nahe Kataloge und Deskriptoren folgen demselben Schnitt wie die Keybind-Actions: Sie leben in `src/ui/**` oder `src/shared/contracts/**`, nicht im Manager und nicht in Persistenzhelfern.
+- Wenn eine bestehende Public-Methode nur Leaf-Charakter hat, bleibt sie Legacy-kompatibel, ist aber kein Ziel fuer neue Features. Konkret sollen neue Session-bezogene Features an `switchSessionType()` oder einen neuen intentartigen Einstieg andocken, nicht direkt an `saveSessionDraft()` oder `applySessionDraft()`.
+- Tests fuer neue Settings-Erweiterungen verankern den Vertrag am schmalsten sinnvollen Punkt: Runtime-/Apply-Pfade in `tests/runtime-settings-live-apply.contract.test.mjs`, Manager-/Facade-Vertraege in einer dedizierten Settings-Contract-Datei. Der in `V103` reservierte Pfad `tests/settings-manager.contract.test.mjs` bleibt dafuer der bevorzugte Zielort, falls neue Manager-spezifische Contract-Coverage noetig wird.
+
 ### 4.7 Aktuelle Simulationskopplungen, die V84 abbauen muss
 
 | Heutiger Uebergangspfad | Beobachtete Kopplung | Ziel fuer V84 |
