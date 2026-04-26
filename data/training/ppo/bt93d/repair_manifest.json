@@ -1,0 +1,444 @@
+{
+  "allowedSidecarPaths": [
+    "python/**",
+    "data/training/ppo/bt93d/**",
+    "data/training/ppo/bt93c/**",
+    "data/training/ppo/bt94a/no_start_gate.json",
+    "docs/bot-training/Bot_Trainingsplan.md"
+  ],
+  "blockId": "BT93D",
+  "bt94aStartStatus": {
+    "blockedClaimChecks": [
+      {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-ppo-regression",
+        "ok": false,
+        "required": "ready=true"
+      },
+      {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 5,
+        "ok": false,
+        "required": 0
+      }
+    ],
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "resultClass": "blocked-no-start"
+  },
+  "currentArtifacts": {
+    "artifactManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "role": "immutable PPO model package manifest",
+      "sha256": "4eff0dd319f6c1590391ea17b736d5c8e20fc51e1263e02041ec1961d933a143"
+    },
+    "baselineReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/baseline_report.json",
+      "role": "PPO baseline bundle",
+      "sha256": "3bdd65b5490de6e83df3779c7dba32f05a9aec1bf20b4a5d3d5d774642a29617"
+    },
+    "baselineSourceManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/baseline_source_manifest.json",
+      "role": "baseline source and excluded evidence policy",
+      "sha256": "dc70734b299940f803aaf135c01ac811a1df97a1ea5a79af9c7d4c151a7ca91a"
+    },
+    "bt94aGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "93D.1.1 refreshed BT94A gate",
+      "sha256": "c65192ac21c8e45df5c5a3de3d198182ab957d8b6f3da1c243fea7e36dafc7f1"
+    },
+    "cleanEnvSmokeReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "role": "clean-env dependency smoke",
+      "sha256": "be560858b6be8d1c294102af487fef064d35c13831ee27cf62086f56be4fe0d4"
+    },
+    "evidenceQualityMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "role": "audit blocker matrix",
+      "sha256": "2955f99595c57e1463271a7b6cc8e141e94cf9f16f4645b3975a2f715305fd22"
+    },
+    "handoverReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "role": "BT93C handover",
+      "sha256": "d38f5813b92b86b9941ee4668db6a546ee7cfea5389b69bb17611cd7954a12a3"
+    },
+    "precomparisonReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "DQN/PPO precomparison",
+      "sha256": "bf0f90f0dcc9ba01104c6531c1f7fd52193d99086c738c8446e4ef230b5e56dd"
+    }
+  },
+  "evidenceSources": {
+    "closureCapable": [
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "data/training/ppo/bt93d/start_matrix.json",
+      "data/training/ppo/bt93d/repair_manifest.json",
+      "data/training/ppo/bt93c/precomparison_report.json",
+      "data/training/ppo/bt93c/handover_report.json",
+      "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "data/training/ppo/bt93c/baseline_report.json",
+      "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "data/training/ppo/bt93c/clean_env_smoke_report.json"
+    ],
+    "supplementalOnly": [
+      {
+        "path": "tmp/**",
+        "reason": "local output is not closure-capable evidence"
+      },
+      {
+        "path": "data/bot_validation_report.json",
+        "reason": "legacy non-PPO validation report"
+      },
+      {
+        "path": "data/training/ppo/bt93c/latest_*.json",
+        "reason": "mutable pointers only"
+      },
+      {
+        "path": "data/training/ppo/bt93b/**",
+        "reason": "scaffold-only PPO path"
+      }
+    ]
+  },
+  "forbiddenWork": [
+    "BT94A candidate training runs",
+    "freeze candidate creation",
+    "BT94B handover",
+    "promote or rollout-ready verdicts",
+    "JS inference, runtime strategy flag, registry, rollback, or latency activation",
+    "productive runtime, matchstart, or AI-Hub surface changes"
+  ],
+  "freshness": {
+    "dependencyLock": {
+      "cleanEnvRequirementsSha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52",
+      "importSmokeOk": true,
+      "installRequirementsOk": true,
+      "minimalPpoTrainStartOk": true,
+      "ok": true,
+      "pipCheckOk": true,
+      "requirements": "python/requirements-ppo.txt",
+      "requirementsSha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52"
+    },
+    "dqnChampion": {
+      "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
+      "ok": true,
+      "semanticWindow": {
+        "bt93cLearner": "runtime-near-headless-v1",
+        "comparisonCaveat": "93C.6 must disclose any semantic drift before PPO/DQN comparison.",
+        "dqnChampion": "BT11 legacy DQN champion window"
+      },
+      "strictApplesToApples": false
+    },
+    "modelPackage": {
+      "config": {
+        "actualSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+        "expectedSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/config.json"
+      },
+      "model": {
+        "actualSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+        "expectedSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/model.zip"
+      },
+      "ok": true,
+      "optimizerState": {
+        "actualSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+        "expectedSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/optimizer_state.pt"
+      },
+      "runId": "20260424T180033Z-baseline-train",
+      "scaffoldOnly": false,
+      "truePpoModelPackage": true,
+      "vecnormalize": {
+        "actualSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
+        "expectedSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c",
+        "ok": true,
+        "path": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/vecnormalize.pkl"
+      }
+    },
+    "ppoBaseline": {
+      "baselineEvalRunId": "20260424T180054Z-baseline-eval",
+      "baselineId": "bt93c-ppo-baseline-publish-v1",
+      "baselineRunId": "20260424T180033Z-baseline-train",
+      "holdoutEvalRunId": "20260424T184311Z-holdout-eval",
+      "ok": true,
+      "resultClass": "baseline go"
+    },
+    "semanticWindow": {
+      "baselineSourceLearner": "runtime-near-headless-v1",
+      "modeId": "runtime-near-headless-v1",
+      "ok": true
+    },
+    "v101": {
+      "driftCount": 0,
+      "freezeOk": true,
+      "ok": true,
+      "resultClass": "no-ppo-contract-drift"
+    }
+  },
+  "generatedAt": "2026-04-24T20:14:19Z",
+  "generatedBy": "python/scripts/bt93d_repair_manifest.py",
+  "gitSha": "040e6fc1d3eabde232585ef6db3479f0a52f2177",
+  "mandatoryStartValues": [
+    {
+      "current": "observed resultClass=blocked-no-start, claimable=False",
+      "id": "bt94a_gate_report",
+      "ok": false,
+      "required": {
+        "claimable": true,
+        "resultClass": "claimable"
+      },
+      "source": "data/training/ppo/bt94a/no_start_gate.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed candidateRunsAllowed=False; BT93D itself still forbids candidates",
+      "id": "candidate_runs_allowed",
+      "ok": false,
+      "required": {
+        "candidateRunsAllowed": true,
+        "scope": "BT94A only after BT93D"
+      },
+      "source": "data/training/ppo/bt94a/no_start_gate.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed matrixDefinitionAllowed=False",
+      "id": "matrix_definition_allowed",
+      "ok": false,
+      "required": {
+        "matrixDefinitionAllowed": true
+      },
+      "source": "data/training/ppo/bt94a/no_start_gate.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed candidateFreezeAllowed=False",
+      "id": "candidate_freeze_allowed",
+      "ok": true,
+      "required": {
+        "candidateFreezeAllowed": false,
+        "until": "BT94A.3"
+      },
+      "source": "data/training/ppo/bt94a/no_start_gate.json",
+      "status": "ok"
+    },
+    {
+      "current": "observed resultClass=diagnose",
+      "id": "handover_result",
+      "ok": false,
+      "required": {
+        "resultClass": "not diagnose"
+      },
+      "source": "data/training/ppo/bt93c/handover_report.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed ready=False, gate=closed-diagnose-ppo-regression",
+      "id": "handover_gate",
+      "ok": false,
+      "required": {
+        "bt94aHandover.ready": true
+      },
+      "source": "data/training/ppo/bt93c/handover_report.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed resultClass=ppo-regression",
+      "id": "precomparison",
+      "ok": false,
+      "required": {
+        "resultClass": "not ppo-regression"
+      },
+      "source": "data/training/ppo/bt93c/precomparison_report.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed bt94a-blocker=5",
+      "id": "audit_blockers",
+      "ok": false,
+      "required": {
+        "summary.bt94a-blocker": 0
+      },
+      "source": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "status": "blocked"
+    },
+    {
+      "current": "F.05 is still a BT94A blocker",
+      "id": "f05_survival_first",
+      "ok": false,
+      "required": "PPO survival must be evidenced against the same matrix; legacy bot validation is excluded",
+      "source": "data/training/ppo/bt93c/precomparison_report.json",
+      "status": "blocked"
+    },
+    {
+      "current": "F.19 is still a BT94A blocker",
+      "id": "f19_terminal_death_diagnostics",
+      "ok": false,
+      "required": "natural terminal/death cases and survival distribution are diagnostic, not max-steps only",
+      "source": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "status": "blocked"
+    },
+    {
+      "current": "F.27 is still a BT94A blocker",
+      "id": "f27_dqn_ppo_comparison",
+      "ok": false,
+      "required": "PPO is not a clear DQN regression, or the regression is downgraded with new evidence",
+      "source": "data/training/ppo/bt93c/precomparison_report.json",
+      "status": "blocked"
+    },
+    {
+      "current": "F.30 is still a BT94A blocker",
+      "id": "f30_mask_clamp_load",
+      "ok": false,
+      "required": "policy-mask and post-decode clamp/veto load are separated",
+      "source": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "status": "blocked"
+    },
+    {
+      "current": "F.31 is still a BT94A blocker",
+      "id": "f31_natural_terminal_matrix",
+      "ok": false,
+      "required": "death/terminal matrix and survival distribution are visible before freeze path",
+      "source": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed baselineId=bt93c-ppo-baseline-publish-v1, baseline result=baseline go",
+      "id": "baseline_id",
+      "ok": true,
+      "required": "versioned PPO baseline id with command, date, seeds, modes, maps, semantic window, artifacts",
+      "source": "data/training/ppo/bt93c/baseline_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "observed dqnChampion=bt93c-dqn-reference-bt11-final-20260324-v1",
+      "id": "dqn_champion",
+      "ok": true,
+      "required": "named DQN anchor with baseline id, metrics, semantic window, and drift note",
+      "source": "data/training/ppo/bt93c/precomparison_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "observed holdoutEvalRunId=20260424T184311Z-holdout-eval",
+      "id": "holdout",
+      "ok": true,
+      "required": "holdout seeds consumed, reported, and not optimized on",
+      "source": "data/training/ppo/bt93c/precomparison_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "observed modeId=runtime-near-headless-v1, v101=no-ppo-contract-drift",
+      "id": "semantic_window",
+      "ok": true,
+      "required": "DQN/PPO semantic window is named; drift is no-op or blocker",
+      "source": "data/training/ppo/bt93c/precomparison_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "clean-env report ok and requirements hash matches",
+      "id": "dependency_lock",
+      "ok": true,
+      "required": "PPO stack is pinned and clean-env smoke remains valid",
+      "source": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "observed truePpoModelPackage=True, scaffoldOnly=False",
+      "id": "model_package",
+      "ok": true,
+      "required": "true PPO package with model/config/optimizer/VecNormalize hashes; no scaffold",
+      "source": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "status": "ok"
+    },
+    {
+      "current": "evidence matrix still contains BT94A blockers; mutable latest/tmp remain non-closure sources",
+      "id": "evidence_quality",
+      "ok": false,
+      "required": "no tmp-only, self-count, stale-doc, scaffold, pilot-only, or mutable latest evidence as start signal",
+      "source": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "status": "blocked"
+    },
+    {
+      "current": "observed fourEnvAllowed=False",
+      "id": "four_env",
+      "ok": true,
+      "required": "4-env remains locked without direct evidence",
+      "source": "data/training/ppo/bt93c/baseline_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "observed PPO-Validate status=ppo-validate-missing",
+      "id": "ppo_validate",
+      "ok": true,
+      "required": "BT94B.3 rest debt stays visible; no BT80C/internal-eval replacement",
+      "source": "data/training/ppo/bt93c/precomparison_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "observed rolloutSignal=False, productiveRuntimeChanged=False",
+      "id": "rollout_boundary",
+      "ok": true,
+      "required": "no rollout, JS inference, registry, rollback, latency, or strategy flag signal",
+      "source": "data/training/ppo/bt93c/handover_report.json",
+      "status": "ok"
+    },
+    {
+      "current": "deferred to BT93D closure gate",
+      "id": "governance_gates",
+      "ok": false,
+      "required": "npm.cmd run plan:check, docs:sync, docs:check, build pass at closure gate",
+      "source": "docs/bot-training/Bot_Trainingsplan.md",
+      "status": "blocked"
+    }
+  ],
+  "nextRepairTargets": [
+    "F.05",
+    "F.19",
+    "F.27",
+    "F.30",
+    "F.31"
+  ],
+  "ok": true,
+  "phaseId": "93D.1",
+  "readOnlyRuntimeSurfaces": [
+    "ObservationBridgePolicy",
+    "RuntimeConfig",
+    "BotPolicyRegistry",
+    "BotPolicyTypes",
+    "LocalDqnInference",
+    "HybridDecisionArchitecture",
+    "RewardCalculator",
+    "MatchSessionFactory"
+  ],
+  "resultClass": "gate-truth-pinned",
+  "startMatrixPath": "data/training/ppo/bt93d/start_matrix.json"
+}

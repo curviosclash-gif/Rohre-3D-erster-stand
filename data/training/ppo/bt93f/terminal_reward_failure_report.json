@@ -1,0 +1,572 @@
+{
+  "blockId": "BT93F",
+  "bt94aImpact": {
+    "blockedFindings": [
+      "F.19",
+      "F.31",
+      "R.01"
+    ],
+    "claimableAfter93F2": false,
+    "decision": "BT94A remains closed; BT93F.2 repaired emission/probe visibility but source eval/holdout still show max-steps-only, too-small episode counts, empty death matrix, or R.01."
+  },
+  "commands": {
+    "report": "python python\\scripts\\bt93f_terminal_reward_failure_report.py --write-report --write-probes"
+  },
+  "controlledTerminalDeathProbes": {
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsQualityEvidence": false,
+    "deathCauseProbeCount": 1,
+    "maxStepsProbeCount": 1,
+    "naturalTerminalOrDeathCauseTriggered": true,
+    "naturalTerminalProbeCount": 1,
+    "probeCount": 3,
+    "probeIds": [
+      "bt93f-probe-player-dead",
+      "bt93f-probe-match-ended",
+      "bt93f-probe-max-steps"
+    ],
+    "probeRunnerOk": true
+  },
+  "evidenceLimits": {
+    "classification": "BT93F.2 sidecar emission/probe diagnostics only",
+    "countsAsLongRunStabilityEvidence": false,
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsRolloutEvidence": false
+  },
+  "findingDisposition": {
+    "F.18": "closed",
+    "F.19": "still-blocking",
+    "F.24": "not-start-blocking-carried",
+    "F.31": "still-blocking",
+    "R.01": "still-blocking"
+  },
+  "generatedAt": "2026-04-24T23:32:03Z",
+  "generatedBy": "python/scripts/bt93f_terminal_reward_failure_report.py",
+  "gitSha": "eaf31df86256e34fa5b3924b93b56434c88c9507",
+  "guardrails": {
+    "bt93eSurvivalResultClass": "diagnose-blocked",
+    "bt93eTerminalResultClass": "diagnose-blocked",
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "noGoResultClass": "no-go-active",
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": [],
+    "sourceNoStartState": {
+      "candidateFreezeAllowed": false,
+      "candidateRunsAllowed": false,
+      "claimable": false,
+      "matrixDefinitionAllowed": false,
+      "redClaimChecks": [
+        {
+          "blocksStart": true,
+          "id": "bt93c_result_allows_bt94a",
+          "observed": "diagnose",
+          "ok": false,
+          "required": "not diagnose"
+        },
+        {
+          "blocksStart": true,
+          "id": "handover_gate_ready",
+          "observed": "closed-diagnose-blocked-by-bt93e",
+          "ok": false,
+          "required": "ready=true"
+        },
+        {
+          "blocksStart": true,
+          "id": "precomparison_not_regression",
+          "observed": "ppo-regression",
+          "ok": false,
+          "required": "not ppo-regression"
+        },
+        {
+          "blocksStart": true,
+          "id": "no_open_bt94a_audit_blockers",
+          "observed": 5,
+          "ok": false,
+          "required": 0
+        }
+      ],
+      "remainingBt94aGates": [
+        "F.05",
+        "F.19",
+        "F.27",
+        "F.30",
+        "F.31",
+        "R.01"
+      ],
+      "resultClass": "blocked-no-start"
+    }
+  },
+  "laneSchemaContract": {
+    "bt93fNormalizedMatrixHasAllFields": true,
+    "missingSourceEmissionBlocksStart": true,
+    "requiredFailureFields": [
+      "runtimeErrorCount",
+      "crash",
+      "timeout",
+      "forcedRound",
+      "socketClose",
+      "teardownFailure",
+      "maxSteps",
+      "naturalTerminal",
+      "terminalReasonCounts",
+      "truncatedReasonCounts",
+      "deathCauseCounts"
+    ],
+    "requiredLanes": [
+      "eval",
+      "holdout",
+      "train"
+    ],
+    "sourceReportsAlreadyEmitAllFields": false,
+    "trainEvalHoldoutAreNamedConsistently": true
+  },
+  "lanes": {
+    "eval": {
+      "lane": "eval",
+      "laneVerdict": {
+        "bt94aStartImpact": "blocked",
+        "reasons": [
+          "max-steps-only with empty terminal/death matrix",
+          "max-steps-only terminal/death matrix; death-cause classes are empty; completedEpisodeCount 2 below minimum 6",
+          "positive reward coexists with shorter/regressive survival"
+        ]
+      },
+      "phaseId": "93E.2.2",
+      "report": "data/training/ppo/bt93e/runs/20260424T221840Z-baseline-repro-eval/eval_report.json",
+      "rewardSafetyEpisodeShorteningRules": {
+        "blockReason": "positive reward coexists with shorter/regressive survival",
+        "blocksBt94a": true,
+        "episodeShorteningAgainstDqn": true,
+        "episodeShorteningCheck": {
+          "avgStepsPerCompletedEpisode": 16.0,
+          "baselineComparable": true,
+          "completedEpisodeLengths": [
+            16,
+            16
+          ],
+          "doneCount": 2,
+          "maxStepsPerEpisode": 16
+        },
+        "positiveRewardWhileSurvivalRegresses": true,
+        "r01BlocksStart": true,
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.1125,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 3.6,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownVisible": true,
+        "rewardMean": 0.1125,
+        "rewardTotal": 3.6,
+        "safetyOverruleCounts": {
+          "combatVeto": 16,
+          "intent-request-applied-mismatch": 16,
+          "vetoActive": 16
+        },
+        "source": "diagnostics.rewardSafetyDiagnostics"
+      },
+      "role": "BT93E same-matrix baseline repro eval",
+      "runId": "20260424T221840Z-baseline-repro-eval",
+      "runKind": "baseline-repro-eval",
+      "survivalDistributionRules": {
+        "averageBotSurvival": 16.0,
+        "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+        "avgStepsPerEpisode": 16.0,
+        "blockReason": "max-steps-only terminal/death matrix; death-cause classes are empty; completedEpisodeCount 2 below minimum 6",
+        "blocksBt94a": true,
+        "completedEpisodeCount": 2,
+        "completedEpisodeLengths": [
+          16.0,
+          16.0
+        ],
+        "completedEpisodeStats": {
+          "count": 2,
+          "max": 16.0,
+          "mean": 16.0,
+          "median": 16.0,
+          "min": 16.0,
+          "stdev": 0.0
+        },
+        "emptyDeathCauseBlocksStart": true,
+        "maxStepsOnlyBlocksStart": true,
+        "minimumCompletedEpisodes": 6,
+        "source": "diagnostics.survivalKpis + rewardHackingSignals.episodeShorteningCheck",
+        "tooSmallEpisodeCountBlocksStart": true
+      },
+      "terminalDeathFailureMatrix": {
+        "blockReason": "max-steps-only with empty terminal/death matrix",
+        "blocksBt94a": true,
+        "crash": 0,
+        "deathCauseCounts": {},
+        "emptyDeathCauseCounts": true,
+        "fieldNamesAligned": true,
+        "fieldNamesPresent": {
+          "crash": true,
+          "deathCauseCounts": true,
+          "forcedRound": true,
+          "maxSteps": true,
+          "naturalTerminal": true,
+          "runtimeErrorCount": true,
+          "socketClose": true,
+          "teardownFailure": true,
+          "terminalReasonCounts": true,
+          "timeout": true,
+          "truncatedReasonCounts": true
+        },
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "maxStepsOnly": true,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "source": "diagnostics.failureSemantics",
+        "sourceObservabilityStatus": "visible",
+        "sourceReportAlreadyEmitsFields": true,
+        "teardownFailure": 0,
+        "terminalDeathMatrixVisibleInBt93f": true,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      }
+    },
+    "holdout": {
+      "lane": "holdout",
+      "laneVerdict": {
+        "bt94aStartImpact": "blocked",
+        "reasons": [
+          "max-steps-only with empty terminal/death matrix",
+          "max-steps-only terminal/death matrix; death-cause classes are empty; completedEpisodeCount 2 below minimum 4",
+          "positive reward coexists with shorter/regressive survival"
+        ]
+      },
+      "phaseId": "93E.2.4",
+      "report": "data/training/ppo/bt93e/runs/20260424T221812Z-holdout-eval/eval_report.json",
+      "rewardSafetyEpisodeShorteningRules": {
+        "blockReason": "positive reward coexists with shorter/regressive survival",
+        "blocksBt94a": true,
+        "episodeShorteningAgainstDqn": true,
+        "episodeShorteningCheck": {
+          "avgStepsPerCompletedEpisode": 16.0,
+          "baselineComparable": true,
+          "completedEpisodeLengths": [
+            16,
+            16
+          ],
+          "doneCount": 2,
+          "maxStepsPerEpisode": 16
+        },
+        "positiveRewardWhileSurvivalRegresses": true,
+        "r01BlocksStart": true,
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.1125,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 3.6,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownVisible": true,
+        "rewardMean": 0.1125,
+        "rewardTotal": 3.6,
+        "safetyOverruleCounts": {
+          "combatVeto": 4,
+          "intent-request-applied-mismatch": 4,
+          "vetoActive": 4
+        },
+        "source": "diagnostics.rewardSafetyDiagnostics"
+      },
+      "role": "BT93E holdout eval",
+      "runId": "20260424T221812Z-holdout-eval",
+      "runKind": "holdout-eval",
+      "survivalDistributionRules": {
+        "averageBotSurvival": 16.0,
+        "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+        "avgStepsPerEpisode": 16.0,
+        "blockReason": "max-steps-only terminal/death matrix; death-cause classes are empty; completedEpisodeCount 2 below minimum 4",
+        "blocksBt94a": true,
+        "completedEpisodeCount": 2,
+        "completedEpisodeLengths": [
+          16.0,
+          16.0
+        ],
+        "completedEpisodeStats": {
+          "count": 2,
+          "max": 16.0,
+          "mean": 16.0,
+          "median": 16.0,
+          "min": 16.0,
+          "stdev": 0.0
+        },
+        "emptyDeathCauseBlocksStart": true,
+        "maxStepsOnlyBlocksStart": true,
+        "minimumCompletedEpisodes": 4,
+        "source": "diagnostics.survivalKpis + rewardHackingSignals.episodeShorteningCheck",
+        "tooSmallEpisodeCountBlocksStart": true
+      },
+      "terminalDeathFailureMatrix": {
+        "blockReason": "max-steps-only with empty terminal/death matrix",
+        "blocksBt94a": true,
+        "crash": 0,
+        "deathCauseCounts": {},
+        "emptyDeathCauseCounts": true,
+        "fieldNamesAligned": true,
+        "fieldNamesPresent": {
+          "crash": true,
+          "deathCauseCounts": true,
+          "forcedRound": true,
+          "maxSteps": true,
+          "naturalTerminal": true,
+          "runtimeErrorCount": true,
+          "socketClose": true,
+          "teardownFailure": true,
+          "terminalReasonCounts": true,
+          "timeout": true,
+          "truncatedReasonCounts": true
+        },
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "maxStepsOnly": true,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "source": "diagnostics.failureSemantics",
+        "sourceObservabilityStatus": "visible",
+        "sourceReportAlreadyEmitsFields": true,
+        "teardownFailure": 0,
+        "terminalDeathMatrixVisibleInBt93f": true,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      }
+    },
+    "train": {
+      "lane": "train",
+      "laneVerdict": {
+        "bt94aStartImpact": "blocked",
+        "reasons": [
+          "death-cause classes are empty or natural terminal evidence is absent",
+          "death-cause classes are empty"
+        ]
+      },
+      "phaseId": "93E.2.1",
+      "report": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/training_report.json",
+      "rewardSafetyEpisodeShorteningRules": {
+        "blockReason": null,
+        "blocksBt94a": false,
+        "episodeShorteningAgainstDqn": false,
+        "episodeShorteningCheck": {},
+        "positiveRewardWhileSurvivalRegresses": false,
+        "r01BlocksStart": false,
+        "rewardBreakdownMeanPerStep": {},
+        "rewardBreakdownTotals": {},
+        "rewardBreakdownVisible": false,
+        "rewardMean": null,
+        "rewardTotal": null,
+        "safetyOverruleCounts": {
+          "postDecodeSafetyVetoCount": 2
+        },
+        "source": "learning.telemetry-only"
+      },
+      "role": "BT93E diagnostic repair train",
+      "runId": "20260424T221741Z-diagnostics-smoke",
+      "runKind": "diagnostics-smoke",
+      "survivalDistributionRules": {
+        "averageBotSurvival": null,
+        "averageBotSurvivalSource": null,
+        "avgStepsPerEpisode": null,
+        "blockReason": "death-cause classes are empty",
+        "blocksBt94a": true,
+        "completedEpisodeCount": 0,
+        "completedEpisodeLengths": [],
+        "completedEpisodeStats": {
+          "count": 0,
+          "max": null,
+          "mean": null,
+          "median": null,
+          "min": null,
+          "stdev": null
+        },
+        "emptyDeathCauseBlocksStart": true,
+        "maxStepsOnlyBlocksStart": false,
+        "minimumCompletedEpisodes": null,
+        "source": "not-emitted-by-training-report",
+        "tooSmallEpisodeCountBlocksStart": false
+      },
+      "terminalDeathFailureMatrix": {
+        "blockReason": "death-cause classes are empty or natural terminal evidence is absent",
+        "blocksBt94a": true,
+        "crash": 0,
+        "deathCauseCounts": {},
+        "emptyDeathCauseCounts": true,
+        "fieldNamesAligned": true,
+        "fieldNamesPresent": {
+          "crash": true,
+          "deathCauseCounts": true,
+          "forcedRound": true,
+          "maxSteps": true,
+          "naturalTerminal": true,
+          "runtimeErrorCount": true,
+          "socketClose": true,
+          "teardownFailure": true,
+          "terminalReasonCounts": true,
+          "timeout": true,
+          "truncatedReasonCounts": true
+        },
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "source": "missing",
+        "sourceObservabilityStatus": "missing-in-training-report",
+        "sourceReportAlreadyEmitsFields": false,
+        "teardownFailure": 0,
+        "terminalDeathMatrixVisibleInBt93f": true,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      }
+    }
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93F.2.1": true,
+    "93F.2.2": true,
+    "93F.2.3": true,
+    "93F.2.4": true
+  },
+  "phaseId": "93F.2",
+  "resultClass": "diagnose-blocked",
+  "sourceArtifacts": {
+    "bt93eSurvivalRepair": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/survival_repair_report.json",
+      "role": "BT93E survival repair report",
+      "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57"
+    },
+    "bt93eTerminalRewardFailure": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+      "role": "BT93E terminal/reward/failure diagnostics",
+      "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706"
+    },
+    "bt93fNoGoReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/no_go_report.json",
+      "role": "BT93F no-go report",
+      "sha256": "ce5c8e7b7a79bc6f58679a770b86d50c3d98a9287fcc0ca905d05625b860a905"
+    },
+    "bt93fStartRepairPackage": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/start_repair_package.json",
+      "role": "BT93F start repair package",
+      "sha256": "da0c571e494a42af93ea83165a160ea1109640e0e77f95275517b47b6b875e4a"
+    },
+    "episodeController": {
+      "closureCapable": true,
+      "path": "src/state/training/EpisodeController.js",
+      "role": "JS terminal/truncation source used by controlled probes",
+      "sha256": "6fd88a12ea9f7d1268d0a43bd60ef2622511fe88fa611468128ca779f3bf9e7f"
+    },
+    "rewardCalculator": {
+      "closureCapable": true,
+      "path": "src/state/training/RewardCalculator.js",
+      "role": "JS reward source used by controlled probes",
+      "sha256": "455bfd1c3aa94ea23a4275d410c2f48454315937ce41b8b57efcdcfca86a0c74"
+    }
+  },
+  "startRules": {
+    "controlledProbesDoNotCountAsQualityEvidence": true,
+    "maxStepsOnlyWithEmptyDeathMatrixBlocksStart": true,
+    "minimumCompletedEpisodes": {
+      "eval": 6,
+      "holdout": 4
+    },
+    "positiveRewardWhileSurvivalRegressesBlocksStart": true,
+    "tooSmallEvalHoldoutEpisodeCountsBlockStart": true
+  }
+}

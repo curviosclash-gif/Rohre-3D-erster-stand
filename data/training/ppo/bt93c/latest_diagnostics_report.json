@@ -1,0 +1,6 @@
+{
+  "ok": true,
+  "resultClass": "go",
+  "report": "data/training/ppo/bt93c/diagnostics_report.json",
+  "sha256": "661d4cd8508a6bcbf3d8decd282491a8bc2899710b5298fd26b70be5cbf42ea2"
+}

@@ -24,7 +24,11 @@ import { createNeutralBotAction, sanitizeBotAction } from '../src/entities/ai/ac
 import { resolveHybridDecision } from '../src/entities/ai/hybrid/HybridDecisionArchitecture.js';
 import { RuntimeNearObservationTracker } from '../src/entities/ai/observation/RuntimeNearObservationAdapter.js';
 import { buildObservation, createObservationContext } from '../src/entities/ai/observation/ObservationSystem.js';
-import { EpisodeController } from '../src/state/training/EpisodeController.js';
+import {
+    EpisodeController,
+    TRAINING_TERMINAL_REASONS,
+    TRAINING_TRUNCATION_REASONS,
+} from '../src/state/training/EpisodeController.js';
 import { RewardCalculator } from '../src/state/training/RewardCalculator.js';
 
 const DEFAULT_ENVIRONMENT_PROFILE = 'runtime-near';
@@ -37,6 +41,7 @@ const DEFAULT_ACTION_TIMEOUT_MS = 2_000;
 const DEFAULT_ACK_TIMEOUT_MS = 2_000;
 const DEFAULT_BRIDGE_READY_TIMEOUT_MS = 8_000;
 const DEFAULT_STATS_TIMEOUT_MS = 2_000;
+const KERNEL_RUNNING_LIFECYCLES = new Set(['running', 'round_end', 'match_end']);
 
 if (typeof globalThis.WebSocket !== 'function') {
     globalThis.WebSocket = WebSocket;
@@ -90,6 +95,85 @@ function createSmokeSettings() {
             planarMode: false,
         },
         portalsEnabled: false,
+    };
+}
+
+function normalizeKernelLifecycle(...values) {
+    for (const value of values) {
+        if (typeof value !== 'string') continue;
+        const normalized = value.trim().toLowerCase();
+        if (normalized) return normalized;
+    }
+    return 'running';
+}
+
+function normalizeReason(value, fallback) {
+    if (typeof value !== 'string') return fallback;
+    const trimmed = value.trim();
+    return trimmed || fallback;
+}
+
+export function deriveHeadlessLaneEpisodeStep({
+    player = null,
+    lifecycle = 'running',
+    tickLifecycle = null,
+    input = {},
+    nowMs = null,
+} = {}) {
+    const kernelLifecycle = normalizeKernelLifecycle(tickLifecycle, lifecycle);
+    const playerAlive = player?.alive !== false;
+
+    if (!playerAlive) {
+        return {
+            done: true,
+            terminalReason: TRAINING_TERMINAL_REASONS.PLAYER_DEAD,
+            truncated: false,
+            truncatedReason: null,
+            nowMs,
+        };
+    }
+
+    if (kernelLifecycle === 'round_end' || kernelLifecycle === 'match_end') {
+        return {
+            done: true,
+            terminalReason: TRAINING_TERMINAL_REASONS.MATCH_ENDED,
+            truncated: false,
+            truncatedReason: null,
+            nowMs,
+        };
+    }
+
+    if (input?.done === true) {
+        return {
+            done: true,
+            terminalReason: normalizeReason(input.terminalReason, TRAINING_TERMINAL_REASONS.EXTERNAL),
+            truncated: false,
+            truncatedReason: null,
+            nowMs,
+        };
+    }
+
+    if (input?.truncated === true || input?.timeout === true) {
+        return {
+            done: false,
+            terminalReason: null,
+            truncated: true,
+            truncatedReason: normalizeReason(
+                input.truncatedReason,
+                input?.timeout === true
+                    ? TRAINING_TRUNCATION_REASONS.TIME_LIMIT
+                    : TRAINING_TRUNCATION_REASONS.EXTERNAL,
+            ),
+            nowMs,
+        };
+    }
+
+    return {
+        done: false,
+        terminalReason: null,
+        truncated: false,
+        truncatedReason: null,
+        nowMs,
     };
 }
 
@@ -328,7 +412,11 @@ export class HeadlessLaneStepRunner {
             highResTimestampMs: (tickIndex + 1) * 16,
         });
         assert(stepResult?.tickResult, 'headless lane produced no tickResult');
-        assert(stepResult.lifecycle === 'running', `headless lane lifecycle drifted to ${stepResult.lifecycle}`);
+        const kernelLifecycle = normalizeKernelLifecycle(stepResult.lifecycle, stepResult.tickResult.lifecycle);
+        assert(
+            KERNEL_RUNNING_LIFECYCLES.has(kernelLifecycle),
+            `headless lane lifecycle drifted to ${kernelLifecycle}`,
+        );
 
         const player = createPlayerSnapshot(this._getPlayer());
         const observation = this._buildRawObservation();
@@ -338,7 +426,14 @@ export class HeadlessLaneStepRunner {
                 tickIndex: stepResult.tickResult.tickIndex,
             },
         });
-        const episode = this.episodeController.step({});
+        const episodeStepInput = deriveHeadlessLaneEpisodeStep({
+            player,
+            lifecycle: stepResult.lifecycle,
+            tickLifecycle: stepResult.tickResult.lifecycle,
+            input,
+            nowMs: (tickIndex + 1) * 16,
+        });
+        const episode = this.episodeController.step(episodeStepInput);
         const liftedObservation = this.observationTracker.lift(observation, {
             environmentProfile: this.environmentProfile,
             metadata,
@@ -372,6 +467,15 @@ export class HeadlessLaneStepRunner {
             truncatedReason: episode.truncatedReason,
             metadata: {
                 ...metadata,
+                episodeSemantics: {
+                    source: 'player-kernel-state',
+                    playerAlive: player.alive,
+                    kernelLifecycle,
+                    done: episode.done,
+                    truncated: episode.truncated,
+                    terminalReason: episode.terminalReason,
+                    truncatedReason: episode.truncatedReason,
+                },
                 observationContext: liftedObservation.details,
                 hybridDecision: {
                     contractVersion: 'v80-hybrid-decision-trace-v1',

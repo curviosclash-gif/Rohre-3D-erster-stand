@@ -1,0 +1,10 @@
+{
+  "runId": "20260425T151155Z-terminal-curriculum-repair",
+  "runKind": "terminal-curriculum-repair",
+  "ok": true,
+  "report": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+  "artifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+  "model": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/model.zip",
+  "vecnormalize": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/vecnormalize.pkl",
+  "optimizerState": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/checkpoints/optimizer_state.pt"
+}

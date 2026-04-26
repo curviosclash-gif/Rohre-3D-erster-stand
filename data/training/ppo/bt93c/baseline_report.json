@@ -1,0 +1,118 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T18:01:02Z",
+  "generatedBy": "python/scripts/bt93c_baseline_report.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.5.3",
+  "claim": "93C-Conservative-Baseline",
+  "gitSha": "743bf06d634ad05df9971bf07a32f9c7b40423e0",
+  "resultClass": "baseline go",
+  "phaseCoverage": {
+    "93C.5.3": true,
+    "93C.5.4": true,
+    "93C.5.5": true
+  },
+  "statusChecks": {
+    "pilotGo": true,
+    "trainingOk": true,
+    "evalOk": true,
+    "baselineRunKind": true,
+    "baselineTimestepsConservative": true,
+    "twoEnvOnly": true,
+    "fourEnvLocked": true,
+    "promotionBlocked": true,
+    "runtimeSurfacesUntouched": true,
+    "runtimeErrorCountZero": true
+  },
+  "baselineLane": {
+    "baselineId": "bt93c-ppo-baseline-publish-v1",
+    "runScope": "conservative baseline, not promotion",
+    "trainCommand": "python\\train.py --profile bt93c --run-kind baseline-train --phase-id 93C.5.3 --config python\\configs\\ppo_bt93c_baseline.json --checkpoint data\\training\\ppo\\bt93c\\runs\\20260424T171554Z-pilot-train\\artifact_manifest.json",
+    "evalCommand": "python/eval.py --profile bt93c --run-kind baseline-eval --phase-id 93C.5.3 --config python/configs/ppo_bt93c_baseline.json",
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "baselineTimesteps": 128,
+    "evalSteps": 16,
+    "maxStepsPerEpisode": 16,
+    "trainSeeds": [
+      934,
+      935
+    ],
+    "evalSeeds": [
+      944,
+      945
+    ],
+    "holdoutSeeds": [
+      950,
+      951
+    ],
+    "holdoutStatus": "reserved-for-93C.6; not consumed by 93C.5 baseline",
+    "budgetRule": "conservative first baseline after pilot go: 2 envs, 128 timesteps, 16 eval steps, no 300000-draft budget and no 4-env escalation"
+  },
+  "ppoBaselineMetrics": {
+    "avgStepsPerEpisode": 16.0,
+    "averageBotSurvival": 16.0,
+    "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+    "runtimeErrorCount": 0,
+    "failureClasses": {
+      "crash": 0,
+      "timeout": 0,
+      "forcedRound": 0,
+      "socketClose": 0,
+      "teardownFailure": 0,
+      "maxSteps": 2,
+      "naturalTerminal": 0
+    },
+    "invalidActionRate": 0.0,
+    "sanitizerRate": 0.0,
+    "vetoRate": 0.84375,
+    "maskRate": 1.0,
+    "rewardTotal": 3.6,
+    "stepsPerSecond": 29.933344
+  },
+  "dqnReferenceOnly": {
+    "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
+    "role": "DQN champion comparison anchor, not a PPO baseline",
+    "avgStepsPerEpisode": 117.525,
+    "averageBotSurvival": 37.376986,
+    "semanticWindow": {
+      "dqnChampion": "BT11 legacy DQN champion window",
+      "bt93cLearner": "runtime-near-headless-v1",
+      "comparisonCaveat": "93C.6 must disclose any semantic drift before PPO/DQN comparison."
+    },
+    "comparisonDeferredTo": "93C.6"
+  },
+  "guardrails": {
+    "baselineRunsStarted": true,
+    "pilotRequiredResult": "pilot go",
+    "promotionAllowed": false,
+    "fourEnvAllowed": false,
+    "fourEnvStatus": "locked; direct 4-env evidence is still absent",
+    "draft300000Allowed": false,
+    "runtimeSurfacesTouched": [],
+    "productiveRuntimeChanged": false
+  },
+  "sourceReports": {
+    "pilotReport": {
+      "report": "data/training/ppo/bt93c/pilot_report.json",
+      "sha256": "6f3885669166012a791dd662035fbe28fd9139b5bcdd711896da3c10b3876e7c"
+    },
+    "baselineTrain": {
+      "pointer": "data/training/ppo/bt93c/latest_baseline_train.json",
+      "runId": "20260424T180033Z-baseline-train",
+      "report": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/training_report.json",
+      "sha256": "7e2e118c7be7d6a1ba1757f57b6a595c01453e4b547c2d4bd4d058f4847613e6"
+    },
+    "baselineEval": {
+      "pointer": "data/training/ppo/bt93c/latest_baseline_eval.json",
+      "runId": "20260424T180054Z-baseline-eval",
+      "report": "data/training/ppo/bt93c/runs/20260424T180054Z-baseline-eval/eval_report.json",
+      "sha256": "ba2f013cb31536cacf65b2e481e39b8a99ee40a03238210bb89c63595242d548"
+    }
+  },
+  "artifacts": {
+    "config": "python/configs/ppo_bt93c_baseline.json",
+    "configSha256": "8699565e23f61faa71dcb53e7eac0f737bb5ba7409e62feda301c703b857d6cf",
+    "baselineReport": "data/training/ppo/bt93c/baseline_report.json"
+  }
+}

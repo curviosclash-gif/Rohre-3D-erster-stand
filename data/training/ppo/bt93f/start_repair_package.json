@@ -1,0 +1,403 @@
+{
+  "blockId": "BT93F",
+  "blockerRegister": [
+    {
+      "closureRule": "same-matrix eval and holdout no longer classify PPO as ppo-regression against the DQN anchor",
+      "currentEvidence": "Survival-First remains blocked by negative averageBotSurvival and holdout deltas.",
+      "forbiddenWorkaround": "Do not close via old validation reports, tmp-only data, latest_* pointers, plan grep, candidate/freeze wording, or matrix drift.",
+      "id": "F.05",
+      "nextPhase": "93F.4",
+      "ownerLayer": "ppo-training/qa",
+      "sourceArtifact": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93e/survival_repair_report.json",
+        "role": "BT93E source for F.05",
+        "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57"
+      },
+      "status": "still-blocking"
+    },
+    {
+      "closureRule": "terminal/death/failure classes are visible in train/eval/holdout and no longer max-steps-only",
+      "currentEvidence": "Terminal/death matrix remains insufficient for BT94A start.",
+      "forbiddenWorkaround": "Do not close via old validation reports, tmp-only data, latest_* pointers, plan grep, candidate/freeze wording, or matrix drift.",
+      "id": "F.19",
+      "nextPhase": "93F.2",
+      "ownerLayer": "ppo-eval/qa",
+      "sourceArtifact": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+        "role": "BT93E source for F.19",
+        "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706"
+      },
+      "status": "still-blocking"
+    },
+    {
+      "closureRule": "precomparison_report.json.resultClass is not ppo-regression on the pinned matrix",
+      "currentEvidence": "Current precomparison remains ppo-regression.",
+      "forbiddenWorkaround": "Do not close via old validation reports, tmp-only data, latest_* pointers, plan grep, candidate/freeze wording, or matrix drift.",
+      "id": "F.27",
+      "nextPhase": "93F.4",
+      "ownerLayer": "ppo-training/qa",
+      "sourceArtifact": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93e/survival_repair_report.json",
+        "role": "BT93E source for F.27",
+        "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57"
+      },
+      "status": "still-blocking"
+    },
+    {
+      "closureRule": "policy-level mask is trainable before sampling or a hard follow-blocker keeps BT94A closed",
+      "currentEvidence": "Policy-level masking is absent while post-decode clamp and veto load remain high.",
+      "forbiddenWorkaround": "Do not close via old validation reports, tmp-only data, latest_* pointers, plan grep, candidate/freeze wording, or matrix drift.",
+      "id": "F.30",
+      "nextPhase": "93F.3",
+      "ownerLayer": "ppo-action-surface",
+      "sourceArtifact": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+        "role": "BT93E source for F.30",
+        "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4"
+      },
+      "status": "still-blocking"
+    },
+    {
+      "closureRule": "natural terminal or death-cause evidence exists, or the report keeps no-start active",
+      "currentEvidence": "Natural terminal/death evidence remains weak.",
+      "forbiddenWorkaround": "Do not close via old validation reports, tmp-only data, latest_* pointers, plan grep, candidate/freeze wording, or matrix drift.",
+      "id": "F.31",
+      "nextPhase": "93F.2",
+      "ownerLayer": "ppo-eval/qa",
+      "sourceArtifact": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+        "role": "BT93E source for F.31",
+        "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706"
+      },
+      "status": "still-blocking"
+    },
+    {
+      "closureRule": "reward gains cannot coexist with shorter survival or hidden safety/episode-shortening regression",
+      "currentEvidence": "Reward and safety signals are not trusted while survival remains regressive.",
+      "forbiddenWorkaround": "Do not close via old validation reports, tmp-only data, latest_* pointers, plan grep, candidate/freeze wording, or matrix drift.",
+      "id": "R.01",
+      "nextPhase": "93F.2",
+      "ownerLayer": "ppo-reward/qa",
+      "sourceArtifact": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+        "role": "BT93E source for R.01",
+        "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706"
+      },
+      "status": "still-blocking"
+    }
+  ],
+  "countsAsPpoValidateEvidence": false,
+  "countsAsPromotionEvidence": false,
+  "countsAsRolloutEvidence": false,
+  "currentNoStartState": {
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "redClaimChecks": [
+      {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93e",
+        "ok": false,
+        "required": "ready=true"
+      },
+      {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 5,
+        "ok": false,
+        "required": 0
+      }
+    ],
+    "remainingBt94aGates": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.30",
+      "F.31",
+      "R.01"
+    ],
+    "resultClass": "blocked-no-start"
+  },
+  "generatedAt": "2026-04-24T23:18:53Z",
+  "generatedBy": "python/scripts/bt93f_start_repair_contract.py",
+  "gitSha": "c4b2007da1b9b43a1e9b90e5714caafdb47bf5ac",
+  "ok": true,
+  "phaseId": "93F.1",
+  "resultClass": "start-repair-contract",
+  "scopeControl": {
+    "allowedFiles": [
+      "python/scripts/bt93f_*.py",
+      "python/configs/ppo_bt93f_*.json",
+      "python/envs/**",
+      "python/scaffold/**",
+      "src/entities/ai/training/**",
+      "trainer/**",
+      "tests/**/ppo*",
+      "data/training/ppo/bt93f/**",
+      "data/training/ppo/bt93c/precomparison_report.json",
+      "data/training/ppo/bt93c/handover_report.json",
+      "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md",
+      "docs/Fehlerberichte/2026-04-25_bt93f-*.md"
+    ],
+    "forbiddenWorkarounds": [
+      "BT94A candidate run inside BT93F",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promote or rollout-ready verdict",
+      "JS inference, runtime strategy flag, registry, rollback, or latency activation",
+      "using data/bot_validation_report.json as PPO evidence",
+      "using tmp/** as closure evidence",
+      "using latest_* pointers as immutable evidence",
+      "using plan grep/self-count as evidence",
+      "renaming post-decode clamp as policy-level mask",
+      "changing matrix ID, seeds, maps, or semantic window during evaluation"
+    ],
+    "ownerLayers": {
+      "environment": [
+        "python/envs/**",
+        "src/entities/ai/training/**"
+      ],
+      "governance": [
+        "docs/bot-training/Bot_Trainingsplan.md"
+      ],
+      "harness": [
+        "python/scripts/bt93f_*.py",
+        "data/training/ppo/bt93f/**"
+      ],
+      "ppoLogic": [
+        "python/configs/ppo_bt93f_*.json",
+        "python/scaffold/**"
+      ]
+    },
+    "readOnlyRuntimeSurfaces": [
+      "ObservationBridgePolicy",
+      "RuntimeConfig",
+      "BotPolicyRegistry",
+      "BotPolicyTypes",
+      "LocalDqnInference",
+      "HybridDecisionArchitecture",
+      "RewardCalculator",
+      "MatchSessionFactory"
+    ]
+  },
+  "separatedRepairHypotheses": [
+    {
+      "allowedOutputs": [
+        "data/training/ppo/bt93f/terminal_reward_failure_report.json",
+        "data/training/ppo/bt93f/runs/*/training_report.json",
+        "data/training/ppo/bt93f/runs/*/eval_report.json"
+      ],
+      "id": "H1-survival-reward",
+      "mustNotMixWith": [
+        "BT94A candidate runs",
+        "freeze candidate creation",
+        "matrix expansion"
+      ],
+      "phase": "93F.2/93F.4",
+      "question": "Can reward and survival be aligned without hiding shorter episodes or safety overrules?"
+    },
+    {
+      "allowedOutputs": [
+        "data/training/ppo/bt93f/terminal_reward_failure_report.json",
+        "data/training/ppo/bt93f/terminal_death_probe_report.json"
+      ],
+      "id": "H2-terminal-death-emission",
+      "mustNotMixWith": [
+        "quality claim",
+        "promotion claim",
+        "PPO-Validate claim"
+      ],
+      "phase": "93F.2",
+      "question": "Can train/eval/holdout reports expose terminal, death, truncation, and failure classes consistently?"
+    },
+    {
+      "allowedOutputs": [
+        "data/training/ppo/bt93f/action_surface_repair_report.json",
+        "data/training/ppo/bt93f/action_surface_smoke_93f3.json"
+      ],
+      "id": "H3-policy-level-mask",
+      "mustNotMixWith": [
+        "postDecodeClamp counted as policy-mask",
+        "BT94A start if masking is absent"
+      ],
+      "phase": "93F.3",
+      "question": "Can inventory/item legality be masked before policy sampling instead of only clamped after decode?"
+    },
+    {
+      "allowedOutputs": [
+        "data/training/ppo/bt93f/runs/*/eval_report.json",
+        "data/training/ppo/bt93f/runs/*/artifact_manifest.json"
+      ],
+      "id": "H4-eval-holdout-statistics",
+      "mustNotMixWith": [
+        "changed seeds",
+        "changed maps",
+        "changed semantic window",
+        "candidate/freeze labels"
+      ],
+      "phase": "93F.4",
+      "question": "Can the repaired lane meet minimum eval/holdout episodes on the pinned same matrix?"
+    },
+    {
+      "allowedOutputs": [
+        "data/training/ppo/bt93c/precomparison_report.json",
+        "data/training/ppo/bt93c/handover_report.json",
+        "data/training/ppo/bt93c/evidence_quality_matrix.json",
+        "data/training/ppo/bt94a/no_start_gate.json",
+        "data/training/ppo/bt93f/handover_package.json"
+      ],
+      "id": "H5-gate-refresh",
+      "mustNotMixWith": [
+        "BT94A checkbox closure while no_start_gate is red",
+        "BT94B handover"
+      ],
+      "phase": "93F.5",
+      "question": "Do BT93F artifacts make the gate claimable, or must the block end diagnose-blocked?"
+    }
+  ],
+  "sourceArtifacts": {
+    "actionSurfaceHardening": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+      "role": "BT93E action-surface source",
+      "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4"
+    },
+    "bt93eHandover": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/handover_package.json",
+      "role": "BT93E diagnose-blocked handover",
+      "sha256": "506176397ef4b8bd8f8ec7ee8df1d7cddc674923ed44541f01ecbd3f9d428dc9"
+    },
+    "findingRegister": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/finding_register.json",
+      "role": "BT93E finding register",
+      "sha256": "cc9f4987e4ac3846a699d3ca6f304b94f4404ade8c70ea00423baa010b74fa8e"
+    },
+    "noStartGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "current BT94A no-start gate",
+      "sha256": "921f4cb8bc4c8f30a6f31c311e96ee8ed7065ede38befd408f098eb77cb79381"
+    },
+    "precomparison": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "BT93C/BT93E precomparison source",
+      "sha256": "e08ada1f41716e2262e436afdd9d48edaddbbe8000d63ad0d69e736729057135"
+    },
+    "startMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/start_matrix.json",
+      "role": "BT93E start matrix",
+      "sha256": "6c01e9d958befbad1ee02b5ee5093dad3d8f26fd896dec851b848ee804f851a5"
+    },
+    "survivalRepair": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/survival_repair_report.json",
+      "role": "BT93E survival repair source",
+      "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57"
+    },
+    "terminalRewardFailure": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+      "role": "BT93E terminal/reward/failure source",
+      "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706"
+    }
+  },
+  "sourceSnapshot": {
+    "bt93eHandoverResultClass": "diagnose-blocked",
+    "bt93eStartMatrixResultClass": "blocked-no-start",
+    "bt94aNoStartStatus": "BT94A remains closed before 94A.1"
+  },
+  "startCriteria": {
+    "actionTelemetryThresholds": {
+      "invalidActionRateAboveZeroBlocks": true,
+      "policyLevelMaskRequired": true,
+      "policyMaskAndPostDecodeClampMustNotBeMixed": true,
+      "postDecodeClampRateBlocksAtOrAbove": 0.5,
+      "safetyVetoRateBlocksAtOrAbove": 0.25,
+      "sanitizerRateAboveZeroBlocks": true
+    },
+    "closureTargetPaths": {
+      "actionSurfaceRepair": "data/training/ppo/bt93f/action_surface_repair_report.json",
+      "bt93fHandover": "data/training/ppo/bt93f/handover_package.json",
+      "gateRefresh": "data/training/ppo/bt94a/no_start_gate.json",
+      "noGoReport": "data/training/ppo/bt93f/no_go_report.json",
+      "repairEvalRuns": "data/training/ppo/bt93f/runs/*/eval_report.json",
+      "startPackage": "data/training/ppo/bt93f/start_repair_package.json",
+      "terminalRewardFailure": "data/training/ppo/bt93f/terminal_reward_failure_report.json"
+    },
+    "dqnAnchor": {
+      "averageBotSurvival": 37.376986,
+      "avgStepsPerEpisode": 117.525,
+      "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
+      "source": "BT11 historical DQN champion anchor"
+    },
+    "matrix": {
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "matrixId": "bt93c-dqn-ppo-precomparison-v1",
+      "seeds": {
+        "eval": [
+          944,
+          945
+        ],
+        "holdout": [
+          950,
+          951
+        ],
+        "train": [
+          934,
+          935
+        ]
+      },
+      "semanticWindow": "runtime-near-headless-v1"
+    },
+    "minimumCompletedEpisodes": {
+      "eval": 6,
+      "holdout": 4
+    },
+    "modelPackageHashes": {
+      "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+      "configSha256": "73d90f7167e264a24ea468d5a7bd47a87449caf5d31ba6508e6f38378dc0319e",
+      "modelSha256": "61252df703ce1a74cc38a9645e9566319f16426681692639f08743f05b0424e1",
+      "optimizerStateSha256": "fddfe12398ddd57671cdb408a5dcd6ef371ade5ce895401eabffa01851b1a728",
+      "runId": "20260424T180033Z-baseline-train",
+      "vecnormalizeSha256": "0f8367b5127af35660cf95950a63328ed9ab71f1332223972bcb86f1b0823a1c"
+    },
+    "nonRegressionRule": {
+      "averageBotSurvival": ">= dqnAnchor.averageBotSurvival or explicitly downgated with versioned evidence",
+      "avgStepsPerEpisode": "non-regression or explicit no-start",
+      "holdoutAverageBotSurvival": ">= dqnAnchor.averageBotSurvival or BT94A stays closed",
+      "precomparisonResultClass": "not ppo-regression",
+      "runtimeErrorCount": 0
+    }
+  }
+}

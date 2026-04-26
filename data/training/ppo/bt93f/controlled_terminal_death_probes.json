@@ -1,0 +1,137 @@
+{
+  "countsAsPpoValidateEvidence": false,
+  "countsAsPromotionEvidence": false,
+  "countsAsQualityEvidence": false,
+  "generatedAt": "2026-04-24T23:32:03Z",
+  "generatedBy": "python/scripts/bt93f_terminal_reward_failure_report.py::node-probes",
+  "ok": true,
+  "probes": [
+    {
+      "done": true,
+      "failureSemantics": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 1
+        },
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 1
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "id": "bt93f-probe-player-dead",
+      "kind": "death-cause-probe",
+      "maxSteps": 5,
+      "rewardBreakdown": {
+        "baseStep": 0,
+        "checkpointReached": 0,
+        "crash": -6,
+        "damageDealt": 0,
+        "damageTaken": 0,
+        "external": 0,
+        "itemPickup": 0,
+        "itemUse": 0,
+        "kill": 0,
+        "loss": 0,
+        "lowHealthThreat": 0,
+        "opponentRisk": 0,
+        "parcoursCompleted": 0,
+        "stuck": 0,
+        "survival": 0,
+        "survivalPressureBonus": 0,
+        "trailRisk": 0,
+        "wallRisk": 0,
+        "win": 0,
+        "wrongOrder": 0
+      },
+      "rewardTotal": -6,
+      "stepIndex": 1,
+      "terminalReason": "player-dead",
+      "truncated": false,
+      "truncatedReason": null
+    },
+    {
+      "done": true,
+      "failureSemantics": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "naturalTerminal": 1,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "match-ended": 1
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "id": "bt93f-probe-match-ended",
+      "kind": "natural-terminal-probe",
+      "maxSteps": 5,
+      "rewardBreakdown": {
+        "baseStep": 0,
+        "checkpointReached": 0,
+        "crash": 0,
+        "damageDealt": 0,
+        "damageTaken": 0,
+        "external": 0,
+        "itemPickup": 0,
+        "itemUse": 0,
+        "kill": 0,
+        "loss": 0,
+        "lowHealthThreat": 0,
+        "opponentRisk": 0,
+        "parcoursCompleted": 0,
+        "stuck": 0,
+        "survival": 0.12,
+        "survivalPressureBonus": 0,
+        "trailRisk": 0,
+        "wallRisk": 0,
+        "win": 0,
+        "wrongOrder": 0
+      },
+      "rewardTotal": 0.12,
+      "stepIndex": 1,
+      "terminalReason": "match-ended",
+      "truncated": false,
+      "truncatedReason": null
+    },
+    {
+      "done": false,
+      "failureSemantics": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 1,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 1
+        }
+      },
+      "id": "bt93f-probe-max-steps",
+      "kind": "truncation-probe",
+      "maxSteps": 2,
+      "stepIndex": 2,
+      "terminalReason": null,
+      "truncated": true,
+      "truncatedReason": "max-steps"
+    }
+  ],
+  "sourceModules": [
+    "src/state/training/EpisodeController.js",
+    "src/state/training/RewardCalculator.js"
+  ]
+}

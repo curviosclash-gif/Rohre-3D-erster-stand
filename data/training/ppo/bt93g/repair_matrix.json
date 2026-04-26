@@ -1,0 +1,61 @@
+{
+  "baseline": {
+    "baselineId": "bt93c-ppo-baseline-publish-v1",
+    "dqnChampion": {
+      "averageBotSurvival": 37.376986,
+      "avgStepsPerEpisode": 117.525,
+      "invalidActionRate": 1.0,
+      "runtimeErrorCount": null,
+      "source": "BT11 historical DQN champion anchor"
+    }
+  },
+  "blockId": "BT93G",
+  "classification": "comparable-repair-matrix",
+  "comparisonUse": "BT93G repair/eval gate only; not a BT94A candidate, freeze, promotion, or PPO-Validate lane.",
+  "env": {
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "maps": [
+      "standard",
+      "maze"
+    ],
+    "maxStepsPerEpisode": 180,
+    "minComparableMaxSteps": 128,
+    "modeId": "runtime-near-headless-v1",
+    "preferredMaxStepsPerEpisode": 180
+  },
+  "holdoutRule": {
+    "holdoutMayNotOpenBt94aIf": [
+      "pre-sampling mask is missing",
+      "terminal/death matrix is empty or max-steps-only",
+      "reward is positive while survival or steps regress",
+      "runtimeErrorCount is greater than 0"
+    ],
+    "noPostHoldoutOptimization": true,
+    "status": "reserved-for-93G.5-after-root-fixes"
+  },
+  "matrixId": "bt93g-comparable-repair-matrix-v1",
+  "minimumEpisodes": {
+    "derivation": "2 maps x 3 eval seeds = 6 eval episodes; 2 maps x 2 holdout seeds = 4 holdout episodes.",
+    "eval": 6,
+    "holdout": 4
+  },
+  "phaseId": "93G.1",
+  "seeds": {
+    "eval": [
+      944,
+      945,
+      946
+    ],
+    "holdout": [
+      960,
+      961
+    ],
+    "train": [
+      934,
+      935,
+      936,
+      937
+    ]
+  }
+}

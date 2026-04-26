@@ -1,0 +1,472 @@
+{
+  "artifactAudit": {
+    "lanes": [
+      {
+        "bt94aStartCapableTerminalMatrix": false,
+        "deathCauseCounts": {
+          "player-dead": 15
+        },
+        "hasDeathCause": true,
+        "hasNonDeathNaturalTerminal": false,
+        "laneId": "bt93g-repair-report-comparable-eval",
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "missingFields": [],
+        "naturalTerminal": 0,
+        "report": "data/training/ppo/bt93g/repair_ladder_report.json",
+        "requiredFieldsPresent": true,
+        "terminalReasonCounts": {
+          "player-dead": 15
+        },
+        "truncatedReasonCounts": {}
+      },
+      {
+        "bt94aStartCapableTerminalMatrix": false,
+        "deathCauseCounts": {
+          "player-dead": 8
+        },
+        "hasDeathCause": true,
+        "hasNonDeathNaturalTerminal": false,
+        "laneId": "bt93g-repair-report-holdout",
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "missingFields": [],
+        "naturalTerminal": 0,
+        "report": "data/training/ppo/bt93g/repair_ladder_report.json",
+        "requiredFieldsPresent": true,
+        "terminalReasonCounts": {
+          "player-dead": 8
+        },
+        "truncatedReasonCounts": {}
+      },
+      {
+        "bt94aStartCapableTerminalMatrix": false,
+        "deathCauseCounts": {
+          "player-dead": 15
+        },
+        "hasDeathCause": true,
+        "hasNonDeathNaturalTerminal": false,
+        "laneId": "bt93g-raw-comparable-eval",
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "missingFields": [],
+        "naturalTerminal": 0,
+        "report": "data/training/ppo/bt93g/runs/20260425T102416Z-comparable-repair-eval/eval_report.json",
+        "requiredFieldsPresent": true,
+        "terminalReasonCounts": {
+          "player-dead": 15
+        },
+        "truncatedReasonCounts": {}
+      },
+      {
+        "bt94aStartCapableTerminalMatrix": false,
+        "deathCauseCounts": {
+          "player-dead": 8
+        },
+        "hasDeathCause": true,
+        "hasNonDeathNaturalTerminal": false,
+        "laneId": "bt93g-raw-holdout-eval",
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "missingFields": [],
+        "naturalTerminal": 0,
+        "report": "data/training/ppo/bt93g/runs/20260425T102509Z-holdout-eval/eval_report.json",
+        "requiredFieldsPresent": true,
+        "terminalReasonCounts": {
+          "player-dead": 8
+        },
+        "truncatedReasonCounts": {}
+      }
+    ],
+    "ok": true,
+    "sourceReports": {
+      "comparableEval": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93g/runs/20260425T102416Z-comparable-repair-eval/eval_report.json",
+        "role": "BT93G comparable eval",
+        "sha256": "b66b448d62c7224af52a51f71f74ef9df4025d1e9777b619c7d74cceffa1182a"
+      },
+      "holdoutEval": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93g/runs/20260425T102509Z-holdout-eval/eval_report.json",
+        "role": "BT93G holdout eval",
+        "sha256": "01d474915a0847556e3629bf4e53af97caccccb1224d1f954e66fec4e3e8c029"
+      },
+      "repairLadder": {
+        "closureCapable": true,
+        "path": "data/training/ppo/bt93g/repair_ladder_report.json",
+        "role": "BT93G repair ladder",
+        "sha256": "4b555e885d9ffefc3c725f7775930105e83569fd10d1480c40611afa45d19739"
+      }
+    },
+    "summary": {
+      "allRequiredFieldsPresent": true,
+      "anyMaxStepsOnlyLane": false,
+      "bt94aStartCapableTerminalMatrix": false,
+      "deathCauseObserved": true,
+      "laneCount": 4,
+      "nonDeathNaturalTerminalObserved": false
+    }
+  },
+  "blockId": "BT93H",
+  "bt94aGateContext": {
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "followupRequired": true,
+    "matrixDefinitionAllowed": false,
+    "remainingBt94aGates": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "resultClass": "blocked-no-start"
+  },
+  "commands": {
+    "report": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93h_terminal_root_cause.py --write-report"
+  },
+  "evidenceLimits": {
+    "candidateRun": false,
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsRolloutEvidence": false,
+    "freezeCandidate": false,
+    "qualityClaimFromProbes": false
+  },
+  "findingDisposition": {
+    "F.19": {
+      "reason": "BT93G eval/holdout death fields are present, but the BT94A start matrix still lacks non-death natural terminal coverage.",
+      "status": "still-blocking"
+    },
+    "F.31": {
+      "reason": "Natural terminal evidence is absent from BT93G eval/holdout; only player-dead death cases were observed.",
+      "status": "still-blocking"
+    }
+  },
+  "generatedAt": "2026-04-25T11:24:04Z",
+  "generatedBy": "python/scripts/bt93h_terminal_root_cause.py",
+  "gitSha": "a10ab7eede1e8e6a37bb638659aa7a26be15bcf7",
+  "guardrails": {
+    "bt94aCheckboxClosureAllowed": false,
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "headlessProbeAudit": {
+    "checks": {
+      "bt93g-probe-match-ended": true,
+      "bt93g-probe-max-steps": true,
+      "bt93g-probe-player-dead": true,
+      "bt93g-probe-round-ended": true
+    },
+    "countsAsQualityEvidence": false,
+    "ok": true,
+    "probeCount": 4,
+    "probes": [
+      {
+        "countsAsQualityEvidence": false,
+        "done": true,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {
+            "player-dead": 1
+          },
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "naturalTerminal": 0,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "player-dead": 1
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "id": "bt93g-probe-player-dead",
+        "maxSteps": 5,
+        "stepIndex": 1,
+        "terminalReason": "player-dead",
+        "truncated": false,
+        "truncatedReason": null
+      },
+      {
+        "countsAsQualityEvidence": false,
+        "done": true,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {},
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "naturalTerminal": 1,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "match-ended": 1
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "id": "bt93g-probe-round-ended",
+        "maxSteps": 5,
+        "stepIndex": 1,
+        "terminalReason": "match-ended",
+        "truncated": false,
+        "truncatedReason": null
+      },
+      {
+        "countsAsQualityEvidence": false,
+        "done": true,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {},
+          "forcedRound": 0,
+          "maxSteps": 0,
+          "naturalTerminal": 1,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {
+            "match-ended": 1
+          },
+          "timeout": 0,
+          "truncatedReasonCounts": {}
+        },
+        "id": "bt93g-probe-match-ended",
+        "maxSteps": 5,
+        "stepIndex": 1,
+        "terminalReason": "match-ended",
+        "truncated": false,
+        "truncatedReason": null
+      },
+      {
+        "countsAsQualityEvidence": false,
+        "done": false,
+        "failureSemantics": {
+          "crash": 0,
+          "deathCauseCounts": {},
+          "forcedRound": 0,
+          "maxSteps": 1,
+          "naturalTerminal": 0,
+          "runtimeErrorCount": 0,
+          "socketClose": 0,
+          "teardownFailure": 0,
+          "terminalReasonCounts": {},
+          "timeout": 0,
+          "truncatedReasonCounts": {
+            "max-steps": 1
+          }
+        },
+        "id": "bt93g-probe-max-steps",
+        "maxSteps": 2,
+        "stepIndex": 2,
+        "terminalReason": null,
+        "truncated": true,
+        "truncatedReason": "max-steps"
+      }
+    ],
+    "source": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/terminal_wiring_probe_report.json",
+      "role": "BT93G headless terminal/death probes",
+      "sha256": "dd3d623e66be28b3e27e9d49fce1c92cefe67631218dda70bc9538266cdbedde"
+    }
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93H.1.1": true,
+    "93H.1.2": true,
+    "93H.1.3": true,
+    "93H.1.4": true
+  },
+  "phaseId": "93H.1",
+  "resultClass": "terminal-root-cause-isolated",
+  "rootCause": {
+    "blockingReasons": [
+      "non-death natural terminal coverage missing in BT93G eval/holdout"
+    ],
+    "coverageGap": true,
+    "driftVerdict": "no-field-drift",
+    "fieldContractOk": true,
+    "summary": "BT93G did not lose terminal/death fields. Death cases are present as player-dead, but eval/holdout never observe a non-death natural terminal such as match-ended; BT94A therefore remains blocked by natural-terminal coverage, not by a field-name drift."
+  },
+  "sourceAlignment": {
+    "driftHandling": "blocker-not-normalized",
+    "fieldNamesAligned": true,
+    "headless": {
+      "episodeController": {
+        "TRAINING_TERMINAL_REASONS": true,
+        "TRAINING_TRUNCATION_REASONS": true,
+        "done": true,
+        "max-steps": true,
+        "terminalReason": true,
+        "truncated": true,
+        "truncatedReason": true
+      },
+      "laneRunner": {
+        "TRAINING_TERMINAL_REASONS.MATCH_ENDED": true,
+        "TRAINING_TERMINAL_REASONS.PLAYER_DEAD": true,
+        "TRAINING_TRUNCATION_REASONS.TIME_LIMIT": true,
+        "deriveHeadlessLaneEpisodeStep": true,
+        "terminalReason": true,
+        "truncatedReason": true
+      }
+    },
+    "ok": true,
+    "pythonEval": {
+      "curviosEnv": {
+        "info_payload.get(\"terminalReason\")": true,
+        "info_payload.get(\"truncatedReason\")": true,
+        "payload.get(\"done\")": true,
+        "payload.get(\"truncated\")": true
+      },
+      "evalDiagnostics": {
+        "deathCauseCounts": true,
+        "failureSemantics": true,
+        "maxSteps": true,
+        "naturalTerminal": true,
+        "terminalReasonCounts": true,
+        "truncatedReasonCounts": true
+      }
+    },
+    "sourceArtifacts": {
+      "curviosEnv": {
+        "closureCapable": true,
+        "path": "python/envs/curvios_env.py",
+        "role": "Python env done/truncated extraction",
+        "sha256": "fdec907ec011348f8697155d4edbdb1ae96113b740d5f93b0bd0d04552b69f87"
+      },
+      "episodeController": {
+        "closureCapable": true,
+        "path": "src/state/training/EpisodeController.js",
+        "role": "episode lifecycle authority",
+        "sha256": "6fd88a12ea9f7d1268d0a43bd60ef2622511fe88fa611468128ca779f3bf9e7f"
+      },
+      "evalDiagnostics": {
+        "closureCapable": true,
+        "path": "python/scripts/bt93c_learner_smoke.py",
+        "role": "Python eval failureSemantics aggregation",
+        "sha256": "83d548f95e7657eae829f4a7e647e0035378187443f652bfd178b699fec4d2b8"
+      },
+      "laneRunner": {
+        "closureCapable": true,
+        "path": "scripts/training-headless-lane-runner.mjs",
+        "role": "headless terminal derivation",
+        "sha256": "8b22a0bedd674751ca1298fe9ede8c9cb5894433081dee63f1e4f8a89a2bca77"
+      }
+    }
+  },
+  "sourceArtifacts": {
+    "bt93gFollowupGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/followup_gate_report.json",
+      "role": "BT93G followup gate",
+      "sha256": "712e6ffd5d135899a6b83f3470e868dfe0a2f6b9b7b01bbf7bc4905c1dc525b8"
+    },
+    "bt93gRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "role": "BT93G repair ladder report",
+      "sha256": "4b555e885d9ffefc3c725f7775930105e83569fd10d1480c40611afa45d19739"
+    },
+    "bt93gTerminalWiring": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/terminal_wiring_probe_report.json",
+      "role": "BT93G terminal wiring probes",
+      "sha256": "dd3d623e66be28b3e27e9d49fce1c92cefe67631218dda70bc9538266cdbedde"
+    },
+    "bt94aNoStartGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A no-start gate",
+      "sha256": "0df69bf2db4a891bc4c7c503a321dbf2564cc225a871135d8a84fb4c8b58fd30"
+    }
+  },
+  "terminalProvocationMatrix": {
+    "allowedRunKinds": [
+      "diagnostic",
+      "terminal-provocation"
+    ],
+    "entryCriteriaFor93H3": {
+      "currentStatus": "blocked-until-93H.2-contract-and-93H.3-run",
+      "fieldContractOk": true,
+      "requiresNonDeathNaturalTerminalProbe": true,
+      "requiresPythonEvalArtifactAudit": true
+    },
+    "forbiddenRunKinds": [
+      "candidate",
+      "freeze",
+      "promote",
+      "rollout-ready",
+      "BT94B-ready"
+    ],
+    "matrixId": "bt93h-terminal-provocation-matrix-v1",
+    "noRuntimeBypass": true,
+    "scenarios": [
+      {
+        "countsAsQualityEvidence": false,
+        "expected": {
+          "deathCauseCounts.player-dead": ">=1",
+          "done": true,
+          "naturalTerminal": 0,
+          "terminalReason": "player-dead",
+          "truncated": false
+        },
+        "id": "93h-provocation-player-dead",
+        "purpose": "prove death class emission",
+        "runKind": "terminal-provocation"
+      },
+      {
+        "countsAsQualityEvidence": false,
+        "expected": {
+          "deathCauseCounts": {},
+          "done": true,
+          "naturalTerminal": ">=1",
+          "terminalReason": "match-ended",
+          "truncated": false
+        },
+        "id": "93h-provocation-match-ended",
+        "purpose": "prove non-death natural terminal emission",
+        "runKind": "terminal-provocation"
+      },
+      {
+        "countsAsQualityEvidence": false,
+        "expected": {
+          "done": false,
+          "maxSteps": ">=1",
+          "terminalReason": null,
+          "truncated": true,
+          "truncatedReason": "max-steps"
+        },
+        "id": "93h-provocation-max-steps-control",
+        "purpose": "keep truncation separate from terminal/death quality",
+        "runKind": "terminal-provocation"
+      },
+      {
+        "countsAsQualityEvidence": false,
+        "expected": {
+          "failureSemantics": [
+            "runtimeErrorCount",
+            "crash",
+            "timeout",
+            "forcedRound",
+            "maxSteps",
+            "naturalTerminal",
+            "deathCauseCounts",
+            "terminalReasonCounts",
+            "truncatedReasonCounts"
+          ],
+          "fieldNamesAlignedWithHeadlessLane": true
+        },
+        "id": "93h-python-eval-artifact-audit",
+        "purpose": "verify Python eval reports carry the same terminal/death/truncation fields",
+        "runKind": "diagnostic"
+      }
+    ]
+  }
+}

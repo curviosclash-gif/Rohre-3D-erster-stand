@@ -1,0 +1,8 @@
+{
+  "runId": "20260424T171608Z-pilot-eval",
+  "runKind": "pilot-eval",
+  "ok": true,
+  "report": "data/training/ppo/bt93c/runs/20260424T171608Z-pilot-eval/eval_report.json",
+  "sourceArtifactManifest": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/artifact_manifest.json",
+  "sourceModel": "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/checkpoints/model.zip"
+}

@@ -1,0 +1,267 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T17:01:10Z",
+  "generatedBy": "python/scripts/bt93c_diagnostics_report.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.4",
+  "resultClass": "go",
+  "gitSha": "1ee3833209c489a1668647d68b15ee35518cd656",
+  "sourceReports": {
+    "diagnosticsSmoke": {
+      "pointer": "data/training/ppo/bt93c/latest_diagnostics_smoke.json",
+      "runId": "20260424T170052Z-diagnostics-smoke",
+      "report": "data/training/ppo/bt93c/runs/20260424T170052Z-diagnostics-smoke/training_report.json",
+      "sha256": "b5180f68a5f3be6329d3571e47481a5ac56ce232a6d74fbeff0aafaa1f6d0d92"
+    },
+    "diagnosticsEval": {
+      "pointer": "data/training/ppo/bt93c/latest_diagnostics_eval.json",
+      "runId": "20260424T170102Z-diagnostics-eval",
+      "report": "data/training/ppo/bt93c/runs/20260424T170102Z-diagnostics-eval/eval_report.json",
+      "sha256": "c89fd3e0230a9c6f0e801c69fb360437d0dc7d12e909d4e2b8b29abff19e716d"
+    }
+  },
+  "phaseCoverage": {
+    "93C.4.1": true,
+    "93C.4.2": true,
+    "93C.4.3": true,
+    "93C.4.4": true,
+    "93C.4.5": true
+  },
+  "ppoLearningMetrics": {
+    "source": "stable_baselines3.PPO logger after model.learn()",
+    "sampleClass": "diagnostic-smoke-not-baseline",
+    "metrics": {
+      "policy_loss": -0.006412982940673828,
+      "value_loss": 0.12588881328701973,
+      "entropy": 19.415233612060547,
+      "approx_kl": 0.00015497207641601562,
+      "clip_fraction": 0.0,
+      "explained_variance": 0.9480974525213242,
+      "grad_norm": {
+        "observed": true,
+        "tensorCount": 12,
+        "globalNorm": 0.499997,
+        "maxAbsGradient": 0.036028,
+        "configuredMaxGradNorm": 0.5,
+        "tolerance": 5e-05,
+        "withinConfiguredMaxGradNorm": true
+      }
+    },
+    "rawLoggerKeys": [
+      "train/approx_kl",
+      "train/clip_fraction",
+      "train/clip_range",
+      "train/entropy_loss",
+      "train/explained_variance",
+      "train/learning_rate",
+      "train/loss",
+      "train/n_updates",
+      "train/policy_gradient_loss",
+      "train/value_loss"
+    ],
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "minEntropy": 0.01,
+      "maxValueLoss": 100.0,
+      "maxGradNorm": 0.5,
+      "minExplainedVariance": -1.0
+    },
+    "thresholdStatus": {
+      "approxKlWithinThreshold": true,
+      "clipFractionWithinThreshold": true,
+      "entropyAboveMinimum": true,
+      "valueLossWithinThreshold": true,
+      "explainedVarianceAboveMinimum": true,
+      "gradNormWithinThreshold": true
+    },
+    "collapseOrInstabilitySignal": false
+  },
+  "rewardSafetyDiagnostics": {
+    "rewardBreakdownTotals": {
+      "baseStep": 0.0,
+      "checkpointReached": 0.0,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": 0.0,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 0.72,
+      "survivalPressureBonus": 0.0,
+      "trailRisk": 0.0,
+      "wallRisk": 0.0,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "rewardBreakdownMeanPerStep": {
+      "baseStep": 0.0,
+      "checkpointReached": 0.0,
+      "crash": 0.0,
+      "damageDealt": 0.0,
+      "damageTaken": 0.0,
+      "external": 0.0,
+      "itemPickup": 0.0,
+      "itemUse": 0.0,
+      "kill": 0.0,
+      "loss": 0.0,
+      "lowHealthThreat": 0.0,
+      "opponentRisk": 0.0,
+      "parcoursCompleted": 0.0,
+      "stuck": 0.0,
+      "survival": 0.09,
+      "survivalPressureBonus": 0.0,
+      "trailRisk": 0.0,
+      "wallRisk": 0.0,
+      "win": 0.0,
+      "wrongOrder": 0.0
+    },
+    "rewardTotal": 0.72,
+    "rewardMean": 0.09,
+    "rewardHackingSignals": {
+      "survivalRewardShare": 1.0,
+      "episodeShorteningCheck": {
+        "doneCount": 2,
+        "completedEpisodeLengths": [
+          4,
+          4
+        ],
+        "avgStepsPerCompletedEpisode": 4.0,
+        "maxStepsPerEpisode": 4,
+        "baselineComparable": false
+      },
+      "safetyOverruleCounts": {
+        "combatVeto": 4,
+        "intent-request-applied-mismatch": 4,
+        "vetoActive": 4
+      }
+    },
+    "actionTelemetry": {
+      "totalActions": 8,
+      "invalidActionCount": 0,
+      "maskCount": 8,
+      "vetoCount": 3,
+      "sanitizerCount": 0,
+      "noopCount": 0,
+      "invalidActionRate": 0.0,
+      "maskRate": 1.0,
+      "vetoRate": 0.375,
+      "sanitizerRate": 0.0,
+      "noopRate": 0.0,
+      "fieldCounts": {
+        "shootItem-without-index": 3,
+        "shootItemIndex": 8,
+        "useItem": 8
+      },
+      "sanitizerReasons": {}
+    },
+    "terminalReasonCounts": {},
+    "truncatedReasonCounts": {
+      "max-steps": 2
+    },
+    "deathCauseCounts": {}
+  },
+  "survivalKpis": {
+    "observedVectorSteps": 8,
+    "envCount": 2,
+    "doneCount": 2,
+    "completedEpisodeCount": 2,
+    "avgStepsPerEpisodeObserved": 4.0,
+    "openEpisodeLengthsAtStop": [
+      0,
+      0
+    ],
+    "averageBotSurvival": null,
+    "averageBotSurvivalReason": "BT93C.4 diagnostic smoke is not the 93C.5 baseline/publish lane.",
+    "baselineComparable": false
+  },
+  "policyQualityRestDebt": {
+    "bt73IntentRecovery": {
+      "status": "open-restschuld-visible",
+      "requestedIntentCounts": {
+        "chase": 4,
+        "combat": 4
+      },
+      "appliedIntentCounts": {
+        "chase": 8
+      },
+      "note": "Intent-/Recovery-Luecken bleiben Bewertungsrestschuld; Survival allein entscheidet nicht."
+    },
+    "bt80cProductionValidation": {
+      "status": "blocked-by-BT80C-80.9.3",
+      "rolloutOrPromoteAllowed": false
+    },
+    "jsInferenceIntegration": {
+      "status": "not-in-BT93C-scope",
+      "runtimeSwitchAllowed": false,
+      "latencyCountsAsJsTickEvidence": false
+    }
+  },
+  "failureSemantics": {
+    "runtimeErrorCount": 0,
+    "crash": 0,
+    "timeout": 0,
+    "forcedRound": 0,
+    "socketClose": 0,
+    "teardownFailure": 0,
+    "maxSteps": 2,
+    "naturalTerminal": 0,
+    "deathCauseCounts": {},
+    "terminalReasonCounts": {},
+    "truncatedReasonCounts": {
+      "max-steps": 2
+    }
+  },
+  "latencyAndThroughputBudget": {
+    "countsAsLearningProgress": false,
+    "modelReloadMs": 1340.787,
+    "pythonForwardPassMs": 2.5044,
+    "bridgeActionLatencyMs": {
+      "count": 8,
+      "min": 6.591,
+      "max": 14.632,
+      "mean": 10.987625
+    },
+    "bridgeAckLatencyMs": {
+      "count": 8,
+      "min": 13.4,
+      "max": 19.061,
+      "mean": 14.730125
+    },
+    "trainingStepsPerSecond": 23.555621,
+    "trainingWallClockSeconds": 1.358487,
+    "classification": "budget-and-stability-only"
+  },
+  "gateInterpretation": {
+    "thresholdStatus": {
+      "approxKlWithinThreshold": true,
+      "clipFractionWithinThreshold": true,
+      "entropyAboveMinimum": true,
+      "valueLossWithinThreshold": true,
+      "explainedVarianceAboveMinimum": true,
+      "gradNormWithinThreshold": true
+    },
+    "collapseOrInstabilitySignal": false,
+    "runtimeErrorCount": 0,
+    "pilotAllowedByThisReport": true,
+    "baselineAllowedByThisReport": false,
+    "promotionAllowed": false,
+    "learningProgressFromThroughputAllowed": false
+  },
+  "guardrails": {
+    "diagnosticOnly": true,
+    "pilotRunsStarted": false,
+    "baselineRunsStarted": false,
+    "runtimeSurfacesTouched": [],
+    "productiveRuntimeChanged": false
+  },
+  "artifacts": {
+    "diagnosticsReport": "data/training/ppo/bt93c/diagnostics_report.json"
+  }
+}

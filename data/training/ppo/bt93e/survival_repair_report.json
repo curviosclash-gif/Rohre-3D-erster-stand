@@ -1,0 +1,318 @@
+{
+  "blockId": "BT93E",
+  "bt94aGateSnapshot": {
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "matrixDefinitionAllowed": false,
+    "resultClass": "blocked-no-start"
+  },
+  "commands": {
+    "diagnosticTrain": "python\\train.py --profile bt93c --run-kind diagnostics-smoke --phase-id 93E.2.1 --config python\\configs\\ppo_bt93c_baseline.json --artifact-root data\\training\\ppo\\bt93e --checkpoint data\\training\\ppo\\bt93c\\runs\\20260424T180033Z-baseline-train\\artifact_manifest.json --total-timesteps 8",
+    "eval": "tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe python\\eval.py --profile bt93c --run-kind baseline-repro-eval --phase-id 93E.2.2 --config python\\configs\\ppo_bt93c_baseline.json --artifact-root data\\training\\ppo\\bt93e --checkpoint data\\training\\ppo\\bt93e\\runs\\20260424T221741Z-diagnostics-smoke\\artifact_manifest.json --eval-steps 16",
+    "holdout": "tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe python\\eval.py --profile bt93c --run-kind holdout-eval --phase-id 93E.2.4 --config python\\configs\\ppo_bt93c_baseline.json --artifact-root data\\training\\ppo\\bt93e --checkpoint data\\training\\ppo\\bt93e\\runs\\20260424T221741Z-diagnostics-smoke\\artifact_manifest.json --eval-steps 16",
+    "report": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93e_survival_repair_report.py --write-report"
+  },
+  "comparison": {
+    "deltasAgainstDqn": {
+      "averageBotSurvivalPct": -57.19291,
+      "avgStepsPerEpisodePct": -86.385875,
+      "holdoutAverageBotSurvivalPct": -57.19291,
+      "resultClass": "ppo-regression"
+    },
+    "dqnChampion": {
+      "averageBotSurvival": 37.376986,
+      "avgStepsPerEpisode": 117.525,
+      "invalidActionRate": 1.0,
+      "runtimeErrorCount": null,
+      "source": "BT11 historical DQN champion anchor"
+    },
+    "maps": [
+      "standard",
+      "maze"
+    ],
+    "matrixId": "bt93c-dqn-ppo-precomparison-v1",
+    "oldReportsExcluded": [
+      "data/bot_validation_report.json",
+      "tmp/**",
+      "BT93B scaffold reports"
+    ],
+    "ppoDiagnosticEval": {
+      "actionTelemetry": {
+        "fieldCounts": {
+          "shootItem-without-index": 32,
+          "shootItemIndex": 32,
+          "useItem": 32
+        },
+        "invalidActionRate": 0.0,
+        "maskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 32,
+        "vetoRate": 1.0
+      },
+      "averageBotSurvival": 16.0,
+      "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+      "avgStepsPerEpisode": 16.0,
+      "avgStepsPerEpisodeObserved": 16.0,
+      "baselineComparable": true,
+      "completedEpisodeCount": 2,
+      "completedEpisodeLengths": [
+        16.0,
+        16.0
+      ],
+      "completedEpisodeStats": {
+        "count": 2,
+        "max": 16.0,
+        "mean": 16.0,
+        "median": 16.0,
+        "min": 16.0,
+        "stdev": 0.0
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "naturalTerminal": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      },
+      "phaseId": "93E.2.2",
+      "report": "data/training/ppo/bt93e/runs/20260424T221840Z-baseline-repro-eval/eval_report.json",
+      "runId": "20260424T221840Z-baseline-repro-eval",
+      "runKind": "baseline-repro-eval",
+      "runtimeErrorCount": 0
+    },
+    "ppoHoldout": {
+      "actionTelemetry": {
+        "fieldCounts": {
+          "shootItem-without-index": 17,
+          "shootItemIndex": 32,
+          "useItem": 32
+        },
+        "invalidActionRate": 0.0,
+        "maskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 32,
+        "vetoRate": 0.53125
+      },
+      "averageBotSurvival": 16.0,
+      "averageBotSurvivalSource": "BT93C runtime-near completed episode length",
+      "avgStepsPerEpisode": 16.0,
+      "avgStepsPerEpisodeObserved": 16.0,
+      "baselineComparable": true,
+      "completedEpisodeCount": 2,
+      "completedEpisodeLengths": [
+        16.0,
+        16.0
+      ],
+      "completedEpisodeStats": {
+        "count": 2,
+        "max": 16.0,
+        "mean": 16.0,
+        "median": 16.0,
+        "min": 16.0,
+        "stdev": 0.0
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "naturalTerminal": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      },
+      "phaseId": "93E.2.4",
+      "report": "data/training/ppo/bt93e/runs/20260424T221812Z-holdout-eval/eval_report.json",
+      "runId": "20260424T221812Z-holdout-eval",
+      "runKind": "holdout-eval",
+      "runtimeErrorCount": 0
+    },
+    "resultRulesApplied": true,
+    "seeds": {
+      "eval": [
+        944,
+        945
+      ],
+      "holdout": [
+        950,
+        951
+      ]
+    },
+    "semanticWindow": "runtime-near-headless-v1"
+  },
+  "findingDisposition": {
+    "C.03": "still-blocking",
+    "F.05": "still-blocking",
+    "F.27": "still-blocking",
+    "F.29": "closed",
+    "F.32": "still-blocking",
+    "G.07": "still-blocking"
+  },
+  "generatedAt": "2026-04-24T22:20:36Z",
+  "generatedBy": "python/scripts/bt93e_survival_repair_report.py",
+  "gitSha": "81769083a505cf4a153eeb462676b6cd4c62e892",
+  "guardrails": {
+    "candidateRun": false,
+    "findingRegisterSummaryBefore93E2": {
+      "bt94aBlockerCount": 5,
+      "closed": 21,
+      "not-start-blocking-carried": 12,
+      "redClaimChecks": 4,
+      "still-blocking": 17,
+      "total": 50
+    },
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": [],
+    "startMatrixResultBefore93E2": "blocked-no-start"
+  },
+  "holdoutNonOptimization": {
+    "holdoutRunId": "20260424T221812Z-holdout-eval",
+    "holdoutSeeds": [
+      950,
+      951
+    ],
+    "mutableLatestPointersExcludedAsClosureEvidence": true,
+    "ok": true,
+    "oldNonPpoReportsExcluded": [
+      "data/bot_validation_report.json"
+    ],
+    "optimizerRunBeforeHoldout": true,
+    "optimizerRunId": "20260424T221741Z-diagnostics-smoke",
+    "postHoldoutOptimizerRuns": [],
+    "tmpOnlyEvidenceExcluded": true
+  },
+  "minimumStatisticsObserved": {
+    "evalCompletedEpisodeStats": {
+      "count": 2,
+      "max": 16.0,
+      "mean": 16.0,
+      "median": 16.0,
+      "min": 16.0,
+      "stdev": 0.0
+    },
+    "evalCompletedEpisodes": 2,
+    "holdoutCompletedEpisodeStats": {
+      "count": 2,
+      "max": 16.0,
+      "mean": 16.0,
+      "median": 16.0,
+      "min": 16.0,
+      "stdev": 0.0
+    },
+    "holdoutCompletedEpisodes": 2,
+    "minimumStatsStillNeededBeforeBT94A": true
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93E.2.1": true,
+    "93E.2.2": true,
+    "93E.2.3": true,
+    "93E.2.4": true
+  },
+  "phaseId": "93E.2",
+  "repairLearnerRun": {
+    "candidateRun": false,
+    "diagnosticOnly": true,
+    "freezeCandidate": false,
+    "learningQualityClaimAllowed": false,
+    "phaseId": "93E.2.1",
+    "promotionClaim": false,
+    "requestedTimesteps": 8,
+    "runId": "20260424T221741Z-diagnostics-smoke",
+    "runKind": "diagnostics-smoke",
+    "sourceModelPackage": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+    "status": "executed-diagnostic-smoke",
+    "truePpoOptimizerUpdate": true
+  },
+  "resultClass": "diagnose-blocked",
+  "resultRules": {
+    "bt94aClaimableAfter93E2": false,
+    "candidateFreezeAllowed": false,
+    "downgradeRequiresNewEvidence": true,
+    "newEvidenceUsed": {
+      "diagnosticTrainRunId": "20260424T221741Z-diagnostics-smoke",
+      "evalRunId": "20260424T221840Z-baseline-repro-eval",
+      "holdoutRunId": "20260424T221812Z-holdout-eval"
+    },
+    "ppoRegressionRemainsStartBlocker": true,
+    "precomparisonObserved": "ppo-regression",
+    "precomparisonRequired": "not ppo-regression"
+  },
+  "sourceArtifacts": {
+    "baselineReproEvalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93e/latest_baseline_repro_eval.json",
+      "role": "BT93E eval pointer",
+      "sha256": "ea0a194e39d2e7bcaf9410c5cfe3c07e1ed77f1bf006434f029a0f994ebf767d"
+    },
+    "baselineReproEvalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/runs/20260424T221840Z-baseline-repro-eval/eval_report.json",
+      "role": "BT93E same-matrix eval",
+      "sha256": "6739efce5e1a6cc4e676356a7ef0ab1e95c70abae343a73168e65b5748742a49"
+    },
+    "bt93cPrecomparison": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "DQN anchor and comparison matrix",
+      "sha256": "8598a16f8379a6557f2e1effcd4a6d2680d99ab6e95de9a2cff5da6f00a88621"
+    },
+    "bt93eFindingRegister": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/finding_register.json",
+      "role": "BT93E finding register",
+      "sha256": "cc9f4987e4ac3846a699d3ca6f304b94f4404ade8c70ea00423baa010b74fa8e"
+    },
+    "bt93eStartMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/start_matrix.json",
+      "role": "BT93E start matrix",
+      "sha256": "8982afda630365787dfce01f3022a39e98356edd29bfc050e31fa7b986ec222b"
+    },
+    "bt94aGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A current gate",
+      "sha256": "83fcc312dd935a24cfdf56c4b35934ac070c810bc35282d3052e21348855750e"
+    },
+    "diagnosticTrainPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93e/latest_diagnostics_smoke.json",
+      "role": "BT93E diagnostic train pointer",
+      "sha256": "35176d24db507251d317648d74bdbf11402e5010d23413409408c9e7eb4524ab"
+    },
+    "diagnosticTrainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/training_report.json",
+      "role": "BT93E diagnostic repair train",
+      "sha256": "2f58099370548f5cfd6f9619d9bee9db09f214a6c8f6273fdf29c5d018b44f01"
+    },
+    "holdoutEvalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93e/latest_holdout_eval.json",
+      "role": "BT93E holdout pointer",
+      "sha256": "c83ba9c39fe2197b8453828c6f5ef18785e2b51c3fa04ac7736a225ca27d7e21"
+    },
+    "holdoutEvalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/runs/20260424T221812Z-holdout-eval/eval_report.json",
+      "role": "BT93E holdout eval",
+      "sha256": "ba2ec1d731866da725fa6ff7d71efb18a67709c75b86cdff13ebcfe9eea308bc"
+    }
+  }
+}

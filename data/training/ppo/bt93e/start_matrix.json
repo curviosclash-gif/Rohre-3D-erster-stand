@@ -1,0 +1,669 @@
+{
+  "actionSurfaceHardeningMatrix": {
+    "bt94aImpact": {
+      "blockedFindings": [
+        "F.30"
+      ],
+      "claimableAfter93E4": false,
+      "decision": "BT94A remains closed; 93E.4 separates policy-mask absence from post-decode clamp/veto load",
+      "findingStatus": {
+        "F.03": "closed",
+        "F.20": "closed",
+        "F.30": "still-blocking"
+      }
+    },
+    "classification": "bt93e-action-surface-start-diagnostics-only",
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsRolloutEvidence": false,
+    "findingDisposition": {
+      "F.03": "closed",
+      "F.20": "closed",
+      "F.30": "still-blocking"
+    },
+    "generatedAt": "2026-04-24T22:39:30Z",
+    "generatedBy": "python/scripts/bt93e_action_surface_hardening_report.py",
+    "laneMatrix": {
+      "eval": {
+        "bt94aStartImpact": "blocked",
+        "invalidAction": {
+          "count": 0,
+          "eventName": "invalidReasons",
+          "rate": 0.0
+        },
+        "noopFallback": {
+          "count": 0,
+          "eventName": "noopRate",
+          "rate": 0.0
+        },
+        "policyLevelMask": {
+          "count": null,
+          "eventName": null,
+          "mixedWithPostDecodeClamp": false,
+          "present": false,
+          "rate": null,
+          "status": "absent-in-current-sb3-multidiscrete-policy"
+        },
+        "postDecodeClamp": {
+          "count": 32,
+          "eventName": "maskEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 32,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 1.0,
+          "source": "decode_multidiscrete_action inventory clamp after policy output"
+        },
+        "safetyVeto": {
+          "count": 32,
+          "eventName": "vetoEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 32,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 1.0
+        },
+        "sanitizer": {
+          "count": 0,
+          "eventName": "sanitizerEvents",
+          "rate": 0.0,
+          "reasons": {}
+        }
+      },
+      "holdout": {
+        "bt94aStartImpact": "blocked",
+        "invalidAction": {
+          "count": 0,
+          "eventName": "invalidReasons",
+          "rate": 0.0
+        },
+        "noopFallback": {
+          "count": 0,
+          "eventName": "noopRate",
+          "rate": 0.0
+        },
+        "policyLevelMask": {
+          "count": null,
+          "eventName": null,
+          "mixedWithPostDecodeClamp": false,
+          "present": false,
+          "rate": null,
+          "status": "absent-in-current-sb3-multidiscrete-policy"
+        },
+        "postDecodeClamp": {
+          "count": 32,
+          "eventName": "maskEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 17,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 1.0,
+          "source": "decode_multidiscrete_action inventory clamp after policy output"
+        },
+        "safetyVeto": {
+          "count": 17,
+          "eventName": "vetoEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 17,
+            "shootItemIndex": 32,
+            "useItem": 32
+          },
+          "rate": 0.53125
+        },
+        "sanitizer": {
+          "count": 0,
+          "eventName": "sanitizerEvents",
+          "rate": 0.0,
+          "reasons": {}
+        }
+      },
+      "train": {
+        "bt94aStartImpact": "blocked",
+        "invalidAction": {
+          "count": 0,
+          "eventName": "invalidReasons",
+          "rate": 0.0
+        },
+        "noopFallback": {
+          "count": 0,
+          "eventName": "noopRate",
+          "rate": 0.0
+        },
+        "policyLevelMask": {
+          "count": null,
+          "eventName": null,
+          "mixedWithPostDecodeClamp": false,
+          "present": false,
+          "rate": null,
+          "status": "absent-in-current-sb3-multidiscrete-policy"
+        },
+        "postDecodeClamp": {
+          "count": 8,
+          "eventName": "maskEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 2,
+            "shootItemIndex": 8,
+            "useItem": 8
+          },
+          "rate": 1.0,
+          "source": "decode_multidiscrete_action inventory clamp after policy output"
+        },
+        "safetyVeto": {
+          "count": 2,
+          "eventName": "vetoEvents",
+          "fieldCounts": {
+            "shootItem-without-index": 2,
+            "shootItemIndex": 8,
+            "useItem": 8
+          },
+          "rate": 0.25
+        },
+        "sanitizer": {
+          "count": 0,
+          "eventName": "sanitizerEvents",
+          "rate": 0.0,
+          "reasons": {}
+        }
+      }
+    },
+    "phaseId": "93E.4.4",
+    "policyMaskClampContract": {
+      "boundarySanitizer": "bridge.contract_v1.sanitize_action_payload",
+      "fallbackSemantics": {
+        "invalidWidthFallbackVisible": true,
+        "invalidWidthProbe": {
+          "boundaryAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [
+            "action width 0 != 14"
+          ],
+          "inventoryLength": 0,
+          "maskEvents": [],
+          "rawAction": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerChangedAction": false,
+          "sanitizerEvents": [],
+          "surfaceId": "bt93c-multidiscrete-action-v1",
+          "vetoEvents": []
+        },
+        "noopFallbackVisible": true,
+        "noopProbe": {
+          "boundaryAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "invalidReasons": [],
+          "inventoryLength": 2,
+          "maskEvents": [],
+          "rawAction": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "sanitizedAction": {
+            "boost": false,
+            "cameraSwitch": false,
+            "dropItem": false,
+            "nextItem": false,
+            "pitchDown": false,
+            "pitchUp": false,
+            "rollLeft": false,
+            "rollRight": false,
+            "shootItem": false,
+            "shootItemIndex": -1,
+            "shootMG": false,
+            "useItem": -1,
+            "yawLeft": false,
+            "yawRight": false
+          },
+          "sanitizerChangedAction": false,
+          "sanitizerEvents": [],
+          "surfaceId": "bt93c-multidiscrete-action-v1",
+          "vetoEvents": []
+        }
+      },
+      "gymSpace": "MultiDiscrete",
+      "indexEncoding": {
+        "maskSource": "info.match.inventoryLength from the JS-authoritative transition payload",
+        "token0": "no-op / -1",
+        "tokenN": "inventory index N-1",
+        "width": 257
+      },
+      "policyLevelMasking": {
+        "evidence": "Current SB3 policy emits MultiDiscrete heads; inventory legality is clamped after decode.",
+        "present": false,
+        "rateSource": null,
+        "status": "not-implemented-in-current-policy"
+      },
+      "postDecodeClamp": {
+        "eventName": "maskEvents",
+        "maskSource": "info.match.inventoryLength from the JS-authoritative transition payload",
+        "mixedWithPolicyMask": false,
+        "present": true
+      },
+      "rawBoundarySurfaceTraining": false,
+      "sameWrapperForTrainAndEval": true,
+      "sb3Trainable": true,
+      "surfaceId": "bt93c-multidiscrete-action-v1"
+    },
+    "sourceReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+      "role": "BT93E action-surface hardening report",
+      "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4"
+    },
+    "thresholds": {
+      "highLoadWithoutPolicyMaskBlocksBt94a": true,
+      "invalidActionRateAboveZeroBlocks": true,
+      "policyMaskAndPostDecodeClampMustNotBeMixed": true,
+      "postDecodeClampRateBlocksAtOrAbove": 0.5,
+      "safetyVetoRateBlocksAtOrAbove": 0.25,
+      "sanitizerRateAboveZeroBlocks": true
+    }
+  },
+  "blockId": "BT93E",
+  "bt94aBlockerCount": 5,
+  "candidateFreezeAllowed": false,
+  "candidateRunsAllowed": false,
+  "claimChecks": [
+    {
+      "blocksStart": true,
+      "id": "bt93c_result_allows_bt94a",
+      "observed": "diagnose",
+      "ok": false,
+      "required": "not diagnose"
+    },
+    {
+      "blocksStart": true,
+      "id": "handover_gate_ready",
+      "observed": "closed-diagnose-blocked-by-bt93d",
+      "ok": false,
+      "required": "ready=true"
+    },
+    {
+      "blocksStart": true,
+      "id": "precomparison_not_regression",
+      "observed": "ppo-regression",
+      "ok": false,
+      "required": "not ppo-regression"
+    },
+    {
+      "blocksStart": true,
+      "id": "no_open_bt94a_audit_blockers",
+      "observed": 5,
+      "ok": false,
+      "required": 0
+    }
+  ],
+  "claimable": false,
+  "generatedAt": "2026-04-24T22:10:15Z",
+  "generatedBy": "python/scripts/bt93e_start_truth.py",
+  "gitSha": "9729cd9ee83883d3dc8ab6ef6dd97d97b11e1302",
+  "guardrails": {
+    "allowedSidecarPaths": [
+      "python/**",
+      "data/training/ppo/bt93d/**",
+      "data/training/ppo/bt93c/**",
+      "data/training/ppo/bt94a/no_start_gate.json",
+      "docs/bot-training/Bot_Trainingsplan.md"
+    ],
+    "candidateRun": false,
+    "forbiddenWork": [
+      "BT94A candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promote or rollout-ready verdicts",
+      "JS inference, runtime strategy flag, registry, rollback, or latency activation",
+      "productive runtime, matchstart, or AI-Hub surface changes"
+    ],
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "readOnlyRuntimeSurfaces": [
+      "ObservationBridgePolicy",
+      "RuntimeConfig",
+      "BotPolicyRegistry",
+      "BotPolicyTypes",
+      "LocalDqnInference",
+      "HybridDecisionArchitecture",
+      "RewardCalculator",
+      "MatchSessionFactory"
+    ],
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "matrixDefinitionAllowed": false,
+  "noStartDecision": {
+    "allowedWork": [
+      "record gate status",
+      "carry blockers into plan/evidence"
+    ],
+    "forbiddenWork": [
+      "candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promotion or rollout signal"
+    ],
+    "reason": "BT93D propagated still-blocking F.05/F.19/F.27/F.30/F.31 evidence; BT94A remains closed.",
+    "status": "BT94A remains closed before 94A.1"
+  },
+  "ok": true,
+  "phaseId": "93E.1.2",
+  "pinnedValues": {
+    "bt94aHandoverGate": "closed-diagnose-blocked-by-bt93d",
+    "bt94aHandoverReady": false,
+    "handoverResultClass": "diagnose",
+    "precomparisonResultClass": "ppo-regression",
+    "summary.bt94a-blocker": 5,
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "redClaimChecks": [
+    {
+      "blocksStart": true,
+      "id": "bt93c_result_allows_bt94a",
+      "observed": "diagnose",
+      "ok": false,
+      "required": "not diagnose"
+    },
+    {
+      "blocksStart": true,
+      "id": "handover_gate_ready",
+      "observed": "closed-diagnose-blocked-by-bt93d",
+      "ok": false,
+      "required": "ready=true"
+    },
+    {
+      "blocksStart": true,
+      "id": "precomparison_not_regression",
+      "observed": "ppo-regression",
+      "ok": false,
+      "required": "not ppo-regression"
+    },
+    {
+      "blocksStart": true,
+      "id": "no_open_bt94a_audit_blockers",
+      "observed": 5,
+      "ok": false,
+      "required": 0
+    }
+  ],
+  "resultClass": "blocked-no-start",
+  "sourceGate": {
+    "closureCapable": true,
+    "path": "data/training/ppo/bt94a/no_start_gate.json",
+    "role": "BT94A gate report refreshed during 93E.1.2",
+    "sha256": "83fcc312dd935a24cfdf56c4b35934ac070c810bc35282d3052e21348855750e"
+  },
+  "terminalRewardFailureMatrix": {
+    "bt94aImpact": {
+      "blockedFindings": [
+        "F.19",
+        "F.31",
+        "R.01"
+      ],
+      "claimableAfter93E3": false,
+      "decision": "BT94A remains closed; 93E.3 records diagnostics and start blockers only",
+      "findingStatus": {
+        "F.18": "not-start-blocking-carried",
+        "F.19": "still-blocking",
+        "F.24": "not-start-blocking-carried",
+        "F.31": "still-blocking",
+        "R.01": "still-blocking"
+      }
+    },
+    "classification": "bt93e-internal-start-diagnostics-only",
+    "countsAsLongRunStabilityEvidence": false,
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "failureClassStartMatrix": {
+      "eval": {
+        "bt94aStartImpact": "blocked",
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "naturalTerminal": 0,
+        "observabilityStatus": "visible",
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      },
+      "holdout": {
+        "bt94aStartImpact": "blocked",
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 2,
+        "naturalTerminal": 0,
+        "observabilityStatus": "visible",
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 2
+        }
+      },
+      "train": {
+        "bt94aStartImpact": "blocked",
+        "crash": null,
+        "deathCauseCounts": {},
+        "forcedRound": null,
+        "maxSteps": null,
+        "naturalTerminal": null,
+        "observabilityStatus": "missing-in-training-report",
+        "runtimeErrorCount": null,
+        "socketClose": null,
+        "teardownFailure": null,
+        "terminalReasonCounts": {},
+        "timeout": null,
+        "truncatedReasonCounts": {}
+      }
+    },
+    "findingDisposition": {
+      "F.18": "not-start-blocking-carried",
+      "F.19": "still-blocking",
+      "F.24": "not-start-blocking-carried",
+      "F.31": "still-blocking",
+      "R.01": "still-blocking"
+    },
+    "generatedAt": "2026-04-24T22:29:35Z",
+    "generatedBy": "python/scripts/bt93e_terminal_reward_failure_report.py",
+    "phaseId": "93E.3.4",
+    "rewardSafetyRules": {
+      "episodeShorteningWithRegressiveSurvivalBlocksStart": true,
+      "positiveRewardWhileSurvivalRegressesBlocksStart": true
+    },
+    "sourceReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+      "role": "BT93E terminal/reward/failure report",
+      "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706"
+    },
+    "survivalDistributionRules": {
+      "emptyDeathCauseClassesBlockStart": true,
+      "maxStepsOnlyBlocksStart": true,
+      "minimumCompletedEpisodes": {
+        "eval": 6,
+        "holdout": 4
+      },
+      "tooSmallEpisodeCountsBlockStart": true
+    }
+  },
+  "gateRefreshHandover": {
+    "generatedAt": "2026-04-24T22:51:12Z",
+    "generatedBy": "python/scripts/bt93e_gate_refresh_handover.py",
+    "phaseId": "93E.5",
+    "resultClass": "diagnose-blocked",
+    "phaseCoverage": {
+      "93E.5.1": true,
+      "93E.5.2": true,
+      "93E.5.3": true,
+      "93E.5.4": false
+    },
+    "bt94aStartStatus": {
+      "claimable": false,
+      "candidateRunsAllowed": false,
+      "matrixDefinitionAllowed": false,
+      "candidateFreezeAllowed": false,
+      "resultClass": "blocked-no-start",
+      "handoverReady": false,
+      "handoverGate": "closed-diagnose-blocked-by-bt93e",
+      "precomparisonResultClass": "ppo-regression",
+      "bt94aBlockerCount": 5,
+      "status": "BT94A remains closed before 94A.1"
+    },
+    "diagnoseBlocked": {
+      "active": true,
+      "redChecks": [
+        {
+          "blocksStart": true,
+          "id": "bt93c_result_allows_bt94a",
+          "observed": "diagnose",
+          "ok": false,
+          "required": "not diagnose"
+        },
+        {
+          "blocksStart": true,
+          "id": "handover_gate_ready",
+          "observed": "closed-diagnose-blocked-by-bt93e",
+          "ok": false,
+          "required": "ready=true"
+        },
+        {
+          "blocksStart": true,
+          "id": "precomparison_not_regression",
+          "observed": "ppo-regression",
+          "ok": false,
+          "required": "not ppo-regression"
+        },
+        {
+          "blocksStart": true,
+          "id": "no_open_bt94a_audit_blockers",
+          "observed": 5,
+          "ok": false,
+          "required": 0
+        }
+      ],
+      "remainingBt94aGates": [
+        "F.05",
+        "F.19",
+        "F.27",
+        "F.30",
+        "F.31",
+        "R.01"
+      ],
+      "findingRegisterSummary": {
+        "bt94aBlockerCount": 5,
+        "closed": 21,
+        "not-start-blocking-carried": 12,
+        "redClaimChecks": 4,
+        "still-blocking": 17,
+        "total": 50
+      },
+      "startMatrixResultClass": "blocked-no-start",
+      "nextRepairOrReplanStep": "BT93E ended diagnose-blocked. A follow-up repair/replan must close or explicitly downgate the remaining start blockers before BT94A.1 can be claimed.",
+      "noBt94aCheckboxClosed": true
+    },
+    "bt94aReady": {
+      "active": false,
+      "candidateFreezeAllowed": false,
+      "ppoValidateRestDebt": "BT94B.3 remains mandatory before promote",
+      "rolloutRestDebt": "BT95/separate rollout remains mandatory before runtime activation"
+    },
+    "sourcePackage": {
+      "path": "data/training/ppo/bt93e/handover_package.json",
+      "sha256": "506176397ef4b8bd8f8ec7ee8df1d7cddc674923ed44541f01ecbd3f9d428dc9",
+      "role": "BT93E handover package",
+      "closureCapable": true
+    },
+    "diagnoseBlockedErrorReport": {
+      "path": "docs/Fehlerberichte/2026-04-25_bt93e-gate-refresh-diagnose-blocked.md",
+      "sha256": "c70c6b046c88f370d07448ac37f61d25a14b28c9a1b28752c4c85f29ff19d8e7",
+      "role": "BT93E diagnose-blocked error report",
+      "closureCapable": true
+    }
+  }
+}

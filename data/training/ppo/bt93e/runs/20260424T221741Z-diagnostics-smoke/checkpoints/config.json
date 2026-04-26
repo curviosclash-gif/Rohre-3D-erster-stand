@@ -1,0 +1,98 @@
+{
+  "configVersion": "bt93c-ppo-baseline-v1",
+  "blockId": "BT93C",
+  "phaseId": "93C.5",
+  "profileId": "bt93c-real-ppo-conservative-baseline-v1",
+  "claim": "93C-Conservative-Baseline",
+  "scope": "conservative 2-env PPO baseline only; no promotion, 4-env, or runtime integration",
+  "env": {
+    "modeId": "runtime-near-headless-v1",
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "maxStepsPerEpisode": 16,
+    "controllerTimeoutSeconds": 30,
+    "trainSeeds": [
+      934,
+      935
+    ],
+    "evalSeeds": [
+      944,
+      945
+    ],
+    "holdoutSeeds": [
+      950,
+      951
+    ],
+    "holdoutStatus": "reserved-for-93C.6; not consumed by 93C.5 baseline"
+  },
+  "rollout": {
+    "baselineTimesteps": 128,
+    "evalSteps": 16,
+    "nStepsPerEnv": 32,
+    "batchSize": 16,
+    "nEpochs": 1,
+    "sourceBudgetArtifacts": [
+      "data/training/ppo/bt93c/pilot_report.json",
+      "data/training/ppo/bt93c/runs/20260424T171554Z-pilot-train/training_report.json"
+    ],
+    "budgetRule": "conservative first baseline after pilot go: 2 envs, 128 timesteps, 16 eval steps, no 300000-draft budget and no 4-env escalation"
+  },
+  "algorithm": {
+    "library": "stable-baselines3",
+    "name": "PPO",
+    "policy": "MlpPolicy",
+    "device": "cpu",
+    "gamma": 0.99,
+    "gaeLambda": 0.95,
+    "learningRate": 0.0003,
+    "clipRange": 0.2,
+    "entCoef": 0.01,
+    "vfCoef": 0.5,
+    "maxGradNorm": 0.5
+  },
+  "policy": {
+    "netArch": [
+      64,
+      64
+    ],
+    "activation": "tanh",
+    "actorCriticHeadsRequired": true
+  },
+  "normalization": {
+    "implementation": "stable_baselines3.common.vec_env.VecNormalize",
+    "normalizeObservation": true,
+    "normalizeReward": false,
+    "clipObservation": 10.0,
+    "persistStatsWithCheckpoint": true
+  },
+  "diagnostics": {
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "minEntropy": 0.01,
+      "maxValueLoss": 100.0,
+      "maxGradNorm": 0.5,
+      "minExplainedVariance": -1.0
+    },
+    "classification": "BT93C.5 conservative baseline only; no promotion or runtime rollout signal"
+  },
+  "artifacts": {
+    "root": "data/training/ppo/bt93c",
+    "requirements": "python/requirements-ppo.txt",
+    "dependencyLockReport": "data/training/ppo/bt93c/dependency_lock_report.json",
+    "cleanEnvReport": "data/training/ppo/bt93c/clean_env_smoke_report.json",
+    "actionSurfaceReport": "data/training/ppo/bt93c/action_surface_smoke.json",
+    "startManifest": "data/training/ppo/bt93c/start_manifest.json",
+    "pilotReport": "data/training/ppo/bt93c/pilot_report.json",
+    "baselineSourceManifest": "data/training/ppo/bt93c/baseline_source_manifest.json",
+    "baselineReport": "data/training/ppo/bt93c/baseline_report.json"
+  },
+  "guardrails": {
+    "baselineRunsStarted": true,
+    "pilotRequiredResult": "pilot go",
+    "promotionAllowed": false,
+    "fourEnvAllowed": false,
+    "draft300000Allowed": false,
+    "runtimeSurfacesTouched": []
+  }
+}

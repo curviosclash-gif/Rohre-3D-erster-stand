@@ -1,0 +1,10 @@
+{
+  "runId": "20260424T163858Z-learner-smoke",
+  "runKind": "learner-smoke",
+  "ok": true,
+  "report": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/training_report.json",
+  "artifactManifest": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/artifact_manifest.json",
+  "model": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints/model.zip",
+  "vecnormalize": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints/vecnormalize.pkl",
+  "optimizerState": "data/training/ppo/bt93c/runs/20260424T163858Z-learner-smoke/checkpoints/optimizer_state.pt"
+}

@@ -1,0 +1,108 @@
+{
+  "blockId": "BT93G",
+  "budget": {
+    "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+    "batchSize": 32,
+    "checkpointFrequency": "final-model-package-per-ladder-stage",
+    "earlyStopRules": [
+      "stop before any next ladder stage if PPO metrics cross collapse thresholds",
+      "stop before holdout if eval has runtimeErrorCount > 0",
+      "stop before BT94A gate refresh if preSamplingMaskRate is missing or postDecodeClamp/safety-veto thresholds fail",
+      "no optimization after holdout"
+    ],
+    "envCount": 2,
+    "evalEnvCount": 2,
+    "evalIntervalTimesteps": 256,
+    "evalSeeds": [
+      944,
+      945,
+      946
+    ],
+    "evalSteps": 540,
+    "extendedRepairTimesteps": 768,
+    "holdoutEvalSteps": 360,
+    "holdoutSeeds": [
+      960,
+      961
+    ],
+    "matrixId": "bt93g-comparable-repair-matrix-v1",
+    "maxStepsPerEpisode": 180,
+    "nEpochs": 2,
+    "nStepsPerEnv": 64,
+    "shortRepairTimesteps": 256,
+    "technicalSmokeTimesteps": 64,
+    "timeoutBudgetSeconds": 14400,
+    "trainSeeds": [
+      934,
+      935,
+      936,
+      937
+    ],
+    "wallClockLimitSeconds": 14400
+  },
+  "budgetChecks": {
+    "checks": {
+      "batchSizePinned": true,
+      "checkpointFrequencyPinned": true,
+      "earlyStopRulesPinned": true,
+      "evalIntervalPinned": true,
+      "matchesRepairMatrixMaxSteps": true,
+      "maxStepsComparable": true,
+      "nEpochsPinned": true,
+      "nStepsPerEnvPinned": true,
+      "preferredMaxStepsPinned": true,
+      "timeoutBudgetPinned": true,
+      "totalTimestepsPinned": true,
+      "wallClockWithin4h": true
+    },
+    "ok": true
+  },
+  "generatedAt": "2026-04-25T10:22:13Z",
+  "generatedBy": "python/scripts/bt93g_repair_ladder_report.py",
+  "gitSha": "78adca37f5339e918ae466c8e95f89578465a544",
+  "guardrails": {
+    "baselineRunsStarted": false,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "fourEnvAllowed": false,
+    "ppoValidateAllowed": false,
+    "promotionAllowed": false,
+    "repairOnly": true,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseId": "93G.5",
+  "resultClass": "extended-repair-budget-pinned",
+  "sourceArtifacts": {
+    "actionMask": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/action_mask_report.json",
+      "role": "BT93G action mask",
+      "sha256": "7a8ac47dd6ca79b0a9ae87f5cb10a091d59958d2cf3786d08cfdbd888bf05b9a"
+    },
+    "bt93gConfig": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93g_comparable_repair.json",
+      "role": "BT93G.5 comparable repair config",
+      "sha256": "44a722e8d1f2849107af01ffbf4298948aaf9bfa78fc85335cba7ab3a6837b5d"
+    },
+    "repairMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_matrix.json",
+      "role": "BT93G comparable repair matrix",
+      "sha256": "eb8fe175e02e303a93ac74494e694937fde2aa25a9970d1cdbeaa59f8de611e7"
+    },
+    "rewardGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/reward_gate_report.json",
+      "role": "BT93G reward gate",
+      "sha256": "f221e4bfb849bca314bc8873433b68b05d4debd84bbef8eee6aeb9b4c9db8f92"
+    },
+    "startTruth": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/start_truth.json",
+      "role": "BT93G start truth",
+      "sha256": "2fd7dedea39620723ef43419b0a523d15ba8219ea44a4489860c267fad3f4009"
+    }
+  }
+}

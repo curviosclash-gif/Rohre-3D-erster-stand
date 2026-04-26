@@ -1,0 +1,34 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T15:59:19Z",
+  "generatedBy": "python/scripts/bt93c_dependency_gate.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.1.2",
+  "requirements": "python/requirements-ppo.txt",
+  "requirementsSha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52",
+  "directPins": {
+    "stable-baselines3": "2.3.2",
+    "torch": "2.3.1",
+    "gymnasium": "0.29.1",
+    "numpy": "1.26.4",
+    "tensorboard": "2.16.2",
+    "rich": "13.7.1",
+    "cloudpickle": "3.0.0",
+    "packaging": "24.1",
+    "websockets": "12.0"
+  },
+  "requiredPins": [
+    "stable-baselines3",
+    "torch",
+    "gymnasium",
+    "numpy",
+    "tensorboard",
+    "rich",
+    "websockets"
+  ],
+  "missingRequiredPins": [],
+  "bt90MinimalStackSeparated": true,
+  "bt90MinimalRequirements": "python/requirements.txt",
+  "runtimeSurfacesTouched": [],
+  "productiveRuntimeChanged": false
+}

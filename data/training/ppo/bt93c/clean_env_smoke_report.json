@@ -1,0 +1,111 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T16:02:02Z",
+  "generatedBy": "python/scripts/bt93c_dependency_gate.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.1.3",
+  "requirements": "python/requirements-ppo.txt",
+  "requirementsSha256": "a6294d74c43b02ae41b5796d0e758143804425b6133c2ac3b8b392232ceacc52",
+  "cleanEnvPath": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z",
+  "cleanPython": "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe",
+  "steps": {
+    "createVenv": {
+      "command": [
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\.venv\\Scripts\\python.exe",
+        "-m",
+        "venv",
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z"
+      ],
+      "returncode": 0,
+      "startedAt": "2026-04-24T15:59:19Z",
+      "stdoutTail": "",
+      "stderrTail": "",
+      "ok": true
+    },
+    "upgradePip": {
+      "command": [
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "install",
+        "--upgrade",
+        "pip"
+      ],
+      "returncode": 0,
+      "startedAt": "2026-04-24T15:59:25Z",
+      "stdoutTail": "Requirement already satisfied: pip in d:\\antigravity\\projekte\\neuer ordner (6)\\tmp\\bt93c-clean-env-20260424t155919z\\lib\\site-packages (25.0.1)\nCollecting pip\n  Using cached pip-26.0.1-py3-none-any.whl.metadata (4.7 kB)\nUsing cached pip-26.0.1-py3-none-any.whl (1.8 MB)\nInstalling collected packages: pip\n  Attempting uninstall: pip\n    Found existing installation: pip 25.0.1\n    Uninstalling pip-25.0.1:\n      Successfully uninstalled pip-25.0.1\nSuccessfully installed pip-26.0.1\n",
+      "stderrTail": "WARNING: Retrying (Retry(total=4, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProtocolError('Connection aborted.', ConnectionResetError(10054, 'Eine vorhandene Verbindung wurde vom Remotehost geschlossen', None, 10054, None))': /simple/pip/\nWARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ProtocolError('Connection aborted.', ConnectionResetError(10054, 'Eine vorhandene Verbindung wurde vom Remotehost geschlossen', None, 10054, None))': /simple/pip/\n",
+      "ok": true
+    },
+    "installRequirements": {
+      "command": [
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "install",
+        "-r",
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\requirements-ppo.txt"
+      ],
+      "returncode": 0,
+      "startedAt": "2026-04-24T15:59:34Z",
+      "stdoutTail": ")\\python\\requirements-ppo.txt (line 2))\n  Using cached tzdata-2026.2-py2.py3-none-any.whl.metadata (1.4 kB)\nCollecting mpmath<1.4,>=1.1.0 (from sympy->torch==2.3.1->-r D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\python\\requirements-ppo.txt (line 3))\n  Using cached mpmath-1.3.0-py3-none-any.whl.metadata (8.6 kB)\nUsing cached stable_baselines3-2.3.2-py3-none-any.whl (182 kB)\nUsing cached gymnasium-0.29.1-py3-none-any.whl (953 kB)\nUsing cached torch-2.3.1-cp312-cp312-win_amd64.whl (159.7 MB)\nUsing cached numpy-1.26.4-cp312-cp312-win_amd64.whl (15.5 MB)\nUsing cached tensorboard-2.16.2-py3-none-any.whl (5.5 MB)\nUsing cached rich-13.7.1-py3-none-any.whl (240 kB)\nUsing cached cloudpickle-3.0.0-py3-none-any.whl (20 kB)\nUsing cached packaging-24.1-py3-none-any.whl (53 kB)\nUsing cached websockets-12.0-cp312-cp312-win_amd64.whl (124 kB)\nUsing cached mkl-2021.4.0-py2.py3-none-win_amd64.whl (228.5 MB)\nUsing cached intel_openmp-2021.4.0-py2.py3-none-win_amd64.whl (3.5 MB)\nUsing cached pygments-2.20.0-py3-none-any.whl (1.2 MB)\nUsing cached tbb-2021.13.1-py3-none-win_amd64.whl (286 kB)\nUsing cached tensorboard_data_server-0.7.2-py3-none-any.whl (2.4 kB)\nUsing cached absl_py-2.4.0-py3-none-any.whl (135 kB)\nUsing cached farama_notifications-0.0.6-py3-none-any.whl (2.9 kB)\nUsing cached grpcio-1.80.0-cp312-cp312-win_amd64.whl (4.9 MB)\nUsing cached typing_extensions-4.15.0-py3-none-any.whl (44 kB)\nUsing cached markdown-3.10.2-py3-none-any.whl (108 kB)\nUsing cached markdown_it_py-4.0.0-py3-none-any.whl (87 kB)\nUsing cached mdurl-0.1.2-py3-none-any.whl (10.0 kB)\nUsing cached protobuf-7.34.1-cp310-abi3-win_amd64.whl (437 kB)\nUsing cached setuptools-82.0.1-py3-none-any.whl (1.0 MB)\nUsing cached six-1.17.0-py2.py3-none-any.whl (11 kB)\nUsing cached werkzeug-3.1.8-py3-none-any.whl (226 kB)\nUsing cached markupsafe-3.0.3-cp312-cp312-win_amd64.whl (15 kB)\nUsing cached filelock-3.29.0-py3-none-any.whl (39 kB)\nUsing cached fsspec-2026.3.0-py3-none-any.whl (202 kB)\nUsing cached jinja2-3.1.6-py3-none-any.whl (134 kB)\nUsing cached matplotlib-3.10.9-cp312-cp312-win_amd64.whl (8.2 MB)\nUsing cached contourpy-1.3.3-cp312-cp312-win_amd64.whl (226 kB)\nUsing cached cycler-0.12.1-py3-none-any.whl (8.3 kB)\nUsing cached fonttools-4.62.1-cp312-cp312-win_amd64.whl (2.3 MB)\nUsing cached kiwisolver-1.5.0-cp312-cp312-win_amd64.whl (73 kB)\nUsing cached pillow-12.2.0-cp312-cp312-win_amd64.whl (7.1 MB)\nUsing cached pyparsing-3.3.2-py3-none-any.whl (122 kB)\nUsing cached python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)\nUsing cached networkx-3.6.1-py3-none-any.whl (2.1 MB)\nUsing cached pandas-3.0.2-cp312-cp312-win_amd64.whl (9.7 MB)\nUsing cached sympy-1.14.0-py3-none-any.whl (6.3 MB)\nUsing cached mpmath-1.3.0-py3-none-any.whl (536 kB)\nUsing cached tzdata-2026.2-py2.py3-none-any.whl (349 kB)\nInstalling collected packages: tbb, mpmath, intel-openmp, farama-notifications, websockets, tzdata, typing-extensions, tensorboard-data-server, sympy, six, setuptools, pyparsing, pygments, protobuf, pillow, packaging, numpy, networkx, mkl, mdurl, markupsafe, markdown, kiwisolver, fsspec, fonttools, filelock, cycler, cloudpickle, absl-py, werkzeug, python-dateutil, markdown-it-py, jinja2, gymnasium, grpcio, contourpy, torch, tensorboard, rich, pandas, matplotlib, stable-baselines3\n\nSuccessfully installed absl-py-2.4.0 cloudpickle-3.0.0 contourpy-1.3.3 cycler-0.12.1 farama-notifications-0.0.6 filelock-3.29.0 fonttools-4.62.1 fsspec-2026.3.0 grpcio-1.80.0 gymnasium-0.29.1 intel-openmp-2021.4.0 jinja2-3.1.6 kiwisolver-1.5.0 markdown-3.10.2 markdown-it-py-4.0.0 markupsafe-3.0.3 matplotlib-3.10.9 mdurl-0.1.2 mkl-2021.4.0 mpmath-1.3.0 networkx-3.6.1 numpy-1.26.4 packaging-24.1 pandas-3.0.2 pillow-12.2.0 protobuf-7.34.1 pygments-2.20.0 pyparsing-3.3.2 python-dateutil-2.9.0.post0 rich-13.7.1 setuptools-82.0.1 six-1.17.0 stable-baselines3-2.3.2 sympy-1.14.0 tbb-2021.13.1 tensorboard-2.16.2 tensorboard-data-server-0.7.2 torch-2.3.1 typing-extensions-4.15.0 tzdata-2026.2 websockets-12.0 werkzeug-3.1.8\n",
+      "stderrTail": "",
+      "ok": true
+    },
+    "pipCheck": {
+      "command": [
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "check"
+      ],
+      "returncode": 0,
+      "startedAt": "2026-04-24T16:01:44Z",
+      "stdoutTail": "No broken requirements found.\n",
+      "stderrTail": "",
+      "ok": true
+    },
+    "importSmoke": {
+      "command": [
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe",
+        "-c",
+        "import importlib.metadata as md, json\npackages = [\"stable-baselines3\", \"torch\", \"gymnasium\", \"numpy\", \"tensorboard\", \"rich\"]\nprint(json.dumps({name: md.version(name) for name in packages}, sort_keys=True))"
+      ],
+      "returncode": 0,
+      "startedAt": "2026-04-24T16:01:45Z",
+      "stdoutTail": "{\"gymnasium\": \"0.29.1\", \"numpy\": \"1.26.4\", \"rich\": \"13.7.1\", \"stable-baselines3\": \"2.3.2\", \"tensorboard\": \"2.16.2\", \"torch\": \"2.3.1\"}\n",
+      "stderrTail": "",
+      "ok": true
+    },
+    "minimalPpoTrainStart": {
+      "command": [
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe",
+        "-c",
+        "import json\nimport gymnasium as gym\nimport numpy as np\nfrom gymnasium import spaces\nfrom stable_baselines3 import PPO\n\nclass TinyEnv(gym.Env):\n    metadata = {\"render_modes\": []}\n    def __init__(self):\n        self.observation_space = spaces.Box(low=-1, high=1, shape=(4,), dtype=np.float32)\n        self.action_space = spaces.Discrete(2)\n        self.steps = 0\n    def reset(self, *, seed=None, options=None):\n        super().reset(seed=seed)\n        self.steps = 0\n        return np.zeros(4, dtype=np.float32), {}\n    def step(self, action):\n        self.steps += 1\n        obs = np.full(4, self.steps / 8, dtype=np.float32)\n        reward = 1.0 if int(action) == 1 else 0.0\n        return obs, reward, False, self.steps >= 4, {}\n\nenv = TinyEnv()\nmodel = PPO(\"MlpPolicy\", env, n_steps=4, batch_size=4, n_epochs=1, learning_rate=0.0003, seed=931, verbose=0)\nmodel.learn(total_timesteps=8)\nprint(json.dumps({\"ok\": True, \"totalTimesteps\": 8, \"policy\": \"MlpPolicy\"}))"
+      ],
+      "returncode": 0,
+      "startedAt": "2026-04-24T16:01:45Z",
+      "stdoutTail": "{\"ok\": true, \"totalTimesteps\": 8, \"policy\": \"MlpPolicy\"}\n",
+      "stderrTail": "",
+      "ok": true
+    },
+    "pipFreeze": {
+      "command": [
+        "D:\\Antigravity\\Projekte\\Neuer Ordner (6)\\tmp\\bt93c-clean-env-20260424T155919Z\\Scripts\\python.exe",
+        "-m",
+        "pip",
+        "freeze"
+      ],
+      "returncode": 0,
+      "startedAt": "2026-04-24T16:02:01Z",
+      "stdoutTail": "absl-py==2.4.0\ncloudpickle==3.0.0\ncontourpy==1.3.3\ncycler==0.12.1\nFarama-Notifications==0.0.6\nfilelock==3.29.0\nfonttools==4.62.1\nfsspec==2026.3.0\ngrpcio==1.80.0\ngymnasium==0.29.1\nintel-openmp==2021.4.0\nJinja2==3.1.6\nkiwisolver==1.5.0\nMarkdown==3.10.2\nmarkdown-it-py==4.0.0\nMarkupSafe==3.0.3\nmatplotlib==3.10.9\nmdurl==0.1.2\nmkl==2021.4.0\nmpmath==1.3.0\nnetworkx==3.6.1\nnumpy==1.26.4\npackaging==24.1\npandas==3.0.2\npillow==12.2.0\nprotobuf==7.34.1\nPygments==2.20.0\npyparsing==3.3.2\npython-dateutil==2.9.0.post0\nrich==13.7.1\nsetuptools==82.0.1\nsix==1.17.0\nstable_baselines3==2.3.2\nsympy==1.14.0\ntbb==2021.13.1\ntensorboard==2.16.2\ntensorboard-data-server==0.7.2\ntorch==2.3.1\ntyping_extensions==4.15.0\ntzdata==2026.2\nwebsockets==12.0\nWerkzeug==3.1.8\n",
+      "stderrTail": "",
+      "ok": true
+    }
+  },
+  "minimalTrainingSmokeOnly": true,
+  "baselineRunsStarted": false,
+  "pilotRunsStarted": false,
+  "runtimeSurfacesTouched": [],
+  "productiveRuntimeChanged": false
+}

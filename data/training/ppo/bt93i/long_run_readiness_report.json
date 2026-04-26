@@ -1,0 +1,200 @@
+{
+  "artifactChecks": {
+    "artifactRootIsBt93i": true,
+    "configBlockIsBt93i": true,
+    "configPhaseIs93I2": true,
+    "matrixGreen": true,
+    "startTruthGreen": true,
+    "terminalProvocationGreen": true
+  },
+  "blockId": "BT93I",
+  "earlyStopRules": {
+    "checks": {
+      "collapseRulesPinned": true,
+      "noPostHoldoutOptimizationRulePinned": true,
+      "preSamplingMaskGreen": true,
+      "rewardGateGreen": true,
+      "rewardHackingRulePinned": true,
+      "runtimeErrorRulePinned": true,
+      "safetyThresholdsPinned": true,
+      "stepsRegressionRulePinned": true,
+      "survivalRegressionRulePinned": true,
+      "terminalMatrixRulePinned": true,
+      "terminalProvocationGreen": true
+    },
+    "collapseThresholds": {
+      "maxApproxKl": 0.2,
+      "maxClipFraction": 0.6,
+      "maxGradNorm": 0.5,
+      "maxValueLoss": 100.0,
+      "minEntropy": 0.01,
+      "minExplainedVariance": -1.0
+    },
+    "ok": true,
+    "rules": [
+      "stop if runtimeErrorCount > 0",
+      "stop if eval or holdout terminal/death matrix is empty or max-steps-only",
+      "stop if avgStepsPerEpisode regresses below the DQN anchor",
+      "stop if averageBotSurvival regresses below the DQN anchor",
+      "stop if reward gain is paired with episode shortening or survival regression",
+      "stop if approx_kl, clip_fraction, entropy, value_loss, grad_norm, or explained_variance crosses collapse thresholds",
+      "stop if pre-sampling mask is missing or post-decode clamp/veto/invalid-action load exceeds safety thresholds",
+      "stop before holdout if eval does not satisfy the minimum completed-episode target",
+      "no optimization after holdout"
+    ],
+    "safetyThresholds": {
+      "invalidActionRateEq": 0.0,
+      "postDecodeClampRateLt": 0.5,
+      "safetyVetoRateLt": 0.25,
+      "sanitizerRateEq": 0.0
+    }
+  },
+  "episodeTargetedEvalReadiness": {
+    "checks": {
+      "evalEntrypointSupportsEpisodeTarget": true,
+      "evalMaxStepsPinned": true,
+      "evalMinEpisodesPinned": true,
+      "holdoutMaxStepsPinned": true,
+      "holdoutMinEpisodesPinned": true,
+      "runnerWritesEpisodeTargetGate": true
+    },
+    "commands": {
+      "eval": "python\\.venv\\Scripts\\python.exe python\\eval.py --profile bt93i --run-kind terminal-curriculum-repair-eval --phase-id 93I.4.1 --config python/configs/ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93i\\latest_terminal_curriculum_repair.json --min-completed-episodes 15 --max-eval-steps 2700",
+      "holdout": "python\\.venv\\Scripts\\python.exe python\\eval.py --profile bt93i --run-kind holdout-eval --phase-id 93I.4.1 --config python/configs/ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93i\\latest_terminal_curriculum_repair.json --min-completed-episodes 8 --max-eval-steps 1440"
+    },
+    "maxEvalSteps": {
+      "eval": 2700,
+      "holdout": 1440
+    },
+    "minimumEpisodes": {
+      "eval": 15,
+      "holdout": 8
+    },
+    "ok": true,
+    "sourceChecks": {
+      "evalEntrypoint": {
+        "--max-eval-steps": true,
+        "--min-completed-episodes": true,
+        "terminal-curriculum-repair-eval": true
+      },
+      "runner": {
+        "episodeTargetGate": true,
+        "min_completed_episodes": true,
+        "terminal-curriculum-repair-eval": true
+      }
+    }
+  },
+  "generatedAt": "2026-04-25T14:42:10Z",
+  "generatedBy": "python/scripts/bt93i_long_run_readiness.py",
+  "gitSha": "54ba03eb1334f7aabd04a9d5dccafd088225f8b1",
+  "guardrails": {
+    "candidateRun": false,
+    "fourEnvAllowed": false,
+    "freezeCandidate": false,
+    "ppoValidateEvidence": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "longRunAllowed": true,
+  "longRunBudget": {
+    "checkpointFrequencyTimesteps": 2048,
+    "checks": {
+      "checkpointFrequencyPinned": true,
+      "envCountPinned": true,
+      "evalIntervalPinned": true,
+      "extensionIncrementPinned": true,
+      "fourEnvDisabled": true,
+      "mapsMatchMatrix": true,
+      "maxStepsPerEpisodePinned": true,
+      "maxTimestepsPinned": true,
+      "seedsMatchMatrix": true,
+      "smokeTimestepsPinned": true,
+      "wallClockLimitPinned": true
+    },
+    "command": "python\\.venv\\Scripts\\python.exe python\\train.py --profile bt93i --run-kind terminal-curriculum-repair --phase-id 93I.3.2 --config python/configs/ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93h\\latest_comparable_terminal_repair.json --total-timesteps 2048",
+    "envCount": 2,
+    "evalIntervalTimesteps": 2048,
+    "extensionIncrementTimesteps": 4096,
+    "maxTimesteps": 32768,
+    "ok": true,
+    "smokeTimesteps": 2048,
+    "wallClockLimitSeconds": 14400
+  },
+  "matrixId": "bt93i-terminal-curriculum-episode-matrix-v1",
+  "nextAllowedRun": {
+    "phaseId": "93I.3.2",
+    "requires": [
+      "start with 2048 smoke",
+      "extend only by 4096 timesteps while this report remains green",
+      "stop before holdout on eval gate failure",
+      "no candidate, freeze, promote, rollout, or PPO-Validate claim"
+    ],
+    "runKind": "terminal-curriculum-repair"
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93I.2.1": true,
+    "93I.2.2": true,
+    "93I.2.3": true,
+    "93I.2.4": true
+  },
+  "phaseId": "93I.2",
+  "resultClass": "long-run-readiness-green",
+  "sourceArtifacts": {
+    "actionMask": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/action_mask_report.json",
+      "role": "BT93G pre-sampling action mask",
+      "sha256": "7a8ac47dd6ca79b0a9ae87f5cb10a091d59958d2cf3786d08cfdbd888bf05b9a"
+    },
+    "config": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93i_terminal_curriculum_repair.json",
+      "role": "BT93I repair config",
+      "sha256": "7477a19c0ab7ffc5c1f73d2dfc42cccea3379375f77a9389ba533990ec779f12"
+    },
+    "evalEntrypoint": {
+      "closureCapable": true,
+      "path": "python/eval.py",
+      "role": "episode-targeted eval entrypoint",
+      "sha256": "6b366a00f0c5f7ab8400f0405b0648869bc61f983f6e6209c0868b3d38166627"
+    },
+    "matrixManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_manifest.json",
+      "role": "BT93I episode-counted matrix",
+      "sha256": "4b159324c06d7f12a3ad8fd1b0e69dc907889bc8ab3a6c87e30f243b79a5c906"
+    },
+    "ppoRunner": {
+      "closureCapable": true,
+      "path": "python/scripts/bt93c_learner_smoke.py",
+      "role": "PPO train/eval runner",
+      "sha256": "6525531524762da6474493df8d6b091abc609997368d8b1bbe0c0ac9ced76279"
+    },
+    "rewardGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/reward_gate_report.json",
+      "role": "BT93G reward gate",
+      "sha256": "f221e4bfb849bca314bc8873433b68b05d4debd84bbef8eee6aeb9b4c9db8f92"
+    },
+    "startTruth": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/start_truth.json",
+      "role": "BT93I start truth",
+      "sha256": "16efa0c95944b3f22c01aa4e1df69663978d77a20b9dd7a7e7555d9e13a1dc2c"
+    },
+    "terminalProvocation": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/terminal_provocation_report.json",
+      "role": "BT93I terminal provocation",
+      "sha256": "79f57db04b1e715c0aaf9ab383934657de0d6f210e38b3ce8f7219a11191e51f"
+    },
+    "trainEntrypoint": {
+      "closureCapable": true,
+      "path": "python/train.py",
+      "role": "BT93I train entrypoint",
+      "sha256": "64d4e00d39dabdd22597ade5de4b461fbfb7a016e0311717add5e3716f821b65"
+    }
+  }
+}

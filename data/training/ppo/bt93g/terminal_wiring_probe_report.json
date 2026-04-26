@@ -1,0 +1,159 @@
+{
+  "blockId": "BT93G",
+  "generatedAt": "2026-04-25T09:59:05Z",
+  "generatedBy": "python/scripts/bt93g_terminal_wiring_report.py",
+  "gitSha": "1f17413675c080ea43793172b262d0e7a1d2d2a5",
+  "ok": true,
+  "phaseCoverage": {
+    "93G.2.1": true,
+    "93G.2.2": true,
+    "93G.2.3": true,
+    "93G.2.4": true
+  },
+  "phaseId": "93G.2",
+  "probes": [
+    {
+      "countsAsQualityEvidence": false,
+      "done": true,
+      "failureSemantics": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 1
+        },
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 1
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "id": "bt93g-probe-player-dead",
+      "maxSteps": 5,
+      "stepIndex": 1,
+      "terminalReason": "player-dead",
+      "truncated": false,
+      "truncatedReason": null
+    },
+    {
+      "countsAsQualityEvidence": false,
+      "done": true,
+      "failureSemantics": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "naturalTerminal": 1,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "match-ended": 1
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "id": "bt93g-probe-round-ended",
+      "maxSteps": 5,
+      "stepIndex": 1,
+      "terminalReason": "match-ended",
+      "truncated": false,
+      "truncatedReason": null
+    },
+    {
+      "countsAsQualityEvidence": false,
+      "done": true,
+      "failureSemantics": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "naturalTerminal": 1,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "match-ended": 1
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "id": "bt93g-probe-match-ended",
+      "maxSteps": 5,
+      "stepIndex": 1,
+      "terminalReason": "match-ended",
+      "truncated": false,
+      "truncatedReason": null
+    },
+    {
+      "countsAsQualityEvidence": false,
+      "done": false,
+      "failureSemantics": {
+        "crash": 0,
+        "deathCauseCounts": {},
+        "forcedRound": 0,
+        "maxSteps": 1,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {},
+        "timeout": 0,
+        "truncatedReasonCounts": {
+          "max-steps": 1
+        }
+      },
+      "id": "bt93g-probe-max-steps",
+      "maxSteps": 2,
+      "stepIndex": 2,
+      "terminalReason": null,
+      "truncated": true,
+      "truncatedReason": "max-steps"
+    }
+  ],
+  "reportingContract": {
+    "requiredFields": [
+      "terminalReasonCounts",
+      "truncatedReasonCounts",
+      "deathCauseCounts",
+      "naturalTerminal",
+      "maxSteps",
+      "runtimeErrorCount",
+      "crash",
+      "timeout",
+      "forcedRound"
+    ],
+    "trainEvalHoldoutRule": "reports must carry these failure semantics from transition info; probes do not count as survival quality, promotion, or PPO-Validate evidence"
+  },
+  "resultClass": "terminal-wiring-probes-pinned",
+  "sourceArtifacts": {
+    "contractTest": {
+      "closureCapable": true,
+      "path": "tests/training-environment.contract.test.mjs",
+      "role": "BT93G.2 contract coverage",
+      "sha256": "f3a5c707f08fd1aa27d22f6abc1d781cd8bc0f53c6933071f8d7a49802d55ab7"
+    },
+    "episodeController": {
+      "closureCapable": true,
+      "path": "src/state/training/EpisodeController.js",
+      "role": "episode lifecycle authority",
+      "sha256": "6fd88a12ea9f7d1268d0a43bd60ef2622511fe88fa611468128ca779f3bf9e7f"
+    },
+    "laneRunner": {
+      "closureCapable": true,
+      "path": "scripts/training-headless-lane-runner.mjs",
+      "role": "headless lane terminal derivation",
+      "sha256": "8b22a0bedd674751ca1298fe9ede8c9cb5894433081dee63f1e4f8a89a2bca77"
+    }
+  },
+  "stillForbidden": [
+    "BT94A candidate run",
+    "freeze candidate",
+    "promotion or rollout signal",
+    "quality claim from probes alone"
+  ]
+}

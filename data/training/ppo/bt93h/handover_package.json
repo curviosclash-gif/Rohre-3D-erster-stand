@@ -1,0 +1,144 @@
+{
+  "blockId": "BT93H",
+  "bt94aReady": {
+    "active": false,
+    "candidateFreezeAllowed": false,
+    "ppoValidateRestDebt": "BT94B.3 remains mandatory before promote",
+    "rolloutRestDebt": "BT95/separate rollout remains mandatory before runtime activation"
+  },
+  "bt94aStartStatus": {
+    "bt94aBlockerCount": 4,
+    "candidateFreezeAllowed": false,
+    "candidateRunsAllowed": false,
+    "claimable": false,
+    "handoverGate": "closed-diagnose-blocked-by-bt93h",
+    "handoverReady": false,
+    "matrixDefinitionAllowed": false,
+    "precomparisonResultClass": "ppo-regression",
+    "resultClass": "blocked-no-start",
+    "status": "BT94A remains closed before 94A.1"
+  },
+  "commands": {
+    "gateCheck": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt94a_gate_check.py --write-report",
+    "package": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93h_gate_refresh_handover.py --write-package --write-followup-report --write-error-report",
+    "refreshReports": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93h_gate_refresh_handover.py --write-upstream-reports"
+  },
+  "diagnoseBlocked": {
+    "active": true,
+    "nextRepairOrReplanStep": "BT93H ended diagnose-blocked. A user-owned replan or narrower follow-up repair must close or explicitly downgate F.05/F.19/F.27/F.31 before BT94A.1 can be claimed.",
+    "noBt94aCheckboxClosed": true,
+    "redChecks": [
+      {
+        "blocksStart": true,
+        "id": "bt93c_result_allows_bt94a",
+        "observed": "diagnose",
+        "ok": false,
+        "required": "not diagnose"
+      },
+      {
+        "blocksStart": true,
+        "id": "handover_gate_ready",
+        "observed": "closed-diagnose-blocked-by-bt93h",
+        "ok": false,
+        "required": "ready=true"
+      },
+      {
+        "blocksStart": true,
+        "id": "precomparison_not_regression",
+        "observed": "ppo-regression",
+        "ok": false,
+        "required": "not ppo-regression"
+      },
+      {
+        "blocksStart": true,
+        "id": "no_open_bt94a_audit_blockers",
+        "observed": 4,
+        "ok": false,
+        "required": 0
+      }
+    ],
+    "remainingBt94aGates": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "repairLadderResultClass": "diagnose-blocked"
+  },
+  "generatedAt": "2026-04-25T11:48:46Z",
+  "generatedBy": "python/scripts/bt93h_gate_refresh_handover.py",
+  "gitSha": "e579e7919aace6dbcf1f1eae7e91470ba46be97c",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93H.4.1": true,
+    "93H.4.2": true,
+    "93H.4.3": true,
+    "93H.4.4": "not-applicable-red-gate"
+  },
+  "phaseId": "93H.4",
+  "resultClass": "diagnose-blocked",
+  "sourceArtifacts": {
+    "bt93hRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/repair_ladder_report.json",
+      "role": "BT93H repair ladder",
+      "sha256": "5032f14363e43a84df1399b9171b08d99ce997de97ed5f831416c87c0d4d0f2d"
+    },
+    "bt93hSurvivalGateContract": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/survival_gate_contract.json",
+      "role": "BT93H survival gate contract",
+      "sha256": "c5bc0ae27e5c80cc330ea2047daed1529fc5e95a757930ad2a611b140292e117"
+    },
+    "bt93hTerminalRootCause": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/terminal_root_cause_report.json",
+      "role": "BT93H terminal root cause",
+      "sha256": "3af647673ea2a850d539e490fb382bbb57f2b3c213eb6b85e9ab4bd2ebd55ae3"
+    },
+    "bt94aGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt94a/no_start_gate.json",
+      "role": "BT94A gate check",
+      "sha256": "0e54aafe59169c9ae36acd1640c518a9181f74127ec8ed4ee9ce31619e9b3219"
+    },
+    "diagnoseBlockedErrorReport": {
+      "closureCapable": true,
+      "path": "docs/Fehlerberichte/2026-04-25_bt93h-gate-refresh-diagnose-blocked.md",
+      "role": "BT93H diagnose-blocked error report",
+      "sha256": "253c5efc5f1b5637a0a94d3921157a1e864c365ccec42f78b4d473869df6b64e"
+    },
+    "evidenceQualityMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "role": "BT93H-refreshed evidence matrix",
+      "sha256": "deff05850039d767edd181d603d457040d6e4532cf237c3585aa5dfe0dc10cd5"
+    },
+    "followupGateReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/followup_gate_report.json",
+      "role": "BT93H followup gate report",
+      "sha256": "47647f95ca4c8e6888d9c494056bb5ef94d195e28849dcdf5c725a024385e473"
+    },
+    "handoverReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/handover_report.json",
+      "role": "BT93H-refreshed handover",
+      "sha256": "da85f5ecb2a15b086f1335063a485328f782b37b1dab47e95ab34332cec58e51"
+    },
+    "precomparisonReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "BT93H-refreshed precomparison",
+      "sha256": "f341768cf3156eb6a0fa5a9b22b736a16962245b0f60dca3dfe2c3ef2e7460bb"
+    }
+  }
+}

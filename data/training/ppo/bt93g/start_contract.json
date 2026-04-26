@@ -1,0 +1,126 @@
+{
+  "allowedRunKinds": [
+    "diagnostic",
+    "repair",
+    "technical-smoke",
+    "comparable-repair",
+    "comparable-repair-eval",
+    "holdout-eval"
+  ],
+  "blockId": "BT93G",
+  "closurePaths": {
+    "93G.1.1": "data/training/ppo/bt93g/start_truth.json",
+    "93G.1.2": "data/training/ppo/bt93g/repair_matrix.json",
+    "93G.1.3": "data/training/ppo/bt93g/start_contract.json#gateLogic",
+    "93G.1.4": "data/training/ppo/bt93g/start_contract.json"
+  },
+  "contractId": "bt93g-start-contract-v1",
+  "forbiddenEvidenceSources": [
+    "data/bot_validation_report.json",
+    "tmp/**",
+    "latest_* pointers without immutable run artifacts",
+    "plan grep or self-count evidence",
+    "throughput-only reports",
+    "scaffold-only reports",
+    "16-step diagnostics as DQN non-regression proof"
+  ],
+  "forbiddenRunKinds": [
+    "candidate",
+    "freeze",
+    "freeze-candidate",
+    "promote",
+    "rollout-ready",
+    "BT94B-ready",
+    "baseline"
+  ],
+  "gateLogic": {
+    "maxStepsBelow128": {
+      "bt94aClaimAllowed": false,
+      "classification": "diagnose-not-comparable",
+      "dqnNonRegressionAllowed": false
+    },
+    "positiveRewardWithRegression": {
+      "bt94aClaimAllowed": false,
+      "classification": "R.01 still-blocking"
+    },
+    "preSamplingMaskMissing": {
+      "bt94aClaimAllowed": false,
+      "classification": "hard-blocker"
+    },
+    "terminalDeathMatrixEmpty": {
+      "bt94aClaimAllowed": false,
+      "classification": "hard-blocker"
+    }
+  },
+  "phaseId": "93G.1",
+  "phaseOrder": {
+    "93G.1": "start truth, comparable matrix, gate logic, start contract",
+    "93G.2": "natural terminal/death/truncation wiring",
+    "93G.3": "pre-sampling policy-level mask",
+    "93G.4": "reward and diagnosis gates",
+    "93G.5": "comparable repair learner/eval/holdout",
+    "93G.6": "gate refresh and handover decision"
+  },
+  "repairMatrix": {
+    "baseline": {
+      "baselineId": "bt93c-ppo-baseline-publish-v1",
+      "dqnChampion": {
+        "averageBotSurvival": 37.376986,
+        "avgStepsPerEpisode": 117.525,
+        "invalidActionRate": 1.0,
+        "runtimeErrorCount": null,
+        "source": "BT11 historical DQN champion anchor"
+      }
+    },
+    "blockId": "BT93G",
+    "classification": "comparable-repair-matrix",
+    "comparisonUse": "BT93G repair/eval gate only; not a BT94A candidate, freeze, promotion, or PPO-Validate lane.",
+    "env": {
+      "envCount": 2,
+      "evalEnvCount": 2,
+      "maps": [
+        "standard",
+        "maze"
+      ],
+      "maxStepsPerEpisode": 180,
+      "minComparableMaxSteps": 128,
+      "modeId": "runtime-near-headless-v1",
+      "preferredMaxStepsPerEpisode": 180
+    },
+    "holdoutRule": {
+      "holdoutMayNotOpenBt94aIf": [
+        "pre-sampling mask is missing",
+        "terminal/death matrix is empty or max-steps-only",
+        "reward is positive while survival or steps regress",
+        "runtimeErrorCount is greater than 0"
+      ],
+      "noPostHoldoutOptimization": true,
+      "status": "reserved-for-93G.5-after-root-fixes"
+    },
+    "matrixId": "bt93g-comparable-repair-matrix-v1",
+    "minimumEpisodes": {
+      "derivation": "2 maps x 3 eval seeds = 6 eval episodes; 2 maps x 2 holdout seeds = 4 holdout episodes.",
+      "eval": 6,
+      "holdout": 4
+    },
+    "phaseId": "93G.1",
+    "seeds": {
+      "eval": [
+        944,
+        945,
+        946
+      ],
+      "holdout": [
+        960,
+        961
+      ],
+      "train": [
+        934,
+        935,
+        936,
+        937
+      ]
+    }
+  },
+  "resultClass": "start-contract-pinned"
+}

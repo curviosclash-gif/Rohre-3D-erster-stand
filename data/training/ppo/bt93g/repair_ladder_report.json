@@ -1,0 +1,1287 @@
+{
+  "blockId": "BT93G",
+  "bt94aImpact": {
+    "blockedFindings": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "claimableAfter93G5": false,
+    "decision": "BT94A remains closed; BT93G.5 repair evidence still violates hard result rules."
+  },
+  "commands": {
+    "eval": "python\\eval.py --profile bt93g --run-kind comparable-repair-eval --phase-id 93G.5.4 --config python\\configs\\ppo_bt93g_comparable_repair.json --artifact-root data\\training\\ppo\\bt93g --checkpoint data\\training\\ppo\\bt93g\\runs\\20260425T102337Z-comparable-repair\\artifact_manifest.json --eval-steps 540",
+    "extendedComparableRepair": "python\\train.py --profile bt93g --run-kind comparable-repair --phase-id 93G.5.3 --config python\\configs\\ppo_bt93g_comparable_repair.json --artifact-root data\\training\\ppo\\bt93g --checkpoint data\\training\\ppo\\bt93g\\runs\\20260425T102316Z-comparable-repair\\artifact_manifest.json --total-timesteps 768",
+    "holdout": "python\\eval.py --profile bt93g --run-kind holdout-eval --phase-id 93G.5.4 --config python\\configs\\ppo_bt93g_comparable_repair.json --artifact-root data\\training\\ppo\\bt93g --checkpoint data\\training\\ppo\\bt93g\\runs\\20260425T102337Z-comparable-repair\\artifact_manifest.json --eval-steps 360",
+    "report": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93g_repair_ladder_report.py --write-report",
+    "shortComparableRepair": "python\\train.py --profile bt93g --run-kind comparable-repair --phase-id 93G.5.1 --config python\\configs\\ppo_bt93g_comparable_repair.json --artifact-root data\\training\\ppo\\bt93g --checkpoint data\\training\\ppo\\bt93g\\runs\\20260425T102258Z-technical-smoke\\artifact_manifest.json",
+    "technicalSmoke": "python\\train.py --profile bt93g --run-kind technical-smoke --phase-id 93G.5.1 --config python\\configs\\ppo_bt93g_comparable_repair.json --artifact-root data\\training\\ppo\\bt93g"
+  },
+  "comparison": {
+    "deltasAgainstDqn": {
+      "averageBotSurvivalPct": 84.783939,
+      "avgStepsPerEpisodePct": -41.232362,
+      "holdoutAverageBotSurvivalPct": 106.00912,
+      "resultClass": "ppo-regression"
+    },
+    "dqnChampion": {
+      "averageBotSurvival": 37.376986,
+      "avgStepsPerEpisode": 117.525,
+      "invalidActionRate": 1.0,
+      "runtimeErrorCount": null,
+      "source": "BT11 historical DQN champion anchor"
+    },
+    "matrix": {
+      "checks": {
+        "evalConfigHashMatches": true,
+        "evalSeedsUnchanged": true,
+        "holdoutConfigHashMatches": true,
+        "holdoutSeedsUnchanged": true,
+        "mapsUnchanged": true,
+        "matrixIdUnchanged": true,
+        "maxStepsUnchanged": true,
+        "semanticWindowUnchanged": true,
+        "trainSeedsUnchanged": true
+      },
+      "configMatrix": {
+        "actionSurfaceId": "bt93g-masked-semantic-action-v1",
+        "envCount": 2,
+        "evalEnvCount": 2,
+        "maps": [
+          "standard",
+          "maze"
+        ],
+        "matrixId": "bt93g-comparable-repair-matrix-v1",
+        "maxStepsPerEpisode": 180,
+        "seeds": {
+          "eval": [
+            944,
+            945,
+            946
+          ],
+          "holdout": [
+            960,
+            961
+          ],
+          "train": [
+            934,
+            935,
+            936,
+            937
+          ]
+        },
+        "semanticWindow": "runtime-near-headless-v1"
+      },
+      "ok": true,
+      "repairMatrix": {
+        "maps": [
+          "standard",
+          "maze"
+        ],
+        "matrixId": "bt93g-comparable-repair-matrix-v1",
+        "maxStepsPerEpisode": 180,
+        "seeds": {
+          "eval": [
+            944,
+            945,
+            946
+          ],
+          "holdout": [
+            960,
+            961
+          ],
+          "train": [
+            934,
+            935,
+            936,
+            937
+          ]
+        },
+        "semanticWindow": "runtime-near-headless-v1"
+      }
+    },
+    "ppoComparableEval": {
+      "actionTelemetry": {
+        "fieldCounts": {},
+        "invalidActionRate": 0.0,
+        "maskRate": 0.0,
+        "noopRate": 0.126852,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 1080,
+        "vetoRate": 0.0
+      },
+      "averageBotSurvival": 69.066667,
+      "averageBotSurvivalSource": "BT93G comparable repair completed episode length",
+      "avgStepsPerEpisode": 69.066667,
+      "avgStepsPerEpisodeObserved": 69.066667,
+      "baselineComparable": true,
+      "comparisonComparable": true,
+      "completedEpisodeCount": 15,
+      "completedEpisodeLengths": [
+        60.0,
+        71.0,
+        67.0,
+        95.0,
+        64.0,
+        70.0,
+        86.0,
+        70.0,
+        29.0,
+        60.0,
+        67.0,
+        26.0,
+        99.0,
+        83.0,
+        89.0
+      ],
+      "completedEpisodeStats": {
+        "count": 15,
+        "max": 99.0,
+        "mean": 69.066667,
+        "median": 70.0,
+        "min": 26.0,
+        "stdev": 20.184042
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 15
+        },
+        "emptyDeathCauseCounts": false,
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 15
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "phaseId": "93G.5.4",
+      "report": "data/training/ppo/bt93g/runs/20260425T102416Z-comparable-repair-eval/eval_report.json",
+      "reward": {
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.118333,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 127.8,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardMean": 0.118333,
+        "rewardTotal": 127.799997,
+        "safetyOverruleCounts": {
+          "combatVeto": 151,
+          "intent-request-applied-mismatch": 153,
+          "vetoActive": 313
+        }
+      },
+      "runId": "20260425T102416Z-comparable-repair-eval",
+      "runKind": "comparable-repair-eval"
+    },
+    "ppoHoldout": {
+      "actionTelemetry": {
+        "fieldCounts": {},
+        "invalidActionRate": 0.0,
+        "maskRate": 0.0,
+        "noopRate": 0.077778,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerRate": 0.0,
+        "totalActions": 720,
+        "vetoRate": 0.0
+      },
+      "averageBotSurvival": 77.0,
+      "averageBotSurvivalSource": "BT93G comparable repair completed episode length",
+      "avgStepsPerEpisode": 77.0,
+      "avgStepsPerEpisodeObserved": 77.0,
+      "baselineComparable": true,
+      "comparisonComparable": true,
+      "completedEpisodeCount": 8,
+      "completedEpisodeLengths": [
+        54.0,
+        67.0,
+        74.0,
+        87.0,
+        65.0,
+        94.0,
+        79.0,
+        96.0
+      ],
+      "completedEpisodeStats": {
+        "count": 8,
+        "max": 96.0,
+        "mean": 77.0,
+        "median": 76.5,
+        "min": 54.0,
+        "stdev": 13.856406
+      },
+      "failureClasses": {
+        "crash": 0,
+        "deathCauseCounts": {
+          "player-dead": 8
+        },
+        "emptyDeathCauseCounts": false,
+        "forcedRound": 0,
+        "maxSteps": 0,
+        "maxStepsOnly": false,
+        "naturalTerminal": 0,
+        "runtimeErrorCount": 0,
+        "socketClose": 0,
+        "teardownFailure": 0,
+        "terminalReasonCounts": {
+          "player-dead": 8
+        },
+        "timeout": 0,
+        "truncatedReasonCounts": {}
+      },
+      "phaseId": "93G.5.4",
+      "report": "data/training/ppo/bt93g/runs/20260425T102509Z-holdout-eval/eval_report.json",
+      "reward": {
+        "rewardBreakdownMeanPerStep": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 0.118667,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardBreakdownTotals": {
+          "baseStep": 0.0,
+          "checkpointReached": 0.0,
+          "crash": 0.0,
+          "damageDealt": 0.0,
+          "damageTaken": 0.0,
+          "external": 0.0,
+          "itemPickup": 0.0,
+          "itemUse": 0.0,
+          "kill": 0.0,
+          "loss": 0.0,
+          "lowHealthThreat": 0.0,
+          "opponentRisk": 0.0,
+          "parcoursCompleted": 0.0,
+          "stuck": 0.0,
+          "survival": 85.44,
+          "survivalPressureBonus": 0.0,
+          "trailRisk": 0.0,
+          "wallRisk": 0.0,
+          "win": 0.0,
+          "wrongOrder": 0.0
+        },
+        "rewardMean": 0.118667,
+        "rewardTotal": 85.439998,
+        "safetyOverruleCounts": {
+          "combatVeto": 159,
+          "intent-request-applied-mismatch": 160,
+          "vetoActive": 252
+        }
+      },
+      "runId": "20260425T102509Z-holdout-eval",
+      "runKind": "holdout-eval"
+    }
+  },
+  "evidenceLimits": {
+    "candidateRun": false,
+    "classification": "BT93G.5 comparable repair evidence only",
+    "countsAsPpoValidateEvidence": false,
+    "countsAsPromotionEvidence": false,
+    "countsAsRolloutEvidence": false,
+    "freezeCandidate": false
+  },
+  "findingDisposition": {
+    "F.05": "still-blocking",
+    "F.19": "still-blocking",
+    "F.27": "still-blocking",
+    "F.30": "closed-for-bt93g-repair-lane",
+    "F.31": "still-blocking",
+    "R.01": "closed-for-93g-repair-eval"
+  },
+  "generatedAt": "2026-04-25T10:25:44Z",
+  "generatedBy": "python/scripts/bt93g_repair_ladder_report.py",
+  "gitSha": "78adca37f5339e918ae466c8e95f89578465a544",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "ppoValidateEvidence": false,
+    "productiveRuntimeChanged": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "minimumStatisticsObserved": {
+    "evalCompletedEpisodeStats": {
+      "count": 15,
+      "max": 99.0,
+      "mean": 69.066667,
+      "median": 70.0,
+      "min": 26.0,
+      "stdev": 20.184042
+    },
+    "evalCompletedEpisodes": 15,
+    "evalMinimumOk": true,
+    "holdoutCompletedEpisodeStats": {
+      "count": 8,
+      "max": 96.0,
+      "mean": 77.0,
+      "median": 76.5,
+      "min": 54.0,
+      "stdev": 13.856406
+    },
+    "holdoutCompletedEpisodes": 8,
+    "holdoutMinimumOk": true,
+    "required": {
+      "derivation": "2 maps x 3 eval seeds = 6 eval episodes; 2 maps x 2 holdout seeds = 4 holdout episodes.",
+      "eval": 6,
+      "holdout": 4
+    }
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93G.5.1": true,
+    "93G.5.2": true,
+    "93G.5.3": true,
+    "93G.5.4": true,
+    "93G.5.5": true,
+    "93G.5.6": true
+  },
+  "phaseId": "93G.5",
+  "repairLadderRuns": {
+    "extendedComparableRepair": {
+      "actionTelemetry": [
+        {
+          "fieldCounts": {},
+          "invalidActionCount": 0,
+          "invalidActionRate": 0.0,
+          "maskCount": 0,
+          "maskRate": 0.0,
+          "noopCount": 42,
+          "noopRate": 0.109375,
+          "postDecodeClampCount": 0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskCount": 384,
+          "preSamplingMaskRate": 1.0,
+          "rawActionExamples": [
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": true,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 5,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": true,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "roll-left",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": true
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 2,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": true
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "yaw-right",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": true,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 4,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": true,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "pitch-down",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": true,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 3,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": true,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "pitch-up",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": true,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 5,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": true,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "roll-left",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": true,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 8,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": true,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "shoot-mg",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": true,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 1,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": true,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "yaw-left",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": true,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 8,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": true,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "shoot-mg",
+              "vetoEvents": []
+            }
+          ],
+          "sanitizerCount": 0,
+          "sanitizerRate": 0.0,
+          "sanitizerReasons": {},
+          "totalActions": 384,
+          "vetoCount": 0,
+          "vetoRate": 0.0
+        },
+        {
+          "fieldCounts": {},
+          "invalidActionCount": 0,
+          "invalidActionRate": 0.0,
+          "maskCount": 0,
+          "maskRate": 0.0,
+          "noopCount": 50,
+          "noopRate": 0.13020833333333334,
+          "postDecodeClampCount": 0,
+          "postDecodeClampRate": 0.0,
+          "preSamplingMaskCount": 384,
+          "preSamplingMaskRate": 1.0,
+          "rawActionExamples": [
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": true
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 2,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": true
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "yaw-right",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": true,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 4,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": true,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "pitch-down",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 0,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "noop",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": true,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 3,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": true,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "pitch-up",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": true,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 4,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": true,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "pitch-down",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": true,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 5,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": true,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "roll-left",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": true
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 2,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": true
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "yaw-right",
+              "vetoEvents": []
+            },
+            {
+              "decoded": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "invalidReasons": [],
+              "inventoryLength": 0,
+              "maskEvents": [],
+              "raw": 0,
+              "sanitized": {
+                "boost": false,
+                "cameraSwitch": false,
+                "dropItem": false,
+                "nextItem": false,
+                "pitchDown": false,
+                "pitchUp": false,
+                "rollLeft": false,
+                "rollRight": false,
+                "shootItem": false,
+                "shootItemIndex": -1,
+                "shootMG": false,
+                "useItem": -1,
+                "yawLeft": false,
+                "yawRight": false
+              },
+              "sanitizerEvents": [],
+              "semanticAction": "noop",
+              "vetoEvents": []
+            }
+          ],
+          "sanitizerCount": 0,
+          "sanitizerRate": 0.0,
+          "sanitizerReasons": {},
+          "totalActions": 384,
+          "vetoCount": 0,
+          "vetoRate": 0.0
+        }
+      ],
+      "candidateRun": false,
+      "freezeCandidate": false,
+      "learningMetrics": {
+        "collapseOrInstabilitySignal": false,
+        "collapseThresholds": {
+          "maxApproxKl": 0.2,
+          "maxClipFraction": 0.6,
+          "maxGradNorm": 0.5,
+          "maxValueLoss": 100.0,
+          "minEntropy": 0.01,
+          "minExplainedVariance": -1.0
+        },
+        "metrics": {
+          "approx_kl": 1.9581057131290436e-05,
+          "clip_fraction": 0.0,
+          "entropy": 2.1960395872592926,
+          "explained_variance": 0.4429062604904175,
+          "grad_norm": {
+            "configuredMaxGradNorm": 0.5,
+            "globalNorm": 0.5,
+            "maxAbsGradient": 0.119945,
+            "observed": true,
+            "tensorCount": 12,
+            "tolerance": 5e-05,
+            "withinConfiguredMaxGradNorm": true
+          },
+          "policy_loss": -0.0011032561305910349,
+          "value_loss": 1.2422263771295547
+        },
+        "rawLoggerKeys": [
+          "train/approx_kl",
+          "train/clip_fraction",
+          "train/clip_range",
+          "train/entropy_loss",
+          "train/explained_variance",
+          "train/learning_rate",
+          "train/loss",
+          "train/n_updates",
+          "train/policy_gradient_loss",
+          "train/value_loss"
+        ],
+        "sampleClass": "bt93g-comparable-repair-not-candidate",
+        "source": "stable_baselines3.PPO logger after model.learn()",
+        "thresholdStatus": {
+          "approxKlWithinThreshold": true,
+          "clipFractionWithinThreshold": true,
+          "entropyAboveMinimum": true,
+          "explainedVarianceAboveMinimum": true,
+          "gradNormWithinThreshold": true,
+          "valueLossWithinThreshold": true
+        }
+      },
+      "promotionAllowed": false,
+      "report": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/training_report.json",
+      "requestedTimesteps": 768,
+      "runId": "20260425T102337Z-comparable-repair",
+      "runKind": "comparable-repair",
+      "sourceModelPackage": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/artifact_manifest.json",
+      "truePpoModelPackage": true,
+      "truePpoOptimizerUpdate": true
+    },
+    "shortComparableRepair": {
+      "candidateRun": false,
+      "report": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/training_report.json",
+      "requestedTimesteps": 256,
+      "runId": "20260425T102316Z-comparable-repair",
+      "runKind": "comparable-repair",
+      "sourceModelPackage": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/artifact_manifest.json",
+      "truePpoOptimizerUpdate": true
+    },
+    "technicalSmoke": {
+      "candidateRun": false,
+      "report": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/training_report.json",
+      "runId": "20260425T102258Z-technical-smoke",
+      "runKind": "technical-smoke",
+      "truePpoModelPackage": true
+    }
+  },
+  "resultClass": "diagnose-blocked",
+  "resultRules": {
+    "blockingReasons": [
+      "ppo-regression against DQN anchor",
+      "terminal/death matrix remains max-steps-only or empty"
+    ],
+    "bt94aRemainsClosed": true,
+    "candidateFreezeAllowed": false,
+    "emptyTerminalDeathMatrixBlocksStart": true,
+    "extendedBudgetPinned": true,
+    "highClampOrVetoLoadBlocksStart": false,
+    "holdoutNonOptimizationOk": true,
+    "learningTrendMissingBlocksStart": false,
+    "postHoldoutOptimizerRuns": [],
+    "ppoRegressionBlocksStart": true,
+    "preSamplingMaskMissingBlocksStart": false,
+    "promotionAllowed": false,
+    "repairLadderOk": true,
+    "rewardHackingBlocksStart": false,
+    "rolloutSignal": false,
+    "runtimeErrorCountBlocksStart": false
+  },
+  "sourceArtifacts": {
+    "actionMaskReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/action_mask_report.json",
+      "role": "BT93G pre-sampling action mask",
+      "sha256": "7a8ac47dd6ca79b0a9ae87f5cb10a091d59958d2cf3786d08cfdbd888bf05b9a"
+    },
+    "bt93gConfig": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93g_comparable_repair.json",
+      "role": "BT93G.5 comparable repair config",
+      "sha256": "44a722e8d1f2849107af01ffbf4298948aaf9bfa78fc85335cba7ab3a6837b5d"
+    },
+    "evalPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93g/latest_comparable_repair_eval.json",
+      "role": "BT93G.5 eval pointer",
+      "sha256": "c8fbc982d34524de1757447efc766993977078655d5bfcac935ba60fb5e014f5"
+    },
+    "evalReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/runs/20260425T102416Z-comparable-repair-eval/eval_report.json",
+      "role": "BT93G.5 comparable repair eval",
+      "sha256": "b66b448d62c7224af52a51f71f74ef9df4025d1e9777b619c7d74cceffa1182a"
+    },
+    "extendedRepairPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93g/latest_comparable_repair.json",
+      "role": "BT93G.5 extended repair pointer",
+      "sha256": "aed4ecf406930932905c8596ce015f147bd57351ab03e141a1c785aedee265a0"
+    },
+    "extendedRepairTrainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/runs/20260425T102337Z-comparable-repair/training_report.json",
+      "role": "BT93G.5 extended comparable repair train",
+      "sha256": "c4a726931968a32f3550ab87d5a9e4ca2719b1f09996eb89ea3f8d07b27a869a"
+    },
+    "holdoutPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93g/latest_holdout_eval.json",
+      "role": "BT93G.5 holdout pointer",
+      "sha256": "b7e6afe6268eaf3a9c4079794cc77d2166d53543454498f8d339abcdf4d67d70"
+    },
+    "holdoutReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/runs/20260425T102509Z-holdout-eval/eval_report.json",
+      "role": "BT93G.5 holdout eval",
+      "sha256": "01d474915a0847556e3629bf4e53af97caccccb1224d1f954e66fec4e3e8c029"
+    },
+    "repairLadderBudget": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_ladder_budget.json",
+      "role": "BT93G.5 pinned budget",
+      "sha256": "897175ebde0f61fbb87b571ddaffd4afaae09c00e250e6852f7368bca3d84b53"
+    },
+    "repairMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_matrix.json",
+      "role": "BT93G comparable matrix",
+      "sha256": "eb8fe175e02e303a93ac74494e694937fde2aa25a9970d1cdbeaa59f8de611e7"
+    },
+    "rewardGateReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/reward_gate_report.json",
+      "role": "BT93G reward gate",
+      "sha256": "f221e4bfb849bca314bc8873433b68b05d4debd84bbef8eee6aeb9b4c9db8f92"
+    },
+    "shortRepairTrainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/runs/20260425T102316Z-comparable-repair/training_report.json",
+      "role": "BT93G.5 short comparable repair train",
+      "sha256": "c9f1fa079b8707e70792e0ca1599a132627400b4873534748f4bc57a71be67d2"
+    },
+    "technicalSmokeTrainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/runs/20260425T102258Z-technical-smoke/training_report.json",
+      "role": "BT93G.5 technical smoke train",
+      "sha256": "6ae3accd35d62081a5fcc7a755d2df7f7303d2c7da17a1c6ce2c8f25f11d3ebc"
+    }
+  }
+}

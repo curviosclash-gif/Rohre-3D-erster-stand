@@ -1,0 +1,10 @@
+{
+  "runId": "20260424T180033Z-baseline-train",
+  "runKind": "baseline-train",
+  "ok": true,
+  "report": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/training_report.json",
+  "artifactManifest": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/artifact_manifest.json",
+  "model": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/model.zip",
+  "vecnormalize": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/vecnormalize.pkl",
+  "optimizerState": "data/training/ppo/bt93c/runs/20260424T180033Z-baseline-train/checkpoints/optimizer_state.pt"
+}

@@ -1,0 +1,175 @@
+{
+  "blockId": "BT93I",
+  "commands": {
+    "train": "python\\train.py --profile bt93i --run-kind terminal-curriculum-repair --phase-id 93I.3.2 --config python\\configs\\ppo_bt93i_terminal_curriculum_repair.json --artifact-root data\\training\\ppo\\bt93i --checkpoint data\\training\\ppo\\bt93h\\latest_comparable_terminal_repair.json --total-timesteps 2048",
+    "write": "python\\.venv\\Scripts\\python.exe python\\scripts\\bt93i_terminal_curriculum_repair_report.py --write-holdout-guard --write-report"
+  },
+  "earlyStopStatus": {
+    "collapseOrInstabilitySignal": false,
+    "collapseThresholdsOk": true,
+    "runtimeErrorCount": 0,
+    "safety": {
+      "checks": {
+        "invalidActionRateZero": true,
+        "postDecodeClampBelowLimit": true,
+        "preSamplingMaskActive": true,
+        "sanitizerRateZero": true,
+        "vetoBelowLimit": true
+      },
+      "ok": true,
+      "telemetry": {
+        "invalidActionCount": 0,
+        "invalidActionRate": 0.0,
+        "maskCount": 0,
+        "maskRate": 0.0,
+        "noopCount": 234,
+        "noopRate": 0.114258,
+        "postDecodeClampCount": 0,
+        "postDecodeClampRate": 0.0,
+        "preSamplingMaskCount": 2048,
+        "preSamplingMaskRate": 1.0,
+        "sanitizerCount": 0,
+        "sanitizerRate": 0.0,
+        "totalActions": 2048,
+        "vetoCount": 0,
+        "vetoRate": 0.0
+      },
+      "thresholds": {
+        "invalidActionRateEq": 0.0,
+        "postDecodeClampRateLt": 0.5,
+        "safetyVetoRateLt": 0.25,
+        "sanitizerRateEq": 0.0
+      }
+    },
+    "stopRequired": false,
+    "thresholdStatus": {
+      "approxKlWithinThreshold": true,
+      "clipFractionWithinThreshold": true,
+      "entropyAboveMinimum": true,
+      "explainedVarianceAboveMinimum": true,
+      "gradNormWithinThreshold": true,
+      "valueLossWithinThreshold": true
+    }
+  },
+  "extensionDecision": {
+    "extensionExecuted": false,
+    "maxTimesteps": 32768,
+    "nextIncrementTimesteps": 4096,
+    "reason": "93I.3 stops after the green 2048 smoke; 93I.4 owns the episode-targeted eval/holdout matrix before any further optimization or start-gate decision.",
+    "smokeExecuted": true,
+    "wallClockLimitSeconds": 14400
+  },
+  "generatedAt": "2026-04-25T15:35:22Z",
+  "generatedBy": "python/scripts/bt93i_terminal_curriculum_repair_report.py",
+  "gitSha": "ee73aa4907348ff5991dbcc2354b93a70326c0b5",
+  "guardrails": {
+    "candidateRun": false,
+    "freezeCandidate": false,
+    "ppoValidateEvidence": false,
+    "promotionAllowed": false,
+    "rolloutSignal": false,
+    "runtimeSurfacesTouched": []
+  },
+  "holdoutGuard": {
+    "holdoutConsumed": true,
+    "path": "data/training/ppo/bt93i/holdout_guard_report.json",
+    "postHoldoutTrainingRuns": [],
+    "resultClass": "holdout-guard-green"
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93I.3.1": true,
+    "93I.3.2": true,
+    "93I.3.3": true,
+    "93I.3.4": true
+  },
+  "phaseId": "93I.3",
+  "repairRun": {
+    "artifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+    "artifacts": {
+      "configSha256": "4d0d0d259e5e7eb97f2f6a9a54506140ea3334fd41368e32d6705674ff7abda7",
+      "modelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371",
+      "optimizerStateSha256": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+      "vecnormalizeSha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25"
+    },
+    "loadCompatibility": {
+      "numpyBitGeneratorClassPickleCompat": true,
+      "numpyCoreModuleAliases": true,
+      "reason": "legacy VecNormalize pickle may contain Gym space RNG state encoded with a NumPy BitGenerator class",
+      "scope": "PPO model and VecNormalize artifact load only; observation/reward RMS state is loaded from the source artifact"
+    },
+    "modelNumTimesteps": 3968,
+    "optimizerUpdatesAfter": 62,
+    "optimizerUpdatesBefore": 30,
+    "pickleCompatibility": {
+      "normalizationRmsPreserved": true,
+      "spaceRngClearedBeforeVecNormalizeSave": [
+        "action_space"
+      ]
+    },
+    "report": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+    "requestedTimesteps": 2048,
+    "runId": "20260425T151155Z-terminal-curriculum-repair",
+    "runKind": "terminal-curriculum-repair",
+    "sourceModelPackage": {
+      "artifactManifest": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/artifact_manifest.json",
+      "modelSha256": "2cb11aa2f16b9bb6a51077eb52df111f843db092803917a2f62265ecc4179441",
+      "optimizerStateSha256": "cf72ed6a1da04173e859f5c75514561bc653b354e7846a768982358abd8fee40",
+      "runId": "20260425T113941Z-comparable-terminal-repair",
+      "vecnormalizeSha256": "bd741262d44f344e2f29cf74e908055e1028b0cafbc26d43ac0a0445cc00978d"
+    },
+    "truePpoModelPackage": true,
+    "truePpoOptimizerUpdate": true
+  },
+  "resultClass": "terminal-curriculum-smoke-green-awaiting-eval",
+  "sourceArtifacts": {
+    "config": {
+      "closureCapable": true,
+      "path": "python/configs/ppo_bt93i_terminal_curriculum_repair.json",
+      "role": "BT93I repair config",
+      "sha256": "7477a19c0ab7ffc5c1f73d2dfc42cccea3379375f77a9389ba533990ec779f12"
+    },
+    "holdoutGuard": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/holdout_guard_report.json",
+      "role": "BT93I holdout guard",
+      "sha256": "c8aa666ac7a6818fb47e484ea1ec0c1b7f9a014dd6210f00e4e64e07a072cfe6"
+    },
+    "longRunReadiness": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/long_run_readiness_report.json",
+      "role": "BT93I long-run readiness",
+      "sha256": "d88387fc8323057b329981fb54b03a30b4ee2189abfeb0ed66058571599057d0"
+    },
+    "matrixManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_manifest.json",
+      "role": "BT93I matrix manifest",
+      "sha256": "4b159324c06d7f12a3ad8fd1b0e69dc907889bc8ab3a6c87e30f243b79a5c906"
+    },
+    "repairManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+      "role": "BT93I repair artifact manifest",
+      "sha256": "3468844a28aee30b038547b323c9360edc7ed9abe236c9bcbcec85dbeb8aa8b8"
+    },
+    "repairPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "role": "BT93I repair pointer",
+      "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be"
+    },
+    "repairTrainReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/training_report.json",
+      "role": "BT93I repair train",
+      "sha256": "f819b7d808b1694396112a41659bd2ae15a88b8fd7d082e45b8074a51b5928da"
+    },
+    "terminalProvocation": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/terminal_provocation_report.json",
+      "role": "BT93I terminal provocation",
+      "sha256": "79f57db04b1e715c0aaf9ab383934657de0d6f210e38b3ce8f7219a11191e51f"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "runId": "20260424T221741Z-diagnostics-smoke",
+  "runKind": "diagnostics-smoke",
+  "ok": true,
+  "report": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/training_report.json",
+  "artifactManifest": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/artifact_manifest.json",
+  "model": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/model.zip",
+  "vecnormalize": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/vecnormalize.pkl",
+  "optimizerState": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/optimizer_state.pt"
+}

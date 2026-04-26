@@ -1,0 +1,114 @@
+{
+  "ok": true,
+  "generatedAt": "2026-04-24T15:35:31.756992Z",
+  "generatedBy": "python/scripts/bt93c_audit_delta.py",
+  "blockId": "BT93C",
+  "phaseId": "93C.1.4",
+  "manifestVersion": "bt93c-baseline-source-v1",
+  "baselinePolicy": {
+    "singleActiveBaselineSource": true,
+    "oldNonPpoReportsExcludedAsPpoQuality": true,
+    "ppoBaselineExists": false,
+    "ppoBaselineBefore93C5": "blocked until 93C.3/93C.4 produce a real learner/eval path and 93C.5 publishes a candidate baseline bundle"
+  },
+  "comparisonAnchor": {
+    "baselineId": "bt93c-dqn-reference-bt11-final-20260324-v1",
+    "role": "DQN champion comparison anchor, not a PPO baseline",
+    "date": "2026-03-24",
+    "command": "npm run training:10h -- --series-stamp BT11_FIGHT_20260324T014853 --modes hunt-3d,hunt-2d --stop-on-fail false; npm run bot:validate",
+    "metrics": {
+      "avgStepsPerEpisode": 117.525,
+      "averageBotSurvival": 37.376986,
+      "invalidActionRate": 1.0,
+      "runtimeErrorCount": null
+    },
+    "seeds": {
+      "status": "not versioned in legacy BT11 evidence; 93C.6 must freeze a reproducible apples-to-apples matrix before comparison",
+      "bt93cReservedTrainSeeds": [
+        930,
+        931
+      ],
+      "bt93cReservedEvalSeeds": [
+        940,
+        941
+      ],
+      "bt93cReservedHoldoutSeeds": [
+        950,
+        951
+      ]
+    },
+    "modes": {
+      "trainingRun": [
+        "hunt-3d",
+        "hunt-2d"
+      ],
+      "botValidateScenarios": [
+        "classic-3d",
+        "classic-2d"
+      ]
+    },
+    "maps": [
+      "standard",
+      "maze"
+    ],
+    "semanticWindow": {
+      "dqnChampion": "BT11 legacy DQN champion window",
+      "bt93cLearner": "runtime-near-headless-v1",
+      "comparisonCaveat": "93C.6 must disclose any semantic drift before PPO/DQN comparison."
+    },
+    "artifactPaths": [
+      {
+        "path": "docs/tests/Testergebnisse_Phase4b_2026-03-24.md",
+        "versioned": true,
+        "role": "versioned rounded bot-validation survival summary"
+      },
+      {
+        "path": "docs/bot-training/Bot_Trainingsplan.md",
+        "versioned": true,
+        "role": "active plan stores exact BT11 checkpoint metrics"
+      },
+      {
+        "path": "output/training/BT11_FIGHT_20260324T014853-botvalidate-final-pass.log",
+        "versioned": false,
+        "role": "historical command log referenced by plan; not closure evidence by itself"
+      }
+    ],
+    "ppoBaselineEligible": false
+  },
+  "excludedSources": [
+    {
+      "path": "data/bot_validation_report.json",
+      "generatedAt": "2026-03-27",
+      "reason": "legacy non-PPO DQN validation report; current file points to 2026-03-27 and is not a PPO candidate or baseline-quality report"
+    },
+    {
+      "path": "tmp/**",
+      "reason": "local tmp output is never closure-capable survival evidence"
+    },
+    {
+      "path": "data/training/ppo/bt93b/**",
+      "reason": "BT93B is scaffold-only and contains no PPO optimizer update"
+    },
+    {
+      "path": "data/training/ppo/lane_baseline*.json",
+      "reason": "lane throughput/boot-step evidence only; not PPO survival baseline"
+    }
+  ],
+  "requiredBefore93C5": {
+    "baselineId": "bt93c-ppo-baseline-publish-v1",
+    "minimumFields": [
+      "avgStepsPerEpisode",
+      "averageBotSurvival",
+      "runtimeErrorCount",
+      "sanitizerRate",
+      "vetoRate",
+      "invalidActionRate",
+      "failureClasses",
+      "modelHash",
+      "configHash",
+      "matrixId"
+    ],
+    "publishCommand": "npm run bot:validate:publish with an explicit PPO candidate/eval bundle after 93C.3 and 93C.4",
+    "status": "not runnable in 93C-Audit-Delta"
+  }
+}

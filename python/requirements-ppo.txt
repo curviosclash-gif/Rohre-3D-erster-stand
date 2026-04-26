@@ -1,0 +1,10 @@
+# BT93C PPO dependency lane. Keep python/requirements.txt as the BT90 minimal bootstrap.
+stable-baselines3==2.3.2
+torch==2.3.1
+gymnasium==0.29.1
+numpy==1.26.4
+tensorboard==2.16.2
+rich==13.7.1
+cloudpickle==3.0.0
+packaging==24.1
+websockets==12.0

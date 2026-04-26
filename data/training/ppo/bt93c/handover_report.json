@@ -1,0 +1,410 @@
+{
+  "blockId": "BT93C",
+  "bt93dPhaseCoverage": {
+    "93D.4.1": true,
+    "93D.4.2": "pending bt94a_gate_check.py --write-report",
+    "93D.4.3": true,
+    "93D.4.4": true
+  },
+  "bt93dStartGate": {
+    "noBt94aCheckboxClosed": true,
+    "phaseId": "93D.4.1",
+    "resultClass": "diagnose-blocked",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "bt93eHandoverGate": {
+    "noBt94aCheckboxClosed": true,
+    "phaseId": "93E.5.1",
+    "resultClass": "diagnose-blocked",
+    "rewardSafetyEpisodeShortening": "still-blocking",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "bt93ePhaseCoverage": {
+    "93E.5.1": true,
+    "93E.5.2": "pending bt94a_gate_check.py --write-report",
+    "93E.5.3": true,
+    "93E.5.4": false
+  },
+  "bt93fHandoverGate": {
+    "noBt94aCheckboxClosed": true,
+    "phaseId": "93F.5.1",
+    "resultClass": "diagnose-blocked",
+    "rewardSafetyEpisodeShortening": "still-blocking",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "still-blocking",
+      "F.31": "still-blocking",
+      "R.01": "still-blocking"
+    }
+  },
+  "bt93fPhaseCoverage": {
+    "93F.5.1": true,
+    "93F.5.2": "pending bt94a_gate_check.py --write-report",
+    "93F.5.3": true,
+    "93F.5.4": false
+  },
+  "bt93gHandoverGate": {
+    "noBt94aCheckboxClosed": true,
+    "phaseId": "93G.6.1",
+    "resultClass": "diagnose-blocked",
+    "rewardSafetyEpisodeShortening": "closed",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.30": "closed-for-bt93g-repair-lane",
+      "F.31": "still-blocking",
+      "R.01": "closed-for-93g-repair-eval"
+    }
+  },
+  "bt93gPhaseCoverage": {
+    "93G.6.1": true,
+    "93G.6.2": "pending bt94a_gate_check.py --write-report",
+    "93G.6.3": true,
+    "93G.6.4": false
+  },
+  "bt93hHandoverGate": {
+    "noBt94aCheckboxClosed": true,
+    "phaseId": "93H.4.1",
+    "resultClass": "diagnose-blocked",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "bt93hPhaseCoverage": {
+    "93H.4.1": true,
+    "93H.4.2": "pending bt94a_gate_check.py --write-report",
+    "93H.4.3": true,
+    "93H.4.4": "not-applicable-red-gate"
+  },
+  "bt93iHandoverGate": {
+    "noBt94aCheckboxClosed": true,
+    "phaseId": "93I.5.1",
+    "resultClass": "diagnose-blocked",
+    "trackedFindings": {
+      "F.05": "still-blocking",
+      "F.19": "still-blocking",
+      "F.27": "still-blocking",
+      "F.31": "still-blocking"
+    }
+  },
+  "bt93iPhaseCoverage": {
+    "93I.5.1": true,
+    "93I.5.2": "pending bt94a_gate_check.py --write-report",
+    "93I.5.3": true,
+    "93I.5.4": "not-applicable-red-gate"
+  },
+  "bt94aHandover": {
+    "gate": "closed-diagnose-blocked-by-bt93i",
+    "ppoValidateStatus": "ppo-validate-missing-until-BT94B.3",
+    "precomparisonResult": "ppo-regression",
+    "promotionAllowed": false,
+    "ready": false,
+    "reason": "BT93I still has red start evidence; BT94A remains closed.",
+    "rolloutAllowed": false
+  },
+  "claim": "BT93I-BT94A-Gate-Refresh",
+  "currentHandoverSource": {
+    "blockId": "BT93I",
+    "fallbackUsed": false,
+    "phaseId": "93I.5",
+    "sourceArtifact": "data/training/ppo/bt93i/matrix_green_report.json"
+  },
+  "doDCoverage": {
+    "DoD.10": false,
+    "DoD.12": true,
+    "DoD.5": true,
+    "DoD.7": true,
+    "DoD.9": true
+  },
+  "evidenceQualityMatrix": {
+    "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+    "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
+  },
+  "generatedAt": "2026-04-25T19:23:10Z",
+  "generatedBy": "python/scripts/bt93i_gate_refresh_handover.py",
+  "gitSha": "14c90ba318df3f07936beb0445f5522e6f3f8e9a",
+  "guardrails": {
+    "candidateRun": false,
+    "fourEnvAllowed": false,
+    "freezeCandidate": false,
+    "isPromotionEvidence": false,
+    "isRolloutSignal": false,
+    "productiveRuntimeChanged": false,
+    "runtimeSurfacesTouched": []
+  },
+  "modelPackage": {
+    "artifactManifest": "data/training/ppo/bt93i/runs/20260425T151155Z-terminal-curriculum-repair/artifact_manifest.json",
+    "candidateRun": false,
+    "configSha256": "4d0d0d259e5e7eb97f2f6a9a54506140ea3334fd41368e32d6705674ff7abda7",
+    "freezeCandidate": false,
+    "gitSha": "cd432aba522c9384a9d5857ac9c454909f61fe9b",
+    "modelSha256": "d5feac5d84924bcf8433c7adc93360a294bcddf3a807a3ef0907fe67e67a3371",
+    "optimizerStateSha256": "2d561f8836c81d776cedc4db1dd3c243d1521a654d2052eba418bc5e79f712ef",
+    "promotionAllowed": false,
+    "runId": "20260425T151155Z-terminal-curriculum-repair",
+    "scaffoldOnly": false,
+    "truePpoModelPackage": true,
+    "vecnormalizeSha256": "c09be1e806986f68cf751afce67fe3fd710d7e1ac4b42002f83d2ee61df78a25"
+  },
+  "ok": true,
+  "phaseCoverage": {
+    "93C.7.1": true,
+    "93C.7.2": true,
+    "93C.7.3": true,
+    "93C.7.4": true
+  },
+  "phaseId": "93I.5.1",
+  "remainingGates": {
+    "bt94a": [
+      "F.05",
+      "F.19",
+      "F.27",
+      "F.31"
+    ],
+    "bt94bPpoValidate": "BT94B.3 remains mandatory before promote",
+    "runtimeRollout": "outside BT93I; no JS inference, strategy flag, registry, rollback, or latency proof here"
+  },
+  "reproducibility": {
+    "baselineEvalReport": "data/training/ppo/bt93c/runs/20260424T180054Z-baseline-eval/eval_report.json",
+    "baselineMetrics": {
+      "averageBotSurvival": 16.0,
+      "avgStepsPerEpisode": 16.0,
+      "deathCauseCounts": {},
+      "invalidActionRate": 0.0,
+      "maskRate": 1.0,
+      "runtimeErrorCount": 0,
+      "sanitizerRate": 0.0,
+      "terminalReasonCounts": {},
+      "truncatedReasonCounts": {
+        "max-steps": 2
+      },
+      "vetoRate": 0.84375
+    },
+    "command": "python\\.venv\\Scripts\\python.exe python\\eval.py --profile bt93c --run-kind baseline-repro-eval --phase-id 93C.7.1 --config python\\configs\\ppo_bt93c_baseline.json --checkpoint data\\training\\ppo\\bt93c\\runs\\20260424T180033Z-baseline-train\\artifact_manifest.json",
+    "deltas": {
+      "averageBotSurvivalAbs": 0.0,
+      "avgStepsPerEpisodeAbs": 0.0,
+      "rewardTotalAbs": 0.0
+    },
+    "interpretation": "same-config deterministic KPI repro",
+    "ok": true,
+    "reproEvalReport": "data/training/ppo/bt93c/runs/20260424T185232Z-baseline-repro-eval/eval_report.json",
+    "reproMetrics": {
+      "averageBotSurvival": 16.0,
+      "avgStepsPerEpisode": 16.0,
+      "deathCauseCounts": {},
+      "invalidActionRate": 0.0,
+      "maskRate": 1.0,
+      "runtimeErrorCount": 0,
+      "sanitizerRate": 0.0,
+      "terminalReasonCounts": {},
+      "truncatedReasonCounts": {
+        "max-steps": 2
+      },
+      "vetoRate": 0.5
+    },
+    "runId": "20260424T185232Z-baseline-repro-eval",
+    "runKind": "baseline-repro-eval",
+    "tolerance": {
+      "averageBotSurvivalAbs": 1e-06,
+      "avgStepsPerEpisodeAbs": 1e-06,
+      "rewardTotalAbs": 1e-06
+    }
+  },
+  "resultClass": "diagnose",
+  "sourceArtifacts": {
+    "baselineReport": {
+      "path": "data/training/ppo/bt93c/baseline_report.json",
+      "sha256": "3bdd65b5490de6e83df3779c7dba32f05a9aec1bf20b4a5d3d5d774642a29617"
+    },
+    "bt93dMinimumStartStatistics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/minimum_start_statistics.json",
+      "role": "BT93D minimum start statistics",
+      "sha256": "73053320a7b2982bb7de583f44d5c062857e7b8935919d05116e03a470dc317c"
+    },
+    "bt93dSurvivalRegression": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/survival_regression_report.json",
+      "role": "BT93D survival regression",
+      "sha256": "019bb8333a3e8c748fbad09e10d119c496a5595657b29fc57e97f65864a5b508"
+    },
+    "bt93dTerminalPolicyDiagnostics": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93d/terminal_policy_diagnostics.json",
+      "role": "BT93D terminal and policy diagnostics",
+      "sha256": "632995ae2f3f4bb7fdbd4e946395387aca2a0a7e5c92422cf7dadbd3a9e17a02"
+    },
+    "bt93eActionSurfaceHardening": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/action_surface_hardening_report.json",
+      "role": "BT93E action-surface hardening",
+      "sha256": "3ba768a8e4962b660e24287849f9693041258f08b4f78863bfa21969816ce1b4"
+    },
+    "bt93eFollowupGateReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/followup_gate_report.json",
+      "role": "BT93E followup gate report",
+      "sha256": "0a7987f1a9d394acb05f64d36d97af9df2476ad4e7cec6ff6b696cdd87002123"
+    },
+    "bt93eSurvivalRepair": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/survival_repair_report.json",
+      "role": "BT93E survival repair",
+      "sha256": "eff3b359dbab81fd65db186bd95d38f1fe5986ee254b62eb3c8be1b54e188b57"
+    },
+    "bt93eTerminalRewardFailure": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93e/terminal_reward_failure_report.json",
+      "role": "BT93E terminal/reward/failure diagnostics",
+      "sha256": "dadd3bd7ad8588c4962497f085565198576886e70439c5edebe3595c213bb706"
+    },
+    "bt93fActionSurfaceRepair": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/action_surface_repair_report.json",
+      "role": "BT93F action-surface repair",
+      "sha256": "07e01bc8a0ca551b1081caf3b283c6f62d96f4d7172c3e4978d9f1adb1e782ff"
+    },
+    "bt93fRepairDiagnostic": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/repair_diagnostic_report.json",
+      "role": "BT93F repair diagnostic",
+      "sha256": "8ccb7152fef248219a5a0e0a4d181ce2ddc24c0ac8c1eb6908a53991f7700a30"
+    },
+    "bt93fTerminalRewardFailure": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93f/terminal_reward_failure_report.json",
+      "role": "BT93F terminal/reward/failure diagnostics",
+      "sha256": "949a73fc46ed893549b7c3b1812c15902bc0d7f6f8de45ed0760d7fc5c95d211"
+    },
+    "bt93gActionMask": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/action_mask_report.json",
+      "role": "BT93G pre-sampling mask",
+      "sha256": "7a8ac47dd6ca79b0a9ae87f5cb10a091d59958d2cf3786d08cfdbd888bf05b9a"
+    },
+    "bt93gRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/repair_ladder_report.json",
+      "role": "BT93G repair ladder",
+      "sha256": "4b555e885d9ffefc3c725f7775930105e83569fd10d1480c40611afa45d19739"
+    },
+    "bt93gRewardGate": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93g/reward_gate_report.json",
+      "role": "BT93G reward gate",
+      "sha256": "f221e4bfb849bca314bc8873433b68b05d4debd84bbef8eee6aeb9b4c9db8f92"
+    },
+    "bt93hRepairLadder": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93h/repair_ladder_report.json",
+      "role": "BT93H repair ladder",
+      "sha256": "5032f14363e43a84df1399b9171b08d99ce997de97ed5f831416c87c0d4d0f2d"
+    },
+    "bt93iHoldoutGuard": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/holdout_guard_report.json",
+      "role": "BT93I holdout guard",
+      "sha256": "c8aa666ac7a6818fb47e484ea1ec0c1b7f9a014dd6210f00e4e64e07a072cfe6"
+    },
+    "bt93iLatestRepairPointer": {
+      "closureCapable": false,
+      "path": "data/training/ppo/bt93i/latest_terminal_curriculum_repair.json",
+      "role": "BT93I latest repair pointer",
+      "sha256": "10899e5a181fa0d5bd2c7bcaef21fca6c4437829815c83dc11199fe3010630be"
+    },
+    "bt93iLongRunReadiness": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/long_run_readiness_report.json",
+      "role": "BT93I long-run readiness",
+      "sha256": "d88387fc8323057b329981fb54b03a30b4ee2189abfeb0ed66058571599057d0"
+    },
+    "bt93iMatrixGreen": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_green_report.json",
+      "role": "BT93I matrix green report",
+      "sha256": "c664bdc5f716ed7575dd02c9adf7dd7d5bd2aed92c8e6932c0f546639a43d4fc"
+    },
+    "bt93iMatrixManifest": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/matrix_manifest.json",
+      "role": "BT93I matrix manifest",
+      "sha256": "4b159324c06d7f12a3ad8fd1b0e69dc907889bc8ab3a6c87e30f243b79a5c906"
+    },
+    "bt93iRepairReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/terminal_curriculum_repair_report.json",
+      "role": "BT93I terminal curriculum repair report",
+      "sha256": "75579bd77afa861d2ea23dd04b34c4833fc5d13e08cb4dfdfdb40857b7b6aaf9"
+    },
+    "bt93iStartTruth": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/start_truth.json",
+      "role": "BT93I start truth",
+      "sha256": "16efa0c95944b3f22c01aa4e1df69663978d77a20b9dd7a7e7555d9e13a1dc2c"
+    },
+    "bt93iTerminalProvocation": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93i/terminal_provocation_report.json",
+      "role": "BT93I terminal provocation",
+      "sha256": "79f57db04b1e715c0aaf9ab383934657de0d6f210e38b3ce8f7219a11191e51f"
+    },
+    "diagnosticsReport": {
+      "path": "data/training/ppo/bt93c/diagnostics_report.json",
+      "sha256": "661d4cd8508a6bcbf3d8decd282491a8bc2899710b5298fd26b70be5cbf42ea2"
+    },
+    "evidenceQualityMatrix": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/evidence_quality_matrix.json",
+      "role": "BT93I-refreshed evidence matrix",
+      "sha256": "f13a0aabbe8d2bfe0d6ad52e7f39ecc38a772018fd24a150b01cfcb85bbc2d11"
+    },
+    "precomparisonReport": {
+      "closureCapable": true,
+      "path": "data/training/ppo/bt93c/precomparison_report.json",
+      "role": "BT93I-refreshed precomparison",
+      "sha256": "7ff00d1c24d345642e521b76a89f7746a9d5dc0748adaeaa39f51caa12bcb1fb"
+    }
+  },
+  "v101FollowUp": {
+    "driftPaths": [],
+    "freezeCheck": {
+      "driftCount": 0,
+      "freezeOk": true,
+      "headCommit": "7b12c3960ff14cccd5663984b6f3eed9666fb3cb",
+      "path": "data/training/ppo/freeze_check.json",
+      "reAuditRequired": false
+    },
+    "resultClass": "no-ppo-contract-drift"
+  },
+  "worktreeRuntimeSurfaceStatus": {
+    "src/core/RuntimeConfig.js": "clean",
+    "src/entities/ai/ObservationBridgePolicy.js": "clean",
+    "src/entities/ai/actions/BotActionContract.js": "clean",
+    "src/entities/ai/hybrid/HybridDecisionArchitecture.js": "clean",
+    "src/entities/ai/observation/ObservationSchemaV2.js": "clean",
+    "src/entities/ai/observation/RuntimeNearObservationAdapter.js": "clean",
+    "src/entities/ai/training/TrainerPayloadAdapter.js": "clean",
+    "src/entities/ai/training/TrainingContractV1.js": "clean",
+    "src/state/training/RewardCalculator.js": "clean",
+    "src/state/training/TrainingDomain.js": "clean"
+  }
+}

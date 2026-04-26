@@ -1,0 +1,8 @@
+{
+  "runId": "20260425T114122Z-holdout-eval",
+  "runKind": "holdout-eval",
+  "ok": true,
+  "report": "data/training/ppo/bt93h/runs/20260425T114122Z-holdout-eval/eval_report.json",
+  "sourceArtifactManifest": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/artifact_manifest.json",
+  "sourceModel": "data/training/ppo/bt93h/runs/20260425T113941Z-comparable-terminal-repair/checkpoints/model.zip"
+}

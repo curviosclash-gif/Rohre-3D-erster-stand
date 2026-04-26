@@ -1,0 +1,8 @@
+{
+  "runId": "20260424T221840Z-baseline-repro-eval",
+  "runKind": "baseline-repro-eval",
+  "ok": true,
+  "report": "data/training/ppo/bt93e/runs/20260424T221840Z-baseline-repro-eval/eval_report.json",
+  "sourceArtifactManifest": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/artifact_manifest.json",
+  "sourceModel": "data/training/ppo/bt93e/runs/20260424T221741Z-diagnostics-smoke/checkpoints/model.zip"
+}

@@ -1,0 +1,69 @@
+{
+  "blockId": "BT93D",
+  "candidateFreezeAllowed": false,
+  "candidateRunsAllowed": false,
+  "claimChecks": [
+    {
+      "blocksStart": true,
+      "id": "bt93c_result_allows_bt94a",
+      "observed": "diagnose",
+      "ok": false,
+      "required": "not diagnose"
+    },
+    {
+      "blocksStart": true,
+      "id": "handover_gate_ready",
+      "observed": "closed-diagnose-ppo-regression",
+      "ok": false,
+      "required": "ready=true"
+    },
+    {
+      "blocksStart": true,
+      "id": "precomparison_not_regression",
+      "observed": "ppo-regression",
+      "ok": false,
+      "required": "not ppo-regression"
+    },
+    {
+      "blocksStart": true,
+      "id": "no_open_bt94a_audit_blockers",
+      "observed": 5,
+      "ok": false,
+      "required": 0
+    }
+  ],
+  "claimable": false,
+  "generatedAt": "2026-04-24T20:14:19Z",
+  "generatedBy": "python/scripts/bt93d_repair_manifest.py",
+  "gitSha": "040e6fc1d3eabde232585ef6db3479f0a52f2177",
+  "matrixDefinitionAllowed": false,
+  "ok": true,
+  "phaseId": "93D.1.1",
+  "pinnedClaimCheckIds": [
+    "bt93c_result_allows_bt94a",
+    "handover_gate_ready",
+    "precomparison_not_regression",
+    "no_open_bt94a_audit_blockers"
+  ],
+  "resultClass": "blocked-no-start",
+  "sourceGate": {
+    "closureCapable": true,
+    "path": "data/training/ppo/bt94a/no_start_gate.json",
+    "role": "fresh BT94A gate report",
+    "sha256": "c65192ac21c8e45df5c5a3de3d198182ab957d8b6f3da1c243fea7e36dafc7f1"
+  },
+  "startDecision": {
+    "allowedWork": [
+      "record gate status",
+      "carry blockers into plan/evidence"
+    ],
+    "forbiddenWork": [
+      "candidate training runs",
+      "freeze candidate creation",
+      "BT94B handover",
+      "promotion or rollout signal"
+    ],
+    "reason": "BT93C has a real model package and repro evidence, but the pre-comparison is ppo-regression and keeps BT94A closed.",
+    "status": "BT94A remains closed before 94A.1"
+  }
+}
