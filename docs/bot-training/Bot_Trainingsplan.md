@@ -277,7 +277,7 @@ Mikro-Claim-Regel:
 | Bot-Codex | BT93G | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`) |
 | Bot-Codex | BT93H | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked`; BT94A-Gate geschlossen) |
 | Bot-Codex | BT93I | 2026-04-25 | frei | 2026-04-25 (abgeschlossen; `diagnose-blocked-closed`; BT94A-Gate geschlossen) |
-| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.5a` abgeschlossen: R2=`same-red`; naechster User-owned Folgeclaim `93J.5b` Reward-/Curriculum-Proof-Lane, danach `93J.5c` 1000000-Step-Diagnose-Longrun; kein BT94A-Claim und kein Push vor Blockabschluss |
+| Bot-Codex | BT93J | 2026-04-26 | in-bearbeitung | `93J.5b` abgeschlossen: `readyForUserOwnedLongrun=true`; naechster User-owned Folgeclaim `93J.5c` 1000000-Step-Diagnose-Longrun; kein BT94A-Claim und kein Push vor Blockabschluss |
 | - | BT94A | - | frei | wartet auf `BT93J.99=BT94A-ready` und `data/training/ppo/bt94a/no_start_gate.json` (`claimable=true`) |
 | - | BT94B | - | frei | wartet auf BT94A.99; Externe A/B-Evidence und Urteilsdisziplin |
 | - | BT95 | - | frei | wartet auf BT94B `promote`; Integrations-Handoff |
@@ -784,7 +784,7 @@ Wichtig: Der Draft-Ordner bleibt Referenzmaterial; sobald einer dieser Bloecke g
 | BT93C | Echter PPO-Learner und konservative Baseline | completed | P2 | BT93B.99 + Audit-Haertung 2026-04-24 | 93C.99 abgeschlossen | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT102_PPO_Baseline_Training.md` |
 | BT93H | Natural-Terminal- und Survival-Reparatur | completed | P2 | BT93G.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93H.99 abgeschlossen; `diagnose-blocked` | `docs/plaene/neu/BT93H_Natural_Terminal_Survival_Reparatur_2026-04-25.md` |
 | BT93I | Terminal-Curriculum und Steps-Non-Regression Repair | completed | P2 | BT93H.99 (`diagnose-blocked`) + User-Intake 2026-04-25 | 93I.99 abgeschlossen; `diagnose-blocked-closed` | `docs/plaene/neu/BT93I_Terminal_Curriculum_Steps_NonRegression_Repair_2026-04-25.md` |
-| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.5a `same-red`; 93J.6 gesperrt | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
+| BT93J | Root-Cause-Blocker-Repair | active | P2 | BT93I.99 (`diagnose-blocked-closed`) + User-Intake 2026-04-25 + R2-Plananpassung 2026-04-26 | 93J.5b `readyForUserOwnedLongrun=true`; 93J.6 gesperrt bis 93J.5c | `docs/plaene/neu/BT93J_Root_Cause_Blocker_Repair_2026-04-25.md` |
 | BT94A | Candidate Freeze und Ablationen | planned | P2 | BT93J.99 + Gate `claimable=true` | gesperrt vor 94A.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT103_Hyperparameter_Curriculum_Candidate_Freeze.md` |
 | BT94B | Externe A/B-Evidence und Urteilsdisziplin | planned | P2 | BT94A.99 | 94B.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT104_AB_Validation_Promotion.md` |
 | BT95 | Integrations-Handoff und Rollout-Intake-Vorbereitung | planned | P3 | BT94B `promote` | 95.1 | `docs/plaene/neu/BT90_GoldStandard/bloecke/BT105_Integrations_Handoff_DQN_Sunset.md` |
@@ -2544,13 +2544,13 @@ Closure-Evidence je Blocker:
 
 ### 93J.5b Reward-/Curriculum-Proof-Lane fuer den Longrun-Beweis
 
-- [ ] 93J.5b.1 `r2_micro_train_counterprobe_report.json` und `reward_curriculum_diagnostics.json` als Startbefund pinnen: R2=`same-red`, `player-dead-only`, Eval `72.833333` Steps vs. DQN-Anker `117.525`, Reward-Breakdown `survival=61.2`, `loss=-9.0`, alle anderen Komponenten `0`.
-- [ ] 93J.5b.2 Reward/Curriculum nur trainingsnah und run-kind-gebunden umstrukturieren: staerkere Death-/Loss-Pressure, Terminal-Diversity-/Progress-Druck, Survival-Cap oder -Taper gegen passives Sterben, kein produktiver Runtime-/AI-Hub-/Matchstart-Touch.
-- [ ] 93J.5b.3 `scripts/training-headless-lane-runner.mjs`/PPO-Config nur so erweitern, dass der Proof-Longrun die neue Reward-/Curriculum-Lane deterministisch aktiviert; Default- und produktive Semantik bleiben unveraendert.
-- [ ] 93J.5b.4 Reward-Smoke schreiben: `player-dead-only` darf ohne Progress/Natural-Terminal nicht mehr netto-gruen werden; Natural-Terminal, Progress oder belegte Risikoreduktion muessen getrennt sichtbar belohnt werden.
-- [ ] 93J.5b.5 `reward_curriculum_proof_lane_report.json` schreiben mit alter/neuer Reward-Matrix, Beispiel-Episoden, erwarteter Wirkung, Hashes, Scope-Files und Risikoanalyse.
-- [ ] 93J.5b.6 `user_owned_1m_longrun_readiness_report.json` vorbereiten; `readyForUserOwnedLongrun=true` nur bei gruenem Reward-Smoke, Observation-/Action-Safety gruen, `runtimeErrorCount=0` und unveraenderten No-Go-Surfaces.
-- [ ] 93J.5b.7 Holdout bleibt unbenutzt; BT94A, Candidate, Freeze, Promote, Rollout und PPO-Validate bleiben geschlossen.
+- [x] 93J.5b.1 `r2_micro_train_counterprobe_report.json` und `reward_curriculum_diagnostics.json` als Startbefund pinnen: R2=`same-red`, `player-dead-only`, Eval `72.833333` Steps vs. DQN-Anker `117.525`, Reward-Breakdown `survival=61.2`, `loss=-9.0`, alle anderen Komponenten `0`. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_reward_curriculum_proof_lane.py --write-reports` -> `data/training/ppo/bt93j/reward_curriculum_proof_lane_report.json` (`phaseCoverage.93J.5b.1=true`))
+- [x] 93J.5b.2 Reward/Curriculum nur trainingsnah und run-kind-gebunden umstrukturieren: staerkere Death-/Loss-Pressure, Terminal-Diversity-/Progress-Druck, Survival-Cap oder -Taper gegen passives Sterben, kein produktiver Runtime-/AI-Hub-/Matchstart-Touch. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_reward_curriculum_proof_lane.py --write-reports` -> `data/training/ppo/bt93j/reward_curriculum_proof_lane_report.json` (`phaseCoverage.93J.5b.2=true`))
+- [x] 93J.5b.3 `scripts/training-headless-lane-runner.mjs`/PPO-Config nur so erweitern, dass der Proof-Longrun die neue Reward-/Curriculum-Lane deterministisch aktiviert; Default- und produktive Semantik bleiben unveraendert. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_reward_curriculum_proof_lane.py --write-reports` -> `data/training/ppo/bt93j/reward_curriculum_proof_lane_report.json` (`phaseCoverage.93J.5b.3=true`))
+- [x] 93J.5b.4 Reward-Smoke schreiben: `player-dead-only` darf ohne Progress/Natural-Terminal nicht mehr netto-gruen werden; Natural-Terminal, Progress oder belegte Risikoreduktion muessen getrennt sichtbar belohnt werden. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_reward_curriculum_proof_lane.py --write-reports` -> `data/training/ppo/bt93j/reward_curriculum_proof_lane_report.json` (`player_dead_only_is_net_negative=true`, `natural_terminal_is_separately_positive=true`, `progress_reward_is_separately_visible=true`))
+- [x] 93J.5b.5 `reward_curriculum_proof_lane_report.json` schreiben mit alter/neuer Reward-Matrix, Beispiel-Episoden, erwarteter Wirkung, Hashes, Scope-Files und Risikoanalyse. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_reward_curriculum_proof_lane.py --write-reports` -> `data/training/ppo/bt93j/reward_curriculum_proof_lane_report.json` (`resultClass=reward-curriculum-proof-lane-ready`))
+- [x] 93J.5b.6 `user_owned_1m_longrun_readiness_report.json` vorbereiten; `readyForUserOwnedLongrun=true` nur bei gruenem Reward-Smoke, Observation-/Action-Safety gruen, `runtimeErrorCount=0` und unveraenderten No-Go-Surfaces. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_reward_curriculum_proof_lane.py --write-reports` -> `data/training/ppo/bt93j/user_owned_1m_longrun_readiness_report.json` (`readyForUserOwnedLongrun=true`))
+- [x] 93J.5b.7 Holdout bleibt unbenutzt; BT94A, Candidate, Freeze, Promote, Rollout und PPO-Validate bleiben geschlossen. (abgeschlossen: 2026-04-26; evidence: `python\.venv\Scripts\python.exe python\scripts\bt93j_reward_curriculum_proof_lane.py --write-reports` -> `data/training/ppo/bt93j/user_owned_1m_longrun_readiness_report.json` (`holdoutUsed=false`, `candidateRun=false`, `bt94aGateRefresh=false`, `ppoValidateEvidence=false`))
 
 ### 93J.5c User-owned 1000000-Step Proof-Longrun
 
@@ -2624,7 +2624,7 @@ Claim-Grenze vor BT94A:
 Startstatus 2026-04-25:
 
 - `BT94A` bleibt vor `94A.1` geschlossen. (evidence: `data/training/ppo/bt94a/no_start_gate.json` (`resultClass=blocked-no-start`, `claimable=false`, `candidateRunsAllowed=false`, `matrixDefinitionAllowed=false`, `precomparison=ppo-regression`, `bt94aBlockerCount=4`, Blocker `F.05/F.19/F.27/F.31`))
-- Naechster erlaubter Diagnose-/Trainingsclaim vor BT94A ist `93J.5b Reward-/Curriculum-Proof-Lane`; danach folgt bei gruener Readiness der explizit user-owned `93J.5c 1000000-Step Proof-Longrun`. `93J.6` oeffnet nur bei `green-for-93J.6` aus 93J.5c. Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
+- Naechster erlaubter Diagnose-/Trainingsclaim vor BT94A ist der explizit user-owned `93J.5c 1000000-Step Proof-Longrun`, weil `93J.5b` `readyForUserOwnedLongrun=true` schreibt. `93J.6` oeffnet nur bei `green-for-93J.6` aus 93J.5c. Keine `94A.*`-Checkbox wird geschlossen, solange die Claim-Grenze rot ist; keine Kandidatenlaeufe, kein Freeze-Kandidat und kein BT94B-Handover.
 
 ### Definition of Done (DoD)
 
